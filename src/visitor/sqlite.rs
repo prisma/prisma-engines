@@ -119,14 +119,21 @@ mod tests {
 
     #[test]
     fn test_select_and() {
-        let expected_sql = "SELECT * FROM `naukio` WHERE (`word` = ? AND `age` = ?) LIMIT -1";
+        let expected_sql =
+            "SELECT * FROM `naukio` WHERE ((`word` = ? AND `age` < ?) AND `paw` = ?) LIMIT -1";
 
         let expected_params = vec![
             ParameterizedValue::Text(String::from("meow")),
-            ParameterizedValue::Integer(6),
+            ParameterizedValue::Integer(10),
+            ParameterizedValue::Text(String::from("warm")),
         ];
 
-        let query = Select::from("naukio").so_that("word".equals("meow").and("age".equals(6)));
+        let conditions = "word"
+            .equals("meow")
+            .and("age".less_than(10))
+            .and("paw".equals("warm"));
+
+        let query = Select::from("naukio").so_that(conditions);
 
         let (sql, params) = Sqlite::build(query);
 

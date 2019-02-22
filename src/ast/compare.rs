@@ -1,4 +1,4 @@
-use crate::ast::{Column, DatabaseValue, Row};
+use crate::ast::{And, Column, ConditionTree, DatabaseValue, Expression, Row};
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Compare {
@@ -12,6 +12,31 @@ pub enum Compare {
     NotIn(Box<DatabaseValue>, Box<Row>),
     Null(Box<DatabaseValue>),
     NotNull(Box<DatabaseValue>),
+}
+
+impl Into<ConditionTree> for Compare {
+    fn into(self) -> ConditionTree {
+        let expression: Expression = self.into();
+        ConditionTree::single(expression)
+    }
+}
+
+impl Into<Expression> for Compare {
+    fn into(self) -> Expression {
+        Expression::Compare(self)
+    }
+}
+
+impl And for Compare {
+    fn and<E>(self, other: E) -> ConditionTree
+    where
+        E: Into<Expression>,
+    {
+        let left: Expression = self.into();
+        let right: Expression = other.into();
+
+        ConditionTree::and(left, right)
+    }
 }
 
 pub trait Comparable {

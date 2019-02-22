@@ -1,4 +1,4 @@
-use crate::ast::{Compare, Expression};
+use crate::ast::Expression;
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum ConditionTree {
@@ -48,10 +48,29 @@ impl Default for ConditionTree {
     }
 }
 
-impl Into<ConditionTree> for Compare {
-    fn into(self) -> ConditionTree {
-        let expression: Expression = self.into();
-        ConditionTree::single(expression)
+impl Into<Expression> for ConditionTree {
+    fn into(self) -> Expression {
+        Expression::ConditionTree(self)
+    }
+}
+
+impl And for ConditionTree {
+    fn and<E>(self, other: E) -> ConditionTree
+    where
+        E: Into<Expression>,
+    {
+        let left: Expression = self.into();
+        left.and(other)
+    }
+}
+
+impl And for Expression {
+    fn and<E>(self, other: E) -> ConditionTree
+    where
+        E: Into<Expression>,
+    {
+        let right: Expression = other.into();
+        ConditionTree::and(self, right)
     }
 }
 
