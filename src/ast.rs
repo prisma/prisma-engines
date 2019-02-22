@@ -12,7 +12,7 @@ mod values;
 
 pub use column::Column;
 pub use compare::{Comparable, Compare};
-pub use conditions::ConditionTree;
+pub use conditions::{And, ConditionTree};
 pub use expression::Expression;
 pub use like::{Likable, Like, LikeType};
 pub use ordering::{Order, OrderDefinition, Orderable, Ordering};

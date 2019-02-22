@@ -137,7 +137,8 @@ macro_rules! comparable {
                 where
                     T: Into<DatabaseValue>,
                 {
-                    let val: DatabaseValue = self.into();
+                    let col: Column = self.into();
+                    let val: DatabaseValue = col.into();
                     val.equals(comparison)
                 }
 
@@ -146,7 +147,8 @@ macro_rules! comparable {
                 where
                     T: Into<DatabaseValue>,
                 {
-                    let val: DatabaseValue = self.into();
+                    let col: Column = self.into();
+                    let val: DatabaseValue = col.into();
                     val.not_equals(comparison)
                 }
 
@@ -155,7 +157,8 @@ macro_rules! comparable {
                 where
                     T: Into<DatabaseValue>,
                 {
-                    let val: DatabaseValue = self.into();
+                    let col: Column = self.into();
+                    let val: DatabaseValue = col.into();
                     val.less_than(comparison)
                 }
 
@@ -164,7 +167,8 @@ macro_rules! comparable {
                 where
                     T: Into<DatabaseValue>,
                 {
-                    let val: DatabaseValue = self.into();
+                    let col: Column = self.into();
+                    let val: DatabaseValue = col.into();
                     val.less_than_or_equals(comparison)
                 }
 
@@ -173,7 +177,8 @@ macro_rules! comparable {
                 where
                     T: Into<DatabaseValue>,
                 {
-                    let val: DatabaseValue = self.into();
+                    let col: Column = self.into();
+                    let val: DatabaseValue = col.into();
                     val.greater_than(comparison)
                 }
 
@@ -182,7 +187,8 @@ macro_rules! comparable {
                 where
                     T: Into<DatabaseValue>,
                 {
-                    let val: DatabaseValue = self.into();
+                    let col: Column = self.into();
+                    let val: DatabaseValue = col.into();
                     val.greater_than_or_equals(comparison)
                 }
 
@@ -191,7 +197,8 @@ macro_rules! comparable {
                 where
                     T: Into<DatabaseValue>,
                 {
-                    let val: DatabaseValue = self.into();
+                    let col: Column = self.into();
+                    let val: DatabaseValue = col.into();
                     val.in_selection(selection)
                 }
 
@@ -200,19 +207,22 @@ macro_rules! comparable {
                 where
                     T: Into<DatabaseValue>,
                 {
-                    let val: DatabaseValue = self.into();
+                    let col: Column = self.into();
+                    let val: DatabaseValue = col.into();
                     val.not_in_selection(selection)
                 }
 
                 #[inline]
                 fn is_null(self) -> Compare {
-                    let val: DatabaseValue = self.into();
+                    let col: Column = self.into();
+                    let val: DatabaseValue = col.into();
                     val.is_null()
                 }
 
                 #[inline]
                 fn is_not_null(self) -> Compare {
-                    let val: DatabaseValue = self.into();
+                    let col: Column = self.into();
+                    let val: DatabaseValue = col.into();
                     val.is_not_null()
                 }
             }
@@ -220,4 +230,4 @@ macro_rules! comparable {
     );
 }
 
-comparable!(&str, Row, Column, String, i64, f64, bool);
+comparable!(&str, (&str, &str, &str), (&str, &str));

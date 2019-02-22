@@ -102,4 +102,35 @@ mod tests {
         assert_eq!(expected_sql, sql);
         assert_eq!(Vec::<ParameterizedValue>::new(), params);
     }
+
+    #[test]
+    fn test_select_where_equals() {
+        let expected = expected_values(
+            "SELECT * FROM `naukio` WHERE `word` = ? LIMIT -1",
+            vec!["meow"],
+        );
+
+        let query = Select::from("naukio").so_that("word".equals("meow"));
+        let (sql, params) = Sqlite::build(query);
+
+        assert_eq!(expected.0, sql);
+        assert_eq!(expected.1, params);
+    }
+
+    #[test]
+    fn test_select_and() {
+        let expected_sql = "SELECT * FROM `naukio` WHERE (`word` = ? AND `age` = ?) LIMIT -1";
+
+        let expected_params = vec![
+            ParameterizedValue::Text(String::from("meow")),
+            ParameterizedValue::Integer(6),
+        ];
+
+        let query = Select::from("naukio").so_that("word".equals("meow").and("age".equals(6)));
+
+        let (sql, params) = Sqlite::build(query);
+
+        assert_eq!(expected_sql, sql);
+        assert_eq!(expected_params, params);
+    }
 }
