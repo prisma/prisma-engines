@@ -85,8 +85,8 @@ mod tests {
 
     #[test]
     fn test_select_star_from() {
-        let expected_sql = "SELECT * FROM `cat`.`musti` LIMIT -1";
-        let query = Select::from(("cat", "musti"));
+        let expected_sql = "SELECT * FROM `musti` LIMIT -1";
+        let query = Select::from("musti");
         let (sql, params) = Sqlite::build(query);
 
         assert_eq!(expected_sql, sql);
