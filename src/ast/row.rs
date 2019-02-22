@@ -1,8 +1,8 @@
-use crate::ast::ParameterizedValue;
+use crate::ast::DatabaseValue;
 
 #[derive(Debug, Default, PartialEq, Clone)]
 pub struct Row {
-    values: Vec<ParameterizedValue>,
+    pub values: Vec<DatabaseValue>,
 }
 
 impl Row {
@@ -12,7 +12,7 @@ impl Row {
 
     pub fn add<T>(mut self, value: T) -> Self
     where
-        T: Into<ParameterizedValue>,
+        T: Into<DatabaseValue>,
     {
         self.values.push(value.into());
         self
@@ -21,7 +21,7 @@ impl Row {
 
 impl<T> From<Vec<T>> for Row
 where
-    T: Into<ParameterizedValue>,
+    T: Into<DatabaseValue>,
 {
     fn from(vector: Vec<T>) -> Row {
         vector
@@ -32,8 +32,8 @@ where
 
 impl<A, B> From<(A, B)> for Row
 where
-    A: Into<ParameterizedValue>,
-    B: Into<ParameterizedValue>,
+    A: Into<DatabaseValue>,
+    B: Into<DatabaseValue>,
 {
     fn from(vals: (A, B)) -> Row {
         Row::new().add(vals.0).add(vals.1)
@@ -42,9 +42,9 @@ where
 
 impl<A, B, C> From<(A, B, C)> for Row
 where
-    A: Into<ParameterizedValue>,
-    B: Into<ParameterizedValue>,
-    C: Into<ParameterizedValue>,
+    A: Into<DatabaseValue>,
+    B: Into<DatabaseValue>,
+    C: Into<DatabaseValue>,
 {
     fn from(vals: (A, B, C)) -> Row {
         Row::new().add(vals.0).add(vals.1).add(vals.2)
@@ -53,10 +53,10 @@ where
 
 impl<A, B, C, D> From<(A, B, C, D)> for Row
 where
-    A: Into<ParameterizedValue>,
-    B: Into<ParameterizedValue>,
-    C: Into<ParameterizedValue>,
-    D: Into<ParameterizedValue>,
+    A: Into<DatabaseValue>,
+    B: Into<DatabaseValue>,
+    C: Into<DatabaseValue>,
+    D: Into<DatabaseValue>,
 {
     fn from(vals: (A, B, C, D)) -> Row {
         Row::new().add(vals.0).add(vals.1).add(vals.2).add(vals.3)
@@ -65,11 +65,11 @@ where
 
 impl<A, B, C, D, E> From<(A, B, C, D, E)> for Row
 where
-    A: Into<ParameterizedValue>,
-    B: Into<ParameterizedValue>,
-    C: Into<ParameterizedValue>,
-    D: Into<ParameterizedValue>,
-    E: Into<ParameterizedValue>,
+    A: Into<DatabaseValue>,
+    B: Into<DatabaseValue>,
+    C: Into<DatabaseValue>,
+    D: Into<DatabaseValue>,
+    E: Into<DatabaseValue>,
 {
     fn from(vals: (A, B, C, D, E)) -> Row {
         Row::new()

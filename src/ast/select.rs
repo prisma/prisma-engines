@@ -2,12 +2,12 @@ use crate::ast::{ConditionTree, DatabaseValue, OrderDefinition, Ordering, Query}
 
 #[derive(Debug, PartialEq, Clone, Default)]
 pub struct Select {
-    table: Option<String>,
-    columns: Vec<DatabaseValue>,
-    conditions: Option<ConditionTree>,
-    ordering: Ordering,
-    limit: Option<usize>,
-    offset: Option<usize>,
+    pub table: Option<String>,
+    pub columns: Vec<DatabaseValue>,
+    pub conditions: Option<ConditionTree>,
+    pub ordering: Ordering,
+    pub limit: Option<usize>,
+    pub offset: Option<usize>,
 }
 
 impl Into<DatabaseValue> for Select {

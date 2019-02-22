@@ -5,3 +5,4 @@ authors = ["Julius de Bruijn <bruijn@prisma.io>"]
 edition = "2018"
 
 [dependencies]
+sqlite = { version = "0.16", features = ["chrono"], package = 'rusqlite', optional = true }

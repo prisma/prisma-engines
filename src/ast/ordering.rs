@@ -1,12 +1,9 @@
-use crate::{
-    ast::DatabaseValue,
-    visitor::{Destination, Visitor},
-};
+use crate::ast::DatabaseValue;
 
 pub type OrderDefinition = (DatabaseValue, Option<Order>);
 
 #[derive(Debug, Default, PartialEq, Clone)]
-pub struct Ordering(Vec<OrderDefinition>);
+pub struct Ordering(pub Vec<OrderDefinition>);
 
 impl Ordering {
     #[doc(hidden)]
@@ -17,6 +14,10 @@ impl Ordering {
 
     pub fn new(values: Vec<OrderDefinition>) -> Self {
         Self(values)
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.0.is_empty()
     }
 }
 
@@ -38,11 +39,5 @@ where
 
     fn descend(self) -> OrderDefinition {
         self.order(Some(Order::Descending))
-    }
-}
-
-impl Destination for Ordering {
-    fn visit(&self, visitor: &mut Visitor) {
-        visitor.visit_ordering(self);
     }
 }

@@ -1,4 +1,4 @@
-use crate::ast::{Column, DatabaseValue, ParameterizedValue, Row};
+use crate::ast::{Column, DatabaseValue, Row};
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Compare {
@@ -8,8 +8,8 @@ pub enum Compare {
     LessThanOrEquals(Box<DatabaseValue>, Box<DatabaseValue>),
     GreaterThan(Box<DatabaseValue>, Box<DatabaseValue>),
     GreaterThanOrEquals(Box<DatabaseValue>, Box<DatabaseValue>),
-    In(Box<DatabaseValue>, Box<DatabaseValue>),
-    NotIn(Box<DatabaseValue>, Box<DatabaseValue>),
+    In(Box<DatabaseValue>, Box<Row>),
+    NotIn(Box<DatabaseValue>, Box<Row>),
     Null(Box<DatabaseValue>),
     NotNull(Box<DatabaseValue>),
 }
@@ -41,11 +41,11 @@ pub trait Comparable {
 
     fn in_selection<T>(self, selection: Vec<T>) -> Compare
     where
-        T: Into<ParameterizedValue>;
+        T: Into<DatabaseValue>;
 
     fn not_in_selection<T>(self, selection: Vec<T>) -> Compare
     where
-        T: Into<ParameterizedValue>;
+        T: Into<DatabaseValue>;
 
     fn is_null(self) -> Compare;
     fn is_not_null(self) -> Compare;
@@ -103,7 +103,7 @@ impl Comparable for DatabaseValue {
     #[inline]
     fn in_selection<T>(self, selection: Vec<T>) -> Compare
     where
-        T: Into<ParameterizedValue>,
+        T: Into<DatabaseValue>,
     {
         Compare::In(Box::new(self), Box::new(Row::from(selection).into()))
     }
@@ -111,7 +111,7 @@ impl Comparable for DatabaseValue {
     #[inline]
     fn not_in_selection<T>(self, selection: Vec<T>) -> Compare
     where
-        T: Into<ParameterizedValue>,
+        T: Into<DatabaseValue>,
     {
         Compare::NotIn(Box::new(self), Box::new(Row::from(selection).into()))
     }
@@ -189,7 +189,7 @@ macro_rules! comparable {
                 #[inline]
                 fn in_selection<T>(self, selection: Vec<T>) -> Compare
                 where
-                    T: Into<ParameterizedValue>,
+                    T: Into<DatabaseValue>,
                 {
                     let val: DatabaseValue = self.into();
                     val.in_selection(selection)
@@ -198,7 +198,7 @@ macro_rules! comparable {
                 #[inline]
                 fn not_in_selection<T>(self, selection: Vec<T>) -> Compare
                 where
-                    T: Into<ParameterizedValue>,
+                    T: Into<DatabaseValue>,
                 {
                     let val: DatabaseValue = self.into();
                     val.not_in_selection(selection)

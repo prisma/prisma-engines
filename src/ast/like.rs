@@ -1,4 +1,4 @@
-use crate::ast::{DatabaseValue, Expression};
+use crate::ast::Expression;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum LikeType {
@@ -12,13 +12,16 @@ pub enum LikeType {
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Like {
-    typ: LikeType,
-    expression: Expression,
-    value: DatabaseValue,
+    pub typ: LikeType,
+    pub expression: Expression,
+    pub value: String,
 }
 
 pub trait Likable {
-    fn create_like(typ: LikeType, expression: Expression, value: String) -> Like {
+    fn create_like<T>(typ: LikeType, expression: Expression, value: T) -> Like
+    where
+        T: Into<String>,
+    {
         Like {
             typ: typ,
             expression: expression,
