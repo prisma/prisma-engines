@@ -22,7 +22,7 @@ impl Visitor for Sqlite {
         }
 
         if let Some(table) = select.table {
-            result.push(format!("FROM {}", table));
+            result.push(format!("FROM {}", Self::visit_table(table)));
 
             if let Some(conditions) = select.conditions {
                 result.push(format!("WHERE {}", self.visit_conditions(conditions)));
@@ -62,15 +62,34 @@ impl Visitor for Sqlite {
 mod tests {
     use crate::visitor::*;
 
+    fn expected_values<T>(sql: &'static str, params: Vec<T>) -> (String, Vec<ParameterizedValue>)
+    where
+        T: Into<ParameterizedValue>,
+    {
+        (
+            String::from(sql),
+            params.into_iter().map(|p| p.into()).collect(),
+        )
+    }
+
     #[test]
     fn test_select_1() {
-        let expected_sql = "SELECT ?";
-        let expected_params: Vec<ParameterizedValue> = vec![1.into()];
+        let expected = expected_values("SELECT ?", vec![1]);
 
         let query = Select::default().column(1);
         let (sql, params) = Sqlite::build(query);
 
-        assert_eq!(expected_sql, &sql);
-        assert_eq!(expected_params, params);
+        assert_eq!(expected.0, sql);
+        assert_eq!(expected.1, params);
+    }
+
+    #[test]
+    fn test_select_star_from() {
+        let expected_sql = "SELECT * FROM `cat`.`musti` LIMIT -1";
+        let query = Select::from(("cat", "musti"));
+        let (sql, params) = Sqlite::build(query);
+
+        assert_eq!(expected_sql, sql);
+        assert_eq!(Vec::<ParameterizedValue>::new(), params);
     }
 }

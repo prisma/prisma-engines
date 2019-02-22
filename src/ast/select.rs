@@ -1,8 +1,8 @@
-use crate::ast::{ConditionTree, DatabaseValue, OrderDefinition, Ordering, Query};
+use crate::ast::{ConditionTree, DatabaseValue, OrderDefinition, Ordering, Query, Table};
 
 #[derive(Debug, PartialEq, Clone, Default)]
 pub struct Select {
-    pub table: Option<String>,
+    pub table: Option<Table>,
     pub columns: Vec<DatabaseValue>,
     pub conditions: Option<ConditionTree>,
     pub ordering: Ordering,
@@ -25,7 +25,7 @@ impl Into<Query> for Select {
 impl Select {
     pub fn from<T>(table: T) -> Self
     where
-        T: Into<String>,
+        T: Into<Table>,
     {
         Select {
             table: Some(table.into()),

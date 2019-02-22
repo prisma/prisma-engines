@@ -17,6 +17,16 @@ pub trait Visitor {
     where
         Q: Into<Query>;
 
+    fn delimited_identifiers(parts: Vec<String>) -> String {
+        let mut result = Vec::new();
+
+        for part in parts.into_iter() {
+            result.push(format!("{}{}{}", Self::C_QUOTE, part, Self::C_QUOTE));
+        }
+
+        result.join(".")
+    }
+
     fn visit_query(&mut self, query: Query) -> String {
         match query {
             Query::Select(select) => self.visit_select(select),
@@ -45,21 +55,22 @@ pub trait Visitor {
         }
     }
 
+    fn visit_table(table: Table) -> String {
+        if let Some(database) = table.database {
+            Self::delimited_identifiers(vec![database, table.name])
+        } else {
+            Self::delimited_identifiers(vec![table.name])
+        }
+    }
+
     fn visit_column(column: Column) -> String {
-        let format_parts = |parts: Vec<String>| {
-            let mut result = Vec::new();
-
-            for part in parts.into_iter() {
-                result.push(format!("{}{}{}", Self::C_QUOTE, part, Self::C_QUOTE));
-            }
-
-            result.join(".")
-        };
-
-        match (column.database, column.table) {
-            (Some(db), Some(table)) => format_parts(vec![db, table, column.name]),
-            (None, Some(table)) => format_parts(vec![table, column.name]),
-            _ => format_parts(vec![column.name]),
+        match column.table {
+            Some(table) => format!(
+                "{}.{}",
+                Self::visit_table(table),
+                Self::delimited_identifiers(vec![column.name])
+            ),
+            _ => Self::delimited_identifiers(vec![column.name]),
         }
     }
 

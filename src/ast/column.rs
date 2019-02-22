@@ -1,11 +1,10 @@
-use crate::ast::DatabaseValue;
+use crate::ast::{DatabaseValue, Table};
 
 /// A column definition.
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct Column {
     pub name: String,
-    pub table: Option<String>,
-    pub database: Option<String>,
+    pub table: Option<Table>,
 }
 
 impl Into<DatabaseValue> for Column {
@@ -27,19 +26,8 @@ impl Column {
         }
     }
 
-    pub fn table<S>(mut self, name: S) -> Self
-    where
-        S: Into<String>,
-    {
-        self.table = Some(name.into());
-        self
-    }
-
-    pub fn database<S>(mut self, name: S) -> Self
-    where
-        S: Into<String>,
-    {
-        self.database = Some(name.into());
+    pub fn table(mut self, table: Table) -> Self {
+        self.table = Some(table);
         self
     }
 }

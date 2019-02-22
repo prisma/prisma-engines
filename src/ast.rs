@@ -7,6 +7,7 @@ mod ordering;
 mod query;
 mod row;
 mod select;
+mod table;
 mod values;
 
 pub use column::Column;
@@ -18,4 +19,5 @@ pub use ordering::{Order, OrderDefinition, Orderable, Ordering};
 pub use query::Query;
 pub use row::Row;
 pub use select::Select;
+pub use table::*;
 pub use values::{DatabaseValue, ParameterizedValue};
