@@ -23,7 +23,7 @@ impl Into<Query> for Select {
 }
 
 impl Select {
-    pub fn new<T>(table: T) -> Self
+    pub fn from<T>(table: T) -> Self
     where
         T: Into<String>,
     {

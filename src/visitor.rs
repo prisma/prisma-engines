@@ -1,13 +1,21 @@
 use crate::ast::*;
 
 #[cfg(feature = "sqlite")]
-pub mod sqlite;
+mod sqlite;
+
+#[cfg(feature = "sqlite")]
+pub use self::sqlite::Sqlite;
 
 pub trait Visitor {
     const C_PARAM: &'static str;
     const C_QUOTE: &'static str;
 
     fn add_parameter(&mut self, value: ParameterizedValue);
+    fn visit_select(&mut self, select: Select) -> String;
+
+    fn build<Q>(query: Q) -> (String, Vec<ParameterizedValue>)
+    where
+        Q: Into<Query>;
 
     fn visit_query(&mut self, query: Query) -> String {
         match query {
@@ -193,7 +201,4 @@ pub trait Visitor {
 
         result.join(", ")
     }
-
-    fn visit_select(&mut self, select: Select) -> String;
-    fn build(self, query: Query) -> (String, Vec<ParameterizedValue>);
 }
