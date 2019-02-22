@@ -31,3 +31,30 @@ impl Column {
         self
     }
 }
+
+impl<'a> Into<Column> for &'a str {
+    fn into(self) -> Column {
+        Column {
+            name: self.to_string(),
+            table: None,
+        }
+    }
+}
+
+impl<'a, 'b> Into<Column> for (&'a str, &'b str) {
+    fn into(self) -> Column {
+        let mut column: Column = self.1.into();
+        column = column.table(self.0.into());
+
+        column
+    }
+}
+
+impl<'a, 'b, 'c> Into<Column> for (&'a str, &'b str, &'c str) {
+    fn into(self) -> Column {
+        let column: Column = self.2.into();
+        let table: Table = (self.0, self.1).into();
+
+        column.table(table)
+    }
+}

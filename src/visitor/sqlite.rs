@@ -76,7 +76,7 @@ mod tests {
     fn test_select_1() {
         let expected = expected_values("SELECT ?", vec![1]);
 
-        let query = Select::default().column(1);
+        let query = Select::default().value(1);
         let (sql, params) = Sqlite::build(query);
 
         assert_eq!(expected.0, sql);
@@ -87,6 +87,16 @@ mod tests {
     fn test_select_star_from() {
         let expected_sql = "SELECT * FROM `cat`.`musti` LIMIT -1";
         let query = Select::from(("cat", "musti"));
+        let (sql, params) = Sqlite::build(query);
+
+        assert_eq!(expected_sql, sql);
+        assert_eq!(Vec::<ParameterizedValue>::new(), params);
+    }
+
+    #[test]
+    fn test_select_fields_from() {
+        let expected_sql = "SELECT `paw`, `nose` FROM `cat`.`musti` LIMIT -1";
+        let query = Select::from(("cat", "musti")).column("paw").column("nose");
         let (sql, params) = Sqlite::build(query);
 
         assert_eq!(expected_sql, sql);

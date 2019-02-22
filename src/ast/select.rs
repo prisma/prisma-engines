@@ -1,4 +1,4 @@
-use crate::ast::{ConditionTree, DatabaseValue, OrderDefinition, Ordering, Query, Table};
+use crate::ast::*;
 
 #[derive(Debug, PartialEq, Clone, Default)]
 pub struct Select {
@@ -33,11 +33,19 @@ impl Select {
         }
     }
 
-    pub fn column<T>(mut self, column: T) -> Self
+    pub fn value<T>(mut self, value: T) -> Self
     where
         T: Into<DatabaseValue>,
     {
-        self.columns.push(column.into());
+        self.columns.push(value.into());
+        self
+    }
+
+    pub fn column<T>(mut self, column: T) -> Self
+    where
+        T: Into<Column>,
+    {
+        self.columns.push(column.into().into());
         self
     }
 

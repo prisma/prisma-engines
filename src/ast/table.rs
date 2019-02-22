@@ -4,6 +4,16 @@ pub struct Table {
     pub database: Option<String>,
 }
 
+impl Table {
+    pub fn database<T>(mut self, database: T) -> Self
+    where
+        T: Into<String>,
+    {
+        self.database = Some(database.into());
+        self
+    }
+}
+
 impl<'a> Into<Table> for &'a str {
     fn into(self) -> Table {
         Table {
@@ -15,9 +25,7 @@ impl<'a> Into<Table> for &'a str {
 
 impl<'a, 'b> Into<Table> for (&'a str, &'b str) {
     fn into(self) -> Table {
-        Table {
-            name: self.1.to_string(),
-            database: Some(self.0.to_string()),
-        }
+        let table: Table = self.1.into();
+        table.database(self.0)
     }
 }
