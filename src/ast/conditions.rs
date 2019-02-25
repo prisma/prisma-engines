@@ -1,12 +1,19 @@
 use crate::ast::{Conjuctive, Expression};
 
+/// Tree structures and leaves for condition building.
 #[derive(Debug, PartialEq, Clone)]
 pub enum ConditionTree {
+    /// `(left_expression AND right_expression)`
     And(Box<Expression>, Box<Expression>),
+    /// `(left_expression OR right_expression)`
     Or(Box<Expression>, Box<Expression>),
+    /// `(NOT expression)`
     Not(Box<Expression>),
+    /// A single expression leaf
     Single(Box<Expression>),
+    /// A leaf that does nothing to the condition, `1=1`
     NoCondition,
+    /// A leaf that cancels the condition, `1=0`
     NegativeCondition,
 }
 

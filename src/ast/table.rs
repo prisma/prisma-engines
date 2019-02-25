@@ -1,3 +1,4 @@
+/// A table definition
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct Table {
     pub name: String,
@@ -5,6 +6,7 @@ pub struct Table {
 }
 
 impl Table {
+    /// Define in which database the table is located
     pub fn database<T>(mut self, database: T) -> Self
     where
         T: Into<String>,

@@ -1,25 +1,39 @@
 use crate::ast::{Column, ConditionTree, Conjuctive, DatabaseValue, Expression, Row};
 
+/// A comparison expression
 #[derive(Debug, Clone, PartialEq)]
 pub enum Compare {
+    /// `left = right`
     Equals(Box<DatabaseValue>, Box<DatabaseValue>),
+    /// `left <> right`
     NotEquals(Box<DatabaseValue>, Box<DatabaseValue>),
+    /// `left < right`
     LessThan(Box<DatabaseValue>, Box<DatabaseValue>),
+    /// `left <= right`
     LessThanOrEquals(Box<DatabaseValue>, Box<DatabaseValue>),
+    /// `left > right`
     GreaterThan(Box<DatabaseValue>, Box<DatabaseValue>),
+    /// `left >= right`
     GreaterThanOrEquals(Box<DatabaseValue>, Box<DatabaseValue>),
-
+    /// `left IN (..)`
     In(Box<DatabaseValue>, Box<Row>),
-
+    /// `left NOT IN (..)`
     NotIn(Box<DatabaseValue>, Box<Row>),
+    /// `left LIKE %..%`
     Like(Box<DatabaseValue>, String),
+    /// `left NOT LIKE %..%`
     NotLike(Box<DatabaseValue>, String),
+    /// `left LIKE ..%`
     BeginsWith(Box<DatabaseValue>, String),
+    /// `left NOT LIKE ..%`
     NotBeginsWith(Box<DatabaseValue>, String),
+    /// `left LIKE %..`
     EndsInto(Box<DatabaseValue>, String),
+    /// `left NOT LIKE %..`
     NotEndsInto(Box<DatabaseValue>, String),
-
+    /// `value IS NULL`
     Null(Box<DatabaseValue>),
+    /// `value IS NOT NULL`
     NotNull(Box<DatabaseValue>),
 }
 
@@ -62,6 +76,7 @@ impl Conjuctive for Compare {
     }
 }
 
+/// An item that can be compared against other values in the database.
 pub trait Comparable {
     /// Tests if both sides are the same value.
     ///

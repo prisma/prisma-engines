@@ -1,19 +1,30 @@
 use crate::ast::{Column, Comparable, Compare, Row, Select};
 
+/// A value we must parameterize for the prepared statement.
 #[derive(Debug, Clone, PartialEq)]
 pub enum ParameterizedValue {
+    /// A database null
     Null,
+    /// An integer value
     Integer(i64),
+    /// A floating point value
     Real(f64),
+    /// A string value
     Text(String),
+    /// a boolean value
     Boolean(bool),
 }
 
+/// A value we can compare and use in database queries.
 #[derive(Debug, Clone, PartialEq)]
 pub enum DatabaseValue {
+    /// Anything that we must parameterize before querying
     Parameterized(ParameterizedValue),
+    /// A database column
     Column(Column),
+    /// Data in a row form, e.g. (1, 2, 3)
     Row(Row),
+    /// A nested `SELECT` statement
     Select(Select),
 }
 

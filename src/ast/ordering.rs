@@ -2,6 +2,7 @@ use crate::ast::{Column, DatabaseValue};
 
 pub type OrderDefinition = (DatabaseValue, Option<Order>);
 
+/// A list of definitions for the `ORDER BY` statement
 #[derive(Debug, Default, PartialEq, Clone)]
 pub struct Ordering(pub Vec<OrderDefinition>);
 
@@ -21,27 +22,35 @@ impl Ordering {
     }
 }
 
+/// The ordering direction
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum Order {
+    /// Ascending
     Asc,
+    /// Descending
     Desc,
 }
 
+/// An item that can be used in the `ORDER BY` statement
 pub trait Orderable
 where
     Self: Sized,
 {
+    /// Order by `self` in the given order
     fn order(self, order: Option<Order>) -> OrderDefinition;
 
+    /// Change the order to `ASC`
     fn ascend(self) -> OrderDefinition {
         self.order(Some(Order::Asc))
     }
 
+    /// Change the order to `DESC`
     fn descend(self) -> OrderDefinition {
         self.order(Some(Order::Desc))
     }
 }
 
+/// Convert the value into an order definition with order item and direction
 pub trait IntoOrderDefinition {
     fn into_order_definition(self) -> OrderDefinition;
 }

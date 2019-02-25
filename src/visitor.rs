@@ -6,18 +6,32 @@ mod sqlite;
 #[cfg(feature = "rusqlite")]
 pub use self::sqlite::Sqlite;
 
+/// A function travelling through the query AST, building the final query string
+/// and gathering parameters sent to the database together with the query.
 pub trait Visitor {
+    /// Parameter character when parameterizing values in the query.
     const C_PARAM: &'static str;
+    /// Quote character to surround identifiers, such as column and table names.
     const C_QUOTE: &'static str;
 
+    /// Convert the given `Query` to an SQL string and a vector of parameters.
+    /// When certain parameters are replaced with the `C_PARAM` character in the
+    /// query, the vector should contain the parameter value in the right position.
     fn build<Q>(query: Q) -> (String, Vec<ParameterizedValue>)
     where
         Q: Into<Query>;
 
+    /// When called, the visitor decided to not render the parameter into the query,
+    /// replacing it with the `C_PARAM`, calling `add_parameter` with the replaced value.
     fn add_parameter(&mut self, value: ParameterizedValue);
+
+    /// The `LIMIT` statement in the query
     fn visit_limit(&mut self, limit: Option<usize>) -> String;
+
+    /// The `OFFSET` statement in the query
     fn visit_offset(&mut self, offset: usize) -> String;
 
+    /// A walk through a `SELECT` statement
     fn visit_select(&mut self, select: Select) -> String {
         let mut result = vec!["SELECT".to_string()];
 
@@ -47,6 +61,18 @@ pub trait Visitor {
         result.join(" ")
     }
 
+    /// A helper for delimiting an identifier, surrounding every part with `C_QUOTE`
+    /// and delimiting the values with a `.`
+    ///
+    /// ```rust
+    /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # fn main() {
+    /// assert_eq!(
+    ///     "`a`.`b`",
+    ///     Sqlite::delimited_identifiers(vec!["a".to_string(), "b".to_string()])
+    /// );
+    /// # }
+    /// ```
     fn delimited_identifiers(parts: Vec<String>) -> String {
         let mut result = Vec::new();
 
@@ -57,12 +83,14 @@ pub trait Visitor {
         result.join(".")
     }
 
+    /// A walk through a complete `Query` statement
     fn visit_query(&mut self, query: Query) -> String {
         match query {
             Query::Select(select) => self.visit_select(select),
         }
     }
 
+    /// The selected columns
     fn visit_columns(&mut self, columns: Vec<DatabaseValue>) -> String {
         let mut values = Vec::new();
 
@@ -73,6 +101,7 @@ pub trait Visitor {
         values.join(", ")
     }
 
+    /// A visit to a value used in an expression
     fn visit_database_value(&mut self, value: DatabaseValue) -> String {
         match value {
             DatabaseValue::Parameterized(val) => {
@@ -85,6 +114,7 @@ pub trait Visitor {
         }
     }
 
+    /// A database table identifier
     fn visit_table(table: Table) -> String {
         if let Some(database) = table.database {
             Self::delimited_identifiers(vec![database, table.name])
@@ -93,6 +123,7 @@ pub trait Visitor {
         }
     }
 
+    /// A database column identifier
     fn visit_column(column: Column) -> String {
         match column.table {
             Some(table) => format!(
@@ -104,6 +135,7 @@ pub trait Visitor {
         }
     }
 
+    /// A row of data used as an expression
     fn visit_row(&mut self, row: Row) -> String {
         let mut values = Vec::new();
 
@@ -114,6 +146,7 @@ pub trait Visitor {
         format!("({})", values.join(", "))
     }
 
+    /// A walk through the query conditions
     fn visit_conditions(&mut self, tree: ConditionTree) -> String {
         match tree {
             ConditionTree::And(left, right) => format!(
@@ -135,6 +168,8 @@ pub trait Visitor {
         }
     }
 
+    /// An expression that can either be a single value, a set of conditions or
+    /// a comparison call
     fn visit_expression(&mut self, expression: Expression) -> String {
         match expression {
             Expression::Value(value) => self.visit_database_value(value),
@@ -143,6 +178,7 @@ pub trait Visitor {
         }
     }
 
+    /// A comparison expression
     fn visit_compare(&mut self, compare: Compare) -> String {
         match compare {
             Compare::Equals(left, right) => format!(
@@ -222,6 +258,7 @@ pub trait Visitor {
         }
     }
 
+    /// A visit in the `ORDER BY` section of the query
     fn visit_ordering(&mut self, ordering: Ordering) -> String {
         let mut result = Vec::new();
 
