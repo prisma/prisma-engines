@@ -11,11 +11,41 @@ pub trait Visitor {
     const C_QUOTE: &'static str;
 
     fn add_parameter(&mut self, value: ParameterizedValue);
-    fn visit_select(&mut self, select: Select) -> String;
 
     fn build<Q>(query: Q) -> (String, Vec<ParameterizedValue>)
     where
         Q: Into<Query>;
+
+    fn visit_select(&mut self, select: Select) -> String {
+        let mut result = vec!["SELECT".to_string()];
+
+        if select.columns.is_empty() {
+            result.push(String::from("*"));
+        } else {
+            result.push(format!("{}", self.visit_columns(select.columns)));
+        }
+
+        if let Some(table) = select.table {
+            result.push(format!("FROM {}", Self::visit_table(table)));
+
+            if let Some(conditions) = select.conditions {
+                result.push(format!("WHERE {}", self.visit_conditions(conditions)));
+            }
+            if !select.ordering.is_empty() {
+                result.push(format!("ORDER BY {}", self.visit_ordering(select.ordering)));
+            }
+            if let Some(limit) = select.limit {
+                result.push(format!("LIMIT {}", limit));
+            } else {
+                result.push(format!("LIMIT {}", -1));
+            }
+            if let Some(offset) = select.offset {
+                result.push(format!("OFFSET {}", offset));
+            }
+        }
+
+        result.join(" ")
+    }
 
     fn delimited_identifiers(parts: Vec<String>) -> String {
         let mut result = Vec::new();
@@ -110,7 +140,6 @@ pub trait Visitor {
             Expression::Value(value) => self.visit_database_value(value),
             Expression::ConditionTree(tree) => self.visit_conditions(tree),
             Expression::Compare(compare) => self.visit_compare(compare),
-            Expression::Like(like) => self.visit_like(*like),
         }
     }
 
@@ -156,40 +185,39 @@ pub trait Visitor {
                 self.visit_database_value(*left),
                 self.visit_row(*right),
             ),
+            Compare::Like(left, right) => {
+                let expression = self.visit_database_value(*left);
+                self.add_parameter(ParameterizedValue::Text(format!("%{}%", right)));
+                format!("{} LIKE ?", expression)
+            }
+            Compare::NotLike(left, right) => {
+                let expression = self.visit_database_value(*left);
+                self.add_parameter(ParameterizedValue::Text(format!("%{}%", right)));
+                format!("{} NOT LIKE ?", expression)
+            }
+            Compare::BeginsWith(left, right) => {
+                let expression = self.visit_database_value(*left);
+                self.add_parameter(ParameterizedValue::Text(format!("{}%", right)));
+                format!("{} LIKE ?", expression)
+            }
+            Compare::NotBeginsWith(left, right) => {
+                let expression = self.visit_database_value(*left);
+                self.add_parameter(ParameterizedValue::Text(format!("{}%", right)));
+                format!("{} NOT LIKE ?", expression)
+            }
+            Compare::EndsInto(left, right) => {
+                let expression = self.visit_database_value(*left);
+                self.add_parameter(ParameterizedValue::Text(format!("%{}", right)));
+                format!("{} LIKE ?", expression)
+            }
+            Compare::NotEndsInto(left, right) => {
+                let expression = self.visit_database_value(*left);
+                self.add_parameter(ParameterizedValue::Text(format!("%{}", right)));
+                format!("{} NOT LIKE ?", expression)
+            }
             Compare::Null(column) => format!("{} IS NULL", self.visit_database_value(*column)),
             Compare::NotNull(column) => {
                 format!("{} IS NOT NULL", self.visit_database_value(*column))
-            }
-        }
-    }
-
-    fn visit_like(&mut self, like: Like) -> String {
-        let expression = self.visit_expression(like.expression);
-
-        match like.typ {
-            LikeType::Like => {
-                self.add_parameter(ParameterizedValue::Text(format!("%{}%", like.value)));
-                format!("{} LIKE ?", expression)
-            }
-            LikeType::NotLike => {
-                self.add_parameter(ParameterizedValue::Text(format!("%{}%", like.value)));
-                format!("{} NOT LIKE ?", expression)
-            }
-            LikeType::StartsWith => {
-                self.add_parameter(ParameterizedValue::Text(format!("{}%", like.value)));
-                format!("{} LIKE ?", expression)
-            }
-            LikeType::NotStartsWith => {
-                self.add_parameter(ParameterizedValue::Text(format!("{}%", like.value)));
-                format!("{} NOT LIKE ?", expression)
-            }
-            LikeType::EndsWith => {
-                self.add_parameter(ParameterizedValue::Text(format!("%{}", like.value)));
-                format!("{} LIKE ?", expression)
-            }
-            LikeType::NotEndsWith => {
-                self.add_parameter(ParameterizedValue::Text(format!("%{}", like.value)));
-                format!("{} NOT LIKE ?", expression)
             }
         }
     }

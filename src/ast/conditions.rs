@@ -1,4 +1,4 @@
-use crate::ast::Expression;
+use crate::ast::{Conjuctive, Expression};
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum ConditionTree {
@@ -54,7 +54,7 @@ impl Into<Expression> for ConditionTree {
     }
 }
 
-impl And for ConditionTree {
+impl Conjuctive for ConditionTree {
     fn and<E>(self, other: E) -> ConditionTree
     where
         E: Into<Expression>,
@@ -62,9 +62,22 @@ impl And for ConditionTree {
         let left: Expression = self.into();
         left.and(other)
     }
+
+    fn or<E>(self, other: E) -> ConditionTree
+    where
+        E: Into<Expression>,
+    {
+        let left: Expression = self.into();
+        left.or(other)
+    }
+
+    fn not(self) -> ConditionTree {
+        let exp: Expression = self.into();
+        exp.not()
+    }
 }
 
-impl And for Expression {
+impl Conjuctive for Expression {
     fn and<E>(self, other: E) -> ConditionTree
     where
         E: Into<Expression>,
@@ -72,10 +85,16 @@ impl And for Expression {
         let right: Expression = other.into();
         ConditionTree::and(self, right)
     }
-}
 
-pub trait And {
-    fn and<E>(self, other: E) -> ConditionTree
+    fn or<E>(self, other: E) -> ConditionTree
     where
-        E: Into<Expression>;
+        E: Into<Expression>,
+    {
+        let right: Expression = other.into();
+        ConditionTree::or(self, right)
+    }
+
+    fn not(self) -> ConditionTree {
+        ConditionTree::not(self)
+    }
 }

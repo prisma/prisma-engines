@@ -1,8 +1,8 @@
 mod column;
 mod compare;
 mod conditions;
+mod conjuctive;
 mod expression;
-mod like;
 mod ordering;
 mod query;
 mod row;
@@ -12,9 +12,9 @@ mod values;
 
 pub use column::Column;
 pub use compare::{Comparable, Compare};
-pub use conditions::{And, ConditionTree};
+pub use conditions::ConditionTree;
+pub use conjuctive::Conjuctive;
 pub use expression::Expression;
-pub use like::{Likable, Like, LikeType};
 pub use ordering::{Order, OrderDefinition, Orderable, Ordering};
 pub use query::Query;
 pub use row::Row;

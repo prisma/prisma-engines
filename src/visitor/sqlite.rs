@@ -17,37 +17,6 @@ impl Visitor for Sqlite {
         self.parameters.push(value);
     }
 
-    fn visit_select(&mut self, select: Select) -> String {
-        let mut result = vec!["SELECT".to_string()];
-
-        if select.columns.is_empty() {
-            result.push(String::from("*"));
-        } else {
-            result.push(format!("{}", self.visit_columns(select.columns)));
-        }
-
-        if let Some(table) = select.table {
-            result.push(format!("FROM {}", Self::visit_table(table)));
-
-            if let Some(conditions) = select.conditions {
-                result.push(format!("WHERE {}", self.visit_conditions(conditions)));
-            }
-            if !select.ordering.is_empty() {
-                result.push(format!("ORDER BY {}", self.visit_ordering(select.ordering)));
-            }
-            if let Some(limit) = select.limit {
-                result.push(format!("LIMIT {}", limit));
-            } else {
-                result.push(format!("LIMIT {}", -1));
-            }
-            if let Some(offset) = select.offset {
-                result.push(format!("OFFSET {}", offset));
-            }
-        }
-
-        result.join(" ")
-    }
-
     fn build<Q>(query: Q) -> (String, Vec<ParameterizedValue>)
     where
         Q: Into<Query>,
@@ -137,6 +106,90 @@ mod tests {
     }
 
     #[test]
+    fn test_select_where_like() {
+        let expected = expected_values(
+            "SELECT * FROM `naukio` WHERE `word` LIKE ? LIMIT -1",
+            vec!["%meow%"],
+        );
+
+        let query = Select::from("naukio").so_that("word".like("meow"));
+        let (sql, params) = Sqlite::build(query);
+
+        assert_eq!(expected.0, sql);
+        assert_eq!(expected.1, params);
+    }
+
+    #[test]
+    fn test_select_where_not_like() {
+        let expected = expected_values(
+            "SELECT * FROM `naukio` WHERE `word` NOT LIKE ? LIMIT -1",
+            vec!["%meow%"],
+        );
+
+        let query = Select::from("naukio").so_that("word".not_like("meow"));
+        let (sql, params) = Sqlite::build(query);
+
+        assert_eq!(expected.0, sql);
+        assert_eq!(expected.1, params);
+    }
+
+    #[test]
+    fn test_select_where_begins_with() {
+        let expected = expected_values(
+            "SELECT * FROM `naukio` WHERE `word` LIKE ? LIMIT -1",
+            vec!["meow%"],
+        );
+
+        let query = Select::from("naukio").so_that("word".begins_with("meow"));
+        let (sql, params) = Sqlite::build(query);
+
+        assert_eq!(expected.0, sql);
+        assert_eq!(expected.1, params);
+    }
+
+    #[test]
+    fn test_select_where_not_begins_with() {
+        let expected = expected_values(
+            "SELECT * FROM `naukio` WHERE `word` NOT LIKE ? LIMIT -1",
+            vec!["meow%"],
+        );
+
+        let query = Select::from("naukio").so_that("word".not_begins_with("meow"));
+        let (sql, params) = Sqlite::build(query);
+
+        assert_eq!(expected.0, sql);
+        assert_eq!(expected.1, params);
+    }
+
+    #[test]
+    fn test_select_where_ends_into() {
+        let expected = expected_values(
+            "SELECT * FROM `naukio` WHERE `word` LIKE ? LIMIT -1",
+            vec!["%meow"],
+        );
+
+        let query = Select::from("naukio").so_that("word".ends_into("meow"));
+        let (sql, params) = Sqlite::build(query);
+
+        assert_eq!(expected.0, sql);
+        assert_eq!(expected.1, params);
+    }
+
+    #[test]
+    fn test_select_where_not_ends_into() {
+        let expected = expected_values(
+            "SELECT * FROM `naukio` WHERE `word` NOT LIKE ? LIMIT -1",
+            vec!["%meow"],
+        );
+
+        let query = Select::from("naukio").so_that("word".not_ends_into("meow"));
+        let (sql, params) = Sqlite::build(query);
+
+        assert_eq!(expected.0, sql);
+        assert_eq!(expected.1, params);
+    }
+
+    #[test]
     fn test_select_and() {
         let expected_sql =
             "SELECT * FROM `naukio` WHERE ((`word` = ? AND `age` < ?) AND `paw` = ?) LIMIT -1";
@@ -151,6 +204,78 @@ mod tests {
             .equals("meow")
             .and("age".less_than(10))
             .and("paw".equals("warm"));
+
+        let query = Select::from("naukio").so_that(conditions);
+
+        let (sql, params) = Sqlite::build(query);
+
+        assert_eq!(expected_sql, sql);
+        assert_eq!(expected_params, params);
+    }
+
+    #[test]
+    fn test_select_and_different_execution_order() {
+        let expected_sql =
+            "SELECT * FROM `naukio` WHERE (`word` = ? AND (`age` < ? AND `paw` = ?)) LIMIT -1";
+
+        let expected_params = vec![
+            ParameterizedValue::Text(String::from("meow")),
+            ParameterizedValue::Integer(10),
+            ParameterizedValue::Text(String::from("warm")),
+        ];
+
+        let conditions = "word"
+            .equals("meow")
+            .and("age".less_than(10).and("paw".equals("warm")));
+
+        let query = Select::from("naukio").so_that(conditions);
+
+        let (sql, params) = Sqlite::build(query);
+
+        assert_eq!(expected_sql, sql);
+        assert_eq!(expected_params, params);
+    }
+
+    #[test]
+    fn test_select_or() {
+        let expected_sql =
+            "SELECT * FROM `naukio` WHERE ((`word` = ? OR `age` < ?) AND `paw` = ?) LIMIT -1";
+
+        let expected_params = vec![
+            ParameterizedValue::Text(String::from("meow")),
+            ParameterizedValue::Integer(10),
+            ParameterizedValue::Text(String::from("warm")),
+        ];
+
+        let conditions = "word"
+            .equals("meow")
+            .or("age".less_than(10))
+            .and("paw".equals("warm"));
+
+        let query = Select::from("naukio").so_that(conditions);
+
+        let (sql, params) = Sqlite::build(query);
+
+        assert_eq!(expected_sql, sql);
+        assert_eq!(expected_params, params);
+    }
+
+    #[test]
+    fn test_select_negation() {
+        let expected_sql =
+            "SELECT * FROM `naukio` WHERE (NOT ((`word` = ? OR `age` < ?) AND `paw` = ?)) LIMIT -1";
+
+        let expected_params = vec![
+            ParameterizedValue::Text(String::from("meow")),
+            ParameterizedValue::Integer(10),
+            ParameterizedValue::Text(String::from("warm")),
+        ];
+
+        let conditions = "word"
+            .equals("meow")
+            .or("age".less_than(10))
+            .and("paw".equals("warm"))
+            .not();
 
         let query = Select::from("naukio").so_that(conditions);
 

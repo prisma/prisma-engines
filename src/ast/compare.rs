@@ -1,4 +1,4 @@
-use crate::ast::{And, Column, ConditionTree, DatabaseValue, Expression, Row};
+use crate::ast::{Column, ConditionTree, Conjuctive, DatabaseValue, Expression, Row};
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Compare {
@@ -8,8 +8,17 @@ pub enum Compare {
     LessThanOrEquals(Box<DatabaseValue>, Box<DatabaseValue>),
     GreaterThan(Box<DatabaseValue>, Box<DatabaseValue>),
     GreaterThanOrEquals(Box<DatabaseValue>, Box<DatabaseValue>),
+
     In(Box<DatabaseValue>, Box<Row>),
+
     NotIn(Box<DatabaseValue>, Box<Row>),
+    Like(Box<DatabaseValue>, String),
+    NotLike(Box<DatabaseValue>, String),
+    BeginsWith(Box<DatabaseValue>, String),
+    NotBeginsWith(Box<DatabaseValue>, String),
+    EndsInto(Box<DatabaseValue>, String),
+    NotEndsInto(Box<DatabaseValue>, String),
+
     Null(Box<DatabaseValue>),
     NotNull(Box<DatabaseValue>),
 }
@@ -27,7 +36,7 @@ impl Into<Expression> for Compare {
     }
 }
 
-impl And for Compare {
+impl Conjuctive for Compare {
     fn and<E>(self, other: E) -> ConditionTree
     where
         E: Into<Expression>,
@@ -36,6 +45,20 @@ impl And for Compare {
         let right: Expression = other.into();
 
         ConditionTree::and(left, right)
+    }
+
+    fn or<E>(self, other: E) -> ConditionTree
+    where
+        E: Into<Expression>,
+    {
+        let left: Expression = self.into();
+        let right: Expression = other.into();
+
+        ConditionTree::or(left, right)
+    }
+
+    fn not(self) -> ConditionTree {
+        ConditionTree::not(self)
     }
 }
 
@@ -71,6 +94,30 @@ pub trait Comparable {
     fn not_in_selection<T>(self, selection: Vec<T>) -> Compare
     where
         T: Into<DatabaseValue>;
+
+    fn like<T>(self, pattern: T) -> Compare
+    where
+        T: Into<String>;
+
+    fn not_like<T>(self, pattern: T) -> Compare
+    where
+        T: Into<String>;
+
+    fn begins_with<T>(self, pattern: T) -> Compare
+    where
+        T: Into<String>;
+
+    fn not_begins_with<T>(self, pattern: T) -> Compare
+    where
+        T: Into<String>;
+
+    fn ends_into<T>(self, pattern: T) -> Compare
+    where
+        T: Into<String>;
+
+    fn not_ends_into<T>(self, pattern: T) -> Compare
+    where
+        T: Into<String>;
 
     fn is_null(self) -> Compare;
     fn is_not_null(self) -> Compare;
@@ -139,6 +186,54 @@ impl Comparable for DatabaseValue {
         T: Into<DatabaseValue>,
     {
         Compare::NotIn(Box::new(self), Box::new(Row::from(selection).into()))
+    }
+
+    #[inline]
+    fn like<T>(self, pattern: T) -> Compare
+    where
+        T: Into<String>,
+    {
+        Compare::Like(Box::new(self), pattern.into())
+    }
+
+    #[inline]
+    fn not_like<T>(self, pattern: T) -> Compare
+    where
+        T: Into<String>,
+    {
+        Compare::NotLike(Box::new(self), pattern.into())
+    }
+
+    #[inline]
+    fn begins_with<T>(self, pattern: T) -> Compare
+    where
+        T: Into<String>,
+    {
+        Compare::BeginsWith(Box::new(self), pattern.into())
+    }
+
+    #[inline]
+    fn not_begins_with<T>(self, pattern: T) -> Compare
+    where
+        T: Into<String>,
+    {
+        Compare::NotBeginsWith(Box::new(self), pattern.into())
+    }
+
+    #[inline]
+    fn ends_into<T>(self, pattern: T) -> Compare
+    where
+        T: Into<String>,
+    {
+        Compare::EndsInto(Box::new(self), pattern.into())
+    }
+
+    #[inline]
+    fn not_ends_into<T>(self, pattern: T) -> Compare
+    where
+        T: Into<String>,
+    {
+        Compare::NotEndsInto(Box::new(self), pattern.into())
     }
 
     #[inline]
@@ -235,6 +330,66 @@ macro_rules! comparable {
                     let col: Column = self.into();
                     let val: DatabaseValue = col.into();
                     val.not_in_selection(selection)
+                }
+
+                #[inline]
+                fn like<T>(self, pattern: T) -> Compare
+                where
+                    T: Into<String>
+                {
+                    let col: Column = self.into();
+                    let val: DatabaseValue = col.into();
+                    val.like(pattern)
+                }
+
+                #[inline]
+                fn not_like<T>(self, pattern: T) -> Compare
+                where
+                    T: Into<String>
+                {
+                    let col: Column = self.into();
+                    let val: DatabaseValue = col.into();
+                    val.not_like(pattern)
+                }
+
+                #[inline]
+                fn begins_with<T>(self, pattern: T) -> Compare
+                where
+                    T: Into<String>
+                {
+                    let col: Column = self.into();
+                    let val: DatabaseValue = col.into();
+                    val.begins_with(pattern)
+                }
+
+                #[inline]
+                fn not_begins_with<T>(self, pattern: T) -> Compare
+                where
+                    T: Into<String>
+                {
+                    let col: Column = self.into();
+                    let val: DatabaseValue = col.into();
+                    val.not_begins_with(pattern)
+                }
+
+                #[inline]
+                fn ends_into<T>(self, pattern: T) -> Compare
+                where
+                    T: Into<String>
+                {
+                    let col: Column = self.into();
+                    let val: DatabaseValue = col.into();
+                    val.ends_into(pattern)
+                }
+
+                #[inline]
+                fn not_ends_into<T>(self, pattern: T) -> Compare
+                where
+                    T: Into<String>
+                {
+                    let col: Column = self.into();
+                    let val: DatabaseValue = col.into();
+                    val.not_ends_into(pattern)
                 }
 
                 #[inline]
