@@ -97,5 +97,5 @@
 //! In some cases we want to build a `ConditionTree` manually from the input,
 //! e.g. with an `Into<ConditionTree>` trait. In these cases it is easier to
 //! build the conditions as a tree.
-mod ast;
-mod visitor;
+pub mod ast;
+pub mod visitor;
