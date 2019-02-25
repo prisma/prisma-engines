@@ -13,10 +13,6 @@ impl Visitor for Sqlite {
     const C_PARAM: &'static str = "?";
     const C_QUOTE: &'static str = "`";
 
-    fn add_parameter(&mut self, value: ParameterizedValue) {
-        self.parameters.push(value);
-    }
-
     fn build<Q>(query: Q) -> (String, Vec<ParameterizedValue>)
     where
         Q: Into<Query>,
@@ -29,6 +25,22 @@ impl Visitor for Sqlite {
             Sqlite::visit_query(&mut sqlite, query.into()),
             sqlite.parameters,
         )
+    }
+
+    fn add_parameter(&mut self, value: ParameterizedValue) {
+        self.parameters.push(value);
+    }
+
+    fn visit_limit(&mut self, limit: Option<usize>) -> String {
+        if let Some(limit) = limit {
+            format!("LIMIT {}", limit)
+        } else {
+            format!("LIMIT {}", -1)
+        }
+    }
+
+    fn visit_offset(&mut self, offset: usize) -> String {
+        format!("OFFSET {}", offset)
     }
 }
 

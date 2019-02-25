@@ -10,11 +10,13 @@ pub trait Visitor {
     const C_PARAM: &'static str;
     const C_QUOTE: &'static str;
 
-    fn add_parameter(&mut self, value: ParameterizedValue);
-
     fn build<Q>(query: Q) -> (String, Vec<ParameterizedValue>)
     where
         Q: Into<Query>;
+
+    fn add_parameter(&mut self, value: ParameterizedValue);
+    fn visit_limit(&mut self, limit: Option<usize>) -> String;
+    fn visit_offset(&mut self, offset: usize) -> String;
 
     fn visit_select(&mut self, select: Select) -> String {
         let mut result = vec!["SELECT".to_string()];
@@ -34,13 +36,11 @@ pub trait Visitor {
             if !select.ordering.is_empty() {
                 result.push(format!("ORDER BY {}", self.visit_ordering(select.ordering)));
             }
-            if let Some(limit) = select.limit {
-                result.push(format!("LIMIT {}", limit));
-            } else {
-                result.push(format!("LIMIT {}", -1));
-            }
+
+            result.push(self.visit_limit(select.limit));
+
             if let Some(offset) = select.offset {
-                result.push(format!("OFFSET {}", offset));
+                result.push(self.visit_offset(offset));
             }
         }
 
