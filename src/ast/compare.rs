@@ -608,3 +608,4 @@ macro_rules! comparable {
 }
 
 comparable!(&str, (&str, &str, &str), (&str, &str));
+comparable!(String, (String, String, String), (String, String));
