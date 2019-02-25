@@ -41,11 +41,11 @@
 //!         .and("paw".equals("warm"));
 //!
 //!     let query = Select::from("naukio").so_that(conditions);
-//!     let (sql, params) = Sqlite::build(query);
+//!     let (sql_str, params) = Sqlite::build(query);
 //!
 //!     assert_eq!(
-//!         "SELECT * FROM `naukio` WHERE (`word` = ? AND (`age` < ? AND `paw` = ?)) LIMIT -1",
-//!         sql,
+//!         "SELECT * FROM `naukio` WHERE ((`word` = ? AND `age` < ?) AND `paw` = ?) LIMIT -1",
+//!         sql_str,
 //!     );
 //!
 //!     assert_eq!(
@@ -53,8 +53,8 @@
 //!             ParameterizedValue::Text(String::from("meow")),
 //!             ParameterizedValue::Integer(10),
 //!             ParameterizedValue::Text(String::from("warm")),
-//!         ]
-//!         params,
+//!         ],
+//!         params
 //!     );
 //! }
 //! ```
@@ -70,16 +70,16 @@
 //! use prisma_query::{ast::*, visitor::*};
 //!
 //! fn main() {
-//!     let conditions = ConditionTree::not(ConditionTree::and(
+//!     let conditions = ConditionTree::and(
 //!         ConditionTree::or("word".equals("meow"), "age".less_than(10)),
 //!         "paw".equals("warm"),
-//!     ));
+//!     );
 //!
 //!     let query = Select::from("naukio").so_that(conditions);
 //!     let (sql, params) = Sqlite::build(query);
 //!
 //!     assert_eq!(
-//!         "SELECT * FROM `naukio` WHERE (`word` = ? AND (`age` < ? AND `paw` = ?)) LIMIT -1",
+//!         "SELECT * FROM `naukio` WHERE ((`word` = ? OR `age` < ?) AND `paw` = ?) LIMIT -1",
 //!         sql,
 //!     );
 //!
@@ -88,8 +88,8 @@
 //!             ParameterizedValue::Text(String::from("meow")),
 //!             ParameterizedValue::Integer(10),
 //!             ParameterizedValue::Text(String::from("warm")),
-//!         ]
-//!         params,
+//!         ],
+//!         params
 //!     );
 //! }
 //! ```

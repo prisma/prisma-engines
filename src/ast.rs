@@ -15,7 +15,7 @@ pub use compare::{Comparable, Compare};
 pub use conditions::ConditionTree;
 pub use conjuctive::Conjuctive;
 pub use expression::Expression;
-pub use ordering::{Order, OrderDefinition, Orderable, Ordering};
+pub use ordering::{IntoOrderDefinition, Order, OrderDefinition, Orderable, Ordering};
 pub use query::Query;
 pub use row::Row;
 pub use select::Select;

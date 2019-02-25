@@ -62,8 +62,11 @@ impl Select {
         self
     }
 
-    pub fn order_by<T>(mut self, value: OrderDefinition) -> Self {
-        self.ordering = self.ordering.append(value);
+    pub fn order_by<T>(mut self, value: T) -> Self
+    where
+        T: IntoOrderDefinition,
+    {
+        self.ordering = self.ordering.append(value.into_order_definition());
         self
     }
 

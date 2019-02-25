@@ -227,8 +227,8 @@ pub trait Visitor {
 
         for (value, ordering) in ordering.0.into_iter() {
             let direction = ordering.map(|dir| match dir {
-                Order::Ascending => " ASC",
-                Order::Descending => " DESC",
+                Order::Asc => " ASC",
+                Order::Desc => " DESC",
             });
 
             result.push(format!(

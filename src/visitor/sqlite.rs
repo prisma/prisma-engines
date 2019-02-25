@@ -94,6 +94,19 @@ mod tests {
     }
 
     #[test]
+    fn test_select_order_by() {
+        let expected_sql = "SELECT * FROM `musti` ORDER BY `foo`, `baz` ASC, `bar` DESC LIMIT -1";
+        let query = Select::from("musti")
+            .order_by("foo")
+            .order_by("baz".ascend())
+            .order_by("bar".descend());
+        let (sql, params) = Sqlite::build(query);
+
+        assert_eq!(expected_sql, sql);
+        assert_eq!(Vec::<ParameterizedValue>::new(), params);
+    }
+
+    #[test]
     fn test_select_fields_from() {
         let expected_sql = "SELECT `paw`, `nose` FROM `cat`.`musti` LIMIT -1";
         let query = Select::from(("cat", "musti")).column("paw").column("nose");
