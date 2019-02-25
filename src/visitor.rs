@@ -1,9 +1,9 @@
 use crate::ast::*;
 
-#[cfg(feature = "sqlite")]
+#[cfg(feature = "rusqlite")]
 mod sqlite;
 
-#[cfg(feature = "sqlite")]
+#[cfg(feature = "rusqlite")]
 pub use self::sqlite::Sqlite;
 
 pub trait Visitor {

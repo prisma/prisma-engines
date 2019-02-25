@@ -1,5 +1,10 @@
 use crate::{ast::*, visitor::Visitor};
 
+use rusqlite::{
+    types::{Null, ToSql, ToSqlOutput},
+    Error as RusqlError,
+};
+
 pub struct Sqlite {
     parameters: Vec<ParameterizedValue>,
 }
@@ -55,6 +60,20 @@ impl Visitor for Sqlite {
             Sqlite::visit_query(&mut sqlite, query.into()),
             sqlite.parameters,
         )
+    }
+}
+
+impl ToSql for ParameterizedValue {
+    fn to_sql(&self) -> Result<ToSqlOutput, RusqlError> {
+        let value = match self {
+            ParameterizedValue::Null => ToSqlOutput::from(Null),
+            ParameterizedValue::Integer(integer) => ToSqlOutput::from(*integer),
+            ParameterizedValue::Real(float) => ToSqlOutput::from(*float),
+            ParameterizedValue::Text(string) => ToSqlOutput::from(string.clone()),
+            ParameterizedValue::Boolean(boo) => ToSqlOutput::from(*boo),
+        };
+
+        Ok(value)
     }
 }
 
