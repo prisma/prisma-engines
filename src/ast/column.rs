@@ -58,3 +58,30 @@ impl<'a, 'b, 'c> Into<Column> for (&'a str, &'b str, &'c str) {
         column.table(table)
     }
 }
+
+impl Into<Column> for String {
+    fn into(self) -> Column {
+        Column {
+            name: self,
+            table: None,
+        }
+    }
+}
+
+impl Into<Column> for (String, String) {
+    fn into(self) -> Column {
+        let mut column: Column = self.1.into();
+        column = column.table(self.0.into());
+
+        column
+    }
+}
+
+impl Into<Column> for (String, String, String) {
+    fn into(self) -> Column {
+        let column: Column = self.2.into();
+        let table: Table = (self.0, self.1).into();
+
+        column.table(table)
+    }
+}

@@ -29,3 +29,19 @@ impl<'a, 'b> Into<Table> for (&'a str, &'b str) {
         table.database(self.0)
     }
 }
+
+impl Into<Table> for String {
+    fn into(self) -> Table {
+        Table {
+            name: self,
+            database: None,
+        }
+    }
+}
+
+impl Into<Table> for (String, String) {
+    fn into(self) -> Table {
+        let table: Table = self.1.into();
+        table.database(self.0)
+    }
+}
