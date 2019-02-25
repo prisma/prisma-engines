@@ -296,4 +296,28 @@ mod tests {
         assert_eq!(expected_sql, sql);
         assert_eq!(expected_params, params);
     }
+
+    #[test]
+    fn test_with_raw_condition_tree() {
+        let expected_sql =
+            "SELECT * FROM `naukio` WHERE (NOT ((`word` = ? OR `age` < ?) AND `paw` = ?)) LIMIT -1";
+
+        let expected_params = vec![
+            ParameterizedValue::Text(String::from("meow")),
+            ParameterizedValue::Integer(10),
+            ParameterizedValue::Text(String::from("warm")),
+        ];
+
+        let conditions = ConditionTree::not(ConditionTree::and(
+            ConditionTree::or("word".equals("meow"), "age".less_than(10)),
+            "paw".equals("warm"),
+        ));
+
+        let query = Select::from("naukio").so_that(conditions);
+
+        let (sql, params) = Sqlite::build(query);
+
+        assert_eq!(expected_sql, sql);
+        assert_eq!(expected_params, params);
+    }
 }
