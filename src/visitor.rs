@@ -19,8 +19,8 @@ pub use self::sqlite::Sqlite;
 pub trait Visitor {
     /// Parameter character when parameterizing values in the query.
     const C_PARAM: &'static str;
-    /// Quote character to surround identifiers, such as column and table names.
-    const C_QUOTE: &'static str;
+    /// Backtick character to surround identifiers, such as column and table names.
+    const C_BACKTICK: &'static str;
     /// Wildcard character to be used in `LIKE` queries.
     const C_WILDCARD: &'static str;
 
@@ -71,7 +71,7 @@ pub trait Visitor {
         result.join(" ")
     }
 
-    /// A helper for delimiting an identifier, surrounding every part with `C_QUOTE`
+    /// A helper for delimiting an identifier, surrounding every part with `C_BACKTICK`
     /// and delimiting the values with a `.`
     ///
     /// ```rust
@@ -87,7 +87,7 @@ pub trait Visitor {
         let mut result = Vec::new();
 
         for part in parts.into_iter() {
-            result.push(format!("{}{}{}", Self::C_QUOTE, part, Self::C_QUOTE));
+            result.push(format!("{}{}{}", Self::C_BACKTICK, part, Self::C_BACKTICK));
         }
 
         result.join(".")
