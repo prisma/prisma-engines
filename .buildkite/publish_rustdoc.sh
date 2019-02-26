@@ -5,6 +5,7 @@ shopt -s globstar
 
 docker run -w /build -v $(pwd):/build prismagraphql/rust-build:latest cargo rustdoc
 
+rm -rf deploy_docs
 git clone --branch gh-pages "git@github.com:prisma/prisma-query.git" deploy_docs
 rm -rf deploy_docs/*
 cd deploy_docs
