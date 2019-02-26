@@ -2,13 +2,17 @@
 
 set -e
 
+echo $(pwd)
+
 pipeline=$(printf "
 steps:
     - label: \":rust: Cargo test\"
-      command: cd .. && docker run -w /build -v $(pwd):/build prismagraphql/rust-build:latest cargo test
+      command: docker run -w /build -v $(pwd):/build prismagraphql/rust-build:latest cargo test
+
+    - wait
 
     - label: \":rust: Publish Rustdoc\"
-      command: cd .. && ./.buildkite/publish_rustdoc.sh
+      command: ./.buildkite/publish_rustdoc.sh
       branches: master
 ")
 
