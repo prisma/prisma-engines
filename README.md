@@ -10,7 +10,7 @@ for production use in the current form.
 
 ### Documentation
 
-- [Master](http://query.prisma.io/)
+- [Master](https://prisma.github.io/prisma-query/prisma_query/index.html)
 
 ### Goals:
 
