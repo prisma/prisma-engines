@@ -8,10 +8,10 @@
 //! For prelude, all important imports are in `prisma_query::visitor::*`;
 use crate::ast::*;
 
-#[cfg(feature = "rusqlite")]
+#[cfg(feature = "sqlite")]
 mod sqlite;
 
-#[cfg(feature = "rusqlite")]
+#[cfg(feature = "sqlite")]
 pub use self::sqlite::Sqlite;
 
 /// A function travelling through the query AST, building the final query string
@@ -21,6 +21,8 @@ pub trait Visitor {
     const C_PARAM: &'static str;
     /// Quote character to surround identifiers, such as column and table names.
     const C_QUOTE: &'static str;
+    /// Wildcard character to be used in `LIKE` queries.
+    const C_WILDCARD: &'static str;
 
     /// Convert the given `Query` to an SQL string and a vector of parameters.
     /// When certain parameters are replaced with the `C_PARAM` character in the
@@ -231,32 +233,58 @@ pub trait Visitor {
             ),
             Compare::Like(left, right) => {
                 let expression = self.visit_database_value(*left);
-                self.add_parameter(ParameterizedValue::Text(format!("%{}%", right)));
+                self.add_parameter(ParameterizedValue::Text(format!(
+                    "{}{}{}",
+                    Self::C_WILDCARD,
+                    right,
+                    Self::C_WILDCARD
+                )));
                 format!("{} LIKE ?", expression)
             }
             Compare::NotLike(left, right) => {
                 let expression = self.visit_database_value(*left);
-                self.add_parameter(ParameterizedValue::Text(format!("%{}%", right)));
+                self.add_parameter(ParameterizedValue::Text(format!(
+                    "{}{}{}",
+                    Self::C_WILDCARD,
+                    right,
+                    Self::C_WILDCARD
+                )));
                 format!("{} NOT LIKE ?", expression)
             }
             Compare::BeginsWith(left, right) => {
                 let expression = self.visit_database_value(*left);
-                self.add_parameter(ParameterizedValue::Text(format!("{}%", right)));
+                self.add_parameter(ParameterizedValue::Text(format!(
+                    "{}{}",
+                    right,
+                    Self::C_WILDCARD
+                )));
                 format!("{} LIKE ?", expression)
             }
             Compare::NotBeginsWith(left, right) => {
                 let expression = self.visit_database_value(*left);
-                self.add_parameter(ParameterizedValue::Text(format!("{}%", right)));
+                self.add_parameter(ParameterizedValue::Text(format!(
+                    "{}{}",
+                    right,
+                    Self::C_WILDCARD
+                )));
                 format!("{} NOT LIKE ?", expression)
             }
             Compare::EndsInto(left, right) => {
                 let expression = self.visit_database_value(*left);
-                self.add_parameter(ParameterizedValue::Text(format!("%{}", right)));
+                self.add_parameter(ParameterizedValue::Text(format!(
+                    "{}{}",
+                    Self::C_WILDCARD,
+                    right
+                )));
                 format!("{} LIKE ?", expression)
             }
             Compare::NotEndsInto(left, right) => {
                 let expression = self.visit_database_value(*left);
-                self.add_parameter(ParameterizedValue::Text(format!("%{}", right)));
+                self.add_parameter(ParameterizedValue::Text(format!(
+                    "{}{}",
+                    Self::C_WILDCARD,
+                    right
+                )));
                 format!("{} NOT LIKE ?", expression)
             }
             Compare::Null(column) => format!("{} IS NULL", self.visit_database_value(*column)),

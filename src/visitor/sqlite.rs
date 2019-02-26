@@ -14,6 +14,7 @@ pub struct Sqlite {
 impl Visitor for Sqlite {
     const C_PARAM: &'static str = "?";
     const C_QUOTE: &'static str = "`";
+    const C_WILDCARD: &'static str = "%";
 
     fn build<Q>(query: Q) -> (String, Vec<ParameterizedValue>)
     where
