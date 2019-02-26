@@ -29,25 +29,20 @@ impl Select {
     ///
     /// ```rust
     /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
-    /// # fn main() {
     /// let query = Select::from("users");
     /// let (sql, _) = Sqlite::build(query);
     ///
     /// assert_eq!("SELECT * FROM `users` LIMIT -1", sql);
-    /// # }
     /// ```
     ///
     /// The table can be in multiple parts, defining the database.
     ///
     /// ```rust
     /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
-    ///
-    /// # fn main() {
     /// let query = Select::from(("crm", "users"));
     /// let (sql, _) = Sqlite::build(query);
     ///
     /// assert_eq!("SELECT * FROM `crm`.`users` LIMIT -1", sql);
-    /// # }
     /// ```
     pub fn from<T>(table: T) -> Self
     where
@@ -63,13 +58,11 @@ impl Select {
     ///
     /// ```rust
     /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
-    /// # fn main() {
     /// let query = Select::default().value(1);
     /// let (sql, params) = Sqlite::build(query);
     ///
     /// assert_eq!("SELECT ?", sql);
     /// assert_eq!(vec![ParameterizedValue::Integer(1)], params);
-    /// # }
     /// ```
     pub fn value<T>(mut self, value: T) -> Self
     where
@@ -83,7 +76,6 @@ impl Select {
     ///
     /// ```rust
     /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
-    /// # fn main() {
     /// let query = Select::from("users")
     ///     .column("name")
     ///     .column(("users", "id"))
@@ -92,7 +84,6 @@ impl Select {
     /// let (sql, _) = Sqlite::build(query);
     ///
     /// assert_eq!("SELECT `name`, `users`.`id`, `crm`.`users`.`foo` FROM `users` LIMIT -1", sql);
-    /// # }
     /// ```
     pub fn column<T>(mut self, column: T) -> Self
     where
@@ -106,7 +97,6 @@ impl Select {
     ///
     /// ```rust
     /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
-    /// # fn main() {
     /// let query = Select::from("users").columns(vec!["foo", "bar"]);
     /// let (sql, params) = Sqlite::build(query);
     ///
@@ -115,7 +105,6 @@ impl Select {
     ///    ParameterizedValue::Text("foo".to_string()),
     ///    ParameterizedValue::Text("bar".to_string())
     /// ], params);
-    /// # }
     /// ```
     pub fn columns<T>(mut self, columns: Vec<T>) -> Self
     where
@@ -130,13 +119,11 @@ impl Select {
     ///
     /// ```rust
     /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
-    /// # fn main() {
     /// let query = Select::from("users").so_that("foo".equals("bar"));
     /// let (sql, params) = Sqlite::build(query);
     ///
     /// assert_eq!("SELECT * FROM `users` WHERE `foo` = ? LIMIT -1", sql);
     /// assert_eq!(vec![ParameterizedValue::Text("bar".to_string())], params);
-    /// # }
     /// ```
     pub fn so_that<T>(mut self, conditions: T) -> Self
     where
@@ -150,13 +137,11 @@ impl Select {
     ///
     /// ```rust
     /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
-    /// # fn main() {
     /// let join = "posts".alias("p").on(("p", "user_id").equals(Column::from(("users", "id"))));
     /// let query = Select::from("users").inner_join(join);
     /// let (sql, _) = Sqlite::build(query);
     ///
     /// assert_eq!("SELECT * FROM `users` INNER JOIN `posts` AS `p` ON `p`.`user_id` = `users`.`id` LIMIT -1", sql);
-    /// # }
     /// ```
     pub fn inner_join<J>(mut self, join: J) -> Self
     where
@@ -170,7 +155,6 @@ impl Select {
     ///
     /// ```rust
     /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
-    /// # fn main() {
     /// let query = Select::from("users")
     ///     .order_by("foo")
     ///     .order_by("baz".ascend())
@@ -179,7 +163,6 @@ impl Select {
     /// let (sql, _) = Sqlite::build(query);
     ///
     /// assert_eq!("SELECT * FROM `users` ORDER BY `foo`, `baz` ASC, `bar` DESC LIMIT -1", sql);
-    /// # }
     pub fn order_by<T>(mut self, value: T) -> Self
     where
         T: IntoOrderDefinition,
@@ -192,12 +175,10 @@ impl Select {
     ///
     /// ```rust
     /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
-    /// # fn main() {
     /// let query = Select::from("users").limit(10);
     /// let (sql, _) = Sqlite::build(query);
     ///
     /// assert_eq!("SELECT * FROM `users` LIMIT 10", sql);
-    /// # }
     pub fn limit(mut self, limit: usize) -> Self {
         self.limit = Some(limit);
         self
@@ -207,12 +188,10 @@ impl Select {
     ///
     /// ```rust
     /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
-    /// # fn main() {
     /// let query = Select::from("users").offset(10);
     /// let (sql, _) = Sqlite::build(query);
     ///
     /// assert_eq!("SELECT * FROM `users` LIMIT -1 OFFSET 10", sql);
-    /// # }
     pub fn offset(mut self, offset: usize) -> Self {
         self.offset = Some(offset);
         self

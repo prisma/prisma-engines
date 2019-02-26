@@ -82,13 +82,11 @@ pub trait Comparable {
     ///
     /// ```rust
     /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
-    /// # fn main() {
     /// let query = Select::from("users").so_that("foo".equals("bar"));
     /// let (sql, params) = Sqlite::build(query);
     ///
     /// assert_eq!("SELECT * FROM `users` WHERE `foo` = ? LIMIT -1", sql);
     /// assert_eq!(vec![ParameterizedValue::Text("bar".to_string())], params);
-    /// # }
     /// ```
     fn equals<T>(self, comparison: T) -> Compare
     where
@@ -98,13 +96,11 @@ pub trait Comparable {
     ///
     /// ```rust
     /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
-    /// # fn main() {
     /// let query = Select::from("users").so_that("foo".not_equals("bar"));
     /// let (sql, params) = Sqlite::build(query);
     ///
     /// assert_eq!("SELECT * FROM `users` WHERE `foo` <> ? LIMIT -1", sql);
     /// assert_eq!(vec![ParameterizedValue::Text("bar".to_string())], params);
-    /// # }
     /// ```
     fn not_equals<T>(self, comparison: T) -> Compare
     where
@@ -114,13 +110,11 @@ pub trait Comparable {
     ///
     /// ```rust
     /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
-    /// # fn main() {
     /// let query = Select::from("users").so_that("foo".less_than(10));
     /// let (sql, params) = Sqlite::build(query);
     ///
     /// assert_eq!("SELECT * FROM `users` WHERE `foo` < ? LIMIT -1", sql);
     /// assert_eq!(vec![ParameterizedValue::Integer(10)], params);
-    /// # }
     /// ```
     fn less_than<T>(self, comparison: T) -> Compare
     where
@@ -130,13 +124,11 @@ pub trait Comparable {
     ///
     /// ```rust
     /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
-    /// # fn main() {
     /// let query = Select::from("users").so_that("foo".less_than_or_equals(10));
     /// let (sql, params) = Sqlite::build(query);
     ///
     /// assert_eq!("SELECT * FROM `users` WHERE `foo` <= ? LIMIT -1", sql);
     /// assert_eq!(vec![ParameterizedValue::Integer(10)], params);
-    /// # }
     /// ```
     fn less_than_or_equals<T>(self, comparison: T) -> Compare
     where
@@ -146,13 +138,11 @@ pub trait Comparable {
     ///
     /// ```rust
     /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
-    /// # fn main() {
     /// let query = Select::from("users").so_that("foo".greater_than(10));
     /// let (sql, params) = Sqlite::build(query);
     ///
     /// assert_eq!("SELECT * FROM `users` WHERE `foo` > ? LIMIT -1", sql);
     /// assert_eq!(vec![ParameterizedValue::Integer(10)], params);
-    /// # }
     /// ```
     fn greater_than<T>(self, comparison: T) -> Compare
     where
@@ -162,13 +152,11 @@ pub trait Comparable {
     ///
     /// ```rust
     /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
-    /// # fn main() {
     /// let query = Select::from("users").so_that("foo".greater_than_or_equals(10));
     /// let (sql, params) = Sqlite::build(query);
     ///
     /// assert_eq!("SELECT * FROM `users` WHERE `foo` >= ? LIMIT -1", sql);
     /// assert_eq!(vec![ParameterizedValue::Integer(10)], params);
-    /// # }
     /// ```
     fn greater_than_or_equals<T>(self, comparison: T) -> Compare
     where
@@ -178,7 +166,6 @@ pub trait Comparable {
     ///
     /// ```rust
     /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
-    /// # fn main() {
     /// let query = Select::from("users").so_that("foo".in_selection(vec![1, 2]));
     /// let (sql, params) = Sqlite::build(query);
     ///
@@ -187,7 +174,6 @@ pub trait Comparable {
     ///     ParameterizedValue::Integer(1),
     ///     ParameterizedValue::Integer(2),
     /// ], params);
-    /// # }
     /// ```
     fn in_selection<T>(self, selection: Vec<T>) -> Compare
     where
@@ -197,7 +183,6 @@ pub trait Comparable {
     ///
     /// ```rust
     /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
-    /// # fn main() {
     /// let query = Select::from("users").so_that("foo".not_in_selection(vec![1, 2]));
     /// let (sql, params) = Sqlite::build(query);
     ///
@@ -206,7 +191,6 @@ pub trait Comparable {
     ///     ParameterizedValue::Integer(1),
     ///     ParameterizedValue::Integer(2),
     /// ], params);
-    /// # }
     /// ```
     fn not_in_selection<T>(self, selection: Vec<T>) -> Compare
     where
@@ -216,13 +200,11 @@ pub trait Comparable {
     ///
     /// ```rust
     /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
-    /// # fn main() {
     /// let query = Select::from("users").so_that("foo".like("bar"));
     /// let (sql, params) = Sqlite::build(query);
     ///
     /// assert_eq!("SELECT * FROM `users` WHERE `foo` LIKE ? LIMIT -1", sql);
     /// assert_eq!(vec![ParameterizedValue::Text("%bar%".to_string())], params);
-    /// # }
     /// ```
     fn like<T>(self, pattern: T) -> Compare
     where
@@ -232,13 +214,11 @@ pub trait Comparable {
     ///
     /// ```rust
     /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
-    /// # fn main() {
     /// let query = Select::from("users").so_that("foo".not_like("bar"));
     /// let (sql, params) = Sqlite::build(query);
     ///
     /// assert_eq!("SELECT * FROM `users` WHERE `foo` NOT LIKE ? LIMIT -1", sql);
     /// assert_eq!(vec![ParameterizedValue::Text("%bar%".to_string())], params);
-    /// # }
     /// ```
     fn not_like<T>(self, pattern: T) -> Compare
     where
@@ -248,13 +228,11 @@ pub trait Comparable {
     ///
     /// ```rust
     /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
-    /// # fn main() {
     /// let query = Select::from("users").so_that("foo".begins_with("bar"));
     /// let (sql, params) = Sqlite::build(query);
     ///
     /// assert_eq!("SELECT * FROM `users` WHERE `foo` LIKE ? LIMIT -1", sql);
     /// assert_eq!(vec![ParameterizedValue::Text("bar%".to_string())], params);
-    /// # }
     /// ```
     fn begins_with<T>(self, pattern: T) -> Compare
     where
@@ -264,13 +242,11 @@ pub trait Comparable {
     ///
     /// ```rust
     /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
-    /// # fn main() {
     /// let query = Select::from("users").so_that("foo".not_begins_with("bar"));
     /// let (sql, params) = Sqlite::build(query);
     ///
     /// assert_eq!("SELECT * FROM `users` WHERE `foo` NOT LIKE ? LIMIT -1", sql);
     /// assert_eq!(vec![ParameterizedValue::Text("bar%".to_string())], params);
-    /// # }
     /// ```
     fn not_begins_with<T>(self, pattern: T) -> Compare
     where
@@ -280,13 +256,11 @@ pub trait Comparable {
     ///
     /// ```rust
     /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
-    /// # fn main() {
     /// let query = Select::from("users").so_that("foo".ends_into("bar"));
     /// let (sql, params) = Sqlite::build(query);
     ///
     /// assert_eq!("SELECT * FROM `users` WHERE `foo` LIKE ? LIMIT -1", sql);
     /// assert_eq!(vec![ParameterizedValue::Text("%bar".to_string())], params);
-    /// # }
     /// ```
     fn ends_into<T>(self, pattern: T) -> Compare
     where
@@ -296,13 +270,11 @@ pub trait Comparable {
     ///
     /// ```rust
     /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
-    /// # fn main() {
     /// let query = Select::from("users").so_that("foo".not_ends_into("bar"));
     /// let (sql, params) = Sqlite::build(query);
     ///
     /// assert_eq!("SELECT * FROM `users` WHERE `foo` NOT LIKE ? LIMIT -1", sql);
     /// assert_eq!(vec![ParameterizedValue::Text("%bar".to_string())], params);
-    /// # }
     /// ```
     fn not_ends_into<T>(self, pattern: T) -> Compare
     where
@@ -312,12 +284,10 @@ pub trait Comparable {
     ///
     /// ```rust
     /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
-    /// # fn main() {
     /// let query = Select::from("users").so_that("foo".is_null());
     /// let (sql, _) = Sqlite::build(query);
     ///
     /// assert_eq!("SELECT * FROM `users` WHERE `foo` IS NULL LIMIT -1", sql);
-    /// # }
     /// ```
     fn is_null(self) -> Compare;
 
@@ -325,12 +295,10 @@ pub trait Comparable {
     ///
     /// ```rust
     /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
-    /// # fn main() {
     /// let query = Select::from("users").so_that("foo".is_not_null());
     /// let (sql, _) = Sqlite::build(query);
     ///
     /// assert_eq!("SELECT * FROM `users` WHERE `foo` IS NOT NULL LIMIT -1", sql);
-    /// # }
     /// ```
     fn is_not_null(self) -> Compare;
 }
