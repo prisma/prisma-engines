@@ -101,12 +101,10 @@ pub trait Visitor {
     ///
     /// ```rust
     /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
-    /// # fn main() {
     /// assert_eq!(
     ///     "`a`.`b`",
     ///     Sqlite::delimited_identifiers(vec!["a".to_string(), "b".to_string()])
     /// );
-    /// # }
     /// ```
     fn delimited_identifiers(parts: Vec<String>) -> String {
         let mut result = Vec::new();

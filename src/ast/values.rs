@@ -106,7 +106,6 @@ impl Into<DatabaseValue> for Row {
 }
 
 impl Comparable for DatabaseValue {
-    #[inline]
     fn equals<T>(self, comparison: T) -> Compare
     where
         T: Into<DatabaseValue>,
@@ -114,7 +113,6 @@ impl Comparable for DatabaseValue {
         Compare::Equals(Box::new(self), Box::new(comparison.into()))
     }
 
-    #[inline]
     fn not_equals<T>(self, comparison: T) -> Compare
     where
         T: Into<DatabaseValue>,
@@ -122,7 +120,6 @@ impl Comparable for DatabaseValue {
         Compare::NotEquals(Box::new(self), Box::new(comparison.into()))
     }
 
-    #[inline]
     fn less_than<T>(self, comparison: T) -> Compare
     where
         T: Into<DatabaseValue>,
@@ -130,7 +127,6 @@ impl Comparable for DatabaseValue {
         Compare::LessThan(Box::new(self), Box::new(comparison.into()))
     }
 
-    #[inline]
     fn less_than_or_equals<T>(self, comparison: T) -> Compare
     where
         T: Into<DatabaseValue>,
@@ -138,7 +134,6 @@ impl Comparable for DatabaseValue {
         Compare::LessThanOrEquals(Box::new(self), Box::new(comparison.into()))
     }
 
-    #[inline]
     fn greater_than<T>(self, comparison: T) -> Compare
     where
         T: Into<DatabaseValue>,
@@ -146,7 +141,6 @@ impl Comparable for DatabaseValue {
         Compare::GreaterThan(Box::new(self), Box::new(comparison.into()))
     }
 
-    #[inline]
     fn greater_than_or_equals<T>(self, comparison: T) -> Compare
     where
         T: Into<DatabaseValue>,
@@ -154,7 +148,6 @@ impl Comparable for DatabaseValue {
         Compare::GreaterThanOrEquals(Box::new(self), Box::new(comparison.into()))
     }
 
-    #[inline]
     fn in_selection<T>(self, selection: Vec<T>) -> Compare
     where
         T: Into<DatabaseValue>,
@@ -162,7 +155,6 @@ impl Comparable for DatabaseValue {
         Compare::In(Box::new(self), Box::new(Row::from(selection).into()))
     }
 
-    #[inline]
     fn not_in_selection<T>(self, selection: Vec<T>) -> Compare
     where
         T: Into<DatabaseValue>,
@@ -170,7 +162,6 @@ impl Comparable for DatabaseValue {
         Compare::NotIn(Box::new(self), Box::new(Row::from(selection).into()))
     }
 
-    #[inline]
     fn like<T>(self, pattern: T) -> Compare
     where
         T: Into<String>,
@@ -178,7 +169,6 @@ impl Comparable for DatabaseValue {
         Compare::Like(Box::new(self), pattern.into())
     }
 
-    #[inline]
     fn not_like<T>(self, pattern: T) -> Compare
     where
         T: Into<String>,
@@ -186,7 +176,6 @@ impl Comparable for DatabaseValue {
         Compare::NotLike(Box::new(self), pattern.into())
     }
 
-    #[inline]
     fn begins_with<T>(self, pattern: T) -> Compare
     where
         T: Into<String>,
@@ -194,7 +183,6 @@ impl Comparable for DatabaseValue {
         Compare::BeginsWith(Box::new(self), pattern.into())
     }
 
-    #[inline]
     fn not_begins_with<T>(self, pattern: T) -> Compare
     where
         T: Into<String>,
@@ -202,7 +190,6 @@ impl Comparable for DatabaseValue {
         Compare::NotBeginsWith(Box::new(self), pattern.into())
     }
 
-    #[inline]
     fn ends_into<T>(self, pattern: T) -> Compare
     where
         T: Into<String>,
@@ -210,7 +197,6 @@ impl Comparable for DatabaseValue {
         Compare::EndsInto(Box::new(self), pattern.into())
     }
 
-    #[inline]
     fn not_ends_into<T>(self, pattern: T) -> Compare
     where
         T: Into<String>,
@@ -218,12 +204,10 @@ impl Comparable for DatabaseValue {
         Compare::NotEndsInto(Box::new(self), pattern.into())
     }
 
-    #[inline]
     fn is_null(self) -> Compare {
         Compare::Null(Box::new(self))
     }
 
-    #[inline]
     fn is_not_null(self) -> Compare {
         Compare::NotNull(Box::new(self))
     }
