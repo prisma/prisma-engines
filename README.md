@@ -7,6 +7,11 @@ statements.
 *Under construction and will go through several rounds of changes*. Not meant
 for production use in the current form.
 
+
+### Documentation
+
+- [Master](http://query.prisma.io/)
+
 ### Goals:
 
 - Query generation when the database and conditions are not known beforehand.
@@ -25,17 +30,3 @@ for production use in the current form.
 - MySQL
 
 More databases will be decided later.
-
-## Documentation
-
-For now it is needed to locally generate the documentation until the crate is
-published.
-
-``` sh
-cargo test
-cargo rustdoc
-cd target/doc
-python3 -m http.server
-```
-
-The documentation should be visible in http://localhost:8000/prisma_query/
