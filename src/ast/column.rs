@@ -15,7 +15,6 @@ impl Into<DatabaseValue> for Column {
 
 impl Column {
     /// Create a column definition.
-    #[inline]
     pub fn new<S>(name: S) -> Self
     where
         S: Into<String>,
@@ -87,7 +86,6 @@ impl From<(String, String, String)> for Column {
 }
 
 impl Comparable for Column {
-    #[inline]
     fn equals<T>(self, comparison: T) -> Compare
     where
         T: Into<DatabaseValue>,
@@ -96,7 +94,6 @@ impl Comparable for Column {
         value.equals(comparison)
     }
 
-    #[inline]
     fn not_equals<T>(self, comparison: T) -> Compare
     where
         T: Into<DatabaseValue>,
@@ -105,7 +102,6 @@ impl Comparable for Column {
         value.not_equals(comparison)
     }
 
-    #[inline]
     fn less_than<T>(self, comparison: T) -> Compare
     where
         T: Into<DatabaseValue>,
@@ -114,7 +110,6 @@ impl Comparable for Column {
         value.not_equals(comparison)
     }
 
-    #[inline]
     fn less_than_or_equals<T>(self, comparison: T) -> Compare
     where
         T: Into<DatabaseValue>,
@@ -123,7 +118,6 @@ impl Comparable for Column {
         value.less_than_or_equals(comparison)
     }
 
-    #[inline]
     fn greater_than<T>(self, comparison: T) -> Compare
     where
         T: Into<DatabaseValue>,
@@ -132,7 +126,6 @@ impl Comparable for Column {
         value.greater_than(comparison)
     }
 
-    #[inline]
     fn greater_than_or_equals<T>(self, comparison: T) -> Compare
     where
         T: Into<DatabaseValue>,
@@ -141,7 +134,6 @@ impl Comparable for Column {
         value.greater_than_or_equals(comparison)
     }
 
-    #[inline]
     fn in_selection<T>(self, selection: Vec<T>) -> Compare
     where
         T: Into<DatabaseValue>,
@@ -150,7 +142,6 @@ impl Comparable for Column {
         value.in_selection(selection)
     }
 
-    #[inline]
     fn not_in_selection<T>(self, selection: Vec<T>) -> Compare
     where
         T: Into<DatabaseValue>,
@@ -159,7 +150,6 @@ impl Comparable for Column {
         value.not_in_selection(selection)
     }
 
-    #[inline]
     fn like<T>(self, pattern: T) -> Compare
     where
         T: Into<String>,
@@ -168,7 +158,6 @@ impl Comparable for Column {
         value.like(pattern)
     }
 
-    #[inline]
     fn not_like<T>(self, pattern: T) -> Compare
     where
         T: Into<String>,
@@ -177,7 +166,6 @@ impl Comparable for Column {
         value.not_like(pattern)
     }
 
-    #[inline]
     fn begins_with<T>(self, pattern: T) -> Compare
     where
         T: Into<String>,
@@ -186,7 +174,6 @@ impl Comparable for Column {
         value.begins_with(pattern)
     }
 
-    #[inline]
     fn not_begins_with<T>(self, pattern: T) -> Compare
     where
         T: Into<String>,
@@ -195,7 +182,6 @@ impl Comparable for Column {
         value.not_begins_with(pattern)
     }
 
-    #[inline]
     fn ends_into<T>(self, pattern: T) -> Compare
     where
         T: Into<String>,
@@ -204,7 +190,6 @@ impl Comparable for Column {
         value.ends_into(pattern)
     }
 
-    #[inline]
     fn not_ends_into<T>(self, pattern: T) -> Compare
     where
         T: Into<String>,
@@ -213,13 +198,11 @@ impl Comparable for Column {
         value.not_ends_into(pattern)
     }
 
-    #[inline]
     fn is_null(self) -> Compare {
         let value: DatabaseValue = self.into();
         value.is_null()
     }
 
-    #[inline]
     fn is_not_null(self) -> Compare {
         let value: DatabaseValue = self.into();
         value.is_not_null()
