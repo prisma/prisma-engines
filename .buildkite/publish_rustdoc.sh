@@ -13,6 +13,8 @@ git config user.email "hello@prisma.io"
 
 mv ../target/doc/* .
 
+echo "<meta http-equiv=refresh content=0;url=prisma_query/index.html>" > index.html
+
 git add -A .
 git commit -m "Rebuild pages at ${BUILDKITE_COMMIT}"
 
