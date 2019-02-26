@@ -1,4 +1,5 @@
 # prisma-query
+[![Build status](https://badge.buildkite.com/c30bc2b4dccc155aec44608ad5f366feabdab121295ceb6b6b.svg)](https://buildkite.com/prisma/prisma-query)
 
 prisma-query is an AST and database-specific visitors for creating SQL
 statements.
