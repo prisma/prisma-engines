@@ -1,3 +1,10 @@
+//! An abstract syntax tree for SQL queries.
+//!
+//! The ast module handles everything related building abstract SQL queries
+//! without going into database-level specifics. Everything related to the
+//! actual query building is in the [visitor](../visitor/index.html) module.
+//!
+//! For prelude, all important imports are in `prisma_query::ast::*`.
 mod column;
 mod compare;
 mod conditions;

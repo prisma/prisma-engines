@@ -1,6 +1,6 @@
 use crate::ast::{Column, ConditionTree, Conjuctive, DatabaseValue, Expression, Row};
 
-/// A comparison expression
+/// For modeling comparison expression
 #[derive(Debug, Clone, PartialEq)]
 pub enum Compare {
     /// `left = right`
