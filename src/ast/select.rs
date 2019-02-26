@@ -9,6 +9,7 @@ pub struct Select {
     pub ordering: Ordering,
     pub limit: Option<usize>,
     pub offset: Option<usize>,
+    pub joins: Vec<Join>,
 }
 
 impl Into<DatabaseValue> for Select {
@@ -142,6 +143,26 @@ impl Select {
         T: Into<ConditionTree>,
     {
         self.conditions = Some(conditions.into());
+        self
+    }
+
+    /// Adds `INNER JOIN` clause to the query.
+    ///
+    /// ```rust
+    /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # fn main() {
+    /// let join = "posts".alias("p").on(("p", "user_id").equals(Column::from(("users", "id"))));
+    /// let query = Select::from("users").inner_join(join);
+    /// let (sql, _) = Sqlite::build(query);
+    ///
+    /// assert_eq!("SELECT * FROM `users` INNER JOIN `posts` AS `p` ON `p`.`user_id` = `users`.`id` LIMIT -1", sql);
+    /// # }
+    /// ```
+    pub fn inner_join<J>(mut self, join: J) -> Self
+    where
+        J: Into<JoinData>,
+    {
+        self.joins.push(Join::Inner(join.into()));
         self
     }
 

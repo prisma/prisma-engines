@@ -41,6 +41,27 @@ pub trait Visitor {
     /// The `OFFSET` statement in the query
     fn visit_offset(&mut self, offset: usize) -> String;
 
+    /// The join statements in the query
+    fn visit_joins(&mut self, joins: Vec<Join>) -> String {
+        let result = joins.into_iter().fold(Vec::new(), |mut acc, j| {
+            match j {
+                Join::Inner(data) => acc.push(format!("INNER JOIN {}", self.visit_join_data(data))),
+            }
+
+            acc
+        });
+
+        result.join(" ")
+    }
+
+    fn visit_join_data(&mut self, data: JoinData) -> String {
+        format!(
+            "{} ON {}",
+            Self::visit_table(data.table),
+            self.visit_conditions(data.conditions)
+        )
+    }
+
     /// A walk through a `SELECT` statement
     fn visit_select(&mut self, select: Select) -> String {
         let mut result = vec!["SELECT".to_string()];
@@ -53,6 +74,10 @@ pub trait Visitor {
 
         if let Some(table) = select.table {
             result.push(format!("FROM {}", Self::visit_table(table)));
+
+            if !select.joins.is_empty() {
+                result.push(self.visit_joins(select.joins));
+            }
 
             if let Some(conditions) = select.conditions {
                 result.push(format!("WHERE {}", self.visit_conditions(conditions)));
@@ -126,11 +151,17 @@ pub trait Visitor {
 
     /// A database table identifier
     fn visit_table(table: Table) -> String {
-        if let Some(database) = table.database {
-            Self::delimited_identifiers(vec![database, table.name])
-        } else {
-            Self::delimited_identifiers(vec![table.name])
-        }
+        let mut result = match table.database {
+            Some(database) => Self::delimited_identifiers(vec![database, table.name]),
+            None => Self::delimited_identifiers(vec![table.name]),
+        };
+
+        if let Some(alias) = table.alias {
+            result.push_str(" AS ");
+            result.push_str(&Self::delimited_identifiers(vec![alias]));
+        };
+
+        result
     }
 
     /// A database column identifier

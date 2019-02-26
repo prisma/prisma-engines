@@ -32,55 +32,55 @@ impl Column {
     }
 }
 
-impl<'a> Into<Column> for &'a str {
-    fn into(self) -> Column {
+impl<'a> From<&'a str> for Column {
+    fn from(s: &'a str) -> Column {
         Column {
-            name: self.to_string(),
+            name: s.to_string(),
             table: None,
         }
     }
 }
 
-impl<'a, 'b> Into<Column> for (&'a str, &'b str) {
-    fn into(self) -> Column {
-        let mut column: Column = self.1.into();
-        column = column.table(self.0.into());
+impl<'a, 'b> From<(&'a str, &'b str)> for Column {
+    fn from(t: (&'a str, &'b str)) -> Column {
+        let mut column: Column = t.1.into();
+        column = column.table(t.0.into());
 
         column
     }
 }
 
-impl<'a, 'b, 'c> Into<Column> for (&'a str, &'b str, &'c str) {
-    fn into(self) -> Column {
-        let column: Column = self.2.into();
-        let table: Table = (self.0, self.1).into();
+impl<'a, 'b, 'c> From<(&'a str, &'b str, &'c str)> for Column {
+    fn from(t: (&'a str, &'b str, &'c str)) -> Column {
+        let column: Column = t.2.into();
+        let table: Table = (t.0, t.1).into();
 
         column.table(table)
     }
 }
 
-impl Into<Column> for String {
-    fn into(self) -> Column {
+impl From<String> for Column {
+    fn from(s: String) -> Column {
         Column {
-            name: self,
+            name: s,
             table: None,
         }
     }
 }
 
-impl Into<Column> for (String, String) {
-    fn into(self) -> Column {
-        let mut column: Column = self.1.into();
-        column = column.table(self.0.into());
+impl From<(String, String)> for Column {
+    fn from(s: (String, String)) -> Column {
+        let mut column: Column = s.1.into();
+        column = column.table(s.0.into());
 
         column
     }
 }
 
-impl Into<Column> for (String, String, String) {
-    fn into(self) -> Column {
-        let column: Column = self.2.into();
-        let table: Table = (self.0, self.1).into();
+impl From<(String, String, String)> for Column {
+    fn from(s: (String, String, String)) -> Column {
+        let column: Column = s.2.into();
+        let table: Table = (s.0, s.1).into();
 
         column.table(table)
     }
