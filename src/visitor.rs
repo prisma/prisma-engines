@@ -46,6 +46,9 @@ pub trait Visitor {
         let result = joins.into_iter().fold(Vec::new(), |mut acc, j| {
             match j {
                 Join::Inner(data) => acc.push(format!("INNER JOIN {}", self.visit_join_data(data))),
+                Join::LeftOuter(data) => {
+                    acc.push(format!("LEFT OUTER JOIN {}", self.visit_join_data(data)))
+                }
             }
 
             acc

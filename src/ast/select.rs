@@ -141,13 +141,39 @@ impl Select {
     /// let query = Select::from("users").inner_join(join);
     /// let (sql, _) = Sqlite::build(query);
     ///
-    /// assert_eq!("SELECT * FROM `users` INNER JOIN `posts` AS `p` ON `p`.`user_id` = `users`.`id` LIMIT -1", sql);
+    /// assert_eq!(
+    ///     "SELECT * FROM `users` INNER JOIN `posts` AS `p` ON `p`.`user_id` = `users`.`id` LIMIT -1",
+    ///     sql
+    /// );
     /// ```
     pub fn inner_join<J>(mut self, join: J) -> Self
     where
         J: Into<JoinData>,
     {
         self.joins.push(Join::Inner(join.into()));
+        self
+    }
+
+    /// Adds `LEFT OUTER JOIN` clause to the query.
+    ///
+    /// ```rust
+    /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
+    /// let join = "posts".alias("p").on(("p", "visible").equals(true));
+    /// let query = Select::from("users").left_outer_join(join);
+    /// let (sql, params) = Sqlite::build(query);
+    ///
+    /// assert_eq!(
+    ///     "SELECT * FROM `users` LEFT OUTER JOIN `posts` AS `p` ON `p`.`visible` = ? LIMIT -1",
+    ///     sql
+    /// );
+    ///
+    /// assert_eq!(vec![ParameterizedValue::Boolean(true)], params);
+    /// ```
+    pub fn left_outer_join<J>(mut self, join: J) -> Self
+    where
+        J: Into<JoinData>,
+    {
+        self.joins.push(Join::LeftOuter(join.into()));
         self
     }
 

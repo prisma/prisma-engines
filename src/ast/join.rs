@@ -12,6 +12,8 @@ pub struct JoinData {
 pub enum Join {
     /// Implements an `INNER JOIN` with given `JoinData`.
     Inner(JoinData),
+    /// Implements an `LEFT OUTER JOIN` with given `JoinData`.
+    LeftOuter(JoinData),
 }
 
 /// An item that can be joined.

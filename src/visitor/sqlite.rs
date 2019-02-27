@@ -338,7 +338,7 @@ mod tests {
     }
 
     #[test]
-    fn test_simple_join() {
+    fn test_simple_inner_join() {
         let expected_sql =
             "SELECT * FROM `users` INNER JOIN `posts` ON `users`.`id` = `posts`.`user_id` LIMIT -1";
 
@@ -350,11 +350,41 @@ mod tests {
     }
 
     #[test]
-    fn test_additional_condition_join() {
+    fn test_additional_condition_inner_join() {
         let expected_sql =
             "SELECT * FROM `users` INNER JOIN `posts` ON (`users`.`id` = `posts`.`user_id` AND `posts`.`published` = ?) LIMIT -1";
 
         let query = Select::from("users").inner_join(
+            "posts".on(("users", "id")
+                .equals(Column::from(("posts", "user_id")))
+                .and(("posts", "published").equals(true))),
+        );
+
+        let (sql, params) = Sqlite::build(query);
+
+        assert_eq!(expected_sql, sql);
+        assert_eq!(vec![ParameterizedValue::Boolean(true),], params);
+    }
+
+    #[test]
+    fn test_simple_left_join() {
+        let expected_sql =
+            "SELECT * FROM `users` LEFT OUTER JOIN `posts` ON `users`.`id` = `posts`.`user_id` LIMIT -1";
+
+        let query = Select::from("users").left_outer_join(
+            "posts".on(("users", "id").equals(Column::from(("posts", "user_id")))),
+        );
+        let (sql, _) = Sqlite::build(query);
+
+        assert_eq!(expected_sql, sql);
+    }
+
+    #[test]
+    fn test_additional_condition_left_join() {
+        let expected_sql =
+            "SELECT * FROM `users` LEFT OUTER JOIN `posts` ON (`users`.`id` = `posts`.`user_id` AND `posts`.`published` = ?) LIMIT -1";
+
+        let query = Select::from("users").left_outer_join(
             "posts".on(("users", "id")
                 .equals(Column::from(("posts", "user_id")))
                 .and(("posts", "published").equals(true))),
