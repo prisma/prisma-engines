@@ -6,28 +6,27 @@
 //! Under construction and will go through several rounds of changes. Not meant
 //! for production use in the current form.
 //!
-//! ### Goals:
+//! ### Goals
 //!
 //! - Query generation when the database and conditions are not known beforehand.
 //! - Parameterized queries when possible.
-//! - A modular design, separate AST and visitor when extending to new databases.
+//! - A modular design, separate AST for query building and visitors for
+//!   different databases.
 //! - Database support behind a feature flag.
 //!
-//! ### Non-goals:
+//! ### Non-goals
 //!
 //! - Database-level type-safety in query building or being an ORM.
 //!
-//! ## Database priorities:
+//! ## Database priorities
 //!
-//! - SQLite will be the first Visitor
+//! - SQLite will be the first visitor
 //! - PostgreSQL
 //! - MySQL
 //!
 //! More databases will be decided later.
 //!
 //! ## Examples
-//!
-//! In the following examples we use the feature flag `rusqlite` to get Sqlite support.
 //!
 //! ### Chaining conditions
 //!
@@ -60,7 +59,7 @@
 //! ```
 //!
 //! We can chain the conditions together by calling the corresponding conjuctive
-//! with the operations. The parameters returned implement the corresponding output
+//! with the compares. The parameters returned implement the corresponding output
 //! trait from the database adapter for easy passing into a prepared statement,
 //! in this case [rusqlite](https://github.com/jgallagher/rusqlite).
 //!
@@ -94,8 +93,7 @@
 //! }
 //! ```
 //!
-//! In some cases we want to build a `ConditionTree` manually from the input,
-//! e.g. with an `Into<ConditionTree>` trait. In these cases it is easier to
-//! build the conditions as a tree.
+//! In cases where more feasible we want to build a `ConditionTree` manually
+//! from the input, e.g. when mapping data using an `Into<ConditionTree>` trait.
 pub mod ast;
 pub mod visitor;

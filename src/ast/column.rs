@@ -25,6 +25,7 @@ impl Column {
         }
     }
 
+    /// Include the table name in the column expression.
     pub fn table(mut self, table: Table) -> Self {
         self.table = Some(table);
         self
