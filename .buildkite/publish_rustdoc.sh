@@ -17,8 +17,9 @@ mv ../target/doc/* .
 
 echo "<meta http-equiv=refresh content=0;url=prisma_query/index.html>" > index.html
 
-X=$(git diff --exit-code --name-only HEAD HEAD~1)
-if [ $? -eq 0 ]
+DIFF=$(git diff --exit-code --name-only HEAD HEAD~1)
+# if [ $? -eq 0 ]
+if [ -z "$DIFF" ]
 then
     echo "Nothing to do"
 else
