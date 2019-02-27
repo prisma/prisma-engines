@@ -1,6 +1,8 @@
 use crate::ast::{ConditionTree, JoinData, Joinable};
 
+/// An object that can be aliased.
 pub trait Aliasable {
+    /// Alias table for usage elsewhere in the query.
     fn alias<T>(self, alias: T) -> Table
     where
         T: Into<String>;

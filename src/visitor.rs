@@ -57,7 +57,7 @@ pub trait Visitor {
     fn visit_join_data(&mut self, data: JoinData) -> String {
         format!(
             "{} ON {}",
-            Self::visit_table(data.table),
+            Self::visit_table(data.table, true),
             self.visit_conditions(data.conditions)
         )
     }
@@ -73,7 +73,7 @@ pub trait Visitor {
         }
 
         if let Some(table) = select.table {
-            result.push(format!("FROM {}", Self::visit_table(table)));
+            result.push(format!("FROM {}", Self::visit_table(table, true)));
 
             if !select.joins.is_empty() {
                 result.push(self.visit_joins(select.joins));
@@ -148,16 +148,18 @@ pub trait Visitor {
     }
 
     /// A database table identifier
-    fn visit_table(table: Table) -> String {
+    fn visit_table(table: Table, include_alias: bool) -> String {
         let mut result = match table.database {
             Some(database) => Self::delimited_identifiers(vec![database, table.name]),
             None => Self::delimited_identifiers(vec![table.name]),
         };
 
-        if let Some(alias) = table.alias {
-            result.push_str(" AS ");
-            result.push_str(&Self::delimited_identifiers(vec![alias]));
-        };
+        if include_alias {
+            if let Some(alias) = table.alias {
+                result.push_str(" AS ");
+                result.push_str(&Self::delimited_identifiers(vec![alias]));
+            };
+        }
 
         result
     }
@@ -167,7 +169,7 @@ pub trait Visitor {
         match column.table {
             Some(table) => format!(
                 "{}.{}",
-                Self::visit_table(table),
+                Self::visit_table(table, false),
                 Self::delimited_identifiers(vec![column.name])
             ),
             _ => Self::delimited_identifiers(vec![column.name]),
