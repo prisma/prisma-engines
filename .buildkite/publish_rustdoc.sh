@@ -6,7 +6,7 @@ shopt -s globstar
 docker run -w /build -v $(pwd):/build prismagraphql/rust-build:latest cargo rustdoc
 
 rm -rf deploy_docs
-git clone --branch gh-pages "git@github.com:prisma/prisma-query.git" deploy_docs
+git clone --branch gh-pages "git@github.com:prisma/prisma-query.git" deploy_docs > /dev/null 2>&1
 rm -rf deploy_docs/*
 cd deploy_docs
 
@@ -22,7 +22,7 @@ git commit -m "Rebuild pages at ${BUILDKITE_COMMIT}"
 
 echo
 echo "Pushing docs..."
-git push --quiet origin gh-pages
+git push --quiet origin gh-pages > /dev/null 2>&1
 echo
 echo "Docs published."
 echo
