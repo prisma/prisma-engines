@@ -20,9 +20,16 @@ echo "<meta http-equiv=refresh content=0;url=prisma_query/index.html>" > index.h
 git add -A .
 git commit -m "Rebuild pages at ${BUILDKITE_COMMIT}"
 
-echo
-echo "Pushing docs..."
-git push --quiet origin gh-pages > /dev/null 2>&1
-echo
-echo "Docs published."
-echo
+
+$(git diff --exit-code --name-only HEAD HEAD~1)
+if [ $? -eq 0 ]
+then
+    echo "Nothing to do"
+else
+    echo
+    echo "Pushing docs..."
+    git push --quiet origin gh-pages > /dev/null 2>&1
+    echo
+    echo "Docs published."
+    echo
+fi
