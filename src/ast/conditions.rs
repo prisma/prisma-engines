@@ -18,6 +18,7 @@ pub enum ConditionTree {
 }
 
 impl ConditionTree {
+    /// An `AND` statement, is true when both sides are true.
     pub fn and<E, J>(left: E, right: J) -> ConditionTree
     where
         E: Into<Expression>,
@@ -26,6 +27,7 @@ impl ConditionTree {
         ConditionTree::And(Box::new(left.into()), Box::new(right.into()))
     }
 
+    /// An `OR` statement, is true when one side is true.
     pub fn or<E, J>(left: E, right: J) -> ConditionTree
     where
         E: Into<Expression>,
@@ -34,6 +36,7 @@ impl ConditionTree {
         ConditionTree::Or(Box::new(left.into()), Box::new(right.into()))
     }
 
+    /// A `NOT` statement, is true when the expression is false.
     pub fn not<E>(left: E) -> ConditionTree
     where
         E: Into<Expression>,
@@ -41,6 +44,7 @@ impl ConditionTree {
         ConditionTree::Not(Box::new(left.into()))
     }
 
+    /// A single leaf, is true when the expression is true.
     pub fn single<E>(left: E) -> ConditionTree
     where
         E: Into<Expression>,
