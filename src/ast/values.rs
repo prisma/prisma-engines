@@ -105,6 +105,16 @@ impl Into<DatabaseValue> for Row {
     }
 }
 
+impl<T> From<Vec<T>> for DatabaseValue
+where
+    T: Into<DatabaseValue>,
+{
+    fn from(v: Vec<T>) -> DatabaseValue {
+        let row: Row = v.into();
+        row.into()
+    }
+}
+
 impl Comparable for DatabaseValue {
     fn equals<T>(self, comparison: T) -> Compare
     where
@@ -148,18 +158,18 @@ impl Comparable for DatabaseValue {
         Compare::GreaterThanOrEquals(Box::new(self), Box::new(comparison.into()))
     }
 
-    fn in_selection<T>(self, selection: Vec<T>) -> Compare
+    fn in_selection<T>(self, selection: T) -> Compare
     where
         T: Into<DatabaseValue>,
     {
-        Compare::In(Box::new(self), Box::new(Row::from(selection).into()))
+        Compare::In(Box::new(self), Box::new(selection.into()))
     }
 
-    fn not_in_selection<T>(self, selection: Vec<T>) -> Compare
+    fn not_in_selection<T>(self, selection: T) -> Compare
     where
         T: Into<DatabaseValue>,
     {
-        Compare::NotIn(Box::new(self), Box::new(Row::from(selection).into()))
+        Compare::NotIn(Box::new(self), Box::new(selection.into()))
     }
 
     fn like<T>(self, pattern: T) -> Compare

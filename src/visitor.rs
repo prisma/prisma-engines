@@ -258,12 +258,12 @@ pub trait Visitor {
             Compare::In(left, right) => format!(
                 "{} IN {}",
                 self.visit_database_value(*left),
-                self.visit_row(*right),
+                self.visit_database_value(*right),
             ),
             Compare::NotIn(left, right) => format!(
                 "{} NOT IN {}",
                 self.visit_database_value(*left),
-                self.visit_row(*right),
+                self.visit_database_value(*right),
             ),
             Compare::Like(left, right) => {
                 let expression = self.visit_database_value(*left);
