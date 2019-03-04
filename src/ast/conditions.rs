@@ -1,4 +1,4 @@
-use crate::ast::{Conjuctive, Expression};
+use crate::ast::*;
 
 /// Tree structures and leaves for condition building.
 #[derive(Debug, PartialEq, Clone)]
@@ -65,6 +65,12 @@ impl Into<Expression> for ConditionTree {
     }
 }
 
+impl From<Select> for ConditionTree {
+    fn from(sel: Select) -> ConditionTree {
+        ConditionTree::single(Expression::Value(sel.into()))
+    }
+}
+
 impl Conjuctive for ConditionTree {
     fn and<E>(self, other: E) -> ConditionTree
     where
@@ -85,27 +91,5 @@ impl Conjuctive for ConditionTree {
     fn not(self) -> ConditionTree {
         let exp: Expression = self.into();
         exp.not()
-    }
-}
-
-impl Conjuctive for Expression {
-    fn and<E>(self, other: E) -> ConditionTree
-    where
-        E: Into<Expression>,
-    {
-        let right: Expression = other.into();
-        ConditionTree::and(self, right)
-    }
-
-    fn or<E>(self, other: E) -> ConditionTree
-    where
-        E: Into<Expression>,
-    {
-        let right: Expression = other.into();
-        ConditionTree::or(self, right)
-    }
-
-    fn not(self) -> ConditionTree {
-        ConditionTree::not(self)
     }
 }

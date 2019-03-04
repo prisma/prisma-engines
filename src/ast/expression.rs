@@ -1,4 +1,4 @@
-use crate::ast::{Compare, ConditionTree, DatabaseValue};
+use crate::ast::*;
 
 /// A database expression
 #[derive(Debug, PartialEq, Clone)]
@@ -9,4 +9,33 @@ pub enum Expression {
     Compare(Compare),
     /// A single value, column, row or a nested select
     Value(DatabaseValue),
+}
+
+impl Conjuctive for Expression {
+    fn and<E>(self, other: E) -> ConditionTree
+    where
+        E: Into<Expression>,
+    {
+        let right: Expression = other.into();
+        ConditionTree::and(self, right)
+    }
+
+    fn or<E>(self, other: E) -> ConditionTree
+    where
+        E: Into<Expression>,
+    {
+        let right: Expression = other.into();
+        ConditionTree::or(self, right)
+    }
+
+    fn not(self) -> ConditionTree {
+        ConditionTree::not(self)
+    }
+}
+
+impl From<Select> for Expression {
+    fn from(sel: Select) -> Expression {
+        let dv: DatabaseValue = sel.into();
+        Expression::Value(dv)
+    }
 }
