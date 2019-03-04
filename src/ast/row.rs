@@ -131,7 +131,7 @@ impl Comparable for Row {
         value.greater_than_or_equals(comparison)
     }
 
-    fn in_selection<T>(self, selection: Vec<T>) -> Compare
+    fn in_selection<T>(self, selection: T) -> Compare
     where
         T: Into<DatabaseValue>,
     {
@@ -139,7 +139,7 @@ impl Comparable for Row {
         value.in_selection(selection)
     }
 
-    fn not_in_selection<T>(self, selection: Vec<T>) -> Compare
+    fn not_in_selection<T>(self, selection: T) -> Compare
     where
         T: Into<DatabaseValue>,
     {

@@ -1,4 +1,4 @@
-use crate::ast::{Column, ConditionTree, Conjuctive, DatabaseValue, Expression, Row};
+use crate::ast::{Column, ConditionTree, Conjuctive, DatabaseValue, Expression};
 
 /// For modeling comparison expression
 #[derive(Debug, Clone, PartialEq)]
@@ -16,9 +16,9 @@ pub enum Compare {
     /// `left >= right`
     GreaterThanOrEquals(Box<DatabaseValue>, Box<DatabaseValue>),
     /// `left IN (..)`
-    In(Box<DatabaseValue>, Box<Row>),
+    In(Box<DatabaseValue>, Box<DatabaseValue>),
     /// `left NOT IN (..)`
-    NotIn(Box<DatabaseValue>, Box<Row>),
+    NotIn(Box<DatabaseValue>, Box<DatabaseValue>),
     /// `left LIKE %..%`
     Like(Box<DatabaseValue>, String),
     /// `left NOT LIKE %..%`
@@ -175,7 +175,7 @@ pub trait Comparable {
     ///     ParameterizedValue::Integer(2),
     /// ], params);
     /// ```
-    fn in_selection<T>(self, selection: Vec<T>) -> Compare
+    fn in_selection<T>(self, selection: T) -> Compare
     where
         T: Into<DatabaseValue>;
 
@@ -192,7 +192,7 @@ pub trait Comparable {
     ///     ParameterizedValue::Integer(2),
     /// ], params);
     /// ```
-    fn not_in_selection<T>(self, selection: Vec<T>) -> Compare
+    fn not_in_selection<T>(self, selection: T) -> Compare
     where
         T: Into<DatabaseValue>;
 
@@ -362,7 +362,7 @@ macro_rules! comparable {
                     val.greater_than_or_equals(comparison)
                 }
 
-                fn in_selection<T>(self, selection: Vec<T>) -> Compare
+                fn in_selection<T>(self, selection: T) -> Compare
                 where
                     T: Into<DatabaseValue>,
                 {
@@ -371,7 +371,7 @@ macro_rules! comparable {
                     val.in_selection(selection)
                 }
 
-                fn not_in_selection<T>(self, selection: Vec<T>) -> Compare
+                fn not_in_selection<T>(self, selection: T) -> Compare
                 where
                     T: Into<DatabaseValue>,
                 {

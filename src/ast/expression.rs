@@ -1,6 +1,6 @@
 use crate::ast::*;
 
-/// A database expression
+/// A database expression.
 #[derive(Debug, PartialEq, Clone)]
 pub enum Expression {
     /// A tree of expressions to evaluate from the deepest value to up

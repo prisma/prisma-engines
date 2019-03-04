@@ -51,6 +51,15 @@ impl ConditionTree {
     {
         ConditionTree::Single(Box::new(left.into()))
     }
+
+    /// Inverts the entire condition tree if condition is met.
+    pub fn invert_if(self, invert: bool) -> ConditionTree {
+        if invert {
+            self.not()
+        } else {
+            self
+        }
+    }
 }
 
 impl Default for ConditionTree {

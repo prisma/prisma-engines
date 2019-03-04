@@ -14,11 +14,11 @@ git config user.name "Buildkite agent"
 git config user.email "hello@prisma.io"
 
 mv ../target/doc/* .
-
 echo "<meta http-equiv=refresh content=0;url=prisma_query/index.html>" > index.html
 
-DIFF=$(git diff --name-only HEAD HEAD~1)
-# if [ $? -eq 0 ]
+DIFF=$(git status -s)
+printf "$DIFF\n"
+
 if [ -z "$DIFF" ]
 then
     echo "Nothing to do"
