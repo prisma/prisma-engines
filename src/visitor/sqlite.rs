@@ -1,6 +1,6 @@
 use crate::{ast::*, visitor::Visitor};
 
-use sqlite::Bindable;
+use sqlite::{Bindable, Result as SqliteResult, Statement};
 
 /// A visitor for generating queries for an SQLite database. Requires that
 /// `rusqlite` feature flag is selected.
@@ -40,20 +40,45 @@ impl Visitor for Sqlite {
     }
 
     fn visit_function(&mut self, fun: Function) -> String {
-        match fun {
-            Function::RowNumber(fun_rownum) => {
-                let definition = if fun_rownum.ordering.is_empty() {
-                    format!("ROW_NUMBER() OVER()")
+        let mut result = match fun.typ_ {
+            FunctionType::RowNumber(fun_rownum) => {
+                if fun_rownum.over.is_empty() {
+                    String::from("ROW_NUMBER() OVER()")
                 } else {
                     format!(
-                        "ROW_NUMBER() OVER(ORDER BY {})",
-                        self.visit_ordering(fun_rownum.ordering)
+                        "ROW_NUMBER() OVER({})",
+                        self.visit_partitioning(fun_rownum.over)
                     )
-                };
-
-                definition
+                }
             }
+        };
+
+        if let Some(alias) = fun.alias {
+            result.push_str(" AS ");
+            result.push_str(&Self::delimited_identifiers(vec![alias]));
         }
+
+        result
+    }
+
+    fn visit_partitioning(&mut self, over: Over) -> String {
+        let mut result = Vec::new();
+
+        if !over.partitioning.is_empty() {
+            let mut parts = Vec::new();
+
+            for partition in over.partitioning {
+                parts.push(Self::visit_column(partition))
+            }
+
+            result.push(format!("PARTITION BY {}", parts.join(", ")));
+        }
+
+        if !over.ordering.is_empty() {
+            result.push(format!("ORDER BY {}", self.visit_ordering(over.ordering)));
+        }
+
+        result.join(" ")
     }
 
     fn visit_offset(&mut self, offset: usize) -> String {
@@ -63,7 +88,7 @@ impl Visitor for Sqlite {
 
 impl Bindable for ParameterizedValue {
     #[inline]
-    fn bind(self, statement: &mut sqlite::Statement, i: usize) -> sqlite::Result<()> {
+    fn bind(self, statement: &mut Statement, i: usize) -> SqliteResult<()> {
         use ParameterizedValue as Pv;
         match self {
             Pv::Null => statement.bind(i, ()),

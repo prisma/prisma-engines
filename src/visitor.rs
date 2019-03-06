@@ -45,6 +45,9 @@ pub trait Visitor {
     /// A database function.
     fn visit_function(&mut self, fun: Function) -> String;
 
+    /// A partitioning statement.
+    fn visit_partitioning(&mut self, fun: Over) -> String;
+
     /// The join statements in the query
     fn visit_joins(&mut self, joins: Vec<Join>) -> String {
         let result = joins.into_iter().fold(Vec::new(), |mut acc, j| {
