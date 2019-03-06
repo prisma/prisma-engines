@@ -1,4 +1,4 @@
-use crate::ast::{ConditionTree, JoinData, Joinable};
+use crate::ast::{ConditionTree, JoinData, Joinable, Select};
 
 /// An object that can be aliased.
 pub trait Aliasable {
@@ -8,10 +8,16 @@ pub trait Aliasable {
         T: Into<String>;
 }
 
+#[derive(Clone, Debug, PartialEq)]
+pub enum TableType {
+    Table(String),
+    Query(Select),
+}
+
 /// A table definition
-#[derive(Clone, Debug, Default, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct Table {
-    pub name: String,
+    pub typ: TableType,
     pub alias: Option<String>,
     pub database: Option<String>,
 }
@@ -30,8 +36,9 @@ impl Table {
 impl<'a> Into<Table> for &'a str {
     fn into(self) -> Table {
         Table {
-            name: self.to_string(),
-            ..Default::default()
+            typ: TableType::Table(self.to_string()),
+            alias: None,
+            database: None,
         }
     }
 }
@@ -46,8 +53,9 @@ impl<'a, 'b> Into<Table> for (&'a str, &'b str) {
 impl Into<Table> for String {
     fn into(self) -> Table {
         Table {
-            name: self,
-            ..Default::default()
+            typ: TableType::Table(self),
+            alias: None,
+            database: None,
         }
     }
 }
@@ -56,6 +64,16 @@ impl Into<Table> for (String, String) {
     fn into(self) -> Table {
         let table: Table = self.1.into();
         table.database(self.0)
+    }
+}
+
+impl From<Select> for Table {
+    fn from(select: Select) -> Table {
+        Table {
+            typ: TableType::Query(select),
+            alias: None,
+            database: None,
+        }
     }
 }
 

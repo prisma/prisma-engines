@@ -3,7 +3,7 @@ use crate::ast::*;
 /// A builder for a `SELECT` statement.
 #[derive(Debug, PartialEq, Clone, Default)]
 pub struct Select {
-    pub table: Option<Table>,
+    pub table: Option<Box<Table>>,
     pub columns: Vec<DatabaseValue>,
     pub conditions: Option<ConditionTree>,
     pub ordering: Ordering,
@@ -44,12 +44,24 @@ impl Select {
     ///
     /// assert_eq!("SELECT * FROM `crm`.`users` LIMIT -1", sql);
     /// ```
+    ///
+    /// It is also possible to use a nested `SELECT`.
+    ///
+    /// ```rust
+    /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
+    /// let select = Table::from(Select::default().value(1)).alias("num");
+    /// let query = Select::from(select.alias("num"));
+    /// let (sql, params) = Sqlite::build(query);
+    ///
+    /// assert_eq!("SELECT * FROM (SELECT ?) AS `num` LIMIT -1", sql);
+    /// assert_eq!(vec![ParameterizedValue::Integer(1)], params);
+    /// ```
     pub fn from<T>(table: T) -> Self
     where
         T: Into<Table>,
     {
         Select {
-            table: Some(table.into()),
+            table: Some(Box::new(table.into())),
             ..Default::default()
         }
     }

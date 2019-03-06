@@ -68,7 +68,7 @@ impl Visitor for Sqlite {
             let mut parts = Vec::new();
 
             for partition in over.partitioning {
-                parts.push(Self::visit_column(partition))
+                parts.push(self.visit_column(partition))
             }
 
             result.push(format!("PARTITION BY {}", parts.join(", ")));

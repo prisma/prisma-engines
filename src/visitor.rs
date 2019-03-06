@@ -67,7 +67,7 @@ pub trait Visitor {
     fn visit_join_data(&mut self, data: JoinData) -> String {
         format!(
             "{} ON {}",
-            Self::visit_table(data.table, true),
+            self.visit_table(data.table, true),
             self.visit_conditions(data.conditions)
         )
     }
@@ -83,7 +83,7 @@ pub trait Visitor {
         }
 
         if let Some(table) = select.table {
-            result.push(format!("FROM {}", Self::visit_table(table, true)));
+            result.push(format!("FROM {}", self.visit_table(*table, true)));
 
             if !select.joins.is_empty() {
                 result.push(self.visit_joins(select.joins));
@@ -151,7 +151,7 @@ pub trait Visitor {
                 self.add_parameter(val);
                 Self::C_PARAM.to_string()
             }
-            DatabaseValue::Column(column) => Self::visit_column(column),
+            DatabaseValue::Column(column) => self.visit_column(column),
             DatabaseValue::Row(row) => self.visit_row(row),
             DatabaseValue::Select(select) => format!("({})", self.visit_select(select)),
             DatabaseValue::Function(function) => self.visit_function(function),
@@ -159,10 +159,13 @@ pub trait Visitor {
     }
 
     /// A database table identifier
-    fn visit_table(table: Table, include_alias: bool) -> String {
-        let mut result = match table.database {
-            Some(database) => Self::delimited_identifiers(vec![database, table.name]),
-            None => Self::delimited_identifiers(vec![table.name]),
+    fn visit_table(&mut self, table: Table, include_alias: bool) -> String {
+        let mut result = match table.typ {
+            TableType::Table(table_name) => match table.database {
+                Some(database) => Self::delimited_identifiers(vec![database, table_name]),
+                None => Self::delimited_identifiers(vec![table_name]),
+            },
+            TableType::Query(select) => format!("({})", self.visit_select(select)),
         };
 
         if include_alias {
@@ -176,11 +179,11 @@ pub trait Visitor {
     }
 
     /// A database column identifier
-    fn visit_column(column: Column) -> String {
+    fn visit_column(&mut self, column: Column) -> String {
         let mut column_identifier = match column.table {
             Some(table) => format!(
                 "{}.{}",
-                Self::visit_table(table, false),
+                self.visit_table(table, false),
                 Self::delimited_identifiers(vec![column.name])
             ),
             _ => Self::delimited_identifiers(vec![column.name]),
