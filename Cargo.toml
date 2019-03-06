@@ -1,12 +1,15 @@
 [package]
 name = "prisma-query"
 version = "0.1.0"
-authors = ["Julius de Bruijn <bruijn@prisma.io>", "Dominic Petrick <petrick@prisma.io>"]
+authors = [
+    "Julius de Bruijn <bruijn@prisma.io>", 
+    "Dominic Petrick <petrick@prisma.io>",
+    "Katharina Fey <kookie@spacekookie.de>"
+]
 edition = "2018"
 
 [features]
 default = ["sqlite"]
-sqlite = ["rusqlite"]
 
 [dependencies]
-rusqlite = { version = "0.16", features = ["chrono"], package = 'rusqlite', optional = true }
+sqlite = { version = "0.24", optional = true }

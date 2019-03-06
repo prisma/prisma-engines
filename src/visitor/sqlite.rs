@@ -1,9 +1,6 @@
 use crate::{ast::*, visitor::Visitor};
 
-use rusqlite::{
-    types::{Null, ToSql, ToSqlOutput},
-    Error as RusqlError,
-};
+use ::sqlite::Bindable;
 
 /// A visitor for generating queries for an SQLite database. Requires that
 /// `rusqlite` feature flag is selected.
@@ -47,17 +44,20 @@ impl Visitor for Sqlite {
     }
 }
 
-impl ToSql for ParameterizedValue {
-    fn to_sql(&self) -> Result<ToSqlOutput, RusqlError> {
-        let value = match self {
-            ParameterizedValue::Null => ToSqlOutput::from(Null),
-            ParameterizedValue::Integer(integer) => ToSqlOutput::from(*integer),
-            ParameterizedValue::Real(float) => ToSqlOutput::from(*float),
-            ParameterizedValue::Text(string) => ToSqlOutput::from(string.clone()),
-            ParameterizedValue::Boolean(boo) => ToSqlOutput::from(*boo),
-        };
-
-        Ok(value)
+impl Bindable for ParameterizedValue {
+    #[inline]
+    fn bind(self, statement: &mut sqlite::Statement, i: usize) -> sqlite::Result<()> {
+        use ParameterizedValue as Pv;
+        match self {
+            Pv::Null => statement.bind(i, ()),
+            Pv::Integer(integer) => statement.bind(i, integer),
+            Pv::Real(float) => statement.bind(i, float),
+            Pv::Text(string) => statement.bind(i, string.as_str()),
+            
+            // Sqlite3 doesn't have booleans so we match to ints
+            Pv::Boolean(true) => statement.bind(i, 1),
+            Pv::Boolean(false) => statement.bind(i, 0),
+        }
     }
 }
 
@@ -403,5 +403,40 @@ mod tests {
         let (sql, _) = Sqlite::build(query);
 
         assert_eq!(expected_sql, sql);
+    }
+
+    /// Creates a simple sqlite database with a user table and a nice user
+    fn sqlite_harness() -> ::sqlite::Connection {
+        let conn = ::sqlite::open(":memory:").unwrap();
+        conn.execute(
+            "
+            CREATE TABLE users (id, name TEXT, age REAL, nice INTEGER);
+            INSERT INTO users (id, name, age, nice) VALUES (1, 'Alice', 42.69, 1);
+            ",
+        ).unwrap();
+        conn
+    }
+
+    #[test]
+    fn bind_test_1() {
+        let conn = sqlite_harness();
+
+        let conditions = "name"
+            .equals("Alice")
+            .and("age".less_than(100.0))
+            .and("nice".equals(true));
+        let query = Select::from("users").so_that(conditions);
+        let (sql_str, params) = Sqlite::build(query);
+
+        let mut s = conn.prepare(sql_str.clone()).unwrap();
+        for i in 1..params.len() + 1 {
+            s.bind::<ParameterizedValue>(i, params[i - 1].clone().into()).unwrap();
+        }
+
+        s.next().unwrap();
+
+        assert_eq!("Alice", s.read::<String>(1).unwrap());
+        assert_eq!(42.69, s.read::<f64>(2).unwrap());
+        assert_eq!(1, s.read::<i64>(3).unwrap());
     }
 }
