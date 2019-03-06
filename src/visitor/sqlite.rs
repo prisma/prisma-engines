@@ -1,10 +1,5 @@
 use crate::{ast::*, visitor::Visitor};
 
-// use sqlite::{
-//     types::{Null, ToSql, ToSqlOutput},
-//     Error as RusqlError,
-// };
-
 use ::sqlite::Bindable;
 
 /// A visitor for generating queries for an SQLite database. Requires that
