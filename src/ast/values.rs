@@ -1,4 +1,4 @@
-use crate::ast::{Column, Comparable, Compare, Row, Select};
+use crate::ast::*;
 
 /// A value we must parameterize for the prepared statement.
 #[derive(Debug, Clone, PartialEq)]
@@ -26,6 +26,8 @@ pub enum DatabaseValue {
     Row(Row),
     /// A nested `SELECT` statement
     Select(Select),
+    /// A database function call
+    Function(Function),
 }
 
 impl<'a> Into<ParameterizedValue> for &'a str {
@@ -102,6 +104,12 @@ impl Into<DatabaseValue> for ParameterizedValue {
 impl Into<DatabaseValue> for Row {
     fn into(self) -> DatabaseValue {
         DatabaseValue::Row(self)
+    }
+}
+
+impl Into<DatabaseValue> for Function {
+    fn into(self) -> DatabaseValue {
+        DatabaseValue::Function(self)
     }
 }
 

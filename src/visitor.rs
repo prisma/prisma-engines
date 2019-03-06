@@ -42,6 +42,9 @@ pub trait Visitor {
     /// The `OFFSET` statement in the query
     fn visit_offset(&mut self, offset: usize) -> String;
 
+    /// A database function.
+    fn visit_function(&mut self, fun: Function) -> String;
+
     /// The join statements in the query
     fn visit_joins(&mut self, joins: Vec<Join>) -> String {
         let result = joins.into_iter().fold(Vec::new(), |mut acc, j| {
@@ -148,6 +151,7 @@ pub trait Visitor {
             DatabaseValue::Column(column) => Self::visit_column(column),
             DatabaseValue::Row(row) => self.visit_row(row),
             DatabaseValue::Select(select) => format!("({})", self.visit_select(select)),
+            DatabaseValue::Function(function) => self.visit_function(function),
         }
     }
 

@@ -1,11 +1,26 @@
 use crate::ast::{Comparable, Compare, DatabaseValue, Table};
 
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum TypeIdentifier {
+    String,
+    Float,
+    Boolean,
+    Enum,
+    Json,
+    DateTime,
+    GraphQLID,
+    UUID,
+    Int,
+    Relation,
+}
+
 /// A column definition.
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct Column {
     pub name: String,
     pub table: Option<Table>,
     pub alias: Option<String>,
+    pub type_identifier: Option<TypeIdentifier>,
 }
 
 impl Into<DatabaseValue> for Column {
@@ -32,6 +47,7 @@ impl Column {
         self
     }
 
+    /// Give the column an alias in the query.
     pub fn alias<S>(mut self, alias: S) -> Self
     where
         S: Into<String>,
