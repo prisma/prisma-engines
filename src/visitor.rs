@@ -19,6 +19,7 @@ pub use self::sqlite::Sqlite;
 pub trait Visitor {
     /// Parameter character when parameterizing values in the query.
     const C_PARAM: &'static str;
+
     /// Backtick character to surround identifiers, such as column and table names.
     const C_BACKTICK: &'static str;
     /// Wildcard character to be used in `LIKE` queries.
@@ -169,14 +170,21 @@ pub trait Visitor {
 
     /// A database column identifier
     fn visit_column(column: Column) -> String {
-        match column.table {
+        let mut column_identifier = match column.table {
             Some(table) => format!(
                 "{}.{}",
                 Self::visit_table(table, false),
                 Self::delimited_identifiers(vec![column.name])
             ),
             _ => Self::delimited_identifiers(vec![column.name]),
+        };
+
+        if let Some(alias) = column.alias {
+            column_identifier.push_str(" AS ");
+            column_identifier.push_str(&Self::delimited_identifiers(vec![alias]));
         }
+
+        column_identifier
     }
 
     /// A row of data used as an expression

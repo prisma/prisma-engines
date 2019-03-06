@@ -5,6 +5,7 @@ use crate::ast::{Comparable, Compare, DatabaseValue, Table};
 pub struct Column {
     pub name: String,
     pub table: Option<Table>,
+    pub alias: Option<String>,
 }
 
 impl Into<DatabaseValue> for Column {
@@ -30,13 +31,21 @@ impl Column {
         self.table = Some(table);
         self
     }
+
+    pub fn alias<S>(mut self, alias: S) -> Self
+    where
+        S: Into<String>,
+    {
+        self.alias = Some(alias.into());
+        self
+    }
 }
 
 impl<'a> From<&'a str> for Column {
     fn from(s: &'a str) -> Column {
         Column {
             name: s.to_string(),
-            table: None,
+            ..Default::default()
         }
     }
 }
@@ -63,7 +72,7 @@ impl From<String> for Column {
     fn from(s: String) -> Column {
         Column {
             name: s,
-            table: None,
+            ..Default::default()
         }
     }
 }

@@ -395,4 +395,13 @@ mod tests {
         assert_eq!(expected_sql, sql);
         assert_eq!(vec![ParameterizedValue::Boolean(true),], params);
     }
+
+    #[test]
+    fn test_column_aliasing() {
+        let expected_sql = "SELECT `bar` AS `foo` FROM `meow` LIMIT -1";
+        let query = Select::from("meow").column(Column::new("bar").alias("foo"));
+        let (sql, _) = Sqlite::build(query);
+
+        assert_eq!(expected_sql, sql);
+    }
 }
