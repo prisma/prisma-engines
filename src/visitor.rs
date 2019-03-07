@@ -8,10 +8,10 @@
 //! For prelude, all important imports are in `prisma_query::visitor::*`;
 use crate::ast::*;
 
-#[cfg(feature = "sqlite")]
+#[cfg(any(feature = "sqlite", feature = "rusqlite"))]
 mod sqlite;
 
-#[cfg(feature = "sqlite")]
+#[cfg(any(feature = "sqlite", feature = "rusqlite"))]
 pub use self::sqlite::Sqlite;
 
 /// A function travelling through the query AST, building the final query string

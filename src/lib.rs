@@ -95,5 +95,6 @@
 //!
 //! In cases where more feasible we want to build a `ConditionTree` manually
 //! from the input, e.g. when mapping data using an `Into<ConditionTree>` trait.
+
 pub mod ast;
 pub mod visitor;
