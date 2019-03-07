@@ -9,7 +9,9 @@ authors = [
 edition = "2018"
 
 [features]
-default = ["sqlite"]
+default = ["sqlite3"]
+sqlite3 = ["sqlite"]
 
 [dependencies]
 sqlite = { version = "0.24", optional = true }
+rusqlite = { version = "0.16", optional = true }

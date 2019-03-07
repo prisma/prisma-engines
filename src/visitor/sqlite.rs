@@ -1,6 +1,13 @@
 use crate::{ast::*, visitor::Visitor};
 
-use sqlite::{Bindable, Result as SqliteResult, Statement};
+#[cfg(feature = "sqlite")]
+use sqlite::Bindable;
+
+#[cfg(feature = "rusqlite")]
+use rusqlite::{
+    types::{Null, ToSql, ToSqlOutput},
+    Error as RusqlError,
+};
 
 /// A visitor for generating queries for an SQLite database. Requires that
 /// `rusqlite` feature flag is selected.
@@ -86,6 +93,7 @@ impl Visitor for Sqlite {
     }
 }
 
+#[cfg(feature = "sqlite")]
 impl Bindable for ParameterizedValue {
     #[inline]
     fn bind(self, statement: &mut Statement, i: usize) -> SqliteResult<()> {
@@ -100,6 +108,21 @@ impl Bindable for ParameterizedValue {
             Pv::Boolean(true) => statement.bind(i, 1),
             Pv::Boolean(false) => statement.bind(i, 0),
         }
+    }
+}
+
+#[cfg(feature = "rusqlite")]
+impl ToSql for ParameterizedValue {
+    fn to_sql(&self) -> Result<ToSqlOutput, RusqlError> {
+        let value = match self {
+            ParameterizedValue::Null => ToSqlOutput::from(Null),
+            ParameterizedValue::Integer(integer) => ToSqlOutput::from(*integer),
+            ParameterizedValue::Real(float) => ToSqlOutput::from(*float),
+            ParameterizedValue::Text(string) => ToSqlOutput::from(string.clone()),
+            ParameterizedValue::Boolean(boo) => ToSqlOutput::from(*boo),
+        };
+
+        Ok(value)
     }
 }
 
@@ -448,6 +471,7 @@ mod tests {
     }
 
     /// Creates a simple sqlite database with a user table and a nice user
+    #[cfg(feature = "sqlite")]
     fn sqlite_harness() -> ::sqlite::Connection {
         let conn = ::sqlite::open(":memory:").unwrap();
         conn.execute(
@@ -461,6 +485,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(feature = "sqlite")]
     fn bind_test_1() {
         let conn = sqlite_harness();
 
@@ -483,4 +508,60 @@ mod tests {
         assert_eq!(42.69, s.read::<f64>(2).unwrap());
         assert_eq!(1, s.read::<i64>(3).unwrap());
     }
+
+    #[cfg(feature = "rusqlite")]
+    fn sqlite_harness() -> ::rusqlite::Connection {
+        let conn = ::rusqlite::Connection::open_in_memory().unwrap();
+        conn.execute(
+            "
+            CREATE TABLE users (id, name TEXT, age REAL, nice INTEGER);
+            ",
+            ::rusqlite::NO_PARAMS,
+        )
+        .unwrap();
+        conn.execute(
+            "
+            INSERT INTO users (id, name, age, nice) VALUES (1, 'Alice', 42.69, 1);
+            ",
+            ::rusqlite::NO_PARAMS,
+        )
+        .unwrap();
+        conn
+    }
+
+    #[test]
+    #[cfg(feature = "rusqlite")]
+    fn bind_test_1() {
+        let conn = sqlite_harness();
+
+        let conditions = "name"
+            .equals("Alice")
+            .and("age".less_than(100.0))
+            .and("nice".equals(1));
+        let query = Select::from("users").so_that(conditions);
+        let (sql_str, params) = Sqlite::build(query);
+
+        #[derive(Debug)]
+        struct Person {
+            name: String,
+            age: f64,
+            nice: i32,
+        }
+
+        let mut stmt = conn.prepare(&sql_str).unwrap();
+        let mut person_iter = stmt
+            .query_map(&params, |row| Person {
+                name: row.get(1),
+                age: row.get(2),
+                nice: row.get(3),
+            })
+            .unwrap();
+
+        let person: Person = person_iter.nth(0).unwrap().unwrap();
+
+        assert_eq!("Alice", person.name);
+        assert_eq!(42.69, person.age);
+        assert_eq!(1, person.nice);
+    }
+
 }
