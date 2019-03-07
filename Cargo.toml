@@ -9,7 +9,7 @@ authors = [
 edition = "2018"
 
 [features]
-default = ["sqlite3"]
+default = ["rusqlite"]
 sqlite3 = ["sqlite"]
 
 [dependencies]
