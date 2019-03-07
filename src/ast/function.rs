@@ -43,7 +43,7 @@ impl Function {
 
 impl RowNumber {
     /// Define the order of the row number. Is the row order if not set.
-    pub fn over<T>(mut self, value: T) -> Self
+    pub fn order_by<T>(mut self, value: T) -> Self
     where
         T: IntoOrderDefinition,
     {
@@ -67,7 +67,7 @@ impl RowNumber {
 ///
 /// ```rust
 /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
-/// let fun = Function::from(row_number().over("created_at").partition_by("name"));
+/// let fun = Function::from(row_number().order_by("created_at").partition_by("name"));
 ///
 /// let query = Select::from("users")
 ///     .column("id")
