@@ -28,8 +28,8 @@ pub enum DatabaseValue {
     Select(Select),
     /// A database function call
     Function(Function),
-    /// An asterisk
-    Asterisk,
+    /// A qualified asterisk to a table
+    Asterisk(Table),
 }
 
 impl<'a> Into<ParameterizedValue> for &'a str {

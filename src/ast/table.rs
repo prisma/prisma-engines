@@ -1,4 +1,4 @@
-use crate::ast::{ConditionTree, JoinData, Joinable, Select};
+use crate::ast::{ConditionTree, DatabaseValue, JoinData, Joinable, Select};
 
 /// An object that can be aliased.
 pub trait Aliasable {
@@ -31,39 +31,44 @@ impl Table {
         self.database = Some(database.into());
         self
     }
+
+    /// A qualified asterisk to this table
+    pub fn asterisk(self) -> DatabaseValue {
+        DatabaseValue::Asterisk(self)
+    }
 }
 
-impl<'a> Into<Table> for &'a str {
-    fn into(self) -> Table {
+impl<'a> From<&'a str> for Table {
+    fn from(s: &'a str) -> Table {
         Table {
-            typ: TableType::Table(self.to_string()),
+            typ: TableType::Table(s.to_string()),
             alias: None,
             database: None,
         }
     }
 }
 
-impl<'a, 'b> Into<Table> for (&'a str, &'b str) {
-    fn into(self) -> Table {
-        let table: Table = self.1.into();
-        table.database(self.0)
+impl<'a, 'b> From<(&'a str, &'b str)> for Table {
+    fn from(s: (&'a str, &'b str)) -> Table {
+        let table: Table = s.1.into();
+        table.database(s.0)
     }
 }
 
-impl Into<Table> for String {
-    fn into(self) -> Table {
+impl From<String> for Table {
+    fn from(s: String) -> Table {
         Table {
-            typ: TableType::Table(self),
+            typ: TableType::Table(s),
             alias: None,
             database: None,
         }
     }
 }
 
-impl Into<Table> for (String, String) {
-    fn into(self) -> Table {
-        let table: Table = self.1.into();
-        table.database(self.0)
+impl From<(String, String)> for Table {
+    fn from(s: (String, String)) -> Table {
+        let table: Table = s.1.into();
+        table.database(s.0)
     }
 }
 

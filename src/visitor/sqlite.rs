@@ -130,7 +130,7 @@ mod tests {
 
     #[test]
     fn test_select_star_from() {
-        let expected_sql = "SELECT * FROM `musti` LIMIT -1";
+        let expected_sql = "SELECT `musti`.* FROM `musti` LIMIT -1";
         let query = Select::from("musti");
         let (sql, params) = Sqlite::build(query);
 
@@ -140,7 +140,8 @@ mod tests {
 
     #[test]
     fn test_select_order_by() {
-        let expected_sql = "SELECT * FROM `musti` ORDER BY `foo`, `baz` ASC, `bar` DESC LIMIT -1";
+        let expected_sql =
+            "SELECT `musti`.* FROM `musti` ORDER BY `foo`, `baz` ASC, `bar` DESC LIMIT -1";
         let query = Select::from("musti")
             .order_by("foo")
             .order_by("baz".ascend())
@@ -164,7 +165,7 @@ mod tests {
     #[test]
     fn test_select_where_equals() {
         let expected = expected_values(
-            "SELECT * FROM `naukio` WHERE `word` = ? LIMIT -1",
+            "SELECT `naukio`.* FROM `naukio` WHERE `word` = ? LIMIT -1",
             vec!["meow"],
         );
 
@@ -178,7 +179,7 @@ mod tests {
     #[test]
     fn test_select_where_like() {
         let expected = expected_values(
-            "SELECT * FROM `naukio` WHERE `word` LIKE ? LIMIT -1",
+            "SELECT `naukio`.* FROM `naukio` WHERE `word` LIKE ? LIMIT -1",
             vec!["%meow%"],
         );
 
@@ -192,7 +193,7 @@ mod tests {
     #[test]
     fn test_select_where_not_like() {
         let expected = expected_values(
-            "SELECT * FROM `naukio` WHERE `word` NOT LIKE ? LIMIT -1",
+            "SELECT `naukio`.* FROM `naukio` WHERE `word` NOT LIKE ? LIMIT -1",
             vec!["%meow%"],
         );
 
@@ -206,7 +207,7 @@ mod tests {
     #[test]
     fn test_select_where_begins_with() {
         let expected = expected_values(
-            "SELECT * FROM `naukio` WHERE `word` LIKE ? LIMIT -1",
+            "SELECT `naukio`.* FROM `naukio` WHERE `word` LIKE ? LIMIT -1",
             vec!["meow%"],
         );
 
@@ -220,7 +221,7 @@ mod tests {
     #[test]
     fn test_select_where_not_begins_with() {
         let expected = expected_values(
-            "SELECT * FROM `naukio` WHERE `word` NOT LIKE ? LIMIT -1",
+            "SELECT `naukio`.* FROM `naukio` WHERE `word` NOT LIKE ? LIMIT -1",
             vec!["meow%"],
         );
 
@@ -234,7 +235,7 @@ mod tests {
     #[test]
     fn test_select_where_ends_into() {
         let expected = expected_values(
-            "SELECT * FROM `naukio` WHERE `word` LIKE ? LIMIT -1",
+            "SELECT `naukio`.* FROM `naukio` WHERE `word` LIKE ? LIMIT -1",
             vec!["%meow"],
         );
 
@@ -248,7 +249,7 @@ mod tests {
     #[test]
     fn test_select_where_not_ends_into() {
         let expected = expected_values(
-            "SELECT * FROM `naukio` WHERE `word` NOT LIKE ? LIMIT -1",
+            "SELECT `naukio`.* FROM `naukio` WHERE `word` NOT LIKE ? LIMIT -1",
             vec!["%meow"],
         );
 
@@ -262,7 +263,7 @@ mod tests {
     #[test]
     fn test_select_and() {
         let expected_sql =
-            "SELECT * FROM `naukio` WHERE ((`word` = ? AND `age` < ?) AND `paw` = ?) LIMIT -1";
+            "SELECT `naukio`.* FROM `naukio` WHERE ((`word` = ? AND `age` < ?) AND `paw` = ?) LIMIT -1";
 
         let expected_params = vec![
             ParameterizedValue::Text(String::from("meow")),
@@ -286,7 +287,7 @@ mod tests {
     #[test]
     fn test_select_and_different_execution_order() {
         let expected_sql =
-            "SELECT * FROM `naukio` WHERE (`word` = ? AND (`age` < ? AND `paw` = ?)) LIMIT -1";
+            "SELECT `naukio`.* FROM `naukio` WHERE (`word` = ? AND (`age` < ? AND `paw` = ?)) LIMIT -1";
 
         let expected_params = vec![
             ParameterizedValue::Text(String::from("meow")),
@@ -309,7 +310,7 @@ mod tests {
     #[test]
     fn test_select_or() {
         let expected_sql =
-            "SELECT * FROM `naukio` WHERE ((`word` = ? OR `age` < ?) AND `paw` = ?) LIMIT -1";
+            "SELECT `naukio`.* FROM `naukio` WHERE ((`word` = ? OR `age` < ?) AND `paw` = ?) LIMIT -1";
 
         let expected_params = vec![
             ParameterizedValue::Text(String::from("meow")),
@@ -333,7 +334,7 @@ mod tests {
     #[test]
     fn test_select_negation() {
         let expected_sql =
-            "SELECT * FROM `naukio` WHERE (NOT ((`word` = ? OR `age` < ?) AND `paw` = ?)) LIMIT -1";
+            "SELECT `naukio`.* FROM `naukio` WHERE (NOT ((`word` = ? OR `age` < ?) AND `paw` = ?)) LIMIT -1";
 
         let expected_params = vec![
             ParameterizedValue::Text(String::from("meow")),
@@ -358,7 +359,7 @@ mod tests {
     #[test]
     fn test_with_raw_condition_tree() {
         let expected_sql =
-            "SELECT * FROM `naukio` WHERE (NOT ((`word` = ? OR `age` < ?) AND `paw` = ?)) LIMIT -1";
+            "SELECT `naukio`.* FROM `naukio` WHERE (NOT ((`word` = ? OR `age` < ?) AND `paw` = ?)) LIMIT -1";
 
         let expected_params = vec![
             ParameterizedValue::Text(String::from("meow")),
@@ -382,7 +383,7 @@ mod tests {
     #[test]
     fn test_simple_inner_join() {
         let expected_sql =
-            "SELECT * FROM `users` INNER JOIN `posts` ON `users`.`id` = `posts`.`user_id` LIMIT -1";
+            "SELECT `users`.* FROM `users` INNER JOIN `posts` ON `users`.`id` = `posts`.`user_id` LIMIT -1";
 
         let query = Select::from("users")
             .inner_join("posts".on(("users", "id").equals(Column::from(("posts", "user_id")))));
@@ -394,7 +395,7 @@ mod tests {
     #[test]
     fn test_additional_condition_inner_join() {
         let expected_sql =
-            "SELECT * FROM `users` INNER JOIN `posts` ON (`users`.`id` = `posts`.`user_id` AND `posts`.`published` = ?) LIMIT -1";
+            "SELECT `users`.* FROM `users` INNER JOIN `posts` ON (`users`.`id` = `posts`.`user_id` AND `posts`.`published` = ?) LIMIT -1";
 
         let query = Select::from("users").inner_join(
             "posts".on(("users", "id")
@@ -411,7 +412,7 @@ mod tests {
     #[test]
     fn test_simple_left_join() {
         let expected_sql =
-            "SELECT * FROM `users` LEFT OUTER JOIN `posts` ON `users`.`id` = `posts`.`user_id` LIMIT -1";
+            "SELECT `users`.* FROM `users` LEFT OUTER JOIN `posts` ON `users`.`id` = `posts`.`user_id` LIMIT -1";
 
         let query = Select::from("users").left_outer_join(
             "posts".on(("users", "id").equals(Column::from(("posts", "user_id")))),
@@ -424,7 +425,7 @@ mod tests {
     #[test]
     fn test_additional_condition_left_join() {
         let expected_sql =
-            "SELECT * FROM `users` LEFT OUTER JOIN `posts` ON (`users`.`id` = `posts`.`user_id` AND `posts`.`published` = ?) LIMIT -1";
+            "SELECT `users`.* FROM `users` LEFT OUTER JOIN `posts` ON (`users`.`id` = `posts`.`user_id` AND `posts`.`published` = ?) LIMIT -1";
 
         let query = Select::from("users").left_outer_join(
             "posts".on(("users", "id")

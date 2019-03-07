@@ -43,7 +43,7 @@
 //!     let (sql_str, params) = Sqlite::build(query);
 //!
 //!     assert_eq!(
-//!         "SELECT * FROM `naukio` WHERE ((`word` = ? AND `age` < ?) AND `paw` = ?) LIMIT -1",
+//!         "SELECT `naukio`.* FROM `naukio` WHERE ((`word` = ? AND `age` < ?) AND `paw` = ?) LIMIT -1",
 //!         sql_str,
 //!     );
 //!
@@ -78,7 +78,7 @@
 //!     let (sql, params) = Sqlite::build(query);
 //!
 //!     assert_eq!(
-//!         "SELECT * FROM `naukio` WHERE ((`word` = ? OR `age` < ?) AND `paw` = ?) LIMIT -1",
+//!         "SELECT `naukio`.* FROM `naukio` WHERE ((`word` = ? OR `age` < ?) AND `paw` = ?) LIMIT -1",
 //!         sql,
 //!     );
 //!

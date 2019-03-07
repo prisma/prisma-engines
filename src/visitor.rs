@@ -76,13 +76,30 @@ pub trait Visitor {
     fn visit_select(&mut self, select: Select) -> String {
         let mut result = vec!["SELECT".to_string()];
 
-        if select.columns.is_empty() {
-            result.push(self.visit_database_value(DatabaseValue::Asterisk));
-        } else {
-            result.push(format!("{}", self.visit_columns(select.columns)));
-        }
-
         if let Some(table) = select.table {
+            if select.columns.is_empty() {
+                match table.typ {
+                    TableType::Query(_) => match table.alias {
+                        Some(ref alias) => result.push(format!(
+                            "{}.*",
+                            Self::delimited_identifiers(vec![alias.clone()])
+                        )),
+                        None => result.push(String::from("*")),
+                    },
+                    TableType::Table(_) => match table.alias.clone() {
+                        Some(ref alias) => result.push(format!(
+                            "{}.*",
+                            Self::delimited_identifiers(vec![alias.clone()])
+                        )),
+                        None => {
+                            result.push(format!("{}.*", self.visit_table(*table.clone(), false)))
+                        }
+                    },
+                }
+            } else {
+                result.push(format!("{}", self.visit_columns(select.columns)));
+            }
+
             result.push(format!("FROM {}", self.visit_table(*table, true)));
 
             if !select.joins.is_empty() {
@@ -100,6 +117,12 @@ pub trait Visitor {
 
             if let Some(offset) = select.offset {
                 result.push(self.visit_offset(offset));
+            }
+        } else {
+            if select.columns.is_empty() {
+                result.push(String::from("*"));
+            } else {
+                result.push(format!("{}", self.visit_columns(select.columns)));
             }
         }
 
@@ -155,7 +178,7 @@ pub trait Visitor {
             DatabaseValue::Row(row) => self.visit_row(row),
             DatabaseValue::Select(select) => format!("({})", self.visit_select(select)),
             DatabaseValue::Function(function) => self.visit_function(function),
-            DatabaseValue::Asterisk => String::from("*"),
+            DatabaseValue::Asterisk(table) => format!("{}.*", self.visit_table(table, false)),
         }
     }
 
