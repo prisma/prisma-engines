@@ -77,7 +77,7 @@ pub trait Visitor {
         let mut result = vec!["SELECT".to_string()];
 
         if select.columns.is_empty() {
-            result.push(String::from("*"));
+            result.push(self.visit_database_value(DatabaseValue::Asterisk));
         } else {
             result.push(format!("{}", self.visit_columns(select.columns)));
         }
@@ -155,6 +155,7 @@ pub trait Visitor {
             DatabaseValue::Row(row) => self.visit_row(row),
             DatabaseValue::Select(select) => format!("({})", self.visit_select(select)),
             DatabaseValue::Function(function) => self.visit_function(function),
+            DatabaseValue::Asterisk => String::from("*"),
         }
     }
 
