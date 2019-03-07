@@ -1,7 +1,7 @@
 use crate::{ast::*, visitor::Visitor};
 
 #[cfg(feature = "sqlite")]
-use sqlite::Bindable;
+use sqlite::{Bindable, Statement, Result as SqliteResult};
 
 #[cfg(feature = "rusqlite")]
 use rusqlite::{
