@@ -231,4 +231,28 @@ impl Comparable for DatabaseValue {
     fn is_not_null(self) -> Compare {
         Compare::NotNull(Box::new(self))
     }
+
+    fn between<T, V>(self, left: T, right: V) -> Compare
+    where
+        T: Into<DatabaseValue>,
+        V: Into<DatabaseValue>,
+    {
+        Compare::Between(
+            Box::new(self),
+            Box::new(left.into()),
+            Box::new(right.into()),
+        )
+    }
+
+    fn not_between<T, V>(self, left: T, right: V) -> Compare
+    where
+        T: Into<DatabaseValue>,
+        V: Into<DatabaseValue>,
+    {
+        Compare::NotBetween(
+            Box::new(self),
+            Box::new(left.into()),
+            Box::new(right.into()),
+        )
+    }
 }

@@ -344,6 +344,18 @@ pub trait Visitor {
             Compare::NotNull(column) => {
                 format!("{} IS NOT NULL", self.visit_database_value(*column))
             }
+            Compare::Between(val, left, right) => format!(
+                "{} BETWEEN {} AND {}",
+                self.visit_database_value(*val),
+                self.visit_database_value(*left),
+                self.visit_database_value(*right)
+            ),
+            Compare::NotBetween(val, left, right) => format!(
+                "{} NOT BETWEEN {} AND {}",
+                self.visit_database_value(*val),
+                self.visit_database_value(*left),
+                self.visit_database_value(*right)
+            ),
         }
     }
 

@@ -233,4 +233,22 @@ impl Comparable for Column {
         let value: DatabaseValue = self.into();
         value.is_not_null()
     }
+
+    fn between<T, V>(self, left: T, right: V) -> Compare
+    where
+        T: Into<DatabaseValue>,
+        V: Into<DatabaseValue>,
+    {
+        let value: DatabaseValue = self.into();
+        value.between(left, right)
+    }
+
+    fn not_between<T, V>(self, left: T, right: V) -> Compare
+    where
+        T: Into<DatabaseValue>,
+        V: Into<DatabaseValue>,
+    {
+        let value: DatabaseValue = self.into();
+        value.not_between(left, right)
+    }
 }

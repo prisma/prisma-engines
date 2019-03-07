@@ -35,6 +35,10 @@ pub enum Compare {
     Null(Box<DatabaseValue>),
     /// `value IS NOT NULL`
     NotNull(Box<DatabaseValue>),
+    /// `value` BETWEEN `left` AND `right`
+    Between(Box<DatabaseValue>, Box<DatabaseValue>, Box<DatabaseValue>),
+    /// `value` NOT BETWEEN `left` AND `right`
+    NotBetween(Box<DatabaseValue>, Box<DatabaseValue>, Box<DatabaseValue>),
 }
 
 impl Into<ConditionTree> for Compare {
@@ -301,6 +305,44 @@ pub trait Comparable {
     /// assert_eq!("SELECT * FROM `users` WHERE `foo` IS NOT NULL LIMIT -1", sql);
     /// ```
     fn is_not_null(self) -> Compare;
+
+    /// Tests if the value is between two given values.
+    ///
+    /// ```rust
+    /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
+    /// let query = Select::from("users").so_that("foo".between(420, 666));
+    /// let (sql, params) = Sqlite::build(query);
+    ///
+    /// assert_eq!("SELECT * FROM `users` WHERE `foo` BETWEEN ? AND ? LIMIT -1", sql);
+    ///
+    /// assert_eq!(vec![
+    ///     ParameterizedValue::Integer(420),
+    ///     ParameterizedValue::Integer(666)
+    /// ], params);
+    /// ```
+    fn between<T, V>(self, left: T, right: V) -> Compare
+    where
+        T: Into<DatabaseValue>,
+        V: Into<DatabaseValue>;
+
+    /// Tests if the value is not between two given values.
+    ///
+    /// ```rust
+    /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
+    /// let query = Select::from("users").so_that("foo".not_between(420, 666));
+    /// let (sql, params) = Sqlite::build(query);
+    ///
+    /// assert_eq!("SELECT * FROM `users` WHERE `foo` NOT BETWEEN ? AND ? LIMIT -1", sql);
+    ///
+    /// assert_eq!(vec![
+    ///     ParameterizedValue::Integer(420),
+    ///     ParameterizedValue::Integer(666)
+    /// ], params);
+    /// ```
+    fn not_between<T, V>(self, left: T, right: V) -> Compare
+    where
+        T: Into<DatabaseValue>,
+        V: Into<DatabaseValue>;
 }
 
 #[macro_export]
@@ -444,6 +486,26 @@ macro_rules! comparable {
                     let col: Column = self.into();
                     let val: DatabaseValue = col.into();
                     val.is_not_null()
+                }
+
+                fn between<T, V>(self, left: T, right: V) -> Compare
+                where
+                    T: Into<DatabaseValue>,
+                    V: Into<DatabaseValue>
+                {
+                    let col: Column = self.into();
+                    let val: DatabaseValue = col.into();
+                    val.between(left, right)
+                }
+
+                fn not_between<T, V>(self, left: T, right: V) -> Compare
+                where
+                    T: Into<DatabaseValue>,
+                    V: Into<DatabaseValue>
+                {
+                    let col: Column = self.into();
+                    let val: DatabaseValue = col.into();
+                    val.not_between(left, right)
                 }
             }
         )*
