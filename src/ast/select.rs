@@ -13,12 +13,14 @@ pub struct Select {
 }
 
 impl Into<DatabaseValue> for Select {
+    #[inline]
     fn into(self) -> DatabaseValue {
         DatabaseValue::Select(self)
     }
 }
 
 impl Into<Query> for Select {
+    #[inline]
     fn into(self) -> Query {
         Query::Select(self)
     }
@@ -56,6 +58,7 @@ impl Select {
     /// assert_eq!("SELECT `num`.* FROM (SELECT ?) AS `num` LIMIT -1", sql);
     /// assert_eq!(vec![ParameterizedValue::Integer(1)], params);
     /// ```
+    #[inline]
     pub fn from<T>(table: T) -> Self
     where
         T: Into<Table>,

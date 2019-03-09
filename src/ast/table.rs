@@ -33,12 +33,14 @@ impl Table {
     }
 
     /// A qualified asterisk to this table
+    #[inline]
     pub fn asterisk(self) -> DatabaseValue {
         DatabaseValue::Asterisk(self)
     }
 }
 
 impl<'a> From<&'a str> for Table {
+    #[inline]
     fn from(s: &'a str) -> Table {
         Table {
             typ: TableType::Table(s.to_string()),
@@ -49,6 +51,7 @@ impl<'a> From<&'a str> for Table {
 }
 
 impl<'a, 'b> From<(&'a str, &'b str)> for Table {
+    #[inline]
     fn from(s: (&'a str, &'b str)) -> Table {
         let table: Table = s.1.into();
         table.database(s.0)
@@ -56,6 +59,7 @@ impl<'a, 'b> From<(&'a str, &'b str)> for Table {
 }
 
 impl From<String> for Table {
+    #[inline]
     fn from(s: String) -> Table {
         Table {
             typ: TableType::Table(s),
@@ -66,6 +70,7 @@ impl From<String> for Table {
 }
 
 impl From<(String, String)> for Table {
+    #[inline]
     fn from(s: (String, String)) -> Table {
         let table: Table = s.1.into();
         table.database(s.0)
@@ -73,6 +78,7 @@ impl From<(String, String)> for Table {
 }
 
 impl From<Select> for Table {
+    #[inline]
     fn from(select: Select) -> Table {
         Table {
             typ: TableType::Query(select),
@@ -96,6 +102,7 @@ macro_rules! aliasable {
     ($($kind:ty),*) => (
         $(
             impl Aliasable for $kind {
+                #[inline]
                 fn alias<T>(self, alias: T) -> Table
                 where
                     T: Into<String>,

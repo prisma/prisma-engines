@@ -13,10 +13,12 @@ impl Ordering {
         self
     }
 
+    #[inline]
     pub fn new(values: Vec<OrderDefinition>) -> Self {
         Self(values)
     }
 
+    #[inline]
     pub fn is_empty(&self) -> bool {
         self.0.is_empty()
     }
@@ -40,11 +42,13 @@ where
     fn order(self, order: Option<Order>) -> OrderDefinition;
 
     /// Change the order to `ASC`
+    #[inline]
     fn ascend(self) -> OrderDefinition {
         self.order(Some(Order::Asc))
     }
 
     /// Change the order to `DESC`
+    #[inline]
     fn descend(self) -> OrderDefinition {
         self.order(Some(Order::Desc))
     }
@@ -56,6 +60,7 @@ pub trait IntoOrderDefinition {
 }
 
 impl<'a> IntoOrderDefinition for &'a str {
+    #[inline]
     fn into_order_definition(self) -> OrderDefinition {
         let column: Column = self.into();
         (column.into(), None)
@@ -63,24 +68,28 @@ impl<'a> IntoOrderDefinition for &'a str {
 }
 
 impl IntoOrderDefinition for Column {
+    #[inline]
     fn into_order_definition(self) -> OrderDefinition {
         (self.into(), None)
     }
 }
 
 impl IntoOrderDefinition for OrderDefinition {
+    #[inline]
     fn into_order_definition(self) -> OrderDefinition {
         self
     }
 }
 
 impl Orderable for Column {
+    #[inline]
     fn order(self, order: Option<Order>) -> OrderDefinition {
         (self.into(), order)
     }
 }
 
 impl<'a> Orderable for &'a str {
+    #[inline]
     fn order(self, order: Option<Order>) -> OrderDefinition {
         let column: Column = self.into();
         column.order(order)

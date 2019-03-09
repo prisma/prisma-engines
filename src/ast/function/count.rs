@@ -34,6 +34,7 @@ impl Count {
 /// let (sql, _) = Sqlite::build(query);
 /// assert_eq!("SELECT COUNT(`users`.*) FROM `users` LIMIT -1", sql);
 /// ```
+#[inline]
 pub fn count<T>(expr: T) -> Count
 where
     T: Into<DatabaseValue>,

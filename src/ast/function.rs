@@ -38,6 +38,7 @@ macro_rules! function {
     ($($kind:ident),*) => (
         $(
             impl From<$kind> for Function {
+                #[inline]
                 fn from(f: $kind) -> Function {
                     Function {
                         typ_: FunctionType::$kind(f),
@@ -47,6 +48,7 @@ macro_rules! function {
             }
 
             impl From<$kind> for DatabaseValue {
+                #[inline]
                 fn from(f: $kind) -> DatabaseValue {
                     Function::from(f).into()
                 }

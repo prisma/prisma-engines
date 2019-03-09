@@ -37,6 +37,7 @@ pub trait Joinable {
 }
 
 impl<U> Joinable for U where U: Into<Table> {
+    #[inline]
     fn on<T>(self, conditions: T) -> JoinData
     where
         T: Into<ConditionTree>,

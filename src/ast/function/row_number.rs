@@ -24,7 +24,6 @@ impl RowNumber {
         T: IntoOrderDefinition,
     {
         self.over.ordering = self.over.ordering.append(value.into_order_definition());
-
         self
     }
 
@@ -34,7 +33,6 @@ impl RowNumber {
         T: Into<Column>,
     {
         self.over.partitioning.push(partition.into());
-
         self
     }
 }
@@ -56,6 +54,7 @@ impl RowNumber {
 ///     sql
 /// );
 /// ```
+#[inline]
 pub fn row_number() -> RowNumber {
     RowNumber::default()
 }

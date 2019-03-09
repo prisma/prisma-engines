@@ -34,6 +34,7 @@ impl Distinct {
 /// let (sql, _) = Sqlite::build(query);
 /// assert_eq!("SELECT DISTINCT(`name`) FROM `users` LIMIT -1", sql);
 /// ```
+#[inline]
 pub fn distinct<T>(expr: T) -> Distinct
 where
     T: Into<Column>,

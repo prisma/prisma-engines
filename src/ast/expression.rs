@@ -12,6 +12,7 @@ pub enum Expression {
 }
 
 impl From<Select> for Expression {
+    #[inline]
     fn from(sel: Select) -> Expression {
         let dv: DatabaseValue = sel.into();
         Expression::Value(dv)
