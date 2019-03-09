@@ -8,13 +8,13 @@ pub enum Expression {
     /// A comparison expression
     Compare(Compare),
     /// A single value, column, row or a nested select
-    Value(DatabaseValue),
+    Value(Box<DatabaseValue>),
 }
 
 impl From<Select> for Expression {
     #[inline]
     fn from(sel: Select) -> Expression {
         let dv: DatabaseValue = sel.into();
-        Expression::Value(dv)
+        Expression::Value(Box::new(dv))
     }
 }

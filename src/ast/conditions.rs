@@ -84,6 +84,6 @@ impl Into<Expression> for ConditionTree {
 impl From<Select> for ConditionTree {
     #[inline]
     fn from(sel: Select) -> ConditionTree {
-        ConditionTree::single(Expression::Value(sel.into()))
+        ConditionTree::single(Expression::Value(Box::new(sel.into())))
     }
 }

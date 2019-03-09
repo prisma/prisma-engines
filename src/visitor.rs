@@ -97,7 +97,7 @@ pub trait Visitor {
                     },
                 }
             } else {
-                result.push(format!("{}", self.visit_columns(select.columns)));
+                result.push(self.visit_columns(select.columns));
             }
 
             result.push(format!("FROM {}", self.visit_table(*table, true)));
@@ -118,12 +118,10 @@ pub trait Visitor {
             if let Some(offset) = select.offset {
                 result.push(self.visit_offset(offset));
             }
+        } else if select.columns.is_empty() {
+            result.push(String::from("*"));
         } else {
-            if select.columns.is_empty() {
-                result.push(String::from("*"));
-            } else {
-                result.push(format!("{}", self.visit_columns(select.columns)));
-            }
+            result.push(self.visit_columns(select.columns));
         }
 
         result.join(" ")
@@ -174,7 +172,7 @@ pub trait Visitor {
                 self.add_parameter(val);
                 Self::C_PARAM.to_string()
             }
-            DatabaseValue::Column(column) => self.visit_column(column),
+            DatabaseValue::Column(column) => self.visit_column(*column),
             DatabaseValue::Row(row) => self.visit_row(row),
             DatabaseValue::Select(select) => format!("({})", self.visit_select(select)),
             DatabaseValue::Function(function) => self.visit_function(function),
@@ -258,7 +256,7 @@ pub trait Visitor {
     /// a comparison call
     fn visit_expression(&mut self, expression: Expression) -> String {
         match expression {
-            Expression::Value(value) => self.visit_database_value(value),
+            Expression::Value(value) => self.visit_database_value(*value),
             Expression::ConditionTree(tree) => self.visit_conditions(tree),
             Expression::Compare(compare) => self.visit_compare(compare),
         }

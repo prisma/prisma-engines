@@ -26,7 +26,7 @@ pub struct Column {
 impl Into<DatabaseValue> for Column {
     #[inline]
     fn into(self) -> DatabaseValue {
-        DatabaseValue::Column(self)
+        DatabaseValue::Column(Box::new(self))
     }
 }
 

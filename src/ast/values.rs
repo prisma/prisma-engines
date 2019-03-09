@@ -21,7 +21,7 @@ pub enum DatabaseValue {
     /// Anything that we must parameterize before querying
     Parameterized(ParameterizedValue),
     /// A database column
-    Column(Column),
+    Column(Box<Column>),
     /// Data in a row form, e.g. (1, 2, 3)
     Row(Row),
     /// A nested `SELECT` statement

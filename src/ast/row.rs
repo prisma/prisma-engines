@@ -12,7 +12,7 @@ impl Row {
         Row { values: Vec::new() }
     }
 
-    pub fn add<T>(mut self, value: T) -> Self
+    pub fn push<T>(mut self, value: T) -> Self
     where
         T: Into<DatabaseValue>,
     {
@@ -29,7 +29,7 @@ where
     fn from(vector: Vec<T>) -> Row {
         vector
             .into_iter()
-            .fold(Row::new(), |row, v| row.add(v.into()))
+            .fold(Row::new(), |row, v| row.push(v.into()))
     }
 }
 
@@ -40,7 +40,7 @@ where
 {
     #[inline]
     fn from(vals: (A, B)) -> Row {
-        Row::new().add(vals.0).add(vals.1)
+        Row::new().push(vals.0).push(vals.1)
     }
 }
 
@@ -52,7 +52,7 @@ where
 {
     #[inline]
     fn from(vals: (A, B, C)) -> Row {
-        Row::new().add(vals.0).add(vals.1).add(vals.2)
+        Row::new().push(vals.0).push(vals.1).push(vals.2)
     }
 }
 
@@ -65,7 +65,7 @@ where
 {
     #[inline]
     fn from(vals: (A, B, C, D)) -> Row {
-        Row::new().add(vals.0).add(vals.1).add(vals.2).add(vals.3)
+        Row::new().push(vals.0).push(vals.1).push(vals.2).push(vals.3)
     }
 }
 
@@ -80,11 +80,11 @@ where
     #[inline]
     fn from(vals: (A, B, C, D, E)) -> Row {
         Row::new()
-            .add(vals.0)
-            .add(vals.1)
-            .add(vals.2)
-            .add(vals.3)
-            .add(vals.4)
+            .push(vals.0)
+            .push(vals.1)
+            .push(vals.2)
+            .push(vals.3)
+            .push(vals.4)
     }
 }
 
