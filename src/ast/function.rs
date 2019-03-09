@@ -1,7 +1,10 @@
 mod row_number;
 mod count;
+mod distinct;
+
 pub use row_number::*;
 pub use count::*;
+pub use distinct::*;
 
 use super::DatabaseValue;
 
@@ -17,6 +20,7 @@ pub struct Function {
 pub enum FunctionType {
     RowNumber(RowNumber),
     Count(Count),
+    Distinct(Distinct),
 }
 
 impl Function {
@@ -51,4 +55,8 @@ macro_rules! function {
     );
 }
 
-function!(RowNumber, Count);
+function!(
+    RowNumber,
+    Distinct,
+    Count
+);

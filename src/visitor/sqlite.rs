@@ -65,6 +65,13 @@ impl Visitor for Sqlite {
                     format!("COUNT({})", self.visit_columns(fun_count.exprs))
                 }
             }
+            FunctionType::Distinct(fun_distinct) => {
+                if fun_distinct.exprs.is_empty() {
+                    String::from("DISTINCT()")
+                } else {
+                    format!("DISTINCT({})", self.visit_columns(fun_distinct.exprs))
+                }
+            }
         };
 
         if let Some(alias) = fun.alias {
