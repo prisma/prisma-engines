@@ -10,7 +10,10 @@ impl Count {
     ///
     /// ```rust
     /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
-    /// let query = Select::from("users").value(count(Column::from(("users", "id"))).count(Column::from(("users", "name"))));
+    /// let fun = count(Column::from(("users", "id")))
+    ///     .count(Column::from(("users", "name")));
+    ///
+    /// let query = Select::from("users").value(fun);
     /// let (sql, _) = Sqlite::build(query);
     /// assert_eq!("SELECT COUNT(`users`.`id`, `users`.`name`) FROM `users` LIMIT -1", sql);
     /// ```
