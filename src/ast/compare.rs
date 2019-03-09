@@ -319,172 +319,162 @@ pub trait Comparable {
         V: Into<DatabaseValue>;
 }
 
-#[macro_export]
-macro_rules! comparable {
-    ($($kind:ty),*) => (
-        $(
-            impl Comparable for $kind {
-                fn equals<T>(self, comparison: T) -> Compare
-                where
-                    T: Into<DatabaseValue>,
-                {
-                    let col: Column = self.into();
-                    let val: DatabaseValue = col.into();
-                    val.equals(comparison)
-                }
+impl<U> Comparable for U where U: Into<Column> {
+    fn equals<T>(self, comparison: T) -> Compare
+    where
+        T: Into<DatabaseValue>,
+    {
+        let col: Column = self.into();
+        let val: DatabaseValue = col.into();
+        val.equals(comparison)
+    }
 
-                fn not_equals<T>(self, comparison: T) -> Compare
-                where
-                    T: Into<DatabaseValue>,
-                {
-                    let col: Column = self.into();
-                    let val: DatabaseValue = col.into();
-                    val.not_equals(comparison)
-                }
+    fn not_equals<T>(self, comparison: T) -> Compare
+    where
+        T: Into<DatabaseValue>,
+    {
+        let col: Column = self.into();
+        let val: DatabaseValue = col.into();
+        val.not_equals(comparison)
+    }
 
-                fn less_than<T>(self, comparison: T) -> Compare
-                where
-                    T: Into<DatabaseValue>,
-                {
-                    let col: Column = self.into();
-                    let val: DatabaseValue = col.into();
-                    val.less_than(comparison)
-                }
+    fn less_than<T>(self, comparison: T) -> Compare
+    where
+        T: Into<DatabaseValue>,
+    {
+        let col: Column = self.into();
+        let val: DatabaseValue = col.into();
+        val.less_than(comparison)
+    }
 
-                fn less_than_or_equals<T>(self, comparison: T) -> Compare
-                where
-                    T: Into<DatabaseValue>,
-                {
-                    let col: Column = self.into();
-                    let val: DatabaseValue = col.into();
-                    val.less_than_or_equals(comparison)
-                }
+    fn less_than_or_equals<T>(self, comparison: T) -> Compare
+    where
+        T: Into<DatabaseValue>,
+    {
+        let col: Column = self.into();
+        let val: DatabaseValue = col.into();
+        val.less_than_or_equals(comparison)
+    }
 
-                fn greater_than<T>(self, comparison: T) -> Compare
-                where
-                    T: Into<DatabaseValue>,
-                {
-                    let col: Column = self.into();
-                    let val: DatabaseValue = col.into();
-                    val.greater_than(comparison)
-                }
+    fn greater_than<T>(self, comparison: T) -> Compare
+    where
+        T: Into<DatabaseValue>,
+    {
+        let col: Column = self.into();
+        let val: DatabaseValue = col.into();
+        val.greater_than(comparison)
+    }
 
-                fn greater_than_or_equals<T>(self, comparison: T) -> Compare
-                where
-                    T: Into<DatabaseValue>,
-                {
-                    let col: Column = self.into();
-                    let val: DatabaseValue = col.into();
-                    val.greater_than_or_equals(comparison)
-                }
+    fn greater_than_or_equals<T>(self, comparison: T) -> Compare
+    where
+        T: Into<DatabaseValue>,
+    {
+        let col: Column = self.into();
+        let val: DatabaseValue = col.into();
+        val.greater_than_or_equals(comparison)
+    }
 
-                fn in_selection<T>(self, selection: T) -> Compare
-                where
-                    T: Into<DatabaseValue>,
-                {
-                    let col: Column = self.into();
-                    let val: DatabaseValue = col.into();
-                    val.in_selection(selection)
-                }
+    fn in_selection<T>(self, selection: T) -> Compare
+    where
+        T: Into<DatabaseValue>,
+    {
+        let col: Column = self.into();
+        let val: DatabaseValue = col.into();
+        val.in_selection(selection)
+    }
 
-                fn not_in_selection<T>(self, selection: T) -> Compare
-                where
-                    T: Into<DatabaseValue>,
-                {
-                    let col: Column = self.into();
-                    let val: DatabaseValue = col.into();
-                    val.not_in_selection(selection)
-                }
+    fn not_in_selection<T>(self, selection: T) -> Compare
+    where
+        T: Into<DatabaseValue>,
+    {
+        let col: Column = self.into();
+        let val: DatabaseValue = col.into();
+        val.not_in_selection(selection)
+    }
 
-                fn like<T>(self, pattern: T) -> Compare
-                where
-                    T: Into<String>
-                {
-                    let col: Column = self.into();
-                    let val: DatabaseValue = col.into();
-                    val.like(pattern)
-                }
+    fn like<T>(self, pattern: T) -> Compare
+    where
+        T: Into<String>
+    {
+        let col: Column = self.into();
+        let val: DatabaseValue = col.into();
+        val.like(pattern)
+    }
 
-                fn not_like<T>(self, pattern: T) -> Compare
-                where
-                    T: Into<String>
-                {
-                    let col: Column = self.into();
-                    let val: DatabaseValue = col.into();
-                    val.not_like(pattern)
-                }
+    fn not_like<T>(self, pattern: T) -> Compare
+    where
+        T: Into<String>
+    {
+        let col: Column = self.into();
+        let val: DatabaseValue = col.into();
+        val.not_like(pattern)
+    }
 
-                fn begins_with<T>(self, pattern: T) -> Compare
-                where
-                    T: Into<String>
-                {
-                    let col: Column = self.into();
-                    let val: DatabaseValue = col.into();
-                    val.begins_with(pattern)
-                }
+    fn begins_with<T>(self, pattern: T) -> Compare
+    where
+        T: Into<String>
+    {
+        let col: Column = self.into();
+        let val: DatabaseValue = col.into();
+        val.begins_with(pattern)
+    }
 
-                fn not_begins_with<T>(self, pattern: T) -> Compare
-                where
-                    T: Into<String>
-                {
-                    let col: Column = self.into();
-                    let val: DatabaseValue = col.into();
-                    val.not_begins_with(pattern)
-                }
+    fn not_begins_with<T>(self, pattern: T) -> Compare
+    where
+        T: Into<String>
+    {
+        let col: Column = self.into();
+        let val: DatabaseValue = col.into();
+        val.not_begins_with(pattern)
+    }
 
-                fn ends_into<T>(self, pattern: T) -> Compare
-                where
-                    T: Into<String>
-                {
-                    let col: Column = self.into();
-                    let val: DatabaseValue = col.into();
-                    val.ends_into(pattern)
-                }
+    fn ends_into<T>(self, pattern: T) -> Compare
+    where
+        T: Into<String>
+    {
+        let col: Column = self.into();
+        let val: DatabaseValue = col.into();
+        val.ends_into(pattern)
+    }
 
-                fn not_ends_into<T>(self, pattern: T) -> Compare
-                where
-                    T: Into<String>
-                {
-                    let col: Column = self.into();
-                    let val: DatabaseValue = col.into();
-                    val.not_ends_into(pattern)
-                }
+    fn not_ends_into<T>(self, pattern: T) -> Compare
+    where
+        T: Into<String>
+    {
+        let col: Column = self.into();
+        let val: DatabaseValue = col.into();
+        val.not_ends_into(pattern)
+    }
 
-                fn is_null(self) -> Compare {
-                    let col: Column = self.into();
-                    let val: DatabaseValue = col.into();
-                    val.is_null()
-                }
+    fn is_null(self) -> Compare {
+        let col: Column = self.into();
+        let val: DatabaseValue = col.into();
+        val.is_null()
+    }
 
-                fn is_not_null(self) -> Compare {
-                    let col: Column = self.into();
-                    let val: DatabaseValue = col.into();
-                    val.is_not_null()
-                }
+    fn is_not_null(self) -> Compare {
+        let col: Column = self.into();
+        let val: DatabaseValue = col.into();
+        val.is_not_null()
+    }
 
-                fn between<T, V>(self, left: T, right: V) -> Compare
-                where
-                    T: Into<DatabaseValue>,
-                    V: Into<DatabaseValue>
-                {
-                    let col: Column = self.into();
-                    let val: DatabaseValue = col.into();
-                    val.between(left, right)
-                }
+    fn between<T, V>(self, left: T, right: V) -> Compare
+    where
+        T: Into<DatabaseValue>,
+        V: Into<DatabaseValue>
+    {
+        let col: Column = self.into();
+        let val: DatabaseValue = col.into();
+        val.between(left, right)
+    }
 
-                fn not_between<T, V>(self, left: T, right: V) -> Compare
-                where
-                    T: Into<DatabaseValue>,
-                    V: Into<DatabaseValue>
-                {
-                    let col: Column = self.into();
-                    let val: DatabaseValue = col.into();
-                    val.not_between(left, right)
-                }
-            }
-        )*
-    );
+    fn not_between<T, V>(self, left: T, right: V) -> Compare
+    where
+        T: Into<DatabaseValue>,
+        V: Into<DatabaseValue>
+    {
+        let col: Column = self.into();
+        let val: DatabaseValue = col.into();
+        val.not_between(left, right)
+    }
 }
-
-comparable!(&str, (&str, &str, &str), (&str, &str));
-comparable!(String, (String, String, String), (String, String));
