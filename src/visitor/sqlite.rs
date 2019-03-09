@@ -58,6 +58,13 @@ impl Visitor for Sqlite {
                     )
                 }
             }
+            FunctionType::Count(fun_count) => {
+                if fun_count.exprs.is_empty() {
+                    String::from("COUNT()")
+                } else {
+                    format!("COUNT({})", self.visit_columns(fun_count.exprs))
+                }
+            }
         };
 
         if let Some(alias) = fun.alias {

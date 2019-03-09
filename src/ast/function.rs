@@ -1,4 +1,9 @@
-use crate::ast::{Column, IntoOrderDefinition, Ordering};
+mod row_number;
+mod count;
+pub use row_number::*;
+pub use count::*;
+
+use super::DatabaseValue;
 
 /// A database function definition
 #[derive(Debug, Clone, PartialEq)]
@@ -11,23 +16,7 @@ pub struct Function {
 #[derive(Debug, Clone, PartialEq)]
 pub enum FunctionType {
     RowNumber(RowNumber),
-}
-
-#[derive(Debug, Default, Clone, PartialEq)]
-pub struct Over {
-    pub ordering: Ordering,
-    pub partitioning: Vec<Column>,
-}
-
-impl Over {
-    pub fn is_empty(&self) -> bool {
-        self.ordering.is_empty() && self.partitioning.is_empty()
-    }
-}
-
-#[derive(Debug, Default, Clone, PartialEq)]
-pub struct RowNumber {
-    pub over: Over,
+    Count(Count),
 }
 
 impl Function {
@@ -41,54 +30,25 @@ impl Function {
     }
 }
 
-impl RowNumber {
-    /// Define the order of the row number. Is the row order if not set.
-    pub fn order_by<T>(mut self, value: T) -> Self
-    where
-        T: IntoOrderDefinition,
-    {
-        self.over.ordering = self.over.ordering.append(value.into_order_definition());
+macro_rules! function {
+    ($($kind:ident),*) => (
+        $(
+            impl From<$kind> for Function {
+                fn from(f: $kind) -> Function {
+                    Function {
+                        typ_: FunctionType::$kind(f),
+                        alias: None,
+                    }
+                }
+            }
 
-        self
-    }
-
-    /// Define the partitioning of the row number
-    pub fn partition_by<T>(mut self, partition: T) -> Self
-    where
-        T: Into<Column>,
-    {
-        self.over.partitioning.push(partition.into());
-
-        self
-    }
+            impl From<$kind> for DatabaseValue {
+                fn from(f: $kind) -> DatabaseValue {
+                    Function::from(f).into()
+                }
+            }
+        )*
+    );
 }
 
-/// A number from 1 to n in specified order
-///
-/// ```rust
-/// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
-/// let fun = Function::from(row_number().order_by("created_at").partition_by("name"));
-///
-/// let query = Select::from("users")
-///     .column("id")
-///     .value(fun.alias("num"));
-///
-/// let (sql, _) = Sqlite::build(query);
-///
-/// assert_eq!(
-///     "SELECT `id`, ROW_NUMBER() OVER(PARTITION BY `name` ORDER BY `created_at`) AS `num` FROM `users` LIMIT -1",
-///     sql
-/// );
-/// ```
-pub fn row_number() -> RowNumber {
-    RowNumber::default()
-}
-
-impl From<RowNumber> for Function {
-    fn from(rn: RowNumber) -> Function {
-        Function {
-            typ_: FunctionType::RowNumber(rn),
-            alias: None,
-        }
-    }
-}
+function!(RowNumber, Count);

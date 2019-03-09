@@ -32,7 +32,23 @@ pub enum DatabaseValue {
     Asterisk(Table),
 }
 
-impl<'a> Into<ParameterizedValue> for &'a str {
+/// A quick alias to create an asterisk to a table.
+///
+/// ```rust
+/// # use prisma_query::ast::*;
+/// assert_eq!(
+///     asterisk("foo"),
+///     DatabaseValue::Asterisk(Table::from("foo"))
+/// )
+/// ```
+pub fn asterisk<T>(table: T) -> DatabaseValue
+where
+    T: Into<Table>,
+{
+    DatabaseValue::Asterisk(table.into())
+}
+
+impl Into<ParameterizedValue> for &str {
     fn into(self) -> ParameterizedValue {
         ParameterizedValue::Text(self.to_string())
     }
