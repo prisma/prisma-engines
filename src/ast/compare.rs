@@ -1,4 +1,4 @@
-use crate::ast::{Column, ConditionTree, Conjuctive, DatabaseValue, Expression};
+use crate::ast::{Column, ConditionTree, DatabaseValue, Expression};
 
 /// For modeling comparison expression
 #[derive(Debug, Clone, PartialEq)]
@@ -51,32 +51,6 @@ impl Into<ConditionTree> for Compare {
 impl Into<Expression> for Compare {
     fn into(self) -> Expression {
         Expression::Compare(self)
-    }
-}
-
-impl Conjuctive for Compare {
-    fn and<E>(self, other: E) -> ConditionTree
-    where
-        E: Into<Expression>,
-    {
-        let left: Expression = self.into();
-        let right: Expression = other.into();
-
-        ConditionTree::and(left, right)
-    }
-
-    fn or<E>(self, other: E) -> ConditionTree
-    where
-        E: Into<Expression>,
-    {
-        let left: Expression = self.into();
-        let right: Expression = other.into();
-
-        ConditionTree::or(left, right)
-    }
-
-    fn not(self) -> ConditionTree {
-        ConditionTree::not(self)
     }
 }
 

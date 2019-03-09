@@ -79,26 +79,3 @@ impl From<Select> for ConditionTree {
         ConditionTree::single(Expression::Value(sel.into()))
     }
 }
-
-impl Conjuctive for ConditionTree {
-    fn and<E>(self, other: E) -> ConditionTree
-    where
-        E: Into<Expression>,
-    {
-        let left: Expression = self.into();
-        left.and(other)
-    }
-
-    fn or<E>(self, other: E) -> ConditionTree
-    where
-        E: Into<Expression>,
-    {
-        let left: Expression = self.into();
-        left.or(other)
-    }
-
-    fn not(self) -> ConditionTree {
-        let exp: Expression = self.into();
-        exp.not()
-    }
-}
