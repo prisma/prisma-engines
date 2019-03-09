@@ -36,23 +36,14 @@ pub trait Joinable {
         T: Into<ConditionTree>;
 }
 
-macro_rules! joinable {
-    ($($kind:ty),*) => (
-        $(
-            impl Joinable for $kind {
-                fn on<T>(self, conditions: T) -> JoinData
-                where
-                    T: Into<ConditionTree>,
-                {
-                    JoinData {
-                        table: self.into(),
-                        conditions: conditions.into(),
-                    }
-                }
-            }
-        )*
-    );
+impl<U> Joinable for U where U: Into<Table> {
+    fn on<T>(self, conditions: T) -> JoinData
+    where
+        T: Into<ConditionTree>,
+    {
+        JoinData {
+            table: self.into(),
+            conditions: conditions.into(),
+        }
+    }
 }
-
-joinable!(String, (String, String));
-joinable!(&str, (&str, &str));

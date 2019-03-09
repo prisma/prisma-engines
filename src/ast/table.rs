@@ -1,4 +1,4 @@
-use crate::ast::{ConditionTree, DatabaseValue, JoinData, Joinable, Select};
+use crate::ast::{DatabaseValue, Select};
 
 /// An object that can be aliased.
 pub trait Aliasable {
@@ -78,18 +78,6 @@ impl From<Select> for Table {
             typ: TableType::Query(select),
             alias: None,
             database: None,
-        }
-    }
-}
-
-impl Joinable for Table {
-    fn on<T>(self, conditions: T) -> JoinData
-    where
-        T: Into<ConditionTree>,
-    {
-        JoinData {
-            table: self,
-            conditions: conditions.into(),
         }
     }
 }
