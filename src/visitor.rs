@@ -176,7 +176,10 @@ pub trait Visitor {
             DatabaseValue::Row(row) => self.visit_row(row),
             DatabaseValue::Select(select) => format!("({})", self.visit_select(select)),
             DatabaseValue::Function(function) => self.visit_function(function),
-            DatabaseValue::Asterisk(table) => format!("{}.*", self.visit_table(table, false)),
+            DatabaseValue::Asterisk(table) => match table {
+                Some(table) => format!("{}.*", self.visit_table(table, false)),
+                None => String::from("*"),
+            },
         }
     }
 

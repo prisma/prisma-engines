@@ -29,7 +29,7 @@ pub enum DatabaseValue {
     /// A database function call
     Function(Function),
     /// A qualified asterisk to a table
-    Asterisk(Table),
+    Asterisk(Option<Table>),
 }
 
 /// A quick alias to create an asterisk to a table.
@@ -37,16 +37,13 @@ pub enum DatabaseValue {
 /// ```rust
 /// # use prisma_query::ast::*;
 /// assert_eq!(
-///     asterisk("foo"),
-///     DatabaseValue::Asterisk(Table::from("foo"))
+///     asterisk(),
+///     DatabaseValue::Asterisk(None)
 /// )
 /// ```
 #[inline]
-pub fn asterisk<T>(table: T) -> DatabaseValue
-where
-    T: Into<Table>,
-{
-    DatabaseValue::Asterisk(table.into())
+pub fn asterisk() -> DatabaseValue {
+    DatabaseValue::Asterisk(None)
 }
 
 impl Into<ParameterizedValue> for &str {

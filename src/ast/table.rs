@@ -35,7 +35,7 @@ impl Table {
     /// A qualified asterisk to this table
     #[inline]
     pub fn asterisk(self) -> DatabaseValue {
-        DatabaseValue::Asterisk(self)
+        DatabaseValue::Asterisk(Some(self))
     }
 }
 
