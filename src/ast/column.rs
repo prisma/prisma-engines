@@ -1,26 +1,11 @@
 use crate::ast::{DatabaseValue, Table};
 
-#[derive(Clone, Copy, Debug, PartialEq)]
-pub enum TypeIdentifier {
-    String,
-    Float,
-    Boolean,
-    Enum,
-    Json,
-    DateTime,
-    GraphQLID,
-    UUID,
-    Int,
-    Relation,
-}
-
 /// A column definition.
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct Column {
-    pub name: String,
-    pub table: Option<Table>,
-    pub alias: Option<String>,
-    pub type_identifier: Option<TypeIdentifier>,
+    pub(crate) name: String,
+    pub(crate) table: Option<Table>,
+    pub(crate) alias: Option<String>,
 }
 
 impl Into<DatabaseValue> for Column {

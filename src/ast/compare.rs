@@ -321,7 +321,10 @@ pub trait Comparable {
         V: Into<DatabaseValue>;
 }
 
-impl<U> Comparable for U where U: Into<Column> {
+impl<U> Comparable for U
+where
+    U: Into<Column>,
+{
     #[inline]
     fn equals<T>(self, comparison: T) -> Compare
     where
@@ -405,7 +408,7 @@ impl<U> Comparable for U where U: Into<Column> {
     #[inline]
     fn like<T>(self, pattern: T) -> Compare
     where
-        T: Into<String>
+        T: Into<String>,
     {
         let col: Column = self.into();
         let val: DatabaseValue = col.into();
@@ -415,7 +418,7 @@ impl<U> Comparable for U where U: Into<Column> {
     #[inline]
     fn not_like<T>(self, pattern: T) -> Compare
     where
-        T: Into<String>
+        T: Into<String>,
     {
         let col: Column = self.into();
         let val: DatabaseValue = col.into();
@@ -425,7 +428,7 @@ impl<U> Comparable for U where U: Into<Column> {
     #[inline]
     fn begins_with<T>(self, pattern: T) -> Compare
     where
-        T: Into<String>
+        T: Into<String>,
     {
         let col: Column = self.into();
         let val: DatabaseValue = col.into();
@@ -435,7 +438,7 @@ impl<U> Comparable for U where U: Into<Column> {
     #[inline]
     fn not_begins_with<T>(self, pattern: T) -> Compare
     where
-        T: Into<String>
+        T: Into<String>,
     {
         let col: Column = self.into();
         let val: DatabaseValue = col.into();
@@ -445,7 +448,7 @@ impl<U> Comparable for U where U: Into<Column> {
     #[inline]
     fn ends_into<T>(self, pattern: T) -> Compare
     where
-        T: Into<String>
+        T: Into<String>,
     {
         let col: Column = self.into();
         let val: DatabaseValue = col.into();
@@ -455,7 +458,7 @@ impl<U> Comparable for U where U: Into<Column> {
     #[inline]
     fn not_ends_into<T>(self, pattern: T) -> Compare
     where
-        T: Into<String>
+        T: Into<String>,
     {
         let col: Column = self.into();
         let val: DatabaseValue = col.into();
@@ -480,7 +483,7 @@ impl<U> Comparable for U where U: Into<Column> {
     fn between<T, V>(self, left: T, right: V) -> Compare
     where
         T: Into<DatabaseValue>,
-        V: Into<DatabaseValue>
+        V: Into<DatabaseValue>,
     {
         let col: Column = self.into();
         let val: DatabaseValue = col.into();
@@ -491,7 +494,7 @@ impl<U> Comparable for U where U: Into<Column> {
     fn not_between<T, V>(self, left: T, right: V) -> Compare
     where
         T: Into<DatabaseValue>,
-        V: Into<DatabaseValue>
+        V: Into<DatabaseValue>,
     {
         let col: Column = self.into();
         let val: DatabaseValue = col.into();

@@ -1,18 +1,18 @@
-mod row_number;
 mod count;
 mod distinct;
+mod row_number;
 
-pub use row_number::*;
 pub use count::*;
 pub use distinct::*;
+pub use row_number::*;
 
 use super::DatabaseValue;
 
 /// A database function definition
 #[derive(Debug, Clone, PartialEq)]
 pub struct Function {
-    pub typ_: FunctionType,
-    pub alias: Option<String>,
+    pub(crate) typ_: FunctionType,
+    pub(crate) alias: Option<String>,
 }
 
 /// A database function type
@@ -57,8 +57,4 @@ macro_rules! function {
     );
 }
 
-function!(
-    RowNumber,
-    Distinct,
-    Count
-);
+function!(RowNumber, Distinct, Count);

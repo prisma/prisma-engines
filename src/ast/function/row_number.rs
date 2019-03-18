@@ -2,8 +2,8 @@ use crate::ast::{Column, IntoOrderDefinition, Ordering};
 
 #[derive(Debug, Default, Clone, PartialEq)]
 pub struct Over {
-    pub ordering: Ordering,
-    pub partitioning: Vec<Column>,
+    pub(crate) ordering: Ordering,
+    pub(crate) partitioning: Vec<Column>,
 }
 
 impl Over {
@@ -14,7 +14,7 @@ impl Over {
 
 #[derive(Debug, Default, Clone, PartialEq)]
 pub struct RowNumber {
-    pub over: Over,
+    pub(crate) over: Over,
 }
 
 impl RowNumber {

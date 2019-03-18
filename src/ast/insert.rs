@@ -4,9 +4,9 @@ use std::collections::BTreeMap;
 /// A builder for an `INSERT` statement.
 #[derive(Clone, Debug, PartialEq)]
 pub struct Insert {
-    pub table: Table,
-    pub values: BTreeMap<String, ParameterizedValue>,
-    pub returning: Option<Column>,
+    pub(crate) table: Table,
+    pub(crate) values: BTreeMap<String, ParameterizedValue>,
+    pub(crate) returning: Option<Column>,
 }
 
 impl From<Insert> for Query {

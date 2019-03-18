@@ -3,8 +3,8 @@ use crate::ast::{ConditionTree, Table};
 /// The `JOIN` table and conditions.
 #[derive(Debug, PartialEq, Clone)]
 pub struct JoinData {
-    pub table: Table,
-    pub conditions: ConditionTree,
+    pub(crate) table: Table,
+    pub(crate) conditions: ConditionTree,
 }
 
 /// A representation of a `JOIN` statement.
@@ -36,7 +36,10 @@ pub trait Joinable {
         T: Into<ConditionTree>;
 }
 
-impl<U> Joinable for U where U: Into<Table> {
+impl<U> Joinable for U
+where
+    U: Into<Table>,
+{
     #[inline]
     fn on<T>(self, conditions: T) -> JoinData
     where

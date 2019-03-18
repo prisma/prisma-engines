@@ -3,13 +3,13 @@ use crate::ast::*;
 /// A builder for a `SELECT` statement.
 #[derive(Debug, PartialEq, Clone, Default)]
 pub struct Select {
-    pub table: Option<Box<Table>>,
-    pub columns: Vec<DatabaseValue>,
-    pub conditions: Option<ConditionTree>,
-    pub ordering: Ordering,
-    pub limit: Option<usize>,
-    pub offset: Option<usize>,
-    pub joins: Vec<Join>,
+    pub(crate) table: Option<Box<Table>>,
+    pub(crate) columns: Vec<DatabaseValue>,
+    pub(crate) conditions: Option<ConditionTree>,
+    pub(crate) ordering: Ordering,
+    pub(crate) limit: Option<usize>,
+    pub(crate) offset: Option<usize>,
+    pub(crate) joins: Vec<Join>,
 }
 
 impl Into<DatabaseValue> for Select {

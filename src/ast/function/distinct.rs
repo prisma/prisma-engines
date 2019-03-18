@@ -2,7 +2,7 @@ use crate::ast::{Column, DatabaseValue};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Distinct {
-    pub exprs: Vec<DatabaseValue>,
+    pub(crate) exprs: Vec<DatabaseValue>,
 }
 
 impl Distinct {

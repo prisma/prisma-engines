@@ -2,7 +2,7 @@ use crate::ast::DatabaseValue;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Count {
-    pub exprs: Vec<DatabaseValue>,
+    pub(crate) exprs: Vec<DatabaseValue>,
 }
 
 /// Count of the underlying table where the given expression is not null.
