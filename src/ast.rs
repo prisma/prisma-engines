@@ -31,4 +31,4 @@ pub use query::Query;
 pub use row::Row;
 pub use select::Select;
 pub use table::*;
-pub use values::{DatabaseValue, ParameterizedValue, asterisk};
+pub use values::{asterisk, DatabaseValue, ParameterizedValue};
