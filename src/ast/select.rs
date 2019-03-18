@@ -19,15 +19,15 @@ impl Into<DatabaseValue> for Select {
     }
 }
 
-impl Into<Query> for Select {
+impl From<Select> for Query {
     #[inline]
-    fn into(self) -> Query {
-        Query::Select(self)
+    fn from(sel: Select) -> Query {
+        Query::Select(sel)
     }
 }
 
 impl Select {
-    /// Creates a new `SELECT` statement from the given table.
+    /// Creates a new `SELECT` statement for the given table.
     ///
     /// ```rust
     /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};

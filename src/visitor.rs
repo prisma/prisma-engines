@@ -127,6 +127,40 @@ pub trait Visitor {
         result.join(" ")
     }
 
+    fn visit_insert(&mut self, insert: Insert) -> String {
+        let mut result = vec![format!(
+            "INSERT INTO {}",
+            self.visit_table(insert.table, true)
+        )];
+
+        if insert.values.is_empty() {
+            result.push("DEFAULT VALUES".to_string());
+        } else {
+            let (keys, values) =
+                insert
+                    .values
+                    .into_iter()
+                    .fold((Vec::new(), Vec::new()), |mut acc, kv| {
+                        acc.0.push(self.visit_column(Column::from(kv.0)));
+                        acc.1.push(self.visit_parameterized(kv.1));
+
+                        acc
+                    });
+
+            result.push(format!(
+                "({}) VALUES ({})",
+                keys.join(","),
+                values.join(",")
+            ))
+        }
+
+        if let Some(returning) = insert.returning {
+            result.push(format!("RETURNING {}", self.visit_column(returning)));
+        }
+
+        result.join(" ")
+    }
+
     /// A helper for delimiting an identifier, surrounding every part with `C_BACKTICK`
     /// and delimiting the values with a `.`
     ///
@@ -151,6 +185,7 @@ pub trait Visitor {
     fn visit_query(&mut self, query: Query) -> String {
         match query {
             Query::Select(select) => self.visit_select(select),
+            Query::Insert(insert) => self.visit_insert(insert),
         }
     }
 
@@ -165,13 +200,16 @@ pub trait Visitor {
         values.join(", ")
     }
 
+    /// A visit to a value we parameterize and replace with a ?
+    fn visit_parameterized(&mut self, value: ParameterizedValue) -> String {
+        self.add_parameter(value);
+        Self::C_PARAM.to_string()
+    }
+
     /// A visit to a value used in an expression
     fn visit_database_value(&mut self, value: DatabaseValue) -> String {
         match value {
-            DatabaseValue::Parameterized(val) => {
-                self.add_parameter(val);
-                Self::C_PARAM.to_string()
-            }
+            DatabaseValue::Parameterized(val) => self.visit_parameterized(val),
             DatabaseValue::Column(column) => self.visit_column(*column),
             DatabaseValue::Row(row) => self.visit_row(row),
             DatabaseValue::Select(select) => format!("({})", self.visit_select(select)),
