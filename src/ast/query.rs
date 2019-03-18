@@ -5,7 +5,7 @@ use crate::ast::{Delete, Insert, Select, Update};
 pub enum Query {
     /// Query for fetching data. E.g. the `SELECT` query.
     Select(Select),
-    Insert(Insert),
-    Update(Update),
-    Delete(Delete),
+    Insert(Box<Insert>),
+    Update(Box<Update>),
+    Delete(Box<Delete>),
 }

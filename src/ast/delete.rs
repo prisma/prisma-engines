@@ -10,7 +10,7 @@ pub struct Delete {
 impl From<Delete> for Query {
     #[inline]
     fn from(delete: Delete) -> Query {
-        Query::Delete(delete)
+        Query::Delete(Box::new(delete))
     }
 }
 

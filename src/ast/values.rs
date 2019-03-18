@@ -46,99 +46,56 @@ pub fn asterisk() -> DatabaseValue {
     DatabaseValue::Asterisk(None)
 }
 
-impl Into<ParameterizedValue> for &str {
+/*
+ * Here be the parameterized value converters.
+ */
+
+impl From<&str> for ParameterizedValue {
     #[inline]
-    fn into(self) -> ParameterizedValue {
-        ParameterizedValue::Text(self.to_string())
+    fn from(that: &str) -> ParameterizedValue {
+        ParameterizedValue::Text(that.to_string())
     }
 }
 
-impl Into<ParameterizedValue> for String {
-    #[inline]
-    fn into(self) -> ParameterizedValue {
-        ParameterizedValue::Text(self)
-    }
+macro_rules! parameterized_value {
+    ($kind:ident,$paramkind:ident) => {
+        impl From<$kind> for ParameterizedValue {
+            fn from(that: $kind) -> Self {
+                ParameterizedValue::$paramkind(that)
+            }
+        }
+    };
 }
 
-impl Into<ParameterizedValue> for i64 {
-    #[inline]
-    fn into(self) -> ParameterizedValue {
-        ParameterizedValue::Integer(self)
-    }
+parameterized_value!(String, Text);
+parameterized_value!(i64, Integer);
+parameterized_value!(f64, Real);
+parameterized_value!(bool, Boolean);
+
+/*
+ * Here be the database value converters.
+ */
+
+macro_rules! database_value {
+    ($kind:ident,$paramkind:ident) => {
+        impl From<$kind> for DatabaseValue {
+            fn from(that: $kind) -> Self {
+                DatabaseValue::$paramkind(that)
+            }
+        }
+    };
 }
 
-impl Into<ParameterizedValue> for f64 {
-    #[inline]
-    fn into(self) -> ParameterizedValue {
-        ParameterizedValue::Real(self)
-    }
-}
+database_value!(Row, Row);
+database_value!(Function, Function);
 
-impl Into<ParameterizedValue> for bool {
+impl<T> From<T> for DatabaseValue
+where
+    T: Into<ParameterizedValue>,
+{
     #[inline]
-    fn into(self) -> ParameterizedValue {
-        ParameterizedValue::Boolean(self)
-    }
-}
-
-impl<'a> Into<DatabaseValue> for &'a str {
-    #[inline]
-    fn into(self) -> DatabaseValue {
-        let val: ParameterizedValue = self.into();
-        DatabaseValue::Parameterized(val)
-    }
-}
-
-impl Into<DatabaseValue> for String {
-    #[inline]
-    fn into(self) -> DatabaseValue {
-        let val: ParameterizedValue = self.into();
-        DatabaseValue::Parameterized(val)
-    }
-}
-
-impl Into<DatabaseValue> for i64 {
-    #[inline]
-    fn into(self) -> DatabaseValue {
-        let val: ParameterizedValue = self.into();
-        DatabaseValue::Parameterized(val)
-    }
-}
-
-impl Into<DatabaseValue> for f64 {
-    #[inline]
-    fn into(self) -> DatabaseValue {
-        let val: ParameterizedValue = self.into();
-        DatabaseValue::Parameterized(val)
-    }
-}
-
-impl Into<DatabaseValue> for bool {
-    #[inline]
-    fn into(self) -> DatabaseValue {
-        let val: ParameterizedValue = self.into();
-        DatabaseValue::Parameterized(val)
-    }
-}
-
-impl Into<DatabaseValue> for ParameterizedValue {
-    #[inline]
-    fn into(self) -> DatabaseValue {
-        DatabaseValue::Parameterized(self)
-    }
-}
-
-impl Into<DatabaseValue> for Row {
-    #[inline]
-    fn into(self) -> DatabaseValue {
-        DatabaseValue::Row(self)
-    }
-}
-
-impl Into<DatabaseValue> for Function {
-    #[inline]
-    fn into(self) -> DatabaseValue {
-        DatabaseValue::Function(self)
+    fn from(p: T) -> DatabaseValue {
+        DatabaseValue::Parameterized(p.into())
     }
 }
 

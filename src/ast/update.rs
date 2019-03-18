@@ -21,14 +21,12 @@ impl PartialUpdate {
         K: Into<Column>,
         V: Into<DatabaseValue>,
     {
-        let update = Update {
+        Update {
             table: self.table,
             columns: vec![column.into()],
             values: vec![value.into()],
             conditions: None,
-        };
-
-        update
+        }
     }
 }
 
@@ -44,7 +42,7 @@ pub struct Update {
 impl From<Update> for Query {
     #[inline]
     fn from(update: Update) -> Query {
-        Query::Update(update)
+        Query::Update(Box::new(update))
     }
 }
 

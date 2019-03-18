@@ -12,7 +12,7 @@ pub struct Insert {
 impl From<Insert> for Query {
     #[inline]
     fn from(insert: Insert) -> Query {
-        Query::Insert(insert)
+        Query::Insert(Box::new(insert))
     }
 }
 

@@ -230,9 +230,9 @@ pub trait Visitor {
     fn visit_query(&mut self, query: Query) -> String {
         match query {
             Query::Select(select) => self.visit_select(select),
-            Query::Insert(insert) => self.visit_insert(insert),
-            Query::Update(update) => self.visit_update(update),
-            Query::Delete(delete) => self.visit_delete(delete),
+            Query::Insert(insert) => self.visit_insert(*insert),
+            Query::Update(update) => self.visit_update(*update),
+            Query::Delete(delete) => self.visit_delete(*delete),
         }
     }
 
