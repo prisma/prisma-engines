@@ -6,7 +6,7 @@ use std::collections::BTreeMap;
 pub struct Insert {
     pub(crate) table: Table,
     pub(crate) values: BTreeMap<String, ParameterizedValue>,
-    pub(crate) returning: Option<Column>,
+    pub(crate) returning: Option<DatabaseValue>,
 }
 
 impl From<Insert> for Query {
@@ -58,16 +58,17 @@ impl Insert {
     }
 
     /// Define the column to be returned from the newly inserted row.
+    ///
     /// ```rust
     /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
-    /// let query = Insert::into("users").returning("id");
+    /// let query = Insert::into("users").returning(Column::from("id"));
     /// let (sql, _) = Sqlite::build(query);
     ///
     /// assert_eq!("INSERT INTO `users` DEFAULT VALUES RETURNING `id`", sql);
     /// ```
     pub fn returning<T>(mut self, column: T) -> Self
     where
-        T: Into<Column>,
+        T: Into<DatabaseValue>,
     {
         self.returning = Some(column.into());
         self

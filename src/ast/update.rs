@@ -26,6 +26,7 @@ impl PartialUpdate {
             columns: vec![column.into()],
             values: vec![value.into()],
             conditions: None,
+            returning: None,
         }
     }
 }
@@ -37,6 +38,7 @@ pub struct Update {
     pub(crate) columns: Vec<Column>,
     pub(crate) values: Vec<DatabaseValue>,
     pub(crate) conditions: Option<ConditionTree>,
+    pub(crate) returning: Option<DatabaseValue>,
 }
 
 impl From<Update> for Query {
@@ -131,6 +133,24 @@ impl Update {
         T: Into<ConditionTree>,
     {
         self.conditions = Some(conditions.into());
+        self
+    }
+
+    /// Define the column(s) to be returned from the newly updated row.
+    ///
+    /// ```rust
+    /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
+    /// let query = Update::table("users").set("foo", 1).returning(asterisk());
+    /// let (sql, params) = Sqlite::build(query);
+    ///
+    /// assert_eq!("UPDATE `users` SET `foo` = ? RETURNING *", sql);
+    /// assert_eq!(vec![ParameterizedValue::Integer(1)], params);
+    /// ```
+    pub fn returning<T>(mut self, column: T) -> Self
+    where
+        T: Into<DatabaseValue>,
+    {
+        self.returning = Some(column.into());
         self
     }
 }
