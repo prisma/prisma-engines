@@ -127,6 +127,7 @@ pub trait Visitor {
         result.join(" ")
     }
 
+    /// A walk through an `INSERT` statement
     fn visit_insert(&mut self, insert: Insert) -> String {
         let mut result = vec![format!(
             "INSERT INTO {}",
@@ -161,6 +162,36 @@ pub trait Visitor {
         result.join(" ")
     }
 
+    /// A walk through an `UPDATE` statement
+    fn visit_update(&mut self, update: Update) -> String {
+        let mut result = vec![format!(
+            "UPDATE {} SET",
+            self.visit_table(update.table, true)
+        )];
+
+        {
+            let pairs = update.columns.into_iter().zip(update.values.into_iter());
+
+            let assignments: Vec<String> = pairs
+                .map(|(key, value)| {
+                    format!(
+                        "{} = {}",
+                        self.visit_column(key),
+                        self.visit_database_value(value)
+                    )
+                })
+                .collect();
+
+            result.push(assignments.join(", "));
+        }
+
+        if let Some(conditions) = update.conditions {
+            result.push(format!("WHERE {}", self.visit_conditions(conditions)));
+        }
+
+        result.join(" ")
+    }
+
     /// A helper for delimiting an identifier, surrounding every part with `C_BACKTICK`
     /// and delimiting the values with a `.`
     ///
@@ -186,6 +217,7 @@ pub trait Visitor {
         match query {
             Query::Select(select) => self.visit_select(select),
             Query::Insert(insert) => self.visit_insert(insert),
+            Query::Update(update) => self.visit_update(update),
         }
     }
 

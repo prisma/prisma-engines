@@ -18,6 +18,7 @@ mod query;
 mod row;
 mod select;
 mod table;
+mod update;
 mod values;
 
 pub use column::Column;
@@ -33,4 +34,5 @@ pub use query::Query;
 pub use row::Row;
 pub use select::Select;
 pub use table::*;
+pub use update::Update;
 pub use values::{asterisk, DatabaseValue, ParameterizedValue};
