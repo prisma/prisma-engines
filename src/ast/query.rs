@@ -1,4 +1,4 @@
-use crate::ast::{Insert, Select, Update};
+use crate::ast::{Delete, Insert, Select, Update};
 
 /// A database query
 #[derive(Debug, Clone, PartialEq)]
@@ -7,4 +7,5 @@ pub enum Query {
     Select(Select),
     Insert(Insert),
     Update(Update),
+    Delete(Delete),
 }

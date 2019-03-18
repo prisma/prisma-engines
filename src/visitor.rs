@@ -192,6 +192,20 @@ pub trait Visitor {
         result.join(" ")
     }
 
+    /// A walk through an `DELETE` statement
+    fn visit_delete(&mut self, delete: Delete) -> String {
+        let mut result = vec![format!(
+            "DELETE FROM {}",
+            self.visit_table(delete.table, true)
+        )];
+
+        if let Some(conditions) = delete.conditions {
+            result.push(format!("WHERE {}", self.visit_conditions(conditions)));
+        }
+
+        result.join(" ")
+    }
+
     /// A helper for delimiting an identifier, surrounding every part with `C_BACKTICK`
     /// and delimiting the values with a `.`
     ///
@@ -218,6 +232,7 @@ pub trait Visitor {
             Query::Select(select) => self.visit_select(select),
             Query::Insert(insert) => self.visit_insert(insert),
             Query::Update(update) => self.visit_update(update),
+            Query::Delete(delete) => self.visit_delete(delete),
         }
     }
 

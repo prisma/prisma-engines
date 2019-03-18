@@ -1,5 +1,6 @@
 use crate::ast::*;
 
+#[derive(Debug, PartialEq, Clone)]
 pub struct PartialUpdate {
     pub(crate) table: Table,
 }
