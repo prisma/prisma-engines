@@ -1,7 +1,7 @@
 use crate::{ast::*, visitor::Visitor};
 
 #[cfg(feature = "sqlite")]
-use sqlite::{Bindable, Statement, Result as SqliteResult};
+use sqlite::{Bindable, Result as SqliteResult, Statement};
 
 #[cfg(feature = "rusqlite")]
 use rusqlite::{
@@ -489,6 +489,7 @@ mod tests {
     #[cfg(feature = "sqlite")]
     fn sqlite_harness() -> ::sqlite::Connection {
         let conn = ::sqlite::open(":memory:").unwrap();
+
         conn.execute(
             "
             CREATE TABLE users (id, name TEXT, age REAL, nice INTEGER);
@@ -496,6 +497,7 @@ mod tests {
             ",
         )
         .unwrap();
+
         conn
     }
 
@@ -527,20 +529,22 @@ mod tests {
     #[cfg(feature = "rusqlite")]
     fn sqlite_harness() -> ::rusqlite::Connection {
         let conn = ::rusqlite::Connection::open_in_memory().unwrap();
+
         conn.execute(
-            "
-            CREATE TABLE users (id, name TEXT, age REAL, nice INTEGER);
-            ",
+            "CREATE TABLE users (id, name TEXT, age REAL, nice INTEGER)",
             ::rusqlite::NO_PARAMS,
         )
         .unwrap();
-        conn.execute(
-            "
-            INSERT INTO users (id, name, age, nice) VALUES (1, 'Alice', 42.69, 1);
-            ",
-            ::rusqlite::NO_PARAMS,
-        )
-        .unwrap();
+
+        let insert = Insert::into("users")
+            .value("id", 1)
+            .value("name", "Alice")
+            .value("age", 42.69)
+            .value("nice", true);
+
+        let (sql, params) = Sqlite::build(insert);
+
+        conn.execute(&sql, params.as_slice()).unwrap();
         conn
     }
 
@@ -578,5 +582,4 @@ mod tests {
         assert_eq!(42.69, person.age);
         assert_eq!(1, person.nice);
     }
-
 }

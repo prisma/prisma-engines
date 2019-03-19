@@ -5,7 +5,6 @@ use crate::ast::*;
 pub struct Delete {
     pub(crate) table: Table,
     pub(crate) conditions: Option<ConditionTree>,
-    pub(crate) returning: Option<DatabaseValue>,
 }
 
 impl From<Delete> for Query {
@@ -33,7 +32,6 @@ impl Delete {
         Self {
             table: table.into(),
             conditions: None,
-            returning: None,
         }
     }
 
@@ -53,24 +51,6 @@ impl Delete {
         T: Into<ConditionTree>,
     {
         self.conditions = Some(conditions.into());
-        self
-    }
-
-    /// Define the column(s) to be returned from the newly deleted row.
-    ///
-    /// ```rust
-    /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
-    /// let query = Delete::from("users").so_that("bar".equals(false)).returning(Column::from("id"));
-    /// let (sql, params) = Sqlite::build(query);
-    ///
-    /// assert_eq!("DELETE FROM `users` WHERE `bar` = ? RETURNING `id`", sql);
-    /// assert_eq!(vec![ParameterizedValue::Boolean(false)], params);
-    /// ```
-    pub fn returning<T>(mut self, column: T) -> Self
-    where
-        T: Into<DatabaseValue>,
-    {
-        self.returning = Some(column.into());
         self
     }
 }

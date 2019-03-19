@@ -17,7 +17,7 @@ pub struct Function {
 
 /// A database function type
 #[derive(Debug, Clone, PartialEq)]
-pub enum FunctionType {
+pub(crate) enum FunctionType {
     RowNumber(RowNumber),
     Count(Count),
     Distinct(Distinct),

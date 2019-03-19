@@ -155,13 +155,6 @@ pub trait Visitor {
             ))
         }
 
-        if let Some(returning) = insert.returning {
-            result.push(format!(
-                "RETURNING {}",
-                self.visit_database_value(returning)
-            ));
-        }
-
         result.join(" ")
     }
 
@@ -192,13 +185,6 @@ pub trait Visitor {
             result.push(format!("WHERE {}", self.visit_conditions(conditions)));
         }
 
-        if let Some(returning) = update.returning {
-            result.push(format!(
-                "RETURNING {}",
-                self.visit_database_value(returning)
-            ));
-        }
-
         result.join(" ")
     }
 
@@ -211,13 +197,6 @@ pub trait Visitor {
 
         if let Some(conditions) = delete.conditions {
             result.push(format!("WHERE {}", self.visit_conditions(conditions)));
-        }
-
-        if let Some(returning) = delete.returning {
-            result.push(format!(
-                "RETURNING {}",
-                self.visit_database_value(returning)
-            ));
         }
 
         result.join(" ")

@@ -36,5 +36,5 @@ pub use query::Query;
 pub use row::Row;
 pub use select::Select;
 pub use table::*;
-pub use update::Update;
+pub use update::*;
 pub use values::{asterisk, DatabaseValue, ParameterizedValue};
