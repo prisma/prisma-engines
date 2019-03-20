@@ -1,11 +1,11 @@
 use crate::ast::*;
-use std::collections::BTreeMap;
 
 /// A builder for an `INSERT` statement.
 #[derive(Clone, Debug, PartialEq)]
 pub struct Insert {
     pub(crate) table: Table,
-    pub(crate) values: BTreeMap<String, ParameterizedValue>,
+    pub(crate) columns: Vec<Column>,
+    pub(crate) values: Vec<DatabaseValue>,
 }
 
 impl From<Insert> for Query {
@@ -34,7 +34,8 @@ impl Insert {
 
         Insert {
             table: table,
-            values: BTreeMap::new(),
+            columns: Vec::new(),
+            values: Vec::new(),
         }
     }
 
@@ -50,10 +51,12 @@ impl Insert {
     /// ```
     pub fn value<K, V>(mut self, key: K, val: V) -> Self
     where
-        K: Into<String>,
-        V: Into<ParameterizedValue>,
+        K: Into<Column>,
+        V: Into<DatabaseValue>,
     {
-        self.values.insert(key.into(), val.into());
+        self.columns.push(key.into());
+        self.values.push(val.into());
+
         self
     }
 }

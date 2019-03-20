@@ -137,16 +137,16 @@ pub trait Visitor {
         if insert.values.is_empty() {
             result.push("DEFAULT VALUES".to_string());
         } else {
-            let (keys, values) =
-                insert
-                    .values
-                    .into_iter()
-                    .fold((Vec::new(), Vec::new()), |mut acc, kv| {
-                        acc.0.push(self.visit_column(Column::from(kv.0)));
-                        acc.1.push(self.visit_parameterized(kv.1));
+            let (keys, values) = insert
+                .columns
+                .into_iter()
+                .zip(insert.values.into_iter())
+                .fold((Vec::new(), Vec::new()), |mut acc, kv| {
+                    acc.0.push(self.visit_column(Column::from(kv.0)));
+                    acc.1.push(self.visit_database_value(kv.1));
 
-                        acc
-                    });
+                    acc
+                });
 
             result.push(format!(
                 "({}) VALUES ({})",
