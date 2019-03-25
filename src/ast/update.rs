@@ -1,35 +1,5 @@
 use crate::ast::*;
 
-#[derive(Debug, PartialEq, Clone)]
-pub struct PartialUpdate {
-    pub(crate) table: Table,
-}
-
-impl PartialUpdate {
-    /// Specify a value for the given column.
-    ///
-    /// ```rust
-    /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
-    /// let query = Update::table("users").set("foo", 10);
-    /// let (sql, params) = Sqlite::build(query);
-    ///
-    /// assert_eq!("UPDATE `users` SET `foo` = ?", sql);
-    /// assert_eq!(vec![ParameterizedValue::Integer(10)], params);
-    /// ```
-    pub fn set<K, V>(self, column: K, value: V) -> Update
-    where
-        K: Into<Column>,
-        V: Into<DatabaseValue>,
-    {
-        Update {
-            table: self.table.clone(),
-            columns: vec![column.into()],
-            values: vec![value.into()],
-            conditions: None,
-        }
-    }
-}
-
 /// A builder for an `UPDATE` statement.
 #[derive(Debug, PartialEq, Clone)]
 pub struct Update {
@@ -49,12 +19,15 @@ impl From<Update> for Query {
 impl Update {
     /// Creates the basis for an `UPDATE` statement to the given table.
     #[inline]
-    pub fn table<T>(table: T) -> PartialUpdate
+    pub fn table<T>(table: T) -> Self
     where
         T: Into<Table>,
     {
-        PartialUpdate {
+        Self {
             table: table.into(),
+            columns: Vec::new(),
+            values: Vec::new(),
+            conditions: None,
         }
     }
 
