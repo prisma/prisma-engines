@@ -29,7 +29,7 @@ pub use conjuctive::Conjuctive;
 pub use delete::Delete;
 pub use expression::Expression;
 pub use function::*;
-pub use insert::Insert;
+pub use insert::*;
 pub use join::{Join, JoinData, Joinable};
 pub use ordering::{IntoOrderDefinition, Order, OrderDefinition, Orderable, Ordering};
 pub use query::Query;

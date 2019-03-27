@@ -8,12 +8,14 @@ pub struct Insert {
     pub(crate) values: Vec<Row>,
 }
 
+/// A builder for a single row `INSERT` statement.
 pub struct SingleRowInsert {
     pub(crate) table: Table,
     pub(crate) columns: Vec<Column>,
     pub(crate) values: Row,
 }
 
+/// A builder for a multi-row `INSERT` statement.
 pub struct MultiRowInsert {
     pub(crate) table: Table,
     pub(crate) columns: Vec<Column>,
