@@ -53,9 +53,7 @@ pub trait Visitor {
         let result = joins.into_iter().fold(Vec::new(), |mut acc, j| {
             match j {
                 Join::Inner(data) => acc.push(format!("INNER JOIN {}", self.visit_join_data(data))),
-                Join::LeftOuter(data) => {
-                    acc.push(format!("LEFT OUTER JOIN {}", self.visit_join_data(data)))
-                }
+                Join::LeftOuter(data) => acc.push(format!("LEFT OUTER JOIN {}", self.visit_join_data(data))),
             }
 
             acc
@@ -80,20 +78,16 @@ pub trait Visitor {
             if select.columns.is_empty() {
                 match table.typ {
                     TableType::Query(_) => match table.alias {
-                        Some(ref alias) => result.push(format!(
-                            "{}.*",
-                            Self::delimited_identifiers(vec![alias.clone()])
-                        )),
+                        Some(ref alias) => {
+                            result.push(format!("{}.*", Self::delimited_identifiers(vec![alias.clone()])))
+                        }
                         None => result.push(String::from("*")),
                     },
                     TableType::Table(_) => match table.alias.clone() {
-                        Some(ref alias) => result.push(format!(
-                            "{}.*",
-                            Self::delimited_identifiers(vec![alias.clone()])
-                        )),
-                        None => {
-                            result.push(format!("{}.*", self.visit_table(*table.clone(), false)))
+                        Some(ref alias) => {
+                            result.push(format!("{}.*", Self::delimited_identifiers(vec![alias.clone()])))
                         }
+                        None => result.push(format!("{}.*", self.visit_table(*table.clone(), false))),
                     },
                 }
             } else {
@@ -129,30 +123,20 @@ pub trait Visitor {
 
     /// A walk through an `INSERT` statement
     fn visit_insert(&mut self, insert: Insert) -> String {
-        let mut result = vec![format!(
-            "INSERT INTO {}",
-            self.visit_table(insert.table, true)
-        )];
+        let mut result = vec![format!("INSERT INTO {}", self.visit_table(insert.table, true))];
 
         if insert.values.is_empty() {
             result.push("DEFAULT VALUES".to_string());
         } else {
-            let (keys, values) = insert
+            let columns: Vec<String> = insert
                 .columns
                 .into_iter()
-                .zip(insert.values.into_iter())
-                .fold((Vec::new(), Vec::new()), |mut acc, kv| {
-                    acc.0.push(self.visit_column(Column::from(kv.0)));
-                    acc.1.push(self.visit_database_value(kv.1));
+                .map(|c| self.visit_column(Column::from(c)))
+                .collect();
 
-                    acc
-                });
+            let values: Vec<String> = insert.values.into_iter().map(|row| self.visit_row(row)).collect();
 
-            result.push(format!(
-                "({}) VALUES ({})",
-                keys.join(","),
-                values.join(",")
-            ))
+            result.push(format!("({}) VALUES {}", columns.join(", "), values.join(", "),))
         }
 
         result.join(" ")
@@ -160,22 +144,13 @@ pub trait Visitor {
 
     /// A walk through an `UPDATE` statement
     fn visit_update(&mut self, update: Update) -> String {
-        let mut result = vec![format!(
-            "UPDATE {} SET",
-            self.visit_table(update.table, true)
-        )];
+        let mut result = vec![format!("UPDATE {} SET", self.visit_table(update.table, true))];
 
         {
             let pairs = update.columns.into_iter().zip(update.values.into_iter());
 
             let assignments: Vec<String> = pairs
-                .map(|(key, value)| {
-                    format!(
-                        "{} = {}",
-                        self.visit_column(key),
-                        self.visit_database_value(value)
-                    )
-                })
+                .map(|(key, value)| format!("{} = {}", self.visit_column(key), self.visit_database_value(value)))
                 .collect();
 
             result.push(assignments.join(", "));
@@ -190,10 +165,7 @@ pub trait Visitor {
 
     /// A walk through an `DELETE` statement
     fn visit_delete(&mut self, delete: Delete) -> String {
-        let mut result = vec![format!(
-            "DELETE FROM {}",
-            self.visit_table(delete.table, true)
-        )];
+        let mut result = vec![format!("DELETE FROM {}", self.visit_table(delete.table, true))];
 
         if let Some(conditions) = delete.conditions {
             result.push(format!("WHERE {}", self.visit_conditions(conditions)));
@@ -327,9 +299,7 @@ pub trait Visitor {
                 self.visit_expression(*left),
                 self.visit_expression(*right),
             ),
-            ConditionTree::Not(expression) => {
-                format!("(NOT {})", self.visit_expression(*expression))
-            }
+            ConditionTree::Not(expression) => format!("(NOT {})", self.visit_expression(*expression)),
             ConditionTree::Single(expression) => self.visit_expression(*expression),
             ConditionTree::NoCondition => String::from("1=1"),
             ConditionTree::NegativeCondition => String::from("1=0"),
@@ -411,44 +381,26 @@ pub trait Visitor {
             }
             Compare::BeginsWith(left, right) => {
                 let expression = self.visit_database_value(*left);
-                self.add_parameter(ParameterizedValue::Text(format!(
-                    "{}{}",
-                    right,
-                    Self::C_WILDCARD
-                )));
+                self.add_parameter(ParameterizedValue::Text(format!("{}{}", right, Self::C_WILDCARD)));
                 format!("{} LIKE ?", expression)
             }
             Compare::NotBeginsWith(left, right) => {
                 let expression = self.visit_database_value(*left);
-                self.add_parameter(ParameterizedValue::Text(format!(
-                    "{}{}",
-                    right,
-                    Self::C_WILDCARD
-                )));
+                self.add_parameter(ParameterizedValue::Text(format!("{}{}", right, Self::C_WILDCARD)));
                 format!("{} NOT LIKE ?", expression)
             }
             Compare::EndsInto(left, right) => {
                 let expression = self.visit_database_value(*left);
-                self.add_parameter(ParameterizedValue::Text(format!(
-                    "{}{}",
-                    Self::C_WILDCARD,
-                    right
-                )));
+                self.add_parameter(ParameterizedValue::Text(format!("{}{}", Self::C_WILDCARD, right)));
                 format!("{} LIKE ?", expression)
             }
             Compare::NotEndsInto(left, right) => {
                 let expression = self.visit_database_value(*left);
-                self.add_parameter(ParameterizedValue::Text(format!(
-                    "{}{}",
-                    Self::C_WILDCARD,
-                    right
-                )));
+                self.add_parameter(ParameterizedValue::Text(format!("{}{}", Self::C_WILDCARD, right)));
                 format!("{} NOT LIKE ?", expression)
             }
             Compare::Null(column) => format!("{} IS NULL", self.visit_database_value(*column)),
-            Compare::NotNull(column) => {
-                format!("{} IS NOT NULL", self.visit_database_value(*column))
-            }
+            Compare::NotNull(column) => format!("{} IS NOT NULL", self.visit_database_value(*column)),
             Compare::Between(val, left, right) => format!(
                 "{} BETWEEN {} AND {}",
                 self.visit_database_value(*val),

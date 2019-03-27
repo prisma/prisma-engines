@@ -24,14 +24,9 @@ impl Visitor for Sqlite {
     where
         Q: Into<Query>,
     {
-        let mut sqlite = Sqlite {
-            parameters: Vec::new(),
-        };
+        let mut sqlite = Sqlite { parameters: Vec::new() };
 
-        (
-            Sqlite::visit_query(&mut sqlite, query.into()),
-            sqlite.parameters,
-        )
+        (Sqlite::visit_query(&mut sqlite, query.into()), sqlite.parameters)
     }
 
     fn add_parameter(&mut self, value: ParameterizedValue) {
@@ -52,10 +47,7 @@ impl Visitor for Sqlite {
                 if fun_rownum.over.is_empty() {
                     String::from("ROW_NUMBER() OVER()")
                 } else {
-                    format!(
-                        "ROW_NUMBER() OVER({})",
-                        self.visit_partitioning(fun_rownum.over)
-                    )
+                    format!("ROW_NUMBER() OVER({})", self.visit_partitioning(fun_rownum.over))
                 }
             }
             FunctionType::Count(fun_count) => {
@@ -148,10 +140,7 @@ mod tests {
     where
         T: Into<ParameterizedValue>,
     {
-        (
-            String::from(sql),
-            params.into_iter().map(|p| p.into()).collect(),
-        )
+        (String::from(sql), params.into_iter().map(|p| p.into()).collect())
     }
 
     #[test]
@@ -177,8 +166,7 @@ mod tests {
 
     #[test]
     fn test_select_order_by() {
-        let expected_sql =
-            "SELECT `musti`.* FROM `musti` ORDER BY `foo`, `baz` ASC, `bar` DESC LIMIT -1";
+        let expected_sql = "SELECT `musti`.* FROM `musti` ORDER BY `foo`, `baz` ASC, `bar` DESC LIMIT -1";
         let query = Select::from("musti")
             .order_by("foo")
             .order_by("baz".ascend())
@@ -299,8 +287,7 @@ mod tests {
 
     #[test]
     fn test_select_and() {
-        let expected_sql =
-            "SELECT `naukio`.* FROM `naukio` WHERE ((`word` = ? AND `age` < ?) AND `paw` = ?) LIMIT -1";
+        let expected_sql = "SELECT `naukio`.* FROM `naukio` WHERE ((`word` = ? AND `age` < ?) AND `paw` = ?) LIMIT -1";
 
         let expected_params = vec![
             ParameterizedValue::Text(String::from("meow")),
@@ -308,10 +295,7 @@ mod tests {
             ParameterizedValue::Text(String::from("warm")),
         ];
 
-        let conditions = "word"
-            .equals("meow")
-            .and("age".less_than(10))
-            .and("paw".equals("warm"));
+        let conditions = "word".equals("meow").and("age".less_than(10)).and("paw".equals("warm"));
 
         let query = Select::from("naukio").so_that(conditions);
 
@@ -323,8 +307,7 @@ mod tests {
 
     #[test]
     fn test_select_and_different_execution_order() {
-        let expected_sql =
-            "SELECT `naukio`.* FROM `naukio` WHERE (`word` = ? AND (`age` < ? AND `paw` = ?)) LIMIT -1";
+        let expected_sql = "SELECT `naukio`.* FROM `naukio` WHERE (`word` = ? AND (`age` < ? AND `paw` = ?)) LIMIT -1";
 
         let expected_params = vec![
             ParameterizedValue::Text(String::from("meow")),
@@ -332,9 +315,7 @@ mod tests {
             ParameterizedValue::Text(String::from("warm")),
         ];
 
-        let conditions = "word"
-            .equals("meow")
-            .and("age".less_than(10).and("paw".equals("warm")));
+        let conditions = "word".equals("meow").and("age".less_than(10).and("paw".equals("warm")));
 
         let query = Select::from("naukio").so_that(conditions);
 
@@ -346,8 +327,7 @@ mod tests {
 
     #[test]
     fn test_select_or() {
-        let expected_sql =
-            "SELECT `naukio`.* FROM `naukio` WHERE ((`word` = ? OR `age` < ?) AND `paw` = ?) LIMIT -1";
+        let expected_sql = "SELECT `naukio`.* FROM `naukio` WHERE ((`word` = ? OR `age` < ?) AND `paw` = ?) LIMIT -1";
 
         let expected_params = vec![
             ParameterizedValue::Text(String::from("meow")),
@@ -355,10 +335,7 @@ mod tests {
             ParameterizedValue::Text(String::from("warm")),
         ];
 
-        let conditions = "word"
-            .equals("meow")
-            .or("age".less_than(10))
-            .and("paw".equals("warm"));
+        let conditions = "word".equals("meow").or("age".less_than(10)).and("paw".equals("warm"));
 
         let query = Select::from("naukio").so_that(conditions);
 
@@ -422,8 +399,8 @@ mod tests {
         let expected_sql =
             "SELECT `users`.* FROM `users` INNER JOIN `posts` ON `users`.`id` = `posts`.`user_id` LIMIT -1";
 
-        let query = Select::from("users")
-            .inner_join("posts".on(("users", "id").equals(Column::from(("posts", "user_id")))));
+        let query =
+            Select::from("users").inner_join("posts".on(("users", "id").equals(Column::from(("posts", "user_id")))));
         let (sql, _) = Sqlite::build(query);
 
         assert_eq!(expected_sql, sql);
@@ -451,9 +428,8 @@ mod tests {
         let expected_sql =
             "SELECT `users`.* FROM `users` LEFT OUTER JOIN `posts` ON `users`.`id` = `posts`.`user_id` LIMIT -1";
 
-        let query = Select::from("users").left_outer_join(
-            "posts".on(("users", "id").equals(Column::from(("posts", "user_id")))),
-        );
+        let query = Select::from("users")
+            .left_outer_join("posts".on(("users", "id").equals(Column::from(("posts", "user_id")))));
         let (sql, _) = Sqlite::build(query);
 
         assert_eq!(expected_sql, sql);
@@ -515,8 +491,7 @@ mod tests {
 
         let mut s = conn.prepare(sql_str.clone()).unwrap();
         for i in 1..params.len() + 1 {
-            s.bind::<ParameterizedValue>(i, params[i - 1].clone().into())
-                .unwrap();
+            s.bind::<ParameterizedValue>(i, params[i - 1].clone().into()).unwrap();
         }
 
         s.next().unwrap();
@@ -536,7 +511,7 @@ mod tests {
         )
         .unwrap();
 
-        let insert = Insert::into("users")
+        let insert = Insert::single_into("users")
             .value("id", 1)
             .value("name", "Alice")
             .value("age", 42.69)
@@ -553,10 +528,7 @@ mod tests {
     fn bind_test_1() {
         let conn = sqlite_harness();
 
-        let conditions = "name"
-            .equals("Alice")
-            .and("age".less_than(100.0))
-            .and("nice".equals(1));
+        let conditions = "name".equals("Alice").and("age".less_than(100.0)).and("nice".equals(1));
         let query = Select::from("users").so_that(conditions);
         let (sql_str, params) = Sqlite::build(query);
 

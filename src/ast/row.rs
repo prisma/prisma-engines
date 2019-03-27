@@ -19,6 +19,10 @@ impl Row {
         self.values.push(value.into());
         self
     }
+
+    pub fn is_empty(&self) -> bool {
+        self.values.is_empty()
+    }
 }
 
 impl<T> From<Vec<T>> for Row
@@ -27,9 +31,7 @@ where
 {
     #[inline]
     fn from(vector: Vec<T>) -> Row {
-        vector
-            .into_iter()
-            .fold(Row::new(), |row, v| row.push(v.into()))
+        vector.into_iter().fold(Row::new(), |row, v| row.push(v.into()))
     }
 }
 
@@ -65,11 +67,7 @@ where
 {
     #[inline]
     fn from(vals: (A, B, C, D)) -> Row {
-        Row::new()
-            .push(vals.0)
-            .push(vals.1)
-            .push(vals.2)
-            .push(vals.3)
+        Row::new().push(vals.0).push(vals.1).push(vals.2).push(vals.3)
     }
 }
 
