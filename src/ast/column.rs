@@ -3,7 +3,7 @@ use crate::ast::{DatabaseValue, Table};
 /// A column definition.
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct Column {
-    pub(crate) name: String,
+    pub name: String,
     pub(crate) table: Option<Table>,
     pub(crate) alias: Option<String>,
 }
