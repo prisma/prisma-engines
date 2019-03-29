@@ -517,7 +517,7 @@ mod tests {
             .value("age", 42.69)
             .value("nice", true);
 
-        let (sql, params) = Sqlite::build(insert);
+        let (sql, params) = dbg!(Sqlite::build(insert));
 
         conn.execute(&sql, params.as_slice()).unwrap();
         conn

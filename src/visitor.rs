@@ -123,7 +123,12 @@ pub trait Visitor {
 
     /// A walk through an `INSERT` statement
     fn visit_insert(&mut self, insert: Insert) -> String {
-        let mut result = vec![format!("INSERT INTO {}", self.visit_table(insert.table, true))];
+        let mut result = match insert.on_conflict {
+            Some(OnConflict::DoNothing) => vec![String::from("INSERT OR IGNORE")],
+            None => vec![String::from("INSERT")],
+        };
+
+        result.push(format!("INTO {}", self.visit_table(insert.table, true)));
 
         if insert.values.is_empty() {
             result.push("DEFAULT VALUES".to_string());

@@ -6,20 +6,35 @@ pub struct Insert {
     pub(crate) table: Table,
     pub(crate) columns: Vec<Column>,
     pub(crate) values: Vec<Row>,
+    pub(crate) on_conflict: Option<OnConflict>,
 }
 
-/// A builder for a single row `INSERT` statement.
 pub struct SingleRowInsert {
     pub(crate) table: Table,
     pub(crate) columns: Vec<Column>,
     pub(crate) values: Row,
 }
 
-/// A builder for a multi-row `INSERT` statement.
 pub struct MultiRowInsert {
     pub(crate) table: Table,
     pub(crate) columns: Vec<Column>,
     pub(crate) values: Vec<Row>,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq)]
+/// `INSERT` conflict resolution strategies.
+pub enum OnConflict {
+    /// When a row already exists, do nothing.
+    ///
+    /// ```rust
+    /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
+    /// let query: Insert = Insert::single_into("users").into();
+    ///
+    /// let (sql, _) = Sqlite::build(query.on_conflict(OnConflict::DoNothing));
+    ///
+    /// assert_eq!("INSERT OR IGNORE INTO `users` DEFAULT VALUES", sql);
+    /// ```
+    DoNothing,
 }
 
 impl From<Insert> for Query {
@@ -42,6 +57,7 @@ impl From<SingleRowInsert> for Insert {
             table: insert.table,
             columns: insert.columns,
             values,
+            on_conflict: None,
         }
     }
 }
@@ -53,6 +69,7 @@ impl From<MultiRowInsert> for Insert {
             table: insert.table,
             columns: insert.columns,
             values: insert.values,
+            on_conflict: None,
         }
     }
 }
@@ -109,6 +126,13 @@ impl Insert {
             columns: columns.into_iter().map(|c| c.into()).collect(),
             values: Vec::new(),
         }
+    }
+
+    /// Sets the conflict resolution strategy.
+    #[inline]
+    pub fn on_conflict(mut self, on_conflict: OnConflict) -> Self {
+        self.on_conflict = Some(on_conflict);
+        self
     }
 }
 
