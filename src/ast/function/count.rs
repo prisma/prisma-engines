@@ -9,7 +9,7 @@ pub struct Count {
 ///
 /// ```rust
 /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
-/// let query = Select::from("users").value(count(asterisk()));
+/// let query = Select::from_table("users").value(count(asterisk()));
 /// let (sql, _) = Sqlite::build(query);
 /// assert_eq!("SELECT COUNT(*) FROM `users` LIMIT -1", sql);
 /// ```

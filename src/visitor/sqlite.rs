@@ -157,7 +157,7 @@ mod tests {
     #[test]
     fn test_select_star_from() {
         let expected_sql = "SELECT `musti`.* FROM `musti` LIMIT -1";
-        let query = Select::from("musti");
+        let query = Select::from_table("musti");
         let (sql, params) = Sqlite::build(query);
 
         assert_eq!(expected_sql, sql);
@@ -167,7 +167,7 @@ mod tests {
     #[test]
     fn test_select_order_by() {
         let expected_sql = "SELECT `musti`.* FROM `musti` ORDER BY `foo`, `baz` ASC, `bar` DESC LIMIT -1";
-        let query = Select::from("musti")
+        let query = Select::from_table("musti")
             .order_by("foo")
             .order_by("baz".ascend())
             .order_by("bar".descend());
@@ -180,7 +180,7 @@ mod tests {
     #[test]
     fn test_select_fields_from() {
         let expected_sql = "SELECT `paw`, `nose` FROM `cat`.`musti` LIMIT -1";
-        let query = Select::from(("cat", "musti")).column("paw").column("nose");
+        let query = Select::from_table(("cat", "musti")).column("paw").column("nose");
         let (sql, params) = Sqlite::build(query);
 
         assert_eq!(expected_sql, sql);
@@ -194,7 +194,7 @@ mod tests {
             vec!["meow"],
         );
 
-        let query = Select::from("naukio").so_that("word".equals("meow"));
+        let query = Select::from_table("naukio").so_that("word".equals("meow"));
         let (sql, params) = Sqlite::build(query);
 
         assert_eq!(expected.0, sql);
@@ -208,7 +208,7 @@ mod tests {
             vec!["%meow%"],
         );
 
-        let query = Select::from("naukio").so_that("word".like("meow"));
+        let query = Select::from_table("naukio").so_that("word".like("meow"));
         let (sql, params) = Sqlite::build(query);
 
         assert_eq!(expected.0, sql);
@@ -222,7 +222,7 @@ mod tests {
             vec!["%meow%"],
         );
 
-        let query = Select::from("naukio").so_that("word".not_like("meow"));
+        let query = Select::from_table("naukio").so_that("word".not_like("meow"));
         let (sql, params) = Sqlite::build(query);
 
         assert_eq!(expected.0, sql);
@@ -236,7 +236,7 @@ mod tests {
             vec!["meow%"],
         );
 
-        let query = Select::from("naukio").so_that("word".begins_with("meow"));
+        let query = Select::from_table("naukio").so_that("word".begins_with("meow"));
         let (sql, params) = Sqlite::build(query);
 
         assert_eq!(expected.0, sql);
@@ -250,7 +250,7 @@ mod tests {
             vec!["meow%"],
         );
 
-        let query = Select::from("naukio").so_that("word".not_begins_with("meow"));
+        let query = Select::from_table("naukio").so_that("word".not_begins_with("meow"));
         let (sql, params) = Sqlite::build(query);
 
         assert_eq!(expected.0, sql);
@@ -264,7 +264,7 @@ mod tests {
             vec!["%meow"],
         );
 
-        let query = Select::from("naukio").so_that("word".ends_into("meow"));
+        let query = Select::from_table("naukio").so_that("word".ends_into("meow"));
         let (sql, params) = Sqlite::build(query);
 
         assert_eq!(expected.0, sql);
@@ -278,7 +278,7 @@ mod tests {
             vec!["%meow"],
         );
 
-        let query = Select::from("naukio").so_that("word".not_ends_into("meow"));
+        let query = Select::from_table("naukio").so_that("word".not_ends_into("meow"));
         let (sql, params) = Sqlite::build(query);
 
         assert_eq!(expected.0, sql);
@@ -297,7 +297,7 @@ mod tests {
 
         let conditions = "word".equals("meow").and("age".less_than(10)).and("paw".equals("warm"));
 
-        let query = Select::from("naukio").so_that(conditions);
+        let query = Select::from_table("naukio").so_that(conditions);
 
         let (sql, params) = Sqlite::build(query);
 
@@ -317,7 +317,7 @@ mod tests {
 
         let conditions = "word".equals("meow").and("age".less_than(10).and("paw".equals("warm")));
 
-        let query = Select::from("naukio").so_that(conditions);
+        let query = Select::from_table("naukio").so_that(conditions);
 
         let (sql, params) = Sqlite::build(query);
 
@@ -337,7 +337,7 @@ mod tests {
 
         let conditions = "word".equals("meow").or("age".less_than(10)).and("paw".equals("warm"));
 
-        let query = Select::from("naukio").so_that(conditions);
+        let query = Select::from_table("naukio").so_that(conditions);
 
         let (sql, params) = Sqlite::build(query);
 
@@ -362,7 +362,7 @@ mod tests {
             .and("paw".equals("warm"))
             .not();
 
-        let query = Select::from("naukio").so_that(conditions);
+        let query = Select::from_table("naukio").so_that(conditions);
 
         let (sql, params) = Sqlite::build(query);
 
@@ -386,7 +386,7 @@ mod tests {
             "paw".equals("warm"),
         ));
 
-        let query = Select::from("naukio").so_that(conditions);
+        let query = Select::from_table("naukio").so_that(conditions);
 
         let (sql, params) = Sqlite::build(query);
 
@@ -399,8 +399,8 @@ mod tests {
         let expected_sql =
             "SELECT `users`.* FROM `users` INNER JOIN `posts` ON `users`.`id` = `posts`.`user_id` LIMIT -1";
 
-        let query =
-            Select::from("users").inner_join("posts".on(("users", "id").equals(Column::from(("posts", "user_id")))));
+        let query = Select::from_table("users")
+            .inner_join("posts".on(("users", "id").equals(Column::from(("posts", "user_id")))));
         let (sql, _) = Sqlite::build(query);
 
         assert_eq!(expected_sql, sql);
@@ -411,7 +411,7 @@ mod tests {
         let expected_sql =
             "SELECT `users`.* FROM `users` INNER JOIN `posts` ON (`users`.`id` = `posts`.`user_id` AND `posts`.`published` = ?) LIMIT -1";
 
-        let query = Select::from("users").inner_join(
+        let query = Select::from_table("users").inner_join(
             "posts".on(("users", "id")
                 .equals(Column::from(("posts", "user_id")))
                 .and(("posts", "published").equals(true))),
@@ -428,7 +428,7 @@ mod tests {
         let expected_sql =
             "SELECT `users`.* FROM `users` LEFT OUTER JOIN `posts` ON `users`.`id` = `posts`.`user_id` LIMIT -1";
 
-        let query = Select::from("users")
+        let query = Select::from_table("users")
             .left_outer_join("posts".on(("users", "id").equals(Column::from(("posts", "user_id")))));
         let (sql, _) = Sqlite::build(query);
 
@@ -440,7 +440,7 @@ mod tests {
         let expected_sql =
             "SELECT `users`.* FROM `users` LEFT OUTER JOIN `posts` ON (`users`.`id` = `posts`.`user_id` AND `posts`.`published` = ?) LIMIT -1";
 
-        let query = Select::from("users").left_outer_join(
+        let query = Select::from_table("users").left_outer_join(
             "posts".on(("users", "id")
                 .equals(Column::from(("posts", "user_id")))
                 .and(("posts", "published").equals(true))),
@@ -455,7 +455,7 @@ mod tests {
     #[test]
     fn test_column_aliasing() {
         let expected_sql = "SELECT `bar` AS `foo` FROM `meow` LIMIT -1";
-        let query = Select::from("meow").column(Column::new("bar").alias("foo"));
+        let query = Select::from_table("meow").column(Column::new("bar").alias("foo"));
         let (sql, _) = Sqlite::build(query);
 
         assert_eq!(expected_sql, sql);
@@ -486,7 +486,7 @@ mod tests {
             .equals("Alice")
             .and("age".less_than(100.0))
             .and("nice".equals(true));
-        let query = Select::from("users").so_that(conditions);
+        let query = Select::from_table("users").so_that(conditions);
         let (sql_str, params) = Sqlite::build(query);
 
         let mut s = conn.prepare(sql_str.clone()).unwrap();
@@ -529,7 +529,7 @@ mod tests {
         let conn = sqlite_harness();
 
         let conditions = "name".equals("Alice").and("age".less_than(100.0)).and("nice".equals(1));
-        let query = Select::from("users").so_that(conditions);
+        let query = Select::from_table("users").so_that(conditions);
         let (sql_str, params) = Sqlite::build(query);
 
         #[derive(Debug)]

@@ -39,7 +39,7 @@
 //!         .and("age".less_than(10))
 //!         .and("paw".equals("warm"));
 //!
-//!     let query = Select::from("naukio").so_that(conditions);
+//!     let query = Select::from_table("naukio").so_that(conditions);
 //!     let (sql_str, params) = Sqlite::build(query);
 //!
 //!     assert_eq!(
@@ -74,7 +74,7 @@
 //!         "paw".equals("warm"),
 //!     );
 //!
-//!     let query = Select::from("naukio").so_that(conditions);
+//!     let query = Select::from_table("naukio").so_that(conditions);
 //!     let (sql, params) = Sqlite::build(query);
 //!
 //!     assert_eq!(

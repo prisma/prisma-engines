@@ -82,7 +82,7 @@ impl Update {
     ///
     /// ```rust
     /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
-    /// let select = Select::from("bars").column("id").so_that("uniq_val".equals(3));
+    /// let select = Select::from_table("bars").column("id").so_that("uniq_val".equals(3));
     /// let query = Update::table("users").set("foo", 1).so_that("bar".equals(select));
     /// let (sql, params) = Sqlite::build(query);
     ///

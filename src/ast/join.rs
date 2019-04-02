@@ -23,7 +23,7 @@ pub trait Joinable {
     /// ```rust
     /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
     /// let join_data = "b".on(("b", "id").equals(Column::from(("a", "id"))));
-    /// let query = Select::from("a").inner_join(join_data);
+    /// let query = Select::from_table("a").inner_join(join_data);
     /// let (sql, _) = Sqlite::build(query);
     ///
     /// assert_eq!(

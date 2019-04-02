@@ -43,7 +43,7 @@ impl RowNumber {
 /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
 /// let fun = Function::from(row_number().order_by("created_at").partition_by("name"));
 ///
-/// let query = Select::from("users")
+/// let query = Select::from_table("users")
 ///     .column("id")
 ///     .value(fun.alias("num"));
 ///

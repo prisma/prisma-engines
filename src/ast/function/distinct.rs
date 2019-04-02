@@ -13,7 +13,7 @@ impl Distinct {
     /// let fun = distinct(Column::from(("users", "id")))
     ///     .distinct(Column::from(("users", "name")));
     ///
-    /// let query = Select::from("users").value(fun);
+    /// let query = Select::from_table("users").value(fun);
     /// let (sql, _) = Sqlite::build(query);
     /// assert_eq!("SELECT DISTINCT(`users`.`id`, `users`.`name`) FROM `users` LIMIT -1", sql);
     /// ```
@@ -30,7 +30,7 @@ impl Distinct {
 ///
 /// ```rust
 /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
-/// let query = Select::from("users").value(distinct("name"));
+/// let query = Select::from_table("users").value(distinct("name"));
 /// let (sql, _) = Sqlite::build(query);
 /// assert_eq!("SELECT DISTINCT(`name`) FROM `users` LIMIT -1", sql);
 /// ```

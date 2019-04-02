@@ -19,13 +19,13 @@ impl Delete {
     ///
     /// ```rust
     /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
-    /// let query = Delete::from("users");
+    /// let query = Delete::from_table("users");
     /// let (sql, _) = Sqlite::build(query);
     ///
     /// assert_eq!("DELETE FROM `users`", sql);
     /// ```
     #[inline]
-    pub fn from<T>(table: T) -> Self
+    pub fn from_table<T>(table: T) -> Self
     where
         T: Into<Table>,
     {
@@ -40,7 +40,7 @@ impl Delete {
     ///
     /// ```rust
     /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
-    /// let query = Delete::from("users").so_that("bar".equals(false));
+    /// let query = Delete::from_table("users").so_that("bar".equals(false));
     /// let (sql, params) = Sqlite::build(query);
     ///
     /// assert_eq!("DELETE FROM `users` WHERE `bar` = ?", sql);
