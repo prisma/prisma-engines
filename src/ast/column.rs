@@ -29,12 +29,30 @@ impl Column {
     }
 
     /// Include the table name in the column expression.
-    pub fn table(mut self, table: Table) -> Self {
-        self.table = Some(table);
+    #[inline]
+    pub fn table<T>(mut self, table: T) -> Self
+    where
+        T: Into<Table>,
+    {
+        self.table = Some(table.into());
+        self
+    }
+
+    /// Include the table name in the column expression, if table is defined.
+    #[inline]
+    pub fn opt_table<T>(mut self, table: Option<T>) -> Self
+    where
+        T: Into<Table>,
+    {
+        if let Some(table) = table {
+            self.table = Some(table.into());
+        }
+
         self
     }
 
     /// Give the column an alias in the query.
+    #[inline]
     pub fn alias<S>(mut self, alias: S) -> Self
     where
         S: Into<String>,
@@ -54,26 +72,6 @@ impl<'a> From<&'a str> for Column {
     }
 }
 
-impl<'a, 'b> From<(&'a str, &'b str)> for Column {
-    #[inline]
-    fn from(t: (&'a str, &'b str)) -> Column {
-        let mut column: Column = t.1.into();
-        column = column.table(t.0.into());
-
-        column
-    }
-}
-
-impl<'a, 'b, 'c> From<(&'a str, &'b str, &'c str)> for Column {
-    #[inline]
-    fn from(t: (&'a str, &'b str, &'c str)) -> Column {
-        let column: Column = t.2.into();
-        let table: Table = (t.0, t.1).into();
-
-        column.table(table)
-    }
-}
-
 impl From<String> for Column {
     #[inline]
     fn from(s: String) -> Column {
@@ -84,22 +82,16 @@ impl From<String> for Column {
     }
 }
 
-impl From<(String, String)> for Column {
+impl<T, C> From<(T, C)> for Column
+where
+    T: Into<Table>,
+    C: Into<Column>,
+{
     #[inline]
-    fn from(s: (String, String)) -> Column {
-        let mut column: Column = s.1.into();
-        column = column.table(s.0.into());
+    fn from(t: (T, C)) -> Column {
+        let mut column: Column = t.1.into();
+        column = column.table(t.0);
 
         column
-    }
-}
-
-impl From<(String, String, String)> for Column {
-    #[inline]
-    fn from(s: (String, String, String)) -> Column {
-        let column: Column = s.2.into();
-        let table: Table = (s.0, s.1).into();
-
-        column.table(table)
     }
 }

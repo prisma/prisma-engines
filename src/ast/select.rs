@@ -113,7 +113,7 @@ impl Select {
     /// let query = Select::from_table("users")
     ///     .column("name")
     ///     .column(("users", "id"))
-    ///     .column(("crm", "users", "foo"));
+    ///     .column((("crm", "users"), "foo"));
     ///
     /// let (sql, _) = Sqlite::build(query);
     ///
