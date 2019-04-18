@@ -43,7 +43,7 @@ impl Update {
     /// assert_eq!(
     ///     vec![
     ///         ParameterizedValue::Integer(10),
-    ///         ParameterizedValue::Boolean(false)
+    ///         ParameterizedValue::Boolean(false),
     ///     ],
     ///     params,
     /// );
@@ -72,7 +72,7 @@ impl Update {
     /// assert_eq!(
     ///     vec![
     ///         ParameterizedValue::Integer(1),
-    ///         ParameterizedValue::Boolean(false)
+    ///         ParameterizedValue::Boolean(false),
     ///     ],
     ///     params,
     /// );
@@ -87,14 +87,15 @@ impl Update {
     /// let (sql, params) = Sqlite::build(query);
     ///
     /// assert_eq!(
-    ///     "UPDATE `users` SET `foo` = ? WHERE `bar` = (SELECT `id` FROM `bars` WHERE `uniq_val` = ? LIMIT -1)",
+    ///     "UPDATE `users` SET `foo` = ? WHERE `bar` = (SELECT `id` FROM `bars` WHERE `uniq_val` = ? LIMIT ?)",
     ///     sql
     /// );
     ///
     /// assert_eq!(
     ///     vec![
     ///         ParameterizedValue::Integer(1),
-    ///         ParameterizedValue::Integer(3)
+    ///         ParameterizedValue::Integer(3),
+    ///         ParameterizedValue::Integer(-1),
     ///     ],
     ///     params,
     /// );

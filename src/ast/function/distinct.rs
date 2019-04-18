@@ -15,7 +15,7 @@ impl Distinct {
     ///
     /// let query = Select::from_table("users").value(fun);
     /// let (sql, _) = Sqlite::build(query);
-    /// assert_eq!("SELECT DISTINCT(`users`.`id`, `users`.`name`) FROM `users` LIMIT -1", sql);
+    /// assert_eq!("SELECT DISTINCT(`users`.`id`, `users`.`name`) FROM `users` LIMIT ?", sql);
     /// ```
     pub fn distinct<T>(mut self, expr: T) -> Distinct
     where
@@ -32,7 +32,7 @@ impl Distinct {
 /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
 /// let query = Select::from_table("users").value(distinct("name"));
 /// let (sql, _) = Sqlite::build(query);
-/// assert_eq!("SELECT DISTINCT(`name`) FROM `users` LIMIT -1", sql);
+/// assert_eq!("SELECT DISTINCT(`name`) FROM `users` LIMIT ?", sql);
 /// ```
 #[inline]
 pub fn distinct<T>(expr: T) -> Distinct

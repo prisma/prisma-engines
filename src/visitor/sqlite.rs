@@ -33,11 +33,14 @@ impl Visitor for Sqlite {
         self.parameters.push(value);
     }
 
-    fn visit_limit(&mut self, limit: Option<usize>) -> String {
+    fn visit_limit(&mut self, limit: Option<ParameterizedValue>) -> String {
         if let Some(limit) = limit {
-            format!("LIMIT {}", limit)
+            format!("LIMIT {}", self.visit_parameterized(limit))
         } else {
-            format!("LIMIT {}", -1)
+            format!(
+                "LIMIT {}",
+                self.visit_parameterized(ParameterizedValue::from(-1 as i64))
+            )
         }
     }
 
@@ -94,8 +97,8 @@ impl Visitor for Sqlite {
         result.join(" ")
     }
 
-    fn visit_offset(&mut self, offset: usize) -> String {
-        format!("OFFSET {}", offset)
+    fn visit_offset(&mut self, offset: ParameterizedValue) -> String {
+        format!("OFFSET {}", self.visit_parameterized(offset))
     }
 }
 
@@ -143,6 +146,18 @@ mod tests {
         (String::from(sql), params.into_iter().map(|p| p.into()).collect())
     }
 
+    fn default_params(mut additional: Vec<ParameterizedValue>) -> Vec<ParameterizedValue> {
+        let mut result = Vec::new();
+
+        for param in additional.drain(0..) {
+            result.push(param)
+        }
+
+        result.push(ParameterizedValue::from(-1));
+
+        result
+    }
+
     #[test]
     fn test_select_1() {
         let expected = expected_values("SELECT ?", vec![1]);
@@ -156,17 +171,17 @@ mod tests {
 
     #[test]
     fn test_select_star_from() {
-        let expected_sql = "SELECT `musti`.* FROM `musti` LIMIT -1";
+        let expected_sql = "SELECT `musti`.* FROM `musti` LIMIT ?";
         let query = Select::from_table("musti");
         let (sql, params) = Sqlite::build(query);
 
         assert_eq!(expected_sql, sql);
-        assert_eq!(Vec::<ParameterizedValue>::new(), params);
+        assert_eq!(default_params(vec![]), params);
     }
 
     #[test]
     fn test_select_order_by() {
-        let expected_sql = "SELECT `musti`.* FROM `musti` ORDER BY `foo`, `baz` ASC, `bar` DESC LIMIT -1";
+        let expected_sql = "SELECT `musti`.* FROM `musti` ORDER BY `foo`, `baz` ASC, `bar` DESC LIMIT ?";
         let query = Select::from_table("musti")
             .order_by("foo")
             .order_by("baz".ascend())
@@ -174,37 +189,34 @@ mod tests {
         let (sql, params) = Sqlite::build(query);
 
         assert_eq!(expected_sql, sql);
-        assert_eq!(Vec::<ParameterizedValue>::new(), params);
+        assert_eq!(default_params(vec![]), params);
     }
 
     #[test]
     fn test_select_fields_from() {
-        let expected_sql = "SELECT `paw`, `nose` FROM `cat`.`musti` LIMIT -1";
+        let expected_sql = "SELECT `paw`, `nose` FROM `cat`.`musti` LIMIT ?";
         let query = Select::from_table(("cat", "musti")).column("paw").column("nose");
         let (sql, params) = Sqlite::build(query);
 
         assert_eq!(expected_sql, sql);
-        assert_eq!(Vec::<ParameterizedValue>::new(), params);
+        assert_eq!(default_params(vec![]), params);
     }
 
     #[test]
     fn test_select_where_equals() {
-        let expected = expected_values(
-            "SELECT `naukio`.* FROM `naukio` WHERE `word` = ? LIMIT -1",
-            vec!["meow"],
-        );
+        let expected = expected_values("SELECT `naukio`.* FROM `naukio` WHERE `word` = ? LIMIT ?", vec!["meow"]);
 
         let query = Select::from_table("naukio").so_that("word".equals("meow"));
         let (sql, params) = Sqlite::build(query);
 
         assert_eq!(expected.0, sql);
-        assert_eq!(expected.1, params);
+        assert_eq!(default_params(expected.1), params);
     }
 
     #[test]
     fn test_select_where_like() {
         let expected = expected_values(
-            "SELECT `naukio`.* FROM `naukio` WHERE `word` LIKE ? LIMIT -1",
+            "SELECT `naukio`.* FROM `naukio` WHERE `word` LIKE ? LIMIT ?",
             vec!["%meow%"],
         );
 
@@ -212,13 +224,13 @@ mod tests {
         let (sql, params) = Sqlite::build(query);
 
         assert_eq!(expected.0, sql);
-        assert_eq!(expected.1, params);
+        assert_eq!(default_params(expected.1), params);
     }
 
     #[test]
     fn test_select_where_not_like() {
         let expected = expected_values(
-            "SELECT `naukio`.* FROM `naukio` WHERE `word` NOT LIKE ? LIMIT -1",
+            "SELECT `naukio`.* FROM `naukio` WHERE `word` NOT LIKE ? LIMIT ?",
             vec!["%meow%"],
         );
 
@@ -226,13 +238,13 @@ mod tests {
         let (sql, params) = Sqlite::build(query);
 
         assert_eq!(expected.0, sql);
-        assert_eq!(expected.1, params);
+        assert_eq!(default_params(expected.1), params);
     }
 
     #[test]
     fn test_select_where_begins_with() {
         let expected = expected_values(
-            "SELECT `naukio`.* FROM `naukio` WHERE `word` LIKE ? LIMIT -1",
+            "SELECT `naukio`.* FROM `naukio` WHERE `word` LIKE ? LIMIT ?",
             vec!["meow%"],
         );
 
@@ -240,13 +252,13 @@ mod tests {
         let (sql, params) = Sqlite::build(query);
 
         assert_eq!(expected.0, sql);
-        assert_eq!(expected.1, params);
+        assert_eq!(default_params(expected.1), params);
     }
 
     #[test]
     fn test_select_where_not_begins_with() {
         let expected = expected_values(
-            "SELECT `naukio`.* FROM `naukio` WHERE `word` NOT LIKE ? LIMIT -1",
+            "SELECT `naukio`.* FROM `naukio` WHERE `word` NOT LIKE ? LIMIT ?",
             vec!["meow%"],
         );
 
@@ -254,13 +266,13 @@ mod tests {
         let (sql, params) = Sqlite::build(query);
 
         assert_eq!(expected.0, sql);
-        assert_eq!(expected.1, params);
+        assert_eq!(default_params(expected.1), params);
     }
 
     #[test]
     fn test_select_where_ends_into() {
         let expected = expected_values(
-            "SELECT `naukio`.* FROM `naukio` WHERE `word` LIKE ? LIMIT -1",
+            "SELECT `naukio`.* FROM `naukio` WHERE `word` LIKE ? LIMIT ?",
             vec!["%meow"],
         );
 
@@ -268,13 +280,13 @@ mod tests {
         let (sql, params) = Sqlite::build(query);
 
         assert_eq!(expected.0, sql);
-        assert_eq!(expected.1, params);
+        assert_eq!(default_params(expected.1), params);
     }
 
     #[test]
     fn test_select_where_not_ends_into() {
         let expected = expected_values(
-            "SELECT `naukio`.* FROM `naukio` WHERE `word` NOT LIKE ? LIMIT -1",
+            "SELECT `naukio`.* FROM `naukio` WHERE `word` NOT LIKE ? LIMIT ?",
             vec!["%meow"],
         );
 
@@ -282,12 +294,12 @@ mod tests {
         let (sql, params) = Sqlite::build(query);
 
         assert_eq!(expected.0, sql);
-        assert_eq!(expected.1, params);
+        assert_eq!(default_params(expected.1), params);
     }
 
     #[test]
     fn test_select_and() {
-        let expected_sql = "SELECT `naukio`.* FROM `naukio` WHERE ((`word` = ? AND `age` < ?) AND `paw` = ?) LIMIT -1";
+        let expected_sql = "SELECT `naukio`.* FROM `naukio` WHERE ((`word` = ? AND `age` < ?) AND `paw` = ?) LIMIT ?";
 
         let expected_params = vec![
             ParameterizedValue::Text(String::from("meow")),
@@ -302,12 +314,12 @@ mod tests {
         let (sql, params) = Sqlite::build(query);
 
         assert_eq!(expected_sql, sql);
-        assert_eq!(expected_params, params);
+        assert_eq!(default_params(expected_params), params);
     }
 
     #[test]
     fn test_select_and_different_execution_order() {
-        let expected_sql = "SELECT `naukio`.* FROM `naukio` WHERE (`word` = ? AND (`age` < ? AND `paw` = ?)) LIMIT -1";
+        let expected_sql = "SELECT `naukio`.* FROM `naukio` WHERE (`word` = ? AND (`age` < ? AND `paw` = ?)) LIMIT ?";
 
         let expected_params = vec![
             ParameterizedValue::Text(String::from("meow")),
@@ -322,12 +334,12 @@ mod tests {
         let (sql, params) = Sqlite::build(query);
 
         assert_eq!(expected_sql, sql);
-        assert_eq!(expected_params, params);
+        assert_eq!(default_params(expected_params), params);
     }
 
     #[test]
     fn test_select_or() {
-        let expected_sql = "SELECT `naukio`.* FROM `naukio` WHERE ((`word` = ? OR `age` < ?) AND `paw` = ?) LIMIT -1";
+        let expected_sql = "SELECT `naukio`.* FROM `naukio` WHERE ((`word` = ? OR `age` < ?) AND `paw` = ?) LIMIT ?";
 
         let expected_params = vec![
             ParameterizedValue::Text(String::from("meow")),
@@ -342,13 +354,13 @@ mod tests {
         let (sql, params) = Sqlite::build(query);
 
         assert_eq!(expected_sql, sql);
-        assert_eq!(expected_params, params);
+        assert_eq!(default_params(expected_params), params);
     }
 
     #[test]
     fn test_select_negation() {
         let expected_sql =
-            "SELECT `naukio`.* FROM `naukio` WHERE (NOT ((`word` = ? OR `age` < ?) AND `paw` = ?)) LIMIT -1";
+            "SELECT `naukio`.* FROM `naukio` WHERE (NOT ((`word` = ? OR `age` < ?) AND `paw` = ?)) LIMIT ?";
 
         let expected_params = vec![
             ParameterizedValue::Text(String::from("meow")),
@@ -367,13 +379,13 @@ mod tests {
         let (sql, params) = Sqlite::build(query);
 
         assert_eq!(expected_sql, sql);
-        assert_eq!(expected_params, params);
+        assert_eq!(default_params(expected_params), params);
     }
 
     #[test]
     fn test_with_raw_condition_tree() {
         let expected_sql =
-            "SELECT `naukio`.* FROM `naukio` WHERE (NOT ((`word` = ? OR `age` < ?) AND `paw` = ?)) LIMIT -1";
+            "SELECT `naukio`.* FROM `naukio` WHERE (NOT ((`word` = ? OR `age` < ?) AND `paw` = ?)) LIMIT ?";
 
         let expected_params = vec![
             ParameterizedValue::Text(String::from("meow")),
@@ -391,13 +403,13 @@ mod tests {
         let (sql, params) = Sqlite::build(query);
 
         assert_eq!(expected_sql, sql);
-        assert_eq!(expected_params, params);
+        assert_eq!(default_params(expected_params), params);
     }
 
     #[test]
     fn test_simple_inner_join() {
         let expected_sql =
-            "SELECT `users`.* FROM `users` INNER JOIN `posts` ON `users`.`id` = `posts`.`user_id` LIMIT -1";
+            "SELECT `users`.* FROM `users` INNER JOIN `posts` ON `users`.`id` = `posts`.`user_id` LIMIT ?";
 
         let query = Select::from_table("users")
             .inner_join("posts".on(("users", "id").equals(Column::from(("posts", "user_id")))));
@@ -409,7 +421,7 @@ mod tests {
     #[test]
     fn test_additional_condition_inner_join() {
         let expected_sql =
-            "SELECT `users`.* FROM `users` INNER JOIN `posts` ON (`users`.`id` = `posts`.`user_id` AND `posts`.`published` = ?) LIMIT -1";
+            "SELECT `users`.* FROM `users` INNER JOIN `posts` ON (`users`.`id` = `posts`.`user_id` AND `posts`.`published` = ?) LIMIT ?";
 
         let query = Select::from_table("users").inner_join(
             "posts".on(("users", "id")
@@ -420,13 +432,13 @@ mod tests {
         let (sql, params) = Sqlite::build(query);
 
         assert_eq!(expected_sql, sql);
-        assert_eq!(vec![ParameterizedValue::Boolean(true),], params);
+        assert_eq!(default_params(vec![ParameterizedValue::Boolean(true),]), params);
     }
 
     #[test]
     fn test_simple_left_join() {
         let expected_sql =
-            "SELECT `users`.* FROM `users` LEFT OUTER JOIN `posts` ON `users`.`id` = `posts`.`user_id` LIMIT -1";
+            "SELECT `users`.* FROM `users` LEFT OUTER JOIN `posts` ON `users`.`id` = `posts`.`user_id` LIMIT ?";
 
         let query = Select::from_table("users")
             .left_outer_join("posts".on(("users", "id").equals(Column::from(("posts", "user_id")))));
@@ -438,7 +450,7 @@ mod tests {
     #[test]
     fn test_additional_condition_left_join() {
         let expected_sql =
-            "SELECT `users`.* FROM `users` LEFT OUTER JOIN `posts` ON (`users`.`id` = `posts`.`user_id` AND `posts`.`published` = ?) LIMIT -1";
+            "SELECT `users`.* FROM `users` LEFT OUTER JOIN `posts` ON (`users`.`id` = `posts`.`user_id` AND `posts`.`published` = ?) LIMIT ?";
 
         let query = Select::from_table("users").left_outer_join(
             "posts".on(("users", "id")
@@ -449,12 +461,12 @@ mod tests {
         let (sql, params) = Sqlite::build(query);
 
         assert_eq!(expected_sql, sql);
-        assert_eq!(vec![ParameterizedValue::Boolean(true),], params);
+        assert_eq!(default_params(vec![ParameterizedValue::Boolean(true),]), params);
     }
 
     #[test]
     fn test_column_aliasing() {
-        let expected_sql = "SELECT `bar` AS `foo` FROM `meow` LIMIT -1";
+        let expected_sql = "SELECT `bar` AS `foo` FROM `meow` LIMIT ?";
         let query = Select::from_table("meow").column(Column::new("bar").alias("foo"));
         let (sql, _) = Sqlite::build(query);
 

@@ -65,8 +65,15 @@ pub trait Comparable {
     /// let query = Select::from_table("users").so_that("foo".equals("bar"));
     /// let (sql, params) = Sqlite::build(query);
     ///
-    /// assert_eq!("SELECT `users`.* FROM `users` WHERE `foo` = ? LIMIT -1", sql);
-    /// assert_eq!(vec![ParameterizedValue::Text("bar".to_string())], params);
+    /// assert_eq!("SELECT `users`.* FROM `users` WHERE `foo` = ? LIMIT ?", sql);
+    ///
+    /// assert_eq!(
+    ///     vec![
+    ///         ParameterizedValue::from("bar"),
+    ///         ParameterizedValue::from(-1),
+    ///     ],
+    ///     params
+    /// );
     /// ```
     fn equals<T>(self, comparison: T) -> Compare
     where
@@ -79,8 +86,15 @@ pub trait Comparable {
     /// let query = Select::from_table("users").so_that("foo".not_equals("bar"));
     /// let (sql, params) = Sqlite::build(query);
     ///
-    /// assert_eq!("SELECT `users`.* FROM `users` WHERE `foo` <> ? LIMIT -1", sql);
-    /// assert_eq!(vec![ParameterizedValue::Text("bar".to_string())], params);
+    /// assert_eq!("SELECT `users`.* FROM `users` WHERE `foo` <> ? LIMIT ?", sql);
+    ///
+    /// assert_eq!(
+    ///     vec![
+    ///         ParameterizedValue::from("bar"),
+    ///         ParameterizedValue::from(-1),
+    ///     ],
+    ///     params
+    /// );
     /// ```
     fn not_equals<T>(self, comparison: T) -> Compare
     where
@@ -93,8 +107,15 @@ pub trait Comparable {
     /// let query = Select::from_table("users").so_that("foo".less_than(10));
     /// let (sql, params) = Sqlite::build(query);
     ///
-    /// assert_eq!("SELECT `users`.* FROM `users` WHERE `foo` < ? LIMIT -1", sql);
-    /// assert_eq!(vec![ParameterizedValue::Integer(10)], params);
+    /// assert_eq!("SELECT `users`.* FROM `users` WHERE `foo` < ? LIMIT ?", sql);
+    ///
+    /// assert_eq!(
+    ///     vec![
+    ///         ParameterizedValue::from(10),
+    ///         ParameterizedValue::from(-1),
+    ///     ],
+    ///     params
+    /// );
     /// ```
     fn less_than<T>(self, comparison: T) -> Compare
     where
@@ -107,8 +128,15 @@ pub trait Comparable {
     /// let query = Select::from_table("users").so_that("foo".less_than_or_equals(10));
     /// let (sql, params) = Sqlite::build(query);
     ///
-    /// assert_eq!("SELECT `users`.* FROM `users` WHERE `foo` <= ? LIMIT -1", sql);
-    /// assert_eq!(vec![ParameterizedValue::Integer(10)], params);
+    /// assert_eq!("SELECT `users`.* FROM `users` WHERE `foo` <= ? LIMIT ?", sql);
+    ///
+    /// assert_eq!(
+    ///     vec![
+    ///         ParameterizedValue::from(10),
+    ///         ParameterizedValue::from(-1),
+    ///     ],
+    ///     params
+    /// );
     /// ```
     fn less_than_or_equals<T>(self, comparison: T) -> Compare
     where
@@ -121,8 +149,15 @@ pub trait Comparable {
     /// let query = Select::from_table("users").so_that("foo".greater_than(10));
     /// let (sql, params) = Sqlite::build(query);
     ///
-    /// assert_eq!("SELECT `users`.* FROM `users` WHERE `foo` > ? LIMIT -1", sql);
-    /// assert_eq!(vec![ParameterizedValue::Integer(10)], params);
+    /// assert_eq!("SELECT `users`.* FROM `users` WHERE `foo` > ? LIMIT ?", sql);
+    ///
+    /// assert_eq!(
+    ///     vec![
+    ///         ParameterizedValue::from(10),
+    ///         ParameterizedValue::from(-1),
+    ///     ],
+    ///     params
+    /// );
     /// ```
     fn greater_than<T>(self, comparison: T) -> Compare
     where
@@ -135,8 +170,15 @@ pub trait Comparable {
     /// let query = Select::from_table("users").so_that("foo".greater_than_or_equals(10));
     /// let (sql, params) = Sqlite::build(query);
     ///
-    /// assert_eq!("SELECT `users`.* FROM `users` WHERE `foo` >= ? LIMIT -1", sql);
-    /// assert_eq!(vec![ParameterizedValue::Integer(10)], params);
+    /// assert_eq!("SELECT `users`.* FROM `users` WHERE `foo` >= ? LIMIT ?", sql);
+    ///
+    /// assert_eq!(
+    ///     vec![
+    ///         ParameterizedValue::from(10),
+    ///         ParameterizedValue::from(-1),
+    ///     ],
+    ///     params
+    /// );
     /// ```
     fn greater_than_or_equals<T>(self, comparison: T) -> Compare
     where
@@ -149,10 +191,11 @@ pub trait Comparable {
     /// let query = Select::from_table("users").so_that("foo".in_selection(vec![1, 2]));
     /// let (sql, params) = Sqlite::build(query);
     ///
-    /// assert_eq!("SELECT `users`.* FROM `users` WHERE `foo` IN (?, ?) LIMIT -1", sql);
+    /// assert_eq!("SELECT `users`.* FROM `users` WHERE `foo` IN (?, ?) LIMIT ?", sql);
     /// assert_eq!(vec![
     ///     ParameterizedValue::Integer(1),
     ///     ParameterizedValue::Integer(2),
+    ///     ParameterizedValue::Integer(-1),
     /// ], params);
     /// ```
     fn in_selection<T>(self, selection: T) -> Compare
@@ -166,10 +209,12 @@ pub trait Comparable {
     /// let query = Select::from_table("users").so_that("foo".not_in_selection(vec![1, 2]));
     /// let (sql, params) = Sqlite::build(query);
     ///
-    /// assert_eq!("SELECT `users`.* FROM `users` WHERE `foo` NOT IN (?, ?) LIMIT -1", sql);
+    /// assert_eq!("SELECT `users`.* FROM `users` WHERE `foo` NOT IN (?, ?) LIMIT ?", sql);
+    ///
     /// assert_eq!(vec![
     ///     ParameterizedValue::Integer(1),
     ///     ParameterizedValue::Integer(2),
+    ///     ParameterizedValue::Integer(-1),
     /// ], params);
     /// ```
     fn not_in_selection<T>(self, selection: T) -> Compare
@@ -183,8 +228,15 @@ pub trait Comparable {
     /// let query = Select::from_table("users").so_that("foo".like("bar"));
     /// let (sql, params) = Sqlite::build(query);
     ///
-    /// assert_eq!("SELECT `users`.* FROM `users` WHERE `foo` LIKE ? LIMIT -1", sql);
-    /// assert_eq!(vec![ParameterizedValue::Text("%bar%".to_string())], params);
+    /// assert_eq!("SELECT `users`.* FROM `users` WHERE `foo` LIKE ? LIMIT ?", sql);
+    ///
+    /// assert_eq!(
+    ///     vec![
+    ///         ParameterizedValue::from("%bar%"),
+    ///         ParameterizedValue::from(-1),
+    ///     ],
+    ///     params
+    /// );
     /// ```
     fn like<T>(self, pattern: T) -> Compare
     where
@@ -197,8 +249,15 @@ pub trait Comparable {
     /// let query = Select::from_table("users").so_that("foo".not_like("bar"));
     /// let (sql, params) = Sqlite::build(query);
     ///
-    /// assert_eq!("SELECT `users`.* FROM `users` WHERE `foo` NOT LIKE ? LIMIT -1", sql);
-    /// assert_eq!(vec![ParameterizedValue::Text("%bar%".to_string())], params);
+    /// assert_eq!("SELECT `users`.* FROM `users` WHERE `foo` NOT LIKE ? LIMIT ?", sql);
+    ///
+    /// assert_eq!(
+    ///     vec![
+    ///         ParameterizedValue::from("%bar%"),
+    ///         ParameterizedValue::from(-1),
+    ///     ],
+    ///     params
+    /// );
     /// ```
     fn not_like<T>(self, pattern: T) -> Compare
     where
@@ -211,8 +270,15 @@ pub trait Comparable {
     /// let query = Select::from_table("users").so_that("foo".begins_with("bar"));
     /// let (sql, params) = Sqlite::build(query);
     ///
-    /// assert_eq!("SELECT `users`.* FROM `users` WHERE `foo` LIKE ? LIMIT -1", sql);
-    /// assert_eq!(vec![ParameterizedValue::Text("bar%".to_string())], params);
+    /// assert_eq!("SELECT `users`.* FROM `users` WHERE `foo` LIKE ? LIMIT ?", sql);
+    ///
+    /// assert_eq!(
+    ///     vec![
+    ///         ParameterizedValue::from("bar%"),
+    ///         ParameterizedValue::from(-1),
+    ///     ],
+    ///     params
+    /// );
     /// ```
     fn begins_with<T>(self, pattern: T) -> Compare
     where
@@ -225,8 +291,15 @@ pub trait Comparable {
     /// let query = Select::from_table("users").so_that("foo".not_begins_with("bar"));
     /// let (sql, params) = Sqlite::build(query);
     ///
-    /// assert_eq!("SELECT `users`.* FROM `users` WHERE `foo` NOT LIKE ? LIMIT -1", sql);
-    /// assert_eq!(vec![ParameterizedValue::Text("bar%".to_string())], params);
+    /// assert_eq!("SELECT `users`.* FROM `users` WHERE `foo` NOT LIKE ? LIMIT ?", sql);
+    ///
+    /// assert_eq!(
+    ///     vec![
+    ///         ParameterizedValue::from("bar%"),
+    ///         ParameterizedValue::from(-1),
+    ///     ],
+    ///     params
+    /// );
     /// ```
     fn not_begins_with<T>(self, pattern: T) -> Compare
     where
@@ -239,8 +312,15 @@ pub trait Comparable {
     /// let query = Select::from_table("users").so_that("foo".ends_into("bar"));
     /// let (sql, params) = Sqlite::build(query);
     ///
-    /// assert_eq!("SELECT `users`.* FROM `users` WHERE `foo` LIKE ? LIMIT -1", sql);
-    /// assert_eq!(vec![ParameterizedValue::Text("%bar".to_string())], params);
+    /// assert_eq!("SELECT `users`.* FROM `users` WHERE `foo` LIKE ? LIMIT ?", sql);
+    ///
+    /// assert_eq!(
+    ///     vec![
+    ///         ParameterizedValue::from("%bar"),
+    ///         ParameterizedValue::from(-1),
+    ///     ],
+    ///     params
+    /// );
     /// ```
     fn ends_into<T>(self, pattern: T) -> Compare
     where
@@ -253,8 +333,15 @@ pub trait Comparable {
     /// let query = Select::from_table("users").so_that("foo".not_ends_into("bar"));
     /// let (sql, params) = Sqlite::build(query);
     ///
-    /// assert_eq!("SELECT `users`.* FROM `users` WHERE `foo` NOT LIKE ? LIMIT -1", sql);
-    /// assert_eq!(vec![ParameterizedValue::Text("%bar".to_string())], params);
+    /// assert_eq!("SELECT `users`.* FROM `users` WHERE `foo` NOT LIKE ? LIMIT ?", sql);
+    ///
+    /// assert_eq!(
+    ///     vec![
+    ///         ParameterizedValue::from("%bar"),
+    ///         ParameterizedValue::from(-1),
+    ///     ],
+    ///     params
+    /// );
     /// ```
     fn not_ends_into<T>(self, pattern: T) -> Compare
     where
@@ -267,7 +354,7 @@ pub trait Comparable {
     /// let query = Select::from_table("users").so_that("foo".is_null());
     /// let (sql, _) = Sqlite::build(query);
     ///
-    /// assert_eq!("SELECT `users`.* FROM `users` WHERE `foo` IS NULL LIMIT -1", sql);
+    /// assert_eq!("SELECT `users`.* FROM `users` WHERE `foo` IS NULL LIMIT ?", sql);
     /// ```
     fn is_null(self) -> Compare;
 
@@ -278,7 +365,7 @@ pub trait Comparable {
     /// let query = Select::from_table("users").so_that("foo".is_not_null());
     /// let (sql, _) = Sqlite::build(query);
     ///
-    /// assert_eq!("SELECT `users`.* FROM `users` WHERE `foo` IS NOT NULL LIMIT -1", sql);
+    /// assert_eq!("SELECT `users`.* FROM `users` WHERE `foo` IS NOT NULL LIMIT ?", sql);
     /// ```
     fn is_not_null(self) -> Compare;
 
@@ -289,11 +376,12 @@ pub trait Comparable {
     /// let query = Select::from_table("users").so_that("foo".between(420, 666));
     /// let (sql, params) = Sqlite::build(query);
     ///
-    /// assert_eq!("SELECT `users`.* FROM `users` WHERE `foo` BETWEEN ? AND ? LIMIT -1", sql);
+    /// assert_eq!("SELECT `users`.* FROM `users` WHERE `foo` BETWEEN ? AND ? LIMIT ?", sql);
     ///
     /// assert_eq!(vec![
     ///     ParameterizedValue::Integer(420),
-    ///     ParameterizedValue::Integer(666)
+    ///     ParameterizedValue::Integer(666),
+    ///     ParameterizedValue::Integer(-1),
     /// ], params);
     /// ```
     fn between<T, V>(self, left: T, right: V) -> Compare
@@ -308,11 +396,12 @@ pub trait Comparable {
     /// let query = Select::from_table("users").so_that("foo".not_between(420, 666));
     /// let (sql, params) = Sqlite::build(query);
     ///
-    /// assert_eq!("SELECT `users`.* FROM `users` WHERE `foo` NOT BETWEEN ? AND ? LIMIT -1", sql);
+    /// assert_eq!("SELECT `users`.* FROM `users` WHERE `foo` NOT BETWEEN ? AND ? LIMIT ?", sql);
     ///
     /// assert_eq!(vec![
     ///     ParameterizedValue::Integer(420),
-    ///     ParameterizedValue::Integer(666)
+    ///     ParameterizedValue::Integer(666),
+    ///     ParameterizedValue::Integer(-1),
     /// ], params);
     /// ```
     fn not_between<T, V>(self, left: T, right: V) -> Compare

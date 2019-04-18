@@ -37,10 +37,10 @@ pub trait Visitor {
     fn add_parameter(&mut self, value: ParameterizedValue);
 
     /// The `LIMIT` statement in the query
-    fn visit_limit(&mut self, limit: Option<usize>) -> String;
+    fn visit_limit(&mut self, limit: Option<ParameterizedValue>) -> String;
 
     /// The `OFFSET` statement in the query
-    fn visit_offset(&mut self, offset: usize) -> String;
+    fn visit_offset(&mut self, offset: ParameterizedValue) -> String;
 
     /// A database function.
     fn visit_function(&mut self, fun: Function) -> String;

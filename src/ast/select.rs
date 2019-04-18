@@ -7,8 +7,8 @@ pub struct Select {
     pub(crate) columns: Vec<DatabaseValue>,
     pub(crate) conditions: Option<ConditionTree>,
     pub(crate) ordering: Ordering,
-    pub(crate) limit: Option<usize>,
-    pub(crate) offset: Option<usize>,
+    pub(crate) limit: Option<ParameterizedValue>,
+    pub(crate) offset: Option<ParameterizedValue>,
     pub(crate) joins: Vec<Join>,
 }
 
@@ -34,7 +34,7 @@ impl Select {
     /// let query = Select::from_table("users");
     /// let (sql, _) = Sqlite::build(query);
     ///
-    /// assert_eq!("SELECT `users`.* FROM `users` LIMIT -1", sql);
+    /// assert_eq!("SELECT `users`.* FROM `users` LIMIT ?", sql);
     /// ```
     ///
     /// The table can be in multiple parts, defining the database.
@@ -44,7 +44,7 @@ impl Select {
     /// let query = Select::from_table(("crm", "users"));
     /// let (sql, _) = Sqlite::build(query);
     ///
-    /// assert_eq!("SELECT `crm`.`users`.* FROM `crm`.`users` LIMIT -1", sql);
+    /// assert_eq!("SELECT `crm`.`users`.* FROM `crm`.`users` LIMIT ?", sql);
     /// ```
     ///
     /// It is also possible to use a nested `SELECT`.
@@ -55,8 +55,8 @@ impl Select {
     /// let query = Select::from_table(select.alias("num"));
     /// let (sql, params) = Sqlite::build(query);
     ///
-    /// assert_eq!("SELECT `num`.* FROM (SELECT ?) AS `num` LIMIT -1", sql);
-    /// assert_eq!(vec![ParameterizedValue::Integer(1)], params);
+    /// assert_eq!("SELECT `num`.* FROM (SELECT ?) AS `num` LIMIT ?", sql);
+    /// assert_eq!(vec![ParameterizedValue::from(1), ParameterizedValue::from(-1)], params);
     /// ```
     #[inline]
     pub fn from_table<T>(table: T) -> Self
@@ -77,7 +77,7 @@ impl Select {
     /// let (sql, params) = Sqlite::build(query);
     ///
     /// assert_eq!("SELECT ?", sql);
-    /// assert_eq!(vec![ParameterizedValue::Integer(1)], params);
+    /// assert_eq!(vec![ParameterizedValue::from(1)], params);
     /// ```
     ///
     /// Creating a qualified asterisk to a joined table:
@@ -94,7 +94,7 @@ impl Select {
     /// let (sql, _) = Sqlite::build(query);
     ///
     /// assert_eq!(
-    ///     "SELECT `cats`.*, `dogs`.* FROM `cats` INNER JOIN `dogs` ON `dogs`.`slave_id` = `cats`.`master_id` LIMIT -1",
+    ///     "SELECT `cats`.*, `dogs`.* FROM `cats` INNER JOIN `dogs` ON `dogs`.`slave_id` = `cats`.`master_id` LIMIT ?",
     ///     sql
     /// );
     /// ```
@@ -117,7 +117,7 @@ impl Select {
     ///
     /// let (sql, _) = Sqlite::build(query);
     ///
-    /// assert_eq!("SELECT `name`, `users`.`id`, `crm`.`users`.`foo` FROM `users` LIMIT -1", sql);
+    /// assert_eq!("SELECT `name`, `users`.`id`, `crm`.`users`.`foo` FROM `users` LIMIT ?", sql);
     /// ```
     pub fn column<T>(mut self, column: T) -> Self
     where
@@ -134,10 +134,12 @@ impl Select {
     /// let query = Select::from_table("users").columns(vec!["foo", "bar"]);
     /// let (sql, params) = Sqlite::build(query);
     ///
-    /// assert_eq!("SELECT ?, ? FROM `users` LIMIT -1", sql);
+    /// assert_eq!("SELECT ?, ? FROM `users` LIMIT ?", sql);
+    ///
     /// assert_eq!(vec![
-    ///    ParameterizedValue::Text("foo".to_string()),
-    ///    ParameterizedValue::Text("bar".to_string())
+    ///    ParameterizedValue::from("foo"),
+    ///    ParameterizedValue::from("bar"),
+    ///    ParameterizedValue::from(-1),
     /// ], params);
     /// ```
     pub fn columns<T>(mut self, columns: Vec<T>) -> Self
@@ -156,8 +158,12 @@ impl Select {
     /// let query = Select::from_table("users").so_that("foo".equals("bar"));
     /// let (sql, params) = Sqlite::build(query);
     ///
-    /// assert_eq!("SELECT `users`.* FROM `users` WHERE `foo` = ? LIMIT -1", sql);
-    /// assert_eq!(vec![ParameterizedValue::Text("bar".to_string())], params);
+    /// assert_eq!("SELECT `users`.* FROM `users` WHERE `foo` = ? LIMIT ?", sql);
+    ///
+    /// assert_eq!(vec![
+    ///    ParameterizedValue::from("bar"),
+    ///    ParameterizedValue::from(-1),
+    /// ], params);
     /// ```
     pub fn so_that<T>(mut self, conditions: T) -> Self
     where
@@ -176,7 +182,7 @@ impl Select {
     /// let (sql, _) = Sqlite::build(query);
     ///
     /// assert_eq!(
-    ///     "SELECT `users`.* FROM `users` INNER JOIN `posts` AS `p` ON `p`.`user_id` = `users`.`id` LIMIT -1",
+    ///     "SELECT `users`.* FROM `users` INNER JOIN `posts` AS `p` ON `p`.`user_id` = `users`.`id` LIMIT ?",
     ///     sql
     /// );
     /// ```
@@ -197,11 +203,17 @@ impl Select {
     /// let (sql, params) = Sqlite::build(query);
     ///
     /// assert_eq!(
-    ///     "SELECT `users`.* FROM `users` LEFT OUTER JOIN `posts` AS `p` ON `p`.`visible` = ? LIMIT -1",
+    ///     "SELECT `users`.* FROM `users` LEFT OUTER JOIN `posts` AS `p` ON `p`.`visible` = ? LIMIT ?",
     ///     sql
     /// );
     ///
-    /// assert_eq!(vec![ParameterizedValue::Boolean(true)], params);
+    /// assert_eq!(
+    ///     vec![
+    ///         ParameterizedValue::from(true),
+    ///         ParameterizedValue::from(-1)
+    ///     ],
+    ///     params
+    /// );
     /// ```
     pub fn left_outer_join<J>(mut self, join: J) -> Self
     where
@@ -222,7 +234,7 @@ impl Select {
     ///
     /// let (sql, _) = Sqlite::build(query);
     ///
-    /// assert_eq!("SELECT `users`.* FROM `users` ORDER BY `foo`, `baz` ASC, `bar` DESC LIMIT -1", sql);
+    /// assert_eq!("SELECT `users`.* FROM `users` ORDER BY `foo`, `baz` ASC, `bar` DESC LIMIT ?", sql);
     pub fn order_by<T>(mut self, value: T) -> Self
     where
         T: IntoOrderDefinition,
@@ -236,11 +248,12 @@ impl Select {
     /// ```rust
     /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
     /// let query = Select::from_table("users").limit(10);
-    /// let (sql, _) = Sqlite::build(query);
+    /// let (sql, params) = Sqlite::build(query);
     ///
-    /// assert_eq!("SELECT `users`.* FROM `users` LIMIT 10", sql);
+    /// assert_eq!("SELECT `users`.* FROM `users` LIMIT ?", sql);
+    /// assert_eq!(vec![ParameterizedValue::from(10)], params);
     pub fn limit(mut self, limit: usize) -> Self {
-        self.limit = Some(limit);
+        self.limit = Some(ParameterizedValue::from(limit));
         self
     }
 
@@ -249,11 +262,12 @@ impl Select {
     /// ```rust
     /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
     /// let query = Select::from_table("users").offset(10);
-    /// let (sql, _) = Sqlite::build(query);
+    /// let (sql, params) = Sqlite::build(query);
     ///
-    /// assert_eq!("SELECT `users`.* FROM `users` LIMIT -1 OFFSET 10", sql);
+    /// assert_eq!("SELECT `users`.* FROM `users` LIMIT ? OFFSET ?", sql);
+    /// assert_eq!(vec![ParameterizedValue::from(-1), ParameterizedValue::from(10)], params);
     pub fn offset(mut self, offset: usize) -> Self {
-        self.offset = Some(offset);
+        self.offset = Some(ParameterizedValue::from(offset));
         self
     }
 }

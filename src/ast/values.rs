@@ -57,6 +57,20 @@ impl From<&str> for ParameterizedValue {
     }
 }
 
+impl From<usize> for ParameterizedValue {
+    #[inline]
+    fn from(that: usize) -> Self {
+        ParameterizedValue::Integer(that as i64)
+    }
+}
+
+impl From<i32> for ParameterizedValue {
+    #[inline]
+    fn from(that: i32) -> Self {
+        ParameterizedValue::Integer(that as i64)
+    }
+}
+
 macro_rules! parameterized_value {
     ($kind:ident,$paramkind:ident) => {
         impl From<$kind> for ParameterizedValue {
@@ -239,11 +253,7 @@ impl Comparable for DatabaseValue {
         T: Into<DatabaseValue>,
         V: Into<DatabaseValue>,
     {
-        Compare::Between(
-            Box::new(self),
-            Box::new(left.into()),
-            Box::new(right.into()),
-        )
+        Compare::Between(Box::new(self), Box::new(left.into()), Box::new(right.into()))
     }
 
     #[inline]
@@ -252,10 +262,6 @@ impl Comparable for DatabaseValue {
         T: Into<DatabaseValue>,
         V: Into<DatabaseValue>,
     {
-        Compare::NotBetween(
-            Box::new(self),
-            Box::new(left.into()),
-            Box::new(right.into()),
-        )
+        Compare::NotBetween(Box::new(self), Box::new(left.into()), Box::new(right.into()))
     }
 }

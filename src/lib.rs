@@ -43,15 +43,16 @@
 //!     let (sql_str, params) = Sqlite::build(query);
 //!
 //!     assert_eq!(
-//!         "SELECT `naukio`.* FROM `naukio` WHERE ((`word` = ? AND `age` < ?) AND `paw` = ?) LIMIT -1",
+//!         "SELECT `naukio`.* FROM `naukio` WHERE ((`word` = ? AND `age` < ?) AND `paw` = ?) LIMIT ?",
 //!         sql_str,
 //!     );
 //!
 //!     assert_eq!(
 //!         vec![
-//!             ParameterizedValue::Text(String::from("meow")),
-//!             ParameterizedValue::Integer(10),
-//!             ParameterizedValue::Text(String::from("warm")),
+//!             ParameterizedValue::from("meow"),
+//!             ParameterizedValue::from(10),
+//!             ParameterizedValue::from("warm"),
+//!             ParameterizedValue::from(-1),
 //!         ],
 //!         params
 //!     );
@@ -78,15 +79,16 @@
 //!     let (sql, params) = Sqlite::build(query);
 //!
 //!     assert_eq!(
-//!         "SELECT `naukio`.* FROM `naukio` WHERE ((`word` = ? OR `age` < ?) AND `paw` = ?) LIMIT -1",
+//!         "SELECT `naukio`.* FROM `naukio` WHERE ((`word` = ? OR `age` < ?) AND `paw` = ?) LIMIT ?",
 //!         sql,
 //!     );
 //!
 //!     assert_eq!(
 //!         vec![
-//!             ParameterizedValue::Text(String::from("meow")),
-//!             ParameterizedValue::Integer(10),
-//!             ParameterizedValue::Text(String::from("warm")),
+//!             ParameterizedValue::from("meow"),
+//!             ParameterizedValue::from(10),
+//!             ParameterizedValue::from("warm"),
+//!             ParameterizedValue::from(-1),
 //!         ],
 //!         params
 //!     );

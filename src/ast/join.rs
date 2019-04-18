@@ -27,7 +27,7 @@ pub trait Joinable {
     /// let (sql, _) = Sqlite::build(query);
     ///
     /// assert_eq!(
-    ///     "SELECT `a`.* FROM `a` INNER JOIN `b` ON `b`.`id` = `a`.`id` LIMIT -1",
+    ///     "SELECT `a`.* FROM `a` INNER JOIN `b` ON `b`.`id` = `a`.`id` LIMIT ?",
     ///     sql,
     /// );
     /// ```
