@@ -206,6 +206,7 @@ pub trait Visitor {
             Query::Insert(insert) => self.visit_insert(*insert),
             Query::Update(update) => self.visit_update(*update),
             Query::Delete(delete) => self.visit_delete(*delete),
+            Query::Raw(string) => string,
         }
     }
 

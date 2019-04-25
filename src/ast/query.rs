@@ -8,6 +8,16 @@ pub enum Query {
     Insert(Box<Insert>),
     Update(Box<Update>),
     Delete(Box<Delete>),
+    Raw(String),
+}
+
+impl<T> From<T> for Query
+where
+    T: ToString,
+{
+    fn from(t: T) -> Query {
+        Query::Raw(t.to_string())
+    }
 }
 
 impl Query {

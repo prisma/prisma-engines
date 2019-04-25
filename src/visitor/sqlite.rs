@@ -24,14 +24,9 @@ impl Visitor for Sqlite {
     where
         Q: Into<Query>,
     {
-        let mut sqlite = Sqlite {
-            parameters: Vec::new(),
-        };
+        let mut sqlite = Sqlite { parameters: Vec::new() };
 
-        (
-            Sqlite::visit_query(&mut sqlite, query.into()),
-            sqlite.parameters,
-        )
+        (Sqlite::visit_query(&mut sqlite, query.into()), sqlite.parameters)
     }
 
     fn add_parameter(&mut self, value: ParameterizedValue) {
