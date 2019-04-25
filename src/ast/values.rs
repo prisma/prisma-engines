@@ -1,4 +1,5 @@
 use crate::ast::*;
+use serde_json::Value;
 
 /// A value we must parameterize for the prepared statement.
 #[derive(Debug, Clone, PartialEq)]
@@ -11,8 +12,11 @@ pub enum ParameterizedValue {
     Real(f64),
     /// A string value
     Text(String),
-    /// a boolean value
+    /// A boolean value
     Boolean(bool),
+    /// A JSON value
+    #[cfg(feature = "json")]
+    Json(Value),
 }
 
 /// A value we can compare and use in database queries.
@@ -68,6 +72,14 @@ impl From<i32> for ParameterizedValue {
     #[inline]
     fn from(that: i32) -> Self {
         ParameterizedValue::Integer(that as i64)
+    }
+}
+
+#[cfg(feature = "json")]
+impl From<Value> for ParameterizedValue {
+    #[inline]
+    fn from(that: Value) -> Self {
+        ParameterizedValue::Json(that)
     }
 }
 
@@ -253,7 +265,11 @@ impl Comparable for DatabaseValue {
         T: Into<DatabaseValue>,
         V: Into<DatabaseValue>,
     {
-        Compare::Between(Box::new(self), Box::new(left.into()), Box::new(right.into()))
+        Compare::Between(
+            Box::new(self),
+            Box::new(left.into()),
+            Box::new(right.into()),
+        )
     }
 
     #[inline]
@@ -262,6 +278,10 @@ impl Comparable for DatabaseValue {
         T: Into<DatabaseValue>,
         V: Into<DatabaseValue>,
     {
-        Compare::NotBetween(Box::new(self), Box::new(left.into()), Box::new(right.into()))
+        Compare::NotBetween(
+            Box::new(self),
+            Box::new(left.into()),
+            Box::new(right.into()),
+        )
     }
 }
