@@ -1,5 +1,13 @@
 use crate::ast::*;
+
+#[cfg(feature = "json-1")]
 use serde_json::Value;
+
+#[cfg(feature = "uuid-0_7")]
+use uuid::Uuid;
+
+#[cfg(feature = "chrono-0_4")]
+use chrono::{DateTime, Utc};
 
 /// A value we must parameterize for the prepared statement.
 #[derive(Debug, Clone, PartialEq)]
@@ -15,8 +23,12 @@ pub enum ParameterizedValue {
     /// A boolean value
     Boolean(bool),
     /// A JSON value
-    #[cfg(feature = "json")]
+    #[cfg(feature = "json-1")]
     Json(Value),
+    #[cfg(feature = "uuid-0_7")]
+    Uuid(Uuid),
+    #[cfg(feature = "chrono-0_4")]
+    DateTime(DateTime<Utc>),
 }
 
 /// A value we can compare and use in database queries.
@@ -75,14 +87,6 @@ impl From<i32> for ParameterizedValue {
     }
 }
 
-#[cfg(feature = "json")]
-impl From<Value> for ParameterizedValue {
-    #[inline]
-    fn from(that: Value) -> Self {
-        ParameterizedValue::Json(that)
-    }
-}
-
 macro_rules! parameterized_value {
     ($kind:ident,$paramkind:ident) => {
         impl From<$kind> for ParameterizedValue {
@@ -97,6 +101,20 @@ parameterized_value!(String, Text);
 parameterized_value!(i64, Integer);
 parameterized_value!(f64, Real);
 parameterized_value!(bool, Boolean);
+
+#[cfg(feature = "json-1")]
+parameterized_value!(Value, Json);
+
+#[cfg(feature = "uuid-0_7")]
+parameterized_value!(Uuid, Uuid);
+
+#[cfg(feature = "chrono-0_4")]
+impl From<DateTime<Utc>> for ParameterizedValue {
+    #[inline]
+    fn from(that: DateTime<Utc>) -> Self {
+        ParameterizedValue::DateTime(that)
+    }
+}
 
 /*
  * Here be the database value converters.

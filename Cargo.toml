@@ -9,11 +9,17 @@ authors = [
 edition = "2018"
 
 [features]
-default = ["rusqlite", "json"]
+default = ["rusqlite", "json-1", "postgresql-0_16", "uuid-0_7", "chrono-0_4"]
 sqlite3 = ["sqlite"]
-json = ["serde_json"]
+json-1 = ["serde_json"]
+postgresql-0_16 = ["postgres"]
+uuid-0_7 = ["uuid"]
+chrono-0_4 = ["chrono"]
 
 [dependencies]
 sqlite = { version = "0.24", optional = true }
 rusqlite = { version = "0.16", optional = true }
 serde_json = { version = "1.0", optional = true }
+uuid = { version = "0.7", optional = true }
+chrono = { version = "0.4", optional = true }
+postgres = { version = "0.16.0-rc.1", optional = true, features = ["with-serde_json-1", "with-uuid-0_7", "with-chrono-0_4"]}

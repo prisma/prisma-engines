@@ -16,7 +16,6 @@ pub struct Sqlite {
 }
 
 impl Visitor for Sqlite {
-    const C_PARAM: &'static str = "?";
     const C_BACKTICK: &'static str = "`";
     const C_WILDCARD: &'static str = "%";
 
@@ -24,13 +23,56 @@ impl Visitor for Sqlite {
     where
         Q: Into<Query>,
     {
-        let mut sqlite = Sqlite { parameters: Vec::new() };
+        let mut sqlite = Sqlite {
+            parameters: Vec::new(),
+        };
 
-        (Sqlite::visit_query(&mut sqlite, query.into()), sqlite.parameters)
+        (
+            Sqlite::visit_query(&mut sqlite, query.into()),
+            sqlite.parameters,
+        )
+    }
+
+    fn visit_insert(&mut self, insert: Insert) -> String {
+        let mut result = match insert.on_conflict {
+            Some(OnConflict::DoNothing) => vec![String::from("INSERT OR IGNORE")],
+            None => vec![String::from("INSERT")],
+        };
+
+        result.push(format!("INTO {}", self.visit_table(insert.table, true)));
+
+        if insert.values.is_empty() {
+            result.push("DEFAULT VALUES".to_string());
+        } else {
+            let columns: Vec<String> = insert
+                .columns
+                .into_iter()
+                .map(|c| self.visit_column(Column::from(c)))
+                .collect();
+
+            let values: Vec<String> = insert
+                .values
+                .into_iter()
+                .map(|row| self.visit_row(row))
+                .collect();
+
+            result.push(format!(
+                "({}) VALUES {}",
+                columns.join(", "),
+                values.join(", "),
+            ))
+        }
+
+        result.join(" ")
     }
 
     fn add_parameter(&mut self, value: ParameterizedValue) {
         self.parameters.push(value);
+    }
+
+    fn visit_parameterized(&mut self, value: ParameterizedValue) -> String {
+        self.add_parameter(value);
+        String::from("?")
     }
 
     fn visit_limit(&mut self, limit: Option<ParameterizedValue>) -> String {
@@ -61,13 +103,6 @@ impl Visitor for Sqlite {
                     String::from("COUNT()")
                 } else {
                     format!("COUNT({})", self.visit_columns(fun_count.exprs))
-                }
-            }
-            FunctionType::Distinct(fun_distinct) => {
-                if fun_distinct.exprs.is_empty() {
-                    String::from("DISTINCT()")
-                } else {
-                    format!("DISTINCT({})", self.visit_columns(fun_distinct.exprs))
                 }
             }
         };
@@ -132,12 +167,16 @@ impl ToSql for ParameterizedValue {
             ParameterizedValue::Real(float) => ToSqlOutput::from(*float),
             ParameterizedValue::Text(string) => ToSqlOutput::from(string.clone()),
             ParameterizedValue::Boolean(boo) => ToSqlOutput::from(*boo),
-            #[cfg(feature = "json")]
+            #[cfg(feature = "json-1")]
             ParameterizedValue::Json(value) => {
                 let stringified = serde_json::to_string(value)
                     .map_err(|err| RusqlError::ToSqlConversionFailure(Box::new(err)))?;
                 ToSqlOutput::from(stringified)
             }
+            #[cfg(feature = "uuid-0_7")]
+            ParameterizedValue::Uuid(value) => ToSqlOutput::from(value.to_hyphenated().to_string()),
+            #[cfg(feature = "chrono-0_4")]
+            ParameterizedValue::DateTime(value) => ToSqlOutput::from(value.timestamp_millis()),
         };
 
         Ok(value)
