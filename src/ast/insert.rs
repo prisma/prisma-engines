@@ -7,6 +7,7 @@ pub struct Insert {
     pub(crate) columns: Vec<Column>,
     pub(crate) values: Vec<Row>,
     pub(crate) on_conflict: Option<OnConflict>,
+    pub(crate) returning: Option<Vec<Column>>,
 }
 
 pub struct SingleRowInsert {
@@ -58,6 +59,7 @@ impl From<SingleRowInsert> for Insert {
             columns: insert.columns,
             values,
             on_conflict: None,
+            returning: None,
         }
     }
 }
@@ -70,6 +72,7 @@ impl From<MultiRowInsert> for Insert {
             columns: insert.columns,
             values: insert.values,
             on_conflict: None,
+            returning: None,
         }
     }
 }
@@ -132,6 +135,24 @@ impl Insert {
     #[inline]
     pub fn on_conflict(mut self, on_conflict: OnConflict) -> Self {
         self.on_conflict = Some(on_conflict);
+        self
+    }
+
+    /// Sets the returned columns. Works only with PostgreSQL.
+    ///
+    /// ```rust
+    /// # use prisma_query::{ast::*, visitor::{Visitor, Postgres}};
+    /// let query = Insert::single_into("users");
+    /// let insert = Insert::from(query).returning(vec!["id"]);
+    /// let (sql, _) = Postgres::build(insert);
+    ///
+    /// assert_eq!("INSERT INTO \"users\" DEFAULT VALUES RETURNING \"id\"", sql);
+    /// ```
+    pub fn returning<K>(mut self, columns: Vec<K>) -> Self
+    where
+        K: Into<Column>,
+    {
+        self.returning = Some(columns.into_iter().map(|k| k.into()).collect());
         self
     }
 }
