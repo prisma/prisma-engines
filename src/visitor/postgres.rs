@@ -1,6 +1,7 @@
 use crate::{ast::*, visitor::Visitor};
 use postgres::types::{IsNull, ToSql, Type};
-use std::error::Error;
+use rust_decimal::Decimal;
+use std::{error::Error, str::FromStr};
 
 pub struct Postgres {
     parameters: Vec<ParameterizedValue>,
@@ -23,8 +24,7 @@ impl Visitor for Postgres {
         self.parameters.push(value);
     }
 
-    fn visit_parameterized(&mut self, value: ParameterizedValue) -> String {
-        self.add_parameter(value);
+    fn parameter_substitution(&self) -> String {
         format!("${}", self.parameters.len())
     }
 
@@ -125,8 +125,18 @@ impl ToSql for ParameterizedValue {
     fn to_sql(&self, ty: &Type, out: &mut Vec<u8>) -> Result<IsNull, Box<dyn Error + 'static + Send + Sync>> {
         match self {
             ParameterizedValue::Null => Ok(IsNull::Yes),
-            ParameterizedValue::Integer(integer) => integer.to_sql(ty, out),
-            ParameterizedValue::Real(float) => float.to_sql(ty, out),
+            ParameterizedValue::Integer(integer) => match *ty {
+                Type::INT2 => (*integer as i16).to_sql(ty, out),
+                Type::INT4 => (*integer as i32).to_sql(ty, out),
+                _ => (*integer as i64).to_sql(ty, out),
+            },
+            ParameterizedValue::Real(float) => match *ty {
+                Type::NUMERIC => {
+                    let s = float.to_string();
+                    Decimal::from_str(&s).unwrap().to_sql(ty, out)
+                }
+                _ => float.to_sql(ty, out),
+            },
             ParameterizedValue::Text(string) => string.to_sql(ty, out),
             ParameterizedValue::Boolean(boo) => boo.to_sql(ty, out),
             #[cfg(feature = "json-1")]
@@ -134,7 +144,7 @@ impl ToSql for ParameterizedValue {
             #[cfg(feature = "uuid-0_7")]
             ParameterizedValue::Uuid(value) => value.to_sql(ty, out),
             #[cfg(feature = "chrono-0_4")]
-            ParameterizedValue::DateTime(value) => value.to_sql(ty, out),
+            ParameterizedValue::DateTime(value) => value.naive_utc().to_sql(ty, out),
         }
     }
 
@@ -145,8 +155,18 @@ impl ToSql for ParameterizedValue {
     fn to_sql_checked(&self, ty: &Type, out: &mut Vec<u8>) -> Result<IsNull, Box<dyn Error + 'static + Send + Sync>> {
         match self {
             ParameterizedValue::Null => Ok(IsNull::Yes),
-            ParameterizedValue::Integer(integer) => integer.to_sql_checked(ty, out),
-            ParameterizedValue::Real(float) => float.to_sql_checked(ty, out),
+            ParameterizedValue::Integer(integer) => match *ty {
+                Type::INT2 => (*integer as i16).to_sql_checked(ty, out),
+                Type::INT4 => (*integer as i32).to_sql_checked(ty, out),
+                _ => integer.to_sql_checked(ty, out),
+            },
+            ParameterizedValue::Real(float) => match *ty {
+                Type::NUMERIC => {
+                    let s = float.to_string();
+                    Decimal::from_str(&s).unwrap().to_sql(ty, out)
+                }
+                _ => float.to_sql(ty, out),
+            },
             ParameterizedValue::Text(string) => string.to_sql_checked(ty, out),
             ParameterizedValue::Boolean(boo) => boo.to_sql_checked(ty, out),
             #[cfg(feature = "json-1")]
@@ -154,7 +174,7 @@ impl ToSql for ParameterizedValue {
             #[cfg(feature = "uuid-0_7")]
             ParameterizedValue::Uuid(value) => value.to_sql_checked(ty, out),
             #[cfg(feature = "chrono-0_4")]
-            ParameterizedValue::DateTime(value) => value.to_sql_checked(ty, out),
+            ParameterizedValue::DateTime(value) => value.naive_utc().to_sql_checked(ty, out),
         }
     }
 }

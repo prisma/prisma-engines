@@ -39,9 +39,6 @@ pub trait Visitor {
     /// replacing it with the `C_PARAM`, calling `add_parameter` with the replaced value.
     fn add_parameter(&mut self, value: ParameterizedValue);
 
-    /// A visit to a value we parameterize and replace with a ?
-    fn visit_parameterized(&mut self, value: ParameterizedValue) -> String;
-
     /// The `LIMIT` statement in the query
     fn visit_limit(&mut self, limit: Option<ParameterizedValue>) -> String;
 
@@ -56,6 +53,15 @@ pub trait Visitor {
 
     /// A walk through an `INSERT` statement
     fn visit_insert(&mut self, insert: Insert) -> String;
+
+    /// What to use to substitute a parameter in the query.
+    fn parameter_substitution(&self) -> String;
+
+    /// A visit to a value we parameterize
+    fn visit_parameterized(&mut self, value: ParameterizedValue) -> String {
+        self.add_parameter(value);
+        self.parameter_substitution()
+    }
 
     /// The join statements in the query
     fn visit_joins(&mut self, joins: Vec<Join>) -> String {
@@ -350,7 +356,7 @@ pub trait Visitor {
                     right,
                     Self::C_WILDCARD
                 )));
-                format!("{} LIKE ?", expression)
+                format!("{} LIKE {}", expression, self.parameter_substitution())
             }
             Compare::NotLike(left, right) => {
                 let expression = self.visit_database_value(*left);
@@ -360,27 +366,27 @@ pub trait Visitor {
                     right,
                     Self::C_WILDCARD
                 )));
-                format!("{} NOT LIKE ?", expression)
+                format!("{} NOT LIKE {}", expression, self.parameter_substitution())
             }
             Compare::BeginsWith(left, right) => {
                 let expression = self.visit_database_value(*left);
                 self.add_parameter(ParameterizedValue::Text(format!("{}{}", right, Self::C_WILDCARD)));
-                format!("{} LIKE ?", expression)
+                format!("{} LIKE {}", expression, self.parameter_substitution())
             }
             Compare::NotBeginsWith(left, right) => {
                 let expression = self.visit_database_value(*left);
                 self.add_parameter(ParameterizedValue::Text(format!("{}{}", right, Self::C_WILDCARD)));
-                format!("{} NOT LIKE ?", expression)
+                format!("{} NOT LIKE {}", expression, self.parameter_substitution())
             }
             Compare::EndsInto(left, right) => {
                 let expression = self.visit_database_value(*left);
                 self.add_parameter(ParameterizedValue::Text(format!("{}{}", Self::C_WILDCARD, right)));
-                format!("{} LIKE ?", expression)
+                format!("{} LIKE {}", expression, self.parameter_substitution())
             }
             Compare::NotEndsInto(left, right) => {
                 let expression = self.visit_database_value(*left);
                 self.add_parameter(ParameterizedValue::Text(format!("{}{}", Self::C_WILDCARD, right)));
-                format!("{} NOT LIKE ?", expression)
+                format!("{} NOT LIKE {}", expression, self.parameter_substitution())
             }
             Compare::Null(column) => format!("{} IS NULL", self.visit_database_value(*column)),
             Compare::NotNull(column) => format!("{} IS NOT NULL", self.visit_database_value(*column)),
