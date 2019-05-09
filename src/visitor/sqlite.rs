@@ -16,7 +16,6 @@ pub struct Sqlite {
 }
 
 impl Visitor for Sqlite {
-    const C_PARAM: &'static str = "?";
     const C_BACKTICK: &'static str = "`";
     const C_WILDCARD: &'static str = "%";
 
@@ -27,6 +26,35 @@ impl Visitor for Sqlite {
         let mut sqlite = Sqlite { parameters: Vec::new() };
 
         (Sqlite::visit_query(&mut sqlite, query.into()), sqlite.parameters)
+    }
+
+    fn visit_insert(&mut self, insert: Insert) -> String {
+        let mut result = match insert.on_conflict {
+            Some(OnConflict::DoNothing) => vec![String::from("INSERT OR IGNORE")],
+            None => vec![String::from("INSERT")],
+        };
+
+        result.push(format!("INTO {}", self.visit_table(insert.table, true)));
+
+        if insert.values.is_empty() {
+            result.push("DEFAULT VALUES".to_string());
+        } else {
+            let columns: Vec<String> = insert
+                .columns
+                .into_iter()
+                .map(|c| self.visit_column(Column::from(c)))
+                .collect();
+
+            let values: Vec<String> = insert.values.into_iter().map(|row| self.visit_row(row)).collect();
+
+            result.push(format!("({}) VALUES {}", columns.join(", "), values.join(", "),))
+        }
+
+        result.join(" ")
+    }
+
+    fn parameter_substitution(&self) -> String {
+        String::from("?")
     }
 
     fn add_parameter(&mut self, value: ParameterizedValue) {
@@ -50,10 +78,7 @@ impl Visitor for Sqlite {
                 if fun_rownum.over.is_empty() {
                     String::from("ROW_NUMBER() OVER()")
                 } else {
-                    format!(
-                        "ROW_NUMBER() OVER({})",
-                        self.visit_partitioning(fun_rownum.over)
-                    )
+                    format!("ROW_NUMBER() OVER({})", self.visit_partitioning(fun_rownum.over))
                 }
             }
             FunctionType::Count(fun_count) => {
@@ -61,13 +86,6 @@ impl Visitor for Sqlite {
                     String::from("COUNT()")
                 } else {
                     format!("COUNT({})", self.visit_columns(fun_count.exprs))
-                }
-            }
-            FunctionType::Distinct(fun_distinct) => {
-                if fun_distinct.exprs.is_empty() {
-                    String::from("DISTINCT()")
-                } else {
-                    format!("DISTINCT({})", self.visit_columns(fun_distinct.exprs))
                 }
             }
         };
@@ -132,12 +150,16 @@ impl ToSql for ParameterizedValue {
             ParameterizedValue::Real(float) => ToSqlOutput::from(*float),
             ParameterizedValue::Text(string) => ToSqlOutput::from(string.clone()),
             ParameterizedValue::Boolean(boo) => ToSqlOutput::from(*boo),
-            #[cfg(feature = "json")]
+            #[cfg(feature = "json-1")]
             ParameterizedValue::Json(value) => {
-                let stringified = serde_json::to_string(value)
-                    .map_err(|err| RusqlError::ToSqlConversionFailure(Box::new(err)))?;
+                let stringified =
+                    serde_json::to_string(value).map_err(|err| RusqlError::ToSqlConversionFailure(Box::new(err)))?;
                 ToSqlOutput::from(stringified)
             }
+            #[cfg(feature = "uuid-0_7")]
+            ParameterizedValue::Uuid(value) => ToSqlOutput::from(value.to_hyphenated().to_string()),
+            #[cfg(feature = "chrono-0_4")]
+            ParameterizedValue::DateTime(value) => ToSqlOutput::from(value.timestamp_millis()),
         };
 
         Ok(value)
@@ -152,10 +174,7 @@ mod tests {
     where
         T: Into<ParameterizedValue>,
     {
-        (
-            String::from(sql),
-            params.into_iter().map(|p| p.into()).collect(),
-        )
+        (String::from(sql), params.into_iter().map(|p| p.into()).collect())
     }
 
     fn default_params(mut additional: Vec<ParameterizedValue>) -> Vec<ParameterizedValue> {
@@ -193,8 +212,7 @@ mod tests {
 
     #[test]
     fn test_select_order_by() {
-        let expected_sql =
-            "SELECT `musti`.* FROM `musti` ORDER BY `foo`, `baz` ASC, `bar` DESC LIMIT ?";
+        let expected_sql = "SELECT `musti`.* FROM `musti` ORDER BY `foo`, `baz` ASC, `bar` DESC LIMIT ?";
         let query = Select::from_table("musti")
             .order_by("foo")
             .order_by("baz".ascend())
@@ -208,9 +226,7 @@ mod tests {
     #[test]
     fn test_select_fields_from() {
         let expected_sql = "SELECT `paw`, `nose` FROM `cat`.`musti` LIMIT ?";
-        let query = Select::from_table(("cat", "musti"))
-            .column("paw")
-            .column("nose");
+        let query = Select::from_table(("cat", "musti")).column("paw").column("nose");
         let (sql, params) = Sqlite::build(query);
 
         assert_eq!(expected_sql, sql);
@@ -219,10 +235,7 @@ mod tests {
 
     #[test]
     fn test_select_where_equals() {
-        let expected = expected_values(
-            "SELECT `naukio`.* FROM `naukio` WHERE `word` = ? LIMIT ?",
-            vec!["meow"],
-        );
+        let expected = expected_values("SELECT `naukio`.* FROM `naukio` WHERE `word` = ? LIMIT ?", vec!["meow"]);
 
         let query = Select::from_table("naukio").so_that("word".equals("meow"));
         let (sql, params) = Sqlite::build(query);
@@ -325,10 +338,7 @@ mod tests {
             ParameterizedValue::Text(String::from("warm")),
         ];
 
-        let conditions = "word"
-            .equals("meow")
-            .and("age".less_than(10))
-            .and("paw".equals("warm"));
+        let conditions = "word".equals("meow").and("age".less_than(10)).and("paw".equals("warm"));
 
         let query = Select::from_table("naukio").so_that(conditions);
 
@@ -348,9 +358,7 @@ mod tests {
             ParameterizedValue::Text(String::from("warm")),
         ];
 
-        let conditions = "word"
-            .equals("meow")
-            .and("age".less_than(10).and("paw".equals("warm")));
+        let conditions = "word".equals("meow").and("age".less_than(10).and("paw".equals("warm")));
 
         let query = Select::from_table("naukio").so_that(conditions);
 
@@ -370,10 +378,7 @@ mod tests {
             ParameterizedValue::Text(String::from("warm")),
         ];
 
-        let conditions = "word"
-            .equals("meow")
-            .or("age".less_than(10))
-            .and("paw".equals("warm"));
+        let conditions = "word".equals("meow").or("age".less_than(10)).and("paw".equals("warm"));
 
         let query = Select::from_table("naukio").so_that(conditions);
 
@@ -458,10 +463,7 @@ mod tests {
         let (sql, params) = Sqlite::build(query);
 
         assert_eq!(expected_sql, sql);
-        assert_eq!(
-            default_params(vec![ParameterizedValue::Boolean(true),]),
-            params
-        );
+        assert_eq!(default_params(vec![ParameterizedValue::Boolean(true),]), params);
     }
 
     #[test]
@@ -469,9 +471,8 @@ mod tests {
         let expected_sql =
             "SELECT `users`.* FROM `users` LEFT OUTER JOIN `posts` ON `users`.`id` = `posts`.`user_id` LIMIT ?";
 
-        let query = Select::from_table("users").left_outer_join(
-            "posts".on(("users", "id").equals(Column::from(("posts", "user_id")))),
-        );
+        let query = Select::from_table("users")
+            .left_outer_join("posts".on(("users", "id").equals(Column::from(("posts", "user_id")))));
         let (sql, _) = Sqlite::build(query);
 
         assert_eq!(expected_sql, sql);
@@ -491,10 +492,7 @@ mod tests {
         let (sql, params) = Sqlite::build(query);
 
         assert_eq!(expected_sql, sql);
-        assert_eq!(
-            default_params(vec![ParameterizedValue::Boolean(true),]),
-            params
-        );
+        assert_eq!(default_params(vec![ParameterizedValue::Boolean(true),]), params);
     }
 
     #[test]
@@ -536,8 +534,7 @@ mod tests {
 
         let mut s = conn.prepare(sql_str.clone()).unwrap();
         for i in 1..params.len() + 1 {
-            s.bind::<ParameterizedValue>(i, params[i - 1].clone().into())
-                .unwrap();
+            s.bind::<ParameterizedValue>(i, params[i - 1].clone().into()).unwrap();
         }
 
         s.next().unwrap();
@@ -574,10 +571,7 @@ mod tests {
     fn bind_test_1() {
         let conn = sqlite_harness();
 
-        let conditions = "name"
-            .equals("Alice")
-            .and("age".less_than(100.0))
-            .and("nice".equals(1));
+        let conditions = "name".equals("Alice").and("age".less_than(100.0)).and("nice".equals(1));
         let query = Select::from_table("users").so_that(conditions);
         let (sql_str, params) = Sqlite::build(query);
 

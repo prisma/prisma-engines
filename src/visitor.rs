@@ -14,12 +14,15 @@ mod sqlite;
 #[cfg(any(feature = "sqlite", feature = "rusqlite"))]
 pub use self::sqlite::Sqlite;
 
+#[cfg(feature = "postgresql-0_16")]
+mod postgres;
+
+#[cfg(feature = "postgresql-0_16")]
+pub use self::postgres::Postgres;
+
 /// A function travelling through the query AST, building the final query string
 /// and gathering parameters sent to the database together with the query.
 pub trait Visitor {
-    /// Parameter character when parameterizing values in the query.
-    const C_PARAM: &'static str;
-
     /// Backtick character to surround identifiers, such as column and table names.
     const C_BACKTICK: &'static str;
     /// Wildcard character to be used in `LIKE` queries.
@@ -47,6 +50,18 @@ pub trait Visitor {
 
     /// A partitioning statement.
     fn visit_partitioning(&mut self, fun: Over) -> String;
+
+    /// A walk through an `INSERT` statement
+    fn visit_insert(&mut self, insert: Insert) -> String;
+
+    /// What to use to substitute a parameter in the query.
+    fn parameter_substitution(&self) -> String;
+
+    /// A visit to a value we parameterize
+    fn visit_parameterized(&mut self, value: ParameterizedValue) -> String {
+        self.add_parameter(value);
+        self.parameter_substitution()
+    }
 
     /// The join statements in the query
     fn visit_joins(&mut self, joins: Vec<Join>) -> String {
@@ -116,32 +131,6 @@ pub trait Visitor {
             result.push(String::from("*"));
         } else {
             result.push(self.visit_columns(select.columns));
-        }
-
-        result.join(" ")
-    }
-
-    /// A walk through an `INSERT` statement
-    fn visit_insert(&mut self, insert: Insert) -> String {
-        let mut result = match insert.on_conflict {
-            Some(OnConflict::DoNothing) => vec![String::from("INSERT OR IGNORE")],
-            None => vec![String::from("INSERT")],
-        };
-
-        result.push(format!("INTO {}", self.visit_table(insert.table, true)));
-
-        if insert.values.is_empty() {
-            result.push("DEFAULT VALUES".to_string());
-        } else {
-            let columns: Vec<String> = insert
-                .columns
-                .into_iter()
-                .map(|c| self.visit_column(Column::from(c)))
-                .collect();
-
-            let values: Vec<String> = insert.values.into_iter().map(|row| self.visit_row(row)).collect();
-
-            result.push(format!("({}) VALUES {}", columns.join(", "), values.join(", "),))
         }
 
         result.join(" ")
@@ -219,12 +208,6 @@ pub trait Visitor {
         }
 
         values.join(", ")
-    }
-
-    /// A visit to a value we parameterize and replace with a ?
-    fn visit_parameterized(&mut self, value: ParameterizedValue) -> String {
-        self.add_parameter(value);
-        Self::C_PARAM.to_string()
     }
 
     /// A visit to a value used in an expression
@@ -355,16 +338,22 @@ pub trait Visitor {
                 self.visit_database_value(*left),
                 self.visit_database_value(*right),
             ),
-            Compare::In(left, right) => format!(
-                "{} IN {}",
-                self.visit_database_value(*left),
-                self.visit_database_value(*right),
-            ),
-            Compare::NotIn(left, right) => format!(
-                "{} NOT IN {}",
-                self.visit_database_value(*left),
-                self.visit_database_value(*right),
-            ),
+            Compare::In(left, right) => match *right {
+                DatabaseValue::Row(ref row) if row.is_empty() => String::from("1=0"),
+                _ => format!(
+                    "{} IN {}",
+                    self.visit_database_value(*left),
+                    self.visit_database_value(*right),
+                ),
+            },
+            Compare::NotIn(left, right) => match *right {
+                DatabaseValue::Row(ref row) if row.is_empty() => String::from("1=1"),
+                _ => format!(
+                    "{} NOT IN {}",
+                    self.visit_database_value(*left),
+                    self.visit_database_value(*right),
+                ),
+            },
             Compare::Like(left, right) => {
                 let expression = self.visit_database_value(*left);
                 self.add_parameter(ParameterizedValue::Text(format!(
@@ -373,7 +362,7 @@ pub trait Visitor {
                     right,
                     Self::C_WILDCARD
                 )));
-                format!("{} LIKE ?", expression)
+                format!("{} LIKE {}", expression, self.parameter_substitution())
             }
             Compare::NotLike(left, right) => {
                 let expression = self.visit_database_value(*left);
@@ -383,27 +372,27 @@ pub trait Visitor {
                     right,
                     Self::C_WILDCARD
                 )));
-                format!("{} NOT LIKE ?", expression)
+                format!("{} NOT LIKE {}", expression, self.parameter_substitution())
             }
             Compare::BeginsWith(left, right) => {
                 let expression = self.visit_database_value(*left);
                 self.add_parameter(ParameterizedValue::Text(format!("{}{}", right, Self::C_WILDCARD)));
-                format!("{} LIKE ?", expression)
+                format!("{} LIKE {}", expression, self.parameter_substitution())
             }
             Compare::NotBeginsWith(left, right) => {
                 let expression = self.visit_database_value(*left);
                 self.add_parameter(ParameterizedValue::Text(format!("{}{}", right, Self::C_WILDCARD)));
-                format!("{} NOT LIKE ?", expression)
+                format!("{} NOT LIKE {}", expression, self.parameter_substitution())
             }
             Compare::EndsInto(left, right) => {
                 let expression = self.visit_database_value(*left);
                 self.add_parameter(ParameterizedValue::Text(format!("{}{}", Self::C_WILDCARD, right)));
-                format!("{} LIKE ?", expression)
+                format!("{} LIKE {}", expression, self.parameter_substitution())
             }
             Compare::NotEndsInto(left, right) => {
                 let expression = self.visit_database_value(*left);
                 self.add_parameter(ParameterizedValue::Text(format!("{}{}", Self::C_WILDCARD, right)));
-                format!("{} NOT LIKE ?", expression)
+                format!("{} NOT LIKE {}", expression, self.parameter_substitution())
             }
             Compare::Null(column) => format!("{} IS NULL", self.visit_database_value(*column)),
             Compare::NotNull(column) => format!("{} IS NOT NULL", self.visit_database_value(*column)),
