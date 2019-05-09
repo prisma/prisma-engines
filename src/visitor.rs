@@ -338,16 +338,22 @@ pub trait Visitor {
                 self.visit_database_value(*left),
                 self.visit_database_value(*right),
             ),
-            Compare::In(left, right) => format!(
-                "{} IN {}",
-                self.visit_database_value(*left),
-                self.visit_database_value(*right),
-            ),
-            Compare::NotIn(left, right) => format!(
-                "{} NOT IN {}",
-                self.visit_database_value(*left),
-                self.visit_database_value(*right),
-            ),
+            Compare::In(left, right) => match *right {
+                DatabaseValue::Row(ref row) if row.is_empty() => String::from("1=0"),
+                _ => format!(
+                    "{} IN {}",
+                    self.visit_database_value(*left),
+                    self.visit_database_value(*right),
+                ),
+            },
+            Compare::NotIn(left, right) => match *right {
+                DatabaseValue::Row(ref row) if row.is_empty() => String::from("1=1"),
+                _ => format!(
+                    "{} NOT IN {}",
+                    self.visit_database_value(*left),
+                    self.visit_database_value(*right),
+                ),
+            },
             Compare::Like(left, right) => {
                 let expression = self.visit_database_value(*left);
                 self.add_parameter(ParameterizedValue::Text(format!(
