@@ -2,12 +2,10 @@
 
 set -e
 
-echo $(pwd)
-
 pipeline=$(printf "
 steps:
     - label: \":rust: Cargo test\"
-      command: docker run -w /build -v $(pwd):/build prismagraphql/rust-build:latest cargo test
+      command: ./.buildkite/docker.sh
 
     - wait
 
