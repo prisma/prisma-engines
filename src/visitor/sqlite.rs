@@ -85,55 +85,6 @@ impl Visitor for Sqlite {
         }
     }
 
-    fn visit_function(&mut self, fun: Function) -> String {
-        let mut result = match fun.typ_ {
-            FunctionType::RowNumber(fun_rownum) => {
-                if fun_rownum.over.is_empty() {
-                    String::from("ROW_NUMBER() OVER()")
-                } else {
-                    format!(
-                        "ROW_NUMBER() OVER({})",
-                        self.visit_partitioning(fun_rownum.over)
-                    )
-                }
-            }
-            FunctionType::Count(fun_count) => {
-                if fun_count.exprs.is_empty() {
-                    String::from("COUNT()")
-                } else {
-                    format!("COUNT({})", self.visit_columns(fun_count.exprs))
-                }
-            }
-        };
-
-        if let Some(alias) = fun.alias {
-            result.push_str(" AS ");
-            result.push_str(&Self::delimited_identifiers(vec![alias]));
-        }
-
-        result
-    }
-
-    fn visit_partitioning(&mut self, over: Over) -> String {
-        let mut result = Vec::new();
-
-        if !over.partitioning.is_empty() {
-            let mut parts = Vec::new();
-
-            for partition in over.partitioning {
-                parts.push(self.visit_column(partition))
-            }
-
-            result.push(format!("PARTITION BY {}", parts.join(", ")));
-        }
-
-        if !over.ordering.is_empty() {
-            result.push(format!("ORDER BY {}", self.visit_ordering(over.ordering)));
-        }
-
-        result.join(" ")
-    }
-
     fn visit_offset(&mut self, offset: ParameterizedValue) -> String {
         format!("OFFSET {}", self.visit_parameterized(offset))
     }

@@ -20,6 +20,12 @@ mod postgres;
 #[cfg(feature = "postgresql-0_16")]
 pub use self::postgres::Postgres;
 
+#[cfg(feature = "mysql_async-0_19")]
+mod mysql;
+
+#[cfg(feature = "mysql_async-0_19")]
+pub use self::mysql::Mysql;
+
 /// A function travelling through the query AST, building the final query string
 /// and gathering parameters sent to the database together with the query.
 pub trait Visitor {
@@ -45,12 +51,6 @@ pub trait Visitor {
     /// The `OFFSET` statement in the query
     fn visit_offset(&mut self, offset: ParameterizedValue) -> String;
 
-    /// A database function.
-    fn visit_function(&mut self, fun: Function) -> String;
-
-    /// A partitioning statement.
-    fn visit_partitioning(&mut self, fun: Over) -> String;
-
     /// A walk through an `INSERT` statement
     fn visit_insert(&mut self, insert: Insert) -> String;
 
@@ -68,7 +68,9 @@ pub trait Visitor {
         let result = joins.into_iter().fold(Vec::new(), |mut acc, j| {
             match j {
                 Join::Inner(data) => acc.push(format!("INNER JOIN {}", self.visit_join_data(data))),
-                Join::LeftOuter(data) => acc.push(format!("LEFT OUTER JOIN {}", self.visit_join_data(data))),
+                Join::LeftOuter(data) => {
+                    acc.push(format!("LEFT OUTER JOIN {}", self.visit_join_data(data)))
+                }
             }
 
             acc
@@ -93,16 +95,20 @@ pub trait Visitor {
             if select.columns.is_empty() {
                 match table.typ {
                     TableType::Query(_) => match table.alias {
-                        Some(ref alias) => {
-                            result.push(format!("{}.*", Self::delimited_identifiers(vec![alias.clone()])))
-                        }
+                        Some(ref alias) => result.push(format!(
+                            "{}.*",
+                            Self::delimited_identifiers(vec![alias.clone()])
+                        )),
                         None => result.push(String::from("*")),
                     },
                     TableType::Table(_) => match table.alias.clone() {
-                        Some(ref alias) => {
-                            result.push(format!("{}.*", Self::delimited_identifiers(vec![alias.clone()])))
+                        Some(ref alias) => result.push(format!(
+                            "{}.*",
+                            Self::delimited_identifiers(vec![alias.clone()])
+                        )),
+                        None => {
+                            result.push(format!("{}.*", self.visit_table(*table.clone(), false)))
                         }
-                        None => result.push(format!("{}.*", self.visit_table(*table.clone(), false))),
                     },
                 }
             } else {
@@ -138,13 +144,22 @@ pub trait Visitor {
 
     /// A walk through an `UPDATE` statement
     fn visit_update(&mut self, update: Update) -> String {
-        let mut result = vec![format!("UPDATE {} SET", self.visit_table(update.table, true))];
+        let mut result = vec![format!(
+            "UPDATE {} SET",
+            self.visit_table(update.table, true)
+        )];
 
         {
             let pairs = update.columns.into_iter().zip(update.values.into_iter());
 
             let assignments: Vec<String> = pairs
-                .map(|(key, value)| format!("{} = {}", self.visit_column(key), self.visit_database_value(value)))
+                .map(|(key, value)| {
+                    format!(
+                        "{} = {}",
+                        self.visit_column(key),
+                        self.visit_database_value(value)
+                    )
+                })
                 .collect();
 
             result.push(assignments.join(", "));
@@ -159,7 +174,10 @@ pub trait Visitor {
 
     /// A walk through an `DELETE` statement
     fn visit_delete(&mut self, delete: Delete) -> String {
-        let mut result = vec![format!("DELETE FROM {}", self.visit_table(delete.table, true))];
+        let mut result = vec![format!(
+            "DELETE FROM {}",
+            self.visit_table(delete.table, true)
+        )];
 
         if let Some(conditions) = delete.conditions {
             result.push(format!("WHERE {}", self.visit_conditions(conditions)));
@@ -288,7 +306,9 @@ pub trait Visitor {
                 self.visit_expression(*left),
                 self.visit_expression(*right),
             ),
-            ConditionTree::Not(expression) => format!("(NOT {})", self.visit_expression(*expression)),
+            ConditionTree::Not(expression) => {
+                format!("(NOT {})", self.visit_expression(*expression))
+            }
             ConditionTree::Single(expression) => self.visit_expression(*expression),
             ConditionTree::NoCondition => String::from("1=1"),
             ConditionTree::NegativeCondition => String::from("1=0"),
@@ -376,26 +396,44 @@ pub trait Visitor {
             }
             Compare::BeginsWith(left, right) => {
                 let expression = self.visit_database_value(*left);
-                self.add_parameter(ParameterizedValue::Text(format!("{}{}", right, Self::C_WILDCARD)));
+                self.add_parameter(ParameterizedValue::Text(format!(
+                    "{}{}",
+                    right,
+                    Self::C_WILDCARD
+                )));
                 format!("{} LIKE {}", expression, self.parameter_substitution())
             }
             Compare::NotBeginsWith(left, right) => {
                 let expression = self.visit_database_value(*left);
-                self.add_parameter(ParameterizedValue::Text(format!("{}{}", right, Self::C_WILDCARD)));
+                self.add_parameter(ParameterizedValue::Text(format!(
+                    "{}{}",
+                    right,
+                    Self::C_WILDCARD
+                )));
                 format!("{} NOT LIKE {}", expression, self.parameter_substitution())
             }
             Compare::EndsInto(left, right) => {
                 let expression = self.visit_database_value(*left);
-                self.add_parameter(ParameterizedValue::Text(format!("{}{}", Self::C_WILDCARD, right)));
+                self.add_parameter(ParameterizedValue::Text(format!(
+                    "{}{}",
+                    Self::C_WILDCARD,
+                    right
+                )));
                 format!("{} LIKE {}", expression, self.parameter_substitution())
             }
             Compare::NotEndsInto(left, right) => {
                 let expression = self.visit_database_value(*left);
-                self.add_parameter(ParameterizedValue::Text(format!("{}{}", Self::C_WILDCARD, right)));
+                self.add_parameter(ParameterizedValue::Text(format!(
+                    "{}{}",
+                    Self::C_WILDCARD,
+                    right
+                )));
                 format!("{} NOT LIKE {}", expression, self.parameter_substitution())
             }
             Compare::Null(column) => format!("{} IS NULL", self.visit_database_value(*column)),
-            Compare::NotNull(column) => format!("{} IS NOT NULL", self.visit_database_value(*column)),
+            Compare::NotNull(column) => {
+                format!("{} IS NOT NULL", self.visit_database_value(*column))
+            }
             Compare::Between(val, left, right) => format!(
                 "{} BETWEEN {} AND {}",
                 self.visit_database_value(*val),
@@ -429,5 +467,54 @@ pub trait Visitor {
         }
 
         result.join(", ")
+    }
+
+    fn visit_function(&mut self, fun: Function) -> String {
+        let mut result = match fun.typ_ {
+            FunctionType::RowNumber(fun_rownum) => {
+                if fun_rownum.over.is_empty() {
+                    String::from("ROW_NUMBER() OVER()")
+                } else {
+                    format!(
+                        "ROW_NUMBER() OVER({})",
+                        self.visit_partitioning(fun_rownum.over)
+                    )
+                }
+            }
+            FunctionType::Count(fun_count) => {
+                if fun_count.exprs.is_empty() {
+                    String::from("COUNT(*)")
+                } else {
+                    format!("COUNT({})", self.visit_columns(fun_count.exprs))
+                }
+            }
+        };
+
+        if let Some(alias) = fun.alias {
+            result.push_str(" AS ");
+            result.push_str(&Self::delimited_identifiers(vec![alias]));
+        }
+
+        result
+    }
+
+    fn visit_partitioning(&mut self, over: Over) -> String {
+        let mut result = Vec::new();
+
+        if !over.partitioning.is_empty() {
+            let mut parts = Vec::new();
+
+            for partition in over.partitioning {
+                parts.push(self.visit_column(partition))
+            }
+
+            result.push(format!("PARTITION BY {}", parts.join(", ")));
+        }
+
+        if !over.ordering.is_empty() {
+            result.push(format!("ORDER BY {}", self.visit_ordering(over.ordering)));
+        }
+
+        result.join(" ")
     }
 }
