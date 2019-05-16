@@ -1,5 +1,5 @@
 use crate::{ast::*, visitor::Visitor};
-use mysql_async::{prelude::ToValue, Value as MyValue};
+use mysql_async::Value as MyValue;
 
 #[cfg(feature = "chrono-0_4")]
 use chrono::{Datelike, Timelike};
@@ -80,23 +80,23 @@ impl Visitor for Mysql {
     }
 }
 
-impl ToValue for ParameterizedValue {
-    fn to_value(&self) -> MyValue {
-        match self {
+impl From<ParameterizedValue> for MyValue {
+    fn from(pv: ParameterizedValue) -> MyValue {
+        match pv {
             ParameterizedValue::Null => MyValue::NULL,
-            ParameterizedValue::Integer(i) => MyValue::Int(*i),
-            ParameterizedValue::Real(f) => MyValue::Float(*f),
-            ParameterizedValue::Text(s) => MyValue::Bytes(s.as_bytes().to_vec()),
-            ParameterizedValue::Boolean(b) => MyValue::Int(*b as i64),
+            ParameterizedValue::Integer(i) => MyValue::Int(i),
+            ParameterizedValue::Real(f) => MyValue::Float(f),
+            ParameterizedValue::Text(s) => MyValue::Bytes(s.into_bytes()),
+            ParameterizedValue::Boolean(b) => MyValue::Int(b as i64),
             #[cfg(feature = "json-1")]
             ParameterizedValue::Json(json) => {
-                let s = serde_json::to_string(json).expect("Cannot convert JSON to String.");
+                let s = serde_json::to_string(&json).expect("Cannot convert JSON to String.");
 
-                MyValue::Bytes(s.as_bytes().to_vec())
+                MyValue::Bytes(s.into_bytes())
             }
             #[cfg(feature = "uuid-0_7")]
             ParameterizedValue::Uuid(u) => {
-                MyValue::Bytes(u.to_hyphenated().to_string().as_bytes().to_vec())
+                MyValue::Bytes(u.to_hyphenated().to_string().into_bytes())
             }
             #[cfg(feature = "chrono-0_4")]
             ParameterizedValue::DateTime(dt) => MyValue::Date(
