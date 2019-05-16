@@ -1,5 +1,5 @@
 use crate::{ast::*, visitor::Visitor};
-use mysql_async::Value as MyValue;
+use mysql::Value as MyValue;
 
 #[cfg(feature = "chrono-0_4")]
 use chrono::{Datelike, Timelike};
