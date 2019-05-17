@@ -50,7 +50,7 @@ impl RowNumber {
 /// let (sql, _) = Sqlite::build(query);
 ///
 /// assert_eq!(
-///     "SELECT `id`, ROW_NUMBER() OVER(PARTITION BY `name` ORDER BY `created_at`) AS `num` FROM `users` LIMIT ?",
+///     "SELECT `id`, ROW_NUMBER() OVER(PARTITION BY `name` ORDER BY `created_at`) AS `num` FROM `users`",
 ///     sql
 /// );
 /// ```

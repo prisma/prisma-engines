@@ -34,7 +34,7 @@ impl Select {
     /// let query = Select::from_table("users");
     /// let (sql, _) = Sqlite::build(query);
     ///
-    /// assert_eq!("SELECT `users`.* FROM `users` LIMIT ?", sql);
+    /// assert_eq!("SELECT `users`.* FROM `users`", sql);
     /// ```
     ///
     /// The table can be in multiple parts, defining the database.
@@ -44,7 +44,7 @@ impl Select {
     /// let query = Select::from_table(("crm", "users"));
     /// let (sql, _) = Sqlite::build(query);
     ///
-    /// assert_eq!("SELECT `crm`.`users`.* FROM `crm`.`users` LIMIT ?", sql);
+    /// assert_eq!("SELECT `crm`.`users`.* FROM `crm`.`users`", sql);
     /// ```
     ///
     /// It is also possible to use a nested `SELECT`.
@@ -55,8 +55,8 @@ impl Select {
     /// let query = Select::from_table(select.alias("num"));
     /// let (sql, params) = Sqlite::build(query);
     ///
-    /// assert_eq!("SELECT `num`.* FROM (SELECT ?) AS `num` LIMIT ?", sql);
-    /// assert_eq!(vec![ParameterizedValue::from(1), ParameterizedValue::from(-1)], params);
+    /// assert_eq!("SELECT `num`.* FROM (SELECT ?) AS `num`", sql);
+    /// assert_eq!(vec![ParameterizedValue::from(1)], params);
     /// ```
     #[inline]
     pub fn from_table<T>(table: T) -> Self
@@ -94,7 +94,7 @@ impl Select {
     /// let (sql, _) = Sqlite::build(query);
     ///
     /// assert_eq!(
-    ///     "SELECT `cats`.*, `dogs`.* FROM `cats` INNER JOIN `dogs` ON `dogs`.`slave_id` = `cats`.`master_id` LIMIT ?",
+    ///     "SELECT `cats`.*, `dogs`.* FROM `cats` INNER JOIN `dogs` ON `dogs`.`slave_id` = `cats`.`master_id`",
     ///     sql
     /// );
     /// ```
@@ -117,7 +117,7 @@ impl Select {
     ///
     /// let (sql, _) = Sqlite::build(query);
     ///
-    /// assert_eq!("SELECT `name`, `users`.`id`, `crm`.`users`.`foo` FROM `users` LIMIT ?", sql);
+    /// assert_eq!("SELECT `name`, `users`.`id`, `crm`.`users`.`foo` FROM `users`", sql);
     /// ```
     pub fn column<T>(mut self, column: T) -> Self
     where
@@ -134,12 +134,11 @@ impl Select {
     /// let query = Select::from_table("users").columns(vec!["foo", "bar"]);
     /// let (sql, params) = Sqlite::build(query);
     ///
-    /// assert_eq!("SELECT ?, ? FROM `users` LIMIT ?", sql);
+    /// assert_eq!("SELECT ?, ? FROM `users`", sql);
     ///
     /// assert_eq!(vec![
     ///    ParameterizedValue::from("foo"),
     ///    ParameterizedValue::from("bar"),
-    ///    ParameterizedValue::from(-1),
     /// ], params);
     /// ```
     pub fn columns<T>(mut self, columns: Vec<T>) -> Self
@@ -158,11 +157,10 @@ impl Select {
     /// let query = Select::from_table("users").so_that("foo".equals("bar"));
     /// let (sql, params) = Sqlite::build(query);
     ///
-    /// assert_eq!("SELECT `users`.* FROM `users` WHERE `foo` = ? LIMIT ?", sql);
+    /// assert_eq!("SELECT `users`.* FROM `users` WHERE `foo` = ?", sql);
     ///
     /// assert_eq!(vec![
     ///    ParameterizedValue::from("bar"),
-    ///    ParameterizedValue::from(-1),
     /// ], params);
     /// ```
     pub fn so_that<T>(mut self, conditions: T) -> Self
@@ -182,7 +180,7 @@ impl Select {
     /// let (sql, _) = Sqlite::build(query);
     ///
     /// assert_eq!(
-    ///     "SELECT `users`.* FROM `users` INNER JOIN `posts` AS `p` ON `p`.`user_id` = `users`.`id` LIMIT ?",
+    ///     "SELECT `users`.* FROM `users` INNER JOIN `posts` AS `p` ON `p`.`user_id` = `users`.`id`",
     ///     sql
     /// );
     /// ```
@@ -203,14 +201,13 @@ impl Select {
     /// let (sql, params) = Sqlite::build(query);
     ///
     /// assert_eq!(
-    ///     "SELECT `users`.* FROM `users` LEFT OUTER JOIN `posts` AS `p` ON `p`.`visible` = ? LIMIT ?",
+    ///     "SELECT `users`.* FROM `users` LEFT OUTER JOIN `posts` AS `p` ON `p`.`visible` = ?",
     ///     sql
     /// );
     ///
     /// assert_eq!(
     ///     vec![
     ///         ParameterizedValue::from(true),
-    ///         ParameterizedValue::from(-1)
     ///     ],
     ///     params
     /// );
@@ -234,7 +231,7 @@ impl Select {
     ///
     /// let (sql, _) = Sqlite::build(query);
     ///
-    /// assert_eq!("SELECT `users`.* FROM `users` ORDER BY `foo`, `baz` ASC, `bar` DESC LIMIT ?", sql);
+    /// assert_eq!("SELECT `users`.* FROM `users` ORDER BY `foo`, `baz` ASC, `bar` DESC", sql);
     pub fn order_by<T>(mut self, value: T) -> Self
     where
         T: IntoOrderDefinition,

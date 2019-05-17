@@ -33,16 +33,21 @@ impl Visitor for Postgres {
         format!("${}", self.parameters.len())
     }
 
-    fn visit_limit(&mut self, limit: Option<ParameterizedValue>) -> String {
-        if let Some(limit) = limit {
-            format!("LIMIT {}", self.visit_parameterized(limit))
-        } else {
-            String::new()
+    fn visit_limit_and_offset(
+        &mut self,
+        limit: Option<ParameterizedValue>,
+        offset: Option<ParameterizedValue>,
+    ) -> Option<String> {
+        match (limit, offset) {
+            (Some(limit), Some(offset)) => Some(format!(
+                "LIMIT {} OFFSET {}",
+                self.visit_parameterized(limit),
+                self.visit_parameterized(offset)
+            )),
+            (None, Some(offset)) => Some(format!("OFFSET {}", self.visit_parameterized(offset))),
+            (Some(limit), None) => Some(format!("LIMIT {}", self.visit_parameterized(limit))),
+            (None, None) => None,
         }
-    }
-
-    fn visit_offset(&mut self, offset: ParameterizedValue) -> String {
-        format!("OFFSET {}", self.visit_parameterized(offset))
     }
 
     fn visit_insert(&mut self, insert: Insert) -> String {

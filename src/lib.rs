@@ -43,7 +43,7 @@
 //!     let (sql_str, params) = Sqlite::build(query);
 //!
 //!     assert_eq!(
-//!         "SELECT `naukio`.* FROM `naukio` WHERE ((`word` = ? AND `age` < ?) AND `paw` = ?) LIMIT ?",
+//!         "SELECT `naukio`.* FROM `naukio` WHERE ((`word` = ? AND `age` < ?) AND `paw` = ?)",
 //!         sql_str,
 //!     );
 //!
@@ -52,7 +52,6 @@
 //!             ParameterizedValue::from("meow"),
 //!             ParameterizedValue::from(10),
 //!             ParameterizedValue::from("warm"),
-//!             ParameterizedValue::from(-1),
 //!         ],
 //!         params
 //!     );
@@ -79,7 +78,7 @@
 //!     let (sql, params) = Sqlite::build(query);
 //!
 //!     assert_eq!(
-//!         "SELECT `naukio`.* FROM `naukio` WHERE ((`word` = ? OR `age` < ?) AND `paw` = ?) LIMIT ?",
+//!         "SELECT `naukio`.* FROM `naukio` WHERE ((`word` = ? OR `age` < ?) AND `paw` = ?)",
 //!         sql,
 //!     );
 //!
@@ -88,7 +87,6 @@
 //!             ParameterizedValue::from("meow"),
 //!             ParameterizedValue::from(10),
 //!             ParameterizedValue::from("warm"),
-//!             ParameterizedValue::from(-1),
 //!         ],
 //!         params
 //!     );

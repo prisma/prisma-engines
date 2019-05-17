@@ -45,11 +45,12 @@ pub trait Visitor {
     /// replacing it with the `C_PARAM`, calling `add_parameter` with the replaced value.
     fn add_parameter(&mut self, value: ParameterizedValue);
 
-    /// The `LIMIT` statement in the query
-    fn visit_limit(&mut self, limit: Option<ParameterizedValue>) -> String;
-
-    /// The `OFFSET` statement in the query
-    fn visit_offset(&mut self, offset: ParameterizedValue) -> String;
+    /// The `LIMIT` and `OFFSET` statement in the query
+    fn visit_limit_and_offset(
+        &mut self,
+        limit: Option<ParameterizedValue>,
+        offset: Option<ParameterizedValue>,
+    ) -> Option<String>;
 
     /// A walk through an `INSERT` statement
     fn visit_insert(&mut self, insert: Insert) -> String;
@@ -128,10 +129,8 @@ pub trait Visitor {
                 result.push(format!("ORDER BY {}", self.visit_ordering(select.ordering)));
             }
 
-            result.push(self.visit_limit(select.limit));
-
-            if let Some(offset) = select.offset {
-                result.push(self.visit_offset(offset));
+            if let Some(window) = self.visit_limit_and_offset(select.limit, select.offset) {
+                result.push(window);
             }
         } else if select.columns.is_empty() {
             result.push(String::from("*"));
