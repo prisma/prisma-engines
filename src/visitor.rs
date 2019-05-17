@@ -20,10 +20,10 @@ mod postgres;
 #[cfg(feature = "postgresql-0_16")]
 pub use self::postgres::Postgres;
 
-#[cfg(feature = "mysql_async-0_19")]
+#[cfg(feature = "mysql_sync")]
 mod mysql;
 
-#[cfg(feature = "mysql_async-0_19")]
+#[cfg(feature = "mysql_sync")]
 pub use self::mysql::Mysql;
 
 /// A function travelling through the query AST, building the final query string
