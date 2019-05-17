@@ -213,8 +213,19 @@ pub trait Visitor {
             Query::Insert(insert) => self.visit_insert(*insert),
             Query::Update(update) => self.visit_update(*update),
             Query::Delete(delete) => self.visit_delete(*delete),
+            Query::UnionAll(union) => self.visit_union_all(union),
             Query::Raw(string) => string,
         }
+    }
+
+    /// A walk through a union of `SELECT` statements
+    fn visit_union_all(&mut self, ua: UnionAll) -> String {
+        let selects: Vec<String> =
+            ua.0.into_iter()
+                .map(|s| format!("({})", self.visit_select(s)))
+                .collect();
+
+        selects.join(" UNION ALL ")
     }
 
     /// The selected columns
