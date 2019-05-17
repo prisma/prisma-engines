@@ -71,7 +71,7 @@ impl Visitor for Mysql {
         if let Some(limit) = limit {
             format!("LIMIT {}", self.visit_parameterized(limit))
         } else {
-            String::new()
+            String::from("LIMIT 18446744073709551615")
         }
     }
 
