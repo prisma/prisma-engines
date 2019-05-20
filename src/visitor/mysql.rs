@@ -78,10 +78,11 @@ impl Visitor for Mysql {
                 self.visit_parameterized(limit),
                 self.visit_parameterized(offset)
             )),
+            (None, Some(ParameterizedValue::Integer(offset))) if offset < 1 => None,
             (None, Some(offset)) => Some(format!(
                 "LIMIT {} OFFSET {}",
                 self.visit_parameterized(ParameterizedValue::from(9223372036854775807i64)),
-                self.visit_parameterized(offset)
+                self.visit_parameterized(offset),
             )),
             (Some(limit), None) => Some(format!("LIMIT {}", self.visit_parameterized(limit))),
             (None, None) => None,
