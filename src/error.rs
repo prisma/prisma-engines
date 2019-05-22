@@ -12,6 +12,13 @@ pub enum Error {
     ConnectionError(FError),
     #[fail(display = "Error reading the column value: {}", _0)]
     ColumnReadFailure(FError),
+    #[fail(display = "Error accessing result set, index out of bounds: {}", _0)]
+    ResultIndexOutOfBounts(usize),
+    #[fail(
+        display = "Error accessing result set, type missmatch, expected: {}",
+        _0
+    )]
+    ResultTypeMissmatch(&'static str),
 }
 
 impl From<r2d2::Error> for Error {
