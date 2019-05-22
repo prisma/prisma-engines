@@ -97,4 +97,9 @@
 //! from the input, e.g. when mapping data using an `Into<ConditionTree>` trait.
 
 pub mod ast;
+pub mod connector;
+pub mod error;
+pub mod transaction;
 pub mod visitor;
+
+pub type QueryResult<T> = Result<T, error::Error>;
