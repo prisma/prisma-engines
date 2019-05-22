@@ -490,16 +490,11 @@ pub trait Visitor {
         let mut result = Vec::new();
 
         for value in grouping.0.into_iter() {
-
-            result.push(format!(
-                "{}",
-                self.visit_database_value(value)
-            ));
+            result.push(format!("{}", self.visit_database_value(value)));
         }
 
         result.join(", ")
     }
-
 
     fn visit_function(&mut self, fun: Function) -> String {
         let mut result = match fun.typ_ {

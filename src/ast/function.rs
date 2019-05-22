@@ -1,10 +1,10 @@
+mod aggregate_to_string;
 mod count;
 mod row_number;
-mod aggregate_to_string;
 
+pub use aggregate_to_string::*;
 pub use count::*;
 pub use row_number::*;
-pub use aggregate_to_string::*;
 
 use super::DatabaseValue;
 

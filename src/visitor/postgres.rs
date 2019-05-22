@@ -93,7 +93,10 @@ impl Visitor for Postgres {
     }
 
     fn visit_aggregate_to_string(&mut self, value: DatabaseValue) -> String {
-        format!("array_to_string(array_agg({}), ',')", self.visit_database_value(value))
+        format!(
+            "array_to_string(array_agg({}), ',')",
+            self.visit_database_value(value)
+        )
     }
 }
 

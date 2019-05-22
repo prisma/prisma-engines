@@ -1,4 +1,4 @@
-use crate::ast::{IntoOrderDefinition, Column, Over};
+use crate::ast::{Column, IntoOrderDefinition, Over};
 
 #[derive(Debug, Default, Clone, PartialEq)]
 pub struct RowNumber {

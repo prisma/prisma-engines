@@ -242,7 +242,7 @@ impl Select {
     }
 
     /// Adds a grouping to the `GROUP BY` section.
-    /// 
+    ///
     /// This does not check if the grouping is actually valid in respect to aggregated columns.
     ///
     /// ```rust
