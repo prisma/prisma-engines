@@ -11,6 +11,12 @@ pub trait ToResultRow {
 pub trait Transaction {
     fn execute(&mut self, q: Query) -> QueryResult<Option<Id>>;
     fn query(&mut self, q: Query) -> QueryResult<Vec<ResultRow>>;
+    
+    
+    /// Executes a query given as SQL, interpolating the given parameters.
+    /// 
+    /// This is needed, for example, for PRAGMA commands in sqlite.
+    fn query_raw(&mut self, sql: &str, params: &Vec<ParameterizedValue>) -> QueryResult<Vec<ResultRow>>;
 }
 
 pub trait Transactional {

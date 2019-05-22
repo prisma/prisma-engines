@@ -54,7 +54,11 @@ impl<'a> Transaction for SqliteTransaction<'a> {
     fn query(&mut self, q: Query) -> QueryResult<Vec<ResultRow>> {
         let (sql, params) = dbg!(visitor::Sqlite::build(q));
 
-        let mut stmt = self.prepare_cached(&sql)?;
+        return self.query_raw(&sql, &params)    
+    }
+
+    fn query_raw(&mut self, sql: &str, params: &Vec<ParameterizedValue>) -> QueryResult<Vec<ResultRow>> {
+        let mut stmt = self.prepare_cached(sql)?;
         let mut rows = stmt.query(params)?;
         let mut result = Vec::new();
 
