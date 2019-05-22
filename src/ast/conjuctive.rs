@@ -40,11 +40,14 @@ pub trait Conjuctive {
     fn not(self) -> ConditionTree;
 }
 
-impl<T> Conjuctive for T where T: Into<Expression> {
+impl<T> Conjuctive for T
+where
+    T: Into<Expression>,
+{
     #[inline]
     fn and<E>(self, other: E) -> ConditionTree
     where
-        E: Into<Expression>
+        E: Into<Expression>,
     {
         ConditionTree::and(self.into(), other.into())
     }
@@ -52,7 +55,7 @@ impl<T> Conjuctive for T where T: Into<Expression> {
     #[inline]
     fn or<E>(self, other: E) -> ConditionTree
     where
-        E: Into<Expression>
+        E: Into<Expression>,
     {
         ConditionTree::or(self.into(), other.into())
     }
