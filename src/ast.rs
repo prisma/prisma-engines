@@ -22,6 +22,8 @@ mod table;
 mod union_all;
 mod update;
 mod values;
+mod over;
+mod grouping;
 
 pub use column::Column;
 pub use compare::{Comparable, Compare};
@@ -40,3 +42,5 @@ pub use table::*;
 pub use union_all::UnionAll;
 pub use update::*;
 pub use values::{asterisk, DatabaseValue, ParameterizedValue};
+pub use over::*;
+pub use grouping::*;

@@ -91,6 +91,10 @@ impl Visitor for Postgres {
 
         result.join(" ")
     }
+
+    fn visit_aggregate_to_string(&mut self, value: DatabaseValue) -> String {
+        format!("array_to_string(array_agg({}), ',')", self.visit_database_value(value))
+    }
 }
 
 impl ToSql for ParameterizedValue {

@@ -7,6 +7,7 @@ pub struct Select {
     pub(crate) columns: Vec<DatabaseValue>,
     pub(crate) conditions: Option<ConditionTree>,
     pub(crate) ordering: Ordering,
+    pub(crate) grouping: Grouping,
     pub(crate) limit: Option<ParameterizedValue>,
     pub(crate) offset: Option<ParameterizedValue>,
     pub(crate) joins: Vec<Join>,
@@ -237,6 +238,27 @@ impl Select {
         T: IntoOrderDefinition,
     {
         self.ordering = self.ordering.append(value.into_order_definition());
+        self
+    }
+
+    /// Adds a grouping to the `GROUP BY` section.
+    /// 
+    /// This does not check if the grouping is actually valid in respect to aggregated columns.
+    ///
+    /// ```rust
+    /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
+    /// let query = Select::from_table("users").column("foo").column("bar")
+    ///     .group_by("foo")
+    ///     .group_by("bar");
+    ///
+    /// let (sql, _) = Sqlite::build(query);
+    ///
+    /// assert_eq!("SELECT `foo`, `bar` FROM `users` GROUP BY `foo`, `bar`", sql);
+    pub fn group_by<T>(mut self, value: T) -> Self
+    where
+        T: IntoGroupByDefinition,
+    {
+        self.grouping = self.grouping.append(value.into_group_by_definition());
         self
     }
 
