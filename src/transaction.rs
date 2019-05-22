@@ -33,7 +33,7 @@ impl ResultRow {
         }
     }
 
-    pub fn as_string(&self, i: usize) -> Result<&str, Error> {
+    pub fn as_str(&self, i: usize) -> Result<&str, Error> {
         match self.at(i)? {
             ParameterizedValue::Text(s) => Ok(s),
             _ => Err(Error::ResultTypeMissmatch("string")),
