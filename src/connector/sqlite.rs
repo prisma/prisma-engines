@@ -1,7 +1,7 @@
 use crate::{
     ast::{Id, ParameterizedValue, Query},
     error::Error,
-    transaction::{Connection, ResultRow, ToResultRow, Transaction, Connectional, Transactional},
+    transaction::{Connection, Connectional, ResultRow, ToResultRow, Transaction, Transactional},
     visitor::{self, Visitor},
     QueryResult,
 };
@@ -71,8 +71,7 @@ fn query_raw_impl(
     conn: &SqliteConnection,
     sql: &str,
     params: &[ParameterizedValue],
-) -> QueryResult<Vec<ResultRow>>
-{
+) -> QueryResult<Vec<ResultRow>> {
     let mut stmt = conn.prepare_cached(sql)?;
     let mut rows = stmt.query(params)?;
     let mut result = Vec::new();
@@ -83,7 +82,6 @@ fn query_raw_impl(
 
     Ok(result)
 }
-
 
 // Exploits that sqlite::Transaction implements std::ops::Deref<&sqlite::Connection>.
 // Dereferenced Connection is immuteable!
@@ -100,8 +98,7 @@ impl<'a> Connection for SqliteTransaction<'a> {
         &mut self,
         sql: &str,
         params: &[ParameterizedValue],
-    ) -> QueryResult<Vec<ResultRow>>
-    {
+    ) -> QueryResult<Vec<ResultRow>> {
         query_raw_impl(self, sql, params)
     }
 }
@@ -118,8 +115,7 @@ impl Connection for SqliteConnection {
         &mut self,
         sql: &str,
         params: &[ParameterizedValue],
-    ) -> QueryResult<Vec<ResultRow>>
-    {
+    ) -> QueryResult<Vec<ResultRow>> {
         query_raw_impl(self, sql, params)
     }
 }
@@ -186,13 +182,14 @@ impl Sqlite {
             // This is basically hacked until we have a full rust stack with a migration engine.
             // Currently, the scala tests use the JNA library to write to the database. This
             let database_file_path = format!("{}/{}.db", self.databases_folder_path, db_name);
-            SqliteConnection::execute(conn,
+            SqliteConnection::execute(
+                conn,
                 "ATTACH DATABASE ? AS ?",
                 &[database_file_path.as_ref(), db_name],
             )?;
         }
 
-        SqliteConnection::execute(conn,"PRAGMA foreign_keys = ON", NO_PARAMS)?;
+        SqliteConnection::execute(conn, "PRAGMA foreign_keys = ON", NO_PARAMS)?;
         Ok(())
     }
 

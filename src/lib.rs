@@ -102,4 +102,6 @@ pub mod error;
 pub mod transaction;
 pub mod visitor;
 
+pub use transaction::{ResultRow, ToResultRow};
+
 pub type QueryResult<T> = Result<T, error::Error>;
