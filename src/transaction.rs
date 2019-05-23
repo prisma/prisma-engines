@@ -80,6 +80,13 @@ impl ResultRow {
         }
     }
 
+    pub fn as_string(&self, i: usize) -> Result<String, Error> {
+        match self.at(i)? {
+            ParameterizedValue::Text(s) => Ok(s.clone()),
+            _ => Err(Error::ResultTypeMissmatch("string")),
+        }
+    }
+
     pub fn as_integer(&self, i: usize) -> Result<i64, Error> {
         match self.at(i)? {
             ParameterizedValue::Integer(v) => Ok(*v),
@@ -94,7 +101,7 @@ impl ResultRow {
         }
     }
 
-    pub fn as_boolean(&self, i: usize) -> Result<bool, Error> {
+    pub fn as_bool(&self, i: usize) -> Result<bool, Error> {
         match self.at(i)? {
             ParameterizedValue::Boolean(v) => Ok(*v),
             _ => Err(Error::ResultTypeMissmatch("boolean")),
