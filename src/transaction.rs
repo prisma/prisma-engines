@@ -104,6 +104,7 @@ impl ResultRow {
     pub fn as_bool(&self, i: usize) -> Result<bool, Error> {
         match self.at(i)? {
             ParameterizedValue::Boolean(v) => Ok(*v),
+            ParameterizedValue::Integer(v) => Ok(*v != 0),
             _ => Err(Error::ResultTypeMissmatch("boolean")),
         }
     }
