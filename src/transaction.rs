@@ -38,7 +38,7 @@ pub trait Connection {
     ) -> QueryResult<Vec<ResultRow>>;
 }
 
-pub trait Transactional {
+pub trait Connectional {
     /// Opens a connection, which is valid inside the given handler closure..
     ///
     /// This method does not open a transaction, and should used for
@@ -47,7 +47,9 @@ pub trait Transactional {
     fn with_connection<F, T>(&self, db: &str, f: F) -> QueryResult<T>
     where
         F: FnOnce(&mut Connection) -> QueryResult<T>;
-        
+}
+
+pub trait Transactional {
     /// Opens a connection and a transaction, which is valid inside the given handler closure.
     ///
     /// The transaction is comitted if the result returned by the handler is Ok.

@@ -1,7 +1,7 @@
 use crate::{
     ast::{Id, ParameterizedValue, Query},
     error::Error,
-    transaction::{Connection, ResultRow, ToResultRow, Transaction, Transactional},
+    transaction::{Connection, ResultRow, ToResultRow, Transaction, Connectional, Transactional},
     visitor::{self, Visitor},
     QueryResult,
 };
@@ -39,7 +39,9 @@ impl Transactional for Sqlite {
             result
         })
     }
+}
 
+impl Connectional for Sqlite {
     fn with_connection<F, T>(&self, db: &str, f: F) -> QueryResult<T>
     where
         F: FnOnce(&mut Connection) -> QueryResult<T>,
