@@ -1,7 +1,7 @@
 use crate::{
     ast::{Id, ParameterizedValue, Query},
     error::Error,
-    transaction::{ResultRow, ToResultRow, Transaction, Transactional},
+    transaction::{Connection, ResultRow, ToResultRow, Transaction, Transactional},
     visitor::{self, Visitor},
     QueryResult,
 };
@@ -9,7 +9,7 @@ use libsqlite3_sys as ffi;
 use r2d2_sqlite::SqliteConnectionManager;
 use rusqlite::{
     types::{FromSqlError, ValueRef},
-    Connection, Row as SqliteRow, Transaction as SqliteTransaction, NO_PARAMS,
+    Connection as SqliteConnection, Row as SqliteRow, Transaction as SqliteTransaction, NO_PARAMS,
 };
 use std::collections::HashSet;
 
@@ -26,7 +26,7 @@ impl Transactional for Sqlite {
     where
         F: FnOnce(&mut Transaction) -> QueryResult<T>,
     {
-        self.with_connection(db, |ref mut conn| {
+        self.with_connection_internal(db, |ref mut conn| {
             let mut tx = conn.transaction()?;
             tx.set_prepared_statement_cache_capacity(65536);
 
@@ -39,34 +39,86 @@ impl Transactional for Sqlite {
             result
         })
     }
+
+    fn with_connection<F, T>(&self, db: &str, f: F) -> QueryResult<T>
+    where
+        F: FnOnce(&mut Connection) -> QueryResult<T>,
+    {
+        self.with_connection_internal(db, |c| f(c))
+    }
 }
 
-impl<'a> Transaction for SqliteTransaction<'a> {
+// Concrete implmentations of trait methods, dropping the mut
+// so we can share it between Connection and Transaction.
+fn execute_impl(conn: &SqliteConnection, q: Query) -> QueryResult<Option<Id>> {
+    let (sql, params) = dbg!(visitor::Sqlite::build(q));
+
+    let mut stmt = conn.prepare_cached(&sql)?;
+    stmt.execute(params)?;
+
+    Ok(Some(Id::Int(conn.last_insert_rowid() as usize)))
+}
+
+fn query_impl(conn: &SqliteConnection, q: Query) -> QueryResult<Vec<ResultRow>> {
+    let (sql, params) = dbg!(visitor::Sqlite::build(q));
+
+    return query_raw_impl(conn, &sql, &params);
+}
+
+fn query_raw_impl(
+    conn: &SqliteConnection,
+    sql: &str,
+    params: &[ParameterizedValue],
+) -> QueryResult<Vec<ResultRow>>
+{
+    let mut stmt = conn.prepare_cached(sql)?;
+    let mut rows = stmt.query(params)?;
+    let mut result = Vec::new();
+
+    while let Some(row) = rows.next()? {
+        result.push(row.to_result_row()?);
+    }
+
+    Ok(result)
+}
+
+
+// Exploits that sqlite::Transaction implements std::ops::Deref<&sqlite::Connection>.
+// Dereferenced Connection is immuteable!
+impl<'a> Transaction for SqliteTransaction<'a> {}
+impl<'a> Connection for SqliteTransaction<'a> {
     fn execute(&mut self, q: Query) -> QueryResult<Option<Id>> {
-        let (sql, params) = dbg!(visitor::Sqlite::build(q));
-
-        let mut stmt = self.prepare_cached(&sql)?;
-        stmt.execute(params)?;
-
-        Ok(Some(Id::Int(self.last_insert_rowid() as usize)))
+        execute_impl(self, q)
     }
 
     fn query(&mut self, q: Query) -> QueryResult<Vec<ResultRow>> {
-        let (sql, params) = dbg!(visitor::Sqlite::build(q));
+        query_impl(self, q)
+    }
+    fn query_raw(
+        &mut self,
+        sql: &str,
+        params: &[ParameterizedValue],
+    ) -> QueryResult<Vec<ResultRow>>
+    {
+        query_raw_impl(self, sql, params)
+    }
+}
 
-        return self.query_raw(&sql, &params)    
+impl Connection for SqliteConnection {
+    fn execute(&mut self, q: Query) -> QueryResult<Option<Id>> {
+        execute_impl(self, q)
     }
 
-    fn query_raw(&mut self, sql: &str, params: &Vec<ParameterizedValue>) -> QueryResult<Vec<ResultRow>> {
-        let mut stmt = self.prepare_cached(sql)?;
-        let mut rows = stmt.query(params)?;
-        let mut result = Vec::new();
-
-        while let Some(row) = rows.next()? {
-            result.push(row.to_result_row()?);
-        }
-
-        Ok(result)
+    fn query(&mut self, q: Query) -> QueryResult<Vec<ResultRow>> {
+        query_impl(self, q)
+    }
+    fn query_raw(
+        &mut self,
+        sql: &str,
+        params: &[ParameterizedValue],
+    ) -> QueryResult<Vec<ResultRow>>
+    {
+        query_raw_impl(self, sql, params)
     }
 }
 
@@ -116,7 +168,7 @@ impl Sqlite {
         })
     }
 
-    fn attach_database(&self, conn: &mut Connection, db_name: &str) -> QueryResult<()> {
+    fn attach_database(&self, conn: &mut SqliteConnection, db_name: &str) -> QueryResult<()> {
         let mut stmt = conn.prepare("PRAGMA database_list")?;
 
         let databases: HashSet<String> = stmt
@@ -132,19 +184,19 @@ impl Sqlite {
             // This is basically hacked until we have a full rust stack with a migration engine.
             // Currently, the scala tests use the JNA library to write to the database. This
             let database_file_path = format!("{}/{}.db", self.databases_folder_path, db_name);
-            conn.execute(
+            SqliteConnection::execute(conn,
                 "ATTACH DATABASE ? AS ?",
                 &[database_file_path.as_ref(), db_name],
             )?;
         }
 
-        conn.execute("PRAGMA foreign_keys = ON", NO_PARAMS)?;
+        SqliteConnection::execute(conn,"PRAGMA foreign_keys = ON", NO_PARAMS)?;
         Ok(())
     }
 
-    fn with_connection<F, T>(&self, db: &str, f: F) -> QueryResult<T>
+    fn with_connection_internal<F, T>(&self, db: &str, f: F) -> QueryResult<T>
     where
-        F: FnOnce(&mut Connection) -> QueryResult<T>,
+        F: FnOnce(&mut SqliteConnection) -> QueryResult<T>,
     {
         let mut conn = self.pool.get()?;
         self.attach_database(&mut conn, db)?;
@@ -152,7 +204,7 @@ impl Sqlite {
         let result = f(&mut conn);
 
         if self.test_mode {
-            conn.execute("DETACH DATABASE ?", &[db])?;
+            SqliteConnection::execute(&conn, "DETACH DATABASE ?", &[db])?;
         }
 
         result
