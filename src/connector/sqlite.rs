@@ -1,7 +1,7 @@
 use crate::{
     ast::{Id, ParameterizedValue, Query},
     error::Error,
-    transaction::{Connection, Connectional, ResultRow, ToResultRow, Transaction, Transactional},
+    transaction::{Connection, Connectional, ResultRow, ToResultRow, ToColumnNames, Transaction, Transactional, ColumnNames},
     visitor::{self, Visitor},
     QueryResult,
 };
@@ -61,7 +61,7 @@ fn execute_impl(conn: &SqliteConnection, q: Query) -> QueryResult<Option<Id>> {
     Ok(Some(Id::Int(conn.last_insert_rowid() as usize)))
 }
 
-fn query_impl(conn: &SqliteConnection, q: Query) -> QueryResult<Vec<ResultRow>> {
+fn query_impl(conn: &SqliteConnection, q: Query) -> QueryResult<(ColumnNames, Vec<ResultRow>)> {
     let (sql, params) = dbg!(visitor::Sqlite::build(q));
 
     return query_raw_impl(conn, &sql, &params);
@@ -71,16 +71,20 @@ fn query_raw_impl(
     conn: &SqliteConnection,
     sql: &str,
     params: &[ParameterizedValue],
-) -> QueryResult<Vec<ResultRow>> {
+) -> QueryResult<(ColumnNames, Vec<ResultRow>)> {
     let mut stmt = conn.prepare_cached(sql)?;
     let mut rows = stmt.query(params)?;
     let mut result = Vec::new();
+    let mut names: Option<ColumnNames> = None;
 
     while let Some(row) = rows.next()? {
+        if names.is_none() {
+            names = Some(row.to_column_names());
+        }
         result.push(row.to_result_row()?);
     }
 
-    Ok(result)
+    Ok((names.unwrap_or_default(), result))
 }
 
 // Exploits that sqlite::Transaction implements std::ops::Deref<&sqlite::Connection>.
@@ -91,14 +95,14 @@ impl<'a> Connection for SqliteTransaction<'a> {
         execute_impl(self, q)
     }
 
-    fn query(&mut self, q: Query) -> QueryResult<Vec<ResultRow>> {
+    fn query(&mut self, q: Query) -> QueryResult<(ColumnNames, Vec<ResultRow>)> {
         query_impl(self, q)
     }
     fn query_raw(
         &mut self,
         sql: &str,
         params: &[ParameterizedValue],
-    ) -> QueryResult<Vec<ResultRow>> {
+    ) -> QueryResult<(ColumnNames, Vec<ResultRow>)> {
         query_raw_impl(self, sql, params)
     }
 }
@@ -108,14 +112,14 @@ impl Connection for SqliteConnection {
         execute_impl(self, q)
     }
 
-    fn query(&mut self, q: Query) -> QueryResult<Vec<ResultRow>> {
+    fn query(&mut self, q: Query) -> QueryResult<(ColumnNames, Vec<ResultRow>)> {
         query_impl(self, q)
     }
     fn query_raw(
         &mut self,
         sql: &str,
         params: &[ParameterizedValue],
-    ) -> QueryResult<Vec<ResultRow>> {
+    ) -> QueryResult<(ColumnNames, Vec<ResultRow>)> {
         query_raw_impl(self, sql, params)
     }
 }
@@ -146,6 +150,18 @@ impl<'a> ToResultRow for SqliteRow<'a> {
         }
 
         Ok(row)
+    }
+}
+
+impl<'a> ToColumnNames for SqliteRow<'a> {
+    fn to_column_names<'b>(&'b self) -> ColumnNames {
+        let mut names = ColumnNames::default();
+
+        for column in self.columns().iter() {
+            names.names.push(String::from(column.name()))
+        }
+
+        names
     }
 }
 

@@ -8,6 +8,11 @@ pub trait ToResultRow {
     fn to_result_row<'b>(&'b self) -> QueryResult<ResultRow>;
 }
 
+pub trait ToColumnNames {
+    fn to_column_names<'b>(&'b self) -> ColumnNames;
+}
+
+
 /// Represents a transaction.
 pub trait Transaction: Connection {}
 
@@ -26,7 +31,7 @@ pub trait Connection {
     /// Executes the given query and returns the result set.
     ///
     /// This is typically used for select queries.
-    fn query(&mut self, q: Query) -> QueryResult<Vec<ResultRow>>;
+    fn query(&mut self, q: Query) -> QueryResult<(ColumnNames, Vec<ResultRow>)>;
 
     /// Executes a query given as SQL, interpolating the given parameters.
     ///
@@ -35,7 +40,7 @@ pub trait Connection {
         &mut self,
         sql: &str,
         params: &[ParameterizedValue],
-    ) -> QueryResult<Vec<ResultRow>>;
+    ) -> QueryResult<(ColumnNames, Vec<ResultRow>)>;
 }
 
 pub trait Connectional {
@@ -62,6 +67,11 @@ pub trait Transactional {
 #[derive(Debug, Default, PartialEq, Clone)]
 pub struct ResultRow {
     pub values: Vec<ParameterizedValue>,
+}
+
+#[derive(Debug, Default, PartialEq, Clone)]
+pub struct ColumnNames {
+    pub names: Vec<String>,
 }
 
 impl ResultRow {
