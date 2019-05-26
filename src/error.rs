@@ -14,6 +14,8 @@ pub enum Error {
     ColumnReadFailure(FError),
     #[fail(display = "Error accessing result set, index out of bounds: {}", _0)]
     ResultIndexOutOfBounts(usize),
+    #[fail(display = "Error accessing result set, column not found: {}", _0)]
+    ColumnNotFound(String),
     #[fail(
         display = "Error accessing result set, type missmatch, expected: {}",
         _0
