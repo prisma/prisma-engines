@@ -13,6 +13,7 @@ use rusqlite::{
 };
 use std::collections::HashSet;
 
+type PooledConnection = r2d2::PooledConnection<r2d2_sqlite::SqliteConnectionManager>;
 type Pool = r2d2::Pool<SqliteConnectionManager>;
 
 pub struct Sqlite {
@@ -27,7 +28,7 @@ impl Transactional for Sqlite {
         F: FnOnce(&mut Transaction) -> QueryResult<T>,
     {
         self.with_connection_internal(db, |ref mut conn| {
-            let mut tx = conn.transaction()?;
+            let mut tx = conn.get_mut().transaction()?;
             tx.set_prepared_statement_cache_capacity(65536);
 
             let result = f(&mut tx);
@@ -45,6 +46,14 @@ impl Connectional for Sqlite {
     fn with_connection<F, T>(&self, db: &str, f: F) -> QueryResult<T>
     where
         F: FnOnce(&mut Connection) -> QueryResult<T>,
+    {
+        self.with_connection_internal(db, |c| f(c.get_mut()))
+    }
+
+
+    fn with_shared_connection<F, T>(&self, db: &str, f: F) -> QueryResult<T>
+    where
+        F: FnOnce(&mut std::cell::RefCell<Connection>) -> QueryResult<T>,
     {
         self.with_connection_internal(db, |c| f(c))
     }
@@ -90,6 +99,26 @@ fn query_raw_impl(
 // Exploits that sqlite::Transaction implements std::ops::Deref<&sqlite::Connection>.
 // Dereferenced Connection is immuteable!
 impl<'a> Transaction for SqliteTransaction<'a> {}
+
+// Trait implementation for r2d2 pooled connection, needed for RefCell.
+impl Connection for PooledConnection { 
+    fn execute(&mut self, q: Query) -> QueryResult<Option<Id>> {
+        execute_impl(self, q)
+    }
+
+    fn query(&mut self, q: Query) -> QueryResult<(ColumnNames, Vec<ResultRow>)> {
+        query_impl(self, q)
+    }
+    fn query_raw(
+        &mut self,
+        sql: &str,
+        params: &[ParameterizedValue],
+    ) -> QueryResult<(ColumnNames, Vec<ResultRow>)> {
+        query_raw_impl(self, sql, params)
+    }
+}
+
+// Trait implementation for r2d2 sqlite.
 impl<'a> Connection for SqliteTransaction<'a> {
     fn execute(&mut self, q: Query) -> QueryResult<Option<Id>> {
         execute_impl(self, q)
@@ -211,15 +240,15 @@ impl Sqlite {
 
     fn with_connection_internal<F, T>(&self, db: &str, f: F) -> QueryResult<T>
     where
-        F: FnOnce(&mut SqliteConnection) -> QueryResult<T>,
+        F: FnOnce(&mut std::cell::RefCell<PooledConnection>) -> QueryResult<T>,
     {
-        let mut conn = self.pool.get()?;
-        self.attach_database(&mut conn, db)?;
+        let mut conn = std::cell::RefCell::new(self.pool.get()?);
+        self.attach_database(conn.get_mut(), db)?;
 
         let result = f(&mut conn);
 
         if self.test_mode {
-            SqliteConnection::execute(&conn, "DETACH DATABASE ?", &[db])?;
+            SqliteConnection::execute(conn.get_mut(), "DETACH DATABASE ?", &[db])?;
         }
 
         result

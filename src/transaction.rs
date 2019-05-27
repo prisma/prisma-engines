@@ -51,6 +51,11 @@ pub trait Connectional {
     fn with_connection<F, T>(&self, db: &str, f: F) -> QueryResult<T>
     where
         F: FnOnce(&mut Connection) -> QueryResult<T>;
+
+
+    fn with_shared_connection<F, T>(&self, db: &str, f: F) -> QueryResult<T>
+    where
+        F: FnOnce(&mut std::cell::RefCell<Connection>) -> QueryResult<T>;
 }
 
 pub trait Transactional {
