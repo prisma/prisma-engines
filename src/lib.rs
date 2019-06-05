@@ -105,6 +105,6 @@ mod result_set;
 mod transaction;
 
 pub use result_set::*;
-pub use transaction::{ResultRow, ToResultRow};
+pub use transaction::{Connectional, ResultRow, ToResultRow, Transactional};
 
 pub type QueryResult<T> = Result<T, error::Error>;

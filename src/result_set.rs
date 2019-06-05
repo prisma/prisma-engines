@@ -20,6 +20,7 @@ impl ResultSet {
         }
     }
 
+    /// Creates a lookup map for column names.
     pub(crate) fn build_name_map(names: &ColumnNames) -> HashMap<String, usize> {
         let mut mapped = HashMap::<String, usize>::new();
 
