@@ -1,10 +1,14 @@
+use crate::{
+    ast::ParameterizedValue,
+    error::Error,
+    transaction::{ColumnNames, ResultRow},
+};
 use std::collections::HashMap;
-use crate::{error::Error, transaction::{ ResultRow, ColumnNames }, ast::ParameterizedValue};
 
 /// Encapsulates a set of results and their respective column names.
 pub struct ResultSet {
     pub(crate) rows: Vec<ResultRow>,
-    pub(crate) name_to_index: HashMap<String, usize>
+    pub(crate) name_to_index: HashMap<String, usize>,
 }
 
 impl ResultSet {
@@ -12,7 +16,7 @@ impl ResultSet {
     pub fn new(names: &ColumnNames, values: Vec<ResultRow>) -> ResultSet {
         ResultSet {
             name_to_index: Self::build_name_map(names),
-            rows: values
+            rows: values,
         }
     }
 
@@ -25,12 +29,12 @@ impl ResultSet {
 
         mapped
     }
-    
+
     /// Creates a new, empty instance.
-    pub(crate) fn empty() -> ResultSet { 
+    pub(crate) fn empty() -> ResultSet {
         ResultSet {
             name_to_index: HashMap::new(),
-            rows: Vec::new()
+            rows: Vec::new(),
         }
     }
 
@@ -38,13 +42,16 @@ impl ResultSet {
     pub fn column_index(&self, name: &str) -> Result<usize, Error> {
         match self.name_to_index.get(name) {
             None => Err(Error::ColumnNotFound(String::from(name))),
-            Some(idx) => Ok(*idx)
+            Some(idx) => Ok(*idx),
         }
     }
 
     /// Returns an interator over wrapped result rows.
     pub fn iter(&self) -> impl std::iter::Iterator<Item = ResultRowWithName> {
-        self.rows.iter().map(move |val| ResultRowWithName { values: val, parent_set: self })
+        self.rows.iter().map(move |val| ResultRowWithName {
+            values: val,
+            parent_set: self,
+        })
     }
 }
 
@@ -52,11 +59,10 @@ impl ResultSet {
 /// by name.
 pub struct ResultRowWithName<'a> {
     parent_set: &'a ResultSet,
-    values: &'a ResultRow
+    values: &'a ResultRow,
 }
 
-impl<'a> ResultRowWithName<'a>  {
-
+impl<'a> ResultRowWithName<'a> {
     // TODO: If the API is fixed, reduce internal duplication by moving
     // getters for specific types to ParameterizedValue
 
@@ -150,5 +156,4 @@ impl<'a> ResultRowWithName<'a>  {
             _ => Err(Error::ResultTypeMissmatch("boolean")),
         }
     }
-
 }

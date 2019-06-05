@@ -101,10 +101,10 @@ pub mod connector;
 pub mod error;
 pub mod visitor;
 
-mod transaction;
 mod result_set;
+mod transaction;
 
-pub use transaction::{ResultRow, ToResultRow};
 pub use result_set::*;
+pub use transaction::{ResultRow, ToResultRow};
 
 pub type QueryResult<T> = Result<T, error::Error>;

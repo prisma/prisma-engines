@@ -1,10 +1,12 @@
 use crate::{
     ast::{Id, ParameterizedValue, Query},
     error::Error,
-    transaction::{Connection, Connectional, ResultRow, ToResultRow, ToColumnNames, Transaction, Transactional, ColumnNames},
+    transaction::{
+        ColumnNames, Connection, Connectional, ResultRow, ToColumnNames, ToResultRow, Transaction,
+        Transactional,
+    },
     visitor::{self, Visitor},
-    QueryResult,
-    ResultSet
+    QueryResult, ResultSet,
 };
 use libsqlite3_sys as ffi;
 use r2d2_sqlite::SqliteConnectionManager;
@@ -94,7 +96,7 @@ fn query_raw_impl(
 impl<'a> Transaction for SqliteTransaction<'a> {}
 
 // Trait implementation for r2d2 pooled connection, needed for RefCell.
-impl Connection for PooledConnection { 
+impl Connection for PooledConnection {
     fn execute(&mut self, q: Query) -> QueryResult<Option<Id>> {
         execute_impl(self, q)
     }
@@ -102,11 +104,7 @@ impl Connection for PooledConnection {
     fn query(&mut self, q: Query) -> QueryResult<ResultSet> {
         query_impl(self, q)
     }
-    fn query_raw(
-        &mut self,
-        sql: &str,
-        params: &[ParameterizedValue],
-    ) -> QueryResult<ResultSet> {
+    fn query_raw(&mut self, sql: &str, params: &[ParameterizedValue]) -> QueryResult<ResultSet> {
         query_raw_impl(self, sql, params)
     }
 }
@@ -120,11 +118,7 @@ impl<'a> Connection for SqliteTransaction<'a> {
     fn query(&mut self, q: Query) -> QueryResult<ResultSet> {
         query_impl(self, q)
     }
-    fn query_raw(
-        &mut self,
-        sql: &str,
-        params: &[ParameterizedValue],
-    ) -> QueryResult<ResultSet> {
+    fn query_raw(&mut self, sql: &str, params: &[ParameterizedValue]) -> QueryResult<ResultSet> {
         query_raw_impl(self, sql, params)
     }
 }
@@ -137,11 +131,7 @@ impl Connection for SqliteConnection {
     fn query(&mut self, q: Query) -> QueryResult<ResultSet> {
         query_impl(self, q)
     }
-    fn query_raw(
-        &mut self,
-        sql: &str,
-        params: &[ParameterizedValue],
-    ) -> QueryResult<ResultSet> {
+    fn query_raw(&mut self, sql: &str, params: &[ParameterizedValue]) -> QueryResult<ResultSet> {
         query_raw_impl(self, sql, params)
     }
 }

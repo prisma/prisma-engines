@@ -1,7 +1,6 @@
 use crate::{
     ast::{Id, ParameterizedValue, Query},
-    QueryResult,
-    ResultSet
+    QueryResult, ResultSet,
 };
 
 pub trait ToResultRow {
@@ -11,7 +10,6 @@ pub trait ToResultRow {
 pub trait ToColumnNames {
     fn to_column_names<'b>(&'b self) -> ColumnNames;
 }
-
 
 /// Represents a transaction.
 pub trait Transaction: Connection {}
@@ -36,11 +34,7 @@ pub trait Connection {
     /// Executes a query given as SQL, interpolating the given parameters.
     ///
     /// This is needed, for example, for PRAGMA commands in sqlite.
-    fn query_raw(
-        &mut self,
-        sql: &str,
-        params: &[ParameterizedValue],
-    ) -> QueryResult<ResultSet>;
+    fn query_raw(&mut self, sql: &str, params: &[ParameterizedValue]) -> QueryResult<ResultSet>;
 }
 
 pub trait Connectional {
