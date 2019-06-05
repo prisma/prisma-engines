@@ -4,6 +4,7 @@ use crate::{
     transaction::{Connection, Connectional, ResultRow, ToResultRow, ToColumnNames, Transaction, Transactional, ColumnNames},
     visitor::{self, Visitor},
     QueryResult,
+    ResultSet
 };
 use libsqlite3_sys as ffi;
 use r2d2_sqlite::SqliteConnectionManager;
@@ -49,14 +50,6 @@ impl Connectional for Sqlite {
     {
         self.with_connection_internal(db, |c| f(c.get_mut()))
     }
-
-
-    fn with_shared_connection<F, T>(&self, db: &str, f: F) -> QueryResult<T>
-    where
-        F: FnOnce(&mut std::cell::RefCell<Connection>) -> QueryResult<T>,
-    {
-        self.with_connection_internal(db, |c| f(c))
-    }
 }
 
 // Concrete implmentations of trait methods, dropping the mut
@@ -70,7 +63,7 @@ fn execute_impl(conn: &SqliteConnection, q: Query) -> QueryResult<Option<Id>> {
     Ok(Some(Id::Int(conn.last_insert_rowid() as usize)))
 }
 
-fn query_impl(conn: &SqliteConnection, q: Query) -> QueryResult<(ColumnNames, Vec<ResultRow>)> {
+fn query_impl(conn: &SqliteConnection, q: Query) -> QueryResult<ResultSet> {
     let (sql, params) = dbg!(visitor::Sqlite::build(q));
 
     return query_raw_impl(conn, &sql, &params);
@@ -80,20 +73,20 @@ fn query_raw_impl(
     conn: &SqliteConnection,
     sql: &str,
     params: &[ParameterizedValue],
-) -> QueryResult<(ColumnNames, Vec<ResultRow>)> {
+) -> QueryResult<ResultSet> {
     let mut stmt = conn.prepare_cached(sql)?;
     let mut rows = stmt.query(params)?;
-    let mut result = Vec::new();
-    let mut names: Option<ColumnNames> = None;
+
+    let mut result = ResultSet::empty();
 
     while let Some(row) = rows.next()? {
-        if names.is_none() {
-            names = Some(row.to_column_names());
+        if result.name_to_index.len() == 0 {
+            result.name_to_index = ResultSet::build_name_map(&row.to_column_names())
         }
-        result.push(row.to_result_row()?);
+        result.rows.push(row.to_result_row()?);
     }
 
-    Ok((names.unwrap_or_default(), result))
+    Ok(result)
 }
 
 // Exploits that sqlite::Transaction implements std::ops::Deref<&sqlite::Connection>.
@@ -106,14 +99,14 @@ impl Connection for PooledConnection {
         execute_impl(self, q)
     }
 
-    fn query(&mut self, q: Query) -> QueryResult<(ColumnNames, Vec<ResultRow>)> {
+    fn query(&mut self, q: Query) -> QueryResult<ResultSet> {
         query_impl(self, q)
     }
     fn query_raw(
         &mut self,
         sql: &str,
         params: &[ParameterizedValue],
-    ) -> QueryResult<(ColumnNames, Vec<ResultRow>)> {
+    ) -> QueryResult<ResultSet> {
         query_raw_impl(self, sql, params)
     }
 }
@@ -124,14 +117,14 @@ impl<'a> Connection for SqliteTransaction<'a> {
         execute_impl(self, q)
     }
 
-    fn query(&mut self, q: Query) -> QueryResult<(ColumnNames, Vec<ResultRow>)> {
+    fn query(&mut self, q: Query) -> QueryResult<ResultSet> {
         query_impl(self, q)
     }
     fn query_raw(
         &mut self,
         sql: &str,
         params: &[ParameterizedValue],
-    ) -> QueryResult<(ColumnNames, Vec<ResultRow>)> {
+    ) -> QueryResult<ResultSet> {
         query_raw_impl(self, sql, params)
     }
 }
@@ -141,14 +134,14 @@ impl Connection for SqliteConnection {
         execute_impl(self, q)
     }
 
-    fn query(&mut self, q: Query) -> QueryResult<(ColumnNames, Vec<ResultRow>)> {
+    fn query(&mut self, q: Query) -> QueryResult<ResultSet> {
         query_impl(self, q)
     }
     fn query_raw(
         &mut self,
         sql: &str,
         params: &[ParameterizedValue],
-    ) -> QueryResult<(ColumnNames, Vec<ResultRow>)> {
+    ) -> QueryResult<ResultSet> {
         query_raw_impl(self, sql, params)
     }
 }

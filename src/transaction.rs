@@ -1,6 +1,7 @@
 use crate::{
     ast::{Id, ParameterizedValue, Query},
     QueryResult,
+    ResultSet
 };
 
 pub trait ToResultRow {
@@ -30,7 +31,7 @@ pub trait Connection {
     /// Executes the given query and returns the result set.
     ///
     /// This is typically used for select queries.
-    fn query(&mut self, q: Query) -> QueryResult<(ColumnNames, Vec<ResultRow>)>;
+    fn query(&mut self, q: Query) -> QueryResult<ResultSet>;
 
     /// Executes a query given as SQL, interpolating the given parameters.
     ///
@@ -39,7 +40,7 @@ pub trait Connection {
         &mut self,
         sql: &str,
         params: &[ParameterizedValue],
-    ) -> QueryResult<(ColumnNames, Vec<ResultRow>)>;
+    ) -> QueryResult<ResultSet>;
 }
 
 pub trait Connectional {
@@ -51,11 +52,6 @@ pub trait Connectional {
     fn with_connection<F, T>(&self, db: &str, f: F) -> QueryResult<T>
     where
         F: FnOnce(&mut Connection) -> QueryResult<T>;
-
-
-    fn with_shared_connection<F, T>(&self, db: &str, f: F) -> QueryResult<T>
-    where
-        F: FnOnce(&mut std::cell::RefCell<Connection>) -> QueryResult<T>;
 }
 
 pub trait Transactional {

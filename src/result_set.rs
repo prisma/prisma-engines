@@ -2,58 +2,60 @@ use std::collections::HashMap;
 use crate::{error::Error, transaction::{ ResultRow, ColumnNames }, ast::ParameterizedValue};
 
 /// Encapsulates a set of results and their respective column names.
-pub struct ResultSet<'a> {
-    values: &'a Vec<ResultRow>,
-    #[allow(dead_code)]
-    names: &'a ColumnNames,
-    mapped_names: HashMap<&'a str, usize>
+pub struct ResultSet {
+    pub(crate) rows: Vec<ResultRow>,
+    pub(crate) name_to_index: HashMap<String, usize>
 }
 
-/// Convenience conversion method.
-impl<'a> From<(&'a ColumnNames, &'a Vec<ResultRow>)> for ResultSet<'a> {
-    fn from(result: (&'a ColumnNames, &'a Vec<ResultRow>)) -> ResultSet<'a>  {
-        ResultSet::<'a>::new(result.0, result.1)
-    }
-}
-
-impl<'a> ResultSet<'a> {
+impl ResultSet {
     /// Creates a new instance, bound to the given column names and result rows.
-    pub fn new(names: &'a ColumnNames, values: &'a Vec<ResultRow>) -> ResultSet<'a> {
-        let mut mapped = HashMap::<&'a str, usize>::new();
+    pub fn new(names: &ColumnNames, values: Vec<ResultRow>) -> ResultSet {
+        ResultSet {
+            name_to_index: Self::build_name_map(names),
+            rows: values
+        }
+    }
 
-        for (i, name) in names.names.iter().enumerate() {
-            mapped.insert(name, i);
+    pub(crate) fn build_name_map(names: &ColumnNames) -> HashMap<String, usize> {
+        let mut mapped = HashMap::<String, usize>::new();
+
+        for i in 0..names.names.len() {
+            mapped.insert(names.names[i].clone(), i);
         }
 
+        mapped
+    }
+    
+    /// Creates a new, empty instance.
+    pub(crate) fn empty() -> ResultSet { 
         ResultSet {
-            mapped_names: mapped,
-            values: values,
-            names: names
+            name_to_index: HashMap::new(),
+            rows: Vec::new()
         }
     }
 
     /// Finds a column index for a name.
     pub fn column_index(&self, name: &str) -> Result<usize, Error> {
-        match self.mapped_names.get(name) {
+        match self.name_to_index.get(name) {
             None => Err(Error::ColumnNotFound(String::from(name))),
             Some(idx) => Ok(*idx)
         }
     }
 
     /// Returns an interator over wrapped result rows.
-    pub fn iter(&'a self) -> impl std::iter::Iterator<Item = ResultRowWithName<'a>> {
-        self.values.iter().map(move |val| ResultRowWithName::<'a> { values: val, parent_set: self })
+    pub fn iter(&self) -> impl std::iter::Iterator<Item = ResultRowWithName> {
+        self.rows.iter().map(move |val| ResultRowWithName { values: val, parent_set: self })
     }
 }
 
 /// Wraps a result row, so it's columns can be accessed
 /// by name.
 pub struct ResultRowWithName<'a> {
-    parent_set: &'a ResultSet<'a>,
+    parent_set: &'a ResultSet,
     values: &'a ResultRow
 }
 
-impl<'a>  ResultRowWithName<'a>  {
+impl<'a> ResultRowWithName<'a>  {
 
     // TODO: If the API is fixed, reduce internal duplication by moving
     // getters for specific types to ParameterizedValue

@@ -99,11 +99,12 @@
 pub mod ast;
 pub mod connector;
 pub mod error;
-pub mod transaction;
 pub mod visitor;
 
-pub mod convenience;
+mod transaction;
+mod result_set;
 
 pub use transaction::{ResultRow, ToResultRow};
+pub use result_set::*;
 
 pub type QueryResult<T> = Result<T, error::Error>;
