@@ -88,6 +88,10 @@ impl Visitor for Mysql {
             (None, None) => None,
         }
     }
+
+    fn visit_aggregate_to_string(&mut self, value: DatabaseValue) -> String {
+        format!("group_concat({})", self.visit_database_value(value))
+    }
 }
 
 impl From<ParameterizedValue> for MyValue {

@@ -58,6 +58,9 @@ pub trait Visitor {
     /// What to use to substitute a parameter in the query.
     fn parameter_substitution(&self) -> String;
 
+    /// What to use to substitute a parameter in the query.
+    fn visit_aggregate_to_string(&mut self, value: DatabaseValue) -> String;
+
     /// A visit to a value we parameterize
     fn visit_parameterized(&mut self, value: ParameterizedValue) -> String {
         self.add_parameter(value);
@@ -127,6 +130,9 @@ pub trait Visitor {
             }
             if !select.ordering.is_empty() {
                 result.push(format!("ORDER BY {}", self.visit_ordering(select.ordering)));
+            }
+            if !select.grouping.is_empty() {
+                result.push(format!("GROUP BY {}", self.visit_grouping(select.grouping)));
             }
 
             if let Some(window) = self.visit_limit_and_offset(select.limit, select.offset) {
@@ -479,6 +485,17 @@ pub trait Visitor {
         result.join(", ")
     }
 
+    /// A visit in the `GROUP BY` section of the query
+    fn visit_grouping(&mut self, grouping: Grouping) -> String {
+        let mut result = Vec::new();
+
+        for value in grouping.0.into_iter() {
+            result.push(format!("{}", self.visit_database_value(value)));
+        }
+
+        result.join(", ")
+    }
+
     fn visit_function(&mut self, fun: Function) -> String {
         let mut result = match fun.typ_ {
             FunctionType::RowNumber(fun_rownum) => {
@@ -497,6 +514,9 @@ pub trait Visitor {
                 } else {
                     format!("COUNT({})", self.visit_columns(fun_count.exprs))
                 }
+            }
+            FunctionType::AggregateToString(agg) => {
+                self.visit_aggregate_to_string(agg.value.as_ref().clone())
             }
         };
 

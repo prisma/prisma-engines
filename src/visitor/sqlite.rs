@@ -94,6 +94,10 @@ impl Visitor for Sqlite {
             (None, None) => None,
         }
     }
+
+    fn visit_aggregate_to_string(&mut self, value: DatabaseValue) -> String {
+        format!("group_concat({})", self.visit_database_value(value))
+    }
 }
 
 #[cfg(feature = "sqlite")]
