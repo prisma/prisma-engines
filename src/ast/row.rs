@@ -3,7 +3,7 @@ use crate::ast::{Comparable, Compare, DatabaseValue};
 /// A collection of values surrounded by parentheses.
 #[derive(Debug, Default, PartialEq, Clone)]
 pub struct Row {
-    pub(crate) values: Vec<DatabaseValue>,
+    pub values: Vec<DatabaseValue>,
 }
 
 impl Row {
