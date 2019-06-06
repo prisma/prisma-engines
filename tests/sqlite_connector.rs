@@ -9,7 +9,7 @@ fn should_provide_a_database_connection() {
             let res = connection.query_raw("SELECT * FROM sqlite_master", &[])?;
 
             // No results expected.
-            assert_eq!(res.iter().next().is_none(), true);
+            assert_eq!(res.into_iter().next().is_none(), true);
 
             Ok(())
         })
@@ -25,7 +25,7 @@ fn should_provide_a_database_transaction() {
             let res = transaction.query_raw("SELECT * FROM sqlite_master", &[])?;
 
             // No results expected.
-            assert_eq!(res.iter().next().is_none(), true);
+            assert_eq!(res.into_iter().next().is_none(), true);
 
             Ok(())
         })
@@ -60,7 +60,7 @@ fn should_map_columns_correctly() {
             let mut result_count: u32 = 0;
 
             // Exactly one result expected.
-            for row in res.iter() {
+            for row in &res {
                 assert_eq!(row.get_as_integer("ID")?, 1);
                 assert_eq!(row.get_as_string("NAME")?, "Joe");
                 assert_eq!(row.get_as_integer("AGE")?, 27);

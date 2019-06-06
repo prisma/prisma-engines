@@ -7,6 +7,9 @@ use std::collections::HashMap;
 
 /// Encapsulates a set of results and their respective column names.
 pub struct ResultSet {
+    /// DO NOT expose these fields.
+    /// ResultSet might become lazy-loading one day,
+    /// no longer backed by a vector.
     pub(crate) rows: Vec<ResultRow>,
     pub(crate) name_to_index: HashMap<String, usize>,
 }
@@ -21,7 +24,7 @@ impl ResultSet {
     }
 
     /// Creates a lookup map for column names.
-    pub(crate) fn build_name_map(names: &ColumnNames) -> HashMap<String, usize> {
+    fn build_name_map(names: &ColumnNames) -> HashMap<String, usize> {
         let mut mapped = HashMap::<String, usize>::new();
 
         for i in 0..names.names.len() {
@@ -31,14 +34,6 @@ impl ResultSet {
         mapped
     }
 
-    /// Creates a new, empty instance.
-    pub(crate) fn empty() -> ResultSet {
-        ResultSet {
-            name_to_index: HashMap::new(),
-            rows: Vec::new(),
-        }
-    }
-
     /// Finds a column index for a name.
     pub fn column_index(&self, name: &str) -> Result<usize, Error> {
         match self.name_to_index.get(name) {
@@ -46,13 +41,45 @@ impl ResultSet {
             Some(idx) => Ok(*idx),
         }
     }
+}
+
+/// Into iterator implementation for ResultSet.
+/// Note: This has to be implemented on &ResultSet, otherwise
+/// it's impossible to carry on the lifetimes.
+impl<'a> IntoIterator for &'a ResultSet {
+    type Item = ResultRowWithName<'a>;
+    type IntoIter = ResultSetIterator<'a>;
 
     /// Returns an interator over wrapped result rows.
-    pub fn iter(&self) -> impl std::iter::Iterator<Item = ResultRowWithName> {
-        self.rows.iter().map(move |val| ResultRowWithName {
-            values: val,
+    fn into_iter(self) -> Self::IntoIter {
+        ResultSetIterator {
             parent_set: self,
-        })
+            index: 0,
+        }
+    }
+}
+
+/// Thin iterator for ResultSet rows.
+/// Might become lazy one day.
+pub struct ResultSetIterator<'a> {
+    parent_set: &'a ResultSet,
+    index: usize,
+}
+
+impl<'a> Iterator for ResultSetIterator<'a> {
+    type Item = ResultRowWithName<'a>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.parent_set.rows.len() > self.index {
+            let row = ResultRowWithName {
+                parent_set: self.parent_set,
+                values: &self.parent_set.rows[self.index],
+            };
+            self.index += 1;
+            Some(row)
+        } else {
+            None
+        }
     }
 }
 

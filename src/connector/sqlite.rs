@@ -12,7 +12,8 @@ use libsqlite3_sys as ffi;
 use r2d2_sqlite::SqliteConnectionManager;
 use rusqlite::{
     types::{FromSqlError, ValueRef},
-    Connection as SqliteConnection, Row as SqliteRow, Transaction as SqliteTransaction, NO_PARAMS,
+    Connection as SqliteConnection, Row as SqliteRow, Rows as SqliteRows,
+    Transaction as SqliteTransaction, NO_PARAMS,
 };
 use std::collections::HashSet;
 
@@ -79,12 +80,9 @@ fn query_raw_impl(
     let mut stmt = conn.prepare_cached(sql)?;
     let mut rows = stmt.query(params)?;
 
-    let mut result = ResultSet::empty();
+    let mut result = ResultSet::new(&rows.to_column_names(), Vec::new());
 
     while let Some(row) = rows.next()? {
-        if result.name_to_index.len() == 0 {
-            result.name_to_index = ResultSet::build_name_map(&row.to_column_names())
-        }
         result.rows.push(row.to_result_row()?);
     }
 
@@ -104,6 +102,7 @@ impl Connection for PooledConnection {
     fn query(&mut self, q: Query) -> QueryResult<ResultSet> {
         query_impl(self, q)
     }
+
     fn query_raw(&mut self, sql: &str, params: &[ParameterizedValue]) -> QueryResult<ResultSet> {
         query_raw_impl(self, sql, params)
     }
@@ -118,6 +117,7 @@ impl<'a> Connection for SqliteTransaction<'a> {
     fn query(&mut self, q: Query) -> QueryResult<ResultSet> {
         query_impl(self, q)
     }
+
     fn query_raw(&mut self, sql: &str, params: &[ParameterizedValue]) -> QueryResult<ResultSet> {
         query_raw_impl(self, sql, params)
     }
@@ -131,6 +131,7 @@ impl Connection for SqliteConnection {
     fn query(&mut self, q: Query) -> QueryResult<ResultSet> {
         query_impl(self, q)
     }
+
     fn query_raw(&mut self, sql: &str, params: &[ParameterizedValue]) -> QueryResult<ResultSet> {
         query_raw_impl(self, sql, params)
     }
@@ -165,12 +166,14 @@ impl<'a> ToResultRow for SqliteRow<'a> {
     }
 }
 
-impl<'a> ToColumnNames for SqliteRow<'a> {
+impl<'a> ToColumnNames for SqliteRows<'a> {
     fn to_column_names<'b>(&'b self) -> ColumnNames {
         let mut names = ColumnNames::default();
 
-        for column in self.columns().iter() {
-            names.names.push(String::from(column.name()))
+        if let Some(columns) = self.column_names() {
+            for column in columns {
+                names.names.push(String::from(column));
+            }
         }
 
         names
