@@ -54,7 +54,7 @@ impl<'a> IntoIterator for &'a ResultSet {
     fn into_iter(self) -> Self::IntoIter {
         ResultSetIterator {
             parent_set: self,
-            index: 0,
+            internal_iterator: self.rows.iter(),
         }
     }
 }
@@ -63,22 +63,19 @@ impl<'a> IntoIterator for &'a ResultSet {
 /// Might become lazy one day.
 pub struct ResultSetIterator<'a> {
     parent_set: &'a ResultSet,
-    index: usize,
+    internal_iterator: std::slice::Iter<'a, ResultRow>,
 }
 
 impl<'a> Iterator for ResultSetIterator<'a> {
     type Item = ResultRowWithName<'a>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        if self.parent_set.rows.len() > self.index {
-            let row = ResultRowWithName {
+        match self.internal_iterator.next() {
+            Some(row) => Some(ResultRowWithName {
                 parent_set: self.parent_set,
-                values: &self.parent_set.rows[self.index],
-            };
-            self.index += 1;
-            Some(row)
-        } else {
-            None
+                values: &row,
+            }),
+            None => None,
         }
     }
 }
