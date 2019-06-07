@@ -1,12 +1,11 @@
 extern crate datamodel;
 
-const DATAMODEL_STRING: &str = r#"
-model User {
+const DATAMODEL_STRING: &str = r#"model User {
     id Int @id
     createdAt DateTime
     email String @unique
     name String?
-    posts Post[] @relation(onDelete: CASCADE)
+    posts Post[] @relation("author", onDelete: CASCADE)
     profile Profile?
     @@db("user")
 }
@@ -26,14 +25,14 @@ model Post {
     wasLiked Boolean @default(false)
     author User @relation("author")
     published Boolean @default(false)
-    categories Category[]
+    categories PostToCategory[]
     @@db("post")
 }
 
 model Category {
     id Int @id
     name String
-    posts Post[]
+    posts PostToCategory[]
     cat CategoryEnum
     @@db("category")
 }
@@ -47,7 +46,7 @@ model PostToCategory {
 
 model A {
     id Int @id
-    b B @relation(references: [id])
+    b B
 }
 
 model B {
@@ -59,8 +58,7 @@ enum CategoryEnum {
     A
     B
     C
-}
-"#;
+}"#;
 
 #[test]
 fn test_dmmf_roundtrip() {
@@ -72,4 +70,22 @@ fn test_dmmf_roundtrip() {
     println!("{}", rendered);
 
     assert_eq!(DATAMODEL_STRING, rendered);
+}
+
+const DATAMODEL_STRING_WITH_FUNCTIONS: &str = r#"model User {
+    id Int @id
+    createdAt DateTime @default(now())
+    someId String @default(cuid()) @unique
+}"#;
+
+#[test]
+fn test_dmmf_roundtrip_with_functions() {
+    let dml = datamodel::parse(&DATAMODEL_STRING_WITH_FUNCTIONS).unwrap();
+    let dmmf = datamodel::dmmf::render_to_dmmf(&dml);
+    let dml2 = datamodel::dmmf::parse_from_dmmf(&dmmf);
+    let rendered = datamodel::render(&dml2).unwrap();
+
+    println!("{}", rendered);
+
+    assert_eq!(DATAMODEL_STRING_WITH_FUNCTIONS, rendered);
 }
