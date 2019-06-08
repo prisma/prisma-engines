@@ -1,7 +1,8 @@
 use crate::{ast::*, visitor::Visitor};
-use postgres::types::{IsNull, ToSql, Type};
+use postgres::types::{IsNull, Type};
 use rust_decimal::Decimal;
 use std::{error::Error, str::FromStr};
+use tokio_postgres::types::ToSql;
 
 pub struct Postgres {
     parameters: Vec<ParameterizedValue>,

@@ -93,7 +93,7 @@ fn query_raw_impl(
 // Dereferenced Connection is immuteable!
 impl<'a> Transaction for SqliteTransaction<'a> {}
 
-// Trait implementation for r2d2 pooled connection, needed for RefCell.
+// Trait implementation for r2d2 pooled connection.
 impl Connection for PooledConnection {
     fn execute(&mut self, q: Query) -> QueryResult<Option<Id>> {
         execute_impl(self, q)
