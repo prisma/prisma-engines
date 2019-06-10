@@ -118,7 +118,6 @@ impl Bindable for ParameterizedValue {
     }
 }
 
-// TODO: This most likely should be in another class, as it is not related to sqlite.
 #[cfg(feature = "rusqlite")]
 impl ToSql for ParameterizedValue {
     fn to_sql(&self) -> Result<ToSqlOutput, RusqlError> {
@@ -129,7 +128,7 @@ impl ToSql for ParameterizedValue {
             ParameterizedValue::Text(string) => ToSqlOutput::from(string.clone()),
             ParameterizedValue::Boolean(boo) => ToSqlOutput::from(*boo),
             #[cfg(feature = "array")]
-            ParameterizedValue::Array(vec) => ToSqlOutput::from(vec),
+            ParameterizedValue::Array(_) => unimplemented!("Arrays are not supported for sqlite."),
             #[cfg(feature = "json-1")]
             ParameterizedValue::Json(value) => {
                 let stringified = serde_json::to_string(value)
