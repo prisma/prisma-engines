@@ -417,8 +417,7 @@ impl From<native_tls::Error> for Error {
 
 #[cfg(test)]
 mod tests {
-    use crate::{connector::PostgreSql, Connectional, Transactional};
-    use postgres::Config;
+    use super::*;
     use std::env;
 
     #[allow(unused)]
