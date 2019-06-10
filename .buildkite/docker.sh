@@ -2,7 +2,7 @@
 
 set -e
 
-docker network create test-net
+docker network create test-net || echo "Unable to create network. Ignoring fo rnow."
 docker run --name test-postgres --network test-net \
     -e POSTGRES_PASSWORD=prisma \
     -e POSTGRES_USER=prisma \
