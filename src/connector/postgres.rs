@@ -405,16 +405,12 @@ impl PostgreSql {
 
 impl From<postgres::error::Error> for Error {
     fn from(e: postgres::error::Error) -> Error {
-        dbg!(&e);
-        // TODO: Ask J how to map to Failure::Error
-        Error::NotFound
+        Error::QueryError(e.into())
     }
 }
 
 impl From<native_tls::Error> for Error {
     fn from(e: native_tls::Error) -> Error {
-        dbg!(&e);
-        // TODO: Ask J how to map to Failure::Error
-        Error::NotFound
+        Error::ConnectionError(e.into())
     }
 }

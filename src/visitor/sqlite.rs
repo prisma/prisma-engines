@@ -118,7 +118,7 @@ impl Bindable for ParameterizedValue {
     }
 }
 
-// TODO: This most likely needs to be in another class.
+// TODO: This most likely should be in another class, as it is not related to sqlite.
 #[cfg(feature = "rusqlite")]
 impl ToSql for ParameterizedValue {
     fn to_sql(&self) -> Result<ToSqlOutput, RusqlError> {
