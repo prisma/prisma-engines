@@ -26,7 +26,7 @@ impl Mysql {
         let manager = MysqlConnectionManager::new(conf);
 
         Ok(Mysql {
-            pool: r2d2::Pool::builder().build(manager)?
+            pool: r2d2::Pool::builder().build(manager)?,
         })
     }
 }
@@ -48,7 +48,6 @@ impl Transactional for Mysql {
     }
 }
 
-
 impl Connectional for Mysql {
     fn with_connection<F, T>(&self, _db: &str, f: F) -> QueryResult<T>
     where
@@ -62,14 +61,18 @@ impl Connectional for Mysql {
 }
 
 fn conv_params(params: &[ParameterizedValue]) -> my::params::Params {
-    my::params::Params::Positional(
-        params.iter().map(|x| x.into()).collect::<Vec<my::Value>>()
-    )
+    if params.len() > 0 {
+        my::params::Params::Positional(params.iter().map(|x| x.into()).collect::<Vec<my::Value>>())
+    } else {
+        // If we don't use explicit 'Empty',
+        // mysql crashes with 'internal error: entered unreachable code'
+        my::params::Params::Empty
+    }
 }
 
-impl<'a> Transaction for my::Transaction<'a> { }
+impl<'a> Transaction for my::Transaction<'a> {}
 
-impl<'a> Connection for my::Transaction<'a> { 
+impl<'a> Connection for my::Transaction<'a> {
     fn execute(&mut self, q: Query) -> QueryResult<Option<Id>> {
         let (sql, params) = dbg!(visitor::Mysql::build(q));
         let mut stmt = self.prepare(&sql)?;
@@ -124,12 +127,11 @@ impl Connection for PooledConnection {
         }
 
         Ok(result)
-    }   
+    }
 }
 
 impl ToResultRow for my::Row {
-    fn to_result_row<'b>(&'b self) -> QueryResult<ResultRow>
-    {
+    fn to_result_row<'b>(&'b self) -> QueryResult<ResultRow> {
         fn convert(row: &my::Row, i: usize) -> QueryResult<ParameterizedValue> {
             // TODO: It would prob. be better to inver via Column::column_type()
             let raw_value = row.as_ref(i).unwrap_or(&my::Value::NULL);
@@ -141,11 +143,8 @@ impl ToResultRow for my::Row {
                 my::Value::UInt(i) => ParameterizedValue::Integer(*i as i64),
                 my::Value::Float(f) => ParameterizedValue::Real(*f),
                 my::Value::Date(year, month, day, hour, min, sec, _) => {
-                    let naive = NaiveDate::from_ymd(*year as i32, *month as u32, *day as u32).and_hms(
-                        *hour as u32,
-                        *min as u32,
-                        *sec as u32,
-                    );
+                    let naive = NaiveDate::from_ymd(*year as i32, *month as u32, *day as u32)
+                        .and_hms(*hour as u32, *min as u32, *sec as u32);
 
                     let dt: DateTime<Utc> = DateTime::from_utc(naive, Utc);
                     ParameterizedValue::DateTime(dt)

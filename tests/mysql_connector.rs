@@ -4,11 +4,11 @@ use std::env;
 
 fn get_config() -> OptsBuilder {
     let mut config = OptsBuilder::new();
-    config.ip_or_hostname(env::var("TEST_MYSQL_HOST"));
-    config.tcp_por(env::var("TEST_MYSQL_HOST").map(|x| x.parse::<u16>()));
-    config.db_name(env::var("TEST_MYSQL_PORT").unwrap());
-    config.pass(env::var("TEST_MYSQL_PASSWORD").unwrap());
-    config.user(env::var("TEST_MYSQL_USER").unwrap());
+    config.ip_or_hostname(env::var("TEST_MYSQL_HOST").ok());
+    config.tcp_port(env::var("TEST_MYSQL_PORT").unwrap().parse::<u16>().unwrap());
+    config.db_name(env::var("TEST_MYSQL_DB").ok());
+    config.pass(env::var("TEST_MYSQL_PASSWORD").ok());
+    config.user(env::var("TEST_MYSQL_USER").ok());
     config
 }
 
@@ -19,7 +19,7 @@ fn should_provide_a_database_connection() {
     connector
         .with_connection("TEST", |connection| {
             let res = connection.query_raw(
-                "select * from \"pg_catalog\".\"pg_am\" where amtype = 'x'",
+                "select * from information_schema.`COLUMNS` where COLUMN_NAME = 'unknown_123'",
                 &[],
             )?;
 
@@ -38,7 +38,7 @@ fn should_provide_a_database_transaction() {
     connector
         .with_transaction("TEST", |transaction| {
             let res = transaction.query_raw(
-                "select * from \"pg_catalog\".\"pg_am\" where amtype = 'x'",
+                "select * from information_schema.`COLUMNS` where COLUMN_NAME = 'unknown_123'",
                 &[],
             )?;
 
@@ -51,7 +51,7 @@ fn should_provide_a_database_transaction() {
 }
 
 const TABLE_DEF: &str = r#"
-CREATE TABLE "user"(
+CREATE TABLE `user`(
     id       int4    PRIMARY KEY     NOT NULL,
     name     text    NOT NULL,
     age      int4    NOT NULL,
@@ -60,11 +60,11 @@ CREATE TABLE "user"(
 "#;
 
 const CREATE_USER: &str = r#"
-INSERT INTO "user" (id, name, age, salary)
+INSERT INTO `user` (id, name, age, salary)
 VALUES (1, 'Joe', 27, 20000.00 );
 "#;
 
-const DROP_TABLE: &str = "DROP TABLE IF EXISTS \"user\";";
+const DROP_TABLE: &str = "DROP TABLE IF EXISTS `user`;";
 
 #[test]
 fn should_map_columns_correctly() {
@@ -76,7 +76,7 @@ fn should_map_columns_correctly() {
             connection.query_raw(TABLE_DEF, &[]).unwrap();
             connection.query_raw(CREATE_USER, &[]).unwrap();
 
-            let res = connection.query_raw("SELECT * FROM \"user\"", &[]).unwrap();
+            let res = connection.query_raw("SELECT * FROM `user`", &[]).unwrap();
 
             let mut result_count: u32 = 0;
 
