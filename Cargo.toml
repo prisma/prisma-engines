@@ -10,15 +10,14 @@ authors = [
 edition = "2018"
 
 [features]
-default = ["rusqlite-client", "json-1", "postgresql-0_16", "uuid-0_7", "chrono-0_4", "mysql_sync", "postgresql" ]
+default = ["rusqlite-client", "json-1", "postgresql-0_16", "uuid-0_7", "chrono-0_4", "mysql_sync" ]
 rusqlite-client = ["rusqlite", "r2d2_sqlite", "r2d2", "libsqlite3-sys"]
 sqlite3 = ["sqlite", "r2d2", "r2d2_sqlite"]
 json-1 = ["serde_json"]
-postgresql-0_16 = ["postgres", "rust_decimal", "r2d2"]
+postgresql-0_16 = ["postgres", "rust_decimal", "r2d2", "r2d2_postgres", "native-tls", "tokio-postgres", "tokio-postgres-native-tls"]
 uuid-0_7 = ["uuid"]
 chrono-0_4 = ["chrono"]
 mysql_sync = ["mysql", "r2d2"]
-postgresql = ["postgres", "r2d2_postgres", "native-tls", "rust_decimal", "tokio-postgres", "tokio-postgres-native-tls"]
 
 [dependencies]
 failure = "0.1"
