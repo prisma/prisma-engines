@@ -289,7 +289,7 @@ impl From<FromSqlError> for Error {
 
 #[cfg(test)]
 mod tests {
-    use crate::{connector::Sqlite, Connectional, Transactional};
+    use super::*;
 
     #[test]
     fn should_provide_a_database_connection() {
