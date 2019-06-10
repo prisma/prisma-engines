@@ -118,6 +118,7 @@ impl Bindable for ParameterizedValue {
     }
 }
 
+// TODO: This most likely needs to be in another class.
 #[cfg(feature = "rusqlite")]
 impl ToSql for ParameterizedValue {
     fn to_sql(&self) -> Result<ToSqlOutput, RusqlError> {
@@ -127,6 +128,8 @@ impl ToSql for ParameterizedValue {
             ParameterizedValue::Real(float) => ToSqlOutput::from(*float),
             ParameterizedValue::Text(string) => ToSqlOutput::from(string.clone()),
             ParameterizedValue::Boolean(boo) => ToSqlOutput::from(*boo),
+            #[cfg(feature = "array")]
+            ParameterizedValue::Array(vec) => ToSqlOutput::from(vec),
             #[cfg(feature = "json-1")]
             ParameterizedValue::Json(value) => {
                 let stringified = serde_json::to_string(value)

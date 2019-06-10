@@ -238,100 +238,118 @@ impl ToResultRow for PostgresRow {
                     }
                     None => ParameterizedValue::Null,
                 },
-                /*
-                TODO: How to support arrays?
+                #[cfg(feature = "array")]
                 PostgresType::INT2_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<i16> = val;
-                        Value::Array(val.into_iter().map(Value::from).collect())
+                        ParameterizedValue::Array(
+                            val.into_iter()
+                                .map(|x| ParameterizedValue::Integer(x as i64))
+                                .collect(),
+                        )
                     }
-                    None => Value::Null,
+                    None => ParameterizedValue::Null,
                 },
+                #[cfg(feature = "array")]
                 PostgresType::INT4_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<i32> = val;
-                        Value::Array(val.into_iter().map(Value::from).collect())
+                        ParameterizedValue::Array(
+                            val.into_iter()
+                                .map(|x| ParameterizedValue::Integer(x as i64))
+                                .collect(),
+                        )
                     }
-                    None => Value::Null,
+                    None => ParameterizedValue::Null,
                 },
+                #[cfg(feature = "array")]
                 PostgresType::INT8_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<i64> = val;
-                        Value::Array(val.into_iter().map(Value::from).collect())
+                        ParameterizedValue::Array(
+                            val.into_iter()
+                                .map(|x| ParameterizedValue::Integer(x as i64))
+                                .collect(),
+                        )
                     }
-                    None => Value::Null,
+                    None => ParameterizedValue::Null,
                 },
+                #[cfg(feature = "array")]
                 PostgresType::FLOAT4_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<f32> = val;
-                        Value::Array(
+                        ParameterizedValue::Array(
                             val.into_iter()
-                                .map(|f| Number::from_f64(f as f64).unwrap())
-                                .map(Value::Number)
+                                .map(|x| ParameterizedValue::Real(x as f64))
                                 .collect(),
                         )
                     }
-                    None => Value::Null,
+                    None => ParameterizedValue::Null,
                 },
+                #[cfg(feature = "array")]
                 PostgresType::FLOAT8_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<f64> = val;
-                        Value::Array(
+                        ParameterizedValue::Array(
                             val.into_iter()
-                                .map(|f| Value::Number(Number::from_f64(f).unwrap()))
+                                .map(|x| ParameterizedValue::Real(x as f64))
                                 .collect(),
                         )
                     }
-                    None => Value::Null,
+                    None => ParameterizedValue::Null,
                 },
+                #[cfg(feature = "array")]
                 PostgresType::BOOL_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<bool> = val;
-                        Value::Array(val.into_iter().map(Value::from).collect())
+                        ParameterizedValue::Array(
+                            val.into_iter()
+                                .map(|x| ParameterizedValue::Boolean(x))
+                                .collect(),
+                        )
                     }
-                    None => Value::Null,
+                    None => ParameterizedValue::Null,
                 },
+                #[cfg(feature = "array")]
                 PostgresType::TIMESTAMP_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<NaiveDateTime> = val;
-
-                        let val: Vec<Value> = val
-                            .into_iter()
-                            .map(|ts| DateTime::<Utc>::from_utc(ts, Utc))
-                            .map(|dt| dt.to_rfc3339())
-                            .map(Value::from)
-                            .collect();
-
-                        Value::Array(val)
+                        ParameterizedValue::Array(
+                            val.into_iter()
+                                .map(|x| {
+                                    ParameterizedValue::DateTime(DateTime::<Utc>::from_utc(x, Utc))
+                                })
+                                .collect(),
+                        )
                     }
-                    None => Value::Null,
+                    None => ParameterizedValue::Null,
                 },
+                #[cfg(feature = "array")]
                 PostgresType::NUMERIC_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<Decimal> = val;
-
-                        let val: Vec<Value> = val
-                            .into_iter()
-                            .map(|d| d.to_string())
-                            .map(|s| s.parse::<f64>().unwrap())
-                            .map(|f| Number::from_f64(f).unwrap())
-                            .map(Value::Number)
-                            .collect();
-
-                        Value::Array(val)
+                        ParameterizedValue::Array(
+                            val.into_iter()
+                                .map(|x| ParameterizedValue::Real(x.to_string().parse().unwrap()))
+                                .collect(),
+                        )
                     }
-                    None => Value::Null,
+                    None => ParameterizedValue::Null,
                 },
-                PostgresType::TEXT_ARRAY | PostgresType::NAME_ARRAY | PostgresType::VARCHAR_ARRAY => {
-                    match row.try_get(i)? {
-                        Some(val) => {
-                            let val: Vec<&str> = val;
-                            Value::Array(val.into_iter().map(Value::from).collect())
-                        }
-                        None => Value::Null,
+                #[cfg(feature = "array")]
+                PostgresType::TEXT_ARRAY
+                | PostgresType::NAME_ARRAY
+                | PostgresType::VARCHAR_ARRAY => match row.try_get(i)? {
+                    Some(val) => {
+                        let val: Vec<&str> = val;
+                        ParameterizedValue::Array(
+                            val.into_iter()
+                                .map(|x| ParameterizedValue::Text(String::from(x)))
+                                .collect(),
+                        )
                     }
-                }
-                */
+                    None => ParameterizedValue::Null,
+                },
                 _ => match row.try_get(i)? {
                     Some(val) => ParameterizedValue::Text(val),
                     None => ParameterizedValue::Null,

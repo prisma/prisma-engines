@@ -22,6 +22,9 @@ pub enum ParameterizedValue {
     Text(String),
     /// A boolean value
     Boolean(bool),
+    // An array of things.
+    #[cfg(feature = "array")]
+    Array(Vec<ParameterizedValue>),
     /// A JSON value
     #[cfg(feature = "json-1")]
     Json(Value),
