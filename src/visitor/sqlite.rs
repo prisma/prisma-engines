@@ -127,6 +127,8 @@ impl ToSql for ParameterizedValue {
             ParameterizedValue::Real(float) => ToSqlOutput::from(*float),
             ParameterizedValue::Text(string) => ToSqlOutput::from(string.clone()),
             ParameterizedValue::Boolean(boo) => ToSqlOutput::from(*boo),
+            #[cfg(feature = "array")]
+            ParameterizedValue::Array(_) => unimplemented!("Arrays are not supported for sqlite."),
             #[cfg(feature = "json-1")]
             ParameterizedValue::Json(value) => {
                 let stringified = serde_json::to_string(value)

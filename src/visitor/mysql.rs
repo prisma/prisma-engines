@@ -108,6 +108,8 @@ impl From<ParameterizedValue> for MyValue {
 
                 MyValue::Bytes(s.into_bytes())
             }
+            #[cfg(feature = "array")]
+            ParameterizedValue::Array(_) => unimplemented!("Arrays are not supported for mysql."),
             #[cfg(feature = "uuid-0_7")]
             ParameterizedValue::Uuid(u) => {
                 MyValue::Bytes(u.to_hyphenated().to_string().into_bytes())
