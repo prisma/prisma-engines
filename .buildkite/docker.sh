@@ -12,7 +12,8 @@ docker run -w /build --network test-net -v $BUILDKITE_BUILD_CHECKOUT_PATH:/build
     -e TEST_PG_DB=prisma \
     -e TEST_PG_USER=prisma \
     -e TEST_PG_PASSWORD=prisma \
-    prismagraphql/rust-build:latest cargo
+    prismagraphql/rust-build:latest cargo test
+
 exit_code=$?
 
 docker stop test-postgres
