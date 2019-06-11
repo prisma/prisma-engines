@@ -15,7 +15,7 @@ use rusqlite::{
     Connection as SqliteConnection, Row as SqliteRow, Rows as SqliteRows,
     Transaction as SqliteTransaction, NO_PARAMS,
 };
-use std::{collections::HashSet, convert::TryFrom};
+use std::{collections::HashSet, convert::TryFrom, path::PathBuf};
 
 type PooledConnection = r2d2::PooledConnection<r2d2_sqlite::SqliteConnectionManager>;
 type Pool = r2d2::Pool<SqliteConnectionManager>;
@@ -189,10 +189,10 @@ impl TryFrom<&str> for Sqlite {
         let normalized = std::fs::canonicalize(url.trim_start_matches("file:"))
             .expect("Turning into an absolute path did not work.");
 
-        if normalized.exists() && !normalized.is_dir() {
-            Sqlite::new(normalized.to_str().unwrap().to_string(), 10, false)
+        if normalized.is_dir() {
+            Err(Error::DatabaseUrlIsInvalid(url.to_string()))
         } else {
-            Err(Error::DatabaseDoesNotExist(url.to_string()))
+            Sqlite::new(normalized.to_str().unwrap().to_string(), 10, false)
         }
     }
 }
@@ -208,6 +208,11 @@ impl Sqlite {
             pool,
             test_mode,
         })
+    }
+
+    pub fn does_file_exist(&self) -> bool {
+        let normalized = PathBuf::from(&self.file_path);
+        normalized.exists()
     }
 
     fn attach_database(&self, conn: &mut SqliteConnection, db_name: &str) -> QueryResult<()> {
