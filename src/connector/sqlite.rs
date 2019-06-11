@@ -15,13 +15,13 @@ use rusqlite::{
     Connection as SqliteConnection, Row as SqliteRow, Rows as SqliteRows,
     Transaction as SqliteTransaction, NO_PARAMS,
 };
-use std::collections::HashSet;
+use std::{collections::HashSet, convert::TryFrom};
 
 type PooledConnection = r2d2::PooledConnection<r2d2_sqlite::SqliteConnectionManager>;
 type Pool = r2d2::Pool<SqliteConnectionManager>;
 
 pub struct Sqlite {
-    databases_folder_path: String,
+    file_path: String,
     pool: Pool,
     test_mode: bool,
 }
@@ -180,18 +180,31 @@ impl<'a> ToColumnNames for SqliteRows<'a> {
     }
 }
 
+impl TryFrom<&str> for Sqlite {
+    type Error = Error;
+
+    /// Todo connection limit configuration
+    fn try_from(url: &str) -> QueryResult<Sqlite> {
+        // We must handle file URLs ourselves.
+        let normalized = std::fs::canonicalize(url.trim_start_matches("file:"))
+            .expect("Turning into an absolute path did not work.");
+
+        if normalized.exists() && !normalized.is_dir() {
+            Sqlite::new(normalized.to_str().unwrap().to_string(), 10, false)
+        } else {
+            Err(Error::DatabaseDoesNotExist(url.to_string()))
+        }
+    }
+}
+
 impl Sqlite {
-    pub fn new(
-        databases_folder_path: String,
-        connection_limit: u32,
-        test_mode: bool,
-    ) -> QueryResult<Sqlite> {
+    pub fn new(file_path: String, connection_limit: u32, test_mode: bool) -> QueryResult<Sqlite> {
         let pool = r2d2::Pool::builder()
             .max_size(connection_limit)
             .build(SqliteConnectionManager::memory())?;
 
         Ok(Sqlite {
-            databases_folder_path,
+            file_path,
             pool,
             test_mode,
         })
@@ -210,13 +223,10 @@ impl Sqlite {
             .collect();
 
         if !databases.contains(db_name) {
-            // This is basically hacked until we have a full rust stack with a migration engine.
-            // Currently, the scala tests use the JNA library to write to the database. This
-            let database_file_path = format!("{}/{}.db", self.databases_folder_path, db_name);
             SqliteConnection::execute(
                 conn,
                 "ATTACH DATABASE ? AS ?",
-                &[database_file_path.as_ref(), db_name],
+                &[self.file_path.as_ref(), db_name],
             )?;
         }
 
@@ -293,10 +303,10 @@ mod tests {
 
     #[test]
     fn should_provide_a_database_connection() {
-        let connector = Sqlite::new(String::from("db"), 1, true).unwrap();
+        let connector = Sqlite::new(String::from("db/test.db"), 1, true).unwrap();
 
         connector
-            .with_connection("TEST", |connection| {
+            .with_connection("test", |connection| {
                 let res = connection.query_raw("SELECT * FROM sqlite_master", &[])?;
 
                 // No results expected.
@@ -309,10 +319,10 @@ mod tests {
 
     #[test]
     fn should_provide_a_database_transaction() {
-        let connector = Sqlite::new(String::from("db"), 1, true).unwrap();
+        let connector = Sqlite::new(String::from("db/test.db"), 1, true).unwrap();
 
         connector
-            .with_transaction("TEST", |transaction| {
+            .with_transaction("test", |transaction| {
                 let res = transaction.query_raw("SELECT * FROM sqlite_master", &[])?;
 
                 // No results expected.
@@ -341,10 +351,10 @@ mod tests {
 
     #[test]
     fn should_map_columns_correctly() {
-        let connector = Sqlite::new(String::from("db"), 1, true).unwrap();
+        let connector = Sqlite::new(String::from("db/test.db"), 1, true).unwrap();
 
         connector
-            .with_connection("TEST", |connection| {
+            .with_connection("test", |connection| {
                 connection.query_raw(TABLE_DEF, &[])?;
                 connection.query_raw(CREATE_USER, &[])?;
 
