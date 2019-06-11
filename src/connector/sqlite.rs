@@ -186,13 +186,13 @@ impl TryFrom<&str> for Sqlite {
     /// Todo connection limit configuration
     fn try_from(url: &str) -> QueryResult<Sqlite> {
         // We must handle file URLs ourselves.
-        let normalized = std::fs::canonicalize(url.trim_start_matches("file:"))
-            .expect("Turning into an absolute path did not work.");
+        let normalized = url.trim_start_matches("file:");
+        let path = PathBuf::from(&normalized);
 
-        if normalized.is_dir() {
+        if path.is_dir() {
             Err(Error::DatabaseUrlIsInvalid(url.to_string()))
         } else {
-            Sqlite::new(normalized.to_str().unwrap().to_string(), 10, false)
+            Sqlite::new(normalized.to_string(), 10, false)
         }
     }
 }
@@ -211,8 +211,8 @@ impl Sqlite {
     }
 
     pub fn does_file_exist(&self) -> bool {
-        let normalized = PathBuf::from(&self.file_path);
-        normalized.exists()
+        let path = PathBuf::from(&self.file_path);
+        path.exists()
     }
 
     fn attach_database(&self, conn: &mut SqliteConnection, db_name: &str) -> QueryResult<()> {
