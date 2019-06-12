@@ -45,7 +45,19 @@ pub trait Connectional {
     /// or schema mutations.
     fn with_connection<F, T>(&self, db: &str, f: F) -> QueryResult<T>
     where
-        F: FnOnce(&mut Connection) -> QueryResult<T>;
+        F: FnOnce(&mut Connection) -> QueryResult<T>,
+        Self: Sized;
+
+    fn execute_on_connection(&self, db: &str, query: Query) -> QueryResult<Option<Id>>;
+
+    fn query_on_connection(&self, db: &str, query: Query) -> QueryResult<ResultSet>;
+
+    fn query_on_raw_connection(
+        &self,
+        db: &str,
+        sql: &str,
+        params: &[ParameterizedValue],
+    ) -> QueryResult<ResultSet>;
 }
 
 pub trait Transactional {

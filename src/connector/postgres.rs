@@ -75,12 +75,30 @@ impl Connectional for PostgreSql {
     fn with_connection<F, T>(&self, _db: &str, f: F) -> QueryResult<T>
     where
         F: FnOnce(&mut Connection) -> QueryResult<T>,
+        Self: Sized,
     {
         // TODO: Select DB.
         self.with_connection_internal(|mut client| {
             let result = f(&mut client);
             result
         })
+    }
+
+    fn execute_on_connection(&self, db: &str, query: Query) -> QueryResult<Option<Id>> {
+        self.with_connection(&db, |conn| conn.execute(query))
+    }
+
+    fn query_on_connection(&self, db: &str, query: Query) -> QueryResult<ResultSet> {
+        self.with_connection(&db, |conn| conn.query(query))
+    }
+
+    fn query_on_raw_connection(
+        &self,
+        db: &str,
+        sql: &str,
+        params: &[ParameterizedValue],
+    ) -> QueryResult<ResultSet> {
+        self.with_connection(&db, |conn| conn.query_raw(&sql, &params))
     }
 }
 
