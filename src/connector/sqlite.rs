@@ -53,6 +53,23 @@ impl Connectional for Sqlite {
     {
         self.with_connection_internal(db, |c| f(c.get_mut()))
     }
+
+    fn execute_on_connection(&self, db: &str, query: Query) -> QueryResult<Option<Id>> {
+        self.with_connection(&db, |conn| conn.execute(query))
+    }
+
+    fn query_on_connection(&self, db: &str, query: Query) -> QueryResult<ResultSet> {
+        self.with_connection(&db, |conn| conn.query(query))
+    }
+
+    fn query_on_raw_connection(
+        &self,
+        db: &str,
+        sql: &str,
+        params: &[ParameterizedValue],
+    ) -> QueryResult<ResultSet> {
+        self.with_connection(&db, |conn| conn.query_raw(&sql, &params))
+    }
 }
 
 // Concrete implmentations of trait methods, dropping the mut
