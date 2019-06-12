@@ -50,6 +50,7 @@ impl Connectional for Sqlite {
     fn with_connection<F, T>(&self, db: &str, f: F) -> QueryResult<T>
     where
         F: FnOnce(&mut Connection) -> QueryResult<T>,
+        Self: Sized,
     {
         self.with_connection_internal(db, |c| f(c.get_mut()))
     }

@@ -75,6 +75,7 @@ impl Connectional for PostgreSql {
     fn with_connection<F, T>(&self, _db: &str, f: F) -> QueryResult<T>
     where
         F: FnOnce(&mut Connection) -> QueryResult<T>,
+        Self: Sized,
     {
         // TODO: Select DB.
         self.with_connection_internal(|mut client| {

@@ -52,6 +52,7 @@ impl Connectional for Mysql {
     fn with_connection<F, T>(&self, _db: &str, f: F) -> QueryResult<T>
     where
         F: FnOnce(&mut Connection) -> QueryResult<T>,
+        Self: Sized,
     {
         dbg!(self.pool.state());
         let mut conn = self.pool.get()?;
