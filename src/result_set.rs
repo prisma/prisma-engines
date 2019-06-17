@@ -6,6 +6,7 @@ use crate::{
 use std::collections::HashMap;
 
 /// Encapsulates a set of results and their respective column names.
+#[derive(Debug)]
 pub struct ResultSet {
     /// DO NOT expose these fields.
     /// ResultSet might become lazy-loading one day,
