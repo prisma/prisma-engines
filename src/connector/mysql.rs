@@ -127,7 +127,7 @@ impl<'a> Connection for my::Transaction<'a> {
     }
 
     fn query(&mut self, q: Query) -> QueryResult<ResultSet> {
-        let (sql, params) = dbg!(visitor::Postgres::build(q));
+        let (sql, params) = dbg!(visitor::Mysql::build(q));
 
         self.query_raw(&sql, &params[..])
     }
@@ -155,7 +155,7 @@ impl Connection for PooledConnection {
     }
 
     fn query(&mut self, q: Query) -> QueryResult<ResultSet> {
-        let (sql, params) = dbg!(visitor::Postgres::build(q));
+        let (sql, params) = dbg!(visitor::Mysql::build(q));
 
         self.query_raw(&sql, &params[..])
     }
