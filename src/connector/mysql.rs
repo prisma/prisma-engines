@@ -20,14 +20,17 @@ type PooledConnection = r2d2::PooledConnection<MysqlConnectionManager>;
 /// The World's Most Advanced Open Source Relational Database
 pub struct Mysql {
     pool: Pool,
+    pub db_name: Option<String>,
 }
 
 impl Mysql {
+    // TODO: we should not use this constructor since it does set the db_name field
     pub fn new(conf: mysql::OptsBuilder) -> QueryResult<Mysql> {
         let manager = MysqlConnectionManager::new(conf);
 
         Ok(Mysql {
             pool: r2d2::Pool::builder().build(manager)?,
+            db_name: None,
         })
     }
 
@@ -45,7 +48,12 @@ impl Mysql {
         builder.verify_peer(false);
         builder.stmt_cache_size(Some(1000));
 
-        Self::new(builder)
+        let manager = MysqlConnectionManager::new(builder);
+
+        Ok(Mysql {
+            pool: r2d2::Pool::builder().build(manager)?,
+            db_name: db_name.map(|x| x.to_string()),
+        })
     }
 }
 
