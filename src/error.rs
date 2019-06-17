@@ -30,3 +30,9 @@ impl From<r2d2::Error> for Error {
         Error::ConnectionError(e.into())
     }
 }
+
+impl From<url::ParseError> for Error {
+    fn from(_: url::ParseError) -> Error {
+        Error::DatabaseUrlIsInvalid("Error parsing database connection string.".to_string())
+    }
+}
