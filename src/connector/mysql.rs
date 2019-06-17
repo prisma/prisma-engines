@@ -151,8 +151,7 @@ impl Connection for PooledConnection {
         let mut stmt = self.prepare(&sql)?;
         let _rows = stmt.execute(conv_params(&params))?;
 
-        // TODO: Return last inserted ID is not implemented for mysql.
-        Ok(None)
+        Ok(Some(Id::Int(_rows.last_insert_id() as usize)))
     }
 
     fn query(&mut self, q: Query) -> QueryResult<ResultSet> {
