@@ -11,6 +11,7 @@ use crate::{
 use chrono::{DateTime, Duration, NaiveDate, Utc};
 use mysql as my;
 use r2d2_mysql::pool::MysqlConnectionManager;
+use url::Url;
 
 type Pool = r2d2::Pool<MysqlConnectionManager>;
 #[allow(unused)] // We implement a trait on the alias, it is used.
@@ -28,6 +29,26 @@ impl Mysql {
         Ok(Mysql {
             pool: r2d2::Pool::builder().build(manager)?,
         })
+    }
+
+    pub fn new_from_url(url: &str) -> QueryResult<Mysql> {
+        // TODO: connection limit configuration
+        let mut builder = my::OptsBuilder::new();
+        let url = Url::parse(url)?;
+        let db_name = match url.path_segments() {
+            Some(mut segments) => segments.next().unwrap_or("mysql"),
+            None => "mysql",
+        };
+
+        builder.ip_or_hostname(url.host_str());
+        builder.tcp_port(url.port().unwrap_or(3306));
+        builder.user(Some(url.username()));
+        builder.pass(url.password());
+        builder.db_name(Some(db_name));
+        builder.verify_peer(false);
+        builder.stmt_cache_size(Some(1000));
+
+        Self::new(builder)
     }
 }
 
