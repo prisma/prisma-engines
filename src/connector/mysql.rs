@@ -35,16 +35,13 @@ impl Mysql {
         // TODO: connection limit configuration
         let mut builder = my::OptsBuilder::new();
         let url = Url::parse(url)?;
-        let db_name = match url.path_segments() {
-            Some(mut segments) => segments.next().unwrap_or("mysql"),
-            None => "mysql",
-        };
+        let db_name = url.path_segments().and_then(|mut segments| segments.next());
 
         builder.ip_or_hostname(url.host_str());
         builder.tcp_port(url.port().unwrap_or(3306));
         builder.user(Some(url.username()));
         builder.pass(url.password());
-        builder.db_name(Some(db_name));
+        builder.db_name(db_name);
         builder.verify_peer(false);
         builder.stmt_cache_size(Some(1000));
 
