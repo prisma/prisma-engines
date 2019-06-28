@@ -86,25 +86,25 @@ impl Connectional for Mysql {
         result
     }
 
-    fn execute_on_connection(&self, db: &str, query: Query) -> QueryResult<Option<Id>> {
+    fn execute_on_connection<'a>(&self, db: &str, query: Query<'a>) -> QueryResult<Option<Id>> {
         self.with_connection(&db, |conn| conn.execute(query))
     }
 
-    fn query_on_connection(&self, db: &str, query: Query) -> QueryResult<ResultSet> {
+    fn query_on_connection<'a>(&self, db: &str, query: Query<'a>) -> QueryResult<ResultSet> {
         self.with_connection(&db, |conn| conn.query(query))
     }
 
-    fn query_on_raw_connection(
+    fn query_on_raw_connection<'a>(
         &self,
         db: &str,
         sql: &str,
-        params: &[ParameterizedValue],
+        params: &[ParameterizedValue<'a>],
     ) -> QueryResult<ResultSet> {
         self.with_connection(&db, |conn| conn.query_raw(&sql, &params))
     }
 }
 
-fn conv_params(params: &[ParameterizedValue]) -> my::params::Params {
+fn conv_params<'a>(params: &[ParameterizedValue<'a>]) -> my::params::Params {
     if params.len() > 0 {
         my::params::Params::Positional(params.iter().map(|x| x.into()).collect::<Vec<my::Value>>())
     } else {
@@ -116,8 +116,8 @@ fn conv_params(params: &[ParameterizedValue]) -> my::params::Params {
 
 impl<'a> Transaction for my::Transaction<'a> {}
 
-impl<'a> Connection for my::Transaction<'a> {
-    fn execute(&mut self, q: Query) -> QueryResult<Option<Id>> {
+impl<'t> Connection for my::Transaction<'t> {
+    fn execute<'a>(&mut self, q: Query<'a>) -> QueryResult<Option<Id>> {
         let (sql, params) = dbg!(visitor::Mysql::build(q));
         let mut stmt = self.prepare(&sql)?;
         let _rows = stmt.execute(conv_params(&params))?;
@@ -126,13 +126,17 @@ impl<'a> Connection for my::Transaction<'a> {
         Ok(None)
     }
 
-    fn query(&mut self, q: Query) -> QueryResult<ResultSet> {
+    fn query<'a>(&mut self, q: Query<'a>) -> QueryResult<ResultSet> {
         let (sql, params) = dbg!(visitor::Mysql::build(q));
 
         self.query_raw(&sql, &params[..])
     }
 
-    fn query_raw(&mut self, sql: &str, params: &[ParameterizedValue]) -> QueryResult<ResultSet> {
+    fn query_raw<'a>(
+        &mut self,
+        sql: &str,
+        params: &[ParameterizedValue<'a>],
+    ) -> QueryResult<ResultSet> {
         let mut stmt = self.prepare(&sql)?;
         let mut result = ResultSet::new(&stmt.to_column_names(), Vec::new());
         let rows = stmt.execute(conv_params(params))?;
@@ -146,7 +150,7 @@ impl<'a> Connection for my::Transaction<'a> {
 }
 
 impl Connection for PooledConnection {
-    fn execute(&mut self, q: Query) -> QueryResult<Option<Id>> {
+    fn execute<'a>(&mut self, q: Query<'a>) -> QueryResult<Option<Id>> {
         let (sql, params) = dbg!(visitor::Mysql::build(q));
         let mut stmt = self.prepare(&sql)?;
         let _rows = stmt.execute(conv_params(&params))?;
@@ -154,13 +158,17 @@ impl Connection for PooledConnection {
         Ok(Some(Id::Int(_rows.last_insert_id() as usize)))
     }
 
-    fn query(&mut self, q: Query) -> QueryResult<ResultSet> {
+    fn query<'a>(&mut self, q: Query<'a>) -> QueryResult<ResultSet> {
         let (sql, params) = dbg!(visitor::Mysql::build(q));
 
         self.query_raw(&sql, &params[..])
     }
 
-    fn query_raw(&mut self, sql: &str, params: &[ParameterizedValue]) -> QueryResult<ResultSet> {
+    fn query_raw<'a>(
+        &mut self,
+        sql: &str,
+        params: &[ParameterizedValue<'a>],
+    ) -> QueryResult<ResultSet> {
         let mut stmt = self.prepare(&sql)?;
         let mut result = ResultSet::new(&stmt.to_column_names(), Vec::new());
         let rows = stmt.execute(conv_params(params))?;
@@ -175,12 +183,14 @@ impl Connection for PooledConnection {
 
 impl ToResultRow for my::Row {
     fn to_result_row<'b>(&'b self) -> QueryResult<ResultRow> {
-        fn convert(row: &my::Row, i: usize) -> QueryResult<ParameterizedValue> {
+        fn convert(row: &my::Row, i: usize) -> QueryResult<ParameterizedValue<'static>> {
             // TODO: It would prob. be better to inver via Column::column_type()
             let raw_value = row.as_ref(i).unwrap_or(&my::Value::NULL);
             let res = match raw_value {
                 my::Value::NULL => ParameterizedValue::Null,
-                my::Value::Bytes(b) => ParameterizedValue::Text(String::from_utf8(b.to_vec())?),
+                my::Value::Bytes(b) => {
+                    ParameterizedValue::Text(String::from_utf8(b.to_vec())?.into())
+                }
                 my::Value::Int(i) => ParameterizedValue::Integer(*i),
                 // TOOD: This is unsafe
                 my::Value::UInt(i) => ParameterizedValue::Integer(*i as i64),

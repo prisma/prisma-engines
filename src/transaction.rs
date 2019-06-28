@@ -24,17 +24,21 @@ pub trait Connection {
     /// inserted row.
     ///
     /// This is typically used for mutating queries.
-    fn execute(&mut self, q: Query) -> QueryResult<Option<Id>>;
+    fn execute<'a>(&mut self, q: Query<'a>) -> QueryResult<Option<Id>>;
 
     /// Executes the given query and returns the result set.
     ///
     /// This is typically used for select queries.
-    fn query(&mut self, q: Query) -> QueryResult<ResultSet>;
+    fn query<'a>(&mut self, q: Query<'a>) -> QueryResult<ResultSet>;
 
     /// Executes a query given as SQL, interpolating the given parameters.
     ///
     /// This is needed, for example, for PRAGMA commands in sqlite.
-    fn query_raw(&mut self, sql: &str, params: &[ParameterizedValue]) -> QueryResult<ResultSet>;
+    fn query_raw<'a>(
+        &mut self,
+        sql: &str,
+        params: &[ParameterizedValue<'a>],
+    ) -> QueryResult<ResultSet>;
 }
 
 pub trait Connectional {
@@ -48,15 +52,15 @@ pub trait Connectional {
         F: FnOnce(&mut Connection) -> QueryResult<T>,
         Self: Sized;
 
-    fn execute_on_connection(&self, db: &str, query: Query) -> QueryResult<Option<Id>>;
+    fn execute_on_connection<'a>(&self, db: &str, query: Query<'a>) -> QueryResult<Option<Id>>;
 
-    fn query_on_connection(&self, db: &str, query: Query) -> QueryResult<ResultSet>;
+    fn query_on_connection<'a>(&self, db: &str, query: Query<'a>) -> QueryResult<ResultSet>;
 
-    fn query_on_raw_connection(
+    fn query_on_raw_connection<'a>(
         &self,
         db: &str,
         sql: &str,
-        params: &[ParameterizedValue],
+        params: &[ParameterizedValue<'a>],
     ) -> QueryResult<ResultSet>;
 }
 
@@ -72,7 +76,7 @@ pub trait Transactional {
 
 #[derive(Debug, Default, PartialEq, Clone)]
 pub struct ResultRow {
-    pub values: Vec<ParameterizedValue>,
+    pub values: Vec<ParameterizedValue<'static>>,
 }
 
 #[derive(Debug, Default, PartialEq, Clone)]

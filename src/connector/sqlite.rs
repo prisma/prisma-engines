@@ -47,7 +47,7 @@ impl Transactional for Sqlite {
 }
 
 impl Connectional for Sqlite {
-    fn with_connection<F, T>(&self, db: &str, f: F) -> QueryResult<T>
+    fn with_connection<'a, F, T>(&self, db: &str, f: F) -> QueryResult<T>
     where
         F: FnOnce(&mut Connection) -> QueryResult<T>,
         Self: Sized,
@@ -55,19 +55,19 @@ impl Connectional for Sqlite {
         self.with_connection_internal(db, |c| f(c.get_mut()))
     }
 
-    fn execute_on_connection(&self, db: &str, query: Query) -> QueryResult<Option<Id>> {
+    fn execute_on_connection<'a>(&self, db: &str, query: Query<'a>) -> QueryResult<Option<Id>> {
         self.with_connection(&db, |conn| conn.execute(query))
     }
 
-    fn query_on_connection(&self, db: &str, query: Query) -> QueryResult<ResultSet> {
+    fn query_on_connection<'a>(&self, db: &str, query: Query<'a>) -> QueryResult<ResultSet> {
         self.with_connection(&db, |conn| conn.query(query))
     }
 
-    fn query_on_raw_connection(
+    fn query_on_raw_connection<'a>(
         &self,
         db: &str,
         sql: &str,
-        params: &[ParameterizedValue],
+        params: &[ParameterizedValue<'a>],
     ) -> QueryResult<ResultSet> {
         self.with_connection(&db, |conn| conn.query_raw(&sql, &params))
     }
@@ -75,7 +75,7 @@ impl Connectional for Sqlite {
 
 // Concrete implmentations of trait methods, dropping the mut
 // so we can share it between Connection and Transaction.
-fn execute_impl(conn: &SqliteConnection, q: Query) -> QueryResult<Option<Id>> {
+fn execute_impl<'a>(conn: &SqliteConnection, q: Query<'a>) -> QueryResult<Option<Id>> {
     let (sql, params) = dbg!(visitor::Sqlite::build(q));
 
     let mut stmt = conn.prepare_cached(&sql)?;
@@ -84,16 +84,16 @@ fn execute_impl(conn: &SqliteConnection, q: Query) -> QueryResult<Option<Id>> {
     Ok(Some(Id::Int(conn.last_insert_rowid() as usize)))
 }
 
-fn query_impl(conn: &SqliteConnection, q: Query) -> QueryResult<ResultSet> {
+fn query_impl<'a>(conn: &SqliteConnection, q: Query<'a>) -> QueryResult<ResultSet> {
     let (sql, params) = dbg!(visitor::Sqlite::build(q));
 
     return query_raw_impl(conn, &sql, &params);
 }
 
-fn query_raw_impl(
+fn query_raw_impl<'a>(
     conn: &SqliteConnection,
     sql: &str,
-    params: &[ParameterizedValue],
+    params: &[ParameterizedValue<'a>],
 ) -> QueryResult<ResultSet> {
     let mut stmt = conn.prepare_cached(sql)?;
     let mut rows = stmt.query(params)?;
@@ -113,44 +113,56 @@ impl<'a> Transaction for SqliteTransaction<'a> {}
 
 // Trait implementation for r2d2 pooled connection.
 impl Connection for PooledConnection {
-    fn execute(&mut self, q: Query) -> QueryResult<Option<Id>> {
+    fn execute<'a>(&mut self, q: Query<'a>) -> QueryResult<Option<Id>> {
         execute_impl(self, q)
     }
 
-    fn query(&mut self, q: Query) -> QueryResult<ResultSet> {
+    fn query<'a>(&mut self, q: Query<'a>) -> QueryResult<ResultSet> {
         query_impl(self, q)
     }
 
-    fn query_raw(&mut self, sql: &str, params: &[ParameterizedValue]) -> QueryResult<ResultSet> {
+    fn query_raw<'a>(
+        &mut self,
+        sql: &str,
+        params: &[ParameterizedValue<'a>],
+    ) -> QueryResult<ResultSet> {
         query_raw_impl(self, sql, params)
     }
 }
 
 // Trait implementation for r2d2 sqlite.
-impl<'a> Connection for SqliteTransaction<'a> {
-    fn execute(&mut self, q: Query) -> QueryResult<Option<Id>> {
+impl<'t> Connection for SqliteTransaction<'t> {
+    fn execute<'a>(&mut self, q: Query<'a>) -> QueryResult<Option<Id>> {
         execute_impl(self, q)
     }
 
-    fn query(&mut self, q: Query) -> QueryResult<ResultSet> {
+    fn query<'a>(&mut self, q: Query<'a>) -> QueryResult<ResultSet> {
         query_impl(self, q)
     }
 
-    fn query_raw(&mut self, sql: &str, params: &[ParameterizedValue]) -> QueryResult<ResultSet> {
+    fn query_raw<'a>(
+        &mut self,
+        sql: &str,
+        params: &[ParameterizedValue<'a>],
+    ) -> QueryResult<ResultSet> {
         query_raw_impl(self, sql, params)
     }
 }
 
 impl Connection for SqliteConnection {
-    fn execute(&mut self, q: Query) -> QueryResult<Option<Id>> {
+    fn execute<'a>(&mut self, q: Query<'a>) -> QueryResult<Option<Id>> {
         execute_impl(self, q)
     }
 
-    fn query(&mut self, q: Query) -> QueryResult<ResultSet> {
+    fn query<'a>(&mut self, q: Query<'a>) -> QueryResult<ResultSet> {
         query_impl(self, q)
     }
 
-    fn query_raw(&mut self, sql: &str, params: &[ParameterizedValue]) -> QueryResult<ResultSet> {
+    fn query_raw<'a>(
+        &mut self,
+        sql: &str,
+        params: &[ParameterizedValue<'a>],
+    ) -> QueryResult<ResultSet> {
         query_raw_impl(self, sql, params)
     }
 }
@@ -173,7 +185,7 @@ impl<'a> ToResultRow for SqliteRow<'a> {
                     _ => ParameterizedValue::Integer(i),
                 },
                 ValueRef::Real(f) => ParameterizedValue::Real(f),
-                ValueRef::Text(s) => ParameterizedValue::Text(s.to_string()),
+                ValueRef::Text(s) => ParameterizedValue::Text(s.to_string().into()),
                 ValueRef::Blob(_) => panic!("Blobs not supprted, yet"),
             };
 

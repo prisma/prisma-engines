@@ -7,27 +7,28 @@ pub use count::*;
 pub use row_number::*;
 
 use super::DatabaseValue;
+use std::borrow::Cow;
 
 /// A database function definition
 #[derive(Debug, Clone, PartialEq)]
-pub struct Function {
-    pub(crate) typ_: FunctionType,
-    pub(crate) alias: Option<String>,
+pub struct Function<'a> {
+    pub(crate) typ_: FunctionType<'a>,
+    pub(crate) alias: Option<Cow<'a, str>>,
 }
 
 /// A database function type
 #[derive(Debug, Clone, PartialEq)]
-pub(crate) enum FunctionType {
-    RowNumber(RowNumber),
-    Count(Count),
-    AggregateToString(AggregateToString),
+pub(crate) enum FunctionType<'a> {
+    RowNumber(RowNumber<'a>),
+    Count(Count<'a>),
+    AggregateToString(AggregateToString<'a>),
 }
 
-impl Function {
+impl<'a> Function<'a> {
     /// Give the function an alias in the query.
     pub fn alias<S>(mut self, alias: S) -> Self
     where
-        S: Into<String>,
+        S: Into<Cow<'a, str>>,
     {
         self.alias = Some(alias.into());
         self
@@ -37,9 +38,9 @@ impl Function {
 macro_rules! function {
     ($($kind:ident),*) => (
         $(
-            impl From<$kind> for Function {
+            impl<'a> From<$kind<'a>> for Function<'a> {
                 #[inline]
-                fn from(f: $kind) -> Function {
+                fn from(f: $kind<'a>) -> Self {
                     Function {
                         typ_: FunctionType::$kind(f),
                         alias: None,
@@ -47,9 +48,9 @@ macro_rules! function {
                 }
             }
 
-            impl From<$kind> for DatabaseValue {
+            impl<'a> From<$kind<'a>> for DatabaseValue<'a> {
                 #[inline]
-                fn from(f: $kind) -> DatabaseValue {
+                fn from(f: $kind<'a>) -> Self {
                     Function::from(f).into()
                 }
             }

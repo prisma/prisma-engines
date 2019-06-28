@@ -1,8 +1,8 @@
 use crate::ast::DatabaseValue;
 
 #[derive(Debug, Clone, PartialEq)]
-pub struct AggregateToString {
-    pub(crate) value: Box<DatabaseValue>,
+pub struct AggregateToString<'a> {
+    pub(crate) value: Box<DatabaseValue<'a>>,
 }
 
 /// Aggregates the given field into a string.
@@ -15,9 +15,9 @@ pub struct AggregateToString {
 /// assert_eq!("SELECT group_concat(`firstName`) FROM `users` GROUP BY `firstName`", sql);
 /// ```
 #[inline]
-pub fn aggregate_to_string<T>(expr: T) -> AggregateToString
+pub fn aggregate_to_string<'a, T>(expr: T) -> AggregateToString<'a>
 where
-    T: Into<DatabaseValue>,
+    T: Into<DatabaseValue<'a>>,
 {
     AggregateToString {
         value: Box::new(expr.into()),

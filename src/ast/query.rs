@@ -1,27 +1,28 @@
 use crate::ast::{Delete, Insert, Select, UnionAll, Update};
+use std::borrow::Cow;
 
 /// A database query
 #[derive(Debug, Clone, PartialEq)]
-pub enum Query {
+pub enum Query<'a> {
     /// Query for fetching data. E.g. the `SELECT` query.
-    Select(Select),
-    Insert(Box<Insert>),
-    Update(Box<Update>),
-    Delete(Box<Delete>),
-    UnionAll(UnionAll),
-    Raw(String),
+    Select(Select<'a>),
+    Insert(Box<Insert<'a>>),
+    Update(Box<Update<'a>>),
+    Delete(Box<Delete<'a>>),
+    UnionAll(UnionAll<'a>),
+    Raw(Cow<'a, str>),
 }
 
-impl<T> From<T> for Query
+impl<'a, T> From<T> for Query<'a>
 where
-    T: ToString,
+    T: Into<Cow<'a, str>>,
 {
-    fn from(t: T) -> Query {
-        Query::Raw(t.to_string())
+    fn from(t: T) -> Self {
+        Query::Raw(t.into())
     }
 }
 
-impl Query {
+impl<'a> Query<'a> {
     pub fn is_select(&self) -> bool {
         if let Query::Select(_) = self {
             true

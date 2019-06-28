@@ -2,26 +2,26 @@ use crate::ast::*;
 
 /// A builder for an `UPDATE` statement.
 #[derive(Debug, PartialEq, Clone)]
-pub struct Update {
-    pub(crate) table: Table,
-    pub(crate) columns: Vec<Column>,
-    pub(crate) values: Vec<DatabaseValue>,
-    pub(crate) conditions: Option<ConditionTree>,
+pub struct Update<'a> {
+    pub(crate) table: Table<'a>,
+    pub(crate) columns: Vec<Column<'a>>,
+    pub(crate) values: Vec<DatabaseValue<'a>>,
+    pub(crate) conditions: Option<ConditionTree<'a>>,
 }
 
-impl From<Update> for Query {
+impl<'a> From<Update<'a>> for Query<'a> {
     #[inline]
-    fn from(update: Update) -> Query {
+    fn from(update: Update<'a>) -> Self {
         Query::Update(Box::new(update))
     }
 }
 
-impl Update {
+impl<'a> Update<'a> {
     /// Creates the basis for an `UPDATE` statement to the given table.
     #[inline]
     pub fn table<T>(table: T) -> Self
     where
-        T: Into<Table>,
+        T: Into<Table<'a>>,
     {
         Self {
             table: table.into(),
@@ -48,10 +48,10 @@ impl Update {
     ///     params,
     /// );
     /// ```
-    pub fn set<K, V>(mut self, column: K, value: V) -> Update
+    pub fn set<K, V>(mut self, column: K, value: V) -> Update<'a>
     where
-        K: Into<Column>,
-        V: Into<DatabaseValue>,
+        K: Into<Column<'a>>,
+        V: Into<DatabaseValue<'a>>,
     {
         self.columns.push(column.into());
         self.values.push(value.into());
@@ -101,7 +101,7 @@ impl Update {
     /// ```
     pub fn so_that<T>(mut self, conditions: T) -> Self
     where
-        T: Into<ConditionTree>,
+        T: Into<ConditionTree<'a>>,
     {
         self.conditions = Some(conditions.into());
         self

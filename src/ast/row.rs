@@ -1,12 +1,13 @@
 use crate::ast::{Comparable, Compare, DatabaseValue};
+use std::borrow::Cow;
 
 /// A collection of values surrounded by parentheses.
 #[derive(Debug, Default, PartialEq, Clone)]
-pub struct Row {
-    pub values: Vec<DatabaseValue>,
+pub struct Row<'a> {
+    pub values: Vec<DatabaseValue<'a>>,
 }
 
-impl Row {
+impl<'a> Row<'a> {
     #[inline]
     pub fn new() -> Self {
         Row { values: Vec::new() }
@@ -14,7 +15,7 @@ impl Row {
 
     pub fn push<T>(mut self, value: T) -> Self
     where
-        T: Into<DatabaseValue>,
+        T: Into<DatabaseValue<'a>>,
     {
         self.values.push(value.into());
         self
@@ -25,50 +26,50 @@ impl Row {
     }
 }
 
-impl<T> From<Vec<T>> for Row
+impl<'a, T> From<Vec<T>> for Row<'a>
 where
-    T: Into<DatabaseValue>,
+    T: Into<DatabaseValue<'a>>,
 {
     #[inline]
-    fn from(vector: Vec<T>) -> Row {
+    fn from(vector: Vec<T>) -> Row<'a> {
         vector
             .into_iter()
             .fold(Row::new(), |row, v| row.push(v.into()))
     }
 }
 
-impl<A, B> From<(A, B)> for Row
+impl<'a, A, B> From<(A, B)> for Row<'a>
 where
-    A: Into<DatabaseValue>,
-    B: Into<DatabaseValue>,
+    A: Into<DatabaseValue<'a>>,
+    B: Into<DatabaseValue<'a>>,
 {
     #[inline]
-    fn from(vals: (A, B)) -> Row {
+    fn from(vals: (A, B)) -> Self {
         Row::new().push(vals.0).push(vals.1)
     }
 }
 
-impl<A, B, C> From<(A, B, C)> for Row
+impl<'a, A, B, C> From<(A, B, C)> for Row<'a>
 where
-    A: Into<DatabaseValue>,
-    B: Into<DatabaseValue>,
-    C: Into<DatabaseValue>,
+    A: Into<DatabaseValue<'a>>,
+    B: Into<DatabaseValue<'a>>,
+    C: Into<DatabaseValue<'a>>,
 {
     #[inline]
-    fn from(vals: (A, B, C)) -> Row {
+    fn from(vals: (A, B, C)) -> Self {
         Row::new().push(vals.0).push(vals.1).push(vals.2)
     }
 }
 
-impl<A, B, C, D> From<(A, B, C, D)> for Row
+impl<'a, A, B, C, D> From<(A, B, C, D)> for Row<'a>
 where
-    A: Into<DatabaseValue>,
-    B: Into<DatabaseValue>,
-    C: Into<DatabaseValue>,
-    D: Into<DatabaseValue>,
+    A: Into<DatabaseValue<'a>>,
+    B: Into<DatabaseValue<'a>>,
+    C: Into<DatabaseValue<'a>>,
+    D: Into<DatabaseValue<'a>>,
 {
     #[inline]
-    fn from(vals: (A, B, C, D)) -> Row {
+    fn from(vals: (A, B, C, D)) -> Self {
         Row::new()
             .push(vals.0)
             .push(vals.1)
@@ -77,16 +78,16 @@ where
     }
 }
 
-impl<A, B, C, D, E> From<(A, B, C, D, E)> for Row
+impl<'a, A, B, C, D, E> From<(A, B, C, D, E)> for Row<'a>
 where
-    A: Into<DatabaseValue>,
-    B: Into<DatabaseValue>,
-    C: Into<DatabaseValue>,
-    D: Into<DatabaseValue>,
-    E: Into<DatabaseValue>,
+    A: Into<DatabaseValue<'a>>,
+    B: Into<DatabaseValue<'a>>,
+    C: Into<DatabaseValue<'a>>,
+    D: Into<DatabaseValue<'a>>,
+    E: Into<DatabaseValue<'a>>,
 {
     #[inline]
-    fn from(vals: (A, B, C, D, E)) -> Row {
+    fn from(vals: (A, B, C, D, E)) -> Self {
         Row::new()
             .push(vals.0)
             .push(vals.1)
@@ -96,162 +97,162 @@ where
     }
 }
 
-impl Comparable for Row {
+impl<'a> Comparable<'a> for Row<'a> {
     #[inline]
-    fn equals<T>(self, comparison: T) -> Compare
+    fn equals<T>(self, comparison: T) -> Compare<'a>
     where
-        T: Into<DatabaseValue>,
+        T: Into<DatabaseValue<'a>>,
     {
-        let value: DatabaseValue = self.into();
+        let value: DatabaseValue<'a> = self.into();
         value.equals(comparison)
     }
 
     #[inline]
-    fn not_equals<T>(self, comparison: T) -> Compare
+    fn not_equals<T>(self, comparison: T) -> Compare<'a>
     where
-        T: Into<DatabaseValue>,
+        T: Into<DatabaseValue<'a>>,
     {
-        let value: DatabaseValue = self.into();
+        let value: DatabaseValue<'a> = self.into();
         value.not_equals(comparison)
     }
 
     #[inline]
-    fn less_than<T>(self, comparison: T) -> Compare
+    fn less_than<T>(self, comparison: T) -> Compare<'a>
     where
-        T: Into<DatabaseValue>,
+        T: Into<DatabaseValue<'a>>,
     {
-        let value: DatabaseValue = self.into();
+        let value: DatabaseValue<'a> = self.into();
         value.not_equals(comparison)
     }
 
     #[inline]
-    fn less_than_or_equals<T>(self, comparison: T) -> Compare
+    fn less_than_or_equals<T>(self, comparison: T) -> Compare<'a>
     where
-        T: Into<DatabaseValue>,
+        T: Into<DatabaseValue<'a>>,
     {
-        let value: DatabaseValue = self.into();
+        let value: DatabaseValue<'a> = self.into();
         value.less_than_or_equals(comparison)
     }
 
     #[inline]
-    fn greater_than<T>(self, comparison: T) -> Compare
+    fn greater_than<T>(self, comparison: T) -> Compare<'a>
     where
-        T: Into<DatabaseValue>,
+        T: Into<DatabaseValue<'a>>,
     {
-        let value: DatabaseValue = self.into();
+        let value: DatabaseValue<'a> = self.into();
         value.greater_than(comparison)
     }
 
     #[inline]
-    fn greater_than_or_equals<T>(self, comparison: T) -> Compare
+    fn greater_than_or_equals<T>(self, comparison: T) -> Compare<'a>
     where
-        T: Into<DatabaseValue>,
+        T: Into<DatabaseValue<'a>>,
     {
-        let value: DatabaseValue = self.into();
+        let value: DatabaseValue<'a> = self.into();
         value.greater_than_or_equals(comparison)
     }
 
     #[inline]
-    fn in_selection<T>(self, selection: T) -> Compare
+    fn in_selection<T>(self, selection: T) -> Compare<'a>
     where
-        T: Into<DatabaseValue>,
+        T: Into<DatabaseValue<'a>>,
     {
-        let value: DatabaseValue = self.into();
+        let value: DatabaseValue<'a> = self.into();
         value.in_selection(selection)
     }
 
     #[inline]
-    fn not_in_selection<T>(self, selection: T) -> Compare
+    fn not_in_selection<T>(self, selection: T) -> Compare<'a>
     where
-        T: Into<DatabaseValue>,
+        T: Into<DatabaseValue<'a>>,
     {
-        let value: DatabaseValue = self.into();
+        let value: DatabaseValue<'a> = self.into();
         value.not_in_selection(selection)
     }
 
     #[inline]
-    fn like<T>(self, pattern: T) -> Compare
+    fn like<T>(self, pattern: T) -> Compare<'a>
     where
-        T: Into<String>,
+        T: Into<Cow<'a, str>>,
     {
-        let value: DatabaseValue = self.into();
+        let value: DatabaseValue<'a> = self.into();
         value.like(pattern)
     }
 
     #[inline]
-    fn not_like<T>(self, pattern: T) -> Compare
+    fn not_like<T>(self, pattern: T) -> Compare<'a>
     where
-        T: Into<String>,
+        T: Into<Cow<'a, str>>,
     {
-        let value: DatabaseValue = self.into();
+        let value: DatabaseValue<'a> = self.into();
         value.not_like(pattern)
     }
 
     #[inline]
-    fn begins_with<T>(self, pattern: T) -> Compare
+    fn begins_with<T>(self, pattern: T) -> Compare<'a>
     where
-        T: Into<String>,
+        T: Into<Cow<'a, str>>,
     {
-        let value: DatabaseValue = self.into();
+        let value: DatabaseValue<'a> = self.into();
         value.begins_with(pattern)
     }
 
     #[inline]
-    fn not_begins_with<T>(self, pattern: T) -> Compare
+    fn not_begins_with<T>(self, pattern: T) -> Compare<'a>
     where
-        T: Into<String>,
+        T: Into<Cow<'a, str>>,
     {
-        let value: DatabaseValue = self.into();
+        let value: DatabaseValue<'a> = self.into();
         value.not_begins_with(pattern)
     }
 
     #[inline]
-    fn ends_into<T>(self, pattern: T) -> Compare
+    fn ends_into<T>(self, pattern: T) -> Compare<'a>
     where
-        T: Into<String>,
+        T: Into<Cow<'a, str>>,
     {
-        let value: DatabaseValue = self.into();
+        let value: DatabaseValue<'a> = self.into();
         value.ends_into(pattern)
     }
 
     #[inline]
-    fn not_ends_into<T>(self, pattern: T) -> Compare
+    fn not_ends_into<T>(self, pattern: T) -> Compare<'a>
     where
-        T: Into<String>,
+        T: Into<Cow<'a, str>>,
     {
-        let value: DatabaseValue = self.into();
+        let value: DatabaseValue<'a> = self.into();
         value.not_ends_into(pattern)
     }
 
     #[inline]
-    fn is_null(self) -> Compare {
-        let value: DatabaseValue = self.into();
+    fn is_null(self) -> Compare<'a> {
+        let value: DatabaseValue<'a> = self.into();
         value.is_null()
     }
 
     #[inline]
-    fn is_not_null(self) -> Compare {
-        let value: DatabaseValue = self.into();
+    fn is_not_null(self) -> Compare<'a> {
+        let value: DatabaseValue<'a> = self.into();
         value.is_not_null()
     }
 
     #[inline]
-    fn between<T, V>(self, left: T, right: V) -> Compare
+    fn between<T, V>(self, left: T, right: V) -> Compare<'a>
     where
-        T: Into<DatabaseValue>,
-        V: Into<DatabaseValue>,
+        T: Into<DatabaseValue<'a>>,
+        V: Into<DatabaseValue<'a>>,
     {
-        let value: DatabaseValue = self.into();
+        let value: DatabaseValue<'a> = self.into();
         value.between(left, right)
     }
 
     #[inline]
-    fn not_between<T, V>(self, left: T, right: V) -> Compare
+    fn not_between<T, V>(self, left: T, right: V) -> Compare<'a>
     where
-        T: Into<DatabaseValue>,
-        V: Into<DatabaseValue>,
+        T: Into<DatabaseValue<'a>>,
+        V: Into<DatabaseValue<'a>>,
     {
-        let value: DatabaseValue = self.into();
+        let value: DatabaseValue<'a> = self.into();
         value.not_between(left, right)
     }
 }

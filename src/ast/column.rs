@@ -1,26 +1,27 @@
 use crate::ast::{DatabaseValue, Table};
+use std::borrow::Cow;
 
 /// A column definition.
 #[derive(Clone, Debug, Default, PartialEq)]
-pub struct Column {
-    pub name: String,
-    pub(crate) table: Option<Table>,
-    pub(crate) alias: Option<String>,
+pub struct Column<'a> {
+    pub name: Cow<'a, str>,
+    pub(crate) table: Option<Table<'a>>,
+    pub(crate) alias: Option<Cow<'a, str>>,
 }
 
-impl Into<DatabaseValue> for Column {
+impl<'a> From<Column<'a>> for DatabaseValue<'a> {
     #[inline]
-    fn into(self) -> DatabaseValue {
-        DatabaseValue::Column(Box::new(self))
+    fn from(col: Column<'a>) -> Self {
+        DatabaseValue::Column(Box::new(col))
     }
 }
 
-impl Column {
+impl<'a> Column<'a> {
     /// Create a column definition.
     #[inline]
     pub fn new<S>(name: S) -> Self
     where
-        S: Into<String>,
+        S: Into<Cow<'a, str>>,
     {
         Column {
             name: name.into(),
@@ -32,7 +33,7 @@ impl Column {
     #[inline]
     pub fn table<T>(mut self, table: T) -> Self
     where
-        T: Into<Table>,
+        T: Into<Table<'a>>,
     {
         self.table = Some(table.into());
         self
@@ -42,7 +43,7 @@ impl Column {
     #[inline]
     pub fn opt_table<T>(mut self, table: Option<T>) -> Self
     where
-        T: Into<Table>,
+        T: Into<Table<'a>>,
     {
         if let Some(table) = table {
             self.table = Some(table.into());
@@ -55,41 +56,41 @@ impl Column {
     #[inline]
     pub fn alias<S>(mut self, alias: S) -> Self
     where
-        S: Into<String>,
+        S: Into<Cow<'a, str>>,
     {
         self.alias = Some(alias.into());
         self
     }
 }
 
-impl<'a> From<&'a str> for Column {
+impl<'a> From<&'a str> for Column<'a> {
     #[inline]
-    fn from(s: &'a str) -> Column {
+    fn from(s: &'a str) -> Self {
         Column {
-            name: s.to_string(),
+            name: s.into(),
             ..Default::default()
         }
     }
 }
 
-impl From<String> for Column {
+impl<'a> From<String> for Column<'a> {
     #[inline]
-    fn from(s: String) -> Column {
+    fn from(s: String) -> Self {
         Column {
-            name: s,
+            name: s.into(),
             ..Default::default()
         }
     }
 }
 
-impl<T, C> From<(T, C)> for Column
+impl<'a, T, C> From<(T, C)> for Column<'a>
 where
-    T: Into<Table>,
-    C: Into<Column>,
+    T: Into<Table<'a>>,
+    C: Into<Column<'a>>,
 {
     #[inline]
-    fn from(t: (T, C)) -> Column {
-        let mut column: Column = t.1.into();
+    fn from(t: (T, C)) -> Column<'a> {
+        let mut column: Column<'a> = t.1.into();
         column = column.table(t.0);
 
         column

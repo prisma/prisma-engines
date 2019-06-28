@@ -1,8 +1,8 @@
 use crate::ast::DatabaseValue;
 
 #[derive(Debug, Clone, PartialEq)]
-pub struct Count {
-    pub(crate) exprs: Vec<DatabaseValue>,
+pub struct Count<'a> {
+    pub(crate) exprs: Vec<DatabaseValue<'a>>,
 }
 
 /// Count of the underlying table where the given expression is not null.
@@ -14,9 +14,9 @@ pub struct Count {
 /// assert_eq!("SELECT COUNT(*) FROM `users`", sql);
 /// ```
 #[inline]
-pub fn count<T>(expr: T) -> Count
+pub fn count<'a, T>(expr: T) -> Count<'a>
 where
-    T: Into<DatabaseValue>,
+    T: Into<DatabaseValue<'a>>,
 {
     Count {
         exprs: vec![expr.into()],

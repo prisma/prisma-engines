@@ -1,32 +1,33 @@
 use crate::ast::{DatabaseValue, Select};
+use std::borrow::Cow;
 
 /// An object that can be aliased.
-pub trait Aliasable {
+pub trait Aliasable<'a> {
     /// Alias table for usage elsewhere in the query.
-    fn alias<T>(self, alias: T) -> Table
+    fn alias<T>(self, alias: T) -> Table<'a>
     where
-        T: Into<String>;
+        T: Into<Cow<'a, str>>;
 }
 
 #[derive(Clone, Debug, PartialEq)]
-pub enum TableType {
-    Table(String),
-    Query(Select),
+pub enum TableType<'a> {
+    Table(Cow<'a, str>),
+    Query(Select<'a>),
 }
 
 /// A table definition
 #[derive(Clone, Debug, PartialEq)]
-pub struct Table {
-    pub typ: TableType,
-    pub alias: Option<String>,
-    pub database: Option<String>,
+pub struct Table<'a> {
+    pub typ: TableType<'a>,
+    pub alias: Option<Cow<'a, str>>,
+    pub database: Option<Cow<'a, str>>,
 }
 
-impl Table {
+impl<'a> Table<'a> {
     /// Define in which database the table is located
     pub fn database<T>(mut self, database: T) -> Self
     where
-        T: Into<String>,
+        T: Into<Cow<'a, str>>,
     {
         self.database = Some(database.into());
         self
@@ -34,52 +35,52 @@ impl Table {
 
     /// A qualified asterisk to this table
     #[inline]
-    pub fn asterisk(self) -> DatabaseValue {
+    pub fn asterisk(self) -> DatabaseValue<'a> {
         DatabaseValue::Asterisk(Some(self))
     }
 }
 
-impl<'a> From<&'a str> for Table {
+impl<'a> From<&'a str> for Table<'a> {
     #[inline]
-    fn from(s: &'a str) -> Table {
+    fn from(s: &'a str) -> Table<'a> {
         Table {
-            typ: TableType::Table(s.to_string()),
+            typ: TableType::Table(s.into()),
             alias: None,
             database: None,
         }
     }
 }
 
-impl<'a, 'b> From<(&'a str, &'b str)> for Table {
+impl<'a> From<(&'a str, &'a str)> for Table<'a> {
     #[inline]
-    fn from(s: (&'a str, &'b str)) -> Table {
-        let table: Table = s.1.into();
+    fn from(s: (&'a str, &'a str)) -> Table<'a> {
+        let table: Table<'a> = s.1.into();
         table.database(s.0)
     }
 }
 
-impl From<String> for Table {
+impl<'a> From<String> for Table<'a> {
     #[inline]
-    fn from(s: String) -> Table {
+    fn from(s: String) -> Self {
         Table {
-            typ: TableType::Table(s),
+            typ: TableType::Table(s.into()),
             alias: None,
             database: None,
         }
     }
 }
 
-impl From<(String, String)> for Table {
+impl<'a> From<(String, String)> for Table<'a> {
     #[inline]
-    fn from(s: (String, String)) -> Table {
-        let table: Table = s.1.into();
+    fn from(s: (String, String)) -> Table<'a> {
+        let table: Table<'a> = s.1.into();
         table.database(s.0)
     }
 }
 
-impl From<Select> for Table {
+impl<'a> From<Select<'a>> for Table<'a> {
     #[inline]
-    fn from(select: Select) -> Table {
+    fn from(select: Select<'a>) -> Self {
         Table {
             typ: TableType::Query(select),
             alias: None,
@@ -88,10 +89,10 @@ impl From<Select> for Table {
     }
 }
 
-impl Aliasable for Table {
-    fn alias<T>(mut self, alias: T) -> Self
+impl<'a> Aliasable<'a> for Table<'a> {
+    fn alias<T>(mut self, alias: T) -> Table<'a>
     where
-        T: Into<String>,
+        T: Into<Cow<'a, str>>,
     {
         self.alias = Some(alias.into());
         self
@@ -101,11 +102,11 @@ impl Aliasable for Table {
 macro_rules! aliasable {
     ($($kind:ty),*) => (
         $(
-            impl Aliasable for $kind {
+            impl<'a> Aliasable<'a> for $kind {
                 #[inline]
-                fn alias<T>(self, alias: T) -> Table
+                fn alias<T>(self, alias: T) -> Table<'a>
                 where
-                    T: Into<String>,
+                    T: Into<Cow<'a, str>>,
                 {
                     let table: Table = self.into();
                     table.alias(alias)
@@ -116,4 +117,4 @@ macro_rules! aliasable {
 }
 
 aliasable!(String, (String, String));
-aliasable!(&str, (&str, &str));
+aliasable!(&'a str, (&'a str, &'a str));

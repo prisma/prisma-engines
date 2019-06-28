@@ -2,22 +2,22 @@ use crate::ast::{ConditionTree, Table};
 
 /// The `JOIN` table and conditions.
 #[derive(Debug, PartialEq, Clone)]
-pub struct JoinData {
-    pub(crate) table: Table,
-    pub(crate) conditions: ConditionTree,
+pub struct JoinData<'a> {
+    pub(crate) table: Table<'a>,
+    pub(crate) conditions: ConditionTree<'a>,
 }
 
 /// A representation of a `JOIN` statement.
 #[derive(Debug, PartialEq, Clone)]
-pub enum Join {
+pub enum Join<'a> {
     /// Implements an `INNER JOIN` with given `JoinData`.
-    Inner(JoinData),
+    Inner(JoinData<'a>),
     /// Implements an `LEFT OUTER JOIN` with given `JoinData`.
-    LeftOuter(JoinData),
+    LeftOuter(JoinData<'a>),
 }
 
 /// An item that can be joined.
-pub trait Joinable {
+pub trait Joinable<'a> {
     /// Add the `JOIN` conditions.
     ///
     /// ```rust
@@ -31,19 +31,19 @@ pub trait Joinable {
     ///     sql,
     /// );
     /// ```
-    fn on<T>(self, conditions: T) -> JoinData
+    fn on<T>(self, conditions: T) -> JoinData<'a>
     where
-        T: Into<ConditionTree>;
+        T: Into<ConditionTree<'a>>;
 }
 
-impl<U> Joinable for U
+impl<'a, U> Joinable<'a> for U
 where
-    U: Into<Table>,
+    U: Into<Table<'a>>,
 {
     #[inline]
-    fn on<T>(self, conditions: T) -> JoinData
+    fn on<T>(self, conditions: T) -> JoinData<'a>
     where
-        T: Into<ConditionTree>,
+        T: Into<ConditionTree<'a>>,
     {
         JoinData {
             table: self.into(),

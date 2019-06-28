@@ -4,17 +4,17 @@ use rust_decimal::Decimal;
 use std::{error::Error, str::FromStr};
 use tokio_postgres::types::ToSql;
 
-pub struct Postgres {
-    parameters: Vec<ParameterizedValue>,
+pub struct Postgres<'a> {
+    parameters: Vec<ParameterizedValue<'a>>,
 }
 
-impl Visitor for Postgres {
+impl<'a> Visitor<'a> for Postgres<'a> {
     const C_BACKTICK: &'static str = "\"";
     const C_WILDCARD: &'static str = "%";
 
-    fn build<Q>(query: Q) -> (String, Vec<ParameterizedValue>)
+    fn build<Q>(query: Q) -> (String, Vec<ParameterizedValue<'a>>)
     where
-        Q: Into<Query>,
+        Q: Into<Query<'a>>,
     {
         let mut postgres = Postgres {
             parameters: Vec::new(),
@@ -26,7 +26,7 @@ impl Visitor for Postgres {
         )
     }
 
-    fn add_parameter(&mut self, value: ParameterizedValue) {
+    fn add_parameter(&mut self, value: ParameterizedValue<'a>) {
         self.parameters.push(value);
     }
 
@@ -36,8 +36,8 @@ impl Visitor for Postgres {
 
     fn visit_limit_and_offset(
         &mut self,
-        limit: Option<ParameterizedValue>,
-        offset: Option<ParameterizedValue>,
+        limit: Option<ParameterizedValue<'a>>,
+        offset: Option<ParameterizedValue<'a>>,
     ) -> Option<String> {
         match (limit, offset) {
             (Some(limit), Some(offset)) => Some(format!(
@@ -51,7 +51,7 @@ impl Visitor for Postgres {
         }
     }
 
-    fn visit_insert(&mut self, insert: Insert) -> String {
+    fn visit_insert(&mut self, insert: Insert<'a>) -> String {
         let mut result = vec![String::from("INSERT")];
 
         result.push(format!("INTO {}", self.visit_table(insert.table, true)));
@@ -93,7 +93,7 @@ impl Visitor for Postgres {
         result.join(" ")
     }
 
-    fn visit_aggregate_to_string(&mut self, value: DatabaseValue) -> String {
+    fn visit_aggregate_to_string(&mut self, value: DatabaseValue<'a>) -> String {
         format!(
             "array_to_string(array_agg({}), ',')",
             self.visit_database_value(value)
@@ -101,7 +101,7 @@ impl Visitor for Postgres {
     }
 }
 
-impl ToSql for ParameterizedValue {
+impl<'a> ToSql for ParameterizedValue<'a> {
     fn to_sql(
         &self,
         ty: &Type,

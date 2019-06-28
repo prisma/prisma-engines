@@ -1,7 +1,7 @@
 use crate::ast::{ConditionTree, Expression};
 
 /// `AND`, `OR` and `NOT` conjuctive implementations.
-pub trait Conjuctive {
+pub trait Conjuctive<'a> {
     /// Builds an `AND` condition having `self` as the left leaf and `other` as the right.
     ///
     /// ```rust
@@ -11,9 +11,9 @@ pub trait Conjuctive {
     ///     ConditionTree::and("foo".equals("bar"), "wtf".less_than(3))
     /// )
     /// ```
-    fn and<E>(self, other: E) -> ConditionTree
+    fn and<E>(self, other: E) -> ConditionTree<'a>
     where
-        E: Into<Expression>;
+        E: Into<Expression<'a>>;
 
     /// Builds an `OR` condition having `self` as the left leaf and `other` as the right.
     ///
@@ -24,9 +24,9 @@ pub trait Conjuctive {
     ///     ConditionTree::or("foo".equals("bar"), "wtf".less_than(3))
     /// )
     /// ```
-    fn or<E>(self, other: E) -> ConditionTree
+    fn or<E>(self, other: E) -> ConditionTree<'a>
     where
-        E: Into<Expression>;
+        E: Into<Expression<'a>>;
 
     /// Builds a `NOT` condition having `self` as the condition.
     ///
@@ -37,31 +37,31 @@ pub trait Conjuctive {
     ///     ConditionTree::not("foo".equals("bar"))
     /// )
     /// ```
-    fn not(self) -> ConditionTree;
+    fn not(self) -> ConditionTree<'a>;
 }
 
-impl<T> Conjuctive for T
+impl<'a, T> Conjuctive<'a> for T
 where
-    T: Into<Expression>,
+    T: Into<Expression<'a>>,
 {
     #[inline]
-    fn and<E>(self, other: E) -> ConditionTree
+    fn and<E>(self, other: E) -> ConditionTree<'a>
     where
-        E: Into<Expression>,
+        E: Into<Expression<'a>>,
     {
         ConditionTree::and(self.into(), other.into())
     }
 
     #[inline]
-    fn or<E>(self, other: E) -> ConditionTree
+    fn or<E>(self, other: E) -> ConditionTree<'a>
     where
-        E: Into<Expression>,
+        E: Into<Expression<'a>>,
     {
         ConditionTree::or(self.into(), other.into())
     }
 
     #[inline]
-    fn not(self) -> ConditionTree {
+    fn not(self) -> ConditionTree<'a> {
         ConditionTree::not(self.into())
     }
 }

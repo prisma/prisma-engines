@@ -2,19 +2,19 @@ use crate::ast::*;
 
 #[derive(Debug, PartialEq, Clone)]
 /// A builder for a `DELETE` statement.
-pub struct Delete {
-    pub(crate) table: Table,
-    pub(crate) conditions: Option<ConditionTree>,
+pub struct Delete<'a> {
+    pub(crate) table: Table<'a>,
+    pub(crate) conditions: Option<ConditionTree<'a>>,
 }
 
-impl From<Delete> for Query {
+impl<'a> From<Delete<'a>> for Query<'a> {
     #[inline]
-    fn from(delete: Delete) -> Query {
+    fn from(delete: Delete<'a>) -> Self {
         Query::Delete(Box::new(delete))
     }
 }
 
-impl Delete {
+impl<'a> Delete<'a> {
     /// Creates a new `DELETE` statement for the given table.
     ///
     /// ```rust
@@ -27,7 +27,7 @@ impl Delete {
     #[inline]
     pub fn from_table<T>(table: T) -> Self
     where
-        T: Into<Table>,
+        T: Into<Table<'a>>,
     {
         Self {
             table: table.into(),
@@ -48,7 +48,7 @@ impl Delete {
     /// ```
     pub fn so_that<T>(mut self, conditions: T) -> Self
     where
-        T: Into<ConditionTree>,
+        T: Into<ConditionTree<'a>>,
     {
         self.conditions = Some(conditions.into());
         self

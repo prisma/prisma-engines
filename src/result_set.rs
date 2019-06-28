@@ -105,14 +105,14 @@ impl<'a> ResultRowWithName<'a> {
 
     pub fn at_as_str(&self, i: usize) -> Result<&str, Error> {
         match self.at(i)? {
-            ParameterizedValue::Text(s) => Ok(s),
+            ParameterizedValue::Text(s) => Ok(&*s),
             _ => Err(Error::ResultTypeMissmatch("string")),
         }
     }
 
     pub fn at_as_string(&self, i: usize) -> Result<String, Error> {
         match self.at(i)? {
-            ParameterizedValue::Text(s) => Ok(s.clone()),
+            ParameterizedValue::Text(s) => Ok(s.clone().into_owned()),
             _ => Err(Error::ResultTypeMissmatch("string")),
         }
     }
@@ -149,14 +149,14 @@ impl<'a> ResultRowWithName<'a> {
 
     pub fn get_as_str(&self, name: &str) -> Result<&str, Error> {
         match self.get(name)? {
-            ParameterizedValue::Text(s) => Ok(s),
+            ParameterizedValue::Text(s) => Ok(&*s),
             _ => Err(Error::ResultTypeMissmatch("string")),
         }
     }
 
     pub fn get_as_string(&self, name: &str) -> Result<String, Error> {
         match self.get(name)? {
-            ParameterizedValue::Text(s) => Ok(s.clone()),
+            ParameterizedValue::Text(s) => Ok(s.clone().into_owned()),
             _ => Err(Error::ResultTypeMissmatch("string")),
         }
     }

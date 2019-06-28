@@ -1,20 +1,20 @@
 use crate::ast::{Column, DatabaseValue};
 
-pub type GroupByDefinition = (DatabaseValue);
+pub type GroupByDefinition<'a> = (DatabaseValue<'a>);
 
 /// A list of definitions for the `GROUP BY` statement
 #[derive(Debug, Default, PartialEq, Clone)]
-pub struct Grouping(pub Vec<GroupByDefinition>);
+pub struct Grouping<'a>(pub Vec<GroupByDefinition<'a>>);
 
-impl Grouping {
+impl<'a> Grouping<'a> {
     #[doc(hidden)]
-    pub fn append(mut self, value: GroupByDefinition) -> Self {
+    pub fn append(mut self, value: GroupByDefinition<'a>) -> Self {
         self.0.push(value);
         self
     }
 
     #[inline]
-    pub fn new(values: Vec<GroupByDefinition>) -> Self {
+    pub fn new(values: Vec<GroupByDefinition<'a>>) -> Self {
         Self(values)
     }
 
@@ -25,52 +25,51 @@ impl Grouping {
 }
 
 /// An item that can be used in the `GROUP BY` statement
-pub trait Groupable
+pub trait Groupable<'a>
 where
     Self: Sized,
 {
     /// Group by `self`
-    fn group(self) -> GroupByDefinition;
+    fn group(self) -> GroupByDefinition<'a>;
 }
 
 /// Convert the value into a group by definition.
-pub trait IntoGroupByDefinition {
-    fn into_group_by_definition(self) -> GroupByDefinition;
+pub trait IntoGroupByDefinition<'a> {
+    fn into_group_by_definition(self) -> GroupByDefinition<'a>;
 }
 
-impl<'a> IntoGroupByDefinition for &'a str {
+impl<'a> IntoGroupByDefinition<'a> for &'a str {
     #[inline]
-    fn into_group_by_definition(self) -> GroupByDefinition {
+    fn into_group_by_definition(self) -> GroupByDefinition<'a> {
         let column: Column = self.into();
         (column.into())
     }
 }
 
-impl IntoGroupByDefinition for Column {
+impl<'a> IntoGroupByDefinition<'a> for Column<'a> {
     #[inline]
-    fn into_group_by_definition(self) -> GroupByDefinition {
+    fn into_group_by_definition(self) -> GroupByDefinition<'a> {
         (self.into())
     }
 }
 
-impl IntoGroupByDefinition for GroupByDefinition {
+impl<'a> IntoGroupByDefinition<'a> for GroupByDefinition<'a> {
     #[inline]
-    fn into_group_by_definition(self) -> GroupByDefinition {
+    fn into_group_by_definition(self) -> GroupByDefinition<'a> {
         self
     }
 }
 
-impl Groupable for Column {
+impl<'a> Groupable<'a> for Column<'a> {
     #[inline]
-    fn group(self) -> GroupByDefinition {
+    fn group(self) -> GroupByDefinition<'a> {
         (self.into())
     }
 }
 
-impl<'a> Groupable for &'a str {
+impl<'a> Groupable<'a> for &'a str {
     #[inline]
-    fn group(self) -> GroupByDefinition {
-        let column: Column = self.into();
-        column.group()
+    fn group(self) -> GroupByDefinition<'a> {
+        Column::from(self).group()
     }
 }

@@ -11,17 +11,17 @@ use rusqlite::{
 
 /// A visitor for generating queries for an SQLite database. Requires that
 /// `rusqlite` feature flag is selected.
-pub struct Sqlite {
-    parameters: Vec<ParameterizedValue>,
+pub struct Sqlite<'a> {
+    parameters: Vec<ParameterizedValue<'a>>,
 }
 
-impl Visitor for Sqlite {
+impl<'a> Visitor<'a> for Sqlite<'a> {
     const C_BACKTICK: &'static str = "`";
     const C_WILDCARD: &'static str = "%";
 
-    fn build<Q>(query: Q) -> (String, Vec<ParameterizedValue>)
+    fn build<Q>(query: Q) -> (String, Vec<ParameterizedValue<'a>>)
     where
-        Q: Into<Query>,
+        Q: Into<Query<'a>>,
     {
         let mut sqlite = Sqlite {
             parameters: Vec::new(),
@@ -33,7 +33,7 @@ impl Visitor for Sqlite {
         )
     }
 
-    fn visit_insert(&mut self, insert: Insert) -> String {
+    fn visit_insert(&mut self, insert: Insert<'a>) -> String {
         let mut result = match insert.on_conflict {
             Some(OnConflict::DoNothing) => vec![String::from("INSERT OR IGNORE")],
             None => vec![String::from("INSERT")],
@@ -70,14 +70,14 @@ impl Visitor for Sqlite {
         String::from("?")
     }
 
-    fn add_parameter(&mut self, value: ParameterizedValue) {
+    fn add_parameter(&mut self, value: ParameterizedValue<'a>) {
         self.parameters.push(value);
     }
 
     fn visit_limit_and_offset(
         &mut self,
-        limit: Option<ParameterizedValue>,
-        offset: Option<ParameterizedValue>,
+        limit: Option<ParameterizedValue<'a>>,
+        offset: Option<ParameterizedValue<'a>>,
     ) -> Option<String> {
         match (limit, offset) {
             (Some(limit), Some(offset)) => Some(format!(
@@ -95,13 +95,13 @@ impl Visitor for Sqlite {
         }
     }
 
-    fn visit_aggregate_to_string(&mut self, value: DatabaseValue) -> String {
+    fn visit_aggregate_to_string(&mut self, value: DatabaseValue<'a>) -> String {
         format!("group_concat({})", self.visit_database_value(value))
     }
 }
 
 #[cfg(feature = "sqlite")]
-impl Bindable for ParameterizedValue {
+impl<'a> Bindable for ParameterizedValue<'a> {
     #[inline]
     fn bind(self, statement: &mut Statement, i: usize) -> SqliteResult<()> {
         use ParameterizedValue as Pv;
@@ -119,13 +119,13 @@ impl Bindable for ParameterizedValue {
 }
 
 #[cfg(feature = "rusqlite")]
-impl ToSql for ParameterizedValue {
+impl<'a> ToSql for ParameterizedValue<'a> {
     fn to_sql(&self) -> Result<ToSqlOutput, RusqlError> {
         let value = match self {
             ParameterizedValue::Null => ToSqlOutput::from(Null),
             ParameterizedValue::Integer(integer) => ToSqlOutput::from(*integer),
             ParameterizedValue::Real(float) => ToSqlOutput::from(*float),
-            ParameterizedValue::Text(string) => ToSqlOutput::from(string.clone()),
+            ParameterizedValue::Text(cow) => ToSqlOutput::from(&**cow),
             ParameterizedValue::Boolean(boo) => ToSqlOutput::from(*boo),
             #[cfg(feature = "array")]
             ParameterizedValue::Array(_) => unimplemented!("Arrays are not supported for sqlite."),
@@ -149,9 +149,12 @@ impl ToSql for ParameterizedValue {
 mod tests {
     use crate::visitor::*;
 
-    fn expected_values<T>(sql: &'static str, params: Vec<T>) -> (String, Vec<ParameterizedValue>)
+    fn expected_values<'a, T>(
+        sql: &'static str,
+        params: Vec<T>,
+    ) -> (String, Vec<ParameterizedValue<'a>>)
     where
-        T: Into<ParameterizedValue>,
+        T: Into<ParameterizedValue<'a>>,
     {
         (
             String::from(sql),
@@ -159,7 +162,9 @@ mod tests {
         )
     }
 
-    fn default_params(mut additional: Vec<ParameterizedValue>) -> Vec<ParameterizedValue> {
+    fn default_params<'a>(
+        mut additional: Vec<ParameterizedValue<'a>>,
+    ) -> Vec<ParameterizedValue<'a>> {
         let mut result = Vec::new();
 
         for param in additional.drain(0..) {
@@ -319,9 +324,9 @@ mod tests {
             "SELECT `naukio`.* FROM `naukio` WHERE ((`word` = ? AND `age` < ?) AND `paw` = ?)";
 
         let expected_params = vec![
-            ParameterizedValue::Text(String::from("meow")),
+            ParameterizedValue::Text(Cow::from("meow")),
             ParameterizedValue::Integer(10),
-            ParameterizedValue::Text(String::from("warm")),
+            ParameterizedValue::Text(Cow::from("warm")),
         ];
 
         let conditions = "word"
@@ -343,9 +348,9 @@ mod tests {
             "SELECT `naukio`.* FROM `naukio` WHERE (`word` = ? AND (`age` < ? AND `paw` = ?))";
 
         let expected_params = vec![
-            ParameterizedValue::Text(String::from("meow")),
+            ParameterizedValue::Text(Cow::from("meow")),
             ParameterizedValue::Integer(10),
-            ParameterizedValue::Text(String::from("warm")),
+            ParameterizedValue::Text(Cow::from("warm")),
         ];
 
         let conditions = "word"
@@ -366,9 +371,9 @@ mod tests {
             "SELECT `naukio`.* FROM `naukio` WHERE ((`word` = ? OR `age` < ?) AND `paw` = ?)";
 
         let expected_params = vec![
-            ParameterizedValue::Text(String::from("meow")),
+            ParameterizedValue::Text(Cow::from("meow")),
             ParameterizedValue::Integer(10),
-            ParameterizedValue::Text(String::from("warm")),
+            ParameterizedValue::Text(Cow::from("warm")),
         ];
 
         let conditions = "word"
@@ -390,9 +395,9 @@ mod tests {
             "SELECT `naukio`.* FROM `naukio` WHERE (NOT ((`word` = ? OR `age` < ?) AND `paw` = ?))";
 
         let expected_params = vec![
-            ParameterizedValue::Text(String::from("meow")),
+            ParameterizedValue::Text(Cow::from("meow")),
             ParameterizedValue::Integer(10),
-            ParameterizedValue::Text(String::from("warm")),
+            ParameterizedValue::Text(Cow::from("warm")),
         ];
 
         let conditions = "word"
@@ -415,9 +420,9 @@ mod tests {
             "SELECT `naukio`.* FROM `naukio` WHERE (NOT ((`word` = ? OR `age` < ?) AND `paw` = ?))";
 
         let expected_params = vec![
-            ParameterizedValue::Text(String::from("meow")),
+            ParameterizedValue::Text(Cow::from("meow")),
             ParameterizedValue::Integer(10),
-            ParameterizedValue::Text(String::from("warm")),
+            ParameterizedValue::Text(Cow::from("warm")),
         ];
 
         let conditions = ConditionTree::not(ConditionTree::and(

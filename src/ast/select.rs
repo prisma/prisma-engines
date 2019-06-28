@@ -2,32 +2,32 @@ use crate::ast::*;
 
 /// A builder for a `SELECT` statement.
 #[derive(Debug, PartialEq, Clone, Default)]
-pub struct Select {
-    pub(crate) table: Option<Box<Table>>,
-    pub(crate) columns: Vec<DatabaseValue>,
-    pub(crate) conditions: Option<ConditionTree>,
-    pub(crate) ordering: Ordering,
-    pub(crate) grouping: Grouping,
-    pub(crate) limit: Option<ParameterizedValue>,
-    pub(crate) offset: Option<ParameterizedValue>,
-    pub(crate) joins: Vec<Join>,
+pub struct Select<'a> {
+    pub(crate) table: Option<Box<Table<'a>>>,
+    pub(crate) columns: Vec<DatabaseValue<'a>>,
+    pub(crate) conditions: Option<ConditionTree<'a>>,
+    pub(crate) ordering: Ordering<'a>,
+    pub(crate) grouping: Grouping<'a>,
+    pub(crate) limit: Option<ParameterizedValue<'a>>,
+    pub(crate) offset: Option<ParameterizedValue<'a>>,
+    pub(crate) joins: Vec<Join<'a>>,
 }
 
-impl Into<DatabaseValue> for Select {
+impl<'a> From<Select<'a>> for DatabaseValue<'a> {
     #[inline]
-    fn into(self) -> DatabaseValue {
-        DatabaseValue::Select(self)
+    fn from(sel: Select<'a>) -> DatabaseValue<'a> {
+        DatabaseValue::Select(sel)
     }
 }
 
-impl From<Select> for Query {
+impl<'a> From<Select<'a>> for Query<'a> {
     #[inline]
-    fn from(sel: Select) -> Query {
+    fn from(sel: Select<'a>) -> Query<'a> {
         Query::Select(sel)
     }
 }
 
-impl Select {
+impl<'a> Select<'a> {
     /// Creates a new `SELECT` statement for the given table.
     ///
     /// ```rust
@@ -62,7 +62,7 @@ impl Select {
     #[inline]
     pub fn from_table<T>(table: T) -> Self
     where
-        T: Into<Table>,
+        T: Into<Table<'a>>,
     {
         Select {
             table: Some(Box::new(table.into())),
@@ -101,7 +101,7 @@ impl Select {
     /// ```
     pub fn value<T>(mut self, value: T) -> Self
     where
-        T: Into<DatabaseValue>,
+        T: Into<DatabaseValue<'a>>,
     {
         self.columns.push(value.into());
         self
@@ -122,7 +122,7 @@ impl Select {
     /// ```
     pub fn column<T>(mut self, column: T) -> Self
     where
-        T: Into<Column>,
+        T: Into<Column<'a>>,
     {
         self.columns.push(column.into().into());
         self
@@ -144,7 +144,7 @@ impl Select {
     /// ```
     pub fn columns<T>(mut self, columns: Vec<T>) -> Self
     where
-        T: Into<DatabaseValue>,
+        T: Into<DatabaseValue<'a>>,
     {
         self.columns = columns.into_iter().map(|c| c.into()).collect();
         self
@@ -166,7 +166,7 @@ impl Select {
     /// ```
     pub fn so_that<T>(mut self, conditions: T) -> Self
     where
-        T: Into<ConditionTree>,
+        T: Into<ConditionTree<'a>>,
     {
         self.conditions = Some(conditions.into());
         self
@@ -187,7 +187,7 @@ impl Select {
     /// ```
     pub fn inner_join<J>(mut self, join: J) -> Self
     where
-        J: Into<JoinData>,
+        J: Into<JoinData<'a>>,
     {
         self.joins.push(Join::Inner(join.into()));
         self
@@ -215,7 +215,7 @@ impl Select {
     /// ```
     pub fn left_outer_join<J>(mut self, join: J) -> Self
     where
-        J: Into<JoinData>,
+        J: Into<JoinData<'a>>,
     {
         self.joins.push(Join::LeftOuter(join.into()));
         self
@@ -235,7 +235,7 @@ impl Select {
     /// assert_eq!("SELECT `users`.* FROM `users` ORDER BY `foo`, `baz` ASC, `bar` DESC", sql);
     pub fn order_by<T>(mut self, value: T) -> Self
     where
-        T: IntoOrderDefinition,
+        T: IntoOrderDefinition<'a>,
     {
         self.ordering = self.ordering.append(value.into_order_definition());
         self
@@ -256,7 +256,7 @@ impl Select {
     /// assert_eq!("SELECT `foo`, `bar` FROM `users` GROUP BY `foo`, `bar`", sql);
     pub fn group_by<T>(mut self, value: T) -> Self
     where
-        T: IntoGroupByDefinition,
+        T: IntoGroupByDefinition<'a>,
     {
         self.grouping = self.grouping.append(value.into_group_by_definition());
         self

@@ -2,22 +2,22 @@ use crate::ast::{Query, Select};
 
 /// A builder for a `UNION ALL` over multiple `SELECT` statements.
 #[derive(Debug, PartialEq, Clone, Default)]
-pub struct UnionAll(pub Vec<Select>);
+pub struct UnionAll<'a>(pub Vec<Select<'a>>);
 
-impl From<Select> for UnionAll {
-    fn from(q: Select) -> Self {
+impl<'a> From<Select<'a>> for UnionAll<'a> {
+    fn from(q: Select<'a>) -> Self {
         UnionAll(vec![q])
     }
 }
 
-impl From<UnionAll> for Query {
+impl<'a> From<UnionAll<'a>> for Query<'a> {
     #[inline]
-    fn from(ua: UnionAll) -> Query {
+    fn from(ua: UnionAll<'a>) -> Self {
         Query::UnionAll(ua)
     }
 }
 
-impl UnionAll {
+impl<'a> UnionAll<'a> {
     /// Creates a union with previous and given `SELECT` statement.
     ///
     /// ```rust
@@ -33,7 +33,7 @@ impl UnionAll {
     ///     ParameterizedValue::from(2)
     /// ], params);
     /// ```
-    pub fn add(mut self, q: Select) -> Self {
+    pub fn add(mut self, q: Select<'a>) -> Self {
         self.0.push(q);
         self
     }

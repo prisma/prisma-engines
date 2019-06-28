@@ -38,7 +38,7 @@ impl<'a> FromSql<'a> for Id {
             PostgresType::INT4 => Id::Int(i32::from_sql(ty, raw)? as usize),
             PostgresType::INT8 => Id::Int(i64::from_sql(ty, raw)? as usize),
             PostgresType::UUID => Id::UUID(Uuid::from_sql(ty, raw)?),
-            _ => Id::String(String::from_sql(ty, raw)?),
+            _ => Id::String(String::from_sql(ty, raw)?.into()),
         };
 
         Ok(res)
@@ -84,19 +84,19 @@ impl Connectional for PostgreSql {
         })
     }
 
-    fn execute_on_connection(&self, db: &str, query: Query) -> QueryResult<Option<Id>> {
+    fn execute_on_connection<'a>(&self, db: &str, query: Query<'a>) -> QueryResult<Option<Id>> {
         self.with_connection(&db, |conn| conn.execute(query))
     }
 
-    fn query_on_connection(&self, db: &str, query: Query) -> QueryResult<ResultSet> {
+    fn query_on_connection<'a>(&self, db: &str, query: Query<'a>) -> QueryResult<ResultSet> {
         self.with_connection(&db, |conn| conn.query(query))
     }
 
-    fn query_on_raw_connection(
+    fn query_on_raw_connection<'a>(
         &self,
         db: &str,
         sql: &str,
-        params: &[ParameterizedValue],
+        params: &[ParameterizedValue<'a>],
     ) -> QueryResult<ResultSet> {
         self.with_connection(&db, |conn| conn.query_raw(&sql, &params))
     }
@@ -106,12 +106,12 @@ impl<'a> Transaction for PostgresTransaction<'a> {}
 
 // Postgres uses a somewhat weird parameter format, therefore
 // we have to re-map all elements.
-fn conv_params(params: &[ParameterizedValue]) -> Vec<&tokio_postgres::types::ToSql> {
-    params.iter().map(|x| x as &ToSql).collect::<Vec<_>>()
+fn conv_params<'a>(params: &'a [ParameterizedValue<'a>]) -> Vec<&'a tokio_postgres::types::ToSql> {
+    params.into_iter().map(|x| x as &ToSql).collect::<Vec<_>>()
 }
 
-impl<'a> Connection for PostgresTransaction<'a> {
-    fn execute(&mut self, q: Query) -> QueryResult<Option<Id>> {
+impl<'t> Connection for PostgresTransaction<'t> {
+    fn execute<'a>(&mut self, q: Query<'a>) -> QueryResult<Option<Id>> {
         let (sql, params) = dbg!(visitor::Postgres::build(q));
 
         let stmt = self.prepare(&sql)?;
@@ -130,13 +130,17 @@ impl<'a> Connection for PostgresTransaction<'a> {
         }
     }
 
-    fn query(&mut self, q: Query) -> QueryResult<ResultSet> {
+    fn query<'a>(&mut self, q: Query<'a>) -> QueryResult<ResultSet> {
         let (sql, params) = dbg!(visitor::Postgres::build(q));
 
         self.query_raw(&sql, &params[..])
     }
 
-    fn query_raw(&mut self, sql: &str, params: &[ParameterizedValue]) -> QueryResult<ResultSet> {
+    fn query_raw<'a>(
+        &mut self,
+        sql: &str,
+        params: &[ParameterizedValue<'a>],
+    ) -> QueryResult<ResultSet> {
         let stmt = self.prepare(&sql)?;
         let rows = PostgresTransaction::query(self, &stmt, &conv_params(params))?;
 
@@ -151,7 +155,7 @@ impl<'a> Connection for PostgresTransaction<'a> {
 }
 
 impl Connection for &mut PostgresConnection {
-    fn execute(&mut self, q: Query) -> QueryResult<Option<Id>> {
+    fn execute<'a>(&mut self, q: Query<'a>) -> QueryResult<Option<Id>> {
         let (sql, params) = dbg!(visitor::Postgres::build(q));
 
         let stmt = self.prepare(&sql)?;
@@ -170,13 +174,17 @@ impl Connection for &mut PostgresConnection {
         }
     }
 
-    fn query(&mut self, q: Query) -> QueryResult<ResultSet> {
+    fn query<'a>(&mut self, q: Query<'a>) -> QueryResult<ResultSet> {
         let (sql, params) = dbg!(visitor::Postgres::build(q));
 
         self.query_raw(&sql, &params)
     }
 
-    fn query_raw(&mut self, sql: &str, params: &[ParameterizedValue]) -> QueryResult<ResultSet> {
+    fn query_raw<'a>(
+        &mut self,
+        sql: &str,
+        params: &[ParameterizedValue<'a>],
+    ) -> QueryResult<ResultSet> {
         let stmt = self.prepare(&sql)?;
         let rows = PostgresConnection::query(self, &stmt, &conv_params(params))?;
 
@@ -192,7 +200,7 @@ impl Connection for &mut PostgresConnection {
 
 impl ToResultRow for PostgresRow {
     fn to_result_row<'b>(&'b self) -> QueryResult<ResultRow> {
-        fn convert(row: &PostgresRow, i: usize) -> QueryResult<ParameterizedValue> {
+        fn convert(row: &PostgresRow, i: usize) -> QueryResult<ParameterizedValue<'static>> {
             let result = match *row.columns()[i].type_() {
                 PostgresType::BOOL => match row.try_get(i)? {
                     Some(val) => ParameterizedValue::Boolean(val),
@@ -362,14 +370,17 @@ impl ToResultRow for PostgresRow {
                         let val: Vec<&str> = val;
                         ParameterizedValue::Array(
                             val.into_iter()
-                                .map(|x| ParameterizedValue::Text(String::from(x)))
+                                .map(|x| ParameterizedValue::Text(String::from(x).into()))
                                 .collect(),
                         )
                     }
                     None => ParameterizedValue::Null,
                 },
                 _ => match row.try_get(i)? {
-                    Some(val) => ParameterizedValue::Text(val),
+                    Some(val) => {
+                        let val: String = val;
+                        ParameterizedValue::Text(val.into())
+                    }
                     None => ParameterizedValue::Null,
                 },
             };

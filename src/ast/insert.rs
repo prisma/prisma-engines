@@ -2,24 +2,24 @@ use crate::ast::*;
 
 /// A builder for an `INSERT` statement.
 #[derive(Clone, Debug, PartialEq)]
-pub struct Insert {
-    pub(crate) table: Table,
-    pub(crate) columns: Vec<Column>,
-    pub(crate) values: Vec<Row>,
+pub struct Insert<'a> {
+    pub(crate) table: Table<'a>,
+    pub(crate) columns: Vec<Column<'a>>,
+    pub(crate) values: Vec<Row<'a>>,
     pub(crate) on_conflict: Option<OnConflict>,
-    pub(crate) returning: Option<Vec<Column>>,
+    pub(crate) returning: Option<Vec<Column<'a>>>,
 }
 
-pub struct SingleRowInsert {
-    pub(crate) table: Table,
-    pub(crate) columns: Vec<Column>,
-    pub(crate) values: Row,
+pub struct SingleRowInsert<'a> {
+    pub(crate) table: Table<'a>,
+    pub(crate) columns: Vec<Column<'a>>,
+    pub(crate) values: Row<'a>,
 }
 
-pub struct MultiRowInsert {
-    pub(crate) table: Table,
-    pub(crate) columns: Vec<Column>,
-    pub(crate) values: Vec<Row>,
+pub struct MultiRowInsert<'a> {
+    pub(crate) table: Table<'a>,
+    pub(crate) columns: Vec<Column<'a>>,
+    pub(crate) values: Vec<Row<'a>>,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -38,16 +38,15 @@ pub enum OnConflict {
     DoNothing,
 }
 
-impl From<Insert> for Query {
+impl<'a> From<Insert<'a>> for Query<'a> {
     #[inline]
-    fn from(insert: Insert) -> Query {
+    fn from(insert: Insert<'a>) -> Self {
         Query::Insert(Box::new(insert))
     }
 }
 
-impl From<SingleRowInsert> for Insert {
-    #[inline]
-    fn from(insert: SingleRowInsert) -> Insert {
+impl<'a> From<SingleRowInsert<'a>> for Insert<'a> {
+    fn from(insert: SingleRowInsert<'a>) -> Self {
         let values = if insert.values.is_empty() {
             Vec::new()
         } else {
@@ -64,9 +63,9 @@ impl From<SingleRowInsert> for Insert {
     }
 }
 
-impl From<MultiRowInsert> for Insert {
+impl<'a> From<MultiRowInsert<'a>> for Insert<'a> {
     #[inline]
-    fn from(insert: MultiRowInsert) -> Insert {
+    fn from(insert: MultiRowInsert<'a>) -> Self {
         Insert {
             table: insert.table,
             columns: insert.columns,
@@ -77,21 +76,21 @@ impl From<MultiRowInsert> for Insert {
     }
 }
 
-impl From<SingleRowInsert> for Query {
+impl<'a> From<SingleRowInsert<'a>> for Query<'a> {
     #[inline]
-    fn from(insert: SingleRowInsert) -> Query {
+    fn from(insert: SingleRowInsert<'a>) -> Query<'a> {
         Query::from(Insert::from(insert))
     }
 }
 
-impl From<MultiRowInsert> for Query {
+impl<'a> From<MultiRowInsert<'a>> for Query<'a> {
     #[inline]
-    fn from(insert: MultiRowInsert) -> Query {
+    fn from(insert: MultiRowInsert<'a>) -> Query<'a> {
         Query::from(Insert::from(insert))
     }
 }
 
-impl Insert {
+impl<'a> Insert<'a> {
     /// Creates a new single row `INSERT` statement for the given table.
     ///
     /// ```rust
@@ -102,14 +101,12 @@ impl Insert {
     /// assert_eq!("INSERT INTO `users` DEFAULT VALUES", sql);
     /// ```
     #[inline]
-    pub fn single_into<T>(table: T) -> SingleRowInsert
+    pub fn single_into<T>(table: T) -> SingleRowInsert<'a>
     where
-        T: Into<Table>,
+        T: Into<Table<'a>>,
     {
-        let table: Table = table.into();
-
         SingleRowInsert {
-            table: table,
+            table: table.into(),
             columns: Vec::new(),
             values: Row::new(),
         }
@@ -117,15 +114,13 @@ impl Insert {
 
     /// Creates a new multi row `INSERT` statement for the given table.
     #[inline]
-    pub fn multi_into<T, K>(table: T, columns: Vec<K>) -> MultiRowInsert
+    pub fn multi_into<T, K>(table: T, columns: Vec<K>) -> MultiRowInsert<'a>
     where
-        T: Into<Table>,
-        K: Into<Column>,
+        T: Into<Table<'a>>,
+        K: Into<Column<'a>>,
     {
-        let table: Table = table.into();
-
         MultiRowInsert {
-            table: table,
+            table: table.into(),
             columns: columns.into_iter().map(|c| c.into()).collect(),
             values: Vec::new(),
         }
@@ -150,14 +145,14 @@ impl Insert {
     /// ```
     pub fn returning<K>(mut self, columns: Vec<K>) -> Self
     where
-        K: Into<Column>,
+        K: Into<Column<'a>>,
     {
         self.returning = Some(columns.into_iter().map(|k| k.into()).collect());
         self
     }
 }
 
-impl SingleRowInsert {
+impl<'a> SingleRowInsert<'a> {
     /// Adds a new value to the `INSERT` statement
     ///
     /// ```rust
@@ -168,10 +163,10 @@ impl SingleRowInsert {
     /// assert_eq!("INSERT INTO `users` (`foo`) VALUES (?)", sql);
     /// assert_eq!(vec![ParameterizedValue::Integer(10)], params);
     /// ```
-    pub fn value<K, V>(mut self, key: K, val: V) -> SingleRowInsert
+    pub fn value<K, V>(mut self, key: K, val: V) -> SingleRowInsert<'a>
     where
-        K: Into<Column>,
-        V: Into<DatabaseValue>,
+        K: Into<Column<'a>>,
+        V: Into<DatabaseValue<'a>>,
     {
         self.columns.push(key.into());
         self.values = self.values.push(val.into());
@@ -180,7 +175,7 @@ impl SingleRowInsert {
     }
 }
 
-impl MultiRowInsert {
+impl<'a> MultiRowInsert<'a> {
     /// Adds a new row to be inserted.
     ///
     /// ```rust
@@ -201,7 +196,7 @@ impl MultiRowInsert {
     /// ```
     pub fn values<V>(mut self, values: V) -> Self
     where
-        V: Into<Row>,
+        V: Into<Row<'a>>,
     {
         self.values.push(values.into());
         self

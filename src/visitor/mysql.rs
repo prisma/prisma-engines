@@ -4,17 +4,17 @@ use mysql::Value as MyValue;
 #[cfg(feature = "chrono-0_4")]
 use chrono::{Datelike, Timelike};
 
-pub struct Mysql {
-    parameters: Vec<ParameterizedValue>,
+pub struct Mysql<'a> {
+    parameters: Vec<ParameterizedValue<'a>>,
 }
 
-impl Visitor for Mysql {
+impl<'a> Visitor<'a> for Mysql<'a> {
     const C_BACKTICK: &'static str = "`";
     const C_WILDCARD: &'static str = "%";
 
-    fn build<Q>(query: Q) -> (String, Vec<ParameterizedValue>)
+    fn build<Q>(query: Q) -> (String, Vec<ParameterizedValue<'a>>)
     where
-        Q: Into<Query>,
+        Q: Into<Query<'a>>,
     {
         let mut mysql = Mysql {
             parameters: Vec::new(),
@@ -26,7 +26,7 @@ impl Visitor for Mysql {
         )
     }
 
-    fn visit_insert(&mut self, insert: Insert) -> String {
+    fn visit_insert(&mut self, insert: Insert<'a>) -> String {
         let mut result = match insert.on_conflict {
             Some(OnConflict::DoNothing) => vec![String::from("INSERT IGNORE")],
             None => vec![String::from("INSERT")],
@@ -63,14 +63,14 @@ impl Visitor for Mysql {
         String::from("?")
     }
 
-    fn add_parameter(&mut self, value: ParameterizedValue) {
+    fn add_parameter(&mut self, value: ParameterizedValue<'a>) {
         self.parameters.push(value);
     }
 
     fn visit_limit_and_offset(
         &mut self,
-        limit: Option<ParameterizedValue>,
-        offset: Option<ParameterizedValue>,
+        limit: Option<ParameterizedValue<'a>>,
+        offset: Option<ParameterizedValue<'a>>,
     ) -> Option<String> {
         match (limit, offset) {
             (Some(limit), Some(offset)) => Some(format!(
@@ -89,18 +89,18 @@ impl Visitor for Mysql {
         }
     }
 
-    fn visit_aggregate_to_string(&mut self, value: DatabaseValue) -> String {
+    fn visit_aggregate_to_string(&mut self, value: DatabaseValue<'a>) -> String {
         format!("group_concat({})", self.visit_database_value(value))
     }
 }
 
-impl From<ParameterizedValue> for MyValue {
-    fn from(pv: ParameterizedValue) -> MyValue {
+impl<'a> From<ParameterizedValue<'a>> for MyValue {
+    fn from(pv: ParameterizedValue<'a>) -> MyValue {
         match pv {
             ParameterizedValue::Null => MyValue::NULL,
             ParameterizedValue::Integer(i) => MyValue::Int(i),
             ParameterizedValue::Real(f) => MyValue::Float(f),
-            ParameterizedValue::Text(s) => MyValue::Bytes(s.into_bytes()),
+            ParameterizedValue::Text(s) => MyValue::Bytes((&*s).as_bytes().to_vec()),
             ParameterizedValue::Boolean(b) => MyValue::Int(b as i64),
             #[cfg(feature = "json-1")]
             ParameterizedValue::Json(json) => {
