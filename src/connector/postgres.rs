@@ -6,7 +6,7 @@ use crate::{
         Transactional,
     },
     visitor::{self, Visitor},
-    QueryResult, ResultSet,
+    ResultSet,
 };
 use chrono::{DateTime, NaiveDateTime, Utc};
 use native_tls::TlsConnector;
@@ -54,9 +54,9 @@ impl<'a> FromSql<'a> for Id {
 }
 
 impl Transactional for PostgreSql {
-    fn with_transaction<F, T>(&self, _db: &str, f: F) -> QueryResult<T>
+    fn with_transaction<F, T>(&self, _db: &str, f: F) -> crate::Result<T>
     where
-        F: FnOnce(&mut Transaction) -> QueryResult<T>,
+        F: FnOnce(&mut Transaction) -> crate::Result<T>,
     {
         self.with_connection_internal(|client| {
             let mut tx = client.transaction()?;
@@ -72,9 +72,9 @@ impl Transactional for PostgreSql {
 }
 
 impl Connectional for PostgreSql {
-    fn with_connection<F, T>(&self, _db: &str, f: F) -> QueryResult<T>
+    fn with_connection<F, T>(&self, _db: &str, f: F) -> crate::Result<T>
     where
-        F: FnOnce(&mut Connection) -> QueryResult<T>,
+        F: FnOnce(&mut Connection) -> crate::Result<T>,
         Self: Sized,
     {
         // TODO: Select DB.
@@ -84,11 +84,11 @@ impl Connectional for PostgreSql {
         })
     }
 
-    fn execute_on_connection<'a>(&self, db: &str, query: Query<'a>) -> QueryResult<Option<Id>> {
+    fn execute_on_connection<'a>(&self, db: &str, query: Query<'a>) -> crate::Result<Option<Id>> {
         self.with_connection(&db, |conn| conn.execute(query))
     }
 
-    fn query_on_connection<'a>(&self, db: &str, query: Query<'a>) -> QueryResult<ResultSet> {
+    fn query_on_connection<'a>(&self, db: &str, query: Query<'a>) -> crate::Result<ResultSet> {
         self.with_connection(&db, |conn| conn.query(query))
     }
 
@@ -97,7 +97,7 @@ impl Connectional for PostgreSql {
         db: &str,
         sql: &str,
         params: &[ParameterizedValue<'a>],
-    ) -> QueryResult<ResultSet> {
+    ) -> crate::Result<ResultSet> {
         self.with_connection(&db, |conn| conn.query_raw(&sql, &params))
     }
 }
@@ -111,7 +111,7 @@ fn conv_params<'a>(params: &'a [ParameterizedValue<'a>]) -> Vec<&'a tokio_postgr
 }
 
 impl<'t> Connection for PostgresTransaction<'t> {
-    fn execute<'a>(&mut self, q: Query<'a>) -> QueryResult<Option<Id>> {
+    fn execute<'a>(&mut self, q: Query<'a>) -> crate::Result<Option<Id>> {
         let (sql, params) = dbg!(visitor::Postgres::build(q));
 
         let stmt = self.prepare(&sql)?;
@@ -130,7 +130,7 @@ impl<'t> Connection for PostgresTransaction<'t> {
         }
     }
 
-    fn query<'a>(&mut self, q: Query<'a>) -> QueryResult<ResultSet> {
+    fn query<'a>(&mut self, q: Query<'a>) -> crate::Result<ResultSet> {
         let (sql, params) = dbg!(visitor::Postgres::build(q));
 
         self.query_raw(&sql, &params[..])
@@ -140,7 +140,7 @@ impl<'t> Connection for PostgresTransaction<'t> {
         &mut self,
         sql: &str,
         params: &[ParameterizedValue<'a>],
-    ) -> QueryResult<ResultSet> {
+    ) -> crate::Result<ResultSet> {
         let stmt = self.prepare(&sql)?;
         let rows = PostgresTransaction::query(self, &stmt, &conv_params(params))?;
 
@@ -155,7 +155,7 @@ impl<'t> Connection for PostgresTransaction<'t> {
 }
 
 impl Connection for &mut PostgresConnection {
-    fn execute<'a>(&mut self, q: Query<'a>) -> QueryResult<Option<Id>> {
+    fn execute<'a>(&mut self, q: Query<'a>) -> crate::Result<Option<Id>> {
         let (sql, params) = dbg!(visitor::Postgres::build(q));
 
         let stmt = self.prepare(&sql)?;
@@ -174,7 +174,7 @@ impl Connection for &mut PostgresConnection {
         }
     }
 
-    fn query<'a>(&mut self, q: Query<'a>) -> QueryResult<ResultSet> {
+    fn query<'a>(&mut self, q: Query<'a>) -> crate::Result<ResultSet> {
         let (sql, params) = dbg!(visitor::Postgres::build(q));
 
         self.query_raw(&sql, &params)
@@ -184,7 +184,7 @@ impl Connection for &mut PostgresConnection {
         &mut self,
         sql: &str,
         params: &[ParameterizedValue<'a>],
-    ) -> QueryResult<ResultSet> {
+    ) -> crate::Result<ResultSet> {
         let stmt = self.prepare(&sql)?;
         let rows = PostgresConnection::query(self, &stmt, &conv_params(params))?;
 
@@ -199,8 +199,8 @@ impl Connection for &mut PostgresConnection {
 }
 
 impl ToResultRow for PostgresRow {
-    fn to_result_row<'b>(&'b self) -> QueryResult<ResultRow> {
-        fn convert(row: &PostgresRow, i: usize) -> QueryResult<ParameterizedValue<'static>> {
+    fn to_result_row<'b>(&'b self) -> crate::Result<ResultRow> {
+        fn convert(row: &PostgresRow, i: usize) -> crate::Result<ParameterizedValue<'static>> {
             let result = match *row.columns()[i].type_() {
                 PostgresType::BOOL => match row.try_get(i)? {
                     Some(val) => ParameterizedValue::Boolean(val),
@@ -411,7 +411,7 @@ impl ToColumnNames for PostgresStatement {
 }
 
 impl PostgreSql {
-    pub fn new(config: Config, connections: u32) -> QueryResult<PostgreSql> {
+    pub fn new(config: Config, connections: u32) -> crate::Result<PostgreSql> {
         let mut tls_builder = TlsConnector::builder();
         tls_builder.danger_accept_invalid_certs(true); // For Heroku
         let tls = MakeTlsConnector::new(tls_builder.build()?);
@@ -422,9 +422,9 @@ impl PostgreSql {
         Ok(PostgreSql { pool })
     }
 
-    fn with_connection_internal<F, T>(&self, f: F) -> QueryResult<T>
+    fn with_connection_internal<F, T>(&self, f: F) -> crate::Result<T>
     where
-        F: FnOnce(&mut PostgresConnection) -> QueryResult<T>,
+        F: FnOnce(&mut PostgresConnection) -> crate::Result<T>,
     {
         let mut client = self.pool.get()?;
         let result = f(&mut client);

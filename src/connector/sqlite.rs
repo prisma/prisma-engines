@@ -6,7 +6,7 @@ use crate::{
         Transactional,
     },
     visitor::{self, Visitor},
-    QueryResult, ResultSet,
+    ResultSet,
 };
 use libsqlite3_sys as ffi;
 use r2d2_sqlite::SqliteConnectionManager;
@@ -27,9 +27,9 @@ pub struct Sqlite {
 }
 
 impl Transactional for Sqlite {
-    fn with_transaction<F, T>(&self, db: &str, f: F) -> QueryResult<T>
+    fn with_transaction<F, T>(&self, db: &str, f: F) -> crate::Result<T>
     where
-        F: FnOnce(&mut Transaction) -> QueryResult<T>,
+        F: FnOnce(&mut Transaction) -> crate::Result<T>,
     {
         self.with_connection_internal(db, |ref mut conn| {
             let mut tx = conn.get_mut().transaction()?;
@@ -47,19 +47,19 @@ impl Transactional for Sqlite {
 }
 
 impl Connectional for Sqlite {
-    fn with_connection<'a, F, T>(&self, db: &str, f: F) -> QueryResult<T>
+    fn with_connection<'a, F, T>(&self, db: &str, f: F) -> crate::Result<T>
     where
-        F: FnOnce(&mut Connection) -> QueryResult<T>,
+        F: FnOnce(&mut Connection) -> crate::Result<T>,
         Self: Sized,
     {
         self.with_connection_internal(db, |c| f(c.get_mut()))
     }
 
-    fn execute_on_connection<'a>(&self, db: &str, query: Query<'a>) -> QueryResult<Option<Id>> {
+    fn execute_on_connection<'a>(&self, db: &str, query: Query<'a>) -> crate::Result<Option<Id>> {
         self.with_connection(&db, |conn| conn.execute(query))
     }
 
-    fn query_on_connection<'a>(&self, db: &str, query: Query<'a>) -> QueryResult<ResultSet> {
+    fn query_on_connection<'a>(&self, db: &str, query: Query<'a>) -> crate::Result<ResultSet> {
         self.with_connection(&db, |conn| conn.query(query))
     }
 
@@ -68,14 +68,14 @@ impl Connectional for Sqlite {
         db: &str,
         sql: &str,
         params: &[ParameterizedValue<'a>],
-    ) -> QueryResult<ResultSet> {
+    ) -> crate::Result<ResultSet> {
         self.with_connection(&db, |conn| conn.query_raw(&sql, &params))
     }
 }
 
 // Concrete implmentations of trait methods, dropping the mut
 // so we can share it between Connection and Transaction.
-fn execute_impl<'a>(conn: &SqliteConnection, q: Query<'a>) -> QueryResult<Option<Id>> {
+fn execute_impl<'a>(conn: &SqliteConnection, q: Query<'a>) -> crate::Result<Option<Id>> {
     let (sql, params) = dbg!(visitor::Sqlite::build(q));
 
     let mut stmt = conn.prepare_cached(&sql)?;
@@ -84,7 +84,7 @@ fn execute_impl<'a>(conn: &SqliteConnection, q: Query<'a>) -> QueryResult<Option
     Ok(Some(Id::Int(conn.last_insert_rowid() as usize)))
 }
 
-fn query_impl<'a>(conn: &SqliteConnection, q: Query<'a>) -> QueryResult<ResultSet> {
+fn query_impl<'a>(conn: &SqliteConnection, q: Query<'a>) -> crate::Result<ResultSet> {
     let (sql, params) = dbg!(visitor::Sqlite::build(q));
 
     return query_raw_impl(conn, &sql, &params);
@@ -94,7 +94,7 @@ fn query_raw_impl<'a>(
     conn: &SqliteConnection,
     sql: &str,
     params: &[ParameterizedValue<'a>],
-) -> QueryResult<ResultSet> {
+) -> crate::Result<ResultSet> {
     let mut stmt = conn.prepare_cached(sql)?;
     let mut rows = stmt.query(params)?;
 
@@ -113,11 +113,11 @@ impl<'a> Transaction for SqliteTransaction<'a> {}
 
 // Trait implementation for r2d2 pooled connection.
 impl Connection for PooledConnection {
-    fn execute<'a>(&mut self, q: Query<'a>) -> QueryResult<Option<Id>> {
+    fn execute<'a>(&mut self, q: Query<'a>) -> crate::Result<Option<Id>> {
         execute_impl(self, q)
     }
 
-    fn query<'a>(&mut self, q: Query<'a>) -> QueryResult<ResultSet> {
+    fn query<'a>(&mut self, q: Query<'a>) -> crate::Result<ResultSet> {
         query_impl(self, q)
     }
 
@@ -125,18 +125,18 @@ impl Connection for PooledConnection {
         &mut self,
         sql: &str,
         params: &[ParameterizedValue<'a>],
-    ) -> QueryResult<ResultSet> {
+    ) -> crate::Result<ResultSet> {
         query_raw_impl(self, sql, params)
     }
 }
 
 // Trait implementation for r2d2 sqlite.
 impl<'t> Connection for SqliteTransaction<'t> {
-    fn execute<'a>(&mut self, q: Query<'a>) -> QueryResult<Option<Id>> {
+    fn execute<'a>(&mut self, q: Query<'a>) -> crate::Result<Option<Id>> {
         execute_impl(self, q)
     }
 
-    fn query<'a>(&mut self, q: Query<'a>) -> QueryResult<ResultSet> {
+    fn query<'a>(&mut self, q: Query<'a>) -> crate::Result<ResultSet> {
         query_impl(self, q)
     }
 
@@ -144,17 +144,17 @@ impl<'t> Connection for SqliteTransaction<'t> {
         &mut self,
         sql: &str,
         params: &[ParameterizedValue<'a>],
-    ) -> QueryResult<ResultSet> {
+    ) -> crate::Result<ResultSet> {
         query_raw_impl(self, sql, params)
     }
 }
 
 impl Connection for SqliteConnection {
-    fn execute<'a>(&mut self, q: Query<'a>) -> QueryResult<Option<Id>> {
+    fn execute<'a>(&mut self, q: Query<'a>) -> crate::Result<Option<Id>> {
         execute_impl(self, q)
     }
 
-    fn query<'a>(&mut self, q: Query<'a>) -> QueryResult<ResultSet> {
+    fn query<'a>(&mut self, q: Query<'a>) -> crate::Result<ResultSet> {
         query_impl(self, q)
     }
 
@@ -162,13 +162,13 @@ impl Connection for SqliteConnection {
         &mut self,
         sql: &str,
         params: &[ParameterizedValue<'a>],
-    ) -> QueryResult<ResultSet> {
+    ) -> crate::Result<ResultSet> {
         query_raw_impl(self, sql, params)
     }
 }
 
 impl<'a> ToResultRow for SqliteRow<'a> {
-    fn to_result_row<'b>(&'b self) -> QueryResult<ResultRow> {
+    fn to_result_row<'b>(&'b self) -> crate::Result<ResultRow> {
         let mut row = ResultRow::default();
 
         for (i, column) in self.columns().iter().enumerate() {
@@ -214,7 +214,7 @@ impl TryFrom<&str> for Sqlite {
     type Error = Error;
 
     /// Todo connection limit configuration
-    fn try_from(url: &str) -> QueryResult<Sqlite> {
+    fn try_from(url: &str) -> crate::Result<Sqlite> {
         // We must handle file URLs ourselves.
         let normalized = url.trim_start_matches("file:");
         let path = PathBuf::from(&normalized);
@@ -228,7 +228,7 @@ impl TryFrom<&str> for Sqlite {
 }
 
 impl Sqlite {
-    pub fn new(file_path: String, connection_limit: u32, test_mode: bool) -> QueryResult<Sqlite> {
+    pub fn new(file_path: String, connection_limit: u32, test_mode: bool) -> crate::Result<Sqlite> {
         let pool = r2d2::Pool::builder()
             .max_size(connection_limit)
             .build(SqliteConnectionManager::memory())?;
@@ -245,7 +245,7 @@ impl Sqlite {
         path.exists()
     }
 
-    fn attach_database(&self, conn: &mut SqliteConnection, db_name: &str) -> QueryResult<()> {
+    fn attach_database(&self, conn: &mut SqliteConnection, db_name: &str) -> crate::Result<()> {
         let mut stmt = conn.prepare("PRAGMA database_list")?;
 
         let databases: HashSet<String> = stmt
@@ -269,9 +269,9 @@ impl Sqlite {
         Ok(())
     }
 
-    fn with_connection_internal<F, T>(&self, db: &str, f: F) -> QueryResult<T>
+    fn with_connection_internal<F, T>(&self, db: &str, f: F) -> crate::Result<T>
     where
-        F: FnOnce(&mut std::cell::RefCell<PooledConnection>) -> QueryResult<T>,
+        F: FnOnce(&mut std::cell::RefCell<PooledConnection>) -> crate::Result<T>,
     {
         let mut conn = std::cell::RefCell::new(self.pool.get()?);
         self.attach_database(conn.get_mut(), db)?;

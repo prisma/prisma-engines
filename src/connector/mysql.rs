@@ -6,7 +6,7 @@ use crate::{
         Transactional,
     },
     visitor::{self, Visitor},
-    QueryResult, ResultSet,
+    ResultSet,
 };
 use chrono::{DateTime, Duration, NaiveDate, Utc};
 use mysql as my;
@@ -25,7 +25,7 @@ pub struct Mysql {
 
 impl Mysql {
     // TODO: we should not use this constructor since it does set the db_name field
-    pub fn new(conf: mysql::OptsBuilder) -> QueryResult<Mysql> {
+    pub fn new(conf: mysql::OptsBuilder) -> crate::Result<Mysql> {
         let manager = MysqlConnectionManager::new(conf);
 
         Ok(Mysql {
@@ -34,7 +34,7 @@ impl Mysql {
         })
     }
 
-    pub fn new_from_url(url: &str) -> QueryResult<Mysql> {
+    pub fn new_from_url(url: &str) -> crate::Result<Mysql> {
         // TODO: connection limit configuration
         let mut builder = my::OptsBuilder::new();
         let url = Url::parse(url)?;
@@ -58,9 +58,9 @@ impl Mysql {
 }
 
 impl Transactional for Mysql {
-    fn with_transaction<F, T>(&self, _db: &str, f: F) -> QueryResult<T>
+    fn with_transaction<F, T>(&self, _db: &str, f: F) -> crate::Result<T>
     where
-        F: FnOnce(&mut Transaction) -> QueryResult<T>,
+        F: FnOnce(&mut Transaction) -> crate::Result<T>,
     {
         let mut conn = self.pool.get()?;
         let mut tx = conn.start_transaction(true, None, None)?;
@@ -75,9 +75,9 @@ impl Transactional for Mysql {
 }
 
 impl Connectional for Mysql {
-    fn with_connection<F, T>(&self, _db: &str, f: F) -> QueryResult<T>
+    fn with_connection<F, T>(&self, _db: &str, f: F) -> crate::Result<T>
     where
-        F: FnOnce(&mut Connection) -> QueryResult<T>,
+        F: FnOnce(&mut Connection) -> crate::Result<T>,
         Self: Sized,
     {
         dbg!(self.pool.state());
@@ -86,11 +86,11 @@ impl Connectional for Mysql {
         result
     }
 
-    fn execute_on_connection<'a>(&self, db: &str, query: Query<'a>) -> QueryResult<Option<Id>> {
+    fn execute_on_connection<'a>(&self, db: &str, query: Query<'a>) -> crate::Result<Option<Id>> {
         self.with_connection(&db, |conn| conn.execute(query))
     }
 
-    fn query_on_connection<'a>(&self, db: &str, query: Query<'a>) -> QueryResult<ResultSet> {
+    fn query_on_connection<'a>(&self, db: &str, query: Query<'a>) -> crate::Result<ResultSet> {
         self.with_connection(&db, |conn| conn.query(query))
     }
 
@@ -99,7 +99,7 @@ impl Connectional for Mysql {
         db: &str,
         sql: &str,
         params: &[ParameterizedValue<'a>],
-    ) -> QueryResult<ResultSet> {
+    ) -> crate::Result<ResultSet> {
         self.with_connection(&db, |conn| conn.query_raw(&sql, &params))
     }
 }
@@ -117,7 +117,7 @@ fn conv_params<'a>(params: &[ParameterizedValue<'a>]) -> my::params::Params {
 impl<'a> Transaction for my::Transaction<'a> {}
 
 impl<'t> Connection for my::Transaction<'t> {
-    fn execute<'a>(&mut self, q: Query<'a>) -> QueryResult<Option<Id>> {
+    fn execute<'a>(&mut self, q: Query<'a>) -> crate::Result<Option<Id>> {
         let (sql, params) = dbg!(visitor::Mysql::build(q));
         let mut stmt = self.prepare(&sql)?;
         let _rows = stmt.execute(conv_params(&params))?;
@@ -126,7 +126,7 @@ impl<'t> Connection for my::Transaction<'t> {
         Ok(None)
     }
 
-    fn query<'a>(&mut self, q: Query<'a>) -> QueryResult<ResultSet> {
+    fn query<'a>(&mut self, q: Query<'a>) -> crate::Result<ResultSet> {
         let (sql, params) = dbg!(visitor::Mysql::build(q));
 
         self.query_raw(&sql, &params[..])
@@ -136,7 +136,7 @@ impl<'t> Connection for my::Transaction<'t> {
         &mut self,
         sql: &str,
         params: &[ParameterizedValue<'a>],
-    ) -> QueryResult<ResultSet> {
+    ) -> crate::Result<ResultSet> {
         let mut stmt = self.prepare(&sql)?;
         let mut result = ResultSet::new(&stmt.to_column_names(), Vec::new());
         let rows = stmt.execute(conv_params(params))?;
@@ -150,7 +150,7 @@ impl<'t> Connection for my::Transaction<'t> {
 }
 
 impl Connection for PooledConnection {
-    fn execute<'a>(&mut self, q: Query<'a>) -> QueryResult<Option<Id>> {
+    fn execute<'a>(&mut self, q: Query<'a>) -> crate::Result<Option<Id>> {
         let (sql, params) = dbg!(visitor::Mysql::build(q));
         let mut stmt = self.prepare(&sql)?;
         let _rows = stmt.execute(conv_params(&params))?;
@@ -158,7 +158,7 @@ impl Connection for PooledConnection {
         Ok(Some(Id::Int(_rows.last_insert_id() as usize)))
     }
 
-    fn query<'a>(&mut self, q: Query<'a>) -> QueryResult<ResultSet> {
+    fn query<'a>(&mut self, q: Query<'a>) -> crate::Result<ResultSet> {
         let (sql, params) = dbg!(visitor::Mysql::build(q));
 
         self.query_raw(&sql, &params[..])
@@ -168,7 +168,7 @@ impl Connection for PooledConnection {
         &mut self,
         sql: &str,
         params: &[ParameterizedValue<'a>],
-    ) -> QueryResult<ResultSet> {
+    ) -> crate::Result<ResultSet> {
         let mut stmt = self.prepare(&sql)?;
         let mut result = ResultSet::new(&stmt.to_column_names(), Vec::new());
         let rows = stmt.execute(conv_params(params))?;
@@ -182,8 +182,8 @@ impl Connection for PooledConnection {
 }
 
 impl ToResultRow for my::Row {
-    fn to_result_row<'b>(&'b self) -> QueryResult<ResultRow> {
-        fn convert(row: &my::Row, i: usize) -> QueryResult<ParameterizedValue<'static>> {
+    fn to_result_row<'b>(&'b self) -> crate::Result<ResultRow> {
+        fn convert(row: &my::Row, i: usize) -> crate::Result<ParameterizedValue<'static>> {
             // TODO: It would prob. be better to inver via Column::column_type()
             let raw_value = row.as_ref(i).unwrap_or(&my::Value::NULL);
             let res = match raw_value {

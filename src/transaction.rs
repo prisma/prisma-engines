@@ -1,10 +1,10 @@
 use crate::{
     ast::{Id, ParameterizedValue, Query},
-    QueryResult, ResultSet,
+    ResultSet,
 };
 
 pub trait ToResultRow {
-    fn to_result_row<'b>(&'b self) -> QueryResult<ResultRow>;
+    fn to_result_row<'b>(&'b self) -> crate::Result<ResultRow>;
 }
 
 pub trait ToColumnNames {
@@ -24,12 +24,12 @@ pub trait Connection {
     /// inserted row.
     ///
     /// This is typically used for mutating queries.
-    fn execute<'a>(&mut self, q: Query<'a>) -> QueryResult<Option<Id>>;
+    fn execute<'a>(&mut self, q: Query<'a>) -> crate::Result<Option<Id>>;
 
     /// Executes the given query and returns the result set.
     ///
     /// This is typically used for select queries.
-    fn query<'a>(&mut self, q: Query<'a>) -> QueryResult<ResultSet>;
+    fn query<'a>(&mut self, q: Query<'a>) -> crate::Result<ResultSet>;
 
     /// Executes a query given as SQL, interpolating the given parameters.
     ///
@@ -38,7 +38,7 @@ pub trait Connection {
         &mut self,
         sql: &str,
         params: &[ParameterizedValue<'a>],
-    ) -> QueryResult<ResultSet>;
+    ) -> crate::Result<ResultSet>;
 }
 
 pub trait Connectional {
@@ -47,21 +47,21 @@ pub trait Connectional {
     /// This method does not open a transaction, and should used for
     /// operations not requiring transactions, e.g. single queries
     /// or schema mutations.
-    fn with_connection<F, T>(&self, db: &str, f: F) -> QueryResult<T>
+    fn with_connection<F, T>(&self, db: &str, f: F) -> crate::Result<T>
     where
-        F: FnOnce(&mut Connection) -> QueryResult<T>,
+        F: FnOnce(&mut Connection) -> crate::Result<T>,
         Self: Sized;
 
-    fn execute_on_connection<'a>(&self, db: &str, query: Query<'a>) -> QueryResult<Option<Id>>;
+    fn execute_on_connection<'a>(&self, db: &str, query: Query<'a>) -> crate::Result<Option<Id>>;
 
-    fn query_on_connection<'a>(&self, db: &str, query: Query<'a>) -> QueryResult<ResultSet>;
+    fn query_on_connection<'a>(&self, db: &str, query: Query<'a>) -> crate::Result<ResultSet>;
 
     fn query_on_raw_connection<'a>(
         &self,
         db: &str,
         sql: &str,
         params: &[ParameterizedValue<'a>],
-    ) -> QueryResult<ResultSet>;
+    ) -> crate::Result<ResultSet>;
 }
 
 pub trait Transactional {
@@ -69,9 +69,9 @@ pub trait Transactional {
     ///
     /// The transaction is comitted if the result returned by the handler is Ok.
     /// Otherise, the transaction is discarded.
-    fn with_transaction<F, T>(&self, db: &str, f: F) -> QueryResult<T>
+    fn with_transaction<F, T>(&self, db: &str, f: F) -> crate::Result<T>
     where
-        F: FnOnce(&mut Transaction) -> QueryResult<T>;
+        F: FnOnce(&mut Transaction) -> crate::Result<T>;
 }
 
 #[derive(Debug, Default, PartialEq, Clone)]
