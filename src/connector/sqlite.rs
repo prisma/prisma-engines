@@ -289,7 +289,7 @@ impl Sqlite {
 impl From<rusqlite::Error> for Error {
     fn from(e: rusqlite::Error) -> Error {
         match e {
-            rusqlite::Error::QueryReturnedNoRows => Error::RecordDoesNotExist,
+            rusqlite::Error::QueryReturnedNoRows => Error::NotFound,
 
             rusqlite::Error::SqliteFailure(
                 ffi::Error {

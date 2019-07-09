@@ -25,8 +25,6 @@ pub enum Error {
     ResultTypeMissmatch(&'static str),
     #[fail(display = "The specified database url {} is invalid.", _0)]
     DatabaseUrlIsInvalid(String),
-    #[fail(display = "Record does not exist.")]
-    RecordDoesNotExist,
 }
 
 impl From<r2d2::Error> for Error {
