@@ -65,13 +65,15 @@ pub trait Connectional {
 }
 
 pub trait Transactional {
+    type Error;
+
     /// Opens a connection and a transaction, which is valid inside the given handler closure.
     ///
     /// The transaction is comitted if the result returned by the handler is Ok.
     /// Otherise, the transaction is discarded.
-    fn with_transaction<F, T>(&self, db: &str, f: F) -> crate::Result<T>
+    fn with_transaction<F, T>(&self, db: &str, f: F) -> std::result::Result<T, Self::Error>
     where
-        F: FnOnce(&mut Transaction) -> crate::Result<T>;
+        F: FnOnce(&mut Transaction) -> std::result::Result<T, Self::Error>;
 }
 
 #[derive(Debug, Default, PartialEq, Clone)]

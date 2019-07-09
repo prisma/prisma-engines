@@ -27,6 +27,8 @@ pub struct Sqlite {
 }
 
 impl Transactional for Sqlite {
+    type Error = Error;
+
     fn with_transaction<F, T>(&self, db: &str, f: F) -> crate::Result<T>
     where
         F: FnOnce(&mut Transaction) -> crate::Result<T>,

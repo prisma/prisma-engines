@@ -58,6 +58,8 @@ impl Mysql {
 }
 
 impl Transactional for Mysql {
+    type Error = Error;
+
     fn with_transaction<F, T>(&self, _db: &str, f: F) -> crate::Result<T>
     where
         F: FnOnce(&mut Transaction) -> crate::Result<T>,

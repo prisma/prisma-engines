@@ -54,6 +54,8 @@ impl<'a> FromSql<'a> for Id {
 }
 
 impl Transactional for PostgreSql {
+    type Error = Error;
+
     fn with_transaction<F, T>(&self, _db: &str, f: F) -> crate::Result<T>
     where
         F: FnOnce(&mut Transaction) -> crate::Result<T>,
