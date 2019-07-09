@@ -106,28 +106,28 @@ impl<'a> ResultRowWithName<'a> {
     pub fn at_as_str(&self, i: usize) -> Result<&str, Error> {
         match self.at(i)? {
             ParameterizedValue::Text(s) => Ok(&*s),
-            _ => Err(Error::ResultTypeMissmatch("string")),
+            _ => Err(Error::ResultTypeMismatch("string")),
         }
     }
 
     pub fn at_as_string(&self, i: usize) -> Result<String, Error> {
         match self.at(i)? {
             ParameterizedValue::Text(s) => Ok(s.clone().into_owned()),
-            _ => Err(Error::ResultTypeMissmatch("string")),
+            _ => Err(Error::ResultTypeMismatch("string")),
         }
     }
 
     pub fn at_as_integer(&self, i: usize) -> Result<i64, Error> {
         match self.at(i)? {
             ParameterizedValue::Integer(v) => Ok(*v),
-            _ => Err(Error::ResultTypeMissmatch("integer")),
+            _ => Err(Error::ResultTypeMismatch("integer")),
         }
     }
 
     pub fn at_as_real(&self, i: usize) -> Result<f64, Error> {
         match self.at(i)? {
             ParameterizedValue::Real(v) => Ok(*v),
-            _ => Err(Error::ResultTypeMissmatch("real")),
+            _ => Err(Error::ResultTypeMismatch("real")),
         }
     }
 
@@ -135,7 +135,7 @@ impl<'a> ResultRowWithName<'a> {
         match self.at(i)? {
             ParameterizedValue::Boolean(v) => Ok(*v),
             ParameterizedValue::Integer(v) => Ok(*v != 0),
-            _ => Err(Error::ResultTypeMissmatch("boolean")),
+            _ => Err(Error::ResultTypeMismatch("boolean")),
         }
     }
 
@@ -150,28 +150,28 @@ impl<'a> ResultRowWithName<'a> {
     pub fn get_as_str(&self, name: &str) -> Result<&str, Error> {
         match self.get(name)? {
             ParameterizedValue::Text(s) => Ok(&*s),
-            _ => Err(Error::ResultTypeMissmatch("string")),
+            _ => Err(Error::ResultTypeMismatch("string")),
         }
     }
 
     pub fn get_as_string(&self, name: &str) -> Result<String, Error> {
         match self.get(name)? {
             ParameterizedValue::Text(s) => Ok(s.clone().into_owned()),
-            _ => Err(Error::ResultTypeMissmatch("string")),
+            _ => Err(Error::ResultTypeMismatch("string")),
         }
     }
 
     pub fn get_as_integer(&self, name: &str) -> Result<i64, Error> {
         match self.get(name)? {
             ParameterizedValue::Integer(v) => Ok(*v),
-            _ => Err(Error::ResultTypeMissmatch("integer")),
+            _ => Err(Error::ResultTypeMismatch("integer")),
         }
     }
 
     pub fn get_as_real(&self, name: &str) -> Result<f64, Error> {
         match self.get(name)? {
             ParameterizedValue::Real(v) => Ok(*v),
-            _ => Err(Error::ResultTypeMissmatch("real")),
+            _ => Err(Error::ResultTypeMismatch("real")),
         }
     }
 
@@ -179,7 +179,7 @@ impl<'a> ResultRowWithName<'a> {
         match self.get(name)? {
             ParameterizedValue::Boolean(v) => Ok(*v),
             ParameterizedValue::Integer(v) => Ok(*v != 0),
-            _ => Err(Error::ResultTypeMissmatch("boolean")),
+            _ => Err(Error::ResultTypeMismatch("boolean")),
         }
     }
 }

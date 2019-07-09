@@ -19,10 +19,10 @@ pub enum Error {
     #[fail(display = "Error accessing result set, column not found: {}", _0)]
     ColumnNotFound(String),
     #[fail(
-        display = "Error accessing result set, type missmatch, expected: {}",
+        display = "Error accessing result set, type mismatch, expected: {}",
         _0
     )]
-    ResultTypeMissmatch(&'static str),
+    ResultTypeMismatch(&'static str),
     #[fail(display = "The specified database url {} is invalid.", _0)]
     DatabaseUrlIsInvalid(String),
 }
