@@ -289,7 +289,7 @@ impl Sqlite {
 impl From<rusqlite::Error> for Error {
     fn from(e: rusqlite::Error) -> Error {
         match e {
-            rusqlite::Error::QueryReturnedNoRows => Error::NotFound,
+            rusqlite::Error::QueryReturnedNoRows => Error::RecordDoesNotExist,
 
             rusqlite::Error::SqliteFailure(
                 ffi::Error {
@@ -317,6 +317,21 @@ impl From<rusqlite::Error> for Error {
                 let splitted: Vec<&str> = splitted[1].split(".").collect();
 
                 Error::UniqueConstraintViolation {
+                    field_name: splitted[1].into(),
+                }
+            }
+
+            rusqlite::Error::SqliteFailure(
+                ffi::Error {
+                    code: ffi::ErrorCode::ConstraintViolation,
+                    extended_code: 1299,
+                },
+                Some(description),
+            ) => {
+                let splitted: Vec<&str> = description.split(": ").collect();
+                let splitted: Vec<&str> = splitted[1].split(".").collect();
+
+                Error::NullConstraintViolation {
                     field_name: splitted[1].into(),
                 }
             }

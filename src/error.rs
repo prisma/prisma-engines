@@ -8,6 +8,8 @@ pub enum Error {
     NotFound,
     #[fail(display = "Unique constraint failed: {}", field_name)]
     UniqueConstraintViolation { field_name: String },
+    #[fail(display = "Null constraint failed: {}", field_name)]
+    NullConstraintViolation { field_name: String },
     #[fail(display = "Error creating a database connection.")]
     ConnectionError(FError),
     #[fail(display = "Error reading the column value: {}", _0)]
@@ -23,6 +25,8 @@ pub enum Error {
     ResultTypeMissmatch(&'static str),
     #[fail(display = "The specified database url {} is invalid.", _0)]
     DatabaseUrlIsInvalid(String),
+    #[fail(display = "Record does not exist.")]
+    RecordDoesNotExist,
 }
 
 impl From<r2d2::Error> for Error {
