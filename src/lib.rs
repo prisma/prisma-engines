@@ -105,6 +105,6 @@ mod result_set;
 mod transaction;
 
 pub use result_set::*;
-pub use transaction::{Connectional, ResultRow, ToResultRow, Transactional};
+pub use transaction::{Connectional, ResultRow, ToResultRow, Transaction, Transactional};
 
 pub type Result<T> = std::result::Result<T, error::Error>;
