@@ -97,7 +97,7 @@ impl<'a> ResultRowWithName<'a> {
     /// Gets a value by index.
     pub fn at(&self, i: usize) -> Result<&ParameterizedValue, Error> {
         if self.values.values.len() <= i {
-            Err(Error::ResultIndexOutOfBounts(i))
+            Err(Error::ResultIndexOutOfBounds(i))
         } else {
             Ok(&self.values.values[i])
         }
