@@ -22,6 +22,7 @@ use std::{collections::HashSet, convert::TryFrom, path::PathBuf};
 type PooledConnection = r2d2::PooledConnection<r2d2_sqlite::SqliteConnectionManager>;
 type Pool = r2d2::Pool<SqliteConnectionManager>;
 
+/// A connector interface for the SQLite database.
 pub struct Sqlite {
     file_path: String,
     pool: Pool,

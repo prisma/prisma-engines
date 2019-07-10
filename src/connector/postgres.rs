@@ -25,7 +25,7 @@ use uuid::Uuid;
 
 type Pool = r2d2::Pool<PostgresConnectionManager<MakeTlsConnector>>;
 
-/// The World's Most Advanced Open Source Relational Database
+/// A connector interface for the PostgreSQL database.
 pub struct PostgreSql {
     pool: Pool,
 }

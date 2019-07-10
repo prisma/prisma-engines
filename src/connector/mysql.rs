@@ -19,7 +19,7 @@ type Pool = r2d2::Pool<MysqlConnectionManager>;
 #[allow(unused)] // We implement a trait on the alias, it is used.
 type PooledConnection = r2d2::PooledConnection<MysqlConnectionManager>;
 
-/// The World's Most Advanced Open Source Relational Database
+/// A connector interface for the MySQL database.
 pub struct Mysql {
     pool: Pool,
     pub db_name: Option<String>,
