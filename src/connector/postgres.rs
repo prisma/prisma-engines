@@ -1,10 +1,7 @@
 use crate::{
     ast::{Id, ParameterizedValue, Query},
     connector::{
-        transaction::{
-            ColumnNames, Connection, Connectional, Row, ToColumnNames, ToRow, Transaction,
-            Transactional,
-        },
+        transaction::{Connection, Connectional, ToColumnNames, ToRow, Transaction, Transactional},
         ResultSet,
     },
     error::Error,
@@ -203,7 +200,7 @@ impl Connection for &mut PostgresConnection {
 }
 
 impl ToRow for PostgresRow {
-    fn to_result_row<'b>(&'b self) -> crate::Result<Row> {
+    fn to_result_row<'b>(&'b self) -> crate::Result<Vec<ParameterizedValue<'static>>> {
         fn convert(row: &PostgresRow, i: usize) -> crate::Result<ParameterizedValue<'static>> {
             let result = match *row.columns()[i].type_() {
                 PostgresType::BOOL => match row.try_get(i)? {
@@ -392,10 +389,10 @@ impl ToRow for PostgresRow {
             Ok(result)
         }
 
-        let mut row = Row::default();
+        let mut row = Vec::new();
 
         for i in 0..self.columns().len() {
-            row.values.push(convert(self, i)?);
+            row.push(convert(self, i)?);
         }
 
         Ok(row)
@@ -403,11 +400,11 @@ impl ToRow for PostgresRow {
 }
 
 impl ToColumnNames for PostgresStatement {
-    fn to_column_names<'b>(&'b self) -> ColumnNames {
-        let mut names = ColumnNames::default();
+    fn to_column_names<'b>(&'b self) -> Vec<String> {
+        let mut names = Vec::new();
 
         for column in self.columns() {
-            names.names.push(String::from(column.name()));
+            names.push(String::from(column.name()));
         }
 
         names

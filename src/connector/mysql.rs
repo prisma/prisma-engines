@@ -1,10 +1,7 @@
 use crate::{
     ast::{Id, ParameterizedValue, Query},
     connector::{
-        transaction::{
-            ColumnNames, Connection, Connectional, Row, ToColumnNames, ToRow, Transaction,
-            Transactional,
-        },
+        transaction::{Connection, Connectional, ToColumnNames, ToRow, Transaction, Transactional},
         ResultSet,
     },
     error::Error,
@@ -185,7 +182,7 @@ impl Connection for PooledConnection {
 }
 
 impl ToRow for my::Row {
-    fn to_result_row<'b>(&'b self) -> crate::Result<Row> {
+    fn to_result_row<'b>(&'b self) -> crate::Result<Vec<ParameterizedValue<'static>>> {
         fn convert(row: &my::Row, i: usize) -> crate::Result<ParameterizedValue<'static>> {
             // TODO: It would prob. be better to inver via Column::column_type()
             let raw_value = row.as_ref(i).unwrap_or(&my::Value::NULL);
@@ -229,10 +226,10 @@ impl ToRow for my::Row {
             Ok(res)
         }
 
-        let mut row = Row::default();
+        let mut row = Vec::new();
 
         for i in 0..self.len() {
-            row.values.push(convert(self, i)?);
+            row.push(convert(self, i)?);
         }
 
         Ok(row)
@@ -240,12 +237,12 @@ impl ToRow for my::Row {
 }
 
 impl<'a> ToColumnNames for my::Stmt<'a> {
-    fn to_column_names<'b>(&'b self) -> ColumnNames {
-        let mut names = ColumnNames::default();
+    fn to_column_names<'b>(&'b self) -> Vec<String> {
+        let mut names = Vec::new();
 
         if let Some(columns) = self.columns_ref() {
             for column in columns {
-                names.names.push(String::from(column.name_str()));
+                names.push(String::from(column.name_str()));
             }
         }
 

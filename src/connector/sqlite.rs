@@ -1,10 +1,7 @@
 use crate::{
     ast::{Id, ParameterizedValue, Query},
     connector::{
-        transaction::{
-            ColumnNames, Connection, Connectional, Row, ToColumnNames, ToRow, Transaction,
-            Transactional,
-        },
+        transaction::{Connection, Connectional, ToColumnNames, ToRow, Transaction, Transactional},
         ResultSet,
     },
     error::Error,
@@ -173,8 +170,8 @@ impl Connection for SqliteConnection {
 }
 
 impl<'a> ToRow for SqliteRow<'a> {
-    fn to_result_row<'b>(&'b self) -> crate::Result<Row> {
-        let mut row = Row::default();
+    fn to_result_row<'b>(&'b self) -> crate::Result<Vec<ParameterizedValue<'static>>> {
+        let mut row = Vec::new();
 
         for (i, column) in self.columns().iter().enumerate() {
             let pv = match self.get_raw(i) {
@@ -194,7 +191,7 @@ impl<'a> ToRow for SqliteRow<'a> {
                 ValueRef::Blob(_) => panic!("Blobs not supprted, yet"),
             };
 
-            row.values.push(pv);
+            row.push(pv);
         }
 
         Ok(row)
@@ -202,12 +199,12 @@ impl<'a> ToRow for SqliteRow<'a> {
 }
 
 impl<'a> ToColumnNames for SqliteRows<'a> {
-    fn to_column_names<'b>(&'b self) -> ColumnNames {
-        let mut names = ColumnNames::default();
+    fn to_column_names<'b>(&'b self) -> Vec<String> {
+        let mut names = Vec::new();
 
         if let Some(columns) = self.column_names() {
             for column in columns {
-                names.names.push(String::from(column));
+                names.push(String::from(column));
             }
         }
 

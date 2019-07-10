@@ -8,4 +8,4 @@ pub use self::mysql::*;
 pub use self::postgres::*;
 pub use self::result_set::*;
 pub use sqlite::*;
-pub use transaction::{ColumnNames, Connectional, Row, ToRow, Transaction, Transactional};
+pub use transaction::{Connectional, ToRow, Transaction, Transactional};

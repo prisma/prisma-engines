@@ -4,19 +4,19 @@ mod result_row;
 pub use index::*;
 pub use result_row::*;
 
-use crate::connector::transaction::{ColumnNames, Row};
+use crate::ast::ParameterizedValue;
 use std::{collections::HashMap, sync::Arc};
 
 /// Encapsulates a set of results and their respective column names.
 #[derive(Debug)]
 pub struct ResultSet {
-    pub(crate) rows: Vec<Row>,
+    pub(crate) rows: Vec<Vec<ParameterizedValue<'static>>>,
     pub(crate) name_to_index: Arc<HashMap<String, usize>>,
 }
 
 impl ResultSet {
     /// Creates a new instance, bound to the given column names and result rows.
-    pub fn new(names: ColumnNames, rows: Vec<Row>) -> ResultSet {
+    pub fn new(names: Vec<String>, rows: Vec<Vec<ParameterizedValue<'static>>>) -> ResultSet {
         ResultSet {
             name_to_index: Arc::new(Self::build_name_map(names)),
             rows,
@@ -47,9 +47,8 @@ impl ResultSet {
     }
 
     /// Creates a lookup map for column names.
-    fn build_name_map(names: ColumnNames) -> HashMap<String, usize> {
+    fn build_name_map(names: Vec<String>) -> HashMap<String, usize> {
         names
-            .names
             .into_iter()
             .enumerate()
             .fold(HashMap::new(), |mut acc, (i, name)| {
@@ -75,7 +74,7 @@ impl IntoIterator for ResultSet {
 /// Might become lazy one day.
 pub struct ResultSetIterator {
     pub(crate) name_to_index: Arc<HashMap<String, usize>>,
-    pub(crate) internal_iterator: std::vec::IntoIter<Row>,
+    pub(crate) internal_iterator: std::vec::IntoIter<Vec<ParameterizedValue<'static>>>,
 }
 
 impl Iterator for ResultSetIterator {
