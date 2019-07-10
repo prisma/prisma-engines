@@ -3,7 +3,7 @@ use crate::{
     error::Error,
     transaction::{ColumnNames, ResultRow},
 };
-use std::collections::HashMap;
+use std::{collections::HashMap, ops};
 
 /// Encapsulates a set of results and their respective column names.
 #[derive(Debug)]
@@ -86,6 +86,14 @@ impl<'a> Iterator for ResultSetIterator<'a> {
 pub struct ResultRowWithName<'a> {
     parent_set: &'a ResultSet,
     values: &'a ResultRow,
+}
+
+impl<'a> ops::Index<usize> for ResultRowWithName<'a> {
+    type Output = ParameterizedValue<'a>;
+
+    fn index(&self, index: usize) -> &ParameterizedValue<'a> {
+        &self.values.values[index]
+    }
 }
 
 impl<'a> ResultRowWithName<'a> {
