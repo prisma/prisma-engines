@@ -101,10 +101,4 @@ pub mod connector;
 pub mod error;
 pub mod visitor;
 
-mod result_set;
-mod transaction;
-
-pub use result_set::*;
-pub use transaction::{ColumnNames, Connectional, Row, ToRow, Transaction, Transactional};
-
 pub type Result<T> = std::result::Result<T, error::Error>;

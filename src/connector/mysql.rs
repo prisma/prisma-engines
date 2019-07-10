@@ -1,12 +1,14 @@
 use crate::{
     ast::{Id, ParameterizedValue, Query},
-    error::Error,
-    transaction::{
-        ColumnNames, Connection, Connectional, Row, ToColumnNames, ToRow, Transaction,
-        Transactional,
+    connector::{
+        transaction::{
+            ColumnNames, Connection, Connectional, Row, ToColumnNames, ToRow, Transaction,
+            Transactional,
+        },
+        ResultSet,
     },
+    error::Error,
     visitor::{self, Visitor},
-    ResultSet,
 };
 use chrono::{DateTime, Duration, NaiveDate, Utc};
 use mysql as my;

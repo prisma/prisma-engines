@@ -1,7 +1,5 @@
-use crate::{
-    ast::{Id, ParameterizedValue, Query},
-    ResultSet,
-};
+use super::ResultSet;
+use crate::ast::{Id, ParameterizedValue, Query};
 
 pub trait ToRow {
     fn to_result_row<'b>(&'b self) -> crate::Result<Row>;
