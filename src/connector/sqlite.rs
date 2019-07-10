@@ -2,7 +2,7 @@ use crate::{
     ast::{Id, ParameterizedValue, Query},
     error::Error,
     transaction::{
-        ColumnNames, Connection, Connectional, ResultRow, ToColumnNames, ToResultRow, Transaction,
+        ColumnNames, Connection, Connectional, Row, ToColumnNames, ToRow, Transaction,
         Transactional,
     },
     visitor::{self, Visitor},
@@ -100,7 +100,7 @@ fn query_raw_impl<'a>(
     let mut stmt = conn.prepare_cached(sql)?;
     let mut rows = stmt.query(params)?;
 
-    let mut result = ResultSet::new(&rows.to_column_names(), Vec::new());
+    let mut result = ResultSet::new(rows.to_column_names(), Vec::new());
 
     while let Some(row) = rows.next()? {
         result.rows.push(row.to_result_row()?);
@@ -169,9 +169,9 @@ impl Connection for SqliteConnection {
     }
 }
 
-impl<'a> ToResultRow for SqliteRow<'a> {
-    fn to_result_row<'b>(&'b self) -> crate::Result<ResultRow> {
-        let mut row = ResultRow::default();
+impl<'a> ToRow for SqliteRow<'a> {
+    fn to_result_row<'b>(&'b self) -> crate::Result<Row> {
+        let mut row = Row::default();
 
         for (i, column) in self.columns().iter().enumerate() {
             let pv = match self.get_raw(i) {
@@ -362,7 +362,7 @@ mod tests {
                 let res = connection.query_raw("SELECT * FROM sqlite_master", &[])?;
 
                 // No results expected.
-                assert_eq!(res.into_iter().next().is_none(), true);
+                assert!(res.is_empty());
 
                 Ok(())
             })
@@ -378,7 +378,7 @@ mod tests {
                 let res = transaction.query_raw("SELECT * FROM sqlite_master", &[])?;
 
                 // No results expected.
-                assert_eq!(res.into_iter().next().is_none(), true);
+                assert!(res.is_empty());
 
                 Ok(())
             })
@@ -410,20 +410,14 @@ mod tests {
                 connection.query_raw(TABLE_DEF, &[])?;
                 connection.query_raw(CREATE_USER, &[])?;
 
-                let res = connection.query_raw("SELECT * FROM USER", &[])?;
+                let rows = connection.query_raw("SELECT * FROM USER", &[])?;
+                assert_eq!(rows.len(), 1);
 
-                let mut result_count: u32 = 0;
-
-                // Exactly one result expected.
-                for row in res {
-                    assert_eq!(row.get_as_integer("ID")?, 1);
-                    assert_eq!(row.get_as_string("NAME")?, "Joe");
-                    assert_eq!(row.get_as_integer("AGE")?, 27);
-                    assert_eq!(row.get_as_real("SALARY")?, 20000.0);
-                    result_count = result_count + 1;
-                }
-
-                assert_eq!(result_count, 1);
+                let row = rows.get(0).unwrap();
+                assert_eq!(row["ID"].as_i64(), Some(1));
+                assert_eq!(row["NAME"].as_str(), Some("Joe"));
+                assert_eq!(row["AGE"].as_i64(), Some(27));
+                assert_eq!(row["SALARY"].as_f64(), Some(20000.0));
 
                 Ok(())
             })

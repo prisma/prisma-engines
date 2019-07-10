@@ -2,7 +2,7 @@ use crate::{
     ast::{Id, ParameterizedValue, Query},
     error::Error,
     transaction::{
-        ColumnNames, Connection, Connectional, ResultRow, ToColumnNames, ToResultRow, Transaction,
+        ColumnNames, Connection, Connectional, Row, ToColumnNames, ToRow, Transaction,
         Transactional,
     },
     visitor::{self, Visitor},
@@ -146,7 +146,7 @@ impl<'t> Connection for PostgresTransaction<'t> {
         let stmt = self.prepare(&sql)?;
         let rows = PostgresTransaction::query(self, &stmt, &conv_params(params))?;
 
-        let mut result = ResultSet::new(&stmt.to_column_names(), Vec::new());
+        let mut result = ResultSet::new(stmt.to_column_names(), Vec::new());
 
         for row in rows {
             result.rows.push(row.to_result_row()?);
@@ -190,7 +190,7 @@ impl Connection for &mut PostgresConnection {
         let stmt = self.prepare(&sql)?;
         let rows = PostgresConnection::query(self, &stmt, &conv_params(params))?;
 
-        let mut result = ResultSet::new(&stmt.to_column_names(), Vec::new());
+        let mut result = ResultSet::new(stmt.to_column_names(), Vec::new());
 
         for row in rows {
             result.rows.push(row.to_result_row()?);
@@ -200,8 +200,8 @@ impl Connection for &mut PostgresConnection {
     }
 }
 
-impl ToResultRow for PostgresRow {
-    fn to_result_row<'b>(&'b self) -> crate::Result<ResultRow> {
+impl ToRow for PostgresRow {
+    fn to_result_row<'b>(&'b self) -> crate::Result<Row> {
         fn convert(row: &PostgresRow, i: usize) -> crate::Result<ParameterizedValue<'static>> {
             let result = match *row.columns()[i].type_() {
                 PostgresType::BOOL => match row.try_get(i)? {
@@ -390,7 +390,7 @@ impl ToResultRow for PostgresRow {
             Ok(result)
         }
 
-        let mut row = ResultRow::default();
+        let mut row = Row::default();
 
         for i in 0..self.columns().len() {
             row.values.push(convert(self, i)?);
@@ -502,7 +502,7 @@ mod tests {
                 )?;
 
                 // No results expected.
-                assert_eq!(res.into_iter().next().is_none(), true);
+                assert!(res.is_empty());
 
                 Ok(())
             })
@@ -521,7 +521,7 @@ mod tests {
                 )?;
 
                 // No results expected.
-                assert_eq!(res.into_iter().next().is_none(), true);
+                assert!(res.is_empty());
 
                 Ok(())
             })
@@ -557,20 +557,14 @@ mod tests {
                 connection.query_raw(TABLE_DEF, &[]).unwrap();
                 connection.query_raw(CREATE_USER, &[]).unwrap();
 
-                let res = connection.query_raw("SELECT * FROM \"user\"", &[]).unwrap();
+                let rows = connection.query_raw("SELECT * FROM \"user\"", &[]).unwrap();
+                assert_eq!(rows.len(), 1);
 
-                let mut result_count: u32 = 0;
-
-                // Exactly one result expected.
-                for row in res {
-                    assert_eq!(row.get_as_integer("id")?, 1);
-                    assert_eq!(row.get_as_string("name")?, "Joe");
-                    assert_eq!(row.get_as_integer("age")?, 27);
-                    assert_eq!(row.get_as_real("salary")?, 20000.0);
-                    result_count = result_count + 1;
-                }
-
-                assert_eq!(result_count, 1);
+                let row = rows.get(0).unwrap();
+                assert_eq!(row["ID"].as_i64(), Some(1));
+                assert_eq!(row["NAME"].as_str(), Some("Joe"));
+                assert_eq!(row["AGE"].as_i64(), Some(27));
+                assert_eq!(row["SALARY"].as_f64(), Some(20000.0));
 
                 Ok(())
             })

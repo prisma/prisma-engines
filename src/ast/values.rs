@@ -1,5 +1,5 @@
 use crate::ast::*;
-use std::borrow::Cow;
+use std::borrow::{Borrow, Cow};
 
 #[cfg(feature = "json-1")]
 use serde_json::Value;
@@ -33,6 +33,152 @@ pub enum ParameterizedValue<'a> {
     Uuid(Uuid),
     #[cfg(feature = "chrono-0_4")]
     DateTime(DateTime<Utc>),
+}
+
+impl<'a> ParameterizedValue<'a> {
+    /// `true` if the `ParameterizedValue` is null.
+    pub fn is_null(&self) -> bool {
+        match self {
+            ParameterizedValue::Null => true,
+            _ => false,
+        }
+    }
+
+    /// `true` if the `ParameterizedValue` is text.
+    pub fn is_text(&self) -> bool {
+        match self {
+            ParameterizedValue::Text(_) => true,
+            _ => false,
+        }
+    }
+
+    /// Returns a &str if the value is a text, otherwise `None`.
+    pub fn as_str(&self) -> Option<&str> {
+        match self {
+            ParameterizedValue::Text(cow) => Some(cow.borrow()),
+            _ => None,
+        }
+    }
+
+    /// Transforms the `ParameterizedValue` to a `String` if it's text,
+    /// otherwise `None`.
+    pub fn into_string(self) -> Option<String> {
+        match self {
+            ParameterizedValue::Text(cow) => Some(cow.into_owned()),
+            _ => None,
+        }
+    }
+
+    /// `true` if the `ParameterizedValue` is an integer.
+    pub fn is_integer(&self) -> bool {
+        match self {
+            ParameterizedValue::Integer(_) => true,
+            _ => false,
+        }
+    }
+
+    /// Returns an i64 if the value is an integer, otherwise `None`.
+    pub fn as_i64(&self) -> Option<i64> {
+        match self {
+            ParameterizedValue::Integer(i) => Some(*i),
+            _ => None,
+        }
+    }
+
+    /// `true` if the `ParameterizedValue` is a real value.
+    pub fn is_real(&self) -> bool {
+        match self {
+            ParameterizedValue::Real(_) => true,
+            _ => false,
+        }
+    }
+
+    /// Returns a f64 if the value is a real value, otherwise `None`.
+    pub fn as_f64(&self) -> Option<f64> {
+        match self {
+            ParameterizedValue::Real(f) => Some(*f),
+            _ => None,
+        }
+    }
+
+    /// `true` if the `ParameterizedValue` is a boolean value.
+    pub fn is_bool(&self) -> bool {
+        match self {
+            ParameterizedValue::Boolean(_) => true,
+            _ => false,
+        }
+    }
+
+    /// Returns a bool if the value is a boolean, otherwise `None`.
+    pub fn as_bool(&self) -> Option<bool> {
+        match self {
+            ParameterizedValue::Boolean(b) => Some(*b),
+            _ => None,
+        }
+    }
+
+    /// `true` if the `ParameterizedValue` is of UUID type.
+    #[cfg(feature = "uuid-0_7")]
+    pub fn is_uuid(&self) -> bool {
+        match self {
+            ParameterizedValue::Uuid(_) => true,
+            _ => false,
+        }
+    }
+
+    /// Returns an UUID if the value is of UUID type, otherwise `None`.
+    #[cfg(feature = "uuid-0_7")]
+    pub fn as_uuid(&self) -> Option<Uuid> {
+        match self {
+            ParameterizedValue::Uuid(u) => Some(*u),
+            _ => None,
+        }
+    }
+
+    /// `true` if the `ParameterizedValue` is a DateTime.
+    #[cfg(feature = "uuid-0_7")]
+    pub fn is_datetime(&self) -> bool {
+        match self {
+            ParameterizedValue::DateTime(_) => true,
+            _ => false,
+        }
+    }
+
+    /// Returns a DateTime if the value is a DateTime, otherwise `None`.
+    #[cfg(feature = "chrono-0_4")]
+    pub fn as_datetime(&self) -> Option<DateTime<Utc>> {
+        match self {
+            ParameterizedValue::DateTime(dt) => Some(*dt),
+            _ => None,
+        }
+    }
+
+    /// `true` if the `ParameterizedValue` is a JSON value.
+    #[cfg(feature = "json-1")]
+    pub fn is_json(&self) -> bool {
+        match self {
+            ParameterizedValue::Json(_) => true,
+            _ => false,
+        }
+    }
+
+    /// Returns a reference to a JSON Value if of Json type, otherwise `None`.
+    #[cfg(feature = "json-1")]
+    pub fn as_json(&self) -> Option<&Value> {
+        match self {
+            ParameterizedValue::Json(j) => Some(j),
+            _ => None,
+        }
+    }
+
+    /// Transforms to a JSON Value if of Json type, otherwise `None`.
+    #[cfg(feature = "json-1")]
+    pub fn into_json(self) -> Option<Value> {
+        match self {
+            ParameterizedValue::Json(j) => Some(j),
+            _ => None,
+        }
+    }
 }
 
 /// A value we can compare and use in database queries.

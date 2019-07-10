@@ -3,8 +3,8 @@ use crate::{
     ResultSet,
 };
 
-pub trait ToResultRow {
-    fn to_result_row<'b>(&'b self) -> crate::Result<ResultRow>;
+pub trait ToRow {
+    fn to_result_row<'b>(&'b self) -> crate::Result<Row>;
 }
 
 pub trait ToColumnNames {
@@ -77,11 +77,33 @@ pub trait Transactional {
 }
 
 #[derive(Debug, Default, PartialEq, Clone)]
-pub struct ResultRow {
+pub struct Row {
     pub values: Vec<ParameterizedValue<'static>>,
+}
+
+impl<T> From<Vec<T>> for Row
+where
+    T: Into<ParameterizedValue<'static>>,
+{
+    fn from(values: Vec<T>) -> Self {
+        Self {
+            values: values.into_iter().map(Into::into).collect(),
+        }
+    }
 }
 
 #[derive(Debug, Default, PartialEq, Clone)]
 pub struct ColumnNames {
     pub names: Vec<String>,
+}
+
+impl<T> From<Vec<T>> for ColumnNames
+where
+    T: Into<String>,
+{
+    fn from(names: Vec<T>) -> Self {
+        Self {
+            names: names.into_iter().map(Into::into).collect(),
+        }
+    }
 }
