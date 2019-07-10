@@ -3,7 +3,7 @@ use crate::{
     error::Error,
     transaction::{ColumnNames, ResultRow},
 };
-use std::{collections::HashMap, ops};
+use std::{collections::HashMap, ops, rc::Rc};
 
 /// Encapsulates a set of results and their respective column names.
 #[derive(Debug)]
@@ -34,47 +34,35 @@ impl ResultSet {
 
         mapped
     }
-
-    /// Finds a column index for a name.
-    pub fn column_index(&self, name: &str) -> Result<usize, Error> {
-        match self.name_to_index.get(name) {
-            None => Err(Error::ColumnNotFound(String::from(name))),
-            Some(idx) => Ok(*idx),
-        }
-    }
 }
 
-/// Into iterator implementation for ResultSet.
-/// Note: This has to be implemented on &ResultSet, otherwise
-/// it's impossible to carry on the lifetimes.
-impl<'a> IntoIterator for &'a ResultSet {
-    type Item = ResultRowWithName<'a>;
-    type IntoIter = ResultSetIterator<'a>;
+impl IntoIterator for ResultSet {
+    type Item = ResultRowWithName;
+    type IntoIter = ResultSetIterator;
 
-    /// Returns an interator over wrapped result rows.
     fn into_iter(self) -> Self::IntoIter {
         ResultSetIterator {
-            parent_set: self,
-            internal_iterator: self.rows.iter(),
+            name_to_index: Rc::new(self.name_to_index),
+            internal_iterator: self.rows.into_iter(),
         }
     }
 }
 
 /// Thin iterator for ResultSet rows.
 /// Might become lazy one day.
-pub struct ResultSetIterator<'a> {
-    parent_set: &'a ResultSet,
-    internal_iterator: std::slice::Iter<'a, ResultRow>,
+pub struct ResultSetIterator {
+    name_to_index: Rc<HashMap<String, usize>>,
+    internal_iterator: std::vec::IntoIter<ResultRow>,
 }
 
-impl<'a> Iterator for ResultSetIterator<'a> {
-    type Item = ResultRowWithName<'a>;
+impl Iterator for ResultSetIterator {
+    type Item = ResultRowWithName;
 
     fn next(&mut self) -> Option<Self::Item> {
         match self.internal_iterator.next() {
             Some(row) => Some(ResultRowWithName {
-                parent_set: self.parent_set,
-                values: &row,
+                name_to_index: Rc::clone(&self.name_to_index),
+                values: row,
             }),
             None => None,
         }
@@ -83,20 +71,20 @@ impl<'a> Iterator for ResultSetIterator<'a> {
 
 /// Wraps a result row, so it's columns can be accessed
 /// by name.
-pub struct ResultRowWithName<'a> {
-    parent_set: &'a ResultSet,
-    values: &'a ResultRow,
+pub struct ResultRowWithName {
+    name_to_index: Rc<HashMap<String, usize>>,
+    values: ResultRow,
 }
 
-impl<'a> ops::Index<usize> for ResultRowWithName<'a> {
-    type Output = ParameterizedValue<'a>;
+impl ops::Index<usize> for ResultRowWithName {
+    type Output = ParameterizedValue<'static>;
 
-    fn index(&self, index: usize) -> &ParameterizedValue<'a> {
+    fn index(&self, index: usize) -> &ParameterizedValue<'static> {
         &self.values.values[index]
     }
 }
 
-impl<'a> ResultRowWithName<'a> {
+impl ResultRowWithName {
     // TODO: If the API is fixed, reduce internal duplication by moving
     // getters for specific types to ParameterizedValue
 
@@ -151,8 +139,10 @@ impl<'a> ResultRowWithName<'a> {
 
     /// Gets a value by column name.
     pub fn get(&self, name: &str) -> Result<&ParameterizedValue, Error> {
-        let idx = self.parent_set.column_index(name)?;
-        Ok(&self.values.values[idx])
+        match self.name_to_index.get(name) {
+            None => Err(Error::ColumnNotFound(String::from(name))),
+            Some(idx) => Ok(&self.values.values[*idx]),
+        }
     }
 
     pub fn get_as_str(&self, name: &str) -> Result<&str, Error> {

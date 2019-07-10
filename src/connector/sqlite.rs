@@ -415,7 +415,7 @@ mod tests {
                 let mut result_count: u32 = 0;
 
                 // Exactly one result expected.
-                for row in &res {
+                for row in res {
                     assert_eq!(row.get_as_integer("ID")?, 1);
                     assert_eq!(row.get_as_string("NAME")?, "Joe");
                     assert_eq!(row.get_as_integer("AGE")?, 27);
