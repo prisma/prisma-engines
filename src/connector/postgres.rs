@@ -561,10 +561,10 @@ mod tests {
                 assert_eq!(rows.len(), 1);
 
                 let row = rows.get(0).unwrap();
-                assert_eq!(row["ID"].as_i64(), Some(1));
-                assert_eq!(row["NAME"].as_str(), Some("Joe"));
-                assert_eq!(row["AGE"].as_i64(), Some(27));
-                assert_eq!(row["SALARY"].as_f64(), Some(20000.0));
+                assert_eq!(row["id"].as_i64(), Some(1));
+                assert_eq!(row["name"].as_str(), Some("Joe"));
+                assert_eq!(row["age"].as_i64(), Some(27));
+                assert_eq!(row["salary"].as_f64(), Some(20000.0));
 
                 Ok(())
             })
