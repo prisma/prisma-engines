@@ -8,6 +8,13 @@ authors = [
     "Emanuel Jöbstl <emanuel.joebstl@gmail.com>"
 ]
 edition = "2018"
+readme  = "README.md"
+license = "Apache-2.0"
+description = "An abstraction layer for SQL databases."
+repository  = "https://github.com/prisma/prisma-query/"
+homepage    = "https://github.com/prisma/prisma-query/"
+keywords    = ["mysql", "postgresql", "sqlite", "sql"]
+documentation = "https://docs.rs/prisma-query/"
 
 [features]
 default = ["rusqlite-client", "json-1", "postgresql-0_16", "uuid-0_7", "chrono-0_4", "mysql_sync" ]
