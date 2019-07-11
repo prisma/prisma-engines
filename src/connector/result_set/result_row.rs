@@ -8,6 +8,15 @@ pub struct ResultRow {
     pub(crate) values: Vec<ParameterizedValue<'static>>,
 }
 
+impl IntoIterator for ResultRow {
+    type Item = ParameterizedValue<'static>;
+    type IntoIter = std::vec::IntoIter<ParameterizedValue<'static>>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.values.into_iter()
+    }
+}
+
 /// A reference to a `Row` in a `ResultSet`. The columns can be accessed either
 /// through their position or using the column name.
 ///

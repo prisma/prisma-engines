@@ -12,10 +12,6 @@ pub trait ToColumnNames {
 /// Represents a transaction.
 pub trait Transaction: Connection {}
 
-// Note: The methods here have somewhat cumbersome
-// naming, so they do not clash with names exported from
-// rusqlite etc.
-
 /// Represents a connection.
 pub trait Connection {
     /// Executes the given query and returns the ID of the last inserted row.
