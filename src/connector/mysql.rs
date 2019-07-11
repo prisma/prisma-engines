@@ -1,3 +1,5 @@
+mod connection;
+
 use crate::{
     ast::{Id, ParameterizedValue, Query},
     connector::{
@@ -5,7 +7,6 @@ use crate::{
         ResultSet,
     },
     error::Error,
-    visitor::{self, Visitor},
 };
 use chrono::{DateTime, Duration, NaiveDate, Utc};
 use mysql as my;
@@ -104,32 +105,15 @@ impl Connectional for Mysql {
     }
 }
 
-fn conv_params<'a>(params: &[ParameterizedValue<'a>]) -> my::params::Params {
-    if params.len() > 0 {
-        my::params::Params::Positional(params.iter().map(|x| x.into()).collect::<Vec<my::Value>>())
-    } else {
-        // If we don't use explicit 'Empty',
-        // mysql crashes with 'internal error: entered unreachable code'
-        my::params::Params::Empty
-    }
-}
-
 impl<'a> Transaction for my::Transaction<'a> {}
 
 impl<'t> Connection for my::Transaction<'t> {
     fn execute<'a>(&mut self, q: Query<'a>) -> crate::Result<Option<Id>> {
-        let (sql, params) = dbg!(visitor::Mysql::build(q));
-        let mut stmt = self.prepare(&sql)?;
-        let _rows = stmt.execute(conv_params(&params))?;
-
-        // TODO: Return last inserted ID is not implemented for mysql.
-        Ok(None)
+        connection::execute(self, q)
     }
 
     fn query<'a>(&mut self, q: Query<'a>) -> crate::Result<ResultSet> {
-        let (sql, params) = dbg!(visitor::Mysql::build(q));
-
-        self.query_raw(&sql, &params[..])
+        connection::query(self, q)
     }
 
     fn query_raw<'a>(
@@ -137,31 +121,17 @@ impl<'t> Connection for my::Transaction<'t> {
         sql: &str,
         params: &[ParameterizedValue<'a>],
     ) -> crate::Result<ResultSet> {
-        let mut stmt = self.prepare(&sql)?;
-        let mut result = ResultSet::new(stmt.to_column_names(), Vec::new());
-        let rows = stmt.execute(conv_params(params))?;
-
-        for row in rows {
-            result.rows.push(row?.to_result_row()?);
-        }
-
-        Ok(result)
+        connection::query_raw(self, sql, params)
     }
 }
 
 impl Connection for PooledConnection {
     fn execute<'a>(&mut self, q: Query<'a>) -> crate::Result<Option<Id>> {
-        let (sql, params) = dbg!(visitor::Mysql::build(q));
-        let mut stmt = self.prepare(&sql)?;
-        let _rows = stmt.execute(conv_params(&params))?;
-
-        Ok(Some(Id::Int(_rows.last_insert_id() as usize)))
+        connection::execute(self, q)
     }
 
     fn query<'a>(&mut self, q: Query<'a>) -> crate::Result<ResultSet> {
-        let (sql, params) = dbg!(visitor::Mysql::build(q));
-
-        self.query_raw(&sql, &params[..])
+        connection::query(self, q)
     }
 
     fn query_raw<'a>(
@@ -169,15 +139,7 @@ impl Connection for PooledConnection {
         sql: &str,
         params: &[ParameterizedValue<'a>],
     ) -> crate::Result<ResultSet> {
-        let mut stmt = self.prepare(&sql)?;
-        let mut result = ResultSet::new(stmt.to_column_names(), Vec::new());
-        let rows = stmt.execute(conv_params(params))?;
-
-        for row in rows {
-            result.rows.push(row?.to_result_row()?);
-        }
-
-        Ok(result)
+        connection::query_raw(self, sql, params)
     }
 }
 

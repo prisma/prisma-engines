@@ -1,3 +1,5 @@
+mod connection;
+
 use crate::{
     ast::{Id, ParameterizedValue, Query},
     connector::{
@@ -5,7 +7,6 @@ use crate::{
         ResultSet,
     },
     error::Error,
-    visitor::{self, Visitor},
 };
 use libsqlite3_sys as ffi;
 use r2d2_sqlite::SqliteConnectionManager;
@@ -75,52 +76,16 @@ impl Connectional for Sqlite {
     }
 }
 
-// Concrete implmentations of trait methods, dropping the mut
-// so we can share it between Connection and Transaction.
-fn execute_impl<'a>(conn: &SqliteConnection, q: Query<'a>) -> crate::Result<Option<Id>> {
-    let (sql, params) = dbg!(visitor::Sqlite::build(q));
-
-    let mut stmt = conn.prepare_cached(&sql)?;
-    stmt.execute(params)?;
-
-    Ok(Some(Id::Int(conn.last_insert_rowid() as usize)))
-}
-
-fn query_impl<'a>(conn: &SqliteConnection, q: Query<'a>) -> crate::Result<ResultSet> {
-    let (sql, params) = dbg!(visitor::Sqlite::build(q));
-
-    return query_raw_impl(conn, &sql, &params);
-}
-
-fn query_raw_impl<'a>(
-    conn: &SqliteConnection,
-    sql: &str,
-    params: &[ParameterizedValue<'a>],
-) -> crate::Result<ResultSet> {
-    let mut stmt = conn.prepare_cached(sql)?;
-    let mut rows = stmt.query(params)?;
-
-    let mut result = ResultSet::new(rows.to_column_names(), Vec::new());
-
-    while let Some(row) = rows.next()? {
-        result.rows.push(row.to_result_row()?);
-    }
-
-    Ok(result)
-}
-
-// Exploits that sqlite::Transaction implements std::ops::Deref<&sqlite::Connection>.
-// Dereferenced Connection is immuteable!
 impl<'a> Transaction for SqliteTransaction<'a> {}
 
 // Trait implementation for r2d2 pooled connection.
 impl Connection for PooledConnection {
     fn execute<'a>(&mut self, q: Query<'a>) -> crate::Result<Option<Id>> {
-        execute_impl(self, q)
+        connection::execute(self, q)
     }
 
     fn query<'a>(&mut self, q: Query<'a>) -> crate::Result<ResultSet> {
-        query_impl(self, q)
+        connection::query(self, q)
     }
 
     fn query_raw<'a>(
@@ -128,18 +93,18 @@ impl Connection for PooledConnection {
         sql: &str,
         params: &[ParameterizedValue<'a>],
     ) -> crate::Result<ResultSet> {
-        query_raw_impl(self, sql, params)
+        connection::query_raw(self, sql, params)
     }
 }
 
 // Trait implementation for r2d2 sqlite.
 impl<'t> Connection for SqliteTransaction<'t> {
     fn execute<'a>(&mut self, q: Query<'a>) -> crate::Result<Option<Id>> {
-        execute_impl(self, q)
+        connection::execute(self, q)
     }
 
     fn query<'a>(&mut self, q: Query<'a>) -> crate::Result<ResultSet> {
-        query_impl(self, q)
+        connection::query(self, q)
     }
 
     fn query_raw<'a>(
@@ -147,17 +112,17 @@ impl<'t> Connection for SqliteTransaction<'t> {
         sql: &str,
         params: &[ParameterizedValue<'a>],
     ) -> crate::Result<ResultSet> {
-        query_raw_impl(self, sql, params)
+        connection::query_raw(self, sql, params)
     }
 }
 
 impl Connection for SqliteConnection {
     fn execute<'a>(&mut self, q: Query<'a>) -> crate::Result<Option<Id>> {
-        execute_impl(self, q)
+        connection::execute(self, q)
     }
 
     fn query<'a>(&mut self, q: Query<'a>) -> crate::Result<ResultSet> {
-        query_impl(self, q)
+        connection::query(self, q)
     }
 
     fn query_raw<'a>(
@@ -165,7 +130,7 @@ impl Connection for SqliteConnection {
         sql: &str,
         params: &[ParameterizedValue<'a>],
     ) -> crate::Result<ResultSet> {
-        query_raw_impl(self, sql, params)
+        connection::query_raw(self, sql, params)
     }
 }
 

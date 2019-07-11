@@ -1,3 +1,5 @@
+mod connection;
+
 use crate::{
     ast::{Id, ParameterizedValue, Query},
     connector::{
@@ -5,12 +7,11 @@ use crate::{
         ResultSet,
     },
     error::Error,
-    visitor::{self, Visitor},
 };
 use chrono::{DateTime, NaiveDateTime, Utc};
 use native_tls::TlsConnector;
 use postgres::{
-    types::{FromSql, ToSql, Type as PostgresType},
+    types::{FromSql, Type as PostgresType},
     Client as PostgresConnection, Config, Statement as PostgresStatement,
     Transaction as PostgresTransaction,
 };
@@ -105,36 +106,13 @@ impl Connectional for PostgreSql {
 
 impl<'a> Transaction for PostgresTransaction<'a> {}
 
-// Postgres uses a somewhat weird parameter format, therefore
-// we have to re-map all elements.
-fn conv_params<'a>(params: &'a [ParameterizedValue<'a>]) -> Vec<&'a tokio_postgres::types::ToSql> {
-    params.into_iter().map(|x| x as &ToSql).collect::<Vec<_>>()
-}
-
 impl<'t> Connection for PostgresTransaction<'t> {
     fn execute<'a>(&mut self, q: Query<'a>) -> crate::Result<Option<Id>> {
-        let (sql, params) = dbg!(visitor::Postgres::build(q));
-
-        let stmt = self.prepare(&sql)?;
-        let rows = PostgresTransaction::query(self, &stmt, &conv_params(&params))?;
-
-        let id = rows.into_iter().rev().next().map(|row| {
-            let id = row.get(0);
-            let tpe = row.columns()[0].type_();
-            Id::from_sql(tpe, id)
-        });
-
-        match id {
-            Some(Ok(id)) => Ok(Some(id)),
-            Some(Err(_)) => panic!("Cannot convert err, todo."),
-            None => Ok(None),
-        }
+        connection::execute(self, q)
     }
 
     fn query<'a>(&mut self, q: Query<'a>) -> crate::Result<ResultSet> {
-        let (sql, params) = dbg!(visitor::Postgres::build(q));
-
-        self.query_raw(&sql, &params[..])
+        connection::query(self, q)
     }
 
     fn query_raw<'a>(
@@ -142,43 +120,17 @@ impl<'t> Connection for PostgresTransaction<'t> {
         sql: &str,
         params: &[ParameterizedValue<'a>],
     ) -> crate::Result<ResultSet> {
-        let stmt = self.prepare(&sql)?;
-        let rows = PostgresTransaction::query(self, &stmt, &conv_params(params))?;
-
-        let mut result = ResultSet::new(stmt.to_column_names(), Vec::new());
-
-        for row in rows {
-            result.rows.push(row.to_result_row()?);
-        }
-
-        Ok(result)
+        connection::query_raw(self, sql, params)
     }
 }
 
 impl Connection for &mut PostgresConnection {
     fn execute<'a>(&mut self, q: Query<'a>) -> crate::Result<Option<Id>> {
-        let (sql, params) = dbg!(visitor::Postgres::build(q));
-
-        let stmt = self.prepare(&sql)?;
-        let rows = PostgresConnection::query(self, &stmt, &conv_params(&params))?;
-
-        let id = rows.into_iter().rev().next().map(|row| {
-            let id = row.get(0);
-            let tpe = row.columns()[0].type_();
-            Id::from_sql(tpe, id)
-        });
-
-        match id {
-            Some(Ok(id)) => Ok(Some(id)),
-            Some(Err(_)) => panic!("Cannot convert err, todo."),
-            None => Ok(None),
-        }
+        connection::execute(self, q)
     }
 
     fn query<'a>(&mut self, q: Query<'a>) -> crate::Result<ResultSet> {
-        let (sql, params) = dbg!(visitor::Postgres::build(q));
-
-        self.query_raw(&sql, &params)
+        connection::query(self, q)
     }
 
     fn query_raw<'a>(
@@ -186,16 +138,7 @@ impl Connection for &mut PostgresConnection {
         sql: &str,
         params: &[ParameterizedValue<'a>],
     ) -> crate::Result<ResultSet> {
-        let stmt = self.prepare(&sql)?;
-        let rows = PostgresConnection::query(self, &stmt, &conv_params(params))?;
-
-        let mut result = ResultSet::new(stmt.to_column_names(), Vec::new());
-
-        for row in rows {
-            result.rows.push(row.to_result_row()?);
-        }
-
-        Ok(result)
+        connection::query_raw(self, sql, params)
     }
 }
 

@@ -18,8 +18,7 @@ pub trait Transaction: Connection {}
 
 /// Represents a connection.
 pub trait Connection {
-    /// Executes the given query and returns the ID of the last
-    /// inserted row.
+    /// Executes the given query and returns the ID of the last inserted row.
     ///
     /// This is typically used for mutating queries.
     fn execute<'a>(&mut self, q: Query<'a>) -> crate::Result<Option<Id>>;
