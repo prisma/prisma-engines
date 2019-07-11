@@ -1,56 +1,25 @@
 mod connection;
+mod conversion;
+mod error;
 
 use crate::{
     ast::{Id, ParameterizedValue, Query},
     connector::{
-        transaction::{Connection, Connectional, ToColumnNames, ToRow, Transaction, Transactional},
+        transaction::{Connection, Connectional, Transaction, Transactional},
         ResultSet,
     },
     error::Error,
 };
-use chrono::{DateTime, NaiveDateTime, Utc};
 use native_tls::TlsConnector;
-use postgres::{
-    types::{FromSql, Type as PostgresType},
-    Client as PostgresConnection, Config, Statement as PostgresStatement,
-    Transaction as PostgresTransaction,
-};
+use postgres::{Client as PostgresConnection, Config, Transaction as PostgresTransaction};
 use r2d2_postgres::PostgresConnectionManager;
-use rust_decimal::Decimal;
-use tokio_postgres::Row as PostgresRow;
 use tokio_postgres_native_tls::MakeTlsConnector;
-use uuid::Uuid;
 
 type Pool = r2d2::Pool<PostgresConnectionManager<MakeTlsConnector>>;
 
 /// A connector interface for the PostgreSQL database.
 pub struct PostgreSql {
     pool: Pool,
-}
-
-impl<'a> FromSql<'a> for Id {
-    fn from_sql(
-        ty: &PostgresType,
-        raw: &'a [u8],
-    ) -> Result<Id, Box<dyn std::error::Error + Sync + Send>> {
-        let res = match *ty {
-            PostgresType::INT2 => Id::Int(i16::from_sql(ty, raw)? as usize),
-            PostgresType::INT4 => Id::Int(i32::from_sql(ty, raw)? as usize),
-            PostgresType::INT8 => Id::Int(i64::from_sql(ty, raw)? as usize),
-            PostgresType::UUID => Id::UUID(Uuid::from_sql(ty, raw)?),
-            _ => Id::String(String::from_sql(ty, raw)?.into()),
-        };
-
-        Ok(res)
-    }
-
-    fn accepts(ty: &PostgresType) -> bool {
-        <&str as FromSql>::accepts(ty)
-            || <Uuid as FromSql>::accepts(ty)
-            || <i16 as FromSql>::accepts(ty)
-            || <i32 as FromSql>::accepts(ty)
-            || <i64 as FromSql>::accepts(ty)
-    }
 }
 
 impl Transactional for PostgreSql {
@@ -142,218 +111,6 @@ impl Connection for &mut PostgresConnection {
     }
 }
 
-impl ToRow for PostgresRow {
-    fn to_result_row<'b>(&'b self) -> crate::Result<Vec<ParameterizedValue<'static>>> {
-        fn convert(row: &PostgresRow, i: usize) -> crate::Result<ParameterizedValue<'static>> {
-            let result = match *row.columns()[i].type_() {
-                PostgresType::BOOL => match row.try_get(i)? {
-                    Some(val) => ParameterizedValue::Boolean(val),
-                    None => ParameterizedValue::Null,
-                },
-                PostgresType::INT2 => match row.try_get(i)? {
-                    Some(val) => {
-                        let val: i16 = val;
-                        ParameterizedValue::Integer(val as i64)
-                    }
-                    None => ParameterizedValue::Null,
-                },
-                PostgresType::INT4 => match row.try_get(i)? {
-                    Some(val) => {
-                        let val: i32 = val;
-                        ParameterizedValue::Integer(val as i64)
-                    }
-                    None => ParameterizedValue::Null,
-                },
-                PostgresType::INT8 => match row.try_get(i)? {
-                    Some(val) => {
-                        let val: i64 = val;
-                        ParameterizedValue::Integer(val)
-                    }
-                    None => ParameterizedValue::Null,
-                },
-                PostgresType::NUMERIC => match row.try_get(i)? {
-                    Some(val) => {
-                        let val: Decimal = val;
-                        let val: f64 = val.to_string().parse().unwrap();
-                        ParameterizedValue::Real(val)
-                    }
-                    None => ParameterizedValue::Null,
-                },
-                PostgresType::FLOAT4 => match row.try_get(i)? {
-                    Some(val) => {
-                        let val: f32 = val;
-                        ParameterizedValue::Real(val as f64)
-                    }
-                    None => ParameterizedValue::Null,
-                },
-                PostgresType::FLOAT8 => match row.try_get(i)? {
-                    Some(val) => {
-                        let val: f64 = val;
-                        ParameterizedValue::Real(val)
-                    }
-                    None => ParameterizedValue::Null,
-                },
-                PostgresType::TIMESTAMP => match row.try_get(i)? {
-                    Some(val) => {
-                        let ts: NaiveDateTime = val;
-                        let dt = DateTime::<Utc>::from_utc(ts, Utc);
-                        ParameterizedValue::DateTime(dt)
-                    }
-                    None => ParameterizedValue::Null,
-                },
-                PostgresType::UUID => match row.try_get(i)? {
-                    Some(val) => {
-                        let val: Uuid = val;
-                        ParameterizedValue::Uuid(val)
-                    }
-                    None => ParameterizedValue::Null,
-                },
-                #[cfg(feature = "array")]
-                PostgresType::INT2_ARRAY => match row.try_get(i)? {
-                    Some(val) => {
-                        let val: Vec<i16> = val;
-                        ParameterizedValue::Array(
-                            val.into_iter()
-                                .map(|x| ParameterizedValue::Integer(x as i64))
-                                .collect(),
-                        )
-                    }
-                    None => ParameterizedValue::Null,
-                },
-                #[cfg(feature = "array")]
-                PostgresType::INT4_ARRAY => match row.try_get(i)? {
-                    Some(val) => {
-                        let val: Vec<i32> = val;
-                        ParameterizedValue::Array(
-                            val.into_iter()
-                                .map(|x| ParameterizedValue::Integer(x as i64))
-                                .collect(),
-                        )
-                    }
-                    None => ParameterizedValue::Null,
-                },
-                #[cfg(feature = "array")]
-                PostgresType::INT8_ARRAY => match row.try_get(i)? {
-                    Some(val) => {
-                        let val: Vec<i64> = val;
-                        ParameterizedValue::Array(
-                            val.into_iter()
-                                .map(|x| ParameterizedValue::Integer(x as i64))
-                                .collect(),
-                        )
-                    }
-                    None => ParameterizedValue::Null,
-                },
-                #[cfg(feature = "array")]
-                PostgresType::FLOAT4_ARRAY => match row.try_get(i)? {
-                    Some(val) => {
-                        let val: Vec<f32> = val;
-                        ParameterizedValue::Array(
-                            val.into_iter()
-                                .map(|x| ParameterizedValue::Real(x as f64))
-                                .collect(),
-                        )
-                    }
-                    None => ParameterizedValue::Null,
-                },
-                #[cfg(feature = "array")]
-                PostgresType::FLOAT8_ARRAY => match row.try_get(i)? {
-                    Some(val) => {
-                        let val: Vec<f64> = val;
-                        ParameterizedValue::Array(
-                            val.into_iter()
-                                .map(|x| ParameterizedValue::Real(x as f64))
-                                .collect(),
-                        )
-                    }
-                    None => ParameterizedValue::Null,
-                },
-                #[cfg(feature = "array")]
-                PostgresType::BOOL_ARRAY => match row.try_get(i)? {
-                    Some(val) => {
-                        let val: Vec<bool> = val;
-                        ParameterizedValue::Array(
-                            val.into_iter()
-                                .map(|x| ParameterizedValue::Boolean(x))
-                                .collect(),
-                        )
-                    }
-                    None => ParameterizedValue::Null,
-                },
-                #[cfg(feature = "array")]
-                PostgresType::TIMESTAMP_ARRAY => match row.try_get(i)? {
-                    Some(val) => {
-                        let val: Vec<NaiveDateTime> = val;
-                        ParameterizedValue::Array(
-                            val.into_iter()
-                                .map(|x| {
-                                    ParameterizedValue::DateTime(DateTime::<Utc>::from_utc(x, Utc))
-                                })
-                                .collect(),
-                        )
-                    }
-                    None => ParameterizedValue::Null,
-                },
-                #[cfg(feature = "array")]
-                PostgresType::NUMERIC_ARRAY => match row.try_get(i)? {
-                    Some(val) => {
-                        let val: Vec<Decimal> = val;
-                        ParameterizedValue::Array(
-                            val.into_iter()
-                                .map(|x| ParameterizedValue::Real(x.to_string().parse().unwrap()))
-                                .collect(),
-                        )
-                    }
-                    None => ParameterizedValue::Null,
-                },
-                #[cfg(feature = "array")]
-                PostgresType::TEXT_ARRAY
-                | PostgresType::NAME_ARRAY
-                | PostgresType::VARCHAR_ARRAY => match row.try_get(i)? {
-                    Some(val) => {
-                        let val: Vec<&str> = val;
-                        ParameterizedValue::Array(
-                            val.into_iter()
-                                .map(|x| ParameterizedValue::Text(String::from(x).into()))
-                                .collect(),
-                        )
-                    }
-                    None => ParameterizedValue::Null,
-                },
-                _ => match row.try_get(i)? {
-                    Some(val) => {
-                        let val: String = val;
-                        ParameterizedValue::Text(val.into())
-                    }
-                    None => ParameterizedValue::Null,
-                },
-            };
-
-            Ok(result)
-        }
-
-        let mut row = Vec::new();
-
-        for i in 0..self.columns().len() {
-            row.push(convert(self, i)?);
-        }
-
-        Ok(row)
-    }
-}
-
-impl ToColumnNames for PostgresStatement {
-    fn to_column_names<'b>(&'b self) -> Vec<String> {
-        let mut names = Vec::new();
-
-        for column in self.columns() {
-            names.push(String::from(column.name()));
-        }
-
-        names
-    }
-}
-
 impl PostgreSql {
     pub fn new(config: Config, connections: u32) -> crate::Result<PostgreSql> {
         let mut tls_builder = TlsConnector::builder();
@@ -373,46 +130,6 @@ impl PostgreSql {
         let mut client = self.pool.get()?;
         let result = f(&mut client);
         result
-    }
-}
-
-impl From<tokio_postgres::error::Error> for Error {
-    fn from(e: tokio_postgres::error::Error) -> Error {
-        use tokio_postgres::error::DbError;
-
-        match e.code().map(|c| c.code()) {
-            // Don't look at me, I'm hideous ;((
-            Some("23505") => {
-                let error = e.into_source().unwrap(); // boom
-                let db_error = error.downcast_ref::<DbError>().unwrap(); // BOOM
-                let detail = db_error.detail().unwrap(); // KA-BOOM
-
-                let splitted: Vec<&str> = detail.split(")=(").collect();
-                let splitted: Vec<&str> = splitted[0].split(" (").collect();
-                let field_name = splitted[1].replace("\"", "");
-
-                Error::UniqueConstraintViolation { field_name }
-            }
-            // Even lipstick will not save this...
-            Some("23502") => {
-                let error = e.into_source().unwrap(); // boom
-                let db_error = error.downcast_ref::<DbError>().unwrap(); // BOOM
-                let detail = db_error.detail().unwrap(); // KA-BOOM
-
-                let splitted: Vec<&str> = detail.split(")=(").collect();
-                let splitted: Vec<&str> = splitted[0].split(" (").collect();
-                let field_name = splitted[1].replace("\"", "");
-
-                Error::NullConstraintViolation { field_name }
-            }
-            _ => Error::QueryError(e.into()),
-        }
-    }
-}
-
-impl From<native_tls::Error> for Error {
-    fn from(e: native_tls::Error) -> Error {
-        Error::ConnectionError(e.into())
     }
 }
 

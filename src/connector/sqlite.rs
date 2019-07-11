@@ -1,20 +1,17 @@
 mod connection;
+mod conversion;
+mod error;
 
 use crate::{
     ast::{Id, ParameterizedValue, Query},
     connector::{
-        transaction::{Connection, Connectional, ToColumnNames, ToRow, Transaction, Transactional},
+        transaction::{Connection, Connectional, Transaction, Transactional},
         ResultSet,
     },
     error::Error,
 };
-use libsqlite3_sys as ffi;
 use r2d2_sqlite::SqliteConnectionManager;
-use rusqlite::{
-    types::{FromSqlError, ValueRef},
-    Connection as SqliteConnection, Row as SqliteRow, Rows as SqliteRows,
-    Transaction as SqliteTransaction, NO_PARAMS,
-};
+use rusqlite::{Connection as SqliteConnection, Transaction as SqliteTransaction, NO_PARAMS};
 use std::{collections::HashSet, convert::TryFrom, path::PathBuf};
 
 type PooledConnection = r2d2::PooledConnection<r2d2_sqlite::SqliteConnectionManager>;
@@ -134,49 +131,6 @@ impl Connection for SqliteConnection {
     }
 }
 
-impl<'a> ToRow for SqliteRow<'a> {
-    fn to_result_row<'b>(&'b self) -> crate::Result<Vec<ParameterizedValue<'static>>> {
-        let mut row = Vec::new();
-
-        for (i, column) in self.columns().iter().enumerate() {
-            let pv = match self.get_raw(i) {
-                ValueRef::Null => ParameterizedValue::Null,
-                ValueRef::Integer(i) => match column.decl_type() {
-                    Some("BOOLEAN") => {
-                        if i == 0 {
-                            ParameterizedValue::Boolean(false)
-                        } else {
-                            ParameterizedValue::Boolean(true)
-                        }
-                    }
-                    _ => ParameterizedValue::Integer(i),
-                },
-                ValueRef::Real(f) => ParameterizedValue::Real(f),
-                ValueRef::Text(s) => ParameterizedValue::Text(s.to_string().into()),
-                ValueRef::Blob(_) => panic!("Blobs not supprted, yet"),
-            };
-
-            row.push(pv);
-        }
-
-        Ok(row)
-    }
-}
-
-impl<'a> ToColumnNames for SqliteRows<'a> {
-    fn to_column_names<'b>(&'b self) -> Vec<String> {
-        let mut names = Vec::new();
-
-        if let Some(columns) = self.column_names() {
-            for column in columns {
-                names.push(String::from(column));
-            }
-        }
-
-        names
-    }
-}
-
 impl TryFrom<&str> for Sqlite {
     type Error = Error;
 
@@ -250,67 +204,6 @@ impl Sqlite {
         }
 
         result
-    }
-}
-
-impl From<rusqlite::Error> for Error {
-    fn from(e: rusqlite::Error) -> Error {
-        match e {
-            rusqlite::Error::QueryReturnedNoRows => Error::NotFound,
-
-            rusqlite::Error::SqliteFailure(
-                ffi::Error {
-                    code: ffi::ErrorCode::ConstraintViolation,
-                    extended_code: 2067,
-                },
-                Some(description),
-            ) => {
-                let splitted: Vec<&str> = description.split(": ").collect();
-                let splitted: Vec<&str> = splitted[1].split(".").collect();
-
-                Error::UniqueConstraintViolation {
-                    field_name: splitted[1].into(),
-                }
-            }
-
-            rusqlite::Error::SqliteFailure(
-                ffi::Error {
-                    code: ffi::ErrorCode::ConstraintViolation,
-                    extended_code: 1555,
-                },
-                Some(description),
-            ) => {
-                let splitted: Vec<&str> = description.split(": ").collect();
-                let splitted: Vec<&str> = splitted[1].split(".").collect();
-
-                Error::UniqueConstraintViolation {
-                    field_name: splitted[1].into(),
-                }
-            }
-
-            rusqlite::Error::SqliteFailure(
-                ffi::Error {
-                    code: ffi::ErrorCode::ConstraintViolation,
-                    extended_code: 1299,
-                },
-                Some(description),
-            ) => {
-                let splitted: Vec<&str> = description.split(": ").collect();
-                let splitted: Vec<&str> = splitted[1].split(".").collect();
-
-                Error::NullConstraintViolation {
-                    field_name: splitted[1].into(),
-                }
-            }
-
-            e => Error::QueryError(e.into()),
-        }
-    }
-}
-
-impl From<FromSqlError> for Error {
-    fn from(e: FromSqlError) -> Error {
-        Error::ColumnReadFailure(e.into())
     }
 }
 

@@ -1,14 +1,15 @@
 mod connection;
+mod conversion;
+mod error;
 
 use crate::{
     ast::{Id, ParameterizedValue, Query},
     connector::{
-        transaction::{Connection, Connectional, ToColumnNames, ToRow, Transaction, Transactional},
+        transaction::{Connection, Connectional, Transaction, Transactional},
         ResultSet,
     },
     error::Error,
 };
-use chrono::{DateTime, Duration, NaiveDate, Utc};
 use mysql as my;
 use r2d2_mysql::pool::MysqlConnectionManager;
 use url::Url;
@@ -140,117 +141,6 @@ impl Connection for PooledConnection {
         params: &[ParameterizedValue<'a>],
     ) -> crate::Result<ResultSet> {
         connection::query_raw(self, sql, params)
-    }
-}
-
-impl ToRow for my::Row {
-    fn to_result_row<'b>(&'b self) -> crate::Result<Vec<ParameterizedValue<'static>>> {
-        fn convert(row: &my::Row, i: usize) -> crate::Result<ParameterizedValue<'static>> {
-            // TODO: It would prob. be better to inver via Column::column_type()
-            let raw_value = row.as_ref(i).unwrap_or(&my::Value::NULL);
-            let res = match raw_value {
-                my::Value::NULL => ParameterizedValue::Null,
-                my::Value::Bytes(b) => {
-                    ParameterizedValue::Text(String::from_utf8(b.to_vec())?.into())
-                }
-                my::Value::Int(i) => ParameterizedValue::Integer(*i),
-                // TOOD: This is unsafe
-                my::Value::UInt(i) => ParameterizedValue::Integer(*i as i64),
-                my::Value::Float(f) => ParameterizedValue::Real(*f),
-                my::Value::Date(year, month, day, hour, min, sec, _) => {
-                    let naive = NaiveDate::from_ymd(*year as i32, *month as u32, *day as u32)
-                        .and_hms(*hour as u32, *min as u32, *sec as u32);
-
-                    let dt: DateTime<Utc> = DateTime::from_utc(naive, Utc);
-                    ParameterizedValue::DateTime(dt)
-                }
-                my::Value::Time(is_neg, days, hours, minutes, seconds, micros) => {
-                    let days = Duration::days(*days as i64);
-                    let hours = Duration::hours(*hours as i64);
-                    let minutes = Duration::minutes(*minutes as i64);
-                    let seconds = Duration::seconds(*seconds as i64);
-                    let micros = Duration::microseconds(*micros as i64);
-
-                    let time = days
-                        .checked_add(&hours)
-                        .and_then(|t| t.checked_add(&minutes))
-                        .and_then(|t| t.checked_add(&seconds))
-                        .and_then(|t| t.checked_add(&micros))
-                        .unwrap();
-
-                    let duration = time.to_std().unwrap();
-                    let f_time = duration.as_secs() as f64 + duration.subsec_micros() as f64 * 1e-6;
-
-                    ParameterizedValue::Real(if *is_neg { -f_time } else { f_time })
-                }
-            };
-
-            Ok(res)
-        }
-
-        let mut row = Vec::new();
-
-        for i in 0..self.len() {
-            row.push(convert(self, i)?);
-        }
-
-        Ok(row)
-    }
-}
-
-impl<'a> ToColumnNames for my::Stmt<'a> {
-    fn to_column_names<'b>(&'b self) -> Vec<String> {
-        let mut names = Vec::new();
-
-        if let Some(columns) = self.columns_ref() {
-            for column in columns {
-                names.push(String::from(column.name_str()));
-            }
-        }
-
-        names
-    }
-}
-
-impl From<my::error::Error> for Error {
-    fn from(e: my::error::Error) -> Error {
-        use my::error::MySqlError;
-
-        match e {
-            my::error::Error::MySqlError(MySqlError {
-                state: _,
-                ref message,
-                code,
-            }) if code == 1062 => {
-                let splitted: Vec<&str> = message.split_whitespace().collect();
-                let splitted: Vec<&str> = splitted.last().map(|s| s.split("'").collect()).unwrap();
-                let splitted: Vec<&str> = splitted[1].split("_").collect();
-
-                let field_name: String = splitted[0].into();
-
-                Error::UniqueConstraintViolation { field_name }
-            }
-            my::error::Error::MySqlError(MySqlError {
-                state: _,
-                ref message,
-                code,
-            }) if code == 1263 => {
-                let splitted: Vec<&str> = message.split_whitespace().collect();
-                let splitted: Vec<&str> = splitted.last().map(|s| s.split("'").collect()).unwrap();
-                let splitted: Vec<&str> = splitted[1].split("_").collect();
-
-                let field_name: String = splitted[0].into();
-
-                Error::NullConstraintViolation { field_name }
-            }
-            e => Error::QueryError(e.into()),
-        }
-    }
-}
-
-impl From<std::string::FromUtf8Error> for Error {
-    fn from(e: std::string::FromUtf8Error) -> Error {
-        Error::QueryError(e.into())
     }
 }
 
