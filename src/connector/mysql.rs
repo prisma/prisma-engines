@@ -124,6 +124,16 @@ impl<'t> Connection for my::Transaction<'t> {
     ) -> crate::Result<ResultSet> {
         connection::query_raw(self, sql, params)
     }
+
+    fn turn_off_fk_constraints(&mut self) -> crate::Result<()> {
+        self.query_raw("SET FOREIGN_KEY_CHECKS=0", &[])?;
+        Ok(())
+    }
+
+    fn turn_on_fk_constraints(&mut self) -> crate::Result<()> {
+        self.query_raw("SET FOREIGN_KEY_CHECKS=1", &[])?;
+        Ok(())
+    }
 }
 
 impl Connection for PooledConnection {
@@ -141,6 +151,16 @@ impl Connection for PooledConnection {
         params: &[ParameterizedValue<'a>],
     ) -> crate::Result<ResultSet> {
         connection::query_raw(self, sql, params)
+    }
+
+    fn turn_off_fk_constraints(&mut self) -> crate::Result<()> {
+        self.query_raw("SET FOREIGN_KEY_CHECKS=0", &[])?;
+        Ok(())
+    }
+
+    fn turn_on_fk_constraints(&mut self) -> crate::Result<()> {
+        self.query_raw("SET FOREIGN_KEY_CHECKS=1", &[])?;
+        Ok(())
     }
 }
 

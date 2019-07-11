@@ -1,5 +1,5 @@
 use super::ResultSet;
-use crate::ast::{Id, ParameterizedValue, Query};
+use crate::ast::*;
 
 pub trait ToRow {
     fn to_result_row<'b>(&'b self) -> crate::Result<Vec<ParameterizedValue<'static>>>;
@@ -36,6 +36,25 @@ pub trait Connection {
         sql: &str,
         params: &[ParameterizedValue<'a>],
     ) -> crate::Result<ResultSet>;
+
+    /// Turns off all foreign key constraints.
+    fn turn_off_fk_constraints(&mut self) -> crate::Result<()>;
+
+    /// Turns on all foreign key constraints.
+    fn turn_on_fk_constraints(&mut self) -> crate::Result<()>;
+
+    /// Empties the given set of tables.
+    fn empty_tables<'a>(&mut self, tables: Vec<Table>) -> crate::Result<()> {
+        self.turn_off_fk_constraints()?;
+
+        for table in tables {
+            self.query(Delete::from_table(table).into())?;
+        }
+
+        self.turn_on_fk_constraints()?;
+
+        Ok(())
+    }
 }
 
 pub trait Connectional {

@@ -91,6 +91,16 @@ impl<'t> Connection for PostgresTransaction<'t> {
     ) -> crate::Result<ResultSet> {
         connection::query_raw(self, sql, params)
     }
+
+    fn turn_off_fk_constraints(&mut self) -> crate::Result<()> {
+        self.query_raw("SET CONSTRAINTS ALL DEFERRED", &[])?;
+        Ok(())
+    }
+
+    fn turn_on_fk_constraints(&mut self) -> crate::Result<()> {
+        self.query_raw("SET CONSTRAINTS ALL IMMEDIATE", &[])?;
+        Ok(())
+    }
 }
 
 impl Connection for &mut PostgresConnection {
@@ -108,6 +118,16 @@ impl Connection for &mut PostgresConnection {
         params: &[ParameterizedValue<'a>],
     ) -> crate::Result<ResultSet> {
         connection::query_raw(self, sql, params)
+    }
+
+    fn turn_off_fk_constraints(&mut self) -> crate::Result<()> {
+        self.query_raw("SET CONSTRAINTS ALL DEFERRED", &[])?;
+        Ok(())
+    }
+
+    fn turn_on_fk_constraints(&mut self) -> crate::Result<()> {
+        self.query_raw("SET CONSTRAINTS ALL IMMEDIATE", &[])?;
+        Ok(())
     }
 }
 

@@ -92,6 +92,16 @@ impl Connection for PooledConnection {
     ) -> crate::Result<ResultSet> {
         connection::query_raw(self, sql, params)
     }
+
+    fn turn_off_fk_constraints(&mut self) -> crate::Result<()> {
+        self.query_raw("PRAGMA foreign_keys = OFF", &[])?;
+        Ok(())
+    }
+
+    fn turn_on_fk_constraints(&mut self) -> crate::Result<()> {
+        self.query_raw("PRAGMA foreign_keys = ON", &[])?;
+        Ok(())
+    }
 }
 
 // Trait implementation for r2d2 sqlite.
@@ -111,6 +121,16 @@ impl<'t> Connection for SqliteTransaction<'t> {
     ) -> crate::Result<ResultSet> {
         connection::query_raw(self, sql, params)
     }
+
+    fn turn_off_fk_constraints(&mut self) -> crate::Result<()> {
+        self.query_raw("PRAGMA foreign_keys = OFF", &[])?;
+        Ok(())
+    }
+
+    fn turn_on_fk_constraints(&mut self) -> crate::Result<()> {
+        self.query_raw("PRAGMA foreign_keys = ON", &[])?;
+        Ok(())
+    }
 }
 
 impl Connection for SqliteConnection {
@@ -128,6 +148,16 @@ impl Connection for SqliteConnection {
         params: &[ParameterizedValue<'a>],
     ) -> crate::Result<ResultSet> {
         connection::query_raw(self, sql, params)
+    }
+
+    fn turn_off_fk_constraints(&mut self) -> crate::Result<()> {
+        self.query_raw("PRAGMA foreign_keys = OFF", &[])?;
+        Ok(())
+    }
+
+    fn turn_on_fk_constraints(&mut self) -> crate::Result<()> {
+        self.query_raw("PRAGMA foreign_keys = ON", &[])?;
+        Ok(())
     }
 }
 
