@@ -1,17 +1,17 @@
-mod connection;
 mod conversion;
 mod error;
 
 use crate::{
     ast::{Id, ParameterizedValue, Query},
     connector::{
-        queryable::{Database, Queryable, Transactional},
+        queryable::{Database, Queryable, ToColumnNames, ToRow, Transactional},
         ResultSet,
     },
     error::Error,
+    visitor::{self, Visitor},
 };
 use r2d2_sqlite::SqliteConnectionManager;
-use rusqlite::{Connection as SqliteConnection, Transaction as SqliteTransaction, NO_PARAMS};
+use rusqlite::NO_PARAMS;
 use std::{collections::HashSet, convert::TryFrom, path::PathBuf};
 
 type PooledConnection = r2d2::PooledConnection<r2d2_sqlite::SqliteConnectionManager>;
@@ -31,13 +31,15 @@ impl Transactional for Sqlite {
     where
         F: FnOnce(&mut Queryable) -> crate::Result<T>,
     {
-        self.with_connection_internal(db, |ref mut conn| {
-            let mut tx = conn.get_mut().transaction()?;
+        self.with_connection_internal(db, |conn| {
+            let tx = conn.transaction()?;
             tx.set_prepared_statement_cache_capacity(65536);
 
-            let result = f(&mut tx);
+            let mut connection_like = ConnectionLike::from(tx);
+            let result = f(&mut connection_like);
 
             if result.is_ok() {
+                let tx = rusqlite::Transaction::try_from(connection_like).unwrap();
                 tx.commit()?;
             }
 
@@ -52,7 +54,7 @@ impl Database for Sqlite {
         F: FnOnce(&mut Queryable) -> crate::Result<T>,
         Self: Sized,
     {
-        self.with_connection_internal(db, |c| f(c.get_mut()))
+        self.with_connection_internal(db, |c| f(c))
     }
 
     fn execute_on_connection<'a>(&self, db: &str, query: Query<'a>) -> crate::Result<Option<Id>> {
@@ -73,69 +75,110 @@ impl Database for Sqlite {
     }
 }
 
-impl Queryable for PooledConnection {
-    fn execute<'a>(&mut self, q: Query<'a>) -> crate::Result<Option<Id>> {
-        connection::execute(self, q)
-    }
+pub enum ConnectionLike<'a> {
+    Pooled(PooledConnection),
+    Connection(rusqlite::Connection),
+    Transaction(rusqlite::Transaction<'a>),
+}
 
-    fn query<'a>(&mut self, q: Query<'a>) -> crate::Result<ResultSet> {
-        connection::query(self, q)
-    }
-
-    fn query_raw<'a>(
-        &mut self,
-        sql: &str,
-        params: &[ParameterizedValue<'a>],
-    ) -> crate::Result<ResultSet> {
-        connection::query_raw(self, sql, params)
-    }
-
-    fn turn_off_fk_constraints(&mut self) -> crate::Result<()> {
-        self.query_raw("PRAGMA foreign_keys = OFF", &[])?;
-        Ok(())
-    }
-
-    fn turn_on_fk_constraints(&mut self) -> crate::Result<()> {
-        self.query_raw("PRAGMA foreign_keys = ON", &[])?;
-        Ok(())
+impl<'a> From<PooledConnection> for ConnectionLike<'a> {
+    fn from(conn: PooledConnection) -> Self {
+        ConnectionLike::Pooled(conn)
     }
 }
 
-impl<'t> Queryable for SqliteTransaction<'t> {
-    fn execute<'a>(&mut self, q: Query<'a>) -> crate::Result<Option<Id>> {
-        connection::execute(self, q)
-    }
-
-    fn query<'a>(&mut self, q: Query<'a>) -> crate::Result<ResultSet> {
-        connection::query(self, q)
-    }
-
-    fn query_raw<'a>(
-        &mut self,
-        sql: &str,
-        params: &[ParameterizedValue<'a>],
-    ) -> crate::Result<ResultSet> {
-        connection::query_raw(self, sql, params)
-    }
-
-    fn turn_off_fk_constraints(&mut self) -> crate::Result<()> {
-        self.query_raw("PRAGMA foreign_keys = OFF", &[])?;
-        Ok(())
-    }
-
-    fn turn_on_fk_constraints(&mut self) -> crate::Result<()> {
-        self.query_raw("PRAGMA foreign_keys = ON", &[])?;
-        Ok(())
+impl<'a> From<rusqlite::Connection> for ConnectionLike<'a> {
+    fn from(conn: rusqlite::Connection) -> Self {
+        ConnectionLike::Connection(conn)
     }
 }
 
-impl Queryable for SqliteConnection {
+impl<'a> From<rusqlite::Transaction<'a>> for ConnectionLike<'a> {
+    fn from(conn: rusqlite::Transaction<'a>) -> Self {
+        ConnectionLike::Transaction(conn)
+    }
+}
+
+impl<'a> TryFrom<ConnectionLike<'a>> for rusqlite::Transaction<'a> {
+    type Error = Error;
+
+    fn try_from(cl: ConnectionLike<'a>) -> crate::Result<Self> {
+        match cl {
+            ConnectionLike::Transaction(tx) => Ok(tx),
+            _ => Err(Error::ConversionError(
+                "ConnectionLike was not a transaction...",
+            )),
+        }
+    }
+}
+
+impl<'a> TryFrom<ConnectionLike<'a>> for PooledConnection {
+    type Error = Error;
+
+    fn try_from(cl: ConnectionLike<'a>) -> crate::Result<Self> {
+        match cl {
+            ConnectionLike::Pooled(pooled) => Ok(pooled),
+            _ => Err(Error::ConversionError(
+                "ConnectionLike was not a pooled connection...",
+            )),
+        }
+    }
+}
+
+impl<'a> TryFrom<ConnectionLike<'a>> for rusqlite::Connection {
+    type Error = Error;
+
+    fn try_from(cl: ConnectionLike<'a>) -> crate::Result<Self> {
+        match cl {
+            ConnectionLike::Connection(conn) => Ok(conn),
+            _ => Err(Error::ConversionError(
+                "ConnectionLike was not a connection...",
+            )),
+        }
+    }
+}
+
+impl<'a> ConnectionLike<'a> {
+    fn prepare_cached(&self, sql: &str) -> rusqlite::Result<rusqlite::CachedStatement> {
+        match self {
+            ConnectionLike::Pooled(c) => c.prepare_cached(sql),
+            ConnectionLike::Connection(c) => c.prepare_cached(sql),
+            ConnectionLike::Transaction(c) => c.prepare_cached(sql),
+        }
+    }
+
+    fn last_insert_rowid(&self) -> i64 {
+        match self {
+            ConnectionLike::Pooled(c) => c.last_insert_rowid(),
+            ConnectionLike::Connection(c) => c.last_insert_rowid(),
+            ConnectionLike::Transaction(c) => c.last_insert_rowid(),
+        }
+    }
+
+    pub fn transaction(&mut self) -> rusqlite::Result<rusqlite::Transaction> {
+        match self {
+            ConnectionLike::Pooled(ref mut c) => c.transaction(),
+            ConnectionLike::Connection(ref mut c) => c.transaction(),
+            ConnectionLike::Transaction(_) => {
+                panic!("Could not start a transaction from transaction")
+            }
+        }
+    }
+}
+
+impl<'t> Queryable for ConnectionLike<'t> {
     fn execute<'a>(&mut self, q: Query<'a>) -> crate::Result<Option<Id>> {
-        connection::execute(self, q)
+        let (sql, params) = dbg!(visitor::Sqlite::build(q));
+
+        let mut stmt = self.prepare_cached(&sql)?;
+        stmt.execute(params)?;
+
+        Ok(Some(Id::Int(self.last_insert_rowid() as usize)))
     }
 
     fn query<'a>(&mut self, q: Query<'a>) -> crate::Result<ResultSet> {
-        connection::query(self, q)
+        let (sql, params) = dbg!(visitor::Sqlite::build(q));
+        self.query_raw(&sql, &params)
     }
 
     fn query_raw<'a>(
@@ -143,7 +186,16 @@ impl Queryable for SqliteConnection {
         sql: &str,
         params: &[ParameterizedValue<'a>],
     ) -> crate::Result<ResultSet> {
-        connection::query_raw(self, sql, params)
+        let mut stmt = self.prepare_cached(sql)?;
+        let mut rows = stmt.query(params)?;
+
+        let mut result = ResultSet::new(rows.to_column_names(), Vec::new());
+
+        while let Some(row) = rows.next()? {
+            result.rows.push(row.to_result_row()?);
+        }
+
+        Ok(result)
     }
 
     fn turn_off_fk_constraints(&mut self) -> crate::Result<()> {
@@ -192,7 +244,7 @@ impl Sqlite {
         path.exists()
     }
 
-    fn attach_database(&self, conn: &mut SqliteConnection, db_name: &str) -> crate::Result<()> {
+    fn attach_database(&self, conn: &mut rusqlite::Connection, db_name: &str) -> crate::Result<()> {
         let mut stmt = conn.prepare("PRAGMA database_list")?;
 
         let databases: HashSet<String> = stmt
@@ -205,28 +257,30 @@ impl Sqlite {
             .collect();
 
         if !databases.contains(db_name) {
-            SqliteConnection::execute(
+            rusqlite::Connection::execute(
                 conn,
                 "ATTACH DATABASE ? AS ?",
                 &[self.file_path.as_ref(), db_name],
             )?;
         }
 
-        SqliteConnection::execute(conn, "PRAGMA foreign_keys = ON", NO_PARAMS)?;
+        rusqlite::Connection::execute(conn, "PRAGMA foreign_keys = ON", NO_PARAMS)?;
         Ok(())
     }
 
     fn with_connection_internal<F, T>(&self, db: &str, f: F) -> crate::Result<T>
     where
-        F: FnOnce(&mut std::cell::RefCell<PooledConnection>) -> crate::Result<T>,
+        F: FnOnce(&mut ConnectionLike) -> crate::Result<T>,
     {
-        let mut conn = std::cell::RefCell::new(self.pool.get()?);
-        self.attach_database(conn.get_mut(), db)?;
+        let mut conn = self.pool.get()?;
+        self.attach_database(&mut conn, db)?;
 
-        let result = f(&mut conn);
+        let mut connection_like = ConnectionLike::from(conn);
+        let result = f(&mut connection_like);
 
         if self.test_mode {
-            SqliteConnection::execute(conn.get_mut(), "DETACH DATABASE ?", &[db])?;
+            let conn = PooledConnection::try_from(connection_like).unwrap();
+            conn.execute("DETACH DATABASE ?", &[db])?;
         }
 
         result

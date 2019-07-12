@@ -25,6 +25,8 @@ pub enum Error {
     ResultTypeMismatch(&'static str),
     #[fail(display = "The specified database url {} is invalid.", _0)]
     DatabaseUrlIsInvalid(String),
+    #[fail(display = "Conversion failed: {}", _0)]
+    ConversionError(&'static str),
 }
 
 impl From<r2d2::Error> for Error {
