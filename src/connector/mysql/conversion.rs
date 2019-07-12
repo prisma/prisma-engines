@@ -5,6 +5,16 @@ use crate::{
 use chrono::{DateTime, Duration, NaiveDate, Utc};
 use mysql as my;
 
+pub fn conv_params<'a>(params: &[ParameterizedValue<'a>]) -> my::Params {
+    if params.len() > 0 {
+        my::Params::Positional(params.iter().map(|x| x.into()).collect::<Vec<my::Value>>())
+    } else {
+        // If we don't use explicit 'Empty',
+        // mysql crashes with 'internal error: entered unreachable code'
+        my::Params::Empty
+    }
+}
+
 impl ToRow for my::Row {
     fn to_result_row<'b>(&'b self) -> crate::Result<Vec<ParameterizedValue<'static>>> {
         fn convert(row: &my::Row, i: usize) -> crate::Result<ParameterizedValue<'static>> {

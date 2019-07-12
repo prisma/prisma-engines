@@ -1,17 +1,15 @@
-mod connection;
 mod conversion;
 mod error;
 
 use crate::{
     ast::{Id, ParameterizedValue, Query},
-    connector::{
-        queryable::{Database, Queryable, Transactional},
-        ResultSet,
-    },
+    connector::{queryable::*, ResultSet},
     error::Error,
+    visitor::{self, Visitor},
 };
 use mysql as my;
 use r2d2_mysql::pool::MysqlConnectionManager;
+use std::convert::TryFrom;
 use url::Url;
 
 type Pool = r2d2::Pool<MysqlConnectionManager>;
@@ -25,7 +23,6 @@ pub struct Mysql {
 }
 
 impl Mysql {
-    // TODO: we should not use this constructor since it does set the db_name field
     pub fn new(conf: mysql::OptsBuilder) -> crate::Result<Mysql> {
         let manager = MysqlConnectionManager::new(conf);
 
@@ -36,7 +33,6 @@ impl Mysql {
     }
 
     pub fn new_from_url(url: &str) -> crate::Result<Mysql> {
-        // TODO: connection limit configuration
         let mut builder = my::OptsBuilder::new();
         let url = Url::parse(url)?;
         let db_name = url.path_segments().and_then(|mut segments| segments.next());
@@ -66,10 +62,12 @@ impl Transactional for Mysql {
         F: FnOnce(&mut Queryable) -> crate::Result<T>,
     {
         let mut conn = self.pool.get()?;
-        let mut tx = conn.start_transaction(true, None, None)?;
-        let result = f(&mut tx);
+        let tx = conn.start_transaction(true, None, None)?;
+        let mut conn_like = ConnectionLike::from(tx);
+        let result = f(&mut conn_like);
 
         if result.is_ok() {
+            let tx = my::Transaction::try_from(conn_like).unwrap();
             tx.commit()?;
         }
 
@@ -83,8 +81,7 @@ impl Database for Mysql {
         F: FnOnce(&mut Queryable) -> crate::Result<T>,
         Self: Sized,
     {
-        let mut conn = self.pool.get()?;
-        let result = f(&mut conn);
+        let result = f(&mut ConnectionLike::from(self.pool.get()?));
         result
     }
 
@@ -106,41 +103,92 @@ impl Database for Mysql {
     }
 }
 
-impl<'t> Queryable for my::Transaction<'t> {
-    fn execute<'a>(&mut self, q: Query<'a>) -> crate::Result<Option<Id>> {
-        connection::execute(self, q)
-    }
+pub enum ConnectionLike<'a> {
+    Pooled(PooledConnection),
+    Connection(my::Conn),
+    Transaction(my::Transaction<'a>),
+}
 
-    fn query<'a>(&mut self, q: Query<'a>) -> crate::Result<ResultSet> {
-        connection::query(self, q)
-    }
-
-    fn query_raw<'a>(
-        &mut self,
-        sql: &str,
-        params: &[ParameterizedValue<'a>],
-    ) -> crate::Result<ResultSet> {
-        connection::query_raw(self, sql, params)
-    }
-
-    fn turn_off_fk_constraints(&mut self) -> crate::Result<()> {
-        self.query_raw("SET FOREIGN_KEY_CHECKS=0", &[])?;
-        Ok(())
-    }
-
-    fn turn_on_fk_constraints(&mut self) -> crate::Result<()> {
-        self.query_raw("SET FOREIGN_KEY_CHECKS=1", &[])?;
-        Ok(())
+impl<'a> From<PooledConnection> for ConnectionLike<'a> {
+    fn from(conn: PooledConnection) -> Self {
+        ConnectionLike::Pooled(conn)
     }
 }
 
-impl Queryable for PooledConnection {
+impl<'a> From<my::Conn> for ConnectionLike<'a> {
+    fn from(conn: my::Conn) -> Self {
+        ConnectionLike::Connection(conn)
+    }
+}
+
+impl<'a> From<my::Transaction<'a>> for ConnectionLike<'a> {
+    fn from(conn: my::Transaction<'a>) -> Self {
+        ConnectionLike::Transaction(conn)
+    }
+}
+
+impl<'a> TryFrom<ConnectionLike<'a>> for my::Transaction<'a> {
+    type Error = Error;
+
+    fn try_from(cl: ConnectionLike<'a>) -> crate::Result<Self> {
+        match cl {
+            ConnectionLike::Transaction(tx) => Ok(tx),
+            _ => Err(Error::ConversionError(
+                "ConnectionLike was not a transaction...",
+            )),
+        }
+    }
+}
+
+impl<'a> TryFrom<ConnectionLike<'a>> for PooledConnection {
+    type Error = Error;
+
+    fn try_from(cl: ConnectionLike<'a>) -> crate::Result<Self> {
+        match cl {
+            ConnectionLike::Pooled(pooled) => Ok(pooled),
+            _ => Err(Error::ConversionError(
+                "ConnectionLike was not a pooled connection...",
+            )),
+        }
+    }
+}
+
+impl<'a> TryFrom<ConnectionLike<'a>> for my::Conn {
+    type Error = Error;
+
+    fn try_from(cl: ConnectionLike<'a>) -> crate::Result<Self> {
+        match cl {
+            ConnectionLike::Connection(conn) => Ok(conn),
+            _ => Err(Error::ConversionError(
+                "ConnectionLike was not a connection...",
+            )),
+        }
+    }
+}
+
+impl<'a> ConnectionLike<'a> {
+    pub fn prepare<T: AsRef<str>>(&mut self, query: T) -> my::Result<my::Stmt> {
+        match self {
+            ConnectionLike::Pooled(ref mut conn) => conn.prepare(query),
+            ConnectionLike::Connection(ref mut conn) => conn.prepare(query),
+            ConnectionLike::Transaction(ref mut conn) => conn.prepare(query),
+        }
+    }
+}
+
+impl<'t> Queryable for ConnectionLike<'t> {
     fn execute<'a>(&mut self, q: Query<'a>) -> crate::Result<Option<Id>> {
-        connection::execute(self, q)
+        let (sql, params) = dbg!(visitor::Mysql::build(q));
+
+        let mut stmt = self.prepare(&sql)?;
+        let result = stmt.execute(params)?;
+
+        Ok(Some(Id::from(result.last_insert_id())))
     }
 
     fn query<'a>(&mut self, q: Query<'a>) -> crate::Result<ResultSet> {
-        connection::query(self, q)
+        let (sql, params) = dbg!(visitor::Mysql::build(q));
+        self.query_raw(&sql, &params[..])
     }
 
     fn query_raw<'a>(
@@ -148,7 +196,15 @@ impl Queryable for PooledConnection {
         sql: &str,
         params: &[ParameterizedValue<'a>],
     ) -> crate::Result<ResultSet> {
-        connection::query_raw(self, sql, params)
+        let mut stmt = self.prepare(&sql)?;
+        let mut result = ResultSet::new(stmt.to_column_names(), Vec::new());
+        let rows = stmt.execute(conversion::conv_params(params))?;
+
+        for row in rows {
+            result.rows.push(row?.to_result_row()?);
+        }
+
+        Ok(result)
     }
 
     fn turn_off_fk_constraints(&mut self) -> crate::Result<()> {
