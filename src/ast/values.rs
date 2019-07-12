@@ -2,7 +2,7 @@ use crate::ast::*;
 use std::borrow::{Borrow, Cow};
 
 #[cfg(feature = "json-1")]
-use serde_json::Value;
+use serde_json::{Number, Value};
 
 #[cfg(feature = "uuid-0_7")]
 use uuid::Uuid;
@@ -13,26 +13,39 @@ use chrono::{DateTime, Utc};
 /// A value we must parameterize for the prepared statement.
 #[derive(Debug, Clone, PartialEq)]
 pub enum ParameterizedValue<'a> {
-    /// A database null
     Null,
-    /// An integer value
     Integer(i64),
-    /// A floating point value
     Real(f64),
-    /// A string value
     Text(Cow<'a, str>),
-    /// A boolean value
     Boolean(bool),
-    // An array of things.
     #[cfg(feature = "array")]
     Array(Vec<ParameterizedValue<'a>>),
-    /// A JSON value
     #[cfg(feature = "json-1")]
     Json(Value),
     #[cfg(feature = "uuid-0_7")]
     Uuid(Uuid),
     #[cfg(feature = "chrono-0_4")]
     DateTime(DateTime<Utc>),
+}
+
+#[cfg(feature = "json-1")]
+impl<'a> From<ParameterizedValue<'a>> for Value {
+    fn from(pv: ParameterizedValue<'a>) -> Self {
+        match pv {
+            ParameterizedValue::Null => Value::Null,
+            ParameterizedValue::Integer(i) => Value::Number(Number::from(i)),
+            ParameterizedValue::Real(f) => Value::Number(Number::from_f64(f).unwrap()),
+            ParameterizedValue::Text(cow) => Value::String(cow.into_owned()),
+            ParameterizedValue::Boolean(b) => Value::Bool(b),
+            ParameterizedValue::Json(v) => v,
+            #[cfg(feature = "array")]
+            ParameterizedValue::Array(v) => Value::Array(v.into_iter().map(Value::from).collect()),
+            #[cfg(feature = "uuid-0_7")]
+            ParameterizedValue::Uuid(u) => Value::String(u.to_hyphenated().to_string()),
+            #[cfg(feature = "chrono-0_4")]
+            ParameterizedValue::DateTime(dt) => Value::String(dt.to_rfc3339()),
+        }
+    }
 }
 
 impl<'a> ParameterizedValue<'a> {
