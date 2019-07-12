@@ -81,7 +81,7 @@ impl<'a> ConnectionLike<'a> {
         &mut self,
         query: &T,
         params: &[&dyn ToSql],
-    ) -> Result<Vec<tokio_postgres::row::Row>, tokio_postgres::error::Error>
+    ) -> Result<Vec<postgres::row::Row>, postgres::error::Error>
     where
         T: postgres::ToStatement,
     {
@@ -92,11 +92,26 @@ impl<'a> ConnectionLike<'a> {
         }
     }
 
-    pub fn prepare(&mut self, query: &str) -> Result<Statement, tokio_postgres::error::Error> {
+    pub fn prepare(&mut self, query: &str) -> Result<Statement, postgres::error::Error> {
         match self {
             ConnectionLike::Pooled(ref mut conn) => conn.prepare(query),
             ConnectionLike::Connection(ref mut conn) => conn.prepare(query),
             ConnectionLike::Transaction(ref mut conn) => conn.prepare(query),
+        }
+    }
+
+    pub fn execute<T: ?Sized>(
+        &mut self,
+        query: &T,
+        params: &[&dyn ToSql],
+    ) -> Result<u64, postgres::error::Error>
+    where
+        T: postgres::ToStatement,
+    {
+        match self {
+            ConnectionLike::Pooled(ref mut conn) => conn.execute(query, params),
+            ConnectionLike::Connection(ref mut conn) => conn.execute(query, params),
+            ConnectionLike::Transaction(ref mut conn) => conn.execute(query, params),
         }
     }
 }
@@ -142,6 +157,17 @@ impl<'t> Queryable for ConnectionLike<'t> {
         }
 
         Ok(result)
+    }
+
+    fn execute_raw<'a>(
+        &mut self,
+        sql: &str,
+        params: &[ParameterizedValue<'a>],
+    ) -> crate::Result<u64> {
+        let stmt = self.prepare(&sql)?;
+        let changes = ConnectionLike::execute(self, &stmt, &conversion::conv_params(params))?;
+
+        Ok(changes)
     }
 
     fn turn_off_fk_constraints(&mut self) -> crate::Result<()> {

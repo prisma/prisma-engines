@@ -21,14 +21,21 @@ pub trait Queryable {
     /// This is typically used for select queries.
     fn query<'a>(&mut self, q: Query<'a>) -> crate::Result<ResultSet>;
 
-    /// Executes a query given as SQL, interpolating the given parameters.
-    ///
-    /// This is needed, for example, for PRAGMA commands in sqlite.
+    /// Executes a query given as SQL, interpolating the given parameters and
+    /// returning a set of results.
     fn query_raw<'a>(
         &mut self,
         sql: &str,
         params: &[ParameterizedValue<'a>],
     ) -> crate::Result<ResultSet>;
+
+    /// Executes a query given as SQL, interpolating the given parameters and
+    /// returning the number of affected rows.
+    fn execute_raw<'a>(
+        &mut self,
+        sql: &str,
+        params: &[ParameterizedValue<'a>],
+    ) -> crate::Result<u64>;
 
     /// Turns off all foreign key constraints.
     fn turn_off_fk_constraints(&mut self) -> crate::Result<()>;

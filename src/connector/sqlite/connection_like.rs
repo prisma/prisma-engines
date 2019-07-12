@@ -105,8 +105,7 @@ impl<'t> Queryable for ConnectionLike<'t> {
     fn execute<'a>(&mut self, q: Query<'a>) -> crate::Result<Option<Id>> {
         let (sql, params) = dbg!(visitor::Sqlite::build(q));
 
-        let mut stmt = self.prepare_cached(&sql)?;
-        stmt.execute(params)?;
+        self.execute_raw(&sql, &params)?;
 
         Ok(Some(Id::Int(self.last_insert_rowid() as usize)))
     }
@@ -131,6 +130,17 @@ impl<'t> Queryable for ConnectionLike<'t> {
         }
 
         Ok(result)
+    }
+
+    fn execute_raw<'a>(
+        &mut self,
+        sql: &str,
+        params: &[ParameterizedValue<'a>],
+    ) -> crate::Result<u64> {
+        let mut stmt = self.prepare_cached(sql)?;
+        let changes = stmt.execute(params)?;
+
+        Ok(u64::try_from(changes).unwrap())
     }
 
     fn turn_off_fk_constraints(&mut self) -> crate::Result<()> {

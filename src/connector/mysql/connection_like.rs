@@ -114,6 +114,17 @@ impl<'t> Queryable for ConnectionLike<'t> {
         Ok(result)
     }
 
+    fn execute_raw<'a>(
+        &mut self,
+        sql: &str,
+        params: &[ParameterizedValue<'a>],
+    ) -> crate::Result<u64> {
+        let mut stmt = self.prepare(sql)?;
+        let result = stmt.execute(conversion::conv_params(params))?;
+
+        Ok(result.affected_rows())
+    }
+
     fn turn_off_fk_constraints(&mut self) -> crate::Result<()> {
         self.query_raw("SET FOREIGN_KEY_CHECKS=0", &[])?;
         Ok(())
