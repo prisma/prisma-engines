@@ -5,7 +5,7 @@ mod error;
 use crate::{
     ast::{Id, ParameterizedValue, Query},
     connector::{
-        transaction::{Connection, Connectional, Transaction, Transactional},
+        queryable::{Database, Queryable, Transactional},
         ResultSet,
     },
     error::Error,
@@ -27,7 +27,7 @@ impl Transactional for PostgreSql {
 
     fn with_transaction<F, T>(&self, _db: &str, f: F) -> crate::Result<T>
     where
-        F: FnOnce(&mut Transaction) -> crate::Result<T>,
+        F: FnOnce(&mut Queryable) -> crate::Result<T>,
     {
         self.with_connection_internal(|client| {
             let mut tx = client.transaction()?;
@@ -42,10 +42,10 @@ impl Transactional for PostgreSql {
     }
 }
 
-impl Connectional for PostgreSql {
+impl Database for PostgreSql {
     fn with_connection<F, T>(&self, _db: &str, f: F) -> crate::Result<T>
     where
-        F: FnOnce(&mut Connection) -> crate::Result<T>,
+        F: FnOnce(&mut Queryable) -> crate::Result<T>,
         Self: Sized,
     {
         // TODO: Select DB.
@@ -73,9 +73,7 @@ impl Connectional for PostgreSql {
     }
 }
 
-impl<'a> Transaction for PostgresTransaction<'a> {}
-
-impl<'t> Connection for PostgresTransaction<'t> {
+impl<'t> Queryable for PostgresTransaction<'t> {
     fn execute<'a>(&mut self, q: Query<'a>) -> crate::Result<Option<Id>> {
         connection::execute(self, q)
     }
@@ -103,7 +101,7 @@ impl<'t> Connection for PostgresTransaction<'t> {
     }
 }
 
-impl Connection for &mut PostgresConnection {
+impl Queryable for &mut PostgresConnection {
     fn execute<'a>(&mut self, q: Query<'a>) -> crate::Result<Option<Id>> {
         connection::execute(self, q)
     }

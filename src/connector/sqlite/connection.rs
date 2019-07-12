@@ -1,7 +1,7 @@
 use crate::{
     ast::{Id, ParameterizedValue, Query},
     connector::{
-        transaction::{ToColumnNames, ToRow},
+        queryable::{ToColumnNames, ToRow},
         ResultSet,
     },
     visitor::{self, Visitor},

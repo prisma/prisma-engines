@@ -9,11 +9,8 @@ pub trait ToColumnNames {
     fn to_column_names<'b>(&'b self) -> Vec<String>;
 }
 
-/// Represents a transaction.
-pub trait Transaction: Connection {}
-
 /// Represents a connection.
-pub trait Connection {
+pub trait Queryable {
     /// Executes the given query and returns the ID of the last inserted row.
     ///
     /// This is typically used for mutating queries.
@@ -53,7 +50,7 @@ pub trait Connection {
     }
 }
 
-pub trait Connectional {
+pub trait Database {
     /// Opens a connection, which is valid inside the given handler closure..
     ///
     /// This method does not open a transaction, and should used for
@@ -61,7 +58,7 @@ pub trait Connectional {
     /// or schema mutations.
     fn with_connection<F, T>(&self, db: &str, f: F) -> crate::Result<T>
     where
-        F: FnOnce(&mut Connection) -> crate::Result<T>,
+        F: FnOnce(&mut Queryable) -> crate::Result<T>,
         Self: Sized;
 
     fn execute_on_connection<'a>(&self, db: &str, query: Query<'a>) -> crate::Result<Option<Id>>;
@@ -85,5 +82,5 @@ pub trait Transactional {
     /// Otherise, the transaction is discarded.
     fn with_transaction<F, T>(&self, db: &str, f: F) -> std::result::Result<T, Self::Error>
     where
-        F: FnOnce(&mut Transaction) -> std::result::Result<T, Self::Error>;
+        F: FnOnce(&mut Queryable) -> std::result::Result<T, Self::Error>;
 }

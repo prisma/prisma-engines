@@ -5,7 +5,7 @@ mod error;
 use crate::{
     ast::{Id, ParameterizedValue, Query},
     connector::{
-        transaction::{Connection, Connectional, Transaction, Transactional},
+        queryable::{Database, Queryable, Transactional},
         ResultSet,
     },
     error::Error,
@@ -29,7 +29,7 @@ impl Transactional for Sqlite {
 
     fn with_transaction<F, T>(&self, db: &str, f: F) -> crate::Result<T>
     where
-        F: FnOnce(&mut Transaction) -> crate::Result<T>,
+        F: FnOnce(&mut Queryable) -> crate::Result<T>,
     {
         self.with_connection_internal(db, |ref mut conn| {
             let mut tx = conn.get_mut().transaction()?;
@@ -46,10 +46,10 @@ impl Transactional for Sqlite {
     }
 }
 
-impl Connectional for Sqlite {
+impl Database for Sqlite {
     fn with_connection<'a, F, T>(&self, db: &str, f: F) -> crate::Result<T>
     where
-        F: FnOnce(&mut Connection) -> crate::Result<T>,
+        F: FnOnce(&mut Queryable) -> crate::Result<T>,
         Self: Sized,
     {
         self.with_connection_internal(db, |c| f(c.get_mut()))
@@ -73,10 +73,7 @@ impl Connectional for Sqlite {
     }
 }
 
-impl<'a> Transaction for SqliteTransaction<'a> {}
-
-// Trait implementation for r2d2 pooled connection.
-impl Connection for PooledConnection {
+impl Queryable for PooledConnection {
     fn execute<'a>(&mut self, q: Query<'a>) -> crate::Result<Option<Id>> {
         connection::execute(self, q)
     }
@@ -104,8 +101,7 @@ impl Connection for PooledConnection {
     }
 }
 
-// Trait implementation for r2d2 sqlite.
-impl<'t> Connection for SqliteTransaction<'t> {
+impl<'t> Queryable for SqliteTransaction<'t> {
     fn execute<'a>(&mut self, q: Query<'a>) -> crate::Result<Option<Id>> {
         connection::execute(self, q)
     }
@@ -133,7 +129,7 @@ impl<'t> Connection for SqliteTransaction<'t> {
     }
 }
 
-impl Connection for SqliteConnection {
+impl Queryable for SqliteConnection {
     fn execute<'a>(&mut self, q: Query<'a>) -> crate::Result<Option<Id>> {
         connection::execute(self, q)
     }

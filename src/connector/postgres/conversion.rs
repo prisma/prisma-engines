@@ -1,6 +1,6 @@
 use crate::{
     ast::{Id, ParameterizedValue},
-    connector::transaction::{ToColumnNames, ToRow},
+    connector::queryable::{ToColumnNames, ToRow},
 };
 use chrono::{DateTime, NaiveDateTime, Utc};
 use postgres::{

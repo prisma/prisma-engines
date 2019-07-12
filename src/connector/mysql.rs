@@ -5,7 +5,7 @@ mod error;
 use crate::{
     ast::{Id, ParameterizedValue, Query},
     connector::{
-        transaction::{Connection, Connectional, Transaction, Transactional},
+        queryable::{Database, Queryable, Transactional},
         ResultSet,
     },
     error::Error,
@@ -63,7 +63,7 @@ impl Transactional for Mysql {
 
     fn with_transaction<F, T>(&self, _db: &str, f: F) -> crate::Result<T>
     where
-        F: FnOnce(&mut Transaction) -> crate::Result<T>,
+        F: FnOnce(&mut Queryable) -> crate::Result<T>,
     {
         let mut conn = self.pool.get()?;
         let mut tx = conn.start_transaction(true, None, None)?;
@@ -77,10 +77,10 @@ impl Transactional for Mysql {
     }
 }
 
-impl Connectional for Mysql {
+impl Database for Mysql {
     fn with_connection<F, T>(&self, _db: &str, f: F) -> crate::Result<T>
     where
-        F: FnOnce(&mut Connection) -> crate::Result<T>,
+        F: FnOnce(&mut Queryable) -> crate::Result<T>,
         Self: Sized,
     {
         let mut conn = self.pool.get()?;
@@ -106,9 +106,7 @@ impl Connectional for Mysql {
     }
 }
 
-impl<'a> Transaction for my::Transaction<'a> {}
-
-impl<'t> Connection for my::Transaction<'t> {
+impl<'t> Queryable for my::Transaction<'t> {
     fn execute<'a>(&mut self, q: Query<'a>) -> crate::Result<Option<Id>> {
         connection::execute(self, q)
     }
@@ -136,7 +134,7 @@ impl<'t> Connection for my::Transaction<'t> {
     }
 }
 
-impl Connection for PooledConnection {
+impl Queryable for PooledConnection {
     fn execute<'a>(&mut self, q: Query<'a>) -> crate::Result<Option<Id>> {
         connection::execute(self, q)
     }
