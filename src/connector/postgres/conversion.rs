@@ -4,12 +4,18 @@ use crate::{
 };
 use chrono::{DateTime, NaiveDateTime, Utc};
 use postgres::{
-    types::{FromSql, Type as PostgresType},
+    types::{FromSql, ToSql, Type as PostgresType},
     Statement as PostgresStatement,
 };
 use rust_decimal::Decimal;
 use tokio_postgres::Row as PostgresRow;
 use uuid::Uuid;
+
+pub fn conv_params<'a>(
+    params: &'a [ParameterizedValue<'a>],
+) -> Vec<&'a tokio_postgres::types::ToSql> {
+    params.into_iter().map(|x| x as &ToSql).collect::<Vec<_>>()
+}
 
 impl<'a> FromSql<'a> for Id {
     fn from_sql(

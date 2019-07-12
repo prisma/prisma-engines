@@ -1,21 +1,24 @@
-mod connection;
 mod conversion;
 mod error;
 
 use crate::{
     ast::{Id, ParameterizedValue, Query},
-    connector::{
-        queryable::{Database, Queryable, Transactional},
-        ResultSet,
-    },
+    connector::{queryable::*, ResultSet},
     error::Error,
+    visitor::{self, Visitor},
 };
 use native_tls::TlsConnector;
-use postgres::{Client as PostgresConnection, Config, Transaction as PostgresTransaction};
+use postgres::{
+    types::{FromSql, ToSql},
+    Statement,
+};
 use r2d2_postgres::PostgresConnectionManager;
+use std::convert::TryFrom;
 use tokio_postgres_native_tls::MakeTlsConnector;
 
-type Pool = r2d2::Pool<PostgresConnectionManager<MakeTlsConnector>>;
+type Manager = PostgresConnectionManager<MakeTlsConnector>;
+type Pool = r2d2::Pool<Manager>;
+type PooledConnection = r2d2::PooledConnection<Manager>;
 
 /// A connector interface for the PostgreSQL database.
 pub struct PostgreSql {
@@ -29,16 +32,17 @@ impl Transactional for PostgreSql {
     where
         F: FnOnce(&mut Queryable) -> crate::Result<T>,
     {
-        self.with_connection_internal(|client| {
-            let mut tx = client.transaction()?;
-            let result = f(&mut tx);
+        let mut client = self.pool.get()?;
+        let tx = client.transaction()?;
+        let mut conn_like = ConnectionLike::from(tx);
+        let result = f(&mut conn_like);
 
-            if result.is_ok() {
-                tx.commit()?;
-            }
+        if result.is_ok() {
+            let tx = postgres::Transaction::try_from(conn_like).unwrap();
+            tx.commit()?;
+        }
 
-            result
-        })
+        result
     }
 }
 
@@ -48,11 +52,7 @@ impl Database for PostgreSql {
         F: FnOnce(&mut Queryable) -> crate::Result<T>,
         Self: Sized,
     {
-        // TODO: Select DB.
-        self.with_connection_internal(|mut client| {
-            let result = f(&mut client);
-            result
-        })
+        f(&mut ConnectionLike::from(self.pool.get()?))
     }
 
     fn execute_on_connection<'a>(&self, db: &str, query: Query<'a>) -> crate::Result<Option<Id>> {
@@ -73,41 +73,118 @@ impl Database for PostgreSql {
     }
 }
 
-impl<'t> Queryable for PostgresTransaction<'t> {
-    fn execute<'a>(&mut self, q: Query<'a>) -> crate::Result<Option<Id>> {
-        connection::execute(self, q)
-    }
+pub enum ConnectionLike<'a> {
+    Pooled(PooledConnection),
+    Connection(postgres::Client),
+    Transaction(postgres::Transaction<'a>),
+}
 
-    fn query<'a>(&mut self, q: Query<'a>) -> crate::Result<ResultSet> {
-        connection::query(self, q)
-    }
-
-    fn query_raw<'a>(
-        &mut self,
-        sql: &str,
-        params: &[ParameterizedValue<'a>],
-    ) -> crate::Result<ResultSet> {
-        connection::query_raw(self, sql, params)
-    }
-
-    fn turn_off_fk_constraints(&mut self) -> crate::Result<()> {
-        self.query_raw("SET CONSTRAINTS ALL DEFERRED", &[])?;
-        Ok(())
-    }
-
-    fn turn_on_fk_constraints(&mut self) -> crate::Result<()> {
-        self.query_raw("SET CONSTRAINTS ALL IMMEDIATE", &[])?;
-        Ok(())
+impl<'a> From<PooledConnection> for ConnectionLike<'a> {
+    fn from(conn: PooledConnection) -> Self {
+        ConnectionLike::Pooled(conn)
     }
 }
 
-impl Queryable for &mut PostgresConnection {
+impl<'a> From<postgres::Client> for ConnectionLike<'a> {
+    fn from(conn: postgres::Client) -> Self {
+        ConnectionLike::Connection(conn)
+    }
+}
+
+impl<'a> From<postgres::Transaction<'a>> for ConnectionLike<'a> {
+    fn from(conn: postgres::Transaction<'a>) -> Self {
+        ConnectionLike::Transaction(conn)
+    }
+}
+
+impl<'a> TryFrom<ConnectionLike<'a>> for postgres::Transaction<'a> {
+    type Error = Error;
+
+    fn try_from(cl: ConnectionLike<'a>) -> crate::Result<Self> {
+        match cl {
+            ConnectionLike::Transaction(tx) => Ok(tx),
+            _ => Err(Error::ConversionError(
+                "ConnectionLike was not a transaction...",
+            )),
+        }
+    }
+}
+
+impl<'a> TryFrom<ConnectionLike<'a>> for PooledConnection {
+    type Error = Error;
+
+    fn try_from(cl: ConnectionLike<'a>) -> crate::Result<Self> {
+        match cl {
+            ConnectionLike::Pooled(pooled) => Ok(pooled),
+            _ => Err(Error::ConversionError(
+                "ConnectionLike was not a pooled connection...",
+            )),
+        }
+    }
+}
+
+impl<'a> TryFrom<ConnectionLike<'a>> for postgres::Client {
+    type Error = Error;
+
+    fn try_from(cl: ConnectionLike<'a>) -> crate::Result<Self> {
+        match cl {
+            ConnectionLike::Connection(conn) => Ok(conn),
+            _ => Err(Error::ConversionError(
+                "ConnectionLike was not a connection...",
+            )),
+        }
+    }
+}
+
+impl<'a> ConnectionLike<'a> {
+    pub fn query<T: ?Sized>(
+        &mut self,
+        query: &T,
+        params: &[&dyn ToSql],
+    ) -> Result<Vec<tokio_postgres::row::Row>, tokio_postgres::error::Error>
+    where
+        T: postgres::ToStatement,
+    {
+        match self {
+            ConnectionLike::Pooled(ref mut conn) => conn.query(query, params),
+            ConnectionLike::Connection(ref mut conn) => conn.query(query, params),
+            ConnectionLike::Transaction(ref mut conn) => conn.query(query, params),
+        }
+    }
+
+    pub fn prepare(&mut self, query: &str) -> Result<Statement, tokio_postgres::error::Error> {
+        match self {
+            ConnectionLike::Pooled(ref mut conn) => conn.prepare(query),
+            ConnectionLike::Connection(ref mut conn) => conn.prepare(query),
+            ConnectionLike::Transaction(ref mut conn) => conn.prepare(query),
+        }
+    }
+}
+
+impl<'t> Queryable for ConnectionLike<'t> {
     fn execute<'a>(&mut self, q: Query<'a>) -> crate::Result<Option<Id>> {
-        connection::execute(self, q)
+        let (sql, params) = dbg!(visitor::Postgres::build(q));
+
+        let stmt = self.prepare(&sql)?;
+        let rows = self.query(&stmt, &conversion::conv_params(&params))?;
+
+        let id = rows.into_iter().rev().next().map(|row| {
+            let id = row.get(0);
+            let tpe = row.columns()[0].type_();
+
+            Id::from_sql(tpe, id)
+        });
+
+        match id {
+            Some(Ok(id)) => Ok(Some(id)),
+            Some(Err(_)) => panic!("Cannot convert err, todo."),
+            None => Ok(None),
+        }
     }
 
     fn query<'a>(&mut self, q: Query<'a>) -> crate::Result<ResultSet> {
-        connection::query(self, q)
+        let (sql, params) = dbg!(visitor::Postgres::build(q));
+        self.query_raw(sql.as_str(), &params[..])
     }
 
     fn query_raw<'a>(
@@ -115,7 +192,16 @@ impl Queryable for &mut PostgresConnection {
         sql: &str,
         params: &[ParameterizedValue<'a>],
     ) -> crate::Result<ResultSet> {
-        connection::query_raw(self, sql, params)
+        let stmt = self.prepare(&sql)?;
+        let rows = self.query(&stmt, &conversion::conv_params(params))?;
+
+        let mut result = ResultSet::new(stmt.to_column_names(), Vec::new());
+
+        for row in rows {
+            result.rows.push(row.to_result_row()?);
+        }
+
+        Ok(result)
     }
 
     fn turn_off_fk_constraints(&mut self) -> crate::Result<()> {
@@ -130,7 +216,7 @@ impl Queryable for &mut PostgresConnection {
 }
 
 impl PostgreSql {
-    pub fn new(config: Config, connections: u32) -> crate::Result<PostgreSql> {
+    pub fn new(config: postgres::Config, connections: u32) -> crate::Result<PostgreSql> {
         let mut tls_builder = TlsConnector::builder();
         tls_builder.danger_accept_invalid_certs(true); // For Heroku
         let tls = MakeTlsConnector::new(tls_builder.build()?);
@@ -140,15 +226,6 @@ impl PostgreSql {
 
         Ok(PostgreSql { pool })
     }
-
-    fn with_connection_internal<F, T>(&self, f: F) -> crate::Result<T>
-    where
-        F: FnOnce(&mut PostgresConnection) -> crate::Result<T>,
-    {
-        let mut client = self.pool.get()?;
-        let result = f(&mut client);
-        result
-    }
 }
 
 #[cfg(test)]
@@ -157,8 +234,8 @@ mod tests {
     use std::env;
 
     #[allow(unused)]
-    fn get_config() -> Config {
-        let mut config = Config::new();
+    fn get_config() -> postgres::Config {
+        let mut config = postgres::Config::new();
         config.host(&env::var("TEST_PG_HOST").unwrap());
         config.dbname(&env::var("TEST_PG_DB").unwrap());
         config.user(&env::var("TEST_PG_USER").unwrap());
