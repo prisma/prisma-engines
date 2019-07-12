@@ -1,10 +1,10 @@
 use crate::ast::ParameterizedValue;
-use std::{collections::HashMap, sync::Arc};
+use std::{collections::BTreeMap, sync::Arc};
 
 /// An owned version of a `Row` in a `ResultSet`. See
 /// [ResultRowRef](struct.ResultRowRef.html) for documentation on data access.
 pub struct ResultRow {
-    pub(crate) name_to_index: Arc<HashMap<String, usize>>,
+    pub(crate) name_to_index: Arc<BTreeMap<String, usize>>,
     pub(crate) values: Vec<ParameterizedValue<'static>>,
 }
 
@@ -32,7 +32,7 @@ impl IntoIterator for ResultRow {
 /// assert_eq!(row[1], row["name"]);
 /// ```
 pub struct ResultRowRef<'a> {
-    pub(crate) name_to_index: Arc<HashMap<String, usize>>,
+    pub(crate) name_to_index: Arc<BTreeMap<String, usize>>,
     pub(crate) values: &'a Vec<ParameterizedValue<'static>>,
 }
 

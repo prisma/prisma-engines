@@ -5,13 +5,16 @@ pub use index::*;
 pub use result_row::*;
 
 use crate::ast::ParameterizedValue;
-use std::{collections::HashMap, sync::Arc};
+use std::{
+    collections::{btree_map::Keys, BTreeMap},
+    sync::Arc,
+};
 
 /// Encapsulates a set of results and their respective column names.
 #[derive(Debug)]
 pub struct ResultSet {
     pub(crate) rows: Vec<Vec<ParameterizedValue<'static>>>,
-    pub(crate) name_to_index: Arc<HashMap<String, usize>>,
+    pub(crate) name_to_index: Arc<BTreeMap<String, usize>>,
 }
 
 impl ResultSet {
@@ -21,6 +24,11 @@ impl ResultSet {
             name_to_index: Arc::new(Self::build_name_map(names)),
             rows,
         }
+    }
+
+    /// An iterator of column names.
+    pub fn columns<'a>(&'a self) -> Keys<'a, String, usize> {
+        self.name_to_index.keys()
     }
 
     /// Returns the number of rows in the `ResultSet`.
@@ -47,11 +55,11 @@ impl ResultSet {
     }
 
     /// Creates a lookup map for column names.
-    fn build_name_map(names: Vec<String>) -> HashMap<String, usize> {
+    fn build_name_map(names: Vec<String>) -> BTreeMap<String, usize> {
         names
             .into_iter()
             .enumerate()
-            .fold(HashMap::new(), |mut acc, (i, name)| {
+            .fold(BTreeMap::new(), |mut acc, (i, name)| {
                 acc.insert(name, i);
                 acc
             })
@@ -73,7 +81,7 @@ impl IntoIterator for ResultSet {
 /// Thin iterator for ResultSet rows.
 /// Might become lazy one day.
 pub struct ResultSetIterator {
-    pub(crate) name_to_index: Arc<HashMap<String, usize>>,
+    pub(crate) name_to_index: Arc<BTreeMap<String, usize>>,
     pub(crate) internal_iterator: std::vec::IntoIter<Vec<ParameterizedValue<'static>>>,
 }
 
