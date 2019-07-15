@@ -65,10 +65,18 @@ impl<'a> ParameterizedValue<'a> {
         }
     }
 
-    /// Returns a &str if the value is a text, otherwise `None`.
+    /// Returns a &str if the value is text, otherwise `None`.
     pub fn as_str(&self) -> Option<&str> {
         match self {
             ParameterizedValue::Text(cow) => Some(cow.borrow()),
+            _ => None,
+        }
+    }
+
+    /// Returns a cloned String if the value is text, otherwise `None`.
+    pub fn to_string(&self) -> Option<String> {
+        match self {
+            ParameterizedValue::Text(cow) => Some(cow.to_string()),
             _ => None,
         }
     }
