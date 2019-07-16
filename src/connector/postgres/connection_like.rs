@@ -2,82 +2,57 @@ use super::conversion;
 use crate::{
     ast::{Id, ParameterizedValue, Query},
     connector::{queryable::*, ResultSet},
-    error::Error,
     visitor::{self, Visitor},
 };
 use postgres::{
     types::{FromSql, ToSql},
     Statement,
 };
-use std::convert::TryFrom;
 
-type PooledConnection = r2d2::PooledConnection<super::Manager>;
-
-pub enum ConnectionLike<'a> {
-    Pooled(PooledConnection),
-    Connection(postgres::Client),
-    Transaction(postgres::Transaction<'a>),
+pub struct ConnectionLike<T>
+where
+    T: LikePsqlConnection,
+{
+    inner: T,
 }
 
-impl<'a> From<PooledConnection> for ConnectionLike<'a> {
-    fn from(conn: PooledConnection) -> Self {
-        ConnectionLike::Pooled(conn)
+impl From<super::PostgreSql> for ConnectionLike<super::PostgreSql> {
+    fn from(inner: super::PostgreSql) -> Self {
+        ConnectionLike { inner }
     }
 }
 
-impl<'a> From<postgres::Client> for ConnectionLike<'a> {
-    fn from(conn: postgres::Client) -> Self {
-        ConnectionLike::Connection(conn)
+impl<'a> From<postgres::Transaction<'a>> for ConnectionLike<postgres::Transaction<'a>> {
+    fn from(inner: postgres::Transaction<'a>) -> Self {
+        ConnectionLike { inner }
     }
 }
 
-impl<'a> From<postgres::Transaction<'a>> for ConnectionLike<'a> {
-    fn from(conn: postgres::Transaction<'a>) -> Self {
-        ConnectionLike::Transaction(conn)
-    }
+pub trait LikePsqlConnection {
+    fn query<T: ?Sized>(
+        &mut self,
+        query: &T,
+        params: &[&dyn ToSql],
+    ) -> Result<Vec<postgres::row::Row>, postgres::error::Error>
+    where
+        T: postgres::ToStatement;
+
+    fn prepare(&mut self, query: &str) -> Result<Statement, postgres::error::Error>;
+
+    fn _execute<T: ?Sized>(
+        &mut self,
+        query: &T,
+        params: &[&dyn ToSql],
+    ) -> Result<u64, postgres::error::Error>
+    where
+        T: postgres::ToStatement;
+
+    fn start_transaction<'a>(&'a mut self)
+        -> Result<postgres::Transaction, postgres::error::Error>;
 }
 
-impl<'a> TryFrom<ConnectionLike<'a>> for postgres::Transaction<'a> {
-    type Error = Error;
-
-    fn try_from(cl: ConnectionLike<'a>) -> crate::Result<Self> {
-        match cl {
-            ConnectionLike::Transaction(tx) => Ok(tx),
-            _ => Err(Error::ConversionError(
-                "ConnectionLike was not a transaction...",
-            )),
-        }
-    }
-}
-
-impl<'a> TryFrom<ConnectionLike<'a>> for PooledConnection {
-    type Error = Error;
-
-    fn try_from(cl: ConnectionLike<'a>) -> crate::Result<Self> {
-        match cl {
-            ConnectionLike::Pooled(pooled) => Ok(pooled),
-            _ => Err(Error::ConversionError(
-                "ConnectionLike was not a pooled connection...",
-            )),
-        }
-    }
-}
-
-impl<'a> TryFrom<ConnectionLike<'a>> for postgres::Client {
-    type Error = Error;
-
-    fn try_from(cl: ConnectionLike<'a>) -> crate::Result<Self> {
-        match cl {
-            ConnectionLike::Connection(conn) => Ok(conn),
-            _ => Err(Error::ConversionError(
-                "ConnectionLike was not a connection...",
-            )),
-        }
-    }
-}
-
-impl<'a> ConnectionLike<'a> {
-    pub fn query<T: ?Sized>(
+impl LikePsqlConnection for super::PostgreSql {
+    fn query<T: ?Sized>(
         &mut self,
         query: &T,
         params: &[&dyn ToSql],
@@ -85,22 +60,14 @@ impl<'a> ConnectionLike<'a> {
     where
         T: postgres::ToStatement,
     {
-        match self {
-            ConnectionLike::Pooled(ref mut conn) => conn.query(query, params),
-            ConnectionLike::Connection(ref mut conn) => conn.query(query, params),
-            ConnectionLike::Transaction(ref mut conn) => conn.query(query, params),
-        }
+        self.client.query(query, params)
     }
 
-    pub fn prepare(&mut self, query: &str) -> Result<Statement, postgres::error::Error> {
-        match self {
-            ConnectionLike::Pooled(ref mut conn) => conn.prepare(query),
-            ConnectionLike::Connection(ref mut conn) => conn.prepare(query),
-            ConnectionLike::Transaction(ref mut conn) => conn.prepare(query),
-        }
+    fn prepare(&mut self, query: &str) -> Result<Statement, postgres::error::Error> {
+        self.client.prepare(query)
     }
 
-    pub fn execute<T: ?Sized>(
+    fn _execute<T: ?Sized>(
         &mut self,
         query: &T,
         params: &[&dyn ToSql],
@@ -108,20 +75,59 @@ impl<'a> ConnectionLike<'a> {
     where
         T: postgres::ToStatement,
     {
-        match self {
-            ConnectionLike::Pooled(ref mut conn) => conn.execute(query, params),
-            ConnectionLike::Connection(ref mut conn) => conn.execute(query, params),
-            ConnectionLike::Transaction(ref mut conn) => conn.execute(query, params),
-        }
+        self.client.execute(query, params)
+    }
+
+    fn start_transaction<'a>(
+        &'a mut self,
+    ) -> Result<postgres::Transaction, postgres::error::Error> {
+        self.client.transaction()
     }
 }
 
-impl<'t> Queryable for ConnectionLike<'t> {
+impl<'t> LikePsqlConnection for postgres::Transaction<'t> {
+    fn query<T: ?Sized>(
+        &mut self,
+        query: &T,
+        params: &[&dyn ToSql],
+    ) -> Result<Vec<postgres::row::Row>, postgres::error::Error>
+    where
+        T: postgres::ToStatement,
+    {
+        self.query(query, params)
+    }
+
+    fn prepare(&mut self, query: &str) -> Result<Statement, postgres::error::Error> {
+        self.prepare(query)
+    }
+
+    fn _execute<T: ?Sized>(
+        &mut self,
+        query: &T,
+        params: &[&dyn ToSql],
+    ) -> Result<u64, postgres::error::Error>
+    where
+        T: postgres::ToStatement,
+    {
+        self.execute(query, params)
+    }
+
+    fn start_transaction<'a>(
+        &'a mut self,
+    ) -> Result<postgres::Transaction, postgres::error::Error> {
+        panic!("Nested transactions are not supported for PostgreSQL")
+    }
+}
+
+impl<C> Queryable for ConnectionLike<C>
+where
+    C: LikePsqlConnection,
+{
     fn execute<'a>(&mut self, q: Query<'a>) -> crate::Result<Option<Id>> {
         let (sql, params) = dbg!(visitor::Postgres::build(q));
 
-        let stmt = self.prepare(&sql)?;
-        let rows = self.query(&stmt, &conversion::conv_params(&params))?;
+        let stmt = self.inner.prepare(&sql)?;
+        let rows = self.inner.query(&stmt, &conversion::conv_params(&params))?;
 
         let id = rows.into_iter().rev().next().map(|row| {
             let id = row.get(0);
@@ -147,8 +153,8 @@ impl<'t> Queryable for ConnectionLike<'t> {
         sql: &str,
         params: &[ParameterizedValue<'a>],
     ) -> crate::Result<ResultSet> {
-        let stmt = self.prepare(&sql)?;
-        let rows = self.query(&stmt, &conversion::conv_params(params))?;
+        let stmt = self.inner.prepare(&sql)?;
+        let rows = self.inner.query(&stmt, &conversion::conv_params(params))?;
 
         let mut result = ResultSet::new(stmt.to_column_names(), Vec::new());
 
@@ -164,8 +170,8 @@ impl<'t> Queryable for ConnectionLike<'t> {
         sql: &str,
         params: &[ParameterizedValue<'a>],
     ) -> crate::Result<u64> {
-        let stmt = self.prepare(&sql)?;
-        let changes = ConnectionLike::execute(self, &stmt, &conversion::conv_params(params))?;
+        let stmt = self.inner.prepare(&sql)?;
+        let changes = self.inner._execute(&stmt, &conversion::conv_params(params))?;
 
         Ok(changes)
     }
@@ -178,5 +184,20 @@ impl<'t> Queryable for ConnectionLike<'t> {
     fn turn_on_fk_constraints(&mut self) -> crate::Result<()> {
         self.query_raw("SET CONSTRAINTS ALL IMMEDIATE", &[])?;
         Ok(())
+    }
+
+    fn start_transaction<'a>(&'a mut self) -> crate::Result<Box<dyn Transaction + 'a>> {
+        let tx = ConnectionLike::from(self.inner.start_transaction()?);
+        Ok(Box::new(tx))
+    }
+}
+
+impl<'t> Transaction for ConnectionLike<postgres::Transaction<'t>> {
+    fn commit(self) -> crate::Result<()> {
+        Ok(self.inner.commit()?)
+    }
+
+    fn rollback(self) -> crate::Result<()> {
+        Ok(self.inner.rollback()?)
     }
 }

@@ -1,9 +1,11 @@
+#[cfg(feature = "uuid-0_7")]
 use uuid::Uuid;
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone)]
 pub enum Id {
     String(String),
     Int(usize),
+    #[cfg(feature = "uuid-0_7")]
     UUID(Uuid),
 }
 
@@ -25,6 +27,7 @@ impl From<String> for Id {
     }
 }
 
+#[cfg(feature = "uuid-0_7")]
 impl From<Uuid> for Id {
     fn from(u: Uuid) -> Self {
         Id::UUID(u)

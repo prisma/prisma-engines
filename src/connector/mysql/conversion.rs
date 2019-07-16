@@ -2,6 +2,7 @@ use crate::{
     ast::ParameterizedValue,
     connector::queryable::{ToColumnNames, ToRow},
 };
+#[cfg(feature = "chrono-0_4")]
 use chrono::{DateTime, Duration, NaiveDate, Utc};
 use mysql as my;
 
@@ -29,6 +30,7 @@ impl ToRow for my::Row {
                 // TOOD: This is unsafe
                 my::Value::UInt(i) => ParameterizedValue::Integer(*i as i64),
                 my::Value::Float(f) => ParameterizedValue::Real(*f),
+                #[cfg(feature = "chrono-0_4")]
                 my::Value::Date(year, month, day, hour, min, sec, _) => {
                     let naive = NaiveDate::from_ymd(*year as i32, *month as u32, *day as u32)
                         .and_hms(*hour as u32, *min as u32, *sec as u32);
@@ -36,6 +38,7 @@ impl ToRow for my::Row {
                     let dt: DateTime<Utc> = DateTime::from_utc(naive, Utc);
                     ParameterizedValue::DateTime(dt)
                 }
+                #[cfg(feature = "chrono-0_4")]
                 my::Value::Time(is_neg, days, hours, minutes, seconds, micros) => {
                     let days = Duration::days(*days as i64);
                     let hours = Duration::hours(*hours as i64);
@@ -55,6 +58,8 @@ impl ToRow for my::Row {
 
                     ParameterizedValue::Real(if *is_neg { -f_time } else { f_time })
                 }
+                #[cfg(not(feature = "chrono-0_4"))]
+                typ => panic!("Value of type {:?} is not supported with the current configuration", typ)
             };
 
             Ok(res)

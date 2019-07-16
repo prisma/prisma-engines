@@ -2,37 +2,29 @@ mod connection_like;
 mod conversion;
 mod error;
 
-use crate::{
-    ast::{Id, ParameterizedValue, Query},
-    connector::{queryable::*, ResultSet},
-    error::Error,
-};
-use connection_like::*;
-use mysql as my;
-use r2d2_mysql::pool::MysqlConnectionManager;
-use std::convert::TryFrom;
-use url::Url;
+pub use connection_like::*;
 
-type Manager = MysqlConnectionManager;
-type Pool = r2d2::Pool<Manager>;
+use mysql as my;
+use url::Url;
 
 /// A connector interface for the MySQL database.
 pub struct Mysql {
-    pool: Pool,
-    pub db_name: Option<String>,
+    pub(crate) client: my::Conn,
+}
+
+impl From<my::Conn> for Mysql {
+    fn from(client: my::Conn) -> Self {
+        Self { client }
+    }
 }
 
 impl Mysql {
-    pub fn new(conf: mysql::OptsBuilder) -> crate::Result<Mysql> {
-        let manager = MysqlConnectionManager::new(conf);
-
-        Ok(Mysql {
-            pool: r2d2::Pool::builder().build(manager)?,
-            db_name: None,
-        })
+    pub fn new(conf: mysql::OptsBuilder) -> crate::Result<ConnectionLike<Self>> {
+        let client = my::Conn::new(conf)?;
+        Ok(ConnectionLike::from(Mysql { client }))
     }
 
-    pub fn new_from_url(url: &str) -> crate::Result<Mysql> {
+    pub fn new_from_url(url: &str) -> crate::Result<ConnectionLike<Self>> {
         let mut builder = my::OptsBuilder::new();
         let url = Url::parse(url)?;
         let db_name = url.path_segments().and_then(|mut segments| segments.next());
@@ -45,61 +37,9 @@ impl Mysql {
         builder.verify_peer(false);
         builder.stmt_cache_size(Some(1000));
 
-        let manager = MysqlConnectionManager::new(builder);
+        let client = my::Conn::new(builder)?;
 
-        Ok(Mysql {
-            pool: r2d2::Pool::builder().build(manager)?,
-            db_name: db_name.map(|x| x.to_string()),
-        })
-    }
-}
-
-impl Transactional for Mysql {
-    type Error = Error;
-
-    fn with_transaction<F, T>(&self, _db: &str, f: F) -> crate::Result<T>
-    where
-        F: FnOnce(&mut Queryable) -> crate::Result<T>,
-    {
-        let mut conn = self.pool.get()?;
-        let tx = conn.start_transaction(true, None, None)?;
-        let mut conn_like = ConnectionLike::from(tx);
-        let result = f(&mut conn_like);
-
-        if result.is_ok() {
-            let tx = my::Transaction::try_from(conn_like).unwrap();
-            tx.commit()?;
-        }
-
-        result
-    }
-}
-
-impl Database for Mysql {
-    fn with_connection<F, T>(&self, _db: &str, f: F) -> crate::Result<T>
-    where
-        F: FnOnce(&mut Queryable) -> crate::Result<T>,
-        Self: Sized,
-    {
-        let result = f(&mut ConnectionLike::from(self.pool.get()?));
-        result
-    }
-
-    fn execute_on_connection<'a>(&self, db: &str, query: Query<'a>) -> crate::Result<Option<Id>> {
-        self.with_connection(&db, |conn| conn.execute(query))
-    }
-
-    fn query_on_connection<'a>(&self, db: &str, query: Query<'a>) -> crate::Result<ResultSet> {
-        self.with_connection(&db, |conn| conn.query(query))
-    }
-
-    fn query_on_raw_connection<'a>(
-        &self,
-        db: &str,
-        sql: &str,
-        params: &[ParameterizedValue<'a>],
-    ) -> crate::Result<ResultSet> {
-        self.with_connection(&db, |conn| conn.query_raw(&sql, &params))
+        Ok(ConnectionLike::from(Mysql { client }))
     }
 }
 
@@ -107,6 +47,7 @@ impl Database for Mysql {
 mod tests {
     use super::*;
     use mysql::OptsBuilder;
+    use crate::connector::Queryable;
     use std::env;
 
     fn get_config() -> OptsBuilder {
@@ -121,40 +62,27 @@ mod tests {
 
     #[test]
     fn should_provide_a_database_connection() {
-        let connector = Mysql::new(get_config()).unwrap();
+        let mut connection = Mysql::new(get_config()).unwrap();
 
-        connector
-            .with_connection("TEST", |connection| {
-                let res = connection.query_raw(
-                    "select * from information_schema.`COLUMNS` where COLUMN_NAME = 'unknown_123'",
-                    &[],
-                )?;
+        let res = connection.query_raw(
+            "select * from information_schema.`COLUMNS` where COLUMN_NAME = 'unknown_123'",
+            &[],
+        ).unwrap();
 
-                // No results expected.
-                assert!(res.is_empty());
-
-                Ok(())
-            })
-            .unwrap()
+        assert!(res.is_empty());
     }
 
     #[test]
     fn should_provide_a_database_transaction() {
-        let connector = Mysql::new(get_config()).unwrap();
+        let mut connection = Mysql::new(get_config()).unwrap();
+        let mut tx = connection.start_transaction().unwrap();
 
-        connector
-            .with_transaction("TEST", |transaction| {
-                let res = transaction.query_raw(
-                    "select * from information_schema.`COLUMNS` where COLUMN_NAME = 'unknown_123'",
-                    &[],
-                )?;
+        let res = tx.query_raw(
+            "select * from information_schema.`COLUMNS` where COLUMN_NAME = 'unknown_123'",
+            &[],
+        ).unwrap();
 
-                // No results expected.
-                assert!(res.is_empty());
-
-                Ok(())
-            })
-            .unwrap()
+        assert!(res.is_empty());
     }
 
     const TABLE_DEF: &str = r#"
@@ -175,26 +103,19 @@ VALUES (1, 'Joe', 27, 20000.00 );
 
     #[test]
     fn should_map_columns_correctly() {
-        let connector = Mysql::new(get_config()).unwrap();
+        let mut connection = Mysql::new(get_config()).unwrap();
 
-        connector
-            .with_connection("TEST", |connection| {
-                connection.query_raw(DROP_TABLE, &[]).unwrap();
-                connection.query_raw(TABLE_DEF, &[]).unwrap();
-                connection.query_raw(CREATE_USER, &[]).unwrap();
+        connection.query_raw(DROP_TABLE, &[]).unwrap();
+        connection.query_raw(TABLE_DEF, &[]).unwrap();
+        connection.query_raw(CREATE_USER, &[]).unwrap();
 
-                let rows = connection.query_raw("SELECT * FROM `user`", &[]).unwrap();
-                assert_eq!(rows.len(), 1);
+        let rows = connection.query_raw("SELECT * FROM `user`", &[]).unwrap();
+        assert_eq!(rows.len(), 1);
 
-                let row = rows.get(0).unwrap();
-                assert_eq!(row["id"].as_i64(), Some(1));
-                assert_eq!(row["name"].as_str(), Some("Joe"));
-                assert_eq!(row["age"].as_i64(), Some(27));
-                assert_eq!(row["salary"].as_f64(), Some(20000.0));
-
-                Ok(())
-            })
-            .unwrap()
+        let row = rows.get(0).unwrap();
+        assert_eq!(row["id"].as_i64(), Some(1));
+        assert_eq!(row["name"].as_str(), Some("Joe"));
+        assert_eq!(row["age"].as_i64(), Some(27));
+        assert_eq!(row["salary"].as_f64(), Some(20000.0));
     }
-
 }

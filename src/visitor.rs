@@ -9,10 +9,10 @@
 use crate::ast::*;
 use std::borrow::Cow;
 
-#[cfg(any(feature = "sqlite", feature = "rusqlite"))]
+#[cfg(feature = "rusqlite-0_19")]
 mod sqlite;
 
-#[cfg(any(feature = "sqlite", feature = "rusqlite"))]
+#[cfg(feature = "rusqlite-0_19")]
 pub use self::sqlite::Sqlite;
 
 #[cfg(feature = "postgresql-0_16")]
@@ -21,10 +21,10 @@ mod postgres;
 #[cfg(feature = "postgresql-0_16")]
 pub use self::postgres::Postgres;
 
-#[cfg(feature = "mysql_sync")]
+#[cfg(feature = "mysql-16")]
 mod mysql;
 
-#[cfg(feature = "mysql_sync")]
+#[cfg(feature = "mysql-16")]
 pub use self::mysql::Mysql;
 
 /// A function travelling through the query AST, building the final query string

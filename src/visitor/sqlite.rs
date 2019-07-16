@@ -1,9 +1,5 @@
 use crate::{ast::*, visitor::Visitor};
 
-#[cfg(feature = "sqlite")]
-use sqlite::{Bindable, Result as SqliteResult, Statement};
-
-#[cfg(feature = "rusqlite")]
 use rusqlite::{
     types::{Null, ToSql, ToSqlOutput},
     Error as RusqlError,
@@ -100,25 +96,6 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
     }
 }
 
-#[cfg(feature = "sqlite")]
-impl<'a> Bindable for ParameterizedValue<'a> {
-    #[inline]
-    fn bind(self, statement: &mut Statement, i: usize) -> SqliteResult<()> {
-        use ParameterizedValue as Pv;
-        match self {
-            Pv::Null => statement.bind(i, ()),
-            Pv::Integer(integer) => statement.bind(i, integer),
-            Pv::Real(float) => statement.bind(i, float),
-            Pv::Text(string) => statement.bind(i, string.as_str()),
-
-            // Sqlite3 doesn't have booleans so we match to ints
-            Pv::Boolean(true) => statement.bind(i, 1),
-            Pv::Boolean(false) => statement.bind(i, 0),
-        }
-    }
-}
-
-#[cfg(feature = "rusqlite")]
 impl<'a> ToSql for ParameterizedValue<'a> {
     fn to_sql(&self) -> Result<ToSqlOutput, RusqlError> {
         let value = match self {
@@ -512,48 +489,6 @@ mod tests {
         assert_eq!(expected_sql, sql);
     }
 
-    /// Creates a simple sqlite database with a user table and a nice user
-    #[cfg(feature = "sqlite")]
-    fn sqlite_harness() -> ::sqlite::Connection {
-        let conn = ::sqlite::open(":memory:").unwrap();
-
-        conn.execute(
-            "
-            CREATE TABLE users (id, name TEXT, age REAL, nice INTEGER);
-            INSERT INTO users (id, name, age, nice) VALUES (1, 'Alice', 42.69, 1);
-            ",
-        )
-        .unwrap();
-
-        conn
-    }
-
-    #[test]
-    #[cfg(feature = "sqlite")]
-    fn bind_test_1() {
-        let conn = sqlite_harness();
-
-        let conditions = "name"
-            .equals("Alice")
-            .and("age".less_than(100.0))
-            .and("nice".equals(true));
-        let query = Select::from_table("users").so_that(conditions);
-        let (sql_str, params) = Sqlite::build(query);
-
-        let mut s = conn.prepare(sql_str.clone()).unwrap();
-        for i in 1..params.len() + 1 {
-            s.bind::<ParameterizedValue>(i, params[i - 1].clone().into())
-                .unwrap();
-        }
-
-        s.next().unwrap();
-
-        assert_eq!("Alice", s.read::<String>(1).unwrap());
-        assert_eq!(42.69, s.read::<f64>(2).unwrap());
-        assert_eq!(1, s.read::<i64>(3).unwrap());
-    }
-
-    #[cfg(feature = "rusqlite")]
     fn sqlite_harness() -> ::rusqlite::Connection {
         let conn = ::rusqlite::Connection::open_in_memory().unwrap();
 
@@ -576,7 +511,6 @@ mod tests {
     }
 
     #[test]
-    #[cfg(feature = "rusqlite")]
     fn bind_test_1() {
         let conn = sqlite_harness();
 

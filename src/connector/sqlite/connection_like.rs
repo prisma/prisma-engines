@@ -1,113 +1,72 @@
-use super::PooledConnection;
 use crate::{
     ast::{Id, ParameterizedValue, Query},
     connector::{
-        queryable::{Queryable, ToColumnNames, ToRow},
+        queryable::*,
         ResultSet,
     },
-    error::Error,
     visitor::{self, Visitor},
 };
 use std::convert::TryFrom;
 
-pub enum ConnectionLike<'a> {
-    Pooled(PooledConnection),
-    Connection(rusqlite::Connection),
-    Transaction(rusqlite::Transaction<'a>),
+pub struct ConnectionLike<T>
+where
+    T: LikeSqliteConnection,
+{
+    inner: T,
 }
 
-impl<'a> From<PooledConnection> for ConnectionLike<'a> {
-    fn from(conn: PooledConnection) -> Self {
-        ConnectionLike::Pooled(conn)
-    }
-}
-
-impl<'a> From<rusqlite::Connection> for ConnectionLike<'a> {
-    fn from(conn: rusqlite::Connection) -> Self {
-        ConnectionLike::Connection(conn)
+impl From<super::Sqlite> for ConnectionLike<super::Sqlite> {
+    fn from(inner: super::Sqlite) -> Self {
+        ConnectionLike { inner }
     }
 }
 
-impl<'a> From<rusqlite::Transaction<'a>> for ConnectionLike<'a> {
-    fn from(conn: rusqlite::Transaction<'a>) -> Self {
-        ConnectionLike::Transaction(conn)
+impl<'a> From<rusqlite::Transaction<'a>> for ConnectionLike<rusqlite::Transaction<'a>> {
+    fn from(inner: rusqlite::Transaction<'a>) -> Self {
+        ConnectionLike { inner }
     }
 }
 
-impl<'a> TryFrom<ConnectionLike<'a>> for rusqlite::Transaction<'a> {
-    type Error = Error;
+pub trait LikeSqliteConnection {
+    fn _prepare_cached(&self, sql: &str) -> rusqlite::Result<rusqlite::CachedStatement>;
+    fn _last_insert_rowid(&self) -> i64;
+    fn start_transaction<'a>(&'a mut self) -> rusqlite::Result<rusqlite::Transaction>;
+}
 
-    fn try_from(cl: ConnectionLike<'a>) -> crate::Result<Self> {
-        match cl {
-            ConnectionLike::Transaction(tx) => Ok(tx),
-            _ => Err(Error::ConversionError(
-                "ConnectionLike was not a transaction...",
-            )),
-        }
+impl LikeSqliteConnection for super::Sqlite {
+    fn _prepare_cached(&self, sql: &str) -> rusqlite::Result<rusqlite::CachedStatement> {
+        self.client.prepare_cached(sql)
+    }
+
+    fn _last_insert_rowid(&self) -> i64 {
+        self.client.last_insert_rowid()
+    }
+
+    fn start_transaction<'a>(&'a mut self) -> rusqlite::Result<rusqlite::Transaction> {
+        self.client.transaction()
     }
 }
 
-impl<'a> TryFrom<ConnectionLike<'a>> for PooledConnection {
-    type Error = Error;
+impl<'t> LikeSqliteConnection for rusqlite::Transaction<'t> {
+    fn _prepare_cached(&self, sql: &str) -> rusqlite::Result<rusqlite::CachedStatement> {
+        self.prepare_cached(sql)
+    }
 
-    fn try_from(cl: ConnectionLike<'a>) -> crate::Result<Self> {
-        match cl {
-            ConnectionLike::Pooled(pooled) => Ok(pooled),
-            _ => Err(Error::ConversionError(
-                "ConnectionLike was not a pooled connection...",
-            )),
-        }
+    fn _last_insert_rowid(&self) -> i64 {
+        self.last_insert_rowid()
+    }
+
+    fn start_transaction(&mut self) -> rusqlite::Result<rusqlite::Transaction> {
+        panic!("Nested transactions are not supported for MySQL")
     }
 }
 
-impl<'a> TryFrom<ConnectionLike<'a>> for rusqlite::Connection {
-    type Error = Error;
-
-    fn try_from(cl: ConnectionLike<'a>) -> crate::Result<Self> {
-        match cl {
-            ConnectionLike::Connection(conn) => Ok(conn),
-            _ => Err(Error::ConversionError(
-                "ConnectionLike was not a connection...",
-            )),
-        }
-    }
-}
-
-impl<'a> ConnectionLike<'a> {
-    fn prepare_cached(&self, sql: &str) -> rusqlite::Result<rusqlite::CachedStatement> {
-        match self {
-            ConnectionLike::Pooled(c) => c.prepare_cached(sql),
-            ConnectionLike::Connection(c) => c.prepare_cached(sql),
-            ConnectionLike::Transaction(c) => c.prepare_cached(sql),
-        }
-    }
-
-    fn last_insert_rowid(&self) -> i64 {
-        match self {
-            ConnectionLike::Pooled(c) => c.last_insert_rowid(),
-            ConnectionLike::Connection(c) => c.last_insert_rowid(),
-            ConnectionLike::Transaction(c) => c.last_insert_rowid(),
-        }
-    }
-
-    pub fn transaction(&mut self) -> rusqlite::Result<rusqlite::Transaction> {
-        match self {
-            ConnectionLike::Pooled(ref mut c) => c.transaction(),
-            ConnectionLike::Connection(ref mut c) => c.transaction(),
-            ConnectionLike::Transaction(_) => {
-                panic!("Could not start a transaction from transaction")
-            }
-        }
-    }
-}
-
-impl<'t> Queryable for ConnectionLike<'t> {
+impl<C> Queryable for ConnectionLike<C> where C: LikeSqliteConnection {
     fn execute<'a>(&mut self, q: Query<'a>) -> crate::Result<Option<Id>> {
         let (sql, params) = dbg!(visitor::Sqlite::build(q));
-
         self.execute_raw(&sql, &params)?;
 
-        Ok(Some(Id::Int(self.last_insert_rowid() as usize)))
+        Ok(Some(Id::Int(self.inner._last_insert_rowid() as usize)))
     }
 
     fn query<'a>(&mut self, q: Query<'a>) -> crate::Result<ResultSet> {
@@ -120,7 +79,7 @@ impl<'t> Queryable for ConnectionLike<'t> {
         sql: &str,
         params: &[ParameterizedValue<'a>],
     ) -> crate::Result<ResultSet> {
-        let mut stmt = self.prepare_cached(sql)?;
+        let mut stmt = self.inner._prepare_cached(sql)?;
         let mut rows = stmt.query(params)?;
 
         let mut result = ResultSet::new(rows.to_column_names(), Vec::new());
@@ -137,7 +96,7 @@ impl<'t> Queryable for ConnectionLike<'t> {
         sql: &str,
         params: &[ParameterizedValue<'a>],
     ) -> crate::Result<u64> {
-        let mut stmt = self.prepare_cached(sql)?;
+        let mut stmt = self.inner._prepare_cached(sql)?;
         let changes = stmt.execute(params)?;
 
         Ok(u64::try_from(changes).unwrap())
@@ -151,5 +110,20 @@ impl<'t> Queryable for ConnectionLike<'t> {
     fn turn_on_fk_constraints(&mut self) -> crate::Result<()> {
         self.query_raw("PRAGMA foreign_keys = ON", &[])?;
         Ok(())
+    }
+
+    fn start_transaction<'a>(&'a mut self) -> crate::Result<Box<dyn Transaction + 'a>> {
+        let tx = ConnectionLike::from(self.inner.start_transaction()?);
+        Ok(Box::new(tx))
+    }
+}
+
+impl<'t> Transaction for ConnectionLike<rusqlite::Transaction<'t>> {
+    fn commit(self) -> crate::Result<()> {
+        Ok(self.inner.commit()?)
+    }
+
+    fn rollback(self) -> crate::Result<()> {
+        Ok(self.inner.rollback()?)
     }
 }
