@@ -20,4 +20,4 @@ pub use self::postgres::*;
 pub use sqlite::*;
 
 pub use self::result_set::*;
-pub use queryable::{Queryable, ToRow};
+pub use queryable::*;
