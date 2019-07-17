@@ -5,8 +5,9 @@ use crate::{
 };
 use failure::{Compat, Fail};
 use r2d2::ManageConnection;
-use r2d2_sqlite::SqliteConnectionManager;
 use std::path::PathBuf;
+
+pub use r2d2_sqlite::SqliteConnectionManager;
 
 impl PrismaConnectionManager<SqliteConnectionManager> {
     pub fn new(url: &str) -> crate::Result<Self> {
