@@ -29,6 +29,7 @@ pub enum Error {
     ConversionError(&'static str),
 }
 
+#[cfg(any(feature = "mysql-16", feature = "postgresql-0_16", feature = "rusqlite-0_19"))]
 impl From<r2d2::Error> for Error {
     fn from(e: r2d2::Error) -> Error {
         Error::ConnectionError(e.into())

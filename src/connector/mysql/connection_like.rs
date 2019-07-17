@@ -2,92 +2,59 @@ use super::conversion;
 use crate::{
     ast::{Id, ParameterizedValue, Query},
     connector::{queryable::*, ResultSet},
-    error::Error,
     visitor::{self, Visitor},
 };
 use mysql as my;
-use std::convert::TryFrom;
 
-type PooledConnection = r2d2::PooledConnection<super::Manager>;
-
-pub enum ConnectionLike<'a> {
-    Pooled(PooledConnection),
-    Connection(my::Conn),
-    Transaction(my::Transaction<'a>),
+pub struct ConnectionLike<T>
+where
+    T: LikeMysqlConnection,
+{
+    inner: T,
 }
 
-impl<'a> From<PooledConnection> for ConnectionLike<'a> {
-    fn from(conn: PooledConnection) -> Self {
-        ConnectionLike::Pooled(conn)
+impl From<super::Mysql> for ConnectionLike<super::Mysql> {
+    fn from(inner: super::Mysql) -> Self {
+        ConnectionLike { inner }
     }
 }
 
-impl<'a> From<my::Conn> for ConnectionLike<'a> {
-    fn from(conn: my::Conn) -> Self {
-        ConnectionLike::Connection(conn)
+impl<'a> From<my::Transaction<'a>> for ConnectionLike<my::Transaction<'a>> {
+    fn from(inner: my::Transaction<'a>) -> Self {
+        ConnectionLike { inner }
     }
 }
 
-impl<'a> From<my::Transaction<'a>> for ConnectionLike<'a> {
-    fn from(conn: my::Transaction<'a>) -> Self {
-        ConnectionLike::Transaction(conn)
+pub trait LikeMysqlConnection {
+    fn prepare<T: AsRef<str>>(&mut self, query: T) -> my::Result<my::Stmt>;
+    fn start_transaction<'a>(&'a mut self) -> my::Result<my::Transaction>;
+}
+
+impl LikeMysqlConnection for super::Mysql {
+    fn prepare<T: AsRef<str>>(&mut self, query: T) -> my::Result<my::Stmt> {
+        self.client.prepare(query)
+    }
+
+    fn start_transaction<'a>(&'a mut self) -> my::Result<my::Transaction> {
+        self.client.start_transaction(true, None, None)
     }
 }
 
-impl<'a> TryFrom<ConnectionLike<'a>> for my::Transaction<'a> {
-    type Error = Error;
+impl<'a> LikeMysqlConnection for my::Transaction<'a> {
+    fn prepare<T: AsRef<str>>(&mut self, query: T) -> my::Result<my::Stmt> {
+        self.prepare(query)
+    }
 
-    fn try_from(cl: ConnectionLike<'a>) -> crate::Result<Self> {
-        match cl {
-            ConnectionLike::Transaction(tx) => Ok(tx),
-            _ => Err(Error::ConversionError(
-                "ConnectionLike was not a transaction...",
-            )),
-        }
+    fn start_transaction(&mut self) -> my::Result<my::Transaction> {
+        panic!("Nested transactions are not supported for MySQL")
     }
 }
 
-impl<'a> TryFrom<ConnectionLike<'a>> for PooledConnection {
-    type Error = Error;
-
-    fn try_from(cl: ConnectionLike<'a>) -> crate::Result<Self> {
-        match cl {
-            ConnectionLike::Pooled(pooled) => Ok(pooled),
-            _ => Err(Error::ConversionError(
-                "ConnectionLike was not a pooled connection...",
-            )),
-        }
-    }
-}
-
-impl<'a> TryFrom<ConnectionLike<'a>> for my::Conn {
-    type Error = Error;
-
-    fn try_from(cl: ConnectionLike<'a>) -> crate::Result<Self> {
-        match cl {
-            ConnectionLike::Connection(conn) => Ok(conn),
-            _ => Err(Error::ConversionError(
-                "ConnectionLike was not a connection...",
-            )),
-        }
-    }
-}
-
-impl<'a> ConnectionLike<'a> {
-    pub fn prepare<T: AsRef<str>>(&mut self, query: T) -> my::Result<my::Stmt> {
-        match self {
-            ConnectionLike::Pooled(ref mut conn) => conn.prepare(query),
-            ConnectionLike::Connection(ref mut conn) => conn.prepare(query),
-            ConnectionLike::Transaction(ref mut conn) => conn.prepare(query),
-        }
-    }
-}
-
-impl<'t> Queryable for ConnectionLike<'t> {
+impl<C> Queryable for ConnectionLike<C> where C: LikeMysqlConnection {
     fn execute<'a>(&mut self, q: Query<'a>) -> crate::Result<Option<Id>> {
         let (sql, params) = dbg!(visitor::Mysql::build(q));
 
-        let mut stmt = self.prepare(&sql)?;
+        let mut stmt = self.inner.prepare(&sql)?;
         let result = stmt.execute(params)?;
 
         Ok(Some(Id::from(result.last_insert_id())))
@@ -103,7 +70,7 @@ impl<'t> Queryable for ConnectionLike<'t> {
         sql: &str,
         params: &[ParameterizedValue<'a>],
     ) -> crate::Result<ResultSet> {
-        let mut stmt = self.prepare(&sql)?;
+        let mut stmt = self.inner.prepare(&sql)?;
         let mut result = ResultSet::new(stmt.to_column_names(), Vec::new());
         let rows = stmt.execute(conversion::conv_params(params))?;
 
@@ -119,7 +86,7 @@ impl<'t> Queryable for ConnectionLike<'t> {
         sql: &str,
         params: &[ParameterizedValue<'a>],
     ) -> crate::Result<u64> {
-        let mut stmt = self.prepare(sql)?;
+        let mut stmt = self.inner.prepare(sql)?;
         let result = stmt.execute(conversion::conv_params(params))?;
 
         Ok(result.affected_rows())
@@ -133,5 +100,20 @@ impl<'t> Queryable for ConnectionLike<'t> {
     fn turn_on_fk_constraints(&mut self) -> crate::Result<()> {
         self.query_raw("SET FOREIGN_KEY_CHECKS=1", &[])?;
         Ok(())
+    }
+
+    fn start_transaction<'a>(&'a mut self) -> crate::Result<Box<dyn Transaction + 'a>> {
+        let tx = ConnectionLike::from(self.inner.start_transaction()?);
+        Ok(Box::new(tx))
+    }
+}
+
+impl<'t> Transaction for ConnectionLike<my::Transaction<'t>> {
+    fn commit(self) -> crate::Result<()> {
+        Ok(self.inner.commit()?)
+    }
+
+    fn rollback(self) -> crate::Result<()> {
+        Ok(self.inner.rollback()?)
     }
 }

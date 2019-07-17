@@ -55,39 +55,11 @@ pub trait Queryable {
 
         Ok(())
     }
+
+    fn start_transaction<'a>(&'a mut self) -> crate::Result<Box<dyn Transaction + 'a>>;
 }
 
-pub trait Database {
-    /// Opens a connection, which is valid inside the given handler closure..
-    ///
-    /// This method does not open a transaction, and should used for
-    /// operations not requiring transactions, e.g. single queries
-    /// or schema mutations.
-    fn with_connection<F, T>(&self, db: &str, f: F) -> crate::Result<T>
-    where
-        F: FnOnce(&mut Queryable) -> crate::Result<T>,
-        Self: Sized;
-
-    fn execute_on_connection<'a>(&self, db: &str, query: Query<'a>) -> crate::Result<Option<Id>>;
-
-    fn query_on_connection<'a>(&self, db: &str, query: Query<'a>) -> crate::Result<ResultSet>;
-
-    fn query_on_raw_connection<'a>(
-        &self,
-        db: &str,
-        sql: &str,
-        params: &[ParameterizedValue<'a>],
-    ) -> crate::Result<ResultSet>;
-}
-
-pub trait Transactional {
-    type Error;
-
-    /// Opens a connection and a transaction, which is valid inside the given handler closure.
-    ///
-    /// The transaction is comitted if the result returned by the handler is Ok.
-    /// Otherise, the transaction is discarded.
-    fn with_transaction<F, T>(&self, db: &str, f: F) -> std::result::Result<T, Self::Error>
-    where
-        F: FnOnce(&mut Queryable) -> std::result::Result<T, Self::Error>;
+pub trait Transaction: Queryable {
+    fn commit(self) -> crate::Result<()>;
+    fn rollback(self) -> crate::Result<()>;
 }

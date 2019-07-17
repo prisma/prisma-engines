@@ -2,6 +2,7 @@ use crate::{
     ast::{Id, ParameterizedValue},
     connector::queryable::{ToColumnNames, ToRow},
 };
+#[cfg(feature = "chrono-0_4")]
 use chrono::{DateTime, NaiveDateTime, Utc};
 use postgres::{
     types::{FromSql, ToSql, Type as PostgresType},
@@ -9,12 +10,31 @@ use postgres::{
 };
 use rust_decimal::Decimal;
 use tokio_postgres::Row as PostgresRow;
+
+#[cfg(feature = "uuid-0_7")]
 use uuid::Uuid;
 
 pub fn conv_params<'a>(
     params: &'a [ParameterizedValue<'a>],
 ) -> Vec<&'a tokio_postgres::types::ToSql> {
     params.into_iter().map(|x| x as &ToSql).collect::<Vec<_>>()
+}
+
+#[cfg(feature = "uuid-0_7")]
+fn accepts(ty: &PostgresType) -> bool {
+    <Uuid as FromSql>::accepts(ty)
+        || <&str as FromSql>::accepts(ty)
+        || <i16 as FromSql>::accepts(ty)
+        || <i32 as FromSql>::accepts(ty)
+        || <i64 as FromSql>::accepts(ty)
+}
+
+#[cfg(not(feature = "uuid-0_7"))]
+fn accepts(ty: &PostgresType) -> bool {
+    <&str as FromSql>::accepts(ty)
+        || <i16 as FromSql>::accepts(ty)
+        || <i32 as FromSql>::accepts(ty)
+        || <i64 as FromSql>::accepts(ty)
 }
 
 impl<'a> FromSql<'a> for Id {
@@ -26,6 +46,7 @@ impl<'a> FromSql<'a> for Id {
             PostgresType::INT2 => Id::Int(i16::from_sql(ty, raw)? as usize),
             PostgresType::INT4 => Id::Int(i32::from_sql(ty, raw)? as usize),
             PostgresType::INT8 => Id::Int(i64::from_sql(ty, raw)? as usize),
+            #[cfg(feature = "uuid-0_7")]
             PostgresType::UUID => Id::UUID(Uuid::from_sql(ty, raw)?),
             _ => Id::String(String::from_sql(ty, raw)?.into()),
         };
@@ -34,11 +55,7 @@ impl<'a> FromSql<'a> for Id {
     }
 
     fn accepts(ty: &PostgresType) -> bool {
-        <&str as FromSql>::accepts(ty)
-            || <Uuid as FromSql>::accepts(ty)
-            || <i16 as FromSql>::accepts(ty)
-            || <i32 as FromSql>::accepts(ty)
-            || <i64 as FromSql>::accepts(ty)
+        accepts(ty)
     }
 }
 
@@ -93,6 +110,7 @@ impl ToRow for PostgresRow {
                     }
                     None => ParameterizedValue::Null,
                 },
+                #[cfg(feature = "chrono-0_4")]
                 PostgresType::TIMESTAMP => match row.try_get(i)? {
                     Some(val) => {
                         let ts: NaiveDateTime = val;
@@ -101,6 +119,7 @@ impl ToRow for PostgresRow {
                     }
                     None => ParameterizedValue::Null,
                 },
+                #[cfg(feature = "uuid-0_7")]
                 PostgresType::UUID => match row.try_get(i)? {
                     Some(val) => {
                         let val: Uuid = val;
@@ -180,7 +199,7 @@ impl ToRow for PostgresRow {
                     }
                     None => ParameterizedValue::Null,
                 },
-                #[cfg(feature = "array")]
+                #[cfg(all(feature = "array", feature = "chrono-0_4"))]
                 PostgresType::TIMESTAMP_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<NaiveDateTime> = val;
