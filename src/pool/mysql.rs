@@ -4,9 +4,10 @@ use crate::{
     error::Error,
 };
 use failure::{Compat, Fail};
-use mysql::OptsBuilder;
 use r2d2::ManageConnection;
-use r2d2_mysql::MysqlConnectionManager;
+
+pub use mysql::OptsBuilder;
+pub use r2d2_mysql::MysqlConnectionManager;
 
 impl From<OptsBuilder> for PrismaConnectionManager<MysqlConnectionManager> {
     fn from(opts: OptsBuilder) -> Self {

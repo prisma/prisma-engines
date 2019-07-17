@@ -7,13 +7,15 @@ use crate::{
 use failure::{Compat, Fail};
 use native_tls::TlsConnector;
 use r2d2::ManageConnection;
-use r2d2_postgres::PostgresConnectionManager;
 use std::convert::TryFrom;
 use tokio_postgres_native_tls::MakeTlsConnector;
 
+pub use r2d2_postgres::PostgresConnectionManager;
+pub use postgres::Config;
+
 pub type PostgresManager = PostgresConnectionManager<MakeTlsConnector>;
 
-impl TryFrom<postgres::Config> for PrismaConnectionManager<PostgresManager> {
+impl TryFrom<Config> for PrismaConnectionManager<PostgresManager> {
     type Error = Error;
 
     fn try_from(opts: postgres::Config) -> crate::Result<Self> {

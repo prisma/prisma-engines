@@ -1,13 +1,13 @@
 //! Support for the `r2d2` connection pool.
 
 #[cfg(feature = "mysql-16")]
-mod mysql;
+pub mod mysql;
 
 #[cfg(feature = "postgresql-0_16")]
-mod postgres;
+pub mod postgres;
 
 #[cfg(feature = "rusqlite-0_19")]
-mod sqlite;
+pub mod sqlite;
 
 use std::path::PathBuf;
 
