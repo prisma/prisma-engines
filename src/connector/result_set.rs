@@ -10,6 +10,9 @@ use std::{
     sync::Arc,
 };
 
+#[cfg(feature = "json-1")]
+use serde_json::{Map, Value};
+
 /// Encapsulates a set of results and their respective column names.
 #[derive(Debug)]
 pub struct ResultSet {
@@ -96,5 +99,26 @@ impl Iterator for ResultSetIterator {
             }),
             None => None,
         }
+    }
+}
+
+#[cfg(feature = "json-1")]
+impl From<ResultSet> for Value {
+    fn from(result_set: ResultSet) -> Self {
+        let columns: Vec<String> = result_set.columns().map(ToString::to_string).collect();
+        let mut result = Vec::new();
+
+        for row in result_set.into_iter() {
+            let mut object = Map::new();
+
+            for (idx, p_value) in row.into_iter().enumerate() {
+                let column_name: String = columns[idx].clone();
+                object.insert(column_name, Value::from(p_value));
+            }
+
+            result.push(Value::Object(object));
+        }
+
+        Value::Array(result)
     }
 }

@@ -65,4 +65,18 @@ where
     /// Runs a command in the database, for queries that can't be run using
     /// prepared statements.
     fn raw_cmd<'a>(&mut self, cmd: &str) -> crate::Result<()>;
+
+    fn insert(&mut self, q: Insert) -> crate::Result<Option<Id>> {
+        self.execute(q.into())
+    }
+
+    fn update(&mut self, q: Update) -> crate::Result<()> {
+        self.execute(q.into())?;
+        Ok(())
+    }
+
+    fn delete(&mut self, q: Delete) -> crate::Result<()> {
+        self.execute(q.into())?;
+        Ok(())
+    }
 }
