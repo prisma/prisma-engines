@@ -59,7 +59,10 @@ impl ToRow for my::Row {
                     ParameterizedValue::Real(if *is_neg { -f_time } else { f_time })
                 }
                 #[cfg(not(feature = "chrono-0_4"))]
-                typ => panic!("Value of type {:?} is not supported with the current configuration", typ)
+                typ => panic!(
+                    "Value of type {:?} is not supported with the current configuration",
+                    typ
+                ),
             };
 
             Ok(res)

@@ -1,8 +1,7 @@
 use super::*;
 use crate::ast::*;
 
-pub struct Transaction<'a>
-{
+pub struct Transaction<'a> {
     pub(crate) inner: &'a mut Queryable,
     done: bool,
 }
@@ -45,19 +44,11 @@ impl<'a> Queryable for Transaction<'a> {
         self.inner.query(q)
     }
 
-    fn query_raw(
-        &mut self,
-        sql: &str,
-        params: &[ParameterizedValue],
-    ) -> crate::Result<ResultSet> {
+    fn query_raw(&mut self, sql: &str, params: &[ParameterizedValue]) -> crate::Result<ResultSet> {
         self.inner.query_raw(sql, params)
     }
 
-    fn execute_raw(
-        &mut self,
-        sql: &str,
-        params: &[ParameterizedValue],
-    ) -> crate::Result<u64> {
+    fn execute_raw(&mut self, sql: &str, params: &[ParameterizedValue]) -> crate::Result<u64> {
         self.inner.execute_raw(sql, params)
     }
 

@@ -97,12 +97,24 @@
 //! from the input, e.g. when mapping data using an `Into<ConditionTree>` trait.
 
 pub mod ast;
-#[cfg(any(feature = "mysql-16", feature = "postgresql-0_16", feature = "rusqlite-0_19"))]
+#[cfg(any(
+    feature = "mysql-16",
+    feature = "postgresql-0_16",
+    feature = "rusqlite-0_19"
+))]
 pub mod connector;
 pub mod error;
-#[cfg(any(feature = "mysql-16", feature = "postgresql-0_16", feature = "rusqlite-0_19"))]
-pub mod visitor;
-#[cfg(any(feature = "mysql-16", feature = "postgresql-0_16", feature = "rusqlite-0_19"))]
+#[cfg(any(
+    feature = "mysql-16",
+    feature = "postgresql-0_16",
+    feature = "rusqlite-0_19"
+))]
 pub mod pool;
+#[cfg(any(
+    feature = "mysql-16",
+    feature = "postgresql-0_16",
+    feature = "rusqlite-0_19"
+))]
+pub mod visitor;
 
 pub type Result<T> = std::result::Result<T, error::Error>;

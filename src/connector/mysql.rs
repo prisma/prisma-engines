@@ -111,8 +111,8 @@ impl Queryable for Mysql {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use mysql::OptsBuilder;
     use crate::connector::Queryable;
+    use mysql::OptsBuilder;
     use std::env;
 
     fn get_config() -> OptsBuilder {
@@ -129,10 +129,12 @@ mod tests {
     fn should_provide_a_database_connection() {
         let mut connection = Mysql::new(get_config()).unwrap();
 
-        let res = connection.query_raw(
-            "select * from information_schema.`COLUMNS` where COLUMN_NAME = 'unknown_123'",
-            &[],
-        ).unwrap();
+        let res = connection
+            .query_raw(
+                "select * from information_schema.`COLUMNS` where COLUMN_NAME = 'unknown_123'",
+                &[],
+            )
+            .unwrap();
 
         assert!(res.is_empty());
     }
@@ -142,10 +144,12 @@ mod tests {
         let mut connection = Mysql::new(get_config()).unwrap();
         let mut tx = connection.start_transaction().unwrap();
 
-        let res = tx.query_raw(
-            "select * from information_schema.`COLUMNS` where COLUMN_NAME = 'unknown_123'",
-            &[],
-        ).unwrap();
+        let res = tx
+            .query_raw(
+                "select * from information_schema.`COLUMNS` where COLUMN_NAME = 'unknown_123'",
+                &[],
+            )
+            .unwrap();
 
         assert!(res.is_empty());
     }

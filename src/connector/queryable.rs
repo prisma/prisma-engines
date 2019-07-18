@@ -10,8 +10,7 @@ pub trait ToColumnNames {
 }
 
 /// Represents a connection.
-pub trait Queryable
-{
+pub trait Queryable {
     /// Executes the given query and returns the ID of the last inserted row.
     ///
     /// This is typically used for mutating queries.
@@ -24,19 +23,11 @@ pub trait Queryable
 
     /// Executes a query given as SQL, interpolating the given parameters and
     /// returning a set of results.
-    fn query_raw(
-        &mut self,
-        sql: &str,
-        params: &[ParameterizedValue],
-    ) -> crate::Result<ResultSet>;
+    fn query_raw(&mut self, sql: &str, params: &[ParameterizedValue]) -> crate::Result<ResultSet>;
 
     /// Executes a query given as SQL, interpolating the given parameters and
     /// returning the number of affected rows.
-    fn execute_raw(
-        &mut self,
-        sql: &str,
-        params: &[ParameterizedValue],
-    ) -> crate::Result<u64>;
+    fn execute_raw(&mut self, sql: &str, params: &[ParameterizedValue]) -> crate::Result<u64>;
 
     /// Turns off all foreign key constraints.
     fn turn_off_fk_constraints(&mut self) -> crate::Result<()>;

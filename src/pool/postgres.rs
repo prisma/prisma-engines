@@ -1,6 +1,6 @@
 use super::PrismaConnectionManager;
 use crate::{
-    connector::{Queryable, PostgreSql},
+    connector::{PostgreSql, Queryable},
     error::Error,
 };
 use failure::{Compat, Fail};
@@ -9,8 +9,8 @@ use r2d2::ManageConnection;
 use std::convert::TryFrom;
 use tokio_postgres_native_tls::MakeTlsConnector;
 
-pub use r2d2_postgres::PostgresConnectionManager;
 pub use postgres::Config;
+pub use r2d2_postgres::PostgresConnectionManager;
 
 pub type PostgresManager = PostgresConnectionManager<MakeTlsConnector>;
 

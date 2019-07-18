@@ -4,8 +4,8 @@ mod error;
 use crate::{
     ast::{Id, ParameterizedValue, Query},
     connector::{queryable::*, ResultSet, Transaction},
-    visitor::{self, Visitor},
     error::Error,
+    visitor::{self, Visitor},
 };
 use rusqlite::NO_PARAMS;
 use std::{collections::HashSet, convert::TryFrom, path::PathBuf};
@@ -82,11 +82,7 @@ impl Queryable for Sqlite {
         self.query_raw(&sql, &params)
     }
 
-    fn query_raw(
-        &mut self,
-        sql: &str,
-        params: &[ParameterizedValue],
-    ) -> crate::Result<ResultSet> {
+    fn query_raw(&mut self, sql: &str, params: &[ParameterizedValue]) -> crate::Result<ResultSet> {
         let mut stmt = self.client.prepare_cached(sql)?;
         let mut rows = stmt.query(params)?;
 
@@ -99,11 +95,7 @@ impl Queryable for Sqlite {
         Ok(result)
     }
 
-    fn execute_raw(
-        &mut self,
-        sql: &str,
-        params: &[ParameterizedValue],
-    ) -> crate::Result<u64> {
+    fn execute_raw(&mut self, sql: &str, params: &[ParameterizedValue]) -> crate::Result<u64> {
         let mut stmt = self.client.prepare_cached(sql)?;
         let changes = stmt.execute(params)?;
 
@@ -138,7 +130,9 @@ mod tests {
     #[test]
     fn should_provide_a_database_connection() {
         let mut connection = Sqlite::new(String::from("db/test.db")).unwrap();
-        let res = connection.query_raw("SELECT * FROM sqlite_master", &[]).unwrap();
+        let res = connection
+            .query_raw("SELECT * FROM sqlite_master", &[])
+            .unwrap();
 
         assert!(res.is_empty());
     }

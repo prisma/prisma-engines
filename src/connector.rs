@@ -1,6 +1,6 @@
 mod queryable;
-mod transaction;
 mod result_set;
+mod transaction;
 
 #[cfg(feature = "mysql-16")]
 pub(crate) mod mysql;
