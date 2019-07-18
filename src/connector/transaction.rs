@@ -12,7 +12,7 @@ impl<'a> Transaction<'a> {
         Ok(Self { inner, done: false })
     }
 
-    pub fn commit(&mut self) -> crate::Result<()> {
+    pub fn commit(mut self) -> crate::Result<()> {
         self.done = true;
         self.inner.raw_cmd("COMMIT")?;
 
