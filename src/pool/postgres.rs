@@ -1,7 +1,6 @@
 use super::PrismaConnectionManager;
 use crate::{
-    connector::Queryable,
-    connector::{postgres::ConnectionLike, PostgreSql},
+    connector::{Queryable, PostgreSql},
     error::Error,
 };
 use failure::{Compat, Fail};
@@ -32,12 +31,12 @@ impl TryFrom<Config> for PrismaConnectionManager<PostgresManager> {
 }
 
 impl ManageConnection for PrismaConnectionManager<PostgresManager> {
-    type Connection = ConnectionLike<PostgreSql>;
+    type Connection = PostgreSql;
     type Error = Compat<Error>;
 
     fn connect(&self) -> Result<Self::Connection, Self::Error> {
         match self.inner.connect() {
-            Ok(client) => Ok(ConnectionLike::from(PostgreSql::from(client))),
+            Ok(client) => Ok(PostgreSql::from(client)),
             Err(e) => Err(Error::from(e).compat()),
         }
     }

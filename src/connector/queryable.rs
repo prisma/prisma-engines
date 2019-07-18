@@ -1,4 +1,4 @@
-use super::ResultSet;
+use super::{ResultSet, Transaction};
 use crate::ast::*;
 
 pub trait ToRow {
@@ -10,31 +10,34 @@ pub trait ToColumnNames {
 }
 
 /// Represents a connection.
-pub trait Queryable {
+pub trait Queryable
+where
+    Self: Sized,
+{
     /// Executes the given query and returns the ID of the last inserted row.
     ///
     /// This is typically used for mutating queries.
-    fn execute<'a>(&mut self, q: Query<'a>) -> crate::Result<Option<Id>>;
+    fn execute(&mut self, q: Query) -> crate::Result<Option<Id>>;
 
     /// Executes the given query and returns the result set.
     ///
     /// This is typically used for select queries.
-    fn query<'a>(&mut self, q: Query<'a>) -> crate::Result<ResultSet>;
+    fn query(&mut self, q: Query) -> crate::Result<ResultSet>;
 
     /// Executes a query given as SQL, interpolating the given parameters and
     /// returning a set of results.
-    fn query_raw<'a>(
+    fn query_raw(
         &mut self,
         sql: &str,
-        params: &[ParameterizedValue<'a>],
+        params: &[ParameterizedValue],
     ) -> crate::Result<ResultSet>;
 
     /// Executes a query given as SQL, interpolating the given parameters and
     /// returning the number of affected rows.
-    fn execute_raw<'a>(
+    fn execute_raw(
         &mut self,
         sql: &str,
-        params: &[ParameterizedValue<'a>],
+        params: &[ParameterizedValue],
     ) -> crate::Result<u64>;
 
     /// Turns off all foreign key constraints.
@@ -44,7 +47,7 @@ pub trait Queryable {
     fn turn_on_fk_constraints(&mut self) -> crate::Result<()>;
 
     /// Empties the given set of tables.
-    fn empty_tables<'a>(&mut self, tables: Vec<Table>) -> crate::Result<()> {
+    fn empty_tables(&mut self, tables: Vec<Table>) -> crate::Result<()> {
         self.turn_off_fk_constraints()?;
 
         for table in tables {
@@ -56,10 +59,10 @@ pub trait Queryable {
         Ok(())
     }
 
-    fn start_transaction<'a>(&'a mut self) -> crate::Result<Box<dyn Transaction + 'a>>;
-}
+    /// Starts a new transaction
+    fn start_transaction<'a>(&'a mut self) -> crate::Result<Transaction<'a, Self>>;
 
-pub trait Transaction: Queryable {
-    fn commit(self) -> crate::Result<()>;
-    fn rollback(self) -> crate::Result<()>;
+    /// Runs a command in the database, for queries that can't be run using
+    /// prepared statements.
+    fn raw_cmd<'a>(&mut self, cmd: &str) -> crate::Result<()>;
 }

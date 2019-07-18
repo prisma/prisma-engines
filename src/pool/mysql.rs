@@ -1,6 +1,6 @@
 use super::PrismaConnectionManager;
 use crate::{
-    connector::{mysql::ConnectionLike, Mysql, Queryable},
+    connector::{Mysql, Queryable},
     error::Error,
 };
 use failure::{Compat, Fail};
@@ -19,12 +19,12 @@ impl From<OptsBuilder> for PrismaConnectionManager<MysqlConnectionManager> {
 }
 
 impl ManageConnection for PrismaConnectionManager<MysqlConnectionManager> {
-    type Connection = ConnectionLike<Mysql>;
+    type Connection = Mysql;
     type Error = Compat<Error>;
 
     fn connect(&self) -> Result<Self::Connection, Self::Error> {
         match self.inner.connect() {
-            Ok(client) => Ok(ConnectionLike::from(Mysql::from(client))),
+            Ok(client) => Ok(Mysql::from(client)),
             Err(e) => Err(Error::from(e).compat()),
         }
     }

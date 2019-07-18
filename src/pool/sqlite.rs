@@ -1,6 +1,6 @@
 use super::PrismaConnectionManager;
 use crate::{
-    connector::{sqlite::ConnectionLike, Queryable, Sqlite},
+    connector::{Queryable, Sqlite},
     error::Error,
 };
 use failure::{Compat, Fail};
@@ -26,7 +26,7 @@ impl PrismaConnectionManager<SqliteConnectionManager> {
 }
 
 impl ManageConnection for PrismaConnectionManager<SqliteConnectionManager> {
-    type Connection = ConnectionLike<Sqlite>;
+    type Connection = Sqlite;
     type Error = Compat<Error>;
 
     fn connect(&self) -> Result<Self::Connection, Self::Error> {
@@ -37,7 +37,7 @@ impl ManageConnection for PrismaConnectionManager<SqliteConnectionManager> {
                     file_path: self.file_path.clone().unwrap(),
                 };
 
-                Ok(ConnectionLike::from(sqlite))
+                Ok(sqlite)
             }
             Err(e) => Err(Error::from(e).compat()),
         }

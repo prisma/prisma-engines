@@ -1,4 +1,5 @@
 mod queryable;
+mod transaction;
 mod result_set;
 
 #[cfg(feature = "mysql-16")]
@@ -21,3 +22,4 @@ pub use sqlite::*;
 
 pub use self::result_set::*;
 pub use queryable::*;
+pub use transaction::*;

@@ -1,11 +1,14 @@
-mod connection_like;
 mod conversion;
 mod error;
 
+use crate::{
+    ast::{Id, ParameterizedValue, Query},
+    connector::{queryable::*, ResultSet, Transaction},
+    visitor::{self, Visitor},
+};
 use native_tls::TlsConnector;
+use postgres::types::FromSql;
 use tokio_postgres_native_tls::MakeTlsConnector;
-
-pub use connection_like::ConnectionLike;
 
 /// A connector interface for the PostgreSQL database.
 pub struct PostgreSql {
@@ -19,14 +22,92 @@ impl From<postgres::Client> for PostgreSql {
 }
 
 impl PostgreSql {
-    pub fn new(config: postgres::Config) -> crate::Result<ConnectionLike<Self>> {
+    pub fn new(config: postgres::Config) -> crate::Result<Self> {
         let mut tls_builder = TlsConnector::builder();
         tls_builder.danger_accept_invalid_certs(true); // For Heroku
 
         let tls = MakeTlsConnector::new(tls_builder.build()?);
         let client = config.connect(tls)?;
 
-        Ok(ConnectionLike::from(PostgreSql { client }))
+        Ok(Self { client })
+    }
+}
+
+impl Queryable for PostgreSql {
+    fn execute<'a>(&mut self, q: Query<'a>) -> crate::Result<Option<Id>> {
+        let (sql, params) = dbg!(visitor::Postgres::build(q));
+
+        let stmt = self.client.prepare(&sql)?;
+        let rows = self
+            .client
+            .query(&stmt, &conversion::conv_params(&params))?;
+
+        let id = rows.into_iter().rev().next().map(|row| {
+            let id = row.get(0);
+            let tpe = row.columns()[0].type_();
+
+            Id::from_sql(tpe, id)
+        });
+
+        match id {
+            Some(Ok(id)) => Ok(Some(id)),
+            Some(Err(_)) => panic!("Cannot convert err, todo."),
+            None => Ok(None),
+        }
+    }
+
+    fn query<'a>(&mut self, q: Query<'a>) -> crate::Result<ResultSet> {
+        let (sql, params) = dbg!(visitor::Postgres::build(q));
+        self.query_raw(sql.as_str(), &params[..])
+    }
+
+    fn query_raw<'a>(
+        &mut self,
+        sql: &str,
+        params: &[ParameterizedValue<'a>],
+    ) -> crate::Result<ResultSet> {
+        let stmt = self.client.prepare(&sql)?;
+        let rows = self.client.query(&stmt, &conversion::conv_params(params))?;
+
+        let mut result = ResultSet::new(stmt.to_column_names(), Vec::new());
+
+        for row in rows {
+            result.rows.push(row.to_result_row()?);
+        }
+
+        Ok(result)
+    }
+
+    fn execute_raw<'a>(
+        &mut self,
+        sql: &str,
+        params: &[ParameterizedValue<'a>],
+    ) -> crate::Result<u64> {
+        let stmt = self.client.prepare(&sql)?;
+        let changes = self
+            .client
+            .execute(&stmt, &conversion::conv_params(params))?;
+
+        Ok(changes)
+    }
+
+    fn turn_off_fk_constraints(&mut self) -> crate::Result<()> {
+        self.query_raw("SET CONSTRAINTS ALL DEFERRED", &[])?;
+        Ok(())
+    }
+
+    fn turn_on_fk_constraints(&mut self) -> crate::Result<()> {
+        self.query_raw("SET CONSTRAINTS ALL IMMEDIATE", &[])?;
+        Ok(())
+    }
+
+    fn start_transaction<'b>(&'b mut self) -> crate::Result<Transaction<'b, Self>> {
+        Ok(Transaction::new(self)?)
+    }
+
+    fn raw_cmd(&mut self, cmd: &str) -> crate::Result<()> {
+        self.client.simple_query(cmd)?;
+        Ok(())
     }
 }
 
@@ -51,10 +132,12 @@ mod tests {
     fn should_provide_a_database_connection() {
         let mut connection = PostgreSql::new(get_config()).unwrap();
 
-        let res = connection.query_raw(
-            "select * from \"pg_catalog\".\"pg_am\" where amtype = 'x'",
-            &[],
-        ).unwrap();
+        let res = connection
+            .query_raw(
+                "select * from \"pg_catalog\".\"pg_am\" where amtype = 'x'",
+                &[],
+            )
+            .unwrap();
 
         // No results expected.
         assert!(res.is_empty());
@@ -65,10 +148,12 @@ mod tests {
         let mut connection = PostgreSql::new(get_config()).unwrap();
         let mut tx = connection.start_transaction().unwrap();
 
-        let res = tx.query_raw(
-            "select * from \"pg_catalog\".\"pg_am\" where amtype = 'x'",
-            &[],
-        ).unwrap();
+        let res = tx
+            .query_raw(
+                "select * from \"pg_catalog\".\"pg_am\" where amtype = 'x'",
+                &[],
+            )
+            .unwrap();
 
         assert!(res.is_empty());
     }

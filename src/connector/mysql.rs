@@ -1,11 +1,14 @@
-mod connection_like;
 mod conversion;
 mod error;
 
-pub use connection_like::*;
-
 use mysql as my;
 use url::Url;
+
+use crate::{
+    ast::{Id, ParameterizedValue, Query},
+    connector::{queryable::*, ResultSet, Transaction},
+    visitor::{self, Visitor},
+};
 
 /// A connector interface for the MySQL database.
 pub struct Mysql {
@@ -19,12 +22,12 @@ impl From<my::Conn> for Mysql {
 }
 
 impl Mysql {
-    pub fn new(conf: mysql::OptsBuilder) -> crate::Result<ConnectionLike<Self>> {
+    pub fn new(conf: mysql::OptsBuilder) -> crate::Result<Self> {
         let client = my::Conn::new(conf)?;
-        Ok(ConnectionLike::from(Mysql { client }))
+        Ok(Mysql { client })
     }
 
-    pub fn new_from_url(url: &str) -> crate::Result<ConnectionLike<Self>> {
+    pub fn new_from_url(url: &str) -> crate::Result<Self> {
         let mut builder = my::OptsBuilder::new();
         let url = Url::parse(url)?;
         let db_name = url.path_segments().and_then(|mut segments| segments.next());
@@ -39,7 +42,69 @@ impl Mysql {
 
         let client = my::Conn::new(builder)?;
 
-        Ok(ConnectionLike::from(Mysql { client }))
+        Ok(Mysql { client })
+    }
+}
+
+impl Queryable for Mysql {
+    fn execute(&mut self, q: Query) -> crate::Result<Option<Id>> {
+        let (sql, params) = dbg!(visitor::Mysql::build(q));
+
+        let mut stmt = self.client.prepare(&sql)?;
+        let result = stmt.execute(params)?;
+
+        Ok(Some(Id::from(result.last_insert_id())))
+    }
+
+    fn query<'a>(&mut self, q: Query<'a>) -> crate::Result<ResultSet> {
+        let (sql, params) = dbg!(visitor::Mysql::build(q));
+        self.query_raw(&sql, &params[..])
+    }
+
+    fn query_raw<'a>(
+        &mut self,
+        sql: &str,
+        params: &[ParameterizedValue<'a>],
+    ) -> crate::Result<ResultSet> {
+        let mut stmt = self.client.prepare(&sql)?;
+        let mut result = ResultSet::new(stmt.to_column_names(), Vec::new());
+        let rows = stmt.execute(conversion::conv_params(params))?;
+
+        for row in rows {
+            result.rows.push(row?.to_result_row()?);
+        }
+
+        Ok(result)
+    }
+
+    fn execute_raw<'a>(
+        &mut self,
+        sql: &str,
+        params: &[ParameterizedValue<'a>],
+    ) -> crate::Result<u64> {
+        let mut stmt = self.client.prepare(sql)?;
+        let result = stmt.execute(conversion::conv_params(params))?;
+
+        Ok(result.affected_rows())
+    }
+
+    fn turn_off_fk_constraints(&mut self) -> crate::Result<()> {
+        self.client.query("SET FOREIGN_KEY_CHECKS=0")?;
+        Ok(())
+    }
+
+    fn turn_on_fk_constraints(&mut self) -> crate::Result<()> {
+        self.client.query("SET FOREIGN_KEY_CHECKS=1")?;
+        Ok(())
+    }
+
+    fn start_transaction<'b>(&'b mut self) -> crate::Result<Transaction<'b, Self>> {
+        Ok(Transaction::new(self)?)
+    }
+
+    fn raw_cmd(&mut self, cmd: &str) -> crate::Result<()> {
+        self.client.query(cmd)?;
+        Ok(())
     }
 }
 

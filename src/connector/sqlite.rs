@@ -1,10 +1,10 @@
-mod connection_like;
 mod conversion;
 mod error;
 
-pub use connection_like::*;
-
 use crate::{
+    ast::{Id, ParameterizedValue, Query},
+    connector::{queryable::*, ResultSet, Transaction},
+    visitor::{self, Visitor},
     error::Error,
 };
 use rusqlite::NO_PARAMS;
@@ -43,10 +43,6 @@ impl Sqlite {
         })
     }
 
-    pub fn queryable(self) -> ConnectionLike<Self> {
-        ConnectionLike::from(self)
-    }
-
     pub fn attach_database(&mut self, db_name: &str) -> crate::Result<()> {
         let mut stmt = self.client.prepare("PRAGMA database_list")?;
 
@@ -73,6 +69,67 @@ impl Sqlite {
     }
 }
 
+impl Queryable for Sqlite {
+    fn execute(&mut self, q: Query) -> crate::Result<Option<Id>> {
+        let (sql, params) = dbg!(visitor::Sqlite::build(q));
+        self.execute_raw(&sql, &params)?;
+
+        Ok(Some(Id::Int(self.client.last_insert_rowid() as usize)))
+    }
+
+    fn query(&mut self, q: Query) -> crate::Result<ResultSet> {
+        let (sql, params) = dbg!(visitor::Sqlite::build(q));
+        self.query_raw(&sql, &params)
+    }
+
+    fn query_raw(
+        &mut self,
+        sql: &str,
+        params: &[ParameterizedValue],
+    ) -> crate::Result<ResultSet> {
+        let mut stmt = self.client.prepare_cached(sql)?;
+        let mut rows = stmt.query(params)?;
+
+        let mut result = ResultSet::new(rows.to_column_names(), Vec::new());
+
+        while let Some(row) = rows.next()? {
+            result.rows.push(row.to_result_row()?);
+        }
+
+        Ok(result)
+    }
+
+    fn execute_raw(
+        &mut self,
+        sql: &str,
+        params: &[ParameterizedValue],
+    ) -> crate::Result<u64> {
+        let mut stmt = self.client.prepare_cached(sql)?;
+        let changes = stmt.execute(params)?;
+
+        Ok(u64::try_from(changes).unwrap())
+    }
+
+    fn turn_off_fk_constraints(&mut self) -> crate::Result<()> {
+        self.query_raw("PRAGMA foreign_keys = OFF", &[])?;
+        Ok(())
+    }
+
+    fn turn_on_fk_constraints(&mut self) -> crate::Result<()> {
+        self.query_raw("PRAGMA foreign_keys = ON", &[])?;
+        Ok(())
+    }
+
+    fn start_transaction<'b>(&'b mut self) -> crate::Result<Transaction<'b, Self>> {
+        Ok(Transaction::new(self)?)
+    }
+
+    fn raw_cmd(&mut self, cmd: &str) -> crate::Result<()> {
+        self.client.execute_batch(cmd)?;
+        Ok(())
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -80,7 +137,7 @@ mod tests {
 
     #[test]
     fn should_provide_a_database_connection() {
-        let mut connection = Sqlite::new(String::from("db/test.db")).unwrap().queryable();
+        let mut connection = Sqlite::new(String::from("db/test.db")).unwrap();
         let res = connection.query_raw("SELECT * FROM sqlite_master", &[]).unwrap();
 
         assert!(res.is_empty());
@@ -88,7 +145,7 @@ mod tests {
 
     #[test]
     fn should_provide_a_database_transaction() {
-        let mut connection = Sqlite::new(String::from("db/test.db")).unwrap().queryable();
+        let mut connection = Sqlite::new(String::from("db/test.db")).unwrap();
         let mut tx = connection.start_transaction().unwrap();
         let res = tx.query_raw("SELECT * FROM sqlite_master", &[]).unwrap();
 
@@ -113,7 +170,7 @@ mod tests {
 
     #[test]
     fn should_map_columns_correctly() {
-        let mut connection = Sqlite::new(String::from("db/test.db")).unwrap().queryable();
+        let mut connection = Sqlite::new(String::from("db/test.db")).unwrap();
 
         connection.query_raw(TABLE_DEF, &[]).unwrap();
         connection.query_raw(CREATE_USER, &[]).unwrap();
