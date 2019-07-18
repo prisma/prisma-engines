@@ -98,7 +98,7 @@ impl Queryable for Mysql {
         Ok(())
     }
 
-    fn start_transaction<'b>(&'b mut self) -> crate::Result<Transaction<'b, Self>> {
+    fn start_transaction<'b>(&'b mut self) -> crate::Result<Transaction<'b>> {
         Ok(Transaction::new(self)?)
     }
 

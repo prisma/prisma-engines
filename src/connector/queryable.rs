@@ -11,8 +11,6 @@ pub trait ToColumnNames {
 
 /// Represents a connection.
 pub trait Queryable
-where
-    Self: Sized,
 {
     /// Executes the given query and returns the ID of the last inserted row.
     ///
@@ -60,7 +58,7 @@ where
     }
 
     /// Starts a new transaction
-    fn start_transaction<'a>(&'a mut self) -> crate::Result<Transaction<'a, Self>>;
+    fn start_transaction<'a>(&'a mut self) -> crate::Result<Transaction<'a>>;
 
     /// Runs a command in the database, for queries that can't be run using
     /// prepared statements.

@@ -1,14 +1,14 @@
 use super::*;
 use crate::ast::*;
 
-pub struct Transaction<'a, Q> where Q: Queryable
+pub struct Transaction<'a>
 {
-    pub(crate) inner: &'a mut Q,
+    pub(crate) inner: &'a mut Queryable,
     done: bool,
 }
 
-impl<'a, Q> Transaction<'a, Q> where Q: Queryable {
-    pub fn new(inner: &'a mut Q) -> crate::Result<Self> {
+impl<'a> Transaction<'a> {
+    pub fn new(inner: &'a mut Queryable) -> crate::Result<Self> {
         inner.raw_cmd("BEGIN")?;
         Ok(Self { inner, done: false })
     }
@@ -28,7 +28,7 @@ impl<'a, Q> Transaction<'a, Q> where Q: Queryable {
     }
 }
 
-impl<'a, Q> Drop for Transaction<'a, Q> where Q: Queryable {
+impl<'a> Drop for Transaction<'a> {
     fn drop(&mut self) {
         if !self.done {
             let _ = self.rollback();
@@ -36,7 +36,7 @@ impl<'a, Q> Drop for Transaction<'a, Q> where Q: Queryable {
     }
 }
 
-impl<'a, Q> Queryable for Transaction<'a, Q> where Q: Queryable {
+impl<'a> Queryable for Transaction<'a> {
     fn execute(&mut self, q: Query) -> crate::Result<Option<Id>> {
         self.inner.execute(q)
     }
@@ -73,7 +73,7 @@ impl<'a, Q> Queryable for Transaction<'a, Q> where Q: Queryable {
         self.inner.empty_tables(tables)
     }
 
-    fn start_transaction<'b>(&'b mut self) -> crate::Result<Transaction<'b, Self>> {
+    fn start_transaction<'b>(&'b mut self) -> crate::Result<Transaction<'b>> {
         panic!("Nested transactions are not supported")
     }
 
