@@ -3,6 +3,7 @@ use std::{collections::BTreeMap, sync::Arc};
 
 /// An owned version of a `Row` in a `ResultSet`. See
 /// [ResultRowRef](struct.ResultRowRef.html) for documentation on data access.
+#[derive(Debug)]
 pub struct ResultRow {
     pub(crate) name_to_index: Arc<BTreeMap<String, usize>>,
     pub(crate) values: Vec<ParameterizedValue<'static>>,
@@ -31,6 +32,7 @@ impl IntoIterator for ResultRow {
 /// assert_eq!(row[0], row["id"]);
 /// assert_eq!(row[1], row["name"]);
 /// ```
+#[derive(Debug)]
 pub struct ResultRowRef<'a> {
     pub(crate) name_to_index: Arc<BTreeMap<String, usize>>,
     pub(crate) values: &'a Vec<ParameterizedValue<'static>>,
