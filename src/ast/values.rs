@@ -126,6 +126,8 @@ impl<'a> ParameterizedValue<'a> {
     pub fn is_bool(&self) -> bool {
         match self {
             ParameterizedValue::Boolean(_) => true,
+            // For schemas which don't tag booleans
+            ParameterizedValue::Integer(i) if *i == 0 || *i == 1 => true,
             _ => false,
         }
     }
@@ -134,6 +136,8 @@ impl<'a> ParameterizedValue<'a> {
     pub fn as_bool(&self) -> Option<bool> {
         match self {
             ParameterizedValue::Boolean(b) => Some(*b),
+            // For schemas which don't tag booleans
+            ParameterizedValue::Integer(i) if *i == 0 || *i == 1 => Some(*i == 1),
             _ => None,
         }
     }
