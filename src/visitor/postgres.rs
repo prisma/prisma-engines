@@ -4,6 +4,10 @@ use rust_decimal::Decimal;
 use std::{error::Error, str::FromStr};
 use tokio_postgres::types::ToSql;
 
+/// A visitor to generate queries for the PostgreSQL database.
+///
+/// The returned parameter values implement the `ToSql` trait from postgres and
+/// can be used directly with the database.
 pub struct Postgres<'a> {
     parameters: Vec<ParameterizedValue<'a>>,
 }

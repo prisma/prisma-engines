@@ -38,6 +38,23 @@ pub trait Visitor<'a> {
     /// Convert the given `Query` to an SQL string and a vector of parameters.
     /// When certain parameters are replaced with the `C_PARAM` character in the
     /// query, the vector should contain the parameter value in the right position.
+    ///
+    /// The point of entry for visiting query ASTs.
+    ///
+    /// ```
+    /// use prisma_query::{ast::*, visitor::*};
+    ///
+    /// fn main() {
+    ///     let query = Select::from_table("cats");
+    ///     let (sqlite, _) = Sqlite::build(query.clone());
+    ///     let (psql, _) = Postgres::build(query.clone());
+    ///     let (mysql, _) = Mysql::build(query.clone());
+    ///
+    ///     assert_eq!("SELECT `cats`.* FROM `cats`", sqlite);
+    ///     assert_eq!("SELECT \"cats\".* FROM \"cats\"", psql);
+    ///     assert_eq!("SELECT `cats`.* FROM `cats`", mysql);
+    /// }
+    /// ```
     fn build<Q>(query: Q) -> (String, Vec<ParameterizedValue<'a>>)
     where
         Q: Into<Query<'a>>;

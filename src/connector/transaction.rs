@@ -1,17 +1,23 @@
 use super::*;
 use crate::ast::*;
 
+/// A representation of an SQL database transaction. If not commited, a
+/// transaction will be rolled back by default when dropped.
+///
+/// Currently does not support nesting, so starting a new transaction using the
+/// transaction object will panic.
 pub struct Transaction<'a> {
     pub(crate) inner: &'a mut Queryable,
     done: bool,
 }
 
 impl<'a> Transaction<'a> {
-    pub fn new(inner: &'a mut Queryable) -> crate::Result<Self> {
+    pub(crate) fn new(inner: &'a mut Queryable) -> crate::Result<Self> {
         inner.raw_cmd("BEGIN")?;
         Ok(Self { inner, done: false })
     }
 
+    /// Commit the changes to the database and consume the transaction.
     pub fn commit(mut self) -> crate::Result<()> {
         self.done = true;
         self.inner.raw_cmd("COMMIT")?;
@@ -19,6 +25,7 @@ impl<'a> Transaction<'a> {
         Ok(())
     }
 
+    /// Rolls back the changes to the database.
     pub fn rollback(&mut self) -> crate::Result<()> {
         self.done = true;
         self.inner.raw_cmd("ROLLBACK")?;

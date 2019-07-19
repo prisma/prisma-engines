@@ -4,6 +4,9 @@ use mysql::Value as MyValue;
 #[cfg(feature = "chrono-0_4")]
 use chrono::{Datelike, Timelike};
 
+/// A visitor to generate queries for the MySQL database.
+///
+/// The returned parameter values can be used directly with the mysql crate.
 pub struct Mysql<'a> {
     parameters: Vec<ParameterizedValue<'a>>,
 }

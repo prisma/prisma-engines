@@ -10,6 +10,7 @@ use crate::{
 use rusqlite::NO_PARAMS;
 use std::{collections::HashSet, convert::TryFrom, path::PathBuf};
 
+/// A connector interface for the SQLite database
 pub struct Sqlite {
     pub(crate) client: rusqlite::Connection,
     pub(crate) file_path: PathBuf,

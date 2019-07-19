@@ -18,20 +18,26 @@
 //!
 //! - Database-level type-safety in query building or being an ORM.
 //!
-//! ## Database priorities
+//! ## Databases
 //!
-//! - SQLite will be the first visitor
+//! - SQLite
 //! - PostgreSQL
 //! - MySQL
 //!
-//! More databases will be decided later.
-//!
 //! ## Examples
 //!
-//! ### Chaining conditions
+//! ### Building an SQL query string
+//!
+//! The crate can be used as an SQL string builder using the [ast](ast/index.html) and
+//! [visitor](visitor/index.html) modules.
+//!
+//! AST is generic for all databases and the visitors generate correct SQL
+//! syntax for the database.
+//!
+//! The visitor returns the query as a string and its parameters as a vector.
 //!
 //! ```
-//! use prisma_query::{ast::*, visitor::*};
+//! use prisma_query::{ast::*, visitor::{Sqlite, Visitor}};
 //!
 //! fn main() {
 //!     let conditions = "word"
@@ -58,44 +64,29 @@
 //! }
 //! ```
 //!
-//! We can chain the conditions together by calling the corresponding conjuctive
-//! with the compares. The parameters returned implement the corresponding output
-//! trait from the database adapter for easy passing into a prepared statement,
-//! in this case [rusqlite](https://github.com/jgallagher/rusqlite).
+//! ### Querying a database with an AST object
 //!
-//! ### Building the conditions as a tree
+//! The [connector](connector/index.html) module abstracts a generic query interface over
+//! different databases. It offers querying with the [ast](ast/index.html) module or
+//! directly using raw strings.
+//!
+//! When querying with an ast object the queries are paremeterized
+//! automatically.
 //!
 //! ```
-//! use prisma_query::{ast::*, visitor::*};
+//! use prisma_query::{ast::*, connector::*};
 //!
 //! fn main() {
-//!     let conditions = ConditionTree::and(
-//!         ConditionTree::or("word".equals("meow"), "age".less_than(10)),
-//!         "paw".equals("warm"),
-//!     );
-//!
-//!     let query = Select::from_table("naukio").so_that(conditions);
-//!     let (sql, params) = Sqlite::build(query);
+//!     let mut conn = Sqlite::new("test.db").unwrap();
+//!     let query = Select::default().value(1);
+//!     let result = conn.query(query.into()).unwrap();
 //!
 //!     assert_eq!(
-//!         "SELECT `naukio`.* FROM `naukio` WHERE ((`word` = ? OR `age` < ?) AND `paw` = ?)",
-//!         sql,
-//!     );
-//!
-//!     assert_eq!(
-//!         vec![
-//!             ParameterizedValue::from("meow"),
-//!             ParameterizedValue::from(10),
-//!             ParameterizedValue::from("warm"),
-//!         ],
-//!         params
+//!         Some(1),
+//!         result[0].into_iter().nth(0).and_then(|row| row[0].as_i64()),
 //!     );
 //! }
 //! ```
-//!
-//! In cases where more feasible we want to build a `ConditionTree` manually
-//! from the input, e.g. when mapping data using an `Into<ConditionTree>` trait.
-
 pub mod ast;
 #[cfg(any(
     feature = "mysql-16",

@@ -5,8 +5,10 @@ use rusqlite::{
     Error as RusqlError,
 };
 
-/// A visitor for generating queries for an SQLite database. Requires that
-/// `rusqlite` feature flag is selected.
+/// A visitor to generate queries for the SQLite database.
+///
+/// The returned parameter values implement the `ToSql` trait from rusqlite and
+/// can be used directly with the database.
 pub struct Sqlite<'a> {
     parameters: Vec<ParameterizedValue<'a>>,
 }
