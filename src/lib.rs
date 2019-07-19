@@ -83,7 +83,7 @@
 //!
 //!     assert_eq!(
 //!         Some(1),
-//!         result[0].into_iter().nth(0).and_then(|row| row[0].as_i64()),
+//!         result.into_iter().nth(0).and_then(|row| row[0].as_i64()),
 //!     );
 //! }
 //! ```
