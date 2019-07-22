@@ -30,7 +30,7 @@ impl ManageConnection for PrismaConnectionManager<MysqlConnectionManager> {
     }
 
     fn is_valid(&self, conn: &mut Self::Connection) -> Result<(), Self::Error> {
-        match conn.query_raw("", &[]) {
+        match conn.query_raw("SELECT version()", &[]) {
             Ok(_) => Ok(()),
             Err(e) => Err(Error::from(e).compat()),
         }

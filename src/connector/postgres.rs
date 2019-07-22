@@ -7,7 +7,6 @@ use crate::{
     visitor::{self, Visitor},
 };
 use native_tls::TlsConnector;
-use postgres::types::FromSql;
 use tokio_postgres_native_tls::MakeTlsConnector;
 
 /// A connector interface for the PostgreSQL database.

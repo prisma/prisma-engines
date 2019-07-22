@@ -3,7 +3,7 @@ use crate::{
     connector::queryable::{ToColumnNames, ToRow},
 };
 #[cfg(feature = "chrono-0_4")]
-use chrono::{DateTime, Duration, NaiveDate, Utc};
+use chrono::{DateTime, Duration, NaiveDateTime, Utc};
 use mysql as my;
 
 pub fn conv_params<'a>(params: &[ParameterizedValue<'a>]) -> my::Params {
@@ -31,12 +31,9 @@ impl ToRow for my::Row {
                 my::Value::UInt(i) => ParameterizedValue::Integer(*i as i64),
                 my::Value::Float(f) => ParameterizedValue::Real(*f),
                 #[cfg(feature = "chrono-0_4")]
-                my::Value::Date(year, month, day, hour, min, sec, _) => {
-                    let naive = NaiveDate::from_ymd(*year as i32, *month as u32, *day as u32)
-                        .and_hms(*hour as u32, *min as u32, *sec as u32);
-
-                    let dt: DateTime<Utc> = DateTime::from_utc(naive, Utc);
-                    ParameterizedValue::DateTime(dt)
+                my::Value::Date(..) => {
+                    let ts: NaiveDateTime = row.get(i).unwrap();
+                    ParameterizedValue::DateTime(DateTime::<Utc>::from_utc(ts, Utc))
                 }
                 #[cfg(feature = "chrono-0_4")]
                 my::Value::Time(is_neg, days, hours, minutes, seconds, micros) => {
