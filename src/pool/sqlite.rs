@@ -44,7 +44,7 @@ impl ManageConnection for PrismaConnectionManager<SqliteConnectionManager> {
     }
 
     fn is_valid(&self, conn: &mut Self::Connection) -> Result<(), Self::Error> {
-        match conn.query_raw("", &[]) {
+        match conn.query_raw("SELECT 1", &[]) {
             Ok(_) => Ok(()),
             Err(e) => Err(Error::from(e).compat()),
         }
