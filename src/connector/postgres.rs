@@ -42,18 +42,12 @@ impl Queryable for PostgreSql {
             .client
             .query(&stmt, &conversion::conv_params(&params))?;
 
-        let id = rows.into_iter().rev().next().map(|row| {
-            let id = row.get(0);
-            let tpe = row.columns()[0].type_();
-
-            Id::from_sql(tpe, id)
+        let id: Option<Id> = rows.into_iter().rev().next().map(|row| {
+            let id: Id = row.get(0);
+            id
         });
 
-        match id {
-            Some(Ok(id)) => Ok(Some(id)),
-            Some(Err(_)) => panic!("Cannot convert err, todo."),
-            None => Ok(None),
-        }
+        Ok(id)
     }
 
     fn query<'a>(&mut self, q: Query<'a>) -> crate::Result<ResultSet> {
