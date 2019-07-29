@@ -24,7 +24,7 @@ pub(crate) mod sqlite;
 pub use self::mysql::*;
 
 #[cfg(feature = "postgresql-0_16")]
-pub use self::postgres::PostgreSql;
+pub use self::postgres::*;
 
 #[cfg(feature = "rusqlite-0_19")]
 pub use sqlite::*;
