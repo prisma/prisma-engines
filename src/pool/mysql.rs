@@ -14,6 +14,7 @@ impl From<OptsBuilder> for PrismaConnectionManager<MysqlConnectionManager> {
         Self {
             inner: MysqlConnectionManager::new(opts),
             file_path: None,
+            schema: None,
         }
     }
 }

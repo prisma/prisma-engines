@@ -101,4 +101,5 @@ where
 {
     inner: Inner,
     file_path: Option<PathBuf>,
+    schema: Option<String>,
 }

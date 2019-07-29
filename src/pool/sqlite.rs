@@ -20,6 +20,7 @@ impl PrismaConnectionManager<SqliteConnectionManager> {
             Ok(Self {
                 inner: SqliteConnectionManager::memory(),
                 file_path: Some(path),
+                schema: None,
             })
         }
     }

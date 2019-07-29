@@ -1,6 +1,6 @@
 use super::PrismaConnectionManager;
 use crate::{
-    connector::{PostgreSql, Queryable, PostgresParams},
+    connector::{PostgreSql, Queryable, PostgresParams, DEFAULT_SCHEMA},
     error::Error,
 };
 use failure::{Compat, Fail};
@@ -27,6 +27,7 @@ impl TryFrom<Config> for PrismaConnectionManager<PostgresManager> {
         Ok(Self {
             inner: PostgresConnectionManager::new(opts, tls),
             file_path: None,
+            schema: None,
         })
     }
 }
@@ -46,7 +47,14 @@ impl ManageConnection for PrismaConnectionManager<PostgresManager> {
 
     fn connect(&self) -> Result<Self::Connection, Self::Error> {
         match self.inner.connect() {
-            Ok(client) => Ok(PostgreSql::from(client)),
+            Ok(mut client) => {
+                let schema = self.schema.as_ref().map(|s| s.as_str()).unwrap_or(DEFAULT_SCHEMA);
+
+                match client.execute(format!("SET search_path = {}", schema).as_str(), &[]) {
+                    Ok(_) => Ok(PostgreSql::from(client)),
+                    Err(e) => Err(Error::from(e).compat()),
+                }
+            },
             Err(e) => Err(Error::from(e).compat()),
         }
     }
