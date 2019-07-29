@@ -27,6 +27,8 @@ pub enum Error {
     DatabaseUrlIsInvalid(String),
     #[fail(display = "Conversion failed: {}", _0)]
     ConversionError(&'static str),
+    #[fail(display = "The provided arguments are not supported.")]
+    InvalidConnectionArguments,
 }
 
 #[cfg(any(

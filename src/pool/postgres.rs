@@ -1,6 +1,6 @@
 use super::PrismaConnectionManager;
 use crate::{
-    connector::{PostgreSql, Queryable},
+    connector::{PostgreSql, Queryable, postgres::Params},
     error::Error,
 };
 use failure::{Compat, Fail};
@@ -8,6 +8,7 @@ use native_tls::TlsConnector;
 use r2d2::ManageConnection;
 use std::convert::TryFrom;
 use tokio_postgres_native_tls::MakeTlsConnector;
+use url::Url;
 
 pub use postgres::Config;
 pub use r2d2_postgres::PostgresConnectionManager;
@@ -27,6 +28,15 @@ impl TryFrom<Config> for PrismaConnectionManager<PostgresManager> {
             inner: PostgresConnectionManager::new(opts, tls),
             file_path: None,
         })
+    }
+}
+
+impl TryFrom<Url> for PrismaConnectionManager<PostgresManager> {
+    type Error = Error;
+
+    fn try_from(url: Url) -> crate::Result<Self> {
+        let params = Params::try_from(url)?;
+        Self::try_from(params.config)
     }
 }
 

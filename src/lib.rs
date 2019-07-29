@@ -108,4 +108,7 @@ pub mod pool;
 ))]
 pub mod visitor;
 
+#[macro_use]
+extern crate log;
+
 pub type Result<T> = std::result::Result<T, error::Error>;

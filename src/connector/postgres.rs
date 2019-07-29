@@ -5,13 +5,73 @@ use crate::{
     ast::{Id, ParameterizedValue, Query},
     connector::{queryable::*, ResultSet, Transaction},
     visitor::{self, Visitor},
+    error::Error,
 };
 use native_tls::TlsConnector;
 use tokio_postgres_native_tls::MakeTlsConnector;
+use url::Url;
+use tokio_postgres::config::SslMode;
+use std::{str::FromStr, convert::TryFrom};
 
 /// A connector interface for the PostgreSQL database.
 pub struct PostgreSql {
     client: postgres::Client,
+}
+
+pub struct Params {
+    pub(crate) connection_limit: u32,
+    pub(crate) config: postgres::Config,
+}
+
+impl TryFrom<Url> for Params {
+    type Error = Error;
+
+    fn try_from(mut url: Url) -> crate::Result<Self> {
+        let official = vec![];
+
+        let (supported, unsupported): (Vec<(String, String)>, Vec<(String, String)>) = url
+            .query_pairs()
+            .into_iter()
+            .map(|(k, v)| (String::from(k), String::from(v)))
+            .collect::<Vec<(String, String)>>()
+            .into_iter()
+            .partition(|(k, _)| official.contains(&k.as_str()));
+
+        url.query_pairs_mut().clear();
+
+        supported.into_iter().for_each(|(k, v)| {
+            url.query_pairs_mut().append_pair(&k, &v);
+        });
+
+        let mut config = postgres::Config::from_str(&url.to_string())?;
+        let mut connection_limit = 1;
+
+        for (k, v) in unsupported.into_iter() {
+            match k.as_ref() {
+                "sslmode" => {
+                    match v.as_ref() {
+                        "disable" => config.ssl_mode(SslMode::Disable),
+                        "prefer" => config.ssl_mode(SslMode::Prefer),
+                        "require" => config.ssl_mode(SslMode::Require),
+                        _ => {
+                            debug!("Unsupported ssl mode {}, defaulting to 'prefer'", v);
+                            config.ssl_mode(SslMode::Prefer)
+                        }
+                    };
+                }
+                "connection_limit" => {
+                    let as_int: u32 = v.parse().map_err(|_| Error::InvalidConnectionArguments)?;
+                    connection_limit = as_int;
+                }
+                _ => trace!("Discarding connection string param: {}", k),
+            };
+        }
+
+        Ok(Self {
+            connection_limit,
+            config,
+        })
+    }
 }
 
 impl From<postgres::Client> for PostgreSql {
@@ -29,6 +89,11 @@ impl PostgreSql {
         let client = config.connect(tls)?;
 
         Ok(Self { client })
+    }
+
+    pub fn from_url(mut url: Url) -> crate::Result<Self> {
+        let params = Params::try_from(url)?;
+        Self::new(params.config)
     }
 }
 
