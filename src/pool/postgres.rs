@@ -20,12 +20,12 @@ impl TryFrom<Url> for PrismaConnectionManager<PostgresManager> {
 
     fn try_from(url: Url) -> crate::Result<Self> {
         let params = PostgresParams::try_from(url)?;
-        Self::new(params.config, Some(params.schema))
+        Self::postgres(params.config, Some(params.schema))
     }
 }
 
 impl PrismaConnectionManager<PostgresManager> {
-    pub fn new(opts: postgres::Config, schema: Option<String>) -> crate::Result<Self> {
+    pub fn postgres(opts: postgres::Config, schema: Option<String>) -> crate::Result<Self> {
         let mut tls_builder = TlsConnector::builder();
         tls_builder.danger_accept_invalid_certs(true); // For Heroku
 
@@ -93,7 +93,7 @@ mod tests {
         let url = Url::parse(&conn_string).unwrap();
         let params = PostgresParams::try_from(url).unwrap();
 
-        let manager = PrismaConnectionManager::<PostgresManager>::new(params.config, None).unwrap();
+        let manager = PrismaConnectionManager::postgres(params.config, None).unwrap();
 
         let pool = r2d2::Pool::builder()
             .max_size(params.connection_limit)
@@ -117,7 +117,7 @@ mod tests {
         let url = Url::parse(&conn_string).unwrap();
         let params = PostgresParams::try_from(url).unwrap();
 
-        let manager = PrismaConnectionManager::<PostgresManager>::new(params.config, None).unwrap();
+        let manager = PrismaConnectionManager::postgres(params.config, None).unwrap();
 
         let pool = r2d2::Pool::builder()
             .max_size(params.connection_limit)

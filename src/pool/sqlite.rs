@@ -10,7 +10,7 @@ use std::path::PathBuf;
 pub use r2d2_sqlite::SqliteConnectionManager;
 
 impl PrismaConnectionManager<SqliteConnectionManager> {
-    pub fn new(url: &str) -> crate::Result<Self> {
+    pub fn sqlite(url: &str) -> crate::Result<Self> {
         let normalized = url.trim_start_matches("file:");
         let path = PathBuf::from(&normalized);
 

@@ -23,7 +23,7 @@ use std::path::PathBuf;
 /// use std::thread;
 ///
 /// fn main() {
-///     let manager = PrismaConnectionManager::new("db/test.db").unwrap();
+///     let manager = PrismaConnectionManager::sqlite("db/test.db").unwrap();
 ///     let pool = r2d2::Pool::new(manager).unwrap();
 ///
 ///     for i in 0..10i32 {
@@ -52,7 +52,7 @@ use std::path::PathBuf;
 ///     config.host("localhost");
 ///     config.user("root");
 ///
-///     let manager = PrismaConnectionManager::try_from(config).unwrap();
+///     let manager = PrismaConnectionManager::postgres(config, None).unwrap();
 ///     let pool = r2d2::Pool::new(manager).unwrap();
 ///
 ///     for i in 0..10i32 {
@@ -81,7 +81,7 @@ use std::path::PathBuf;
 ///     opts.ip_or_hostname(Some("localhost"));
 ///     opts.user(Some("root"));
 ///
-///     let manager = PrismaConnectionManager::from(opts);
+///     let manager = PrismaConnectionManager::mysql(opts);
 ///     let pool = r2d2::Pool::new(manager).unwrap();
 ///
 ///     for i in 0..10i32 {
