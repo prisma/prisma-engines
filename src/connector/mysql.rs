@@ -3,9 +3,11 @@ mod error;
 
 use mysql as my;
 use url::Url;
+use std::convert::TryFrom;
 
 use crate::{
     ast::{Id, ParameterizedValue, Query},
+    error::Error,
     connector::{queryable::*, ResultSet, Transaction},
     visitor::{self, Visitor},
 };
@@ -15,6 +17,75 @@ pub struct Mysql {
     pub(crate) client: my::Conn,
 }
 
+pub struct MysqlParams {
+    pub connection_limit: u32,
+    pub config: my::OptsBuilder,
+}
+
+type ConnectionParams = (Vec<(String, String)>, Vec<(String, String)>);
+
+impl TryFrom<Url> for MysqlParams {
+    type Error = Error;
+
+    fn try_from(mut url: Url) -> crate::Result<Self> {
+        let official = vec![];
+
+        let (supported, unsupported): ConnectionParams = url
+            .query_pairs()
+            .map(|(k, v)| (String::from(k), String::from(v)))
+            .collect::<Vec<(String, String)>>()
+            .into_iter()
+            .partition(|(k, _)| official.contains(&k.as_str()));
+
+        url.query_pairs_mut().clear();
+
+        supported.into_iter().for_each(|(k, v)| {
+            url.query_pairs_mut().append_pair(&k, &v);
+        });
+
+        let db_name = match url.path_segments() {
+            Some(mut segments) => segments.next().unwrap_or("mysql"),
+            None => "mysql",
+        };
+
+        let mut config = my::OptsBuilder::new();
+
+        config.ip_or_hostname(url.host_str());
+        config.tcp_port(url.port().unwrap_or(3306));
+        config.user(Some(url.username()));
+        config.pass(url.password());
+        config.db_name(Some(db_name));
+        config.verify_peer(false);
+        config.stmt_cache_size(Some(1000));
+
+        let mut connection_limit = 1;
+
+        for (k, v) in unsupported.into_iter() {
+            match k.as_ref() {
+                "connection_limit" => {
+                    let as_int: u32 = v.parse().map_err(|_| Error::InvalidConnectionArguments)?;
+                    connection_limit = as_int;
+                }
+                _ => trace!("Discarding connection string param: {}", k),
+            };
+        }
+
+        Ok(Self {
+            connection_limit,
+            config,
+        })
+    }
+}
+
+impl TryFrom<Url> for Mysql {
+    type Error = Error;
+
+    fn try_from(url: Url) -> crate::Result<Self> {
+        let params = MysqlParams::try_from(url)?;
+        Mysql::new(params.config)
+    }
+}
+
 impl From<my::Conn> for Mysql {
     fn from(client: my::Conn) -> Self {
         Self { client }
@@ -22,7 +93,7 @@ impl From<my::Conn> for Mysql {
 }
 
 impl Mysql {
-    pub fn new(conf: mysql::OptsBuilder) -> crate::Result<Self> {
+    pub fn new(conf: my::OptsBuilder) -> crate::Result<Self> {
         let client = my::Conn::new(conf)?;
         Ok(Mysql { client })
     }

@@ -9,6 +9,7 @@ use crate::{
 };
 use rusqlite::NO_PARAMS;
 use std::{collections::HashSet, convert::TryFrom, path::PathBuf};
+use url::Url;
 
 /// A connector interface for the SQLite database
 pub struct Sqlite {
@@ -16,18 +17,74 @@ pub struct Sqlite {
     pub(crate) file_path: PathBuf,
 }
 
-impl TryFrom<&str> for Sqlite {
+pub struct SqliteParams {
+    pub connection_limit: u32,
+    pub file_path: PathBuf,
+}
+
+type ConnectionParams = (Vec<(String, String)>, Vec<(String, String)>);
+
+impl TryFrom<Url> for SqliteParams {
     type Error = Error;
 
-    fn try_from(url: &str) -> crate::Result<Self> {
-        let normalized = url.trim_start_matches("file:");
-        let path = PathBuf::from(&normalized);
+    fn try_from(mut url: Url) -> crate::Result<Self> {
+        let path = url
+            .to_file_path()
+            .map_err(|_| Error::ConversionError("Sqlite path is not a proper file path."))?;
 
         if path.is_dir() {
             Err(Error::DatabaseUrlIsInvalid(url.to_string()))
         } else {
-            Sqlite::new(normalized.to_string())
+            let official = vec![];
+
+            let (supported, unsupported): ConnectionParams = url
+                .query_pairs()
+                .map(|(k, v)| (String::from(k), String::from(v)))
+                .collect::<Vec<(String, String)>>()
+                .into_iter()
+                .partition(|(k, _)| official.contains(&k.as_str()));
+
+            url.query_pairs_mut().clear();
+
+            supported.into_iter().for_each(|(k, v)| {
+                url.query_pairs_mut().append_pair(&k, &v);
+            });
+
+            let mut connection_limit = 1;
+
+            for (k, v) in unsupported.into_iter() {
+                match k.as_ref() {
+                    "connection_limit" => {
+                        let as_int: u32 =
+                            v.parse().map_err(|_| Error::InvalidConnectionArguments)?;
+                        connection_limit = as_int;
+                    }
+                    _ => trace!("Discarding connection string param: {}", k),
+                };
+            }
+
+            Ok(Self {
+                connection_limit,
+                file_path: path,
+            })
         }
+    }
+}
+
+impl TryFrom<Url> for Sqlite {
+    type Error = Error;
+
+    fn try_from(url: Url) -> crate::Result<Self> {
+        let client = rusqlite::Connection::open_in_memory()?;
+
+        let file_path = url
+            .to_file_path()
+            .map_err(|_| Error::ConversionError("Sqlite path is not a proper file path."))?;
+
+        Ok(Sqlite {
+            client,
+            file_path,
+        })
     }
 }
 

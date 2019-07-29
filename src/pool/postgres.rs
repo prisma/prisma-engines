@@ -24,6 +24,20 @@ impl TryFrom<Url> for PrismaConnectionManager<PostgresManager> {
     }
 }
 
+impl TryFrom<PostgresParams> for r2d2::Pool<PrismaConnectionManager<PostgresManager>> {
+    type Error = Error;
+
+    fn try_from(params: PostgresParams) -> crate::Result<Self> {
+        let manager = PrismaConnectionManager::postgres(params.config, Some(params.schema)).unwrap();
+
+        let pool = r2d2::Pool::builder()
+            .max_size(params.connection_limit)
+            .build(manager)?;
+
+        Ok(pool)
+    }
+}
+
 impl PrismaConnectionManager<PostgresManager> {
     pub fn postgres(opts: postgres::Config, schema: Option<String>) -> crate::Result<Self> {
         let mut tls_builder = TlsConnector::builder();
@@ -92,13 +106,7 @@ mod tests {
 
         let url = Url::parse(&conn_string).unwrap();
         let params = PostgresParams::try_from(url).unwrap();
-
-        let manager = PrismaConnectionManager::postgres(params.config, None).unwrap();
-
-        let pool = r2d2::Pool::builder()
-            .max_size(params.connection_limit)
-            .build(manager)
-            .unwrap();
+        let pool = r2d2::Pool::try_from(params).unwrap();
 
         assert_eq!(1, pool.max_size());
     }
@@ -116,13 +124,7 @@ mod tests {
 
         let url = Url::parse(&conn_string).unwrap();
         let params = PostgresParams::try_from(url).unwrap();
-
-        let manager = PrismaConnectionManager::postgres(params.config, None).unwrap();
-
-        let pool = r2d2::Pool::builder()
-            .max_size(params.connection_limit)
-            .build(manager)
-            .unwrap();
+        let pool = r2d2::Pool::try_from(params).unwrap();
 
         assert_eq!(10, pool.max_size());
     }
@@ -139,9 +141,8 @@ mod tests {
         );
 
         let url = Url::parse(&conn_string).unwrap();
-        let manager = PrismaConnectionManager::try_from(url).unwrap();
-
-        let pool = r2d2::Pool::builder().build(manager).unwrap();
+        let params = PostgresParams::try_from(url).unwrap();
+        let pool = r2d2::Pool::try_from(params).unwrap();
 
         let mut conn = pool.get().unwrap();
         let result_set = conn.query_raw("SHOW search_path", &[]).unwrap();
