@@ -84,6 +84,15 @@ impl TryFrom<Url> for PostgresParams {
     }
 }
 
+impl TryFrom<Url> for PostgreSql {
+    type Error = Error;
+
+    fn try_from(url: Url) -> crate::Result<Self> {
+        let params = PostgresParams::try_from(url)?;
+        PostgreSql::new(params.config, Some(params.schema))
+    }
+}
+
 impl From<postgres::Client> for PostgreSql {
     fn from(client: postgres::Client) -> Self {
         Self { client }
@@ -264,5 +273,25 @@ mod tests {
         assert_eq!(row["age"].as_i64(), Some(27));
 
         assert_eq!(row["salary"].as_f64(), Some(20000.0));
+    }
+
+    #[test]
+    fn test_custom_search_path() {
+        let conn_string = format!(
+            "postgresql://{}:{}@{}:{}/{}?schema=musti",
+            env::var("TEST_PG_USER").unwrap(),
+            env::var("TEST_PG_PASSWORD").unwrap(),
+            env::var("TEST_PG_HOST").unwrap(),
+            env::var("TEST_PG_PORT").unwrap(),
+            env::var("TEST_PG_DB").unwrap(),
+        );
+
+        let url = Url::parse(&conn_string).unwrap();
+        let mut client = PostgreSql::try_from(url).unwrap();
+
+        let result_set = client.query_raw("SHOW search_path", &[]).unwrap();
+        let row = result_set.first().unwrap();
+
+        assert_eq!(Some("musti"), row[0].as_str());
     }
 }
