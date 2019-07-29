@@ -9,8 +9,8 @@ use r2d2::ManageConnection;
 pub use mysql::OptsBuilder;
 pub use r2d2_mysql::MysqlConnectionManager;
 
-impl From<OptsBuilder> for PrismaConnectionManager<MysqlConnectionManager> {
-    fn from(opts: OptsBuilder) -> Self {
+impl PrismaConnectionManager<MysqlConnectionManager> {
+    pub fn mysql(opts: OptsBuilder) -> Self {
         Self {
             inner: MysqlConnectionManager::new(opts),
             file_path: None,
