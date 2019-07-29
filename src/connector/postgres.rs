@@ -20,6 +20,7 @@ pub struct PostgreSql {
     client: postgres::Client,
 }
 
+#[derive(Debug)]
 pub struct PostgresParams {
     pub connection_limit: u32,
     pub schema: String,
