@@ -18,12 +18,12 @@ pub struct PostgreSql {
     client: postgres::Client,
 }
 
-pub struct Params {
+pub struct PostgresParams {
     pub(crate) connection_limit: u32,
     pub(crate) config: postgres::Config,
 }
 
-impl TryFrom<Url> for Params {
+impl TryFrom<Url> for PostgresParams {
     type Error = Error;
 
     fn try_from(mut url: Url) -> crate::Result<Self> {
@@ -92,7 +92,7 @@ impl PostgreSql {
     }
 
     pub fn from_url(mut url: Url) -> crate::Result<Self> {
-        let params = Params::try_from(url)?;
+        let params = PostgresParams::try_from(url)?;
         Self::new(params.config)
     }
 }

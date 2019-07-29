@@ -1,6 +1,6 @@
 use super::PrismaConnectionManager;
 use crate::{
-    connector::{PostgreSql, Queryable, postgres::Params},
+    connector::{PostgreSql, Queryable, PostgresParams},
     error::Error,
 };
 use failure::{Compat, Fail};
@@ -35,7 +35,7 @@ impl TryFrom<Url> for PrismaConnectionManager<PostgresManager> {
     type Error = Error;
 
     fn try_from(url: Url) -> crate::Result<Self> {
-        let params = Params::try_from(url)?;
+        let params = PostgresParams::try_from(url)?;
         Self::try_from(params.config)
     }
 }
