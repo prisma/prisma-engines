@@ -19,8 +19,8 @@ pub struct PostgreSql {
 }
 
 pub struct PostgresParams {
-    pub(crate) connection_limit: u32,
-    pub(crate) config: postgres::Config,
+    pub connection_limit: u32,
+    pub config: postgres::Config,
 }
 
 impl TryFrom<Url> for PostgresParams {
