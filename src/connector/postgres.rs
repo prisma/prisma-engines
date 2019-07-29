@@ -13,6 +13,8 @@ use url::Url;
 use tokio_postgres::config::SslMode;
 use std::{str::FromStr, convert::TryFrom};
 
+pub(crate) const DEFAULT_SCHEMA: &str = "public";
+
 /// A connector interface for the PostgreSQL database.
 pub struct PostgreSql {
     client: postgres::Client,
@@ -20,8 +22,11 @@ pub struct PostgreSql {
 
 pub struct PostgresParams {
     pub connection_limit: u32,
+    pub schema: String,
     pub config: postgres::Config,
 }
+
+type ConnectionParams = (Vec<(String, String)>, Vec<(String, String)>);
 
 impl TryFrom<Url> for PostgresParams {
     type Error = Error;
@@ -29,9 +34,8 @@ impl TryFrom<Url> for PostgresParams {
     fn try_from(mut url: Url) -> crate::Result<Self> {
         let official = vec![];
 
-        let (supported, unsupported): (Vec<(String, String)>, Vec<(String, String)>) = url
+        let (supported, unsupported): ConnectionParams = url
             .query_pairs()
-            .into_iter()
             .map(|(k, v)| (String::from(k), String::from(v)))
             .collect::<Vec<(String, String)>>()
             .into_iter()
@@ -45,6 +49,7 @@ impl TryFrom<Url> for PostgresParams {
 
         let mut config = postgres::Config::from_str(&url.to_string())?;
         let mut connection_limit = 1;
+        let mut schema = String::from(DEFAULT_SCHEMA);
 
         for (k, v) in unsupported.into_iter() {
             match k.as_ref() {
@@ -59,6 +64,9 @@ impl TryFrom<Url> for PostgresParams {
                         }
                     };
                 }
+                "schema" => {
+                    schema = v.to_string();
+                }
                 "connection_limit" => {
                     let as_int: u32 = v.parse().map_err(|_| Error::InvalidConnectionArguments)?;
                     connection_limit = as_int;
@@ -69,6 +77,7 @@ impl TryFrom<Url> for PostgresParams {
 
         Ok(Self {
             connection_limit,
+            schema,
             config,
         })
     }
@@ -81,19 +90,22 @@ impl From<postgres::Client> for PostgreSql {
 }
 
 impl PostgreSql {
-    pub fn new(config: postgres::Config) -> crate::Result<Self> {
+    pub fn new(config: postgres::Config, schema: Option<String>) -> crate::Result<Self> {
         let mut tls_builder = TlsConnector::builder();
         tls_builder.danger_accept_invalid_certs(true); // For Heroku
 
         let tls = MakeTlsConnector::new(tls_builder.build()?);
-        let client = config.connect(tls)?;
+        let schema = schema.unwrap_or_else(|| String::from(DEFAULT_SCHEMA));
+
+        let mut client = config.connect(tls)?;
+        client.execute(format!("SET search_path = {}", schema).as_str(), &[])?;
 
         Ok(Self { client })
     }
 
-    pub fn from_url(mut url: Url) -> crate::Result<Self> {
+    pub fn from_url(url: Url) -> crate::Result<Self> {
         let params = PostgresParams::try_from(url)?;
-        Self::new(params.config)
+        Self::new(params.config, Some(params.schema))
     }
 }
 
@@ -188,7 +200,7 @@ mod tests {
 
     #[test]
     fn should_provide_a_database_connection() {
-        let mut connection = PostgreSql::new(get_config()).unwrap();
+        let mut connection = PostgreSql::new(get_config(), None).unwrap();
 
         let res = connection
             .query_raw(
@@ -203,7 +215,7 @@ mod tests {
 
     #[test]
     fn should_provide_a_database_transaction() {
-        let mut connection = PostgreSql::new(get_config()).unwrap();
+        let mut connection = PostgreSql::new(get_config(), None).unwrap();
         let mut tx = connection.start_transaction().unwrap();
 
         let res = tx
@@ -237,7 +249,7 @@ mod tests {
 
     #[test]
     fn should_map_columns_correctly() {
-        let mut connection = PostgreSql::new(get_config()).unwrap();
+        let mut connection = PostgreSql::new(get_config(), None).unwrap();
         connection.query_raw(DROP_TABLE, &[]).unwrap();
         connection.query_raw(TABLE_DEF, &[]).unwrap();
         connection.query_raw(CREATE_USER, &[]).unwrap();
@@ -249,6 +261,7 @@ mod tests {
         assert_eq!(row["id"].as_i64(), Some(1));
         assert_eq!(row["name"].as_str(), Some("Joe"));
         assert_eq!(row["age"].as_i64(), Some(27));
+
         assert_eq!(row["salary"].as_f64(), Some(20000.0));
     }
 }
