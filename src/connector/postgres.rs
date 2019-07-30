@@ -24,6 +24,7 @@ pub struct PostgreSql {
 #[derive(Debug)]
 pub struct PostgresParams {
     pub connection_limit: u32,
+    pub dbname: String,
     pub schema: String,
     pub config: postgres::Config,
 }
@@ -74,14 +75,16 @@ impl TryFrom<Url> for PostgresParams {
         config.host(url.host_str().unwrap_or("localhost"));
         config.port(url.port().unwrap_or(5432));
 
-        match url.path_segments() {
+        let dbname = match url.path_segments() {
             Some(mut segments) => {
-                config.dbname(segments.next().unwrap_or("postgres"));
+                segments.next().unwrap_or("postgres")
             },
             None => {
-                config.dbname("postgres");
+                "postgres"
             },
-        }
+        };
+
+        config.dbname(dbname);
 
         let mut connection_limit = 1;
         let mut schema = String::from(DEFAULT_SCHEMA);
@@ -114,6 +117,7 @@ impl TryFrom<Url> for PostgresParams {
             connection_limit,
             schema,
             config,
+            dbname: dbname.to_string(),
         })
     }
 }
