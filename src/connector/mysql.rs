@@ -4,7 +4,7 @@ mod error;
 use mysql as my;
 use url::Url;
 use percent_encoding::percent_decode;
-use std::convert::TryFrom;
+use std::{convert::TryFrom, time::Duration};
 
 use crate::{
     ast::{Id, ParameterizedValue, Query},
@@ -70,6 +70,7 @@ impl TryFrom<Url> for MysqlParams {
         config.tcp_port(url.port().unwrap_or(3306));
         config.verify_peer(false);
         config.stmt_cache_size(Some(1000));
+        config.tcp_connect_timeout(Some(Duration::from_millis(5000)));
 
         let dbname = match url.path_segments() {
             Some(mut segments) => {
