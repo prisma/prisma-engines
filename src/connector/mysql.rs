@@ -3,6 +3,7 @@ mod error;
 
 use mysql as my;
 use url::Url;
+use percent_encoding::percent_decode;
 use std::convert::TryFrom;
 
 use crate::{
@@ -43,20 +44,40 @@ impl TryFrom<Url> for MysqlParams {
             url.query_pairs_mut().append_pair(&k, &v);
         });
 
-        let db_name = match url.path_segments() {
-            Some(mut segments) => segments.next().unwrap_or("mysql"),
-            None => "mysql",
-        };
-
         let mut config = my::OptsBuilder::new();
+
+        match percent_decode(url.username().as_bytes()).decode_utf8() {
+            Ok(username) => {
+                config.user(Some(username.into_owned()));
+            },
+            Err(_) => {
+                warn!("Couldn't decode username to UTF-8, using the non-decoded version.");
+                config.user(Some(url.username()));
+            }
+        }
+
+        match url.password().and_then(|pw| percent_decode(pw.as_bytes()).decode_utf8().ok()) {
+            Some(password) => {
+                config.pass(Some(password));
+            },
+            None => {
+                config.pass(url.password());
+            }
+        }
 
         config.ip_or_hostname(url.host_str());
         config.tcp_port(url.port().unwrap_or(3306));
-        config.user(Some(url.username()));
-        config.pass(url.password());
-        config.db_name(Some(db_name));
         config.verify_peer(false);
         config.stmt_cache_size(Some(1000));
+
+        match url.path_segments() {
+            Some(mut segments) => {
+                config.db_name(Some(segments.next().unwrap_or("mysql")));
+            },
+            None => {
+                config.db_name(Some("mysql"));
+            },
+        }
 
         let mut connection_limit = 1;
 

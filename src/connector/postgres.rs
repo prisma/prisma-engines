@@ -11,7 +11,8 @@ use native_tls::TlsConnector;
 use tokio_postgres_native_tls::MakeTlsConnector;
 use url::Url;
 use tokio_postgres::config::SslMode;
-use std::{str::FromStr, convert::TryFrom};
+use percent_encoding::percent_decode;
+use std::{borrow::Borrow, convert::TryFrom};
 
 pub(crate) const DEFAULT_SCHEMA: &str = "public";
 
@@ -48,7 +49,40 @@ impl TryFrom<Url> for PostgresParams {
             url.query_pairs_mut().append_pair(&k, &v);
         });
 
-        let mut config = postgres::Config::from_str(&url.to_string())?;
+        let mut config = postgres::Config::new();
+
+        match percent_decode(url.username().as_bytes()).decode_utf8() {
+            Ok(username) => {
+                config.user(username.borrow());
+            },
+            Err(_) => {
+                warn!("Couldn't decode username to UTF-8, using the non-decoded version.");
+                config.user(url.username());
+            }
+        }
+
+        match url.password().and_then(|pw| percent_decode(pw.as_bytes()).decode_utf8().ok()) {
+            Some(password) => {
+                let pw: &str = password.borrow();
+                config.password(pw);
+            },
+            None => {
+                config.password(url.password().unwrap_or(""));
+            }
+        }
+
+        config.host(url.host_str().unwrap_or("localhost"));
+        config.port(url.port().unwrap_or(5432));
+
+        match url.path_segments() {
+            Some(mut segments) => {
+                config.dbname(segments.next().unwrap_or("postgres"));
+            },
+            None => {
+                config.dbname("postgres");
+            },
+        }
+
         let mut connection_limit = 1;
         let mut schema = String::from(DEFAULT_SCHEMA);
 

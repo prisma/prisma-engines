@@ -6,7 +6,6 @@ use crate::{
 use failure::{Compat, Fail};
 use r2d2::ManageConnection;
 use std::{convert::TryFrom, path::PathBuf};
-use url::Url;
 
 pub use r2d2_sqlite::SqliteConnectionManager;
 
@@ -76,7 +75,6 @@ impl ManageConnection for PrismaConnectionManager<SqliteConnectionManager> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::env;
     use url::Url;
 
     #[test]
