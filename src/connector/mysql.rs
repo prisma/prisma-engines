@@ -20,6 +20,7 @@ pub struct Mysql {
 
 pub struct MysqlParams {
     pub connection_limit: u32,
+    pub dbname: String,
     pub config: my::OptsBuilder,
 }
 
@@ -70,14 +71,16 @@ impl TryFrom<Url> for MysqlParams {
         config.verify_peer(false);
         config.stmt_cache_size(Some(1000));
 
-        match url.path_segments() {
+        let dbname = match url.path_segments() {
             Some(mut segments) => {
-                config.db_name(Some(segments.next().unwrap_or("mysql")));
+                segments.next().unwrap_or("mysql")
             },
             None => {
-                config.db_name(Some("mysql"));
+                "mysql"
             },
-        }
+        };
+
+        config.db_name(Some(dbname));
 
         let mut connection_limit = 1;
 
@@ -94,6 +97,7 @@ impl TryFrom<Url> for MysqlParams {
         Ok(Self {
             connection_limit,
             config,
+            dbname: dbname.to_string(),
         })
     }
 }
