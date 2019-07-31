@@ -1,4 +1,5 @@
 use failure::{Error as FError, Fail};
+use std::io;
 
 #[derive(Debug, Fail)]
 pub enum Error {
@@ -29,6 +30,8 @@ pub enum Error {
     ConversionError(&'static str),
     #[fail(display = "The provided arguments are not supported.")]
     InvalidConnectionArguments,
+    #[fail(display = "Error in an I/O operation")]
+    IoError(FError)
 }
 
 #[cfg(any(
@@ -45,5 +48,12 @@ impl From<r2d2::Error> for Error {
 impl From<url::ParseError> for Error {
     fn from(_: url::ParseError) -> Error {
         Error::DatabaseUrlIsInvalid("Error parsing database connection string.".to_string())
+    }
+}
+
+
+impl From<io::Error> for Error {
+    fn from(e: io::Error) -> Error {
+        Error::IoError(e.into())
     }
 }

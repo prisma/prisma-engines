@@ -8,7 +8,7 @@ use crate::{
     visitor::{self, Visitor},
 };
 use rusqlite::NO_PARAMS;
-use std::{collections::HashSet, convert::TryFrom, path::PathBuf};
+use std::{collections::HashSet, convert::TryFrom, path::PathBuf, fs};
 use url::Url;
 
 /// A connector interface for the SQLite database
@@ -24,10 +24,28 @@ pub struct SqliteParams {
 
 type ConnectionParams = (Vec<(String, String)>, Vec<(String, String)>);
 
-impl TryFrom<Url> for SqliteParams {
+impl TryFrom<&str> for SqliteParams {
     type Error = Error;
 
-    fn try_from(mut url: Url) -> crate::Result<Self> {
+    fn try_from(path: &str) -> crate::Result<Self> {
+        let path = path.trim_start_matches("file:");
+        let path_parts: Vec<&str> = path.split("?").collect();
+
+        let path = PathBuf::from(path_parts[0]);
+        let params = path_parts.last();
+        let canon = fs::canonicalize(&path)?;
+
+        let normalized = match params {
+            None => {
+                format!("file:{}", canon.to_str().unwrap())
+            }
+            Some(params) => {
+                format!("file:{}?{}", canon.to_str().unwrap(), params)
+            }
+        };
+
+        let mut url = Url::parse(&normalized)?;
+
         let path = url
             .to_file_path()
             .map_err(|_| Error::ConversionError("Sqlite path is not a proper file path."))?;
@@ -71,15 +89,13 @@ impl TryFrom<Url> for SqliteParams {
     }
 }
 
-impl TryFrom<Url> for Sqlite {
+impl TryFrom<&str> for Sqlite {
     type Error = Error;
 
-    fn try_from(url: Url) -> crate::Result<Self> {
+    fn try_from(path: &str) -> crate::Result<Self> {
+        let params = SqliteParams::try_from(path)?;
         let client = rusqlite::Connection::open_in_memory()?;
-
-        let file_path = url
-            .to_file_path()
-            .map_err(|_| Error::ConversionError("Sqlite path is not a proper file path."))?;
+        let file_path = params.file_path;
 
         Ok(Sqlite {
             client,
@@ -235,5 +251,31 @@ mod tests {
         assert_eq!(row["NAME"].as_str(), Some("Joe"));
         assert_eq!(row["AGE"].as_i64(), Some(27));
         assert_eq!(row["SALARY"].as_f64(), Some(20000.0));
+    }
+
+    #[test]
+    fn test_relative_paths() {
+        let conn_string = "file:Cargo.toml?connection_limit=10";
+        let params = SqliteParams::try_from(conn_string).unwrap();
+        let pwd = fs::canonicalize(PathBuf::from(".")).unwrap();
+
+        assert_eq!(
+            &format!("{}/Cargo.toml", pwd.to_str().unwrap()),
+            params.file_path.to_str().unwrap(),
+        )
+    }
+
+    #[test]
+    fn test_absolute_paths() {
+        let pwd = fs::canonicalize(PathBuf::from(".")).unwrap();
+        let conn_string = format!("file:{}/Cargo.toml?connection_limit=10", pwd.to_str().unwrap());
+        let params = SqliteParams::try_from(conn_string.as_str()).unwrap();
+
+        let expected = conn_string.trim_start_matches("file:").split("?").next().unwrap();
+
+        assert_eq!(
+            expected,
+            params.file_path.to_str().unwrap(),
+        )
     }
 }

@@ -5,7 +5,7 @@ use crate::{
 };
 use failure::{Compat, Fail};
 use r2d2::ManageConnection;
-use std::{convert::TryFrom, path::PathBuf};
+use std::convert::TryFrom;
 
 pub use r2d2_sqlite::SqliteConnectionManager;
 
@@ -13,7 +13,7 @@ impl TryFrom<SqliteParams> for r2d2::Pool<PrismaConnectionManager<SqliteConnecti
     type Error = Error;
 
     fn try_from(params: SqliteParams) -> crate::Result<Self> {
-        let manager = PrismaConnectionManager::sqlite(params.file_path)?;
+        let manager = PrismaConnectionManager::sqlite(params.file_path.to_str().unwrap())?;
 
         let pool = r2d2::Pool::builder()
             .max_size(params.connection_limit)
@@ -24,21 +24,14 @@ impl TryFrom<SqliteParams> for r2d2::Pool<PrismaConnectionManager<SqliteConnecti
 }
 
 impl PrismaConnectionManager<SqliteConnectionManager> {
-    pub fn sqlite<P>(pbuf: P) -> crate::Result<Self>
-    where
-        P: Into<PathBuf>,
-    {
-        let path = pbuf.into();
+    pub fn sqlite(path: &str) -> crate::Result<Self> {
+        let params = SqliteParams::try_from(path)?;
 
-        if path.is_dir() {
-            Err(Error::DatabaseUrlIsInvalid(String::from(path.to_str().unwrap())))
-        } else {
-            Ok(Self {
-                inner: SqliteConnectionManager::memory(),
-                file_path: Some(path),
-                schema: None,
-            })
-        }
+        Ok(Self {
+            inner: SqliteConnectionManager::memory(),
+            file_path: Some(params.file_path),
+            schema: None,
+        })
     }
 }
 
@@ -75,16 +68,11 @@ impl ManageConnection for PrismaConnectionManager<SqliteConnectionManager> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use url::Url;
 
     #[test]
     fn test_default_connection_limit() {
-        let conn_string = format!(
-            "file:///home/naukio/file.db",
-        );
-
-        let url = Url::parse(&conn_string).unwrap();
-        let params = SqliteParams::try_from(url).unwrap();
+        let conn_string = format!("file:Cargo.toml",);
+        let params = SqliteParams::try_from(conn_string.as_str()).unwrap();
         let pool = r2d2::Pool::try_from(params).unwrap();
 
         assert_eq!(1, pool.max_size());
@@ -92,12 +80,9 @@ mod tests {
 
     #[test]
     fn test_custom_connection_limit() {
-        let conn_string = format!(
-            "file:///home/naukio/file.db?connection_limit=10",
-        );
+        let conn_string = format!("file:Cargo.toml?connection_limit=10",);
 
-        let url = Url::parse(&conn_string).unwrap();
-        let params = SqliteParams::try_from(url).unwrap();
+        let params = SqliteParams::try_from(conn_string.as_str()).unwrap();
         let pool = r2d2::Pool::try_from(params).unwrap();
 
         assert_eq!(10, pool.max_size());
