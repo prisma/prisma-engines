@@ -23,10 +23,14 @@ impl<'a> Visitor<'a> for Mysql<'a> {
             parameters: Vec::new(),
         };
 
-        (
+        let result = (
             Mysql::visit_query(&mut mysql, query.into()),
             mysql.parameters,
-        )
+        );
+
+        debug!("query: \"{}\", params: [{}]", result.0, Params(result.1.as_slice()));
+
+        result
     }
 
     fn visit_insert(&mut self, insert: Insert<'a>) -> String {

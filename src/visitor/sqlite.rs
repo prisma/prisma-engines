@@ -25,10 +25,14 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
             parameters: Vec::new(),
         };
 
-        (
+        let result = (
             Sqlite::visit_query(&mut sqlite, query.into()),
             sqlite.parameters,
-        )
+        );
+
+        debug!("query: \"{}\", params: [{}]", result.0, Params(result.1.as_slice()));
+
+        result
     }
 
     fn visit_insert(&mut self, insert: Insert<'a>) -> String {
@@ -506,7 +510,7 @@ mod tests {
             .value("age", 42.69)
             .value("nice", true);
 
-        let (sql, params) = dbg!(Sqlite::build(insert));
+        let (sql, params) = Sqlite::build(insert);
 
         conn.execute(&sql, params.as_slice()).unwrap();
         conn

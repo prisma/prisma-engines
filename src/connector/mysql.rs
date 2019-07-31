@@ -145,7 +145,7 @@ impl Mysql {
 
 impl Queryable for Mysql {
     fn execute(&mut self, q: Query) -> crate::Result<Option<Id>> {
-        let (sql, params) = dbg!(visitor::Mysql::build(q));
+        let (sql, params) = visitor::Mysql::build(q);
 
         let mut stmt = self.client.prepare(&sql)?;
         let result = stmt.execute(params)?;
@@ -154,7 +154,7 @@ impl Queryable for Mysql {
     }
 
     fn query<'a>(&mut self, q: Query<'a>) -> crate::Result<ResultSet> {
-        let (sql, params) = dbg!(visitor::Mysql::build(q));
+        let (sql, params) = visitor::Mysql::build(q);
         self.query_raw(&sql, &params[..])
     }
 

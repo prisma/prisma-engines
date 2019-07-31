@@ -35,7 +35,7 @@ uuid = { version = "0.7", optional = true }
 chrono = { version = "0.4", optional = true }
 url = "1.7"
 percent-encoding = "2"
-log = "0.4"
+log = { version = "*", features = ["max_level_trace", "release_max_level_info"] }
 
 r2d2 = {  version = "0.8", optional = true }
 r2d2_mysql= { version = "*", optional = true }

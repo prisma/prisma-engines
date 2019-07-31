@@ -24,10 +24,14 @@ impl<'a> Visitor<'a> for Postgres<'a> {
             parameters: Vec::new(),
         };
 
-        (
+        let result = (
             Postgres::visit_query(&mut postgres, query.into()),
             postgres.parameters,
-        )
+        );
+
+        debug!("query: \"{}\", params: [{}]", result.0, Params(result.1.as_slice()));
+
+        result
     }
 
     fn add_parameter(&mut self, value: ParameterizedValue<'a>) {

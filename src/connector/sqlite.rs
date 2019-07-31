@@ -126,14 +126,16 @@ impl Sqlite {
 
 impl Queryable for Sqlite {
     fn execute(&mut self, q: Query) -> crate::Result<Option<Id>> {
-        let (sql, params) = dbg!(visitor::Sqlite::build(q));
+        let (sql, params) = visitor::Sqlite::build(q);
+
         self.execute_raw(&sql, &params)?;
 
         Ok(Some(Id::Int(self.client.last_insert_rowid() as usize)))
     }
 
     fn query(&mut self, q: Query) -> crate::Result<ResultSet> {
-        let (sql, params) = dbg!(visitor::Sqlite::build(q));
+        let (sql, params) = visitor::Sqlite::build(q);
+
         self.query_raw(&sql, &params)
     }
 

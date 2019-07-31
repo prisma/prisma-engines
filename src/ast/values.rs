@@ -1,7 +1,10 @@
 use crate::ast::*;
 use crate::error::Error;
-use std::borrow::{Borrow, Cow};
-use std::convert::TryFrom;
+use std::{
+    borrow::{Borrow, Cow},
+    convert::TryFrom,
+    fmt,
+};
 
 #[cfg(feature = "json-1")]
 use serde_json::{Number, Value};
@@ -28,6 +31,46 @@ pub enum ParameterizedValue<'a> {
     Uuid(Uuid),
     #[cfg(feature = "chrono-0_4")]
     DateTime(DateTime<Utc>),
+}
+
+pub(crate) struct Params<'a>(pub(crate) &'a [ParameterizedValue<'a>]);
+
+impl<'a> fmt::Display for Params<'a> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "[")?;
+        for val in self.0.iter() {
+            write!(f, "{},", val)?;
+        }
+        write!(f, "]")
+    }
+}
+
+impl<'a> fmt::Display for ParameterizedValue<'a> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            ParameterizedValue::Null => write!(f, "null"),
+            ParameterizedValue::Integer(val) => write!(f, "{}", val),
+            ParameterizedValue::Real(val) => write!(f, "{}", val),
+            ParameterizedValue::Text(val) => write!(f, "{}", val),
+            ParameterizedValue::Boolean(val) => write!(f, "{}", val),
+            #[cfg(feature = "array")]
+            ParameterizedValue::Array(vals) => {
+                write!(f, "[")?;
+
+                for val in vals.iter() {
+                    write!(f, "{},", val)?;
+                }
+
+                write!(f, "]")
+            }
+            #[cfg(feature = "json-1")]
+            ParameterizedValue::Json(val) => write!(f, "{}", val),
+            #[cfg(feature = "uuid-0_7")]
+            ParameterizedValue::Uuid(val) => write!(f, "{}", val),
+            #[cfg(feature = "chrono-0_4")]
+            ParameterizedValue::DateTime(val) => write!(f, "{}", val),
+        }
+    }
 }
 
 #[cfg(feature = "json-1")]
@@ -208,20 +251,19 @@ impl<'a> ParameterizedValue<'a> {
     }
 
     /// Returns a Vec<T> if the value is an array of T, otherwise `None`.
-    pub fn into_vec<T>(self) -> Option<Vec<T>> where
+    pub fn into_vec<T>(self) -> Option<Vec<T>>
+    where
         // Implement From<ParameterizedValue>
-        T: TryFrom<ParameterizedValue<'a>>
+        T: TryFrom<ParameterizedValue<'a>>,
     {
         match self {
             ParameterizedValue::Array(vec) => {
-                let rslt: Result<Vec<_>, _> = vec.into_iter().map(|pv| {
-                    T::try_from(pv)
-                }).collect();
+                let rslt: Result<Vec<_>, _> = vec.into_iter().map(|pv| T::try_from(pv)).collect();
                 match rslt {
                     Err(_) => None,
-                    Ok(values) => Some(values)
-                } 
-            },
+                    Ok(values) => Some(values),
+                }
+            }
             _ => None,
         }
     }
@@ -293,7 +335,7 @@ impl<'a> TryFrom<ParameterizedValue<'a>> for i64 {
 
     fn try_from(value: ParameterizedValue<'a>) -> Result<i64, Self::Error> {
         value.as_i64().ok_or(Error::ConversionError("Not an i64"))
-     }
+    }
 }
 
 impl<'a> TryFrom<ParameterizedValue<'a>> for f64 {
@@ -301,15 +343,17 @@ impl<'a> TryFrom<ParameterizedValue<'a>> for f64 {
 
     fn try_from(value: ParameterizedValue<'a>) -> Result<f64, Self::Error> {
         value.as_f64().ok_or(Error::ConversionError("Not an f64"))
-     }
+    }
 }
 
 impl<'a> TryFrom<ParameterizedValue<'a>> for String {
     type Error = Error;
 
     fn try_from(value: ParameterizedValue<'a>) -> Result<String, Self::Error> {
-        value.into_string().ok_or(Error::ConversionError("Not a string"))
-     }
+        value
+            .into_string()
+            .ok_or(Error::ConversionError("Not a string"))
+    }
 }
 
 impl<'a> TryFrom<ParameterizedValue<'a>> for bool {
@@ -317,7 +361,7 @@ impl<'a> TryFrom<ParameterizedValue<'a>> for bool {
 
     fn try_from(value: ParameterizedValue<'a>) -> Result<bool, Self::Error> {
         value.as_bool().ok_or(Error::ConversionError("Not a bool"))
-     }
+    }
 }
 
 #[cfg(feature = "chrono-0_4")]
@@ -325,8 +369,10 @@ impl<'a> TryFrom<ParameterizedValue<'a>> for DateTime<Utc> {
     type Error = Error;
 
     fn try_from(value: ParameterizedValue<'a>) -> Result<DateTime<Utc>, Self::Error> {
-        value.as_datetime().ok_or(Error::ConversionError("Not a datetime"))
-     }
+        value
+            .as_datetime()
+            .ok_or(Error::ConversionError("Not a datetime"))
+    }
 }
 
 macro_rules! parameterized_value {
@@ -553,7 +599,7 @@ mod tests {
     #[test]
     fn a_parameterized_value_of_ints_can_be_converted_into_a_vec() {
         let pv = ParameterizedValue::Array(vec![ParameterizedValue::Integer(1)]);
-    
+
         let values: Vec<i64> = pv.into_vec().expect("convert into Vec<i64>");
 
         assert_eq!(values, vec![1]);
@@ -562,27 +608,27 @@ mod tests {
     #[test]
     fn a_parameterized_value_of_reals_can_be_converted_into_a_vec() {
         let pv = ParameterizedValue::Array(vec![ParameterizedValue::Real(1.0)]);
-    
+
         let values: Vec<f64> = pv.into_vec().expect("convert into Vec<f64>");
-        
+
         assert_eq!(values, vec![1.0]);
     }
 
     #[test]
     fn a_parameterized_value_of_texts_can_be_converted_into_a_vec() {
         let pv = ParameterizedValue::Array(vec![ParameterizedValue::Text(Cow::from("test"))]);
-    
+
         let values: Vec<String> = pv.into_vec().expect("convert into Vec<String>");
-        
+
         assert_eq!(values, vec!["test"]);
     }
 
     #[test]
     fn a_parameterized_value_of_booleans_can_be_converted_into_a_vec() {
         let pv = ParameterizedValue::Array(vec![ParameterizedValue::Boolean(true)]);
-    
+
         let values: Vec<bool> = pv.into_vec().expect("convert into Vec<bool>");
-        
+
         assert_eq!(values, vec![true]);
     }
 
@@ -590,18 +636,18 @@ mod tests {
     fn a_parameterized_value_of_datetimes_can_be_converted_into_a_vec() {
         let datetime = DateTime::from_str("2019-07-27T05:30:30Z").expect("parsing date/time");
         let pv = ParameterizedValue::Array(vec![ParameterizedValue::DateTime(datetime)]);
-    
+
         let values: Vec<DateTime<Utc>> = pv.into_vec().expect("convert into Vec<DateTime>");
-        
+
         assert_eq!(values, vec![datetime]);
     }
 
     #[test]
     fn a_parameterized_value_of_an_array_cant_be_converted_into_a_vec_of_the_wrong_type() {
         let pv = ParameterizedValue::Array(vec![ParameterizedValue::Integer(1)]);
-    
+
         let rslt: Option<Vec<f64>> = pv.into_vec();
-        
+
         assert!(rslt.is_none());
     }
 }

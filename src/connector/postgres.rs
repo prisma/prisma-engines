@@ -160,7 +160,7 @@ impl PostgreSql {
 
 impl Queryable for PostgreSql {
     fn execute<'a>(&mut self, q: Query<'a>) -> crate::Result<Option<Id>> {
-        let (sql, params) = dbg!(visitor::Postgres::build(q));
+        let (sql, params) = visitor::Postgres::build(q);
 
         let stmt = self.client.prepare(&sql)?;
         let rows = self
@@ -176,7 +176,7 @@ impl Queryable for PostgreSql {
     }
 
     fn query<'a>(&mut self, q: Query<'a>) -> crate::Result<ResultSet> {
-        let (sql, params) = dbg!(visitor::Postgres::build(q));
+        let (sql, params) = visitor::Postgres::build(q);
         self.query_raw(sql.as_str(), &params[..])
     }
 
