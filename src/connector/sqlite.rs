@@ -8,8 +8,7 @@ use crate::{
     visitor::{self, Visitor},
 };
 use rusqlite::NO_PARAMS;
-use std::{collections::HashSet, convert::TryFrom, path::PathBuf, fs};
-use url::Url;
+use std::{collections::HashSet, convert::TryFrom, path::PathBuf};
 
 /// A connector interface for the SQLite database
 pub struct Sqlite {
@@ -32,53 +31,38 @@ impl TryFrom<&str> for SqliteParams {
         let path_parts: Vec<&str> = path.split("?").collect();
 
         let path = PathBuf::from(path_parts[0]);
-        let params = path_parts.last();
-        let canon = fs::canonicalize(&path)?;
-
-        let normalized = match params {
-            None => {
-                format!("file:{}", canon.to_str().unwrap())
-            }
-            Some(params) => {
-                format!("file:{}?{}", canon.to_str().unwrap(), params)
-            }
-        };
-
-        let mut url = Url::parse(&normalized)?;
-
-        let path = url
-            .to_file_path()
-            .map_err(|_| Error::ConversionError("Sqlite path is not a proper file path."))?;
 
         if path.is_dir() {
-            Err(Error::DatabaseUrlIsInvalid(url.to_string()))
+            Err(Error::DatabaseUrlIsInvalid(
+                path.to_str().unwrap().to_string(),
+            ))
         } else {
             let official = vec![];
-
-            let (supported, unsupported): ConnectionParams = url
-                .query_pairs()
-                .map(|(k, v)| (String::from(k), String::from(v)))
-                .collect::<Vec<(String, String)>>()
-                .into_iter()
-                .partition(|(k, _)| official.contains(&k.as_str()));
-
-            url.query_pairs_mut().clear();
-
-            supported.into_iter().for_each(|(k, v)| {
-                url.query_pairs_mut().append_pair(&k, &v);
-            });
-
             let mut connection_limit = 1;
 
-            for (k, v) in unsupported.into_iter() {
-                match k.as_ref() {
-                    "connection_limit" => {
-                        let as_int: u32 =
-                            v.parse().map_err(|_| Error::InvalidConnectionArguments)?;
-                        connection_limit = as_int;
-                    }
-                    _ => trace!("Discarding connection string param: {}", k),
-                };
+            if path_parts.len() > 1 {
+                let (_, unsupported): ConnectionParams = path_parts
+                    .last()
+                    .unwrap()
+                    .split("&")
+                    .map(|kv| {
+                        let splitted: Vec<&str> = kv.split("=").collect();
+                        (String::from(splitted[0]), String::from(splitted[1]))
+                    })
+                    .collect::<Vec<(String, String)>>()
+                    .into_iter()
+                    .partition(|(k, _)| official.contains(&k.as_str()));
+
+                for (k, v) in unsupported.into_iter() {
+                    match k.as_ref() {
+                        "connection_limit" => {
+                            let as_int: u32 =
+                                v.parse().map_err(|_| Error::InvalidConnectionArguments)?;
+                            connection_limit = as_int;
+                        }
+                        _ => trace!("Discarding connection string param: {}", k),
+                    };
+                }
             }
 
             Ok(Self {
@@ -97,10 +81,7 @@ impl TryFrom<&str> for Sqlite {
         let client = rusqlite::Connection::open_in_memory()?;
         let file_path = params.file_path;
 
-        Ok(Sqlite {
-            client,
-            file_path,
-        })
+        Ok(Sqlite { client, file_path })
     }
 }
 
@@ -238,7 +219,7 @@ mod tests {
 
     #[test]
     fn should_map_columns_correctly() {
-        let mut connection = Sqlite::new(String::from("db/test.db")).unwrap();
+        let mut connection = Sqlite::try_from("file:db/test.db").unwrap();
 
         connection.query_raw(TABLE_DEF, &[]).unwrap();
         connection.query_raw(CREATE_USER, &[]).unwrap();
@@ -251,31 +232,5 @@ mod tests {
         assert_eq!(row["NAME"].as_str(), Some("Joe"));
         assert_eq!(row["AGE"].as_i64(), Some(27));
         assert_eq!(row["SALARY"].as_f64(), Some(20000.0));
-    }
-
-    #[test]
-    fn test_relative_paths() {
-        let conn_string = "file:Cargo.toml?connection_limit=10";
-        let params = SqliteParams::try_from(conn_string).unwrap();
-        let pwd = fs::canonicalize(PathBuf::from(".")).unwrap();
-
-        assert_eq!(
-            &format!("{}/Cargo.toml", pwd.to_str().unwrap()),
-            params.file_path.to_str().unwrap(),
-        )
-    }
-
-    #[test]
-    fn test_absolute_paths() {
-        let pwd = fs::canonicalize(PathBuf::from(".")).unwrap();
-        let conn_string = format!("file:{}/Cargo.toml?connection_limit=10", pwd.to_str().unwrap());
-        let params = SqliteParams::try_from(conn_string.as_str()).unwrap();
-
-        let expected = conn_string.trim_start_matches("file:").split("?").next().unwrap();
-
-        assert_eq!(
-            expected,
-            params.file_path.to_str().unwrap(),
-        )
     }
 }

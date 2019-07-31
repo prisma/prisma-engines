@@ -71,7 +71,7 @@ mod tests {
 
     #[test]
     fn test_default_connection_limit() {
-        let conn_string = format!("file:Cargo.toml",);
+        let conn_string = format!("file:db/test.db",);
         let params = SqliteParams::try_from(conn_string.as_str()).unwrap();
         let pool = r2d2::Pool::try_from(params).unwrap();
 
@@ -80,7 +80,7 @@ mod tests {
 
     #[test]
     fn test_custom_connection_limit() {
-        let conn_string = format!("file:Cargo.toml?connection_limit=10",);
+        let conn_string = format!("file:db/test.db?connection_limit=10",);
 
         let params = SqliteParams::try_from(conn_string.as_str()).unwrap();
         let pool = r2d2::Pool::try_from(params).unwrap();
