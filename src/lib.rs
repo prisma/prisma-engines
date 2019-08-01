@@ -111,4 +111,7 @@ pub mod visitor;
 #[macro_use]
 extern crate log;
 
+#[macro_use]
+extern crate metrics;
+
 pub type Result<T> = std::result::Result<T, error::Error>;

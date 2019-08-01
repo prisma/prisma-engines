@@ -1,6 +1,6 @@
 use super::PrismaConnectionManager;
 use crate::{
-    connector::{Queryable, Sqlite, SqliteParams},
+    connector::{Queryable, Sqlite, SqliteParams, metrics},
     error::Error,
 };
 use failure::{Compat, Fail};
@@ -40,7 +40,7 @@ impl ManageConnection for PrismaConnectionManager<SqliteConnectionManager> {
     type Error = Compat<Error>;
 
     fn connect(&self) -> Result<Self::Connection, Self::Error> {
-        match self.inner.connect() {
+        match metrics::connect("pool.sqlite", || self.inner.connect()) {
             Ok(client) => {
                 let sqlite = Sqlite {
                     client,

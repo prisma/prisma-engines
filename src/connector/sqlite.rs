@@ -3,7 +3,7 @@ mod error;
 
 use crate::{
     ast::{Id, ParameterizedValue, Query},
-    connector::{queryable::*, ResultSet, Transaction},
+    connector::{queryable::*, ResultSet, Transaction, metrics},
     error::Error,
     visitor::{self, Visitor},
 };
@@ -78,7 +78,7 @@ impl TryFrom<&str> for Sqlite {
 
     fn try_from(path: &str) -> crate::Result<Self> {
         let params = SqliteParams::try_from(path)?;
-        let client = rusqlite::Connection::open_in_memory()?;
+        let client = metrics::connect("sqlite", || rusqlite::Connection::open_in_memory())?;
         let file_path = params.file_path;
 
         Ok(Sqlite { client, file_path })
@@ -90,12 +90,7 @@ impl Sqlite {
     where
         P: Into<PathBuf>,
     {
-        let client = rusqlite::Connection::open_in_memory()?;
-
-        Ok(Sqlite {
-            client,
-            file_path: file_path.into(),
-        })
+        Self::try_from(file_path.into().to_str().unwrap())
     }
 
     pub fn attach_database(&mut self, db_name: &str) -> crate::Result<()> {
@@ -126,37 +121,42 @@ impl Sqlite {
 
 impl Queryable for Sqlite {
     fn execute(&mut self, q: Query) -> crate::Result<Option<Id>> {
-        let (sql, params) = visitor::Sqlite::build(q);
-
-        self.execute_raw(&sql, &params)?;
-
-        Ok(Some(Id::Int(self.client.last_insert_rowid() as usize)))
+        metrics::query("sqlite.execute", || {
+            let (sql, params) = visitor::Sqlite::build(q);
+            self.execute_raw(&sql, &params)?;
+            Ok(Some(Id::Int(self.client.last_insert_rowid() as usize)))
+        })
     }
 
     fn query(&mut self, q: Query) -> crate::Result<ResultSet> {
-        let (sql, params) = visitor::Sqlite::build(q);
-
-        self.query_raw(&sql, &params)
+        metrics::query("sqlite.query", || {
+            let (sql, params) = visitor::Sqlite::build(q);
+            self.query_raw(&sql, &params)
+        })
     }
 
     fn query_raw(&mut self, sql: &str, params: &[ParameterizedValue]) -> crate::Result<ResultSet> {
-        let mut stmt = self.client.prepare_cached(sql)?;
-        let mut rows = stmt.query(params)?;
+        metrics::query("sqlite.query_raw", || {
+            let mut stmt = self.client.prepare_cached(sql)?;
+            let mut rows = stmt.query(params)?;
 
-        let mut result = ResultSet::new(rows.to_column_names(), Vec::new());
+            let mut result = ResultSet::new(rows.to_column_names(), Vec::new());
 
-        while let Some(row) = rows.next()? {
-            result.rows.push(row.to_result_row()?);
-        }
+            while let Some(row) = rows.next()? {
+                result.rows.push(row.to_result_row()?);
+            }
 
-        Ok(result)
+            Ok(result)
+        })
     }
 
     fn execute_raw(&mut self, sql: &str, params: &[ParameterizedValue]) -> crate::Result<u64> {
-        let mut stmt = self.client.prepare_cached(sql)?;
-        let changes = stmt.execute(params)?;
+        metrics::query("sqlite.execute_raw", || {
+            let mut stmt = self.client.prepare_cached(sql)?;
+            let changes = stmt.execute(params)?;
 
-        Ok(u64::try_from(changes).unwrap())
+            Ok(u64::try_from(changes).unwrap())
+        })
     }
 
     fn turn_off_fk_constraints(&mut self) -> crate::Result<()> {

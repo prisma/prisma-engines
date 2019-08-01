@@ -1,6 +1,6 @@
 use super::PrismaConnectionManager;
 use crate::{
-    connector::{PostgreSql, PostgresParams, Queryable, DEFAULT_SCHEMA},
+    connector::{PostgreSql, PostgresParams, Queryable, DEFAULT_SCHEMA, metrics},
     error::Error,
 };
 use failure::{Compat, Fail};
@@ -58,7 +58,7 @@ impl ManageConnection for PrismaConnectionManager<PostgresManager> {
     type Error = Compat<Error>;
 
     fn connect(&self) -> Result<Self::Connection, Self::Error> {
-        match self.inner.connect() {
+        match metrics::connect("pool.postgres", || self.inner.connect()) {
             Ok(mut client) => {
                 let schema = self
                     .schema

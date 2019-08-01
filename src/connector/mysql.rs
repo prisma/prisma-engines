@@ -9,7 +9,7 @@ use std::{convert::TryFrom, time::Duration};
 use crate::{
     ast::{Id, ParameterizedValue, Query},
     error::Error,
-    connector::{queryable::*, ResultSet, Transaction},
+    connector::{queryable::*, ResultSet, Transaction, metrics},
     visitor::{self, Visitor},
 };
 
@@ -120,42 +120,28 @@ impl From<my::Conn> for Mysql {
 
 impl Mysql {
     pub fn new(conf: my::OptsBuilder) -> crate::Result<Self> {
-        let client = my::Conn::new(conf)?;
-        Ok(Mysql { client })
-    }
-
-    pub fn new_from_url(url: &str) -> crate::Result<Self> {
-        let mut builder = my::OptsBuilder::new();
-        let url = Url::parse(url)?;
-        let db_name = url.path_segments().and_then(|mut segments| segments.next());
-
-        builder.ip_or_hostname(url.host_str());
-        builder.tcp_port(url.port().unwrap_or(3306));
-        builder.user(Some(url.username()));
-        builder.pass(url.password());
-        builder.db_name(db_name);
-        builder.verify_peer(false);
-        builder.stmt_cache_size(Some(1000));
-
-        let client = my::Conn::new(builder)?;
-
-        Ok(Mysql { client })
+        let client = metrics::connect("mysql", || my::Conn::new(conf))?;
+        Ok(Self::from(client))
     }
 }
 
 impl Queryable for Mysql {
     fn execute(&mut self, q: Query) -> crate::Result<Option<Id>> {
-        let (sql, params) = visitor::Mysql::build(q);
+        metrics::query("mysql.execute", || {
+            let (sql, params) = visitor::Mysql::build(q);
 
-        let mut stmt = self.client.prepare(&sql)?;
-        let result = stmt.execute(params)?;
+            let mut stmt = self.client.prepare(&sql)?;
+            let result = stmt.execute(params)?;
 
-        Ok(Some(Id::from(result.last_insert_id())))
+            Ok(Some(Id::from(result.last_insert_id())))
+        })
     }
 
     fn query<'a>(&mut self, q: Query<'a>) -> crate::Result<ResultSet> {
-        let (sql, params) = visitor::Mysql::build(q);
-        self.query_raw(&sql, &params[..])
+        metrics::query("mysql.query", || {
+            let (sql, params) = visitor::Mysql::build(q);
+            self.query_raw(&sql, &params[..])
+        })
     }
 
     fn query_raw<'a>(
@@ -163,15 +149,17 @@ impl Queryable for Mysql {
         sql: &str,
         params: &[ParameterizedValue<'a>],
     ) -> crate::Result<ResultSet> {
-        let mut stmt = self.client.prepare(&sql)?;
-        let mut result = ResultSet::new(stmt.to_column_names(), Vec::new());
-        let rows = stmt.execute(conversion::conv_params(params))?;
+        metrics::query("mysql.query_raw", || {
+            let mut stmt = self.client.prepare(&sql)?;
+            let mut result = ResultSet::new(stmt.to_column_names(), Vec::new());
+            let rows = stmt.execute(conversion::conv_params(params))?;
 
-        for row in rows {
-            result.rows.push(row?.to_result_row()?);
-        }
+            for row in rows {
+                result.rows.push(row?.to_result_row()?);
+            }
 
-        Ok(result)
+            Ok(result)
+        })
     }
 
     fn execute_raw<'a>(
@@ -179,10 +167,12 @@ impl Queryable for Mysql {
         sql: &str,
         params: &[ParameterizedValue<'a>],
     ) -> crate::Result<u64> {
-        let mut stmt = self.client.prepare(sql)?;
-        let result = stmt.execute(conversion::conv_params(params))?;
+        metrics::query("mysql.execute_raw", || {
+            let mut stmt = self.client.prepare(sql)?;
+            let result = stmt.execute(conversion::conv_params(params))?;
 
-        Ok(result.affected_rows())
+            Ok(result.affected_rows())
+        })
     }
 
     fn turn_off_fk_constraints(&mut self) -> crate::Result<()> {

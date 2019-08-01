@@ -3,7 +3,7 @@ mod error;
 
 use crate::{
     ast::{Id, ParameterizedValue, Query},
-    connector::{queryable::*, ResultSet, Transaction},
+    connector::{queryable::*, ResultSet, Transaction, metrics},
     visitor::{self, Visitor},
     error::Error,
 };
@@ -146,10 +146,10 @@ impl PostgreSql {
         let tls = MakeTlsConnector::new(tls_builder.build()?);
         let schema = schema.unwrap_or_else(|| String::from(DEFAULT_SCHEMA));
 
-        let mut client = config.connect(tls)?;
+        let mut client = metrics::connect("postgres", || config.connect(tls))?;
         client.execute(format!("SET search_path = {}", schema).as_str(), &[])?;
 
-        Ok(Self { client })
+        Ok(Self::from(client))
     }
 
     pub fn from_url(url: Url) -> crate::Result<Self> {
@@ -160,24 +160,28 @@ impl PostgreSql {
 
 impl Queryable for PostgreSql {
     fn execute<'a>(&mut self, q: Query<'a>) -> crate::Result<Option<Id>> {
-        let (sql, params) = visitor::Postgres::build(q);
+        metrics::query("postgres.execute", || {
+            let (sql, params) = visitor::Postgres::build(q);
 
-        let stmt = self.client.prepare(&sql)?;
-        let rows = self
-            .client
-            .query(&stmt, &conversion::conv_params(&params))?;
+            let stmt = self.client.prepare(&sql)?;
+            let rows = self
+                .client
+                .query(&stmt, &conversion::conv_params(&params))?;
 
-        let id: Option<Id> = rows.into_iter().rev().next().map(|row| {
-            let id: Id = row.get(0);
-            id
-        });
+            let id: Option<Id> = rows.into_iter().rev().next().map(|row| {
+                let id: Id = row.get(0);
+                id
+            });
 
-        Ok(id)
+            Ok(id)
+        })
     }
 
     fn query<'a>(&mut self, q: Query<'a>) -> crate::Result<ResultSet> {
-        let (sql, params) = visitor::Postgres::build(q);
-        self.query_raw(sql.as_str(), &params[..])
+        metrics::query("postgres.query", || {
+            let (sql, params) = visitor::Postgres::build(q);
+            self.query_raw(sql.as_str(), &params[..])
+        })
     }
 
     fn query_raw<'a>(
@@ -185,16 +189,18 @@ impl Queryable for PostgreSql {
         sql: &str,
         params: &[ParameterizedValue<'a>],
     ) -> crate::Result<ResultSet> {
-        let stmt = self.client.prepare(&sql)?;
-        let rows = self.client.query(&stmt, &conversion::conv_params(params))?;
+        metrics::query("postgres.query_raw", || {
+            let stmt = self.client.prepare(&sql)?;
+            let rows = self.client.query(&stmt, &conversion::conv_params(params))?;
 
-        let mut result = ResultSet::new(stmt.to_column_names(), Vec::new());
+            let mut result = ResultSet::new(stmt.to_column_names(), Vec::new());
 
-        for row in rows {
-            result.rows.push(row.to_result_row()?);
-        }
+            for row in rows {
+                result.rows.push(row.to_result_row()?);
+            }
 
-        Ok(result)
+            Ok(result)
+        })
     }
 
     fn execute_raw<'a>(
@@ -202,12 +208,14 @@ impl Queryable for PostgreSql {
         sql: &str,
         params: &[ParameterizedValue<'a>],
     ) -> crate::Result<u64> {
-        let stmt = self.client.prepare(&sql)?;
-        let changes = self
-            .client
-            .execute(&stmt, &conversion::conv_params(params))?;
+        metrics::query("postgres.execute_raw", || {
+            let stmt = self.client.prepare(&sql)?;
+            let changes = self
+                .client
+                .execute(&stmt, &conversion::conv_params(params))?;
 
-        Ok(changes)
+            Ok(changes)
+        })
     }
 
     fn turn_off_fk_constraints(&mut self) -> crate::Result<()> {

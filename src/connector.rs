@@ -11,6 +11,8 @@ mod queryable;
 mod result_set;
 mod transaction;
 
+pub(crate) mod metrics;
+
 #[cfg(feature = "mysql-16")]
 pub(crate) mod mysql;
 
