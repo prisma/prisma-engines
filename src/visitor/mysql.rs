@@ -47,7 +47,7 @@ impl<'a> Visitor<'a> for Mysql<'a> {
             let columns: Vec<String> = insert
                 .columns
                 .into_iter()
-                .map(|c| self.visit_column(Column::from(c)))
+                .map(|c| self.visit_column(c))
                 .collect();
 
             let values: Vec<String> = insert
@@ -88,7 +88,7 @@ impl<'a> Visitor<'a> for Mysql<'a> {
             (None, Some(ParameterizedValue::Integer(offset))) if offset < 1 => None,
             (None, Some(offset)) => Some(format!(
                 "LIMIT {} OFFSET {}",
-                self.visit_parameterized(ParameterizedValue::from(9223372036854775807i64)),
+                self.visit_parameterized(ParameterizedValue::from(9_223_372_036_854_775_807i64)),
                 self.visit_parameterized(offset),
             )),
             (Some(limit), None) => Some(format!("LIMIT {}", self.visit_parameterized(limit))),

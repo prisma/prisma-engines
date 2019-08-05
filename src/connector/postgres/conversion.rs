@@ -17,7 +17,7 @@ use uuid::Uuid;
 pub fn conv_params<'a>(
     params: &'a [ParameterizedValue<'a>],
 ) -> Vec<&'a tokio_postgres::types::ToSql> {
-    params.into_iter().map(|x| x as &ToSql).collect::<Vec<_>>()
+    params.iter().map(|x| x as &ToSql).collect::<Vec<_>>()
 }
 
 #[cfg(feature = "uuid-0_7")]
@@ -48,7 +48,7 @@ impl<'a> FromSql<'a> for Id {
             PostgresType::INT8 => Id::Int(i64::from_sql(ty, raw)? as usize),
             #[cfg(feature = "uuid-0_7")]
             PostgresType::UUID => Id::UUID(Uuid::from_sql(ty, raw)?),
-            _ => Id::String(String::from_sql(ty, raw)?.into()),
+            _ => Id::String(String::from_sql(ty, raw)?),
         };
 
         Ok(res)
@@ -70,14 +70,14 @@ impl ToRow for PostgresRow {
                 PostgresType::INT2 => match row.try_get(i)? {
                     Some(val) => {
                         let val: i16 = val;
-                        ParameterizedValue::Integer(val as i64)
+                        ParameterizedValue::Integer(i64::from(val))
                     }
                     None => ParameterizedValue::Null,
                 },
                 PostgresType::INT4 => match row.try_get(i)? {
                     Some(val) => {
                         let val: i32 = val;
-                        ParameterizedValue::Integer(val as i64)
+                        ParameterizedValue::Integer(i64::from(val))
                     }
                     None => ParameterizedValue::Null,
                 },
@@ -99,7 +99,7 @@ impl ToRow for PostgresRow {
                 PostgresType::FLOAT4 => match row.try_get(i)? {
                     Some(val) => {
                         let val: f32 = val;
-                        ParameterizedValue::Real(val as f64)
+                        ParameterizedValue::Real(f64::from(val))
                     }
                     None => ParameterizedValue::Null,
                 },
@@ -133,7 +133,7 @@ impl ToRow for PostgresRow {
                         let val: Vec<i16> = val;
                         ParameterizedValue::Array(
                             val.into_iter()
-                                .map(|x| ParameterizedValue::Integer(x as i64))
+                                .map(|x| ParameterizedValue::Integer(i64::from(x)))
                                 .collect(),
                         )
                     }
@@ -145,7 +145,7 @@ impl ToRow for PostgresRow {
                         let val: Vec<i32> = val;
                         ParameterizedValue::Array(
                             val.into_iter()
-                                .map(|x| ParameterizedValue::Integer(x as i64))
+                                .map(|x| ParameterizedValue::Integer(i64::from(x)))
                                 .collect(),
                         )
                     }
@@ -169,7 +169,7 @@ impl ToRow for PostgresRow {
                         let val: Vec<f32> = val;
                         ParameterizedValue::Array(
                             val.into_iter()
-                                .map(|x| ParameterizedValue::Real(x as f64))
+                                .map(|x| ParameterizedValue::Real(f64::from(x)))
                                 .collect(),
                         )
                     }
@@ -193,7 +193,7 @@ impl ToRow for PostgresRow {
                         let val: Vec<bool> = val;
                         ParameterizedValue::Array(
                             val.into_iter()
-                                .map(|x| ParameterizedValue::Boolean(x))
+                                .map(ParameterizedValue::Boolean)
                                 .collect(),
                         )
                     }
@@ -242,7 +242,7 @@ impl ToRow for PostgresRow {
                 PostgresType::OID => match row.try_get(i)? {
                     Some(val) => {
                         let val: u32 = val;
-                        ParameterizedValue::Integer(val as i64)
+                        ParameterizedValue::Integer(i64::from(val))
                     }
                     None => ParameterizedValue::Null,
                 },
@@ -269,7 +269,7 @@ impl ToRow for PostgresRow {
 }
 
 impl ToColumnNames for PostgresStatement {
-    fn to_column_names<'b>(&'b self) -> Vec<String> {
+    fn to_column_names(&self) -> Vec<String> {
         let mut names = Vec::new();
 
         for column in self.columns() {

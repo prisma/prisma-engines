@@ -30,7 +30,7 @@ impl ResultSet {
     }
 
     /// An iterator of column names.
-    pub fn columns<'a>(&'a self) -> Keys<'a, String, usize> {
+    pub fn columns(&self) -> Keys<'_, String, usize> {
         self.name_to_index.keys()
     }
 
@@ -45,12 +45,12 @@ impl ResultSet {
     }
 
     /// Returns the first row of the `ResultSet`, or None if the set is empty.
-    pub fn first<'a>(&'a self) -> Option<ResultRowRef<'a>> {
+    pub fn first(&self) -> Option<ResultRowRef> {
         self.get(0)
     }
 
     /// Returns a reference to a row in a given position.
-    pub fn get<'a>(&'a self, index: usize) -> Option<ResultRowRef<'a>> {
+    pub fn get(&self, index: usize) -> Option<ResultRowRef> {
         self.rows.get(index).map(|row| ResultRowRef {
             name_to_index: Arc::clone(&self.name_to_index),
             values: row,

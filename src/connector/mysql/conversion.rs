@@ -7,12 +7,12 @@ use chrono::{DateTime, Duration, NaiveDateTime, Utc};
 use mysql as my;
 
 pub fn conv_params<'a>(params: &[ParameterizedValue<'a>]) -> my::Params {
-    if params.len() > 0 {
-        my::Params::Positional(params.iter().map(|x| x.into()).collect::<Vec<my::Value>>())
-    } else {
+    if params.is_empty() {
         // If we don't use explicit 'Empty',
         // mysql crashes with 'internal error: entered unreachable code'
         my::Params::Empty
+    } else {
+        my::Params::Positional(params.iter().map(|x| x.into()).collect::<Vec<my::Value>>())
     }
 }
 
@@ -37,11 +37,11 @@ impl ToRow for my::Row {
                 }
                 #[cfg(feature = "chrono-0_4")]
                 my::Value::Time(is_neg, days, hours, minutes, seconds, micros) => {
-                    let days = Duration::days(*days as i64);
-                    let hours = Duration::hours(*hours as i64);
-                    let minutes = Duration::minutes(*minutes as i64);
-                    let seconds = Duration::seconds(*seconds as i64);
-                    let micros = Duration::microseconds(*micros as i64);
+                    let days = Duration::days(i64::from(*days));
+                    let hours = Duration::hours(i64::from(*hours));
+                    let minutes = Duration::minutes(i64::from(*minutes));
+                    let seconds = Duration::seconds(i64::from(*seconds));
+                    let micros = Duration::microseconds(i64::from(*micros));
 
                     let time = days
                         .checked_add(&hours)
@@ -51,7 +51,7 @@ impl ToRow for my::Row {
                         .unwrap();
 
                     let duration = time.to_std().unwrap();
-                    let f_time = duration.as_secs() as f64 + duration.subsec_micros() as f64 * 1e-6;
+                    let f_time = duration.as_secs() as f64 + f64::from(duration.subsec_micros()) * 1e-6;
 
                     ParameterizedValue::Real(if *is_neg { -f_time } else { f_time })
                 }
@@ -76,7 +76,7 @@ impl ToRow for my::Row {
 }
 
 impl<'a> ToColumnNames for my::Stmt<'a> {
-    fn to_column_names<'b>(&'b self) -> Vec<String> {
+    fn to_column_names(&self) -> Vec<String> {
         let mut names = Vec::new();
 
         if let Some(columns) = self.columns_ref() {

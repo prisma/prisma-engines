@@ -78,7 +78,7 @@ impl ManageConnection for PrismaConnectionManager<PostgresManager> {
     fn is_valid(&self, conn: &mut Self::Connection) -> Result<(), Self::Error> {
         match conn.query_raw("", &[]) {
             Ok(_) => Ok(()),
-            Err(e) => Err(Error::from(e).compat()),
+            Err(e) => Err(e.compat()),
         }
     }
 

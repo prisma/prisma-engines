@@ -269,7 +269,7 @@ pub trait Visitor<'a> {
             DatabaseValue::Select(select) => format!("({})", self.visit_select(select)),
             DatabaseValue::Function(function) => self.visit_function(function),
             DatabaseValue::Asterisk(table) => match table {
-                Some(table) => format!("{}.*", self.visit_table(table, false)),
+                Some(table) => format!("{}.*", self.visit_table(*table, false)),
                 None => String::from("*"),
             },
         }
@@ -506,7 +506,7 @@ pub trait Visitor<'a> {
         let mut result = Vec::new();
 
         for value in grouping.0.into_iter() {
-            result.push(format!("{}", self.visit_database_value(value)));
+            result.push(self.visit_database_value(value).to_string());
         }
 
         result.join(", ")

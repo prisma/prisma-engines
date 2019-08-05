@@ -34,7 +34,7 @@ impl<'a> ToRow for SqliteRow<'a> {
 }
 
 impl<'a> ToColumnNames for SqliteRows<'a> {
-    fn to_column_names<'b>(&'b self) -> Vec<String> {
+    fn to_column_names(&self) -> Vec<String> {
         let mut names = Vec::new();
 
         if let Some(columns) = self.column_names() {

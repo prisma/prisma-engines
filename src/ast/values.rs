@@ -258,7 +258,7 @@ impl<'a> ParameterizedValue<'a> {
     {
         match self {
             ParameterizedValue::Array(vec) => {
-                let rslt: Result<Vec<_>, _> = vec.into_iter().map(|pv| T::try_from(pv)).collect();
+                let rslt: Result<Vec<_>, _> = vec.into_iter().map(T::try_from).collect();
                 match rslt {
                     Err(_) => None,
                     Ok(values) => Some(values),
@@ -283,7 +283,7 @@ pub enum DatabaseValue<'a> {
     /// A database function call
     Function(Function<'a>),
     /// A qualified asterisk to a table
-    Asterisk(Option<Table<'a>>),
+    Asterisk(Option<Box<Table<'a>>>),
 }
 
 /// A quick alias to create an asterisk to a table.
@@ -319,14 +319,14 @@ impl<'a> From<String> for ParameterizedValue<'a> {
 impl<'a> From<usize> for ParameterizedValue<'a> {
     #[inline]
     fn from(that: usize) -> Self {
-        ParameterizedValue::Integer(that as i64)
+        ParameterizedValue::Integer(i64::try_from(that).unwrap())
     }
 }
 
 impl<'a> From<i32> for ParameterizedValue<'a> {
     #[inline]
     fn from(that: i32) -> Self {
-        ParameterizedValue::Integer(that as i64)
+        ParameterizedValue::Integer(i64::try_from(that).unwrap())
     }
 }
 

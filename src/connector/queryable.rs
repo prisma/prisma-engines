@@ -2,11 +2,11 @@ use super::{ResultSet, Transaction};
 use crate::ast::*;
 
 pub trait ToRow {
-    fn to_result_row<'b>(&'b self) -> crate::Result<Vec<ParameterizedValue<'static>>>;
+    fn to_result_row(&self) -> crate::Result<Vec<ParameterizedValue<'static>>>;
 }
 
 pub trait ToColumnNames {
-    fn to_column_names<'b>(&'b self) -> Vec<String>;
+    fn to_column_names(&self) -> Vec<String>;
 }
 
 /// Represents a connection or a transaction that can be queried.
@@ -49,7 +49,7 @@ pub trait Queryable {
 
     /// Runs a command in the database, for queries that can't be run using
     /// prepared statements.
-    fn raw_cmd<'a>(&mut self, cmd: &str) -> crate::Result<()>;
+    fn raw_cmd(&mut self, cmd: &str) -> crate::Result<()>;
 
     /// For inserting data. Returns the ID of the last inserted row.
     fn insert(&mut self, q: Insert) -> crate::Result<Option<Id>> {

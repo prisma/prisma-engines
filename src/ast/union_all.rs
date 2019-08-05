@@ -24,7 +24,7 @@ impl<'a> UnionAll<'a> {
     /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
     /// let s1 = Select::default().value(1);
     /// let s2 = Select::default().value(2);
-    /// let (sql, params) = Sqlite::build(UnionAll::from(s1).add(s2));
+    /// let (sql, params) = Sqlite::build(UnionAll::from(s1).union_all(s2));
     ///
     /// assert_eq!("(SELECT ?) UNION ALL (SELECT ?)", sql);
     ///
@@ -33,7 +33,7 @@ impl<'a> UnionAll<'a> {
     ///     ParameterizedValue::from(2)
     /// ], params);
     /// ```
-    pub fn add(mut self, q: Select<'a>) -> Self {
+    pub fn union_all(mut self, q: Select<'a>) -> Self {
         self.0.push(q);
         self
     }

@@ -61,7 +61,7 @@ impl ResultRow {
     }
 
     /// Make a referring [ResultRowRef](struct.ResultRowRef.html).
-    pub fn as_ref<'a>(&'a self) -> ResultRowRef<'a> {
+    pub fn as_ref(&self) -> ResultRowRef {
         ResultRowRef {
             name_to_index: Arc::clone(&self.name_to_index),
             values: &self.values,

@@ -49,7 +49,7 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
             let columns: Vec<String> = insert
                 .columns
                 .into_iter()
-                .map(|c| self.visit_column(Column::from(c)))
+                .map(|c| self.visit_column(c))
                 .collect();
 
             let values: Vec<String> = insert

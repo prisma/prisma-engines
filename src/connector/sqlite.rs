@@ -28,7 +28,7 @@ impl TryFrom<&str> for SqliteParams {
 
     fn try_from(path: &str) -> crate::Result<Self> {
         let path = path.trim_start_matches("file:");
-        let path_parts: Vec<&str> = path.split("?").collect();
+        let path_parts: Vec<&str> = path.split('?').collect();
 
         let path = PathBuf::from(path_parts[0]);
 
@@ -44,9 +44,9 @@ impl TryFrom<&str> for SqliteParams {
                 let (_, unsupported): ConnectionParams = path_parts
                     .last()
                     .unwrap()
-                    .split("&")
+                    .split('&')
                     .map(|kv| {
-                        let splitted: Vec<&str> = kv.split("=").collect();
+                        let splitted: Vec<&str> = kv.split('=').collect();
                         (String::from(splitted[0]), String::from(splitted[1]))
                     })
                     .collect::<Vec<(String, String)>>()
@@ -78,7 +78,7 @@ impl TryFrom<&str> for Sqlite {
 
     fn try_from(path: &str) -> crate::Result<Self> {
         let params = SqliteParams::try_from(path)?;
-        let client = metrics::connect("sqlite", || rusqlite::Connection::open_in_memory())?;
+        let client = metrics::connect("sqlite", rusqlite::Connection::open_in_memory)?;
         let file_path = params.file_path;
 
         Ok(Sqlite { client, file_path })

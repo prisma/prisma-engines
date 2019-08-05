@@ -15,7 +15,7 @@ impl From<rusqlite::Error> for Error {
                 Some(description),
             ) => {
                 let splitted: Vec<&str> = description.split(": ").collect();
-                let splitted: Vec<&str> = splitted[1].split(".").collect();
+                let splitted: Vec<&str> = splitted[1].split('.').collect();
 
                 Error::UniqueConstraintViolation {
                     field_name: splitted[1].into(),
@@ -30,7 +30,7 @@ impl From<rusqlite::Error> for Error {
                 Some(description),
             ) => {
                 let splitted: Vec<&str> = description.split(": ").collect();
-                let splitted: Vec<&str> = splitted[1].split(".").collect();
+                let splitted: Vec<&str> = splitted[1].split('.').collect();
 
                 Error::UniqueConstraintViolation {
                     field_name: splitted[1].into(),
@@ -45,7 +45,7 @@ impl From<rusqlite::Error> for Error {
                 Some(description),
             ) => {
                 let splitted: Vec<&str> = description.split(": ").collect();
-                let splitted: Vec<&str> = splitted[1].split(".").collect();
+                let splitted: Vec<&str> = splitted[1].split('.').collect();
 
                 Error::NullConstraintViolation {
                     field_name: splitted[1].into(),

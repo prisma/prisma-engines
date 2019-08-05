@@ -70,7 +70,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
             let columns: Vec<String> = insert
                 .columns
                 .into_iter()
-                .map(|c| self.visit_column(Column::from(c)))
+                .map(|c| self.visit_column(c))
                 .collect();
 
             let values: Vec<String> = insert
@@ -86,9 +86,8 @@ impl<'a> Visitor<'a> for Postgres<'a> {
             ))
         }
 
-        match insert.on_conflict {
-            Some(OnConflict::DoNothing) => result.push(String::from("ON CONFLICT DO NOTHING")),
-            None => (),
+        if let Some(OnConflict::DoNothing) = insert.on_conflict {
+            result.push(String::from("ON CONFLICT DO NOTHING"));
         };
 
         if let Some(returning) = insert.returning {

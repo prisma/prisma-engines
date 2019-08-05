@@ -4,7 +4,7 @@ use std::ops;
 
 pub trait ValueIndex<RowType, ReturnValue>: private::Sealed {
     #[doc(hidden)]
-    fn index_into<'a>(self, row: &'a RowType) -> &'a ReturnValue;
+    fn index_into(self, row: &RowType) -> &ReturnValue;
 }
 
 mod private {
