@@ -109,6 +109,7 @@ impl<'a> From<ParameterizedValue<'a>> for MyValue {
             ParameterizedValue::Real(f) => MyValue::Float(f),
             ParameterizedValue::Text(s) => MyValue::Bytes((&*s).as_bytes().to_vec()),
             ParameterizedValue::Boolean(b) => MyValue::Int(b as i64),
+            ParameterizedValue::Char(c) => MyValue::Bytes(vec![c as u8]),
             #[cfg(feature = "json-1")]
             ParameterizedValue::Json(json) => {
                 let s = serde_json::to_string(&json).expect("Cannot convert JSON to String.");

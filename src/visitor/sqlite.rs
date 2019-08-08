@@ -110,6 +110,7 @@ impl<'a> ToSql for ParameterizedValue<'a> {
             ParameterizedValue::Real(float) => ToSqlOutput::from(*float),
             ParameterizedValue::Text(cow) => ToSqlOutput::from(&**cow),
             ParameterizedValue::Boolean(boo) => ToSqlOutput::from(*boo),
+            ParameterizedValue::Char(c) => ToSqlOutput::from(*c as u8),
             #[cfg(feature = "array")]
             ParameterizedValue::Array(_) => unimplemented!("Arrays are not supported for sqlite."),
             #[cfg(feature = "json-1")]

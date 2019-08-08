@@ -246,6 +246,13 @@ impl ToRow for PostgresRow {
                     }
                     None => ParameterizedValue::Null,
                 },
+                PostgresType::CHAR => match row.try_get(i)? {
+                    Some(val) => {
+                        let val: i8 = val;
+                        ParameterizedValue::Char((val as u8) as char)
+                    }
+                    None => ParameterizedValue::Null,
+                },
                 _ => match row.try_get(i)? {
                     Some(val) => {
                         let val: String = val;

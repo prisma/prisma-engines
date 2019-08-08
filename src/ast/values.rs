@@ -23,6 +23,7 @@ pub enum ParameterizedValue<'a> {
     Real(f64),
     Text(Cow<'a, str>),
     Boolean(bool),
+    Char(char),
     #[cfg(feature = "array")]
     Array(Vec<ParameterizedValue<'a>>),
     #[cfg(feature = "json-1")]
@@ -53,6 +54,7 @@ impl<'a> fmt::Display for ParameterizedValue<'a> {
             ParameterizedValue::Real(val) => write!(f, "{}", val),
             ParameterizedValue::Text(val) => write!(f, "{}", val),
             ParameterizedValue::Boolean(val) => write!(f, "{}", val),
+            ParameterizedValue::Char(val) => write!(f, "{}", val),
             #[cfg(feature = "array")]
             ParameterizedValue::Array(vals) => {
                 write!(f, "[")?;
@@ -82,6 +84,11 @@ impl<'a> From<ParameterizedValue<'a>> for Value {
             ParameterizedValue::Real(f) => Value::Number(Number::from_f64(f).unwrap()),
             ParameterizedValue::Text(cow) => Value::String(cow.into_owned()),
             ParameterizedValue::Boolean(b) => Value::Bool(b),
+            ParameterizedValue::Char(c) => {
+                let bytes = [c as u8];
+                let s = std::str::from_utf8(&bytes).expect("interpret byte as UTF-8").to_string();
+                Value::String(s)
+            },
             ParameterizedValue::Json(v) => v,
             #[cfg(feature = "array")]
             ParameterizedValue::Array(v) => Value::Array(v.into_iter().map(Value::from).collect()),
@@ -114,6 +121,14 @@ impl<'a> ParameterizedValue<'a> {
     pub fn as_str(&self) -> Option<&str> {
         match self {
             ParameterizedValue::Text(cow) => Some(cow.borrow()),
+            _ => None,
+        }
+    }
+
+    /// Returns a char if the value is a char, otherwise `None`.
+    pub fn as_char(&self) -> Option<char> {
+        match self {
+            ParameterizedValue::Char(c) => Some(*c),
             _ => None,
         }
     }
