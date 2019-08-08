@@ -130,6 +130,7 @@ impl<'a> ToSql for ParameterizedValue<'a> {
             },
             ParameterizedValue::Text(string) => string.to_sql(ty, out),
             ParameterizedValue::Boolean(boo) => boo.to_sql(ty, out),
+            ParameterizedValue::Char(c) => (*c as i8).to_sql(ty, out),
             #[cfg(feature = "array")]
             ParameterizedValue::Array(vec) => vec.to_sql(ty, out),
             #[cfg(feature = "json-1")]
@@ -166,6 +167,7 @@ impl<'a> ToSql for ParameterizedValue<'a> {
             },
             ParameterizedValue::Text(string) => string.to_sql_checked(ty, out),
             ParameterizedValue::Boolean(boo) => boo.to_sql_checked(ty, out),
+            ParameterizedValue::Char(c) => (*c as i8).to_sql_checked(ty, out),
             #[cfg(feature = "array")]
             ParameterizedValue::Array(vec) => vec.to_sql_checked(ty, out),
             #[cfg(feature = "json-1")]
