@@ -121,22 +121,18 @@ impl Sqlite {
 
 impl Queryable for Sqlite {
     fn execute(&mut self, q: Query) -> crate::Result<Option<Id>> {
-        metrics::query("sqlite.execute", || {
-            let (sql, params) = visitor::Sqlite::build(q);
-            self.execute_raw(&sql, &params)?;
-            Ok(Some(Id::Int(self.client.last_insert_rowid() as usize)))
-        })
+        let (sql, params) = visitor::Sqlite::build(q);
+        self.execute_raw(&sql, &params)?;
+        Ok(Some(Id::Int(self.client.last_insert_rowid() as usize)))
     }
 
     fn query(&mut self, q: Query) -> crate::Result<ResultSet> {
-        metrics::query("sqlite.query", || {
-            let (sql, params) = visitor::Sqlite::build(q);
-            self.query_raw(&sql, &params)
-        })
+        let (sql, params) = visitor::Sqlite::build(q);
+        self.query_raw(&sql, &params)
     }
 
     fn query_raw(&mut self, sql: &str, params: &[ParameterizedValue]) -> crate::Result<ResultSet> {
-        metrics::query("sqlite.query_raw", || {
+        metrics::query("sqlite.query_raw", sql, || {
             let mut stmt = self.client.prepare_cached(sql)?;
             let mut rows = stmt.query(params)?;
 
@@ -151,7 +147,7 @@ impl Queryable for Sqlite {
     }
 
     fn execute_raw(&mut self, sql: &str, params: &[ParameterizedValue]) -> crate::Result<u64> {
-        metrics::query("sqlite.execute_raw", || {
+        metrics::query("sqlite.execute_raw", sql, || {
             let mut stmt = self.client.prepare_cached(sql)?;
             let changes = stmt.execute(params)?;
 

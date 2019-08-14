@@ -1,18 +1,16 @@
 use std::time::Instant;
 
-pub(crate) fn query<F, T>(tag: &'static str, f: F) -> T
+pub(crate) fn query<F, T>(tag: &'static str, query: &str, f: F) -> T
 where
     F: FnOnce() -> T,
 {
-    counter!(format!("{}.query.count", tag), 1);
-    time(format!("{}.query.time", tag), f)
+    time(format!("{}.query.time ({})", tag, query), f)
 }
 
 pub(crate) fn connect<F, T>(tag: &'static str, f: F) -> T
 where
     F: FnOnce() -> T,
 {
-    counter!(format!("{}.connect.count", tag), 1);
     time(format!("{}.connect.time", tag), f)
 }
 
