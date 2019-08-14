@@ -87,7 +87,7 @@ impl TryFrom<Url> for PostgresParams {
         config.dbname(dbname);
         config.connect_timeout(Duration::from_millis(5000));
 
-        let mut connection_limit = 1;
+        let mut connection_limit = 2;
         let mut schema = String::from(DEFAULT_SCHEMA);
 
         for (k, v) in unsupported.into_iter() {

@@ -38,7 +38,7 @@ impl TryFrom<&str> for SqliteParams {
             ))
         } else {
             let official = vec![];
-            let mut connection_limit = 1;
+            let mut connection_limit = 2;
 
             if path_parts.len() > 1 {
                 let (_, unsupported): ConnectionParams = path_parts

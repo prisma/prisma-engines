@@ -75,7 +75,7 @@ mod tests {
         let params = SqliteParams::try_from(conn_string.as_str()).unwrap();
         let pool = r2d2::Pool::try_from(params).unwrap();
 
-        assert_eq!(1, pool.max_size());
+        assert_eq!(2, pool.max_size());
     }
 
     #[test]

@@ -83,7 +83,7 @@ impl TryFrom<Url> for MysqlParams {
 
         config.db_name(Some(dbname));
 
-        let mut connection_limit = 1;
+        let mut connection_limit = 2;
 
         for (k, v) in unsupported.into_iter() {
             match k.as_ref() {
