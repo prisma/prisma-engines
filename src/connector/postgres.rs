@@ -147,7 +147,7 @@ impl PostgreSql {
         let schema = schema.unwrap_or_else(|| String::from(DEFAULT_SCHEMA));
 
         let mut client = metrics::connect("postgres", || config.connect(tls))?;
-        client.execute(format!("SET search_path = {}", schema).as_str(), &[])?;
+        client.execute(format!("SET search_path = \"{}\"", schema).as_str(), &[])?;
 
         Ok(Self::from(client))
     }
@@ -324,7 +324,7 @@ mod tests {
     #[test]
     fn test_custom_search_path() {
         let conn_string = format!(
-            "postgresql://{}:{}@{}:{}/{}?schema=musti",
+            "postgresql://{}:{}@{}:{}/{}?schema=musti-test",
             env::var("TEST_PG_USER").unwrap(),
             env::var("TEST_PG_PASSWORD").unwrap(),
             env::var("TEST_PG_HOST").unwrap(),
@@ -338,6 +338,6 @@ mod tests {
         let result_set = client.query_raw("SHOW search_path", &[]).unwrap();
         let row = result_set.first().unwrap();
 
-        assert_eq!(Some("musti"), row[0].as_str());
+        assert_eq!(Some("musti-test"), row[0].as_str());
     }
 }

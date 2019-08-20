@@ -66,7 +66,7 @@ impl ManageConnection for PrismaConnectionManager<PostgresManager> {
                     .map(|s| s.as_str())
                     .unwrap_or(DEFAULT_SCHEMA);
 
-                match client.execute(format!("SET search_path = {}", schema).as_str(), &[]) {
+                match client.execute(format!("SET search_path = \"{}\"", schema).as_str(), &[]) {
                     Ok(_) => Ok(PostgreSql::from(client)),
                     Err(e) => Err(Error::from(e).compat()),
                 }
@@ -132,7 +132,7 @@ mod tests {
     #[test]
     fn test_custom_search_path() {
         let conn_string = format!(
-            "postgresql://{}:{}@{}:{}/{}?schema=musti",
+            "postgresql://{}:{}@{}:{}/{}?schema=musti-test",
             env::var("TEST_PG_USER").unwrap(),
             env::var("TEST_PG_PASSWORD").unwrap(),
             env::var("TEST_PG_HOST").unwrap(),
@@ -148,6 +148,6 @@ mod tests {
         let result_set = conn.query_raw("SHOW search_path", &[]).unwrap();
         let row = result_set.first().unwrap();
 
-        assert_eq!(Some("musti"), row[0].as_str());
+        assert_eq!(Some("musti-test"), row[0].as_str());
     }
 }
