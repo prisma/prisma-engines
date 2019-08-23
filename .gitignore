@@ -8,7 +8,6 @@ connector_to_test
 *.class
 *.log
 .coursier
-.envrc
 .ivy2
 
 # Idea
