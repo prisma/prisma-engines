@@ -1,8 +1,8 @@
 use crate::*;
 use database_introspection::*;
 use migration_connector::*;
-use std::sync::Arc;
 use sql_renderer::SqlRenderer;
+use std::sync::Arc;
 
 pub struct SqlDatabaseStepApplier {
     pub sql_family: SqlFamily,
@@ -102,10 +102,9 @@ fn render_raw_sql(step: &SqlMigrationStep, sql_family: SqlFamily, schema_name: &
                 create_table_suffix(sql_family),
             )
         }
-        SqlMigrationStep::DropTable(DropTable { name }) => format!(
-            "DROP TABLE {};",
-            renderer.quote_with_schema(&schema_name, &name)
-        ),
+        SqlMigrationStep::DropTable(DropTable { name }) => {
+            format!("DROP TABLE {};", renderer.quote_with_schema(&schema_name, &name))
+        }
         SqlMigrationStep::DropTables(DropTables { names }) => {
             let fully_qualified_names: Vec<String> = names
                 .iter()
@@ -115,7 +114,7 @@ fn render_raw_sql(step: &SqlMigrationStep, sql_family: SqlFamily, schema_name: &
         }
         SqlMigrationStep::RenameTable { name, new_name } => {
             let new_name = match sql_family {
-                SqlFamily::Sqlite => format!("{}", renderer.quote(new_name)),
+                SqlFamily::Sqlite => renderer.quote(new_name),
                 _ => renderer.quote_with_schema(&schema_name, &new_name),
             };
             format!(
@@ -129,8 +128,7 @@ fn render_raw_sql(step: &SqlMigrationStep, sql_family: SqlFamily, schema_name: &
             for change in changes.clone() {
                 match change {
                     TableChange::AddColumn(AddColumn { column }) => {
-                        let col_sql =
-                            renderer.render_column(&schema_name, &table, &column, true);
+                        let col_sql = renderer.render_column(&schema_name, &table, &column, true);
                         lines.push(format!("ADD COLUMN {}", col_sql));
                     }
                     TableChange::DropColumn(DropColumn { name }) => {
@@ -181,10 +179,9 @@ fn render_raw_sql(step: &SqlMigrationStep, sql_family: SqlFamily, schema_name: &
                 renderer.quote(&name),
                 renderer.quote_with_schema(&schema_name, &table),
             ),
-            SqlFamily::Postgres | SqlFamily::Sqlite => format!(
-                "DROP INDEX {}",
-                renderer.quote_with_schema(&schema_name, &name),
-            ),
+            SqlFamily::Postgres | SqlFamily::Sqlite => {
+                format!("DROP INDEX {}", renderer.quote_with_schema(&schema_name, &name),)
+            }
         },
         SqlMigrationStep::RawSql { raw } => raw.to_string(),
     }

@@ -1,5 +1,5 @@
-use database_introspection::*;
 use super::common::*;
+use database_introspection::*;
 
 pub struct PostgresRenderer {}
 impl super::SqlRenderer for PostgresRenderer {
@@ -7,13 +7,7 @@ impl super::SqlRenderer for PostgresRenderer {
         format!("\"{}\"", name)
     }
 
-    fn render_column(
-        &self,
-        schema_name: &str,
-        table: &Table,
-        column: &Column,
-        _add_fk_prefix: bool,
-    ) -> String {
+    fn render_column(&self, schema_name: &str, table: &Table, column: &Column, _add_fk_prefix: bool) -> String {
         let column_name = self.quote(&column.name);
         let tpe_str = self.render_column_type(&column.tpe);
         let nullability_str = render_nullability(&table, &column);
