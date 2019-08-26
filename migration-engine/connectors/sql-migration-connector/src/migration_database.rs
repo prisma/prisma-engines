@@ -18,7 +18,12 @@ pub struct MigrationDatabaseWrapper {
 }
 
 impl database_introspection::IntrospectionConnection for MigrationDatabaseWrapper {
-    fn query_raw(&self, sql: &str, schema: &str, params: &[ParameterizedValue]) -> prisma_query::Result<prisma_query::connector::ResultSet> {
+    fn query_raw(
+        &self,
+        sql: &str,
+        schema: &str,
+        params: &[ParameterizedValue],
+    ) -> prisma_query::Result<prisma_query::connector::ResultSet> {
         self.database.query_raw(schema, sql, params)
     }
 }
