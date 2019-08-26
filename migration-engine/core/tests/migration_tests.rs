@@ -92,6 +92,28 @@ fn adding_an_id_field_with_a_special_name_must_work() {
 }
 
 #[test]
+fn adding_an_id_field_of_type_int_must_work() {
+    test_each_connector(|sql_family, api| {
+        let dm2 = r#"
+            model Test {
+                myId Int @id
+            }
+        "#;
+        let result = infer_and_apply(api, &dm2);
+        let column = result.table_bang("Test").column_bang("myId");
+        match sql_family {
+            SqlFamily::Postgres => {
+                let sequence = result.get_sequence("Test_myId_seq").expect("sequence must exist");
+                let default = column.default.as_ref().expect("Must have nextval default");
+                assert_eq!(default.contains(&sequence.name), true);
+                assert_eq!(default, &format!("nextval('\"{}\"'::regclass)", sequence.name))
+            }
+            _ => assert_eq!(column.auto_increment, true),
+        }
+    });
+}
+
+#[test]
 fn removing_a_scalar_field_must_work() {
     test_each_connector(|_, api| {
         let dm1 = r#"

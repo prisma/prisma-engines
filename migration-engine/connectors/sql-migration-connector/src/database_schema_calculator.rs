@@ -53,8 +53,14 @@ impl<'a> DatabaseSchemaCalculator<'a> {
                                 name: f.db_name(),
                                 tpe: column_type(f),
                                 arity: column_arity(&f),
-                                default: Some(f.migration_value_new(&self.data_model)),
-                                auto_increment: false,
+                                default: f.migration_value_new(&self.data_model),
+                                auto_increment: {
+                                    if column_type(f).family == ColumnTypeFamily::Int {
+                                        f.is_id()
+                                    } else {
+                                        false
+                                    }
+                                },
                             })
                         }
                         _ => None,
@@ -283,7 +289,7 @@ pub trait FieldExtensions {
 
     fn migration_value(&self, datamodel: &Datamodel) -> Value;
 
-    fn migration_value_new(&self, datamodel: &Datamodel) -> String;
+    fn migration_value_new(&self, datamodel: &Datamodel) -> Option<String>;
 }
 
 impl FieldExtensions for Field {
@@ -309,7 +315,7 @@ impl FieldExtensions for Field {
             .unwrap_or_else(|| default_migration_value(&self.field_type, datamodel))
     }
 
-    fn migration_value_new(&self, datamodel: &Datamodel) -> String {
+    fn migration_value_new(&self, datamodel: &Datamodel) -> Option<String> {
         let value = match &self.default_value {
             Some(x) => match x {
                 PrismaValue::Expression(_, _, _) => default_migration_value(&self.field_type, datamodel),
@@ -317,7 +323,7 @@ impl FieldExtensions for Field {
             },
             None => default_migration_value(&self.field_type, datamodel),
         };
-        match value {
+        let result = match value {
             Value::Boolean(x) => {
                 if x {
                     "true".to_string()
@@ -339,6 +345,11 @@ impl FieldExtensions for Field {
             Value::Expression(_, _, _) => {
                 unreachable!("expressions must have been filtered out in the preceding pattern match")
             }
+        };
+        if self.is_id() {
+            None
+        } else {
+            Some(result)
         }
     }
 }

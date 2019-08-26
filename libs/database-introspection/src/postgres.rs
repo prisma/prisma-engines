@@ -39,15 +39,15 @@ impl IntrospectionConnector {
 
     fn get_table_names(&self, schema: &str) -> Vec<String> {
         debug!("Getting table names");
-        let sql = format!(
-            "SELECT table_name as table_name FROM information_schema.tables
-            WHERE table_schema = '{}'
+        let sql = "SELECT table_name as table_name FROM information_schema.tables
+            WHERE table_schema = $1
             -- Views are not supported yet
             AND table_type = 'BASE TABLE'
-            ORDER BY table_name",
-            schema
-        );
-        let rows = self.conn.query_raw(&sql, schema).expect("get table names ");
+            ORDER BY table_name";
+        let rows = self
+            .conn
+            .query_raw(sql, schema, &[schema.into()])
+            .expect("get table names ");
         let names = rows
             .into_iter()
             .map(|row| {
@@ -76,14 +76,14 @@ impl IntrospectionConnector {
     }
 
     fn get_columns(&self, schema: &str, table: &str) -> Vec<Column> {
-        let sql = format!(
-            "SELECT column_name, udt_name, column_default, is_nullable, is_identity, data_type
+        let sql = "SELECT column_name, udt_name, column_default, is_nullable, is_identity, data_type
             FROM information_schema.columns
-            WHERE table_schema = '{}' AND table_name  = '{}'
-            ORDER BY column_name",
-            schema, table
-        );
-        let rows = self.conn.query_raw(&sql, schema).expect("querying for columns");
+            WHERE table_schema = $1 AND table_name = $2
+            ORDER BY column_name";
+        let rows = self
+            .conn
+            .query_raw(&sql, schema, &[schema.into(), table.into()])
+            .expect("querying for columns");
         let cols = rows
             .into_iter()
             .map(|col| {
@@ -155,8 +155,7 @@ impl IntrospectionConnector {
     }
 
     fn get_foreign_keys(&self, schema: &str, table: &str) -> Vec<ForeignKey> {
-        let sql = format!(
-            "SELECT 
+        let sql = "SELECT 
                 con.oid as \"con_id\",
                 att2.attname as \"child_column\", 
                 cl.relname as \"parent_table\", 
@@ -176,8 +175,8 @@ impl IntrospectionConnector {
                     join pg_namespace ns on cl.relnamespace = ns.oid
                     join pg_constraint con1 on con1.conrelid = cl.oid
                 WHERE
-                    cl.relname = '{}'
-                    and ns.nspname = '{}'
+                    cl.relname = $1
+                    and ns.nspname = $2
                     and con1.contype = 'f'
             ) con
             JOIN pg_attribute att on
@@ -186,16 +185,16 @@ impl IntrospectionConnector {
                 cl.oid = con.confrelid
             JOIN pg_attribute att2 on
                 att2.attrelid = con.conrelid and att2.attnum = con.parent
-            ORDER BY con_id
-            ",
-            table, schema
-        );
+            ORDER BY con_id";
         debug!("Introspecting table foreign keys, SQL: '{}'", sql);
 
         // One foreign key with multiple columns will be represented here as several
         // rows with the same ID, which we will have to combine into corresponding foreign key
         // objects.
-        let result_set = self.conn.query_raw(&sql, schema).expect("querying for foreign keys");
+        let result_set = self
+            .conn
+            .query_raw(&sql, schema, &[table.into(), schema.into()])
+            .expect("querying for foreign keys");
         let mut intermediate_fks: HashMap<i64, ForeignKey> = HashMap::new();
         for row in result_set.into_iter() {
             debug!("Got introspection FK row {:?}", row);
@@ -259,7 +258,7 @@ impl IntrospectionConnector {
 
     fn get_indices(&self, schema: &str, table_name: &str) -> (Vec<Index>, Option<PrimaryKey>) {
         debug!("Getting indices");
-        let sql = format!("SELECT indexInfos.relname as name,
+        let sql = "SELECT indexInfos.relname as name,
             array_agg(columnInfos.attname) as column_names,
             rawIndex.indisunique as is_unique, rawIndex.indisprimary as is_primary_key
             FROM
@@ -283,12 +282,14 @@ impl IntrospectionConnector {
             AND tableInfos.relkind = 'r'
             -- we only consider stuff out of one specific schema
             AND tableInfos.relnamespace = schemaInfo.oid
-            AND schemaInfo.nspname = '{}'
-            AND tableInfos.relname = '{}'
+            AND schemaInfo.nspname = $1
+            AND tableInfos.relname = $2
             GROUP BY tableInfos.relname, indexInfos.relname, rawIndex.indisunique,
-            rawIndex.indisprimary
-        ", schema, table_name);
-        let rows = self.conn.query_raw(&sql, schema).expect("querying for indices");
+            rawIndex.indisprimary";
+        let rows = self
+            .conn
+            .query_raw(&sql, schema, &[schema.into(), table_name.into()])
+            .expect("querying for indices");
         let mut pk: Option<PrimaryKey> = None;
         let indices = rows
             .into_iter()
@@ -326,14 +327,13 @@ impl IntrospectionConnector {
 
     fn get_sequences(&self, schema: &str) -> IntrospectionResult<Vec<Sequence>> {
         debug!("Getting sequences");
-        let sql = format!(
-            "SELECT start_value, sequence_name
+        let sql = "SELECT start_value, sequence_name
                   FROM information_schema.sequences
-                  WHERE sequence_schema = '{}'
-                  ",
-            schema
-        );
-        let rows = self.conn.query_raw(&sql, schema).expect("querying for sequences");
+                  WHERE sequence_schema = $1";
+        let rows = self
+            .conn
+            .query_raw(&sql, schema, &[schema.into()])
+            .expect("querying for sequences");
         let sequences = rows
             .into_iter()
             .map(|seq| {
@@ -362,16 +362,15 @@ impl IntrospectionConnector {
 
     fn get_enums(&self, schema: &str) -> IntrospectionResult<Vec<Enum>> {
         debug!("Getting enums");
-        let sql = format!(
-            "SELECT t.typname as name, e.enumlabel as value
+        let sql = "SELECT t.typname as name, e.enumlabel as value
             FROM pg_type t 
             JOIN pg_enum e ON t.oid = e.enumtypid  
             JOIN pg_catalog.pg_namespace n ON n.oid = t.typnamespace
-            WHERE n.nspname = '{}'
-            ",
-            schema
-        );
-        let rows = self.conn.query_raw(&sql, schema).expect("querying for enums");
+            WHERE n.nspname = $1";
+        let rows = self
+            .conn
+            .query_raw(&sql, schema, &[schema.into()])
+            .expect("querying for enums");
         let mut enum_values: HashMap<String, HashSet<String>> = HashMap::new();
         for row in rows.into_iter() {
             debug!("Got enum row: {:?}", row);
