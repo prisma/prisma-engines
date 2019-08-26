@@ -37,15 +37,15 @@ impl IntrospectionConnector {
 
     fn get_table_names(&self, schema: &str) -> Vec<String> {
         debug!("Getting table names");
-        let sql = format!(
-            "SELECT table_name as table_name FROM information_schema.tables
-            WHERE table_schema = '{}'
+        let sql = "SELECT table_name as table_name FROM information_schema.tables
+            WHERE table_schema = ?
             -- Views are not supported yet
             AND table_type = 'BASE TABLE'
-            ORDER BY table_name",
-            schema
-        );
-        let rows = self.conn.query_raw(&sql, schema).expect("get table names ");
+            ORDER BY table_name";
+        let rows = self
+            .conn
+            .query_raw(sql, schema, &[schema.into()])
+            .expect("get table names ");
         let names = rows
             .into_iter()
             .map(|row| {
@@ -78,14 +78,14 @@ impl IntrospectionConnector {
     }
 
     fn get_columns(&self, schema: &str, table: &str) -> Vec<Column> {
-        let sql = format!(
-            "SELECT column_name, data_type, column_default, is_nullable, extra
+        let sql = "SELECT column_name, data_type, column_default, is_nullable, extra
             FROM information_schema.columns
-            WHERE table_schema = '{}' AND table_name  = '{}'
-            ORDER BY column_name",
-            schema, table
-        );
-        let rows = self.conn.query_raw(&sql, schema).expect("querying for columns");
+            WHERE table_schema = ? AND table_name = ?
+            ORDER BY column_name";
+        let rows = self
+            .conn
+            .query_raw(sql, schema, &[schema.into(), table.into()])
+            .expect("querying for columns");
         let cols = rows
             .into_iter()
             .map(|col| {
@@ -151,20 +151,20 @@ impl IntrospectionConnector {
         // One should think it's unique since it's used to join information_schema.key_column_usage
         // and information_schema.referential_constraints tables in this query lifted from
         // Stack Overflow
-        let sql = format!(
-            "SELECT kcu.constraint_name, kcu.column_name, kcu.referenced_table_name, 
+        let sql = "SELECT kcu.constraint_name, kcu.column_name, kcu.referenced_table_name, 
             kcu.referenced_column_name, kcu.ordinal_position, rc.delete_rule
             FROM information_schema.key_column_usage AS kcu
             INNER JOIN information_schema.referential_constraints AS rc ON
             kcu.constraint_name = rc.constraint_name
-            WHERE kcu.table_schema = '{}' AND kcu.table_name = '{}' AND 
+            WHERE kcu.table_schema = ? AND kcu.table_name = ? AND 
             referenced_column_name IS NOT NULL
-        ",
-            schema, table
-        );
+        ";
         debug!("Introspecting table foreign keys, SQL: '{}'", sql);
 
-        let result_set = self.conn.query_raw(&sql, schema).expect("querying for foreign keys");
+        let result_set = self
+            .conn
+            .query_raw(sql, schema, &[schema.into(), table.into()])
+            .expect("querying for foreign keys");
         let mut intermediate_fks: HashMap<String, ForeignKey> = HashMap::new();
         for row in result_set.into_iter() {
             debug!("Got introspection FK row {:#?}", row);
@@ -243,16 +243,15 @@ impl IntrospectionConnector {
     }
 
     fn get_indices(&self, schema: &str, table_name: &str, fk_cols: Vec<String>) -> (Vec<Index>, Option<PrimaryKey>) {
-        let sql = format!(
-            "SELECT DISTINCT
+        let sql = "SELECT DISTINCT
                 index_name, non_unique, column_name, seq_in_index
             FROM INFORMATION_SCHEMA.STATISTICS
-            WHERE table_schema = '{}' AND table_name = '{}'
-        ",
-            schema, table_name
-        );
+            WHERE table_schema = ? AND table_name = ?";
         debug!("Introspecting indices, SQL: {}", sql);
-        let rows = self.conn.query_raw(&sql, schema).expect("querying for indices");
+        let rows = self
+            .conn
+            .query_raw(sql, schema, &[schema.into(), table_name.into()])
+            .expect("querying for indices");
         let mut pk: Option<PrimaryKey> = None;
         let indices = rows
             .into_iter()

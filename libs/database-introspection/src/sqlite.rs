@@ -41,9 +41,9 @@ impl IntrospectionConnector {
     }
 
     fn get_table_names(&self, schema: &str) -> Vec<String> {
-        let sql = format!("SELECT name FROM \"{}\".sqlite_master WHERE type='table'", schema);
+        let sql = format!(r#"SELECT name FROM "{}".sqlite_master WHERE type='table'"#, schema);
         debug!("Introspecting table names with query: '{}'", sql);
-        let result_set = self.conn.query_raw(&sql, schema).expect("get table names");
+        let result_set = self.conn.query_raw(&sql, schema, &[]).expect("get table names");
         let names = result_set
             .into_iter()
             .map(|row| row.get("name").and_then(|x| x.to_string()).unwrap())
@@ -68,9 +68,9 @@ impl IntrospectionConnector {
     }
 
     fn get_columns(&self, schema: &str, table: &str) -> (Vec<Column>, Option<PrimaryKey>) {
-        let sql = format!(r#"Pragma "{}".table_info ("{}")"#, schema, table);
+        let sql = format!(r#"PRAGMA "{}".table_info ("{}")"#, schema, table);
         debug!("Introspecting table columns, query: '{}'", sql);
-        let result_set = self.conn.query_raw(&sql, schema).unwrap();
+        let result_set = self.conn.query_raw(&sql, schema, &[]).unwrap();
         let mut pk_cols: HashMap<i64, String> = HashMap::new();
         let mut cols: Vec<Column> = result_set
             .into_iter()
@@ -145,9 +145,12 @@ impl IntrospectionConnector {
             pub on_delete_action: ForeignKeyAction,
         }
 
-        let sql = format!(r#"Pragma "{}".foreign_key_list("{}");"#, schema, table);
+        let sql = format!(r#"PRAGMA "{}".foreign_key_list("{}");"#, schema, table);
         debug!("Introspecting table foreign keys, SQL: '{}'", sql);
-        let result_set = self.conn.query_raw(&sql, schema).expect("querying for foreign keys");
+        let result_set = self
+            .conn
+            .query_raw(&sql, schema, &[])
+            .expect("querying for foreign keys");
 
         // Since one foreign key with multiple columns will be represented here as several
         // rows with the same ID, we have to use an intermediate representation that gets
@@ -237,9 +240,9 @@ impl IntrospectionConnector {
             is_unique: bool,
         }
 
-        let sql = format!(r#"Pragma "{}".index_list("{}");"#, schema, table);
+        let sql = format!(r#"PRAGMA "{}".index_list("{}");"#, schema, table);
         debug!("Introspecting table indices, SQL: '{}'", sql);
-        let result_set = self.conn.query_raw(&sql, schema).expect("querying for indices");
+        let result_set = self.conn.query_raw(&sql, schema, &[]).expect("querying for indices");
         debug!("Got indices introspection results: {:?}", result_set);
         let re_auto = Regex::new(&format!(r"^sqlite_autoindex_{}_\d+", table)).expect("compile auto index regex");
         let index_reprs: Vec<IndexRepr> = result_set
@@ -268,9 +271,9 @@ impl IntrospectionConnector {
                     columns: vec![],
                 };
 
-                let sql = format!(r#"Pragma "{}".index_info("{}");"#, schema, index_repr.name);
+                let sql = format!(r#"PRAGMA "{}".index_info("{}");"#, schema, index_repr.name);
                 debug!("Introspecting table index '{}', SQL: '{}'", index_repr.name, sql);
-                let result_set = self.conn.query_raw(&sql, schema).expect("querying for index info");
+                let result_set = self.conn.query_raw(&sql, schema, &[]).expect("querying for index info");
                 debug!("Got index introspection results: {:?}", result_set);
                 for row in result_set.into_iter() {
                     let pos = row.get("seqno").and_then(|x| x.as_i64()).expect("get seqno") as usize;

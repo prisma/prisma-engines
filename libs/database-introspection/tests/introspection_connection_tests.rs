@@ -2,7 +2,7 @@ use barrel::{types, Migration};
 use database_introspection::*;
 use log::{debug, LevelFilter};
 use pretty_assertions::assert_eq;
-use prisma_query::connector::Queryable;
+use prisma_query::{ast::ParameterizedValue, connector::Queryable};
 use std::collections::HashSet;
 use std::path::Path;
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -1937,8 +1937,13 @@ struct SqliteConnection {
 }
 
 impl crate::IntrospectionConnection for SqliteConnection {
-    fn query_raw(&self, sql: &str, _schema: &str) -> prisma_query::Result<prisma_query::connector::ResultSet> {
-        self.client.lock().expect("self.client.lock").query_raw(sql, &[])
+    fn query_raw(
+        &self,
+        sql: &str,
+        _schema: &str,
+        params: &[ParameterizedValue],
+    ) -> prisma_query::Result<prisma_query::connector::ResultSet> {
+        self.client.lock().expect("self.client.lock").query_raw(sql, params)
     }
 }
 
@@ -1975,8 +1980,13 @@ struct PostgresConnection {
 }
 
 impl crate::IntrospectionConnection for PostgresConnection {
-    fn query_raw(&self, sql: &str, _: &str) -> prisma_query::Result<prisma_query::connector::ResultSet> {
-        self.client.lock().expect("self.client.lock").query_raw(sql, &[])
+    fn query_raw(
+        &self,
+        sql: &str,
+        _: &str,
+        params: &[ParameterizedValue],
+    ) -> prisma_query::Result<prisma_query::connector::ResultSet> {
+        self.client.lock().expect("self.client.lock").query_raw(sql, params)
     }
 }
 
@@ -2020,8 +2030,13 @@ struct MySqlConnection {
 }
 
 impl crate::IntrospectionConnection for MySqlConnection {
-    fn query_raw(&self, sql: &str, _: &str) -> prisma_query::Result<prisma_query::connector::ResultSet> {
-        self.client.lock().expect("self.client.lock").query_raw(sql, &[])
+    fn query_raw(
+        &self,
+        sql: &str,
+        _: &str,
+        params: &[ParameterizedValue],
+    ) -> prisma_query::Result<prisma_query::connector::ResultSet> {
+        self.client.lock().expect("self.client.lock").query_raw(sql, params)
     }
 }
 
