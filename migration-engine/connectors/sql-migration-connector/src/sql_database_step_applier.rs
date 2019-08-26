@@ -217,15 +217,110 @@ fn render_column(
     column: &Column,
     add_fk_prefix: bool,
 ) -> String {
+    match sql_family {
+        SqlFamily::Postgres => render_column_postgres(sql_family, schema_name, &table, &column),
+        SqlFamily::Mysql => render_column_mysql(sql_family, schema_name, &table, &column, add_fk_prefix),
+        SqlFamily::Sqlite => render_column_sqlite(sql_family, schema_name, &table, &column),
+    }
+}
+
+fn render_column_postgres(
+    sql_family: SqlFamily,
+    schema_name: String,
+    table: &Table,
+    column: &Column,
+) -> String {
     let column_name = quote(&column.name, sql_family);
     let tpe_str = render_column_type(sql_family, &column.tpe);
-    // TODO: bring back when the query planning for writes is done
-    let nullability_str = if column.is_required() && !table.is_part_of_foreign_key(&column.name) {
-        "NOT NULL"
+    let nullability_str = render_nullability(&table, &column);
+    let default_str = render_default(&column);
+    let foreign_key = table.foreign_key_for_column(&column.name);
+    let references_str = render_references(sql_family, &schema_name, foreign_key);
+
+    let is_serial = column.auto_increment;
+
+    if is_serial {
+        format!("{} SERIAL", column_name)
+    } else {
+        format!(
+            "{} {} {} {} {}",
+            column_name, tpe_str, nullability_str, default_str, references_str
+        )
+    }
+}
+
+fn render_column_mysql(
+    sql_family: SqlFamily,
+    schema_name: String,
+    table: &Table,
+    column: &Column,
+    add_fk_prefix: bool,
+) -> String {
+    let column_name = quote(&column.name, sql_family);
+    let tpe_str = render_column_type(sql_family, &column.tpe);
+    let nullability_str = render_nullability(&table, &column);
+    let default_str = render_default(&column);
+    let foreign_key = table.foreign_key_for_column(&column.name);
+    let references_str = render_references(sql_family, &schema_name, foreign_key);
+    let auto_increment_str = if column.auto_increment {
+        "AUTO_INCREMENT"
     } else {
         ""
     };
-    let default_str = match &column.default {
+
+    match foreign_key {
+        Some(_) => {
+            let add = if add_fk_prefix { "ADD" } else { "" };
+            let fk_line = format!("{} FOREIGN KEY ({}) {}", add, column_name, references_str);
+            format!(
+                "{} {} {} {},\n{}",
+                column_name, tpe_str, nullability_str, default_str, fk_line
+            )
+        }
+        None => {
+            format!(
+                "{} {} {} {} {}",
+                column_name, tpe_str, nullability_str, default_str, auto_increment_str
+            )
+        }
+    }
+}
+
+fn render_column_sqlite(
+    sql_family: SqlFamily,
+    schema_name: String,
+    table: &Table,
+    column: &Column,
+) -> String {
+    let column_name = quote(&column.name, sql_family);
+    let tpe_str = render_column_type(sql_family, &column.tpe);
+    let nullability_str = render_nullability(&table, &column);
+    let default_str = render_default(&column);
+    let foreign_key = table.foreign_key_for_column(&column.name);
+    let references_str = render_references(sql_family, &schema_name, foreign_key);
+    let auto_increment_str = if column.auto_increment {
+        "PRIMARY KEY AUTOINCREMENT"
+    } else {
+        ""
+    };
+
+    format!(
+        "{} {} {} {} {} {}",
+        column_name, tpe_str, nullability_str, default_str, auto_increment_str, references_str
+    )
+}
+
+fn render_nullability(table: &Table, column: &Column) -> &'static str {
+    // TODO: bring back when the query planning for writes is done
+    if column.is_required() && !table.is_part_of_foreign_key(&column.name) {
+        "NOT NULL"
+    } else {
+        ""
+    }
+}
+
+fn render_default(column: &Column) -> String {
+    match &column.default {
         Some(value) => {
             let default = match column.tpe.family {
                 ColumnTypeFamily::String | ColumnTypeFamily::DateTime => {
@@ -246,9 +341,11 @@ fn render_column(
             }
         }
         None => "".to_string(),
-    };
-    let foreign_key = table.foreign_key_for_column(&column.name);
-    let references_str = match (sql_family, foreign_key) {
+    }
+}
+
+fn render_references(sql_family: SqlFamily, schema_name: &str, foreign_key: Option<&ForeignKey>) -> String {
+    match (sql_family, foreign_key) {
         (SqlFamily::Postgres, Some(fk)) => format!(
             "REFERENCES \"{}\".\"{}\"(\"{}\") {}",
             schema_name,
@@ -270,29 +367,6 @@ fn render_column(
             render_on_delete(&fk.on_delete_action)
         ),
         (_, None) => "".to_string(),
-    };
-    let auto_increment_str = if column.auto_increment {
-        match sql_family {
-            SqlFamily::Mysql => "AUTO_INCREMENT",
-            SqlFamily::Sqlite => "PRIMARY KEY AUTOINCREMENT",
-            _ => unreachable!("Postgres must never set auto increment on a column. Column was: {}", &column.name)
-        }
-    } else {
-        ""
-    };
-    match (sql_family, foreign_key) {
-        (SqlFamily::Mysql, Some(_)) => {
-            let add = if add_fk_prefix { "ADD" } else { "" };
-            let fk_line = format!("{} FOREIGN KEY ({}) {}", add, column_name, references_str);
-            format!(
-                "{} {} {} {} {},\n{}",
-                column_name, tpe_str, nullability_str, default_str, auto_increment_str, fk_line
-            )
-        }
-        _ => format!(
-            "{} {} {} {} {} {}",
-            column_name, tpe_str, nullability_str, default_str, auto_increment_str, references_str
-        ),
     }
 }
 
