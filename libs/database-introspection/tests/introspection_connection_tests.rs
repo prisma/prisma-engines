@@ -1153,10 +1153,10 @@ fn sqlite_column_types_must_work() {
         t.add_column("int4_col", types::integer());
         t.add_column("text_col", types::text());
         t.add_column("real_col", types::float());
-        t.add_column("primary_col", types::custom("INTEGER PRIMARY KEY"));
+        t.add_column("primary_col", types::primary());
     });
 
-    let full_sql = migration.make::<barrel::backend::Pg>();
+    let full_sql = migration.make::<barrel::backend::Sqlite>();
     let inspector = get_sqlite_connector(&full_sql);
     let result = inspector.introspect(SCHEMA).expect("introspection");
     let table = result.get_table("User").expect("couldn't get User table");
@@ -1184,7 +1184,7 @@ fn sqlite_column_types_must_work() {
         Column {
             name: "real_col".to_string(),
             tpe: ColumnType {
-                raw: "FLOAT".to_string(),
+                raw: "REAL".to_string(),
                 family: ColumnTypeFamily::Float,
             },
             arity: ColumnArity::Required,
