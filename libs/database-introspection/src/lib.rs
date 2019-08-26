@@ -202,6 +202,8 @@ pub struct Column {
     pub default: Option<String>,
     /// Column auto increment setting, MySQL/SQLite only.
     pub auto_increment: bool,
+    /// Is the column unique?
+    pub is_unique: bool,
 }
 
 impl Column {
