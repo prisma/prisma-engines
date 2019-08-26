@@ -11,6 +11,7 @@ mod sql_database_step_applier;
 mod sql_destructive_changes_checker;
 mod sql_migration;
 mod sql_migration_persistence;
+mod sql_renderer;
 
 pub use error::*;
 pub use sql_migration::*;
