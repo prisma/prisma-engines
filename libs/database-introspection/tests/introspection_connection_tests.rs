@@ -1145,7 +1145,6 @@ fn all_mysql_column_types_must_work() {
 }
 
 #[test]
-#[ignore]
 fn sqlite_column_types_must_work() {
     setup();
 
@@ -1220,7 +1219,6 @@ fn sqlite_column_types_must_work() {
 }
 
 #[test]
-#[ignore]
 fn is_required_must_work() {
     setup();
 
@@ -1262,7 +1260,6 @@ fn is_required_must_work() {
 }
 
 #[test]
-#[ignore]
 fn foreign_keys_must_work() {
     setup();
 
@@ -1320,7 +1317,6 @@ fn foreign_keys_must_work() {
 }
 
 #[test]
-#[ignore]
 fn multi_column_foreign_keys_must_work() {
     setup();
 
@@ -1400,7 +1396,6 @@ fn multi_column_foreign_keys_must_work() {
 }
 
 #[test]
-#[ignore]
 fn names_with_hyphens_must_work() {
     setup();
 
@@ -1671,7 +1666,6 @@ fn mysql_foreign_key_on_delete_must_be_handled() {
 }
 
 #[test]
-#[ignore]
 fn sqlite_foreign_key_on_delete_must_be_handled() {
     setup();
 
@@ -1844,7 +1838,6 @@ fn postgres_sequences_must_work() {
 }
 
 #[test]
-#[ignore]
 fn indices_must_work() {
     setup();
 
