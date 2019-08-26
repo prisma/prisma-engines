@@ -196,6 +196,8 @@ pub struct Column {
     pub default: Option<String>,
     /// Column auto increment setting, MySQL/SQLite only.
     pub auto_increment: bool,
+    /// Is the column marked as unique?
+    pub unique: bool,
 }
 
 impl Column {
@@ -213,6 +215,11 @@ impl Column {
         //            println!("differs_in_something_except_default \n {:?} \n {:?}", &self, &other);
         //        }
         result
+    }
+
+    /// Is this column unique, either through column property or via index?
+    pub fn is_unique(&self) -> bool {
+        self.unique
     }
 }
 

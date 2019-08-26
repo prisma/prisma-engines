@@ -11,7 +11,8 @@
           },
           "arity": "nullable",
           "default": null,
-          "autoIncrement": false
+          "autoIncrement": false,
+          "unique": false
         },
         {
           "name": "column2",
@@ -21,7 +22,8 @@
           },
           "arity": "nullable",
           "default": null,
-          "autoIncrement": false
+          "autoIncrement": false,
+          "unique": false
         },
         {
           "name": "column3",
@@ -31,7 +33,8 @@
           },
           "arity": "nullable",
           "default": null,
-          "autoIncrement": false
+          "autoIncrement": false,
+          "unique": false
         },
         {
           "name": "column4",
@@ -41,7 +44,8 @@
           },
           "arity": "nullable",
           "default": null,
-          "autoIncrement": false
+          "autoIncrement": false,
+          "unique": false
         },
         {
           "name": "column5",
@@ -51,7 +55,8 @@
           },
           "arity": "nullable",
           "default": null,
-          "autoIncrement": false
+          "autoIncrement": false,
+          "unique": false
         },
         {
           "name": "column6",
@@ -61,7 +66,8 @@
           },
           "arity": "nullable",
           "default": null,
-          "autoIncrement": false
+          "autoIncrement": false,
+          "unique": false
         },
         {
           "name": "column7",
@@ -71,7 +77,8 @@
           },
           "arity": "nullable",
           "default": null,
-          "autoIncrement": false
+          "autoIncrement": false,
+          "unique": false
         },
         {
           "name": "column8",
@@ -81,7 +88,8 @@
           },
           "arity": "nullable",
           "default": null,
-          "autoIncrement": false
+          "autoIncrement": false,
+          "unique": false
         },
         {
           "name": "column9",
@@ -91,7 +99,8 @@
           },
           "arity": "nullable",
           "default": null,
-          "autoIncrement": false
+          "autoIncrement": false,
+          "unique": false
         },
         {
           "name": "column10",
@@ -101,7 +110,8 @@
           },
           "arity": "nullable",
           "default": null,
-          "autoIncrement": false
+          "autoIncrement": false,
+          "unique": false
         },
         {
           "name": "column11",
@@ -111,7 +121,8 @@
           },
           "arity": "nullable",
           "default": null,
-          "autoIncrement": false
+          "autoIncrement": false,
+          "unique": false
         },
         {
           "name": "column12",
@@ -121,7 +132,8 @@
           },
           "arity": "nullable",
           "default": null,
-          "autoIncrement": false
+          "autoIncrement": false,
+          "unique": false
         }
       ],
       "indices": [],

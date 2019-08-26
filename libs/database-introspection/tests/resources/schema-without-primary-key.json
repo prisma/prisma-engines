@@ -11,7 +11,8 @@
           },
           "arity": "nullable",
           "default": null,
-          "autoIncrement": false
+          "autoIncrement": false,
+          "unique": false
         }
       ],
       "indices": [],

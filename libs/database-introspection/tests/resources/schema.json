@@ -11,7 +11,8 @@
           },
           "arity": "required",
           "default": null,
-          "autoIncrement": true
+          "autoIncrement": true,
+          "unique": false
         },
         {
           "name": "column2",
@@ -21,7 +22,8 @@
           },
           "arity": "nullable",
           "default": "default value",
-          "autoIncrement": false
+          "autoIncrement": false,
+          "unique": false
         },
         {
           "name": "column3",
@@ -31,7 +33,8 @@
           },
           "arity": "required",
           "default": null,
-          "autoIncrement": false
+          "autoIncrement": false,
+          "unique": false
         }
       ],
       "indices": [
@@ -72,7 +75,8 @@
           },
           "arity": "required",
           "default": null,
-          "autoIncrement": true
+          "autoIncrement": true,
+          "unique": false
         }
       ],
       "indices": [],

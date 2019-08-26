@@ -37,7 +37,7 @@ pub fn calculate_model(schema: &DatabaseSchema) -> Result<Datamodel> {
                 field_type,
                 database_name: None,
                 default_value: None,
-                is_unique: false,
+                is_unique: column.is_unique(),
                 id_info: None,
                 scalar_list_strategy: None,
                 documentation: None,

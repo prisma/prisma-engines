@@ -98,6 +98,7 @@ impl IntrospectionConnector {
                     arity: arity.clone(),
                     default: default_value.clone(),
                     auto_increment: false,
+                    unique: false,
                 };
                 if pk_col > 0 {
                     pk_cols.insert(pk_col, col.name.clone());
@@ -137,7 +138,8 @@ impl IntrospectionConnector {
                         if &col.name == pk_col && &col.tpe.raw.to_lowercase() == "integer" {
                             debug!(
                                 "Detected that the primary key column corresponds to rowid and \
-                                is auto incrementing");
+                                 is auto incrementing"
+                            );
                             col.auto_increment = true;
                         }
                     }
