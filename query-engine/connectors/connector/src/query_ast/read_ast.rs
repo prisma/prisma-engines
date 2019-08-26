@@ -10,6 +10,7 @@ pub enum ReadQuery {
     RecordQuery(RecordQuery),
     ManyRecordsQuery(ManyRecordsQuery),
     RelatedRecordsQuery(RelatedRecordsQuery),
+    AggregateRecordsQuery(AggregateRecordsQuery),
 }
 
 impl ModelExtractor for ReadQuery {
@@ -18,6 +19,7 @@ impl ModelExtractor for ReadQuery {
             ReadQuery::RecordQuery(q) => q.record_finder.as_ref().map(|rf| rf.field.model()),
             ReadQuery::ManyRecordsQuery(q) => Some(Arc::clone(&q.model)),
             ReadQuery::RelatedRecordsQuery(q) => Some(q.parent_field.related_model()),
+            ReadQuery::AggregateRecordsQuery(q) => Some(Arc::clone(&q.model)),
         }
     }
 }
@@ -52,4 +54,11 @@ pub struct RelatedRecordsQuery {
     pub selected_fields: SelectedFields,
     pub nested: Vec<ReadQuery>,
     pub selection_order: Vec<String>,
+}
+
+#[derive(Debug, Clone)]
+pub struct AggregateRecordsQuery {
+    pub name: String,
+    pub alias: Option<String>,
+    pub model: ModelRef,
 }

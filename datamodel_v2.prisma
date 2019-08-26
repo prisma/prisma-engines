@@ -1,6 +1,6 @@
 datasource chinook {
   provider = "sqlite"
-  url = "file:../db/Chinook.db"
+  url = "file:./db/Chinook.db"
 }
 
 model Album {

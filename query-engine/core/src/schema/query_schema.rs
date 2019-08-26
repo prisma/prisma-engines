@@ -203,6 +203,7 @@ pub enum OperationTag {
     DeleteOne(Box<OperationTag>),
     DeleteMany(Box<OperationTag>),
     UpsertOne(Box<OperationTag>),
+    Aggregate(Box<OperationTag>),
 
     /// Marks an operation to write the result of the previous query directly
     /// as map shaped as the defined output type of a query.
@@ -221,6 +222,7 @@ impl fmt::Display for OperationTag {
             OperationTag::DeleteOne(_) => "deleteOne",
             OperationTag::DeleteMany(_) => "deleteMany",
             OperationTag::UpsertOne(_) => "upsertOne",
+            OperationTag::Aggregate(_) => "aggregate",
             OperationTag::CoerceResultToOutputType => unreachable!(), // Only top-level ops are reached.
         };
 

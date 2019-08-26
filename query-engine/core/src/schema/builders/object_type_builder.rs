@@ -219,4 +219,18 @@ impl<'a> ObjectTypeBuilder<'a> {
         self.cache("BatchPayload".into(), Arc::clone(&object_type));
         Arc::downgrade(&object_type)
     }
+
+    /// Builds aggregation object type for given model (e.g. AggregateUser).
+    pub fn aggregation_object_type(&self, model: &ModelRef) -> ObjectTypeRef {
+        let name = format!("Aggregate{}", capitalize(&model.name));
+        return_cached!(self.get_cache(), &name);
+
+        let object = ObjectTypeStrongRef::new(init_object_type(&name, Some(ModelRef::clone(model))));
+        let fields = vec![field("count", vec![], OutputType::int(), None)];
+
+        object.set_fields(fields);
+        self.cache(name, ObjectTypeStrongRef::clone(&object));
+
+        ObjectTypeStrongRef::downgrade(&object)
+    }
 }

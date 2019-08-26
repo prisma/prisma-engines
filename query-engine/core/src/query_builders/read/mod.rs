@@ -1,10 +1,12 @@
 mod many;
 mod one;
 mod related;
+mod aggregate;
 
 pub use many::*;
 pub use one::*;
 pub use related::*;
+pub use aggregate::*;
 
 use crate::query_builders::{Builder, ParsedField, QueryBuilderResult};
 use connector::read_ast::ReadQuery;
@@ -17,6 +19,7 @@ pub enum ReadQueryBuilder {
     ReadOneRecordBuilder(ReadOneRecordBuilder),
     ReadManyRecordsBuilder(ReadManyRecordsBuilder),
     ReadRelatedRecordsBuilder(ReadRelatedRecordsBuilder),
+    AggregateRecordsBuilder(AggregateRecordsBuilder),
 }
 
 impl Builder<ReadQuery> for ReadQueryBuilder {
@@ -25,6 +28,7 @@ impl Builder<ReadQuery> for ReadQueryBuilder {
             ReadQueryBuilder::ReadOneRecordBuilder(b) => b.build(),
             ReadQueryBuilder::ReadManyRecordsBuilder(b) => b.build(),
             ReadQueryBuilder::ReadRelatedRecordsBuilder(b) => b.build(),
+            ReadQueryBuilder::AggregateRecordsBuilder(b) => b.build(),
         }
     }
 }

@@ -1,5 +1,5 @@
 use crate::CoreResult;
-use connector::{self, query_ast::*, result_ast::*, ManagedDatabaseReader, ScalarListValues};
+use connector::{self, query_ast::*, result_ast::*, ManagedDatabaseReader, ScalarListValues, QueryArguments};
 use prisma_models::{GraphqlId, ScalarField, SelectedFields};
 use std::sync::Arc;
 
@@ -13,6 +13,7 @@ impl ReadQueryExecutor {
             ReadQuery::RecordQuery(q) => self.read_one(q),
             ReadQuery::ManyRecordsQuery(q) => self.read_many(q),
             ReadQuery::RelatedRecordsQuery(q) => self.read_related(q, parent_ids),
+            ReadQuery::AggregateRecordsQuery(q) => self.aggregate(q),
         }
     }
 
@@ -40,20 +41,24 @@ impl ReadQueryExecutor {
                 Ok(ReadQueryResult {
                     name: query.name,
                     alias: query.alias,
-                    fields: query.selection_order,
-                    scalars: record.into(),
-                    nested,
-                    lists,
-                    id_field,
-                    ..Default::default()
+                    content: ResultContent::RecordSelection(RecordSelection {
+                        fields: query.selection_order,
+                        scalars: record.into(),
+                        nested,
+                        lists,
+                        id_field,
+                        ..Default::default()
+                    }),
                 })
             }
             None => Ok(ReadQueryResult {
                 name: query.name,
                 alias: query.alias,
-                fields: query.selection_order,
-                id_field,
-                ..Default::default()
+                content: ResultContent::RecordSelection(RecordSelection {
+                    fields: query.selection_order,
+                    id_field,
+                    ..Default::default()
+                }),
             }),
         }
     }
@@ -79,12 +84,14 @@ impl ReadQueryExecutor {
         Ok(ReadQueryResult {
             name: query.name,
             alias: query.alias,
-            fields: query.selection_order,
-            query_arguments: query.args,
-            scalars,
-            nested,
-            lists,
-            id_field,
+            content: ResultContent::RecordSelection(RecordSelection {
+                fields: query.selection_order,
+                query_arguments: query.args,
+                scalars,
+                nested,
+                lists,
+                id_field,
+            }),
         })
     }
 
@@ -112,12 +119,24 @@ impl ReadQueryExecutor {
         Ok(ReadQueryResult {
             name: query.name,
             alias: query.alias,
-            fields: query.selection_order,
-            query_arguments: query.args,
-            scalars,
-            nested,
-            lists,
-            id_field,
+            content: ResultContent::RecordSelection(RecordSelection {
+                fields: query.selection_order,
+                query_arguments: query.args,
+                scalars,
+                nested,
+                lists,
+                id_field,
+            }),
+        })
+    }
+
+    pub fn aggregate(&self, query: AggregateRecordsQuery) -> CoreResult<ReadQueryResult> {
+        let result = self.data_resolver.count_by_model(query.model, QueryArguments::default())?;
+
+        Ok(ReadQueryResult {
+            name: query.name,
+            alias: query.alias,
+            content: ResultContent::Count(result),
         })
     }
 
@@ -148,7 +167,12 @@ impl ReadQueryExecutor {
     fn inject_required_fields(mut selected_fields: SelectedFields) -> SelectedFields {
         let id_field = selected_fields.model().fields().id();
 
-        if selected_fields.scalar.iter().find(|f| f.field.name == id_field.name).is_none() {
+        if selected_fields
+            .scalar
+            .iter()
+            .find(|f| f.field.name == id_field.name)
+            .is_none()
+        {
             selected_fields.add_scalar(id_field);
         }
 

@@ -88,6 +88,10 @@ impl QueryBuilder {
                 parsed_field,
                 Arc::clone(&operation.model),
             )),
+            OperationTag::Aggregate(_) => ReadQueryBuilder::AggregateRecordsBuilder(AggregateRecordsBuilder::new(
+                parsed_field,
+                Arc::clone(&operation.model),
+            )),
             _ => unreachable!(),
         };
 

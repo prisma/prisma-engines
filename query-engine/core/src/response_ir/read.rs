@@ -1,6 +1,6 @@
 use super::*;
 use crate::{CoreError, CoreResult, IntoArc, ObjectTypeStrongRef, OutputType, OutputTypeRef, ScalarType};
-use connector::{ReadQueryResult, ScalarListValues};
+use connector::{ReadQueryResult, RecordSelection, ResultContent, ScalarListValues};
 use indexmap::IndexMap;
 use prisma_models::{GraphqlId, PrismaValue};
 use std::{borrow::Borrow, collections::HashMap, convert::TryFrom};
@@ -35,14 +35,37 @@ pub fn serialize_read(
     is_list: bool,
     is_optional: bool,
 ) -> CoreResult<CheckedItemsWithParents> {
-    let query_args = result.query_arguments.clone();
-    let name = result.name.clone();
+    match result.content {
+        ResultContent::RecordSelection(rs) => {
+            serialize_record_selection(result.name, result.alias, rs, typ, is_list, is_optional)
+        }
+        ResultContent::Count(c) => {
+            let mut map: IndexMap<String, Item> = IndexMap::new();
+            let mut result = CheckedItemsWithParents::new();
+
+            map.insert("count".into(), Item::Value(PrismaValue::Int(c as i64)));
+            result.insert(None, Item::Map(map));
+
+            Ok(result)
+        }
+    }
+}
+
+fn serialize_record_selection(
+    name: String,
+    alias: Option<String>,
+    record_selection: RecordSelection,
+    typ: &OutputTypeRef,
+    is_list: bool,
+    is_optional: bool,
+) -> CoreResult<CheckedItemsWithParents> {
+    let query_args = record_selection.query_arguments.clone();
 
     match typ.borrow() {
-        OutputType::List(inner) => serialize_read(result, inner, true, false),
-        OutputType::Opt(inner) => serialize_read(result, inner, is_list, true),
+        OutputType::List(inner) => serialize_record_selection(name, alias, record_selection, inner, true, false),
+        OutputType::Opt(inner) => serialize_record_selection(name, alias, record_selection, inner, is_list, true),
         OutputType::Object(obj) => {
-            let result = serialize_objects(result, obj.into_arc())?;
+            let result = serialize_objects(record_selection, obj.into_arc())?;
 
             // Items will be ref'ed on the top level to allow cheap clones in nested scenarios.
             match (is_list, is_optional) {
@@ -106,7 +129,7 @@ pub fn serialize_read(
 /// Serializes the given result into objects of given type.
 /// Doesn't validate the shape of the result set ("unchecked" result).
 /// Returns a vector of serialized objects (as Item::Map), grouped into a map by parent, if present.
-fn serialize_objects(mut result: ReadQueryResult, typ: ObjectTypeStrongRef) -> CoreResult<UncheckedItemsWithParents> {
+fn serialize_objects(mut result: RecordSelection, typ: ObjectTypeStrongRef) -> CoreResult<UncheckedItemsWithParents> {
     // The way our query execution works, we only need to look at nested + lists if we hit an object.
     // Move lists and nested out of result for separate processing.
     let nested = std::mem::replace(&mut result.nested, vec![]);
@@ -338,11 +361,9 @@ fn serialize_scalar(value: PrismaValue, typ: &OutputTypeRef) -> CoreResult<Item>
 
             Ok(Item::Value(item_value))
         }
-        (pv, ot) => {
-            Err(CoreError::SerializationError(format!(
-                "Attempted to serialize scalar '{}' with non-scalar compatible type '{:?}'",
-                pv, ot
-            )))
-        }
+        (pv, ot) => Err(CoreError::SerializationError(format!(
+            "Attempted to serialize scalar '{}' with non-scalar compatible type '{:?}'",
+            pv, ot
+        ))),
     }
 }

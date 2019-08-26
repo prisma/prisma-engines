@@ -133,9 +133,12 @@ impl<'a> QuerySchemaBuilder<'a> {
         let fields = non_embedded_models
             .into_iter()
             .map(|m| {
-                let mut vec = vec![self.all_items_field(Arc::clone(&m))];
-                append_opt(&mut vec, self.single_item_field(Arc::clone(&m)));
+                let mut vec = vec![
+                    self.all_items_field(Arc::clone(&m)),
+                    self.aggregation_field(Arc::clone(&m)),
+                ];
 
+                append_opt(&mut vec, self.single_item_field(Arc::clone(&m)));
                 vec
             })
             .flatten()
@@ -215,6 +218,24 @@ impl<'a> QuerySchemaBuilder<'a> {
                 self.object_type_builder.map_model_object_type(&model),
             ))),
             Some(ModelOperation::new(Arc::clone(&model), OperationTag::FindMany)),
+        )
+    }
+
+    /// Builds an "aggregate" query field (e.g. "aggregateUser") for given model.
+    fn aggregation_field(&self, model: ModelRef) -> Field {
+        let field_name = self.pluralize_internal(
+            format!("aggregate{}", model.name.clone()), // Has no legacy counterpart.
+            format!("aggregate{}", model.name.clone()),
+        );
+
+        field(
+            field_name,
+            vec![],
+            OutputType::object(self.object_type_builder.aggregation_object_type(&model)),
+            Some(ModelOperation::new(
+                Arc::clone(&model),
+                OperationTag::Aggregate(Box::new(OperationTag::CoerceResultToOutputType)),
+            )),
         )
     }
 
