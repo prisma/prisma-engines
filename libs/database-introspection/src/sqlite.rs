@@ -97,7 +97,7 @@ impl IntrospectionConnector {
                     tpe,
                     arity: arity.clone(),
                     default: default_value.clone(),
-                    auto_increment: pk_col > 0,
+                    auto_increment: false,
                 };
                 if pk_col > 0 {
                     pk_cols.insert(pk_col, col.name.clone());
@@ -129,6 +129,20 @@ impl IntrospectionConnector {
                 for i in col_idxs {
                     columns.push(pk_cols[i].clone());
                 }
+
+                // If the primary key is a single integer column, it's autoincrementing
+                if pk_cols.len() == 1 {
+                    let pk_col = &columns[0];
+                    for col in cols.iter_mut() {
+                        if &col.name == pk_col && &col.tpe.raw.to_lowercase() == "integer" {
+                            debug!(
+                                "Detected that the primary key column corresponds to rowid and \
+                                is auto incrementing");
+                            col.auto_increment = true;
+                        }
+                    }
+                }
+
                 debug!("Determined that table has primary key with columns {:?}", columns);
                 Some(PrimaryKey { columns })
             }
