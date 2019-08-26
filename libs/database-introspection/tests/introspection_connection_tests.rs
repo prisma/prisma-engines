@@ -1153,7 +1153,7 @@ fn sqlite_column_types_must_work() {
         t.add_column("int4_col", types::integer());
         t.add_column("text_col", types::text());
         t.add_column("real_col", types::float());
-        t.add_column("primary_col", types::primary());
+        t.add_column("primary_col", types::custom("INTEGER PRIMARY KEY"));
     });
 
     let full_sql = migration.make::<barrel::backend::Pg>();
@@ -1194,7 +1194,7 @@ fn sqlite_column_types_must_work() {
         Column {
             name: "primary_col".to_string(),
             tpe: ColumnType {
-                raw: "SERIAL".to_string(),
+                raw: "INTEGER".to_string(),
                 family: ColumnTypeFamily::Int,
             },
             arity: ColumnArity::Required,
@@ -1661,6 +1661,60 @@ fn mysql_foreign_key_on_delete_must_be_handled() {
                     on_delete_action: ForeignKeyAction::SetNull,
                 },
             ],
+        }
+    );
+}
+
+#[test]
+fn sqlite_composite_primary_key_must_work() {
+    setup();
+
+    let sql = format!(
+        "CREATE TABLE \"{0}\".User (
+            id INTEGER NOT NULL,
+            name VARCHAR(255) NOT NULL,
+            PRIMARY KEY(id, name)
+        )",
+        SCHEMA
+    );
+    let inspector = get_sqlite_connector(&sql);
+
+    let schema = inspector.introspect(SCHEMA).expect("introspection");
+    let table = schema.get_table("User").expect("couldn't get User table");
+    let mut expected_columns = vec![
+        Column {
+            name: "id".to_string(),
+            tpe: ColumnType {
+                raw: "INTEGER".to_string(),
+                family: ColumnTypeFamily::Int,
+            },
+            arity: ColumnArity::Required,
+            default: None,
+            auto_increment: false,
+        },
+        Column {
+            name: "name".to_string(),
+            tpe: ColumnType {
+                raw: "VARCHAR(255)".to_string(),
+                family: ColumnTypeFamily::String,
+            },
+            arity: ColumnArity::Required,
+            default: None,
+            auto_increment: false,
+        },
+    ];
+    expected_columns.sort_unstable_by_key(|c| c.name.to_owned());
+
+    assert_eq!(
+        table,
+        &Table {
+            name: "User".to_string(),
+            columns: expected_columns,
+            indices: vec![],
+            primary_key: Some(PrimaryKey {
+                columns: vec!["id".to_string(), "name".to_string()],
+            }),
+            foreign_keys: vec![],
         }
     );
 }
