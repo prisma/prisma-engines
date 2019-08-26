@@ -37,6 +37,7 @@ impl SqlDatabaseStepApplier {
 
         let step = &steps[index];
         let sql_string = render_raw_sql(&step, self.sql_family, &self.schema_name);
+        println!("{}", sql_string);
         debug!("{}", sql_string);
 
         let result = self.conn.query_raw(&self.schema_name, &sql_string, &[]);
@@ -83,7 +84,9 @@ fn render_raw_sql(step: &SqlMigrationStep, sql_family: SqlFamily, schema_name: &
                 let col_sql = render_column(sql_family, schema_name.to_string(), &table, &column, false);
                 lines.push(col_sql);
             }
-            if primary_columns.len() > 0 {
+            let primary_key_was_already_set_in_column_line = lines.join(",").contains(&"PRIMARY KEY");
+
+            if primary_columns.len() > 0 && !primary_key_was_already_set_in_column_line {
                 let column_names: Vec<String> = primary_columns
                     .clone()
                     .into_iter()
@@ -268,18 +271,27 @@ fn render_column(
         ),
         (_, None) => "".to_string(),
     };
+    let auto_increment_str = if column.auto_increment {
+        match sql_family {
+            SqlFamily::Mysql => "AUTO_INCREMENT",
+            SqlFamily::Sqlite => "PRIMARY KEY AUTOINCREMENT",
+            _ => unreachable!("Postgres must never set auto increment on a column. Column was: {}", &column.name)
+        }
+    } else {
+        ""
+    };
     match (sql_family, foreign_key) {
         (SqlFamily::Mysql, Some(_)) => {
             let add = if add_fk_prefix { "ADD" } else { "" };
             let fk_line = format!("{} FOREIGN KEY ({}) {}", add, column_name, references_str);
             format!(
-                "{} {} {} {},{}",
-                column_name, tpe_str, nullability_str, default_str, fk_line
+                "{} {} {} {} {},\n{}",
+                column_name, tpe_str, nullability_str, default_str, auto_increment_str, fk_line
             )
         }
         _ => format!(
-            "{} {} {} {} {}",
-            column_name, tpe_str, nullability_str, default_str, references_str
+            "{} {} {} {} {} {}",
+            column_name, tpe_str, nullability_str, default_str, auto_increment_str, references_str
         ),
     }
 }
