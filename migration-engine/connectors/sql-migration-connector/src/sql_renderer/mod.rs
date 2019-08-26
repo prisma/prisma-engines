@@ -11,11 +11,19 @@ use postgres_renderer::PostgresRenderer;
 use sqlite_renderer::SqliteRenderer;
 
 pub trait SqlRenderer {
+    fn quote_with_schema(&self, schema: &str, name: &str) -> String {
+        format!(
+            "{}.{}",
+            self.quote(&schema),
+            self.quote(&name),
+        )
+    }
+
     fn quote(&self, name: &str) -> String;
 
     fn render_column(
         &self,
-        schema_name: String,
+        schema_name: &str,
         table: &Table,
         column: &Column,
         add_fk_prefix: bool,

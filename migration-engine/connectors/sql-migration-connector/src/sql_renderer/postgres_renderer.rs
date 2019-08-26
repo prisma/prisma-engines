@@ -9,7 +9,7 @@ impl super::SqlRenderer for PostgresRenderer {
 
     fn render_column(
         &self,
-        schema_name: String,
+        schema_name: &str,
         table: &Table,
         column: &Column,
         _add_fk_prefix: bool,

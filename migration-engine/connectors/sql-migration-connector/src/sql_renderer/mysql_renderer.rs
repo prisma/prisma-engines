@@ -9,7 +9,7 @@ impl super::SqlRenderer for MySqlRenderer {
 
     fn render_column(
         &self,
-        schema_name: String,
+        schema_name: &str,
         table: &Table,
         column: &Column,
         add_fk_prefix: bool,

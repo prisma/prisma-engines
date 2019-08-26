@@ -83,7 +83,7 @@ fn render_raw_sql(step: &SqlMigrationStep, sql_family: SqlFamily, schema_name: &
             let primary_columns = table.primary_key_columns();
             let mut lines = Vec::new();
             for column in cloned_columns.clone() {
-                let col_sql = renderer.render_column(schema_name.to_string(), &table, &column, false);
+                let col_sql = renderer.render_column(&schema_name, &table, &column, false);
                 lines.push(col_sql);
             }
             let primary_key_was_already_set_in_column_line = lines.join(",").contains(&"PRIMARY KEY");
@@ -97,34 +97,31 @@ fn render_raw_sql(step: &SqlMigrationStep, sql_family: SqlFamily, schema_name: &
                 lines.push(format!("PRIMARY KEY ({})", column_names.join(",")))
             }
             format!(
-                "CREATE TABLE {}.{}({})\n{};",
-                renderer.quote(&schema_name),
-                renderer.quote(&table.name),
+                "CREATE TABLE {}({})\n{};",
+                renderer.quote_with_schema(&schema_name, &table.name),
                 lines.join(","),
                 create_table_suffix(sql_family),
             )
         }
         SqlMigrationStep::DropTable(DropTable { name }) => format!(
-            "DROP TABLE {}.{};",
-            renderer.quote(&schema_name),
-            renderer.quote(name)
+            "DROP TABLE {};",
+            renderer.quote_with_schema(&schema_name, &name)
         ),
         SqlMigrationStep::DropTables(DropTables { names }) => {
             let fully_qualified_names: Vec<String> = names
                 .iter()
-                .map(|name| format!("{}.{}", renderer.quote(&schema_name), renderer.quote(name)))
+                .map(|name| renderer.quote_with_schema(&schema_name, &name))
                 .collect();
             format!("DROP TABLE {};", fully_qualified_names.join(","))
         }
         SqlMigrationStep::RenameTable { name, new_name } => {
             let new_name = match sql_family {
                 SqlFamily::Sqlite => format!("{}", renderer.quote(new_name)),
-                _ => format!("{}.{}", renderer.quote(&schema_name), renderer.quote(new_name)),
+                _ => renderer.quote_with_schema(&schema_name, &new_name),
             };
             format!(
-                "ALTER TABLE {}.{} RENAME TO {};",
-                renderer.quote(&schema_name),
-                renderer.quote(name),
+                "ALTER TABLE {} RENAME TO {};",
+                renderer.quote_with_schema(&schema_name, &name),
                 new_name
             )
         }
@@ -134,7 +131,7 @@ fn render_raw_sql(step: &SqlMigrationStep, sql_family: SqlFamily, schema_name: &
                 match change {
                     TableChange::AddColumn(AddColumn { column }) => {
                         let col_sql =
-                            renderer.render_column(schema_name.to_string(), &table, &column, true);
+                            renderer.render_column(&schema_name, &table, &column, true);
                         lines.push(format!("ADD COLUMN {}", col_sql));
                     }
                     TableChange::DropColumn(DropColumn { name }) => {
@@ -145,15 +142,14 @@ fn render_raw_sql(step: &SqlMigrationStep, sql_family: SqlFamily, schema_name: &
                     TableChange::AlterColumn(AlterColumn { name, column }) => {
                         let name = renderer.quote(&name);
                         lines.push(format!("DROP COLUMN {}", name));
-                        let col_sql = renderer.render_column(schema_name.to_string(), &table, &column, true);
+                        let col_sql = renderer.render_column(&schema_name, &table, &column, true);
                         lines.push(format!("ADD COLUMN {}", col_sql));
                     }
                 }
             }
             format!(
-                "ALTER TABLE {}.{} {};",
-                renderer.quote(&schema_name),
-                renderer.quote(&table.name),
+                "ALTER TABLE {} {};",
+                renderer.quote_with_schema(&schema_name, &table.name),
                 lines.join(",")
             )
         }
@@ -164,12 +160,12 @@ fn render_raw_sql(step: &SqlMigrationStep, sql_family: SqlFamily, schema_name: &
                 IndexType::Normal => "",
             };
             let index_name = match sql_family {
-                SqlFamily::Sqlite => format!("{}.{}", renderer.quote(&schema_name), renderer.quote(&name)),
+                SqlFamily::Sqlite => renderer.quote_with_schema(&schema_name, &name),
                 _ => renderer.quote(&name),
             };
             let table_reference = match sql_family {
                 SqlFamily::Sqlite => renderer.quote(&table),
-                _ => format!("{}.{}", renderer.quote(&schema_name), renderer.quote(&table)),
+                _ => renderer.quote_with_schema(&schema_name, &table),
             };
             let columns: Vec<String> = columns.iter().map(|c| renderer.quote(c)).collect();
             format!(
@@ -182,25 +178,23 @@ fn render_raw_sql(step: &SqlMigrationStep, sql_family: SqlFamily, schema_name: &
         }
         SqlMigrationStep::DropIndex(DropIndex { table, name }) => match sql_family {
             SqlFamily::Mysql => format!(
-                "DROP INDEX {} ON {}.{}",
+                "DROP INDEX {} ON {}",
                 renderer.quote(&name),
-                renderer.quote(&schema_name),
-                renderer.quote(&table)
+                renderer.quote_with_schema(&schema_name, &table),
             ),
             SqlFamily::Postgres | SqlFamily::Sqlite => format!(
-                "DROP INDEX {}.{}",
-                renderer.quote(&schema_name),
-                renderer.quote(&name)
+                "DROP INDEX {}",
+                renderer.quote_with_schema(&schema_name, &name),
             ),
         },
         SqlMigrationStep::RawSql { raw } => raw.to_string(),
     }
 }
 
-fn create_table_suffix(sql_family: SqlFamily) -> String {
+fn create_table_suffix(sql_family: SqlFamily) -> &'static str {
     match sql_family {
-        SqlFamily::Sqlite => "".to_string(),
-        SqlFamily::Postgres => "".to_string(),
-        SqlFamily::Mysql => "DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci".to_string(),
+        SqlFamily::Sqlite => "",
+        SqlFamily::Postgres => "",
+        SqlFamily::Mysql => "DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci",
     }
 }
