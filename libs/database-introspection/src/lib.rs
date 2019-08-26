@@ -3,6 +3,7 @@ use failure::Fail;
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 use std::fmt;
+use prisma_query::ast::ParameterizedValue;
 
 pub mod mysql;
 pub mod postgres;
@@ -22,7 +23,7 @@ pub type IntrospectionResult<T> = core::result::Result<T, IntrospectionError>;
 /// Connection abstraction for the introspection connectors.
 pub trait IntrospectionConnection: Send + Sync + 'static {
     /// Make raw SQL query.
-    fn query_raw(&self, sql: &str, schema: &str) -> prisma_query::Result<prisma_query::connector::ResultSet>;
+    fn query_raw(&self, sql: &str, schema: &str, params: &[ParameterizedValue]) -> prisma_query::Result<prisma_query::connector::ResultSet>;
 }
 
 /// A database introspection connector.
