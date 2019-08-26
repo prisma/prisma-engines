@@ -20,7 +20,7 @@ impl<'a> MigrationCommand<'a> for CreateDatabaseCommand<'a> {
         D: DatabaseMigrationMarker + 'static,
     {
         debug!("{:?}", self.input);
-        let connector = engine.connector();
+        let _connector = engine.connector();
 
         let result = CreateDatabaseOutput {};
         Ok(result)
