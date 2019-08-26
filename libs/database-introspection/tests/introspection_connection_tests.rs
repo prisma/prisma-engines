@@ -2,7 +2,7 @@ use barrel::{types, Migration};
 use database_introspection::*;
 use log::{debug, LevelFilter};
 use pretty_assertions::assert_eq;
-use prisma_query::connector::Queryable;
+use prisma_query::{ast::ParameterizedValue, connector::Queryable};
 use std::collections::HashSet;
 use std::path::Path;
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -1145,7 +1145,6 @@ fn all_mysql_column_types_must_work() {
 }
 
 #[test]
-#[ignore]
 fn sqlite_column_types_must_work() {
     setup();
 
@@ -1157,7 +1156,7 @@ fn sqlite_column_types_must_work() {
         t.add_column("primary_col", types::primary());
     });
 
-    let full_sql = migration.make::<barrel::backend::Pg>();
+    let full_sql = migration.make::<barrel::backend::Sqlite>();
     let inspector = get_sqlite_connector(&full_sql);
     let result = inspector.introspect(SCHEMA).expect("introspection");
     let table = result.get_table("User").expect("couldn't get User table");
@@ -1185,7 +1184,7 @@ fn sqlite_column_types_must_work() {
         Column {
             name: "real_col".to_string(),
             tpe: ColumnType {
-                raw: "FLOAT".to_string(),
+                raw: "REAL".to_string(),
                 family: ColumnTypeFamily::Float,
             },
             arity: ColumnArity::Required,
@@ -1195,7 +1194,7 @@ fn sqlite_column_types_must_work() {
         Column {
             name: "primary_col".to_string(),
             tpe: ColumnType {
-                raw: "SERIAL".to_string(),
+                raw: "INTEGER".to_string(),
                 family: ColumnTypeFamily::Int,
             },
             arity: ColumnArity::Required,
@@ -1220,7 +1219,6 @@ fn sqlite_column_types_must_work() {
 }
 
 #[test]
-#[ignore]
 fn is_required_must_work() {
     setup();
 
@@ -1262,7 +1260,6 @@ fn is_required_must_work() {
 }
 
 #[test]
-#[ignore]
 fn foreign_keys_must_work() {
     setup();
 
@@ -1320,7 +1317,6 @@ fn foreign_keys_must_work() {
 }
 
 #[test]
-#[ignore]
 fn multi_column_foreign_keys_must_work() {
     setup();
 
@@ -1400,7 +1396,6 @@ fn multi_column_foreign_keys_must_work() {
 }
 
 #[test]
-#[ignore]
 fn names_with_hyphens_must_work() {
     setup();
 
@@ -1671,7 +1666,60 @@ fn mysql_foreign_key_on_delete_must_be_handled() {
 }
 
 #[test]
-#[ignore]
+fn sqlite_composite_primary_key_must_work() {
+    setup();
+
+    let sql = format!(
+        "CREATE TABLE \"{0}\".User (
+            id INTEGER NOT NULL,
+            name VARCHAR(255) NOT NULL,
+            PRIMARY KEY(id, name)
+        )",
+        SCHEMA
+    );
+    let inspector = get_sqlite_connector(&sql);
+
+    let schema = inspector.introspect(SCHEMA).expect("introspection");
+    let table = schema.get_table("User").expect("couldn't get User table");
+    let mut expected_columns = vec![
+        Column {
+            name: "id".to_string(),
+            tpe: ColumnType {
+                raw: "INTEGER".to_string(),
+                family: ColumnTypeFamily::Int,
+            },
+            arity: ColumnArity::Required,
+            default: None,
+            auto_increment: false,
+        },
+        Column {
+            name: "name".to_string(),
+            tpe: ColumnType {
+                raw: "VARCHAR(255)".to_string(),
+                family: ColumnTypeFamily::String,
+            },
+            arity: ColumnArity::Required,
+            default: None,
+            auto_increment: false,
+        },
+    ];
+    expected_columns.sort_unstable_by_key(|c| c.name.to_owned());
+
+    assert_eq!(
+        table,
+        &Table {
+            name: "User".to_string(),
+            columns: expected_columns,
+            indices: vec![],
+            primary_key: Some(PrimaryKey {
+                columns: vec!["id".to_string(), "name".to_string()],
+            }),
+            foreign_keys: vec![],
+        }
+    );
+}
+
+#[test]
 fn sqlite_foreign_key_on_delete_must_be_handled() {
     setup();
 
@@ -1844,7 +1892,6 @@ fn postgres_sequences_must_work() {
 }
 
 #[test]
-#[ignore]
 fn indices_must_work() {
     setup();
 
@@ -1944,8 +1991,13 @@ struct SqliteConnection {
 }
 
 impl crate::IntrospectionConnection for SqliteConnection {
-    fn query_raw(&self, sql: &str, _schema: &str) -> prisma_query::Result<prisma_query::connector::ResultSet> {
-        self.client.lock().expect("self.client.lock").query_raw(sql, &[])
+    fn query_raw(
+        &self,
+        sql: &str,
+        _schema: &str,
+        params: &[ParameterizedValue],
+    ) -> prisma_query::Result<prisma_query::connector::ResultSet> {
+        self.client.lock().expect("self.client.lock").query_raw(sql, params)
     }
 }
 
@@ -1982,8 +2034,13 @@ struct PostgresConnection {
 }
 
 impl crate::IntrospectionConnection for PostgresConnection {
-    fn query_raw(&self, sql: &str, _: &str) -> prisma_query::Result<prisma_query::connector::ResultSet> {
-        self.client.lock().expect("self.client.lock").query_raw(sql, &[])
+    fn query_raw(
+        &self,
+        sql: &str,
+        _: &str,
+        params: &[ParameterizedValue],
+    ) -> prisma_query::Result<prisma_query::connector::ResultSet> {
+        self.client.lock().expect("self.client.lock").query_raw(sql, params)
     }
 }
 
@@ -2027,8 +2084,13 @@ struct MySqlConnection {
 }
 
 impl crate::IntrospectionConnection for MySqlConnection {
-    fn query_raw(&self, sql: &str, _: &str) -> prisma_query::Result<prisma_query::connector::ResultSet> {
-        self.client.lock().expect("self.client.lock").query_raw(sql, &[])
+    fn query_raw(
+        &self,
+        sql: &str,
+        _: &str,
+        params: &[ParameterizedValue],
+    ) -> prisma_query::Result<prisma_query::connector::ResultSet> {
+        self.client.lock().expect("self.client.lock").query_raw(sql, params)
     }
 }
 
