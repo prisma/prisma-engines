@@ -5,7 +5,7 @@ authors = []
 edition = "2018"
 
 [dependencies]
-connector-interface = { path = "../connector", package = "connector" }
+connector-interface = { path = "../query-connector", package = "query-connector" }
 prisma-models = { path = "../../../prisma-models" }
 itertools = "0.8"
 chrono = { version = "0.4", features = ["serde"] }

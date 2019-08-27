@@ -1,8 +1,8 @@
 //! Filtering types to select records from the database
 //!
 //! The creation of the types should be done with
-//! [ScalarCompare](/connector/trait.ScalarCompare.html) and
-//! [RelationCompare](/connector/trait.RelationCompare.html).
+//! [ScalarCompare](/query-connector/trait.ScalarCompare.html) and
+//! [RelationCompare](/query-connector/trait.RelationCompare.html).
 
 mod list;
 mod record_finder;

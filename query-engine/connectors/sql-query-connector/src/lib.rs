@@ -2,8 +2,8 @@
 //!
 //! The public interface to outside is split into separate traits:
 //!
-//! - [DatabaseReader](../connector/trait.DatabaseReader.html) to fetch data.
-//! - [DatabaseWriter](../connector/trait.DatabaseWriter.html) to write
+//! - [DatabaseReader](../query-connector/trait.DatabaseReader.html) to fetch data.
+//! - [DatabaseWriter](../query-connector/trait.DatabaseWriter.html) to write
 //!   data.
 
 mod cursor_condition;

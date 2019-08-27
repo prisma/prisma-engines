@@ -8,7 +8,7 @@ edition = "2018"
 graphql-parser = "0.2.2"
 prisma-models = { path = "../../prisma-models" }
 prisma-inflector = { path = "../../libs/prisma-inflector" }
-connector = { path = "../connectors/connector" }
+connector = { path = "../connectors/query-connector", package = "query-connector" }
 failure = "0.1"
 failure_derive = "0.1"
 lazy_static = "1.3"
