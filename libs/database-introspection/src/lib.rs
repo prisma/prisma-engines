@@ -304,7 +304,7 @@ pub enum ColumnArity {
     List,
 }
 
-/// Foreign key action types (for ON DELETE|ON UPDATE) constraints.
+/// Foreign key action types (for ON DELETE|ON UPDATE).
 #[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum ForeignKeyAction {
