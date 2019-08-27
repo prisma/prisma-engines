@@ -6,7 +6,7 @@ members = [
   "migration-engine/connectors/sql-migration-connector",
   "migration-engine/core",
   "query-engine/connectors/connector",
-  "query-engine/connectors/sql-connector",
+  "query-engine/connectors/sql-query-connector",
   "query-engine/prisma",
   "query-engine/core",
   "prisma-fmt",
