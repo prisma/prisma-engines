@@ -97,7 +97,6 @@ impl IntrospectionConnector {
                     arity: arity.clone(),
                     default: default_value.clone(),
                     auto_increment: false,
-                    is_unique: false,
                 };
                 if pk_col > 0 {
                     pk_cols.insert(pk_col, col.name.clone());

@@ -200,10 +200,8 @@ pub struct Column {
     /// Column default.
     // Does this field need to be richer? E.g. to easier detect the usages of sequences here
     pub default: Option<String>,
-    /// Column auto increment setting, MySQL/SQLite only.
+    /// Is the column auto-incrementing?
     pub auto_increment: bool,
-    /// Is the column unique?
-    pub is_unique: bool,
 }
 
 impl Column {

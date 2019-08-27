@@ -1,5 +1,8 @@
 use database_introspection::*;
-use datamodel::{common::PrismaType, Datamodel, Field, FieldArity, FieldType, Model, OnDeleteStrategy, RelationInfo};
+use datamodel::{
+    common::PrismaType, Datamodel, Field, FieldArity, FieldType, IdInfo, IdStrategy, Model, OnDeleteStrategy,
+    RelationInfo,
+};
 use introspection_command::calculate_model;
 use log::LevelFilter;
 use pretty_assertions::assert_eq;
@@ -109,7 +112,6 @@ fn a_data_model_can_be_generated_from_a_schema() {
                     arity: ColumnArity::Nullable,
                     default: None,
                     auto_increment: false,
-                    is_unique: false,
                 })
                 .collect(),
             indices: vec![],
@@ -195,7 +197,6 @@ fn arity_is_preserved_when_generating_data_model_from_a_schema() {
                     arity: ColumnArity::Nullable,
                     default: None,
                     auto_increment: false,
-                    is_unique: false,
                 },
                 Column {
                     name: "required".to_string(),
@@ -206,7 +207,6 @@ fn arity_is_preserved_when_generating_data_model_from_a_schema() {
                     arity: ColumnArity::Required,
                     default: None,
                     auto_increment: false,
-                    is_unique: false,
                 },
                 Column {
                     name: "list".to_string(),
@@ -217,7 +217,6 @@ fn arity_is_preserved_when_generating_data_model_from_a_schema() {
                     arity: ColumnArity::List,
                     default: None,
                     auto_increment: false,
-                    is_unique: false,
                 },
             ],
             indices: vec![],
@@ -235,79 +234,102 @@ fn arity_is_preserved_when_generating_data_model_from_a_schema() {
 }
 
 #[test]
-fn uniqueness_is_preserved_when_generating_data_model_from_a_schema() {
+fn primary_key_is_preserved_when_generating_data_model_from_a_schema() {
     setup();
 
     let ref_data_model = Datamodel {
-        models: vec![Model {
-            database_name: None,
-            name: "Table1".to_string(),
-            documentation: None,
-            is_embedded: false,
-            fields: vec![
-                Field {
-                    name: "non-unique".to_string(),
-                    arity: FieldArity::Optional,
-                    field_type: FieldType::Base(PrismaType::Int),
-                    database_name: None,
-                    default_value: None,
-                    is_unique: false,
-                    id_info: None,
-                    scalar_list_strategy: None,
-                    documentation: None,
-                    is_generated: false,
-                    is_updated_at: false,
-                },
-                Field {
-                    name: "unique".to_string(),
+        models: vec![
+            // Model with auto-incrementing primary key
+            Model {
+                database_name: None,
+                name: "Table1".to_string(),
+                documentation: None,
+                is_embedded: false,
+                fields: vec![Field {
+                    name: "primary".to_string(),
                     arity: FieldArity::Required,
                     field_type: FieldType::Base(PrismaType::Int),
                     database_name: None,
                     default_value: None,
-                    is_unique: true,
-                    id_info: None,
+                    is_unique: false,
+                    id_info: Some(IdInfo {
+                        strategy: IdStrategy::Auto,
+                        sequence: None,
+                    }),
                     scalar_list_strategy: None,
                     documentation: None,
                     is_generated: false,
                     is_updated_at: false,
-                },
-            ],
-            is_generated: false,
-        }],
+                }],
+                is_generated: false,
+            },
+            // Model with non-auto-incrementing primary key
+            Model {
+                database_name: None,
+                name: "Table2".to_string(),
+                documentation: None,
+                is_embedded: false,
+                fields: vec![Field {
+                    name: "primary".to_string(),
+                    arity: FieldArity::Required,
+                    field_type: FieldType::Base(PrismaType::Int),
+                    database_name: None,
+                    default_value: None,
+                    is_unique: false,
+                    id_info: Some(IdInfo {
+                        strategy: IdStrategy::None,
+                        sequence: None,
+                    }),
+                    scalar_list_strategy: None,
+                    documentation: None,
+                    is_generated: false,
+                    is_updated_at: false,
+                }],
+                is_generated: false,
+            },
+        ],
         enums: vec![],
     };
 
     let schema = DatabaseSchema {
-        tables: vec![Table {
-            name: "Table1".to_string(),
-            columns: vec![
-                Column {
-                    name: "non-unique".to_string(),
+        tables: vec![
+            Table {
+                name: "Table1".to_string(),
+                columns: vec![Column {
+                    name: "primary".to_string(),
                     tpe: ColumnType {
-                        raw: "raw".to_string(),
+                        raw: "integer".to_string(),
                         family: ColumnTypeFamily::Int,
                     },
-                    arity: ColumnArity::Nullable,
+                    arity: ColumnArity::Required,
                     default: None,
-                    auto_increment: false,
-                    is_unique: false,
-                },
-                Column {
-                    name: "unique".to_string(),
+                    auto_increment: true,
+                }],
+                indices: vec![],
+                primary_key: Some(PrimaryKey {
+                    columns: vec!["primary".to_string()],
+                }),
+                foreign_keys: vec![],
+            },
+            Table {
+                name: "Table2".to_string(),
+                columns: vec![Column {
+                    name: "primary".to_string(),
                     tpe: ColumnType {
-                        raw: "raw".to_string(),
+                        raw: "integer".to_string(),
                         family: ColumnTypeFamily::Int,
                     },
                     arity: ColumnArity::Required,
                     default: None,
                     auto_increment: false,
-                    is_unique: true,
-                },
-            ],
-            indices: vec![],
-            primary_key: None,
-            foreign_keys: vec![],
-        }],
+                }],
+                indices: vec![],
+                primary_key: Some(PrimaryKey {
+                    columns: vec!["primary".to_string()],
+                }),
+                foreign_keys: vec![],
+            },
+        ],
         enums: vec![],
         sequences: vec![],
     };
@@ -419,7 +441,10 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                         database_name: None,
                         default_value: None,
                         is_unique: false,
-                        id_info: None,
+                        id_info: Some(IdInfo {
+                            strategy: IdStrategy::Auto,
+                            sequence: None,
+                        }),
                         scalar_list_strategy: None,
                         documentation: None,
                         is_generated: false,

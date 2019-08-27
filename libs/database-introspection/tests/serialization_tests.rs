@@ -68,7 +68,6 @@ fn database_schema_is_serializable() {
                         arity: ColumnArity::Required,
                         default: None,
                         auto_increment: true,
-                        is_unique: false,
                     },
                     Column {
                         name: "column2".to_string(),
@@ -79,7 +78,6 @@ fn database_schema_is_serializable() {
                         arity: ColumnArity::Nullable,
                         default: Some("default value".to_string()),
                         auto_increment: false,
-                        is_unique: false,
                     },
                     Column {
                         name: "column3".to_string(),
@@ -90,7 +88,6 @@ fn database_schema_is_serializable() {
                         arity: ColumnArity::Required,
                         default: None,
                         auto_increment: false,
-                        is_unique: false,
                     },
                 ],
                 indices: vec![Index {
@@ -119,7 +116,6 @@ fn database_schema_is_serializable() {
                     arity: ColumnArity::Required,
                     default: None,
                     auto_increment: true,
-                    is_unique: false,
                 }],
                 indices: vec![],
                 primary_key: Some(PrimaryKey {
@@ -166,7 +162,6 @@ fn database_schema_without_primary_key_is_serializable() {
                 arity: ColumnArity::Nullable,
                 default: None,
                 auto_increment: false,
-                is_unique: false,
             }],
             indices: vec![],
             primary_key: None,
@@ -217,7 +212,6 @@ fn database_schema_is_serializable_for_every_column_type_family() {
         arity: ColumnArity::Nullable,
         default: None,
         auto_increment: false,
-        is_unique: false,
     })
     .collect();
     let schema = DatabaseSchema {
@@ -260,7 +254,6 @@ fn database_schema_is_serializable_for_every_column_arity() {
             arity: arity.to_owned(),
             default: None,
             auto_increment: false,
-            is_unique: false,
         })
         .collect();
     let schema = DatabaseSchema {
@@ -304,7 +297,6 @@ fn database_schema_is_serializable_for_every_foreign_key_action() {
                     arity: ColumnArity::Nullable,
                     auto_increment: false,
                     default: None,
-                    is_unique: false,
                 },
                 Column {
                     name: "column2".to_string(),
@@ -315,7 +307,6 @@ fn database_schema_is_serializable_for_every_foreign_key_action() {
                     arity: ColumnArity::Nullable,
                     auto_increment: false,
                     default: None,
-                    is_unique: false,
                 },
                 Column {
                     name: "column3".to_string(),
@@ -326,7 +317,6 @@ fn database_schema_is_serializable_for_every_foreign_key_action() {
                     arity: ColumnArity::Nullable,
                     auto_increment: false,
                     default: None,
-                    is_unique: false,
                 },
                 Column {
                     name: "column4".to_string(),
@@ -337,7 +327,6 @@ fn database_schema_is_serializable_for_every_foreign_key_action() {
                     arity: ColumnArity::Nullable,
                     auto_increment: false,
                     default: None,
-                    is_unique: false,
                 },
                 Column {
                     name: "column5".to_string(),
@@ -348,7 +337,6 @@ fn database_schema_is_serializable_for_every_foreign_key_action() {
                     arity: ColumnArity::Nullable,
                     auto_increment: false,
                     default: None,
-                    is_unique: false,
                 },
             ],
             indices: vec![],

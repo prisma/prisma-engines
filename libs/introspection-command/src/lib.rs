@@ -1,6 +1,9 @@
 //! Logic for generating Prisma data models from database introspection.
-use database_introspection::{Column, ColumnArity, ColumnTypeFamily, DatabaseSchema, ForeignKeyAction, Table};
-use datamodel::{common::PrismaType, Datamodel, Field, FieldArity, FieldType, Model, OnDeleteStrategy, RelationInfo};
+use database_introspection::*;
+use datamodel::{
+    common::PrismaType, Datamodel, Field, FieldArity, FieldType, IdInfo, IdStrategy, Model, OnDeleteStrategy,
+    RelationInfo,
+};
 use failure::Error;
 use log::debug;
 
@@ -22,6 +25,7 @@ pub fn calculate_model(schema: &DatabaseSchema) -> Result<Datamodel> {
                 ColumnArity::Nullable => FieldArity::Optional,
                 ColumnArity::List => FieldArity::List,
             };
+            let id_info = calc_id_info(&column, &table);
             let field = Field {
                 name: column.name.clone(),
                 arity,
@@ -29,7 +33,7 @@ pub fn calculate_model(schema: &DatabaseSchema) -> Result<Datamodel> {
                 database_name: None,
                 default_value: None,
                 is_unique: table.is_column_unique(&column),
-                id_info: None,
+                id_info,
                 scalar_list_strategy: None,
                 documentation: None,
                 is_generated: false,
@@ -40,6 +44,23 @@ pub fn calculate_model(schema: &DatabaseSchema) -> Result<Datamodel> {
         data_model.add_model(model);
     }
     Ok(data_model)
+}
+
+fn calc_id_info(column: &Column, table: &Table) -> Option<IdInfo> {
+    table.primary_key.as_ref().and_then(|pk| {
+        if pk.contains_column(&column.name) {
+            let strategy = match column.auto_increment {
+                true => IdStrategy::Auto,
+                false => IdStrategy::None,
+            };
+            Some(IdInfo {
+                strategy,
+                sequence: None,
+            })
+        } else {
+            None
+        }
+    })
 }
 
 fn calculate_field_type(column: &Column, table: &Table) -> FieldType {
