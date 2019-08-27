@@ -1077,6 +1077,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "introspection-core"
+version = "0.1.0"
+dependencies = [
+ "database-introspection 0.1.0",
+ "datamodel 0.1.0",
+ "failure 0.1.5 (registry+https://github.com/rust-lang/crates.io-index)",
+ "introspection-command 0.1.0",
+ "prisma-query 0.1.0 (git+https://github.com/prisma/prisma-query.git)",
+ "url 1.7.2 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
 name = "iovec"
 version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"

@@ -1,0 +1,20 @@
+[package]
+name = "introspection-core"
+version = "0.1.0"
+authors = ["Marcus Böhm <boehm@prisma.io>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+url = "1.7"
+prisma-query = { git = "https://github.com/prisma/prisma-query.git" }
+database-introspection = { path = "../../libs/database-introspection" }
+introspection-command = { path = "../../libs/introspection-command" }
+datamodel = { path = "../../libs/datamodel" }
+failure = "0.1"
+
+[[bin]]
+name = "introspection-engine"
+path = "src/main.rs"
+
