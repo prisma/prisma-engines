@@ -10,7 +10,10 @@ use crate::{
     response_ir::{Response, ResultIrBuilder},
     CoreError, CoreResult, QueryPair, QuerySchemaRef, ResultPair, ResultResolutionStrategy,
 };
-use connector::{ModelExtractor, Query, ReadQuery};
+use connector::*;
+use petgraph::{graph::*, *};
+use prisma_models::RelationFieldRef;
+use std::sync::Arc;
 
 /// Central query executor and main entry point into the query core.
 pub struct QueryExecutor {
@@ -39,16 +42,72 @@ impl QueryExecutor {
         let queries = QueryBuilder::new(query_schema).build(query_doc)?;
 
         // 2. Build query plan
-        // ...
+        let mut graph = self.build_graph(queries);
+        self.transform(&mut graph);
 
         // 3. Execute query plan
-        let results: Vec<ResultPair> = self.execute_queries(queries)?;
+        // let results: Vec<ResultPair> = self.execute_queries(queries)?;
 
         // 4. Build IR response / Parse results into IR response
-        Ok(results
+        // Ok(results
+        //     .into_iter()
+        //     .fold(ResultIrBuilder::new(), |builder, result| builder.push(result))
+        //     .build())
+        unimplemented!()
+    }
+
+    fn build_graph(&self, pairs: Vec<QueryPair>) -> Graph<Query, RelationFieldRef> {
+        let mut graph = Graph::<Query, RelationFieldRef>::new();
+
+        pairs.into_iter().for_each(|pair| match pair {
+            (Query::Write(wq), _) => {
+                let nested = wq.nested_queries();
+                let top = graph.add_node(Query::Write(wq));
+
+                nested.creates.into_iter().for_each(|nc| {
+                    let relation_field = Arc::clone(&nc.relation_field);
+                    let n = graph.add_node(Query::Write(WriteQuery::Root("".into(), Some("".into()), nc.into())));
+                    graph.add_edge(top, n, relation_field);
+                });
+            }
+            _ => unimplemented!(),
+        });
+
+        graph
+    }
+
+    fn transform(&self, graph: &mut Graph<Query, RelationFieldRef>) {
+        let candidates: Vec<EdgeIndex> = graph
+            .raw_edges()
             .into_iter()
-            .fold(ResultIrBuilder::new(), |builder, result| builder.push(result))
-            .build())
+            .filter_map(|edge| {
+                let parent = graph.node_weight(edge.source()).unwrap();
+                let child = graph.node_weight(edge.target()).unwrap();
+                let edge_index = graph.find_edge(edge.source(), edge.target()).unwrap();
+                let relation_field: &RelationFieldRef = &edge.weight;
+
+                match (parent, child) {
+                    (
+                        Query::Write(WriteQuery::Root(_, _, RootWriteQuery::CreateRecord(_))),
+                        Query::Write(WriteQuery::Root(_, _, RootWriteQuery::CreateRecord(_))),
+                    ) => {
+                        if relation_field.relation_is_inlined_in_parent() {
+                            None
+                        } else {
+                            Some(edge_index)
+                        }
+                    }
+                    _ => None,
+                }
+            })
+            .collect();
+
+        candidates.into_iter().for_each(|edge_index| {
+            let (parent, child) = graph.edge_endpoints(edge_index).unwrap();
+            let relation_field = graph.remove_edge(edge_index).unwrap();
+
+            graph.add_edge(child, parent, relation_field.related_field());
+        });
     }
 
     fn execute_queries(&self, queries: Vec<QueryPair>) -> CoreResult<Vec<ResultPair>> {

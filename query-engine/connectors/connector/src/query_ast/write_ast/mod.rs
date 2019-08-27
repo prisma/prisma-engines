@@ -26,6 +26,15 @@ pub enum WriteQuery {
     Nested(NestedWriteQuery),
 }
 
+impl WriteQuery {
+    pub fn nested_queries(&self) -> NestedWriteQueries {
+        match self {
+            WriteQuery::Root(_, _, _wq) => unimplemented!(),
+            WriteQuery::Nested(_nwq) => unimplemented!(),
+        }
+    }
+}
+
 impl ModelExtractor for WriteQuery {
     fn extract_model(&self) -> Option<ModelRef> {
         match self {
