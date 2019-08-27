@@ -109,7 +109,6 @@ fn a_data_model_can_be_generated_from_a_schema() {
                     arity: ColumnArity::Nullable,
                     default: None,
                     auto_increment: false,
-                    unique: false,
                 })
                 .collect(),
             indices: vec![],
@@ -195,7 +194,6 @@ fn arity_is_preserved_when_generating_data_model_from_a_schema() {
                     arity: ColumnArity::Nullable,
                     default: None,
                     auto_increment: false,
-                    unique: false,
                 },
                 Column {
                     name: "required".to_string(),
@@ -206,7 +204,6 @@ fn arity_is_preserved_when_generating_data_model_from_a_schema() {
                     arity: ColumnArity::Required,
                     default: None,
                     auto_increment: false,
-                    unique: false,
                 },
                 Column {
                     name: "list".to_string(),
@@ -217,7 +214,6 @@ fn arity_is_preserved_when_generating_data_model_from_a_schema() {
                     arity: ColumnArity::List,
                     default: None,
                     auto_increment: false,
-                    unique: false,
                 },
             ],
             indices: vec![],
@@ -290,7 +286,6 @@ fn uniqueness_is_preserved_when_generating_data_model_from_a_schema() {
                     arity: ColumnArity::Nullable,
                     default: None,
                     auto_increment: false,
-                    unique: false,
                 },
                 Column {
                     name: "unique".to_string(),
@@ -301,10 +296,13 @@ fn uniqueness_is_preserved_when_generating_data_model_from_a_schema() {
                     arity: ColumnArity::Required,
                     default: None,
                     auto_increment: false,
-                    unique: true,
                 },
             ],
-            indices: vec![],
+            indices: vec![Index {
+                name: "unique".to_string(),
+                columns: vec!["unique".to_string()],
+                tpe: IndexType::Unique,
+            }],
             primary_key: None,
             foreign_keys: vec![],
         }],

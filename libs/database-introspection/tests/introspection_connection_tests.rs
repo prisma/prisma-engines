@@ -234,7 +234,6 @@ fn all_postgres_column_types_must_work() {
             arity: ColumnArity::List,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "array_bool_col".to_string(),
@@ -245,7 +244,6 @@ fn all_postgres_column_types_must_work() {
             arity: ColumnArity::List,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "array_date_col".to_string(),
@@ -256,7 +254,6 @@ fn all_postgres_column_types_must_work() {
             arity: ColumnArity::List,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "array_double_col".to_string(),
@@ -267,7 +264,6 @@ fn all_postgres_column_types_must_work() {
             arity: ColumnArity::List,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "array_float_col".to_string(),
@@ -278,7 +274,6 @@ fn all_postgres_column_types_must_work() {
             arity: ColumnArity::List,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "array_int_col".to_string(),
@@ -289,7 +284,6 @@ fn all_postgres_column_types_must_work() {
             arity: ColumnArity::List,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "array_text_col".to_string(),
@@ -300,7 +294,6 @@ fn all_postgres_column_types_must_work() {
             arity: ColumnArity::List,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "array_varchar_col".to_string(),
@@ -311,7 +304,6 @@ fn all_postgres_column_types_must_work() {
             arity: ColumnArity::List,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "binary_col".to_string(),
@@ -322,7 +314,6 @@ fn all_postgres_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "boolean_col".to_string(),
@@ -333,7 +324,6 @@ fn all_postgres_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "date_time_col".to_string(),
@@ -344,7 +334,6 @@ fn all_postgres_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "double_col".to_string(),
@@ -355,7 +344,6 @@ fn all_postgres_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "float_col".to_string(),
@@ -366,7 +354,6 @@ fn all_postgres_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "int_col".to_string(),
@@ -377,7 +364,6 @@ fn all_postgres_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "primary_col".to_string(),
@@ -394,7 +380,6 @@ fn all_postgres_column_types_must_work() {
                 _ => None,
             },
             auto_increment: true,
-            unique: false,
         },
         Column {
             name: "string1_col".to_string(),
@@ -405,7 +390,6 @@ fn all_postgres_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "string2_col".to_string(),
@@ -416,7 +400,6 @@ fn all_postgres_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "bigint_col".to_string(),
@@ -427,7 +410,6 @@ fn all_postgres_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "bigserial_col".to_string(),
@@ -441,7 +423,6 @@ fn all_postgres_column_types_must_work() {
                 SCHEMA
             )),
             auto_increment: true,
-            unique: false,
         },
         Column {
             name: "bit_col".to_string(),
@@ -452,7 +433,6 @@ fn all_postgres_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "bit_varying_col".to_string(),
@@ -463,7 +443,6 @@ fn all_postgres_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "box_col".to_string(),
@@ -474,7 +453,6 @@ fn all_postgres_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "char_col".to_string(),
@@ -485,7 +463,6 @@ fn all_postgres_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "circle_col".to_string(),
@@ -496,7 +473,6 @@ fn all_postgres_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "interval_col".to_string(),
@@ -507,7 +483,6 @@ fn all_postgres_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "line_col".to_string(),
@@ -518,7 +493,6 @@ fn all_postgres_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "lseg_col".to_string(),
@@ -529,7 +503,6 @@ fn all_postgres_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "numeric_col".to_string(),
@@ -540,7 +513,6 @@ fn all_postgres_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "path_col".to_string(),
@@ -551,7 +523,6 @@ fn all_postgres_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "pg_lsn_col".to_string(),
@@ -562,7 +533,6 @@ fn all_postgres_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "polygon_col".to_string(),
@@ -573,7 +543,6 @@ fn all_postgres_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "smallint_col".to_string(),
@@ -584,7 +553,6 @@ fn all_postgres_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "smallserial_col".to_string(),
@@ -598,7 +566,6 @@ fn all_postgres_column_types_must_work() {
                 SCHEMA
             )),
             auto_increment: true,
-            unique: false,
         },
         Column {
             name: "serial_col".to_string(),
@@ -609,7 +576,6 @@ fn all_postgres_column_types_must_work() {
             arity: ColumnArity::Required,
             default: Some(format!("nextval('\"{}\".\"User_serial_col_seq\"'::regclass)", SCHEMA)),
             auto_increment: true,
-            unique: false,
         },
         Column {
             name: "time_col".to_string(),
@@ -620,7 +586,6 @@ fn all_postgres_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "time_with_zone_col".to_string(),
@@ -631,7 +596,6 @@ fn all_postgres_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "timestamp_col".to_string(),
@@ -642,7 +606,6 @@ fn all_postgres_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "timestamp_with_zone_col".to_string(),
@@ -653,7 +616,6 @@ fn all_postgres_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "tsquery_col".to_string(),
@@ -664,7 +626,6 @@ fn all_postgres_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "tsvector_col".to_string(),
@@ -675,7 +636,6 @@ fn all_postgres_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "txid_col".to_string(),
@@ -686,7 +646,6 @@ fn all_postgres_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "json_col".to_string(),
@@ -697,7 +656,6 @@ fn all_postgres_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "jsonb_col".to_string(),
@@ -708,7 +666,6 @@ fn all_postgres_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "uuid_col".to_string(),
@@ -719,7 +676,6 @@ fn all_postgres_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
     ];
     expected_columns.sort_unstable_by_key(|c| c.name.to_owned());
@@ -729,7 +685,11 @@ fn all_postgres_column_types_must_work() {
         Table {
             name: "User".to_string(),
             columns: expected_columns,
-            indices: vec![],
+            indices: vec![Index {
+                name: "User_uuid_col_key".to_string(),
+                columns: vec!["uuid_col".to_string(),],
+                tpe: IndexType::Unique,
+            },],
             primary_key: Some(PrimaryKey {
                 columns: vec!["primary_col".to_string()],
             }),
@@ -800,7 +760,6 @@ fn all_mysql_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: true,
-            unique: false,
         },
         Column {
             name: "int_col".to_string(),
@@ -811,7 +770,6 @@ fn all_mysql_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "smallint_col".to_string(),
@@ -822,7 +780,6 @@ fn all_mysql_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "tinyint_col".to_string(),
@@ -833,7 +790,6 @@ fn all_mysql_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "mediumint_col".to_string(),
@@ -844,7 +800,6 @@ fn all_mysql_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "bigint_col".to_string(),
@@ -855,7 +810,6 @@ fn all_mysql_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "decimal_col".to_string(),
@@ -866,7 +820,6 @@ fn all_mysql_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "numeric_col".to_string(),
@@ -877,7 +830,6 @@ fn all_mysql_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "float_col".to_string(),
@@ -888,7 +840,6 @@ fn all_mysql_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "double_col".to_string(),
@@ -899,7 +850,6 @@ fn all_mysql_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "date_col".to_string(),
@@ -910,7 +860,6 @@ fn all_mysql_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "time_col".to_string(),
@@ -921,7 +870,6 @@ fn all_mysql_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "datetime_col".to_string(),
@@ -932,7 +880,6 @@ fn all_mysql_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "timestamp_col".to_string(),
@@ -943,7 +890,6 @@ fn all_mysql_column_types_must_work() {
             arity: ColumnArity::Required,
             default: Some("CURRENT_TIMESTAMP".to_string()),
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "year_col".to_string(),
@@ -954,7 +900,6 @@ fn all_mysql_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "char_col".to_string(),
@@ -965,7 +910,6 @@ fn all_mysql_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "varchar_col".to_string(),
@@ -976,7 +920,6 @@ fn all_mysql_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "text_col".to_string(),
@@ -987,7 +930,6 @@ fn all_mysql_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "tinytext_col".to_string(),
@@ -998,7 +940,6 @@ fn all_mysql_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "mediumtext_col".to_string(),
@@ -1009,7 +950,6 @@ fn all_mysql_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "longtext_col".to_string(),
@@ -1020,7 +960,6 @@ fn all_mysql_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "enum_col".to_string(),
@@ -1031,7 +970,6 @@ fn all_mysql_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "set_col".to_string(),
@@ -1042,7 +980,6 @@ fn all_mysql_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "binary_col".to_string(),
@@ -1053,7 +990,6 @@ fn all_mysql_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "varbinary_col".to_string(),
@@ -1064,7 +1000,6 @@ fn all_mysql_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "blob_col".to_string(),
@@ -1075,7 +1010,6 @@ fn all_mysql_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "tinyblob_col".to_string(),
@@ -1086,7 +1020,6 @@ fn all_mysql_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "mediumblob_col".to_string(),
@@ -1097,7 +1030,6 @@ fn all_mysql_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "longblob_col".to_string(),
@@ -1108,7 +1040,6 @@ fn all_mysql_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "geometry_col".to_string(),
@@ -1119,7 +1050,6 @@ fn all_mysql_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "point_col".to_string(),
@@ -1130,7 +1060,6 @@ fn all_mysql_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "linestring_col".to_string(),
@@ -1141,7 +1070,6 @@ fn all_mysql_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "polygon_col".to_string(),
@@ -1152,7 +1080,6 @@ fn all_mysql_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "multipoint_col".to_string(),
@@ -1163,7 +1090,6 @@ fn all_mysql_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "multilinestring_col".to_string(),
@@ -1174,7 +1100,6 @@ fn all_mysql_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "multipolygon_col".to_string(),
@@ -1185,7 +1110,6 @@ fn all_mysql_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "geometrycollection_col".to_string(),
@@ -1196,7 +1120,6 @@ fn all_mysql_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "json_col".to_string(),
@@ -1207,7 +1130,6 @@ fn all_mysql_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
     ];
     expected_columns.sort_unstable_by_key(|c| c.name.to_owned());
@@ -1252,7 +1174,6 @@ fn sqlite_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "text_col".to_string(),
@@ -1263,7 +1184,6 @@ fn sqlite_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "real_col".to_string(),
@@ -1274,7 +1194,6 @@ fn sqlite_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "primary_col".to_string(),
@@ -1285,7 +1204,6 @@ fn sqlite_column_types_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: true,
-            unique: false,
         },
     ];
     expected_columns.sort_unstable_by_key(|c| c.name.to_owned());
@@ -1328,7 +1246,6 @@ fn is_required_must_work() {
                     arity: ColumnArity::Required,
                     default: None,
                     auto_increment: false,
-                    unique: false,
                 },
                 Column {
                     name: "column2".to_string(),
@@ -1339,7 +1256,6 @@ fn is_required_must_work() {
                     arity: ColumnArity::Nullable,
                     default: None,
                     auto_increment: false,
-                    unique: false,
                 },
             ];
             assert_eq!(user_table.columns, expected_columns);
@@ -1379,7 +1295,6 @@ fn foreign_keys_must_work() {
                 arity: ColumnArity::Required,
                 default: None,
                 auto_increment: false,
-                unique: false,
             }];
 
             let on_delete_action = match db_type {
@@ -1448,7 +1363,6 @@ fn multi_column_foreign_keys_must_work() {
                     arity: ColumnArity::Required,
                     default: None,
                     auto_increment: false,
-                    unique: false,
                 },
                 Column {
                     name: "city_name".to_string(),
@@ -1459,7 +1373,6 @@ fn multi_column_foreign_keys_must_work() {
                     arity: ColumnArity::Required,
                     default: None,
                     auto_increment: false,
-                    unique: false,
                 },
             ];
 
@@ -1508,7 +1421,6 @@ fn names_with_hyphens_must_work() {
                 arity: ColumnArity::Required,
                 default: None,
                 auto_increment: false,
-                unique: false,
             }];
             assert_eq!(user_table.columns, expected_columns);
         },
@@ -1552,7 +1464,6 @@ fn postgres_foreign_key_on_delete_must_be_handled() {
                     arity: ColumnArity::Nullable,
                     default: None,
                     auto_increment: false,
-                    unique: false,
                 },
                 Column {
                     name: "city_cascade".to_string(),
@@ -1563,7 +1474,6 @@ fn postgres_foreign_key_on_delete_must_be_handled() {
                     arity: ColumnArity::Nullable,
                     default: None,
                     auto_increment: false,
-                    unique: false,
                 },
                 Column {
                     name: "city_restrict".to_string(),
@@ -1574,7 +1484,6 @@ fn postgres_foreign_key_on_delete_must_be_handled() {
                     arity: ColumnArity::Nullable,
                     default: None,
                     auto_increment: false,
-                    unique: false,
                 },
                 Column {
                     name: "city_set_default".to_string(),
@@ -1585,7 +1494,6 @@ fn postgres_foreign_key_on_delete_must_be_handled() {
                     arity: ColumnArity::Nullable,
                     default: None,
                     auto_increment: false,
-                    unique: false,
                 },
                 Column {
                     name: "city_set_null".to_string(),
@@ -1596,7 +1504,6 @@ fn postgres_foreign_key_on_delete_must_be_handled() {
                     arity: ColumnArity::Nullable,
                     default: None,
                     auto_increment: false,
-                    unique: false,
                 },
                 Column {
                     name: "id".to_string(),
@@ -1607,7 +1514,6 @@ fn postgres_foreign_key_on_delete_must_be_handled() {
                     arity: ColumnArity::Required,
                     default: None,
                     auto_increment: false,
-                    unique: false,
                 },
             ],
             indices: vec![],
@@ -1687,7 +1593,6 @@ fn mysql_foreign_key_on_delete_must_be_handled() {
                     arity: ColumnArity::Nullable,
                     default: None,
                     auto_increment: false,
-                    unique: false,
                 },
                 Column {
                     name: "city_cascade".to_string(),
@@ -1698,7 +1603,6 @@ fn mysql_foreign_key_on_delete_must_be_handled() {
                     arity: ColumnArity::Nullable,
                     default: None,
                     auto_increment: false,
-                    unique: false,
                 },
                 Column {
                     name: "city_restrict".to_string(),
@@ -1709,7 +1613,6 @@ fn mysql_foreign_key_on_delete_must_be_handled() {
                     arity: ColumnArity::Nullable,
                     default: None,
                     auto_increment: false,
-                    unique: false,
                 },
                 Column {
                     name: "city_set_null".to_string(),
@@ -1720,7 +1623,6 @@ fn mysql_foreign_key_on_delete_must_be_handled() {
                     arity: ColumnArity::Nullable,
                     default: None,
                     auto_increment: false,
-                    unique: false,
                 },
                 Column {
                     name: "id".to_string(),
@@ -1731,7 +1633,6 @@ fn mysql_foreign_key_on_delete_must_be_handled() {
                     arity: ColumnArity::Required,
                     default: None,
                     auto_increment: true,
-                    unique: false,
                 },
             ],
             indices: vec![],
@@ -1794,7 +1695,6 @@ fn sqlite_composite_primary_key_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
         Column {
             name: "name".to_string(),
@@ -1805,7 +1705,6 @@ fn sqlite_composite_primary_key_must_work() {
             arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
-            unique: false,
         },
     ];
     expected_columns.sort_unstable_by_key(|c| c.name.to_owned());
@@ -1815,7 +1714,11 @@ fn sqlite_composite_primary_key_must_work() {
         &Table {
             name: "User".to_string(),
             columns: expected_columns,
-            indices: vec![],
+            indices: vec![Index {
+                name: "sqlite_autoindex_User_1".to_string(),
+                columns: vec!["id".to_string(), "name".to_string(),],
+                tpe: IndexType::Unique,
+            },],
             primary_key: Some(PrimaryKey {
                 columns: vec!["id".to_string(), "name".to_string()],
             }),
@@ -1860,7 +1763,6 @@ fn sqlite_foreign_key_on_delete_must_be_handled() {
                     arity: ColumnArity::Nullable,
                     default: None,
                     auto_increment: false,
-                    unique: false,
                 },
                 Column {
                     name: "city_cascade".to_string(),
@@ -1871,7 +1773,6 @@ fn sqlite_foreign_key_on_delete_must_be_handled() {
                     arity: ColumnArity::Nullable,
                     default: None,
                     auto_increment: false,
-                    unique: false,
                 },
                 Column {
                     name: "city_restrict".to_string(),
@@ -1882,7 +1783,6 @@ fn sqlite_foreign_key_on_delete_must_be_handled() {
                     arity: ColumnArity::Nullable,
                     default: None,
                     auto_increment: false,
-                    unique: false,
                 },
                 Column {
                     name: "city_set_default".to_string(),
@@ -1893,7 +1793,6 @@ fn sqlite_foreign_key_on_delete_must_be_handled() {
                     arity: ColumnArity::Nullable,
                     default: None,
                     auto_increment: false,
-                    unique: false,
                 },
                 Column {
                     name: "city_set_null".to_string(),
@@ -1904,7 +1803,6 @@ fn sqlite_foreign_key_on_delete_must_be_handled() {
                     arity: ColumnArity::Nullable,
                     default: None,
                     auto_increment: false,
-                    unique: false,
                 },
                 Column {
                     name: "id".to_string(),
@@ -1915,7 +1813,6 @@ fn sqlite_foreign_key_on_delete_must_be_handled() {
                     arity: ColumnArity::Required,
                     default: None,
                     auto_increment: true,
-                    unique: false,
                 },
             ],
             indices: vec![],
@@ -2031,7 +1928,6 @@ fn indices_must_work() {
                     arity: ColumnArity::Required,
                     default: None,
                     auto_increment: false,
-                    unique: false,
                 },
                 Column {
                     name: "id".to_string(),
@@ -2042,7 +1938,6 @@ fn indices_must_work() {
                     arity: ColumnArity::Required,
                     default,
                     auto_increment: true,
-                    unique: false,
                 },
             ];
             assert_eq!(
@@ -2072,46 +1967,86 @@ fn column_uniqueness_must_be_detected() {
     test_each_backend(
         |db_type, migration| {
             migration.create_table("User", move |t| {
-                t.add_column("uniq", types::integer());
+                t.add_column("uniq1", types::integer().unique(true));
+                t.add_column("uniq2", types::integer());
             });
             let index_sql = match db_type {
-                DbType::MySql => format!("CREATE UNIQUE INDEX `uniq` ON `{}`.`User` (uniq)", SCHEMA),
-                DbType::Sqlite => format!("CREATE UNIQUE INDEX \"{}\".\"uniq\" ON \"User\" (uniq)", SCHEMA),
-                DbType::Postgres => format!("CREATE UNIQUE INDEX \"uniq\" ON \"{}\".\"User\" (uniq)", SCHEMA),
+                DbType::MySql => format!("CREATE UNIQUE INDEX `uniq` ON `{}`.`User` (uniq2)", SCHEMA),
+                DbType::Sqlite => format!("CREATE UNIQUE INDEX \"{}\".\"uniq\" ON \"User\" (uniq2)", SCHEMA),
+                DbType::Postgres => format!("CREATE UNIQUE INDEX \"uniq\" ON \"{}\".\"User\" (uniq2)", SCHEMA),
             };
             migration.inject_custom(index_sql);
         },
         |db_type, inspector| {
             let result = inspector.introspect(&SCHEMA.to_string()).expect("introspecting");
             let user_table = result.get_table("User").expect("getting User table");
-            let expected_columns = vec![Column {
-                name: "uniq".to_string(),
-                tpe: ColumnType {
-                    raw: int_type(db_type),
-                    family: ColumnTypeFamily::Int,
+            let expected_columns = vec![
+                Column {
+                    name: "uniq1".to_string(),
+                    tpe: ColumnType {
+                        raw: int_type(db_type),
+                        family: ColumnTypeFamily::Int,
+                    },
+                    arity: ColumnArity::Required,
+                    default: None,
+                    auto_increment: false,
                 },
-                arity: ColumnArity::Required,
-                default: None,
-                auto_increment: false,
-                unique: false,
+                Column {
+                    name: "uniq2".to_string(),
+                    tpe: ColumnType {
+                        raw: int_type(db_type),
+                        family: ColumnTypeFamily::Int,
+                    },
+                    arity: ColumnArity::Required,
+                    default: None,
+                    auto_increment: false,
+                },
+            ];
+            let mut expected_indices = vec![Index {
+                name: "uniq".to_string(),
+                columns: vec!["uniq2".to_string()],
+                tpe: IndexType::Unique,
             }];
+            match db_type {
+                DbType::MySql => expected_indices.insert(
+                    0,
+                    Index {
+                        name: "uniq1".to_string(),
+                        columns: vec!["uniq1".to_string()],
+                        tpe: IndexType::Unique,
+                    },
+                ),
+                DbType::Postgres => expected_indices.insert(
+                    0,
+                    Index {
+                        name: "User_uniq1_key".to_string(),
+                        columns: vec!["uniq1".to_string()],
+                        tpe: IndexType::Unique,
+                    },
+                ),
+                DbType::Sqlite => expected_indices.push(Index {
+                    name: "sqlite_autoindex_User_1".to_string(),
+                    columns: vec!["uniq1".to_string()],
+                    tpe: IndexType::Unique,
+                }),
+            };
             assert_eq!(
                 user_table,
                 &Table {
                     name: "User".to_string(),
                     columns: expected_columns,
-                    indices: vec![Index {
-                        name: "uniq".to_string(),
-                        columns: vec!["uniq".to_string()],
-                        tpe: IndexType::Unique,
-                    },],
+                    indices: expected_indices,
                     primary_key: None,
                     foreign_keys: vec![],
                 }
             );
             assert!(
-                user_table.columns[0].is_unique(),
-                "Column should return true for is_unique"
+                user_table.is_column_unique(&user_table.columns[0]),
+                "Column 1 should return true for is_unique"
+            );
+            assert!(
+                user_table.is_column_unique(&user_table.columns[1]),
+                "Column 2 should return true for is_unique"
             );
         },
     );

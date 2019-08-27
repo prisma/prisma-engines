@@ -233,7 +233,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 [[package]]
 name = "barrel"
 version = "0.6.3-alpha.0"
-source = "git+https://github.com/aknuds1/barrel.git#7b67ad4c8810e138c071bfca94b2ecc11f296494"
+source = "git+https://github.com/aknuds1/barrel.git#ad9a0b30fe867d74037b900f7c28f8ae7f5e5e3f"
 
 [[package]]
 name = "base64"

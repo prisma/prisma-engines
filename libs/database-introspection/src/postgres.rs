@@ -146,7 +146,6 @@ impl IntrospectionConnector {
                     arity,
                     default,
                     auto_increment: is_auto_increment,
-                    unique: false,
                 }
             })
             .collect();

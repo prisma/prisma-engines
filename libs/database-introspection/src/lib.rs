@@ -144,6 +144,12 @@ impl Table {
             None => Vec::new(),
         }
     }
+
+    pub fn is_column_unique(&self, column: &Column) -> bool {
+        self.indices
+            .iter()
+            .any(|index| index.tpe == IndexType::Unique && index.columns.contains(&column.name))
+    }
 }
 /// The type of an index.
 #[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
@@ -196,8 +202,6 @@ pub struct Column {
     pub default: Option<String>,
     /// Column auto increment setting, MySQL/SQLite only.
     pub auto_increment: bool,
-    /// Is the column marked as unique?
-    pub unique: bool,
 }
 
 impl Column {
@@ -215,11 +219,6 @@ impl Column {
         //            println!("differs_in_something_except_default \n {:?} \n {:?}", &self, &other);
         //        }
         result
-    }
-
-    /// Is this column unique, either through column property or via index?
-    pub fn is_unique(&self) -> bool {
-        self.unique
     }
 }
 

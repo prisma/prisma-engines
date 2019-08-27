@@ -138,7 +138,6 @@ impl IntrospectionConnector {
                         })
                         .expect("get default"),
                     auto_increment: auto_increment,
-                    unique: false,
                 }
             })
             .collect();

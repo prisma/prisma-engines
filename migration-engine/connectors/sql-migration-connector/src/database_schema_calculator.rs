@@ -61,7 +61,6 @@ impl<'a> DatabaseSchemaCalculator<'a> {
                                         false
                                     }
                                 },
-                                unique: false,
                             })
                         }
                         _ => None,
@@ -129,7 +128,6 @@ impl<'a> DatabaseSchemaCalculator<'a> {
                             arity: ColumnArity::Required,
                             default: None,
                             auto_increment: false,
-                            unique: false,
                         },
                         Column {
                             name: "position".to_string(),
@@ -137,7 +135,6 @@ impl<'a> DatabaseSchemaCalculator<'a> {
                             arity: ColumnArity::Required,
                             default: None,
                             auto_increment: false,
-                            unique: false,
                         },
                         Column {
                             name: "value".to_string(),
@@ -145,7 +142,6 @@ impl<'a> DatabaseSchemaCalculator<'a> {
                             arity: ColumnArity::Required,
                             default: None,
                             auto_increment: false,
-                            unique: false,
                         },
                     ],
                     indices: Vec::new(),
@@ -187,7 +183,6 @@ impl<'a> DatabaseSchemaCalculator<'a> {
                             arity: column_arity(&field),
                             default: None,
                             auto_increment: false,
-                            unique: false,
                         };
                         model_table.table.columns.push(column);
                         model_table.table.foreign_keys.push(foreign_key)
@@ -228,7 +223,6 @@ impl<'a> DatabaseSchemaCalculator<'a> {
                                 arity: ColumnArity::Required,
                                 default: None,
                                 auto_increment: false,
-                                unique: false,
                             },
                             Column {
                                 name: relation.model_b_column(),
@@ -236,7 +230,6 @@ impl<'a> DatabaseSchemaCalculator<'a> {
                                 arity: ColumnArity::Required,
                                 default: None,
                                 auto_increment: false,
-                                unique: false,
                             },
                         ],
                         indices: vec![Index {

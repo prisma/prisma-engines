@@ -3,7 +3,6 @@ use super::*;
 use crate::IntrospectionConnection;
 use log::debug;
 use prisma_query::ast::ParameterizedValue;
-use regex::Regex;
 use std::collections::HashMap;
 use std::sync::Arc;
 
@@ -55,12 +54,12 @@ impl IntrospectionConnector {
 
     fn get_table(&self, schema: &str, name: &str) -> Table {
         debug!("Introspecting table '{}' in schema '{}", name, schema);
-        let (introspected_columns, primary_key) = self.get_columns(schema, name);
+        let (columns, primary_key) = self.get_columns(schema, name);
         let foreign_keys = self.get_foreign_keys(schema, name);
         let indices = self.get_indices(schema, name);
         Table {
             name: name.to_string(),
-            columns: introspected_columns,
+            columns,
             indices,
             primary_key,
             foreign_keys,
@@ -98,7 +97,6 @@ impl IntrospectionConnector {
                     arity: arity.clone(),
                     default: default_value.clone(),
                     auto_increment: false,
-                    unique: false,
                 };
                 if pk_col > 0 {
                     pk_cols.insert(pk_col, col.name.clone());
@@ -251,44 +249,26 @@ impl IntrospectionConnector {
     }
 
     fn get_indices(&self, schema: &str, table: &str) -> Vec<Index> {
-        struct IndexRepr {
-            name: String,
-            is_unique: bool,
-        }
-
         let sql = format!(r#"PRAGMA "{}".index_list("{}");"#, schema, table);
         debug!("Introspecting table indices, SQL: '{}'", sql);
         let result_set = self.conn.query_raw(&sql, schema, &[]).expect("querying for indices");
         debug!("Got indices introspection results: {:?}", result_set);
-        let re_auto = Regex::new(&format!(r"^sqlite_autoindex_{}_\d+", table)).expect("compile auto index regex");
-        let index_reprs: Vec<IndexRepr> = result_set
+        result_set
             .into_iter()
-            .filter_map(|row| {
+            .map(|row| {
                 let is_unique = row.get("unique").and_then(|x| x.as_bool()).expect("get unique");
                 let name = row.get("name").and_then(|x| x.to_string()).expect("get name");
-                // Ignore automatic SQLite indices (f.ex. for primary keys)
-                if re_auto.is_match(&name) {
-                    None
-                } else {
-                    Some(IndexRepr { name, is_unique })
-                }
-            })
-            .collect();
-
-        index_reprs
-            .iter()
-            .map(|index_repr| {
                 let mut index = Index {
-                    name: index_repr.name.clone(),
-                    tpe: match index_repr.is_unique {
+                    name: name.clone(),
+                    tpe: match is_unique {
                         true => IndexType::Unique,
                         false => IndexType::Normal,
                     },
                     columns: vec![],
                 };
 
-                let sql = format!(r#"PRAGMA "{}".index_info("{}");"#, schema, index_repr.name);
-                debug!("Introspecting table index '{}', SQL: '{}'", index_repr.name, sql);
+                let sql = format!(r#"PRAGMA "{}".index_info("{}");"#, schema, name);
+                debug!("Introspecting table index '{}', SQL: '{}'", name, sql);
                 let result_set = self.conn.query_raw(&sql, schema, &[]).expect("querying for index info");
                 debug!("Got index introspection results: {:?}", result_set);
                 for row in result_set.into_iter() {

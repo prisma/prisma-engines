@@ -1,5 +1,6 @@
 use crate::*;
 use database_introspection::*;
+use log::debug;
 
 const MIGRATION_TABLE_NAME: &str = "_Migration";
 
@@ -177,11 +178,23 @@ impl<'a> DatabaseSchemaDiffer<'a> {
                     .ok()
                     .and_then(|t| t.indices.iter().find(|i| i.name == index.name));
                 if let None = next_index_opt {
-                    let drop = DropIndex {
-                        table: previous_table.name.clone(),
-                        name: index.name.clone(),
+                    // If index covers PK, ignore it
+                    let index_covers_pk = match &previous_table.primary_key {
+                        None => false,
+                        Some(pk) => pk.columns == index.columns,
                     };
-                    result.push(drop);
+                    if !index_covers_pk {
+                        debug!("Dropping index '{}' on table '{}'", index.name, 
+                            previous_table.name);
+                        let drop = DropIndex {
+                            table: previous_table.name.clone(),
+                            name: index.name.clone(),
+                        };
+                        result.push(drop);
+                    } else {
+                        debug!("Not dropping index '{}' on table '{}' since it covers PK", 
+                            index.name, previous_table.name);
+                    }
                 }
             }
         }
