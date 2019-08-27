@@ -2072,6 +2072,47 @@ fn column_uniqueness_must_be_detected() {
     );
 }
 
+#[test]
+fn defaults_must_work() {
+    setup();
+
+    test_each_backend(
+        |_, migration| {
+            migration.create_table("User", move |t| {
+                t.add_column("id", types::integer().default(1).nullable(true));
+            });
+        },
+        |db_type, inspector| {
+            let result = inspector.introspect(&SCHEMA.to_string()).expect("introspecting");
+            let user_table = result.get_table("User").expect("getting User table");
+            let default = match db_type {
+                DbType::Sqlite => "'1'".to_string(),
+                _ => "1".to_string(),
+            };
+            let expected_columns = vec![Column {
+                name: "id".to_string(),
+                tpe: ColumnType {
+                    raw: int_type(db_type),
+                    family: ColumnTypeFamily::Int,
+                },
+                arity: ColumnArity::Nullable,
+                default: Some(default),
+                auto_increment: false,
+            }];
+            assert_eq!(
+                user_table,
+                &Table {
+                    name: "User".to_string(),
+                    columns: expected_columns,
+                    indices: vec![],
+                    primary_key: None,
+                    foreign_keys: vec![],
+                }
+            );
+        },
+    );
+}
+
 fn test_each_backend<MigrationFn, TestFn>(mut migration_fn: MigrationFn, test_fn: TestFn)
 where
     MigrationFn: FnMut(DbType, &mut Migration) -> (),
