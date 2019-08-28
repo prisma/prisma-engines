@@ -42,7 +42,7 @@ pub trait ManagedDatabaseReader {
     fn count_by_table(&self, database: &str, table: &str) -> crate::Result<usize>;
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ScalarListValues {
     pub record_id: GraphqlId,
     pub values: Vec<PrismaValue>,

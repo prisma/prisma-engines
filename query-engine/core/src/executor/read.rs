@@ -3,6 +3,7 @@ use connector::{self, query_ast::*, result_ast::*, ManagedDatabaseReader, Scalar
 use prisma_models::{GraphqlId, ScalarField, SelectedFields};
 use std::sync::Arc;
 
+#[derive(Clone)]
 pub struct ReadQueryExecutor {
     pub data_resolver: Arc<dyn ManagedDatabaseReader + Send + Sync + 'static>,
 }

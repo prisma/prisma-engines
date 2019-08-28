@@ -29,7 +29,7 @@ use prisma_models::ManyRecords;
 //     pub id_field: String,
 // }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ReadQueryResult {
     /// Orignal query key.
     pub name: String,
@@ -41,13 +41,13 @@ pub struct ReadQueryResult {
     pub content: ResultContent,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum ResultContent {
     RecordSelection(RecordSelection),
     Count(usize),
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct RecordSelection {
     /// Holds an ordered list of selected field names for each contained record.
     pub fields: Vec<String>,

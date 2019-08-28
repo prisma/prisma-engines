@@ -6,6 +6,7 @@ use petgraph::visit::EdgeRef;
 use prisma_models::prelude::*;
 use std::convert::TryInto;
 use std::fmt::Debug;
+use connector::ReadQuery;
 
 pub enum Expression {
     Sequence {
@@ -17,10 +18,17 @@ pub enum Expression {
     Write {
         write: RootWriteQuery,
     },
+    Read {
+        read: ReadQuery,
+    },
     Let {
         bindings: Vec<Binding>,
         expressions: Vec<Expression>,
     },
+    Serialize {
+        key: String,
+        expression: Box<Expression>,
+    }
 }
 
 impl Debug for Expression {
@@ -54,7 +62,8 @@ impl Debug for Expression {
                 write!(f, "Write {{\n")?;
                 write!(f, "\twrite = {:?}\n", write)?;
                 write!(f, "}}\n")?;
-            }
+            },
+            _ => unimplemented!()
         };
 
         Ok(())
@@ -141,6 +150,7 @@ impl Expressionista {
 pub enum ExpressionResult {
     Vec(Vec<ExpressionResult>),
     Write(WriteQueryResultWrapper),
+    Read(ReadQueryResult)
 }
 
 impl ExpressionResult {
@@ -175,6 +185,7 @@ impl Env {
 
 pub struct QueryInterpreter {
     pub writer: WriteQueryExecutor,
+    pub reader: ReadQueryExecutor,
 }
 
 impl QueryInterpreter {
@@ -200,6 +211,10 @@ impl QueryInterpreter {
                 .writer
                 .execute(WriteQuery::Root("".to_owned(), Some("".to_owned()), write))
                 .map(|res| ExpressionResult::Write(res))?),
+
+            Expression::Read { read } => {
+                Ok(self.reader.execute(read, &[]).map(|res| ExpressionResult::Read(res))?)
+            }
 
             _ => unimplemented!(),
         }

@@ -54,11 +54,12 @@ impl QueryExecutor {
 
         let interpreter = QueryInterpreter {
             writer: self.write_executor.clone(),
+            reader: self.read_executor.clone(),
         };
 
         let exp = Expressionista::translate(graph);
         dbg!(&exp);
-        interpreter.interpret(exp, Env::default())?;
+        let result = interpreter.interpret(exp, Env::default())?;
 
         // 3. Execute query plan
         // let results: Vec<ResultPair> = self.execute_queries(queries)?;
