@@ -1,6 +1,9 @@
+mod error;
+mod interpreter;
 mod read;
 mod write;
 
+pub use error::*;
 pub use read::ReadQueryExecutor;
 pub use write::WriteQueryExecutor;
 
@@ -11,6 +14,7 @@ use crate::{
     CoreError, CoreResult, QueryPair, QuerySchemaRef, ResultPair, ResultResolutionStrategy,
 };
 use connector::*;
+use interpreter::*;
 use petgraph::{graph::*, *};
 use prisma_models::RelationFieldRef;
 use std::sync::Arc;
@@ -20,6 +24,9 @@ pub struct QueryExecutor {
     read_executor: ReadQueryExecutor,
     write_executor: WriteQueryExecutor,
 }
+
+type QueryExecutionResult<T> = std::result::Result<T, QueryExecutionError>;
+type QueryGraph = Graph<Query, RelationFieldRef>;
 
 // Todo:
 // - Partial execution semantics?
@@ -45,6 +52,14 @@ impl QueryExecutor {
         let mut graph = self.build_graph(queries);
         self.transform(&mut graph);
 
+        let interpreter = QueryInterpreter {
+            writer: self.write_executor.clone(),
+        };
+
+        let exp = Expressionista::translate(graph);
+        dbg!(&exp);
+        interpreter.interpret(exp, Env::default())?;
+
         // 3. Execute query plan
         // let results: Vec<ResultPair> = self.execute_queries(queries)?;
 
@@ -56,19 +71,15 @@ impl QueryExecutor {
         unimplemented!()
     }
 
-    fn build_graph(&self, pairs: Vec<QueryPair>) -> Graph<Query, RelationFieldRef> {
+    fn build_graph(&self, pairs: Vec<QueryPair>) -> QueryGraph {
         let mut graph = Graph::<Query, RelationFieldRef>::new();
 
         pairs.into_iter().for_each(|pair| match pair {
-            (Query::Write(wq), _) => {
-                let nested = wq.nested_queries();
+            (Query::Write(mut wq), _) => {
+                let nested = wq.replace_nested_writes();
                 let top = graph.add_node(Query::Write(wq));
 
-                nested.creates.into_iter().for_each(|nc| {
-                    let relation_field = Arc::clone(&nc.relation_field);
-                    let n = graph.add_node(Query::Write(WriteQuery::Root("".into(), Some("".into()), nc.into())));
-                    graph.add_edge(top, n, relation_field);
-                });
+                self.build_nested_graph(top, nested, &mut graph)
             }
             _ => unimplemented!(),
         });
@@ -76,7 +87,18 @@ impl QueryExecutor {
         graph
     }
 
-    fn transform(&self, graph: &mut Graph<Query, RelationFieldRef>) {
+    fn build_nested_graph(&self, top: NodeIndex, nested: NestedWriteQueries, graph: &mut QueryGraph) {
+        nested.creates.into_iter().for_each(|nc| {
+            let relation_field = Arc::clone(&nc.relation_field);
+            let nested = nc.nested_writes.clone();
+            let n = graph.add_node(Query::Write(WriteQuery::Root("".into(), Some("".into()), nc.into())));
+
+            graph.add_edge(top, n, relation_field);
+            self.build_nested_graph(n, nested, graph);
+        });
+    }
+
+    fn transform(&self, graph: &mut QueryGraph) {
         let candidates: Vec<EdgeIndex> = graph
             .raw_edges()
             .into_iter()
@@ -91,10 +113,11 @@ impl QueryExecutor {
                         Query::Write(WriteQuery::Root(_, _, RootWriteQuery::CreateRecord(_))),
                         Query::Write(WriteQuery::Root(_, _, RootWriteQuery::CreateRecord(_))),
                     ) => {
-                        if relation_field.relation_is_inlined_in_parent() {
-                            None
-                        } else {
+                        dbg!(&relation_field);
+                        if dbg!(relation_field.relation_is_inlined_in_parent()) {
                             Some(edge_index)
+                        } else {
+                            None
                         }
                     }
                     _ => None,

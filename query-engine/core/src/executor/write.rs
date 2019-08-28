@@ -3,6 +3,7 @@ use connector::{UnmanagedDatabaseWriter, WriteQuery};
 use std::sync::Arc;
 
 /// A small wrapper around running WriteQueries
+#[derive(Clone)]
 pub struct WriteQueryExecutor {
     pub db_name: String,
     pub write_executor: Arc<dyn UnmanagedDatabaseWriter + Send + Sync + 'static>,

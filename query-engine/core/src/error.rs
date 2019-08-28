@@ -1,4 +1,4 @@
-use crate::query_builders::QueryValidationError;
+use crate::{query_builders::QueryValidationError, executor::QueryExecutionError};
 use connector::error::ConnectorError;
 use failure::Fail;
 use prisma_models::DomainError;
@@ -15,9 +15,6 @@ pub enum CoreError {
     #[fail(display = "{}", _0)]
     QueryValidationError(QueryValidationError),
 
-    #[fail(display = "{}", _0)]
-    LegacyQueryValidationError(String),
-
     #[fail(display = "Unsupported feature: {}", _0)]
     UnsupportedFeatureError(String),
 
@@ -26,6 +23,9 @@ pub enum CoreError {
 
     #[fail(display = "{}", _0)]
     SerializationError(String),
+
+    #[fail(display = "{}", _0)]
+    QueryExecutionError(QueryExecutionError),
 }
 
 impl From<ConnectorError> for CoreError {
@@ -43,5 +43,11 @@ impl From<DomainError> for CoreError {
 impl From<QueryValidationError> for CoreError {
     fn from(e: QueryValidationError) -> CoreError {
         CoreError::QueryValidationError(e)
+    }
+}
+
+impl From<QueryExecutionError> for CoreError {
+    fn from(e: QueryExecutionError) -> CoreError {
+        CoreError::QueryExecutionError(e)
     }
 }

@@ -27,9 +27,9 @@ pub enum WriteQuery {
 }
 
 impl WriteQuery {
-    pub fn nested_queries(&self) -> NestedWriteQueries {
+    pub fn replace_nested_writes(&mut self) -> NestedWriteQueries {
         match self {
-            WriteQuery::Root(_, _, _wq) => unimplemented!(),
+            WriteQuery::Root(_, _, ref mut wq) => wq.replace_nested_writes(),
             WriteQuery::Nested(_nwq) => unimplemented!(),
         }
     }
@@ -53,6 +53,54 @@ pub enum RootWriteQuery {
     UpdateManyRecords(UpdateManyRecords),
     DeleteManyRecords(DeleteManyRecords),
     ResetData(ResetData),
+}
+
+impl RootWriteQuery {
+    // pub fn nested_queries(&self) -> NestedWriteQueries {
+    //     let empty = NestedWriteQueries::default();
+
+    //     match self {
+    //         RootWriteQuery::CreateRecord(x) => x.nested_writes.clone(),
+    //         RootWriteQuery::UpdateRecord(x) => x.nested_writes.clone(),
+    //         RootWriteQuery::DeleteRecord(_) => empty,
+    //         RootWriteQuery::UpsertRecord(_) => empty,
+    //         RootWriteQuery::UpdateManyRecords(_) => empty,
+    //         RootWriteQuery::DeleteManyRecords(_) => empty,
+    //         RootWriteQuery::ResetData(_) => empty,
+    //     }
+    // }
+
+    pub fn inject_non_list_arg(&mut self, key: String, value: PrismaValue) {
+        match self {
+            RootWriteQuery::CreateRecord(x) => {
+                x.non_list_args.insert(key, value);
+            }
+            RootWriteQuery::UpdateRecord(x) => {
+                x.non_list_args.insert(key, value);
+            }
+            RootWriteQuery::DeleteRecord(_) => (),
+            RootWriteQuery::UpsertRecord(_) => (),
+            RootWriteQuery::UpdateManyRecords(x) => {
+                x.non_list_args.insert(key, value);
+            }
+            RootWriteQuery::DeleteManyRecords(_) => (),
+            RootWriteQuery::ResetData(_) => (),
+        };
+    }
+
+    pub fn replace_nested_writes(&mut self) -> NestedWriteQueries {
+        let empty = NestedWriteQueries::default();
+
+        match self {
+            RootWriteQuery::CreateRecord(x) => std::mem::replace(&mut x.nested_writes, empty),
+            RootWriteQuery::UpdateRecord(x) => std::mem::replace(&mut x.nested_writes, empty),
+            RootWriteQuery::DeleteRecord(_) => empty,
+            RootWriteQuery::UpsertRecord(_) => empty,
+            RootWriteQuery::UpdateManyRecords(_) => empty,
+            RootWriteQuery::DeleteManyRecords(_) => empty,
+            RootWriteQuery::ResetData(_) => empty,
+        }
+    }
 }
 
 impl RootWriteQuery {

@@ -22,7 +22,7 @@ pub struct NestedCreateRecord {
 impl Into<RootWriteQuery> for NestedCreateRecord {
     fn into(self) -> RootWriteQuery {
         RootWriteQuery::CreateRecord(Box::new(CreateRecord {
-            model: self.relation_field.model(),
+            model: self.relation_field.related_model(),
             non_list_args: self.non_list_args,
             list_args: self.list_args,
             nested_writes: NestedWriteQueries::default(),
