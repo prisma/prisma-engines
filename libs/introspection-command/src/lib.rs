@@ -2,7 +2,7 @@
 use database_introspection::*;
 use datamodel::{
     common::PrismaType, dml, Datamodel, Field, FieldArity, FieldType, IdInfo, IdStrategy, Model, OnDeleteStrategy,
-    RelationInfo,
+    RelationInfo, ScalarListStrategy,
 };
 use failure::Error;
 use log::debug;
@@ -26,6 +26,10 @@ pub fn calculate_model(schema: &DatabaseSchema) -> Result<Datamodel> {
                 ColumnArity::List => FieldArity::List,
             };
             let id_info = calc_id_info(&column, &table);
+            let scalar_list_strategy = match arity {
+                FieldArity::List => Some(ScalarListStrategy::Embedded),
+                _ => None,
+            };
             let field = Field {
                 name: column.name.clone(),
                 arity,
@@ -34,7 +38,7 @@ pub fn calculate_model(schema: &DatabaseSchema) -> Result<Datamodel> {
                 default_value: None,
                 is_unique: table.is_column_unique(&column),
                 id_info,
-                scalar_list_strategy: None,
+                scalar_list_strategy,
                 documentation: None,
                 is_generated: false,
                 is_updated_at: false,
