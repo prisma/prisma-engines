@@ -117,6 +117,7 @@ fn a_data_model_can_be_generated_from_a_schema() {
             indices: vec![],
             primary_key: Some(PrimaryKey {
                 columns: vec!["primary_col".to_string()],
+                sequence: None,
             }),
             foreign_keys: vec![],
         }],
@@ -222,6 +223,7 @@ fn arity_is_preserved_when_generating_data_model_from_a_schema() {
             indices: vec![],
             primary_key: Some(PrimaryKey {
                 columns: vec!["primary_col".to_string()],
+                sequence: None,
             }),
             foreign_keys: vec![],
         }],
@@ -414,6 +416,7 @@ fn primary_key_is_preserved_when_generating_data_model_from_a_schema() {
                 indices: vec![],
                 primary_key: Some(PrimaryKey {
                     columns: vec!["primary".to_string()],
+                    sequence: None,
                 }),
                 foreign_keys: vec![],
             },
@@ -433,6 +436,7 @@ fn primary_key_is_preserved_when_generating_data_model_from_a_schema() {
                 indices: vec![],
                 primary_key: Some(PrimaryKey {
                     columns: vec!["primary".to_string()],
+                    sequence: None,
                 }),
                 foreign_keys: vec![],
             },

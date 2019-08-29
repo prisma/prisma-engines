@@ -69,6 +69,7 @@ impl<'a> DatabaseSchemaCalculator<'a> {
 
                 let primary_key = PrimaryKey {
                     columns: vec![model.id_field()?.db_name()],
+                    sequence: None,
                 };
 
                 let indexes = model
@@ -112,6 +113,7 @@ impl<'a> DatabaseSchemaCalculator<'a> {
                 let id_field = model.id_field()?;
                 let primary_key = PrimaryKey {
                     columns: vec!["nodeId".to_string(), "position".to_string()],
+                    sequence: None,
                 };
                 let foreign_keys = vec![ForeignKey {
                     columns: vec!["nodeId".to_string()],

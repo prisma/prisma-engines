@@ -7,9 +7,9 @@ use serde::{Deserialize, Serialize};
 /// Represents a prisma-datamodel.
 #[derive(Default, Debug, PartialEq, Clone, Serialize, Deserialize)]
 pub struct Datamodel {
-    // All enums.
+    /// All enums.
     pub enums: Vec<Enum>,
-    // All models.
+    /// All models.
     pub models: Vec<Model>,
 }
 

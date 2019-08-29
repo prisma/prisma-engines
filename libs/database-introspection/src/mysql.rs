@@ -267,6 +267,7 @@ impl IntrospectionConnector {
                 if is_pk {
                     pk = Some(PrimaryKey {
                         columns: vec![column_name],
+                        sequence: None,
                     });
                     None
                 } else if fk_cols.contains(&column_name) {

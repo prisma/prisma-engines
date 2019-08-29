@@ -3,6 +3,7 @@ use super::*;
 use log::debug;
 use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
+use regex::Regex;
 
 /// IntrospectionConnector implementation.
 pub struct IntrospectionConnector {
@@ -16,13 +17,13 @@ impl super::IntrospectionConnector for IntrospectionConnector {
 
     fn introspect(&self, schema: &str) -> IntrospectionResult<DatabaseSchema> {
         debug!("Introspecting schema '{}'", schema);
+        let sequences = self.get_sequences(schema)?;
         let tables = self
             .get_table_names(schema)
             .into_iter()
-            .map(|t| self.get_table(schema, &t))
+            .map(|t| self.get_table(schema, &t, &sequences))
             .collect();
         let enums = self.get_enums(schema)?;
-        let sequences = self.get_sequences(schema)?;
         Ok(DatabaseSchema {
             enums,
             sequences,
@@ -61,10 +62,10 @@ impl IntrospectionConnector {
         names
     }
 
-    fn get_table(&self, schema: &str, name: &str) -> Table {
+    fn get_table(&self, schema: &str, name: &str, sequences: &Vec<Sequence>) -> Table {
         debug!("Getting table '{}'", name);
         let columns = self.get_columns(schema, name);
-        let (indices, primary_key) = self.get_indices(schema, name);
+        let (indices, primary_key) = self.get_indices(schema, name, sequences);
         let foreign_keys = self.get_foreign_keys(schema, name);
         Table {
             name: name.to_string(),
@@ -256,8 +257,8 @@ impl IntrospectionConnector {
         fks
     }
 
-    fn get_indices(&self, schema: &str, table_name: &str) -> (Vec<Index>, Option<PrimaryKey>) {
-        debug!("Getting indices");
+    fn get_indices(&self, schema: &str, table_name: &str, sequences: &Vec<Sequence>) -> 
+        (Vec<Index>, Option<PrimaryKey>) {
         let sql = "SELECT indexInfos.relname as name,
             array_agg(columnInfos.attname) as column_names,
             rawIndex.indisunique as is_unique, rawIndex.indisprimary as is_primary_key
@@ -286,6 +287,7 @@ impl IntrospectionConnector {
             AND tableInfos.relname = $2
             GROUP BY tableInfos.relname, indexInfos.relname, rawIndex.indisunique,
             rawIndex.indisprimary";
+        debug!("Getting indices: {}", sql);
         let rows = self
             .conn
             .query_raw(&sql, schema, &[schema.into(), table_name.into()])
@@ -305,7 +307,7 @@ impl IntrospectionConnector {
                     .and_then(|x| x.clone().into_vec::<String>())
                     .expect("column_names");
                 if is_pk {
-                    pk = Some(PrimaryKey { columns });
+                    pk = Some(self.infer_primary_key(schema, table_name, columns, sequences));
                     None
                 } else {
                     let is_unique = index.get("is_unique").and_then(|x| x.as_bool()).expect("is_unique");
@@ -323,6 +325,39 @@ impl IntrospectionConnector {
 
         debug!("Found table indices: {:?}, primary key: {:?}", indices, pk);
         (indices, pk)
+    }
+
+    fn infer_primary_key(&self, schema: &str, table_name: &str, columns: Vec<String>, 
+        sequences: &Vec<Sequence>) -> PrimaryKey {
+        let sequence = if columns.len() == 1 {
+            let sql = format!("SELECT pg_get_serial_sequence('\"{}\".\"{}\"', '{}') as sequence",
+                schema, table_name, columns[0]);
+            debug!("Querying for sequence seeding primary key column '{}': '{}'", columns[0], sql);
+            let re_seq = Regex::new("^(?:.+\\.)?\"?([^.\"]+)\"?").expect("compile regex");
+            let rows = self
+                .conn
+                .query_raw(&sql, schema, &[])
+                .expect("querying for sequence seeding primary key column");
+            // Given the result rows, find any sequence
+            rows.into_iter().fold(None, |_: Option<Sequence>, row| {
+                row.get("sequence").and_then(|x|x.to_string()).and_then(|sequence_name| {
+                    let captures = re_seq.captures(&sequence_name).expect("get captures");
+                    let sequence_name = captures.get(1).expect("get capture").as_str();
+                    debug!("Found sequence name corresponding to primary key: {}", sequence_name);
+                    sequences.iter().find(|s| &s.name == sequence_name).map(|sequence| {
+                        debug!("Got sequence corresponding to primary key: {:#?}", sequence);
+                        sequence.clone()
+                    })
+                })
+            })
+        } else {
+            None
+        };
+   
+        PrimaryKey{
+            columns,
+            sequence,
+        }
     }
 
     fn get_sequences(&self, schema: &str) -> IntrospectionResult<Vec<Sequence>> {
