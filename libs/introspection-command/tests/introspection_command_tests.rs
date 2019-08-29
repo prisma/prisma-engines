@@ -1,6 +1,6 @@
 use database_introspection::*;
 use datamodel::{
-    common::PrismaType, Datamodel, Field, FieldArity, FieldType, IdInfo, IdStrategy, Model, OnDeleteStrategy,
+    common::PrismaType, dml, Datamodel, Field, FieldArity, FieldType, IdInfo, IdStrategy, Model, OnDeleteStrategy,
     RelationInfo,
 };
 use introspection_command::calculate_model;
@@ -289,67 +289,10 @@ fn primary_key_is_preserved_when_generating_data_model_from_a_schema() {
                 }],
                 is_generated: false,
             },
-        ],
-        enums: vec![],
-    };
-
-    let schema = DatabaseSchema {
-        tables: vec![
-            Table {
-                name: "Table1".to_string(),
-                columns: vec![Column {
-                    name: "primary".to_string(),
-                    tpe: ColumnType {
-                        raw: "integer".to_string(),
-                        family: ColumnTypeFamily::Int,
-                    },
-                    arity: ColumnArity::Required,
-                    default: None,
-                    auto_increment: true,
-                }],
-                indices: vec![],
-                primary_key: Some(PrimaryKey {
-                    columns: vec!["primary".to_string()],
-                }),
-                foreign_keys: vec![],
-            },
-            Table {
-                name: "Table2".to_string(),
-                columns: vec![Column {
-                    name: "primary".to_string(),
-                    tpe: ColumnType {
-                        raw: "integer".to_string(),
-                        family: ColumnTypeFamily::Int,
-                    },
-                    arity: ColumnArity::Required,
-                    default: None,
-                    auto_increment: false,
-                }],
-                indices: vec![],
-                primary_key: Some(PrimaryKey {
-                    columns: vec!["primary".to_string()],
-                }),
-                foreign_keys: vec![],
-            },
-        ],
-        enums: vec![],
-        sequences: vec![],
-    };
-    let data_model = calculate_model(&schema).expect("calculate data model");
-
-    assert_eq!(data_model, ref_data_model);
-}
-
-#[test]
-fn primary_key_is_preserved_when_generating_data_model_from_a_schema() {
-    setup();
-
-    let ref_data_model = Datamodel {
-        models: vec![
-            // Model with auto-incrementing primary key
+            // Model with primary key seeded by sequence
             Model {
                 database_name: None,
-                name: "Table1".to_string(),
+                name: "Table3".to_string(),
                 documentation: None,
                 is_embedded: false,
                 fields: vec![Field {
@@ -358,34 +301,14 @@ fn primary_key_is_preserved_when_generating_data_model_from_a_schema() {
                     field_type: FieldType::Base(PrismaType::Int),
                     database_name: None,
                     default_value: None,
-                    is_unique: true,
+                    is_unique: false,
                     id_info: Some(IdInfo {
                         strategy: IdStrategy::Auto,
-                        sequence: None,
-                    }),
-                    scalar_list_strategy: None,
-                    documentation: None,
-                    is_generated: false,
-                    is_updated_at: false,
-                }],
-                is_generated: false,
-            },
-            // Model with non-auto-incrementing primary key
-            Model {
-                database_name: None,
-                name: "Table2".to_string(),
-                documentation: None,
-                is_embedded: false,
-                fields: vec![Field {
-                    name: "primary".to_string(),
-                    arity: FieldArity::Required,
-                    field_type: FieldType::Base(PrismaType::Int),
-                    database_name: None,
-                    default_value: None,
-                    is_unique: true,
-                    id_info: Some(IdInfo {
-                        strategy: IdStrategy::None,
-                        sequence: None,
+                        sequence: Some(dml::Sequence {
+                            name: "sequence".to_string(),
+                            initial_value: 1,
+                            allocation_size: 1,
+                        }),
                     }),
                     scalar_list_strategy: None,
                     documentation: None,
@@ -411,7 +334,6 @@ fn primary_key_is_preserved_when_generating_data_model_from_a_schema() {
                     arity: ColumnArity::Required,
                     default: None,
                     auto_increment: true,
-                    is_unique: true,
                 }],
                 indices: vec![],
                 primary_key: Some(PrimaryKey {
@@ -431,12 +353,34 @@ fn primary_key_is_preserved_when_generating_data_model_from_a_schema() {
                     arity: ColumnArity::Required,
                     default: None,
                     auto_increment: false,
-                    is_unique: true,
                 }],
                 indices: vec![],
                 primary_key: Some(PrimaryKey {
                     columns: vec!["primary".to_string()],
                     sequence: None,
+                }),
+                foreign_keys: vec![],
+            },
+            Table {
+                name: "Table3".to_string(),
+                columns: vec![Column {
+                    name: "primary".to_string(),
+                    tpe: ColumnType {
+                        raw: "integer".to_string(),
+                        family: ColumnTypeFamily::Int,
+                    },
+                    arity: ColumnArity::Required,
+                    default: None,
+                    auto_increment: true,
+                }],
+                indices: vec![],
+                primary_key: Some(PrimaryKey {
+                    columns: vec!["primary".to_string()],
+                    sequence: Some(Sequence {
+                        name: "sequence".to_string(),
+                        initial_value: 1,
+                        allocation_size: 1,
+                    }),
                 }),
                 foreign_keys: vec![],
             },
@@ -668,6 +612,7 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                 indices: vec![],
                 primary_key: Some(PrimaryKey {
                     columns: vec!["id".to_string()],
+                    sequence: None,
                 }),
                 foreign_keys: vec![],
             },

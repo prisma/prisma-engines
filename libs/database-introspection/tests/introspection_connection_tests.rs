@@ -692,13 +692,11 @@ fn all_postgres_column_types_must_work() {
             },],
             primary_key: Some(PrimaryKey {
                 columns: vec!["primary_col".to_string()],
-                sequence: Some(
-                    Sequence {
-                        name: "User_primary_col_seq".to_string(),
-                        initial_value: 1,
-                        allocation_size: 1,
-                    },
-                ),
+                sequence: Some(Sequence {
+                    name: "User_primary_col_seq".to_string(),
+                    initial_value: 1,
+                    allocation_size: 1,
+                },),
             }),
             foreign_keys: vec![],
         }
@@ -1954,13 +1952,11 @@ fn indices_must_work() {
                 },
             ];
             let pk_sequence = match db_type {
-                DbType::Postgres => {
-                    Some(Sequence{
-                        name: "User_id_seq".to_string(),
-                        allocation_size: 1,
-                        initial_value: 1,
-                    })
-                },
+                DbType::Postgres => Some(Sequence {
+                    name: "User_id_seq".to_string(),
+                    allocation_size: 1,
+                    initial_value: 1,
+                }),
                 _ => None,
             };
             assert_eq!(
