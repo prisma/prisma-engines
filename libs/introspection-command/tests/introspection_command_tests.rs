@@ -6,6 +6,7 @@ use datamodel::{
 use introspection_command::calculate_model;
 use log::LevelFilter;
 use pretty_assertions::assert_eq;
+use std::collections::HashSet;
 use std::sync::atomic::{AtomicBool, Ordering};
 
 static IS_SETUP: AtomicBool = AtomicBool::new(false);
@@ -661,6 +662,36 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
             },
         ],
         enums: vec![],
+        sequences: vec![],
+    };
+    let data_model = calculate_model(&schema).expect("calculate data model");
+
+    assert_eq!(data_model, ref_data_model);
+}
+
+#[test]
+fn enums_are_preserved_when_generating_data_model_from_a_schema() {
+    setup();
+
+    let ref_data_model = Datamodel {
+        models: vec![],
+        enums: vec![dml::Enum {
+            name: "Enum".to_string(),
+            database_name: None,
+            documentation: None,
+            values: vec!["a".to_string(), "b".to_string()],
+        }],
+    };
+
+    let mut enum_values = HashSet::new();
+    enum_values.insert("a".to_string());
+    enum_values.insert("b".to_string());
+    let schema = DatabaseSchema {
+        tables: vec![],
+        enums: vec![Enum {
+            name: "Enum".to_string(),
+            values: enum_values,
+        }],
         sequences: vec![],
     };
     let data_model = calculate_model(&schema).expect("calculate data model");

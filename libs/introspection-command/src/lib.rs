@@ -47,6 +47,18 @@ pub fn calculate_model(schema: &DatabaseSchema) -> Result<Datamodel> {
         }
         data_model.add_model(model);
     }
+
+    for e in schema.enums.iter() {
+        let mut values: Vec<String> = e.values.iter().cloned().collect();
+        values.sort_unstable();
+        data_model.add_enum(dml::Enum {
+            name: e.name.clone(),
+            values,
+            database_name: None,
+            documentation: None,
+        });
+    }
+
     Ok(data_model)
 }
 
