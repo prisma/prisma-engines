@@ -692,6 +692,11 @@ fn all_postgres_column_types_must_work() {
             },],
             primary_key: Some(PrimaryKey {
                 columns: vec!["primary_col".to_string()],
+                sequence: Some(Sequence {
+                    name: "User_primary_col_seq".to_string(),
+                    initial_value: 1,
+                    allocation_size: 1,
+                },),
             }),
             foreign_keys: vec![],
         }
@@ -1142,6 +1147,7 @@ fn all_mysql_column_types_must_work() {
             indices: vec![],
             primary_key: Some(PrimaryKey {
                 columns: vec!["primary_col".to_string()],
+                sequence: None,
             }),
             foreign_keys: vec![],
         }
@@ -1216,6 +1222,7 @@ fn sqlite_column_types_must_work() {
             indices: vec![],
             primary_key: Some(PrimaryKey {
                 columns: vec!["primary_col".to_string()],
+                sequence: None,
             }),
             foreign_keys: vec![],
         }
@@ -1519,6 +1526,7 @@ fn postgres_foreign_key_on_delete_must_be_handled() {
             indices: vec![],
             primary_key: Some(PrimaryKey {
                 columns: vec!["id".to_string()],
+                sequence: None,
             }),
             foreign_keys: vec![
                 ForeignKey {
@@ -1638,6 +1646,7 @@ fn mysql_foreign_key_on_delete_must_be_handled() {
             indices: vec![],
             primary_key: Some(PrimaryKey {
                 columns: vec!["id".to_string()],
+                sequence: None,
             }),
             foreign_keys: vec![
                 ForeignKey {
@@ -1721,6 +1730,7 @@ fn sqlite_composite_primary_key_must_work() {
             },],
             primary_key: Some(PrimaryKey {
                 columns: vec!["id".to_string(), "name".to_string()],
+                sequence: None,
             }),
             foreign_keys: vec![],
         }
@@ -1818,6 +1828,7 @@ fn sqlite_foreign_key_on_delete_must_be_handled() {
             indices: vec![],
             primary_key: Some(PrimaryKey {
                 columns: vec!["id".to_string()],
+                sequence: None,
             }),
             foreign_keys: vec![
                 ForeignKey {
@@ -1940,6 +1951,14 @@ fn indices_must_work() {
                     auto_increment: true,
                 },
             ];
+            let pk_sequence = match db_type {
+                DbType::Postgres => Some(Sequence {
+                    name: "User_id_seq".to_string(),
+                    allocation_size: 1,
+                    initial_value: 1,
+                }),
+                _ => None,
+            };
             assert_eq!(
                 user_table,
                 &Table {
@@ -1952,6 +1971,7 @@ fn indices_must_work() {
                     },],
                     primary_key: Some(PrimaryKey {
                         columns: vec!["id".to_string()],
+                        sequence: pk_sequence,
                     }),
                     foreign_keys: vec![],
                 }

@@ -144,7 +144,10 @@ impl IntrospectionConnector {
                 }
 
                 debug!("Determined that table has primary key with columns {:?}", columns);
-                Some(PrimaryKey { columns })
+                Some(PrimaryKey {
+                    columns,
+                    sequence: None,
+                })
             }
         };
 

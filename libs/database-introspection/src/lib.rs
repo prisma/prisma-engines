@@ -179,6 +179,8 @@ pub struct Index {
 pub struct PrimaryKey {
     /// Columns.
     pub columns: Vec<String>,
+    /// The sequence optionally seeding this primary key.
+    pub sequence: Option<Sequence>,
 }
 
 impl PrimaryKey {

@@ -1,7 +1,7 @@
 //! Logic for generating Prisma data models from database introspection.
 use database_introspection::*;
 use datamodel::{
-    common::PrismaType, Datamodel, Field, FieldArity, FieldType, IdInfo, IdStrategy, Model, OnDeleteStrategy,
+    common::PrismaType, dml, Datamodel, Field, FieldArity, FieldType, IdInfo, IdStrategy, Model, OnDeleteStrategy,
     RelationInfo,
 };
 use failure::Error;
@@ -55,7 +55,11 @@ fn calc_id_info(column: &Column, table: &Table) -> Option<IdInfo> {
             };
             Some(IdInfo {
                 strategy,
-                sequence: None,
+                sequence: pk.sequence.as_ref().map(|sequence| dml::Sequence {
+                    name: sequence.name.clone(),
+                    allocation_size: sequence.allocation_size as i32,
+                    initial_value: sequence.initial_value as i32,
+                }),
             })
         } else {
             None
