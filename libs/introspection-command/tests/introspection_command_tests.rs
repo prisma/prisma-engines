@@ -1,7 +1,7 @@
 use database_introspection::*;
 use datamodel::{
     common::PrismaType, dml, Datamodel, Field, FieldArity, FieldType, IdInfo, IdStrategy, Model, OnDeleteStrategy,
-    RelationInfo,
+    RelationInfo, ScalarListStrategy,
 };
 use introspection_command::calculate_model;
 use log::LevelFilter;
@@ -174,7 +174,7 @@ fn arity_is_preserved_when_generating_data_model_from_a_schema() {
                     default_value: None,
                     is_unique: false,
                     id_info: None,
-                    scalar_list_strategy: None,
+                    scalar_list_strategy: Some(ScalarListStrategy::Embedded),
                     documentation: None,
                     is_generated: false,
                     is_updated_at: false,
