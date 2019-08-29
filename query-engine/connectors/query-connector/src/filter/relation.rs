@@ -35,13 +35,13 @@ impl RelationCondition {
 impl RelationCompare for Arc<RelationField> {
     /// Every related record matches the filter.
     /// ```rust
-    /// # use connector::{*, filter::*};
+    /// # use query_connector::{*, filter::*};
     /// # use prisma_models::*;
     /// # use prisma_query::ast::*;
     /// # use serde_json;
     /// # use std::{fs::File, sync::Arc};
     /// #
-    /// # let tmp: InternalDataModelTemplate = serde_json::from_reader(File::open("../sql-connector/test_schema.json").unwrap()).unwrap();
+    /// # let tmp: InternalDataModelTemplate = serde_json::from_reader(File::open("../sql-query-connector/test_schema.json").unwrap()).unwrap();
     /// # let schema = tmp.build(String::from("test"));
     /// # let user = schema.find_model("User").unwrap();
     /// # let site = schema.find_model("Site").unwrap();
@@ -86,13 +86,13 @@ impl RelationCompare for Arc<RelationField> {
 
     /// At least one related record matches the filter.
     /// ```rust
-    /// # use connector::{*, filter::*};
+    /// # use query_connector::{*, filter::*};
     /// # use prisma_models::*;
     /// # use prisma_query::ast::*;
     /// # use serde_json;
     /// # use std::{fs::File, sync::Arc};
     /// #
-    /// # let tmp: InternalDataModelTemplate = serde_json::from_reader(File::open("../sql-connector/test_schema.json").unwrap()).unwrap();
+    /// # let tmp: InternalDataModelTemplate = serde_json::from_reader(File::open("../sql-query-connector/test_schema.json").unwrap()).unwrap();
     /// # let schema = tmp.build(String::from("test"));
     /// # let user = schema.find_model("User").unwrap();
     /// # let site = schema.find_model("Site").unwrap();
@@ -137,13 +137,13 @@ impl RelationCompare for Arc<RelationField> {
 
     /// To one related record. FIXME
     /// ```rust
-    /// # use connector::{*, filter::*};
+    /// # use query_connector::{*, filter::*};
     /// # use prisma_models::*;
     /// # use prisma_query::ast::*;
     /// # use serde_json;
     /// # use std::{fs::File, sync::Arc};
     /// #
-    /// # let tmp: InternalDataModelTemplate = serde_json::from_reader(File::open("../sql-connector/test_schema.json").unwrap()).unwrap();
+    /// # let tmp: InternalDataModelTemplate = serde_json::from_reader(File::open("../sql-query-connector/test_schema.json").unwrap()).unwrap();
     /// # let schema = tmp.build(String::from("test"));
     /// # let user = schema.find_model("User").unwrap();
     /// # let site = schema.find_model("Site").unwrap();
@@ -188,13 +188,13 @@ impl RelationCompare for Arc<RelationField> {
 
     /// None of the related records matches the filter.
     /// ```rust
-    /// # use connector::{*, filter::*};
+    /// # use query_connector::{*, filter::*};
     /// # use prisma_models::*;
     /// # use prisma_query::ast::*;
     /// # use serde_json;
     /// # use std::{fs::File, sync::Arc};
     /// #
-    /// # let tmp: InternalDataModelTemplate = serde_json::from_reader(File::open("../sql-connector/test_schema.json").unwrap()).unwrap();
+    /// # let tmp: InternalDataModelTemplate = serde_json::from_reader(File::open("../sql-query-connector/test_schema.json").unwrap()).unwrap();
     /// # let schema = tmp.build(String::from("test"));
     /// # let user = schema.find_model("User").unwrap();
     /// # let site = schema.find_model("Site").unwrap();
@@ -239,13 +239,13 @@ impl RelationCompare for Arc<RelationField> {
 
     /// One of the relations is `Null`.
     /// ```rust
-    /// # use connector::{*, filter::*};
+    /// # use query_connector::{*, filter::*};
     /// # use prisma_models::*;
     /// # use prisma_query::ast::*;
     /// # use serde_json;
     /// # use std::{fs::File, sync::Arc};
     /// #
-    /// # let tmp: InternalDataModelTemplate = serde_json::from_reader(File::open("../sql-connector/test_schema.json").unwrap()).unwrap();
+    /// # let tmp: InternalDataModelTemplate = serde_json::from_reader(File::open("../sql-query-connector/test_schema.json").unwrap()).unwrap();
     /// # let schema = tmp.build(String::from("test"));
     /// # let user = schema.find_model("User").unwrap();
     /// #
