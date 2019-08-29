@@ -229,3 +229,87 @@ fn arity_is_preserved_when_generating_data_model_from_a_schema() {
 
     assert_eq!(data_model, ref_data_model);
 }
+
+#[test]
+fn uniqueness_is_preserved_when_generating_data_model_from_a_schema() {
+    setup();
+
+    let ref_data_model = Datamodel {
+        models: vec![Model {
+            database_name: None,
+            name: "Table1".to_string(),
+            documentation: None,
+            is_embedded: false,
+            fields: vec![
+                Field {
+                    name: "non-unique".to_string(),
+                    arity: FieldArity::Optional,
+                    field_type: FieldType::Base(PrismaType::Int),
+                    database_name: None,
+                    default_value: None,
+                    is_unique: false,
+                    id_info: None,
+                    scalar_list_strategy: None,
+                    documentation: None,
+                    is_generated: false,
+                    is_updated_at: false,
+                },
+                Field {
+                    name: "unique".to_string(),
+                    arity: FieldArity::Required,
+                    field_type: FieldType::Base(PrismaType::Int),
+                    database_name: None,
+                    default_value: None,
+                    is_unique: true,
+                    id_info: None,
+                    scalar_list_strategy: None,
+                    documentation: None,
+                    is_generated: false,
+                    is_updated_at: false,
+                },
+            ],
+            is_generated: false,
+        }],
+        enums: vec![],
+    };
+
+    let schema = DatabaseSchema {
+        tables: vec![Table {
+            name: "Table1".to_string(),
+            columns: vec![
+                Column {
+                    name: "non-unique".to_string(),
+                    tpe: ColumnType {
+                        raw: "raw".to_string(),
+                        family: ColumnTypeFamily::Int,
+                    },
+                    arity: ColumnArity::Nullable,
+                    default: None,
+                    auto_increment: false,
+                },
+                Column {
+                    name: "unique".to_string(),
+                    tpe: ColumnType {
+                        raw: "raw".to_string(),
+                        family: ColumnTypeFamily::Int,
+                    },
+                    arity: ColumnArity::Required,
+                    default: None,
+                    auto_increment: false,
+                },
+            ],
+            indices: vec![Index {
+                name: "unique".to_string(),
+                columns: vec!["unique".to_string()],
+                tpe: IndexType::Unique,
+            }],
+            primary_key: None,
+            foreign_keys: vec![],
+        }],
+        enums: vec![],
+        sequences: vec![],
+    };
+    let data_model = calculate_model(&schema).expect("calculate data model");
+
+    assert_eq!(data_model, ref_data_model);
+}
