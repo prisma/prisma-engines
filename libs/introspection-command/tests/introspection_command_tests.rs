@@ -1,5 +1,5 @@
 use database_introspection::*;
-use datamodel::{common::PrismaType, Datamodel, Field, FieldArity, FieldType, Model};
+use datamodel::{common::PrismaType, Datamodel, Field, FieldArity, FieldType, Model, OnDeleteStrategy, RelationInfo};
 use introspection_command::calculate_model;
 use log::LevelFilter;
 use pretty_assertions::assert_eq;
@@ -306,6 +306,193 @@ fn uniqueness_is_preserved_when_generating_data_model_from_a_schema() {
             primary_key: None,
             foreign_keys: vec![],
         }],
+        enums: vec![],
+        sequences: vec![],
+    };
+    let data_model = calculate_model(&schema).expect("calculate data model");
+
+    assert_eq!(data_model, ref_data_model);
+}
+
+#[test]
+fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
+    setup();
+
+    let ref_data_model = Datamodel {
+        models: vec![
+            Model {
+                database_name: None,
+                name: "City".to_string(),
+                documentation: None,
+                is_embedded: false,
+                fields: vec![
+                    Field {
+                        name: "id".to_string(),
+                        arity: FieldArity::Required,
+                        field_type: FieldType::Base(PrismaType::Int),
+                        database_name: None,
+                        default_value: None,
+                        is_unique: false,
+                        id_info: None,
+                        scalar_list_strategy: None,
+                        documentation: None,
+                        is_generated: false,
+                        is_updated_at: false,
+                    },
+                    Field {
+                        name: "name".to_string(),
+                        arity: FieldArity::Required,
+                        field_type: FieldType::Base(PrismaType::String),
+                        database_name: None,
+                        default_value: None,
+                        is_unique: false,
+                        id_info: None,
+                        scalar_list_strategy: None,
+                        documentation: None,
+                        is_generated: false,
+                        is_updated_at: false,
+                    },
+                ],
+                is_generated: false,
+            },
+            Model {
+                database_name: None,
+                name: "User".to_string(),
+                documentation: None,
+                is_embedded: false,
+                fields: vec![
+                    Field {
+                        name: "id".to_string(),
+                        arity: FieldArity::Required,
+                        field_type: FieldType::Base(PrismaType::Int),
+                        database_name: None,
+                        default_value: None,
+                        is_unique: false,
+                        id_info: None,
+                        scalar_list_strategy: None,
+                        documentation: None,
+                        is_generated: false,
+                        is_updated_at: false,
+                    },
+                    Field {
+                        name: "city-id".to_string(),
+                        arity: FieldArity::Required,
+                        field_type: FieldType::Relation(RelationInfo {
+                            name: "".to_string(),
+                            to: "City".to_string(),
+                            to_fields: vec!["id".to_string()],
+                            on_delete: OnDeleteStrategy::None,
+                        }),
+                        database_name: None,
+                        default_value: None,
+                        is_unique: false,
+                        id_info: None,
+                        scalar_list_strategy: None,
+                        documentation: None,
+                        is_generated: false,
+                        is_updated_at: false,
+                    },
+                    Field {
+                        name: "city-name".to_string(),
+                        arity: FieldArity::Required,
+                        field_type: FieldType::Relation(RelationInfo {
+                            name: "".to_string(),
+                            to: "City".to_string(),
+                            to_fields: vec!["name".to_string()],
+                            on_delete: OnDeleteStrategy::None,
+                        }),
+                        database_name: None,
+                        default_value: None,
+                        is_unique: false,
+                        id_info: None,
+                        scalar_list_strategy: None,
+                        documentation: None,
+                        is_generated: false,
+                        is_updated_at: false,
+                    },
+                ],
+                is_generated: false,
+            },
+        ],
+        enums: vec![],
+    };
+
+    let schema = DatabaseSchema {
+        tables: vec![
+            Table {
+                name: "City".to_string(),
+                columns: vec![
+                    Column {
+                        name: "id".to_string(),
+                        tpe: ColumnType {
+                            raw: "integer".to_string(),
+                            family: ColumnTypeFamily::Int,
+                        },
+                        arity: ColumnArity::Required,
+                        default: None,
+                        auto_increment: true,
+                    },
+                    Column {
+                        name: "name".to_string(),
+                        tpe: ColumnType {
+                            raw: "text".to_string(),
+                            family: ColumnTypeFamily::String,
+                        },
+                        arity: ColumnArity::Required,
+                        default: None,
+                        auto_increment: false,
+                    },
+                ],
+                indices: vec![],
+                primary_key: Some(PrimaryKey {
+                    columns: vec!["id".to_string()],
+                }),
+                foreign_keys: vec![],
+            },
+            Table {
+                name: "User".to_string(),
+                columns: vec![
+                    Column {
+                        name: "id".to_string(),
+                        tpe: ColumnType {
+                            raw: "integer".to_string(),
+                            family: ColumnTypeFamily::Int,
+                        },
+                        arity: ColumnArity::Required,
+                        default: None,
+                        auto_increment: true,
+                    },
+                    Column {
+                        name: "city-id".to_string(),
+                        tpe: ColumnType {
+                            raw: "integer".to_string(),
+                            family: ColumnTypeFamily::Int,
+                        },
+                        arity: ColumnArity::Required,
+                        default: None,
+                        auto_increment: false,
+                    },
+                    Column {
+                        name: "city-name".to_string(),
+                        tpe: ColumnType {
+                            raw: "text".to_string(),
+                            family: ColumnTypeFamily::String,
+                        },
+                        arity: ColumnArity::Required,
+                        default: None,
+                        auto_increment: false,
+                    },
+                ],
+                indices: vec![],
+                primary_key: None,
+                foreign_keys: vec![ForeignKey {
+                    columns: vec!["city-id".to_string(), "city-name".to_string()],
+                    referenced_table: "City".to_string(),
+                    on_delete_action: ForeignKeyAction::NoAction,
+                    referenced_columns: vec!["id".to_string(), "name".to_string()],
+                }],
+            },
+        ],
         enums: vec![],
         sequences: vec![],
     };
