@@ -144,6 +144,12 @@ impl Table {
             None => Vec::new(),
         }
     }
+
+    pub fn is_column_unique(&self, column: &Column) -> bool {
+        self.indices
+            .iter()
+            .any(|index| index.tpe == IndexType::Unique && index.columns.contains(&column.name))
+    }
 }
 /// The type of an index.
 #[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
