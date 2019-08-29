@@ -33,6 +33,13 @@ impl WriteQuery {
             WriteQuery::Nested(_nwq) => unimplemented!(),
         }
     }
+
+    pub fn inject_non_list_arg(&mut self, key: String, value: PrismaValue) {
+        match self {
+            WriteQuery::Root(_, _, ref mut wq) => wq.inject_non_list_arg(key, value),
+            WriteQuery::Nested(_nwq) => unimplemented!(),
+        }
+    }
 }
 
 impl ModelExtractor for WriteQuery {

@@ -62,6 +62,8 @@ impl QueryExecutor {
 
         let exp = Expressionista::translate(graph);
         let result = interpreter.interpret(exp, Env::default())?;
+        dbg!(&result);
+
         let mut builder = ResultIrBuilder::new();
 
         builder.push(result.into());
@@ -77,47 +79,47 @@ impl QueryExecutor {
         //     .build())
     }
 
-    fn execute_queries(&self, queries: Vec<QueryPair>) -> CoreResult<Vec<ResultPair>> {
-        queries.into_iter().map(|query| self.execute_query(query)).collect()
-    }
+    // fn execute_queries(&self, queries: Vec<QueryPair>) -> CoreResult<Vec<ResultPair>> {
+    //     queries.into_iter().map(|query| self.execute_query(query)).collect()
+    // }
 
-    fn execute_query(&self, query: QueryPair) -> CoreResult<ResultPair> {
-        let (query, strategy) = query;
-        let model_opt = query.extract_model();
-        match query {
-            Query::Read(read) => {
-                let query_result = self.read_executor.execute(read, &[])?;
+    // fn execute_query(&self, query: QueryPair) -> CoreResult<ResultPair> {
+    //     let (query, strategy) = query;
+    //     let model_opt = query.extract_model();
+    //     match query {
+    //         Query::Read(read) => {
+    //             let query_result = self.read_executor.execute(read, &[])?;
 
-                Ok(match strategy {
-                    ResultResolutionStrategy::Serialize(typ) => ResultPair::Read(query_result, typ),
-                    ResultResolutionStrategy::Dependent(_) => unimplemented!(), // Dependent query exec. from read is not supported in this execution model.
-                })
-            }
+    //             Ok(match strategy {
+    //                 ResultResolutionStrategy::Serialize(typ) => ResultPair::Read(query_result, typ),
+    //                 ResultResolutionStrategy::Dependent(_) => unimplemented!(), // Dependent query exec. from read is not supported in this execution model.
+    //             })
+    //         }
 
-            Query::Write(write) => {
-                let query_result = self.write_executor.execute(write)?;
+    //         Query::Write(write) => {
+    //             let query_result = self.write_executor.execute(write)?;
 
-                match strategy {
-                    ResultResolutionStrategy::Serialize(typ) => Ok(ResultPair::Write(query_result, typ)),
-                    ResultResolutionStrategy::Dependent(dependent_pair) => match model_opt {
-                        Some(model) => match *dependent_pair {
-                            (Query::Read(ReadQuery::RecordQuery(mut rq)), strategy) => {
-                                // Inject required information into the query and execute
-                                rq.record_finder = Some(query_result.result.to_record_finder(model)?);
+    //             match strategy {
+    //                 ResultResolutionStrategy::Serialize(typ) => Ok(ResultPair::Write(query_result, typ)),
+    //                 ResultResolutionStrategy::Dependent(dependent_pair) => match model_opt {
+    //                     Some(model) => match *dependent_pair {
+    //                         (Query::Read(ReadQuery::RecordQuery(mut rq)), strategy) => {
+    //                             // Inject required information into the query and execute
+    //                             rq.record_finder = Some(query_result.result.to_record_finder(model)?);
 
-                                let dependent_pair = (Query::Read(ReadQuery::RecordQuery(rq)), strategy);
-                                self.execute_query(dependent_pair)
-                            }
-                            _ => unreachable!(), // Invariant for now
-                        },
-                        None => Err(CoreError::ConversionError(
-                            "Model required for dependent query execution".into(),
-                        )),
-                    },
-                }
-            }
-        }
-    }
+    //                             let dependent_pair = (Query::Read(ReadQuery::RecordQuery(rq)), strategy);
+    //                             self.execute_query(dependent_pair)
+    //                         }
+    //                         _ => unreachable!(), // Invariant for now
+    //                     },
+    //                     None => Err(CoreError::ConversionError(
+    //                         "Model required for dependent query execution".into(),
+    //                     )),
+    //                 },
+    //             }
+    //         }
+    //     }
+    // }
 
     /// Returns db name used in the executor.
     pub fn db_name(&self) -> String {

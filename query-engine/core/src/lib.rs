@@ -41,7 +41,7 @@ pub enum ResultResolutionStrategy {
 #[derive(Debug)]
 pub enum ResultPair {
     Read(ReadQueryResult, OutputTypeRef),
-    Write(WriteQueryResultWrapper, OutputTypeRef),
+    Write(WriteQueryResultWrapper),
 }
 
 /// Purely a workaround to not mess with the internals of the write query and result ASTs for now.

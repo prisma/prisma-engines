@@ -71,9 +71,9 @@ impl ResultIrBuilder {
             .into_iter()
             .fold(vec![], |mut vec, res| {
                 match res {
-                    ResultPair::Write(r, typ) => {
+                    ResultPair::Write(r) => {
                         let name = r.alias.clone().unwrap_or_else(|| r.name.clone());
-                        let serialized = serialize_write(r.result, &typ);
+                        let serialized = serialize_write(r.result);
 
                         match serialized {
                             Ok(result) => vec.push(Response::Data(name, result)),

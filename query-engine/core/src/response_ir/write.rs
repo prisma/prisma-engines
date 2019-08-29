@@ -4,7 +4,7 @@ use connector::{Identifier, WriteQueryResult};
 use prisma_models::PrismaValue;
 
 /// We just assume we ever get a single item back
-pub fn serialize_write(result: WriteQueryResult, typ: &OutputTypeRef) -> CoreResult<Item> {
+pub fn serialize_write(result: WriteQueryResult) -> CoreResult<Item> {
     match result.identifier {
         Identifier::Count(c) => {
             let mut map: IndexMap<String, Item> = IndexMap::new();
@@ -13,20 +13,24 @@ pub fn serialize_write(result: WriteQueryResult, typ: &OutputTypeRef) -> CoreRes
             Ok(Item::Map(map))
         }
         Identifier::Record(r) => {
-            let obj = typ.as_object_type().unwrap();
+            // let obj = typ.as_object_type().unwrap();
             let mut map: IndexMap<String, Item> = IndexMap::new();
 
-            let mut values = r.record.values;
-            let mut fields = r.field_names;
+            let values = r.record.values;
+            let fields = r.field_names;
 
-            obj.get_fields().iter().for_each(|field| {
-                if let Some(pos) = fields.iter().position(|f| &field.name == f) {
-                    let val = values.remove(pos);
-                    fields.remove(pos);
-
-                    map.insert(field.name.clone(), Item::Value(val));
-                }
+            fields.into_iter().zip(values.into_iter()).for_each(|(field, value)| {
+                map.insert(field, Item::Value(value));
             });
+
+            // obj.get_fields().iter().for_each(|field| {
+            //     if let Some(pos) = fields.iter().position(|f| &field.name == f) {
+            //         let val = values.remove(pos);
+            //         fields.remove(pos);
+
+            //         map.insert(field.name.clone(), Item::Value(val));
+            //     }
+            // });
 
             Ok(Item::Map(map))
         }

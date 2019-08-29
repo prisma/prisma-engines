@@ -14,7 +14,7 @@ pub enum Expression {
         func: Box<dyn FnOnce(Env) -> Expression>,
     },
     Write {
-        write: RootWriteQuery,
+        write: WriteQuery,
     },
     Read {
         read: ReadQuery,
@@ -53,7 +53,7 @@ impl Into<ResultPair> for ExpressionResult {
     fn into(self) -> ResultPair {
         match self {
             Self::Read(r, typ) => ResultPair::Read(r, typ),
-            _ => unimplemented!(),
+            Self::Write(w) => ResultPair::Write(w),
         }
     }
 }
@@ -94,10 +94,7 @@ impl QueryInterpreter {
                 seq.into_iter()
                     .map(|exp| self.interpret(exp, env.clone()))
                     .collect::<QueryExecutionResult<Vec<_>>>()
-                    .map(|mut results| {
-                        results.reverse();
-                        results.pop().unwrap()
-                    })
+                    .map(|mut results| results.pop().unwrap())
             }
 
             Expression::Let { bindings, expressions } => {
@@ -113,10 +110,7 @@ impl QueryInterpreter {
 
             Expression::Write { write } => {
                 println!("WRITE");
-                Ok(self
-                    .writer
-                    .execute(WriteQuery::Root("".to_owned(), Some("".to_owned()), write))
-                    .map(|res| ExpressionResult::Write(res))?)
+                Ok(self.writer.execute(write).map(|res| ExpressionResult::Write(res))?)
             }
 
             Expression::Read { read, typ } => {

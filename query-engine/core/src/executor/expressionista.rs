@@ -70,8 +70,8 @@ impl Expressionista {
 
     fn query_expression(edge: Option<EdgeReference<Dependency>>, query: &Query) -> Expression {
         match (edge, query) {
-            (None, Query::Write(WriteQuery::Root(_, _, wq))) => Expression::Write { write: wq.clone() },
-            (Some(child_edge), Query::Write(WriteQuery::Root(_, _, wq))) => {
+            (None, Query::Write(wq)) => Expression::Write { write: wq.clone() },
+            (Some(child_edge), Query::Write(wq)) => {
                 let mut new_writes = wq.clone();
                 let field_name = match child_edge.weight() {
                     Dependency::Write(rf) => rf.related_field().name.clone(),
