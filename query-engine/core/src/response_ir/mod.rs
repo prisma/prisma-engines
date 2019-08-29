@@ -61,9 +61,8 @@ impl ResultIrBuilder {
     }
 
     /// Add a single query result to the builder
-    pub fn push(mut self, q: ResultPair) -> Self {
+    pub fn push(&mut self, q: ResultPair) {
         self.0.push(q);
-        self
     }
 
     /// Parse collected queries into the return wrapper type

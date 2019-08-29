@@ -1,12 +1,12 @@
 use super::*;
 use crate::{OutputTypeRef, WriteQueryResultWrapper};
+use connector::filter::RecordFinder;
 use connector::Identifier;
 use connector::ReadQuery;
 use im::HashMap;
 use petgraph::visit::EdgeRef;
 use prisma_models::prelude::*;
 use std::convert::TryInto;
-use connector::filter::RecordFinder;
 
 pub enum Expression {
     Sequence {
@@ -80,7 +80,6 @@ pub struct Expressionista {}
 
 impl Expressionista {
     pub fn translate(graph: QueryGraph) -> Expression {
-        dbg!(&graph);
         let root_nodes: Vec<NodeIndex> = graph
             .node_indices()
             .filter_map(|ix| {
@@ -92,104 +91,118 @@ impl Expressionista {
             })
             .collect();
 
-        // todo likely recursion missing
-        let expressions: Vec<Expression> = root_nodes
+        let expressions = root_nodes
             .into_iter()
-            .map(|ix| {
-                let query = graph.node_weight(ix).unwrap();
-                let children = graph.edges_directed(ix, Direction::Outgoing).collect::<Vec<_>>();
-
-                match query {
-                    Query::Write(WriteQuery::Root(_, _, wq)) => Expression::Let {
-                        bindings: vec![Binding {
-                            name: "parent".to_owned(),
-                            exp: Expression::Write { write: wq.clone() },
-                        }],
-                        expressions: {
-                            dbg!(&children);
-                            let (writes, reads): (Vec<_>, Vec<_>) =
-                                children.into_iter().partition(|child| match child.weight() {
-                                    Dependency::Write(_) => true,
-                                    Dependency::Read(_) => false,
-                                });
-
-                                dbg!(&writes);
-                                dbg!(&reads);
-
-                            let mut writes: Vec<_> = writes
-                                .into_iter()
-                                .map(|child| {
-                                    let child_node = graph.node_weight(child.target()).unwrap();
-
-                                    let db_name = match child.weight() {
-                                        Dependency::Write(rf) => rf.related_field().name.clone(),
-                                        _ => unreachable!(),
-                                    };
-
-                                    match child_node {
-                                        Query::Write(WriteQuery::Root(_, _, wq)) => {
-                                            let mut new_writes = wq.clone();
-                                            Expression::Func {
-                                                func: Box::new(|env: Env| {
-                                                    let parent_result = env.get("parent").unwrap();
-                                                    let parent_id = parent_result.as_id();
-
-                                                    new_writes.inject_non_list_arg(db_name, parent_id);
-                                                    Expression::Write { write: new_writes }
-                                                }),
-                                            }
-                                        }
-                                        _ => unimplemented!(),
-                                    }
-                                })
-                                .collect();
-
-                            let mut reads = reads
-                                .into_iter()
-                                .map(|read| {
-                                    let read_node = graph.node_weight(read.target()).unwrap();
-                                    let typ = match read.weight() {
-                                        Dependency::Read(t) => Arc::clone(t),
-                                        _ => unreachable!(),
-                                    };
-
-                                    match read_node {
-                                        Query::Read(rq) => match rq {
-                                            ReadQuery::RecordQuery(rq) => {
-                                                let mut new_reads = rq.clone();
-                                            Expression::Func {
-                                                func: Box::new(|env: Env| {
-                                                    let parent_result = env.get("parent").unwrap();
-                                                    let parent_id = parent_result.as_id();
-
-                                                    let finder = RecordFinder {
-                                                        field: new_reads.selected_fields.scalar.first().unwrap().field.model().fields().id().clone(),
-                                                        value: parent_id,
-                                                    };
-
-                                                    new_reads.record_finder = Some(finder);
-
-                                                    Expression::Read { read: ReadQuery::RecordQuery(new_reads), typ }
-                                                }),
-                                            }},
-                                            _ => unreachable!(),
-                                        }
-                                        _ => unimplemented!(),
-                                    }
-                                })
-                                .collect();
-
-                                writes.append(&mut reads);
-                                writes
-                        },
-                    },
-                    Query::Read(_rq) => unimplemented!(),
-                    _ => unimplemented!(),
-                }
-            })
+            .map(|node_id| Self::build_expression(&graph, node_id, None))
             .collect();
+        // let expressions = Self::build_expressions(&graph, root_nodes);
 
         Expression::Sequence { seq: expressions }
+    }
+
+    fn build_expression(
+        graph: &QueryGraph,
+        node_id: NodeIndex,
+        parent_edge: Option<EdgeReference<Dependency>>,
+    ) -> Expression {
+        let query = graph.node_weight(node_id).unwrap();
+        let exp = Self::query_expression(parent_edge, query);
+        let child_edges = graph.edges_directed(node_id, Direction::Outgoing).collect::<Vec<_>>();
+
+        // Writes before reads
+        let (write_edges, read_edges): (Vec<_>, Vec<_>) =
+            child_edges.into_iter().partition(|child| match child.weight() {
+                Dependency::Write(_) => true,
+                Dependency::Read(_) => false,
+            });
+
+        let mut expressions: Vec<_> = write_edges
+            .into_iter()
+            .map(|child_edge| Self::build_expression(graph, child_edge.target(), Some(child_edge)))
+            .collect();
+
+        let mut read_expressions: Vec<_> = read_edges
+            .into_iter()
+            .map(|child_edge| Self::build_expression(graph, child_edge.target(), Some(child_edge)))
+            .collect();
+
+        expressions.append(&mut read_expressions);
+
+        if expressions.is_empty() {
+            exp
+        } else {
+            Expression::Let {
+                bindings: vec![Binding {
+                    name: "parent".to_owned(),
+                    exp,
+                }],
+                expressions: expressions,
+            }
+        }
+    }
+
+    fn query_expression(edge: Option<EdgeReference<Dependency>>, query: &Query) -> Expression {
+        match (edge, query) {
+            (None, Query::Write(WriteQuery::Root(_, _, wq))) => Expression::Write { write: wq.clone() },
+            (Some(child_edge), Query::Write(WriteQuery::Root(_, _, wq))) => {
+                let mut new_writes = wq.clone();
+                let field_name = match child_edge.weight() {
+                    Dependency::Write(rf) => rf.related_field().name.clone(),
+                    _ => unreachable!(),
+                };
+
+                Expression::Func {
+                    func: Box::new(|env: Env| {
+                        let parent_result = env.get("parent").unwrap();
+                        let parent_id = parent_result.as_id();
+
+                        new_writes.inject_non_list_arg(field_name, parent_id);
+                        Expression::Write { write: new_writes }
+                    }),
+                }
+            }
+            (None, Query::Read(rq)) => unimplemented!(), //Expression::Read { read: ReadQuery::RecordQuery(new_reads), typ },
+            (Some(child_edge), Query::Read(rq)) => match rq {
+                ReadQuery::RecordQuery(rq) => {
+                    let typ = match child_edge.weight() {
+                        Dependency::Read(t) => Arc::clone(t),
+                        _ => unreachable!(),
+                    };
+
+                    let mut new_reads = rq.clone();
+                    Expression::Func {
+                        func: Box::new(|env: Env| {
+                            let parent_result = env.get("parent").unwrap();
+                            let parent_id = parent_result.as_id();
+
+                            let finder = RecordFinder {
+                                field: new_reads
+                                    .selected_fields
+                                    .scalar
+                                    .first()
+                                    .unwrap()
+                                    .field
+                                    .model()
+                                    .fields()
+                                    .id()
+                                    .clone(),
+                                value: parent_id,
+                            };
+
+                            new_reads.record_finder = Some(finder);
+
+                            Expression::Read {
+                                read: ReadQuery::RecordQuery(new_reads),
+                                typ,
+                            }
+                        }),
+                    }
+                }
+                _ => unimplemented!(),
+            },
+
+            _ => unimplemented!(),
+        }
     }
 }
 
@@ -207,6 +220,15 @@ impl ExpressionResult {
                 Identifier::Id(id) => id.clone().try_into().unwrap(),
                 _ => unimplemented!(),
             },
+            _ => unimplemented!(),
+        }
+    }
+}
+
+impl Into<ResultPair> for ExpressionResult {
+    fn into(self) -> ResultPair {
+        match self {
+            Self::Read(r, typ) => ResultPair::Read(r, typ),
             _ => unimplemented!(),
         }
     }
@@ -241,14 +263,18 @@ impl QueryInterpreter {
             Expression::Func { func } => {
                 println!("FUNC");
                 self.interpret(func(env.clone()), env)
-                },
+            }
+
             Expression::Sequence { seq } => {
                 println!("SEQ");
-                seq
-                .into_iter()
-                .map(|exp| self.interpret(exp, env.clone()))
-                .collect::<QueryExecutionResult<Vec<_>>>()
-                .map(|res| ExpressionResult::Vec(res))},
+                seq.into_iter()
+                    .map(|exp| self.interpret(exp, env.clone()))
+                    .collect::<QueryExecutionResult<Vec<_>>>()
+                    .map(|mut results| {
+                        results.reverse();
+                        results.pop().unwrap()
+                    })
+            }
 
             Expression::Let { bindings, expressions } => {
                 println!("LET");
@@ -260,19 +286,22 @@ impl QueryInterpreter {
 
                 self.interpret(Expression::Sequence { seq: expressions }, inner_env)
             }
+
             Expression::Write { write } => {
                 println!("WRITE");
                 Ok(self
-                .writer
-                .execute(WriteQuery::Root("".to_owned(), Some("".to_owned()), write))
-                .map(|res| ExpressionResult::Write(res))?)},
+                    .writer
+                    .execute(WriteQuery::Root("".to_owned(), Some("".to_owned()), write))
+                    .map(|res| ExpressionResult::Write(res))?)
+            }
 
             Expression::Read { read, typ } => {
                 println!("READ");
                 Ok(self
-                .reader
-                .execute(read, &[])
-                .map(|res| ExpressionResult::Read(res, typ))?)},
+                    .reader
+                    .execute(read, &[])
+                    .map(|res| ExpressionResult::Read(res, typ))?)
+            }
 
             _ => unimplemented!(),
         }

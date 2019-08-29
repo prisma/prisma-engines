@@ -66,7 +66,10 @@ impl QueryExecutor {
 
         let exp = Expressionista::translate(graph);
         let result = interpreter.interpret(exp, Env::default())?;
-        dbg!(result);
+        let mut builder = ResultIrBuilder::new();
+
+        builder.push(result.into());
+        Ok(builder.build())
 
         // 3. Execute query plan
         // let results: Vec<ResultPair> = self.execute_queries(queries)?;
@@ -74,9 +77,8 @@ impl QueryExecutor {
         // 4. Build IR response / Parse results into IR response
         // Ok(results
         //     .into_iter()
-        //     .fold(ResultIrBuilder::new(), |builder, result| builder.push(result))
+        //     .fold()
         //     .build())
-        unimplemented!()
     }
 
     fn build_graph(&self, pairs: Vec<QueryPair>) -> QueryGraph {
