@@ -1,23 +1,26 @@
 mod error;
 mod interpreter;
+mod query_graph;
 mod read;
 mod write;
+mod expressionista;
 
 pub use error::*;
 pub use read::ReadQueryExecutor;
 pub use write::WriteQueryExecutor;
+pub use query_graph::*;
+pub use expressionista::*;
 
 use crate::{
     query_builders::QueryBuilder,
     query_document::QueryDocument,
     response_ir::{Response, ResultIrBuilder},
-    CoreError, CoreResult, OutputTypeRef, QueryPair, QuerySchemaRef, ResultPair, ResultResolutionStrategy,
+    CoreError, CoreResult, QueryPair, QuerySchemaRef, ResultPair, ResultResolutionStrategy,
 };
 use connector::*;
 use interpreter::*;
 use petgraph::{graph::*, *};
-use prisma_models::RelationFieldRef;
-use std::borrow::Borrow;
+
 use std::sync::Arc;
 
 /// Central query executor and main entry point into the query core.
@@ -27,13 +30,6 @@ pub struct QueryExecutor {
 }
 
 type QueryExecutionResult<T> = std::result::Result<T, QueryExecutionError>;
-type QueryGraph = Graph<Query, Dependency>;
-
-#[derive(Debug)]
-pub enum Dependency {
-    Write(RelationFieldRef),
-    Read(OutputTypeRef),
-}
 
 // Todo:
 // - Partial execution semantics?
@@ -56,7 +52,7 @@ impl QueryExecutor {
         let queries = QueryBuilder::new(query_schema).build(query_doc)?;
 
         // 2. Build query plan
-        let mut graph = self.build_graph(queries);
+        let mut graph = QueryGraph::from(queries);
         self.transform(&mut graph);
 
         let interpreter = QueryInterpreter {
@@ -79,81 +75,6 @@ impl QueryExecutor {
         //     .into_iter()
         //     .fold()
         //     .build())
-    }
-
-    fn build_graph(&self, pairs: Vec<QueryPair>) -> QueryGraph {
-        let mut graph = QueryGraph::new();
-
-        pairs.into_iter().for_each(|pair| match pair {
-            (Query::Write(mut wq), ResultResolutionStrategy::Dependent(qp)) => {
-                let nested = wq.replace_nested_writes();
-                let top = graph.add_node(Query::Write(wq));
-
-                self.build_nested_graph(top, nested, &mut graph);
-
-                match *qp {
-                    (Query::Read(rq), ResultResolutionStrategy::Serialize(typ)) => {
-                        let read = graph.add_node(Query::Read(rq));
-                        graph.add_edge(top, read, Dependency::Read(typ));
-                    }
-                    _ => unreachable!(),
-                };
-            }
-            _ => unimplemented!(),
-        });
-
-        graph
-    }
-
-    fn build_nested_graph(&self, top: NodeIndex, nested: NestedWriteQueries, graph: &mut QueryGraph) {
-        nested.creates.into_iter().for_each(|nc| {
-            let relation_field = Arc::clone(&nc.relation_field);
-            let nested = nc.nested_writes.clone();
-            let n = graph.add_node(Query::Write(WriteQuery::Root("".into(), Some("".into()), nc.into())));
-
-            graph.add_edge(top, n, Dependency::Write(relation_field));
-            self.build_nested_graph(n, nested, graph);
-        });
-    }
-
-    fn transform(&self, graph: &mut QueryGraph) {
-        let candidates: Vec<EdgeIndex> = graph
-            .raw_edges()
-            .into_iter()
-            .filter_map(|edge| {
-                let parent = graph.node_weight(edge.source()).unwrap();
-                let child = graph.node_weight(edge.target()).unwrap();
-                let edge_index = graph.find_edge(edge.source(), edge.target()).unwrap();
-
-                match (parent, child) {
-                    (
-                        Query::Write(WriteQuery::Root(_, _, RootWriteQuery::CreateRecord(_))),
-                        Query::Write(WriteQuery::Root(_, _, RootWriteQuery::CreateRecord(_))),
-                    ) => {
-                        let relation_field: &RelationFieldRef = match &edge.weight {
-                            Dependency::Write(rf) => rf,
-                            _ => unreachable!(),
-                        };
-
-                        if dbg!(relation_field.relation_is_inlined_in_parent()) {
-                            Some(edge_index)
-                        } else {
-                            None
-                        }
-                    }
-                    _ => None,
-                }
-            })
-            .collect();
-
-        candidates.into_iter().for_each(|edge_index| {
-            let (parent, child) = graph.edge_endpoints(edge_index).unwrap();
-            let edge = graph.remove_edge(edge_index).unwrap();
-
-            if let Dependency::Write(rf) = edge {
-                graph.add_edge(child, parent, Dependency::Write(rf.related_field()));
-            }
-        });
     }
 
     fn execute_queries(&self, queries: Vec<QueryPair>) -> CoreResult<Vec<ResultPair>> {
