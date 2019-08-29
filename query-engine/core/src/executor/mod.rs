@@ -16,6 +16,7 @@ use crate::{
     query_document::QueryDocument,
     response_ir::{Response, ResultIrBuilder},
     CoreError, CoreResult, QueryPair, QuerySchemaRef, ResultPair, ResultResolutionStrategy,
+    OutputTypeRef, ResultInfo,
 };
 use connector::*;
 use interpreter::*;
@@ -30,6 +31,28 @@ pub struct QueryExecutor {
 }
 
 type QueryExecutionResult<T> = std::result::Result<T, QueryExecutionError>;
+
+struct QueryPipeline {
+    graph: QueryGraph,
+    interpreter: QueryInterpreter,
+    result_info: ResultInfo,
+}
+
+impl QueryPipeline {
+    pub fn new(query: Query, interpreter: QueryInterpreter, result_info: ResultInfo) -> Self {
+        let graph = QueryGraph::from(query);
+        Self { graph, interpreter, result_info }
+    }
+
+    pub fn execute(self) -> QueryExecutionResult<Response> {
+        let exp = Expressionista::translate(self.graph);
+        let result = self.interpreter.interpret(exp, Env::default())?;
+        let mut builder = ResultIrBuilder::new();
+
+        builder.push(result.into());
+        Ok(builder.build().pop().unwrap()) // todo builder semantics
+    }
+}
 
 // Todo:
 // - Partial execution semantics?
@@ -48,35 +71,21 @@ impl QueryExecutor {
     /// building queries and a query execution plan, and finally calling the connector APIs to
     /// resolve the queries and build reponses.
     pub fn execute(&self, query_doc: QueryDocument, query_schema: QuerySchemaRef) -> CoreResult<Vec<Response>> {
-        // 1. Parse and validate query document (building)
-        let queries = QueryBuilder::new(query_schema).build(query_doc)?;
+        // Parse and validate query document
+        let queries: Vec<(Query, ResultInfo)> = QueryBuilder::new(query_schema).build_test(query_doc)?;
 
-        // 2. Build query plan
-        let mut graph = QueryGraph::from(queries);
-        self.transform(&mut graph);
+        // Create pipelines for all separate queries
+        let results = queries.into_iter().map(|(query, info)| {
+            let interpreter = QueryInterpreter {
+                writer: self.write_executor.clone(),
+                reader: self.read_executor.clone(),
+            };
 
-        let interpreter = QueryInterpreter {
-            writer: self.write_executor.clone(),
-            reader: self.read_executor.clone(),
-        };
+            QueryPipeline::new(query, interpreter , info)
+        });
 
-        let exp = Expressionista::translate(graph);
-        let result = interpreter.interpret(exp, Env::default())?;
-        dbg!(&result);
-
-        let mut builder = ResultIrBuilder::new();
-
-        builder.push(result.into());
-        Ok(builder.build())
-
-        // 3. Execute query plan
-        // let results: Vec<ResultPair> = self.execute_queries(queries)?;
-
-        // 4. Build IR response / Parse results into IR response
-        // Ok(results
-        //     .into_iter()
-        //     .fold()
-        //     .build())
+        // todo merge results
+        unimplemented!()
     }
 
     // fn execute_queries(&self, queries: Vec<QueryPair>) -> CoreResult<Vec<ResultPair>> {

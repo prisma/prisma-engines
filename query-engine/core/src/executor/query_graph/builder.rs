@@ -13,7 +13,8 @@ use std::sync::Arc;
 pub struct QueryGraphBuilder {}
 
 impl QueryGraphBuilder {
-    pub fn build(query: QueryPair) -> QueryGraph {
+    // WIP change to query from pair semantic
+    pub fn build(query: Query) -> QueryGraph {
         let mut graph = InnerGraph::new();
 
         match query {

@@ -24,8 +24,8 @@ pub enum GraphEdge {
     Read(OutputTypeRef),
 }
 
-impl From<QueryPair> for QueryGraph {
-    fn from(q: QueryPair) -> Self {
+impl From<query> for QueryGraph {
+    fn from(q: Query) -> Self {
         QueryGraphBuilder::build(q)
     }
 }

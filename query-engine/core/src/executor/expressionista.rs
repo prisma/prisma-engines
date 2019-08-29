@@ -30,7 +30,7 @@ impl Expressionista {
     fn build_expression(
         graph: &QueryGraph,
         node_id: NodeIndex,
-        parent_edge: Option<EdgeReference<Dependency>>,
+        parent_edge: Option<EdgeReference<GraphEdge>>,
     ) -> Expression {
         let query = graph.node_weight(node_id).unwrap();
         let exp = Self::query_expression(parent_edge, query);
@@ -39,8 +39,8 @@ impl Expressionista {
         // Writes before reads
         let (write_edges, read_edges): (Vec<_>, Vec<_>) =
             child_edges.into_iter().partition(|child| match child.weight() {
-                Dependency::Write(_) => true,
-                Dependency::Read(_) => false,
+                GraphEdge::Write(_) => true,
+                GraphEdge::Read(_) => false,
             });
 
         let mut expressions: Vec<_> = write_edges
@@ -68,13 +68,13 @@ impl Expressionista {
         }
     }
 
-    fn query_expression(edge: Option<EdgeReference<Dependency>>, query: &Query) -> Expression {
+    fn query_expression(edge: Option<EdgeReference<GraphEdge>>, query: &Query) -> Expression {
         match (edge, query) {
             (None, Query::Write(wq)) => Expression::Write { write: wq.clone() },
             (Some(child_edge), Query::Write(wq)) => {
                 let mut new_writes = wq.clone();
                 let field_name = match child_edge.weight() {
-                    Dependency::Write(rf) => rf.related_field().name.clone(),
+                    GraphEdge::Write(rf) => rf.related_field().name.clone(),
                     _ => unreachable!(),
                 };
 
@@ -92,7 +92,7 @@ impl Expressionista {
             (Some(child_edge), Query::Read(rq)) => match rq {
                 ReadQuery::RecordQuery(rq) => {
                     let typ = match child_edge.weight() {
-                        Dependency::Read(t) => Arc::clone(t),
+                        GraphEdge::Read(t) => Arc::clone(t),
                         _ => unreachable!(),
                     };
 

@@ -2,7 +2,7 @@ use super::*;
 use crate::{
     query_document::*, CoreResult, FieldRef, InputFieldRef, InputObjectTypeStrongRef, InputType, IntoArc,
     ModelOperation, ObjectTypeStrongRef, OperationTag, OutputTypeRef, QueryPair, QuerySchemaRef,
-    ResultResolutionStrategy, ScalarType,
+    ResultResolutionStrategy, ScalarType, ResultInfo,
 };
 use chrono::prelude::*;
 use connector::Query;
@@ -25,6 +25,11 @@ pub struct QueryBuilder {
 impl QueryBuilder {
     pub fn new(query_schema: QuerySchemaRef) -> Self {
         QueryBuilder { query_schema }
+    }
+
+    // WIP
+    pub fn build_test(self, query_doc: QueryDocument) -> QueryBuilderResult<Vec<(Query, ResultInfo)>> {
+        unimplemented!()
     }
 
     /// Builds queries from a query document.

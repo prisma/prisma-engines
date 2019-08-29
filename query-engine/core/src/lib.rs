@@ -29,6 +29,12 @@ pub type CoreResult<T> = Result<T, CoreError>;
 /// This is intended to be a temporary type to work around current dependent execution limitations.
 pub type QueryPair = (Query, ResultResolutionStrategy);
 
+/// WIP Holds all necessary meta info to serialize a result.
+pub struct ResultInfo {
+    key: String,
+    output_type: OutputTypeRef,
+}
+
 #[derive(Debug)]
 pub enum ResultResolutionStrategy {
     /// Resolve the actual result by evaluating another query.
