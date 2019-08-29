@@ -122,24 +122,13 @@ impl IntrospectionConnector {
                 } else {
                     ColumnArity::Nullable
                 };
-                let default = col
-                    .get("column_default")
-                    .map(|x| {
-                        debug!("Converting default to string: {:?}", x);
-                        if x.is_null() {
-                            None
-                        } else {
-                            let default = x.to_string().expect("default to string");
-                            Some(default)
-                        }
-                    })
-                    .expect("get default");
+                let default = col.get("column_default").and_then(|x| x.to_string());
                 let is_auto_increment = is_identity
                     || match default {
                         Some(ref val) => {
                             val == &format!("nextval(\'\"{}\".\"{}_{}_seq\"\'::regclass)", schema, table, col_name,)
                         }
-                        None => false,
+                        _ => false,
                     };
                 Column {
                     name: col_name,

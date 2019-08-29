@@ -9,6 +9,7 @@ database-introspection = { path = "../../libs/database-introspection" }
 failure = "0.1"
 datamodel = { path = "../../libs/datamodel" }
 log = "0.4"
+regex = "1.2"
 
 [dev-dependencies]
 fern = "0.5"

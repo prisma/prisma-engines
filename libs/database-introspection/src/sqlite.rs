@@ -103,10 +103,10 @@ impl IntrospectionConnector {
                 }
 
                 debug!(
-                    "Found column '{}', type: '{:?}', default: '{}', arity: {:?}, primary key: {}",
+                    "Found column '{}', type: '{:?}', default: {:?}, arity: {:?}, primary key: {}",
                     col.name,
                     col.tpe,
-                    default_value.unwrap_or("none".to_string()),
+                    col.default,
                     arity,
                     pk_col > 0
                 );

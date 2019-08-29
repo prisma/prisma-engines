@@ -1,7 +1,8 @@
 use database_introspection::*;
 use datamodel::{
-    common::PrismaType, dml, Datamodel, Field, FieldArity, FieldType, IdInfo, IdStrategy, Model, OnDeleteStrategy,
-    RelationInfo, ScalarListStrategy,
+    common::{PrismaType, PrismaValue},
+    dml, Datamodel, Field, FieldArity, FieldType, IdInfo, IdStrategy, Model, OnDeleteStrategy, RelationInfo,
+    ScalarListStrategy,
 };
 use introspection_command::calculate_model;
 use log::LevelFilter;
@@ -225,6 +226,155 @@ fn arity_is_preserved_when_generating_data_model_from_a_schema() {
                 columns: vec!["primary_col".to_string()],
                 sequence: None,
             }),
+            foreign_keys: vec![],
+        }],
+        enums: vec![],
+        sequences: vec![],
+    };
+    let data_model = calculate_model(&schema).expect("calculate data model");
+
+    assert_eq!(data_model, ref_data_model);
+}
+
+#[test]
+fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
+    setup();
+
+    let ref_data_model = Datamodel {
+        models: vec![Model {
+            database_name: None,
+            name: "Table1".to_string(),
+            documentation: None,
+            is_embedded: false,
+            fields: vec![
+                Field {
+                    name: "no-default".to_string(),
+                    arity: FieldArity::Optional,
+                    field_type: FieldType::Base(PrismaType::Int),
+                    database_name: None,
+                    default_value: None,
+                    is_unique: false,
+                    id_info: None,
+                    scalar_list_strategy: None,
+                    documentation: None,
+                    is_generated: false,
+                    is_updated_at: false,
+                },
+                Field {
+                    name: "int-default".to_string(),
+                    arity: FieldArity::Optional,
+                    field_type: FieldType::Base(PrismaType::Int),
+                    database_name: None,
+                    default_value: Some(PrismaValue::Int(1)),
+                    is_unique: false,
+                    id_info: None,
+                    scalar_list_strategy: None,
+                    documentation: None,
+                    is_generated: false,
+                    is_updated_at: false,
+                },
+                Field {
+                    name: "bool-default".to_string(),
+                    arity: FieldArity::Optional,
+                    field_type: FieldType::Base(PrismaType::Boolean),
+                    database_name: None,
+                    default_value: Some(PrismaValue::Boolean(true)),
+                    is_unique: false,
+                    id_info: None,
+                    scalar_list_strategy: None,
+                    documentation: None,
+                    is_generated: false,
+                    is_updated_at: false,
+                },
+                Field {
+                    name: "float-default".to_string(),
+                    arity: FieldArity::Optional,
+                    field_type: FieldType::Base(PrismaType::Float),
+                    database_name: None,
+                    default_value: Some(PrismaValue::Float(1.0)),
+                    is_unique: false,
+                    id_info: None,
+                    scalar_list_strategy: None,
+                    documentation: None,
+                    is_generated: false,
+                    is_updated_at: false,
+                },
+                Field {
+                    name: "string-default".to_string(),
+                    arity: FieldArity::Optional,
+                    field_type: FieldType::Base(PrismaType::String),
+                    database_name: None,
+                    default_value: Some(PrismaValue::String("default".to_string())),
+                    is_unique: false,
+                    id_info: None,
+                    scalar_list_strategy: None,
+                    documentation: None,
+                    is_generated: false,
+                    is_updated_at: false,
+                },
+            ],
+            is_generated: false,
+        }],
+        enums: vec![],
+    };
+
+    let schema = DatabaseSchema {
+        tables: vec![Table {
+            name: "Table1".to_string(),
+            columns: vec![
+                Column {
+                    name: "no-default".to_string(),
+                    tpe: ColumnType {
+                        raw: "raw".to_string(),
+                        family: ColumnTypeFamily::Int,
+                    },
+                    arity: ColumnArity::Nullable,
+                    default: None,
+                    auto_increment: false,
+                },
+                Column {
+                    name: "int-default".to_string(),
+                    tpe: ColumnType {
+                        raw: "raw".to_string(),
+                        family: ColumnTypeFamily::Int,
+                    },
+                    arity: ColumnArity::Nullable,
+                    default: Some("'1'".to_string()),
+                    auto_increment: false,
+                },
+                Column {
+                    name: "bool-default".to_string(),
+                    tpe: ColumnType {
+                        raw: "raw".to_string(),
+                        family: ColumnTypeFamily::Boolean,
+                    },
+                    arity: ColumnArity::Nullable,
+                    default: Some("'1'".to_string()),
+                    auto_increment: false,
+                },
+                Column {
+                    name: "float-default".to_string(),
+                    tpe: ColumnType {
+                        raw: "raw".to_string(),
+                        family: ColumnTypeFamily::Float,
+                    },
+                    arity: ColumnArity::Nullable,
+                    default: Some("'1.0'".to_string()),
+                    auto_increment: false,
+                },
+                Column {
+                    name: "string-default".to_string(),
+                    tpe: ColumnType {
+                        raw: "raw".to_string(),
+                        family: ColumnTypeFamily::String,
+                    },
+                    arity: ColumnArity::Nullable,
+                    default: Some("default".to_string()),
+                    auto_increment: false,
+                },
+            ],
+            indices: vec![],
+            primary_key: None,
             foreign_keys: vec![],
         }],
         enums: vec![],

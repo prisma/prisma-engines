@@ -1,11 +1,13 @@
 //! Logic for generating Prisma data models from database introspection.
 use database_introspection::*;
 use datamodel::{
-    common::PrismaType, dml, Datamodel, Field, FieldArity, FieldType, IdInfo, IdStrategy, Model, OnDeleteStrategy,
-    RelationInfo, ScalarListStrategy,
+    common::{PrismaType, PrismaValue},
+    dml, Datamodel, Field, FieldArity, FieldType, IdInfo, IdStrategy, Model, OnDeleteStrategy, RelationInfo,
+    ScalarListStrategy,
 };
 use failure::Error;
 use log::debug;
+use regex::Regex;
 
 /// The result type.
 pub type Result<T> = core::result::Result<T, Error>;
@@ -30,12 +32,16 @@ pub fn calculate_model(schema: &DatabaseSchema) -> Result<Datamodel> {
                 FieldArity::List => Some(ScalarListStrategy::Embedded),
                 _ => None,
             };
+            let default_value = column
+                .default
+                .as_ref()
+                .and_then(|default| calculate_default(default, &column.tpe.family));
             let field = Field {
                 name: column.name.clone(),
                 arity,
                 field_type,
                 database_name: None,
-                default_value: None,
+                default_value,
                 is_unique: table.is_column_unique(&column),
                 id_info,
                 scalar_list_strategy,
@@ -48,6 +54,58 @@ pub fn calculate_model(schema: &DatabaseSchema) -> Result<Datamodel> {
         data_model.add_model(model);
     }
     Ok(data_model)
+}
+
+fn parse_int(value: &str) -> Option<i32> {
+    debug!("Parsing int '{}'", value);
+    let re_num = Regex::new(r"^'?(\d+)'?$").expect("compile regex");
+    let rslt = re_num.captures(value);
+    if rslt.is_none() {
+        debug!("Couldn't parse int");
+        return None;
+    }
+
+    let captures = rslt.expect("get captures");
+    let num_str = captures.get(1).expect("get capture").as_str();
+    let num_rslt = num_str.parse::<i32>();
+    match num_rslt {
+        Ok(num) => Some(num),
+        Err(_) => {
+            debug!("Couldn't parse int '{}'", num_str);
+            None
+        }
+    }
+}
+
+fn parse_float(value: &str) -> Option<f32> {
+    debug!("Parsing float '{}'", value);
+    let re_num = Regex::new(r"^'?([^']+)'?$").expect("compile regex");
+    let rslt = re_num.captures(value);
+    if rslt.is_none() {
+        debug!("Couldn't parse float");
+        return None;
+    }
+
+    let captures = rslt.expect("get captures");
+    let num_str = captures.get(1).expect("get capture").as_str();
+    let num_rslt = num_str.parse::<f32>();
+    match num_rslt {
+        Ok(num) => Some(num),
+        Err(_) => {
+            debug!("Couldn't parse float '{}'", num_str);
+            None
+        }
+    }
+}
+
+fn calculate_default(default: &str, tpe: &ColumnTypeFamily) -> Option<PrismaValue> {
+    match tpe {
+        ColumnTypeFamily::Boolean => parse_int(default).map(|x| PrismaValue::Boolean(x != 0)),
+        ColumnTypeFamily::Int => parse_int(default).map(|x| PrismaValue::Int(x)),
+        ColumnTypeFamily::Float => parse_float(default).map(|x| PrismaValue::Float(x)),
+        ColumnTypeFamily::String => Some(PrismaValue::String(default.to_string())),
+        _ => None,
+    }
 }
 
 fn calc_id_info(column: &Column, table: &Table) -> Option<IdInfo> {

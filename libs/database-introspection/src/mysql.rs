@@ -125,18 +125,7 @@ impl IntrospectionConnector {
                         .expect("get column name"),
                     tpe,
                     arity,
-                    default: col
-                        .get("column_default")
-                        .map(|x| {
-                            debug!("Converting default to string: {:?}", x);
-                            if x.is_null() {
-                                None
-                            } else {
-                                let default = x.to_string().expect("default to string");
-                                Some(default)
-                            }
-                        })
-                        .expect("get default"),
+                    default: col.get("column_default").and_then(|x| x.to_string()),
                     auto_increment: auto_increment,
                 }
             })
