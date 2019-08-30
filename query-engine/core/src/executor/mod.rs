@@ -1,26 +1,24 @@
 mod error;
+mod expressionista;
 mod interpreter;
 mod query_graph;
 mod read;
 mod write;
-mod expressionista;
 
 pub use error::*;
+pub use expressionista::*;
+pub use query_graph::*;
 pub use read::ReadQueryExecutor;
 pub use write::WriteQueryExecutor;
-pub use query_graph::*;
-pub use expressionista::*;
 
 use crate::{
     query_builders::QueryBuilder,
     query_document::QueryDocument,
     response_ir::{Response, ResultIrBuilder},
-    CoreError, CoreResult, QueryPair, QuerySchemaRef, ResultPair, ResultResolutionStrategy,
-    OutputTypeRef, ResultInfo,
+    CoreResult, OutputTypeRef, QueryPair, QuerySchemaRef, ResultInfo, ResultPair, ResultResolutionStrategy,
 };
 use connector::*;
 use interpreter::*;
-use petgraph::{graph::*, *};
 
 use std::sync::Arc;
 
@@ -41,7 +39,11 @@ struct QueryPipeline {
 impl QueryPipeline {
     pub fn new(query: Query, interpreter: QueryInterpreter, result_info: ResultInfo) -> Self {
         let graph = QueryGraph::from(query);
-        Self { graph, interpreter, result_info }
+        Self {
+            graph,
+            interpreter,
+            result_info,
+        }
     }
 
     pub fn execute(self) -> QueryExecutionResult<Response> {
@@ -81,7 +83,7 @@ impl QueryExecutor {
                 reader: self.read_executor.clone(),
             };
 
-            QueryPipeline::new(query, interpreter , info)
+            QueryPipeline::new(query, interpreter, info)
         });
 
         // todo merge results

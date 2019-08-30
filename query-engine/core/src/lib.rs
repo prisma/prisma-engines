@@ -31,8 +31,10 @@ pub type QueryPair = (Query, ResultResolutionStrategy);
 
 /// WIP Holds all necessary meta info to serialize a result.
 pub struct ResultInfo {
-    key: String,
-    output_type: OutputTypeRef,
+    pub key: String,
+    pub output_type: OutputTypeRef,
+    // selected fields?
+    // query args?
 }
 
 #[derive(Debug)]
