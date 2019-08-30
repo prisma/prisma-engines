@@ -241,23 +241,44 @@ impl IntrospectionConnector {
             .conn
             .query_raw(sql, schema, &[schema.into(), table_name.into()])
             .expect("querying for indices");
-        let mut pk: Option<PrimaryKey> = None;
+        let mut primary_key: Option<PrimaryKey> = None;
         let indices = rows
             .into_iter()
             .filter_map(|index| {
                 debug!("Got index row: {:#?}", index);
+                let pos = index
+                    .get("seq_in_index")
+                    .and_then(|x| x.as_i64())
+                    .expect("seq_in_index")
+                    - 1;
                 let index_name = index.get("index_name").and_then(|x| x.to_string()).expect("index_name");
-                let is_pk = index_name == "PRIMARY";
+                let is_pk = index_name.to_lowercase() == "primary";
                 let column_name = index
                     .get("column_name")
                     .and_then(|x| x.to_string())
                     .expect("column_name");
                 let is_unique = !index.get("non_unique").and_then(|x| x.as_bool()).expect("non_unique");
                 if is_pk {
-                    pk = Some(PrimaryKey {
-                        columns: vec![column_name],
-                        sequence: None,
-                    });
+                    debug!("Column '{}' is part of the primary key", column_name);
+                    match primary_key.as_mut() {
+                        Some(pk) => {
+                            if pk.columns.len() < (pos + 1) as usize {
+                                pk.columns.resize((pos + 1) as usize, "".to_string());
+                            }
+                            pk.columns[pos as usize] = column_name;
+                            debug!(
+                                "The primary key has already been created, added column to it: {:?}",
+                                pk.columns
+                            );
+                        }
+                        None => {
+                            debug!("Instantiating primary key");
+                            primary_key = Some(PrimaryKey {
+                                columns: vec![column_name],
+                                sequence: None,
+                            });
+                        }
+                    };
                     None
                 } else if fk_cols.contains(&column_name) {
                     None
@@ -274,8 +295,8 @@ impl IntrospectionConnector {
             })
             .collect();
 
-        debug!("Found table indices: {:?}, primary key: {:?}", indices, pk);
-        (indices, pk)
+        debug!("Found table indices: {:?}, primary key: {:?}", indices, primary_key);
+        (indices, primary_key)
     }
 }
 
