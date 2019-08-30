@@ -1,25 +1,24 @@
 mod error;
 mod expressionista;
 mod interpreter;
-mod query_graph;
 mod read;
 mod write;
 
 pub use error::*;
 pub use expressionista::*;
-pub use query_graph::*;
+pub use interpreter::*;
 pub use read::ReadQueryExecutor;
 pub use write::WriteQueryExecutor;
 
 use crate::{
+    query_graph::*,
     query_builders::QueryBuilder,
     query_document::QueryDocument,
     response_ir::{Response, ResultIrBuilder},
-    CoreResult, OutputTypeRef, QueryPair, QuerySchemaRef, ResultInfo, ResultPair, ResultResolutionStrategy,
+    CoreResult, OutputTypeRef, schema::QuerySchemaRef, ResultInfo,
 };
 use connector::*;
 use interpreter::*;
-
 use std::sync::Arc;
 
 /// Central query executor and main entry point into the query core.
@@ -47,12 +46,10 @@ impl QueryPipeline {
     }
 
     pub fn execute(self) -> QueryExecutionResult<Response> {
+        let result_info = self.result_info;
         let exp = Expressionista::translate(self.graph);
-        let result = self.interpreter.interpret(exp, Env::default())?;
-        let mut builder = ResultIrBuilder::new();
 
-        builder.push(result.into());
-        Ok(builder.build().pop().unwrap()) // todo builder semantics
+        self.interpreter.interpret(exp, Env::default()).map(|result| ResultIrBuilder::build(result, result_info))
     }
 }
 

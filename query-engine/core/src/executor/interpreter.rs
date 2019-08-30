@@ -1,7 +1,5 @@
 use super::*;
-use crate::{OutputTypeRef, WriteQueryResultWrapper};
-use connector::Identifier;
-use connector::ReadQuery;
+use connector::{Identifier, ReadQuery};
 use im::HashMap;
 use prisma_models::prelude::*;
 use std::convert::TryInto;
@@ -18,7 +16,6 @@ pub enum Expression {
     },
     Read {
         read: ReadQuery,
-        typ: OutputTypeRef,
     },
     Let {
         bindings: Vec<Binding>,
@@ -33,27 +30,18 @@ pub struct Binding {
 
 #[derive(Debug, Clone)]
 pub enum ExpressionResult {
-    Write(WriteQueryResultWrapper),
-    Read(ReadQueryResult, OutputTypeRef),
+    Read(ReadQueryResult),
+    Write(WriteQueryResult),
 }
 
 impl ExpressionResult {
     pub fn as_id(&self) -> PrismaValue {
         match self {
-            Self::Write(wrapper) => match &wrapper.result.identifier {
+            Self::Write(result) => match &result.identifier {
                 Identifier::Id(id) => id.clone().try_into().unwrap(),
                 _ => unimplemented!(),
             },
             _ => unimplemented!(),
-        }
-    }
-}
-
-impl Into<ResultPair> for ExpressionResult {
-    fn into(self) -> ResultPair {
-        match self {
-            Self::Read(r, typ) => ResultPair::Read(r, typ),
-            Self::Write(w) => ResultPair::Write(w),
         }
     }
 }
@@ -113,12 +101,12 @@ impl QueryInterpreter {
                 Ok(self.writer.execute(write).map(|res| ExpressionResult::Write(res))?)
             }
 
-            Expression::Read { read, typ } => {
+            Expression::Read { read } => {
                 println!("READ");
                 Ok(self
                     .reader
                     .execute(read, &[])
-                    .map(|res| ExpressionResult::Read(res, typ))?)
+                    .map(|res| ExpressionResult::Read(res))?)
             }
 
             _ => unimplemented!(),

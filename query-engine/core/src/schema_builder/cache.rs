@@ -12,11 +12,11 @@
 ///! but also prevents issues with memory leaks in the schema, as well as issues that when all strong
 ///! arcs are dropped due to visitor operations, the schema can't be traversed anymore due to invalid references.
 ///!
+use super::*;
 use std::{
     cell::RefCell,
     collections::HashMap,
     fmt::Debug,
-    sync::{Arc, Weak},
 };
 
 pub trait CachedBuilder<T: Debug> {

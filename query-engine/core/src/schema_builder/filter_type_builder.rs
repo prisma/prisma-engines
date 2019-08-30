@@ -1,6 +1,4 @@
 use super::*;
-use prisma_models::{Field as ModelField, ModelRef, RelationFieldRef, ScalarFieldRef};
-use std::sync::Arc;
 
 /// Filter object and scalar filter object type builder.
 #[derive(Debug)]

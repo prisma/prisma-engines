@@ -1,16 +1,14 @@
+///! Query graph abstraction for simple high-level query representation
+///! and manipulation.
 mod builder;
 
+use crate::OutputTypeRef;
 use builder::*;
-use prisma_models::RelationFieldRef;
-use crate::{
-    query_builders::QueryBuilder,
-    query_document::QueryDocument,
-    response_ir::{Response, ResultIrBuilder},
-    CoreError, CoreResult, OutputTypeRef, QueryPair, QuerySchemaRef, ResultPair, ResultResolutionStrategy,
-};
 use connector::*;
 use petgraph::{graph::*, visit::EdgeRef, *};
+use prisma_models::RelationFieldRef;
 
+/// Implementation detail of the query graph.
 type InnerGraph = Graph<Query, EdgeContent>;
 
 #[derive(Debug, Default)]
@@ -35,7 +33,7 @@ impl<'a> Node<'a> {
 
 pub enum EdgeDirection {
     Outgoing,
-    Incoming
+    Incoming,
 }
 
 pub struct Edge<'a> {
@@ -60,7 +58,7 @@ impl<'a> Edge<'a> {
 #[derive(Debug, Clone)]
 pub enum EdgeContent {
     Write(RelationFieldRef),
-    Read(OutputTypeRef),
+    Read,
 }
 
 impl From<Query> for QueryGraph {
@@ -95,19 +93,13 @@ impl<'a> QueryGraph {
     pub fn edge_source(&'a self, edge: &Edge) -> Node<'a> {
         let (node_ix, _) = self.graph.edge_endpoints(edge.edge_ix).unwrap();
 
-        Node {
-            node_ix,
-            graph: self,
-        }
+        Node { node_ix, graph: self }
     }
 
     pub fn edge_target(&'a self, edge: &Edge) -> Node<'a> {
         let (_, node_ix) = self.graph.edge_endpoints(edge.edge_ix).unwrap();
 
-        Node {
-            node_ix,
-            graph: self,
-        }
+        Node { node_ix, graph: self }
     }
 
     pub fn edges_for(&'a self, node: &Node, direction: EdgeDirection) -> Vec<Edge<'a>> {
@@ -116,6 +108,12 @@ impl<'a> QueryGraph {
             EdgeDirection::Incoming => Direction::Incoming,
         };
 
-        self.graph.edges_directed(node.node_ix, direction).map(|edge| Edge { graph: self, edge_ix: edge.id() }).collect()
+        self.graph
+            .edges_directed(node.node_ix, direction)
+            .map(|edge| Edge {
+                graph: self,
+                edge_ix: edge.id(),
+            })
+            .collect()
     }
 }

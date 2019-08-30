@@ -1,8 +1,8 @@
 use super::*;
-use connector::filter::RecordFinder;
-use connector::ReadQuery;
+use connector::{ReadQuery, filter::RecordFinder};
+use crate::QueryGraph;
 
-pub struct Expressionista {}
+pub struct Expressionista;
 
 impl Expressionista {
     pub fn translate(graph: QueryGraph) -> Expression {
@@ -26,7 +26,7 @@ impl Expressionista {
                 .into_iter()
                 .partition(|child_edge| match child_edge.content() {
                     EdgeContent::Write(_) => true,
-                    EdgeContent::Read(_) => false,
+                    EdgeContent::Read => false,
                 });
 
         let mut expressions: Vec<_> = write_edges
@@ -77,12 +77,8 @@ impl Expressionista {
             (None, Query::Read(rq)) => unimplemented!(), //Expression::Read { read: ReadQuery::RecordQuery(new_reads), typ },
             (Some(child_edge), Query::Read(rq)) => match rq {
                 ReadQuery::RecordQuery(rq) => {
-                    let typ = match child_edge.content() {
-                        EdgeContent::Read(ref t) => Arc::clone(t),
-                        _ => unreachable!(),
-                    };
-
                     let mut new_reads = rq.clone();
+
                     Expression::Func {
                         func: Box::new(|env: Env| {
                             let parent_result = env.get("parent").unwrap();
@@ -106,7 +102,6 @@ impl Expressionista {
 
                             Expression::Read {
                                 read: ReadQuery::RecordQuery(new_reads),
-                                typ,
                             }
                         }),
                     }

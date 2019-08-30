@@ -16,10 +16,10 @@ pub use read::*;
 pub use utils::*;
 pub use write::*;
 
-use crate::{OutputType, ResultPair};
+use crate::{schema::OutputType, ResultInfo, ExpressionResult};
 use indexmap::IndexMap;
 use prisma_models::PrismaValue;
-use std::{borrow::Borrow, sync::Arc};
+use std::{sync::Arc};
 
 /// A `key -> value` map to an IR item
 pub type Map = IndexMap<String, Item>;
@@ -38,6 +38,8 @@ pub enum Response {
     Error(String),
 }
 
+// todo merge of responses
+
 /// An IR item that either expands to a subtype or leaf-record.
 #[derive(Debug, Clone)]
 pub enum Item {
@@ -52,66 +54,58 @@ pub enum Item {
 }
 
 /// An IR builder utility
+/// TODO ordering of top level results?
 #[derive(Debug, Default)]
-pub struct ResultIrBuilder(Vec<ResultPair>);
+pub struct ResultIrBuilder;
 
 impl ResultIrBuilder {
-    pub fn new() -> Self {
-        Self::default()
-    }
+    pub fn build(result: ExpressionResult, info: ResultInfo) -> Response {
+        // self.0
+        //     .into_iter()
+        //     .fold(vec![], |mut vec, res| {
+        //         match res {
+        //             ResultPair::Write(r) => {
+        //                 let name = r.alias.clone().unwrap_or_else(|| r.name.clone());
+        //                 let serialized = serialize_write(r.result);
 
-    /// Add a single query result to the builder
-    pub fn push(&mut self, q: ResultPair) {
-        self.0.push(q);
-    }
+        //                 match serialized {
+        //                     Ok(result) => vec.push(Response::Data(name, result)),
+        //                     Err(err) => vec.push(Response::Error(format!("{}", err))),
+        //                 };
+        //             }
 
-    /// Parse collected queries into the return wrapper type
-    pub fn build(self) -> Vec<Response> {
-        self.0
-            .into_iter()
-            .fold(vec![], |mut vec, res| {
-                match res {
-                    ResultPair::Write(r) => {
-                        let name = r.alias.clone().unwrap_or_else(|| r.name.clone());
-                        let serialized = serialize_write(r.result);
+        //             ResultPair::Read(r, typ) => {
+        //                 let name = r.alias.clone().unwrap_or_else(|| r.name.clone());
+        //                 let serialized = serialize_read(r, &typ, false, false);
 
-                        match serialized {
-                            Ok(result) => vec.push(Response::Data(name, result)),
-                            Err(err) => vec.push(Response::Error(format!("{}", err))),
-                        };
-                    }
+        //                 match serialized {
+        //                     Ok(result) => {
+        //                         // On the top level, each result pair boils down to a exactly a single serialized result.
+        //                         // All checks for lists and optionals have already been performed during the recursion,
+        //                         // so we just unpack the only result possible.
+        //                         let result = if result.is_empty() {
+        //                             match typ.borrow() {
+        //                                 OutputType::Opt(_) => Item::Value(PrismaValue::Null),
+        //                                 OutputType::List(_) => Item::List(vec![]),
+        //                                 _ => unreachable!(),
+        //                             }
+        //                         } else {
+        //                             let (_, item) = result.into_iter().take(1).next().unwrap();
+        //                             item
+        //                         };
 
-                    ResultPair::Read(r, typ) => {
-                        let name = r.alias.clone().unwrap_or_else(|| r.name.clone());
-                        let serialized = serialize_read(r, &typ, false, false);
+        //                         vec.push(Response::Data(name, result));
+        //                     }
 
-                        match serialized {
-                            Ok(result) => {
-                                // On the top level, each result pair boils down to a exactly a single serialized result.
-                                // All checks for lists and optionals have already been performed during the recursion,
-                                // so we just unpack the only result possible.
-                                let result = if result.is_empty() {
-                                    match typ.borrow() {
-                                        OutputType::Opt(_) => Item::Value(PrismaValue::Null),
-                                        OutputType::List(_) => Item::List(vec![]),
-                                        _ => unreachable!(),
-                                    }
-                                } else {
-                                    let (_, item) = result.into_iter().take(1).next().unwrap();
-                                    item
-                                };
+        //                     Err(err) => vec.push(Response::Error(format!("{}", err))),
+        //                 };
+        //             }
+        //         };
 
-                                vec.push(Response::Data(name, result));
-                            }
-
-                            Err(err) => vec.push(Response::Error(format!("{}", err))),
-                        };
-                    }
-                };
-
-                vec
-            })
-            .into_iter()
-            .collect()
+        //         vec
+        //     })
+        //     .into_iter()
+        //     .collect()
+        unimplemented!()
     }
 }

@@ -1,7 +1,8 @@
 use crate::{data_model_loader::{load_data_model_components, load_configuration}, dmmf, PrismaResult};
 use clap::ArgMatches;
 use core::{
-    schema::{QuerySchemaBuilder, QuerySchemaRef, SupportedCapabilities},
+    QuerySchemaBuilder,
+    schema::{QuerySchemaRef, SupportedCapabilities},
     BuildMode,
 };
 use serde::Deserialize;

@@ -1,4 +1,4 @@
-use prisma_models::{Field, TypeIdentifier};
+use super::*;
 
 pub struct FilterArgument {
     pub suffix: &'static str,
@@ -53,7 +53,7 @@ lazy_static! {
     };
 }
 
-pub fn get_field_filters<'a>(field: &Field) -> Vec<&'a FilterArgument> {
+pub fn get_field_filters<'a>(field: &ModelField) -> Vec<&'a FilterArgument> {
     let args = &FILTER_ARGUMENTS;
 
     if field.is_list() {

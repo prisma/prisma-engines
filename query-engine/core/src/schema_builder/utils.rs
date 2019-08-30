@@ -72,7 +72,7 @@ where
 }
 
 /// Field convenience wrapper function.
-pub fn field<T>(name: T, arguments: Vec<Argument>, field_type: OutputType, operation: Option<ModelOperation>) -> Field
+pub fn field<T>(name: T, arguments: Vec<Argument>, field_type: OutputType, operation: Option<Operation>) -> Field
 where
     T: Into<String>,
 {

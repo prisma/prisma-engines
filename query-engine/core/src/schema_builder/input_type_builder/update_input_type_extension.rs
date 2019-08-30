@@ -1,5 +1,4 @@
 use super::*;
-use prisma_models::{ModelRef, RelationFieldRef, ScalarFieldRef};
 
 pub trait UpdateInputTypeBuilderExtension<'a>: InputTypeBuilderBase<'a> + CreateInputTypeBuilderExtension<'a> {
     /// Builds "<x>UpdateInput" input object type.

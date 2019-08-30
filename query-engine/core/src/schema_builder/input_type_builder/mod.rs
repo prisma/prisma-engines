@@ -1,3 +1,5 @@
+use super::*;
+
 mod create_input_type_extension;
 mod input_builder_extensions;
 mod update_input_type_extension;
@@ -6,9 +8,6 @@ pub use create_input_type_extension::*;
 pub use input_builder_extensions::*;
 pub use update_input_type_extension::*;
 
-use super::*;
-use prisma_models::{InternalDataModelRef, FieldBehaviour, IdStrategy, ModelRef, RelationFieldRef, ScalarFieldRef, TypeIdentifier};
-use std::sync::{Arc, Weak};
 
 pub trait InputTypeBuilderBase<'a>: CachedBuilder<InputObjectType> + InputBuilderExtensions {
     /// Builds scalar input fields using the mapper and the given, prefiltered, scalar fields.

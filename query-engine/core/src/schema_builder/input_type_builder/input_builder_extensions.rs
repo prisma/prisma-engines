@@ -1,5 +1,4 @@
 use super::*;
-use prisma_models::{EnumType, ScalarFieldRef, TypeIdentifier};
 
 /// Generic extension also used by the FilterInputTypeBuilder.
 pub trait InputBuilderExtensions {

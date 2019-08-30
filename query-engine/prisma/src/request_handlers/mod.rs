@@ -1,6 +1,6 @@
 pub mod graphql;
 
-pub use core::QuerySchemaRenderer;
+pub use core::schema::QuerySchemaRenderer;
 pub use graphql::{GraphQlBody, GraphQlRequestHandler};
 
 use crate::{context::PrismaContext, RequestContext};

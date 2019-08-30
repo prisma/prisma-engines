@@ -1,5 +1,4 @@
 use super::*;
-use prisma_models::ModelRef;
 
 pub struct ArgumentBuilder<'a> {
     input_type_builder: Weak<InputTypeBuilder<'a>>,

@@ -1,13 +1,13 @@
 use super::*;
-use prisma_models::RelationFieldRef;
 use crate::{
     query_builders::QueryBuilder,
     query_document::QueryDocument,
     response_ir::{Response, ResultIrBuilder},
-    CoreError, CoreResult, OutputTypeRef, QueryPair, QuerySchemaRef, ResultPair, ResultResolutionStrategy,
+    CoreError, CoreResult, OutputTypeRef,
 };
 use connector::*;
-use petgraph::{graph::*};
+use petgraph::graph::*;
+use prisma_models::RelationFieldRef;
 use std::sync::Arc;
 
 pub struct QueryGraphBuilder {}
@@ -16,7 +16,7 @@ impl QueryGraphBuilder {
     // WIP change to query from pair semantic
     pub fn build(query: Query) -> QueryGraph {
         unimplemented!()
-        // let mut graph = QueryGraph::new();
+        // let mut graph = InnerGraph::new();
 
         // match query {
         //     (Query::Write(mut wq), ResultResolutionStrategy::Dependent(qp)) => {
@@ -28,7 +28,7 @@ impl QueryGraphBuilder {
         //         match *qp {
         //             (Query::Read(rq), ResultResolutionStrategy::Serialize(typ)) => {
         //                 let read = graph.add_node(Query::Read(rq));
-        //                 graph.add_edge(top, read, GraphEdge::Read(typ));
+        //                 graph.add_edge(top, read, EdgeContent::Read(typ));
         //             }
         //             _ => unreachable!(),
         //         };
@@ -38,9 +38,7 @@ impl QueryGraphBuilder {
 
         // Self::transform(&mut graph);
 
-        // QueryGraph {
-        //     graph
-        // }
+        // QueryGraph { graph }
     }
 
     // fn build_nested_graph(top: NodeIndex, nested: NestedWriteQueries, graph: &mut InnerGraph) {

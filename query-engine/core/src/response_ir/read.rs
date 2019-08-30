@@ -1,5 +1,5 @@
 use super::*;
-use crate::{CoreError, CoreResult, IntoArc, ObjectTypeStrongRef, OutputType, OutputTypeRef, ScalarType};
+use crate::{CoreError, CoreResult, schema::{IntoArc, ObjectTypeStrongRef, OutputType, OutputTypeRef, ScalarType}};
 use connector::{ReadQueryResult, RecordSelection, ResultContent, ScalarListValues};
 use indexmap::IndexMap;
 use prisma_models::{GraphqlId, PrismaValue};

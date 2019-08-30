@@ -1,8 +1,4 @@
 use super::*;
-use prisma_models::{
-    EnumType, EnumValue, Field as ModelField, InternalDataModelRef, ModelRef, ScalarField, SortOrder, TypeIdentifier,
-};
-use std::sync::Arc;
 
 #[derive(Debug)]
 pub struct ObjectTypeBuilder<'a> {

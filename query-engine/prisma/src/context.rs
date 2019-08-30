@@ -1,8 +1,6 @@
 use std::sync::Arc;
-
-use core::{BuildMode, QueryExecutor, QuerySchemaBuilder, QuerySchemaRef, SupportedCapabilities};
+use core::{BuildMode, QueryExecutor, QuerySchemaBuilder, schema::{QuerySchemaRef, SupportedCapabilities}};
 use prisma_models::InternalDataModelRef;
-
 use crate::{data_model_loader::*, exec_loader, PrismaError, PrismaResult};
 
 /// Prisma request context containing all immutable state of the process.
