@@ -246,11 +246,11 @@ impl IntrospectionConnector {
             .into_iter()
             .filter_map(|index| {
                 debug!("Got index row: {:#?}", index);
-                let pos = index
+                let seq_in_index = index
                     .get("seq_in_index")
                     .and_then(|x| x.as_i64())
-                    .expect("seq_in_index")
-                    - 1;
+                    .expect("seq_in_index");
+                let pos = seq_in_index - 1;
                 let index_name = index.get("index_name").and_then(|x| x.to_string()).expect("index_name");
                 let is_pk = index_name.to_lowercase() == "primary";
                 let column_name = index
