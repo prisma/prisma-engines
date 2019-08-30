@@ -11,11 +11,12 @@ pub use read::ReadQueryExecutor;
 pub use write::WriteQueryExecutor;
 
 use crate::{
-    query_graph::*,
     query_builders::QueryBuilder,
     query_document::QueryDocument,
+    query_graph::*,
     response_ir::{Response, ResultIrBuilder},
-    CoreResult, OutputTypeRef, schema::QuerySchemaRef, ResultInfo,
+    schema::QuerySchemaRef,
+    CoreResult, OutputTypeRef, ResultInfo,
 };
 use connector::*;
 use interpreter::*;
@@ -49,7 +50,9 @@ impl QueryPipeline {
         let result_info = self.result_info;
         let exp = Expressionista::translate(self.graph);
 
-        self.interpreter.interpret(exp, Env::default()).map(|result| ResultIrBuilder::build(result, result_info))
+        self.interpreter
+            .interpret(exp, Env::default())
+            .map(|result| ResultIrBuilder::build(result, result_info))
     }
 }
 
@@ -80,10 +83,10 @@ impl QueryExecutor {
                 reader: self.read_executor.clone(),
             };
 
-            QueryPipeline::new(query, interpreter, info)
+            QueryPipeline::new(query, interpreter, info).execute()
         });
 
-        // todo merge results
+        // todo merge results. What about order?
         unimplemented!()
     }
 

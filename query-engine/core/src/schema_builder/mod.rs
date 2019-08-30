@@ -17,8 +17,11 @@ use object_type_builder::*;
 use utils::*;
 
 /// Common module imports shared accross submodules.
-pub(self) use crate::schema::*;
-pub(self) use std::sync::{Arc, Weak};
-pub(self) use prisma_models::{InternalDataModelRef, FieldBehaviour, IdStrategy, ModelRef, RelationFieldRef, ScalarFieldRef, EnumType, EnumValue, Field as ModelField, ScalarField, SortOrder, TypeIdentifier,};
+use crate::schema::*;
+use prisma_models::{
+    EnumType, EnumValue, Field as ModelField, FieldBehaviour, IdStrategy, InternalDataModelRef, ModelRef,
+    RelationFieldRef, ScalarField, ScalarFieldRef, SortOrder, TypeIdentifier,
+};
+use std::sync::{Arc, Weak};
 
 pub use query_schema_builder::*;
