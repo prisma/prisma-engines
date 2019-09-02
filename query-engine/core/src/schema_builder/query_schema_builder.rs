@@ -1,4 +1,6 @@
 use super::*;
+use crate::{query_builders::*, QueryGraph};
+use connector::Query;
 
 /// Build mode for schema generation.
 #[derive(Debug, Copy, Clone)]
@@ -196,10 +198,16 @@ impl<'a> QuerySchemaBuilder<'a> {
                     OutputType::opt(OutputType::object(
                         self.object_type_builder.map_model_object_type(&model),
                     )),
-                    Some(Operation::ModelQuery(ModelQuery::new(
+                    Some(SchemaQueryBuilder::ModelQueryBuilder(ModelQueryBuilder::new(
                         Arc::clone(&model),
                         QueryTag::FindOne,
-                        Arc::new(|_, _, _| unimplemented!()),
+                        Box::new(|model, parsed_field| {
+                            let mut graph = QueryGraph::new();
+                            let query = ReadOneRecordBuilder::new(parsed_field, model).build()?;
+
+                            graph.create_node(Query::Read(query));
+                            Ok(graph)
+                        }),
                     ))),
                 )
             })
@@ -219,10 +227,10 @@ impl<'a> QuerySchemaBuilder<'a> {
             OutputType::list(OutputType::opt(OutputType::object(
                 self.object_type_builder.map_model_object_type(&model),
             ))),
-            Some(Operation::ModelQuery(ModelQuery::new(
+            Some(SchemaQueryBuilder::ModelQueryBuilder(ModelQueryBuilder::new(
                 Arc::clone(&model),
                 QueryTag::FindMany,
-                Arc::new(|_, _, _| unimplemented!()),
+                Box::new(|_, _| unimplemented!()),
             ))),
         )
     }
@@ -238,10 +246,10 @@ impl<'a> QuerySchemaBuilder<'a> {
             field_name,
             vec![],
             OutputType::object(self.object_type_builder.aggregation_object_type(&model)),
-            Some(Operation::ModelQuery(ModelQuery::new(
+            Some(SchemaQueryBuilder::ModelQueryBuilder(ModelQueryBuilder::new(
                 Arc::clone(&model),
                 QueryTag::Aggregate,
-                Arc::new(|_, _, _| unimplemented!()),
+                Box::new(|_, _| unimplemented!()),
             ))),
         )
     }
@@ -262,10 +270,10 @@ impl<'a> QuerySchemaBuilder<'a> {
             field_name,
             args,
             OutputType::object(self.object_type_builder.map_model_object_type(&model)),
-            Some(Operation::ModelQuery(ModelQuery::new(
+            Some(SchemaQueryBuilder::ModelQueryBuilder(ModelQueryBuilder::new(
                 Arc::clone(&model),
                 QueryTag::CreateOne,
-                Arc::new(|_, _, _| unimplemented!()),
+                Box::new(|_, _| unimplemented!()),
             ))),
         )
     }
@@ -284,10 +292,10 @@ impl<'a> QuerySchemaBuilder<'a> {
                 OutputType::opt(OutputType::object(
                     self.object_type_builder.map_model_object_type(&model),
                 )),
-                Some(Operation::ModelQuery(ModelQuery::new(
+                Some(SchemaQueryBuilder::ModelQueryBuilder(ModelQueryBuilder::new(
                     Arc::clone(&model),
                     QueryTag::DeleteOne,
-                    Arc::new(|_, _, _| unimplemented!()),
+                    Box::new(|_, _| unimplemented!()),
                 ))),
             )
         })
@@ -305,10 +313,10 @@ impl<'a> QuerySchemaBuilder<'a> {
             field_name,
             arguments,
             OutputType::object(self.object_type_builder.batch_payload_object_type()),
-            Some(Operation::ModelQuery(ModelQuery::new(
+            Some(SchemaQueryBuilder::ModelQueryBuilder(ModelQueryBuilder::new(
                 Arc::clone(&model),
                 QueryTag::DeleteMany,
-                Arc::new(|_, _, _| unimplemented!()),
+                Box::new(|_, _| unimplemented!()),
             ))),
         )
     }
@@ -325,10 +333,10 @@ impl<'a> QuerySchemaBuilder<'a> {
                 OutputType::opt(OutputType::object(
                     self.object_type_builder.map_model_object_type(&model),
                 )),
-                Some(Operation::ModelQuery(ModelQuery::new(
+                Some(SchemaQueryBuilder::ModelQueryBuilder(ModelQueryBuilder::new(
                     Arc::clone(&model),
                     QueryTag::UpdateOne,
-                    Arc::new(|_, _, _| unimplemented!()),
+                    Box::new(|_, _| unimplemented!()),
                 ))),
             )
         })
@@ -346,10 +354,10 @@ impl<'a> QuerySchemaBuilder<'a> {
             field_name,
             arguments,
             OutputType::object(self.object_type_builder.batch_payload_object_type()),
-            Some(Operation::ModelQuery(ModelQuery::new(
+            Some(SchemaQueryBuilder::ModelQueryBuilder(ModelQueryBuilder::new(
                 Arc::clone(&model),
                 QueryTag::UpdateMany,
-                Arc::new(|_, _, _| unimplemented!()),
+                Box::new(|_, _| unimplemented!()),
             ))),
         )
     }
@@ -364,10 +372,10 @@ impl<'a> QuerySchemaBuilder<'a> {
                 field_name,
                 args,
                 OutputType::object(self.object_type_builder.map_model_object_type(&model)),
-                Some(Operation::ModelQuery(ModelQuery::new(
+                Some(SchemaQueryBuilder::ModelQueryBuilder(ModelQueryBuilder::new(
                     Arc::clone(&model),
                     QueryTag::UpsertOne,
-                    Arc::new(|_, _, _| unimplemented!()),
+                    Box::new(|_, _| unimplemented!()),
                 ))),
             )
         })

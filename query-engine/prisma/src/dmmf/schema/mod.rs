@@ -87,11 +87,11 @@ impl RenderContext {
         self.schema.borrow_mut().output_types.push(output_type);
     }
 
-    pub fn add_mapping(&self, name: String, operation: Option<&Operation>) {
+    pub fn add_mapping(&self, name: String, operation: Option<&SchemaQueryBuilder>) {
         operation.into_iter().for_each(|op| {
-            if let Operation::ModelQuery(mq) = op {
-                let model_name = mq.model.name.clone();
-                let tag_str = format!("{}", mq.tag);
+            if let SchemaQueryBuilder::ModelQueryBuilder(m) = op {
+                let model_name = m.model.name.clone();
+                let tag_str = format!("{}", m.tag);
                 let mut mappings = self.mappings.borrow_mut();
                 let mapping = mappings.iter().find(|mapping| mapping.model_name == model_name);
 

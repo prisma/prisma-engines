@@ -1,5 +1,5 @@
 use super::*;
-use crate::{query_builders::*, query_document::ParsedField, ResultInfo};
+use crate::{QueryGraph, QueryBuilderResult, ParsedField};
 use connector::Query;
 use once_cell::sync::OnceCell;
 use prisma_models::{EnumType, InternalDataModelRef, ModelRef, PrismaValue};
@@ -139,28 +139,37 @@ pub struct Field {
     pub name: String,
     pub arguments: Vec<Argument>,
     pub field_type: OutputTypeRef,
-    pub operation: Option<Operation>,
+    pub query_builder: Option<SchemaQueryBuilder>,
 }
 
-/// An operation designates that something should be done
+/// A query builder allows to attach queries to the schema:
 /// on a field:
-/// - A `ModelQuery` is a type of operation that builds queries specific to models,
-///   such as `findOne<Model>`. It requires additional context compared to a `GenericQuery`.
+/// - A `ModelQueryBuilder` builds queries specific to models, such as `findOne<Model>`.
+///   It requires additional context compared to a `GenericQueryBuilder`.
 ///
-/// - A `GenericQuery` is a query that requires no additional context but the parsed query
-///   document data from the incoming query and is thus not associated to any particular
+/// - A `GenericQueryBuilder` is a query builder that requires no additional context but
+///   the parsed query document data from the incoming query and is thus not associated to any particular
 ///   model. The `ResetData` query is such an example.
-#[derive(Debug, Clone)]
-pub enum Operation {
-    ModelQuery(ModelQuery),
-    GenericQuery(GenericQuery),
+#[derive(Debug)]
+pub enum SchemaQueryBuilder {
+    ModelQueryBuilder(ModelQueryBuilder),
+    GenericQueryBuilder(GenericQueryBuilder),
 }
 
-pub type QueryBuilderFn = dyn (Fn(ModelRef, Field, ParsedField) -> (Query, ResultInfo)) + Send + Sync;
+impl SchemaQueryBuilder {
+    pub fn build(&self, parsed_field: ParsedField) -> QueryBuilderResult<QueryGraph> {
+        match self {
+            Self::ModelQueryBuilder(m) => m.build(parsed_field),
+            _ => unimplemented!(),
+        }
+    }
+}
+
+pub type QueryBuilderFn = dyn (Fn(ModelRef, ParsedField) -> QueryBuilderResult<QueryGraph>) + Send + Sync;
 
 /// Designates a specific top-level operation on a corresponding model.
-#[derive(DebugStub, Clone)]
-pub struct ModelQuery {
+#[derive(DebugStub)]
+pub struct ModelQueryBuilder {
     pub model: ModelRef,
     pub tag: QueryTag,
 
@@ -168,12 +177,16 @@ pub struct ModelQuery {
     /// that the executer will execute. The result info is required
     /// by the serialization to correctly build the response.
     #[debug_stub = "#BuilderFn#"]
-    pub builder_fn: Arc<QueryBuilderFn>,
+    pub builder_fn: Box<QueryBuilderFn>,
 }
 
-impl ModelQuery {
-    pub fn new(model: ModelRef, tag: QueryTag, builder_fn: Arc<QueryBuilderFn>) -> Self {
+impl ModelQueryBuilder {
+    pub fn new(model: ModelRef, tag: QueryTag, builder_fn: Box<QueryBuilderFn>) -> Self {
         Self { model, tag, builder_fn }
+    }
+
+    pub fn build(&self, parsed_field: ParsedField) -> QueryBuilderResult<QueryGraph> {
+        (self.builder_fn)(Arc::clone(&self.model), parsed_field)
     }
 }
 
@@ -210,7 +223,7 @@ impl fmt::Display for QueryTag {
 }
 
 #[derive(Debug, Clone)]
-pub struct GenericQuery {
+pub struct GenericQueryBuilder {
     // WIP
 }
 

@@ -1,10 +1,10 @@
 use super::*;
-use crate::{CoreResult, OutputTypeRef};
+use crate::{CoreResult, ResultInfo};
 use connector::{Identifier, WriteQueryResult};
 use prisma_models::PrismaValue;
 
 /// We just assume we ever get a single item back
-pub fn serialize_write(result: WriteQueryResult) -> CoreResult<Item> {
+pub fn serialize_write(result: WriteQueryResult, info: &ResultInfo) -> CoreResult<Item> {
     match result.identifier {
         Identifier::Count(c) => {
             let mut map: IndexMap<String, Item> = IndexMap::new();

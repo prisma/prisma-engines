@@ -1,7 +1,8 @@
 //! Parsed query document tree. Naming is WIP.
 //! Structures represent parsed and validated parts of the query document, used by the query builders.
 use prisma_models::PrismaValue;
-use std::{collections::BTreeMap};
+use std::collections::BTreeMap;
+use crate::FieldRef;
 
 pub type ParsedInputMap = BTreeMap<String, ParsedInputValue>;
 
@@ -16,6 +17,9 @@ pub struct ParsedField {
     pub alias: Option<String>,
     pub arguments: Vec<ParsedArgument>,
     pub nested_fields: Option<ParsedObject>,
+
+    /// Associated schema field
+    pub schema_field: FieldRef,
 }
 
 #[derive(Debug, Clone)]

@@ -1,6 +1,6 @@
 use super::*;
-use connector::{ReadQuery, filter::RecordFinder};
 use crate::QueryGraph;
+use connector::{filter::RecordFinder, ReadQuery};
 
 pub struct Expressionista;
 
@@ -74,8 +74,8 @@ impl Expressionista {
                     }),
                 }
             }
-            (None, Query::Read(rq)) => unimplemented!(), //Expression::Read { read: ReadQuery::RecordQuery(new_reads), typ },
-            (Some(child_edge), Query::Read(rq)) => match rq {
+            (None, Query::Read(rq)) => Expression::Read { read: rq },
+            (Some(_), Query::Read(rq)) => match rq {
                 ReadQuery::RecordQuery(rq) => {
                     let mut new_reads = rq.clone();
 

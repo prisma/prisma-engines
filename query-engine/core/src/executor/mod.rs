@@ -30,17 +30,16 @@ pub struct QueryExecutor {
 
 type QueryExecutionResult<T> = std::result::Result<T, QueryExecutionError>;
 
-struct QueryPipeline {
+struct QueryPipeline<'a> {
     graph: QueryGraph,
-    interpreter: QueryInterpreter,
+    interpreter: QueryInterpreter<'a>,
     result_info: ResultInfo,
 }
 
-impl QueryPipeline {
-    pub fn new(query: Query, interpreter: QueryInterpreter, result_info: ResultInfo) -> Self {
-        let graph = QueryGraph::from(query);
+impl<'a> QueryPipeline<'a> {
+    pub fn new(graph: QueryGraph, interpreter: QueryInterpreter<'a>, result_info: ResultInfo) -> Self {
         Self {
-            graph,
+            graph: graph.transform(),
             interpreter,
             result_info,
         }
@@ -72,22 +71,22 @@ impl QueryExecutor {
     /// Executes a query document, which involves parsing & validating the document,
     /// building queries and a query execution plan, and finally calling the connector APIs to
     /// resolve the queries and build reponses.
-    pub fn execute(&self, query_doc: QueryDocument, query_schema: QuerySchemaRef) -> CoreResult<Vec<Response>> {
-        // Parse and validate query document
-        let queries: Vec<(Query, ResultInfo)> = QueryBuilder::new(query_schema).build_test(query_doc)?;
+    pub fn execute(&self, query_doc: QueryDocument, query_schema: QuerySchemaRef) -> QueryExecutionResult<Vec<Response>> {
+        // Parse, validate, and extract queries from query document.
+        let queries: Vec<(QueryGraph, ResultInfo)> = QueryBuilder::new(query_schema).build(query_doc)?;
 
         // Create pipelines for all separate queries
-        let results = queries.into_iter().map(|(query, info)| {
-            let interpreter = QueryInterpreter {
-                writer: self.write_executor.clone(),
-                reader: self.read_executor.clone(),
-            };
+        queries
+            .into_iter()
+            .map(|(query_graph, info)| {
+                let interpreter = QueryInterpreter {
+                    writer: &self.write_executor,
+                    reader: &self.read_executor,
+                };
 
-            QueryPipeline::new(query, interpreter, info).execute()
-        });
-
-        // todo merge results. What about order?
-        unimplemented!()
+                QueryPipeline::new(query_graph, interpreter, info).execute()
+            })
+            .collect::<QueryExecutionResult<Vec<Response>>>()
     }
 
     // fn execute_queries(&self, queries: Vec<QueryPair>) -> CoreResult<Vec<ResultPair>> {

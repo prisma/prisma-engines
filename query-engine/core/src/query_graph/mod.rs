@@ -2,7 +2,6 @@
 ///! and manipulation.
 mod builder;
 
-use crate::OutputTypeRef;
 use builder::*;
 use connector::*;
 use petgraph::{graph::*, visit::EdgeRef, *};
@@ -68,6 +67,12 @@ impl From<Query> for QueryGraph {
 }
 
 impl<'a> QueryGraph {
+    pub fn new() -> Self {
+        Self {
+            graph: InnerGraph::new(),
+        }
+    }
+
     pub fn root_nodes(&'a self) -> Vec<Node<'a>> {
         self.graph
             .node_indices()
@@ -80,6 +85,18 @@ impl<'a> QueryGraph {
             })
             .map(|node_ix: NodeIndex| Node { graph: &self, node_ix })
             .collect()
+    }
+
+    pub fn create_node(&'a mut self, query: Query) -> Node<'a> {
+        let node_ix = self.graph.add_node(query);
+
+        Node { node_ix, graph: self }
+    }
+
+    pub fn create_edge(&'a mut self, from: &Node<'a>, to: &Node<'a>, content: EdgeContent) -> Edge<'a> {
+        let edge_ix = self.graph.add_edge(from.node_ix, to.node_ix, content);
+
+        Edge { graph: self, edge_ix }
     }
 
     pub fn node_content(&self, node: &Node) -> Query {
@@ -115,5 +132,50 @@ impl<'a> QueryGraph {
                 edge_ix: edge.id(),
             })
             .collect()
+    }
+
+    /// Current way to fix inconsistencies in the graph.
+    pub fn transform(mut self) -> Self {
+        let candidates: Vec<EdgeIndex> = self
+            .graph
+            .raw_edges()
+            .into_iter()
+            .filter_map(|edge| {
+                let parent = self.graph.node_weight(edge.source()).unwrap();
+                let child = self.graph.node_weight(edge.target()).unwrap();
+                let edge_index = self.graph.find_edge(edge.source(), edge.target()).unwrap();
+
+                match (parent, child) {
+                    (
+                        Query::Write(WriteQuery::Root(RootWriteQuery::CreateRecord(_))),
+                        Query::Write(WriteQuery::Root(RootWriteQuery::CreateRecord(_))),
+                    ) => {
+                        let relation_field: &RelationFieldRef = match &edge.weight {
+                            EdgeContent::Write(rf) => rf,
+                            _ => unreachable!(),
+                        };
+
+                        if relation_field.relation_is_inlined_in_parent() {
+                            Some(edge_index)
+                        } else {
+                            None
+                        }
+                    }
+                    _ => None,
+                }
+            })
+            .collect();
+
+        candidates.into_iter().for_each(|edge_index| {
+            let (parent, child) = self.graph.edge_endpoints(edge_index).unwrap();
+            let edge = self.graph.remove_edge(edge_index).unwrap();
+
+            if let EdgeContent::Write(rf) = edge {
+                self.graph
+                    .add_edge(child, parent, EdgeContent::Write(rf.related_field()));
+            }
+        });
+
+        self
     }
 }

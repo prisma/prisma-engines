@@ -72,7 +72,7 @@ where
 }
 
 /// Field convenience wrapper function.
-pub fn field<T>(name: T, arguments: Vec<Argument>, field_type: OutputType, operation: Option<Operation>) -> Field
+pub fn field<T>(name: T, arguments: Vec<Argument>, field_type: OutputType, query_builder: Option<SchemaQueryBuilder>) -> Field
 where
     T: Into<String>,
 {
@@ -80,7 +80,7 @@ where
         name: name.into(),
         arguments,
         field_type: Arc::new(field_type),
-        operation,
+        query_builder,
     }
 }
 

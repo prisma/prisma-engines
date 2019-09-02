@@ -1,4 +1,4 @@
-use crate::{QueryValidationError, QueryExecutionError};
+use crate::{QueryExecutionError, QueryValidationError};
 use connector::error::ConnectorError;
 use failure::Fail;
 use prisma_models::DomainError;

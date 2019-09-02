@@ -64,12 +64,12 @@ impl Env {
     }
 }
 
-pub struct QueryInterpreter {
-    pub writer: WriteQueryExecutor,
-    pub reader: ReadQueryExecutor,
+pub struct QueryInterpreter<'a> {
+    pub writer: &'a WriteQueryExecutor,
+    pub reader: &'a ReadQueryExecutor,
 }
 
-impl QueryInterpreter {
+impl<'a> QueryInterpreter<'a> {
     pub fn interpret(&self, exp: Expression, env: Env) -> QueryExecutionResult<ExpressionResult> {
         match exp {
             Expression::Func { func } => {

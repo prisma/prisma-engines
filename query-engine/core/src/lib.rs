@@ -24,8 +24,9 @@ pub use response_ir::*;
 pub use schema_builder::*;
 pub use error::*;
 pub use executor::*;
+pub use schema::*;
+pub use query_document::*;
 
-use connector::WriteQueryResult;
 use schema::OutputTypeRef;
 
 pub type CoreResult<T> = Result<T, CoreError>;

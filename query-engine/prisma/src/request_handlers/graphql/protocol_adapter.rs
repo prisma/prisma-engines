@@ -1,4 +1,3 @@
-use crate::error::PrismaError::QueryValidationError;
 use crate::{error::PrismaError, PrismaResult};
 use core::query_document::*;
 use graphql_parser::query::{
@@ -29,7 +28,7 @@ impl GraphQLProtocolAdapter {
                 .definitions
                 .into_iter()
                 .find(|def| Self::matches_operation(def, op))
-                .ok_or_else(|| QueryValidationError(format!("Operation '{}' does not match any query.", op)))
+                .ok_or_else(|| PrismaError::QueryConversionError(format!("Operation '{}' does not match any query.", op)))
                 .and_then(|def| Self::convert_definition(def)),
 
             None => gql_doc
@@ -130,7 +129,7 @@ impl GraphQLProtocolAdapter {
             )),
             Value::Int(i) => match i.as_i64() {
                 Some(i) => Ok(QueryValue::Int(i)),
-                None => Err(PrismaError::QueryValidationError(format!(
+                None => Err(PrismaError::QueryConversionError(format!(
                     "Invalid 64 bit integer: {:?}",
                     i
                 ))),
