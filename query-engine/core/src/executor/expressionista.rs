@@ -108,8 +108,6 @@ impl Expressionista {
                 }
                 _ => unimplemented!(),
             },
-
-            _ => unimplemented!(),
         }
     }
 }

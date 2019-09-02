@@ -1,6 +1,5 @@
 use super::*;
-use crate::{QueryGraph, QueryBuilderResult, ParsedField};
-use connector::Query;
+use crate::{ParsedField, QueryBuilderResult, QueryGraph};
 use once_cell::sync::OnceCell;
 use prisma_models::{EnumType, InternalDataModelRef, ModelRef, PrismaValue};
 use std::{

@@ -1,5 +1,5 @@
 use super::*;
-use crate::query_document::{ParsedField, ParsedInputMap, ArgumentListLookup};
+use crate::query_document::{ArgumentListLookup, ParsedField, ParsedInputMap};
 use connector::write_ast::*;
 use prisma_models::ModelRef;
 use std::convert::TryInto;
@@ -19,9 +19,6 @@ impl CreateBuilder {
 impl Builder<WriteQuery> for CreateBuilder {
     fn build(mut self) -> QueryBuilderResult<WriteQuery> {
         let model = self.model;
-        let _name = self.field.name;
-        let _alias = self.field.alias;
-
         let data_argument = self.field.arguments.lookup("data").unwrap();
         let data_map: ParsedInputMap = data_argument.value.try_into()?;
 
@@ -33,7 +30,9 @@ impl CreateBuilder {
     pub fn build_from(model: ModelRef, data: ParsedInputMap) -> QueryBuilderResult<CreateRecord> {
         let create_args = WriteArguments::from(&model, data, true)?;
         let mut non_list_args = create_args.non_list;
+
         non_list_args.add_datetimes(Arc::clone(&model));
+
         Ok(CreateRecord {
             model,
             non_list_args,

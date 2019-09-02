@@ -1,8 +1,5 @@
 ///! Query graph abstraction for simple high-level query representation
 ///! and manipulation.
-mod builder;
-
-use builder::*;
 use connector::*;
 use petgraph::{graph::*, visit::EdgeRef, *};
 use prisma_models::RelationFieldRef;
@@ -58,12 +55,6 @@ impl<'a> Edge<'a> {
 pub enum EdgeContent {
     Write(RelationFieldRef),
     Read,
-}
-
-impl From<Query> for QueryGraph {
-    fn from(q: Query) -> Self {
-        QueryGraphBuilder::build(q)
-    }
 }
 
 impl<'a> QueryGraph {

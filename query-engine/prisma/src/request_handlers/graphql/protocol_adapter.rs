@@ -8,8 +8,8 @@ use std::collections::BTreeMap;
 /// Protocol adapter for GraphQL -> Query Document.
 ///
 /// GraphQL is mapped as following:
-/// - Every field of a `query { ... }` or single selection block `{ ... }` is mapped to a `Operation::Read`.
-/// - Every field of a single `mutation { ... }` is mapped to a `Operation::Write`.
+/// - Every field of a `query { ... }` or single selection block `{ ... }` is mapped to an `Operation::Read`.
+/// - Every field of a single `mutation { ... }` is mapped to an `Operation::Write`.
 /// - If the JSON payload specifies an operation name, only that specific operation is picked and the rest ignored.
 /// - Fields on the queries are mapped to `Field`s, including arguments.
 /// - Concrete values (e.g. in arguments) are mapped to `QueryValue`s.

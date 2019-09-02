@@ -105,8 +105,6 @@ impl<'a> QueryInterpreter<'a> {
                 println!("READ");
                 Ok(self.reader.execute(read, &[]).map(|res| ExpressionResult::Read(res))?)
             }
-
-            _ => unimplemented!(),
         }
     }
 }

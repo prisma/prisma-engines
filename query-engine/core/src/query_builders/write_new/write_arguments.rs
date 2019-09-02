@@ -1,0 +1,45 @@
+use super::*;
+use crate::query_document::{ParsedInputMap, ParsedInputValue};
+use prisma_models::{Field, ModelRef, PrismaArgs, PrismaListValue, PrismaValue, RelationFieldRef};
+use std::{convert::TryInto, sync::Arc};
+
+#[derive(Default, Debug)]
+pub struct WriteArguments {
+    pub non_list: PrismaArgs,
+    pub list: Vec<(String, PrismaListValue)>,
+    pub nested: Vec<(RelationFieldRef, ParsedInputMap)>,
+}
+
+impl WriteArguments {
+    /// Creates a new set of WriteArguments. Expects the parsed input map from the respective data key, not the enclosing map.
+    /// E.g.: { data: { THIS MAP } } from the `data` argument of a write query.
+    pub fn from(model: &ModelRef, data_map: ParsedInputMap) -> QueryBuilderResult<Self> {
+        data_map.into_iter().try_fold(
+            WriteArguments::default(),
+            |mut args, (k, v): (String, ParsedInputValue)| {
+                let field = model.fields().find_from_all(&k).unwrap();
+                match field {
+                    Field::Scalar(sf) if sf.is_list => {
+                        let vals: ParsedInputMap = v.try_into()?;
+                        let set_value: PrismaValue =
+                            vals.into_iter().find(|(k, _)| k == "set").unwrap().1.try_into()?;
+                        let list_value: PrismaListValue = set_value.try_into()?;
+
+                        args.list.push((sf.name.clone(), list_value))
+                    }
+
+                    Field::Scalar(sf) => {
+                        let value: PrismaValue = v.try_into()?;
+                        args.non_list.insert(sf.name.clone(), value)
+                    }
+
+                    Field::Relation(ref rf) => {
+                        args.nested.push((Arc::clone(rf), v.try_into()?));
+                    }
+                };
+
+                Ok(args)
+            },
+        )
+    }
+}

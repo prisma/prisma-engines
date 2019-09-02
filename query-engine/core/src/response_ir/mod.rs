@@ -16,7 +16,7 @@ pub use read::*;
 pub use utils::*;
 pub use write::*;
 
-use crate::{schema::OutputType, ExpressionResult, ResultInfo};
+use crate::{ExpressionResult, OutputType, OutputTypeRef};
 use indexmap::IndexMap;
 use prisma_models::PrismaValue;
 use std::{borrow::Borrow, sync::Arc};
@@ -53,23 +53,30 @@ pub enum Item {
     Ref(ItemRef),
 }
 
-/// An IR builder utility
-/// TODO ordering of top level results?
-#[derive(Debug, Default)]
-pub struct ResultIrBuilder;
+#[derive(Debug)]
+pub struct IrSerializer {
+    /// Serialization key for root DataItem
+    pub key: String,
 
-impl ResultIrBuilder {
-    pub fn build(result: ExpressionResult, info: ResultInfo) -> Response {
+    /// Output type describing the possible shape of the result
+    pub output_type: OutputTypeRef,
+
+    /// Field selection of the query to narrow down selection and order.
+    pub selected_fields: Vec<String>, // Temporary(?) workaround to hold state for write queries
+}
+
+impl IrSerializer {
+    pub fn serialize(&self, result: ExpressionResult) -> Response {
         match result {
             ExpressionResult::Read(r) => {
-                match serialize_read(r, &info.output_type, false, false) {
+                match serialize_read(r, &self.output_type, false, false) {
                     Ok(result) => {
                         // On the top level, each result pair boils down to a exactly a single serialized result.
                         // All checks for lists and optionals have already been performed during the recursion,
                         // so we just unpack the only result possible.
                         // Todo: The following checks feel out of place. Imo this needs to be handled already one level deeper.
                         let result = if result.is_empty() {
-                            match info.output_type.borrow() {
+                            match self.output_type.borrow() {
                                 OutputType::Opt(_) => Item::Value(PrismaValue::Null),
                                 OutputType::List(_) => Item::List(vec![]),
                                 _ => unreachable!(),
@@ -79,17 +86,17 @@ impl ResultIrBuilder {
                             item
                         };
 
-                        Response::Data(info.key, result)
+                        Response::Data(self.key.clone(), result)
                     }
                     Err(err) => Response::Error(format!("{}", err)),
                 }
             }
 
             ExpressionResult::Write(w) => {
-                let serialized = serialize_write(w, &info);
+                let serialized = serialize_write(w, &self.output_type, &self.selected_fields);
 
                 match serialized {
-                    Ok(result) => Response::Data(info.key, result),
+                    Ok(result) => Response::Data(self.key.clone(), result),
                     Err(err) => Response::Error(format!("{}", err)),
                 }
             }

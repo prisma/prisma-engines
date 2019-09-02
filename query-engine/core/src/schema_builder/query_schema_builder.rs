@@ -230,7 +230,13 @@ impl<'a> QuerySchemaBuilder<'a> {
             Some(SchemaQueryBuilder::ModelQueryBuilder(ModelQueryBuilder::new(
                 Arc::clone(&model),
                 QueryTag::FindMany,
-                Box::new(|_, _| unimplemented!()),
+                Box::new(|model, parsed_field| {
+                    let mut graph = QueryGraph::new();
+                    let query = ReadManyRecordsBuilder::new(parsed_field, model).build()?;
+
+                    graph.create_node(Query::Read(query));
+                    Ok(graph)
+                }),
             ))),
         )
     }
@@ -249,7 +255,13 @@ impl<'a> QuerySchemaBuilder<'a> {
             Some(SchemaQueryBuilder::ModelQueryBuilder(ModelQueryBuilder::new(
                 Arc::clone(&model),
                 QueryTag::Aggregate,
-                Box::new(|_, _| unimplemented!()),
+                Box::new(|model, parsed_field| {
+                    let mut graph = QueryGraph::new();
+                    let query = AggregateRecordsBuilder::new(parsed_field, model).build()?;
+
+                    graph.create_node(Query::Read(query));
+                    Ok(graph)
+                }),
             ))),
         )
     }
@@ -273,10 +285,50 @@ impl<'a> QuerySchemaBuilder<'a> {
             Some(SchemaQueryBuilder::ModelQueryBuilder(ModelQueryBuilder::new(
                 Arc::clone(&model),
                 QueryTag::CreateOne,
-                Box::new(|_, _| unimplemented!()),
+                Box::new(|model, parsed_field| {
+                    //
+                    unimplemented!()
+                }),
             ))),
         )
     }
+
+    // pub fn build(query: Query) -> QueryGraph {
+    // let mut graph = InnerGraph::new();
+
+    // match query {
+    //     (Query::Write(mut wq), ResultResolutionStrategy::Dependent(qp)) => {
+    //         let nested = wq.replace_nested_writes();
+    //         let top = graph.add_node(Query::Write(wq));
+
+    //         Self::build_nested_graph(top, nested, &mut graph);
+
+    //         match *qp {
+    //             (Query::Read(rq), ResultResolutionStrategy::Serialize(typ)) => {
+    //                 let read = graph.add_node(Query::Read(rq));
+    //                 graph.add_edge(top, read, EdgeContent::Read(typ));
+    //             }
+    //             _ => unreachable!(),
+    //         };
+    //     }
+    //     _ => unimplemented!(),
+    // };
+
+    // Self::transform(&mut graph);
+
+    // QueryGraph { graph }
+    // }
+
+    // fn build_nested_graph(top: NodeIndex, nested: NestedWriteQueries, graph: &mut InnerGraph) {
+    //     nested.creates.into_iter().for_each(|nc| {
+    //         let relation_field = Arc::clone(&nc.relation_field);
+    //         let nested = nc.nested_writes.clone();
+    //         let n = graph.add_node(Query::Write(WriteQuery::Root("".into(), Some("".into()), nc.into())));
+
+    //         graph.add_edge(top, n, GraphEdge::Write(relation_field));
+    //         Self::build_nested_graph(n, nested, graph);
+    //     });
+    // }
 
     /// Builds a delete mutation field (e.g. deleteUser) for given model.
     fn delete_item_field(&self, model: ModelRef) -> Option<Field> {

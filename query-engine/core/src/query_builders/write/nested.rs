@@ -109,6 +109,7 @@ pub fn nested_create(
         .map(|value| {
             let args = WriteArguments::from(&model, value.try_into()?, true)?;
             let mut non_list_args = args.non_list;
+
             non_list_args.add_datetimes(Arc::clone(&model));
 
             Ok(NestedCreateRecord {
