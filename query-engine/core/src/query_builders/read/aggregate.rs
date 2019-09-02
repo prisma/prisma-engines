@@ -1,4 +1,5 @@
-use crate::query_builders::{Builder, ParsedField, QueryBuilderResult};
+use super::*;
+use crate::query_document::ParsedField;
 use connector::read_ast::{AggregateRecordsQuery, ReadQuery};
 use prisma_models::ModelRef;
 

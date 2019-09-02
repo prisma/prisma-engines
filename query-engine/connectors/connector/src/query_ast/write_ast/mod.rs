@@ -21,22 +21,21 @@ use std::sync::Arc;
 
 #[derive(Debug, Clone)]
 pub enum WriteQuery {
-    /// (Name, Alias, Query)
-    Root(String, Option<String>, RootWriteQuery),
+    Root(RootWriteQuery),
     Nested(NestedWriteQuery),
 }
 
 impl WriteQuery {
     pub fn replace_nested_writes(&mut self) -> NestedWriteQueries {
         match self {
-            WriteQuery::Root(_, _, ref mut wq) => wq.replace_nested_writes(),
+            WriteQuery::Root(ref mut wq) => wq.replace_nested_writes(),
             WriteQuery::Nested(_nwq) => unimplemented!(),
         }
     }
 
     pub fn inject_non_list_arg(&mut self, key: String, value: PrismaValue) {
         match self {
-            WriteQuery::Root(_, _, ref mut wq) => wq.inject_non_list_arg(key, value),
+            WriteQuery::Root(ref mut wq) => wq.inject_non_list_arg(key, value),
             WriteQuery::Nested(_nwq) => unimplemented!(),
         }
     }
@@ -45,7 +44,7 @@ impl WriteQuery {
 impl ModelExtractor for WriteQuery {
     fn extract_model(&self) -> Option<ModelRef> {
         match self {
-            WriteQuery::Root(_, _, r) => r.extract_model(),
+            WriteQuery::Root(r) => r.extract_model(),
             _ => None,
         }
     }

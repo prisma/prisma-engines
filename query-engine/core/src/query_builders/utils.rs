@@ -1,5 +1,5 @@
 use super::*;
-use crate::query_builders::{ParsedArgument, ParsedInputValue, QueryBuilderResult};
+use crate::query_document::{ParsedArgument, ParsedInputValue, ParsedInputMap};
 use connector::{filter::RecordFinder, QueryArguments};
 use prisma_models::{ModelRef, PrismaValue};
 use std::convert::TryInto;

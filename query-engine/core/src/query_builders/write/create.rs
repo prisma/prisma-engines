@@ -1,5 +1,5 @@
 use super::*;
-use crate::query_builders::{Builder, ParsedField, ParsedInputMap, QueryBuilderResult};
+use crate::query_document::{ParsedField, ParsedInputMap, ArgumentListLookup};
 use connector::write_ast::*;
 use prisma_models::ModelRef;
 use std::convert::TryInto;
@@ -19,13 +19,13 @@ impl CreateBuilder {
 impl Builder<WriteQuery> for CreateBuilder {
     fn build(mut self) -> QueryBuilderResult<WriteQuery> {
         let model = self.model;
-        let name = self.field.name;
-        let alias = self.field.alias;
+        let _name = self.field.name;
+        let _alias = self.field.alias;
 
         let data_argument = self.field.arguments.lookup("data").unwrap();
         let data_map: ParsedInputMap = data_argument.value.try_into()?;
 
-        Self::build_from(model, data_map).map(|cr| WriteQuery::Root(name, alias, RootWriteQuery::CreateRecord(Box::new(cr))))
+        Self::build_from(model, data_map).map(|cr| WriteQuery::Root(RootWriteQuery::CreateRecord(Box::new(cr))))
     }
 }
 

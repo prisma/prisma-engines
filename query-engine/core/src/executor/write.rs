@@ -12,7 +12,7 @@ pub struct WriteQueryExecutor {
 impl WriteQueryExecutor {
     pub fn execute(&self, write_query: WriteQuery) -> CoreResult<WriteQueryResult> {
         match write_query {
-            WriteQuery::Root(name, alias, wq) => self
+            WriteQuery::Root(wq) => self
                 .write_executor
                 .execute(self.db_name.clone(), wq)
                 .map_err(|err| err.into()),

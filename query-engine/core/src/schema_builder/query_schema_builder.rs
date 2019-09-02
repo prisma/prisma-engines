@@ -196,7 +196,11 @@ impl<'a> QuerySchemaBuilder<'a> {
                     OutputType::opt(OutputType::object(
                         self.object_type_builder.map_model_object_type(&model),
                     )),
-                    Some(Operation::ModelQuery(ModelQuery::new(Arc::clone(&model), QueryTag::FindOne))),
+                    Some(Operation::ModelQuery(ModelQuery::new(
+                        Arc::clone(&model),
+                        QueryTag::FindOne,
+                        Arc::new(|_, _, _| unimplemented!()),
+                    ))),
                 )
             })
     }
@@ -215,7 +219,11 @@ impl<'a> QuerySchemaBuilder<'a> {
             OutputType::list(OutputType::opt(OutputType::object(
                 self.object_type_builder.map_model_object_type(&model),
             ))),
-            Some(Operation::ModelQuery(ModelQuery::new(Arc::clone(&model), QueryTag::FindMany))),
+            Some(Operation::ModelQuery(ModelQuery::new(
+                Arc::clone(&model),
+                QueryTag::FindMany,
+                Arc::new(|_, _, _| unimplemented!()),
+            ))),
         )
     }
 
@@ -233,6 +241,7 @@ impl<'a> QuerySchemaBuilder<'a> {
             Some(Operation::ModelQuery(ModelQuery::new(
                 Arc::clone(&model),
                 QueryTag::Aggregate,
+                Arc::new(|_, _, _| unimplemented!()),
             ))),
         )
     }
@@ -256,6 +265,7 @@ impl<'a> QuerySchemaBuilder<'a> {
             Some(Operation::ModelQuery(ModelQuery::new(
                 Arc::clone(&model),
                 QueryTag::CreateOne,
+                Arc::new(|_, _, _| unimplemented!()),
             ))),
         )
     }
@@ -277,6 +287,7 @@ impl<'a> QuerySchemaBuilder<'a> {
                 Some(Operation::ModelQuery(ModelQuery::new(
                     Arc::clone(&model),
                     QueryTag::DeleteOne,
+                    Arc::new(|_, _, _| unimplemented!()),
                 ))),
             )
         })
@@ -297,6 +308,7 @@ impl<'a> QuerySchemaBuilder<'a> {
             Some(Operation::ModelQuery(ModelQuery::new(
                 Arc::clone(&model),
                 QueryTag::DeleteMany,
+                Arc::new(|_, _, _| unimplemented!()),
             ))),
         )
     }
@@ -316,6 +328,7 @@ impl<'a> QuerySchemaBuilder<'a> {
                 Some(Operation::ModelQuery(ModelQuery::new(
                     Arc::clone(&model),
                     QueryTag::UpdateOne,
+                    Arc::new(|_, _, _| unimplemented!()),
                 ))),
             )
         })
@@ -336,6 +349,7 @@ impl<'a> QuerySchemaBuilder<'a> {
             Some(Operation::ModelQuery(ModelQuery::new(
                 Arc::clone(&model),
                 QueryTag::UpdateMany,
+                Arc::new(|_, _, _| unimplemented!()),
             ))),
         )
     }
@@ -353,6 +367,7 @@ impl<'a> QuerySchemaBuilder<'a> {
                 Some(Operation::ModelQuery(ModelQuery::new(
                     Arc::clone(&model),
                     QueryTag::UpsertOne,
+                    Arc::new(|_, _, _| unimplemented!()),
                 ))),
             )
         })

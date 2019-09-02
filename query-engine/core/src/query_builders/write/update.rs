@@ -1,5 +1,5 @@
 use super::*;
-use crate::query_builders::{Builder, ParsedField, ParsedInputMap, QueryBuilderResult};
+use crate::query_document::{ArgumentListLookup, ParsedField, ParsedInputMap};
 use connector::{filter::RecordFinder, write_ast::*};
 use prisma_models::ModelRef;
 use std::convert::TryInto;
@@ -19,8 +19,8 @@ impl UpdateBuilder {
 impl Builder<WriteQuery> for UpdateBuilder {
     fn build(mut self) -> QueryBuilderResult<WriteQuery> {
         let model = self.model;
-        let name = self.field.name;
-        let alias = self.field.alias;
+        // let name = self.field.name;
+        // let alias = self.field.alias;
 
         // "where"
         let where_arg = self.field.arguments.lookup("where").unwrap();
@@ -31,7 +31,7 @@ impl Builder<WriteQuery> for UpdateBuilder {
         let data_map: ParsedInputMap = data_argument.value.try_into()?;
 
         Self::build_from(model, data_map, record_finder)
-            .map(|ur| WriteQuery::Root(name, alias, RootWriteQuery::UpdateRecord(Box::new(ur))))
+            .map(|ur| WriteQuery::Root(RootWriteQuery::UpdateRecord(Box::new(ur))))
     }
 }
 

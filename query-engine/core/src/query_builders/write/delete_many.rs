@@ -1,5 +1,5 @@
 use super::*;
-use crate::query_builders::{extract_filter, Builder, ParsedField, QueryBuilderResult};
+use crate::query_document::{ParsedField, ArgumentListLookup};
 use connector::filter::Filter;
 use connector::write_ast::*;
 use prisma_models::ModelRef;
@@ -28,6 +28,6 @@ impl Builder<WriteQuery> for DeleteManyBuilder {
             filter,
         });
 
-        Ok(WriteQuery::Root(self.field.name, self.field.alias, delete_many))
+        Ok(WriteQuery::Root(delete_many))
     }
 }

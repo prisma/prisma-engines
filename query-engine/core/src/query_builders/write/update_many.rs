@@ -1,5 +1,5 @@
 use super::*;
-use crate::query_builders::{Builder, ParsedField, ParsedInputMap, QueryBuilderResult};
+use crate::query_document::{ParsedField, ParsedInputMap, ArgumentListLookup};
 use connector::filter::Filter;
 use connector::write_ast::*;
 use prisma_models::ModelRef;
@@ -40,6 +40,6 @@ impl Builder<WriteQuery> for UpdateManyBuilder {
             list_args: update_args.list,
         });
 
-        Ok(WriteQuery::Root(self.field.name, self.field.alias, update_many))
+        Ok(WriteQuery::Root(update_many))
     }
 }

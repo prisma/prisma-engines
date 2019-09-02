@@ -1,5 +1,5 @@
 use super::*;
-use crate::{query_builders::*, ResultInfo};
+use crate::{query_builders::*, query_document::ParsedField, ResultInfo};
 use connector::Query;
 use once_cell::sync::OnceCell;
 use prisma_models::{EnumType, InternalDataModelRef, ModelRef, PrismaValue};
@@ -156,10 +156,10 @@ pub enum Operation {
     GenericQuery(GenericQuery),
 }
 
-pub type QueryBuilderFn = Fn(ModelRef, Field, ParsedField) -> (Query, ResultInfo);
+pub type QueryBuilderFn = dyn (Fn(ModelRef, Field, ParsedField) -> (Query, ResultInfo)) + Send + Sync;
 
 /// Designates a specific top-level operation on a corresponding model.
-#[derive(Debug, Clone)]
+#[derive(DebugStub, Clone)]
 pub struct ModelQuery {
     pub model: ModelRef,
     pub tag: QueryTag,
@@ -167,14 +167,13 @@ pub struct ModelQuery {
     /// An associated builder is responsible for building queries
     /// that the executer will execute. The result info is required
     /// by the serialization to correctly build the response.
-    pub builder_fn: Box<dyn QueryBuilderFn>,
+    #[debug_stub = "#BuilderFn#"]
+    pub builder_fn: Arc<QueryBuilderFn>,
 }
 
 impl ModelQuery {
-    pub fn new(model: ModelRef, tag: QueryTag /*builder_fn: QueryBuilderFn*/) -> Self {
-        Self { model, tag, builder_fn: Box::new(|_,_,_| {
-            unimplemented!()
-        }) }
+    pub fn new(model: ModelRef, tag: QueryTag, builder_fn: Arc<QueryBuilderFn>) -> Self {
+        Self { model, tag, builder_fn }
     }
 }
 

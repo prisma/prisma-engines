@@ -1,4 +1,5 @@
-use crate::query_builders::{ParsedInputValue, QueryBuilderResult};
+use super::*;
+use crate::query_document::ParsedInputValue;
 use connector::{filter::Filter, RelationCompare, ScalarCompare};
 use prisma_models::{Field, ModelRef, PrismaListValue, PrismaValue};
 use std::{collections::BTreeMap, convert::TryFrom, convert::TryInto};

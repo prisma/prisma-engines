@@ -1,5 +1,5 @@
 use super::*;
-use crate::query_builders::{Builder, ParsedField, QueryBuilderResult};
+use crate::query_document::{ParsedField, ArgumentListLookup};
 use connector::write_ast::*;
 use prisma_models::ModelRef;
 
@@ -20,6 +20,6 @@ impl Builder<WriteQuery> for DeleteBuilder {
         let record_finder = utils::extract_record_finder(where_arg.value, &self.model)?;
         let delete = RootWriteQuery::DeleteRecord(DeleteRecord { where_: record_finder });
 
-        Ok(WriteQuery::Root(self.field.name, self.field.alias, delete))
+        Ok(WriteQuery::Root(delete))
     }
 }

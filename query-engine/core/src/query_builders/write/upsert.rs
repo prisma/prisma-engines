@@ -1,5 +1,5 @@
 use super::*;
-use crate::query_builders::{Builder, ParsedField, QueryBuilderResult};
+use crate::query_document::{ParsedField, ArgumentListLookup};
 use connector::write_ast::*;
 use prisma_models::ModelRef;
 use std::{convert::TryInto, sync::Arc};
@@ -36,6 +36,6 @@ impl Builder<WriteQuery> for UpsertBuilder {
             update,
         }));
 
-        Ok(WriteQuery::Root(self.field.name, self.field.alias, upsert))
+        Ok(WriteQuery::Root(upsert))
     }
 }
