@@ -4,10 +4,10 @@ use connector::write_ast::*;
 use prisma_models::{ModelRef, PrismaValue, RelationFieldRef};
 use std::{convert::TryInto, sync::Arc};
 
-pub fn connect_nested_queries(relation_field: &RelationFieldRef, input_map: ParsedInputMap) -> QueryBuilderResult<()> {
+pub fn connect_nested_query(relation_field: &RelationFieldRef, data_map: ParsedInputMap) -> QueryBuilderResult<()> {
     let model = relation_field.related_model();
-    unimplemented!()
 
+    unimplemented!()
     // for (field_name, value) in input_map {
     //     match &field_name {
     //         "create" => {
@@ -76,30 +76,30 @@ pub fn connect_nested_queries(relation_field: &RelationFieldRef, input_map: Pars
     // });
 }
 
-pub fn nested_create(
-    value: ParsedInputValue,
-    model: &ModelRef,
-    relation_field: &RelationFieldRef,
-) -> QueryBuilderResult<Vec<NestedCreateRecord>> {
-    coerce_vec(value)
-        .into_iter()
-        .map(|value| {
-            let args = WriteArguments::from(&model, value.try_into()?)?;
-            let mut non_list_args = args.non_list;
+// pub fn nested_create(
+//     value: ParsedInputValue,
+//     model: &ModelRef,
+//     relation_field: &RelationFieldRef,
+// ) -> QueryBuilderResult<Vec<NestedCreateRecord>> {
+//     coerce_vec(value)
+//         .into_iter()
+//         .map(|value| {
+//             let args = WriteArguments::from(&model, value.try_into()?)?;
+//             let mut non_list_args = args.non_list;
 
-            non_list_args.add_datetimes(Arc::clone(&model));
+//             non_list_args.add_datetimes(Arc::clone(&model));
 
-            // Ok(NestedCreateRecord {
-            //     relation_field: Arc::clone(relation_field),
-            //     non_list_args,
-            //     list_args: args.list,
-            //     nested_writes: NestedWriteQueries::default(),
-            // })
+//             // Ok(NestedCreateRecord {
+//             //     relation_field: Arc::clone(relation_field),
+//             //     non_list_args,
+//             //     list_args: args.list,
+//             //     nested_writes: NestedWriteQueries::default(),
+//             // })
 
-            unimplemented!()
-        })
-        .collect::<QueryBuilderResult<Vec<_>>>()
-}
+//             unimplemented!()
+//         })
+//         .collect::<QueryBuilderResult<Vec<_>>>()
+// }
 
 // pub fn nested_update(
 //     value: ParsedInputValue,
@@ -352,10 +352,10 @@ pub fn nested_create(
 //         .collect::<QueryBuilderResult<Vec<_>>>()
 // }
 
-pub fn coerce_vec(val: ParsedInputValue) -> Vec<ParsedInputValue> {
-    match val {
-        ParsedInputValue::List(l) => l,
-        m @ ParsedInputValue::Map(_) => vec![m],
-        single => vec![single],
-    }
-}
+// pub fn coerce_vec(val: ParsedInputValue) -> Vec<ParsedInputValue> {
+//     match val {
+//         ParsedInputValue::List(l) => l,
+//         m @ ParsedInputValue::Map(_) => vec![m],
+//         single => vec![single],
+//     }
+// }

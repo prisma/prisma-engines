@@ -286,49 +286,12 @@ impl<'a> QuerySchemaBuilder<'a> {
                 Arc::clone(&model),
                 QueryTag::CreateOne,
                 Box::new(|model, parsed_field| {
-                    let builder = WriteQueryBuilder::new().create_record_root(model, parsed_field)?;
+                    let builder = WriteQueryBuilder::new().create_record(model, parsed_field)?;
                     Ok(builder.into())
                 }),
             ))),
         )
     }
-
-    // pub fn build(query: Query) -> QueryGraph {
-    // let graph = InnerGraph::new();
-
-    // match query {
-    //     (Query::Write(mut wq), ResultResolutionStrategy::Dependent(qp)) => {
-    //         let nested = wq.replace_nested_writes();
-    //         let top = graph.add_node(Query::Write(wq));
-
-    //         Self::build_nested_graph(top, nested, &mut graph);
-
-    //         match *qp {
-    //             (Query::Read(rq), ResultResolutionStrategy::Serialize(typ)) => {
-    //                 let read = graph.add_node(Query::Read(rq));
-    //                 graph.add_edge(top, read, EdgeContent::Read(typ));
-    //             }
-    //             _ => unreachable!(),
-    //         };
-    //     }
-    //     _ => unimplemented!(),
-    // };
-
-    // Self::transform(&mut graph);
-
-    // QueryGraph { graph }
-    // }
-
-    // fn build_nested_graph(top: NodeIndex, nested: NestedWriteQueries, graph: &mut InnerGraph) {
-    //     nested.creates.into_iter().for_each(|nc| {
-    //         let relation_field = Arc::clone(&nc.relation_field);
-    //         let nested = nc.nested_writes.clone();
-    //         let n = graph.add_node(Query::Write(WriteQuery::Root("".into(), Some("".into()), nc.into())));
-
-    //         graph.add_edge(top, n, GraphEdge::Write(relation_field));
-    //         Self::build_nested_graph(n, nested, graph);
-    //     });
-    // }
 
     /// Builds a delete mutation field (e.g. deleteUser) for given model.
     fn delete_item_field(&self, model: ModelRef) -> Option<Field> {
@@ -347,7 +310,10 @@ impl<'a> QuerySchemaBuilder<'a> {
                 Some(SchemaQueryBuilder::ModelQueryBuilder(ModelQueryBuilder::new(
                     Arc::clone(&model),
                     QueryTag::DeleteOne,
-                    Box::new(|_, _| unimplemented!()),
+                    Box::new(|model, parsed_field| {
+                        let builder = WriteQueryBuilder::new().delete_record(model, parsed_field)?;
+                        Ok(builder.into())
+                    }),
                 ))),
             )
         })
@@ -368,7 +334,10 @@ impl<'a> QuerySchemaBuilder<'a> {
             Some(SchemaQueryBuilder::ModelQueryBuilder(ModelQueryBuilder::new(
                 Arc::clone(&model),
                 QueryTag::DeleteMany,
-                Box::new(|_, _| unimplemented!()),
+                Box::new(|model, parsed_field| {
+                    let builder = WriteQueryBuilder::new().delete_many_records(model, parsed_field)?;
+                    Ok(builder.into())
+                }),
             ))),
         )
     }
