@@ -35,7 +35,15 @@ impl QueryDocumentParser {
         selections
             .iter()
             .map(|selection| {
-                Self::parse_field(selection, schema_object).map_err(|err| QueryValidationError::ObjectValidationError {
+                let parsed_field = match schema_object.find_field(selection.name.as_str()) {
+                    Some(ref field) => Self::parse_field(selection, field),
+                    None => Err(QueryValidationError::FieldValidationError {
+                        field_name: selection.name.clone(),
+                        inner: Box::new(QueryValidationError::FieldNotFoundError),
+                    }),
+                };
+
+                parsed_field.map_err(|err| QueryValidationError::ObjectValidationError {
                     object_name: schema_object.name.clone(),
                     inner: Box::new(err),
                 })
@@ -44,20 +52,10 @@ impl QueryDocumentParser {
             .map(|fields| ParsedObject { fields })
     }
 
-    /// Parses and validates a selection against a schema (output) field, as found on the given object.
-    pub fn parse_field(selection: &Selection, schema_object: &ObjectTypeStrongRef) -> QueryBuilderResult<ParsedField> {
-        let schema_field = match schema_object.find_field(selection.name.as_str()) {
-            Some(field) => Ok(field),
-            None => Err(QueryValidationError::FieldValidationError {
-                field_name: selection.name.clone(),
-                inner: Box::new(QueryValidationError::FieldNotFoundError),
-            }),
-        }?;
-
-        let field_name = schema_field.name.clone();
-
+    /// Parses and validates a selection against a schema (output) field.
+    fn parse_field(selection: &Selection, schema_field: &FieldRef) -> QueryBuilderResult<ParsedField> {
         // Parse and validate all provided arguments for the field
-        Self::parse_arguments(&schema_field, &selection.arguments)
+        Self::parse_arguments(schema_field, &selection.arguments)
             .and_then(|arguments| {
                 // If the output type of the field is an object type of any form, validate the sub selection as well.
                 let nested_fields = schema_field
@@ -75,11 +73,11 @@ impl QueryDocumentParser {
                     alias: selection.alias.clone(),
                     arguments,
                     nested_fields,
-                    schema_field,
+                    schema_field: Arc::clone(schema_field),
                 })
             })
             .map_err(|err| QueryValidationError::FieldValidationError {
-                field_name,
+                field_name: schema_field.name.clone(),
                 inner: Box::new(err),
             })
     }

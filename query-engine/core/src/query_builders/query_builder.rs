@@ -32,18 +32,20 @@ impl QueryBuilder {
     /// Maps a read operation to one or more queries.
     fn map_read_operation(&self, read_selection: Selection) -> QueryBuilderResult<(QueryGraph, IrSerializer)> {
         let query_object = self.query_schema.query();
-        Self::process(&read_selection, &query_object)
+        Self::process(read_selection, &query_object)
     }
 
     /// Maps a write operation to one or more queries.
     fn map_write_operation(&self, write_selection: Selection) -> QueryBuilderResult<(QueryGraph, IrSerializer)> {
-        let mutation_object = self.query_schema.query();
-        Self::process(&write_selection, &mutation_object)
+        let mutation_object = self.query_schema.mutation();
+        Self::process(write_selection, &mutation_object)
     }
 
-    fn process(selection: &Selection, object: &ObjectTypeStrongRef) -> QueryBuilderResult<(QueryGraph, IrSerializer)> {
-        let parsed_field = QueryDocumentParser::parse_field(selection, object)?;
-        let result_info = Self::derive_result_info(selection, &parsed_field);
+    fn process(selection: Selection, object: &ObjectTypeStrongRef) -> QueryBuilderResult<(QueryGraph, IrSerializer)> {
+        let mut selections = vec![selection];
+        let mut parsed_object = QueryDocumentParser::parse_object(&selections, object)?;
+        let parsed_field = parsed_object.fields.pop().unwrap();
+        let result_info = Self::derive_serializer(&selections.pop().unwrap(), &parsed_field);
 
         let query_graph = match &parsed_field.schema_field.clone().query_builder {
             Some(builder) => builder.build(parsed_field),
@@ -60,7 +62,7 @@ impl QueryBuilder {
     // that have nesting at the moment, have all info encoded in their result. This needs to change when unifying the
     // result types: Push the result state into a structure that can reflect all nesting levels.
     // Tl;dr: Selected_fields are only interesting for write query results at the moment and that's okay.
-    fn derive_result_info(selection: &Selection, field: &ParsedField) -> IrSerializer {
+    fn derive_serializer(selection: &Selection, field: &ParsedField) -> IrSerializer {
         IrSerializer {
             key: selection.alias.clone().unwrap_or_else(|| selection.name.clone()),
             output_type: field.schema_field.field_type.clone(),
