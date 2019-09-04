@@ -1,9 +1,7 @@
 //! Prisma read query AST
 
-use super::ModelExtractor;
 use crate::{filter::RecordFinder, QueryArguments};
 use prisma_models::prelude::*;
-use std::sync::Arc;
 
 #[derive(Debug, Clone)]
 pub enum ReadQuery {
@@ -11,17 +9,6 @@ pub enum ReadQuery {
     ManyRecordsQuery(ManyRecordsQuery),
     RelatedRecordsQuery(RelatedRecordsQuery),
     AggregateRecordsQuery(AggregateRecordsQuery),
-}
-
-impl ModelExtractor for ReadQuery {
-    fn extract_model(&self) -> Option<ModelRef> {
-        match self {
-            ReadQuery::RecordQuery(q) => q.record_finder.as_ref().map(|rf| rf.field.model()),
-            ReadQuery::ManyRecordsQuery(q) => Some(Arc::clone(&q.model)),
-            ReadQuery::RelatedRecordsQuery(q) => Some(q.parent_field.related_model()),
-            ReadQuery::AggregateRecordsQuery(q) => Some(Arc::clone(&q.model)),
-        }
-    }
 }
 
 #[derive(Debug, Clone)]

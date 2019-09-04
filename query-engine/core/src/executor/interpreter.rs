@@ -3,6 +3,7 @@ use connector::{Identifier, ReadQuery};
 use im::HashMap;
 use prisma_models::prelude::*;
 use std::convert::TryInto;
+use connector::Query;
 
 pub enum Expression {
     Sequence {
@@ -11,11 +12,14 @@ pub enum Expression {
     Func {
         func: Box<dyn FnOnce(Env) -> Expression>,
     },
-    Write {
+    Write { // possible deprecated
         write: WriteQuery,
     },
-    Read {
+    Read { // possible deprecated
         read: ReadQuery,
+    },
+    Query {
+        query: Query,
     },
     Let {
         bindings: Vec<Binding>,
@@ -104,6 +108,14 @@ impl<'a> QueryInterpreter<'a> {
             Expression::Read { read } => {
                 println!("READ");
                 Ok(self.reader.execute(read, &[]).map(|res| ExpressionResult::Read(res))?)
+            }
+
+            Expression::Query { query } => {
+                println!("QUERY");
+                match query {
+                    Query::Read(rq) => Ok(self.reader.execute(rq, &[]).map(|res| ExpressionResult::Read(res))?),
+                    Query::Write(wq) => Ok(self.writer.execute(wq).map(|res| ExpressionResult::Write(res))?),
+                }
             }
         }
     }

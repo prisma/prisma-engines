@@ -16,6 +16,9 @@ where
     let model = record_finder.field.model();
     let id = conn.find_id(record_finder)?;
 
+    dbg!(&model);
+    dbg!(&non_list_args);
+
     if let Some(update) = WriteQueryBuilder::update_one(Arc::clone(&model), &id, non_list_args)? {
         conn.update(update)?;
     }

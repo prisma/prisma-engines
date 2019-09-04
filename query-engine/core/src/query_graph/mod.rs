@@ -2,30 +2,27 @@
 ///! and manipulation.
 use connector::*;
 use petgraph::{graph::*, visit::EdgeRef, *};
-use prisma_models::RelationFieldRef;
+use prisma_models::{PrismaValue, RelationFieldRef};
 use std::cell::RefCell;
+use std::ops::Deref;
 
 /// Implementation detail of the query graph.
 type InnerGraph = Graph<Query, EdgeContent>;
+// type InnerGraph = Graph<Guard<Query>, Guard<EdgeContent>>;
 
-#[derive(Debug, Default)]
+/// Workaround to keep the graph stable during removals
+// enum Guard<T> {
+//     Empty,
+//     Set(T),
+// }
+
+#[derive(Default)]
 pub struct QueryGraph {
     graph: RefCell<InnerGraph>,
 }
 
-pub struct Node<'a> {
-    pub(self) graph: &'a QueryGraph,
+pub struct Node {
     pub(self) node_ix: NodeIndex,
-}
-
-impl<'a> Node<'a> {
-    pub fn edges(&self, direction: EdgeDirection) -> Vec<Edge> {
-        self.graph.edges_for(self, direction)
-    }
-
-    pub fn content(&self) -> Query {
-        self.graph.node_content(&self)
-    }
 }
 
 pub enum EdgeDirection {
@@ -33,39 +30,31 @@ pub enum EdgeDirection {
     Incoming,
 }
 
-pub struct Edge<'a> {
-    pub(self) graph: &'a QueryGraph,
+pub struct Edge {
     pub(self) edge_ix: EdgeIndex,
 }
 
-impl<'a> Edge<'a> {
-    pub fn source(&self) -> Node<'a> {
-        self.graph.edge_source(self)
-    }
-
-    pub fn target(&self) -> Node<'a> {
-        self.graph.edge_target(self)
-    }
-
-    pub fn content(&self) -> EdgeContent {
-        self.graph.edge_content(self)
-    }
-}
-
-#[derive(Debug, Clone)]
+/// Read / Write distinction is only really important for ordering in the interpreter...
+/// we should try to get rid of that.
+/// Another major factor is the RelationFieldRef, which is required in the graph transformation.
 pub enum EdgeContent {
-    Write(RelationFieldRef),
-    Read,
+    Write(RelationFieldRef, EdgeOperation<WriteQuery>),
+    Read(EdgeOperation<ReadQuery>),
 }
 
-impl<'a> QueryGraph {
+pub enum EdgeOperation<T> {
+    /// Performs a transformation on a query based on the parent ID (PrismaValue)
+    DependentId(Box<dyn FnOnce(T, PrismaValue) -> T>),
+}
+
+impl QueryGraph {
     pub fn new() -> Self {
         Self {
             graph: RefCell::new(InnerGraph::new()),
         }
     }
 
-    pub fn root_nodes(&'a self) -> Vec<Node<'a>> {
+    pub fn root_nodes(&self) -> Vec<Node> {
         let graph = self.graph.borrow();
 
         graph
@@ -77,43 +66,43 @@ impl<'a> QueryGraph {
                     Some(ix)
                 }
             })
-            .map(|node_ix: NodeIndex| Node { graph: &self, node_ix })
+            .map(|node_ix: NodeIndex| Node { node_ix })
             .collect()
     }
 
-    pub fn create_node(&'a self, query: Query) -> Node<'a> {
+    pub fn create_node(&self, query: Query) -> Node {
         let node_ix = self.graph.borrow_mut().add_node(query);
 
-        Node { node_ix, graph: self }
+        Node { node_ix }
     }
 
-    pub fn create_edge(&'a self, from: &Node<'a>, to: &Node<'a>, content: EdgeContent) -> Edge<'a> {
+    pub fn create_edge(&self, from: &Node, to: &Node, content: EdgeContent) -> Edge {
         let edge_ix = self.graph.borrow_mut().add_edge(from.node_ix, to.node_ix, content);
 
-        Edge { graph: self, edge_ix }
+        Edge { edge_ix }
     }
 
-    pub fn node_content(&self, node: &Node) -> Query {
-        self.graph.borrow().node_weight(node.node_ix).unwrap().clone()
+    pub fn node_content(&self, node: &Node) -> impl Deref<Target = Query> + '_ {
+        std::cell::Ref::map(self.graph.borrow(), |g| g.node_weight(node.node_ix).unwrap())
     }
 
-    pub fn edge_content(&self, edge: &Edge) -> EdgeContent {
-        self.graph.borrow().edge_weight(edge.edge_ix).unwrap().clone()
+    pub fn edge_content(&self, edge: &Edge) -> impl Deref<Target = EdgeContent> + '_ {
+        std::cell::Ref::map(self.graph.borrow(), |g| g.edge_weight(edge.edge_ix).unwrap())
     }
 
-    pub fn edge_source(&'a self, edge: &Edge) -> Node<'a> {
+    pub fn edge_source(&self, edge: &Edge) -> Node {
         let (node_ix, _) = self.graph.borrow().edge_endpoints(edge.edge_ix).unwrap();
 
-        Node { node_ix, graph: self }
+        Node { node_ix }
     }
 
-    pub fn edge_target(&'a self, edge: &Edge) -> Node<'a> {
+    pub fn edge_target(&self, edge: &Edge) -> Node {
         let (_, node_ix) = self.graph.borrow().edge_endpoints(edge.edge_ix).unwrap();
 
-        Node { node_ix, graph: self }
+        Node { node_ix }
     }
 
-    pub fn edges_for(&'a self, node: &Node, direction: EdgeDirection) -> Vec<Edge<'a>> {
+    pub fn edges_for(&self, node: &Node, direction: EdgeDirection) -> Vec<Edge> {
         let direction = match direction {
             EdgeDirection::Outgoing => Direction::Outgoing,
             EdgeDirection::Incoming => Direction::Incoming,
@@ -122,11 +111,16 @@ impl<'a> QueryGraph {
         self.graph
             .borrow()
             .edges_directed(node.node_ix, direction)
-            .map(|edge| Edge {
-                graph: self,
-                edge_ix: edge.id(),
-            })
+            .map(|edge| Edge { edge_ix: edge.id() })
             .collect()
+    }
+
+    pub fn remove_edge(&self, edge: Edge) -> EdgeContent {
+        self.graph.borrow_mut().remove_edge(edge.edge_ix).unwrap()
+    }
+
+    pub fn remove_node(&self, node: Node) -> Query {
+        self.graph.borrow_mut().remove_node(node.node_ix).unwrap()
     }
 
     /// Current way to fix inconsistencies in the graph.
@@ -146,7 +140,7 @@ impl<'a> QueryGraph {
                         Query::Write(WriteQuery::Root(RootWriteQuery::CreateRecord(_))),
                     ) => {
                         let relation_field: &RelationFieldRef = match &edge.weight {
-                            EdgeContent::Write(rf) => rf,
+                            EdgeContent::Write(rf, _) => rf,
                             _ => unreachable!(),
                         };
 
@@ -165,8 +159,9 @@ impl<'a> QueryGraph {
             let (parent, child) = graph.edge_endpoints(edge_index).unwrap();
             let edge = graph.remove_edge(edge_index).unwrap();
 
-            if let EdgeContent::Write(rf) = edge {
-                graph.add_edge(child, parent, EdgeContent::Write(rf.related_field()));
+            // Warning: This assumes that the EdgeOperation is also flippable.
+            if let EdgeContent::Write(rf, op) = edge {
+                graph.add_edge(child, parent, EdgeContent::Write(rf.related_field(), op));
             }
         });
 

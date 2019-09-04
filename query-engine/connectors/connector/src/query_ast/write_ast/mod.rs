@@ -14,7 +14,6 @@ pub use record_address::*;
 pub use update_record::*;
 pub use upsert_record::*;
 
-use super::ModelExtractor;
 use crate::filter::{Filter, RecordFinder};
 use prisma_models::prelude::*;
 use std::sync::Arc;
@@ -41,15 +40,6 @@ impl WriteQuery {
     }
 }
 
-impl ModelExtractor for WriteQuery {
-    fn extract_model(&self) -> Option<ModelRef> {
-        match self {
-            WriteQuery::Root(r) => r.extract_model(),
-            _ => None,
-        }
-    }
-}
-
 #[derive(Debug, Clone)]
 pub enum RootWriteQuery {
     CreateRecord(Box<CreateRecord>),
@@ -62,20 +52,6 @@ pub enum RootWriteQuery {
 }
 
 impl RootWriteQuery {
-    // pub fn nested_queries(&self) -> NestedWriteQueries {
-    //     let empty = NestedWriteQueries::default();
-
-    //     match self {
-    //         RootWriteQuery::CreateRecord(x) => x.nested_writes.clone(),
-    //         RootWriteQuery::UpdateRecord(x) => x.nested_writes.clone(),
-    //         RootWriteQuery::DeleteRecord(_) => empty,
-    //         RootWriteQuery::UpsertRecord(_) => empty,
-    //         RootWriteQuery::UpdateManyRecords(_) => empty,
-    //         RootWriteQuery::DeleteManyRecords(_) => empty,
-    //         RootWriteQuery::ResetData(_) => empty,
-    //     }
-    // }
-
     pub fn inject_non_list_arg(&mut self, key: String, value: PrismaValue) {
         match self {
             RootWriteQuery::CreateRecord(x) => {
@@ -105,20 +81,6 @@ impl RootWriteQuery {
             RootWriteQuery::UpdateManyRecords(_) => empty,
             RootWriteQuery::DeleteManyRecords(_) => empty,
             RootWriteQuery::ResetData(_) => empty,
-        }
-    }
-}
-
-impl RootWriteQuery {
-    pub fn extract_model(&self) -> Option<ModelRef> {
-        match self {
-            RootWriteQuery::CreateRecord(q) => Some(Arc::clone(&q.model)),
-            RootWriteQuery::UpdateRecord(q) => Some(q.where_.field.model()),
-            RootWriteQuery::DeleteRecord(q) => Some(q.where_.field.model()),
-            RootWriteQuery::UpsertRecord(q) => Some(q.where_.field.model()),
-            RootWriteQuery::UpdateManyRecords(q) => Some(Arc::clone(&q.model)),
-            RootWriteQuery::DeleteManyRecords(q) => Some(Arc::clone(&q.model)),
-            _ => None,
         }
     }
 }

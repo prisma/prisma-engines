@@ -33,7 +33,14 @@ where
             }
 
             fn update(conn: &mut dyn Transaction, un: &UpdateRecord) -> crate::Result<WriteQueryResult> {
-                let parent_id = update::execute(conn, &un.where_, &un.non_list_args, &un.list_args)?;
+                let parent_id = update::execute(
+                    conn,
+                    un.where_
+                        .as_ref()
+                        .expect("Expected record finder to be present on update query."),
+                    &un.non_list_args,
+                    &un.list_args,
+                )?;
                 nested::execute(conn, &un.nested_writes, &parent_id)?;
 
                 Ok(WriteQueryResult {

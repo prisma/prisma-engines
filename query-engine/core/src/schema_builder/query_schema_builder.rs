@@ -357,7 +357,10 @@ impl<'a> QuerySchemaBuilder<'a> {
                 Some(SchemaQueryBuilder::ModelQueryBuilder(ModelQueryBuilder::new(
                     Arc::clone(&model),
                     QueryTag::UpdateOne,
-                    Box::new(|_, _| unimplemented!()),
+                    Box::new(|model, parsed_field| {
+                        let builder = WriteQueryBuilder::new().update_record(model, parsed_field)?;
+                        Ok(builder.into())
+                    }),
                 ))),
             )
         })
@@ -378,7 +381,10 @@ impl<'a> QuerySchemaBuilder<'a> {
             Some(SchemaQueryBuilder::ModelQueryBuilder(ModelQueryBuilder::new(
                 Arc::clone(&model),
                 QueryTag::UpdateMany,
-                Box::new(|_, _| unimplemented!()),
+                Box::new(|model, parsed_field| {
+                    let builder = WriteQueryBuilder::new().update_many_records(model, parsed_field)?;
+                    Ok(builder.into())
+                }),
             ))),
         )
     }
@@ -396,7 +402,10 @@ impl<'a> QuerySchemaBuilder<'a> {
                 Some(SchemaQueryBuilder::ModelQueryBuilder(ModelQueryBuilder::new(
                     Arc::clone(&model),
                     QueryTag::UpsertOne,
-                    Box::new(|_, _| unimplemented!()),
+                    Box::new(|model, parsed_field| {
+                        let builder = WriteQueryBuilder::new().upsert_record(model, parsed_field)?;
+                        Ok(builder.into())
+                    }),
                 ))),
             )
         })

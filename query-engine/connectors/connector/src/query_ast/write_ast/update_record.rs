@@ -4,7 +4,7 @@ use std::sync::Arc;
 
 #[derive(Debug, Clone)]
 pub struct UpdateRecord {
-    pub where_: RecordFinder,
+    pub where_: Option<RecordFinder>,
     pub non_list_args: PrismaArgs,
     pub list_args: Vec<(String, PrismaListValue)>,
     pub nested_writes: NestedWriteQueries, // Why is this a struct and not actual queries?
