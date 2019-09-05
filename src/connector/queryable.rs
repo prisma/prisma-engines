@@ -70,7 +70,7 @@ pub trait Queryable {
     }
 }
 
-impl<Q: Queryable> Queryable for DerefMut<Target = Q> {
+impl<Q: Queryable> Queryable for dyn DerefMut<Target = Q> {
     fn execute(&mut self, q: Query) -> crate::Result<Option<Id>> {
         self.deref_mut().execute(q)
     }

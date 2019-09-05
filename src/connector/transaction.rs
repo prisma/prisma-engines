@@ -7,12 +7,12 @@ use crate::ast::*;
 /// Currently does not support nesting, so starting a new transaction using the
 /// transaction object will panic.
 pub struct Transaction<'a> {
-    pub(crate) inner: &'a mut Queryable,
+    pub(crate) inner: &'a mut dyn Queryable,
     done: bool,
 }
 
 impl<'a> Transaction<'a> {
-    pub(crate) fn new(inner: &'a mut Queryable) -> crate::Result<Self> {
+    pub(crate) fn new(inner: &'a mut dyn Queryable) -> crate::Result<Self> {
         inner.raw_cmd("BEGIN")?;
         Ok(Self { inner, done: false })
     }

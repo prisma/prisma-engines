@@ -16,8 +16,8 @@ use uuid::Uuid;
 
 pub fn conv_params<'a>(
     params: &'a [ParameterizedValue<'a>],
-) -> Vec<&'a tokio_postgres::types::ToSql> {
-    params.iter().map(|x| x as &ToSql).collect::<Vec<_>>()
+) -> Vec<&'a dyn tokio_postgres::types::ToSql> {
+    params.iter().map(|x| x as &dyn ToSql).collect::<Vec<_>>()
 }
 
 #[cfg(feature = "uuid-0_7")]
