@@ -148,6 +148,6 @@ mod tests {
         let result_set = conn.query_raw("SHOW search_path", &[]).unwrap();
         let row = result_set.first().unwrap();
 
-        assert_eq!(Some("musti-test"), row[0].as_str());
+        assert_eq!(Some("\"musti-test\""), row[0].as_str());
     }
 }
