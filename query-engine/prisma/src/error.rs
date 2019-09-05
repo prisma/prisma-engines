@@ -6,7 +6,7 @@ use graphql_parser::query::ParseError as GqlParseError;
 use serde_json;
 
 #[cfg(feature = "sql")]
-use sql_connector::SqlError;
+use sql_query_connector::SqlError;
 
 #[derive(Debug, Fail)]
 pub enum PrismaError {

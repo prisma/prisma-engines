@@ -8,7 +8,7 @@ use std::{collections::HashMap, path::PathBuf, sync::Arc};
 use url::Url;
 
 #[cfg(feature = "sql")]
-use sql_connector::*;
+use sql_query_connector::*;
 
 pub fn load(source: &dyn Source) -> PrismaResult<QueryExecutor> {
     match source.connector_type() {
