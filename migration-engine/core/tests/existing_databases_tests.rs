@@ -2,11 +2,11 @@
 #![allow(unused)]
 mod test_harness;
 use barrel::{types, Migration, SqlVariant};
-use database_introspection::*;
 use migration_core::api::GenericApi;
 use pretty_assertions::{assert_eq, assert_ne};
 use sql_migration_connector::SqlFamily;
 use sql_migration_connector::{migration_database::MigrationDatabase, SqlMigrationConnector};
+use sql_schema_describer::*;
 use std::sync::Arc;
 use test_harness::*;
 
@@ -363,7 +363,7 @@ fn get_sqlite() -> (Arc<dyn SqlSchemaDescriberBackend>, Arc<dyn MigrationDatabas
     let database_file_path = sqlite_test_file();
     let _ = std::fs::remove_file(database_file_path.clone()); // ignore potential errors
 
-    let inspector = database_introspection::sqlite::SqlSchemaDescriber::new(Arc::new(wrapper));
+    let inspector = sql_schema_describer::sqlite::SqlSchemaDescriber::new(Arc::new(wrapper));
 
     (Arc::new(inspector), database)
 }
@@ -375,7 +375,7 @@ fn get_postgres() -> (Arc<dyn SqlSchemaDescriberBackend>, Arc<dyn MigrationDatab
     let drop_schema = dbg!(format!("DROP SCHEMA IF EXISTS \"{}\" CASCADE;", SCHEMA_NAME));
     let _ = database.query_raw(SCHEMA_NAME, &drop_schema, &[]);
 
-    let inspector = database_introspection::postgres::SqlSchemaDescriber::new(Arc::new(wrapper));
+    let inspector = sql_schema_describer::postgres::SqlSchemaDescriber::new(Arc::new(wrapper));
 
     (Arc::new(inspector), database)
 }

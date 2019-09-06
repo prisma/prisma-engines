@@ -1,9 +1,9 @@
 #![allow(non_snake_case)]
 #![allow(unused)]
 mod test_harness;
-use database_introspection::*;
 use pretty_assertions::{assert_eq, assert_ne};
 use sql_migration_connector::SqlFamily;
+use sql_schema_describer::*;
 use test_harness::*;
 
 #[test]

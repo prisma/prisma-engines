@@ -1,4 +1,3 @@
-use database_introspection::{SqlConnection, SqlSchema, SqlSchemaDescriberBackend};
 use datamodel;
 use migration_connector::*;
 use migration_core::{
@@ -8,6 +7,7 @@ use migration_core::{
 };
 use prisma_query::connector::{MysqlParams, PostgresParams};
 use sql_migration_connector::{migration_database::*, SqlFamily, SqlMigrationConnector};
+use sql_schema_describer::{SqlConnection, SqlSchema, SqlSchemaDescriberBackend};
 use std::convert::TryFrom;
 use std::sync::Arc;
 use url::Url;
@@ -93,15 +93,15 @@ pub fn introspect_database(api: &dyn GenericApi) -> SqlSchema {
     let inspector: Box<dyn SqlSchemaDescriberBackend> = match api.connector_type() {
         "postgresql" => {
             let db = Arc::new(database_wrapper(SqlFamily::Postgres));
-            Box::new(database_introspection::postgres::SqlSchemaDescriber::new(db))
+            Box::new(sql_schema_describer::postgres::SqlSchemaDescriber::new(db))
         }
         "sqlite" => {
             let db = Arc::new(database_wrapper(SqlFamily::Sqlite));
-            Box::new(database_introspection::sqlite::SqlSchemaDescriber::new(db))
+            Box::new(sql_schema_describer::sqlite::SqlSchemaDescriber::new(db))
         }
         "mysql" => {
             let db = Arc::new(database_wrapper(SqlFamily::Mysql));
-            Box::new(database_introspection::mysql::SqlSchemaDescriber::new(db))
+            Box::new(sql_schema_describer::mysql::SqlSchemaDescriber::new(db))
         }
         _ => unimplemented!(),
     };
