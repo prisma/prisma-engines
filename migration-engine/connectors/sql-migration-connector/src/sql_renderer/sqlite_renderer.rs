@@ -1,5 +1,5 @@
 use super::common::*;
-use database_introspection::*;
+use sql_schema_describer::*;
 
 pub struct SqliteRenderer {}
 impl super::SqlRenderer for SqliteRenderer {

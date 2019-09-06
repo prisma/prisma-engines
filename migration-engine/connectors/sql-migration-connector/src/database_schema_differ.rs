@@ -1,6 +1,6 @@
 use crate::*;
-use database_introspection::*;
 use log::debug;
+use sql_schema_describer::*;
 
 const MIGRATION_TABLE_NAME: &str = "_Migration";
 

@@ -1,9 +1,9 @@
 use crate::SqlResult;
 use chrono::*;
-use database_introspection::*;
 use datamodel::common::*;
 use datamodel::*;
 use prisma_models::{DatamodelConverter, TempManifestationHolder, TempRelationHolder};
+use sql_schema_describer::*;
 
 pub struct DatabaseSchemaCalculator<'a> {
     data_model: &'a Datamodel,

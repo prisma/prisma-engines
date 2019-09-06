@@ -1,7 +1,7 @@
 use crate::*;
-use database_introspection::*;
 use migration_connector::*;
 use sql_renderer::SqlRenderer;
+use sql_schema_describer::*;
 use std::sync::Arc;
 
 pub struct SqlDatabaseStepApplier {

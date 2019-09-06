@@ -1,10 +1,10 @@
 use crate::database_schema_calculator::DatabaseSchemaCalculator;
 use crate::database_schema_differ::{DatabaseSchemaDiff, DatabaseSchemaDiffer};
 use crate::*;
-use database_introspection::*;
 use datamodel::*;
 use migration_connector::steps::*;
 use migration_connector::*;
+use sql_schema_describer::*;
 use std::sync::Arc;
 
 pub struct SqlDatabaseMigrationInferrer {
