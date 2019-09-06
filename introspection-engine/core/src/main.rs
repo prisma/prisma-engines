@@ -1,9 +1,9 @@
 mod error;
 
-use database_introspection::SqlSchemaDescriberBackend;
 use error::*;
 use prisma_query::ast::*;
 use prisma_query::connector::{PostgreSql, Queryable, Sqlite, SqliteParams};
+use sql_schema_describer::SqlSchemaDescriberBackend;
 use std::convert::TryFrom;
 use std::io;
 use std::sync::{Arc, Mutex};
@@ -29,12 +29,12 @@ fn doit(url: &str) -> CoreResult<()> {
 fn load_connector(url_str: &str) -> CoreResult<Box<dyn SqlSchemaDescriberBackend>> {
     if url_str.starts_with("postgresql://") {
         let wrapper = PostgresWrapper::new(&url_str)?;
-        Ok(Box::new(database_introspection::postgres::SqlSchemaDescriber::new(
+        Ok(Box::new(sql_schema_describer::postgres::SqlSchemaDescriber::new(
             Arc::new(wrapper),
         )))
     } else if url_str.starts_with("file:") {
         let wrapper = SqliteWrapper::new(url_str)?;
-        Ok(Box::new(database_introspection::sqlite::SqlSchemaDescriber::new(
+        Ok(Box::new(sql_schema_describer::sqlite::SqlSchemaDescriber::new(
             Arc::new(wrapper),
         )))
     } else {
@@ -58,7 +58,7 @@ impl PostgresWrapper {
     }
 }
 
-impl database_introspection::SqlConnection for PostgresWrapper {
+impl sql_schema_describer::SqlConnection for PostgresWrapper {
     fn query_raw(
         &self,
         sql: &str,
@@ -85,7 +85,7 @@ impl SqliteWrapper {
     }
 }
 
-impl database_introspection::SqlConnection for SqliteWrapper {
+impl sql_schema_describer::SqlConnection for SqliteWrapper {
     fn query_raw(
         &self,
         sql: &str,

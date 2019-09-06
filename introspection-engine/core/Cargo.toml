@@ -9,7 +9,7 @@ edition = "2018"
 [dependencies]
 url = "1.7"
 prisma-query = { git = "https://github.com/prisma/prisma-query.git" }
-database-introspection = { path = "../../libs/sql-schema-describer", package = "sql-schema-describer" }
+sql-schema-describer = { path = "../../libs/sql-schema-describer" }
 introspection-command = { path = "../../libs/introspection-command" }
 datamodel = { path = "../../libs/datamodel" }
 failure = "0.1"

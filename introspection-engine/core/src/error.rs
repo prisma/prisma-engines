@@ -25,8 +25,8 @@ impl From<prisma_query::error::Error> for CoreError {
     }
 }
 
-impl From<database_introspection::SqlSchemaDescriberError> for CoreError {
-    fn from(e: database_introspection::SqlSchemaDescriberError) -> Self {
+impl From<sql_schema_describer::SqlSchemaDescriberError> for CoreError {
+    fn from(e: sql_schema_describer::SqlSchemaDescriberError) -> Self {
         CoreError::ConnetorError(e.into())
     }
 }
