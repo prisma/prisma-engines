@@ -64,7 +64,7 @@ fn all_postgres_column_types_must_work() {
 
     let full_sql = migration.make::<barrel::backend::Pg>();
     let inspector = get_postgres_describer(&full_sql);
-    let result = inspector.describe(SCHEMA).expect("introspection");
+    let result = inspector.describe(SCHEMA).expect("describing");
     let mut table = result.get_table("User").expect("couldn't get User table").to_owned();
     // Ensure columns are sorted as expected when comparing
     table.columns.sort_unstable_by_key(|c| c.name.to_owned());
@@ -563,7 +563,7 @@ fn postgres_foreign_key_on_delete_must_be_handled() {
     );
     let inspector = get_postgres_describer(&sql);
 
-    let schema = inspector.describe(SCHEMA).expect("introspection");
+    let schema = inspector.describe(SCHEMA).expect("describing");
     let mut table = schema.get_table("User").expect("get User table").to_owned();
     table.foreign_keys.sort_unstable_by_key(|fk| fk.columns.clone());
 
@@ -683,7 +683,7 @@ fn postgres_enums_must_work() {
         SCHEMA
     ));
 
-    let schema = inspector.describe(SCHEMA).expect("introspection");
+    let schema = inspector.describe(SCHEMA).expect("describing");
     let got_enum = schema.get_enum("mood").expect("get enum");
 
     let values: HashSet<String> = ["happy".into(), "ok".into(), "sad".into()].iter().cloned().collect();
@@ -702,7 +702,7 @@ fn postgres_sequences_must_work() {
 
     let inspector = get_postgres_describer(&format!("CREATE SEQUENCE \"{}\".\"test\"", SCHEMA));
 
-    let schema = inspector.describe(SCHEMA).expect("introspection");
+    let schema = inspector.describe(SCHEMA).expect("describing");
     let got_seq = schema.get_sequence("test").expect("get sequence");
 
     assert_eq!(

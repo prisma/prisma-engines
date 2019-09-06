@@ -56,7 +56,7 @@ fn all_mysql_column_types_must_work() {
 
     let full_sql = migration.make::<barrel::backend::MySql>();
     let inspector = get_mysql_describer(&full_sql);
-    let result = inspector.describe(&SCHEMA.to_string()).expect("introspection");
+    let result = inspector.describe(&SCHEMA.to_string()).expect("describing");
     let mut table = result.get_table("User").expect("couldn't get User table").to_owned();
     // Ensure columns are sorted as expected when comparing
     table.columns.sort_unstable_by_key(|c| c.name.to_owned());
@@ -478,7 +478,7 @@ fn mysql_foreign_key_on_delete_must_be_handled() {
     );
     let inspector = get_mysql_describer(&sql);
 
-    let schema = inspector.describe(SCHEMA).expect("introspection");
+    let schema = inspector.describe(SCHEMA).expect("describing");
     let mut table = schema.get_table("User").expect("get User table").to_owned();
     table.foreign_keys.sort_unstable_by_key(|fk| fk.columns.clone());
 
