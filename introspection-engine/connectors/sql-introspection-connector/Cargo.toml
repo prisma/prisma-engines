@@ -7,3 +7,13 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+introspection-connector = { path = "../introspection-connector" }
+sql-schema-describer = { path = "../../../libs/sql-schema-describer" }
+datamodel = { path = "../../../libs/datamodel" }
+failure = "0.1"
+log = "0.4"
+regex = "1.2"
+
+[dev-dependencies]
+fern = "0.5"
+pretty_assertions = "0.6"
