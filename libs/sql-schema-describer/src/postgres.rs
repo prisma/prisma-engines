@@ -1,22 +1,21 @@
-//! Postgres introspection.
+//! Postgres description.
 use super::*;
 use log::debug;
 use regex::Regex;
 use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
 
-/// IntrospectionConnector implementation.
-pub struct IntrospectionConnector {
-    conn: Arc<dyn IntrospectionConnection>,
+pub struct SqlSchemaDescriber {
+    conn: Arc<dyn SqlConnection>,
 }
 
-impl super::IntrospectionConnector for IntrospectionConnector {
-    fn list_schemas(&self) -> IntrospectionResult<Vec<String>> {
+impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
+    fn list_databases(&self) -> SqlSchemaDescriberResult<Vec<String>> {
         Ok(vec![])
     }
 
-    fn introspect(&self, schema: &str) -> IntrospectionResult<DatabaseSchema> {
-        debug!("Introspecting schema '{}'", schema);
+    fn describe(&self, schema: &str) -> SqlSchemaDescriberResult<SqlSchema> {
+        debug!("describing schema '{}'", schema);
         let sequences = self.get_sequences(schema)?;
         let tables = self
             .get_table_names(schema)
@@ -24,7 +23,7 @@ impl super::IntrospectionConnector for IntrospectionConnector {
             .map(|t| self.get_table(schema, &t, &sequences))
             .collect();
         let enums = self.get_enums(schema)?;
-        Ok(DatabaseSchema {
+        Ok(SqlSchema {
             enums,
             sequences,
             tables,
@@ -32,10 +31,10 @@ impl super::IntrospectionConnector for IntrospectionConnector {
     }
 }
 
-impl IntrospectionConnector {
+impl SqlSchemaDescriber {
     /// Constructor.
-    pub fn new(conn: Arc<dyn IntrospectionConnection>) -> IntrospectionConnector {
-        IntrospectionConnector { conn }
+    pub fn new(conn: Arc<dyn SqlConnection>) -> SqlSchemaDescriber {
+        SqlSchemaDescriber { conn }
     }
 
     fn get_table_names(&self, schema: &str) -> Vec<String> {
@@ -176,7 +175,7 @@ impl IntrospectionConnector {
             JOIN pg_attribute att2 on
                 att2.attrelid = con.conrelid and att2.attnum = con.parent
             ORDER BY con_id";
-        debug!("Introspecting table foreign keys, SQL: '{}'", sql);
+        debug!("describing table foreign keys, SQL: '{}'", sql);
 
         // One foreign key with multiple columns will be represented here as several
         // rows with the same ID, which we will have to combine into corresponding foreign key
@@ -187,7 +186,7 @@ impl IntrospectionConnector {
             .expect("querying for foreign keys");
         let mut intermediate_fks: HashMap<i64, ForeignKey> = HashMap::new();
         for row in result_set.into_iter() {
-            debug!("Got introspection FK row {:?}", row);
+            debug!("Got description FK row {:?}", row);
             let id = row.get("con_id").and_then(|x| x.as_i64()).expect("get con_id");
             let column = row
                 .get("child_column")
@@ -362,7 +361,7 @@ impl IntrospectionConnector {
         PrimaryKey { columns, sequence }
     }
 
-    fn get_sequences(&self, schema: &str) -> IntrospectionResult<Vec<Sequence>> {
+    fn get_sequences(&self, schema: &str) -> SqlSchemaDescriberResult<Vec<Sequence>> {
         debug!("Getting sequences");
         let sql = "SELECT start_value, sequence_name
                   FROM information_schema.sequences
@@ -397,7 +396,7 @@ impl IntrospectionConnector {
         Ok(sequences)
     }
 
-    fn get_enums(&self, schema: &str) -> IntrospectionResult<Vec<Enum>> {
+    fn get_enums(&self, schema: &str) -> SqlSchemaDescriberResult<Vec<Enum>> {
         debug!("Getting enums");
         let sql = "SELECT t.typname as name, e.enumlabel as value
             FROM pg_type t 

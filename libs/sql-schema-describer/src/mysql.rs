@@ -1,27 +1,25 @@
-//! MySQL introspection.
 use super::*;
 use log::debug;
 use std::collections::HashMap;
 use std::sync::Arc;
 
-/// IntrospectionConnector implementation.
-pub struct IntrospectionConnector {
-    conn: Arc<dyn IntrospectionConnection>,
+pub struct SqlSchemaDescriber {
+    conn: Arc<dyn SqlConnection>,
 }
 
-impl super::IntrospectionConnector for IntrospectionConnector {
-    fn list_schemas(&self) -> IntrospectionResult<Vec<String>> {
+impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
+    fn list_databases(&self) -> SqlSchemaDescriberResult<Vec<String>> {
         Ok(vec![])
     }
 
-    fn introspect(&self, schema: &str) -> IntrospectionResult<DatabaseSchema> {
-        debug!("Introspecting schema '{}'", schema);
+    fn describe(&self, schema: &str) -> SqlSchemaDescriberResult<SqlSchema> {
+        debug!("describing schema '{}'", schema);
         let tables = self
             .get_table_names(schema)
             .into_iter()
             .map(|t| self.get_table(schema, &t))
             .collect();
-        Ok(DatabaseSchema {
+        Ok(SqlSchema {
             tables,
             enums: vec![],
             sequences: vec![],
@@ -29,10 +27,10 @@ impl super::IntrospectionConnector for IntrospectionConnector {
     }
 }
 
-impl IntrospectionConnector {
+impl SqlSchemaDescriber {
     /// Constructor.
-    pub fn new(conn: Arc<dyn IntrospectionConnection>) -> IntrospectionConnector {
-        IntrospectionConnector { conn }
+    pub fn new(conn: Arc<dyn SqlConnection>) -> SqlSchemaDescriber {
+        SqlSchemaDescriber { conn }
     }
 
     fn get_table_names(&self, schema: &str) -> Vec<String> {
@@ -148,7 +146,7 @@ impl IntrospectionConnector {
             WHERE kcu.table_schema = ? AND kcu.table_name = ? AND 
             referenced_column_name IS NOT NULL
         ";
-        debug!("Introspecting table foreign keys, SQL: '{}'", sql);
+        debug!("describing table foreign keys, SQL: '{}'", sql);
 
         let result_set = self
             .conn
@@ -156,7 +154,7 @@ impl IntrospectionConnector {
             .expect("querying for foreign keys");
         let mut intermediate_fks: HashMap<String, ForeignKey> = HashMap::new();
         for row in result_set.into_iter() {
-            debug!("Got introspection FK row {:#?}", row);
+            debug!("Got description FK row {:#?}", row);
             let constraint_name = row
                 .get("constraint_name")
                 .and_then(|x| x.to_string())
@@ -236,7 +234,7 @@ impl IntrospectionConnector {
                 index_name, non_unique, column_name, seq_in_index
             FROM INFORMATION_SCHEMA.STATISTICS
             WHERE table_schema = ? AND table_name = ?";
-        debug!("Introspecting indices, SQL: {}", sql);
+        debug!("describing indices, SQL: {}", sql);
         let rows = self
             .conn
             .query_raw(sql, schema, &[schema.into(), table_name.into()])

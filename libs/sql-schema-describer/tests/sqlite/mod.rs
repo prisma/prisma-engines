@@ -10,7 +10,7 @@ struct SqliteConnection {
     client: Mutex<prisma_query::connector::Sqlite>,
 }
 
-impl crate::IntrospectionConnection for SqliteConnection {
+impl crate::SqlConnection for SqliteConnection {
     fn query_raw(
         &self,
         sql: &str,
@@ -21,7 +21,7 @@ impl crate::IntrospectionConnection for SqliteConnection {
     }
 }
 
-pub fn get_sqlite_connector(sql: &str) -> sqlite::IntrospectionConnector {
+pub fn get_sqlite_describer(sql: &str) -> sqlite::SqlSchemaDescriber {
     let server_root = std::env::var("SERVER_ROOT").expect("Env var SERVER_ROOT required but not found.");
     let database_folder_path = format!("{}/db", server_root);
     let database_file_path = format!("{}/{}.db", database_folder_path, SCHEMA);
@@ -46,5 +46,5 @@ pub fn get_sqlite_connector(sql: &str) -> sqlite::IntrospectionConnector {
     let int_conn = Arc::new(SqliteConnection {
         client: Mutex::new(queryable),
     });
-    sqlite::IntrospectionConnector::new(int_conn)
+    sqlite::SqlSchemaDescriber::new(int_conn)
 }

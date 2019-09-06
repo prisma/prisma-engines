@@ -356,38 +356,38 @@ where
     }
 }
 
-fn get_sqlite() -> (Arc<dyn IntrospectionConnector>, Arc<dyn MigrationDatabase>) {
+fn get_sqlite() -> (Arc<dyn SqlSchemaDescriberBackend>, Arc<dyn MigrationDatabase>) {
     let wrapper = database_wrapper(SqlFamily::Sqlite);
     let database = Arc::clone(&wrapper.database);
 
     let database_file_path = sqlite_test_file();
     let _ = std::fs::remove_file(database_file_path.clone()); // ignore potential errors
 
-    let inspector = database_introspection::sqlite::IntrospectionConnector::new(Arc::new(wrapper));
+    let inspector = database_introspection::sqlite::SqlSchemaDescriber::new(Arc::new(wrapper));
 
     (Arc::new(inspector), database)
 }
 
-fn get_postgres() -> (Arc<dyn IntrospectionConnector>, Arc<dyn MigrationDatabase>) {
+fn get_postgres() -> (Arc<dyn SqlSchemaDescriberBackend>, Arc<dyn MigrationDatabase>) {
     let wrapper = database_wrapper(SqlFamily::Postgres);
     let database = Arc::clone(&wrapper.database);
 
     let drop_schema = dbg!(format!("DROP SCHEMA IF EXISTS \"{}\" CASCADE;", SCHEMA_NAME));
     let _ = database.query_raw(SCHEMA_NAME, &drop_schema, &[]);
 
-    let inspector = database_introspection::postgres::IntrospectionConnector::new(Arc::new(wrapper));
+    let inspector = database_introspection::postgres::SqlSchemaDescriber::new(Arc::new(wrapper));
 
     (Arc::new(inspector), database)
 }
 
 struct BarrelMigrationExecutor {
-    inspector: Arc<dyn IntrospectionConnector>,
+    inspector: Arc<dyn SqlSchemaDescriberBackend>,
     database: Arc<dyn MigrationDatabase>,
     sql_variant: barrel::backend::SqlVariant,
 }
 
 impl BarrelMigrationExecutor {
-    fn execute<F>(&self, mut migrationFn: F) -> DatabaseSchema
+    fn execute<F>(&self, mut migrationFn: F) -> SqlSchema
     where
         F: FnMut(&mut Migration) -> (),
     {
@@ -397,7 +397,7 @@ impl BarrelMigrationExecutor {
         run_full_sql(&self.database, &full_sql);
         let mut result = self
             .inspector
-            .introspect(&SCHEMA_NAME.to_string())
+            .describe(&SCHEMA_NAME.to_string())
             .expect("Introspection failed");
         // the presence of the _Migration table makes assertions harder. Therefore remove it.
         result.tables = result.tables.into_iter().filter(|t| t.name != "_Migration").collect();

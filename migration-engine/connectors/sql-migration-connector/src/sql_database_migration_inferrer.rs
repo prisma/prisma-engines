@@ -9,7 +9,7 @@ use std::sync::Arc;
 
 pub struct SqlDatabaseMigrationInferrer {
     pub sql_family: SqlFamily,
-    pub introspector: Arc<dyn IntrospectionConnector + Send + Sync + 'static>,
+    pub introspector: Arc<dyn SqlSchemaDescriberBackend + Send + Sync + 'static>,
     pub schema_name: String,
 }
 
@@ -20,7 +20,7 @@ impl DatabaseMigrationInferrer<SqlMigration> for SqlDatabaseMigrationInferrer {
         next: &Datamodel,
         _steps: &Vec<MigrationStep>,
     ) -> ConnectorResult<SqlMigration> {
-        let current_database_schema: DatabaseSchema = self.introspect(&self.schema_name)?;
+        let current_database_schema: SqlSchema = self.introspect(&self.schema_name)?;
         let expected_database_schema = DatabaseSchemaCalculator::calculate(next)?;
         infer(
             &current_database_schema,
@@ -32,14 +32,14 @@ impl DatabaseMigrationInferrer<SqlMigration> for SqlDatabaseMigrationInferrer {
 }
 
 impl SqlDatabaseMigrationInferrer {
-    fn introspect(&self, schema: &str) -> SqlResult<DatabaseSchema> {
-        Ok(self.introspector.introspect(&schema)?)
+    fn introspect(&self, schema: &str) -> SqlResult<SqlSchema> {
+        Ok(self.introspector.describe(&schema)?)
     }
 }
 
 fn infer(
-    current_database_schema: &DatabaseSchema,
-    expected_database_schema: &DatabaseSchema,
+    current_database_schema: &SqlSchema,
+    expected_database_schema: &SqlSchema,
     schema_name: &str,
     sql_family: SqlFamily,
 ) -> ConnectorResult<SqlMigration> {
@@ -64,8 +64,8 @@ fn infer(
 }
 
 fn infer_database_migration_steps_and_fix(
-    from: &DatabaseSchema,
-    to: &DatabaseSchema,
+    from: &SqlSchema,
+    to: &SqlSchema,
     schema_name: &str,
     sql_family: SqlFamily,
 ) -> SqlResult<Vec<SqlMigrationStep>> {
@@ -81,8 +81,8 @@ fn infer_database_migration_steps_and_fix(
 }
 
 fn fix_id_column_type_change(
-    from: &DatabaseSchema,
-    to: &DatabaseSchema,
+    from: &SqlSchema,
+    to: &SqlSchema,
     _schema_name: &str,
     steps: Vec<SqlMigrationStep>,
 ) -> SqlResult<Vec<SqlMigrationStep>> {
@@ -125,7 +125,7 @@ fn fix_id_column_type_change(
             .map(|t| t.name.clone())
             .collect();
         radical_steps.push(SqlMigrationStep::DropTables(DropTables { names: tables_to_drop }));
-        let diff_from_empty: DatabaseSchemaDiff = DatabaseSchemaDiffer::diff(&DatabaseSchema::empty(), &to);
+        let diff_from_empty: DatabaseSchemaDiff = DatabaseSchemaDiffer::diff(&SqlSchema::empty(), &to);
         let mut steps_from_empty = delay_foreign_key_creation(diff_from_empty);
         radical_steps.append(&mut steps_from_empty);
 
@@ -184,8 +184,8 @@ fn delay_foreign_key_creation(mut diff: DatabaseSchemaDiff) -> Vec<SqlMigrationS
 
 fn fix_stupid_sqlite(
     diff: DatabaseSchemaDiff,
-    current_database_schema: &DatabaseSchema,
-    next_database_schema: &DatabaseSchema,
+    current_database_schema: &SqlSchema,
+    next_database_schema: &SqlSchema,
     schema_name: &str,
 ) -> SqlResult<Vec<SqlMigrationStep>> {
     let steps = diff.into_steps();

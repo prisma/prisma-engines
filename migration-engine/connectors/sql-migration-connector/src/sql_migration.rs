@@ -4,8 +4,8 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SqlMigration {
-    pub before: DatabaseSchema,
-    pub after: DatabaseSchema,
+    pub before: SqlSchema,
+    pub after: SqlSchema,
     pub steps: Vec<SqlMigrationStep>,
     pub rollback: Vec<SqlMigrationStep>,
 }
@@ -13,8 +13,8 @@ pub struct SqlMigration {
 impl SqlMigration {
     pub fn empty() -> SqlMigration {
         SqlMigration {
-            before: DatabaseSchema::empty(),
-            after: DatabaseSchema::empty(),
+            before: SqlSchema::empty(),
+            after: SqlSchema::empty(),
             steps: Vec::new(),
             rollback: Vec::new(),
         }

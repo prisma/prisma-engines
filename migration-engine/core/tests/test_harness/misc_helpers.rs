@@ -1,4 +1,4 @@
-use database_introspection::{DatabaseSchema, IntrospectionConnection, IntrospectionConnector};
+use database_introspection::{SqlConnection, SqlSchema, SqlSchemaDescriberBackend};
 use datamodel;
 use migration_connector::*;
 use migration_core::{
@@ -89,25 +89,25 @@ where
     api
 }
 
-pub fn introspect_database(api: &dyn GenericApi) -> DatabaseSchema {
-    let inspector: Box<dyn IntrospectionConnector> = match api.connector_type() {
+pub fn introspect_database(api: &dyn GenericApi) -> SqlSchema {
+    let inspector: Box<dyn SqlSchemaDescriberBackend> = match api.connector_type() {
         "postgresql" => {
             let db = Arc::new(database_wrapper(SqlFamily::Postgres));
-            Box::new(database_introspection::postgres::IntrospectionConnector::new(db))
+            Box::new(database_introspection::postgres::SqlSchemaDescriber::new(db))
         }
         "sqlite" => {
             let db = Arc::new(database_wrapper(SqlFamily::Sqlite));
-            Box::new(database_introspection::sqlite::IntrospectionConnector::new(db))
+            Box::new(database_introspection::sqlite::SqlSchemaDescriber::new(db))
         }
         "mysql" => {
             let db = Arc::new(database_wrapper(SqlFamily::Mysql));
-            Box::new(database_introspection::mysql::IntrospectionConnector::new(db))
+            Box::new(database_introspection::mysql::SqlSchemaDescriber::new(db))
         }
         _ => unimplemented!(),
     };
 
     let mut result = inspector
-        .introspect(&SCHEMA_NAME.to_string())
+        .describe(&SCHEMA_NAME.to_string())
         .expect("Introspection failed");
 
     // the presence of the _Migration table makes assertions harder. Therefore remove it from the result.

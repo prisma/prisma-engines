@@ -13,7 +13,7 @@ use regex::Regex;
 pub type Result<T> = core::result::Result<T, Error>;
 
 /// Calculate a data model from a database schema.
-pub fn calculate_model(schema: &DatabaseSchema) -> Result<Datamodel> {
+pub fn calculate_model(schema: &SqlSchema) -> Result<Datamodel> {
     debug!("Calculating data model");
 
     let mut data_model = Datamodel::new();

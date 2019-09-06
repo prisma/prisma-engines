@@ -16,7 +16,7 @@ mod sql_renderer;
 pub use error::*;
 pub use sql_migration::*;
 
-use database_introspection::IntrospectionConnector;
+use database_introspection::SqlSchemaDescriberBackend;
 use migration_connector::*;
 use migration_database::*;
 use prisma_query::connector::{MysqlParams, PostgresParams};
@@ -41,7 +41,7 @@ pub struct SqlMigrationConnector {
     pub database_migration_inferrer: Arc<dyn DatabaseMigrationInferrer<SqlMigration>>,
     pub database_migration_step_applier: Arc<dyn DatabaseMigrationStepApplier<SqlMigration>>,
     pub destructive_changes_checker: Arc<dyn DestructiveChangesChecker<SqlMigration>>,
-    pub database_introspector: Arc<dyn IntrospectionConnector + Send + Sync + 'static>,
+    pub database_introspector: Arc<dyn SqlSchemaDescriberBackend + Send + Sync + 'static>,
 }
 
 #[derive(Debug, Copy, Clone, PartialEq)]
@@ -153,14 +153,14 @@ impl SqlMigrationConnector {
         let introspection_connection = Arc::new(MigrationDatabaseWrapper {
             database: Arc::clone(&conn),
         });
-        let inspector: Arc<dyn IntrospectionConnector + Send + Sync + 'static> = match sql_family {
-            SqlFamily::Sqlite => Arc::new(database_introspection::sqlite::IntrospectionConnector::new(
+        let inspector: Arc<dyn SqlSchemaDescriberBackend + Send + Sync + 'static> = match sql_family {
+            SqlFamily::Sqlite => Arc::new(database_introspection::sqlite::SqlSchemaDescriber::new(
                 introspection_connection,
             )),
-            SqlFamily::Postgres => Arc::new(database_introspection::postgres::IntrospectionConnector::new(
+            SqlFamily::Postgres => Arc::new(database_introspection::postgres::SqlSchemaDescriber::new(
                 introspection_connection,
             )),
-            SqlFamily::Mysql => Arc::new(database_introspection::mysql::IntrospectionConnector::new(
+            SqlFamily::Mysql => Arc::new(database_introspection::mysql::SqlSchemaDescriber::new(
                 introspection_connection,
             )),
         };

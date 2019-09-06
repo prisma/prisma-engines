@@ -9,7 +9,7 @@ struct MySqlConnection {
     client: Mutex<prisma_query::connector::Mysql>,
 }
 
-impl crate::IntrospectionConnection for MySqlConnection {
+impl crate::SqlConnection for MySqlConnection {
     fn query_raw(
         &self,
         sql: &str,
@@ -20,7 +20,7 @@ impl crate::IntrospectionConnection for MySqlConnection {
     }
 }
 
-pub fn get_mysql_connector(sql: &str) -> mysql::IntrospectionConnector {
+pub fn get_mysql_describer(sql: &str) -> mysql::SqlSchemaDescriber {
     let host = match std::env::var("IS_BUILDKITE") {
         Ok(_) => "test-db-mysql",
         Err(_) => "127.0.0.1",
@@ -62,7 +62,7 @@ pub fn get_mysql_connector(sql: &str) -> mysql::IntrospectionConnector {
         .db_name(Some(SCHEMA));
     let conn = prisma_query::connector::Mysql::new(opts_builder).expect("connect to MySQL");
 
-    mysql::IntrospectionConnector::new(Arc::new(MySqlConnection {
+    mysql::SqlSchemaDescriber::new(Arc::new(MySqlConnection {
         client: Mutex::new(conn),
     }))
 }

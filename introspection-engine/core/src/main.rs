@@ -1,6 +1,6 @@
 mod error;
 
-use database_introspection::IntrospectionConnector;
+use database_introspection::SqlSchemaDescriberBackend;
 use error::*;
 use prisma_query::ast::*;
 use prisma_query::connector::{PostgreSql, Queryable, Sqlite, SqliteParams};
@@ -21,20 +21,20 @@ fn main() {
 }
 
 fn doit(url: &str) -> CoreResult<()> {
-    let database_schema = load_connector(&url)?.introspect("")?;
+    let database_schema = load_connector(&url)?.describe("")?;
     let data_model = introspection_command::calculate_model(&database_schema).unwrap();
     Ok(datamodel::render_to(&mut std::io::stdout().lock(), &data_model).unwrap())
 }
 
-fn load_connector(url_str: &str) -> CoreResult<Box<dyn IntrospectionConnector>> {
+fn load_connector(url_str: &str) -> CoreResult<Box<dyn SqlSchemaDescriberBackend>> {
     if url_str.starts_with("postgresql://") {
         let wrapper = PostgresWrapper::new(&url_str)?;
-        Ok(Box::new(database_introspection::postgres::IntrospectionConnector::new(
+        Ok(Box::new(database_introspection::postgres::SqlSchemaDescriber::new(
             Arc::new(wrapper),
         )))
     } else if url_str.starts_with("file:") {
         let wrapper = SqliteWrapper::new(url_str)?;
-        Ok(Box::new(database_introspection::sqlite::IntrospectionConnector::new(
+        Ok(Box::new(database_introspection::sqlite::SqlSchemaDescriber::new(
             Arc::new(wrapper),
         )))
     } else {
@@ -58,7 +58,7 @@ impl PostgresWrapper {
     }
 }
 
-impl database_introspection::IntrospectionConnection for PostgresWrapper {
+impl database_introspection::SqlConnection for PostgresWrapper {
     fn query_raw(
         &self,
         sql: &str,
@@ -85,7 +85,7 @@ impl SqliteWrapper {
     }
 }
 
-impl database_introspection::IntrospectionConnection for SqliteWrapper {
+impl database_introspection::SqlConnection for SqliteWrapper {
     fn query_raw(
         &self,
         sql: &str,
