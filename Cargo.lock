@@ -1019,6 +1019,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "introspection-connector"
+version = "0.1.0"
+
+[[package]]
 name = "introspection-core"
 version = "0.1.0"
 dependencies = [
@@ -2691,6 +2695,10 @@ dependencies = [
  "redox_syscall 0.1.56 (registry+https://github.com/rust-lang/crates.io-index)",
  "winapi 0.3.7 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
+
+[[package]]
+name = "sql-introspection-connector"
+version = "0.1.0"
 
 [[package]]
 name = "sql-migration-connector"
