@@ -1,5 +1,4 @@
 //! Logic for generating Prisma data models from database introspection.
-use database_introspection::*;
 use datamodel::{
     common::{PrismaType, PrismaValue},
     dml, Datamodel, Field, FieldArity, FieldType, IdInfo, IdStrategy, Model, OnDeleteStrategy, RelationInfo,
@@ -8,6 +7,7 @@ use datamodel::{
 use failure::Error;
 use log::debug;
 use regex::Regex;
+use sql_schema_describer::*;
 
 /// The result type.
 pub type Result<T> = core::result::Result<T, Error>;

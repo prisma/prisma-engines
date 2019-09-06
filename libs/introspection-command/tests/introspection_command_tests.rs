@@ -1,4 +1,3 @@
-use database_introspection::*;
 use datamodel::{
     common::{PrismaType, PrismaValue},
     dml, Datamodel, Field, FieldArity, FieldType, IdInfo, IdStrategy, Model, OnDeleteStrategy, RelationInfo,
@@ -7,6 +6,7 @@ use datamodel::{
 use introspection_command::calculate_model;
 use log::LevelFilter;
 use pretty_assertions::assert_eq;
+use sql_schema_describer::*;
 use std::collections::HashSet;
 use std::sync::atomic::{AtomicBool, Ordering};
 
