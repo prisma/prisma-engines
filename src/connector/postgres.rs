@@ -152,8 +152,7 @@ impl PostgreSql {
         Ok(Self::from(client))
     }
 
-    pub fn from_url(url: Url) -> crate::Result<Self> {
-        let params = PostgresParams::try_from(url)?;
+    pub fn from_params(params: PostgresParams) -> crate::Result<Self> {
         Self::new(params.config, Some(params.schema))
     }
 }

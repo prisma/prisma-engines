@@ -123,6 +123,10 @@ impl Mysql {
         let client = metrics::connect("mysql", || my::Conn::new(conf))?;
         Ok(Self::from(client))
     }
+
+    pub fn from_params(params: MysqlParams) -> crate::Result<Self> {
+        Self::new(params.config)
+    }
 }
 
 impl Queryable for Mysql {
