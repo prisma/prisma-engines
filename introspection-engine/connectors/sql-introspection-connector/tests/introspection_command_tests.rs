@@ -5,7 +5,7 @@ use datamodel::{
 };
 use log::LevelFilter;
 use pretty_assertions::assert_eq;
-use sql_introspection_connector::calculate_model;
+use sql_introspection_connector::calculate_datamodel::calculate_model;
 use sql_schema_describer::*;
 use std::collections::HashSet;
 use std::sync::atomic::{AtomicBool, Ordering};
