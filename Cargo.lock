@@ -1006,19 +1006,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "introspection-command"
-version = "0.1.0"
-dependencies = [
- "datamodel 0.1.0",
- "failure 0.1.5 (registry+https://github.com/rust-lang/crates.io-index)",
- "fern 0.5.8 (registry+https://github.com/rust-lang/crates.io-index)",
- "log 0.4.8 (registry+https://github.com/rust-lang/crates.io-index)",
- "pretty_assertions 0.6.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "regex 1.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "sql-schema-describer 0.1.0",
-]
-
-[[package]]
 name = "introspection-connector"
 version = "0.1.0"
 dependencies = [

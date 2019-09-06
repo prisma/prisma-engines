@@ -24,7 +24,7 @@ pub fn load_describer(url_str: &str) -> SqlIntrospectionResult<Box<dyn SqlSchema
     }
 }
 
-pub struct PostgresWrapper {
+struct PostgresWrapper {
     conn: Mutex<PostgreSql>,
 }
 
@@ -49,7 +49,7 @@ impl sql_schema_describer::SqlConnection for PostgresWrapper {
     }
 }
 
-pub struct SqliteWrapper {
+struct SqliteWrapper {
     conn: Mutex<Sqlite>,
     file_path: String,
 }
