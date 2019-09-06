@@ -1,6 +1,6 @@
 use barrel::{types, Migration};
-use database_introspection::{IntrospectionConnector, *};
 use pretty_assertions::assert_eq;
+use sql_schema_describer::{IntrospectionConnector, *};
 
 mod common;
 mod mysql;

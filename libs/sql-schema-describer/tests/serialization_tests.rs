@@ -2,10 +2,10 @@
 #![allow(unused)]
 
 use barrel::{types, Migration};
-use database_introspection::*;
 use log::{debug, LevelFilter};
 use pretty_assertions::assert_eq;
 use prisma_query::connector::{Queryable, Sqlite as SqliteDatabaseClient};
+use sql_schema_describer::*;
 use std::collections::HashSet;
 use std::fs::File;
 use std::path::Path;

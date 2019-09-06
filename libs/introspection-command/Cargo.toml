@@ -5,7 +5,7 @@ authors = ["Arve Knudsen <arve.knudsen@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-database-introspection = { path = "../../libs/database-introspection" }
+database-introspection = { path = "../../libs/sql-schema-describer", package = "sql-schema-describer" }
 failure = "0.1"
 datamodel = { path = "../../libs/datamodel" }
 log = "0.4"

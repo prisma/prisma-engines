@@ -1,6 +1,6 @@
 use barrel::{types, Migration};
-use database_introspection::*;
 use pretty_assertions::assert_eq;
+use sql_schema_describer::*;
 use std::collections::HashSet;
 
 mod common;

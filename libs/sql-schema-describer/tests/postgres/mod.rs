@@ -1,6 +1,6 @@
-use database_introspection::*;
 use log::debug;
 use prisma_query::{ast::ParameterizedValue, connector::Queryable};
+use sql_schema_describer::*;
 use std::sync::{Arc, Mutex};
 
 use super::SCHEMA;

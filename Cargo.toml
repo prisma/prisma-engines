@@ -12,7 +12,7 @@ members = [
   "prisma-fmt",
   "libs/datamodel",
   "libs/prisma-inflector",
-  "libs/database-introspection",
+  "libs/sql-schema-describer",
   "libs/introspection-command",
   "libs/logger",
 ]

@@ -1,5 +1,5 @@
 [package]
-name = "database-introspection"
+name = "sql-schema-describer"
 version = "0.1.0"
 authors = ["Arve Knudsen <arve.knudsen@gmail.com>"]
 edition = "2018"
