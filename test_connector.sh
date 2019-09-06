@@ -2,8 +2,8 @@
 # TODO: abort if connector argument is missing
 set -e
 export CONNECTOR_TO_TEST=$1
-export PRISMA_BINARY_PATH=`pwd`/target/release/prisma
-export MIGRATION_ENGINE_BINARY_PATH=`pwd`/target/release/migration-engine
+export PRISMA_BINARY_PATH=${CARGO_TARGET_DIR}/target/release/prisma
+export MIGRATION_ENGINE_BINARY_PATH=${CARGO_TARGET_DIR}/target/release/migration-engine
 
 echo "Will run tests against connector $CONNECTOR_TO_TEST"
 echo $CONNECTOR_TO_TEST > connector_to_test
