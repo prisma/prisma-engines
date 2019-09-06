@@ -1,29 +1,28 @@
-//! SQLite introspection.
+//! SQLite description.
 use super::*;
-use crate::IntrospectionConnection;
+use crate::SqlConnection;
 use log::debug;
 use prisma_query::ast::ParameterizedValue;
 use std::collections::HashMap;
 use std::sync::Arc;
 
-/// IntrospectionConnector implementation.
-pub struct IntrospectionConnector {
-    conn: Arc<dyn IntrospectionConnection>,
+pub struct SqlSchemaDescriber {
+    conn: Arc<dyn SqlConnection>,
 }
 
-impl super::IntrospectionConnector for IntrospectionConnector {
-    fn list_schemas(&self) -> IntrospectionResult<Vec<String>> {
+impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
+    fn list_databases(&self) -> SqlSchemaDescriberResult<Vec<String>> {
         Ok(vec![])
     }
 
-    fn introspect(&self, schema: &str) -> IntrospectionResult<DatabaseSchema> {
-        debug!("Introspecting schema '{}'", schema);
+    fn describe(&self, schema: &str) -> SqlSchemaDescriberResult<SqlSchema> {
+        debug!("describing schema '{}'", schema);
         let tables = self
             .get_table_names(schema)
             .into_iter()
             .map(|t| self.get_table(schema, &t))
             .collect();
-        Ok(DatabaseSchema {
+        Ok(SqlSchema {
             // There's no enum type in SQLite.
             enums: vec![],
             // There are no sequences in SQLite.
@@ -33,15 +32,15 @@ impl super::IntrospectionConnector for IntrospectionConnector {
     }
 }
 
-impl IntrospectionConnector {
+impl SqlSchemaDescriber {
     /// Constructor.
-    pub fn new(conn: Arc<dyn IntrospectionConnection>) -> IntrospectionConnector {
-        IntrospectionConnector { conn }
+    pub fn new(conn: Arc<dyn SqlConnection>) -> SqlSchemaDescriber {
+        SqlSchemaDescriber { conn }
     }
 
     fn get_table_names(&self, schema: &str) -> Vec<String> {
         let sql = format!(r#"SELECT name FROM "{}".sqlite_master WHERE type='table'"#, schema);
-        debug!("Introspecting table names with query: '{}'", sql);
+        debug!("describing table names with query: '{}'", sql);
         let result_set = self.conn.query_raw(&sql, schema, &[]).expect("get table names");
         let names = result_set
             .into_iter()
@@ -53,7 +52,7 @@ impl IntrospectionConnector {
     }
 
     fn get_table(&self, schema: &str, name: &str) -> Table {
-        debug!("Introspecting table '{}' in schema '{}", name, schema);
+        debug!("describing table '{}' in schema '{}", name, schema);
         let (columns, primary_key) = self.get_columns(schema, name);
         let foreign_keys = self.get_foreign_keys(schema, name);
         let indices = self.get_indices(schema, name);
@@ -68,7 +67,7 @@ impl IntrospectionConnector {
 
     fn get_columns(&self, schema: &str, table: &str) -> (Vec<Column>, Option<PrimaryKey>) {
         let sql = format!(r#"PRAGMA "{}".table_info ("{}")"#, schema, table);
-        debug!("Introspecting table columns, query: '{}'", sql);
+        debug!("describing table columns, query: '{}'", sql);
         let result_set = self.conn.query_raw(&sql, schema, &[]).unwrap();
         let mut pk_cols: HashMap<i64, String> = HashMap::new();
         let mut cols: Vec<Column> = result_set
@@ -163,7 +162,7 @@ impl IntrospectionConnector {
         }
 
         let sql = format!(r#"PRAGMA "{}".foreign_key_list("{}");"#, schema, table);
-        debug!("Introspecting table foreign keys, SQL: '{}'", sql);
+        debug!("describing table foreign keys, SQL: '{}'", sql);
         let result_set = self
             .conn
             .query_raw(&sql, schema, &[])
@@ -174,7 +173,7 @@ impl IntrospectionConnector {
         // translated into the real foreign keys in another pass
         let mut intermediate_fks: HashMap<i64, IntermediateForeignKey> = HashMap::new();
         for row in result_set.into_iter() {
-            debug!("got FK introspection row {:?}", row);
+            debug!("got FK description row {:?}", row);
             let id = row.get("id").and_then(|x| x.as_i64()).expect("id");
             let seq = row.get("seq").and_then(|x| x.as_i64()).expect("seq");
             let column = row.get("from").and_then(|x| x.to_string()).expect("from");
@@ -253,9 +252,9 @@ impl IntrospectionConnector {
 
     fn get_indices(&self, schema: &str, table: &str) -> Vec<Index> {
         let sql = format!(r#"PRAGMA "{}".index_list("{}");"#, schema, table);
-        debug!("Introspecting table indices, SQL: '{}'", sql);
+        debug!("describing table indices, SQL: '{}'", sql);
         let result_set = self.conn.query_raw(&sql, schema, &[]).expect("querying for indices");
-        debug!("Got indices introspection results: {:?}", result_set);
+        debug!("Got indices description results: {:?}", result_set);
         result_set
             .into_iter()
             .map(|row| {
@@ -271,9 +270,9 @@ impl IntrospectionConnector {
                 };
 
                 let sql = format!(r#"PRAGMA "{}".index_info("{}");"#, schema, name);
-                debug!("Introspecting table index '{}', SQL: '{}'", name, sql);
+                debug!("describing table index '{}', SQL: '{}'", name, sql);
                 let result_set = self.conn.query_raw(&sql, schema, &[]).expect("querying for index info");
-                debug!("Got index introspection results: {:?}", result_set);
+                debug!("Got index description results: {:?}", result_set);
                 for row in result_set.into_iter() {
                     let pos = row.get("seqno").and_then(|x| x.as_i64()).expect("get seqno") as usize;
                     let col_name = row.get("name").and_then(|x| x.to_string()).expect("get name");

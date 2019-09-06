@@ -1,6 +1,6 @@
 use barrel::{types, Migration};
-use database_introspection::*;
 use pretty_assertions::assert_eq;
+use sql_schema_describer::*;
 
 mod common;
 mod sqlite;
@@ -21,8 +21,8 @@ fn sqlite_column_types_must_work() {
     });
 
     let full_sql = migration.make::<barrel::backend::Sqlite>();
-    let inspector = get_sqlite_connector(&full_sql);
-    let result = inspector.introspect(SCHEMA).expect("introspection");
+    let inspector = get_sqlite_describer(&full_sql);
+    let result = inspector.describe(SCHEMA).expect("describing");
     let table = result.get_table("User").expect("couldn't get User table");
     let mut expected_columns = vec![
         Column {
@@ -99,9 +99,9 @@ fn sqlite_foreign_key_on_delete_must_be_handled() {
         )",
         SCHEMA
     );
-    let inspector = get_sqlite_connector(&sql);
+    let inspector = get_sqlite_describer(&sql);
 
-    let schema = inspector.introspect(SCHEMA).expect("introspection");
+    let schema = inspector.describe(SCHEMA).expect("describing");
     let mut table = schema.get_table("User").expect("get User table").to_owned();
     table.foreign_keys.sort_unstable_by_key(|fk| fk.columns.clone());
 

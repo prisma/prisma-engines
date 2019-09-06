@@ -1,21 +1,21 @@
 use crate::SqlResult;
 use chrono::*;
-use database_introspection::*;
 use datamodel::common::*;
 use datamodel::*;
 use prisma_models::{DatamodelConverter, TempManifestationHolder, TempRelationHolder};
+use sql_schema_describer::*;
 
 pub struct DatabaseSchemaCalculator<'a> {
     data_model: &'a Datamodel,
 }
 
 impl<'a> DatabaseSchemaCalculator<'a> {
-    pub fn calculate(data_model: &Datamodel) -> SqlResult<DatabaseSchema> {
+    pub fn calculate(data_model: &Datamodel) -> SqlResult<SqlSchema> {
         let calculator = DatabaseSchemaCalculator { data_model };
         calculator.calculate_internal()
     }
 
-    fn calculate_internal(&self) -> SqlResult<DatabaseSchema> {
+    fn calculate_internal(&self) -> SqlResult<SqlSchema> {
         let mut tables = Vec::new();
         let model_tables_without_inline_relations = self.calculate_model_tables()?;
         let mut model_tables = self.add_inline_relations_to_model_tables(model_tables_without_inline_relations)?;
@@ -26,7 +26,7 @@ impl<'a> DatabaseSchemaCalculator<'a> {
         tables.append(&mut scalar_list_tables);
         tables.append(&mut relation_tables);
 
-        // guarantee same sorting as in the database-introspection
+        // guarantee same sorting as in the sql-schema-describer
         for table in &mut tables {
             table.columns.sort_unstable_by_key(|col| col.name.clone());
         }
@@ -34,7 +34,7 @@ impl<'a> DatabaseSchemaCalculator<'a> {
         let enums = Vec::new();
         let sequences = Vec::new();
 
-        Ok(DatabaseSchema {
+        Ok(SqlSchema {
             tables,
             enums,
             sequences,

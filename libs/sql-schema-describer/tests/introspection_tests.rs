@@ -1,6 +1,6 @@
 use barrel::{types, Migration};
-use database_introspection::{IntrospectionConnector, *};
 use pretty_assertions::assert_eq;
+use sql_schema_describer::{SqlSchemaDescriberBackend, *};
 
 mod common;
 mod mysql;
@@ -47,7 +47,7 @@ fn is_required_must_work() {
             });
         },
         |db_type, inspector| {
-            let result = inspector.introspect(SCHEMA).expect("introspecting");
+            let result = inspector.describe(SCHEMA).expect("describing");
             let user_table = result.get_table("User").expect("getting User table");
             let expected_columns = vec![
                 Column {
@@ -97,7 +97,7 @@ fn foreign_keys_must_work() {
             });
         },
         |db_type, inspector| {
-            let schema = inspector.introspect(SCHEMA).expect("introspection");
+            let schema = inspector.describe(SCHEMA).expect("describe failed");
             let user_table = schema.get_table("User").expect("couldn't get User table");
             let expected_columns = vec![Column {
                 name: "city".to_string(),
@@ -164,7 +164,7 @@ fn multi_column_foreign_keys_must_work() {
             });
         },
         |db_type, inspector| {
-            let schema = inspector.introspect(SCHEMA).expect("introspection");
+            let schema = inspector.describe(SCHEMA).expect("describe failed");
             let user_table = schema.get_table("User").expect("couldn't get User table");
             let expected_columns = vec![
                 Column {
@@ -223,7 +223,7 @@ fn names_with_hyphens_must_work() {
             });
         },
         |db_type, inspector| {
-            let result = inspector.introspect(SCHEMA).expect("introspecting");
+            let result = inspector.describe(SCHEMA).expect("describing");
             let user_table = result.get_table("User-table").expect("getting User table");
             let expected_columns = vec![Column {
                 name: "column-1".to_string(),
@@ -267,7 +267,7 @@ fn composite_primary_keys_must_work() {
             migration.inject_custom(&sql);
         },
         |db_type, inspector| {
-            let schema = inspector.introspect(SCHEMA).expect("introspection");
+            let schema = inspector.describe(SCHEMA).expect("describe failed");
             let table = schema.get_table("User").expect("couldn't get User table");
             let (exp_int, exp_varchar) = match db_type {
                 DbType::Sqlite => ("INTEGER", "VARCHAR(255)"),
@@ -336,7 +336,7 @@ fn indices_must_work() {
             });
         },
         |db_type, inspector| {
-            let result = inspector.introspect(&SCHEMA.to_string()).expect("introspecting");
+            let result = inspector.describe(&SCHEMA.to_string()).expect("describing");
             let user_table = result.get_table("User").expect("getting User table");
             let default = match db_type {
                 DbType::Postgres => Some(format!("nextval('\"{}\".\"User_id_seq\"'::regclass)", SCHEMA)),
@@ -411,7 +411,7 @@ fn column_uniqueness_must_be_detected() {
             migration.inject_custom(index_sql);
         },
         |db_type, inspector| {
-            let result = inspector.introspect(&SCHEMA.to_string()).expect("introspecting");
+            let result = inspector.describe(&SCHEMA.to_string()).expect("describing");
             let user_table = result.get_table("User").expect("getting User table");
             let expected_columns = vec![
                 Column {
@@ -496,7 +496,7 @@ fn defaults_must_work() {
             });
         },
         |db_type, inspector| {
-            let result = inspector.introspect(&SCHEMA.to_string()).expect("introspecting");
+            let result = inspector.describe(&SCHEMA.to_string()).expect("describing");
             let user_table = result.get_table("User").expect("getting User table");
             let default = match db_type {
                 DbType::Sqlite => "'1'".to_string(),
@@ -529,33 +529,33 @@ fn defaults_must_work() {
 fn test_each_backend<MigrationFn, TestFn>(mut migration_fn: MigrationFn, test_fn: TestFn)
 where
     MigrationFn: FnMut(DbType, &mut Migration) -> (),
-    TestFn: Fn(DbType, &mut dyn IntrospectionConnector) -> (),
+    TestFn: Fn(DbType, &mut dyn SqlSchemaDescriberBackend) -> (),
 {
     // SQLite
     {
         let mut migration = Migration::new().schema(SCHEMA);
         migration_fn(DbType::Sqlite, &mut migration);
         let full_sql = migration.make::<barrel::backend::Sqlite>();
-        let mut inspector = get_sqlite_connector(&full_sql);
+        let mut describer = get_sqlite_describer(&full_sql);
 
-        test_fn(DbType::Sqlite, &mut inspector);
+        test_fn(DbType::Sqlite, &mut describer);
     }
     // Postgres
     {
         let mut migration = Migration::new().schema(SCHEMA);
         migration_fn(DbType::Postgres, &mut migration);
         let full_sql = migration.make::<barrel::backend::Pg>();
-        let mut inspector = get_postgres_connector(&full_sql);
+        let mut describer = get_postgres_describer(&full_sql);
 
-        test_fn(DbType::Postgres, &mut inspector);
+        test_fn(DbType::Postgres, &mut describer);
     }
     // MySQL
     {
         let mut migration = Migration::new().schema(SCHEMA);
         migration_fn(DbType::MySql, &mut migration);
         let full_sql = migration.make::<barrel::backend::MySql>();
-        let mut inspector = get_mysql_connector(&full_sql);
+        let mut describer = get_mysql_describer(&full_sql);
 
-        test_fn(DbType::MySql, &mut inspector);
+        test_fn(DbType::MySql, &mut describer);
     }
 }

@@ -1,12 +1,12 @@
-use database_introspection::*;
 use datamodel::{
     common::{PrismaType, PrismaValue},
     dml, Datamodel, Field, FieldArity, FieldType, IdInfo, IdStrategy, Model, OnDeleteStrategy, RelationInfo,
     ScalarListStrategy,
 };
-use introspection_command::calculate_model;
 use log::LevelFilter;
 use pretty_assertions::assert_eq;
+use sql_introspection_connector::calculate_datamodel::calculate_model;
+use sql_schema_describer::*;
 use std::collections::HashSet;
 use std::sync::atomic::{AtomicBool, Ordering};
 
@@ -100,7 +100,7 @@ fn a_data_model_can_be_generated_from_a_schema() {
         enums: vec![],
     };
 
-    let schema = DatabaseSchema {
+    let schema = SqlSchema {
         tables: vec![Table {
             name: "Table1".to_string(),
             columns: col_types
@@ -187,7 +187,7 @@ fn arity_is_preserved_when_generating_data_model_from_a_schema() {
         enums: vec![],
     };
 
-    let schema = DatabaseSchema {
+    let schema = SqlSchema {
         tables: vec![Table {
             name: "Table1".to_string(),
             columns: vec![
@@ -319,7 +319,7 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
         enums: vec![],
     };
 
-    let schema = DatabaseSchema {
+    let schema = SqlSchema {
         tables: vec![Table {
             name: "Table1".to_string(),
             columns: vec![
@@ -472,7 +472,7 @@ fn primary_key_is_preserved_when_generating_data_model_from_a_schema() {
         enums: vec![],
     };
 
-    let schema = DatabaseSchema {
+    let schema = SqlSchema {
         tables: vec![
             Table {
                 name: "Table1".to_string(),
@@ -587,7 +587,7 @@ fn uniqueness_is_preserved_when_generating_data_model_from_a_schema() {
         enums: vec![],
     };
 
-    let schema = DatabaseSchema {
+    let schema = SqlSchema {
         tables: vec![Table {
             name: "Table1".to_string(),
             columns: vec![
@@ -734,7 +734,7 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
         enums: vec![],
     };
 
-    let schema = DatabaseSchema {
+    let schema = SqlSchema {
         tables: vec![
             Table {
                 name: "City".to_string(),
@@ -836,7 +836,7 @@ fn enums_are_preserved_when_generating_data_model_from_a_schema() {
     let mut enum_values = HashSet::new();
     enum_values.insert("a".to_string());
     enum_values.insert("b".to_string());
-    let schema = DatabaseSchema {
+    let schema = SqlSchema {
         tables: vec![],
         enums: vec![Enum {
             name: "Enum".to_string(),

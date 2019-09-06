@@ -1,5 +1,5 @@
 use crate::SqlFamily;
-use database_introspection::*;
+use sql_schema_describer::*;
 
 mod common;
 mod mysql_renderer;

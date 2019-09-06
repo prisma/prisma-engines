@@ -1,4 +1,4 @@
-//! Database introspection.
+//! Database description.
 use failure::Fail;
 use prisma_query::ast::ParameterizedValue;
 use serde::{Deserialize, Serialize};
@@ -9,19 +9,19 @@ pub mod mysql;
 pub mod postgres;
 pub mod sqlite;
 
-/// Introspection errors.
+/// description errors.
 #[derive(Debug, Fail)]
-pub enum IntrospectionError {
+pub enum SqlSchemaDescriberError {
     /// An unknown error occurred.
     #[fail(display = "unknown")]
     UnknownError,
 }
 
 /// The result type.
-pub type IntrospectionResult<T> = core::result::Result<T, IntrospectionError>;
+pub type SqlSchemaDescriberResult<T> = core::result::Result<T, SqlSchemaDescriberError>;
 
-/// Connection abstraction for the introspection connectors.
-pub trait IntrospectionConnection: Send + Sync + 'static {
+/// Connection abstraction for the description backends.
+pub trait SqlConnection: Send + Sync + 'static {
     /// Make raw SQL query.
     fn query_raw(
         &self,
@@ -31,18 +31,18 @@ pub trait IntrospectionConnection: Send + Sync + 'static {
     ) -> prisma_query::Result<prisma_query::connector::ResultSet>;
 }
 
-/// A database introspection connector.
-pub trait IntrospectionConnector: Send + Sync + 'static {
+/// A database description connector.
+pub trait SqlSchemaDescriberBackend: Send + Sync + 'static {
     /// List the database's schemas.
-    fn list_schemas(&self) -> IntrospectionResult<Vec<String>>;
-    /// Introspect a database schema.
-    fn introspect(&self, schema: &str) -> IntrospectionResult<DatabaseSchema>;
+    fn list_databases(&self) -> SqlSchemaDescriberResult<Vec<String>>;
+    /// Describe a database schema.
+    fn describe(&self, schema: &str) -> SqlSchemaDescriberResult<SqlSchema>;
 }
 
-/// The result of introspecting a database schema.
+/// The result of describing a database schema.
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 #[serde(rename_all = "camelCase")]
-pub struct DatabaseSchema {
+pub struct SqlSchema {
     /// The schema's tables.
     pub tables: Vec<Table>,
     /// The schema's enums.
@@ -51,7 +51,7 @@ pub struct DatabaseSchema {
     pub sequences: Vec<Sequence>,
 }
 
-impl DatabaseSchema {
+impl SqlSchema {
     pub fn has_table(&self, name: &str) -> bool {
         self.get_table(name).is_some()
     }
@@ -82,8 +82,8 @@ impl DatabaseSchema {
         self.sequences.iter().find(|x| x.name == name)
     }
 
-    pub fn empty() -> DatabaseSchema {
-        DatabaseSchema {
+    pub fn empty() -> SqlSchema {
+        SqlSchema {
             tables: Vec::new(),
             enums: Vec::new(),
             sequences: Vec::new(),

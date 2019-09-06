@@ -2,10 +2,10 @@
 #![allow(unused)]
 
 use barrel::{types, Migration};
-use database_introspection::*;
 use log::{debug, LevelFilter};
 use pretty_assertions::assert_eq;
 use prisma_query::connector::{Queryable, Sqlite as SqliteDatabaseClient};
+use sql_schema_describer::*;
 use std::collections::HashSet;
 use std::fs::File;
 use std::path::Path;
@@ -54,7 +54,7 @@ fn database_schema_is_serializable() {
     let mut enum_values = HashSet::new();
     enum_values.insert("option1".to_string());
     enum_values.insert("option2".to_string());
-    let schema = DatabaseSchema {
+    let schema = SqlSchema {
         tables: vec![
             Table {
                 name: "table1".to_string(),
@@ -137,10 +137,10 @@ fn database_schema_is_serializable() {
         }],
     };
     let ref_schema_json = include_str!("./resources/schema.json");
-    let ref_schema: DatabaseSchema = serde_json::from_str(ref_schema_json).expect("deserialize reference schema");
+    let ref_schema: SqlSchema = serde_json::from_str(ref_schema_json).expect("deserialize reference schema");
 
     let schema_json = serde_json::to_string(&schema).expect("serialize schema to JSON");
-    let schema_deser: DatabaseSchema = serde_json::from_str(&schema_json).expect("deserialize schema");
+    let schema_deser: SqlSchema = serde_json::from_str(&schema_json).expect("deserialize schema");
 
     // Verify that deserialized schema is equivalent
     assert_eq!(schema_deser, schema);
@@ -152,7 +152,7 @@ fn database_schema_is_serializable() {
 fn database_schema_without_primary_key_is_serializable() {
     setup();
 
-    let schema = DatabaseSchema {
+    let schema = SqlSchema {
         tables: vec![Table {
             name: "table1".to_string(),
             columns: vec![Column {
@@ -173,10 +173,10 @@ fn database_schema_without_primary_key_is_serializable() {
         sequences: vec![],
     };
     let ref_schema_json = include_str!("./resources/schema-without-primary-key.json");
-    let ref_schema: DatabaseSchema = serde_json::from_str(ref_schema_json).expect("deserialize reference schema");
+    let ref_schema: SqlSchema = serde_json::from_str(ref_schema_json).expect("deserialize reference schema");
 
     let schema_json = serde_json::to_string(&schema).expect("serialize schema to JSON");
-    let schema_deser: DatabaseSchema = serde_json::from_str(&schema_json).expect("deserialize schema");
+    let schema_deser: SqlSchema = serde_json::from_str(&schema_json).expect("deserialize schema");
 
     // Verify that deserialized schema is equivalent
     assert_eq!(schema_deser, schema);
@@ -216,7 +216,7 @@ fn database_schema_is_serializable_for_every_column_type_family() {
         auto_increment: false,
     })
     .collect();
-    let schema = DatabaseSchema {
+    let schema = SqlSchema {
         tables: vec![Table {
             name: "table1".to_string(),
             columns,
@@ -228,10 +228,10 @@ fn database_schema_is_serializable_for_every_column_type_family() {
         sequences: vec![],
     };
     let ref_schema_json = include_str!("./resources/schema-all-column-type-families.json");
-    let ref_schema: DatabaseSchema = serde_json::from_str(ref_schema_json).expect("deserialize reference schema");
+    let ref_schema: SqlSchema = serde_json::from_str(ref_schema_json).expect("deserialize reference schema");
 
     let schema_json = serde_json::to_string(&schema).expect("serialize schema to JSON");
-    let schema_deser: DatabaseSchema = serde_json::from_str(&schema_json).expect("deserialize schema");
+    let schema_deser: SqlSchema = serde_json::from_str(&schema_json).expect("deserialize schema");
 
     // Verify that deserialized schema is equivalent
     assert_eq!(schema_deser, schema);
@@ -258,7 +258,7 @@ fn database_schema_is_serializable_for_every_column_arity() {
             auto_increment: false,
         })
         .collect();
-    let schema = DatabaseSchema {
+    let schema = SqlSchema {
         tables: vec![Table {
             name: "table1".to_string(),
             columns,
@@ -270,10 +270,10 @@ fn database_schema_is_serializable_for_every_column_arity() {
         sequences: vec![],
     };
     let ref_schema_json = include_str!("./resources/schema-all-column-arities.json");
-    let ref_schema: DatabaseSchema = serde_json::from_str(ref_schema_json).expect("deserialize reference schema");
+    let ref_schema: SqlSchema = serde_json::from_str(ref_schema_json).expect("deserialize reference schema");
 
     let schema_json = serde_json::to_string(&schema).expect("serialize schema to JSON");
-    let schema_deser: DatabaseSchema = serde_json::from_str(&schema_json).expect("deserialize schema");
+    let schema_deser: SqlSchema = serde_json::from_str(&schema_json).expect("deserialize schema");
 
     // Verify that deserialized schema is equivalent
     assert_eq!(schema_deser, schema);
@@ -286,7 +286,7 @@ fn database_schema_is_serializable_for_every_foreign_key_action() {
     setup();
 
     // Add a foreign key of every possible action
-    let schema = DatabaseSchema {
+    let schema = SqlSchema {
         tables: vec![Table {
             name: "table1".to_string(),
             columns: vec![
@@ -380,10 +380,10 @@ fn database_schema_is_serializable_for_every_foreign_key_action() {
         sequences: vec![],
     };
     let ref_schema_json = include_str!("./resources/schema-all-foreign-key-actions.json");
-    let ref_schema: DatabaseSchema = serde_json::from_str(ref_schema_json).expect("deserialize reference schema");
+    let ref_schema: SqlSchema = serde_json::from_str(ref_schema_json).expect("deserialize reference schema");
 
     let schema_json = serde_json::to_string(&schema).expect("serialize schema to JSON");
-    let schema_deser: DatabaseSchema = serde_json::from_str(&schema_json).expect("deserialize schema");
+    let schema_deser: SqlSchema = serde_json::from_str(&schema_json).expect("deserialize schema");
 
     // Verify that deserialized schema is equivalent
     assert_eq!(schema_deser, schema);

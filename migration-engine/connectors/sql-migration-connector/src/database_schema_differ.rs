@@ -1,13 +1,13 @@
 use crate::*;
-use database_introspection::*;
 use log::debug;
+use sql_schema_describer::*;
 
 const MIGRATION_TABLE_NAME: &str = "_Migration";
 
 #[derive(Debug)]
 pub struct DatabaseSchemaDiffer<'a> {
-    previous: &'a DatabaseSchema,
-    next: &'a DatabaseSchema,
+    previous: &'a SqlSchema,
+    next: &'a SqlSchema,
 }
 
 #[derive(Debug, Clone)]
@@ -38,7 +38,7 @@ impl DatabaseSchemaDiff {
 }
 
 impl<'a> DatabaseSchemaDiffer<'a> {
-    pub fn diff(previous: &DatabaseSchema, next: &DatabaseSchema) -> DatabaseSchemaDiff {
+    pub fn diff(previous: &SqlSchema, next: &SqlSchema) -> DatabaseSchemaDiff {
         let differ = DatabaseSchemaDiffer { previous, next };
         differ.diff_internal()
     }
@@ -184,16 +184,17 @@ impl<'a> DatabaseSchemaDiffer<'a> {
                         Some(pk) => pk.columns == index.columns,
                     };
                     if !index_covers_pk {
-                        debug!("Dropping index '{}' on table '{}'", index.name, 
-                            previous_table.name);
+                        debug!("Dropping index '{}' on table '{}'", index.name, previous_table.name);
                         let drop = DropIndex {
                             table: previous_table.name.clone(),
                             name: index.name.clone(),
                         };
                         result.push(drop);
                     } else {
-                        debug!("Not dropping index '{}' on table '{}' since it covers PK", 
-                            index.name, previous_table.name);
+                        debug!(
+                            "Not dropping index '{}' on table '{}' since it covers PK",
+                            index.name, previous_table.name
+                        );
                     }
                 }
             }

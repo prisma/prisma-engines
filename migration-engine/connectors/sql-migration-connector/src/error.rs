@@ -25,8 +25,8 @@ impl From<prisma_query::error::Error> for SqlError {
     }
 }
 
-impl From<database_introspection::IntrospectionError> for SqlError {
-    fn from(error: database_introspection::IntrospectionError) -> Self {
+impl From<sql_schema_describer::SqlSchemaDescriberError> for SqlError {
+    fn from(error: sql_schema_describer::SqlSchemaDescriberError) -> Self {
         SqlError::QueryError(error.into())
     }
 }

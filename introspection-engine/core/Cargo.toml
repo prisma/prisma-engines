@@ -8,11 +8,11 @@ edition = "2018"
 
 [dependencies]
 url = "1.7"
-prisma-query = { git = "https://github.com/prisma/prisma-query.git" }
-database-introspection = { path = "../../libs/database-introspection" }
-introspection-command = { path = "../../libs/introspection-command" }
-datamodel = { path = "../../libs/datamodel" }
 failure = "0.1"
+introspection-connector = { path = "../connectors/introspection-connector" }
+sql-introspection-connector = { path = "../connectors/sql-introspection-connector" }
+datamodel = { path = "../../libs/datamodel" }
+
 
 [[bin]]
 name = "introspection-engine"

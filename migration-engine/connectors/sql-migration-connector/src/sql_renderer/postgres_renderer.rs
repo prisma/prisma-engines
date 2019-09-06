@@ -1,5 +1,5 @@
 use super::common::*;
-use database_introspection::*;
+use sql_schema_describer::*;
 
 pub struct PostgresRenderer {}
 impl super::SqlRenderer for PostgresRenderer {

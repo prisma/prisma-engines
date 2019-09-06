@@ -17,7 +17,7 @@ pub struct MigrationDatabaseWrapper {
     pub database: Arc<dyn MigrationDatabase + Send + Sync + 'static>,
 }
 
-impl database_introspection::IntrospectionConnection for MigrationDatabaseWrapper {
+impl sql_schema_describer::SqlConnection for MigrationDatabaseWrapper {
     fn query_raw(
         &self,
         sql: &str,

@@ -1,6 +1,6 @@
-use database_introspection::*;
 use log::debug;
 use prisma_query::{ast::ParameterizedValue, connector::Queryable};
+use sql_schema_describer::*;
 use std::sync::{Arc, Mutex};
 
 use super::SCHEMA;
@@ -9,7 +9,7 @@ struct PostgresConnection {
     client: Mutex<prisma_query::connector::PostgreSql>,
 }
 
-impl crate::IntrospectionConnection for PostgresConnection {
+impl crate::SqlConnection for PostgresConnection {
     fn query_raw(
         &self,
         sql: &str,
@@ -20,7 +20,7 @@ impl crate::IntrospectionConnection for PostgresConnection {
     }
 }
 
-pub fn get_postgres_connector(sql: &str) -> postgres::IntrospectionConnector {
+pub fn get_postgres_describer(sql: &str) -> postgres::SqlSchemaDescriber {
     let host = match std::env::var("IS_BUILDKITE") {
         Ok(_) => "test-db-postgres",
         Err(_) => "127.0.0.1",
@@ -52,5 +52,5 @@ pub fn get_postgres_connector(sql: &str) -> postgres::IntrospectionConnector {
     let conn = Arc::new(PostgresConnection {
         client: Mutex::new(prisma_query::connector::PostgreSql::from(client)),
     });
-    postgres::IntrospectionConnector::new(conn)
+    postgres::SqlSchemaDescriber::new(conn)
 }

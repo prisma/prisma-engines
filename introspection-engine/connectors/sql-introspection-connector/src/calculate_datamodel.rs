@@ -1,19 +1,15 @@
-//! Logic for generating Prisma data models from database introspection.
-use database_introspection::*;
+use crate::SqlIntrospectionResult;
 use datamodel::{
     common::{PrismaType, PrismaValue},
     dml, Datamodel, Field, FieldArity, FieldType, IdInfo, IdStrategy, Model, OnDeleteStrategy, RelationInfo,
     ScalarListStrategy,
 };
-use failure::Error;
 use log::debug;
 use regex::Regex;
-
-/// The result type.
-pub type Result<T> = core::result::Result<T, Error>;
+use sql_schema_describer::*;
 
 /// Calculate a data model from a database schema.
-pub fn calculate_model(schema: &DatabaseSchema) -> Result<Datamodel> {
+pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> {
     debug!("Calculating data model");
 
     let mut data_model = Datamodel::new();
