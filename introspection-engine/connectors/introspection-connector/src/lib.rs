@@ -1,7 +1,7 @@
 mod error;
 
 use datamodel::Datamodel;
-use error::ConnectorError;
+pub use error::ConnectorError;
 
 pub type ConnectorResult<T> = Result<T, ConnectorError>;
 
