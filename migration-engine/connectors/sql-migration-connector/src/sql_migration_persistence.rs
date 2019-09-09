@@ -157,27 +157,31 @@ impl MigrationPersistence for SqlMigrationPersistence {
 }
 
 fn migration_table_setup_sqlite(t: &mut barrel::Table) {
-    migration_table_setup(t, types::date());
+    migration_table_setup(t, types::date(), types::custom("TEXT"));
 }
 
 fn migration_table_setup_postgres(t: &mut barrel::Table) {
-    migration_table_setup(t, types::custom("timestamp(3)"));
+    migration_table_setup(t, types::custom("timestamp(3)"), types::custom("TEXT"));
 }
 
 fn migration_table_setup_mysql(t: &mut barrel::Table) {
-    migration_table_setup(t, types::custom("datetime(3)"));
+    migration_table_setup(t, types::custom("datetime(3)"), types::custom("LONGTEXT"));
 }
 
-fn migration_table_setup(t: &mut barrel::Table, datetime_type: barrel::types::Type) {
+fn migration_table_setup(
+    t: &mut barrel::Table,
+    datetime_type: barrel::types::Type,
+    unlimited_text_type: barrel::types::Type,
+) {
     t.add_column(REVISION_COLUMN, types::primary());
     t.add_column(NAME_COLUMN, types::text());
-    t.add_column(DATAMODEL_COLUMN, types::text());
+    t.add_column(DATAMODEL_COLUMN, unlimited_text_type.clone());
     t.add_column(STATUS_COLUMN, types::text());
     t.add_column(APPLIED_COLUMN, types::integer());
     t.add_column(ROLLED_BACK_COLUMN, types::integer());
-    t.add_column(DATAMODEL_STEPS_COLUMN, types::text());
-    t.add_column(DATABASE_MIGRATION_COLUMN, types::text());
-    t.add_column(ERRORS_COLUMN, types::text());
+    t.add_column(DATAMODEL_STEPS_COLUMN, unlimited_text_type.clone());
+    t.add_column(DATABASE_MIGRATION_COLUMN, unlimited_text_type.clone());
+    t.add_column(ERRORS_COLUMN, unlimited_text_type.clone());
     t.add_column(STARTED_AT_COLUMN, datetime_type.clone());
     t.add_column(FINISHED_AT_COLUMN, datetime_type.clone().nullable(true));
 }
