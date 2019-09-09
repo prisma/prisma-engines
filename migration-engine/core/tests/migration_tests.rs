@@ -680,6 +680,26 @@ fn adding_a_new_unique_field_must_work() {
 }
 
 #[test]
+fn unique_in_conjunction_with_custom_column_name_must_work() {
+    test_each_connector(|_, api| {
+        let dm1 = r#"
+            model A {
+                id Int @id
+                field String @unique @map("custom_field_name")
+            }
+        "#;
+        let result = infer_and_apply(api, &dm1);
+        let index = result
+            .table_bang("A")
+            .indices
+            .iter()
+            .find(|i| i.columns == vec!["custom_field_name"]);
+        assert_eq!(index.is_some(), true);
+        assert_eq!(index.unwrap().tpe, IndexType::Unique);
+    });
+}
+
+#[test]
 fn sqlite_must_recreate_indexes() {
     // SQLite must go through a complicated migration procedure which requires dropping and recreating indexes. This test checks that.
     // We run them still against each connector.

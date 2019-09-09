@@ -78,7 +78,7 @@ impl<'a> DatabaseSchemaCalculator<'a> {
                         if f.is_unique {
                             Some(Index {
                                 name: format!("{}.{}", &model.db_name(), &f.db_name()),
-                                columns: vec![f.name.clone()],
+                                columns: vec![f.db_name().clone()],
                                 tpe: IndexType::Unique,
                             })
                         } else {
