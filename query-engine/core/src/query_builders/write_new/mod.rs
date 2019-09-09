@@ -4,13 +4,13 @@ pub use write_arguments::*;
 
 use super::*;
 use crate::{
-    ArgumentListLookup, EdgeContent, EdgeOperation, Node, ParsedField, ParsedInputMap, ParsedInputValue, QueryGraph,
+    ArgumentListLookup, QueryDependency, DependencyType, Node, ParsedField, ParsedInputMap, ParsedInputValue, QueryGraph,
     ReadOneRecordBuilder,
 };
 use connector::{
     filter::{Filter, RecordFinder},
-    CreateRecord, DeleteManyRecords, DeleteRecord, NestedWriteQueries, Query, ReadQuery, RootWriteQuery, UpdateRecord,
-    WriteQuery,
+    CreateRecord, DeleteManyRecords, DeleteRecord, NestedWriteQueries, Query, QueryArguments, ReadQuery,
+    RelatedRecordsQuery, RootWriteQuery, UpdateRecord, WriteQuery,
 };
 use prisma_models::{ModelRef, RelationFieldRef};
 use std::{convert::TryInto, sync::Arc};
@@ -41,7 +41,7 @@ impl WriteQueryBuilder {
         self.graph.create_edge(
             &create_node,
             &read_node,
-            EdgeContent::Read(EdgeOperation::DependentId(Box::new(|mut query, parent_id| {
+            QueryDependency::Read(DependencyType::ParentId(Box::new(|mut query, parent_id| {
                 if let ReadQuery::RecordQuery(ref mut rq) = query {
                     let finder = RecordFinder {
                         field: id_field,
@@ -78,7 +78,7 @@ impl WriteQueryBuilder {
         self.graph.create_edge(
             &update_node,
             &read_node,
-            EdgeContent::Read(EdgeOperation::DependentId(Box::new(|mut query, parent_id| {
+            QueryDependency::Read(DependencyType::ParentId(Box::new(|mut query, parent_id| {
                 if let ReadQuery::RecordQuery(ref mut rq) = query {
                     let finder = RecordFinder {
                         field: id_field,
@@ -203,9 +203,9 @@ impl WriteQueryBuilder {
                         self.graph.create_edge(
                             parent,
                             &node,
-                            EdgeContent::Write(
+                            QueryDependency::Write(
                                 Arc::clone(&relation_field),
-                                EdgeOperation::DependentId(Box::new(|mut query, parent_id| {
+                                DependencyType::ParentId(Box::new(|mut query, parent_id| {
                                     query.inject_non_list_arg(relation_field_name, parent_id);
                                     query
                                 })),
@@ -218,24 +218,21 @@ impl WriteQueryBuilder {
                     .nested_update(value, &model, &relation_field)?
                     .into_iter()
                     .map(|node| {
-                        let id_field = model.fields().id();
-                        self.graph.create_edge(
-                            parent,
-                            &node,
-                            EdgeContent::Write(
-                                Arc::clone(&relation_field),
-                                EdgeOperation::DependentId(Box::new(|mut query, parent_id| {
-                                    if let WriteQuery::Root(RootWriteQuery::UpdateRecord(ref mut ur)) = query {
-                                        ur.where_ = Some(RecordFinder {
-                                            field: id_field,
-                                            value: parent_id,
-                                        });
-                                    }
+                        let edge_content = match *self.graph.node_content(&node) {
+                            Query::Read(_) => {
+                                QueryDependency::Read(DependencyType::ParentId(Box::new(|mut query, parent_id| {
+                                    if let ReadQuery::RelatedRecordsQuery(ref mut rq) = query {
+                                        rq.parent_ids = Some(vec![parent_id.try_into().unwrap()]);
+                                    };
 
                                     query
-                                })),
-                            ),
-                        );
+                                })))
+                            }
+
+                            Query::Write(_) => QueryDependency::Write(Arc::clone(&relation_field), DependencyType::ExecutionOrder),
+                        };
+
+                        self.graph.create_edge(parent, &node, edge_content);
                     })
                     .collect::<Vec<_>>(),
 
@@ -262,18 +259,53 @@ impl WriteQueryBuilder {
         Self::coerce_vec(value)
             .into_iter()
             .map(|value| {
-                let (data_value, record_finder) = if relation_field.is_list {
+                if relation_field.is_list {
+                    // We have a record specified as a record finder in "where"
                     let mut map: ParsedInputMap = value.try_into()?;
                     let where_arg = map.remove("where").unwrap();
                     let record_finder = utils::extract_record_finder(where_arg, &model)?;
-                    let data_arg = map.remove("data").unwrap();
+                    let data_value = map.remove("data").unwrap();
 
-                    (data_arg, Some(record_finder))
+                    self.update_record_node(Some(record_finder), Arc::clone(model), data_value.try_into()?)
                 } else {
-                    (value, None)
-                };
+                    // We don't have a specific record, we need to find it first.
+                    // Build a read query to load the necessary data first.
+                    let read_parent_node =
+                        self.graph
+                            .create_node(Query::Read(ReadQuery::RelatedRecordsQuery(RelatedRecordsQuery {
+                                name: "parent".to_owned(),
+                                alias: None,
+                                parent_field: Arc::clone(relation_field),
+                                parent_ids: None,
+                                args: QueryArguments::default(),
+                                selected_fields: relation_field.related_field().model().fields().id().into(),
+                                nested: vec![],
+                                selection_order: vec![],
+                            })));
 
-                self.update_record_node(record_finder, Arc::clone(model), data_value.try_into()?)
+                    let update_node = self.update_record_node(None, Arc::clone(model), value.try_into()?)?;
+                    let id_field = model.fields().id();
+
+                    self.graph.create_edge(
+                        &read_parent_node,
+                        &update_node,
+                        QueryDependency::Write(
+                            Arc::clone(relation_field),
+                            DependencyType::ParentId(Box::new(|mut query, parent_id| {
+                                if let WriteQuery::Root(RootWriteQuery::UpdateRecord(ref mut ur)) = query {
+                                    ur.where_ = Some(RecordFinder {
+                                        field: id_field,
+                                        value: parent_id,
+                                    });
+                                }
+
+                                query
+                            })),
+                        ),
+                    );
+
+                    Ok(read_parent_node)
+                }
             })
             .collect::<QueryBuilderResult<Vec<_>>>()
     }

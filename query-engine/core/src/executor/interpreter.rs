@@ -1,9 +1,9 @@
 use super::*;
 use connector::{Identifier, ReadQuery};
+use connector::{Query, ReadQueryResult, ResultContent};
 use im::HashMap;
 use prisma_models::prelude::*;
 use std::convert::TryInto;
-use connector::Query;
 
 pub enum Expression {
     Sequence {
@@ -12,10 +12,12 @@ pub enum Expression {
     Func {
         func: Box<dyn FnOnce(Env) -> Expression>,
     },
-    Write { // possible deprecated
+    Write {
+        // possible deprecated
         write: WriteQuery,
     },
-    Read { // possible deprecated
+    Read {
+        // possible deprecated
         read: ReadQuery,
     },
     Query {
@@ -39,13 +41,26 @@ pub enum ExpressionResult {
 }
 
 impl ExpressionResult {
+    /// Wip impl of transforming results into an ID.
+    /// todos:
+    ///   - Lists are not really handled. Last element wins.
+    ///   - Not all result sets are handled.
     pub fn as_id(&self) -> PrismaValue {
         match self {
             Self::Write(result) => match &result.identifier {
                 Identifier::Id(id) => id.clone().try_into().unwrap(),
                 _ => unimplemented!(),
             },
-            _ => unimplemented!(),
+            Self::Read(res) => match &res.content {
+                ResultContent::RecordSelection(rs) => rs
+                    .scalars
+                    .collect_ids(rs.id_field.as_str())
+                    .unwrap()
+                    .pop()
+                    .unwrap()
+                    .into(),
+                _ => unimplemented!(),
+            },
         }
     }
 }

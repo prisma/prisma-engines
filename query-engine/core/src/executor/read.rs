@@ -1,5 +1,5 @@
 use crate::CoreResult;
-use connector::{self, query_ast::*, result_ast::*, ManagedDatabaseReader, ScalarListValues, QueryArguments};
+use connector::{self, query_ast::*, result_ast::*, ManagedDatabaseReader, QueryArguments, ScalarListValues};
 use prisma_models::{GraphqlId, ScalarField, SelectedFields};
 use std::sync::Arc;
 
@@ -99,6 +99,11 @@ impl ReadQueryExecutor {
     /// Queries related records for a set of parent IDs.
     pub fn read_related(&self, query: RelatedRecordsQuery, parent_ids: &[GraphqlId]) -> CoreResult<ReadQueryResult> {
         let selected_fields = Self::inject_required_fields(query.selected_fields.clone());
+        let parent_ids = match query.parent_ids {
+            Some(ref ids) => ids,
+            None => parent_ids,
+        };
+
         let scalars = self.data_resolver.get_related_records(
             Arc::clone(&query.parent_field),
             parent_ids,
@@ -132,7 +137,9 @@ impl ReadQueryExecutor {
     }
 
     pub fn aggregate(&self, query: AggregateRecordsQuery) -> CoreResult<ReadQueryResult> {
-        let result = self.data_resolver.count_by_model(query.model, QueryArguments::default())?;
+        let result = self
+            .data_resolver
+            .count_by_model(query.model, QueryArguments::default())?;
 
         Ok(ReadQueryResult {
             name: query.name,

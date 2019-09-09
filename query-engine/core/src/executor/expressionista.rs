@@ -1,6 +1,5 @@
 use super::*;
 use crate::QueryGraph;
-use connector::ReadQuery;
 
 pub struct Expressionista;
 
@@ -17,15 +16,15 @@ impl Expressionista {
 
     fn build_expression(graph: &QueryGraph, node: Node, parent_edge: Option<Edge>) -> Expression {
         let child_edges = graph.edges_for(&node, EdgeDirection::Outgoing);
-        let query = graph.remove_node(node);
+        let query = graph.pluck_node(node);
         let exp = Self::query_expression(graph, parent_edge, query);
 
         // Writes before reads
         let (write_edges, read_edges): (Vec<_>, Vec<_>) = child_edges.into_iter().partition(|child_edge| match &*graph
             .edge_content(&child_edge)
         {
-            EdgeContent::Write(_, _) => true,
-            EdgeContent::Read(_) => false,
+            QueryDependency::Write(_, _) => true,
+            QueryDependency::Read(_) => false,
         });
 
         let mut expressions: Vec<_> = write_edges
@@ -58,8 +57,8 @@ impl Expressionista {
             (None, Query::Write(wq)) => Expression::Write { write: wq },
             (None, Query::Read(rq)) => Expression::Read { read: rq },
 
-            (Some(child_edge), Query::Write(wq)) => match graph.remove_edge(child_edge) {
-                EdgeContent::Write(_, EdgeOperation::DependentId(f)) => Expression::Func {
+            (Some(child_edge), Query::Write(wq)) => match graph.pluck_edge(child_edge) {
+                QueryDependency::Write(_, DependencyType::ParentId(f)) => Expression::Func {
                     func: Box::new(|env: Env| {
                         let parent_result = env.get("parent").unwrap();
                         let parent_id = parent_result.as_id();
@@ -68,23 +67,22 @@ impl Expressionista {
                         Expression::Write { write: query }
                     }),
                 },
+
+                QueryDependency::Write(_, DependencyType::ExecutionOrder) => Expression::Write { write: wq },
                 _ => unreachable!(),
             },
 
-            (Some(child_edge), Query::Read(rq)) => match rq {
-                ReadQuery::RecordQuery(_) => match graph.remove_edge(child_edge) {
-                    EdgeContent::Read(EdgeOperation::DependentId(f)) => Expression::Func {
-                        func: Box::new(|env: Env| {
-                            let parent_result = env.get("parent").unwrap();
-                            let parent_id = parent_result.as_id();
-                            let query = f(rq, parent_id);
+            (Some(child_edge), Query::Read(rq)) => match graph.pluck_edge(child_edge) {
+                QueryDependency::Read(DependencyType::ParentId(f)) => Expression::Func {
+                    func: Box::new(|env: Env| {
+                        let parent_result = env.get("parent").unwrap();
+                        let parent_id = parent_result.as_id();
+                        let query = f(rq, parent_id);
 
-                            Expression::Read { read: query }
-                        }),
-                    },
-                    _ => unreachable!(),
+                        Expression::Read { read: query }
+                    }),
                 },
-                _ => unimplemented!(),
+                _ => unreachable!(),
             },
         }
     }

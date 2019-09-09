@@ -111,16 +111,20 @@ pub fn nested_update(
     for value in coerce_vec(value) {
         if relation_field.is_list {
             let mut map: ParsedInputMap = value.try_into()?;
-            let data_arg = map.remove("data").expect("1");
             let where_arg = map.remove("where").expect("2");
             let record_finder = Some(utils::extract_record_finder(where_arg, &model)?);
+
+            // ----------------
+
+            let data_arg = map.remove("data").expect("1");
+
+            // ----------------
 
             let write_args = WriteArguments::from(&model, data_arg.try_into()?, false)?;
             let list_causes_update = !write_args.list.is_empty();
             let mut non_list_args = write_args.non_list;
+
             non_list_args.update_datetimes(Arc::clone(&model), list_causes_update);
-
-
 
             vec.push(NestedUpdateRecord {
                 relation_field: Arc::clone(&relation_field),
@@ -133,6 +137,7 @@ pub fn nested_update(
             let write_args = WriteArguments::from(&model, value.try_into()?, false)?;
             let list_causes_update = !write_args.list.is_empty();
             let mut non_list_args = write_args.non_list;
+
             non_list_args.update_datetimes(Arc::clone(&model), list_causes_update);
 
             vec.push(NestedUpdateRecord {

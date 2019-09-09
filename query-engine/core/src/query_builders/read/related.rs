@@ -39,6 +39,7 @@ impl Builder<ReadQuery> for ReadRelatedRecordsBuilder {
             selected_fields,
             nested,
             selection_order,
+            parent_ids: None,
         }))
     }
 }
