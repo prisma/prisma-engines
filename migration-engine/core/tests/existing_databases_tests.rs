@@ -148,13 +148,30 @@ fn creating_a_scalar_list_field_for_an_existing_table_must_work() {
         let initial_result = infer_and_apply(api, &dm1);
         assert!(!initial_result.has_table("Blog_tags"));
 
-        let result = barrel.execute(|migration| {
+        let mut result = barrel.execute(|migration| {
             migration.create_table("Blog_tags", |t| {
-                t.add_column("nodeId", types::foreign("Blog", "id")); // TODO: barrel does not render this one correctly
+                // TODO: barrel does not render this one correctly
+                // TODO: the column should not be nullable. We just set it nullable because of our current inline relation nullability hack
+                t.add_column("nodeId", types::foreign("Blog", "id").nullable(true));
                 t.add_column("position", types::integer());
                 t.add_column("value", types::text());
             });
         });
+        // hacks for things i can't set in barrel due to limitations
+        for table in &mut result.tables {
+            if table.name == "Blog_tags" {
+                for fk in &mut table.foreign_keys {
+                    if fk.columns == vec!["nodeId".to_string()] {
+                        fk.on_delete_action = ForeignKeyAction::Cascade
+                    }
+                }
+                //                table.primary_key = Some(PrimaryKey {
+                //                    columns: vec!["nodeId".to_string(), "position".to_string()],
+                //                    sequence: None,
+                //                });
+            }
+        }
+
         assert!(result.has_table("Blog_tags"));
 
         let dm2 = r#"
@@ -163,7 +180,14 @@ fn creating_a_scalar_list_field_for_an_existing_table_must_work() {
                 tags String[]
             }
         "#;
-        let final_result = infer_and_apply(api, &dm2);
+        let mut final_result = infer_and_apply(api, &dm2);
+        for table in &mut final_result.tables {
+            if table.name == "Blog_tags" {
+                // can't set that properly up again
+                table.indices = vec![];
+                table.primary_key = None;
+            }
+        }
         assert_eq!(result, final_result);
     });
 }

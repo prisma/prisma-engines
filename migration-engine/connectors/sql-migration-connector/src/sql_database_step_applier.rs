@@ -83,7 +83,7 @@ fn render_raw_sql(step: &SqlMigrationStep, sql_family: SqlFamily, schema_name: &
             let mut lines = Vec::new();
             for column in cloned_columns.clone() {
                 let col_sql = renderer.render_column(&schema_name, &table, &column, false);
-                lines.push(col_sql);
+                lines.push(format!("  {}", col_sql));
             }
             let primary_key_was_already_set_in_column_line = lines.join(",").contains(&"PRIMARY KEY");
 
@@ -93,12 +93,12 @@ fn render_raw_sql(step: &SqlMigrationStep, sql_family: SqlFamily, schema_name: &
                     .into_iter()
                     .map(|col| renderer.quote(&col))
                     .collect();
-                lines.push(format!("PRIMARY KEY ({})", column_names.join(",")))
+                lines.push(format!("  PRIMARY KEY ({})", column_names.join(",")))
             }
             format!(
-                "CREATE TABLE {}({})\n{};",
+                "CREATE TABLE {} (\n{}\n){};",
                 renderer.quote_with_schema(&schema_name, &table.name),
-                lines.join(","),
+                lines.join(",\n"),
                 create_table_suffix(sql_family),
             )
         }
@@ -147,7 +147,7 @@ fn render_raw_sql(step: &SqlMigrationStep, sql_family: SqlFamily, schema_name: &
             format!(
                 "ALTER TABLE {} {};",
                 renderer.quote_with_schema(&schema_name, &table.name),
-                lines.join(",")
+                lines.join(",\n")
             )
         }
         SqlMigrationStep::CreateIndex(CreateIndex { table, index }) => {
@@ -191,6 +191,6 @@ fn create_table_suffix(sql_family: SqlFamily) -> &'static str {
     match sql_family {
         SqlFamily::Sqlite => "",
         SqlFamily::Postgres => "",
-        SqlFamily::Mysql => "DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci",
+        SqlFamily::Mysql => "\nDEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci",
     }
 }
