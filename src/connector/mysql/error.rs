@@ -37,9 +37,9 @@ impl From<my::error::Error> for Error {
                 code,
                 ..
             }) if code == 1049 => {
-                let splitted: Vec<&str> = dbg!(message.split_whitespace().collect());
-                let splitted: Vec<&str> = dbg!(splitted.last().map(|s| s.split('\'').collect()).unwrap());
-                let db_name: String = dbg!(splitted[1]).into();
+                let splitted: Vec<&str> = message.split_whitespace().collect();
+                let splitted: Vec<&str> = splitted.last().map(|s| s.split('\'').collect()).unwrap();
+                let db_name: String = splitted[1].into();
 
                 Error::DatabaseDoesNotExist(db_name)
             }
