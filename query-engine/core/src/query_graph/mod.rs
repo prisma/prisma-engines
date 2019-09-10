@@ -1,78 +1,50 @@
 ///! Query graph abstraction for simple high-level query representation
 ///! and manipulation.
+mod guard;
+
 use connector::*;
+use guard::*;
 use petgraph::{graph::*, visit::EdgeRef, *};
 use prisma_models::{PrismaValue, RelationFieldRef};
 use std::{borrow::Borrow, cell::RefCell, ops::Deref};
 
-/// Implementation detail of the query graph.
-// type InnerGraph = Graph<Query, QueryDependency>;
+/// Implementation detail of the QueryGraph.
 type InnerGraph = Graph<Guard<Query>, Guard<QueryDependency>>;
-
-/// Workaround to keep the graph stable during removals.
-struct Guard<T: Sized> {
-    content: Option<T>,
-}
-
-impl<T> Guard<T> {
-    pub fn new(content: T) -> Self {
-        Guard { content: Some(content) }
-    }
-
-    pub fn unset(&mut self) -> T {
-        let content = std::mem::replace(&mut self.content, None);
-        match content {
-            Some(c) => c,
-            None => panic!("Logic error: Attempted to unset empty graph guard."),
-        }
-    }
-
-    // fn into_inner(self) -> T {
-    //     match self.content {
-    //         Some(c) => c,
-    //         None => panic!("Logic error: Attempted to unwrap empty graph guard.")
-    //     }
-    // }
-}
-
-impl<T> Borrow<T> for Guard<T> {
-    fn borrow(&self) -> &T {
-        match self.content {
-            Some(ref c) => c,
-            None => panic!("Logic error: Attempted to borrow empty graph guard."),
-        }
-    }
-}
 
 #[derive(Default)]
 pub struct QueryGraph {
     graph: RefCell<InnerGraph>,
+
+    /// Designates the node which interpretation result will be returned.
+    /// If no node is set, the interpretation will take the result of the
+    /// last statement derived from the query graph.
+    result_node: RefCell<Option<NodeIndex>>,
 }
 
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Node {
-    pub(self) node_ix: NodeIndex,
+    pub node_ix: NodeIndex,
 }
 
-pub enum EdgeDirection {
-    Outgoing,
-    Incoming,
-}
-
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Edge {
-    pub(self) edge_ix: EdgeIndex,
+    edge_ix: EdgeIndex,
 }
 
-/// Read / Write distinction is only really important for ordering in the interpreter...
-/// we should try to get rid of that.
-/// Another major factor is the RelationFieldRef, which is required in the graph transformation.
+// todo Read / Write distinction is only really important for ordering in the interpreter...we should try to get rid of that.
+// todo Can we get rid of the relation field dependency?
+/// Stored on the edges of the QueryGraph, a QueryDependency contains information on how children behave
+/// relative to their parent during execution, for example requiring additional information from the parent to be able to execute.
 pub enum QueryDependency {
     Write(RelationFieldRef, DependencyType<WriteQuery>),
     Read(DependencyType<ReadQuery>),
 }
 
 pub enum DependencyType<T> {
-    /// Performs a transformation on a query based on the parent ID (PrismaValue)
+    /// Performs a transformation on a query type T based on the parent ID (PrismaValue)
     ParentId(Box<dyn FnOnce(T, PrismaValue) -> T>),
+
+    /// Simple dependency indicating order of execution.
     ExecutionOrder,
 }
 
@@ -80,7 +52,31 @@ impl QueryGraph {
     pub fn new() -> Self {
         Self {
             graph: RefCell::new(InnerGraph::new()),
+            result_node: RefCell::new(None),
         }
+    }
+
+    pub fn set_result_node(&self, node: &Node) {
+        self.result_node.borrow_mut().replace(node.node_ix.clone());
+    }
+
+    pub fn is_result_node(&self, node: &Node) -> bool {
+        match self.result_node.borrow().as_ref() {
+            Some(ix) => ix == &node.node_ix,
+            None => false,
+        }
+    }
+
+    pub fn subgraph_contains_result(&self, node: &Node) -> bool {
+        self.is_result_node(node)
+            || self
+                .outgoing_edges(node)
+                .into_iter()
+                .find(|edge| {
+                    let child_node = self.edge_target(edge);
+                    self.subgraph_contains_result(&child_node)
+                })
+                .is_some()
     }
 
     pub fn root_nodes(&self) -> Vec<Node> {
@@ -134,28 +130,32 @@ impl QueryGraph {
         Node { node_ix }
     }
 
-    pub fn edges_for(&self, node: &Node, direction: EdgeDirection) -> Vec<Edge> {
-        let direction = match direction {
-            EdgeDirection::Outgoing => Direction::Outgoing,
-            EdgeDirection::Incoming => Direction::Incoming,
-        };
-
-        self.graph
+    pub fn outgoing_edges(&self, node: &Node) -> Vec<Edge> {
+        let mut edges = self.graph
             .borrow()
-            .edges_directed(node.node_ix, direction)
+            .edges_directed(node.node_ix, Direction::Outgoing)
             .map(|edge| Edge { edge_ix: edge.id() })
-            .collect()
+            .collect::<Vec<_>>();
+
+        edges.sort();
+        edges
     }
 
+    /// Removes the edge from the graph but leaves the graph itself intact by keeping the empty
+    /// edge in the graph by plucking the content of the edge, but not the node itself.
     pub fn pluck_edge(&self, edge: Edge) -> QueryDependency {
         self.graph.borrow_mut().edge_weight_mut(edge.edge_ix).unwrap().unset()
     }
 
+    /// Removes the node from the graph but leaves the graph itself intact by keeping the empty
+    /// node in the graph by plucking the content of the node, but not the node itself.
     pub fn pluck_node(&self, node: Node) -> Query {
         self.graph.borrow_mut().node_weight_mut(node.node_ix).unwrap().unset()
     }
 
     /// Current way to fix inconsistencies in the graph.
+    // Todo This transformation could be encoded in the WriteQueryBuilder, making it possible to remove the relation field
+    // on the graph edge.
     pub fn transform(self) -> Self {
         let mut graph = self.graph.borrow_mut();
         let candidates: Vec<EdgeIndex> = graph
@@ -202,7 +202,6 @@ impl QueryGraph {
         });
 
         drop(graph);
-
         self
     }
 }

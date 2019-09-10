@@ -11,6 +11,15 @@ pub enum ReadQuery {
     AggregateRecordsQuery(AggregateRecordsQuery),
 }
 
+impl ReadQuery {
+    pub fn inject_record_finder(&mut self, rf: RecordFinder) {
+        match self {
+            Self::RecordQuery(ref mut rq) => rq.record_finder = Some(rf),
+            _ => unimplemented!(),
+        }
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct RecordQuery {
     pub name: String,

@@ -3,7 +3,7 @@ use crate::{CoreError, QueryValidationError};
 
 #[derive(Debug)]
 pub enum QueryExecutionError {
-    InvalidEnv(String),
+    EnvVarNotFound(String),
     InvalidQuery(QueryValidationError),
     Generic(String),
 }

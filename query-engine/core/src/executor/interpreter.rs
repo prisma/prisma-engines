@@ -13,19 +13,17 @@ pub enum Expression {
         func: Box<dyn FnOnce(Env) -> Expression>,
     },
     Write {
-        // possible deprecated
         write: WriteQuery,
     },
     Read {
-        // possible deprecated
         read: ReadQuery,
-    },
-    Query {
-        query: Query,
     },
     Let {
         bindings: Vec<Binding>,
         expressions: Vec<Expression>,
+    },
+    Get {
+        binding_name: String,
     },
 }
 
@@ -74,12 +72,19 @@ impl Env {
     pub fn get(&self, key: &str) -> QueryExecutionResult<&ExpressionResult> {
         match self.env.get(key) {
             Some(env) => Ok(env),
-            None => Err(QueryExecutionError::InvalidEnv(key.to_owned())),
+            None => Err(QueryExecutionError::EnvVarNotFound(key.to_owned())),
         }
     }
 
     pub fn insert(&mut self, key: String, value: ExpressionResult) {
         self.env.insert(key, value);
+    }
+
+    pub fn remove(&mut self, key: &str) -> QueryExecutionResult<ExpressionResult> {
+        match self.env.remove(key) {
+            Some(val) => Ok(val),
+            None => Err(QueryExecutionError::EnvVarNotFound(key.to_owned())),
+        }
     }
 }
 
@@ -125,12 +130,9 @@ impl<'a> QueryInterpreter<'a> {
                 Ok(self.reader.execute(read, &[]).map(|res| ExpressionResult::Read(res))?)
             }
 
-            Expression::Query { query } => {
-                println!("QUERY");
-                match query {
-                    Query::Read(rq) => Ok(self.reader.execute(rq, &[]).map(|res| ExpressionResult::Read(res))?),
-                    Query::Write(wq) => Ok(self.writer.execute(wq).map(|res| ExpressionResult::Write(res))?),
-                }
+            Expression::Get { binding_name } => {
+                println!("GET {}", binding_name);
+                env.clone().remove(&binding_name)
             }
         }
     }

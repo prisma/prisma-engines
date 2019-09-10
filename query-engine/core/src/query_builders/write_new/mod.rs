@@ -4,13 +4,13 @@ pub use write_arguments::*;
 
 use super::*;
 use crate::{
-    ArgumentListLookup, QueryDependency, DependencyType, Node, ParsedField, ParsedInputMap, ParsedInputValue, QueryGraph,
-    ReadOneRecordBuilder,
+    query_graph::{DependencyType, Node, QueryDependency, QueryGraph},
+    ArgumentListLookup, ParsedField, ParsedInputMap, ParsedInputValue, ReadOneRecordBuilder,
 };
 use connector::{
     filter::{Filter, RecordFinder},
     CreateRecord, DeleteManyRecords, DeleteRecord, NestedWriteQueries, Query, QueryArguments, ReadQuery,
-    RelatedRecordsQuery, RootWriteQuery, UpdateRecord, WriteQuery,
+    RelatedRecordsQuery, RootWriteQuery, UpdateManyRecords, UpdateRecord, WriteQuery,
 };
 use prisma_models::{ModelRef, RelationFieldRef};
 use std::{convert::TryInto, sync::Arc};
@@ -38,6 +38,7 @@ impl WriteQueryBuilder {
         let read_query = ReadOneRecordBuilder::new(field, model).build()?;
         let read_node = self.graph.create_node(Query::Read(read_query));
 
+        self.graph.set_result_node(&read_node);
         self.graph.create_edge(
             &create_node,
             &read_node,
@@ -75,6 +76,7 @@ impl WriteQueryBuilder {
         let read_query = ReadOneRecordBuilder::new(field, model).build()?;
         let read_node = self.graph.create_node(Query::Read(read_query));
 
+        self.graph.set_result_node(&read_node);
         self.graph.create_edge(
             &update_node,
             &read_node,
@@ -99,9 +101,22 @@ impl WriteQueryBuilder {
     pub fn delete_record(self, model: ModelRef, mut field: ParsedField) -> QueryBuilderResult<Self> {
         let where_arg = field.arguments.lookup("where").unwrap();
         let record_finder = extract_record_finder(where_arg.value, &model)?;
-        let delete = WriteQuery::Root(RootWriteQuery::DeleteRecord(DeleteRecord { where_: record_finder }));
 
-        self.graph.create_node(Query::Write(delete));
+        // Prefetch read query for the delete
+        let mut read_query = ReadOneRecordBuilder::new(field, model).build()?;
+        read_query.inject_record_finder(record_finder.clone());
+
+        let read_node = self.graph.create_node(Query::Read(read_query));
+        let delete_query = WriteQuery::Root(RootWriteQuery::DeleteRecord(DeleteRecord { where_: record_finder }));
+        let delete_node = self.graph.create_node(Query::Write(delete_query));
+
+        self.graph.set_result_node(&read_node);
+        self.graph.create_edge(
+            &read_node,
+            &delete_node,
+            QueryDependency::Read(DependencyType::ExecutionOrder),
+        );
+
         Ok(self)
     }
 
@@ -118,8 +133,31 @@ impl WriteQueryBuilder {
         Ok(self)
     }
 
+    /// Creates a create record query and adds it to the query graph.
     pub fn update_many_records(self, model: ModelRef, mut field: ParsedField) -> QueryBuilderResult<Self> {
-        unimplemented!()
+        let filter = match field.arguments.lookup("where") {
+            Some(where_arg) => extract_filter(where_arg.value.try_into()?, &model)?,
+            None => Filter::empty(),
+        };
+
+        let data_argument = field.arguments.lookup("data").unwrap();
+        let data_map: ParsedInputMap = data_argument.value.try_into()?;
+        let update_args = WriteArguments::from(&model, data_map)?;
+
+        let list_causes_update = !update_args.list.is_empty();
+        let mut non_list_args = update_args.non_list;
+
+        non_list_args.update_datetimes(Arc::clone(&model), list_causes_update);
+
+        let update_many = WriteQuery::Root(RootWriteQuery::UpdateManyRecords(UpdateManyRecords {
+            model,
+            filter,
+            non_list_args,
+            list_args: update_args.list,
+        }));
+
+        self.graph.create_node(Query::Write(update_many));
+        Ok(self)
     }
 
     pub fn upsert_record(self, model: ModelRef, mut field: ParsedField) -> QueryBuilderResult<Self> {
@@ -229,10 +267,21 @@ impl WriteQueryBuilder {
                                 })))
                             }
 
-                            Query::Write(_) => QueryDependency::Write(Arc::clone(&relation_field), DependencyType::ExecutionOrder),
+                            Query::Write(_) => {
+                                QueryDependency::Write(Arc::clone(&relation_field), DependencyType::ExecutionOrder)
+                            }
                         };
 
                         self.graph.create_edge(parent, &node, edge_content);
+                    })
+                    .collect::<Vec<_>>(),
+
+                "delete" => self
+                    .nested_delete(value, &model, &relation_field)?
+                    .into_iter()
+                    .map(|node| {
+                        //
+                        unimplemented!()
                     })
                     .collect::<Vec<_>>(),
 
@@ -268,7 +317,7 @@ impl WriteQueryBuilder {
 
                     self.update_record_node(Some(record_finder), Arc::clone(model), data_value.try_into()?)
                 } else {
-                    // We don't have a specific record, we need to find it first.
+                    // We don't have a specific record (i.e. finder), we need to find it first.
                     // Build a read query to load the necessary data first.
                     let read_parent_node =
                         self.graph
@@ -308,6 +357,15 @@ impl WriteQueryBuilder {
                 }
             })
             .collect::<QueryBuilderResult<Vec<_>>>()
+    }
+
+    pub fn nested_delete(
+        &self,
+        value: ParsedInputValue,
+        model: &ModelRef,
+        relation_field: &RelationFieldRef,
+    ) -> QueryBuilderResult<Vec<Node>> {
+        unimplemented!()
     }
 
     fn coerce_vec(val: ParsedInputValue) -> Vec<ParsedInputValue> {
