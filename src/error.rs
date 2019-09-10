@@ -5,6 +5,8 @@ use std::io;
 pub enum Error {
     #[fail(display = "Error querying the database: {}", _0)]
     QueryError(FError),
+    #[fail(display = "Database '{}' does not exist.", _0)]
+    DatabaseDoesNotExist(String),
     #[fail(display = "Query returned no data")]
     NotFound,
     #[fail(display = "Unique constraint failed: {}", field_name)]

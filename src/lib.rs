@@ -114,4 +114,7 @@ extern crate log;
 #[macro_use]
 extern crate metrics;
 
+#[macro_use]
+extern crate debug_stub_derive;
+
 pub type Result<T> = std::result::Result<T, error::Error>;

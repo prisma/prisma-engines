@@ -17,7 +17,9 @@ use std::{borrow::Borrow, convert::TryFrom, time::Duration};
 pub(crate) const DEFAULT_SCHEMA: &str = "public";
 
 /// A connector interface for the PostgreSQL database.
+#[derive(DebugStub)]
 pub struct PostgreSql {
+    #[debug_stub = "postgres::Client"]
     client: postgres::Client,
 }
 
@@ -338,5 +340,24 @@ mod tests {
         let row = result_set.first().unwrap();
 
         assert_eq!(Some("\"musti-test\""), row[0].as_str());
+    }
+
+    #[test]
+    fn should_map_nonexisting_database_error() {
+        let mut config = get_config();
+        config.dbname("this_does_not_exist");
+
+        let res = PostgreSql::new(config, None);
+
+        assert!(res.is_err());
+
+        match res.unwrap_err() {
+            Error::DatabaseDoesNotExist(e) => assert_eq!(
+                String::from("this_does_not_exist"),
+                e,
+            ),
+            e => panic!("Expected `DatabaseDoesNotExist`, got {:?}", e)
+
+        }
     }
 }

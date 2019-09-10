@@ -32,6 +32,17 @@ impl From<my::error::Error> for Error {
 
                 Error::NullConstraintViolation { field_name }
             }
+            my::error::Error::MySqlError(MySqlError {
+                ref message,
+                code,
+                ..
+            }) if code == 1049 => {
+                let splitted: Vec<&str> = dbg!(message.split_whitespace().collect());
+                let splitted: Vec<&str> = dbg!(splitted.last().map(|s| s.split('\'').collect()).unwrap());
+                let db_name: String = dbg!(splitted[1]).into();
+
+                Error::DatabaseDoesNotExist(db_name)
+            }
             e => Error::QueryError(e.into()),
         }
     }

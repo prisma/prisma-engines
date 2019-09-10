@@ -14,6 +14,7 @@ use crate::{
 };
 
 /// A connector interface for the MySQL database.
+#[derive(Debug)]
 pub struct Mysql {
     pub(crate) client: my::Conn,
 }
@@ -275,5 +276,24 @@ VALUES (1, 'Joe', 27, 20000.00 );
         assert_eq!(row["name"].as_str(), Some("Joe"));
         assert_eq!(row["age"].as_i64(), Some(27));
         assert_eq!(row["salary"].as_f64(), Some(20000.0));
+    }
+
+    #[test]
+    fn should_map_nonexisting_database_error() {
+        let mut config = get_config();
+        config.db_name(Some("this_does_not_exist"));
+
+        let res = Mysql::new(config);
+
+        assert!(res.is_err());
+
+        match res.unwrap_err() {
+            Error::DatabaseDoesNotExist(e) => assert_eq!(
+                String::from("this_does_not_exist"),
+                e,
+            ),
+            e => panic!("Expected `DatabaseDoesNotExist`, got {:?}", e)
+
+        }
     }
 }

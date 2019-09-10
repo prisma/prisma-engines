@@ -29,6 +29,17 @@ impl From<tokio_postgres::error::Error> for Error {
 
                 Error::NullConstraintViolation { field_name }
             }
+            Some("3D000") => {
+                let error = e.into_source().unwrap(); // boom
+                let db_error = error.downcast_ref::<DbError>().unwrap(); // BOOM
+                let message = db_error.message();
+
+                let splitted: Vec<&str> = message.split_whitespace().collect();
+                let splitted: Vec<&str> = splitted[1].split('"').collect();
+                let field_name = splitted[1].into();
+
+                Error::DatabaseDoesNotExist(field_name)
+            }
             _ => Error::QueryError(e.into()),
         }
     }
