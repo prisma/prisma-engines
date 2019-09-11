@@ -5,7 +5,7 @@ use prisma_models::*;
 
 use crate::query_builder::write::NestedActions;
 use crate::query_builder::WriteQueryBuilder;
-use crate::transactional::create;
+use crate::transactional;
 use crate::SqlError;
 
 pub struct ConnectorTransaction<'a> {
@@ -26,7 +26,28 @@ impl MaybeTransaction for ConnectorTransaction<'_> {}
 impl ReadOperations for ConnectorTransaction<'_> {}
 impl WriteOperations for ConnectorTransaction<'_> {
     fn create_record(&mut self, model: ModelRef, args: WriteArgs) -> connector_interface::Result<GraphqlId> {
-        let result = create::execute(&mut self.inner, model, args.non_list_args(), args.list_args())?;
+        let result = transactional::create::execute(&mut self.inner, model, args.non_list_args(), args.list_args())?;
+        Ok(result)
+    }
+
+    fn update_records(
+        &mut self,
+        model: ModelRef,
+        where_: Filter,
+        args: WriteArgs,
+    ) -> connector_interface::Result<usize> {
+        let result = transactional::update_many::execute(
+            &mut self.inner,
+            model,
+            &where_,
+            args.non_list_args(),
+            args.list_args(),
+        )?;
+        Ok(result)
+    }
+
+    fn delete_records(&mut self, model: ModelRef, where_: Filter) -> connector_interface::Result<usize> {
+        let result = transactional::delete_many::execute(&mut self.inner, model, &where_)?;
         Ok(result)
     }
 

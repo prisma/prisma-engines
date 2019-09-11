@@ -1,10 +1,10 @@
 pub mod create;
 mod delete;
-mod delete_many;
+pub mod delete_many;
 mod nested;
 mod relation;
 mod update;
-mod update_many;
+pub mod update_many;
 
 use crate::{
     database::{SqlCapabilities, SqlDatabase},

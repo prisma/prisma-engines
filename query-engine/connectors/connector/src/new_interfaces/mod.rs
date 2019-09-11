@@ -1,3 +1,4 @@
+use crate::Filter;
 use prisma_models::*;
 
 pub trait Connector {
@@ -36,6 +37,12 @@ pub trait MaybeTransaction: ReadOperations + WriteOperations {}
 pub trait ReadOperations {}
 pub trait WriteOperations {
     fn create_record(&mut self, model: ModelRef, args: WriteArgs) -> crate::Result<GraphqlId>;
+
+    fn update_records(&mut self, model: ModelRef, where_: Filter, args: WriteArgs) -> crate::Result<usize>;
+
+    fn delete_records(&mut self, model: ModelRef, where_: Filter) -> crate::Result<usize>;
+
+    // We plan to remove the methods below in the future. We want emulate them with the ones above. Those should suffice.
 
     fn connect(&mut self, field: RelationFieldRef, parent_id: &GraphqlId, child_id: &GraphqlId) -> crate::Result<()>;
 
