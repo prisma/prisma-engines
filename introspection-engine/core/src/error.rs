@@ -24,3 +24,13 @@ impl From<introspection_connector::ConnectorError> for CoreError {
         CoreError::ConnectorError(e.into())
     }
 }
+
+impl From<CoreError> for jsonrpc_core::types::error::Error {
+    fn from(e: CoreError) -> Self {
+        jsonrpc_core::types::error::Error {
+            code: jsonrpc_core::ErrorCode::ServerError(1000),
+            message: format!("CoreError: {}", e),
+            data: None,
+        }
+    }
+}
