@@ -5,8 +5,12 @@ use std::io;
 pub enum Error {
     #[fail(display = "Error querying the database: {}", _0)]
     QueryError(FError),
-    #[fail(display = "Database '{}' does not exist.", _0)]
-    DatabaseDoesNotExist(String),
+    #[fail(display = "Database '{}' does not exist.", db_name)]
+    DatabaseDoesNotExist { db_name: String },
+    #[fail(display = "Access denied to database '{}'", db_name)]
+    DatabaseAccessDenied { db_name: String },
+    #[fail(display = "Authentication failed for user '{}'", user)]
+    AuthenticationFailed { user: String },
     #[fail(display = "Query returned no data")]
     NotFound,
     #[fail(display = "Unique constraint failed: {}", field_name)]
@@ -33,7 +37,7 @@ pub enum Error {
     #[fail(display = "The provided arguments are not supported.")]
     InvalidConnectionArguments,
     #[fail(display = "Error in an I/O operation")]
-    IoError(FError)
+    IoError(FError),
 }
 
 #[cfg(any(
@@ -52,7 +56,6 @@ impl From<url::ParseError> for Error {
         Error::DatabaseUrlIsInvalid("Error parsing database connection string.".to_string())
     }
 }
-
 
 impl From<io::Error> for Error {
     fn from(e: io::Error) -> Error {

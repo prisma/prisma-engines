@@ -1,6 +1,6 @@
 use super::PrismaConnectionManager;
 use crate::{
-    connector::{PostgreSql, PostgresParams, Queryable, DEFAULT_SCHEMA, metrics},
+    connector::{metrics, PostgreSql, PostgresParams, Queryable, DEFAULT_SCHEMA},
     error::Error,
 };
 use failure::{Compat, Fail};
@@ -28,7 +28,8 @@ impl TryFrom<PostgresParams> for r2d2::Pool<PrismaConnectionManager<PostgresMana
     type Error = Error;
 
     fn try_from(params: PostgresParams) -> crate::Result<Self> {
-        let manager = PrismaConnectionManager::postgres(params.config, Some(params.schema)).unwrap();
+        let manager =
+            PrismaConnectionManager::postgres(params.config, Some(params.schema)).unwrap();
 
         let pool = r2d2::Pool::builder()
             .max_size(params.connection_limit)

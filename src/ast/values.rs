@@ -86,9 +86,11 @@ impl<'a> From<ParameterizedValue<'a>> for Value {
             ParameterizedValue::Boolean(b) => Value::Bool(b),
             ParameterizedValue::Char(c) => {
                 let bytes = [c as u8];
-                let s = std::str::from_utf8(&bytes).expect("interpret byte as UTF-8").to_string();
+                let s = std::str::from_utf8(&bytes)
+                    .expect("interpret byte as UTF-8")
+                    .to_string();
                 Value::String(s)
-            },
+            }
             ParameterizedValue::Json(v) => v,
             #[cfg(feature = "array")]
             ParameterizedValue::Array(v) => Value::Array(v.into_iter().map(Value::from).collect()),

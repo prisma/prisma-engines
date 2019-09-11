@@ -1,6 +1,6 @@
 use super::PrismaConnectionManager;
 use crate::{
-    connector::{Mysql, MysqlParams, Queryable, metrics},
+    connector::{metrics, Mysql, MysqlParams, Queryable},
     error::Error,
 };
 use failure::{Compat, Fail};

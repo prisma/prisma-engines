@@ -3,16 +3,16 @@ mod error;
 
 use crate::{
     ast::{Id, ParameterizedValue, Query},
-    connector::{queryable::*, ResultSet, Transaction, metrics},
-    visitor::{self, Visitor},
+    connector::{metrics, queryable::*, ResultSet, Transaction},
     error::Error,
+    visitor::{self, Visitor},
 };
 use native_tls::TlsConnector;
-use tokio_postgres_native_tls::MakeTlsConnector;
-use url::Url;
-use tokio_postgres::config::SslMode;
 use percent_encoding::percent_decode;
 use std::{borrow::Borrow, convert::TryFrom, time::Duration};
+use tokio_postgres::config::SslMode;
+use tokio_postgres_native_tls::MakeTlsConnector;
+use url::Url;
 
 pub(crate) const DEFAULT_SCHEMA: &str = "public";
 
@@ -57,18 +57,21 @@ impl TryFrom<Url> for PostgresParams {
         match percent_decode(url.username().as_bytes()).decode_utf8() {
             Ok(username) => {
                 config.user(username.borrow());
-            },
+            }
             Err(_) => {
                 warn!("Couldn't decode username to UTF-8, using the non-decoded version.");
                 config.user(url.username());
             }
         }
 
-        match url.password().and_then(|pw| percent_decode(pw.as_bytes()).decode_utf8().ok()) {
+        match url
+            .password()
+            .and_then(|pw| percent_decode(pw.as_bytes()).decode_utf8().ok())
+        {
             Some(password) => {
                 let pw: &str = password.borrow();
                 config.password(pw);
-            },
+            }
             None => {
                 config.password(url.password().unwrap_or(""));
             }
@@ -78,12 +81,8 @@ impl TryFrom<Url> for PostgresParams {
         config.port(url.port().unwrap_or(5432));
 
         let dbname = match url.path_segments() {
-            Some(mut segments) => {
-                segments.next().unwrap_or("postgres")
-            },
-            None => {
-                "postgres"
-            },
+            Some(mut segments) => segments.next().unwrap_or("postgres"),
+            None => "postgres",
         };
 
         config.dbname(dbname);
@@ -352,12 +351,36 @@ mod tests {
         assert!(res.is_err());
 
         match res.unwrap_err() {
-            Error::DatabaseDoesNotExist(e) => assert_eq!(
-                String::from("this_does_not_exist"),
-                e,
-            ),
-            e => panic!("Expected `DatabaseDoesNotExist`, got {:?}", e)
-
+            Error::DatabaseDoesNotExist { db_name } => assert_eq!("this_does_not_exist", db_name.as_str()),
+            e => panic!("Expected `DatabaseDoesNotExist`, got {:?}", e),
         }
+    }
+
+    #[test]
+    fn should_map_authentication_failed_error() {
+        let mut admin = PostgreSql::new(get_config(), None).unwrap();
+        admin
+            .execute_raw("CREATE USER should_map_access_denied_test with password 'password'", &[])
+            .unwrap();
+
+        let res = std::panic::catch_unwind(|| {
+            let mut config = get_config();
+            config.user("should_map_access_denied_test");
+            config.password("catword");
+
+            let conn = PostgreSql::new(config, None);
+
+            assert!(conn.is_err());
+
+            match conn.unwrap_err() {
+                Error::AuthenticationFailed { user } => assert_eq!("should_map_access_denied_test", user.as_str()),
+                e => panic!("Expected `AuthenticationFailed`, got {:?}", e),
+            }
+        });
+
+        admin
+            .execute_raw("DROP USER should_map_access_denied_test", &[])
+            .unwrap();
+        res.unwrap();
     }
 }

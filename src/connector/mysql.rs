@@ -2,14 +2,14 @@ mod conversion;
 mod error;
 
 use mysql as my;
-use url::Url;
 use percent_encoding::percent_decode;
 use std::{convert::TryFrom, time::Duration};
+use url::Url;
 
 use crate::{
     ast::{Id, ParameterizedValue, Query},
+    connector::{metrics, queryable::*, ResultSet, Transaction},
     error::Error,
-    connector::{queryable::*, ResultSet, Transaction, metrics},
     visitor::{self, Visitor},
 };
 
@@ -51,17 +51,20 @@ impl TryFrom<Url> for MysqlParams {
         match percent_decode(url.username().as_bytes()).decode_utf8() {
             Ok(username) => {
                 config.user(Some(username.into_owned()));
-            },
+            }
             Err(_) => {
                 warn!("Couldn't decode username to UTF-8, using the non-decoded version.");
                 config.user(Some(url.username()));
             }
         }
 
-        match url.password().and_then(|pw| percent_decode(pw.as_bytes()).decode_utf8().ok()) {
+        match url
+            .password()
+            .and_then(|pw| percent_decode(pw.as_bytes()).decode_utf8().ok())
+        {
             Some(password) => {
                 config.pass(Some(password));
-            },
+            }
             None => {
                 config.pass(url.password());
             }
@@ -74,12 +77,8 @@ impl TryFrom<Url> for MysqlParams {
         config.tcp_connect_timeout(Some(Duration::from_millis(5000)));
 
         let dbname = match url.path_segments() {
-            Some(mut segments) => {
-                segments.next().unwrap_or("mysql")
-            },
-            None => {
-                "mysql"
-            },
+            Some(mut segments) => segments.next().unwrap_or("mysql"),
+            None => "mysql",
         };
 
         config.db_name(Some(dbname));
@@ -288,12 +287,66 @@ VALUES (1, 'Joe', 27, 20000.00 );
         assert!(res.is_err());
 
         match res.unwrap_err() {
-            Error::DatabaseDoesNotExist(e) => assert_eq!(
-                String::from("this_does_not_exist"),
-                e,
-            ),
-            e => panic!("Expected `DatabaseDoesNotExist`, got {:?}", e)
-
+            Error::DatabaseDoesNotExist { db_name } => assert_eq!("this_does_not_exist", db_name.as_str()),
+            e => panic!("Expected `DatabaseDoesNotExist`, got {:?}", e),
         }
+    }
+
+    #[test]
+    fn should_map_access_denied_error() {
+        let mut admin = Mysql::new(get_config()).unwrap();
+        admin
+            .execute_raw("CREATE USER should_map_access_denied_test", &[])
+            .unwrap();
+
+        let mut config = get_config();
+        config.user(Some("should_map_access_denied_test"));
+        config.pass::<&str>(None);
+        config.db_name(Some("mysql"));
+
+        let res = std::panic::catch_unwind(|| {
+            let conn = Mysql::new(config);
+
+            assert!(conn.is_err());
+
+            match conn.unwrap_err() {
+                Error::DatabaseAccessDenied { db_name } => assert_eq!("mysql", db_name.as_str(),),
+                e => panic!("Expected `AccessDenied`, got {:?}", e),
+            }
+        });
+
+        admin
+            .execute_raw("DROP USER should_map_access_denied_test", &[])
+            .unwrap();
+        res.unwrap();
+    }
+
+    #[test]
+    fn should_map_authentication_failed_error() {
+        let mut admin = Mysql::new(get_config()).unwrap();
+        admin
+            .execute_raw("CREATE USER authentication_failed", &[])
+
+            .unwrap();
+
+        let res = std::panic::catch_unwind(|| {
+            let mut config = get_config();
+            config.user(Some("authentication_failed"));
+            config.pass(Some("catword"));
+
+            let conn = Mysql::new(config);
+
+            assert!(conn.is_err());
+
+            match conn.unwrap_err() {
+                Error::AuthenticationFailed { user } => assert_eq!("authentication_failed", user.as_str()),
+                e => panic!("Expected `AuthenticationFailed`, got {:?}", e),
+            }
+        });
+
+        admin
+            .execute_raw("DROP USER authentication_failed", &[])
+            .unwrap();
+        res.unwrap();
     }
 }

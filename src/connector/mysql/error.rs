@@ -7,9 +7,7 @@ impl From<my::error::Error> for Error {
 
         match e {
             my::error::Error::MySqlError(MySqlError {
-                ref message,
-                code,
-                ..
+                ref message, code, ..
             }) if code == 1062 => {
                 let splitted: Vec<&str> = message.split_whitespace().collect();
                 let splitted: Vec<&str> = splitted.last().map(|s| s.split('\'').collect()).unwrap();
@@ -20,9 +18,7 @@ impl From<my::error::Error> for Error {
                 Error::UniqueConstraintViolation { field_name }
             }
             my::error::Error::MySqlError(MySqlError {
-                ref message,
-                code,
-                ..
+                ref message, code, ..
             }) if code == 1263 => {
                 let splitted: Vec<&str> = message.split_whitespace().collect();
                 let splitted: Vec<&str> = splitted.last().map(|s| s.split('\'').collect()).unwrap();
@@ -33,15 +29,32 @@ impl From<my::error::Error> for Error {
                 Error::NullConstraintViolation { field_name }
             }
             my::error::Error::MySqlError(MySqlError {
-                ref message,
-                code,
-                ..
+                ref message, code, ..
             }) if code == 1049 => {
                 let splitted: Vec<&str> = message.split_whitespace().collect();
                 let splitted: Vec<&str> = splitted.last().map(|s| s.split('\'').collect()).unwrap();
                 let db_name: String = splitted[1].into();
 
-                Error::DatabaseDoesNotExist(db_name)
+                Error::DatabaseDoesNotExist { db_name }
+            }
+            my::error::Error::MySqlError(MySqlError {
+                ref message, code, ..
+            }) if code == 1044 => {
+                let splitted: Vec<&str> = message.split_whitespace().collect();
+                let splitted: Vec<&str> = splitted.last().map(|s| s.split('\'').collect()).unwrap();
+                let db_name: String = splitted[1].into();
+
+                Error::DatabaseAccessDenied { db_name }
+            }
+            my::error::Error::MySqlError(MySqlError {
+                ref message, code, ..
+            }) if code == 1045 => {
+                let splitted: Vec<&str> = message.split_whitespace().collect();
+                let splitted: Vec<&str> = splitted[4].split('@').collect();
+                let splitted: Vec<&str> = splitted[0].split("'").collect();
+                let user: String = splitted[1].into();
+
+                Error::AuthenticationFailed { user }
             }
             e => Error::QueryError(e.into()),
         }

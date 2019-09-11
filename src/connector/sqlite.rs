@@ -3,7 +3,7 @@ mod error;
 
 use crate::{
     ast::{Id, ParameterizedValue, Query},
-    connector::{queryable::*, ResultSet, Transaction, metrics},
+    connector::{metrics, queryable::*, ResultSet, Transaction},
     error::Error,
     visitor::{self, Visitor},
 };

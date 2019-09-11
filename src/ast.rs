@@ -45,5 +45,5 @@ pub use select::Select;
 pub use table::*;
 pub use union_all::UnionAll;
 pub use update::*;
-pub use values::{asterisk, DatabaseValue, ParameterizedValue};
 pub(crate) use values::Params;
+pub use values::{asterisk, DatabaseValue, ParameterizedValue};

@@ -1,6 +1,6 @@
 use super::PrismaConnectionManager;
 use crate::{
-    connector::{Queryable, Sqlite, SqliteParams, metrics},
+    connector::{metrics, Queryable, Sqlite, SqliteParams},
     error::Error,
 };
 use failure::{Compat, Fail};

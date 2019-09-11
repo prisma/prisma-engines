@@ -192,9 +192,7 @@ impl ToRow for PostgresRow {
                     Some(val) => {
                         let val: Vec<bool> = val;
                         ParameterizedValue::Array(
-                            val.into_iter()
-                                .map(ParameterizedValue::Boolean)
-                                .collect(),
+                            val.into_iter().map(ParameterizedValue::Boolean).collect(),
                         )
                     }
                     None => ParameterizedValue::Null,

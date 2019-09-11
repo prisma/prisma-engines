@@ -51,7 +51,8 @@ impl ToRow for my::Row {
                         .unwrap();
 
                     let duration = time.to_std().unwrap();
-                    let f_time = duration.as_secs() as f64 + f64::from(duration.subsec_micros()) * 1e-6;
+                    let f_time =
+                        duration.as_secs() as f64 + f64::from(duration.subsec_micros()) * 1e-6;
 
                     ParameterizedValue::Real(if *is_neg { -f_time } else { f_time })
                 }
