@@ -1,27 +1,20 @@
+mod connector_loader;
 mod error;
+mod rpc;
 
 use error::*;
-use introspection_connector::IntrospectionConnector;
-use sql_introspection_connector::SqlIntrospectionConnector;
-use std::io;
+use rpc::{Rpc, RpcImpl};
+
+use jsonrpc_core::*;
+use jsonrpc_stdio_server::ServerBuilder;
+
+#[macro_use]
+extern crate serde_derive;
 
 fn main() {
-    let mut input = String::new();
-    io::stdin()
-        .read_line(&mut input)
-        .expect("Reading datasource url from stdin failed");
+    let mut io_handler = IoHandler::new();
+    io_handler.extend_with(RpcImpl {}.to_delegate());
 
-    let data_source_url = input.trim_end_matches('\n'); // read_line appends a line break
-
-    doit(&data_source_url).expect("Introspection Failed");
-}
-
-fn doit(url: &str) -> CoreResult<()> {
-    // FIXME: parse URL correctly via a to be built lib and pass database param;
-    let data_model = load_connector(&url)?.introspect("")?;
-    Ok(datamodel::render_to(&mut std::io::stdout().lock(), &data_model).unwrap())
-}
-
-fn load_connector(url_str: &str) -> CoreResult<Box<dyn IntrospectionConnector>> {
-    Ok(Box::new(SqlIntrospectionConnector::new(&url_str)?))
+    let server = ServerBuilder::new(io_handler);
+    server.build();
 }

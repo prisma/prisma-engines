@@ -196,11 +196,17 @@ pub fn render_ast_to(stream: &mut dyn std::io::Write, datamodel: &ast::Datamodel
     renderer.render(datamodel);
 }
 
-/// Renders a datamodel to a stream as datamodel string.
+/// Renders a datamodel to a stream as datamodel string into the stream.
 pub fn render_to(stream: &mut dyn std::io::Write, datamodel: &dml::Datamodel) -> Result<(), errors::ErrorCollection> {
     let lowered = dml::validator::LowerDmlToAst::new().lower(datamodel)?;
     render_ast_to(stream, &lowered, 2);
     Ok(())
+}
+
+pub fn render_to_string(datamodel: &dml::Datamodel) -> Result<String, errors::ErrorCollection> {
+    let mut writable_string = common::WritableString::new();
+    render_to(&mut writable_string, datamodel)?;
+    Ok(writable_string.into())
 }
 
 /// Renders a datamodel and sources to a stream as datamodel string.
