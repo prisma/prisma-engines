@@ -54,11 +54,11 @@ impl Connector for PostgreSql {
     {
         let mut conn = self.pool.get().map_err(SqlError::from)?;
         let tx = conn.start_transaction().map_err(SqlError::from)?;
-        let mut connector_transaction = ConnectorTransaction { inner: tx };
+        let mut connector_transaction = ConnectorTransaction::new(tx);
         let result = f(&mut connector_transaction);
 
         if result.is_ok() {
-            connector_transaction.inner.commit().map_err(SqlError::from)?;
+            connector_transaction.commit()?;
         }
 
         result

@@ -5,14 +5,25 @@ use prisma_models::*;
 
 use crate::query_builder::write::NestedActions;
 use crate::query_builder::WriteQueryBuilder;
+use crate::SqlError;
 
 pub struct ConnectorTransaction<'a> {
-    pub inner: prisma_query::connector::Transaction<'a>,
+    inner: prisma_query::connector::Transaction<'a>,
 }
-impl connector_interface::MaybeTransaction for ConnectorTransaction<'_> {}
+impl<'a> ConnectorTransaction<'a> {
+    pub fn new(tx: prisma_query::connector::Transaction) -> ConnectorTransaction {
+        ConnectorTransaction { inner: tx }
+    }
 
-impl connector_interface::ReadOperations for ConnectorTransaction<'_> {}
-impl connector_interface::WriteOperations for ConnectorTransaction<'_> {
+    pub fn commit(self) -> crate::Result<()> {
+        Ok(self.inner.commit().map_err(SqlError::from)?)
+    }
+}
+
+impl MaybeTransaction for ConnectorTransaction<'_> {}
+
+impl ReadOperations for ConnectorTransaction<'_> {}
+impl WriteOperations for ConnectorTransaction<'_> {
     fn connect(
         &mut self,
         field: RelationFieldRef,
