@@ -2,6 +2,7 @@
 
 use crate::{filter::RecordFinder, QueryArguments};
 use prisma_models::prelude::*;
+use std::fmt::Display;
 
 #[derive(Debug, Clone)]
 pub enum ReadQuery {
@@ -16,6 +17,17 @@ impl ReadQuery {
         match self {
             Self::RecordQuery(ref mut rq) => rq.record_finder = Some(rf),
             _ => unimplemented!(),
+        }
+    }
+}
+
+impl Display for ReadQuery {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match self {
+            Self::RecordQuery(q) => write!(f, "RecordQuery: {}", q.name),
+            Self::ManyRecordsQuery(q) => write!(f, "ManyRecordsQuery: {}", q.name),
+            Self::RelatedRecordsQuery(q) => write!(f, "RelatedRecordsQuery: {}", q.name),
+            Self::AggregateRecordsQuery(q) => write!(f, "AggregateRecordsQuery: {}", q.name),
         }
     }
 }

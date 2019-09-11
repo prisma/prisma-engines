@@ -36,7 +36,7 @@ struct QueryPipeline<'a> {
 impl<'a> QueryPipeline<'a> {
     pub fn new(graph: QueryGraph, interpreter: QueryInterpreter<'a>, serializer: IrSerializer) -> Self {
         Self {
-            graph: graph.transform(),
+            graph,
             interpreter,
             serializer,
         }
@@ -44,7 +44,12 @@ impl<'a> QueryPipeline<'a> {
 
     pub fn execute(self) -> QueryExecutionResult<Response> {
         let serializer = self.serializer;
+
+        println!("{}", self.graph);
+
         let exp = Expressionista::translate(self.graph);
+
+        println!("{}", exp.to_string(0));
 
         self.interpreter
             .interpret(exp, Env::default())

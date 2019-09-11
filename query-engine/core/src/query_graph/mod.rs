@@ -5,8 +5,8 @@ mod guard;
 use connector::*;
 use guard::*;
 use petgraph::{graph::*, visit::EdgeRef, *};
-use prisma_models::{PrismaValue, RelationFieldRef};
-use std::{borrow::Borrow, cell::RefCell, ops::Deref};
+use prisma_models::PrismaValue;
+use std::{borrow::Borrow, collections::VecDeque};
 
 /// Implementation detail of the QueryGraph.
 type InnerGraph = Graph<Guard<Query>, Guard<QueryDependency>>;
@@ -21,9 +21,22 @@ pub struct QueryGraph {
     result_node: Option<NodeIndex>,
 }
 
+impl std::fmt::Display for QueryGraph {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "{}", self.stringify())
+    }
+}
+
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Node {
     pub node_ix: NodeIndex,
+}
+
+impl Node {
+    /// Returns a unique node identifier.
+    pub fn id(&self) -> String {
+        self.node_ix.index().to_string()
+    }
 }
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
@@ -31,27 +44,30 @@ pub struct Edge {
     edge_ix: EdgeIndex,
 }
 
-// todo Read / Write distinction is only really important for ordering in the interpreter...we should try to get rid of that.
-// todo Can we get rid of the relation field dependency?
-/// Stored on the edges of the QueryGraph, a QueryDependency contains information on how children behave
-/// relative to their parent during execution, for example requiring additional information from the parent to be able to execute.
+/// Stored on the edges of the QueryGraph, a QueryDependency contains information on how children are connected to their parents,
+/// expressing for example the need for additional information from the parent to be able to execute at runtime.
 pub enum QueryDependency {
-    Write(RelationFieldRef, DependencyType<WriteQuery>),
-    Read(DependencyType<ReadQuery>),
-}
-
-pub enum DependencyType<T> {
-    /// Simple dependency indicating order of execution.
+    /// Simple dependency indicating order of execution. Effectively a NOOP for now.
     ExecutionOrder,
 
     /// Performs a transformation on a query type T based on the parent ID (PrismaValue)
-    ParentId(Box<dyn FnOnce(T, PrismaValue) -> T>),
+    ParentId(Box<dyn FnOnce(Query, PrismaValue) -> Query>),
 
     /// Expresses a conditional dependency that decides whether or not the child node
     /// is included in the execution.
     /// Currently, the evaluation function receives the parent ID as PrismaValue if it exists,
     /// None otherwise.
     Conditional(Box<dyn FnOnce(Option<PrismaValue>) -> bool>),
+}
+
+impl std::fmt::Display for QueryDependency {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match self {
+            Self::ExecutionOrder => write!(f, "ExecutionOrder"),
+            Self::ParentId(_) => write!(f, "ParentId"),
+            Self::Conditional(_) => write!(f, "Conditional"),
+        }
+    }
 }
 
 impl QueryGraph {
@@ -111,9 +127,7 @@ impl QueryGraph {
     }
 
     pub fn create_edge(&mut self, from: &Node, to: &Node, content: QueryDependency) -> Edge {
-        let edge_ix = self
-            .graph
-            .add_edge(from.node_ix, to.node_ix, Guard::new(content));
+        let edge_ix = self.graph.add_edge(from.node_ix, to.node_ix, Guard::new(content));
 
         Edge { edge_ix }
     }
@@ -141,14 +155,11 @@ impl QueryGraph {
     }
 
     pub fn outgoing_edges(&self, node: &Node) -> Vec<Edge> {
-        let mut edges = self
-            .graph
-            .edges_directed(node.node_ix, Direction::Outgoing)
-            .map(|edge| Edge { edge_ix: edge.id() })
-            .collect::<Vec<_>>();
+        self.collect_edges(node, Direction::Outgoing)
+    }
 
-        edges.sort();
-        edges
+    pub fn incoming_edges(&self, node: &Node) -> Vec<Edge> {
+        self.collect_edges(node, Direction::Incoming)
     }
 
     /// Removes the edge from the graph but leaves the graph intact by keeping the empty
@@ -163,54 +174,57 @@ impl QueryGraph {
         self.graph.node_weight_mut(node.node_ix).unwrap().unset()
     }
 
-    /// Current way to fix inconsistencies in the graph.
-    // Todo This transformation could be encoded in the WriteQueryBuilder, making it possible to remove the relation field
-    // on the graph edge.
-    pub fn transform(mut self) -> Self {
-        let graph = &mut self.graph;
-        let candidates: Vec<EdgeIndex> = graph
-            .raw_edges()
-            .into_iter()
-            .filter_map(|edge| {
-                let parent = graph.node_weight(edge.source()).unwrap().borrow().unwrap();
-                let child = graph.node_weight(edge.target()).unwrap().borrow().unwrap();
-                let edge_index = graph.find_edge(edge.source(), edge.target()).unwrap();
+    /// Completely removes the edge from the graph, returning it's content.
+    pub fn remove_edge(&mut self, edge: Edge) -> Option<QueryDependency> {
+        self.graph.remove_edge(edge.edge_ix).unwrap().into_inner()
+    }
 
-                match (parent, child) {
-                    (
-                        Query::Write(WriteQuery::Root(RootWriteQuery::CreateRecord(_))),
-                        Query::Write(WriteQuery::Root(RootWriteQuery::CreateRecord(_))),
-                    ) => {
-                        let relation_field: &RelationFieldRef = match edge.weight.borrow().unwrap() {
-                            QueryDependency::Write(ref rf, _) => rf,
-                            _ => unreachable!(),
-                        };
+    fn collect_edges(&self, node: &Node, direction: Direction) -> Vec<Edge> {
+        let mut edges = self
+            .graph
+            .edges_directed(node.node_ix, direction)
+            .map(|edge| Edge { edge_ix: edge.id() })
+            .collect::<Vec<_>>();
 
-                        if relation_field.relation_is_inlined_in_parent() {
-                            Some(edge_index)
-                        } else {
-                            None
-                        }
-                    }
-                    _ => None,
-                }
-            })
-            .collect();
+        edges.sort();
+        edges
+    }
 
-        candidates.into_iter().for_each(|edge_index| {
-            let (parent, child) = graph.edge_endpoints(edge_index).unwrap();
-            let edge = graph.remove_edge(edge_index).unwrap().unset();
+    fn stringify(&self) -> String {
+        self.stringify_nodes(self.root_nodes()).join("\n\n")
+    }
 
-            // Warning: This assumes that the DependencyType is also flippable.
-            if let QueryDependency::Write(rf, op) = edge {
-                graph.add_edge(
-                    child,
-                    parent,
-                    Guard::new(QueryDependency::Write(rf.related_field(), op)),
-                );
-            }
-        });
+    fn stringify_nodes(&self, nodes: Vec<Node>) -> VecDeque<String> {
+        let mut rendered_nodes = VecDeque::new();
 
-        self
+        for node in nodes {
+            let mut node_child_info = vec![];
+
+            let children: Vec<Node> = self
+                .outgoing_edges(&node)
+                .iter()
+                .map(|child_edge| {
+                    let child_node = self.edge_target(child_edge);
+                    node_child_info.push(format!(
+                        "{}: {}",
+                        child_node.id(),
+                        self.edge_content(child_edge).unwrap()
+                    ));
+
+                    child_node
+                })
+                .collect();
+
+            rendered_nodes.append(&mut self.stringify_nodes(children));
+
+            rendered_nodes.prepend(format!(
+                "Node {}: {}\n  {}",
+                node.id(),
+                self.node_content(&node).unwrap(),
+                node_child_info.join("  \n")
+            ));
+        }
+
+        rendered_nodes
     }
 }

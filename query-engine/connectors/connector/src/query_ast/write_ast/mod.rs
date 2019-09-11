@@ -51,6 +51,38 @@ pub enum RootWriteQuery {
     ResetData(ResetData),
 }
 
+impl std::fmt::Display for RootWriteQuery {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match self {
+            Self::CreateRecord(q) => write!(f, "CreateRecord: {}", q.model.name),
+            Self::UpdateRecord(q) => write!(
+                f,
+                "UpdateRecord: {:?}",
+                q.where_.as_ref().map(|finder| format!(
+                    "{}, {} = {:?}",
+                    finder.field.model().name,
+                    finder.field.name,
+                    finder.value
+                ))
+            ),
+            Self::DeleteRecord(q) => write!(
+                f,
+                "DeleteRecord: {:?}",
+                format!(
+                    "{}, {} = {:?}",
+                    q.where_.field.model().name,
+                    q.where_.field.name,
+                    q.where_.value
+                )
+            ),
+            Self::UpsertRecord(_q) => write!(f, "UpsertRecord"),
+            Self::UpdateManyRecords(q) => write!(f, "UpdateManyRecords: {}", q.model.name),
+            Self::DeleteManyRecords(q) => write!(f, "DeleteManyRecords: {}", q.model.name),
+            Self::ResetData(_) => write!(f, "ResetData"),
+        }
+    }
+}
+
 impl RootWriteQuery {
     pub fn inject_non_list_arg(&mut self, key: String, value: PrismaValue) {
         match self {

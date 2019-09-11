@@ -111,38 +111,36 @@ impl Expressionista {
 
     fn query_expression(graph: &mut QueryGraph, parent_edge: Option<Edge>, query: Query) -> Expression {
         match (parent_edge, query) {
-            (None, Query::Write(wq)) => Expression::Write { write: wq },
-            (None, Query::Read(rq)) => Expression::Read { read: rq },
+            (None, query) => Expression::Query { query },
+            // (None, Query::Read(rq)) => Expression::Read { read: rq },
 
-            (Some(child_edge), Query::Write(wq)) => match graph.pluck_edge(child_edge) {
-                QueryDependency::Write(_, DependencyType::ParentId(f)) => Expression::Func {
+            (Some(child_edge), query) => match graph.pluck_edge(child_edge) {
+                QueryDependency::ParentId(f) => Expression::Func {
                     func: Box::new(|env: Env| {
                         let parent_result = env.get("parent").unwrap();
                         let parent_id = parent_result.as_id();
-                        let query = f(wq, parent_id);
+                        let query = f(query, parent_id);
 
-                        Expression::Write { write: query }
+                        Expression::Query { query }
                     }),
                 },
 
-                QueryDependency::Write(_, DependencyType::ExecutionOrder) => Expression::Write { write: wq },
-                QueryDependency::Read(DependencyType::ExecutionOrder) => Expression::Write { write: wq }, // tmp
-
+                QueryDependency::ExecutionOrder => Expression::Query { query },
                 _ => unreachable!(),
             },
 
-            (Some(child_edge), Query::Read(rq)) => match graph.pluck_edge(child_edge) {
-                QueryDependency::Read(DependencyType::ParentId(f)) => Expression::Func {
-                    func: Box::new(|env: Env| {
-                        let parent_result = env.get("parent").unwrap();
-                        let parent_id = parent_result.as_id();
-                        let query = f(rq, parent_id);
+            // (Some(child_edge), Query::Read(rq)) => match graph.pluck_edge(child_edge) {
+            //     QueryDependency::ParentId(f) => Expression::Func {
+            //         func: Box::new(|env: Env| {
+            //             let parent_result = env.get("parent").unwrap();
+            //             let parent_id = parent_result.as_id();
+            //             let query = f(rq, parent_id);
 
-                        Expression::Read { read: query }
-                    }),
-                },
-                _ => unreachable!(),
-            },
+            //             Expression::Read { read: query }
+            //         }),
+            //     },
+            //     _ => unreachable!(),
+            // },
         }
     }
 }

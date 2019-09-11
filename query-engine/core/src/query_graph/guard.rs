@@ -1,5 +1,3 @@
-// use std::borrow::Borrow;
-
 /// Guard struct to allow the QueryGraph implementation to retain
 /// empty nodes and edges, instead of destroying parts of the graph
 /// and losing information in the process.
@@ -13,10 +11,6 @@ impl<T> Guard<T> {
         Guard { content: Some(content) }
     }
 
-    pub fn is_set(&self) -> bool {
-        self.content.is_some()
-    }
-
     pub fn unset(&mut self) -> T {
         let content = std::mem::replace(&mut self.content, None);
         match content {
@@ -28,13 +22,8 @@ impl<T> Guard<T> {
     pub fn borrow(&self) -> Option<&T> {
         self.content.as_ref()
     }
-}
 
-// impl<T> Borrow<T> for Guard<T> {
-//     fn borrow(&self) -> &T {
-//         match self.content {
-//             Some(ref c) => c,
-//             None => panic!("Logic error: Attempted to borrow empty graph guard."),
-//         }
-//     }
-// }
+    pub fn into_inner(self) -> Option<T> {
+        self.content
+    }
+}

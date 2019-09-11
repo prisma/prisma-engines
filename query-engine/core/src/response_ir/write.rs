@@ -34,7 +34,10 @@ pub fn serialize_write(result: WriteQueryResult, typ: &OutputTypeRef, selected_f
 
             Ok(Item::Map(map))
         }
-        _ => unreachable!(),
+        _ => {
+            dbg!(result);
+            unreachable!()
+        }
     }
 }
 
