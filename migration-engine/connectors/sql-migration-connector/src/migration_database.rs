@@ -1,10 +1,9 @@
 use prisma_query::{
     ast::*,
-    connector::{MysqlParams, PostgresParams, Queryable, ResultSet, SqliteParams},
+    connector::{self, MysqlParams, PostgresParams, Queryable, ResultSet, SqliteParams},
     pool::{mysql::*, postgres::*, sqlite::*, PrismaConnectionManager},
 };
-use std::sync::Arc;
-use std::{convert::TryFrom, ops::DerefMut, time::Duration};
+use std::{sync::{Arc, Mutex}, convert::TryFrom, ops::DerefMut, time::Duration};
 
 pub trait MigrationDatabase: Send + Sync + 'static {
     fn execute(&self, db: &str, q: Query) -> prisma_query::Result<Option<Id>>;
@@ -93,29 +92,48 @@ impl MigrationDatabase for Sqlite {
     }
 }
 
+enum PostgresConnection {
+    Pooled(PostgresPool),
+    Single(Mutex<connector::PostgreSql>)
+}
+
 pub struct PostgreSql {
-    pool: PostgresPool,
+    conn: PostgresConnection,
 }
 
 impl PostgreSql {
-    pub fn new(params: PostgresParams) -> prisma_query::Result<Self> {
-        let manager = PrismaConnectionManager::postgres(params.config, Some(params.schema))?;
+    pub fn new(params: PostgresParams, pooled: bool) -> prisma_query::Result<Self> {
+        let conn = if pooled {
+            let manager = PrismaConnectionManager::postgres(params.config, Some(params.schema))?;
 
-        let pool = r2d2::Pool::builder()
-            .max_size(params.connection_limit)
-            .connection_timeout(Duration::from_millis(1500))
-            .test_on_check_out(false)
-            .build(manager)?;
+            let pool = r2d2::Pool::builder()
+                .max_size(params.connection_limit)
+                .connection_timeout(Duration::from_millis(1500))
+                .test_on_check_out(false)
+                .build(manager)?;
 
-        Ok(Self { pool })
+            PostgresConnection::Pooled(pool)
+        } else {
+            let conn = connector::PostgreSql::from_params(params)?;
+            PostgresConnection::Single(Mutex::new(conn))
+        };
+
+        Ok(Self { conn })
     }
 
     fn with_connection<F, T>(&self, f: F) -> T
     where
         F: FnOnce(&mut dyn Queryable) -> T,
     {
-        let mut conn = self.pool.get().unwrap();
-        f(conn.deref_mut())
+        match self.conn {
+            PostgresConnection::Single(ref mutex) => {
+                f(mutex.lock().unwrap().deref_mut())
+            },
+            PostgresConnection::Pooled(ref pool) => {
+                let mut conn = pool.get().unwrap();
+                f(conn.deref_mut())
+            }
+        }
     }
 }
 
@@ -137,28 +155,48 @@ impl MigrationDatabase for PostgreSql {
     }
 }
 
+enum MysqlConnection {
+    Pooled(MysqlPool),
+    Single(Mutex<connector::Mysql>)
+}
+
 pub struct Mysql {
-    pool: MysqlPool,
+    conn: MysqlConnection,
 }
 
 impl Mysql {
-    pub fn new(params: MysqlParams) -> prisma_query::Result<Self> {
-        let manager = PrismaConnectionManager::mysql(params.config);
+    pub fn new(params: MysqlParams, pooled: bool) -> prisma_query::Result<Self> {
+        let conn = if pooled {
+            let manager = PrismaConnectionManager::mysql(params.config);
 
-        let pool = r2d2::Pool::builder()
-            .max_size(params.connection_limit)
-            .test_on_check_out(false)
-            .build(manager)?;
+            let pool = r2d2::Pool::builder()
+                .connection_timeout(Duration::from_millis(1500))
+                .max_size(params.connection_limit)
+                .test_on_check_out(false)
+                .build(manager)?;
 
-        Ok(Self { pool })
+            MysqlConnection::Pooled(pool)
+        } else {
+            let conn = connector::Mysql::from_params(params)?;
+            MysqlConnection::Single(Mutex::new(conn))
+        };
+
+        Ok(Self { conn })
     }
 
     fn with_connection<F, T>(&self, f: F) -> T
     where
         F: FnOnce(&mut dyn Queryable) -> T,
     {
-        let mut conn = self.pool.get().unwrap();
-        f(conn.deref_mut())
+        match self.conn {
+            MysqlConnection::Single(ref mutex) => {
+                f(mutex.lock().unwrap().deref_mut())
+            },
+            MysqlConnection::Pooled(ref pool) => {
+                let mut conn = pool.get().unwrap();
+                f(conn.deref_mut())
+            }
+        }
     }
 }
 

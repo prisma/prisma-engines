@@ -365,7 +365,7 @@ where
         let (inspector, database) = get_postgres();
 
         println!("Running the test function now");
-        let connector = SqlMigrationConnector::postgres(&postgres_url()).unwrap();
+        let connector = SqlMigrationConnector::postgres(&postgres_url(), false).unwrap();
         let api = test_api(connector);
 
         let barrel_migration_executor = BarrelMigrationExecutor {

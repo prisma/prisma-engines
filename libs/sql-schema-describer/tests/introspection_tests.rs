@@ -193,6 +193,7 @@ fn multi_column_foreign_keys_must_work() {
                 DbType::MySql => ForeignKeyAction::Restrict,
                 _ => ForeignKeyAction::NoAction,
             };
+
             assert_eq!(
                 user_table,
                 &Table {
