@@ -29,9 +29,7 @@ impl Rpc for RpcImpl {
 
     fn introspect(&self, url: UrlInput) -> Result<String> {
         let data_model = Self::introspect_internal(url)?;
-        let mut result = StringWrapper::empty();
-        datamodel::render_to(&mut result, &data_model).unwrap();
-        Ok(result.inner)
+        Ok(datamodel::render_to_string(&data_model).expect("Datamodel rendering failed"))
     }
 }
 
@@ -65,26 +63,4 @@ pub struct DatabaseMetadata {
 #[derive(Serialize, Deserialize)]
 pub struct UrlInput {
     url: String,
-}
-
-struct StringWrapper {
-    inner: String,
-}
-
-impl StringWrapper {
-    fn empty() -> StringWrapper {
-        StringWrapper { inner: "".to_string() }
-    }
-}
-
-impl std::io::Write for StringWrapper {
-    fn write(&mut self, buf: &[u8]) -> std::result::Result<usize, std::io::Error> {
-        let as_string = String::from_utf8(buf.to_vec()).expect("ByteArray to String failed");
-        self.inner.push_str(&as_string);
-        Ok(buf.len())
-    }
-
-    fn flush(&mut self) -> std::result::Result<(), std::io::Error> {
-        Ok(())
-    }
 }
