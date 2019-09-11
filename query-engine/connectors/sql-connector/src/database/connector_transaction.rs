@@ -11,6 +11,7 @@ use crate::SqlError;
 pub struct ConnectorTransaction<'a> {
     inner: prisma_query::connector::Transaction<'a>,
 }
+
 impl<'a> ConnectorTransaction<'a> {
     pub fn new(tx: prisma_query::connector::Transaction) -> ConnectorTransaction {
         ConnectorTransaction { inner: tx }
@@ -78,12 +79,15 @@ impl WriteOperations for ConnectorTransaction<'_> {
         child_id: &GraphqlId,
     ) -> connector_interface::Result<()> {
         let child_model = field.related_model();
+
         let nested_disconnect = NestedDisconnect {
             relation_field: field,
             where_: Some(RecordFinder::new(child_model.fields().id(), child_id)),
         };
+
         let query = nested_disconnect.removal_by_parent_and_child(parent_id, child_id);
         self.inner.execute(query).unwrap();
+
         Ok(())
     }
 
