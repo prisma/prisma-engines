@@ -1,18 +1,14 @@
-use std::convert::TryFrom;
-
+use super::connector_transaction::ConnectorTransaction;
+use crate::{
+    query_builder::ManyRelatedRecordsWithRowNumber, FromSource, SqlCapabilities, SqlError, Transaction, Transactional,
+};
+use connector_interface::*;
+use datamodel::Source;
 use prisma_query::{
     connector::{PostgresParams, Queryable},
     pool::{postgres::PostgresManager, PrismaConnectionManager},
 };
-
-use connector_interface::*;
-use datamodel::Source;
-
-use crate::{
-    query_builder::ManyRelatedRecordsWithRowNumber, FromSource, SqlCapabilities, SqlError, Transaction, Transactional,
-};
-
-use super::connector_transaction::ConnectorTransaction;
+use std::convert::TryFrom;
 
 type Pool = r2d2::Pool<PrismaConnectionManager<PostgresManager>>;
 
