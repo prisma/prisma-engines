@@ -202,7 +202,7 @@ impl<'a> QuerySchemaBuilder<'a> {
                         Arc::clone(&model),
                         QueryTag::FindOne,
                         Box::new(|model, parsed_field| {
-                            let graph = QueryGraph::new();
+                            let mut graph = QueryGraph::new();
                             let query = ReadOneRecordBuilder::new(parsed_field, model).build()?;
 
                             graph.create_node(Query::Read(query));
@@ -231,7 +231,7 @@ impl<'a> QuerySchemaBuilder<'a> {
                 Arc::clone(&model),
                 QueryTag::FindMany,
                 Box::new(|model, parsed_field| {
-                    let graph = QueryGraph::new();
+                    let mut graph = QueryGraph::new();
                     let query = ReadManyRecordsBuilder::new(parsed_field, model).build()?;
 
                     graph.create_node(Query::Read(query));
@@ -256,7 +256,7 @@ impl<'a> QuerySchemaBuilder<'a> {
                 Arc::clone(&model),
                 QueryTag::Aggregate,
                 Box::new(|model, parsed_field| {
-                    let graph = QueryGraph::new();
+                    let mut graph = QueryGraph::new();
                     let query = AggregateRecordsBuilder::new(parsed_field, model).build()?;
 
                     graph.create_node(Query::Read(query));

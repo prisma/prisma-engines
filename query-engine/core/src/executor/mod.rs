@@ -14,7 +14,7 @@ use crate::{
     query_builders::QueryBuilder,
     query_document::QueryDocument,
     query_graph::*,
-    response_ir::{Response, IrSerializer},
+    response_ir::{IrSerializer, Response},
     schema::QuerySchemaRef,
 };
 use connector::*;
@@ -71,7 +71,7 @@ impl QueryExecutor {
         query_doc: QueryDocument,
         query_schema: QuerySchemaRef,
     ) -> QueryExecutionResult<Vec<Response>> {
-        // Parse, validate, and extract queries from query document.
+        // Parse, validate, and extract query graphs from query document.
         let queries: Vec<(QueryGraph, IrSerializer)> = QueryBuilder::new(query_schema).build(query_doc)?;
 
         // Create pipelines for all separate queries

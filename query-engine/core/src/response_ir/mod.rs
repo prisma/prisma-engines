@@ -99,7 +99,9 @@ impl IrSerializer {
                     Ok(result) => Response::Data(self.key.clone(), result),
                     Err(err) => Response::Error(format!("{}", err)),
                 }
-            }
+            },
+
+            ExpressionResult::Empty => panic!("Domain logic error: Attempted to serialize empty result."),
         }
     }
 }

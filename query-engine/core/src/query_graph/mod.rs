@@ -13,12 +13,12 @@ type InnerGraph = Graph<Guard<Query>, Guard<QueryDependency>>;
 
 #[derive(Default)]
 pub struct QueryGraph {
-    graph: RefCell<InnerGraph>,
+    graph: InnerGraph,
 
-    /// Designates the node which interpretation result will be returned.
+    /// Designates the node that is returning the result of the entire QueryGraph.
     /// If no node is set, the interpretation will take the result of the
     /// last statement derived from the query graph.
-    result_node: RefCell<Option<NodeIndex>>,
+    result_node: Option<NodeIndex>,
 }
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
@@ -41,25 +41,33 @@ pub enum QueryDependency {
 }
 
 pub enum DependencyType<T> {
+    /// Simple dependency indicating order of execution.
+    ExecutionOrder,
+
     /// Performs a transformation on a query type T based on the parent ID (PrismaValue)
     ParentId(Box<dyn FnOnce(T, PrismaValue) -> T>),
 
-    /// Simple dependency indicating order of execution.
-    ExecutionOrder,
+    /// Expresses a conditional dependency that decides whether or not the child node
+    /// is included in the execution.
+    /// Currently, the evaluation function receives the parent ID as PrismaValue if it exists,
+    /// None otherwise.
+    Conditional(Box<dyn FnOnce(Option<PrismaValue>) -> bool>),
 }
 
 impl QueryGraph {
     pub fn new() -> Self {
         Self {
-            graph: RefCell::new(InnerGraph::new()),
-            result_node: RefCell::new(None),
+            graph: InnerGraph::new(),
+            result_node: None,
         }
     }
 
-    pub fn set_result_node(&self, node: &Node) {
-        self.result_node.borrow_mut().replace(node.node_ix.clone());
+    /// Sets the result node of the graph.
+    pub fn set_result_node(&mut self, node: &Node) {
+        self.result_node.replace(node.node_ix.clone());
     }
 
+    /// Checks if the given node is marked as the result node in the graph.
     pub fn is_result_node(&self, node: &Node) -> bool {
         match self.result_node.borrow().as_ref() {
             Some(ix) => ix == &node.node_ix,
@@ -67,6 +75,7 @@ impl QueryGraph {
         }
     }
 
+    /// Checks if the subgraph starting at the given node contains the node designated as the overall result.
     pub fn subgraph_contains_result(&self, node: &Node) -> bool {
         self.is_result_node(node)
             || self
@@ -95,44 +104,45 @@ impl QueryGraph {
             .collect()
     }
 
-    pub fn create_node(&self, query: Query) -> Node {
-        let node_ix = self.graph.borrow_mut().add_node(Guard::new(query));
+    pub fn create_node(&mut self, query: Query) -> Node {
+        let node_ix = self.graph.add_node(Guard::new(query));
 
         Node { node_ix }
     }
 
-    pub fn create_edge(&self, from: &Node, to: &Node, content: QueryDependency) -> Edge {
+    pub fn create_edge(&mut self, from: &Node, to: &Node, content: QueryDependency) -> Edge {
         let edge_ix = self
             .graph
-            .borrow_mut()
             .add_edge(from.node_ix, to.node_ix, Guard::new(content));
 
         Edge { edge_ix }
     }
 
-    pub fn node_content(&self, node: &Node) -> std::cell::Ref<Query> {
-        std::cell::Ref::map(self.graph.borrow(), |g| g.node_weight(node.node_ix).unwrap().borrow())
+    pub fn node_content(&self, node: &Node) -> Option<&Query> {
+        self.graph.node_weight(node.node_ix).unwrap().borrow()
+        // std::cell::Ref::map(self.graph.borrow(), |g| g.node_weight(node.node_ix).unwrap().borrow())
     }
 
-    pub fn edge_content(&self, edge: &Edge) -> impl Deref<Target = QueryDependency> + '_ {
-        std::cell::Ref::map(self.graph.borrow(), |g| g.edge_weight(edge.edge_ix).unwrap().borrow())
+    pub fn edge_content(&self, edge: &Edge) -> Option<&QueryDependency> {
+        // std::cell::Ref::map(self.graph.borrow(), |g| g.edge_weight(edge.edge_ix).unwrap().borrow())
+        self.graph.edge_weight(edge.edge_ix).unwrap().borrow()
     }
 
     pub fn edge_source(&self, edge: &Edge) -> Node {
-        let (node_ix, _) = self.graph.borrow().edge_endpoints(edge.edge_ix).unwrap();
+        let (node_ix, _) = self.graph.edge_endpoints(edge.edge_ix).unwrap();
 
         Node { node_ix }
     }
 
     pub fn edge_target(&self, edge: &Edge) -> Node {
-        let (_, node_ix) = self.graph.borrow().edge_endpoints(edge.edge_ix).unwrap();
+        let (_, node_ix) = self.graph.edge_endpoints(edge.edge_ix).unwrap();
 
         Node { node_ix }
     }
 
     pub fn outgoing_edges(&self, node: &Node) -> Vec<Edge> {
-        let mut edges = self.graph
-            .borrow()
+        let mut edges = self
+            .graph
             .edges_directed(node.node_ix, Direction::Outgoing)
             .map(|edge| Edge { edge_ix: edge.id() })
             .collect::<Vec<_>>();
@@ -141,29 +151,29 @@ impl QueryGraph {
         edges
     }
 
-    /// Removes the edge from the graph but leaves the graph itself intact by keeping the empty
-    /// edge in the graph by plucking the content of the edge, but not the node itself.
-    pub fn pluck_edge(&self, edge: Edge) -> QueryDependency {
-        self.graph.borrow_mut().edge_weight_mut(edge.edge_ix).unwrap().unset()
+    /// Removes the edge from the graph but leaves the graph intact by keeping the empty
+    /// edge in the graph by plucking the content of the edge, but not the edge itself.
+    pub fn pluck_edge(&mut self, edge: Edge) -> QueryDependency {
+        self.graph.edge_weight_mut(edge.edge_ix).unwrap().unset()
     }
 
-    /// Removes the node from the graph but leaves the graph itself intact by keeping the empty
+    /// Removes the node from the graph but leaves the graph intact by keeping the empty
     /// node in the graph by plucking the content of the node, but not the node itself.
-    pub fn pluck_node(&self, node: Node) -> Query {
-        self.graph.borrow_mut().node_weight_mut(node.node_ix).unwrap().unset()
+    pub fn pluck_node(&mut self, node: Node) -> Query {
+        self.graph.node_weight_mut(node.node_ix).unwrap().unset()
     }
 
     /// Current way to fix inconsistencies in the graph.
     // Todo This transformation could be encoded in the WriteQueryBuilder, making it possible to remove the relation field
     // on the graph edge.
-    pub fn transform(self) -> Self {
-        let mut graph = self.graph.borrow_mut();
+    pub fn transform(mut self) -> Self {
+        let graph = &mut self.graph;
         let candidates: Vec<EdgeIndex> = graph
             .raw_edges()
             .into_iter()
             .filter_map(|edge| {
-                let parent = graph.node_weight(edge.source()).unwrap().borrow();
-                let child = graph.node_weight(edge.target()).unwrap().borrow();
+                let parent = graph.node_weight(edge.source()).unwrap().borrow().unwrap();
+                let child = graph.node_weight(edge.target()).unwrap().borrow().unwrap();
                 let edge_index = graph.find_edge(edge.source(), edge.target()).unwrap();
 
                 match (parent, child) {
@@ -171,7 +181,7 @@ impl QueryGraph {
                         Query::Write(WriteQuery::Root(RootWriteQuery::CreateRecord(_))),
                         Query::Write(WriteQuery::Root(RootWriteQuery::CreateRecord(_))),
                     ) => {
-                        let relation_field: &RelationFieldRef = match *edge.weight.borrow() {
+                        let relation_field: &RelationFieldRef = match edge.weight.borrow().unwrap() {
                             QueryDependency::Write(ref rf, _) => rf,
                             _ => unreachable!(),
                         };
@@ -201,7 +211,6 @@ impl QueryGraph {
             }
         });
 
-        drop(graph);
         self
     }
 }

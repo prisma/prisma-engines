@@ -1,6 +1,6 @@
 use super::*;
 use connector::{Identifier, ReadQuery};
-use connector::{Query, ReadQueryResult, ResultContent};
+use connector::{ReadQueryResult, ResultContent};
 use im::HashMap;
 use prisma_models::prelude::*;
 use std::convert::TryInto;
@@ -36,6 +36,7 @@ pub struct Binding {
 pub enum ExpressionResult {
     Read(ReadQueryResult),
     Write(WriteQueryResult),
+    Empty,
 }
 
 impl ExpressionResult {
@@ -59,6 +60,7 @@ impl ExpressionResult {
                     .into(),
                 _ => unimplemented!(),
             },
+            _ => unimplemented!()
         }
     }
 }
@@ -69,11 +71,8 @@ pub struct Env {
 }
 
 impl Env {
-    pub fn get(&self, key: &str) -> QueryExecutionResult<&ExpressionResult> {
-        match self.env.get(key) {
-            Some(env) => Ok(env),
-            None => Err(QueryExecutionError::EnvVarNotFound(key.to_owned())),
-        }
+    pub fn get(&self, key: &str) -> Option<&ExpressionResult> {
+        self.env.get(key)
     }
 
     pub fn insert(&mut self, key: String, value: ExpressionResult) {

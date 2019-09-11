@@ -4,17 +4,17 @@ use crate::query_graph::{Edge, Node, QueryGraph};
 pub struct Expressionista;
 
 impl Expressionista {
-    pub fn translate(graph: QueryGraph) -> Expression {
+    pub fn translate(mut graph: QueryGraph) -> Expression {
         let root_nodes: Vec<Node> = graph.root_nodes();
         let expressions = root_nodes
             .into_iter()
-            .map(|root_node| Self::build_expression(&graph, root_node, None))
+            .map(|root_node| Self::build_expression(&mut graph, root_node, None))
             .collect();
 
         Expression::Sequence { seq: expressions }
     }
 
-    fn build_expression(graph: &QueryGraph, node: Node, parent_edge: Option<Edge>) -> Expression {
+    fn build_expression(graph: &mut QueryGraph, node: Node, parent_edge: Option<Edge>) -> Expression {
         let is_result = graph.is_result_node(&node);
 
         // Child edges are ordered, execution rule is left to right in the graph, unless other rules override.
@@ -109,7 +109,7 @@ impl Expressionista {
         }
     }
 
-    fn query_expression(graph: &QueryGraph, parent_edge: Option<Edge>, query: Query) -> Expression {
+    fn query_expression(graph: &mut QueryGraph, parent_edge: Option<Edge>, query: Query) -> Expression {
         match (parent_edge, query) {
             (None, Query::Write(wq)) => Expression::Write { write: wq },
             (None, Query::Read(rq)) => Expression::Read { read: rq },
@@ -126,6 +126,8 @@ impl Expressionista {
                 },
 
                 QueryDependency::Write(_, DependencyType::ExecutionOrder) => Expression::Write { write: wq },
+                QueryDependency::Read(DependencyType::ExecutionOrder) => Expression::Write { write: wq }, // tmp
+
                 _ => unreachable!(),
             },
 
