@@ -5,6 +5,7 @@ use prisma_models::*;
 
 use crate::query_builder::write::NestedActions;
 use crate::query_builder::WriteQueryBuilder;
+use crate::transactional::create;
 use crate::SqlError;
 
 pub struct ConnectorTransaction<'a> {
@@ -24,6 +25,11 @@ impl MaybeTransaction for ConnectorTransaction<'_> {}
 
 impl ReadOperations for ConnectorTransaction<'_> {}
 impl WriteOperations for ConnectorTransaction<'_> {
+    fn create_record(&mut self, model: ModelRef, args: WriteArgs) -> connector_interface::Result<GraphqlId> {
+        let result = create::execute(&mut self.inner, model, args.non_list_args(), args.list_args())?;
+        Ok(result)
+    }
+
     fn connect(
         &mut self,
         field: RelationFieldRef,

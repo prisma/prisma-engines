@@ -1,4 +1,4 @@
-mod create;
+pub mod create;
 mod delete;
 mod delete_many;
 mod nested;
