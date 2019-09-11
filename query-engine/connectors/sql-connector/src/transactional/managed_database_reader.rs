@@ -25,24 +25,10 @@ where
         selected_fields: &SelectedFields,
     ) -> connector_interface::Result<Option<SingleRecord>> {
         let db_name = &record_finder.field.model().internal_data_model().db_name;
-        let query = ReadQueryBuilder::get_records(record_finder.field.model(), selected_fields, record_finder);
-        let field_names = selected_fields.names();
-        let idents = selected_fields.type_identifiers();
-
-        let record = self
-            .executor
-            .with_transaction(db_name, |conn| match conn.find(query, idents.as_slice()) {
-                Ok(result) => Ok(Some(result)),
-                Err(_e @ SqlError::RecordNotFoundForWhere(_)) => Ok(None),
-                Err(e) => Err(e),
-            })?
-            .map(Record::from)
-            .map(|record| SingleRecord {
-                record,
-                field_names,
-            });
-
-        Ok(record)
+        let result = self.executor.with_transaction(db_name, |conn| {
+            execute_get_single_record(conn, record_finder, selected_fields)
+        })?;
+        Ok(result)
     }
 
     fn get_many_records(
@@ -174,4 +160,24 @@ where
 
         Ok(list_values)
     }
+}
+
+pub fn execute_get_single_record(
+    transaction: &mut dyn super::Transaction,
+    record_finder: &RecordFinder,
+    selected_fields: &SelectedFields,
+) -> crate::Result<Option<SingleRecord>> {
+    let query = ReadQueryBuilder::get_records(record_finder.field.model(), selected_fields, record_finder);
+    let field_names = selected_fields.names();
+    let idents = selected_fields.type_identifiers();
+
+    let record = (match transaction.find(query, idents.as_slice()) {
+        Ok(result) => Ok(Some(result)),
+        Err(_e @ SqlError::RecordNotFoundForWhere(_)) => Ok(None),
+        Err(e) => Err(e),
+    })?
+    .map(Record::from)
+    .map(|record| SingleRecord { record, field_names });
+
+    Ok(record)
 }

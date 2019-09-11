@@ -1,4 +1,4 @@
-use crate::Filter;
+use crate::{Filter, RecordFinder};
 use prisma_models::*;
 
 pub trait Connector {
@@ -34,7 +34,13 @@ impl WriteArgs {
 
 pub trait MaybeTransaction: ReadOperations + WriteOperations {}
 
-pub trait ReadOperations {}
+pub trait ReadOperations {
+    fn get_single_record(
+        &mut self,
+        record_finder: &RecordFinder,
+        selected_fields: &SelectedFields,
+    ) -> crate::Result<Option<SingleRecord>>;
+}
 pub trait WriteOperations {
     fn create_record(&mut self, model: ModelRef, args: WriteArgs) -> crate::Result<GraphqlId>;
 

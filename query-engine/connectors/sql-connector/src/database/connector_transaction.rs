@@ -23,7 +23,16 @@ impl<'a> ConnectorTransaction<'a> {
 
 impl MaybeTransaction for ConnectorTransaction<'_> {}
 
-impl ReadOperations for ConnectorTransaction<'_> {}
+impl ReadOperations for ConnectorTransaction<'_> {
+    fn get_single_record(
+        &mut self,
+        record_finder: &RecordFinder,
+        selected_fields: &SelectedFields,
+    ) -> connector_interface::Result<Option<SingleRecord>> {
+        let result = transactional::execute_get_single_record(&mut self.inner, record_finder, selected_fields)?;
+        Ok(result)
+    }
+}
 impl WriteOperations for ConnectorTransaction<'_> {
     fn create_record(&mut self, model: ModelRef, args: WriteArgs) -> connector_interface::Result<GraphqlId> {
         let result = transactional::create::execute(&mut self.inner, model, args.non_list_args(), args.list_args())?;
