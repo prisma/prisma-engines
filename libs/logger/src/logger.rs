@@ -69,6 +69,8 @@ impl Logger {
                             );
                         }
                     }
+
+                    std::process::exit(255);
                 }));
 
                 this

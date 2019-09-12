@@ -3,6 +3,13 @@ use migration_core::{api::RpcApi, Error};
 use std::{env, fs, io, io::Read};
 
 fn main() {
+    let orig_hook = std::panic::take_hook();
+
+    std::panic::set_hook(Box::new(move |info| {
+        orig_hook(info);
+        std::process::exit(255);
+    }));
+
     env_logger::init();
 
     let matches = App::new("Prisma Migration Engine")
