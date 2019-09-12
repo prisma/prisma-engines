@@ -1,4 +1,4 @@
-use crate::{Filter, RecordFinder};
+use crate::{Filter, QueryArguments, RecordFinder};
 use prisma_models::*;
 
 pub trait Connector {
@@ -40,6 +40,21 @@ pub trait ReadOperations {
         record_finder: &RecordFinder,
         selected_fields: &SelectedFields,
     ) -> crate::Result<Option<SingleRecord>>;
+
+    fn get_many_records(
+        &mut self,
+        model: ModelRef,
+        query_arguments: QueryArguments,
+        selected_fields: &SelectedFields,
+    ) -> crate::Result<ManyRecords>;
+
+    fn get_related_records(
+        &mut self,
+        from_field: RelationFieldRef,
+        from_record_ids: &[GraphqlId],
+        query_arguments: QueryArguments,
+        selected_fields: &SelectedFields,
+    ) -> crate::Result<ManyRecords>;
 }
 pub trait WriteOperations {
     fn create_record(&mut self, model: ModelRef, args: WriteArgs) -> crate::Result<GraphqlId>;

@@ -5,7 +5,7 @@ use crate::{
     Transactional,
 };
 
-use connector_interface::{self, error::ConnectorError, filter::RecordFinder, *};
+use connector_interface::{self, filter::RecordFinder, *};
 use itertools::Itertools;
 use prisma_models::*;
 use std::convert::TryFrom;
@@ -25,8 +25,8 @@ where
         selected_fields: &SelectedFields,
     ) -> connector_interface::Result<Option<SingleRecord>> {
         let db_name = &record_finder.field.model().internal_data_model().db_name;
-        let result = self.executor.with_transaction(db_name, |conn| {
-            execute_get_single_record(conn, record_finder, selected_fields)
+        let result = self.executor.with_transaction(db_name, |transaction| {
+            execute_get_single_record(transaction, record_finder, selected_fields)
         })?;
         Ok(result)
     }
@@ -38,18 +38,11 @@ where
         selected_fields: &SelectedFields,
     ) -> connector_interface::Result<ManyRecords> {
         let db_name = &model.internal_data_model().db_name;
-        let field_names = selected_fields.names();
-        let idents = selected_fields.type_identifiers();
-        let query = ReadQueryBuilder::get_records(model, selected_fields, query_arguments);
+        let result = self.executor.with_transaction(db_name, |transaction| {
+            execute_get_many_records(transaction, model, query_arguments, selected_fields)
+        })?;
 
-        let records = self
-            .executor
-            .with_transaction(db_name, |conn| conn.filter(query.into(), idents.as_slice()))?
-            .into_iter()
-            .map(Record::from)
-            .collect();
-
-        Ok(ManyRecords { records, field_names })
+        Ok(result)
     }
 
     fn get_related_records(
@@ -60,42 +53,17 @@ where
         selected_fields: &SelectedFields,
     ) -> connector_interface::Result<ManyRecords> {
         let db_name = &from_field.model().internal_data_model().db_name;
-        let idents = selected_fields.type_identifiers();
-        let field_names = selected_fields.names();
+        let result = self.executor.with_transaction(db_name, |transaction| {
+            execute_get_related_records::<T::ManyRelatedRecordsBuilder>(
+                transaction,
+                from_field,
+                from_record_ids,
+                query_arguments,
+                selected_fields,
+            )
+        })?;
 
-        let query = {
-            let is_with_pagination = query_arguments.is_with_pagination();
-            let base = ManyRelatedRecordsBaseQuery::new(from_field, from_record_ids, query_arguments, selected_fields);
-
-            if is_with_pagination {
-                T::ManyRelatedRecordsBuilder::with_pagination(base)
-            } else {
-                T::ManyRelatedRecordsBuilder::without_pagination(base)
-            }
-        };
-
-        let records: connector_interface::Result<Vec<Record>> = self
-            .executor
-            .with_transaction(db_name, |conn| conn.filter(query, idents.as_slice()))?
-            .into_iter()
-            .map(|mut row| {
-                let parent_id = row.values.pop().ok_or(ConnectorError::ColumnDoesNotExist)?;
-
-                // Relation id is always the second last value. We don't need it
-                // here and we don't need it in the record.
-                let _ = row.values.pop();
-
-                let mut record = Record::from(row);
-                record.add_parent_id(GraphqlId::try_from(parent_id)?);
-
-                Ok(record)
-            })
-            .collect();
-
-        Ok(ManyRecords {
-            records: records?,
-            field_names,
-        })
+        Ok(result)
     }
 
     fn count_by_model(&self, model: ModelRef, query_arguments: QueryArguments) -> connector_interface::Result<usize> {
@@ -180,4 +148,81 @@ pub fn execute_get_single_record(
     .map(|record| SingleRecord { record, field_names });
 
     Ok(record)
+}
+
+pub fn execute_get_many_records(
+    transaction: &mut dyn super::Transaction,
+    model: ModelRef,
+    query_arguments: QueryArguments,
+    selected_fields: &SelectedFields,
+) -> crate::Result<ManyRecords> {
+    let field_names = selected_fields.names();
+    let idents = selected_fields.type_identifiers();
+    let query = ReadQueryBuilder::get_records(model, selected_fields, query_arguments);
+
+    let records = transaction
+        .filter(query.into(), idents.as_slice())?
+        .into_iter()
+        .map(Record::from)
+        .collect();
+
+    Ok(ManyRecords { records, field_names })
+}
+
+pub fn execute_get_related_records<T: ManyRelatedRecordsQueryBuilder>(
+    transaction: &mut dyn super::Transaction,
+    from_field: RelationFieldRef,
+    from_record_ids: &[GraphqlId],
+    query_arguments: QueryArguments,
+    selected_fields: &SelectedFields,
+) -> crate::Result<ManyRecords> {
+    let idents = selected_fields.type_identifiers();
+    let field_names = selected_fields.names();
+
+    let query = {
+        let is_with_pagination = query_arguments.is_with_pagination();
+        let base = ManyRelatedRecordsBaseQuery::new(from_field, from_record_ids, query_arguments, selected_fields);
+
+        if is_with_pagination {
+            T::with_pagination(base)
+        } else {
+            T::without_pagination(base)
+        }
+    };
+
+    let mut records = Vec::new();
+    for mut row in transaction.filter(query, idents.as_slice())?.into_iter() {
+        let parent_id = row.values.pop().ok_or(SqlError::ColumnDoesNotExist)?;
+
+        // Relation id is always the second last value. We don't need it
+        // here and we don't need it in the record.
+        let _ = row.values.pop();
+
+        let mut record = Record::from(row);
+        record.add_parent_id(GraphqlId::try_from(parent_id)?);
+
+        records.push(record)
+    }
+
+    //    let records = transaction
+    //        .filter(query, idents.as_slice())?
+    //        .into_iter()
+    //        .map(|mut row| {
+    //            let parent_id = row.values.pop().ok_or(ConnectorError::ColumnDoesNotExist)?;
+    //
+    //            // Relation id is always the second last value. We don't need it
+    //            // here and we don't need it in the record.
+    //            let _ = row.values.pop();
+    //
+    //            let mut record = Record::from(row);
+    //            record.add_parent_id(GraphqlId::try_from(parent_id)?);
+    //
+    //            Ok(record)
+    //        })
+    //        .collect();
+
+    Ok(ManyRecords {
+        records: records,
+        field_names,
+    })
 }

@@ -4,7 +4,7 @@ use connector_interface::*;
 use prisma_models::*;
 
 use crate::query_builder::write::NestedActions;
-use crate::query_builder::WriteQueryBuilder;
+use crate::query_builder::{ManyRelatedRecordsWithUnionAll, WriteQueryBuilder};
 use crate::transactional;
 use crate::SqlError;
 
@@ -31,6 +31,34 @@ impl ReadOperations for ConnectorTransaction<'_> {
         selected_fields: &SelectedFields,
     ) -> connector_interface::Result<Option<SingleRecord>> {
         let result = transactional::execute_get_single_record(&mut self.inner, record_finder, selected_fields)?;
+        Ok(result)
+    }
+
+    fn get_many_records(
+        &mut self,
+        model: ModelRef,
+        query_arguments: QueryArguments,
+        selected_fields: &SelectedFields,
+    ) -> connector_interface::Result<ManyRecords> {
+        let result = transactional::execute_get_many_records(&mut self.inner, model, query_arguments, selected_fields)?;
+        Ok(result)
+    }
+
+    fn get_related_records(
+        &mut self,
+        from_field: RelationFieldRef,
+        from_record_ids: &[GraphqlId],
+        query_arguments: QueryArguments,
+        selected_fields: &SelectedFields,
+    ) -> connector_interface::Result<ManyRecords> {
+        // TODO: we must pass the right related records builder as a type parameter.
+        let result = transactional::execute_get_related_records::<ManyRelatedRecordsWithUnionAll>(
+            &mut self.inner,
+            from_field,
+            from_record_ids,
+            query_arguments,
+            selected_fields,
+        )?;
         Ok(result)
     }
 }
