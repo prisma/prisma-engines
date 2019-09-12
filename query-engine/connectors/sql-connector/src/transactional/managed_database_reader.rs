@@ -68,13 +68,9 @@ where
 
     fn count_by_model(&self, model: ModelRef, query_arguments: QueryArguments) -> connector_interface::Result<usize> {
         let db_name = &model.internal_data_model().db_name;
-        let query = ReadQueryBuilder::count_by_model(model, query_arguments);
-
-        let result = self
-            .executor
-            .with_transaction(db_name, |conn| conn.find_int(query))
-            .map(|count| count as usize)?;
-
+        let result = self.executor.with_transaction(db_name, |transaction| {
+            execute_count_by_model(transaction, model, query_arguments)
+        })?;
         Ok(result)
     }
 
@@ -225,4 +221,15 @@ pub fn execute_get_related_records<T: ManyRelatedRecordsQueryBuilder>(
         records: records,
         field_names,
     })
+}
+
+pub fn execute_count_by_model(
+    transaction: &mut dyn super::Transaction,
+    model: ModelRef,
+    query_arguments: QueryArguments,
+) -> crate::Result<usize> {
+    let query = ReadQueryBuilder::count_by_model(model, query_arguments);
+    let result = transaction.find_int(query)? as usize;
+
+    Ok(result)
 }

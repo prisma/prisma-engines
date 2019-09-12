@@ -55,6 +55,8 @@ pub trait ReadOperations {
         query_arguments: QueryArguments,
         selected_fields: &SelectedFields,
     ) -> crate::Result<ManyRecords>;
+
+    fn count_by_model(&mut self, model: ModelRef, query_arguments: QueryArguments) -> crate::Result<usize>;
 }
 pub trait WriteOperations {
     fn create_record(&mut self, model: ModelRef, args: WriteArgs) -> crate::Result<GraphqlId>;

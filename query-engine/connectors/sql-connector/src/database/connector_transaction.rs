@@ -61,6 +61,15 @@ impl ReadOperations for ConnectorTransaction<'_> {
         )?;
         Ok(result)
     }
+
+    fn count_by_model(
+        &mut self,
+        model: ModelRef,
+        query_arguments: QueryArguments,
+    ) -> connector_interface::Result<usize> {
+        let result = transactional::execute_count_by_model(&mut self.inner, model, query_arguments)?;
+        Ok(result)
+    }
 }
 impl WriteOperations for ConnectorTransaction<'_> {
     fn create_record(&mut self, model: ModelRef, args: WriteArgs) -> connector_interface::Result<GraphqlId> {
