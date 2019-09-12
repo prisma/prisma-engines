@@ -28,6 +28,12 @@ pub enum Expression {
     Get {
         binding_name: String,
     },
+    GetFirstNonEmpty {
+        binding_names: Vec<String>,
+    },
+    If {
+        func: Box<dyn FnOnce(Env) -> bool>,
+    },
 }
 
 impl Expression {
@@ -68,6 +74,10 @@ impl Expression {
                 format!("(Let [\n{}\n{}]\n{}\n)", binding_strs, Self::indent(indent), exp_strs)
             }
             Self::Get { binding_name } => Self::add_indent(indent, format!("(Get env '{}')", binding_name)),
+            Self::GetFirstNonEmpty { binding_names } => {
+                Self::add_indent(indent, format!("(GetFirstNoneEmpty env '{:?}')", binding_names))
+            }
+            Self::If { func: _ } => Self::add_indent(indent, "if (Fn env)"),
         }
     }
 
@@ -196,6 +206,19 @@ impl<'a> QueryInterpreter<'a> {
             Expression::Get { binding_name } => {
                 println!("GET {}", binding_name);
                 env.clone().remove(&binding_name)
+            }
+
+            Expression::GetFirstNonEmpty { binding_names } => Ok(binding_names
+                .into_iter()
+                .find_map(|binding_name| match env.get(&binding_name) {
+                    Some(_) => Some(env.clone().remove(&binding_name).unwrap()),
+                    None => None,
+                })
+                .unwrap()),
+
+            Expression::If { func } =>  {
+                //
+                unimplemented!()
             }
         }
     }

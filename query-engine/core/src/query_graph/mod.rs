@@ -6,7 +6,7 @@ use connector::*;
 use guard::*;
 use petgraph::{graph::*, visit::EdgeRef, *};
 use prisma_models::PrismaValue;
-use std::{borrow::Borrow, collections::VecDeque};
+use std::borrow::Borrow;
 
 /// Implementation detail of the QueryGraph.
 type InnerGraph = Graph<Guard<Query>, Guard<QueryDependency>>;
@@ -15,10 +15,10 @@ type InnerGraph = Graph<Guard<Query>, Guard<QueryDependency>>;
 pub struct QueryGraph {
     graph: InnerGraph,
 
-    /// Designates the node that is returning the result of the entire QueryGraph.
+    /// Designates the nodes that is returning the result of the entire QueryGraph.
     /// If no node is set, the interpretation will take the result of the
     /// last statement derived from the query graph.
-    result_node: Option<NodeIndex>,
+    result_nodes: Vec<NodeIndex>,
 }
 
 impl std::fmt::Display for QueryGraph {
@@ -74,21 +74,24 @@ impl QueryGraph {
     pub fn new() -> Self {
         Self {
             graph: InnerGraph::new(),
-            result_node: None,
+            result_nodes: vec![],
         }
     }
 
-    /// Sets the result node of the graph.
-    pub fn set_result_node(&mut self, node: &Node) {
-        self.result_node.replace(node.node_ix.clone());
+    /// Adds a result node to the graph.
+    pub fn add_result_node(&mut self, node: &Node) {
+        self.result_nodes.push(node.node_ix.clone());
     }
 
     /// Checks if the given node is marked as the result node in the graph.
     pub fn is_result_node(&self, node: &Node) -> bool {
-        match self.result_node.borrow().as_ref() {
-            Some(ix) => ix == &node.node_ix,
-            None => false,
-        }
+        self.result_nodes
+            .iter()
+            .find(|rn| rn.index() == node.node_ix.index())
+            .is_some()
+        //     Some(ix) => ix == &node.node_ix,
+        //     None => false,
+        // }
     }
 
     /// Checks if the subgraph starting at the given node contains the node designated as the overall result.
@@ -179,6 +182,10 @@ impl QueryGraph {
         self.graph.remove_edge(edge.edge_ix).unwrap().into_inner()
     }
 
+    pub fn is_direct_child(&self, parent: &Node, child: &Node) -> bool {
+        self.incoming_edges(child).into_iter().find(|edge| &self.edge_source(edge) != parent).is_none()
+    }
+
     fn collect_edges(&self, node: &Node, direction: Direction) -> Vec<Edge> {
         let mut edges = self
             .graph
@@ -191,11 +198,15 @@ impl QueryGraph {
     }
 
     fn stringify(&self) -> String {
-        self.stringify_nodes(self.root_nodes()).join("\n\n")
+        format!(
+            "---- Query Graph ----\nResult Nodes: {:?}\n{}\n----------------------",
+            self.result_nodes,
+            self.stringify_nodes(self.root_nodes()).join("\n\n")
+        )
     }
 
-    fn stringify_nodes(&self, nodes: Vec<Node>) -> VecDeque<String> {
-        let mut rendered_nodes = VecDeque::new();
+    fn stringify_nodes(&self, nodes: Vec<Node>) -> Vec<String> {
+        let mut rendered_nodes = vec![];
 
         for node in nodes {
             let mut node_child_info = vec![];
@@ -206,7 +217,7 @@ impl QueryGraph {
                 .map(|child_edge| {
                     let child_node = self.edge_target(child_edge);
                     node_child_info.push(format!(
-                        "{}: {}",
+                        "Child: Node {} - {}",
                         child_node.id(),
                         self.edge_content(child_edge).unwrap()
                     ));
@@ -215,14 +226,14 @@ impl QueryGraph {
                 })
                 .collect();
 
-            rendered_nodes.append(&mut self.stringify_nodes(children));
-
-            rendered_nodes.prepend(format!(
+            rendered_nodes.push(format!(
                 "Node {}: {}\n  {}",
                 node.id(),
                 self.node_content(&node).unwrap(),
-                node_child_info.join("  \n")
+                node_child_info.join("\n  ")
             ));
+
+            rendered_nodes.append(&mut self.stringify_nodes(children));
         }
 
         rendered_nodes

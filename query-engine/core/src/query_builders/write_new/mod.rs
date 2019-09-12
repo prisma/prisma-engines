@@ -9,10 +9,10 @@ use crate::{
 };
 use connector::{
     filter::{Filter, RecordFinder},
-    CreateRecord, DeleteManyRecords, DeleteRecord, NestedWriteQueries, Query, QueryArguments, ReadQuery,
+    CreateRecord, DeleteManyRecords, DeleteRecord, NestedWriteQueries, Query, QueryArguments, ReadQuery, RecordQuery,
     RelatedRecordsQuery, RootWriteQuery, UpdateManyRecords, UpdateRecord, WriteQuery,
 };
-use prisma_models::{ModelRef, PrismaValue, RelationFieldRef};
+use prisma_models::{ModelRef, PrismaValue, RelationFieldRef, SelectedFields};
 use std::{convert::TryInto, sync::Arc};
 
 pub struct WriteQueryBuilder {
@@ -38,7 +38,7 @@ impl WriteQueryBuilder {
         let read_query = ReadOneRecordBuilder::new(field, model).build()?;
         let read_node = self.graph.create_node(Query::Read(read_query));
 
-        self.graph.set_result_node(&read_node);
+        self.graph.add_result_node(&read_node);
         self.graph.create_edge(
             &create_node,
             &read_node,
@@ -76,7 +76,7 @@ impl WriteQueryBuilder {
         let read_query = ReadOneRecordBuilder::new(field, model).build()?;
         let read_node = self.graph.create_node(Query::Read(read_query));
 
-        self.graph.set_result_node(&read_node);
+        self.graph.add_result_node(&read_node);
         self.graph.create_edge(
             &update_node,
             &read_node,
@@ -110,7 +110,7 @@ impl WriteQueryBuilder {
         let delete_query = WriteQuery::Root(RootWriteQuery::DeleteRecord(DeleteRecord { where_: record_finder }));
         let delete_node = self.graph.create_node(Query::Write(delete_query));
 
-        self.graph.set_result_node(&read_node);
+        self.graph.add_result_node(&read_node);
         self.graph
             .create_edge(&read_node, &delete_node, QueryDependency::ExecutionOrder);
 
@@ -157,33 +157,39 @@ impl WriteQueryBuilder {
         Ok(self)
     }
 
-    pub fn upsert_record(self, model: ModelRef, mut field: ParsedField) -> QueryBuilderResult<Self> {
+    pub fn upsert_record(mut self, model: ModelRef, mut field: ParsedField) -> QueryBuilderResult<Self> {
         let where_arg = field.arguments.lookup("where").unwrap();
         let record_finder = utils::extract_record_finder(where_arg.value, &model)?;
 
         let create_argument = field.arguments.lookup("create").unwrap();
         let update_argument = field.arguments.lookup("update").unwrap();
 
-        // first: read node on id only
-        // second: create + update + conditional edges to read
-        // third: read node on full selection
+        let selected_fields: SelectedFields = model.fields().id().into();
+        let initial_read_query = ReadQuery::RecordQuery(RecordQuery {
+            name: "".into(),
+            alias: None,
+            record_finder: Some(record_finder.clone()),
+            selected_fields,
+            nested: vec![],
+            selection_order: vec![],
+        });
 
-        let initial_read_query = unimplemented!();
         let initial_read_node = self.graph.create_node(Query::Read(initial_read_query));
 
         let create_node = self.create_record_node(Arc::clone(&model), create_argument.value.try_into()?)?;
         let update_node = self.update_record_node(
-            Some(record_finder.clone()),
+            Some(record_finder),
             Arc::clone(&model),
             update_argument.value.try_into()?,
         )?;
 
         let read_query = ReadOneRecordBuilder::new(field, Arc::clone(&model)).build()?;
-        read_query.inject_record_finder(record_finder);
+        let read_node_create = self.graph.create_node(Query::Read(read_query.clone()));
+        let read_node_update = self.graph.create_node(Query::Read(read_query));
 
-        let read_node = self.graph.create_node(Query::Read(read_query));
+        self.graph.add_result_node(&read_node_create);
+        self.graph.add_result_node(&read_node_update);
 
-        self.graph.set_result_node(&read_node);
         self.graph.create_edge(
             &initial_read_node,
             &create_node,
@@ -196,30 +202,43 @@ impl WriteQueryBuilder {
             QueryDependency::Conditional(Box::new(|parent_id: Option<PrismaValue>| parent_id.is_some())),
         );
 
-        self.graph
-            .create_edge(&update_node, &read_node, QueryDependency::ExecutionOrder);
+        let id_field = model.fields().id();
+        self.graph.create_edge(
+            &update_node,
+            &read_node_update,
+            QueryDependency::ParentId(Box::new(|mut query, parent_id| {
+                if let Query::Read(ReadQuery::RecordQuery(ref mut rq)) = query {
+                    let finder = RecordFinder {
+                        field: id_field,
+                        value: parent_id,
+                    };
 
-        // self.graph.create_edge(
-        //     &create_node,
-        //     &read_node,
-        //     QueryDependency::Read(DependencyType::ParentId),
-        // );
+                    rq.record_finder = Some(finder);
+                };
 
-        // let update = UpdateBuilder::build_from(
-        //     Arc::clone(&model),
-        //     update_argument.value.try_into()?,
-        //     record_finder.clone(),
-        // )?;
+                query
+            })),
+        );
 
-        // let upsert = RootWriteQuery::UpsertRecord(Box::new(UpsertRecord {
-        //     where_: record_finder,
-        //     create,
-        //     update,
-        // }));
+        let id_field = model.fields().id();
+        self.graph.create_edge(
+            &create_node,
+            &read_node_create,
+            QueryDependency::ParentId(Box::new(|mut query, parent_id| {
+                if let Query::Read(ReadQuery::RecordQuery(ref mut rq)) = query {
+                    let finder = RecordFinder {
+                        field: id_field,
+                        value: parent_id,
+                    };
 
-        // Ok(WriteQuery::Root(upsert))
+                    rq.record_finder = Some(finder);
+                };
 
-        unimplemented!()
+                query
+            })),
+        );
+
+        Ok(self)
     }
 
     fn create_record_node(&mut self, model: ModelRef, data_map: ParsedInputMap) -> QueryBuilderResult<Node> {
