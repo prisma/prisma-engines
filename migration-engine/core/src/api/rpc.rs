@@ -50,7 +50,6 @@ static AVAILABLE_COMMANDS: &[RpcCommand] = &[
     RpcCommand::InferMigrationSteps,
     RpcCommand::ListMigrations,
     RpcCommand::MigrationProgress,
-    RpcCommand::MigrationProgress,
     RpcCommand::UnapplyMigration,
     RpcCommand::Reset,
     RpcCommand::CalculateDatamodel,
