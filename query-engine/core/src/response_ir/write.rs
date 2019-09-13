@@ -4,7 +4,11 @@ use connector::{Identifier, WriteQueryResult};
 use prisma_models::PrismaValue;
 
 /// We just assume we ever get a single item back
-pub fn serialize_write(result: WriteQueryResult, typ: &OutputTypeRef, selected_fields: &[String]) -> CoreResult<Item> {
+pub fn serialize_write(
+    result: WriteQueryResult,
+    _typ: &OutputTypeRef,
+    _selected_fields: &[String],
+) -> CoreResult<Item> {
     match result.identifier {
         Identifier::Count(c) => {
             let mut map: IndexMap<String, Item> = IndexMap::new();

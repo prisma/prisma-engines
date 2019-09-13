@@ -9,10 +9,10 @@ use crate::{
 };
 use connector::{
     filter::{Filter, RecordFinder},
-    CreateRecord, DeleteManyRecords, DeleteRecord, NestedWriteQueries, Query, QueryArguments, ReadQuery, RecordQuery,
-    RelatedRecordsQuery, RootWriteQuery, UpdateManyRecords, UpdateRecord, WriteQuery, ManyRecordsQuery,
+    CreateRecord, DeleteManyRecords, DeleteRecord, ManyRecordsQuery, NestedWriteQueries, Query, QueryArguments,
+    ReadQuery, RelatedRecordsQuery, RootWriteQuery, UpdateManyRecords, UpdateRecord, WriteQuery,
 };
-use prisma_models::{ModelRef, PrismaValue, RelationFieldRef, SelectedFields};
+use prisma_models::{ModelRef, RelationFieldRef, SelectedFields};
 use std::{convert::TryInto, sync::Arc};
 
 pub struct WriteQueryBuilder {
@@ -465,14 +465,14 @@ impl WriteQueryBuilder {
         Ok(())
     }
 
-    pub fn nested_delete(
-        &mut self,
-        value: ParsedInputValue,
-        model: &ModelRef,
-        relation_field: &RelationFieldRef,
-    ) -> QueryBuilderResult<Vec<Node>> {
-        unimplemented!()
-    }
+    // pub fn nested_delete(
+    //     &mut self,
+    //     value: ParsedInputValue,
+    //     model: &ModelRef,
+    //     relation_field: &RelationFieldRef,
+    // ) -> QueryBuilderResult<Vec<Node>> {
+    //     unimplemented!()
+    // }
 
     fn coerce_vec(val: ParsedInputValue) -> Vec<ParsedInputValue> {
         match val {

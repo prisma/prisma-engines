@@ -177,7 +177,6 @@ impl Expressionista {
                                                     else_: else_expr,
                                                 }
                                             }
-                                            _ => unreachable!(),
                                         }
                                     }),
                                 }
@@ -217,7 +216,6 @@ impl Expressionista {
         // If there are more scopes, build the nested ones.
         let last_expression = if has_sub_scopes {
             Self::fold_result_scopes(graph, result_binding_names, result_scopes)
-        // expressions.push(sub_scope);
         } else {
             // Else, build the final select if necessary
             Ok(Expression::GetFirstNonEmpty {
@@ -237,7 +235,7 @@ impl Expressionista {
                     name: result_binding_name,
                     expr: head,
                 }],
-                expressions, // last_expression
+                expressions,
             })
         } else {
             Ok(head)
