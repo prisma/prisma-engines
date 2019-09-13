@@ -6,43 +6,36 @@ pub struct Expressionista;
 
 impl Expressionista {
     pub fn translate(mut graph: QueryGraph) -> QueryExecutionResult<Expression> {
-        graph.root_nodes()
+        graph
+            .root_nodes()
             .into_iter()
-            .map(|root_node| Self::build_expression(&mut graph, root_node, None))
+            .map(|root_node| Self::build_expression(&mut graph, &root_node, None))
             .collect::<QueryExecutionResult<Vec<Expression>>>()
             .map(|res| Expression::Sequence { seq: res })
     }
 
-    fn build_expression(graph: &mut QueryGraph, node: NodeRef, parent_edge: Option<EdgeRef>) -> QueryExecutionResult<Expression> {
-        // Graph invariants (TODO put them into code in the graph impl):
-        // - Directed, acyclic.
-        // - Node IDs are unique and stable, as they are used to bind variables in the scopes.
-        // - At most one node is designated as result node.
-        // - Multiple paths in the graph may point to the result node. The first non-empty (ExpressionResult::Empty) return value of those path wins.
-        // - Currently, Nodes are allowed to have multiple parents, but the following invariants apply:
-        //   * They may only refer to their parent and / or one of its direct ancestors.
-        //   * Note: This rule guarantees that the dependent ancestor node result is always in scope for fulfillment of dependencies.
-        // - Following the above, sibling dependencies are disallowed as well.
-        // - Edges are ordered and evaluation is performed from low to high ordering, unless other rules require reshuffling the edges.
-
+    fn build_expression(
+        graph: &mut QueryGraph,
+        node: &NodeRef,
+        parent_edge: Option<EdgeRef>,
+    ) -> QueryExecutionResult<Expression> {
         // todo children pointing to ancestor handling
 
-        // Child edges are ordered, execution rule is low to high in the graph, unless other rules override.
-        let child_edges = graph.outgoing_edges(&node);
-        let mut direct_children: Vec<(EdgeRef, NodeRef)> = child_edges
-            .into_iter()
-            .filter_map(|edge| {
-                let child_node = graph.edge_target(&edge);
+        match graph.node_content(node).unwrap() {
+            Node::Query(_) => Self::build_query_expression(graph, node, parent_edge),
+            Node::Flow(_) => Self::build_flow_expression(graph, node, parent_edge),
+        }
+    }
 
-                if graph.is_direct_child(&node, &child_node) {
-                    Some((edge, child_node))
-                } else {
-                    None
-                }
-            })
-            .collect();
+    fn build_query_expression(
+        graph: &mut QueryGraph,
+        node: &NodeRef,
+        parent_edge: Option<EdgeRef>,
+    ) -> QueryExecutionResult<Expression> {
+        // Child edges are ordered, evaluation order is low to high in the graph, unless other rules override.
+        let mut direct_children = graph.direct_child_pairs(&node);
 
-        // Find the positions of all result returning graph nodes
+        // Find the positions of all result returning graph nodes.
         let mut result_positions: Vec<usize> = direct_children
             .iter()
             .enumerate()
@@ -57,20 +50,21 @@ impl Expressionista {
 
         let mut result_scopes: Vec<Vec<(EdgeRef, NodeRef)>> = vec![];
 
-        // Start splitting of at the end to keep indices intact
+        // Start splitting of at the end to keep indices intact.
         result_positions.reverse();
         result_positions.iter().for_each(|pos| {
             let scope = direct_children.split_off(*pos);
             result_scopes.push(scope);
         });
 
-        // Because we split from right to left, everything left in the direct_children
+        // Because we split from right to left, everything remaining in `direct_children`
         // doesn't belong into results, and is executed before all result scopes.
         let mut expressions: Vec<Expression> = direct_children
             .into_iter()
-            .map(|(edge, node)| Self::build_expression(graph, node, Some(edge)))
+            .map(|(edge, node)| Self::build_expression(graph, &node, Some(edge)))
             .collect::<QueryExecutionResult<Vec<Expression>>>()?;
 
+        // Fold result scopes into one expression.
         if result_scopes.len() > 0 {
             let result_exp = Self::fold_result_scopes(graph, vec![], result_scopes)?;
             expressions.push(result_exp);
@@ -80,11 +74,11 @@ impl Expressionista {
 
         let is_result = graph.is_result_node(&node);
         let node_id = node.id();
-        let query: Query = graph.pluck_node(node).try_into()?;
-        let exp = Self::query_expression(graph, parent_edge, query);
+        let query: Query = graph.pluck_node(&node).try_into()?;
+        let expr = Self::query_expression(graph, parent_edge, query);
 
         if expressions.is_empty() {
-            Ok(exp)
+            Ok(expr)
         } else {
             let node_binding_name = format!("{}", node_id);
 
@@ -99,99 +93,103 @@ impl Expressionista {
             Ok(Expression::Let {
                 bindings: vec![Binding {
                     name: node_binding_name,
-                    exp,
+                    expr,
                 }],
                 expressions,
             })
         }
+    }
 
-        // --------------------------
+    fn query_expression(graph: &mut QueryGraph, parent_edge: Option<EdgeRef>, query: Query) -> Expression {
+        match (parent_edge, query) {
+            (None, query) => Expression::Query { query },
 
-        // Split the children into a set of siblings to be executed before the result and one with/after the result subgraph.
-        // let result_position = child_edges.iter().position(|edge| {
-        //     let target = graph.edge_target(edge);
-        //     graph.subgraph_contains_result(&target)
-        // });
+            (Some(child_edge), query) => {
+                let parent_binding_name = graph.edge_source(&child_edge).id();
+                match graph.pluck_edge(&child_edge) {
+                    QueryGraphDependency::ParentId(f) => Expression::Func {
+                        func: Box::new(move |env: Env| {
+                            let parent_id = env.get(&parent_binding_name).and_then(|pid| pid.as_id());
+                            let query = f(query.into(), parent_id);
 
-        // let (before, after) = match result_position {
-        //     Some(pos) => (child_edges.split_off(pos), child_edges),
-        //     None => (child_edges, vec![]),
-        // };
+                            Expression::Query {
+                                query: query.try_into().unwrap(),
+                            }
+                        }),
+                    },
 
-        // let mut before_result: Vec<_> = before
-        //     .into_iter()
-        //     .map(|child_edge| Self::build_expression(graph, graph.edge_target(&child_edge), Some(child_edge)))
-        //     .collect();
+                    QueryGraphDependency::ExecutionOrder => Expression::Query { query },
 
-        // let mut after_result: Vec<_> = after
-        //     .into_iter()
-        //     .map(|child_edge| Self::build_expression(graph, graph.edge_target(&child_edge), Some(child_edge)))
-        //     .collect();
+                    _ => unreachable!(),
+                }
+            }
+        }
+    }
 
-        // Append a let binding to bind the result to a variable and allow it to be returned last to propagate back up the call chain.
-        // By the virtue of the split, the subgraph root node that contains the result is first in the `after_result` vector.
-        // If `after_vector` contains only the expression of the result graph, just append it to the end - no additional bindings
-        // are required.
-        // let mut expressions = if after_result.len() > 1 {
-        //     let head = after_result.split_off(0).pop().unwrap();
+    fn build_flow_expression(
+        graph: &mut QueryGraph,
+        node: &NodeRef,
+        parent_edge: Option<EdgeRef>,
+    ) -> QueryExecutionResult<Expression> {
+        let flow: Flow = graph.pluck_node(node).try_into()?;
 
-        //     after_result.push(Expression::Get {
-        //         binding_name: "result".to_owned(),
-        //     });
+        match flow {
+            Flow::If(_) => {
+                let child_pairs = graph.child_pairs(node);
 
-        //     before_result.push(Expression::Let {
-        //         bindings: vec![Binding {
-        //             name: "result".to_owned(),
-        //             exp: head,
-        //         }],
-        //         expressions: after_result,
-        //     });
+                // Graph validation guarantees this succeeds.
+                let (mut then_pair, mut else_pair): (Vec<(EdgeRef, NodeRef)>, Vec<(EdgeRef, NodeRef)>) = child_pairs
+                    .into_iter()
+                    .partition(|(edge, _)| match graph.edge_content(&edge).unwrap() {
+                        QueryGraphDependency::Then => true,
+                        QueryGraphDependency::Else => false,
+                        _ => unreachable!(),
+                    });
 
-        //     before_result
-        // } else {
-        //     before_result.append(&mut after_result);
-        //     before_result
-        // };
+                let then_pair = then_pair.pop().unwrap();
+                let else_pair = else_pair.pop();
 
-        // // Writes before reads
-        // let (write_edges, read_edges): (Vec<_>, Vec<_>) = child_edges.into_iter().partition(|child_edge| match &*graph
-        //     .edge_content(&child_edge)
-        // {
-        //     QueryGraphDependency::Write(_, _) => true,
-        //     QueryGraphDependency::Read(_) => false,
-        // });
+                // Build expressions for both arms. They are treated as separate root nodes.
+                let then_expr = Self::build_expression(graph, &then_pair.1, None)?;
+                let else_expr = else_pair
+                    .into_iter()
+                    .map(|(_, node)| Self::build_expression(graph, &node, None))
+                    .collect::<QueryExecutionResult<Vec<Expression>>>()?;
 
-        // let mut expressions: Vec<_> = write_edges
-        //     .into_iter()
-        //     .map(|child_edge| Self::build_expression(graph, graph.edge_target(&child_edge), Some(child_edge)))
-        //     .collect();
+                Ok(match parent_edge {
+                    Some(p) => {
+                        match graph.pluck_edge(&p) {
+                            QueryGraphDependency::ParentId(f) => {
+                                let parent_binding_name = graph.edge_source(&p).id();
+                                Expression::Func {
+                                    func: Box::new(move |env| {
+                                        let parent_id = env.get(&parent_binding_name).and_then(|pid| pid.as_id());
 
-        // let mut read_expressions: Vec<_> = read_edges
-        //     .into_iter()
-        //     .map(|child_edge| Self::build_expression(graph, graph.edge_target(&child_edge), Some(child_edge)))
-        //     .collect();
+                                        // Todo: This still needs some interface polishing...
+                                        let flow: Flow = f(flow.into(), parent_id).try_into().unwrap();
+                                        match flow {
+                                            Flow::If(cond_fn) => {
+                                                // Todo: Maybe this construct points to a misconception: That the if node needs to be actually in the program.
+                                                // At this point here, we could evaluate the condition already and decide which branch to return.
+                                                Expression::If {
+                                                    func: cond_fn,
+                                                    then: vec![then_expr],
+                                                    else_: else_expr,
+                                                }
+                                            }
+                                            _ => unreachable!(),
+                                        }
+                                    }),
+                                }
+                            }
+                            _ => unimplemented!(),
+                        }
+                    }
 
-        // expressions.append(&mut read_expressions);
-
-        // if expressions.is_empty() {
-        //     exp
-        // } else {
-        //     // Add a final statement to the evaluation if the current node has child nodes and is supposed to be the
-        //     // final result, to make sure it propagates upwards.
-        //     if is_result {
-        //         expressions.push(Expression::Get {
-        //             binding_name: "parent".to_owned(),
-        //         });
-        //     };
-
-        //     Expression::Let {
-        //         bindings: vec![Binding {
-        //             name: "parent".to_owned(),
-        //             exp,
-        //         }],
-        //         expressions,
-        //     }
-        // }
+                    None => unimplemented!(),
+                })
+            }
+        }
     }
 
     // All result scopes are nested into each other to allow a final select at the end,
@@ -210,7 +208,7 @@ impl Expressionista {
 
         let mut expressions: Vec<Expression> = current_scope
             .into_iter()
-            .map(|(edge, node)| Self::build_expression(graph, node, Some(edge)))
+            .map(|(edge, node)| Self::build_expression(graph, &node, Some(edge)))
             .collect::<QueryExecutionResult<Vec<Expression>>>()?;
 
         // The first expression of every result scope is the one returning a potential result.
@@ -237,43 +235,12 @@ impl Expressionista {
             Ok(Expression::Let {
                 bindings: vec![Binding {
                     name: result_binding_name,
-                    exp: head,
+                    expr: head,
                 }],
                 expressions, // last_expression
             })
         } else {
             Ok(head)
-        }
-    }
-
-    fn query_expression(graph: &mut QueryGraph, parent_edge: Option<EdgeRef>, query: Query) -> Expression {
-        match (parent_edge, query) {
-            (None, query) => Expression::Query { query },
-
-            (Some(child_edge), query) => {
-                // let parent_binding_name = graph.edge_source(&child_edge).id();
-                // match graph.pluck_edge(child_edge) {
-                //     QueryGraphDependency::ParentId(f) => Expression::Func {
-                //         func: Box::new(move |env: Env| {
-                //             let parent_result = env.get(&parent_binding_name).unwrap();
-                //             let parent_id = parent_result.as_id();
-                //             let query = f(query, parent_id);
-
-                //             Expression::Query { query }
-                //         }),
-                //     },
-                //     QueryGraphDependency::ExecutionOrder => Expression::Query { query },
-                //     QueryGraphDependency::Conditional(f) => Expression::If {
-                //         func: Box::new(move |env: Env| {
-                //             let parent_id = env.get(&parent_binding_name).map(|pid| pid.as_id());
-                //             f(parent_id)
-                //         }),
-                //     },
-                //     _ => unreachable!(),
-                // }
-
-                unimplemented!()
-            }
         }
     }
 }

@@ -1,4 +1,5 @@
 #[derive(Debug)]
 pub enum QueryGraphError {
-    InvalidTransformation { from: String, to: String }
+    RuleViolation(String),
+    InvalidTransformation { from: String, to: String },
 }

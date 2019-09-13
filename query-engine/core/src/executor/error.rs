@@ -5,9 +5,9 @@ use crate::{CoreError, QueryValidationError, QueryGraphError};
 pub enum QueryExecutionError {
     EnvVarNotFound(String),
     InvalidQuery(QueryValidationError),
-    Generic(String),
-    TranslationError(QueryGraphError),
+    TranslationError(String),
     InterpretationError(String),
+    Generic(String),
 }
 
 impl fmt::Display for QueryExecutionError {
@@ -37,6 +37,6 @@ impl From<QueryValidationError> for QueryExecutionError {
 
 impl From<QueryGraphError> for QueryExecutionError {
     fn from(e: QueryGraphError) -> Self {
-        QueryExecutionError::TranslationError(e)
+        QueryExecutionError::TranslationError(format!("{:?}", e))
     }
 }

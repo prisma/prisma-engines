@@ -1,5 +1,5 @@
 use super::*;
-use connector::{Identifier};
+use connector::Identifier;
 use connector::{ReadQueryResult, ResultContent};
 use im::HashMap;
 use prisma_models::prelude::*;
@@ -32,69 +32,15 @@ pub enum Expression {
     },
 
     If {
-        func: Box<dyn FnOnce(Env) -> bool>,
+        func: Box<dyn FnOnce() -> bool>,
         then: Vec<Expression>,
         else_: Vec<Expression>,
     },
 }
 
-impl Expression {
-    // Todo put into display or whatever.
-    pub fn to_string(&self, indent: usize) -> String {
-        match self {
-            Self::Sequence { seq } => seq
-                .into_iter()
-                .map(|exp| Self::add_indent(indent, exp.to_string(indent + 2)))
-                .collect::<Vec<String>>()
-                .join("\n"),
-
-            Self::Query { query } => match query {
-                Query::Read(rq) => Self::add_indent(indent, format!("{}", rq)),
-                Query::Write(WriteQuery::Root(wq)) => Self::add_indent(indent, format!("{}", wq)),
-                _ => unreachable!(),
-            },
-
-            Self::Func { func: _ } => Self::add_indent(indent, "(Fn env)"),
-            Self::Let { bindings, expressions } => {
-                let binding_strs = bindings
-                    .into_iter()
-                    .map(|binding| {
-                        Self::add_indent(
-                            indent + 2,
-                            format!("(\"{}\" {})", binding.name, binding.exp.to_string(0)),
-                        )
-                    })
-                    .collect::<Vec<String>>()
-                    .join("\n");
-
-                let exp_strs = expressions
-                    .into_iter()
-                    .map(|exp| exp.to_string(indent))
-                    .collect::<Vec<String>>()
-                    .join("\n");
-
-                format!("(Let [\n{}\n{}]\n{}\n)", binding_strs, Self::indent(indent), exp_strs)
-            }
-            Self::Get { binding_name } => Self::add_indent(indent, format!("(Get env '{}')", binding_name)),
-            Self::GetFirstNonEmpty { binding_names } => {
-                Self::add_indent(indent, format!("(GetFirstNoneEmpty env '{:?}')", binding_names))
-            }
-            Self::If { func: _, then: _, else_: _ } => Self::add_indent(indent, "if (Fn env)"),
-        }
-    }
-
-    fn add_indent<T: AsRef<str>>(indent: usize, s: T) -> String {
-        format!("{}{}", Self::indent(indent), s.as_ref())
-    }
-
-    fn indent(indent: usize) -> String {
-        " ".repeat(indent)
-    }
-}
-
 pub struct Binding {
     pub name: String,
-    pub exp: Expression,
+    pub expr: Expression,
 }
 
 #[derive(Debug, Clone)]
@@ -109,20 +55,21 @@ impl ExpressionResult {
     /// todos:
     ///   - Lists are not really handled. Last element wins.
     ///   - Not all result sets are handled.
-    pub fn as_id(&self) -> PrismaValue {
+    pub fn as_id(&self) -> Option<PrismaValue> {
         match self {
             Self::Write(result) => match &result.identifier {
-                Identifier::Id(id) => id.clone().try_into().unwrap(),
+                Identifier::Id(id) => Some(id.clone().try_into().unwrap()),
                 _ => unimplemented!(),
             },
+
             Self::Read(res) => match &res.content {
                 ResultContent::RecordSelection(rs) => rs
                     .scalars
                     .collect_ids(rs.id_field.as_str())
                     .unwrap()
                     .pop()
-                    .unwrap()
-                    .into(),
+                    .map(|val| val.into()),
+
                 _ => unimplemented!(),
             },
             _ => unimplemented!(),
@@ -177,7 +124,7 @@ impl<'a> QueryInterpreter<'a> {
                 println!("LET");
                 let mut inner_env = env.clone();
                 for binding in bindings {
-                    let result = self.interpret(binding.exp, env.clone())?;
+                    let result = self.interpret(binding.expr, env.clone())?;
                     inner_env.insert(binding.name, result);
                 }
 
@@ -209,9 +156,13 @@ impl<'a> QueryInterpreter<'a> {
                 })
                 .unwrap()),
 
-            Expression::If { func, then, else_ } =>  {
-                //
-                unimplemented!()
+            Expression::If { func, then, else_ } => {
+                println!("IF");
+                if func() {
+                    self.interpret(Expression::Sequence { seq: then }, env)
+                } else {
+                    self.interpret(Expression::Sequence { seq: else_ }, env)
+                }
             }
         }
     }

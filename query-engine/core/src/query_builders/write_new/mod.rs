@@ -4,13 +4,13 @@ pub use write_arguments::*;
 
 use super::*;
 use crate::{
-    query_graph::{Node, NodeRef, QueryGraphDependency, QueryGraph, Flow},
+    query_graph::{Flow, Node, NodeRef, QueryGraph, QueryGraphDependency},
     ArgumentListLookup, ParsedField, ParsedInputMap, ParsedInputValue, ReadOneRecordBuilder,
 };
 use connector::{
     filter::{Filter, RecordFinder},
     CreateRecord, DeleteManyRecords, DeleteRecord, NestedWriteQueries, Query, QueryArguments, ReadQuery, RecordQuery,
-    RelatedRecordsQuery, RootWriteQuery, UpdateManyRecords, UpdateRecord, WriteQuery,
+    RelatedRecordsQuery, RootWriteQuery, UpdateManyRecords, UpdateRecord, WriteQuery, ManyRecordsQuery,
 };
 use prisma_models::{ModelRef, PrismaValue, RelationFieldRef, SelectedFields};
 use std::{convert::TryInto, sync::Arc};
@@ -46,7 +46,7 @@ impl WriteQueryBuilder {
                 if let Node::Query(Query::Read(ReadQuery::RecordQuery(ref mut rq))) = node {
                     let finder = RecordFinder {
                         field: id_field,
-                        value: parent_id,
+                        value: parent_id.unwrap(),
                     };
 
                     rq.record_finder = Some(finder);
@@ -84,7 +84,7 @@ impl WriteQueryBuilder {
                 if let Node::Query(Query::Read(ReadQuery::RecordQuery(ref mut rq))) = node {
                     let finder = RecordFinder {
                         field: id_field,
-                        value: parent_id,
+                        value: parent_id.unwrap(),
                     };
 
                     rq.record_finder = Some(finder);
@@ -164,11 +164,13 @@ impl WriteQueryBuilder {
         let create_argument = field.arguments.lookup("create").unwrap();
         let update_argument = field.arguments.lookup("update").unwrap();
 
+        // Use ManyRecordsQuery to circumvent the connector blowing up on nonexistent record.
         let selected_fields: SelectedFields = model.fields().id().into();
-        let initial_read_query = ReadQuery::RecordQuery(RecordQuery {
+        let initial_read_query = ReadQuery::ManyRecordsQuery(ManyRecordsQuery {
             name: "".into(),
             alias: None,
-            record_finder: Some(record_finder.clone()),
+            model: Arc::clone(&model),
+            args: record_finder.clone().into(),
             selected_fields,
             nested: vec![],
             selection_order: vec![],
@@ -190,36 +192,26 @@ impl WriteQueryBuilder {
         self.graph.add_result_node(&read_node_create);
         self.graph.add_result_node(&read_node_update);
 
-        let if_node = self.graph.create_node(Flow::If(Box::new(|parent_id: Option<PrismaValue>| parent_id.is_none())));
+        let if_node = self.graph.create_node(Flow::default_if());
 
         self.graph.create_edge(
             &initial_read_node,
             &if_node,
-            QueryGraphDependency::ParentId(Box::new(|mut node, parent_id| {
-                if let Node::Flow(Flow::If(ref cond)) = node {
-                    // let finder = RecordFinder {
-                    //     field: id_field,
-                    //     value: parent_id,
-                    // };
-
-                    // rq.record_finder = Some(finder);
-                };
-
-                node
+            QueryGraphDependency::ParentId(Box::new(|node, parent_id| {
+                if let Node::Flow(Flow::If(_)) = node {
+                    // Todo: This looks super unnecessary
+                    Node::Flow(Flow::If(Box::new(move || parent_id.is_some())))
+                } else {
+                    node
+                }
             })),
         );
 
-        self.graph.create_edge(
-            &if_node,
-            &update_node,
-            QueryGraphDependency::Then,
-        );
+        self.graph
+            .create_edge(&if_node, &update_node, QueryGraphDependency::Then);
 
-        self.graph.create_edge(
-            &if_node,
-            &create_node,
-            QueryGraphDependency::Else,
-        );
+        self.graph
+            .create_edge(&if_node, &create_node, QueryGraphDependency::Else);
 
         let id_field = model.fields().id();
         self.graph.create_edge(
@@ -229,7 +221,7 @@ impl WriteQueryBuilder {
                 if let Node::Query(Query::Read(ReadQuery::RecordQuery(ref mut rq))) = node {
                     let finder = RecordFinder {
                         field: id_field,
-                        value: parent_id,
+                        value: parent_id.unwrap(),
                     };
 
                     rq.record_finder = Some(finder);
@@ -247,7 +239,7 @@ impl WriteQueryBuilder {
                 if let Node::Query(Query::Read(ReadQuery::RecordQuery(ref mut rq))) = node {
                     let finder = RecordFinder {
                         field: id_field,
-                        value: parent_id,
+                        value: parent_id.unwrap(),
                     };
 
                     rq.record_finder = Some(finder);
@@ -359,38 +351,38 @@ impl WriteQueryBuilder {
             let relation_field_name = relation_field.related_field().name.clone();
 
             // Detect if a flip is necessary
-            let (parent, child) = if let Node::Query(Query::Write(WriteQuery::Root(RootWriteQuery::CreateRecord(_)))) = parent_query
-            {
-                if relation_field.relation_is_inlined_in_parent() {
-                    // Actions required to do a flip:
-                    // 1. Remove all edges from the parent to it's parents, and rewire them to the child.
-                    // 2. Create an edge from child -> parent.
-                    // Todo: Warning, this destroys the ordering of edges, which can lead to incorrect results being read.
-                    //       Consider how the underlying graph can handle that.
-                    let parent_edges = self.graph.incoming_edges(parent);
-                    for parent_edge in parent_edges {
-                        let parent_of_parent_node = self.graph.edge_source(&parent_edge);
-                        let edge_content = self.graph.remove_edge(parent_edge).unwrap();
+            let (parent, child) =
+                if let Node::Query(Query::Write(WriteQuery::Root(RootWriteQuery::CreateRecord(_)))) = parent_query {
+                    if relation_field.relation_is_inlined_in_parent() {
+                        // Actions required to do a flip:
+                        // 1. Remove all edges from the parent to it's parents, and rewire them to the child.
+                        // 2. Create an edge from child -> parent.
+                        // Todo: Warning, this destroys the ordering of edges, which can lead to incorrect results being read.
+                        //       Consider how the underlying graph can handle that.
+                        let parent_edges = self.graph.incoming_edges(parent);
+                        for parent_edge in parent_edges {
+                            let parent_of_parent_node = self.graph.edge_source(&parent_edge);
+                            let edge_content = self.graph.remove_edge(parent_edge).unwrap();
 
-                        // Todo: Warning, this assumes the edge contents can also be "flipped".
-                        self.graph
-                            .create_edge(&parent_of_parent_node, &nested_node, edge_content);
+                            // Todo: Warning, this assumes the edge contents can also be "flipped".
+                            self.graph
+                                .create_edge(&parent_of_parent_node, &nested_node, edge_content);
+                        }
+
+                        (&nested_node, parent)
+                    } else {
+                        (parent, &nested_node)
                     }
-
-                    (&nested_node, parent)
                 } else {
                     (parent, &nested_node)
-                }
-            } else {
-                (parent, &nested_node)
-            };
+                };
 
             self.graph.create_edge(
                 parent,
                 child,
                 QueryGraphDependency::ParentId(Box::new(|mut node, parent_id| {
                     if let Node::Query(Query::Write(ref mut wq)) = node {
-                        wq.inject_non_list_arg(relation_field_name, parent_id);
+                        wq.inject_non_list_arg(relation_field_name, parent_id.unwrap());
                     }
 
                     node
@@ -443,10 +435,12 @@ impl WriteQueryBuilder {
                     &read_parent_node,
                     &update_node,
                     QueryGraphDependency::ParentId(Box::new(|mut node, parent_id| {
-                        if let Node::Query(Query::Write(WriteQuery::Root(RootWriteQuery::UpdateRecord(ref mut ur)))) = node {
+                        if let Node::Query(Query::Write(WriteQuery::Root(RootWriteQuery::UpdateRecord(ref mut ur)))) =
+                            node
+                        {
                             ur.where_ = Some(RecordFinder {
                                 field: id_field,
-                                value: parent_id,
+                                value: parent_id.unwrap(),
                             });
                         }
 
@@ -459,7 +453,7 @@ impl WriteQueryBuilder {
                     &read_parent_node,
                     QueryGraphDependency::ParentId(Box::new(|mut node, parent_id| {
                         if let Node::Query(Query::Read(ReadQuery::RelatedRecordsQuery(ref mut rq))) = node {
-                            rq.parent_ids = Some(vec![parent_id.try_into().unwrap()]);
+                            rq.parent_ids = Some(vec![parent_id.unwrap().try_into().unwrap()]);
                         };
 
                         node

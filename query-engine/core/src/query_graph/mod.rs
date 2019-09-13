@@ -1,9 +1,10 @@
 ///! Query graph abstraction for simple high-level query representation
 ///! and manipulation.
-mod guard;
-mod formatters;
-mod transformers;
 mod error;
+mod formatters;
+mod guard;
+mod rules;
+mod transformers;
 
 pub use error::*;
 pub use formatters::*;
@@ -13,7 +14,37 @@ use connector::*;
 use guard::*;
 use petgraph::{graph::*, visit::EdgeRef as PEdgeRef, *};
 use prisma_models::PrismaValue;
+use rules::*;
 use std::borrow::Borrow;
+
+pub type QueryGraphResult<T> = std::result::Result<T, QueryGraphError>;
+
+/// A graph representing an abstract view of queries and their execution dependencies.
+///
+/// Graph invariants (TODO put checks into the code?):
+/// - Directed, acyclic.
+///
+/// - Node IDs are unique and stable.
+///
+/// - The graph may have multiple result nodes, and multiple paths in the graph may point to result nodes, but only one result is serialized.
+///   Note: The exact rules determining the final result are subject of the graph translation.
+///
+/// - Currently, Nodes are allowed to have multiple parents, but the following invariant applies: They may only refer to their parent and / or one of its ancestors.
+///   Note: This rule guarantees that the dependent ancestor node result is always in scope for fulfillment of dependencies.
+///
+/// - Following the above, sibling dependencies are disallowed as well.
+///
+/// - Edges are ordered.
+///   Node: Their evaluation is performed from low to high ordering, unless other rules require reshuffling the edges during translation.
+#[derive(Default)]
+pub struct QueryGraph {
+    graph: InnerGraph,
+
+    /// Designates the nodes that are returning the result of the entire QueryGraph.
+    /// If no nodes are set, the interpretation will take the result of the
+    /// last statement derived from the graph.
+    result_nodes: Vec<NodeIndex>,
+}
 
 /// Implementation detail of the QueryGraph.
 type InnerGraph = Graph<Guard<Node>, Guard<QueryGraphDependency>>;
@@ -37,19 +68,14 @@ impl From<Flow> for Node {
 
 pub enum Flow {
     /// Expresses a conditional control flow in the graph.
-    /// Currently, the evaluation function receives the parent ID as PrismaValue if it exists, None otherwise.
     /// Possible outgoing edges are `then` and `else`, each at most once, with `then` required to be present.
-    If(Box<dyn FnOnce(Option<PrismaValue>) -> bool>),
+    If(Box<dyn FnOnce() -> bool>),
 }
 
-#[derive(Default)]
-pub struct QueryGraph {
-    graph: InnerGraph,
-
-    /// Designates the nodes that are returning the result of the entire QueryGraph.
-    /// If no nodes are set, the interpretation will take the result of the
-    /// last statement derived from the graph.
-    result_nodes: Vec<NodeIndex>,
+impl Flow {
+    pub fn default_if() -> Self {
+        Self::If(Box::new(|| true))
+    }
 }
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
@@ -76,7 +102,7 @@ pub enum QueryGraphDependency {
     ExecutionOrder,
 
     /// Performs a transformation on a node based on the parent ID (PrismaValue).
-    ParentId(Box<dyn FnOnce(Node, PrismaValue) -> Node>),
+    ParentId(Box<dyn FnOnce(Node, Option<PrismaValue>) -> Node>), // Todo: It might be a good idea to return Result.
 
     /// Only valid in the context of a `If` control flow node.
     Then,
@@ -135,7 +161,10 @@ impl QueryGraph {
             .collect()
     }
 
-    pub fn create_node<T>(&mut self, t: T) -> NodeRef where T: Into<Node> {
+    pub fn create_node<T>(&mut self, t: T) -> NodeRef
+    where
+        T: Into<Node>,
+    {
         let node_ix = self.graph.add_node(Guard::new(t.into()));
 
         NodeRef { node_ix }
@@ -143,8 +172,10 @@ impl QueryGraph {
 
     pub fn create_edge(&mut self, from: &NodeRef, to: &NodeRef, content: QueryGraphDependency) -> EdgeRef {
         let edge_ix = self.graph.add_edge(from.node_ix, to.node_ix, Guard::new(content));
+        let edge = EdgeRef { edge_ix };
 
-        EdgeRef { edge_ix }
+        after_edge_creation(self, &edge).unwrap(); // todo interface change to results.
+        edge
     }
 
     pub fn node_content(&self, node: &NodeRef) -> Option<&Node> {
@@ -177,13 +208,13 @@ impl QueryGraph {
 
     /// Removes the edge from the graph but leaves the graph intact by keeping the empty
     /// edge in the graph by plucking the content of the edge, but not the edge itself.
-    pub fn pluck_edge(&mut self, edge: EdgeRef) -> QueryGraphDependency {
+    pub fn pluck_edge(&mut self, edge: &EdgeRef) -> QueryGraphDependency {
         self.graph.edge_weight_mut(edge.edge_ix).unwrap().unset()
     }
 
     /// Removes the node from the graph but leaves the graph intact by keeping the empty
     /// node in the graph by plucking the content of the node, but not the node itself.
-    pub fn pluck_node(&mut self, node: NodeRef) -> Node {
+    pub fn pluck_node(&mut self, node: &NodeRef) -> Node {
         self.graph.node_weight_mut(node.node_ix).unwrap().unset()
     }
 
@@ -197,6 +228,31 @@ impl QueryGraph {
             .into_iter()
             .find(|edge| &self.edge_source(edge) != parent)
             .is_none()
+    }
+
+    pub fn child_pairs(&self, node: &NodeRef) -> Vec<(EdgeRef, NodeRef)> {
+        self.outgoing_edges(node)
+            .into_iter()
+            .map(|edge| {
+                let target = self.edge_target(&edge);
+                (edge, target)
+            })
+            .collect()
+    }
+
+    pub fn direct_child_pairs(&self, node: &NodeRef) -> Vec<(EdgeRef, NodeRef)> {
+        self.outgoing_edges(node)
+            .into_iter()
+            .filter_map(|edge| {
+                let child_node = self.edge_target(&edge);
+
+                if self.is_direct_child(node, &child_node) {
+                    Some((edge, child_node))
+                } else {
+                    None
+                }
+            })
+            .collect()
     }
 
     fn collect_edges(&self, node: &NodeRef, direction: Direction) -> Vec<EdgeRef> {

@@ -3,8 +3,10 @@ mod expressionista;
 mod interpreter;
 mod read;
 mod write;
+mod formatters;
 
 pub use error::*;
+pub use formatters::*;
 pub use expressionista::*;
 pub use interpreter::*;
 pub use read::ReadQueryExecutor;
@@ -46,13 +48,11 @@ impl<'a> QueryPipeline<'a> {
         let serializer = self.serializer;
 
         println!("{}", self.graph);
+        let expr = Expressionista::translate(self.graph)?;
 
-        let exp = Expressionista::translate(self.graph)?;
-
-        println!("{}", exp.to_string(0));
-
+        println!("{}", format_expression(&expr, 0));
         self.interpreter
-            .interpret(exp, Env::default())
+            .interpret(expr, Env::default())
             .map(|result| serializer.serialize(result))
     }
 }
