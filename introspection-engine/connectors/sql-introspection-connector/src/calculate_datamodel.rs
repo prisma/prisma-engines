@@ -1,10 +1,11 @@
 use crate::SqlIntrospectionResult;
 use datamodel::{
-    common::{PrismaType, PrismaValue},
+    common::{names::NameNormalizer, PrismaType, PrismaValue},
     dml, Datamodel, Field, FieldArity, FieldType, IdInfo, IdStrategy, Model, OnDeleteStrategy, RelationInfo,
     ScalarListStrategy,
 };
 use log::debug;
+use prisma_inflector;
 use regex::Regex;
 use sql_schema_describer::*;
 
@@ -13,7 +14,7 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
     debug!("Calculating data model");
 
     let mut data_model = Datamodel::new();
-    for table in schema.tables.iter() {
+    for table in schema.tables.iter().filter(|table| table.name != "_Migration") {
         let mut model = Model::new(&table.name);
         for column in table.columns.iter() {
             debug!("Handling column {:?}", column);
@@ -32,13 +33,19 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
                 .default
                 .as_ref()
                 .and_then(|default| calculate_default(default, &column.tpe.family));
+
+            let is_unique = if id_info.is_some() {
+                false
+            } else {
+                table.is_column_unique(&column)
+            };
             let field = Field {
                 name: column.name.clone(),
                 arity,
                 field_type,
                 database_name: None,
                 default_value,
-                is_unique: table.is_column_unique(&column),
+                is_unique: is_unique,
                 id_info,
                 scalar_list_strategy,
                 documentation: None,
@@ -59,6 +66,72 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
             database_name: None,
             documentation: None,
         });
+    }
+
+    let mut back_relation_fields = Vec::new();
+
+    for model in data_model.models.iter() {
+        for relation_field in model.fields.iter() {
+            match &relation_field.field_type {
+                FieldType::Relation(relation_info) => {
+                    if data_model
+                        .related_field_new(
+                            &model.name,
+                            &relation_info.to,
+                            &relation_info.name,
+                            &relation_field.name,
+                        )
+                        .is_none()
+                    {
+                        let other_model = data_model.find_model(&relation_info.to).unwrap();
+
+                        let field_type = FieldType::Relation(RelationInfo {
+                            name: "".to_string(),
+                            to: model.name.clone(),
+                            to_fields: vec![],
+                            on_delete: OnDeleteStrategy::None,
+                        });
+
+                        let arity = match relation_field.arity {
+                            FieldArity::Required | FieldArity::Optional => FieldArity::List,
+                            FieldArity::List => FieldArity::Optional,
+                        };
+
+                        let inflector = prisma_inflector::default();
+
+                        let name = match arity {
+                            FieldArity::List => inflector.pluralize(&model.name).camel_case(), // pluralize
+                            FieldArity::Optional => model.name.clone().camel_case(),
+                            FieldArity::Required => model.name.clone().camel_case(),
+                        };
+
+                        let field = Field {
+                            name,
+                            arity,
+                            field_type,
+                            database_name: None,
+                            default_value: None,
+                            is_unique: false,
+                            id_info: None,
+                            scalar_list_strategy: None,
+                            documentation: None,
+                            is_generated: false,
+                            is_updated_at: false,
+                        };
+
+                        back_relation_fields.push((other_model.name.clone(), field));
+                    }
+                }
+                _ => {}
+            }
+        }
+    }
+
+    eprintln!("{:?}", back_relation_fields);
+
+    for (model, field) in back_relation_fields {
+        let model = data_model.find_model_mut(&model).unwrap();
+        model.add_field(field);
     }
 
     Ok(data_model)

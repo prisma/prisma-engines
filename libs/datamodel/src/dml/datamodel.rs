@@ -1,7 +1,8 @@
 use super::enummodel::*;
-use super::field::Field;
+use super::field::{Field, FieldType};
 use super::model::*;
 use serde::{Deserialize, Serialize};
+
 
 // TODO: Is schema the right name here?
 /// Represents a prisma-datamodel.
@@ -114,5 +115,20 @@ impl Datamodel {
     /// Finds an enum by name and returns a mutable reference.
     pub fn find_enum_mut(&mut self, name: &str) -> Option<&mut Enum> {
         self.enums_mut().find(|m| m.name == *name)
+    }
+
+   /// Finds a field with a certain relation guarantee.
+    /// exclude_field are necessary to avoid corner cases with self-relations (e.g. we must not recognize a field as its own related field).
+    pub fn related_field_new(&self,from: &str,  to: &str, name: &str, exclude_field: &str) -> Option<&Field> {
+       self.find_model(&to).and_then(|related_model|
+            related_model.fields().find(|f| {
+                if let FieldType::Relation(rel_info) = &f.field_type {
+                    if rel_info.to == from && rel_info.name == name && f.name != exclude_field {
+                        return true;
+                    }
+                }
+                false
+            })
+       )
     }
 }

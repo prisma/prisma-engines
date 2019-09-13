@@ -2755,6 +2755,7 @@ dependencies = [
  "introspection-connector 0.1.0",
  "log 0.4.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "pretty_assertions 0.6.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "prisma-inflector 0.1.0",
  "prisma-query 0.1.0 (git+https://github.com/prisma/prisma-query.git)",
  "regex 1.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "sql-schema-describer 0.1.0",
