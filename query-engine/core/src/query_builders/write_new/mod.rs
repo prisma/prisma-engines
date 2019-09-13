@@ -4,7 +4,7 @@ pub use write_arguments::*;
 
 use super::*;
 use crate::{
-    query_graph::{Node, QueryDependency, QueryGraph},
+    query_graph::{Node, NodeRef, QueryGraphDependency, QueryGraph, Flow},
     ArgumentListLookup, ParsedField, ParsedInputMap, ParsedInputValue, ReadOneRecordBuilder,
 };
 use connector::{
@@ -42,8 +42,8 @@ impl WriteQueryBuilder {
         self.graph.create_edge(
             &create_node,
             &read_node,
-            QueryDependency::ParentId(Box::new(|mut query, parent_id| {
-                if let Query::Read(ReadQuery::RecordQuery(ref mut rq)) = query {
+            QueryGraphDependency::ParentId(Box::new(|mut node, parent_id| {
+                if let Node::Query(Query::Read(ReadQuery::RecordQuery(ref mut rq))) = node {
                     let finder = RecordFinder {
                         field: id_field,
                         value: parent_id,
@@ -52,7 +52,7 @@ impl WriteQueryBuilder {
                     rq.record_finder = Some(finder);
                 };
 
-                query
+                node
             })),
         );
 
@@ -80,8 +80,8 @@ impl WriteQueryBuilder {
         self.graph.create_edge(
             &update_node,
             &read_node,
-            QueryDependency::ParentId(Box::new(|mut query, parent_id| {
-                if let Query::Read(ReadQuery::RecordQuery(ref mut rq)) = query {
+            QueryGraphDependency::ParentId(Box::new(|mut node, parent_id| {
+                if let Node::Query(Query::Read(ReadQuery::RecordQuery(ref mut rq))) = node {
                     let finder = RecordFinder {
                         field: id_field,
                         value: parent_id,
@@ -90,7 +90,7 @@ impl WriteQueryBuilder {
                     rq.record_finder = Some(finder);
                 };
 
-                query
+                node
             })),
         );
 
@@ -112,7 +112,7 @@ impl WriteQueryBuilder {
 
         self.graph.add_result_node(&read_node);
         self.graph
-            .create_edge(&read_node, &delete_node, QueryDependency::ExecutionOrder);
+            .create_edge(&read_node, &delete_node, QueryGraphDependency::ExecutionOrder);
 
         Ok(self)
     }
@@ -190,24 +190,43 @@ impl WriteQueryBuilder {
         self.graph.add_result_node(&read_node_create);
         self.graph.add_result_node(&read_node_update);
 
-        self.graph.create_edge(
-            &initial_read_node,
-            &create_node,
-            QueryDependency::Conditional(Box::new(|parent_id: Option<PrismaValue>| parent_id.is_none())),
-        );
+        let if_node = self.graph.create_node(Flow::If(Box::new(|parent_id: Option<PrismaValue>| parent_id.is_none())));
 
         self.graph.create_edge(
             &initial_read_node,
+            &if_node,
+            QueryGraphDependency::ParentId(Box::new(|mut node, parent_id| {
+                if let Node::Flow(Flow::If(ref cond)) = node {
+                    // let finder = RecordFinder {
+                    //     field: id_field,
+                    //     value: parent_id,
+                    // };
+
+                    // rq.record_finder = Some(finder);
+                };
+
+                node
+            })),
+        );
+
+        self.graph.create_edge(
+            &if_node,
             &update_node,
-            QueryDependency::Conditional(Box::new(|parent_id: Option<PrismaValue>| parent_id.is_some())),
+            QueryGraphDependency::Then,
+        );
+
+        self.graph.create_edge(
+            &if_node,
+            &create_node,
+            QueryGraphDependency::Else,
         );
 
         let id_field = model.fields().id();
         self.graph.create_edge(
             &update_node,
             &read_node_update,
-            QueryDependency::ParentId(Box::new(|mut query, parent_id| {
-                if let Query::Read(ReadQuery::RecordQuery(ref mut rq)) = query {
+            QueryGraphDependency::ParentId(Box::new(|mut node, parent_id| {
+                if let Node::Query(Query::Read(ReadQuery::RecordQuery(ref mut rq))) = node {
                     let finder = RecordFinder {
                         field: id_field,
                         value: parent_id,
@@ -216,7 +235,7 @@ impl WriteQueryBuilder {
                     rq.record_finder = Some(finder);
                 };
 
-                query
+                node
             })),
         );
 
@@ -224,8 +243,8 @@ impl WriteQueryBuilder {
         self.graph.create_edge(
             &create_node,
             &read_node_create,
-            QueryDependency::ParentId(Box::new(|mut query, parent_id| {
-                if let Query::Read(ReadQuery::RecordQuery(ref mut rq)) = query {
+            QueryGraphDependency::ParentId(Box::new(|mut node, parent_id| {
+                if let Node::Query(Query::Read(ReadQuery::RecordQuery(ref mut rq))) = node {
                     let finder = RecordFinder {
                         field: id_field,
                         value: parent_id,
@@ -234,14 +253,14 @@ impl WriteQueryBuilder {
                     rq.record_finder = Some(finder);
                 };
 
-                query
+                node
             })),
         );
 
         Ok(self)
     }
 
-    fn create_record_node(&mut self, model: ModelRef, data_map: ParsedInputMap) -> QueryBuilderResult<Node> {
+    fn create_record_node(&mut self, model: ModelRef, data_map: ParsedInputMap) -> QueryBuilderResult<NodeRef> {
         let create_args = WriteArguments::from(&model, data_map)?;
         let mut non_list_args = create_args.non_list;
 
@@ -272,7 +291,7 @@ impl WriteQueryBuilder {
         record_finder: Option<RecordFinder>,
         model: ModelRef,
         data_map: ParsedInputMap,
-    ) -> QueryBuilderResult<Node> {
+    ) -> QueryBuilderResult<NodeRef> {
         let update_args = WriteArguments::from(&model, data_map)?;
         let list_causes_update = !update_args.list.is_empty();
         let mut non_list_args = update_args.non_list;
@@ -301,7 +320,7 @@ impl WriteQueryBuilder {
 
     fn connect_nested_query(
         &mut self,
-        parent: &Node,
+        parent: &NodeRef,
         relation_field: RelationFieldRef,
         data_map: ParsedInputMap,
     ) -> QueryBuilderResult<()> {
@@ -329,7 +348,7 @@ impl WriteQueryBuilder {
 
     pub fn connect_nested_create(
         &mut self,
-        parent: &Node,
+        parent: &NodeRef,
         relation_field: &RelationFieldRef,
         value: ParsedInputValue,
         model: &ModelRef,
@@ -340,7 +359,7 @@ impl WriteQueryBuilder {
             let relation_field_name = relation_field.related_field().name.clone();
 
             // Detect if a flip is necessary
-            let (parent, child) = if let Query::Write(WriteQuery::Root(RootWriteQuery::CreateRecord(_))) = parent_query
+            let (parent, child) = if let Node::Query(Query::Write(WriteQuery::Root(RootWriteQuery::CreateRecord(_)))) = parent_query
             {
                 if relation_field.relation_is_inlined_in_parent() {
                     // Actions required to do a flip:
@@ -369,11 +388,12 @@ impl WriteQueryBuilder {
             self.graph.create_edge(
                 parent,
                 child,
-                QueryDependency::ParentId(Box::new(|mut query, parent_id| {
-                    if let Query::Write(ref mut wq) = query {
+                QueryGraphDependency::ParentId(Box::new(|mut node, parent_id| {
+                    if let Node::Query(Query::Write(ref mut wq)) = node {
                         wq.inject_non_list_arg(relation_field_name, parent_id);
                     }
-                    query
+
+                    node
                 })),
             );
         }
@@ -383,7 +403,7 @@ impl WriteQueryBuilder {
 
     pub fn connect_nested_update(
         &mut self,
-        parent: &Node,
+        parent: &NodeRef,
         relation_field: &RelationFieldRef,
         value: ParsedInputValue,
         model: &ModelRef,
@@ -399,7 +419,7 @@ impl WriteQueryBuilder {
                     self.update_record_node(Some(record_finder), Arc::clone(model), data_value.try_into()?)?;
 
                 self.graph
-                    .create_edge(parent, &update_node, QueryDependency::ExecutionOrder);
+                    .create_edge(parent, &update_node, QueryGraphDependency::ExecutionOrder);
             } else {
                 // We don't have a specific record (i.e. finder), we need to find it first.
                 // Build a read query to load the necessary data first and connect it to the update.
@@ -422,27 +442,27 @@ impl WriteQueryBuilder {
                 self.graph.create_edge(
                     &read_parent_node,
                     &update_node,
-                    QueryDependency::ParentId(Box::new(|mut query, parent_id| {
-                        if let Query::Write(WriteQuery::Root(RootWriteQuery::UpdateRecord(ref mut ur))) = query {
+                    QueryGraphDependency::ParentId(Box::new(|mut node, parent_id| {
+                        if let Node::Query(Query::Write(WriteQuery::Root(RootWriteQuery::UpdateRecord(ref mut ur)))) = node {
                             ur.where_ = Some(RecordFinder {
                                 field: id_field,
                                 value: parent_id,
                             });
                         }
 
-                        query
+                        node
                     })),
                 );
 
                 self.graph.create_edge(
                     parent,
                     &read_parent_node,
-                    QueryDependency::ParentId(Box::new(|mut query, parent_id| {
-                        if let Query::Read(ReadQuery::RelatedRecordsQuery(ref mut rq)) = query {
+                    QueryGraphDependency::ParentId(Box::new(|mut node, parent_id| {
+                        if let Node::Query(Query::Read(ReadQuery::RelatedRecordsQuery(ref mut rq))) = node {
                             rq.parent_ids = Some(vec![parent_id.try_into().unwrap()]);
                         };
 
-                        query
+                        node
                     })),
                 );
             }

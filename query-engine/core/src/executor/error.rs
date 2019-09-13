@@ -1,11 +1,13 @@
 use std::fmt;
-use crate::{CoreError, QueryValidationError};
+use crate::{CoreError, QueryValidationError, QueryGraphError};
 
 #[derive(Debug)]
 pub enum QueryExecutionError {
     EnvVarNotFound(String),
     InvalidQuery(QueryValidationError),
     Generic(String),
+    TranslationError(QueryGraphError),
+    InterpretationError(String),
 }
 
 impl fmt::Display for QueryExecutionError {
@@ -30,5 +32,11 @@ impl From<CoreError> for QueryExecutionError {
 impl From<QueryValidationError> for QueryExecutionError {
     fn from(e: QueryValidationError) -> Self {
         QueryExecutionError::InvalidQuery(e)
+    }
+}
+
+impl From<QueryGraphError> for QueryExecutionError {
+    fn from(e: QueryGraphError) -> Self {
+        QueryExecutionError::TranslationError(e)
     }
 }

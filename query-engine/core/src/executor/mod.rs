@@ -47,7 +47,7 @@ impl<'a> QueryPipeline<'a> {
 
         println!("{}", self.graph);
 
-        let exp = Expressionista::translate(self.graph);
+        let exp = Expressionista::translate(self.graph)?;
 
         println!("{}", exp.to_string(0));
 

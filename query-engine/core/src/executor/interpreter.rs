@@ -1,5 +1,5 @@
 use super::*;
-use connector::{Identifier, ReadQuery};
+use connector::{Identifier};
 use connector::{ReadQueryResult, ResultContent};
 use im::HashMap;
 use prisma_models::prelude::*;
@@ -9,30 +9,32 @@ pub enum Expression {
     Sequence {
         seq: Vec<Expression>,
     },
+
     Func {
         func: Box<dyn FnOnce(Env) -> Expression>,
     },
-    // Write {
-    //     write: WriteQuery,
-    // },
-    // Read {
-    //     read: ReadQuery,
-    // },
+
     Query {
         query: Query,
     },
+
     Let {
         bindings: Vec<Binding>,
         expressions: Vec<Expression>,
     },
+
     Get {
         binding_name: String,
     },
+
     GetFirstNonEmpty {
         binding_names: Vec<String>,
     },
+
     If {
         func: Box<dyn FnOnce(Env) -> bool>,
+        then: Vec<Expression>,
+        else_: Vec<Expression>,
     },
 }
 
@@ -77,7 +79,7 @@ impl Expression {
             Self::GetFirstNonEmpty { binding_names } => {
                 Self::add_indent(indent, format!("(GetFirstNoneEmpty env '{:?}')", binding_names))
             }
-            Self::If { func: _ } => Self::add_indent(indent, "if (Fn env)"),
+            Self::If { func: _, then: _, else_: _ } => Self::add_indent(indent, "if (Fn env)"),
         }
     }
 
@@ -182,15 +184,6 @@ impl<'a> QueryInterpreter<'a> {
                 self.interpret(Expression::Sequence { seq: expressions }, inner_env)
             }
 
-            // Expression::Write { write } => {
-            //     println!("WRITE");
-            //     Ok(self.writer.execute(write).map(|res| ExpressionResult::Write(res))?)
-            // }
-
-            // Expression::Read { read } => {
-            //     println!("READ");
-            //     Ok(self.reader.execute(read, &[]).map(|res| ExpressionResult::Read(res))?)
-            // }
             Expression::Query { query } => match query {
                 Query::Read(read) => {
                     println!("READ");
@@ -216,7 +209,7 @@ impl<'a> QueryInterpreter<'a> {
                 })
                 .unwrap()),
 
-            Expression::If { func } =>  {
+            Expression::If { func, then, else_ } =>  {
                 //
                 unimplemented!()
             }
