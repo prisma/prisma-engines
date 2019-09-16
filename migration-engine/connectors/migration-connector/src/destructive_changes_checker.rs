@@ -33,11 +33,6 @@ impl DestructiveChangeDiagnostics {
     }
 }
 
-pub enum MigrationErrorOrWarning {
-    Error(MigrationError),
-    Warning(MigrationWarning),
-}
-
 #[derive(Debug, Serialize, PartialEq)]
 pub struct MigrationWarning {
     pub description: String,
