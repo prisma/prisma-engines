@@ -9,24 +9,53 @@ use prisma_inflector;
 use regex::Regex;
 use sql_schema_describer::*;
 
-pub fn is_migration_table(table: &Table) -> bool {
+ fn is_migration_table(table: &Table) -> bool {
     table.name == "_Migration"
 }
 
-pub fn is_many_to_many_relation_table(table: &Table) -> bool {
+ fn is_many_to_many_relation_table(table: &Table) -> bool {
     table.name.starts_with("_")
         && table.columns.iter().count() == 2
+        && table.foreign_keys.iter().count() == 2
         && table.columns.iter().find(|column| column.name == "A").is_some()
         && table.columns.iter().find(|column| column.name == "B").is_some()
 }
 
-pub fn is_scalar_list_table(table: &Table) -> bool {
+ fn is_scalar_list_table(table: &Table) -> bool {
     table.name.contains("_")
         && table.columns.iter().count() == 3
         && table.columns.iter().find(|column| column.name == "nodeId").is_some()
         && table.columns.iter().find(|column| column.name == "position").is_some()
         && table.columns.iter().find(|column| column.name == "value").is_some()
 }
+
+    fn create_many_to_many_field(foreign_key: &ForeignKey, relation_table_name: &str) -> Field {
+        let inflector = prisma_inflector::default();
+
+        let field_type = FieldType::Relation(RelationInfo {
+            name: relation_table_name.to_owned(), // we should remove the _ but this somehow gets rid of the relationName altogether
+            to: foreign_key.referenced_table.clone(),
+            to_fields: foreign_key.referenced_columns.clone(),
+            on_delete: match foreign_key.on_delete_action {
+                ForeignKeyAction::Cascade => OnDeleteStrategy::Cascade,
+                _ => OnDeleteStrategy::None,
+            },
+        });
+
+        Field {
+            name: inflector.pluralize(&foreign_key.referenced_table).camel_case(),
+            arity: FieldArity::List,
+            field_type,
+            database_name: None,
+            default_value: None,
+            is_unique: false,
+            id_info: None,
+            scalar_list_strategy: None,
+            documentation: None,
+            is_generated: false,
+            is_updated_at: false,
+        }
+    }
 
 /// Calculate a data model from a database schema.
 pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> {
@@ -37,8 +66,8 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
         .tables
         .iter()
         .filter(|table| !is_migration_table(&table))
-        // .filter(|table| !is_many_to_many_relation_table(&table))
-    .filter(|table| !is_scalar_list_table(&table))
+        .filter(|table| !is_many_to_many_relation_table(&table))
+        .filter(|table| !is_scalar_list_table(&table))
     {
         let mut model = Model::new(&table.name);
         for column in table.columns.iter() {
@@ -93,8 +122,9 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
         });
     }
 
+    let mut fields_to_be_added = Vec::new();
+
     // add backrelation fields
-    let mut back_relation_fields = Vec::new();
 
     for model in data_model.models.iter() {
         for relation_field in model.fields.iter() {
@@ -145,7 +175,7 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
                             is_updated_at: false,
                         };
 
-                        back_relation_fields.push((other_model.name.clone(), field));
+                        fields_to_be_added.push((other_model.name.clone(), field));
                     }
                 }
                 _ => {}
@@ -153,54 +183,63 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
         }
     }
 
-    for (model, field) in back_relation_fields {
-        let model = data_model.find_model_mut(&model).unwrap();
-        model.add_field(field);
+    // add many to many relation fields
+    for table in schema
+        .tables
+        .iter()
+        .filter(|table| is_many_to_many_relation_table(&table))
+    {
+        // use foreign keys to find tables that are linked to??
+
+        let first = table.foreign_keys.get(0);
+        let second = table.foreign_keys.get(1);
+
+        match (first, second) {
+            (Some(f), Some(s)) => {
+                fields_to_be_added.push((
+                    s.referenced_table.clone(),
+                    create_many_to_many_field(f, &table.name),
+                ));
+                fields_to_be_added.push((
+                    f.referenced_table.clone(),
+                    create_many_to_many_field(s, &table.name),
+                ));
+            }
+            (_, _) => (),
+        }
     }
 
-    // add many to many relation fields
-    // let mut many_to_many_relation_fields = Vec::new();
-    // for table in schema.tables.iter().filter(|table| is_many_to_many_relation_table(&table)){
-            // use foreign keys to find tables that are linked to??
-
-    //     many_to_many_relation_fields.push((model.clone(), field1 ));   
-    //     many_to_many_relation_fields.push((model.clone(), field2 ));   
-    // }
-
-    //  for (model, field) in many_to_many_relation_fields {
-    //     let model = data_model.find_model_mut(&model).unwrap();
-    //     model.add_field(field);
-    // }
 
     // add scalar lists fields
-    let mut scalar_list_fields = Vec::new();
-    for table in schema.tables.iter().filter(|table| is_scalar_list_table(&table)){
+    for table in schema.tables.iter().filter(|table| is_scalar_list_table(&table)) {
         let name = table.name.split('_').nth(1).unwrap();
         let model = table.name.split('_').nth(0).unwrap();
 
         let field_type = calculate_field_type(&table.columns.iter().find(|c| c.name == "value").unwrap(), &table);
 
         let field = Field {
-                            name: name.to_string(),
-                            arity: FieldArity::List,
-                            field_type,  
-                            database_name: None,
-                            default_value: None,
-                            is_unique: false,
-                            id_info: None,
-                            scalar_list_strategy: None,
-                            documentation: None,
-                            is_generated: false,
-                            is_updated_at: false,
-                        };
-    
-         scalar_list_fields.push((model.clone(), field ));   
+            name: name.to_string(),
+            arity: FieldArity::List,
+            field_type,
+            database_name: None,
+            default_value: None,
+            is_unique: false,
+            id_info: None,
+            scalar_list_strategy: Some(ScalarListStrategy::Relation),
+            documentation: None,
+            is_generated: false,
+            is_updated_at: false,
+        };
+
+        fields_to_be_added.push((model.to_owned(), field));
     }
 
-     for (model, field) in scalar_list_fields {
+    for (model, field) in fields_to_be_added {
         let model = data_model.find_model_mut(&model).unwrap();
         model.add_field(field);
     }
+
+    // refactor to use only one list with fields to add??
 
     Ok(data_model)
 }
