@@ -16,7 +16,7 @@ case class ConnectorConfig(
 
 object ConnectorConfig {
   lazy val instance: ConnectorConfig = {
-    val filePath        = EnvVars.serverRoot + "/connector_to_test"
+    val filePath        = EnvVars.serverRoot + "/current_connector"
     val connectorToTest = scala.io.Source.fromFile(filePath).mkString.lines.next().trim
 
     connectorToTest match {

@@ -9,10 +9,13 @@ pub mod result_ast;
 
 mod compare;
 mod interfaces;
+mod new_interfaces;
 mod query_arguments;
 
 pub use compare::*;
+pub use filter::*;
 pub use interfaces::*;
+pub use new_interfaces::*;
 pub use query_arguments::*;
 pub use query_ast::*;
 pub use result_ast::*;
