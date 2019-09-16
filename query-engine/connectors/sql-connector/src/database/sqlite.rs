@@ -1,4 +1,8 @@
-use crate::{query_builder::ManyRelatedRecordsWithRowNumber, FromSource, SqlCapabilities, Transaction, Transactional};
+use super::connector_transaction::ConnectorTransaction;
+use crate::{
+    query_builder::ManyRelatedRecordsWithRowNumber, FromSource, SqlCapabilities, SqlError, Transaction, Transactional,
+};
+use connector_interface::Connector;
 use datamodel::Source;
 use prisma_query::{
     ast::ParameterizedValue,
@@ -95,6 +99,24 @@ impl Transactional for Sqlite {
 
         if self.test_mode {
             conn.execute_raw("DETACH DATABASE ?", &[ParameterizedValue::from(db)])?;
+        }
+
+        result
+    }
+}
+
+impl Connector for Sqlite {
+    fn with_transaction<F, T>(&self, f: F) -> connector_interface::Result<T>
+    where
+        F: FnOnce(&mut dyn connector_interface::MaybeTransaction) -> connector_interface::Result<T>,
+    {
+        let mut conn = self.pool.get().map_err(SqlError::from)?;
+        let tx = conn.start_transaction().map_err(SqlError::from)?;
+        let mut connector_transaction = ConnectorTransaction::new(tx);
+        let result = f(&mut connector_transaction);
+
+        if result.is_ok() {
+            connector_transaction.commit()?;
         }
 
         result
