@@ -32,7 +32,7 @@ impl Display for ReadQuery {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Default, Clone)]
 pub struct RecordQuery {
     pub name: String,
     pub alias: Option<String>,

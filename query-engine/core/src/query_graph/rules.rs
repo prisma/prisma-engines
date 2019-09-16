@@ -1,10 +1,11 @@
 ///! Skeleton for QueryGraph validation rules.
-///! Only basic POC rules, to be expanded later.
+///! Only basic POC rules jotted down at the moment, to be expanded later.
 use super::*;
+use itertools::Itertools;
 
 /// Check validity of an edge creation.
 pub fn after_edge_creation(graph: &QueryGraph, edge: &EdgeRef) -> QueryGraphResult<()> {
-    if_flow_edge_rules(graph, edge)
+    if_flow_edge_rules(graph, edge).and_then(|_| only_allow_related_parents_edges(graph, edge))
 }
 
 /// Only allow `Then` and `Else`. Disallow more than 2 edges.
@@ -31,4 +32,33 @@ fn if_flow_edge_rules(graph: &QueryGraph, edge: &EdgeRef) -> QueryGraphResult<()
     }
 
     Ok(())
+}
+
+/// Only allow multiple parent edges if all parents are ancestors of each other.
+fn only_allow_related_parents_edges(graph: &QueryGraph, edge: &EdgeRef) -> QueryGraphResult<()> {
+    let target_node = graph.edge_target(edge);
+    let incoming_edges = graph.incoming_edges(&target_node);
+    let parents: Vec<NodeRef> = graph
+        .zip_source_nodes(incoming_edges)
+        .into_iter()
+        .map(|(_, node)| node)
+        .collect();
+
+    if parents
+        .iter()
+        .tuple_combinations()
+        .into_iter()
+        .find(|(parent_a, parent_b)| {
+            !graph.is_ancestor(&parent_a, &parent_b) && !graph.is_ancestor(&parent_b, &parent_a)
+        })
+        .is_none()
+    {
+        Ok(())
+    } else {
+        Err(QueryGraphError::RuleViolation(format!(
+            "Edge {} to node {} violates constraint that all parents must be ancestors of each other.",
+            edge.id(),
+            graph.edge_target(edge).id()
+        )))
+    }
 }

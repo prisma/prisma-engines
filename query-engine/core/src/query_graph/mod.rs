@@ -1,10 +1,13 @@
-///! Query graph abstraction for simple high-level query representation
-///! and manipulation.
+///! Query graph abstraction for simple high-level query representation and manipulation.
+///! Wraps Petgraph crate graph.
 mod error;
 mod formatters;
 mod guard;
 mod rules;
 mod transformers;
+
+#[cfg(test)]
+mod tests;
 
 pub use error::*;
 pub use formatters::*;
@@ -18,36 +21,6 @@ use rules::*;
 use std::borrow::Borrow;
 
 pub type QueryGraphResult<T> = std::result::Result<T, QueryGraphError>;
-
-/// A graph representing an abstract view of queries and their execution dependencies.
-///
-/// Graph invariants (TODO put checks into the code?):
-/// - Directed, acyclic.
-///
-/// - Node IDs are unique and stable.
-///
-/// - The graph may have multiple result nodes, and multiple paths in the graph may point to result nodes, but only one result is serialized.
-///   Note: The exact rules determining the final result are subject of the graph translation.
-///
-/// - Currently, Nodes are allowed to have multiple parents, but the following invariant applies: They may only refer to their parent and / or one of its ancestors.
-///   Note: This rule guarantees that the dependent ancestor node result is always in scope for fulfillment of dependencies.
-///
-/// - Following the above, sibling dependencies are disallowed as well.
-///
-/// - Edges are ordered.
-///   Node: Their evaluation is performed from low to high ordering, unless other rules require reshuffling the edges during translation.
-#[derive(Default)]
-pub struct QueryGraph {
-    graph: InnerGraph,
-
-    /// Designates the nodes that are returning the result of the entire QueryGraph.
-    /// If no nodes are set, the interpretation will take the result of the
-    /// last statement derived from the graph.
-    result_nodes: Vec<NodeIndex>,
-}
-
-/// Implementation detail of the QueryGraph.
-type InnerGraph = Graph<Guard<Node>, Guard<QueryGraphDependency>>;
 
 pub enum Node {
     Query(Query),
@@ -95,6 +68,13 @@ pub struct EdgeRef {
     edge_ix: EdgeIndex,
 }
 
+impl EdgeRef {
+    /// Returns the unique identifier of the Edge.
+    pub fn id(&self) -> String {
+        self.edge_ix.index().to_string()
+    }
+}
+
 /// Stored on the edges of the QueryGraph, a QueryGraphDependency contains information on how children are connected to their parents,
 /// expressing for example the need for additional information from the parent to be able to execute at runtime.
 pub enum QueryGraphDependency {
@@ -110,6 +90,36 @@ pub enum QueryGraphDependency {
     /// Only valid in the context of a `If` control flow node.
     Else,
 }
+
+/// A graph representing an abstract view of queries and their execution dependencies.
+///
+/// Graph invariants (TODO put checks into the code?):
+/// - Directed, acyclic.
+///
+/// - Node IDs are unique and stable.
+///
+/// - The graph may have multiple result nodes, and multiple paths in the graph may point to result nodes, but only one result is serialized.
+///   Note: The exact rules determining the final result are subject of the graph translation.
+///
+/// - Currently, Nodes are allowed to have multiple parents, but the following invariant applies: They may only refer to their parent and / or one of its ancestors.
+///   Note: This rule guarantees that the dependent ancestor node result is always in scope for fulfillment of dependencies.
+///
+/// - Following the above, sibling dependencies are disallowed as well.
+///
+/// - Edges are ordered.
+///   Node: Their evaluation is performed from low to high ordering, unless other rules require reshuffling the edges during translation.
+#[derive(Default)]
+pub struct QueryGraph {
+    graph: InnerGraph,
+
+    /// Designates the nodes that are returning the result of the entire QueryGraph.
+    /// If no nodes are set, the interpretation will take the result of the
+    /// last statement derived from the graph.
+    result_nodes: Vec<NodeIndex>,
+}
+
+/// Implementation detail of the QueryGraph.
+type InnerGraph = Graph<Guard<Node>, Guard<QueryGraphDependency>>;
 
 impl QueryGraph {
     pub fn new() -> Self {
@@ -145,6 +155,8 @@ impl QueryGraph {
                 .is_some()
     }
 
+    /// Returns all root nodes of the graph.
+    /// A root node is defined by having no incoming edges.
     pub fn root_nodes(&self) -> Vec<NodeRef> {
         let graph = self.graph.borrow();
 
@@ -161,6 +173,8 @@ impl QueryGraph {
             .collect()
     }
 
+    /// Creates a node with content `t` and adds it to the graph.
+    /// Returns a `NodeRef` to the newly added node.
     pub fn create_node<T>(&mut self, t: T) -> NodeRef
     where
         T: Into<Node>,
@@ -170,38 +184,46 @@ impl QueryGraph {
         NodeRef { node_ix }
     }
 
+    /// Creates an edge with given `content`, originating from node `from` and pointing to node `to`.
+    /// Checks are run after edge creation to ensure validity of the query graph.
+    /// Returns an `EdgeRef` to the newly added edge.
+    /// Todo currently panics, change interface to result type.
     pub fn create_edge(&mut self, from: &NodeRef, to: &NodeRef, content: QueryGraphDependency) -> EdgeRef {
         let edge_ix = self.graph.add_edge(from.node_ix, to.node_ix, Guard::new(content));
         let edge = EdgeRef { edge_ix };
 
-        after_edge_creation(self, &edge).unwrap(); // todo interface change to results.
+        after_edge_creation(self, &edge).unwrap();
         edge
     }
 
+    /// Returns a reference to the content of `node`, if the content is still present.
     pub fn node_content(&self, node: &NodeRef) -> Option<&Node> {
         self.graph.node_weight(node.node_ix).unwrap().borrow()
     }
 
+    /// Returns a reference to the content of `edge`, if the content is still present.
     pub fn edge_content(&self, edge: &EdgeRef) -> Option<&QueryGraphDependency> {
         self.graph.edge_weight(edge.edge_ix).unwrap().borrow()
     }
 
+    /// Returns the node from where `edge` originates (e.g. source).
     pub fn edge_source(&self, edge: &EdgeRef) -> NodeRef {
         let (node_ix, _) = self.graph.edge_endpoints(edge.edge_ix).unwrap();
-
         NodeRef { node_ix }
     }
 
+    /// Returns the node to which `edge` points (e.g. target).
     pub fn edge_target(&self, edge: &EdgeRef) -> NodeRef {
         let (_, node_ix) = self.graph.edge_endpoints(edge.edge_ix).unwrap();
-
         NodeRef { node_ix }
     }
 
+    /// Returns all edges originating from= `node` (e.g. outgoing edges).
     pub fn outgoing_edges(&self, node: &NodeRef) -> Vec<EdgeRef> {
         self.collect_edges(node, Direction::Outgoing)
     }
 
+    /// Returns all edges pointing to `node` (e.g. incoming edges).
     pub fn incoming_edges(&self, node: &NodeRef) -> Vec<EdgeRef> {
         self.collect_edges(node, Direction::Incoming)
     }
@@ -219,17 +241,30 @@ impl QueryGraph {
     }
 
     /// Completely removes the edge from the graph, returning it's content.
+    /// This operation is destructive on the underlying graph and invalidates
     pub fn remove_edge(&mut self, edge: EdgeRef) -> Option<QueryGraphDependency> {
         self.graph.remove_edge(edge.edge_ix).unwrap().into_inner()
     }
 
+    /// Checks if `child` is a direct child of `parent`.
+    ///
+    /// Criteria for a direct child:
+    /// - Every node that only has `parent` as their parent.
+    /// - In case of multiple parents, has `parent` as their parent and _all_ other parents are ancestors of `parent`.
     pub fn is_direct_child(&self, parent: &NodeRef, child: &NodeRef) -> bool {
-        self.incoming_edges(child)
-            .into_iter()
-            .find(|edge| &self.edge_source(edge) != parent)
-            .is_none()
+        self.incoming_edges(child).into_iter().all(|edge| {
+            let ancestor = self.edge_source(&edge);
+
+            if &ancestor != parent {
+                self.is_ancestor(&ancestor, parent)
+            } else {
+                true
+            }
+        })
     }
 
+    /// Returns a list of child nodes, together with their child edge for the given `node`.
+    /// The list contains all children reachable by outgoing edges of `node`.
     pub fn child_pairs(&self, node: &NodeRef) -> Vec<(EdgeRef, NodeRef)> {
         self.outgoing_edges(node)
             .into_iter()
@@ -240,6 +275,8 @@ impl QueryGraph {
             .collect()
     }
 
+    /// Returns all direct child pairs of `node`.
+    /// See `is_direct_child` for exact definition of what a direct child encompasses.
     pub fn direct_child_pairs(&self, node: &NodeRef) -> Vec<(EdgeRef, NodeRef)> {
         self.outgoing_edges(node)
             .into_iter()
@@ -255,6 +292,27 @@ impl QueryGraph {
             .collect()
     }
 
+    /// Resolves and adds all source `NodeRef`s to the respective `EdgeRef`.
+    pub fn zip_source_nodes(&self, edges: Vec<EdgeRef>) -> Vec<(EdgeRef, NodeRef)> {
+        edges
+            .into_iter()
+            .map(|edge| {
+                let target = self.edge_source(&edge);
+                (edge, target)
+            })
+            .collect()
+    }
+
+    /// Checks if `ancestor` is in any of the ancestor nodes of `successor_node`.
+    /// Determined by trying to reach `successor_node` from `ancestor`.
+    pub fn is_ancestor(&self, ancestor: &NodeRef, successor_node: &NodeRef) -> bool {
+        self.direct_child_pairs(ancestor)
+            .into_iter()
+            .find(|(_, node)| node == node || self.is_ancestor(&node, &successor_node))
+            .is_some()
+    }
+
+    /// Internal utility function to collect all edges of defined direction directed to, or originating from, `node`.
     fn collect_edges(&self, node: &NodeRef, direction: Direction) -> Vec<EdgeRef> {
         let mut edges = self
             .graph
