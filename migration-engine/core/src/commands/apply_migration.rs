@@ -100,18 +100,30 @@ impl<'a> ApplyMigrationCommand<'a> {
         migration.datamodel_steps = self.input.steps.clone();
         migration.database_migration = database_migration_json;
         migration.datamodel = next_datamodel.clone();
-        let saved_migration = migration_persistence.create(migration);
 
-        connector
-            .migration_applier()
-            .apply(&saved_migration, &database_migration)?;
+        let diagnostics = connector.destructive_changes_checker().check(&database_migration)?;
+
+        match (diagnostics.has_warnings(), self.input.force.unwrap_or(false)) {
+            // We have no warnings, or the force flag is passed.
+            (false, _) | (true, true) => {
+                let saved_migration = migration_persistence.create(migration);
+
+                connector
+                    .migration_applier()
+                    .apply(&saved_migration, &database_migration)?;
+            }
+            // We have warnings, but no force flag was passed.
+            (true, false) => (),
+        }
+
+        let DestructiveChangeDiagnostics { warnings, errors } = diagnostics;
 
         Ok(MigrationStepsResultOutput {
             datamodel: datamodel::render(&next_datamodel).unwrap(),
             datamodel_steps: self.input.steps.clone(),
             database_steps: database_steps_json_pretty,
-            errors: Vec::new(),
-            warnings: Vec::new(),
+            errors,
+            warnings,
             general_errors: Vec::new(),
         })
     }

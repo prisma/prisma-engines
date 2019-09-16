@@ -153,7 +153,10 @@ impl SqlMigrationConnector {
             conn: Arc::clone(&conn),
         });
 
-        let destructive_changes_checker = Arc::new(SqlDestructiveChangesChecker {});
+        let destructive_changes_checker = Arc::new(SqlDestructiveChangesChecker {
+            schema_name: schema_name.clone(),
+            database: Arc::clone(&conn),
+        });
 
         Self {
             url: url.to_string(),

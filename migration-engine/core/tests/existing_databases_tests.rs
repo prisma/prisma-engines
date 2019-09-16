@@ -23,7 +23,7 @@ fn adding_a_model_for_an_existing_table_must_work() {
                 id Int @id
             }
         "#;
-        let result = infer_and_apply(api, &dm);
+        let result = infer_and_apply(api, &dm).sql_schema;
         assert_eq!(initial_result, result);
     });
 }
@@ -45,7 +45,7 @@ fn removing_a_model_for_a_table_that_is_already_deleted_must_work() {
                 id Int @id
             }
         "#;
-        let initial_result = infer_and_apply(api, &dm1);
+        let initial_result = infer_and_apply(api, &dm1).sql_schema;
         assert!(initial_result.has_table("Post"));
 
         let result = barrel.execute(|migration| {
@@ -58,7 +58,7 @@ fn removing_a_model_for_a_table_that_is_already_deleted_must_work() {
                 id Int @id
             }
         "#;
-        let final_result = infer_and_apply(api, &dm2);
+        let final_result = infer_and_apply(api, &dm2).sql_schema;
         assert_eq!(result, final_result);
     });
 }
@@ -78,7 +78,7 @@ fn creating_a_field_for_an_existing_column_with_a_compatible_type_must_work() {
                 title String
             }
         "#;
-        let result = infer_and_apply(api, &dm);
+        let result = infer_and_apply(api, &dm).sql_schema;
         assert_eq!(initial_result, result);
     });
 }
@@ -102,7 +102,7 @@ fn creating_a_field_for_an_existing_column_and_changing_its_type_must_work() {
                 title String @unique
             }
         "#;
-        let result = infer_and_apply(api, &dm);
+        let result = infer_and_apply(api, &dm).sql_schema;
         let table = result.table_bang("Blog");
         let column = table.column_bang("title");
         assert_eq!(column.tpe.family, ColumnTypeFamily::String);
@@ -131,7 +131,7 @@ fn creating_a_field_for_an_existing_column_and_simultaneously_making_it_optional
                 title String?
             }
         "#;
-        let result = infer_and_apply(api, &dm);
+        let result = infer_and_apply(api, &dm).sql_schema;
         let column = result.table_bang("Blog").column_bang("title");
         assert_eq!(column.is_required(), false);
     });
@@ -145,7 +145,7 @@ fn creating_a_scalar_list_field_for_an_existing_table_must_work() {
                 id Int @id
             }
         "#;
-        let initial_result = infer_and_apply(api, &dm1);
+        let initial_result = infer_and_apply(api, &dm1).sql_schema;
         assert!(!initial_result.has_table("Blog_tags"));
 
         let mut result = barrel.execute(|migration| {
@@ -180,7 +180,7 @@ fn creating_a_scalar_list_field_for_an_existing_table_must_work() {
                 tags String[]
             }
         "#;
-        let mut final_result = infer_and_apply(api, &dm2);
+        let mut final_result = infer_and_apply(api, &dm2).sql_schema;
         for table in &mut final_result.tables {
             if table.name == "Blog_tags" {
                 // can't set that properly up again
@@ -201,7 +201,7 @@ fn delete_a_field_for_a_non_existent_column_must_work() {
                 title String
             }
         "#;
-        let initial_result = infer_and_apply(api, &dm1);
+        let initial_result = infer_and_apply(api, &dm1).sql_schema;
         assert_eq!(initial_result.table_bang("Blog").column("title").is_some(), true);
 
         let result = barrel.execute(|migration| {
@@ -218,7 +218,7 @@ fn delete_a_field_for_a_non_existent_column_must_work() {
                 id Int @id
             }
         "#;
-        let final_result = infer_and_apply(api, &dm2);
+        let final_result = infer_and_apply(api, &dm2).sql_schema;
         assert_eq!(result, final_result);
     });
 }
@@ -232,7 +232,7 @@ fn deleting_a_scalar_list_field_for_a_non_existent_list_table_must_work() {
                 tags String[]
             }
         "#;
-        let initial_result = infer_and_apply(api, &dm1);
+        let initial_result = infer_and_apply(api, &dm1).sql_schema;
         assert!(initial_result.has_table("Blog_tags"));
 
         let result = barrel.execute(|migration| {
@@ -245,7 +245,7 @@ fn deleting_a_scalar_list_field_for_a_non_existent_list_table_must_work() {
                 id Int @id
             }
         "#;
-        let final_result = infer_and_apply(api, &dm2);
+        let final_result = infer_and_apply(api, &dm2).sql_schema;
         assert_eq!(result, final_result);
     });
 }
@@ -259,7 +259,7 @@ fn updating_a_field_for_a_non_existent_column() {
                 title String
             }
         "#;
-        let initial_result = infer_and_apply(api, &dm1);
+        let initial_result = infer_and_apply(api, &dm1).sql_schema;
         let initial_column = initial_result.table_bang("Blog").column_bang("title");
         assert_eq!(initial_column.tpe.family, ColumnTypeFamily::String);
 
@@ -278,7 +278,7 @@ fn updating_a_field_for_a_non_existent_column() {
                 title Int @unique
             }
         "#;
-        let final_result = infer_and_apply(api, &dm2);
+        let final_result = infer_and_apply(api, &dm2).sql_schema;
         let final_column = final_result.table_bang("Blog").column_bang("title");
         assert_eq!(final_column.tpe.family, ColumnTypeFamily::Int);
         let index = final_result
@@ -300,7 +300,7 @@ fn renaming_a_field_where_the_column_was_already_renamed_must_work() {
                 title String
             }
         "#;
-        let initial_result = infer_and_apply(api, &dm1);
+        let initial_result = infer_and_apply(api, &dm1).sql_schema;
         let initial_column = initial_result.table_bang("Blog").column_bang("title");
         assert_eq!(initial_column.tpe.family, ColumnTypeFamily::String);
 
@@ -321,7 +321,7 @@ fn renaming_a_field_where_the_column_was_already_renamed_must_work() {
             }
         "#;
 
-        let final_result = infer_and_apply(api, &dm2);
+        let final_result = infer_and_apply(api, &dm2).sql_schema;
         let final_column = final_result.table_bang("Blog").column_bang("new_title");
 
         assert_eq!(final_column.tpe.family, ColumnTypeFamily::Float);
