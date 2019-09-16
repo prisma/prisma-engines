@@ -1,6 +1,6 @@
 use super::connector_transaction::ConnectorTransaction;
 use crate::{
-    query_builder::ManyRelatedRecordsWithUnionAll, FromSource, SqlCapabilities, SqlError, Transaction, Transactional,
+    query_builder::ManyRelatedRecordsWithUnionAll, FromSource, SqlCapabilities, SqlError, Transaction,
 };
 use connector_interface::Connector;
 use datamodel::Source;
@@ -29,24 +29,6 @@ impl FromSource for Mysql {
 
 impl SqlCapabilities for Mysql {
     type ManyRelatedRecordsBuilder = ManyRelatedRecordsWithUnionAll;
-}
-
-impl Transactional for Mysql {
-    fn with_transaction<F, T>(&self, _: &str, f: F) -> crate::Result<T>
-    where
-        F: FnOnce(&mut dyn Transaction) -> crate::Result<T>,
-    {
-        let mut conn = self.pool.get()?;
-        let mut tx = conn.start_transaction()?;
-
-        let result = f(&mut tx);
-
-        if result.is_ok() {
-            tx.commit()?;
-        }
-
-        result
-    }
 }
 
 impl Connector for Mysql {

@@ -1,6 +1,6 @@
 use crate::{
     error::SqlError,
-    query_builder::{NestedActions, WriteQueryBuilder},
+    query_builder::{WriteQueryBuilder},
     Transaction,
 };
 use prisma_models::{GraphqlId, ModelRef, PrismaArgs, PrismaListValue, RelationFieldRef};
@@ -61,43 +61,4 @@ where
     }
 
     Ok(id)
-}
-
-/// Creates a new nested item related to a parent, including any associated
-/// list values, and is connected with the `parent_id` to the parent record.
-pub fn execute_nested<S>(
-    conn: &mut dyn Transaction,
-    parent_id: &GraphqlId,
-    actions: &dyn NestedActions,
-    relation_field: RelationFieldRef,
-    non_list_args: &PrismaArgs,
-    list_args: &[(S, PrismaListValue)],
-) -> crate::Result<GraphqlId>
-where
-    S: AsRef<str>,
-{
-    if let Some((select, check)) = actions.required_check(parent_id)? {
-        let ids = conn.select_ids(select)?;
-        check(ids.into_iter().next().is_some())?
-    };
-
-    if let Some(query) = actions.parent_removal(parent_id) {
-        conn.execute(query)?;
-    }
-
-    let related_field = relation_field.related_field();
-
-    if related_field.relation_is_inlined_in_parent() {
-        let mut prisma_args = non_list_args.clone();
-        prisma_args.insert(related_field.name.clone(), parent_id.clone());
-
-        execute(conn, relation_field.related_model(), &prisma_args, list_args)
-    } else {
-        let id = execute(conn, relation_field.related_model(), non_list_args, list_args)?;
-        let relation_query = WriteQueryBuilder::create_relation(relation_field, parent_id, &id);
-
-        conn.execute(relation_query)?;
-
-        Ok(id)
-    }
 }

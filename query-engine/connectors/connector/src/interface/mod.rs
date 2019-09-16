@@ -5,16 +5,13 @@ pub trait Connector {
     fn with_transaction<F, T>(&self, f: F) -> crate::Result<T>
     where
         F: FnOnce(&mut dyn MaybeTransaction) -> crate::Result<T>;
-
-    //    fn with_connection<F, T>(&self, f: F) -> crate::Result<T>
-    //    where
-    //        F: FnOnce(&mut dyn MaybeTransaction) -> crate::Result<T>;
 }
 
 pub struct WriteArgs {
     non_list_args: PrismaArgs,
     list_args: Vec<(String, PrismaListValue)>,
 }
+
 impl WriteArgs {
     pub fn new(non_list_args: PrismaArgs, list_args: Vec<(String, PrismaListValue)>) -> WriteArgs {
         WriteArgs {
@@ -32,7 +29,14 @@ impl WriteArgs {
     }
 }
 
-pub trait MaybeTransaction: ReadOperations + WriteOperations {}
+pub trait MaybeTransaction: ReadOperations + WriteOperations {
+    // fn execute_raw(&self, db_name: String, query: String) -> crate::Result<Value>;
+    // fn execute_raw(&self, db_name: String, query: String) -> connector_interface::Result<Value> {
+    //     let result = self.inner.raw_json(RawQuery::from(query))?;
+
+    //     Ok(result)
+    // }
+}
 
 pub trait ReadOperations {
     fn get_single_record(

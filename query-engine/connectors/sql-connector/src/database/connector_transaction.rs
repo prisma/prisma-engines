@@ -1,9 +1,8 @@
-use prisma_query::connector::Queryable;
+use prisma_query::{connector::{Queryable}};
 
 use connector_interface::*;
 use prisma_models::*;
 
-use crate::query_builder::write::NestedActions;
 use crate::query_builder::{ManyRelatedRecordsWithUnionAll, WriteQueryBuilder};
 use crate::transactional;
 use crate::SqlError;
@@ -115,17 +114,18 @@ impl WriteOperations for ConnectorTransaction<'_> {
         parent_id: &GraphqlId,
         child_id: &GraphqlId,
     ) -> connector_interface::Result<()> {
-        let child_model = field.related_model();
+        // let child_model = field.related_model();
 
-        let nested_disconnect = NestedDisconnect {
-            relation_field: field,
-            where_: Some(RecordFinder::new(child_model.fields().id(), child_id)),
-        };
+        // let nested_disconnect = NestedDisconnect {
+        //     relation_field: field,
+        //     where_: Some(RecordFinder::new(child_model.fields().id(), child_id)),
+        // };
 
-        let query = nested_disconnect.removal_by_parent_and_child(parent_id, child_id);
-        self.inner.execute(query).unwrap();
+        // let query = nested_disconnect.removal_by_parent_and_child(parent_id, child_id);
+        // self.inner.execute(query).unwrap();
 
-        Ok(())
+        // Ok(())
+        unimplemented!()
     }
 
     fn set(
