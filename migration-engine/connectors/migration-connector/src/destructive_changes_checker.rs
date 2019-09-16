@@ -8,6 +8,7 @@ where
     fn check(&self, database_migration: &T) -> ConnectorResult<DestructiveChangeDiagnostics>;
 }
 
+/// The errors and warnings emitted by the [DestructiveChangesChecker](trait.DestructiveChangesChecker.html).
 #[derive(Debug)]
 pub struct DestructiveChangeDiagnostics {
     pub errors: Vec<MigrationError>,
