@@ -1,25 +1,49 @@
+use crate::ConnectorResult;
 use std::marker::PhantomData;
 
 pub trait DestructiveChangesChecker<T>: Send + Sync + 'static
 where
-    T: Send + Sync + 'static,
+    T: 'static,
 {
-    fn check(&self, database_migration: &T) -> Vec<MigrationErrorOrWarning>;
+    fn check(&self, database_migration: &T) -> ConnectorResult<DestructiveChangeDiagnostics>;
+}
+
+#[derive(Debug)]
+pub struct DestructiveChangeDiagnostics {
+    pub errors: Vec<MigrationError>,
+    pub warnings: Vec<MigrationWarning>,
+}
+
+impl DestructiveChangeDiagnostics {
+    pub fn new() -> DestructiveChangeDiagnostics {
+        DestructiveChangeDiagnostics {
+            errors: Vec::new(),
+            warnings: Vec::new(),
+        }
+    }
+
+    pub fn add_warning<T: Into<Option<MigrationWarning>>>(&mut self, warning: T) {
+        if let Some(warning) = warning.into() {
+            self.warnings.push(warning)
+        }
+    }
+
+    pub fn has_warnings(&self) -> bool {
+        !self.warnings.is_empty()
+    }
 }
 
 pub enum MigrationErrorOrWarning {
-    Error(MigrationWarning),
-    Warning(MigrationError),
+    Error(MigrationError),
+    Warning(MigrationWarning),
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, PartialEq)]
 pub struct MigrationWarning {
-    pub tpe: String,
     pub description: String,
-    pub field: Option<String>,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, PartialEq)]
 pub struct MigrationError {
     pub tpe: String,
     pub description: String,
@@ -42,7 +66,7 @@ impl<T> DestructiveChangesChecker<T> for EmptyDestructiveChangesChecker<T>
 where
     T: Send + Sync + 'static,
 {
-    fn check(&self, _database_migration: &T) -> Vec<MigrationErrorOrWarning> {
-        Vec::new()
+    fn check(&self, _database_migration: &T) -> ConnectorResult<DestructiveChangeDiagnostics> {
+        Ok(DestructiveChangeDiagnostics::new())
     }
 }

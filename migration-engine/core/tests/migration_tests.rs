@@ -25,7 +25,7 @@ fn adding_a_scalar_field_must_work() {
                 B
             }
         "#;
-        let result = infer_and_apply(api, &dm2);
+        let result = infer_and_apply(api, &dm2).sql_schema;
         let table = result.table_bang("Test");
         table.columns.iter().for_each(|c| assert_eq!(c.is_required(), true));
 
@@ -71,7 +71,7 @@ fn adding_an_optional_field_must_work() {
                 field String?
             }
         "#;
-        let result = infer_and_apply(api, &dm2);
+        let result = infer_and_apply(api, &dm2).sql_schema;
         let column = result.table_bang("Test").column_bang("field");
         assert_eq!(column.is_required(), false);
     });
@@ -85,7 +85,7 @@ fn adding_an_id_field_with_a_special_name_must_work() {
                 specialName String @id @default(cuid())
             }
         "#;
-        let result = infer_and_apply(api, &dm2);
+        let result = infer_and_apply(api, &dm2).sql_schema;
         let column = result.table_bang("Test").column("specialName");
         assert_eq!(column.is_some(), true);
     });
@@ -99,7 +99,7 @@ fn adding_an_id_field_of_type_int_must_work() {
                 myId Int @id
             }
         "#;
-        let result = infer_and_apply(api, &dm2);
+        let result = infer_and_apply(api, &dm2).sql_schema;
         let column = result.table_bang("Test").column_bang("myId");
         match sql_family {
             SqlFamily::Postgres => {
@@ -122,7 +122,7 @@ fn removing_a_scalar_field_must_work() {
                 field String
             }
         "#;
-        let result = infer_and_apply(api, &dm1);
+        let result = infer_and_apply(api, &dm1).sql_schema;
         let column1 = result.table_bang("Test").column("field");
         assert_eq!(column1.is_some(), true);
 
@@ -131,7 +131,7 @@ fn removing_a_scalar_field_must_work() {
                 id String @id @default(cuid())
             }
         "#;
-        let result = infer_and_apply(api, &dm2);
+        let result = infer_and_apply(api, &dm2).sql_schema;
         let column2 = result.table_bang("Test").column("field");
         assert_eq!(column2.is_some(), false);
     });
@@ -146,7 +146,7 @@ fn can_handle_reserved_sql_keywords_for_model_name() {
                 field String
             }
         "#;
-        let result = infer_and_apply(api, &dm1);
+        let result = infer_and_apply(api, &dm1).sql_schema;
         let column = result.table_bang("Group").column_bang("field");
         assert_eq!(column.tpe.family, ColumnTypeFamily::String);
 
@@ -156,7 +156,7 @@ fn can_handle_reserved_sql_keywords_for_model_name() {
                 field Int
             }
         "#;
-        let result = infer_and_apply(api, &dm2);
+        let result = infer_and_apply(api, &dm2).sql_schema;
         let column = result.table_bang("Group").column_bang("field");
         assert_eq!(column.tpe.family, ColumnTypeFamily::Int);
     });
@@ -171,7 +171,7 @@ fn can_handle_reserved_sql_keywords_for_field_name() {
                 Group String
             }
         "#;
-        let result = infer_and_apply(api, &dm1);
+        let result = infer_and_apply(api, &dm1).sql_schema;
         let column = result.table_bang("Test").column_bang("Group");
         assert_eq!(column.tpe.family, ColumnTypeFamily::String);
 
@@ -181,7 +181,7 @@ fn can_handle_reserved_sql_keywords_for_field_name() {
                 Group Int
             }
         "#;
-        let result = infer_and_apply(api, &dm2);
+        let result = infer_and_apply(api, &dm2).sql_schema;
         let column = result.table_bang("Test").column_bang("Group");
         assert_eq!(column.tpe.family, ColumnTypeFamily::Int);
     });
@@ -196,7 +196,7 @@ fn update_type_of_scalar_field_must_work() {
                 field String
             }
         "#;
-        let result = infer_and_apply(api, &dm1);
+        let result = infer_and_apply(api, &dm1).sql_schema;
         let column1 = result.table_bang("Test").column_bang("field");
         assert_eq!(column1.tpe.family, ColumnTypeFamily::String);
 
@@ -206,7 +206,7 @@ fn update_type_of_scalar_field_must_work() {
                 field Int
             }
         "#;
-        let result = infer_and_apply(api, &dm2);
+        let result = infer_and_apply(api, &dm2).sql_schema;
         let column2 = result.table_bang("Test").column_bang("field");
         assert_eq!(column2.tpe.family, ColumnTypeFamily::Int);
     });
@@ -224,7 +224,7 @@ fn changing_the_type_of_an_id_field_must_work() {
                 id Int @id
             }
         "#;
-        let result = infer_and_apply(api, &dm1);
+        let result = infer_and_apply(api, &dm1).sql_schema;
         let table = result.table_bang("A");
         let column = table.column_bang("b");
         assert_eq!(column.tpe.family, ColumnTypeFamily::Int);
@@ -247,7 +247,7 @@ fn changing_the_type_of_an_id_field_must_work() {
                 id String @id @default(cuid())
             }
         "#;
-        let result = infer_and_apply(api, &dm2);
+        let result = infer_and_apply(api, &dm2).sql_schema;
         let table = result.table_bang("A");
         let column = table.column_bang("b");
         assert_eq!(column.tpe.family, ColumnTypeFamily::String);
@@ -272,7 +272,7 @@ fn updating_db_name_of_a_scalar_field_must_work() {
                 field String @map(name:"name1")
             }
         "#;
-        let result = infer_and_apply(api, &dm1);
+        let result = infer_and_apply(api, &dm1).sql_schema;
         assert_eq!(result.table_bang("A").column("name1").is_some(), true);
 
         let dm2 = r#"
@@ -281,7 +281,7 @@ fn updating_db_name_of_a_scalar_field_must_work() {
                 field String @map(name:"name2")
             }
         "#;
-        let result = infer_and_apply(api, &dm2);
+        let result = infer_and_apply(api, &dm2).sql_schema;
         assert_eq!(result.table_bang("A").column("name1").is_some(), false);
         assert_eq!(result.table_bang("A").column("name2").is_some(), true);
     });
@@ -301,7 +301,7 @@ fn changing_a_relation_field_to_a_scalar_field_must_work() {
                 a A // remove this once the implicit back relation field is implemented
             }
         "#;
-        let result = infer_and_apply(api, &dm1);
+        let result = infer_and_apply(api, &dm1).sql_schema;
         let table = result.table_bang("A");
         let column = table.column_bang("b");
         assert_eq!(column.tpe.family, ColumnTypeFamily::Int);
@@ -324,7 +324,7 @@ fn changing_a_relation_field_to_a_scalar_field_must_work() {
                 id Int @id
             }
         "#;
-        let result = infer_and_apply(api, &dm2);
+        let result = infer_and_apply(api, &dm2).sql_schema;
         let table = result.table_bang("A");
         let column = table.column_bang("b");
         assert_eq!(column.tpe.family, ColumnTypeFamily::String);
@@ -344,7 +344,7 @@ fn changing_a_scalar_field_to_a_relation_field_must_work() {
                 id Int @id
             }
         "#;
-        let result = infer_and_apply(api, &dm1);
+        let result = infer_and_apply(api, &dm1).sql_schema;
         let table = result.table_bang("A");
         let column = table.column_bang("b");
         assert_eq!(column.tpe.family, ColumnTypeFamily::String);
@@ -360,7 +360,7 @@ fn changing_a_scalar_field_to_a_relation_field_must_work() {
                 a A // remove this once the implicit back relation field is implemented
             }
         "#;
-        let result = infer_and_apply(api, &dm2);
+        let result = infer_and_apply(api, &dm2).sql_schema;
         let table = result.table_bang("A");
         let column = result.table_bang("A").column_bang("b");
         assert_eq!(column.tpe.family, ColumnTypeFamily::Int);
@@ -390,7 +390,7 @@ fn adding_a_many_to_many_relation_must_result_in_a_prisma_style_relation_table()
                 as A[]
             }
         "#;
-        let result = infer_and_apply(api, &dm1);
+        let result = infer_and_apply(api, &dm1).sql_schema;
         let relation_table = result.table_bang("_AToB");
         println!("{:?}", relation_table.foreign_keys);
         assert_eq!(relation_table.columns.len(), 2);
@@ -434,7 +434,7 @@ fn adding_a_many_to_many_relation_with_custom_name_must_work() {
             }
         "#;
 
-        let result = infer_and_apply(api, &dm1);
+        let result = infer_and_apply(api, &dm1).sql_schema;
         let relation_table = result.table_bang("_my_relation");
         assert_eq!(relation_table.columns.len(), 2);
 
@@ -504,7 +504,7 @@ fn adding_an_inline_relation_must_result_in_a_foreign_key_in_the_model_table() {
                 id Int @id
             }
         "#;
-        let result = dbg!(infer_and_apply(api, &dm1));
+        let result = dbg!(infer_and_apply(api, &dm1).sql_schema);
         let table = result.table_bang("A");
         let column = table.column_bang("b");
         assert_eq!(column.tpe.family, ColumnTypeFamily::Int);
@@ -533,7 +533,7 @@ fn specifying_a_db_name_for_an_inline_relation_must_work() {
                 id Int @id
             }
         "#;
-        let result = infer_and_apply(api, &dm1);
+        let result = infer_and_apply(api, &dm1).sql_schema;
         let table = result.table_bang("A");
         let column = table.column_bang("b_column");
         assert_eq!(column.tpe.family, ColumnTypeFamily::Int);
@@ -562,7 +562,7 @@ fn adding_an_inline_relation_to_a_model_with_an_exotic_id_type() {
                 id String @id @default(cuid())
             }
         "#;
-        let result = dbg!(infer_and_apply(api, &dm1));
+        let result = dbg!(infer_and_apply(api, &dm1).sql_schema);
         let table = result.table_bang("A");
         let column = table.column_bang("b");
         assert_eq!(column.tpe.family, ColumnTypeFamily::String);
@@ -591,7 +591,7 @@ fn removing_an_inline_relation_must_work() {
                 id Int @id
             }
         "#;
-        let result = dbg!(infer_and_apply(api, &dm1));
+        let result = infer_and_apply(api, &dm1).sql_schema;
         let column = result.table_bang("A").column("b");
         assert_eq!(column.is_some(), true);
 
@@ -604,7 +604,7 @@ fn removing_an_inline_relation_must_work() {
                 id Int @id
             }
         "#;
-        let result = dbg!(infer_and_apply(api, &dm2));
+        let result = infer_and_apply(api, &dm2).sql_schema;
         let column = result.table_bang("A").column("b");
         assert_eq!(column.is_some(), false);
     });
@@ -623,7 +623,7 @@ fn moving_an_inline_relation_to_the_other_side_must_work() {
                 id Int @id
             }
         "#;
-        let result = infer_and_apply(api, &dm1);
+        let result = infer_and_apply(api, &dm1).sql_schema;
         let table = result.table_bang("A");
         assert_eq!(
             table.foreign_keys,
@@ -645,7 +645,7 @@ fn moving_an_inline_relation_to_the_other_side_must_work() {
                 a A @relation(references: [id])
             }
         "#;
-        let result = infer_and_apply(api, &dm2);
+        let result = infer_and_apply(api, &dm2).sql_schema;
         let table = result.table_bang("B");
         assert_eq!(
             table.foreign_keys,
@@ -668,7 +668,7 @@ fn adding_a_new_unique_field_must_work() {
                 field String @unique
             }
         "#;
-        let result = infer_and_apply(api, &dm1);
+        let result = infer_and_apply(api, &dm1).sql_schema;
         let index = result
             .table_bang("A")
             .indices
@@ -688,7 +688,7 @@ fn unique_in_conjunction_with_custom_column_name_must_work() {
                 field String @unique @map("custom_field_name")
             }
         "#;
-        let result = infer_and_apply(api, &dm1);
+        let result = infer_and_apply(api, &dm1).sql_schema;
         let index = result
             .table_bang("A")
             .indices
@@ -710,7 +710,7 @@ fn sqlite_must_recreate_indexes() {
                 field String @unique
             }
         "#;
-        let result = infer_and_apply(api, &dm1);
+        let result = infer_and_apply(api, &dm1).sql_schema;
         let index = result
             .table_bang("A")
             .indices
@@ -726,7 +726,7 @@ fn sqlite_must_recreate_indexes() {
                 other String
             }
         "#;
-        let result = infer_and_apply(api, &dm2);
+        let result = infer_and_apply(api, &dm2).sql_schema;
         let index = result
             .table_bang("A")
             .indices
@@ -747,7 +747,7 @@ fn removing_an_existing_unique_field_must_work() {
                 field String @unique
             }
         "#;
-        let result = infer_and_apply(api, &dm1);
+        let result = infer_and_apply(api, &dm1).sql_schema;
         let index = result
             .table_bang("A")
             .indices
@@ -761,7 +761,7 @@ fn removing_an_existing_unique_field_must_work() {
                 id    Int    @id
             }
         "#;
-        let result = dbg!(infer_and_apply(api, &dm2));
+        let result = infer_and_apply(api, &dm2).sql_schema;
         let index = result
             .table_bang("A")
             .indices
@@ -780,7 +780,7 @@ fn adding_unique_to_an_existing_field_must_work() {
                 field String
             }
         "#;
-        let result = infer_and_apply(api, &dm1);
+        let result = infer_and_apply(api, &dm1).sql_schema;
         let index = result
             .table_bang("A")
             .indices
@@ -794,7 +794,7 @@ fn adding_unique_to_an_existing_field_must_work() {
                 field String @unique
             }
         "#;
-        let result = infer_and_apply(api, &dm2);
+        let result = infer_and_apply(api, &dm2).sql_schema;
         let index = result
             .table_bang("A")
             .indices
@@ -815,7 +815,7 @@ fn removing_unique_from_an_existing_field_must_work() {
                 field String @unique
             }
         "#;
-        let result = infer_and_apply(api, &dm1);
+        let result = infer_and_apply(api, &dm1).sql_schema;
         let index = result
             .table_bang("A")
             .indices
@@ -830,7 +830,7 @@ fn removing_unique_from_an_existing_field_must_work() {
                 field String
             }
         "#;
-        let result = dbg!(infer_and_apply(api, &dm2));
+        let result = infer_and_apply(api, &dm2).sql_schema;
         let index = result
             .table_bang("A")
             .indices
@@ -855,7 +855,7 @@ fn adding_a_scalar_list_for_a_modelwith_id_type_int_must_work() {
               ERROR
             }
         "#;
-        let result = infer_and_apply(api, &dm1);
+        let result = infer_and_apply(api, &dm1).sql_schema;
         let scalar_list_table_for_strings = result.table_bang("A_strings");
         let node_id_column = scalar_list_table_for_strings.column_bang("nodeId");
         assert_eq!(node_id_column.tpe.family, ColumnTypeFamily::Int);
@@ -882,7 +882,7 @@ fn updating_a_model_with_a_scalar_list_to_a_different_id_type_must_work() {
                 strings String[]
             }
         "#;
-        let result = infer_and_apply(api, &dm);
+        let result = infer_and_apply(api, &dm).sql_schema;
         let node_id_column = result.table_bang("A_strings").column_bang("nodeId");
         assert_eq!(node_id_column.tpe.family, ColumnTypeFamily::Int);
 
@@ -892,7 +892,7 @@ fn updating_a_model_with_a_scalar_list_to_a_different_id_type_must_work() {
                 strings String[]
             }
         "#;
-        let result = infer_and_apply(api, &dm);
+        let result = infer_and_apply(api, &dm).sql_schema;
         let node_id_column = result.table_bang("A_strings").column_bang("nodeId");
         assert_eq!(node_id_column.tpe.family, ColumnTypeFamily::String);
     });
@@ -909,7 +909,7 @@ fn reserved_sql_key_words_must_work() {
                 childGroups Group[] @relation(name: "ChildGroups")
             }
         "#;
-        let result = infer_and_apply(api, &dm);
+        let result = infer_and_apply(api, &dm).sql_schema;
 
         let table = result.table_bang("Group");
         let relation_column = table.column_bang("parent");
