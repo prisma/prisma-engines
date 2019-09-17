@@ -9,11 +9,11 @@ use prisma_inflector;
 use regex::Regex;
 use sql_schema_describer::*;
 
- fn is_migration_table(table: &Table) -> bool {
+fn is_migration_table(table: &Table) -> bool {
     table.name == "_Migration"
 }
 
- fn is_many_to_many_relation_table(table: &Table) -> bool {
+fn is_prisma_many_to_many_relation_table(table: &Table) -> bool {
     table.name.starts_with("_")
         && table.columns.iter().count() == 2
         && table.foreign_keys.iter().count() == 2
@@ -21,7 +21,7 @@ use sql_schema_describer::*;
         && table.columns.iter().find(|column| column.name == "B").is_some()
 }
 
- fn is_scalar_list_table(table: &Table) -> bool {
+fn is_prisma_scalar_list_table(table: &Table) -> bool {
     table.name.contains("_")
         && table.columns.iter().count() == 3
         && table.columns.iter().find(|column| column.name == "nodeId").is_some()
@@ -29,33 +29,37 @@ use sql_schema_describer::*;
         && table.columns.iter().find(|column| column.name == "value").is_some()
 }
 
-    fn create_many_to_many_field(foreign_key: &ForeignKey, relation_table_name: &str) -> Field {
-        let inflector = prisma_inflector::default();
+fn create_many_to_many_field(foreign_key: &ForeignKey, relation_table_name: &str, is_self_relation: bool) -> Field {
+    let inflector = prisma_inflector::default();
 
-        let field_type = FieldType::Relation(RelationInfo {
-            name: relation_table_name.to_owned(), // we should remove the _ but this somehow gets rid of the relationName altogether
-            to: foreign_key.referenced_table.clone(),
-            to_fields: foreign_key.referenced_columns.clone(),
-            on_delete: match foreign_key.on_delete_action {
-                ForeignKeyAction::Cascade => OnDeleteStrategy::Cascade,
-                _ => OnDeleteStrategy::None,
-            },
-        });
+    let field_type = FieldType::Relation(RelationInfo {
+        name: relation_table_name.replacen('_', "", 1),
+        to: foreign_key.referenced_table.clone(),
+        to_fields: foreign_key.referenced_columns.clone(),
+        on_delete: OnDeleteStrategy::None,
+    });
 
-        Field {
-            name: inflector.pluralize(&foreign_key.referenced_table).camel_case(),
-            arity: FieldArity::List,
-            field_type,
-            database_name: None,
-            default_value: None,
-            is_unique: false,
-            id_info: None,
-            scalar_list_strategy: None,
-            documentation: None,
-            is_generated: false,
-            is_updated_at: false,
-        }
+    let basename = inflector.pluralize(&foreign_key.referenced_table).camel_case();
+
+    let name = match is_self_relation {
+        true => format!("{}_{}", basename, foreign_key.columns[0]),
+        false => basename
+    };
+
+    Field {
+        name,
+        arity: FieldArity::List,
+        field_type,
+        database_name: None,
+        default_value: None,
+        is_unique: false,
+        id_info: None,
+        scalar_list_strategy: None,
+        documentation: None,
+        is_generated: false,
+        is_updated_at: false,
     }
+}
 
 /// Calculate a data model from a database schema.
 pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> {
@@ -66,8 +70,8 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
         .tables
         .iter()
         .filter(|table| !is_migration_table(&table))
-        .filter(|table| !is_many_to_many_relation_table(&table))
-        .filter(|table| !is_scalar_list_table(&table))
+        .filter(|table| !is_prisma_many_to_many_relation_table(&table))
+        .filter(|table| !is_prisma_scalar_list_table(&table))
     {
         let mut model = Model::new(&table.name);
         for column in table.columns.iter() {
@@ -142,7 +146,7 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
                         let other_model = data_model.find_model(&relation_info.to).unwrap();
 
                         let field_type = FieldType::Relation(RelationInfo {
-                            name: "".to_string(),
+                            name: relation_info.name.clone(),
                             to: model.name.clone(),
                             to_fields: vec![],
                             on_delete: OnDeleteStrategy::None,
@@ -187,31 +191,26 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
     for table in schema
         .tables
         .iter()
-        .filter(|table| is_many_to_many_relation_table(&table))
+        .filter(|table| is_prisma_many_to_many_relation_table(&table))
     {
-        // use foreign keys to find tables that are linked to??
-
         let first = table.foreign_keys.get(0);
         let second = table.foreign_keys.get(1);
 
+
+
         match (first, second) {
             (Some(f), Some(s)) => {
-                fields_to_be_added.push((
-                    s.referenced_table.clone(),
-                    create_many_to_many_field(f, &table.name),
-                ));
-                fields_to_be_added.push((
-                    f.referenced_table.clone(),
-                    create_many_to_many_field(s, &table.name),
-                ));
+                let is_self_relation = f.referenced_table == s.referenced_table;
+
+                fields_to_be_added.push((s.referenced_table.clone(), create_many_to_many_field(f, &table.name, is_self_relation)));
+                fields_to_be_added.push((f.referenced_table.clone(), create_many_to_many_field(s, &table.name, is_self_relation)));
             }
             (_, _) => (),
         }
     }
 
-
     // add scalar lists fields
-    for table in schema.tables.iter().filter(|table| is_scalar_list_table(&table)) {
+    for table in schema.tables.iter().filter(|table| is_prisma_scalar_list_table(&table)) {
         let name = table.name.split('_').nth(1).unwrap();
         let model = table.name.split('_').nth(0).unwrap();
 
@@ -234,12 +233,38 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
         fields_to_be_added.push((model.to_owned(), field));
     }
 
+    let mut duplicated_relation_fields = Vec::new();
+
+    fields_to_be_added
+        .iter()
+        .enumerate()
+        .for_each(|(index, (model, field))| {
+            let is_duplicated = fields_to_be_added
+                .iter()
+                .filter(|(other_model, other_field)| model == other_model && field.name == other_field.name)
+                .count()
+                > 1;
+
+            if is_duplicated {
+                duplicated_relation_fields.push(index);
+            }
+        });
+
+    duplicated_relation_fields.iter().for_each(|index| {
+       let (_, ref mut field) = fields_to_be_added.get_mut(*index).unwrap();
+        let suffix = match &field.field_type{
+            FieldType::Relation(RelationInfo{name, ..}) => format!("_{}", &name),
+            FieldType::Base(_) => "".to_string(),
+            _ => "".to_string()
+        };
+
+        field.name = format!("{}{}", field.name, suffix)
+    });
+
     for (model, field) in fields_to_be_added {
         let model = data_model.find_model_mut(&model).unwrap();
         model.add_field(field);
     }
-
-    // refactor to use only one list with fields to add??
 
     Ok(data_model)
 }
@@ -317,6 +342,28 @@ fn calc_id_info(column: &Column, table: &Table) -> Option<IdInfo> {
     })
 }
 
+fn not_many_to_many_relation_name(fk: &ForeignKey, table: &Table) -> String {
+    let referenced_model = &fk.referenced_table;
+    let model_with_fk = &table.name;
+    let fk_column_name = fk.columns.get(0).unwrap();
+
+    if model_with_fk < referenced_model {
+        format!(
+            "{}_{}To{}",
+            model_with_fk,
+            fk_column_name,
+            referenced_model
+        )
+    } else {
+        format!(
+            "{}To{}_{}",
+            referenced_model,
+            model_with_fk,
+            fk_column_name
+        )
+    }
+}
+
 fn calculate_field_type(column: &Column, table: &Table) -> FieldType {
     debug!("Calculating field type for '{}'", column.name);
     // Look for a foreign key referencing this column
@@ -329,8 +376,9 @@ fn calculate_field_type(column: &Column, table: &Table) -> FieldType {
                 .position(|n| n == &column.name)
                 .expect("get column FK position");
             let referenced_col = &fk.referenced_columns[idx];
+            
             FieldType::Relation(RelationInfo {
-                name: "".to_string(),
+                name: not_many_to_many_relation_name(fk, table),
                 to: fk.referenced_table.clone(),
                 to_fields: vec![referenced_col.clone()],
                 on_delete: match fk.on_delete_action {
