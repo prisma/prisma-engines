@@ -295,6 +295,7 @@ VALUES (1, 'Joe', 27, 20000.00 );
     #[test]
     fn should_map_access_denied_error() {
         let mut admin = Mysql::new(get_config()).unwrap();
+
         admin
             .execute_raw("CREATE USER should_map_access_denied_test", &[])
             .unwrap();
@@ -318,15 +319,16 @@ VALUES (1, 'Joe', 27, 20000.00 );
         admin
             .execute_raw("DROP USER should_map_access_denied_test", &[])
             .unwrap();
+
         res.unwrap();
     }
 
     #[test]
     fn should_map_authentication_failed_error() {
         let mut admin = Mysql::new(get_config()).unwrap();
+
         admin
             .execute_raw("CREATE USER authentication_failed", &[])
-
             .unwrap();
 
         let res = std::panic::catch_unwind(|| {
@@ -347,6 +349,36 @@ VALUES (1, 'Joe', 27, 20000.00 );
         admin
             .execute_raw("DROP USER authentication_failed", &[])
             .unwrap();
+
+        res.unwrap();
+    }
+
+    #[test]
+    fn should_map_database_already_exists_error() {
+        let mut admin = Mysql::new(get_config()).unwrap();
+
+        admin
+            .execute_raw("CREATE DATABASE should_map_if_database_already_exists", &[])
+            .unwrap();
+
+        let res = std::panic::catch_unwind(|| {
+            let mut admin = Mysql::new(get_config()).unwrap();
+
+            let res = admin
+                .execute_raw("CREATE DATABASE should_map_if_database_already_exists", &[]);
+
+            assert!(res.is_err());
+
+            match res.unwrap_err() {
+                Error::DatabaseAlreadyExists { db_name } => assert_eq!("should_map_if_database_already_exists", db_name.as_str()),
+                e => panic!("Expected `DatabaseAlreadyExists`, got {:?}", e),
+            }
+        });
+
+        admin
+            .execute_raw("DROP DATABASE should_map_if_database_already_exists", &[])
+            .unwrap();
+
         res.unwrap();
     }
 }

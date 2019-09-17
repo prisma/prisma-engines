@@ -45,6 +45,15 @@ impl From<my::error::Error> for Error {
             }
             my::error::Error::MySqlError(MySqlError {
                 ref message, code, ..
+            }) if code == 1007 => {
+                let splitted: Vec<&str> = message.split_whitespace().collect();
+                let splitted: Vec<&str> = splitted[3].split('\'').collect();
+                let db_name: String = splitted[1].into();
+
+                Error::DatabaseAlreadyExists { db_name }
+            }
+            my::error::Error::MySqlError(MySqlError {
+                ref message, code, ..
             }) if code == 1044 => {
                 let splitted: Vec<&str> = message.split_whitespace().collect();
                 let splitted: Vec<&str> = splitted.last().map(|s| s.split('\'').collect()).unwrap();

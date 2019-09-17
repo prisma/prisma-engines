@@ -383,4 +383,33 @@ mod tests {
             .unwrap();
         res.unwrap();
     }
+
+    #[test]
+    fn should_map_database_already_exists_error() {
+        let mut admin = PostgreSql::new(get_config(), None).unwrap();
+
+        admin
+            .execute_raw("CREATE DATABASE should_map_if_database_already_exists", &[])
+            .unwrap();
+
+        let res = std::panic::catch_unwind(|| {
+            let mut admin = PostgreSql::new(get_config(), None).unwrap();
+
+            let res = admin
+                .execute_raw("CREATE DATABASE should_map_if_database_already_exists", &[]);
+
+            assert!(res.is_err());
+
+            match res.unwrap_err() {
+                Error::DatabaseAlreadyExists { db_name } => assert_eq!("should_map_if_database_already_exists", db_name.as_str()),
+                e => panic!("Expected `DatabaseAlreadyExists`, got {:?}", e),
+            }
+        });
+
+        admin
+            .execute_raw("DROP DATABASE should_map_if_database_already_exists", &[])
+            .unwrap();
+
+        res.unwrap();
+    }
 }
