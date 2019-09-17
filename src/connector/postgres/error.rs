@@ -51,7 +51,14 @@ impl From<tokio_postgres::error::Error> for Error {
 
                 Error::AuthenticationFailed { user }
             }
-            _ => Error::QueryError(e.into()),
+            _ => {
+                let reason = format!("{}", e);
+
+                match reason.as_str() {
+                    "error connecting to server: timed out" => Error::ConnectTimeout, // sigh...
+                    _ => Error::QueryError(e.into())
+                }
+            }
         }
     }
 }

@@ -30,14 +30,18 @@ pub enum Error {
         _0
     )]
     ResultTypeMismatch(&'static str),
-    #[fail(display = "The specified database url {} is invalid.", _0)]
+    #[fail(display = "The specified database url {} is invalid", _0)]
     DatabaseUrlIsInvalid(String),
     #[fail(display = "Conversion failed: {}", _0)]
     ConversionError(&'static str),
-    #[fail(display = "The provided arguments are not supported.")]
+    #[fail(display = "The provided arguments are not supported")]
     InvalidConnectionArguments,
     #[fail(display = "Error in an I/O operation")]
     IoError(FError),
+    #[fail(display = "Connect timed out")]
+    ConnectTimeout,
+    #[fail(display = "Operation timed out")]
+    Timeout
 }
 
 #[cfg(any(

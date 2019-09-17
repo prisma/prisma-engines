@@ -4,8 +4,14 @@ use mysql as my;
 impl From<my::error::Error> for Error {
     fn from(e: my::error::Error) -> Error {
         use my::error::MySqlError;
+        use my::error::DriverError;
 
         match e {
+            my::error::Error::DriverError(e) => match e {
+                DriverError::ConnectTimeout => Error::ConnectTimeout,
+                DriverError::Timeout => Error::Timeout,
+                _ => Error::QueryError(e.into())
+            },
             my::error::Error::MySqlError(MySqlError {
                 ref message, code, ..
             }) if code == 1062 => {
