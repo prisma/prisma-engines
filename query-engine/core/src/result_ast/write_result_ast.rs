@@ -1,5 +1,6 @@
+use crate::{CoreError, CoreResult};
 use prisma_models::prelude::{GraphqlId, SingleRecord, ModelRef};
-use crate::{filter::RecordFinder, error::ConnectorError};
+use connector::{filter::RecordFinder};
 
 #[derive(Debug, Clone)]
 pub enum Identifier {
@@ -49,7 +50,7 @@ impl WriteQueryResult {
 
     /// Attempts to convert a write query result into a RecordFinder required for dependent queries.
     /// Assumes ID field is used as dependent field (which is true for now in the current execution model).
-    pub fn to_record_finder(&self, model: ModelRef) -> crate::Result<RecordFinder> {
+    pub fn to_record_finder(&self, model: ModelRef) -> CoreResult<RecordFinder> {
         let id_field = model.fields().id();
 
         match &self.identifier {
@@ -59,7 +60,7 @@ impl WriteQueryResult {
                 .map(|id_val| RecordFinder::new(id_field, id_val))
                 .map_err(|err| err.into()),
 
-            other => Err(ConnectorError::InternalConversionError(format!(
+            other => Err(CoreError::ConversionError(format!(
                 "Impossible conversion of write query result {:?} to RecordFinder.",
                 other
             ))),

@@ -1,6 +1,6 @@
 use super::*;
-use crate::{CoreError, CoreResult, schema::{IntoArc, ObjectTypeStrongRef, OutputType, OutputTypeRef, ScalarType}};
-use connector::{ReadQueryResult, RecordSelection, ResultContent, ScalarListValues};
+use crate::{ReadQueryResult, RecordSelection, ResultContent, CoreError, CoreResult, schema::{IntoArc, ObjectTypeStrongRef, OutputType, OutputTypeRef, ScalarType}};
+use connector::{ScalarListValues};
 use indexmap::IndexMap;
 use prisma_models::{GraphqlId, PrismaValue};
 use std::{borrow::Borrow, collections::HashMap, convert::TryFrom};

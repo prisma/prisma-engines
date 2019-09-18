@@ -1,5 +1,4 @@
-use crate::{QueryArguments, ScalarListValues};
-// use prisma_models::{GraphqlId, ManyRecords, PrismaValue, SingleRecord};
+use connector::{ScalarListValues,QueryArguments};
 use prisma_models::ManyRecords;
 
 // #[derive(Debug, Default)]

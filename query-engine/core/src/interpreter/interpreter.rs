@@ -1,6 +1,6 @@
 use super::{InterpretationResult, InterpreterError, expression::*, query_interpreters::{read, write}};
-use crate::Query;
-use connector::{TransactionLike, Identifier, ReadQueryResult, ResultContent, WriteQueryResult};
+use crate::{Query, Identifier, ReadQueryResult, ResultContent, WriteQueryResult};
+use connector::{TransactionLike};
 use im::HashMap;
 use prisma_models::prelude::*;
 use std::convert::TryInto;

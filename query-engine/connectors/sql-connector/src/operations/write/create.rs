@@ -1,9 +1,5 @@
-use crate::{
-    error::SqlError,
-    query_builder::{WriteQueryBuilder},
-    QueryExt,
-};
-use prisma_models::{GraphqlId, ModelRef, PrismaArgs, PrismaListValue, RelationFieldRef};
+use crate::{error::SqlError, query_builder::WriteQueryBuilder, QueryExt};
+use prisma_models::{GraphqlId, ModelRef, PrismaArgs, PrismaListValue};
 use prisma_query::error::Error as QueryError;
 use std::sync::Arc;
 

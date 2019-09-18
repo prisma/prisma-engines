@@ -1,5 +1,5 @@
-use crate::{interpreter::InterpretationResult, WriteQuery};
-use connector::{TransactionLike, WriteQueryResult};
+use crate::{interpreter::InterpretationResult, WriteQuery, WriteQueryResult};
+use connector::{TransactionLike};
 
 pub fn execute(_tx: &mut dyn TransactionLike, _write_query: WriteQuery) -> InterpretationResult<WriteQueryResult> {
     unimplemented!()

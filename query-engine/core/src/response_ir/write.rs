@@ -1,6 +1,6 @@
 use super::*;
 use crate::CoreResult;
-use connector::{Identifier, WriteQueryResult};
+use crate::{Identifier, WriteQueryResult};
 use prisma_models::PrismaValue;
 
 /// We just assume we ever get a single item back
