@@ -1,4 +1,4 @@
-mod sql_connector_transaction;
+mod transaction;
 mod mysql;
 mod postgresql;
 mod sqlite;

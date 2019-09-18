@@ -1,4 +1,4 @@
-use super::sql_connector_transaction::SqlConnectorTransaction;
+use super::transaction::SqlConnectorTransaction;
 use crate::{
     query_builder::ManyRelatedRecordsWithRowNumber, FromSource, SqlError,
 };
