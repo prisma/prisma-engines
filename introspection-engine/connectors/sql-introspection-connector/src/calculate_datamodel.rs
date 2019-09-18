@@ -129,7 +129,6 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
     let mut fields_to_be_added = Vec::new();
 
     // add backrelation fields
-
     for model in data_model.models.iter() {
         for relation_field in model.fields.iter() {
             match &relation_field.field_type {
@@ -211,8 +210,8 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
 
     // add scalar lists fields
     for table in schema.tables.iter().filter(|table| is_prisma_scalar_list_table(&table)) {
-        let name = table.name.split('_').nth(1).unwrap();
-        let model = table.name.split('_').nth(0).unwrap();
+        let model = table.name.split('_')[0];
+        let name = table.name.split('_')[1];
 
         let field_type = calculate_field_type(&table.columns.iter().find(|c| c.name == "value").unwrap(), &table);
 
@@ -262,15 +261,8 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
     });
 
     for (model, field) in fields_to_be_added {
-        let model_option = data_model.find_model_mut(&model);
-
-        match model_option {
-            Some(m) =>        m.add_field(field),
-            None => {
-                debug!("Could not find model to add field to. Model name '{}'", model);
-                ()
-            }
-        }
+        let model = data_model.find_model_mut(&model).unwrap();
+        model.add_field(field);
     }
 
     Ok(data_model)
