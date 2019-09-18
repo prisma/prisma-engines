@@ -1,6 +1,6 @@
 use crate::{CoreError, CoreResult};
-use prisma_models::prelude::{GraphqlId, SingleRecord, ModelRef};
-use connector::{filter::RecordFinder};
+use connector::filter::RecordFinder;
+use prisma_models::prelude::{GraphqlId, ModelRef, SingleRecord};
 
 #[derive(Debug, Clone)]
 pub enum Identifier {
@@ -10,20 +10,9 @@ pub enum Identifier {
     None,
 }
 
-/// TODO this can likely be removed.
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub enum WriteQueryResultType {
-    Create,
-    Update,
-    Delete,
-    Many,
-    Unit,
-}
-
 #[derive(Debug, Clone)]
 pub struct WriteQueryResult {
     pub identifier: Identifier,
-    pub typ: WriteQueryResultType,
 }
 
 impl WriteQueryResult {

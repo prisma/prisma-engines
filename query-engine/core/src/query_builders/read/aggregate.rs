@@ -1,5 +1,5 @@
 use super::*;
-use crate::{query_document::ParsedField, query_ast::read_ast::{AggregateRecordsQuery, ReadQuery}};
+use crate::{query_document::ParsedField, AggregateRecordsQuery, ReadQuery};
 use prisma_models::ModelRef;
 
 pub struct AggregateRecordsBuilder {

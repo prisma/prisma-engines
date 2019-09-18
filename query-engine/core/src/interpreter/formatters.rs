@@ -1,5 +1,5 @@
 use super::Expression;
-use crate::{Query, WriteQuery};
+use crate::Query;
 
 pub fn format_expression(expr: &Expression, indent: usize) -> String {
     match expr {
@@ -11,8 +11,7 @@ pub fn format_expression(expr: &Expression, indent: usize) -> String {
 
         Expression::Query { query } => match query {
             Query::Read(rq) => add_indent(indent, format!("{}", rq)),
-            Query::Write(WriteQuery::Root(wq)) => add_indent(indent, format!("{}", wq)),
-            _ => unreachable!(),
+            Query::Write(wq) => add_indent(indent, format!("{}", wq)),
         },
 
         Expression::Func { func: _ } => add_indent(indent, "(Fn env)"),

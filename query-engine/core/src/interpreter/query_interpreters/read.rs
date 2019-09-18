@@ -1,4 +1,4 @@
-use crate::{query_ast::read_ast::*, result_ast::*, interpreter::InterpretationResult};
+use crate::{query_ast::*, result_ast::*, interpreter::InterpretationResult};
 use connector::{self, QueryArguments, ScalarListValues, TransactionLike};
 use prisma_models::{GraphqlId, ScalarField, SelectedFields};
 use std::sync::Arc;

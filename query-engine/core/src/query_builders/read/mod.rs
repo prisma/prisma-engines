@@ -8,7 +8,7 @@ pub use one::*;
 pub use related::*;
 pub use aggregate::*;
 
-use crate::{query_document::ParsedField, query_ast::read_ast::ReadQuery};
+use crate::{query_document::ParsedField, ReadQuery};
 use super::*;
 use prisma_models::{
     Field, ModelRef, RelationFieldRef, SelectedField, SelectedFields, SelectedRelationField, SelectedScalarField,

@@ -104,7 +104,7 @@ impl WriteQueryBuilder {
         read_query.inject_record_finder(record_finder.clone());
 
         let read_node = self.graph.create_node(Query::Read(read_query));
-        let delete_query = WriteQuery::Root(RootWriteQuery::DeleteRecord(DeleteRecord { where_: record_finder }));
+        let delete_query = WriteQuery::DeleteRecord(DeleteRecord { where_: record_finder });
         let delete_node = self.graph.create_node(Query::Write(delete_query));
 
         self.graph.add_result_node(&read_node);
@@ -121,7 +121,7 @@ impl WriteQueryBuilder {
             None => Filter::empty(),
         };
 
-        let delete_many = WriteQuery::Root(RootWriteQuery::DeleteManyRecords(DeleteManyRecords { model, filter }));
+        let delete_many = WriteQuery::DeleteManyRecords(DeleteManyRecords { model, filter });
 
         self.graph.create_node(Query::Write(delete_many));
         Ok(self)
@@ -143,12 +143,12 @@ impl WriteQueryBuilder {
 
         non_list_args.update_datetimes(Arc::clone(&model), list_causes_update);
 
-        let update_many = WriteQuery::Root(RootWriteQuery::UpdateManyRecords(UpdateManyRecords {
+        let update_many = WriteQuery::UpdateManyRecords(UpdateManyRecords{
             model,
             filter,
             non_list_args,
             list_args: update_args.list,
-        }));
+        });
 
         self.graph.create_node(Query::Write(update_many));
         Ok(self)
@@ -259,14 +259,11 @@ impl WriteQueryBuilder {
             model,
             non_list_args,
             list_args: create_args.list,
-            nested_writes: NestedWriteQueries::default(),
         };
 
         let node = self
             .graph
-            .create_node(Query::Write(WriteQuery::Root(RootWriteQuery::CreateRecord(Box::new(
-                cr,
-            )))));
+            .create_node(Query::Write(WriteQuery::CreateRecord(cr)));
 
         for (relation_field, data_map) in create_args.nested {
             self.connect_nested_query(&node, relation_field, data_map)?;
@@ -291,14 +288,11 @@ impl WriteQueryBuilder {
             where_: record_finder,
             non_list_args,
             list_args: update_args.list,
-            nested_writes: NestedWriteQueries::default(),
         };
 
         let node = self
             .graph
-            .create_node(Query::Write(WriteQuery::Root(RootWriteQuery::UpdateRecord(Box::new(
-                ur,
-            )))));
+            .create_node(Query::Write(WriteQuery::UpdateRecord(ur)));
 
         for (relation_field, data_map) in update_args.nested {
             self.connect_nested_query(&node, relation_field, data_map)?;
@@ -349,7 +343,7 @@ impl WriteQueryBuilder {
 
             // Detect if a flip is necessary
             let (parent, child) =
-                if let Node::Query(Query::Write(WriteQuery::Root(RootWriteQuery::CreateRecord(_)))) = parent_query {
+                if let Node::Query(Query::Write(WriteQuery::CreateRecord(_))) = parent_query {
                     if relation_field.relation_is_inlined_in_parent() {
                         // Actions required to do a flip:
                         // 1. Remove all edges from the parent to it's parents, and rewire them to the child.
@@ -432,7 +426,7 @@ impl WriteQueryBuilder {
                     &read_parent_node,
                     &update_node,
                     QueryGraphDependency::ParentId(Box::new(|mut node, parent_id| {
-                        if let Node::Query(Query::Write(WriteQuery::Root(RootWriteQuery::UpdateRecord(ref mut ur)))) =
+                        if let Node::Query(Query::Write(WriteQuery::UpdateRecord(ref mut ur))) =
                             node
                         {
                             ur.where_ = Some(RecordFinder {

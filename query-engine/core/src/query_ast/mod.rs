@@ -1,8 +1,8 @@
-pub mod read_ast;
-pub mod write_ast;
+mod read;
+mod write;
 
-pub use read_ast::*;
-pub use write_ast::*;
+pub use read::*;
+pub use write::*;
 
 #[derive(Debug, Clone)]
 pub enum Query {
@@ -14,8 +14,7 @@ impl std::fmt::Display for Query {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             Self::Read(q) => write!(f, "{}", q),
-            Self::Write(WriteQuery::Root(q)) => write!(f, "{}", q),
-            _ => unimplemented!(),
+            Self::Write(q) => write!(f, "{}", q),
         }
     }
 }
