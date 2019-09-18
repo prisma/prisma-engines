@@ -38,9 +38,15 @@ pub(crate) struct Params<'a>(pub(crate) &'a [ParameterizedValue<'a>]);
 
 impl<'a> fmt::Display for Params<'a> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let len = self.0.len();
+
         write!(f, "[")?;
-        for val in self.0.iter() {
-            write!(f, "{},", val)?;
+        for (i, val) in self.0.iter().enumerate() {
+            write!(f, "{}", val)?;
+
+            if i < (len - 1) {
+                write!(f, ",")?;
+            }
         }
         write!(f, "]")
     }

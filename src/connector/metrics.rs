@@ -1,9 +1,23 @@
+use crate::ast::{ParameterizedValue, Params};
 use std::time::Instant;
 
-pub(crate) fn query<F, T>(tag: &'static str, query: &str, f: F) -> T
+pub(crate) fn query<'a, F, T>(
+    tag: &'static str,
+    query: &str,
+    params: &[ParameterizedValue<'a>],
+    f: F,
+) -> T
 where
     F: FnOnce() -> T,
 {
+    if *crate::LOG_QUERIES {
+        info!(
+            "query: \"{}\", params: {}",
+            query,
+            Params(params)
+        );
+    }
+
     time(format!("{}.query.time ({})", tag, query), f)
 }
 

@@ -133,9 +133,9 @@ impl Queryable for Mysql {
     fn execute(&mut self, q: Query) -> crate::Result<Option<Id>> {
         let (sql, params) = visitor::Mysql::build(q);
 
-        metrics::query("mysql.execute", &sql, || {
+        metrics::query("mysql.execute", &sql, &params, || {
             let mut stmt = self.client.prepare(&sql)?;
-            let result = stmt.execute(params)?;
+            let result = stmt.execute(&params)?;
 
             Ok(Some(Id::from(result.last_insert_id())))
         })
@@ -151,7 +151,7 @@ impl Queryable for Mysql {
         sql: &str,
         params: &[ParameterizedValue<'a>],
     ) -> crate::Result<ResultSet> {
-        metrics::query("mysql.query_raw", sql, || {
+        metrics::query("mysql.query_raw", sql, params, || {
             let mut stmt = self.client.prepare(sql)?;
             let mut result = ResultSet::new(stmt.to_column_names(), Vec::new());
             let rows = stmt.execute(conversion::conv_params(params))?;
@@ -169,7 +169,7 @@ impl Queryable for Mysql {
         sql: &str,
         params: &[ParameterizedValue<'a>],
     ) -> crate::Result<u64> {
-        metrics::query("mysql.execute_raw", sql, || {
+        metrics::query("mysql.execute_raw", sql, params, || {
             let mut stmt = self.client.prepare(sql)?;
             let result = stmt.execute(conversion::conv_params(params))?;
 
