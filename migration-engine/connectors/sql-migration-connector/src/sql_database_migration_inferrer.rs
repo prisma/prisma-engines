@@ -260,6 +260,7 @@ fn fix(_alter_table: &AlterTable, current: &Table, next: &Table, schema_name: &s
             SqlMigrationStep::RawSql { raw: sql.to_string() }
         },
     );
+
     result.push(SqlMigrationStep::DropTable(DropTable {
         name: current.name.clone(),
     }));

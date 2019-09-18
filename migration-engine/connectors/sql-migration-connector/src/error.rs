@@ -8,6 +8,9 @@ pub enum SqlError {
     #[fail(display = "{}", _0)]
     Generic(String),
 
+    #[fail(display = "{}", column_name)]
+    UnknownColumnDropped { column_name: String },
+
     #[fail(display = "Error connecting to the database {}", _0)]
     ConnectionError(&'static str),
 

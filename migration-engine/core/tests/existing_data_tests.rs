@@ -138,3 +138,47 @@ fn dropping_a_table_with_rows_should_warn() {
         );
     })
 }
+
+#[test]
+fn dropping_a_column_with_non_null_values_should_warn() {
+    test_each_connector(|sql_family, engine| {
+        let dm = r#"
+            model Test {
+                id String @id @default(cuid())
+                puppiesCount Int?
+            }
+        "#;
+
+        let original_database_schema = infer_and_apply(engine, &dm).sql_schema;
+
+        let conn = database(sql_family);
+        let insert = Insert::multi_into((SCHEMA_NAME, "Test"), vec!["id", "puppiesCount"])
+            .values(("a", 7))
+            .values(("b", 8));
+
+        conn.execute(SCHEMA_NAME, insert.into()).unwrap();
+
+        // Drop the `favouriteAnimal` column.
+        let dm = r#"
+            model Test {
+                id String @id @default(cuid())
+            }
+        "#;
+
+        let InferAndApplyOutput {
+            migration_output,
+            sql_schema: final_database_schema,
+        } = infer_and_apply(engine, &dm);
+
+        // The schema should not change because the migration should not run if there are warnings
+        // and the force flag isn't passed.
+        assert_eq!(original_database_schema, final_database_schema);
+
+        assert_eq!(
+            migration_output.warnings,
+            &[MigrationWarning {
+                description: "You are about to drop the column `puppiesCount` on the `Test` table, which still contains 2 non-null, non-default values.".to_owned(),
+            }]
+        );
+    });
+}
