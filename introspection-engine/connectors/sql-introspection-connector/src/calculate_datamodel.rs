@@ -14,8 +14,8 @@ fn is_migration_table(table: &Table) -> bool {
 }
 
 fn is_prisma_join_table(table: &Table) -> bool {
-    table.columns.iter().count() == 2
-        && table.foreign_keys.iter().count() == 2
+    table.columns.len() == 2
+        && table.foreign_keys.len() == 2
         && table.name.starts_with("_")
         && table.columns.iter().find(|column| column.name == "A").is_some()
         && table.columns.iter().find(|column| column.name == "B").is_some()
@@ -23,7 +23,7 @@ fn is_prisma_join_table(table: &Table) -> bool {
 
 fn is_prisma_scalar_list_table(table: &Table) -> bool {
     table.name.contains("_")
-        && table.columns.iter().count() == 3
+        && table.columns.len() == 3
         && table.columns.iter().find(|column| column.name == "nodeId").is_some()
         && table.columns.iter().find(|column| column.name == "position").is_some()
         && table.columns.iter().find(|column| column.name == "value").is_some()
@@ -262,8 +262,15 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
     });
 
     for (model, field) in fields_to_be_added {
-        let model = data_model.find_model_mut(&model).unwrap();
-        model.add_field(field);
+        let model_option = data_model.find_model_mut(&model);
+
+        match model_option {
+            Some(m) =>        m.add_field(field),
+            None => {
+                debug!("Could not find model to add field to. Model name '{}'", model);
+                ()
+            }
+        }
     }
 
     Ok(data_model)
