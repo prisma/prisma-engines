@@ -5,11 +5,9 @@
 ///!
 ///! What the executor module DOES NOT DO:
 ///! - Define low level execution of queries. This is considered an implementation detail of the modules used by the executors.
-mod error;
 mod interpreting_executor;
 mod pipeline;
 
-pub use error::*;
 pub use interpreting_executor::*;
 
 use crate::{query_document::QueryDocument, response_ir::Response, schema::QuerySchemaRef, CoreResult};
