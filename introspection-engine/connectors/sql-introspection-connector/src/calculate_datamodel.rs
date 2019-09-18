@@ -210,8 +210,8 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
 
     // add scalar lists fields
     for table in schema.tables.iter().filter(|table| is_prisma_scalar_list_table(&table)) {
-        let model = table.name.split('_')[0];
-        let name = table.name.split('_')[1];
+        let model = table.name.split('_').nth(0).unwrap();
+        let name = table.name.split('_').nth(1).unwrap();
 
         let field_type = calculate_field_type(&table.columns.iter().find(|c| c.name == "value").unwrap(), &table);
 
@@ -347,9 +347,9 @@ fn not_many_to_many_relation_name(fk: &ForeignKey, table: &Table) -> String {
     let fk_column_name = fk.columns.get(0).unwrap();
 
     if model_with_fk < referenced_model {
-        format!("{}_{}To{}", model_with_fk, fk_column_name, referenced_model)
+        format!("{}_{}_{}", model_with_fk, fk_column_name, referenced_model)
     } else {
-        format!("{}To{}_{}", referenced_model, model_with_fk, fk_column_name)
+        format!("{}_{}_{}", referenced_model, model_with_fk, fk_column_name)
     }
 }
 
