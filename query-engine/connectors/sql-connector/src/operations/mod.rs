@@ -1,8 +1,8 @@
-mod managed_database_reader;
-mod unmanaged_database_writer;
+mod read;
+mod write;
 
-pub use managed_database_reader::*;
-pub use unmanaged_database_writer::*;
+pub use read::*;
+pub use write::*;
 
 use crate::{error::*, query_builder::ReadQueryBuilder, AliasedCondition, RawQuery, SqlRow, ToSqlRow};
 use connector_interface::{
@@ -17,9 +17,11 @@ use prisma_query::{
 use serde_json::{Map, Number, Value};
 use std::{convert::TryFrom, sync::Arc};
 
-impl<'t> Transaction for connector::Transaction<'t> {}
+impl<'t> QueryExt for connector::Transaction<'t> {}
 
-pub trait Transaction: Queryable {
+/// Functions for querying data.
+/// Basically represents a connection wrapper?
+pub trait QueryExt: Queryable {
     fn filter(&mut self, q: Query, idents: &[TypeIdentifier]) -> crate::Result<Vec<SqlRow>> {
         let result_set = self.query(q)?;
         let mut sql_rows = Vec::new();

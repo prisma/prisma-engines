@@ -5,7 +5,6 @@ use crate::{data_model_loader::*, exec_loader, PrismaError, PrismaResult};
 
 /// Prisma request context containing all immutable state of the process.
 /// There is usually only one context initialized per process.
-#[derive(DebugStub)]
 pub struct PrismaContext {
     /// Internal data model used throughout the query engine.
     pub internal_data_model: InternalDataModelRef,
@@ -17,8 +16,7 @@ pub struct PrismaContext {
     pub dm: datamodel::Datamodel,
 
     /// Central query executor.
-    #[debug_stub = "#QueryExecutor#"]
-    pub executor: QueryExecutor,
+    pub executor: Box<dyn QueryExecutor + Send + Sync + 'static>,
 }
 
 impl PrismaContext {
@@ -41,8 +39,7 @@ impl PrismaContext {
         };
 
         // Load executor
-        let executor = exec_loader::load(&**data_source)?;
-        let db_name: String = executor.db_name();
+        let (db_name, executor) = exec_loader::load(&**data_source)?;
 
         // Build internal data model
         let internal_data_model = template.build(db_name);

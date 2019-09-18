@@ -1,4 +1,4 @@
-use crate::{QueryExecutionError, QueryValidationError};
+use crate::{InterpreterError, QueryValidationError};
 use connector::error::ConnectorError;
 use failure::Fail;
 use prisma_models::DomainError;
@@ -25,7 +25,7 @@ pub enum CoreError {
     SerializationError(String),
 
     #[fail(display = "{}", _0)]
-    QueryExecutionError(QueryExecutionError),
+    InterpreterError(InterpreterError),
 }
 
 impl From<ConnectorError> for CoreError {
@@ -46,8 +46,8 @@ impl From<QueryValidationError> for CoreError {
     }
 }
 
-impl From<QueryExecutionError> for CoreError {
-    fn from(e: QueryExecutionError) -> CoreError {
-        CoreError::QueryExecutionError(e)
+impl From<InterpreterError> for CoreError {
+    fn from(e: InterpreterError) -> CoreError {
+        CoreError::InterpreterError(e)
     }
 }

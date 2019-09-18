@@ -1,6 +1,5 @@
 use super::*;
-use crate::{query_builders::*, QueryGraph};
-use connector::Query;
+use crate::{query_builders::*, QueryGraph, Query};
 
 /// Build mode for schema generation.
 #[derive(Debug, Copy, Clone)]

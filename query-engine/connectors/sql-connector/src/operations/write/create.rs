@@ -1,7 +1,7 @@
 use crate::{
     error::SqlError,
     query_builder::{WriteQueryBuilder},
-    Transaction,
+    QueryExt,
 };
 use prisma_models::{GraphqlId, ModelRef, PrismaArgs, PrismaListValue, RelationFieldRef};
 use prisma_query::error::Error as QueryError;
@@ -9,7 +9,7 @@ use std::sync::Arc;
 
 /// Creates a new root record and any associated list records to the database.
 pub fn execute<S>(
-    conn: &mut dyn Transaction,
+    conn: &mut dyn QueryExt,
     model: ModelRef,
     non_list_args: &PrismaArgs,
     list_args: &[(S, PrismaListValue)],

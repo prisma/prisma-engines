@@ -1,10 +1,12 @@
 use std::fmt;
 use crate::{CoreError, QueryValidationError, QueryGraphError};
+use connector::error::ConnectorError;
 
 #[derive(Debug)]
 pub enum QueryExecutionError {
     EnvVarNotFound(String),
     InvalidQuery(QueryValidationError),
+    ConnectorError(ConnectorError),
     TranslationError(String),
     InterpretationError(String),
     Generic(String),
@@ -40,3 +42,15 @@ impl From<QueryGraphError> for QueryExecutionError {
         QueryExecutionError::TranslationError(format!("{:?}", e))
     }
 }
+
+impl From<ConnectorError> for QueryExecutionError {
+    fn from(e: ConnectorError) -> Self {
+        QueryExecutionError::ConnectorError(e)
+    }
+}
+
+// impl From<QueryExecutionError> for ConnectorError {
+//     fn from(e: QueryExecutionError) -> Self {
+//         ConnectorError::QueryError(e.into())
+//     }
+// }

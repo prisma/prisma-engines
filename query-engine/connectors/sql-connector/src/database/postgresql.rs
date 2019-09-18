@@ -1,6 +1,6 @@
-use super::connector_transaction::ConnectorTransaction;
+use super::sql_connector_transaction::SqlConnectorTransaction;
 use crate::{
-    query_builder::ManyRelatedRecordsWithRowNumber, FromSource, SqlCapabilities, SqlError, Transaction,
+    query_builder::ManyRelatedRecordsWithRowNumber, FromSource, SqlError,
 };
 use connector_interface::*;
 use datamodel::Source;
@@ -26,22 +26,18 @@ impl FromSource for PostgreSql {
     }
 }
 
-impl SqlCapabilities for PostgreSql {
-    type ManyRelatedRecordsBuilder = ManyRelatedRecordsWithRowNumber;
-}
-
 impl Connector for PostgreSql {
     fn with_transaction<F, T>(&self, f: F) -> connector_interface::Result<T>
     where
-        F: FnOnce(&mut dyn connector_interface::MaybeTransaction) -> connector_interface::Result<T>,
+        F: FnOnce(&mut dyn connector_interface::TransactionLike) -> connector_interface::Result<T>,
     {
         let mut conn = self.pool.get().map_err(SqlError::from)?;
         let tx = conn.start_transaction().map_err(SqlError::from)?;
-        let mut connector_transaction = ConnectorTransaction::new(tx);
-        let result = f(&mut connector_transaction);
+        let mut tx = SqlConnectorTransaction::<ManyRelatedRecordsWithRowNumber>::new(tx);
+        let result = f(&mut tx);
 
         if result.is_ok() {
-            connector_transaction.commit()?;
+            tx.commit()?;
         }
 
         result

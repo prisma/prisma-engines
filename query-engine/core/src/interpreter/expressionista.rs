@@ -1,16 +1,16 @@
-use super::*;
-use crate::query_graph::{EdgeRef, Node, NodeRef, QueryGraph};
+use super::{InterpretationResult, expression::*};
+use crate::{Query, query_graph::*};
 use std::convert::TryInto;
 
 pub struct Expressionista;
 
 impl Expressionista {
-    pub fn translate(mut graph: QueryGraph) -> QueryExecutionResult<Expression> {
+    pub fn translate(mut graph: QueryGraph) -> InterpretationResult<Expression> {
         graph
             .root_nodes()
             .into_iter()
             .map(|root_node| Self::build_expression(&mut graph, &root_node, vec![]))
-            .collect::<QueryExecutionResult<Vec<Expression>>>()
+            .collect::<InterpretationResult<Vec<Expression>>>()
             .map(|res| Expression::Sequence { seq: res })
     }
 
@@ -18,7 +18,7 @@ impl Expressionista {
         graph: &mut QueryGraph,
         node: &NodeRef,
         mut parent_edges: Vec<EdgeRef>,
-    ) -> QueryExecutionResult<Expression> {
+    ) -> InterpretationResult<Expression> {
         match graph.node_content(node).unwrap() {
             Node::Query(_) => Self::build_query_expression(graph, node, parent_edges),
             Node::Flow(_) => Self::build_flow_expression(graph, node, parent_edges.pop()),
@@ -29,7 +29,7 @@ impl Expressionista {
         graph: &mut QueryGraph,
         node: &NodeRef,
         parent_edges: Vec<EdgeRef>,
-    ) -> QueryExecutionResult<Expression> {
+    ) -> InterpretationResult<Expression> {
         // Child edges are ordered, evaluation order is low to high in the graph, unless other rules override.
         let mut direct_children = graph.direct_child_pairs(&node);
 
@@ -63,7 +63,7 @@ impl Expressionista {
                 let edges = graph.incoming_edges(&node);
                 Self::build_expression(graph, &node, edges)
             })
-            .collect::<QueryExecutionResult<Vec<Expression>>>()?;
+            .collect::<InterpretationResult<Vec<Expression>>>()?;
 
         // Fold result scopes into one expression.
         if result_scopes.len() > 0 {
@@ -99,7 +99,7 @@ impl Expressionista {
         }
     }
 
-    fn query_expression(graph: &mut QueryGraph, parent_edges: Vec<EdgeRef>, query: Query) -> Expression {
+    fn query_expression(_graph: &mut QueryGraph, parent_edges: Vec<EdgeRef>, query: Query) -> Expression {
         if parent_edges.is_empty() {
             Expression::Query { query }
         } else {
@@ -131,7 +131,7 @@ impl Expressionista {
         graph: &mut QueryGraph,
         node: &NodeRef,
         parent_edge: Option<EdgeRef>,
-    ) -> QueryExecutionResult<Expression> {
+    ) -> InterpretationResult<Expression> {
         let flow: Flow = graph.pluck_node(node).try_into()?;
 
         match flow {
@@ -155,7 +155,7 @@ impl Expressionista {
                 let else_expr = else_pair
                     .into_iter()
                     .map(|(_, node)| Self::build_expression(graph, &node, vec![]))
-                    .collect::<QueryExecutionResult<Vec<Expression>>>()?;
+                    .collect::<InterpretationResult<Vec<Expression>>>()?;
 
                 Ok(match parent_edge {
                     Some(p) => {
@@ -198,7 +198,7 @@ impl Expressionista {
         graph: &mut QueryGraph,
         mut result_binding_names: Vec<String>,
         mut result_scopes: Vec<Vec<(EdgeRef, NodeRef)>>,
-    ) -> QueryExecutionResult<Expression> {
+    ) -> InterpretationResult<Expression> {
         let current_scope = result_scopes.split_off(0).pop().unwrap();
         let result_binding_name = current_scope.first().unwrap().1.id();
         let has_sub_scopes = result_scopes.len() > 0; // todo necessary?
@@ -212,7 +212,7 @@ impl Expressionista {
                 let edges = graph.incoming_edges(&node);
                 Self::build_expression(graph, &node, edges)
             })
-            .collect::<QueryExecutionResult<Vec<Expression>>>()?;
+            .collect::<InterpretationResult<Vec<Expression>>>()?;
 
         // The first expression of every result scope is the one returning a potential result.
         let head = expressions.split_off(0).pop().unwrap();

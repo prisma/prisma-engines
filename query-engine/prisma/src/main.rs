@@ -4,8 +4,6 @@ extern crate slog;
 extern crate slog_scope;
 #[macro_use]
 extern crate rust_embed;
-#[macro_use]
-extern crate debug_stub_derive;
 
 mod cli;
 mod context;
@@ -37,11 +35,8 @@ pub type PrismaResult<T> = Result<T, PrismaError>;
 #[folder = "query-engine/prisma/static_files"]
 struct StaticFiles;
 
-#[derive(DebugStub)]
 struct RequestContext {
     context: PrismaContext,
-
-    #[debug_stub = "#GraphQlRequestHandler#"]
     graphql_request_handler: GraphQlRequestHandler,
 }
 
@@ -195,6 +190,7 @@ fn dmmf_handler(req: HttpRequest<Arc<RequestContext>>) -> impl Responder {
         &request_context.context.dm,
         Arc::clone(&request_context.context.query_schema),
     );
+
     let serialized = serde_json::to_string(&dmmf).unwrap();
 
     HttpResponse::Ok().content_type("application/json").body(serialized)

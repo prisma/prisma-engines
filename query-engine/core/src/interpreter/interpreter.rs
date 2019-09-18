@@ -1,47 +1,9 @@
-use super::*;
-use connector::Identifier;
-use connector::{ReadQueryResult, ResultContent};
+use super::{InterpretationResult, InterpreterError, expression::*, query_interpreters::{read, write}};
+use crate::Query;
+use connector::{TransactionLike, Identifier, ReadQueryResult, ResultContent, WriteQueryResult};
 use im::HashMap;
 use prisma_models::prelude::*;
 use std::convert::TryInto;
-
-pub enum Expression {
-    Sequence {
-        seq: Vec<Expression>,
-    },
-
-    Func {
-        func: Box<dyn FnOnce(Env) -> Expression>,
-    },
-
-    Query {
-        query: Query,
-    },
-
-    Let {
-        bindings: Vec<Binding>,
-        expressions: Vec<Expression>,
-    },
-
-    Get {
-        binding_name: String,
-    },
-
-    GetFirstNonEmpty {
-        binding_names: Vec<String>,
-    },
-
-    If {
-        func: Box<dyn FnOnce() -> bool>,
-        then: Vec<Expression>,
-        else_: Vec<Expression>,
-    },
-}
-
-pub struct Binding {
-    pub name: String,
-    pub expr: Expression,
-}
 
 #[derive(Debug, Clone)]
 pub enum ExpressionResult {
@@ -91,21 +53,20 @@ impl Env {
         self.env.insert(key, value);
     }
 
-    pub fn remove(&mut self, key: &str) -> QueryExecutionResult<ExpressionResult> {
+    pub fn remove(&mut self, key: &str) -> InterpretationResult<ExpressionResult> {
         match self.env.remove(key) {
             Some(val) => Ok(val),
-            None => Err(QueryExecutionError::EnvVarNotFound(key.to_owned())),
+            None => Err(InterpreterError::EnvVarNotFound(key.to_owned())),
         }
     }
 }
 
 pub struct QueryInterpreter<'a> {
-    pub writer: &'a WriteQueryExecutor,
-    pub reader: &'a ReadQueryExecutor,
+    pub(crate) tx: &'a mut dyn TransactionLike,
 }
 
 impl<'a> QueryInterpreter<'a> {
-    pub fn interpret(&self, exp: Expression, env: Env) -> QueryExecutionResult<ExpressionResult> {
+    pub fn interpret(&mut self, exp: Expression, env: Env) -> InterpretationResult<ExpressionResult> {
         match exp {
             Expression::Func { func } => {
                 println!("FUNC");
@@ -116,7 +77,7 @@ impl<'a> QueryInterpreter<'a> {
                 println!("SEQ");
                 seq.into_iter()
                     .map(|exp| self.interpret(exp, env.clone()))
-                    .collect::<QueryExecutionResult<Vec<_>>>()
+                    .collect::<InterpretationResult<Vec<_>>>()
                     .map(|mut results| results.pop().unwrap())
             }
 
@@ -134,12 +95,12 @@ impl<'a> QueryInterpreter<'a> {
             Expression::Query { query } => match query {
                 Query::Read(read) => {
                     println!("READ");
-                    Ok(self.reader.execute(read, &[]).map(|res| ExpressionResult::Read(res))?)
+                    Ok(read::execute(self.tx, read, &[]).map(|res| ExpressionResult::Read(res))?)
                 }
 
                 Query::Write(write) => {
                     println!("WRITE");
-                    Ok(self.writer.execute(write).map(|res| ExpressionResult::Write(res))?)
+                    Ok(write::execute(self.tx, write).map(|res| ExpressionResult::Write(res))?)
                 }
             },
 

@@ -1,5 +1,5 @@
 use super::Path;
-use crate::filter::RecordFinder;
+use connector::filter::RecordFinder;
 
 pub struct RecordAddress {
     pub path: Path,

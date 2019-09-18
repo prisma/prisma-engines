@@ -1,6 +1,6 @@
 use crate::{
     query_builder::{DeleteActions, WriteQueryBuilder},
-    Transaction,
+    QueryExt,
 };
 use connector_interface::filter::Filter;
 use prisma_models::{GraphqlId, ModelRef, RelationFieldRef};
@@ -10,7 +10,7 @@ use std::sync::Arc;
 /// any relations will cause an error.
 ///
 /// Will return the number records deleted.
-pub fn execute(conn: &mut dyn Transaction, model: ModelRef, filter: &Filter) -> crate::Result<usize> {
+pub fn execute(conn: &mut dyn QueryExt, model: ModelRef, filter: &Filter) -> crate::Result<usize> {
     let ids = conn.filter_ids(Arc::clone(&model), filter.clone())?;
     let ids: Vec<&GraphqlId> = ids.iter().map(|id| &*id).collect();
     let count = ids.len();
@@ -35,7 +35,7 @@ pub fn execute(conn: &mut dyn Transaction, model: ModelRef, filter: &Filter) -> 
 /// nested items related to the given `parent_id`. An error will be thrown
 /// if any deleted record is required in a model.
 pub fn execute_nested(
-    conn: &mut dyn Transaction,
+    conn: &mut dyn QueryExt,
     parent_id: &GraphqlId,
     filter: &Option<Filter>,
     relation_field: RelationFieldRef,

@@ -14,7 +14,7 @@ mod ordering;
 mod query_builder;
 mod raw_query;
 mod row;
-mod transactional;
+mod operations;
 
 use filter_conversion::*;
 use raw_query::*;
@@ -22,6 +22,6 @@ use row::*;
 
 pub use database::*;
 pub use error::SqlError;
-pub use transactional::*;
+pub use operations::*;
 
 type Result<T> = std::result::Result<T, error::SqlError>;

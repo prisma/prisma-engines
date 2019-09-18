@@ -13,7 +13,7 @@ pub use error::*;
 pub use formatters::*;
 pub use transformers::*;
 
-use connector::*;
+use crate::Query;
 use guard::*;
 use petgraph::{graph::*, visit::EdgeRef as PEdgeRef, *};
 use prisma_models::PrismaValue;

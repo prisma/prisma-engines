@@ -1,6 +1,6 @@
 //! Prisma read query AST
 
-use crate::{filter::RecordFinder, QueryArguments};
+use connector::{filter::RecordFinder, QueryArguments};
 use prisma_models::prelude::*;
 use std::fmt::Display;
 

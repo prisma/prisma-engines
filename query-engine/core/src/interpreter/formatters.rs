@@ -1,4 +1,5 @@
-use super::*;
+use super::Expression;
+use crate::{Query, WriteQuery};
 
 pub fn format_expression(expr: &Expression, indent: usize) -> String {
     match expr {

@@ -1,4 +1,4 @@
-use crate::filter::{Filter, RecordFinder};
+use connector::filter::{Filter, RecordFinder};
 use prisma_models::prelude::*;
 
 pub struct Path {

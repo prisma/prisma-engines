@@ -1,42 +1,25 @@
-use crate::{Filter, QueryArguments, RecordFinder};
+use crate::{Filter, QueryArguments, RecordFinder, WriteArgs};
 use prisma_models::*;
 
 pub trait Connector {
     fn with_transaction<F, T>(&self, f: F) -> crate::Result<T>
     where
-        F: FnOnce(&mut dyn MaybeTransaction) -> crate::Result<T>;
+        F: FnOnce(&mut dyn TransactionLike) -> crate::Result<T>;
 }
 
-pub struct WriteArgs {
-    non_list_args: PrismaArgs,
-    list_args: Vec<(String, PrismaListValue)>,
-}
+pub trait TransactionLike: ReadOperations + WriteOperations {}
 
-impl WriteArgs {
-    pub fn new(non_list_args: PrismaArgs, list_args: Vec<(String, PrismaListValue)>) -> WriteArgs {
-        WriteArgs {
-            non_list_args,
-            list_args,
-        }
-    }
+// AdditionalOperations? MetaOperations? ...
+// pub trait UtilityOperations {
+// fn execute_raw(&self, db_name: String, query: String) -> crate::Result<Value>;
+// fn execute_raw(&self, db_name: String, query: String) -> connector_interface::Result<Value> {
+//     let result = self.inner.raw_json(RawQuery::from(query))?;
 
-    pub fn non_list_args(&self) -> &PrismaArgs {
-        &self.non_list_args
-    }
+//     Ok(result)
+// }
 
-    pub fn list_args(&self) -> &Vec<(String, PrismaListValue)> {
-        &self.list_args
-    }
-}
-
-pub trait MaybeTransaction: ReadOperations + WriteOperations {
-    // fn execute_raw(&self, db_name: String, query: String) -> crate::Result<Value>;
-    // fn execute_raw(&self, db_name: String, query: String) -> connector_interface::Result<Value> {
-    //     let result = self.inner.raw_json(RawQuery::from(query))?;
-
-    //     Ok(result)
-    // }
-}
+// reset data
+// }
 
 pub trait ReadOperations {
     fn get_single_record(
@@ -60,8 +43,21 @@ pub trait ReadOperations {
         selected_fields: &SelectedFields,
     ) -> crate::Result<ManyRecords>;
 
+    fn get_scalar_list_values(
+        &mut self,
+        list_field: ScalarFieldRef,
+        record_ids: Vec<GraphqlId>,
+    ) -> crate::Result<Vec<ScalarListValues>>;
+
     fn count_by_model(&mut self, model: ModelRef, query_arguments: QueryArguments) -> crate::Result<usize>;
 }
+
+#[derive(Debug, Clone)]
+pub struct ScalarListValues {
+    pub record_id: GraphqlId,
+    pub values: Vec<PrismaValue>,
+}
+
 pub trait WriteOperations {
     fn create_record(&mut self, model: ModelRef, args: WriteArgs) -> crate::Result<GraphqlId>;
 

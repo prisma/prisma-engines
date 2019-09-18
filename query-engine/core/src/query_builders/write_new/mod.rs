@@ -6,12 +6,9 @@ use super::*;
 use crate::{
     query_graph::{Flow, Node, NodeRef, QueryGraph, QueryGraphDependency},
     ArgumentListLookup, ParsedField, ParsedInputMap, ParsedInputValue, ReadOneRecordBuilder,
+    query_ast::*,
 };
-use connector::{
-    filter::{Filter, RecordFinder},
-    CreateRecord, DeleteManyRecords, DeleteRecord, ManyRecordsQuery, NestedWriteQueries, Query, QueryArguments,
-    ReadQuery, RelatedRecordsQuery, RootWriteQuery, UpdateManyRecords, UpdateRecord, WriteQuery,
-};
+use connector::{filter::{Filter, RecordFinder}, QueryArguments,};
 use prisma_models::{ModelRef, RelationFieldRef, SelectedFields};
 use std::{convert::TryInto, sync::Arc};
 

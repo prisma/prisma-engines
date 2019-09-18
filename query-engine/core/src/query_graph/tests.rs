@@ -1,5 +1,5 @@
 use super::*;
-use connector::{Query, ReadQuery, RecordQuery};
+use crate::{Query, ReadQuery, RecordQuery};
 
 #[test]
 fn test_direct_children() {

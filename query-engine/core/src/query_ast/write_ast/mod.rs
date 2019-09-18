@@ -14,7 +14,7 @@ pub use record_address::*;
 pub use update_record::*;
 pub use upsert_record::*;
 
-use crate::filter::{Filter, RecordFinder};
+use connector::filter::{Filter, RecordFinder};
 use prisma_models::prelude::*;
 use std::sync::Arc;
 
