@@ -6,10 +6,9 @@ use migration_core::{
     parse_datamodel,
 };
 use prisma_query::connector::{MysqlParams, PostgresParams};
+use sql_schema_describer::{SqlSchemaDescriberBackend, SqlSchema};
 use sql_migration_connector::{migration_database::*, SqlFamily, SqlMigrationConnector};
-use sql_schema_describer::{SqlConnection, SqlSchema, SqlSchemaDescriberBackend};
-use std::convert::TryFrom;
-use std::sync::Arc;
+use std::{convert::TryFrom, sync::Arc, rc::Rc};
 use url::Url;
 
 pub const SCHEMA_NAME: &str = "migration-engine";
@@ -43,7 +42,22 @@ where
     if !ignores.contains(&SqlFamily::Postgres) {
         println!("--------------- Testing with Postgres now ---------------");
 
-        let connector = SqlMigrationConnector::postgres(&postgres_url()).unwrap();
+        let connector = match SqlMigrationConnector::postgres(&postgres_url(), true) {
+            Ok(c) => c,
+            Err(e) => {
+                let url = Url::parse(&postgres_url()).unwrap();
+                let name_cmd = |name| format!("CREATE DATABASE \"{}\"", name);
+
+                let connect_cmd = |url| {
+                    let params = PostgresParams::try_from(url)?;
+                    PostgreSql::new(params, true)
+                };
+
+                create_database(url, "postgres", "postgres", name_cmd, Rc::new(connect_cmd));
+                SqlMigrationConnector::postgres(&postgres_url(), true).unwrap()
+            }
+        };
+
         let api = test_api(connector);
 
         test_fn(SqlFamily::Postgres, &api);
@@ -55,7 +69,23 @@ where
     if !ignores.contains(&SqlFamily::Mysql) {
         println!("--------------- Testing with MySQL now ---------------");
 
-        let connector = SqlMigrationConnector::mysql(&mysql_url()).unwrap();
+        let connector = match SqlMigrationConnector::mysql(&postgres_url(), true) {
+            Ok(c) => c,
+            Err(e) => {
+                let url = Url::parse(&mysql_url()).unwrap();
+
+                let name_cmd = |name| format!("CREATE DATABASE `{}`", name);
+
+                let connect_cmd = |url| {
+                    let params = MysqlParams::try_from(url)?;
+                    Mysql::new(params, true)
+                };
+
+                create_database(url, "mysql", "/", name_cmd, Rc::new(connect_cmd));
+                SqlMigrationConnector::mysql(&mysql_url(), true).unwrap()
+            }
+        };
+
         let api = test_api(connector);
 
         test_fn(SqlFamily::Mysql, &api);
@@ -122,20 +152,78 @@ pub fn database_wrapper(sql_family: SqlFamily) -> MigrationDatabaseWrapper {
     }
 }
 
+fn fetch_db_name(url: &Url, default: &str) -> String {
+    let result = match url.path_segments() {
+        Some(mut segments) => segments.next().unwrap_or(default),
+        None => default,
+    };
+
+    String::from(result)
+}
+
+fn create_database<F, T, S>(url: Url, default_name: &str, root_path: &str, create_stmt: S, f: Rc<F>)
+where
+    T: MigrationDatabase,
+    F: Fn(Url) -> Result<T, prisma_query::error::Error>,
+    S: FnOnce(String) -> String,
+{
+    let db_name = fetch_db_name(&url, default_name);
+
+    let mut url = url.clone();
+    url.set_path(root_path);
+
+    let conn = f(url).unwrap();
+
+    conn.execute_raw(
+        "",
+        &create_stmt(db_name),
+        &[]
+    );
+}
+
+fn with_database<F, T, S>(url: Url, default_name: &str, root_path: &str, create_stmt: S, f: Rc<F>) -> T
+where
+    T: MigrationDatabase,
+    F: Fn(Url) -> Result<T, prisma_query::error::Error>,
+    S: FnOnce(String) -> String,
+{
+    match f(url.clone()) {
+        Ok(conn) => conn,
+        Err(_) => {
+            create_database(url.clone(), default_name, root_path, create_stmt, f.clone());
+            f(url).unwrap()
+        }
+    }
+}
+
 pub fn database(sql_family: SqlFamily) -> Box<dyn MigrationDatabase + Send + Sync + 'static> {
     match sql_family {
         SqlFamily::Postgres => {
             let url = Url::parse(&postgres_url()).unwrap();
-            let params = PostgresParams::try_from(url).unwrap();
+            let create_cmd = |name| format!("CREATE DATABASE \"{}\"", name);
 
-            Box::new(PostgreSql::new(params).unwrap())
+            let connect_cmd = |url| {
+                let params = PostgresParams::try_from(url)?;
+                PostgreSql::new(params, true)
+            };
+
+            let conn = with_database(url, "postgres", "postgres", create_cmd, Rc::new(connect_cmd));
+
+            Box::new(conn)
         }
         SqlFamily::Sqlite => Box::new(Sqlite::new(&sqlite_test_file()).unwrap()),
         SqlFamily::Mysql => {
             let url = Url::parse(&mysql_url()).unwrap();
-            let params = MysqlParams::try_from(url).unwrap();
+            let create_cmd = |name| format!("CREATE DATABASE `{}`", name);
 
-            Box::new(Mysql::new(params).unwrap())
+            let connect_cmd = |url| {
+                let params = MysqlParams::try_from(url)?;
+                Mysql::new(params, true)
+            };
+
+            let conn = with_database(url, "mysql", "/", create_cmd, Rc::new(connect_cmd));
+
+            Box::new(conn)
         }
     }
 }

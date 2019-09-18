@@ -13,9 +13,10 @@ pub use destructive_changes_checker::*;
 pub use error::*;
 pub use migration_applier::*;
 pub use migration_persistence::*;
+pub use steps::*;
+
 use std::fmt::Debug;
 use std::sync::Arc;
-pub use steps::*;
 
 #[macro_use]
 extern crate serde_derive;
@@ -25,9 +26,7 @@ pub trait MigrationConnector: Send + Sync + 'static {
 
     fn connector_type(&self) -> &'static str;
 
-    fn can_connect(&self) -> bool;
-    fn can_create_database(&self) -> bool;
-    fn create_database(&self);
+    fn create_database(&self, create: &str) -> ConnectorResult<()>;
 
     fn initialize(&self) -> ConnectorResult<()>;
 
