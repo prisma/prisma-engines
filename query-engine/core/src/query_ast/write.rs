@@ -9,16 +9,11 @@ pub enum WriteQuery {
     DeleteRecord(DeleteRecord),
     UpdateManyRecords(UpdateManyRecords),
     DeleteManyRecords(DeleteManyRecords),
+    ConnectRecords(ConnectRecords),
     ResetData(ResetData),
 }
 
 impl WriteQuery {
-    // pub fn replace_nested_writes(&mut self) -> NestedWriteQueries {
-    //     match self {
-    //         WriteQuery::Root(ref mut wq) => wq.replace_nested_writes(),
-    //     }
-    // }
-
     pub fn inject_non_list_arg(&mut self, key: String, value: PrismaValue) {
         match self {
             Self::CreateRecord(x) => {
@@ -33,9 +28,7 @@ impl WriteQuery {
                 x.non_list_args.insert(key, value);
             }
 
-            Self::DeleteRecord(_) => (),
-            Self::DeleteManyRecords(_) => (),
-            Self::ResetData(_) => (),
+            _ => (),
         };
     }
 }
@@ -66,6 +59,7 @@ impl std::fmt::Display for WriteQuery {
             ),
             Self::UpdateManyRecords(q) => write!(f, "UpdateManyRecords: {}", q.model.name),
             Self::DeleteManyRecords(q) => write!(f, "DeleteManyRecords: {}", q.model.name),
+            Self::ConnectRecords(_) => write!(f, "ConnectRecords"),
             Self::ResetData(_) => write!(f, "ResetData"),
         }
     }
@@ -104,6 +98,8 @@ pub struct DeleteManyRecords {
     pub filter: Filter,
 }
 
+#[derive(Debug, Clone)]
+pub struct ConnectRecords {}
 
 // SET
 

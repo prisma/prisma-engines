@@ -4,11 +4,14 @@ pub use write_arguments::*;
 
 use super::*;
 use crate::{
+    query_ast::*,
     query_graph::{Flow, Node, NodeRef, QueryGraph, QueryGraphDependency},
     ArgumentListLookup, ParsedField, ParsedInputMap, ParsedInputValue, ReadOneRecordBuilder,
-    query_ast::*,
 };
-use connector::{filter::{Filter, RecordFinder}, QueryArguments,};
+use connector::{
+    filter::{Filter, RecordFinder},
+    QueryArguments,
+};
 use prisma_models::{ModelRef, RelationFieldRef, SelectedFields};
 use std::{convert::TryInto, sync::Arc};
 
@@ -143,7 +146,7 @@ impl WriteQueryBuilder {
 
         non_list_args.update_datetimes(Arc::clone(&model), list_causes_update);
 
-        let update_many = WriteQuery::UpdateManyRecords(UpdateManyRecords{
+        let update_many = WriteQuery::UpdateManyRecords(UpdateManyRecords {
             model,
             filter,
             non_list_args,
@@ -261,9 +264,7 @@ impl WriteQueryBuilder {
             list_args: create_args.list,
         };
 
-        let node = self
-            .graph
-            .create_node(Query::Write(WriteQuery::CreateRecord(cr)));
+        let node = self.graph.create_node(Query::Write(WriteQuery::CreateRecord(cr)));
 
         for (relation_field, data_map) in create_args.nested {
             self.connect_nested_query(&node, relation_field, data_map)?;
@@ -290,9 +291,7 @@ impl WriteQueryBuilder {
             list_args: update_args.list,
         };
 
-        let node = self
-            .graph
-            .create_node(Query::Write(WriteQuery::UpdateRecord(ur)));
+        let node = self.graph.create_node(Query::Write(WriteQuery::UpdateRecord(ur)));
 
         for (relation_field, data_map) in update_args.nested {
             self.connect_nested_query(&node, relation_field, data_map)?;
@@ -342,31 +341,30 @@ impl WriteQueryBuilder {
             let relation_field_name = relation_field.related_field().name.clone();
 
             // Detect if a flip is necessary
-            let (parent, child) =
-                if let Node::Query(Query::Write(WriteQuery::CreateRecord(_))) = parent_query {
-                    if relation_field.relation_is_inlined_in_parent() {
-                        // Actions required to do a flip:
-                        // 1. Remove all edges from the parent to it's parents, and rewire them to the child.
-                        // 2. Create an edge from child -> parent.
-                        // Todo: Warning, this destroys the ordering of edges, which can lead to incorrect results being read.
-                        //       Consider how the underlying graph can handle that.
-                        let parent_edges = self.graph.incoming_edges(parent);
-                        for parent_edge in parent_edges {
-                            let parent_of_parent_node = self.graph.edge_source(&parent_edge);
-                            let edge_content = self.graph.remove_edge(parent_edge).unwrap();
+            let (parent, child) = if let Node::Query(Query::Write(WriteQuery::CreateRecord(_))) = parent_query {
+                if relation_field.relation_is_inlined_in_parent() {
+                    // Actions required to do a flip:
+                    // 1. Remove all edges from the parent to it's parents, and rewire them to the child.
+                    // 2. Create an edge from child -> parent.
+                    // Todo: Warning, this destroys the ordering of edges, which can lead to incorrect results being read.
+                    //       Consider how the underlying graph can handle that.
+                    let parent_edges = self.graph.incoming_edges(parent);
+                    for parent_edge in parent_edges {
+                        let parent_of_parent_node = self.graph.edge_source(&parent_edge);
+                        let edge_content = self.graph.remove_edge(parent_edge).unwrap();
 
-                            // Todo: Warning, this assumes the edge contents can also be "flipped".
-                            self.graph
-                                .create_edge(&parent_of_parent_node, &nested_node, edge_content);
-                        }
-
-                        (&nested_node, parent)
-                    } else {
-                        (parent, &nested_node)
+                        // Todo: Warning, this assumes the edge contents can also be "flipped".
+                        self.graph
+                            .create_edge(&parent_of_parent_node, &nested_node, edge_content);
                     }
+
+                    (&nested_node, parent)
                 } else {
                     (parent, &nested_node)
-                };
+                }
+            } else {
+                (parent, &nested_node)
+            };
 
             self.graph.create_edge(
                 parent,
@@ -379,6 +377,9 @@ impl WriteQueryBuilder {
                     node
                 })),
             );
+
+            // Detect if a connect is necessary?
+            // ConnectRecords
         }
 
         Ok(())
@@ -426,9 +427,7 @@ impl WriteQueryBuilder {
                     &read_parent_node,
                     &update_node,
                     QueryGraphDependency::ParentId(Box::new(|mut node, parent_id| {
-                        if let Node::Query(Query::Write(WriteQuery::UpdateRecord(ref mut ur))) =
-                            node
-                        {
+                        if let Node::Query(Query::Write(WriteQuery::UpdateRecord(ref mut ur))) = node {
                             ur.where_ = Some(RecordFinder {
                                 field: id_field,
                                 value: parent_id.unwrap(),
