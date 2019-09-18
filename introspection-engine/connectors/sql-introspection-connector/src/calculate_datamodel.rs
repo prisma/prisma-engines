@@ -13,10 +13,10 @@ fn is_migration_table(table: &Table) -> bool {
     table.name == "_Migration"
 }
 
-fn is_prisma_many_to_many_relation_table(table: &Table) -> bool {
-    table.name.starts_with("_")
-        && table.columns.iter().count() == 2
+fn is_prisma_join_table(table: &Table) -> bool {
+    table.columns.iter().count() == 2
         && table.foreign_keys.iter().count() == 2
+        && table.name.starts_with("_")
         && table.columns.iter().find(|column| column.name == "A").is_some()
         && table.columns.iter().find(|column| column.name == "B").is_some()
 }
@@ -29,11 +29,11 @@ fn is_prisma_scalar_list_table(table: &Table) -> bool {
         && table.columns.iter().find(|column| column.name == "value").is_some()
 }
 
-fn create_many_to_many_field(foreign_key: &ForeignKey, relation_table_name: &str, is_self_relation: bool) -> Field {
+fn create_many_to_many_field(foreign_key: &ForeignKey, relation_name: String, is_self_relation: bool) -> Field {
     let inflector = prisma_inflector::default();
 
     let field_type = FieldType::Relation(RelationInfo {
-        name: relation_table_name.replacen('_', "", 1),
+        name: relation_name,
         to: foreign_key.referenced_table.clone(),
         to_fields: foreign_key.referenced_columns.clone(),
         on_delete: OnDeleteStrategy::None,
@@ -43,7 +43,7 @@ fn create_many_to_many_field(foreign_key: &ForeignKey, relation_table_name: &str
 
     let name = match is_self_relation {
         true => format!("{}_{}", basename, foreign_key.columns[0]),
-        false => basename
+        false => basename,
     };
 
     Field {
@@ -70,7 +70,7 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
         .tables
         .iter()
         .filter(|table| !is_migration_table(&table))
-        .filter(|table| !is_prisma_many_to_many_relation_table(&table))
+        .filter(|table| !is_prisma_join_table(&table))
         .filter(|table| !is_prisma_scalar_list_table(&table))
     {
         let mut model = Model::new(&table.name);
@@ -187,23 +187,23 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
         }
     }
 
-    // add many to many relation fields
-    for table in schema
-        .tables
-        .iter()
-        .filter(|table| is_prisma_many_to_many_relation_table(&table))
-    {
+    // add prisma many to many relation fields
+    for table in schema.tables.iter().filter(|table| is_prisma_join_table(&table)) {
         let first = table.foreign_keys.get(0);
         let second = table.foreign_keys.get(1);
-
-
 
         match (first, second) {
             (Some(f), Some(s)) => {
                 let is_self_relation = f.referenced_table == s.referenced_table;
 
-                fields_to_be_added.push((s.referenced_table.clone(), create_many_to_many_field(f, &table.name, is_self_relation)));
-                fields_to_be_added.push((f.referenced_table.clone(), create_many_to_many_field(s, &table.name, is_self_relation)));
+                fields_to_be_added.push((
+                    s.referenced_table.clone(),
+                    create_many_to_many_field(f, table.name.clone() , is_self_relation),
+                ));
+                fields_to_be_added.push((
+                    f.referenced_table.clone(),
+                    create_many_to_many_field(s, table.name.clone() , is_self_relation),
+                ));
             }
             (_, _) => (),
         }
@@ -251,11 +251,11 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
         });
 
     duplicated_relation_fields.iter().for_each(|index| {
-       let (_, ref mut field) = fields_to_be_added.get_mut(*index).unwrap();
-        let suffix = match &field.field_type{
-            FieldType::Relation(RelationInfo{name, ..}) => format!("_{}", &name),
+        let (_, ref mut field) = fields_to_be_added.get_mut(*index).unwrap();
+        let suffix = match &field.field_type {
+            FieldType::Relation(RelationInfo { name, .. }) => format!("_{}", &name),
             FieldType::Base(_) => "".to_string(),
-            _ => "".to_string()
+            _ => "".to_string(),
         };
 
         field.name = format!("{}{}", field.name, suffix)
@@ -348,19 +348,9 @@ fn not_many_to_many_relation_name(fk: &ForeignKey, table: &Table) -> String {
     let fk_column_name = fk.columns.get(0).unwrap();
 
     if model_with_fk < referenced_model {
-        format!(
-            "{}_{}To{}",
-            model_with_fk,
-            fk_column_name,
-            referenced_model
-        )
+        format!("{}_{}To{}", model_with_fk, fk_column_name, referenced_model)
     } else {
-        format!(
-            "{}To{}_{}",
-            referenced_model,
-            model_with_fk,
-            fk_column_name
-        )
+        format!("{}To{}_{}", referenced_model, model_with_fk, fk_column_name)
     }
 }
 
@@ -376,7 +366,7 @@ fn calculate_field_type(column: &Column, table: &Table) -> FieldType {
                 .position(|n| n == &column.name)
                 .expect("get column FK position");
             let referenced_col = &fk.referenced_columns[idx];
-            
+
             FieldType::Relation(RelationInfo {
                 name: not_many_to_many_relation_name(fk, table),
                 to: fk.referenced_table.clone(),
