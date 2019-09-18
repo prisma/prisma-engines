@@ -15,10 +15,12 @@ mod query_builder;
 mod raw_query;
 mod row;
 mod operations;
+mod query_ext;
 
 use filter_conversion::*;
 use raw_query::*;
 use row::*;
+use query_ext::QueryExt;
 
 pub use database::*;
 pub use error::SqlError;
