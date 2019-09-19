@@ -19,6 +19,7 @@ pub struct Sqlite {
 pub struct SqliteParams {
     pub connection_limit: u32,
     pub file_path: PathBuf,
+    pub schema: Option<String>,
 }
 
 type ConnectionParams = (Vec<(String, String)>, Vec<(String, String)>);
@@ -29,8 +30,8 @@ impl TryFrom<&str> for SqliteParams {
     fn try_from(path: &str) -> crate::Result<Self> {
         let path = path.trim_start_matches("file:");
         let path_parts: Vec<&str> = path.split('?').collect();
-
         let path = PathBuf::from(path_parts[0]);
+        let schema = path.file_stem().unwrap().to_str().unwrap().to_owned();
 
         if path.is_dir() {
             Err(Error::DatabaseUrlIsInvalid(
@@ -68,6 +69,7 @@ impl TryFrom<&str> for SqliteParams {
             Ok(Self {
                 connection_limit,
                 file_path: path,
+                schema: Some(schema),
             })
         }
     }

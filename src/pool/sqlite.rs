@@ -13,7 +13,7 @@ impl TryFrom<SqliteParams> for r2d2::Pool<PrismaConnectionManager<SqliteConnecti
     type Error = Error;
 
     fn try_from(params: SqliteParams) -> crate::Result<Self> {
-        let manager = PrismaConnectionManager::sqlite(params.file_path.to_str().unwrap())?;
+        let manager = PrismaConnectionManager::sqlite(params.schema, params.file_path.to_str().unwrap())?;
 
         let pool = r2d2::Pool::builder()
             .max_size(params.connection_limit)
@@ -24,13 +24,16 @@ impl TryFrom<SqliteParams> for r2d2::Pool<PrismaConnectionManager<SqliteConnecti
 }
 
 impl PrismaConnectionManager<SqliteConnectionManager> {
-    pub fn sqlite(path: &str) -> crate::Result<Self> {
+    pub fn sqlite<S>(db_name: Option<S>, path: &str) -> crate::Result<Self>
+    where
+        S: ToString,
+    {
         let params = SqliteParams::try_from(path)?;
 
         Ok(Self {
             inner: SqliteConnectionManager::memory(),
             file_path: Some(params.file_path),
-            schema: None,
+            schema: db_name.map(|s| s.to_string()),
         })
     }
 }
@@ -42,10 +45,16 @@ impl ManageConnection for PrismaConnectionManager<SqliteConnectionManager> {
     fn connect(&self) -> Result<Self::Connection, Self::Error> {
         match metrics::connect("pool.sqlite", || self.inner.connect()) {
             Ok(client) => {
-                let sqlite = Sqlite {
+                let mut sqlite = Sqlite {
                     client,
                     file_path: self.file_path.clone().unwrap(),
                 };
+
+                if let Some(ref schema) = self.schema {
+                    sqlite
+                        .attach_database(schema)
+                        .map_err(|err| Error::from(err).compat())?;
+                }
 
                 Ok(sqlite)
             }
