@@ -62,7 +62,7 @@ pub struct ScalarListValues {
 pub trait WriteOperations {
     fn create_record(&mut self, model: ModelRef, args: WriteArgs) -> crate::Result<GraphqlId>;
 
-    fn update_records(&mut self, model: ModelRef, where_: Filter, args: WriteArgs) -> crate::Result<usize>;
+    fn update_records(&mut self, model: ModelRef, where_: Filter, args: WriteArgs) -> crate::Result<Vec<GraphqlId>>;
 
     fn delete_records(&mut self, model: ModelRef, where_: Filter) -> crate::Result<usize>;
 

@@ -31,7 +31,7 @@ impl ExpressionResult {
                     .pop()
                     .map(|val| val.into()),
 
-                _ => unimplemented!(),
+                _ => None,
             },
 
             _ => unimplemented!(),

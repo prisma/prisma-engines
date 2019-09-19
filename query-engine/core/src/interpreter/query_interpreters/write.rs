@@ -21,13 +21,13 @@ fn create_one(tx: &mut dyn TransactionLike, q: CreateRecord) -> InterpretationRe
 }
 
 fn update_one(tx: &mut dyn TransactionLike, q: UpdateRecord) -> InterpretationResult<QueryResult> {
-    let res = tx.update_records(
+    let mut res = tx.update_records(
         q.model,
         Filter::from(q.where_),
         WriteArgs::new(q.non_list_args, q.list_args),
     )?;
 
-    Ok(QueryResult::Count(res))
+    Ok(QueryResult::Id(res.pop().unwrap()))
 }
 
 fn delete_one(tx: &mut dyn TransactionLike, q: DeleteRecord) -> InterpretationResult<QueryResult> {
@@ -37,7 +37,7 @@ fn delete_one(tx: &mut dyn TransactionLike, q: DeleteRecord) -> InterpretationRe
 
 fn update_many(tx: &mut dyn TransactionLike, q: UpdateManyRecords) -> InterpretationResult<QueryResult> {
     let res = tx.update_records(q.model, q.filter, WriteArgs::new(q.non_list_args, q.list_args))?;
-    Ok(QueryResult::Count(res))
+    Ok(QueryResult::Count(res.len()))
 }
 
 fn delete_many(tx: &mut dyn TransactionLike, q: DeleteManyRecords) -> InterpretationResult<QueryResult> {

@@ -107,7 +107,10 @@ impl WriteQueryBuilder {
         read_query.inject_record_finder(record_finder.clone());
 
         let read_node = self.graph.create_node(Query::Read(read_query));
-        let delete_query = WriteQuery::DeleteRecord(DeleteRecord { model, where_: record_finder });
+        let delete_query = WriteQuery::DeleteRecord(DeleteRecord {
+            model,
+            where_: record_finder,
+        });
         let delete_node = self.graph.create_node(Query::Write(delete_query));
 
         self.graph.add_result_node(&read_node);
@@ -339,7 +342,7 @@ impl WriteQueryBuilder {
         for value in Self::coerce_vec(value) {
             let nested_node = self.create_record_node(Arc::clone(model), value.try_into()?)?;
             let parent_query = self.graph.node_content(parent).unwrap();
-            let relation_field_name = relation_field.related_field().name.clone();
+            let relation_field_name = relation_field.name.clone();
 
             // Detect if a flip is necessary
             let (parent, child) = if let Node::Query(Query::Write(WriteQuery::CreateRecord(_))) = parent_query {

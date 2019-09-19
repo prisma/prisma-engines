@@ -58,12 +58,11 @@ impl<T> WriteOperations for SqlConnectorTransaction<'_, T> {
         model: ModelRef,
         where_: Filter,
         args: WriteArgs,
-    ) -> connector_interface::Result<usize> {
+    ) -> connector_interface::Result<Vec<GraphqlId>> {
         let ids = self.inner.filter_ids(Arc::clone(&model), where_.clone())?;
-        let count = ids.len();
 
-        if count == 0 {
-            return Ok(count);
+        if ids.len() == 0 {
+            return Ok(vec![]);
         }
 
         let updates = {
@@ -90,7 +89,7 @@ impl<T> WriteOperations for SqlConnectorTransaction<'_, T> {
             }
         }
 
-        Ok(count)
+        Ok(ids)
     }
 
     fn delete_records(&mut self, model: ModelRef, where_: Filter) -> connector_interface::Result<usize> {
