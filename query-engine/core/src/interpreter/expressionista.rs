@@ -1,5 +1,5 @@
-use super::{InterpretationResult, expression::*};
-use crate::{Query, query_graph::*};
+use super::{expression::*, Env, InterpretationResult};
+use crate::{query_graph::*, Query};
 use std::convert::TryInto;
 
 pub struct Expressionista;
@@ -99,32 +99,42 @@ impl Expressionista {
         }
     }
 
-    fn query_expression(_graph: &mut QueryGraph, parent_edges: Vec<EdgeRef>, query: Query) -> Expression {
+    /// Returns an `Expression::Query` directly, or indirectly via `Expression::Func`.
+    fn query_expression(graph: &mut QueryGraph, parent_edges: Vec<EdgeRef>, query: Query) -> Expression {
         if parent_edges.is_empty() {
             Expression::Query { query }
         } else {
-            unimplemented!()
+            // Collect all parent ID dependency tuples.
+            let parent_id_deps: Vec<(String, Box<_>)> = parent_edges
+                .into_iter()
+                .filter_map(|edge| match graph.pluck_edge(&edge) {
+                    QueryGraphDependency::ParentId(f) => {
+                        let parent_binding_name = graph.edge_source(&edge).id();
+                        Some((parent_binding_name, f))
+                    }
+                    _ => None,
+                })
+                .collect();
+
+            // If there is at least one parent ID dependency we build a func, else just render a flat query expression.
+            if parent_id_deps.is_empty() {
+                Expression::Query { query }
+            } else {
+                Expression::Func {
+                    func: Box::new(move |env: Env| {
+                        // Run transformers in order on the query
+                        let query: Query = parent_id_deps
+                            .into_iter()
+                            .fold(query, |query, (parent_binding_name, f)| {
+                                let parent_id = env.get(&parent_binding_name).and_then(|pid| pid.as_id());
+                                f(query.into(), parent_id).try_into().unwrap()
+                            });
+
+                        Expression::Query { query: query }
+                    }),
+                }
+            }
         }
-
-        // query => {
-        //     let parent_binding_name = graph.edge_source(&child_edge).id();
-        //     match graph.pluck_edge(&child_edge) {
-        //         QueryGraphDependency::ParentId(f) => Expression::Func {
-        //             func: Box::new(move |env: Env| {
-        //                 let parent_id = env.get(&parent_binding_name).and_then(|pid| pid.as_id());
-        //                 let query = f(query.into(), parent_id);
-
-        //                 Expression::Query {
-        //                     query: query.try_into().unwrap(),
-        //                 }
-        //             }),
-        //         },
-
-        //         QueryGraphDependency::ExecutionOrder => Expression::Query { query },
-
-        //         _ => unreachable!(),
-        //     }
-        // }
     }
 
     fn build_flow_expression(

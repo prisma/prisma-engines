@@ -18,9 +18,9 @@ impl WriteQueryBuilder {
                 args.insert(id_field.name.as_str(), id.clone());
                 Some(id)
             }
-            Some(prisma_value) => Some(
-                GraphqlId::try_from(prisma_value).expect("Could not convert prisma value to graphqlid"),
-            ),
+            Some(prisma_value) => {
+                Some(GraphqlId::try_from(prisma_value).expect("Could not convert prisma value to graphqlid"))
+            }
         };
 
         let fields: Vec<&Field> = model
@@ -115,9 +115,9 @@ impl WriteQueryBuilder {
         Some(result)
     }
 
-    pub fn update_one(model: ModelRef, id: &GraphqlId, args: &PrismaArgs) -> crate::Result<Option<Update<'static>>> {
-        Self::update_many(model, &[id; 1], args).map(|updates| updates.into_iter().next())
-    }
+    // pub fn update_one(model: ModelRef, id: &GraphqlId, args: &PrismaArgs) -> crate::Result<Option<Update<'static>>> {
+    //     Self::update_many(model, &[id; 1], args).map(|updates| updates.into_iter().next())
+    // }
 
     pub fn update_many(model: ModelRef, ids: &[&GraphqlId], args: &PrismaArgs) -> crate::Result<Vec<Update<'static>>> {
         if args.args.is_empty() || ids.is_empty() {
