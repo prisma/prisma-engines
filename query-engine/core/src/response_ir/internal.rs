@@ -1,6 +1,9 @@
 use super::*;
-use crate::{ReadQueryResult, RecordSelection, ResultContent, CoreError, CoreResult, schema::{IntoArc, ObjectTypeStrongRef, OutputType, OutputTypeRef, ScalarType}};
-use connector::{ScalarListValues};
+use crate::{
+    schema::{IntoArc, ObjectTypeStrongRef, OutputType, OutputTypeRef, ScalarType},
+    CoreError, CoreResult, QueryResult, RecordSelection,
+};
+use connector::ScalarListValues;
 use indexmap::IndexMap;
 use prisma_models::{GraphqlId, PrismaValue};
 use std::{borrow::Borrow, collections::HashMap, convert::TryFrom};
@@ -28,18 +31,18 @@ type UncheckedItemsWithParents = IndexMap<Option<GraphqlId>, Vec<Item>>;
 /// The is_list and is_optional flags dictate how object checks are done.
 /// // todo more here
 ///
-/// Returns a pair of (parent ID, response)
-pub fn serialize_read(
-    result: ReadQueryResult,
+/// Returns a map of pairs of (parent ID, response)
+pub fn serialize_internal(
+    result: QueryResult,
     typ: &OutputTypeRef,
     is_list: bool,
     is_optional: bool,
 ) -> CoreResult<CheckedItemsWithParents> {
-    match result.content {
-        ResultContent::RecordSelection(rs) => {
-            serialize_record_selection(result.name, result.alias, rs, typ, is_list, is_optional)
-        }
-        ResultContent::Count(c) => {
+    match result {
+        QueryResult::RecordSelection(rs) => serialize_record_selection(rs, typ, is_list, is_optional),
+
+        QueryResult::Count(c) => {
+            // Todo needs a real implementation
             let mut map: IndexMap<String, Item> = IndexMap::new();
             let mut result = CheckedItemsWithParents::new();
 
@@ -48,22 +51,24 @@ pub fn serialize_read(
 
             Ok(result)
         }
+
+        QueryResult::Id(_) => unimplemented!(),
+        QueryResult::Unit => unimplemented!(),
     }
 }
 
 fn serialize_record_selection(
-    name: String,
-    alias: Option<String>,
     record_selection: RecordSelection,
     typ: &OutputTypeRef,
     is_list: bool,
     is_optional: bool,
 ) -> CoreResult<CheckedItemsWithParents> {
     let query_args = record_selection.query_arguments.clone();
+    let name = record_selection.name.clone();
 
     match typ.borrow() {
-        OutputType::List(inner) => serialize_record_selection(name, alias, record_selection, inner, true, false),
-        OutputType::Opt(inner) => serialize_record_selection(name, alias, record_selection, inner, is_list, true),
+        OutputType::List(inner) => serialize_record_selection(record_selection, inner, true, false),
+        OutputType::Opt(inner) => serialize_record_selection(record_selection, inner, is_list, true),
         OutputType::Object(obj) => {
             let result = serialize_objects(record_selection, obj.into_arc())?;
 
@@ -122,7 +127,7 @@ fn serialize_record_selection(
             }
         }
 
-        _ => unreachable!(), // We always serialize reads into objects or lists on the top levels. Scalars and enums are handled separately.
+        _ => unreachable!(), // We always serialize record selections into objects or lists on the top levels. Scalars and enums are handled separately.
     }
 }
 
@@ -235,7 +240,7 @@ fn write_nested_items(
 
 /// Processes nested results into a more ergonomic structure of { <nested field name> -> { parent ID -> item (list, map, ...) } }.
 fn process_nested_results(
-    nested: Vec<ReadQueryResult>,
+    nested: Vec<QueryResult>,
     enclosing_type: &ObjectTypeStrongRef,
 ) -> CoreResult<HashMap<String, CheckedItemsWithParents>> {
     // For each nested selected field we need to map the parents to their items.
@@ -244,11 +249,14 @@ fn process_nested_results(
     // Parse and validate all nested objects with their respective output type.
     // Unwraps are safe due to query validation.
     for nested_result in nested {
-        let name = nested_result.name.clone();
-        let field = enclosing_type.find_field(&name).unwrap();
-        let result = serialize_read(nested_result, &field.field_type, false, false)?;
+        // todo Workaroun, tb changed with flat reads.
+        if let QueryResult::RecordSelection(ref rs) = nested_result {
+            let name = rs.name.clone();
+            let field = enclosing_type.find_field(&name).unwrap();
+            let result = serialize_internal(nested_result, &field.field_type, false, false)?;
 
-        nested_mapping.insert(name, result);
+            nested_mapping.insert(name, result);
+        }
     }
 
     Ok(nested_mapping)

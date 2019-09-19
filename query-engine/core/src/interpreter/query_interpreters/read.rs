@@ -7,7 +7,7 @@ pub fn execute(
     tx: &mut dyn TransactionLike,
     query: ReadQuery,
     parent_ids: &[GraphqlId],
-) -> InterpretationResult<ReadQueryResult> {
+) -> InterpretationResult<QueryResult> {
     match query {
         ReadQuery::RecordQuery(q) => read_one(tx, q),
         ReadQuery::ManyRecordsQuery(q) => read_many(tx, q),
@@ -17,7 +17,7 @@ pub fn execute(
 }
 
 /// Queries a single record.
-fn read_one(tx: &mut dyn TransactionLike, query: RecordQuery) -> InterpretationResult<ReadQueryResult> {
+fn read_one(tx: &mut dyn TransactionLike, query: RecordQuery) -> InterpretationResult<QueryResult> {
     let selected_fields = inject_required_fields(query.selected_fields.clone());
     let scalars = tx.get_single_record(query.record_finder.as_ref().unwrap(), &selected_fields)?;
 
@@ -29,39 +29,37 @@ fn read_one(tx: &mut dyn TransactionLike, query: RecordQuery) -> InterpretationR
             let ids = vec![record.collect_id(&id_field)?];
             let list_fields = selected_fields.scalar_lists();
             let lists = resolve_scalar_list_fields(tx, ids.clone(), list_fields)?;
-            let nested: Vec<ReadQueryResult> = query
+            let nested: Vec<QueryResult> = query
                 .nested
                 .into_iter()
                 .map(|q| execute(tx, q, &ids))
-                .collect::<InterpretationResult<Vec<ReadQueryResult>>>()?;
+                .collect::<InterpretationResult<Vec<QueryResult>>>()?;
 
-            Ok(ReadQueryResult {
-                name: query.name,
-                alias: query.alias,
-                content: ResultContent::RecordSelection(RecordSelection {
-                    fields: query.selection_order,
-                    scalars: record.into(),
-                    nested,
-                    lists,
-                    id_field,
-                    ..Default::default()
-                }),
-            })
-        }
-        None => Ok(ReadQueryResult {
-            name: query.name,
-            alias: query.alias,
-            content: ResultContent::RecordSelection(RecordSelection {
+            Ok(QueryResult::RecordSelection(RecordSelection {
+                // name: query.name,
+                // alias: query.alias,
+                // content: ResultContent::RecordSelection(RecordSelection {
                 fields: query.selection_order,
+                scalars: record.into(),
+                nested,
+                lists,
                 id_field,
                 ..Default::default()
-            }),
-        }),
+            }))
+        }
+        None => Ok(QueryResult::RecordSelection(RecordSelection {
+            // name: query.name,
+            // alias: query.alias,
+            // content: ResultContent::RecordSelection(RecordSelection {
+            fields: query.selection_order,
+            id_field,
+            ..Default::default()
+        })),
     }
 }
 
 /// Queries a set of records.
-fn read_many(tx: &mut dyn TransactionLike, query: ManyRecordsQuery) -> InterpretationResult<ReadQueryResult> {
+fn read_many(tx: &mut dyn TransactionLike, query: ManyRecordsQuery) -> InterpretationResult<QueryResult> {
     let selected_fields = inject_required_fields(query.selected_fields.clone());
     let scalars = tx.get_many_records(Arc::clone(&query.model), query.args.clone(), &selected_fields)?;
 
@@ -70,24 +68,23 @@ fn read_many(tx: &mut dyn TransactionLike, query: ManyRecordsQuery) -> Interpret
     let ids = scalars.collect_ids(&id_field)?;
     let list_fields = selected_fields.scalar_lists();
     let lists = resolve_scalar_list_fields(tx, ids.clone(), list_fields)?;
-    let nested: Vec<ReadQueryResult> = query
+    let nested: Vec<QueryResult> = query
         .nested
         .into_iter()
         .map(|q| execute(tx, q, &ids))
-        .collect::<InterpretationResult<Vec<ReadQueryResult>>>()?;
+        .collect::<InterpretationResult<Vec<QueryResult>>>()?;
 
-    Ok(ReadQueryResult {
+    Ok(QueryResult::RecordSelection(RecordSelection {
         name: query.name,
-        alias: query.alias,
-        content: ResultContent::RecordSelection(RecordSelection {
-            fields: query.selection_order,
-            query_arguments: query.args,
-            scalars,
-            nested,
-            lists,
-            id_field,
-        }),
-    })
+        // alias: query.alias,
+        // content: ResultContent::RecordSelection(RecordSelection {
+        fields: query.selection_order,
+        query_arguments: query.args,
+        scalars,
+        nested,
+        lists,
+        id_field,
+    }))
 }
 
 /// Queries related records for a set of parent IDs.
@@ -95,7 +92,7 @@ fn read_related(
     tx: &mut dyn TransactionLike,
     query: RelatedRecordsQuery,
     parent_ids: &[GraphqlId],
-) -> InterpretationResult<ReadQueryResult> {
+) -> InterpretationResult<QueryResult> {
     let selected_fields = inject_required_fields(query.selected_fields.clone());
     let parent_ids = match query.parent_ids {
         Some(ref ids) => ids,
@@ -114,34 +111,28 @@ fn read_related(
     let ids = scalars.collect_ids(&id_field)?;
     let list_fields = selected_fields.scalar_lists();
     let lists = resolve_scalar_list_fields(tx, ids.clone(), list_fields)?;
-    let nested: Vec<ReadQueryResult> = query
+    let nested: Vec<QueryResult> = query
         .nested
         .into_iter()
         .map(|q| execute(tx, q, &ids))
-        .collect::<InterpretationResult<Vec<ReadQueryResult>>>()?;
+        .collect::<InterpretationResult<Vec<QueryResult>>>()?;
 
-    Ok(ReadQueryResult {
+    Ok(QueryResult::RecordSelection(RecordSelection {
         name: query.name,
-        alias: query.alias,
-        content: ResultContent::RecordSelection(RecordSelection {
+        // alias: query.alias,
+        // content: ResultContent::RecordSelection(RecordSelection {
             fields: query.selection_order,
             query_arguments: query.args,
             scalars,
             nested,
             lists,
             id_field,
-        }),
-    })
+    }))
 }
 
-fn aggregate(tx: &mut dyn TransactionLike, query: AggregateRecordsQuery) -> InterpretationResult<ReadQueryResult> {
+fn aggregate(tx: &mut dyn TransactionLike, query: AggregateRecordsQuery) -> InterpretationResult<QueryResult> {
     let result = tx.count_by_model(query.model, QueryArguments::default())?;
-
-    Ok(ReadQueryResult {
-        name: query.name,
-        alias: query.alias,
-        content: ResultContent::Count(result),
-    })
+    Ok(QueryResult::Count(result))
 }
 
 /// Resolves scalar lists for a list field for a set of parent IDs.

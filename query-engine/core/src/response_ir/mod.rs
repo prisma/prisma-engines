@@ -1,25 +1,22 @@
 //! Prisma Response IR (Intermediate Representation).
 //!
-//! This module takes care of processing the results
+//! This module takes care of processing query execution results
 //! and transforming them into a different AST.
 //!
 //! This IR is meant for general processing and storage.
 //! It can also be easily serialized.
 //!
-//! The code itself can be considered WIP. It is clear when reading the code that there are missing abstractions
+//! Note: The code itself can be considered WIP. It is clear when reading the code that there are missing abstractions
 //! and a restructure might be necessary (good example is the default value handling sprinkled all over the place).
-mod read;
+mod internal;
 mod utils;
-mod write;
-
-pub use read::*;
-pub use utils::*;
-pub use write::*;
 
 use crate::{ExpressionResult, OutputType, OutputTypeRef};
 use indexmap::IndexMap;
+use internal::*;
 use prisma_models::PrismaValue;
 use std::{borrow::Borrow, sync::Arc};
+use utils::*;
 
 /// A `key -> value` map to an IR item
 pub type Map = IndexMap<String, Item>;
@@ -56,25 +53,23 @@ pub enum Item {
 #[derive(Debug)]
 pub struct IrSerializer {
     /// Serialization key for root DataItem
+    /// Note: This will change
     pub key: String,
 
     /// Output type describing the possible shape of the result
     pub output_type: OutputTypeRef,
-
-    /// Field selection of the query to narrow down selection and order.
-    pub selected_fields: Vec<String>, // Temporary(?) workaround to hold state for write queries
 }
 
 impl IrSerializer {
     pub fn serialize(&self, result: ExpressionResult) -> Response {
         match result {
-            ExpressionResult::Read(r) => {
-                match serialize_read(r, &self.output_type, false, false) {
+            ExpressionResult::Query(r) => {
+                match serialize_internal(r, &self.output_type, false, false) {
                     Ok(result) => {
-                        // On the top level, each result pair boils down to a exactly a single serialized result.
+                        // On the top level, each result boils down to a exactly a single serialized result.
                         // All checks for lists and optionals have already been performed during the recursion,
                         // so we just unpack the only result possible.
-                        // Todo: The following checks feel out of place. Imo this needs to be handled already one level deeper.
+                        // Todo: The following checks feel out of place. This probably needs to be handled already one level deeper.
                         let result = if result.is_empty() {
                             match self.output_type.borrow() {
                                 OutputType::Opt(_) => Item::Value(PrismaValue::Null),
@@ -92,15 +87,14 @@ impl IrSerializer {
                 }
             }
 
-            ExpressionResult::Write(w) => {
-                let serialized = serialize_write(w, &self.output_type, &self.selected_fields);
+            // ExpressionResult::Write(w) => {
+            //     let serialized = serialize_write(w, &self.output_type, &self.selected_fields);
 
-                match serialized {
-                    Ok(result) => Response::Data(self.key.clone(), result),
-                    Err(err) => Response::Error(format!("{}", err)),
-                }
-            },
-
+            //     match serialized {
+            //         Ok(result) => Response::Data(self.key.clone(), result),
+            //         Err(err) => Response::Error(format!("{}", err)),
+            //     }
+            // },
             ExpressionResult::Empty => panic!("Domain logic error: Attempted to serialize empty result."),
         }
     }

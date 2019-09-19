@@ -58,15 +58,10 @@ impl QueryBuilder {
         Ok((query_graph, result_info))
     }
 
-    // TODO: Issue - the selected fields only reflect the first layer, which is ok, because read results, the only results
-    // that have nesting at the moment, have all info encoded in their result. This needs to change when unifying the
-    // result types: Push the result state into a structure that can reflect all nesting levels.
-    // Tl;dr: Selected_fields are only interesting for write query results at the moment and that's okay.
     fn derive_serializer(selection: &Selection, field: &ParsedField) -> IrSerializer {
         IrSerializer {
             key: selection.alias.clone().unwrap_or_else(|| selection.name.clone()),
             output_type: field.schema_field.field_type.clone(),
-            selected_fields: selection.nested_selections.iter().map(|s| s.name.clone()).collect(),
         }
     }
 }

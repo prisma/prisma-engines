@@ -1,14 +1,17 @@
-use super::{InterpretationResult, InterpreterError, expression::*, query_interpreters::{read, write}};
-use crate::{Query, Identifier, ReadQueryResult, ResultContent, WriteQueryResult};
-use connector::{TransactionLike};
+use super::{
+    expression::*,
+    query_interpreters::{read, write},
+    InterpretationResult, InterpreterError,
+};
+use crate::{Query, QueryResult};
+use connector::TransactionLike;
 use im::HashMap;
 use prisma_models::prelude::*;
 use std::convert::TryInto;
 
 #[derive(Debug, Clone)]
 pub enum ExpressionResult {
-    Read(ReadQueryResult),
-    Write(WriteQueryResult),
+    Query(QueryResult),
     Empty,
 }
 
@@ -19,13 +22,9 @@ impl ExpressionResult {
     ///   - Not all result sets are handled.
     pub fn as_id(&self) -> Option<PrismaValue> {
         match self {
-            Self::Write(result) => match &result.identifier {
-                Identifier::Id(id) => Some(id.clone().try_into().unwrap()),
-                _ => unimplemented!(),
-            },
-
-            Self::Read(res) => match &res.content {
-                ResultContent::RecordSelection(rs) => rs
+            Self::Query(ref result) => match result {
+                QueryResult::Id(id) => Some(id.clone().try_into().unwrap()),
+                QueryResult::RecordSelection(rs) => rs
                     .scalars
                     .collect_ids(rs.id_field.as_str())
                     .unwrap()
@@ -34,6 +33,7 @@ impl ExpressionResult {
 
                 _ => unimplemented!(),
             },
+
             _ => unimplemented!(),
         }
     }
@@ -95,12 +95,12 @@ impl<'a> QueryInterpreter<'a> {
             Expression::Query { query } => match query {
                 Query::Read(read) => {
                     println!("READ");
-                    Ok(read::execute(self.tx, read, &[]).map(|res| ExpressionResult::Read(res))?)
+                    Ok(read::execute(self.tx, read, &[]).map(|res| ExpressionResult::Query(res))?)
                 }
 
                 Query::Write(write) => {
                     println!("WRITE");
-                    Ok(write::execute(self.tx, write).map(|res| ExpressionResult::Write(res))?)
+                    Ok(write::execute(self.tx, write).map(|res| ExpressionResult::Query(res))?)
                 }
             },
 

@@ -11,14 +11,13 @@ pub trait TransactionLike: ReadOperations + WriteOperations {}
 
 // AdditionalOperations? MetaOperations? ...
 // pub trait UtilityOperations {
-// fn execute_raw(&self, db_name: String, query: String) -> crate::Result<Value>;
-// fn execute_raw(&self, db_name: String, query: String) -> connector_interface::Result<Value> {
-//     let result = self.inner.raw_json(RawQuery::from(query))?;
+//     fn execute_raw(&self, db_name: String, query: String) -> crate::Result<Value>;
+//     fn execute_raw(&self, db_name: String, query: String) -> connector_interface::Result<Value> {
+//         let result = self.inner.raw_json(RawQuery::from(query))?;
+//         Ok(result)
+//     }
 
-//     Ok(result)
-// }
-
-// reset data
+//     reset data
 // }
 
 pub trait ReadOperations {

@@ -1,7 +1,7 @@
-use crate::{interpreter::InterpretationResult, query_ast::*, WriteQueryResult};
-use connector::{TransactionLike};
+use crate::{interpreter::InterpretationResult, query_ast::*, QueryResult};
+use connector::TransactionLike;
 
-pub fn execute(tx: &mut dyn TransactionLike, write_query: WriteQuery) -> InterpretationResult<WriteQueryResult> {
+pub fn execute(tx: &mut dyn TransactionLike, write_query: WriteQuery) -> InterpretationResult<QueryResult> {
     match write_query {
         WriteQuery::CreateRecord(q) => create_one(tx, q),
         WriteQuery::UpdateRecord(q) => unimplemented!(),
@@ -15,6 +15,6 @@ pub fn execute(tx: &mut dyn TransactionLike, write_query: WriteQuery) -> Interpr
     }
 }
 
-fn create_one(tx: &mut dyn TransactionLike, q: CreateRecord) -> InterpretationResult<WriteQueryResult> {
+fn create_one(tx: &mut dyn TransactionLike, q: CreateRecord) -> InterpretationResult<QueryResult> {
     unimplemented!()
 }
