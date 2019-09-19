@@ -149,7 +149,7 @@ fn main() {
                     pretty_print_errors(errors, &datamodel);
                     std::process::exit(1);
                 }
-                Err(e) => panic!(e),
+                Err(e) => panic!("{:?}", e),
             }
         }
     }
