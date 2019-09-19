@@ -214,6 +214,16 @@ mod tests {
         config
     }
 
+    fn get_admin_config() -> OptsBuilder {
+        let mut config = OptsBuilder::new();
+        config.ip_or_hostname(env::var("TEST_MYSQL_HOST").ok());
+        config.tcp_port(env::var("TEST_MYSQL_PORT").unwrap().parse::<u16>().unwrap());
+        config.db_name(env::var("TEST_MYSQL_DB").ok());
+        config.pass(env::var("TEST_MYSQL_ROOT_PASSWORD").ok());
+        config.user("root".into());
+        config
+    }
+
     #[test]
     fn should_provide_a_database_connection() {
         let mut connection = Mysql::new(get_config()).unwrap();
@@ -279,7 +289,7 @@ VALUES (1, 'Joe', 27, 20000.00 );
 
     #[test]
     fn should_map_nonexisting_database_error() {
-        let mut config = get_config();
+        let mut config = get_admin_config();
         config.db_name(Some("this_does_not_exist"));
 
         let res = Mysql::new(config);
@@ -287,14 +297,16 @@ VALUES (1, 'Joe', 27, 20000.00 );
         assert!(res.is_err());
 
         match res.unwrap_err() {
-            Error::DatabaseDoesNotExist { db_name } => assert_eq!("this_does_not_exist", db_name.as_str()),
+            Error::DatabaseDoesNotExist { db_name } => {
+                assert_eq!("this_does_not_exist", db_name.as_str())
+            }
             e => panic!("Expected `DatabaseDoesNotExist`, got {:?}", e),
         }
     }
 
     #[test]
     fn should_map_access_denied_error() {
-        let mut admin = Mysql::new(get_config()).unwrap();
+        let mut admin = Mysql::new(get_admin_config()).unwrap();
 
         admin
             .execute_raw("CREATE USER should_map_access_denied_test", &[])
@@ -325,7 +337,7 @@ VALUES (1, 'Joe', 27, 20000.00 );
 
     #[test]
     fn should_map_authentication_failed_error() {
-        let mut admin = Mysql::new(get_config()).unwrap();
+        let mut admin = Mysql::new(get_admin_config()).unwrap();
 
         admin
             .execute_raw("CREATE USER authentication_failed", &[])
@@ -341,7 +353,9 @@ VALUES (1, 'Joe', 27, 20000.00 );
             assert!(conn.is_err());
 
             match conn.unwrap_err() {
-                Error::AuthenticationFailed { user } => assert_eq!("authentication_failed", user.as_str()),
+                Error::AuthenticationFailed { user } => {
+                    assert_eq!("authentication_failed", user.as_str())
+                }
                 e => panic!("Expected `AuthenticationFailed`, got {:?}", e),
             }
         });
@@ -355,22 +369,24 @@ VALUES (1, 'Joe', 27, 20000.00 );
 
     #[test]
     fn should_map_database_already_exists_error() {
-        let mut admin = Mysql::new(get_config()).unwrap();
+        let mut admin = Mysql::new(get_admin_config()).unwrap();
 
         admin
             .execute_raw("CREATE DATABASE should_map_if_database_already_exists", &[])
             .unwrap();
 
         let res = std::panic::catch_unwind(|| {
-            let mut admin = Mysql::new(get_config()).unwrap();
+            let mut admin = Mysql::new(get_admin_config()).unwrap();
 
-            let res = admin
-                .execute_raw("CREATE DATABASE should_map_if_database_already_exists", &[]);
+            let res =
+                admin.execute_raw("CREATE DATABASE should_map_if_database_already_exists", &[]);
 
             assert!(res.is_err());
 
             match res.unwrap_err() {
-                Error::DatabaseAlreadyExists { db_name } => assert_eq!("should_map_if_database_already_exists", db_name.as_str()),
+                Error::DatabaseAlreadyExists { db_name } => {
+                    assert_eq!("should_map_if_database_already_exists", db_name.as_str())
+                }
                 e => panic!("Expected `DatabaseAlreadyExists`, got {:?}", e),
             }
         });
