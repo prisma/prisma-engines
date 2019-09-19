@@ -26,11 +26,12 @@ impl FromSource for Sqlite {
         let params = SqliteParams::try_from(source.url().value.as_str())?;
         let file_path = params.file_path.clone();
         let pool = r2d2::Pool::try_from(params).unwrap();
-
-        Ok(Sqlite {
+        let sqlite = Sqlite {
             pool,
             file_path: file_path.to_str().unwrap().to_string(),
-        })
+        };
+
+        Ok(sqlite)
     }
 }
 

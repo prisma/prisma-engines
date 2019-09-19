@@ -103,11 +103,11 @@ impl WriteQueryBuilder {
         let record_finder = extract_record_finder(where_arg.value, &model)?;
 
         // Prefetch read query for the delete
-        let mut read_query = ReadOneRecordBuilder::new(field, model).build()?;
+        let mut read_query = ReadOneRecordBuilder::new(field, Arc::clone(&model)).build()?;
         read_query.inject_record_finder(record_finder.clone());
 
         let read_node = self.graph.create_node(Query::Read(read_query));
-        let delete_query = WriteQuery::DeleteRecord(DeleteRecord { where_: record_finder });
+        let delete_query = WriteQuery::DeleteRecord(DeleteRecord { model, where_: record_finder });
         let delete_node = self.graph.create_node(Query::Write(delete_query));
 
         self.graph.add_result_node(&read_node);
@@ -286,6 +286,7 @@ impl WriteQueryBuilder {
         non_list_args.update_datetimes(Arc::clone(&model), list_causes_update);
 
         let ur = UpdateRecord {
+            model,
             where_: record_finder,
             non_list_args,
             list_args: update_args.list,

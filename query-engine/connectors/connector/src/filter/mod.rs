@@ -83,3 +83,12 @@ impl From<RecordFinder> for Filter {
         })
     }
 }
+
+impl From<Option<RecordFinder>> for Filter {
+    fn from(record_finder: Option<RecordFinder>) -> Self {
+        match record_finder {
+            Some(rf) => Self::from(rf),
+            None => Self::empty(),
+        }
+    }
+}

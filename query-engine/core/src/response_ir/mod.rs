@@ -87,14 +87,6 @@ impl IrSerializer {
                 }
             }
 
-            // ExpressionResult::Write(w) => {
-            //     let serialized = serialize_write(w, &self.output_type, &self.selected_fields);
-
-            //     match serialized {
-            //         Ok(result) => Response::Data(self.key.clone(), result),
-            //         Err(err) => Response::Error(format!("{}", err)),
-            //     }
-            // },
             ExpressionResult::Empty => panic!("Domain logic error: Attempted to serialize empty result."),
         }
     }

@@ -1,12 +1,17 @@
 use super::SqlConnectorTransaction;
 use crate::{
-    QueryExt,
     query_builder::read::{ManyRelatedRecordsBaseQuery, ManyRelatedRecordsQueryBuilder, ReadQueryBuilder},
-    SqlError,
+    QueryExt, SqlError,
 };
 use connector_interface::{error::ConnectorError, *};
+use itertools::Itertools;
 use prisma_models::*;
 use std::convert::TryFrom;
+
+struct ScalarListElement {
+    record_id: GraphqlId,
+    value: PrismaValue,
+}
 
 impl<T> ReadOperations for SqlConnectorTransaction<'_, T>
 where
@@ -99,11 +104,41 @@ where
 
     fn get_scalar_list_values(
         &mut self,
-        _list_field: ScalarFieldRef,
-        _record_ids: Vec<GraphqlId>,
+        list_field: ScalarFieldRef,
+        record_ids: Vec<GraphqlId>,
     ) -> connector_interface::Result<Vec<ScalarListValues>> {
-        unimplemented!()
-        //get_scalar_list_values_by_record_ids
+        let type_identifier = list_field.type_identifier;
+        let query = ReadQueryBuilder::get_scalar_list_values_by_record_ids(list_field, record_ids);
+        let rows = self
+            .inner
+            .filter(query.into(), &[TypeIdentifier::GraphQLID, type_identifier])?;
+
+        let results: Vec<ScalarListElement> = rows
+            .into_iter()
+            .map(|row| {
+                let mut iter = row.values.into_iter();
+
+                let record_id = iter.next().ok_or(SqlError::ColumnDoesNotExist)?;
+                let value = iter.next().ok_or(SqlError::ColumnDoesNotExist)?;
+
+                Ok(ScalarListElement {
+                    record_id: GraphqlId::try_from(record_id)?,
+                    value,
+                })
+            })
+            .collect::<connector_interface::Result<Vec<ScalarListElement>>>()?;
+
+        let mut list_values = Vec::new();
+
+        for (record_id, elements) in &results.into_iter().group_by(|ele| ele.record_id.clone()) {
+            let values = ScalarListValues {
+                record_id,
+                values: elements.into_iter().map(|e| e.value).collect(),
+            };
+            list_values.push(values);
+        }
+
+        Ok(list_values)
     }
 
     fn count_by_model(

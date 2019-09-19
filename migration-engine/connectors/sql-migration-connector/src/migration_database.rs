@@ -41,7 +41,7 @@ impl Sqlite {
     pub fn new(url: &str) -> prisma_query::Result<Self> {
         let params = SqliteParams::try_from(url)?;
         let file_path = params.file_path.to_str().unwrap().to_string();
-        let manager = PrismaConnectionManager::sqlite(&file_path)?;
+        let manager = PrismaConnectionManager::sqlite(None, &file_path)?;
 
         let pool = r2d2::Pool::builder()
             .max_size(params.connection_limit)

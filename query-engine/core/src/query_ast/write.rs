@@ -78,6 +78,7 @@ pub struct CreateRecord {
 
 #[derive(Debug, Clone)]
 pub struct UpdateRecord {
+    pub model: ModelRef,
     pub where_: Option<RecordFinder>,
     pub non_list_args: PrismaArgs,
     pub list_args: Vec<(String, PrismaListValue)>,
@@ -93,6 +94,7 @@ pub struct UpdateManyRecords {
 
 #[derive(Debug, Clone)]
 pub struct DeleteRecord {
+    pub model: ModelRef,
     pub where_: RecordFinder,
 }
 

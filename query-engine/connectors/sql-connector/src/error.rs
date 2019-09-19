@@ -141,6 +141,12 @@ impl From<prisma_query::error::Error> for SqlError {
             e @ prisma_query::error::Error::ResultIndexOutOfBounds { .. } => SqlError::QueryError(e.into()),
             e @ prisma_query::error::Error::ResultTypeMismatch { .. } => SqlError::QueryError(e.into()),
             e @ prisma_query::error::Error::DatabaseUrlIsInvalid { .. } => SqlError::ConnectionError(e.into()),
+            e @ prisma_query::error::Error::DatabaseDoesNotExist { .. } => SqlError::ConnectionError(e.into()),
+            e @ prisma_query::error::Error::AuthenticationFailed { .. } => SqlError::ConnectionError(e.into()),
+            e @ prisma_query::error::Error::DatabaseAccessDenied { .. } => SqlError::ConnectionError(e.into()),
+            e @ prisma_query::error::Error::DatabaseAlreadyExists { .. } => SqlError::ConnectionError(e.into()),
+            e @ prisma_query::error::Error::ConnectTimeout { .. } => SqlError::ConnectionError(e.into()),
+            e @ prisma_query::error::Error::Timeout => SqlError::ConnectionError(e.into()),
         }
     }
 }

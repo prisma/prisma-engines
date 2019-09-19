@@ -36,9 +36,7 @@ fn read_one(tx: &mut dyn TransactionLike, query: RecordQuery) -> InterpretationR
                 .collect::<InterpretationResult<Vec<QueryResult>>>()?;
 
             Ok(QueryResult::RecordSelection(RecordSelection {
-                // name: query.name,
-                // alias: query.alias,
-                // content: ResultContent::RecordSelection(RecordSelection {
+                name: query.name,
                 fields: query.selection_order,
                 scalars: record.into(),
                 nested,
@@ -48,9 +46,7 @@ fn read_one(tx: &mut dyn TransactionLike, query: RecordQuery) -> InterpretationR
             }))
         }
         None => Ok(QueryResult::RecordSelection(RecordSelection {
-            // name: query.name,
-            // alias: query.alias,
-            // content: ResultContent::RecordSelection(RecordSelection {
+            name: query.name,
             fields: query.selection_order,
             id_field,
             ..Default::default()
@@ -76,8 +72,6 @@ fn read_many(tx: &mut dyn TransactionLike, query: ManyRecordsQuery) -> Interpret
 
     Ok(QueryResult::RecordSelection(RecordSelection {
         name: query.name,
-        // alias: query.alias,
-        // content: ResultContent::RecordSelection(RecordSelection {
         fields: query.selection_order,
         query_arguments: query.args,
         scalars,
@@ -119,14 +113,12 @@ fn read_related(
 
     Ok(QueryResult::RecordSelection(RecordSelection {
         name: query.name,
-        // alias: query.alias,
-        // content: ResultContent::RecordSelection(RecordSelection {
-            fields: query.selection_order,
-            query_arguments: query.args,
-            scalars,
-            nested,
-            lists,
-            id_field,
+        fields: query.selection_order,
+        query_arguments: query.args,
+        scalars,
+        nested,
+        lists,
+        id_field,
     }))
 }
 
