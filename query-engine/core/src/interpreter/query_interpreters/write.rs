@@ -1,16 +1,20 @@
-use crate::{interpreter::InterpretationResult, WriteQuery, WriteQueryResult};
+use crate::{interpreter::InterpretationResult, query_ast::*, WriteQueryResult};
 use connector::{TransactionLike};
 
-pub fn execute(_tx: &mut dyn TransactionLike, _write_query: WriteQuery) -> InterpretationResult<WriteQueryResult> {
-    unimplemented!()
-    // match write_query {
-    //     WriteQuery::Root(wq) => self
-    //         .write_executor
-    //         .execute(self.db_name.clone(), wq)
-    //         .map_err(|err| err.into()),
+pub fn execute(tx: &mut dyn TransactionLike, write_query: WriteQuery) -> InterpretationResult<WriteQueryResult> {
+    match write_query {
+        WriteQuery::CreateRecord(q) => create_one(tx, q),
+        WriteQuery::UpdateRecord(q) => unimplemented!(),
+        WriteQuery::DeleteRecord(q) => unimplemented!(),
+        WriteQuery::UpdateManyRecords(q) => unimplemented!(),
+        WriteQuery::DeleteManyRecords(q) => unimplemented!(),
+        WriteQuery::ConnectRecords(q) => unimplemented!(),
+        WriteQuery::DisconnectRecords(q) => unimplemented!(),
+        WriteQuery::SetRecords(q) => unimplemented!(),
+        WriteQuery::ResetData(q) => unimplemented!(),
+    }
+}
 
-    //     _ => Err(CoreError::UnsupportedFeatureError(
-    //         "Attempted to execute nested write query on the root level.".into(),
-    //     )),
-    // }
+fn create_one(tx: &mut dyn TransactionLike, q: CreateRecord) -> InterpretationResult<WriteQueryResult> {
+    unimplemented!()
 }

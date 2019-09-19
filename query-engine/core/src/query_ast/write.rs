@@ -10,6 +10,8 @@ pub enum WriteQuery {
     UpdateManyRecords(UpdateManyRecords),
     DeleteManyRecords(DeleteManyRecords),
     ConnectRecords(ConnectRecords),
+    DisconnectRecords(DisconnectRecords),
+    SetRecords(SetRecords),
     ResetData(ResetData),
 }
 
@@ -60,6 +62,8 @@ impl std::fmt::Display for WriteQuery {
             Self::UpdateManyRecords(q) => write!(f, "UpdateManyRecords: {}", q.model.name),
             Self::DeleteManyRecords(q) => write!(f, "DeleteManyRecords: {}", q.model.name),
             Self::ConnectRecords(_) => write!(f, "ConnectRecords"),
+            Self::DisconnectRecords(_) => write!(f, "DisconnectRecords"),
+            Self::SetRecords(_) => write!(f, "SetRecords"),
             Self::ResetData(_) => write!(f, "ResetData"),
         }
     }
@@ -99,7 +103,23 @@ pub struct DeleteManyRecords {
 }
 
 #[derive(Debug, Clone)]
-pub struct ConnectRecords {}
+pub struct ConnectRecords {
+    parent: GraphqlId, // or finders?
+    child: GraphqlId,
+}
+
+#[derive(Debug, Clone)]
+pub struct DisconnectRecords {}
+
+#[derive(Debug, Clone)]
+pub struct SetRecords {
+    pub wheres: Vec<RecordFinder>,
+}
+
+#[derive(Debug, Clone)]
+pub struct ResetData {
+    pub internal_data_model: InternalDataModelRef,
+}
 
 // SET
 
@@ -127,8 +147,3 @@ pub struct ConnectRecords {}
 // }
 
 // // RESET
-
-#[derive(Debug, Clone)]
-pub struct ResetData {
-    pub internal_data_model: InternalDataModelRef,
-}
