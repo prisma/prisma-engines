@@ -30,12 +30,6 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
             sqlite.parameters,
         );
 
-        debug!(
-            "query: \"{}\", params: [{}]",
-            result.0,
-            Params(result.1.as_slice())
-        );
-
         result
     }
 

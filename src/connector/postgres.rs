@@ -162,7 +162,7 @@ impl Queryable for PostgreSql {
     fn execute<'a>(&mut self, q: Query<'a>) -> crate::Result<Option<Id>> {
         let (sql, params) = visitor::Postgres::build(q);
 
-        metrics::query("postgres.execute", &sql, || {
+        metrics::query("postgres.execute", &sql, &params, || {
             let stmt = self.client.prepare(&sql)?;
             let rows = self
                 .client
@@ -187,7 +187,7 @@ impl Queryable for PostgreSql {
         sql: &str,
         params: &[ParameterizedValue<'a>],
     ) -> crate::Result<ResultSet> {
-        metrics::query("postgres.query_raw", sql, || {
+        metrics::query("postgres.query_raw", sql, params, || {
             let stmt = self.client.prepare(sql)?;
             let rows = self.client.query(&stmt, &conversion::conv_params(params))?;
 
@@ -206,7 +206,7 @@ impl Queryable for PostgreSql {
         sql: &str,
         params: &[ParameterizedValue<'a>],
     ) -> crate::Result<u64> {
-        metrics::query("postgres.execute_raw", sql, || {
+        metrics::query("postgres.execute_raw", sql, params, || {
             let stmt = self.client.prepare(sql)?;
 
             let changes = self

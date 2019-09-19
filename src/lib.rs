@@ -118,3 +118,11 @@ extern crate metrics;
 extern crate debug_stub_derive;
 
 pub type Result<T> = std::result::Result<T, error::Error>;
+
+use lazy_static::lazy_static;
+
+lazy_static! {
+    static ref LOG_QUERIES: bool = std::env::var("PRISMA_LOG_QUERIES")
+        .map(|_| true)
+        .unwrap_or(false);
+}
