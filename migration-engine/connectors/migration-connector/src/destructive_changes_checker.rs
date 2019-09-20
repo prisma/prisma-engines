@@ -3,7 +3,7 @@ use std::marker::PhantomData;
 
 pub trait DestructiveChangesChecker<T>: Send + Sync + 'static
 where
-    T: 'static,
+    T: Send + Sync + 'static,
 {
     fn check(&self, database_migration: &T) -> ConnectorResult<DestructiveChangeDiagnostics>;
 }

@@ -19,7 +19,7 @@ impl<'a> MigrationCommand<'a> for ApplyMigrationCommand<'a> {
     fn execute<C, D>(&self, engine: &MigrationEngine<C, D>) -> CommandResult<Self::Output>
     where
         C: MigrationConnector<DatabaseMigration = D>,
-        D: DatabaseMigrationMarker + 'static,
+        D: DatabaseMigrationMarker + Send + Sync + 'static,
     {
         debug!("{:?}", self.input);
 
@@ -42,7 +42,7 @@ impl<'a> ApplyMigrationCommand<'a> {
     ) -> CommandResult<MigrationStepsResultOutput>
     where
         C: MigrationConnector<DatabaseMigration = D>,
-        D: DatabaseMigrationMarker + 'static,
+        D: DatabaseMigrationMarker + Send + Sync + 'static,
     {
         let connector = engine.connector();
         let migration_persistence = connector.migration_persistence();
@@ -59,7 +59,7 @@ impl<'a> ApplyMigrationCommand<'a> {
     fn handle_normal_migration<C, D>(&self, engine: &MigrationEngine<C, D>) -> CommandResult<MigrationStepsResultOutput>
     where
         C: MigrationConnector<DatabaseMigration = D>,
-        D: DatabaseMigrationMarker + 'static,
+        D: DatabaseMigrationMarker + Send + Sync + 'static,
     {
         let connector = engine.connector();
         let migration_persistence = connector.migration_persistence();
@@ -80,7 +80,7 @@ impl<'a> ApplyMigrationCommand<'a> {
     ) -> CommandResult<MigrationStepsResultOutput>
     where
         C: MigrationConnector<DatabaseMigration = D>,
-        D: DatabaseMigrationMarker + 'static,
+        D: DatabaseMigrationMarker + Send + Sync + 'static,
     {
         let connector = engine.connector();
         let migration_persistence = connector.migration_persistence();
