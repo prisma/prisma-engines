@@ -90,6 +90,29 @@ where
         let api = test_api(connector);
 
         test_fn(SqlFamily::Mysql, &api);
+
+        println!("--------------- Testing with MySQL 8 now ---------------");
+
+        let connector = match SqlMigrationConnector::mysql(&mysql_8_url(), true) {
+            Ok(c) => c,
+            Err(_) => {
+                let url = Url::parse(&mysql_url()).unwrap();
+
+                let name_cmd = |name| format!("CREATE DATABASE `{}`", name);
+
+                let connect_cmd = |url| {
+                    let params = MysqlParams::try_from(url)?;
+                    Mysql::new(params, true)
+                };
+
+                create_database(url, "mysql", "/", name_cmd, Rc::new(connect_cmd));
+                SqlMigrationConnector::mysql(&mysql_url(), true).unwrap()
+            }
+        };
+
+        let api = test_api(connector);
+
+        test_fn(SqlFamily::Mysql, &api);
     } else {
         println!("--------------- Ignoring MySQL ---------------")
     }
@@ -281,6 +304,10 @@ pub fn postgres_url() -> String {
 
 pub fn mysql_url() -> String {
     dbg!(format!("mysql://root:prisma@{}:3306/{}", db_host_mysql(), SCHEMA_NAME))
+}
+
+pub fn mysql_8_url() -> String {
+    dbg!(format!("mysql://root:prisma@{}:3307/{}", db_host_mysql(), SCHEMA_NAME))
 }
 
 fn db_host_postgres() -> String {
