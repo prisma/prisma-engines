@@ -39,6 +39,25 @@ where
     test_each_connector_with_ignores(ignores, test_fn);
 }
 
+fn mysql_migration_connector(database_url: &str) -> SqlMigrationConnector {
+    match SqlMigrationConnector::mysql(database_url, true) {
+        Ok(c) => c,
+        Err(e) => {
+            let url = Url::parse(database_url).unwrap();
+
+            let name_cmd = |name| format!("CREATE DATABASE `{}`", name);
+
+            let connect_cmd = |url| {
+                let params = MysqlParams::try_from(url)?;
+                Mysql::new(params, true)
+            };
+
+            create_database(url, "mysql", "/", name_cmd, Rc::new(connect_cmd));
+            SqlMigrationConnector::mysql(database_url, true).unwrap()
+        }
+    }
+}
+
 pub fn test_each_connector_with_ignores<I: AsRef<[SqlFamily]>, F>(ignores: I, test_fn: F)
 where
     F: Fn(&TestSetup, &dyn GenericApi) -> () + std::panic::RefUnwindSafe,
@@ -79,22 +98,7 @@ where
     if !ignores.contains(&SqlFamily::Mysql) {
         println!("--------------- Testing with MySQL now ---------------");
 
-        let connector = match SqlMigrationConnector::mysql(&mysql_url(), true) {
-            Ok(c) => c,
-            Err(_) => {
-                let url = Url::parse(&mysql_url()).unwrap();
-
-                let name_cmd = |name| format!("CREATE DATABASE `{}`", name);
-
-                let connect_cmd = |url| {
-                    let params = MysqlParams::try_from(url)?;
-                    Mysql::new(params, true)
-                };
-
-                create_database(url, "mysql", "/", name_cmd, Rc::new(connect_cmd));
-                SqlMigrationConnector::mysql(&mysql_url(), true).unwrap()
-            }
-        };
+        let connector = mysql_migration_connector(&mysql_url());
 
         let test_setup = TestSetup {
             sql_family: SqlFamily::Mysql,
@@ -106,22 +110,7 @@ where
 
         println!("--------------- Testing with MySQL 8 now ---------------");
 
-        let connector = match SqlMigrationConnector::mysql(&mysql_8_url(), true) {
-            Ok(c) => c,
-            Err(e) => {
-                let url = Url::parse(&mysql_8_url()).unwrap();
-
-                let name_cmd = |name| format!("CREATE DATABASE `{}`", name);
-
-                let connect_cmd = |url| {
-                    let params = MysqlParams::try_from(url)?;
-                    Mysql::new(params, true)
-                };
-
-                create_database(url, "mysql", "/", name_cmd, Rc::new(connect_cmd));
-                SqlMigrationConnector::mysql(&mysql_8_url(), true).unwrap()
-            }
-        };
+        let connector = mysql_migration_connector(&mysql_8_url());
 
         let test_setup = TestSetup {
             sql_family: SqlFamily::Mysql,
