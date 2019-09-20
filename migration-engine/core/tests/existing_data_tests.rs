@@ -7,7 +7,7 @@ use test_harness::*;
 
 #[test]
 fn adding_a_required_field_if_there_is_data() {
-    test_each_connector(|sql_family, api| {
+    test_each_connector(|test_setup, api| {
         let dm = r#"
             model Test {
                 id String @id @default(cuid())
@@ -20,9 +20,8 @@ fn adding_a_required_field_if_there_is_data() {
         "#;
         infer_and_apply(api, &dm).sql_schema;
 
-        let conn = database(sql_family);
         let insert = Insert::single_into((SCHEMA_NAME, "Test")).value("id", "test");
-        conn.execute(SCHEMA_NAME, insert.into()).unwrap();
+        test_setup.database.execute(SCHEMA_NAME, insert.into()).unwrap();
 
         let dm = r#"
             model Test {
@@ -46,7 +45,7 @@ fn adding_a_required_field_if_there_is_data() {
 
 #[test]
 fn adding_a_required_field_must_use_the_default_value_for_migrations() {
-    test_each_connector(|sql_family, api| {
+    test_each_connector(|test_setup, api| {
         let dm = r#"
             model Test {
                 id String @id @default(cuid())
@@ -59,7 +58,7 @@ fn adding_a_required_field_must_use_the_default_value_for_migrations() {
         "#;
         infer_and_apply(api, &dm);
 
-        let conn = database(sql_family);
+        let conn = &test_setup.database;
         let insert = Insert::single_into((SCHEMA_NAME, "Test")).value("id", "test");
 
         conn.execute(SCHEMA_NAME, insert.into()).unwrap();
@@ -84,9 +83,9 @@ fn adding_a_required_field_must_use_the_default_value_for_migrations() {
         infer_and_apply(api, &dm);
 
         // TODO: those assertions somehow fail with column not found on SQLite. I could observe the correct data in the db file though.
-        if sql_family != SqlFamily::Sqlite {
+        if test_setup.sql_family != SqlFamily::Sqlite {
             let conditions = "id".equals("test");
-            let table_for_select: Table = match sql_family {
+            let table_for_select: Table = match test_setup.sql_family {
                 SqlFamily::Sqlite => {
                     // sqlite case. Otherwise prisma-query produces invalid SQL
                     "Test".into()

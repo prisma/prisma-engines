@@ -93,7 +93,7 @@ fn adding_an_id_field_with_a_special_name_must_work() {
 
 #[test]
 fn adding_an_id_field_of_type_int_must_work() {
-    test_each_connector(|sql_family, api| {
+    test_each_connector(|test_setup, api| {
         let dm2 = r#"
             model Test {
                 myId Int @id
@@ -101,7 +101,7 @@ fn adding_an_id_field_of_type_int_must_work() {
         "#;
         let result = infer_and_apply(api, &dm2).sql_schema;
         let column = result.table_bang("Test").column_bang("myId");
-        match sql_family {
+        match test_setup.sql_family {
             SqlFamily::Postgres => {
                 let sequence = result.get_sequence("Test_myId_seq").expect("sequence must exist");
                 let default = column.default.as_ref().expect("Must have nextval default");

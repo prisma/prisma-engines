@@ -381,7 +381,7 @@ where
 }
 
 fn get_sqlite() -> (Arc<dyn SqlSchemaDescriberBackend>, Arc<dyn MigrationDatabase>) {
-    let wrapper = database_wrapper(SqlFamily::Sqlite);
+    let wrapper = database_wrapper(SqlFamily::Sqlite, &sqlite_test_file());
     let database = Arc::clone(&wrapper.database);
 
     let database_file_path = sqlite_test_file();
@@ -393,7 +393,7 @@ fn get_sqlite() -> (Arc<dyn SqlSchemaDescriberBackend>, Arc<dyn MigrationDatabas
 }
 
 fn get_postgres() -> (Arc<dyn SqlSchemaDescriberBackend>, Arc<dyn MigrationDatabase>) {
-    let wrapper = database_wrapper(SqlFamily::Postgres);
+    let wrapper = database_wrapper(SqlFamily::Postgres, &postgres_url());
     let database = Arc::clone(&wrapper.database);
 
     let drop_schema = dbg!(format!("DROP SCHEMA IF EXISTS \"{}\" CASCADE;", SCHEMA_NAME));

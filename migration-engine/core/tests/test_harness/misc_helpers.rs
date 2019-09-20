@@ -13,20 +13,25 @@ use url::Url;
 
 pub const SCHEMA_NAME: &str = "migration-engine";
 
+pub struct TestSetup {
+    pub sql_family: SqlFamily,
+    pub database: Arc<dyn MigrationDatabase + Send + Sync + 'static>,
+}
+
 pub fn parse(datamodel_string: &str) -> datamodel::Datamodel {
     parse_datamodel(datamodel_string).unwrap()
 }
 
 pub fn test_each_connector<F>(test_fn: F)
 where
-    F: Fn(SqlFamily, &dyn GenericApi) -> () + std::panic::RefUnwindSafe,
+    F: Fn(&TestSetup, &dyn GenericApi) -> () + std::panic::RefUnwindSafe,
 {
     test_each_connector_with_ignores(Vec::new(), test_fn);
 }
 
 pub fn test_only_connector<F>(sql_family: SqlFamily, test_fn: F)
 where
-    F: Fn(SqlFamily, &dyn GenericApi) -> () + std::panic::RefUnwindSafe,
+    F: Fn(&TestSetup, &dyn GenericApi) -> () + std::panic::RefUnwindSafe,
 {
     let all = &[SqlFamily::Postgres, SqlFamily::Mysql, SqlFamily::Sqlite];
     let ignores: Vec<SqlFamily> = all.iter().filter(|f| f != &&sql_family).map(|f| *f).collect();
@@ -36,7 +41,7 @@ where
 
 pub fn test_each_connector_with_ignores<I: AsRef<[SqlFamily]>, F>(ignores: I, test_fn: F)
 where
-    F: Fn(SqlFamily, &dyn GenericApi) -> () + std::panic::RefUnwindSafe,
+    F: Fn(&TestSetup, &dyn GenericApi) -> () + std::panic::RefUnwindSafe,
 {
     let ignores: &[SqlFamily] = ignores.as_ref();
     // POSTGRES
@@ -59,9 +64,13 @@ where
             }
         };
 
+        let test_setup = TestSetup {
+            sql_family: SqlFamily::Postgres,
+            database: Arc::clone(&connector.database),
+        };
         let api = test_api(connector);
 
-        test_fn(SqlFamily::Postgres, &api);
+        test_fn(&test_setup, &api);
     } else {
         println!("--------------- Ignoring Postgres ---------------")
     }
@@ -87,16 +96,20 @@ where
             }
         };
 
+        let test_setup = TestSetup {
+            sql_family: SqlFamily::Mysql,
+            database: Arc::clone(&connector.database),
+        };
         let api = test_api(connector);
 
-        test_fn(SqlFamily::Mysql, &api);
+        test_fn(&test_setup, &api);
 
         println!("--------------- Testing with MySQL 8 now ---------------");
 
         let connector = match SqlMigrationConnector::mysql(&mysql_8_url(), true) {
             Ok(c) => c,
-            Err(_) => {
-                let url = Url::parse(&mysql_url()).unwrap();
+            Err(e) => {
+                let url = Url::parse(&mysql_8_url()).unwrap();
 
                 let name_cmd = |name| format!("CREATE DATABASE `{}`", name);
 
@@ -106,13 +119,17 @@ where
                 };
 
                 create_database(url, "mysql", "/", name_cmd, Rc::new(connect_cmd));
-                SqlMigrationConnector::mysql(&mysql_url(), true).unwrap()
+                SqlMigrationConnector::mysql(&mysql_8_url(), true).unwrap()
             }
         };
 
+        let test_setup = TestSetup {
+            sql_family: SqlFamily::Mysql,
+            database: Arc::clone(&connector.database),
+        };
         let api = test_api(connector);
 
-        test_fn(SqlFamily::Mysql, &api);
+        test_fn(&test_setup, &api);
     } else {
         println!("--------------- Ignoring MySQL ---------------")
     }
@@ -122,9 +139,13 @@ where
         println!("--------------- Testing with SQLite now ---------------");
 
         let connector = SqlMigrationConnector::sqlite(&sqlite_test_file()).unwrap();
+        let test_setup = TestSetup {
+            sql_family: SqlFamily::Sqlite,
+            database: Arc::clone(&connector.database),
+        };
         let api = test_api(connector);
 
-        test_fn(SqlFamily::Sqlite, &api);
+        test_fn(&test_setup, &api);
     } else {
         println!("--------------- Ignoring SQLite ---------------")
     }
@@ -146,15 +167,15 @@ where
 pub fn introspect_database(api: &dyn GenericApi) -> SqlSchema {
     let inspector: Box<dyn SqlSchemaDescriberBackend> = match api.connector_type() {
         "postgresql" => {
-            let db = Arc::new(database_wrapper(SqlFamily::Postgres));
+            let db = Arc::new(database_wrapper(SqlFamily::Postgres, &postgres_url()));
             Box::new(sql_schema_describer::postgres::SqlSchemaDescriber::new(db))
         }
         "sqlite" => {
-            let db = Arc::new(database_wrapper(SqlFamily::Sqlite));
+            let db = Arc::new(database_wrapper(SqlFamily::Sqlite, &sqlite_test_file()));
             Box::new(sql_schema_describer::sqlite::SqlSchemaDescriber::new(db))
         }
         "mysql" => {
-            let db = Arc::new(database_wrapper(SqlFamily::Mysql));
+            let db = Arc::new(database_wrapper(SqlFamily::Mysql, &mysql_url()));
             Box::new(sql_schema_describer::mysql::SqlSchemaDescriber::new(db))
         }
         _ => unimplemented!(),
@@ -170,9 +191,9 @@ pub fn introspect_database(api: &dyn GenericApi) -> SqlSchema {
     result
 }
 
-pub fn database_wrapper(sql_family: SqlFamily) -> MigrationDatabaseWrapper {
+pub fn database_wrapper(sql_family: SqlFamily, database_url: &str) -> MigrationDatabaseWrapper {
     MigrationDatabaseWrapper {
-        database: database(sql_family).into(),
+        database: database(sql_family, database_url).into(),
     }
 }
 
@@ -216,10 +237,10 @@ where
     }
 }
 
-pub fn database(sql_family: SqlFamily) -> Box<dyn MigrationDatabase + Send + Sync + 'static> {
+pub fn database(sql_family: SqlFamily, database_url: &str) -> Box<dyn MigrationDatabase + Send + Sync + 'static> {
     match sql_family {
         SqlFamily::Postgres => {
-            let url = Url::parse(&postgres_url()).unwrap();
+            let url = Url::parse(database_url).unwrap();
             let create_cmd = |name| format!("CREATE DATABASE \"{}\"", name);
 
             let connect_cmd = |url| {
@@ -231,9 +252,9 @@ pub fn database(sql_family: SqlFamily) -> Box<dyn MigrationDatabase + Send + Syn
 
             Box::new(conn)
         }
-        SqlFamily::Sqlite => Box::new(Sqlite::new(&sqlite_test_file()).unwrap()),
+        SqlFamily::Sqlite => Box::new(Sqlite::new(database_url).unwrap()),
         SqlFamily::Mysql => {
-            let url = Url::parse(&mysql_url()).unwrap();
+            let url = Url::parse(database_url).unwrap();
             let create_cmd = |name| format!("CREATE DATABASE `{}`", name);
 
             let connect_cmd = |url| {
