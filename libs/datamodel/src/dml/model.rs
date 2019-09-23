@@ -22,9 +22,9 @@ pub struct Model {
 
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
 pub struct IndexDefinition {
-    name: Option<String>,
-    fields: Vec<String>,
-    is_unique: bool,
+    pub name: Option<String>,
+    pub fields: Vec<String>,
+    pub is_unique: bool,
 }
 
 impl Model {
