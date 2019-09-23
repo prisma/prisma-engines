@@ -69,7 +69,7 @@ where
     if !ignores.contains(&SqlFamily::Mysql) {
         println!("--------------- Testing with MySQL now ---------------");
 
-        let connector = match SqlMigrationConnector::mysql(&postgres_url(), true) {
+        let connector = match SqlMigrationConnector::mysql(&mysql_url(), true) {
             Ok(c) => c,
             Err(_) => {
                 let url = Url::parse(&mysql_url()).unwrap();
