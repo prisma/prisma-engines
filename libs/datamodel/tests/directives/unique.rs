@@ -45,6 +45,35 @@ fn the_name_argument_must_work() {
 }
 
 #[test]
+fn multiple_unique_must_work() {
+    let dml = r#"
+    model User {
+        id        Int    @id
+        firstName String
+        lastName  String
+        
+        @@unique([firstName,lastName])
+        @@unique([firstName,lastName], name: "MyIndexName")
+    }
+    "#;
+
+    let schema = parse(dml);
+    let user_model = schema.assert_has_model("User");
+
+    user_model.assert_has_index(IndexDefinition {
+        name: None,
+        fields: vec!["firstName".to_string(), "lastName".to_string()],
+        is_unique: true,
+    });
+
+    user_model.assert_has_index(IndexDefinition {
+        name: Some("MyIndexName".to_string()),
+        fields: vec!["firstName".to_string(), "lastName".to_string()],
+        is_unique: true,
+    });
+}
+
+#[test]
 fn must_error_when_unknown_fields_are_used() {
     let dml = r#"
     model User {
