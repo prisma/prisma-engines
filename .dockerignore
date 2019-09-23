@@ -1,0 +1,44 @@
+db/*
+!.placeholder
+build/
+prisma.yml
+connector_to_test
+.DS_Store
+
+*.class
+*.log
+.coursier
+.ivy2
+
+# Idea
+.iml
+.idea
+.idea_modules
+
+# sbt specific
+.sbt
+dist/*
+target/
+lib_managed/
+src_managed/
+project/boot/
+project/plugins/project/
+
+# Scala-IDE specific
+.scala_dependencies
+.ensime
+.ensime_cache
+
+# test files
+/schema
+/request.json
+/docker.env
+
+# buildkite artifacts
+buildkite-script-*
+
+# VSCode specific
+.vscode/
+
+# git
+.git/
