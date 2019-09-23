@@ -19,7 +19,7 @@ impl<'a> MigrationCommand<'a> for ApplyMigrationCommand<'a> {
     fn execute<C, D>(&self, engine: &MigrationEngine<C, D>) -> CommandResult<Self::Output>
     where
         C: MigrationConnector<DatabaseMigration = D>,
-        D: DatabaseMigrationMarker + 'static,
+        D: DatabaseMigrationMarker + Send + Sync + 'static,
     {
         debug!("{:?}", self.input);
 
@@ -42,7 +42,7 @@ impl<'a> ApplyMigrationCommand<'a> {
     ) -> CommandResult<MigrationStepsResultOutput>
     where
         C: MigrationConnector<DatabaseMigration = D>,
-        D: DatabaseMigrationMarker + 'static,
+        D: DatabaseMigrationMarker + Send + Sync + 'static,
     {
         let connector = engine.connector();
         let migration_persistence = connector.migration_persistence();
@@ -59,7 +59,7 @@ impl<'a> ApplyMigrationCommand<'a> {
     fn handle_normal_migration<C, D>(&self, engine: &MigrationEngine<C, D>) -> CommandResult<MigrationStepsResultOutput>
     where
         C: MigrationConnector<DatabaseMigration = D>,
-        D: DatabaseMigrationMarker + 'static,
+        D: DatabaseMigrationMarker + Send + Sync + 'static,
     {
         let connector = engine.connector();
         let migration_persistence = connector.migration_persistence();
@@ -80,7 +80,7 @@ impl<'a> ApplyMigrationCommand<'a> {
     ) -> CommandResult<MigrationStepsResultOutput>
     where
         C: MigrationConnector<DatabaseMigration = D>,
-        D: DatabaseMigrationMarker + 'static,
+        D: DatabaseMigrationMarker + Send + Sync + 'static,
     {
         let connector = engine.connector();
         let migration_persistence = connector.migration_persistence();
@@ -100,18 +100,33 @@ impl<'a> ApplyMigrationCommand<'a> {
         migration.datamodel_steps = self.input.steps.clone();
         migration.database_migration = database_migration_json;
         migration.datamodel = next_datamodel.clone();
-        let saved_migration = migration_persistence.create(migration);
 
-        connector
-            .migration_applier()
-            .apply(&saved_migration, &database_migration)?;
+        let diagnostics = connector.destructive_changes_checker().check(&database_migration)?;
+
+        // We always force the migrations for now to preserve backwards-compatibility (i.e. never
+        // cancelling migrations). Once the lift CLI is ready, the `force` option will default to
+        // `false`.
+        match (diagnostics.has_warnings(), self.input.force.unwrap_or(true)) {
+            // We have no warnings, or the force flag is passed.
+            (false, _) | (true, true) => {
+                let saved_migration = migration_persistence.create(migration);
+
+                connector
+                    .migration_applier()
+                    .apply(&saved_migration, &database_migration)?;
+            }
+            // We have warnings, but no force flag was passed.
+            (true, false) => (),
+        }
+
+        let DestructiveChangeDiagnostics { warnings, errors } = diagnostics;
 
         Ok(MigrationStepsResultOutput {
             datamodel: datamodel::render(&next_datamodel).unwrap(),
             datamodel_steps: self.input.steps.clone(),
             database_steps: database_steps_json_pretty,
-            errors: Vec::new(),
-            warnings: Vec::new(),
+            errors,
+            warnings,
             general_errors: Vec::new(),
         })
     }

@@ -153,7 +153,10 @@ impl SqlMigrationConnector {
             conn: Arc::clone(&conn),
         });
 
-        let destructive_changes_checker = Arc::new(SqlDestructiveChangesChecker {});
+        let destructive_changes_checker = Arc::new(SqlDestructiveChangesChecker {
+            schema_name: schema_name.clone(),
+            database: Arc::clone(&conn),
+        });
 
         Self {
             url: url.to_string(),
@@ -180,21 +183,15 @@ impl MigrationConnector for SqlMigrationConnector {
     fn create_database(&self, db_name: &str) -> ConnectorResult<()> {
         match self.sql_family {
             SqlFamily::Postgres => {
-                self.database.query_raw(
-                    "",
-                    &format!("CREATE DATABASE \"{}\"", db_name),
-                    &[]
-                )?;
+                self.database
+                    .query_raw("", &format!("CREATE DATABASE \"{}\"", db_name), &[])?;
 
                 Ok(())
             }
             SqlFamily::Sqlite => Ok(()),
             SqlFamily::Mysql => {
-                self.database.query_raw(
-                    "",
-                    &format!("CREATE DATABASE `{}`", db_name),
-                    &[]
-                )?;
+                self.database
+                    .query_raw("", &format!("CREATE DATABASE `{}`", db_name), &[])?;
 
                 Ok(())
             }

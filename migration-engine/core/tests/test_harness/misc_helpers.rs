@@ -6,9 +6,9 @@ use migration_core::{
     parse_datamodel,
 };
 use prisma_query::connector::{MysqlParams, PostgresParams};
-use sql_schema_describer::{SqlSchemaDescriberBackend, SqlSchema};
 use sql_migration_connector::{migration_database::*, SqlFamily, SqlMigrationConnector};
-use std::{convert::TryFrom, sync::Arc, rc::Rc};
+use sql_schema_describer::{SqlSchema, SqlSchemaDescriberBackend};
+use std::{convert::TryFrom, rc::Rc, sync::Arc};
 use url::Url;
 
 pub const SCHEMA_NAME: &str = "migration-engine";
@@ -44,7 +44,7 @@ where
 
         let connector = match SqlMigrationConnector::postgres(&postgres_url(), true) {
             Ok(c) => c,
-            Err(e) => {
+            Err(_) => {
                 let url = Url::parse(&postgres_url()).unwrap();
                 let name_cmd = |name| format!("CREATE DATABASE \"{}\"", name);
 
@@ -69,9 +69,9 @@ where
     if !ignores.contains(&SqlFamily::Mysql) {
         println!("--------------- Testing with MySQL now ---------------");
 
-        let connector = match SqlMigrationConnector::mysql(&postgres_url(), true) {
+        let connector = match SqlMigrationConnector::mysql(&mysql_url(), true) {
             Ok(c) => c,
-            Err(e) => {
+            Err(_) => {
                 let url = Url::parse(&mysql_url()).unwrap();
 
                 let name_cmd = |name| format!("CREATE DATABASE `{}`", name);
@@ -174,11 +174,7 @@ where
 
     let conn = f(url).unwrap();
 
-    conn.execute_raw(
-        "",
-        &create_stmt(db_name),
-        &[]
-    );
+    conn.execute_raw("", &create_stmt(db_name), &[]).unwrap();
 }
 
 fn with_database<F, T, S>(url: Url, default_name: &str, root_path: &str, create_stmt: S, f: Rc<F>) -> T
