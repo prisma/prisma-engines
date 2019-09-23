@@ -23,7 +23,7 @@ use std::path::PathBuf;
 /// use std::thread;
 ///
 /// fn main() {
-///     let manager = PrismaConnectionManager::sqlite("db/test.db").unwrap();
+///     let manager = PrismaConnectionManager::sqlite(None, "db/test.db").unwrap();
 ///     let pool = r2d2::Pool::new(manager).unwrap();
 ///
 ///     for i in 0..10i32 {
