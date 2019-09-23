@@ -1,5 +1,7 @@
 #!/bin/bash
 
+MYSQL_ROOT_PASSWORD=prisma
+
 docker network create test-net
 docker run --name test-postgres --network test-net \
     -e POSTGRES_PASSWORD=prisma \
@@ -9,7 +11,7 @@ docker run --name test-postgres --network test-net \
 docker run --name test-mysql --network test-net \
     -e MYSQL_USER=prisma \
     -e MYSQL_DATABASE=prisma \
-    -e MYSQL_ROOT_PASSWORD=prisma \
+    -e MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD \
     -e MYSQL_PASSWORD=prisma -d mysql
 
 docker run -w /build --network test-net -v $BUILDKITE_BUILD_CHECKOUT_PATH:/build \
@@ -23,6 +25,7 @@ docker run -w /build --network test-net -v $BUILDKITE_BUILD_CHECKOUT_PATH:/build
     -e TEST_MYSQL_DB=prisma \
     -e TEST_MYSQL_USER=prisma \
     -e TEST_MYSQL_PASSWORD=prisma \
+    -e TEST_MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD \
     prismagraphql/rust-build:latest cargo test
 
 exit_code=$?
