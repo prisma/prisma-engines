@@ -92,11 +92,11 @@ impl DirectiveValidator<dml::Model> for ModelLevelUniqueValidator {
                     args.push(ast::Argument::new_string("name", &name));
                 }
                 args.push(ast::Argument::new_array(
-                    "fields",
+                    "",
                     index_def
                         .fields
                         .iter()
-                        .map(|f| ast::Value::StringValue(f.to_string(), ast::Span::empty()))
+                        .map(|f| ast::Value::ConstantValue(f.to_string(), ast::Span::empty()))
                         .collect(),
                 ));
 
