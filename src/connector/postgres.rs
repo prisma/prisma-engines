@@ -412,4 +412,14 @@ mod tests {
 
         res.unwrap();
     }
+
+    #[test]
+    fn postgres_params_from_url_should_capture_database_name() {
+        let url: Url = "postgresql://postgres:prisma@127.0.0.1:5432/pgress?schema=test_schema"
+            .parse()
+            .unwrap();
+        let params = PostgresParams::try_from(url).unwrap();
+        assert_eq!(params.dbname, "pgress");
+        assert_eq!(params.schema, "test_schema");
+    }
 }
