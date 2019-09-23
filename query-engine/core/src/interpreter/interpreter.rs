@@ -19,7 +19,6 @@ impl ExpressionResult {
     /// Wip impl of transforming results into an ID.
     /// todos:
     ///   - Lists are not really handled. Last element wins.
-    ///   - Not all result sets are handled.
     pub fn as_id(&self) -> Option<PrismaValue> {
         match self {
             Self::Query(ref result) => match result {
@@ -34,7 +33,7 @@ impl ExpressionResult {
                 _ => None,
             },
 
-            _ => unimplemented!(),
+            _ => None,
         }
     }
 }

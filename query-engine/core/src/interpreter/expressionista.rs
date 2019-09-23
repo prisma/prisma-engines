@@ -19,6 +19,7 @@ impl Expressionista {
         node: &NodeRef,
         mut parent_edges: Vec<EdgeRef>,
     ) -> InterpretationResult<Expression> {
+        println!("Building node {}", node.id());
         match graph.node_content(node).unwrap() {
             Node::Query(_) => Self::build_query_expression(graph, node, parent_edges),
             Node::Flow(_) => Self::build_flow_expression(graph, node, parent_edges.pop()),
@@ -32,6 +33,8 @@ impl Expressionista {
     ) -> InterpretationResult<Expression> {
         // Child edges are ordered, evaluation order is low to high in the graph, unless other rules override.
         let mut direct_children = graph.direct_child_pairs(&node);
+
+        println!("Direct children of {}: {:?}", node.id(), direct_children);
 
         // Find the positions of all result returning graph nodes.
         let mut result_positions: Vec<usize> = direct_children

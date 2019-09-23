@@ -1,5 +1,7 @@
-use super::{QueryExecutor, pipeline::QueryPipeline};
-use crate::{CoreResult, QueryInterpreter, QueryGraph, IrSerializer, Response, QuerySchemaRef, QueryDocument, QueryBuilder};
+use super::{pipeline::QueryPipeline, QueryExecutor};
+use crate::{
+    CoreResult, IrSerializer, QueryBuilder, QueryDocument, QueryGraph, QueryInterpreter, QuerySchemaRef, Response,
+};
 use connector::{Connector, TransactionLike};
 
 /// Central query executor and main entry point into the query core.

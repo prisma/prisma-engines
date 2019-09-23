@@ -106,8 +106,9 @@ pub struct DeleteManyRecords {
 
 #[derive(Debug, Clone)]
 pub struct ConnectRecords {
-    parent: GraphqlId, // or finders?
-    child: GraphqlId,
+    pub parent: Option<GraphqlId>,
+    pub child: Option<GraphqlId>,
+    pub relation_field: RelationFieldRef,
 }
 
 #[derive(Debug, Clone)]

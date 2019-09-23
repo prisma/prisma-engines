@@ -250,14 +250,19 @@ impl QueryGraph {
     ///
     /// Criteria for a direct child:
     /// - Every node that only has `parent` as their parent.
-    /// - In case of multiple parents, has `parent` as their parent and _all_ other parents are ancestors of `parent`.
+    /// - In case of multiple parents, has `parent` as their parent and _all_ other
+    ///   parents are strict ancestors of `parent`, meaning they are "higher up" in the graph.
     pub fn is_direct_child(&self, parent: &NodeRef, child: &NodeRef) -> bool {
         self.incoming_edges(child).into_iter().all(|edge| {
             let ancestor = self.edge_source(&edge);
 
+            println!("Ancestor {} || Parent {} ?", ancestor.id(), parent.id(),);
+
             if &ancestor != parent {
+                println!("{}", self.is_ancestor(&ancestor, parent));
                 self.is_ancestor(&ancestor, parent)
             } else {
+                println!("true");
                 true
             }
         })
@@ -292,6 +297,22 @@ impl QueryGraph {
             .collect()
     }
 
+    /// Returns all exclusive children of `node`.
+    /// An exclusive child has no other parents than `node`.
+    pub fn exclusive_child_pairs(&self, node: &NodeRef) -> Vec<(EdgeRef, NodeRef)> {
+        self.outgoing_edges(node)
+            .into_iter()
+            .filter_map(|edge| {
+                let target = self.edge_target(&edge);
+                if self.incoming_edges(&target).len() == 1 {
+                    Some((edge, target))
+                } else {
+                    None
+                }
+            })
+            .collect()
+    }
+
     /// Resolves and adds all source `NodeRef`s to the respective `EdgeRef`.
     pub fn zip_source_nodes(&self, edges: Vec<EdgeRef>) -> Vec<(EdgeRef, NodeRef)> {
         edges
@@ -306,9 +327,9 @@ impl QueryGraph {
     /// Checks if `ancestor` is in any of the ancestor nodes of `successor_node`.
     /// Determined by trying to reach `successor_node` from `ancestor`.
     pub fn is_ancestor(&self, ancestor: &NodeRef, successor_node: &NodeRef) -> bool {
-        self.direct_child_pairs(ancestor)
+        self.exclusive_child_pairs(ancestor)
             .into_iter()
-            .find(|(_, node)| node == node || self.is_ancestor(&node, &successor_node))
+            .find(|(_, child_node)| child_node == successor_node || self.is_ancestor(&child_node, &successor_node))
             .is_some()
     }
 

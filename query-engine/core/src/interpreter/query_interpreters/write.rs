@@ -45,8 +45,14 @@ fn delete_many(tx: &mut dyn TransactionLike, q: DeleteManyRecords) -> Interpreta
     Ok(QueryResult::Count(res))
 }
 
-fn connect(_tx: &mut dyn TransactionLike, _q: ConnectRecords) -> InterpretationResult<QueryResult> {
-    unimplemented!()
+fn connect(tx: &mut dyn TransactionLike, q: ConnectRecords) -> InterpretationResult<QueryResult> {
+    tx.connect(
+        q.relation_field,
+        &q.parent.expect("Expected parent record ID to be set for connect"),
+        &q.child.expect("Expected child record ID to be set for connect"),
+    )?;
+
+    Ok(QueryResult::Unit)
 }
 
 fn disconnect(_tx: &mut dyn TransactionLike, _q: DisconnectRecords) -> InterpretationResult<QueryResult> {

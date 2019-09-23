@@ -29,7 +29,6 @@ impl WriteQueryBuilder {
     /// Creates a create record query and adds it to the query graph, together with it's nested queries and companion read query.
     pub fn create_record(mut self, model: ModelRef, mut field: ParsedField) -> QueryBuilderResult<Self> {
         let id_field = model.fields().id();
-
         let data_argument = field.arguments.lookup("data").unwrap();
         let data_map: ParsedInputMap = data_argument.value.try_into()?;
         let create_node = self.create_record_node(Arc::clone(&model), data_map)?;
@@ -180,7 +179,6 @@ impl WriteQueryBuilder {
         });
 
         let initial_read_node = self.graph.create_node(Query::Read(initial_read_query));
-
         let create_node = self.create_record_node(Arc::clone(&model), create_argument.value.try_into()?)?;
         let update_node = self.update_record_node(
             Some(record_finder),
@@ -296,13 +294,28 @@ impl WriteQueryBuilder {
         };
 
         let node = self.graph.create_node(Query::Write(WriteQuery::UpdateRecord(ur)));
-
         for (relation_field, data_map) in update_args.nested {
             self.connect_nested_query(&node, relation_field, data_map)?;
         }
 
         Ok(node)
     }
+
+    // Child
+    // fn connect_records_node(
+    //     &mut self,
+    //     parent: &NodeRef,
+    //     child: &NodeRef,
+    //     relation_field: RelationFieldRef,
+    // ) -> QueryBuilderResult<NodeRef> {
+    //     let query = ConnectRecords {
+    //         None,
+    //         None,
+    //         relation_field,
+    //     };
+
+    //     Ok(self.graph.create_node(Node::Query(Query::Write(query))))
+    // }
 
     fn connect_nested_query(
         &mut self,
@@ -316,7 +329,7 @@ impl WriteQueryBuilder {
             match field_name.as_str() {
                 "create" => self.connect_nested_create(parent, &relation_field, value, &model)?,
                 "update" => self.connect_nested_update(parent, &relation_field, value, &model)?,
-
+                "connect" => self.connect_nested_connect(parent, &relation_field, value, &model)?,
                 // "delete" => self
                 //     .nested_delete(value, &model, &relation_field)?
                 //     .into_iter()
@@ -340,35 +353,9 @@ impl WriteQueryBuilder {
         model: &ModelRef,
     ) -> QueryBuilderResult<()> {
         for value in Self::coerce_vec(value) {
-            let nested_node = self.create_record_node(Arc::clone(model), value.try_into()?)?;
-            let parent_query = self.graph.node_content(parent).unwrap();
+            let child = self.create_record_node(Arc::clone(model), value.try_into()?)?;
             let relation_field_name = relation_field.name.clone();
-
-            // Detect if a flip is necessary
-            let (parent, child) = if let Node::Query(Query::Write(WriteQuery::CreateRecord(_))) = parent_query {
-                if relation_field.relation_is_inlined_in_parent() {
-                    // Actions required to do a flip:
-                    // 1. Remove all edges from the parent to it's parents, and rewire them to the child.
-                    // 2. Create an edge from child -> parent.
-                    // Todo: Warning, this destroys the ordering of edges, which can lead to incorrect results being read.
-                    //       Consider how the underlying graph can handle that.
-                    let parent_edges = self.graph.incoming_edges(parent);
-                    for parent_edge in parent_edges {
-                        let parent_of_parent_node = self.graph.edge_source(&parent_edge);
-                        let edge_content = self.graph.remove_edge(parent_edge).unwrap();
-
-                        // Todo: Warning, this assumes the edge contents can also be "flipped".
-                        self.graph
-                            .create_edge(&parent_of_parent_node, &nested_node, edge_content);
-                    }
-
-                    (&nested_node, parent)
-                } else {
-                    (parent, &nested_node)
-                }
-            } else {
-                (parent, &nested_node)
-            };
+            let (parent, child) = self.flip_nodes(parent, &child, relation_field);
 
             self.graph.create_edge(
                 parent,
@@ -382,8 +369,10 @@ impl WriteQueryBuilder {
                 })),
             );
 
-            // Detect if a connect is necessary?
-            // ConnectRecords
+            // Detect if a connect is necessary between the nodes.
+            if relation_field.is_list && !relation_field.relation_is_inlined_in_parent() {
+                unimplemented!()
+            }
         }
 
         Ok(())
@@ -457,6 +446,123 @@ impl WriteQueryBuilder {
         }
 
         Ok(())
+    }
+
+    pub fn connect_nested_connect(
+        &mut self,
+        parent: &NodeRef,
+        relation_field: &RelationFieldRef,
+        value: ParsedInputValue,
+        model: &ModelRef,
+    ) -> QueryBuilderResult<()> {
+        for value in Self::coerce_vec(value) {
+            let record_finder = utils::extract_record_finder(value, &model)?;
+            let child_read_query = Self::id_read_query_infallible(&model, record_finder);
+            let child_node = self.graph.create_node(child_read_query);
+            let (parent, child) = self.flip_nodes(parent, &child_node, relation_field);
+            let relation_field_name = relation_field.name.clone();
+
+            // Edge from parent to child (e.g. Create to ReadQuery).
+            self.graph.create_edge(
+                parent,
+                child,
+                QueryGraphDependency::ParentId(Box::new(|mut child_node, parent_id| {
+                    if let Node::Query(Query::Write(ref mut wq)) = child_node {
+                        wq.inject_non_list_arg(relation_field_name, parent_id.unwrap())
+                    }
+
+                    child_node
+                })),
+            );
+
+            let connect = WriteQuery::ConnectRecords(ConnectRecords {
+                parent: None,
+                child: None,
+                relation_field: Arc::clone(relation_field),
+            });
+
+            let connect_node = self.graph.create_node(Query::Write(connect));
+
+            // Edge from parent to connect.
+            self.graph.create_edge(
+                parent,
+                &connect_node,
+                QueryGraphDependency::ParentId(Box::new(|mut node, parent_id| {
+                    if let Node::Query(Query::Write(WriteQuery::ConnectRecords(ref mut c))) = node {
+                        let parent_id = parent_id.expect("Required parent Id field to be present for connect query");
+                        c.parent = Some(parent_id.try_into().unwrap());
+                    }
+
+                    node
+                })),
+            );
+
+            // Edge from child to connect.
+            self.graph.create_edge(
+                &child,
+                &connect_node,
+                QueryGraphDependency::ParentId(Box::new(|mut node, parent_id| {
+                    if let Node::Query(Query::Write(WriteQuery::ConnectRecords(ref mut c))) = node {
+                        let child_id = parent_id.expect("Required child Id field to be present for connect query");
+                        c.child = Some(child_id.try_into().unwrap());
+                    }
+
+                    node
+                })),
+            );
+        }
+
+        Ok(())
+    }
+
+    /// Produces a non-failing ReadQuery for a given RecordFinder by using
+    /// a ManyRecordsQuery instead of a find one.
+    fn id_read_query_infallible(model: &ModelRef, record_finder: RecordFinder) -> Query {
+        let selected_fields: SelectedFields = model.fields().id().into();
+        let read_query = ReadQuery::ManyRecordsQuery(ManyRecordsQuery {
+            name: "".into(),
+            alias: None,
+            model: Arc::clone(&model),
+            args: record_finder.into(),
+            selected_fields,
+            nested: vec![],
+            selection_order: vec![],
+        });
+
+        Query::Read(read_query)
+    }
+
+    /// Detects and performs a flip of `parent` and `child`, if necessary.
+    /// If a flip is performed: Removes all edges from the parent to it's parents, and rewire them to the child.
+    /// Note: Any edge existing between parent and child are NOT FLIPPED here.
+    ///
+    /// Returns (parent `NodeRef`, child `NodeRef`).
+    fn flip_nodes<'a>(
+        &mut self,
+        parent: &'a NodeRef,
+        child: &'a NodeRef,
+        relation_field: &RelationFieldRef,
+    ) -> (&'a NodeRef, &'a NodeRef) {
+        let parent_node_content = self.graph.node_content(parent).unwrap();
+
+        if let Node::Query(Query::Write(WriteQuery::CreateRecord(_))) = parent_node_content {
+            if relation_field.relation_is_inlined_in_parent() {
+                let parent_edges = self.graph.incoming_edges(parent);
+                for parent_edge in parent_edges {
+                    let parent_of_parent_node = self.graph.edge_source(&parent_edge);
+                    let edge_content = self.graph.remove_edge(parent_edge).unwrap();
+
+                    // Todo: Warning, this assumes the edge contents can also be "flipped".
+                    self.graph.create_edge(&parent_of_parent_node, child, edge_content);
+                }
+
+                (child, parent)
+            } else {
+                (parent, child)
+            }
+        } else {
+            (parent, child)
+        }
     }
 
     // pub fn nested_delete(

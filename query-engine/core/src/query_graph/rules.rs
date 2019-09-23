@@ -8,7 +8,7 @@ pub fn after_edge_creation(graph: &QueryGraph, edge: &EdgeRef) -> QueryGraphResu
     if_flow_edge_rules(graph, edge).and_then(|_| only_allow_related_parents_edges(graph, edge))
 }
 
-/// Only allow `Then` and `Else`. Disallow more than 2 edges.
+/// For an If flow node: Only allow `Then` and `Else` edges. Disallow more than 2 edges.
 fn if_flow_edge_rules(graph: &QueryGraph, edge: &EdgeRef) -> QueryGraphResult<()> {
     let source_node = graph.edge_source(edge);
     let source_node_content = graph.node_content(&source_node).unwrap();
