@@ -80,6 +80,7 @@ impl SqlSchemaDescriber {
             FROM information_schema.columns
             WHERE table_schema = ? AND table_name = ?
             ORDER BY column_name";
+
         let rows = self
             .conn
             .query_raw(sql, schema, &[schema.into(), table.into()])
@@ -88,6 +89,7 @@ impl SqlSchemaDescriber {
             .into_iter()
             .map(|col| {
                 debug!("Got column: {:?}", col);
+
                 let data_type = col.get("data_type").and_then(|x| x.to_string()).expect("get data_type");
                 let is_nullable = col
                     .get("is_nullable")

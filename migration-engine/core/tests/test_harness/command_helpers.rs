@@ -1,4 +1,4 @@
-use super::introspect_database;
+use super::{introspect_database, TestSetup};
 use migration_connector::*;
 use migration_core::{api::GenericApi, commands::*};
 use sql_migration_connector::SqlMigrationStep;
@@ -25,6 +25,7 @@ pub fn infer_and_apply(api: &dyn GenericApi, datamodel: &str) -> InferAndApplyOu
 }
 
 pub fn infer_and_apply_with_migration_id(
+    test_setup: &TestSetup,
     api: &dyn GenericApi,
     datamodel: &str,
     migration_id: &str,
@@ -37,7 +38,7 @@ pub fn infer_and_apply_with_migration_id(
 
     let steps = run_infer_command(api, input);
 
-    apply_migration(api, steps, migration_id)
+    apply_migration(test_setup, api, steps, migration_id)
 }
 
 pub fn run_infer_command(api: &dyn GenericApi, input: InferMigrationStepsInput) -> Vec<MigrationStep> {
@@ -51,7 +52,12 @@ pub fn run_infer_command(api: &dyn GenericApi, input: InferMigrationStepsInput) 
     output.datamodel_steps
 }
 
-pub fn apply_migration(api: &dyn GenericApi, steps: Vec<MigrationStep>, migration_id: &str) -> InferAndApplyOutput {
+pub fn apply_migration(
+    test_setup: &TestSetup,
+    api: &dyn GenericApi,
+    steps: Vec<MigrationStep>,
+    migration_id: &str,
+) -> InferAndApplyOutput {
     let input = ApplyMigrationInput {
         migration_id: migration_id.to_string(),
         steps: steps,
@@ -69,14 +75,14 @@ pub fn apply_migration(api: &dyn GenericApi, steps: Vec<MigrationStep>, migratio
     );
 
     InferAndApplyOutput {
-        sql_schema: introspect_database(api),
+        sql_schema: introspect_database(test_setup, api),
         migration_output,
     }
 }
 
-pub fn unapply_migration(api: &dyn GenericApi) -> SqlSchema {
+pub fn unapply_migration(test_setup: &TestSetup, api: &dyn GenericApi) -> SqlSchema {
     let input = UnapplyMigrationInput {};
     let _ = api.unapply_migration(&input);
 
-    introspect_database(api)
+    introspect_database(test_setup, api)
 }

@@ -18,6 +18,14 @@ pub struct TestSetup {
     pub database: Arc<dyn MigrationDatabase + Send + Sync + 'static>,
 }
 
+impl TestSetup {
+    pub fn database_wrapper(&self) -> MigrationDatabaseWrapper {
+        MigrationDatabaseWrapper {
+            database: Arc::clone(&self.database),
+        }
+    }
+}
+
 pub fn parse(datamodel_string: &str) -> datamodel::Datamodel {
     parse_datamodel(datamodel_string).unwrap()
 }
@@ -42,7 +50,7 @@ where
 fn mysql_migration_connector(database_url: &str) -> SqlMigrationConnector {
     match SqlMigrationConnector::mysql(database_url, true) {
         Ok(c) => c,
-        Err(e) => {
+        Err(_) => {
             let url = Url::parse(database_url).unwrap();
 
             let name_cmd = |name| format!("CREATE DATABASE `{}`", name);
@@ -153,20 +161,12 @@ where
     api
 }
 
-pub fn introspect_database(api: &dyn GenericApi) -> SqlSchema {
+pub fn introspect_database(test_setup: &TestSetup, api: &dyn GenericApi) -> SqlSchema {
+    let db = Arc::new(test_setup.database_wrapper());
     let inspector: Box<dyn SqlSchemaDescriberBackend> = match api.connector_type() {
-        "postgresql" => {
-            let db = Arc::new(database_wrapper(SqlFamily::Postgres, &postgres_url()));
-            Box::new(sql_schema_describer::postgres::SqlSchemaDescriber::new(db))
-        }
-        "sqlite" => {
-            let db = Arc::new(database_wrapper(SqlFamily::Sqlite, &sqlite_test_file()));
-            Box::new(sql_schema_describer::sqlite::SqlSchemaDescriber::new(db))
-        }
-        "mysql" => {
-            let db = Arc::new(database_wrapper(SqlFamily::Mysql, &mysql_url()));
-            Box::new(sql_schema_describer::mysql::SqlSchemaDescriber::new(db))
-        }
+        "postgresql" => Box::new(sql_schema_describer::postgres::SqlSchemaDescriber::new(db)),
+        "sqlite" => Box::new(sql_schema_describer::sqlite::SqlSchemaDescriber::new(db)),
+        "mysql" => Box::new(sql_schema_describer::mysql::SqlSchemaDescriber::new(db)),
         _ => unimplemented!(),
     };
 
