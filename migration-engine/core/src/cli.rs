@@ -2,7 +2,7 @@ use clap::ArgMatches;
 use failure::Fail;
 use itertools::Itertools;
 use migration_connector::*;
-use sql_migration_connector::SqlMigrationConnector;
+use sql_migration_connector::{SqlError, SqlMigrationConnector};
 use std::collections::HashMap;
 use url::Url;
 
@@ -91,19 +91,13 @@ fn create_conn(
         "postgresql" => {
             let db_name = fetch_db_name(&url, "postgres");
 
-            if admin_mode {
-                url.set_path("postgres");
+            let connector = if admin_mode {
+                create_postgres_admin_conn(url)?
+            } else {
+                SqlMigrationConnector::postgres(url.as_str(), false)?
+            };
 
-                let mut params: HashMap<String, String> = url.query_pairs().into_owned().collect();
-                params.remove("schema");
-
-                let params = params.into_iter().map(|(k, v)| format!("{}={}", k, v)).join("&");
-                url.set_query(Some(&params));
-            }
-
-            let inner = SqlMigrationConnector::postgres(url.as_str(), false)?;
-
-            Ok((db_name, Box::new(inner)))
+            Ok((db_name, Box::new(connector)))
         }
         "mysql" => {
             let db_name = fetch_db_name(&url, "mysql");
@@ -117,6 +111,37 @@ fn create_conn(
         }
         x => unimplemented!("Connector {} is not supported yet", x),
     }
+}
+
+/// Try to connect as an admin to a postgres database. We try to pick a default database from which
+/// we can create another database.
+fn create_postgres_admin_conn(mut url: Url) -> crate::Result<SqlMigrationConnector> {
+    let candidate_default_databases = &["postgres", "template1"];
+
+    let mut params: HashMap<String, String> = url.query_pairs().into_owned().collect();
+    params.remove("schema");
+    let params = params.into_iter().map(|(k, v)| format!("{}={}", k, v)).join("&");
+    url.set_query(Some(&params));
+
+    let inner = candidate_default_databases
+        .iter()
+        .filter_map(|database_name| {
+            url.set_path(database_name);
+            match SqlMigrationConnector::postgres(url.as_str(), false) {
+                // If the database does not exist, try the next one.
+                Err(SqlError::DatabaseDoesNotExist { .. }) => None,
+                // If the outcome is anything else, use this.
+                other_outcome => Some(other_outcome),
+            }
+        })
+        .next()
+        .ok_or_else(|| {
+            ConnectorError::Generic(failure::format_err!(
+                "Prisma could not connect to a default database (`postgres` or `template1`), it cannot create the specified database."
+            ))
+        })??;
+
+    Ok(inner)
 }
 
 #[cfg(test)]
@@ -267,7 +292,10 @@ mod tests {
 
         if let Ok(()) = res {
             let res = with_cli(vec!["cli", "--can_connect_to_database"], |matches| {
-                assert_eq!(Ok(String::from("Connection successful")), super::run(&matches, dbg!(&url)));
+                assert_eq!(
+                    Ok(String::from("Connection successful")),
+                    super::run(&matches, dbg!(&url))
+                );
             });
 
             {
