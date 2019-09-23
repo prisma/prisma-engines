@@ -283,4 +283,13 @@ mod tests {
             res.unwrap();
         }
     }
+
+    #[test]
+    fn test_fetch_db_name() {
+        let url: url::Url = "postgresql://postgres:prisma@127.0.0.1:5432/pgres?schema=test_schema"
+            .parse()
+            .unwrap();
+        let db_name = super::fetch_db_name(&url, "postgres");
+        assert_eq!(db_name, "pgres");
+    }
 }
