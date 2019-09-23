@@ -103,7 +103,10 @@ impl<'a> ApplyMigrationCommand<'a> {
 
         let diagnostics = connector.destructive_changes_checker().check(&database_migration)?;
 
-        match (diagnostics.has_warnings(), self.input.force.unwrap_or(false)) {
+        // We always force the migrations for now to preserve backwards-compatibility (i.e. never
+        // cancelling migrations). Once the lift CLI is ready, the `force` option will default to
+        // `false`.
+        match (diagnostics.has_warnings(), self.input.force.unwrap_or(true)) {
             // We have no warnings, or the force flag is passed.
             (false, _) | (true, true) => {
                 let saved_migration = migration_persistence.create(migration);

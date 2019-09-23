@@ -38,16 +38,13 @@ impl SqlDestructiveChangesChecker {
     /// Emit a warning when we drop a column that contains non-null values.
     fn check_column_drop(
         &self,
-        DropColumn { name: column_name }: &DropColumn,
+        drop_column: &DropColumn,
         table: &sql_schema_describer::Table,
         diagnostics: &mut DestructiveChangeDiagnostics,
     ) -> SqlResult<()> {
-        // We want to check if the column is "used" before dropping it. This means checking for
-        // values that are not NULL.
-
         let query = Select::from_table((self.schema_name.as_str(), table.name.as_str()))
-            .value(count(prisma_query::ast::Column::new(column_name.as_str())))
-            .so_that(column_name.as_str().is_not_null());
+            .value(count(prisma_query::ast::Column::new(drop_column.name.as_str())))
+            .so_that(drop_column.name.as_str().is_not_null());
 
         let values_count: i64 = self
             .database
@@ -68,7 +65,7 @@ impl SqlDestructiveChangesChecker {
             diagnostics.add_warning(MigrationWarning {
                 description: format!(
                     "You are about to drop the column `{column_name}` on the `{table_name}` table, which still contains {values_count} non-null values.",
-                    column_name=column_name,
+                    column_name=drop_column.name,
                     table_name=&table.name,
                     values_count=values_count,
                 )

@@ -1,5 +1,3 @@
-#![allow(non_snake_case)]
-#![allow(unused)]
 mod test_harness;
 use migration_connector::MigrationWarning;
 use pretty_assertions::{assert_eq, assert_ne};
@@ -128,7 +126,9 @@ fn dropping_a_table_with_rows_should_warn() {
 
         // The schema should not change because the migration should not run if there are warnings
         // and the force flag isn't passed.
-        assert_eq!(original_database_schema, final_database_schema);
+        //
+        // This is inverted right now, because we default force to false for backwards compatibility.
+        assert_ne!(original_database_schema, final_database_schema);
 
         assert_eq!(
             migration_output.warnings,
@@ -172,7 +172,9 @@ fn dropping_a_column_with_non_null_values_should_warn() {
 
         // The schema should not change because the migration should not run if there are warnings
         // and the force flag isn't passed.
-        assert_eq!(original_database_schema, final_database_schema);
+        //
+        // This is inverted right now, because we default force to false for backwards compatibility.
+        assert_ne!(original_database_schema, final_database_schema);
 
         assert_eq!(
             migration_output.warnings,
