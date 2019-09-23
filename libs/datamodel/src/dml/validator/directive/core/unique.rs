@@ -1,6 +1,5 @@
 use crate::dml::validator::directive::{Args, DirectiveValidator, Error};
 use crate::{ast, dml, IndexDefinition};
-use itertools::Itertools;
 
 /// Prismas builtin `@unique` directive.
 pub struct UniqueDirectiveValidator {}
@@ -82,7 +81,28 @@ impl DirectiveValidator<dml::Model> for ModelLevelUniqueValidator {
         Ok(())
     }
 
-    fn serialize(&self, field: &dml::Model, _datamodel: &dml::Datamodel) -> Result<Option<ast::Directive>, Error> {
-        unimplemented!()
+    fn serialize(&self, model: &dml::Model, _datamodel: &dml::Datamodel) -> Result<Option<ast::Directive>, Error> {
+        let directives: Vec<ast::Directive> = model
+            .indexes
+            .iter()
+            .map(|index_def| {
+                let mut args = Vec::new();
+
+                if let Some(name) = &index_def.name {
+                    args.push(ast::Argument::new_string("name", &name));
+                }
+                args.push(ast::Argument::new_array(
+                    "fields",
+                    index_def
+                        .fields
+                        .iter()
+                        .map(|f| ast::Value::StringValue(f.to_string(), ast::Span::empty()))
+                        .collect(),
+                ));
+
+                ast::Directive::new(self.directive_name(), args)
+            })
+            .collect();
+        Ok(directives.first().cloned())
     }
 }

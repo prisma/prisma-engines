@@ -1,5 +1,6 @@
-use crate::common::*;
 use datamodel::{ast::Span, common::PrismaType, dml, errors::*, IndexDefinition};
+
+use crate::common::*;
 
 #[test]
 fn basic_unique_index_must_work() {
