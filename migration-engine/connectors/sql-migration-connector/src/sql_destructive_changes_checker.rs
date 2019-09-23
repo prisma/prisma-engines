@@ -83,7 +83,7 @@ impl DestructiveChangesChecker<SqlMigration> for SqlDestructiveChangesChecker {
     fn check(&self, database_migration: &SqlMigration) -> ConnectorResult<DestructiveChangeDiagnostics> {
         let mut diagnostics = DestructiveChangeDiagnostics::new();
 
-        for step in &database_migration.steps {
+        for step in &database_migration.original_steps {
             match step {
                 SqlMigrationStep::AlterTable(alter_table) => {
                     alter_table

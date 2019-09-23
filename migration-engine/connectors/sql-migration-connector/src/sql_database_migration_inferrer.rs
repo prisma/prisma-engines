@@ -43,13 +43,13 @@ fn infer(
     schema_name: &str,
     sql_family: SqlFamily,
 ) -> ConnectorResult<SqlMigration> {
-    let steps = infer_database_migration_steps_and_fix(
+    let (original_steps, corrected_steps) = infer_database_migration_steps_and_fix(
         &current_database_schema,
         &expected_database_schema,
         &schema_name,
         sql_family,
     )?;
-    let rollback = infer_database_migration_steps_and_fix(
+    let (_, rollback) = infer_database_migration_steps_and_fix(
         &expected_database_schema,
         &current_database_schema,
         &schema_name,
@@ -58,7 +58,8 @@ fn infer(
     Ok(SqlMigration {
         before: current_database_schema.clone(),
         after: expected_database_schema.clone(),
-        steps,
+        original_steps,
+        corrected_steps,
         rollback,
     })
 }
@@ -68,16 +69,18 @@ fn infer_database_migration_steps_and_fix(
     to: &SqlSchema,
     schema_name: &str,
     sql_family: SqlFamily,
-) -> SqlResult<Vec<SqlMigrationStep>> {
+) -> SqlResult<(Vec<SqlMigrationStep>, Vec<SqlMigrationStep>)> {
     let diff: DatabaseSchemaDiff = DatabaseSchemaDiffer::diff(&from, &to);
     let is_sqlite = sql_family == SqlFamily::Sqlite;
 
-    if is_sqlite {
-        fix_stupid_sqlite(diff, &from, &to, &schema_name)
+    let corrected_steps = if is_sqlite {
+        fix_stupid_sqlite(diff, &from, &to, &schema_name)?
     } else {
         let steps = delay_foreign_key_creation(diff);
-        fix_id_column_type_change(&from, &to, schema_name, steps)
-    }
+        fix_id_column_type_change(&from, &to, schema_name, steps)?
+    };
+
+    Ok((DatabaseSchemaDiffer::diff(&from, &to).into_steps(), corrected_steps))
 }
 
 fn fix_id_column_type_change(

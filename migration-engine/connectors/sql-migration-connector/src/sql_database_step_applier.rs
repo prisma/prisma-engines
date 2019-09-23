@@ -13,7 +13,7 @@ pub struct SqlDatabaseStepApplier {
 #[allow(unused, dead_code)]
 impl DatabaseMigrationStepApplier<SqlMigration> for SqlDatabaseStepApplier {
     fn apply_step(&self, database_migration: &SqlMigration, index: usize) -> ConnectorResult<bool> {
-        Ok(self.apply_next_step(&database_migration.steps, index)?)
+        Ok(self.apply_next_step(&database_migration.corrected_steps, index)?)
     }
 
     fn unapply_step(&self, database_migration: &SqlMigration, index: usize) -> ConnectorResult<bool> {
@@ -56,7 +56,7 @@ fn render_steps_pretty(
     schema_name: &str,
 ) -> ConnectorResult<serde_json::Value> {
     let jsons = database_migration
-        .steps
+        .corrected_steps
         .iter()
         .map(|step| {
             let cloned = step.clone();

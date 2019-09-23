@@ -183,21 +183,15 @@ impl MigrationConnector for SqlMigrationConnector {
     fn create_database(&self, db_name: &str) -> ConnectorResult<()> {
         match self.sql_family {
             SqlFamily::Postgres => {
-                self.database.query_raw(
-                    "",
-                    &format!("CREATE DATABASE \"{}\"", db_name),
-                    &[]
-                )?;
+                self.database
+                    .query_raw("", &format!("CREATE DATABASE \"{}\"", db_name), &[])?;
 
                 Ok(())
             }
             SqlFamily::Sqlite => Ok(()),
             SqlFamily::Mysql => {
-                self.database.query_raw(
-                    "",
-                    &format!("CREATE DATABASE `{}`", db_name),
-                    &[]
-                )?;
+                self.database
+                    .query_raw("", &format!("CREATE DATABASE `{}`", db_name), &[])?;
 
                 Ok(())
             }
