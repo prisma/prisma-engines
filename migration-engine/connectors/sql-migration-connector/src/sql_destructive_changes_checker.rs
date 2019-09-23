@@ -4,7 +4,6 @@ use crate::{
 };
 use migration_connector::*;
 use prisma_query::ast::*;
-use sql_schema_describer::ColumnArity;
 use std::sync::Arc;
 
 pub struct SqlDestructiveChangesChecker {
@@ -36,44 +35,19 @@ impl SqlDestructiveChangesChecker {
         Ok(())
     }
 
-    /// Emit a warning when we drop a column that contains non-null, non-default values.
+    /// Emit a warning when we drop a column that contains non-null values.
     fn check_column_drop(
         &self,
         DropColumn { name: column_name }: &DropColumn,
         table: &sql_schema_describer::Table,
         diagnostics: &mut DestructiveChangeDiagnostics,
     ) -> SqlResult<()> {
-        let column_info = table
-            .columns
-            .iter()
-            .find(|column| column.name == *column_name)
-            .ok_or_else(|| SqlError::UnknownColumnDropped {
-                column_name: column_name.to_owned(),
-            })?;
-
         // We want to check if the column is "used" before dropping it. This means checking for
-        // values that are not the default value or NULL.
-        //
-        // PROBLEM: are NULL and default (non-null) value semantically different for a column that
-        // is nullable with a default?
-
-        let mut condition = prisma_query::ast::ConditionTree::default();
-
-        // When the column is nullable, we need to check for non-null values.
-        if let ColumnArity::Nullable = column_info.arity {
-            condition = condition.and(column_name.as_str().is_not_null());
-        };
-
-        // When the column has a default value, we need to check for values different from the
-        // default.
-        if let Some(default_value) = &column_info.default {
-            // FIXME: condition = condition.and(column_name.as_str().not_equals(cast(default_value.as_str(), column_info.tpe.raw)))
-            condition = condition.and(column_name.as_str().not_equals(default_value.as_str()));
-        };
+        // values that are not NULL.
 
         let query = Select::from_table((self.schema_name.as_str(), table.name.as_str()))
             .value(count(prisma_query::ast::Column::new(column_name.as_str())))
-            .so_that(condition);
+            .so_that(column_name.as_str().is_not_null());
 
         let values_count: i64 = self
             .database
@@ -93,7 +67,7 @@ impl SqlDestructiveChangesChecker {
         if values_count > 0 {
             diagnostics.add_warning(MigrationWarning {
                 description: format!(
-                    "You are about to drop the column `{column_name}` on the `{table_name}` table, which still contains {values_count} non-null, non-default values.",
+                    "You are about to drop the column `{column_name}` on the `{table_name}` table, which still contains {values_count} non-null values.",
                     column_name=column_name,
                     table_name=&table.name,
                     values_count=values_count,

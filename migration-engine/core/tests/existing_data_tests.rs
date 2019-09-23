@@ -177,7 +177,7 @@ fn dropping_a_column_with_non_null_values_should_warn() {
         assert_eq!(
             migration_output.warnings,
             &[MigrationWarning {
-                description: "You are about to drop the column `puppiesCount` on the `Test` table, which still contains 2 non-null, non-default values.".to_owned(),
+                description: "You are about to drop the column `puppiesCount` on the `Test` table, which still contains 2 non-null values.".to_owned(),
             }]
         );
     });
