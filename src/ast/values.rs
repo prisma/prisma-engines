@@ -58,17 +58,21 @@ impl<'a> fmt::Display for ParameterizedValue<'a> {
             ParameterizedValue::Null => write!(f, "null"),
             ParameterizedValue::Integer(val) => write!(f, "{}", val),
             ParameterizedValue::Real(val) => write!(f, "{}", val),
-            ParameterizedValue::Text(val) => write!(f, "{}", val),
+            ParameterizedValue::Text(val) => write!(f, "\"{}\"", val),
             ParameterizedValue::Boolean(val) => write!(f, "{}", val),
-            ParameterizedValue::Char(val) => write!(f, "{}", val),
+            ParameterizedValue::Char(val) => write!(f, "'{}'", val),
             #[cfg(feature = "array")]
             ParameterizedValue::Array(vals) => {
+                let len = vals.len();
+
                 write!(f, "[")?;
+                for (i, val) in vals.iter().enumerate() {
+                    write!(f, "{}", val)?;
 
-                for val in vals.iter() {
-                    write!(f, "{},", val)?;
+                    if i < (len - 1) {
+                        write!(f, ",")?;
+                    }
                 }
-
                 write!(f, "]")
             }
             #[cfg(feature = "json-1")]
