@@ -232,8 +232,10 @@ impl Queryable for PostgreSql {
     }
 
     fn raw_cmd(&mut self, cmd: &str) -> crate::Result<()> {
-        self.client.simple_query(cmd)?;
-        Ok(())
+        metrics::query("postgres.raw_cmd", cmd, &[], || {
+            self.client.simple_query(cmd)?;
+            Ok(())
+        })
     }
 }
 

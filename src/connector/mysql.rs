@@ -192,8 +192,10 @@ impl Queryable for Mysql {
     }
 
     fn raw_cmd(&mut self, cmd: &str) -> crate::Result<()> {
-        self.client.query(cmd)?;
-        Ok(())
+        metrics::query("mysql.raw_cmd", cmd, &[], || {
+            self.client.query(cmd)?;
+            Ok(())
+        })
     }
 }
 

@@ -173,8 +173,10 @@ impl Queryable for Sqlite {
     }
 
     fn raw_cmd(&mut self, cmd: &str) -> crate::Result<()> {
-        self.client.execute_batch(cmd)?;
-        Ok(())
+        metrics::query("sqlite.raw_cmd", cmd, &[], || {
+            self.client.execute_batch(cmd)?;
+            Ok(())
+        })
     }
 }
 
