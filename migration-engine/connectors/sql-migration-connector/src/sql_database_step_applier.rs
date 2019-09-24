@@ -1,5 +1,4 @@
 use crate::*;
-use migration_connector::*;
 use sql_renderer::SqlRenderer;
 use sql_schema_describer::*;
 use std::sync::Arc;

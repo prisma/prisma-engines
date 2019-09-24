@@ -127,6 +127,10 @@ impl Model {
     pub fn is_pure_relation_model(&self) -> bool {
         self.is_relation_model() && self.fields.len() == 2
     }
+
+    pub fn add_index(&mut self, index: IndexDefinition) {
+        self.indexes.push(index)
+    }
 }
 
 impl WithName for Model {

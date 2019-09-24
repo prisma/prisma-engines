@@ -13,7 +13,7 @@ pub use destructive_changes_checker::*;
 pub use error::*;
 pub use migration_applier::*;
 pub use migration_persistence::*;
-pub use steps::*;
+pub use steps::MigrationStep;
 
 use std::fmt::Debug;
 use std::sync::Arc;

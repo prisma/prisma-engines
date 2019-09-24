@@ -28,6 +28,7 @@ impl DataModelCalculator for DataModelCalculatorImpl {
             MigrationStep::DeleteField(x) => apply_delete_field(&mut result, x),
             MigrationStep::UpdateField(x) => apply_update_field(&mut result, x),
             MigrationStep::CreateField(x) => apply_create_field(&mut result, x),
+            MigrationStep::CreateIndex(x) => apply_create_index(&mut result, x),
         });
         result
     }
@@ -154,4 +155,31 @@ fn apply_create_field(data_model: &mut Datamodel, step: &CreateField) {
     field.scalar_list_strategy = step.scalar_list;
 
     model.add_field(field);
+}
+
+fn apply_create_index(data_model: &mut Datamodel, step: &CreateIndex) {
+    let model = data_model.find_model_mut(&step.model).expect(&format!(
+        "The model {} does not exist in this Datamodel. It is not possible to create an index in it.",
+        step.model
+    ));
+
+    match model
+        .indexes
+        .iter()
+        .find(|index| index.name == step.name && index.is_unique == step.is_unique && index.fields == step.fields)
+    {
+        Some(_) => panic!(
+            "The index {:?} on fields ({:?}) of model {} already exists in this Datamodel. It is not possible to create it once more.",
+            step.name, step.fields, model.name,
+        ),
+        None => {
+            let index = IndexDefinition {
+                name: step.name.clone(),
+                fields: step.fields.clone(),
+                is_unique: step.is_unique,
+            };
+
+            model.add_index(index)
+        }
+    }
 }
