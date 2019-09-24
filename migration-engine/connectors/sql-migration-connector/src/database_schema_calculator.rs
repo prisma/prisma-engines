@@ -2,6 +2,7 @@ use crate::SqlResult;
 use chrono::*;
 use datamodel::common::*;
 use datamodel::*;
+use itertools::Itertools;
 use prisma_models::{DatamodelConverter, TempManifestationHolder, TempRelationHolder};
 use sql_schema_describer::*;
 
@@ -72,27 +73,38 @@ impl<'a> DatabaseSchemaCalculator<'a> {
                     sequence: None,
                 };
 
-                let indexes = model
-                    .fields()
-                    .filter_map(|f| {
-                        if f.is_unique {
-                            Some(Index {
-                                name: format!("{}.{}", &model.db_name(), &f.db_name()),
-                                columns: vec![f.db_name().clone()],
-                                tpe: IndexType::Unique,
-                            })
-                        } else {
-                            None
-                        }
-                    })
-                    .collect();
+                let single_field_indexes = model.fields().filter_map(|f| {
+                    if f.is_unique {
+                        Some(Index {
+                            name: format!("{}.{}", &model.db_name(), &f.db_name()),
+                            columns: vec![f.db_name().clone()],
+                            tpe: IndexType::Unique,
+                        })
+                    } else {
+                        None
+                    }
+                });
+
+                let multiple_field_indexes = model.indexes.iter().map(|index_definition: &IndexDefinition| Index {
+                    name: index_definition.name.clone().unwrap_or_else(|| {
+                        format!("{}.{}", &model.db_name(), index_definition.fields.iter().join("_"))
+                    }),
+                    columns: index_definition.fields.clone(),
+                    tpe: if index_definition.is_unique {
+                        IndexType::Unique
+                    } else {
+                        IndexType::Normal
+                    },
+                });
+
                 let table = Table {
                     name: model.db_name(),
                     columns,
-                    indices: indexes,
+                    indices: single_field_indexes.chain(multiple_field_indexes).collect(),
                     primary_key: Some(primary_key),
                     foreign_keys: Vec::new(),
                 };
+
                 Ok(ModelTable {
                     model: model.clone(),
                     table,

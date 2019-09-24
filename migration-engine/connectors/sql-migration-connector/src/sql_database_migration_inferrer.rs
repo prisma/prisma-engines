@@ -2,7 +2,7 @@ use crate::database_schema_calculator::DatabaseSchemaCalculator;
 use crate::database_schema_differ::{DatabaseSchemaDiff, DatabaseSchemaDiffer};
 use crate::*;
 use datamodel::*;
-use migration_connector::steps::*;
+use migration_connector::steps::MigrationStep;
 use migration_connector::*;
 use sql_schema_describer::*;
 use std::sync::Arc;

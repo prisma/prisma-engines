@@ -33,6 +33,7 @@ impl<'a> DataModelMigrationStepsInferrerImpl<'a> {
         let enums_to_create = self.enums_to_create();
         let enums_to_delete = self.enums_to_delete();
         let enums_to_update = self.enums_to_update();
+        let indexes_to_create = self.indexes_to_create();
 
         result.append(&mut Self::wrap_as_step(models_to_create, MigrationStep::CreateModel));
         result.append(&mut Self::wrap_as_step(models_to_delete, MigrationStep::DeleteModel));
@@ -43,6 +44,7 @@ impl<'a> DataModelMigrationStepsInferrerImpl<'a> {
         result.append(&mut Self::wrap_as_step(enums_to_create, MigrationStep::CreateEnum));
         result.append(&mut Self::wrap_as_step(enums_to_delete, MigrationStep::DeleteEnum));
         result.append(&mut Self::wrap_as_step(enums_to_update, MigrationStep::UpdateEnum));
+        result.append(&mut Self::wrap_as_step(indexes_to_create, MigrationStep::CreateIndex));
         result
     }
 
@@ -227,6 +229,34 @@ impl<'a> DataModelMigrationStepsInferrerImpl<'a> {
                 }
             }
         }
+        result
+    }
+
+    fn indexes_to_create(&self) -> Vec<CreateIndex> {
+        let mut result = Vec::new();
+        for next_model in self.next.models() {
+            let previous_model = self.previous.find_model(&next_model.name);
+
+            for next_index in &next_model.indexes {
+                let index_present = previous_model
+                    .and_then(|previous_model| {
+                        previous_model
+                            .indexes
+                            .iter()
+                            .find(|previous_index| *previous_index == next_index)
+                    })
+                    .is_some();
+                if !index_present {
+                    result.push(CreateIndex {
+                        model: next_model.name.clone(),
+                        name: next_index.name.clone(),
+                        is_unique: next_index.is_unique,
+                        fields: next_index.fields.clone(),
+                    })
+                }
+            }
+        }
+
         result
     }
 

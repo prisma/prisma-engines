@@ -680,6 +680,29 @@ fn adding_a_new_unique_field_must_work() {
 }
 
 #[test]
+fn adding_new_fields_with_multi_column_unique_must_work() {
+    test_each_connector(|_, api| {
+        let dm1 = r#"
+            model A {
+                id Int @id
+                field String
+                secondField String
+
+                @@unique([field, secondField])
+            }
+        "#;
+        let result = infer_and_apply(api, &dm1).sql_schema;
+        let index = result
+            .table_bang("A")
+            .indices
+            .iter()
+            .find(|i| i.columns == vec!["field", "secondField"]);
+        assert_eq!(index.is_some(), true);
+        assert_eq!(index.unwrap().tpe, IndexType::Unique);
+    });
+}
+
+#[test]
 fn unique_in_conjunction_with_custom_column_name_must_work() {
     test_each_connector(|_, api| {
         let dm1 = r#"
@@ -694,6 +717,29 @@ fn unique_in_conjunction_with_custom_column_name_must_work() {
             .indices
             .iter()
             .find(|i| i.columns == vec!["custom_field_name"]);
+        assert_eq!(index.is_some(), true);
+        assert_eq!(index.unwrap().tpe, IndexType::Unique);
+    });
+}
+
+#[test]
+fn multi_column_unique_in_conjunction_with_custom_column_name_must_work() {
+    test_each_connector(|_, api| {
+        let dm1 = r#"
+            model A {
+                id Int @id
+                field String @map("custom_field_name")
+                secondField String @map("second_custom_field_name")
+
+                @@unique([field, secondField])
+            }
+        "#;
+        let result = infer_and_apply(api, &dm1).sql_schema;
+        let index = result
+            .table_bang("A")
+            .indices
+            .iter()
+            .find(|i| i.columns == vec!["custom_field_name", "second_custom_field_name"]);
         assert_eq!(index.is_some(), true);
         assert_eq!(index.unwrap().tpe, IndexType::Unique);
     });
