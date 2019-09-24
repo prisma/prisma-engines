@@ -9,6 +9,7 @@ const DATAMODEL_STRING: &str = r#"model User {
   profile   Profile?
 
   @@map("user")
+  @@unique([email, name])
 }
 
 model Profile {

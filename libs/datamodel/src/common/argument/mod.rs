@@ -74,6 +74,13 @@ impl<'a> Arguments<'a> {
         }
     }
 
+    pub fn optional_arg(&mut self, name: &str) -> Option<Result<value::ValueValidator, ValidationError>> {
+        match self.arg_internal(name) {
+            None => None,
+            Some(arg) => Some(value::ValueValidator::new(&arg.value)),
+        }
+    }
+
     /// Gets the full argument span for an argument, used to generate errors.
     fn arg_internal(&mut self, name: &str) -> Option<&'a ast::Argument> {
         for arg in self.arguments {

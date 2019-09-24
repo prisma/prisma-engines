@@ -1,5 +1,6 @@
 extern crate datamodel;
 
+use self::datamodel::IndexDefinition;
 use datamodel::{common::PrismaType, configuration::SourceDefinition, dml, errors::*};
 
 pub trait FieldAsserts {
@@ -26,6 +27,7 @@ pub trait ModelAsserts {
     fn assert_is_embedded(&self, t: bool) -> &Self;
     fn assert_with_db_name(&self, t: &str) -> &Self;
     fn assert_with_documentation(&self, t: &str) -> &Self;
+    fn assert_has_index(&self, def: IndexDefinition) -> &Self;
 }
 
 pub trait EnumAsserts {
@@ -50,7 +52,7 @@ impl FieldAsserts for dml::Field {
             panic!("Scalar expected, but found {:?}", self.field_type);
         }
 
-        return self;
+        self
     }
 
     fn assert_enum_type(&self, en: &str) -> &Self {
@@ -60,7 +62,7 @@ impl FieldAsserts for dml::Field {
             panic!("Enum expected, but found {:?}", self.field_type);
         }
 
-        return self;
+        self
     }
 
     fn assert_relation_to(&self, t: &str) -> &Self {
@@ -70,7 +72,7 @@ impl FieldAsserts for dml::Field {
             panic!("Relation expected, but found {:?}", self.field_type);
         }
 
-        return self;
+        self
     }
 
     fn assert_relation_name(&self, t: &str) -> &Self {
@@ -80,7 +82,7 @@ impl FieldAsserts for dml::Field {
             panic!("Relation expected, but found {:?}", self.field_type);
         }
 
-        return self;
+        self
     }
 
     fn assert_relation_delete_strategy(&self, t: dml::OnDeleteStrategy) -> &Self {
@@ -90,7 +92,7 @@ impl FieldAsserts for dml::Field {
             panic!("Relation expected, but found {:?}", self.field_type);
         }
 
-        return self;
+        self
     }
 
     fn assert_relation_to_fields(&self, t: &[&str]) -> &Self {
@@ -100,55 +102,55 @@ impl FieldAsserts for dml::Field {
             panic!("Relation expected, but found {:?}", self.field_type);
         }
 
-        return self;
+        self
     }
 
     fn assert_arity(&self, arity: &dml::FieldArity) -> &Self {
         assert_eq!(self.arity, *arity);
 
-        return self;
+        self
     }
 
     fn assert_with_db_name(&self, t: &str) -> &Self {
         assert_eq!(self.database_name, Some(String::from(t)));
 
-        return self;
+        self
     }
 
     fn assert_with_documentation(&self, t: &str) -> &Self {
         assert_eq!(self.documentation, Some(String::from(t)));
 
-        return self;
+        self
     }
 
     fn assert_default_value(&self, t: dml::Value) -> &Self {
         assert_eq!(self.default_value, Some(t));
 
-        return self;
+        self
     }
 
     fn assert_is_id(&self, b: bool) -> &Self {
         assert_eq!(self.id_info.is_some(), b);
 
-        return self;
+        self
     }
 
     fn assert_is_generated(&self, b: bool) -> &Self {
         assert_eq!(self.is_generated, b);
 
-        return self;
+        self
     }
 
     fn assert_is_unique(&self, b: bool) -> &Self {
         assert_eq!(self.is_unique, b);
 
-        return self;
+        self
     }
 
     fn assert_is_updated_at(&self, b: bool) -> &Self {
         assert_eq!(self.is_updated_at, b);
 
-        return self;
+        self
     }
 
     fn assert_id_strategy(&self, strategy: dml::IdStrategy) -> &Self {
@@ -158,7 +160,7 @@ impl FieldAsserts for dml::Field {
             panic!("Id field expected, but no id info given");
         }
 
-        return self;
+        self
     }
 
     fn assert_id_sequence(&self, sequence: Option<dml::Sequence>) -> &Self {
@@ -168,7 +170,7 @@ impl FieldAsserts for dml::Field {
             panic!("Id field expected, but no id info given");
         }
 
-        return self;
+        self
     }
 }
 
@@ -188,20 +190,33 @@ impl ModelAsserts for dml::Model {
         self.find_field(&String::from(t))
             .expect(format!("Field {} not found", t).as_str())
     }
+
     fn assert_is_embedded(&self, t: bool) -> &Self {
         assert_eq!(self.is_embedded, t);
 
-        return self;
+        self
     }
+
     fn assert_with_db_name(&self, t: &str) -> &Self {
         assert_eq!(self.database_name, Some(String::from(t)));
 
-        return self;
+        self
     }
+
     fn assert_with_documentation(&self, t: &str) -> &Self {
         assert_eq!(self.documentation, Some(String::from(t)));
 
-        return self;
+        self
+    }
+
+    fn assert_has_index(&self, def: IndexDefinition) -> &Self {
+        assert!(
+            self.indexes.contains(&def),
+            "could not find index {:?} in the indexes of this model \n {:?}",
+            def,
+            self.indexes
+        );
+        self
     }
 }
 
@@ -213,7 +228,7 @@ impl EnumAsserts for dml::Enum {
             .find(|x| **x == pred)
             .expect(format!("Field {} not found", t).as_str());
 
-        return self;
+        self
     }
 }
 
@@ -225,12 +240,12 @@ impl ErrorAsserts for ErrorCollection {
             panic!("Expected exactly one validation error.");
         }
 
-        return self;
+        self
     }
 
     fn assert_is_at(&self, index: usize, error: ValidationError) -> &Self {
         assert_eq!(self.errors[index], error);
-        return self;
+        self
     }
 }
 
