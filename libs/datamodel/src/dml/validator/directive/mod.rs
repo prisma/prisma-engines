@@ -6,7 +6,7 @@ use crate::errors::{ErrorCollection, ValidationError};
 
 // BTreeMap has a strictly defined order.
 // That's important since rendering depends on that order.
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, HashMap};
 
 pub mod core;
 
@@ -23,6 +23,10 @@ pub type Args<'a> = common::argument::Arguments<'a>;
 pub trait DirectiveValidator<T> {
     /// Gets the directive name.
     fn directive_name(&self) -> &str;
+
+    fn is_duplicate_definition_allowed(&self) -> bool {
+        false
+    }
 
     /// Validates a directive and applies the directive
     /// to the given object.
@@ -136,16 +140,14 @@ impl<T: 'static> DirectiveListValidator<T> {
     pub fn validate_and_apply(&self, ast: &dyn ast::WithDirectives, t: &mut T) -> Result<(), ErrorCollection> {
         let mut errors = ErrorCollection::new();
 
+        let mut directive_counts = HashMap::new();
         for directive in ast.directives() {
-            for other_directive in ast.directives() {
-                if directive as *const ast::Directive != other_directive as *const ast::Directive
-                    && directive.name.name == other_directive.name.name
-                {
-                    errors.push(ValidationError::new_duplicate_directive_error(
-                        &directive.name.name,
-                        directive.name.span,
-                    ));
+            match directive_counts.get_mut(&directive.name.name) {
+                None => {
+                    directive_counts.insert(&directive.name.name, 1);
+                    ()
                 }
+                Some(count) => *count += 1,
             }
         }
 
@@ -155,6 +157,14 @@ impl<T: 'static> DirectiveListValidator<T> {
             match self.known_directives.get(&directive.name.name) {
                 Some(validator) => {
                     let mut arguments = Arguments::new(&directive.arguments, directive.span);
+
+                    let directive_count = directive_counts.get(&directive.name.name).unwrap();
+                    if *directive_count > 1 && !validator.is_duplicate_definition_allowed() {
+                        errors.push(ValidationError::new_duplicate_directive_error(
+                            &directive.name.name,
+                            directive.name.span,
+                        ));
+                    }
 
                     if let Err(mut errs) = arguments.check_for_duplicate_arguments() {
                         errors.append(&mut errs);

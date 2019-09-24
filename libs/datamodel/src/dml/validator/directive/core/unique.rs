@@ -32,6 +32,10 @@ impl DirectiveValidator<dml::Model> for ModelLevelUniqueValidator {
         "unique"
     }
 
+    fn is_duplicate_definition_allowed(&self) -> bool {
+        true
+    }
+
     fn validate_and_apply(&self, args: &mut Args, obj: &mut dml::Model) -> Result<(), Error> {
         let mut index_def = IndexDefinition {
             name: None,
