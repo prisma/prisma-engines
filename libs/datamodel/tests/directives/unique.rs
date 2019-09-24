@@ -78,7 +78,7 @@ fn must_error_when_unknown_fields_are_used() {
     let dml = r#"
     model User {
         id Int @id
-        
+
         @@unique([foo,bar])
     }
     "#;
