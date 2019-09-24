@@ -731,7 +731,7 @@ fn multi_column_unique_in_conjunction_with_custom_column_name_must_work() {
                 field String @map("custom_field_name")
                 secondField String @map("second_custom_field_name")
 
-                @@unique([field, secondField])
+                @@unique([custom_field_name, second_custom_field_name])
             }
         "#;
         let result = infer_and_apply(api, &dm1).sql_schema;
