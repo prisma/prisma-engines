@@ -10,25 +10,25 @@ pub(crate) fn query<'a, F, T>(
 where
     F: FnOnce() -> T,
 {
+    let start = Instant::now();
+    let res = f();
+    let end = Instant::now();
+
     if *crate::LOG_QUERIES {
         info!(
-            "query: \"{}\", params: {}",
+            "query: \"{}\", params: {} (in {}ms)",
             query,
-            Params(params)
+            Params(params),
+            start.elapsed().as_millis(),
         );
     }
 
-    time(format!("{}.query.time ({})", tag, query), f)
+    timing!(format!("{}.query.time", tag), start, end);
+
+    res
 }
 
 pub(crate) fn connect<F, T>(tag: &'static str, f: F) -> T
-where
-    F: FnOnce() -> T,
-{
-    time(format!("{}.connect.time", tag), f)
-}
-
-fn time<F, T>(tag: String, f: F) -> T
 where
     F: FnOnce() -> T,
 {
@@ -36,7 +36,7 @@ where
     let res = f();
     let end = Instant::now();
 
-    timing!(tag, start, end);
+    timing!(format!("{}.connect.time", tag), start, end);
 
     res
 }
