@@ -15,8 +15,16 @@ pub struct Model {
     pub database_name: Option<String>,
     /// Indicates if this model is embedded or not.
     pub is_embedded: bool,
+    pub indexes: Vec<IndexDefinition>,
     /// Indicates if this model is generated.
     pub is_generated: bool,
+}
+
+#[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
+pub struct IndexDefinition {
+    pub name: Option<String>,
+    pub fields: Vec<String>,
+    pub is_unique: bool,
 }
 
 impl Model {
@@ -25,6 +33,7 @@ impl Model {
         Model {
             name: String::from(name),
             fields: vec![],
+            indexes: vec![],
             documentation: None,
             database_name: None,
             is_embedded: false,
