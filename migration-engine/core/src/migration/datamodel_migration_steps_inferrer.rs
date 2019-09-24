@@ -34,6 +34,7 @@ impl<'a> DataModelMigrationStepsInferrerImpl<'a> {
         let enums_to_delete = self.enums_to_delete();
         let enums_to_update = self.enums_to_update();
         let indexes_to_create = self.indexes_to_create();
+        let indexes_to_delete = self.indexes_to_delete();
 
         result.append(&mut Self::wrap_as_step(models_to_create, MigrationStep::CreateModel));
         result.append(&mut Self::wrap_as_step(models_to_delete, MigrationStep::DeleteModel));
@@ -45,6 +46,7 @@ impl<'a> DataModelMigrationStepsInferrerImpl<'a> {
         result.append(&mut Self::wrap_as_step(enums_to_delete, MigrationStep::DeleteEnum));
         result.append(&mut Self::wrap_as_step(enums_to_update, MigrationStep::UpdateEnum));
         result.append(&mut Self::wrap_as_step(indexes_to_create, MigrationStep::CreateIndex));
+        result.append(&mut Self::wrap_as_step(indexes_to_delete, MigrationStep::DeleteIndex));
         result
     }
 
@@ -258,6 +260,38 @@ impl<'a> DataModelMigrationStepsInferrerImpl<'a> {
         }
 
         result
+    }
+
+    fn indexes_to_delete(&self) -> Vec<DeleteIndex> {
+        self.previous
+            .models()
+            .filter_map(|previous_model| {
+                self.next
+                    .models()
+                    .find(|next_model| next_model.name == previous_model.name)
+                    .map(|next_model| (previous_model, next_model))
+            })
+            .flat_map(|(previous_model, next_model)| {
+                previous_model.indexes.iter().filter_map(move |existing_index| {
+                    let still_exists = next_model
+                        .indexes
+                        .iter()
+                        .find(|new_index| *new_index == existing_index)
+                        .is_some();
+
+                    if still_exists {
+                        None
+                    } else {
+                        Some(DeleteIndex {
+                            fields: existing_index.fields.clone(),
+                            is_unique: existing_index.is_unique,
+                            model: previous_model.name.clone(),
+                            name: existing_index.name.clone(),
+                        })
+                    }
+                })
+            })
+            .collect()
     }
 
     fn diff<T: PartialEq + Clone>(current: &T, updated: &T) -> Option<T> {
