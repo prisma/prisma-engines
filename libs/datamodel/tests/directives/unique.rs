@@ -1,4 +1,4 @@
-use datamodel::{ast::Span, common::PrismaType, dml, errors::*, IndexDefinition};
+use datamodel::{ast::Span, errors::*, IndexDefinition};
 
 use crate::common::*;
 
@@ -9,7 +9,7 @@ fn basic_unique_index_must_work() {
         id        Int    @id
         firstName String
         lastName  String
-        
+
         @@unique([firstName,lastName])
     }
     "#;
@@ -30,7 +30,7 @@ fn the_name_argument_must_work() {
         id        Int    @id
         firstName String
         lastName  String
-        
+
         @@unique([firstName,lastName], name: "MyIndexName")
     }
     "#;
@@ -51,7 +51,7 @@ fn multiple_unique_must_work() {
         id        Int    @id
         firstName String
         lastName  String
-        
+
         @@unique([firstName,lastName])
         @@unique([firstName,lastName], name: "MyIndexName")
     }
@@ -78,7 +78,7 @@ fn must_error_when_unknown_fields_are_used() {
     let dml = r#"
     model User {
         id Int @id
-
+        
         @@unique([foo,bar])
     }
     "#;
