@@ -29,6 +29,7 @@ impl DataModelCalculator for DataModelCalculatorImpl {
             MigrationStep::UpdateField(x) => apply_update_field(&mut result, x),
             MigrationStep::CreateField(x) => apply_create_field(&mut result, x),
             MigrationStep::CreateIndex(x) => apply_create_index(&mut result, x),
+            MigrationStep::DeleteIndex(x) => apply_delete_index(&mut result, x),
         });
         result
     }
@@ -181,5 +182,26 @@ fn apply_create_index(data_model: &mut Datamodel, step: &CreateIndex) {
 
             model.add_index(index)
         }
+    }
+}
+
+fn apply_delete_index(data_model: &mut Datamodel, step: &DeleteIndex) {
+    let model = data_model.find_model_mut(&step.model).expect(&format!(
+        "The model {} does not exist in this Datamodel. It is not possible to drop an index in it.",
+        step.model
+    ));
+
+    match model
+        .indexes
+        .iter()
+        .find(|index| index.name == step.name && index.is_unique == step.is_unique && index.fields == step.fields) {
+        None => panic!(
+            "The index {:?} on fields ({:?}) of model {} does not exist in this Datamodel. It is not possible to delete it.",
+            step.name, step.fields, model.name,
+        ),
+        Some(_) => {
+            let new_indexes = model.indexes.drain(..).filter(|index| !(index.name == step.name && index.is_unique == step.is_unique && index.fields == step.fields)).collect();
+            model.indexes = new_indexes;
+        },
     }
 }

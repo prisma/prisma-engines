@@ -14,6 +14,7 @@ pub enum MigrationStep {
     UpdateEnum(UpdateEnum),
     DeleteEnum(DeleteEnum),
     CreateIndex(CreateIndex),
+    DeleteIndex(DeleteIndex),
 }
 
 pub trait WithDbName {
@@ -219,6 +220,15 @@ pub struct DeleteEnum {
 pub struct CreateIndex {
     pub model: String,
 
+    pub name: Option<String>,
+    pub is_unique: bool,
+    pub fields: Vec<String>,
+}
+
+#[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct DeleteIndex {
+    pub model: String,
     pub name: Option<String>,
     pub is_unique: bool,
     pub fields: Vec<String>,
