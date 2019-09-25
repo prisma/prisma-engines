@@ -182,6 +182,24 @@ fn render_raw_sql(step: &SqlMigrationStep, sql_family: SqlFamily, schema_name: &
                 format!("DROP INDEX {}", renderer.quote_with_schema(&schema_name, &name),)
             }
         },
+        SqlMigrationStep::AlterIndex(AlterIndex {
+            table,
+            index_name,
+            index_new_name,
+        }) => match sql_family {
+            SqlFamily::Mysql => format!(
+                "ALTER TABLE {table_name} RENAME INDEX {index_name} TO {index_new_name}",
+                table_name = renderer.quote_with_schema(&schema_name, &table),
+                index_name = renderer.quote(index_name),
+                index_new_name = renderer.quote(index_new_name)
+            ),
+            SqlFamily::Postgres => format!(
+                "ALTER INDEX {} RENAME TO {}",
+                renderer.quote_with_schema(&schema_name, index_name),
+                renderer.quote(index_new_name)
+            ),
+            SqlFamily::Sqlite => unimplemented!("Index renaming on SQLite."),
+        },
         SqlMigrationStep::RawSql { raw } => raw.to_string(),
     }
 }

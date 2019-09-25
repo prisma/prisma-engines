@@ -32,7 +32,7 @@ impl DatabaseMigrationMarker for SqlMigration {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub enum SqlMigrationStep {
     CreateTable(CreateTable),
     AlterTable(AlterTable),
@@ -42,47 +42,48 @@ pub enum SqlMigrationStep {
     RawSql { raw: String },
     CreateIndex(CreateIndex),
     DropIndex(DropIndex),
+    AlterIndex(AlterIndex),
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct CreateTable {
     pub table: Table,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct DropTable {
     pub name: String,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct DropTables {
     pub names: Vec<String>,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct AlterTable {
     pub table: Table,
     pub changes: Vec<TableChange>,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub enum TableChange {
     AddColumn(AddColumn),
     AlterColumn(AlterColumn),
     DropColumn(DropColumn),
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct AddColumn {
     pub column: Column,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct DropColumn {
     pub name: String,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct AlterColumn {
     pub name: String,
     pub column: Column,
@@ -98,4 +99,11 @@ pub struct CreateIndex {
 pub struct DropIndex {
     pub table: String,
     pub name: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
+pub struct AlterIndex {
+    pub table: String,
+    pub index_name: String,
+    pub index_new_name: String,
 }

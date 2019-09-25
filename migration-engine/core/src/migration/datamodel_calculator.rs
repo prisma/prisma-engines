@@ -30,6 +30,7 @@ impl DataModelCalculator for DataModelCalculatorImpl {
             MigrationStep::CreateField(x) => apply_create_field(&mut result, x),
             MigrationStep::CreateIndex(x) => apply_create_index(&mut result, x),
             MigrationStep::DeleteIndex(x) => apply_delete_index(&mut result, x),
+            MigrationStep::UpdateIndex(x) => apply_update_index(&mut result, x),
         });
         result
     }
@@ -199,4 +200,19 @@ fn apply_delete_index(data_model: &mut Datamodel, step: &DeleteIndex) {
             step.name, step.fields, model.name,
         )
     }
+}
+
+fn apply_update_index(data_model: &mut Datamodel, step: &UpdateIndex) {
+    let model = data_model.find_model_mut(&step.model).expect(&format!(
+        "The model {} does not exist in this Datamodel. It is not possible to rename an index in it.",
+        step.model
+    ));
+
+    model
+        .indexes
+        .iter_mut()
+        .find(|index| step.applies_to_index(index))
+        .map(|index| {
+            index.name = step.name.clone();
+        });
 }

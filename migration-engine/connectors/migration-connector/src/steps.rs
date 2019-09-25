@@ -14,6 +14,7 @@ pub enum MigrationStep {
     UpdateEnum(UpdateEnum),
     DeleteEnum(DeleteEnum),
     CreateIndex(CreateIndex),
+    UpdateIndex(UpdateIndex),
     DeleteIndex(DeleteIndex),
 }
 
@@ -227,6 +228,17 @@ pub struct CreateIndex {
 
 #[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct UpdateIndex {
+    pub model: String,
+
+    // The new name.
+    pub name: Option<String>,
+    pub tpe: IndexType,
+    pub fields: Vec<String>,
+}
+
+#[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct DeleteIndex {
     pub model: String,
     pub name: Option<String>,
@@ -244,17 +256,19 @@ pub trait IndexStep {
 
 impl IndexStep for CreateIndex {
     fn applies_to_index(&self, index_definition: &IndexDefinition) -> bool {
-        self.name == index_definition.name
-            && self.is_unique == index_definition.is_unique
-            && self.fields == index_definition.fields
+        self.tpe == index_definition.tpe && self.fields == index_definition.fields
     }
 }
 
 impl IndexStep for DeleteIndex {
     fn applies_to_index(&self, index_definition: &IndexDefinition) -> bool {
-        self.name == index_definition.name
-            && self.is_unique == index_definition.is_unique
-            && self.fields == index_definition.fields
+        self.tpe == index_definition.tpe && self.fields == index_definition.fields
+    }
+}
+
+impl IndexStep for UpdateIndex {
+    fn applies_to_index(&self, index_definition: &IndexDefinition) -> bool {
+        self.tpe == index_definition.tpe && self.fields == index_definition.fields
     }
 }
 
@@ -291,8 +305,8 @@ mod tests {
             ..correct_delete_index.clone()
         };
 
-        // name does not match
-        assert!(!delete_index.applies_to_index(&definition));
+        // name does not match, but it does not matter
+        assert!(delete_index.applies_to_index(&definition));
 
         let delete_index = DeleteIndex {
             fields: vec!["testColumn".into(), "otherColumn".into()],
@@ -332,8 +346,8 @@ mod tests {
             ..correct_create_index.clone()
         };
 
-        // name does not match
-        assert!(!create_index.applies_to_index(&definition));
+        // name does not match, but it does not matter
+        assert!(create_index.applies_to_index(&definition));
 
         let create_index = CreateIndex {
             fields: vec!["testColumn".into(), "otherColumn".into()],

@@ -2,7 +2,7 @@
 #![allow(unused)]
 mod test_harness;
 use pretty_assertions::{assert_eq, assert_ne};
-use sql_migration_connector::SqlFamily;
+use sql_migration_connector::{AlterIndex, SqlFamily, SqlMigrationStep};
 use sql_schema_describer::*;
 use test_harness::*;
 
@@ -951,6 +951,165 @@ fn removing_multi_field_unique_index_must_work() {
             .iter()
             .find(|i| i.columns == &["field", "secondField"]);
         assert!(index.is_none());
+    });
+}
+
+#[test]
+fn index_renaming_must_work() {
+    test_each_connector(|sql_family, api| {
+        let dm1 = r#"
+            model A {
+                id Int @id
+                field String
+                secondField Int
+
+                @@unique([field, secondField], name: "customName")
+            }
+        "#;
+        let result = infer_and_apply(api, &dm1).sql_schema;
+        let index = result
+            .table_bang("A")
+            .indices
+            .iter()
+            .find(|i| i.name == "customName" && i.columns == &["field", "secondField"]);
+        assert!(index.is_some());
+        assert_eq!(index.unwrap().tpe, IndexType::Unique);
+
+        let dm2 = r#"
+            model A {
+                id Int @id
+                field String
+                secondField Int
+
+                @@unique([field, secondField], name: "customNameA")
+            }
+        "#;
+        let result = infer_and_apply(api, &dm2);
+        let indexes = result
+            .sql_schema
+            .table_bang("A")
+            .indices
+            .iter()
+            .filter(|i| i.columns == &["field", "secondField"] && i.name == "customNameA");
+        assert_eq!(indexes.count(), 1);
+
+        // Test that we are not dropping and recreating the index. Except in SQLite, because there we are.
+        if sql_family != SqlFamily::Sqlite {
+            let expected_steps = vec![SqlMigrationStep::AlterIndex(AlterIndex {
+                table: "A".into(),
+                index_new_name: "customNameA".into(),
+                index_name: "customName".into(),
+            })];
+            let actual_steps = result.sql_migration();
+            assert_eq!(actual_steps, expected_steps);
+        }
+    });
+}
+
+#[test]
+fn index_renaming_must_work_when_renaming_to_default() {
+    test_each_connector(|sql_family, api| {
+        let dm1 = r#"
+            model A {
+                id Int @id
+                field String
+                secondField Int
+
+                @@unique([field, secondField], name: "customName")
+            }
+        "#;
+        let result = infer_and_apply(api, &dm1);
+        let index = result
+            .sql_schema
+            .table_bang("A")
+            .indices
+            .iter()
+            .find(|i| i.columns == &["field", "secondField"]);
+        assert!(index.is_some());
+        assert_eq!(index.unwrap().tpe, IndexType::Unique);
+
+        let dm2 = r#"
+            model A {
+                id Int @id
+                field String
+                secondField Int
+
+                @@unique([field, secondField])
+            }
+        "#;
+        let result = infer_and_apply(api, &dm2);
+        let indexes = result
+            .sql_schema
+            .table_bang("A")
+            .indices
+            .iter()
+            .filter(|i| i.columns == &["field", "secondField"] && i.name == "A.field_secondField");
+        assert_eq!(indexes.count(), 1);
+
+        // Test that we are not dropping and recreating the index. Except in SQLite, because there we are.
+        if sql_family != SqlFamily::Sqlite {
+            let expected_steps = vec![SqlMigrationStep::AlterIndex(AlterIndex {
+                table: "A".into(),
+                index_new_name: "A.field_secondField".into(),
+                index_name: "customName".into(),
+            })];
+            let actual_steps = result.sql_migration();
+            assert_eq!(actual_steps, expected_steps);
+        }
+    });
+}
+
+#[test]
+fn index_renaming_must_work_when_renaming_to_custom() {
+    test_each_connector(|sql_family, api| {
+        let dm1 = r#"
+            model A {
+                id Int @id
+                field String
+                secondField Int
+
+                @@unique([field, secondField])
+            }
+        "#;
+        let result = infer_and_apply(api, &dm1);
+        let index = result
+            .sql_schema
+            .table_bang("A")
+            .indices
+            .iter()
+            .find(|i| i.columns == &["field", "secondField"]);
+        assert!(index.is_some());
+        assert_eq!(index.unwrap().tpe, IndexType::Unique);
+
+        let dm2 = r#"
+            model A {
+                id Int @id
+                field String
+                secondField Int
+
+                @@unique([field, secondField], name: "somethingCustom")
+            }
+        "#;
+        let result = infer_and_apply(api, &dm2);
+        // panic!("{:#?}", result.sql_schema.table_bang("A").indices);
+        let indexes = result
+            .sql_schema
+            .table_bang("A")
+            .indices
+            .iter()
+            .filter(|i| i.columns == &["field", "secondField"] && i.name == "somethingCustom");
+        assert_eq!(indexes.count(), 1);
+
+        // Test that we are not dropping and recreating the index. Except in SQLite, because there we are.
+        if sql_family != SqlFamily::Sqlite {
+            let expected_steps = vec![SqlMigrationStep::AlterIndex(AlterIndex {
+                table: "A".into(),
+                index_name: "A.field_secondField".into(),
+                index_new_name: "somethingCustom".into(),
+            })];
+            let actual_steps = result.sql_migration();
+            assert_eq!(actual_steps, expected_steps);
+        }
     });
 }
 
