@@ -131,6 +131,10 @@ impl Model {
     pub fn add_index(&mut self, index: IndexDefinition) {
         self.indexes.push(index)
     }
+
+    pub fn has_index(&self, index: &IndexDefinition) -> bool {
+        self.indexes.iter().any(|own_index| own_index == index)
+    }
 }
 
 impl WithName for Model {
