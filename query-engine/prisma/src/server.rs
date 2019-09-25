@@ -8,6 +8,7 @@ use crate::{
     PrismaResult,
 };
 use actix_web::{http::Method, App, HttpRequest, HttpResponse, Json, Responder};
+use serde_json::json;
 use core::schema::QuerySchemaRenderer;
 use std::{sync::Arc, time::Instant};
 
@@ -46,6 +47,7 @@ impl HttpServer {
                 .resource("/sdl", |r| r.method(Method::GET).with(Self::sdl_handler))
                 .resource("/dmmf", |r| r.method(Method::GET).with(Self::dmmf_handler))
                 .resource("/status", |r| r.method(Method::GET).with(Self::status_handler))
+                .resource("/server_info", |r| r.method(Method::GET).with(Self::server_info_handler))
         });
 
         server.bind(address)?.start();
@@ -90,7 +92,7 @@ impl HttpServer {
     fn sdl_handler(req: HttpRequest<Arc<RequestContext>>) -> impl Responder {
         let request_context = req.state();
 
-        let rendered = GraphQLSchemaRenderer::render(Arc::clone(&request_context.context.query_schema));
+        let rendered = GraphQLSchemaRenderer::render(Arc::clone(request_context.context.query_schema()));
         HttpResponse::Ok().content_type("application/text").body(rendered)
     }
 
@@ -99,8 +101,8 @@ impl HttpServer {
     fn dmmf_handler(req: HttpRequest<Arc<RequestContext>>) -> impl Responder {
         let request_context = req.state();
         let dmmf = dmmf::render_dmmf(
-            &request_context.context.dm,
-            Arc::clone(&request_context.context.query_schema),
+            request_context.context.datamodel(),
+            Arc::clone(request_context.context.query_schema()),
         );
         let serialized = serde_json::to_string(&dmmf).unwrap();
 
@@ -109,8 +111,22 @@ impl HttpServer {
 
     /// Simple status endpoint
     fn status_handler<T>(_: HttpRequest<T>) -> impl Responder {
+        let response = serde_json::to_string(&json!({ "status": "ok" })).unwrap();
+
         HttpResponse::Ok()
             .content_type("application/json")
-            .body("{\"status\": \"ok\"}")
+            .body(response)
+    }
+
+    fn server_info_handler(req: HttpRequest<Arc<RequestContext>>) -> impl Responder {
+        let response = json!({
+            "commit": env!("GIT_HASH"),
+            "version": env!("CARGO_PKG_VERSION"),
+            "primary_connector": req.state().context.primary_connector(),
+        });
+
+        HttpResponse::Ok()
+            .content_type("application/json")
+            .body(serde_json::to_string(&response).unwrap())
     }
 }

@@ -38,7 +38,11 @@ fn sqlite(source: &dyn Source) -> PrismaResult<QueryExecutor> {
     let db_name = path.file_stem().unwrap(); // Safe due to previous validations.
 
     trace!("Loaded SQLite connector.");
-    Ok(sql_executor(db_name.to_os_string().into_string().unwrap(), db))
+    Ok(sql_executor(
+        "sqlite",
+        db_name.to_os_string().into_string().unwrap(),
+        db,
+    ))
 }
 
 #[cfg(feature = "sql")]
@@ -57,7 +61,7 @@ fn postgres(source: &dyn Source) -> PrismaResult<QueryExecutor> {
     let db = SqlDatabase::new(psql);
 
     trace!("Loaded Postgres connector.");
-    Ok(sql_executor(db_name, db))
+    Ok(sql_executor("postgres", db_name, db))
 }
 
 #[cfg(feature = "sql")]
@@ -76,11 +80,11 @@ fn mysql(source: &dyn Source) -> PrismaResult<QueryExecutor> {
     let db_name = db_name.next().expect(err_str);
 
     trace!("Loaded MySQL connector.");
-    Ok(sql_executor(db_name.into(), db))
+    Ok(sql_executor("mysql", db_name.into(), db))
 }
 
 #[cfg(feature = "sql")]
-fn sql_executor<T>(db_name: String, connector: SqlDatabase<T>) -> QueryExecutor
+fn sql_executor<T>(primary_connector: &'static str, db_name: String, connector: SqlDatabase<T>) -> QueryExecutor
 where
     T: Transactional + SqlCapabilities + Send + Sync + 'static,
 {
@@ -94,5 +98,5 @@ where
         write_executor: arc,
     };
 
-    QueryExecutor::new(read_exec, write_exec)
+    QueryExecutor::new(primary_connector, read_exec, write_exec)
 }

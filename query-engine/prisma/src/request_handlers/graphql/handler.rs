@@ -39,8 +39,8 @@ fn handle_graphql_query(
     let gql_doc = gql::parse_query(&req.body.query)?;
     let query_doc = GraphQLProtocolAdapter::convert(gql_doc, req.body.operation_name)?;
 
-    ctx.executor
-        .execute(query_doc, Arc::clone(&ctx.query_schema))
+    ctx.executor()
+        .execute(query_doc, Arc::clone(ctx.query_schema()))
         .map_err(|err| {
             debug!("{}", err);
             err.into()
