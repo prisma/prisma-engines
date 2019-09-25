@@ -572,3 +572,30 @@ fn mysql_foreign_key_on_delete_must_be_handled() {
         }
     );
 }
+
+#[test]
+fn mysql_multi_field_indexes_must_be_inferred() {
+    setup();
+
+    let mut migration = Migration::new().schema(SCHEMA);
+    migration.create_table("Employee", move |t| {
+        t.add_column("id", types::primary());
+        t.add_column("age", types::integer());
+        t.add_column("name", types::varchar(200));
+        t.add_index("age_and_name_index", types::index(vec!["name", "age"]).unique(true));
+    });
+
+    let full_sql = migration.make::<barrel::backend::MySql>();
+    let inspector = get_mysql_describer(&full_sql);
+    let result = inspector.describe(&SCHEMA.to_string()).expect("describing");
+    let table = result.get_table("Employee").expect("couldn't get Employee table");
+
+    assert_eq!(
+        table.indices,
+        &[Index {
+            name: "age_and_name_index".into(),
+            columns: vec!["name".to_owned(), "age".to_owned()],
+            tpe: IndexType::Unique
+        }]
+    );
+}
