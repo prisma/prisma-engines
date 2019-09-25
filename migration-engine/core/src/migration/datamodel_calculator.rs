@@ -174,7 +174,7 @@ fn apply_create_index(data_model: &mut Datamodel, step: &CreateIndex) {
     let index = IndexDefinition {
         name: step.name.clone(),
         fields: step.fields.clone(),
-        is_unique: step.is_unique,
+        tpe: step.tpe,
     };
 
     model.add_index(index)

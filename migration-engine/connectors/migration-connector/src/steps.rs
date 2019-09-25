@@ -221,7 +221,7 @@ pub struct CreateIndex {
     pub model: String,
 
     pub name: Option<String>,
-    pub is_unique: bool,
+    pub tpe: IndexType,
     pub fields: Vec<String>,
 }
 
@@ -230,7 +230,7 @@ pub struct CreateIndex {
 pub struct DeleteIndex {
     pub model: String,
     pub name: Option<String>,
-    pub is_unique: bool,
+    pub tpe: IndexType,
     pub fields: Vec<String>,
 }
 

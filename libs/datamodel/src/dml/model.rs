@@ -24,7 +24,13 @@ pub struct Model {
 pub struct IndexDefinition {
     pub name: Option<String>,
     pub fields: Vec<String>,
-    pub is_unique: bool,
+    pub tpe: IndexType,
+}
+
+#[derive(Debug, PartialEq, Clone, Serialize, Deserialize, Copy)]
+pub enum IndexType {
+    Unique,
+    Normal,
 }
 
 impl Model {

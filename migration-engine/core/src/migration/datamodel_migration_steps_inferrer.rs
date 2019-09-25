@@ -247,7 +247,7 @@ impl<'a> DataModelMigrationStepsInferrerImpl<'a> {
                     result.push(CreateIndex {
                         model: next_model.name.clone(),
                         name: next_index.name.clone(),
-                        is_unique: next_index.is_unique,
+                        tpe: next_index.tpe,
                         fields: next_index.fields.clone(),
                     })
                 }
@@ -274,7 +274,7 @@ impl<'a> DataModelMigrationStepsInferrerImpl<'a> {
                     } else {
                         Some(DeleteIndex {
                             fields: existing_index.fields.clone(),
-                            is_unique: existing_index.is_unique,
+                            tpe: existing_index.tpe,
                             model: previous_model.name.clone(),
                             name: existing_index.name.clone(),
                         })
