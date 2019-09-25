@@ -45,8 +45,8 @@ impl<'a> DataModelMigrationStepsInferrerImpl<'a> {
         result.append(&mut Self::wrap_as_step(enums_to_create, MigrationStep::CreateEnum));
         result.append(&mut Self::wrap_as_step(enums_to_delete, MigrationStep::DeleteEnum));
         result.append(&mut Self::wrap_as_step(enums_to_update, MigrationStep::UpdateEnum));
-        result.append(&mut Self::wrap_as_step(indexes_to_create, MigrationStep::CreateIndex));
         result.append(&mut Self::wrap_as_step(indexes_to_delete, MigrationStep::DeleteIndex));
+        result.append(&mut Self::wrap_as_step(indexes_to_create, MigrationStep::CreateIndex));
         result
     }
 
