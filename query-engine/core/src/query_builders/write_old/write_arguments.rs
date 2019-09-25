@@ -1,19 +1,23 @@
 use super::*;
 use crate::query_document::{ParsedInputMap, ParsedInputValue};
-use prisma_models::{Field, ModelRef, PrismaArgs, PrismaListValue, PrismaValue, RelationFieldRef};
-use std::{convert::TryInto, sync::Arc};
+use connector::write_ast::*;
+use prisma_models::{Field, ModelRef, PrismaArgs, PrismaListValue, PrismaValue};
+use std::convert::TryInto;
 
 #[derive(Default, Debug)]
 pub struct WriteArguments {
     pub non_list: PrismaArgs,
     pub list: Vec<(String, PrismaListValue)>,
-    pub nested: Vec<(RelationFieldRef, ParsedInputMap)>,
+    pub nested: NestedWriteQueries,
 }
 
 impl WriteArguments {
-    /// Creates a new set of WriteArguments. Expects the parsed input map from the respective data key, not the enclosing map.
-    /// E.g.: { data: { THIS MAP } } from the `data` argument of a write query.
-    pub fn from(model: &ModelRef, data_map: ParsedInputMap) -> QueryBuilderResult<Self> {
+    /// Creates a new set of WriteArguments from the `data` argument of a write query.
+    /// Expects the parsed input map from the data key, not the enclosing map.
+    ///
+    /// Note: `root_create` is only a safeguard variable for now as we don't have flipped query semantics right now.
+    /// This limitation will be lifted in the near future.
+    pub fn from(model: &ModelRef, data_map: ParsedInputMap, triggered_from_create: bool) -> QueryBuilderResult<Self> {
         data_map.into_iter().try_fold(
             WriteArguments::default(),
             |mut args, (k, v): (String, ParsedInputValue)| {
@@ -34,7 +38,8 @@ impl WriteArguments {
                     }
 
                     Field::Relation(ref rf) => {
-                        args.nested.push((Arc::clone(rf), v.try_into()?));
+                        args.nested
+                            .merge(extract_nested_queries(rf, v.try_into()?, triggered_from_create)?);
                     }
                 };
 

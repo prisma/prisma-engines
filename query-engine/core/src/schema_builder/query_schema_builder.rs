@@ -285,8 +285,8 @@ impl<'a> QuerySchemaBuilder<'a> {
                 Arc::clone(&model),
                 QueryTag::CreateOne,
                 Box::new(|model, parsed_field| {
-                    let builder = WriteQueryBuilder::new().create_record(model, parsed_field)?;
-                    Ok(builder.into())
+                    let mut graph = QueryGraph::new();
+                    write::create_record(&mut graph, model, parsed_field).map(|_| graph)
                 }),
             ))),
         )
@@ -310,8 +310,8 @@ impl<'a> QuerySchemaBuilder<'a> {
                     Arc::clone(&model),
                     QueryTag::DeleteOne,
                     Box::new(|model, parsed_field| {
-                        let builder = WriteQueryBuilder::new().delete_record(model, parsed_field)?;
-                        Ok(builder.into())
+                        let mut graph = QueryGraph::new();
+                        write::delete_record(&mut graph, model, parsed_field).map(|_| graph)
                     }),
                 ))),
             )
@@ -334,8 +334,8 @@ impl<'a> QuerySchemaBuilder<'a> {
                 Arc::clone(&model),
                 QueryTag::DeleteMany,
                 Box::new(|model, parsed_field| {
-                    let builder = WriteQueryBuilder::new().delete_many_records(model, parsed_field)?;
-                    Ok(builder.into())
+                    let mut graph = QueryGraph::new();
+                    write::delete_many_records(&mut graph, model, parsed_field).map(|_| graph)
                 }),
             ))),
         )
@@ -357,8 +357,8 @@ impl<'a> QuerySchemaBuilder<'a> {
                     Arc::clone(&model),
                     QueryTag::UpdateOne,
                     Box::new(|model, parsed_field| {
-                        let builder = WriteQueryBuilder::new().update_record(model, parsed_field)?;
-                        Ok(builder.into())
+                        let mut graph = QueryGraph::new();
+                        write::update_record(&mut graph, model, parsed_field).map(|_| graph)
                     }),
                 ))),
             )
@@ -381,8 +381,8 @@ impl<'a> QuerySchemaBuilder<'a> {
                 Arc::clone(&model),
                 QueryTag::UpdateMany,
                 Box::new(|model, parsed_field| {
-                    let builder = WriteQueryBuilder::new().update_many_records(model, parsed_field)?;
-                    Ok(builder.into())
+                    let mut graph = QueryGraph::new();
+                        write::update_many_records(&mut graph, model, parsed_field).map(|_| graph)
                 }),
             ))),
         )
@@ -402,8 +402,8 @@ impl<'a> QuerySchemaBuilder<'a> {
                     Arc::clone(&model),
                     QueryTag::UpsertOne,
                     Box::new(|model, parsed_field| {
-                        let builder = WriteQueryBuilder::new().upsert_record(model, parsed_field)?;
-                        Ok(builder.into())
+                        let mut graph = QueryGraph::new();
+                        write::upsert_record(&mut graph, model, parsed_field).map(|_| graph)
                     }),
                 ))),
             )

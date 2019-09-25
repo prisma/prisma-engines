@@ -1,55 +1,105 @@
 use super::*;
-use crate::query_document::{ArgumentListLookup, ParsedField, ParsedInputMap};
-use connector::{filter::RecordFinder, write_ast::*};
-use prisma_models::ModelRef;
-use std::convert::TryInto;
-use std::sync::Arc;
+use write_arguments::*;
+use crate::{
+    query_ast::*,
+    query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
+    ArgumentListLookup, ParsedField, ParsedInputMap, ReadOneRecordBuilder,
+};
+use connector::{
+    filter::{RecordFinder, Filter},
+};
+use prisma_models::{ModelRef};
+use std::{convert::TryInto, sync::Arc};
 
-pub struct UpdateBuilder {
-    field: ParsedField,
-    model: ModelRef,
-}
-
-impl UpdateBuilder {
-    pub fn new(field: ParsedField, model: ModelRef) -> Self {
-        Self { field, model }
-    }
-}
-
-impl Builder<WriteQuery> for UpdateBuilder {
-    fn build(mut self) -> QueryBuilderResult<WriteQuery> {
-        let model = self.model;
-        // let name = self.field.name;
-        // let alias = self.field.alias;
+/// Creates an update record query and adds it to the query graph, together with it's nested queries and companion read query.
+    pub fn update_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedField) -> QueryBuilderResult<()> {
+        let id_field = model.fields().id();
 
         // "where"
-        let where_arg = self.field.arguments.lookup("where").unwrap();
-        let record_finder = utils::extract_record_finder(where_arg.value, &model)?;
+        let where_arg = field.arguments.lookup("where").unwrap();
+        let record_finder = extract_record_finder(where_arg.value, &model)?;
 
         // "data"
-        let data_argument = self.field.arguments.lookup("data").unwrap();
+        let data_argument = field.arguments.lookup("data").unwrap();
         let data_map: ParsedInputMap = data_argument.value.try_into()?;
 
-        Self::build_from(model, data_map, record_finder)
-            .map(|ur| WriteQuery::Root(RootWriteQuery::UpdateRecord(Box::new(ur))))
+        let update_node = update_record_node(graph, Some(record_finder), Arc::clone(&model), data_map)?;
+
+        let read_query = ReadOneRecordBuilder::new(field, model).build()?;
+        let read_node = graph.create_node(Query::Read(read_query));
+
+        graph.add_result_node(&read_node);
+        graph.create_edge(
+            &update_node,
+            &read_node,
+            QueryGraphDependency::ParentId(Box::new(|mut node, parent_id| {
+                if let Node::Query(Query::Read(ReadQuery::RecordQuery(ref mut rq))) = node {
+                    let finder = RecordFinder {
+                        field: id_field,
+                        value: parent_id.unwrap(),
+                    };
+
+                    rq.record_finder = Some(finder);
+                };
+
+                node
+            })),
+        );
+
+        Ok(())
     }
+
+/// Creates a create record query and adds it to the query graph.
+pub fn update_many_records(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedField) -> QueryBuilderResult<()> {
+    let filter = match field.arguments.lookup("where") {
+        Some(where_arg) => extract_filter(where_arg.value.try_into()?, &model)?,
+        None => Filter::empty(),
+    };
+
+    let data_argument = field.arguments.lookup("data").unwrap();
+    let data_map: ParsedInputMap = data_argument.value.try_into()?;
+    let update_args = WriteArguments::from(&model, data_map)?;
+
+    let list_causes_update = !update_args.list.is_empty();
+    let mut non_list_args = update_args.non_list;
+
+    non_list_args.update_datetimes(Arc::clone(&model), list_causes_update);
+
+    let update_many = WriteQuery::UpdateManyRecords(UpdateManyRecords {
+        model,
+        filter,
+        non_list_args,
+        list_args: update_args.list,
+    });
+
+    graph.create_node(Query::Write(update_many));
+
+    Ok(())
 }
 
-impl UpdateBuilder {
-    pub fn build_from(
+pub fn update_record_node(
+        graph: &mut QueryGraph,
+        record_finder: Option<RecordFinder>,
         model: ModelRef,
-        data: ParsedInputMap,
-        record_finder: RecordFinder,
-    ) -> QueryBuilderResult<UpdateRecord> {
-        let update_args = WriteArguments::from(&model, data, false)?;
+        data_map: ParsedInputMap,
+    ) -> QueryBuilderResult<NodeRef> {
+        let update_args = WriteArguments::from(&model, data_map)?;
         let list_causes_update = !update_args.list.is_empty();
         let mut non_list_args = update_args.non_list;
+
         non_list_args.update_datetimes(Arc::clone(&model), list_causes_update);
-        Ok(UpdateRecord {
+
+        let ur = UpdateRecord {
+            model,
             where_: record_finder,
             non_list_args,
             list_args: update_args.list,
-            nested_writes: update_args.nested,
-        })
+        };
+
+        let node = graph.create_node(Query::Write(WriteQuery::UpdateRecord(ur)));
+        for (relation_field, data_map) in update_args.nested {
+            nested::connect_nested_query(graph, &node, relation_field, data_map)?;
+        }
+
+        Ok(node)
     }
-}

@@ -1,387 +1,193 @@
 use super::*;
-use crate::query_document::{ParsedInputMap, ParsedInputValue};
-use connector::write_ast::*;
-use prisma_models::{ModelRef, PrismaValue, RelationFieldRef};
+use crate::{
+    query_ast::*,
+    query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
+    ParsedInputValue, ParsedInputMap,
+};
+use connector::{
+    QueryArguments,
+    filter::{RecordFinder},
+};
+use prisma_models::{ModelRef, RelationFieldRef};
 use std::{convert::TryInto, sync::Arc};
 
-pub fn extract_nested_queries(
-    relation_field: &RelationFieldRef,
-    field: ParsedInputMap,
-    triggered_from_create: bool,
-) -> QueryBuilderResult<NestedWriteQueries> {
-    let model = relation_field.related_model();
+pub fn connect_nested_query(
+        graph: &mut QueryGraph,
+        parent: &NodeRef,
+        relation_field: RelationFieldRef,
+        data_map: ParsedInputMap,
+    ) -> QueryBuilderResult<()> {
+        let model = relation_field.related_model();
 
-    let nested_queries = field
-        .into_iter()
-        .fold(Ok(NestedWriteQueries::default()), |prev, (name, value)| {
-            let mut prev = prev?;
-            match name.as_str() {
-                "create" => {
-                    nested_create(value, &model, &relation_field, triggered_from_create)?
-                        .into_iter()
-                        .for_each(|nested_create| prev.creates.push(nested_create));
-                }
-                "update" => {
-                    nested_update(value, &model, &relation_field)?
-                        .into_iter()
-                        .for_each(|nested_update| prev.updates.push(nested_update));
-                }
-                "upsert" => {
-                    nested_upsert(value, &model, &relation_field, triggered_from_create)?
-                        .into_iter()
-                        .for_each(|nested_upsert| prev.upserts.push(nested_upsert));
-                }
-                "delete" => {
-                    nested_delete(value, &model, &relation_field)?
-                        .into_iter()
-                        .for_each(|nested_delete| prev.deletes.push(nested_delete));
-                }
-                "connect" => {
-                    nested_connect(value, &model, &relation_field, triggered_from_create)?
-                        .into_iter()
-                        .for_each(|nested_connect| prev.connects.push(nested_connect));
-                }
-                "set" => {
-                    nested_set(value, &model, &relation_field)?
-                        .into_iter()
-                        .for_each(|nested_set| prev.sets.push(nested_set));
-                }
-                "disconnect" => {
-                    nested_disconnect(value, &model, &relation_field)?
-                        .into_iter()
-                        .for_each(|nested_disconnect| prev.disconnects.push(nested_disconnect));
-                }
-                "updateMany" => {
-                    nested_update_many(value, &model, &relation_field)?
-                        .into_iter()
-                        .for_each(|nested_update_many| prev.update_manys.push(nested_update_many));
-                }
-                "deleteMany" => {
-                    nested_delete_many(value, &model, &relation_field)?
-                        .into_iter()
-                        .for_each(|nested_delete_many| prev.delete_manys.push(nested_delete_many));
-                }
-                _ => unimplemented!(),
+        for (field_name, value) in data_map {
+            match field_name.as_str() {
+                "create" => connect_nested_create(graph, parent, &relation_field, value, &model)?,
+                "update" => connect_nested_update(graph, parent, &relation_field, value, &model)?,
+                "connect" => connect_nested_connect(graph, parent, &relation_field, value, &model)?,
+                // "delete" => self
+                //     .nested_delete(value, &model, &relation_field)?
+                //     .into_iter()
+                //     .map(|node| {
+                //         //
+                //         unimplemented!()
+                //     })
+                //     .collect::<Vec<_>>(),
+                _ => (),
             };
+        }
 
-            Ok(prev)
-        });
+        Ok(())
+    }
 
-    // Check if we need to abort due to limitation in the query engine
-    nested_queries.and_then(|nq| {
-        /*
-        let is_unsupported = match relation_field.relation().manifestation {
-            Some(RelationLinkManifestation::Inline(ref i)) => {
-                i.in_table_of_model_name == relation_field.model().db_name()
+    pub fn connect_nested_create(
+        graph: &mut QueryGraph,
+        parent: &NodeRef,
+        relation_field: &RelationFieldRef,
+        value: ParsedInputValue,
+        model: &ModelRef,
+    ) -> QueryBuilderResult<()> {
+        for value in utils::coerce_vec(value) {
+            let child = create::create_record_node(graph, Arc::clone(model), value.try_into()?)?;
+            let relation_field_name = relation_field.name.clone();
+            let (parent, child) = utils::flip_nodes(graph, parent, &child, relation_field);
+
+            graph.create_edge(
+                parent,
+                child,
+                QueryGraphDependency::ParentId(Box::new(|mut node, parent_id| {
+                    // The following injection is necessary for cases where the relation is inlined.
+                    // The injection won't do anything in other cases.
+                    // The other case where the relation is not inlined is handled further down.
+                    if let Node::Query(Query::Write(ref mut wq)) = node {
+                        wq.inject_non_list_arg(relation_field_name, parent_id.unwrap());
+                    }
+
+                    node
+                })),
+            );
+
+            // Detect if a connect is necessary between the nodes.
+            // A connect is necessary if the nested create is done on a relation that
+            // is a list (x-to-many) and where the relation is not inlined (aka manifested as an
+            // actual join table, for example).
+            if relation_field.is_list && !relation_field.relation().is_inline_relation() {
+                connect::connect_records_node(graph, parent, child, relation_field);
             }
-            _ => false,
-        };
-        */
-
-        // TODO: probably we don't need the check anymore. Remove when the query planning for writes is done.
-        //        if triggered_from_create
-        //            && (nq.creates.len() + nq.connects.len() > 0)
-        //            && relation_field.is_required
-        //            && is_unsupported
-        //        {
-        //            Err(QueryValidationError::AssertionError(
-        //                format!(
-        //                    "A create or connect cannot be performed in this direction. You're first creating a {} and then {}, but only the reverse order is currently supported. This limitation will be lifted for general availability",
-        //                    relation_field.model().name,
-        //                    relation_field.related_model().name)
-        //                )
-        //            )
-        //        } else {
-        //            Ok(nq)
-        //        }
-        Ok(nq)
-    })
-}
-
-pub fn nested_create(
-    value: ParsedInputValue,
-    model: &ModelRef,
-    relation_field: &RelationFieldRef,
-    triggered_from_create: bool,
-) -> QueryBuilderResult<Vec<NestedCreateRecord>> {
-    coerce_vec(value)
-        .into_iter()
-        .map(|value| {
-            let args = WriteArguments::from(&model, value.try_into()?, true)?;
-            let mut non_list_args = args.non_list;
-
-            non_list_args.add_datetimes(Arc::clone(&model));
-
-            Ok(NestedCreateRecord {
-                relation_field: Arc::clone(relation_field),
-                non_list_args,
-                list_args: args.list,
-                nested_writes: args.nested,
-                top_is_create: triggered_from_create,
-            })
-        })
-        .collect::<QueryBuilderResult<Vec<_>>>()
-}
-
-pub fn nested_update(
-    value: ParsedInputValue,
-    model: &ModelRef,
-    relation_field: &RelationFieldRef,
-) -> QueryBuilderResult<Vec<NestedUpdateRecord>> {
-    let mut vec = vec![];
-
-    for value in coerce_vec(value) {
-        if relation_field.is_list {
-            let mut map: ParsedInputMap = value.try_into()?;
-            let data_arg = map.remove("data").expect("1");
-            let write_args = WriteArguments::from(&model, data_arg.try_into()?, false)?;
-            let where_arg = map.remove("where").expect("2");
-            let record_finder = Some(utils::extract_record_finder(where_arg, &model)?);
-
-            let list_causes_update = !write_args.list.is_empty();
-            let mut non_list_args = write_args.non_list;
-            non_list_args.update_datetimes(Arc::clone(&model), list_causes_update);
-
-            vec.push(NestedUpdateRecord {
-                relation_field: Arc::clone(&relation_field),
-                where_: record_finder,
-                non_list_args,
-                list_args: write_args.list,
-                nested_writes: write_args.nested,
-            });
-        } else {
-            let write_args = WriteArguments::from(&model, value.try_into()?, false)?;
-            let list_causes_update = !write_args.list.is_empty();
-            let mut non_list_args = write_args.non_list;
-            non_list_args.update_datetimes(Arc::clone(&model), list_causes_update);
-
-            vec.push(NestedUpdateRecord {
-                relation_field: Arc::clone(&relation_field),
-                where_: None,
-                non_list_args,
-                list_args: write_args.list,
-                nested_writes: write_args.nested,
-            });
         }
+
+        Ok(())
     }
 
-    Ok(vec)
-}
+    pub fn connect_nested_update(
+        graph: &mut QueryGraph,
+        parent: &NodeRef,
+        relation_field: &RelationFieldRef,
+        value: ParsedInputValue,
+        model: &ModelRef,
+    ) -> QueryBuilderResult<()> {
+        for value in utils::coerce_vec(value) {
+            if relation_field.is_list {
+                // We have a record specified as a record finder in "where"
+                let mut map: ParsedInputMap = value.try_into()?;
+                let where_arg = map.remove("where").unwrap();
+                let record_finder = extract_record_finder(where_arg, &model)?;
+                let data_value = map.remove("data").unwrap();
+                let update_node =
+                    update::update_record_node(graph, Some(record_finder), Arc::clone(model), data_value.try_into()?)?;
 
-pub fn nested_upsert(
-    value: ParsedInputValue,
-    model: &ModelRef,
-    relation_field: &RelationFieldRef,
-    triggered_from_create: bool,
-) -> QueryBuilderResult<Vec<NestedUpsertRecord>> {
-    coerce_vec(value)
-        .into_iter()
-        .map(|value| {
-            let mut map: ParsedInputMap = value.try_into()?;
-            let record_finder = if relation_field.is_list {
-                let where_arg = map.remove("where").expect("5");
-                Some(utils::extract_record_finder(where_arg, &model)?)
+                graph
+                    .create_edge(parent, &update_node, QueryGraphDependency::ExecutionOrder);
             } else {
-                None
-            };
+                // We don't have a specific record (i.e. finder), we need to find it first.
+                // Build a read query to load the necessary data first and connect it to the update.
+                let read_parent_node =
+                    graph
+                        .create_node(Query::Read(ReadQuery::RelatedRecordsQuery(RelatedRecordsQuery {
+                            name: "parent".to_owned(),
+                            alias: None,
+                            parent_field: Arc::clone(relation_field),
+                            parent_ids: None,
+                            args: QueryArguments::default(),
+                            selected_fields: relation_field.related_field().model().fields().id().into(),
+                            nested: vec![],
+                            selection_order: vec![],
+                        })));
 
-            let create_arg = map.remove("create").expect("3");
-            let create_args = WriteArguments::from(&model, create_arg.try_into()?, triggered_from_create)?;
-            let mut create_non_list_args = create_args.non_list;
-            create_non_list_args.add_datetimes(Arc::clone(&model));
+                let update_node = update::update_record_node(graph, None, Arc::clone(model), value.try_into()?)?;
+                let id_field = model.fields().id();
 
-            let update_arg = map.remove("update").expect("4");
-            let update_args = WriteArguments::from(&model, update_arg.try_into()?, triggered_from_create)?;
-            let list_causes_update = !update_args.list.is_empty();
-            let mut update_non_list_args = update_args.non_list;
-            update_non_list_args.update_datetimes(Arc::clone(&model), list_causes_update);
+                graph.create_edge(
+                    &read_parent_node,
+                    &update_node,
+                    QueryGraphDependency::ParentId(Box::new(|mut node, parent_id| {
+                        if let Node::Query(Query::Write(WriteQuery::UpdateRecord(ref mut ur))) = node {
+                            ur.where_ = Some(RecordFinder {
+                                field: id_field,
+                                value: parent_id.unwrap(),
+                            });
+                        }
 
-            let create = NestedCreateRecord {
-                relation_field: Arc::clone(relation_field),
-                non_list_args: create_non_list_args,
-                list_args: create_args.list,
-                nested_writes: create_args.nested,
-                top_is_create: triggered_from_create,
-            };
+                        node
+                    })),
+                );
 
-            let update = NestedUpdateRecord {
-                relation_field: Arc::clone(&relation_field),
-                where_: record_finder.clone(),
-                non_list_args: update_non_list_args,
-                list_args: update_args.list,
-                nested_writes: update_args.nested,
-            };
+                graph.create_edge(
+                    parent,
+                    &read_parent_node,
+                    QueryGraphDependency::ParentId(Box::new(|mut node, parent_id| {
+                        if let Node::Query(Query::Read(ReadQuery::RelatedRecordsQuery(ref mut rq))) = node {
+                            rq.parent_ids = Some(vec![parent_id.unwrap().try_into().unwrap()]);
+                        };
 
-            Ok(NestedUpsertRecord {
-                relation_field: Arc::clone(&relation_field),
-                where_: record_finder,
-                create,
-                update,
-            })
-        })
-        .collect::<QueryBuilderResult<Vec<_>>>()
-}
-
-pub fn nested_delete(
-    value: ParsedInputValue,
-    model: &ModelRef,
-    relation_field: &RelationFieldRef,
-) -> QueryBuilderResult<Vec<NestedDeleteRecord>> {
-    let mut vec = vec![];
-
-    for value in coerce_vec(value) {
-        if relation_field.is_list {
-            let record_finder = if relation_field.is_list {
-                Some(utils::extract_record_finder(value, &model)?)
-            } else {
-                None
-            };
-
-            vec.push(NestedDeleteRecord {
-                relation_field: Arc::clone(&relation_field),
-                where_: record_finder,
-            })
-        } else {
-            let val: PrismaValue = value.try_into()?;
-            match val {
-                PrismaValue::Boolean(b) if b => vec.push(NestedDeleteRecord {
-                    relation_field: Arc::clone(&relation_field),
-                    where_: None,
-                }),
-                _ => (),
-            };
+                        node
+                    })),
+                );
+            }
         }
+
+        Ok(())
     }
 
-    Ok(vec)
-}
+    pub fn connect_nested_connect(
+        graph: &mut QueryGraph,
+        parent: &NodeRef,
+        relation_field: &RelationFieldRef,
+        value: ParsedInputValue,
+        model: &ModelRef,
+    ) -> QueryBuilderResult<()> {
+        for value in utils::coerce_vec(value) {
+            // First, we need to build a read query on the record to be conneted.
+            let record_finder = extract_record_finder(value, &model)?;
+            let child_read_query = utils::id_read_query_infallible(&model, record_finder);
+            let child_node = graph.create_node(child_read_query);
 
-pub fn nested_connect(
-    value: ParsedInputValue,
-    model: &ModelRef,
-    relation_field: &RelationFieldRef,
-    triggered_from_create: bool,
-) -> QueryBuilderResult<Vec<NestedConnect>> {
-    coerce_vec(value)
-        .into_iter()
-        .map(|value| {
-            let record_finder = utils::extract_record_finder(value, &model)?;
+            // Flip the read node and parent node if necessary.
+            let (parent, child) = utils::flip_nodes(graph, parent, &child_node, relation_field);
+            let relation_field_name = relation_field.name.clone();
 
-            Ok(NestedConnect {
-                relation_field: Arc::clone(&relation_field),
-                where_: record_finder,
-                top_is_create: triggered_from_create,
-            })
-        })
-        .collect::<QueryBuilderResult<Vec<_>>>()
-}
+            // Edge from parent to child (e.g. Create to ReadQuery).
+            graph.create_edge(
+                parent,
+                child,
+                QueryGraphDependency::ParentId(Box::new(|mut child_node, parent_id| {
+                    // If the child is a write query, inject the parent id.
+                    // This covers cases of inlined relations.
+                    if let Node::Query(Query::Write(ref mut wq)) = child_node {
+                        wq.inject_non_list_arg(relation_field_name, parent_id.unwrap())
+                    }
 
-pub fn nested_set(
-    value: ParsedInputValue,
-    model: &ModelRef,
-    relation_field: &RelationFieldRef,
-) -> QueryBuilderResult<Vec<NestedSet>> {
-    let finders = coerce_vec(value)
-        .into_iter()
-        .map(|value| utils::extract_record_finder(value, &model))
-        .collect::<QueryBuilderResult<Vec<_>>>()?;
+                    child_node
+                })),
+            );
 
-    Ok(vec![NestedSet {
-        relation_field: Arc::clone(&relation_field),
-        wheres: finders,
-    }])
-}
-
-pub fn nested_disconnect(
-    value: ParsedInputValue,
-    model: &ModelRef,
-    relation_field: &RelationFieldRef,
-) -> QueryBuilderResult<Vec<NestedDisconnect>> {
-    let mut vec = vec![];
-
-    for value in coerce_vec(value) {
-        if relation_field.is_list {
-            let record_finder = if relation_field.is_list {
-                Some(utils::extract_record_finder(value, &model)?)
-            } else {
-                None
-            };
-
-            vec.push(NestedDisconnect {
-                relation_field: Arc::clone(&relation_field),
-                where_: record_finder,
-            })
-        } else {
-            let val: PrismaValue = value.try_into()?;
-            match val {
-                PrismaValue::Boolean(b) if b => vec.push(NestedDisconnect {
-                    relation_field: Arc::clone(&relation_field),
-                    where_: None,
-                }),
-                _ => (),
-            };
+            // Detect if a connect is actually necessary between the nodes.
+            // A connect is necessary if the nested connect is done on a relation that
+            // is a list (x-to-many) and where the relation is not inlined (aka manifested as an
+            // actual join table, for example).
+            if relation_field.is_list && !relation_field.relation().is_inline_relation() {
+                connect::connect_records_node(graph, parent, child, relation_field);
+            }
         }
+
+        Ok(())
     }
-
-    Ok(vec)
-}
-
-pub fn nested_update_many(
-    value: ParsedInputValue,
-    model: &ModelRef,
-    relation_field: &RelationFieldRef,
-) -> QueryBuilderResult<Vec<NestedUpdateManyRecords>> {
-    coerce_vec(value)
-        .into_iter()
-        .map(|value| {
-            let mut map: ParsedInputMap = value.try_into()?;
-            let data_arg = map.remove("data").expect("123");
-            let write_args = WriteArguments::from(&model, data_arg.try_into()?, false)?;
-
-            let filter = if relation_field.is_list {
-                let where_arg = map.remove("where").expect("sss");
-                Some(extract_filter(where_arg.try_into()?, &model)?)
-            } else {
-                None
-            };
-
-            Ok(NestedUpdateManyRecords {
-                relation_field: Arc::clone(&relation_field),
-                filter,
-                non_list_args: write_args.non_list,
-                list_args: write_args.list,
-            })
-        })
-        .collect::<QueryBuilderResult<Vec<_>>>()
-}
-
-pub fn nested_delete_many(
-    value: ParsedInputValue,
-    model: &ModelRef,
-    relation_field: &RelationFieldRef,
-) -> QueryBuilderResult<Vec<NestedDeleteManyRecords>> {
-    coerce_vec(value)
-        .into_iter()
-        .map(|value| {
-            // Note: how can a *_many nested mutation be without a list?
-            let filter = if relation_field.is_list {
-                Some(extract_filter(value.try_into()?, &model)?)
-            } else {
-                None
-            };
-
-            Ok(NestedDeleteManyRecords {
-                relation_field: Arc::clone(&relation_field),
-                filter,
-            })
-        })
-        .collect::<QueryBuilderResult<Vec<_>>>()
-}
-
-pub fn coerce_vec(val: ParsedInputValue) -> Vec<ParsedInputValue> {
-    match val {
-        ParsedInputValue::List(l) => l,
-        m @ ParsedInputValue::Map(_) => vec![m],
-        single => vec![single],
-    }
-}
