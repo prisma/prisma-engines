@@ -39,6 +39,3 @@ buildkite-script-*
 
 # VSCode specific
 .vscode/
-
-# git
-.git/
