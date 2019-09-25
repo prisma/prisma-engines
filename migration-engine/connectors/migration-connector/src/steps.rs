@@ -266,27 +266,40 @@ mod tests {
     fn delete_index_must_apply_to_the_right_indexes() {
         let definition = IndexDefinition {
             fields: vec!["testColumn".into()],
-            is_unique: true,
+            tpe: IndexType::Unique,
             name: None,
         };
-        let mut delete_index = DeleteIndex {
+        let correct_delete_index = DeleteIndex {
             model: "ignored".into(),
             fields: vec!["testColumn".into()],
-            is_unique: true,
+            tpe: IndexType::Unique,
             name: None,
         };
 
-        assert!(delete_index.applies_to_index(&definition));
+        assert!(correct_delete_index.applies_to_index(&definition));
 
-        delete_index.is_unique = false;
+        let delete_index = DeleteIndex {
+            tpe: IndexType::Normal,
+            ..correct_delete_index.clone()
+        };
 
-        // is_unique does not match
+        // tpe does not match
         assert!(!delete_index.applies_to_index(&definition));
 
-        delete_index.is_unique = true;
-        delete_index.name = Some("index_on_testColumn".to_owned());
+        let delete_index = DeleteIndex {
+            name: Some("index_on_testColumn".to_owned()),
+            ..correct_delete_index.clone()
+        };
 
         // name does not match
+        assert!(!delete_index.applies_to_index(&definition));
+
+        let delete_index = DeleteIndex {
+            fields: vec!["testColumn".into(), "otherColumn".into()],
+            ..correct_delete_index.clone()
+        };
+
+        // fields do not match
         assert!(!delete_index.applies_to_index(&definition));
     }
 
@@ -294,27 +307,40 @@ mod tests {
     fn create_index_must_apply_to_the_right_indexes() {
         let definition = IndexDefinition {
             fields: vec!["testColumn".into()],
-            is_unique: true,
+            tpe: IndexType::Unique,
             name: None,
         };
-        let mut create_index = CreateIndex {
+        let correct_create_index = CreateIndex {
             model: "ignored".into(),
             fields: vec!["testColumn".into()],
-            is_unique: true,
+            tpe: IndexType::Unique,
             name: None,
         };
 
-        assert!(create_index.applies_to_index(&definition));
+        assert!(correct_create_index.applies_to_index(&definition));
 
-        create_index.is_unique = false;
+        let create_index = CreateIndex {
+            tpe: IndexType::Normal,
+            ..correct_create_index.clone()
+        };
 
-        // is_unique does not match
+        // tpe does not match
         assert!(!create_index.applies_to_index(&definition));
 
-        create_index.is_unique = true;
-        create_index.name = Some("index_on_testColumn".to_owned());
+        let create_index = CreateIndex {
+            name: Some("index_on_testColumn".to_owned()),
+            ..correct_create_index.clone()
+        };
 
         // name does not match
+        assert!(!create_index.applies_to_index(&definition));
+
+        let create_index = CreateIndex {
+            fields: vec!["testColumn".into(), "otherColumn".into()],
+            ..correct_create_index.clone()
+        };
+
+        // fields do not match
         assert!(!create_index.applies_to_index(&definition));
     }
 }
