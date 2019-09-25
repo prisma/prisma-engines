@@ -240,15 +240,10 @@ impl<'a> DataModelMigrationStepsInferrerImpl<'a> {
             let previous_model = self.previous.find_model(&next_model.name);
 
             for next_index in &next_model.indexes {
-                let index_present = previous_model
-                    .and_then(|previous_model| {
-                        previous_model
-                            .indexes
-                            .iter()
-                            .find(|previous_index| *previous_index == next_index)
-                    })
-                    .is_some();
-                if !index_present {
+                let index_already_exists = previous_model
+                    .map(|previous_model| previous_model.has_index(next_index))
+                    .unwrap_or(false);
+                if !index_already_exists {
                     result.push(CreateIndex {
                         model: next_model.name.clone(),
                         name: next_index.name.clone(),
@@ -273,12 +268,7 @@ impl<'a> DataModelMigrationStepsInferrerImpl<'a> {
             })
             .flat_map(|(previous_model, next_model)| {
                 previous_model.indexes.iter().filter_map(move |existing_index| {
-                    let still_exists = next_model
-                        .indexes
-                        .iter()
-                        .find(|new_index| *new_index == existing_index)
-                        .is_some();
-
+                    let still_exists = next_model.has_index(existing_index);
                     if still_exists {
                         None
                     } else {
