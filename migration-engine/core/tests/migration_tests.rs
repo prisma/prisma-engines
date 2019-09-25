@@ -731,7 +731,7 @@ fn multi_column_unique_in_conjunction_with_custom_column_name_must_work() {
                 field String @map("custom_field_name")
                 secondField String @map("second_custom_field_name")
 
-                @@unique([custom_field_name, second_custom_field_name])
+                @@unique([field, secondField])
             }
         "#;
         let result = infer_and_apply(api, &dm1).sql_schema;
@@ -853,7 +853,6 @@ fn adding_unique_to_an_existing_field_must_work() {
 
 #[test]
 fn removing_unique_from_an_existing_field_must_work() {
-    //    test_only_connector(SqlFamily::Postgres, |_, api| {
     test_each_connector(|_, api| {
         let dm1 = r#"
             model A {

@@ -89,7 +89,18 @@ impl<'a> DatabaseSchemaCalculator<'a> {
                     name: index_definition.name.clone().unwrap_or_else(|| {
                         format!("{}.{}", &model.db_name(), index_definition.fields.iter().join("_"))
                     }),
-                    columns: index_definition.fields.clone(),
+                    // The model index definition uses the model field names, but the SQL Index
+                    // wants the column names.
+                    columns: index_definition
+                        .fields
+                        .iter()
+                        .map(|field_name| {
+                            model
+                                .find_field(field_name)
+                                .expect("Unknown field in index directive.")
+                                .db_name()
+                        })
+                        .collect(),
                     tpe: if index_definition.is_unique {
                         IndexType::Unique
                     } else {
