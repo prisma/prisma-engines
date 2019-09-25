@@ -85,27 +85,30 @@ impl<'a> DatabaseSchemaCalculator<'a> {
                     }
                 });
 
-                let multiple_field_indexes = model.indexes.iter().map(|index_definition: &IndexDefinition| Index {
-                    name: index_definition.name.clone().unwrap_or_else(|| {
-                        format!("{}.{}", &model.db_name(), index_definition.fields.iter().join("_"))
-                    }),
-                    // The model index definition uses the model field names, but the SQL Index
-                    // wants the column names.
-                    columns: index_definition
+                let multiple_field_indexes = model.indexes.iter().map(|index_definition: &IndexDefinition| {
+                    let referenced_fields: Vec<&Field> = index_definition
                         .fields
                         .iter()
-                        .map(|field_name| {
-                            model
-                                .find_field(field_name)
-                                .expect("Unknown field in index directive.")
-                                .db_name()
-                        })
-                        .collect(),
-                    tpe: if index_definition.is_unique {
-                        IndexType::Unique
-                    } else {
-                        IndexType::Normal
-                    },
+                        .map(|field_name| model.find_field(field_name).expect("Unknown field in index directive."))
+                        .collect();
+
+                    Index {
+                        name: index_definition.name.clone().unwrap_or_else(|| {
+                            format!(
+                                "{}.{}",
+                                &model.db_name(),
+                                referenced_fields.iter().map(|field| field.db_name()).join("_")
+                            )
+                        }),
+                        // The model index definition uses the model field names, but the SQL Index
+                        // wants the column names.
+                        columns: referenced_fields.iter().map(|field| field.db_name()).collect(),
+                        tpe: if index_definition.is_unique {
+                            IndexType::Unique
+                        } else {
+                            IndexType::Normal
+                        },
+                    }
                 });
 
                 let table = Table {
