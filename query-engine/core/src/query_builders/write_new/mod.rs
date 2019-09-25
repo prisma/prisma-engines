@@ -361,6 +361,9 @@ impl WriteQueryBuilder {
                 parent,
                 child,
                 QueryGraphDependency::ParentId(Box::new(|mut node, parent_id| {
+                    // The following injection is necessary for cases where the relation is inlined.
+                    // The injection won't do anything in other cases.
+                    // The other case where the relation is not inlined is handled further down.
                     if let Node::Query(Query::Write(ref mut wq)) = node {
                         wq.inject_non_list_arg(relation_field_name, parent_id.unwrap());
                     }
@@ -370,12 +373,64 @@ impl WriteQueryBuilder {
             );
 
             // Detect if a connect is necessary between the nodes.
-            if relation_field.is_list && !relation_field.relation_is_inlined_in_parent() {
-                unimplemented!()
+            // A connect is necessary if the nested create is done on a relation that
+            // is a list (x-to-many) and where the relation is not inlined (aka manifested as an
+            // actual join table, for example).
+            if relation_field.is_list && !relation_field.relation().is_inline_relation() {
+                self.connect_records_node(parent, child, relation_field);
             }
         }
 
         Ok(())
+    }
+
+    // Creates a Connect node in the graph and creates edges to parent and child.
+    // The connect node assumes that both the parent and the child node results
+    // are convertible to IDs, as the edges perform a transformation on the connect node to
+    // inject the required IDs after the parents executed.
+    fn connect_records_node(
+        &mut self,
+        parent: &NodeRef,
+        child: &NodeRef,
+        relation_field: &RelationFieldRef,
+    ) -> NodeRef {
+        let connect = WriteQuery::ConnectRecords(ConnectRecords {
+            parent: None,
+            child: None,
+            relation_field: Arc::clone(relation_field),
+        });
+
+        let connect_node = self.graph.create_node(Query::Write(connect));
+
+        // Edge from parent to connect.
+        self.graph.create_edge(
+            parent,
+            &connect_node,
+            QueryGraphDependency::ParentId(Box::new(|mut child_node, parent_id| {
+                if let Node::Query(Query::Write(WriteQuery::ConnectRecords(ref mut c))) = child_node {
+                    let parent_id = parent_id.expect("Required parent Id field to be present for connect query");
+                    c.parent = Some(parent_id.try_into().unwrap());
+                }
+
+                child_node
+            })),
+        );
+
+        // Edge from child to connect.
+        self.graph.create_edge(
+            &child,
+            &connect_node,
+            QueryGraphDependency::ParentId(Box::new(|mut child_node, parent_id| {
+                if let Node::Query(Query::Write(WriteQuery::ConnectRecords(ref mut c))) = child_node {
+                    let child_id = parent_id.expect("Required child Id field to be present for connect query");
+                    c.child = Some(child_id.try_into().unwrap());
+                }
+
+                child_node
+            })),
+        );
+
+        connect_node
     }
 
     pub fn connect_nested_update(
@@ -456,9 +511,12 @@ impl WriteQueryBuilder {
         model: &ModelRef,
     ) -> QueryBuilderResult<()> {
         for value in Self::coerce_vec(value) {
+            // First, we need to build a read query on the record to be conneted.
             let record_finder = utils::extract_record_finder(value, &model)?;
             let child_read_query = Self::id_read_query_infallible(&model, record_finder);
             let child_node = self.graph.create_node(child_read_query);
+
+            // Flip the read node and parent node if necessary.
             let (parent, child) = self.flip_nodes(parent, &child_node, relation_field);
             let relation_field_name = relation_field.name.clone();
 
@@ -467,6 +525,8 @@ impl WriteQueryBuilder {
                 parent,
                 child,
                 QueryGraphDependency::ParentId(Box::new(|mut child_node, parent_id| {
+                    // If the child is a write query, inject the parent id.
+                    // This covers cases of inlined relations.
                     if let Node::Query(Query::Write(ref mut wq)) = child_node {
                         wq.inject_non_list_arg(relation_field_name, parent_id.unwrap())
                     }
@@ -475,48 +535,20 @@ impl WriteQueryBuilder {
                 })),
             );
 
-            let connect = WriteQuery::ConnectRecords(ConnectRecords {
-                parent: None,
-                child: None,
-                relation_field: Arc::clone(relation_field),
-            });
-
-            let connect_node = self.graph.create_node(Query::Write(connect));
-
-            // Edge from parent to connect.
-            self.graph.create_edge(
-                parent,
-                &connect_node,
-                QueryGraphDependency::ParentId(Box::new(|mut node, parent_id| {
-                    if let Node::Query(Query::Write(WriteQuery::ConnectRecords(ref mut c))) = node {
-                        let parent_id = parent_id.expect("Required parent Id field to be present for connect query");
-                        c.parent = Some(parent_id.try_into().unwrap());
-                    }
-
-                    node
-                })),
-            );
-
-            // Edge from child to connect.
-            self.graph.create_edge(
-                &child,
-                &connect_node,
-                QueryGraphDependency::ParentId(Box::new(|mut node, parent_id| {
-                    if let Node::Query(Query::Write(WriteQuery::ConnectRecords(ref mut c))) = node {
-                        let child_id = parent_id.expect("Required child Id field to be present for connect query");
-                        c.child = Some(child_id.try_into().unwrap());
-                    }
-
-                    node
-                })),
-            );
+            // Detect if a connect is actually necessary between the nodes.
+            // A connect is necessary if the nested connect is done on a relation that
+            // is a list (x-to-many) and where the relation is not inlined (aka manifested as an
+            // actual join table, for example).
+            if relation_field.is_list && !relation_field.relation().is_inline_relation() {
+                self.connect_records_node(parent, child, relation_field);
+            }
         }
 
         Ok(())
     }
 
     /// Produces a non-failing ReadQuery for a given RecordFinder by using
-    /// a ManyRecordsQuery instead of a find one.
+    /// a ManyRecordsQuery instead of a find one (returns empty list instead of error).
     fn id_read_query_infallible(model: &ModelRef, record_finder: RecordFinder) -> Query {
         let selected_fields: SelectedFields = model.fields().id().into();
         let read_query = ReadQuery::ManyRecordsQuery(ManyRecordsQuery {
