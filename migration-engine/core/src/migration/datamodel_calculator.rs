@@ -164,25 +164,20 @@ fn apply_create_index(data_model: &mut Datamodel, step: &CreateIndex) {
         step.model
     ));
 
-    match model
-        .indexes
-        .iter()
-        .find(|index| index.name == step.name && index.is_unique == step.is_unique && index.fields == step.fields)
-    {
-        Some(_) => panic!(
+    if model.indexes.iter().any(|index| step.applies_to_index(index)) {
+        panic!(
             "The index {:?} on fields ({:?}) of model {} already exists in this Datamodel. It is not possible to create it once more.",
             step.name, step.fields, model.name,
-        ),
-        None => {
-            let index = IndexDefinition {
-                name: step.name.clone(),
-                fields: step.fields.clone(),
-                is_unique: step.is_unique,
-            };
-
-            model.add_index(index)
-        }
+        )
     }
+
+    let index = IndexDefinition {
+        name: step.name.clone(),
+        fields: step.fields.clone(),
+        is_unique: step.is_unique,
+    };
+
+    model.add_index(index)
 }
 
 fn apply_delete_index(data_model: &mut Datamodel, step: &DeleteIndex) {
@@ -191,17 +186,17 @@ fn apply_delete_index(data_model: &mut Datamodel, step: &DeleteIndex) {
         step.model
     ));
 
-    match model
-        .indexes
-        .iter()
-        .find(|index| index.name == step.name && index.is_unique == step.is_unique && index.fields == step.fields) {
-        None => panic!(
+    if model.indexes.iter().any(|index| step.applies_to_index(index)) {
+        let new_indexes = model
+            .indexes
+            .drain(..)
+            .filter(|index| !step.applies_to_index(index))
+            .collect();
+        model.indexes = new_indexes;
+    } else {
+        panic!(
             "The index {:?} on fields ({:?}) of model {} does not exist in this Datamodel. It is not possible to delete it.",
             step.name, step.fields, model.name,
-        ),
-        Some(_) => {
-            let new_indexes = model.indexes.drain(..).filter(|index| !(index.name == step.name && index.is_unique == step.is_unique && index.fields == step.fields)).collect();
-            model.indexes = new_indexes;
-        },
+        )
     }
 }

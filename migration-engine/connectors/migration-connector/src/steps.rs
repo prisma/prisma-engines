@@ -233,3 +233,88 @@ pub struct DeleteIndex {
     pub is_unique: bool,
     pub fields: Vec<String>,
 }
+
+/// Convenience trait for migration steps on model indexes.
+pub trait IndexStep {
+    /// Does the step apply to the given IndexDefinition?
+    ///
+    /// This will only work if the index definition and the step's model match.
+    fn applies_to_index(&self, index_definition: &IndexDefinition) -> bool;
+}
+
+impl IndexStep for CreateIndex {
+    fn applies_to_index(&self, index_definition: &IndexDefinition) -> bool {
+        self.name == index_definition.name
+            && self.is_unique == index_definition.is_unique
+            && self.fields == index_definition.fields
+    }
+}
+
+impl IndexStep for DeleteIndex {
+    fn applies_to_index(&self, index_definition: &IndexDefinition) -> bool {
+        self.name == index_definition.name
+            && self.is_unique == index_definition.is_unique
+            && self.fields == index_definition.fields
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn delete_index_must_apply_to_the_right_indexes() {
+        let definition = IndexDefinition {
+            fields: vec!["testColumn".into()],
+            is_unique: true,
+            name: None,
+        };
+        let mut delete_index = DeleteIndex {
+            model: "ignored".into(),
+            fields: vec!["testColumn".into()],
+            is_unique: true,
+            name: None,
+        };
+
+        assert!(delete_index.applies_to_index(&definition));
+
+        delete_index.is_unique = false;
+
+        // is_unique does not match
+        assert!(!delete_index.applies_to_index(&definition));
+
+        delete_index.is_unique = true;
+        delete_index.name = Some("index_on_testColumn".to_owned());
+
+        // name does not match
+        assert!(!delete_index.applies_to_index(&definition));
+    }
+
+    #[test]
+    fn create_index_must_apply_to_the_right_indexes() {
+        let definition = IndexDefinition {
+            fields: vec!["testColumn".into()],
+            is_unique: true,
+            name: None,
+        };
+        let mut create_index = CreateIndex {
+            model: "ignored".into(),
+            fields: vec!["testColumn".into()],
+            is_unique: true,
+            name: None,
+        };
+
+        assert!(create_index.applies_to_index(&definition));
+
+        create_index.is_unique = false;
+
+        // is_unique does not match
+        assert!(!create_index.applies_to_index(&definition));
+
+        create_index.is_unique = true;
+        create_index.name = Some("index_on_testColumn".to_owned());
+
+        // name does not match
+        assert!(!create_index.applies_to_index(&definition));
+    }
+}
