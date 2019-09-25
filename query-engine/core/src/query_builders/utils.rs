@@ -1,5 +1,5 @@
 use super::*;
-use crate::query_document::{ParsedArgument, ParsedInputValue, ParsedInputMap};
+use crate::query_document::{ParsedArgument, ParsedInputMap, ParsedInputValue};
 use connector::{filter::RecordFinder, QueryArguments};
 use prisma_models::{ModelRef, PrismaValue};
 use std::convert::TryInto;
@@ -16,7 +16,8 @@ pub fn extract_record_finder(parsed_value: ParsedInputValue, model: &ModelRef) -
     let values: ParsedInputMap = parsed_value.try_into()?;
     if values.len() != 1 {
         Err(QueryValidationError::AssertionError(format!(
-            "Expected exactly one key-value pair for 'where' argument, got: '{}'",
+            "Expected exactly one key-value pair for 'where' argument (or implicit nested selector) for {}, got: '{}'",
+            &model.name,
             values.iter().map(|v| v.0.as_str()).collect::<Vec<&str>>().join(", ")
         )))
     } else {

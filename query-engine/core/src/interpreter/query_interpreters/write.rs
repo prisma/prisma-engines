@@ -1,4 +1,4 @@
-use crate::{interpreter::InterpretationResult, query_ast::*, QueryResult};
+use crate::{interpreter::{InterpreterError, InterpretationResult}, query_ast::*, QueryResult};
 use connector::{Filter, TransactionLike, WriteArgs};
 
 pub fn execute(tx: &mut dyn TransactionLike, write_query: WriteQuery) -> InterpretationResult<QueryResult> {
@@ -31,7 +31,13 @@ fn update_one(tx: &mut dyn TransactionLike, q: UpdateRecord) -> InterpretationRe
 }
 
 fn delete_one(tx: &mut dyn TransactionLike, q: DeleteRecord) -> InterpretationResult<QueryResult> {
-    let res = tx.delete_records(q.model, Filter::from(q.where_))?;
+    // We need to ensure that we have a record finder, else we delete everything (conversion to empty filter).
+    let finder = match q.where_ {
+        Some(f) => Ok(f),
+        None => Err(InterpreterError::InterpretationError("No record finder specified for delete record operation. Aborting.".to_owned()))
+    }?;
+
+    let res = tx.delete_records(q.model, Filter::from(finder))?;
     Ok(QueryResult::Count(res))
 }
 

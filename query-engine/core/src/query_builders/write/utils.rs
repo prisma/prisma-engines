@@ -1,11 +1,11 @@
 use crate::{
     query_ast::*,
-    query_graph::{Node, NodeRef, QueryGraph},
+    query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
     ParsedInputValue,
 };
-use connector::filter::RecordFinder;
+use connector::{filter::RecordFinder, QueryArguments};
 use prisma_models::{ModelRef, RelationFieldRef, SelectedFields};
-use std::sync::Arc;
+use std::{convert::TryInto, sync::Arc};
 
 /// Detects and performs a flip of `parent` and `child`, if necessary.
 /// If a flip is performed: Removes all edges from the parent to it's parents, and rewire them to the child.
@@ -65,4 +65,34 @@ pub fn id_read_query_infallible(model: &ModelRef, record_finder: RecordFinder) -
     });
 
     Query::Read(read_query)
+}
+
+/// Adds a read query to the query graph that finds related records by parent ID.
+/// Connects the parent node and the read node witha an edge.
+/// Returns a `NodeRef` to the newly created read node.
+pub fn find_ids_by_parent(graph: &mut QueryGraph, relation_field: &RelationFieldRef, parent: &NodeRef) -> NodeRef {
+    let read_parent_node = graph.create_node(Query::Read(ReadQuery::RelatedRecordsQuery(RelatedRecordsQuery {
+        name: "parent".to_owned(),
+        alias: None,
+        parent_field: Arc::clone(relation_field),
+        parent_ids: None,
+        args: QueryArguments::default(),
+        selected_fields: relation_field.related_model().fields().id().into(),
+        nested: vec![],
+        selection_order: vec![],
+    })));
+
+    graph.create_edge(
+        parent,
+        &read_parent_node,
+        QueryGraphDependency::ParentId(Box::new(|mut node, parent_id| {
+            if let Node::Query(Query::Read(ReadQuery::RelatedRecordsQuery(ref mut rq))) = node {
+                rq.parent_ids = Some(vec![parent_id.unwrap().try_into().unwrap()]);
+            };
+
+            node
+        })),
+    );
+
+    read_parent_node
 }

@@ -1,13 +1,11 @@
 use super::*;
 use crate::{
     query_ast::*,
-    query_graph::{QueryGraph, QueryGraphDependency},
+    query_graph::{QueryGraph, QueryGraphDependency, NodeRef},
     ArgumentListLookup, ParsedField, ReadOneRecordBuilder,
 };
-use connector::{
-    filter::Filter,
-};
-use prisma_models::{ModelRef};
+use connector::filter::{Filter, RecordFinder};
+use prisma_models::ModelRef;
 use std::{convert::TryInto, sync::Arc};
 
 /// Creates a delete record query and adds it to the query graph.
@@ -20,15 +18,10 @@ pub fn delete_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedF
     read_query.inject_record_finder(record_finder.clone());
 
     let read_node = graph.create_node(Query::Read(read_query));
-    let delete_query = WriteQuery::DeleteRecord(DeleteRecord {
-        model,
-        where_: record_finder,
-    });
-    let delete_node = graph.create_node(Query::Write(delete_query));
+    let delete_node = delete_record_node(graph, Some(record_finder), model)?;
 
     graph.add_result_node(&read_node);
-    graph
-        .create_edge(&read_node, &delete_node, QueryGraphDependency::ExecutionOrder);
+    graph.create_edge(&read_node, &delete_node, QueryGraphDependency::ExecutionOrder);
 
     Ok(())
 }
@@ -44,4 +37,17 @@ pub fn delete_many_records(graph: &mut QueryGraph, model: ModelRef, mut field: P
 
     graph.create_node(Query::Write(delete_many));
     Ok(())
+}
+
+pub fn delete_record_node(
+    graph: &mut QueryGraph,
+    record_finder: Option<RecordFinder>,
+    model: ModelRef,
+) -> QueryBuilderResult<NodeRef> {
+    let delete_query = Query::Write(WriteQuery::DeleteRecord(DeleteRecord {
+        model,
+        where_: record_finder,
+    }));
+
+    Ok(graph.create_node(delete_query))
 }

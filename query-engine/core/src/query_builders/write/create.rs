@@ -1,15 +1,13 @@
 use super::*;
-use write_arguments::*;
 use crate::{
     query_ast::*,
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
     ArgumentListLookup, ParsedField, ParsedInputMap, ReadOneRecordBuilder,
 };
-use connector::{
-    filter::{RecordFinder},
-};
-use prisma_models::{ModelRef};
+use connector::filter::RecordFinder;
+use prisma_models::ModelRef;
 use std::{convert::TryInto, sync::Arc};
+use write_arguments::*;
 
 /// Creates a create record query and adds it to the query graph, together with it's nested queries and companion read query.
 pub fn create_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedField) -> QueryBuilderResult<()> {

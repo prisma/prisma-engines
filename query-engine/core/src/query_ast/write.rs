@@ -52,12 +52,12 @@ impl std::fmt::Display for WriteQuery {
             Self::DeleteRecord(q) => write!(
                 f,
                 "DeleteRecord: {:?}",
-                format!(
+                q.where_.as_ref().map(|finder| format!(
                     "{}, {} = {:?}",
-                    q.where_.field.model().name,
-                    q.where_.field.name,
-                    q.where_.value
-                )
+                    finder.field.model().name,
+                    finder.field.name,
+                    finder.value
+                ))
             ),
             Self::UpdateManyRecords(q) => write!(f, "UpdateManyRecords: {}", q.model.name),
             Self::DeleteManyRecords(q) => write!(f, "DeleteManyRecords: {}", q.model.name),
@@ -95,7 +95,7 @@ pub struct UpdateManyRecords {
 #[derive(Debug, Clone)]
 pub struct DeleteRecord {
     pub model: ModelRef,
-    pub where_: RecordFinder,
+    pub where_: Option<RecordFinder>,
 }
 
 #[derive(Debug, Clone)]
