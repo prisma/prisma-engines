@@ -167,7 +167,7 @@ fn apply_create_index(data_model: &mut Datamodel, step: &CreateIndex) {
     match model
         .indexes
         .iter()
-        .find(|index| index.name == step.name && index.is_unique == step.is_unique && index.fields == step.fields)
+        .find(|index| index.name == step.name && index.tpe == step.tpe && index.fields == step.fields)
     {
         Some(_) => panic!(
             "The index {:?} on fields ({:?}) of model {} already exists in this Datamodel. It is not possible to create it once more.",
@@ -177,7 +177,7 @@ fn apply_create_index(data_model: &mut Datamodel, step: &CreateIndex) {
             let index = IndexDefinition {
                 name: step.name.clone(),
                 fields: step.fields.clone(),
-                is_unique: step.is_unique,
+                tpe: step.tpe,
             };
 
             model.add_index(index)
@@ -194,13 +194,13 @@ fn apply_delete_index(data_model: &mut Datamodel, step: &DeleteIndex) {
     match model
         .indexes
         .iter()
-        .find(|index| index.name == step.name && index.is_unique == step.is_unique && index.fields == step.fields) {
+        .find(|index| index.name == step.name && index.tpe == step.tpe && index.fields == step.fields) {
         None => panic!(
             "The index {:?} on fields ({:?}) of model {} does not exist in this Datamodel. It is not possible to delete it.",
             step.name, step.fields, model.name,
         ),
         Some(_) => {
-            let new_indexes = model.indexes.drain(..).filter(|index| !(index.name == step.name && index.is_unique == step.is_unique && index.fields == step.fields)).collect();
+            let new_indexes = model.indexes.drain(..).filter(|index| !(index.name == step.name && index.tpe == step.tpe && index.fields == step.fields)).collect();
             model.indexes = new_indexes;
         },
     }
