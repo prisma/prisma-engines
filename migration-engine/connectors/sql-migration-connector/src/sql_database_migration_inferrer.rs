@@ -1,5 +1,5 @@
-use crate::database_schema_calculator::DatabaseSchemaCalculator;
-use crate::database_schema_differ::{DatabaseSchemaDiff, DatabaseSchemaDiffer};
+use crate::sql_schema_calculator::SqlSchemaCalculator;
+use crate::sql_schema_differ::{SqlSchemaDiff, SqlSchemaDiffer};
 use crate::*;
 use datamodel::*;
 use migration_connector::steps::MigrationStep;
@@ -21,7 +21,7 @@ impl DatabaseMigrationInferrer<SqlMigration> for SqlDatabaseMigrationInferrer {
         _steps: &Vec<MigrationStep>,
     ) -> ConnectorResult<SqlMigration> {
         let current_database_schema: SqlSchema = self.introspect(&self.schema_name)?;
-        let expected_database_schema = DatabaseSchemaCalculator::calculate(next)?;
+        let expected_database_schema = SqlSchemaCalculator::calculate(next)?;
         infer(
             &current_database_schema,
             &expected_database_schema,
@@ -70,7 +70,7 @@ fn infer_database_migration_steps_and_fix(
     schema_name: &str,
     sql_family: SqlFamily,
 ) -> SqlResult<(Vec<SqlMigrationStep>, Vec<SqlMigrationStep>)> {
-    let diff: DatabaseSchemaDiff = DatabaseSchemaDiffer::diff(&from, &to);
+    let diff: SqlSchemaDiff = SqlSchemaDiffer::diff(&from, &to);
     let is_sqlite = sql_family == SqlFamily::Sqlite;
 
     let corrected_steps = if is_sqlite {
@@ -80,7 +80,7 @@ fn infer_database_migration_steps_and_fix(
         fix_id_column_type_change(&from, &to, schema_name, steps)?
     };
 
-    Ok((DatabaseSchemaDiffer::diff(&from, &to).into_steps(), corrected_steps))
+    Ok((SqlSchemaDiffer::diff(&from, &to).into_steps(), corrected_steps))
 }
 
 fn fix_id_column_type_change(
@@ -128,7 +128,7 @@ fn fix_id_column_type_change(
             .map(|t| t.name.clone())
             .collect();
         radical_steps.push(SqlMigrationStep::DropTables(DropTables { names: tables_to_drop }));
-        let diff_from_empty: DatabaseSchemaDiff = DatabaseSchemaDiffer::diff(&SqlSchema::empty(), &to);
+        let diff_from_empty: SqlSchemaDiff = SqlSchemaDiffer::diff(&SqlSchema::empty(), &to);
         let mut steps_from_empty = delay_foreign_key_creation(diff_from_empty);
         radical_steps.append(&mut steps_from_empty);
 
@@ -142,7 +142,7 @@ fn fix_id_column_type_change(
 // Example: Table A has a reference to Table B and Table B has a reference to Table A.
 // We therefore split the creation of foreign key columns into separate steps when the referenced tables are not existing yet.
 // FIXME: This does not work with SQLite. A required column might get delayed. SQLite then fails with: "Cannot add a NOT NULL column with default value NULL"
-fn delay_foreign_key_creation(mut diff: DatabaseSchemaDiff) -> Vec<SqlMigrationStep> {
+fn delay_foreign_key_creation(mut diff: SqlSchemaDiff) -> Vec<SqlMigrationStep> {
     let names_of_tables_that_get_created: Vec<String> =
         diff.create_tables.iter().map(|t| t.table.name.clone()).collect();
     let mut extra_alter_tables = Vec::new();
@@ -186,7 +186,7 @@ fn delay_foreign_key_creation(mut diff: DatabaseSchemaDiff) -> Vec<SqlMigrationS
 }
 
 fn fix_stupid_sqlite(
-    diff: DatabaseSchemaDiff,
+    diff: SqlSchemaDiff,
     current_database_schema: &SqlSchema,
     next_database_schema: &SqlSchema,
     schema_name: &str,
