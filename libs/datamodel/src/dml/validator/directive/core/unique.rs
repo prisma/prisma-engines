@@ -61,14 +61,7 @@ impl DirectiveValidator<dml::Model> for ModelLevelUniqueValidator {
             .fields
             .iter()
             .filter_map(|field| {
-                if obj
-                    .fields
-                    .iter()
-                    .find(|model_field| {
-                        model_field.database_name.as_ref().unwrap_or(&model_field.name) == field.as_str()
-                    })
-                    .is_none()
-                {
+                if obj.find_field(&field).is_none() {
                     Some(field.to_string())
                 } else {
                     None
