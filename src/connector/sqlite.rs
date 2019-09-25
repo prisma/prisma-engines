@@ -39,7 +39,7 @@ impl TryFrom<&str> for SqliteParams {
             ))
         } else {
             let official = vec![];
-            let mut connection_limit = 2;
+            let mut connection_limit = num_cpus::get() * 2 + 4;
 
             if path_parts.len() > 1 {
                 let (_, unsupported): ConnectionParams = path_parts
@@ -57,8 +57,9 @@ impl TryFrom<&str> for SqliteParams {
                 for (k, v) in unsupported.into_iter() {
                     match k.as_ref() {
                         "connection_limit" => {
-                            let as_int: u32 =
+                            let as_int: usize =
                                 v.parse().map_err(|_| Error::InvalidConnectionArguments)?;
+
                             connection_limit = as_int;
                         }
                         _ => trace!("Discarding connection string param: {}", k),
@@ -67,7 +68,7 @@ impl TryFrom<&str> for SqliteParams {
             }
 
             Ok(Self {
-                connection_limit,
+                connection_limit: u32::try_from(connection_limit).unwrap(),
                 file_path: path,
                 schema: Some(schema),
             })

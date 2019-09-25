@@ -88,7 +88,7 @@ impl TryFrom<Url> for PostgresParams {
         config.dbname(dbname);
         config.connect_timeout(Duration::from_millis(5000));
 
-        let mut connection_limit = 2;
+        let mut connection_limit = num_cpus::get() * 2 + 4;
         let mut schema = String::from(DEFAULT_SCHEMA);
 
         for (k, v) in unsupported.into_iter() {
@@ -108,7 +108,7 @@ impl TryFrom<Url> for PostgresParams {
                     schema = v.to_string();
                 }
                 "connection_limit" => {
-                    let as_int: u32 = v.parse().map_err(|_| Error::InvalidConnectionArguments)?;
+                    let as_int: usize = v.parse().map_err(|_| Error::InvalidConnectionArguments)?;
                     connection_limit = as_int;
                 }
                 _ => trace!("Discarding connection string param: {}", k),
@@ -116,7 +116,7 @@ impl TryFrom<Url> for PostgresParams {
         }
 
         Ok(Self {
-            connection_limit,
+            connection_limit: u32::try_from(connection_limit).unwrap(),
             schema,
             config,
             dbname: dbname.to_string(),

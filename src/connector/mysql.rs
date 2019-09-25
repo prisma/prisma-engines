@@ -83,12 +83,12 @@ impl TryFrom<Url> for MysqlParams {
 
         config.db_name(Some(dbname));
 
-        let mut connection_limit = 2;
+        let mut connection_limit = num_cpus::get() * 2 + 4;
 
         for (k, v) in unsupported.into_iter() {
             match k.as_ref() {
                 "connection_limit" => {
-                    let as_int: u32 = v.parse().map_err(|_| Error::InvalidConnectionArguments)?;
+                    let as_int: usize = v.parse().map_err(|_| Error::InvalidConnectionArguments)?;
                     connection_limit = as_int;
                 }
                 _ => trace!("Discarding connection string param: {}", k),
@@ -96,7 +96,7 @@ impl TryFrom<Url> for MysqlParams {
         }
 
         Ok(Self {
-            connection_limit,
+            connection_limit: u32::try_from(connection_limit).unwrap(),
             config,
             dbname: dbname.to_string(),
         })
