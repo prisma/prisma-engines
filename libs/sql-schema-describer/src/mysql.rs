@@ -247,7 +247,7 @@ impl SqlSchemaDescriber {
         // We cannot assume that one row corresponds to one index.
 
         let mut primary_key: Option<PrimaryKey> = None;
-        let mut indices_map = BTreeMap::new();
+        let mut indexes_map: BTreeMap<String, Index> = BTreeMap::new();
 
         for row in rows {
             debug!("Got index row: {:#?}", row);
@@ -281,12 +281,12 @@ impl SqlSchemaDescriber {
             } else if fk_cols.contains(&column_name) {
                 ()
             } else {
-                if indices_map.contains_key(&index_name) {
-                    indices_map.get_mut(&index_name).map(|index: &mut Index| {
+                if indexes_map.contains_key(&index_name) {
+                    indexes_map.get_mut(&index_name).map(|index: &mut Index| {
                         index.columns.push(column_name);
                     });
                 } else {
-                    indices_map.insert(
+                    indexes_map.insert(
                         index_name.clone(),
                         Index {
                             name: index_name,
@@ -301,7 +301,7 @@ impl SqlSchemaDescriber {
             }
         }
 
-        let indices = indices_map.into_iter().map(|(_k, v)| v).collect();
+        let indices = indexes_map.into_iter().map(|(_k, v)| v).collect();
 
         debug!("Found table indices: {:?}, primary key: {:?}", indices, primary_key);
         (indices, primary_key)
