@@ -13,7 +13,7 @@ pub struct WriteArguments {
 impl WriteArguments {
     /// Creates a new set of WriteArguments. Expects the parsed input map from the respective data key, not the enclosing map.
     /// E.g.: { data: { THIS MAP } } from the `data` argument of a write query.
-    pub fn from(model: &ModelRef, data_map: ParsedInputMap) -> QueryBuilderResult<Self> {
+    pub fn from(model: &ModelRef, data_map: ParsedInputMap) -> QueryGraphBuilderResult<Self> {
         data_map.into_iter().try_fold(
             WriteArguments::default(),
             |mut args, (k, v): (String, ParsedInputValue)| {

@@ -7,7 +7,7 @@ mod upsert;
 mod utils;
 mod write_arguments;
 
-use super::{filters::*, utils::*, Builder, QueryBuilderResult};
+use super::*;
 
 // Expose top level write operation builder functions.
 pub use create::create_record;

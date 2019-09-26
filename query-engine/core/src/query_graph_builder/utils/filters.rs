@@ -91,7 +91,7 @@ impl FilterOp {
     }
 }
 
-pub fn extract_filter(value_map: BTreeMap<String, ParsedInputValue>, model: &ModelRef) -> QueryBuilderResult<Filter> {
+pub fn extract_filter(value_map: BTreeMap<String, ParsedInputValue>, model: &ModelRef) -> QueryGraphBuilderResult<Filter> {
     let filters = value_map
         .into_iter()
         .map(|(key, value): (String, ParsedInputValue)| {
@@ -99,7 +99,7 @@ pub fn extract_filter(value_map: BTreeMap<String, ParsedInputValue>, model: &Mod
 
             match op {
                 op if (op == FilterOp::NestedAnd || op == FilterOp::NestedOr || op == FilterOp::NestedNot) => {
-                    let value: QueryBuilderResult<Vec<Filter>> = match value {
+                    let value: QueryGraphBuilderResult<Vec<Filter>> = match value {
                         ParsedInputValue::List(values) => values
                             .into_iter()
                             .map(|val| extract_filter(val.try_into()?, model))
@@ -166,7 +166,7 @@ pub fn extract_filter(value_map: BTreeMap<String, ParsedInputValue>, model: &Mod
                 }
             }
         })
-        .collect::<QueryBuilderResult<Vec<Filter>>>()?;
+        .collect::<QueryGraphBuilderResult<Vec<Filter>>>()?;
 
     Ok(Filter::and(filters))
 }

@@ -10,7 +10,7 @@ use std::{convert::TryInto, sync::Arc};
 use write_arguments::*;
 
 /// Creates an update record query and adds it to the query graph, together with it's nested queries and companion read query.
-pub fn update_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedField) -> QueryBuilderResult<()> {
+pub fn update_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedField) -> QueryGraphBuilderResult<()> {
     let id_field = model.fields().id();
 
     // "where"
@@ -47,7 +47,11 @@ pub fn update_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedF
     Ok(())
 }
 /// Creates a create record query and adds it to the query graph.
-pub fn update_many_records(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedField) -> QueryBuilderResult<()> {
+pub fn update_many_records(
+    graph: &mut QueryGraph,
+    model: ModelRef,
+    mut field: ParsedField,
+) -> QueryGraphBuilderResult<()> {
     let filter = match field.arguments.lookup("where") {
         Some(where_arg) => extract_filter(where_arg.value.try_into()?, &model)?,
         None => Filter::empty(),
@@ -79,7 +83,7 @@ pub fn update_record_node(
     record_finder: Option<RecordFinder>,
     model: ModelRef,
     data_map: ParsedInputMap,
-) -> QueryBuilderResult<NodeRef> {
+) -> QueryGraphBuilderResult<NodeRef> {
     let update_args = WriteArguments::from(&model, data_map)?;
     let list_causes_update = !update_args.list.is_empty();
     let mut non_list_args = update_args.non_list;

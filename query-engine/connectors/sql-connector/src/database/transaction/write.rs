@@ -1,6 +1,10 @@
 use super::SqlConnectorTransaction;
-use crate::{QueryExt, query_builder::{WriteQueryBuilder, DeleteActions}, error::SqlError};
-use connector_interface::{*, error::ConnectorError};
+use crate::{
+    error::SqlError,
+    query_builder::{DeleteActions, WriteQueryBuilder},
+    QueryExt,
+};
+use connector_interface::{error::ConnectorError, *};
 use prisma_models::*;
 use prisma_query::{connector::Queryable, error::Error as QueryError};
 use std::sync::Arc;
@@ -73,7 +77,6 @@ impl<T> WriteOperations for SqlConnectorTransaction<'_, T> {
         for update in updates {
             self.inner.update(update).map_err(SqlError::from)?;
         }
-
 
         for (field_name, list_value) in args.list_args() {
             let field = model.fields().find_from_scalar(field_name.as_ref()).unwrap();

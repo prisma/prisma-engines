@@ -1,5 +1,4 @@
 use super::*;
-use crate::query_builders::{QueryBuilderResult, QueryValidationError}; // Todo note: Own error type for this mod.
 use crate::schema::*;
 use chrono::prelude::*;
 use prisma_models::{GraphqlId, PrismaValue};
@@ -24,11 +23,11 @@ impl QueryDocumentParser {
     pub fn parse_object(
         selections: &[Selection],
         schema_object: &ObjectTypeStrongRef,
-    ) -> QueryBuilderResult<ParsedObject> {
+    ) -> QueryParserResult<ParsedObject> {
         if selections.is_empty() {
-            return Err(QueryValidationError::ObjectValidationError {
+            return Err(QueryParserError::ObjectValidationError {
                 object_name: schema_object.name.clone(),
-                inner: Box::new(QueryValidationError::AtLeastOneSelectionError),
+                inner: Box::new(QueryParserError::AtLeastOneSelectionError),
             });
         }
 
@@ -37,23 +36,23 @@ impl QueryDocumentParser {
             .map(|selection| {
                 let parsed_field = match schema_object.find_field(selection.name.as_str()) {
                     Some(ref field) => Self::parse_field(selection, field),
-                    None => Err(QueryValidationError::FieldValidationError {
+                    None => Err(QueryParserError::FieldValidationError {
                         field_name: selection.name.clone(),
-                        inner: Box::new(QueryValidationError::FieldNotFoundError),
+                        inner: Box::new(QueryParserError::FieldNotFoundError),
                     }),
                 };
 
-                parsed_field.map_err(|err| QueryValidationError::ObjectValidationError {
+                parsed_field.map_err(|err| QueryParserError::ObjectValidationError {
                     object_name: schema_object.name.clone(),
                     inner: Box::new(err),
                 })
             })
-            .collect::<QueryBuilderResult<Vec<ParsedField>>>()
+            .collect::<QueryParserResult<Vec<ParsedField>>>()
             .map(|fields| ParsedObject { fields })
     }
 
     /// Parses and validates a selection against a schema (output) field.
-    fn parse_field(selection: &Selection, schema_field: &FieldRef) -> QueryBuilderResult<ParsedField> {
+    fn parse_field(selection: &Selection, schema_field: &FieldRef) -> QueryParserResult<ParsedField> {
         // Parse and validate all provided arguments for the field
         Self::parse_arguments(schema_field, &selection.arguments)
             .and_then(|arguments| {
@@ -76,7 +75,7 @@ impl QueryDocumentParser {
                     schema_field: Arc::clone(schema_field),
                 })
             })
-            .map_err(|err| QueryValidationError::FieldValidationError {
+            .map_err(|err| QueryParserError::FieldValidationError {
                 field_name: schema_field.name.clone(),
                 inner: Box::new(err),
             })
@@ -87,7 +86,7 @@ impl QueryDocumentParser {
     pub fn parse_arguments(
         schema_field: &FieldRef,
         given_arguments: &[(String, QueryValue)],
-    ) -> QueryBuilderResult<Vec<ParsedArgument>> {
+    ) -> QueryParserResult<Vec<ParsedArgument>> {
         let left: HashSet<&str> = schema_field.arguments.iter().map(|arg| arg.name.as_str()).collect();
         let right: HashSet<&str> = given_arguments.iter().map(|arg| arg.0.as_str()).collect();
         let diff = Diff::new(&left, &right);
@@ -96,12 +95,12 @@ impl QueryDocumentParser {
         diff.right
             .into_iter()
             .map(|extra_arg| {
-                Err(QueryValidationError::ArgumentValidationError {
+                Err(QueryParserError::ArgumentValidationError {
                     argument: (*extra_arg).to_owned(),
-                    inner: Box::new(QueryValidationError::ArgumentNotFoundError),
+                    inner: Box::new(QueryParserError::ArgumentNotFoundError),
                 })
             })
-            .collect::<QueryBuilderResult<Vec<()>>>()?;
+            .collect::<QueryParserResult<Vec<()>>>()?;
 
         // Check remaining arguments
         schema_field
@@ -128,7 +127,7 @@ impl QueryDocumentParser {
                         name: schema_arg.name.clone(),
                         value,
                     })
-                    .map_err(|err| QueryValidationError::ArgumentValidationError {
+                    .map_err(|err| QueryParserError::ArgumentValidationError {
                         argument: schema_arg.name.clone(),
                         inner: Box::new(err),
                     });
@@ -139,14 +138,14 @@ impl QueryDocumentParser {
                     None
                 }
             })
-            .collect::<Vec<QueryBuilderResult<ParsedArgument>>>()
+            .collect::<Vec<QueryParserResult<ParsedArgument>>>()
             .into_iter()
             .collect()
     }
 
     /// Parses and validates a QueryValue against an InputType, recursively.
     #[rustfmt::skip]
-    pub fn parse_input_value(value: QueryValue, input_type: &InputType) -> QueryBuilderResult<ParsedInputValue> {
+    pub fn parse_input_value(value: QueryValue, input_type: &InputType) -> QueryParserResult<ParsedInputValue> {
         // todo figure out what is up with enums
         match (&value, input_type) {
             // Handle null inputs
@@ -154,7 +153,7 @@ impl QueryDocumentParser {
             (_, InputType::Opt(ref inner))                  => Self::parse_input_value(value, inner),
 
             // The optional handling above guarantees that if we hit a Null here, a required value is missing.
-            (QueryValue::Null, _)                           => Err(QueryValidationError::RequiredValueNotSetError),
+            (QueryValue::Null, _)                           => Err(QueryParserError::RequiredValueNotSetError),
 
             // Scalar and enum handling.
             (_, InputType::Scalar(scalar))                  => Self::parse_scalar(value, &scalar).map(ParsedInputValue::Single),
@@ -164,13 +163,13 @@ impl QueryDocumentParser {
             (QueryValue::List(values), InputType::List(l))  => Self::parse_list(values.clone(), &l).map(ParsedInputValue::List),
             (_, InputType::List(l))                         => Self::parse_list(vec![value], &l).map(ParsedInputValue::List),
             (QueryValue::Object(o), InputType::Object(obj)) => Self::parse_input_object(o.clone(), obj.into_arc()).map(ParsedInputValue::Map),
-            (_, input_type)                                 => Err(QueryValidationError::ValueTypeMismatchError { have: value, want: input_type.clone() }),
+            (_, input_type)                                 => Err(QueryParserError::ValueTypeMismatchError { have: value, want: input_type.clone() }),
         }
     }
 
     /// Attempts to parse given query value into a concrete PrismaValue based on given scalar type.
     #[rustfmt::skip]
-    pub fn parse_scalar(value: QueryValue, scalar_type: &ScalarType) -> QueryBuilderResult<PrismaValue> {
+    pub fn parse_scalar(value: QueryValue, scalar_type: &ScalarType) -> QueryParserResult<PrismaValue> {
         match (value, scalar_type.clone()) {
             (QueryValue::Null, _)                         => Ok(PrismaValue::Null),
             (QueryValue::String(s), ScalarType::String)   => Ok(PrismaValue::String(s)),
@@ -184,7 +183,7 @@ impl QueryDocumentParser {
             (QueryValue::Boolean(b), ScalarType::Boolean) => Ok(PrismaValue::Boolean(b)),
             (QueryValue::Enum(e), ScalarType::Enum(et))   => match et.value_for(e.as_str()) {
                                                                 Some(val) => Ok(PrismaValue::Enum(val.clone())),
-                                                                None => Err(QueryValidationError::ValueParseError(format!("Enum value '{}' is invalid for enum type {}", e, et.name)))
+                                                                None => Err(QueryParserError::ValueParseError(format!("Enum value '{}' is invalid for enum type {}", e, et.name)))
                                                              },
 
             // Possible ID combinations TODO UUID ids are not encoded in any useful way in the schema.
@@ -192,42 +191,42 @@ impl QueryDocumentParser {
             (QueryValue::Int(i), ScalarType::ID)          => Ok(PrismaValue::GraphqlId(GraphqlId::Int(i as usize))),
 
             // Remainder of combinations is invalid
-            (qv, _)                                       => Err(QueryValidationError::ValueTypeMismatchError { have: qv, want: InputType::Scalar(scalar_type.clone()) }),
+            (qv, _)                                       => Err(QueryParserError::ValueTypeMismatchError { have: qv, want: InputType::Scalar(scalar_type.clone()) }),
         }
     }
 
-    pub fn parse_datetime(s: &str) -> QueryBuilderResult<DateTime<Utc>> {
+    pub fn parse_datetime(s: &str) -> QueryParserResult<DateTime<Utc>> {
         let fmt = "%Y-%m-%dT%H:%M:%S%.3f";
         Utc.datetime_from_str(s.trim_end_matches('Z'), fmt)
             .map(|dt| DateTime::<Utc>::from_utc(dt.naive_utc(), Utc))
             .map_err(|err| {
-                QueryValidationError::ValueParseError(format!(
+                QueryParserError::ValueParseError(format!(
                     "Invalid DateTime: {} DateTime must adhere to format: %Y-%m-%dT%H:%M:%S%.3f",
                     err
                 ))
             })
     }
 
-    pub fn parse_json(s: &str) -> QueryBuilderResult<serde_json::Value> {
-        serde_json::from_str(s).map_err(|err| QueryValidationError::ValueParseError(format!("Invalid json: {}", err)))
+    pub fn parse_json(s: &str) -> QueryParserResult<serde_json::Value> {
+        serde_json::from_str(s).map_err(|err| QueryParserError::ValueParseError(format!("Invalid json: {}", err)))
     }
 
-    pub fn parse_uuid(s: &str) -> QueryBuilderResult<Uuid> {
-        Uuid::parse_str(s).map_err(|err| QueryValidationError::ValueParseError(format!("Invalid UUID: {}", err)))
+    pub fn parse_uuid(s: &str) -> QueryParserResult<Uuid> {
+        Uuid::parse_str(s).map_err(|err| QueryParserError::ValueParseError(format!("Invalid UUID: {}", err)))
     }
 
-    pub fn parse_list(values: Vec<QueryValue>, value_type: &InputType) -> QueryBuilderResult<Vec<ParsedInputValue>> {
+    pub fn parse_list(values: Vec<QueryValue>, value_type: &InputType) -> QueryParserResult<Vec<ParsedInputValue>> {
         values
             .into_iter()
             .map(|val| Self::parse_input_value(val, value_type))
-            .collect::<QueryBuilderResult<Vec<ParsedInputValue>>>()
+            .collect::<QueryParserResult<Vec<ParsedInputValue>>>()
     }
 
     /// Parses and validates an input object recursively.
     pub fn parse_input_object(
         object: BTreeMap<String, QueryValue>,
         schema_object: InputObjectTypeStrongRef,
-    ) -> QueryBuilderResult<ParsedInputMap> {
+    ) -> QueryParserResult<ParsedInputMap> {
         let left: HashSet<&str> = schema_object
             .get_fields()
             .iter()
@@ -257,7 +256,7 @@ impl QueryDocumentParser {
                     },
                 }
             })
-            .collect::<QueryBuilderResult<Vec<_>>>()
+            .collect::<QueryParserResult<Vec<_>>>()
             .and_then(|defaults| {
                 // Checks all fields on the provided input object. This will catch extra, unknown fields and parsing errors.
                 object
@@ -265,30 +264,28 @@ impl QueryDocumentParser {
                     .map(|(k, v)| match schema_object.find_field(k.as_str()) {
                         Some(field) => Self::parse_input_field(v, &field).map(|parsed| (k, parsed)),
 
-                        None => Err(QueryValidationError::FieldValidationError {
+                        None => Err(QueryParserError::FieldValidationError {
                             field_name: k.clone(),
-                            inner: Box::new(QueryValidationError::FieldNotFoundError),
+                            inner: Box::new(QueryParserError::FieldNotFoundError),
                         }),
                     })
-                    .collect::<QueryBuilderResult<Vec<_>>>()
+                    .collect::<QueryParserResult<Vec<_>>>()
                     .map(|mut tuples| {
                         tuples.extend(defaults.into_iter());
                         tuples.into_iter().collect()
                     })
             })
-            .map_err(|err| QueryValidationError::ObjectValidationError {
+            .map_err(|err| QueryParserError::ObjectValidationError {
                 object_name: schema_object.name.clone(),
                 inner: Box::new(err),
             })
     }
 
     /// Parses and validates an input query value against a schema input field.
-    pub fn parse_input_field(value: QueryValue, schema_field: &InputFieldRef) -> QueryBuilderResult<ParsedInputValue> {
-        Self::parse_input_value(value, &schema_field.field_type).map_err(|err| {
-            QueryValidationError::FieldValidationError {
-                field_name: schema_field.name.clone(),
-                inner: Box::new(err),
-            }
+    pub fn parse_input_field(value: QueryValue, schema_field: &InputFieldRef) -> QueryParserResult<ParsedInputValue> {
+        Self::parse_input_value(value, &schema_field.field_type).map_err(|err| QueryParserError::FieldValidationError {
+            field_name: schema_field.name.clone(),
+            inner: Box::new(err),
         })
     }
 }

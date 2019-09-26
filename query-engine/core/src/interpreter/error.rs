@@ -1,28 +1,33 @@
-use std::fmt;
-use crate::{CoreError, QueryValidationError, QueryGraphError};
+use crate::{CoreError, QueryGraphBuilderError, QueryGraphError};
 use connector::error::ConnectorError;
 use prisma_models::DomainError;
+use std::fmt;
 
 #[derive(Debug)]
 pub enum InterpreterError {
     EnvVarNotFound(String),
-    TranslationError(String),
+
     DomainError(DomainError),
+
+    /// Expresses an error that ocurred during interpretation.
     InterpretationError(String),
-    InvalidQuery(QueryValidationError),
+
+    QueryGraphError(QueryGraphError),
+
+    /// Wraps errors occurring during the query graph building stage.
+    QueryGraphBuilderError(QueryGraphBuilderError),
+
+    /// Wraps errors coming from the connector during execution.
     ConnectorError(ConnectorError),
+
     Generic(String),
 }
 
 impl fmt::Display for InterpreterError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            Self::InvalidQuery(e) => write!(f, "{}", e),
-            _ => write!(
-            f,
-            "Error occurred during query execution:\n{:?}",
-            self
-        )
+            Self::QueryGraphBuilderError(e) => write!(f, "{:?}", e),
+            _ => write!(f, "Error occurred during query execution:\n{:?}", self),
         }
     }
 }
@@ -39,15 +44,15 @@ impl From<DomainError> for InterpreterError {
     }
 }
 
-impl From<QueryValidationError> for InterpreterError {
-    fn from(e: QueryValidationError) -> Self {
-        InterpreterError::InvalidQuery(e)
+impl From<QueryGraphBuilderError> for InterpreterError {
+    fn from(e: QueryGraphBuilderError) -> Self {
+        InterpreterError::QueryGraphBuilderError(e)
     }
 }
 
 impl From<QueryGraphError> for InterpreterError {
     fn from(e: QueryGraphError) -> Self {
-        InterpreterError::TranslationError(format!("{:?}", e))
+        InterpreterError::QueryGraphError(e)
     }
 }
 

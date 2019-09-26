@@ -12,17 +12,17 @@ impl QueryBuilder {
         QueryBuilder { query_schema }
     }
 
-    pub fn build(self, query_doc: QueryDocument) -> QueryBuilderResult<Vec<(QueryGraph, IrSerializer)>> {
+    pub fn build(self, query_doc: QueryDocument) -> QueryGraphBuilderResult<Vec<(QueryGraph, IrSerializer)>> {
         query_doc
             .operations
             .into_iter()
             .map(|op| self.map_operation(op))
-            .collect::<QueryBuilderResult<Vec<(QueryGraph, IrSerializer)>>>()
+            .collect::<QueryGraphBuilderResult<Vec<(QueryGraph, IrSerializer)>>>()
             .map_err(|err| err.into())
     }
 
     /// Maps an operation to a query.
-    fn map_operation(&self, operation: Operation) -> QueryBuilderResult<(QueryGraph, IrSerializer)> {
+    fn map_operation(&self, operation: Operation) -> QueryGraphBuilderResult<(QueryGraph, IrSerializer)> {
         match operation {
             Operation::Read(selection) => self.map_read_operation(selection),
             Operation::Write(selection) => self.map_write_operation(selection),
@@ -30,18 +30,21 @@ impl QueryBuilder {
     }
 
     /// Maps a read operation to one or more queries.
-    fn map_read_operation(&self, read_selection: Selection) -> QueryBuilderResult<(QueryGraph, IrSerializer)> {
+    fn map_read_operation(&self, read_selection: Selection) -> QueryGraphBuilderResult<(QueryGraph, IrSerializer)> {
         let query_object = self.query_schema.query();
         Self::process(read_selection, &query_object)
     }
 
     /// Maps a write operation to one or more queries.
-    fn map_write_operation(&self, write_selection: Selection) -> QueryBuilderResult<(QueryGraph, IrSerializer)> {
+    fn map_write_operation(&self, write_selection: Selection) -> QueryGraphBuilderResult<(QueryGraph, IrSerializer)> {
         let mutation_object = self.query_schema.mutation();
         Self::process(write_selection, &mutation_object)
     }
 
-    fn process(selection: Selection, object: &ObjectTypeStrongRef) -> QueryBuilderResult<(QueryGraph, IrSerializer)> {
+    fn process(
+        selection: Selection,
+        object: &ObjectTypeStrongRef,
+    ) -> QueryGraphBuilderResult<(QueryGraph, IrSerializer)> {
         let mut selections = vec![selection];
         let mut parsed_object = QueryDocumentParser::parse_object(&selections, object)?;
         let parsed_field = parsed_object.fields.pop().unwrap();
@@ -49,7 +52,7 @@ impl QueryBuilder {
 
         let query_graph = match &parsed_field.schema_field.clone().query_builder {
             Some(builder) => builder.build(parsed_field),
-            None => Err(QueryValidationError::AssertionError(format!(
+            None => Err(QueryGraphBuilderError::SchemaError(format!(
                 "Expected attached query builder on {} object, root level field '{}'.",
                 object.name, parsed_field.name
             ))),

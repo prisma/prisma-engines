@@ -1,4 +1,4 @@
-use crate::{InterpreterError, QueryValidationError};
+use crate::{InterpreterError, QueryParserError, QueryGraphError, QueryGraphBuilderError};
 use connector::error::ConnectorError;
 use failure::Fail;
 use prisma_models::DomainError;
@@ -6,6 +6,12 @@ use prisma_models::DomainError;
 // TODO: Cleanup unused errors after refactorings.
 #[derive(Debug, Fail)]
 pub enum CoreError {
+    #[fail(display = "Error in query graph construction: {:?}", _0)]
+    QueryGraphError(QueryGraphError),
+
+    #[fail(display = "Error in query graph construction: {:?}", _0)]
+    QueryGraphBuilderError(QueryGraphBuilderError),
+
     #[fail(display = "Error in connector: {}", _0)]
     ConnectorError(ConnectorError),
 
@@ -13,7 +19,7 @@ pub enum CoreError {
     DomainError(DomainError),
 
     #[fail(display = "{}", _0)]
-    QueryValidationError(QueryValidationError),
+    QueryParserError(QueryParserError),
 
     #[fail(display = "Unsupported feature: {}", _0)]
     UnsupportedFeatureError(String),
@@ -28,6 +34,18 @@ pub enum CoreError {
     InterpreterError(InterpreterError),
 }
 
+impl From<QueryGraphBuilderError> for CoreError {
+    fn from(e: QueryGraphBuilderError) -> CoreError {
+        CoreError::QueryGraphBuilderError(e)
+    }
+}
+
+impl From<QueryGraphError> for CoreError {
+    fn from(e: QueryGraphError) -> CoreError {
+        CoreError::QueryGraphError(e)
+    }
+}
+
 impl From<ConnectorError> for CoreError {
     fn from(e: ConnectorError) -> CoreError {
         CoreError::ConnectorError(e)
@@ -40,9 +58,9 @@ impl From<DomainError> for CoreError {
     }
 }
 
-impl From<QueryValidationError> for CoreError {
-    fn from(e: QueryValidationError) -> CoreError {
-        CoreError::QueryValidationError(e)
+impl From<QueryParserError> for CoreError {
+    fn from(e: QueryParserError) -> CoreError {
+        CoreError::QueryParserError(e)
     }
 }
 

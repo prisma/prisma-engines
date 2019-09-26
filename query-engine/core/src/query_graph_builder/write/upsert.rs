@@ -8,7 +8,7 @@ use connector::filter::RecordFinder;
 use prisma_models::ModelRef;
 use std::{convert::TryInto, sync::Arc};
 
-pub fn upsert_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedField) -> QueryBuilderResult<()> {
+pub fn upsert_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedField) -> QueryGraphBuilderResult<()> {
     let where_arg = field.arguments.lookup("where").unwrap();
     let record_finder = extract_record_finder(where_arg.value, &model)?;
 

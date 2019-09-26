@@ -23,7 +23,7 @@ pub enum ReadQueryBuilder {
 }
 
 impl Builder<ReadQuery> for ReadQueryBuilder {
-    fn build(self) -> QueryBuilderResult<ReadQuery> {
+    fn build(self) -> QueryGraphBuilderResult<ReadQuery> {
         match self {
             ReadQueryBuilder::ReadOneRecordBuilder(b) => b.build(),
             ReadQueryBuilder::ReadManyRecordsBuilder(b) => b.build(),
@@ -66,7 +66,7 @@ pub fn collect_selected_fields(
     SelectedFields::new(selected_fields, parent)
 }
 
-pub fn collect_nested_queries(from: Vec<ParsedField>, model: &ModelRef) -> QueryBuilderResult<Vec<ReadQuery>> {
+pub fn collect_nested_queries(from: Vec<ParsedField>, model: &ModelRef) -> QueryGraphBuilderResult<Vec<ReadQuery>> {
     from.into_iter()
         .filter_map(|selected_field| {
             let model_field = model.fields().find_from_all(&selected_field.name).unwrap();
@@ -85,5 +85,5 @@ pub fn collect_nested_queries(from: Vec<ParsedField>, model: &ModelRef) -> Query
         .collect::<Vec<ReadQueryBuilder>>()
         .into_iter()
         .map(|builder| builder.build())
-        .collect::<QueryBuilderResult<Vec<ReadQuery>>>()
+        .collect::<QueryGraphBuilderResult<Vec<ReadQuery>>>()
 }

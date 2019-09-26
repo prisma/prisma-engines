@@ -13,7 +13,7 @@ pub fn connect_nested_query(
     parent: &NodeRef,
     relation_field: RelationFieldRef,
     data_map: ParsedInputMap,
-) -> QueryBuilderResult<()> {
+) -> QueryGraphBuilderResult<()> {
     let model = relation_field.related_model();
 
     for (field_name, value) in data_map {
@@ -35,7 +35,7 @@ pub fn connect_nested_create(
     relation_field: &RelationFieldRef,
     value: ParsedInputValue,
     model: &ModelRef,
-) -> QueryBuilderResult<()> {
+) -> QueryGraphBuilderResult<()> {
     for value in utils::coerce_vec(value) {
         let child = create::create_record_node(graph, Arc::clone(model), value.try_into()?)?;
         let relation_field_name = relation_field.name.clone();
@@ -74,7 +74,7 @@ pub fn connect_nested_update(
     relation_field: &RelationFieldRef,
     value: ParsedInputValue,
     model: &ModelRef,
-) -> QueryBuilderResult<()> {
+) -> QueryGraphBuilderResult<()> {
     for value in utils::coerce_vec(value) {
         if relation_field.is_list {
             // We have a record specified as a record finder in "where"
@@ -117,7 +117,7 @@ pub fn connect_nested_connect(
     relation_field: &RelationFieldRef,
     value: ParsedInputValue,
     model: &ModelRef,
-) -> QueryBuilderResult<()> {
+) -> QueryGraphBuilderResult<()> {
     for value in utils::coerce_vec(value) {
         // First, we need to build a read query on the record to be conneted.
         let record_finder = extract_record_finder(value, &model)?;
@@ -155,7 +155,7 @@ pub fn connect_nested_connect(
     Ok(())
 }
 
-/// Adds a delete record node to the graph and connects it to the parent.
+/// Adds a delete (single) record node to the graph and connects it to the parent.
 /// Auxiliary nodes may be added to support the deletion process, e.g. extra read nodes.
 ///
 /// If the relation is a list:
@@ -172,14 +172,17 @@ pub fn connect_nested_delete(
     relation_field: &RelationFieldRef,
     value: ParsedInputValue,
     model: &ModelRef,
-) -> QueryBuilderResult<()> {
+) -> QueryGraphBuilderResult<()> {
     for value in utils::coerce_vec(value) {
         if relation_field.is_list {
-            // Todo we need to make sure the records are actually connected...
+            // Todo:
+            // - we need to make sure the records are actually connected...
+            // - What about the checks currently performed in `DeleteActions`?
             let record_finder = extract_record_finder(value, &model)?;
             let delete_node = delete::delete_record_node(graph, Some(record_finder), Arc::clone(&model));
 
-            graph.create_edge(parent, to: &NodeRef, content: QueryGraphDependency);
+            // graph.create_edge(parent, to: &NodeRef, content: QueryGraphDependency);
+            unimplemented!()
         } else {
             // if relation_field.relation_is_inlined_in_parent() {
             //     let delete_node = delete::delete_record_node(graph, None, Arc::clone(&model));

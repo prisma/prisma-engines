@@ -1,17 +1,17 @@
-///! Every builder is required to cache input and output type refs that are created inside
-///! of them, e.g. as soon as the builder produces a ref, it must be retrievable later,
-///! without leaking memory due to Arcs pointing to each other.
-///!
-///! The cache has two purposes:
-///! - First, break circular dependencies, as they can happen in recursive input / output types.
-///! - Second, it serves as a central list of build types of that builder, which are used later to
-///!   collect all types of the query schema.
-///!
-///! The cached types are stored as Arcs, and the cache owns these (strong) Arcs,
-///! while the cache will only hand out weak arcs. Not only does this simplify the builder architecture,
-///! but also prevents issues with memory leaks in the schema, as well as issues that when all strong
-///! arcs are dropped due to visitor operations, the schema can't be traversed anymore due to invalid references.
-///!
+//! Every builder is required to cache input and output type refs that are created inside
+//! of them, e.g. as soon as the builder produces a ref, it must be retrievable later,
+//! without leaking memory due to Arcs pointing to each other.
+//!
+//! The cache has two purposes:
+//! - First, break circular dependencies, as they can happen in recursive input / output types.
+//! - Second, it serves as a central list of build types of that builder, which are used later to
+//!   collect all types of the query schema.
+//!
+//! The cached types are stored as Arcs, and the cache owns these (strong) Arcs,
+//! while the cache will only hand out weak arcs. Not only does this simplify the builder architecture,
+//! but also prevents issues with memory leaks in the schema, as well as issues that when all strong
+//! arcs are dropped due to visitor operations, the schema can't be traversed anymore due to invalid references.
+//!
 use super::*;
 use std::{
     cell::RefCell,

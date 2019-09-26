@@ -20,7 +20,7 @@ impl ReadRelatedRecordsBuilder {
 }
 
 impl Builder<ReadQuery> for ReadRelatedRecordsBuilder {
-    fn build(self) -> QueryBuilderResult<ReadQuery> {
+    fn build(self) -> QueryGraphBuilderResult<ReadQuery> {
         let args = utils::extract_query_args(self.field.arguments, &self.model)?;
         let name = self.field.name;
         let alias = self.field.alias;

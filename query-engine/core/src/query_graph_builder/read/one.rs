@@ -16,7 +16,7 @@ impl ReadOneRecordBuilder {
 impl Builder<ReadQuery> for ReadOneRecordBuilder {
     /// Builds a read query tree from a parsed top-level field of a query
     /// Unwraps are safe because of query validation that ensures conformity to the query schema.
-    fn build(mut self) -> QueryBuilderResult<ReadQuery> {
+    fn build(mut self) -> QueryGraphBuilderResult<ReadQuery> {
         let record_finder = match self.field.arguments.lookup("where") {
             Some(where_arg) => Some(utils::extract_record_finder(where_arg.value, &self.model)?),
             None => None,

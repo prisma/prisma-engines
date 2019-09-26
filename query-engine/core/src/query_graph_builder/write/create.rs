@@ -10,7 +10,7 @@ use std::{convert::TryInto, sync::Arc};
 use write_arguments::*;
 
 /// Creates a create record query and adds it to the query graph, together with it's nested queries and companion read query.
-pub fn create_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedField) -> QueryBuilderResult<()> {
+pub fn create_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedField) -> QueryGraphBuilderResult<()> {
     let id_field = model.fields().id();
     let data_argument = field.arguments.lookup("data").unwrap();
     let data_map: ParsedInputMap = data_argument.value.try_into()?;
@@ -45,7 +45,7 @@ pub fn create_record_node(
     graph: &mut QueryGraph,
     model: ModelRef,
     data_map: ParsedInputMap,
-) -> QueryBuilderResult<NodeRef> {
+) -> QueryGraphBuilderResult<NodeRef> {
     let create_args = WriteArguments::from(&model, data_map)?;
     let mut non_list_args = create_args.non_list;
 

@@ -2,8 +2,8 @@ use crate::{query_document::QueryValue, schema::InputType};
 use std::fmt;
 
 #[derive(Debug)]
-pub enum QueryValidationError {
-    AssertionError(String), // Naming is WIP. Denotes a generic validation error.
+pub enum QueryParserError {
+    AssertionError(String),
     RequiredValueNotSetError,
     FieldNotFoundError,
     ArgumentNotFoundError,
@@ -16,44 +16,44 @@ pub enum QueryValidationError {
     },
     FieldValidationError {
         field_name: String,
-        inner: Box<QueryValidationError>,
+        inner: Box<QueryParserError>,
     },
     ArgumentValidationError {
         argument: String,
-        inner: Box<QueryValidationError>,
+        inner: Box<QueryParserError>,
     },
     ObjectValidationError {
         object_name: String,
-        inner: Box<QueryValidationError>,
+        inner: Box<QueryParserError>,
     },
 }
 
-impl QueryValidationError {
+impl QueryParserError {
     pub fn format(&self, ident: usize) -> String {
         match self {
-            QueryValidationError::AssertionError(reason) => format!("General assertion error: {}.", reason),
-            QueryValidationError::RequiredValueNotSetError => "A value is required but not set.".into(),
-            QueryValidationError::FieldNotFoundError => "Field does not exist on enclosing type.".into(),
-            QueryValidationError::ArgumentNotFoundError => "Argument does not exist on enclosing type.".into(),
-            QueryValidationError::AtLeastOneSelectionError => "At least one selection is required.".into(),
-            QueryValidationError::ValueParseError(reason) => format!("Error parsing value: {}.", reason),
-            QueryValidationError::ValueTypeMismatchError { have, want } => {
+            QueryParserError::AssertionError(reason) => format!("General assertion error: {}.", reason),
+            QueryParserError::RequiredValueNotSetError => "A value is required but not set.".into(),
+            QueryParserError::FieldNotFoundError => "Field does not exist on enclosing type.".into(),
+            QueryParserError::ArgumentNotFoundError => "Argument does not exist on enclosing type.".into(),
+            QueryParserError::AtLeastOneSelectionError => "At least one selection is required.".into(),
+            QueryParserError::ValueParseError(reason) => format!("Error parsing value: {}.", reason),
+            QueryParserError::ValueTypeMismatchError { have, want } => {
                 format!("Value types mismatch. Have: {:?}, want: {:?}", have, want)
             } // wip value/type formatting
 
             // Validation root
-            QueryValidationError::ObjectValidationError { object_name, inner } => format!(
+            QueryParserError::ObjectValidationError { object_name, inner } => format!(
                 "{} (object)\n{}",
                 object_name,
                 Self::ident(inner.format(ident + 2), ident + 2)
             ),
 
-            QueryValidationError::FieldValidationError { field_name, inner } => format!(
+            QueryParserError::FieldValidationError { field_name, inner } => format!(
                 "{} (field)\n{}",
                 field_name,
                 Self::ident(inner.format(ident + 2), ident + 2)
             ),
-            QueryValidationError::ArgumentValidationError { argument, inner } => format!(
+            QueryParserError::ArgumentValidationError { argument, inner } => format!(
                 "{} (argument)\n{}",
                 argument,
                 Self::ident(inner.format(ident + 2), ident + 2)
@@ -66,7 +66,7 @@ impl QueryValidationError {
     }
 }
 
-impl fmt::Display for QueryValidationError {
+impl fmt::Display for QueryParserError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(
             f,
@@ -76,8 +76,8 @@ impl fmt::Display for QueryValidationError {
     }
 }
 
-impl From<prisma_models::DomainError> for QueryValidationError {
+impl From<prisma_models::DomainError> for QueryParserError {
     fn from(err: prisma_models::DomainError) -> Self {
-        QueryValidationError::AssertionError(format!("Domain error occurred: {}", err))
+        QueryParserError::AssertionError(format!("Domain error occurred: {}", err))
     }
 }

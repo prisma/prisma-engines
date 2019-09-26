@@ -1,5 +1,5 @@
-///! Skeleton for QueryGraph validation rules.
-///! Only basic POC rules jotted down at the moment, to be expanded later.
+//! Skeleton for QueryGraph invariance rules checker.
+//! Only basic POC rules jotted down at the moment, to be expanded later.
 use super::*;
 use itertools::Itertools;
 
@@ -16,7 +16,7 @@ fn if_flow_edge_rules(graph: &QueryGraph, edge: &EdgeRef) -> QueryGraphResult<()
     if let Node::Flow(Flow::If(_)) = source_node_content {
         match graph.edge_content(edge).unwrap() {
             QueryGraphDependency::Then | QueryGraphDependency::Else => Ok(()),
-            x => Err(QueryGraphError::RuleViolation(format!(
+            x => Err(QueryGraphError::InvarianceViolation(format!(
                 "Invalid edge '{}' for If node {}.",
                 x,
                 source_node.id()
@@ -25,7 +25,7 @@ fn if_flow_edge_rules(graph: &QueryGraph, edge: &EdgeRef) -> QueryGraphResult<()
 
         let pairs = graph.child_pairs(&source_node);
         if pairs.len() > 2 {
-            return Err(QueryGraphError::RuleViolation(
+            return Err(QueryGraphError::InvarianceViolation(
                 "'If' node has invalid amound of children (min 1, max 2).".into(),
             ));
         }
@@ -55,7 +55,7 @@ fn only_allow_related_parents_edges(graph: &QueryGraph, edge: &EdgeRef) -> Query
     {
         Ok(())
     } else {
-        Err(QueryGraphError::RuleViolation(format!(
+        Err(QueryGraphError::InvarianceViolation(format!(
             "Edge {} to node {} violates constraint that all parents must be ancestors of each other.",
             edge.id(),
             graph.edge_target(edge).id()

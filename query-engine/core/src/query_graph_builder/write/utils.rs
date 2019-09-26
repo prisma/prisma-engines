@@ -96,3 +96,8 @@ pub fn find_ids_by_parent(graph: &mut QueryGraph, relation_field: &RelationField
 
     read_parent_node
 }
+
+pub fn ensure_connected(graph: &mut QueryGraph) -> NodeRef {
+    // load all children with their parent ids and make sure they match?
+    unimplemented!()
+}

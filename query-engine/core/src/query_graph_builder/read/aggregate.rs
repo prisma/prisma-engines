@@ -14,7 +14,7 @@ impl AggregateRecordsBuilder {
 }
 
 impl Builder<ReadQuery> for AggregateRecordsBuilder {
-    fn build(self) -> QueryBuilderResult<ReadQuery> {
+    fn build(self) -> QueryGraphBuilderResult<ReadQuery> {
         let name = self.field.name;
         let alias = self.field.alias;
         let model = self.model;

@@ -1,5 +1,5 @@
 use super::*;
-use crate::{ParsedField, QueryBuilderResult, QueryGraph};
+use crate::{ParsedField, QueryGraph, QueryGraphBuilderResult};
 use once_cell::sync::OnceCell;
 use prisma_models::{EnumType, InternalDataModelRef, ModelRef, PrismaValue};
 use std::{
@@ -141,6 +141,7 @@ pub struct Field {
     pub query_builder: Option<SchemaQueryBuilder>,
 }
 
+/// Todo rework description.
 /// A query builder allows to attach queries to the schema:
 /// on a field:
 /// - A `ModelQueryBuilder` builds queries specific to models, such as `findOne<Model>`.
@@ -156,7 +157,7 @@ pub enum SchemaQueryBuilder {
 }
 
 impl SchemaQueryBuilder {
-    pub fn build(&self, parsed_field: ParsedField) -> QueryBuilderResult<QueryGraph> {
+    pub fn build(&self, parsed_field: ParsedField) -> QueryGraphBuilderResult<QueryGraph> {
         match self {
             Self::ModelQueryBuilder(m) => m.build(parsed_field),
             _ => unimplemented!(),
@@ -164,7 +165,7 @@ impl SchemaQueryBuilder {
     }
 }
 
-pub type QueryBuilderFn = dyn (Fn(ModelRef, ParsedField) -> QueryBuilderResult<QueryGraph>) + Send + Sync;
+pub type QueryBuilderFn = dyn (Fn(ModelRef, ParsedField) -> QueryGraphBuilderResult<QueryGraph>) + Send + Sync;
 
 /// Designates a specific top-level operation on a corresponding model.
 #[derive(DebugStub)]
@@ -184,7 +185,7 @@ impl ModelQueryBuilder {
         Self { model, tag, builder_fn }
     }
 
-    pub fn build(&self, parsed_field: ParsedField) -> QueryBuilderResult<QueryGraph> {
+    pub fn build(&self, parsed_field: ParsedField) -> QueryGraphBuilderResult<QueryGraph> {
         (self.builder_fn)(Arc::clone(&self.model), parsed_field)
     }
 }

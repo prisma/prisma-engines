@@ -1,9 +1,9 @@
-///! Query graph abstraction for simple high-level query representation and manipulation.
-///! Wraps Petgraph crate graph.
+//! Query graph abstraction for simple high-level query representation and manipulation.
+//! Wraps Petgraph crate graph.
 mod error;
 mod formatters;
 mod guard;
-mod rules;
+mod invariance_rules;
 mod transformers;
 
 #[cfg(test)]
@@ -15,9 +15,9 @@ pub use transformers::*;
 
 use crate::Query;
 use guard::*;
+use invariance_rules::*;
 use petgraph::{graph::*, visit::EdgeRef as PEdgeRef, *};
 use prisma_models::PrismaValue;
-use rules::*;
 use std::borrow::Borrow;
 
 pub type QueryGraphResult<T> = std::result::Result<T, QueryGraphError>;

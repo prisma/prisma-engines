@@ -1,5 +1,6 @@
-#![warn(warnings)] // todo deny warnings once done
+#![warn(warnings)] // Todo deny warnings once done
 
+// Todo logging?
 // #[macro_use]
 // extern crate log;
 
@@ -13,7 +14,7 @@ pub mod error;
 pub mod executor;
 pub mod interpreter;
 pub mod query_ast;
-pub mod query_builders;
+pub mod query_graph_builder;
 pub mod query_document;
 pub mod query_graph;
 pub mod response_ir;
@@ -25,7 +26,7 @@ pub use error::*;
 pub use executor::*;
 pub use interpreter::*;
 pub use query_ast::*;
-pub use query_builders::*;
+pub use query_graph_builder::*;
 pub use query_document::*;
 pub use query_graph::*;
 pub use response_ir::*;
@@ -33,4 +34,5 @@ pub use schema::*;
 pub use schema_builder::*;
 pub use result_ast::*;
 
+/// Result type tying all sub-result type hierarchies of the core together.
 pub type CoreResult<T> = Result<T, CoreError>;

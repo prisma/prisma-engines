@@ -1,5 +1,5 @@
 use super::*;
-use crate::{query_builders::*, QueryGraph, Query};
+use crate::{query_graph_builder::*, Query, QueryGraph};
 
 /// Build mode for schema generation.
 #[derive(Debug, Copy, Clone)]
@@ -382,7 +382,7 @@ impl<'a> QuerySchemaBuilder<'a> {
                 QueryTag::UpdateMany,
                 Box::new(|model, parsed_field| {
                     let mut graph = QueryGraph::new();
-                        write::update_many_records(&mut graph, model, parsed_field).map(|_| graph)
+                    write::update_many_records(&mut graph, model, parsed_field).map(|_| graph)
                 }),
             ))),
         )
