@@ -1,6 +1,6 @@
 use super::{pipeline::QueryPipeline, QueryExecutor};
 use crate::{
-    CoreResult, IrSerializer, QueryBuilder, QueryDocument, QueryGraph, QueryInterpreter, QuerySchemaRef, Response,
+    CoreResult, IrSerializer, QueryGraphBuilder, QueryDocument, QueryGraph, QueryInterpreter, QuerySchemaRef, Response,
 };
 use connector::{Connector, TransactionLike};
 
@@ -41,7 +41,7 @@ where
 {
     fn execute(&self, query_doc: QueryDocument, query_schema: QuerySchemaRef) -> CoreResult<Vec<Response>> {
         // Parse, validate, and extract query graphs from query document.
-        let queries: Vec<(QueryGraph, IrSerializer)> = QueryBuilder::new(query_schema).build(query_doc)?;
+        let queries: Vec<(QueryGraph, IrSerializer)> = QueryGraphBuilder::new(query_schema).build(query_doc)?;
 
         // Create pipelines for all separate queries
         queries

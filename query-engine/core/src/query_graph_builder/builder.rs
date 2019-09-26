@@ -3,13 +3,13 @@ use crate::{query_document::*, query_graph::*, schema::*, IrSerializer};
 
 // TODO: Think about if this is really necessary here, or if the whole code should move into
 // the query_document module, possibly already as part of the parser.
-pub struct QueryBuilder {
+pub struct QueryGraphBuilder {
     pub query_schema: QuerySchemaRef,
 }
 
-impl QueryBuilder {
+impl QueryGraphBuilder {
     pub fn new(query_schema: QuerySchemaRef) -> Self {
-        QueryBuilder { query_schema }
+        Self { query_schema }
     }
 
     pub fn build(self, query_doc: QueryDocument) -> QueryGraphBuilderResult<Vec<(QueryGraph, IrSerializer)>> {

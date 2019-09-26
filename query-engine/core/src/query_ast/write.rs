@@ -123,30 +123,3 @@ pub struct SetRecords {
 pub struct ResetData {
     pub internal_data_model: InternalDataModelRef,
 }
-
-// SET
-
-// #[derive(Debug, Clone)]
-// pub struct NestedSet {
-//     pub relation_field: Arc<RelationField>,
-//     pub wheres: Vec<RecordFinder>,
-// }
-
-// // CONNECT
-
-// #[derive(Debug, Clone)]
-// pub struct NestedConnect {
-//     pub relation_field: RelationFieldRef,
-//     pub where_: RecordFinder,
-//     pub top_is_create: bool,
-// }
-
-// // DISCONNECT
-
-// #[derive(Debug, Clone)]
-// pub struct NestedDisconnect {
-//     pub relation_field: Arc<RelationField>,
-//     pub where_: Option<RecordFinder>,
-// }
-
-// // RESET

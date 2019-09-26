@@ -2,14 +2,14 @@
 //! tbd
 
 mod error;
-mod query_builder;
+mod builder;
 mod read;
 mod utils;
 
 pub mod write;
 
 pub use error::*;
-pub use query_builder::*;
+pub use builder::*;
 pub use read::*;
 pub use utils::*;
 
