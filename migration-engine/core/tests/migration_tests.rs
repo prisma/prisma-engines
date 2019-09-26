@@ -1091,7 +1091,6 @@ fn index_renaming_must_work_when_renaming_to_custom() {
             }
         "#;
         let result = infer_and_apply(api, &dm2);
-        // panic!("{:#?}", result.sql_schema.table_bang("A").indices);
         let indexes = result
             .sql_schema
             .table_bang("A")

@@ -357,4 +357,45 @@ mod tests {
         // fields do not match
         assert!(!create_index.applies_to_index(&definition));
     }
+
+    #[test]
+    fn update_index_must_apply_to_the_right_indexes() {
+        let definition = IndexDefinition {
+            fields: vec!["testColumn".into()],
+            tpe: IndexType::Unique,
+            name: None,
+        };
+        let correct_update_index = UpdateIndex {
+            model: "ignored".into(),
+            fields: vec!["testColumn".into()],
+            tpe: IndexType::Unique,
+            name: None,
+        };
+
+        assert!(correct_update_index.applies_to_index(&definition));
+
+        let update_index = UpdateIndex {
+            tpe: IndexType::Normal,
+            ..correct_update_index.clone()
+        };
+
+        // tpe does not match
+        assert!(!update_index.applies_to_index(&definition));
+
+        let update_index = UpdateIndex {
+            name: Some("index_on_testColumn".to_owned()),
+            ..correct_update_index.clone()
+        };
+
+        // name does not match, but it does not matter
+        assert!(update_index.applies_to_index(&definition));
+
+        let update_index = UpdateIndex {
+            fields: vec!["testColumn".into(), "otherColumn".into()],
+            ..correct_update_index.clone()
+        };
+
+        // fields do not match
+        assert!(!update_index.applies_to_index(&definition));
+    }
 }
