@@ -1,4 +1,4 @@
-use super::{expression::*, Env, InterpretationResult};
+use super::{expression::*, Env, InterpretationResult, InterpreterError};
 use crate::{query_graph::*, Query};
 use std::convert::TryInto;
 
@@ -107,11 +107,11 @@ impl Expressionista {
         if parent_edges.is_empty() {
             Expression::Query { query }
         } else {
-            // Collect all parent ID dependency tuples.
+            // Collect all parent ID dependency tuples (transformers).
             let parent_id_deps: Vec<(String, Box<_>)> = parent_edges
                 .into_iter()
                 .filter_map(|edge| match graph.pluck_edge(&edge) {
-                    QueryGraphDependency::ParentId(f) => {
+                    QueryGraphDependency::ParentIds(f) => {
                         let parent_binding_name = graph.edge_source(&edge).id();
                         Some((parent_binding_name, f))
                     }
@@ -119,21 +119,33 @@ impl Expressionista {
                 })
                 .collect();
 
-            // If there is at least one parent ID dependency we build a func, else just render a flat query expression.
+            // If there is at least one parent ID dependency we build a func to run the transformer(s),
+            // else just render a flat query expression.
             if parent_id_deps.is_empty() {
                 Expression::Query { query }
             } else {
                 Expression::Func {
                     func: Box::new(move |env: Env| {
-                        // Run transformers in order on the query
-                        let query: Query = parent_id_deps
+                        // Run transformers in order on the query to retrieve the final, transformed, query.
+                        let query: InterpretationResult<Query> = parent_id_deps
                             .into_iter()
-                            .fold(query, |query, (parent_binding_name, f)| {
-                                let parent_id = env.get(&parent_binding_name).and_then(|pid| pid.as_id());
-                                f(query.into(), parent_id).try_into().unwrap()
+                            .try_fold(query, |query, (parent_binding_name, f)| {
+                                let binding = match env.get(&parent_binding_name) {
+                                    Some(binding) => Ok(binding),
+                                    None => Err(InterpreterError::EnvVarNotFound(format!("Expected parent binding '{}' to be present.", parent_binding_name)))
+                                }?;
+
+                                let parent_ids = match binding.as_ids() {
+                                    Some(ids) => Ok(ids),
+                                    None => Err(InterpreterError::InterpretationError(format!("Invalid parent result: Unable to transform binding '{}' into a set of IDs.", parent_binding_name))),
+                                }?;
+
+                                let query: Query = f(query.into(), parent_ids)?.try_into()?;
+
+                                Ok(query)
                             });
 
-                        Expression::Query { query: query }
+                        Ok(Expression::Query { query: query? })
                     }),
                 }
             }
@@ -173,23 +185,31 @@ impl Expressionista {
                 Ok(match parent_edge {
                     Some(p) => {
                         match graph.pluck_edge(&p) {
-                            QueryGraphDependency::ParentId(f) => {
+                            QueryGraphDependency::ParentIds(f) => {
                                 let parent_binding_name = graph.edge_source(&p).id();
                                 Expression::Func {
                                     func: Box::new(move |env| {
-                                        let parent_id = env.get(&parent_binding_name).and_then(|pid| pid.as_id());
+                                        let binding = match env.get(&parent_binding_name) {
+                                            Some(binding) => Ok(binding),
+                                            None => Err(InterpreterError::EnvVarNotFound(format!("Expected parent binding '{}' to be present.", parent_binding_name)))
+                                        }?;
+
+                                        let parent_ids = match binding.as_ids() {
+                                            Some(ids) => Ok(ids),
+                                            None => Err(InterpreterError::InterpretationError(format!("Invalid parent result: Unable to transform binding '{}' into a set of IDs.", parent_binding_name))),
+                                        }?;
 
                                         // Todo: This still needs some interface polishing...
-                                        let flow: Flow = f(flow.into(), parent_id).try_into().unwrap();
+                                        let flow: Flow = f(flow.into(), parent_ids)?.try_into()?;
                                         match flow {
                                             Flow::If(cond_fn) => {
                                                 // Todo: Maybe this construct points to a misconception: That the if node needs to be actually in the program.
                                                 // At this point here, we could evaluate the condition already and decide which branch to return.
-                                                Expression::If {
+                                                Ok(Expression::If {
                                                     func: cond_fn,
                                                     then: vec![then_expr],
                                                     else_: else_expr,
-                                                }
+                                                })
                                             }
                                         }
                                     }),

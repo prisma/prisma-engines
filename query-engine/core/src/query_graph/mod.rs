@@ -13,7 +13,7 @@ pub use error::*;
 pub use formatters::*;
 pub use transformers::*;
 
-use crate::Query;
+use crate::{Query, QueryGraphBuilderResult};
 use guard::*;
 use invariance_rules::*;
 use petgraph::{graph::*, visit::EdgeRef as PEdgeRef, *};
@@ -81,8 +81,10 @@ pub enum QueryGraphDependency {
     /// Simple dependency indicating order of execution. Effectively a NOOP for now.
     ExecutionOrder,
 
-    /// Performs a transformation on a node based on the parent ID (PrismaValue).
-    ParentId(Box<dyn FnOnce(Node, Option<PrismaValue>) -> Node>), // Todo: It might be a good idea to return Result.
+    /// Performs a transformation on a node based on the IDs of the parent result (as PrismaValues).
+    /// The result is typed to the builder result as the construction of the closures takes place in that module,
+    /// and it avoids ugly hacks to combine the error types.
+    ParentIds(Box<dyn FnOnce(Node, Vec<PrismaValue>) -> QueryGraphBuilderResult<Node>>),
 
     /// Only valid in the context of a `If` control flow node.
     Then,

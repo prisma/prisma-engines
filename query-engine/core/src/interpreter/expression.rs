@@ -1,4 +1,4 @@
-use super::Env;
+use super::{Env, InterpretationResult};
 use crate::Query;
 
 pub enum Expression {
@@ -7,7 +7,7 @@ pub enum Expression {
     },
 
     Func {
-        func: Box<dyn FnOnce(Env) -> Expression>,
+        func: Box<dyn FnOnce(Env) -> InterpretationResult<Expression>>,
     },
 
     Query {

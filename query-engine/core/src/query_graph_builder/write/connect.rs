@@ -1,6 +1,7 @@
 use crate::{
     query_ast::*,
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
+    QueryGraphBuilderError,
 };
 use prisma_models::RelationFieldRef;
 use std::{convert::TryInto, sync::Arc};
@@ -27,13 +28,20 @@ pub fn connect_records_node(
     graph.create_edge(
         parent,
         &connect_node,
-        QueryGraphDependency::ParentId(Box::new(|mut child_node, parent_id| {
-            if let Node::Query(Query::Write(WriteQuery::ConnectRecords(ref mut c))) = child_node {
-                let parent_id = parent_id.expect("Required parent Id field to be present for connect query");
-                c.parent = Some(parent_id.try_into().unwrap());
-            }
+        QueryGraphDependency::ParentIds(Box::new(|mut child_node, mut parent_ids| {
+            let len = parent_ids.len();
+            if len == 0 {
+                Err(QueryGraphBuilderError::AssertionError(format!("Required exactly one parent ID to be present for connect query, found none.")))
+            } else if len > 1 {
+                Err(QueryGraphBuilderError::AssertionError(format!("Required exactly one parent ID to be present for connect query, found {}.", len)))
+            } else {
+                if let Node::Query(Query::Write(WriteQuery::ConnectRecords(ref mut c))) = child_node {
+                    let parent_id = parent_ids.pop().unwrap();
+                    c.parent = Some(parent_id.try_into()?);
+                }
 
-            child_node
+                Ok(child_node)
+            }
         })),
     );
 
@@ -41,13 +49,20 @@ pub fn connect_records_node(
     graph.create_edge(
         &child,
         &connect_node,
-        QueryGraphDependency::ParentId(Box::new(|mut child_node, parent_id| {
-            if let Node::Query(Query::Write(WriteQuery::ConnectRecords(ref mut c))) = child_node {
-                let child_id = parent_id.expect("Required child Id field to be present for connect query");
-                c.child = Some(child_id.try_into().unwrap());
-            }
+        QueryGraphDependency::ParentIds(Box::new(|mut child_node, mut parent_ids| {
+            let len = parent_ids.len();
+            if len == 0 {
+                Err(QueryGraphBuilderError::AssertionError(format!("Required exactly one child ID to be present for connect query, found none.")))
+            } else if len > 1 {
+                Err(QueryGraphBuilderError::AssertionError(format!("Required exactly one child ID to be present for connect query, found {}.", len)))
+            } else {
+                if let Node::Query(Query::Write(WriteQuery::ConnectRecords(ref mut c))) = child_node {
+                    let child_id = parent_ids.pop().unwrap();
+                    c.child = Some(child_id.try_into()?);
+                }
 
-            child_node
+                Ok(child_node)
+            }
         })),
     );
 

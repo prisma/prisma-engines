@@ -17,6 +17,9 @@ pub enum QueryGraphBuilderError {
 
     /// Wraps transformation errors from the prisma models.
     DomainError(DomainError),
+
+    /// General assertion error.
+    AssertionError(String),
 }
 
 // impl fmt::Display for QueryValidationError {

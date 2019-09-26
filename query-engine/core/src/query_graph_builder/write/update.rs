@@ -30,17 +30,22 @@ pub fn update_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedF
     graph.create_edge(
         &update_node,
         &read_node,
-        QueryGraphDependency::ParentId(Box::new(|mut node, parent_id| {
+        QueryGraphDependency::ParentIds(Box::new(|mut node, mut parent_ids| {
+            let parent_id = match parent_ids.pop() {
+                Some(pid) => Ok(pid),
+                None => Err(QueryGraphBuilderError::AssertionError(format!("Expected a valid parent ID to be present for update follow-up read query."))),
+            }?;
+
             if let Node::Query(Query::Read(ReadQuery::RecordQuery(ref mut rq))) = node {
                 let finder = RecordFinder {
                     field: id_field,
-                    value: parent_id.unwrap(),
+                    value: parent_id,
                 };
 
                 rq.record_finder = Some(finder);
             };
 
-            node
+            Ok(node)
         })),
     );
 

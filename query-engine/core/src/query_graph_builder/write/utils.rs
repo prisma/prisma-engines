@@ -68,15 +68,27 @@ pub fn id_read_query_infallible(model: &ModelRef, record_finder: RecordFinder) -
 }
 
 /// Adds a read query to the query graph that finds related records by parent ID.
-/// Connects the parent node and the read node witha an edge.
+/// Connects the parent node and the read node with an edge, which takes care of the
+/// node transformation based on the parent ID.
+///
+/// Optionally, a filter can be passed that narrows down the child selection.
+///
 /// Returns a `NodeRef` to the newly created read node.
-pub fn find_ids_by_parent(graph: &mut QueryGraph, relation_field: &RelationFieldRef, parent: &NodeRef) -> NodeRef {
+pub fn find_ids_by_parent<T>(
+    graph: &mut QueryGraph,
+    relation_field: &RelationFieldRef,
+    parent: &NodeRef,
+    filter: T,
+) -> NodeRef
+where
+    T: Into<QueryArguments>,
+{
     let read_parent_node = graph.create_node(Query::Read(ReadQuery::RelatedRecordsQuery(RelatedRecordsQuery {
         name: "parent".to_owned(),
         alias: None,
         parent_field: Arc::clone(relation_field),
         parent_ids: None,
-        args: QueryArguments::default(),
+        args: filter.into(),
         selected_fields: relation_field.related_model().fields().id().into(),
         nested: vec![],
         selection_order: vec![],
@@ -85,12 +97,13 @@ pub fn find_ids_by_parent(graph: &mut QueryGraph, relation_field: &RelationField
     graph.create_edge(
         parent,
         &read_parent_node,
-        QueryGraphDependency::ParentId(Box::new(|mut node, parent_id| {
+        QueryGraphDependency::ParentIds(Box::new(|mut node, parent_ids| {
             if let Node::Query(Query::Read(ReadQuery::RelatedRecordsQuery(ref mut rq))) = node {
-                rq.parent_ids = Some(vec![parent_id.unwrap().try_into().unwrap()]);
+                // We know that all PrismaValues in `parent_ids` are transformable into GraphqlIds.
+                rq.parent_ids = Some(parent_ids.into_iter().map(|id| id.try_into().unwrap()).collect());
             };
 
-            node
+            Ok(node)
         })),
     );
 

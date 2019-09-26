@@ -70,7 +70,7 @@ impl Display for QueryGraphDependency {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             Self::ExecutionOrder => write!(f, "ExecutionOrder"),
-            Self::ParentId(_) => write!(f, "ParentId"),
+            Self::ParentIds(_) => write!(f, "ParentIds"),
             Self::Then => write!(f, "Then"),
             Self::Else => write!(f, "Else"),
         }

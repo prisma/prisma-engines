@@ -7,7 +7,6 @@ use crate::{Query, QueryResult};
 use connector::TransactionLike;
 use im::HashMap;
 use prisma_models::prelude::*;
-use std::convert::TryInto;
 
 #[derive(Debug, Clone)]
 pub enum ExpressionResult {
@@ -16,19 +15,20 @@ pub enum ExpressionResult {
 }
 
 impl ExpressionResult {
-    /// Wip impl of transforming results into an ID.
-    /// todos:
-    ///   - Lists are not really handled. Last element wins.
-    pub fn as_id(&self) -> Option<PrismaValue> {
+    /// Attempts to transform the result into a vector of IDs (as PrismaValue).
+    pub fn as_ids(&self) -> Option<Vec<PrismaValue>> {
         match self {
             Self::Query(ref result) => match result {
-                QueryResult::Id(id) => Some(id.clone().try_into().unwrap()),
-                QueryResult::RecordSelection(rs) => rs
+                QueryResult::Id(id) => Some(vec![id.clone().into()]),
+
+                // We always select IDs, the unwraps are safe.
+                QueryResult::RecordSelection(rs) => Some(rs
                     .scalars
                     .collect_ids(rs.id_field.as_str())
                     .unwrap()
-                    .pop()
-                    .map(|val| val.into()),
+                    .into_iter()
+                    .map(|val| val.into())
+                    .collect()),
 
                 _ => None,
             },
@@ -69,7 +69,7 @@ impl<'a> QueryInterpreter<'a> {
         match exp {
             Expression::Func { func } => {
                 println!("FUNC");
-                self.interpret(func(env.clone()), env)
+                self.interpret(func(env.clone())?, env)
             }
 
             Expression::Sequence { seq } => {

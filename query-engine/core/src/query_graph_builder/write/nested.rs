@@ -44,15 +44,22 @@ pub fn connect_nested_create(
         graph.create_edge(
             parent,
             child,
-            QueryGraphDependency::ParentId(Box::new(|mut node, parent_id| {
+            QueryGraphDependency::ParentIds(Box::new(|mut node, mut parent_ids| {
+                let parent_id = match parent_ids.pop() {
+                    Some(pid) => Ok(pid),
+                    None => Err(QueryGraphBuilderError::AssertionError(format!(
+                        "Expected a valid parent ID to be present for a nested create."
+                    ))),
+                }?;
+
                 // The following injection is necessary for cases where the relation is inlined.
                 // The injection won't do anything in other cases.
                 // The other case where the relation is not inlined is handled further down.
                 if let Node::Query(Query::Write(ref mut wq)) = node {
-                    wq.inject_non_list_arg(relation_field_name, parent_id.unwrap());
+                    wq.inject_non_list_arg(relation_field_name, parent_id);
                 }
 
-                node
+                Ok(node)
             })),
         );
 
@@ -68,6 +75,7 @@ pub fn connect_nested_create(
     Ok(())
 }
 
+// Todo tons of checks missing
 pub fn connect_nested_update(
     graph: &mut QueryGraph,
     parent: &NodeRef,
@@ -77,7 +85,7 @@ pub fn connect_nested_update(
 ) -> QueryGraphBuilderResult<()> {
     for value in utils::coerce_vec(value) {
         if relation_field.is_list {
-            // We have a record specified as a record finder in "where"
+            // We have to have a record specified as a record finder in "where".
             let mut map: ParsedInputMap = value.try_into()?;
             let where_arg = map.remove("where").unwrap();
             let record_finder = extract_record_finder(where_arg, &model)?;
@@ -87,22 +95,30 @@ pub fn connect_nested_update(
 
             graph.create_edge(parent, &update_node, QueryGraphDependency::ExecutionOrder);
         } else {
-            let find_child_records_node = utils::find_ids_by_parent(graph, relation_field, parent);
+            // To-one relation.
+            let find_child_records_node = utils::find_ids_by_parent(graph, relation_field, parent, None);
             let update_node = update::update_record_node(graph, None, Arc::clone(model), value.try_into()?)?;
             let id_field = model.fields().id();
 
             graph.create_edge(
                 &find_child_records_node,
                 &update_node,
-                QueryGraphDependency::ParentId(Box::new(|mut node, parent_id| {
+                QueryGraphDependency::ParentIds(Box::new(|mut node, mut parent_ids| {
+                    let parent_id = match parent_ids.pop() {
+                        Some(pid) => Ok(pid),
+                        None => Err(QueryGraphBuilderError::AssertionError(format!(
+                            "Expected a valid parent ID to be present for nested update to-one case."
+                        ))),
+                    }?;
+
                     if let Node::Query(Query::Write(WriteQuery::UpdateRecord(ref mut ur))) = node {
                         ur.where_ = Some(RecordFinder {
                             field: id_field,
-                            value: parent_id.unwrap(),
+                            value: parent_id,
                         });
                     }
 
-                    node
+                    Ok(node)
                 })),
             );
         }
@@ -132,14 +148,21 @@ pub fn connect_nested_connect(
         graph.create_edge(
             parent,
             child,
-            QueryGraphDependency::ParentId(Box::new(|mut child_node, parent_id| {
+            QueryGraphDependency::ParentIds(Box::new(|mut child_node, mut parent_ids| {
+                let parent_id = match parent_ids.pop() {
+                    Some(pid) => Ok(pid),
+                    None => Err(QueryGraphBuilderError::AssertionError(format!(
+                        "Expected a valid parent ID to be present for nested connect pre read."
+                    ))),
+                }?;
+
                 // If the child is a write query, inject the parent id.
                 // This covers cases of inlined relations.
                 if let Node::Query(Query::Write(ref mut wq)) = child_node {
-                    wq.inject_non_list_arg(relation_field_name, parent_id.unwrap())
+                    wq.inject_non_list_arg(relation_field_name, parent_id)
                 }
 
-                child_node
+                Ok(child_node)
             })),
         );
 
