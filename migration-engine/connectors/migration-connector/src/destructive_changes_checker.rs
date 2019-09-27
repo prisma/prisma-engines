@@ -1,6 +1,11 @@
 use crate::ConnectorResult;
 use std::marker::PhantomData;
+use serde::Serialize;
 
+/// Implementors of this trait are responsible for checking whether a migration could lead to data loss.
+///
+/// The type parameter is the connector's [DatabaseMigration](trait.MigrationConnector.html#associatedtype.DatabaseMigration)
+/// type.
 pub trait DestructiveChangesChecker<T>: Send + Sync + 'static
 where
     T: Send + Sync + 'static,
@@ -34,11 +39,15 @@ impl DestructiveChangeDiagnostics {
     }
 }
 
+/// A warning emitted by [DestructiveChangesChecker](trait.DestructiveChangesChecker.html). Warnings will
+/// prevent a migration from being applied, unless the `force` flag is passed.
 #[derive(Debug, Serialize, PartialEq)]
 pub struct MigrationWarning {
     pub description: String,
 }
 
+/// An error emitted by the [DestructiveChangesChecker](trait.DestructiveChangesChecker.html). Errors will
+/// always prevent a migration from being applied.
 #[derive(Debug, Serialize, PartialEq)]
 pub struct MigrationError {
     pub tpe: String,
@@ -46,6 +55,7 @@ pub struct MigrationError {
     pub field: Option<String>,
 }
 
+/// An implementor of [DestructiveChangesChecker](trait.DestructiveChangesChecker.html) that performs no check.
 pub struct EmptyDestructiveChangesChecker<T> {
     database_migration: PhantomData<T>,
 }

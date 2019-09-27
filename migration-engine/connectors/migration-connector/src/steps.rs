@@ -1,6 +1,9 @@
-use datamodel::*;
-use serde::{Deserialize, Deserializer};
+//! Datamodel migration steps.
 
+use datamodel::*;
+use serde::{Serialize, Deserialize, Deserializer};
+
+/// An atomic change to a [Datamodel](datamodel/dml/struct.Datamodel.html).
 #[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
 #[serde(tag = "stepType")]
 pub enum MigrationStep {
@@ -19,7 +22,7 @@ pub trait WithDbName {
     fn db_name(&self) -> String;
 }
 
-// Deserializes the cases undefined, null and Some(T) into an Option<Option<T>>
+/// Deserializes the cases `undefined`, `null` and `Some(T)` into an `Option<Option<T>>`.
 fn some_option<'de, T, D>(deserializer: D) -> Result<Option<Option<T>>, D::Error>
 where
     T: Deserialize<'de>,
