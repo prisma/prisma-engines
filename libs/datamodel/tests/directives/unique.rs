@@ -88,7 +88,7 @@ fn must_error_when_unknown_fields_are_used() {
     errors.assert_is(ValidationError::new_model_validation_error(
         "The unique index definition refers to the unkown fields foo, bar.",
         "User",
-        Span::new(56, 73),
+        Span::new(48, 65),
     ));
 }
 

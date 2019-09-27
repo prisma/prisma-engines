@@ -1174,6 +1174,32 @@ fn index_updates_with_rename_must_work() {
 }
 
 #[test]
+fn dropping_a_model_with_a_multi_field_unique_index_must_work() {
+    test_each_connector(|_, api| {
+        let dm1 = r#"
+            model A {
+                id Int @id
+                field String
+                secondField Int
+
+                @@unique([field, secondField], name: "customName")
+            }
+        "#;
+        let result = infer_and_apply(api, &dm1).sql_schema;
+        let index = result
+            .table_bang("A")
+            .indices
+            .iter()
+            .find(|i| i.name == "customName" && i.columns == &["field", "secondField"]);
+        assert!(index.is_some());
+        assert_eq!(index.unwrap().tpe, IndexType::Unique);
+
+        let dm2 = r#""#;
+        infer_and_apply(api, &dm2);
+    })
+}
+
+#[test]
 fn adding_a_scalar_list_for_a_modelwith_id_type_int_must_work() {
     test_each_connector(|sql_family, api| {
         let dm1 = r#"
