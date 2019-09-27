@@ -17,6 +17,9 @@ pub enum ConnectorError {
     #[fail(display = "Database '{}' already exists", db_name)]
     DatabaseAlreadyExists { db_name: String },
 
+    #[fail(display = "Could not create the database. {}", explanation)]
+    DatabaseCreationFailed { explanation: String },
+
     #[fail(display = "Authentication failed for user '{}'", user)]
     AuthenticationFailed { user: String },
 

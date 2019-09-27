@@ -136,9 +136,9 @@ fn create_postgres_admin_conn(mut url: Url) -> crate::Result<SqlMigrationConnect
         })
         .next()
         .ok_or_else(|| {
-            ConnectorError::Generic(failure::format_err!(
-                "Prisma could not connect to a default database (`postgres` or `template1`), it cannot create the specified database."
-            ))
+            ConnectorError::DatabaseCreationFailed {
+                explanation: "Prisma could not connect to a default database (`postgres` or `template1`), it cannot create the specified database.".to_owned()
+            }
         })??;
 
     Ok(inner)
