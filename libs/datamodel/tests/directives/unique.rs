@@ -1,4 +1,4 @@
-use datamodel::{ast::Span, common::PrismaType, dml, errors::*, IndexDefinition};
+use datamodel::{ast::Span, errors::*, render_to_string, IndexDefinition};
 
 use crate::common::*;
 
@@ -90,4 +90,20 @@ fn must_error_when_unknown_fields_are_used() {
         "User",
         Span::new(56, 73),
     ));
+}
+
+#[test]
+fn unique_directives_must_serialize_to_valid_dml() {
+    let dml = r#"
+        model User {
+            id        Int    @id
+            firstName String
+            lastName  String
+
+            @@unique([firstName,lastName], name: "customName")
+        }
+    "#;
+    let schema = parse(dml);
+
+    assert!(datamodel::parse(&render_to_string(&schema).unwrap()).is_ok());
 }

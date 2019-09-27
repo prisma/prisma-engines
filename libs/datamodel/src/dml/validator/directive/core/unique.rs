@@ -92,9 +92,6 @@ impl DirectiveValidator<dml::Model> for ModelLevelUniqueValidator {
             .map(|index_def| {
                 let mut args = Vec::new();
 
-                if let Some(name) = &index_def.name {
-                    args.push(ast::Argument::new_string("name", &name));
-                }
                 args.push(ast::Argument::new_array(
                     "",
                     index_def
@@ -103,6 +100,10 @@ impl DirectiveValidator<dml::Model> for ModelLevelUniqueValidator {
                         .map(|f| ast::Value::ConstantValue(f.to_string(), ast::Span::empty()))
                         .collect(),
                 ));
+
+                if let Some(name) = &index_def.name {
+                    args.push(ast::Argument::new_string("name", &name));
+                }
 
                 ast::Directive::new(self.directive_name(), args)
             })
