@@ -9,18 +9,21 @@ use std::{convert::TryInto, sync::Arc};
 
 /// Detects and performs a flip of `parent` and `child`, if necessary.
 /// If a flip is performed: Removes all edges from the parent to it's parents, and rewire them to the child.
-/// Note: Any edge existing between parent and child are NOT FLIPPED here.
+/// Note: Any edge already existing between parent and child are NOT FLIPPED here.
 ///
-/// Returns (parent `NodeRef`, child `NodeRef`).
+/// Returns the correct `RelationFieldRef` in the result triple. The relation field is always the one on the parent,
+/// not the child, and flipping parent and child "flips" the relation field the code is reasoning about as well,
+/// which is why we need to also return another relation field in case a flip happened.
+/// Todo: This unfortunately requires us to clone the arcs to satisfy the interface. Any better solution possible?
+///
+/// Returns (parent `NodeRef`, child `NodeRef`, relation field on parent `RelationFieldRef`).
 pub fn flip_nodes<'a>(
     graph: &mut QueryGraph,
     parent: &'a NodeRef,
     child: &'a NodeRef,
-    relation_field: &RelationFieldRef,
-) -> (&'a NodeRef, &'a NodeRef) {
-    let parent_node_content = graph.node_content(parent).unwrap();
-
-    if let Node::Query(Query::Write(WriteQuery::CreateRecord(_))) = parent_node_content {
+    relation_field: &'a RelationFieldRef,
+) -> (&'a NodeRef, &'a NodeRef, RelationFieldRef) {
+    if node_is_create(graph, parent) {
         if relation_field.relation_is_inlined_in_parent() {
             let parent_edges = graph.incoming_edges(parent);
             for parent_edge in parent_edges {
@@ -31,12 +34,19 @@ pub fn flip_nodes<'a>(
                 graph.create_edge(&parent_of_parent_node, child, edge_content);
             }
 
-            (child, parent)
+            (child, parent, relation_field.related_field())
         } else {
-            (parent, child)
+            (parent, child, Arc::clone(relation_field))
         }
     } else {
-        (parent, child)
+        (parent, child, Arc::clone(relation_field))
+    }
+}
+
+pub fn node_is_create(graph: &QueryGraph, node: &NodeRef) -> bool {
+    match graph.node_content(node).unwrap() {
+        Node::Query(Query::Write(WriteQuery::CreateRecord(_))) => true,
+        _ => false,
     }
 }
 
@@ -74,7 +84,7 @@ pub fn id_read_query_infallible(model: &ModelRef, record_finder: RecordFinder) -
 /// Optionally, a filter can be passed that narrows down the child selection.
 ///
 /// Returns a `NodeRef` to the newly created read node.
-pub fn find_ids_by_parent<T>(
+pub fn find_ids_by_parent_node<T>(
     graph: &mut QueryGraph,
     relation_field: &RelationFieldRef,
     parent: &NodeRef,
@@ -113,4 +123,12 @@ where
 pub fn ensure_connected(graph: &mut QueryGraph) -> NodeRef {
     // load all children with their parent ids and make sure they match?
     unimplemented!()
+}
+
+/// Creates an "empty" query node. Sometimes required for
+/// Todo: Consider elevating the placeholder concept to the actual graph.
+/// - Prevents accidential reads, could just error if placeholder hasn't been replaced during building.
+/// - Definitely the cleaner solution.
+pub fn query_node_placeholder(graph: &mut QueryGraph) -> NodeRef {
+    graph.create_node(Query::Read(ReadQuery::RecordQuery(RecordQuery::default())))
 }

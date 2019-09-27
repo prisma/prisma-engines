@@ -75,6 +75,8 @@ impl EdgeRef {
     }
 }
 
+pub type ParentIdsFn = Box<dyn FnOnce(Node, Vec<PrismaValue>) -> QueryGraphBuilderResult<Node>>;
+
 /// Stored on the edges of the QueryGraph, a QueryGraphDependency contains information on how children are connected to their parents,
 /// expressing for example the need for additional information from the parent to be able to execute at runtime.
 pub enum QueryGraphDependency {
@@ -84,7 +86,7 @@ pub enum QueryGraphDependency {
     /// Performs a transformation on a node based on the IDs of the parent result (as PrismaValues).
     /// The result is typed to the builder result as the construction of the closures takes place in that module,
     /// and it avoids ugly hacks to combine the error types.
-    ParentIds(Box<dyn FnOnce(Node, Vec<PrismaValue>) -> QueryGraphBuilderResult<Node>>),
+    ParentIds(ParentIdsFn),
 
     /// Only valid in the context of a `If` control flow node.
     Then,

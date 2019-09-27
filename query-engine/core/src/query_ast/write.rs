@@ -112,7 +112,11 @@ pub struct ConnectRecords {
 }
 
 #[derive(Debug, Clone)]
-pub struct DisconnectRecords {}
+pub struct DisconnectRecords {
+    pub parent: Option<GraphqlId>,
+    pub child: Option<GraphqlId>,
+    pub relation_field: RelationFieldRef,
+}
 
 #[derive(Debug, Clone)]
 pub struct SetRecords {

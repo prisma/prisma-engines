@@ -38,9 +38,65 @@ pub fn connect_nested_create(
 ) -> QueryGraphBuilderResult<()> {
     for value in utils::coerce_vec(value) {
         let child = create::create_record_node(graph, Arc::clone(model), value.try_into()?)?;
+        let (parent, child, relation_field) = utils::flip_nodes(graph, parent, &child, relation_field);
         let relation_field_name = relation_field.name.clone();
-        let (parent, child) = utils::flip_nodes(graph, parent, &child, relation_field);
 
+        // We need to perform additional 1:1 relation checks if the parent of a nested create is not a create as well.
+        // Why? If the top is a create, we don't have to consider already existing relation connections,
+        // or other relation requirements from parent to child, as they can't exist yet.
+        if !utils::node_is_create(graph, &parent) && relation_field.relation().is_one_to_one() {
+            let p = &relation_field;
+            let c = p.related_field();
+
+            match (p.is_required, c.is_required) {
+                // Both sides required. Results in a violation, because the parent is already existing with a connected child
+                // that would be disconnected by creating a new one, violating the required relation side of the child.
+                (true, true) => Err(QueryGraphBuilderError::RelationViolation((&relation_field).into())),
+
+                // Conditional case.
+                // 1) Child requires a parent node, but not vice versa.
+                // 2) Both do not require the relation.
+                //
+                // For case 1): If the child needs the parent to be connected,
+                // we can't create a new child without violating the required relation side of the child if there's already a child existing.
+                // Hence, we have to check if there's already an existing child for the parent.
+                //
+                // For case 2): Any existing child record has to be disconnected first.
+                //
+                // Both cases can be combined into the graph by having a read node on the child and a disconnect node connected to the read node.
+                // The parent ids transformation either fails if `child_required` is true (case 1), or does nothing (case 2 pass-through).
+                (false, child_required) => {
+                    let check_node = utils::find_ids_by_parent_node(graph, &relation_field, parent, None);
+                    let disconnect_node =
+                        disconnect::disconnect_records_node(graph, parent, &check_node, &relation_field);
+
+                    let relation_field = Arc::clone(&relation_field);
+
+                    // Connect check and parent
+                    graph.create_edge(
+                        &check_node,
+                        &disconnect_node,
+                        QueryGraphDependency::ParentIds(Box::new(move |child_node, parent_ids| {
+                            if !parent_ids.is_empty() && child_required {
+                                return Err(QueryGraphBuilderError::RelationViolation((&relation_field).into()));
+                            }
+
+                            // fill in disconnect node with child id.
+                            unimplemented!()
+                        })),
+                    );
+
+                    // Connect disconnect and child
+                    graph.create_edge(&disconnect_node, &child, QueryGraphDependency::ExecutionOrder);
+                    Ok(())
+                }
+
+                // Every other case is unproblematic, as the child is either not requiring a parent, or both are not requiring the relation.
+                _ => Ok(()),
+            }?;
+        }
+
+        // Connect parent and child.
         graph.create_edge(
             parent,
             child,
@@ -68,7 +124,7 @@ pub fn connect_nested_create(
         // is a list (x-to-many) and where the relation is not inlined (aka manifested as an
         // actual join table, for example).
         if relation_field.is_list && !relation_field.relation().is_inline_relation() {
-            connect::connect_records_node(graph, parent, child, relation_field);
+            connect::connect_records_node(graph, parent, child, &relation_field, None, None);
         }
     }
 
@@ -96,7 +152,7 @@ pub fn connect_nested_update(
             graph.create_edge(parent, &update_node, QueryGraphDependency::ExecutionOrder);
         } else {
             // To-one relation.
-            let find_child_records_node = utils::find_ids_by_parent(graph, relation_field, parent, None);
+            let find_child_records_node = utils::find_ids_by_parent_node(graph, relation_field, parent, None);
             let update_node = update::update_record_node(graph, None, Arc::clone(model), value.try_into()?)?;
             let id_field = model.fields().id();
 
@@ -141,7 +197,7 @@ pub fn connect_nested_connect(
         let child_node = graph.create_node(child_read_query);
 
         // Flip the read node and parent node if necessary.
-        let (parent, child) = utils::flip_nodes(graph, parent, &child_node, relation_field);
+        let (parent, child, relation_field) = utils::flip_nodes(graph, parent, &child_node, relation_field);
         let relation_field_name = relation_field.name.clone();
 
         // Edge from parent to child (e.g. Create to ReadQuery).
@@ -171,7 +227,7 @@ pub fn connect_nested_connect(
         // is a list (x-to-many) and where the relation is not inlined (aka manifested as an
         // actual join table, for example).
         if relation_field.is_list && !relation_field.relation().is_inline_relation() {
-            connect::connect_records_node(graph, parent, child, relation_field);
+            connect::connect_records_node(graph, parent, child, &relation_field, None, None);
         }
     }
 

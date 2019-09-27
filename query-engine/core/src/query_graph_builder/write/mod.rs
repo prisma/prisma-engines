@@ -1,6 +1,7 @@
 mod connect;
 mod create;
 mod delete;
+mod disconnect;
 mod nested;
 mod update;
 mod upsert;
