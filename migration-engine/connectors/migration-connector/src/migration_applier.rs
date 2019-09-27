@@ -1,13 +1,14 @@
 use crate::*;
 use std::sync::Arc;
 
+/// Apply and unapply migrations on the connector's database.
 pub trait MigrationApplier<T> {
     fn apply(&self, migration: &Migration, database_migration: &T) -> ConnectorResult<()>;
 
     fn unapply(&self, migration: &Migration, database_migration: &T) -> ConnectorResult<()>;
 }
 
-pub struct MigrationApplierImpl<T> {
+pub(crate) struct MigrationApplierImpl<T> {
     pub migration_persistence: Arc<dyn MigrationPersistence>,
     pub step_applier: Arc<dyn DatabaseMigrationStepApplier<T>>,
 }
