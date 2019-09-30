@@ -3,8 +3,6 @@ extern crate log;
 
 pub mod migration_database;
 
-mod database_schema_calculator;
-mod database_schema_differ;
 mod error;
 mod sql_database_migration_inferrer;
 mod sql_database_step_applier;
@@ -12,6 +10,8 @@ mod sql_destructive_changes_checker;
 mod sql_migration;
 mod sql_migration_persistence;
 mod sql_renderer;
+mod sql_schema_calculator;
+mod sql_schema_differ;
 
 pub use error::*;
 pub use sql_migration::*;

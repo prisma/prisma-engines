@@ -5,13 +5,13 @@ use sql_schema_describer::*;
 const MIGRATION_TABLE_NAME: &str = "_Migration";
 
 #[derive(Debug)]
-pub struct DatabaseSchemaDiffer<'a> {
+pub struct SqlSchemaDiffer<'a> {
     previous: &'a SqlSchema,
     next: &'a SqlSchema,
 }
 
 #[derive(Debug, Clone)]
-pub struct DatabaseSchemaDiff {
+pub struct SqlSchemaDiff {
     pub drop_tables: Vec<DropTable>,
     pub create_tables: Vec<CreateTable>,
     pub alter_tables: Vec<AlterTable>,
@@ -20,7 +20,7 @@ pub struct DatabaseSchemaDiff {
     pub alter_indexes: Vec<AlterIndex>,
 }
 
-impl DatabaseSchemaDiff {
+impl SqlSchemaDiff {
     pub fn into_steps(self) -> Vec<SqlMigrationStep> {
         let mut steps = Vec::new();
         steps.append(&mut wrap_as_step(self.drop_indexes, |x| SqlMigrationStep::DropIndex(x)));
@@ -41,15 +41,16 @@ impl DatabaseSchemaDiff {
     }
 }
 
-impl<'a> DatabaseSchemaDiffer<'a> {
-    pub fn diff(previous: &SqlSchema, next: &SqlSchema) -> DatabaseSchemaDiff {
-        let differ = DatabaseSchemaDiffer { previous, next };
+impl<'a> SqlSchemaDiffer<'a> {
+    pub fn diff(previous: &SqlSchema, next: &SqlSchema) -> SqlSchemaDiff {
+        let differ = SqlSchemaDiffer { previous, next };
         differ.diff_internal()
     }
 
-    fn diff_internal(&self) -> DatabaseSchemaDiff {
+    fn diff_internal(&self) -> SqlSchemaDiff {
         let alter_indexes = self.alter_indexes();
-        DatabaseSchemaDiff {
+
+        SqlSchemaDiff {
             drop_tables: self.drop_tables(),
             create_tables: self.create_tables(),
             alter_tables: self.alter_tables(),

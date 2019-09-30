@@ -6,13 +6,13 @@ use itertools::Itertools;
 use prisma_models::{DatamodelConverter, TempManifestationHolder, TempRelationHolder};
 use sql_schema_describer as sql;
 
-pub struct DatabaseSchemaCalculator<'a> {
+pub struct SqlSchemaCalculator<'a> {
     data_model: &'a Datamodel,
 }
 
-impl<'a> DatabaseSchemaCalculator<'a> {
+impl<'a> SqlSchemaCalculator<'a> {
     pub fn calculate(data_model: &Datamodel) -> SqlResult<sql::SqlSchema> {
-        let calculator = DatabaseSchemaCalculator { data_model };
+        let calculator = SqlSchemaCalculator { data_model };
         calculator.calculate_internal()
     }
 
