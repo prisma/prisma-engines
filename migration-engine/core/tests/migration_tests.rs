@@ -786,7 +786,7 @@ fn unique_in_conjunction_with_custom_column_name_must_work() {
 
 #[test]
 fn multi_column_unique_in_conjunction_with_custom_column_name_must_work() {
-    test_each_connector(|_, api| {
+    test_each_connector(|test_setup, api| {
         let dm1 = r#"
             model A {
                 id Int @id
@@ -796,7 +796,7 @@ fn multi_column_unique_in_conjunction_with_custom_column_name_must_work() {
                 @@unique([field, secondField])
             }
         "#;
-        let result = infer_and_apply(api, &dm1).sql_schema;
+        let result = infer_and_apply(test_setup, api, &dm1).sql_schema;
         let index = result
             .table_bang("A")
             .indices
@@ -849,7 +849,7 @@ fn sqlite_must_recreate_indexes() {
 fn sqlite_must_recreate_multi_field_indexes() {
     // SQLite must go through a complicated migration procedure which requires dropping and recreating indexes. This test checks that.
     // We run them still against each connector.
-    test_each_connector(|_, api| {
+    test_each_connector(|test_setup, api| {
         let dm1 = r#"
             model A {
                 id Int @id
@@ -859,7 +859,7 @@ fn sqlite_must_recreate_multi_field_indexes() {
                 @@unique([field, secondField])
             }
         "#;
-        let result = infer_and_apply(api, &dm1).sql_schema;
+        let result = infer_and_apply(test_setup, api, &dm1).sql_schema;
         let index = result
             .table_bang("A")
             .indices
@@ -878,7 +878,7 @@ fn sqlite_must_recreate_multi_field_indexes() {
                 @@unique([field, secondField])
             }
         "#;
-        let result = infer_and_apply(api, &dm2).sql_schema;
+        let result = infer_and_apply(test_setup, api, &dm2).sql_schema;
         let index = result
             .table_bang("A")
             .indices
@@ -967,7 +967,7 @@ fn removing_unique_from_an_existing_field_must_work() {
                 field String @unique
             }
         "#;
-        let result = infer_and_apply(api, &dm1).sql_schema;
+        let result = infer_and_apply(test_setup, api, &dm1).sql_schema;
         let index = result.table_bang("A").indices.iter().find(|i| i.columns == &["field"]);
         assert!(index.is_some());
         assert_eq!(index.unwrap().tpe, IndexType::Unique);
@@ -978,7 +978,7 @@ fn removing_unique_from_an_existing_field_must_work() {
                 field String
             }
         "#;
-        let result = infer_and_apply(api, &dm2).sql_schema;
+        let result = infer_and_apply(test_setup, api, &dm2).sql_schema;
         let index = result.table_bang("A").indices.iter().find(|i| i.columns == &["field"]);
         assert!(!index.is_some());
     });
@@ -1024,7 +1024,7 @@ fn removing_multi_field_unique_index_must_work() {
 
 #[test]
 fn index_renaming_must_work() {
-    test_each_connector(|sql_family, api| {
+    test_each_connector(|test_setup, api| {
         let dm1 = r#"
             model A {
                 id Int @id
@@ -1034,7 +1034,7 @@ fn index_renaming_must_work() {
                 @@unique([field, secondField], name: "customName")
             }
         "#;
-        let result = infer_and_apply(api, &dm1).sql_schema;
+        let result = infer_and_apply(test_setup, api, &dm1).sql_schema;
         let index = result
             .table_bang("A")
             .indices
@@ -1052,7 +1052,7 @@ fn index_renaming_must_work() {
                 @@unique([field, secondField], name: "customNameA")
             }
         "#;
-        let result = infer_and_apply(api, &dm2);
+        let result = infer_and_apply(test_setup, api, &dm2);
         let indexes = result
             .sql_schema
             .table_bang("A")
@@ -1062,7 +1062,7 @@ fn index_renaming_must_work() {
         assert_eq!(indexes.count(), 1);
 
         // Test that we are not dropping and recreating the index. Except in SQLite, because there we are.
-        if sql_family != SqlFamily::Sqlite {
+        if test_setup.sql_family != SqlFamily::Sqlite {
             let expected_steps = vec![SqlMigrationStep::AlterIndex(AlterIndex {
                 table: "A".into(),
                 index_new_name: "customNameA".into(),
@@ -1076,7 +1076,7 @@ fn index_renaming_must_work() {
 
 #[test]
 fn index_renaming_must_work_when_renaming_to_default() {
-    test_each_connector(|sql_family, api| {
+    test_each_connector(|test_setup, api| {
         let dm1 = r#"
             model A {
                 id Int @id
@@ -1086,7 +1086,7 @@ fn index_renaming_must_work_when_renaming_to_default() {
                 @@unique([field, secondField], name: "customName")
             }
         "#;
-        let result = infer_and_apply(api, &dm1);
+        let result = infer_and_apply(test_setup, api, &dm1);
         let index = result
             .sql_schema
             .table_bang("A")
@@ -1105,7 +1105,7 @@ fn index_renaming_must_work_when_renaming_to_default() {
                 @@unique([field, secondField])
             }
         "#;
-        let result = infer_and_apply(api, &dm2);
+        let result = infer_and_apply(test_setup, api, &dm2);
         let indexes = result
             .sql_schema
             .table_bang("A")
@@ -1115,7 +1115,7 @@ fn index_renaming_must_work_when_renaming_to_default() {
         assert_eq!(indexes.count(), 1);
 
         // Test that we are not dropping and recreating the index. Except in SQLite, because there we are.
-        if sql_family != SqlFamily::Sqlite {
+        if test_setup.sql_family != SqlFamily::Sqlite {
             let expected_steps = vec![SqlMigrationStep::AlterIndex(AlterIndex {
                 table: "A".into(),
                 index_new_name: "A.field_secondField".into(),
@@ -1129,7 +1129,7 @@ fn index_renaming_must_work_when_renaming_to_default() {
 
 #[test]
 fn index_renaming_must_work_when_renaming_to_custom() {
-    test_each_connector(|sql_family, api| {
+    test_each_connector(|test_setup, api| {
         let dm1 = r#"
             model A {
                 id Int @id
@@ -1139,7 +1139,7 @@ fn index_renaming_must_work_when_renaming_to_custom() {
                 @@unique([field, secondField])
             }
         "#;
-        let result = infer_and_apply(api, &dm1);
+        let result = infer_and_apply(test_setup, api, &dm1);
         let index = result
             .sql_schema
             .table_bang("A")
@@ -1158,7 +1158,7 @@ fn index_renaming_must_work_when_renaming_to_custom() {
                 @@unique([field, secondField], name: "somethingCustom")
             }
         "#;
-        let result = infer_and_apply(api, &dm2);
+        let result = infer_and_apply(test_setup, api, &dm2);
         let indexes = result
             .sql_schema
             .table_bang("A")
@@ -1168,7 +1168,7 @@ fn index_renaming_must_work_when_renaming_to_custom() {
         assert_eq!(indexes.count(), 1);
 
         // Test that we are not dropping and recreating the index. Except in SQLite, because there we are.
-        if sql_family != SqlFamily::Sqlite {
+        if test_setup.sql_family != SqlFamily::Sqlite {
             let expected_steps = vec![SqlMigrationStep::AlterIndex(AlterIndex {
                 table: "A".into(),
                 index_name: "A.field_secondField".into(),
@@ -1182,7 +1182,7 @@ fn index_renaming_must_work_when_renaming_to_custom() {
 
 #[test]
 fn index_updates_with_rename_must_work() {
-    test_each_connector(|sql_family, api| {
+    test_each_connector(|test_setup, api| {
         let dm1 = r#"
             model A {
                 id Int @id
@@ -1192,7 +1192,7 @@ fn index_updates_with_rename_must_work() {
                 @@unique([field, secondField], name: "customName")
             }
         "#;
-        let result = infer_and_apply(api, &dm1).sql_schema;
+        let result = infer_and_apply(test_setup, api, &dm1).sql_schema;
         let index = result
             .table_bang("A")
             .indices
@@ -1210,7 +1210,7 @@ fn index_updates_with_rename_must_work() {
                 @@unique([field, id], name: "customNameA")
             }
         "#;
-        let result = infer_and_apply(api, &dm2);
+        let result = infer_and_apply(test_setup, api, &dm2);
         let indexes = result
             .sql_schema
             .table_bang("A")
@@ -1220,7 +1220,7 @@ fn index_updates_with_rename_must_work() {
         assert_eq!(indexes.count(), 1);
 
         // Test that we are not dropping and recreating the index. Except in SQLite, because there we are.
-        if sql_family != SqlFamily::Sqlite {
+        if test_setup.sql_family != SqlFamily::Sqlite {
             let expected_steps = vec![
                 SqlMigrationStep::DropIndex(DropIndex {
                     table: "A".into(),
@@ -1243,7 +1243,7 @@ fn index_updates_with_rename_must_work() {
 
 #[test]
 fn dropping_a_model_with_a_multi_field_unique_index_must_work() {
-    test_each_connector(|_, api| {
+    test_each_connector(|test_setup, api| {
         let dm1 = r#"
             model A {
                 id Int @id
@@ -1253,7 +1253,7 @@ fn dropping_a_model_with_a_multi_field_unique_index_must_work() {
                 @@unique([field, secondField], name: "customName")
             }
         "#;
-        let result = infer_and_apply(api, &dm1).sql_schema;
+        let result = infer_and_apply(test_setup, api, &dm1).sql_schema;
         let index = result
             .table_bang("A")
             .indices
@@ -1263,7 +1263,7 @@ fn dropping_a_model_with_a_multi_field_unique_index_must_work() {
         assert_eq!(index.unwrap().tpe, IndexType::Unique);
 
         let dm2 = r#""#;
-        infer_and_apply(api, &dm2);
+        infer_and_apply(test_setup, api, &dm2);
     })
 }
 
@@ -1360,7 +1360,7 @@ fn reserved_sql_key_words_must_work() {
 #[test]
 fn migrations_with_many_to_many_related_models_must_not_recreate_indexes() {
     // test case for https://github.com/prisma/lift/issues/148
-    test_each_connector(|sql_family, api| {
+    test_each_connector(|test_setup, api| {
         let dm_1 = r#"
             model User {
                 id        String  @default(cuid()) @id
@@ -1377,7 +1377,7 @@ fn migrations_with_many_to_many_related_models_must_not_recreate_indexes() {
                 profiles    Profile[]
             }
         "#;
-        let sql_schema = infer_and_apply(api, &dm_1).sql_schema;
+        let sql_schema = infer_and_apply(test_setup, api, &dm_1).sql_schema;
 
         let index = sql_schema
             .table_bang("_ProfileToSkill")
@@ -1405,7 +1405,7 @@ fn migrations_with_many_to_many_related_models_must_not_recreate_indexes() {
             }
         "#;
 
-        let result = infer_and_apply(api, &dm_1);
+        let result = infer_and_apply(test_setup, api, &dm_1);
         let sql_schema = result.sql_schema;
 
         let index = sql_schema

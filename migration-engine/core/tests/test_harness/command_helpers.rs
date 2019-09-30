@@ -20,8 +20,8 @@ impl InferAndApplyOutput {
     }
 }
 
-pub fn infer_and_apply(api: &dyn GenericApi, datamodel: &str) -> InferAndApplyOutput {
-    infer_and_apply_with_migration_id(api, &datamodel, "the-migration-id")
+pub fn infer_and_apply(test_setup: &TestSetup, api: &dyn GenericApi, datamodel: &str) -> InferAndApplyOutput {
+    infer_and_apply_with_migration_id(test_setup, api, &datamodel, "the-migration-id")
 }
 
 pub fn infer_and_apply_with_migration_id(
