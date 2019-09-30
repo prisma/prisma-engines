@@ -442,14 +442,11 @@ fn column_uniqueness_must_be_detected() {
                 tpe: IndexType::Unique,
             }];
             match db_type {
-                DbType::MySql => expected_indices.insert(
-                    0,
-                    Index {
-                        name: "uniq1".to_string(),
-                        columns: vec!["uniq1".to_string()],
-                        tpe: IndexType::Unique,
-                    },
-                ),
+                DbType::MySql => expected_indices.push(Index {
+                    name: "uniq1".to_string(),
+                    columns: vec!["uniq1".to_string()],
+                    tpe: IndexType::Unique,
+                }),
                 DbType::Postgres => expected_indices.insert(
                     0,
                     Index {

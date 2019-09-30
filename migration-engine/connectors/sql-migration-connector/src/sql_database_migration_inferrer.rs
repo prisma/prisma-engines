@@ -2,7 +2,7 @@ use crate::database_schema_calculator::DatabaseSchemaCalculator;
 use crate::database_schema_differ::{DatabaseSchemaDiff, DatabaseSchemaDiffer};
 use crate::*;
 use datamodel::*;
-use migration_connector::steps::*;
+use migration_connector::steps::MigrationStep;
 use migration_connector::*;
 use sql_schema_describer::*;
 use std::sync::Arc;
@@ -197,14 +197,25 @@ fn fix_stupid_sqlite(
     for step in steps {
         match step {
             SqlMigrationStep::AlterTable(ref alter_table) if needs_fix(&alter_table) => {
-                let current_table = current_database_schema.table(&alter_table.table.name)?;
-                let next_table = next_database_schema.table(&alter_table.table.name)?;
-                let mut altered_steps = fix(&alter_table, &current_table, &next_table, &schema_name);
-                result.append(&mut altered_steps);
-                fixed_tables.push(current_table.name.clone());
+                result.extend(sqlite_fix_table(
+                    current_database_schema,
+                    next_database_schema,
+                    &alter_table.table.name,
+                    schema_name,
+                )?);
+                fixed_tables.push(alter_table.table.name.clone());
             }
             SqlMigrationStep::CreateIndex(ref create_index) if fixed_tables.contains(&create_index.table) => {
                 // The fixed alter table step will already create the index
+            }
+            SqlMigrationStep::AlterIndex(AlterIndex { table, .. }) => {
+                result.extend(sqlite_fix_table(
+                    current_database_schema,
+                    next_database_schema,
+                    &table,
+                    schema_name,
+                )?);
+                fixed_tables.push(table.clone());
             }
             x => result.push(x),
         }
@@ -226,7 +237,18 @@ fn needs_fix(alter_table: &AlterTable) -> bool {
     change_that_does_not_work_on_sqlite.is_some()
 }
 
-fn fix(_alter_table: &AlterTable, current: &Table, next: &Table, schema_name: &str) -> Vec<SqlMigrationStep> {
+fn sqlite_fix_table(
+    current_database_schema: &SqlSchema,
+    next_database_schema: &SqlSchema,
+    table_name: &str,
+    schema_name: &str,
+) -> SqlResult<impl Iterator<Item = SqlMigrationStep>> {
+    let current_table = current_database_schema.table(table_name)?;
+    let next_table = next_database_schema.table(table_name)?;
+    Ok(fix(&current_table, &next_table, &schema_name).into_iter())
+}
+
+fn fix(current: &Table, next: &Table, schema_name: &str) -> Vec<SqlMigrationStep> {
     // based on 'Making Other Kinds Of Table Schema Changes' from https://www.sqlite.org/lang_altertable.html
     let name_of_temporary_table = format!("new_{}", next.name.clone());
     let mut temporary_table = next.clone();

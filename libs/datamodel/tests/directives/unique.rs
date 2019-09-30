@@ -1,4 +1,4 @@
-use datamodel::{ast::Span, errors::*, render_to_string, IndexDefinition};
+use datamodel::{ast::Span, errors::*, render_to_string, IndexDefinition, IndexType};
 
 use crate::common::*;
 
@@ -9,7 +9,7 @@ fn basic_unique_index_must_work() {
         id        Int    @id
         firstName String
         lastName  String
-        
+
         @@unique([firstName,lastName])
     }
     "#;
@@ -19,7 +19,7 @@ fn basic_unique_index_must_work() {
     user_model.assert_has_index(IndexDefinition {
         name: None,
         fields: vec!["firstName".to_string(), "lastName".to_string()],
-        is_unique: true,
+        tpe: IndexType::Unique,
     });
 }
 
@@ -30,7 +30,7 @@ fn the_name_argument_must_work() {
         id        Int    @id
         firstName String
         lastName  String
-        
+
         @@unique([firstName,lastName], name: "MyIndexName")
     }
     "#;
@@ -40,7 +40,7 @@ fn the_name_argument_must_work() {
     user_model.assert_has_index(IndexDefinition {
         name: Some("MyIndexName".to_string()),
         fields: vec!["firstName".to_string(), "lastName".to_string()],
-        is_unique: true,
+        tpe: IndexType::Unique,
     });
 }
 
@@ -51,7 +51,7 @@ fn multiple_unique_must_work() {
         id        Int    @id
         firstName String
         lastName  String
-        
+
         @@unique([firstName,lastName])
         @@unique([firstName,lastName], name: "MyIndexName")
     }
@@ -63,13 +63,13 @@ fn multiple_unique_must_work() {
     user_model.assert_has_index(IndexDefinition {
         name: None,
         fields: vec!["firstName".to_string(), "lastName".to_string()],
-        is_unique: true,
+        tpe: IndexType::Unique,
     });
 
     user_model.assert_has_index(IndexDefinition {
         name: Some("MyIndexName".to_string()),
         fields: vec!["firstName".to_string(), "lastName".to_string()],
-        is_unique: true,
+        tpe: IndexType::Unique,
     });
 }
 
@@ -78,7 +78,7 @@ fn must_error_when_unknown_fields_are_used() {
     let dml = r#"
     model User {
         id Int @id
-        
+
         @@unique([foo,bar])
     }
     "#;
@@ -88,7 +88,7 @@ fn must_error_when_unknown_fields_are_used() {
     errors.assert_is(ValidationError::new_model_validation_error(
         "The unique index definition refers to the unkown fields foo, bar.",
         "User",
-        Span::new(56, 73),
+        Span::new(48, 65),
     ));
 }
 

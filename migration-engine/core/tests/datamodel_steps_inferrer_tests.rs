@@ -299,6 +299,43 @@ fn infer_DeleteEnum() {
     assert_eq!(steps, expected);
 }
 
+#[test]
+fn infer_UpdateIndex() {
+    let dm1 = parse(
+        r#"
+        model Dog {
+            id Int @id
+            age Int
+            name String
+
+            @@unique([age, name], name: "customDogIndex")
+        }
+        "#,
+    );
+
+    let dm2 = parse(
+        r#"
+        model Dog {
+            id Int @id
+            age Int
+            name String
+
+            @@unique([age, name], name: "customDogIndex2")
+        }
+        "#,
+    );
+
+    let steps = infer(&dm1, &dm2);
+    let expected = vec![MigrationStep::UpdateIndex(UpdateIndex {
+        model: "Dog".into(),
+        name: Some("customDogIndex2".into()),
+        tpe: IndexType::Unique,
+        fields: vec!["age".into(), "name".into()],
+    })];
+
+    assert_eq!(steps, expected);
+}
+
 fn infer(dm1: &Datamodel, dm2: &Datamodel) -> Vec<MigrationStep> {
     let inferrer = DataModelMigrationStepsInferrerImplWrapper {};
     inferrer.infer(&dm1, &dm2)

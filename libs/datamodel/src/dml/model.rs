@@ -24,7 +24,13 @@ pub struct Model {
 pub struct IndexDefinition {
     pub name: Option<String>,
     pub fields: Vec<String>,
-    pub is_unique: bool,
+    pub tpe: IndexType,
+}
+
+#[derive(Debug, PartialEq, Clone, Serialize, Deserialize, Copy)]
+pub enum IndexType {
+    Unique,
+    Normal,
 }
 
 impl Model {
@@ -126,6 +132,14 @@ impl Model {
     /// It has only two fields, both of them are required relations.
     pub fn is_pure_relation_model(&self) -> bool {
         self.is_relation_model() && self.fields.len() == 2
+    }
+
+    pub fn add_index(&mut self, index: IndexDefinition) {
+        self.indexes.push(index)
+    }
+
+    pub fn has_index(&self, index: &IndexDefinition) -> bool {
+        self.indexes.iter().any(|own_index| own_index == index)
     }
 }
 

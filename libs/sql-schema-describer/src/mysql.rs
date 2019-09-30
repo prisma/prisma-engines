@@ -1,6 +1,6 @@
 use super::*;
 use log::debug;
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 use std::sync::Arc;
 
 pub struct SqlSchemaDescriber {
@@ -230,68 +230,78 @@ impl SqlSchemaDescriber {
     }
 
     fn get_indices(&self, schema: &str, table_name: &str, fk_cols: Vec<String>) -> (Vec<Index>, Option<PrimaryKey>) {
-        let sql = "SELECT DISTINCT
+        let sql = "
+            SELECT DISTINCT
                 index_name, non_unique, column_name, seq_in_index
             FROM INFORMATION_SCHEMA.STATISTICS
-            WHERE table_schema = ? AND table_name = ?";
+            WHERE table_schema = ? AND table_name = ?
+            ORDER BY index_name, seq_in_index
+            ";
         debug!("describing indices, SQL: {}", sql);
         let rows = self
             .conn
             .query_raw(sql, schema, &[schema.into(), table_name.into()])
             .expect("querying for indices");
+
+        // Multi-column indices will return more than one row (with different column_name values).
+        // We cannot assume that one row corresponds to one index.
+
         let mut primary_key: Option<PrimaryKey> = None;
-        let indices = rows
-            .into_iter()
-            .filter_map(|index| {
-                debug!("Got index row: {:#?}", index);
-                let seq_in_index = index
-                    .get("seq_in_index")
-                    .and_then(|x| x.as_i64())
-                    .expect("seq_in_index");
-                let pos = seq_in_index - 1;
-                let index_name = index.get("index_name").and_then(|x| x.to_string()).expect("index_name");
-                let is_pk = index_name.to_lowercase() == "primary";
-                let column_name = index
-                    .get("column_name")
-                    .and_then(|x| x.to_string())
-                    .expect("column_name");
-                let is_unique = !index.get("non_unique").and_then(|x| x.as_bool()).expect("non_unique");
-                if is_pk {
-                    debug!("Column '{}' is part of the primary key", column_name);
-                    match primary_key.as_mut() {
-                        Some(pk) => {
-                            if pk.columns.len() < (pos + 1) as usize {
-                                pk.columns.resize((pos + 1) as usize, "".to_string());
-                            }
-                            pk.columns[pos as usize] = column_name;
-                            debug!(
-                                "The primary key has already been created, added column to it: {:?}",
-                                pk.columns
-                            );
+        let mut indexes_map: BTreeMap<String, Index> = BTreeMap::new();
+
+        for row in rows {
+            debug!("Got index row: {:#?}", row);
+            let seq_in_index = row.get("seq_in_index").and_then(|x| x.as_i64()).expect("seq_in_index");
+            let pos = seq_in_index - 1;
+            let index_name = row.get("index_name").and_then(|x| x.to_string()).expect("index_name");
+            let is_unique = !row.get("non_unique").and_then(|x| x.as_bool()).expect("non_unique");
+            let column_name = row.get("column_name").and_then(|x| x.to_string()).expect("column_name");
+            let is_pk = index_name.to_lowercase() == "primary";
+            if is_pk {
+                debug!("Column '{}' is part of the primary key", column_name);
+                match primary_key.as_mut() {
+                    Some(pk) => {
+                        if pk.columns.len() < (pos + 1) as usize {
+                            pk.columns.resize((pos + 1) as usize, "".to_string());
                         }
-                        None => {
-                            debug!("Instantiating primary key");
-                            primary_key = Some(PrimaryKey {
-                                columns: vec![column_name],
-                                sequence: None,
-                            });
-                        }
-                    };
-                    None
-                } else if fk_cols.contains(&column_name) {
-                    None
+                        pk.columns[pos as usize] = column_name;
+                        debug!(
+                            "The primary key has already been created, added column to it: {:?}",
+                            pk.columns
+                        );
+                    }
+                    None => {
+                        debug!("Instantiating primary key");
+                        primary_key = Some(PrimaryKey {
+                            columns: vec![column_name],
+                            sequence: None,
+                        });
+                    }
+                };
+            } else if fk_cols.contains(&column_name) {
+                ()
+            } else {
+                if indexes_map.contains_key(&index_name) {
+                    indexes_map.get_mut(&index_name).map(|index: &mut Index| {
+                        index.columns.push(column_name);
+                    });
                 } else {
-                    Some(Index {
-                        name: index_name,
-                        columns: vec![column_name],
-                        tpe: match is_unique {
-                            true => IndexType::Unique,
-                            false => IndexType::Normal,
+                    indexes_map.insert(
+                        index_name.clone(),
+                        Index {
+                            name: index_name,
+                            columns: vec![column_name],
+                            tpe: match is_unique {
+                                true => IndexType::Unique,
+                                false => IndexType::Normal,
+                            },
                         },
-                    })
+                    );
                 }
-            })
-            .collect();
+            }
+        }
+
+        let indices = indexes_map.into_iter().map(|(_k, v)| v).collect();
 
         debug!("Found table indices: {:?}, primary key: {:?}", indices, primary_key);
         (indices, primary_key)

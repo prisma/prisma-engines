@@ -28,6 +28,9 @@ impl DataModelCalculator for DataModelCalculatorImpl {
             MigrationStep::DeleteField(x) => apply_delete_field(&mut result, x),
             MigrationStep::UpdateField(x) => apply_update_field(&mut result, x),
             MigrationStep::CreateField(x) => apply_create_field(&mut result, x),
+            MigrationStep::CreateIndex(x) => apply_create_index(&mut result, x),
+            MigrationStep::DeleteIndex(x) => apply_delete_index(&mut result, x),
+            MigrationStep::UpdateIndex(x) => apply_update_index(&mut result, x),
         });
         result
     }
@@ -154,4 +157,63 @@ fn apply_create_field(data_model: &mut Datamodel, step: &CreateField) {
     field.scalar_list_strategy = step.scalar_list;
 
     model.add_field(field);
+}
+
+fn apply_create_index(data_model: &mut Datamodel, step: &CreateIndex) {
+    let model = data_model.find_model_mut(&step.model).expect(&format!(
+        "The model {} does not exist in this Datamodel. It is not possible to create an index in it.",
+        step.model
+    ));
+
+    if model.indexes.iter().any(|index| step.applies_to_index(index)) {
+        panic!(
+            "The index {:?} on fields ({:?}) of model {} already exists in this Datamodel. It is not possible to create it once more.",
+            step.name, step.fields, model.name,
+        )
+    }
+
+    let index = IndexDefinition {
+        name: step.name.clone(),
+        fields: step.fields.clone(),
+        tpe: step.tpe,
+    };
+
+    model.add_index(index)
+}
+
+fn apply_delete_index(data_model: &mut Datamodel, step: &DeleteIndex) {
+    let model = data_model.find_model_mut(&step.model).expect(&format!(
+        "The model {} does not exist in this Datamodel. It is not possible to drop an index in it.",
+        step.model
+    ));
+
+    if model.indexes.iter().any(|index| step.applies_to_index(index)) {
+        let new_indexes = model
+            .indexes
+            .drain(..)
+            .filter(|index| !step.applies_to_index(index))
+            .collect();
+        model.indexes = new_indexes;
+    } else {
+        panic!(
+            "The index {:?} on fields ({:?}) of model {} does not exist in this Datamodel. It is not possible to delete it.",
+            step.name, step.fields, model.name,
+        )
+    }
+}
+
+fn apply_update_index(data_model: &mut Datamodel, step: &UpdateIndex) {
+    let model = data_model.find_model_mut(&step.model).expect(&format!(
+        "The model {} does not exist in this Datamodel. It is not possible to rename an index in it.",
+        step.model
+    ));
+
+    let index_opt = model
+        .indexes
+        .iter_mut()
+        .find(|index| step.applies_to_index(index));
+
+    if let Some(index) = index_opt {
+            index.name = step.name.clone();
+    }
 }

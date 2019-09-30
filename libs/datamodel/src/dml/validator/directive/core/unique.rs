@@ -1,5 +1,5 @@
 use crate::dml::validator::directive::{Args, DirectiveValidator, Error};
-use crate::{ast, dml, IndexDefinition};
+use crate::{ast, dml, IndexDefinition, IndexType};
 
 /// Prismas builtin `@unique` directive.
 pub struct UniqueDirectiveValidator {}
@@ -40,7 +40,7 @@ impl DirectiveValidator<dml::Model> for ModelLevelUniqueValidator {
         let mut index_def = IndexDefinition {
             name: None,
             fields: vec![],
-            is_unique: true,
+            tpe: IndexType::Unique,
         };
         //        let name = args.optional_arg("name").map(|name_arg| name_arg?.as_str()?);
         let name = match args.optional_arg("name") {
