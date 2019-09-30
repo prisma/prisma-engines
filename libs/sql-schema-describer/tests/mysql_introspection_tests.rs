@@ -599,3 +599,41 @@ fn mysql_multi_field_indexes_must_be_inferred() {
         }]
     );
 }
+
+#[test]
+fn mysql_join_table_unique_indexes_must_be_inferred() {
+    setup();
+
+    let mut migration = Migration::new().schema(SCHEMA);
+
+    migration.create_table("Cat", move |t| {
+        t.add_column("id", types::primary());
+        t.add_column("name", types::text());
+    });
+
+    migration.create_table("Human", move |t| {
+        t.add_column("id", types::primary());
+        t.add_column("name", types::text());
+    });
+
+    migration.create_table("CatToHuman", move |t| {
+        t.add_column("cat", types::foreign("Cat", "id").nullable(true));
+        t.add_column("human", types::foreign("Human", "id").nullable(true));
+        t.add_column("relationship", types::text());
+        t.add_index("cat_and_human_index", types::index(vec!["cat", "human"]).unique(true));
+    });
+
+    let full_sql = migration.make::<barrel::backend::MySql>();
+    let inspector = get_mysql_describer(&full_sql);
+    let result = inspector.describe(&SCHEMA.to_string()).expect("describing");
+    let table = result.get_table("CatToHuman").expect("couldn't get CatToHuman table");
+
+    assert_eq!(
+        table.indices,
+        &[Index {
+            name: "cat_and_human_index".into(),
+            columns: vec!["cat".to_owned(), "human".to_owned()],
+            tpe: IndexType::Unique
+        }]
+    );
+}
