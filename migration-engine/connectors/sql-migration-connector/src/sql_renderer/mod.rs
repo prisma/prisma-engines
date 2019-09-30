@@ -6,6 +6,7 @@ mod mysql_renderer;
 mod postgres_renderer;
 mod sqlite_renderer;
 
+use itertools::Itertools;
 use mysql_renderer::MySqlRenderer;
 use postgres_renderer::PostgresRenderer;
 use sqlite_renderer::SqliteRenderer;
@@ -22,6 +23,10 @@ pub trait SqlRenderer {
     fn render_column_type(&self, t: &ColumnType) -> String;
 
     fn render_references(&self, schema_name: &str, foreign_key: Option<&ForeignKey>) -> String;
+
+    fn render_index_columns(&self, _table: &Table, columns: &[String]) -> String {
+        columns.iter().map(|col| self.quote(&col)).join(", ")
+    }
 }
 
 impl dyn SqlRenderer {

@@ -1,4 +1,5 @@
 use super::common::*;
+use itertools::Itertools;
 use sql_schema_describer::*;
 
 pub struct MySqlRenderer {}
@@ -61,5 +62,31 @@ impl super::SqlRenderer for MySqlRenderer {
             ),
             None => "".to_string(),
         }
+    }
+
+    // For String columns, we can't index the whole column, so we have to add the prefix (e.g. `ON name(191)`).
+    fn render_index_columns(&self, table: &Table, columns: &[String]) -> String {
+        columns
+            .iter()
+            .map(|name| {
+                (
+                    name,
+                    &table
+                        .columns
+                        .iter()
+                        .find(|col| &col.name == name)
+                        .expect("Index column is in the table.")
+                        .tpe
+                        .family,
+                )
+            })
+            .map(|(name, tpe)| {
+                if tpe == &ColumnTypeFamily::String {
+                    format!("{}(191)", self.quote(&name))
+                } else {
+                    self.quote(&name)
+                }
+            })
+            .join(", ")
     }
 }

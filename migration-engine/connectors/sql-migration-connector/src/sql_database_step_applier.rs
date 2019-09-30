@@ -63,7 +63,7 @@ fn render_steps_pretty(
             let json_object = json_value.as_object_mut().unwrap();
             json_object.insert(
                 "raw".to_string(),
-                serde_json::Value::String(render_raw_sql(&cloned, sql_family, schema_name)),
+                serde_json::Value::String(dbg!(render_raw_sql(&cloned, sql_family, schema_name))),
             );
             json_value
         })
@@ -87,12 +87,9 @@ fn render_raw_sql(step: &SqlMigrationStep, sql_family: SqlFamily, schema_name: &
             let primary_key_was_already_set_in_column_line = lines.join(",").contains(&"PRIMARY KEY");
 
             if primary_columns.len() > 0 && !primary_key_was_already_set_in_column_line {
-                let column_names: Vec<String> = primary_columns
-                    .clone()
-                    .into_iter()
-                    .map(|col| renderer.quote(&col))
-                    .collect();
-                lines.push(format!("  PRIMARY KEY ({})", column_names.join(",")))
+                let rendered_primary_key_columns: String =
+                    renderer.render_index_columns(&table, primary_columns.as_slice());
+                lines.push(format!("  PRIMARY KEY ({})", rendered_primary_key_columns))
             }
             format!(
                 "CREATE TABLE {} (\n{}\n){};",

@@ -2,7 +2,7 @@
 #![allow(unused)]
 mod test_harness;
 use pretty_assertions::{assert_eq, assert_ne};
-use sql_migration_connector::{AlterIndex, DropIndex, CreateIndex, SqlFamily, SqlMigrationStep};
+use sql_migration_connector::{AlterIndex, CreateIndex, DropIndex, SqlFamily, SqlMigrationStep};
 use sql_schema_describer::*;
 use test_harness::*;
 
@@ -1163,9 +1163,9 @@ fn index_updates_with_rename_must_work() {
                     index: Index {
                         name: "customNameA".into(),
                         columns: vec!["field".into(), "id".into()],
-                        tpe: IndexType::Unique, 
+                        tpe: IndexType::Unique,
                     },
-                })
+                }),
             ];
             let actual_steps = result.sql_migration();
             assert_eq!(actual_steps, expected_steps);
@@ -1208,7 +1208,7 @@ fn adding_a_scalar_list_for_a_modelwith_id_type_int_must_work() {
                 strings String[]
                 enums Status[]
             }
-            
+
             enum Status {
               OK
               ERROR
