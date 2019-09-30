@@ -1,5 +1,5 @@
 //! Prisma read query AST
-
+use super::RecordFinderInjector;
 use connector::{filter::RecordFinder, QueryArguments};
 use prisma_models::prelude::*;
 use std::fmt::Display;
@@ -12,8 +12,8 @@ pub enum ReadQuery {
     AggregateRecordsQuery(AggregateRecordsQuery),
 }
 
-impl ReadQuery {
-    pub fn inject_record_finder(&mut self, rf: RecordFinder) {
+impl RecordFinderInjector for ReadQuery {
+    fn inject_record_finder(&mut self, rf: RecordFinder) {
         match self {
             Self::RecordQuery(ref mut rq) => rq.record_finder = Some(rf),
             _ => unimplemented!(),

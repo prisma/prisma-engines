@@ -30,6 +30,8 @@ pub enum QueryGraphBuilderError {
         child_name: String,
         // child_where: Option<Box<RecordFinderInfo>>,
     },
+
+    RecordNotFound(String),
 }
 
 #[derive(Debug)]

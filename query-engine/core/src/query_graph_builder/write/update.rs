@@ -5,7 +5,7 @@ use crate::{
     ArgumentListLookup, ParsedField, ParsedInputMap, ReadOneRecordBuilder,
 };
 use connector::filter::{Filter, RecordFinder};
-use prisma_models::ModelRef;
+use prisma_models::{self as models, ModelRef, PrismaArgs, PrismaValue};
 use std::{convert::TryInto, sync::Arc};
 use write_arguments::*;
 
@@ -54,7 +54,7 @@ pub fn update_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedF
     Ok(())
 }
 
-/// Creates a create record query and adds it to the query graph.
+/// Creates an update many record query and adds it to the query graph.
 pub fn update_many_records(
     graph: &mut QueryGraph,
     model: ModelRef,
@@ -86,6 +86,7 @@ pub fn update_many_records(
     Ok(())
 }
 
+/// Creates an update record query node and adds it to the query graph.
 pub fn update_record_node(
     graph: &mut QueryGraph,
     record_finder: Option<RecordFinder>,
@@ -112,3 +113,28 @@ pub fn update_record_node(
 
     Ok(node)
 }
+
+///// Creates an update record query node and adds it to the query graph, updating a specific field on the given model and record.
+// pub fn update_record_node_on_field(
+//     graph: &mut QueryGraph,
+//     record_finder: Option<RecordFinder>,
+//     model: ModelRef,
+//     field: models::Field,
+//     value: PrismaValue) -> QueryGraphBuilderResult<NodeRef> {
+//     let mut args = PrismaArgs::new();
+
+//     // Disregard list fields for now.
+//     args.insert(field.name(), value);
+//     args.update_datetimes(Arc::clone(&model), false);
+
+//     let ur = UpdateRecord {
+//         model,
+//         where_: record_finder,
+//         non_list_args: args,
+//         list_args: vec![],
+//     };
+
+//     let node = graph.create_node(Query::Write(WriteQuery::UpdateRecord(ur)));
+
+//     Ok(node)
+// }

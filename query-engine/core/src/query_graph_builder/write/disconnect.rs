@@ -1,16 +1,26 @@
 use crate::{
     query_ast::*,
-    query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
+    query_graph::{Node, NodeRef, ParentIdsFn, QueryGraph, QueryGraphDependency},
     QueryGraphBuilderError,
 };
 use prisma_models::RelationFieldRef;
 use std::{convert::TryInto, sync::Arc};
 
+/// Adds a disconnect query node to the graph, together with required edges.
+/// Disconnects `parent` and `child`.
+///
+/// A disconnect distinguishes between two cases:
+/// - Relation is many-to-many: Delete extra record (e.g. in a join table), `WriteQuery::Disconnect` query.
+/// - Relation is not many-to-many: Unset the inlined relation field on the side it is set. `WriteQuery::UpdateRecord` query.
+///
+/// Performs checks to make sure relations are not violated by the disconnect.
 pub fn disconnect_records_node(
     graph: &mut QueryGraph,
     parent: &NodeRef,
     child: &NodeRef,
     relation_field: &RelationFieldRef,
+    parent_fn: Option<ParentIdsFn>,
+    child_fn: Option<ParentIdsFn>,
 ) -> NodeRef {
     let connect = WriteQuery::ConnectRecords(ConnectRecords {
         parent: None,
@@ -77,4 +87,13 @@ pub fn disconnect_records_node(
     );
 
     connect_node
+}
+
+fn disconnect_m_to_n() -> () {
+    unimplemented!()
+}
+
+/// Implemented as an update on the
+fn disconnect_1_to_n() -> () {
+    unimplemented!()
 }

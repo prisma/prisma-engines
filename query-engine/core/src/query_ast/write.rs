@@ -1,4 +1,5 @@
 //! Write query AST
+use super::RecordFinderInjector;
 use connector::filter::{Filter, RecordFinder};
 use prisma_models::prelude::*;
 
@@ -32,6 +33,16 @@ impl WriteQuery {
 
             _ => (),
         };
+    }
+}
+
+impl RecordFinderInjector for WriteQuery {
+    fn inject_record_finder(&mut self, rf: RecordFinder) {
+        match self {
+            Self::UpdateRecord(ref mut ur) => ur.where_ = Some(rf),
+            Self::DeleteRecord(ref mut dr) => dr.where_ = Some(rf),
+            _ => unimplemented!(),
+        }
     }
 }
 

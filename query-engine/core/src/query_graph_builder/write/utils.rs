@@ -7,8 +7,18 @@ use connector::{filter::RecordFinder, QueryArguments};
 use prisma_models::{ModelRef, RelationFieldRef, SelectedFields};
 use std::{convert::TryInto, sync::Arc};
 
-/// Detects and performs a flip of `parent` and `child`, if necessary.
-/// If a flip is performed: Removes all edges from the parent to it's parents, and rewire them to the child.
+/// Detects and performs a flip of `parent` and `child` nodes, if necessary, which is basically a transformation
+/// on the query graph to allow "incorrect" incoming queries to be executed.
+///
+/// When is a node flip necessary? If `child` is a create and the parent holds the inlined relation field,
+/// e.g. the foreign key in SQL terms. This means we can't create the parent without knowing the actual
+/// ID first. Hence, we need to execute the child node first to get the child ID, then the
+/// parent node can execute. How the flipped nodes are connected in the end is the callers to decide.
+///
+/// Performing a flip involves:
+/// - Removing all edges from the parent to it's parents
+/// - Rewiring the removed edges to the child.
+///
 /// Note: Any edge already existing between parent and child are NOT FLIPPED here.
 ///
 /// Returns the correct `RelationFieldRef` in the result triple. The relation field is always the one on the parent,
@@ -23,7 +33,7 @@ pub fn flip_nodes<'a>(
     child: &'a NodeRef,
     relation_field: &'a RelationFieldRef,
 ) -> (&'a NodeRef, &'a NodeRef, RelationFieldRef) {
-    if node_is_create(graph, parent) {
+    if node_is_create(graph, child) {
         if relation_field.relation_is_inlined_in_parent() {
             let parent_edges = graph.incoming_edges(parent);
             for parent_edge in parent_edges {

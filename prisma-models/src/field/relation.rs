@@ -112,6 +112,7 @@ impl RelationField {
         }
     }
 
+    /// Inlined in self / model of self
     pub fn relation_is_inlined_in_parent(&self) -> bool {
         let relation = self.relation();
 
