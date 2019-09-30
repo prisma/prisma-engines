@@ -222,6 +222,13 @@ impl Column {
         //        }
         result
     }
+
+    pub fn differs_only_in_arity(&self, other: &Column) -> bool {
+        self.name == other.name
+            && self.tpe == other.tpe
+            && self.default == other.default
+            && self.auto_increment == other.auto_increment
+    }
 }
 
 /// The type of a column.
@@ -362,4 +369,31 @@ pub struct Sequence {
     pub initial_value: u32,
     /// Sequence allocation size.
     pub allocation_size: u32,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn column_only_differs_on_arity_works() {
+        let column = Column {
+            name: "test".into(),
+            tpe: ColumnType::pure(ColumnTypeFamily::Int),
+            arity: ColumnArity::Nullable,
+            auto_increment: false,
+            default: None,
+        };
+        let mut other_column = column.clone();
+
+        assert!(!column.differs_only_in_arity(&other_column));
+
+        other_column.arity = ColumnArity::Required;
+
+        assert!(column.differs_only_in_arity(&other_column));
+
+        other_column.auto_increment = true;
+
+        assert!(!column.differs_only_in_arity(&other_column));
+    }
 }

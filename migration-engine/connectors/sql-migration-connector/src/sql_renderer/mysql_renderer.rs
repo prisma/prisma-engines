@@ -1,4 +1,5 @@
 use super::common::*;
+use itertools::Itertools;
 use sql_schema_describer::*;
 
 pub struct MySqlRenderer {}
@@ -11,7 +12,14 @@ impl super::SqlRenderer for MySqlRenderer {
         let column_name = self.quote(&column.name);
         let tpe_str = self.render_column_type(&column.tpe);
         let nullability_str = render_nullability(&table, &column);
-        let default_str = render_default(&column);
+
+        // Before MySQL 8, mediumtext (String) columns cannot have a default.
+        let default_str = if column.tpe.family == ColumnTypeFamily::String {
+            "".to_owned()
+        } else {
+            render_default(&column)
+        };
+
         let foreign_key = table.foreign_key_for_column(&column.name);
         let references_str = self.render_references(&schema_name, foreign_key);
         let auto_increment_str = if column.auto_increment { "AUTO_INCREMENT" } else { "" };
@@ -38,9 +46,7 @@ impl super::SqlRenderer for MySqlRenderer {
             ColumnTypeFamily::DateTime => format!("datetime(3)"),
             ColumnTypeFamily::Float => format!("Decimal(65,30)"),
             ColumnTypeFamily::Int => format!("int"),
-            // we use varchar right now as mediumtext doesn't allow default values
-            // a bigger length would not allow to use such a column as primary key
-            ColumnTypeFamily::String => format!("varchar(191)"),
+            ColumnTypeFamily::String => format!("mediumtext"),
             x => unimplemented!("{:?} not handled yet", x),
         }
     }
@@ -56,5 +62,31 @@ impl super::SqlRenderer for MySqlRenderer {
             ),
             None => "".to_string(),
         }
+    }
+
+    // For String columns, we can't index the whole column, so we have to add the prefix (e.g. `ON name(191)`).
+    fn render_index_columns(&self, table: &Table, columns: &[String]) -> String {
+        columns
+            .iter()
+            .map(|name| {
+                (
+                    name,
+                    &table
+                        .columns
+                        .iter()
+                        .find(|col| &col.name == name)
+                        .expect("Index column is in the table.")
+                        .tpe
+                        .family,
+                )
+            })
+            .map(|(name, tpe)| {
+                if tpe == &ColumnTypeFamily::String {
+                    format!("{}(191)", self.quote(&name))
+                } else {
+                    self.quote(&name)
+                }
+            })
+            .join(", ")
     }
 }

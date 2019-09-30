@@ -2,7 +2,7 @@
 #![allow(unused)]
 mod test_harness;
 use pretty_assertions::{assert_eq, assert_ne};
-use sql_migration_connector::{AlterIndex, DropIndex, CreateIndex, SqlFamily, SqlMigrationStep};
+use sql_migration_connector::{AlterIndex, CreateIndex, DropIndex, SqlFamily, SqlMigrationStep};
 use sql_schema_describer::*;
 use test_harness::*;
 
@@ -1159,13 +1159,13 @@ fn index_updates_with_rename_must_work() {
                     name: "customName".into(),
                 }),
                 SqlMigrationStep::CreateIndex(CreateIndex {
-                    table: "A".into(),
+                    table: result.sql_schema.table_bang("A").clone(),
                     index: Index {
                         name: "customNameA".into(),
                         columns: vec!["field".into(), "id".into()],
-                        tpe: IndexType::Unique, 
+                        tpe: IndexType::Unique,
                     },
-                })
+                }),
             ];
             let actual_steps = result.sql_migration();
             assert_eq!(actual_steps, expected_steps);

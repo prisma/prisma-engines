@@ -90,8 +90,14 @@ pub struct AlterColumn {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
+pub enum ColumnChange {
+    ReplaceColumn(Column),
+    ChangeArity(ColumnArity),
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct CreateIndex {
-    pub table: String,
+    pub table: Table,
     pub index: Index,
 }
 
