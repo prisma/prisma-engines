@@ -67,3 +67,22 @@ fn allow_complicated_self_relations() {
     user_model.assert_has_field("husband").assert_relation_to("User");
     user_model.assert_has_field("wife").assert_relation_to("User");
 }
+
+#[test]
+fn allow_unambiguous_self_relations_in_presence_of_unrelated_other_relations() {
+    let dml = r#"
+        model User {
+            id Int @id
+            subscribers Follower[]
+            son User
+            mother User
+        }
+
+        model Follower {
+            id Int @id
+            following User[]
+        }
+    "#;
+
+    parse(dml);
+}

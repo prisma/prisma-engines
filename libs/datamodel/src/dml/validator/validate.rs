@@ -90,7 +90,7 @@ impl Validator {
 
             if !is_valid {
                 return Err(ValidationError::new_model_validation_error(
-                    "Invalid ID field. ID field must be one of: Int @id, String @id @default(cuid()), String @id @default(uuid()).", 
+                    "Invalid ID field. ID field must be one of: Int @id, String @id @default(cuid()), String @id @default(uuid()).",
                     &model.name,
                     ast_schema.find_field(&model.name, &id_field.name).expect(STATE_ERROR).span));
             }
@@ -156,7 +156,7 @@ impl Validator {
                                             .span,
                                     ));
                                 }
-                            } else {
+                            } else if rel_a.to == model.name && rel_b.to == model.name {
                                 // A self relation...
                                 for field_c in model.fields() {
                                     if field_a != field_c && field_b != field_c {

@@ -1208,7 +1208,7 @@ fn adding_a_scalar_list_for_a_modelwith_id_type_int_must_work() {
                 strings String[]
                 enums Status[]
             }
-            
+
             enum Status {
               OK
               ERROR
@@ -1282,4 +1282,26 @@ fn reserved_sql_key_words_must_work() {
             }]
         );
     });
+}
+
+#[test]
+fn migrations_with_self_relation_must_be_idempotent() {
+    // Issue: https://github.com/prisma/prisma2/issues/488
+    test_each_connector(|sql_family, api| {
+        let dm = r#"
+            model User {
+                id String @default(cuid()) @id
+            }
+        "#;
+
+        infer_and_apply(api, &dm);
+
+        let dm2 = r#"
+            model User {
+                id String @default(cuid()) @id
+                invitedBy User?
+            }
+        "#;
+        let schema_2 = infer_and_apply(api, &dm).sql_schema;
+    })
 }
