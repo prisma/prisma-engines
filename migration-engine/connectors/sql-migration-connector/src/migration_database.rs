@@ -3,7 +3,12 @@ use prisma_query::{
     connector::{self, MysqlParams, PostgresParams, Queryable, ResultSet, SqliteParams},
     pool::{mysql::*, postgres::*, sqlite::*, PrismaConnectionManager},
 };
-use std::{sync::{Arc, Mutex}, convert::TryFrom, ops::DerefMut, time::Duration};
+use std::{
+    convert::TryFrom,
+    ops::DerefMut,
+    sync::{Arc, Mutex},
+    time::Duration,
+};
 
 pub trait MigrationDatabase: Send + Sync + 'static {
     fn execute(&self, db: &str, q: Query) -> prisma_query::Result<Option<Id>>;
@@ -94,7 +99,7 @@ impl MigrationDatabase for Sqlite {
 
 enum PostgresConnection {
     Pooled(PostgresPool),
-    Single(Mutex<connector::PostgreSql>)
+    Single(Mutex<connector::PostgreSql>),
 }
 
 pub struct PostgreSql {
@@ -126,9 +131,7 @@ impl PostgreSql {
         F: FnOnce(&mut dyn Queryable) -> T,
     {
         match self.conn {
-            PostgresConnection::Single(ref mutex) => {
-                f(mutex.lock().unwrap().deref_mut())
-            },
+            PostgresConnection::Single(ref mutex) => f(mutex.lock().unwrap().deref_mut()),
             PostgresConnection::Pooled(ref pool) => {
                 let mut conn = pool.get().unwrap();
                 f(conn.deref_mut())
@@ -157,7 +160,7 @@ impl MigrationDatabase for PostgreSql {
 
 enum MysqlConnection {
     Pooled(MysqlPool),
-    Single(Mutex<connector::Mysql>)
+    Single(Mutex<connector::Mysql>),
 }
 
 pub struct Mysql {
@@ -189,9 +192,7 @@ impl Mysql {
         F: FnOnce(&mut dyn Queryable) -> T,
     {
         match self.conn {
-            MysqlConnection::Single(ref mutex) => {
-                f(mutex.lock().unwrap().deref_mut())
-            },
+            MysqlConnection::Single(ref mutex) => f(mutex.lock().unwrap().deref_mut()),
             MysqlConnection::Pooled(ref pool) => {
                 let mut conn = pool.get().unwrap();
                 f(conn.deref_mut())
