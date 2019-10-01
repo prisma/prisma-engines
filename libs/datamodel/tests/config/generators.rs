@@ -9,7 +9,7 @@ generator js1 {
 
 generator go {
     provider = "go"
-    platforms = ["a", "b"]
+    binaryTargets = ["a", "b"]
     pinnedPlatform = "b"
 }"#;
 
@@ -23,7 +23,7 @@ fn serialize_generators_to_cmf() {
     "name": "js1",
     "provider": "javascript",
     "output": "../../js",
-    "platforms": [],
+    "binaryTargets": [],
     "pinnedPlatform": null,
     "config": {}
   },
@@ -31,7 +31,7 @@ fn serialize_generators_to_cmf() {
     "name": "go",
     "provider": "go",
     "output": null,
-    "platforms": ["a","b"],
+    "binaryTargets": ["a","b"],
     "pinnedPlatform": {
       "fromEnvVar": null,
       "value": "b"

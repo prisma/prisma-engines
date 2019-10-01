@@ -138,7 +138,7 @@ fn test_dmmf_roundtrip_with_sources_and_comments() {
 const DATAMODEL_WITH_GENERATOR: &str = r#"generator js {
   provider       = "javascript"
   output         = "./client"
-  platforms      = ["a", "b"]
+  binaryTargets  = ["a", "b"]
   pinnedPlatform = "b"
   extra_config   = "test"
 }

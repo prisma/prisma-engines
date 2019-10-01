@@ -14,7 +14,7 @@ pub struct Generator {
     provider: String,
     output: Option<String>,
     #[serde(default = "Vec::new")]
-    platforms: Vec<String>,
+    binary_targets: Vec<String>,
     pub pinned_platform: Option<StringFromEnvVar>,
     // Todo: This is a bad choice, PrismaValue is probably better.
     pub config: HashMap<String, String>,

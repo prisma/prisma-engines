@@ -8,9 +8,9 @@ pub struct GeneratorLoader {}
 
 const PROVIDER_KEY: &str = "provider";
 const OUTPUT_KEY: &str = "output";
-const PLATFORMS_KEY: &str = "platforms";
+const BINARY_TARGETS_KEY: &str = "binaryTargets";
 const PINNED_PLATFORM_KEY: &str = "pinnedPlatform";
-const FIRST_CLASS_PROPERTIES: &[&str] = &[PROVIDER_KEY, OUTPUT_KEY, PLATFORMS_KEY, PINNED_PLATFORM_KEY];
+const FIRST_CLASS_PROPERTIES: &[&str] = &[PROVIDER_KEY, OUTPUT_KEY, BINARY_TARGETS_KEY, PINNED_PLATFORM_KEY];
 
 impl GeneratorLoader {
     pub fn lift_generator(ast_generator: &ast::GeneratorConfig) -> Result<Generator, ValidationError> {
@@ -25,7 +25,7 @@ impl GeneratorLoader {
 
         let mut properties: HashMap<String, String> = HashMap::new();
 
-        let platforms = match args.arg(PLATFORMS_KEY).ok() {
+        let binary_targets = match args.arg(BINARY_TARGETS_KEY).ok() {
             Some(x) => x.as_array()?.to_str_vec()?,
             None => Vec::new(),
         };
@@ -53,7 +53,7 @@ impl GeneratorLoader {
             name: ast_generator.name.name.clone(),
             provider,
             output,
-            platforms,
+            binary_targets,
             pinned_platform,
             config: properties,
             documentation: ast_generator.documentation.clone().map(|comment| comment.text),
@@ -70,12 +70,12 @@ impl GeneratorLoader {
         }
 
         let platform_values: Vec<ast::Value> = generator
-            .platforms
+            .binary_targets
             .iter()
             .map(|p| ast::Value::StringValue(p.to_string(), ast::Span::empty()))
             .collect();
         if !platform_values.is_empty() {
-            arguments.push(ast::Argument::new_array("platforms", platform_values));
+            arguments.push(ast::Argument::new_array("binaryTargets", platform_values));
         }
 
         if let Some(pinned_platform) = &generator.pinned_platform {
