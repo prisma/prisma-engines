@@ -1,7 +1,7 @@
 //! Datamodel migration steps.
 
 use datamodel::*;
-use serde::{Serialize, Deserialize, Deserializer};
+use serde::{Deserialize, Deserializer, Serialize};
 
 /// An atomic change to a [Datamodel](datamodel/dml/struct.Datamodel.html).
 #[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]

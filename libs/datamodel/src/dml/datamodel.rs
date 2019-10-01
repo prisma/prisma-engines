@@ -1,11 +1,10 @@
 use super::enummodel::*;
 use super::field::Field;
 use super::model::*;
-use serde::{Deserialize, Serialize};
 
 // TODO: Is schema the right name here?
 /// Represents a prisma-datamodel.
-#[derive(Default, Debug, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Default, Debug, PartialEq, Clone)]
 pub struct Datamodel {
     /// All enums.
     pub enums: Vec<Enum>,

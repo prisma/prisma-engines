@@ -3,7 +3,7 @@ use super::traits::*;
 use serde::{Deserialize, Serialize};
 
 /// Represents a model in a prisma datamodel.
-#[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct Model {
     /// Name of the model.
     pub name: String,
@@ -20,7 +20,7 @@ pub struct Model {
     pub is_generated: bool,
 }
 
-#[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct IndexDefinition {
     pub name: Option<String>,
     pub fields: Vec<String>,
