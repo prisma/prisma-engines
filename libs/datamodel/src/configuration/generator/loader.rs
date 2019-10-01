@@ -1,7 +1,4 @@
-use crate::{
-    ast, common::argument::Arguments, common::value::ValueListValidator, configuration::Generator, errors::*,
-    StringFromEnvVar,
-};
+use crate::{ast, common::argument::Arguments, common::value::ValueListValidator, configuration::Generator, errors::*};
 use std::collections::HashMap;
 
 pub struct GeneratorLoader {}
@@ -9,8 +6,7 @@ pub struct GeneratorLoader {}
 const PROVIDER_KEY: &str = "provider";
 const OUTPUT_KEY: &str = "output";
 const BINARY_TARGETS_KEY: &str = "binaryTargets";
-const PINNED_PLATFORM_KEY: &str = "pinnedPlatform";
-const FIRST_CLASS_PROPERTIES: &[&str] = &[PROVIDER_KEY, OUTPUT_KEY, BINARY_TARGETS_KEY, PINNED_PLATFORM_KEY];
+const FIRST_CLASS_PROPERTIES: &[&str] = &[PROVIDER_KEY, OUTPUT_KEY, BINARY_TARGETS_KEY];
 
 impl GeneratorLoader {
     pub fn lift_generator(ast_generator: &ast::GeneratorConfig) -> Result<Generator, ValidationError> {
@@ -29,16 +25,6 @@ impl GeneratorLoader {
             Some(x) => x.as_array()?.to_str_vec()?,
             None => Vec::new(),
         };
-        let pinned_platform = args
-            .arg(PINNED_PLATFORM_KEY)
-            .and_then(|x| {
-                let (env_var, value) = x.as_str_from_env()?;
-                Ok(StringFromEnvVar {
-                    from_env_var: env_var,
-                    value: value,
-                })
-            })
-            .ok();
 
         for prop in &ast_generator.properties {
             let is_first_class_prop = FIRST_CLASS_PROPERTIES.iter().any(|k| *k == prop.name.name);
@@ -54,7 +40,6 @@ impl GeneratorLoader {
             provider,
             output,
             binary_targets,
-            pinned_platform,
             config: properties,
             documentation: ast_generator.documentation.clone().map(|comment| comment.text),
         })
@@ -76,10 +61,6 @@ impl GeneratorLoader {
             .collect();
         if !platform_values.is_empty() {
             arguments.push(ast::Argument::new_array("binaryTargets", platform_values));
-        }
-
-        if let Some(pinned_platform) = &generator.pinned_platform {
-            arguments.push(ast::Argument::new_string("pinnedPlatform", &pinned_platform.value));
         }
 
         for (key, value) in &generator.config {
