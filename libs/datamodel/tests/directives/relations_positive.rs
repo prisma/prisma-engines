@@ -74,7 +74,6 @@ fn allow_unambiguous_self_relations_in_presence_of_unrelated_other_relations() {
         model User {
             id Int @id
             subscribers Follower[]
-            son User
             mother User
         }
 
