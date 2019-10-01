@@ -1208,7 +1208,7 @@ fn adding_a_scalar_list_for_a_modelwith_id_type_int_must_work() {
                 strings String[]
                 enums Status[]
             }
-            
+
             enum Status {
               OK
               ERROR

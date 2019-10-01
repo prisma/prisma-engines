@@ -90,7 +90,7 @@ impl Validator {
 
             if !is_valid {
                 return Err(ValidationError::new_model_validation_error(
-                    "Invalid ID field. ID field must be one of: Int @id, String @id @default(cuid()), String @id @default(uuid()).", 
+                    "Invalid ID field. ID field must be one of: Int @id, String @id @default(cuid()), String @id @default(uuid()).",
                     &model.name,
                     ast_schema.find_field(&model.name, &id_field.name).expect(STATE_ERROR).span));
             }
@@ -156,12 +156,13 @@ impl Validator {
                                             .span,
                                     ));
                                 }
-                            } else {
-                                // A self relation...
+                            } else if rel_a.to == model.name && rel_b.to == model.name {
+                                // This is a self-relation with at least two fields.
+
+                                // Named self relations are ambiguous when they involve more than two fields.
                                 for field_c in model.fields() {
                                     if field_a != field_c && field_b != field_c {
                                         if let dml::FieldType::Relation(rel_c) = &field_c.field_type {
-                                            // ...but there are more thatn three fields without a name.
                                             if rel_c.to == model.name
                                                 && rel_a.name == rel_b.name
                                                 && rel_a.name == rel_c.name
@@ -177,6 +178,19 @@ impl Validator {
                                             }
                                         }
                                     }
+                                }
+
+                                // Ambiguous unnamed self relation: two fields are enough.
+                                if rel_a.name.is_empty() && rel_b.name.is_empty() {
+                                    // A self relation, but there are at least two fields without a name.
+                                    return Err(ValidationError::new_model_validation_error(
+                                        "Ambiguous self relation detected.",
+                                        &model.name,
+                                        ast_schema
+                                            .find_field(&model.name, &field_a.name)
+                                            .expect(STATE_ERROR)
+                                            .span,
+                                    ));
                                 }
                             }
                         }
