@@ -1283,3 +1283,64 @@ fn reserved_sql_key_words_must_work() {
         );
     });
 }
+
+#[test]
+fn migrations_with_many_to_many_related_models_must_not_recreate_indexes() {
+    // test case for https://github.com/prisma/lift/issues/148
+    test_each_connector(|sql_family, api| {
+        let dm_1 = r#"
+            model User {
+                id        String  @default(cuid()) @id
+            }
+
+            model Profile {
+                id        String  @default(cuid()) @id
+                user      User
+                skills    Skill[]
+            }
+
+            model Skill {
+                id          String  @default(cuid()) @id
+                profiles    Profile[]
+            }
+        "#;
+        let sql_schema = infer_and_apply(api, &dm_1).sql_schema;
+
+        let index = sql_schema
+            .table_bang("_ProfileToSkill")
+            .indices
+            .iter()
+            .find(|index| index.name == "_ProfileToSkill_AB_unique")
+            .expect("index is present");
+        assert_eq!(index.tpe, IndexType::Unique);
+
+        let dm_2 = r#"
+            model User {
+                id        String  @default(cuid()) @id
+                someField String?
+            }
+
+            model Profile {
+                id        String  @default(cuid()) @id
+                user      User
+                skills    Skill[]
+            }
+
+            model Skill {
+                id          String  @default(cuid()) @id
+                profiles    Profile[]
+            }
+        "#;
+
+        let result = infer_and_apply(api, &dm_1);
+        let sql_schema = result.sql_schema;
+
+        let index = sql_schema
+            .table_bang("_ProfileToSkill")
+            .indices
+            .iter()
+            .find(|index| index.name == "_ProfileToSkill_AB_unique")
+            .expect("index is present");
+        assert_eq!(index.tpe, IndexType::Unique);
+    })
+}

@@ -61,11 +61,7 @@ impl SqlSchemaDescriber {
         debug!("Getting table '{}'", name);
         let columns = self.get_columns(schema, name);
         let foreign_keys = self.get_foreign_keys(schema, name);
-        let fk_cols = foreign_keys
-            .iter()
-            .flat_map(|fk| fk.columns.iter().map(|col| col.clone()))
-            .collect();
-        let (indices, primary_key) = self.get_indices(schema, name, fk_cols);
+        let (indices, primary_key) = self.get_indices(schema, name, &foreign_keys);
         Table {
             name: name.to_string(),
             columns,
@@ -138,12 +134,12 @@ impl SqlSchemaDescriber {
         // One should think it's unique since it's used to join information_schema.key_column_usage
         // and information_schema.referential_constraints tables in this query lifted from
         // Stack Overflow
-        let sql = "SELECT kcu.constraint_name, kcu.column_name, kcu.referenced_table_name, 
+        let sql = "SELECT kcu.constraint_name, kcu.column_name, kcu.referenced_table_name,
             kcu.referenced_column_name, kcu.ordinal_position, rc.delete_rule
             FROM information_schema.key_column_usage AS kcu
             INNER JOIN information_schema.referential_constraints AS rc ON
             kcu.constraint_name = rc.constraint_name
-            WHERE kcu.table_schema = ? AND kcu.table_name = ? AND 
+            WHERE kcu.table_schema = ? AND kcu.table_name = ? AND
             referenced_column_name IS NOT NULL
         ";
         debug!("describing table foreign keys, SQL: '{}'", sql);
@@ -229,7 +225,12 @@ impl SqlSchemaDescriber {
         fks
     }
 
-    fn get_indices(&self, schema: &str, table_name: &str, fk_cols: Vec<String>) -> (Vec<Index>, Option<PrimaryKey>) {
+    fn get_indices(
+        &self,
+        schema: &str,
+        table_name: &str,
+        foreign_keys: &[ForeignKey],
+    ) -> (Vec<Index>, Option<PrimaryKey>) {
         let sql = "
             SELECT DISTINCT
                 index_name, non_unique, column_name, seq_in_index
@@ -278,8 +279,6 @@ impl SqlSchemaDescriber {
                         });
                     }
                 };
-            } else if fk_cols.contains(&column_name) {
-                ()
             } else {
                 if indexes_map.contains_key(&index_name) {
                     indexes_map.get_mut(&index_name).map(|index: &mut Index| {
@@ -301,7 +300,12 @@ impl SqlSchemaDescriber {
             }
         }
 
-        let indices = indexes_map.into_iter().map(|(_k, v)| v).collect();
+        let indices = indexes_map
+            .into_iter()
+            .map(|(_k, v)| v)
+            // Remove foreign keys, because they are introspected separately.
+            .filter(|index| foreign_keys.iter().find(|fk| fk.columns == index.columns).is_none())
+            .collect();
 
         debug!("Found table indices: {:?}, primary key: {:?}", indices, primary_key);
         (indices, primary_key)
