@@ -39,6 +39,7 @@ pub fn new_builtin_model_directives() -> DirectiveListValidator<dml::Model> {
     validator.add(Box::new(map::MapDirectiveValidator {}));
     validator.add(Box::new(embedded::EmbeddedDirectiveValidator {}));
     validator.add(Box::new(unique::ModelLevelUniqueValidator {}));
+    validator.add(Box::new(id::ModelLevelIdDirectiveValidator {}));
 
     validator
 }
