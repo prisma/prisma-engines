@@ -113,28 +113,3 @@ pub fn update_record_node(
 
     Ok(node)
 }
-
-///// Creates an update record query node and adds it to the query graph, updating a specific field on the given model and record.
-// pub fn update_record_node_on_field(
-//     graph: &mut QueryGraph,
-//     record_finder: Option<RecordFinder>,
-//     model: ModelRef,
-//     field: models::Field,
-//     value: PrismaValue) -> QueryGraphBuilderResult<NodeRef> {
-//     let mut args = PrismaArgs::new();
-
-//     // Disregard list fields for now.
-//     args.insert(field.name(), value);
-//     args.update_datetimes(Arc::clone(&model), false);
-
-//     let ur = UpdateRecord {
-//         model,
-//         where_: record_finder,
-//         non_list_args: args,
-//         list_args: vec![],
-//     };
-
-//     let node = graph.create_node(Query::Write(WriteQuery::UpdateRecord(ur)));
-
-//     Ok(node)
-// }

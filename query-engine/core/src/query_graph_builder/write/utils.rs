@@ -4,37 +4,106 @@ use crate::{
     ParsedInputValue,
 };
 use connector::{filter::RecordFinder, QueryArguments};
-use prisma_models::{ModelRef, RelationFieldRef, SelectedFields};
+use prisma_models::{ModelRef, RelationFieldRef, SelectedFields, PrismaArgs};
 use std::{convert::TryInto, sync::Arc};
 
-/// Detects and performs a flip of `parent` and `child` nodes, if necessary, which is basically a transformation
-/// on the query graph to allow "incorrect" incoming queries to be executed.
+/// Coerces single values (`ParsedInputValue::Single` and `ParsedInputValue::Map`) into a vector.
+/// Simply unpacks `ParsedInputValue::List`.
+pub fn coerce_vec(val: ParsedInputValue) -> Vec<ParsedInputValue> {
+    match val {
+        ParsedInputValue::List(l) => l,
+        m @ ParsedInputValue::Map(_) => vec![m],
+        single => vec![single],
+    }
+}
+
+/// Detects inconsistencies in the ordering of queries and and performs a "flip" of `parent` and `child` nodes if necessary,
 ///
-/// When is a node flip necessary? If `child` is a create and the parent holds the inlined relation field,
-/// e.g. the foreign key in SQL terms. This means we can't create the parent without knowing the actual
-/// ID first. Hence, we need to execute the child node first to get the child ID, then the
-/// parent node can execute. How the flipped nodes are connected in the end is the callers to decide.
+/// ## When is a node flip necessary?
+/// If `parent` is a create and holds the inlined relation field, e.g. the foreign key in SQL terms.
+/// This means we can't create the parent without knowing the actual ID of the child first.
+/// Hence, we need to execute the child node first to get the child ID, then the
+/// parent node can execute.
+///
+/// Important: How the flipped nodes are connected in the end is the callers to decide.
 ///
 /// Performing a flip involves:
-/// - Removing all edges from the parent to it's parents
-/// - Rewiring the removed edges to the child.
+/// - Removing all edges from the parent to its parents
+/// - Rewiring the previously removed edges to the child.
 ///
-/// Note: Any edge already existing between parent and child are NOT FLIPPED here.
+/// Notes:
+/// - The parent keeps its child nodes.
+/// - Any edge already existing between parent and child are not considered and thus NOT FLIPPED here.
+///
+/// ## Example
+/// Take the following GraphQL query:
+/// ```graphql
+/// mutation {
+///   createOneAlbum(
+///     data: {
+///       Title: "Master of Puppets"
+///       Artist: { create: { Name: "Metallica" } }
+///     }
+///   ) {
+///     id
+///     Artist {
+///       id
+///     }
+///   }
+/// }
+/// ```
+///
+/// The resulting query graph would look like this:
+///```text
+/// ┌─────────────┐
+/// │Create Album │───────────┐
+/// └─────────────┘           │
+///        │                  │
+///        │                  │
+///        ▼                  ▼
+/// ┌─────────────┐    ┌────────────┐
+/// │Create Artist│    │ Read Album │
+/// └─────────────┘    └────────────┘
+///```
+/// However, in a typical SQL database, the `Album` table holds the foreign key to Artist, as the relation is usually
+/// "An Artist has many Albums, an Album has one Artist".
+///
+/// This would lead to the execution engine executing the `Create Album` query and failing, because we don't have the
+/// foreign key for `Artist` - it doesn't exist yet. Hence, we "flip" the create queries and ensure that the execution
+/// order is serialized in a way that necessary results for `Create Album` are available when it executes.
+///
+/// The result of the transformation looks like this in our example:
+///```text
+/// ┌─────────────┐
+/// │Create Artist│
+/// └─────────────┘
+///        │
+///        ▼
+/// ┌─────────────┐
+/// │Create Album │
+/// └─────────────┘
+///        │
+///        ▼
+/// ┌─────────────┐
+/// │ Read Result │
+/// └─────────────┘
+///```
+///
+/// ## Return values
 ///
 /// Returns the correct `RelationFieldRef` in the result triple. The relation field is always the one on the parent,
 /// not the child, and flipping parent and child "flips" the relation field the code is reasoning about as well,
 /// which is why we need to also return another relation field in case a flip happened.
-/// Todo: This unfortunately requires us to clone the arcs to satisfy the interface. Any better solution possible?
 ///
 /// Returns (parent `NodeRef`, child `NodeRef`, relation field on parent `RelationFieldRef`).
-pub fn flip_nodes<'a>(
+pub fn ensure_query_ordering<'a>(
     graph: &mut QueryGraph,
     parent: &'a NodeRef,
     child: &'a NodeRef,
-    relation_field: &'a RelationFieldRef,
+    parent_relation_field: &'a RelationFieldRef,
 ) -> (&'a NodeRef, &'a NodeRef, RelationFieldRef) {
-    if node_is_create(graph, child) {
-        if relation_field.relation_is_inlined_in_parent() {
+    if node_is_create(graph, parent) {
+        if parent_relation_field.relation_is_inlined_in_parent() {
             let parent_edges = graph.incoming_edges(parent);
             for parent_edge in parent_edges {
                 let parent_of_parent_node = graph.edge_source(&parent_edge);
@@ -44,12 +113,12 @@ pub fn flip_nodes<'a>(
                 graph.create_edge(&parent_of_parent_node, child, edge_content);
             }
 
-            (child, parent, relation_field.related_field())
+            (child, parent, parent_relation_field.related_field())
         } else {
-            (parent, child, Arc::clone(relation_field))
+            (parent, child, Arc::clone(parent_relation_field))
         }
     } else {
-        (parent, child, Arc::clone(relation_field))
+        (parent, child, Arc::clone(parent_relation_field))
     }
 }
 
@@ -57,16 +126,6 @@ pub fn node_is_create(graph: &QueryGraph, node: &NodeRef) -> bool {
     match graph.node_content(node).unwrap() {
         Node::Query(Query::Write(WriteQuery::CreateRecord(_))) => true,
         _ => false,
-    }
-}
-
-/// Coerces single values (`ParsedInputValue::Single` and `ParsedInputValue::Map`) into a vector.
-/// Simply unpacks `ParsedInputValue::List`.
-pub fn coerce_vec(val: ParsedInputValue) -> Vec<ParsedInputValue> {
-    match val {
-        ParsedInputValue::List(l) => l,
-        m @ ParsedInputValue::Map(_) => vec![m],
-        single => vec![single],
     }
 }
 
@@ -94,9 +153,9 @@ pub fn id_read_query_infallible(model: &ModelRef, record_finder: RecordFinder) -
 /// Optionally, a filter can be passed that narrows down the child selection.
 ///
 /// Returns a `NodeRef` to the newly created read node.
-pub fn find_ids_by_parent_node<T>(
+pub fn insert_find_children_by_parent_node<T>(
     graph: &mut QueryGraph,
-    relation_field: &RelationFieldRef,
+    parent_relation_field: &RelationFieldRef,
     parent: &NodeRef,
     filter: T,
 ) -> NodeRef
@@ -106,10 +165,10 @@ where
     let read_parent_node = graph.create_node(Query::Read(ReadQuery::RelatedRecordsQuery(RelatedRecordsQuery {
         name: "parent".to_owned(),
         alias: None,
-        parent_field: Arc::clone(relation_field),
+        parent_field: Arc::clone(parent_relation_field),
         parent_ids: None,
         args: filter.into(),
-        selected_fields: relation_field.related_model().fields().id().into(),
+        selected_fields: parent_relation_field.related_model().fields().id().into(), // Select related IDs
         nested: vec![],
         selection_order: vec![],
     })));
@@ -130,15 +189,33 @@ where
     read_parent_node
 }
 
-pub fn ensure_connected(graph: &mut QueryGraph) -> NodeRef {
-    // load all children with their parent ids and make sure they match?
-    unimplemented!()
-}
+// Creates an "empty" query node. Sometimes required for
+// Todo: Consider elevating the placeholder concept to the actual graph.
+// - Prevents accidential reads, could just error if placeholder hasn't been replaced during building.
+// - Definitely the cleaner solution.
+// pub fn insert_query_node_placeholder(graph: &mut QueryGraph) -> NodeRef {
+//     graph.create_node(Query::Read(ReadQuery::RecordQuery(RecordQuery::default())))
+// }
 
-/// Creates an "empty" query node. Sometimes required for
-/// Todo: Consider elevating the placeholder concept to the actual graph.
-/// - Prevents accidential reads, could just error if placeholder hasn't been replaced during building.
-/// - Definitely the cleaner solution.
-pub fn query_node_placeholder(graph: &mut QueryGraph) -> NodeRef {
-    graph.create_node(Query::Read(ReadQuery::RecordQuery(RecordQuery::default())))
+/// Creates an update record query node and adds it to the query graph.
+/// Used to have a skeleton update node in the graph that can be further transformed during query execution based
+/// on available information.
+pub fn update_record_node_placeholder(
+    graph: &mut QueryGraph,
+    record_finder: Option<RecordFinder>,
+    model: ModelRef,
+) -> NodeRef {
+    let mut args = PrismaArgs::new();
+
+    // args.insert(field.name(), value);
+    args.update_datetimes(Arc::clone(&model), false);
+
+    let ur = UpdateRecord {
+        model,
+        where_: record_finder,
+        non_list_args: args,
+        list_args: vec![],
+    };
+
+    graph.create_node(Query::Write(WriteQuery::UpdateRecord(ur)))
 }

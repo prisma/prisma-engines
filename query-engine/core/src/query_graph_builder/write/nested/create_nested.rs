@@ -12,6 +12,7 @@ use std::{convert::TryInto, sync::Arc};
 ///
 /// (illustration simplified)
 ///
+///```text
 ///  1:1 relation case            n:m relation case
 ///    ┌──────┐                      ┌──────┐
 /// ┌──│Parent│────────┐          ┌──│Parent│────────┐
@@ -26,34 +27,34 @@ use std::{convert::TryInto, sync::Arc};
 /// │  ┌──────┐                   │  ┌───────┐
 /// └─▶│Create│                   └─▶│Connect│
 ///    └──────┘                      └───────┘
-///
+///```
 /// Where `Parent` with `Read result` is examplary for a typical nested create use case.
 /// The actual parent graph can differ. The pieces added by this handler are `Check`, `Create` and `Connect`.
 pub fn connect_nested_create(
     graph: &mut QueryGraph,
-    parent: &NodeRef,
+    parent_node: &NodeRef,
     parent_relation_field: &RelationFieldRef,
     value: ParsedInputValue,
     child_model: &ModelRef,
 ) -> QueryGraphBuilderResult<()> {
     for value in utils::coerce_vec(value) {
-        let child = create::create_record_node(graph, Arc::clone(child_model), value.try_into()?)?;
+        let child_node = create::create_record_node(graph, Arc::clone(child_model), value.try_into()?)?;
 
         // Make sure the creation is done in correct order.
-        let (parent, child, parent_relation_field) = utils::flip_nodes(graph, parent, &child, parent_relation_field);
+        let (parent_node, child_node, parent_relation_field) = utils::ensure_query_ordering(graph, parent_node, &child_node, parent_relation_field);
         let relation_field_name = parent_relation_field.name.clone();
 
         // We need to perform additional 1:1 relation checks if the parent of a nested create is not a create as well.
         // Why? If the top is a create, we don't have to consider already existing relation connections,
         // or other relation requirements from parent to child, as they can't exist yet.
-        if !utils::node_is_create(graph, &parent) && parent_relation_field.relation().is_one_to_one() {
-            insert_relation_checks(graph, parent, child, &parent_relation_field)?;
+        if !utils::node_is_create(graph, &parent_node) && parent_relation_field.relation().is_one_to_one() {
+            insert_relation_checks(graph, parent_node, child_node, &parent_relation_field)?;
         }
 
         // Connect parent and child.
         graph.create_edge(
-            parent,
-            child,
+            parent_node,
+            child_node,
             QueryGraphDependency::ParentIds(Box::new(|mut node, mut parent_ids| {
                 let parent_id = match parent_ids.pop() {
                     Some(pid) => Ok(pid),
@@ -78,7 +79,7 @@ pub fn connect_nested_create(
         // A connect is necessary if the nested create is done on a relation that
         // is a many-to-many (aka manifested as an actual join table in SQL, for example).
         if parent_relation_field.relation().is_many_to_many() {
-            connect::connect_records_node(graph, parent, child, &parent_relation_field, None, None);
+            connect::connect_records_node(graph, parent_node, child_node, &parent_relation_field, None, None);
         }
     }
 
@@ -87,8 +88,8 @@ pub fn connect_nested_create(
 
 fn insert_relation_checks(
     graph: &mut QueryGraph,
-    parent: &NodeRef,
-    child: &NodeRef,
+    parent_node: &NodeRef,
+    child_node: &NodeRef,
     parent_relation_field: &RelationFieldRef,
 ) -> QueryGraphBuilderResult<()> {
     let child_relation_field = parent_relation_field.related_field();
@@ -118,13 +119,13 @@ fn insert_relation_checks(
         // The parent IDs edge transformation from `check_node` to `child` either fails if `child_side_required` is true (case 1),
         // passes through successfully ("noop", case 2).
         (false, child_side_required) => {
-            let check_node = utils::find_ids_by_parent_node(graph, parent_relation_field, parent, None);
+            let check_node = utils::insert_find_children_by_parent_node(graph, parent_relation_field, parent_node, None);
             let parent_relation_field = Arc::clone(parent_relation_field);
 
             // Connect check and child
             graph.create_edge(
                 &check_node,
-                child,
+                child_node,
                 QueryGraphDependency::ParentIds(Box::new(move |child_node, parent_ids| {
                     if !parent_ids.is_empty() && child_side_required {
                         return Err(QueryGraphBuilderError::RelationViolation(
