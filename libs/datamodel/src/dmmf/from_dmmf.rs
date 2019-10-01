@@ -130,6 +130,7 @@ pub fn model_from_dmmf(model: &Model) -> dml::Model {
         is_embedded: model.is_embedded,
         fields: model.fields.iter().map(&field_from_dmmf).collect(),
         indexes: vec![],
+        id_fields: vec![],
         documentation: model.documentation.clone(),
         is_generated: model.is_generated.unwrap_or(false),
     }

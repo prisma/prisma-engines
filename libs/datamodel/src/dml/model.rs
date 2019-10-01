@@ -16,6 +16,7 @@ pub struct Model {
     /// Indicates if this model is embedded or not.
     pub is_embedded: bool,
     pub indexes: Vec<IndexDefinition>,
+    pub id_fields: Vec<String>,
     /// Indicates if this model is generated.
     pub is_generated: bool,
 }
@@ -40,6 +41,7 @@ impl Model {
             name: String::from(name),
             fields: vec![],
             indexes: vec![],
+            id_fields: vec![],
             documentation: None,
             database_name: None,
             is_embedded: false,

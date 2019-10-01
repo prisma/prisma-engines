@@ -69,6 +69,7 @@ fn a_data_model_can_be_generated_from_a_schema() {
             is_embedded: false,
             is_generated: false,
             indexes: vec![],
+            id_fields: vec![],
             fields: col_types
                 .iter()
                 .map(|col_type| {
@@ -185,6 +186,7 @@ fn arity_is_preserved_when_generating_data_model_from_a_schema() {
             ],
             is_generated: false,
             indexes: vec![],
+            id_fields: vec![],
         }],
         enums: vec![],
     };
@@ -318,6 +320,7 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
             ],
             is_generated: false,
             indexes: vec![],
+            id_fields: vec![],
         }],
         enums: vec![],
     };
@@ -419,6 +422,7 @@ fn primary_key_is_preserved_when_generating_data_model_from_a_schema() {
                 }],
                 is_generated: false,
                 indexes: vec![],
+                id_fields: vec![],
             },
             // Model with non-auto-incrementing primary key
             Model {
@@ -444,6 +448,7 @@ fn primary_key_is_preserved_when_generating_data_model_from_a_schema() {
                 }],
                 is_generated: false,
                 indexes: vec![],
+                id_fields: vec![],
             },
             // Model with primary key seeded by sequence
             Model {
@@ -473,6 +478,7 @@ fn primary_key_is_preserved_when_generating_data_model_from_a_schema() {
                 }],
                 is_generated: false,
                 indexes: vec![],
+                id_fields: vec![],
             },
         ],
         enums: vec![],
@@ -590,6 +596,7 @@ fn uniqueness_is_preserved_when_generating_data_model_from_a_schema() {
             ],
             is_generated: false,
             indexes: vec![],
+            id_fields: vec![],
         }],
         enums: vec![],
     };
@@ -679,6 +686,7 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                 ],
                 is_generated: false,
                 indexes: vec![],
+                id_fields: vec![],
             },
             Model {
                 database_name: None,
@@ -738,6 +746,7 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                 ],
                 is_generated: false,
                 indexes: vec![],
+                id_fields: vec![],
             },
         ],
         enums: vec![],
