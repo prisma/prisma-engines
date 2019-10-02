@@ -21,8 +21,8 @@ object ConnectorConfig {
 
     connectorToTest match {
       case "sqlite"                  => ConnectorConfig("sqlite", "file://$DB_FILE")
-      case "postgres" | "postgresql" => ConnectorConfig("postgresql", s"postgresql://postgres:prisma@$postgresHost:5432/db?schema=$$DB")
-      case "mysql"                   => ConnectorConfig("mysql", s"mysql://root:prisma@$mysqlHost:3306/$$DB")
+      case "postgres" | "postgresql" => ConnectorConfig("postgresql", s"postgresql://postgres:prisma@$postgresHost:5432/db?schema=$$DB&connection_limit=1")
+      case "mysql"                   => ConnectorConfig("mysql", s"mysql://root:prisma@$mysqlHost:3306/$$DB?connection_limit=1")
       case x                         => sys.error(s"Connector $x is not supported yet.")
     }
 

@@ -31,13 +31,13 @@ impl MigrationPersistence for SqlMigrationPersistence {
             }
             SqlFamily::Mysql => {
                 // work around barrels missing quoting
-                let mut m = barrel::Migration::new().schema(format!("`{}`", self.schema_name.clone()));
-                m.create_table(format!("`{}`", TABLE_NAME), migration_table_setup_mysql);
+                let mut m = barrel::Migration::new().schema(format!("{}", self.schema_name.clone()));
+                m.create_table(format!("{}", TABLE_NAME), migration_table_setup_mysql);
                 m.make_from(barrel::SqlVariant::Mysql)
             }
         };
 
-        let _ = self.connection.query_raw(&self.schema_name, &sql_str, &[]);
+        let _ = self.connection.query_raw(&self.schema_name, dbg!(&sql_str), &[]);
     }
 
     fn reset(&self) {

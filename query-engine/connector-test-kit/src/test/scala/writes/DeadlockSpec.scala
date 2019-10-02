@@ -12,9 +12,6 @@ class DeadlockSpec extends FlatSpec with Matchers with Retries with ApiSpecBase 
   override def runOnlyForCapabilities = Set(ScalarListsCapability)
   override def doNotRunForConnectors  = Set(ConnectorTag.SQLiteConnectorTag)
 
-
-  override def doNotRun = true // FIXME: this tests currently fails for all connectors due to connection issues
-
   override def withFixture(test: NoArgTest) = {
     val delay = Span(5, Seconds) // we assume that the process gets overwhelmed sometimes by the concurrent requests. Give it a bit of time to recover before retrying.
     withRetry(delay) { super.withFixture(test) }
