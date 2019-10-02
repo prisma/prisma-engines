@@ -2,7 +2,7 @@ use super::common::*;
 use itertools::Itertools;
 use sql_schema_describer::*;
 
-const MYSQL_TEXT_FIELD_INDEX_PREFIX: &str = "(100)";
+const MYSQL_TEXT_FIELD_INDEX_PREFIX: &str = "(191)";
 
 pub struct MySqlRenderer {}
 impl super::SqlRenderer for MySqlRenderer {
@@ -12,27 +12,29 @@ impl super::SqlRenderer for MySqlRenderer {
 
     fn render_column(&self, schema_name: &str, table: &Table, column: &Column, add_fk_prefix: bool) -> String {
         let column_name = self.quote(&column.name);
-        let tpe_str = self.render_column_type(&column.tpe);
+        let column_is_part_of_pk = table
+            .primary_key
+            .as_ref()
+            .filter(|pk| pk.columns.contains(&column.name))
+            .is_some();
         let nullability_str = render_nullability(&table, &column);
         let default_str = self.render_default(&column).unwrap_or_else(String::new);
 
         let foreign_key = table.foreign_key_for_column(&column.name);
-        let references_str = self.render_references(&schema_name, column, foreign_key);
+        let references_str = self.render_references(&schema_name, foreign_key);
         let auto_increment_str = if column.auto_increment { "AUTO_INCREMENT" } else { "" };
+
+        let tpe_str = if column_is_part_of_pk || foreign_key.is_some() {
+            self.render_id_or_relation_column_type(&column.tpe)
+        } else {
+            self.render_column_type(&column.tpe)
+        };
 
         match foreign_key {
             Some(_) => {
-                let index_prefix = if column.tpe.family == ColumnTypeFamily::String {
-                    MYSQL_TEXT_FIELD_INDEX_PREFIX
-                } else {
-                    ""
-                };
-
                 let add = if add_fk_prefix { "ADD" } else { "" };
-                let fk_line = {
-                    let column_name = &format!("{}{}", self.quote(&column.name), index_prefix);
-                    format!("{} FOREIGN KEY ({}) {}", add, column_name, references_str)
-                };
+                let fk_line = format!("{} FOREIGN KEY ({}) {}", add, column_name, references_str);
+
                 format!(
                     "{} {} {} {},\n{}",
                     column_name, tpe_str, nullability_str, default_str, fk_line
@@ -42,6 +44,13 @@ impl super::SqlRenderer for MySqlRenderer {
                 "{} {} {} {} {}",
                 column_name, tpe_str, nullability_str, default_str, auto_increment_str
             ),
+        }
+    }
+
+    fn render_id_or_relation_column_type(&self, t: &ColumnType) -> String {
+        match &t.family {
+            ColumnTypeFamily::String => format!("varchar(191)"),
+            _ => self.render_column_type(t),
         }
     }
 

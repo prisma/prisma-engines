@@ -20,6 +20,10 @@ pub trait SqlRenderer {
 
     fn render_column(&self, schema_name: &str, table: &Table, column: &Column, add_fk_prefix: bool) -> String;
 
+    fn render_id_or_relation_column_type(&self, t: &ColumnType) -> String {
+        self.render_column_type(t)
+    }
+
     fn render_column_type(&self, t: &ColumnType) -> String;
 
     fn render_references(&self, schema_name: &str, foreign_key: Option<&ForeignKey>) -> String;
