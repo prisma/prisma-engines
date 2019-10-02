@@ -88,7 +88,10 @@ fn render_raw_sql(step: &SqlMigrationStep, sql_family: SqlFamily, schema_name: &
             let primary_key_was_already_set_in_column_line = lines.join(",").contains(&"PRIMARY KEY");
 
             if primary_columns.len() > 0 && !primary_key_was_already_set_in_column_line {
-                lines.push(format!("  PRIMARY KEY ({})", primary_columns.iter().join(", ")))
+                lines.push(format!(
+                    "  PRIMARY KEY ({})",
+                    primary_columns.iter().map(|pk| renderer.quote(&pk)).join(", ")
+                ))
             }
             format!(
                 "CREATE TABLE {} (\n{}\n){};",

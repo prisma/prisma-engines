@@ -342,7 +342,7 @@ where
 {
     // SQLite
     if !ignores.contains(&SqlFamily::Sqlite) {
-        println!("Testing with SQLite now");
+        println!("--------------- Testing with SQLite now ---------------");
         let (inspector, database) = get_sqlite();
 
         println!("Running the test function now");
@@ -361,7 +361,7 @@ where
     }
     // POSTGRES
     if !ignores.contains(&SqlFamily::Postgres) {
-        println!("Testing with Postgres now");
+        println!("--------------- Testing with Postgres now ---------------");
         let (inspector, database) = get_postgres();
 
         println!("Running the test function now");
