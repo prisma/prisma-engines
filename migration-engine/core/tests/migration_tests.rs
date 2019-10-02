@@ -1159,7 +1159,7 @@ fn index_updates_with_rename_must_work() {
                     name: "customName".into(),
                 }),
                 SqlMigrationStep::CreateIndex(CreateIndex {
-                    table: "A".into(),
+                    table: result.sql_schema.table_bang("A").clone(),
                     index: Index {
                         name: "customNameA".into(),
                         columns: vec!["field".into(), "id".into()],

@@ -172,7 +172,7 @@ impl<'a> SqlSchemaDiffer<'a> {
                 let index_was_altered = alter_indexes.iter().any(|altered| altered.index_new_name == index.name);
                 if previous_index_opt.is_none() && !index_was_altered {
                     let create = CreateIndex {
-                        table: next_table.name.clone(),
+                        table: next_table.clone(),
                         index: index.clone(),
                     };
                     result.push(create);

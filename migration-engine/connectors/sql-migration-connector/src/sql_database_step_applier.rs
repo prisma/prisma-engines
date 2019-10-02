@@ -157,16 +157,13 @@ fn render_raw_sql(step: &SqlMigrationStep, sql_family: SqlFamily, schema_name: &
                 _ => renderer.quote(&name),
             };
             let table_reference = match sql_family {
-                SqlFamily::Sqlite => renderer.quote(&table),
-                _ => renderer.quote_with_schema(&schema_name, &table),
+                SqlFamily::Sqlite => renderer.quote(&table.name),
+                _ => renderer.quote_with_schema(&schema_name, &table.name),
             };
-            let columns: Vec<String> = columns.iter().map(|c| renderer.quote(c)).collect();
+            let columns: String = renderer.render_index_columns(&table, &columns);
             format!(
                 "CREATE {} INDEX {} ON {}({})",
-                index_type,
-                index_name,
-                table_reference,
-                columns.join(",")
+                index_type, index_name, table_reference, columns
             )
         }
         SqlMigrationStep::DropIndex(DropIndex { table, name }) => match sql_family {
