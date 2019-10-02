@@ -85,14 +85,17 @@ pub struct DropColumn {
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct AlterColumn {
+    /// The name of the column before the migration.
     pub name: String,
+    /// The new shape of the column.
     pub column: Column,
+    pub change: ColumnChange,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub enum ColumnChange {
-    ReplaceColumn(Column),
-    ChangeArity(ColumnArity),
+    ReplaceColumn,
+    ChangeArity { from: ColumnArity, to: ColumnArity },
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]

@@ -151,6 +151,7 @@ impl<'a> SqlSchemaDiffer<'a> {
                     let change = AlterColumn {
                         name: previous_column.name.clone(),
                         column: next_column.clone(),
+                        change: ColumnChange::ReplaceColumn,
                     };
                     result.push(TableChange::AlterColumn(change));
                 }

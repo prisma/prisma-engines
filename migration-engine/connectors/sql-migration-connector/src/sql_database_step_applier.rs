@@ -132,12 +132,54 @@ fn render_raw_sql(step: &SqlMigrationStep, sql_family: SqlFamily, schema_name: &
                         let name = renderer.quote(&name);
                         lines.push(format!("DROP COLUMN {}", name));
                     }
-                    TableChange::AlterColumn(AlterColumn { name, column }) => {
-                        let name = renderer.quote(&name);
-                        lines.push(format!("DROP COLUMN {}", name));
-                        let col_sql = renderer.render_column(&schema_name, &table, &column, true);
-                        lines.push(format!("ADD COLUMN {}", col_sql));
+                    TableChange::AlterColumn(AlterColumn {
+                        name,
+                        column,
+                        change: ColumnChange::ReplaceColumn,
+                    }) => {
+                        render_drop_and_add_column(&mut lines, &schema_name, &table, &name, &column, renderer);
                     }
+                    TableChange::AlterColumn(AlterColumn {
+                        name,
+                        column,
+                        change: ColumnChange::ChangeArity { from, to },
+                    }) => match (sql_family, from, to) {
+                        (SqlFamily::Postgres, ColumnArity::Nullable, ColumnArity::Required) => {
+                            lines.push(format!(
+                                "ALTER COLUMN {column_name} SET NOT NULL",
+                                column_name = renderer.quote(&name)
+                            ));
+                        }
+                        (SqlFamily::Postgres, ColumnArity::Required, ColumnArity::Nullable) => {
+                            lines.push(format!(
+                                "ALTER COLUMN {column_name} DROP NOT NULL",
+                                column_name = renderer.quote(&name)
+                            ));
+                        }
+                        (SqlFamily::Mysql, ColumnArity::Nullable, ColumnArity::Required) => lines.push(format!(
+                            "MODIFY {column_name} {column_type} NOT NULL {default}",
+                            column_name = name,
+                            column_type = renderer.render_column_type(&column.tpe),
+                            default = renderer
+                                .render_default(&column)
+                                .as_ref()
+                                .map(String::as_str)
+                                .unwrap_or(""),
+                        )),
+                        (SqlFamily::Mysql, ColumnArity::Required, ColumnArity::Nullable) => lines.push(format!(
+                            "MODIFY {column_name} {column_type} {default}",
+                            column_name = name,
+                            column_type = renderer.render_column_type(&column.tpe),
+                            default = renderer
+                                .render_default(&column)
+                                .as_ref()
+                                .map(String::as_str)
+                                .unwrap_or(""),
+                        )),
+                        (_, _, _) => {
+                            render_drop_and_add_column(&mut lines, &schema_name, &table, &name, &column, renderer)
+                        }
+                    },
                 }
             }
             format!(
@@ -196,6 +238,20 @@ fn render_raw_sql(step: &SqlMigrationStep, sql_family: SqlFamily, schema_name: &
         },
         SqlMigrationStep::RawSql { raw } => raw.to_string(),
     }
+}
+
+fn render_drop_and_add_column(
+    lines: &mut Vec<String>,
+    schema_name: &str,
+    table: &Table,
+    initial_column_name: &str,
+    column: &Column,
+    renderer: &dyn SqlRenderer,
+) {
+    let name = renderer.quote(initial_column_name);
+    lines.push(format!("DROP COLUMN {}", name));
+    let col_sql = renderer.render_column(&schema_name, &table, &column, true);
+    lines.push(format!("ADD COLUMN {}", col_sql));
 }
 
 fn create_table_suffix(sql_family: SqlFamily) -> &'static str {
