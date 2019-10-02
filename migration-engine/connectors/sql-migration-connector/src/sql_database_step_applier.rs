@@ -1,4 +1,5 @@
 use crate::*;
+use itertools::Itertools;
 use sql_renderer::SqlRenderer;
 use sql_schema_describer::*;
 use std::sync::Arc;
@@ -87,9 +88,7 @@ fn render_raw_sql(step: &SqlMigrationStep, sql_family: SqlFamily, schema_name: &
             let primary_key_was_already_set_in_column_line = lines.join(",").contains(&"PRIMARY KEY");
 
             if primary_columns.len() > 0 && !primary_key_was_already_set_in_column_line {
-                let rendered_primary_key_columns: String =
-                    renderer.render_index_columns(&table, primary_columns.as_slice());
-                lines.push(format!("  PRIMARY KEY ({})", rendered_primary_key_columns))
+                lines.push(format!("  PRIMARY KEY ({})", primary_columns.iter().join(", ")))
             }
             format!(
                 "CREATE TABLE {} (\n{}\n){};",

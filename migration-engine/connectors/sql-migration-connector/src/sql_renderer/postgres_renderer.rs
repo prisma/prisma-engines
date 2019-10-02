@@ -13,7 +13,7 @@ impl super::SqlRenderer for PostgresRenderer {
         let nullability_str = render_nullability(&table, &column);
         let default_str = render_default(&column);
         let foreign_key = table.foreign_key_for_column(&column.name);
-        let references_str = self.render_references(&schema_name, column, foreign_key);
+        let references_str = self.render_references(&schema_name, foreign_key);
 
         let is_serial = column.auto_increment;
 
@@ -38,12 +38,7 @@ impl super::SqlRenderer for PostgresRenderer {
         }
     }
 
-    fn render_references(
-        &self,
-        schema_name: &str,
-        _foreign_key_column: &Column,
-        foreign_key: Option<&ForeignKey>,
-    ) -> String {
+    fn render_references(&self, schema_name: &str, foreign_key: Option<&ForeignKey>) -> String {
         match foreign_key {
             Some(fk) => format!(
                 "REFERENCES \"{}\".\"{}\"(\"{}\") {}",
