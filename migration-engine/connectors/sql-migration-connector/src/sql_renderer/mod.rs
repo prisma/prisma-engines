@@ -27,6 +27,10 @@ pub trait SqlRenderer {
     fn render_index_columns(&self, _table: &Table, columns: &[String]) -> String {
         columns.iter().map(|col| self.quote(&col)).join(", ")
     }
+
+    fn render_default(&self, column: &Column) -> Option<String> {
+        Some(common::render_default(column))
+    }
 }
 
 impl dyn SqlRenderer {

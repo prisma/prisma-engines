@@ -98,6 +98,10 @@ fn fix_mysql_add_required_text_column(
         changes: vec![TableChange::AlterColumn(AlterColumn {
             name: column.name.clone(),
             column,
+            change: ColumnChange::ChangeArity {
+                from: ColumnArity::Nullable,
+                to: ColumnArity::Required,
+            },
         })],
     }));
 
