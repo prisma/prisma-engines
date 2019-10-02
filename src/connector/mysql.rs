@@ -83,7 +83,7 @@ impl TryFrom<Url> for MysqlParams {
 
         config.db_name(Some(dbname));
 
-        let mut connection_limit = num_cpus::get() * 2 + 4;
+        let mut connection_limit = num_cpus::get_physical() * 2 + 1;
 
         for (k, v) in unsupported.into_iter() {
             match k.as_ref() {

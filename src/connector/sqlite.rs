@@ -39,7 +39,7 @@ impl TryFrom<&str> for SqliteParams {
             ))
         } else {
             let official = vec![];
-            let mut connection_limit = num_cpus::get() * 2 + 4;
+            let mut connection_limit = num_cpus::get_physical() * 2 + 1;
 
             if path_parts.len() > 1 {
                 let (_, unsupported): ConnectionParams = path_parts
