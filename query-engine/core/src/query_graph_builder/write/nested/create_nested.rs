@@ -10,10 +10,10 @@ use std::{convert::TryInto, sync::Arc};
 /// Handles nested create cases.
 /// The resulting graph can take two forms, based on the relation type to the parent model:
 ///
-/// (illustration simplified)
+/// (illustration simplified, `Parent` / `Read Result` exemplary)
 ///
 ///```text
-///  1:1 relation case            n:m relation case
+/// 1:1 relation case             n:m relation case
 ///    ┌──────┐                      ┌──────┐
 /// ┌──│Parent│────────┐          ┌──│Parent│────────┐
 /// │  └──────┘        │          │  └──────┘        │
@@ -40,8 +40,13 @@ pub fn connect_nested_create(
     for value in utils::coerce_vec(value) {
         let child_node = create::create_record_node(graph, Arc::clone(child_model), value.try_into()?)?;
 
-        // Make sure the creation is done in correct order.
-        let (parent_node, child_node, parent_relation_field) = utils::ensure_query_ordering(graph, parent_node, &child_node, parent_relation_field);
+        // Make sure the creation is done in correct order if the parent is a create as well.
+        let (parent_node, child_node, parent_relation_field) = if utils::node_is_create(graph, parent_node) && parent_relation_field.relation_is_inlined_in_parent() {
+            utils::swap_nodes(graph, parent_node, &child_node, parent_relation_field)
+        } else {
+            (parent_node, &child_node, Arc::clone(parent_relation_field))
+        };
+
         let relation_field_name = parent_relation_field.name.clone();
 
         // We need to perform additional 1:1 relation checks if the parent of a nested create is not a create as well.

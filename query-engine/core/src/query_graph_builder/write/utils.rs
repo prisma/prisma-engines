@@ -17,23 +17,23 @@ pub fn coerce_vec(val: ParsedInputValue) -> Vec<ParsedInputValue> {
     }
 }
 
-/// Detects inconsistencies in the ordering of queries and and performs a "flip" of `parent` and `child` nodes if necessary,
+/// Swaps `parent` and `child` nodes.
 ///
-/// ## When is a node flip necessary?
-/// If `parent` is a create and holds the inlined relation field, e.g. the foreign key in SQL terms.
+/// ## When is a node swap necessary?
+/// A common example: `parent` is a create and holds the inlined relation field, e.g. the foreign key in SQL terms.
 /// This means we can't create the parent without knowing the actual ID of the child first.
 /// Hence, we need to execute the child node first to get the child ID, then the
 /// parent node can execute.
 ///
-/// Important: How the flipped nodes are connected in the end is the callers to decide.
+/// Important: How the swapped nodes are connected in the end is the callers to decide.
 ///
-/// Performing a flip involves:
+/// Performing a swap involves:
 /// - Removing all edges from the parent to its parents
 /// - Rewiring the previously removed edges to the child.
 ///
 /// Notes:
 /// - The parent keeps its child nodes.
-/// - Any edge already existing between parent and child are not considered and thus NOT FLIPPED here.
+/// - Any edge already existing between parent and child are not considered and thus NOT TOUCHED here.
 ///
 /// ## Example
 /// Take the following GraphQL query:
@@ -69,7 +69,7 @@ pub fn coerce_vec(val: ParsedInputValue) -> Vec<ParsedInputValue> {
 /// "An Artist has many Albums, an Album has one Artist".
 ///
 /// This would lead to the execution engine executing the `Create Album` query and failing, because we don't have the
-/// foreign key for `Artist` - it doesn't exist yet. Hence, we "flip" the create queries and ensure that the execution
+/// foreign key for `Artist` - it doesn't exist yet. Hence, we swap the create queries and ensure that the execution
 /// order is serialized in a way that necessary results for `Create Album` are available when it executes.
 ///
 /// The result of the transformation looks like this in our example:
@@ -91,35 +91,23 @@ pub fn coerce_vec(val: ParsedInputValue) -> Vec<ParsedInputValue> {
 ///
 /// ## Return values
 ///
-/// Returns the correct `RelationFieldRef` in the result triple. The relation field is always the one on the parent,
-/// not the child, and flipping parent and child "flips" the relation field the code is reasoning about as well,
-/// which is why we need to also return another relation field in case a flip happened.
-///
-/// Returns (parent `NodeRef`, child `NodeRef`, relation field on parent `RelationFieldRef`).
-pub fn ensure_query_ordering<'a>(
+/// Returns (parent `NodeRef`, child `NodeRef`, relation field on parent `RelationFieldRef`) for convenience.
+pub fn swap_nodes<'a>(
     graph: &mut QueryGraph,
     parent: &'a NodeRef,
     child: &'a NodeRef,
     parent_relation_field: &'a RelationFieldRef,
 ) -> (&'a NodeRef, &'a NodeRef, RelationFieldRef) {
-    if node_is_create(graph, parent) {
-        if parent_relation_field.relation_is_inlined_in_parent() {
-            let parent_edges = graph.incoming_edges(parent);
-            for parent_edge in parent_edges {
-                let parent_of_parent_node = graph.edge_source(&parent_edge);
-                let edge_content = graph.remove_edge(parent_edge).unwrap();
+    let parent_edges = graph.incoming_edges(parent);
+    for parent_edge in parent_edges {
+        let parent_of_parent_node = graph.edge_source(&parent_edge);
+        let edge_content = graph.remove_edge(parent_edge).unwrap();
 
-                // Todo: Warning, this assumes the edge contents can also be "flipped".
-                graph.create_edge(&parent_of_parent_node, child, edge_content);
-            }
-
-            (child, parent, parent_relation_field.related_field())
-        } else {
-            (parent, child, Arc::clone(parent_relation_field))
-        }
-    } else {
-        (parent, child, Arc::clone(parent_relation_field))
+        // Todo: Warning, this assumes the edge contents can also be swapped.
+        graph.create_edge(&parent_of_parent_node, child, edge_content);
     }
+
+    (child, parent, parent_relation_field.related_field())
 }
 
 pub fn node_is_create(graph: &QueryGraph, node: &NodeRef) -> bool {
