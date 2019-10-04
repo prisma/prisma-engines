@@ -42,7 +42,7 @@ pub trait MigrationConnector: Send + Sync + 'static {
     /// Drop all database state.
     fn reset(&self) -> ConnectorResult<()>;
 
-    /// See [MigrationPersistence](trait.MigrationPersistence.html).
+    /// See [MigrationPersistence](trait.MigrationPersistencey.html).
     fn migration_persistence(&self) -> Arc<dyn MigrationPersistence>;
 
     /// See [DatabaseMigrationInferrer](trait.DatabaseMigrationInferrer.html).

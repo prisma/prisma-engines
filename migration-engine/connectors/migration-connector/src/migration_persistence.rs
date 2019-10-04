@@ -1,10 +1,9 @@
 use crate::steps::*;
 use chrono::{DateTime, Utc};
 use datamodel::Datamodel;
-use serde::{Serialize};
+use serde::Serialize;
 
-
-/// This trait is implemented by each connector. It provides a generic API to store and retrieve [Migration](struct.Migration.html) records. 
+/// This trait is implemented by each connector. It provides a generic API to store and retrieve [Migration](struct.Migration.html) records.
 pub trait MigrationPersistence: Send + Sync + 'static {
     /// Initialize migration persistence state. E.g. create the migrations table in an SQL database.
     fn init(&self);
@@ -15,6 +14,12 @@ pub trait MigrationPersistence: Send + Sync + 'static {
     /// Returns the currently active Datamodel.
     fn current_datamodel(&self) -> Datamodel {
         self.last().map(|m| m.datamodel).unwrap_or_else(Datamodel::empty)
+    }
+
+    fn current_datamodel_ast(&self) -> datamodel::ast::Datamodel {
+        self.last()
+            .and_then(|m| datamodel::parse_to_ast(&m.datamodel_string).ok())
+            .unwrap_or_else(|| datamodel::ast::Datamodel { models: Vec::new() })
     }
 
     fn last_non_watch_datamodel(&self) -> Datamodel {
@@ -79,6 +84,7 @@ pub struct Migration {
     pub status: MigrationStatus,
     pub applied: usize,
     pub rolled_back: usize,
+    pub datamodel_string: String,
     pub datamodel: Datamodel,
     pub datamodel_steps: Vec<MigrationStep>,
     pub database_migration: serde_json::Value,
@@ -117,6 +123,7 @@ impl Migration {
             name: name,
             revision: 0,
             status: MigrationStatus::Pending,
+            datamodel_string: String::new(),
             applied: 0,
             rolled_back: 0,
             datamodel: Datamodel::empty(),
@@ -222,5 +229,9 @@ impl MigrationPersistence for EmptyMigrationPersistence {
 
     fn update(&self, _params: &MigrationUpdateParams) {
         unimplemented!("Not allowed on a EmptyMigrationPersistence")
+    }
+
+    fn current_datamodel_ast(&self) -> datamodel::ast::Datamodel {
+        datamodel::ast::Datamodel { models: Vec::new() }
     }
 }
