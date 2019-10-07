@@ -66,7 +66,7 @@ impl Validator {
             ast_model.span,
         ));
 
-        let multiple_id_criteria = Err(ValidationError::new_model_validation_error(
+        let multiple_id_criteria_error = Err(ValidationError::new_model_validation_error(
             "Each model must have exactly one id criteria. Either mark a single field with `@id` or add a multi field id criterion with `@@id([])` to the model.",
             &model.name,
             ast_model.span,
@@ -74,8 +74,8 @@ impl Validator {
 
         match (model.singular_id_fields().count(), model.id_fields.is_empty()) {
             (c, _) if c > 1 => multiple_single_field_id_error,
-            (0, true) => multiple_id_criteria,
-            (1, false) => multiple_id_criteria,
+            (0, true) => multiple_id_criteria_error,
+            (1, false) => multiple_id_criteria_error,
             (1, true) | (0, false) => Ok(()),
             (_, _) => unreachable!(), // the compiler does not check the first if guard
         }
