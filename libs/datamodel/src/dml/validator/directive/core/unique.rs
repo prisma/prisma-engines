@@ -86,29 +86,12 @@ impl DirectiveValidator<dml::Model> for ModelLevelUniqueValidator {
     }
 
     fn serialize(&self, model: &dml::Model, _datamodel: &dml::Datamodel) -> Result<Option<ast::Directive>, Error> {
-        let directives: Vec<ast::Directive> = model
+        let normal_indexes = model
             .indexes
             .iter()
-            .map(|index_def| {
-                let mut args = Vec::new();
-
-                args.push(ast::Argument::new_array(
-                    "",
-                    index_def
-                        .fields
-                        .iter()
-                        .map(|f| ast::Value::ConstantValue(f.to_string(), ast::Span::empty()))
-                        .collect(),
-                ));
-
-                if let Some(name) = &index_def.name {
-                    args.push(ast::Argument::new_string("name", &name));
-                }
-
-                ast::Directive::new(self.directive_name(), args)
-            })
+            .filter(|index| index.tpe == IndexType::Unique)
             .collect();
-        Ok(directives.first().cloned())
+        serialize_index_definitions(self.directive_name(), normal_indexes)
     }
 }
 
@@ -174,32 +157,39 @@ impl DirectiveValidator<dml::Model> for ModelLevelIndexValidator {
     }
 
     fn serialize(&self, model: &dml::Model, _datamodel: &dml::Datamodel) -> Result<Option<ast::Directive>, Error> {
-        let directives: Vec<ast::Directive> = model
+        let normal_indexes = model
             .indexes
             .iter()
-            .filter_map(|index_def| {
-                let mut args = Vec::new();
-
-                if index_def.tpe == IndexType::Normal {
-                    args.push(ast::Argument::new_array(
-                        "",
-                        index_def
-                            .fields
-                            .iter()
-                            .map(|f| ast::Value::ConstantValue(f.to_string(), ast::Span::empty()))
-                            .collect(),
-                    ));
-
-                    if let Some(name) = &index_def.name {
-                        args.push(ast::Argument::new_string("name", &name));
-                    }
-
-                    Some(ast::Directive::new(self.directive_name(), args))
-                } else {
-                    None
-                }
-            })
+            .filter(|index| index.tpe == IndexType::Normal)
             .collect();
-        Ok(directives.first().cloned())
+        serialize_index_definitions(self.directive_name(), normal_indexes)
     }
+}
+
+fn serialize_index_definitions(
+    directive_name: &str,
+    index_definitions: Vec<&IndexDefinition>,
+) -> Result<Option<ast::Directive>, Error> {
+    let directives: Vec<ast::Directive> = index_definitions
+        .iter()
+        .map(|index_def| {
+            let mut args = Vec::new();
+
+            args.push(ast::Argument::new_array(
+                "",
+                index_def
+                    .fields
+                    .iter()
+                    .map(|f| ast::Value::ConstantValue(f.to_string(), ast::Span::empty()))
+                    .collect(),
+            ));
+            if let Some(name) = &index_def.name {
+                args.push(ast::Argument::new_string("name", &name));
+            }
+
+            ast::Directive::new(directive_name, args)
+        })
+        .collect();
+
+    Ok(directives.first().cloned())
 }
