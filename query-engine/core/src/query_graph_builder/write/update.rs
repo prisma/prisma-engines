@@ -108,7 +108,7 @@ pub fn update_record_node(
 
     let node = graph.create_node(Query::Write(WriteQuery::UpdateRecord(ur)));
     for (relation_field, data_map) in update_args.nested {
-        nested::connect_nested_query(graph, &node, relation_field, data_map)?;
+        nested::connect_nested_query(graph, node, relation_field, data_map)?;
     }
 
     Ok(node)

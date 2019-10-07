@@ -17,7 +17,7 @@ use update_nested::*;
 
 pub fn connect_nested_query(
     graph: &mut QueryGraph,
-    parent: &NodeRef,
+    parent: NodeRef,
     parent_relation_field: RelationFieldRef,
     data_map: ParsedInputMap,
 ) -> QueryGraphBuilderResult<()> {
@@ -26,9 +26,9 @@ pub fn connect_nested_query(
     for (field_name, value) in data_map {
         match field_name.as_str() {
             "create" => connect_nested_create(graph, parent, &parent_relation_field, value, &child_model)?,
-            "update" => connect_nested_update(graph, parent, &parent_relation_field, value, &child_model)?,
             "connect" => connect_nested_connect(graph, parent, &parent_relation_field, value, &child_model)?,
-            "delete" => connect_nested_delete(graph, parent, &parent_relation_field, value, &child_model)?,
+            "update" => connect_nested_update(graph, &parent, &parent_relation_field, value, &child_model)?,
+            "delete" => connect_nested_delete(graph, &parent, &parent_relation_field, value, &child_model)?,
             _ => (),
         };
     }

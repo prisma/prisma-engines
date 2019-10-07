@@ -51,7 +51,7 @@ impl Flow {
     }
 }
 
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
 pub struct NodeRef {
     node_ix: NodeIndex,
 }

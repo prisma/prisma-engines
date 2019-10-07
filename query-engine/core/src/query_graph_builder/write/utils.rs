@@ -4,7 +4,7 @@ use crate::{
     ParsedInputValue,
 };
 use connector::{filter::RecordFinder, QueryArguments};
-use prisma_models::{ModelRef, RelationFieldRef, SelectedFields, PrismaArgs};
+use prisma_models::{ModelRef, PrismaArgs, RelationFieldRef, SelectedFields};
 use std::{convert::TryInto, sync::Arc};
 
 /// Coerces single values (`ParsedInputValue::Single` and `ParsedInputValue::Map`) into a vector.
@@ -33,7 +33,7 @@ pub fn coerce_vec(val: ParsedInputValue) -> Vec<ParsedInputValue> {
 ///
 /// Notes:
 /// - The parent keeps its child nodes.
-/// - Any edge already existing between parent and child are not considered and thus NOT TOUCHED here.
+/// - Any edge already existing between parent and child are not considered and NOT TOUCHED here.
 ///
 /// ## Example
 /// Take the following GraphQL query:
@@ -89,25 +89,27 @@ pub fn coerce_vec(val: ParsedInputValue) -> Vec<ParsedInputValue> {
 /// └─────────────┘
 ///```
 ///
+/// Please note that the decision of when to swap nodes is entirely on the callers side.
+/// This function only swaps and doesn't check if the swap is necessary.
+///
 /// ## Return values
 ///
 /// Returns (parent `NodeRef`, child `NodeRef`, relation field on parent `RelationFieldRef`) for convenience.
-pub fn swap_nodes<'a>(
+pub fn swap_nodes(
     graph: &mut QueryGraph,
-    parent: &'a NodeRef,
-    child: &'a NodeRef,
-    parent_relation_field: &'a RelationFieldRef,
-) -> (&'a NodeRef, &'a NodeRef, RelationFieldRef) {
-    let parent_edges = graph.incoming_edges(parent);
+    parent_node: NodeRef,
+    child_node: NodeRef,
+) -> (NodeRef, NodeRef) {
+    let parent_edges = graph.incoming_edges(&parent_node);
     for parent_edge in parent_edges {
         let parent_of_parent_node = graph.edge_source(&parent_edge);
         let edge_content = graph.remove_edge(parent_edge).unwrap();
 
         // Todo: Warning, this assumes the edge contents can also be swapped.
-        graph.create_edge(&parent_of_parent_node, child, edge_content);
+        graph.create_edge(&parent_of_parent_node, &child_node, edge_content);
     }
 
-    (child, parent, parent_relation_field.related_field())
+    (child_node, parent_node)
 }
 
 pub fn node_is_create(graph: &QueryGraph, node: &NodeRef) -> bool {

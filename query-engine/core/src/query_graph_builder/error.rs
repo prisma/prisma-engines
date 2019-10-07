@@ -41,6 +41,12 @@ pub struct RelationViolation {
     model_b_name: String,
 }
 
+impl From<RelationFieldRef> for RelationViolation {
+    fn from(rf: RelationFieldRef) -> Self {
+        Self::from(&rf)
+    }
+}
+
 impl From<&RelationFieldRef> for RelationViolation {
     fn from(rf: &RelationFieldRef) -> Self {
         let relation = rf.relation();

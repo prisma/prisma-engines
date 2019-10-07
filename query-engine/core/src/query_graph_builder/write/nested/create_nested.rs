@@ -32,7 +32,7 @@ use std::{convert::TryInto, sync::Arc};
 /// The actual parent graph can differ. The pieces added by this handler are `Check`, `Create` and `Connect`.
 pub fn connect_nested_create(
     graph: &mut QueryGraph,
-    parent_node: &NodeRef,
+    parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
     value: ParsedInputValue,
     child_model: &ModelRef,
@@ -41,10 +41,12 @@ pub fn connect_nested_create(
         let child_node = create::create_record_node(graph, Arc::clone(child_model), value.try_into()?)?;
 
         // Make sure the creation is done in correct order if the parent is a create as well.
-        let (parent_node, child_node, parent_relation_field) = if utils::node_is_create(graph, parent_node) && parent_relation_field.relation_is_inlined_in_parent() {
-            utils::swap_nodes(graph, parent_node, &child_node, parent_relation_field)
+        let (parent_node, child_node, parent_relation_field) = if utils::node_is_create(graph, &parent_node) && parent_relation_field.relation_is_inlined_in_parent() {
+            let (new_parent, new_child) = utils::swap_nodes(graph, parent_node, child_node);
+
+            (new_parent, new_child, parent_relation_field.related_field())
         } else {
-            (parent_node, &child_node, Arc::clone(parent_relation_field))
+            (parent_node, child_node, Arc::clone(parent_relation_field))
         };
 
         let relation_field_name = parent_relation_field.name.clone();
@@ -53,13 +55,13 @@ pub fn connect_nested_create(
         // Why? If the top is a create, we don't have to consider already existing relation connections,
         // or other relation requirements from parent to child, as they can't exist yet.
         if !utils::node_is_create(graph, &parent_node) && parent_relation_field.relation().is_one_to_one() {
-            insert_relation_checks(graph, parent_node, child_node, &parent_relation_field)?;
+            insert_relation_checks(graph, &parent_node, &child_node, &parent_relation_field)?;
         }
 
         // Connect parent and child.
         graph.create_edge(
-            parent_node,
-            child_node,
+            &parent_node,
+            &child_node,
             QueryGraphDependency::ParentIds(Box::new(|mut node, mut parent_ids| {
                 let parent_id = match parent_ids.pop() {
                     Some(pid) => Ok(pid),
@@ -84,7 +86,7 @@ pub fn connect_nested_create(
         // A connect is necessary if the nested create is done on a relation that
         // is a many-to-many (aka manifested as an actual join table in SQL, for example).
         if parent_relation_field.relation().is_many_to_many() {
-            connect::connect_records_node(graph, parent_node, child_node, &parent_relation_field, None, None);
+            connect::connect_records_node(graph, &parent_node, &child_node, &parent_relation_field, None, None);
         }
     }
 

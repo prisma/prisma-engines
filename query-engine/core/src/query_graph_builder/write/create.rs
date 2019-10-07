@@ -67,7 +67,7 @@ pub fn create_record_node(
     let node = graph.create_node(Query::Write(WriteQuery::CreateRecord(cr)));
 
     for (relation_field, data_map) in create_args.nested {
-        nested::connect_nested_query(graph, &node, relation_field, data_map)?;
+        nested::connect_nested_query(graph, node, relation_field, data_map)?;
     }
 
     Ok(node)
