@@ -16,6 +16,7 @@ pub enum MigrationStep {
     CreateEnum(CreateEnum),
     UpdateEnum(UpdateEnum),
     DeleteEnum(DeleteEnum),
+    // TODO: clarify what this becomes when we switch to AST-based diffing
     CreateIndex(CreateIndex),
     UpdateIndex(UpdateIndex),
     DeleteIndex(DeleteIndex),
