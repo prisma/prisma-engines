@@ -94,6 +94,25 @@ fn it_must_error_when_single_and_multi_field_id_is_used() {
     ));
 }
 
+#[test]
+fn it_must_error_when_multi_field_is_referring_to_undefined_fields() {
+    let dml = r#"
+    model Model {
+      a String
+      b String
+      
+      @@id([a,c])
+    }
+    "#;
+    let errors = parse_error(dml);
+
+    errors.assert_is(ValidationError::new_model_validation_error(
+        "The multi field id declaration refers to the unknown fields c.",
+        "Model",
+        Span::new(64, 73),
+    ));
+}
+
 const ID_TYPE_ERROR: &str =
     "Invalid ID field. ID field must be one of: Int @id, String @id @default(cuid()), String @id @default(uuid()).";
 

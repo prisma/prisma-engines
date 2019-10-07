@@ -58,6 +58,29 @@ impl DirectiveValidator<dml::Model> for ModelLevelIdDirectiveValidator {
             Err(err) => return self.parser_error(&err),
         };
 
+        let undefined_fields: Vec<String> = obj
+            .id_fields
+            .iter()
+            .filter_map(|field| {
+                if obj.find_field(&field).is_none() {
+                    Some(field.to_string())
+                } else {
+                    None
+                }
+            })
+            .collect();
+
+        if !undefined_fields.is_empty() {
+            return Err(Error::new_model_validation_error(
+                &format!(
+                    "The multi field id declaration refers to the unknown fields {}.",
+                    undefined_fields.join(", ")
+                ),
+                &obj.name,
+                args.span(),
+            ));
+        }
+
         Ok(())
     }
 
