@@ -47,6 +47,7 @@ fn model_to_dmmf(model: &dml::Model) -> Model {
         fields: model.fields().map(&field_to_dmmf).collect(),
         is_generated: Some(model.is_generated),
         documentation: model.documentation.clone(),
+        id_fields: model.id_fields.clone(),
     }
 }
 
