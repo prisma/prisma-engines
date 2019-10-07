@@ -170,6 +170,7 @@ const DMFF_WITHOUT_RELATION_NAME: &str = r#"
       "name": "User",
       "isEmbedded": false,
       "dbName": null,
+      "idFields": [],
       "fields": [
         {
           "name": "id",
@@ -204,6 +205,7 @@ const DMFF_WITHOUT_RELATION_NAME: &str = r#"
       "name": "Post",
       "isEmbedded": false,
       "dbName": null,
+      "idFields": [],
       "fields": [
         {
           "name": "id",
