@@ -1,4 +1,5 @@
 extern crate datamodel;
+use pretty_assertions::assert_eq;
 
 const DATAMODEL_STRING: &str = r#"model User {
   id        Int      @id
@@ -21,7 +22,7 @@ model Profile {
 }
 
 model Post {
-  id         Int              @id
+  id         Int
   createdAt  DateTime
   updatedAt  DateTime
   title      String           @default("Default-Title")
@@ -30,6 +31,7 @@ model Post {
   published  Boolean          @default(false)
   categories PostToCategory[]
 
+  @@id([title, createdAt])
   @@map("post")
 }
 

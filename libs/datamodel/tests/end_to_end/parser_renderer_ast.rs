@@ -22,7 +22,7 @@ model Profile {
 }
 
 model Post {
-  id         Int              @id
+  id         Int
   createdAt  DateTime
   updatedAt  DateTime
   title      String           @default("Default-Title")
@@ -31,6 +31,7 @@ model Post {
   published  Boolean          @default(false)
   categories PostToCategory[]
 
+  @@id([title, createdAt])
   @@map("post")
 }
 

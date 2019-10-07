@@ -61,7 +61,22 @@ impl DirectiveValidator<dml::Model> for ModelLevelIdDirectiveValidator {
         Ok(())
     }
 
-    fn serialize(&self, obj: &dml::Model, _datamodel: &dml::Datamodel) -> Result<Option<ast::Directive>, Error> {
+    fn serialize(&self, model: &dml::Model, _datamodel: &dml::Datamodel) -> Result<Option<ast::Directive>, Error> {
+        if !model.id_fields.is_empty() {
+            let mut args = Vec::new();
+
+            args.push(ast::Argument::new_array(
+                "",
+                model
+                    .id_fields
+                    .iter()
+                    .map(|f| ast::Value::ConstantValue(f.to_string(), ast::Span::empty()))
+                    .collect(),
+            ));
+
+            return Ok(Some(ast::Directive::new(self.directive_name(), args)));
+        }
+
         Ok(None)
     }
 }
