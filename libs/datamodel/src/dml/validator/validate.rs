@@ -60,18 +60,29 @@ impl Validator {
             // Extempt from the id rule, we have an relation table.
         }
 
-        match model.id_fields().count() {
-            1 => Ok(()),
-            _ => Err(ValidationError::new_model_validation_error(
-                "Exactly one field must be marked as the id field with the `@id` directive.",
-                &model.name,
-                ast_model.span,
-            )),
+        let multiple_single_field_id_error = Err(ValidationError::new_model_validation_error(
+            "At most one field must be marked as the id field with the `@id` directive.",
+            &model.name,
+            ast_model.span,
+        ));
+
+        let multiple_id_criteria = Err(ValidationError::new_model_validation_error(
+            "Each model must have exactly one id criteria. Either mark a single field with `@id` or add a multi field id criterion with `@@id([])` to the model.",
+            &model.name,
+            ast_model.span,
+        ));
+
+        match (model.singular_id_fields().count(), model.id_fields.is_empty()) {
+            (c, _) if c > 1 => multiple_single_field_id_error,
+            (0, true) => multiple_id_criteria,
+            (1, false) => multiple_id_criteria,
+            (1, true) | (0, false) => Ok(()),
+            (_, _) => unreachable!(), // the compiler does not check the first if guard
         }
     }
 
     fn validate_id_fields_valid(&self, ast_schema: &ast::Datamodel, model: &dml::Model) -> Result<(), ValidationError> {
-        for id_field in model.id_fields() {
+        for id_field in model.singular_id_fields() {
             let is_valid = match (&id_field.default_value, &id_field.field_type, &id_field.arity) {
                 (
                     Some(dml::Value::Expression(name, return_type, args)),

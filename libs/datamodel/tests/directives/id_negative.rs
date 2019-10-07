@@ -50,7 +50,7 @@ fn id_should_error_on_model_without_id() {
     let errors = parse_error(dml);
 
     errors.assert_is(ValidationError::new_model_validation_error(
-        "Exactly one field must be marked as the id field with the `@id` directive.",
+        "Each model must have exactly one id criteria. Either mark a single field with `@id` or add a multi field id criterion with `@@id([])` to the model.",
         "Model",
         Span::new(5, 42),
     ));
@@ -68,9 +68,29 @@ fn id_should_error_multiple_ids_are_provided() {
     let errors = parse_error(dml);
 
     errors.assert_is(ValidationError::new_model_validation_error(
-        "Exactly one field must be marked as the id field with the `@id` directive.",
+        "At most one field must be marked as the id field with the `@id` directive.",
         "Model",
         Span::new(5, 105),
+    ));
+}
+
+#[test]
+fn it_must_error_when_single_and_multi_field_id_is_used() {
+    let dml = r#"
+    model Model {
+        id         Int      @id
+        b          String
+        
+        @@id([id,b])
+    }
+    "#;
+
+    let errors = parse_error(dml);
+
+    errors.assert_is(ValidationError::new_model_validation_error(
+        "Each model must have exactly one id criteria. Either mark a single field with `@id` or add a multi field id criterion with `@@id([])` to the model.",
+        "Model",
+        Span::new(5, 112),
     ));
 }
 
