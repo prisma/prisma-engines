@@ -72,7 +72,7 @@ impl DirectiveValidator<dml::Model> for ModelLevelUniqueValidator {
         if !undefined_fields.is_empty() {
             return Err(Error::new_model_validation_error(
                 &format!(
-                    "The unique index definition refers to the unkown fields {}.",
+                    "The unique index definition refers to the unknown fields {}.",
                     undefined_fields.join(", ")
                 ),
                 &obj.name,
