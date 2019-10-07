@@ -7,7 +7,7 @@ use crate::{
     error::Error,
     visitor::{self, Visitor},
 };
-use native_tls::TlsConnector;
+use native_tls::{Certificate, Identity, TlsConnector};
 use percent_encoding::percent_decode;
 use std::{borrow::Borrow, convert::TryFrom, time::Duration};
 use tokio_postgres::config::SslMode;
@@ -23,12 +23,28 @@ pub struct PostgreSql {
     client: postgres::Client,
 }
 
-#[derive(Debug)]
+#[derive(DebugStub)]
 pub struct PostgresParams {
     pub connection_limit: u32,
     pub dbname: String,
     pub schema: String,
     pub config: postgres::Config,
+    pub ssl_params: SslParams,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum SslAcceptMode {
+    Strict,
+    AcceptInvalidCerts,
+}
+
+#[derive(DebugStub)]
+pub struct SslParams {
+    #[debug_stub = "native_tls::Certificate"]
+    certificate: Option<Certificate>,
+    #[debug_stub = "native_tls::Identity"]
+    identity: Option<Identity>,
+    ssl_accept_mode: SslAcceptMode,
 }
 
 type ConnectionParams = (Vec<(String, String)>, Vec<(String, String)>);
@@ -90,6 +106,10 @@ impl TryFrom<Url> for PostgresParams {
 
         let mut connection_limit = num_cpus::get_physical() * 2 + 1;
         let mut schema = String::from(DEFAULT_SCHEMA);
+        let mut certificate = None;
+        let mut identity_db = None;
+        let mut identity_password = None;
+        let mut ssl_accept_mode = SslAcceptMode::Strict;
 
         for (k, v) in unsupported.into_iter() {
             match k.as_ref() {
@@ -104,6 +124,31 @@ impl TryFrom<Url> for PostgresParams {
                         }
                     };
                 }
+                "sslcert" => {
+                    let cert = std::fs::read(v.as_str())?;
+                    certificate = Some(Certificate::from_pem(&cert)?);
+                }
+                "sslidentity" => {
+                    identity_db = Some(std::fs::read(v.as_str())?);
+                }
+                "sslpassword" => {
+                    identity_password = Some(v.to_string());
+                }
+                "sslaccept" => {
+                    match v.as_ref() {
+                        "strict" => {
+                            ssl_accept_mode = SslAcceptMode::Strict;
+                        },
+                        "accept_invalid_certs" => {
+                            ssl_accept_mode = SslAcceptMode::AcceptInvalidCerts;
+                        },
+                        _ => {
+                            debug!("Unsupported ssl accept mode {}, defaulting to 'strict'", v);
+                            ssl_accept_mode = SslAcceptMode::Strict;
+                        }
+                    };
+
+                }
                 "schema" => {
                     schema = v.to_string();
                 }
@@ -115,11 +160,23 @@ impl TryFrom<Url> for PostgresParams {
             };
         }
 
+        let mut identity = None;
+
+        if let Some(identity_db) = identity_db {
+            let password = identity_password.as_ref().map(|s| s.as_str()).unwrap_or("");
+            identity = Some(Identity::from_pkcs12(&identity_db, &password)?);
+        }
+
         Ok(Self {
             connection_limit: u32::try_from(connection_limit).unwrap(),
             schema,
             config,
             dbname: dbname.to_string(),
+            ssl_params: SslParams {
+                ssl_accept_mode,
+                certificate,
+                identity,
+            },
         })
     }
 }
@@ -129,7 +186,7 @@ impl TryFrom<Url> for PostgreSql {
 
     fn try_from(url: Url) -> crate::Result<Self> {
         let params = PostgresParams::try_from(url)?;
-        PostgreSql::new(params.config, Some(params.schema))
+        PostgreSql::from_params(params)
     }
 }
 
@@ -140,9 +197,24 @@ impl From<postgres::Client> for PostgreSql {
 }
 
 impl PostgreSql {
-    pub fn new(config: postgres::Config, schema: Option<String>) -> crate::Result<Self> {
+    pub fn new(
+        config: postgres::Config,
+        schema: Option<String>,
+        ssl_params: Option<SslParams>,
+    ) -> crate::Result<Self> {
         let mut tls_builder = TlsConnector::builder();
-        tls_builder.danger_accept_invalid_certs(true); // For Heroku
+
+        if let Some(params) = ssl_params {
+            if let Some(cert) = params.certificate {
+                tls_builder.add_root_certificate(cert);
+            }
+
+            tls_builder.danger_accept_invalid_certs(params.ssl_accept_mode == SslAcceptMode::AcceptInvalidCerts);
+
+            if let Some(identity) = params.identity {
+                tls_builder.identity(identity);
+            }
+        };
 
         let tls = MakeTlsConnector::new(tls_builder.build()?);
         let schema = schema.unwrap_or_else(|| String::from(DEFAULT_SCHEMA));
@@ -154,7 +226,11 @@ impl PostgreSql {
     }
 
     pub fn from_params(params: PostgresParams) -> crate::Result<Self> {
-        Self::new(params.config, Some(params.schema))
+        Self::new(
+            params.config,
+            Some(params.schema),
+            Some(params.ssl_params),
+        )
     }
 }
 
@@ -258,7 +334,7 @@ mod tests {
 
     #[test]
     fn should_provide_a_database_connection() {
-        let mut connection = PostgreSql::new(get_config(), None).unwrap();
+        let mut connection = PostgreSql::new(get_config(), None, None).unwrap();
 
         let res = connection
             .query_raw(
@@ -273,7 +349,7 @@ mod tests {
 
     #[test]
     fn should_provide_a_database_transaction() {
-        let mut connection = PostgreSql::new(get_config(), None).unwrap();
+        let mut connection = PostgreSql::new(get_config(), None, None).unwrap();
         let mut tx = connection.start_transaction().unwrap();
 
         let res = tx
@@ -307,7 +383,7 @@ mod tests {
 
     #[test]
     fn should_map_columns_correctly() {
-        let mut connection = PostgreSql::new(get_config(), None).unwrap();
+        let mut connection = PostgreSql::new(get_config(), None, None).unwrap();
         connection.query_raw(DROP_TABLE, &[]).unwrap();
         connection.query_raw(TABLE_DEF, &[]).unwrap();
         connection.query_raw(CREATE_USER, &[]).unwrap();
@@ -348,21 +424,26 @@ mod tests {
         let mut config = get_config();
         config.dbname("this_does_not_exist");
 
-        let res = PostgreSql::new(config, None);
+        let res = PostgreSql::new(config, None, None);
 
         assert!(res.is_err());
 
         match res.unwrap_err() {
-            Error::DatabaseDoesNotExist { db_name } => assert_eq!("this_does_not_exist", db_name.as_str()),
+            Error::DatabaseDoesNotExist { db_name } => {
+                assert_eq!("this_does_not_exist", db_name.as_str())
+            }
             e => panic!("Expected `DatabaseDoesNotExist`, got {:?}", e),
         }
     }
 
     #[test]
     fn should_map_authentication_failed_error() {
-        let mut admin = PostgreSql::new(get_config(), None).unwrap();
+        let mut admin = PostgreSql::new(get_config(), None, None).unwrap();
         admin
-            .execute_raw("CREATE USER should_map_access_denied_test with password 'password'", &[])
+            .execute_raw(
+                "CREATE USER should_map_access_denied_test with password 'password'",
+                &[],
+            )
             .unwrap();
 
         let res = std::panic::catch_unwind(|| {
@@ -370,12 +451,14 @@ mod tests {
             config.user("should_map_access_denied_test");
             config.password("catword");
 
-            let conn = PostgreSql::new(config, None);
+            let conn = PostgreSql::new(config, None, None);
 
             assert!(conn.is_err());
 
             match conn.unwrap_err() {
-                Error::AuthenticationFailed { user } => assert_eq!("should_map_access_denied_test", user.as_str()),
+                Error::AuthenticationFailed { user } => {
+                    assert_eq!("should_map_access_denied_test", user.as_str())
+                }
                 e => panic!("Expected `AuthenticationFailed`, got {:?}", e),
             }
         });
@@ -388,22 +471,24 @@ mod tests {
 
     #[test]
     fn should_map_database_already_exists_error() {
-        let mut admin = PostgreSql::new(get_config(), None).unwrap();
+        let mut admin = PostgreSql::new(get_config(), None, None).unwrap();
 
         admin
             .execute_raw("CREATE DATABASE should_map_if_database_already_exists", &[])
             .unwrap();
 
         let res = std::panic::catch_unwind(|| {
-            let mut admin = PostgreSql::new(get_config(), None).unwrap();
+            let mut admin = PostgreSql::new(get_config(), None, None).unwrap();
 
-            let res = admin
-                .execute_raw("CREATE DATABASE should_map_if_database_already_exists", &[]);
+            let res =
+                admin.execute_raw("CREATE DATABASE should_map_if_database_already_exists", &[]);
 
             assert!(res.is_err());
 
             match res.unwrap_err() {
-                Error::DatabaseAlreadyExists { db_name } => assert_eq!("should_map_if_database_already_exists", db_name.as_str()),
+                Error::DatabaseAlreadyExists { db_name } => {
+                    assert_eq!("should_map_if_database_already_exists", db_name.as_str())
+                }
                 e => panic!("Expected `DatabaseAlreadyExists`, got {:?}", e),
             }
         });
