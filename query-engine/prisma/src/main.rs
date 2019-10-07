@@ -46,6 +46,13 @@ fn main() -> Result<(), Box<dyn Error + Send + Sync + 'static>> {
                 .takes_value(false)
                 .required(false),
         )
+        .arg(
+            Arg::with_name("version")
+                .long("version")
+                .help("Prints the server commit ID")
+                .takes_value(false)
+                .required(false),
+        )
         .subcommand(
             SubCommand::with_name("cli")
                 .about("Doesn't start a server, but allows running specific commands against Prisma.")
@@ -73,7 +80,9 @@ fn main() -> Result<(), Box<dyn Error + Send + Sync + 'static>> {
         )
         .get_matches();
 
-    if let Some(matches) = matches.subcommand_matches("cli") {
+    if matches.is_present("version") {
+        println!(env!("GIT_HASH"));
+    } else if let Some(matches) = matches.subcommand_matches("cli") {
         match CliCommand::new(matches) {
             Some(cmd) => {
                 if let Err(err) = cmd.execute() {

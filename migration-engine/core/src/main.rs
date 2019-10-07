@@ -69,6 +69,13 @@ fn main() {
                 .takes_value(false)
                 .required(false),
         )
+        .arg(
+            Arg::with_name("version")
+                .long("version")
+                .help("Prints the server commit ID")
+                .takes_value(false)
+                .required(false),
+        )
         .subcommand(
             SubCommand::with_name("cli")
                 .about("Doesn't start a server, but allows running specific commands against Prisma.")
@@ -97,7 +104,9 @@ fn main() {
         )
         .get_matches();
 
-    if let Some(matches) = matches.subcommand_matches("cli") {
+    if matches.is_present("version") {
+        println!(env!("GIT_HASH"));
+    } else if let Some(matches) = matches.subcommand_matches("cli") {
         let datasource = matches.value_of("datasource").unwrap();
 
         match cli::run(&matches, &datasource) {
