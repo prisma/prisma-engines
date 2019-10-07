@@ -16,6 +16,7 @@ pub struct Model {
     /// Indicates if this model is embedded or not.
     pub is_embedded: bool,
     pub indexes: Vec<IndexDefinition>,
+    pub id_fields: Vec<String>,
     /// Indicates if this model is generated.
     pub is_generated: bool,
 }
@@ -40,6 +41,7 @@ impl Model {
             name: String::from(name),
             fields: vec![],
             indexes: vec![],
+            id_fields: vec![],
             documentation: None,
             database_name: None,
             is_embedded: false,
@@ -78,12 +80,16 @@ impl Model {
     }
 
     /// Finds the name of all id fields
-    pub fn id_field_names(&self) -> impl std::iter::Iterator<Item = &String> {
-        self.fields().filter(|x| x.id_info.is_some()).map(|x| &x.name)
+    pub fn id_field_names(&self) -> Vec<String> {
+        let singular_id_field = self.singular_id_fields().next();
+        match singular_id_field {
+            Some(f) => vec![f.name.clone()],
+            None => self.id_fields.clone(),
+        }
     }
 
     /// Finds the name of all id fields
-    pub fn id_fields(&self) -> impl std::iter::Iterator<Item = &Field> {
+    pub fn singular_id_fields(&self) -> impl std::iter::Iterator<Item = &Field> {
         self.fields().filter(|x| x.id_info.is_some())
     }
 

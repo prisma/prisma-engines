@@ -47,7 +47,7 @@ impl DirectiveValidator<dml::Field> for RelationDirectiveValidator {
                 .find_model(&relation_info.to)
                 .unwrap_or_else(|| panic!("Related model not found: {}.", relation_info.to));
 
-            let mut all_related_ids: Vec<&String> = related_model.id_field_names().collect();
+            let mut all_related_ids = related_model.id_field_names();
 
             if !relation_info.name.is_empty()
                 && relation_info.name != DefaultNames::relation_name(&relation_info.to, &parent_model.name)
@@ -59,7 +59,7 @@ impl DirectiveValidator<dml::Field> for RelationDirectiveValidator {
             // if we have references
             // and we do only reference the IDs, which is the default case.
 
-            let mut relation_fields: Vec<&String> = relation_info.to_fields.iter().collect();
+            let mut relation_fields = relation_info.to_fields.clone();
 
             relation_fields.sort();
             all_related_ids.sort();
@@ -82,7 +82,7 @@ impl DirectiveValidator<dml::Field> for RelationDirectiveValidator {
             }
 
             if !args.is_empty() {
-                return Ok(Some(ast::Directive::new(self.directive_name(), args)))
+                return Ok(Some(ast::Directive::new(self.directive_name(), args)));
             }
         }
 

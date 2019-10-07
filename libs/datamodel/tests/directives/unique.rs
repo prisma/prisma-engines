@@ -86,7 +86,7 @@ fn must_error_when_unknown_fields_are_used() {
     let errors = parse_error(dml);
 
     errors.assert_is(ValidationError::new_model_validation_error(
-        "The unique index definition refers to the unkown fields foo, bar.",
+        "The unique index definition refers to the unknown fields foo, bar.",
         "User",
         Span::new(48, 65),
     ));
