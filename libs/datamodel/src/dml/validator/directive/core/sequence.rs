@@ -20,17 +20,17 @@ impl DirectiveValidator<dml::Field> for SequenceDirectiveValidator {
 
         match args.arg("name")?.as_str() {
             Ok(name) => seq.name = name,
-            Err(err) => return self.parser_error(&err),
+            Err(err) => return Err(self.parser_error(&err)),
         }
 
         match args.arg("allocationSize")?.as_int() {
             Ok(allocation_size) => seq.allocation_size = allocation_size,
-            Err(err) => return self.parser_error(&err),
+            Err(err) => return Err(self.parser_error(&err)),
         }
 
         match args.arg("initialValie")?.as_int() {
             Ok(initial_value) => seq.initial_value = initial_value,
-            Err(err) => return self.parser_error(&err),
+            Err(err) => return Err(self.parser_error(&err)),
         }
 
         match &mut obj.id_info {

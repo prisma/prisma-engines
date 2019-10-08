@@ -27,6 +27,7 @@ impl DirectiveValidator<dml::Field> for UniqueDirectiveValidator {
 /// Prismas builtin `@@unique` directive.
 pub struct ModelLevelUniqueValidator {}
 
+impl IndexDirectiveBase<dml::Model> for ModelLevelUniqueValidator {}
 impl DirectiveValidator<dml::Model> for ModelLevelUniqueValidator {
     fn directive_name(&self) -> &str {
         "unique"
@@ -37,67 +38,21 @@ impl DirectiveValidator<dml::Model> for ModelLevelUniqueValidator {
     }
 
     fn validate_and_apply(&self, args: &mut Args, obj: &mut dml::Model) -> Result<(), Error> {
-        let mut index_def = IndexDefinition {
-            name: None,
-            fields: vec![],
-            tpe: IndexType::Unique,
-        };
-        //        let name = args.optional_arg("name").map(|name_arg| name_arg?.as_str()?);
-        let name = match args.optional_arg("name") {
-            Some(name_arg) => Some(name_arg?.as_str()?),
-            None => None,
-        };
-        index_def.name = name;
-
-        match args.default_arg("fields")?.as_array() {
-            Ok(fields) => {
-                let fields = fields.iter().map(|f| f.as_constant_literal().unwrap()).collect();
-                index_def.fields = fields;
-            }
-            Err(err) => return self.parser_error(&err),
-        }
-
-        let undefined_fields: Vec<String> = index_def
-            .fields
-            .iter()
-            .filter_map(|field| {
-                if obj.find_field(&field).is_none() {
-                    Some(field.to_string())
-                } else {
-                    None
-                }
-            })
-            .collect();
-
-        if !undefined_fields.is_empty() {
-            return Err(Error::new_model_validation_error(
-                &format!(
-                    "The unique index definition refers to the unknown fields {}.",
-                    undefined_fields.join(", ")
-                ),
-                &obj.name,
-                args.span(),
-            ));
-        }
-
+        let index_def = self.validate_index(args, obj, IndexType::Unique)?;
         obj.indexes.push(index_def);
 
         Ok(())
     }
 
     fn serialize(&self, model: &dml::Model, _datamodel: &dml::Datamodel) -> Result<Option<ast::Directive>, Error> {
-        let normal_indexes = model
-            .indexes
-            .iter()
-            .filter(|index| index.tpe == IndexType::Unique)
-            .collect();
-        serialize_index_definitions(self.directive_name(), normal_indexes)
+        self.serialize_index_definitions(&model, IndexType::Unique)
     }
 }
 
 /// Prismas builtin `@@index` directive.
 pub struct ModelLevelIndexValidator {}
 
+impl IndexDirectiveBase<dml::Model> for ModelLevelIndexValidator {}
 impl DirectiveValidator<dml::Model> for ModelLevelIndexValidator {
     fn directive_name(&self) -> &str {
         "index"
@@ -108,12 +63,30 @@ impl DirectiveValidator<dml::Model> for ModelLevelIndexValidator {
     }
 
     fn validate_and_apply(&self, args: &mut Args, obj: &mut dml::Model) -> Result<(), Error> {
+        let index_def = self.validate_index(args, obj, IndexType::Normal)?;
+        obj.indexes.push(index_def);
+
+        Ok(())
+    }
+
+    fn serialize(&self, model: &dml::Model, _datamodel: &dml::Datamodel) -> Result<Option<ast::Directive>, Error> {
+        self.serialize_index_definitions(&model, IndexType::Normal)
+    }
+}
+
+/// common logic for `@@unique` and `@@index`
+trait IndexDirectiveBase<T>: DirectiveValidator<T> {
+    fn validate_index(
+        &self,
+        args: &mut Args,
+        obj: &mut dml::Model,
+        index_type: IndexType,
+    ) -> Result<IndexDefinition, Error> {
         let mut index_def = IndexDefinition {
             name: None,
             fields: vec![],
-            tpe: IndexType::Normal,
+            tpe: index_type,
         };
-        //        let name = args.optional_arg("name").map(|name_arg| name_arg?.as_str()?);
         let name = match args.optional_arg("name") {
             Some(name_arg) => Some(name_arg?.as_str()?),
             None => None,
@@ -125,7 +98,7 @@ impl DirectiveValidator<dml::Model> for ModelLevelIndexValidator {
                 let fields = fields.iter().map(|f| f.as_constant_literal().unwrap()).collect();
                 index_def.fields = fields;
             }
-            Err(err) => return self.parser_error(&err),
+            Err(err) => return Err(self.parser_error(&err)),
         }
 
         let undefined_fields: Vec<String> = index_def
@@ -143,7 +116,8 @@ impl DirectiveValidator<dml::Model> for ModelLevelIndexValidator {
         if !undefined_fields.is_empty() {
             return Err(Error::new_model_validation_error(
                 &format!(
-                    "The index definition refers to the unknown fields {}.",
+                    "The {}index definition refers to the unknown fields {}.",
+                    if index_type == IndexType::Unique { "unique " } else { "" },
                     undefined_fields.join(", ")
                 ),
                 &obj.name,
@@ -151,45 +125,37 @@ impl DirectiveValidator<dml::Model> for ModelLevelIndexValidator {
             ));
         }
 
-        obj.indexes.push(index_def);
-
-        Ok(())
+        Ok(index_def)
     }
 
-    fn serialize(&self, model: &dml::Model, _datamodel: &dml::Datamodel) -> Result<Option<ast::Directive>, Error> {
-        let normal_indexes = model
+    fn serialize_index_definitions(
+        &self,
+        model: &dml::Model,
+        index_type: IndexType,
+    ) -> Result<Option<ast::Directive>, Error> {
+        let directives: Vec<ast::Directive> = model
             .indexes
             .iter()
-            .filter(|index| index.tpe == IndexType::Normal)
+            .filter(|index| index.tpe == index_type)
+            .map(|index_def| {
+                let mut args = Vec::new();
+
+                args.push(ast::Argument::new_array(
+                    "",
+                    index_def
+                        .fields
+                        .iter()
+                        .map(|f| ast::Value::ConstantValue(f.to_string(), ast::Span::empty()))
+                        .collect(),
+                ));
+                if let Some(name) = &index_def.name {
+                    args.push(ast::Argument::new_string("name", &name));
+                }
+
+                ast::Directive::new(self.directive_name(), args)
+            })
             .collect();
-        serialize_index_definitions(self.directive_name(), normal_indexes)
+
+        Ok(directives.first().cloned())
     }
-}
-
-fn serialize_index_definitions(
-    directive_name: &str,
-    index_definitions: Vec<&IndexDefinition>,
-) -> Result<Option<ast::Directive>, Error> {
-    let directives: Vec<ast::Directive> = index_definitions
-        .iter()
-        .map(|index_def| {
-            let mut args = Vec::new();
-
-            args.push(ast::Argument::new_array(
-                "",
-                index_def
-                    .fields
-                    .iter()
-                    .map(|f| ast::Value::ConstantValue(f.to_string(), ast::Span::empty()))
-                    .collect(),
-            ));
-            if let Some(name) = &index_def.name {
-                args.push(ast::Argument::new_string("name", &name));
-            }
-
-            ast::Directive::new(directive_name, args)
-        })
-        .collect();
-
-    Ok(directives.first().cloned())
 }
