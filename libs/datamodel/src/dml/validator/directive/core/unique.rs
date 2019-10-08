@@ -2,9 +2,9 @@ use crate::dml::validator::directive::{Args, DirectiveValidator, Error};
 use crate::{ast, dml, IndexDefinition, IndexType};
 
 /// Prismas builtin `@unique` directive.
-pub struct UniqueDirectiveValidator {}
+pub struct FieldLevelUniqueDirectiveValidator {}
 
-impl DirectiveValidator<dml::Field> for UniqueDirectiveValidator {
+impl DirectiveValidator<dml::Field> for FieldLevelUniqueDirectiveValidator {
     fn directive_name(&self) -> &'static str {
         &"unique"
     }
@@ -25,10 +25,10 @@ impl DirectiveValidator<dml::Field> for UniqueDirectiveValidator {
 }
 
 /// Prismas builtin `@@unique` directive.
-pub struct ModelLevelUniqueValidator {}
+pub struct ModelLevelUniqueDirectiveValidator {}
 
-impl IndexDirectiveBase<dml::Model> for ModelLevelUniqueValidator {}
-impl DirectiveValidator<dml::Model> for ModelLevelUniqueValidator {
+impl IndexDirectiveBase<dml::Model> for ModelLevelUniqueDirectiveValidator {}
+impl DirectiveValidator<dml::Model> for ModelLevelUniqueDirectiveValidator {
     fn directive_name(&self) -> &str {
         "unique"
     }
@@ -50,10 +50,10 @@ impl DirectiveValidator<dml::Model> for ModelLevelUniqueValidator {
 }
 
 /// Prismas builtin `@@index` directive.
-pub struct ModelLevelIndexValidator {}
+pub struct ModelLevelIndexDirectiveValidator {}
 
-impl IndexDirectiveBase<dml::Model> for ModelLevelIndexValidator {}
-impl DirectiveValidator<dml::Model> for ModelLevelIndexValidator {
+impl IndexDirectiveBase<dml::Model> for ModelLevelIndexDirectiveValidator {}
+impl DirectiveValidator<dml::Model> for ModelLevelIndexDirectiveValidator {
     fn directive_name(&self) -> &str {
         "index"
     }

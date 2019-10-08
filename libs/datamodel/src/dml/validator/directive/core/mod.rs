@@ -22,7 +22,7 @@ pub fn new_builtin_field_directives() -> DirectiveListValidator<dml::Field> {
     validator.add(Box::new(id::IdDirectiveValidator {}));
     validator.add(Box::new(scalarlist::ScalarListDirectiveValidator {}));
     validator.add(Box::new(sequence::SequenceDirectiveValidator {}));
-    validator.add(Box::new(unique::UniqueDirectiveValidator {}));
+    validator.add(Box::new(unique::FieldLevelUniqueDirectiveValidator {}));
     validator.add(Box::new(default::DefaultDirectiveValidator {}));
     validator.add(Box::new(relation::RelationDirectiveValidator {}));
     validator.add(Box::new(updated_at::UpdatedAtDirectiveValidator {}));
@@ -38,8 +38,8 @@ pub fn new_builtin_model_directives() -> DirectiveListValidator<dml::Model> {
 
     validator.add(Box::new(map::MapDirectiveValidator {}));
     validator.add(Box::new(embedded::EmbeddedDirectiveValidator {}));
-    validator.add(Box::new(unique::ModelLevelUniqueValidator {}));
-    validator.add(Box::new(unique::ModelLevelIndexValidator {}));
+    validator.add(Box::new(unique::ModelLevelUniqueDirectiveValidator {}));
+    validator.add(Box::new(unique::ModelLevelIndexDirectiveValidator {}));
     validator.add(Box::new(id::ModelLevelIdDirectiveValidator {}));
 
     validator
