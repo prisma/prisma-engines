@@ -28,17 +28,17 @@ impl DirectiveValidator<dml::Field> for IdDirectiveValidator {
         Ok(())
     }
 
-    fn serialize(&self, field: &dml::Field, _datamodel: &dml::Datamodel) -> Result<Option<ast::Directive>, Error> {
+    fn serialize(&self, field: &dml::Field, _datamodel: &dml::Datamodel) -> Result<Vec<ast::Directive>, Error> {
         if let Some(id_info) = &field.id_info {
             let mut args = Vec::new();
 
             if id_info.strategy != dml::IdStrategy::Auto {
                 args.push(ast::Argument::new_constant("strategy", &id_info.strategy.to_string()));
             }
-            return Ok(Some(ast::Directive::new(self.directive_name(), args)));
+            return Ok(vec![ast::Directive::new(self.directive_name(), args)]);
         }
 
-        Ok(None)
+        Ok(vec![])
     }
 }
 
@@ -84,7 +84,7 @@ impl DirectiveValidator<dml::Model> for ModelLevelIdDirectiveValidator {
         Ok(())
     }
 
-    fn serialize(&self, model: &dml::Model, _datamodel: &dml::Datamodel) -> Result<Option<ast::Directive>, Error> {
+    fn serialize(&self, model: &dml::Model, _datamodel: &dml::Datamodel) -> Result<Vec<ast::Directive>, Error> {
         if !model.id_fields.is_empty() {
             let mut args = Vec::new();
 
@@ -97,9 +97,9 @@ impl DirectiveValidator<dml::Model> for ModelLevelIdDirectiveValidator {
                     .collect(),
             ));
 
-            return Ok(Some(ast::Directive::new(self.directive_name(), args)));
+            return Ok(vec![ast::Directive::new(self.directive_name(), args)]);
         }
 
-        Ok(None)
+        Ok(vec![])
     }
 }

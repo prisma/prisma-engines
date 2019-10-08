@@ -33,14 +33,14 @@ impl DirectiveValidator<dml::Field> for DefaultDirectiveValidator {
         Ok(())
     }
 
-    fn serialize(&self, field: &dml::Field, _datamodel: &dml::Datamodel) -> Result<Option<ast::Directive>, Error> {
+    fn serialize(&self, field: &dml::Field, _datamodel: &dml::Datamodel) -> Result<Vec<ast::Directive>, Error> {
         if let Some(default_value) = &field.default_value {
-            return Ok(Some(ast::Directive::new(
+            return Ok(vec![ast::Directive::new(
                 self.directive_name(),
                 vec![ast::Argument::new("", default_value.into())],
-            )));
+            )]);
         }
 
-        Ok(None)
+        Ok(vec![])
     }
 }

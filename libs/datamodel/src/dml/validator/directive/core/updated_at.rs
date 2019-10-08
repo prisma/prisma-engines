@@ -26,11 +26,11 @@ impl DirectiveValidator<dml::Field> for UpdatedAtDirectiveValidator {
         Ok(())
     }
 
-    fn serialize(&self, field: &dml::Field, _datamodel: &dml::Datamodel) -> Result<Option<ast::Directive>, Error> {
+    fn serialize(&self, field: &dml::Field, _datamodel: &dml::Datamodel) -> Result<Vec<ast::Directive>, Error> {
         if field.is_updated_at {
-            Ok(Some(ast::Directive::new(self.directive_name(), Vec::new())))
+            Ok(vec![ast::Directive::new(self.directive_name(), Vec::new())])
         } else {
-            Ok(None)
+            Ok(vec![])
         }
     }
 }

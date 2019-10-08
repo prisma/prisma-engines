@@ -36,7 +36,7 @@ impl DirectiveValidator<dml::Field> for RelationDirectiveValidator {
         }
     }
 
-    fn serialize(&self, field: &dml::Field, datamodel: &dml::Datamodel) -> Result<Option<ast::Directive>, Error> {
+    fn serialize(&self, field: &dml::Field, datamodel: &dml::Datamodel) -> Result<Vec<ast::Directive>, Error> {
         if let dml::FieldType::Relation(relation_info) = &field.field_type {
             let mut args = Vec::new();
 
@@ -82,10 +82,10 @@ impl DirectiveValidator<dml::Field> for RelationDirectiveValidator {
             }
 
             if !args.is_empty() {
-                return Ok(Some(ast::Directive::new(self.directive_name(), args)));
+                return Ok(vec![ast::Directive::new(self.directive_name(), args)]);
             }
         }
 
-        Ok(None)
+        Ok(vec![])
     }
 }

@@ -15,12 +15,12 @@ impl DirectiveValidator<dml::Field> for FieldLevelUniqueDirectiveValidator {
         Ok(())
     }
 
-    fn serialize(&self, field: &dml::Field, _datamodel: &dml::Datamodel) -> Result<Option<ast::Directive>, Error> {
+    fn serialize(&self, field: &dml::Field, _datamodel: &dml::Datamodel) -> Result<Vec<ast::Directive>, Error> {
         if field.is_unique {
-            return Ok(Some(ast::Directive::new(self.directive_name(), vec![])));
+            return Ok(vec![ast::Directive::new(self.directive_name(), vec![])]);
         }
 
-        Ok(None)
+        Ok(vec![])
     }
 }
 
@@ -44,7 +44,7 @@ impl DirectiveValidator<dml::Model> for ModelLevelUniqueDirectiveValidator {
         Ok(())
     }
 
-    fn serialize(&self, model: &dml::Model, _datamodel: &dml::Datamodel) -> Result<Option<ast::Directive>, Error> {
+    fn serialize(&self, model: &dml::Model, _datamodel: &dml::Datamodel) -> Result<Vec<ast::Directive>, Error> {
         self.serialize_index_definitions(&model, IndexType::Unique)
     }
 }
@@ -69,7 +69,7 @@ impl DirectiveValidator<dml::Model> for ModelLevelIndexDirectiveValidator {
         Ok(())
     }
 
-    fn serialize(&self, model: &dml::Model, _datamodel: &dml::Datamodel) -> Result<Option<ast::Directive>, Error> {
+    fn serialize(&self, model: &dml::Model, _datamodel: &dml::Datamodel) -> Result<Vec<ast::Directive>, Error> {
         self.serialize_index_definitions(&model, IndexType::Normal)
     }
 }
@@ -132,7 +132,7 @@ trait IndexDirectiveBase<T>: DirectiveValidator<T> {
         &self,
         model: &dml::Model,
         index_type: IndexType,
-    ) -> Result<Option<ast::Directive>, Error> {
+    ) -> Result<Vec<ast::Directive>, Error> {
         let directives: Vec<ast::Directive> = model
             .indexes
             .iter()
@@ -156,6 +156,6 @@ trait IndexDirectiveBase<T>: DirectiveValidator<T> {
             })
             .collect();
 
-        Ok(directives.first().cloned())
+        Ok(directives)
     }
 }
