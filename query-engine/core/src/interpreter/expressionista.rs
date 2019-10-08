@@ -19,7 +19,6 @@ impl Expressionista {
         node: &NodeRef,
         mut parent_edges: Vec<EdgeRef>,
     ) -> InterpretationResult<Expression> {
-        println!("Building node {}", node.id());
         match graph.node_content(node).unwrap() {
             Node::Query(_) => Self::build_query_expression(graph, node, parent_edges),
             Node::Flow(_) => Self::build_flow_expression(graph, node, parent_edges.pop()),
@@ -33,8 +32,6 @@ impl Expressionista {
     ) -> InterpretationResult<Expression> {
         // Child edges are ordered, evaluation order is low to high in the graph, unless other rules override.
         let mut direct_children = graph.direct_child_pairs(&node);
-
-        println!("Direct children of {}: {:?}", node.id(), direct_children);
 
         // Find the positions of all result returning graph nodes.
         let mut result_positions: Vec<usize> = direct_children
@@ -127,23 +124,30 @@ impl Expressionista {
                 Expression::Func {
                     func: Box::new(move |env: Env| {
                         // Run transformers in order on the query to retrieve the final, transformed, query.
-                        let query: InterpretationResult<Query> = parent_id_deps
-                            .into_iter()
-                            .try_fold(query, |query, (parent_binding_name, f)| {
+                        let query: InterpretationResult<Query> = parent_id_deps.into_iter().try_fold(
+                            query,
+                            |query, (parent_binding_name, f)| {
                                 let binding = match env.get(&parent_binding_name) {
                                     Some(binding) => Ok(binding),
-                                    None => Err(InterpreterError::EnvVarNotFound(format!("Expected parent binding '{}' to be present.", parent_binding_name)))
+                                    None => Err(InterpreterError::EnvVarNotFound(format!(
+                                        "Expected parent binding '{}' to be present.",
+                                        parent_binding_name
+                                    ))),
                                 }?;
 
                                 let parent_ids = match binding.as_ids() {
                                     Some(ids) => Ok(ids),
-                                    None => Err(InterpreterError::InterpretationError(format!("Invalid parent result: Unable to transform binding '{}' into a set of IDs.", parent_binding_name))),
+                                    None => Err(InterpreterError::InterpretationError(format!(
+                                        "Invalid parent result: Unable to transform binding '{}' into a set of IDs.",
+                                        parent_binding_name
+                                    ))),
                                 }?;
 
                                 let query: Query = f(query.into(), parent_ids)?.try_into()?;
 
                                 Ok(query)
-                            });
+                            },
+                        );
 
                         Ok(Expression::Query { query: query? })
                     }),
@@ -191,7 +195,10 @@ impl Expressionista {
                                     func: Box::new(move |env| {
                                         let binding = match env.get(&parent_binding_name) {
                                             Some(binding) => Ok(binding),
-                                            None => Err(InterpreterError::EnvVarNotFound(format!("Expected parent binding '{}' to be present.", parent_binding_name)))
+                                            None => Err(InterpreterError::EnvVarNotFound(format!(
+                                                "Expected parent binding '{}' to be present.",
+                                                parent_binding_name
+                                            ))),
                                         }?;
 
                                         let parent_ids = match binding.as_ids() {

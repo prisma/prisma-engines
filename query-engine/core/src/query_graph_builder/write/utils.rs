@@ -143,10 +143,18 @@ pub fn id_read_query_infallible(model: &ModelRef, record_finder: RecordFinder) -
 /// Optionally, a filter can be passed that narrows down the child selection.
 ///
 /// Returns a `NodeRef` to the newly created read node.
+///
+/// ## Example
+/// Given two models, `Blog` and `Post`, where a blog has many posts, and a post has one block.
+///
+/// If the caller wants to query posts by blog ID:
+/// - `parent_node` needs to return a blog ID during execution.
+/// - `parent_relation_field` is the field on the `Blog` model, e.g. `posts`.
+/// - `filter` narrows down posts, e.g. posts where their titles start with a given string.
 pub fn insert_find_children_by_parent_node<T>(
     graph: &mut QueryGraph,
+    parent_node: &NodeRef,
     parent_relation_field: &RelationFieldRef,
-    parent: &NodeRef,
     filter: T,
 ) -> NodeRef
 where
@@ -164,7 +172,7 @@ where
     })));
 
     graph.create_edge(
-        parent,
+        parent_node,
         &read_parent_node,
         QueryGraphDependency::ParentIds(Box::new(|mut node, parent_ids| {
             if let Node::Query(Query::Read(ReadQuery::RelatedRecordsQuery(ref mut rq))) = node {

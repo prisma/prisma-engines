@@ -126,7 +126,7 @@ fn insert_relation_checks(
         // The parent IDs edge transformation from `check_node` to `child` either fails if `child_side_required` is true (case 1),
         // passes through successfully ("noop", case 2).
         (false, child_side_required) => {
-            let check_node = utils::insert_find_children_by_parent_node(graph, parent_relation_field, parent_node, None);
+            let check_node = utils::insert_find_children_by_parent_node(graph, parent_node, parent_relation_field, None);
             let parent_relation_field = Arc::clone(parent_relation_field);
 
             // Connect check and child

@@ -50,7 +50,7 @@ pub fn connect_nested_update(
         };
 
         let find_child_records_node =
-            utils::insert_find_children_by_parent_node(graph, parent_relation_field, parent, finder);
+            utils::insert_find_children_by_parent_node(graph, parent, parent_relation_field, finder);
         let update_node = update::update_record_node(graph, None, Arc::clone(child_model), data.try_into()?)?;
         let id_field = child_model.fields().id();
 

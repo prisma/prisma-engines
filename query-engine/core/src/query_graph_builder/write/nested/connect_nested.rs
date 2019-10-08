@@ -1,7 +1,7 @@
 use super::*;
 use crate::{
     query_ast::*,
-    query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
+    query_graph::{Flow, Node, NodeRef, QueryGraph, QueryGraphDependency},
     ParsedInputValue,
 };
 use prisma_models::{ModelRef, PrismaValue, RelationFieldRef};
@@ -141,8 +141,8 @@ fn handle_one_to_many(
             let parent_id = match parent_ids.pop() {
                 Some(pid) => Ok(pid),
                 None => Err(QueryGraphBuilderError::AssertionError(format!(
-                "[Query Graph] Expected a valid parent ID to be present for a nested connect on a one-to-many relation."
-            ))),
+                    "[Query Graph] Expected a valid parent ID to be present for a nested connect on a one-to-many relation."
+                ))),
             }?;
 
             if let Node::Query(Query::Write(ref mut wq)) = child_node {
@@ -159,6 +159,60 @@ fn handle_one_to_many(
 /// Handles a one-to-one nested connect.
 /// Most complex case as there are plenty of cases involved where we need to make sure
 /// that we don't violate relation requirements.
+///
+/// The full graph created by this handler looks like this:
+/// ```text
+/// ┌────────────────────────┐
+/// │     Read New Child     │───────┐
+/// └────────────────────────┘       │
+///              │                   │
+///              │                   │
+///              │    ┌ ─ ─ ─ ─ ─ ─ ─▼─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┐
+///              │      ┌────────────────────────┐
+///              │    │ │    Read ex. Parent     │──┐                         │
+///              │      └────────────────────────┘  │
+///              │    │              │              │                         │
+///              │                   ▼              │(Fail on p > 0 if parent
+///              │    │ ┌────────────────────────┐  │     side required)      │
+///              │      │ If p > 0 && p. inlined │  │
+///              │    │ └────────────────────────┘  │                         │
+///              │                   │              │
+///              │    │              ▼              │                         │
+///              │      ┌────────────────────────┐  │
+///              │    │ │   Update ex. parent    │◀─┘                         │
+///              │      └────────────────────────┘                      ┌───┐
+///              │    │         then                                    │ 1 │ │
+///              │                                                      └───┘
+///              ▼    └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘
+/// ┌────────────────────────┐
+/// │    Parent operation    │───────┐
+/// └────────────────────────┘       │
+///              │                   │
+///              │    ┌ ─ ─ ─ ─ ─ ─ ─│─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┐
+///              │                   ▼
+///              │    │ ┌────────────────────────┐                            │
+///              │      │     Read ex. child     │──┐
+///              │    │ └────────────────────────┘  │                         │
+///              │                   │              │
+///              │    │              ▼              │(Fail on c > 0 if child  │
+///              │      ┌────────────────────────┐  │     side required)
+///              │    │ │ If c > 0 && c. inlined │  │                         │
+///              │      └────────────────────────┘  │
+///              │    │         then │              │                         │
+///              │                   ▼              │
+///              │    │ ┌────────────────────────┐  │                         │
+///              │      │    Update ex. child    │◀─┘                   ┌───┐
+///              │    │ └────────────────────────┘                      │ 2 │ │
+///              │                                                      └───┘
+///              ▼    └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘
+/// ┌────────────────────────┐
+/// │      Read Result       │
+/// └────────────────────────┘
+/// ```
+/// Where [1] and [2] are checks inserted into the graph based on the requirements of the relation
+/// connecting the parent and child models.
+///
+///
 fn handle_one_to_one(
     graph: &mut QueryGraph,
     parent_node: NodeRef,
@@ -166,7 +220,7 @@ fn handle_one_to_one(
     value: ParsedInputValue,
     child_model: &ModelRef,
 ) -> QueryGraphBuilderResult<()> {
-    let parent_model = parent_relation_field.model();
+    let parent_is_create = utils::node_is_create(graph, &parent_node);
     let child_relation_field = parent_relation_field.related_field();
     let parent_side_required = parent_relation_field.is_required;
     let child_side_required = child_relation_field.is_required;
@@ -181,7 +235,6 @@ fn handle_one_to_one(
         ));
     }
 
-    let parent_is_create = utils::node_is_create(graph, &parent_node);
     let record_finder = extract_record_finder(value, &child_model)?;
     let read_query = utils::id_read_query_infallible(&child_model, record_finder);
     let read_new_child_node = graph.create_node(read_query);
@@ -190,8 +243,11 @@ fn handle_one_to_one(
     // Preserve naming to keep the code readable.
     let (read_new_child_node, parent_node) = utils::swap_nodes(graph, parent_node, read_new_child_node);
 
-    // Next is the check for and possible disconnect of an existing parent in between `read_new_child_node` and `parent_node`.
-    insert_existing_parent_checks(graph, &read_new_child_node, &parent_node, &parent_relation_field);
+    // Next is the check for (and possible disconnect of) an existing parent.
+    // Those checks are performed on the new child node, hence we use the child relation field side ("backrelation").
+    if parent_side_required || relation_inlined_parent {
+        insert_existing_related_model_checks(graph, &read_new_child_node, &child_relation_field);
+    }
 
     let relation_field_name = parent_relation_field.related_field().name.clone();
 
@@ -201,9 +257,7 @@ fn handle_one_to_one(
         QueryGraphDependency::ParentIds(Box::new(|mut child_node, mut parent_ids| {
             let parent_id = match parent_ids.pop() {
                 Some(pid) => Ok(pid),
-                None => Err(QueryGraphBuilderError::AssertionError(format!(
-                "[Query Graph] Expected a valid parent ID to be present for a nested connect on a one-to-one relation."
-            ))),
+                None => Err(QueryGraphBuilderError::AssertionError(format!("[Query Graph] Expected a valid parent ID to be present for a nested connect on a one-to-one relation."))),
             }?;
 
             // This takes care of cases where the relation is inlined on the parent
@@ -215,46 +269,99 @@ fn handle_one_to_one(
         })),
     );
 
-    unimplemented!()
+    // Finally, insert the check for (and possible disconnect of) an existing child record.
+    // Those checks are performed on the parent node model.
+    // We only need to do those checks if the parent operation is not a create, the reason being that
+    // if the parent is a create, it can't have an existing child already.
+    if parent_is_create && (child_side_required || !relation_inlined_parent) {
+        insert_existing_related_model_checks(graph, &parent_node, parent_relation_field);
+    }
+
+    Ok(())
 }
 
-fn insert_existing_parent_checks(
+/// Inserts checks and disconnects for existing models for a 1:1 relation.
+/// Expects that the parent node returns a valid ID for the model the `parent_relation_field` is located on.
+///
+/// Params:
+/// `parent_node`: Node that provides the parent id for the find query and where the checks are appended to in the graph.
+/// `parent_relation_field`: Field on the parent model to find children.
+///
+/// Todo: This function is virtually identical to the existing child check. Consolidate, if possible.
+///
+/// The elements added to the graph are all except `Append Node`:
+/// ```text
+/// ┌────────────────────────┐
+/// │      Parent Node       │
+/// └────────────────────────┘
+///              │
+///              ▼
+/// ┌────────────────────────┐
+/// │      Read related      │──┐
+/// └────────────────────────┘  │
+///              │              │
+///              ▼              │(Fail on p > 0 if parent
+/// ┌────────────────────────┐  │     side required)
+/// │ If p > 0 && p. inlined │  │
+/// └────────────────────────┘  │
+///         then │              │
+///              ▼              │
+/// ┌────────────────────────┐  │
+/// │    Update ex. model    │◀─┘
+/// └────────────────────────┘
+/// ```
+///
+/// We only need to actually update ("disconnect") the existing model if
+/// the relation is also inlined on that models side, so we put that check into the if flow.
+fn insert_existing_related_model_checks(
     graph: &mut QueryGraph,
     parent_node: &NodeRef,
-    child_node: &NodeRef,
     parent_relation_field: &RelationFieldRef,
 ) {
     let parent_model = parent_relation_field.model();
     let parent_model_id_field = parent_model.fields().id();
-    let child_relation_field = parent_relation_field.related_field();
     let parent_side_required = parent_relation_field.is_required;
-    // let child_side_required = child_relation_field.is_required;
     let relation_inlined_parent = parent_relation_field.relation_is_inlined_in_parent();
-
-    // Now check and disconnect the old parent, if necessary.
-    let read_old_parent_query_node =
-        utils::insert_find_children_by_parent_node(graph, &child_relation_field, &parent_node, None);
     let rf = Arc::clone(&parent_relation_field);
 
-    if relation_inlined_parent {
-        // If the relation is inlined in the parent, we need to update the old parent and null out the relation (i.e. "disconnect").
-        // However, if the parent side is required, we fail during runtime before disconnecting, as that would violate the parent relation side.
-        let update_old_parent_node = utils::update_record_node_placeholder(graph, None, parent_model);
-        let relation_field_name = parent_relation_field.name.clone();
+    // Now check and disconnect the existing model, if necessary.
+    let read_existing_parent_query_node =
+        utils::insert_find_children_by_parent_node(graph, &parent_node, &parent_relation_field, None);
 
-        graph.create_edge(&read_old_parent_query_node, &update_old_parent_node, QueryGraphDependency::ParentIds(Box::new(move |mut child_node, mut parent_ids| {
+    // If the parent side is required, we also fail during runtime before disconnecting, as that would violate the parent relation side.
+    let update_existing_parent_node = utils::update_record_node_placeholder(graph, None, parent_model);
+    let relation_field_name = parent_relation_field.name.clone();
+    let if_node = graph.create_node(Flow::default_if());
+
+    graph.create_edge(
+        &read_existing_parent_query_node,
+        &if_node,
+        QueryGraphDependency::ParentIds(Box::new(move |node, parent_ids| {
+            if let Node::Flow(Flow::If(_)) = node {
+                // If the relation is inlined in the parent, we need to update the old parent and null out the relation (i.e. "disconnect").
+                Ok(Node::Flow(Flow::If(Box::new(move || {
+                    relation_inlined_parent && !parent_ids.is_empty()
+                }))))
+            } else {
+                unreachable!()
+            }
+        })),
+    );
+
+    graph.create_edge(&if_node, &update_existing_parent_node, QueryGraphDependency::Then);
+    graph.create_edge(&read_existing_parent_query_node, &update_existing_parent_node, QueryGraphDependency::ParentIds(Box::new(move |mut child_node, mut parent_ids| {
             // If the parent requires the connection, we need to make sure that there isn't a parent already connected
             // to the existing child, as that would violate the other parent's relation side.
             if parent_ids.len() > 0 && parent_side_required {
                 return Err(QueryGraphBuilderError::RelationViolation(rf.into()));
             }
 
+            // This has to succeed or the if-then node wouldn't trigger.
             let parent_id = match parent_ids.pop() {
                 Some(pid) => Ok(pid),
                 None => Err(QueryGraphBuilderError::AssertionError(format!("[Query Graph] Expected a valid parent ID to be present for a nested connect on a one-to-one relation, updating previous parent."))),
             }?;
 
-            /// Need noop node, remove or whatever concept here.
             let finder = RecordFinder {
                 field: parent_model_id_field,
                 value: parent_id,
@@ -267,165 +374,4 @@ fn insert_existing_parent_checks(
 
             Ok(child_node)
         })));
-
-        graph.create_edge(
-            &update_old_parent_node,
-            &parent_node,
-            QueryGraphDependency::ExecutionOrder,
-        );
-    } else {
-        graph.create_edge(&read_old_parent_query_node, &parent_node, QueryGraphDependency::ParentIds(Box::new(move |mut child_node, mut parent_ids| {
-            // If the parent requires the connection, we need to make sure that there isn't a parent already connected
-            // to the existing child, as that would violate the other parent's relation side.
-            if parent_ids.len() > 0 && parent_side_required {
-                return Err(QueryGraphBuilderError::RelationViolation(rf.into()));
-            }
-
-            Ok(node)
-        };
-    }
 }
-
-// // First, we need to check if the parent operation and the read new child operation need to be swapped.
-// // This also ensures that >>> the inlined relation side is always on `child_node` <<<,which simplifies the code structure/
-// let (parent_node, child_node, parent_relation_field) = if parent_relation_field.relation_is_inlined_in_parent() {
-//     let (new_parent, new_child) = utils::swap_nodes(graph, parent_node, child_node);
-//     (new_parent, new_child, parent_relation_field.related_field())
-// } else {
-//     (parent_node, child_node, Arc::clone(parent_relation_field))
-// };
-
-// insert_relation_checks(graph, &parent_node, &child_node, &parent_relation_field)?;
-
-// // Find out which possible update strategy we need to do for the given parent.
-// // The case "Parent holds the inlined ID && parent IS a create" is covered by the flip.
-// //
-// match (parent_is_create, relation_inlined_parent) {
-//     // Parent holds the inlined ID && parent IS NOT a create => Ok, update on parent works. (Update node on parent ID, requires extra fetch on parent id, or requires parent to return an ID)
-//     // Optimization: If the parent is already an update, we can merge the inline update into the parent and use a read before to get the child ID.
-//     (false, true) => unimplemented!(),
-
-//     // Child holds the inlined ID => Update on child node.
-//     (_, false) => {
-//         let update_node = utils::update_record_node_placeholder(graph, None, Arc::clone(child_model));
-//         let relation_field_name = parent_relation_field.related_field().name.clone();
-
-//         graph.create_edge(
-//             &child_node,
-//             &update_node,
-//             QueryGraphDependency::ParentIds(Box::new(|mut child_node, mut parent_ids| {
-//                 let parent_id = match parent_ids.pop() {
-//                     Some(pid) => Ok(pid),
-//                     None => Err(QueryGraphBuilderError::AssertionError(format!(
-//                         "Expected a valid parent ID to be present for a nested connect."
-//                     ))),
-//                 }?;
-
-//                 if let Node::Query(Query::Write(ref mut wq)) = child_node {
-//                     wq.inject_non_list_arg(relation_field_name, parent_id);
-//                 }
-
-//                 Ok(child_node)
-//             })),
-//         );
-//     }
-
-//     _ => unimplemented!(),
-// };
-
-// let (parent_node, child_node, parent_relation_field) =
-//     utils::ensure_query_ordering(graph, parent_node, &child_node, parent_relation_field);
-
-// // If the parent is a create we have to make sure that we have the ID available - do the flip.
-
-// // let model_to_update = if parent_relation_field.relation_is_inlined_in_parent() {
-// //     parent_relation_field.model()
-// // } else {
-// //     Arc::clone(child_model)
-// // };
-
-// // Prepare an empty update query.
-// //
-
-// let relation_field_name = parent_relation_field.name.clone();
-
-// // In case the relation is 1:1, we need to insert additional checks between
-// // the parent and the child to guarantee 1:1 relation integrity.
-// if parent_relation_field.relation().is_one_to_one() {
-//     insert_relation_checks(graph, parent_node, child_node, &parent_relation_field)?;
-// }
-
-// / Inserts one to one relation checks into the graph in between the given
-// / `parent_node` and `child_node`.
-// /
-// / Those checks will either cause the graph building to fail immediately, or
-// / will fail at graph runtime.
-// fn insert_relation_checks(
-//     graph: &mut QueryGraph,
-//     parent_node: &NodeRef,
-//     child_node: &NodeRef,
-//     parent_relation_field: &RelationFieldRef,
-// ) -> QueryGraphBuilderResult<()> {
-//     let child_relation_field = parent_relation_field.related_field();
-//     let parent_is_create = utils::node_is_create(graph, &parent_node);
-//     // let relation_field_name = parent_relation_field.name.clone();
-
-//     match (parent_relation_field.is_required, child_relation_field.is_required) {
-//         // Both sides are required, which means that know that there has to be already a parent connected to the child.
-//         // A connect to the child would disconnect the other connection, violating the required side of the old parent.
-//         (true, true) => Err(QueryGraphBuilderError::RelationViolation(
-//             (parent_relation_field).into(),
-//         )),
-
-//         // Parent requires the connection, child doesn't. If we connect the child, we need to make sure
-//         // that there isn't a parent already connected, as that would violate the parent's relation side.
-//         (true, false) => {
-//             // find old parent by new
-//         },
-
-//         // This case is only interesting if the parent is NOT a create, because
-//         (false, true) if !parent_is_create => Err(QueryGraphBuilderError::RelationViolation(
-//             (parent_relation_field).into(),
-//         )),
-
-//         (false, false) => unimplemented!(),
-
-//         // Todo come up with a plan to handle (false, true) if parent is create
-//         _ => unimplemented!(),
-//     }?;
-
-//     unimplemented!()
-// }
-
-// let child = create::create_record_node(graph, Arc::clone(child_model), value.try_into()?)?;
-
-// Perform additional 1:1 relation checks.
-// match (p.is_required, c.is_required) {
-// (true, true) => Err(self.relation_violation()),
-// (true, false) => Ok(Some(self.check_for_old_parent_by_child(&self.where_))),
-
-// Edge from parent to child (read query).
-// graph.create_edge(
-//     parent,
-//     child_node,
-//     QueryGraphDependency::ParentIds(Box::new(|mut child_node, mut parent_ids| {
-//         let parent_id = match parent_ids.pop() {
-//             Some(pid) => Ok(pid),
-//             None => Err(QueryGraphBuilderError::AssertionError(format!(
-//                 "Expected a valid parent ID to be present for nested connect pre read."
-//             ))),
-//         }?;
-
-//         if let Node::Query(Query::Read(ref mut rq)) = node {
-//             rq.inject_record_finder()
-//         }
-
-//         // // If the child is a write query, inject the parent id.
-//         // // This covers cases of inlined relations.
-//         // if let Node::Query(Query::Write(ref mut wq)) = child_node {
-//         //     wq.inject_non_list_arg(relation_field_name, parent_id)
-//         // }
-
-//         Ok(child_node)
-//     })),
-// );
