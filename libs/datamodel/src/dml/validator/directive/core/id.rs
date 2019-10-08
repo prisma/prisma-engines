@@ -55,7 +55,7 @@ impl DirectiveValidator<dml::Model> for ModelLevelIdDirectiveValidator {
                 let fields = fields.iter().map(|f| f.as_constant_literal().unwrap()).collect();
                 obj.id_fields = fields;
             }
-            Err(err) => return self.parser_error(&err),
+            Err(err) => return Err(self.parser_error(&err)),
         };
 
         let undefined_fields: Vec<String> = obj

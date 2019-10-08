@@ -45,12 +45,8 @@ pub trait DirectiveValidator<T> {
     }
 
     /// Shorthand to lift a generic parser error to an directive validation error.
-    fn parser_error(&self, err: &ValidationError) -> Result<(), Error> {
-        Err(ValidationError::new_directive_validation_error(
-            &format!("{}", err),
-            self.directive_name(),
-            err.span(),
-        ))
+    fn parser_error(&self, err: &ValidationError) -> ValidationError {
+        ValidationError::new_directive_validation_error(&format!("{}", err), self.directive_name(), err.span())
     }
 }
 
