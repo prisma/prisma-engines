@@ -1,3 +1,7 @@
+mod core;
+
+pub use self::core::{new_builtin_enum_directives, new_builtin_field_directives, new_builtin_model_directives};
+
 use crate::ast;
 use crate::common;
 use crate::common::argument::Arguments;
@@ -7,8 +11,6 @@ use crate::errors::{ErrorCollection, ValidationError};
 // BTreeMap has a strictly defined order.
 // That's important since rendering depends on that order.
 use std::collections::{BTreeMap, HashMap};
-
-pub mod core;
 
 /// The error type for directive validators.
 pub type Error = ValidationError;
