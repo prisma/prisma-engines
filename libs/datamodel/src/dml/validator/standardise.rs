@@ -84,7 +84,7 @@ impl Standardiser {
                     };
 
                     if embed_here {
-                        rel.to_fields = related_model.id_field_names().cloned().collect()
+                        rel.to_fields = related_model.id_field_names()
                     }
                 }
             }
@@ -154,6 +154,8 @@ impl Standardiser {
             database_name: None,
             is_embedded: false,
             fields: vec![a_related_field, b_related_field],
+            indexes: vec![],
+            id_fields: vec![],
             is_generated: true,
         }
     }
@@ -163,7 +165,7 @@ impl Standardiser {
             &NameNormalizer::camel_case(&model.name),
             dml::FieldType::Relation(dml::RelationInfo {
                 to: model.name.clone(),
-                to_fields: model.id_field_names().cloned().collect(),
+                to_fields: model.id_field_names(),
                 name: String::from(relation_name), // Will be corrected in later step
                 on_delete: dml::OnDeleteStrategy::None,
             }),

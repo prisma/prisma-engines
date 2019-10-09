@@ -78,7 +78,7 @@ fn infer_UpdateModel() {
         r#"
         model Post{
             id String @id @default(cuid())
-            
+
             @@embedded
         }
     "#,
@@ -297,6 +297,84 @@ fn infer_DeleteEnum() {
         name: "Test".to_string(),
     })];
     assert_eq!(steps, expected);
+}
+
+#[test]
+fn infer_UpdateIndex() {
+    let dm1 = parse(
+        r#"
+        model Dog {
+            id Int @id
+            age Int
+            name String
+
+            @@unique([age, name], name: "customDogIndex")
+        }
+        "#,
+    );
+
+    let dm2 = parse(
+        r#"
+        model Dog {
+            id Int @id
+            age Int
+            name String
+
+            @@unique([age, name], name: "customDogIndex2")
+        }
+        "#,
+    );
+
+    let steps = infer(&dm1, &dm2);
+    let expected = vec![MigrationStep::UpdateIndex(UpdateIndex {
+        model: "Dog".into(),
+        name: Some("customDogIndex2".into()),
+        tpe: IndexType::Unique,
+        fields: vec!["age".into(), "name".into()],
+    })];
+
+    assert_eq!(steps, expected);
+}
+
+#[test]
+fn infer_CreateField_on_self_relation() {
+    let dm1 = parse(
+        r#"
+            model User {
+                id Int @id
+            }
+        "#,
+    );
+
+    let dm2 = parse(
+        r#"
+            model User {
+                id Int @id
+                invitedBy User?
+            }
+        "#,
+    );
+
+    let steps = infer(&dm1, &dm2);
+
+    let expected = vec![MigrationStep::CreateField(CreateField {
+        model: "User".into(),
+        name: "invitedBy".into(),
+        tpe: FieldType::Relation(RelationInfo {
+            name: "UserToUser".into(),
+            on_delete: OnDeleteStrategy::None,
+            to: "User".into(),
+            to_fields: vec!["id".to_owned()],
+        }),
+        arity: FieldArity::Optional,
+        db_name: None,
+        is_created_at: None,
+        is_updated_at: None,
+        is_unique: false,
+        id: None,
+        default: None,
+        scalar_list: None,
+    })];
 }
 
 fn infer(dm1: &Datamodel, dm2: &Datamodel) -> Vec<MigrationStep> {

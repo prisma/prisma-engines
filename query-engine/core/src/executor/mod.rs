@@ -14,4 +14,5 @@ use crate::{query_document::QueryDocument, response_ir::Response, schema::QueryS
 
 pub trait QueryExecutor {
     fn execute(&self, query_doc: QueryDocument, query_schema: QuerySchemaRef) -> CoreResult<Vec<Response>>;
+    fn primary_connector(&self) -> &'static str;
 }

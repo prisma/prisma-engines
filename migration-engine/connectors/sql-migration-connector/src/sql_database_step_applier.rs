@@ -1,7 +1,6 @@
 use crate::*;
-use database_introspection::*;
-use migration_connector::*;
 use sql_renderer::SqlRenderer;
+use sql_schema_describer::*;
 use std::sync::Arc;
 
 pub struct SqlDatabaseStepApplier {
@@ -13,7 +12,7 @@ pub struct SqlDatabaseStepApplier {
 #[allow(unused, dead_code)]
 impl DatabaseMigrationStepApplier<SqlMigration> for SqlDatabaseStepApplier {
     fn apply_step(&self, database_migration: &SqlMigration, index: usize) -> ConnectorResult<bool> {
-        Ok(self.apply_next_step(&database_migration.steps, index)?)
+        Ok(self.apply_next_step(&database_migration.corrected_steps, index)?)
     }
 
     fn unapply_step(&self, database_migration: &SqlMigration, index: usize) -> ConnectorResult<bool> {
@@ -56,7 +55,7 @@ fn render_steps_pretty(
     schema_name: &str,
 ) -> ConnectorResult<serde_json::Value> {
     let jsons = database_migration
-        .steps
+        .corrected_steps
         .iter()
         .map(|step| {
             let cloned = step.clone();
@@ -83,7 +82,7 @@ fn render_raw_sql(step: &SqlMigrationStep, sql_family: SqlFamily, schema_name: &
             let mut lines = Vec::new();
             for column in cloned_columns.clone() {
                 let col_sql = renderer.render_column(&schema_name, &table, &column, false);
-                lines.push(col_sql);
+                lines.push(format!("  {}", col_sql));
             }
             let primary_key_was_already_set_in_column_line = lines.join(",").contains(&"PRIMARY KEY");
 
@@ -93,12 +92,12 @@ fn render_raw_sql(step: &SqlMigrationStep, sql_family: SqlFamily, schema_name: &
                     .into_iter()
                     .map(|col| renderer.quote(&col))
                     .collect();
-                lines.push(format!("PRIMARY KEY ({})", column_names.join(",")))
+                lines.push(format!("  PRIMARY KEY ({})", column_names.join(",")))
             }
             format!(
-                "CREATE TABLE {}({})\n{};",
+                "CREATE TABLE {} (\n{}\n){};",
                 renderer.quote_with_schema(&schema_name, &table.name),
-                lines.join(","),
+                lines.join(",\n"),
                 create_table_suffix(sql_family),
             )
         }
@@ -147,7 +146,7 @@ fn render_raw_sql(step: &SqlMigrationStep, sql_family: SqlFamily, schema_name: &
             format!(
                 "ALTER TABLE {} {};",
                 renderer.quote_with_schema(&schema_name, &table.name),
-                lines.join(",")
+                lines.join(",\n")
             )
         }
         SqlMigrationStep::CreateIndex(CreateIndex { table, index }) => {
@@ -183,6 +182,24 @@ fn render_raw_sql(step: &SqlMigrationStep, sql_family: SqlFamily, schema_name: &
                 format!("DROP INDEX {}", renderer.quote_with_schema(&schema_name, &name),)
             }
         },
+        SqlMigrationStep::AlterIndex(AlterIndex {
+            table,
+            index_name,
+            index_new_name,
+        }) => match sql_family {
+            SqlFamily::Mysql => format!(
+                "ALTER TABLE {table_name} RENAME INDEX {index_name} TO {index_new_name}",
+                table_name = renderer.quote_with_schema(&schema_name, &table),
+                index_name = renderer.quote(index_name),
+                index_new_name = renderer.quote(index_new_name)
+            ),
+            SqlFamily::Postgres => format!(
+                "ALTER INDEX {} RENAME TO {}",
+                renderer.quote_with_schema(&schema_name, index_name),
+                renderer.quote(index_new_name)
+            ),
+            SqlFamily::Sqlite => unimplemented!("Index renaming on SQLite."),
+        },
         SqlMigrationStep::RawSql { raw } => raw.to_string(),
     }
 }
@@ -191,6 +208,6 @@ fn create_table_suffix(sql_family: SqlFamily) -> &'static str {
     match sql_family {
         SqlFamily::Sqlite => "",
         SqlFamily::Postgres => "",
-        SqlFamily::Mysql => "DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci",
+        SqlFamily::Mysql => "\nDEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci",
     }
 }

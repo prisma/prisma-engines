@@ -17,7 +17,7 @@ logger = { path = "../../libs/logger" }
 prisma-inflector = { path = "../../libs/prisma-inflector" }
 datamodel = { path = "../../libs/datamodel" }
 prisma-models = { path = "../../prisma-models" }
-core = { path = "../core" }
+core = { path = "../core", package = "query-core" }
 connector = { path = "../connectors/query-connector", package = "query-connector" }
 sql-connector = { path = "../connectors/sql-query-connector", optional = true, package = "sql-query-connector" }
 prisma-query = { git = "https://github.com/prisma/prisma-query", optional = true }

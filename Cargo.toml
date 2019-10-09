@@ -2,18 +2,19 @@
 members = [
   "prisma-models",
   "introspection-engine/core",
+  "introspection-engine/connectors/introspection-connector",
+  "introspection-engine/connectors/sql-introspection-connector",
   "migration-engine/connectors/migration-connector",
   "migration-engine/connectors/sql-migration-connector",
   "migration-engine/core",
   "query-engine/connectors/query-connector",
   "query-engine/connectors/sql-query-connector",
-  "query-engine/prisma",
   "query-engine/core",
+  "query-engine/prisma",
   "prisma-fmt",
   "libs/datamodel",
   "libs/prisma-inflector",
-  "libs/database-introspection",
-  "libs/introspection-command",
+  "libs/sql-schema-describer",
   "libs/logger",
 ]
 

@@ -25,8 +25,8 @@ impl DirectiveValidator<dml::Field> for CustomDirective {
         &self,
         _obj: &dml::Field,
         _datamodel: &dml::Datamodel,
-    ) -> Result<Option<datamodel::ast::Directive>, ValidationError> {
-        Ok(None)
+    ) -> Result<Vec<datamodel::ast::Directive>, ValidationError> {
+        Ok(Vec::new())
     }
 }
 

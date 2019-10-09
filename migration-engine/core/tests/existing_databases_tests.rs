@@ -2,11 +2,11 @@
 #![allow(unused)]
 mod test_harness;
 use barrel::{types, Migration, SqlVariant};
-use database_introspection::*;
 use migration_core::api::GenericApi;
 use pretty_assertions::{assert_eq, assert_ne};
 use sql_migration_connector::SqlFamily;
 use sql_migration_connector::{migration_database::MigrationDatabase, SqlMigrationConnector};
+use sql_schema_describer::*;
 use std::sync::Arc;
 use test_harness::*;
 
@@ -23,7 +23,7 @@ fn adding_a_model_for_an_existing_table_must_work() {
                 id Int @id
             }
         "#;
-        let result = infer_and_apply(api, &dm);
+        let result = infer_and_apply(api, &dm).sql_schema;
         assert_eq!(initial_result, result);
     });
 }
@@ -45,7 +45,7 @@ fn removing_a_model_for_a_table_that_is_already_deleted_must_work() {
                 id Int @id
             }
         "#;
-        let initial_result = infer_and_apply(api, &dm1);
+        let initial_result = infer_and_apply(api, &dm1).sql_schema;
         assert!(initial_result.has_table("Post"));
 
         let result = barrel.execute(|migration| {
@@ -58,7 +58,7 @@ fn removing_a_model_for_a_table_that_is_already_deleted_must_work() {
                 id Int @id
             }
         "#;
-        let final_result = infer_and_apply(api, &dm2);
+        let final_result = infer_and_apply(api, &dm2).sql_schema;
         assert_eq!(result, final_result);
     });
 }
@@ -78,7 +78,7 @@ fn creating_a_field_for_an_existing_column_with_a_compatible_type_must_work() {
                 title String
             }
         "#;
-        let result = infer_and_apply(api, &dm);
+        let result = infer_and_apply(api, &dm).sql_schema;
         assert_eq!(initial_result, result);
     });
 }
@@ -102,7 +102,7 @@ fn creating_a_field_for_an_existing_column_and_changing_its_type_must_work() {
                 title String @unique
             }
         "#;
-        let result = infer_and_apply(api, &dm);
+        let result = infer_and_apply(api, &dm).sql_schema;
         let table = result.table_bang("Blog");
         let column = table.column_bang("title");
         assert_eq!(column.tpe.family, ColumnTypeFamily::String);
@@ -131,7 +131,7 @@ fn creating_a_field_for_an_existing_column_and_simultaneously_making_it_optional
                 title String?
             }
         "#;
-        let result = infer_and_apply(api, &dm);
+        let result = infer_and_apply(api, &dm).sql_schema;
         let column = result.table_bang("Blog").column_bang("title");
         assert_eq!(column.is_required(), false);
     });
@@ -145,16 +145,33 @@ fn creating_a_scalar_list_field_for_an_existing_table_must_work() {
                 id Int @id
             }
         "#;
-        let initial_result = infer_and_apply(api, &dm1);
+        let initial_result = infer_and_apply(api, &dm1).sql_schema;
         assert!(!initial_result.has_table("Blog_tags"));
 
-        let result = barrel.execute(|migration| {
+        let mut result = barrel.execute(|migration| {
             migration.create_table("Blog_tags", |t| {
-                t.add_column("nodeId", types::foreign("Blog", "id")); // TODO: barrel does not render this one correctly
+                // TODO: barrel does not render this one correctly
+                // TODO: the column should not be nullable. We just set it nullable because of our current inline relation nullability hack
+                t.add_column("nodeId", types::foreign("Blog", "id").nullable(true));
                 t.add_column("position", types::integer());
                 t.add_column("value", types::text());
             });
         });
+        // hacks for things i can't set in barrel due to limitations
+        for table in &mut result.tables {
+            if table.name == "Blog_tags" {
+                for fk in &mut table.foreign_keys {
+                    if fk.columns == vec!["nodeId".to_string()] {
+                        fk.on_delete_action = ForeignKeyAction::Cascade
+                    }
+                }
+                //                table.primary_key = Some(PrimaryKey {
+                //                    columns: vec!["nodeId".to_string(), "position".to_string()],
+                //                    sequence: None,
+                //                });
+            }
+        }
+
         assert!(result.has_table("Blog_tags"));
 
         let dm2 = r#"
@@ -163,7 +180,14 @@ fn creating_a_scalar_list_field_for_an_existing_table_must_work() {
                 tags String[]
             }
         "#;
-        let final_result = infer_and_apply(api, &dm2);
+        let mut final_result = infer_and_apply(api, &dm2).sql_schema;
+        for table in &mut final_result.tables {
+            if table.name == "Blog_tags" {
+                // can't set that properly up again
+                table.indices = vec![];
+                table.primary_key = None;
+            }
+        }
         assert_eq!(result, final_result);
     });
 }
@@ -177,7 +201,7 @@ fn delete_a_field_for_a_non_existent_column_must_work() {
                 title String
             }
         "#;
-        let initial_result = infer_and_apply(api, &dm1);
+        let initial_result = infer_and_apply(api, &dm1).sql_schema;
         assert_eq!(initial_result.table_bang("Blog").column("title").is_some(), true);
 
         let result = barrel.execute(|migration| {
@@ -194,7 +218,7 @@ fn delete_a_field_for_a_non_existent_column_must_work() {
                 id Int @id
             }
         "#;
-        let final_result = infer_and_apply(api, &dm2);
+        let final_result = infer_and_apply(api, &dm2).sql_schema;
         assert_eq!(result, final_result);
     });
 }
@@ -208,7 +232,7 @@ fn deleting_a_scalar_list_field_for_a_non_existent_list_table_must_work() {
                 tags String[]
             }
         "#;
-        let initial_result = infer_and_apply(api, &dm1);
+        let initial_result = infer_and_apply(api, &dm1).sql_schema;
         assert!(initial_result.has_table("Blog_tags"));
 
         let result = barrel.execute(|migration| {
@@ -221,7 +245,7 @@ fn deleting_a_scalar_list_field_for_a_non_existent_list_table_must_work() {
                 id Int @id
             }
         "#;
-        let final_result = infer_and_apply(api, &dm2);
+        let final_result = infer_and_apply(api, &dm2).sql_schema;
         assert_eq!(result, final_result);
     });
 }
@@ -235,7 +259,7 @@ fn updating_a_field_for_a_non_existent_column() {
                 title String
             }
         "#;
-        let initial_result = infer_and_apply(api, &dm1);
+        let initial_result = infer_and_apply(api, &dm1).sql_schema;
         let initial_column = initial_result.table_bang("Blog").column_bang("title");
         assert_eq!(initial_column.tpe.family, ColumnTypeFamily::String);
 
@@ -254,7 +278,7 @@ fn updating_a_field_for_a_non_existent_column() {
                 title Int @unique
             }
         "#;
-        let final_result = infer_and_apply(api, &dm2);
+        let final_result = infer_and_apply(api, &dm2).sql_schema;
         let final_column = final_result.table_bang("Blog").column_bang("title");
         assert_eq!(final_column.tpe.family, ColumnTypeFamily::Int);
         let index = final_result
@@ -276,7 +300,7 @@ fn renaming_a_field_where_the_column_was_already_renamed_must_work() {
                 title String
             }
         "#;
-        let initial_result = infer_and_apply(api, &dm1);
+        let initial_result = infer_and_apply(api, &dm1).sql_schema;
         let initial_column = initial_result.table_bang("Blog").column_bang("title");
         assert_eq!(initial_column.tpe.family, ColumnTypeFamily::String);
 
@@ -297,7 +321,7 @@ fn renaming_a_field_where_the_column_was_already_renamed_must_work() {
             }
         "#;
 
-        let final_result = infer_and_apply(api, &dm2);
+        let final_result = infer_and_apply(api, &dm2).sql_schema;
         let final_column = final_result.table_bang("Blog").column_bang("new_title");
 
         assert_eq!(final_column.tpe.family, ColumnTypeFamily::Float);
@@ -341,7 +365,7 @@ where
         let (inspector, database) = get_postgres();
 
         println!("Running the test function now");
-        let connector = SqlMigrationConnector::postgres(&postgres_url()).unwrap();
+        let connector = SqlMigrationConnector::postgres(&postgres_url(), false).unwrap();
         let api = test_api(connector);
 
         let barrel_migration_executor = BarrelMigrationExecutor {
@@ -356,38 +380,38 @@ where
     }
 }
 
-fn get_sqlite() -> (Arc<dyn IntrospectionConnector>, Arc<dyn MigrationDatabase>) {
+fn get_sqlite() -> (Arc<dyn SqlSchemaDescriberBackend>, Arc<dyn MigrationDatabase>) {
     let wrapper = database_wrapper(SqlFamily::Sqlite);
     let database = Arc::clone(&wrapper.database);
 
     let database_file_path = sqlite_test_file();
     let _ = std::fs::remove_file(database_file_path.clone()); // ignore potential errors
 
-    let inspector = database_introspection::sqlite::IntrospectionConnector::new(Arc::new(wrapper));
+    let inspector = sql_schema_describer::sqlite::SqlSchemaDescriber::new(Arc::new(wrapper));
 
     (Arc::new(inspector), database)
 }
 
-fn get_postgres() -> (Arc<dyn IntrospectionConnector>, Arc<dyn MigrationDatabase>) {
+fn get_postgres() -> (Arc<dyn SqlSchemaDescriberBackend>, Arc<dyn MigrationDatabase>) {
     let wrapper = database_wrapper(SqlFamily::Postgres);
     let database = Arc::clone(&wrapper.database);
 
     let drop_schema = dbg!(format!("DROP SCHEMA IF EXISTS \"{}\" CASCADE;", SCHEMA_NAME));
     let _ = database.query_raw(SCHEMA_NAME, &drop_schema, &[]);
 
-    let inspector = database_introspection::postgres::IntrospectionConnector::new(Arc::new(wrapper));
+    let inspector = sql_schema_describer::postgres::SqlSchemaDescriber::new(Arc::new(wrapper));
 
     (Arc::new(inspector), database)
 }
 
 struct BarrelMigrationExecutor {
-    inspector: Arc<dyn IntrospectionConnector>,
+    inspector: Arc<dyn SqlSchemaDescriberBackend>,
     database: Arc<dyn MigrationDatabase>,
     sql_variant: barrel::backend::SqlVariant,
 }
 
 impl BarrelMigrationExecutor {
-    fn execute<F>(&self, mut migrationFn: F) -> DatabaseSchema
+    fn execute<F>(&self, mut migrationFn: F) -> SqlSchema
     where
         F: FnMut(&mut Migration) -> (),
     {
@@ -397,7 +421,7 @@ impl BarrelMigrationExecutor {
         run_full_sql(&self.database, &full_sql);
         let mut result = self
             .inspector
-            .introspect(&SCHEMA_NAME.to_string())
+            .describe(&SCHEMA_NAME.to_string())
             .expect("Introspection failed");
         // the presence of the _Migration table makes assertions harder. Therefore remove it.
         result.tables = result.tables.into_iter().filter(|t| t.name != "_Migration").collect();

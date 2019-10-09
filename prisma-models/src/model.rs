@@ -11,18 +11,16 @@ pub type ModelWeakRef = Weak<Model>;
 #[serde(rename_all = "camelCase")]
 pub struct ModelTemplate {
     pub name: String,
-    pub stable_identifier: String, // todo: remove once we fully switched to dm v2
     pub is_embedded: bool,
     pub fields: Vec<FieldTemplate>,
-    pub manifestation: Option<ModelManifestation>, // todo: convert to Option<String> once we fully switched to dm v2
+    pub manifestation: Option<String>,
 }
 
 #[derive(DebugStub)]
 pub struct Model {
     pub name: String,
-    pub stable_identifier: String,
     pub is_embedded: bool,
-    pub manifestation: Option<ModelManifestation>,
+    manifestation: Option<String>,
 
     fields: OnceCell<Fields>,
 
@@ -30,17 +28,10 @@ pub struct Model {
     pub internal_data_model: InternalDataModelWeakRef,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ModelManifestation {
-    pub db_name: String,
-}
-
 impl ModelTemplate {
     pub fn build(self, internal_data_model: InternalDataModelWeakRef) -> ModelRef {
         let model = Arc::new(Model {
             name: self.name,
-            stable_identifier: self.stable_identifier,
             is_embedded: self.is_embedded,
             fields: OnceCell::new(),
             manifestation: self.manifestation,
@@ -105,7 +96,7 @@ impl Model {
     }
 
     pub fn db_name_opt(&self) -> Option<&str> {
-        self.manifestation.as_ref().map(|mf| mf.db_name.as_ref())
+        self.manifestation.as_ref().map(|m| m.as_ref())
     }
 
     pub fn internal_data_model(&self) -> InternalDataModelRef {

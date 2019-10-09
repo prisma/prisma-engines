@@ -20,17 +20,17 @@ impl DirectiveValidator<dml::Field> for SequenceDirectiveValidator {
 
         match args.arg("name")?.as_str() {
             Ok(name) => seq.name = name,
-            Err(err) => return self.parser_error(&err),
+            Err(err) => return Err(self.parser_error(&err)),
         }
 
         match args.arg("allocationSize")?.as_int() {
             Ok(allocation_size) => seq.allocation_size = allocation_size,
-            Err(err) => return self.parser_error(&err),
+            Err(err) => return Err(self.parser_error(&err)),
         }
 
         match args.arg("initialValie")?.as_int() {
             Ok(initial_value) => seq.initial_value = initial_value,
-            Err(err) => return self.parser_error(&err),
+            Err(err) => return Err(self.parser_error(&err)),
         }
 
         match &mut obj.id_info {
@@ -46,7 +46,7 @@ impl DirectiveValidator<dml::Field> for SequenceDirectiveValidator {
         Ok(())
     }
 
-    fn serialize(&self, field: &dml::Field, _datamodel: &dml::Datamodel) -> Result<Option<ast::Directive>, Error> {
+    fn serialize(&self, field: &dml::Field, _datamodel: &dml::Datamodel) -> Result<Vec<ast::Directive>, Error> {
         if let Some(id_info) = &field.id_info {
             if let Some(seq_info) = &id_info.sequence {
                 let mut args = Vec::new();
@@ -57,14 +57,14 @@ impl DirectiveValidator<dml::Field> for SequenceDirectiveValidator {
                     dml::Value::Int(seq_info.allocation_size).into(),
                 ));
                 args.push(ast::Argument::new(
-                    "initialValie",
+                    "initialValue",
                     dml::Value::Int(seq_info.initial_value).into(),
                 ));
 
-                return Ok(Some(ast::Directive::new(self.directive_name(), args)));
+                return Ok(vec![ast::Directive::new(self.directive_name(), args)]);
             }
         }
 
-        Ok(None)
+        Ok(vec![])
     }
 }

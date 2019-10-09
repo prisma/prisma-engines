@@ -38,7 +38,7 @@ fn sqlite(source: &dyn Source) -> PrismaResult<(String, Box<dyn QueryExecutor + 
     let db_name = path.file_stem().unwrap().to_str().unwrap().to_owned(); // Safe due to previous validations.
 
     trace!("Loaded SQLite connector.");
-    Ok((db_name, sql_executor(sqlite)))
+    Ok((db_name, sql_executor("sqlite", sqlite)))
 }
 
 #[cfg(feature = "sql")]
@@ -56,7 +56,7 @@ fn postgres(source: &dyn Source) -> PrismaResult<(String, Box<dyn QueryExecutor 
     let psql = PostgreSql::from_source(source)?;
 
     trace!("Loaded Postgres connector.");
-    Ok((db_name, sql_executor(psql)))
+    Ok((db_name, sql_executor("postgres", psql)))
 }
 
 #[cfg(feature = "sql")]
@@ -74,13 +74,13 @@ fn mysql(source: &dyn Source) -> PrismaResult<(String, Box<dyn QueryExecutor + S
     let db_name = db_name.next().expect(err_str).to_owned();
 
     trace!("Loaded MySQL connector.");
-    Ok((db_name, sql_executor(mysql)))
+    Ok((db_name, sql_executor("mysql", mysql)))
 }
 
 #[cfg(feature = "sql")]
-fn sql_executor<T>(connector: T) -> Box<dyn QueryExecutor + Send + Sync + 'static>
+fn sql_executor<T>(primary_connector: &'static str, connector: T) -> Box<dyn QueryExecutor + Send + Sync + 'static>
 where
     T: Connector + Send + Sync + 'static,
 {
-    Box::new(InterpretingExecutor::new(connector))
+    Box::new(InterpretingExecutor::new(connector, primary_connector))
 }

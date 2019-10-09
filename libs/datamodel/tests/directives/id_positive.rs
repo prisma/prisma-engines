@@ -107,3 +107,18 @@ fn should_allow_string_ids_with_uuid() {
         .assert_base_type(&ScalarType::String)
         .assert_default_value(Value::Expression(String::from("uuid"), ScalarType::String, Vec::new()));
 }
+
+#[test]
+fn multi_field_ids_must_work() {
+    let dml = r#"
+    model Model {
+        a String
+        b Int
+        @@id([a,b])
+    }
+    "#;
+
+    let datamodel = parse(dml);
+    let user_model = datamodel.assert_has_model("Model");
+    user_model.assert_has_id_fields(&["a", "b"]);
+}

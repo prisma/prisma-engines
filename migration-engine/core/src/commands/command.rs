@@ -14,7 +14,7 @@ pub trait MigrationCommand<'a> {
     fn execute<C, D>(&self, engine: &MigrationEngine<C, D>) -> CommandResult<Self::Output>
     where
         C: MigrationConnector<DatabaseMigration = D>,
-        D: DatabaseMigrationMarker + 'static;
+        D: DatabaseMigrationMarker + Send + Sync + 'static;
 }
 
 pub type CommandResult<T> = Result<T, CommandError>;

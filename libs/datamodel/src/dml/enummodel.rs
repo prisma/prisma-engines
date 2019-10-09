@@ -1,8 +1,7 @@
 use super::traits::*;
-use serde::{Deserialize, Serialize};
 
 /// Represents an enum in the datamodel.
-#[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct Enum {
     /// Name of the enum.
     pub name: String,

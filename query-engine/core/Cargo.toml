@@ -1,5 +1,5 @@
 [package]
-name = "core"
+name = "query-core"
 version = "0.1.0"
 authors = ["Dominic Petrick <dompetrick@gmail.com>", "Katharina Fey <kookie@spacekookie.de>"]
 edition = "2018"

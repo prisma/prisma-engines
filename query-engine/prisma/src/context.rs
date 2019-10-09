@@ -1,19 +1,21 @@
-use std::sync::Arc;
-use core::{BuildMode, QueryExecutor, QuerySchemaBuilder, schema::{QuerySchemaRef, SupportedCapabilities}};
-use prisma_models::InternalDataModelRef;
 use crate::{data_model_loader::*, exec_loader, PrismaError, PrismaResult};
+use core::{
+    schema::{QuerySchemaRef, SupportedCapabilities},
+    BuildMode, QueryExecutor, QuerySchemaBuilder,
+};
+// use prisma_models::InternalDataModelRef;
+use std::sync::Arc;
 
 /// Prisma request context containing all immutable state of the process.
 /// There is usually only one context initialized per process.
 pub struct PrismaContext {
-    /// Internal data model used throughout the query engine.
-    pub internal_data_model: InternalDataModelRef,
-
+    // Internal data model used throughout the query engine.
+    //internal_data_model: InternalDataModelRef,
     /// The api query schema.
-    pub query_schema: QuerySchemaRef,
+    query_schema: QuerySchemaRef,
 
     /// DML-based v2 datamodel.
-    pub dm: datamodel::Datamodel,
+    dm: datamodel::Datamodel,
 
     /// Central query executor.
     pub executor: Box<dyn QueryExecutor + Send + Sync + 'static>,
@@ -51,10 +53,22 @@ impl PrismaContext {
         let query_schema: QuerySchemaRef = Arc::new(schema_builder.build());
 
         Ok(Self {
-            internal_data_model,
+            // internal_data_model,
             query_schema,
             dm,
             executor,
         })
+    }
+
+    pub fn query_schema(&self) -> &QuerySchemaRef {
+        &self.query_schema
+    }
+
+    pub fn datamodel(&self) -> &datamodel::Datamodel {
+        &self.dm
+    }
+
+    pub fn primary_connector(&self) -> &'static str {
+        self.executor.primary_connector()
     }
 }

@@ -6,7 +6,7 @@ use crate::errors::{ErrorCollection, ValidationError};
 
 // BTreeMap has a strictly defined order.
 // That's important since rendering depends on that order.
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, HashMap};
 
 pub mod core;
 
@@ -24,12 +24,16 @@ pub trait DirectiveValidator<T> {
     /// Gets the directive name.
     fn directive_name(&self) -> &str;
 
+    fn is_duplicate_definition_allowed(&self) -> bool {
+        false
+    }
+
     /// Validates a directive and applies the directive
     /// to the given object.
     fn validate_and_apply(&self, args: &mut Args, obj: &mut T) -> Result<(), Error>;
 
     /// Serilizes the given directive's arguments for rendering.
-    fn serialize(&self, obj: &T, datamodel: &dml::Datamodel) -> Result<Option<ast::Directive>, Error>;
+    fn serialize(&self, obj: &T, datamodel: &dml::Datamodel) -> Result<Vec<ast::Directive>, Error>;
 
     /// Shorthand to construct an directive validation error.
     fn error(&self, msg: &str, span: ast::Span) -> Result<(), Error> {
@@ -41,12 +45,8 @@ pub trait DirectiveValidator<T> {
     }
 
     /// Shorthand to lift a generic parser error to an directive validation error.
-    fn parser_error(&self, err: &ValidationError) -> Result<(), Error> {
-        Err(ValidationError::new_directive_validation_error(
-            &format!("{}", err),
-            self.directive_name(),
-            err.span(),
-        ))
+    fn parser_error(&self, err: &ValidationError) -> ValidationError {
+        ValidationError::new_directive_validation_error(&format!("{}", err), self.directive_name(), err.span())
     }
 }
 
@@ -80,7 +80,7 @@ impl<T> DirectiveValidator<T> for DirectiveScope<T> {
     fn validate_and_apply(&self, args: &mut Args, obj: &mut T) -> Result<(), Error> {
         self.inner.validate_and_apply(args, obj)
     }
-    fn serialize(&self, obj: &T, datamodel: &dml::Datamodel) -> Result<Option<ast::Directive>, Error> {
+    fn serialize(&self, obj: &T, datamodel: &dml::Datamodel) -> Result<Vec<ast::Directive>, Error> {
         self.inner.serialize(obj, datamodel)
     }
 }
@@ -136,16 +136,14 @@ impl<T: 'static> DirectiveListValidator<T> {
     pub fn validate_and_apply(&self, ast: &dyn ast::WithDirectives, t: &mut T) -> Result<(), ErrorCollection> {
         let mut errors = ErrorCollection::new();
 
+        let mut directive_counts = HashMap::new();
         for directive in ast.directives() {
-            for other_directive in ast.directives() {
-                if directive as *const ast::Directive != other_directive as *const ast::Directive
-                    && directive.name.name == other_directive.name.name
-                {
-                    errors.push(ValidationError::new_duplicate_directive_error(
-                        &directive.name.name,
-                        directive.name.span,
-                    ));
+            match directive_counts.get_mut(&directive.name.name) {
+                None => {
+                    directive_counts.insert(&directive.name.name, 1);
+                    ()
                 }
+                Some(count) => *count += 1,
             }
         }
 
@@ -155,6 +153,14 @@ impl<T: 'static> DirectiveListValidator<T> {
             match self.known_directives.get(&directive.name.name) {
                 Some(validator) => {
                     let mut arguments = Arguments::new(&directive.arguments, directive.span);
+
+                    let directive_count = directive_counts.get(&directive.name.name).unwrap();
+                    if *directive_count > 1 && !validator.is_duplicate_definition_allowed() {
+                        errors.push(ValidationError::new_duplicate_directive_error(
+                            &directive.name.name,
+                            directive.name.span,
+                        ));
+                    }
 
                     if let Err(mut errs) = arguments.check_for_duplicate_arguments() {
                         errors.append(&mut errs);
@@ -195,18 +201,17 @@ impl<T: 'static> DirectiveListValidator<T> {
 
     pub fn serialize(&self, t: &T, datamodel: &dml::Datamodel) -> Result<Vec<ast::Directive>, ErrorCollection> {
         let mut errors = ErrorCollection::new();
-        let mut directives: Vec<ast::Directive> = Vec::new();
+        let mut result: Vec<ast::Directive> = Vec::new();
 
         for directive in self.known_directives.values() {
             match directive.serialize(t, datamodel) {
-                Ok(Some(directive)) => directives.push(directive),
-                Ok(None) => {}
+                Ok(mut directives) => result.append(&mut directives),
                 Err(err) => errors.push(err),
             };
         }
 
         errors.ok()?;
 
-        Ok(directives)
+        Ok(result)
     }
 }

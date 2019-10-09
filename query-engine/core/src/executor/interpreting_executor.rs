@@ -8,6 +8,7 @@ use connector::{Connector, TransactionLike};
 /// Interprets the full query tree to return a result.
 pub struct InterpretingExecutor<C> {
     connector: C,
+    primary_connector: &'static str,
 }
 
 // Todo:
@@ -17,8 +18,8 @@ impl<C> InterpretingExecutor<C>
 where
     C: Connector + Send + Sync + 'static,
 {
-    pub fn new(connector: C) -> Self {
-        InterpretingExecutor { connector }
+    pub fn new(connector: C, primary_connector: &'static str) -> Self {
+        InterpretingExecutor { connector, primary_connector }
     }
 
     pub fn with_interpreter<'a, F>(&self, f: F) -> CoreResult<Response>
@@ -50,5 +51,9 @@ where
                 self.with_interpreter(|interpreter| QueryPipeline::new(query_graph, interpreter, info).execute())
             })
             .collect()
+    }
+
+    fn primary_connector(&self) -> &'static str {
+        self.primary_connector
     }
 }

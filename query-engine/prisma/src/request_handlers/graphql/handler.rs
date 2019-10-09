@@ -40,7 +40,7 @@ fn handle_graphql_query(
     let query_doc = GraphQLProtocolAdapter::convert(gql_doc, req.body.operation_name)?;
 
     ctx.executor
-        .execute(query_doc, Arc::clone(&ctx.query_schema))
+        .execute(query_doc, Arc::clone(ctx.query_schema()))
         .map_err(|err| {
             debug!("{}", err);
             let ce: CoreError = err.into();

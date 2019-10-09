@@ -3,7 +3,7 @@ pub mod graphql;
 pub use core::schema::QuerySchemaRenderer;
 pub use graphql::{GraphQlBody, GraphQlRequestHandler};
 
-use crate::{context::PrismaContext, RequestContext};
+use crate::{context::PrismaContext, server::RequestContext};
 use actix_web::HttpRequest;
 use serde_json;
 use std::collections::HashMap;

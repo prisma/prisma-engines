@@ -1,4 +1,4 @@
-use database_introspection::*;
+use sql_schema_describer::*;
 
 pub fn render_nullability(table: &Table, column: &Column) -> &'static str {
     // TODO: bring back when the query planning for writes is done

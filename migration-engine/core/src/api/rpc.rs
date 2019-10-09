@@ -45,19 +45,24 @@ impl RpcCommand {
     }
 }
 
+static AVAILABLE_COMMANDS: &[RpcCommand] = &[
+    RpcCommand::ApplyMigration,
+    RpcCommand::InferMigrationSteps,
+    RpcCommand::ListMigrations,
+    RpcCommand::MigrationProgress,
+    RpcCommand::UnapplyMigration,
+    RpcCommand::Reset,
+    RpcCommand::CalculateDatamodel,
+    RpcCommand::CalculateDatabaseSteps,
+];
+
 impl RpcApi {
     pub fn new_async(datamodel: &str) -> crate::Result<Self> {
         let mut rpc_api = Self::new(datamodel)?;
 
-        rpc_api.add_async_command_handler(RpcCommand::ApplyMigration);
-        rpc_api.add_async_command_handler(RpcCommand::InferMigrationSteps);
-        rpc_api.add_async_command_handler(RpcCommand::ListMigrations);
-        rpc_api.add_async_command_handler(RpcCommand::MigrationProgress);
-        rpc_api.add_async_command_handler(RpcCommand::MigrationProgress);
-        rpc_api.add_async_command_handler(RpcCommand::UnapplyMigration);
-        rpc_api.add_async_command_handler(RpcCommand::Reset);
-        rpc_api.add_async_command_handler(RpcCommand::CalculateDatamodel);
-        rpc_api.add_async_command_handler(RpcCommand::CalculateDatabaseSteps);
+        for cmd in AVAILABLE_COMMANDS {
+            rpc_api.add_async_command_handler(*cmd);
+        }
 
         Ok(rpc_api)
     }
@@ -65,15 +70,9 @@ impl RpcApi {
     pub fn new_sync(datamodel: &str) -> crate::Result<Self> {
         let mut rpc_api = Self::new(datamodel)?;
 
-        rpc_api.add_sync_command_handler(RpcCommand::ApplyMigration);
-        rpc_api.add_sync_command_handler(RpcCommand::InferMigrationSteps);
-        rpc_api.add_sync_command_handler(RpcCommand::ListMigrations);
-        rpc_api.add_sync_command_handler(RpcCommand::MigrationProgress);
-        rpc_api.add_sync_command_handler(RpcCommand::MigrationProgress);
-        rpc_api.add_sync_command_handler(RpcCommand::UnapplyMigration);
-        rpc_api.add_sync_command_handler(RpcCommand::Reset);
-        rpc_api.add_sync_command_handler(RpcCommand::CalculateDatamodel);
-        rpc_api.add_sync_command_handler(RpcCommand::CalculateDatabaseSteps);
+        for cmd in AVAILABLE_COMMANDS {
+            rpc_api.add_sync_command_handler(*cmd);
+        }
 
         Ok(rpc_api)
     }
@@ -111,8 +110,8 @@ impl RpcApi {
 
         let connector = match source.connector_type() {
             "sqlite" => SqlMigrationConnector::sqlite(&source.url().value)?,
-            "postgresql" => SqlMigrationConnector::postgres(&source.url().value)?,
-            "mysql" => SqlMigrationConnector::mysql(&source.url().value)?,
+            "postgresql" => SqlMigrationConnector::postgres(&source.url().value, true)?,
+            "mysql" => SqlMigrationConnector::mysql(&source.url().value, true)?,
             x => unimplemented!("Connector {} is not supported yet", x),
         };
 

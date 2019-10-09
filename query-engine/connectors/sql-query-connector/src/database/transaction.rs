@@ -25,5 +25,3 @@ impl<'a, T> SqlConnectorTransaction<'a, T> {
 }
 
 impl<T> TransactionLike for SqlConnectorTransaction<'_, T> where T: ManyRelatedRecordsQueryBuilder {}
-
-

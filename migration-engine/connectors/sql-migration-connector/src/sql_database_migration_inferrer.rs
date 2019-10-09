@@ -1,15 +1,15 @@
-use crate::database_schema_calculator::DatabaseSchemaCalculator;
-use crate::database_schema_differ::{DatabaseSchemaDiff, DatabaseSchemaDiffer};
+use crate::sql_schema_calculator::SqlSchemaCalculator;
+use crate::sql_schema_differ::{SqlSchemaDiff, SqlSchemaDiffer};
 use crate::*;
-use database_introspection::*;
 use datamodel::*;
-use migration_connector::steps::*;
+use migration_connector::steps::MigrationStep;
 use migration_connector::*;
+use sql_schema_describer::*;
 use std::sync::Arc;
 
 pub struct SqlDatabaseMigrationInferrer {
     pub sql_family: SqlFamily,
-    pub introspector: Arc<dyn IntrospectionConnector + Send + Sync + 'static>,
+    pub introspector: Arc<dyn SqlSchemaDescriberBackend + Send + Sync + 'static>,
     pub schema_name: String,
 }
 
@@ -20,8 +20,8 @@ impl DatabaseMigrationInferrer<SqlMigration> for SqlDatabaseMigrationInferrer {
         next: &Datamodel,
         _steps: &Vec<MigrationStep>,
     ) -> ConnectorResult<SqlMigration> {
-        let current_database_schema: DatabaseSchema = self.introspect(&self.schema_name)?;
-        let expected_database_schema = DatabaseSchemaCalculator::calculate(next)?;
+        let current_database_schema: SqlSchema = self.introspect(&self.schema_name)?;
+        let expected_database_schema = SqlSchemaCalculator::calculate(next)?;
         infer(
             &current_database_schema,
             &expected_database_schema,
@@ -32,24 +32,24 @@ impl DatabaseMigrationInferrer<SqlMigration> for SqlDatabaseMigrationInferrer {
 }
 
 impl SqlDatabaseMigrationInferrer {
-    fn introspect(&self, schema: &str) -> SqlResult<DatabaseSchema> {
-        Ok(self.introspector.introspect(&schema)?)
+    fn introspect(&self, schema: &str) -> SqlResult<SqlSchema> {
+        Ok(self.introspector.describe(&schema)?)
     }
 }
 
 fn infer(
-    current_database_schema: &DatabaseSchema,
-    expected_database_schema: &DatabaseSchema,
+    current_database_schema: &SqlSchema,
+    expected_database_schema: &SqlSchema,
     schema_name: &str,
     sql_family: SqlFamily,
 ) -> ConnectorResult<SqlMigration> {
-    let steps = infer_database_migration_steps_and_fix(
+    let (original_steps, corrected_steps) = infer_database_migration_steps_and_fix(
         &current_database_schema,
         &expected_database_schema,
         &schema_name,
         sql_family,
     )?;
-    let rollback = infer_database_migration_steps_and_fix(
+    let (_, rollback) = infer_database_migration_steps_and_fix(
         &expected_database_schema,
         &current_database_schema,
         &schema_name,
@@ -58,31 +58,34 @@ fn infer(
     Ok(SqlMigration {
         before: current_database_schema.clone(),
         after: expected_database_schema.clone(),
-        steps,
+        original_steps,
+        corrected_steps,
         rollback,
     })
 }
 
 fn infer_database_migration_steps_and_fix(
-    from: &DatabaseSchema,
-    to: &DatabaseSchema,
+    from: &SqlSchema,
+    to: &SqlSchema,
     schema_name: &str,
     sql_family: SqlFamily,
-) -> SqlResult<Vec<SqlMigrationStep>> {
-    let diff: DatabaseSchemaDiff = DatabaseSchemaDiffer::diff(&from, &to);
+) -> SqlResult<(Vec<SqlMigrationStep>, Vec<SqlMigrationStep>)> {
+    let diff: SqlSchemaDiff = SqlSchemaDiffer::diff(&from, &to);
     let is_sqlite = sql_family == SqlFamily::Sqlite;
 
-    if is_sqlite {
-        fix_stupid_sqlite(diff, &from, &to, &schema_name)
+    let corrected_steps = if is_sqlite {
+        fix_stupid_sqlite(diff, &from, &to, &schema_name)?
     } else {
         let steps = delay_foreign_key_creation(diff);
-        fix_id_column_type_change(&from, &to, schema_name, steps)
-    }
+        fix_id_column_type_change(&from, &to, schema_name, steps)?
+    };
+
+    Ok((SqlSchemaDiffer::diff(&from, &to).into_steps(), corrected_steps))
 }
 
 fn fix_id_column_type_change(
-    from: &DatabaseSchema,
-    to: &DatabaseSchema,
+    from: &SqlSchema,
+    to: &SqlSchema,
     _schema_name: &str,
     steps: Vec<SqlMigrationStep>,
 ) -> SqlResult<Vec<SqlMigrationStep>> {
@@ -125,7 +128,7 @@ fn fix_id_column_type_change(
             .map(|t| t.name.clone())
             .collect();
         radical_steps.push(SqlMigrationStep::DropTables(DropTables { names: tables_to_drop }));
-        let diff_from_empty: DatabaseSchemaDiff = DatabaseSchemaDiffer::diff(&DatabaseSchema::empty(), &to);
+        let diff_from_empty: SqlSchemaDiff = SqlSchemaDiffer::diff(&SqlSchema::empty(), &to);
         let mut steps_from_empty = delay_foreign_key_creation(diff_from_empty);
         radical_steps.append(&mut steps_from_empty);
 
@@ -139,7 +142,7 @@ fn fix_id_column_type_change(
 // Example: Table A has a reference to Table B and Table B has a reference to Table A.
 // We therefore split the creation of foreign key columns into separate steps when the referenced tables are not existing yet.
 // FIXME: This does not work with SQLite. A required column might get delayed. SQLite then fails with: "Cannot add a NOT NULL column with default value NULL"
-fn delay_foreign_key_creation(mut diff: DatabaseSchemaDiff) -> Vec<SqlMigrationStep> {
+fn delay_foreign_key_creation(mut diff: SqlSchemaDiff) -> Vec<SqlMigrationStep> {
     let names_of_tables_that_get_created: Vec<String> =
         diff.create_tables.iter().map(|t| t.table.name.clone()).collect();
     let mut extra_alter_tables = Vec::new();
@@ -183,9 +186,9 @@ fn delay_foreign_key_creation(mut diff: DatabaseSchemaDiff) -> Vec<SqlMigrationS
 }
 
 fn fix_stupid_sqlite(
-    diff: DatabaseSchemaDiff,
-    current_database_schema: &DatabaseSchema,
-    next_database_schema: &DatabaseSchema,
+    diff: SqlSchemaDiff,
+    current_database_schema: &SqlSchema,
+    next_database_schema: &SqlSchema,
     schema_name: &str,
 ) -> SqlResult<Vec<SqlMigrationStep>> {
     let steps = diff.into_steps();
@@ -194,14 +197,25 @@ fn fix_stupid_sqlite(
     for step in steps {
         match step {
             SqlMigrationStep::AlterTable(ref alter_table) if needs_fix(&alter_table) => {
-                let current_table = current_database_schema.table(&alter_table.table.name)?;
-                let next_table = next_database_schema.table(&alter_table.table.name)?;
-                let mut altered_steps = fix(&alter_table, &current_table, &next_table, &schema_name);
-                result.append(&mut altered_steps);
-                fixed_tables.push(current_table.name.clone());
+                result.extend(sqlite_fix_table(
+                    current_database_schema,
+                    next_database_schema,
+                    &alter_table.table.name,
+                    schema_name,
+                )?);
+                fixed_tables.push(alter_table.table.name.clone());
             }
             SqlMigrationStep::CreateIndex(ref create_index) if fixed_tables.contains(&create_index.table) => {
                 // The fixed alter table step will already create the index
+            }
+            SqlMigrationStep::AlterIndex(AlterIndex { table, .. }) => {
+                result.extend(sqlite_fix_table(
+                    current_database_schema,
+                    next_database_schema,
+                    &table,
+                    schema_name,
+                )?);
+                fixed_tables.push(table.clone());
             }
             x => result.push(x),
         }
@@ -223,7 +237,18 @@ fn needs_fix(alter_table: &AlterTable) -> bool {
     change_that_does_not_work_on_sqlite.is_some()
 }
 
-fn fix(_alter_table: &AlterTable, current: &Table, next: &Table, schema_name: &str) -> Vec<SqlMigrationStep> {
+fn sqlite_fix_table(
+    current_database_schema: &SqlSchema,
+    next_database_schema: &SqlSchema,
+    table_name: &str,
+    schema_name: &str,
+) -> SqlResult<impl Iterator<Item = SqlMigrationStep>> {
+    let current_table = current_database_schema.table(table_name)?;
+    let next_table = next_database_schema.table(table_name)?;
+    Ok(fix(&current_table, &next_table, &schema_name).into_iter())
+}
+
+fn fix(current: &Table, next: &Table, schema_name: &str) -> Vec<SqlMigrationStep> {
     // based on 'Making Other Kinds Of Table Schema Changes' from https://www.sqlite.org/lang_altertable.html
     let name_of_temporary_table = format!("new_{}", next.name.clone());
     let mut temporary_table = next.clone();
@@ -260,6 +285,7 @@ fn fix(_alter_table: &AlterTable, current: &Table, next: &Table, schema_name: &s
             SqlMigrationStep::RawSql { raw: sql.to_string() }
         },
     );
+
     result.push(SqlMigrationStep::DropTable(DropTable {
         name: current.name.clone(),
     }));

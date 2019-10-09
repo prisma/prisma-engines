@@ -1,9 +1,9 @@
 #![allow(non_snake_case)]
 #![allow(unused)]
 mod test_harness;
-use database_introspection::*;
 use pretty_assertions::{assert_eq, assert_ne};
-use sql_migration_connector::SqlFamily;
+use sql_migration_connector::{AlterIndex, DropIndex, CreateIndex, SqlFamily, SqlMigrationStep};
+use sql_schema_describer::*;
 use test_harness::*;
 
 #[test]
@@ -25,7 +25,7 @@ fn adding_a_scalar_field_must_work() {
                 B
             }
         "#;
-        let result = infer_and_apply(api, &dm2);
+        let result = infer_and_apply(api, &dm2).sql_schema;
         let table = result.table_bang("Test");
         table.columns.iter().for_each(|c| assert_eq!(c.is_required(), true));
 
@@ -71,7 +71,7 @@ fn adding_an_optional_field_must_work() {
                 field String?
             }
         "#;
-        let result = infer_and_apply(api, &dm2);
+        let result = infer_and_apply(api, &dm2).sql_schema;
         let column = result.table_bang("Test").column_bang("field");
         assert_eq!(column.is_required(), false);
     });
@@ -85,7 +85,7 @@ fn adding_an_id_field_with_a_special_name_must_work() {
                 specialName String @id @default(cuid())
             }
         "#;
-        let result = infer_and_apply(api, &dm2);
+        let result = infer_and_apply(api, &dm2).sql_schema;
         let column = result.table_bang("Test").column("specialName");
         assert_eq!(column.is_some(), true);
     });
@@ -99,7 +99,7 @@ fn adding_an_id_field_of_type_int_must_work() {
                 myId Int @id
             }
         "#;
-        let result = infer_and_apply(api, &dm2);
+        let result = infer_and_apply(api, &dm2).sql_schema;
         let column = result.table_bang("Test").column_bang("myId");
         match sql_family {
             SqlFamily::Postgres => {
@@ -122,7 +122,7 @@ fn removing_a_scalar_field_must_work() {
                 field String
             }
         "#;
-        let result = infer_and_apply(api, &dm1);
+        let result = infer_and_apply(api, &dm1).sql_schema;
         let column1 = result.table_bang("Test").column("field");
         assert_eq!(column1.is_some(), true);
 
@@ -131,7 +131,7 @@ fn removing_a_scalar_field_must_work() {
                 id String @id @default(cuid())
             }
         "#;
-        let result = infer_and_apply(api, &dm2);
+        let result = infer_and_apply(api, &dm2).sql_schema;
         let column2 = result.table_bang("Test").column("field");
         assert_eq!(column2.is_some(), false);
     });
@@ -146,7 +146,7 @@ fn can_handle_reserved_sql_keywords_for_model_name() {
                 field String
             }
         "#;
-        let result = infer_and_apply(api, &dm1);
+        let result = infer_and_apply(api, &dm1).sql_schema;
         let column = result.table_bang("Group").column_bang("field");
         assert_eq!(column.tpe.family, ColumnTypeFamily::String);
 
@@ -156,7 +156,7 @@ fn can_handle_reserved_sql_keywords_for_model_name() {
                 field Int
             }
         "#;
-        let result = infer_and_apply(api, &dm2);
+        let result = infer_and_apply(api, &dm2).sql_schema;
         let column = result.table_bang("Group").column_bang("field");
         assert_eq!(column.tpe.family, ColumnTypeFamily::Int);
     });
@@ -171,7 +171,7 @@ fn can_handle_reserved_sql_keywords_for_field_name() {
                 Group String
             }
         "#;
-        let result = infer_and_apply(api, &dm1);
+        let result = infer_and_apply(api, &dm1).sql_schema;
         let column = result.table_bang("Test").column_bang("Group");
         assert_eq!(column.tpe.family, ColumnTypeFamily::String);
 
@@ -181,7 +181,7 @@ fn can_handle_reserved_sql_keywords_for_field_name() {
                 Group Int
             }
         "#;
-        let result = infer_and_apply(api, &dm2);
+        let result = infer_and_apply(api, &dm2).sql_schema;
         let column = result.table_bang("Test").column_bang("Group");
         assert_eq!(column.tpe.family, ColumnTypeFamily::Int);
     });
@@ -196,7 +196,7 @@ fn update_type_of_scalar_field_must_work() {
                 field String
             }
         "#;
-        let result = infer_and_apply(api, &dm1);
+        let result = infer_and_apply(api, &dm1).sql_schema;
         let column1 = result.table_bang("Test").column_bang("field");
         assert_eq!(column1.tpe.family, ColumnTypeFamily::String);
 
@@ -206,7 +206,7 @@ fn update_type_of_scalar_field_must_work() {
                 field Int
             }
         "#;
-        let result = infer_and_apply(api, &dm2);
+        let result = infer_and_apply(api, &dm2).sql_schema;
         let column2 = result.table_bang("Test").column_bang("field");
         assert_eq!(column2.tpe.family, ColumnTypeFamily::Int);
     });
@@ -224,7 +224,7 @@ fn changing_the_type_of_an_id_field_must_work() {
                 id Int @id
             }
         "#;
-        let result = infer_and_apply(api, &dm1);
+        let result = infer_and_apply(api, &dm1).sql_schema;
         let table = result.table_bang("A");
         let column = table.column_bang("b");
         assert_eq!(column.tpe.family, ColumnTypeFamily::Int);
@@ -247,7 +247,7 @@ fn changing_the_type_of_an_id_field_must_work() {
                 id String @id @default(cuid())
             }
         "#;
-        let result = infer_and_apply(api, &dm2);
+        let result = infer_and_apply(api, &dm2).sql_schema;
         let table = result.table_bang("A");
         let column = table.column_bang("b");
         assert_eq!(column.tpe.family, ColumnTypeFamily::String);
@@ -272,7 +272,7 @@ fn updating_db_name_of_a_scalar_field_must_work() {
                 field String @map(name:"name1")
             }
         "#;
-        let result = infer_and_apply(api, &dm1);
+        let result = infer_and_apply(api, &dm1).sql_schema;
         assert_eq!(result.table_bang("A").column("name1").is_some(), true);
 
         let dm2 = r#"
@@ -281,7 +281,7 @@ fn updating_db_name_of_a_scalar_field_must_work() {
                 field String @map(name:"name2")
             }
         "#;
-        let result = infer_and_apply(api, &dm2);
+        let result = infer_and_apply(api, &dm2).sql_schema;
         assert_eq!(result.table_bang("A").column("name1").is_some(), false);
         assert_eq!(result.table_bang("A").column("name2").is_some(), true);
     });
@@ -301,7 +301,7 @@ fn changing_a_relation_field_to_a_scalar_field_must_work() {
                 a A // remove this once the implicit back relation field is implemented
             }
         "#;
-        let result = infer_and_apply(api, &dm1);
+        let result = infer_and_apply(api, &dm1).sql_schema;
         let table = result.table_bang("A");
         let column = table.column_bang("b");
         assert_eq!(column.tpe.family, ColumnTypeFamily::Int);
@@ -324,7 +324,7 @@ fn changing_a_relation_field_to_a_scalar_field_must_work() {
                 id Int @id
             }
         "#;
-        let result = infer_and_apply(api, &dm2);
+        let result = infer_and_apply(api, &dm2).sql_schema;
         let table = result.table_bang("A");
         let column = table.column_bang("b");
         assert_eq!(column.tpe.family, ColumnTypeFamily::String);
@@ -344,7 +344,7 @@ fn changing_a_scalar_field_to_a_relation_field_must_work() {
                 id Int @id
             }
         "#;
-        let result = infer_and_apply(api, &dm1);
+        let result = infer_and_apply(api, &dm1).sql_schema;
         let table = result.table_bang("A");
         let column = table.column_bang("b");
         assert_eq!(column.tpe.family, ColumnTypeFamily::String);
@@ -360,7 +360,7 @@ fn changing_a_scalar_field_to_a_relation_field_must_work() {
                 a A // remove this once the implicit back relation field is implemented
             }
         "#;
-        let result = infer_and_apply(api, &dm2);
+        let result = infer_and_apply(api, &dm2).sql_schema;
         let table = result.table_bang("A");
         let column = result.table_bang("A").column_bang("b");
         assert_eq!(column.tpe.family, ColumnTypeFamily::Int);
@@ -390,7 +390,7 @@ fn adding_a_many_to_many_relation_must_result_in_a_prisma_style_relation_table()
                 as A[]
             }
         "#;
-        let result = infer_and_apply(api, &dm1);
+        let result = infer_and_apply(api, &dm1).sql_schema;
         let relation_table = result.table_bang("_AToB");
         println!("{:?}", relation_table.foreign_keys);
         assert_eq!(relation_table.columns.len(), 2);
@@ -434,7 +434,7 @@ fn adding_a_many_to_many_relation_with_custom_name_must_work() {
             }
         "#;
 
-        let result = infer_and_apply(api, &dm1);
+        let result = infer_and_apply(api, &dm1).sql_schema;
         let relation_table = result.table_bang("_my_relation");
         assert_eq!(relation_table.columns.len(), 2);
 
@@ -504,7 +504,7 @@ fn adding_an_inline_relation_must_result_in_a_foreign_key_in_the_model_table() {
                 id Int @id
             }
         "#;
-        let result = dbg!(infer_and_apply(api, &dm1));
+        let result = dbg!(infer_and_apply(api, &dm1).sql_schema);
         let table = result.table_bang("A");
         let column = table.column_bang("b");
         assert_eq!(column.tpe.family, ColumnTypeFamily::Int);
@@ -533,7 +533,7 @@ fn specifying_a_db_name_for_an_inline_relation_must_work() {
                 id Int @id
             }
         "#;
-        let result = infer_and_apply(api, &dm1);
+        let result = infer_and_apply(api, &dm1).sql_schema;
         let table = result.table_bang("A");
         let column = table.column_bang("b_column");
         assert_eq!(column.tpe.family, ColumnTypeFamily::Int);
@@ -562,7 +562,7 @@ fn adding_an_inline_relation_to_a_model_with_an_exotic_id_type() {
                 id String @id @default(cuid())
             }
         "#;
-        let result = dbg!(infer_and_apply(api, &dm1));
+        let result = dbg!(infer_and_apply(api, &dm1).sql_schema);
         let table = result.table_bang("A");
         let column = table.column_bang("b");
         assert_eq!(column.tpe.family, ColumnTypeFamily::String);
@@ -591,7 +591,7 @@ fn removing_an_inline_relation_must_work() {
                 id Int @id
             }
         "#;
-        let result = dbg!(infer_and_apply(api, &dm1));
+        let result = infer_and_apply(api, &dm1).sql_schema;
         let column = result.table_bang("A").column("b");
         assert_eq!(column.is_some(), true);
 
@@ -604,7 +604,7 @@ fn removing_an_inline_relation_must_work() {
                 id Int @id
             }
         "#;
-        let result = dbg!(infer_and_apply(api, &dm2));
+        let result = infer_and_apply(api, &dm2).sql_schema;
         let column = result.table_bang("A").column("b");
         assert_eq!(column.is_some(), false);
     });
@@ -623,7 +623,7 @@ fn moving_an_inline_relation_to_the_other_side_must_work() {
                 id Int @id
             }
         "#;
-        let result = infer_and_apply(api, &dm1);
+        let result = infer_and_apply(api, &dm1).sql_schema;
         let table = result.table_bang("A");
         assert_eq!(
             table.foreign_keys,
@@ -645,7 +645,7 @@ fn moving_an_inline_relation_to_the_other_side_must_work() {
                 a A @relation(references: [id])
             }
         "#;
-        let result = infer_and_apply(api, &dm2);
+        let result = infer_and_apply(api, &dm2).sql_schema;
         let table = result.table_bang("B");
         assert_eq!(
             table.foreign_keys,
@@ -668,13 +668,75 @@ fn adding_a_new_unique_field_must_work() {
                 field String @unique
             }
         "#;
-        let result = infer_and_apply(api, &dm1);
+        let result = infer_and_apply(api, &dm1).sql_schema;
+        let index = result.table_bang("A").indices.iter().find(|i| i.columns == &["field"]);
+        assert!(index.is_some());
+        assert_eq!(index.unwrap().tpe, IndexType::Unique);
+    });
+}
+
+#[test]
+fn adding_new_fields_with_multi_column_unique_must_work() {
+    test_each_connector(|_, api| {
+        let dm1 = r#"
+            model A {
+                id Int @id
+                field String
+                secondField String
+
+                @@unique([field, secondField])
+            }
+        "#;
+        let result = infer_and_apply(api, &dm1).sql_schema;
         let index = result
             .table_bang("A")
             .indices
             .iter()
-            .find(|i| i.columns == vec!["field"]);
-        assert_eq!(index.is_some(), true);
+            .find(|i| i.columns == vec!["field", "secondField"]);
+        assert!(index.is_some());
+        assert_eq!(index.unwrap().tpe, IndexType::Unique);
+    });
+}
+
+#[test]
+fn unique_in_conjunction_with_custom_column_name_must_work() {
+    test_each_connector(|_, api| {
+        let dm1 = r#"
+            model A {
+                id Int @id
+                field String @unique @map("custom_field_name")
+            }
+        "#;
+        let result = infer_and_apply(api, &dm1).sql_schema;
+        let index = result
+            .table_bang("A")
+            .indices
+            .iter()
+            .find(|i| i.columns == &["custom_field_name"]);
+        assert!(index.is_some());
+        assert_eq!(index.unwrap().tpe, IndexType::Unique);
+    });
+}
+
+#[test]
+fn multi_column_unique_in_conjunction_with_custom_column_name_must_work() {
+    test_each_connector(|_, api| {
+        let dm1 = r#"
+            model A {
+                id Int @id
+                field String @map("custom_field_name")
+                secondField String @map("second_custom_field_name")
+
+                @@unique([field, secondField])
+            }
+        "#;
+        let result = infer_and_apply(api, &dm1).sql_schema;
+        let index = result
+            .table_bang("A")
+            .indices
+            .iter()
+            .find(|i| i.columns == &["custom_field_name", "second_custom_field_name"]);
+        assert!(index.is_some());
         assert_eq!(index.unwrap().tpe, IndexType::Unique);
     });
 }
@@ -690,13 +752,13 @@ fn sqlite_must_recreate_indexes() {
                 field String @unique
             }
         "#;
-        let result = infer_and_apply(api, &dm1);
+        let result = infer_and_apply(api, &dm1).sql_schema;
         let index = result
             .table_bang("A")
             .indices
             .iter()
             .find(|i| i.columns == vec!["field"]);
-        assert_eq!(index.is_some(), true);
+        assert!(index.is_some());
         assert_eq!(index.unwrap().tpe, IndexType::Unique);
 
         let dm2 = r#"
@@ -706,20 +768,63 @@ fn sqlite_must_recreate_indexes() {
                 other String
             }
         "#;
-        let result = infer_and_apply(api, &dm2);
+        let result = infer_and_apply(api, &dm2).sql_schema;
         let index = result
             .table_bang("A")
             .indices
             .iter()
             .find(|i| i.columns == vec!["field"]);
-        assert_eq!(index.is_some(), true);
+        assert!(index.is_some());
+        assert_eq!(index.unwrap().tpe, IndexType::Unique);
+    });
+}
+
+#[test]
+fn sqlite_must_recreate_multi_field_indexes() {
+    // SQLite must go through a complicated migration procedure which requires dropping and recreating indexes. This test checks that.
+    // We run them still against each connector.
+    test_each_connector(|_, api| {
+        let dm1 = r#"
+            model A {
+                id Int @id
+                field String
+                secondField Int
+
+                @@unique([field, secondField])
+            }
+        "#;
+        let result = infer_and_apply(api, &dm1).sql_schema;
+        let index = result
+            .table_bang("A")
+            .indices
+            .iter()
+            .find(|i| i.columns == &["field", "secondField"]);
+        assert!(index.is_some());
+        assert_eq!(index.unwrap().tpe, IndexType::Unique);
+
+        let dm2 = r#"
+            model A {
+                id    Int    @id
+                field String
+                secondField Int
+                other String
+
+                @@unique([field, secondField])
+            }
+        "#;
+        let result = infer_and_apply(api, &dm2).sql_schema;
+        let index = result
+            .table_bang("A")
+            .indices
+            .iter()
+            .find(|i| i.columns == &["field", "secondField"]);
+        assert!(index.is_some());
         assert_eq!(index.unwrap().tpe, IndexType::Unique);
     });
 }
 
 #[test]
 fn removing_an_existing_unique_field_must_work() {
-    //    test_only_connector(SqlFamily::Postgres, |_, api| {
     test_each_connector(|_, api| {
         let dm1 = r#"
             model A {
@@ -727,13 +832,13 @@ fn removing_an_existing_unique_field_must_work() {
                 field String @unique
             }
         "#;
-        let result = infer_and_apply(api, &dm1);
+        let result = infer_and_apply(api, &dm1).sql_schema;
         let index = result
             .table_bang("A")
             .indices
             .iter()
             .find(|i| i.columns == vec!["field"]);
-        assert_eq!(index.is_some(), true);
+        assert!(index.is_some());
         assert_eq!(index.unwrap().tpe, IndexType::Unique);
 
         let dm2 = r#"
@@ -741,7 +846,7 @@ fn removing_an_existing_unique_field_must_work() {
                 id    Int    @id
             }
         "#;
-        let result = dbg!(infer_and_apply(api, &dm2));
+        let result = infer_and_apply(api, &dm2).sql_schema;
         let index = result
             .table_bang("A")
             .indices
@@ -760,7 +865,7 @@ fn adding_unique_to_an_existing_field_must_work() {
                 field String
             }
         "#;
-        let result = infer_and_apply(api, &dm1);
+        let result = infer_and_apply(api, &dm1).sql_schema;
         let index = result
             .table_bang("A")
             .indices
@@ -774,20 +879,19 @@ fn adding_unique_to_an_existing_field_must_work() {
                 field String @unique
             }
         "#;
-        let result = infer_and_apply(api, &dm2);
+        let result = infer_and_apply(api, &dm2).sql_schema;
         let index = result
             .table_bang("A")
             .indices
             .iter()
             .find(|i| i.columns == vec!["field"]);
-        assert_eq!(index.is_some(), true);
+        assert!(index.is_some());
         assert_eq!(index.unwrap().tpe, IndexType::Unique);
     });
 }
 
 #[test]
 fn removing_unique_from_an_existing_field_must_work() {
-    //    test_only_connector(SqlFamily::Postgres, |_, api| {
     test_each_connector(|_, api| {
         let dm1 = r#"
             model A {
@@ -795,13 +899,9 @@ fn removing_unique_from_an_existing_field_must_work() {
                 field String @unique
             }
         "#;
-        let result = infer_and_apply(api, &dm1);
-        let index = result
-            .table_bang("A")
-            .indices
-            .iter()
-            .find(|i| i.columns == vec!["field"]);
-        assert_eq!(index.is_some(), true);
+        let result = infer_and_apply(api, &dm1).sql_schema;
+        let index = result.table_bang("A").indices.iter().find(|i| i.columns == &["field"]);
+        assert!(index.is_some());
         assert_eq!(index.unwrap().tpe, IndexType::Unique);
 
         let dm2 = r#"
@@ -810,14 +910,293 @@ fn removing_unique_from_an_existing_field_must_work() {
                 field String
             }
         "#;
-        let result = dbg!(infer_and_apply(api, &dm2));
+        let result = infer_and_apply(api, &dm2).sql_schema;
+        let index = result.table_bang("A").indices.iter().find(|i| i.columns == &["field"]);
+        assert!(!index.is_some());
+    });
+}
+
+#[test]
+fn removing_multi_field_unique_index_must_work() {
+    test_each_connector(|_, api| {
+        let dm1 = r#"
+            model A {
+                id    Int    @id
+                field String
+                secondField Int
+
+                @@unique([field, secondField])
+            }
+        "#;
+        let result = infer_and_apply(api, &dm1).sql_schema;
         let index = result
             .table_bang("A")
             .indices
             .iter()
-            .find(|i| i.columns == vec!["field"]);
-        assert_eq!(index.is_some(), false);
+            .find(|i| i.columns == &["field", "secondField"]);
+        assert!(index.is_some());
+        assert_eq!(index.unwrap().tpe, IndexType::Unique);
+
+        let dm2 = r#"
+            model A {
+                id    Int    @id
+                field String
+                secondField Int
+            }
+        "#;
+        let result = infer_and_apply(api, &dm2).sql_schema;
+        let index = result
+            .table_bang("A")
+            .indices
+            .iter()
+            .find(|i| i.columns == &["field", "secondField"]);
+        assert!(index.is_none());
     });
+}
+
+#[test]
+fn index_renaming_must_work() {
+    test_each_connector(|sql_family, api| {
+        let dm1 = r#"
+            model A {
+                id Int @id
+                field String
+                secondField Int
+
+                @@unique([field, secondField], name: "customName")
+            }
+        "#;
+        let result = infer_and_apply(api, &dm1).sql_schema;
+        let index = result
+            .table_bang("A")
+            .indices
+            .iter()
+            .find(|i| i.name == "customName" && i.columns == &["field", "secondField"]);
+        assert!(index.is_some());
+        assert_eq!(index.unwrap().tpe, IndexType::Unique);
+
+        let dm2 = r#"
+            model A {
+                id Int @id
+                field String
+                secondField Int
+
+                @@unique([field, secondField], name: "customNameA")
+            }
+        "#;
+        let result = infer_and_apply(api, &dm2);
+        let indexes = result
+            .sql_schema
+            .table_bang("A")
+            .indices
+            .iter()
+            .filter(|i| i.columns == &["field", "secondField"] && i.name == "customNameA");
+        assert_eq!(indexes.count(), 1);
+
+        // Test that we are not dropping and recreating the index. Except in SQLite, because there we are.
+        if sql_family != SqlFamily::Sqlite {
+            let expected_steps = vec![SqlMigrationStep::AlterIndex(AlterIndex {
+                table: "A".into(),
+                index_new_name: "customNameA".into(),
+                index_name: "customName".into(),
+            })];
+            let actual_steps = result.sql_migration();
+            assert_eq!(actual_steps, expected_steps);
+        }
+    });
+}
+
+#[test]
+fn index_renaming_must_work_when_renaming_to_default() {
+    test_each_connector(|sql_family, api| {
+        let dm1 = r#"
+            model A {
+                id Int @id
+                field String
+                secondField Int
+
+                @@unique([field, secondField], name: "customName")
+            }
+        "#;
+        let result = infer_and_apply(api, &dm1);
+        let index = result
+            .sql_schema
+            .table_bang("A")
+            .indices
+            .iter()
+            .find(|i| i.columns == &["field", "secondField"]);
+        assert!(index.is_some());
+        assert_eq!(index.unwrap().tpe, IndexType::Unique);
+
+        let dm2 = r#"
+            model A {
+                id Int @id
+                field String
+                secondField Int
+
+                @@unique([field, secondField])
+            }
+        "#;
+        let result = infer_and_apply(api, &dm2);
+        let indexes = result
+            .sql_schema
+            .table_bang("A")
+            .indices
+            .iter()
+            .filter(|i| i.columns == &["field", "secondField"] && i.name == "A.field_secondField");
+        assert_eq!(indexes.count(), 1);
+
+        // Test that we are not dropping and recreating the index. Except in SQLite, because there we are.
+        if sql_family != SqlFamily::Sqlite {
+            let expected_steps = vec![SqlMigrationStep::AlterIndex(AlterIndex {
+                table: "A".into(),
+                index_new_name: "A.field_secondField".into(),
+                index_name: "customName".into(),
+            })];
+            let actual_steps = result.sql_migration();
+            assert_eq!(actual_steps, expected_steps);
+        }
+    });
+}
+
+#[test]
+fn index_renaming_must_work_when_renaming_to_custom() {
+    test_each_connector(|sql_family, api| {
+        let dm1 = r#"
+            model A {
+                id Int @id
+                field String
+                secondField Int
+
+                @@unique([field, secondField])
+            }
+        "#;
+        let result = infer_and_apply(api, &dm1);
+        let index = result
+            .sql_schema
+            .table_bang("A")
+            .indices
+            .iter()
+            .find(|i| i.columns == &["field", "secondField"]);
+        assert!(index.is_some());
+        assert_eq!(index.unwrap().tpe, IndexType::Unique);
+
+        let dm2 = r#"
+            model A {
+                id Int @id
+                field String
+                secondField Int
+
+                @@unique([field, secondField], name: "somethingCustom")
+            }
+        "#;
+        let result = infer_and_apply(api, &dm2);
+        let indexes = result
+            .sql_schema
+            .table_bang("A")
+            .indices
+            .iter()
+            .filter(|i| i.columns == &["field", "secondField"] && i.name == "somethingCustom");
+        assert_eq!(indexes.count(), 1);
+
+        // Test that we are not dropping and recreating the index. Except in SQLite, because there we are.
+        if sql_family != SqlFamily::Sqlite {
+            let expected_steps = vec![SqlMigrationStep::AlterIndex(AlterIndex {
+                table: "A".into(),
+                index_name: "A.field_secondField".into(),
+                index_new_name: "somethingCustom".into(),
+            })];
+            let actual_steps = result.sql_migration();
+            assert_eq!(actual_steps, expected_steps);
+        }
+    });
+}
+
+#[test]
+fn index_updates_with_rename_must_work() {
+    test_each_connector(|sql_family, api| {
+        let dm1 = r#"
+            model A {
+                id Int @id
+                field String
+                secondField Int
+
+                @@unique([field, secondField], name: "customName")
+            }
+        "#;
+        let result = infer_and_apply(api, &dm1).sql_schema;
+        let index = result
+            .table_bang("A")
+            .indices
+            .iter()
+            .find(|i| i.name == "customName" && i.columns == &["field", "secondField"]);
+        assert!(index.is_some());
+        assert_eq!(index.unwrap().tpe, IndexType::Unique);
+
+        let dm2 = r#"
+            model A {
+                id Int @id
+                field String
+                secondField Int
+
+                @@unique([field, id], name: "customNameA")
+            }
+        "#;
+        let result = infer_and_apply(api, &dm2);
+        let indexes = result
+            .sql_schema
+            .table_bang("A")
+            .indices
+            .iter()
+            .filter(|i| i.columns == &["field", "id"] && i.name == "customNameA");
+        assert_eq!(indexes.count(), 1);
+
+        // Test that we are not dropping and recreating the index. Except in SQLite, because there we are.
+        if sql_family != SqlFamily::Sqlite {
+            let expected_steps = vec![
+                SqlMigrationStep::DropIndex(DropIndex {
+                    table: "A".into(),
+                    name: "customName".into(),
+                }),
+                SqlMigrationStep::CreateIndex(CreateIndex {
+                    table: "A".into(),
+                    index: Index {
+                        name: "customNameA".into(),
+                        columns: vec!["field".into(), "id".into()],
+                        tpe: IndexType::Unique, 
+                    },
+                })
+            ];
+            let actual_steps = result.sql_migration();
+            assert_eq!(actual_steps, expected_steps);
+        }
+    });
+}
+
+#[test]
+fn dropping_a_model_with_a_multi_field_unique_index_must_work() {
+    test_each_connector(|_, api| {
+        let dm1 = r#"
+            model A {
+                id Int @id
+                field String
+                secondField Int
+
+                @@unique([field, secondField], name: "customName")
+            }
+        "#;
+        let result = infer_and_apply(api, &dm1).sql_schema;
+        let index = result
+            .table_bang("A")
+            .indices
+            .iter()
+            .find(|i| i.name == "customName" && i.columns == &["field", "secondField"]);
+        assert!(index.is_some());
+        assert_eq!(index.unwrap().tpe, IndexType::Unique);
+
+        let dm2 = r#""#;
+        infer_and_apply(api, &dm2);
+    })
 }
 
 #[test]
@@ -829,33 +1208,27 @@ fn adding_a_scalar_list_for_a_modelwith_id_type_int_must_work() {
                 strings String[]
                 enums Status[]
             }
-            
+
             enum Status {
               OK
               ERROR
             }
         "#;
-        let result = infer_and_apply(api, &dm1);
+        let result = infer_and_apply(api, &dm1).sql_schema;
         let scalar_list_table_for_strings = result.table_bang("A_strings");
         let node_id_column = scalar_list_table_for_strings.column_bang("nodeId");
         assert_eq!(node_id_column.tpe.family, ColumnTypeFamily::Int);
-        if sql_family != SqlFamily::Mysql {
-            // fixme: this does not work in intropsection
-            assert_eq!(
-                scalar_list_table_for_strings.primary_key_columns(),
-                vec!["nodeId", "position"]
-            );
-        }
+        assert_eq!(
+            scalar_list_table_for_strings.primary_key_columns(),
+            vec!["nodeId", "position"]
+        );
         let scalar_list_table_for_enums = result.table_bang("A_enums");
         let node_id_column = scalar_list_table_for_enums.column_bang("nodeId");
         assert_eq!(node_id_column.tpe.family, ColumnTypeFamily::Int);
-        if sql_family != SqlFamily::Mysql {
-            // fixme: this does not work in intropsection
-            assert_eq!(
-                scalar_list_table_for_enums.primary_key_columns(),
-                vec!["nodeId", "position"]
-            );
-        }
+        assert_eq!(
+            scalar_list_table_for_enums.primary_key_columns(),
+            vec!["nodeId", "position"]
+        );
     });
 }
 
@@ -868,7 +1241,7 @@ fn updating_a_model_with_a_scalar_list_to_a_different_id_type_must_work() {
                 strings String[]
             }
         "#;
-        let result = infer_and_apply(api, &dm);
+        let result = infer_and_apply(api, &dm).sql_schema;
         let node_id_column = result.table_bang("A_strings").column_bang("nodeId");
         assert_eq!(node_id_column.tpe.family, ColumnTypeFamily::Int);
 
@@ -878,7 +1251,7 @@ fn updating_a_model_with_a_scalar_list_to_a_different_id_type_must_work() {
                 strings String[]
             }
         "#;
-        let result = infer_and_apply(api, &dm);
+        let result = infer_and_apply(api, &dm).sql_schema;
         let node_id_column = result.table_bang("A_strings").column_bang("nodeId");
         assert_eq!(node_id_column.tpe.family, ColumnTypeFamily::String);
     });
@@ -895,7 +1268,7 @@ fn reserved_sql_key_words_must_work() {
                 childGroups Group[] @relation(name: "ChildGroups")
             }
         "#;
-        let result = infer_and_apply(api, &dm);
+        let result = infer_and_apply(api, &dm).sql_schema;
 
         let table = result.table_bang("Group");
         let relation_column = table.column_bang("parent");
@@ -909,4 +1282,65 @@ fn reserved_sql_key_words_must_work() {
             }]
         );
     });
+}
+
+#[test]
+fn migrations_with_many_to_many_related_models_must_not_recreate_indexes() {
+    // test case for https://github.com/prisma/lift/issues/148
+    test_each_connector(|sql_family, api| {
+        let dm_1 = r#"
+            model User {
+                id        String  @default(cuid()) @id
+            }
+
+            model Profile {
+                id        String  @default(cuid()) @id
+                user      User
+                skills    Skill[]
+            }
+
+            model Skill {
+                id          String  @default(cuid()) @id
+                profiles    Profile[]
+            }
+        "#;
+        let sql_schema = infer_and_apply(api, &dm_1).sql_schema;
+
+        let index = sql_schema
+            .table_bang("_ProfileToSkill")
+            .indices
+            .iter()
+            .find(|index| index.name == "_ProfileToSkill_AB_unique")
+            .expect("index is present");
+        assert_eq!(index.tpe, IndexType::Unique);
+
+        let dm_2 = r#"
+            model User {
+                id        String  @default(cuid()) @id
+                someField String?
+            }
+
+            model Profile {
+                id        String  @default(cuid()) @id
+                user      User
+                skills    Skill[]
+            }
+
+            model Skill {
+                id          String  @default(cuid()) @id
+                profiles    Profile[]
+            }
+        "#;
+
+        let result = infer_and_apply(api, &dm_1);
+        let sql_schema = result.sql_schema;
+
+        let index = sql_schema
+            .table_bang("_ProfileToSkill")
+            .indices
+            .iter()
+            .find(|index| index.name == "_ProfileToSkill_AB_unique")
+            .expect("index is present");
+        assert_eq!(index.tpe, IndexType::Unique);
+    })
 }

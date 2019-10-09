@@ -65,6 +65,15 @@ pub enum SqlError {
 
     #[fail(display = "Database creation error: {}", _0)]
     DatabaseCreationError(&'static str),
+
+    #[fail(display = "Database '{}' does not exist.", db_name)]
+    DatabaseDoesNotExist { db_name: String },
+
+    #[fail(display = "Access denied to database '{}'", db_name)]
+    DatabaseAccessDenied { db_name: String },
+
+    #[fail(display = "Authentication failed for user '{}'", user)]
+    AuthenticationFailed { user: String },
 }
 
 impl From<tokio_postgres::error::Error> for SqlError {
@@ -80,6 +89,9 @@ impl From<SqlError> for ConnectorError {
                 ConnectorError::UniqueConstraintViolation { field_name }
             }
             SqlError::NullConstraintViolation { field_name } => ConnectorError::NullConstraintViolation { field_name },
+            SqlError::DatabaseDoesNotExist { db_name } => ConnectorError::DatabaseDoesNotExist { db_name },
+            SqlError::DatabaseAccessDenied { db_name } => ConnectorError::DatabaseAccessDenied { db_name },
+            SqlError::AuthenticationFailed { user } => ConnectorError::AuthenticationFailed { user },
             SqlError::RecordDoesNotExist => ConnectorError::RecordDoesNotExist,
             SqlError::ColumnDoesNotExist => ConnectorError::ColumnDoesNotExist,
             SqlError::ConnectionError(e) => ConnectorError::ConnectionError(e),
@@ -120,22 +132,28 @@ impl From<SqlError> for ConnectorError {
 impl From<prisma_query::error::Error> for SqlError {
     fn from(e: prisma_query::error::Error) -> Self {
         match e {
-            prisma_query::error::Error::QueryError(e) => SqlError::QueryError(e.into()),
-            prisma_query::error::Error::IoError(e) => SqlError::ConnectionError(e.into()),
-            prisma_query::error::Error::NotFound => SqlError::RecordDoesNotExist,
-            prisma_query::error::Error::InvalidConnectionArguments => SqlError::InvalidConnectionArguments,
+            prisma_query::error::Error::QueryError(e) => Self::QueryError(e.into()),
+            prisma_query::error::Error::IoError(e) => Self::ConnectionError(e.into()),
+            prisma_query::error::Error::NotFound => Self::RecordDoesNotExist,
+            prisma_query::error::Error::InvalidConnectionArguments => Self::InvalidConnectionArguments,
+            prisma_query::error::Error::ConnectTimeout => Self::ConnectionError(e.into()),
+            prisma_query::error::Error::Timeout => Self::ConnectionError(e.into()),
 
             prisma_query::error::Error::UniqueConstraintViolation { field_name } => {
-                SqlError::UniqueConstraintViolation { field_name }
+                Self::UniqueConstraintViolation { field_name }
             }
 
             prisma_query::error::Error::NullConstraintViolation { field_name } => {
-                SqlError::NullConstraintViolation { field_name }
+                Self::NullConstraintViolation { field_name }
             }
 
-            prisma_query::error::Error::ConnectionError(e) => SqlError::ConnectionError(e.into()),
-            prisma_query::error::Error::ColumnReadFailure(e) => SqlError::ColumnReadFailure(e.into()),
-            prisma_query::error::Error::ColumnNotFound(_) => SqlError::ColumnDoesNotExist,
+            prisma_query::error::Error::DatabaseDoesNotExist { db_name } => Self::DatabaseDoesNotExist { db_name },
+            prisma_query::error::Error::DatabaseAccessDenied { db_name } => Self::DatabaseAccessDenied { db_name },
+            prisma_query::error::Error::AuthenticationFailed { user } => Self::AuthenticationFailed { user },
+
+            prisma_query::error::Error::ConnectionError(e) => Self::ConnectionError(e.into()),
+            prisma_query::error::Error::ColumnReadFailure(e) => Self::ColumnReadFailure(e.into()),
+            prisma_query::error::Error::ColumnNotFound(_) => Self::ColumnDoesNotExist,
 
             e @ prisma_query::error::Error::ConversionError(_) => SqlError::ConversionError(e.into()),
             e @ prisma_query::error::Error::ResultIndexOutOfBounds { .. } => SqlError::QueryError(e.into()),
