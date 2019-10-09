@@ -93,14 +93,15 @@ pub struct DirectiveListValidator<T> {
 
 impl<T: 'static> DirectiveListValidator<T> {
     /// Creates a new instance.
-    pub fn new() -> Self {
+    #[allow(unused)]
+    fn new() -> Self {
         DirectiveListValidator {
             known_directives: BTreeMap::new(),
         }
     }
 
     /// Adds a directive validator.
-    pub fn add(&mut self, validator: Box<dyn DirectiveValidator<T>>) {
+    fn add(&mut self, validator: Box<dyn DirectiveValidator<T>>) {
         let name = validator.directive_name();
 
         if self.known_directives.contains_key(name) {
@@ -111,13 +112,14 @@ impl<T: 'static> DirectiveListValidator<T> {
     }
 
     /// Adds a directive validator with a namespace scope.
-    pub fn add_scoped(&mut self, validator: Box<dyn DirectiveValidator<T>>, scope: &str) {
+    fn add_scoped(&mut self, validator: Box<dyn DirectiveValidator<T>>, scope: &str) {
         let boxed: Box<dyn DirectiveValidator<T>> = Box::new(DirectiveScope::new(validator, scope));
         self.add(boxed)
     }
 
     /// Adds all directive validators from the given list.
-    pub fn add_all(&mut self, validators: Vec<Box<dyn DirectiveValidator<T>>>) {
+    #[allow(unused)]
+    fn add_all(&mut self, validators: Vec<Box<dyn DirectiveValidator<T>>>) {
         for validator in validators {
             self.add(validator);
         }

@@ -10,7 +10,8 @@ pub struct ValidationPipeline {
 
 impl ValidationPipeline {
     /// Creates a new instance, with all builtin directives registered.
-    pub fn new() -> Self {
+    #[allow(unused)]
+    fn new() -> Self {
         Self {
             lifter: LiftAstToDml::new(),
             validator: Validator::new(),
