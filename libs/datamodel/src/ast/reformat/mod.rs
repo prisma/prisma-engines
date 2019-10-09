@@ -39,7 +39,7 @@ impl Reformatter {
         Self::reformat_top(&mut top_formatter, &ast.next().unwrap());
     }
 
-    pub fn reformat_top(target: &mut RefCell<Renderer>, token: &Token) {
+    fn reformat_top(target: &mut RefCell<Renderer>, token: &Token) {
         let mut types_table = TableFormat::new();
         let mut types_mode = false;
 
@@ -102,7 +102,7 @@ impl Reformatter {
         }
     }
 
-    pub fn reformat_config_block(target: &mut Renderer, token: &Token) {
+    fn reformat_config_block(target: &mut Renderer, token: &Token) {
         let mut table = TableFormat::new();
         // Switch to skip whitespace in 'datasource xxxx {'
         let mut skip_whitespace = false;
@@ -156,7 +156,7 @@ impl Reformatter {
         target.maybe_end_line();
     }
 
-    pub fn reformat_key_value(target: &mut TableFormat, token: &Token) {
+    fn reformat_key_value(target: &mut TableFormat, token: &Token) {
         for current in token.clone().into_inner() {
             match current.as_rule() {
                 Rule::identifier => {
@@ -176,7 +176,7 @@ impl Reformatter {
         }
     }
 
-    pub fn reformat_model(target: &mut RefCell<Renderer>, token: &Token) {
+    fn reformat_model(target: &mut RefCell<Renderer>, token: &Token) {
         let mut table = RefCell::new(TableFormat::new());
         // Switch to skip whitespace in 'model xxxx {'
         let mut skip_whitespace = false;
@@ -236,7 +236,7 @@ impl Reformatter {
     }
 
     // TODO: This is very similar to model reformating.
-    pub fn reformat_enum(target: &mut RefCell<Renderer>, token: &Token) {
+    fn reformat_enum(target: &mut RefCell<Renderer>, token: &Token) {
         let mut table = TableFormat::new();
         // Switch to skip whitespace in 'enum xxxx {'
         let mut skip_whitespace = false;
@@ -294,7 +294,7 @@ impl Reformatter {
         target.get_mut().maybe_end_line();
     }
 
-    pub fn reformat_field(target: &mut RefCell<TableFormat>, token: &Token) {
+    fn reformat_field(target: &mut RefCell<TableFormat>, token: &Token) {
         let mut identifier = None;
         let mut directives_started = false;
 
@@ -327,7 +327,7 @@ impl Reformatter {
         target.get_mut().maybe_end_line();
     }
 
-    pub fn reformat_type_declaration(target: &mut TableFormat, token: &Token) {
+    fn reformat_type_declaration(target: &mut TableFormat, token: &Token) {
         let mut identifier = None;
         let mut directives_started = false;
 
@@ -364,7 +364,7 @@ impl Reformatter {
         target.maybe_end_line();
     }
 
-    pub fn reformat_field_type(token: &Token) -> String {
+    fn reformat_field_type(token: &Token) -> String {
         let mut builder = StringBuilder::new();
 
         for current in token.clone().into_inner() {
@@ -383,7 +383,7 @@ impl Reformatter {
         builder.to_string()
     }
 
-    pub fn get_identifier(token: &Token) -> String {
+    fn get_identifier(token: &Token) -> String {
         for current in token.clone().into_inner() {
             if let Rule::identifier = current.as_rule() {
                 return current.as_str().to_string();
@@ -393,7 +393,7 @@ impl Reformatter {
         panic!("No identifier found.")
     }
 
-    pub fn reformat_directive(target: &mut dyn LineWriteable, token: &Token, owl: &str) {
+    fn reformat_directive(target: &mut dyn LineWriteable, token: &Token, owl: &str) {
         for current in token.clone().into_inner() {
             match current.as_rule() {
                 Rule::directive_name => {
@@ -412,7 +412,7 @@ impl Reformatter {
         }
     }
 
-    pub fn reformat_directive_args(target: &mut dyn LineWriteable, token: &Token) {
+    fn reformat_directive_args(target: &mut dyn LineWriteable, token: &Token) {
         let mut builder = StringBuilder::new();
 
         for current in token.clone().into_inner() {
@@ -447,7 +447,7 @@ impl Reformatter {
         }
     }
 
-    pub fn reformat_directive_arg(target: &mut dyn LineWriteable, token: &Token) {
+    fn reformat_directive_arg(target: &mut dyn LineWriteable, token: &Token) {
         for current in token.clone().into_inner() {
             match current.as_rule() {
                 Rule::argument_name => {
@@ -465,7 +465,7 @@ impl Reformatter {
         }
     }
 
-    pub fn reformat_arg_value(target: &mut dyn LineWriteable, token: &Token) {
+    fn reformat_arg_value(target: &mut dyn LineWriteable, token: &Token) {
         for current in token.clone().into_inner() {
             match current.as_rule() {
                 Rule::expression => Self::reformat_expression(target, &current),
@@ -480,7 +480,7 @@ impl Reformatter {
     }
 
     /// Parses an expression, given a Pest parser token.
-    pub fn reformat_expression(target: &mut dyn LineWriteable, token: &Token) {
+    fn reformat_expression(target: &mut dyn LineWriteable, token: &Token) {
         for current in token.clone().into_inner() {
             match current.as_rule() {
                 Rule::numeric_literal => target.write(current.as_str()),
@@ -496,7 +496,7 @@ impl Reformatter {
         }
     }
 
-    pub fn reformat_array_expression(target: &mut dyn LineWriteable, token: &Token) {
+    fn reformat_array_expression(target: &mut dyn LineWriteable, token: &Token) {
         target.write("[");
         let mut expr_count = 0;
 
@@ -518,7 +518,7 @@ impl Reformatter {
         target.write("]");
     }
 
-    pub fn reformat_function_expression(target: &mut dyn LineWriteable, token: &Token) {
+    fn reformat_function_expression(target: &mut dyn LineWriteable, token: &Token) {
         let mut expr_count = 0;
 
         for current in token.clone().into_inner() {

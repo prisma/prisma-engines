@@ -40,7 +40,7 @@ impl TableFormat {
         }
     }
 
-    pub fn column_locked_writer(&mut self) -> ColumnLockedWriter {
+    fn column_locked_writer(&mut self) -> ColumnLockedWriter {
         if self.table.is_empty() {
             self.start_new_line();
             self.write("");
@@ -57,7 +57,7 @@ impl TableFormat {
         }
     }
 
-    pub fn interleave(&mut self, text: &str) {
+    fn interleave(&mut self, text: &str) {
         self.table.push(Row::Interleaved(String::from(text)));
         // We've just ended a line.
         self.line_ending = false;
@@ -69,7 +69,7 @@ impl TableFormat {
     }
 
     // Safely appends to the column with the given index.
-    pub fn append_to(&mut self, text: &str, index: usize) {
+    fn append_to(&mut self, text: &str, index: usize) {
         if self.line_ending || self.maybe_new_line {
             self.start_new_line();
             self.line_ending = false;
