@@ -160,7 +160,8 @@ fn handle_one_to_many(
 /// Most complex case as there are plenty of cases involved where we need to make sure
 /// that we don't violate relation requirements.
 ///
-/// The full graph created by this handler looks like this:
+/// The full graph that can be created by this handler looks like this:
+/// (Either [1] or [2] are in the graph at the same time, not both)
 /// ```text
 /// ┌────────────────────────┐
 /// │     Read New Child     │───────┐
@@ -209,10 +210,20 @@ fn handle_one_to_many(
 /// │      Read Result       │
 /// └────────────────────────┘
 /// ```
-/// Where [1] and [2] are checks inserted into the graph based on the requirements of the relation
-/// connecting the parent and child models.
+/// Where [1] and [2] are checks and disconnects inserted into the graph based
+/// on the requirements of the relation connecting the parent and child models.
 ///
+/// [1]: Checks and disconnects an existing parent. This block is necessary if:
+/// - The parent side is required, to make sure that a connect does not violate those requirements
+///   when disconnecting an already connected parent.
+/// - The relation is inlined on the parent record. Even if the parent side is not required, we then need
+///   to update the previous parent to not point to the child anymore ("disconnect").
 ///
+/// [2]: Checks and disconnects an existing child. This block is necessary if the parent is not a create and:
+/// - The child side is required, to make sure that a connect does not violate those requirements
+///   when disconnecting an already connected child.
+/// - The relation is inlined on the child record. Even if the child side is not required, we then need
+///   to update the previous child to not point to the parent anymore ("disconnect").
 fn handle_one_to_one(
     graph: &mut QueryGraph,
     parent_node: NodeRef,
