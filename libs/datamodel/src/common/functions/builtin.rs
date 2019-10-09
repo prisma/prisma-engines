@@ -38,6 +38,7 @@ impl Functional for EnvFunctional {
 }
 
 /// Shallow implementation for trivial server side functionals.
+#[allow(unused)]
 pub struct ServerSideTrivialFunctional {
     // Needed for const initializer.
     pub(crate) name: &'static str,
@@ -45,6 +46,7 @@ pub struct ServerSideTrivialFunctional {
 }
 
 impl ServerSideTrivialFunctional {
+    #[allow(unused)]
     pub fn new(name: &'static str, return_type: PrismaType) -> ServerSideTrivialFunctional {
         ServerSideTrivialFunctional { name, return_type }
     }

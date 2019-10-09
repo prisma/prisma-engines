@@ -40,6 +40,8 @@ impl TableFormat {
         }
     }
 
+    // TODO: make a decision on whether we can remove this once i understand what this is
+    #[allow(unused)]
     fn column_locked_writer(&mut self) -> ColumnLockedWriter {
         if self.table.is_empty() {
             self.start_new_line();

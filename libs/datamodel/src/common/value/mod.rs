@@ -77,11 +77,6 @@ impl ValueValidator {
         }
     }
 
-    /// The wrapped value.
-    pub fn value(&self) -> &MaybeExpression {
-        &self.value
-    }
-
     /// Attempts to parse the wrapped value
     /// to a given prisma type.
     pub fn as_type(&self, scalar_type: PrismaType) -> Result<dml::Value, ValidationError> {
