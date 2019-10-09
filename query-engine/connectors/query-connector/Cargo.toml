@@ -1,5 +1,5 @@
 [package]
-name = "connector"
+name = "query-connector"
 version = "0.1.0"
 authors = []
 edition = "2018"
