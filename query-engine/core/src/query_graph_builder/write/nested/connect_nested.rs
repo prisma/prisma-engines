@@ -9,7 +9,7 @@ use std::sync::Arc;
 
 /// Handles nested connect cases.
 /// The resulting graph can take multiple forms, based on the relation type to the parent model.
-/// Information on thte graph shapes can be found on the individual handlers.
+/// Information on the graph shapes can be found on the individual handlers.
 pub fn connect_nested_connect(
     graph: &mut QueryGraph,
     parent_node: NodeRef,
