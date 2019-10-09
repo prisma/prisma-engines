@@ -5,7 +5,7 @@ use crate::{
     ArgumentListLookup, ParsedField, ParsedInputMap, ReadOneRecordBuilder,
 };
 use connector::filter::{Filter, RecordFinder};
-use prisma_models::{self as models, ModelRef, PrismaArgs, PrismaValue};
+use prisma_models::ModelRef;
 use std::{convert::TryInto, sync::Arc};
 use write_arguments::*;
 

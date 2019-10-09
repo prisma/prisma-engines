@@ -1,10 +1,11 @@
 use crate::{
     query_ast::*,
-    query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
+    query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency, Flow},
     ParsedInputValue,
+    QueryGraphBuilderError,
 };
 use connector::{filter::RecordFinder, QueryArguments};
-use prisma_models::{ModelRef, PrismaArgs, RelationFieldRef, SelectedFields};
+use prisma_models::{ModelRef, PrismaArgs, RelationFieldRef, SelectedFields, PrismaValue};
 use std::{convert::TryInto, sync::Arc};
 
 /// Coerces single values (`ParsedInputValue::Single` and `ParsedInputValue::Map`) into a vector.
@@ -95,11 +96,7 @@ pub fn coerce_vec(val: ParsedInputValue) -> Vec<ParsedInputValue> {
 /// ## Return values
 ///
 /// Returns (parent `NodeRef`, child `NodeRef`, relation field on parent `RelationFieldRef`) for convenience.
-pub fn swap_nodes(
-    graph: &mut QueryGraph,
-    parent_node: NodeRef,
-    child_node: NodeRef,
-) -> (NodeRef, NodeRef) {
+pub fn swap_nodes(graph: &mut QueryGraph, parent_node: NodeRef, child_node: NodeRef) -> (NodeRef, NodeRef) {
     let parent_edges = graph.incoming_edges(&parent_node);
     for parent_edge in parent_edges {
         let parent_of_parent_node = graph.edge_source(&parent_edge);
@@ -216,4 +213,100 @@ pub fn update_record_node_placeholder(
     };
 
     graph.create_node(Query::Write(WriteQuery::UpdateRecord(ur)))
+}
+
+/// Inserts checks and disconnects for existing models for a 1:1 relation.
+/// Expects that the parent node returns a valid ID for the model the `parent_relation_field` is located on.
+///
+/// Params:
+/// `parent_node`: Node that provides the parent id for the find query and where the checks are appended to in the graph.
+/// `parent_relation_field`: Field on the parent model to find children.
+///
+/// Todo: This function is virtually identical to the existing child check. Consolidate, if possible.
+///
+/// The elements added to the graph are all except `Append Node`:
+/// ```text
+/// ┌────────────────────────┐
+/// │      Parent Node       │
+/// └────────────────────────┘
+///              │
+///              ▼
+/// ┌────────────────────────┐
+/// │      Read related      │──┐
+/// └────────────────────────┘  │
+///              │              │
+///              ▼              │(Fail on p > 0 if parent
+/// ┌────────────────────────┐  │     side required)
+/// │ If p > 0 && p. inlined │  │
+/// └────────────────────────┘  │
+///         then │              │
+///              ▼              │
+/// ┌────────────────────────┐  │
+/// │    Update ex. model    │◀─┘
+/// └────────────────────────┘
+/// ```
+///
+/// We only need to actually update ("disconnect") the existing model if
+/// the relation is also inlined on that models side, so we put that check into the if flow.
+pub fn insert_existing_1to1_related_model_checks(
+    graph: &mut QueryGraph,
+    parent_node: &NodeRef,
+    parent_relation_field: &RelationFieldRef,
+) {
+    let parent_model = parent_relation_field.model();
+    let parent_model_id_field = parent_model.fields().id();
+    let parent_side_required = parent_relation_field.is_required;
+    let relation_inlined_parent = parent_relation_field.relation_is_inlined_in_parent();
+    let rf = Arc::clone(&parent_relation_field);
+
+    // Now check and disconnect the existing model, if necessary.
+    let read_existing_parent_query_node =
+        insert_find_children_by_parent_node(graph, &parent_node, &parent_relation_field, None);
+
+    // If the parent side is required, we also fail during runtime before disconnecting, as that would violate the parent relation side.
+    let update_existing_parent_node = update_record_node_placeholder(graph, None, parent_model);
+    let relation_field_name = parent_relation_field.name.clone();
+    let if_node = graph.create_node(Flow::default_if());
+
+    graph.create_edge(
+        &read_existing_parent_query_node,
+        &if_node,
+        QueryGraphDependency::ParentIds(Box::new(move |node, parent_ids| {
+            if let Node::Flow(Flow::If(_)) = node {
+                // If the relation is inlined in the parent, we need to update the old parent and null out the relation (i.e. "disconnect").
+                Ok(Node::Flow(Flow::If(Box::new(move || {
+                    relation_inlined_parent && !parent_ids.is_empty()
+                }))))
+            } else {
+                unreachable!()
+            }
+        })),
+    );
+
+    graph.create_edge(&if_node, &update_existing_parent_node, QueryGraphDependency::Then);
+    graph.create_edge(&read_existing_parent_query_node, &update_existing_parent_node, QueryGraphDependency::ParentIds(Box::new(move |mut child_node, mut parent_ids| {
+            // If the parent requires the connection, we need to make sure that there isn't a parent already connected
+            // to the existing child, as that would violate the other parent's relation side.
+            if parent_ids.len() > 0 && parent_side_required {
+                return Err(QueryGraphBuilderError::RelationViolation(rf.into()));
+            }
+
+            // This has to succeed or the if-then node wouldn't trigger.
+            let parent_id = match parent_ids.pop() {
+                Some(pid) => Ok(pid),
+                None => Err(QueryGraphBuilderError::AssertionError(format!("[Query Graph] Expected a valid parent ID to be present for a nested connect on a one-to-one relation, updating previous parent."))),
+            }?;
+
+            let finder = RecordFinder {
+                field: parent_model_id_field,
+                value: parent_id,
+            };
+
+            if let Node::Query(Query::Write(ref mut wq)) = child_node {
+                wq.inject_record_finder(finder);
+                wq.inject_non_list_arg(relation_field_name, PrismaValue::Null);
+            }
+
+            Ok(child_node)
+        })));
 }
