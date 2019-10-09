@@ -7,7 +7,6 @@ use crate::{
 /// Helper for validating a datamodel.
 ///
 /// When validating, we check if the datamodel is valid, and generate errors otherwise.
-#[derive(Default)]
 pub struct Validator {}
 
 /// State error message. Seeing this error means something went really wrong internally. It's the datamodel equivalent of a bluescreen.
@@ -16,7 +15,7 @@ const STATE_ERROR: &str = "Failed lookup of model, field or optional property du
 impl Validator {
     /// Creates a new instance, with all builtin directives registered.
     pub fn new() -> Validator {
-        Self::default()
+        Self {}
     }
 
     /// Creates a new instance, with all builtin directives and
@@ -24,7 +23,7 @@ impl Validator {
     ///
     /// The directives defined by the given sources will be namespaced.
     pub fn with_sources(_sources: &[Box<dyn configuration::Source>]) -> Validator {
-        Self::default()
+        Self::new()
     }
 
     pub fn validate(&self, ast_schema: &ast::Datamodel, schema: &mut dml::Datamodel) -> Result<(), ErrorCollection> {

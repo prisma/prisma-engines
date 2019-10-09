@@ -87,7 +87,6 @@ impl<T> DirectiveValidator<T> for DirectiveScope<T> {
 
 /// Struct which holds a list of directive validators and automatically
 /// picks the right one for each directive in the given object.
-#[derive(Default)]
 pub struct DirectiveListValidator<T> {
     known_directives: BTreeMap<String, Box<dyn DirectiveValidator<T>>>,
 }

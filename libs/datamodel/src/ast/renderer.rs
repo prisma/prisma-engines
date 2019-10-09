@@ -143,7 +143,7 @@ impl<'a> Renderer<'a> {
 
         // Attributes
         if !field.directives.is_empty() {
-            let mut attributes_builder = StringBuilder::default();
+            let mut attributes_builder = StringBuilder::new();
 
             for directive in &field.directives {
                 Self::render_field_directive(&mut attributes_builder, &directive);
@@ -218,7 +218,7 @@ impl<'a> Renderer<'a> {
 
         // Type
         {
-            let mut type_builder = StringBuilder::default();
+            let mut type_builder = StringBuilder::new();
 
             type_builder.write(&field.field_type.name);
             Self::render_field_arity(&mut type_builder, &field.arity);
@@ -228,7 +228,7 @@ impl<'a> Renderer<'a> {
 
         // Attributes
         if !field.directives.is_empty() {
-            let mut attributes_builder = StringBuilder::default();
+            let mut attributes_builder = StringBuilder::new();
 
             for directive in &field.directives {
                 attributes_builder.write(&" ");
@@ -292,7 +292,7 @@ impl<'a> Renderer<'a> {
     }
 
     pub fn render_value_to_string(val: &ast::Value) -> String {
-        let mut builder = StringBuilder::default();
+        let mut builder = StringBuilder::new();
         Self::render_value(&mut builder, val);
         builder.to_string()
     }

@@ -1,12 +1,11 @@
 use super::{SqliteSource, SQLITE_SOURCE_NAME};
 use crate::{common::argument::Arguments, configuration::*, errors::ValidationError};
 
-#[derive(Default)]
 pub struct SqliteSourceDefinition {}
 
 impl SqliteSourceDefinition {
     pub fn new() -> Self {
-        Self::default()
+        Self {}
     }
 }
 

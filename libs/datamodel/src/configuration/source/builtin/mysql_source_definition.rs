@@ -1,12 +1,11 @@
 use super::{MySqlSource, MYSQL_SOURCE_NAME};
 use crate::{common::argument::Arguments, configuration::*, errors::ValidationError};
 
-#[derive(Default)]
 pub struct MySqlSourceDefinition {}
 
 impl MySqlSourceDefinition {
     pub fn new() -> Self {
-        Self::default()
+        Self {}
     }
 }
 

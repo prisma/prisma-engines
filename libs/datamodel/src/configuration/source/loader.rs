@@ -5,7 +5,6 @@ use crate::errors::{ErrorCollection, ValidationError};
 use crate::StringFromEnvVar;
 
 /// Helper struct to load and validate source configuration blocks.
-#[derive(Default)]
 pub struct SourceLoader {
     source_declarations: Vec<Box<dyn SourceDefinition>>,
 }
@@ -13,7 +12,9 @@ pub struct SourceLoader {
 impl SourceLoader {
     /// Creates a new, empty source loader.
     pub fn new() -> Self {
-        Self::default()
+        Self {
+            source_declarations: Vec::new(),
+        }
     }
 
     /// Adds a source definition to this loader.

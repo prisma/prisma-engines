@@ -365,7 +365,7 @@ impl Reformatter {
     }
 
     pub fn reformat_field_type(token: &Token) -> String {
-        let mut builder = StringBuilder::default();
+        let mut builder = StringBuilder::new();
 
         for current in token.clone().into_inner() {
             builder.write(&Self::get_identifier(&current));
@@ -386,7 +386,7 @@ impl Reformatter {
     pub fn get_identifier(token: &Token) -> String {
         for current in token.clone().into_inner() {
             if let Rule::identifier = current.as_rule() {
-                return current.as_str().to_string()
+                return current.as_str().to_string();
             }
         }
 
@@ -413,7 +413,7 @@ impl Reformatter {
     }
 
     pub fn reformat_directive_args(target: &mut dyn LineWriteable, token: &Token) {
-        let mut builder = StringBuilder::default();
+        let mut builder = StringBuilder::new();
 
         for current in token.clone().into_inner() {
             match current.as_rule() {

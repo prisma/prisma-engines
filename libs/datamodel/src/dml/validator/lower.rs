@@ -7,18 +7,12 @@ pub struct LowerDmlToAst {
     directives: DirectiveBox,
 }
 
-impl Default for LowerDmlToAst {
-    fn default() -> Self {
-        Self {
-            directives: DirectiveBox::new(),
-        }
-    }
-}
-
 impl LowerDmlToAst {
     /// Creates a new instance, with all builtin directives registered.
     pub fn new() -> Self {
-        Self::default()
+        Self {
+            directives: DirectiveBox::new(),
+        }
     }
 
     /// Creates a new instance, with all builtin directives and

@@ -5,13 +5,12 @@ use crate::{ast, common::names::*, configuration, dml, errors::ErrorCollection};
 ///
 /// When standardsing, datamodel will be made consistent.
 /// Implicit back relation fields, relation names and `to_fields` will be generated.
-#[derive(Default)]
 pub struct Standardiser {}
 
 impl Standardiser {
     /// Creates a new instance, with all builtin directives registered.
     pub fn new() -> Self {
-        Self::default()
+        Standardiser {}
     }
 
     /// Creates a new instance, with all builtin directives and
@@ -19,7 +18,7 @@ impl Standardiser {
     ///
     /// The directives defined by the given sources will be namespaced.
     pub fn with_sources(_sources: &[Box<dyn configuration::Source>]) -> Standardiser {
-        Standardiser {}
+        Self::new()
     }
 
     pub fn standardise(&self, ast_schema: &ast::Datamodel, schema: &mut dml::Datamodel) -> Result<(), ErrorCollection> {

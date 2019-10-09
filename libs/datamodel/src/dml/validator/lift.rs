@@ -16,18 +16,12 @@ pub struct LiftAstToDml {
     directives: DirectiveBox,
 }
 
-impl Default for LiftAstToDml {
-    fn default() -> Self {
-        Self {
-            directives: DirectiveBox::new(),
-        }
-    }
-}
-
 impl LiftAstToDml {
     /// Creates a new instance, with all builtin directives registered.
     pub fn new() -> Self {
-        Self::default()
+        Self {
+            directives: DirectiveBox::new(),
+        }
     }
 
     /// Creates a new instance, with all builtin directives and
