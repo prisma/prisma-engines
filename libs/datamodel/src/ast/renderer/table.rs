@@ -1,5 +1,5 @@
-use super::renderer::LineWriteable;
-use super::string_builder::StringBuilder;
+use super::LineWriteable;
+use super::StringBuilder;
 use std::cmp::max;
 
 const COLUMN_SPACING: usize = 1;

@@ -1,6 +1,10 @@
-use super::string_builder::StringBuilder;
-use super::table::TableFormat;
+mod string_builder;
+mod table;
+
 use crate::ast;
+
+pub use string_builder::StringBuilder;
+pub use table::TableFormat;
 
 pub trait LineWriteable {
     fn write(&mut self, param: &str);

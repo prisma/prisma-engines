@@ -45,8 +45,6 @@ macro_rules! match_first (
 // Lib exports.
 
 pub mod ast;
-pub use ast::parser;
-pub use ast::renderer;
 pub mod dml;
 pub use dml::*;
 pub mod common;
@@ -79,7 +77,7 @@ pub fn parse_with_plugins(
     datamodel_string: &str,
     source_definitions: Vec<Box<dyn configuration::SourceDefinition>>,
 ) -> Result<Datamodel, error::ErrorCollection> {
-    let ast = parser::parse(datamodel_string)?;
+    let ast = ast::parser::parse(datamodel_string)?;
     let mut source_loader = SourceLoader::new();
     for source in get_builtin_sources() {
         source_loader.add_source_definition(source);
@@ -114,7 +112,7 @@ pub fn load_data_source_configuration_with_plugins(
     datamodel_string: &str,
     source_definitions: Vec<Box<dyn configuration::SourceDefinition>>,
 ) -> Result<Vec<Box<dyn Source>>, error::ErrorCollection> {
-    let ast = parser::parse(datamodel_string)?;
+    let ast = ast::parser::parse(datamodel_string)?;
     let mut source_loader = SourceLoader::new();
     for source in get_builtin_sources() {
         source_loader.add_source_definition(source);
@@ -130,7 +128,7 @@ pub fn load_configuration_with_plugins(
     datamodel_string: &str,
     source_definitions: Vec<Box<dyn configuration::SourceDefinition>>,
 ) -> Result<Configuration, error::ErrorCollection> {
-    let ast = parser::parse(datamodel_string)?;
+    let ast = ast::parser::parse(datamodel_string)?;
 
     let mut source_loader = SourceLoader::new();
     for source in get_builtin_sources() {
@@ -189,12 +187,12 @@ pub fn parse_with_formatted_error(datamodel_string: &str, file_name: &str) -> Re
 
 /// Parses a datamodel string to an AST. For internal use only.
 pub fn parse_to_ast(datamodel_string: &str) -> Result<ast::Datamodel, error::ErrorCollection> {
-    parser::parse(datamodel_string)
+    ast::parser::parse(datamodel_string)
 }
 
 /// Renders an datamodel AST to a stream as datamodel string. For internal use only.
 pub fn render_ast_to(stream: &mut dyn std::io::Write, datamodel: &ast::Datamodel, ident_width: usize) {
-    let mut renderer = renderer::Renderer::new(stream, ident_width);
+    let mut renderer = ast::renderer::Renderer::new(stream, ident_width);
     renderer.render(datamodel);
 }
 

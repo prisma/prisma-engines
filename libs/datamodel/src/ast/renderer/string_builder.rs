@@ -1,4 +1,4 @@
-use super::renderer::LineWriteable;
+use super::LineWriteable;
 
 pub struct StringBuilder {
     buffer: Vec<String>,
