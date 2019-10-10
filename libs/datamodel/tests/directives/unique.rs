@@ -1,4 +1,4 @@
-use datamodel::{ast::Span, error::*, render_to_string, IndexDefinition, IndexType};
+use datamodel::{ast::Span, error::*, render_datamodel_to_string, IndexDefinition, IndexType};
 
 use crate::common::*;
 
@@ -105,5 +105,5 @@ fn unique_directives_must_serialize_to_valid_dml() {
     "#;
     let schema = parse(dml);
 
-    assert!(datamodel::parse(&render_to_string(&schema).unwrap()).is_ok());
+    assert!(datamodel::parse(&render_datamodel_to_string(&schema).unwrap()).is_ok());
 }

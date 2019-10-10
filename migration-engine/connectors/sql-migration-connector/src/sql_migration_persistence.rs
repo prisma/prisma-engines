@@ -97,7 +97,7 @@ impl MigrationPersistence for SqlMigrationPersistence {
         let model_steps_json = serde_json::to_string(&migration.datamodel_steps).unwrap();
         let database_migration_json = serde_json::to_string(&migration.database_migration).unwrap();
         let errors_json = serde_json::to_string(&migration.errors).unwrap();
-        let serialized_datamodel = datamodel::render(&migration.datamodel).unwrap();
+        let serialized_datamodel = datamodel::render_datamodel_to_string(&migration.datamodel).unwrap();
 
         let insert = Insert::single_into(self.table())
             .value(NAME_COLUMN, migration.name)

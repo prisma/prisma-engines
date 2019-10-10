@@ -15,7 +15,7 @@ impl Precheck {
         let mut sources_checker = DuplicateChecker::new();
         let mut generators_checker = DuplicateChecker::new();
 
-        for top in &datamodel.models {
+        for top in &datamodel.tops {
             let error_fn = |existing: &ast::Top| {
                 DatamodelError::new_duplicate_top_error(
                     top.name(),

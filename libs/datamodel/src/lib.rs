@@ -179,58 +179,55 @@ pub fn parse_to_ast(datamodel_string: &str) -> Result<ast::SchemaAst, error::Err
 //  ************** RENDERING FUNCTIONS **************
 //
 
-/// Renders an datamodel AST to a stream as datamodel string. For internal use only.
-pub fn render_ast_to(stream: &mut dyn std::io::Write, datamodel: &ast::SchemaAst, ident_width: usize) {
-    let mut renderer = ast::renderer::Renderer::new(stream, ident_width);
-    renderer.render(datamodel);
-}
-
-/// Renders a datamodel to a stream as datamodel string into the stream.
-pub fn render_to(stream: &mut dyn std::io::Write, datamodel: &dml::Datamodel) -> Result<(), error::ErrorCollection> {
-    let lowered = validator::LowerDmlToAst::new().lower(datamodel)?;
-    render_ast_to(stream, &lowered, 2);
-    Ok(())
-}
-
-pub fn render_to_string(datamodel: &dml::Datamodel) -> Result<String, error::ErrorCollection> {
+/// Renders to a return string.
+pub fn render_datamodel_to_string(datamodel: &dml::Datamodel) -> Result<String, error::ErrorCollection> {
     let mut writable_string = common::WritableString::new();
-    render_to(&mut writable_string, datamodel)?;
+    render_datamodel_to(&mut writable_string, datamodel)?;
     Ok(writable_string.into())
 }
 
-/// Renders an datamodel AST to a datamodel string. For internal use only.
-pub fn render_ast(datamodel: &ast::SchemaAst) -> String {
-    let mut buffer = std::io::Cursor::new(Vec::<u8>::new());
-    render_ast_to(&mut buffer, datamodel, 2);
-    String::from_utf8(buffer.into_inner()).unwrap()
-}
-
-/// Renders a datamodel to a datamodel string.
-pub fn render(datamodel: &dml::Datamodel) -> Result<String, error::ErrorCollection> {
-    let lowered = validator::LowerDmlToAst::new().lower(datamodel)?;
-    Ok(render_ast(&lowered))
-}
-
-/// Renders a datamodel, generators and sources to a stream as datamodel string.
-pub fn render_with_config_to(
+/// Renders as a string into the stream.
+pub fn render_datamodel_to(
     stream: &mut dyn std::io::Write,
     datamodel: &dml::Datamodel,
-    config: Configuration,
+) -> Result<(), error::ErrorCollection> {
+    let lowered = validator::LowerDmlToAst::new().lower(datamodel)?;
+    render_schema_ast_to(stream, &lowered, 2);
+    Ok(())
+}
+
+/// Renders a datamodel, sources and generators to a string.
+pub fn render_datamodel_and_config_to_string(
+    datamodel: &dml::Datamodel,
+    config: &configuration::Configuration,
+) -> Result<String, error::ErrorCollection> {
+    let mut writable_string = common::WritableString::new();
+    render_datamodel_and_config_to(&mut writable_string, datamodel, config)?;
+    Ok(writable_string.into())
+}
+
+/// Renders a datamodel, generators and sources to a stream as a string.
+pub fn render_datamodel_and_config_to(
+    stream: &mut dyn std::io::Write,
+    datamodel: &dml::Datamodel,
+    config: &configuration::Configuration,
 ) -> Result<(), error::ErrorCollection> {
     let mut lowered = validator::LowerDmlToAst::new().lower(datamodel)?;
     SourceSerializer::add_sources_to_ast(&config.datasources, &mut lowered);
     GeneratorLoader::add_generators_to_ast(&config.generators, &mut lowered);
-    render_ast_to(stream, &lowered, 2);
+    render_schema_ast_to(stream, &lowered, 2);
     Ok(())
 }
 
-/// Renders a datamodel, sources and generators to a datamodel string.
-pub fn render_with_config(
-    datamodel: &dml::Datamodel,
-    config: &configuration::Configuration,
-) -> Result<String, error::ErrorCollection> {
-    let mut lowered = validator::LowerDmlToAst::new().lower(datamodel)?;
-    SourceSerializer::add_sources_to_ast(&config.datasources, &mut lowered);
-    GeneratorLoader::add_generators_to_ast(&config.generators, &mut lowered);
-    Ok(render_ast(&lowered))
+/// Renders an datamodel AST to a datamodel string. For internal use in tests only.
+pub fn render_schema_ast_to_string(schema: &ast::SchemaAst) -> String {
+    let mut writable_string = common::WritableString::new();
+    render_schema_ast_to(&mut writable_string, schema, 2);
+    writable_string.into()
+}
+
+/// Renders as a string into the stream.
+fn render_schema_ast_to(stream: &mut dyn std::io::Write, schema: &ast::SchemaAst, ident_width: usize) {
+    let mut renderer = ast::renderer::Renderer::new(stream, ident_width);
+    renderer.render(schema);
 }

@@ -12,9 +12,9 @@ impl SourceSerializer {
         }
 
         // Prepend sources.
-        models.append(&mut ast_datamodel.models);
+        models.append(&mut ast_datamodel.tops);
 
-        ast_datamodel.models = models;
+        ast_datamodel.tops = models;
     }
 
     fn source_to_ast(source: &dyn Source) -> ast::SourceConfig {

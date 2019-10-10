@@ -26,7 +26,7 @@ impl<'a> MigrationCommand<'a> for CalculateDatamodelCommand<'a> {
         let datamodel = engine.datamodel_calculator().infer(&base_datamodel, &self.input.steps);
 
         Ok(CalculateDatamodelOutput {
-            datamodel: datamodel::render(&datamodel).unwrap(),
+            datamodel: datamodel::render_datamodel_to_string(&datamodel).unwrap(),
         })
     }
 }

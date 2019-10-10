@@ -13,7 +13,7 @@ impl GeneratorLoader {
         let mut generators: Vec<Generator> = vec![];
         let mut errors = ErrorCollection::new();
 
-        for ast_obj in &ast_schema.models {
+        for ast_obj in &ast_schema.tops {
             if let ast::Top::Generator(gen) = ast_obj {
                 match Self::lift_generator(&gen) {
                     Ok(loaded_gen) => generators.push(loaded_gen),
@@ -77,9 +77,9 @@ impl GeneratorLoader {
         }
 
         // Prepend generstors.
-        models.append(&mut ast_datamodel.models);
+        models.append(&mut ast_datamodel.tops);
 
-        ast_datamodel.models = models;
+        ast_datamodel.tops = models;
     }
 
     fn lower_generator(generator: &Generator) -> ast::GeneratorConfig {

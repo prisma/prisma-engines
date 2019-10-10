@@ -1,4 +1,7 @@
-use crate::{data_model_loader::{load_data_model_components, load_configuration}, dmmf, PrismaResult};
+use crate::{
+    data_model_loader::{load_configuration, load_data_model_components},
+    dmmf, PrismaResult,
+};
 use clap::ArgMatches;
 use core::{
     schema::{QuerySchemaBuilder, QuerySchemaRef, SupportedCapabilities},
@@ -80,7 +83,7 @@ impl CliCommand {
     fn dmmf_to_dml(input: DmmfToDmlInput) -> PrismaResult<()> {
         let datamodel = datamodel::dmmf::parse_from_dmmf(&input.dmmf);
         let config = datamodel::config_from_mcf_json_value(input.config);
-        let serialized = datamodel::render_with_config(&datamodel, &config)?;
+        let serialized = datamodel::render_datamodel_and_config_to_string(&datamodel, &config)?;
 
         println!("{}", serialized);
 

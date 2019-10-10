@@ -38,7 +38,7 @@ impl LiftAstToDml {
         let mut schema = dml::Datamodel::new();
         let mut errors = ErrorCollection::new();
 
-        for ast_obj in &ast_schema.models {
+        for ast_obj in &ast_schema.tops {
             match ast_obj {
                 ast::Top::Enum(en) => match self.lift_enum(&en) {
                     Ok(en) => schema.add_enum(en),

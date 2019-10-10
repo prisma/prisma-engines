@@ -46,7 +46,7 @@ impl LowerDmlToAst {
             }
         }
 
-        Ok(ast::SchemaAst { models: tops })
+        Ok(ast::SchemaAst { tops: tops })
     }
 
     fn lower_model(&self, model: &dml::Model, datamodel: &dml::Datamodel) -> Result<ast::Model, ErrorCollection> {

@@ -23,7 +23,7 @@ model User {
 }"#;
 
     let dml = datamodel::parse(input).unwrap();
-    let rendered = datamodel::render(&dml).unwrap();
+    let rendered = datamodel::render_datamodel_to_string(&dml).unwrap();
 
     print!("{}", rendered);
 
@@ -53,7 +53,7 @@ model User {
 }"#;
 
     let dml = datamodel::parse(input).unwrap();
-    let rendered = datamodel::render(&dml).unwrap();
+    let rendered = datamodel::render_datamodel_to_string(&dml).unwrap();
 
     print!("{}", rendered);
 

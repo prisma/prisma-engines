@@ -72,7 +72,7 @@ enum CategoryEnum {
 #[test]
 fn test_parser_renderer_via_ast() {
     let ast = datamodel::parse_to_ast(DATAMODEL_STRING).expect("failed to parse");
-    let rendered = datamodel::render_ast(&ast);
+    let rendered = datamodel::render_schema_ast_to_string(&ast);
 
     print!("{}", rendered);
 
@@ -103,7 +103,7 @@ model Post {
 #[test]
 fn test_parser_renderer_many_to_many_via_ast() {
     let ast = datamodel::parse_to_ast(MANY_TO_MANY_DATAMODEL).expect("failed to parse");
-    let rendered = datamodel::render_ast(&ast);
+    let rendered = datamodel::render_schema_ast_to_string(&ast);
 
     print!("{}", rendered);
 
@@ -121,7 +121,7 @@ model Author {
 #[test]
 fn test_parser_renderer_types_via_ast() {
     let ast = datamodel::parse_to_ast(DATAMODEL_WITH_TYPES).expect("failed to parse");
-    let rendered = datamodel::render_ast(&ast);
+    let rendered = datamodel::render_schema_ast_to_string(&ast);
 
     print!("{}", rendered);
 
@@ -142,7 +142,7 @@ model Author {
 #[test]
 fn test_parser_renderer_sources_via_ast() {
     let ast = datamodel::parse_to_ast(DATAMODEL_WITH_SOURCE).expect("failed to parse");
-    let rendered = datamodel::render_ast(&ast);
+    let rendered = datamodel::render_schema_ast_to_string(&ast);
 
     print!("{}", rendered);
 
@@ -166,7 +166,7 @@ model Author {
 #[test]
 fn test_parser_renderer_sources_and_comments_via_ast() {
     let ast = datamodel::parse_to_ast(DATAMODEL_WITH_SOURCE_AND_COMMENTS).expect("failed to parse");
-    let rendered = datamodel::render_ast(&ast);
+    let rendered = datamodel::render_schema_ast_to_string(&ast);
 
     print!("{}", rendered);
 
@@ -206,6 +206,6 @@ fn test_parser_renderer_with_tabs() {
     // replaces \t placeholder with a real tab
     let tabbed_dm = DATAMODEL_WITH_TABS.replace("\\t", "\t");
     let ast = datamodel::parse_to_ast(&tabbed_dm).expect("failed to parse");
-    let rendered = datamodel::render_ast(&ast);
+    let rendered = datamodel::render_schema_ast_to_string(&ast);
     assert_eq!(rendered, DATAMODEL_WITH_SPACES.replace("\\t", "\t"));
 }

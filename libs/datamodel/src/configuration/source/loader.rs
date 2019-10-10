@@ -66,7 +66,7 @@ impl SourceLoader {
         let mut sources: Vec<Box<dyn Source>> = vec![];
         let mut errors = ErrorCollection::new();
 
-        for ast_obj in &ast_schema.models {
+        for ast_obj in &ast_schema.tops {
             if let ast::Top::Source(src) = ast_obj {
                 match self.load_source(&src) {
                     Ok(Some(loaded_src)) => sources.push(loaded_src),

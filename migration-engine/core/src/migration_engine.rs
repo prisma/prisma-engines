@@ -55,6 +55,6 @@ where
     }
 
     pub fn render_datamodel(&self, datamodel: &Datamodel) -> String {
-        datamodel::render(&datamodel).expect("Rendering the Datamodel failed.")
+        datamodel::render_datamodel_to_string(&datamodel).expect("Rendering the Datamodel failed.")
     }
 }

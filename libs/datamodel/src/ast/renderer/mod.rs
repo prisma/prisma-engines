@@ -38,7 +38,7 @@ impl<'a> Renderer<'a> {
     pub fn render(&mut self, datamodel: &ast::SchemaAst) {
         let mut type_renderer: Option<TableFormat> = None;
 
-        for (i, top) in datamodel.models.iter().enumerate() {
+        for (i, top) in datamodel.tops.iter().enumerate() {
             match &top {
                 // TODO: This is super ugly. Goal is that type groups get
                 // formatted togehter.

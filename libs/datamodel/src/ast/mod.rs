@@ -43,6 +43,6 @@ pub use traits::*;
 /// Schema = Datamodel + Generators + Datasources
 #[derive(Debug)]
 pub struct SchemaAst {
-    /// All models, enums, or source config blocks.
-    pub models: Vec<Top>,
+    /// All models, enums, datasources, generators or type aliases
+    pub tops: Vec<Top>,
 }

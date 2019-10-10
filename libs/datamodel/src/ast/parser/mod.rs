@@ -450,7 +450,7 @@ pub fn parse(datamodel_string: &str) -> Result<SchemaAst, ErrorCollection> {
 
             errors.ok()?;
 
-            Ok(SchemaAst { models })
+            Ok(SchemaAst { tops: models })
         }
         Err(err) => {
             let location = match err.location {
