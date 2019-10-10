@@ -1,5 +1,5 @@
 use crate::common::*;
-use datamodel::{ast, common::PrismaType, errors::ValidationError};
+use datamodel::{ast, common::PrismaType, errors::DatamodelError};
 
 #[test]
 fn db_directive() {
@@ -65,10 +65,10 @@ fn duplicate_directives_should_error() {
 
     error.assert_is_at(
         0,
-        ValidationError::new_duplicate_directive_error("unique", ast::Span::new(75, 81)),
+        DatamodelError::new_duplicate_directive_error("unique", ast::Span::new(75, 81)),
     );
     error.assert_is_at(
         1,
-        ValidationError::new_duplicate_directive_error("unique", ast::Span::new(83, 89)),
+        DatamodelError::new_duplicate_directive_error("unique", ast::Span::new(83, 89)),
     );
 }

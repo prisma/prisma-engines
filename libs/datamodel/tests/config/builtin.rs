@@ -1,5 +1,5 @@
 use crate::common::ErrorAsserts;
-use datamodel::errors::ValidationError;
+use datamodel::errors::DatamodelError;
 
 #[test]
 fn serialize_builtin_sources_to_dmmf() {
@@ -84,7 +84,7 @@ fn fail_to_load_sources_for_invalid_source() {
     let res = datamodel::load_configuration(INVALID_DATAMODEL);
 
     if let Err(error) = res {
-        error.assert_is(ValidationError::SourceNotKnownError {
+        error.assert_is(DatamodelError::SourceNotKnownError {
             source_name: String::from("AStrangeHalfMongoDatabase"),
             span: datamodel::ast::Span::new(33, 60),
         });

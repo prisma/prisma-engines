@@ -9,7 +9,5 @@ pub use directive_list_validator::DirectiveListValidator;
 pub use directive_scope::DirectiveScope;
 pub use directive_validator::DirectiveValidator;
 
-/// The error type for directive validators.
-type Error = crate::errors::ValidationError;
 /// The argument type for directive validators.
 type Args<'a> = crate::common::argument::Arguments<'a>;

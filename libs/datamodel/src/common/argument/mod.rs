@@ -1,6 +1,6 @@
 use crate::ast;
 use crate::common::value;
-use crate::errors::{ErrorCollection, ValidationError};
+use crate::errors::{DatamodelError, ErrorCollection};
 use std::collections::HashSet;
 
 /// Represents a list of arguments.
@@ -30,7 +30,7 @@ impl<'a> Arguments<'a> {
 
         for arg in self.arguments {
             if arg_names.contains::<&str>(&(&arg.name.name as &str)) {
-                errors.push(ValidationError::new_duplicate_argument_error(&arg.name.name, arg.span));
+                errors.push(DatamodelError::new_duplicate_argument_error(&arg.name.name, arg.span));
             }
             arg_names.insert(&arg.name.name);
         }
@@ -44,7 +44,7 @@ impl<'a> Arguments<'a> {
 
         for arg in self.arguments {
             if !self.used_arguments.contains::<&str>(&(&arg.name.name as &str)) {
-                errors.push(ValidationError::new_unused_argument_error(&arg.name.name, arg.span));
+                errors.push(DatamodelError::new_unused_argument_error(&arg.name.name, arg.span));
             }
         }
 
@@ -57,14 +57,14 @@ impl<'a> Arguments<'a> {
     }
 
     /// Gets the arg with the given name.
-    pub fn arg(&mut self, name: &str) -> Result<value::ValueValidator, ValidationError> {
+    pub fn arg(&mut self, name: &str) -> Result<value::ValueValidator, DatamodelError> {
         match self.arg_internal(name) {
-            None => Err(ValidationError::new_argument_not_found_error(name, self.span)),
+            None => Err(DatamodelError::new_argument_not_found_error(name, self.span)),
             Some(arg) => value::ValueValidator::new(&arg.value),
         }
     }
 
-    pub fn optional_arg(&mut self, name: &str) -> Option<Result<value::ValueValidator, ValidationError>> {
+    pub fn optional_arg(&mut self, name: &str) -> Option<Result<value::ValueValidator, DatamodelError>> {
         match self.arg_internal(name) {
             None => None,
             Some(arg) => Some(value::ValueValidator::new(&arg.value)),
@@ -86,12 +86,12 @@ impl<'a> Arguments<'a> {
     /// Gets the arg with the given name, or if it is not found, the first unnamed argument.
     ///
     /// Use this to implement unnamed argument behavior.
-    pub fn default_arg(&mut self, name: &str) -> Result<value::ValueValidator, ValidationError> {
+    pub fn default_arg(&mut self, name: &str) -> Result<value::ValueValidator, DatamodelError> {
         match (self.arg_internal(name), self.arg_internal("")) {
             (Some(arg), None) => value::ValueValidator::new(&arg.value),
             (None, Some(arg)) => value::ValueValidator::new(&arg.value),
-            (Some(arg), Some(_)) => Err(ValidationError::new_duplicate_default_argument_error(&name, arg.span)),
-            (None, None) => Err(ValidationError::new_argument_not_found_error(name, self.span)),
+            (Some(arg), Some(_)) => Err(DatamodelError::new_duplicate_default_argument_error(&name, arg.span)),
+            (None, None) => Err(DatamodelError::new_argument_not_found_error(name, self.span)),
         }
     }
 }

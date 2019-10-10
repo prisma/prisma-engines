@@ -1,4 +1,5 @@
-use crate::validator::directive::{Args, DirectiveValidator, Error};
+use crate::errors::DatamodelError;
+use crate::validator::directive::{Args, DirectiveValidator};
 use crate::{ast, dml};
 
 /// Prismas builtin `@primary` directive.
@@ -9,7 +10,7 @@ impl DirectiveValidator<dml::Field> for IdDirectiveValidator {
         &"id"
     }
 
-    fn validate_and_apply(&self, args: &mut Args, obj: &mut dml::Field) -> Result<(), Error> {
+    fn validate_and_apply(&self, args: &mut Args, obj: &mut dml::Field) -> Result<(), DatamodelError> {
         let mut id_info = dml::IdInfo {
             strategy: dml::IdStrategy::Auto,
             sequence: None,
@@ -28,7 +29,11 @@ impl DirectiveValidator<dml::Field> for IdDirectiveValidator {
         Ok(())
     }
 
-    fn serialize(&self, field: &dml::Field, _datamodel: &dml::Datamodel) -> Result<Vec<ast::Directive>, Error> {
+    fn serialize(
+        &self,
+        field: &dml::Field,
+        _datamodel: &dml::Datamodel,
+    ) -> Result<Vec<ast::Directive>, DatamodelError> {
         if let Some(id_info) = &field.id_info {
             let mut args = Vec::new();
 
@@ -49,7 +54,7 @@ impl DirectiveValidator<dml::Model> for ModelLevelIdDirectiveValidator {
         "id"
     }
 
-    fn validate_and_apply(&self, args: &mut Args, obj: &mut dml::Model) -> Result<(), Error> {
+    fn validate_and_apply(&self, args: &mut Args, obj: &mut dml::Model) -> Result<(), DatamodelError> {
         match args.default_arg("fields")?.as_array() {
             Ok(fields) => {
                 let fields = fields.iter().map(|f| f.as_constant_literal().unwrap()).collect();
@@ -71,7 +76,7 @@ impl DirectiveValidator<dml::Model> for ModelLevelIdDirectiveValidator {
             .collect();
 
         if !undefined_fields.is_empty() {
-            return Err(Error::new_model_validation_error(
+            return Err(DatamodelError::new_model_validation_error(
                 &format!(
                     "The multi field id declaration refers to the unknown fields {}.",
                     undefined_fields.join(", ")
@@ -84,7 +89,11 @@ impl DirectiveValidator<dml::Model> for ModelLevelIdDirectiveValidator {
         Ok(())
     }
 
-    fn serialize(&self, model: &dml::Model, _datamodel: &dml::Datamodel) -> Result<Vec<ast::Directive>, Error> {
+    fn serialize(
+        &self,
+        model: &dml::Model,
+        _datamodel: &dml::Datamodel,
+    ) -> Result<Vec<ast::Directive>, DatamodelError> {
         if !model.id_fields.is_empty() {
             let mut args = Vec::new();
 

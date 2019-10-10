@@ -1,7 +1,7 @@
-use super::{Args, DirectiveValidator, Error};
+use super::{Args, DirectiveValidator};
 use crate::ast;
 use crate::dml;
-use crate::errors::ValidationError;
+use crate::errors::DatamodelError;
 
 /// Moves an directive into a namespace scope.
 ///
@@ -30,10 +30,10 @@ impl<T> DirectiveValidator<T> for DirectiveScope<T> {
     fn directive_name(&self) -> &str {
         &self.name
     }
-    fn validate_and_apply(&self, args: &mut Args, obj: &mut T) -> Result<(), Error> {
+    fn validate_and_apply(&self, args: &mut Args, obj: &mut T) -> Result<(), DatamodelError> {
         self.inner.validate_and_apply(args, obj)
     }
-    fn serialize(&self, obj: &T, datamodel: &dml::Datamodel) -> Result<Vec<ast::Directive>, Error> {
+    fn serialize(&self, obj: &T, datamodel: &dml::Datamodel) -> Result<Vec<ast::Directive>, DatamodelError> {
         self.inner.serialize(obj, datamodel)
     }
 }

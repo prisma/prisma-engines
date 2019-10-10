@@ -1,4 +1,5 @@
-use crate::validator::directive::{Args, DirectiveValidator, Error};
+use crate::errors::DatamodelError;
+use crate::validator::directive::{Args, DirectiveValidator};
 use crate::{ast, dml};
 
 /// Prismas builtin `@updatedAt` directive.
@@ -9,7 +10,7 @@ impl DirectiveValidator<dml::Field> for UpdatedAtDirectiveValidator {
         &"updatedAt"
     }
 
-    fn validate_and_apply(&self, args: &mut Args, obj: &mut dml::Field) -> Result<(), Error> {
+    fn validate_and_apply(&self, args: &mut Args, obj: &mut dml::Field) -> Result<(), DatamodelError> {
         if obj.field_type != dml::FieldType::Base(dml::ScalarType::DateTime) {
             return self.error(
                 "Fields that are marked with @updatedAt must be of type DateTime.",
@@ -26,7 +27,11 @@ impl DirectiveValidator<dml::Field> for UpdatedAtDirectiveValidator {
         Ok(())
     }
 
-    fn serialize(&self, field: &dml::Field, _datamodel: &dml::Datamodel) -> Result<Vec<ast::Directive>, Error> {
+    fn serialize(
+        &self,
+        field: &dml::Field,
+        _datamodel: &dml::Datamodel,
+    ) -> Result<Vec<ast::Directive>, DatamodelError> {
         if field.is_updated_at {
             Ok(vec![ast::Directive::new(self.directive_name(), Vec::new())])
         } else {

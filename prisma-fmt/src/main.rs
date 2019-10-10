@@ -1,5 +1,5 @@
 use datamodel;
-use datamodel::errors::ValidationError;
+use datamodel::errors::DatamodelError;
 use std::{
     fs,
     io::{self, Read},
@@ -72,11 +72,11 @@ fn main() {
             let errs: Vec<MiniError> = err
                 .errors
                 .iter()
-                .filter(|err: &&ValidationError| match err {
-                    ValidationError::EnvironmentFunctionalEvaluationError { var_name: _, span: _ } => !skip_env_errors,
+                .filter(|err: &&DatamodelError| match err {
+                    DatamodelError::EnvironmentFunctionalEvaluationError { var_name: _, span: _ } => !skip_env_errors,
                     _ => true,
                 })
-                .map(|err: &ValidationError| MiniError {
+                .map(|err: &DatamodelError| MiniError {
                     start: err.span().start,
                     end: err.span().end,
                     text: format!("{}", err),

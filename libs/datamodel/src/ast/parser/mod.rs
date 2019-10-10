@@ -11,7 +11,7 @@ use pest::Parser;
 pub struct PrismaDatamodelParser;
 
 use crate::ast::*;
-use crate::errors::{ErrorCollection, ValidationError};
+use crate::errors::{DatamodelError, ErrorCollection};
 
 trait ToIdentifier {
     fn to_id(&self) -> Identifier;
@@ -173,16 +173,16 @@ fn parse_base_type(token: &pest::iterators::Pair<'_, Rule>) -> String {
     }
 }
 
-fn parse_field_type(token: &pest::iterators::Pair<'_, Rule>) -> Result<(FieldArity, String), ValidationError> {
+fn parse_field_type(token: &pest::iterators::Pair<'_, Rule>) -> Result<(FieldArity, String), DatamodelError> {
     match_first! { token, current,
         Rule::optional_type => Ok((FieldArity::Optional, parse_base_type(&current))),
         Rule::base_type =>  Ok((FieldArity::Required, parse_base_type(&current))),
         Rule::list_type =>  Ok((FieldArity::List, parse_base_type(&current))),
-        Rule::legacy_required_type => Err(ValidationError::new_legacy_parser_error(
+        Rule::legacy_required_type => Err(DatamodelError::new_legacy_parser_error(
             "Fields are required by default, `!` is no longer required.",
             Span::from_pest(current.as_span())
         )),
-        Rule::legacy_list_type => Err(ValidationError::new_legacy_parser_error(
+        Rule::legacy_list_type => Err(DatamodelError::new_legacy_parser_error(
             "To specify a list, please use `Type[]` instead of `[Type]`.",
             Span::from_pest(current.as_span())
         )),
@@ -190,7 +190,7 @@ fn parse_field_type(token: &pest::iterators::Pair<'_, Rule>) -> Result<(FieldAri
     }
 }
 
-fn parse_field(token: &pest::iterators::Pair<'_, Rule>) -> Result<Field, ValidationError> {
+fn parse_field(token: &pest::iterators::Pair<'_, Rule>) -> Result<Field, DatamodelError> {
     let mut name: Option<Identifier> = None;
     let mut directives: Vec<Directive> = Vec::new();
     let mut field_type: Option<((FieldArity, String), Span)> = None;
@@ -204,7 +204,7 @@ fn parse_field(token: &pest::iterators::Pair<'_, Rule>) -> Result<Field, Validat
                 Span::from_pest(current.as_span())
             )
         ),
-        Rule::LEGACY_COLON => return Err(ValidationError::new_legacy_parser_error(
+        Rule::LEGACY_COLON => return Err(DatamodelError::new_legacy_parser_error(
             "Field declarations don't require a `:`.",
             Span::from_pest(current.as_span()))),
         Rule::directive => directives.push(parse_directive(&current)),
@@ -242,7 +242,7 @@ fn parse_model(token: &pest::iterators::Pair<'_, Rule>) -> Result<Model, ErrorCo
     match_children! { token, current,
         Rule::MODEL_KEYWORD => { },
         Rule::TYPE_KEYWORD => { errors.push(
-            ValidationError::new_legacy_parser_error(
+            DatamodelError::new_legacy_parser_error(
                 "Model declarations have to be indicated with the `model` keyword.",
                 Span::from_pest(current.as_span()))
         ) },
@@ -463,7 +463,7 @@ pub fn parse(datamodel_string: &str) -> Result<Datamodel, ErrorCollection> {
                 _ => panic!("Could not construct parsing error. This should never happend."),
             };
 
-            errors.push(ValidationError::new_parser_error(&expected, location));
+            errors.push(DatamodelError::new_parser_error(&expected, location));
             Err(errors)
         }
     }

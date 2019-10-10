@@ -1,5 +1,5 @@
 use crate::common::argument::Arguments;
-use crate::errors::ValidationError;
+use crate::errors::DatamodelError;
 use crate::validator::directive::DirectiveValidator;
 use crate::{dml, StringFromEnvVar};
 use std::collections::HashMap;
@@ -57,5 +57,5 @@ pub trait SourceDefinition {
         url: StringFromEnvVar,
         arguments: &mut Arguments,
         documentation: &Option<String>,
-    ) -> Result<Box<dyn Source>, ValidationError>;
+    ) -> Result<Box<dyn Source>, DatamodelError>;
 }

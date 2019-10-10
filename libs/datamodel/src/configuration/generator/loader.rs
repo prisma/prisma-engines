@@ -18,8 +18,8 @@ impl GeneratorLoader {
                 match Self::lift_generator(&gen) {
                     Ok(loaded_gen) => generators.push(loaded_gen),
                     // Lift error.
-                    Err(ValidationError::ArgumentNotFound { argument_name, span }) => errors.push(
-                        ValidationError::new_generator_argument_not_found_error(&argument_name, &gen.name.name, span),
+                    Err(DatamodelError::ArgumentNotFound { argument_name, span }) => errors.push(
+                        DatamodelError::new_generator_argument_not_found_error(&argument_name, &gen.name.name, span),
                     ),
                     Err(err) => errors.push(err),
                 }
@@ -33,7 +33,7 @@ impl GeneratorLoader {
         }
     }
 
-    fn lift_generator(ast_generator: &ast::GeneratorConfig) -> Result<Generator, ValidationError> {
+    fn lift_generator(ast_generator: &ast::GeneratorConfig) -> Result<Generator, DatamodelError> {
         let mut args = Arguments::new(&ast_generator.properties, ast_generator.span);
 
         let provider = args.arg(PROVIDER_KEY)?.as_str()?;

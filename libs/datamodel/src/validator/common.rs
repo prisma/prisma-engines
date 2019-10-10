@@ -1,4 +1,4 @@
-use crate::{ast, dml, errors::ValidationError};
+use crate::{ast, dml, errors::DatamodelError};
 
 /// State error message. Seeing this error means something went really wrong internally. It's the datamodel equivalent of a bluescreen.
 pub (crate) const STATE_ERROR: &str = "Failed lookup of model or field during internal processing. This means that the internal representation was mutated incorrectly.";
@@ -65,8 +65,8 @@ impl ast::WithDirectives for Vec<ast::Directive> {
     }
 }
 
-pub fn model_validation_error(message: &str, model: &dml::Model, ast: &ast::Datamodel) -> ValidationError {
-    ValidationError::new_model_validation_error(
+pub fn model_validation_error(message: &str, model: &dml::Model, ast: &ast::Datamodel) -> DatamodelError {
+    DatamodelError::new_model_validation_error(
         message,
         &model.name,
         ast.find_model(&model.name).expect(ERROR_GEN_STATE_ERROR).span,
@@ -78,8 +78,8 @@ pub fn field_validation_error(
     model: &dml::Model,
     field: &dml::Field,
     ast: &ast::Datamodel,
-) -> ValidationError {
-    ValidationError::new_model_validation_error(
+) -> DatamodelError {
+    DatamodelError::new_model_validation_error(
         message,
         &model.name,
         ast.find_field(&model.name, &field.name)

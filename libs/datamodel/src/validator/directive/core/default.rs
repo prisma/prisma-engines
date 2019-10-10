@@ -1,4 +1,5 @@
-use crate::validator::directive::{Args, DirectiveValidator, Error};
+use crate::errors::DatamodelError;
+use crate::validator::directive::{Args, DirectiveValidator};
 use crate::{ast, dml};
 
 /// Prismas builtin `@default` directive.
@@ -8,7 +9,7 @@ impl DirectiveValidator<dml::Field> for DefaultDirectiveValidator {
     fn directive_name(&self) -> &'static str {
         &"default"
     }
-    fn validate_and_apply(&self, args: &mut Args, field: &mut dml::Field) -> Result<(), Error> {
+    fn validate_and_apply(&self, args: &mut Args, field: &mut dml::Field) -> Result<(), DatamodelError> {
         // If we allow list default values, we need to adjust the types below properly for that case.
         if field.arity == dml::FieldArity::List {
             return self.error("Cannot set a default value on list field.", args.span());
@@ -33,7 +34,11 @@ impl DirectiveValidator<dml::Field> for DefaultDirectiveValidator {
         Ok(())
     }
 
-    fn serialize(&self, field: &dml::Field, _datamodel: &dml::Datamodel) -> Result<Vec<ast::Directive>, Error> {
+    fn serialize(
+        &self,
+        field: &dml::Field,
+        _datamodel: &dml::Datamodel,
+    ) -> Result<Vec<ast::Directive>, DatamodelError> {
         if let Some(default_value) = &field.default_value {
             return Ok(vec![ast::Directive::new(
                 self.directive_name(),

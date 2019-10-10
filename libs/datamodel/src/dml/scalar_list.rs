@@ -1,6 +1,6 @@
 use crate::ast;
 use crate::common::FromStrAndSpan;
-use crate::errors::ValidationError;
+use crate::errors::DatamodelError;
 use serde::{Deserialize, Serialize};
 
 /// Represents a strategy for embedding scalar lists.
@@ -11,11 +11,11 @@ pub enum ScalarListStrategy {
 }
 
 impl FromStrAndSpan for ScalarListStrategy {
-    fn from_str_and_span(s: &str, span: ast::Span) -> Result<Self, ValidationError> {
+    fn from_str_and_span(s: &str, span: ast::Span) -> Result<Self, DatamodelError> {
         match s {
             "EMBEDDED" => Ok(ScalarListStrategy::Embedded),
             "RELATION" => Ok(ScalarListStrategy::Relation),
-            _ => Err(ValidationError::new_literal_parser_error("id strategy", s, span)),
+            _ => Err(DatamodelError::new_literal_parser_error("id strategy", s, span)),
         }
     }
 }

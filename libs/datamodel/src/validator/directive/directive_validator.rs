@@ -1,7 +1,7 @@
-use super::{Args, Error};
+use super::Args;
 use crate::ast;
 use crate::dml;
-use crate::errors::ValidationError;
+use crate::errors::DatamodelError;
 
 /// Structs implementing this trait can be used to validate any
 /// directive and to apply the directive's effect on the corresponding
@@ -16,14 +16,14 @@ pub trait DirectiveValidator<T> {
 
     /// Validates a directive and applies the directive
     /// to the given object.
-    fn validate_and_apply(&self, args: &mut Args, obj: &mut T) -> Result<(), Error>;
+    fn validate_and_apply(&self, args: &mut Args, obj: &mut T) -> Result<(), DatamodelError>;
 
     /// Serilizes the given directive's arguments for rendering.
-    fn serialize(&self, obj: &T, datamodel: &dml::Datamodel) -> Result<Vec<ast::Directive>, Error>;
+    fn serialize(&self, obj: &T, datamodel: &dml::Datamodel) -> Result<Vec<ast::Directive>, DatamodelError>;
 
     /// Shorthand to construct an directive validation error.
-    fn error(&self, msg: &str, span: ast::Span) -> Result<(), Error> {
-        Err(ValidationError::new_directive_validation_error(
+    fn error(&self, msg: &str, span: ast::Span) -> Result<(), DatamodelError> {
+        Err(DatamodelError::new_directive_validation_error(
             msg,
             self.directive_name(),
             span,
@@ -31,7 +31,7 @@ pub trait DirectiveValidator<T> {
     }
 
     /// Shorthand to lift a generic parser error to an directive validation error.
-    fn parser_error(&self, err: &ValidationError) -> ValidationError {
-        ValidationError::new_directive_validation_error(&format!("{}", err), self.directive_name(), err.span())
+    fn parser_error(&self, err: &DatamodelError) -> DatamodelError {
+        DatamodelError::new_directive_validation_error(&format!("{}", err), self.directive_name(), err.span())
     }
 }

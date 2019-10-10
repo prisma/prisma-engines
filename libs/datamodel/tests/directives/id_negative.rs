@@ -1,5 +1,5 @@
 use crate::common::*;
-use datamodel::{ast::Span, errors::ValidationError};
+use datamodel::{ast::Span, errors::DatamodelError};
 
 // Ported from
 // https://github.com/prisma/prisma/blob/master/server/servers/deploy/src/test/scala/com/prisma/deploy/migration/validation/IdDirectiveSpec.scala
@@ -14,7 +14,7 @@ fn id_should_error_if_the_field_is_not_required() {
 
     let errors = parse_error(dml);
 
-    errors.assert_is(ValidationError::new_directive_validation_error(
+    errors.assert_is(DatamodelError::new_directive_validation_error(
         "Fields that are marked as id must be required.",
         "id",
         Span::new(36, 38),
@@ -31,7 +31,7 @@ fn id_should_error_if_an_unknown_strategy_is_used() {
 
     let errors = parse_error(dml);
 
-    errors.assert_is(ValidationError::new_literal_parser_error(
+    errors.assert_is(DatamodelError::new_literal_parser_error(
         "id strategy",
         "FOO",
         Span::new(48, 51),
@@ -49,7 +49,7 @@ fn id_should_error_on_model_without_id() {
 
     let errors = parse_error(dml);
 
-    errors.assert_is(ValidationError::new_model_validation_error(
+    errors.assert_is(DatamodelError::new_model_validation_error(
         "Each model must have exactly one id criteria. Either mark a single field with `@id` or add a multi field id criterion with `@@id([])` to the model.",
         "Model",
         Span::new(5, 42),
@@ -67,7 +67,7 @@ fn id_should_error_multiple_ids_are_provided() {
 
     let errors = parse_error(dml);
 
-    errors.assert_is(ValidationError::new_model_validation_error(
+    errors.assert_is(DatamodelError::new_model_validation_error(
         "At most one field must be marked as the id field with the `@id` directive.",
         "Model",
         Span::new(5, 105),
@@ -87,7 +87,7 @@ fn it_must_error_when_single_and_multi_field_id_is_used() {
 
     let errors = parse_error(dml);
 
-    errors.assert_is(ValidationError::new_model_validation_error(
+    errors.assert_is(DatamodelError::new_model_validation_error(
         "Each model must have exactly one id criteria. Either mark a single field with `@id` or add a multi field id criterion with `@@id([])` to the model.",
         "Model",
         Span::new(5, 112),
@@ -106,7 +106,7 @@ fn it_must_error_when_multi_field_is_referring_to_undefined_fields() {
     "#;
     let errors = parse_error(dml);
 
-    errors.assert_is(ValidationError::new_model_validation_error(
+    errors.assert_is(DatamodelError::new_model_validation_error(
         "The multi field id declaration refers to the unknown fields c.",
         "Model",
         Span::new(64, 73),
@@ -140,22 +140,22 @@ fn id_should_error_if_the_id_field_is_not_of_valid_type() {
 
     errors.assert_is_at(
         0,
-        ValidationError::new_model_validation_error(ID_TYPE_ERROR, "Model", Span::new(27, 42)),
+        DatamodelError::new_model_validation_error(ID_TYPE_ERROR, "Model", Span::new(27, 42)),
     );
 
     errors.assert_is_at(
         1,
-        ValidationError::new_model_validation_error(ID_TYPE_ERROR, "Model2", Span::new(77, 91)),
+        DatamodelError::new_model_validation_error(ID_TYPE_ERROR, "Model2", Span::new(77, 91)),
     );
 
     errors.assert_is_at(
         2,
-        ValidationError::new_model_validation_error(ID_TYPE_ERROR, "Model3", Span::new(126, 138)),
+        DatamodelError::new_model_validation_error(ID_TYPE_ERROR, "Model3", Span::new(126, 138)),
     );
 
     errors.assert_is_at(
         3,
-        ValidationError::new_model_validation_error(ID_TYPE_ERROR, "Model4", Span::new(173, 187)),
+        DatamodelError::new_model_validation_error(ID_TYPE_ERROR, "Model4", Span::new(173, 187)),
     );
 }
 
@@ -179,16 +179,16 @@ fn id_should_error_if_string_id_field_has_incorrect_default_value() {
 
     errors.assert_is_at(
         0,
-        ValidationError::new_model_validation_error(ID_TYPE_ERROR, "Model1", Span::new(28, 41)),
+        DatamodelError::new_model_validation_error(ID_TYPE_ERROR, "Model1", Span::new(28, 41)),
     );
 
     errors.assert_is_at(
         1,
-        ValidationError::new_model_validation_error(ID_TYPE_ERROR, "Model2", Span::new(76, 107)),
+        DatamodelError::new_model_validation_error(ID_TYPE_ERROR, "Model2", Span::new(76, 107)),
     );
 
     errors.assert_is_at(
         2,
-        ValidationError::new_model_validation_error(ID_TYPE_ERROR, "Model3", Span::new(142, 172)),
+        DatamodelError::new_model_validation_error(ID_TYPE_ERROR, "Model3", Span::new(142, 172)),
     );
 }

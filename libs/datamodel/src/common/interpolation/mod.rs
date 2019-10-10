@@ -1,16 +1,16 @@
 use crate::ast::parser::{parse_expression, PrismaDatamodelParser, Rule};
 use crate::ast::{lift_span, Span, Value};
 use crate::common::value::ValueValidator;
-use crate::errors::ValidationError;
+use crate::errors::DatamodelError;
 use pest::Parser;
 
 pub struct StringInterpolator {}
 
 /// Parses an expression and adds an offset to the span start, so we have consistent error
 /// messages.
-fn parse_expr_and_lift_span(token: &pest::iterators::Pair<'_, Rule>, start: usize) -> Result<Value, ValidationError> {
+fn parse_expr_and_lift_span(token: &pest::iterators::Pair<'_, Rule>, start: usize) -> Result<Value, DatamodelError> {
     match parse_expression(token) {
-        Value::Array(_, s) => Err(ValidationError::new_validation_error(
+        Value::Array(_, s) => Err(DatamodelError::new_validation_error(
             "Arrays cannot be interpolated into strings.",
             lift_span(&s, start),
         )),
@@ -24,7 +24,7 @@ impl StringInterpolator {
     ///
     /// The string is re-parsed and all expressions found within `${...}` are
     /// evaluated recursively.
-    pub fn interpolate(text: &str, span: Span) -> Result<Value, ValidationError> {
+    pub fn interpolate(text: &str, span: Span) -> Result<Value, DatamodelError> {
         let string_result = PrismaDatamodelParser::parse(Rule::string_interpolated, text);
         let mut parts: Vec<String> = Vec::new();
 
@@ -75,14 +75,13 @@ impl StringInterpolator {
                 };
 
                 let expected = match err.variant {
-                    pest::error::ErrorVariant::ParsingError {
-                        positives,
-                        ..
-                    } => crate::ast::parser::get_expected_from_error(&positives),
+                    pest::error::ErrorVariant::ParsingError { positives, .. } => {
+                        crate::ast::parser::get_expected_from_error(&positives)
+                    }
                     _ => panic!("Could not construct parsing error. This should never happend."),
                 };
 
-                Err(ValidationError::new_parser_error(&expected, location))
+                Err(DatamodelError::new_parser_error(&expected, location))
             }
         }
     }

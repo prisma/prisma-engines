@@ -6,7 +6,7 @@ use crate::common::{
     value::{MaybeExpression, ValueValidator},
     PrismaType,
 };
-use crate::errors::ValidationError;
+use crate::errors::DatamodelError;
 
 use traits::*;
 
@@ -52,7 +52,7 @@ impl FunctionalEvaluator {
     /// be identified and and executed.
     ///
     /// Otherwise, if the value is a constant, the value is returned as-is.
-    pub fn evaluate(&self) -> Result<MaybeExpression, ValidationError> {
+    pub fn evaluate(&self) -> Result<MaybeExpression, DatamodelError> {
         match &self.value {
             ast::Value::Function(name, params, span) => self.evaluate_functional(&name, &params, *span),
             _ => Ok(MaybeExpression::Value(None, self.value.clone())),
@@ -64,7 +64,7 @@ impl FunctionalEvaluator {
         name: &str,
         args: &[ast::Value],
         span: ast::Span,
-    ) -> Result<MaybeExpression, ValidationError> {
+    ) -> Result<MaybeExpression, DatamodelError> {
         for f in &BUILTIN_FUNCTIONALS {
             if f.name() == name {
                 let mut resolved_args: Vec<ValueValidator> = Vec::new();
@@ -77,6 +77,6 @@ impl FunctionalEvaluator {
             }
         }
 
-        Err(ValidationError::new_function_not_known_error(name, span))
+        Err(DatamodelError::new_function_not_known_error(name, span))
     }
 }

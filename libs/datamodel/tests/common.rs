@@ -41,8 +41,8 @@ pub trait DatamodelAsserts {
 }
 
 pub trait ErrorAsserts {
-    fn assert_is(&self, error: ValidationError) -> &Self;
-    fn assert_is_at(&self, index: usize, error: ValidationError) -> &Self;
+    fn assert_is(&self, error: DatamodelError) -> &Self;
+    fn assert_is_at(&self, index: usize, error: DatamodelError) -> &Self;
 }
 
 impl FieldAsserts for dml::Field {
@@ -239,7 +239,7 @@ impl EnumAsserts for dml::Enum {
 }
 
 impl ErrorAsserts for ErrorCollection {
-    fn assert_is(&self, error: ValidationError) -> &Self {
+    fn assert_is(&self, error: DatamodelError) -> &Self {
         if self.errors.len() == 1 {
             assert_eq!(self.errors[0], error);
         } else {
@@ -249,7 +249,7 @@ impl ErrorAsserts for ErrorCollection {
         self
     }
 
-    fn assert_is_at(&self, index: usize, error: ValidationError) -> &Self {
+    fn assert_is_at(&self, index: usize, error: DatamodelError) -> &Self {
         assert_eq!(self.errors[index], error);
         self
     }

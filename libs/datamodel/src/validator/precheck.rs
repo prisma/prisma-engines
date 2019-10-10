@@ -2,7 +2,7 @@ use crate::{
     ast::{self, WithIdentifier, WithName},
     common::FromStrAndSpan,
     dml,
-    errors::{ErrorCollection, ValidationError},
+    errors::{DatamodelError, ErrorCollection},
 };
 
 pub struct Precheck {}
@@ -17,7 +17,7 @@ impl Precheck {
 
         for top in &datamodel.models {
             let error_fn = |existing: &ast::Top| {
-                ValidationError::new_duplicate_top_error(
+                DatamodelError::new_duplicate_top_error(
                     top.name(),
                     top.get_type(),
                     existing.get_type(),
@@ -61,7 +61,7 @@ impl Precheck {
 
     fn assert_is_not_a_reserved_scalar_type(identifier: &ast::Identifier, errors: &mut ErrorCollection) {
         if dml::ScalarType::from_str_and_span(&identifier.name, identifier.span).is_ok() {
-            errors.push(ValidationError::new_reserved_scalar_type_error(
+            errors.push(DatamodelError::new_reserved_scalar_type_error(
                 &identifier.name,
                 identifier.span,
             ));
@@ -72,7 +72,7 @@ impl Precheck {
         let mut checker = DuplicateChecker::new();
         for value in &enum_type.values {
             checker.check_if_duplicate_exists(value, |_| {
-                ValidationError::new_duplicate_enum_value_error(&enum_type.name.name, &value.name, value.span)
+                DatamodelError::new_duplicate_enum_value_error(&enum_type.name.name, &value.name, value.span)
             });
         }
         errors.append(&mut checker.errors());
@@ -82,7 +82,7 @@ impl Precheck {
         let mut checker = DuplicateChecker::new();
         for field in &model.fields {
             checker.check_if_duplicate_exists(field, |_| {
-                ValidationError::new_duplicate_field_error(&model.name.name, &field.name.name, field.identifier().span)
+                DatamodelError::new_duplicate_field_error(&model.name.name, &field.name.name, field.identifier().span)
             });
         }
         errors.append(&mut checker.errors());
@@ -92,7 +92,7 @@ impl Precheck {
         let mut checker = DuplicateChecker::new();
         for arg in &config.properties {
             checker.check_if_duplicate_exists(arg, |_| {
-                ValidationError::new_duplicate_config_key_error(
+                DatamodelError::new_duplicate_config_key_error(
                     &format!("generator configuration \"{}\"", config.name.name),
                     &arg.name.name,
                     arg.identifier().span,
@@ -106,7 +106,7 @@ impl Precheck {
         let mut checker = DuplicateChecker::new();
         for arg in &config.properties {
             checker.check_if_duplicate_exists(arg, |_| {
-                ValidationError::new_duplicate_config_key_error(
+                DatamodelError::new_duplicate_config_key_error(
                     &format!("datasource configuration \"{}\"", config.name.name),
                     &arg.name.name,
                     arg.identifier().span,
@@ -135,7 +135,7 @@ impl<'a, T: WithName> DuplicateChecker<'a, T> {
     /// the error returned by the function is then stored
     fn check_if_duplicate_exists<F>(&mut self, named: &'a T, error_fn: F)
     where
-        F: Fn(&T) -> ValidationError,
+        F: Fn(&T) -> DatamodelError,
     {
         match self.seen.iter().find(|x| x.name() == named.name()) {
             Some(existing) => self.errors.push(error_fn(existing)),

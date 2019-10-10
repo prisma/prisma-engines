@@ -1,7 +1,7 @@
 use super::common::*;
 use crate::{
     ast, configuration, dml,
-    errors::{ErrorCollection, ValidationError},
+    errors::{DatamodelError, ErrorCollection},
 };
 
 /// Helper for validating a datamodel.
@@ -53,19 +53,19 @@ impl Validator {
         }
     }
 
-    fn validate_model_has_id(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), ValidationError> {
+    fn validate_model_has_id(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), DatamodelError> {
         if model.is_relation_model() {
             return Ok(());
             // Extempt from the id rule, we have an relation table.
         }
 
-        let multiple_single_field_id_error = Err(ValidationError::new_model_validation_error(
+        let multiple_single_field_id_error = Err(DatamodelError::new_model_validation_error(
             "At most one field must be marked as the id field with the `@id` directive.",
             &model.name,
             ast_model.span,
         ));
 
-        let multiple_id_criteria_error = Err(ValidationError::new_model_validation_error(
+        let multiple_id_criteria_error = Err(DatamodelError::new_model_validation_error(
             "Each model must have exactly one id criteria. Either mark a single field with `@id` or add a multi field id criterion with `@@id([])` to the model.",
             &model.name,
             ast_model.span,
@@ -80,7 +80,7 @@ impl Validator {
         }
     }
 
-    fn validate_id_fields_valid(&self, ast_schema: &ast::Datamodel, model: &dml::Model) -> Result<(), ValidationError> {
+    fn validate_id_fields_valid(&self, ast_schema: &ast::Datamodel, model: &dml::Model) -> Result<(), DatamodelError> {
         for id_field in model.singular_id_fields() {
             let is_valid = match (&id_field.default_value, &id_field.field_type, &id_field.arity) {
                 (
@@ -99,7 +99,7 @@ impl Validator {
             };
 
             if !is_valid {
-                return Err(ValidationError::new_model_validation_error(
+                return Err(DatamodelError::new_model_validation_error(
                     "Invalid ID field. ID field must be one of: Int @id, String @id @default(cuid()), String @id @default(uuid()).",
                     &model.name,
                     ast_schema.find_field(&model.name, &id_field.name).expect(STATE_ERROR).span));
@@ -116,7 +116,7 @@ impl Validator {
         ast_schema: &ast::Datamodel,
         datamodel: &dml::Datamodel,
         model: &dml::Model,
-    ) -> Result<(), ValidationError> {
+    ) -> Result<(), DatamodelError> {
         if model.is_embedded {
             for field in model.fields() {
                 if !field.is_generated {
@@ -127,7 +127,7 @@ impl Validator {
 
                         if rel.to_fields.is_empty() && !related_field.is_generated {
                             // TODO: Refactor that out, it's way too much boilerplate.
-                            return Err(ValidationError::new_model_validation_error(
+                            return Err(DatamodelError::new_model_validation_error(
                                 "Embedded models cannot have back relation fields.",
                                 &model.name,
                                 ast_schema.find_field(&model.name, &field.name).expect(STATE_ERROR).span,
@@ -146,7 +146,7 @@ impl Validator {
         &self,
         ast_schema: &ast::Datamodel,
         model: &dml::Model,
-    ) -> Result<(), ValidationError> {
+    ) -> Result<(), DatamodelError> {
         for field_a in model.fields() {
             for field_b in model.fields() {
                 if field_a != field_b {
@@ -157,7 +157,7 @@ impl Validator {
                                 // but pointing to the same foreign model,
                                 // and also no names set.
                                 if rel_a.to == rel_b.to && rel_a.name == rel_b.name {
-                                    return Err(ValidationError::new_model_validation_error(
+                                    return Err(DatamodelError::new_model_validation_error(
                                         "Ambiguous relation detected.",
                                         &model.name,
                                         ast_schema
@@ -177,7 +177,7 @@ impl Validator {
                                                 && rel_a.name == rel_b.name
                                                 && rel_a.name == rel_c.name
                                             {
-                                                return Err(ValidationError::new_model_validation_error(
+                                                return Err(DatamodelError::new_model_validation_error(
                                                     "Ambiguous self relation detected.",
                                                     &model.name,
                                                     ast_schema
@@ -193,7 +193,7 @@ impl Validator {
                                 // Ambiguous unnamed self relation: two fields are enough.
                                 if rel_a.name.is_empty() && rel_b.name.is_empty() {
                                     // A self relation, but there are at least two fields without a name.
-                                    return Err(ValidationError::new_model_validation_error(
+                                    return Err(DatamodelError::new_model_validation_error(
                                         "Ambiguous self relation detected.",
                                         &model.name,
                                         ast_schema

@@ -1,4 +1,5 @@
-use crate::validator::directive::{Args, DirectiveValidator, Error};
+use crate::errors::DatamodelError;
+use crate::validator::directive::{Args, DirectiveValidator};
 use crate::{ast, dml};
 
 /// Prismas builtin `@scalarList` directive.
@@ -9,7 +10,7 @@ impl DirectiveValidator<dml::Field> for ScalarListDirectiveValidator {
         &"scalarList"
     }
 
-    fn validate_and_apply(&self, args: &mut Args, obj: &mut dml::Field) -> Result<(), Error> {
+    fn validate_and_apply(&self, args: &mut Args, obj: &mut dml::Field) -> Result<(), DatamodelError> {
         // TODO: Throw when field is not of type scalar and arity is list.
         // TODO: We can probably lift this pattern to a macro.
 
@@ -21,7 +22,7 @@ impl DirectiveValidator<dml::Field> for ScalarListDirectiveValidator {
         Ok(())
     }
 
-    fn serialize(&self, obj: &dml::Field, _datamodel: &dml::Datamodel) -> Result<Vec<ast::Directive>, Error> {
+    fn serialize(&self, obj: &dml::Field, _datamodel: &dml::Datamodel) -> Result<Vec<ast::Directive>, DatamodelError> {
         if let Some(strategy) = &obj.scalar_list_strategy {
             return Ok(vec![ast::Directive::new(
                 self.directive_name(),

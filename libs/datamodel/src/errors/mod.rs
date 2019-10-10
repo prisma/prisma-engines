@@ -12,7 +12,7 @@ use colored::Colorize;
 ///
 /// For fancy printing, please use the `pretty_print_error` function.
 #[derive(Debug, Fail, Clone, PartialEq)]
-pub enum ValidationError {
+pub enum DatamodelError {
     #[fail(display = "Argument \"{}\" is missing.", argument_name)]
     ArgumentNotFound { argument_name: String, span: Span },
 
@@ -103,21 +103,21 @@ pub enum ValidationError {
 }
 
 #[rustfmt::skip]
-impl ValidationError {
-    pub fn new_literal_parser_error(literal_type: &str, raw_value: &str, span: Span) -> ValidationError {
-        ValidationError::LiteralParseError {
+impl DatamodelError {
+    pub fn new_literal_parser_error(literal_type: &str, raw_value: &str, span: Span) -> DatamodelError {
+        DatamodelError::LiteralParseError {
             literal_type: String::from(literal_type),
             raw_value: String::from(raw_value),
             span,
         }
     }
 
-    pub fn new_argument_not_found_error(argument_name: &str, span: Span) -> ValidationError {
-        ValidationError::ArgumentNotFound { argument_name: String::from(argument_name), span }
+    pub fn new_argument_not_found_error(argument_name: &str, span: Span) -> DatamodelError {
+        DatamodelError::ArgumentNotFound { argument_name: String::from(argument_name), span }
     }
 
-    pub fn new_argument_count_missmatch_error(function_name: &str, required_count: usize, given_count: usize, span: Span) -> ValidationError {
-        ValidationError::ArgumentCountMissmatch {
+    pub fn new_argument_count_missmatch_error(function_name: &str, required_count: usize, given_count: usize, span: Span) -> DatamodelError {
+        DatamodelError::ArgumentCountMissmatch {
             function_name: String::from(function_name),
             required_count,
             given_count,
@@ -125,54 +125,54 @@ impl ValidationError {
         }
     }
 
-    pub fn new_directive_argument_not_found_error(argument_name: &str, directive_name: &str, span: Span) -> ValidationError {
-        ValidationError::DirectiveArgumentNotFound {
+    pub fn new_directive_argument_not_found_error(argument_name: &str, directive_name: &str, span: Span) -> DatamodelError {
+        DatamodelError::DirectiveArgumentNotFound {
             argument_name: String::from(argument_name),
             directive_name: String::from(directive_name),
             span,
         }
     }
 
-    pub fn new_source_argument_not_found_error(argument_name: &str, source_name: &str, span: Span) -> ValidationError {
-        ValidationError::SourceArgumentNotFound {
+    pub fn new_source_argument_not_found_error(argument_name: &str, source_name: &str, span: Span) -> DatamodelError {
+        DatamodelError::SourceArgumentNotFound {
             argument_name: String::from(argument_name),
             source_name: String::from(source_name),
             span,
         }
     }
 
-    pub fn new_generator_argument_not_found_error(argument_name: &str, generator_name: &str, span: Span) -> ValidationError {
-        ValidationError::GeneratorArgumentNotFound {
+    pub fn new_generator_argument_not_found_error(argument_name: &str, generator_name: &str, span: Span) -> DatamodelError {
+        DatamodelError::GeneratorArgumentNotFound {
             argument_name: String::from(argument_name),
             generator_name: String::from(generator_name),
             span,
         }
     }
 
-    pub fn new_directive_validation_error(message: &str, directive_name: &str, span: Span) -> ValidationError {
-        ValidationError::DirectiveValidationError {
+    pub fn new_directive_validation_error(message: &str, directive_name: &str, span: Span) -> DatamodelError {
+        DatamodelError::DirectiveValidationError {
             message: String::from(message),
             directive_name: String::from(directive_name),
             span,
         }
     }
 
-    pub fn new_duplicate_directive_error(directive_name: &str, span: Span) -> ValidationError {
-        ValidationError::DuplicateDirectiveError {
+    pub fn new_duplicate_directive_error(directive_name: &str, span: Span) -> DatamodelError {
+        DatamodelError::DuplicateDirectiveError {
             directive_name: String::from(directive_name),
             span,
         }
     }
 
-    pub fn new_reserved_scalar_type_error(type_name: &str, span: Span) -> ValidationError {
-        ValidationError::ReservedScalarTypeError {
+    pub fn new_reserved_scalar_type_error(type_name: &str, span: Span) -> DatamodelError {
+        DatamodelError::ReservedScalarTypeError {
             type_name: String::from(type_name),
             span,
         }
     }
 
-    pub fn new_duplicate_top_error(name: &str, top_type: &str, existing_top_type: &str, span: Span) -> ValidationError {
-        ValidationError::DuplicateTopError {
+    pub fn new_duplicate_top_error(name: &str, top_type: &str, existing_top_type: &str, span: Span) -> DatamodelError {
+        DatamodelError::DuplicateTopError {
             name: String::from(name),
             top_type: String::from(top_type),
             existing_top_type: String::from(existing_top_type),
@@ -180,45 +180,45 @@ impl ValidationError {
         }
     }
 
-    pub fn new_duplicate_config_key_error(conf_block_name: &str, key_name: &str, span: Span) -> ValidationError {
-        ValidationError::DuplicateConfigKeyError {
+    pub fn new_duplicate_config_key_error(conf_block_name: &str, key_name: &str, span: Span) -> DatamodelError {
+        DatamodelError::DuplicateConfigKeyError {
             conf_block_name: String::from(conf_block_name),
             key_name: String::from(key_name),
             span,
         }
     }
 
-    pub fn new_duplicate_argument_error(arg_name: &str, span: Span) -> ValidationError {
-        ValidationError::DuplicateArgumentError {
+    pub fn new_duplicate_argument_error(arg_name: &str, span: Span) -> DatamodelError {
+        DatamodelError::DuplicateArgumentError {
             arg_name: String::from(arg_name),
             span,
         }
     }
 
-    pub fn new_unused_argument_error(arg_name: &str, span: Span) -> ValidationError {
-        ValidationError::UnusedArgumentError {
+    pub fn new_unused_argument_error(arg_name: &str, span: Span) -> DatamodelError {
+        DatamodelError::UnusedArgumentError {
             arg_name: String::from(arg_name),
             span,
         }
     }
 
-    pub fn new_duplicate_default_argument_error(arg_name: &str, span: Span) -> ValidationError {
-        ValidationError::DuplicateDefaultArgumentError {
+    pub fn new_duplicate_default_argument_error(arg_name: &str, span: Span) -> DatamodelError {
+        DatamodelError::DuplicateDefaultArgumentError {
             arg_name: String::from(arg_name),
             span,
         }
     }
 
-    pub fn new_duplicate_enum_value_error(enum_name: &str, value_name: &str, span: Span) -> ValidationError {
-        ValidationError::DuplicateEnumValueError {
+    pub fn new_duplicate_enum_value_error(enum_name: &str, value_name: &str, span: Span) -> DatamodelError {
+        DatamodelError::DuplicateEnumValueError {
             enum_name: String::from(enum_name),
             value_name: String::from(value_name),
             span,
         }
     }
 
-    pub fn new_duplicate_field_error(model_name: &str, field_name: &str, span: Span) -> ValidationError {
-        ValidationError::DuplicateFieldError {
+    pub fn new_duplicate_field_error(model_name: &str, field_name: &str, span: Span) -> DatamodelError {
+        DatamodelError::DuplicateFieldError {
             model_name: String::from(model_name),
             field_name: String::from(field_name),
             span,
@@ -226,56 +226,56 @@ impl ValidationError {
     }
 
 
-    pub fn new_model_validation_error(message: &str, model_name: &str, span: Span) -> ValidationError {
-        ValidationError::ModelValidationError {
+    pub fn new_model_validation_error(message: &str, model_name: &str, span: Span) -> DatamodelError {
+        DatamodelError::ModelValidationError {
             message: String::from(message),
             model_name: String::from(model_name),
             span,
         }
     }
 
-    pub fn new_validation_error(message: &str, span: Span) -> ValidationError {
-        ValidationError::ValidationError {
+    pub fn new_validation_error(message: &str, span: Span) -> DatamodelError {
+        DatamodelError::ValidationError {
             message: String::from(message),
             span,
         }
     }
 
-    pub fn new_legacy_parser_error(message: &str, span: Span) -> ValidationError {
-        ValidationError::LegacyParserError {
+    pub fn new_legacy_parser_error(message: &str, span: Span) -> DatamodelError {
+        DatamodelError::LegacyParserError {
             message: String::from(message),
             span,
         }
     }
 
-    pub fn new_parser_error(expected: &Vec<&'static str>, span: Span) -> ValidationError {
-        ValidationError::ParserError { expected: expected.clone(), expected_str: expected.join(", "), span }
+    pub fn new_parser_error(expected: &Vec<&'static str>, span: Span) -> DatamodelError {
+        DatamodelError::ParserError { expected: expected.clone(), expected_str: expected.join(", "), span }
     }
-    pub fn new_functional_evaluation_error(message: &str, span: Span) -> ValidationError {
-        ValidationError::FunctionalEvaluationError { message: String::from(message), span }
+    pub fn new_functional_evaluation_error(message: &str, span: Span) -> DatamodelError {
+        DatamodelError::FunctionalEvaluationError { message: String::from(message), span }
     }
-    pub fn new_environment_functional_evaluation_error(var_name: &str, span: Span) -> ValidationError {
-        ValidationError::EnvironmentFunctionalEvaluationError { var_name: String::from(var_name), span }
+    pub fn new_environment_functional_evaluation_error(var_name: &str, span: Span) -> DatamodelError {
+        DatamodelError::EnvironmentFunctionalEvaluationError { var_name: String::from(var_name), span }
     }
-    pub fn new_type_not_found_error(type_name: &str, span: Span) -> ValidationError {
-        ValidationError::TypeNotFoundError { type_name: String::from(type_name), span }
+    pub fn new_type_not_found_error(type_name: &str, span: Span) -> DatamodelError {
+        DatamodelError::TypeNotFoundError { type_name: String::from(type_name), span }
     }
-    pub fn new_scalar_type_not_found_error(type_name: &str, span: Span) -> ValidationError {
-        ValidationError::ScalarTypeNotFoundError { type_name: String::from(type_name), span }
+    pub fn new_scalar_type_not_found_error(type_name: &str, span: Span) -> DatamodelError {
+        DatamodelError::ScalarTypeNotFoundError { type_name: String::from(type_name), span }
     }
-    pub fn new_directive_not_known_error(directive_name: &str, span: Span) -> ValidationError {
-        ValidationError::DirectiveNotKnownError { directive_name: String::from(directive_name), span }
+    pub fn new_directive_not_known_error(directive_name: &str, span: Span) -> DatamodelError {
+        DatamodelError::DirectiveNotKnownError { directive_name: String::from(directive_name), span }
     }
-    pub fn new_function_not_known_error(function_name: &str, span: Span) -> ValidationError {
-        ValidationError::FunctionNotKnownError { function_name: String::from(function_name), span }
-    }
-
-    pub fn new_source_not_known_error(source_name: &str, span: Span) -> ValidationError {
-        ValidationError::SourceNotKnownError { source_name: String::from(source_name), span }
+    pub fn new_function_not_known_error(function_name: &str, span: Span) -> DatamodelError {
+        DatamodelError::FunctionNotKnownError { function_name: String::from(function_name), span }
     }
 
-    pub fn new_value_parser_error(expected_type: &str, parser_error: &str, raw: &str, span: Span) -> ValidationError {
-        ValidationError::ValueParserError {
+    pub fn new_source_not_known_error(source_name: &str, span: Span) -> DatamodelError {
+        DatamodelError::SourceNotKnownError { source_name: String::from(source_name), span }
+    }
+
+    pub fn new_value_parser_error(expected_type: &str, parser_error: &str, raw: &str, span: Span) -> DatamodelError {
+        DatamodelError::ValueParserError {
             expected_type: String::from(expected_type),
             parser_error: String::from(parser_error),
             raw: String::from(raw),
@@ -283,8 +283,8 @@ impl ValidationError {
         }
     }
 
-    pub fn new_type_mismatch_error(expected_type: &str, received_type: &str, raw: &str, span: Span) -> ValidationError {
-        ValidationError::TypeMismatchError {
+    pub fn new_type_mismatch_error(expected_type: &str, received_type: &str, raw: &str, span: Span) -> DatamodelError {
+        DatamodelError::TypeMismatchError {
             expected_type: String::from(expected_type),
             received_type: String::from(received_type),
             raw: String::from(raw),
@@ -294,35 +294,35 @@ impl ValidationError {
 
     pub fn span(&self) -> Span {
         match self {
-            ValidationError::ArgumentNotFound { span, .. } => *span,
-            ValidationError::DirectiveArgumentNotFound { span, .. } => *span,
-            ValidationError::ArgumentCountMissmatch { span, .. } => *span,
-            ValidationError::SourceArgumentNotFound { span, .. } => *span,
-            ValidationError::GeneratorArgumentNotFound { span, .. } => *span,
-            ValidationError::DirectiveValidationError { span, .. } => *span,
-            ValidationError::DirectiveNotKnownError { span, .. } => *span,
-            ValidationError::ReservedScalarTypeError { span, .. } => *span,
-            ValidationError::FunctionNotKnownError { span, .. } => *span,
-            ValidationError::SourceNotKnownError { span, .. } => *span,
-            ValidationError::LiteralParseError { span, .. } => *span,
-            ValidationError::TypeNotFoundError { span, .. } => *span,
-            ValidationError::ScalarTypeNotFoundError { span, .. } => *span,
-            ValidationError::ParserError { span, .. } => *span,
-            ValidationError::FunctionalEvaluationError { span, .. } => *span,
-            ValidationError::EnvironmentFunctionalEvaluationError { span, .. } => *span,
-            ValidationError::TypeMismatchError { span, .. } => *span,
-            ValidationError::ValueParserError { span, .. } => *span,
-            ValidationError::ValidationError { span, .. } => *span,
-            ValidationError::LegacyParserError { span, .. } => *span,
-            ValidationError::ModelValidationError { span, .. } => *span,
-            ValidationError::DuplicateDirectiveError { span, .. } => *span,
-            ValidationError::DuplicateConfigKeyError { span, .. } => *span,
-            ValidationError::DuplicateTopError { span, .. } => *span,
-            ValidationError::DuplicateFieldError { span, .. } => *span,
-            ValidationError::DuplicateEnumValueError { span, .. } => *span,
-            ValidationError::DuplicateArgumentError { span, .. } => *span,
-            ValidationError::DuplicateDefaultArgumentError { span, .. } => *span,
-            ValidationError::UnusedArgumentError { span, .. } => *span
+            DatamodelError::ArgumentNotFound { span, .. } => *span,
+            DatamodelError::DirectiveArgumentNotFound { span, .. } => *span,
+            DatamodelError::ArgumentCountMissmatch { span, .. } => *span,
+            DatamodelError::SourceArgumentNotFound { span, .. } => *span,
+            DatamodelError::GeneratorArgumentNotFound { span, .. } => *span,
+            DatamodelError::DirectiveValidationError { span, .. } => *span,
+            DatamodelError::DirectiveNotKnownError { span, .. } => *span,
+            DatamodelError::ReservedScalarTypeError { span, .. } => *span,
+            DatamodelError::FunctionNotKnownError { span, .. } => *span,
+            DatamodelError::SourceNotKnownError { span, .. } => *span,
+            DatamodelError::LiteralParseError { span, .. } => *span,
+            DatamodelError::TypeNotFoundError { span, .. } => *span,
+            DatamodelError::ScalarTypeNotFoundError { span, .. } => *span,
+            DatamodelError::ParserError { span, .. } => *span,
+            DatamodelError::FunctionalEvaluationError { span, .. } => *span,
+            DatamodelError::EnvironmentFunctionalEvaluationError { span, .. } => *span,
+            DatamodelError::TypeMismatchError { span, .. } => *span,
+            DatamodelError::ValueParserError { span, .. } => *span,
+            DatamodelError::ValidationError { span, .. } => *span,
+            DatamodelError::LegacyParserError { span, .. } => *span,
+            DatamodelError::ModelValidationError { span, .. } => *span,
+            DatamodelError::DuplicateDirectiveError { span, .. } => *span,
+            DatamodelError::DuplicateConfigKeyError { span, .. } => *span,
+            DatamodelError::DuplicateTopError { span, .. } => *span,
+            DatamodelError::DuplicateFieldError { span, .. } => *span,
+            DatamodelError::DuplicateEnumValueError { span, .. } => *span,
+            DatamodelError::DuplicateArgumentError { span, .. } => *span,
+            DatamodelError::DuplicateDefaultArgumentError { span, .. } => *span,
+            DatamodelError::UnusedArgumentError { span, .. } => *span
         }
     }
     pub fn description(&self) -> String {
@@ -337,7 +337,7 @@ impl ValidationError {
 /// Given the datamodel text representation, pretty prints an error, including
 /// the offending portion of the source code, for human-friendly reading.
 #[rustfmt::skip]
-fn pretty_print_error(f: &mut dyn std::io::Write, file_name: &str, text: &str, error_obj: &ValidationError) -> std::io::Result<()> {
+fn pretty_print_error(f: &mut dyn std::io::Write, file_name: &str, text: &str, error_obj: &DatamodelError) -> std::io::Result<()> {
     let span = error_obj.span();
     let error = error_obj.description();
 

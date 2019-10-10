@@ -4,7 +4,7 @@ use crate::{
     common::value::ValueValidator,
     common::{FromStrAndSpan, PrismaType},
     configuration, dml,
-    errors::{ErrorCollection, ValidationError},
+    errors::{DatamodelError, ErrorCollection},
 };
 
 /// Helper for lifting a datamodel.
@@ -127,7 +127,7 @@ impl LiftAstToDml {
                     Err(err) => errors.push(err),
                 };
             } else {
-                errors.push(ValidationError::new_validation_error(
+                errors.push(DatamodelError::new_validation_error(
                     "Found default value for a non-scalar type.",
                     validator.span(),
                 ))
@@ -164,7 +164,7 @@ impl LiftAstToDml {
         ast_field: &ast::Field,
         ast_schema: &ast::Datamodel,
         checked_types: &mut Vec<String>,
-    ) -> Result<(dml::FieldType, Vec<ast::Directive>), ValidationError> {
+    ) -> Result<(dml::FieldType, Vec<ast::Directive>), DatamodelError> {
         let type_name = &ast_field.field_type.name;
 
         if let Ok(scalar_type) = PrismaType::from_str_and_span(type_name, ast_field.field_type.span) {
@@ -183,12 +183,12 @@ impl LiftAstToDml {
         ast_field: &ast::Field,
         ast_schema: &ast::Datamodel,
         checked_types: &mut Vec<String>,
-    ) -> Result<(dml::FieldType, Vec<ast::Directive>), ValidationError> {
+    ) -> Result<(dml::FieldType, Vec<ast::Directive>), DatamodelError> {
         let type_name = &ast_field.field_type.name;
 
         if checked_types.iter().any(|x| x == type_name) {
             // Recursive type.
-            return Err(ValidationError::new_validation_error(
+            return Err(DatamodelError::new_validation_error(
                 &format!(
                     "Recursive type definitions are not allowed. Recursive path was: {} -> {}",
                     checked_types.join(" -> "),
@@ -203,7 +203,7 @@ impl LiftAstToDml {
             let (field_type, mut attrs) = self.lift_field_type(custom_type, ast_schema, checked_types)?;
 
             if let dml::FieldType::Relation(_) = field_type {
-                return Err(ValidationError::new_validation_error(
+                return Err(DatamodelError::new_validation_error(
                     "Only scalar types can be used for defining custom types.",
                     custom_type.field_type.span,
                 ));
@@ -212,7 +212,7 @@ impl LiftAstToDml {
             attrs.append(&mut custom_type.directives.clone());
             Ok((field_type, attrs))
         } else {
-            Err(ValidationError::new_type_not_found_error(
+            Err(DatamodelError::new_type_not_found_error(
                 type_name,
                 ast_field.field_type.span,
             ))

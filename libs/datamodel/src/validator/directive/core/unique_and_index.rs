@@ -1,4 +1,5 @@
-use crate::validator::directive::{Args, DirectiveValidator, Error};
+use crate::errors::DatamodelError;
+use crate::validator::directive::{Args, DirectiveValidator};
 use crate::{ast, dml, IndexDefinition, IndexType};
 
 /// Prismas builtin `@unique` directive.
@@ -9,13 +10,17 @@ impl DirectiveValidator<dml::Field> for FieldLevelUniqueDirectiveValidator {
         &"unique"
     }
 
-    fn validate_and_apply(&self, _args: &mut Args, obj: &mut dml::Field) -> Result<(), Error> {
+    fn validate_and_apply(&self, _args: &mut Args, obj: &mut dml::Field) -> Result<(), DatamodelError> {
         obj.is_unique = true;
 
         Ok(())
     }
 
-    fn serialize(&self, field: &dml::Field, _datamodel: &dml::Datamodel) -> Result<Vec<ast::Directive>, Error> {
+    fn serialize(
+        &self,
+        field: &dml::Field,
+        _datamodel: &dml::Datamodel,
+    ) -> Result<Vec<ast::Directive>, DatamodelError> {
         if field.is_unique {
             return Ok(vec![ast::Directive::new(self.directive_name(), vec![])]);
         }
@@ -37,14 +42,18 @@ impl DirectiveValidator<dml::Model> for ModelLevelUniqueDirectiveValidator {
         true
     }
 
-    fn validate_and_apply(&self, args: &mut Args, obj: &mut dml::Model) -> Result<(), Error> {
+    fn validate_and_apply(&self, args: &mut Args, obj: &mut dml::Model) -> Result<(), DatamodelError> {
         let index_def = self.validate_index(args, obj, IndexType::Unique)?;
         obj.indexes.push(index_def);
 
         Ok(())
     }
 
-    fn serialize(&self, model: &dml::Model, _datamodel: &dml::Datamodel) -> Result<Vec<ast::Directive>, Error> {
+    fn serialize(
+        &self,
+        model: &dml::Model,
+        _datamodel: &dml::Datamodel,
+    ) -> Result<Vec<ast::Directive>, DatamodelError> {
         self.serialize_index_definitions(&model, IndexType::Unique)
     }
 }
@@ -62,14 +71,18 @@ impl DirectiveValidator<dml::Model> for ModelLevelIndexDirectiveValidator {
         true
     }
 
-    fn validate_and_apply(&self, args: &mut Args, obj: &mut dml::Model) -> Result<(), Error> {
+    fn validate_and_apply(&self, args: &mut Args, obj: &mut dml::Model) -> Result<(), DatamodelError> {
         let index_def = self.validate_index(args, obj, IndexType::Normal)?;
         obj.indexes.push(index_def);
 
         Ok(())
     }
 
-    fn serialize(&self, model: &dml::Model, _datamodel: &dml::Datamodel) -> Result<Vec<ast::Directive>, Error> {
+    fn serialize(
+        &self,
+        model: &dml::Model,
+        _datamodel: &dml::Datamodel,
+    ) -> Result<Vec<ast::Directive>, DatamodelError> {
         self.serialize_index_definitions(&model, IndexType::Normal)
     }
 }
@@ -81,7 +94,7 @@ trait IndexDirectiveBase<T>: DirectiveValidator<T> {
         args: &mut Args,
         obj: &mut dml::Model,
         index_type: IndexType,
-    ) -> Result<IndexDefinition, Error> {
+    ) -> Result<IndexDefinition, DatamodelError> {
         let mut index_def = IndexDefinition {
             name: None,
             fields: vec![],
@@ -114,7 +127,7 @@ trait IndexDirectiveBase<T>: DirectiveValidator<T> {
             .collect();
 
         if !undefined_fields.is_empty() {
-            return Err(Error::new_model_validation_error(
+            return Err(DatamodelError::new_model_validation_error(
                 &format!(
                     "The {}index definition refers to the unknown fields {}.",
                     if index_type == IndexType::Unique { "unique " } else { "" },
@@ -132,7 +145,7 @@ trait IndexDirectiveBase<T>: DirectiveValidator<T> {
         &self,
         model: &dml::Model,
         index_type: IndexType,
-    ) -> Result<Vec<ast::Directive>, Error> {
+    ) -> Result<Vec<ast::Directive>, DatamodelError> {
         let directives: Vec<ast::Directive> = model
             .indexes
             .iter()

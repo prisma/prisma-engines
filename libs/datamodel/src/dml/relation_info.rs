@@ -1,6 +1,6 @@
 use crate::ast;
 use crate::common::FromStrAndSpan;
-use crate::errors::ValidationError;
+use crate::errors::DatamodelError;
 use serde::{Deserialize, Serialize};
 
 /// Holds information about a relation field.
@@ -56,11 +56,11 @@ pub enum OnDeleteStrategy {
 }
 
 impl FromStrAndSpan for OnDeleteStrategy {
-    fn from_str_and_span(s: &str, span: ast::Span) -> Result<Self, ValidationError> {
+    fn from_str_and_span(s: &str, span: ast::Span) -> Result<Self, DatamodelError> {
         match s {
             "CASCADE" => Ok(OnDeleteStrategy::Cascade),
             "NONE" => Ok(OnDeleteStrategy::None),
-            _ => Err(ValidationError::new_literal_parser_error("onDelete strategy", s, span)),
+            _ => Err(DatamodelError::new_literal_parser_error("onDelete strategy", s, span)),
         }
     }
 }

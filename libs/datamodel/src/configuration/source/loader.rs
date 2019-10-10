@@ -1,7 +1,7 @@
 use super::traits::{Source, SourceDefinition};
 use crate::ast;
 use crate::common::argument::Arguments;
-use crate::errors::{ErrorCollection, ValidationError};
+use crate::errors::{DatamodelError, ErrorCollection};
 use crate::StringFromEnvVar;
 
 /// Helper struct to load and validate source configuration blocks.
@@ -23,7 +23,7 @@ impl SourceLoader {
     }
 
     /// Internal: Loads a single source from a source config block in the datamodel.
-    pub fn load_source(&self, ast_source: &ast::SourceConfig) -> Result<Option<Box<dyn Source>>, ValidationError> {
+    pub fn load_source(&self, ast_source: &ast::SourceConfig) -> Result<Option<Box<dyn Source>>, DatamodelError> {
         let mut args = Arguments::new(&ast_source.properties, ast_source.span);
         let (env_var_for_url, url) = args.arg("url")?.as_str_from_env()?;
         let provider_arg = args.arg("provider")?;
@@ -54,7 +54,7 @@ impl SourceLoader {
             }
         }
 
-        Err(ValidationError::new_source_not_known_error(
+        Err(DatamodelError::new_source_not_known_error(
             &provider,
             provider_arg.span(),
         ))
@@ -72,8 +72,8 @@ impl SourceLoader {
                     Ok(Some(loaded_src)) => sources.push(loaded_src),
                     Ok(None) => { /* Source was disabled. */ }
                     // Lift error to source.
-                    Err(ValidationError::ArgumentNotFound { argument_name, span }) => errors.push(
-                        ValidationError::new_source_argument_not_found_error(&argument_name, &src.name.name, span),
+                    Err(DatamodelError::ArgumentNotFound { argument_name, span }) => errors.push(
+                        DatamodelError::new_source_argument_not_found_error(&argument_name, &src.name.name, span),
                     ),
                     Err(err) => errors.push(err),
                 }

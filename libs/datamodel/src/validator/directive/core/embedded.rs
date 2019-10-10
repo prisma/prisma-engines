@@ -1,4 +1,5 @@
-use crate::validator::directive::{Args, DirectiveValidator, Error};
+use crate::errors::DatamodelError;
+use crate::validator::directive::{Args, DirectiveValidator};
 use crate::{ast, dml};
 
 /// Prismas builtin `@embedded` directive.
@@ -8,12 +9,16 @@ impl DirectiveValidator<dml::Model> for EmbeddedDirectiveValidator {
     fn directive_name(&self) -> &'static str {
         &"embedded"
     }
-    fn validate_and_apply(&self, _args: &mut Args, obj: &mut dml::Model) -> Result<(), Error> {
+    fn validate_and_apply(&self, _args: &mut Args, obj: &mut dml::Model) -> Result<(), DatamodelError> {
         obj.is_embedded = true;
         Ok(())
     }
 
-    fn serialize(&self, model: &dml::Model, _datamodel: &dml::Datamodel) -> Result<Vec<ast::Directive>, Error> {
+    fn serialize(
+        &self,
+        model: &dml::Model,
+        _datamodel: &dml::Datamodel,
+    ) -> Result<Vec<ast::Directive>, DatamodelError> {
         if model.is_embedded {
             return Ok(vec![ast::Directive::new(self.directive_name(), vec![])]);
         }

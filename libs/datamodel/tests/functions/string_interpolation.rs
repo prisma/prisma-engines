@@ -3,7 +3,7 @@ use datamodel::{
     ast::Span,
     common::{PrismaType, PrismaValue},
     dml,
-    errors::ValidationError,
+    errors::DatamodelError,
 };
 
 #[test]
@@ -136,7 +136,7 @@ fn resolve_argument_errors_correctly() {
 
     errors.assert_is_at(
         0,
-        ValidationError::new_environment_functional_evaluation_error("UNKNOWN_FOR_SURE", Span::new(83, 101)),
+        DatamodelError::new_environment_functional_evaluation_error("UNKNOWN_FOR_SURE", Span::new(83, 101)),
     );
 }
 
@@ -154,6 +154,6 @@ fn resolve_array_interpolation_errors_correctly() {
 
     errors.assert_is_at(
         0,
-        ValidationError::new_validation_error("Arrays cannot be interpolated into strings.", Span::new(79, 88)),
+        DatamodelError::new_validation_error("Arrays cannot be interpolated into strings.", Span::new(79, 88)),
     );
 }

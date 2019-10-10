@@ -4,7 +4,7 @@ use crate::common::{
     value::{MaybeExpression, ValueValidator},
     PrismaType, PrismaValue,
 };
-use crate::errors::ValidationError;
+use crate::errors::DatamodelError;
 
 /// Environment variable interpolating function (`env(...)`).
 pub struct EnvFunctional {}
@@ -14,7 +14,7 @@ impl Functional for EnvFunctional {
         "env"
     }
 
-    fn apply(&self, values: &[ValueValidator], span: ast::Span) -> Result<MaybeExpression, ValidationError> {
+    fn apply(&self, values: &[ValueValidator], span: ast::Span) -> Result<MaybeExpression, DatamodelError> {
         self.check_arg_count(values, 1, span)?;
 
         let var_wrapped = &values[0];
@@ -25,7 +25,7 @@ impl Functional for EnvFunctional {
                 ast::Value::Any(var, span),
             ))
         } else {
-            Err(ValidationError::new_environment_functional_evaluation_error(
+            Err(DatamodelError::new_environment_functional_evaluation_error(
                 &var_name,
                 var_wrapped.span(),
             ))
@@ -53,7 +53,7 @@ impl Functional for ServerSideTrivialFunctional {
         self.name
     }
 
-    fn apply(&self, values: &[ValueValidator], span: ast::Span) -> Result<MaybeExpression, ValidationError> {
+    fn apply(&self, values: &[ValueValidator], span: ast::Span) -> Result<MaybeExpression, DatamodelError> {
         self.check_arg_count(values, 0, span)?;
 
         Ok(MaybeExpression::Expression(

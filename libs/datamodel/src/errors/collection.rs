@@ -1,11 +1,11 @@
-use super::ValidationError;
+use super::DatamodelError;
 
 /// Represents a list of validation or parser errors.
 ///
 /// This is uses to accumulate all errors and show them all at once.
 #[derive(Debug, Clone)]
 pub struct ErrorCollection {
-    pub errors: Vec<ValidationError>,
+    pub errors: Vec<DatamodelError>,
 }
 
 impl ErrorCollection {
@@ -15,7 +15,7 @@ impl ErrorCollection {
     }
 
     /// Adds an error.
-    pub fn push(&mut self, err: ValidationError) {
+    pub fn push(&mut self, err: DatamodelError) {
         self.errors.push(err)
     }
 
@@ -26,7 +26,7 @@ impl ErrorCollection {
     }
 
     /// Creates an iterator over all errors in this collection.
-    pub fn to_iter(&self) -> std::slice::Iter<ValidationError> {
+    pub fn to_iter(&self) -> std::slice::Iter<DatamodelError> {
         self.errors.iter()
     }
 
@@ -50,8 +50,8 @@ impl std::fmt::Display for ErrorCollection {
     }
 }
 
-impl std::convert::From<ValidationError> for ErrorCollection {
-    fn from(error: ValidationError) -> Self {
+impl std::convert::From<DatamodelError> for ErrorCollection {
+    fn from(error: DatamodelError) -> Self {
         let mut col = ErrorCollection::new();
         col.push(error);
         col

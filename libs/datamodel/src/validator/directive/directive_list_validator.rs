@@ -1,7 +1,7 @@
-use super::{DirectiveScope, DirectiveValidator, Error};
+use super::{DirectiveScope, DirectiveValidator};
 use crate::ast;
 use crate::dml;
-use crate::errors::{ErrorCollection, ValidationError};
+use crate::errors::{DatamodelError, ErrorCollection};
 
 // BTreeMap has a strictly defined order.
 // That's important since rendering depends on that order.
@@ -79,7 +79,7 @@ impl<T: 'static> DirectiveListValidator<T> {
 
                     let directive_count = directive_counts.get(&directive.name.name).unwrap();
                     if *directive_count > 1 && !validator.is_duplicate_definition_allowed() {
-                        errors.push(ValidationError::new_duplicate_directive_error(
+                        errors.push(DatamodelError::new_duplicate_directive_error(
                             &directive.name.name,
                             directive.name.span,
                         ));
@@ -92,8 +92,8 @@ impl<T: 'static> DirectiveListValidator<T> {
                     let directive_validation_result = validator.validate_and_apply(&mut arguments, t);
 
                     match directive_validation_result {
-                        Err(ValidationError::ArgumentNotFound { argument_name, span }) => {
-                            errors.push(ValidationError::new_directive_argument_not_found_error(
+                        Err(DatamodelError::ArgumentNotFound { argument_name, span }) => {
+                            errors.push(DatamodelError::new_directive_argument_not_found_error(
                                 &argument_name,
                                 &directive.name.name,
                                 span,
@@ -110,7 +110,7 @@ impl<T: 'static> DirectiveListValidator<T> {
                         }
                     }
                 }
-                None => errors.push(ValidationError::new_directive_not_known_error(
+                None => errors.push(DatamodelError::new_directive_not_known_error(
                     &directive.name.name,
                     directive.name.span,
                 )),

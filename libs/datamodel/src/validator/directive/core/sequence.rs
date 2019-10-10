@@ -1,4 +1,5 @@
-use crate::validator::directive::{Args, DirectiveValidator, Error};
+use crate::errors::DatamodelError;
+use crate::validator::directive::{Args, DirectiveValidator};
 use crate::{ast, dml};
 
 /// Prismas builtin `@sequence` directive.
@@ -8,7 +9,7 @@ impl DirectiveValidator<dml::Field> for SequenceDirectiveValidator {
     fn directive_name(&self) -> &'static str {
         &"sequence"
     }
-    fn validate_and_apply(&self, args: &mut Args, obj: &mut dml::Field) -> Result<(), Error> {
+    fn validate_and_apply(&self, args: &mut Args, obj: &mut dml::Field) -> Result<(), DatamodelError> {
         // TODO: Handle fields according to tests:
         // https://github.com/prisma/prisma/blob/master/server/servers/deploy/src/test/scala/com/prisma/deploy/migration/validation/SequenceDirectiveSpec.scala
 
@@ -46,7 +47,11 @@ impl DirectiveValidator<dml::Field> for SequenceDirectiveValidator {
         Ok(())
     }
 
-    fn serialize(&self, field: &dml::Field, _datamodel: &dml::Datamodel) -> Result<Vec<ast::Directive>, Error> {
+    fn serialize(
+        &self,
+        field: &dml::Field,
+        _datamodel: &dml::Datamodel,
+    ) -> Result<Vec<ast::Directive>, DatamodelError> {
         if let Some(id_info) = &field.id_info {
             if let Some(seq_info) = &id_info.sequence {
                 let mut args = Vec::new();

@@ -1,6 +1,6 @@
 use crate::common::*;
 use datamodel::{
-    common::FromStrAndSpan, common::PrismaType, configuration::*, dml, errors::ValidationError, Arguments,
+    common::FromStrAndSpan, common::PrismaType, configuration::*, dml, errors::DatamodelError, Arguments,
     DirectiveValidator,
 };
 
@@ -16,7 +16,7 @@ impl DirectiveValidator<dml::Field> for CustomDirective {
     fn directive_name(&self) -> &'static str {
         &"mapToBase"
     }
-    fn validate_and_apply(&self, _args: &mut Arguments, obj: &mut dml::Field) -> Result<(), ValidationError> {
+    fn validate_and_apply(&self, _args: &mut Arguments, obj: &mut dml::Field) -> Result<(), DatamodelError> {
         obj.field_type = dml::FieldType::Base(self.base_type);
         return Ok(());
     }
@@ -25,7 +25,7 @@ impl DirectiveValidator<dml::Field> for CustomDirective {
         &self,
         _obj: &dml::Field,
         _datamodel: &dml::Datamodel,
-    ) -> Result<Vec<datamodel::ast::Directive>, ValidationError> {
+    ) -> Result<Vec<datamodel::ast::Directive>, DatamodelError> {
         Ok(Vec::new())
     }
 }
@@ -43,7 +43,7 @@ impl CustomDbDefinition {
         CustomDbDefinition {}
     }
 
-    fn get_base_type(&self, arguments: &mut Arguments) -> Result<PrismaType, ValidationError> {
+    fn get_base_type(&self, arguments: &mut Arguments) -> Result<PrismaType, DatamodelError> {
         if let Ok(arg) = arguments.arg("base_type") {
             PrismaType::from_str_and_span(&arg.as_constant_literal()?, arg.span())
         } else {
@@ -63,7 +63,7 @@ impl SourceDefinition for CustomDbDefinition {
         url: StringFromEnvVar,
         arguments: &mut Arguments,
         documentation: &Option<String>,
-    ) -> Result<Box<dyn Source>, ValidationError> {
+    ) -> Result<Box<dyn Source>, DatamodelError> {
         Ok(Box::new(CustomDb {
             name: String::from(name),
             url: url,
