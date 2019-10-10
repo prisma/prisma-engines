@@ -11,7 +11,7 @@ pub(crate) trait FindInAstDatamodel {
     fn find_custom_type(&self, type_name: &str) -> Option<&ast::Field>;
 }
 
-impl FindInAstDatamodel for ast::Datamodel {
+impl FindInAstDatamodel for ast::SchemaAst {
     fn find_field(&self, model: &str, field: &str) -> Option<&ast::Field> {
         for ast_field in &self.find_model(model)?.fields {
             if ast_field.name.name == field {
@@ -65,7 +65,7 @@ impl ast::WithDirectives for Vec<ast::Directive> {
     }
 }
 
-pub fn model_validation_error(message: &str, model: &dml::Model, ast: &ast::Datamodel) -> DatamodelError {
+pub fn model_validation_error(message: &str, model: &dml::Model, ast: &ast::SchemaAst) -> DatamodelError {
     DatamodelError::new_model_validation_error(
         message,
         &model.name,
@@ -77,7 +77,7 @@ pub fn field_validation_error(
     message: &str,
     model: &dml::Model,
     field: &dml::Field,
-    ast: &ast::Datamodel,
+    ast: &ast::SchemaAst,
 ) -> DatamodelError {
     DatamodelError::new_model_validation_error(
         message,

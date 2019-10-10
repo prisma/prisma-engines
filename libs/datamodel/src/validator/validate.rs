@@ -26,7 +26,7 @@ impl Validator {
         Self::new()
     }
 
-    pub fn validate(&self, ast_schema: &ast::Datamodel, schema: &mut dml::Datamodel) -> Result<(), ErrorCollection> {
+    pub fn validate(&self, ast_schema: &ast::SchemaAst, schema: &mut dml::Datamodel) -> Result<(), ErrorCollection> {
         let mut errors = ErrorCollection::new();
 
         // Model level validations.
@@ -80,7 +80,7 @@ impl Validator {
         }
     }
 
-    fn validate_id_fields_valid(&self, ast_schema: &ast::Datamodel, model: &dml::Model) -> Result<(), DatamodelError> {
+    fn validate_id_fields_valid(&self, ast_schema: &ast::SchemaAst, model: &dml::Model) -> Result<(), DatamodelError> {
         for id_field in model.singular_id_fields() {
             let is_valid = match (&id_field.default_value, &id_field.field_type, &id_field.arity) {
                 (
@@ -113,7 +113,7 @@ impl Validator {
     /// to their parent types.
     fn validate_embedded_types_have_no_back_relation(
         &self,
-        ast_schema: &ast::Datamodel,
+        ast_schema: &ast::SchemaAst,
         datamodel: &dml::Datamodel,
         model: &dml::Model,
     ) -> Result<(), DatamodelError> {
@@ -144,7 +144,7 @@ impl Validator {
     /// Elegantly checks if any relations in the model are ambigious.
     fn validate_relations_not_ambiguous(
         &self,
-        ast_schema: &ast::Datamodel,
+        ast_schema: &ast::SchemaAst,
         model: &dml::Model,
     ) -> Result<(), DatamodelError> {
         for field_a in model.fields() {

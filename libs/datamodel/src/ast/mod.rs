@@ -39,9 +39,10 @@ pub use traits::*;
 /// annotated with it's location in the text representation.
 /// Basically, the AST is an object oriented representation of the datamodel's text.
 
-/// A prisma datamodel.
+/// A prisma schema.
+/// Schema = Datamodel + Generators + Datasources
 #[derive(Debug)]
-pub struct Datamodel {
+pub struct SchemaAst {
     /// All models, enums, or source config blocks.
     pub models: Vec<Top>,
 }

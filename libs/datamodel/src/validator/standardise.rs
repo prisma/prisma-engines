@@ -21,7 +21,7 @@ impl Standardiser {
         Self::new()
     }
 
-    pub fn standardise(&self, ast_schema: &ast::Datamodel, schema: &mut dml::Datamodel) -> Result<(), ErrorCollection> {
+    pub fn standardise(&self, ast_schema: &ast::SchemaAst, schema: &mut dml::Datamodel) -> Result<(), ErrorCollection> {
         self.add_missing_back_relations(ast_schema, schema)?;
 
         // This is intentionally disabled for now, since the generated types would surface in the
@@ -187,7 +187,7 @@ impl Standardiser {
     #[allow(unused)]
     fn add_missing_relation_tables(
         &self,
-        ast_schema: &ast::Datamodel,
+        ast_schema: &ast::SchemaAst,
         schema: &mut dml::Datamodel,
     ) -> Result<(), ErrorCollection> {
         let mut errors = ErrorCollection::new();
@@ -221,7 +221,7 @@ impl Standardiser {
     /// Explicit n:m relations are not touched, as they already have a back relation field.
     fn add_missing_back_relations(
         &self,
-        ast_schema: &ast::Datamodel,
+        ast_schema: &ast::SchemaAst,
         schema: &mut dml::Datamodel,
     ) -> Result<(), ErrorCollection> {
         let mut errors = ErrorCollection::new();
@@ -269,7 +269,7 @@ impl Standardiser {
     fn find_fields_with_missing_back_relation(
         &self,
         model: &dml::Model,
-        ast_schema: &ast::Datamodel,
+        ast_schema: &ast::SchemaAst,
         schema: &dml::Datamodel,
     ) -> Result<Vec<(dml::RelationInfo, dml::RelationInfo)>, ErrorCollection> {
         let mut fields: Vec<(dml::RelationInfo, dml::RelationInfo)> = Vec::new();

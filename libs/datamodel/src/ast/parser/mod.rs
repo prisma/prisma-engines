@@ -426,7 +426,7 @@ fn parse_type(token: &pest::iterators::Pair<'_, Rule>) -> Field {
 // Whole datamodel parsing
 
 /// Parses a Prisma V2 datamodel document into an internal AST representation.
-pub fn parse(datamodel_string: &str) -> Result<Datamodel, ErrorCollection> {
+pub fn parse(datamodel_string: &str) -> Result<SchemaAst, ErrorCollection> {
     let mut errors = ErrorCollection::new();
     let datamodel_result = PrismaDatamodelParser::parse(Rule::datamodel, datamodel_string);
 
@@ -450,7 +450,7 @@ pub fn parse(datamodel_string: &str) -> Result<Datamodel, ErrorCollection> {
 
             errors.ok()?;
 
-            Ok(Datamodel { models })
+            Ok(SchemaAst { models })
         }
         Err(err) => {
             let location = match err.location {

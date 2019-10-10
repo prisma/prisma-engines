@@ -26,7 +26,7 @@ impl LowerDmlToAst {
         }
     }
 
-    pub fn lower(&self, datamodel: &dml::Datamodel) -> Result<ast::Datamodel, ErrorCollection> {
+    pub fn lower(&self, datamodel: &dml::Datamodel) -> Result<ast::SchemaAst, ErrorCollection> {
         let mut tops: Vec<ast::Top> = Vec::new();
         let mut errors = ErrorCollection::new();
 
@@ -46,7 +46,7 @@ impl LowerDmlToAst {
             }
         }
 
-        Ok(ast::Datamodel { models: tops })
+        Ok(ast::SchemaAst { models: tops })
     }
 
     fn lower_model(&self, model: &dml::Model, datamodel: &dml::Datamodel) -> Result<ast::Model, ErrorCollection> {

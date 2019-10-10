@@ -39,7 +39,7 @@ impl ValidationPipeline {
     /// * Perform string interpolation
     /// * Resolve and check default values
     /// * Resolve and check all field types
-    pub fn validate(&self, ast_schema: &ast::Datamodel) -> Result<dml::Datamodel, ErrorCollection> {
+    pub fn validate(&self, ast_schema: &ast::SchemaAst) -> Result<dml::Datamodel, ErrorCollection> {
         let mut all_errors = ErrorCollection::new();
 
         // Phase 0 is parsing.

@@ -8,7 +8,7 @@ use crate::{
 pub struct Precheck {}
 
 impl Precheck {
-    pub fn precheck(datamodel: &ast::Datamodel) -> Result<(), ErrorCollection> {
+    pub fn precheck(datamodel: &ast::SchemaAst) -> Result<(), ErrorCollection> {
         let mut errors = ErrorCollection::new();
 
         let mut top_level_types_checker = DuplicateChecker::new();

@@ -9,7 +9,7 @@ const FIRST_CLASS_PROPERTIES: &[&str] = &[PROVIDER_KEY, OUTPUT_KEY, BINARY_TARGE
 pub struct GeneratorLoader {}
 
 impl GeneratorLoader {
-    pub fn load_generators_from_ast(ast_schema: &ast::Datamodel) -> Result<Vec<Generator>, ErrorCollection> {
+    pub fn load_generators_from_ast(ast_schema: &ast::SchemaAst) -> Result<Vec<Generator>, ErrorCollection> {
         let mut generators: Vec<Generator> = vec![];
         let mut errors = ErrorCollection::new();
 
@@ -69,7 +69,7 @@ impl GeneratorLoader {
         })
     }
 
-    pub fn add_generators_to_ast(generators: &[Generator], ast_datamodel: &mut ast::Datamodel) {
+    pub fn add_generators_to_ast(generators: &[Generator], ast_datamodel: &mut ast::SchemaAst) {
         let mut models: Vec<ast::Top> = Vec::new();
 
         for generator in generators {

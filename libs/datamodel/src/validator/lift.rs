@@ -34,7 +34,7 @@ impl LiftAstToDml {
         }
     }
 
-    pub fn lift(&self, ast_schema: &ast::Datamodel) -> Result<dml::Datamodel, ErrorCollection> {
+    pub fn lift(&self, ast_schema: &ast::SchemaAst) -> Result<dml::Datamodel, ErrorCollection> {
         let mut schema = dml::Datamodel::new();
         let mut errors = ErrorCollection::new();
 
@@ -63,7 +63,7 @@ impl LiftAstToDml {
     }
 
     /// Internal: Validates a model AST node and lifts it to a DML model.
-    fn lift_model(&self, ast_model: &ast::Model, ast_schema: &ast::Datamodel) -> Result<dml::Model, ErrorCollection> {
+    fn lift_model(&self, ast_model: &ast::Model, ast_schema: &ast::SchemaAst) -> Result<dml::Model, ErrorCollection> {
         let mut model = dml::Model::new(&ast_model.name.name);
         model.documentation = ast_model.documentation.clone().map(|comment| comment.text);
 
@@ -109,7 +109,7 @@ impl LiftAstToDml {
     }
 
     /// Internal: Lift a field AST node to a DML field.
-    fn lift_field(&self, ast_field: &ast::Field, ast_schema: &ast::Datamodel) -> Result<dml::Field, ErrorCollection> {
+    fn lift_field(&self, ast_field: &ast::Field, ast_schema: &ast::SchemaAst) -> Result<dml::Field, ErrorCollection> {
         let mut errors = ErrorCollection::new();
         // If we cannot parse the field type, we exit right away.
         let (field_type, extra_attributes) = self.lift_field_type(&ast_field, ast_schema, &mut Vec::new())?;
@@ -162,7 +162,7 @@ impl LiftAstToDml {
     fn lift_field_type(
         &self,
         ast_field: &ast::Field,
-        ast_schema: &ast::Datamodel,
+        ast_schema: &ast::SchemaAst,
         checked_types: &mut Vec<String>,
     ) -> Result<(dml::FieldType, Vec<ast::Directive>), DatamodelError> {
         let type_name = &ast_field.field_type.name;
@@ -181,7 +181,7 @@ impl LiftAstToDml {
     fn resolve_custom_type(
         &self,
         ast_field: &ast::Field,
-        ast_schema: &ast::Datamodel,
+        ast_schema: &ast::SchemaAst,
         checked_types: &mut Vec<String>,
     ) -> Result<(dml::FieldType, Vec<ast::Directive>), DatamodelError> {
         let type_name = &ast_field.field_type.name;

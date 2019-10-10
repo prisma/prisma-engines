@@ -171,7 +171,7 @@ pub fn parse_with_formatted_error(datamodel_string: &str, file_name: &str) -> Re
 }
 
 /// Parses a datamodel string to an AST. For internal use only.
-pub fn parse_to_ast(datamodel_string: &str) -> Result<ast::Datamodel, error::ErrorCollection> {
+pub fn parse_to_ast(datamodel_string: &str) -> Result<ast::SchemaAst, error::ErrorCollection> {
     ast::parser::parse(datamodel_string)
 }
 
@@ -180,7 +180,7 @@ pub fn parse_to_ast(datamodel_string: &str) -> Result<ast::Datamodel, error::Err
 //
 
 /// Renders an datamodel AST to a stream as datamodel string. For internal use only.
-pub fn render_ast_to(stream: &mut dyn std::io::Write, datamodel: &ast::Datamodel, ident_width: usize) {
+pub fn render_ast_to(stream: &mut dyn std::io::Write, datamodel: &ast::SchemaAst, ident_width: usize) {
     let mut renderer = ast::renderer::Renderer::new(stream, ident_width);
     renderer.render(datamodel);
 }
@@ -199,7 +199,7 @@ pub fn render_to_string(datamodel: &dml::Datamodel) -> Result<String, error::Err
 }
 
 /// Renders an datamodel AST to a datamodel string. For internal use only.
-pub fn render_ast(datamodel: &ast::Datamodel) -> String {
+pub fn render_ast(datamodel: &ast::SchemaAst) -> String {
     let mut buffer = std::io::Cursor::new(Vec::<u8>::new());
     render_ast_to(&mut buffer, datamodel, 2);
     String::from_utf8(buffer.into_inner()).unwrap()
