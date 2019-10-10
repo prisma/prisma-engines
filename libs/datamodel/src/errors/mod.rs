@@ -337,7 +337,7 @@ impl ValidationError {
 /// Given the datamodel text representation, pretty prints an error, including
 /// the offending portion of the source code, for human-friendly reading.
 #[rustfmt::skip]
-pub fn pretty_print_error(f: &mut dyn std::io::Write, file_name: &str, text: &str, error_obj: &ValidationError) -> std::io::Result<()> {
+fn pretty_print_error(f: &mut dyn std::io::Write, file_name: &str, text: &str, error_obj: &ValidationError) -> std::io::Result<()> {
     let span = error_obj.span();
     let error = error_obj.description();
 
