@@ -1,5 +1,5 @@
 use crate::common::ErrorAsserts;
-use datamodel::errors::DatamodelError;
+use datamodel::error::DatamodelError;
 
 const DATAMODEL: &str = r#"
 generator js1 {

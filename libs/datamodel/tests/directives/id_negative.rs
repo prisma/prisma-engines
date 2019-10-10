@@ -1,5 +1,5 @@
 use crate::common::*;
-use datamodel::{ast::Span, errors::DatamodelError};
+use datamodel::{ast::Span, error::DatamodelError};
 
 // Ported from
 // https://github.com/prisma/prisma/blob/master/server/servers/deploy/src/test/scala/com/prisma/deploy/migration/validation/IdDirectiveSpec.scala

@@ -2,7 +2,7 @@ use crate::{
     ast::{self, WithIdentifier, WithName},
     common::FromStrAndSpan,
     dml,
-    errors::{DatamodelError, ErrorCollection},
+    error::{DatamodelError, ErrorCollection},
 };
 
 pub struct Precheck {}

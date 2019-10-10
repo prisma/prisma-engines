@@ -6,7 +6,7 @@ use crate::common::{
     value::{MaybeExpression, ValueValidator},
     PrismaType,
 };
-use crate::errors::DatamodelError;
+use crate::error::DatamodelError;
 
 use traits::*;
 

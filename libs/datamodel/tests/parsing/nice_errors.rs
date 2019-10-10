@@ -1,6 +1,6 @@
 use crate::common::*;
 use datamodel::ast::Span;
-use datamodel::errors::DatamodelError;
+use datamodel::error::DatamodelError;
 
 #[test]
 fn nice_error_for_missing_model_keyword() {

@@ -4,7 +4,7 @@ use crate::{
     common::value::ValueValidator,
     common::{FromStrAndSpan, PrismaType},
     configuration, dml,
-    errors::{DatamodelError, ErrorCollection},
+    error::{DatamodelError, ErrorCollection},
 };
 
 /// Helper for lifting a datamodel.

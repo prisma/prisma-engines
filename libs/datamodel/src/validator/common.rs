@@ -1,4 +1,4 @@
-use crate::{ast, dml, errors::DatamodelError};
+use crate::{ast, dml, error::DatamodelError};
 
 /// State error message. Seeing this error means something went really wrong internally. It's the datamodel equivalent of a bluescreen.
 pub (crate) const STATE_ERROR: &str = "Failed lookup of model or field during internal processing. This means that the internal representation was mutated incorrectly.";

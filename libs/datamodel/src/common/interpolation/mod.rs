@@ -1,7 +1,7 @@
 use crate::ast::parser::{parse_expression, PrismaDatamodelParser, Rule};
 use crate::ast::{lift_span, Span, Value};
 use crate::common::value::ValueValidator;
-use crate::errors::DatamodelError;
+use crate::error::DatamodelError;
 use pest::Parser;
 
 pub struct StringInterpolator {}

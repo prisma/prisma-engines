@@ -54,7 +54,7 @@ pub use crate::common::FromStrAndSpan;
 pub use common::argument::Arguments;
 pub mod configuration;
 pub mod dmmf;
-pub mod errors;
+pub mod error;
 pub use common::functions::FunctionalEvaluator;
 pub use configuration::*;
 pub use validator::directive::DirectiveValidator;
@@ -78,7 +78,7 @@ pub fn get_builtin_sources() -> Vec<Box<dyn SourceDefinition>> {
 pub fn parse_with_plugins(
     datamodel_string: &str,
     source_definitions: Vec<Box<dyn configuration::SourceDefinition>>,
-) -> Result<Datamodel, errors::ErrorCollection> {
+) -> Result<Datamodel, error::ErrorCollection> {
     let ast = parser::parse(datamodel_string)?;
     let mut source_loader = SourceLoader::new();
     for source in get_builtin_sources() {
@@ -88,7 +88,7 @@ pub fn parse_with_plugins(
         source_loader.add_source_definition(source);
     }
 
-    let mut errors = errors::ErrorCollection::new();
+    let mut errors = error::ErrorCollection::new();
 
     let sources = match source_loader.load(&ast) {
         Ok(src) => src,
@@ -113,7 +113,7 @@ pub fn parse_with_plugins(
 pub fn load_data_source_configuration_with_plugins(
     datamodel_string: &str,
     source_definitions: Vec<Box<dyn configuration::SourceDefinition>>,
-) -> Result<Vec<Box<dyn Source>>, errors::ErrorCollection> {
+) -> Result<Vec<Box<dyn Source>>, error::ErrorCollection> {
     let ast = parser::parse(datamodel_string)?;
     let mut source_loader = SourceLoader::new();
     for source in get_builtin_sources() {
@@ -129,7 +129,7 @@ pub fn load_data_source_configuration_with_plugins(
 pub fn load_configuration_with_plugins(
     datamodel_string: &str,
     source_definitions: Vec<Box<dyn configuration::SourceDefinition>>,
-) -> Result<Configuration, errors::ErrorCollection> {
+) -> Result<Configuration, error::ErrorCollection> {
     let ast = parser::parse(datamodel_string)?;
 
     let mut source_loader = SourceLoader::new();
@@ -152,18 +152,18 @@ pub fn load_configuration_with_plugins(
 
 /// Loads all source configuration blocks from a datamodel using the built-in source definitions.
 #[deprecated(note = "please use `load_configuration` instead")]
-pub fn load_data_source_configuration(datamodel_string: &str) -> Result<Vec<Box<dyn Source>>, errors::ErrorCollection> {
+pub fn load_data_source_configuration(datamodel_string: &str) -> Result<Vec<Box<dyn Source>>, error::ErrorCollection> {
     #[allow(deprecated)]
     load_data_source_configuration_with_plugins(datamodel_string, vec![])
 }
 
 /// Loads all configuration blocks from a datamodel using the built-in source definitions.
-pub fn load_configuration(datamodel_string: &str) -> Result<Configuration, errors::ErrorCollection> {
+pub fn load_configuration(datamodel_string: &str) -> Result<Configuration, error::ErrorCollection> {
     load_configuration_with_plugins(datamodel_string, vec![])
 }
 
 /// Parses and validates a datamodel string, using core attributes only.
-pub fn parse(datamodel_string: &str) -> Result<Datamodel, errors::ErrorCollection> {
+pub fn parse(datamodel_string: &str) -> Result<Datamodel, error::ErrorCollection> {
     parse_with_plugins(datamodel_string, vec![])
 }
 
@@ -188,7 +188,7 @@ pub fn parse_with_formatted_error(datamodel_string: &str, file_name: &str) -> Re
 }
 
 /// Parses a datamodel string to an AST. For internal use only.
-pub fn parse_to_ast(datamodel_string: &str) -> Result<ast::Datamodel, errors::ErrorCollection> {
+pub fn parse_to_ast(datamodel_string: &str) -> Result<ast::Datamodel, error::ErrorCollection> {
     parser::parse(datamodel_string)
 }
 
@@ -199,13 +199,13 @@ pub fn render_ast_to(stream: &mut dyn std::io::Write, datamodel: &ast::Datamodel
 }
 
 /// Renders a datamodel to a stream as datamodel string into the stream.
-pub fn render_to(stream: &mut dyn std::io::Write, datamodel: &dml::Datamodel) -> Result<(), errors::ErrorCollection> {
+pub fn render_to(stream: &mut dyn std::io::Write, datamodel: &dml::Datamodel) -> Result<(), error::ErrorCollection> {
     let lowered = validator::LowerDmlToAst::new().lower(datamodel)?;
     render_ast_to(stream, &lowered, 2);
     Ok(())
 }
 
-pub fn render_to_string(datamodel: &dml::Datamodel) -> Result<String, errors::ErrorCollection> {
+pub fn render_to_string(datamodel: &dml::Datamodel) -> Result<String, error::ErrorCollection> {
     let mut writable_string = common::WritableString::new();
     render_to(&mut writable_string, datamodel)?;
     Ok(writable_string.into())
@@ -217,7 +217,7 @@ pub fn render_with_sources_to(
     stream: &mut dyn std::io::Write,
     datamodel: &dml::Datamodel,
     sources: &Vec<Box<dyn Source>>,
-) -> Result<(), errors::ErrorCollection> {
+) -> Result<(), error::ErrorCollection> {
     let mut lowered = validator::LowerDmlToAst::new().lower(datamodel)?;
     SourceSerializer::add_sources_to_ast(sources, &mut lowered);
     render_ast_to(stream, &lowered, 2);
@@ -229,7 +229,7 @@ pub fn render_with_config_to(
     stream: &mut dyn std::io::Write,
     datamodel: &dml::Datamodel,
     config: Configuration,
-) -> Result<(), errors::ErrorCollection> {
+) -> Result<(), error::ErrorCollection> {
     let mut lowered = validator::LowerDmlToAst::new().lower(datamodel)?;
     SourceSerializer::add_sources_to_ast(&config.datasources, &mut lowered);
     GeneratorLoader::add_generators_to_ast(&config.generators, &mut lowered);
@@ -245,7 +245,7 @@ pub fn render_ast(datamodel: &ast::Datamodel) -> String {
 }
 
 /// Renders a datamodel to a datamodel string.
-pub fn render(datamodel: &dml::Datamodel) -> Result<String, errors::ErrorCollection> {
+pub fn render(datamodel: &dml::Datamodel) -> Result<String, error::ErrorCollection> {
     let lowered = validator::LowerDmlToAst::new().lower(datamodel)?;
     Ok(render_ast(&lowered))
 }
@@ -255,7 +255,7 @@ pub fn render(datamodel: &dml::Datamodel) -> Result<String, errors::ErrorCollect
 pub fn render_with_sources(
     datamodel: &dml::Datamodel,
     sources: &Vec<Box<dyn Source>>,
-) -> Result<String, errors::ErrorCollection> {
+) -> Result<String, error::ErrorCollection> {
     let mut lowered = validator::LowerDmlToAst::new().lower(datamodel)?;
     SourceSerializer::add_sources_to_ast(sources, &mut lowered);
     Ok(render_ast(&lowered))
@@ -265,7 +265,7 @@ pub fn render_with_sources(
 pub fn render_with_config(
     datamodel: &dml::Datamodel,
     config: &configuration::Configuration,
-) -> Result<String, errors::ErrorCollection> {
+) -> Result<String, error::ErrorCollection> {
     let mut lowered = validator::LowerDmlToAst::new().lower(datamodel)?;
     SourceSerializer::add_sources_to_ast(&config.datasources, &mut lowered);
     GeneratorLoader::add_generators_to_ast(&config.generators, &mut lowered);

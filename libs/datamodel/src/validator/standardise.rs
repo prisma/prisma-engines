@@ -1,5 +1,5 @@
 use super::common::*;
-use crate::{ast, common::names::*, configuration, dml, errors::ErrorCollection};
+use crate::{ast, common::names::*, configuration, dml, error::ErrorCollection};
 
 /// Helper for standardsing a datamodel.
 ///

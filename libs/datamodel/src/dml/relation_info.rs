@@ -1,6 +1,6 @@
 use crate::ast;
 use crate::common::FromStrAndSpan;
-use crate::errors::DatamodelError;
+use crate::error::DatamodelError;
 use serde::{Deserialize, Serialize};
 
 /// Holds information about a relation field.

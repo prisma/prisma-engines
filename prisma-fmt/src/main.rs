@@ -1,5 +1,5 @@
 use datamodel;
-use datamodel::errors::DatamodelError;
+use datamodel::error::DatamodelError;
 use std::{
     fs,
     io::{self, Read},

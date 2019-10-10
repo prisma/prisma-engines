@@ -1,6 +1,6 @@
 use crate::ast;
 use crate::common::value;
-use crate::errors::{DatamodelError, ErrorCollection};
+use crate::error::{DatamodelError, ErrorCollection};
 use std::collections::HashSet;
 
 /// Represents a list of arguments.

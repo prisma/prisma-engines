@@ -3,7 +3,7 @@ use datamodel::{
     ast::Span,
     common::{PrismaType, PrismaValue},
     dml,
-    errors::DatamodelError,
+    error::DatamodelError,
 };
 
 #[test]

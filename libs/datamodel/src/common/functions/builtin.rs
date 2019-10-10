@@ -4,7 +4,7 @@ use crate::common::{
     value::{MaybeExpression, ValueValidator},
     PrismaType, PrismaValue,
 };
-use crate::errors::DatamodelError;
+use crate::error::DatamodelError;
 
 /// Environment variable interpolating function (`env(...)`).
 pub struct EnvFunctional {}

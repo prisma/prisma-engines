@@ -1,4 +1,4 @@
-use datamodel::{ast::Span, errors::*, render_to_string, IndexDefinition, IndexType};
+use datamodel::{ast::Span, error::*, render_to_string, IndexDefinition, IndexType};
 
 use crate::common::*;
 

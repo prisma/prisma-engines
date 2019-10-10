@@ -1,5 +1,5 @@
 use crate::common::argument::Arguments;
-use crate::errors::DatamodelError;
+use crate::error::DatamodelError;
 use crate::validator::directive::DirectiveValidator;
 use crate::{dml, StringFromEnvVar};
 use std::collections::HashMap;

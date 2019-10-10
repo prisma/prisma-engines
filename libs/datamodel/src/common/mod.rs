@@ -11,7 +11,7 @@ pub use fromstr::FromStrAndSpan;
 pub use string_helper::WritableString;
 
 use crate::ast;
-use crate::errors::DatamodelError;
+use crate::error::DatamodelError;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 

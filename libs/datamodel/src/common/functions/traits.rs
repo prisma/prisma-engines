@@ -1,6 +1,6 @@
 use crate::ast;
 use crate::common::value::{MaybeExpression, ValueValidator};
-use crate::errors::DatamodelError;
+use crate::error::DatamodelError;
 
 /// Trait for functions which can be accessed from the datamodel.
 pub trait Functional {

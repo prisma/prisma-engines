@@ -1,7 +1,7 @@
 use super::{Args, DirectiveValidator};
 use crate::ast;
 use crate::dml;
-use crate::errors::DatamodelError;
+use crate::error::DatamodelError;
 
 /// Moves an directive into a namespace scope.
 ///

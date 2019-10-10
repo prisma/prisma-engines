@@ -1,4 +1,4 @@
-use crate::errors::DatamodelError;
+use crate::error::DatamodelError;
 use crate::validator::directive::{Args, DirectiveValidator};
 use crate::{ast, dml};
 

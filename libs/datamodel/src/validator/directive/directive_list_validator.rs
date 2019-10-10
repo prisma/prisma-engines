@@ -1,7 +1,7 @@
 use super::{DirectiveScope, DirectiveValidator};
 use crate::ast;
 use crate::dml;
-use crate::errors::{DatamodelError, ErrorCollection};
+use crate::error::{DatamodelError, ErrorCollection};
 
 // BTreeMap has a strictly defined order.
 // That's important since rendering depends on that order.

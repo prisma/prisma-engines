@@ -4,7 +4,7 @@ use crate::dml;
 use crate::common::interpolation::StringInterpolator;
 use crate::common::FromStrAndSpan;
 use crate::common::{PrismaType, PrismaValue};
-use crate::errors::DatamodelError;
+use crate::error::DatamodelError;
 use crate::FunctionalEvaluator;
 use chrono::{DateTime, Utc};
 use std::error;

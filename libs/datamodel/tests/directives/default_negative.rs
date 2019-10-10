@@ -1,5 +1,5 @@
 use crate::common::*;
-use datamodel::{ast::Span, errors::DatamodelError};
+use datamodel::{ast::Span, error::DatamodelError};
 
 #[test]
 fn should_error_if_default_value_for_related() {

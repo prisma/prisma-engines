@@ -1,5 +1,5 @@
 use crate::common::ErrorAsserts;
-use datamodel::errors::DatamodelError;
+use datamodel::error::DatamodelError;
 
 #[test]
 fn serialize_builtin_sources_to_dmmf() {

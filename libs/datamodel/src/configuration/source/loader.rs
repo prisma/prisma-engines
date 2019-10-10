@@ -1,7 +1,7 @@
 use super::traits::{Source, SourceDefinition};
 use crate::ast;
 use crate::common::argument::Arguments;
-use crate::errors::{DatamodelError, ErrorCollection};
+use crate::error::{DatamodelError, ErrorCollection};
 use crate::StringFromEnvVar;
 
 /// Helper struct to load and validate source configuration blocks.

@@ -1,6 +1,6 @@
 use super::*;
 use crate::ast;
-use crate::errors::DatamodelError;
+use crate::error::DatamodelError;
 use serde::{Deserialize, Serialize};
 
 use crate::common::FromStrAndSpan;

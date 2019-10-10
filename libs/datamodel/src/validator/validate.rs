@@ -1,7 +1,7 @@
 use super::common::*;
 use crate::{
     ast, configuration, dml,
-    errors::{DatamodelError, ErrorCollection},
+    error::{DatamodelError, ErrorCollection},
 };
 
 /// Helper for validating a datamodel.

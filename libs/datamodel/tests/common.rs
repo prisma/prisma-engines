@@ -1,7 +1,7 @@
 extern crate datamodel;
 
 use self::datamodel::IndexDefinition;
-use datamodel::{common::PrismaType, configuration::SourceDefinition, dml, errors::*};
+use datamodel::{common::PrismaType, configuration::SourceDefinition, dml, error::*};
 
 pub trait FieldAsserts {
     fn assert_base_type(&self, t: &PrismaType) -> &Self;

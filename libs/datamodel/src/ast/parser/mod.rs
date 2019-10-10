@@ -11,7 +11,7 @@ use pest::Parser;
 pub struct PrismaDatamodelParser;
 
 use crate::ast::*;
-use crate::errors::{DatamodelError, ErrorCollection};
+use crate::error::{DatamodelError, ErrorCollection};
 
 trait ToIdentifier {
     fn to_id(&self) -> Identifier;

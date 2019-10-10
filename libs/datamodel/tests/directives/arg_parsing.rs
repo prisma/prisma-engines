@@ -1,5 +1,5 @@
 use crate::common::*;
-use datamodel::{ast::Span, errors::DatamodelError};
+use datamodel::{ast::Span, error::DatamodelError};
 
 #[test]
 fn fail_on_duplicate_directive() {

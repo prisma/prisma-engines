@@ -1,7 +1,7 @@
 use super::Args;
 use crate::ast;
 use crate::dml;
-use crate::errors::DatamodelError;
+use crate::error::DatamodelError;
 
 /// Structs implementing this trait can be used to validate any
 /// directive and to apply the directive's effect on the corresponding

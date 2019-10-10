@@ -1,6 +1,6 @@
 use super::{common::*, DirectiveBox};
 use crate::configuration;
-use crate::errors::ErrorCollection;
+use crate::error::ErrorCollection;
 use crate::{ast, dml};
 
 pub struct LowerDmlToAst {

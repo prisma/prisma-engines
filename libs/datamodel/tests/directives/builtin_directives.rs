@@ -1,5 +1,5 @@
 use crate::common::*;
-use datamodel::{ast, common::PrismaType, errors::DatamodelError};
+use datamodel::{ast, common::PrismaType, error::DatamodelError};
 
 #[test]
 fn db_directive() {
