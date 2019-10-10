@@ -1,5 +1,4 @@
-use super::field::*;
-use super::traits::*;
+use super::*;
 use serde::{Deserialize, Serialize};
 
 /// Represents a model in a prisma datamodel.

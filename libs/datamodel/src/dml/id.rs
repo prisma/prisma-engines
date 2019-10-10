@@ -1,4 +1,4 @@
-use super::traits::*;
+use super::*;
 use crate::ast;
 use crate::errors::ValidationError;
 use serde::{Deserialize, Serialize};
