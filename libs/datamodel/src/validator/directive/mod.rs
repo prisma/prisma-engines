@@ -10,6 +10,6 @@ pub use directive_scope::DirectiveScope;
 pub use directive_validator::DirectiveValidator;
 
 /// The error type for directive validators.
-pub type Error = crate::errors::ValidationError;
+type Error = crate::errors::ValidationError;
 /// The argument type for directive validators.
-pub type Args<'a> = crate::common::argument::Arguments<'a>;
+type Args<'a> = crate::common::argument::Arguments<'a>;
