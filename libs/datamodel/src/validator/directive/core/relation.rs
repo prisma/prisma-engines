@@ -1,6 +1,6 @@
 use crate::common::names::DefaultNames;
 use crate::common::value::ValueListValidator;
-use crate::dml::validator::directive::{Args, DirectiveValidator, Error};
+use crate::validator::directive::{Args, DirectiveValidator, Error};
 use crate::{ast, dml};
 
 /// Prismas builtin `@relation` directive.

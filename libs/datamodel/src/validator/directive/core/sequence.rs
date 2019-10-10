@@ -1,4 +1,4 @@
-use crate::dml::validator::directive::{Args, DirectiveValidator, Error};
+use crate::validator::directive::{Args, DirectiveValidator, Error};
 use crate::{ast, dml};
 
 /// Prismas builtin `@sequence` directive.

@@ -5,7 +5,7 @@ pub (crate) const STATE_ERROR: &str = "Failed lookup of model or field during in
 pub (crate) const ERROR_GEN_STATE_ERROR: &str = "Failed lookup of model or field during generating an error message. This often means that a generated field or model was the cause of an error.";
 
 pub(crate) trait FindInAstDatamodel {
-    fn find_field(&self, field: &str, field: &str) -> Option<&ast::Field>;
+    fn find_field(&self, model: &str, field: &str) -> Option<&ast::Field>;
     fn find_model(&self, model: &str) -> Option<&ast::Model>;
     fn find_enum(&self, enum_name: &str) -> Option<&ast::Enum>;
     fn find_custom_type(&self, type_name: &str) -> Option<&ast::Field>;
