@@ -219,13 +219,6 @@ pub fn render_datamodel_and_config_to(
     Ok(())
 }
 
-/// Renders an datamodel AST to a datamodel string. For internal use in tests only.
-pub fn render_schema_ast_to_string(schema: &ast::SchemaAst) -> String {
-    let mut writable_string = common::WritableString::new();
-    render_schema_ast_to(&mut writable_string, schema, 2);
-    writable_string.into()
-}
-
 /// Renders as a string into the stream.
 fn render_schema_ast_to(stream: &mut dyn std::io::Write, schema: &ast::SchemaAst, ident_width: usize) {
     let mut renderer = ast::renderer::Renderer::new(stream, ident_width);
