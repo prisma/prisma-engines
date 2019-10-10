@@ -9,15 +9,6 @@ use crate::FunctionalEvaluator;
 use chrono::{DateTime, Utc};
 use std::error;
 
-macro_rules! wrap_value (
-    ($value:expr, $wrapper:expr) => ({
-        match $value {
-            Ok(val) => Ok($wrapper(val)),
-            Err(err) => Err(err)
-        }
-    })
-);
-
 #[derive(Debug, Clone)]
 pub enum MaybeExpression {
     // The Option is Some if the value came from an env var. The String is then the name of the env var.
@@ -82,12 +73,12 @@ impl ValueValidator {
     pub fn as_type(&self, scalar_type: PrismaType) -> Result<dml::Value, DatamodelError> {
         match &self.value {
             MaybeExpression::Value(_, _) => match scalar_type {
-                PrismaType::Int => wrap_value!(self.as_int(), dml::Value::Int),
-                PrismaType::Float => wrap_value!(self.as_float(), dml::Value::Float),
-                PrismaType::Decimal => wrap_value!(self.as_decimal(), dml::Value::Decimal),
-                PrismaType::Boolean => wrap_value!(self.as_bool(), dml::Value::Boolean),
-                PrismaType::DateTime => wrap_value!(self.as_date_time(), dml::Value::DateTime),
-                PrismaType::String => wrap_value!(self.as_str(), dml::Value::String),
+                PrismaType::Int => self.as_int().map(dml::Value::Int),
+                PrismaType::Float => self.as_float().map(dml::Value::Float),
+                PrismaType::Decimal => self.as_decimal().map(dml::Value::Decimal),
+                PrismaType::Boolean => self.as_bool().map(dml::Value::Boolean),
+                PrismaType::DateTime => self.as_date_time().map(dml::Value::DateTime),
+                PrismaType::String => self.as_str().map(dml::Value::String),
             },
             MaybeExpression::Expression(expr, _) => {
                 if expr.get_type() == scalar_type {
