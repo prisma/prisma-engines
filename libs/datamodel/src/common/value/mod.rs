@@ -10,7 +10,7 @@ use chrono::{DateTime, Utc};
 use std::error;
 
 macro_rules! wrap_value (
-    ($value:expr, $wrapper:expr, $validator:expr) => ({
+    ($value:expr, $wrapper:expr) => ({
         match $value {
             Ok(val) => Ok($wrapper(val)),
             Err(err) => Err(err)
@@ -82,12 +82,12 @@ impl ValueValidator {
     pub fn as_type(&self, scalar_type: PrismaType) -> Result<dml::Value, DatamodelError> {
         match &self.value {
             MaybeExpression::Value(_, _) => match scalar_type {
-                PrismaType::Int => wrap_value!(self.as_int(), dml::Value::Int, self),
-                PrismaType::Float => wrap_value!(self.as_float(), dml::Value::Float, self),
-                PrismaType::Decimal => wrap_value!(self.as_decimal(), dml::Value::Decimal, self),
-                PrismaType::Boolean => wrap_value!(self.as_bool(), dml::Value::Boolean, self),
-                PrismaType::DateTime => wrap_value!(self.as_date_time(), dml::Value::DateTime, self),
-                PrismaType::String => wrap_value!(self.as_str(), dml::Value::String, self),
+                PrismaType::Int => wrap_value!(self.as_int(), dml::Value::Int),
+                PrismaType::Float => wrap_value!(self.as_float(), dml::Value::Float),
+                PrismaType::Decimal => wrap_value!(self.as_decimal(), dml::Value::Decimal),
+                PrismaType::Boolean => wrap_value!(self.as_bool(), dml::Value::Boolean),
+                PrismaType::DateTime => wrap_value!(self.as_date_time(), dml::Value::DateTime),
+                PrismaType::String => wrap_value!(self.as_str(), dml::Value::String),
             },
             MaybeExpression::Expression(expr, _) => {
                 if expr.get_type() == scalar_type {
