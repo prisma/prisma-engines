@@ -295,25 +295,25 @@ impl<'a> Renderer<'a> {
         Self::render_value(target, &args.value);
     }
 
-    fn render_value_to_string(val: &ast::Value) -> String {
+    fn render_value_to_string(val: &ast::Expression) -> String {
         let mut builder = StringBuilder::new();
         Self::render_value(&mut builder, val);
         builder.to_string()
     }
 
-    fn render_value(target: &mut dyn LineWriteable, val: &ast::Value) {
+    fn render_value(target: &mut dyn LineWriteable, val: &ast::Expression) {
         match val {
-            ast::Value::Array(vals, _) => Self::render_array(target, &vals),
-            ast::Value::BooleanValue(val, _) => target.write(&val),
-            ast::Value::ConstantValue(val, _) => target.write(&val),
-            ast::Value::NumericValue(val, _) => target.write(&val),
-            ast::Value::StringValue(val, _) => Self::render_str(target, &val),
-            ast::Value::Function(name, args, _) => Self::render_func(target, &name, &args),
-            ast::Value::Any(_, _) => unimplemented!("Value of 'Any' type cannot be rendered."),
+            ast::Expression::Array(vals, _) => Self::render_array(target, &vals),
+            ast::Expression::BooleanValue(val, _) => target.write(&val),
+            ast::Expression::ConstantValue(val, _) => target.write(&val),
+            ast::Expression::NumericValue(val, _) => target.write(&val),
+            ast::Expression::StringValue(val, _) => Self::render_str(target, &val),
+            ast::Expression::Function(name, args, _) => Self::render_func(target, &name, &args),
+            ast::Expression::Any(_, _) => unimplemented!("Value of 'Any' type cannot be rendered."),
         };
     }
 
-    fn render_func(target: &mut dyn LineWriteable, name: &str, vals: &[ast::Value]) {
+    fn render_func(target: &mut dyn LineWriteable, name: &str, vals: &[ast::Expression]) {
         target.write(name);
         target.write("(");
         for val in vals {
@@ -333,7 +333,7 @@ impl<'a> Renderer<'a> {
         self.indent -= 1
     }
 
-    fn render_array(target: &mut dyn LineWriteable, vals: &[ast::Value]) {
+    fn render_array(target: &mut dyn LineWriteable, vals: &[ast::Expression]) {
         target.write(&"[");
         for (idx, arg) in vals.iter().enumerate() {
             if idx > 0 {

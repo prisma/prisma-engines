@@ -66,10 +66,13 @@ impl DirectiveValidator<dml::Field> for RelationDirectiveValidator {
             all_related_ids.sort();
 
             if !relation_info.to_fields.is_empty() && relation_fields != all_related_ids {
-                let mut related_fields: Vec<ast::Value> = Vec::new();
+                let mut related_fields: Vec<ast::Expression> = Vec::new();
 
                 for related_field in &relation_info.to_fields {
-                    related_fields.push(ast::Value::ConstantValue(related_field.clone(), ast::Span::empty()));
+                    related_fields.push(ast::Expression::ConstantValue(
+                        related_field.clone(),
+                        ast::Span::empty(),
+                    ));
                 }
 
                 args.push(ast::Argument::new_array("references", related_fields));

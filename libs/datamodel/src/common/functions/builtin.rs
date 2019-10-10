@@ -22,7 +22,7 @@ impl Functional for EnvFunctional {
         if let Ok(var) = std::env::var(&var_name) {
             Ok(MaybeExpression::Value(
                 Some(var_name.clone()),
-                ast::Value::Any(var, span),
+                ast::Expression::Any(var, span),
             ))
         } else {
             Err(DatamodelError::new_environment_functional_evaluation_error(

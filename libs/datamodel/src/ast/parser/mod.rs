@@ -36,21 +36,21 @@ fn parse_string_literal(token: &pest::iterators::Pair<'_, Rule>) -> String {
 // Expressions
 
 /// Parses an expression, given a Pest parser token.
-pub fn parse_expression(token: &pest::iterators::Pair<'_, Rule>) -> Value {
+pub fn parse_expression(token: &pest::iterators::Pair<'_, Rule>) -> Expression {
     return match_first! { token, current,
-        Rule::numeric_literal => Value::NumericValue(current.as_str().to_string(), Span::from_pest(current.as_span())),
-        Rule::string_literal => Value::StringValue(parse_string_literal(&current), Span::from_pest(current.as_span())),
-        Rule::boolean_literal => Value::BooleanValue(current.as_str().to_string(), Span::from_pest(current.as_span())),
-        Rule::constant_literal => Value::ConstantValue(current.as_str().to_string(), Span::from_pest(current.as_span())),
+        Rule::numeric_literal => Expression::NumericValue(current.as_str().to_string(), Span::from_pest(current.as_span())),
+        Rule::string_literal => Expression::StringValue(parse_string_literal(&current), Span::from_pest(current.as_span())),
+        Rule::boolean_literal => Expression::BooleanValue(current.as_str().to_string(), Span::from_pest(current.as_span())),
+        Rule::constant_literal => Expression::ConstantValue(current.as_str().to_string(), Span::from_pest(current.as_span())),
         Rule::function => parse_function(&current),
         Rule::array_expression => parse_array(&current),
         _ => unreachable!("Encounterd impossible literal during parsing: {:?}", current.tokens())
     };
 }
 
-fn parse_function(token: &pest::iterators::Pair<'_, Rule>) -> Value {
+fn parse_function(token: &pest::iterators::Pair<'_, Rule>) -> Expression {
     let mut name: Option<String> = None;
-    let mut arguments: Vec<Value> = vec![];
+    let mut arguments: Vec<Expression> = vec![];
 
     match_children! { token, current,
         Rule::identifier => name = Some(current.as_str().to_string()),
@@ -59,23 +59,23 @@ fn parse_function(token: &pest::iterators::Pair<'_, Rule>) -> Value {
     };
 
     match name {
-        Some(name) => Value::Function(name, arguments, Span::from_pest(token.as_span())),
+        Some(name) => Expression::Function(name, arguments, Span::from_pest(token.as_span())),
         _ => unreachable!("Encounterd impossible function during parsing: {:?}", token.as_str()),
     }
 }
 
-fn parse_array(token: &pest::iterators::Pair<'_, Rule>) -> Value {
-    let mut elements: Vec<Value> = vec![];
+fn parse_array(token: &pest::iterators::Pair<'_, Rule>) -> Expression {
+    let mut elements: Vec<Expression> = vec![];
 
     match_children! { token, current,
         Rule::expression => elements.push(parse_expression(&current)),
         _ => unreachable!("Encounterd impossible array during parsing: {:?}", current.tokens())
     };
 
-    Value::Array(elements, Span::from_pest(token.as_span()))
+    Expression::Array(elements, Span::from_pest(token.as_span()))
 }
 
-fn parse_arg_value(token: &pest::iterators::Pair<'_, Rule>) -> Value {
+fn parse_arg_value(token: &pest::iterators::Pair<'_, Rule>) -> Expression {
     match_first! { token, current,
         Rule::expression => parse_expression(&current),
         _ => unreachable!("Encounterd impossible value during parsing: {:?}", current.tokens())
@@ -110,7 +110,7 @@ fn doc_comments_to_string(comments: &[String]) -> Option<Comment> {
 
 fn parse_directive_arg(token: &pest::iterators::Pair<'_, Rule>) -> Argument {
     let mut name: Option<Identifier> = None;
-    let mut argument: Option<Value> = None;
+    let mut argument: Option<Expression> = None;
 
     match_children! { token, current,
         Rule::argument_name => name = Some(current.to_id()),
@@ -308,7 +308,7 @@ fn parse_enum(token: &pest::iterators::Pair<'_, Rule>) -> Enum {
 
 fn parse_key_value(token: &pest::iterators::Pair<'_, Rule>) -> Argument {
     let mut name: Option<Identifier> = None;
-    let mut value: Option<Value> = None;
+    let mut value: Option<Expression> = None;
 
     match_children! { token, current,
         Rule::identifier => name = Some(current.to_id()),

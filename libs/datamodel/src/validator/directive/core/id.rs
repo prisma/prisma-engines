@@ -102,7 +102,7 @@ impl DirectiveValidator<dml::Model> for ModelLevelIdDirectiveValidator {
                 model
                     .id_fields
                     .iter()
-                    .map(|f| ast::Value::ConstantValue(f.to_string(), ast::Span::empty()))
+                    .map(|f| ast::Expression::ConstantValue(f.to_string(), ast::Span::empty()))
                     .collect(),
             ));
 

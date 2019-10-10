@@ -158,7 +158,7 @@ trait IndexDirectiveBase<T>: DirectiveValidator<T> {
                     index_def
                         .fields
                         .iter()
-                        .map(|f| ast::Value::ConstantValue(f.to_string(), ast::Span::empty()))
+                        .map(|f| ast::Expression::ConstantValue(f.to_string(), ast::Span::empty()))
                         .collect(),
                 ));
                 if let Some(name) = &index_def.name {

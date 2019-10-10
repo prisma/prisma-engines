@@ -91,10 +91,10 @@ impl GeneratorLoader {
             arguments.push(ast::Argument::new_string("output", &output));
         }
 
-        let platform_values: Vec<ast::Value> = generator
+        let platform_values: Vec<ast::Expression> = generator
             .binary_targets
             .iter()
-            .map(|p| ast::Value::StringValue(p.to_string(), ast::Span::empty()))
+            .map(|p| ast::Expression::StringValue(p.to_string(), ast::Span::empty()))
             .collect();
         if !platform_values.is_empty() {
             arguments.push(ast::Argument::new_array("binaryTargets", platform_values));

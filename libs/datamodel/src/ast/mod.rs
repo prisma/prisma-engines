@@ -2,6 +2,7 @@ mod argument;
 mod comment;
 mod directive;
 mod r#enum;
+mod expression;
 mod field;
 mod generator_config;
 mod identifier;
@@ -10,7 +11,6 @@ mod source_config;
 mod span;
 mod top;
 mod traits;
-mod value;
 
 pub mod parser;
 pub mod reformat;
@@ -19,6 +19,7 @@ pub mod renderer;
 pub use argument::*;
 pub use comment::*;
 pub use directive::*;
+pub use expression::*;
 pub use field::*;
 pub use generator_config::*;
 pub use identifier::*;
@@ -28,7 +29,6 @@ pub use source_config::*;
 pub use span::*;
 pub use top::*;
 pub use traits::*;
-pub use value::*;
 
 /// AST representation of a prisma datamodel
 ///
