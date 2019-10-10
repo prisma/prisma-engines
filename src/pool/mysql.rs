@@ -28,6 +28,7 @@ impl TryFrom<MysqlParams> for r2d2::Pool<PrismaConnectionManager<MysqlConnection
 
         let pool = r2d2::Pool::builder()
             .max_size(params.connection_limit)
+            .test_on_check_out(false)
             .build(manager)?;
 
         Ok(pool)
