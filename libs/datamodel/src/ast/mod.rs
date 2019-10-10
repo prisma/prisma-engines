@@ -1,6 +1,9 @@
 pub mod parser;
 pub mod reformat;
 pub mod renderer;
+mod traits;
+
+pub use traits::*;
 
 /// AST representation of a prisma datamodel
 ///
@@ -42,14 +45,6 @@ impl std::fmt::Display for Span {
     }
 }
 
-pub trait WithSpan {
-    fn span(&self) -> &Span;
-}
-
-trait WithKeyValueConfig {
-    fn properties(&self) -> &Vec<Argument>;
-}
-
 #[derive(Debug, Clone)]
 pub struct Identifier {
     pub name: String,
@@ -68,23 +63,6 @@ impl Identifier {
 impl WithSpan for Identifier {
     fn span(&self) -> &Span {
         &self.span
-    }
-}
-
-pub trait WithIdentifier {
-    fn identifier(&self) -> &Identifier;
-}
-
-pub trait WithName {
-    fn name(&self) -> &str;
-}
-
-impl<T> WithName for T
-where
-    T: WithIdentifier,
-{
-    fn name(&self) -> &str {
-        &self.identifier().name
     }
 }
 
@@ -268,16 +246,6 @@ impl WithSpan for Directive {
     fn span(&self) -> &Span {
         &self.span
     }
-}
-
-/// Trait for an AST node which can have directives.
-pub trait WithDirectives {
-    fn directives(&self) -> &Vec<Directive>;
-}
-
-/// Trait for an AST node which can have comments.
-pub trait WithDocumentation {
-    fn documentation(&self) -> &Option<Comment>;
 }
 
 /// A field declaration.
