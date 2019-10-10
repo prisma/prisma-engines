@@ -409,12 +409,6 @@ impl WithIdentifier for SourceConfig {
     }
 }
 
-impl WithKeyValueConfig for SourceConfig {
-    fn properties(&self) -> &Vec<Argument> {
-        &self.properties
-    }
-}
-
 impl WithSpan for SourceConfig {
     fn span(&self) -> &Span {
         &self.span
@@ -443,12 +437,6 @@ pub struct GeneratorConfig {
 impl WithIdentifier for GeneratorConfig {
     fn identifier(&self) -> &Identifier {
         &self.name
-    }
-}
-
-impl WithKeyValueConfig for GeneratorConfig {
-    fn properties(&self) -> &Vec<Argument> {
-        &self.properties
     }
 }
 

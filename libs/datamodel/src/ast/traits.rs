@@ -1,4 +1,4 @@
-use super::{Argument, Comment, Directive, Identifier, Span};
+use super::{Comment, Directive, Identifier, Span};
 
 pub trait WithSpan {
     fn span(&self) -> &Span;
@@ -18,10 +18,6 @@ pub trait WithDirectives {
 
 pub trait WithDocumentation {
     fn documentation(&self) -> &Option<Comment>;
-}
-
-pub trait WithKeyValueConfig {
-    fn properties(&self) -> &Vec<Argument>;
 }
 
 // generic implementations
