@@ -2,6 +2,7 @@ use crate::{
     query_ast::*,
     query_graph::{Node, NodeRef, ParentIdsFn, QueryGraph, QueryGraphDependency},
     QueryGraphBuilderError,
+    QueryGraphBuilderResult,
 };
 use prisma_models::RelationFieldRef;
 use std::{convert::TryInto, sync::Arc};
@@ -21,7 +22,7 @@ pub fn disconnect_records_node(
     relation_field: &RelationFieldRef,
     parent_fn: Option<ParentIdsFn>,
     child_fn: Option<ParentIdsFn>,
-) -> NodeRef {
+) -> QueryGraphBuilderResult<NodeRef> {
     let connect = WriteQuery::ConnectRecords(ConnectRecords {
         parent: None,
         child: None,
@@ -56,7 +57,7 @@ pub fn disconnect_records_node(
                 }
             })
         })),
-    );
+    )?;
 
     // Edge from child to connect.
     graph.create_edge(
@@ -84,9 +85,9 @@ pub fn disconnect_records_node(
                 }
             })
         })),
-    );
+    )?;
 
-    connect_node
+    Ok(connect_node)
 }
 
 fn disconnect_m_to_n() -> () {

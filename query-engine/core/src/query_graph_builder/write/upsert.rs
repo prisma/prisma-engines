@@ -46,11 +46,11 @@ pub fn upsert_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedF
                 Ok(node)
             }
         })),
-    );
+    )?;
 
-    graph.create_edge(&if_node, &update_node, QueryGraphDependency::Then);
+    graph.create_edge(&if_node, &update_node, QueryGraphDependency::Then)?;
 
-    graph.create_edge(&if_node, &create_node, QueryGraphDependency::Else);
+    graph.create_edge(&if_node, &create_node, QueryGraphDependency::Else)?;
 
     let id_field = model.fields().id();
     graph.create_edge(
@@ -59,7 +59,9 @@ pub fn upsert_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedF
         QueryGraphDependency::ParentIds(Box::new(|mut node, mut parent_ids| {
             let parent_id = match parent_ids.pop() {
                 Some(pid) => Ok(pid),
-                None => Err(QueryGraphBuilderError::AssertionError(format!("Expected a valid parent ID to be present for create follow-up for upsert query."))),
+                None => Err(QueryGraphBuilderError::AssertionError(format!(
+                    "Expected a valid parent ID to be present for create follow-up for upsert query."
+                ))),
             }?;
 
             if let Node::Query(Query::Read(ReadQuery::RecordQuery(ref mut rq))) = node {
@@ -73,7 +75,7 @@ pub fn upsert_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedF
 
             Ok(node)
         })),
-    );
+    )?;
 
     let id_field = model.fields().id();
 
@@ -83,7 +85,9 @@ pub fn upsert_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedF
         QueryGraphDependency::ParentIds(Box::new(|mut node, mut parent_ids| {
             let parent_id = match parent_ids.pop() {
                 Some(pid) => Ok(pid),
-                None => Err(QueryGraphBuilderError::AssertionError(format!("Expected a valid parent ID to be present for update follow-up for upsert query."))),
+                None => Err(QueryGraphBuilderError::AssertionError(format!(
+                    "Expected a valid parent ID to be present for update follow-up for upsert query."
+                ))),
             }?;
 
             if let Node::Query(Query::Read(ReadQuery::RecordQuery(ref mut rq))) = node {
@@ -97,7 +101,7 @@ pub fn upsert_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedF
 
             Ok(node)
         })),
-    );
+    )?;
 
     Ok(())
 }

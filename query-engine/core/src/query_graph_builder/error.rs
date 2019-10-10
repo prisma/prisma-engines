@@ -1,5 +1,5 @@
 // use std::fmt;
-use crate::QueryParserError;
+use crate::{QueryParserError, QueryGraphError};
 use prisma_models::{DomainError, RelationFieldRef};
 
 #[derive(Debug)]
@@ -32,6 +32,8 @@ pub enum QueryGraphBuilderError {
     },
 
     RecordNotFound(String),
+
+    QueryGraphError(QueryGraphError),
 }
 
 #[derive(Debug)]
@@ -78,5 +80,11 @@ impl From<DomainError> for QueryGraphBuilderError {
 impl From<QueryParserError> for QueryGraphBuilderError {
     fn from(err: QueryParserError) -> Self {
         QueryGraphBuilderError::QueryParserError(err)
+    }
+}
+
+impl From<QueryGraphError> for QueryGraphBuilderError {
+    fn from(err: QueryGraphError) -> Self {
+        QueryGraphBuilderError::QueryGraphError(err)
     }
 }

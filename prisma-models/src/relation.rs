@@ -296,8 +296,7 @@ impl Relation {
     }
 
     pub fn is_one_to_many(&self) -> bool {
-        (self.field_a().is_list && !self.field_b().is_list) ||
-        (!self.field_a().is_list && self.field_b().is_list)
+        !self.is_many_to_many() && !self.is_one_to_one()
     }
 
     pub fn id_column(&self) -> Option<Column<'static>> {

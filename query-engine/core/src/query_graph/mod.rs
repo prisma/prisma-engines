@@ -133,6 +133,10 @@ impl QueryGraph {
         }
     }
 
+    pub fn validate(&self) -> QueryGraphResult<()> {
+        after_graph_completion(self)
+    }
+
     /// Adds a result node to the graph.
     pub fn add_result_node(&mut self, node: &NodeRef) {
         self.result_nodes.push(node.node_ix.clone());
@@ -192,12 +196,16 @@ impl QueryGraph {
     /// Checks are run after edge creation to ensure validity of the query graph.
     /// Returns an `EdgeRef` to the newly added edge.
     /// Todo currently panics, change interface to result type.
-    pub fn create_edge(&mut self, from: &NodeRef, to: &NodeRef, content: QueryGraphDependency) -> EdgeRef {
+    pub fn create_edge(
+        &mut self,
+        from: &NodeRef,
+        to: &NodeRef,
+        content: QueryGraphDependency,
+    ) -> QueryGraphResult<EdgeRef> {
         let edge_ix = self.graph.add_edge(from.node_ix, to.node_ix, Guard::new(content));
         let edge = EdgeRef { edge_ix };
 
-        after_edge_creation(self, &edge).unwrap();
-        edge
+        after_edge_creation(self, &edge).map(|_| edge)
     }
 
     /// Returns a reference to the content of `node`, if the content is still present.
@@ -260,13 +268,9 @@ impl QueryGraph {
         self.incoming_edges(child).into_iter().all(|edge| {
             let ancestor = self.edge_source(&edge);
 
-            println!("Ancestor {} || Parent {} ?", ancestor.id(), parent.id(),);
-
             if &ancestor != parent {
-                println!("{}", self.is_ancestor(&ancestor, parent));
                 self.is_ancestor(&ancestor, parent)
             } else {
-                println!("true");
                 true
             }
         })
@@ -347,5 +351,14 @@ impl QueryGraph {
 
         edges.sort();
         edges
+    }
+
+    /// Returns all edges
+    fn edges(&self) -> Vec<EdgeRef> {
+        self.graph
+            .edge_indices()
+            .into_iter()
+            .map(|edge_ix| EdgeRef { edge_ix })
+            .collect()
     }
 }

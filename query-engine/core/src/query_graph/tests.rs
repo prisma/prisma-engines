@@ -9,9 +9,15 @@ fn test_direct_children() {
     let parent = graph.create_node(dummy_query());
     let child = graph.create_node(dummy_query());
 
-    let edge_gp_p = graph.create_edge(&grandparent, &parent, QueryGraphDependency::ExecutionOrder);
-    let _edge_gp_c = graph.create_edge(&grandparent, &child, QueryGraphDependency::ExecutionOrder);
-    let edge_p_c = graph.create_edge(&parent, &child, QueryGraphDependency::ExecutionOrder);
+    let edge_gp_p = graph
+        .create_edge(&grandparent, &parent, QueryGraphDependency::ExecutionOrder)
+        .unwrap();
+    let _edge_gp_c = graph
+        .create_edge(&grandparent, &child, QueryGraphDependency::ExecutionOrder)
+        .unwrap();
+    let edge_p_c = graph
+        .create_edge(&parent, &child, QueryGraphDependency::ExecutionOrder)
+        .unwrap();
 
     let g_children = graph.direct_child_pairs(&grandparent);
     let p_children = graph.direct_child_pairs(&parent);
@@ -31,10 +37,18 @@ fn test_direct_children_2() {
 
     graph.add_result_node(&dummy_result);
 
-    let edge_r_c = graph.create_edge(&dummy_read, &dummy_create, QueryGraphDependency::ExecutionOrder);
-    let edge_c_res = graph.create_edge(&dummy_create, &dummy_result, QueryGraphDependency::ExecutionOrder);
-    let _edge_r_con = graph.create_edge(&dummy_read, &dummy_connect, QueryGraphDependency::ExecutionOrder);
-    let edge_c_con = graph.create_edge(&dummy_create, &dummy_connect, QueryGraphDependency::ExecutionOrder);
+    let edge_r_c = graph
+        .create_edge(&dummy_read, &dummy_create, QueryGraphDependency::ExecutionOrder)
+        .unwrap();
+    let edge_c_res = graph
+        .create_edge(&dummy_create, &dummy_result, QueryGraphDependency::ExecutionOrder)
+        .unwrap();
+    let _edge_r_con = graph
+        .create_edge(&dummy_read, &dummy_connect, QueryGraphDependency::ExecutionOrder)
+        .unwrap();
+    let edge_c_con = graph
+        .create_edge(&dummy_create, &dummy_connect, QueryGraphDependency::ExecutionOrder)
+        .unwrap();
 
     let r_children = graph.direct_child_pairs(&dummy_read);
     let c_children = graph.direct_child_pairs(&dummy_create);
@@ -54,11 +68,20 @@ fn test_valid_multiparent() {
     let parent = graph.create_node(dummy_query());
     let child = graph.create_node(dummy_query());
 
-    graph.create_edge(&grandparent, &parent, QueryGraphDependency::ExecutionOrder);
-    graph.create_edge(&parent, &child, QueryGraphDependency::ExecutionOrder);
+    graph
+        .create_edge(&grandparent, &parent, QueryGraphDependency::ExecutionOrder)
+        .unwrap();
+
+    graph
+        .create_edge(&parent, &child, QueryGraphDependency::ExecutionOrder)
+        .unwrap();
+
+    graph
+        .create_edge(&grandparent, &child, QueryGraphDependency::ExecutionOrder)
+        .unwrap();
 
     // This must succeed
-    graph.create_edge(&grandparent, &child, QueryGraphDependency::ExecutionOrder);
+    graph.validate().unwrap();
 }
 
 #[should_panic]
@@ -70,10 +93,28 @@ fn test_invalid_multiparent() {
     let parent_b = graph.create_node(dummy_query());
     let child = graph.create_node(dummy_query());
 
-    graph.create_edge(&parent_a, &child, QueryGraphDependency::ExecutionOrder);
+    graph
+        .create_edge(&parent_a, &child, QueryGraphDependency::ExecutionOrder)
+        .unwrap();
+
+    graph
+        .create_edge(&parent_b, &child, QueryGraphDependency::ExecutionOrder)
+        .unwrap();
 
     // This must fail
-    graph.create_edge(&parent_b, &child, QueryGraphDependency::ExecutionOrder);
+    graph.validate().unwrap();
+}
+
+#[should_panic]
+#[test]
+fn test_invalid_self_connecting_edge() {
+    let mut graph = QueryGraph::new();
+    let node = graph.create_node(dummy_query());
+
+    // This must fail
+    graph
+        .create_edge(&node, &node, QueryGraphDependency::ExecutionOrder)
+        .unwrap();
 }
 
 fn dummy_query() -> Query {

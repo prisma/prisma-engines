@@ -64,8 +64,8 @@ fn handle_many_to_many(
     let child_read_query = utils::id_read_query_infallible(&child_model, record_finder);
     let child_node = graph.create_node(child_read_query);
 
-    graph.create_edge(&parent_node, &child_node, QueryGraphDependency::ExecutionOrder);
-    connect::connect_records_node(graph, &parent_node, &child_node, &parent_relation_field, None, None);
+    graph.create_edge(&parent_node, &child_node, QueryGraphDependency::ExecutionOrder)?;
+    connect::connect_records_node(graph, &parent_node, &child_node, &parent_relation_field, None, None)?;
 
     Ok(())
 }
@@ -122,7 +122,7 @@ fn handle_one_to_many(
         let relation_field_name = parent_relation_field.name.clone();
 
         // We need to swap the read node and the parent because the inlining is done in the parent, and we need to fetch the ID first.
-        let (parent_node, child_node) = utils::swap_nodes(graph, parent_node, child_node);
+        let (parent_node, child_node) = utils::swap_nodes(graph, parent_node, child_node)?;
 
         (parent_node, child_node, relation_field_name)
     } else {
@@ -146,12 +146,13 @@ fn handle_one_to_many(
             }?;
 
             if let Node::Query(Query::Write(ref mut wq)) = child_node {
+                dbg!("[1:m] Injecting from parent node to child node", &relation_field_name, &parent_id);
                 wq.inject_non_list_arg(relation_field_name, parent_id);
             }
 
             Ok(child_node)
         })),
-    );
+    )?;
 
     Ok(())
 }
@@ -167,7 +168,6 @@ fn handle_one_to_many(
 /// │     Read New Child     │───────┐
 /// └────────────────────────┘       │
 ///              │                   │
-///              │                   │
 ///              │    ┌ ─ ─ ─ ─ ─ ─ ─▼─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┐
 ///              │      ┌────────────────────────┐
 ///              │    │ │    Read ex. Parent     │──┐                         │
@@ -177,12 +177,12 @@ fn handle_one_to_many(
 ///              │    │ ┌────────────────────────┐  │     side required)      │
 ///              │      │ If p > 0 && p. inlined │  │
 ///              │    │ └────────────────────────┘  │                         │
-///              │                   │              │
+///              │              then │              │
 ///              │    │              ▼              │                         │
 ///              │      ┌────────────────────────┐  │
 ///              │    │ │   Update ex. parent    │◀─┘                         │
 ///              │      └────────────────────────┘                      ┌───┐
-///              │    │         then                                    │ 1 │ │
+///              │    │                                                 │ 1 │ │
 ///              │                                                      └───┘
 ///              ▼    └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘
 /// ┌────────────────────────┐
@@ -252,15 +252,19 @@ fn handle_one_to_one(
 
     // We always start with the read node in a nested connect 1:1 scenario, so swap the read node into the existing hierarchy.
     // Preserve naming to keep the code readable.
-    let (read_new_child_node, parent_node) = utils::swap_nodes(graph, parent_node, read_new_child_node);
+    let (read_new_child_node, parent_node) = utils::swap_nodes(graph, parent_node, read_new_child_node)?;
 
     // Next is the check for (and possible disconnect of) an existing parent.
     // Those checks are performed on the new child node, hence we use the child relation field side ("backrelation").
     if parent_side_required || relation_inlined_parent {
-        utils::insert_existing_1to1_related_model_checks(graph, &read_new_child_node, &child_relation_field);
+        utils::insert_existing_1to1_related_model_checks(graph, &read_new_child_node, &child_relation_field)?;
     }
 
-    let relation_field_name = parent_relation_field.related_field().name.clone();
+    let relation_field_name = if relation_inlined_parent {
+        parent_relation_field.name.clone()
+    } else {
+        child_relation_field.name.clone()
+    };
 
     graph.create_edge(
         &read_new_child_node,
@@ -273,19 +277,20 @@ fn handle_one_to_one(
 
             // This takes care of cases where the relation is inlined on the parent
             if let Node::Query(Query::Write(ref mut wq)) = child_node {
+                dbg!("[1:1] Injecting from read child node to parent", &relation_field_name, &parent_id);
                 wq.inject_non_list_arg(relation_field_name, parent_id);
             }
 
             Ok(child_node)
         })),
-    );
+    )?;
 
     // Finally, insert the check for (and possible disconnect of) an existing child record.
     // Those checks are performed on the parent node model.
     // We only need to do those checks if the parent operation is not a create, the reason being that
     // if the parent is a create, it can't have an existing child already.
     if parent_is_create && (child_side_required || !relation_inlined_parent) {
-        utils::insert_existing_1to1_related_model_checks(graph, &parent_node, parent_relation_field);
+        utils::insert_existing_1to1_related_model_checks(graph, &parent_node, parent_relation_field)?;
     }
 
     Ok(())

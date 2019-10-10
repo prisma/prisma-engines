@@ -22,13 +22,14 @@ impl ExpressionResult {
                 QueryResult::Id(id) => Some(vec![id.clone().into()]),
 
                 // We always select IDs, the unwraps are safe.
-                QueryResult::RecordSelection(rs) => Some(rs
-                    .scalars
-                    .collect_ids(rs.id_field.as_str())
-                    .unwrap()
-                    .into_iter()
-                    .map(|val| val.into())
-                    .collect()),
+                QueryResult::RecordSelection(rs) => Some(
+                    rs.scalars
+                        .collect_ids(rs.id_field.as_str())
+                        .unwrap()
+                        .into_iter()
+                        .map(|val| val.into())
+                        .collect(),
+                ),
 
                 _ => None,
             },
@@ -77,7 +78,7 @@ impl<'a> QueryInterpreter<'a> {
                 seq.into_iter()
                     .map(|exp| self.interpret(exp, env.clone()))
                     .collect::<InterpretationResult<Vec<_>>>()
-                    .map(|mut results| results.pop().unwrap())
+                    .map(|mut results| results.pop().unwrap_or_else(|| ExpressionResult::Empty))
             }
 
             Expression::Let { bindings, expressions } => {

@@ -21,7 +21,8 @@ fn stringify_nodes(graph: &QueryGraph, nodes: Vec<NodeRef>) -> Vec<String> {
             .map(|child_edge| {
                 let child_node = graph.edge_target(child_edge);
                 node_child_info.push(format!(
-                    "Child: Node {} - {}",
+                    "Child (edge {}): Node {} - {}",
+                    child_edge.id(),
                     child_node.id(),
                     graph.edge_content(child_edge).unwrap()
                 ));

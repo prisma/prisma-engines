@@ -1,11 +1,10 @@
 use crate::{
     query_ast::*,
-    query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency, Flow},
-    ParsedInputValue,
-    QueryGraphBuilderError,
+    query_graph::{Flow, Node, NodeRef, QueryGraph, QueryGraphDependency},
+    ParsedInputValue, QueryGraphBuilderError, QueryGraphBuilderResult,
 };
 use connector::{filter::RecordFinder, QueryArguments};
-use prisma_models::{ModelRef, PrismaArgs, RelationFieldRef, SelectedFields, PrismaValue};
+use prisma_models::{ModelRef, PrismaArgs, PrismaValue, RelationFieldRef, SelectedFields};
 use std::{convert::TryInto, sync::Arc};
 
 /// Coerces single values (`ParsedInputValue::Single` and `ParsedInputValue::Map`) into a vector.
@@ -96,17 +95,31 @@ pub fn coerce_vec(val: ParsedInputValue) -> Vec<ParsedInputValue> {
 /// ## Return values
 ///
 /// Returns (parent `NodeRef`, child `NodeRef`, relation field on parent `RelationFieldRef`) for convenience.
-pub fn swap_nodes(graph: &mut QueryGraph, parent_node: NodeRef, child_node: NodeRef) -> (NodeRef, NodeRef) {
+pub fn swap_nodes(
+    // todo rename and redoc, this isn't doing a swap anymore
+    graph: &mut QueryGraph,
+    parent_node: NodeRef,
+    child_node: NodeRef,
+) -> QueryGraphBuilderResult<(NodeRef, NodeRef)> {
     let parent_edges = graph.incoming_edges(&parent_node);
     for parent_edge in parent_edges {
         let parent_of_parent_node = graph.edge_source(&parent_edge);
-        let edge_content = graph.remove_edge(parent_edge).unwrap();
+        // let edge_content = graph.remove_edge(parent_edge).unwrap();
 
         // Todo: Warning, this assumes the edge contents can also be swapped.
-        graph.create_edge(&parent_of_parent_node, &child_node, edge_content);
+        println!(
+            "[Swap] Connecting parent of parent {} with child {}",
+            parent_of_parent_node.id(),
+            child_node.id()
+        );
+        graph.create_edge(
+            &parent_of_parent_node,
+            &child_node,
+            QueryGraphDependency::ExecutionOrder,
+        )?;
     }
 
-    (child_node, parent_node)
+    Ok((child_node, parent_node))
 }
 
 pub fn node_is_create(graph: &QueryGraph, node: &NodeRef) -> bool {
@@ -153,17 +166,22 @@ pub fn insert_find_children_by_parent_node<T>(
     parent_node: &NodeRef,
     parent_relation_field: &RelationFieldRef,
     filter: T,
-) -> NodeRef
+) -> QueryGraphBuilderResult<NodeRef>
 where
     T: Into<QueryArguments>,
 {
+    let selected_fields = SelectedFields::new(
+        vec![parent_relation_field.related_model().fields().id().into()],
+        Some(Arc::clone(parent_relation_field)),
+    );
+
     let read_parent_node = graph.create_node(Query::Read(ReadQuery::RelatedRecordsQuery(RelatedRecordsQuery {
         name: "parent".to_owned(),
         alias: None,
         parent_field: Arc::clone(parent_relation_field),
         parent_ids: None,
         args: filter.into(),
-        selected_fields: parent_relation_field.related_model().fields().id().into(), // Select related IDs
+        selected_fields,
         nested: vec![],
         selection_order: vec![],
     })));
@@ -179,9 +197,9 @@ where
 
             Ok(node)
         })),
-    );
+    )?;
 
-    read_parent_node
+    Ok(read_parent_node)
 }
 
 // Creates an "empty" query node. Sometimes required for
@@ -252,16 +270,17 @@ pub fn insert_existing_1to1_related_model_checks(
     graph: &mut QueryGraph,
     parent_node: &NodeRef,
     parent_relation_field: &RelationFieldRef,
-) {
+) -> QueryGraphBuilderResult<()> {
     let parent_model = parent_relation_field.model();
     let parent_model_id_field = parent_model.fields().id();
+    let parent_model_name = parent_model.name.clone();
     let parent_side_required = parent_relation_field.is_required;
     let relation_inlined_parent = parent_relation_field.relation_is_inlined_in_parent();
     let rf = Arc::clone(&parent_relation_field);
 
     // Now check and disconnect the existing model, if necessary.
     let read_existing_parent_query_node =
-        insert_find_children_by_parent_node(graph, &parent_node, &parent_relation_field, None);
+        insert_find_children_by_parent_node(graph, &parent_node, &parent_relation_field, None)?;
 
     // If the parent side is required, we also fail during runtime before disconnecting, as that would violate the parent relation side.
     let update_existing_parent_node = update_record_node_placeholder(graph, None, parent_model);
@@ -281,9 +300,9 @@ pub fn insert_existing_1to1_related_model_checks(
                 unreachable!()
             }
         })),
-    );
+    )?;
 
-    graph.create_edge(&if_node, &update_existing_parent_node, QueryGraphDependency::Then);
+    graph.create_edge(&if_node, &update_existing_parent_node, QueryGraphDependency::Then)?;
     graph.create_edge(&read_existing_parent_query_node, &update_existing_parent_node, QueryGraphDependency::ParentIds(Box::new(move |mut child_node, mut parent_ids| {
             // If the parent requires the connection, we need to make sure that there isn't a parent already connected
             // to the existing child, as that would violate the other parent's relation side.
@@ -297,16 +316,20 @@ pub fn insert_existing_1to1_related_model_checks(
                 None => Err(QueryGraphBuilderError::AssertionError(format!("[Query Graph] Expected a valid parent ID to be present for a nested connect on a one-to-one relation, updating previous parent."))),
             }?;
 
-            let finder = RecordFinder {
-                field: parent_model_id_field,
-                value: parent_id,
-            };
-
             if let Node::Query(Query::Write(ref mut wq)) = child_node {
+                println!("[1:1 Checks] Injecting field '{}' with value '{:?}', to update existing parent node from read existing parent check (model: {}) ", &relation_field_name, &parent_id, parent_model_name);
+
+                let finder = RecordFinder {
+                    field: parent_model_id_field,
+                    value: parent_id,
+                };
+
                 wq.inject_record_finder(finder);
                 wq.inject_non_list_arg(relation_field_name, PrismaValue::Null);
             }
 
             Ok(child_node)
-        })));
+        })))?;
+
+    Ok(())
 }

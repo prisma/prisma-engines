@@ -5,7 +5,12 @@ use itertools::Itertools;
 
 /// Check validity of an edge creation.
 pub fn after_edge_creation(graph: &QueryGraph, edge: &EdgeRef) -> QueryGraphResult<()> {
-    if_flow_edge_rules(graph, edge).and_then(|_| only_allow_related_parents_edges(graph, edge))
+    if_flow_edge_rules(graph, edge).and_then(|_| disallow_self_edges(graph, edge))
+}
+
+/// Check validity of graph, after graph is done building.
+pub fn after_graph_completion(graph: &QueryGraph) -> QueryGraphResult<()> {
+    only_allow_related_parents_edges(graph)
 }
 
 /// For an If flow node: Only allow `Then` and `Else` edges. Disallow more than 2 edges.
@@ -34,31 +39,51 @@ fn if_flow_edge_rules(graph: &QueryGraph, edge: &EdgeRef) -> QueryGraphResult<()
     Ok(())
 }
 
-/// Only allow multiple parent edges if all parents are ancestors of each other.
-fn only_allow_related_parents_edges(graph: &QueryGraph, edge: &EdgeRef) -> QueryGraphResult<()> {
-    let target_node = graph.edge_target(edge);
-    let incoming_edges = graph.incoming_edges(&target_node);
-    let parents: Vec<NodeRef> = graph
-        .zip_source_nodes(incoming_edges)
-        .into_iter()
-        .map(|(_, node)| node)
-        .collect();
-
-    if parents
-        .iter()
-        .tuple_combinations()
-        .into_iter()
-        .find(|(parent_a, parent_b)| {
-            !graph.is_ancestor(&parent_a, &parent_b) && !graph.is_ancestor(&parent_b, &parent_a)
-        })
-        .is_none()
-    {
-        Ok(())
-    } else {
-        Err(QueryGraphError::InvarianceViolation(format!(
-            "Edge {} to node {} violates constraint that all parents must be ancestors of each other.",
+fn disallow_self_edges(graph: &QueryGraph, edge: &EdgeRef) -> QueryGraphResult<()> {
+    if graph.edge_source(edge).id() == graph.edge_target(edge).id() {
+        return Err(QueryGraphError::InvarianceViolation(format!(
+            "Edge {} is an edge pointing to the same node it originated from (node {}). This is disallowed.",
             edge.id(),
-            graph.edge_target(edge).id()
-        )))
+            graph.edge_source(edge).id()
+        )));
     }
+
+    Ok(())
+}
+
+/// Only allow multiple parent edges if all parents are ancestors of each other.
+fn only_allow_related_parents_edges(graph: &QueryGraph) -> QueryGraphResult<()> {
+    for edge in graph.edges() {
+        let target_node = graph.edge_target(&edge);
+        let incoming_edges = graph.incoming_edges(&target_node);
+        let parents: Vec<NodeRef> = graph
+            .zip_source_nodes(incoming_edges)
+            .into_iter()
+            .map(|(_, node)| node)
+            .collect();
+
+        let check = if parents
+            .iter()
+            .tuple_combinations()
+            .into_iter()
+            .find(|(parent_a, parent_b)| {
+                !graph.is_ancestor(&parent_a, &parent_b) && !graph.is_ancestor(&parent_b, &parent_a)
+            })
+            .is_none()
+        {
+            Ok(())
+        } else {
+            println!("{}", graph);
+            Err(QueryGraphError::InvarianceViolation(format!(
+                "Edge {} from node {} to node {} violates constraint that all parents must be ancestors of each other.",
+                edge.id(),
+                graph.edge_source(&edge).id(),
+                graph.edge_target(&edge).id(),
+            )))
+        };
+
+        check?;
+    }
+
+    Ok(())
 }

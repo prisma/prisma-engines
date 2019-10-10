@@ -52,13 +52,15 @@ impl std::fmt::Display for WriteQuery {
             Self::CreateRecord(q) => write!(f, "CreateRecord: {}", q.model.name),
             Self::UpdateRecord(q) => write!(
                 f,
-                "UpdateRecord: {:?}",
+                "UpdateRecord(model: {:?}, non-list-args: {:?}, list_args: {:?})",
                 q.where_.as_ref().map(|finder| format!(
                     "{}, {} = {:?}",
                     finder.field.model().name,
                     finder.field.name,
                     finder.value
-                ))
+                ),),
+                q.non_list_args,
+                q.list_args,
             ),
             Self::DeleteRecord(q) => write!(
                 f,
@@ -70,7 +72,11 @@ impl std::fmt::Display for WriteQuery {
                     finder.value
                 ))
             ),
-            Self::UpdateManyRecords(q) => write!(f, "UpdateManyRecords: {}", q.model.name),
+            Self::UpdateManyRecords(q) => write!(
+                f,
+                "UpdateManyRecords(model: {}, non-list-args: {:?}, list_args: {:?})",
+                q.model.name, q.non_list_args, q.list_args
+            ),
             Self::DeleteManyRecords(q) => write!(f, "DeleteManyRecords: {}", q.model.name),
             Self::ConnectRecords(_) => write!(f, "ConnectRecords"),
             Self::DisconnectRecords(_) => write!(f, "DisconnectRecords"),

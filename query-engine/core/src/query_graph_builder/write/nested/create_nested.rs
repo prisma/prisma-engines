@@ -26,10 +26,13 @@ pub fn connect_nested_create(
         .collect::<QueryGraphBuilderResult<Vec<NodeRef>>>()?;
 
     if relation.is_many_to_many() {
+        dbg!("n:m", parent_relation_field);
         handle_many_to_many(graph, parent_node, parent_relation_field, creates)?;
     } else if relation.is_one_to_many() {
+        dbg!("1:m", parent_relation_field);
         handle_one_to_many(graph, parent_node, parent_relation_field, creates)?;
     } else {
+        dbg!("1:1", parent_relation_field);
         handle_one_to_one(graph, parent_node, parent_relation_field, creates)?;
     }
 
@@ -65,8 +68,8 @@ fn handle_many_to_many(
     create_nodes: Vec<NodeRef>,
 ) -> QueryGraphBuilderResult<()> {
     for create_node in create_nodes {
-        graph.create_edge(&parent_node, &create_node, QueryGraphDependency::ExecutionOrder);
-        connect::connect_records_node(graph, &parent_node, &create_node, &parent_relation_field, None, None);
+        graph.create_edge(&parent_node, &create_node, QueryGraphDependency::ExecutionOrder)?;
+        connect::connect_records_node(graph, &parent_node, &create_node, &parent_relation_field, None, None)?;
     }
 
     Ok(())
@@ -129,31 +132,33 @@ fn handle_one_to_many(
         let relation_field_name = parent_relation_field.name.clone();
 
         // We need to swap the create node and the parent because the inlining is done in the parent.
-        let (parent_node, child_node) = utils::swap_nodes(graph, parent_node, create_node);
+        let (parent_node, child_node) = utils::swap_nodes(graph, parent_node, create_node)?;
 
+        dbg!("p inl", parent_node.id(), child_node.id());
         graph.create_edge(
-        &parent_node,
-        &child_node,
-        QueryGraphDependency::ParentIds(Box::new(|mut child_node, mut parent_ids| {
-            let parent_id = match parent_ids.pop() {
-                Some(pid) => Ok(pid),
-                None => Err(QueryGraphBuilderError::AssertionError(format!(
-                    "[Query Graph] Expected a valid parent ID to be present for a nested create on a one-to-many relation."
-                ))),
-            }?;
+            &parent_node,
+            &child_node,
+            QueryGraphDependency::ParentIds(Box::new(|mut child_node, mut parent_ids| {
+                let parent_id = match parent_ids.pop() {
+                    Some(pid) => Ok(pid),
+                    None => Err(QueryGraphBuilderError::AssertionError(format!(
+                        "[Query Graph] Expected a valid parent ID to be present for a nested create on a one-to-many relation."
+                    ))),
+                }?;
 
-            if let Node::Query(Query::Write(ref mut wq)) = child_node {
-                wq.inject_non_list_arg(relation_field_name, parent_id);
-            }
+                if let Node::Query(Query::Write(ref mut wq)) = child_node {
+                    wq.inject_non_list_arg(relation_field_name, parent_id);
+                }
 
-            Ok(child_node)
-        })),
-    );
+                Ok(child_node)
+            })),
+        )?;
     } else {
         for create_node in create_nodes {
             // For the injection, we need the name of the field on the inlined side, in this case the child.
             let relation_field_name = parent_relation_field.related_field().name.clone();
 
+            dbg!("c inl", parent_node.id(), create_node.id());
             graph.create_edge(
                 &parent_node,
                 &create_node,
@@ -170,7 +175,7 @@ fn handle_one_to_many(
                     }
 
                     Ok(child_node)
-                })));
+                })))?;
         }
     };
 
@@ -277,7 +282,7 @@ fn handle_one_to_one(
     // existing parent, either.
     // For the above reasons, the checks always live on `parent_node`.
     if !parent_is_create {
-        utils::insert_existing_1to1_related_model_checks(graph, &parent_node, parent_relation_field);
+        utils::insert_existing_1to1_related_model_checks(graph, &parent_node, parent_relation_field)?;
     }
 
     // If the relation is inlined on the parent, we swap the create and the parent to have the child ID for inlining.
@@ -286,7 +291,7 @@ fn handle_one_to_one(
         let relation_field_name = parent_relation_field.name.clone();
 
         // We need to swap the read node and the parent because the inlining is done in the parent, and we need to fetch the ID first.
-        let (parent_node, child_node) = utils::swap_nodes(graph, parent_node, create_node);
+        let (parent_node, child_node) = utils::swap_nodes(graph, parent_node, create_node)?;
 
         (parent_node, child_node, relation_field_name)
     } else {
@@ -313,7 +318,7 @@ fn handle_one_to_one(
 
             Ok(child_node)
         })),
-    );
+    )?;
 
     Ok(())
 }

@@ -128,11 +128,11 @@ impl WriteQueryBuilder {
         let mut query = Update::table(model.table());
 
         for (name, value) in args.args.iter() {
-            let field = fields.find_from_scalar(&name).unwrap();
+            let field = fields.find_from_all(&name).unwrap();
 
-            if field.is_required && value.is_null() {
+            if field.is_required() && value.is_null() {
                 return Err(SqlError::FieldCannotBeNull {
-                    field: field.name.clone(),
+                    field: field.name().to_owned(),
                 });
             }
 

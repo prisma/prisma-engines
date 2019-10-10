@@ -1,5 +1,11 @@
 use super::common::*;
-use crate::{ast, common::names::*, configuration, dml, errors::ErrorCollection};
+use crate::{
+    ast,
+    common::names::*,
+    configuration,
+    dml::{self, FieldArity},
+    errors::ErrorCollection,
+};
 
 /// Helper for standardsing a datamodel.
 ///
@@ -239,12 +245,14 @@ impl Standardiser {
             let model = schema.find_model(&forward.to).expect(STATE_ERROR);
             let name = backward.to.camel_case();
 
-            if model.find_field(&name).is_some() {
-                let source_model = schema.find_model(&backward.to).expect(STATE_ERROR);
-                let source_field = source_model
-                    .related_field(&forward.to, &forward.name, "")
-                    .expect(STATE_ERROR);
+            let source_model = schema.find_model(&backward.to).expect(STATE_ERROR);
+            let source_field = source_model
+                .related_field(&forward.to, &forward.name, "")
+                .expect(STATE_ERROR);
 
+            let source_arity = source_field.arity;
+
+            if model.find_field(&name).is_some() {
                 errors.push(field_validation_error(
                     "Automatic opposite related field generation would cause a naming conflict. Please add an explicit opposite relation field.",
                     &source_model,
@@ -254,8 +262,16 @@ impl Standardiser {
             }
 
             let model = schema.find_model_mut(&forward.to).expect(STATE_ERROR);
+            let mut back_field = dml::Field::new_generated(&name, dml::FieldType::Relation(backward));
 
-            model.add_field(dml::Field::new_generated(&name, dml::FieldType::Relation(backward)));
+            let arity = match source_arity {
+                FieldArity::List => FieldArity::Optional,
+                FieldArity::Optional => FieldArity::List,
+                FieldArity::Required => FieldArity::List,
+            };
+
+            back_field.arity = arity;
+            model.add_field(back_field);
         }
 
         if errors.has_errors() {

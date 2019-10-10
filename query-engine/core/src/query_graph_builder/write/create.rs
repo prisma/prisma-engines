@@ -43,7 +43,7 @@ pub fn create_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedF
 
             Ok(node)
         })),
-    );
+    )?;
 
     Ok(())
 }

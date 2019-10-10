@@ -24,9 +24,25 @@ impl RecordFinderInjector for ReadQuery {
 impl Display for ReadQuery {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            Self::RecordQuery(q) => write!(f, "RecordQuery: {}", q.name),
-            Self::ManyRecordsQuery(q) => write!(f, "ManyRecordsQuery: {}", q.name),
-            Self::RelatedRecordsQuery(q) => write!(f, "RelatedRecordsQuery: {}", q.name),
+            Self::RecordQuery(q) => write!(
+                f,
+                "RecordQuery(name: '{}', finder: {:?})",
+                q.name,
+                q.record_finder.as_ref().map(|finder| format!(
+                    "{}, {} = {:?}",
+                    finder.field.model().name,
+                    finder.field.name,
+                    finder.value
+                ))
+            ),
+            Self::ManyRecordsQuery(q) => write!(f, "ManyRecordsQuery(name: '{}', model: {})", q.name, q.model.name),
+            Self::RelatedRecordsQuery(q) => write!(
+                f,
+                "RelatedRecordsQuery(name: '{}', parent model: {}, parent relation field: {})",
+                q.name,
+                q.parent_field.model().name,
+                q.parent_field.name
+            ),
             Self::AggregateRecordsQuery(q) => write!(f, "AggregateRecordsQuery: {}", q.name),
         }
     }

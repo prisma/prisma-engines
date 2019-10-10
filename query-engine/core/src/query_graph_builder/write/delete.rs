@@ -21,7 +21,7 @@ pub fn delete_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedF
     let delete_node = delete_record_node(graph, Some(record_finder), model)?;
 
     graph.add_result_node(&read_node);
-    graph.create_edge(&read_node, &delete_node, QueryGraphDependency::ExecutionOrder);
+    graph.create_edge(&read_node, &delete_node, QueryGraphDependency::ExecutionOrder)?;
 
     Ok(())
 }

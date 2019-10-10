@@ -50,11 +50,11 @@ pub fn connect_nested_update(
         };
 
         let find_child_records_node =
-            utils::insert_find_children_by_parent_node(graph, parent, parent_relation_field, finder);
+            utils::insert_find_children_by_parent_node(graph, parent, parent_relation_field, finder)?;
+
         let update_node = update::update_record_node(graph, None, Arc::clone(child_model), data.try_into()?)?;
         let id_field = child_model.fields().id();
 
-        graph.create_edge(parent, &find_child_records_node, QueryGraphDependency::ExecutionOrder);
         graph.create_edge(
             &find_child_records_node,
             &update_node,
@@ -75,7 +75,7 @@ pub fn connect_nested_update(
 
                 Ok(node)
             })),
-        );
+        )?;
     }
 
     Ok(())

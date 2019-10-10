@@ -204,7 +204,11 @@ impl<'a> QuerySchemaBuilder<'a> {
                             let mut graph = QueryGraph::new();
                             let query = ReadOneRecordBuilder::new(parsed_field, model).build()?;
 
+                            // Todo: This (and all following query graph validations) should be unified in the query graph builders mod.
+                            // callers should not have to care about calling validations explicitly.
                             graph.create_node(Query::Read(query));
+                            graph.validate()?;
+
                             Ok(graph)
                         }),
                     ))),
@@ -234,6 +238,8 @@ impl<'a> QuerySchemaBuilder<'a> {
                     let query = ReadManyRecordsBuilder::new(parsed_field, model).build()?;
 
                     graph.create_node(Query::Read(query));
+                    graph.validate()?;
+
                     Ok(graph)
                 }),
             ))),
@@ -259,6 +265,8 @@ impl<'a> QuerySchemaBuilder<'a> {
                     let query = AggregateRecordsBuilder::new(parsed_field, model).build()?;
 
                     graph.create_node(Query::Read(query));
+                    graph.validate()?;
+
                     Ok(graph)
                 }),
             ))),
@@ -286,7 +294,11 @@ impl<'a> QuerySchemaBuilder<'a> {
                 QueryTag::CreateOne,
                 Box::new(|model, parsed_field| {
                     let mut graph = QueryGraph::new();
-                    write::create_record(&mut graph, model, parsed_field).map(|_| graph)
+
+                    write::create_record(&mut graph, model, parsed_field)?;
+                    graph.validate()?;
+
+                    Ok(graph)
                 }),
             ))),
         )
@@ -311,7 +323,11 @@ impl<'a> QuerySchemaBuilder<'a> {
                     QueryTag::DeleteOne,
                     Box::new(|model, parsed_field| {
                         let mut graph = QueryGraph::new();
-                        write::delete_record(&mut graph, model, parsed_field).map(|_| graph)
+
+                        write::delete_record(&mut graph, model, parsed_field)?;
+                        graph.validate()?;
+
+                        Ok(graph)
                     }),
                 ))),
             )
@@ -335,7 +351,11 @@ impl<'a> QuerySchemaBuilder<'a> {
                 QueryTag::DeleteMany,
                 Box::new(|model, parsed_field| {
                     let mut graph = QueryGraph::new();
-                    write::delete_many_records(&mut graph, model, parsed_field).map(|_| graph)
+
+                    write::delete_many_records(&mut graph, model, parsed_field)?;
+                    graph.validate()?;
+
+                    Ok(graph)
                 }),
             ))),
         )
@@ -358,7 +378,11 @@ impl<'a> QuerySchemaBuilder<'a> {
                     QueryTag::UpdateOne,
                     Box::new(|model, parsed_field| {
                         let mut graph = QueryGraph::new();
-                        write::update_record(&mut graph, model, parsed_field).map(|_| graph)
+
+                        write::update_record(&mut graph, model, parsed_field)?;
+                        graph.validate()?;
+
+                        Ok(graph)
                     }),
                 ))),
             )
@@ -382,7 +406,11 @@ impl<'a> QuerySchemaBuilder<'a> {
                 QueryTag::UpdateMany,
                 Box::new(|model, parsed_field| {
                     let mut graph = QueryGraph::new();
-                    write::update_many_records(&mut graph, model, parsed_field).map(|_| graph)
+
+                    write::update_many_records(&mut graph, model, parsed_field)?;
+                    graph.validate()?;
+
+                    Ok(graph)
                 }),
             ))),
         )
@@ -403,7 +431,11 @@ impl<'a> QuerySchemaBuilder<'a> {
                     QueryTag::UpsertOne,
                     Box::new(|model, parsed_field| {
                         let mut graph = QueryGraph::new();
-                        write::upsert_record(&mut graph, model, parsed_field).map(|_| graph)
+
+                        write::upsert_record(&mut graph, model, parsed_field)?;
+                        graph.validate()?;
+
+                        Ok(graph)
                     }),
                 ))),
             )
