@@ -1,6 +1,5 @@
 use crate::dml;
 use crate::validator::directive::DirectiveListValidator;
-use std::collections::BTreeMap;
 
 mod default;
 mod embedded;
@@ -14,9 +13,7 @@ mod updated_at;
 
 /// Returns a directive list validator containing all builtin field directives.
 pub fn new_builtin_field_directives() -> DirectiveListValidator<dml::Field> {
-    let mut validator = DirectiveListValidator::<dml::Field> {
-        known_directives: BTreeMap::new(),
-    };
+    let mut validator = DirectiveListValidator::<dml::Field>::new();
 
     validator.add(Box::new(map::MapDirectiveValidator {}));
     validator.add(Box::new(id::IdDirectiveValidator {}));
@@ -32,9 +29,7 @@ pub fn new_builtin_field_directives() -> DirectiveListValidator<dml::Field> {
 
 /// Returns a directive list validator containing all builtin model directives.
 pub fn new_builtin_model_directives() -> DirectiveListValidator<dml::Model> {
-    let mut validator = DirectiveListValidator::<dml::Model> {
-        known_directives: BTreeMap::new(),
-    };
+    let mut validator = DirectiveListValidator::<dml::Model>::new();
 
     validator.add(Box::new(map::MapDirectiveValidator {}));
     validator.add(Box::new(embedded::EmbeddedDirectiveValidator {}));
@@ -47,7 +42,5 @@ pub fn new_builtin_model_directives() -> DirectiveListValidator<dml::Model> {
 
 /// Returns a directive list validator containing all builtin enum directives.
 pub fn new_builtin_enum_directives() -> DirectiveListValidator<dml::Enum> {
-    DirectiveListValidator::<dml::Enum> {
-        known_directives: BTreeMap::new(),
-    }
+    DirectiveListValidator::<dml::Enum>::new()
 }
