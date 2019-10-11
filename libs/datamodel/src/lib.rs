@@ -42,6 +42,12 @@ macro_rules! match_first (
     );
 );
 
+extern crate pest; // Pest grammar generation on compile time.
+#[macro_use]
+extern crate pest_derive;
+#[macro_use]
+extern crate failure; // Failure enum display derivation
+
 pub mod ast;
 pub mod common;
 pub mod configuration;
@@ -55,24 +61,6 @@ pub use dml::*;
 
 use std::io::Write;
 use validator::ValidationPipeline;
-
-// Pest grammar generation on compile time.
-extern crate pest;
-#[macro_use]
-extern crate pest_derive;
-
-// Failure enum display derivation
-#[macro_use]
-extern crate failure;
-
-// Convenience Helpers
-pub fn get_builtin_sources() -> Vec<Box<dyn SourceDefinition>> {
-    vec![
-        Box::new(configuration::builtin::MySqlSourceDefinition::new()),
-        Box::new(configuration::builtin::PostgresSourceDefinition::new()),
-        Box::new(configuration::builtin::SqliteSourceDefinition::new()),
-    ]
-}
 
 /// Parses and validates a datamodel string, using core attributes only.
 pub fn parse(datamodel_string: &str) -> Result<Datamodel, error::ErrorCollection> {
@@ -213,4 +201,13 @@ pub fn render_datamodel_and_config_to(
 fn render_schema_ast_to(stream: &mut dyn std::io::Write, schema: &ast::SchemaAst, ident_width: usize) {
     let mut renderer = ast::renderer::Renderer::new(stream, ident_width);
     renderer.render(schema);
+}
+
+// Convenience Helpers
+pub fn get_builtin_sources() -> Vec<Box<dyn SourceDefinition>> {
+    vec![
+        Box::new(configuration::builtin::MySqlSourceDefinition::new()),
+        Box::new(configuration::builtin::PostgresSourceDefinition::new()),
+        Box::new(configuration::builtin::SqliteSourceDefinition::new()),
+    ]
 }
