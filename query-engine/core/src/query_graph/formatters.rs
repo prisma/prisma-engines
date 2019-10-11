@@ -3,8 +3,10 @@ use std::fmt::{self, Display};
 
 pub fn format(graph: &QueryGraph) -> String {
     format!(
-        "---- Query Graph ----\nResult Nodes: {:?}\n\n{}\n----------------------",
+        "---- Query Graph ----\nResult Nodes: {:?}\nMarked Nodes: {:?}\nRoot Nodes: {:?}\n\n{}\n----------------------",
         graph.result_nodes,
+        graph.marked_node_pairs,
+        graph.root_nodes(),
         stringify_nodes(graph, graph.root_nodes()).join("\n\n")
     )
 }

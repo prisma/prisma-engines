@@ -147,7 +147,6 @@ fn handle_one_to_many(
             }?;
 
             if let Node::Query(Query::Write(ref mut wq)) = child_node {
-                dbg!("[1:m] Injecting from parent node to child node", &relation_field_name, &parent_id);
                 wq.inject_non_list_arg(relation_field_name, parent_id);
             }
 
@@ -165,51 +164,55 @@ fn handle_one_to_many(
 /// The full graph that can be created by this handler looks like this:
 /// (Either [1] or [2] are in the graph at the same time, not both)
 /// ```text
-/// ┌────────────────────────┐
-/// │     Read New Child     │───────┐
-/// └────────────────────────┘       │
-///              │                   │
-///              │    ┌ ─ ─ ─ ─ ─ ─ ─▼─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┐
-///              │      ┌────────────────────────┐
-///              │    │ │    Read ex. Parent     │──┐                         │
-///              │      └────────────────────────┘  │
-///              │    │              │              │                         │
-///              │                   ▼              │(Fail on p > 0 if parent
-///              │    │ ┌────────────────────────┐  │     side required)      │
-///              │      │ If p > 0 && p. inlined │  │
-///              │    │ └────────────────────────┘  │                         │
-///              │              then │              │
-///              │    │              ▼              │                         │
-///              │      ┌────────────────────────┐  │
-///              │    │ │   Update ex. parent    │◀─┘                         │
-///              │      └────────────────────────┘                      ┌───┐
-///              │    │                                                 │ 1 │ │
-///              │                                                      └───┘
-///              ▼    └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘
-/// ┌────────────────────────┐
-/// │    Parent operation    │───────┐
-/// └────────────────────────┘       │
-///              │                   │
-///              │    ┌ ─ ─ ─ ─ ─ ─ ─│─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┐
-///              │                   ▼
-///              │    │ ┌────────────────────────┐                            │
-///              │      │     Read ex. child     │──┐
-///              │    │ └────────────────────────┘  │                         │
-///              │                   │              │
-///              │    │              ▼              │(Fail on c > 0 if child  │
-///              │      ┌────────────────────────┐  │     side required)
-///              │    │ │ If c > 0 && c. inlined │  │                         │
-///              │      └────────────────────────┘  │
-///              │    │         then │              │                         │
-///              │                   ▼              │
-///              │    │ ┌────────────────────────┐  │                         │
-///              │      │    Update ex. child    │◀─┘                   ┌───┐
-///              │    │ └────────────────────────┘                      │ 2 │ │
-///              │                                                      └───┘
-///              ▼    └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘
-/// ┌────────────────────────┐
-/// │      Read Result       │
-/// └────────────────────────┘
+///    ┌────────────────────────┐
+/// ┌──│     Read New Child     │───────┐
+/// │  └────────────────────────┘       │
+/// │               │                   │
+/// │               │    ┌ ─ ─ ─ ─ ─ ─ ─▼─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┐
+/// │               │      ┌────────────────────────┐
+/// │               │    │ │    Read ex. Parent     │──┐                         │
+/// │               │      └────────────────────────┘  │
+/// │               │    │              │              │                         │
+/// │               │                   ▼              │(Fail on p > 0 if parent
+/// │               │    │ ┌────────────────────────┐  │     side required)      │
+/// │               │      │ If p > 0 && p. inlined │  │
+/// │               │    │ └────────────────────────┘  │                         │
+/// │               │                   │              │
+/// │               │    │              ▼              │                         │
+/// │               │      ┌────────────────────────┐  │
+/// │               │    │ │   Update ex. parent    │◀─┘                         │
+/// │               │      └────────────────────────┘                      ┌───┐
+/// │               │    │         then                                    │ 1 │ │
+/// │               │                                                      └───┘
+/// │               ▼    └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘
+/// │  ┌────────────────────────┐
+/// ├──│    Parent operation    │───────┐
+/// │  └────────────────────────┘       │
+/// │               │                   │
+/// │               │    ┌ ─ ─ ─ ─ ─ ─ ─│─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┐
+/// │               │                   ▼
+/// │               │    │ ┌────────────────────────┐                            │
+/// │               │      │     Read ex. child     │──┐
+/// │               │    │ └────────────────────────┘  │                         │
+/// │               │                   │              │
+/// │               │    │              ▼              │(Fail on c > 0 if child  │
+/// │               │      ┌────────────────────────┐  │     side required)
+/// │               │    │ │ If c > 0 && c. inlined │  │                         │
+/// │               │      └────────────────────────┘  │
+/// │               │    │         then │              │                         │
+/// │               │                   ▼              │
+/// │               │    │ ┌────────────────────────┐  │                         │
+/// │               │      │    Update ex. child    │◀─┘                   ┌───┐
+/// │               │    │ └────────────────────────┘                      │ 2 │ │
+/// │               │                                                      └───┘
+/// │               ▼    └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘
+/// │  ┌────────────────────────┐
+/// │  │      Read Result       │
+/// │  └────────────────────────┘
+/// │
+/// │  ┌────────────────────────┐
+/// └─▶│      Update Child      │ (if inlined on the child)
+///    └────────────────────────┘
 /// ```
 /// Where [1] and [2] are checks and disconnects inserted into the graph based
 /// on the requirements of the relation connecting the parent and child models.
@@ -251,7 +254,7 @@ fn handle_one_to_one(
     let read_query = utils::id_read_query_infallible(&child_model, record_finder);
     let read_new_child_node = graph.create_node(read_query);
 
-    // We always start with the read node in a nested connect 1:1 scenario, so swap the read node into the existing hierarchy.
+    // We always start with the read node in a nested connect 1:1 scenario.
     graph.mark_nodes(&parent_node, &read_new_child_node);
     // let (read_new_child_node, parent_node) = utils::swap_nodes(graph, parent_node, read_new_child_node)?;
 
@@ -268,17 +271,16 @@ fn handle_one_to_one(
     };
 
     graph.create_edge(
-        &read_new_child_node,
         &parent_node,
+        &read_new_child_node,
         QueryGraphDependency::ParentIds(Box::new(|mut child_node, mut parent_ids| {
             let parent_id = match parent_ids.pop() {
                 Some(pid) => Ok(pid),
                 None => Err(QueryGraphBuilderError::AssertionError(format!("[Query Graph] Expected a valid parent ID to be present for a nested connect on a one-to-one relation."))),
             }?;
 
-            // This takes care of cases where the relation is inlined on the parent
+            // This takes care of cases where the relation is inlined.
             if let Node::Query(Query::Write(ref mut wq)) = child_node {
-                dbg!("[1:1] Injecting from read child node to parent", &relation_field_name, &parent_id);
                 wq.inject_non_list_arg(relation_field_name, parent_id);
             }
 
@@ -292,6 +294,50 @@ fn handle_one_to_one(
     // if the parent is a create, it can't have an existing child already.
     if parent_is_create && (child_side_required || !relation_inlined_parent) {
         utils::insert_existing_1to1_related_model_checks(graph, &parent_node, parent_relation_field)?;
+    }
+
+    // If the relation is inlined on the child, we also need to update the child to connect it to the parent.
+    if !relation_inlined_parent {
+        let update_node = utils::update_record_node_placeholder(graph, None, Arc::clone(child_model));
+        let relation_field_name = child_relation_field.name.clone();
+        let child_model_id = child_model.fields().id();
+
+        graph.create_edge(
+            &read_new_child_node,
+            &update_node,
+            QueryGraphDependency::ParentIds(Box::new(|mut child_node, mut parent_ids| {
+                let parent_id = match parent_ids.pop() {
+                    Some(pid) => Ok(pid),
+                    None => Err(QueryGraphBuilderError::AssertionError(format!("[Query Graph] Expected a valid parent ID to be present for a nested connect on a one-to-one relation, updating inlined on child."))),
+                }?;
+
+                if let Node::Query(Query::Write(ref mut wq)) = child_node {
+                    wq.inject_record_finder(RecordFinder {
+                        field: child_model_id,
+                        value: parent_id,
+                    });
+                }
+
+                Ok(child_node)
+            })),
+        )?;
+
+        graph.create_edge(
+            &parent_node,
+            &update_node,
+            QueryGraphDependency::ParentIds(Box::new(|mut child_node, mut parent_ids| {
+                let parent_id = match parent_ids.pop() {
+                    Some(pid) => Ok(pid),
+                    None => Err(QueryGraphBuilderError::AssertionError(format!("[Query Graph] Expected a valid parent ID to be present for a nested connect on a one-to-one relation, updating inlined on child."))),
+                }?;
+
+                if let Node::Query(Query::Write(ref mut wq)) = child_node {
+                    wq.inject_non_list_arg(relation_field_name, parent_id);
+                }
+
+                Ok(child_node)
+            })),
+        )?;
     }
 
     Ok(())

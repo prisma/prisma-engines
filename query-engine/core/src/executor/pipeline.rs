@@ -17,7 +17,7 @@ impl<'a> QueryPipeline<'a> {
 
     pub fn execute(mut self) -> CoreResult<Response> {
         // Run final validations and transformations.
-        self.graph.finalize();
+        self.graph.finalize()?;
 
         let serializer = self.serializer;
 

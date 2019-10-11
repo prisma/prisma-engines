@@ -41,6 +41,7 @@ fn if_flow_edge_rules(graph: &QueryGraph, edge: &EdgeRef) -> QueryGraphResult<()
 
 fn disallow_self_edges(graph: &QueryGraph, edge: &EdgeRef) -> QueryGraphResult<()> {
     if graph.edge_source(edge).id() == graph.edge_target(edge).id() {
+        println!("{}", graph);
         return Err(QueryGraphError::InvarianceViolation(format!(
             "Edge {} is an edge pointing to the same node it originated from (node {}). This is disallowed.",
             edge.id(),
@@ -53,37 +54,39 @@ fn disallow_self_edges(graph: &QueryGraph, edge: &EdgeRef) -> QueryGraphResult<(
 
 /// Only allow multiple parent edges if all parents are ancestors of each other.
 fn only_allow_related_parents_edges(graph: &QueryGraph) -> QueryGraphResult<()> {
-    for edge in graph.edges() {
-        let target_node = graph.edge_target(&edge);
-        let incoming_edges = graph.incoming_edges(&target_node);
-        let parents: Vec<NodeRef> = graph
-            .zip_source_nodes(incoming_edges)
-            .into_iter()
-            .map(|(_, node)| node)
-            .collect();
+    // for edge in graph.edges() {
+    //     let target_node = graph.edge_target(&edge);
+    //     let incoming_edges = graph.incoming_edges(&target_node);
+    //     let parents: Vec<NodeRef> = graph
+    //         .zip_source_nodes(incoming_edges)
+    //         .into_iter()
+    //         .map(|(_, node)| node)
+    //         .collect();
 
-        let check = if parents
-            .iter()
-            .tuple_combinations()
-            .into_iter()
-            .find(|(parent_a, parent_b)| {
-                !graph.is_ancestor(&parent_a, &parent_b) && !graph.is_ancestor(&parent_b, &parent_a)
-            })
-            .is_none()
-        {
-            Ok(())
-        } else {
-            println!("{}", graph);
-            Err(QueryGraphError::InvarianceViolation(format!(
-                "Edge {} from node {} to node {} violates constraint that all parents must be ancestors of each other.",
-                edge.id(),
-                graph.edge_source(&edge).id(),
-                graph.edge_target(&edge).id(),
-            )))
-        };
+    //     let failed_parent_combination =
+    //         dbg!(parents
+    //             .iter()
+    //             .tuple_combinations()
+    //             .into_iter()
+    //             .find(|(parent_a, parent_b)| {
+    //                 !graph.is_ancestor(&parent_a, &parent_b) && !graph.is_ancestor(&parent_b, &parent_a)
+    //             }));
 
-        check?;
-    }
+    //     let check = if failed_parent_combination.is_none() {
+    //         Ok(())
+    //     } else {
+    //         println!("{}", graph);
+    //         let unwrapped = failed_parent_combination.unwrap();
+    //         Err(QueryGraphError::InvarianceViolation(format!(
+    //             "Edge {} from node {} to node {} violates constraint that all parents must be ancestors of each other.",
+    //             edge.id(),
+    //             unwrapped.0.id(),
+    //             unwrapped.1.id(),
+    //         )))
+    //     };
+
+    //     check?;
+    // }
 
     Ok(())
 }

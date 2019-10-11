@@ -21,8 +21,6 @@ pub fn connect_nested_query(
     parent_relation_field: RelationFieldRef,
     data_map: ParsedInputMap,
 ) -> QueryGraphBuilderResult<()> {
-    dbg!(&parent_relation_field);
-
     let child_model = parent_relation_field.related_model();
 
     for (field_name, value) in data_map {

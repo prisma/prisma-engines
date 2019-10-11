@@ -450,6 +450,7 @@ impl QueryGraph {
     ///                                                                                                      └───┘
     /// ```
     fn swap_marked(&mut self) -> QueryGraphResult<()> {
+        println!("before swapping: {}", self);
         let marked = std::mem::replace(&mut self.marked_node_pairs, vec![]);
 
         for (parent_node, child_node) in marked {
