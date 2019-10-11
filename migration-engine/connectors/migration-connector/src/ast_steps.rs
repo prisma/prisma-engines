@@ -3,7 +3,7 @@
 use datamodel::ast;
 use serde::{Deserialize, Deserializer, Serialize};
 
-/// An atomic change to a [Datamodel](datamodel/dml/struct.Datamodel.html).
+/// An atomic change to a [Datamodel AST](datamodel/ast/struct.Datamodel.html).
 #[derive(Debug, Deserialize, Serialize, Clone)]
 #[serde(tag = "stepType")]
 pub enum MigrationStep {
@@ -144,9 +144,6 @@ pub struct UpdateField {
     // pub scalar_list: Option<Option<ScalarListStrategy>>,
 }
 
-// Helper for FieldUpdate.
-enum FieldUpdate {}
-
 impl UpdateField {
     pub fn is_any_option_set(&self) -> bool {
         self.new_name.is_some() || self.tpe.is_some() || self.arity.is_some()
@@ -157,10 +154,6 @@ impl UpdateField {
         // || self.id_info.is_some()
         // || self.default.is_some()
         // || self.scalar_list.is_some()
-    }
-
-    pub fn exhaustive_updates(&self) -> Vec<FieldUpdate> {
-        unimplemented!()
     }
 }
 
