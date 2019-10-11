@@ -1,5 +1,5 @@
 use datamodel::{ast, parse_to_ast};
-use migration_connector::{steps, MigrationStep};
+use migration_connector::ast_steps::{self as steps, MigrationStep};
 
 pub(crate) fn apply(initial: &str, steps: &[MigrationStep]) -> crate::Result<ast::Datamodel> {
     let mut datamodel = parse_to_ast(initial)?;
@@ -15,19 +15,14 @@ fn apply_step(datamodel: &mut ast::Datamodel, step: &MigrationStep) {
     match step {
         MigrationStep::CreateEnum(create_enum) => apply_create_enum(datamodel, create_enum),
         MigrationStep::CreateField(create_field) => apply_create_field(datamodel, create_field),
+        MigrationStep::UpdateField(update_field) => apply_update_field(datamodel, update_field),
         MigrationStep::DeleteModel(delete_model) => apply_delete_model(datamodel, delete_model),
         _ => unimplemented!("Migration step: {:?}", step),
     }
 }
 
 fn apply_create_enum(datamodel: &mut ast::Datamodel, step: &steps::CreateEnum) {
-    let steps::CreateEnum { name, db_name, values } = step;
-
-    let directives = if let Some(db_name) = db_name {
-        vec![new_map_directive(db_name.to_owned())]
-    } else {
-        vec![]
-    };
+    let steps::CreateEnum { name, values } = step;
 
     let new_enum = ast::Enum {
         documentation: None,
@@ -40,7 +35,7 @@ fn apply_create_enum(datamodel: &mut ast::Datamodel, step: &steps::CreateEnum) {
                 span: new_span(),
             })
             .collect(),
-        directives,
+        directives: Vec::new(),
     };
 
     datamodel.models.push(ast::Top::Enum(new_enum));
@@ -51,15 +46,10 @@ fn apply_create_field(datamodel: &mut ast::Datamodel, step: &steps::CreateField)
     let steps::CreateField {
         arity,
         db_name,
-        default,
-        id,
-        is_created_at: _,
-        is_unique: _,
-        is_updated_at: _,
         model: _,
         name,
-        scalar_list,
         tpe,
+        default,
     } = step;
 
     let mut directives = Vec::new();
@@ -68,18 +58,14 @@ fn apply_create_field(datamodel: &mut ast::Datamodel, step: &steps::CreateField)
         directives.push(new_map_directive(db_name.to_owned()))
     };
 
-    if let Some(id_info) = id {
-        unimplemented!("id info");
-    }
-
     let field = ast::Field {
-        arity: unimplemented!(),
+        arity: arity.clone(),
         name: new_ident(name.to_owned()),
         documentation: None,
-        field_type: unimplemented!("display dml field type"),
+        field_type: new_ident(tpe.clone()),
         span: new_span(),
-        directives: vec![unimplemented!()],
-        default_value: unimplemented!(),
+        directives: Vec::new(),
+        default_value: None,
     };
     model.fields.push(field);
 }
@@ -95,6 +81,14 @@ fn apply_delete_model(datamodel: &mut ast::Datamodel, step: &steps::DeleteModel)
         .collect();
 
     datamodel.models = new_models;
+}
+
+fn apply_update_field(datamodel: &mut ast::Datamodel, step: &steps::UpdateField) {
+    let field = find_model_field_mut(datamodel, &step.model, &step.name);
+
+    if let Some(field) = field {
+        unimplemented!();
+    }
 }
 
 fn new_ident(name: String) -> ast::Identifier {
@@ -123,4 +117,13 @@ fn find_model_mut<'a>(datamodel: &'a mut ast::Datamodel, model_name: &str) -> Op
         ast::Top::Model(model) => Some(model),
         _ => None,
     })
+}
+
+fn find_model_field_mut<'a>(
+    datamodel: &'a mut ast::Datamodel,
+    model_name: &str,
+    field_name: &str,
+) -> Option<&'a mut ast::Field> {
+    find_model_mut(datamodel, model_name)
+        .and_then(|model| model.fields.iter_mut().find(|field| field.name.name == field_name))
 }

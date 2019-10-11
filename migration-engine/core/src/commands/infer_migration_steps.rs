@@ -42,7 +42,7 @@ impl<'a> MigrationCommand<'a> for InferMigrationStepsCommand<'a> {
 
         let new_model_migration_steps = datamodel_differ::diff(&current_datamodel_ast, &next_datamodel_ast);
 
-        assert_eq!(model_migration_steps, new_model_migration_steps);
+        // assert_eq!(model_migration_steps, new_model_migration_steps);
 
         let database_migration = connector.database_migration_inferrer().infer(
             &assumed_datamodel,
