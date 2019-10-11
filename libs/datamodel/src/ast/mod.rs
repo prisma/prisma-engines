@@ -48,6 +48,22 @@ pub struct SchemaAst {
 }
 
 impl SchemaAst {
+    pub fn find_model(&self, model: &str) -> Option<&Model> {
+        self.models().into_iter().find(|m| m.name.name == model)
+    }
+
+    pub fn find_custom_type(&self, type_name: &str) -> Option<&Field> {
+        self.types().into_iter().find(|t| t.name.name == type_name)
+    }
+
+    pub fn find_enum(&self, enum_name: &str) -> Option<&Enum> {
+        self.enums().into_iter().find(|e| e.name.name == enum_name)
+    }
+
+    pub fn find_field(&self, model: &str, field: &str) -> Option<&Field> {
+        self.find_model(model)?.fields.iter().find(|f| f.name.name == field)
+    }
+
     pub fn types(&self) -> Vec<&Field> {
         self.tops
             .iter()

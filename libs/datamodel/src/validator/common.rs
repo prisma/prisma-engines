@@ -4,37 +4,6 @@ use crate::{ast, dml, error::DatamodelError};
 pub (crate) const STATE_ERROR: &str = "Failed lookup of model or field during internal processing. This means that the internal representation was mutated incorrectly.";
 pub (crate) const ERROR_GEN_STATE_ERROR: &str = "Failed lookup of model or field during generating an error message. This often means that a generated field or model was the cause of an error.";
 
-pub(crate) trait FindInAstDatamodel {
-    fn find_field(&self, model: &str, field: &str) -> Option<&ast::Field>;
-    fn find_model(&self, model: &str) -> Option<&ast::Model>;
-    fn find_enum(&self, enum_name: &str) -> Option<&ast::Enum>;
-    fn find_custom_type(&self, type_name: &str) -> Option<&ast::Field>;
-}
-
-impl FindInAstDatamodel for ast::SchemaAst {
-    fn find_field(&self, model: &str, field: &str) -> Option<&ast::Field> {
-        for ast_field in &self.find_model(model)?.fields {
-            if ast_field.name.name == field {
-                return Some(&ast_field);
-            }
-        }
-
-        None
-    }
-
-    fn find_model(&self, model: &str) -> Option<&ast::Model> {
-        self.models().into_iter().find(|m| m.name.name == model)
-    }
-
-    fn find_enum(&self, enum_name: &str) -> Option<&ast::Enum> {
-        self.enums().into_iter().find(|e| e.name.name == enum_name)
-    }
-
-    fn find_custom_type(&self, type_name: &str) -> Option<&ast::Field> {
-        self.types().into_iter().find(|t| t.name.name == type_name)
-    }
-}
-
 impl ast::WithDirectives for Vec<ast::Directive> {
     fn directives(&self) -> &Vec<ast::Directive> {
         self
