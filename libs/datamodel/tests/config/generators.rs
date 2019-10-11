@@ -1,5 +1,5 @@
 use crate::common::ErrorAsserts;
-use datamodel::errors::ValidationError;
+use datamodel::error::DatamodelError;
 
 const DATAMODEL: &str = r#"
 generator js1 {
@@ -14,7 +14,7 @@ generator go {
 
 #[test]
 fn serialize_generators_to_cmf() {
-    let config = datamodel::load_configuration(DATAMODEL).unwrap();
+    let config = datamodel::parse_configuration(DATAMODEL).unwrap();
     let rendered = datamodel::generators_to_json(&config.generators);
 
     let expected = r#"[
@@ -55,10 +55,10 @@ generator js1 {
 
 #[test]
 fn fail_to_load_generator_with_options_missing() {
-    let res = datamodel::load_configuration(INVALID_DATAMODEL);
+    let res = datamodel::parse_configuration(INVALID_DATAMODEL);
 
     if let Err(error) = res {
-        error.assert_is(ValidationError::GeneratorArgumentNotFound {
+        error.assert_is(DatamodelError::GeneratorArgumentNotFound {
             argument_name: String::from("provider"),
             generator_name: String::from("js1"),
             span: datamodel::ast::Span::new(1, 73),

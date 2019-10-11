@@ -55,7 +55,7 @@ impl<'a> MigrationCommand<'a> for InferMigrationStepsCommand<'a> {
         };
 
         Ok(MigrationStepsResultOutput {
-            datamodel: datamodel::render(&next_datamodel).unwrap(),
+            datamodel: datamodel::render_datamodel_to_string(&next_datamodel).unwrap(),
             datamodel_steps: returned_datamodel_steps,
             database_steps: database_steps_json,
             errors: vec![],

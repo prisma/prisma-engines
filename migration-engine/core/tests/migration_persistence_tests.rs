@@ -57,7 +57,7 @@ fn load_all_must_return_all_created_migrations() {
 #[test]
 fn create_should_allow_to_create_a_new_migration() {
     test_each_connector(|sql_family, api| {
-        let datamodel = datamodel::parse(
+        let datamodel = datamodel::parse_datamodel(
             r#"
             model Test {
                 id String @id @default(cuid())

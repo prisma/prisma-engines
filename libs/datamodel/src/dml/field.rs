@@ -1,7 +1,4 @@
-use super::id::*;
-use super::relation::*;
-use super::scalar::*;
-use super::traits::*;
+use super::*;
 use crate::common::{PrismaType, PrismaValue};
 use serde::{Deserialize, Serialize};
 

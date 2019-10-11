@@ -122,7 +122,7 @@ impl<'a> ApplyMigrationCommand<'a> {
         let DestructiveChangeDiagnostics { warnings, errors } = diagnostics;
 
         Ok(MigrationStepsResultOutput {
-            datamodel: datamodel::render(&next_datamodel).unwrap(),
+            datamodel: datamodel::render_datamodel_to_string(&next_datamodel).unwrap(),
             datamodel_steps: self.input.steps.clone(),
             database_steps: database_steps_json_pretty,
             errors,

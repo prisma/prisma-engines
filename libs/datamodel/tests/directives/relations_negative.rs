@@ -1,5 +1,5 @@
 use crate::common::*;
-use datamodel::{ast::Span, errors::ValidationError};
+use datamodel::{ast::Span, error::DatamodelError};
 
 #[test]
 fn should_fail_on_ambiguous_relations() {
@@ -19,7 +19,7 @@ fn should_fail_on_ambiguous_relations() {
 
     errors.assert_is_at(
         0,
-        ValidationError::new_model_validation_error("Ambiguous relation detected.", "User", Span::new(45, 57)),
+        DatamodelError::new_model_validation_error("Ambiguous relation detected.", "User", Span::new(45, 57)),
     );
 }
 
@@ -41,7 +41,7 @@ fn should_fail_on_ambiguous_named_relations() {
 
     errors.assert_is_at(
         0,
-        ValidationError::new_model_validation_error("Ambiguous relation detected.", "User", Span::new(45, 81)),
+        DatamodelError::new_model_validation_error("Ambiguous relation detected.", "User", Span::new(45, 81)),
     );
 }
 
@@ -65,7 +65,7 @@ fn should_fail_on_ambiguous_named_relations_2() {
 
     errors.assert_is_at(
         0,
-        ValidationError::new_model_validation_error("Ambiguous relation detected.", "User", Span::new(45, 78)),
+        DatamodelError::new_model_validation_error("Ambiguous relation detected.", "User", Span::new(45, 78)),
     );
 }
 
@@ -82,7 +82,7 @@ fn should_fail_on_ambiguous_self_relation() {
 
     let errors = parse_error(dml);
 
-    errors.assert_is(ValidationError::new_model_validation_error(
+    errors.assert_is(DatamodelError::new_model_validation_error(
         "Ambiguous self relation detected.",
         "User",
         Span::new(45, 56),
@@ -101,7 +101,7 @@ fn should_fail_on_ambiguous_self_relation_with_two_fields() {
 
     let errors = parse_error(dml);
 
-    errors.assert_is(ValidationError::new_model_validation_error(
+    errors.assert_is(DatamodelError::new_model_validation_error(
         "Ambiguous self relation detected.",
         "User",
         Span::new(57, 67),
@@ -121,7 +121,7 @@ fn should_fail_on_ambiguous_named_self_relation() {
 
     let errors = parse_error(dml);
 
-    errors.assert_is(ValidationError::new_model_validation_error(
+    errors.assert_is(DatamodelError::new_model_validation_error(
         "Ambiguous self relation detected.",
         "User",
         Span::new(45, 82),
@@ -145,7 +145,7 @@ fn should_fail_on_conflicting_back_relation_field_name() {
 
     let errors = parse_error(dml);
 
-    errors.assert_is(ValidationError::new_model_validation_error(
+    errors.assert_is(DatamodelError::new_model_validation_error(
         "Automatic opposite related field generation would cause a naming conflict. Please add an explicit opposite relation field.",
         "User",
         Span::new(90, 107),
@@ -173,7 +173,7 @@ fn should_fail_on_conflicting_generated_back_relation_fields() {
 
     let errors = parse_error(dml);
 
-    errors.assert_is_at(0, ValidationError::new_model_validation_error(
+    errors.assert_is_at(0, DatamodelError::new_model_validation_error(
         "Automatic opposite related field generation would cause a naming conflict. Please add an explicit opposite relation field.",
         "Todo",
         Span::new(98, 152),
@@ -198,7 +198,7 @@ fn should_fail_on_named_generated_back_relation_fields() {
 
     errors.assert_is_at(
         0,
-        ValidationError::new_model_validation_error(
+        DatamodelError::new_model_validation_error(
             "Named relations require an opposite field.",
             "Todo",
             Span::new(45, 87),

@@ -1,6 +1,4 @@
-use super::enummodel::*;
-use super::field::Field;
-use super::model::*;
+use super::*;
 
 // TODO: Is schema the right name here?
 /// Represents a prisma-datamodel.

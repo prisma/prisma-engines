@@ -92,7 +92,7 @@ pub fn load_data_model_components() -> PrismaResult<(DatamodelV2Components, Inte
 fn load_datamodel_v2() -> PrismaResult<Option<DatamodelV2Components>> {
     debug!("Trying to load v2 data model...");
 
-    load_v2_dml_string().inner_map(|dml_string| match datamodel::parse(&dml_string) {
+    load_v2_dml_string().inner_map(|dml_string| match datamodel::parse_datamodel(&dml_string) {
         Err(errors) => Err(PrismaError::ConversionError(errors, dml_string.clone())),
         Ok(dm) => load_configuration(&dml_string).map(|configuration| {
             debug!("Loaded Prisma v2 data model.");
@@ -109,7 +109,7 @@ pub fn load_configuration(dml_string: &str) -> PrismaResult<datamodel::Configura
         load_string_from_env("OVERWRITE_DATASOURCES")?.unwrap_or_else(|| r#"[]"#.to_string());
     let datasource_overwrites: Vec<SourceOverride> = serde_json::from_str(&datasource_overwrites_string)?;
 
-    match datamodel::load_configuration(&dml_string) {
+    match datamodel::parse_configuration(&dml_string) {
         Err(errors) => Err(PrismaError::ConversionError(errors, dml_string.to_string())),
         Ok(mut configuration) => {
             for datasource_override in datasource_overwrites {
