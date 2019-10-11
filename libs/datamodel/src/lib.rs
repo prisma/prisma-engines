@@ -42,25 +42,19 @@ macro_rules! match_first (
     );
 );
 
-// Lib exports.
-
 pub mod ast;
-pub mod dml;
-pub use dml::*;
 pub mod common;
-pub use crate::common::FromStrAndSpan;
-pub use common::argument::Arguments;
 pub mod configuration;
+pub mod dml;
 pub mod dmmf;
 pub mod error;
-pub use common::functions::FunctionalEvaluator;
-pub use configuration::*;
-pub use validator::directive::DirectiveValidator;
+pub mod validator;
 
-mod validator;
-pub use validator::ValidationPipeline;
+pub use configuration::*;
+pub use dml::*;
 
 use std::io::Write;
+use validator::ValidationPipeline;
 
 // Pest grammar generation on compile time.
 extern crate pest;

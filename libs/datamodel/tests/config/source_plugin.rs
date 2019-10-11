@@ -1,7 +1,7 @@
 use crate::common::*;
 use datamodel::{
-    common::FromStrAndSpan, common::PrismaType, configuration::*, dml, error::DatamodelError, Arguments,
-    DirectiveValidator,
+    common::argument::Arguments, common::FromStrAndSpan, common::PrismaType, configuration::*, dml,
+    error::DatamodelError, validator::directive::DirectiveValidator,
 };
 
 //##########################

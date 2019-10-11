@@ -1,11 +1,11 @@
 use crate::ast;
 use crate::dml;
-
-use crate::common::interpolation::StringInterpolator;
-use crate::common::FromStrAndSpan;
-use crate::common::{PrismaType, PrismaValue};
 use crate::error::DatamodelError;
-use crate::FunctionalEvaluator;
+
+use super::functions::FunctionalEvaluator;
+use super::interpolation::StringInterpolator;
+use super::FromStrAndSpan;
+use super::{PrismaType, PrismaValue};
 use chrono::{DateTime, Utc};
 use std::error;
 
