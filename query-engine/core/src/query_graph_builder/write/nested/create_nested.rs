@@ -124,20 +124,21 @@ fn handle_one_to_many(
     mut create_nodes: Vec<NodeRef>,
 ) -> QueryGraphBuilderResult<()> {
     if parent_relation_field.relation_is_inlined_in_parent() {
-        let create_node = create_nodes.pop().expect(
-            "[Query Graph] Expected only one nested create node on a 1:m relation with inline IDs on the parent.",
-        );
+        let create_node = create_nodes
+            .pop()
+            .expect("[Query Graph] Expected one nested create node on a 1:m relation with inline IDs on the parent.");
 
         // For the injection, we need the name of the field on the inlined side, in this case the parent.
         let relation_field_name = parent_relation_field.name.clone();
 
         // We need to swap the create node and the parent because the inlining is done in the parent.
-        let (parent_node, child_node) = utils::swap_nodes(graph, parent_node, create_node)?;
+        graph.mark_nodes(&parent_node, &create_node);
+        // let (parent_node, child_node) = utils::swap_nodes(graph, parent_node, create_node)?;
 
-        dbg!("p inl", parent_node.id(), child_node.id());
+        dbg!("p inl", parent_node.id(), create_node.id());
         graph.create_edge(
             &parent_node,
-            &child_node,
+            &create_node,
             QueryGraphDependency::ParentIds(Box::new(|mut child_node, mut parent_ids| {
                 let parent_id = match parent_ids.pop() {
                     Some(pid) => Ok(pid),
@@ -291,9 +292,11 @@ fn handle_one_to_one(
         let relation_field_name = parent_relation_field.name.clone();
 
         // We need to swap the read node and the parent because the inlining is done in the parent, and we need to fetch the ID first.
-        let (parent_node, child_node) = utils::swap_nodes(graph, parent_node, create_node)?;
+        graph.mark_nodes(&parent_node, &create_node);
+        // let (parent_node, child_node) = utils::swap_nodes(graph, parent_node, create_node)?;
 
-        (parent_node, child_node, relation_field_name)
+
+        (parent_node, create_node, relation_field_name)
     } else {
         // For the injection, we need the name of the field on the inlined side, in this case the child.
         let relation_field_name = parent_relation_field.related_field().name.clone();

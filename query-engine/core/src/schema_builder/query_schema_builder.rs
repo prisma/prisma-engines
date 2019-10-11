@@ -207,8 +207,6 @@ impl<'a> QuerySchemaBuilder<'a> {
                             // Todo: This (and all following query graph validations) should be unified in the query graph builders mod.
                             // callers should not have to care about calling validations explicitly.
                             graph.create_node(Query::Read(query));
-                            graph.validate()?;
-
                             Ok(graph)
                         }),
                     ))),
@@ -238,8 +236,6 @@ impl<'a> QuerySchemaBuilder<'a> {
                     let query = ReadManyRecordsBuilder::new(parsed_field, model).build()?;
 
                     graph.create_node(Query::Read(query));
-                    graph.validate()?;
-
                     Ok(graph)
                 }),
             ))),
@@ -265,8 +261,6 @@ impl<'a> QuerySchemaBuilder<'a> {
                     let query = AggregateRecordsBuilder::new(parsed_field, model).build()?;
 
                     graph.create_node(Query::Read(query));
-                    graph.validate()?;
-
                     Ok(graph)
                 }),
             ))),
@@ -296,8 +290,6 @@ impl<'a> QuerySchemaBuilder<'a> {
                     let mut graph = QueryGraph::new();
 
                     write::create_record(&mut graph, model, parsed_field)?;
-                    graph.validate()?;
-
                     Ok(graph)
                 }),
             ))),
@@ -325,8 +317,6 @@ impl<'a> QuerySchemaBuilder<'a> {
                         let mut graph = QueryGraph::new();
 
                         write::delete_record(&mut graph, model, parsed_field)?;
-                        graph.validate()?;
-
                         Ok(graph)
                     }),
                 ))),
@@ -353,8 +343,6 @@ impl<'a> QuerySchemaBuilder<'a> {
                     let mut graph = QueryGraph::new();
 
                     write::delete_many_records(&mut graph, model, parsed_field)?;
-                    graph.validate()?;
-
                     Ok(graph)
                 }),
             ))),
@@ -380,8 +368,6 @@ impl<'a> QuerySchemaBuilder<'a> {
                         let mut graph = QueryGraph::new();
 
                         write::update_record(&mut graph, model, parsed_field)?;
-                        graph.validate()?;
-
                         Ok(graph)
                     }),
                 ))),
@@ -408,8 +394,6 @@ impl<'a> QuerySchemaBuilder<'a> {
                     let mut graph = QueryGraph::new();
 
                     write::update_many_records(&mut graph, model, parsed_field)?;
-                    graph.validate()?;
-
                     Ok(graph)
                 }),
             ))),
@@ -433,8 +417,6 @@ impl<'a> QuerySchemaBuilder<'a> {
                         let mut graph = QueryGraph::new();
 
                         write::upsert_record(&mut graph, model, parsed_field)?;
-                        graph.validate()?;
-
                         Ok(graph)
                     }),
                 ))),

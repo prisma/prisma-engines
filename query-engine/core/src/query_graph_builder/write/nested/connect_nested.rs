@@ -122,7 +122,8 @@ fn handle_one_to_many(
         let relation_field_name = parent_relation_field.name.clone();
 
         // We need to swap the read node and the parent because the inlining is done in the parent, and we need to fetch the ID first.
-        let (parent_node, child_node) = utils::swap_nodes(graph, parent_node, child_node)?;
+        graph.mark_nodes(&parent_node, &child_node);
+        // let (parent_node, child_node) = utils::swap_nodes(graph, parent_node, child_node)?;
 
         (parent_node, child_node, relation_field_name)
     } else {
@@ -251,8 +252,8 @@ fn handle_one_to_one(
     let read_new_child_node = graph.create_node(read_query);
 
     // We always start with the read node in a nested connect 1:1 scenario, so swap the read node into the existing hierarchy.
-    // Preserve naming to keep the code readable.
-    let (read_new_child_node, parent_node) = utils::swap_nodes(graph, parent_node, read_new_child_node)?;
+    graph.mark_nodes(&parent_node, &read_new_child_node);
+    // let (read_new_child_node, parent_node) = utils::swap_nodes(graph, parent_node, read_new_child_node)?;
 
     // Next is the check for (and possible disconnect of) an existing parent.
     // Those checks are performed on the new child node, hence we use the child relation field side ("backrelation").

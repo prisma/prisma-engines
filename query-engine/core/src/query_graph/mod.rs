@@ -120,6 +120,14 @@ pub struct QueryGraph {
     /// If no nodes are set, the interpretation will take the result of the
     /// last statement derived from the graph.
     result_nodes: Vec<NodeIndex>,
+
+    /// Pairs of nodes marked for parent child swap.
+    /// The first `NodeRef` of the tuple is the parent, the second one the child.
+    /// The child will become the parents new parent when the graph is finalized.
+    /// More docs can be found on `swap_marked`.
+    marked_node_pairs: Vec<(NodeRef, NodeRef)>,
+
+    finalized: bool,
 }
 
 /// Implementation detail of the QueryGraph.
@@ -129,8 +137,19 @@ impl QueryGraph {
     pub fn new() -> Self {
         Self {
             graph: InnerGraph::new(),
-            result_nodes: vec![],
+            ..Default::default()
         }
+    }
+
+    pub fn finalize(&mut self) -> QueryGraphResult<()> {
+        if !self.finalized {
+            self.swap_marked()?;
+            self.finalized = true;
+        }
+
+        self.validate()?;
+
+        Ok(())
     }
 
     pub fn validate(&self) -> QueryGraphResult<()> {
@@ -360,5 +379,111 @@ impl QueryGraph {
             .into_iter()
             .map(|edge_ix| EdgeRef { edge_ix })
             .collect()
+    }
+
+    /// Marks a node pair for swapping.
+    pub fn mark_nodes(&mut self, parent_node: &NodeRef, child_node: &NodeRef) {
+        self.marked_node_pairs.push((parent_node.clone(), child_node.clone()));
+    }
+
+    /// Swaps all marked parent-child pairs.
+    ///
+    /// With this function, given a tuple of `(parent, child)`, `child` will be a parent node of `parent` after the swap has been performed.
+    ///
+    /// This operation preserves all edges from the parents of `parent` to the node, while inserting new edges from all parents of
+    /// `parent` to `child`, effectively "pushing the child in the middle" of `parent` and it's parents. The new edges are only expressing
+    /// exection order, and no node transformation like `ParentIds`.
+    ///
+    /// Any edge existing between `parent` and `child` will change direction and will point from `child` to `parent` instead.
+    ///
+    /// ## Example transformation
+    /// Given the marked pairs `[(A, B), (B, C), (B, D)]` and a graph (depicting the state before the transformation):
+    /// ```text
+    ///      ┌───┐
+    ///      │ P │
+    ///      └───┘
+    ///        │
+    ///        ▼
+    ///      ┌───┐
+    ///      │ A │
+    ///      └───┘
+    ///        │
+    ///        ▼
+    ///      ┌───┐
+    ///   ┌──│ B │──┐
+    ///   │  └───┘  │
+    ///   │         │
+    ///   ▼         ▼
+    /// ┌───┐     ┌───┐
+    /// │ C │     │ D │
+    /// └───┘     └───┘
+    /// ```
+    ///
+    /// The marked pairs express that the operations performed by the contained parents depend on the child operation,
+    /// hence making it necessary to execute the child operation first.
+    ///
+    /// Applying the transformations step by step will change the graph as following:
+    /// (original edges marked with an ID to show how they're preserved)
+    /// ```text
+    ///      ┌───┐                 ┌───┐                                 ┌───┐                         ┌───┐
+    ///      │ P │                 │ P │────────────────┐             ┌──│ P │──────────┐           ┌──│ P │────────┐
+    ///      └───┘                 └───┘               1│             │  └───┘         1│           │  └───┘       1│
+    ///       1│                     │                  │            5│   6│            │          5│   6│          │
+    ///        ▼                     │                  │             │    ▼            │           │    ▼          │
+    ///      ┌───┐                   │                  │             │  ┌───┐          │           │  ┌───┐        │
+    ///      │ A │                  5│                  │             │  │ C │          │           │  │ C │───┐    │
+    ///      └───┘     ═(A, B)═▶     │                  │  ═(B, C)═▶  │  └───┘          │ ═(B, D)═▶ │  └───┘  7│    │
+    ///       2│                     │                  │             │   3│            │           │   3│     │    │
+    ///        ▼                     ▼                  │             │    ▼            │           │    │     ▼    │
+    ///      ┌───┐                 ┌───┐                │             │  ┌───┐          │           │    │   ┌───┐  │
+    ///   ┌──│ B │──┐           ┌──│ B │──┬────────┐    │             └─▶│ B │─────┐    │           │    │   │ D │  │
+    ///  3│  └───┘ 4│          3│  └───┘ 4│       2│    │                └───┘     │    │           │    │   └───┘  │
+    ///   │         │           │         │        │    │                 4│      2│    │           │    │    4│    │
+    ///   ▼         ▼           ▼         ▼        ▼    │                  ▼       ▼    │           │    ▼     │    │
+    /// ┌───┐     ┌───┐       ┌───┐     ┌───┐    ┌───┐  │                ┌───┐   ┌───┐  │           │  ┌───┐   │    │
+    /// │ C │     │ D │       │ C │     │ D │    │ A │◀─┘                │ D │   │ A │◀─┘           └─▶│ B │◀──┘    │
+    /// └───┘     └───┘       └───┘     └───┘    └───┘                   └───┘   └───┘                 └───┘        │
+    ///                                                                                                  │          │
+    ///                                                                                                  │          │
+    ///                                                                                                 2│   ┌───┐  │
+    ///                                                                                                  └──▶│ A │◀─┘
+    ///                                                                                                      └───┘
+    /// ```
+    fn swap_marked(&mut self) -> QueryGraphResult<()> {
+        let marked = std::mem::replace(&mut self.marked_node_pairs, vec![]);
+
+        for (parent_node, child_node) in marked {
+            // All parents of `parent_node` are becoming a parent of `child_node` as well.
+            let parent_edges = self.incoming_edges(&parent_node);
+            for parent_edge in parent_edges {
+                let parent_of_parent_node = self.edge_source(&parent_edge);
+
+                println!(
+                    "[Swap] Connecting parent of parent {} with child {}",
+                    parent_of_parent_node.id(),
+                    child_node.id()
+                );
+
+                self.create_edge(
+                    &parent_of_parent_node,
+                    &child_node,
+                    QueryGraphDependency::ExecutionOrder,
+                )?;
+            }
+
+            // Find existing edge between parent and child. Can only be one at most.
+            let existing_edge = self
+                .graph
+                .find_edge(parent_node.node_ix, child_node.node_ix)
+                .map(|edge_ix| EdgeRef { edge_ix });
+
+            // Remove edge and reinsert edge in reverse.
+            if let Some(edge) = existing_edge {
+                let content = self.remove_edge(edge).unwrap();
+                self.create_edge(&child_node, &parent_node, content)?;
+            }
+        }
+
+        Ok(())
     }
 }
