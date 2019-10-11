@@ -59,6 +59,7 @@ pub mod validator;
 pub use configuration::*;
 pub use dml::*;
 
+use crate::ast::SchemaAst;
 use std::io::Write;
 use validator::ValidationPipeline;
 
@@ -95,17 +96,9 @@ pub fn parse_datamodel_with_sources(
 ) -> Result<Datamodel, error::ErrorCollection> {
     let ast = ast::parser::parse(datamodel_string)?;
 
-    let mut source_loader = SourceLoader::new();
-    for source in get_builtin_sources() {
-        source_loader.add_source_definition(source);
-    }
-    for source in source_definitions {
-        source_loader.add_source_definition(source);
-    }
-
     let mut errors = error::ErrorCollection::new();
 
-    let sources = match source_loader.load(&ast) {
+    let sources = match load_sources(&ast, source_definitions) {
         Ok(src) => src,
         Err(mut err) => {
             errors.append(&mut err);
@@ -134,7 +127,19 @@ pub fn parse_configuration_with_sources(
     source_definitions: Vec<Box<dyn configuration::SourceDefinition>>,
 ) -> Result<Configuration, error::ErrorCollection> {
     let ast = ast::parser::parse(datamodel_string)?;
+    let datasources = load_sources(&ast, source_definitions)?;
+    let generators = GeneratorLoader::load_generators_from_ast(&ast)?;
 
+    Ok(Configuration {
+        datasources,
+        generators,
+    })
+}
+
+fn load_sources(
+    schema_ast: &SchemaAst,
+    source_definitions: Vec<Box<dyn configuration::SourceDefinition>>,
+) -> Result<Vec<Box<dyn Source>>, error::ErrorCollection> {
     let mut source_loader = SourceLoader::new();
     for source in get_builtin_sources() {
         source_loader.add_source_definition(source);
@@ -143,14 +148,7 @@ pub fn parse_configuration_with_sources(
         source_loader.add_source_definition(source);
     }
 
-    let datasources = source_loader.load(&ast)?;
-
-    let generators = GeneratorLoader::load_generators_from_ast(&ast)?;
-
-    Ok(Configuration {
-        datasources,
-        generators,
-    })
+    source_loader.load(&schema_ast)
 }
 
 //
