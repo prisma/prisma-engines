@@ -46,3 +46,55 @@ pub struct SchemaAst {
     /// All models, enums, datasources, generators or type aliases
     pub tops: Vec<Top>,
 }
+
+impl SchemaAst {
+    pub fn types(&self) -> Vec<&Field> {
+        self.tops
+            .iter()
+            .filter_map(|top| match top {
+                Top::Type(x) => Some(x),
+                _ => None,
+            })
+            .collect()
+    }
+
+    pub fn enums(&self) -> Vec<&Enum> {
+        self.tops
+            .iter()
+            .filter_map(|top| match top {
+                Top::Enum(x) => Some(x),
+                _ => None,
+            })
+            .collect()
+    }
+
+    pub fn models(&self) -> Vec<&Model> {
+        self.tops
+            .iter()
+            .filter_map(|top| match top {
+                Top::Model(x) => Some(x),
+                _ => None,
+            })
+            .collect()
+    }
+
+    pub fn sources(&self) -> Vec<&SourceConfig> {
+        self.tops
+            .iter()
+            .filter_map(|top| match top {
+                Top::Source(x) => Some(x),
+                _ => None,
+            })
+            .collect()
+    }
+
+    pub fn generators(&self) -> Vec<&GeneratorConfig> {
+        self.tops
+            .iter()
+            .filter_map(|top| match top {
+                Top::Generator(x) => Some(x),
+                _ => None,
+            })
+            .collect()
+    }
+}

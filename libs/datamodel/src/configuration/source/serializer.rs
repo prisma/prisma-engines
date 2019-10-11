@@ -5,16 +5,16 @@ pub struct SourceSerializer {}
 
 impl SourceSerializer {
     pub fn add_sources_to_ast(sources: &[Box<dyn Source>], ast_datamodel: &mut ast::SchemaAst) {
-        let mut models: Vec<ast::Top> = Vec::new();
+        let mut tops: Vec<ast::Top> = Vec::new();
 
         for source in sources {
-            models.push(ast::Top::Source(Self::source_to_ast(&**source)))
+            tops.push(ast::Top::Source(Self::source_to_ast(&**source)))
         }
 
         // Prepend sources.
-        models.append(&mut ast_datamodel.tops);
+        tops.append(&mut ast_datamodel.tops);
 
-        ast_datamodel.tops = models;
+        ast_datamodel.tops = tops;
     }
 
     fn source_to_ast(source: &dyn Source) -> ast::SourceConfig {

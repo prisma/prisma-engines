@@ -13,16 +13,14 @@ impl GeneratorLoader {
         let mut generators: Vec<Generator> = vec![];
         let mut errors = ErrorCollection::new();
 
-        for ast_obj in &ast_schema.tops {
-            if let ast::Top::Generator(gen) = ast_obj {
-                match Self::lift_generator(&gen) {
-                    Ok(loaded_gen) => generators.push(loaded_gen),
-                    // Lift error.
-                    Err(DatamodelError::ArgumentNotFound { argument_name, span }) => errors.push(
-                        DatamodelError::new_generator_argument_not_found_error(&argument_name, &gen.name.name, span),
-                    ),
-                    Err(err) => errors.push(err),
-                }
+        for gen in &ast_schema.generators() {
+            match Self::lift_generator(&gen) {
+                Ok(loaded_gen) => generators.push(loaded_gen),
+                // Lift error.
+                Err(DatamodelError::ArgumentNotFound { argument_name, span }) => errors.push(
+                    DatamodelError::new_generator_argument_not_found_error(&argument_name, &gen.name.name, span),
+                ),
+                Err(err) => errors.push(err),
             }
         }
 
@@ -70,16 +68,16 @@ impl GeneratorLoader {
     }
 
     pub fn add_generators_to_ast(generators: &[Generator], ast_datamodel: &mut ast::SchemaAst) {
-        let mut models: Vec<ast::Top> = Vec::new();
+        let mut tops: Vec<ast::Top> = Vec::new();
 
         for generator in generators {
-            models.push(ast::Top::Generator(Self::lower_generator(&generator)))
+            tops.push(ast::Top::Generator(Self::lower_generator(&generator)))
         }
 
-        // Prepend generstors.
-        models.append(&mut ast_datamodel.tops);
+        // Prepend generators.
+        tops.append(&mut ast_datamodel.tops);
 
-        ast_datamodel.tops = models;
+        ast_datamodel.tops = tops;
     }
 
     fn lower_generator(generator: &Generator) -> ast::GeneratorConfig {

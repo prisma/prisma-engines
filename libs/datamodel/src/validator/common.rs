@@ -23,39 +23,15 @@ impl FindInAstDatamodel for ast::SchemaAst {
     }
 
     fn find_model(&self, model: &str) -> Option<&ast::Model> {
-        for ast_top in &self.tops {
-            if let ast::Top::Model(ast_model) = ast_top {
-                if ast_model.name.name == model {
-                    return Some(&ast_model);
-                }
-            }
-        }
-
-        None
+        self.models().into_iter().find(|m| m.name.name == model)
     }
 
     fn find_enum(&self, enum_name: &str) -> Option<&ast::Enum> {
-        for ast_top in &self.tops {
-            if let ast::Top::Enum(ast_enum) = ast_top {
-                if ast_enum.name.name == enum_name {
-                    return Some(&ast_enum);
-                }
-            }
-        }
-
-        None
+        self.enums().into_iter().find(|e| e.name.name == enum_name)
     }
 
     fn find_custom_type(&self, type_name: &str) -> Option<&ast::Field> {
-        for ast_top in &self.tops {
-            if let ast::Top::Type(ast_type) = ast_top {
-                if ast_type.name.name == type_name {
-                    return Some(&ast_type);
-                }
-            }
-        }
-
-        None
+        self.types().into_iter().find(|t| t.name.name == type_name)
     }
 }
 
