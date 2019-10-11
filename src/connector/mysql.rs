@@ -53,7 +53,11 @@ impl TryFrom<Url> for MysqlParams {
                 config.user(Some(username.into_owned()));
             }
             Err(_) => {
+                #[cfg(not(feature = "tracing-log"))]
                 warn!("Couldn't decode username to UTF-8, using the non-decoded version.");
+                #[cfg(feature = "tracing-log")]
+                tracing::warn!("Couldn't decode username to UTF-8, using the non-decoded version.");
+
                 config.user(Some(url.username()));
             }
         }
@@ -91,7 +95,12 @@ impl TryFrom<Url> for MysqlParams {
                     let as_int: usize = v.parse().map_err(|_| Error::InvalidConnectionArguments)?;
                     connection_limit = as_int;
                 }
-                _ => trace!("Discarding connection string param: {}", k),
+                _ => {
+                    #[cfg(not(feature = "tracing-log"))]
+                    trace!("Discarding connection string param: {}", k);
+                    #[cfg(feature = "tracing-log")]
+                    tracing::trace!(message = "Discarding connection string param", param = k.as_str());
+                },
             };
         }
 

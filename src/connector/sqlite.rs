@@ -62,7 +62,12 @@ impl TryFrom<&str> for SqliteParams {
 
                             connection_limit = as_int;
                         }
-                        _ => trace!("Discarding connection string param: {}", k),
+                        _ => {
+                            #[cfg(not(feature = "tracing-log"))]
+                            trace!("Discarding connection string param: {}", k);
+                            #[cfg(feature = "tracing-log")]
+                            tracing::trace!(message = "Discarding connection string param", param = k.as_str());
+                        },
                     };
                 }
             }

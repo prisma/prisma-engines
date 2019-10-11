@@ -75,7 +75,11 @@ impl TryFrom<Url> for PostgresParams {
                 config.user(username.borrow());
             }
             Err(_) => {
+                #[cfg(not(feature = "tracing-log"))]
                 warn!("Couldn't decode username to UTF-8, using the non-decoded version.");
+                #[cfg(feature = "tracing-log")]
+                tracing::warn!("Couldn't decode username to UTF-8, using the non-decoded version.");
+
                 config.user(url.username());
             }
         }
@@ -119,7 +123,11 @@ impl TryFrom<Url> for PostgresParams {
                         "prefer" => config.ssl_mode(SslMode::Prefer),
                         "require" => config.ssl_mode(SslMode::Require),
                         _ => {
+                            #[cfg(not(feature = "tracing-log"))]
                             debug!("Unsupported ssl mode {}, defaulting to 'prefer'", v);
+                            #[cfg(feature = "tracing-log")]
+                            tracing::debug!(message = "Unsupported SSL mode, defaulting to `prefer`", mode = v.as_str());
+
                             config.ssl_mode(SslMode::Prefer)
                         }
                     };
@@ -143,7 +151,11 @@ impl TryFrom<Url> for PostgresParams {
                             ssl_accept_mode = SslAcceptMode::AcceptInvalidCerts;
                         },
                         _ => {
-                            debug!("Unsupported ssl accept mode {}, defaulting to 'strict'", v);
+                            #[cfg(not(feature = "tracing-log"))]
+                            debug!("Unsupported SSL accept mode {}, defaulting to `strict`", v);
+                            #[cfg(feature = "tracing-log")]
+                            tracing::debug!(message = "Unsupported SSL accept mode, defaulting to `strict`", mode = v.as_str());
+
                             ssl_accept_mode = SslAcceptMode::Strict;
                         }
                     };
@@ -156,7 +168,12 @@ impl TryFrom<Url> for PostgresParams {
                     let as_int: usize = v.parse().map_err(|_| Error::InvalidConnectionArguments)?;
                     connection_limit = as_int;
                 }
-                _ => trace!("Discarding connection string param: {}", k),
+                _ => {
+                    #[cfg(not(feature = "tracing-log"))]
+                    trace!("Discarding connection string param: {}", k);
+                    #[cfg(feature = "tracing-log")]
+                    tracing::trace!(message = "Discarding connection string param", param = k.as_str());
+                },
             };
         }
 

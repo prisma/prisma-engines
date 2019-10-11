@@ -15,12 +15,25 @@ where
     let end = Instant::now();
 
     if *crate::LOG_QUERIES {
-        info!(
-            "query: \"{}\", params: {} (in {}ms)",
-            query,
-            Params(params),
-            start.elapsed().as_millis(),
-        );
+        #[cfg(not(feature = "tracing-log"))]
+        {
+            info!(
+                "query: \"{}\", params: {} (in {}ms)",
+                query,
+                Params(params),
+                start.elapsed().as_millis(),
+            );
+        }
+        #[cfg(feature = "tracing-log")]
+        {
+            //let params: Vec<String> = params.iter().map(|p| format!("{}", p)).collect();
+
+            tracing::info!(
+                query,
+                params = %Params(params),
+                duration_ns = start.elapsed().as_nanos() as u64,
+            )
+        }
     }
 
     timing!(format!("{}.query.time", tag), start, end);
