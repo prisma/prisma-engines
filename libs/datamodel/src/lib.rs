@@ -63,14 +63,14 @@ use std::io::Write;
 use validator::ValidationPipeline;
 
 /// Parses and validates a datamodel string, using core attributes only.
-pub fn parse(datamodel_string: &str) -> Result<Datamodel, error::ErrorCollection> {
-    parse_with_plugins(datamodel_string, vec![])
+pub fn parse_datamodel(datamodel_string: &str) -> Result<Datamodel, error::ErrorCollection> {
+    parse_datamodel_with_sources(datamodel_string, vec![])
 }
 
 /// Parses and validates a datamodel string, using core attributes only.
 /// In case of an error, a pretty, colorful string is returned.
-pub fn parse_with_formatted_error(datamodel_string: &str, file_name: &str) -> Result<Datamodel, String> {
-    match parse_with_plugins(datamodel_string, vec![]) {
+pub fn parse_datamodel_or_pretty_error(datamodel_string: &str, file_name: &str) -> Result<Datamodel, String> {
+    match parse_datamodel_with_sources(datamodel_string, vec![]) {
         Ok(dml) => Ok(dml),
         Err(errs) => {
             let mut buffer = std::io::Cursor::new(Vec::<u8>::new());
@@ -89,7 +89,7 @@ pub fn parse_with_formatted_error(datamodel_string: &str, file_name: &str) -> Re
 
 /// Parses and validates a datamodel string, using core attributes and the given sources.
 /// If source loading failes, validation continues, but an error is returned.
-pub fn parse_with_plugins(
+pub fn parse_datamodel_with_sources(
     datamodel_string: &str,
     source_definitions: Vec<Box<dyn configuration::SourceDefinition>>,
 ) -> Result<Datamodel, error::ErrorCollection> {
@@ -124,12 +124,12 @@ pub fn parse_with_plugins(
 }
 
 /// Loads all configuration blocks from a datamodel using the built-in source definitions.
-pub fn load_configuration(datamodel_string: &str) -> Result<Configuration, error::ErrorCollection> {
-    load_configuration_with_plugins(datamodel_string, vec![])
+pub fn parse_configuration(datamodel_string: &str) -> Result<Configuration, error::ErrorCollection> {
+    parse_configuration_with_sources(datamodel_string, vec![])
 }
 
 /// Loads all configuration blocks from a datamodel using the built-in source definitions and extra given ones.
-pub fn load_configuration_with_plugins(
+pub fn parse_configuration_with_sources(
     datamodel_string: &str,
     source_definitions: Vec<Box<dyn configuration::SourceDefinition>>,
 ) -> Result<Configuration, error::ErrorCollection> {

@@ -101,7 +101,7 @@ impl RpcApi {
     }
 
     fn new(datamodel: &str) -> crate::Result<RpcApi> {
-        let config = datamodel::load_configuration(datamodel)?;
+        let config = datamodel::parse_configuration(datamodel)?;
 
         let source = config.datasources.first().ok_or(CommandError::DataModelErrors {
             code: 1000,

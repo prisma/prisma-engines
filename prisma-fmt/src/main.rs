@@ -68,7 +68,7 @@ fn main() {
             .read_to_string(&mut datamodel_string)
             .expect("Unable to read from stdin.");
 
-        if let Err(err) = datamodel::parse(&datamodel_string) {
+        if let Err(err) = datamodel::parse_datamodel(&datamodel_string) {
             let errs: Vec<MiniError> = err
                 .errors
                 .iter()

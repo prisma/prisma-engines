@@ -186,7 +186,7 @@ model Post {
 fn serialize_sources_to_dmmf() {
     std::env::set_var("URL_CUSTOM_1", "https://localhost");
     let config =
-        datamodel::load_configuration_with_plugins(DATAMODEL, vec![Box::new(CustomDbDefinition::new())]).unwrap();
+        datamodel::parse_configuration_with_sources(DATAMODEL, vec![Box::new(CustomDbDefinition::new())]).unwrap();
     let rendered = datamodel::render_sources_to_json(&config.datasources);
 
     let expected = r#"[

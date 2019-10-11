@@ -105,5 +105,5 @@ fn unique_directives_must_serialize_to_valid_dml() {
     "#;
     let schema = parse(dml);
 
-    assert!(datamodel::parse(&render_datamodel_to_string(&schema).unwrap()).is_ok());
+    assert!(datamodel::parse_datamodel(&render_datamodel_to_string(&schema).unwrap()).is_ok());
 }

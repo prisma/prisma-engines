@@ -25,7 +25,7 @@ fn serialize_builtin_sources_to_dmmf() {
             url = "https://localhost/mysql"
         }
     "#;
-    let config = datamodel::load_configuration(DATAMODEL).unwrap();
+    let config = datamodel::parse_configuration(DATAMODEL).unwrap();
     let rendered = datamodel::render_sources_to_json(&config.datasources);
 
     let expected = r#"[
@@ -81,7 +81,7 @@ datasource pg1 {
 
 #[test]
 fn fail_to_load_sources_for_invalid_source() {
-    let res = datamodel::load_configuration(INVALID_DATAMODEL);
+    let res = datamodel::parse_configuration(INVALID_DATAMODEL);
 
     if let Err(error) = res {
         error.assert_is(DatamodelError::SourceNotKnownError {
@@ -110,7 +110,7 @@ datasource chinook {
 
 #[test]
 fn enable_disable_source_flag() {
-    let config = datamodel::load_configuration(ENABLED_DISABLED_SOURCE).unwrap();
+    let config = datamodel::parse_configuration(ENABLED_DISABLED_SOURCE).unwrap();
 
     assert_eq!(config.datasources.len(), 1);
 
@@ -141,7 +141,7 @@ fn enable_disable_source_flag_from_env() {
     std::env::set_var("PRODUCTION", "false");
     std::env::set_var("STAGING", "true");
 
-    let config = datamodel::load_configuration(ENABLED_DISABLED_SOURCE_ENV).unwrap();
+    let config = datamodel::parse_configuration(ENABLED_DISABLED_SOURCE_ENV).unwrap();
 
     assert_eq!(config.datasources.len(), 1);
 

@@ -14,7 +14,7 @@ generator go {
 
 #[test]
 fn serialize_generators_to_cmf() {
-    let config = datamodel::load_configuration(DATAMODEL).unwrap();
+    let config = datamodel::parse_configuration(DATAMODEL).unwrap();
     let rendered = datamodel::generators_to_json(&config.generators);
 
     let expected = r#"[
@@ -55,7 +55,7 @@ generator js1 {
 
 #[test]
 fn fail_to_load_generator_with_options_missing() {
-    let res = datamodel::load_configuration(INVALID_DATAMODEL);
+    let res = datamodel::parse_configuration(INVALID_DATAMODEL);
 
     if let Err(error) = res {
         error.assert_is(DatamodelError::GeneratorArgumentNotFound {

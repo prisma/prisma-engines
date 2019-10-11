@@ -238,7 +238,7 @@ fn parse_rows_new(result_set: ResultSet) -> Vec<Migration> {
             };
 
             let datamodel_steps = serde_json::from_str(&datamodel_steps_json).unwrap();
-            let datamodel = datamodel::parse(&datamodel_string).unwrap();
+            let datamodel = datamodel::parse_datamodel(&datamodel_string).unwrap();
 
             let database_migration_json = serde_json::from_str(&database_migration_string).unwrap();
             let errors: Vec<String> = serde_json::from_str(&errors_json).unwrap();
