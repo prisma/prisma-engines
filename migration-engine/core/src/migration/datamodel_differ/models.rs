@@ -1,7 +1,7 @@
 use super::{directives::DirectiveDiffer, values::values_match, FieldDiffer};
 use datamodel::ast;
 
-/// Implements the logic to diff a pair of [Model ASTs](/datamodel/ast/struct.Model.html).
+/// Implements the logic to diff a pair of [AST models](/datamodel/ast/struct.Model.html).
 pub(crate) struct ModelDiffer<'a> {
     pub(crate) previous: &'a ast::Model,
     pub(crate) next: &'a ast::Model,
@@ -72,6 +72,7 @@ impl<'a> ModelDiffer<'a> {
         })
     }
 
+    /// Iterator over the model directives (@@) present in both `previous` and `next`.
     pub(crate) fn directive_pairs(&self) -> impl Iterator<Item = DirectiveDiffer<'_>> {
         self.previous_directives().filter_map(move |previous_directive| {
             self.next_directives()

@@ -1,7 +1,7 @@
-use super::directives::directives_match_exactly;
+use super::{directives::DirectiveDiffer, values::values_match, FieldDiffer};
 use datamodel::ast;
 
-/// Implements the logic to diff a pair of [Enum ASTs](/datamodel/ast/struct.Datamodel.html).
+/// Implements the logic to diff a pair of [AST enums](/datamodel/ast/struct.Datamodel.html).
 pub(crate) struct EnumDiffer<'a> {
     pub(crate) previous: &'a ast::Enum,
     pub(crate) next: &'a ast::Enum,
@@ -62,6 +62,18 @@ impl<'a> EnumDiffer<'a> {
             self.next_directives()
                 .find(|next_directive| directives_match_exactly(previous_directive, next_directive))
                 .is_none()
+        })
+    }
+
+    /// Iterator over the enum directives (@@) present in both `previous` and `next`.
+    pub(crate) fn directive_pairs(&self) -> impl Iterator<Item = DirectiveDiffer<'a>> {
+        self.previous_directives().filter_map(move |previous_directive| {
+            self.next_directives()
+                .find(|next_directive| model_directives_match(previous_directive, next_directive))
+                .map(|next_directive| DirectiveDiffer {
+                    previous: previous_directive,
+                    next: next_directive,
+                })
         })
     }
 }

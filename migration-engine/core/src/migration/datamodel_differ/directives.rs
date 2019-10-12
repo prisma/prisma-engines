@@ -31,13 +31,13 @@ impl<'a> DirectiveDiffer<'a> {
         })
     }
 
-    pub(crate) fn argument_pairs(&self) -> impl Iterator<Item = (&ast::Argument, &ast::Argument)> {
-        self.previous_arguments().filter_map(move |previous_argument| {
-            self.next_arguments()
-                .find(|next_argument| arguments_match(previous_argument, next_argument))
-                .map(|next_argument| (previous_argument, next_argument))
-        })
-    }
+    // pub(crate) fn argument_pairs(&self) -> impl Iterator<Item = (&ast::Argument, &ast::Argument)> {
+    //     self.previous_arguments().filter_map(move |previous_argument| {
+    //         self.next_arguments()
+    //             .find(|next_argument| arguments_match(previous_argument, next_argument))
+    //             .map(|next_argument| (previous_argument, next_argument))
+    //     })
+    // }
 }
 
 pub(crate) fn directives_match_exactly(previous: &ast::Directive, next: &ast::Directive) -> bool {
@@ -138,9 +138,9 @@ mod tests {
             assert_eq!(created_arguments.len(), 1);
             assert_eq!(created_arguments.get(0).unwrap().name.name, "legs");
 
-            let updated_arguments: Vec<(_, _)> = directive_diff.argument_pairs().collect();
-            assert_eq!(updated_arguments.len(), 1);
-            assert_eq!(updated_arguments.get(0).unwrap().0.name.name, "animalType");
+            // let updated_arguments: Vec<(_, _)> = directive_diff.argument_pairs().collect();
+            // assert_eq!(updated_arguments.len(), 1);
+            // assert_eq!(updated_arguments.get(0).unwrap().0.name.name, "animalType");
         })
     }
 }
