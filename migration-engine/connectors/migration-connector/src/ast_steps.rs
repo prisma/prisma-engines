@@ -10,6 +10,9 @@ pub enum MigrationStep {
     CreateModel(CreateModel),
     UpdateModel(UpdateModel),
     DeleteModel(DeleteModel),
+    CreateDirective(CreateDirective),
+    UpdateDirective(UpdateDirective),
+    DeleteDirective(DeleteDirective),
     CreateField(CreateField),
     DeleteField(DeleteField),
     UpdateField(UpdateField),
@@ -198,10 +201,62 @@ pub struct DeleteEnum {
     pub name: String,
 }
 
-fn serialize_identifier<S: serde::Serializer>(ident: &ast::Identifier, serializer: S) -> Result<S::Ok, S::Error> {
-    unimplemented!()
+#[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct CreateDirective {
+    #[serde(flatten)]
+    location: DirectiveLocation,
+    name: String,
 }
 
-fn deserialize_identifier<'de, D: serde::de::Deserializer<'de>>(deserializer: D) -> Result<ast::Identifier, D::Error> {
-    unimplemented!()
+#[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct UpdateDirective {
+    #[serde(flatten)]
+    location: DirectiveLocation,
+}
+
+#[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct DeleteDirective {
+    #[serde(flatten)]
+    location: DirectiveLocation,
+    directive_name: String,
+}
+
+#[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
+#[serde(rename_all = "camelCase", deny_unknown_fields, untagged)]
+pub enum DirectiveLocation {
+    Field { model: String, field: String },
+    Model { model: String },
+    Enum { r#enum: String },
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::json;
+
+    #[test]
+    fn directive_location_serialization_gives_expected_json_shape() {
+        let create_directive = CreateDirective {
+            location: DirectiveLocation::Field {
+                model: "Cat".to_owned(),
+                field: "owner".to_owned(),
+            },
+            name: "status".to_owned(),
+        };
+
+        let serialized_step = serde_json::to_value(&create_directive).unwrap();
+        let expected_json = json!({
+            "model": "Cat",
+            "field": "owner",
+            "name": "status",
+        });
+
+        assert_eq!(serialized_step, expected_json);
+
+        let deserialized_step: CreateDirective = serde_json::from_value(expected_json).unwrap();
+        assert_eq!(create_directive, deserialized_step);
+    }
 }

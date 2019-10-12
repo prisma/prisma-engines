@@ -23,6 +23,7 @@ fn apply_step(datamodel: &mut ast::Datamodel, step: &MigrationStep) {
         MigrationStep::CreateField(create_field) => apply_create_field(datamodel, create_field),
         MigrationStep::UpdateField(update_field) => apply_update_field(datamodel, update_field),
         MigrationStep::DeleteField(delete_field) => apply_delete_field(datamodel, delete_field),
+        _ => unimplemented!(),
     }
 }
 
