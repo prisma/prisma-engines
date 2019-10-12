@@ -205,23 +205,29 @@ pub struct DeleteEnum {
 #[serde(rename_all = "camelCase")]
 pub struct CreateDirective {
     #[serde(flatten)]
-    location: DirectiveLocation,
-    name: String,
+    pub locator: DirectiveLocator,
 }
 
 #[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateDirective {
     #[serde(flatten)]
-    location: DirectiveLocation,
+    pub locator: DirectiveLocator,
 }
 
 #[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteDirective {
     #[serde(flatten)]
-    location: DirectiveLocation,
-    directive_name: String,
+    pub locator: DirectiveLocator,
+}
+
+#[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct DirectiveLocator {
+    #[serde(flatten)]
+    pub location: DirectiveLocation,
+    pub name: String,
 }
 
 #[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
@@ -240,11 +246,13 @@ mod tests {
     #[test]
     fn directive_location_serialization_gives_expected_json_shape() {
         let create_directive = CreateDirective {
-            location: DirectiveLocation::Field {
-                model: "Cat".to_owned(),
-                field: "owner".to_owned(),
+            locator: DirectiveLocator {
+                location: DirectiveLocation::Field {
+                    model: "Cat".to_owned(),
+                    field: "owner".to_owned(),
+                },
+                name: "status".to_owned(),
             },
-            name: "status".to_owned(),
         };
 
         let serialized_step = serde_json::to_value(&create_directive).unwrap();

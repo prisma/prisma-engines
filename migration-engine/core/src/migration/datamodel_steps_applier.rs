@@ -23,7 +23,9 @@ fn apply_step(datamodel: &mut ast::Datamodel, step: &MigrationStep) {
         MigrationStep::CreateField(create_field) => apply_create_field(datamodel, create_field),
         MigrationStep::UpdateField(update_field) => apply_update_field(datamodel, update_field),
         MigrationStep::DeleteField(delete_field) => apply_delete_field(datamodel, delete_field),
-        _ => unimplemented!(),
+        MigrationStep::CreateDirective(create_directive) => apply_create_directive(datamodel, create_directive),
+        MigrationStep::DeleteDirective(delete_directive) => apply_delete_directive(datamodel, delete_directive),
+        MigrationStep::UpdateDirective(update_directive) => apply_update_directive(datamodel, update_directive),
     }
 }
 
@@ -231,6 +233,37 @@ fn apply_delete_enum(datamodel: &mut ast::Datamodel, step: &steps::DeleteEnum) {
     datamodel.models = new_tops;
 }
 
+fn apply_create_directive(datamodel: &mut ast::Datamodel, step: &steps::CreateDirective) {
+    let mut directives = find_directives_mut(datamodel, &step.locator.location)
+        .ok_or_else(|| format_err!("CreateDirective on absent target: {:?}.", step))
+        .unwrap();
+
+    let new_directive = ast::Directive {
+        name: new_ident(step.locator.name.clone()),
+        arguments: vec![],
+        span: new_span(),
+    };
+
+    directives.push(new_directive);
+}
+
+fn apply_update_directive(datamodel: &mut ast::Datamodel, step: &steps::UpdateDirective) {
+    unimplemented!();
+}
+
+fn apply_delete_directive(datamodel: &mut ast::Datamodel, step: &steps::DeleteDirective) {
+    let directives = find_directives_mut(datamodel, &step.locator.location)
+        .ok_or_else(|| format_err!("DeleteDirective on absent target: {:?}.", step))
+        .unwrap();
+
+    let new_directives = directives
+        .drain(..)
+        .filter(|directive| directive.name.name != step.locator.name)
+        .collect();
+
+    *directives = new_directives;
+}
+
 fn new_ident(name: String) -> ast::Identifier {
     ast::Identifier { name, span: new_span() }
 }
@@ -273,4 +306,28 @@ fn find_model_field_mut<'a>(
 ) -> Option<&'a mut ast::Field> {
     find_model_mut(datamodel, model_name)
         .and_then(|model| model.fields.iter_mut().find(|field| field.name.name == field_name))
+}
+
+fn find_directives_mut<'a>(
+    datamodel: &'a mut ast::Datamodel,
+    location: &steps::DirectiveLocation,
+) -> Option<&'a mut Vec<ast::Directive>> {
+    let directives = match location {
+        steps::DirectiveLocation::Field { model, field } => {
+            &mut find_model_field_mut(datamodel, &model, &field)?.directives
+        }
+        steps::DirectiveLocation::Model { model } => &mut find_model_mut(datamodel, &model)?.directives,
+        steps::DirectiveLocation::Enum { r#enum } => &mut find_enum_mut(datamodel, &r#enum)?.directives,
+    };
+
+    Some(directives)
+}
+
+fn find_directive_mut<'a>(
+    datamodel: &'a mut ast::Datamodel,
+    locator: &steps::DirectiveLocator,
+) -> Option<&'a mut ast::Directive> {
+    find_directives_mut(datamodel, &locator.location)?
+        .iter_mut()
+        .find(|directive| directive.name.name == locator.name)
 }
