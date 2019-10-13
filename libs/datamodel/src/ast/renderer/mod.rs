@@ -316,7 +316,11 @@ impl<'a> Renderer<'a> {
     fn render_func(target: &mut dyn LineWriteable, name: &str, vals: &[ast::Expression]) {
         target.write(name);
         target.write("(");
-        for val in vals {
+        for (idx, val) in vals.iter().enumerate() {
+            if idx > 0 {
+                target.write(", ");
+            }
+
             Self::render_value(target, val);
         }
         target.write(")");
