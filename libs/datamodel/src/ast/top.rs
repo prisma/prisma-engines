@@ -1,7 +1,7 @@
 use super::*;
 
 /// Enum for distinguishing between top-level entries
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Top {
     Enum(Enum),
     Model(Model),

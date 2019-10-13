@@ -12,7 +12,8 @@ fn single_watch_migrations_must_work() {
 
         let steps = vec![
             create_model_step("Test"),
-            create_id_field_step("Test", "id", ScalarType::Int),
+            create_field_step("Test", "id", "Int"),
+            create_id_directive_step("Test", "id"),
         ];
 
         let db_schema_1 = apply_migration(test_setup, api, steps.clone(), "watch-0001").sql_schema;
@@ -110,7 +111,8 @@ fn multiple_watch_migrations_must_work() {
 
         let steps1 = vec![
             create_model_step("Test"),
-            create_id_field_step("Test", "id", ScalarType::Int),
+            create_field_step("Test", "id", "Int"),
+            create_id_directive_step("Test", "id"),
         ];
 
         let _ = apply_migration(test_setup, api, steps1.clone(), "watch-0001");
@@ -119,7 +121,7 @@ fn multiple_watch_migrations_must_work() {
         assert_eq!(migrations.len(), 1);
         assert_eq!(migrations[0].name, "watch-0001");
 
-        let steps2 = vec![create_field_step("Test", "field", ScalarType::String)];
+        let steps2 = vec![create_field_step("Test", "field", "String")];
         let db_schema_2 = apply_migration(test_setup, api, steps2.clone(), "watch-0002").sql_schema;
         let migrations = migration_persistence.load_all();
 
@@ -156,12 +158,13 @@ fn steps_equivalence_criteria_is_satisfied_when_leaving_watch_mode() {
 
         let steps1 = vec![
             create_model_step("Test"),
-            create_id_field_step("Test", "id", ScalarType::Int),
+            create_field_step("Test", "id", "Int"),
+            create_id_directive_step("Test", "id"),
         ];
 
         let db_schema1 = apply_migration(test_setup, api, steps1.clone(), "watch-0001").sql_schema;
 
-        let steps2 = vec![create_field_step("Test", "field", ScalarType::String)];
+        let steps2 = vec![create_field_step("Test", "field", "String")];
         let _ = apply_migration(test_setup, api, steps2.clone(), "watch-0002");
 
         let steps3 = vec![delete_field_step("Test", "field")];
@@ -188,16 +191,17 @@ fn must_handle_additional_steps_when_transitioning_out_of_watch_mode() {
 
         let steps1 = vec![
             create_model_step("Test"),
-            create_id_field_step("Test", "id", ScalarType::Int),
+            create_field_step("Test", "id", "Int"),
+            create_id_directive_step("Test", "id"),
         ];
 
         let _ = apply_migration(test_setup, api, steps1.clone(), "watch-0001");
 
-        let steps2 = vec![create_field_step("Test", "field1", ScalarType::String)];
+        let steps2 = vec![create_field_step("Test", "field1", "String")];
         let _ = apply_migration(test_setup, api, steps2.clone(), "watch-0002");
 
         let custom_migration_id = "a-custom-migration-id";
-        let additional_steps = vec![create_field_step("Test", "field2", ScalarType::String)];
+        let additional_steps = vec![create_field_step("Test", "field2", "String")];
         let mut final_steps = Vec::new();
 
         final_steps.append(&mut steps1.clone());

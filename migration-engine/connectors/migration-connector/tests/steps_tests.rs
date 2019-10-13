@@ -1,6 +1,6 @@
 #![allow(non_snake_case)]
 
-use datamodel::*;
+use datamodel::ast::FieldArity;
 use migration_connector::steps::*;
 
 #[test]
@@ -60,20 +60,22 @@ fn DeleteModel_must_work() {
 
 #[test]
 fn minimal_CreateField_must_work() {
-    let json =
-        r#"{"stepType":"CreateField","model":"Blog","name":"title","type":{"Base":"String"},"arity":"required","isUnique":false}"#;
+    let json = r#"
+            {
+                "stepType":"CreateField",
+                "model":"Blog",
+                "name":"title",
+                "type":"String",
+                "arity":"required"
+            }
+        "#;
     let expected_struct = MigrationStep::CreateField(CreateField {
         model: "Blog".to_string(),
         name: "title".to_string(),
-        tpe: FieldType::Base(ScalarType::String),
+        tpe: "String".to_owned(),
         arity: FieldArity::Required,
-        db_name: None,
-        is_created_at: None,
-        is_updated_at: None,
-        is_unique: false,
-        id: None,
         default: None,
-        scalar_list: None,
+        db_name: None,
     });
     assert_symmetric_serde(json, expected_struct);
 }
@@ -83,29 +85,20 @@ fn minimal_CreateField_must_work() {
 fn full_CreateField_must_work() {
     let json = r#"{
             "stepType":"CreateField",
-            "model":"Blog",
-            "name":"title",
-            "type":{"Base":"String"},
-            "arity":"optional",
-            "dbName":"blog",
-            "isCreatedAt":true,
-            "isUpdatedAt":true,
-            "isUnique": true,
-            "default":{"String":"default"},
-            "scalarList": "Embedded"
+            "model": "Blog",
+            "name": "title",
+            "type": "String",
+            "arity": "optional",
+            "dbName": "blog",
+            "default": "\"default\""
         }"#;
     let expected_struct = MigrationStep::CreateField(CreateField {
         model: "Blog".to_string(),
         name: "title".to_string(),
-        tpe: FieldType::Base(ScalarType::String),
+        tpe: "String".to_owned(),
         arity: FieldArity::Optional,
         db_name: Some("blog".to_string()),
-        is_created_at: Some(true),
-        is_updated_at: Some(true),
-        is_unique: true,
-        id: None, // TODO: adapt once added to CreateField
-        default: Some(Value::String("default".to_string())),
-        scalar_list: Some(ScalarListStrategy::Embedded),
+        default: Some(MigrationExpression("\"default\"".to_owned())),
     });
 
     assert_symmetric_serde(json, expected_struct);
@@ -115,38 +108,36 @@ fn full_CreateField_must_work() {
 fn minimal_UpdateField_must_work() {
     let json = r#"{"stepType":"UpdateField","model":"Blog","name":"title"}"#;
     let expected_struct = MigrationStep::UpdateField(UpdateField {
+        default: None,
         model: "Blog".to_string(),
         name: "title".to_string(),
         new_name: None,
         tpe: None,
         arity: None,
-        db_name: None,
-        is_created_at: None,
-        is_updated_at: None,
-        is_unique: None,
-        id_info: None,
-        default: None,
-        scalar_list: None,
     });
     assert_symmetric_serde(json, expected_struct);
 }
 
 #[test]
 fn full_UpdateField_must_work() {
-    let json = r#"{"stepType":"UpdateField","model":"Blog","name":"title","newName":"MyBlog","type":{"Base":"String"},"arity":"optional","dbName":"blog","isCreatedAt":true,"isUpdatedAt":true,"isUnique":true,"default":{"String":"default"},"scalarList":"Embedded"}"#;
+    let json = r#"
+        {
+            "default":"cuid()",
+            "stepType":"UpdateField",
+            "model":"Blog",
+            "name":"title",
+            "newName":"MyBlog",
+            "type": "String",
+            "arity":"optional"
+        }
+    "#;
     let expected_struct = MigrationStep::UpdateField(UpdateField {
+        default: Some(Some(MigrationExpression("cuid()".to_owned()))),
         model: "Blog".to_string(),
         name: "title".to_string(),
         new_name: Some("MyBlog".to_string()),
-        tpe: Some(FieldType::Base(ScalarType::String)),
+        tpe: Some("String".to_owned()),
         arity: Some(FieldArity::Optional),
-        db_name: Some(Some("blog".to_string())),
-        is_created_at: Some(true),
-        is_updated_at: Some(true),
-        is_unique: Some(true),
-        id_info: None,
-        default: Some(Some(Value::String("default".to_string()))),
-        scalar_list: Some(Some(ScalarListStrategy::Embedded)),
     });
     assert_symmetric_serde(json, expected_struct);
 }

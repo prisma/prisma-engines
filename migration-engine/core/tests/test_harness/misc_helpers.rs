@@ -1,4 +1,4 @@
-use datamodel;
+use datamodel::ast::{parser, SchemaAst};
 use migration_connector::*;
 use migration_core::{
     api::{GenericApi, MigrationApi},
@@ -26,8 +26,8 @@ impl TestSetup {
     }
 }
 
-pub fn parse(datamodel_string: &str) -> datamodel::Datamodel {
-    parse_datamodel(datamodel_string).unwrap()
+pub fn parse(datamodel_string: &str) -> SchemaAst {
+    parser::parse(datamodel_string).unwrap()
 }
 
 pub fn test_each_connector<F>(test_fn: F)

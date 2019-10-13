@@ -14,7 +14,7 @@ use models::ModelDiffer;
 use top_level::TopDiffer;
 
 use datamodel::ast;
-use migration_connector::ast_steps::{self as steps, MigrationStep};
+use migration_connector::steps::{self, MigrationStep};
 
 /// Diff two datamodels, returning the [MigrationStep](/struct.MigrationStep.html)s from `previous`
 /// to `next`.
@@ -160,18 +160,32 @@ impl DatamodelDiffer {
     }
 
     fn push_created_fields<'a>(&mut self, model_name: &'a str, fields: impl Iterator<Item = &'a ast::Field>) {
-        let create_field_steps = fields
-            .map(|field| steps::CreateField {
+        for field in fields {
+            let default = field
+                .directives
+                .iter()
+                .find(|directive| directive.name.name == "default")
+                .and_then(|directive| directive.arguments.get(0))
+                .map(|argument| steps::MigrationExpression::from_ast_expression(&argument.value));
+
+            let create_field_step = steps::CreateField {
                 arity: field.arity.clone(),
                 name: field.name.name.clone(),
                 tpe: field.field_type.name.clone(),
                 model: model_name.to_owned(),
                 db_name: directives::get_directive_string_value("map", &field.directives).map(String::from),
-                default: directives::get_directive_value("default", &field.directives).map(|val| val.to_string()),
-            })
-            .map(MigrationStep::CreateField);
+                default,
+            };
 
-        self.steps.extend(create_field_steps)
+            self.steps.push(MigrationStep::CreateField(create_field_step));
+
+            let directive_location = steps::DirectiveLocation::Field {
+                model: model_name.to_owned(),
+                field: field.name.name.clone(),
+            };
+
+            self.push_created_directives(&directive_location, field.directives.iter());
+        }
     }
 
     fn push_deleted_fields<'a>(&mut self, model_name: &'a str, fields: impl Iterator<Item = &'a ast::Field>) {
@@ -187,15 +201,43 @@ impl DatamodelDiffer {
 
     fn push_updated_fields<'a>(&mut self, model_name: &'a str, fields: impl Iterator<Item = FieldDiffer<'a>>) {
         for field in fields {
+            let previous_default_directive = field
+                .previous
+                .directives
+                .iter()
+                .find(|directive| directive.name.name == "default")
+                .and_then(|directive| directive.arguments.get(0))
+                .map(|argument| steps::MigrationExpression::from_ast_expression(&argument.value));
+
+            let next_default_directive = field
+                .next
+                .directives
+                .iter()
+                .find(|directive| directive.name.name == "default")
+                .and_then(|directive| directive.arguments.get(0))
+                .map(|argument| steps::MigrationExpression::from_ast_expression(&argument.value));
+
             let update_field_step = steps::UpdateField {
                 arity: diff_value(&field.previous.arity, &field.next.arity),
                 new_name: diff_value(&field.previous.name.name, &field.next.name.name),
                 model: model_name.to_owned(),
                 name: field.previous.name.name.clone(),
                 tpe: diff_value(&field.previous.field_type.name, &field.next.field_type.name),
+                default: diff_value(&previous_default_directive, &next_default_directive),
             };
 
-            self.steps.push(MigrationStep::UpdateField(update_field_step));
+            if update_field_step.is_any_option_set() {
+                self.steps.push(MigrationStep::UpdateField(update_field_step));
+            }
+
+            let directive_location = steps::DirectiveLocation::Field {
+                model: model_name.to_owned(),
+                field: field.previous.name.name.clone(),
+            };
+
+            self.push_created_directives(&directive_location, field.created_directives());
+            self.push_updated_directives(&directive_location, field.directive_pairs());
+            self.push_deleted_directives(&directive_location, field.deleted_directives());
         }
     }
 
@@ -210,14 +252,20 @@ impl DatamodelDiffer {
     }
 
     fn push_created_directive(&mut self, location: steps::DirectiveLocation, directive: &ast::Directive) {
+        let locator = steps::DirectiveLocator {
+            location,
+            name: directive.name.name.clone(),
+        };
+
         let step = steps::CreateDirective {
-            locator: steps::DirectiveLocator {
-                location,
-                name: directive.name.name.clone(),
-            },
+            locator: locator.clone(),
         };
 
         self.steps.push(MigrationStep::CreateDirective(step));
+
+        for argument in &directive.arguments {
+            self.push_created_directive_argument(&locator, argument);
+        }
     }
 
     fn push_deleted_directives<'a>(
@@ -252,7 +300,70 @@ impl DatamodelDiffer {
     }
 
     fn push_updated_directive(&mut self, location: steps::DirectiveLocation, directive: DirectiveDiffer<'_>) {
-        unimplemented!()
+        let locator = steps::DirectiveLocator {
+            name: directive.previous.name.name.clone(),
+            location: location.clone(),
+        };
+
+        for argument in directive.created_arguments() {
+            self.push_created_directive_argument(&locator, &argument);
+        }
+
+        for (previous, next) in directive.argument_pairs() {
+            self.push_updated_directive_argument(&locator, previous, next);
+        }
+
+        for argument in directive.deleted_arguments() {
+            self.push_deleted_directive_argument(&locator, &argument.name.name);
+        }
+    }
+
+    fn push_created_directive_argument(
+        &mut self,
+        directive_location: &steps::DirectiveLocator,
+        argument: &ast::Argument,
+    ) {
+        let create_argument_step = steps::CreateDirectiveArgument {
+            argument_name: argument.name.name.clone(),
+            argument_value: steps::MigrationExpression::from_ast_expression(&argument.value),
+            directive_location: directive_location.clone(),
+        };
+
+        self.steps
+            .push(MigrationStep::CreateDirectiveArgument(create_argument_step));
+    }
+
+    fn push_updated_directive_argument(
+        &mut self,
+        directive_location: &steps::DirectiveLocator,
+        previous_argument: &ast::Argument,
+        next_argument: &ast::Argument,
+    ) {
+        let previous_value = steps::MigrationExpression::from_ast_expression(&previous_argument.value);
+        let next_value = steps::MigrationExpression::from_ast_expression(&next_argument.value);
+
+        if previous_value == next_value {
+            return;
+        }
+
+        let update_argument_step = steps::UpdateDirectiveArgument {
+            argument_name: next_argument.name.name.clone(),
+            new_argument_value: next_value,
+            directive_location: directive_location.clone(),
+        };
+
+        self.steps
+            .push(MigrationStep::UpdateDirectiveArgument(update_argument_step));
+    }
+
+    fn push_deleted_directive_argument(&mut self, directive_location: &steps::DirectiveLocator, argument_name: &str) {
+        let delete_argument_step = steps::DeleteDirectiveArgument {
+            argument_name: argument_name.to_owned(),
+            directive_location: directive_location.clone(),
+        };
+
+        self.steps
+            .push(MigrationStep::DeleteDirectiveArgument(delete_argument_step));
     }
 }
 

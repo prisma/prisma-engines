@@ -7,7 +7,6 @@ mod error;
 mod migration_applier;
 mod migration_persistence;
 
-pub mod ast_steps;
 pub mod steps;
 
 pub use database_migration_inferrer::*;

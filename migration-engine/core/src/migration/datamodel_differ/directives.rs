@@ -1,6 +1,7 @@
 use super::expressions::expressions_match;
 use datamodel::ast;
 
+#[derive(Debug)]
 pub(crate) struct DirectiveDiffer<'a> {
     pub(crate) previous: &'a ast::Directive,
     pub(crate) next: &'a ast::Directive,
@@ -31,13 +32,17 @@ impl<'a> DirectiveDiffer<'a> {
         })
     }
 
-    // pub(crate) fn argument_pairs(&self) -> impl Iterator<Item = (&ast::Argument, &ast::Argument)> {
-    //     self.previous_arguments().filter_map(move |previous_argument| {
-    //         self.next_arguments()
-    //             .find(|next_argument| arguments_match(previous_argument, next_argument))
-    //             .map(|next_argument| (previous_argument, next_argument))
-    //     })
-    // }
+    pub(crate) fn argument_pairs(&self) -> impl Iterator<Item = (&ast::Argument, &ast::Argument)> {
+        self.previous_arguments().filter_map(move |previous_argument| {
+            self.next_arguments()
+                .find(|next_argument| arguments_match(previous_argument, next_argument))
+                .map(|next_argument| (previous_argument, next_argument))
+        })
+    }
+}
+
+pub(crate) fn directives_match(previous: &ast::Directive, next: &ast::Directive) -> bool {
+    previous.name.name == next.name.name
 }
 
 pub(crate) fn directives_match_exactly(previous: &ast::Directive, next: &ast::Directive) -> bool {

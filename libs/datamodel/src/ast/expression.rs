@@ -71,6 +71,7 @@ impl std::str::FromStr for Expression {
             .unwrap()
             .next()
             .unwrap();
+
         Ok(parse_expression(&pair))
     }
 }

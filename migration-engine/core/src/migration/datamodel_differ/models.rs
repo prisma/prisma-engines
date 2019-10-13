@@ -2,6 +2,7 @@ use super::{directives::DirectiveDiffer, expressions::expressions_match, FieldDi
 use datamodel::ast;
 
 /// Implements the logic to diff a pair of [AST models](/datamodel/ast/struct.Model.html).
+#[derive(Debug)]
 pub(crate) struct ModelDiffer<'a> {
     pub(crate) previous: &'a ast::Model,
     pub(crate) next: &'a ast::Model,
@@ -94,11 +95,6 @@ fn model_directives_match(previous: &ast::Directive, next: &ast::Directive) -> b
         return false;
     }
 
-    if ["unique", "index"].contains(&previous.name.name.as_str()) {
-        // TODO: implement fine grained index diffing
-        return false;
-    }
-
     true
 }
 
@@ -117,7 +113,6 @@ mod tests {
             isGoodDog Boolean
 
             @@customDirective(hasFur: true)
-            @@map("goodDogs")
             @@unique([name, coat])
         }
 
@@ -135,7 +130,6 @@ mod tests {
             weight Float
             isGoodDog Boolean // always true
 
-            @@unique([name, weight])
             @@map("goodDogs")
             @@customDirective(hasFur: "Most of the time")
         }
@@ -184,7 +178,7 @@ mod tests {
 
             assert_eq!(created_directives.len(), 1);
             let created_directive = created_directives[0];
-            assert_eq!(created_directive.name.name, "unique");
+            assert_eq!(created_directive.name.name, "map");
             assert_eq!(created_directive.arguments.len(), 1);
 
             let deleted_directives: Vec<&ast::Directive> = model_diff.deleted_directives().collect();

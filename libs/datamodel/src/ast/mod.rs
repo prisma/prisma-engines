@@ -41,13 +41,17 @@ pub use traits::*;
 
 /// A prisma schema.
 /// Schema = Datamodel + Generators + Datasources
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct SchemaAst {
     /// All models, enums, datasources, generators or type aliases
     pub tops: Vec<Top>,
 }
 
 impl SchemaAst {
+    pub fn empty() -> Self {
+        SchemaAst { tops: Vec::new() }
+    }
+
     pub fn find_model(&self, model: &str) -> Option<&Model> {
         self.models().into_iter().find(|m| m.name.name == model)
     }

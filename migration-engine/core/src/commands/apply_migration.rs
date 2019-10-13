@@ -48,10 +48,11 @@ impl<'a> ApplyMigrationCommand<'a> {
         let migration_persistence = connector.migration_persistence();
 
         let current_datamodel = migration_persistence.current_datamodel();
-        let last_non_watch_datamodel = migration_persistence.last_non_watch_datamodel();
-        let next_datamodel = engine
+        let last_non_watch_datamodel = migration_persistence.last_non_watch_datamodel_ast();
+        let next_datamodel_ast = engine
             .datamodel_calculator()
-            .infer(&last_non_watch_datamodel, &self.input.steps);
+            .infer(&last_non_watch_datamodel, self.input.steps.as_slice());
+        let next_datamodel = datamodel::lift_ast(&next_datamodel_ast)?;
 
         self.handle_migration(&engine, current_datamodel, next_datamodel)
     }
@@ -64,10 +65,12 @@ impl<'a> ApplyMigrationCommand<'a> {
         let connector = engine.connector();
         let migration_persistence = connector.migration_persistence();
         let current_datamodel = migration_persistence.current_datamodel();
+        let current_datamodel_ast = migration_persistence.current_datamodel_ast();
 
-        let next_datamodel = engine
+        let next_datamodel_ast = engine
             .datamodel_calculator()
-            .infer(&current_datamodel, &self.input.steps);
+            .infer(&current_datamodel_ast, self.input.steps.as_slice());
+        let next_datamodel = datamodel::lift_ast(&next_datamodel_ast)?;
 
         self.handle_migration(&engine, current_datamodel, next_datamodel)
     }

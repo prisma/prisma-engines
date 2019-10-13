@@ -72,7 +72,6 @@ fn create_should_allow_to_create_a_new_migration() {
         migration.datamodel_steps = vec![MigrationStep::CreateEnum(CreateEnum {
             name: "MyEnum".to_string(),
             values: vec!["A".to_string(), "B".to_string()],
-            db_name: None,
         })];
         migration.errors = vec!["error1".to_string(), "error2".to_string()];
 

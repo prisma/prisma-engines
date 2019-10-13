@@ -5,6 +5,7 @@ use super::{
 use datamodel::ast;
 
 /// Implements the logic to diff a pair of [AST enums](/datamodel/ast/struct.Datamodel.html).
+#[derive(Debug)]
 pub(crate) struct EnumDiffer<'a> {
     pub(crate) previous: &'a ast::Enum,
     pub(crate) next: &'a ast::Enum,
@@ -37,10 +38,10 @@ impl<'a> EnumDiffer<'a> {
         })
     }
 
-    /// Whether the enum values changed in `next`.
-    pub(crate) fn values_changed(&self) -> bool {
-        self.created_values().next().is_some() || self.deleted_values().next().is_some()
-    }
+    // /// Whether the enum values changed in `next`.
+    // pub(crate) fn values_changed(&self) -> bool {
+    //     self.created_values().next().is_some() || self.deleted_values().next().is_some()
+    // }
 
     fn previous_directives(&self) -> impl Iterator<Item = &ast::Directive> {
         self.previous.directives.iter()

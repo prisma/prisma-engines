@@ -1,19 +1,14 @@
-use datamodel::dml::*;
+use datamodel::ast::FieldArity;
 use migration_connector::steps::*;
 
-pub fn create_field_step(model: &str, field: &str, scalar_type: ScalarType) -> MigrationStep {
+pub fn create_field_step(model: &str, field: &str, type_name: &str) -> MigrationStep {
     MigrationStep::CreateField(CreateField {
         model: model.to_string(),
         name: field.to_string(),
-        tpe: FieldType::Base(scalar_type),
+        tpe: type_name.to_owned(),
         arity: FieldArity::Required,
         db_name: None,
-        is_created_at: None,
-        is_updated_at: None,
-        is_unique: false,
-        id: None,
         default: None,
-        scalar_list: None,
     })
 }
 
@@ -24,22 +19,15 @@ pub fn delete_field_step(model: &str, field: &str) -> MigrationStep {
     })
 }
 
-pub fn create_id_field_step(model: &str, field: &str, scalar_type: ScalarType) -> MigrationStep {
-    MigrationStep::CreateField(CreateField {
-        model: model.to_string(),
-        name: field.to_string(),
-        tpe: FieldType::Base(scalar_type),
-        arity: FieldArity::Required,
-        db_name: None,
-        is_created_at: None,
-        is_updated_at: None,
-        is_unique: false,
-        id: Some(IdInfo {
-            strategy: IdStrategy::Auto,
-            sequence: None,
-        }),
-        default: None,
-        scalar_list: None,
+pub fn create_id_directive_step(model: &str, field: &str) -> MigrationStep {
+    MigrationStep::CreateDirective(CreateDirective {
+        locator: DirectiveLocator {
+            name: "id".to_owned(),
+            location: DirectiveLocation::Field {
+                model: model.to_owned(),
+                field: field.to_owned(),
+            },
+        },
     })
 }
 

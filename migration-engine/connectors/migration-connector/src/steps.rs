@@ -1,25 +1,27 @@
 //! Datamodel migration steps.
 
-use datamodel::*;
+use datamodel::ast;
 use serde::{Deserialize, Deserializer, Serialize};
 
-/// An atomic change to a [Datamodel](datamodel/dml/struct.Datamodel.html).
-#[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
+/// An atomic change to a [Datamodel AST](datamodel/ast/struct.Datamodel.html).
+#[derive(Debug, Deserialize, Serialize, Clone, PartialEq)]
 #[serde(tag = "stepType")]
 pub enum MigrationStep {
     CreateModel(CreateModel),
     UpdateModel(UpdateModel),
     DeleteModel(DeleteModel),
+    CreateDirective(CreateDirective),
+    // UpdateDirective(UpdateDirective),
+    DeleteDirective(DeleteDirective),
+    CreateDirectiveArgument(CreateDirectiveArgument),
+    UpdateDirectiveArgument(UpdateDirectiveArgument),
+    DeleteDirectiveArgument(DeleteDirectiveArgument),
     CreateField(CreateField),
     DeleteField(DeleteField),
     UpdateField(UpdateField),
     CreateEnum(CreateEnum),
     UpdateEnum(UpdateEnum),
     DeleteEnum(DeleteEnum),
-    // TODO: clarify what this becomes when we switch to AST-based diffing
-    CreateIndex(CreateIndex),
-    UpdateIndex(UpdateIndex),
-    DeleteIndex(DeleteIndex),
 }
 
 pub trait WithDbName {
@@ -81,29 +83,15 @@ pub struct CreateField {
     pub name: String,
 
     #[serde(rename = "type")]
-    pub tpe: FieldType,
+    pub tpe: String,
 
-    pub arity: FieldArity,
+    pub arity: ast::FieldArity,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub db_name: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub is_created_at: Option<bool>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub is_updated_at: Option<bool>,
-
-    pub is_unique: bool,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub id: Option<IdInfo>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub default: Option<Value>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub scalar_list: Option<ScalarListStrategy>,
+    pub default: Option<MigrationExpression>,
 }
 
 impl WithDbName for CreateField {
@@ -115,7 +103,7 @@ impl WithDbName for CreateField {
     }
 }
 
-#[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone, PartialEq)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct UpdateField {
     pub model: String,
@@ -126,45 +114,18 @@ pub struct UpdateField {
     pub new_name: Option<String>,
 
     #[serde(rename = "type", skip_serializing_if = "Option::is_none")]
-    pub tpe: Option<FieldType>,
+    pub tpe: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub arity: Option<FieldArity>,
+    pub arity: Option<ast::FieldArity>,
 
     #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "some_option")]
-    pub db_name: Option<Option<String>>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub is_created_at: Option<bool>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub is_updated_at: Option<bool>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub is_unique: Option<bool>,
-
-    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "some_option")]
-    pub id_info: Option<Option<IdInfo>>, // fixme: change to behaviour
-
-    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "some_option")]
-    pub default: Option<Option<Value>>,
-
-    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "some_option")]
-    pub scalar_list: Option<Option<ScalarListStrategy>>,
+    pub default: Option<Option<MigrationExpression>>,
 }
 
 impl UpdateField {
     pub fn is_any_option_set(&self) -> bool {
-        self.new_name.is_some()
-            || self.tpe.is_some()
-            || self.arity.is_some()
-            || self.db_name.is_some()
-            || self.is_created_at.is_some()
-            || self.is_updated_at.is_some()
-            || self.is_unique.is_some()
-            || self.id_info.is_some()
-            || self.default.is_some()
-            || self.scalar_list.is_some()
+        self.new_name.is_some() || self.tpe.is_some() || self.arity.is_some() || self.default.is_some()
     }
 }
 
@@ -180,17 +141,6 @@ pub struct DeleteField {
 pub struct CreateEnum {
     pub name: String,
     pub values: Vec<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub db_name: Option<String>,
-}
-
-impl WithDbName for CreateEnum {
-    fn db_name(&self) -> String {
-        match self.db_name {
-            Some(ref db_name) => db_name.clone(),
-            None => self.name.clone(),
-        }
-    }
 }
 
 #[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
@@ -202,15 +152,15 @@ pub struct UpdateEnum {
     pub new_name: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub values: Option<Vec<String>>,
+    pub created_values: Option<Vec<String>>,
 
-    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "some_option")]
-    pub db_name: Option<Option<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub deleted_values: Option<Vec<String>>,
 }
 
 impl UpdateEnum {
     pub fn is_any_option_set(&self) -> bool {
-        self.new_name.is_some() || self.values.is_some() || self.db_name.is_some()
+        self.new_name.is_some() || self.created_values.is_some() || self.deleted_values.is_some()
     }
 }
 
@@ -221,185 +171,108 @@ pub struct DeleteEnum {
 }
 
 #[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
-#[serde(rename_all = "camelCase", deny_unknown_fields)]
-pub struct CreateIndex {
-    pub model: String,
-
-    pub name: Option<String>,
-    pub tpe: IndexType,
-    pub fields: Vec<String>,
+#[serde(rename_all = "camelCase")]
+pub struct CreateDirective {
+    #[serde(flatten)]
+    pub locator: DirectiveLocator,
 }
 
 #[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
-#[serde(rename_all = "camelCase", deny_unknown_fields)]
-pub struct UpdateIndex {
-    pub model: String,
-
-    // The new name.
-    pub name: Option<String>,
-    pub tpe: IndexType,
-    pub fields: Vec<String>,
+#[serde(rename_all = "camelCase")]
+pub struct UpdateDirective {
+    #[serde(flatten)]
+    pub locator: DirectiveLocator,
 }
 
 #[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
-#[serde(rename_all = "camelCase", deny_unknown_fields)]
-pub struct DeleteIndex {
-    pub model: String,
-    pub name: Option<String>,
-    pub tpe: IndexType,
-    pub fields: Vec<String>,
+#[serde(rename_all = "camelCase")]
+pub struct DeleteDirective {
+    #[serde(flatten)]
+    pub locator: DirectiveLocator,
 }
 
-/// Convenience trait for migration steps on model indexes.
-pub trait IndexStep {
-    /// Does the step apply to the given IndexDefinition?
-    ///
-    /// This will only work if the index definition and the step's model match.
-    fn applies_to_index(&self, index_definition: &IndexDefinition) -> bool;
+#[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct DirectiveLocator {
+    #[serde(flatten)]
+    pub location: DirectiveLocation,
+    pub name: String,
 }
 
-impl IndexStep for CreateIndex {
-    fn applies_to_index(&self, index_definition: &IndexDefinition) -> bool {
-        self.tpe == index_definition.tpe && self.fields == index_definition.fields
+#[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
+#[serde(rename_all = "camelCase", deny_unknown_fields, untagged)]
+pub enum DirectiveLocation {
+    Field { model: String, field: String },
+    Model { model: String },
+    Enum { r#enum: String },
+}
+
+#[derive(Debug, Deserialize, Serialize, Clone, PartialEq)]
+#[serde(rename_all = "camelCase")]
+pub struct CreateDirectiveArgument {
+    #[serde(flatten)]
+    pub directive_location: DirectiveLocator,
+    pub argument_name: String,
+    pub argument_value: MigrationExpression,
+}
+
+#[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct DeleteDirectiveArgument {
+    #[serde(flatten)]
+    pub directive_location: DirectiveLocator,
+    pub argument_name: String,
+}
+
+#[derive(Debug, Deserialize, Serialize, Clone, PartialEq)]
+#[serde(rename_all = "camelCase")]
+pub struct UpdateDirectiveArgument {
+    #[serde(flatten)]
+    pub directive_location: DirectiveLocator,
+    pub argument_name: String,
+    pub new_argument_value: MigrationExpression,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct MigrationExpression(pub String);
+
+impl MigrationExpression {
+    pub fn to_ast_expression(&self) -> ast::Expression {
+        self.0.parse().unwrap()
     }
-}
 
-impl IndexStep for DeleteIndex {
-    fn applies_to_index(&self, index_definition: &IndexDefinition) -> bool {
-        self.tpe == index_definition.tpe && self.fields == index_definition.fields
-    }
-}
-
-impl IndexStep for UpdateIndex {
-    fn applies_to_index(&self, index_definition: &IndexDefinition) -> bool {
-        self.tpe == index_definition.tpe && self.fields == index_definition.fields
+    pub fn from_ast_expression(expr: &ast::Expression) -> Self {
+        MigrationExpression(expr.render_to_string())
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use serde_json::json;
 
     #[test]
-    fn delete_index_must_apply_to_the_right_indexes() {
-        let definition = IndexDefinition {
-            fields: vec!["testColumn".into()],
-            tpe: IndexType::Unique,
-            name: None,
-        };
-        let correct_delete_index = DeleteIndex {
-            model: "ignored".into(),
-            fields: vec!["testColumn".into()],
-            tpe: IndexType::Unique,
-            name: None,
+    fn directive_location_serialization_gives_expected_json_shape() {
+        let create_directive = CreateDirective {
+            locator: DirectiveLocator {
+                location: DirectiveLocation::Field {
+                    model: "Cat".to_owned(),
+                    field: "owner".to_owned(),
+                },
+                name: "status".to_owned(),
+            },
         };
 
-        assert!(correct_delete_index.applies_to_index(&definition));
+        let serialized_step = serde_json::to_value(&create_directive).unwrap();
+        let expected_json = json!({
+            "model": "Cat",
+            "field": "owner",
+            "name": "status",
+        });
 
-        let delete_index = DeleteIndex {
-            tpe: IndexType::Normal,
-            ..correct_delete_index.clone()
-        };
+        assert_eq!(serialized_step, expected_json);
 
-        // tpe does not match
-        assert!(!delete_index.applies_to_index(&definition));
-
-        let delete_index = DeleteIndex {
-            name: Some("index_on_testColumn".to_owned()),
-            ..correct_delete_index.clone()
-        };
-
-        // name does not match, but it does not matter
-        assert!(delete_index.applies_to_index(&definition));
-
-        let delete_index = DeleteIndex {
-            fields: vec!["testColumn".into(), "otherColumn".into()],
-            ..correct_delete_index.clone()
-        };
-
-        // fields do not match
-        assert!(!delete_index.applies_to_index(&definition));
-    }
-
-    #[test]
-    fn create_index_must_apply_to_the_right_indexes() {
-        let definition = IndexDefinition {
-            fields: vec!["testColumn".into()],
-            tpe: IndexType::Unique,
-            name: None,
-        };
-        let correct_create_index = CreateIndex {
-            model: "ignored".into(),
-            fields: vec!["testColumn".into()],
-            tpe: IndexType::Unique,
-            name: None,
-        };
-
-        assert!(correct_create_index.applies_to_index(&definition));
-
-        let create_index = CreateIndex {
-            tpe: IndexType::Normal,
-            ..correct_create_index.clone()
-        };
-
-        // tpe does not match
-        assert!(!create_index.applies_to_index(&definition));
-
-        let create_index = CreateIndex {
-            name: Some("index_on_testColumn".to_owned()),
-            ..correct_create_index.clone()
-        };
-
-        // name does not match, but it does not matter
-        assert!(create_index.applies_to_index(&definition));
-
-        let create_index = CreateIndex {
-            fields: vec!["testColumn".into(), "otherColumn".into()],
-            ..correct_create_index.clone()
-        };
-
-        // fields do not match
-        assert!(!create_index.applies_to_index(&definition));
-    }
-
-    #[test]
-    fn update_index_must_apply_to_the_right_indexes() {
-        let definition = IndexDefinition {
-            fields: vec!["testColumn".into()],
-            tpe: IndexType::Unique,
-            name: None,
-        };
-        let correct_update_index = UpdateIndex {
-            model: "ignored".into(),
-            fields: vec!["testColumn".into()],
-            tpe: IndexType::Unique,
-            name: None,
-        };
-
-        assert!(correct_update_index.applies_to_index(&definition));
-
-        let update_index = UpdateIndex {
-            tpe: IndexType::Normal,
-            ..correct_update_index.clone()
-        };
-
-        // tpe does not match
-        assert!(!update_index.applies_to_index(&definition));
-
-        let update_index = UpdateIndex {
-            name: Some("index_on_testColumn".to_owned()),
-            ..correct_update_index.clone()
-        };
-
-        // name does not match, but it does not matter
-        assert!(update_index.applies_to_index(&definition));
-
-        let update_index = UpdateIndex {
-            fields: vec!["testColumn".into(), "otherColumn".into()],
-            ..correct_update_index.clone()
-        };
-
-        // fields do not match
-        assert!(!update_index.applies_to_index(&definition));
+        let deserialized_step: CreateDirective = serde_json::from_value(expected_json).unwrap();
+        assert_eq!(create_directive, deserialized_step);
     }
 }

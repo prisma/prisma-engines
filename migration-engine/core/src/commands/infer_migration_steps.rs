@@ -29,20 +29,17 @@ impl<'a> MigrationCommand<'a> for InferMigrationStepsCommand<'a> {
         let migration_persistence = connector.migration_persistence();
         let current_datamodel = migration_persistence.current_datamodel();
         let current_datamodel_ast = migration_persistence.current_datamodel_ast();
-        let assumed_datamodel = engine
+        let assumed_datamodel_ast = engine
             .datamodel_calculator()
-            .infer(&current_datamodel, &self.input.assume_to_be_applied);
+            .infer(&current_datamodel_ast, self.input.assume_to_be_applied.as_slice());
+        let assumed_datamodel = datamodel::lift_ast(&assumed_datamodel_ast)?;
 
         let next_datamodel = parse_datamodel(&self.input.datamodel)?;
         let next_datamodel_ast = parse(&self.input.datamodel)?;
 
         let model_migration_steps = engine
             .datamodel_migration_steps_inferrer()
-            .infer(&assumed_datamodel, &next_datamodel);
-
-        let new_model_migration_steps = datamodel_differ::diff(&current_datamodel_ast, &next_datamodel_ast);
-
-        // assert_eq!(model_migration_steps, new_model_migration_steps);
+            .infer(&assumed_datamodel_ast, &next_datamodel_ast);
 
         let database_migration = connector.database_migration_inferrer().infer(
             &assumed_datamodel,

@@ -1,6 +1,6 @@
 use crate::steps::*;
 use chrono::{DateTime, Utc};
-use datamodel::Datamodel;
+use datamodel::{ast::SchemaAst, Datamodel};
 use serde::Serialize;
 
 /// This trait is implemented by each connector. It provides a generic API to store and retrieve [Migration](struct.Migration.html) records.
@@ -16,10 +16,10 @@ pub trait MigrationPersistence: Send + Sync + 'static {
         self.last().map(|m| m.datamodel).unwrap_or_else(Datamodel::empty)
     }
 
-    fn current_datamodel_ast(&self) -> datamodel::ast::SchemaAst {
+    fn current_datamodel_ast(&self) -> SchemaAst {
         self.last()
             .and_then(|m| datamodel::ast::parser::parse(&m.datamodel_string).ok())
-            .unwrap_or_else(|| datamodel::ast::SchemaAst { tops: Vec::new() })
+            .unwrap_or_else(SchemaAst::empty)
     }
 
     fn last_non_watch_datamodel(&self) -> Datamodel {
@@ -30,6 +30,16 @@ pub trait MigrationPersistence: Send + Sync + 'static {
             .find(|m| !m.is_watch_migration())
             .map(|m| m.datamodel)
             .unwrap_or(Datamodel::empty())
+    }
+
+    fn last_non_watch_datamodel_ast(&self) -> SchemaAst {
+        let mut all_migrations = self.load_all();
+        all_migrations.reverse();
+        all_migrations
+            .into_iter()
+            .find(|m| !m.is_watch_migration())
+            .and_then(|m| datamodel::ast::parser::parse(&m.datamodel_string).ok())
+            .unwrap_or_else(SchemaAst::empty)
     }
 
     /// Returns the last successful Migration.

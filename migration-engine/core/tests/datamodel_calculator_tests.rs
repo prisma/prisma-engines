@@ -1,7 +1,8 @@
 #![allow(non_snake_case)]
 #![allow(unused)]
 mod test_harness;
-use datamodel::dml::*;
+
+use datamodel::ast::{FieldArity, SchemaAst};
 use migration_connector::steps::*;
 use migration_core::migration::datamodel_calculator::*;
 use migration_core::migration::datamodel_migration_steps_inferrer::*;
@@ -12,7 +13,7 @@ use test_harness::parse;
 
 #[test]
 fn add_CreateModel_to_existing_schema() {
-    let dm1 = Datamodel::empty();
+    let dm1 = SchemaAst::empty();
     let dm2 = parse(
         r#"
         model Test {
@@ -33,7 +34,7 @@ fn add_DeleteModel_to_existing_schema() {
         }
     "#,
     );
-    let dm2 = Datamodel::empty();
+    let dm2 = SchemaAst::empty();
 
     test(dm1, dm2);
 }
@@ -154,7 +155,7 @@ fn add_UpdateField_to_existing_schema() {
 
 #[test]
 fn add_CreateEnum_to_existing_schema() {
-    let dm1 = Datamodel::empty();
+    let dm1 = SchemaAst::empty();
     let dm2 = parse(
         r#"
         enum Test {
@@ -177,7 +178,7 @@ fn add_DeleteEnum_to_existing_schema() {
         }
     "#,
     );
-    let dm2 = Datamodel::empty();
+    let dm2 = SchemaAst::empty();
 
     test(dm1, dm2);
 }
@@ -220,15 +221,10 @@ fn creating_a_field_that_already_exists_must_error() {
     let steps = vec![MigrationStep::CreateField(CreateField {
         model: "Test".to_string(),
         name: "id".to_string(),
-        tpe: FieldType::Base(ScalarType::Int),
+        tpe: "Int".to_owned(),
         arity: FieldArity::Required,
-        db_name: None,
-        is_created_at: None,
-        is_updated_at: None,
-        is_unique: false,
-        id: None,
         default: None,
-        scalar_list: None,
+        db_name: None,
     })];
 
     calculate(&dm, steps);
@@ -249,7 +245,6 @@ fn creating_an_enum_that_already_exists_must_error() {
     let steps = vec![MigrationStep::CreateEnum(CreateEnum {
         name: "Test".to_string(),
         values: Vec::new(),
-        db_name: None,
     })];
 
     calculate(&dm, steps);
@@ -258,7 +253,7 @@ fn creating_an_enum_that_already_exists_must_error() {
 #[should_panic(expected = "The model Test does not exist in this Datamodel. It is not possible to delete it.")]
 #[test]
 fn deleting_a_model_that_does_not_exist_must_error() {
-    let dm = Datamodel::empty();
+    let dm = SchemaAst::empty();
     let steps = vec![MigrationStep::DeleteModel(DeleteModel {
         name: "Test".to_string(),
     })];
@@ -271,7 +266,7 @@ fn deleting_a_model_that_does_not_exist_must_error() {
 )]
 #[test]
 fn deleting_a_field_that_does_not_exist_must_error() {
-    let dm = Datamodel::empty();
+    let dm = SchemaAst::empty();
     let steps = vec![MigrationStep::DeleteField(DeleteField {
         model: "Test".to_string(),
         name: "id".to_string(),
@@ -303,7 +298,7 @@ fn deleting_a_field_that_does_not_exist_2_must_error() {
 #[should_panic(expected = "The enum Test does not exist in this Datamodel. It is not possible to delete it.")]
 #[test]
 fn deleting_an_enum_that_does_not_exist_must_error() {
-    let dm = Datamodel::empty();
+    let dm = SchemaAst::empty();
     let steps = vec![MigrationStep::DeleteEnum(DeleteEnum {
         name: "Test".to_string(),
     })];
@@ -314,7 +309,7 @@ fn deleting_an_enum_that_does_not_exist_must_error() {
 #[should_panic(expected = "The model Test does not exist in this Datamodel. It is not possible to update it.")]
 #[test]
 fn updating_a_model_that_does_not_exist_must_error() {
-    let dm = Datamodel::empty();
+    let dm = SchemaAst::empty();
     let steps = vec![MigrationStep::UpdateModel(UpdateModel {
         name: "Test".to_string(),
         new_name: None,
@@ -330,20 +325,14 @@ fn updating_a_model_that_does_not_exist_must_error() {
 )]
 #[test]
 fn updating_a_field_that_does_not_exist_must_error() {
-    let dm = Datamodel::empty();
+    let dm = SchemaAst::empty();
     let steps = vec![MigrationStep::UpdateField(UpdateField {
+        default: None,
         model: "Test".to_string(),
         name: "id".to_string(),
         new_name: None,
         tpe: None,
         arity: None,
-        db_name: None,
-        is_created_at: None,
-        is_updated_at: None,
-        is_unique: None,
-        id_info: None,
-        default: None,
-        scalar_list: None,
     })];
 
     calculate(&dm, steps);
@@ -362,18 +351,12 @@ fn updating_a_field_that_does_not_exist_must_error_2() {
         "#,
     );
     let steps = vec![MigrationStep::UpdateField(UpdateField {
+        default: None,
         model: "Test".to_string(),
         name: "myField".to_string(),
         new_name: None,
         tpe: None,
         arity: None,
-        db_name: None,
-        is_created_at: None,
-        is_updated_at: None,
-        is_unique: None,
-        id_info: None,
-        default: None,
-        scalar_list: None,
     })];
 
     calculate(&dm, steps);
@@ -382,29 +365,33 @@ fn updating_a_field_that_does_not_exist_must_error_2() {
 #[should_panic(expected = "The enum Test does not exist in this Datamodel. It is not possible to update it.")]
 #[test]
 fn updating_an_enum_that_does_not_exist_must_error() {
-    let dm = Datamodel::empty();
+    let dm = SchemaAst::empty();
     let steps = vec![MigrationStep::UpdateEnum(UpdateEnum {
         name: "Test".to_string(),
         new_name: None,
-        values: None,
-        db_name: None,
+        created_values: None,
+        deleted_values: None,
     })];
 
     calculate(&dm, steps);
 }
 
 // This tests use inferrer to create an end-to-end situation.
-fn test(dm1: Datamodel, dm2: Datamodel) {
+fn test(dm1: SchemaAst, dm2: SchemaAst) {
     let steps = infer(&dm1, &dm2);
     let result = calculate(&dm1, steps);
+
+    let dm2 = datamodel::lift_ast(&dm2).unwrap();
+    let result = datamodel::lift_ast(&result).unwrap();
     assert_eq!(dm2, result);
 }
-fn calculate(schema: &Datamodel, steps: Vec<MigrationStep>) -> Datamodel {
+
+fn calculate(schema: &SchemaAst, steps: Vec<MigrationStep>) -> SchemaAst {
     let calc = DataModelCalculatorImpl {};
     calc.infer(schema, &steps)
 }
 
-fn infer(dm1: &Datamodel, dm2: &Datamodel) -> Vec<MigrationStep> {
+fn infer(dm1: &SchemaAst, dm2: &SchemaAst) -> Vec<MigrationStep> {
     let inferrer = DataModelMigrationStepsInferrerImplWrapper {};
     inferrer.infer(dm1, dm2)
 }
