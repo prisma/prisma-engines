@@ -26,6 +26,15 @@ fn apply_step(datamodel: &mut ast::SchemaAst, step: &MigrationStep) {
         MigrationStep::CreateDirective(create_directive) => apply_create_directive(datamodel, create_directive),
         MigrationStep::DeleteDirective(delete_directive) => apply_delete_directive(datamodel, delete_directive),
         MigrationStep::UpdateDirective(update_directive) => apply_update_directive(datamodel, update_directive),
+        MigrationStep::CreateDirectiveArgument(create_directive_argument) => {
+            apply_create_directive_argument(datamodel, create_directive_argument)
+        }
+        MigrationStep::DeleteDirectiveArgument(delete_directive_argument) => {
+            apply_delete_directive_argument(datamodel, delete_directive_argument)
+        }
+        MigrationStep::UpdateDirectiveArgument(update_directive_argument) => {
+            apply_update_directive_argument(datamodel, update_directive_argument)
+        }
     }
 }
 
@@ -269,6 +278,38 @@ fn apply_delete_directive(datamodel: &mut ast::SchemaAst, step: &steps::DeleteDi
     *directives = new_directives;
 }
 
+fn apply_create_directive_argument(datamodel: &mut ast::SchemaAst, step: &steps::CreateDirectiveArgument) {
+    let directive = find_directive_mut(datamodel, &step.directive_location).unwrap();
+
+    directive.arguments.push(ast::Argument {
+        name: new_ident(step.argument_name.clone()),
+        span: new_span(),
+        value: step.argument_value.to_ast_expression(),
+    });
+}
+
+fn apply_update_directive_argument(datamodel: &mut ast::SchemaAst, step: &steps::UpdateDirectiveArgument) {
+    let directive = find_directive_mut(datamodel, &step.directive_location).unwrap();
+
+    for argument in directive.arguments.iter_mut() {
+        if argument.name.name == step.argument_name {
+            argument.value = step.new_argument_value.to_ast_expression();
+        }
+    }
+}
+
+fn apply_delete_directive_argument(datamodel: &mut ast::SchemaAst, step: &steps::DeleteDirectiveArgument) {
+    let directive = find_directive_mut(datamodel, &step.directive_location).unwrap();
+
+    let new_arguments = directive
+        .arguments
+        .drain(..)
+        .filter(|arg| arg.name.name != step.argument_name)
+        .collect();
+
+    directive.arguments = new_arguments;
+}
+
 fn new_ident(name: String) -> ast::Identifier {
     ast::Identifier { name, span: new_span() }
 }
@@ -285,7 +326,7 @@ fn new_map_directive(name: String) -> ast::Directive {
         arguments: vec![ast::Argument {
             name: new_ident("name".to_owned()),
             span: new_span(),
-            value: ast::Expression::StringValue(name.to_owned(), new_span()),
+            value: ast::Expression::StringValue(name, new_span()),
         }],
     }
 }

@@ -13,6 +13,9 @@ pub enum MigrationStep {
     CreateDirective(CreateDirective),
     UpdateDirective(UpdateDirective),
     DeleteDirective(DeleteDirective),
+    CreateDirectiveArgument(CreateDirectiveArgument),
+    UpdateDirectiveArgument(UpdateDirectiveArgument),
+    DeleteDirectiveArgument(DeleteDirectiveArgument),
     CreateField(CreateField),
     DeleteField(DeleteField),
     UpdateField(UpdateField),
@@ -236,6 +239,45 @@ pub enum DirectiveLocation {
     Field { model: String, field: String },
     Model { model: String },
     Enum { r#enum: String },
+}
+
+#[derive(Debug, Deserialize, Serialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct CreateDirectiveArgument {
+    #[serde(flatten)]
+    pub directive_location: DirectiveLocator,
+    pub argument_name: String,
+    pub argument_value: MigrationExpression,
+}
+
+#[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct DeleteDirectiveArgument {
+    #[serde(flatten)]
+    pub directive_location: DirectiveLocator,
+    pub argument_name: String,
+}
+
+#[derive(Debug, Deserialize, Serialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct UpdateDirectiveArgument {
+    #[serde(flatten)]
+    pub directive_location: DirectiveLocator,
+    pub argument_name: String,
+    pub new_argument_value: MigrationExpression,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct MigrationExpression(String);
+
+impl MigrationExpression {
+    pub fn to_ast_expression(&self) -> ast::Expression {
+        self.0.parse().unwrap()
+    }
+
+    pub fn from_ast_expression(expr: ast::Expression) -> Self {
+        MigrationExpression(expr.render_to_string())
+    }
 }
 
 #[cfg(test)]
