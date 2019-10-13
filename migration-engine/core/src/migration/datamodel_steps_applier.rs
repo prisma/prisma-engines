@@ -1,9 +1,9 @@
-use datamodel::{ast, parse_to_ast};
+use datamodel::ast::{self, parser::parse};
 use failure::format_err;
 use migration_connector::ast_steps::{self as steps, MigrationStep};
 
-pub(crate) fn apply(initial_datamodel: &str, steps: &[MigrationStep]) -> crate::Result<ast::Datamodel> {
-    let mut datamodel = parse_to_ast(initial_datamodel)?;
+pub(crate) fn apply(initial_datamodel: &str, steps: &[MigrationStep]) -> crate::Result<ast::SchemaAst> {
+    let mut datamodel = parse(initial_datamodel)?;
 
     for step in steps {
         apply_step(&mut datamodel, step);
@@ -12,7 +12,7 @@ pub(crate) fn apply(initial_datamodel: &str, steps: &[MigrationStep]) -> crate::
     Ok(datamodel)
 }
 
-fn apply_step(datamodel: &mut ast::Datamodel, step: &MigrationStep) {
+fn apply_step(datamodel: &mut ast::SchemaAst, step: &MigrationStep) {
     match step {
         MigrationStep::CreateEnum(create_enum) => apply_create_enum(datamodel, create_enum),
         MigrationStep::UpdateEnum(update_enum) => apply_update_enum(datamodel, update_enum),
@@ -29,7 +29,7 @@ fn apply_step(datamodel: &mut ast::Datamodel, step: &MigrationStep) {
     }
 }
 
-fn apply_create_enum(datamodel: &mut ast::Datamodel, step: &steps::CreateEnum) {
+fn apply_create_enum(datamodel: &mut ast::SchemaAst, step: &steps::CreateEnum) {
     let steps::CreateEnum { name, values } = step;
 
     let values = values
@@ -48,10 +48,10 @@ fn apply_create_enum(datamodel: &mut ast::Datamodel, step: &steps::CreateEnum) {
         directives: vec![],
     };
 
-    datamodel.models.push(ast::Top::Enum(new_enum));
+    datamodel.tops.push(ast::Top::Enum(new_enum));
 }
 
-fn apply_create_field(datamodel: &mut ast::Datamodel, step: &steps::CreateField) {
+fn apply_create_field(datamodel: &mut ast::SchemaAst, step: &steps::CreateField) {
     let model = find_model_mut(datamodel, &step.model)
         .ok_or_else(|| format_err!("CreateField on unknown model: `{}`", step.model))
         .unwrap();
@@ -83,7 +83,7 @@ fn apply_create_field(datamodel: &mut ast::Datamodel, step: &steps::CreateField)
     model.fields.push(field);
 }
 
-fn apply_create_model(datamodel: &mut ast::Datamodel, step: &steps::CreateModel) {
+fn apply_create_model(datamodel: &mut ast::SchemaAst, step: &steps::CreateModel) {
     // TODO: steps.db_name
 
     let model = ast::Model {
@@ -94,10 +94,10 @@ fn apply_create_model(datamodel: &mut ast::Datamodel, step: &steps::CreateModel)
         directives: vec![],
     };
 
-    datamodel.models.push(ast::Top::Model(model));
+    datamodel.tops.push(ast::Top::Model(model));
 }
 
-fn apply_update_model(datamodel: &mut ast::Datamodel, step: &steps::UpdateModel) {
+fn apply_update_model(datamodel: &mut ast::SchemaAst, step: &steps::UpdateModel) {
     let model = find_model_mut(datamodel, &step.name)
         .ok_or_else(|| format_err!("UpdateModel on unknown model: `{}`", &step.name))
         .unwrap();
@@ -115,9 +115,9 @@ fn update_model_name(model: &mut ast::Model, new_name: &String) {
     model.name = new_ident(new_name.clone());
 }
 
-fn apply_delete_model(datamodel: &mut ast::Datamodel, step: &steps::DeleteModel) {
+fn apply_delete_model(datamodel: &mut ast::SchemaAst, step: &steps::DeleteModel) {
     let new_models = datamodel
-        .models
+        .tops
         .drain(..)
         .filter(|top| match top {
             ast::Top::Model(model) => model.name.name != step.name,
@@ -125,10 +125,10 @@ fn apply_delete_model(datamodel: &mut ast::Datamodel, step: &steps::DeleteModel)
         })
         .collect();
 
-    datamodel.models = new_models;
+    datamodel.tops = new_models;
 }
 
-fn apply_update_field(datamodel: &mut ast::Datamodel, step: &steps::UpdateField) {
+fn apply_update_field(datamodel: &mut ast::SchemaAst, step: &steps::UpdateField) {
     let field = find_model_field_mut(datamodel, &step.model, &step.name)
         .ok_or_else(|| format_err!("UpdateStep on unknown field: `{}.{}`.", &step.model, &step.name))
         .unwrap();
@@ -156,7 +156,7 @@ fn update_field_name(field: &mut ast::Field, new_name: &String) {
     field.name = new_ident(new_name.clone());
 }
 
-fn apply_delete_field(datamodel: &mut ast::Datamodel, step: &steps::DeleteField) {
+fn apply_delete_field(datamodel: &mut ast::SchemaAst, step: &steps::DeleteField) {
     let model = find_model_mut(datamodel, &step.model)
         .ok_or_else(|| format_err!("DeleteField on unknown model: `{}`.", &step.model))
         .unwrap();
@@ -176,7 +176,7 @@ fn apply_delete_field(datamodel: &mut ast::Datamodel, step: &steps::DeleteField)
     model.fields = new_fields;
 }
 
-fn apply_update_enum(datamodel: &mut ast::Datamodel, step: &steps::UpdateEnum) {
+fn apply_update_enum(datamodel: &mut ast::SchemaAst, step: &steps::UpdateEnum) {
     let r#enum = find_enum_mut(datamodel, &step.name)
         .ok_or_else(|| format_err!("UpdateEnum on unknown enum: `{}`.", &step.name))
         .unwrap();
@@ -220,9 +220,9 @@ fn remove_enum_values(r#enum: &mut ast::Enum, removed_values: &Vec<String>) {
     r#enum.values = new_values;
 }
 
-fn apply_delete_enum(datamodel: &mut ast::Datamodel, step: &steps::DeleteEnum) {
+fn apply_delete_enum(datamodel: &mut ast::SchemaAst, step: &steps::DeleteEnum) {
     let new_tops = datamodel
-        .models
+        .tops
         .drain(..)
         .filter(|top| match top {
             ast::Top::Enum(r#enum) => r#enum.name.name != step.name,
@@ -230,10 +230,10 @@ fn apply_delete_enum(datamodel: &mut ast::Datamodel, step: &steps::DeleteEnum) {
         })
         .collect();
 
-    datamodel.models = new_tops;
+    datamodel.tops = new_tops;
 }
 
-fn apply_create_directive(datamodel: &mut ast::Datamodel, step: &steps::CreateDirective) {
+fn apply_create_directive(datamodel: &mut ast::SchemaAst, step: &steps::CreateDirective) {
     let mut directives = find_directives_mut(datamodel, &step.locator.location)
         .ok_or_else(|| format_err!("CreateDirective on absent target: {:?}.", step))
         .unwrap();
@@ -247,11 +247,11 @@ fn apply_create_directive(datamodel: &mut ast::Datamodel, step: &steps::CreateDi
     directives.push(new_directive);
 }
 
-fn apply_update_directive(datamodel: &mut ast::Datamodel, step: &steps::UpdateDirective) {
+fn apply_update_directive(datamodel: &mut ast::SchemaAst, step: &steps::UpdateDirective) {
     unimplemented!();
 }
 
-fn apply_delete_directive(datamodel: &mut ast::Datamodel, step: &steps::DeleteDirective) {
+fn apply_delete_directive(datamodel: &mut ast::SchemaAst, step: &steps::DeleteDirective) {
     let directives = find_directives_mut(datamodel, &step.locator.location)
         .ok_or_else(|| format_err!("DeleteDirective on absent target: {:?}.", step))
         .unwrap();
@@ -280,27 +280,27 @@ fn new_map_directive(name: String) -> ast::Directive {
         arguments: vec![ast::Argument {
             name: new_ident("name".to_owned()),
             span: new_span(),
-            value: ast::Value::StringValue(name.to_owned(), new_span()),
+            value: ast::Expression::StringValue(name.to_owned(), new_span()),
         }],
     }
 }
 
-fn find_model_mut<'a>(datamodel: &'a mut ast::Datamodel, model_name: &str) -> Option<&'a mut ast::Model> {
-    datamodel.models.iter_mut().find_map(|top| match top {
+fn find_model_mut<'a>(datamodel: &'a mut ast::SchemaAst, model_name: &str) -> Option<&'a mut ast::Model> {
+    datamodel.tops.iter_mut().find_map(|top| match top {
         ast::Top::Model(model) if model.name.name == model_name => Some(model),
         _ => None,
     })
 }
 
-fn find_enum_mut<'a>(datamodel: &'a mut ast::Datamodel, enum_name: &str) -> Option<&'a mut ast::Enum> {
-    datamodel.models.iter_mut().find_map(|top| match top {
+fn find_enum_mut<'a>(datamodel: &'a mut ast::SchemaAst, enum_name: &str) -> Option<&'a mut ast::Enum> {
+    datamodel.tops.iter_mut().find_map(|top| match top {
         ast::Top::Enum(r#enum) if r#enum.name.name == enum_name => Some(r#enum),
         _ => None,
     })
 }
 
 fn find_model_field_mut<'a>(
-    datamodel: &'a mut ast::Datamodel,
+    datamodel: &'a mut ast::SchemaAst,
     model_name: &str,
     field_name: &str,
 ) -> Option<&'a mut ast::Field> {
@@ -309,7 +309,7 @@ fn find_model_field_mut<'a>(
 }
 
 fn find_directives_mut<'a>(
-    datamodel: &'a mut ast::Datamodel,
+    datamodel: &'a mut ast::SchemaAst,
     location: &steps::DirectiveLocation,
 ) -> Option<&'a mut Vec<ast::Directive>> {
     let directives = match location {
@@ -324,7 +324,7 @@ fn find_directives_mut<'a>(
 }
 
 fn find_directive_mut<'a>(
-    datamodel: &'a mut ast::Datamodel,
+    datamodel: &'a mut ast::SchemaAst,
     locator: &steps::DirectiveLocator,
 ) -> Option<&'a mut ast::Directive> {
     find_directives_mut(datamodel, &locator.location)?

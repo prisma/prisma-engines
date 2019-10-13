@@ -2,10 +2,10 @@
 
 mod directives;
 mod enums;
+mod expressions;
 mod fields;
 mod models;
 mod top_level;
-mod values;
 
 use directives::DirectiveDiffer;
 use enums::EnumDiffer;
@@ -18,7 +18,7 @@ use migration_connector::ast_steps::{self as steps, MigrationStep};
 
 /// Diff two datamodels, returning the [MigrationStep](/struct.MigrationStep.html)s from `previous`
 /// to `next`.
-pub(crate) fn diff(previous: &ast::Datamodel, next: &ast::Datamodel) -> Vec<MigrationStep> {
+pub(crate) fn diff(previous: &ast::SchemaAst, next: &ast::SchemaAst) -> Vec<MigrationStep> {
     DatamodelDiffer::new().diff(previous, next)
 }
 
@@ -32,7 +32,7 @@ impl DatamodelDiffer {
         Self::default()
     }
 
-    fn diff(mut self, previous: &ast::Datamodel, next: &ast::Datamodel) -> Vec<MigrationStep> {
+    fn diff(mut self, previous: &ast::SchemaAst, next: &ast::SchemaAst) -> Vec<MigrationStep> {
         let differ = TopDiffer { previous, next };
 
         self.push_enums(&differ);
@@ -162,7 +162,7 @@ impl DatamodelDiffer {
     fn push_created_fields<'a>(&mut self, model_name: &'a str, fields: impl Iterator<Item = &'a ast::Field>) {
         let create_field_steps = fields
             .map(|field| steps::CreateField {
-                arity: field.arity,
+                arity: field.arity.clone(),
                 name: field.name.name.clone(),
                 tpe: field.field_type.name.clone(),
                 model: model_name.to_owned(),

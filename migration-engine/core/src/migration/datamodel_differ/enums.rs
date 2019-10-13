@@ -1,4 +1,7 @@
-use super::{directives::DirectiveDiffer, values::values_match, FieldDiffer};
+use super::{
+    directives::{directives_match_exactly, DirectiveDiffer},
+    FieldDiffer,
+};
 use datamodel::ast;
 
 /// Implements the logic to diff a pair of [AST enums](/datamodel/ast/struct.Datamodel.html).
@@ -66,10 +69,10 @@ impl<'a> EnumDiffer<'a> {
     }
 
     /// Iterator over the enum directives (@@) present in both `previous` and `next`.
-    pub(crate) fn directive_pairs(&self) -> impl Iterator<Item = DirectiveDiffer<'a>> {
+    pub(crate) fn directive_pairs(&'a self) -> impl Iterator<Item = DirectiveDiffer<'a>> {
         self.previous_directives().filter_map(move |previous_directive| {
             self.next_directives()
-                .find(|next_directive| model_directives_match(previous_directive, next_directive))
+                .find(|next_directive| enum_directives_match(previous_directive, next_directive))
                 .map(|next_directive| DirectiveDiffer {
                     previous: previous_directive,
                     next: next_directive,
@@ -121,4 +124,17 @@ mod tests {
         let deleted_values: Vec<&str> = enum_diff.deleted_values().map(|val| val.name.as_str()).collect();
         assert_eq!(deleted_values, &["NearlyTrue", "DefinitelyFalse"],);
     }
+}
+
+fn enum_directives_match(previous: &ast::Directive, next: &ast::Directive) -> bool {
+    if previous.name.name != next.name.name {
+        return false;
+    }
+
+    if ["unique", "index"].contains(&previous.name.name.as_str()) {
+        // TODO: implement fine grained index diffing
+        return false;
+    }
+
+    true
 }

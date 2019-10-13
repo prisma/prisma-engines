@@ -1,10 +1,10 @@
 use super::{EnumDiffer, ModelDiffer};
-use datamodel::ast;
+use datamodel::ast::{self, Top};
 
 /// Implements the logic to diff top-level items in a pair of [Datamodel ASTs](/datamodel/ast/struct.Datamodel.html).
 pub(crate) struct TopDiffer<'a> {
-    pub(crate) previous: &'a ast::Datamodel,
-    pub(crate) next: &'a ast::Datamodel,
+    pub(crate) previous: &'a ast::SchemaAst,
+    pub(crate) next: &'a ast::SchemaAst,
 }
 
 impl<'a> TopDiffer<'a> {
@@ -89,16 +89,16 @@ impl<'a> TopDiffer<'a> {
     }
 }
 
-fn walk_enums(ast: &ast::Datamodel) -> impl Iterator<Item = &ast::Enum> {
-    ast.models.iter().filter_map(ast::Top::as_enum)
+fn walk_enums(ast: &ast::SchemaAst) -> impl Iterator<Item = &ast::Enum> {
+    ast.tops.iter().filter_map(Top::as_enum)
 }
 
 fn enums_match(previous: &ast::Enum, next: &ast::Enum) -> bool {
     previous.name.name == next.name.name
 }
 
-fn walk_models(ast: &ast::Datamodel) -> impl Iterator<Item = &ast::Model> {
-    ast.models.iter().filter_map(ast::Top::as_model)
+fn walk_models(ast: &ast::SchemaAst) -> impl Iterator<Item = &ast::Model> {
+    ast.tops.iter().filter_map(Top::as_model)
 }
 
 fn models_match(previous: &ast::Model, next: &ast::Model) -> bool {

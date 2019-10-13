@@ -3,7 +3,7 @@ use crate::commands::command::*;
 use crate::migration::datamodel_differ;
 use crate::migration_engine::MigrationEngine;
 use crate::*;
-use datamodel::parse_to_ast;
+use datamodel::ast::parser::parse;
 use migration_connector::*;
 
 pub struct InferMigrationStepsCommand<'a> {
@@ -34,7 +34,7 @@ impl<'a> MigrationCommand<'a> for InferMigrationStepsCommand<'a> {
             .infer(&current_datamodel, &self.input.assume_to_be_applied);
 
         let next_datamodel = parse_datamodel(&self.input.datamodel)?;
-        let next_datamodel_ast = parse_to_ast(&self.input.datamodel)?;
+        let next_datamodel_ast = parse(&self.input.datamodel)?;
 
         let model_migration_steps = engine
             .datamodel_migration_steps_inferrer()

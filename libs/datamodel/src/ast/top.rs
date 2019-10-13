@@ -54,4 +54,18 @@ impl Top {
             Top::Type(x) => &x.name.name,
         }
     }
+
+    pub fn as_model(&self) -> Option<&Model> {
+        match self {
+            Top::Model(model) => Some(model),
+            _ => None,
+        }
+    }
+
+    pub fn as_enum(&self) -> Option<&Enum> {
+        match self {
+            Top::Enum(r#enum) => Some(r#enum),
+            _ => None,
+        }
+    }
 }

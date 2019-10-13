@@ -16,10 +16,10 @@ pub trait MigrationPersistence: Send + Sync + 'static {
         self.last().map(|m| m.datamodel).unwrap_or_else(Datamodel::empty)
     }
 
-    fn current_datamodel_ast(&self) -> datamodel::ast::Datamodel {
+    fn current_datamodel_ast(&self) -> datamodel::ast::SchemaAst {
         self.last()
-            .and_then(|m| datamodel::parse_to_ast(&m.datamodel_string).ok())
-            .unwrap_or_else(|| datamodel::ast::Datamodel { models: Vec::new() })
+            .and_then(|m| datamodel::ast::parser::parse(&m.datamodel_string).ok())
+            .unwrap_or_else(|| datamodel::ast::SchemaAst { tops: Vec::new() })
     }
 
     fn last_non_watch_datamodel(&self) -> Datamodel {
@@ -231,7 +231,7 @@ impl MigrationPersistence for EmptyMigrationPersistence {
         unimplemented!("Not allowed on a EmptyMigrationPersistence")
     }
 
-    fn current_datamodel_ast(&self) -> datamodel::ast::Datamodel {
-        datamodel::ast::Datamodel { models: Vec::new() }
+    fn current_datamodel_ast(&self) -> datamodel::ast::SchemaAst {
+        datamodel::ast::SchemaAst { tops: Vec::new() }
     }
 }

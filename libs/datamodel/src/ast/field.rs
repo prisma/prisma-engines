@@ -1,4 +1,5 @@
 use super::*;
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug)]
 pub struct Field {
@@ -42,7 +43,7 @@ impl WithDocumentation for Field {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub enum FieldArity {
     Required,
     Optional,

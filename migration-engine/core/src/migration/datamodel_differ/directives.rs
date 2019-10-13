@@ -1,4 +1,4 @@
-use super::values::values_match;
+use super::expressions::expressions_match;
 use datamodel::ast;
 
 pub(crate) struct DirectiveDiffer<'a> {
@@ -54,7 +54,7 @@ fn argument_lists_match_exactly(previous: &[ast::Argument], next: &[ast::Argumen
 }
 
 fn arguments_match_exactly(previous: &ast::Argument, next: &ast::Argument) -> bool {
-    previous.name.name == next.name.name && values_match(&previous.value, &next.value)
+    previous.name.name == next.name.name && expressions_match(&previous.value, &next.value)
 }
 
 fn arguments_match(previous: &ast::Argument, next: &ast::Argument) -> bool {
@@ -71,7 +71,7 @@ pub(crate) fn get_directive_string_value<'a>(
         .find(|directive| directive.name.name == directive_name)
         .and_then(|directive| directive.arguments.iter().next())
         .and_then(|argument| match &argument.value {
-            ast::Value::StringValue(value, _span) => Some(value.as_str()),
+            ast::Expression::StringValue(value, _span) => Some(value.as_str()),
             _ => None,
         })
 }
@@ -80,7 +80,7 @@ pub(crate) fn get_directive_string_value<'a>(
 pub(crate) fn get_directive_value<'a>(
     directive_name: &'a str,
     directives: &'a [ast::Directive],
-) -> Option<&'a ast::Value> {
+) -> Option<&'a ast::Expression> {
     directives
         .iter()
         .find(|directive| directive.name.name == directive_name)

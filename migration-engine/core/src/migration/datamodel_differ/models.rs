@@ -1,4 +1,4 @@
-use super::{directives::DirectiveDiffer, values::values_match, FieldDiffer};
+use super::{directives::DirectiveDiffer, expressions::expressions_match, FieldDiffer};
 use datamodel::ast;
 
 /// Implements the logic to diff a pair of [AST models](/datamodel/ast/struct.Model.html).
