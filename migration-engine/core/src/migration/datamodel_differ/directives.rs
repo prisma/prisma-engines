@@ -92,7 +92,7 @@ pub(crate) fn get_directive_value<'a>(
 mod tests {
     use super::super::{ModelDiffer, TopDiffer};
     use super::*;
-    use datamodel::parse_to_ast;
+    use datamodel::ast::parser::parse;
 
     fn dog_model_custom_directive_test(test_fn: impl FnOnce(DirectiveDiffer<'_>)) {
         let previous = r#"
@@ -102,7 +102,7 @@ mod tests {
             @@customDirective(hasFur: true, animalType: "Mammal")
         }
         "#;
-        let previous = parse_to_ast(previous).unwrap();
+        let previous = parse(previous).unwrap();
         let next = r#"
         model Dog {
             id Int @id
@@ -110,7 +110,7 @@ mod tests {
             @@customDirective(animalType: "Mammals", legs: 4)
         }
         "#;
-        let next = parse_to_ast(next).unwrap();
+        let next = parse(next).unwrap();
 
         let differ = TopDiffer {
             previous: &previous,

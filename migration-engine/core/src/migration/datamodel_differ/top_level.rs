@@ -108,7 +108,7 @@ fn models_match(previous: &ast::Model, next: &ast::Model) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use datamodel::parse_to_ast;
+    use datamodel::ast::parser::parse;
 
     #[test]
     fn datamodel_differ_top_level_methods_work() {
@@ -126,7 +126,7 @@ mod tests {
 
         enum ToBeDeleted { B }
         "#;
-        let previous = parse_to_ast(previous).unwrap();
+        let previous = parse(previous).unwrap();
         let next = r#"
         model Author {
             id Int @id
@@ -141,7 +141,7 @@ mod tests {
 
         enum NewEnum { B }
         "#;
-        let next = parse_to_ast(next).unwrap();
+        let next = parse(next).unwrap();
 
         let differ = TopDiffer {
             previous: &previous,

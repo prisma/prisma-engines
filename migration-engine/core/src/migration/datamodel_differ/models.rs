@@ -106,7 +106,7 @@ fn model_directives_match(previous: &ast::Directive, next: &ast::Directive) -> b
 mod tests {
     use super::super::{directives::directives_match_exactly, TopDiffer};
     use super::*;
-    use datamodel::parse_to_ast;
+    use datamodel::ast::parser::parse;
 
     fn dog_datamodels_test(test_fn: impl FnOnce(ModelDiffer<'_>)) {
         let previous = r#"
@@ -127,7 +127,7 @@ mod tests {
             Curly
         }
         "#;
-        let previous = parse_to_ast(previous).unwrap();
+        let previous = parse(previous).unwrap();
         let next = r#"
         model Dog {
             id Int @id
@@ -140,7 +140,7 @@ mod tests {
             @@customDirective(hasFur: "Most of the time")
         }
         "#;
-        let next = parse_to_ast(next).unwrap();
+        let next = parse(next).unwrap();
 
         let top_differ = TopDiffer {
             previous: &previous,
@@ -194,7 +194,7 @@ mod tests {
             assert_eq!(deleted_directive.name.name, "unique");
             assert_eq!(deleted_directive.arguments.len(), 1);
 
-            assert!(!values_match(
+            assert!(!expressions_match(
                 &created_directive.arguments.get(0).as_ref().unwrap().value,
                 &deleted_directive.arguments.get(0).as_ref().unwrap().value
             ));

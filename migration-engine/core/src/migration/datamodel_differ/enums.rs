@@ -89,7 +89,7 @@ fn values_match(previous: &ast::EnumValue, next: &ast::EnumValue) -> bool {
 mod tests {
     use super::super::TopDiffer;
     use super::*;
-    use datamodel::parse_to_ast;
+    use datamodel::ast::parser::parse;
 
     #[test]
     fn datamodel_differ_enum_differ_works() {
@@ -101,7 +101,7 @@ mod tests {
             DefinitelyFalse
         }
         "#;
-        let previous = parse_to_ast(previous).unwrap();
+        let previous = parse(previous).unwrap();
         let next = r#"
         enum BetterBoolean {
             True
@@ -109,7 +109,7 @@ mod tests {
             MostlyTrue
         }
         "#;
-        let next = parse_to_ast(next).unwrap();
+        let next = parse(next).unwrap();
 
         let differ = TopDiffer {
             previous: &previous,
