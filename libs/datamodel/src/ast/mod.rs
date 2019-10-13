@@ -52,6 +52,13 @@ impl SchemaAst {
         self.models().into_iter().find(|m| m.name.name == model)
     }
 
+    pub fn find_model_mut(&mut self, model_name: &str) -> Option<&mut Model> {
+        self.tops.iter_mut().find_map(|top| match top {
+            Top::Model(model) if model.name.name == model_name => Some(model),
+            _ => None,
+        })
+    }
+
     pub fn find_custom_type(&self, type_name: &str) -> Option<&Field> {
         self.types().into_iter().find(|t| t.name.name == type_name)
     }
@@ -60,8 +67,24 @@ impl SchemaAst {
         self.enums().into_iter().find(|e| e.name.name == enum_name)
     }
 
+    pub fn find_enum_mut(&mut self, enum_name: &str) -> Option<&mut Enum> {
+        self.tops.iter_mut().find_map(|top| match top {
+            Top::Enum(r#enum) if r#enum.name.name == enum_name => Some(r#enum),
+            _ => None,
+        })
+    }
+
     pub fn find_field(&self, model: &str, field: &str) -> Option<&Field> {
         self.find_model(model)?.fields.iter().find(|f| f.name.name == field)
+    }
+
+    pub fn find_field_mut(&mut self, model: &str, field: &str) -> Option<&mut Field> {
+        self.find_model_mut(model).and_then(|model| {
+            model
+                .fields
+                .iter_mut()
+                .find(|model_field| model_field.name.name == field)
+        })
     }
 
     pub fn types(&self) -> Vec<&Field> {

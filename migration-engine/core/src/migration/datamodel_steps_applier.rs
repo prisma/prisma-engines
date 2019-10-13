@@ -52,7 +52,8 @@ fn apply_create_enum(datamodel: &mut ast::SchemaAst, step: &steps::CreateEnum) {
 }
 
 fn apply_create_field(datamodel: &mut ast::SchemaAst, step: &steps::CreateField) {
-    let model = find_model_mut(datamodel, &step.model)
+    let model = datamodel
+        .find_model_mut(&step.model)
         .ok_or_else(|| format_err!("CreateField on unknown model: `{}`", step.model))
         .unwrap();
 
@@ -98,7 +99,8 @@ fn apply_create_model(datamodel: &mut ast::SchemaAst, step: &steps::CreateModel)
 }
 
 fn apply_update_model(datamodel: &mut ast::SchemaAst, step: &steps::UpdateModel) {
-    let model = find_model_mut(datamodel, &step.name)
+    let model = datamodel
+        .find_model_mut(&step.name)
         .ok_or_else(|| format_err!("UpdateModel on unknown model: `{}`", &step.name))
         .unwrap();
 
@@ -129,7 +131,8 @@ fn apply_delete_model(datamodel: &mut ast::SchemaAst, step: &steps::DeleteModel)
 }
 
 fn apply_update_field(datamodel: &mut ast::SchemaAst, step: &steps::UpdateField) {
-    let field = find_model_field_mut(datamodel, &step.model, &step.name)
+    let field = datamodel
+        .find_field_mut(&step.model, &step.name)
         .ok_or_else(|| format_err!("UpdateStep on unknown field: `{}.{}`.", &step.model, &step.name))
         .unwrap();
 
@@ -157,7 +160,8 @@ fn update_field_name(field: &mut ast::Field, new_name: &String) {
 }
 
 fn apply_delete_field(datamodel: &mut ast::SchemaAst, step: &steps::DeleteField) {
-    let model = find_model_mut(datamodel, &step.model)
+    let model = datamodel
+        .find_model_mut(&step.model)
         .ok_or_else(|| format_err!("DeleteField on unknown model: `{}`.", &step.model))
         .unwrap();
 
@@ -177,7 +181,8 @@ fn apply_delete_field(datamodel: &mut ast::SchemaAst, step: &steps::DeleteField)
 }
 
 fn apply_update_enum(datamodel: &mut ast::SchemaAst, step: &steps::UpdateEnum) {
-    let r#enum = find_enum_mut(datamodel, &step.name)
+    let r#enum = datamodel
+        .find_enum_mut(&step.name)
         .ok_or_else(|| format_err!("UpdateEnum on unknown enum: `{}`.", &step.name))
         .unwrap();
 
@@ -285,39 +290,14 @@ fn new_map_directive(name: String) -> ast::Directive {
     }
 }
 
-fn find_model_mut<'a>(datamodel: &'a mut ast::SchemaAst, model_name: &str) -> Option<&'a mut ast::Model> {
-    datamodel.tops.iter_mut().find_map(|top| match top {
-        ast::Top::Model(model) if model.name.name == model_name => Some(model),
-        _ => None,
-    })
-}
-
-fn find_enum_mut<'a>(datamodel: &'a mut ast::SchemaAst, enum_name: &str) -> Option<&'a mut ast::Enum> {
-    datamodel.tops.iter_mut().find_map(|top| match top {
-        ast::Top::Enum(r#enum) if r#enum.name.name == enum_name => Some(r#enum),
-        _ => None,
-    })
-}
-
-fn find_model_field_mut<'a>(
-    datamodel: &'a mut ast::SchemaAst,
-    model_name: &str,
-    field_name: &str,
-) -> Option<&'a mut ast::Field> {
-    find_model_mut(datamodel, model_name)
-        .and_then(|model| model.fields.iter_mut().find(|field| field.name.name == field_name))
-}
-
 fn find_directives_mut<'a>(
     datamodel: &'a mut ast::SchemaAst,
     location: &steps::DirectiveLocation,
 ) -> Option<&'a mut Vec<ast::Directive>> {
     let directives = match location {
-        steps::DirectiveLocation::Field { model, field } => {
-            &mut find_model_field_mut(datamodel, &model, &field)?.directives
-        }
-        steps::DirectiveLocation::Model { model } => &mut find_model_mut(datamodel, &model)?.directives,
-        steps::DirectiveLocation::Enum { r#enum } => &mut find_enum_mut(datamodel, &r#enum)?.directives,
+        steps::DirectiveLocation::Field { model, field } => &mut datamodel.find_field_mut(&model, &field)?.directives,
+        steps::DirectiveLocation::Model { model } => &mut datamodel.find_model_mut(&model)?.directives,
+        steps::DirectiveLocation::Enum { r#enum } => &mut datamodel.find_enum_mut(&r#enum)?.directives,
     };
 
     Some(directives)
