@@ -295,7 +295,7 @@ impl<'a> Renderer<'a> {
         Self::render_value(target, &args.value);
     }
 
-    fn render_value_to_string(val: &ast::Expression) -> String {
+    pub(crate) fn render_value_to_string(val: &ast::Expression) -> String {
         let mut builder = StringBuilder::new();
         Self::render_value(&mut builder, val);
         builder.to_string()
