@@ -85,3 +85,26 @@ fn allow_unambiguous_self_relations_in_presence_of_unrelated_other_relations() {
 
     parse(dml);
 }
+
+#[test]
+fn must_generate_back_relation_fields_for_named_relation_fields() {
+    // More specifically, this should not panic.
+    let dml = r#"
+    model Todo {
+        id Int @id
+        author Owner @relation(name: "AuthorTodo")
+    }
+
+    model Owner {
+        id Int @id
+    }
+    "#;
+
+    let datamodel = parse(dml);
+
+    datamodel
+        .assert_has_model("Owner")
+        .assert_has_field("todo")
+        .assert_relation_name("AuthorTodo")
+        .assert_relation_to("Todo");
+}

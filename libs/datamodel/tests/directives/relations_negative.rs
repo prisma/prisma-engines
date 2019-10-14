@@ -146,7 +146,7 @@ fn should_fail_on_conflicting_back_relation_field_name() {
     let errors = parse_error(dml);
 
     errors.assert_is(DatamodelError::new_model_validation_error(
-        "Automatic opposite related field generation would cause a naming conflict. Please add an explicit opposite relation field.",
+        "Automatic related field generation would cause a naming conflict. Please add an explicit opposite relation field.",
         "User",
         Span::new(90, 107),
     ));
@@ -178,30 +178,4 @@ fn should_fail_on_conflicting_generated_back_relation_fields() {
         "Todo",
         Span::new(98, 152),
     ));
-}
-
-#[test]
-fn should_fail_on_named_generated_back_relation_fields() {
-    // More specifically, this should not panic.
-    let dml = r#"
-    model Todo {
-        id Int @id
-        author Owner @relation(name: "AuthorTodo")
-    }
-
-    model Owner {
-        id Int @id
-    }
-    "#;
-
-    let errors = parse_error(dml);
-
-    errors.assert_is_at(
-        0,
-        DatamodelError::new_model_validation_error(
-            "Named relations require an opposite field.",
-            "Todo",
-            Span::new(45, 87),
-        ),
-    );
 }
