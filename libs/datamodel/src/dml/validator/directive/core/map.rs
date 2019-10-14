@@ -24,14 +24,14 @@ impl<T: dml::WithDatabaseName> DirectiveValidator<T> for MapDirectiveValidator {
         Ok(())
     }
 
-    fn serialize(&self, obj: &T, _atamodel: &dml::Datamodel) -> Result<Option<ast::Directive>, Error> {
+    fn serialize(&self, obj: &T, _atamodel: &dml::Datamodel) -> Result<Vec<ast::Directive>, Error> {
         if let Some(db_name) = obj.database_name() {
-            return Ok(Some(ast::Directive::new(
+            return Ok(vec![ast::Directive::new(
                 DirectiveValidator::<T>::directive_name(self),
                 vec![ast::Argument::new_string("", db_name)],
-            )));
+            )]);
         }
 
-        Ok(None)
+        Ok(vec![])
     }
 }

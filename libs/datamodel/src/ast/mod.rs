@@ -1,8 +1,8 @@
 pub mod parser;
 pub mod reformat;
 pub mod renderer;
-pub mod string_builder;
-pub mod table;
+mod string_builder;
+mod table;
 
 /// AST representation of a prisma datamodel
 ///

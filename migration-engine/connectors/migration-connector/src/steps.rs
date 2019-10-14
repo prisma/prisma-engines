@@ -1,6 +1,9 @@
-use datamodel::*;
-use serde::{Deserialize, Deserializer};
+//! Datamodel migration steps.
 
+use datamodel::*;
+use serde::{Deserialize, Deserializer, Serialize};
+
+/// An atomic change to a [Datamodel](datamodel/dml/struct.Datamodel.html).
 #[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
 #[serde(tag = "stepType")]
 pub enum MigrationStep {
@@ -13,13 +16,16 @@ pub enum MigrationStep {
     CreateEnum(CreateEnum),
     UpdateEnum(UpdateEnum),
     DeleteEnum(DeleteEnum),
+    CreateIndex(CreateIndex),
+    UpdateIndex(UpdateIndex),
+    DeleteIndex(DeleteIndex),
 }
 
 pub trait WithDbName {
     fn db_name(&self) -> String;
 }
 
-// Deserializes the cases undefined, null and Some(T) into an Option<Option<T>>
+/// Deserializes the cases `undefined`, `null` and `Some(T)` into an `Option<Option<T>>`.
 fn some_option<'de, T, D>(deserializer: D) -> Result<Option<Option<T>>, D::Error>
 where
     T: Deserialize<'de>,
@@ -211,4 +217,188 @@ impl UpdateEnum {
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct DeleteEnum {
     pub name: String,
+}
+
+#[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct CreateIndex {
+    pub model: String,
+
+    pub name: Option<String>,
+    pub tpe: IndexType,
+    pub fields: Vec<String>,
+}
+
+#[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct UpdateIndex {
+    pub model: String,
+
+    // The new name.
+    pub name: Option<String>,
+    pub tpe: IndexType,
+    pub fields: Vec<String>,
+}
+
+#[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct DeleteIndex {
+    pub model: String,
+    pub name: Option<String>,
+    pub tpe: IndexType,
+    pub fields: Vec<String>,
+}
+
+/// Convenience trait for migration steps on model indexes.
+pub trait IndexStep {
+    /// Does the step apply to the given IndexDefinition?
+    ///
+    /// This will only work if the index definition and the step's model match.
+    fn applies_to_index(&self, index_definition: &IndexDefinition) -> bool;
+}
+
+impl IndexStep for CreateIndex {
+    fn applies_to_index(&self, index_definition: &IndexDefinition) -> bool {
+        self.tpe == index_definition.tpe && self.fields == index_definition.fields
+    }
+}
+
+impl IndexStep for DeleteIndex {
+    fn applies_to_index(&self, index_definition: &IndexDefinition) -> bool {
+        self.tpe == index_definition.tpe && self.fields == index_definition.fields
+    }
+}
+
+impl IndexStep for UpdateIndex {
+    fn applies_to_index(&self, index_definition: &IndexDefinition) -> bool {
+        self.tpe == index_definition.tpe && self.fields == index_definition.fields
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn delete_index_must_apply_to_the_right_indexes() {
+        let definition = IndexDefinition {
+            fields: vec!["testColumn".into()],
+            tpe: IndexType::Unique,
+            name: None,
+        };
+        let correct_delete_index = DeleteIndex {
+            model: "ignored".into(),
+            fields: vec!["testColumn".into()],
+            tpe: IndexType::Unique,
+            name: None,
+        };
+
+        assert!(correct_delete_index.applies_to_index(&definition));
+
+        let delete_index = DeleteIndex {
+            tpe: IndexType::Normal,
+            ..correct_delete_index.clone()
+        };
+
+        // tpe does not match
+        assert!(!delete_index.applies_to_index(&definition));
+
+        let delete_index = DeleteIndex {
+            name: Some("index_on_testColumn".to_owned()),
+            ..correct_delete_index.clone()
+        };
+
+        // name does not match, but it does not matter
+        assert!(delete_index.applies_to_index(&definition));
+
+        let delete_index = DeleteIndex {
+            fields: vec!["testColumn".into(), "otherColumn".into()],
+            ..correct_delete_index.clone()
+        };
+
+        // fields do not match
+        assert!(!delete_index.applies_to_index(&definition));
+    }
+
+    #[test]
+    fn create_index_must_apply_to_the_right_indexes() {
+        let definition = IndexDefinition {
+            fields: vec!["testColumn".into()],
+            tpe: IndexType::Unique,
+            name: None,
+        };
+        let correct_create_index = CreateIndex {
+            model: "ignored".into(),
+            fields: vec!["testColumn".into()],
+            tpe: IndexType::Unique,
+            name: None,
+        };
+
+        assert!(correct_create_index.applies_to_index(&definition));
+
+        let create_index = CreateIndex {
+            tpe: IndexType::Normal,
+            ..correct_create_index.clone()
+        };
+
+        // tpe does not match
+        assert!(!create_index.applies_to_index(&definition));
+
+        let create_index = CreateIndex {
+            name: Some("index_on_testColumn".to_owned()),
+            ..correct_create_index.clone()
+        };
+
+        // name does not match, but it does not matter
+        assert!(create_index.applies_to_index(&definition));
+
+        let create_index = CreateIndex {
+            fields: vec!["testColumn".into(), "otherColumn".into()],
+            ..correct_create_index.clone()
+        };
+
+        // fields do not match
+        assert!(!create_index.applies_to_index(&definition));
+    }
+
+    #[test]
+    fn update_index_must_apply_to_the_right_indexes() {
+        let definition = IndexDefinition {
+            fields: vec!["testColumn".into()],
+            tpe: IndexType::Unique,
+            name: None,
+        };
+        let correct_update_index = UpdateIndex {
+            model: "ignored".into(),
+            fields: vec!["testColumn".into()],
+            tpe: IndexType::Unique,
+            name: None,
+        };
+
+        assert!(correct_update_index.applies_to_index(&definition));
+
+        let update_index = UpdateIndex {
+            tpe: IndexType::Normal,
+            ..correct_update_index.clone()
+        };
+
+        // tpe does not match
+        assert!(!update_index.applies_to_index(&definition));
+
+        let update_index = UpdateIndex {
+            name: Some("index_on_testColumn".to_owned()),
+            ..correct_update_index.clone()
+        };
+
+        // name does not match, but it does not matter
+        assert!(update_index.applies_to_index(&definition));
+
+        let update_index = UpdateIndex {
+            fields: vec!["testColumn".into(), "otherColumn".into()],
+            ..correct_update_index.clone()
+        };
+
+        // fields do not match
+        assert!(!update_index.applies_to_index(&definition));
+    }
 }

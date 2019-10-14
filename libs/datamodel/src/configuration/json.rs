@@ -24,7 +24,8 @@ pub fn config_from_mcf_json_value(json: serde_json::Value) -> Configuration {
     Configuration::from(mcf)
 }
 
-pub fn config_from_mcf_json_value_with_plugins(
+#[allow(unused)]
+fn config_from_mcf_json_value_with_plugins(
     json: serde_json::Value,
     plugins: Vec<Box<dyn source::SourceDefinition>>,
 ) -> Configuration {

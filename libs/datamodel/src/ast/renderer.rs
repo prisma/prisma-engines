@@ -73,7 +73,7 @@ impl<'a> Renderer<'a> {
         }
     }
 
-    pub fn render_documentation(target: &mut dyn LineWriteable, obj: &dyn ast::WithDocumentation) {
+    fn render_documentation(target: &mut dyn LineWriteable, obj: &dyn ast::WithDocumentation) {
         if let Some(doc) = &obj.documentation() {
             for line in doc.text.split('\n') {
                 target.write("/// ");
@@ -83,7 +83,7 @@ impl<'a> Renderer<'a> {
         }
     }
 
-    pub fn render_source_block(&mut self, source: &ast::SourceConfig) {
+    fn render_source_block(&mut self, source: &ast::SourceConfig) {
         Self::render_documentation(self, source);
 
         self.write("datasource ");
@@ -108,7 +108,7 @@ impl<'a> Renderer<'a> {
         self.end_line();
     }
 
-    pub fn render_generator_block(&mut self, generator: &ast::GeneratorConfig) {
+    fn render_generator_block(&mut self, generator: &ast::GeneratorConfig) {
         Self::render_documentation(self, generator);
 
         self.write("generator ");
@@ -133,7 +133,7 @@ impl<'a> Renderer<'a> {
         self.end_line();
     }
 
-    pub fn render_custom_type(target: &mut TableFormat, field: &ast::Field) {
+    fn render_custom_type(target: &mut TableFormat, field: &ast::Field) {
         Self::render_documentation(&mut target.interleave_writer(), field);
 
         target.write("type ");
@@ -143,7 +143,7 @@ impl<'a> Renderer<'a> {
 
         // Attributes
         if !field.directives.is_empty() {
-            let mut attributes_builder = StringBuilder::default();
+            let mut attributes_builder = StringBuilder::new();
 
             for directive in &field.directives {
                 Self::render_field_directive(&mut attributes_builder, &directive);
@@ -155,7 +155,7 @@ impl<'a> Renderer<'a> {
         target.end_line();
     }
 
-    pub fn render_model(&mut self, model: &ast::Model) {
+    fn render_model(&mut self, model: &ast::Model) {
         Self::render_documentation(self, model);
 
         self.write("model ");
@@ -184,7 +184,7 @@ impl<'a> Renderer<'a> {
         self.end_line();
     }
 
-    pub fn render_enum(&mut self, enm: &ast::Enum) {
+    fn render_enum(&mut self, enm: &ast::Enum) {
         Self::render_documentation(self, enm);
 
         self.write("enum ");
@@ -211,14 +211,14 @@ impl<'a> Renderer<'a> {
         self.end_line();
     }
 
-    pub fn render_field(target: &mut TableFormat, field: &ast::Field) {
+    fn render_field(target: &mut TableFormat, field: &ast::Field) {
         Self::render_documentation(&mut target.interleave_writer(), field);
 
         target.write(&field.name.name);
 
         // Type
         {
-            let mut type_builder = StringBuilder::default();
+            let mut type_builder = StringBuilder::new();
 
             type_builder.write(&field.field_type.name);
             Self::render_field_arity(&mut type_builder, &field.arity);
@@ -228,7 +228,7 @@ impl<'a> Renderer<'a> {
 
         // Attributes
         if !field.directives.is_empty() {
-            let mut attributes_builder = StringBuilder::default();
+            let mut attributes_builder = StringBuilder::new();
 
             for directive in &field.directives {
                 attributes_builder.write(&" ");
@@ -241,7 +241,7 @@ impl<'a> Renderer<'a> {
         target.end_line();
     }
 
-    pub fn render_field_arity(target: &mut dyn LineWriteable, field_arity: &ast::FieldArity) {
+    fn render_field_arity(target: &mut dyn LineWriteable, field_arity: &ast::FieldArity) {
         match field_arity {
             ast::FieldArity::List => target.write("[]"),
             ast::FieldArity::Optional => target.write("?"),
@@ -249,7 +249,7 @@ impl<'a> Renderer<'a> {
         };
     }
 
-    pub fn render_field_directive(target: &mut dyn LineWriteable, directive: &ast::Directive) {
+    fn render_field_directive(target: &mut dyn LineWriteable, directive: &ast::Directive) {
         target.write("@");
         target.write(&directive.name.name);
 
@@ -260,7 +260,7 @@ impl<'a> Renderer<'a> {
         }
     }
 
-    pub fn render_block_directive(&mut self, directive: &ast::Directive) {
+    fn render_block_directive(&mut self, directive: &ast::Directive) {
         self.write("@@");
         self.write(&directive.name.name);
 
@@ -273,7 +273,7 @@ impl<'a> Renderer<'a> {
         self.end_line();
     }
 
-    pub fn render_arguments(target: &mut dyn LineWriteable, args: &[ast::Argument]) {
+    fn render_arguments(target: &mut dyn LineWriteable, args: &[ast::Argument]) {
         for (idx, arg) in args.iter().enumerate() {
             if idx > 0 {
                 target.write(&", ");
@@ -282,7 +282,7 @@ impl<'a> Renderer<'a> {
         }
     }
 
-    pub fn render_argument(target: &mut dyn LineWriteable, args: &ast::Argument) {
+    fn render_argument(target: &mut dyn LineWriteable, args: &ast::Argument) {
         if args.name.name != "" {
             target.write(&args.name.name);
             target.write(&": ");
@@ -291,13 +291,13 @@ impl<'a> Renderer<'a> {
         Self::render_value(target, &args.value);
     }
 
-    pub fn render_value_to_string(val: &ast::Value) -> String {
-        let mut builder = StringBuilder::default();
+    fn render_value_to_string(val: &ast::Value) -> String {
+        let mut builder = StringBuilder::new();
         Self::render_value(&mut builder, val);
         builder.to_string()
     }
 
-    pub fn render_value(target: &mut dyn LineWriteable, val: &ast::Value) {
+    fn render_value(target: &mut dyn LineWriteable, val: &ast::Value) {
         match val {
             ast::Value::Array(vals, _) => Self::render_array(target, &vals),
             ast::Value::BooleanValue(val, _) => target.write(&val),
@@ -309,7 +309,7 @@ impl<'a> Renderer<'a> {
         };
     }
 
-    pub fn render_func(target: &mut dyn LineWriteable, name: &str, vals: &[ast::Value]) {
+    fn render_func(target: &mut dyn LineWriteable, name: &str, vals: &[ast::Value]) {
         target.write(name);
         target.write("(");
         for val in vals {
@@ -329,7 +329,7 @@ impl<'a> Renderer<'a> {
         self.indent -= 1
     }
 
-    pub fn render_array(target: &mut dyn LineWriteable, vals: &[ast::Value]) {
+    fn render_array(target: &mut dyn LineWriteable, vals: &[ast::Value]) {
         target.write(&"[");
         for (idx, arg) in vals.iter().enumerate() {
             if idx > 0 {

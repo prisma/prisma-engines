@@ -90,6 +90,25 @@ fn should_fail_on_ambiguous_self_relation() {
 }
 
 #[test]
+fn should_fail_on_ambiguous_self_relation_with_two_fields() {
+    let dml = r#"
+        model User {
+            id Int @id
+            child User
+            mother User
+        }
+    "#;
+
+    let errors = parse_error(dml);
+
+    errors.assert_is(ValidationError::new_model_validation_error(
+        "Ambiguous self relation detected.",
+        "User",
+        Span::new(57, 67),
+    ));
+}
+
+#[test]
 fn should_fail_on_ambiguous_named_self_relation() {
     let dml = r#"
     model User {

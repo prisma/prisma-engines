@@ -33,6 +33,9 @@ impl<'a> DataModelMigrationStepsInferrerImpl<'a> {
         let enums_to_create = self.enums_to_create();
         let enums_to_delete = self.enums_to_delete();
         let enums_to_update = self.enums_to_update();
+        let indexes_to_rename = self.indexes_to_rename();
+        let indexes_to_create = self.indexes_to_create(&indexes_to_rename);
+        let indexes_to_delete = self.indexes_to_delete(&indexes_to_rename);
 
         result.append(&mut Self::wrap_as_step(models_to_create, MigrationStep::CreateModel));
         result.append(&mut Self::wrap_as_step(models_to_delete, MigrationStep::DeleteModel));
@@ -43,7 +46,19 @@ impl<'a> DataModelMigrationStepsInferrerImpl<'a> {
         result.append(&mut Self::wrap_as_step(enums_to_create, MigrationStep::CreateEnum));
         result.append(&mut Self::wrap_as_step(enums_to_delete, MigrationStep::DeleteEnum));
         result.append(&mut Self::wrap_as_step(enums_to_update, MigrationStep::UpdateEnum));
+        result.append(&mut Self::wrap_as_step(indexes_to_rename, MigrationStep::UpdateIndex));
+        result.append(&mut Self::wrap_as_step(indexes_to_delete, MigrationStep::DeleteIndex));
+        result.append(&mut Self::wrap_as_step(indexes_to_create, MigrationStep::CreateIndex));
         result
+    }
+
+    /// Iterate over the models that are present in both schemas. The order is `(previous_model, next_model)`.
+    fn model_pairs(&self) -> impl Iterator<Item = (&Model, &Model)> {
+        self.previous.models().filter_map(move |previous_model| {
+            self.next
+                .find_model(&previous_model.name)
+                .map(|next_model| (previous_model, next_model))
+        })
     }
 
     fn models_to_create(&self) -> Vec<CreateModel> {
@@ -228,6 +243,85 @@ impl<'a> DataModelMigrationStepsInferrerImpl<'a> {
             }
         }
         result
+    }
+
+    fn indexes_to_rename(&self) -> Vec<UpdateIndex> {
+        self.model_pairs()
+            .flat_map(|(previous_model, next_model)| {
+                next_model
+                    .indexes
+                    .iter()
+                    // Filter for indexes that existed but changed name.
+                    .filter(move |next_index| {
+                        previous_model.indexes.iter().any(|previous_index| {
+                            previous_index.tpe == next_index.tpe
+                                && previous_index.fields == next_index.fields
+                                && previous_index.name != next_index.name
+                        })
+                    })
+                    .map(move |next_index| UpdateIndex {
+                        model: next_model.name.clone(),
+                        fields: next_index.fields.clone(),
+                        name: next_index.name.clone(),
+                        tpe: next_index.tpe,
+                    })
+            })
+            .collect()
+    }
+
+    fn indexes_to_create(&self, updated_indexes: &[UpdateIndex]) -> Vec<CreateIndex> {
+        self.next
+            .models()
+            .map(|next_model| (next_model, self.previous.find_model(&next_model.name)))
+            .flat_map(|(next_model, previous_model_opt)| {
+                next_model
+                    .indexes
+                    .iter()
+                    // Updated indexes should not be created.
+                    .filter(move |next_index| {
+                        !updated_indexes
+                            .iter()
+                            .any(|updated_index| updated_index.applies_to_index(next_index))
+                    })
+                    // Keep only the indexes that do not exist yet.
+                    .filter(move |next_index| {
+                        previous_model_opt
+                            .map(|previous_model| !previous_model.has_index(next_index))
+                            // Create the index if the model didn't exist before.
+                            .unwrap_or(true)
+                    })
+                    .map(move |next_index| CreateIndex {
+                        model: next_model.name.clone(),
+                        name: next_index.name.clone(),
+                        tpe: next_index.tpe,
+                        fields: next_index.fields.clone(),
+                    })
+            })
+            .collect()
+    }
+
+    fn indexes_to_delete(&self, updated_indexes: &[UpdateIndex]) -> Vec<DeleteIndex> {
+        self.model_pairs()
+            .flat_map(|(previous_model, next_model)| {
+                previous_model
+                    .indexes
+                    .iter()
+                    // Updated indexes should not be deleted
+                    .filter(move |existing_index| {
+                        !updated_indexes
+                            .iter()
+                            .any(|updated_index| updated_index.applies_to_index(existing_index))
+                    })
+                    // Keep only the indexes that do not exist anymore.
+                    .filter(move |existing_index| !next_model.has_index(existing_index))
+                    .map(move |existing_index| DeleteIndex {
+                        fields: existing_index.fields.clone(),
+                        tpe: existing_index.tpe,
+                        model: previous_model.name.clone(),
+                        name: existing_index.name.clone(),
+                    })
+            })
+            .collect()
     }
 
     fn diff<T: PartialEq + Clone>(current: &T, updated: &T) -> Option<T> {

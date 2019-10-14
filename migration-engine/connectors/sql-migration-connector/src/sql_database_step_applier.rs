@@ -1,5 +1,4 @@
 use crate::*;
-use migration_connector::*;
 use sql_renderer::SqlRenderer;
 use sql_schema_describer::*;
 use std::sync::Arc;
@@ -13,7 +12,7 @@ pub struct SqlDatabaseStepApplier {
 #[allow(unused, dead_code)]
 impl DatabaseMigrationStepApplier<SqlMigration> for SqlDatabaseStepApplier {
     fn apply_step(&self, database_migration: &SqlMigration, index: usize) -> ConnectorResult<bool> {
-        Ok(self.apply_next_step(&database_migration.steps, index)?)
+        Ok(self.apply_next_step(&database_migration.corrected_steps, index)?)
     }
 
     fn unapply_step(&self, database_migration: &SqlMigration, index: usize) -> ConnectorResult<bool> {
@@ -56,7 +55,7 @@ fn render_steps_pretty(
     schema_name: &str,
 ) -> ConnectorResult<serde_json::Value> {
     let jsons = database_migration
-        .steps
+        .corrected_steps
         .iter()
         .map(|step| {
             let cloned = step.clone();
@@ -182,6 +181,24 @@ fn render_raw_sql(step: &SqlMigrationStep, sql_family: SqlFamily, schema_name: &
             SqlFamily::Postgres | SqlFamily::Sqlite => {
                 format!("DROP INDEX {}", renderer.quote_with_schema(&schema_name, &name),)
             }
+        },
+        SqlMigrationStep::AlterIndex(AlterIndex {
+            table,
+            index_name,
+            index_new_name,
+        }) => match sql_family {
+            SqlFamily::Mysql => format!(
+                "ALTER TABLE {table_name} RENAME INDEX {index_name} TO {index_new_name}",
+                table_name = renderer.quote_with_schema(&schema_name, &table),
+                index_name = renderer.quote(index_name),
+                index_new_name = renderer.quote(index_new_name)
+            ),
+            SqlFamily::Postgres => format!(
+                "ALTER INDEX {} RENAME TO {}",
+                renderer.quote_with_schema(&schema_name, index_name),
+                renderer.quote(index_new_name)
+            ),
+            SqlFamily::Sqlite => unimplemented!("Index renaming on SQLite."),
         },
         SqlMigrationStep::RawSql { raw } => raw.to_string(),
     }

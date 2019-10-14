@@ -14,6 +14,7 @@ use connector::{ModelExtractor, Query, ReadQuery};
 
 /// Central query executor and main entry point into the query core.
 pub struct QueryExecutor {
+    primary_connector: &'static str,
     read_executor: ReadQueryExecutor,
     write_executor: WriteQueryExecutor,
 }
@@ -24,11 +25,16 @@ pub struct QueryExecutor {
 // - ReadQueryResult should probably just be QueryResult
 // - This is all temporary code until the larger query execution overhaul.
 impl QueryExecutor {
-    pub fn new(read_executor: ReadQueryExecutor, write_executor: WriteQueryExecutor) -> Self {
+    pub fn new(primary_connector: &'static str, read_executor: ReadQueryExecutor, write_executor: WriteQueryExecutor) -> Self {
         QueryExecutor {
+            primary_connector,
             read_executor,
             write_executor,
         }
+    }
+
+    pub fn primary_connector(&self) -> &'static str {
+        self.primary_connector
     }
 
     /// Executes a query document, which involves parsing & validating the document,

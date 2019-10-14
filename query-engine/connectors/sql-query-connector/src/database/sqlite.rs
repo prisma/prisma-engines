@@ -17,7 +17,7 @@ pub struct Sqlite {
 
 impl Sqlite {
     pub fn new(file_path: String, connection_limit: u32, test_mode: bool) -> crate::Result<Self> {
-        let manager = PrismaConnectionManager::sqlite(&file_path)?;
+        let manager = PrismaConnectionManager::sqlite(None, &file_path)?;
         let pool = r2d2::Pool::builder().max_size(connection_limit).build(manager)?;
 
         Ok(Self {

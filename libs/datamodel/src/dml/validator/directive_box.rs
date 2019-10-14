@@ -1,5 +1,6 @@
-use super::directive::core::{new_builtin_enum_directives, new_builtin_field_directives, new_builtin_model_directives};
-use super::directive::DirectiveListValidator;
+use super::directive::{
+    new_builtin_enum_directives, new_builtin_field_directives, new_builtin_model_directives, DirectiveListValidator,
+};
 use crate::{configuration, dml};
 
 pub struct DirectiveBox {

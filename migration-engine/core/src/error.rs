@@ -8,7 +8,7 @@ use tokio_threadpool::BlockingError;
 #[derive(Debug, Fail)]
 pub enum Error {
     #[fail(display = "Error in connector: {}", _0)]
-    ConnectorError(Schwerror),
+    ConnectorError(ConnectorError),
 
     #[fail(display = "Failure during a migration command: {}", _0)]
     CommandError(CommandError),
@@ -37,7 +37,7 @@ impl From<SqlError> for Error {
 
 impl From<ConnectorError> for Error {
     fn from(e: ConnectorError) -> Self {
-        Error::ConnectorError(e.into())
+        Error::ConnectorError(e)
     }
 }
 

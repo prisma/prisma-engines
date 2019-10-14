@@ -1,14 +1,20 @@
 use crate::steps::*;
 use chrono::{DateTime, Utc};
 use datamodel::Datamodel;
+use serde::{Serialize};
 
+
+/// This trait is implemented by each connector. It provides a generic API to store and retrieve [Migration](struct.Migration.html) records. 
 pub trait MigrationPersistence: Send + Sync + 'static {
+    /// Initialize migration persistence state. E.g. create the migrations table in an SQL database.
     fn init(&self);
+
+    /// Drop all persisted state.
     fn reset(&self);
 
-    // returns the currently active Datamodel
+    /// Returns the currently active Datamodel.
     fn current_datamodel(&self) -> Datamodel {
-        self.last().map(|m| m.datamodel).unwrap_or(Datamodel::empty())
+        self.last().map(|m| m.datamodel).unwrap_or_else(Datamodel::empty)
     }
 
     fn last_non_watch_datamodel(&self) -> Datamodel {
@@ -21,9 +27,10 @@ pub trait MigrationPersistence: Send + Sync + 'static {
             .unwrap_or(Datamodel::empty())
     }
 
-    // returns the last successful Migration
+    /// Returns the last successful Migration.
     fn last(&self) -> Option<Migration>;
 
+    /// Fetch a migration by name.
     fn by_name(&self, name: &str) -> Option<Migration>;
 
     // this power the listMigrations command
@@ -59,10 +66,12 @@ pub trait MigrationPersistence: Send + Sync + 'static {
     // writes the migration to the Migration table
     fn create(&self, migration: Migration) -> Migration;
 
-    // used by the MigrationApplier to write the progress of a Migration into the database
+    /// Used by the MigrationApplier to write the progress of a [Migration](struct.Migration.html)
+    /// into the database.
     fn update(&self, params: &MigrationUpdateParams);
 }
 
+/// The representation of a migration as persisted through [MigrationPersistence](trait.MigrationPersistence.html).
 #[derive(Debug, PartialEq, Clone)]
 pub struct Migration {
     pub name: String,
@@ -78,6 +87,7 @@ pub struct Migration {
     pub finished_at: Option<DateTime<Utc>>,
 }
 
+/// Updates to be made to a persisted [Migration](struct.Migration.html).
 #[derive(Debug, Clone)]
 pub struct MigrationUpdateParams {
     pub name: String,
@@ -186,7 +196,9 @@ impl MigrationStatus {
     }
 }
 
+/// A no-op implementor of [MigrationPersistence](trait.MigrationPersistence.html).
 pub struct EmptyMigrationPersistence {}
+
 impl MigrationPersistence for EmptyMigrationPersistence {
     fn init(&self) {}
 

@@ -7,6 +7,7 @@ import play.api.libs.json._
 case class TestDatabase() {
   def setup(project: Project): Unit = {
     val engine = MigrationEngine(project)
+    engine.createDatabase()
     engine.reset()
     engine.inferAndApply()
   }
@@ -47,6 +48,13 @@ case class MigrationEngine(project: Project) {
 
   def reset(): Unit = {
     sendRpcCallInternal[JsValue]("reset", Json.obj())
+  }
+
+  def createDatabase(): Unit = {
+    import scala.sys.process._
+    val cmd = List(EnvVars.migrationEngineBinaryPath, "cli", "-d", project.dataSourceUrl, "--create_database")
+
+    cmd.!
   }
 
   private def sendRpcCall[A, B](method: String, params: A)(implicit writes: OWrites[A], reads: Reads[B]): B = {

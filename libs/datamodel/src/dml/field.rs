@@ -40,7 +40,7 @@ pub struct IdInfo {
 }
 
 /// Represents a field in a model.
-#[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct Field {
     /// Name of the field.
     pub name: String,

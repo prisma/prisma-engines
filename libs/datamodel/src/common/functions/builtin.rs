@@ -6,10 +6,6 @@ use crate::common::{
 };
 use crate::errors::ValidationError;
 
-fn server_functional_with(name: &str, return_type: PrismaType, span: ast::Span) -> MaybeExpression {
-    MaybeExpression::Expression(PrismaValue::Expression(String::from(name), return_type, vec![]), span)
-}
-
 /// Environment variable interpolating function (`env(...)`).
 pub struct EnvFunctional {}
 
@@ -38,6 +34,7 @@ impl Functional for EnvFunctional {
 }
 
 /// Shallow implementation for trivial server side functionals.
+#[allow(unused)]
 pub struct ServerSideTrivialFunctional {
     // Needed for const initializer.
     pub(crate) name: &'static str,
@@ -45,6 +42,7 @@ pub struct ServerSideTrivialFunctional {
 }
 
 impl ServerSideTrivialFunctional {
+    #[allow(unused)]
     pub fn new(name: &'static str, return_type: PrismaType) -> ServerSideTrivialFunctional {
         ServerSideTrivialFunctional { name, return_type }
     }
@@ -58,6 +56,9 @@ impl Functional for ServerSideTrivialFunctional {
     fn apply(&self, values: &[ValueValidator], span: ast::Span) -> Result<MaybeExpression, ValidationError> {
         self.check_arg_count(values, 0, span)?;
 
-        Ok(server_functional_with(self.name(), self.return_type, span))
+        Ok(MaybeExpression::Expression(
+            PrismaValue::Expression(String::from(self.name()), self.return_type, vec![]),
+            span,
+        ))
     }
 }

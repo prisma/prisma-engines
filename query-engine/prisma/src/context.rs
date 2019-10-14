@@ -10,17 +10,17 @@ use crate::{data_model_loader::*, exec_loader, PrismaError, PrismaResult};
 #[derive(DebugStub)]
 pub struct PrismaContext {
     /// Internal data model used throughout the query engine.
-    pub internal_data_model: InternalDataModelRef,
+    internal_data_model: InternalDataModelRef,
 
     /// The api query schema.
-    pub query_schema: QuerySchemaRef,
+    query_schema: QuerySchemaRef,
 
     /// DML-based v2 datamodel.
-    pub dm: datamodel::Datamodel,
+    dm: datamodel::Datamodel,
 
     /// Central query executor.
     #[debug_stub = "#QueryExecutor#"]
-    pub executor: QueryExecutor,
+    executor: QueryExecutor,
 }
 
 impl PrismaContext {
@@ -62,4 +62,21 @@ impl PrismaContext {
             executor,
         })
     }
+
+    pub fn query_schema(&self) -> &QuerySchemaRef {
+        &self.query_schema
+    }
+
+    pub fn datamodel(&self) -> &datamodel::Datamodel {
+        &self.dm
+    }
+
+    pub fn primary_connector(&self) -> &'static str {
+        self.executor.primary_connector()
+    }
+
+    pub fn executor(&self) -> &QueryExecutor {
+        &self.executor
+    }
+
 }

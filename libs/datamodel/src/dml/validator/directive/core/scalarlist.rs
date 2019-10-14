@@ -15,20 +15,20 @@ impl DirectiveValidator<dml::Field> for ScalarListDirectiveValidator {
 
         match args.arg("strategy")?.parse_literal::<dml::ScalarListStrategy>() {
             Ok(strategy) => obj.scalar_list_strategy = Some(strategy),
-            Err(err) => return self.parser_error(&err),
+            Err(err) => return Err(self.parser_error(&err)),
         }
 
         Ok(())
     }
 
-    fn serialize(&self, obj: &dml::Field, _datamodel: &dml::Datamodel) -> Result<Option<ast::Directive>, Error> {
+    fn serialize(&self, obj: &dml::Field, _datamodel: &dml::Datamodel) -> Result<Vec<ast::Directive>, Error> {
         if let Some(strategy) = &obj.scalar_list_strategy {
-            return Ok(Some(ast::Directive::new(
+            return Ok(vec![ast::Directive::new(
                 self.directive_name(),
                 vec![ast::Argument::new_constant("strategy", &strategy.to_string())],
-            )));
+            )]);
         }
 
-        Ok(None)
+        Ok(vec![])
     }
 }

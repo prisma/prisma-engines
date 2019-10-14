@@ -6,14 +6,13 @@ mod standardise;
 mod validate;
 mod validation_pipeline;
 
-pub mod common;
+mod common;
 pub mod directive;
 
 use directive_box::*;
 
-pub use lift::*;
+use lift::*;
 pub use lower::*;
-pub use precheck::*;
-pub use standardise::*;
-pub use validate::*;
+use standardise::*;
+use validate::*;
 pub use validation_pipeline::*;

@@ -7,7 +7,6 @@ use crate::{
 /// Helper for validating a datamodel.
 ///
 /// When validating, we check if the datamodel is valid, and generate errors otherwise.
-#[derive(Default)]
 pub struct Validator {}
 
 /// State error message. Seeing this error means something went really wrong internally. It's the datamodel equivalent of a bluescreen.
@@ -16,7 +15,7 @@ const STATE_ERROR: &str = "Failed lookup of model, field or optional property du
 impl Validator {
     /// Creates a new instance, with all builtin directives registered.
     pub fn new() -> Validator {
-        Self::default()
+        Self {}
     }
 
     /// Creates a new instance, with all builtin directives and
@@ -24,7 +23,7 @@ impl Validator {
     ///
     /// The directives defined by the given sources will be namespaced.
     pub fn with_sources(_sources: &[Box<dyn configuration::Source>]) -> Validator {
-        Self::default()
+        Self::new()
     }
 
     pub fn validate(&self, ast_schema: &ast::Datamodel, schema: &mut dml::Datamodel) -> Result<(), ErrorCollection> {
@@ -60,18 +59,29 @@ impl Validator {
             // Extempt from the id rule, we have an relation table.
         }
 
-        match model.id_fields().count() {
-            1 => Ok(()),
-            _ => Err(ValidationError::new_model_validation_error(
-                "Exactly one field must be marked as the id field with the `@id` directive.",
-                &model.name,
-                ast_model.span,
-            )),
+        let multiple_single_field_id_error = Err(ValidationError::new_model_validation_error(
+            "At most one field must be marked as the id field with the `@id` directive.",
+            &model.name,
+            ast_model.span,
+        ));
+
+        let multiple_id_criteria_error = Err(ValidationError::new_model_validation_error(
+            "Each model must have exactly one id criteria. Either mark a single field with `@id` or add a multi field id criterion with `@@id([])` to the model.",
+            &model.name,
+            ast_model.span,
+        ));
+
+        match (model.singular_id_fields().count(), model.id_fields.is_empty()) {
+            (c, _) if c > 1 => multiple_single_field_id_error,
+            (0, true) => multiple_id_criteria_error,
+            (1, false) => multiple_id_criteria_error,
+            (1, true) | (0, false) => Ok(()),
+            (_, _) => unreachable!(), // the compiler does not check the first if guard
         }
     }
 
     fn validate_id_fields_valid(&self, ast_schema: &ast::Datamodel, model: &dml::Model) -> Result<(), ValidationError> {
-        for id_field in model.id_fields() {
+        for id_field in model.singular_id_fields() {
             let is_valid = match (&id_field.default_value, &id_field.field_type, &id_field.arity) {
                 (
                     Some(dml::Value::Expression(name, return_type, args)),
@@ -90,7 +100,7 @@ impl Validator {
 
             if !is_valid {
                 return Err(ValidationError::new_model_validation_error(
-                    "Invalid ID field. ID field must be one of: Int @id, String @id @default(cuid()), String @id @default(uuid()).", 
+                    "Invalid ID field. ID field must be one of: Int @id, String @id @default(cuid()), String @id @default(uuid()).",
                     &model.name,
                     ast_schema.find_field(&model.name, &id_field.name).expect(STATE_ERROR).span));
             }
@@ -156,12 +166,13 @@ impl Validator {
                                             .span,
                                     ));
                                 }
-                            } else {
-                                // A self relation...
+                            } else if rel_a.to == model.name && rel_b.to == model.name {
+                                // This is a self-relation with at least two fields.
+
+                                // Named self relations are ambiguous when they involve more than two fields.
                                 for field_c in model.fields() {
                                     if field_a != field_c && field_b != field_c {
                                         if let dml::FieldType::Relation(rel_c) = &field_c.field_type {
-                                            // ...but there are more thatn three fields without a name.
                                             if rel_c.to == model.name
                                                 && rel_a.name == rel_b.name
                                                 && rel_a.name == rel_c.name
@@ -177,6 +188,19 @@ impl Validator {
                                             }
                                         }
                                     }
+                                }
+
+                                // Ambiguous unnamed self relation: two fields are enough.
+                                if rel_a.name.is_empty() && rel_b.name.is_empty() {
+                                    // A self relation, but there are at least two fields without a name.
+                                    return Err(ValidationError::new_model_validation_error(
+                                        "Ambiguous self relation detected.",
+                                        &model.name,
+                                        ast_schema
+                                            .find_field(&model.name, &field_a.name)
+                                            .expect(STATE_ERROR)
+                                            .span,
+                                    ));
                                 }
                             }
                         }

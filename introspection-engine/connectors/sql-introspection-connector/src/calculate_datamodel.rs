@@ -113,6 +113,11 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
             };
             model.add_field(field);
         }
+
+        //for uniques table.index -> model.index
+
+
+
         data_model.add_model(model);
     }
 
