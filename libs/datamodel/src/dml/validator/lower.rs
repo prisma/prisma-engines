@@ -7,25 +7,20 @@ pub struct LowerDmlToAst {
     directives: DirectiveBox,
 }
 
-impl Default for LowerDmlToAst {
-    fn default() -> Self {
-        Self {
-            directives: DirectiveBox::new(),
-        }
-    }
-}
-
 impl LowerDmlToAst {
     /// Creates a new instance, with all builtin directives registered.
     pub fn new() -> Self {
-        Self::default()
+        Self {
+            directives: DirectiveBox::new(),
+        }
     }
 
     /// Creates a new instance, with all builtin directives and
     /// the directives defined by the given sources registered.
     ///
     /// The directives defined by the given sources will be namespaced.
-    pub fn with_sources(sources: &[Box<dyn configuration::Source>]) -> LowerDmlToAst {
+    #[allow(unused)]
+    fn with_sources(sources: &[Box<dyn configuration::Source>]) -> LowerDmlToAst {
         LowerDmlToAst {
             directives: DirectiveBox::with_sources(sources),
         }

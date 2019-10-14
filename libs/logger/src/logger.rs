@@ -31,8 +31,7 @@ impl Logger {
                 let drain = Json::new(std::io::stdout()).add_default_keys().build().fuse();
                 let drain = slog_envlogger::new(drain);
                 let drain = Async::new(drain)
-                    .chan_size(16384)
-                    .overflow_strategy(slog_async::OverflowStrategy::Block)
+                    .chan_size(524288)
                     .build()
                     .fuse();
 

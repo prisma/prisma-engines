@@ -3,7 +3,7 @@ use super::traits::*;
 use serde::{Deserialize, Serialize};
 
 /// Represents a model in a prisma datamodel.
-#[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct Model {
     /// Name of the model.
     pub name: String,
@@ -15,8 +15,25 @@ pub struct Model {
     pub database_name: Option<String>,
     /// Indicates if this model is embedded or not.
     pub is_embedded: bool,
+    /// Describes Composite Indexes
+    pub indexes: Vec<IndexDefinition>,
+    /// Describes Composite Primary Keys
+    pub id_fields: Vec<String>,
     /// Indicates if this model is generated.
     pub is_generated: bool,
+}
+
+#[derive(Debug, PartialEq, Clone)]
+pub struct IndexDefinition {
+    pub name: Option<String>,
+    pub fields: Vec<String>,
+    pub tpe: IndexType,
+}
+
+#[derive(Debug, PartialEq, Clone, Serialize, Deserialize, Copy)]
+pub enum IndexType {
+    Unique,
+    Normal,
 }
 
 impl Model {
@@ -25,6 +42,8 @@ impl Model {
         Model {
             name: String::from(name),
             fields: vec![],
+            indexes: vec![],
+            id_fields: vec![],
             documentation: None,
             database_name: None,
             is_embedded: false,
@@ -63,12 +82,16 @@ impl Model {
     }
 
     /// Finds the name of all id fields
-    pub fn id_field_names(&self) -> impl std::iter::Iterator<Item = &String> {
-        self.fields().filter(|x| x.id_info.is_some()).map(|x| &x.name)
+    pub fn id_field_names(&self) -> Vec<String> {
+        let singular_id_field = self.singular_id_fields().next();
+        match singular_id_field {
+            Some(f) => vec![f.name.clone()],
+            None => self.id_fields.clone(),
+        }
     }
 
     /// Finds the name of all id fields
-    pub fn id_fields(&self) -> impl std::iter::Iterator<Item = &Field> {
+    pub fn singular_id_fields(&self) -> impl std::iter::Iterator<Item = &Field> {
         self.fields().filter(|x| x.id_info.is_some())
     }
 
@@ -117,6 +140,14 @@ impl Model {
     /// It has only two fields, both of them are required relations.
     pub fn is_pure_relation_model(&self) -> bool {
         self.is_relation_model() && self.fields.len() == 2
+    }
+
+    pub fn add_index(&mut self, index: IndexDefinition) {
+        self.indexes.push(index)
+    }
+
+    pub fn has_index(&self, index: &IndexDefinition) -> bool {
+        self.indexes.iter().any(|own_index| own_index == index)
     }
 }
 

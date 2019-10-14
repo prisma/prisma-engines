@@ -74,6 +74,7 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
         .filter(|table| !is_prisma_scalar_list_table(&table))
     {
         let mut model = Model::new(&table.name);
+        //Todo: This needs to filter out composite Foreign Key columns, they are merged into one new field
         for column in table.columns.iter() {
             debug!("Handling column {:?}", column);
             let field_type = calculate_field_type(&column, &table);
@@ -112,6 +113,11 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
             };
             model.add_field(field);
         }
+
+        //for uniques table.index -> model.index
+
+
+
         data_model.add_model(model);
     }
 

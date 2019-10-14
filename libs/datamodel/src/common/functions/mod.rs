@@ -1,13 +1,14 @@
-mod traits;
-pub use traits::*;
 mod builtin;
+mod traits;
+
 use crate::ast;
 use crate::common::{
     value::{MaybeExpression, ValueValidator},
     PrismaType,
 };
 use crate::errors::ValidationError;
-pub use builtin::*;
+
+use traits::*;
 
 // Client side funcs
 const BUILTIN_ENV_FUNCTIONAL: builtin::EnvFunctional = builtin::EnvFunctional {};

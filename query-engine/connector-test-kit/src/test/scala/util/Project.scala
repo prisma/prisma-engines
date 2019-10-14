@@ -8,16 +8,23 @@ case class Project(
     id: String,
     dataModel: String,
 ) {
+  val dataSourceUrl: String = {
+    ConnectorConfig
+      .instance
+      .url
+      .replaceAllLiterally("$DB_FILE", s"${EnvVars.serverRoot}/db/$id.db")
+      .replaceAllLiterally("$DB", id)
+  }
+
   val dataSourceConfig: String = {
     val config = ConnectorConfig.instance
+
     s"""
            |datasource test {
            |  provider = "${config.provider}"
-           |  url = "${config.url}"
+           |  url = "${dataSourceUrl}"
            |}
     """.stripMargin
-      .replaceAllLiterally("$DB_FILE", s"${EnvVars.serverRoot}/db/$id.db")
-      .replaceAllLiterally("$DB", id)
   }
 
   val dataModelWithDataSourceConfig = {

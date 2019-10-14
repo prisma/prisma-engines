@@ -140,7 +140,7 @@ pub fn load_configuration_with_plugins(
 
     let datasources = source_loader.load(&ast)?;
 
-    let generators = GeneratorLoader::lift(&ast)?;
+    let generators = GeneratorLoader::load_generators_from_ast(&ast)?;
 
     Ok(Configuration {
         datasources,

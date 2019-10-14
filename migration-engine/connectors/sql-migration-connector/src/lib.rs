@@ -3,8 +3,6 @@ extern crate log;
 
 pub mod migration_database;
 
-mod database_schema_calculator;
-mod database_schema_differ;
 mod error;
 mod sql_database_migration_inferrer;
 mod sql_database_step_applier;
@@ -12,6 +10,8 @@ mod sql_destructive_changes_checker;
 mod sql_migration;
 mod sql_migration_persistence;
 mod sql_renderer;
+mod sql_schema_calculator;
+mod sql_schema_differ;
 
 pub use error::*;
 pub use sql_migration::*;
@@ -62,63 +62,32 @@ impl SqlFamily {
 }
 
 impl SqlMigrationConnector {
-    pub fn postgres(url_str: &str) -> crate::Result<Self> {
+    pub fn postgres(url_str: &str, pooled: bool) -> crate::Result<Self> {
         let url = Url::parse(url_str)?;
-
         let params = PostgresParams::try_from(url.clone())?;
 
-        let dbname = params.dbname.clone();
         let schema = params.schema.clone();
+        let conn = PostgreSql::new(params, pooled)?;
 
-        match PostgreSql::new(params) {
-            Ok(conn) => Ok(Self::create_connector(
-                url_str,
-                Arc::new(conn),
-                SqlFamily::Postgres,
-                schema,
-                None,
-            )),
-            Err(prisma_query::error::Error::ConnectionError(_)) => {
-                let _ = {
-                    let mut url = url.clone();
-                    url.set_path("postgres");
-
-                    let params = PostgresParams::try_from(url)?;
-                    let connection = PostgreSql::new(params)?;
-
-                    let db_sql = format!("CREATE DATABASE \"{}\";", dbname);
-
-                    connection.query_raw("", &db_sql, &[]) // ignoring errors as there's no CREATE DATABASE IF NOT EXISTS in Postgres
-                };
-
-                let params = PostgresParams::try_from(url)?;
-                let schema = params.schema.clone();
-                let conn = PostgreSql::new(params)?;
-
-                Ok(Self::create_connector(
-                    url_str,
-                    Arc::new(conn),
-                    SqlFamily::Postgres,
-                    schema,
-                    None,
-                ))
-            }
-            Err(err) => Err(err.into()),
-        }
+        Ok(Self::create_connector(
+            url_str,
+            Arc::new(conn),
+            SqlFamily::Postgres,
+            schema,
+            None,
+        ))
     }
 
-    pub fn mysql(url_str: &str) -> crate::Result<Self> {
-        let mut url = Url::parse(url_str)?;
+    pub fn mysql(url_str: &str, pooled: bool) -> crate::Result<Self> {
+        let url = Url::parse(url_str)?;
 
         let schema = {
             let params = MysqlParams::try_from(url.clone())?;
             params.dbname.clone()
         };
 
-        url.set_path("");
-
         let params = MysqlParams::try_from(url)?;
-        let conn = Mysql::new(params)?;
+        let conn = Mysql::new(params, pooled)?;
 
         Ok(Self::create_connector(
             url_str,
@@ -184,7 +153,10 @@ impl SqlMigrationConnector {
             conn: Arc::clone(&conn),
         });
 
-        let destructive_changes_checker = Arc::new(SqlDestructiveChangesChecker {});
+        let destructive_changes_checker = Arc::new(SqlDestructiveChangesChecker {
+            schema_name: schema_name.clone(),
+            database: Arc::clone(&conn),
+        });
 
         Self {
             url: url.to_string(),
@@ -208,30 +180,22 @@ impl MigrationConnector for SqlMigrationConnector {
         self.sql_family.connector_type_string()
     }
 
-    fn can_connect(&self) -> bool {
+    fn create_database(&self, db_name: &str) -> ConnectorResult<()> {
         match self.sql_family {
-            SqlFamily::Postgres | SqlFamily::Mysql => self
-                .database
-                .query_raw("", "SELECT * FROM information_schema.tables;", &[])
-                .map(|_| true)
-                .unwrap_or(false),
-            SqlFamily::Sqlite => unreachable!(),
-        }
-    }
+            SqlFamily::Postgres => {
+                self.database
+                    .query_raw("", &format!("CREATE DATABASE \"{}\"", db_name), &[])?;
 
-    fn can_create_database(&self) -> bool {
-        match self.sql_family {
-            SqlFamily::Postgres => self
-                .database
-                .query_raw("", "select rolcreatedb from pg_authid where rolname = 'postgres';", &[])
-                .map(|_| true)
-                .unwrap_or(false),
-            SqlFamily::Sqlite | SqlFamily::Mysql => unreachable!(),
-        }
-    }
+                Ok(())
+            }
+            SqlFamily::Sqlite => Ok(()),
+            SqlFamily::Mysql => {
+                self.database
+                    .query_raw("", &format!("CREATE DATABASE `{}`", db_name), &[])?;
 
-    fn create_database(&self) {
-        unimplemented!()
+                Ok(())
+            }
+        }
     }
 
     fn initialize(&self) -> ConnectorResult<()> {

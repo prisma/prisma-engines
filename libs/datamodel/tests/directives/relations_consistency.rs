@@ -37,17 +37,17 @@ fn must_add_to_fields_on_the_right_side_for_one_to_one_relations() {
       id         String @default(cuid()) @id @unique
       referenceA User2
     }
-    
+
     model User2 {
       id         String @default(cuid()) @id @unique
       referenceB User1
     }
-    
+
     model User3 {
       id         String @default(cuid()) @id @unique
       referenceB User4
     }
-    
+
     model User4 {
       id         String @default(cuid()) @id @unique
       referenceA User3
@@ -83,7 +83,7 @@ fn must_add_to_fields_correctly_for_implicit_back_relations_for_one_to_one_relat
     let dml = r#"
     model User {
         user_id Int  @id
-        post    Post 
+        post    Post
     }
 
     model Post {
@@ -108,7 +108,7 @@ fn must_add_to_fields_on_both_sides_for_many_to_many_relations() {
     let dml = r#"
     model User {
         user_id Int    @id
-        posts   Post[] 
+        posts   Post[]
     }
 
     model Post {
@@ -134,7 +134,7 @@ fn must_add_to_fields_on_both_sides_for_one_to_many_relations() {
     let dml = r#"
     model User {
         user_id Int    @id
-        posts   Post[] 
+        posts   Post[]
     }
 
     model Post {
@@ -158,7 +158,7 @@ fn must_add_to_fields_on_both_sides_for_one_to_many_relations() {
     let dml = r#"
     model User {
         user_id Int    @id
-        post    Post 
+        post    Post
     }
 
     model Post {
@@ -447,8 +447,8 @@ fn should_add_embed_ids_on_self_relations() {
     let dml = r#"
     model Human {
         id Int @id
-        father Human?
-        son Human?
+        father Human? @relation("paternity")
+        son Human? @relation("paternity")
     }
     "#;
 
@@ -473,8 +473,8 @@ fn should_not_get_confused_with_complicated_self_relations() {
         id Int @id
         wife Human? @relation("Marrige")
         husband Human? @relation("Marrige")
-        father Human?
-        son Human?
+        father Human? @relation("Paternity")
+        son Human? @relation("Paternity")
         children Human[] @relation("Offspring")
         parent Human? @relation("Offspring")
     }

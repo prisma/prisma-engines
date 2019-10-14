@@ -477,7 +477,7 @@ pub fn get_expected_from_error(positives: &[Rule]) -> Vec<&'static str> {
         .collect()
 }
 
-pub fn rule_to_string(rule: Rule) -> &'static str {
+fn rule_to_string(rule: Rule) -> &'static str {
     match rule {
         Rule::model_declaration => "model declaration",
         Rule::enum_declaration => "enum declaration",

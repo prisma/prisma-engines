@@ -14,7 +14,7 @@ fn unapply_must_work() {
             }
         "#;
 
-        let result1 = infer_and_apply(api, &dm1);
+        let result1 = infer_and_apply(api, &dm1).sql_schema;
         assert_eq!(result1.table_bang("Test").column("field").is_some(), true);
 
         let dm2 = r#"
@@ -23,14 +23,14 @@ fn unapply_must_work() {
             }
         "#;
 
-        let result2 = infer_and_apply(api, &dm2);
+        let result2 = infer_and_apply(api, &dm2).sql_schema;
         assert_eq!(result2.table_bang("Test").column("field").is_some(), false);
 
         let result3 = unapply_migration(api);
         assert_eq!(result1, result3);
 
         // reapply the migration again
-        let result4 = infer_and_apply(api, &dm2);
+        let result4 = infer_and_apply(api, &dm2).sql_schema;
         assert_eq!(result2, result4);
     });
 }

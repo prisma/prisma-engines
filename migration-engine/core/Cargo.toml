@@ -10,6 +10,7 @@ datamodel = { path = "../../libs/datamodel" }
 prisma-models = { path = "../../prisma-models" }
 sql-migration-connector = { path = "../connectors/sql-migration-connector" }
 clap = "2.33"
+itertools = "0.8"
 
 chrono = { version = "0.4", features = ["serde"] }
 boolinator = "2.4.0"

@@ -5,21 +5,22 @@ use sql_schema_describer::*;
 const MIGRATION_TABLE_NAME: &str = "_Migration";
 
 #[derive(Debug)]
-pub struct DatabaseSchemaDiffer<'a> {
+pub struct SqlSchemaDiffer<'a> {
     previous: &'a SqlSchema,
     next: &'a SqlSchema,
 }
 
 #[derive(Debug, Clone)]
-pub struct DatabaseSchemaDiff {
+pub struct SqlSchemaDiff {
     pub drop_tables: Vec<DropTable>,
     pub create_tables: Vec<CreateTable>,
     pub alter_tables: Vec<AlterTable>,
     pub create_indexes: Vec<CreateIndex>,
     pub drop_indexes: Vec<DropIndex>,
+    pub alter_indexes: Vec<AlterIndex>,
 }
 
-impl DatabaseSchemaDiff {
+impl SqlSchemaDiff {
     pub fn into_steps(self) -> Vec<SqlMigrationStep> {
         let mut steps = Vec::new();
         steps.append(&mut wrap_as_step(self.drop_indexes, |x| SqlMigrationStep::DropIndex(x)));
@@ -33,23 +34,29 @@ impl DatabaseSchemaDiff {
         steps.append(&mut wrap_as_step(self.create_indexes, |x| {
             SqlMigrationStep::CreateIndex(x)
         }));
+        steps.append(&mut wrap_as_step(self.alter_indexes, |x| {
+            SqlMigrationStep::AlterIndex(x)
+        }));
         steps
     }
 }
 
-impl<'a> DatabaseSchemaDiffer<'a> {
-    pub fn diff(previous: &SqlSchema, next: &SqlSchema) -> DatabaseSchemaDiff {
-        let differ = DatabaseSchemaDiffer { previous, next };
+impl<'a> SqlSchemaDiffer<'a> {
+    pub fn diff(previous: &SqlSchema, next: &SqlSchema) -> SqlSchemaDiff {
+        let differ = SqlSchemaDiffer { previous, next };
         differ.diff_internal()
     }
 
-    fn diff_internal(&self) -> DatabaseSchemaDiff {
-        DatabaseSchemaDiff {
+    fn diff_internal(&self) -> SqlSchemaDiff {
+        let alter_indexes = self.alter_indexes();
+
+        SqlSchemaDiff {
             drop_tables: self.drop_tables(),
             create_tables: self.create_tables(),
             alter_tables: self.alter_tables(),
-            create_indexes: self.create_indexes(),
-            drop_indexes: self.drop_indexes(),
+            create_indexes: self.create_indexes(&alter_indexes),
+            drop_indexes: self.drop_indexes(&alter_indexes),
+            alter_indexes,
         }
     }
 
@@ -152,7 +159,7 @@ impl<'a> DatabaseSchemaDiffer<'a> {
         result
     }
 
-    fn create_indexes(&self) -> Vec<CreateIndex> {
+    fn create_indexes(&self, alter_indexes: &[AlterIndex]) -> Vec<CreateIndex> {
         let mut result = Vec::new();
         for next_table in &self.next.tables {
             for index in &next_table.indices {
@@ -162,7 +169,8 @@ impl<'a> DatabaseSchemaDiffer<'a> {
                     .table(&next_table.name)
                     .ok()
                     .and_then(|t| t.indices.iter().find(|i| i.name == index.name));
-                if let None = previous_index_opt {
+                let index_was_altered = alter_indexes.iter().any(|altered| altered.index_new_name == index.name);
+                if previous_index_opt.is_none() && !index_was_altered {
                     let create = CreateIndex {
                         table: next_table.name.clone(),
                         index: index.clone(),
@@ -174,7 +182,7 @@ impl<'a> DatabaseSchemaDiffer<'a> {
         result
     }
 
-    fn drop_indexes(&self) -> Vec<DropIndex> {
+    fn drop_indexes(&self, alter_indexes: &[AlterIndex]) -> Vec<DropIndex> {
         let mut result = Vec::new();
         for previous_table in &self.previous.tables {
             for index in &previous_table.indices {
@@ -184,7 +192,8 @@ impl<'a> DatabaseSchemaDiffer<'a> {
                     .table(&previous_table.name)
                     .ok()
                     .and_then(|t| t.indices.iter().find(|i| i.name == index.name));
-                if let None = next_index_opt {
+                let index_was_altered = alter_indexes.iter().any(|altered| altered.index_name == index.name);
+                if next_index_opt.is_none() && !index_was_altered {
                     // If index covers PK, ignore it
                     let index_covers_pk = match &previous_table.primary_key {
                         None => false,
@@ -208,4 +217,45 @@ impl<'a> DatabaseSchemaDiffer<'a> {
         }
         result
     }
+
+    /// An iterator over the tables that are present in both schemas. The yielded tuples should be interpreted as `(previous_table, next_table)`.
+    fn table_pairs(&self) -> impl Iterator<Item = (&Table, &Table)> {
+        self.previous.tables.iter().filter_map(move |previous_table| {
+            self.next
+                .tables
+                .iter()
+                .find(|next_table| next_table.name == previous_table.name)
+                .map(|next_table| (previous_table, next_table))
+        })
+    }
+
+    fn alter_indexes(&self) -> Vec<AlterIndex> {
+        self.table_pairs()
+            .flat_map(|(previous_table, next_table)| {
+                previous_table
+                    .indices
+                    .iter()
+                    .filter_map(move |previous_index| {
+                        next_table
+                            .indices
+                            .iter()
+                            .find(|next_index| {
+                                indexes_are_equivalent(previous_index, next_index)
+                                    && previous_index.name != next_index.name
+                            })
+                            .map(|renamed_index| (previous_index, renamed_index))
+                    })
+                    .map(move |(previous_index, renamed_index)| AlterIndex {
+                        index_name: previous_index.name.clone(),
+                        index_new_name: renamed_index.name.clone(),
+                        table: next_table.name.clone(),
+                    })
+            })
+            .collect()
+    }
+}
+
+/// Compare two SQL indexes and return whether they only differ by name.
+fn indexes_are_equivalent(first: &Index, second: &Index) -> bool {
+    first.columns == second.columns && first.tpe == second.tpe
 }

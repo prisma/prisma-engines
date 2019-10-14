@@ -23,16 +23,6 @@ impl<'a> Arguments<'a> {
         }
     }
 
-    /// Creates empty arguments. The vec is a dummy that needs to be handed in
-    /// due of the shape of the struct.
-    pub fn empty(vec: &'a [ast::Argument]) -> Self {
-        Arguments {
-            used_arguments: HashSet::new(),
-            arguments: vec,
-            span: ast::Span::empty(),
-        }
-    }
-
     /// Checks if arguments occur twice and returns an appropriate error list.
     pub fn check_for_duplicate_arguments(&self) -> Result<(), ErrorCollection> {
         let mut arg_names: HashSet<&'a str> = HashSet::new();
@@ -71,6 +61,13 @@ impl<'a> Arguments<'a> {
         match self.arg_internal(name) {
             None => Err(ValidationError::new_argument_not_found_error(name, self.span)),
             Some(arg) => value::ValueValidator::new(&arg.value),
+        }
+    }
+
+    pub fn optional_arg(&mut self, name: &str) -> Option<Result<value::ValueValidator, ValidationError>> {
+        match self.arg_internal(name) {
+            None => None,
+            Some(arg) => Some(value::ValueValidator::new(&arg.value)),
         }
     }
 

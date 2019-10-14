@@ -35,17 +35,17 @@ impl CliCommand {
                 BuildMode::Modern
             };
 
-            Some(CliCommand::Dmmf(build_mode))
+            Some(Self::Dmmf(build_mode))
         } else if matches.is_present("dmmf_to_dml") {
             let input = matches.value_of("dmmf_to_dml").unwrap();
             let input: DmmfToDmlInput = serde_json::from_str(input).unwrap();
 
-            Some(CliCommand::DmmfToDml(input))
+            Some(Self::DmmfToDml(input))
         } else if matches.is_present("get_config") {
             let input = matches.value_of("get_config").unwrap();
             let input: GetConfigInput = serde_json::from_str(input).unwrap();
 
-            Some(CliCommand::GetConfig(input))
+            Some(Self::GetConfig(input))
         } else {
             None
         }

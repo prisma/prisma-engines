@@ -10,6 +10,8 @@ const DATAMODEL_STRING: &str = r#"model User {
   profile   Profile?
 
   @@map("user")
+  @@unique([email, name])
+  @@unique([name, email])
 }
 
 model Profile {
@@ -21,7 +23,7 @@ model Profile {
 }
 
 model Post {
-  id         Int              @id
+  id         Int
   createdAt  DateTime
   updatedAt  DateTime
   title      String           @default("Default-Title")
@@ -30,6 +32,7 @@ model Post {
   published  Boolean          @default(false)
   categories PostToCategory[]
 
+  @@id([title, createdAt])
   @@map("post")
 }
 

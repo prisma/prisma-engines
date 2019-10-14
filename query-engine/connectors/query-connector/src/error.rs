@@ -105,6 +105,15 @@ pub enum ConnectorError {
 
     #[fail(display = "Database creation error: {}", _0)]
     DatabaseCreationError(&'static str),
+
+    #[fail(display = "Database '{}' does not exist.", db_name)]
+    DatabaseDoesNotExist { db_name: String },
+
+    #[fail(display = "Access denied to database '{}'", db_name)]
+    DatabaseAccessDenied { db_name: String },
+
+    #[fail(display = "Authentication failed for user '{}'", user)]
+    AuthenticationFailed { user: String },
 }
 
 impl From<DomainError> for ConnectorError {
