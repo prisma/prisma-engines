@@ -3,16 +3,18 @@ mod error;
 
 use crate::{
     ast::{Id, ParameterizedValue, Query},
-    connector::{metrics, queryable::*, ResultSet, Transaction},
+    connector::{metrics, queryable::*, ResultSet, Transaction, DBIO},
     error::Error,
     visitor::{self, Visitor},
 };
 use native_tls::{Certificate, Identity, TlsConnector};
 use percent_encoding::percent_decode;
 use std::{borrow::Borrow, convert::TryFrom, time::Duration};
-use tokio_postgres::config::SslMode;
-use tokio_postgres_native_tls::MakeTlsConnector;
+use tokio_postgres::{config::SslMode, Config, Client};
+use postgres_native_tls::MakeTlsConnector;
 use url::Url;
+use futures::future::FutureExt;
+use async_std::{sync::Mutex, fs};
 
 pub(crate) const DEFAULT_SCHEMA: &str = "public";
 
@@ -20,7 +22,7 @@ pub(crate) const DEFAULT_SCHEMA: &str = "public";
 #[derive(DebugStub)]
 pub struct PostgreSql {
     #[debug_stub = "postgres::Client"]
-    client: postgres::Client,
+    client: Mutex<Client>,
 }
 
 #[derive(DebugStub)]
@@ -28,7 +30,7 @@ pub struct PostgresParams {
     pub connection_limit: u32,
     pub dbname: String,
     pub schema: String,
-    pub config: postgres::Config,
+    pub config: Config,
     pub ssl_params: SslParams,
 }
 
@@ -38,13 +40,72 @@ pub enum SslAcceptMode {
     AcceptInvalidCerts,
 }
 
-#[derive(DebugStub)]
+#[derive(DebugStub, Clone)]
 pub struct SslParams {
-    #[debug_stub = "native_tls::Certificate"]
+    certificate_file: Option<String>,
+    identity_file: Option<String>,
+    #[debug_stub = "<HIDDEN>"]
+    identity_password: Option<String>,
+    ssl_accept_mode: SslAcceptMode,
+}
+
+#[derive(DebugStub)]
+struct SslAuth {
+    #[debug_stub = "<HIDDEN>"]
     certificate: Option<Certificate>,
-    #[debug_stub = "native_tls::Identity"]
+    #[debug_stub = "<HIDDEN>"]
     identity: Option<Identity>,
     ssl_accept_mode: SslAcceptMode,
+}
+
+impl Default for SslAuth {
+    fn default() -> Self {
+        Self {
+            certificate: None,
+            identity: None,
+            ssl_accept_mode: SslAcceptMode::AcceptInvalidCerts,
+        }
+    }
+}
+
+impl SslAuth {
+    fn certificate(&mut self, certificate: Certificate) -> &mut Self {
+        self.certificate = Some(certificate);
+        self
+    }
+
+    fn identity(&mut self, identity: Identity) -> &mut Self {
+        self.identity = Some(identity);
+        self
+    }
+
+    fn accept_mode(&mut self, mode: SslAcceptMode) -> &mut Self {
+        self.ssl_accept_mode = mode;
+        self
+    }
+
+}
+
+impl SslParams {
+    async fn into_auth(self) -> crate::Result<SslAuth> {
+        let mut auth = SslAuth::default();
+        auth.accept_mode(self.ssl_accept_mode);
+
+        if let Some(ref cert_file) = self.certificate_file {
+            let cert = fs::read(cert_file).await?;
+            auth.certificate(Certificate::from_pem(&cert)?);
+        }
+
+        if let Some(ref identity_file) = self.identity_file {
+            let db = fs::read(identity_file).await?;
+            let password = self.identity_password.as_ref().map(|s| s.as_str()).unwrap_or("");
+            let identity = Identity::from_pkcs12(&db, &password)?;
+
+            auth.identity(identity);
+        }
+
+        Ok(auth)
+    }
 }
 
 type ConnectionParams = (Vec<(String, String)>, Vec<(String, String)>);
@@ -68,7 +129,7 @@ impl TryFrom<Url> for PostgresParams {
             url.query_pairs_mut().append_pair(&k, &v);
         });
 
-        let mut config = postgres::Config::new();
+        let mut config = Config::new();
 
         match percent_decode(url.username().as_bytes()).decode_utf8() {
             Ok(username) => {
@@ -110,8 +171,8 @@ impl TryFrom<Url> for PostgresParams {
 
         let mut connection_limit = num_cpus::get_physical() * 2 + 1;
         let mut schema = String::from(DEFAULT_SCHEMA);
-        let mut certificate = None;
-        let mut identity_db = None;
+        let mut certificate_file = None;
+        let mut identity_file = None;
         let mut identity_password = None;
         let mut ssl_accept_mode = SslAcceptMode::Strict;
 
@@ -133,11 +194,10 @@ impl TryFrom<Url> for PostgresParams {
                     };
                 }
                 "sslcert" => {
-                    let cert = std::fs::read(v.as_str())?;
-                    certificate = Some(Certificate::from_pem(&cert)?);
+                    certificate_file = Some(v.to_string());
                 }
                 "sslidentity" => {
-                    identity_db = Some(std::fs::read(v.as_str())?);
+                    identity_file = Some(v.to_string());
                 }
                 "sslpassword" => {
                     identity_password = Some(v.to_string());
@@ -177,13 +237,6 @@ impl TryFrom<Url> for PostgresParams {
             };
         }
 
-        let mut identity = None;
-
-        if let Some(identity_db) = identity_db {
-            let password = identity_password.as_ref().map(|s| s.as_str()).unwrap_or("");
-            identity = Some(Identity::from_pkcs12(&identity_db, &password)?);
-        }
-
         Ok(Self {
             connection_limit: u32::try_from(connection_limit).unwrap(),
             schema,
@@ -191,143 +244,151 @@ impl TryFrom<Url> for PostgresParams {
             dbname: dbname.to_string(),
             ssl_params: SslParams {
                 ssl_accept_mode,
-                certificate,
-                identity,
+                certificate_file,
+                identity_file,
+                identity_password,
             },
         })
     }
 }
 
-impl TryFrom<Url> for PostgreSql {
-    type Error = Error;
-
-    fn try_from(url: Url) -> crate::Result<Self> {
-        let params = PostgresParams::try_from(url)?;
-        PostgreSql::from_params(params)
-    }
-}
-
-impl From<postgres::Client> for PostgreSql {
-    fn from(client: postgres::Client) -> Self {
-        Self { client }
-    }
-}
-
 impl PostgreSql {
-    pub fn new(
-        config: postgres::Config,
+    pub async fn new(
+        config: Config,
         schema: Option<String>,
         ssl_params: Option<SslParams>,
     ) -> crate::Result<Self> {
         let mut tls_builder = TlsConnector::builder();
 
         if let Some(params) = ssl_params {
-            if let Some(cert) = params.certificate {
-                tls_builder.add_root_certificate(cert);
+            let auth = params.into_auth().await?;
+
+            if let Some(certificate) = auth.certificate {
+                tls_builder.add_root_certificate(certificate);
             }
 
-            tls_builder.danger_accept_invalid_certs(params.ssl_accept_mode == SslAcceptMode::AcceptInvalidCerts);
+            tls_builder.danger_accept_invalid_certs(auth.ssl_accept_mode == SslAcceptMode::AcceptInvalidCerts);
 
-            if let Some(identity) = params.identity {
+            if let Some(identity) = auth.identity {
                 tls_builder.identity(identity);
             }
         };
 
         let tls = MakeTlsConnector::new(tls_builder.build()?);
+        let (client, conn) = config.connect(tls).await?;
+        tokio::spawn(conn.map(|r| r.unwrap()));
+
         let schema = schema.unwrap_or_else(|| String::from(DEFAULT_SCHEMA));
+        let path = format!("SET search_path = \"{}\"", schema);
+        client.execute(path.as_str(), &[]).await?;
 
-        let mut client = metrics::connect("postgres", || config.connect(tls))?;
-        client.execute(format!("SET search_path = \"{}\"", schema).as_str(), &[])?;
-
-        Ok(Self::from(client))
+        Ok(Self { client: Mutex::new(client) })
     }
 
-    pub fn from_params(params: PostgresParams) -> crate::Result<Self> {
+    pub async fn from_params(params: PostgresParams) -> crate::Result<Self> {
         Self::new(
             params.config,
             Some(params.schema),
             Some(params.ssl_params),
-        )
+        ).await
+    }
+
+    fn execute_and_get_id<'a>(&'a self, sql: &'a str, params: &'a [ParameterizedValue]) -> DBIO<'a, Option<Id>> {
+        metrics::query("postgres.execute", sql, params, move || {
+            async move {
+                let client = self.client.lock().await;
+                let stmt = client.prepare(sql).await?;
+                let rows = client.query(&stmt, conversion::conv_params(params).as_slice()).await?;
+
+                let id: Option<Id> = rows.into_iter().rev().next().map(|row| {
+                    let id: Id = row.get(0);
+                    id
+                });
+
+                Ok(id)
+            }
+        })
     }
 }
 
 impl Queryable for PostgreSql {
-    fn execute<'a>(&mut self, q: Query<'a>) -> crate::Result<Option<Id>> {
-        let (sql, params) = visitor::Postgres::build(q);
-
-        metrics::query("postgres.execute", &sql, &params, || {
-            let stmt = self.client.prepare(&sql)?;
-            let rows = self
-                .client
-                .query(&stmt, &conversion::conv_params(&params))?;
-
-            let id: Option<Id> = rows.into_iter().rev().next().map(|row| {
-                let id: Id = row.get(0);
-                id
-            });
-
-            Ok(id)
+    fn execute<'a>(&'a self, q: Query<'a>) -> DBIO<'a, Option<Id>> {
+        DBIO::new(async move {
+            let (sql, params) = visitor::Postgres::build(q);
+            self.execute_and_get_id(&sql, &params).await
         })
     }
 
-    fn query<'a>(&mut self, q: Query<'a>) -> crate::Result<ResultSet> {
+    fn query<'a>(&'a self, q: Query<'a>) -> DBIO<'a, ResultSet> {
         let (sql, params) = visitor::Postgres::build(q);
-        self.query_raw(sql.as_str(), &params[..])
+
+        DBIO::new(async move {
+            self.query_raw(sql.as_str(), &params[..]).await
+        })
     }
 
     fn query_raw<'a>(
-        &mut self,
-        sql: &str,
-        params: &[ParameterizedValue<'a>],
-    ) -> crate::Result<ResultSet> {
-        metrics::query("postgres.query_raw", sql, params, || {
-            let stmt = self.client.prepare(sql)?;
-            let rows = self.client.query(&stmt, &conversion::conv_params(params))?;
+        &'a self,
+        sql: &'a str,
+        params: &'a [ParameterizedValue],
+    ) -> DBIO<'a, ResultSet> {
+        metrics::query("postgres.query_raw", sql, params, move || {
+            async move {
+                let client = self.client.lock().await;
+                let stmt = client.prepare(sql).await?;
+                let rows = client.query(&stmt, conversion::conv_params(params).as_slice()).await?;
 
-            let mut result = ResultSet::new(stmt.to_column_names(), Vec::new());
+                let mut result = ResultSet::new(stmt.to_column_names(), Vec::new());
 
-            for row in rows {
-                result.rows.push(row.to_result_row()?);
+                for row in rows {
+                    result.rows.push(row.to_result_row()?);
+                }
+
+                Ok(result)
             }
-
-            Ok(result)
         })
     }
 
-    fn execute_raw<'a>(
-        &mut self,
-        sql: &str,
-        params: &[ParameterizedValue<'a>],
-    ) -> crate::Result<u64> {
-        metrics::query("postgres.execute_raw", sql, params, || {
-            let stmt = self.client.prepare(sql)?;
+    fn execute_raw<'a>(&'a self, sql: &'a str, params: &'a [ParameterizedValue]) -> DBIO<'a, u64> {
+        metrics::query("postgres.execute_raw", sql, params, move || {
+            async move {
+                let client = self.client.lock().await;
+                let stmt = client.prepare(sql).await?;
+                let changes = client.execute(&stmt, conversion::conv_params(params).as_slice()).await?;
 
-            let changes = self
-                .client
-                .execute(&stmt, &conversion::conv_params(params))?;
-
-            Ok(changes)
+                Ok(changes)
+            }
         })
     }
 
-    fn turn_off_fk_constraints(&mut self) -> crate::Result<()> {
-        self.query_raw("SET CONSTRAINTS ALL DEFERRED", &[])?;
-        Ok(())
-    }
-
-    fn turn_on_fk_constraints(&mut self) -> crate::Result<()> {
-        self.query_raw("SET CONSTRAINTS ALL IMMEDIATE", &[])?;
-        Ok(())
-    }
-
-    fn start_transaction<'b>(&'b mut self) -> crate::Result<Transaction<'b>> {
-        Ok(Transaction::new(self)?)
-    }
-
-    fn raw_cmd(&mut self, cmd: &str) -> crate::Result<()> {
-        metrics::query("postgres.raw_cmd", cmd, &[], || {
-            self.client.simple_query(cmd)?;
+    fn turn_off_fk_constraints<'a>(&'a self) -> DBIO<'a, ()> {
+        DBIO::new(async move {
+            self.query_raw("SET CONSTRAINTS ALL DEFERRED", &[]).await?;
             Ok(())
+        })
+    }
+
+    fn turn_on_fk_constraints<'a>(&'a self) -> DBIO<'a, ()> {
+        DBIO::new(async move {
+            self.query_raw("SET CONSTRAINTS ALL IMMEDIATE", &[]).await?;
+            Ok(())
+        })
+    }
+
+    fn start_transaction<'b>(&'b self) -> DBIO<'b, Transaction<'b>> {
+        DBIO::new(async move {
+            Transaction::new(self).await
+        })
+    }
+
+    fn raw_cmd<'a>(&'a self, cmd: &'a str) -> DBIO<'a, ()> {
+        metrics::query("postgres.raw_cmd", cmd, &[], move || {
+            async move {
+                let client = self.client.lock().await;
+                client.simple_query(cmd).await?;
+
+                Ok(())
+            }
         })
     }
 }
@@ -337,6 +398,7 @@ mod tests {
     use super::*;
     use crate::connector::Queryable;
     use std::env;
+    use tokio_postgres as postgres;
 
     #[allow(unused)]
     fn get_config() -> postgres::Config {
@@ -349,31 +411,33 @@ mod tests {
         config
     }
 
-    #[test]
-    fn should_provide_a_database_connection() {
-        let mut connection = PostgreSql::new(get_config(), None, None).unwrap();
+    #[tokio::test]
+    async fn should_provide_a_database_connection() {
+        let connection = PostgreSql::new(get_config(), None, None).await.unwrap();
 
         let res = connection
             .query_raw(
                 "select * from \"pg_catalog\".\"pg_am\" where amtype = 'x'",
                 &[],
             )
+            .await
             .unwrap();
 
         // No results expected.
         assert!(res.is_empty());
     }
 
-    #[test]
-    fn should_provide_a_database_transaction() {
-        let mut connection = PostgreSql::new(get_config(), None, None).unwrap();
-        let mut tx = connection.start_transaction().unwrap();
+    #[tokio::test]
+    async fn should_provide_a_database_transaction() {
+        let connection = PostgreSql::new(get_config(), None, None).await.unwrap();
+        let tx = connection.start_transaction().await.unwrap();
 
         let res = tx
             .query_raw(
                 "select * from \"pg_catalog\".\"pg_am\" where amtype = 'x'",
                 &[],
             )
+            .await
             .unwrap();
 
         assert!(res.is_empty());
@@ -398,14 +462,14 @@ mod tests {
     #[allow(unused)]
     const DROP_TABLE: &str = "DROP TABLE IF EXISTS \"user\";";
 
-    #[test]
-    fn should_map_columns_correctly() {
-        let mut connection = PostgreSql::new(get_config(), None, None).unwrap();
-        connection.query_raw(DROP_TABLE, &[]).unwrap();
-        connection.query_raw(TABLE_DEF, &[]).unwrap();
-        connection.query_raw(CREATE_USER, &[]).unwrap();
+    #[tokio::test]
+    async fn should_map_columns_correctly() {
+        let connection = PostgreSql::new(get_config(), None, None).await.unwrap();
+        connection.query_raw(DROP_TABLE, &[]).await.unwrap();
+        connection.query_raw(TABLE_DEF, &[]).await.unwrap();
+        connection.query_raw(CREATE_USER, &[]).await.unwrap();
 
-        let rows = connection.query_raw("SELECT * FROM \"user\"", &[]).unwrap();
+        let rows = connection.query_raw("SELECT * FROM \"user\"", &[]).await.unwrap();
         assert_eq!(rows.len(), 1);
 
         let row = rows.get(0).unwrap();
@@ -416,8 +480,8 @@ mod tests {
         assert_eq!(row["salary"].as_f64(), Some(20000.0));
     }
 
-    #[test]
-    fn test_custom_search_path() {
+    #[tokio::test]
+    async fn test_custom_search_path() {
         let conn_string = format!(
             "postgresql://{}:{}@{}:{}/{}?schema=musti-test",
             env::var("TEST_PG_USER").unwrap(),
@@ -428,20 +492,21 @@ mod tests {
         );
 
         let url = Url::parse(&conn_string).unwrap();
-        let mut client = PostgreSql::try_from(url).unwrap();
+        let params = PostgresParams::try_from(url).unwrap();
+        let client = PostgreSql::new(params.config, Some(params.schema), Some(params.ssl_params)).await.unwrap();
 
-        let result_set = client.query_raw("SHOW search_path", &[]).unwrap();
+        let result_set = client.query_raw("SHOW search_path", &[]).await.unwrap();
         let row = result_set.first().unwrap();
 
         assert_eq!(Some("\"musti-test\""), row[0].as_str());
     }
 
-    #[test]
-    fn should_map_nonexisting_database_error() {
+    #[tokio::test]
+    async fn should_map_nonexisting_database_error() {
         let mut config = get_config();
         config.dbname("this_does_not_exist");
 
-        let res = PostgreSql::new(config, None, None);
+        let res = PostgreSql::new(config, None, None).await;
 
         assert!(res.is_err());
 
@@ -451,70 +516,6 @@ mod tests {
             }
             e => panic!("Expected `DatabaseDoesNotExist`, got {:?}", e),
         }
-    }
-
-    #[test]
-    fn should_map_authentication_failed_error() {
-        let mut admin = PostgreSql::new(get_config(), None, None).unwrap();
-        admin
-            .execute_raw(
-                "CREATE USER should_map_access_denied_test with password 'password'",
-                &[],
-            )
-            .unwrap();
-
-        let res = std::panic::catch_unwind(|| {
-            let mut config = get_config();
-            config.user("should_map_access_denied_test");
-            config.password("catword");
-
-            let conn = PostgreSql::new(config, None, None);
-
-            assert!(conn.is_err());
-
-            match conn.unwrap_err() {
-                Error::AuthenticationFailed { user } => {
-                    assert_eq!("should_map_access_denied_test", user.as_str())
-                }
-                e => panic!("Expected `AuthenticationFailed`, got {:?}", e),
-            }
-        });
-
-        admin
-            .execute_raw("DROP USER should_map_access_denied_test", &[])
-            .unwrap();
-        res.unwrap();
-    }
-
-    #[test]
-    fn should_map_database_already_exists_error() {
-        let mut admin = PostgreSql::new(get_config(), None, None).unwrap();
-
-        admin
-            .execute_raw("CREATE DATABASE should_map_if_database_already_exists", &[])
-            .unwrap();
-
-        let res = std::panic::catch_unwind(|| {
-            let mut admin = PostgreSql::new(get_config(), None, None).unwrap();
-
-            let res =
-                admin.execute_raw("CREATE DATABASE should_map_if_database_already_exists", &[]);
-
-            assert!(res.is_err());
-
-            match res.unwrap_err() {
-                Error::DatabaseAlreadyExists { db_name } => {
-                    assert_eq!("should_map_if_database_already_exists", db_name.as_str())
-                }
-                e => panic!("Expected `DatabaseAlreadyExists`, got {:?}", e),
-            }
-        });
-
-        admin
-            .execute_raw("DROP DATABASE should_map_if_database_already_exists", &[])
-            .unwrap();
-
-        res.unwrap();
     }
 
     #[test]

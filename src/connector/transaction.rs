@@ -7,75 +7,71 @@ use crate::ast::*;
 /// Currently does not support nesting, so starting a new transaction using the
 /// transaction object will panic.
 pub struct Transaction<'a> {
-    pub(crate) inner: &'a mut dyn Queryable,
+    pub(crate) inner: &'a dyn Queryable,
     done: bool,
 }
 
 impl<'a> Transaction<'a> {
-    pub(crate) fn new(inner: &'a mut dyn Queryable) -> crate::Result<Self> {
-        inner.raw_cmd("BEGIN")?;
+    pub(crate) async fn new(inner: &'a dyn Queryable) -> crate::Result<Transaction<'a>> {
+        inner.raw_cmd("BEGIN").await?;
         Ok(Self { inner, done: false })
     }
 
     /// Commit the changes to the database and consume the transaction.
-    pub fn commit(mut self) -> crate::Result<()> {
+    pub async fn commit(mut self) -> crate::Result<()> {
         self.done = true;
-        self.inner.raw_cmd("COMMIT")?;
+        self.inner.raw_cmd("COMMIT").await?;
 
         Ok(())
     }
 
     /// Rolls back the changes to the database.
-    pub fn rollback(&mut self) -> crate::Result<()> {
+    pub async fn rollback(&mut self) -> crate::Result<()> {
         self.done = true;
-        self.inner.raw_cmd("ROLLBACK")?;
+        self.inner.raw_cmd("ROLLBACK").await?;
 
         Ok(())
     }
-}
 
-impl<'a> Drop for Transaction<'a> {
-    fn drop(&mut self) {
-        if !self.done {
-            let _ = self.rollback();
-        }
+    pub fn is_done(&self) -> bool {
+        self.done
     }
 }
 
 impl<'a> Queryable for Transaction<'a> {
-    fn execute(&mut self, q: Query) -> crate::Result<Option<Id>> {
+    fn execute<'b>(&'b self, q: Query<'b>) -> DBIO<'b, Option<Id>> {
         self.inner.execute(q)
     }
 
-    fn query(&mut self, q: Query) -> crate::Result<ResultSet> {
+    fn query<'b>(&'b self, q: Query<'b>) -> DBIO<'b, ResultSet> {
         self.inner.query(q)
     }
 
-    fn query_raw(&mut self, sql: &str, params: &[ParameterizedValue]) -> crate::Result<ResultSet> {
+    fn query_raw<'b>(&'b self, sql: &'b str, params: &'b [ParameterizedValue]) -> DBIO<'b, ResultSet> {
         self.inner.query_raw(sql, params)
     }
 
-    fn execute_raw(&mut self, sql: &str, params: &[ParameterizedValue]) -> crate::Result<u64> {
+    fn execute_raw<'b>(&'b self, sql: &'b str, params: &'b [ParameterizedValue]) -> DBIO<'b, u64> {
         self.inner.execute_raw(sql, params)
     }
 
-    fn turn_off_fk_constraints(&mut self) -> crate::Result<()> {
+    fn turn_off_fk_constraints<'b>(&'b self) -> DBIO<'b, ()> {
         self.inner.turn_off_fk_constraints()
     }
 
-    fn turn_on_fk_constraints(&mut self) -> crate::Result<()> {
+    fn turn_on_fk_constraints<'b>(&'b self) -> DBIO<'b, ()> {
         self.inner.turn_on_fk_constraints()
     }
 
-    fn empty_tables(&mut self, tables: Vec<Table>) -> crate::Result<()> {
+    fn empty_tables<'b>(&'b self, tables: Vec<Table<'b>>) -> DBIO<'b, ()> {
         self.inner.empty_tables(tables)
     }
 
-    fn start_transaction<'b>(&'b mut self) -> crate::Result<Transaction<'b>> {
+    fn start_transaction<'b>(&'b self) -> DBIO<'b, Transaction<'b>> {
         panic!("Nested transactions are not supported")
     }
 
-    fn raw_cmd(&mut self, cmd: &str) -> crate::Result<()> {
+    fn raw_cmd<'b>(&'b self, cmd: &'b str) -> DBIO<'b, ()> {
         self.inner.raw_cmd(cmd)
     }
 }

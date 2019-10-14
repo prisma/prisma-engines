@@ -89,23 +89,19 @@
 //! ```
 pub mod ast;
 #[cfg(any(
-    feature = "mysql-16",
-    feature = "postgresql-0_16",
-    feature = "rusqlite-0_19"
+    feature = "mysql",
+    feature = "postgresql",
+    feature = "sqlite"
 ))]
 pub mod connector;
 pub mod error;
+
 #[cfg(any(
-    feature = "mysql-16",
-    feature = "postgresql-0_16",
-    feature = "rusqlite-0_19"
+    feature = "mysql",
+    feature = "postgresql",
+    feature = "sqlite"
 ))]
 pub mod pool;
-#[cfg(any(
-    feature = "mysql-16",
-    feature = "postgresql-0_16",
-    feature = "rusqlite-0_19"
-))]
 pub mod visitor;
 
 #[cfg(not(feature = "tracing-log"))]

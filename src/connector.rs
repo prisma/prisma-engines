@@ -11,26 +11,24 @@ mod queryable;
 mod result_set;
 mod transaction;
 
-pub(crate) mod metrics;
+mod dbio;
 
-#[cfg(feature = "mysql-16")]
+#[cfg(feature = "mysql")]
 pub(crate) mod mysql;
-
-#[cfg(feature = "postgresql-0_16")]
+#[cfg(feature = "postgresql")]
 pub(crate) mod postgres;
-
-#[cfg(feature = "rusqlite-0_19")]
+#[cfg(feature = "sqlite")]
 pub(crate) mod sqlite;
 
-#[cfg(feature = "mysql-16")]
+#[cfg(feature = "mysql")]
 pub use self::mysql::*;
-
-#[cfg(feature = "postgresql-0_16")]
+#[cfg(feature = "postgresql")]
 pub use self::postgres::*;
-
-#[cfg(feature = "rusqlite-0_19")]
+#[cfg(feature = "sqlite")]
 pub use sqlite::*;
 
+pub(crate) mod metrics;
 pub use self::result_set::*;
 pub use queryable::*;
+pub use dbio::DBIO;
 pub use transaction::*;

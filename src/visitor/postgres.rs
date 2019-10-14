@@ -1,8 +1,9 @@
 use crate::{ast::*, visitor::Visitor};
-use postgres::types::{IsNull, Type};
+use tokio_postgres::types::{IsNull, Type};
 use rust_decimal::Decimal;
 use std::{error::Error, str::FromStr};
 use tokio_postgres::types::ToSql;
+use bytes::BytesMut;
 
 /// A visitor to generate queries for the PostgreSQL database.
 ///
@@ -110,7 +111,7 @@ impl<'a> ToSql for ParameterizedValue<'a> {
     fn to_sql(
         &self,
         ty: &Type,
-        out: &mut Vec<u8>,
+        out: &mut BytesMut,
     ) -> Result<IsNull, Box<dyn Error + 'static + Send + Sync>> {
         match self {
             ParameterizedValue::Null => Ok(IsNull::Yes),
@@ -147,7 +148,7 @@ impl<'a> ToSql for ParameterizedValue<'a> {
     fn to_sql_checked(
         &self,
         ty: &Type,
-        out: &mut Vec<u8>,
+        out: &mut BytesMut,
     ) -> Result<IsNull, Box<dyn Error + 'static + Send + Sync>> {
         match self {
             ParameterizedValue::Null => Ok(IsNull::Yes),

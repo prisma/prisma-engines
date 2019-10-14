@@ -1,105 +1,36 @@
-//! Support for the `r2d2` connection pool.
+#[cfg(feature = "mysql")]
+mod mysql;
+#[cfg(feature = "postgresql")]
+mod postgres;
+#[cfg(feature = "sqlite")]
+mod sqlite;
 
-#[cfg(feature = "mysql-16")]
-pub mod mysql;
+pub use mysql::MysqlManager;
+pub use postgres::PostgresManager;
+pub use sqlite::SqliteManager;
 
-#[cfg(feature = "postgresql-0_16")]
-pub mod postgres;
+use crate::connector::{SqliteParams, PostgresParams, MysqlParams};
+use tokio_resource_pool::{Pool, Builder};
+use std::convert::TryFrom;
+use url::Url;
 
-#[cfg(feature = "rusqlite-0_19")]
-pub mod sqlite;
+pub fn sqlite(path: &str) -> crate::Result<Pool<SqliteManager>> {
+    let params = SqliteParams::try_from(path)?;
+    let manager = SqliteManager::new(params.file_path);
 
-use std::path::PathBuf;
+    Ok(Builder::new().build(params.connection_limit as usize, manager))
+}
 
-/// An `r2d2::ManageConnection` for all of the connectors supported by
-/// prisma-query.
-///
-/// ## Sqlite
-///
-/// ```no_run
-/// use prisma_query::connector::Queryable;
-/// use prisma_query::ast::*;
-/// use prisma_query::pool::PrismaConnectionManager;
-/// use std::thread;
-///
-/// fn main() {
-///     let manager = PrismaConnectionManager::sqlite(None, "db/test.db").unwrap();
-///     let pool = r2d2::Pool::new(manager).unwrap();
-///
-///     for i in 0..10i32 {
-///         let pool = pool.clone();
-///         thread::spawn(move || {
-///             let mut client = pool.get().unwrap();
-///             let insert = Insert::single_into("foo").value("key", i);
-///
-///             client.execute(Query::from(insert)).unwrap();
-///         });
-///     }
-/// }
-/// ```
-///
-/// ## PostgreSQL
-///
-/// ```no_run
-/// use prisma_query::connector::Queryable;
-/// use prisma_query::ast::*;
-/// use prisma_query::pool::PrismaConnectionManager;
-/// use postgres::Client;
-/// use std::{thread, convert::TryFrom};
-///
-/// fn main() {
-///     let mut config = Client::configure();
-///     config.host("localhost");
-///     config.user("root");
-///
-///     let manager = PrismaConnectionManager::postgres(config, None).unwrap();
-///     let pool = r2d2::Pool::new(manager).unwrap();
-///
-///     for i in 0..10i32 {
-///         let pool = pool.clone();
-///         thread::spawn(move || {
-///             let mut client = pool.get().unwrap();
-///             let insert = Insert::single_into("foo").value("key", i);
-///
-///             client.execute(Query::from(insert)).unwrap();
-///         });
-///     }
-/// }
-/// ```
-///
-/// ## MySQL
-///
-/// ```no_run
-/// use prisma_query::connector::Queryable;
-/// use prisma_query::ast::*;
-/// use prisma_query::pool::PrismaConnectionManager;
-/// use mysql::OptsBuilder;
-/// use std::{thread, convert::TryFrom};
-///
-/// fn main() {
-///     let mut opts = OptsBuilder::new();
-///     opts.ip_or_hostname(Some("localhost"));
-///     opts.user(Some("root"));
-///
-///     let manager = PrismaConnectionManager::mysql(opts);
-///     let pool = r2d2::Pool::new(manager).unwrap();
-///
-///     for i in 0..10i32 {
-///         let pool = pool.clone();
-///         thread::spawn(move || {
-///             let mut client = pool.get().unwrap();
-///             let insert = Insert::single_into("foo").value("key", i);
-///
-///             client.execute(Query::from(insert)).unwrap();
-///         });
-///     }
-/// }
-/// ```
-pub struct PrismaConnectionManager<Inner>
-where
-    Inner: r2d2::ManageConnection,
-{
-    inner: Inner,
-    file_path: Option<PathBuf>,
-    schema: Option<String>,
+pub fn postgres(url: Url) -> crate::Result<Pool<PostgresManager>> {
+    let params = PostgresParams::try_from(url)?;
+    let manager = PostgresManager::new(params.config, Some(params.schema), Some(params.ssl_params));
+
+    Ok(Builder::new().build(params.connection_limit as usize, manager))
+}
+
+pub fn mysql(url: Url) -> crate::Result<Pool<MysqlManager>> {
+    let params = MysqlParams::try_from(url)?;
+    let manager = MysqlManager::new(params.config);
+
+    Ok(Builder::new().build(params.connection_limit as usize, manager))
 }

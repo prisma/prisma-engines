@@ -1,18 +1,13 @@
 use crate::error::Error;
-use mysql as my;
+use mysql_async as my;
 
 impl From<my::error::Error> for Error {
     fn from(e: my::error::Error) -> Error {
-        use my::error::MySqlError;
-        use my::error::DriverError;
+        use my::error::ServerError;
 
         match e {
-            my::error::Error::DriverError(e) => match e {
-                DriverError::ConnectTimeout => Error::ConnectTimeout,
-                DriverError::Timeout => Error::Timeout,
-                _ => Error::QueryError(e.into())
-            },
-            my::error::Error::MySqlError(MySqlError {
+            my::error::Error::Driver(e) => Error::QueryError(e.into()),
+            my::error::Error::Server(ServerError {
                 ref message, code, ..
             }) if code == 1062 => {
                 let splitted: Vec<&str> = message.split_whitespace().collect();
@@ -23,7 +18,7 @@ impl From<my::error::Error> for Error {
 
                 Error::UniqueConstraintViolation { field_name }
             }
-            my::error::Error::MySqlError(MySqlError {
+            my::error::Error::Server(ServerError {
                 ref message, code, ..
             }) if code == 1263 => {
                 let splitted: Vec<&str> = message.split_whitespace().collect();
@@ -34,7 +29,7 @@ impl From<my::error::Error> for Error {
 
                 Error::NullConstraintViolation { field_name }
             }
-            my::error::Error::MySqlError(MySqlError {
+            my::error::Error::Server(ServerError {
                 ref message, code, ..
             }) if code == 1049 => {
                 let splitted: Vec<&str> = message.split_whitespace().collect();
@@ -43,7 +38,7 @@ impl From<my::error::Error> for Error {
 
                 Error::DatabaseDoesNotExist { db_name }
             }
-            my::error::Error::MySqlError(MySqlError {
+            my::error::Error::Server(ServerError {
                 ref message, code, ..
             }) if code == 1007 => {
                 let splitted: Vec<&str> = message.split_whitespace().collect();
@@ -52,7 +47,7 @@ impl From<my::error::Error> for Error {
 
                 Error::DatabaseAlreadyExists { db_name }
             }
-            my::error::Error::MySqlError(MySqlError {
+            my::error::Error::Server(ServerError {
                 ref message, code, ..
             }) if code == 1044 => {
                 let splitted: Vec<&str> = message.split_whitespace().collect();
@@ -61,7 +56,7 @@ impl From<my::error::Error> for Error {
 
                 Error::DatabaseAccessDenied { db_name }
             }
-            my::error::Error::MySqlError(MySqlError {
+            my::error::Error::Server(ServerError {
                 ref message, code, ..
             }) if code == 1045 => {
                 let splitted: Vec<&str> = message.split_whitespace().collect();
