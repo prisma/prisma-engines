@@ -1,5 +1,6 @@
 use super::common::*;
 use crate::{ast, common::names::*, configuration, dml, error::ErrorCollection, OnDeleteStrategy};
+use prisma_inflector;
 
 /// Helper for standardsing a datamodel.
 ///
@@ -244,7 +245,6 @@ impl Standardiser {
                 let source_field = source_model
                     .find_field(&missing_back_relation_field.related_field)
                     .expect(STATE_ERROR);
-
                 errors.push(field_validation_error(
                                 "Automatic related field generation would cause a naming conflict. Please add an explicit opposite relation field.",
                                 &source_model,
@@ -256,10 +256,13 @@ impl Standardiser {
                     .find_model_mut(&missing_back_relation_field.model)
                     .expect(STATE_ERROR);
 
-                model_mut.add_field(dml::Field::new_generated(
+                let mut back_relation_field = dml::Field::new_generated(
                     &field_name,
                     dml::FieldType::Relation(missing_back_relation_field.relation_info),
-                ));
+                );
+                back_relation_field.arity = missing_back_relation_field.arity;
+
+                model_mut.add_field(back_relation_field);
             }
         }
 
@@ -295,11 +298,20 @@ impl Standardiser {
                         name: rel.name.clone(),
                         on_delete: OnDeleteStrategy::None,
                     };
-                    let field_name = model.name.camel_case();
+
+                    let (arity, field_name) = if field.arity.is_singular() {
+                        (
+                            dml::FieldArity::List,
+                            prisma_inflector::classical().pluralize(&model.name).camel_case(),
+                        )
+                    } else {
+                        (dml::FieldArity::Optional, model.name.camel_case())
+                    };
 
                     result.push(AddMissingBackRelationField {
                         model: rel.to.clone(),
                         field: field_name,
+                        arity,
                         relation_info,
                         related_model: model.name.to_string(),
                         related_field: field.name.to_string(),
@@ -378,6 +390,7 @@ impl Standardiser {
 struct AddMissingBackRelationField {
     model: String,
     field: String,
+    arity: dml::FieldArity,
     relation_info: dml::RelationInfo,
     related_model: String,
     related_field: String,
