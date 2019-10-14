@@ -7,7 +7,7 @@ mod datamodel;
 mod enummodel;
 mod field;
 mod id;
-mod model;
+pub mod model;
 mod relation;
 mod scalar;
 mod traits;
