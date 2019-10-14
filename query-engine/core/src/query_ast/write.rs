@@ -52,7 +52,8 @@ impl std::fmt::Display for WriteQuery {
             Self::CreateRecord(q) => write!(f, "CreateRecord: {}", q.model.name),
             Self::UpdateRecord(q) => write!(
                 f,
-                "UpdateRecord(model: {:?}, non-list-args: {:?}, list_args: {:?})",
+                "UpdateRecord(model: {}, finder: {:?}, non-list-args: {:?}, list_args: {:?})",
+                q.model.name,
                 q.where_.as_ref().map(|finder| format!(
                     "{}, {} = {:?}",
                     finder.field.model().name,
