@@ -1,7 +1,8 @@
 use crate::common::*;
+use datamodel::FieldArity;
 
 #[test]
-fn should_add_back_relations() {
+fn must_add_back_relation_fields_for_given_list_field() {
     let dml = r#"
     model User {
         id Int @id
@@ -14,17 +15,48 @@ fn should_add_back_relations() {
     "#;
 
     let schema = parse(dml);
+
+    let user_model = schema.assert_has_model("User");
+    user_model
+        .assert_has_field("posts")
+        .assert_relation_to("Post")
+        .assert_relation_to_fields(&[])
+        .assert_arity(&datamodel::dml::FieldArity::List);
+
     let post_model = schema.assert_has_model("Post");
     post_model
         .assert_has_field("user")
         .assert_relation_to("User")
         .assert_relation_to_fields(&["id"])
         .assert_arity(&datamodel::dml::FieldArity::Optional);
+}
+
+#[test]
+fn must_add_back_relation_fields_for_given_singular_field() {
+    let dml = r#"
+    model User {
+        id   Int @id
+        post Post
+    }
+
+    model Post {
+        post_id Int @id
+    }
+    "#;
+
+    let schema = dbg!(parse(dml));
 
     let user_model = schema.assert_has_model("User");
     user_model
-        .assert_has_field("posts")
+        .assert_has_field("post")
         .assert_relation_to("Post")
+        .assert_relation_to_fields(&["post_id"])
+        .assert_arity(&datamodel::dml::FieldArity::Required);
+
+    let post_model = schema.assert_has_model("Post");
+    post_model
+        .assert_has_field("users")
+        .assert_relation_to("User")
         .assert_relation_to_fields(&[])
         .assert_arity(&datamodel::dml::FieldArity::List);
 }
@@ -78,7 +110,7 @@ fn must_add_to_fields_on_the_right_side_for_one_to_one_relations() {
 }
 
 #[test]
-fn must_add_to_fields_correctly_for_implicit_back_relations_for_one_to_one_relations() {
+fn must_add_to_fields_correctly_for_one_to_one_relations() {
     // Post is lower that User. So the to_fields should be stored in Post.
     let dml = r#"
     model User {
@@ -87,7 +119,8 @@ fn must_add_to_fields_correctly_for_implicit_back_relations_for_one_to_one_relat
     }
 
     model Post {
-        post_id Int @id
+        post_id Int  @id
+        user    User
     }
     "#;
 
@@ -421,7 +454,7 @@ fn should_camel_case_back_relation_field_name() {
 }
 
 #[test]
-fn should_add_self_back_relation_fields_on_defined_side() {
+fn must_add_back_relation_fields_for_self_relations() {
     let dml = r#"
     model Human {
         id Int @id
@@ -434,12 +467,14 @@ fn should_add_self_back_relation_fields_on_defined_side() {
     model
         .assert_has_field("son")
         .assert_relation_to("Human")
-        .assert_relation_to_fields(&[]);
+        .assert_arity(&FieldArity::Optional)
+        .assert_relation_to_fields(&["id"]);
 
     model
-        .assert_has_field("human")
+        .assert_has_field("humans")
         .assert_relation_to("Human")
-        .assert_relation_to_fields(&["id"]);
+        .assert_arity(&FieldArity::List)
+        .assert_relation_to_fields(&[]);
 }
 
 #[test]

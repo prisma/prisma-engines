@@ -11,6 +11,12 @@ pub enum FieldArity {
     List,
 }
 
+impl FieldArity {
+    pub fn is_singular(&self) -> bool {
+        self == &FieldArity::Required || self == &FieldArity::Optional
+    }
+}
+
 /// Datamodel field type.
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
 pub enum FieldType {

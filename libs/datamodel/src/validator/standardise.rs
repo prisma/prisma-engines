@@ -1,5 +1,6 @@
 use super::common::*;
-use crate::{ast, common::names::*, configuration, dml, error::ErrorCollection};
+use crate::{ast, common::names::*, configuration, dml, error::ErrorCollection, OnDeleteStrategy};
+use prisma_inflector;
 
 /// Helper for standardsing a datamodel.
 ///
@@ -225,36 +226,44 @@ impl Standardiser {
         schema: &mut dml::Datamodel,
     ) -> Result<(), ErrorCollection> {
         let mut errors = ErrorCollection::new();
-        let mut missing_back_relations = Vec::new();
 
-        for model in schema.models() {
-            match &mut self.find_fields_with_missing_back_relation(model, ast_schema, schema) {
-                Ok(missing) => missing_back_relations.append(missing),
-                Err(errs) => errors.append(errs),
-            }
+        let mut missing_back_relation_fields = Vec::new();
+        for model in &schema.models {
+            missing_back_relation_fields.append(&mut self.find_missing_back_relation_fields(&model, schema));
         }
 
-        for (forward, backward) in missing_back_relations {
-            let model = schema.find_model(&forward.to).expect(STATE_ERROR);
-            let name = backward.to.camel_case();
+        for missing_back_relation_field in missing_back_relation_fields {
+            let model = schema
+                .find_model(&missing_back_relation_field.model)
+                .expect(STATE_ERROR);
+            let field_name = missing_back_relation_field.field;
 
-            if model.find_field(&name).is_some() {
-                let source_model = schema.find_model(&backward.to).expect(STATE_ERROR);
+            if model.find_field(&field_name).is_some() {
+                let source_model = schema
+                    .find_model(&missing_back_relation_field.related_model)
+                    .expect(STATE_ERROR);
                 let source_field = source_model
-                    .related_field(&forward.to, &forward.name, "")
+                    .find_field(&missing_back_relation_field.related_field)
+                    .expect(STATE_ERROR);
+                errors.push(field_validation_error(
+                                "Automatic related field generation would cause a naming conflict. Please add an explicit opposite relation field.",
+                                &source_model,
+                                &source_field,
+                                &ast_schema,
+                            ));
+            } else {
+                let model_mut = schema
+                    .find_model_mut(&missing_back_relation_field.model)
                     .expect(STATE_ERROR);
 
-                errors.push(field_validation_error(
-                    "Automatic opposite related field generation would cause a naming conflict. Please add an explicit opposite relation field.",
-                    &source_model,
-                    &source_field,
-                    &ast_schema,
-                ));
+                let mut back_relation_field = dml::Field::new_generated(
+                    &field_name,
+                    dml::FieldType::Relation(missing_back_relation_field.relation_info),
+                );
+                back_relation_field.arity = missing_back_relation_field.arity;
+
+                model_mut.add_field(back_relation_field);
             }
-
-            let model = schema.find_model_mut(&forward.to).expect(STATE_ERROR);
-
-            model.add_field(dml::Field::new_generated(&name, dml::FieldType::Relation(backward)));
         }
 
         if errors.has_errors() {
@@ -264,17 +273,12 @@ impl Standardiser {
         }
     }
 
-    /// Finds all fields which have a missing back relation.
-    /// Returns a tuple of (forward_relation, back_relation)
-    fn find_fields_with_missing_back_relation(
+    fn find_missing_back_relation_fields(
         &self,
         model: &dml::Model,
-        ast_schema: &ast::SchemaAst,
         schema: &dml::Datamodel,
-    ) -> Result<Vec<(dml::RelationInfo, dml::RelationInfo)>, ErrorCollection> {
-        let mut fields: Vec<(dml::RelationInfo, dml::RelationInfo)> = Vec::new();
-        let mut errors = ErrorCollection::new();
-
+    ) -> Vec<AddMissingBackRelationField> {
+        let mut result = Vec::new();
         for field in model.fields() {
             if let dml::FieldType::Relation(rel) = &field.field_type {
                 let mut back_field_exists = false;
@@ -288,34 +292,35 @@ impl Standardiser {
                 }
 
                 if !back_field_exists {
-                    // We only add back relations for unnamed relations.
-                    if rel.name.is_empty() {
-                        fields.push((
-                            // Forward
-                            rel.clone(),
-                            // Backward
-                            dml::RelationInfo {
-                                to: model.name.clone(),
-                                to_fields: vec![],
-                                name: rel.name.clone(),
-                                on_delete: rel.on_delete,
-                            },
-                        ));
+                    let relation_info = dml::RelationInfo {
+                        to: model.name.clone(),
+                        to_fields: vec![],
+                        name: rel.name.clone(),
+                        on_delete: OnDeleteStrategy::None,
+                    };
+
+                    let (arity, field_name) = if field.arity.is_singular() {
+                        (
+                            dml::FieldArity::List,
+                            prisma_inflector::classical().pluralize(&model.name).camel_case(),
+                        )
                     } else {
-                        errors.push(field_validation_error(
-                            "Named relations require an opposite field.",
-                            model,
-                            &field,
-                            &ast_schema,
-                        ))
-                    }
+                        (dml::FieldArity::Optional, model.name.camel_case())
+                    };
+
+                    result.push(AddMissingBackRelationField {
+                        model: rel.to.clone(),
+                        field: field_name,
+                        arity,
+                        relation_info,
+                        related_model: model.name.to_string(),
+                        related_field: field.name.to_string(),
+                    })
                 }
             }
         }
 
-        errors.ok()?;
-
-        Ok(fields)
+        result
     }
 
     fn name_unnamed_relations(&self, datamodel: &mut dml::Datamodel) {
@@ -379,4 +384,14 @@ impl Standardiser {
 
         rels
     }
+}
+
+#[derive(Debug)]
+struct AddMissingBackRelationField {
+    model: String,
+    field: String,
+    arity: dml::FieldArity,
+    relation_info: dml::RelationInfo,
+    related_model: String,
+    related_field: String,
 }
