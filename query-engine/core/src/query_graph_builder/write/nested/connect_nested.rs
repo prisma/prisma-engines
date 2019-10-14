@@ -113,8 +113,8 @@ fn handle_one_to_many(
     value: ParsedInputValue,
     child_model: &ModelRef,
 ) -> QueryGraphBuilderResult<()> {
+    let record_finder = extract_record_finder(value, &child_model)?;
     let (parent_node, child_node, relation_field_name) = if parent_relation_field.relation_is_inlined_in_parent() {
-        let record_finder = extract_record_finder(value, &child_model)?;
         let read_query = utils::id_read_query_infallible(&child_model, record_finder);
         let child_node = graph.create_node(read_query);
 
@@ -127,7 +127,7 @@ fn handle_one_to_many(
 
         (parent_node, child_node, relation_field_name)
     } else {
-        let update_node = utils::update_record_node_placeholder(graph, None, Arc::clone(child_model));
+        let update_node = utils::update_record_node_placeholder(graph, Some(record_finder), Arc::clone(child_model));
 
         // For the injection, we need the name of the field on the inlined side, in this case the child.
         let relation_field_name = parent_relation_field.related_field().name.clone();
