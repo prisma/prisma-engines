@@ -1,7 +1,7 @@
 use super::MigrationStepsResultOutput;
 use crate::commands::command::*;
 use crate::migration_engine::MigrationEngine;
-use datamodel::{ast::SchemaAst, Datamodel};
+use datamodel::ast::SchemaAst;
 use migration_connector::*;
 
 pub struct CalculateDatabaseStepsCommand<'a> {

@@ -1,6 +1,5 @@
 use super::MigrationStepsResultOutput;
 use crate::commands::command::*;
-use crate::migration::datamodel_differ;
 use crate::migration_engine::MigrationEngine;
 use crate::*;
 use datamodel::ast::parser::parse;
@@ -27,7 +26,6 @@ impl<'a> MigrationCommand<'a> for InferMigrationStepsCommand<'a> {
 
         let connector = engine.connector();
         let migration_persistence = connector.migration_persistence();
-        let current_datamodel = migration_persistence.current_datamodel();
         let current_datamodel_ast = migration_persistence.current_datamodel_ast();
         let assumed_datamodel_ast = engine
             .datamodel_calculator()

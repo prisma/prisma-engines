@@ -9,10 +9,10 @@ pub(crate) struct FieldDiffer<'a> {
 }
 
 impl<'a> FieldDiffer<'a> {
-    /// Has the type of the field changed? This ignores the arity and nullability of the field.
-    pub(crate) fn type_changed(&self) -> bool {
-        self.previous.field_type.name != self.next.field_type.name
-    }
+    // /// Has the type of the field changed? This ignores the arity and nullability of the field.
+    // pub(crate) fn type_changed(&self) -> bool {
+    //     self.previous.field_type.name != self.next.field_type.name
+    // }
 
     // /// Has the nullability of the field changed?.
     // pub(crate) fn nullability_changed(&self) -> bool {

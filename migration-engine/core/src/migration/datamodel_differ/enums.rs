@@ -1,7 +1,4 @@
-use super::{
-    directives::{directives_match_exactly, DirectiveDiffer},
-    FieldDiffer,
-};
+use super::directives::{directives_match_exactly, DirectiveDiffer};
 use datamodel::ast;
 
 /// Implements the logic to diff a pair of [AST enums](/datamodel/ast/struct.Datamodel.html).

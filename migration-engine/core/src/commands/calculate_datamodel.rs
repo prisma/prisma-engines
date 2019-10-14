@@ -1,6 +1,6 @@
 use crate::commands::command::*;
 use crate::migration_engine::MigrationEngine;
-use datamodel::{ast::SchemaAst, dml::Datamodel};
+use datamodel::ast::SchemaAst;
 use migration_connector::*;
 
 pub struct CalculateDatamodelCommand<'a> {

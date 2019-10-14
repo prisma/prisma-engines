@@ -1,8 +1,4 @@
-use datamodel::{
-    ast::{self, parser::parse, SchemaAst},
-    dml::Datamodel,
-    lift_ast,
-};
+use datamodel::ast::{self, SchemaAst};
 use failure::format_err;
 use migration_connector::steps::{self, MigrationStep};
 

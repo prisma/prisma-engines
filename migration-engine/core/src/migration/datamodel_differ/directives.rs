@@ -81,18 +81,6 @@ pub(crate) fn get_directive_string_value<'a>(
         })
 }
 
-/// Note: this assumes the directive has only one argument. It will ignore other values silently if there are more than one.
-pub(crate) fn get_directive_value<'a>(
-    directive_name: &'a str,
-    directives: &'a [ast::Directive],
-) -> Option<&'a ast::Expression> {
-    directives
-        .iter()
-        .find(|directive| directive.name.name == directive_name)
-        .and_then(|directive| directive.arguments.iter().next())
-        .map(|argument| &argument.value)
-}
-
 #[cfg(test)]
 mod tests {
     use super::super::{ModelDiffer, TopDiffer};

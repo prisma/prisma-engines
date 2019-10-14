@@ -3,7 +3,6 @@ use migration_connector::*;
 use migration_core::{
     api::{GenericApi, MigrationApi},
     commands::ResetCommand,
-    parse_datamodel,
 };
 use prisma_query::connector::{MysqlParams, PostgresParams};
 use sql_migration_connector::{migration_database::*, SqlFamily, SqlMigrationConnector};

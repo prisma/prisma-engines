@@ -1,4 +1,7 @@
-use super::{directives::DirectiveDiffer, expressions::expressions_match, FieldDiffer};
+use super::{
+    directives::{directives_match, DirectiveDiffer},
+    FieldDiffer,
+};
 use datamodel::ast;
 
 /// Implements the logic to diff a pair of [AST models](/datamodel/ast/struct.Model.html).
@@ -59,7 +62,7 @@ impl<'a> ModelDiffer<'a> {
     pub(crate) fn created_directives(&self) -> impl Iterator<Item = &ast::Directive> {
         self.next_directives().filter(move |next_directive| {
             self.previous_directives()
-                .find(|previous_directive| model_directives_match(previous_directive, next_directive))
+                .find(|previous_directive| directives_match(previous_directive, next_directive))
                 .is_none()
         })
     }
@@ -68,7 +71,7 @@ impl<'a> ModelDiffer<'a> {
     pub(crate) fn deleted_directives(&self) -> impl Iterator<Item = &ast::Directive> {
         self.previous_directives().filter(move |previous_directive| {
             self.next_directives()
-                .find(|next_directive| model_directives_match(previous_directive, next_directive))
+                .find(|next_directive| directives_match(previous_directive, next_directive))
                 .is_none()
         })
     }
@@ -77,7 +80,7 @@ impl<'a> ModelDiffer<'a> {
     pub(crate) fn directive_pairs(&self) -> impl Iterator<Item = DirectiveDiffer<'_>> {
         self.previous_directives().filter_map(move |previous_directive| {
             self.next_directives()
-                .find(|next_directive| model_directives_match(previous_directive, next_directive))
+                .find(|next_directive| directives_match(previous_directive, next_directive))
                 .map(|next_directive| DirectiveDiffer {
                     previous: previous_directive,
                     next: next_directive,
@@ -90,17 +93,9 @@ fn fields_match(previous: &ast::Field, next: &ast::Field) -> bool {
     previous.name.name == next.name.name
 }
 
-fn model_directives_match(previous: &ast::Directive, next: &ast::Directive) -> bool {
-    if previous.name.name != next.name.name {
-        return false;
-    }
-
-    true
-}
-
 #[cfg(test)]
 mod tests {
-    use super::super::{directives::directives_match_exactly, TopDiffer};
+    use super::super::{directives::directives_match_exactly, expressions::expressions_match, TopDiffer};
     use super::*;
     use datamodel::ast::parser::parse;
 
