@@ -2730,11 +2730,7 @@ name = "sql-migration-connector"
 version = "0.1.0"
 dependencies = [
  "barrel 0.6.3-alpha.0 (git+https://github.com/aknuds1/barrel.git)",
-<<<<<<< HEAD
- "chrono 0.4.7 (registry+https://github.com/rust-lang/crates.io-index)",
-=======
  "chrono 0.4.9 (registry+https://github.com/rust-lang/crates.io-index)",
->>>>>>> 7c13bb8184b566281ec2f934382ffc8393dcfade
  "datamodel 0.1.0",
  "failure 0.1.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "failure_derive 0.1.5 (registry+https://github.com/rust-lang/crates.io-index)",
