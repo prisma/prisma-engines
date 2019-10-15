@@ -133,6 +133,9 @@ fn main() {
                     CliError::DatabaseAlreadyExists(_) => {
                         std::process::exit(5);
                     }
+                    CliError::TlsError(_) => {
+                        std::process::exit(6);
+                    }
                     _ => {
                         std::process::exit(255);
                     }

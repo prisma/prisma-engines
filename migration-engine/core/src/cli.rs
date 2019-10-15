@@ -24,6 +24,8 @@ pub enum CliError {
     ConnectTimeout,
     #[fail(display = "Operation timed out")]
     Timeout,
+    #[fail(display = "Error opening a TLS connection. {}", _0)]
+    TlsError(String),
     #[fail(display = "Unknown error occured: {}", _0)]
     Other(String),
 }
@@ -37,6 +39,7 @@ impl From<ConnectorError> for CliError {
             ConnectorError::AuthenticationFailed { user } => CliError::AuthenticationFailed(user),
             ConnectorError::ConnectTimeout => CliError::ConnectTimeout,
             ConnectorError::Timeout => CliError::Timeout,
+            ConnectorError::TlsError { message } => CliError::TlsError(message),
             _ => CliError::ConnectionError,
         }
     }

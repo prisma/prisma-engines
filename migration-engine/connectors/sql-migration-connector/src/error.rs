@@ -31,6 +31,9 @@ pub enum SqlError {
 
     #[fail(display = "Operation timed out")]
     Timeout,
+
+    #[fail(display = "Error opening a TLS connection. {}", message)]
+    TlsError { message: String },
 }
 
 impl From<SqlError> for ConnectorError {
@@ -42,6 +45,7 @@ impl From<SqlError> for ConnectorError {
             SqlError::AuthenticationFailed { user } => Self::AuthenticationFailed { user },
             SqlError::ConnectTimeout => Self::ConnectTimeout,
             SqlError::Timeout => Self::Timeout,
+            SqlError::TlsError { message } => Self::TlsError { message },
             error => Self::QueryError(error.into()),
         }
     }
@@ -55,6 +59,7 @@ impl From<prisma_query::error::Error> for SqlError {
             prisma_query::error::Error::AuthenticationFailed { user } => Self::AuthenticationFailed { user },
             prisma_query::error::Error::ConnectTimeout => Self::ConnectTimeout,
             prisma_query::error::Error::Timeout => Self::Timeout,
+            prisma_query::error::Error::TlsError { message } => Self::TlsError { message },
             e => SqlError::QueryError(e.into()),
         }
     }
