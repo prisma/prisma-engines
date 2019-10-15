@@ -142,10 +142,18 @@ impl<T> WriteOperations for SqlConnectorTransaction<'_, T> {
 
     fn set(
         &mut self,
-        _relation_field: RelationFieldRef,
-        _parent: GraphqlId,
-        _wheres: Vec<GraphqlId>,
+        field: RelationFieldRef,
+        parent_id: GraphqlId,
+        child_ids: Vec<GraphqlId>,
     ) -> connector_interface::Result<()> {
-        unimplemented!()
+        let query = WriteQueryBuilder::delete_relation_by_parent(Arc::clone(&field), &parent_id);
+        self.inner.execute(query).unwrap();
+
+        // TODO: we can avoid the multiple roundtrips in some cases
+        for child_id in &child_ids {
+            self.connect(Arc::clone(&field), &parent_id, child_id)?;
+        }
+
+        Ok(())
     }
 }

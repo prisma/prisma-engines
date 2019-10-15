@@ -91,7 +91,7 @@ impl WriteQueryBuilder {
             Some(column) => {
                 let referencing_column = column.name.to_string();
 
-                let (update_id, link_id) = match field.relation_is_inlined_in_parent() {
+                let (update_id, _) = match field.relation_is_inlined_in_parent() {
                     true => (parent_id, child_id),
                     false => (child_id, parent_id),
                 };
@@ -111,20 +111,40 @@ impl WriteQueryBuilder {
                 let parent_column = field.relation_column();
                 let child_column = field.opposite_column();
 
-                let insert = Insert::single_into(relation.relation_table())
-                    .value(parent_column.name.to_string(), parent_id.clone())
-                    .value(child_column.name.to_string(), child_id.clone());
-
-                let insert: Insert = match relation.id_column() {
-                    Some(id_column) => insert.value(id_column, cuid::cuid().unwrap()).into(),
-                    None => insert.into(),
-                };
-
                 let parent_id_criteria = parent_column.equals(parent_id);
                 let child_id_criteria = child_column.equals(child_id);
 
                 Delete::from_table(relation.relation_table())
                     .so_that(parent_id_criteria.and(child_id_criteria))
+                    .into()
+            }
+        }
+    }
+
+    pub fn delete_relation_by_parent(field: RelationFieldRef, parent_id: &GraphqlId) -> Query<'static> {
+        let relation = field.relation();
+
+        match relation.inline_relation_column() {
+            Some(referencing_column) => {
+                let referencing_column_name = referencing_column.name.to_string();
+                let update_condition = if field.relation_is_inlined_in_parent() {
+                    field.model().fields().id().as_column().equals(parent_id)
+                } else {
+                    referencing_column.equals(parent_id)
+                };
+
+                Update::table(relation.relation_table())
+                    .set(referencing_column_name, PrismaValue::Null)
+                    .so_that(update_condition)
+                    .into()
+            }
+            None => {
+                let relation = field.relation();
+                let parent_column = field.relation_column();
+                let parent_id_criteria = parent_column.equals(parent_id);
+
+                Delete::from_table(relation.relation_table())
+                    .so_that(parent_id_criteria)
                     .into()
             }
         }

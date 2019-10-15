@@ -1,6 +1,7 @@
 //! Write query AST
 use super::RecordFinderInjector;
 use connector::filter::{Filter, RecordFinder};
+use petgraph::Graph;
 use prisma_models::prelude::*;
 
 #[derive(Debug, Clone)]
@@ -138,7 +139,9 @@ pub struct DisconnectRecords {
 
 #[derive(Debug, Clone)]
 pub struct SetRecords {
-    pub wheres: Vec<RecordFinder>,
+    pub parent: Option<GraphqlId>,
+    pub wheres: Vec<GraphqlId>,
+    pub relation_field: RelationFieldRef,
 }
 
 #[derive(Debug, Clone)]

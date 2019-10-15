@@ -77,13 +77,12 @@ fn disconnect(tx: &mut dyn TransactionLike, q: DisconnectRecords) -> Interpretat
 }
 
 fn set(tx: &mut dyn TransactionLike, q: SetRecords) -> InterpretationResult<QueryResult> {
-    //    tx.set(
-    //        q.relation_field,
-    //        &q.parent.expect("Expected parent record ID to be set for set"),
-    //        &q.child.expect("Expected parent record ID to be set for set"),
-    //    )?;
-    //    Ok(QueryResult::Unit)
-    unimplemented!()
+    tx.set(
+        q.relation_field,
+        q.parent.expect("Expected parent record ID to be set for set"),
+        q.wheres,
+    )?;
+    Ok(QueryResult::Unit)
 }
 
 fn reset(_tx: &mut dyn TransactionLike, _q: ResetData) -> InterpretationResult<QueryResult> {
