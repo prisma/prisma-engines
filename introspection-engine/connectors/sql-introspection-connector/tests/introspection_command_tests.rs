@@ -822,6 +822,7 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                 indices: vec![],
                 primary_key: None,
                 foreign_keys: vec![ForeignKey {
+                    constraint_name: None,
                     columns: vec!["city-id".to_string(), "city-name".to_string()],
                     referenced_table: "City".to_string(),
                     on_delete_action: ForeignKeyAction::NoAction,

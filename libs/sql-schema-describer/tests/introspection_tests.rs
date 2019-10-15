@@ -122,6 +122,11 @@ fn foreign_keys_must_work() {
                     indices: vec![],
                     primary_key: None,
                     foreign_keys: vec![ForeignKey {
+                        constraint_name: match db_type {
+                            DbType::Postgres => Some("User_city_fkey".to_owned()),
+                            DbType::MySql => Some("User_ibfk_1".to_owned()),
+                            DbType::Sqlite => None,
+                        },
                         columns: vec!["city".to_string()],
                         referenced_columns: vec!["id".to_string()],
                         referenced_table: "City".to_string(),
@@ -202,6 +207,11 @@ fn multi_column_foreign_keys_must_work() {
                     indices: vec![],
                     primary_key: None,
                     foreign_keys: vec![ForeignKey {
+                        constraint_name: match db_type {
+                            DbType::Postgres => Some("User_city_fkey".to_owned()),
+                            DbType::MySql => Some("User_ibfk_1".to_owned()),
+                            DbType::Sqlite => None,
+                        },
                         columns: vec!["city".to_string(), "city_name".to_string()],
                         referenced_columns: vec!["id".to_string(), "name".to_string()],
                         referenced_table: "City".to_string(),

@@ -332,6 +332,8 @@ pub enum ForeignKeyAction {
 #[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ForeignKey {
+    /// The database name of the foreign key constraint, when available.
+    pub constraint_name: Option<String>,
     /// Column names.
     pub columns: Vec<String>,
     /// Referenced table.

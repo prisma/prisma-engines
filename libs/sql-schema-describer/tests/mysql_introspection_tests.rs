@@ -545,24 +545,28 @@ fn mysql_foreign_key_on_delete_must_be_handled() {
             }),
             foreign_keys: vec![
                 ForeignKey {
+                    constraint_name: Some("User_ibfk_1".to_owned()),
                     columns: vec!["city".to_string()],
                     referenced_columns: vec!["id".to_string()],
                     referenced_table: "City".to_string(),
                     on_delete_action: ForeignKeyAction::NoAction,
                 },
                 ForeignKey {
+                    constraint_name: Some("User_ibfk_2".to_owned()),
                     columns: vec!["city_cascade".to_string()],
                     referenced_columns: vec!["id".to_string()],
                     referenced_table: "City".to_string(),
                     on_delete_action: ForeignKeyAction::Cascade,
                 },
                 ForeignKey {
+                    constraint_name: Some("User_ibfk_3".to_owned()),
                     columns: vec!["city_restrict".to_string()],
                     referenced_columns: vec!["id".to_string()],
                     referenced_table: "City".to_string(),
                     on_delete_action: ForeignKeyAction::Restrict,
                 },
                 ForeignKey {
+                    constraint_name: Some("User_ibfk_4".to_owned()),
                     columns: vec!["city_set_null".to_string()],
                     referenced_columns: vec!["id".to_string()],
                     referenced_table: "City".to_string(),

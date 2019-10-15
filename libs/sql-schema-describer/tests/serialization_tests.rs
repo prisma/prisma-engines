@@ -100,6 +100,7 @@ fn database_schema_is_serializable() {
                     sequence: None,
                 }),
                 foreign_keys: vec![ForeignKey {
+                    constraint_name: None,
                     columns: vec!["column3".to_string()],
                     referenced_table: "table2".to_string(),
                     referenced_columns: vec!["id".to_string()],
@@ -345,30 +346,35 @@ fn database_schema_is_serializable_for_every_foreign_key_action() {
             primary_key: None,
             foreign_keys: vec![
                 ForeignKey {
+                    constraint_name: None,
                     columns: vec!["column1".to_string()],
                     referenced_table: "table2".to_string(),
                     referenced_columns: vec!["id".to_string()],
                     on_delete_action: ForeignKeyAction::NoAction,
                 },
                 ForeignKey {
+                    constraint_name: None,
                     columns: vec!["column2".to_string()],
                     referenced_table: "table2".to_string(),
                     referenced_columns: vec!["id".to_string()],
                     on_delete_action: ForeignKeyAction::Restrict,
                 },
                 ForeignKey {
+                    constraint_name: None,
                     columns: vec!["column3".to_string()],
                     referenced_table: "table2".to_string(),
                     referenced_columns: vec!["id".to_string()],
                     on_delete_action: ForeignKeyAction::Cascade,
                 },
                 ForeignKey {
+                    constraint_name: None,
                     columns: vec!["column4".to_string()],
                     referenced_table: "table2".to_string(),
                     referenced_columns: vec!["id".to_string()],
                     on_delete_action: ForeignKeyAction::SetNull,
                 },
                 ForeignKey {
+                    constraint_name: None,
                     columns: vec!["column5".to_string()],
                     referenced_table: "table2".to_string(),
                     referenced_columns: vec!["id".to_string()],
