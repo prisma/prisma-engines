@@ -53,9 +53,13 @@ case class TestServer() extends PlayJsonExtensions {
       )
     }
 
-    // TODO: bring those error checks back
-    // Ignore error codes for external tests (0) and containment checks ("")
-    result.assertFailingResponse(0, errorCount, "")
+    // remove ignored ignored error codes again
+    val ignoredErrorCodes = Vector(3041)
+    if(!ignoredErrorCodes.contains(errorCode)){
+      // TODO: bring those error checks back
+      // Ignore error codes for external tests (0) and containment checks ("")
+      result.assertFailingResponse(0, errorCount, "")
+    }
     result
   }
 
