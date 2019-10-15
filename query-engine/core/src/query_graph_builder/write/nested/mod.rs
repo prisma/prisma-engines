@@ -29,6 +29,7 @@ pub fn connect_nested_query(
             "connect" => connect_nested_connect(graph, parent, &parent_relation_field, value, &child_model)?,
             "update" => connect_nested_update(graph, &parent, &parent_relation_field, value, &child_model)?,
             "delete" => connect_nested_delete(graph, &parent, &parent_relation_field, value, &child_model)?,
+            "updateMany" => connect_nested_update_many(graph, &parent, &parent_relation_field, value, &child_model)?,
             _ => (),
         };
     }
