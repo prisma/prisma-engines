@@ -1,8 +1,10 @@
 use super::*;
 use crate::{
-    query_graph::{NodeRef, QueryGraph},
+    query_ast::*,
+    query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
     ParsedInputValue,
 };
+use connector::{Filter, ScalarCompare};
 use prisma_models::{ModelRef, PrismaValue, RelationFieldRef};
 use std::{convert::TryInto, sync::Arc};
 
@@ -57,4 +59,45 @@ pub fn connect_nested_delete(
     }
 
     unimplemented!()
+}
+
+pub fn connect_nested_delete_many(
+    graph: &mut QueryGraph,
+    parent: &NodeRef,
+    parent_relation_field: &RelationFieldRef,
+    value: ParsedInputValue,
+    child_model: &ModelRef,
+) -> QueryGraphBuilderResult<()> {
+    for value in utils::coerce_vec(value) {
+        let as_map: ParsedInputMap = value.try_into()?;
+        let filter = extract_filter(as_map, child_model)?;
+
+        let find_child_records_node =
+            utils::insert_find_children_by_parent_node(graph, parent, parent_relation_field, filter.clone())?;
+
+        let update_many = WriteQuery::DeleteManyRecords(DeleteManyRecords {
+            model: Arc::clone(&child_model),
+            filter,
+        });
+
+        let delete_many_node = graph.create_node(Query::Write(update_many));
+        let id_field = child_model.fields().id();
+
+        graph.create_edge(
+            &find_child_records_node,
+            &delete_many_node,
+            QueryGraphDependency::ParentIds(Box::new(move |mut node, mut parent_ids| {
+                if let Node::Query(Query::Write(WriteQuery::DeleteManyRecords(ref mut ur))) = node {
+                    // TODO: we should not clone here
+                    let ids_filter = id_field.is_in(Some(parent_ids.clone()));
+                    let new_filter = Filter::and(vec![ur.filter.clone(), ids_filter]);
+
+                    ur.filter = new_filter;
+                }
+
+                Ok(node)
+            })),
+        )?;
+    }
+    Ok(())
 }
