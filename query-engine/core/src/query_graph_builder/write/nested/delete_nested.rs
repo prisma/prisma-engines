@@ -24,41 +24,81 @@ pub fn connect_nested_delete(
     parent: &NodeRef,
     relation_field: &RelationFieldRef,
     value: ParsedInputValue,
-    model: &ModelRef,
+    child_model: &ModelRef,
 ) -> QueryGraphBuilderResult<()> {
+    dbg!(&value);
     for value in utils::coerce_vec(value) {
         if relation_field.is_list {
             // Todo:
             // - we need to make sure the records are actually connected...
             // - What about the checks currently performed in `DeleteActions`?
-            let record_finder = extract_record_finder(value, &model)?;
-            let delete_node = delete::delete_record_node(graph, Some(record_finder), Arc::clone(&model));
+            let record_finder = extract_record_finder(value, &child_model)?;
+            //            let delete_record_node = delete::delete_record_node(graph, Some(record_finder), Arc::clone(&child_model))?;
+            let delete_many = WriteQuery::DeleteManyRecords(DeleteManyRecords {
+                model: Arc::clone(&child_model),
+                filter: record_finder.into(),
+            });
+            let delete_many_node = graph.create_node(Query::Write(delete_many));
+            let id_field = child_model.fields().id();
+            let find_child_records_node =
+                utils::insert_find_children_by_parent_node(graph, parent, relation_field, Filter::empty())?;
 
-            // graph.create_edge(parent, to: &NodeRef, content: QueryGraphDependency);
-            unimplemented!()
+            graph.create_edge(
+                &find_child_records_node,
+                &delete_many_node,
+                QueryGraphDependency::ParentIds(Box::new(move |mut node, mut parent_ids| {
+                    if let Node::Query(Query::Write(WriteQuery::DeleteManyRecords(ref mut ur))) = node {
+                        // TODO: we should not clone here
+                        let ids_filter = id_field.is_in(Some(parent_ids.clone()));
+                        let new_filter = Filter::and(vec![ur.filter.clone(), ids_filter]);
+
+                        ur.filter = new_filter;
+                    }
+
+                    Ok(node)
+                })),
+            )?;
         } else {
-            // if relation_field.relation_is_inlined_in_parent() {
-            //     let delete_node = delete::delete_record_node(graph, None, Arc::clone(&model));
-            //     let find_child_records_node = utils::find_ids_by_parent(graph, relation_field, parent);
-
-            //     None
-            // } else {
-            //     None
-            // };
-
             let val: PrismaValue = value.try_into()?;
-            match val {
-                PrismaValue::Boolean(b) if b => unimplemented!(),
-                // vec.push(NestedDeleteRecord {
-                //     relation_field: Arc::clone(&relation_field),
-                //     where_: None,
-                // }),
-                _ => (),
-            };
+            let should_delete = if let PrismaValue::Boolean(b) = val { true } else { false };
+
+            if should_delete {
+                let find_child_records_node =
+                    utils::insert_find_children_by_parent_node(graph, parent, relation_field, Filter::empty())?;
+
+                let delete_record_node = graph.create_node(Query::Write(WriteQuery::DeleteRecord(DeleteRecord {
+                    model: Arc::clone(&child_model),
+                    where_: None,
+                })));
+
+                let id_field = child_model.fields().id();
+
+                graph.create_edge(
+                    &find_child_records_node,
+                    &delete_record_node,
+                    QueryGraphDependency::ParentIds(Box::new(move |mut node, mut parent_ids| {
+                        let parent_id = match parent_ids.pop() {
+                            Some(pid) => Ok(pid),
+                            None => Err(QueryGraphBuilderError::AssertionError(format!(
+                                "[Query Graph] Expected a valid parent ID to be present for a nested connect on a one-to-many relation."
+                            ))),
+                        }?;
+
+                        if let Node::Query(Query::Write(ref mut wq)) = node {
+                            wq.inject_record_finder(RecordFinder {
+                                field: id_field,
+                                value: parent_id,
+                            });
+                        }
+
+                        Ok(node)
+                    })),
+                )?;
+            }
         }
     }
 
-    unimplemented!()
+    Ok(())
 }
 
 pub fn connect_nested_delete_many(
@@ -75,12 +115,12 @@ pub fn connect_nested_delete_many(
         let find_child_records_node =
             utils::insert_find_children_by_parent_node(graph, parent, parent_relation_field, filter.clone())?;
 
-        let update_many = WriteQuery::DeleteManyRecords(DeleteManyRecords {
+        let delete_many = WriteQuery::DeleteManyRecords(DeleteManyRecords {
             model: Arc::clone(&child_model),
             filter,
         });
 
-        let delete_many_node = graph.create_node(Query::Write(update_many));
+        let delete_many_node = graph.create_node(Query::Write(delete_many));
         let id_field = child_model.fields().id();
 
         graph.create_edge(
