@@ -29,7 +29,7 @@ pub fn node_is_create(graph: &QueryGraph, node: &NodeRef) -> bool {
 pub fn id_read_query_infallible(model: &ModelRef, record_finder: RecordFinder) -> Query {
     let selected_fields: SelectedFields = model.fields().id().into();
     let read_query = ReadQuery::ManyRecordsQuery(ManyRecordsQuery {
-        name: "".into(),
+        name: "id_read_query_infallible".into(), // this name only eases debugging
         alias: None,
         model: Arc::clone(&model),
         args: record_finder.into(),
