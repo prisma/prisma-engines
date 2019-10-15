@@ -1,9 +1,11 @@
 mod connect_nested;
 mod create_nested;
 mod delete_nested;
+mod disconnect_nested;
 mod update_nested;
 
 use super::*;
+use crate::query_graph_builder::write::nested::disconnect_nested::connect_nested_disconnect;
 use crate::{
     query_graph::{NodeRef, QueryGraph},
     ParsedInputMap,
@@ -30,7 +32,7 @@ pub fn connect_nested_query(
             "upsert" => (),
             "delete" => connect_nested_delete(graph, &parent, &parent_relation_field, value, &child_model)?,
             "connect" => connect_nested_connect(graph, parent, &parent_relation_field, value, &child_model)?,
-            "disconnect" => (),
+            "disconnect" => connect_nested_disconnect(graph, parent, &parent_relation_field, value, &child_model)?,
             "set" => (),
             "updateMany" => connect_nested_update_many(graph, &parent, &parent_relation_field, value, &child_model)?,
             "deleteMany" => connect_nested_delete_many(graph, &parent, &parent_relation_field, value, &child_model)?,

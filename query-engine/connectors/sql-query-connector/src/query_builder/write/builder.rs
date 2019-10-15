@@ -84,6 +84,52 @@ impl WriteQueryBuilder {
         }
     }
 
+    pub fn delete_relation(field: RelationFieldRef, parent_id: &GraphqlId, child_id: &GraphqlId) -> Query<'static> {
+        let relation = field.relation();
+
+        match relation.inline_relation_column() {
+            Some(column) => {
+                let referencing_column = column.name.to_string();
+
+                let (update_id, link_id) = match field.relation_is_inlined_in_parent() {
+                    true => (parent_id, child_id),
+                    false => (child_id, parent_id),
+                };
+
+                let update_condition = match field.relation_is_inlined_in_parent() {
+                    true => field.model().fields().id().as_column().equals(update_id),
+                    false => field.related_model().fields().id().as_column().equals(update_id),
+                };
+
+                Update::table(relation.relation_table())
+                    .set(referencing_column, PrismaValue::Null)
+                    .so_that(update_condition)
+                    .into()
+            }
+            None => {
+                let relation = field.relation();
+                let parent_column = field.relation_column();
+                let child_column = field.opposite_column();
+
+                let insert = Insert::single_into(relation.relation_table())
+                    .value(parent_column.name.to_string(), parent_id.clone())
+                    .value(child_column.name.to_string(), child_id.clone());
+
+                let insert: Insert = match relation.id_column() {
+                    Some(id_column) => insert.value(id_column, cuid::cuid().unwrap()).into(),
+                    None => insert.into(),
+                };
+
+                let parent_id_criteria = parent_column.equals(parent_id);
+                let child_id_criteria = child_column.equals(child_id);
+
+                Delete::from_table(relation.relation_table())
+                    .so_that(parent_id_criteria.and(child_id_criteria))
+                    .into()
+            }
+        }
+    }
+
     pub fn create_scalar_list_value(
         scalar_list_table: Table<'static>,
         list_value: &PrismaListValue,

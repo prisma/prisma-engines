@@ -130,22 +130,14 @@ impl<T> WriteOperations for SqlConnectorTransaction<'_, T> {
 
     fn disconnect(
         &mut self,
-        _field: RelationFieldRef,
-        _parent_id: &GraphqlId,
-        _child_id: &GraphqlId,
+        field: RelationFieldRef,
+        parent_id: &GraphqlId,
+        child_id: &GraphqlId,
     ) -> connector_interface::Result<()> {
-        // let child_model = field.related_model();
+        let query = WriteQueryBuilder::delete_relation(field, parent_id, child_id);
+        self.inner.execute(query).unwrap();
 
-        // let nested_disconnect = NestedDisconnect {
-        //     relation_field: field,
-        //     where_: Some(RecordFinder::new(child_model.fields().id(), child_id)),
-        // };
-
-        // let query = nested_disconnect.removal_by_parent_and_child(parent_id, child_id);
-        // self.inner.execute(query).unwrap();
-
-        // Ok(())
-        unimplemented!()
+        Ok(())
     }
 
     fn set(

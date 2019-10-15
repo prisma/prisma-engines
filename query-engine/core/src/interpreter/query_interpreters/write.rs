@@ -67,11 +67,22 @@ fn connect(tx: &mut dyn TransactionLike, q: ConnectRecords) -> InterpretationRes
     Ok(QueryResult::Unit)
 }
 
-fn disconnect(_tx: &mut dyn TransactionLike, _q: DisconnectRecords) -> InterpretationResult<QueryResult> {
-    unimplemented!()
+fn disconnect(tx: &mut dyn TransactionLike, q: DisconnectRecords) -> InterpretationResult<QueryResult> {
+    tx.disconnect(
+        q.relation_field,
+        &q.parent.expect("Expected parent record ID to be set for disconnect"),
+        &q.child.expect("Expected parent record ID to be set for disconnect"),
+    )?;
+    Ok(QueryResult::Unit)
 }
 
-fn set(_tx: &mut dyn TransactionLike, _q: SetRecords) -> InterpretationResult<QueryResult> {
+fn set(tx: &mut dyn TransactionLike, q: SetRecords) -> InterpretationResult<QueryResult> {
+    //    tx.set(
+    //        q.relation_field,
+    //        &q.parent.expect("Expected parent record ID to be set for set"),
+    //        &q.child.expect("Expected parent record ID to be set for set"),
+    //    )?;
+    //    Ok(QueryResult::Unit)
     unimplemented!()
 }
 

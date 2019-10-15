@@ -1,8 +1,7 @@
 use crate::{
     query_ast::*,
     query_graph::{Node, NodeRef, ParentIdsFn, QueryGraph, QueryGraphDependency},
-    QueryGraphBuilderError,
-    QueryGraphBuilderResult,
+    QueryGraphBuilderError, QueryGraphBuilderResult,
 };
 use prisma_models::RelationFieldRef;
 use std::{convert::TryInto, sync::Arc};
@@ -23,32 +22,32 @@ pub fn disconnect_records_node(
     parent_fn: Option<ParentIdsFn>,
     child_fn: Option<ParentIdsFn>,
 ) -> QueryGraphBuilderResult<NodeRef> {
-    let connect = WriteQuery::ConnectRecords(ConnectRecords {
+    let disconnect = WriteQuery::DisconnectRecords(DisconnectRecords {
         parent: None,
         child: None,
         relation_field: Arc::clone(relation_field),
     });
 
-    let connect_node = graph.create_node(Query::Write(connect));
+    let disconnect_node = graph.create_node(Query::Write(disconnect));
 
-    // Edge from parent to connect.
+    // Edge from parent to disconnect.
     graph.create_edge(
         parent,
-        &connect_node,
+        &disconnect_node,
         QueryGraphDependency::ParentIds(parent_fn.unwrap_or_else(|| {
             Box::new(|mut child_node, mut parent_ids| {
                 let len = parent_ids.len();
                 if len == 0 {
                     Err(QueryGraphBuilderError::AssertionError(format!(
-                        "Required exactly one parent ID to be present for connect query, found none."
+                        "Required exactly one parent ID to be present for disconnect query, found none."
                     )))
                 } else if len > 1 {
                     Err(QueryGraphBuilderError::AssertionError(format!(
-                        "Required exactly one parent ID to be present for connect query, found {}.",
+                        "Required exactly one parent ID to be present for disconnect query, found {}.",
                         len
                     )))
                 } else {
-                    if let Node::Query(Query::Write(WriteQuery::ConnectRecords(ref mut c))) = child_node {
+                    if let Node::Query(Query::Write(WriteQuery::DisconnectRecords(ref mut c))) = child_node {
                         let parent_id = parent_ids.pop().unwrap();
                         c.parent = Some(parent_id.try_into()?);
                     }
@@ -62,7 +61,7 @@ pub fn disconnect_records_node(
     // Edge from child to connect.
     graph.create_edge(
         &child,
-        &connect_node,
+        &disconnect_node,
         QueryGraphDependency::ParentIds(child_fn.unwrap_or_else(|| {
             Box::new(|mut child_node, mut parent_ids| {
                 let len = parent_ids.len();
@@ -76,7 +75,7 @@ pub fn disconnect_records_node(
                         len
                     )))
                 } else {
-                    if let Node::Query(Query::Write(WriteQuery::ConnectRecords(ref mut c))) = child_node {
+                    if let Node::Query(Query::Write(WriteQuery::DisconnectRecords(ref mut c))) = child_node {
                         let child_id = parent_ids.pop().unwrap();
                         c.child = Some(child_id.try_into()?);
                     }
@@ -87,7 +86,7 @@ pub fn disconnect_records_node(
         })),
     )?;
 
-    Ok(connect_node)
+    Ok(disconnect_node)
 }
 
 fn disconnect_m_to_n() -> () {
