@@ -12,6 +12,17 @@ pub enum ReadQuery {
     AggregateRecordsQuery(AggregateRecordsQuery),
 }
 
+impl ReadQuery {
+    pub fn name(&self) -> &str {
+        match self {
+            ReadQuery::RecordQuery(x) => &x.name,
+            ReadQuery::ManyRecordsQuery(x) => &x.name,
+            ReadQuery::RelatedRecordsQuery(x) => &x.name,
+            ReadQuery::AggregateRecordsQuery(x) => &x.name,
+        }
+    }
+}
+
 impl RecordFinderInjector for ReadQuery {
     fn inject_record_finder(&mut self, rf: RecordFinder) {
         match self {

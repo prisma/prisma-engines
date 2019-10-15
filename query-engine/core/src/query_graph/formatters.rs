@@ -7,14 +7,18 @@ pub fn format(graph: &QueryGraph) -> String {
         graph.result_nodes,
         graph.marked_node_pairs,
         graph.root_nodes(),
-        stringify_nodes(graph, graph.root_nodes()).join("\n\n")
+        stringify_nodes(graph, graph.root_nodes(), &mut Vec::new()).join("\n\n")
     )
 }
 
-fn stringify_nodes(graph: &QueryGraph, nodes: Vec<NodeRef>) -> Vec<String> {
+fn stringify_nodes(graph: &QueryGraph, nodes: Vec<NodeRef>, seen_nodes: &mut Vec<NodeRef>) -> Vec<String> {
     let mut rendered_nodes = vec![];
 
     for node in nodes {
+        if seen_nodes.contains(&node) {
+            continue;
+        }
+        seen_nodes.push(node);
         let mut node_child_info = vec![];
 
         let children: Vec<NodeRef> = graph
@@ -40,7 +44,7 @@ fn stringify_nodes(graph: &QueryGraph, nodes: Vec<NodeRef>) -> Vec<String> {
             node_child_info.join("\n  ")
         ));
 
-        rendered_nodes.append(&mut stringify_nodes(graph, children));
+        rendered_nodes.append(&mut stringify_nodes(graph, children, seen_nodes));
     }
 
     rendered_nodes

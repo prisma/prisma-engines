@@ -85,6 +85,7 @@ impl<'a> QueryInterpreter<'a> {
                 println!("LET");
                 let mut inner_env = env.clone();
                 for binding in bindings {
+                    print!("bind {} ", &binding.name);
                     let result = self.interpret(binding.expr, env.clone())?;
                     inner_env.insert(binding.name, result);
                 }
@@ -94,7 +95,7 @@ impl<'a> QueryInterpreter<'a> {
 
             Expression::Query { query } => match query {
                 Query::Read(read) => {
-                    println!("READ");
+                    println!("READ {} ", read.name());
                     Ok(read::execute(self.tx, read, &[]).map(|res| ExpressionResult::Query(res))?)
                 }
 
