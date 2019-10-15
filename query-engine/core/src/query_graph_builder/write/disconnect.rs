@@ -58,7 +58,7 @@ pub fn disconnect_records_node(
         })),
     )?;
 
-    // Edge from child to connect.
+    // Edge from child to disconnect.
     graph.create_edge(
         &child,
         &disconnect_node,

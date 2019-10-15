@@ -3,7 +3,7 @@ use crate::{
     query_graph::{Flow, Node, NodeRef, QueryGraph, QueryGraphDependency},
     ParsedInputValue, QueryGraphBuilderError, QueryGraphBuilderResult,
 };
-use connector::{filter::RecordFinder, QueryArguments};
+use connector::{filter::RecordFinder, Filter, QueryArguments};
 use prisma_models::{ModelRef, PrismaArgs, PrismaValue, RelationFieldRef, SelectedFields};
 use std::{convert::TryInto, sync::Arc};
 
@@ -33,6 +33,23 @@ pub fn id_read_query_infallible(model: &ModelRef, record_finder: RecordFinder) -
         alias: None,
         model: Arc::clone(&model),
         args: record_finder.into(),
+        selected_fields,
+        nested: vec![],
+        selection_order: vec![],
+    });
+
+    Query::Read(read_query)
+}
+
+pub fn ids_read_query_infallible(model: &ModelRef, finders: Vec<RecordFinder>) -> Query {
+    let selected_fields: SelectedFields = model.fields().id().into();
+    let as_filters: Vec<Filter> = finders.into_iter().map(|x| x.into()).collect();
+
+    let read_query = ReadQuery::ManyRecordsQuery(ManyRecordsQuery {
+        name: "id_read_query_infallible".into(), // this name only eases debugging
+        alias: None,
+        model: Arc::clone(&model),
+        args: Filter::or(as_filters).into(),
         selected_fields,
         nested: vec![],
         selection_order: vec![],
