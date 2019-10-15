@@ -30,11 +30,11 @@ impl Expressionista {
         node: &NodeRef,
         parent_edges: Vec<EdgeRef>,
     ) -> InterpretationResult<Expression> {
-        dbg!("Looking at node:", node.id());
+        //        dbg!("Looking at node:", node.id());
 
         // Child edges are ordered, evaluation order is low to high in the graph, unless other rules override.
         let mut direct_children = graph.direct_child_pairs(&node);
-        dbg!(&direct_children);
+        //        dbg!(&direct_children);
 
         // Find the positions of all result returning graph nodes.
         let mut result_positions: Vec<usize> = direct_children
@@ -49,7 +49,7 @@ impl Expressionista {
             })
             .collect();
 
-        dbg!(&result_positions);
+        //        dbg!(&result_positions);
 
         let mut result_scopes: Vec<Vec<(EdgeRef, NodeRef)>> = vec![];
 
@@ -60,7 +60,7 @@ impl Expressionista {
             result_scopes.push(scope);
         });
 
-        dbg!(&direct_children);
+        //        dbg!(&direct_children);
 
         // Because we split from right to left, everything remaining in `direct_children`
         // doesn't belong into results, and is executed before all result scopes.
@@ -72,7 +72,7 @@ impl Expressionista {
             })
             .collect::<InterpretationResult<Vec<Expression>>>()?;
 
-        dbg!("expressions of", node.id(), expressions.len());
+        //        dbg!("expressions of", node.id(), expressions.len());
 
         // Fold result scopes into one expression.
         if result_scopes.len() > 0 {
