@@ -272,6 +272,8 @@ pub enum ColumnTypeFamily {
     TextSearch,
     /// Transaction ID types.
     TransactionId,
+    /// Unknown
+    Unknown
 }
 
 impl fmt::Display for ColumnTypeFamily {
@@ -289,6 +291,7 @@ impl fmt::Display for ColumnTypeFamily {
             Self::LogSequenceNumber => "logSequenceNumber",
             Self::TextSearch => "textSearch",
             Self::TransactionId => "transactionId",
+            Self::Unknown => "unknown"
         };
         write!(f, "{}", str)
     }

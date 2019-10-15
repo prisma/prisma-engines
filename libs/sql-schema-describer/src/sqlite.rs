@@ -300,17 +300,21 @@ fn get_column_type(tpe: &str) -> ColumnType {
         "boolean" => ColumnTypeFamily::Boolean,
         "text" => ColumnTypeFamily::String,
         s if s.contains("char") => ColumnTypeFamily::String,
+        s if s.contains("numeric") => ColumnTypeFamily::Float,
         "date" => ColumnTypeFamily::DateTime,
+        "datetime" => ColumnTypeFamily::DateTime,
         "binary" => ColumnTypeFamily::Binary,
         "double" => ColumnTypeFamily::Float,
         "binary[]" => ColumnTypeFamily::Binary,
         "boolean[]" => ColumnTypeFamily::Boolean,
         "date[]" => ColumnTypeFamily::DateTime,
+        "datetime[]" => ColumnTypeFamily::DateTime,
         "double[]" => ColumnTypeFamily::Float,
         "float[]" => ColumnTypeFamily::Float,
         "integer[]" => ColumnTypeFamily::Int,
         "text[]" => ColumnTypeFamily::String,
-        x => panic!(format!("type '{}' is not supported here yet", x)),
+        _ => ColumnTypeFamily::Unknown
+//        x => panic!(format!("type '{}' is not supported here yet", x)),
     };
     ColumnType {
         raw: tpe.to_string(),
