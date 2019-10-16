@@ -89,6 +89,7 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
                 .as_ref()
                 .and_then(|default| calculate_default(default, &column.tpe.family));
 
+            //Todo should relationfields be unique if the foreign key field has a unique constraint
             let is_unique = if id_info.is_some() {
                 false
             } else {
@@ -117,6 +118,10 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
                 model.add_index(index)
             }
         }
+
+       if table.primary_key_columns().len() > 1 {
+           model.id_fields = table.primary_key_columns();
+       }
 
         data_model.add_model(model);
     }
@@ -158,6 +163,7 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
                         });
 
                         let arity = match relation_field.arity {
+                            FieldArity::Required | FieldArity::Optional if relation_field.is_unique=> FieldArity::Optional,
                             FieldArity::Required | FieldArity::Optional => FieldArity::List,
                             FieldArity::List => FieldArity::Optional,
                         };
@@ -328,7 +334,7 @@ fn calculate_default(default: &str, tpe: &ColumnTypeFamily) -> Option<PrismaValu
 
 fn calc_id_info(column: &Column, table: &Table) -> Option<IdInfo> {
     table.primary_key.as_ref().and_then(|pk| {
-        if pk.contains_column(&column.name) {
+        if pk.is_single_primary_key(&column.name) {
             let strategy = match column.auto_increment {
                 true => IdStrategy::Auto,
                 false => IdStrategy::None,

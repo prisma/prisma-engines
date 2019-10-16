@@ -184,8 +184,8 @@ pub struct PrimaryKey {
 }
 
 impl PrimaryKey {
-    pub fn contains_column(&self, column: &String) -> bool {
-        self.columns.contains(column)
+    pub fn is_single_primary_key(&self, column: &String) -> bool {
+        self.columns.len() ==1 && self.columns.contains(column)
     }
 }
 
