@@ -34,12 +34,22 @@ pub fn infer_and_apply_with_migration_id(
         assume_to_be_applied: Vec::new(),
     };
 
-    let steps = run_infer_command(api, input);
+    let steps = run_infer_command(api, input).0.datamodel_steps;
 
     apply_migration(test_setup, api, steps, migration_id)
 }
 
-pub fn run_infer_command(api: &dyn GenericApi, input: InferMigrationStepsInput) -> Vec<MigrationStep> {
+#[derive(Debug)]
+pub struct InferOutput(pub MigrationStepsResultOutput);
+
+impl InferOutput {
+    pub fn sql_migration(&self) -> Vec<SqlMigrationStep> {
+        let steps: Vec<PrettySqlMigrationStep> = serde_json::from_value(self.0.database_steps.clone()).unwrap();
+        steps.into_iter().map(|pretty_step| pretty_step.step).collect()
+    }
+}
+
+pub fn run_infer_command(api: &dyn GenericApi, input: InferMigrationStepsInput) -> InferOutput {
     let output = api.infer_migration_steps(&input).expect("InferMigration failed");
 
     assert!(
@@ -47,7 +57,7 @@ pub fn run_infer_command(api: &dyn GenericApi, input: InferMigrationStepsInput) 
         format!("InferMigration returned unexpected errors: {:?}", output.general_errors)
     );
 
-    output.datamodel_steps
+    InferOutput(output)
 }
 
 pub fn apply_migration(

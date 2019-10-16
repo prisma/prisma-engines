@@ -28,8 +28,8 @@ fn assume_to_be_applied_must_work() {
             assume_to_be_applied: Vec::new(),
             datamodel: dm1.to_string(),
         };
-        let steps1 = run_infer_command(api, input1);
-        assert_eq!(steps1, vec![create_field_step("Blog", "field1", ScalarType::String)]);
+        let steps1 = run_infer_command(api, input1).0.datamodel_steps;
+        assert_eq!(steps1, &[create_field_step("Blog", "field1", ScalarType::String)]);
 
         let dm2 = r#"
             model Blog {
@@ -43,8 +43,8 @@ fn assume_to_be_applied_must_work() {
             assume_to_be_applied: steps1,
             datamodel: dm2.to_string(),
         };
-        let steps2 = run_infer_command(api, input2);
-        assert_eq!(steps2, vec![create_field_step("Blog", "field2", ScalarType::String)]);
+        let steps2 = run_infer_command(api, input2).0.datamodel_steps;
+        assert_eq!(steps2, &[create_field_step("Blog", "field2", ScalarType::String)]);
     });
 }
 
@@ -93,7 +93,7 @@ fn special_handling_of_watch_migrations() {
             datamodel: dm.to_string(),
         };
 
-        let steps = run_infer_command(api, input);
+        let steps = run_infer_command(api, input).0.datamodel_steps;
 
         assert_eq!(
             steps,
