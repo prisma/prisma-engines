@@ -88,7 +88,7 @@ impl Expressionista {
         if expressions.is_empty() {
             Ok(expr)
         } else {
-            let node_binding_name = format!("{}", node_id);
+            let node_binding_name = node_id.clone();
 
             // Add a final statement to the evaluation if the current node has child nodes and is supposed to be the
             // final result, to make sure it propagates upwards.
@@ -192,7 +192,7 @@ impl Expressionista {
                 let then_expr = Self::build_expression(graph, &then_pair.1, vec![])?;
                 let else_expr = else_pair
                     .into_iter()
-                    .map(|(_, node)| Self::build_expression(graph, &node, vec![]))
+                    .map(|(_, node)| Self::build_expression(graph, &node, graph.incoming_edges(&node)))
                     .collect::<InterpretationResult<Vec<Expression>>>()?;
 
                 Ok(match parent_edge {
