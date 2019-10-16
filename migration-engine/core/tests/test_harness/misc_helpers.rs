@@ -321,10 +321,12 @@ pub fn mysql_url() -> String {
 }
 
 pub fn mysql_8_url() -> String {
+    let (host, port) = db_host_and_port_mysql_8_0();
     dbg!(format!(
-        "mysql://root:prisma@{}:3307/{}",
-        db_host_mysql_8_0(),
-        SCHEMA_NAME
+        "mysql://root:prisma@{host}:{port}/{schema_name}",
+        host = host,
+        port = port,
+        schema_name = SCHEMA_NAME
     ))
 }
 
@@ -335,10 +337,10 @@ fn db_host_postgres() -> String {
     }
 }
 
-fn db_host_mysql_8_0() -> String {
+fn db_host_and_port_mysql_8_0() -> (String, usize) {
     match std::env::var("IS_BUILDKITE") {
-        Ok(_) => "test-db-mysql-8-0".to_string(),
-        Err(_) => "127.0.0.1".to_string(),
+        Ok(_) => ("test-db-mysql-8-0".to_string(), 3306),
+        Err(_) => ("127.0.0.1".to_string(), 3307),
     }
 }
 

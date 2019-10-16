@@ -38,6 +38,73 @@ fn single_watch_migrations_must_work() {
 
 #[test]
 fn multiple_watch_migrations_must_work() {
+    // // std::env::set_var("RUST_LOG", "debug");
+    // // env_logger::init();
+
+    // use std::fmt::Write;
+    // let mut vars = String::new();
+    // for (k, v) in std::env::vars() {
+    //     writeln!(vars, "{}={}", k, v).unwrap();
+    // }
+
+    // for _ in 1..5 {
+    //     println!("===========================");
+    // }
+
+    // let out = std::process::Command::new("docker").arg("ps").output().unwrap();
+    // println!("=== stdout ===");
+    // println!("{}", String::from_utf8_lossy(&out.stdout));
+    // println!("=== stderr ===");
+    // println!("{}", String::from_utf8_lossy(&out.stderr));
+
+    // for _ in 1..5 {
+    //     println!("===========================");
+    // }
+
+    // println!("docker network\n");
+
+    // let out = std::process::Command::new("docker")
+    //     .arg("network")
+    //     .arg("ls")
+    //     .output()
+    //     .unwrap();
+    // println!("=== stdout ===");
+    // println!("{}", String::from_utf8_lossy(&out.stdout));
+    // println!("=== stderr ===");
+    // println!("{}", String::from_utf8_lossy(&out.stderr));
+
+    // for _ in 1..5 {
+    //     println!("===========================");
+    // }
+
+    // let out = std::process::Command::new("docker")
+    //     .arg("network")
+    //     .arg("ls")
+    //     .output()
+    //     .unwrap();
+    // println!("=== stdout ===");
+    // println!("{}", String::from_utf8_lossy(&out.stdout));
+    // println!("=== stderr ===");
+    // println!("{}", String::from_utf8_lossy(&out.stderr));
+
+    // for _ in 1..5 {
+    //     println!("===========================");
+    // }
+
+    // println!("docker network inspect\n");
+
+    // let out = std::process::Command::new("docker")
+    //     .arg("network")
+    //     .arg("inspect")
+    //     .arg("docker-test-setups_tests")
+    //     .output()
+    //     .unwrap();
+    // println!("=== stdout ===");
+    // println!("{}", String::from_utf8_lossy(&out.stdout));
+    // println!("=== stderr ===");
+    // println!("{}", String::from_utf8_lossy(&out.stderr));
+
+    // panic!("{}", vars);
     test_each_connector(|test_setup, api| {
         let migration_persistence = api.migration_persistence();
 
