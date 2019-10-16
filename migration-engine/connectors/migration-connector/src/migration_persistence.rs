@@ -32,10 +32,10 @@ pub trait MigrationPersistence: Send + Sync + 'static {
     /// Fetch a migration by name.
     fn by_name(&self, name: &str) -> Option<Migration>;
 
-    // this power the listMigrations command
+    /// This power the listMigrations command.
     fn load_all(&self) -> Vec<Migration>;
 
-    // loads all current trailing watch migrations from Migration Event Log
+    /// Load all current trailing watch migrations from Migration Event Log.
     fn load_current_watch_migrations(&self) -> Vec<Migration> {
         let mut all_migrations = self.load_all();
         let mut result = Vec::new();
@@ -53,16 +53,7 @@ pub trait MigrationPersistence: Send + Sync + 'static {
         result
     }
 
-    fn load_all_datamodel_steps_from_all_current_watch_migrations(&self) -> Vec<MigrationStep> {
-        let all_watch_migrations = self.load_current_watch_migrations();
-        let mut all_steps_from_all_watch_migrations = Vec::new();
-        for mut migration in all_watch_migrations.into_iter() {
-            all_steps_from_all_watch_migrations.append(&mut migration.datamodel_steps);
-        }
-        all_steps_from_all_watch_migrations
-    }
-
-    // writes the migration to the Migration table
+    /// Write the migration to the Migration table.
     fn create(&self, migration: Migration) -> Migration;
 
     /// Used by the MigrationApplier to write the progress of a [Migration](struct.Migration.html)
