@@ -640,30 +640,35 @@ fn postgres_foreign_key_on_delete_must_be_handled() {
             }),
             foreign_keys: vec![
                 ForeignKey {
+                    constraint_name: Some("User_city_fkey".to_owned()),
                     columns: vec!["city".into()],
                     referenced_columns: vec!["id".into()],
                     referenced_table: "City".into(),
                     on_delete_action: ForeignKeyAction::NoAction,
                 },
                 ForeignKey {
+                    constraint_name: Some("User_city_cascade_fkey".to_owned()),
                     columns: vec!["city_cascade".into()],
                     referenced_columns: vec!["id".into()],
                     referenced_table: "City".into(),
                     on_delete_action: ForeignKeyAction::Cascade,
                 },
                 ForeignKey {
+                    constraint_name: Some("User_city_restrict_fkey".to_owned()),
                     columns: vec!["city_restrict".into()],
                     referenced_columns: vec!["id".into()],
                     referenced_table: "City".into(),
                     on_delete_action: ForeignKeyAction::Restrict,
                 },
                 ForeignKey {
+                    constraint_name: Some("User_city_set_default_fkey".to_owned()),
                     columns: vec!["city_set_default".into()],
                     referenced_columns: vec!["id".into()],
                     referenced_table: "City".into(),
                     on_delete_action: ForeignKeyAction::SetDefault,
                 },
                 ForeignKey {
+                    constraint_name: Some("User_city_set_null_fkey".to_owned()),
                     columns: vec!["city_set_null".into()],
                     referenced_columns: vec!["id".into()],
                     referenced_table: "City".into(),

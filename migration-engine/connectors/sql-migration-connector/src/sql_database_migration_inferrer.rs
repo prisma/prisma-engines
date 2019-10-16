@@ -233,7 +233,9 @@ fn needs_fix(alter_table: &AlterTable) -> bool {
         }
         TableChange::DropColumn(_) => true,
         TableChange::AlterColumn(_) => true,
+        TableChange::DropForeignKey(_) => true,
     });
+
     change_that_does_not_work_on_sqlite.is_some()
 }
 

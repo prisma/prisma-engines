@@ -161,7 +161,7 @@ fn creating_a_scalar_list_field_for_an_existing_table_must_work() {
         for table in &mut result.tables {
             if table.name == "Blog_tags" {
                 for fk in &mut table.foreign_keys {
-                    if fk.columns == vec!["nodeId".to_string()] {
+                    if fk.columns == &["nodeId"] {
                         fk.on_delete_action = ForeignKeyAction::Cascade
                     }
                 }

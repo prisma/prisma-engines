@@ -28,16 +28,17 @@ pub fn test_only_connector<F>(sql_family: SqlFamily, test_fn: F)
 where
     F: Fn(SqlFamily, &dyn GenericApi) -> () + std::panic::RefUnwindSafe,
 {
-    let all = vec![SqlFamily::Postgres, SqlFamily::Mysql, SqlFamily::Sqlite];
-    let ignores = all.into_iter().filter(|f| f != &sql_family).collect();
+    let all = &[SqlFamily::Postgres, SqlFamily::Mysql, SqlFamily::Sqlite];
+    let ignores: Vec<SqlFamily> = all.iter().filter(|f| f != &&sql_family).map(|f| *f).collect();
 
     test_each_connector_with_ignores(ignores, test_fn);
 }
 
-pub fn test_each_connector_with_ignores<F>(ignores: Vec<SqlFamily>, test_fn: F)
+pub fn test_each_connector_with_ignores<I: AsRef<[SqlFamily]>, F>(ignores: I, test_fn: F)
 where
     F: Fn(SqlFamily, &dyn GenericApi) -> () + std::panic::RefUnwindSafe,
 {
+    let ignores: &[SqlFamily] = ignores.as_ref();
     // POSTGRES
     if !ignores.contains(&SqlFamily::Postgres) {
         println!("--------------- Testing with Postgres now ---------------");

@@ -2,7 +2,7 @@
 #![allow(unused)]
 mod test_harness;
 use pretty_assertions::{assert_eq, assert_ne};
-use sql_migration_connector::{AlterIndex, DropIndex, CreateIndex, SqlFamily, SqlMigrationStep};
+use sql_migration_connector::{AlterIndex, CreateIndex, DropIndex, SqlFamily, SqlMigrationStep};
 use sql_schema_describer::*;
 use test_harness::*;
 
@@ -230,7 +230,12 @@ fn changing_the_type_of_an_id_field_must_work() {
         assert_eq!(column.tpe.family, ColumnTypeFamily::Int);
         assert_eq!(
             table.foreign_keys,
-            vec![ForeignKey {
+            &[ForeignKey {
+                constraint_name: match sql_family {
+                    SqlFamily::Postgres => Some("A_b_fkey".to_owned()),
+                    SqlFamily::Mysql => Some("A_ibfk_1".to_owned()),
+                    SqlFamily::Sqlite => None,
+                },
                 columns: vec![column.name.clone()],
                 referenced_table: "B".to_string(),
                 referenced_columns: vec!["id".to_string()],
@@ -253,7 +258,12 @@ fn changing_the_type_of_an_id_field_must_work() {
         assert_eq!(column.tpe.family, ColumnTypeFamily::String);
         assert_eq!(
             table.foreign_keys,
-            vec![ForeignKey {
+            &[ForeignKey {
+                constraint_name: match sql_family {
+                    SqlFamily::Postgres => Some("A_b_fkey".to_owned()),
+                    SqlFamily::Mysql => Some("A_ibfk_1".to_owned()),
+                    SqlFamily::Sqlite => None,
+                },
                 columns: vec![column.name.clone()],
                 referenced_table: "B".to_string(),
                 referenced_columns: vec!["id".to_string()],
@@ -290,7 +300,7 @@ fn updating_db_name_of_a_scalar_field_must_work() {
 #[test]
 fn changing_a_relation_field_to_a_scalar_field_must_work() {
     // this relies on link: INLINE which we don't support yet
-    test_each_connector_with_ignores(vec![SqlFamily::Mysql], |sql_family, api| {
+    test_each_connector_with_ignores(&[SqlFamily::Mysql], |sql_family, api| {
         let dm1 = r#"
             model A {
                 id Int @id
@@ -307,7 +317,12 @@ fn changing_a_relation_field_to_a_scalar_field_must_work() {
         assert_eq!(column.tpe.family, ColumnTypeFamily::Int);
         assert_eq!(
             table.foreign_keys,
-            vec![ForeignKey {
+            &[ForeignKey {
+                constraint_name: match sql_family {
+                    SqlFamily::Postgres => Some("A_b_fkey".to_owned()),
+                    SqlFamily::Mysql => Some("A_ibfk_1".to_owned()),
+                    SqlFamily::Sqlite => None,
+                },
                 columns: vec![column.name.clone()],
                 referenced_table: "B".to_string(),
                 referenced_columns: vec!["id".to_string()],
@@ -366,7 +381,12 @@ fn changing_a_scalar_field_to_a_relation_field_must_work() {
         assert_eq!(column.tpe.family, ColumnTypeFamily::Int);
         assert_eq!(
             table.foreign_keys,
-            vec![ForeignKey {
+            &[ForeignKey {
+                constraint_name: match sql_family {
+                    SqlFamily::Postgres => Some("A_b_fkey".to_owned()),
+                    SqlFamily::Mysql => Some("A_ibfk_1".to_owned()),
+                    SqlFamily::Sqlite => None,
+                },
                 columns: vec![column.name.clone()],
                 referenced_table: "B".to_string(),
                 referenced_columns: vec!["id".to_string()],
@@ -402,14 +422,24 @@ fn adding_a_many_to_many_relation_must_result_in_a_prisma_style_relation_table()
 
         assert_eq!(
             relation_table.foreign_keys,
-            vec![
+            &[
                 ForeignKey {
+                    constraint_name: match sql_family {
+                        SqlFamily::Postgres => Some("_AToB_A_fkey".to_owned()),
+                        SqlFamily::Mysql => Some("_AToB_ibfk_1".to_owned()),
+                        SqlFamily::Sqlite => None,
+                    },
                     columns: vec![aColumn.name.clone()],
                     referenced_table: "A".to_string(),
                     referenced_columns: vec!["id".to_string()],
                     on_delete_action: ForeignKeyAction::Cascade,
                 },
                 ForeignKey {
+                    constraint_name: match sql_family {
+                        SqlFamily::Postgres => Some("_AToB_B_fkey".to_owned()),
+                        SqlFamily::Mysql => Some("_AToB_ibfk_2".to_owned()),
+                        SqlFamily::Sqlite => None,
+                    },
                     columns: vec![bColumn.name.clone()],
                     referenced_table: "B".to_string(),
                     referenced_columns: vec!["id".to_string()],
@@ -447,12 +477,22 @@ fn adding_a_many_to_many_relation_with_custom_name_must_work() {
             relation_table.foreign_keys,
             vec![
                 ForeignKey {
+                    constraint_name: match sql_family {
+                        SqlFamily::Postgres => Some("_my_relation_A_fkey".to_owned()),
+                        SqlFamily::Mysql => Some("_my_relation_ibfk_1".to_owned()),
+                        SqlFamily::Sqlite => None,
+                    },
                     columns: vec![aColumn.name.clone()],
                     referenced_table: "A".to_string(),
                     referenced_columns: vec!["id".to_string()],
                     on_delete_action: ForeignKeyAction::Cascade,
                 },
                 ForeignKey {
+                    constraint_name: match sql_family {
+                        SqlFamily::Postgres => Some("_my_relation_B_fkey".to_owned()),
+                        SqlFamily::Mysql => Some("_my_relation_ibfk_2".to_owned()),
+                        SqlFamily::Sqlite => None,
+                    },
                     columns: vec![bColumn.name.clone()],
                     referenced_table: "B".to_string(),
                     referenced_columns: vec!["id".to_string()],
@@ -510,7 +550,12 @@ fn adding_an_inline_relation_must_result_in_a_foreign_key_in_the_model_table() {
         assert_eq!(column.tpe.family, ColumnTypeFamily::Int);
         assert_eq!(
             table.foreign_keys,
-            vec![ForeignKey {
+            &[ForeignKey {
+                constraint_name: match sql_family {
+                    SqlFamily::Postgres => Some("A_b_fkey".to_owned()),
+                    SqlFamily::Mysql => Some("A_ibfk_1".to_owned()),
+                    SqlFamily::Sqlite => None,
+                },
                 columns: vec![column.name.clone()],
                 referenced_table: "B".to_string(),
                 referenced_columns: vec!["id".to_string()],
@@ -539,7 +584,12 @@ fn specifying_a_db_name_for_an_inline_relation_must_work() {
         assert_eq!(column.tpe.family, ColumnTypeFamily::Int);
         assert_eq!(
             table.foreign_keys,
-            vec![ForeignKey {
+            &[ForeignKey {
+                constraint_name: match sql_family {
+                    SqlFamily::Postgres => Some("A_b_column_fkey".to_owned()),
+                    SqlFamily::Mysql => Some("A_ibfk_1".to_owned()),
+                    SqlFamily::Sqlite => None,
+                },
                 columns: vec![column.name.clone()],
                 referenced_table: "B".to_string(),
                 referenced_columns: vec!["id".to_string()],
@@ -568,7 +618,12 @@ fn adding_an_inline_relation_to_a_model_with_an_exotic_id_type() {
         assert_eq!(column.tpe.family, ColumnTypeFamily::String);
         assert_eq!(
             table.foreign_keys,
-            vec![ForeignKey {
+            &[ForeignKey {
+                constraint_name: match sql_family {
+                    SqlFamily::Postgres => Some("A_b_fkey".to_owned()),
+                    SqlFamily::Mysql => Some("A_ibfk_1".to_owned()),
+                    SqlFamily::Sqlite => None,
+                },
                 columns: vec![column.name.clone()],
                 referenced_table: "B".to_string(),
                 referenced_columns: vec!["id".to_string()],
@@ -627,7 +682,12 @@ fn moving_an_inline_relation_to_the_other_side_must_work() {
         let table = result.table_bang("A");
         assert_eq!(
             table.foreign_keys,
-            vec![ForeignKey {
+            &[ForeignKey {
+                constraint_name: match sql_family {
+                    SqlFamily::Postgres => Some("A_b_fkey".to_owned()),
+                    SqlFamily::Sqlite => None,
+                    SqlFamily::Mysql => unreachable!(),
+                },
                 columns: vec!["b".to_string()],
                 referenced_table: "B".to_string(),
                 referenced_columns: vec!["id".to_string()],
@@ -649,7 +709,12 @@ fn moving_an_inline_relation_to_the_other_side_must_work() {
         let table = result.table_bang("B");
         assert_eq!(
             table.foreign_keys,
-            vec![ForeignKey {
+            &[ForeignKey {
+                constraint_name: match sql_family {
+                    SqlFamily::Postgres => Some("B_a_fkey".to_owned()),
+                    SqlFamily::Sqlite => None,
+                    SqlFamily::Mysql => unreachable!(),
+                },
                 columns: vec!["a".to_string()],
                 referenced_table: "A".to_string(),
                 referenced_columns: vec!["id".to_string()],
@@ -1163,9 +1228,9 @@ fn index_updates_with_rename_must_work() {
                     index: Index {
                         name: "customNameA".into(),
                         columns: vec!["field".into(), "id".into()],
-                        tpe: IndexType::Unique, 
+                        tpe: IndexType::Unique,
                     },
-                })
+                }),
             ];
             let actual_steps = result.sql_migration();
             assert_eq!(actual_steps, expected_steps);
@@ -1275,6 +1340,11 @@ fn reserved_sql_key_words_must_work() {
         assert_eq!(
             table.foreign_keys,
             vec![ForeignKey {
+                constraint_name: match sql_family {
+                    SqlFamily::Postgres => Some("Group_parent_fkey".to_owned()),
+                    SqlFamily::Mysql => Some("Group_ibfk_1".to_owned()),
+                    SqlFamily::Sqlite => None,
+                },
                 columns: vec!["parent".to_string()],
                 referenced_table: "Group".to_string(),
                 referenced_columns: vec!["id".to_string()],
@@ -1342,5 +1412,53 @@ fn migrations_with_many_to_many_related_models_must_not_recreate_indexes() {
             .find(|index| index.name == "_ProfileToSkill_AB_unique")
             .expect("index is present");
         assert_eq!(index.tpe, IndexType::Unique);
+    })
+}
+
+#[test]
+fn removing_a_relation_field_must_work() {
+    test_each_connector(|sql_family, api| {
+        let dm_1 = r#"
+            model User {
+                id        String  @default(cuid()) @id
+                address   Address @map("address_name")
+            }
+
+            model Address {
+                id        String  @default(cuid()) @id
+                street    String
+            }
+        "#;
+
+        let sql_schema = infer_and_apply(api, &dm_1).sql_schema;
+
+        let address_name_field = sql_schema
+            .table_bang("User")
+            .columns
+            .iter()
+            .find(|col| col.name == "address_name");
+
+        assert!(address_name_field.is_some());
+
+        let dm_2 = r#"
+            model User {
+                id        String  @default(cuid()) @id
+            }
+
+            model Address {
+                id        String  @default(cuid()) @id
+                street    String
+            }
+        "#;
+
+        let sql_schema = infer_and_apply(api, &dm_2).sql_schema;
+
+        let address_name_field = sql_schema
+            .table_bang("User")
+            .columns
+            .iter()
+            .find(|col| col.name == "address_name");
+
+        assert!(address_name_field.is_none());
     })
 }

@@ -149,7 +149,8 @@ impl SqlSchemaDescriber {
                 att2.attname as \"child_column\", 
                 cl.relname as \"parent_table\", 
                 att.attname as \"parent_column\",
-                con.confdeltype
+                con.confdeltype,
+                conname as constraint_name
             FROM
             (SELECT 
                     unnest(con1.conkey) as \"parent\", 
@@ -204,6 +205,10 @@ impl SqlSchemaDescriber {
                 .get("confdeltype")
                 .and_then(|x| x.as_char())
                 .expect("get confdeltype");
+            let constraint_name = row
+                .get("constraint_name")
+                .and_then(|x| x.to_string())
+                .expect("get constraint_name");
             let on_delete_action = match confdeltype {
                 'a' => ForeignKeyAction::NoAction,
                 'r' => ForeignKeyAction::Restrict,
@@ -219,6 +224,7 @@ impl SqlSchemaDescriber {
                 }
                 None => {
                     let fk = ForeignKey {
+                        constraint_name: Some(constraint_name),
                         columns: vec![column],
                         referenced_table,
                         referenced_columns: vec![referenced_column],

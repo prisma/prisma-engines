@@ -142,6 +142,7 @@ impl<'a> SqlSchemaCalculator<'a> {
                     sequence: None,
                 };
                 let foreign_keys = vec![sql::ForeignKey {
+                    constraint_name: None,
                     columns: vec!["nodeId".to_string()],
                     referenced_table: model.db_name(),
                     referenced_columns: vec![model.id_field()?.db_name()],
@@ -200,6 +201,7 @@ impl<'a> SqlSchemaCalculator<'a> {
                         };
                         let field = model.fields().find(|f| &f.db_name() == column).unwrap();
                         let foreign_key = sql::ForeignKey {
+                            constraint_name: None,
                             columns: vec![column.to_string()],
                             referenced_table: related_model.db_name(),
                             referenced_columns: vec![related_model.id_field()?.db_name()],
@@ -230,12 +232,14 @@ impl<'a> SqlSchemaCalculator<'a> {
                 TempManifestationHolder::Table => {
                     let foreign_keys = vec![
                         sql::ForeignKey {
+                            constraint_name: None,
                             columns: vec![relation.model_a_column()],
                             referenced_table: relation.model_a.db_name(),
                             referenced_columns: vec![relation.model_a.id_field()?.db_name()],
                             on_delete_action: sql::ForeignKeyAction::Cascade,
                         },
                         sql::ForeignKey {
+                            constraint_name: None,
                             columns: vec![relation.model_b_column()],
                             referenced_table: relation.model_b.db_name(),
                             referenced_columns: vec![relation.model_b.id_field()?.db_name()],

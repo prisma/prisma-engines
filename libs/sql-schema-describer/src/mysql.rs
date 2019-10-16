@@ -199,6 +199,7 @@ impl SqlSchemaDescriber {
                 }
                 None => {
                     let fk = ForeignKey {
+                        constraint_name: Some(constraint_name.clone()),
                         columns: vec![column],
                         referenced_table,
                         referenced_columns: vec![referenced_column],
