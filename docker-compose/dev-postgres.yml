@@ -1,4 +1,4 @@
-# Transient db - will lose it's data once restarted
+# Transient db - will lose its data once restarted
 version: "3"
 services:
   postgres:
