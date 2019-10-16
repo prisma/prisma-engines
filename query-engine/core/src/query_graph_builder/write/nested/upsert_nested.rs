@@ -5,6 +5,7 @@ use crate::{
     query_graph::{Flow, Node, NodeRef, QueryGraph, QueryGraphDependency},
     ParsedInputValue,
 };
+use connector::Filter;
 use prisma_models::{ModelRef, RelationFieldRef};
 use std::{convert::TryInto, sync::Arc};
 
@@ -26,8 +27,10 @@ pub fn connect_nested_upsert(
         let update_input = as_map.remove("update").expect("update argument is missing");
 
         let record_finder = extract_record_finder(where_input, &model)?;
-        let child_read_query = utils::id_read_query_infallible(&model, record_finder.clone());
-        let initial_read_node = graph.create_node(child_read_query);
+        let finder_as_filter: Filter = record_finder.clone().into();
+
+        let initial_read_node =
+            utils::insert_find_children_by_parent_node(graph, &parent_node, parent_relation_field, finder_as_filter)?;
 
         let create_node = create::create_record_node(graph, Arc::clone(&model), create_input.try_into()?)?;
         let update_node =
@@ -53,7 +56,7 @@ pub fn connect_nested_upsert(
 
         graph.create_edge(&if_node, &create_node, QueryGraphDependency::Else)?;
 
-        if !parent_relation_field.relation_is_inlined_in_parent() {
+        if parent_relation_field.relation_is_inlined_in_child() {
             let related_field_name = parent_relation_field.related_field().name.clone();
             graph.create_edge(
                 &parent_node,
@@ -74,9 +77,9 @@ pub fn connect_nested_upsert(
                     Ok(child_node)
                 })),
             )?;
+        } else {
+            connect::connect_records_node(graph, &parent_node, &create_node, &parent_relation_field, None, None)?;
         }
-
-        graph.create_edge(&parent_node, &initial_read_node, QueryGraphDependency::ExecutionOrder)?;
     }
 
     Ok(())

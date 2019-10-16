@@ -312,9 +312,9 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |  where: { p: "p1"}
          |  data:{
          |    childrenOpt: {upsert: [{
-         |    where: {c: "DOES NOT EXIST"}
-         |    update: {c: "DOES NOT MATTER"}
-         |    create :{c: "updated C"}
+         |      where: {c: "DOES NOT EXIST"}
+         |      update: {c: "DOES NOT MATTER"}
+         |      create :{c: "updated C"}
          |    }]}
          |  }){
          |    childrenOpt{

@@ -134,6 +134,10 @@ impl RelationField {
         }
     }
 
+    pub fn relation_is_inlined_in_child(&self) -> bool {
+        self.relation().is_inline_relation() && !self.relation_is_inlined_in_parent()
+    }
+
     pub fn opposite_column(&self) -> Column<'static> {
         match self.relation_side {
             RelationSide::A => self.relation().model_b_column(),

@@ -19,7 +19,10 @@ impl Expressionista {
         node: &NodeRef,
         mut parent_edges: Vec<EdgeRef>,
     ) -> InterpretationResult<Expression> {
-        match graph.node_content(node).unwrap() {
+        match graph
+            .node_content(node)
+            .expect(&format!("Node content {} was empty", node.id()))
+        {
             Node::Query(_) => Self::build_query_expression(graph, node, parent_edges),
             Node::Flow(_) => Self::build_flow_expression(graph, node, parent_edges.pop()),
         }
