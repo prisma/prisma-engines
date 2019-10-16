@@ -1,7 +1,7 @@
 use super::{introspect_database, TestSetup};
 use migration_connector::*;
 use migration_core::{api::GenericApi, commands::*};
-use sql_migration_connector::SqlMigrationStep;
+use sql_migration_connector::{PrettySqlMigrationStep, SqlMigrationStep};
 use sql_schema_describer::*;
 
 #[derive(Debug)]
@@ -12,11 +12,9 @@ pub struct InferAndApplyOutput {
 
 impl InferAndApplyOutput {
     pub fn sql_migration(&self) -> Vec<SqlMigrationStep> {
-        let mut steps = self.migration_output.database_steps.clone();
-        steps.as_array_mut().unwrap().iter_mut().for_each(|value| {
-            value.as_object_mut().unwrap().remove("raw");
-        });
-        serde_json::from_value(steps).unwrap()
+        let steps: Vec<PrettySqlMigrationStep> =
+            serde_json::from_value(self.migration_output.database_steps.clone()).unwrap();
+        steps.into_iter().map(|pretty_step| pretty_step.step).collect()
     }
 }
 

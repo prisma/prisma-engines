@@ -58,14 +58,11 @@ fn render_steps_pretty(
         .corrected_steps
         .iter()
         .map(|step| {
-            let cloned = step.clone();
-            let mut json_value = serde_json::to_value(&step).unwrap();
-            let json_object = json_value.as_object_mut().unwrap();
-            json_object.insert(
-                "raw".to_string(),
-                serde_json::Value::String(render_raw_sql(&cloned, sql_family, schema_name)),
-            );
-            json_value
+            let pretty_step = PrettySqlMigrationStep {
+                step: step.clone(),
+                raw: render_raw_sql(&step, sql_family, schema_name),
+            };
+            serde_json::to_value(&pretty_step).unwrap()
         })
         .collect();
     Ok(serde_json::Value::Array(jsons))
