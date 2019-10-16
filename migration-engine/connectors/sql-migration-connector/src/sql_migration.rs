@@ -27,8 +27,14 @@ impl SqlMigration {
 }
 
 impl DatabaseMigrationMarker for SqlMigration {
+    type DatabaseMigrationStep = SqlMigrationStep;
+
     fn serialize(&self) -> serde_json::Value {
         serde_json::to_value(self).unwrap()
+    }
+
+    fn steps(&self) -> Vec<SqlMigrationStep> {
+        self.corrected_steps.clone()
     }
 }
 
@@ -47,7 +53,7 @@ pub enum SqlMigrationStep {
 
 /// A helper struct to serialize an [SqlMigrationStep](/sql-migration/enum.SqlMigrationStep.html)
 /// with an additional `raw` field containing the rendered SQL string for that step.
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, PartialEq)]
 pub struct PrettySqlMigrationStep {
     #[serde(flatten)]
     pub step: SqlMigrationStep,

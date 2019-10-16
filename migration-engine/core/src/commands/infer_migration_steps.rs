@@ -45,22 +45,39 @@ impl<'a> MigrationCommand<'a> for InferMigrationStepsCommand<'a> {
         let DestructiveChangeDiagnostics { warnings, errors: _ } =
             connector.destructive_changes_checker().check(&database_migration)?;
 
-        let database_steps_json = connector
+        let database_steps = connector
             .database_migration_step_applier()
             .render_steps_pretty(&database_migration)?;
 
-        let returned_datamodel_steps = if self.input.is_watch_migration() {
-            model_migration_steps
+        let (returned_datamodel_steps, returned_database_migration) = if self.input.is_watch_migration() {
+            (model_migration_steps, database_steps)
         } else {
-            let mut steps = migration_persistence.load_all_datamodel_steps_from_all_current_watch_migrations();
-            steps.append(&mut model_migration_steps.clone());
-            steps
+            let watch_migrations = migration_persistence.load_current_watch_migrations();
+
+            let mut returned_datamodel_steps = Vec::new();
+            let mut returned_database_steps = Vec::new();
+
+            for migration in watch_migrations {
+                let database_migration: D = serde_json::from_value(migration.database_migration)
+                    .expect("Database migration can be deserialized.");
+                let database_migration_steps: Vec<serde_json::Value> = connector
+                    .database_migration_step_applier()
+                    .render_steps_pretty(&database_migration)?;
+
+                returned_datamodel_steps.extend(migration.datamodel_steps);
+                returned_database_steps.extend(database_migration_steps);
+            }
+
+            returned_datamodel_steps.extend(model_migration_steps);
+            returned_database_steps.extend(database_steps);
+
+            (returned_datamodel_steps, returned_database_steps)
         };
 
         Ok(MigrationStepsResultOutput {
             datamodel: datamodel::render_datamodel_to_string(&next_datamodel).unwrap(),
             datamodel_steps: returned_datamodel_steps,
-            database_steps: database_steps_json,
+            database_steps: serde_json::Value::Array(returned_database_migration),
             errors: vec![],
             warnings,
             general_errors: vec![],

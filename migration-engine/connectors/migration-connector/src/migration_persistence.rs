@@ -1,10 +1,9 @@
 use crate::steps::*;
 use chrono::{DateTime, Utc};
 use datamodel::Datamodel;
-use serde::{Serialize};
+use serde::Serialize;
 
-
-/// This trait is implemented by each connector. It provides a generic API to store and retrieve [Migration](struct.Migration.html) records. 
+/// This trait is implemented by each connector. It provides a generic API to store and retrieve [Migration](struct.Migration.html) records.
 pub trait MigrationPersistence: Send + Sync + 'static {
     /// Initialize migration persistence state. E.g. create the migrations table in an SQL database.
     fn init(&self);
