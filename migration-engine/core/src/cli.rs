@@ -198,7 +198,7 @@ mod tests {
 
     fn mysql_url(db: Option<&str>) -> String {
         match std::env::var("IS_BUILDKITE") {
-            Ok(_) => format!("mysql://root:prisma@test-db-mysql:3306/{}", db.unwrap_or("")),
+            Ok(_) => format!("mysql://root:prisma@test-db-mysql-5-7:3306/{}", db.unwrap_or("")),
             _ => format!("mysql://root:prisma@127.0.0.1:3306/{}", db.unwrap_or("")),
         }
     }
