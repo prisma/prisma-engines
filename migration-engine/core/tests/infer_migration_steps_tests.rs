@@ -8,14 +8,14 @@ use test_harness::*;
 
 #[test]
 fn assume_to_be_applied_must_work() {
-    test_each_connector(|_, api| {
+    test_each_connector(|test_setup, api| {
         let dm0 = r#"
             model Blog {
                 id Int @id
             }
         "#;
 
-        infer_and_apply_with_migration_id(api, &dm0, "mig0000");
+        infer_and_apply_with_migration_id(test_setup, api, &dm0, "mig0000");
 
         let dm1 = r#"
             model Blog {
@@ -50,14 +50,14 @@ fn assume_to_be_applied_must_work() {
 
 #[test]
 fn special_handling_of_watch_migrations() {
-    test_each_connector(|_, api| {
+    test_each_connector(|test_setup, api| {
         let dm = r#"
             model Blog {
                 id Int @id
             }
         "#;
 
-        infer_and_apply_with_migration_id(api, &dm, "mig00");
+        infer_and_apply_with_migration_id(test_setup, api, &dm, "mig00");
 
         let dm = r#"
             model Blog {
@@ -66,7 +66,7 @@ fn special_handling_of_watch_migrations() {
             }
         "#;
 
-        infer_and_apply_with_migration_id(api, &dm, "watch01");
+        infer_and_apply_with_migration_id(test_setup, api, &dm, "watch01");
 
         let dm = r#"
             model Blog {
@@ -76,7 +76,7 @@ fn special_handling_of_watch_migrations() {
             }
         "#;
 
-        infer_and_apply_with_migration_id(api, &dm, "watch02");
+        infer_and_apply_with_migration_id(test_setup, api, &dm, "watch02");
 
         let dm = r#"
             model Blog {

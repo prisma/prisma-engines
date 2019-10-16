@@ -7,7 +7,7 @@ use test_harness::*;
 
 #[test]
 fn adding_a_required_field_if_there_is_data() {
-    test_each_connector(|sql_family, api| {
+    test_each_connector(|test_setup, api| {
         let dm = r#"
             model Test {
                 id String @id @default(cuid())
@@ -18,11 +18,10 @@ fn adding_a_required_field_if_there_is_data() {
                 A
             }
         "#;
-        infer_and_apply(api, &dm).sql_schema;
+        infer_and_apply(test_setup, api, &dm).sql_schema;
 
-        let conn = database(sql_family);
         let insert = Insert::single_into((SCHEMA_NAME, "Test")).value("id", "test");
-        conn.execute(SCHEMA_NAME, insert.into()).unwrap();
+        test_setup.database.execute(SCHEMA_NAME, insert.into()).unwrap();
 
         let dm = r#"
             model Test {
@@ -40,13 +39,13 @@ fn adding_a_required_field_if_there_is_data() {
                 A
             }
         "#;
-        infer_and_apply(api, &dm);
+        infer_and_apply(test_setup, api, &dm);
     });
 }
 
 #[test]
 fn adding_a_required_field_must_use_the_default_value_for_migrations() {
-    test_each_connector(|sql_family, api| {
+    test_each_connector(|test_setup, api| {
         let dm = r#"
             model Test {
                 id String @id @default(cuid())
@@ -57,9 +56,9 @@ fn adding_a_required_field_must_use_the_default_value_for_migrations() {
                 A
             }
         "#;
-        infer_and_apply(api, &dm);
+        infer_and_apply(test_setup, api, &dm);
 
-        let conn = database(sql_family);
+        let conn = &test_setup.database;
         let insert = Insert::single_into((SCHEMA_NAME, "Test")).value("id", "test");
 
         conn.execute(SCHEMA_NAME, insert.into()).unwrap();
@@ -81,12 +80,12 @@ fn adding_a_required_field_must_use_the_default_value_for_migrations() {
                 C
             }
         "#;
-        infer_and_apply(api, &dm);
+        infer_and_apply(test_setup, api, &dm);
 
         // TODO: those assertions somehow fail with column not found on SQLite. I could observe the correct data in the db file though.
-        if sql_family != SqlFamily::Sqlite {
+        if test_setup.sql_family != SqlFamily::Sqlite {
             let conditions = "id".equals("test");
-            let table_for_select: Table = match sql_family {
+            let table_for_select: Table = match test_setup.sql_family {
                 SqlFamily::Sqlite => {
                     // sqlite case. Otherwise prisma-query produces invalid SQL
                     "Test".into()
@@ -104,15 +103,15 @@ fn adding_a_required_field_must_use_the_default_value_for_migrations() {
 
 #[test]
 fn dropping_a_table_with_rows_should_warn() {
-    test_each_connector(|sql_family, engine| {
+    test_each_connector(|test_setup, engine| {
         let dm = r#"
                     model Test {
                         id String @id @default(cuid())
                     }
                 "#;
-        let original_database_schema = infer_and_apply(engine, &dm).sql_schema;
+        let original_database_schema = infer_and_apply(test_setup, engine, &dm).sql_schema;
 
-        let conn = database(sql_family);
+        let conn = &test_setup.database;
         let insert = Insert::single_into((SCHEMA_NAME, "Test")).value("id", "test");
 
         conn.execute(SCHEMA_NAME, insert.into()).unwrap();
@@ -122,7 +121,7 @@ fn dropping_a_table_with_rows_should_warn() {
         let InferAndApplyOutput {
             migration_output,
             sql_schema: final_database_schema,
-        } = infer_and_apply(engine, &dm);
+        } = infer_and_apply(test_setup, engine, &dm);
 
         // The schema should not change because the migration should not run if there are warnings
         // and the force flag isn't passed.
@@ -141,7 +140,7 @@ fn dropping_a_table_with_rows_should_warn() {
 
 #[test]
 fn dropping_a_column_with_non_null_values_should_warn() {
-    test_each_connector(|sql_family, engine| {
+    test_each_connector(|test_setup, engine| {
         let dm = r#"
             model Test {
                 id String @id @default(cuid())
@@ -149,14 +148,13 @@ fn dropping_a_column_with_non_null_values_should_warn() {
             }
         "#;
 
-        let original_database_schema = infer_and_apply(engine, &dm).sql_schema;
+        let original_database_schema = infer_and_apply(test_setup, engine, &dm).sql_schema;
 
-        let conn = database(sql_family);
         let insert = Insert::multi_into((SCHEMA_NAME, "Test"), vec!["id", "puppiesCount"])
             .values(("a", 7))
             .values(("b", 8));
 
-        conn.execute(SCHEMA_NAME, insert.into()).unwrap();
+        test_setup.database.execute(SCHEMA_NAME, insert.into()).unwrap();
 
         // Drop the `favouriteAnimal` column.
         let dm = r#"
@@ -168,7 +166,7 @@ fn dropping_a_column_with_non_null_values_should_warn() {
         let InferAndApplyOutput {
             migration_output,
             sql_schema: final_database_schema,
-        } = infer_and_apply(engine, &dm);
+        } = infer_and_apply(test_setup, engine, &dm);
 
         // The schema should not change because the migration should not run if there are warnings
         // and the force flag isn't passed.

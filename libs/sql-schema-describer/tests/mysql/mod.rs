@@ -22,7 +22,7 @@ impl crate::SqlConnection for MySqlConnection {
 
 pub fn get_mysql_describer(sql: &str) -> mysql::SqlSchemaDescriber {
     let host = match std::env::var("IS_BUILDKITE") {
-        Ok(_) => "test-db-mysql",
+        Ok(_) => "test-db-mysql-5-7",
         Err(_) => "127.0.0.1",
     };
     let port = 3306;
