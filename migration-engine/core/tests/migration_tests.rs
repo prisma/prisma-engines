@@ -232,7 +232,7 @@ fn changing_the_type_of_an_id_field_must_work() {
         assert_eq!(
             table.foreign_keys,
             &[ForeignKey {
-                constraint_name: match sql_family {
+                constraint_name: match test_setup.sql_family {
                     SqlFamily::Postgres => Some("A_b_fkey".to_owned()),
                     SqlFamily::Mysql => Some("A_ibfk_1".to_owned()),
                     SqlFamily::Sqlite => None,
@@ -260,7 +260,7 @@ fn changing_the_type_of_an_id_field_must_work() {
         assert_eq!(
             table.foreign_keys,
             &[ForeignKey {
-                constraint_name: match sql_family {
+                constraint_name: match test_setup.sql_family {
                     SqlFamily::Postgres => Some("A_b_fkey".to_owned()),
                     SqlFamily::Mysql => Some("A_ibfk_1".to_owned()),
                     SqlFamily::Sqlite => None,
@@ -301,7 +301,7 @@ fn updating_db_name_of_a_scalar_field_must_work() {
 #[test]
 fn changing_a_relation_field_to_a_scalar_field_must_work() {
     // this relies on link: INLINE which we don't support yet
-    test_each_connector_with_ignores(&[SqlFamily::Mysql], |sql_family, api| {
+    test_each_connector_with_ignores(&[SqlFamily::Mysql], |test_setup, api| {
         let dm1 = r#"
             model A {
                 id Int @id
@@ -319,7 +319,7 @@ fn changing_a_relation_field_to_a_scalar_field_must_work() {
         assert_eq!(
             table.foreign_keys,
             &[ForeignKey {
-                constraint_name: match sql_family {
+                constraint_name: match test_setup.sql_family {
                     SqlFamily::Postgres => Some("A_b_fkey".to_owned()),
                     SqlFamily::Mysql => Some("A_ibfk_1".to_owned()),
                     SqlFamily::Sqlite => None,
@@ -383,7 +383,7 @@ fn changing_a_scalar_field_to_a_relation_field_must_work() {
         assert_eq!(
             table.foreign_keys,
             &[ForeignKey {
-                constraint_name: match sql_family {
+                constraint_name: match test_setup.sql_family {
                     SqlFamily::Postgres => Some("A_b_fkey".to_owned()),
                     SqlFamily::Mysql => Some("A_ibfk_1".to_owned()),
                     SqlFamily::Sqlite => None,
@@ -425,7 +425,7 @@ fn adding_a_many_to_many_relation_must_result_in_a_prisma_style_relation_table()
             relation_table.foreign_keys,
             &[
                 ForeignKey {
-                    constraint_name: match sql_family {
+                    constraint_name: match test_setup.sql_family {
                         SqlFamily::Postgres => Some("_AToB_A_fkey".to_owned()),
                         SqlFamily::Mysql => Some("_AToB_ibfk_1".to_owned()),
                         SqlFamily::Sqlite => None,
@@ -436,7 +436,7 @@ fn adding_a_many_to_many_relation_must_result_in_a_prisma_style_relation_table()
                     on_delete_action: ForeignKeyAction::Cascade,
                 },
                 ForeignKey {
-                    constraint_name: match sql_family {
+                    constraint_name: match test_setup.sql_family {
                         SqlFamily::Postgres => Some("_AToB_B_fkey".to_owned()),
                         SqlFamily::Mysql => Some("_AToB_ibfk_2".to_owned()),
                         SqlFamily::Sqlite => None,
@@ -478,7 +478,7 @@ fn adding_a_many_to_many_relation_with_custom_name_must_work() {
             relation_table.foreign_keys,
             vec![
                 ForeignKey {
-                    constraint_name: match sql_family {
+                    constraint_name: match test_setup.sql_family {
                         SqlFamily::Postgres => Some("_my_relation_A_fkey".to_owned()),
                         SqlFamily::Mysql => Some("_my_relation_ibfk_1".to_owned()),
                         SqlFamily::Sqlite => None,
@@ -489,7 +489,7 @@ fn adding_a_many_to_many_relation_with_custom_name_must_work() {
                     on_delete_action: ForeignKeyAction::Cascade,
                 },
                 ForeignKey {
-                    constraint_name: match sql_family {
+                    constraint_name: match test_setup.sql_family {
                         SqlFamily::Postgres => Some("_my_relation_B_fkey".to_owned()),
                         SqlFamily::Mysql => Some("_my_relation_ibfk_2".to_owned()),
                         SqlFamily::Sqlite => None,
@@ -552,7 +552,7 @@ fn adding_an_inline_relation_must_result_in_a_foreign_key_in_the_model_table() {
         assert_eq!(
             table.foreign_keys,
             &[ForeignKey {
-                constraint_name: match sql_family {
+                constraint_name: match test_setup.sql_family {
                     SqlFamily::Postgres => Some("A_b_fkey".to_owned()),
                     SqlFamily::Mysql => Some("A_ibfk_1".to_owned()),
                     SqlFamily::Sqlite => None,
@@ -586,7 +586,7 @@ fn specifying_a_db_name_for_an_inline_relation_must_work() {
         assert_eq!(
             table.foreign_keys,
             &[ForeignKey {
-                constraint_name: match sql_family {
+                constraint_name: match test_setup.sql_family {
                     SqlFamily::Postgres => Some("A_b_column_fkey".to_owned()),
                     SqlFamily::Mysql => Some("A_ibfk_1".to_owned()),
                     SqlFamily::Sqlite => None,
@@ -620,7 +620,7 @@ fn adding_an_inline_relation_to_a_model_with_an_exotic_id_type() {
         assert_eq!(
             table.foreign_keys,
             &[ForeignKey {
-                constraint_name: match sql_family {
+                constraint_name: match test_setup.sql_family {
                     SqlFamily::Postgres => Some("A_b_fkey".to_owned()),
                     SqlFamily::Mysql => Some("A_ibfk_1".to_owned()),
                     SqlFamily::Sqlite => None,
@@ -684,7 +684,7 @@ fn moving_an_inline_relation_to_the_other_side_must_work() {
         assert_eq!(
             table.foreign_keys,
             &[ForeignKey {
-                constraint_name: match sql_family {
+                constraint_name: match test_setup.sql_family {
                     SqlFamily::Postgres => Some("A_b_fkey".to_owned()),
                     SqlFamily::Sqlite => None,
                     SqlFamily::Mysql => unreachable!(),
@@ -711,7 +711,7 @@ fn moving_an_inline_relation_to_the_other_side_must_work() {
         assert_eq!(
             table.foreign_keys,
             &[ForeignKey {
-                constraint_name: match sql_family {
+                constraint_name: match test_setup.sql_family {
                     SqlFamily::Postgres => Some("B_a_fkey".to_owned()),
                     SqlFamily::Sqlite => None,
                     SqlFamily::Mysql => unreachable!(),
@@ -1329,6 +1329,7 @@ fn updating_a_model_with_a_scalar_list_to_a_different_id_type_must_work() {
 fn reserved_sql_key_words_must_work() {
     // Group is a reserved keyword
     test_each_connector(|test_setup, api| {
+        let sql_family = test_setup.sql_family;
         let dm = r#"
             model Group {
                 id    String  @default(cuid()) @id
@@ -1420,7 +1421,9 @@ fn migrations_with_many_to_many_related_models_must_not_recreate_indexes() {
 
 #[test]
 fn removing_a_relation_field_must_work() {
-    test_each_connector(|sql_family, api| {
+    test_each_connector(|test_setup, api| {
+        let sql_family = test_setup.sql_family;
+
         let dm_1 = r#"
             model User {
                 id        String  @default(cuid()) @id
@@ -1433,7 +1436,7 @@ fn removing_a_relation_field_must_work() {
             }
         "#;
 
-        let sql_schema = infer_and_apply(api, &dm_1).sql_schema;
+        let sql_schema = infer_and_apply(test_setup, api, &dm_1).sql_schema;
 
         let address_name_field = sql_schema
             .table_bang("User")
@@ -1454,7 +1457,7 @@ fn removing_a_relation_field_must_work() {
             }
         "#;
 
-        let sql_schema = infer_and_apply(api, &dm_2).sql_schema;
+        let sql_schema = infer_and_apply(test_setup, api, &dm_2).sql_schema;
 
         let address_name_field = sql_schema
             .table_bang("User")
