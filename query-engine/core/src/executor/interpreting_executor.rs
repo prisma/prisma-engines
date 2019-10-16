@@ -1,6 +1,6 @@
 use super::{pipeline::QueryPipeline, QueryExecutor};
 use crate::{
-    CoreResult, IrSerializer, QueryGraphBuilder, QueryDocument, QueryGraph, QueryInterpreter, QuerySchemaRef, Response,
+    CoreResult, IrSerializer, QueryDocument, QueryGraph, QueryGraphBuilder, QueryInterpreter, QuerySchemaRef, Response,
 };
 use connector::{Connector, TransactionLike};
 
@@ -19,7 +19,10 @@ where
     C: Connector + Send + Sync + 'static,
 {
     pub fn new(connector: C, primary_connector: &'static str) -> Self {
-        InterpretingExecutor { connector, primary_connector }
+        InterpretingExecutor {
+            connector,
+            primary_connector,
+        }
     }
 
     pub fn with_interpreter<'a, F>(&self, f: F) -> CoreResult<Response>
@@ -27,7 +30,7 @@ where
         F: FnOnce(QueryInterpreter) -> CoreResult<Response>,
     {
         let res = self.connector.with_transaction(|tx: &mut dyn TransactionLike| {
-            let interpreter = QueryInterpreter { tx };
+            let interpreter = QueryInterpreter::new(tx);
 
             Ok(f(interpreter))
         })?;
