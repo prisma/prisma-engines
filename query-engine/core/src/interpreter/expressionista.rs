@@ -192,8 +192,7 @@ impl Expressionista {
                 let else_pair = else_pair.pop();
 
                 // Build expressions for both arms. They are treated as separate root nodes.
-                // TODO: passing the parents in the then case breaks a lot of stuff
-                let then_expr = Self::build_expression(graph, &then_pair.1, vec![])?;
+                let then_expr = Self::build_expression(graph, &then_pair.1, graph.incoming_edges(&then_pair.1))?;
                 let else_expr = else_pair
                     .into_iter()
                     .map(|(_, node)| Self::build_expression(graph, &node, graph.incoming_edges(&node)))
