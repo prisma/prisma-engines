@@ -16,14 +16,16 @@ pub trait MigrationPersistence: Send + Sync + 'static {
         self.last().map(|m| m.datamodel).unwrap_or_else(Datamodel::empty)
     }
 
-    fn last_non_watch_datamodel(&self) -> Datamodel {
+    fn last_non_watch_migration(&self) -> Option<Migration> {
         let mut all_migrations = self.load_all();
         all_migrations.reverse();
-        all_migrations
-            .into_iter()
-            .find(|m| !m.is_watch_migration())
+        all_migrations.into_iter().find(|m| !m.is_watch_migration())
+    }
+
+    fn last_non_watch_datamodel(&self) -> Datamodel {
+        self.last_non_watch_migration()
             .map(|m| m.datamodel)
-            .unwrap_or(Datamodel::empty())
+            .unwrap_or_else(Datamodel::empty)
     }
 
     /// Returns the last successful Migration.

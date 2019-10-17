@@ -27,14 +27,8 @@ impl SqlMigration {
 }
 
 impl DatabaseMigrationMarker for SqlMigration {
-    type DatabaseMigrationStep = SqlMigrationStep;
-
     fn serialize(&self) -> serde_json::Value {
         serde_json::to_value(self).unwrap()
-    }
-
-    fn steps(&self) -> Vec<SqlMigrationStep> {
-        self.corrected_steps.clone()
     }
 }
 

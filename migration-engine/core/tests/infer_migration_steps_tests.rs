@@ -5,7 +5,8 @@ use datamodel::dml::*;
 use migration_connector::MigrationStep;
 use migration_core::commands::*;
 use pretty_assertions::{assert_eq, assert_ne};
-use sql_migration_connector::{PrettySqlMigrationStep, SqlFamily};
+use sql_migration_connector::{AlterTable, CreateTable, PrettySqlMigrationStep, SqlFamily, SqlMigrationStep};
+use sql_schema_describer::Table;
 use test_harness::*;
 
 #[test]
@@ -31,7 +32,8 @@ fn assume_to_be_applied_must_work() {
             datamodel: dm1.to_string(),
         };
         let steps1 = run_infer_command(api, input1).0.datamodel_steps;
-        assert_eq!(steps1, &[create_field_step("Blog", "field1", ScalarType::String)]);
+        let expected_steps_1 = create_field_step("Blog", "field1", ScalarType::String);
+        assert_eq!(steps1, &[expected_steps_1.clone()]);
 
         let dm2 = r#"
             model Blog {
@@ -46,7 +48,15 @@ fn assume_to_be_applied_must_work() {
             datamodel: dm2.to_string(),
         };
         let steps2 = run_infer_command(api, input2).0.datamodel_steps;
-        assert_eq!(steps2, &[create_field_step("Blog", "field2", ScalarType::String)]);
+
+        // We are exiting watch mode, so the returned steps go back to the last non-watch migration.
+        assert_eq!(
+            steps2,
+            &[
+                expected_steps_1,
+                create_field_step("Blog", "field2", ScalarType::String)
+            ]
+        );
     });
 }
 
@@ -122,8 +132,6 @@ fn watch_migrations_must_be_returned_when_transitioning_out_of_watch_mode() {
             }
         "#;
 
-        let mut applied_database_steps: Vec<PrettySqlMigrationStep> = Vec::new();
-
         infer_and_apply_with_migration_id(test_setup, api, &dm, "mig00");
 
         let dm = r#"
@@ -132,6 +140,8 @@ fn watch_migrations_must_be_returned_when_transitioning_out_of_watch_mode() {
                 field1 String
             }
         "#;
+
+        let mut applied_database_steps: Vec<PrettySqlMigrationStep> = Vec::new();
 
         let output = infer_and_apply_with_migration_id(test_setup, api, &dm, "watch01").migration_output;
         applied_database_steps
@@ -160,11 +170,7 @@ fn watch_migrations_must_be_returned_when_transitioning_out_of_watch_mode() {
         // We added one field/column twice, and two models, so we should have four database steps.
         assert_eq!(
             applied_database_steps.len(),
-            if test_setup.sql_family == SqlFamily::Sqlite {
-                16
-            } else {
-                4
-            }
+            if test_setup.is_sqlite() { 16 } else { 4 }
         );
 
         let input = InferMigrationStepsInput {
@@ -176,11 +182,9 @@ fn watch_migrations_must_be_returned_when_transitioning_out_of_watch_mode() {
         let output = run_infer_command(api, input);
         let returned_steps: Vec<PrettySqlMigrationStep> = serde_json::from_value(output.0.database_steps).unwrap();
 
-        assert_eq!(
-            returned_steps,
-            applied_database_steps,
-            "The database migration steps returned by the InferMigrationSteps command should represent all the steps since the last non-watch migration."
-        );
+        let expected_steps_count = if test_setup.is_sqlite() { 9 } else { 3 }; // one AlterTable, two CreateTables
+
+        assert_eq!(returned_steps.len(), expected_steps_count);
     });
 }
 
@@ -231,11 +235,7 @@ fn watch_migrations_must_be_returned_in_addition_to_regular_inferred_steps_when_
         // We added one field/column twice, and two models, so we should have four database steps.
         assert_eq!(
             applied_database_steps.len(),
-            if test_setup.sql_family == SqlFamily::Sqlite {
-                16
-            } else {
-                4
-            }
+            if test_setup.is_sqlite() { 16 } else { 4 }
         );
 
         let dm: &'static str = r#"
@@ -251,7 +251,10 @@ fn watch_migrations_must_be_returned_in_addition_to_regular_inferred_steps_when_
 
             model Category {
                 id Int @id
-                name String?
+            }
+
+            model Comment {
+                id Int @id
             }
         "#;
 
@@ -264,10 +267,12 @@ fn watch_migrations_must_be_returned_in_addition_to_regular_inferred_steps_when_
         let output = run_infer_command(api, input);
         let returned_steps: Vec<PrettySqlMigrationStep> = serde_json::from_value(output.0.database_steps).unwrap();
 
-        assert_eq!(
-            returned_steps.len(),
-            applied_database_steps.len() + 1,
-            "The step for the change made after leaving watch mode should be included in the inferred steps."
-        );
+        let expected_steps_count = if test_setup.is_sqlite() {
+            10
+        } else {
+            4 // three CreateModels, one AlterTable
+        };
+
+        assert_eq!(returned_steps.len(), expected_steps_count);
     });
 }

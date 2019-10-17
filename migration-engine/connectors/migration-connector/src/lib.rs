@@ -17,7 +17,6 @@ pub use migration_applier::*;
 pub use migration_persistence::*;
 pub use steps::MigrationStep;
 
-use serde::{de::DeserializeOwned, Serialize};
 use std::fmt::Debug;
 use std::sync::Arc;
 
@@ -69,15 +68,8 @@ pub trait MigrationConnector: Send + Sync + 'static {
     }
 }
 
-/// A database migration is assumed to contain multiple steps, but it can contain more information.
-pub trait DatabaseMigrationMarker: Debug + DeserializeOwned {
-    /// One of the steps in the migration.
-    type DatabaseMigrationStep: Debug + DeserializeOwned + Serialize + Sized;
-
+pub trait DatabaseMigrationMarker: Debug {
     fn serialize(&self) -> serde_json::Value;
-
-    /// Return the steps constituting the migration.
-    fn steps(&self) -> Vec<Self::DatabaseMigrationStep>;
 }
 
 /// Shorthand for a [Result](https://doc.rust-lang.org/std/result/enum.Result.html) where the error
