@@ -598,6 +598,8 @@ fn infer_DeleteDirective_on_enum() {
         "##,
     );
 
+    assert_eq!(infer(&dm1, &dm1), &[]);
+
     let dm2 = parse(
         r##"
             enum Color {
@@ -618,6 +620,406 @@ fn infer_DeleteDirective_on_enum() {
     };
 
     let expected = &[MigrationStep::DeleteDirective(DeleteDirective { locator })];
+
+    assert_eq!(steps, expected);
+}
+
+#[test]
+fn infer_CreateDirectiveArgument_on_field() {
+    let dm1 = parse(
+        r##"
+            model User {
+                id Int @id
+                name String @translate("German")
+            }
+        "##,
+    );
+
+    let dm2 = parse(
+        r##"
+            model User {
+                id Int @id
+                name String @translate("German", secondary: "ZH-CN", tertiary: "FR-BE")
+            }
+        "##,
+    );
+
+    let steps = infer(&dm1, &dm2);
+
+    let locator = DirectiveLocator {
+        name: "translate".to_owned(),
+        location: DirectiveLocation::Field {
+            model: "User".to_owned(),
+            field: "name".to_owned(),
+        },
+    };
+
+    let expected = &[
+        MigrationStep::CreateDirectiveArgument(CreateDirectiveArgument {
+            directive_location: locator.clone(),
+            argument_name: "secondary".to_owned(),
+            argument_value: MigrationExpression("\"ZH-CN\"".to_owned()),
+        }),
+        MigrationStep::CreateDirectiveArgument(CreateDirectiveArgument {
+            directive_location: locator,
+            argument_name: "tertiary".to_owned(),
+            argument_value: MigrationExpression("\"FR-BE\"".to_owned()),
+        }),
+    ];
+
+    assert_eq!(steps, expected);
+}
+
+#[test]
+fn infer_CreateDirectiveArgument_on_model() {
+    let dm1 = parse(
+        r##"
+            model User {
+                id Int @id
+                name String
+
+                @@unique([name])
+            }
+        "##,
+    );
+
+    let dm2 = parse(
+        r##"
+            model User {
+                id Int @id
+                name String
+
+                @@unique([name], name: "usernameUniqueness")
+            }
+        "##,
+    );
+
+    let steps = infer(&dm1, &dm2);
+
+    let locator = DirectiveLocator {
+        name: "unique".to_owned(),
+        location: DirectiveLocation::Model {
+            model: "User".to_owned(),
+        },
+    };
+
+    let expected = &[MigrationStep::CreateDirectiveArgument(CreateDirectiveArgument {
+        directive_location: locator,
+        argument_name: "name".to_owned(),
+        argument_value: MigrationExpression("\"usernameUniqueness\"".to_owned()),
+    })];
+
+    assert_eq!(steps, expected);
+}
+
+#[test]
+fn infer_CreateDirectiveArgument_on_enum() {
+    let dm1 = parse(
+        r##"
+            enum EyeColor {
+                BLUE
+                GREEN
+                BROWN
+
+                @@random(one: "two")
+            }
+        "##,
+    );
+
+    assert_eq!(infer(&dm1, &dm1), &[]);
+
+    let dm2 = parse(
+        r##"
+            enum EyeColor {
+                BLUE
+                GREEN
+                BROWN
+
+                @@random(one: "two", three: 4)
+            }
+        "##,
+    );
+
+    let steps = infer(&dm1, &dm2);
+
+    let locator = DirectiveLocator {
+        name: "random".to_owned(),
+        location: DirectiveLocation::Enum {
+            r#enum: "EyeColor".to_owned(),
+        },
+    };
+
+    let expected = &[MigrationStep::CreateDirectiveArgument(CreateDirectiveArgument {
+        directive_location: locator,
+        argument_name: "three".to_owned(),
+        argument_value: MigrationExpression("4".to_owned()),
+    })];
+
+    assert_eq!(steps, expected);
+}
+
+#[test]
+fn infer_DeleteDirectiveArgument_on_field() {
+    let dm1 = parse(
+        r##"
+            model User {
+                id Int @id
+                name String @translate("German", secondary: "ZH-CN", tertiary: "FR-BE")
+            }
+        "##,
+    );
+
+    let dm2 = parse(
+        r##"
+            model User {
+                id Int @id
+                name String @translate("German")
+            }
+        "##,
+    );
+
+    let steps = infer(&dm1, &dm2);
+
+    let locator = DirectiveLocator {
+        name: "translate".to_owned(),
+        location: DirectiveLocation::Field {
+            model: "User".to_owned(),
+            field: "name".to_owned(),
+        },
+    };
+
+    let expected = &[
+        MigrationStep::DeleteDirectiveArgument(DeleteDirectiveArgument {
+            directive_location: locator.clone(),
+            argument_name: "secondary".to_owned(),
+        }),
+        MigrationStep::DeleteDirectiveArgument(DeleteDirectiveArgument {
+            directive_location: locator,
+            argument_name: "tertiary".to_owned(),
+        }),
+    ];
+
+    assert_eq!(steps, expected);
+}
+
+#[test]
+fn infer_DeleteDirectiveArgument_on_model() {
+    let dm1 = parse(
+        r##"
+            model User {
+                id Int @id
+                name String
+
+                @@unique([name], name: "usernameUniqueness")
+            }
+        "##,
+    );
+
+    let dm2 = parse(
+        r##"
+            model User {
+                id Int @id
+                name String
+
+                @@unique([name])
+            }
+        "##,
+    );
+
+    let steps = infer(&dm1, &dm2);
+
+    let locator = DirectiveLocator {
+        name: "unique".to_owned(),
+        location: DirectiveLocation::Model {
+            model: "User".to_owned(),
+        },
+    };
+
+    let expected = &[MigrationStep::DeleteDirectiveArgument(DeleteDirectiveArgument {
+        directive_location: locator,
+        argument_name: "name".to_owned(),
+    })];
+
+    assert_eq!(steps, expected);
+}
+
+#[test]
+fn infer_DeleteDirectiveArgument_on_enum() {
+    let dm1 = parse(
+        r##"
+            enum EyeColor {
+                BLUE
+                GREEN
+                BROWN
+
+                @@random(one: "two", three: 4)
+            }
+        "##,
+    );
+
+    assert_eq!(infer(&dm1, &dm1), &[]);
+
+    let dm2 = parse(
+        r##"
+            enum EyeColor {
+                BLUE
+                GREEN
+                BROWN
+
+                @@random(one: "two")
+            }
+        "##,
+    );
+
+    let steps = infer(&dm1, &dm2);
+
+    let locator = DirectiveLocator {
+        name: "random".to_owned(),
+        location: DirectiveLocation::Enum {
+            r#enum: "EyeColor".to_owned(),
+        },
+    };
+
+    let expected = &[MigrationStep::DeleteDirectiveArgument(DeleteDirectiveArgument {
+        directive_location: locator,
+        argument_name: "three".to_owned(),
+    })];
+
+    assert_eq!(steps, expected);
+}
+
+#[test]
+fn infer_UpdateDirectiveArgument_on_field() {
+    let dm1 = parse(
+        r##"
+            model User {
+                id Int @id
+                name String @translate("German", secondary: "ZH-CN", tertiary: "FR-BE")
+            }
+        "##,
+    );
+
+    let dm2 = parse(
+        r##"
+            model User {
+                id Int @id
+                name String @translate("German",  secondary: "FR-BE", tertiary: "ZH-CN")
+            }
+        "##,
+    );
+
+    let steps = infer(&dm1, &dm2);
+
+    let locator = DirectiveLocator {
+        name: "translate".to_owned(),
+        location: DirectiveLocation::Field {
+            model: "User".to_owned(),
+            field: "name".to_owned(),
+        },
+    };
+
+    let expected = &[
+        MigrationStep::UpdateDirectiveArgument(UpdateDirectiveArgument {
+            directive_location: locator.clone(),
+            argument_name: "secondary".to_owned(),
+            new_argument_value: MigrationExpression("\"FR-BE\"".to_owned()),
+        }),
+        MigrationStep::UpdateDirectiveArgument(UpdateDirectiveArgument {
+            directive_location: locator,
+            argument_name: "tertiary".to_owned(),
+            new_argument_value: MigrationExpression("\"ZH-CN\"".to_owned()),
+        }),
+    ];
+
+    assert_eq!(steps, expected);
+}
+
+#[test]
+fn infer_UpdateDirectiveArgument_on_model() {
+    let dm1 = parse(
+        r##"
+            model User {
+                id Int @id
+                name String
+                nickname String
+
+                @@unique([name])
+            }
+        "##,
+    );
+
+    let dm2 = parse(
+        r##"
+            model User {
+                id Int @id
+                name String
+                nickname String
+
+                @@unique([name, nickname])
+            }
+        "##,
+    );
+
+    let steps = infer(&dm1, &dm2);
+
+    let locator = DirectiveLocator {
+        name: "unique".to_owned(),
+        location: DirectiveLocation::Model {
+            model: "User".to_owned(),
+        },
+    };
+
+    let expected = &[MigrationStep::UpdateDirectiveArgument(UpdateDirectiveArgument {
+        directive_location: locator,
+        argument_name: "".to_owned(),
+        new_argument_value: MigrationExpression("[name, nickname]".to_owned()),
+    })];
+
+    assert_eq!(steps, expected);
+}
+
+#[test]
+fn infer_UpdateDirectiveArgument_on_enum() {
+    let dm1 = parse(
+        r##"
+            enum EyeColor {
+                BLUE
+                GREEN
+                BROWN
+
+                @@random(one: "two")
+            }
+        "##,
+    );
+
+    assert_eq!(infer(&dm1, &dm1), &[]);
+
+    let dm2 = parse(
+        r##"
+            enum EyeColor {
+                BLUE
+                GREEN
+                BROWN
+
+                @@random(one: "three")
+            }
+        "##,
+    );
+
+    let steps = infer(&dm1, &dm2);
+
+    let locator = DirectiveLocator {
+        name: "random".to_owned(),
+        location: DirectiveLocation::Enum {
+            r#enum: "EyeColor".to_owned(),
+        },
+    };
+
+    let expected = &[MigrationStep::UpdateDirectiveArgument(UpdateDirectiveArgument {
+        directive_location: locator,
+        argument_name: "one".to_owned(),
+        new_argument_value: MigrationExpression("\"three\"".to_owned()),
+    })];
 
     assert_eq!(steps, expected);
 }

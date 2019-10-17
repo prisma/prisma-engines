@@ -2,7 +2,6 @@
 
 mod directives;
 mod enums;
-mod expressions;
 mod fields;
 mod models;
 mod top_level;

@@ -95,7 +95,7 @@ fn fields_match(previous: &ast::Field, next: &ast::Field) -> bool {
 
 #[cfg(test)]
 mod tests {
-    use super::super::{directives::directives_match_exactly, expressions::expressions_match, TopDiffer};
+    use super::super::TopDiffer;
     use super::*;
     use datamodel::ast::parser::parse;
 
@@ -183,15 +183,24 @@ mod tests {
             assert_eq!(deleted_directive.name.name, "unique");
             assert_eq!(deleted_directive.arguments.len(), 1);
 
-            assert!(!expressions_match(
-                &created_directive.arguments.get(0).as_ref().unwrap().value,
-                &deleted_directive.arguments.get(0).as_ref().unwrap().value
-            ));
+            assert_ne!(
+                created_directive
+                    .arguments
+                    .get(0)
+                    .as_ref()
+                    .unwrap()
+                    .value
+                    .render_to_string(),
+                deleted_directive
+                    .arguments
+                    .get(0)
+                    .as_ref()
+                    .unwrap()
+                    .value
+                    .render_to_string()
+            );
 
-            let directive_pairs: Vec<_> = model_diff
-                .directive_pairs()
-                .filter(|differ| !directives_match_exactly(differ.previous, differ.next))
-                .collect();
+            let directive_pairs: Vec<_> = model_diff.directive_pairs().collect();
 
             assert_eq!(directive_pairs.len(), 1);
             let first_directive = directive_pairs.get(0).unwrap();

@@ -1,4 +1,3 @@
-use super::expressions::expressions_match;
 use datamodel::ast;
 
 #[derive(Debug)]
@@ -43,23 +42,6 @@ impl<'a> DirectiveDiffer<'a> {
 
 pub(crate) fn directives_match(previous: &ast::Directive, next: &ast::Directive) -> bool {
     previous.name.name == next.name.name
-}
-
-pub(crate) fn directives_match_exactly(previous: &ast::Directive, next: &ast::Directive) -> bool {
-    previous.name.name == next.name.name && argument_lists_match_exactly(&previous.arguments, &next.arguments)
-}
-
-fn argument_lists_match_exactly(previous: &[ast::Argument], next: &[ast::Argument]) -> bool {
-    previous.len() == next.len()
-        && previous.iter().all(|previous_argument| {
-            next.iter()
-                .find(|next_argument| arguments_match_exactly(previous_argument, next_argument))
-                .is_some()
-        })
-}
-
-fn arguments_match_exactly(previous: &ast::Argument, next: &ast::Argument) -> bool {
-    previous.name.name == next.name.name && expressions_match(&previous.value, &next.value)
 }
 
 fn arguments_match(previous: &ast::Argument, next: &ast::Argument) -> bool {

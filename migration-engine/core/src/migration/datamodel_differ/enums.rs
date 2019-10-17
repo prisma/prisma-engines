@@ -1,4 +1,4 @@
-use super::directives::{directives_match_exactly, DirectiveDiffer};
+use super::directives::DirectiveDiffer;
 use datamodel::ast;
 
 /// Implements the logic to diff a pair of [AST enums](/datamodel/ast/struct.Datamodel.html).
@@ -35,11 +35,6 @@ impl<'a> EnumDiffer<'a> {
         })
     }
 
-    // /// Whether the enum values changed in `next`.
-    // pub(crate) fn values_changed(&self) -> bool {
-    //     self.created_values().next().is_some() || self.deleted_values().next().is_some()
-    // }
-
     fn previous_directives(&self) -> impl Iterator<Item = &ast::Directive> {
         self.previous.directives.iter()
     }
@@ -52,7 +47,7 @@ impl<'a> EnumDiffer<'a> {
     pub(crate) fn created_directives(&self) -> impl Iterator<Item = &ast::Directive> {
         self.next_directives().filter(move |next_directive| {
             self.previous_directives()
-                .find(|previous_directive| directives_match_exactly(previous_directive, next_directive))
+                .find(|previous_directive| enum_directives_match(previous_directive, next_directive))
                 .is_none()
         })
     }
@@ -61,7 +56,7 @@ impl<'a> EnumDiffer<'a> {
     pub(crate) fn deleted_directives(&self) -> impl Iterator<Item = &ast::Directive> {
         self.previous_directives().filter(move |previous_directive| {
             self.next_directives()
-                .find(|next_directive| directives_match_exactly(previous_directive, next_directive))
+                .find(|next_directive| enum_directives_match(previous_directive, next_directive))
                 .is_none()
         })
     }
@@ -81,6 +76,19 @@ impl<'a> EnumDiffer<'a> {
 
 fn values_match(previous: &ast::EnumValue, next: &ast::EnumValue) -> bool {
     previous.name == next.name
+}
+
+fn enum_directives_match(previous: &ast::Directive, next: &ast::Directive) -> bool {
+    if previous.name.name != next.name.name {
+        return false;
+    }
+
+    if ["unique", "index"].contains(&previous.name.name.as_str()) {
+        // TODO: implement fine grained index diffing
+        return false;
+    }
+
+    true
 }
 
 #[cfg(test)]
@@ -122,17 +130,4 @@ mod tests {
         let deleted_values: Vec<&str> = enum_diff.deleted_values().map(|val| val.name.as_str()).collect();
         assert_eq!(deleted_values, &["NearlyTrue", "DefinitelyFalse"],);
     }
-}
-
-fn enum_directives_match(previous: &ast::Directive, next: &ast::Directive) -> bool {
-    if previous.name.name != next.name.name {
-        return false;
-    }
-
-    if ["unique", "index"].contains(&previous.name.name.as_str()) {
-        // TODO: implement fine grained index diffing
-        return false;
-    }
-
-    true
 }
