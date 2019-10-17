@@ -1,11 +1,10 @@
 #![allow(non_snake_case)]
-#![allow(unused)]
 mod test_harness;
 
 use datamodel::ast::{parser, FieldArity, SchemaAst};
 use migration_connector::steps::*;
 use migration_core::migration::datamodel_migration_steps_inferrer::*;
-use pretty_assertions::{assert_eq, assert_ne};
+use pretty_assertions::assert_eq;
 
 #[test]
 fn infer_CreateModel_if_it_does_not_exist_yet() {
@@ -74,6 +73,9 @@ fn infer_UpdateModel() {
         }
     "#,
     );
+
+    assert_eq!(infer(&dm1, &dm1), &[]);
+
     let dm2 = parse(
         r#"
         model Post{
@@ -209,6 +211,9 @@ fn infer_UpdateField_simple() {
         }
     "#,
     );
+
+    assert_eq!(infer(&dm1, &dm1), vec![]);
+
     let dm2 = parse(
         r#"
         model Test {
@@ -357,7 +362,7 @@ fn infer_CreateField_on_self_relation() {
 
     let steps = infer(&dm1, &dm2);
 
-    let expected = vec![MigrationStep::CreateField(CreateField {
+    let expected = &[MigrationStep::CreateField(CreateField {
         model: "User".into(),
         name: "invitedBy".into(),
         tpe: "User".to_owned(),
@@ -365,6 +370,256 @@ fn infer_CreateField_on_self_relation() {
         default: None,
         db_name: None,
     })];
+
+    assert_eq!(steps, expected);
+}
+
+#[test]
+fn infer_CreateDirective_on_field() {
+    let dm1 = parse(
+        r##"
+        model User {
+            id Int @id
+            name String
+        }
+    "##,
+    );
+
+    let dm2 = parse(
+        r##"
+        model User {
+            id Int @id
+            name String @map("handle")
+        }
+    "##,
+    );
+
+    let steps = infer(&dm1, &dm2);
+
+    let locator = DirectiveLocator {
+        name: "map".to_owned(),
+        location: DirectiveLocation::Field {
+            model: "User".to_owned(),
+            field: "name".to_owned(),
+        },
+    };
+
+    let expected = &[
+        MigrationStep::CreateDirective(CreateDirective {
+            locator: locator.clone(),
+        }),
+        MigrationStep::CreateDirectiveArgument(CreateDirectiveArgument {
+            directive_location: locator,
+            argument_name: "".to_owned(),
+            argument_value: MigrationExpression("\"handle\"".to_owned()),
+        }),
+    ];
+
+    assert_eq!(steps, expected);
+}
+
+#[test]
+fn infer_CreateDirective_on_model() {
+    let dm1 = parse(
+        r##"
+        model User {
+            id Int @id
+            name String
+        }
+    "##,
+    );
+
+    let dm2 = parse(
+        r##"
+        model User {
+            id Int @id
+            name String
+
+            @@map("customer")
+        }
+    "##,
+    );
+
+    let steps = infer(&dm1, &dm2);
+
+    let locator = DirectiveLocator {
+        name: "map".to_owned(),
+        location: DirectiveLocation::Model {
+            model: "User".to_owned(),
+        },
+    };
+
+    let expected = &[
+        MigrationStep::CreateDirective(CreateDirective {
+            locator: locator.clone(),
+        }),
+        MigrationStep::CreateDirectiveArgument(CreateDirectiveArgument {
+            directive_location: locator,
+            argument_name: "".to_owned(),
+            argument_value: MigrationExpression("\"customer\"".to_owned()),
+        }),
+    ];
+
+    assert_eq!(steps, expected);
+}
+
+#[test]
+fn infer_CreateDirective_on_enum() {
+    let dm1 = parse(
+        r##"
+            enum Color {
+                RED
+                GREEN
+                BLUE
+            }
+        "##,
+    );
+
+    let dm2 = parse(
+        r##"
+            enum Color {
+                RED
+                GREEN
+                BLUE
+
+                @@map("colour")
+            }
+        "##,
+    );
+
+    let steps = infer(&dm1, &dm2);
+
+    let locator = DirectiveLocator {
+        name: "map".to_owned(),
+        location: DirectiveLocation::Enum {
+            r#enum: "Color".to_owned(),
+        },
+    };
+
+    let expected = &[
+        MigrationStep::CreateDirective(CreateDirective {
+            locator: locator.clone(),
+        }),
+        MigrationStep::CreateDirectiveArgument(CreateDirectiveArgument {
+            directive_location: locator,
+            argument_name: "".to_owned(),
+            argument_value: MigrationExpression("\"colour\"".to_owned()),
+        }),
+    ];
+
+    assert_eq!(steps, expected);
+}
+
+#[test]
+fn infer_DeleteDirective_on_field() {
+    let dm1 = parse(
+        r##"
+        model User {
+            id Int @id
+            name String @map("handle")
+        }
+    "##,
+    );
+
+    let dm2 = parse(
+        r##"
+        model User {
+            id Int @id
+            name String
+        }
+    "##,
+    );
+
+    let steps = infer(&dm1, &dm2);
+
+    let locator = DirectiveLocator {
+        name: "map".to_owned(),
+        location: DirectiveLocation::Field {
+            model: "User".to_owned(),
+            field: "name".to_owned(),
+        },
+    };
+
+    let expected = &[MigrationStep::DeleteDirective(DeleteDirective { locator })];
+
+    assert_eq!(steps, expected);
+}
+
+#[test]
+fn infer_DeleteDirective_on_model() {
+    let dm1 = parse(
+        r##"
+        model User {
+            id Int @id
+            name String
+
+            @@map("customer")
+        }
+    "##,
+    );
+
+    let dm2 = parse(
+        r##"
+        model User {
+            id Int @id
+            name String
+        }
+    "##,
+    );
+
+    let steps = infer(&dm1, &dm2);
+
+    let locator = DirectiveLocator {
+        name: "map".to_owned(),
+        location: DirectiveLocation::Model {
+            model: "User".to_owned(),
+        },
+    };
+
+    let expected = &[MigrationStep::DeleteDirective(DeleteDirective {
+        locator: locator.clone(),
+    })];
+
+    assert_eq!(steps, expected);
+}
+
+#[test]
+fn infer_DeleteDirective_on_enum() {
+    let dm1 = parse(
+        r##"
+            enum Color {
+                RED
+                GREEN
+                BLUE
+
+                @@map("colour")
+            }
+
+        "##,
+    );
+
+    let dm2 = parse(
+        r##"
+            enum Color {
+                RED
+                GREEN
+                BLUE
+            }
+        "##,
+    );
+
+    let steps = infer(&dm1, &dm2);
+
+    let locator = DirectiveLocator {
+        name: "map".to_owned(),
+        location: DirectiveLocation::Enum {
+            r#enum: "Color".to_owned(),
+        },
+    };
+
+    let expected = &[MigrationStep::DeleteDirective(DeleteDirective { locator })];
+
+    assert_eq!(steps, expected);
 }
 
 fn infer(dm1: &SchemaAst, dm2: &SchemaAst) -> Vec<MigrationStep> {
