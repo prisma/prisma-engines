@@ -13,6 +13,8 @@ pub struct ObjectTypeBuilder<'a> {
     object_type_cache: TypeRefCache<ObjectType>,
 }
 
+impl<'a> InputBuilderExtensions for ObjectTypeBuilder<'a> {}
+
 impl<'a> CachedBuilder<ObjectType> for ObjectTypeBuilder<'a> {
     fn get_cache(&self) -> &TypeRefCache<ObjectType> {
         &self.object_type_cache
@@ -144,12 +146,14 @@ impl<'a> ObjectTypeBuilder<'a> {
 
     /// Builds "many records where" arguments solely based on the given model.
     pub fn many_records_arguments(&self, model: &ModelRef) -> Vec<Argument> {
+        let id_field = model.fields().id();
+        let id_input_type = self.map_optional_input_type(id_field);
         vec![
             self.where_argument(&model),
             self.order_by_argument(&model),
             argument("skip", InputType::opt(InputType::int()), None),
-            argument("after", InputType::opt(InputType::string()), None),
-            argument("before", InputType::opt(InputType::string()), None),
+            argument("after", id_input_type.clone(), None),
+            argument("before", id_input_type, None),
             argument("first", InputType::opt(InputType::int()), None),
             argument("last", InputType::opt(InputType::int()), None),
         ]
