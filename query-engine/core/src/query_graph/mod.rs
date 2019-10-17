@@ -262,12 +262,14 @@ impl QueryGraph {
     /// Removes the edge from the graph but leaves the graph intact by keeping the empty
     /// edge in the graph by plucking the content of the edge, but not the edge itself.
     pub fn pluck_edge(&mut self, edge: &EdgeRef) -> QueryGraphDependency {
+        println!("plucking edge: {}", edge.id());
         self.graph.edge_weight_mut(edge.edge_ix).unwrap().unset()
     }
 
     /// Removes the node from the graph but leaves the graph intact by keeping the empty
     /// node in the graph by plucking the content of the node, but not the node itself.
     pub fn pluck_node(&mut self, node: &NodeRef) -> Node {
+        println!("plucking node: {}", node.id());
         self.graph.node_weight_mut(node.node_ix).unwrap().unset()
     }
 
