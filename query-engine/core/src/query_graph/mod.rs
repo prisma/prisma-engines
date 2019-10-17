@@ -326,7 +326,7 @@ impl QueryGraph {
 
     /// Returns all exclusive children of `node`.
     /// An exclusive child has no other parents than `node`.
-    pub fn exclusive_child_pairs(&self, node: &NodeRef) -> Vec<(EdgeRef, NodeRef)> {
+    fn exclusive_child_pairs(&self, node: &NodeRef) -> Vec<(EdgeRef, NodeRef)> {
         self.outgoing_edges(node)
             .into_iter()
             .filter_map(|edge| {
@@ -354,9 +354,18 @@ impl QueryGraph {
     /// Checks if `ancestor` is in any of the ancestor nodes of `successor_node`.
     /// Determined by trying to reach `successor_node` from `ancestor`.
     pub fn is_ancestor(&self, ancestor: &NodeRef, successor_node: &NodeRef) -> bool {
-        self.exclusive_child_pairs(ancestor)
+        // TODO: this used to call exclusive_child_pairs. Discuss implications of this change with Dom
+        self.child_pairs(ancestor)
             .into_iter()
-            .find(|(_, child_node)| child_node == successor_node || self.is_ancestor(&child_node, &successor_node))
+            .find(|(_, child_node)| {
+                //                println!(
+                //                    "ancestor {} has child {}, is_ancestor: {}",
+                //                    ancestor.id(),
+                //                    child_node.id(),
+                //                    child_node == successor_node
+                //                );
+                child_node == successor_node || self.is_ancestor(&child_node, &successor_node)
+            })
             .is_some()
     }
 
