@@ -22,19 +22,22 @@ pub fn connect_nested_upsert(
 
     for value in coerce_vec(value) {
         let mut as_map: ParsedInputMap = value.try_into()?;
-        let where_input = as_map.remove("where").expect("where argument is missing");
         let create_input = as_map.remove("create").expect("create argument is missing");
         let update_input = as_map.remove("update").expect("update argument is missing");
 
-        let record_finder = extract_record_finder(where_input, &model)?;
-        let finder_as_filter: Filter = record_finder.clone().into();
+        let finder_as_filter = if relation.is_one_to_one() {
+            Filter::empty()
+        } else {
+            let where_input = as_map.remove("where").expect("where argument is missing");
+            let finder = extract_record_finder(where_input, &model)?;
+            finder.into()
+        };
 
         let initial_read_node =
             utils::insert_find_children_by_parent_node(graph, &parent_node, parent_relation_field, finder_as_filter)?;
 
         let create_node = create::create_record_node(graph, Arc::clone(&model), create_input.try_into()?)?;
-        let update_node =
-            update::update_record_node(graph, Some(record_finder), Arc::clone(&model), update_input.try_into()?)?;
+        let update_node = update::update_record_node(graph, None, Arc::clone(&model), update_input.try_into()?)?;
 
         let if_node = graph.create_node(Flow::default_if());
 
@@ -49,6 +52,25 @@ pub fn connect_nested_upsert(
                 } else {
                     Ok(node)
                 }
+            })),
+        )?;
+
+        let id_field = model.fields().id();
+        graph.create_edge(
+            &initial_read_node,
+            &update_node,
+            QueryGraphDependency::ParentIds(Box::new(|mut node, mut parent_ids| {
+                if let Node::Query(Query::Write(WriteQuery::UpdateRecord(ref mut x))) = node {
+                    let parent_id = match parent_ids.pop() {
+                        Some(pid) => Ok(pid),
+                        None => Err(QueryGraphBuilderError::AssertionError(format!(
+                            "[Query Graph] Expected a valid parent ID to be present for a nested update in a nested upsert."
+                        ))),
+                    }?;
+                    let finder = RecordFinder::new(id_field, parent_id);
+                    x.where_ = Some(finder);
+                }
+                Ok(node)
             })),
         )?;
 
@@ -78,7 +100,7 @@ pub fn connect_nested_upsert(
                 })),
             )?;
         } else {
-            connect::connect_records_node(graph, &parent_node, &create_node, &parent_relation_field, None, None)?;
+            //            connect::connect_records_node(graph, &parent_node, &create_node, &parent_relation_field, None, None)?;
         }
     }
 
