@@ -61,16 +61,14 @@ impl ToString for Expression {
 }
 
 impl std::str::FromStr for Expression {
-    type Err = ();
+    type Err = pest::error::Error<crate::ast::parser::Rule>;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         use super::parser::{parse_expression, PrismaDatamodelParser, Rule};
         use pest::Parser;
 
-        let pair = PrismaDatamodelParser::parse(Rule::expression, s)
-            .unwrap()
-            .next()
-            .unwrap();
+        // Unwrapping is safe because we know that an expression was parsed.
+        let pair = PrismaDatamodelParser::parse(Rule::expression, s)?.next().unwrap();
 
         Ok(parse_expression(&pair))
     }
@@ -125,6 +123,13 @@ mod test {
             }
             other => panic!("{:?}", other),
         }
+    }
+
+    #[test]
+    fn ast_expression_from_str_does_not_panic_with_empty_strings() {
+        let expression_str = "";
+        let expr: Result<Expression, _> = expression_str.parse();
+        assert!(expr.is_err());
     }
 
     #[test]
