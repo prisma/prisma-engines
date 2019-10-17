@@ -286,8 +286,8 @@ fn apply_update_enum(datamodel: &mut ast::SchemaAst, step: &steps::UpdateEnum) {
         .unwrap();
 
     apply_enum_update(r#enum, &step.new_name, update_enum_name);
-    apply_enum_update(r#enum, &step.created_values, add_enum_values);
-    apply_enum_update(r#enum, &step.deleted_values, remove_enum_values);
+    add_enum_values(r#enum, &step.created_values);
+    remove_enum_values(r#enum, &step.deleted_values);
 }
 
 fn apply_enum_update<T, F: Fn(&mut ast::Enum, &T)>(r#enum: &mut ast::Enum, update: &Option<T>, apply_fn: F) {
@@ -300,7 +300,7 @@ fn update_enum_name(r#enum: &mut ast::Enum, new_name: &String) {
     r#enum.name = new_ident(new_name.clone());
 }
 
-fn add_enum_values(r#enum: &mut ast::Enum, added_values: &Vec<String>) {
+fn add_enum_values(r#enum: &mut ast::Enum, added_values: &[String]) {
     r#enum
         .values
         .extend(added_values.iter().map(|added_name| ast::EnumValue {
@@ -309,7 +309,7 @@ fn add_enum_values(r#enum: &mut ast::Enum, added_values: &Vec<String>) {
         }))
 }
 
-fn remove_enum_values(r#enum: &mut ast::Enum, removed_values: &Vec<String>) {
+fn remove_enum_values(r#enum: &mut ast::Enum, removed_values: &[String]) {
     let new_values = r#enum
         .values
         .drain(..)

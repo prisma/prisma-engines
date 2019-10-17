@@ -369,8 +369,8 @@ fn updating_an_enum_that_does_not_exist_must_error() {
     let steps = vec![MigrationStep::UpdateEnum(UpdateEnum {
         name: "Test".to_string(),
         new_name: None,
-        created_values: None,
-        deleted_values: None,
+        created_values: vec![],
+        deleted_values: vec![],
     })];
 
     calculate(&dm, steps);

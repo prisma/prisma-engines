@@ -150,16 +150,16 @@ pub struct UpdateEnum {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub new_name: Option<String>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub created_values: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub created_values: Vec<String>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub deleted_values: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub deleted_values: Vec<String>,
 }
 
 impl UpdateEnum {
     pub fn is_any_option_set(&self) -> bool {
-        self.new_name.is_some() || self.created_values.is_some() || self.deleted_values.is_some()
+        self.new_name.is_some() || self.created_values.len() > 0 || self.deleted_values.len() > 0
     }
 }
 

@@ -77,11 +77,13 @@ fn push_updated_enums<'a>(steps: &mut Steps, enums: impl Iterator<Item = EnumDif
         let update_enum_step = steps::UpdateEnum {
             name: updated_enum.previous.name.name.clone(),
             new_name: diff_value(&updated_enum.previous.name.name, &updated_enum.next.name.name),
-            created_values: Some(created_values).filter(Vec::is_empty),
-            deleted_values: Some(deleted_values).filter(Vec::is_empty),
+            created_values,
+            deleted_values,
         };
 
-        steps.push(MigrationStep::UpdateEnum(update_enum_step));
+        if update_enum_step.is_any_option_set() {
+            steps.push(MigrationStep::UpdateEnum(update_enum_step));
+        }
 
         let location = steps::DirectiveLocation::Enum {
             r#enum: updated_enum.previous.name.name.clone(),

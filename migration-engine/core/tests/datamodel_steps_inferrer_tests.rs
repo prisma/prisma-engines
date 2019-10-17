@@ -300,42 +300,41 @@ fn infer_DeleteEnum() {
     assert_eq!(steps, expected);
 }
 
-// #[test]
-// fn infer_UpdateIndex() {
-//     let dm1 = parse(
-//         r#"
-//         model Dog {
-//             id Int @id
-//             age Int
-//             name String
+#[test]
+fn infer_UpdateEnum() {
+    let dm1 = parse(
+        r#"
+            enum Color {
+                RED
+                GREEN
+                BLUE
+            }
+        "#,
+    );
 
-//             @@unique([age, name], name: "customDogIndex")
-//         }
-//         "#,
-//     );
+    assert_eq!(infer(&dm1, &dm1), &[]);
 
-//     let dm2 = parse(
-//         r#"
-//         model Dog {
-//             id Int @id
-//             age Int
-//             name String
+    let dm2 = parse(
+        r#"
 
-//             @@unique([age, name], name: "customDogIndex2")
-//         }
-//         "#,
-//     );
+            enum Color {
+                GREEN
+                BEIGE
+                BLUE
+            }
+        "#,
+    );
 
-//     let steps = infer(&dm1, &dm2);
-//     let expected = vec![MigrationStep::UpdateIndex(UpdateIndex {
-//         model: "Dog".into(),
-//         name: Some("customDogIndex2".into()),
-//         tpe: IndexType::Unique,
-//         fields: vec!["age".into(), "name".into()],
-//     })];
+    let steps = infer(&dm1, &dm2);
+    let expected = vec![MigrationStep::UpdateEnum(UpdateEnum {
+        name: "Color".to_owned(),
+        created_values: vec!["BEIGE".to_owned()],
+        deleted_values: vec!["RED".to_owned()],
+        new_name: None,
+    })];
 
-//     assert_eq!(steps, expected);
-// }
+    assert_eq!(steps, expected);
+}
 
 #[test]
 fn infer_CreateField_on_self_relation() {
