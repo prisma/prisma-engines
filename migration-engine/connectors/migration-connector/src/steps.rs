@@ -11,7 +11,6 @@ pub enum MigrationStep {
     UpdateModel(UpdateModel),
     DeleteModel(DeleteModel),
     CreateDirective(CreateDirective),
-    // UpdateDirective(UpdateDirective),
     DeleteDirective(DeleteDirective),
     CreateDirectiveArgument(CreateDirectiveArgument),
     UpdateDirectiveArgument(UpdateDirectiveArgument),
@@ -173,13 +172,6 @@ pub struct DeleteEnum {
 #[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateDirective {
-    #[serde(flatten)]
-    pub locator: DirectiveLocator,
-}
-
-#[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct UpdateDirective {
     #[serde(flatten)]
     pub locator: DirectiveLocator,
 }

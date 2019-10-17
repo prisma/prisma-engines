@@ -36,7 +36,6 @@ fn apply_step(datamodel: &mut ast::SchemaAst, step: &MigrationStep) {
         MigrationStep::DeleteField(delete_field) => apply_delete_field(datamodel, delete_field),
         MigrationStep::CreateDirective(create_directive) => apply_create_directive(datamodel, create_directive),
         MigrationStep::DeleteDirective(delete_directive) => apply_delete_directive(datamodel, delete_directive),
-        // MigrationStep::UpdateDirective(update_directive) => apply_update_directive(datamodel, update_directive),
         MigrationStep::CreateDirectiveArgument(create_directive_argument) => {
             apply_create_directive_argument(datamodel, create_directive_argument)
         }
@@ -361,10 +360,6 @@ fn apply_create_directive(datamodel: &mut ast::SchemaAst, step: &steps::CreateDi
 
     directives.push(new_directive);
 }
-
-// fn apply_update_directive(datamodel: &mut ast::SchemaAst, step: &steps::UpdateDirective) {
-//     unimplemented!();
-// }
 
 fn apply_delete_directive(datamodel: &mut ast::SchemaAst, step: &steps::DeleteDirective) {
     let directives = find_directives_mut(datamodel, &step.locator.location)
