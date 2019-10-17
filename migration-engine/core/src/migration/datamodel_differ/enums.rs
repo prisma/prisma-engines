@@ -61,7 +61,7 @@ impl<'a> EnumDiffer<'a> {
         })
     }
 
-    /// Iterator over the enum directives (@@) present in both `previous` and `next`.
+    /// Iterator over the enum directives (`@@`) present in both `previous` and `next`.
     pub(crate) fn directive_pairs(&'a self) -> impl Iterator<Item = DirectiveDiffer<'a>> {
         self.previous_directives().filter_map(move |previous_directive| {
             self.next_directives()
@@ -79,16 +79,7 @@ fn values_match(previous: &ast::EnumValue, next: &ast::EnumValue) -> bool {
 }
 
 fn enum_directives_match(previous: &ast::Directive, next: &ast::Directive) -> bool {
-    if previous.name.name != next.name.name {
-        return false;
-    }
-
-    if ["unique", "index"].contains(&previous.name.name.as_str()) {
-        // TODO: implement fine grained index diffing
-        return false;
-    }
-
-    true
+    previous.name.name == next.name.name
 }
 
 #[cfg(test)]

@@ -112,10 +112,6 @@ mod tests {
 
             assert_eq!(created_arguments.len(), 1);
             assert_eq!(created_arguments.get(0).unwrap().name.name, "legs");
-
-            // let updated_arguments: Vec<(_, _)> = directive_diff.argument_pairs().collect();
-            // assert_eq!(updated_arguments.len(), 1);
-            // assert_eq!(updated_arguments.get(0).unwrap().0.name.name, "animalType");
         })
     }
 }

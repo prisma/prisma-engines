@@ -9,31 +9,6 @@ pub(crate) struct FieldDiffer<'a> {
 }
 
 impl<'a> FieldDiffer<'a> {
-    // /// Has the type of the field changed? This ignores the arity and nullability of the field.
-    // pub(crate) fn type_changed(&self) -> bool {
-    //     self.previous.field_type.name != self.next.field_type.name
-    // }
-
-    // /// Has the nullability of the field changed?.
-    // pub(crate) fn nullability_changed(&self) -> bool {
-    //     match (&self.previous.arity, &self.next.arity) {
-    //         (ast::FieldArity::Optional, ast::FieldArity::Required)
-    //         | (ast::FieldArity::Required, ast::FieldArity::Optional) => true,
-    //         _ => false,
-    //     }
-    // }
-
-    // /// Has the arity of the field changed (list vs scalar)?.
-    // pub(crate) fn arity_changed(&self) -> bool {
-    //     match (&self.previous.arity, &self.next.arity) {
-    //         (ast::FieldArity::List, ast::FieldArity::Optional)
-    //         | (ast::FieldArity::List, ast::FieldArity::Required)
-    //         | (ast::FieldArity::Optional, ast::FieldArity::List)
-    //         | (ast::FieldArity::Required, ast::FieldArity::List) => true,
-    //         _ => false,
-    //     }
-    // }
-
     fn previous_directives(&self) -> impl Iterator<Item = &ast::Directive> {
         self.previous.directives.iter()
     }

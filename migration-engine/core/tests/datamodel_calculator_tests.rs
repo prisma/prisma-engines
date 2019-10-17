@@ -52,7 +52,7 @@ fn add_UpdateModel_to_existing_schema() {
         r#"
         model Post {
             id String @id @default(cuid())
-            
+
             @@embedded
         }
     "#,

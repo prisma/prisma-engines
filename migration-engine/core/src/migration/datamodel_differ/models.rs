@@ -76,7 +76,7 @@ impl<'a> ModelDiffer<'a> {
         })
     }
 
-    /// Iterator over the model directives (@@) present in both `previous` and `next`.
+    /// Iterator over the model directives (`@@`) present in both `previous` and `next`.
     pub(crate) fn directive_pairs(&self) -> impl Iterator<Item = DirectiveDiffer<'_>> {
         self.previous_directives().filter_map(move |previous_directive| {
             self.next_directives()
