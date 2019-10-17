@@ -20,6 +20,7 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
         let tables = self
             .get_table_names(schema)
             .into_iter()
+            .filter(|table| !is_system_table(&table))
             .map(|t| self.get_table(schema, &t))
             .collect();
         Ok(SqlSchema {
@@ -321,3 +322,19 @@ fn get_column_type(tpe: &str) -> ColumnType {
         family: family,
     }
 }
+
+/// Returns whether a table is one of the SQLite system tables.
+fn is_system_table(table_name: &str) -> bool {
+    SQLITE_SYSTEM_TABLES
+        .iter()
+        .any(|system_table| table_name == *system_table)
+}
+
+/// See https://www.sqlite.org/fileformat2.html
+const SQLITE_SYSTEM_TABLES: &[&str] = &[
+    "sqlite_sequence",
+    "sqlite_stat1",
+    "sqlite_stat2",
+    "sqlite_stat3",
+    "sqlite_stat4",
+];
