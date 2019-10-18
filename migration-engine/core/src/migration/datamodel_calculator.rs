@@ -246,17 +246,11 @@ fn apply_delete_field(datamodel: &mut ast::SchemaAst, step: &steps::DeleteField)
 
     let model = datamodel.find_model_mut(&step.model).unwrap();
 
-    let previous_fields_len = model.fields.len();
-
     let new_fields: Vec<_> = model
         .fields
         .drain(..)
         .filter(|field| field.name.name != step.field)
         .collect();
-
-    let new_fields_len = new_fields.len();
-
-    debug_assert_eq!(new_fields_len, previous_fields_len - 1);
 
     model.fields = new_fields;
 }
