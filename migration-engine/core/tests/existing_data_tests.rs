@@ -70,7 +70,7 @@ fn adding_a_required_field_must_use_the_default_value_for_migrations() {
                 myfloat Float @default(2)
                 boolean Boolean @default(true)
                 string String @default("test_string")
-                dateTime DateTime 
+                dateTime DateTime
                 enum MyEnum @default(C)
             }
 
@@ -125,9 +125,7 @@ fn dropping_a_table_with_rows_should_warn() {
 
         // The schema should not change because the migration should not run if there are warnings
         // and the force flag isn't passed.
-        //
-        // This is inverted right now, because we default force to false for backwards compatibility.
-        assert_ne!(original_database_schema, final_database_schema);
+        assert_eq!(original_database_schema, final_database_schema);
 
         assert_eq!(
             migration_output.warnings,
@@ -170,9 +168,7 @@ fn dropping_a_column_with_non_null_values_should_warn() {
 
         // The schema should not change because the migration should not run if there are warnings
         // and the force flag isn't passed.
-        //
-        // This is inverted right now, because we default force to false for backwards compatibility.
-        assert_ne!(original_database_schema, final_database_schema);
+        assert_eq!(original_database_schema, final_database_schema);
 
         assert_eq!(
             migration_output.warnings,

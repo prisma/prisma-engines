@@ -19,7 +19,7 @@ impl<'a> MigrationCommand<'a> for CalculateDatabaseStepsCommand<'a> {
     fn execute<C, D>(&self, engine: &MigrationEngine<C, D>) -> CommandResult<Self::Output>
     where
         C: MigrationConnector<DatabaseMigration = D>,
-        D: DatabaseMigrationMarker + 'static,
+        D: DatabaseMigrationMarker + Send + Sync + 'static,
     {
         debug!("{:?}", self.input);
 
@@ -39,6 +39,9 @@ impl<'a> MigrationCommand<'a> for CalculateDatabaseStepsCommand<'a> {
             &self.input.steps_to_apply,
         )?;
 
+        let DestructiveChangeDiagnostics { warnings, errors: _ } =
+            connector.destructive_changes_checker().check(&database_migration)?;
+
         let database_steps_json = connector
             .database_migration_step_applier()
             .render_steps_pretty(&database_migration)?;
@@ -48,7 +51,7 @@ impl<'a> MigrationCommand<'a> for CalculateDatabaseStepsCommand<'a> {
             datamodel_steps: self.input.steps_to_apply.clone(),
             database_steps: database_steps_json,
             errors: Vec::new(),
-            warnings: Vec::new(),
+            warnings,
             general_errors: Vec::new(),
         })
     }
