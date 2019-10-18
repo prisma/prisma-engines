@@ -1679,8 +1679,8 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
                                              |}
                                              |
                                              |model Bottom {
-                                             |  id         String @id @default(cuid())
-                                             |  nameBottom String @unique
+                                             |  id         String  @id @default(cuid())
+                                             |  nameBottom String  @unique
                                              |}""".stripMargin }
     database.setup(project)
 
