@@ -39,7 +39,7 @@ where
 #[derive(Debug, Deserialize, Serialize, PartialEq, Eq, Hash, Clone)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct CreateModel {
-    pub name: String,
+    pub model: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub db_name: Option<String>,
@@ -50,7 +50,7 @@ pub struct CreateModel {
 #[derive(Debug, Deserialize, Serialize, PartialEq, Eq, Hash, Clone)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct UpdateModel {
-    pub name: String,
+    pub model: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub new_name: Option<String>,
@@ -71,7 +71,7 @@ impl UpdateModel {
 #[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct DeleteModel {
-    pub name: String,
+    pub model: String,
 }
 
 #[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
@@ -79,7 +79,7 @@ pub struct DeleteModel {
 pub struct CreateField {
     pub model: String,
 
-    pub name: String,
+    pub field: String,
 
     #[serde(rename = "type")]
     pub tpe: String,
@@ -97,7 +97,7 @@ impl WithDbName for CreateField {
     fn db_name(&self) -> String {
         match self.db_name {
             Some(ref db_name) => db_name.clone(),
-            None => self.name.clone(),
+            None => self.field.clone(),
         }
     }
 }
@@ -107,7 +107,7 @@ impl WithDbName for CreateField {
 pub struct UpdateField {
     pub model: String,
 
-    pub name: String,
+    pub field: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub new_name: Option<String>,
@@ -132,28 +132,28 @@ impl UpdateField {
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct DeleteField {
     pub model: String,
-    pub name: String,
+    pub field: String,
 }
 
 #[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct CreateEnum {
-    pub name: String,
+    pub r#enum: String,
     pub values: Vec<String>,
 }
 
 #[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct UpdateEnum {
-    pub name: String,
+    pub r#enum: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub new_name: Option<String>,
 
-    #[serde(skip_serializing_if = "Vec::is_empty")]
+    #[serde(skip_serializing_if = "Vec::is_empty", default = "Vec::new")]
     pub created_values: Vec<String>,
 
-    #[serde(skip_serializing_if = "Vec::is_empty")]
+    #[serde(skip_serializing_if = "Vec::is_empty", default = "Vec::new")]
     pub deleted_values: Vec<String>,
 }
 
@@ -166,7 +166,7 @@ impl UpdateEnum {
 #[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct DeleteEnum {
-    pub name: String,
+    pub r#enum: String,
 }
 
 #[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
@@ -188,7 +188,7 @@ pub struct DeleteDirective {
 pub struct DirectiveLocator {
     #[serde(flatten)]
     pub location: DirectiveLocation,
-    pub name: String,
+    pub r#directive: String,
 }
 
 #[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
@@ -204,8 +204,8 @@ pub enum DirectiveLocation {
 pub struct CreateDirectiveArgument {
     #[serde(flatten)]
     pub directive_location: DirectiveLocator,
-    pub argument_name: String,
-    pub argument_value: MigrationExpression,
+    pub argument: String,
+    pub value: MigrationExpression,
 }
 
 #[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
@@ -213,7 +213,7 @@ pub struct CreateDirectiveArgument {
 pub struct DeleteDirectiveArgument {
     #[serde(flatten)]
     pub directive_location: DirectiveLocator,
-    pub argument_name: String,
+    pub argument: String,
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone, PartialEq)]
@@ -221,8 +221,8 @@ pub struct DeleteDirectiveArgument {
 pub struct UpdateDirectiveArgument {
     #[serde(flatten)]
     pub directive_location: DirectiveLocator,
-    pub argument_name: String,
-    pub new_argument_value: MigrationExpression,
+    pub argument: String,
+    pub new_value: MigrationExpression,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -251,7 +251,7 @@ mod tests {
                     model: "Cat".to_owned(),
                     field: "owner".to_owned(),
                 },
-                name: "status".to_owned(),
+                directive: "status".to_owned(),
             },
         };
 
@@ -259,7 +259,7 @@ mod tests {
         let expected_json = json!({
             "model": "Cat",
             "field": "owner",
-            "name": "status",
+            "directive": "status",
         });
 
         assert_eq!(serialized_step, expected_json);

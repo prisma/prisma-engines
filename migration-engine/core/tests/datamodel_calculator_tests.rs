@@ -197,7 +197,7 @@ fn creating_a_model_that_already_exists_must_error() {
     );
 
     let steps = vec![MigrationStep::CreateModel(CreateModel {
-        name: "Test".to_string(),
+        model: "Test".to_string(),
         db_name: None,
         embedded: false,
     })];
@@ -220,7 +220,7 @@ fn creating_a_field_that_already_exists_must_error() {
 
     let steps = vec![MigrationStep::CreateField(CreateField {
         model: "Test".to_string(),
-        name: "id".to_string(),
+        field: "id".to_string(),
         tpe: "Int".to_owned(),
         arity: FieldArity::Required,
         default: None,
@@ -243,7 +243,7 @@ fn creating_an_enum_that_already_exists_must_error() {
     );
 
     let steps = vec![MigrationStep::CreateEnum(CreateEnum {
-        name: "Test".to_string(),
+        r#enum: "Test".to_string(),
         values: Vec::new(),
     })];
 
@@ -255,7 +255,7 @@ fn creating_an_enum_that_already_exists_must_error() {
 fn deleting_a_model_that_does_not_exist_must_error() {
     let dm = SchemaAst::empty();
     let steps = vec![MigrationStep::DeleteModel(DeleteModel {
-        name: "Test".to_string(),
+        model: "Test".to_string(),
     })];
 
     calculate(&dm, steps);
@@ -269,7 +269,7 @@ fn deleting_a_field_that_does_not_exist_must_error() {
     let dm = SchemaAst::empty();
     let steps = vec![MigrationStep::DeleteField(DeleteField {
         model: "Test".to_string(),
-        name: "id".to_string(),
+        field: "id".to_string(),
     })];
 
     calculate(&dm, steps);
@@ -289,7 +289,7 @@ fn deleting_a_field_that_does_not_exist_2_must_error() {
     );
     let steps = vec![MigrationStep::DeleteField(DeleteField {
         model: "Test".to_string(),
-        name: "my_field".to_string(),
+        field: "my_field".to_string(),
     })];
 
     calculate(&dm, steps);
@@ -300,7 +300,7 @@ fn deleting_a_field_that_does_not_exist_2_must_error() {
 fn deleting_an_enum_that_does_not_exist_must_error() {
     let dm = SchemaAst::empty();
     let steps = vec![MigrationStep::DeleteEnum(DeleteEnum {
-        name: "Test".to_string(),
+        r#enum: "Test".to_string(),
     })];
 
     calculate(&dm, steps);
@@ -311,7 +311,7 @@ fn deleting_an_enum_that_does_not_exist_must_error() {
 fn updating_a_model_that_does_not_exist_must_error() {
     let dm = SchemaAst::empty();
     let steps = vec![MigrationStep::UpdateModel(UpdateModel {
-        name: "Test".to_string(),
+        model: "Test".to_string(),
         new_name: None,
         db_name: None,
         embedded: None,
@@ -329,7 +329,7 @@ fn updating_a_field_that_does_not_exist_must_error() {
     let steps = vec![MigrationStep::UpdateField(UpdateField {
         default: None,
         model: "Test".to_string(),
-        name: "id".to_string(),
+        field: "id".to_string(),
         new_name: None,
         tpe: None,
         arity: None,
@@ -353,7 +353,7 @@ fn updating_a_field_that_does_not_exist_must_error_2() {
     let steps = vec![MigrationStep::UpdateField(UpdateField {
         default: None,
         model: "Test".to_string(),
-        name: "myField".to_string(),
+        field: "myField".to_string(),
         new_name: None,
         tpe: None,
         arity: None,
@@ -367,7 +367,7 @@ fn updating_a_field_that_does_not_exist_must_error_2() {
 fn updating_an_enum_that_does_not_exist_must_error() {
     let dm = SchemaAst::empty();
     let steps = vec![MigrationStep::UpdateEnum(UpdateEnum {
-        name: "Test".to_string(),
+        r#enum: "Test".to_string(),
         new_name: None,
         created_values: vec![],
         deleted_values: vec![],

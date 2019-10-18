@@ -20,21 +20,21 @@ fn infer_CreateModel_if_it_does_not_exist_yet() {
     let steps = infer(&dm1, &dm2);
     let expected = vec![
         MigrationStep::CreateModel(CreateModel {
-            name: "Test".to_string(),
+            model: "Test".to_string(),
             db_name: None,
             embedded: false,
         }),
         MigrationStep::CreateField(CreateField {
             default: None,
             model: "Test".to_string(),
-            name: "id".to_string(),
+            field: "id".to_string(),
             tpe: "Int".to_owned(),
             arity: FieldArity::Required,
             db_name: None,
         }),
         MigrationStep::CreateDirective(CreateDirective {
             locator: DirectiveLocator {
-                name: "id".to_owned(),
+                directive: "id".to_owned(),
                 location: DirectiveLocation::Field {
                     model: "Test".to_owned(),
                     field: "id".to_owned(),
@@ -58,7 +58,7 @@ fn infer_DeleteModel() {
 
     let steps = infer(&dm1, &dm2);
     let expected = vec![MigrationStep::DeleteModel(DeleteModel {
-        name: "Test".to_string(),
+        model: "Test".to_string(),
     })];
     assert_eq!(steps, expected);
 }
@@ -89,7 +89,7 @@ fn infer_UpdateModel() {
     let steps = infer(&dm1, &dm2);
     let expected = vec![MigrationStep::CreateDirective(CreateDirective {
         locator: DirectiveLocator {
-            name: "embedded".to_owned(),
+            directive: "embedded".to_owned(),
             location: DirectiveLocation::Model {
                 model: "Post".to_owned(),
             },
@@ -119,7 +119,7 @@ fn infer_CreateField_if_it_does_not_exist_yet() {
     let steps = infer(&dm1, &dm2);
     let expected = vec![MigrationStep::CreateField(CreateField {
         model: "Test".to_string(),
-        name: "field".to_string(),
+        field: "field".to_string(),
         tpe: "Int".to_owned(),
         arity: FieldArity::Optional,
         db_name: None,
@@ -157,7 +157,7 @@ fn infer_CreateField_if_relation_field_does_not_exist_yet() {
     let expected = vec![
         MigrationStep::CreateField(CreateField {
             model: "Blog".to_string(),
-            name: "posts".to_string(),
+            field: "posts".to_string(),
             tpe: "Post".to_owned(),
             arity: FieldArity::List,
             db_name: None,
@@ -165,7 +165,7 @@ fn infer_CreateField_if_relation_field_does_not_exist_yet() {
         }),
         MigrationStep::CreateField(CreateField {
             model: "Post".to_string(),
-            name: "blog".to_string(),
+            field: "blog".to_string(),
             tpe: "Blog".to_owned(),
             arity: FieldArity::Optional,
             db_name: None,
@@ -196,7 +196,7 @@ fn infer_DeleteField() {
     let steps = infer(&dm1, &dm2);
     let expected = vec![MigrationStep::DeleteField(DeleteField {
         model: "Test".to_string(),
-        name: "field".to_string(),
+        field: "field".to_string(),
     })];
     assert_eq!(steps, expected);
 }
@@ -227,7 +227,7 @@ fn infer_UpdateField_simple() {
     let expected = vec![
         MigrationStep::UpdateField(UpdateField {
             model: "Test".to_string(),
-            name: "field".to_string(),
+            field: "field".to_string(),
             new_name: None,
             tpe: Some("Boolean".to_owned()),
             arity: Some(FieldArity::Required),
@@ -235,7 +235,7 @@ fn infer_UpdateField_simple() {
         }),
         MigrationStep::CreateDirective(CreateDirective {
             locator: DirectiveLocator {
-                name: "default".to_owned(),
+                directive: "default".to_owned(),
                 location: DirectiveLocation::Field {
                     model: "Test".to_owned(),
                     field: "field".to_owned(),
@@ -244,18 +244,18 @@ fn infer_UpdateField_simple() {
         }),
         MigrationStep::CreateDirectiveArgument(CreateDirectiveArgument {
             directive_location: DirectiveLocator {
-                name: "default".to_owned(),
+                directive: "default".to_owned(),
                 location: DirectiveLocation::Field {
                     model: "Test".to_owned(),
                     field: "field".to_owned(),
                 },
             },
-            argument_name: "".to_owned(),
-            argument_value: MigrationExpression("false".to_owned()),
+            argument: "".to_owned(),
+            value: MigrationExpression("false".to_owned()),
         }),
         MigrationStep::CreateDirective(CreateDirective {
             locator: DirectiveLocator {
-                name: "unique".to_owned(),
+                directive: "unique".to_owned(),
                 location: DirectiveLocation::Field {
                     model: "Test".to_owned(),
                     field: "field".to_owned(),
@@ -280,7 +280,7 @@ fn infer_CreateEnum() {
 
     let steps = infer(&dm1, &dm2);
     let expected = vec![MigrationStep::CreateEnum(CreateEnum {
-        name: "Test".to_string(),
+        r#enum: "Test".to_string(),
         values: vec!["A".to_string(), "B".to_string()],
     })];
     assert_eq!(steps, expected);
@@ -300,7 +300,7 @@ fn infer_DeleteEnum() {
 
     let steps = infer(&dm1, &dm2);
     let expected = vec![MigrationStep::DeleteEnum(DeleteEnum {
-        name: "Test".to_string(),
+        r#enum: "Test".to_string(),
     })];
     assert_eq!(steps, expected);
 }
@@ -332,7 +332,7 @@ fn infer_UpdateEnum() {
 
     let steps = infer(&dm1, &dm2);
     let expected = vec![MigrationStep::UpdateEnum(UpdateEnum {
-        name: "Color".to_owned(),
+        r#enum: "Color".to_owned(),
         created_values: vec!["BEIGE".to_owned()],
         deleted_values: vec!["RED".to_owned()],
         new_name: None,
@@ -364,7 +364,7 @@ fn infer_CreateField_on_self_relation() {
 
     let expected = &[MigrationStep::CreateField(CreateField {
         model: "User".into(),
-        name: "invitedBy".into(),
+        field: "invitedBy".into(),
         tpe: "User".to_owned(),
         arity: FieldArity::Optional,
         default: None,
@@ -397,7 +397,7 @@ fn infer_CreateDirective_on_field() {
     let steps = infer(&dm1, &dm2);
 
     let locator = DirectiveLocator {
-        name: "map".to_owned(),
+        directive: "map".to_owned(),
         location: DirectiveLocation::Field {
             model: "User".to_owned(),
             field: "name".to_owned(),
@@ -410,8 +410,8 @@ fn infer_CreateDirective_on_field() {
         }),
         MigrationStep::CreateDirectiveArgument(CreateDirectiveArgument {
             directive_location: locator,
-            argument_name: "".to_owned(),
-            argument_value: MigrationExpression("\"handle\"".to_owned()),
+            argument: "".to_owned(),
+            value: MigrationExpression("\"handle\"".to_owned()),
         }),
     ];
 
@@ -443,7 +443,7 @@ fn infer_CreateDirective_on_model() {
     let steps = infer(&dm1, &dm2);
 
     let locator = DirectiveLocator {
-        name: "map".to_owned(),
+        directive: "map".to_owned(),
         location: DirectiveLocation::Model {
             model: "User".to_owned(),
         },
@@ -455,8 +455,8 @@ fn infer_CreateDirective_on_model() {
         }),
         MigrationStep::CreateDirectiveArgument(CreateDirectiveArgument {
             directive_location: locator,
-            argument_name: "".to_owned(),
-            argument_value: MigrationExpression("\"customer\"".to_owned()),
+            argument: "".to_owned(),
+            value: MigrationExpression("\"customer\"".to_owned()),
         }),
     ];
 
@@ -490,7 +490,7 @@ fn infer_CreateDirective_on_enum() {
     let steps = infer(&dm1, &dm2);
 
     let locator = DirectiveLocator {
-        name: "map".to_owned(),
+        directive: "map".to_owned(),
         location: DirectiveLocation::Enum {
             r#enum: "Color".to_owned(),
         },
@@ -502,8 +502,8 @@ fn infer_CreateDirective_on_enum() {
         }),
         MigrationStep::CreateDirectiveArgument(CreateDirectiveArgument {
             directive_location: locator,
-            argument_name: "".to_owned(),
-            argument_value: MigrationExpression("\"colour\"".to_owned()),
+            argument: "".to_owned(),
+            value: MigrationExpression("\"colour\"".to_owned()),
         }),
     ];
 
@@ -533,7 +533,7 @@ fn infer_DeleteDirective_on_field() {
     let steps = infer(&dm1, &dm2);
 
     let locator = DirectiveLocator {
-        name: "map".to_owned(),
+        directive: "map".to_owned(),
         location: DirectiveLocation::Field {
             model: "User".to_owned(),
             field: "name".to_owned(),
@@ -570,7 +570,7 @@ fn infer_DeleteDirective_on_model() {
     let steps = infer(&dm1, &dm2);
 
     let locator = DirectiveLocator {
-        name: "map".to_owned(),
+        directive: "map".to_owned(),
         location: DirectiveLocation::Model {
             model: "User".to_owned(),
         },
@@ -613,7 +613,7 @@ fn infer_DeleteDirective_on_enum() {
     let steps = infer(&dm1, &dm2);
 
     let locator = DirectiveLocator {
-        name: "map".to_owned(),
+        directive: "map".to_owned(),
         location: DirectiveLocation::Enum {
             r#enum: "Color".to_owned(),
         },
@@ -647,7 +647,7 @@ fn infer_CreateDirectiveArgument_on_field() {
     let steps = infer(&dm1, &dm2);
 
     let locator = DirectiveLocator {
-        name: "translate".to_owned(),
+        directive: "translate".to_owned(),
         location: DirectiveLocation::Field {
             model: "User".to_owned(),
             field: "name".to_owned(),
@@ -657,13 +657,13 @@ fn infer_CreateDirectiveArgument_on_field() {
     let expected = &[
         MigrationStep::CreateDirectiveArgument(CreateDirectiveArgument {
             directive_location: locator.clone(),
-            argument_name: "secondary".to_owned(),
-            argument_value: MigrationExpression("\"ZH-CN\"".to_owned()),
+            argument: "secondary".to_owned(),
+            value: MigrationExpression("\"ZH-CN\"".to_owned()),
         }),
         MigrationStep::CreateDirectiveArgument(CreateDirectiveArgument {
             directive_location: locator,
-            argument_name: "tertiary".to_owned(),
-            argument_value: MigrationExpression("\"FR-BE\"".to_owned()),
+            argument: "tertiary".to_owned(),
+            value: MigrationExpression("\"FR-BE\"".to_owned()),
         }),
     ];
 
@@ -697,7 +697,7 @@ fn infer_CreateDirectiveArgument_on_model() {
     let steps = infer(&dm1, &dm2);
 
     let locator = DirectiveLocator {
-        name: "unique".to_owned(),
+        directive: "unique".to_owned(),
         location: DirectiveLocation::Model {
             model: "User".to_owned(),
         },
@@ -705,8 +705,8 @@ fn infer_CreateDirectiveArgument_on_model() {
 
     let expected = &[MigrationStep::CreateDirectiveArgument(CreateDirectiveArgument {
         directive_location: locator,
-        argument_name: "name".to_owned(),
-        argument_value: MigrationExpression("\"usernameUniqueness\"".to_owned()),
+        argument: "name".to_owned(),
+        value: MigrationExpression("\"usernameUniqueness\"".to_owned()),
     })];
 
     assert_eq!(steps, expected);
@@ -743,7 +743,7 @@ fn infer_CreateDirectiveArgument_on_enum() {
     let steps = infer(&dm1, &dm2);
 
     let locator = DirectiveLocator {
-        name: "random".to_owned(),
+        directive: "random".to_owned(),
         location: DirectiveLocation::Enum {
             r#enum: "EyeColor".to_owned(),
         },
@@ -751,8 +751,8 @@ fn infer_CreateDirectiveArgument_on_enum() {
 
     let expected = &[MigrationStep::CreateDirectiveArgument(CreateDirectiveArgument {
         directive_location: locator,
-        argument_name: "three".to_owned(),
-        argument_value: MigrationExpression("4".to_owned()),
+        argument: "three".to_owned(),
+        value: MigrationExpression("4".to_owned()),
     })];
 
     assert_eq!(steps, expected);
@@ -781,7 +781,7 @@ fn infer_DeleteDirectiveArgument_on_field() {
     let steps = infer(&dm1, &dm2);
 
     let locator = DirectiveLocator {
-        name: "translate".to_owned(),
+        directive: "translate".to_owned(),
         location: DirectiveLocation::Field {
             model: "User".to_owned(),
             field: "name".to_owned(),
@@ -791,11 +791,11 @@ fn infer_DeleteDirectiveArgument_on_field() {
     let expected = &[
         MigrationStep::DeleteDirectiveArgument(DeleteDirectiveArgument {
             directive_location: locator.clone(),
-            argument_name: "secondary".to_owned(),
+            argument: "secondary".to_owned(),
         }),
         MigrationStep::DeleteDirectiveArgument(DeleteDirectiveArgument {
             directive_location: locator,
-            argument_name: "tertiary".to_owned(),
+            argument: "tertiary".to_owned(),
         }),
     ];
 
@@ -829,7 +829,7 @@ fn infer_DeleteDirectiveArgument_on_model() {
     let steps = infer(&dm1, &dm2);
 
     let locator = DirectiveLocator {
-        name: "unique".to_owned(),
+        directive: "unique".to_owned(),
         location: DirectiveLocation::Model {
             model: "User".to_owned(),
         },
@@ -837,7 +837,7 @@ fn infer_DeleteDirectiveArgument_on_model() {
 
     let expected = &[MigrationStep::DeleteDirectiveArgument(DeleteDirectiveArgument {
         directive_location: locator,
-        argument_name: "name".to_owned(),
+        argument: "name".to_owned(),
     })];
 
     assert_eq!(steps, expected);
@@ -874,7 +874,7 @@ fn infer_DeleteDirectiveArgument_on_enum() {
     let steps = infer(&dm1, &dm2);
 
     let locator = DirectiveLocator {
-        name: "random".to_owned(),
+        directive: "random".to_owned(),
         location: DirectiveLocation::Enum {
             r#enum: "EyeColor".to_owned(),
         },
@@ -882,7 +882,7 @@ fn infer_DeleteDirectiveArgument_on_enum() {
 
     let expected = &[MigrationStep::DeleteDirectiveArgument(DeleteDirectiveArgument {
         directive_location: locator,
-        argument_name: "three".to_owned(),
+        argument: "three".to_owned(),
     })];
 
     assert_eq!(steps, expected);
@@ -911,7 +911,7 @@ fn infer_UpdateDirectiveArgument_on_field() {
     let steps = infer(&dm1, &dm2);
 
     let locator = DirectiveLocator {
-        name: "translate".to_owned(),
+        directive: "translate".to_owned(),
         location: DirectiveLocation::Field {
             model: "User".to_owned(),
             field: "name".to_owned(),
@@ -921,13 +921,13 @@ fn infer_UpdateDirectiveArgument_on_field() {
     let expected = &[
         MigrationStep::UpdateDirectiveArgument(UpdateDirectiveArgument {
             directive_location: locator.clone(),
-            argument_name: "secondary".to_owned(),
-            new_argument_value: MigrationExpression("\"FR-BE\"".to_owned()),
+            argument: "secondary".to_owned(),
+            new_value: MigrationExpression("\"FR-BE\"".to_owned()),
         }),
         MigrationStep::UpdateDirectiveArgument(UpdateDirectiveArgument {
             directive_location: locator,
-            argument_name: "tertiary".to_owned(),
-            new_argument_value: MigrationExpression("\"ZH-CN\"".to_owned()),
+            argument: "tertiary".to_owned(),
+            new_value: MigrationExpression("\"ZH-CN\"".to_owned()),
         }),
     ];
 
@@ -963,7 +963,7 @@ fn infer_UpdateDirectiveArgument_on_model() {
     let steps = infer(&dm1, &dm2);
 
     let locator = DirectiveLocator {
-        name: "unique".to_owned(),
+        directive: "unique".to_owned(),
         location: DirectiveLocation::Model {
             model: "User".to_owned(),
         },
@@ -971,8 +971,8 @@ fn infer_UpdateDirectiveArgument_on_model() {
 
     let expected = &[MigrationStep::UpdateDirectiveArgument(UpdateDirectiveArgument {
         directive_location: locator,
-        argument_name: "".to_owned(),
-        new_argument_value: MigrationExpression("[name, nickname]".to_owned()),
+        argument: "".to_owned(),
+        new_value: MigrationExpression("[name, nickname]".to_owned()),
     })];
 
     assert_eq!(steps, expected);
@@ -1009,7 +1009,7 @@ fn infer_UpdateDirectiveArgument_on_enum() {
     let steps = infer(&dm1, &dm2);
 
     let locator = DirectiveLocator {
-        name: "random".to_owned(),
+        directive: "random".to_owned(),
         location: DirectiveLocation::Enum {
             r#enum: "EyeColor".to_owned(),
         },
@@ -1017,8 +1017,8 @@ fn infer_UpdateDirectiveArgument_on_enum() {
 
     let expected = &[MigrationStep::UpdateDirectiveArgument(UpdateDirectiveArgument {
         directive_location: locator,
-        argument_name: "one".to_owned(),
-        new_argument_value: MigrationExpression("\"three\"".to_owned()),
+        argument: "one".to_owned(),
+        new_value: MigrationExpression("\"three\"".to_owned()),
     })];
 
     assert_eq!(steps, expected);

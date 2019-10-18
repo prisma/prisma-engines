@@ -49,7 +49,7 @@ fn apply_step(datamodel: &mut ast::SchemaAst, step: &MigrationStep) {
 }
 
 fn apply_create_enum(datamodel: &mut ast::SchemaAst, step: &steps::CreateEnum) {
-    let steps::CreateEnum { name, values } = step;
+    let steps::CreateEnum { r#enum: name, values } = step;
 
     if let Some(_) = datamodel.find_enum(&name) {
         Err::<(), _>(format_err!(
@@ -79,10 +79,10 @@ fn apply_create_enum(datamodel: &mut ast::SchemaAst, step: &steps::CreateEnum) {
 }
 
 fn apply_create_field(datamodel: &mut ast::SchemaAst, step: &steps::CreateField) {
-    if let Some(_) = datamodel.find_field(&step.model, &step.name) {
+    if let Some(_) = datamodel.find_field(&step.model, &step.field) {
         Err::<(), _>(format_err!(
             "The field {} on model {} already exists in this Datamodel. It is not possible to create it once more.",
-            &step.name,
+            &step.field,
             &step.model,
         ))
         .unwrap();
@@ -97,7 +97,7 @@ fn apply_create_field(datamodel: &mut ast::SchemaAst, step: &steps::CreateField)
         arity,
         db_name,
         model: _,
-        name,
+        field,
         tpe,
         default,
     } = step;
@@ -110,7 +110,7 @@ fn apply_create_field(datamodel: &mut ast::SchemaAst, step: &steps::CreateField)
 
     let field = ast::Field {
         arity: arity.clone(),
-        name: new_ident(name.to_owned()),
+        name: new_ident(field.to_owned()),
         documentation: None,
         field_type: new_ident(tpe.clone()),
         span: new_span(),
@@ -121,17 +121,17 @@ fn apply_create_field(datamodel: &mut ast::SchemaAst, step: &steps::CreateField)
 }
 
 fn apply_create_model(datamodel: &mut ast::SchemaAst, step: &steps::CreateModel) {
-    if let Some(_) = datamodel.find_model(&step.name) {
+    if let Some(_) = datamodel.find_model(&step.model) {
         Err::<(), _>(format_err!(
             "The model {} already exists in this Datamodel. It is not possible to create it once more.",
-            &step.name
+            &step.model
         ))
         .unwrap();
     }
 
     let model = ast::Model {
         documentation: None,
-        name: new_ident(step.name.clone()),
+        name: new_ident(step.model.clone()),
         span: new_span(),
         fields: vec![],
         directives: vec![],
@@ -142,11 +142,11 @@ fn apply_create_model(datamodel: &mut ast::SchemaAst, step: &steps::CreateModel)
 
 fn apply_update_model(datamodel: &mut ast::SchemaAst, step: &steps::UpdateModel) {
     let model = datamodel
-        .find_model_mut(&step.name)
+        .find_model_mut(&step.model)
         .ok_or_else(|| {
             format_err!(
                 "The model {} does not exist in this Datamodel. It is not possible to update it.",
-                &step.name
+                &step.model
             )
         })
         .unwrap();
@@ -166,11 +166,11 @@ fn update_model_name(model: &mut ast::Model, new_name: &String) {
 
 fn apply_delete_model(datamodel: &mut ast::SchemaAst, step: &steps::DeleteModel) {
     datamodel
-        .find_model(&step.name)
+        .find_model(&step.model)
         .ok_or_else(|| {
             format_err!(
                 "The model {} does not exist in this Datamodel. It is not possible to delete it.",
-                &step.name
+                &step.model
             )
         })
         .unwrap();
@@ -179,7 +179,7 @@ fn apply_delete_model(datamodel: &mut ast::SchemaAst, step: &steps::DeleteModel)
         .tops
         .drain(..)
         .filter(|top| match top {
-            ast::Top::Model(model) => model.name.name != step.name,
+            ast::Top::Model(model) => model.name.name != step.model,
             _ => true,
         })
         .collect();
@@ -197,11 +197,11 @@ fn apply_update_field(datamodel: &mut ast::SchemaAst, step: &steps::UpdateField)
     }
 
     let field = datamodel
-        .find_field_mut(&step.model, &step.name)
+        .find_field_mut(&step.model, &step.field)
         .ok_or_else(|| {
             format_err!(
                 "The field {} on model {} does not exist in this Datamodel. It is not possible to update it.",
-                &step.name,
+                &step.field,
                 &step.model
             )
         })
@@ -247,11 +247,11 @@ fn apply_delete_field(datamodel: &mut ast::SchemaAst, step: &steps::DeleteField)
         .unwrap();
 
     datamodel
-        .find_field(&step.model, &step.name)
+        .find_field(&step.model, &step.field)
         .ok_or_else(|| {
             format_err!(
                 "The field {} on model {} does not exist in this Datamodel. It is not possible to delete it.",
-                &step.name,
+                &step.field,
                 &step.model
             )
         })
@@ -264,7 +264,7 @@ fn apply_delete_field(datamodel: &mut ast::SchemaAst, step: &steps::DeleteField)
     let new_fields: Vec<_> = model
         .fields
         .drain(..)
-        .filter(|field| field.name.name != step.name)
+        .filter(|field| field.name.name != step.field)
         .collect();
 
     let new_fields_len = new_fields.len();
@@ -276,11 +276,11 @@ fn apply_delete_field(datamodel: &mut ast::SchemaAst, step: &steps::DeleteField)
 
 fn apply_update_enum(datamodel: &mut ast::SchemaAst, step: &steps::UpdateEnum) {
     let r#enum = datamodel
-        .find_enum_mut(&step.name)
+        .find_enum_mut(&step.r#enum)
         .ok_or_else(|| {
             format_err!(
                 "The enum {} does not exist in this Datamodel. It is not possible to update it.",
-                &step.name
+                &step.r#enum
             )
         })
         .unwrap();
@@ -326,11 +326,11 @@ fn remove_enum_values(r#enum: &mut ast::Enum, removed_values: &[String]) {
 
 fn apply_delete_enum(datamodel: &mut ast::SchemaAst, step: &steps::DeleteEnum) {
     datamodel
-        .find_enum(&step.name)
+        .find_enum(&step.r#enum)
         .ok_or_else(|| {
             format_err!(
                 "The enum {} does not exist in this Datamodel. It is not possible to delete it.",
-                &step.name
+                &step.r#enum
             )
         })
         .unwrap();
@@ -339,7 +339,7 @@ fn apply_delete_enum(datamodel: &mut ast::SchemaAst, step: &steps::DeleteEnum) {
         .tops
         .drain(..)
         .filter(|top| match top {
-            ast::Top::Enum(r#enum) => r#enum.name.name != step.name,
+            ast::Top::Enum(r#enum) => r#enum.name.name != step.r#enum,
             _ => true,
         })
         .collect();
@@ -353,7 +353,7 @@ fn apply_create_directive(datamodel: &mut ast::SchemaAst, step: &steps::CreateDi
         .unwrap();
 
     let new_directive = ast::Directive {
-        name: new_ident(step.locator.name.clone()),
+        name: new_ident(step.locator.directive.clone()),
         arguments: vec![],
         span: new_span(),
     };
@@ -368,7 +368,7 @@ fn apply_delete_directive(datamodel: &mut ast::SchemaAst, step: &steps::DeleteDi
 
     let new_directives = directives
         .drain(..)
-        .filter(|directive| directive.name.name != step.locator.name)
+        .filter(|directive| directive.name.name != step.locator.directive)
         .collect();
 
     *directives = new_directives;
@@ -378,9 +378,9 @@ fn apply_create_directive_argument(datamodel: &mut ast::SchemaAst, step: &steps:
     let directive = find_directive_mut(datamodel, &step.directive_location).unwrap();
 
     directive.arguments.push(ast::Argument {
-        name: new_ident(step.argument_name.clone()),
+        name: new_ident(step.argument.clone()),
         span: new_span(),
-        value: step.argument_value.to_ast_expression(),
+        value: step.value.to_ast_expression(),
     });
 }
 
@@ -388,8 +388,8 @@ fn apply_update_directive_argument(datamodel: &mut ast::SchemaAst, step: &steps:
     let directive = find_directive_mut(datamodel, &step.directive_location).unwrap();
 
     for argument in directive.arguments.iter_mut() {
-        if argument.name.name == step.argument_name {
-            argument.value = step.new_argument_value.to_ast_expression();
+        if argument.name.name == step.argument {
+            argument.value = step.new_value.to_ast_expression();
         }
     }
 }
@@ -400,7 +400,7 @@ fn apply_delete_directive_argument(datamodel: &mut ast::SchemaAst, step: &steps:
     let new_arguments = directive
         .arguments
         .drain(..)
-        .filter(|arg| arg.name.name != step.argument_name)
+        .filter(|arg| arg.name.name != step.argument)
         .collect();
 
     directive.arguments = new_arguments;
@@ -446,5 +446,5 @@ fn find_directive_mut<'a>(
 ) -> Option<&'a mut ast::Directive> {
     find_directives_mut(datamodel, &locator.location)?
         .iter_mut()
-        .find(|directive| directive.name.name == locator.name)
+        .find(|directive| directive.name.name == locator.directive)
 }

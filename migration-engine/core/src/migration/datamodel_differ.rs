@@ -38,7 +38,7 @@ fn push_enums(steps: &mut Steps, differ: &TopDiffer<'_>) {
 fn push_created_enums<'a>(steps: &mut Steps, enums: impl Iterator<Item = &'a ast::Enum>) {
     for r#enum in enums {
         let create_enum_step = steps::CreateEnum {
-            name: r#enum.name.name.clone(),
+            r#enum: r#enum.name.name.clone(),
             values: r#enum.values.iter().map(|value| value.name.clone()).collect(),
         };
 
@@ -55,7 +55,7 @@ fn push_created_enums<'a>(steps: &mut Steps, enums: impl Iterator<Item = &'a ast
 fn push_deleted_enums<'a>(steps: &mut Steps, enums: impl Iterator<Item = &'a ast::Enum>) {
     let deleted_enum_steps = enums
         .map(|deleted_enum| steps::DeleteEnum {
-            name: deleted_enum.name.name.clone(),
+            r#enum: deleted_enum.name.name.clone(),
         })
         .map(MigrationStep::DeleteEnum);
 
@@ -74,7 +74,7 @@ fn push_updated_enums<'a>(steps: &mut Steps, enums: impl Iterator<Item = EnumDif
             .collect();
 
         let update_enum_step = steps::UpdateEnum {
-            name: updated_enum.previous.name.name.clone(),
+            r#enum: updated_enum.previous.name.name.clone(),
             new_name: diff_value(&updated_enum.previous.name.name, &updated_enum.next.name.name),
             created_values,
             deleted_values,
@@ -110,7 +110,7 @@ fn push_created_models<'a>(steps: &mut Steps, models: impl Iterator<Item = &'a a
             directives::get_directive_string_value("map", &created_model.directives).map(|db_name| db_name.to_owned());
 
         let create_model_step = steps::CreateModel {
-            name: created_model.name.name.clone(),
+            model: created_model.name.name.clone(),
             embedded: false, // not represented in the AST yet
             db_name,
         };
@@ -125,7 +125,7 @@ fn push_created_models<'a>(steps: &mut Steps, models: impl Iterator<Item = &'a a
 fn push_deleted_models<'a>(steps: &mut Steps, models: impl Iterator<Item = &'a ast::Model>) {
     let delete_model_steps = models
         .map(|deleted_model| steps::DeleteModel {
-            name: deleted_model.name.name.clone(),
+            model: deleted_model.name.name.clone(),
         })
         .map(MigrationStep::DeleteModel);
 
@@ -161,7 +161,7 @@ fn push_created_fields<'a>(steps: &mut Steps, model_name: &'a str, fields: impl 
 
         let create_field_step = steps::CreateField {
             arity: field.arity.clone(),
-            name: field.name.name.clone(),
+            field: field.name.name.clone(),
             tpe: field.field_type.name.clone(),
             model: model_name.to_owned(),
             db_name: directives::get_directive_string_value("map", &field.directives).map(String::from),
@@ -183,7 +183,7 @@ fn push_deleted_fields<'a>(steps: &mut Steps, model_name: &'a str, fields: impl 
     let delete_field_steps = fields
         .map(|deleted_field| steps::DeleteField {
             model: model_name.to_owned(),
-            name: deleted_field.name.name.clone(),
+            field: deleted_field.name.name.clone(),
         })
         .map(MigrationStep::DeleteField);
 
@@ -212,7 +212,7 @@ fn push_updated_fields<'a>(steps: &mut Steps, model_name: &'a str, fields: impl 
             arity: diff_value(&field.previous.arity, &field.next.arity),
             new_name: diff_value(&field.previous.name.name, &field.next.name.name),
             model: model_name.to_owned(),
-            name: field.previous.name.name.clone(),
+            field: field.previous.name.name.clone(),
             tpe: diff_value(&field.previous.field_type.name, &field.next.field_type.name),
             default: diff_value(&previous_default_directive, &next_default_directive),
         };
@@ -245,7 +245,7 @@ fn push_created_directives<'a>(
 fn push_created_directive(steps: &mut Steps, location: steps::DirectiveLocation, directive: &ast::Directive) {
     let locator = steps::DirectiveLocator {
         location,
-        name: directive.name.name.clone(),
+        directive: directive.name.name.clone(),
     };
 
     let step = steps::CreateDirective {
@@ -273,7 +273,7 @@ fn push_deleted_directive(steps: &mut Steps, location: steps::DirectiveLocation,
     let step = steps::DeleteDirective {
         locator: steps::DirectiveLocator {
             location,
-            name: directive.name.name.clone(),
+            directive: directive.name.name.clone(),
         },
     };
 
@@ -292,7 +292,7 @@ fn push_updated_directives<'a>(
 
 fn push_updated_directive(steps: &mut Steps, location: steps::DirectiveLocation, directive: DirectiveDiffer<'_>) {
     let locator = steps::DirectiveLocator {
-        name: directive.previous.name.name.clone(),
+        directive: directive.previous.name.name.clone(),
         location: location.clone(),
     };
 
@@ -315,8 +315,8 @@ fn push_created_directive_argument(
     argument: &ast::Argument,
 ) {
     let create_argument_step = steps::CreateDirectiveArgument {
-        argument_name: argument.name.name.clone(),
-        argument_value: steps::MigrationExpression::from_ast_expression(&argument.value),
+        argument: argument.name.name.clone(),
+        value: steps::MigrationExpression::from_ast_expression(&argument.value),
         directive_location: directive_location.clone(),
     };
 
@@ -337,21 +337,17 @@ fn push_updated_directive_argument(
     }
 
     let update_argument_step = steps::UpdateDirectiveArgument {
-        argument_name: next_argument.name.name.clone(),
-        new_argument_value: next_value,
+        argument: next_argument.name.name.clone(),
+        new_value: next_value,
         directive_location: directive_location.clone(),
     };
 
     steps.push(MigrationStep::UpdateDirectiveArgument(update_argument_step));
 }
 
-fn push_deleted_directive_argument(
-    steps: &mut Steps,
-    directive_location: &steps::DirectiveLocator,
-    argument_name: &str,
-) {
+fn push_deleted_directive_argument(steps: &mut Steps, directive_location: &steps::DirectiveLocator, argument: &str) {
     let delete_argument_step = steps::DeleteDirectiveArgument {
-        argument_name: argument_name.to_owned(),
+        argument: argument.to_owned(),
         directive_location: directive_location.clone(),
     };
 
