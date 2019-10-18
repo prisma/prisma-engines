@@ -25,6 +25,7 @@ pub fn create_id_directive_step(model: &str, field: &str) -> MigrationStep {
                 model: model.to_owned(),
                 field: field.to_owned(),
             },
+            arguments: None,
         },
     })
 }

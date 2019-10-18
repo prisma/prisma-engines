@@ -200,6 +200,7 @@ fn CreateDirective_must_work() {
     let expected_step = MigrationStep::CreateDirective(CreateDirective {
         locator: DirectiveLocator {
             directive: "map".to_owned(),
+            arguments: None,
             location: DirectiveLocation::Model {
                 model: "Blog".to_owned(),
             },
@@ -210,7 +211,7 @@ fn CreateDirective_must_work() {
 }
 
 #[test]
-fn DeleteDirective_must_work() {
+fn minimal_DeleteDirective_must_work() {
     let json = r#"
         {
             "stepType": "DeleteDirective",
@@ -227,6 +228,39 @@ fn DeleteDirective_must_work() {
                 model: "Blog".to_owned(),
                 field: "title".to_owned(),
             },
+            arguments: None,
+        },
+    });
+
+    assert_symmetric_serde(json, expected_step);
+}
+
+#[test]
+fn full_DeleteDirective_must_work() {
+    let json = r#"
+        {
+            "stepType": "DeleteDirective",
+            "model": "Blog",
+            "directive": "unique",
+            "arguments": [
+                {
+                    "name": "",
+                    "value": "[name, age]"
+                }
+            ]
+        }
+    "#;
+
+    let expected_step = MigrationStep::DeleteDirective(DeleteDirective {
+        locator: DirectiveLocator {
+            directive: "unique".to_owned(),
+            location: DirectiveLocation::Model {
+                model: "Blog".to_owned(),
+            },
+            arguments: Some(vec![Argument {
+                name: "".to_owned(),
+                value: MigrationExpression("[name, age]".to_owned()),
+            }]),
         },
     });
 
@@ -251,6 +285,7 @@ fn UpdateDirectiveArgument_must_work() {
             location: DirectiveLocation::Enum {
                 r#enum: "CatMood".to_owned(),
             },
+            arguments: None,
         },
         argument: "name".to_owned(),
         new_value: MigrationExpression("cat_mood".to_owned()),
@@ -273,6 +308,7 @@ fn CreateDirectiveArgument_must_work() {
 
     let expected_step = MigrationStep::CreateDirectiveArgument(CreateDirectiveArgument {
         directive_location: DirectiveLocator {
+            arguments: None,
             directive: "map".to_owned(),
             location: DirectiveLocation::Enum {
                 r#enum: "CatMood".to_owned(),
@@ -299,6 +335,7 @@ fn DeleteDirectiveArgument_must_work() {
     let expected_step = MigrationStep::DeleteDirectiveArgument(DeleteDirectiveArgument {
         directive_location: DirectiveLocator {
             directive: "map".to_owned(),
+            arguments: None,
             location: DirectiveLocation::Enum {
                 r#enum: "CatMood".to_owned(),
             },

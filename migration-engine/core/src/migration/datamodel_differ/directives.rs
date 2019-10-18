@@ -1,4 +1,5 @@
 use datamodel::ast;
+use migration_connector::steps::MigrationExpression;
 
 #[derive(Debug)]
 pub(crate) struct DirectiveDiffer<'a> {
@@ -48,6 +49,29 @@ fn arguments_match(previous: &ast::Argument, next: &ast::Argument) -> bool {
     previous.name.name == next.name.name
 }
 
+pub(crate) fn directives_are_identical(previous: &ast::Directive, next: &ast::Directive) -> bool {
+    if previous.name.name != next.name.name {
+        return false;
+    }
+
+    if previous.arguments.len() != next.arguments.len() {
+        return false;
+    }
+
+    previous.arguments.iter().all(move |previous_argument| {
+        next.arguments
+            .iter()
+            .find(|next_argument| arguments_are_identical(previous_argument, next_argument))
+            .is_some()
+    })
+}
+
+fn arguments_are_identical(previous: &ast::Argument, next: &ast::Argument) -> bool {
+    previous.name.name == next.name.name
+        && MigrationExpression::from_ast_expression(&previous.value)
+            == MigrationExpression::from_ast_expression(&next.value)
+}
+
 #[cfg(test)]
 mod tests {
     use super::super::{ModelDiffer, TopDiffer};
@@ -78,7 +102,7 @@ mod tests {
         };
 
         let dog_diff: ModelDiffer<'_> = differ.model_pairs().next().unwrap();
-        let custom_directive = dog_diff.directive_pairs().next().unwrap();
+        let custom_directive = dog_diff.regular_directive_pairs().next().unwrap();
 
         assert_eq!(custom_directive.previous.name.name, "customDirective");
 

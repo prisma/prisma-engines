@@ -151,11 +151,70 @@ pub struct DeleteDirective {
 }
 
 #[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct Argument {
+    pub name: String,
+    pub value: MigrationExpression,
+}
+
+impl Argument {
+    fn matches_ast_argument(&self, argument: &ast::Argument) -> bool {
+        self.name == argument.name.name && self.value == MigrationExpression::from_ast_expression(&argument.value)
+    }
+}
+
+impl From<&ast::Argument> for Argument {
+    fn from(arg: &ast::Argument) -> Self {
+        Argument {
+            name: arg.name.name.clone(),
+            value: MigrationExpression::from_ast_expression(&arg.value),
+        }
+    }
+}
+
+impl Into<ast::Argument> for &Argument {
+    fn into(self) -> ast::Argument {
+        ast::Argument {
+            name: ast::Identifier::new(&self.name),
+            value: self.value.to_ast_expression(),
+            span: ast::Span::empty(),
+        }
+    }
+}
+
+#[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct DirectiveLocator {
     #[serde(flatten)]
     pub location: DirectiveLocation,
     pub r#directive: String,
+    /// The arguments of the directive are required to match directives that can be repeated,
+    /// like `@@unique` on a model. This is `None` when matching can be done without comparing
+    /// the arguments, and `Some` when a directive should be matched exactly.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub arguments: Option<Vec<Argument>>,
+}
+
+impl DirectiveLocator {
+    pub fn matches_ast_directive(&self, directive: &ast::Directive) -> bool {
+        if self.directive != directive.name.name {
+            return false;
+        }
+
+        match &self.arguments {
+            Some(arguments) => {
+                directive.arguments.len() == arguments.len()
+                    && directive
+                        .arguments
+                        .iter()
+                        .zip(arguments.iter())
+                        .all(|(directive_argument, self_argument)| {
+                            self_argument.matches_ast_argument(directive_argument)
+                        })
+            }
+            None => true,
+        }
+    }
 }
 
 #[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
@@ -222,6 +281,7 @@ mod tests {
                     field: "owner".to_owned(),
                 },
                 directive: "status".to_owned(),
+                arguments: None,
             },
         };
 

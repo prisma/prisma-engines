@@ -341,7 +341,12 @@ fn apply_create_directive(datamodel: &mut ast::SchemaAst, step: &steps::CreateDi
 
     let new_directive = ast::Directive {
         name: new_ident(step.locator.directive.clone()),
-        arguments: vec![],
+        arguments: step
+            .locator
+            .arguments
+            .as_ref()
+            .map(|args| args.iter().map(|arg| arg.into()).collect())
+            .unwrap_or_else(Vec::new),
         span: new_span(),
     };
 
@@ -355,7 +360,7 @@ fn apply_delete_directive(datamodel: &mut ast::SchemaAst, step: &steps::DeleteDi
 
     let new_directives = directives
         .drain(..)
-        .filter(|directive| directive.name.name != step.locator.directive)
+        .filter(|directive| !step.locator.matches_ast_directive(directive))
         .collect();
 
     *directives = new_directives;
