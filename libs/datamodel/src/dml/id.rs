@@ -1,6 +1,6 @@
-use super::traits::*;
+use super::*;
 use crate::ast;
-use crate::errors::ValidationError;
+use crate::error::DatamodelError;
 use serde::{Deserialize, Serialize};
 
 use crate::common::FromStrAndSpan;
@@ -13,11 +13,11 @@ pub enum IdStrategy {
 }
 
 impl FromStrAndSpan for IdStrategy {
-    fn from_str_and_span(s: &str, span: ast::Span) -> Result<Self, ValidationError> {
+    fn from_str_and_span(s: &str, span: ast::Span) -> Result<Self, DatamodelError> {
         match s {
             "AUTO" => Ok(IdStrategy::Auto),
             "NONE" => Ok(IdStrategy::None),
-            _ => Err(ValidationError::new_literal_parser_error("id strategy", s, span)),
+            _ => Err(DatamodelError::new_literal_parser_error("id strategy", s, span)),
         }
     }
 }

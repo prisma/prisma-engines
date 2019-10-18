@@ -1,4 +1,4 @@
-use datamodel::{ast::Span, errors::*, render_to_string, IndexDefinition, IndexType};
+use datamodel::{ast::Span, error::*, render_datamodel_to_string, IndexDefinition, IndexType};
 
 use crate::common::*;
 
@@ -85,7 +85,7 @@ fn must_error_when_unknown_fields_are_used() {
 
     let errors = parse_error(dml);
 
-    errors.assert_is(ValidationError::new_model_validation_error(
+    errors.assert_is(DatamodelError::new_model_validation_error(
         "The unique index definition refers to the unknown fields foo, bar.",
         "User",
         Span::new(48, 65),
@@ -105,5 +105,5 @@ fn unique_directives_must_serialize_to_valid_dml() {
     "#;
     let schema = parse(dml);
 
-    assert!(datamodel::parse(&render_to_string(&schema).unwrap()).is_ok());
+    assert!(datamodel::parse_datamodel(&render_datamodel_to_string(&schema).unwrap()).is_ok());
 }

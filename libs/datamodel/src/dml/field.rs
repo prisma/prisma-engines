@@ -1,7 +1,4 @@
-use super::id::*;
-use super::relation::*;
-use super::scalar::*;
-use super::traits::*;
+use super::*;
 use crate::common::{PrismaType, PrismaValue};
 use serde::{Deserialize, Serialize};
 
@@ -12,6 +9,12 @@ pub enum FieldArity {
     Required,
     Optional,
     List,
+}
+
+impl FieldArity {
+    pub fn is_singular(&self) -> bool {
+        self == &FieldArity::Required || self == &FieldArity::Optional
+    }
 }
 
 /// Datamodel field type.

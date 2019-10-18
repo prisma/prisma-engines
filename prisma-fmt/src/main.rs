@@ -1,5 +1,5 @@
 use datamodel;
-use datamodel::errors::ValidationError;
+use datamodel::error::DatamodelError;
 use std::{
     fs,
     io::{self, Read},
@@ -68,15 +68,15 @@ fn main() {
             .read_to_string(&mut datamodel_string)
             .expect("Unable to read from stdin.");
 
-        if let Err(err) = datamodel::parse(&datamodel_string) {
+        if let Err(err) = datamodel::parse_datamodel(&datamodel_string) {
             let errs: Vec<MiniError> = err
                 .errors
                 .iter()
-                .filter(|err: &&ValidationError| match err {
-                    ValidationError::EnvironmentFunctionalEvaluationError { var_name: _, span: _ } => !skip_env_errors,
+                .filter(|err: &&DatamodelError| match err {
+                    DatamodelError::EnvironmentFunctionalEvaluationError { var_name: _, span: _ } => !skip_env_errors,
                     _ => true,
                 })
-                .map(|err: &ValidationError| MiniError {
+                .map(|err: &DatamodelError| MiniError {
                     start: err.span().start,
                     end: err.span().end,
                     text: format!("{}", err),

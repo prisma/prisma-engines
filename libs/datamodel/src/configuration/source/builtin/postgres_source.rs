@@ -1,4 +1,4 @@
-use crate::{configuration::*, dml, dml::validator::directive::DirectiveValidator};
+use crate::{configuration::*, dml, validator::directive::DirectiveValidator};
 pub const POSTGRES_SOURCE_NAME: &str = "postgresql";
 
 pub struct PostgresSource {

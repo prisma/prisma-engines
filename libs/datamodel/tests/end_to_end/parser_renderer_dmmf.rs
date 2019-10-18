@@ -69,10 +69,10 @@ enum CategoryEnum {
 
 #[test]
 fn test_dmmf_roundtrip() {
-    let dml = datamodel::parse(&DATAMODEL_STRING).unwrap();
+    let dml = datamodel::parse_datamodel(&DATAMODEL_STRING).unwrap();
     let dmmf = datamodel::dmmf::render_to_dmmf(&dml);
     let dml2 = datamodel::dmmf::parse_from_dmmf(&dmmf);
-    let rendered = datamodel::render(&dml2).unwrap();
+    let rendered = datamodel::render_datamodel_to_string(&dml2).unwrap();
 
     println!("{}", rendered);
 
@@ -87,10 +87,10 @@ const DATAMODEL_STRING_WITH_FUNCTIONS: &str = r#"model User {
 
 #[test]
 fn test_dmmf_roundtrip_with_functions() {
-    let dml = datamodel::parse(&DATAMODEL_STRING_WITH_FUNCTIONS).unwrap();
+    let dml = datamodel::parse_datamodel(&DATAMODEL_STRING_WITH_FUNCTIONS).unwrap();
     let dmmf = datamodel::dmmf::render_to_dmmf(&dml);
     let dml2 = datamodel::dmmf::parse_from_dmmf(&dmmf);
-    let rendered = datamodel::render(&dml2).unwrap();
+    let rendered = datamodel::render_datamodel_to_string(&dml2).unwrap();
 
     println!("{}", rendered);
 
@@ -254,14 +254,14 @@ model Post {
 #[test]
 fn should_serialize_dmmf_without_relation_name_correctly() {
     let dml = datamodel::dmmf::parse_from_dmmf(DMFF_WITHOUT_RELATION_NAME);
-    let rendered = datamodel::render(&dml).unwrap();
+    let rendered = datamodel::render_datamodel_to_string(&dml).unwrap();
 
     assert_eq!(DML_WITHOUT_RELATION_NAME, rendered);
 }
 
 fn dmmf_roundtrip(input: &str) -> String {
-    let dml = datamodel::parse(input).unwrap();
-    let config = datamodel::load_configuration(input).unwrap();
+    let dml = datamodel::parse_datamodel(input).unwrap();
+    let config = datamodel::parse_configuration(input).unwrap();
 
     let dmmf = datamodel::dmmf::render_to_dmmf(&dml);
     let mcf = datamodel::config_to_mcf_json(&config);
@@ -269,7 +269,7 @@ fn dmmf_roundtrip(input: &str) -> String {
     let dml2 = datamodel::dmmf::parse_from_dmmf(&dmmf);
     let config = datamodel::config_from_mcf_json(&mcf);
 
-    let rendered = datamodel::render_with_config(&dml2, &config).unwrap();
+    let rendered = datamodel::render_datamodel_and_config_to_string(&dml2, &config).unwrap();
 
     println!("{}", rendered);
 

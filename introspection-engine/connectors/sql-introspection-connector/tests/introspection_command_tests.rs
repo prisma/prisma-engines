@@ -822,7 +822,11 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
                 indices: vec![],
                 primary_key: None,
                 foreign_keys: vec![ForeignKey {
+<<<<<<< HEAD
                     // what does this mean? the from columns are not targeting a specific to column?
+=======
+                    constraint_name: None,
+>>>>>>> master
                     columns: vec!["city-id".to_string(), "city-name".to_string()],
                     referenced_table: "City".to_string(),
                     on_delete_action: ForeignKeyAction::NoAction,

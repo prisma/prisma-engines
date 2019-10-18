@@ -28,6 +28,9 @@ pub enum ConnectorError {
 
     #[fail(display = "Operation timed out")]
     Timeout,
+
+    #[fail(display = "Error opening a TLS connection. {}", message)]
+    TlsError { message: String },
 }
 
 impl From<prisma_query::error::Error> for ConnectorError {
@@ -39,6 +42,7 @@ impl From<prisma_query::error::Error> for ConnectorError {
             prisma_query::error::Error::AuthenticationFailed { user } => Self::AuthenticationFailed { user },
             prisma_query::error::Error::ConnectTimeout => Self::ConnectTimeout,
             prisma_query::error::Error::Timeout => Self::Timeout,
+            prisma_query::error::Error::TlsError { message } => Self::TlsError { message },
             e => ConnectorError::QueryError(e.into()),
         }
     }

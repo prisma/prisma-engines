@@ -37,14 +37,14 @@ fn load_all_should_return_empty_if_there_is_no_migration() {
 
 #[test]
 fn load_all_must_return_all_created_migrations() {
-    test_each_connector(|sql_family, api| {
+    test_each_connector(|test_setup, api| {
         let persistence = api.migration_persistence();
         let migration1 = persistence.create(Migration::new("migration_1".to_string()));
         let migration2 = persistence.create(Migration::new("migration_2".to_string()));
         let migration3 = persistence.create(Migration::new("migration_3".to_string()));
 
         let mut result = persistence.load_all();
-        if sql_family == SqlFamily::Mysql {
+        if test_setup.sql_family == SqlFamily::Mysql {
             // TODO: mysql currently looses milli seconds on loading
             result[0].started_at = migration1.started_at;
             result[1].started_at = migration2.started_at;
@@ -56,13 +56,13 @@ fn load_all_must_return_all_created_migrations() {
 
 #[test]
 fn create_should_allow_to_create_a_new_migration() {
-    test_each_connector(|sql_family, api| {
-        let datamodel = datamodel::parse(
+    test_each_connector(|test_setup, api| {
+        let datamodel = datamodel::parse_datamodel(
             r#"
-            model Test {
-                id String @id @default(cuid())
-            }
-        "#,
+                model Test {
+                    id String @id @default(cuid())
+                }
+            "#,
         )
         .unwrap();
         let persistence = api.migration_persistence();
@@ -81,7 +81,7 @@ fn create_should_allow_to_create_a_new_migration() {
 
         assert_eq!(result, migration);
         let mut loaded = persistence.last().unwrap();
-        if sql_family == SqlFamily::Mysql {
+        if test_setup.sql_family == SqlFamily::Mysql {
             // TODO: mysql currently looses milli seconds on loading
             loaded.started_at = migration.started_at;
         }
@@ -101,7 +101,7 @@ fn create_should_increment_revisions() {
 
 #[test]
 fn update_must_work() {
-    test_each_connector(|sql_family, api| {
+    test_each_connector(|test_setup, api| {
         let persistence = api.migration_persistence();
         let migration = persistence.create(Migration::new("my_migration".to_string()));
 
@@ -120,7 +120,7 @@ fn update_must_work() {
         assert_eq!(loaded.applied, params.applied);
         assert_eq!(loaded.rolled_back, params.rolled_back);
         assert_eq!(loaded.errors, params.errors);
-        if sql_family != SqlFamily::Mysql {
+        if test_setup.sql_family != SqlFamily::Mysql {
             // TODO: mysql currently looses milli seconds on loading
             assert_eq!(loaded.finished_at, params.finished_at);
         }

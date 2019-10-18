@@ -1,5 +1,5 @@
 use crate::common::*;
-use datamodel::{ast::Span, errors::ValidationError};
+use datamodel::{ast::Span, error::DatamodelError};
 
 #[test]
 fn fail_on_duplicate_models() {
@@ -14,7 +14,7 @@ fn fail_on_duplicate_models() {
 
     let errors = parse_error(dml);
 
-    errors.assert_is(ValidationError::new_duplicate_top_error(
+    errors.assert_is(DatamodelError::new_duplicate_top_error(
         "User",
         "model",
         "model",
@@ -35,7 +35,7 @@ fn fail_on_model_enum_conflict() {
 
     let errors = parse_error(dml);
 
-    errors.assert_is(ValidationError::new_duplicate_top_error(
+    errors.assert_is(DatamodelError::new_duplicate_top_error(
         "User",
         "model",
         "enum",
@@ -53,7 +53,7 @@ fn fail_on_model_type_conflict() {
 
     let errors = parse_error(dml);
 
-    errors.assert_is(ValidationError::new_duplicate_top_error(
+    errors.assert_is(DatamodelError::new_duplicate_top_error(
         "User",
         "model",
         "type",
@@ -73,7 +73,7 @@ fn fail_on_enum_type_conflict() {
 
     let errors = parse_error(dml);
 
-    errors.assert_is(ValidationError::new_duplicate_top_error(
+    errors.assert_is(DatamodelError::new_duplicate_top_error(
         "User",
         "enum",
         "type",
@@ -93,7 +93,7 @@ fn fail_on_duplicate_field() {
 
     let errors = parse_error(dml);
 
-    errors.assert_is(ValidationError::new_duplicate_field_error(
+    errors.assert_is(DatamodelError::new_duplicate_field_error(
         "User",
         "firstName",
         Span::new(70, 79),
@@ -112,7 +112,7 @@ fn fail_on_duplicate_enum_value() {
 
     let errors = parse_error(dml);
 
-    errors.assert_is(ValidationError::new_duplicate_enum_value_error(
+    errors.assert_is(DatamodelError::new_duplicate_enum_value_error(
         "Role",
         "Moderator",
         Span::new(57, 66),
@@ -130,7 +130,7 @@ fn fail_on_reserved_name_for_enum() {
 
     let errors = parse_error(dml);
 
-    errors.assert_is(ValidationError::new_reserved_scalar_type_error(
+    errors.assert_is(DatamodelError::new_reserved_scalar_type_error(
         "String",
         Span::new(10, 16),
     ));
@@ -146,7 +146,7 @@ fn fail_on_reserved_name_for_model() {
 
     let errors = parse_error(dml);
 
-    errors.assert_is(ValidationError::new_reserved_scalar_type_error(
+    errors.assert_is(DatamodelError::new_reserved_scalar_type_error(
         "DateTime",
         Span::new(11, 19),
     ));
@@ -160,8 +160,5 @@ fn fail_on_reserved_name_fo_custom_type() {
 
     let errors = parse_error(dml);
 
-    errors.assert_is(ValidationError::new_reserved_scalar_type_error(
-        "Int",
-        Span::new(10, 13),
-    ));
+    errors.assert_is(DatamodelError::new_reserved_scalar_type_error("Int", Span::new(10, 13)));
 }

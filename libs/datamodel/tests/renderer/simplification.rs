@@ -22,8 +22,8 @@ model User {
   todo Todo
 }"#;
 
-    let dml = datamodel::parse(input).unwrap();
-    let rendered = datamodel::render(&dml).unwrap();
+    let dml = datamodel::parse_datamodel(input).unwrap();
+    let rendered = datamodel::render_datamodel_to_string(&dml).unwrap();
 
     print!("{}", rendered);
 
@@ -52,8 +52,8 @@ model User {
   todo Todo
 }"#;
 
-    let dml = datamodel::parse(input).unwrap();
-    let rendered = datamodel::render(&dml).unwrap();
+    let dml = datamodel::parse_datamodel(input).unwrap();
+    let rendered = datamodel::render_datamodel_to_string(&dml).unwrap();
 
     print!("{}", rendered);
 

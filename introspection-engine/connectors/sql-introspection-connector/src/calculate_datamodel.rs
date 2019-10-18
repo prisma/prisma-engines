@@ -114,7 +114,7 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
         let multi_field_indexes = table.indices.iter().filter(|i| i.columns.len() >1 );
         for multi_field_index in multi_field_indexes {
             if multi_field_index.tpe == IndexType::Unique{
-                let index : IndexDefinition = IndexDefinition{name: Some(multi_field_index.name.clone()), fields: multi_field_index.columns.clone(), tpe:  datamodel::dml::model::IndexType::Unique};
+                let index : IndexDefinition = IndexDefinition{name: Some(multi_field_index.name.clone()), fields: multi_field_index.columns.clone(), tpe:  datamodel::dml::IndexType::Unique};
                 model.add_index(index)
             }
         }

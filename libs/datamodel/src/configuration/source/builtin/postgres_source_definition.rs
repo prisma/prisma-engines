@@ -1,5 +1,5 @@
 use super::{PostgresSource, POSTGRES_SOURCE_NAME};
-use crate::{common::argument::Arguments, configuration::*, errors::ValidationError};
+use crate::{common::argument::Arguments, configuration::*, error::DatamodelError};
 
 pub struct PostgresSourceDefinition {}
 
@@ -20,7 +20,7 @@ impl SourceDefinition for PostgresSourceDefinition {
         url: StringFromEnvVar,
         _arguments: &mut Arguments,
         documentation: &Option<String>,
-    ) -> Result<Box<dyn Source>, ValidationError> {
+    ) -> Result<Box<dyn Source>, DatamodelError> {
         Ok(Box::new(PostgresSource {
             name: String::from(name),
             url: url,

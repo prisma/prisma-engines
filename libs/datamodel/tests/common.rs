@@ -1,7 +1,7 @@
 extern crate datamodel;
 
 use self::datamodel::IndexDefinition;
-use datamodel::{common::PrismaType, configuration::SourceDefinition, dml, errors::*};
+use datamodel::{common::PrismaType, configuration::SourceDefinition, dml, error::*};
 
 pub trait FieldAsserts {
     fn assert_base_type(&self, t: &PrismaType) -> &Self;
@@ -41,8 +41,8 @@ pub trait DatamodelAsserts {
 }
 
 pub trait ErrorAsserts {
-    fn assert_is(&self, error: ValidationError) -> &Self;
-    fn assert_is_at(&self, index: usize, error: ValidationError) -> &Self;
+    fn assert_is(&self, error: DatamodelError) -> &Self;
+    fn assert_is_at(&self, index: usize, error: DatamodelError) -> &Self;
 }
 
 impl FieldAsserts for dml::Field {
@@ -239,7 +239,7 @@ impl EnumAsserts for dml::Enum {
 }
 
 impl ErrorAsserts for ErrorCollection {
-    fn assert_is(&self, error: ValidationError) -> &Self {
+    fn assert_is(&self, error: DatamodelError) -> &Self {
         if self.errors.len() == 1 {
             assert_eq!(self.errors[0], error);
         } else {
@@ -249,7 +249,7 @@ impl ErrorAsserts for ErrorCollection {
         self
     }
 
-    fn assert_is_at(&self, index: usize, error: ValidationError) -> &Self {
+    fn assert_is_at(&self, index: usize, error: DatamodelError) -> &Self {
         assert_eq!(self.errors[index], error);
         self
     }
@@ -264,7 +264,7 @@ pub fn parse_with_plugins(
     datamodel_string: &str,
     source_definitions: Vec<Box<dyn SourceDefinition>>,
 ) -> datamodel::Datamodel {
-    match datamodel::parse_with_plugins(datamodel_string, source_definitions) {
+    match datamodel::parse_datamodel_with_sources(datamodel_string, source_definitions) {
         Ok(s) => s,
         Err(errs) => {
             for err in errs.to_iter() {
@@ -285,7 +285,7 @@ pub fn parse_with_plugins_error(
     datamodel_string: &str,
     source_definitions: Vec<Box<dyn SourceDefinition>>,
 ) -> ErrorCollection {
-    match datamodel::parse_with_plugins(datamodel_string, source_definitions) {
+    match datamodel::parse_datamodel_with_sources(datamodel_string, source_definitions) {
         Ok(_) => panic!("Expected an error when parsing schema."),
         Err(errs) => errs,
     }

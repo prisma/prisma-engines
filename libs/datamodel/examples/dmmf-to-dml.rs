@@ -21,5 +21,5 @@ fn main() {
 
     let dml = datamodel::dmmf::parse_from_dmmf(&file);
 
-    datamodel::render_to(&mut std::io::stdout().lock(), &dml).unwrap();
+    datamodel::render_datamodel_to(&mut std::io::stdout().lock(), &dml).unwrap();
 }

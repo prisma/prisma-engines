@@ -85,3 +85,25 @@ fn allow_unambiguous_self_relations_in_presence_of_unrelated_other_relations() {
 
     parse(dml);
 }
+
+#[test]
+fn must_generate_back_relation_fields_for_named_relation_fields() {
+    let dml = r#"
+    model Todo {
+        id Int @id
+        assignees User[] @relation(name: "AssignedTodos")
+    }
+
+    model User {
+        id Int @id
+    }
+    "#;
+
+    let datamodel = parse(dml);
+
+    datamodel
+        .assert_has_model("User")
+        .assert_has_field("todo")
+        .assert_relation_name("AssignedTodos")
+        .assert_relation_to("Todo");
+}

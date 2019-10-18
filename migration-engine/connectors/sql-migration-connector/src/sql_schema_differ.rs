@@ -92,6 +92,7 @@ impl<'a> SqlSchemaDiffer<'a> {
         for previous_table in &self.previous.tables {
             if let Ok(next_table) = self.next.table(&previous_table.name) {
                 let mut changes = Vec::new();
+                changes.extend(Self::drop_foreign_keys(&previous_table, &next_table));
                 changes.append(&mut Self::drop_columns(&previous_table, &next_table));
                 changes.append(&mut Self::add_columns(&previous_table, &next_table));
                 changes.append(&mut Self::alter_columns(&previous_table, &next_table));
@@ -147,7 +148,7 @@ impl<'a> SqlSchemaDiffer<'a> {
                     || previous_column.tpe.family != next_column.tpe.family
                     || (previous_column.arity != next_column.arity && !is_fk_case);
 
-                if differs_in_something || previous_fk != next_fk {
+                if differs_in_something || foreign_key_changed(previous_fk, next_fk) {
                     let change = AlterColumn {
                         name: previous_column.name.clone(),
                         column: next_column.clone(),
@@ -157,6 +158,29 @@ impl<'a> SqlSchemaDiffer<'a> {
             }
         }
         result
+    }
+
+    fn drop_foreign_keys(previous: &'a Table, next: &'a Table) -> impl Iterator<Item = TableChange> + 'a {
+        previous
+            .foreign_keys
+            .iter()
+            .filter(move |previous_fk| {
+                next.foreign_keys
+                    .iter()
+                    .find(|next_fk| foreign_keys_match(previous_fk, next_fk))
+                    .is_none()
+            })
+            .filter_map(|foreign_key| foreign_key.constraint_name.as_ref())
+            .map(move |dropped_foreign_key_name| {
+                debug!(
+                    "Dropping foreign key '{}' on table '{}'",
+                    &dropped_foreign_key_name, &previous.name
+                );
+                let drop_step = DropForeignKey {
+                    constraint_name: dropped_foreign_key_name.clone(),
+                };
+                TableChange::DropForeignKey(drop_step)
+            })
     }
 
     fn create_indexes(&self, alter_indexes: &[AlterIndex]) -> Vec<CreateIndex> {
@@ -255,7 +279,26 @@ impl<'a> SqlSchemaDiffer<'a> {
     }
 }
 
-/// Compare two SQL indexes and return whether they only differ by name.
+/// Compare two SQL indexes and return whether they only differ by name or type.
 fn indexes_are_equivalent(first: &Index, second: &Index) -> bool {
     first.columns == second.columns && first.tpe == second.tpe
+}
+
+/// Compare two [ForeignKey](/sql-schema-describer/struct.ForeignKey.html)s and return whether a
+/// migration needs to be applied.
+fn foreign_key_changed(previous: Option<&ForeignKey>, next: Option<&ForeignKey>) -> bool {
+    match (previous, next) {
+        (None, None) => false,
+        (Some(previous), Some(next)) => !foreign_keys_match(previous, next),
+        _ => true,
+    }
+}
+
+/// Compare two [ForeignKey](/sql-schema-describer/struct.ForeignKey.html)s and return whether they
+/// should be considered equivalent for schema diffing purposes.
+fn foreign_keys_match(previous: &ForeignKey, next: &ForeignKey) -> bool {
+    previous.referenced_table == next.referenced_table
+        && previous.referenced_columns == next.referenced_columns
+        && previous.columns == next.columns
+        && previous.on_delete_action == next.on_delete_action
 }

@@ -1,6 +1,6 @@
 use crate::common::*;
 use datamodel::dml;
-use datamodel::{ast::Span, errors::ValidationError};
+use datamodel::{ast::Span, error::DatamodelError};
 
 // Ported from
 // https://github.com/prisma/prisma/blob/master/server/servers/deploy/src/test/scala/com/prisma/deploy/migration/validation/RelationDirectiveSpec.scala
@@ -56,7 +56,7 @@ fn fail_if_back_relation_for_embedded_type() {
 
     let errors = parse_error(dml);
 
-    errors.assert_is(ValidationError::new_model_validation_error(
+    errors.assert_is(DatamodelError::new_model_validation_error(
         "Embedded models cannot have back relation fields.",
         "Comment",
         Span::new(151, 160),
@@ -103,6 +103,6 @@ fn fail_if_ambigous_relation_fields_do_not_specify_a_name() {
 
     errors.assert_is_at(
         0,
-        ValidationError::new_model_validation_error("Ambiguous relation detected.", "Todo", Span::new(41, 59)),
+        DatamodelError::new_model_validation_error("Ambiguous relation detected.", "Todo", Span::new(41, 59)),
     );
 }

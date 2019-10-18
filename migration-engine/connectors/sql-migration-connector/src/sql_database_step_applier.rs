@@ -141,6 +141,13 @@ fn render_raw_sql(step: &SqlMigrationStep, sql_family: SqlFamily, schema_name: &
                         let col_sql = renderer.render_column(&schema_name, &table, &column, true);
                         lines.push(format!("ADD COLUMN {}", col_sql));
                     }
+                    TableChange::DropForeignKey(DropForeignKey { constraint_name }) => match sql_family {
+                        SqlFamily::Mysql => {
+                            let constraint_name = renderer.quote(&constraint_name);
+                            lines.push(format!("DROP FOREIGN KEY {}", constraint_name));
+                        }
+                        _ => (),
+                    },
                 }
             }
             format!(

@@ -1,7 +1,7 @@
 use super::traits::{Source, SourceDefinition};
 use crate::ast;
 use crate::common::argument::Arguments;
-use crate::errors::{ErrorCollection, ValidationError};
+use crate::error::{DatamodelError, ErrorCollection};
 use crate::StringFromEnvVar;
 
 /// Helper struct to load and validate source configuration blocks.
@@ -23,7 +23,7 @@ impl SourceLoader {
     }
 
     /// Internal: Loads a single source from a source config block in the datamodel.
-    pub fn load_source(&self, ast_source: &ast::SourceConfig) -> Result<Option<Box<dyn Source>>, ValidationError> {
+    pub fn load_source(&self, ast_source: &ast::SourceConfig) -> Result<Option<Box<dyn Source>>, DatamodelError> {
         let mut args = Arguments::new(&ast_source.properties, ast_source.span);
         let (env_var_for_url, url) = args.arg("url")?.as_str_from_env()?;
         let provider_arg = args.arg("provider")?;
@@ -54,7 +54,7 @@ impl SourceLoader {
             }
         }
 
-        Err(ValidationError::new_source_not_known_error(
+        Err(DatamodelError::new_source_not_known_error(
             &provider,
             provider_arg.span(),
         ))
@@ -62,21 +62,19 @@ impl SourceLoader {
 
     /// Loads all source config blocks form the given AST,
     /// and returns a Source instance for each.
-    pub fn load(&self, ast_schema: &ast::Datamodel) -> Result<Vec<Box<dyn Source>>, ErrorCollection> {
+    pub fn load(&self, ast_schema: &ast::SchemaAst) -> Result<Vec<Box<dyn Source>>, ErrorCollection> {
         let mut sources: Vec<Box<dyn Source>> = vec![];
         let mut errors = ErrorCollection::new();
 
-        for ast_obj in &ast_schema.models {
-            if let ast::Top::Source(src) = ast_obj {
-                match self.load_source(&src) {
-                    Ok(Some(loaded_src)) => sources.push(loaded_src),
-                    Ok(None) => { /* Source was disabled. */ }
-                    // Lift error to source.
-                    Err(ValidationError::ArgumentNotFound { argument_name, span }) => errors.push(
-                        ValidationError::new_source_argument_not_found_error(&argument_name, &src.name.name, span),
-                    ),
-                    Err(err) => errors.push(err),
-                }
+        for src in &ast_schema.sources() {
+            match self.load_source(&src) {
+                Ok(Some(loaded_src)) => sources.push(loaded_src),
+                Ok(None) => { /* Source was disabled. */ }
+                // Lift error to source.
+                Err(DatamodelError::ArgumentNotFound { argument_name, span }) => errors.push(
+                    DatamodelError::new_source_argument_not_found_error(&argument_name, &src.name.name, span),
+                ),
+                Err(err) => errors.push(err),
             }
         }
 

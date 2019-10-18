@@ -80,7 +80,7 @@ fn source_from_json(source: &SourceConfig, loader: &configuration::SourceLoader)
     arguments.push(ast::Argument::new_string("provider", &source.connector_type));
     match source.url.from_env_var {
         Some(ref env_var) => {
-            let values = vec![ast::Value::StringValue(env_var.to_string(), ast::Span::empty())];
+            let values = vec![ast::Expression::StringValue(env_var.to_string(), ast::Span::empty())];
             arguments.push(ast::Argument::new_function("url", "env", values));
         }
         None => {

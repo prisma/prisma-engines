@@ -239,6 +239,10 @@ impl SqlSchemaDescriber {
                     referenced_table: intermediate_fk.referenced_table.to_owned(),
                     referenced_columns,
                     on_delete_action: intermediate_fk.on_delete_action.to_owned(),
+
+                    // Not relevant in SQLite since we cannot ALTER or DROP foreign keys by
+                    // constraint name.
+                    constraint_name: None,
                 };
                 debug!("Detected foreign key {:?}", fk);
                 fk

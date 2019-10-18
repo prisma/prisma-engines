@@ -1,5 +1,5 @@
 use crate::commands::CommandError;
-use datamodel::errors::ErrorCollection;
+use datamodel::error::ErrorCollection;
 use failure::{Error as Schwerror, Fail};
 use migration_connector::ConnectorError;
 use sql_migration_connector::SqlError;
