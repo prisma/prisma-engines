@@ -822,11 +822,8 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
                 indices: vec![],
                 primary_key: None,
                 foreign_keys: vec![ForeignKey {
-<<<<<<< HEAD
                     // what does this mean? the from columns are not targeting a specific to column?
-=======
                     constraint_name: None,
->>>>>>> master
                     columns: vec!["city-id".to_string(), "city-name".to_string()],
                     referenced_table: "City".to_string(),
                     on_delete_action: ForeignKeyAction::NoAction,
@@ -899,7 +896,7 @@ fn multi_field_uniques_are_preserved_when_generating_data_model_from_a_schema() 
                     },
                 ],
                 is_generated: false,
-                indexes:               vec![  datamodel::dml::model::IndexDefinition {
+                indexes:               vec![  datamodel::dml::IndexDefinition {
                             name: Some(
                                 "name_last_name_unique".to_string(),
                             ),
@@ -907,7 +904,7 @@ fn multi_field_uniques_are_preserved_when_generating_data_model_from_a_schema() 
                                 "name".to_string(),
                                 "lastname".to_string(),
                             ],
-                            tpe: datamodel::dml::model::IndexType::Unique,
+                            tpe: datamodel::dml::IndexType::Unique,
                         },
                 ],
                 id_fields: vec![],
@@ -1146,6 +1143,7 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                 indices: vec![],
                 primary_key: None,
                 foreign_keys: vec![ForeignKey {
+                    constraint_name: None,
                     columns: vec!["city-id".to_string() ],
                     referenced_table: "City".to_string(),
                     on_delete_action: ForeignKeyAction::NoAction,
