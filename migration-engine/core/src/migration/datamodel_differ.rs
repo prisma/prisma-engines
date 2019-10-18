@@ -106,13 +106,8 @@ fn push_created_models<'a>(steps: &mut Steps, models: impl Iterator<Item = &'a a
             model: created_model.name.name.clone(),
         };
 
-        let db_name =
-            directives::get_directive_string_value("map", &created_model.directives).map(|db_name| db_name.to_owned());
-
         let create_model_step = steps::CreateModel {
             model: created_model.name.name.clone(),
-            embedded: false, // not represented in the AST yet
-            db_name,
         };
 
         steps.push(MigrationStep::CreateModel(create_model_step));
@@ -164,7 +159,6 @@ fn push_created_fields<'a>(steps: &mut Steps, model_name: &'a str, fields: impl 
             field: field.name.name.clone(),
             tpe: field.field_type.name.clone(),
             model: model_name.to_owned(),
-            db_name: directives::get_directive_string_value("map", &field.directives).map(String::from),
             default,
         };
 

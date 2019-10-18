@@ -7,7 +7,6 @@ pub fn create_field_step(model: &str, field: &str, type_name: &str) -> Migration
         field: field.to_string(),
         tpe: type_name.to_owned(),
         arity: FieldArity::Required,
-        db_name: None,
         default: None,
     })
 }
@@ -34,7 +33,5 @@ pub fn create_id_directive_step(model: &str, field: &str) -> MigrationStep {
 pub fn create_model_step(model: &str) -> MigrationStep {
     MigrationStep::CreateModel(CreateModel {
         model: model.to_string(),
-        db_name: None,
-        embedded: false,
     })
 }

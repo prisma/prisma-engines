@@ -23,10 +23,6 @@ pub enum MigrationStep {
     DeleteEnum(DeleteEnum),
 }
 
-pub trait WithDbName {
-    fn db_name(&self) -> String;
-}
-
 /// Deserializes the cases `undefined`, `null` and `Some(T)` into an `Option<Option<T>>`.
 fn some_option<'de, T, D>(deserializer: D) -> Result<Option<Option<T>>, D::Error>
 where
@@ -40,11 +36,6 @@ where
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct CreateModel {
     pub model: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub db_name: Option<String>,
-
-    pub embedded: bool,
 }
 
 #[derive(Debug, Deserialize, Serialize, PartialEq, Eq, Hash, Clone)]
@@ -54,17 +45,11 @@ pub struct UpdateModel {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub new_name: Option<String>,
-
-    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "some_option")]
-    pub db_name: Option<Option<String>>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub embedded: Option<bool>,
 }
 
 impl UpdateModel {
     pub fn is_any_option_set(&self) -> bool {
-        self.new_name.is_some() || self.embedded.is_some() || self.db_name.is_some()
+        self.new_name.is_some()
     }
 }
 
@@ -87,19 +72,7 @@ pub struct CreateField {
     pub arity: ast::FieldArity,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub db_name: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub default: Option<MigrationExpression>,
-}
-
-impl WithDbName for CreateField {
-    fn db_name(&self) -> String {
-        match self.db_name {
-            Some(ref db_name) => db_name.clone(),
-            None => self.field.clone(),
-        }
-    }
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone, PartialEq)]
@@ -204,6 +177,7 @@ pub enum DirectiveLocation {
 pub struct CreateDirectiveArgument {
     #[serde(flatten)]
     pub directive_location: DirectiveLocator,
+    // TODO: figure out whether we want this, or an option, for default arguments
     pub argument: String,
     pub value: MigrationExpression,
 }
@@ -213,6 +187,7 @@ pub struct CreateDirectiveArgument {
 pub struct DeleteDirectiveArgument {
     #[serde(flatten)]
     pub directive_location: DirectiveLocator,
+    // TODO: figure out whether we want this, or an option, for default arguments
     pub argument: String,
 }
 
@@ -222,6 +197,7 @@ pub struct UpdateDirectiveArgument {
     #[serde(flatten)]
     pub directive_location: DirectiveLocator,
     pub argument: String,
+    // TODO: figure out whether we want this, or an option, for default arguments
     pub new_value: MigrationExpression,
 }
 

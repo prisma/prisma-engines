@@ -95,18 +95,11 @@ fn apply_create_field(datamodel: &mut ast::SchemaAst, step: &steps::CreateField)
 
     let steps::CreateField {
         arity,
-        db_name,
         model: _,
         field,
         tpe,
         default,
     } = step;
-
-    let mut directives = Vec::new();
-
-    if let Some(db_name) = db_name {
-        directives.push(new_map_directive(db_name.to_owned()))
-    };
 
     let field = ast::Field {
         arity: arity.clone(),
@@ -412,19 +405,6 @@ fn new_ident(name: String) -> ast::Identifier {
 
 fn new_span() -> ast::Span {
     ast::Span::empty()
-}
-
-/// See [the spec](https://github.com/prisma/specs/tree/master/schema#map_-name-string).
-fn new_map_directive(name: String) -> ast::Directive {
-    ast::Directive {
-        name: new_ident("map".to_owned()),
-        span: new_span(),
-        arguments: vec![ast::Argument {
-            name: new_ident("name".to_owned()),
-            span: new_span(),
-            value: ast::Expression::StringValue(name, new_span()),
-        }],
-    }
 }
 
 fn find_directives_mut<'a>(

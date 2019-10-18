@@ -48,21 +48,6 @@ fn arguments_match(previous: &ast::Argument, next: &ast::Argument) -> bool {
     previous.name.name == next.name.name
 }
 
-/// Extract the unnamed argument of the specified directive as a string value, if possible.
-pub(crate) fn get_directive_string_value<'a>(
-    directive_name: &str,
-    directives: &'a [ast::Directive],
-) -> Option<&'a str> {
-    directives
-        .iter()
-        .find(|directive| directive.name.name == directive_name)
-        .and_then(|directive| directive.arguments.iter().next())
-        .and_then(|argument| match &argument.value {
-            ast::Expression::StringValue(value, _span) => Some(value.as_str()),
-            _ => None,
-        })
-}
-
 #[cfg(test)]
 mod tests {
     use super::super::{ModelDiffer, TopDiffer};

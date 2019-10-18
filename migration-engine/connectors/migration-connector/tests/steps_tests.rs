@@ -4,23 +4,10 @@ use datamodel::ast::FieldArity;
 use migration_connector::steps::*;
 
 #[test]
-fn minimal_CreateModel_must_work() {
-    let json = r#"{"stepType":"CreateModel","model":"Blog","embedded":false}"#;
-    let expected_struct = MigrationStep::CreateModel(CreateModel {
-        model: "Blog".to_string(),
-        db_name: None,
-        embedded: false,
-    });
-    assert_symmetric_serde(json, expected_struct);
-}
-
-#[test]
 fn full_CreateModel_must_work() {
-    let json = r#"{"stepType":"CreateModel","model":"Blog","dbName":"blog","embedded":true}"#;
+    let json = r#"{"stepType":"CreateModel","model":"Blog"}"#;
     let expected_struct = MigrationStep::CreateModel(CreateModel {
         model: "Blog".to_string(),
-        db_name: Some("blog".to_string()),
-        embedded: true,
     });
     assert_symmetric_serde(json, expected_struct);
 }
@@ -31,20 +18,16 @@ fn minimal_UpdateModel_must_work() {
     let expected_struct = MigrationStep::UpdateModel(UpdateModel {
         model: "Blog".to_string(),
         new_name: None,
-        db_name: None,
-        embedded: None,
     });
     assert_symmetric_serde(json, expected_struct);
 }
 
 #[test]
 fn full_UpdateModel_must_work() {
-    let json = r#"{"stepType":"UpdateModel","model":"Blog","newName":"MyBlog","dbName":"blog","embedded":true}"#;
+    let json = r#"{"stepType":"UpdateModel","model":"Blog","newName":"MyBlog"}"#;
     let expected_struct = MigrationStep::UpdateModel(UpdateModel {
         model: "Blog".to_string(),
         new_name: Some("MyBlog".to_string()),
-        db_name: Some(Some("blog".to_string())),
-        embedded: Some(true),
     });
     assert_symmetric_serde(json, expected_struct);
 }
@@ -75,7 +58,6 @@ fn minimal_CreateField_must_work() {
         tpe: "String".to_owned(),
         arity: FieldArity::Required,
         default: None,
-        db_name: None,
     });
     assert_symmetric_serde(json, expected_struct);
 }
@@ -88,7 +70,6 @@ fn full_CreateField_must_work() {
             "field": "title",
             "type": "String",
             "arity": "optional",
-            "dbName": "blog",
             "default": "\"default\""
         }"#;
     let expected_struct = MigrationStep::CreateField(CreateField {
@@ -96,7 +77,6 @@ fn full_CreateField_must_work() {
         field: "title".to_string(),
         tpe: "String".to_owned(),
         arity: FieldArity::Optional,
-        db_name: Some("blog".to_string()),
         default: Some(MigrationExpression("\"default\"".to_owned())),
     });
 
@@ -215,27 +195,124 @@ fn DeleteEnum_must_work() {
 
 #[test]
 fn CreateDirective_must_work() {
-    unimplemented!()
+    let json = r#"
+        {
+            "stepType": "CreateDirective",
+            "model": "Blog",
+            "directive": "map"
+        }
+    "#;
+
+    let expected_step = MigrationStep::CreateDirective(CreateDirective {
+        locator: DirectiveLocator {
+            directive: "map".to_owned(),
+            location: DirectiveLocation::Model {
+                model: "Blog".to_owned(),
+            },
+        },
+    });
+
+    assert_symmetric_serde(json, expected_step);
 }
 
 #[test]
 fn DeleteDirective_must_work() {
-    unimplemented!()
+    let json = r#"
+        {
+            "stepType": "DeleteDirective",
+            "model": "Blog",
+            "field": "title",
+            "directive": "map"
+        }
+    "#;
+
+    let expected_step = MigrationStep::DeleteDirective(DeleteDirective {
+        locator: DirectiveLocator {
+            directive: "map".to_owned(),
+            location: DirectiveLocation::Field {
+                model: "Blog".to_owned(),
+                field: "title".to_owned(),
+            },
+        },
+    });
+
+    assert_symmetric_serde(json, expected_step);
 }
 
 #[test]
 fn UpdateDirectiveArgument_must_work() {
-    unimplemented!()
+    let json = r#"
+        {
+            "stepType": "UpdateDirectiveArgument",
+            "enum": "CatMood",
+            "directive": "map",
+            "argument": "name",
+            "newValue": "cat_mood"
+        }
+    "#;
+
+    let expected_step = MigrationStep::UpdateDirectiveArgument(UpdateDirectiveArgument {
+        directive_location: DirectiveLocator {
+            directive: "map".to_owned(),
+            location: DirectiveLocation::Enum {
+                r#enum: "CatMood".to_owned(),
+            },
+        },
+        argument: "name".to_owned(),
+        new_value: MigrationExpression("cat_mood".to_owned()),
+    });
+
+    assert_symmetric_serde(json, expected_step);
 }
 
 #[test]
 fn CreateDirectiveArgument_must_work() {
-    unimplemented!()
+    let json = r#"
+        {
+            "stepType": "CreateDirectiveArgument",
+            "enum": "CatMood",
+            "directive": "map",
+            "argument": "name",
+            "value": "cat_mood"
+        }
+    "#;
+
+    let expected_step = MigrationStep::CreateDirectiveArgument(CreateDirectiveArgument {
+        directive_location: DirectiveLocator {
+            directive: "map".to_owned(),
+            location: DirectiveLocation::Enum {
+                r#enum: "CatMood".to_owned(),
+            },
+        },
+        argument: "name".to_owned(),
+        value: MigrationExpression("cat_mood".to_owned()),
+    });
+
+    assert_symmetric_serde(json, expected_step);
 }
 
 #[test]
 fn DeleteDirectiveArgument_must_work() {
-    unimplemented!()
+    let json = r#"
+        {
+            "stepType": "DeleteDirectiveArgument",
+            "enum": "CatMood",
+            "directive": "map",
+            "argument": "name"
+        }
+    "#;
+
+    let expected_step = MigrationStep::DeleteDirectiveArgument(DeleteDirectiveArgument {
+        directive_location: DirectiveLocator {
+            directive: "map".to_owned(),
+            location: DirectiveLocation::Enum {
+                r#enum: "CatMood".to_owned(),
+            },
+        },
+        argument: "name".to_owned(),
+    });
+
+    assert_symmetric_serde(json, expected_step);
 }
 
 fn assert_symmetric_serde(json: &str, expected: MigrationStep) {

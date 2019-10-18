@@ -196,10 +196,8 @@ fn creating_a_model_that_already_exists_must_error() {
         "#,
     );
 
-    let steps = vec![MigrationStep::CreateModel(CreateModel {
+    let steps = &[MigrationStep::CreateModel(CreateModel {
         model: "Test".to_string(),
-        db_name: None,
-        embedded: false,
     })];
 
     calculate(&dm, steps);
@@ -224,7 +222,6 @@ fn creating_a_field_that_already_exists_must_error() {
         tpe: "Int".to_owned(),
         arity: FieldArity::Required,
         default: None,
-        db_name: None,
     })];
 
     calculate(&dm, steps);
@@ -299,7 +296,7 @@ fn deleting_a_field_that_does_not_exist_2_must_error() {
 #[test]
 fn deleting_an_enum_that_does_not_exist_must_error() {
     let dm = SchemaAst::empty();
-    let steps = vec![MigrationStep::DeleteEnum(DeleteEnum {
+    let steps = &[MigrationStep::DeleteEnum(DeleteEnum {
         r#enum: "Test".to_string(),
     })];
 
@@ -310,11 +307,9 @@ fn deleting_an_enum_that_does_not_exist_must_error() {
 #[test]
 fn updating_a_model_that_does_not_exist_must_error() {
     let dm = SchemaAst::empty();
-    let steps = vec![MigrationStep::UpdateModel(UpdateModel {
+    let steps = &[MigrationStep::UpdateModel(UpdateModel {
         model: "Test".to_string(),
         new_name: None,
-        db_name: None,
-        embedded: None,
     })];
 
     calculate(&dm, steps);
@@ -326,7 +321,7 @@ fn updating_a_model_that_does_not_exist_must_error() {
 #[test]
 fn updating_a_field_that_does_not_exist_must_error() {
     let dm = SchemaAst::empty();
-    let steps = vec![MigrationStep::UpdateField(UpdateField {
+    let steps = &[MigrationStep::UpdateField(UpdateField {
         default: None,
         model: "Test".to_string(),
         field: "id".to_string(),
@@ -386,9 +381,9 @@ fn test(dm1: SchemaAst, dm2: SchemaAst) {
     assert_eq!(dm2, result);
 }
 
-fn calculate(schema: &SchemaAst, steps: Vec<MigrationStep>) -> SchemaAst {
+fn calculate(schema: &SchemaAst, steps: impl AsRef<[MigrationStep]>) -> SchemaAst {
     let calc = DataModelCalculatorImpl {};
-    calc.infer(schema, &steps)
+    calc.infer(schema, steps.as_ref())
 }
 
 fn infer(dm1: &SchemaAst, dm2: &SchemaAst) -> Vec<MigrationStep> {
