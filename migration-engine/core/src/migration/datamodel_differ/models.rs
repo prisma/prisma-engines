@@ -63,7 +63,7 @@ impl<'a> ModelDiffer<'a> {
         self.next.directives.iter().filter(is_regular)
     }
 
-    /// Regular odel directives (`@@`) created in `next`.
+    /// Regular model directives (`@@`) created in `next`.
     pub(crate) fn created_regular_directives(&self) -> impl Iterator<Item = &ast::Directive> {
         self.next_regular_directives().filter(move |next_directive| {
             self.previous_regular_directives()
