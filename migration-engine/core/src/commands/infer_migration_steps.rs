@@ -19,7 +19,7 @@ impl<'a> MigrationCommand<'a> for InferMigrationStepsCommand<'a> {
     fn execute<C, D>(&self, engine: &MigrationEngine<C, D>) -> CommandResult<Self::Output>
     where
         C: MigrationConnector<DatabaseMigration = D>,
-        D: DatabaseMigrationMarker + 'static,
+        D: DatabaseMigrationMarker + Sync + Send + 'static,
     {
         debug!("{:?}", self.input);
 
@@ -42,6 +42,9 @@ impl<'a> MigrationCommand<'a> for InferMigrationStepsCommand<'a> {
             &model_migration_steps,
         )?;
 
+        let DestructiveChangeDiagnostics { warnings, errors: _ } =
+            connector.destructive_changes_checker().check(&database_migration)?;
+
         let database_steps_json = connector
             .database_migration_step_applier()
             .render_steps_pretty(&database_migration)?;
@@ -59,7 +62,7 @@ impl<'a> MigrationCommand<'a> for InferMigrationStepsCommand<'a> {
             datamodel_steps: returned_datamodel_steps,
             database_steps: database_steps_json,
             errors: vec![],
-            warnings: vec![],
+            warnings,
             general_errors: vec![],
         })
     }
