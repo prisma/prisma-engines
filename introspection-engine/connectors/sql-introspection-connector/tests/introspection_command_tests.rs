@@ -4,7 +4,7 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use log::LevelFilter;
 use pretty_assertions::assert_eq;
 
-use datamodel::{common::{PrismaType, PrismaValue}, Datamodel, dml, Field, FieldArity, FieldType, IdInfo, IdStrategy, IndexDefinition, Model, OnDeleteStrategy, RelationInfo, ScalarListStrategy};
+use datamodel::{common::{PrismaType, PrismaValue}, Datamodel, dml, Field, FieldArity, FieldType, IdInfo, IdStrategy, Model, OnDeleteStrategy, RelationInfo, ScalarListStrategy};
 use sql_introspection_connector::calculate_datamodel::calculate_model;
 use sql_schema_describer::*;
 
