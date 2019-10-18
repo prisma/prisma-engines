@@ -50,7 +50,11 @@ impl RecordFinderInjector for WriteQuery {
 impl std::fmt::Display for WriteQuery {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            Self::CreateRecord(q) => write!(f, "CreateRecord: {}", q.model.name),
+            Self::CreateRecord(q) => write!(
+                f,
+                "CreateRecord(model: {}, non-list-args: {:?}, list_args: {:?})",
+                q.model.name, q.non_list_args, q.list_args,
+            ),
             Self::UpdateRecord(q) => write!(
                 f,
                 "UpdateRecord(model: {}, finder: {:?}, non-list-args: {:?}, list_args: {:?})",
