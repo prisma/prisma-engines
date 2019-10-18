@@ -7,7 +7,6 @@ pub fn create_field_step(model: &str, field: &str, type_name: &str) -> Migration
         field: field.to_string(),
         tpe: type_name.to_owned(),
         arity: FieldArity::Required,
-        default: None,
     })
 }
 

@@ -23,7 +23,6 @@ fn infer_CreateModel_if_it_does_not_exist_yet() {
             model: "Test".to_string(),
         }),
         MigrationStep::CreateField(CreateField {
-            default: None,
             model: "Test".to_string(),
             field: "id".to_string(),
             tpe: "Int".to_owned(),
@@ -119,12 +118,10 @@ fn infer_CreateField_if_it_does_not_exist_yet() {
         field: "field".to_string(),
         tpe: "Int".to_owned(),
         arity: FieldArity::Optional,
-        default: None,
     })];
     assert_eq!(steps, expected);
 }
 
-// TODO: figure out if this is the behaviour we want
 #[test]
 fn infer_CreateField_with_default() {
     let dm1 = parse(
@@ -151,7 +148,6 @@ fn infer_CreateField_with_default() {
             field: "isReady".to_owned(),
             tpe: "Boolean".to_owned(),
             arity: FieldArity::Required,
-            default: Some(MigrationExpression("false".to_owned())),
         }),
         MigrationStep::CreateDirective(CreateDirective {
             locator: DirectiveLocator {
@@ -210,14 +206,12 @@ fn infer_CreateField_if_relation_field_does_not_exist_yet() {
             field: "posts".to_string(),
             tpe: "Post".to_owned(),
             arity: FieldArity::List,
-            default: None,
         }),
         MigrationStep::CreateField(CreateField {
             model: "Post".to_string(),
             field: "blog".to_string(),
             tpe: "Blog".to_owned(),
             arity: FieldArity::Optional,
-            default: None,
         }),
     ];
     assert_eq!(steps, expected);
@@ -272,14 +266,13 @@ fn infer_UpdateField_simple() {
     );
 
     let steps = infer(&dm1, &dm2);
-    let expected = vec![
+    let expected = &[
         MigrationStep::UpdateField(UpdateField {
             model: "Test".to_string(),
             field: "field".to_string(),
             new_name: None,
             tpe: Some("Boolean".to_owned()),
             arity: Some(FieldArity::Required),
-            default: Some(Some(MigrationExpression("false".to_owned()))),
         }),
         MigrationStep::CreateDirective(CreateDirective {
             locator: DirectiveLocator {
@@ -415,7 +408,6 @@ fn infer_CreateField_on_self_relation() {
         field: "invitedBy".into(),
         tpe: "User".to_owned(),
         arity: FieldArity::Optional,
-        default: None,
     })];
 
     assert_eq!(steps, expected);

@@ -70,9 +70,6 @@ pub struct CreateField {
     pub tpe: String,
 
     pub arity: ast::FieldArity,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub default: Option<MigrationExpression>,
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone, PartialEq)]
@@ -90,14 +87,11 @@ pub struct UpdateField {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub arity: Option<ast::FieldArity>,
-
-    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "some_option")]
-    pub default: Option<Option<MigrationExpression>>,
 }
 
 impl UpdateField {
     pub fn is_any_option_set(&self) -> bool {
-        self.new_name.is_some() || self.tpe.is_some() || self.arity.is_some() || self.default.is_some()
+        self.new_name.is_some() || self.tpe.is_some() || self.arity.is_some()
     }
 }
 

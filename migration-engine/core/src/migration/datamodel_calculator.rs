@@ -98,7 +98,6 @@ fn apply_create_field(datamodel: &mut ast::SchemaAst, step: &steps::CreateField)
         model: _,
         field,
         tpe,
-        default,
     } = step;
 
     let field = ast::Field {
@@ -108,7 +107,7 @@ fn apply_create_field(datamodel: &mut ast::SchemaAst, step: &steps::CreateField)
         field_type: new_ident(tpe.clone()),
         span: new_span(),
         directives: Vec::new(),
-        default_value: default.as_ref().map(|default| default.to_ast_expression()),
+        default_value: None,
     };
     model.fields.push(field);
 }
@@ -203,7 +202,6 @@ fn apply_update_field(datamodel: &mut ast::SchemaAst, step: &steps::UpdateField)
     apply_field_update(field, &step.arity, update_field_arity);
     apply_field_update(field, &step.tpe, update_field_type);
     apply_field_update(field, &step.new_name, update_field_name);
-    apply_field_update(field, &step.default, update_field_default);
 }
 
 fn apply_field_update<T, F: Fn(&mut ast::Field, &T)>(field: &mut ast::Field, update: &Option<T>, apply_fn: F) {
@@ -222,10 +220,6 @@ fn update_field_type(field: &mut ast::Field, new_type: &String) {
 
 fn update_field_name(field: &mut ast::Field, new_name: &String) {
     field.name = new_ident(new_name.clone());
-}
-
-fn update_field_default(field: &mut ast::Field, new_default: &Option<steps::MigrationExpression>) {
-    field.default_value = new_default.as_ref().map(|expr| expr.to_ast_expression());
 }
 
 fn apply_delete_field(datamodel: &mut ast::SchemaAst, step: &steps::DeleteField) {

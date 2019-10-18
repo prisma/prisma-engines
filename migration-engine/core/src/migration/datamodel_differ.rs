@@ -147,19 +147,11 @@ fn push_updated_models<'a>(steps: &mut Steps, models: impl Iterator<Item = Model
 
 fn push_created_fields<'a>(steps: &mut Steps, model_name: &'a str, fields: impl Iterator<Item = &'a ast::Field>) {
     for field in fields {
-        let default = field
-            .directives
-            .iter()
-            .find(|directive| directive.name.name == "default")
-            .and_then(|directive| directive.arguments.get(0))
-            .map(|argument| steps::MigrationExpression::from_ast_expression(&argument.value));
-
         let create_field_step = steps::CreateField {
             arity: field.arity.clone(),
             field: field.name.name.clone(),
             tpe: field.field_type.name.clone(),
             model: model_name.to_owned(),
-            default,
         };
 
         steps.push(MigrationStep::CreateField(create_field_step));
@@ -186,29 +178,12 @@ fn push_deleted_fields<'a>(steps: &mut Steps, model_name: &'a str, fields: impl 
 
 fn push_updated_fields<'a>(steps: &mut Steps, model_name: &'a str, fields: impl Iterator<Item = FieldDiffer<'a>>) {
     for field in fields {
-        let previous_default_directive = field
-            .previous
-            .directives
-            .iter()
-            .find(|directive| directive.name.name == "default")
-            .and_then(|directive| directive.arguments.get(0))
-            .map(|argument| steps::MigrationExpression::from_ast_expression(&argument.value));
-
-        let next_default_directive = field
-            .next
-            .directives
-            .iter()
-            .find(|directive| directive.name.name == "default")
-            .and_then(|directive| directive.arguments.get(0))
-            .map(|argument| steps::MigrationExpression::from_ast_expression(&argument.value));
-
         let update_field_step = steps::UpdateField {
             arity: diff_value(&field.previous.arity, &field.next.arity),
             new_name: diff_value(&field.previous.name.name, &field.next.name.name),
             model: model_name.to_owned(),
             field: field.previous.name.name.clone(),
             tpe: diff_value(&field.previous.field_type.name, &field.next.field_type.name),
-            default: diff_value(&previous_default_directive, &next_default_directive),
         };
 
         if update_field_step.is_any_option_set() {

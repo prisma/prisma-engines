@@ -57,7 +57,6 @@ fn minimal_CreateField_must_work() {
         field: "title".to_string(),
         tpe: "String".to_owned(),
         arity: FieldArity::Required,
-        default: None,
     });
     assert_symmetric_serde(json, expected_struct);
 }
@@ -69,15 +68,13 @@ fn full_CreateField_must_work() {
             "model": "Blog",
             "field": "title",
             "type": "String",
-            "arity": "optional",
-            "default": "\"default\""
+            "arity": "optional"
         }"#;
     let expected_struct = MigrationStep::CreateField(CreateField {
         model: "Blog".to_string(),
         field: "title".to_string(),
         tpe: "String".to_owned(),
         arity: FieldArity::Optional,
-        default: Some(MigrationExpression("\"default\"".to_owned())),
     });
 
     assert_symmetric_serde(json, expected_struct);
@@ -87,7 +84,6 @@ fn full_CreateField_must_work() {
 fn minimal_UpdateField_must_work() {
     let json = r#"{"stepType":"UpdateField","model":"Blog","field":"title"}"#;
     let expected_struct = MigrationStep::UpdateField(UpdateField {
-        default: None,
         model: "Blog".to_string(),
         field: "title".to_string(),
         new_name: None,
@@ -101,7 +97,6 @@ fn minimal_UpdateField_must_work() {
 fn full_UpdateField_must_work() {
     let json = r#"
         {
-            "default": "cuid()",
             "stepType": "UpdateField",
             "model": "Blog",
             "field": "title",
@@ -111,7 +106,6 @@ fn full_UpdateField_must_work() {
         }
     "#;
     let expected_struct = MigrationStep::UpdateField(UpdateField {
-        default: Some(Some(MigrationExpression("cuid()".to_owned()))),
         model: "Blog".to_string(),
         field: "title".to_string(),
         new_name: Some("MyBlog".to_string()),

@@ -221,7 +221,6 @@ fn creating_a_field_that_already_exists_must_error() {
         field: "id".to_string(),
         tpe: "Int".to_owned(),
         arity: FieldArity::Required,
-        default: None,
     })];
 
     calculate(&dm, steps);
@@ -322,7 +321,6 @@ fn updating_a_model_that_does_not_exist_must_error() {
 fn updating_a_field_that_does_not_exist_must_error() {
     let dm = SchemaAst::empty();
     let steps = &[MigrationStep::UpdateField(UpdateField {
-        default: None,
         model: "Test".to_string(),
         field: "id".to_string(),
         new_name: None,
@@ -346,7 +344,6 @@ fn updating_a_field_that_does_not_exist_must_error_2() {
         "#,
     );
     let steps = vec![MigrationStep::UpdateField(UpdateField {
-        default: None,
         model: "Test".to_string(),
         field: "myField".to_string(),
         new_name: None,
