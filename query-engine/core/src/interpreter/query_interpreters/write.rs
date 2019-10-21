@@ -21,6 +21,7 @@ pub fn execute(tx: &mut dyn TransactionLike, write_query: WriteQuery) -> Interpr
 
 fn create_one(tx: &mut dyn TransactionLike, q: CreateRecord) -> InterpretationResult<QueryResult> {
     let res = tx.create_record(q.model, WriteArgs::new(q.non_list_args, q.list_args))?;
+
     Ok(QueryResult::Id(res))
 }
 
@@ -44,16 +45,19 @@ fn delete_one(tx: &mut dyn TransactionLike, q: DeleteRecord) -> InterpretationRe
     }?;
 
     let res = tx.delete_records(q.model, Filter::from(finder))?;
+
     Ok(QueryResult::Count(res))
 }
 
 fn update_many(tx: &mut dyn TransactionLike, q: UpdateManyRecords) -> InterpretationResult<QueryResult> {
     let res = tx.update_records(q.model, q.filter, WriteArgs::new(q.non_list_args, q.list_args))?;
+
     Ok(QueryResult::Count(res.len()))
 }
 
 fn delete_many(tx: &mut dyn TransactionLike, q: DeleteManyRecords) -> InterpretationResult<QueryResult> {
     let res = tx.delete_records(q.model, q.filter)?;
+
     Ok(QueryResult::Count(res))
 }
 
@@ -71,8 +75,9 @@ fn disconnect(tx: &mut dyn TransactionLike, q: DisconnectRecords) -> Interpretat
     tx.disconnect(
         q.relation_field,
         &q.parent.expect("Expected parent record ID to be set for disconnect"),
-        &q.child.expect("Expected parent record ID to be set for disconnect"),
+        &q.child.expect("Expected child record ID to be set for disconnect"),
     )?;
+
     Ok(QueryResult::Unit)
 }
 
@@ -82,6 +87,7 @@ fn set(tx: &mut dyn TransactionLike, q: SetRecords) -> InterpretationResult<Quer
         q.parent.expect("Expected parent record ID to be set for set"),
         q.wheres,
     )?;
+
     Ok(QueryResult::Unit)
 }
 

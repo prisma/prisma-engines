@@ -1,7 +1,6 @@
 //! Write query AST
 use super::RecordFinderInjector;
 use connector::filter::{Filter, RecordFinder};
-use petgraph::Graph;
 use prisma_models::prelude::*;
 
 #[derive(Debug, Clone)]

@@ -3,10 +3,10 @@ use std::fmt::{self, Display};
 
 pub fn format(graph: &QueryGraph) -> String {
     format!(
-        "---- Query Graph ----\nResult Nodes: {:?}\nMarked Nodes: {:?}\nRoot Nodes: {:?}\n\n{}\n----------------------",
-        graph.result_nodes,
-        graph.marked_node_pairs,
-        graph.root_nodes(),
+        "---- Query Graph ----\nResult Nodes: {}\nMarked Nodes: {}\nRoot Nodes: {}\n\n{}\n----------------------",
+        fmt_raw_indices(&graph.result_nodes),
+        fmt_node_tuples(&graph.marked_node_pairs),
+        fmt_node_list(&graph.root_nodes()),
         stringify_nodes(graph, graph.root_nodes(), &mut Vec::new()).join("\n\n")
     )
 }
@@ -67,6 +67,12 @@ impl Display for Node {
     }
 }
 
+impl Display for NodeRef {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "Node {}", self.id())
+    }
+}
+
 impl Display for QueryGraph {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{}", format(self))
@@ -82,4 +88,35 @@ impl Display for QueryGraphDependency {
             Self::Else => write!(f, "Else"),
         }
     }
+}
+
+fn fmt_raw_indices(i: &[NodeIndex]) -> String {
+    let refs: Vec<NodeRef> = i
+        .into_iter()
+        .map(|node_ix| NodeRef {
+            node_ix: node_ix.clone(),
+        })
+        .collect();
+
+    fmt_node_list(&refs)
+}
+
+fn fmt_node_list(v: &[NodeRef]) -> String {
+    let inner_string = v
+        .into_iter()
+        .map(|x| format!("{}", x))
+        .collect::<Vec<String>>()
+        .join(", ");
+
+    format!("[{}]", inner_string.as_str())
+}
+
+fn fmt_node_tuples(t: &[(NodeRef, NodeRef)]) -> String {
+    let inner_string = t
+        .into_iter()
+        .map(|x| format!("({}, {})", x.0, x.1))
+        .collect::<Vec<String>>()
+        .join(", ");
+
+    format!("[{}]", inner_string.as_str())
 }
