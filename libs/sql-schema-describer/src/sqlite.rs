@@ -262,6 +262,8 @@ impl SqlSchemaDescriber {
         debug!("Got indices description results: {:?}", result_set);
         result_set
             .into_iter()
+            // Exclude primary keys, they are inferred separately.
+            .filter(|row| row.get("origin").and_then(|origin| origin.as_str()).unwrap() != "pk")
             .map(|row| {
                 let is_unique = row.get("unique").and_then(|x| x.as_bool()).expect("get unique");
                 let name = row.get("name").and_then(|x| x.to_string()).expect("get name");

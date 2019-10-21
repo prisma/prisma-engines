@@ -285,14 +285,6 @@ fn composite_primary_keys_must_work() {
                 DbType::MySql => ("int", "varchar"),
                 DbType::Postgres => ("int4", "varchar"),
             };
-            let expected_indices = match db_type {
-                DbType::Sqlite => vec![Index {
-                    name: "sqlite_autoindex_User_1".to_string(),
-                    columns: vec!["id".to_string(), "name".to_string()],
-                    tpe: IndexType::Unique,
-                }],
-                _ => vec![],
-            };
             let mut expected_columns = vec![
                 Column {
                     name: "id".to_string(),
@@ -322,7 +314,7 @@ fn composite_primary_keys_must_work() {
                 &Table {
                     name: "User".to_string(),
                     columns: expected_columns,
-                    indices: expected_indices,
+                    indices: vec![],
                     primary_key: Some(PrimaryKey {
                         columns: vec!["id".to_string(), "name".to_string()],
                         sequence: None,
