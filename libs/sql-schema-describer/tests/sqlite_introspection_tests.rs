@@ -216,3 +216,35 @@ fn sqlite_foreign_key_on_delete_must_be_handled() {
         }
     );
 }
+
+#[test]
+fn sqlite_text_primary_keys_must_be_inferred_on_table_and_not_as_separate_indexes() {
+    setup();
+
+    let mut migration = Migration::new().schema(SCHEMA);
+    migration.create_table("User", move |t| {
+        t.add_column("int4_col", types::integer());
+        t.add_column("text_col", types::text());
+        t.add_column("real_col", types::float());
+        t.add_column("primary_col", types::text());
+
+        // Simulate how we create primary keys in the migrations engine.
+        t.inject_custom("PRIMARY KEY (\"primary_col\")");
+    });
+    let full_sql = migration.make::<barrel::backend::Sqlite>();
+
+    let inspector = get_sqlite_describer(&full_sql);
+    let result = inspector.describe(SCHEMA).expect("describing");
+
+    let table = result.get_table("User").expect("couldn't get User table");
+
+    assert!(table.indices.is_empty());
+
+    assert_eq!(
+        table.primary_key.as_ref().unwrap(),
+        &PrimaryKey {
+            columns: vec!["primary_col".to_owned()],
+            sequence: None
+        }
+    );
+}
