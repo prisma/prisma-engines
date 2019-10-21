@@ -405,6 +405,8 @@ impl QueryGraph {
     ///
     /// Any edge existing between `parent` and `child` will change direction and will point from `child` to `parent` instead.
     ///
+    /// Important exception: If a parent node is a `Flow` node, we need to completely remove the edge to the flow node and rewire it to the child.
+    ///
     /// ## Example transformation
     /// Given the marked pairs `[(A, B), (B, C), (B, D)]` and a graph (depicting the state before the transformation):
     /// ```text
@@ -458,27 +460,42 @@ impl QueryGraph {
     ///                                                                                                  └──▶│ A │◀─┘
     ///                                                                                                      └───┘
     /// ```
+    /// todo put if flow exception illustration here.
     fn swap_marked(&mut self) -> QueryGraphResult<()> {
         println!("before swapping: {}", self);
         let marked = std::mem::replace(&mut self.marked_node_pairs, vec![]);
 
         for (parent_node, child_node) in marked {
-            // All parents of `parent_node` are becoming a parent of `child_node` as well.
+            // All parents of `parent_node` are becoming a parent of `child_node` as well, except flow nodes.
             let parent_edges = self.incoming_edges(&parent_node);
             for parent_edge in parent_edges {
                 let parent_of_parent_node = self.edge_source(&parent_edge);
 
-                println!(
-                    "[Swap] Connecting parent of parent {} with child {}",
-                    parent_of_parent_node.id(),
-                    child_node.id()
-                );
+                match self
+                    .node_content(&parent_of_parent_node)
+                    .expect("Expected marked nodes to be non-empty.")
+                {
+                    Node::Flow(_) => {
+                        let content = self
+                            .remove_edge(parent_edge)
+                            .expect("Expected edges between marked nodes to be non-empty.");
+                        self.create_edge(&parent_of_parent_node, &child_node, content)?;
+                    }
 
-                self.create_edge(
-                    &parent_of_parent_node,
-                    &child_node,
-                    QueryGraphDependency::ExecutionOrder,
-                )?;
+                    _ => {
+                        println!(
+                            "[Swap] Connecting parent of parent {} with child {}",
+                            parent_of_parent_node.id(),
+                            child_node.id()
+                        );
+
+                        self.create_edge(
+                            &parent_of_parent_node,
+                            &child_node,
+                            QueryGraphDependency::ExecutionOrder,
+                        )?;
+                    }
+                }
             }
 
             // Find existing edge between parent and child. Can only be one at most.
