@@ -41,7 +41,7 @@ pub trait MigrationPersistence: Send + Sync + 'static {
     /// Fetch a migration by name.
     fn by_name(&self, name: &str) -> Option<Migration>;
 
-    /// This power the listMigrations command.
+    /// This powers the listMigrations command.
     fn load_all(&self) -> Vec<Migration>;
 
     /// Load all current trailing watch migrations from Migration Event Log.
