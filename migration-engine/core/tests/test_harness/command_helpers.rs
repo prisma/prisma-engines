@@ -72,7 +72,7 @@ pub fn apply_migration(
         force: None,
     };
 
-    let migration_output = api.apply_migration(&input).expect("ApplyMigration failed");
+    let migration_output = dbg!(api.apply_migration(&input)).expect("ApplyMigration failed");
 
     assert!(
         migration_output.general_errors.is_empty(),
@@ -88,9 +88,17 @@ pub fn apply_migration(
     }
 }
 
-pub fn unapply_migration(test_setup: &TestSetup, api: &dyn GenericApi) -> SqlSchema {
-    let input = UnapplyMigrationInput {};
-    let _ = api.unapply_migration(&input);
+#[derive(Debug)]
+pub struct UnapplyOutput {
+    pub sql_schema: SqlSchema,
+    pub output: UnapplyMigrationOutput,
+}
 
-    introspect_database(test_setup, api)
+pub fn unapply_migration(test_setup: &TestSetup, api: &dyn GenericApi) -> UnapplyOutput {
+    let input = UnapplyMigrationInput {};
+    let output = api.unapply_migration(&input).unwrap();
+
+    let sql_schema = introspect_database(test_setup, api);
+
+    UnapplyOutput { sql_schema, output }
 }
