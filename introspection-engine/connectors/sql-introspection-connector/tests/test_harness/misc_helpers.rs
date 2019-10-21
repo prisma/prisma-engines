@@ -68,7 +68,7 @@ where
     test_each_backend_with_ignores(Vec::new(), test_fn);
 }
 
-fn test_each_backend_with_ignores<F>(ignores: Vec<SqlFamily>, test_fn: F)
+pub(crate) fn test_each_backend_with_ignores<F>(ignores: Vec<SqlFamily>, test_fn: F)
 where
     F: Fn(&TestSetup, &BarrelMigrationExecutor) -> () + std::panic::RefUnwindSafe,
 {
