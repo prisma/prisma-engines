@@ -1235,11 +1235,11 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
 
     val result = server.query(updateMutation, project)
 
-    result.toString should be(
-      """{"data":{"updateTop":{"nameTop":"updated top","middles":[{"nameMiddle":"updated middle","bottom":{"nameBottom":"created bottom"}},{"nameMiddle":"the second middle","bottom":{"nameBottom":"the second bottom"}}]}}}""")
+    result should be(
+      """{"data":{"updateTop":{"nameTop":"updated top","middles":[{"nameMiddle":"the second middle","bottom":{"nameBottom":"the second bottom"}},{"nameMiddle":"updated middle","bottom":{"nameBottom":"created bottom"}}]}}}""".parseJson)
 
-    server.query("query{bottoms{nameBottom}}", project).toString should be(
-      """{"data":{"bottoms":[{"nameBottom":"the second bottom"},{"nameBottom":"created bottom"}]}}""")
+    server.query("query{bottoms{nameBottom}}", project) should be(
+      """{"data":{"bottoms":[{"nameBottom":"the second bottom"},{"nameBottom":"created bottom"}]}}""".parseJson)
   }
 
   "a deeply nested mutation" should "execute all levels of the mutation if there are model and node edges on the path  and back relations are missing and node edges follow model edges for update" in {
@@ -1679,8 +1679,8 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
                                              |}
                                              |
                                              |model Bottom {
-                                             |  id         String @id @default(cuid())
-                                             |  nameBottom String @unique
+                                             |  id         String  @id @default(cuid())
+                                             |  nameBottom String  @unique
                                              |}""".stripMargin }
     database.setup(project)
 

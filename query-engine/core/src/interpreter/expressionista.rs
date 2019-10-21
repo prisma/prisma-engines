@@ -19,6 +19,7 @@ impl Expressionista {
         node: &NodeRef,
         mut parent_edges: Vec<EdgeRef>,
     ) -> InterpretationResult<Expression> {
+        log_node_and_eges("build_expression", node, &parent_edges);
         match graph
             .node_content(node)
             .expect(&format!("Node content {} was empty", node.id()))
@@ -33,8 +34,6 @@ impl Expressionista {
         node: &NodeRef,
         parent_edges: Vec<EdgeRef>,
     ) -> InterpretationResult<Expression> {
-        //        dbg!("Looking at node:", node.id());
-
         // Child edges are ordered, evaluation order is low to high in the graph, unless other rules override.
         let mut direct_children = graph.direct_child_pairs(&node);
         //        dbg!(&direct_children);
@@ -192,8 +191,7 @@ impl Expressionista {
                 let else_pair = else_pair.pop();
 
                 // Build expressions for both arms. They are treated as separate root nodes.
-                // TODO: passing the parents in the then case breaks a lot of stuff
-                let then_expr = Self::build_expression(graph, &then_pair.1, vec![])?;
+                let then_expr = Self::build_expression(graph, &then_pair.1, graph.incoming_edges(&then_pair.1))?;
                 let else_expr = else_pair
                     .into_iter()
                     .map(|(_, node)| Self::build_expression(graph, &node, graph.incoming_edges(&node)))
@@ -298,4 +296,8 @@ impl Expressionista {
             Ok(head)
         }
     }
+}
+fn log_node_and_eges(prefix: &str, node: &NodeRef, parent_edges: &Vec<EdgeRef>) {
+    let parent_edge_ids: Vec<String> = parent_edges.iter().map(|x| x.id()).collect();
+    println!("{} node: {} parents: {}", prefix, node.id(), parent_edge_ids.join(","));
 }

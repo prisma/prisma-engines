@@ -25,7 +25,7 @@ pub fn connect_nested_upsert(
         let create_input = as_map.remove("create").expect("create argument is missing");
         let update_input = as_map.remove("update").expect("update argument is missing");
 
-        let finder_as_filter = if relation.is_one_to_one() {
+        let finder_as_filter = if !parent_relation_field.is_list {
             Filter::empty()
         } else {
             let where_input = as_map.remove("where").expect("where argument is missing");
