@@ -16,6 +16,13 @@ pub trait MigrationPersistence: Send + Sync + 'static {
         self.last().map(|m| m.datamodel).unwrap_or_else(Datamodel::empty)
     }
 
+    fn last_non_watch_applied_migration(&self) -> Option<Migration> {
+        self.load_all()
+            .into_iter()
+            .rev()
+            .find(|migration| !migration.is_watch_migration() && migration.status == MigrationStatus::MigrationSuccess)
+    }
+
     fn last_non_watch_migration(&self) -> Option<Migration> {
         let mut all_migrations = self.load_all();
         all_migrations.reverse();

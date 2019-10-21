@@ -51,8 +51,8 @@ impl<'a> MigrationCommand<'a> for InferMigrationStepsCommand<'a> {
 
             (model_migration_steps, database_steps)
         } else {
-            let last_non_watch_migration = migration_persistence.last_non_watch_migration();
-            let last_non_watch_datamodel = last_non_watch_migration
+            let last_non_watch_applied_migration = migration_persistence.last_non_watch_applied_migration();
+            let last_non_watch_datamodel = last_non_watch_applied_migration
                 .map(|m| m.datamodel)
                 .unwrap_or_else(Datamodel::empty);
             let datamodel_steps = engine
