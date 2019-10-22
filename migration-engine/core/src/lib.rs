@@ -4,13 +4,6 @@ mod error;
 pub mod migration;
 pub mod migration_engine;
 
-#[macro_use]
-extern crate log;
-#[macro_use]
-extern crate serde_derive;
-#[macro_use]
-extern crate serde_json;
-
 use commands::*;
 use datamodel::{self, Datamodel};
 

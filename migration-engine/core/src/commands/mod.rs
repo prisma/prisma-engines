@@ -19,6 +19,7 @@ pub use reset::*;
 pub use unapply_migration::*;
 
 use migration_connector::{MigrationError, MigrationStep, MigrationWarning};
+use serde::Serialize;
 
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
