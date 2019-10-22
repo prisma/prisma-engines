@@ -23,9 +23,8 @@ impl<'a> QueryPipeline<'a> {
 
         println!("{}", self.graph);
         let expr = Expressionista::translate(self.graph)?;
-
-        //        println!("{}", format_expression(&expr, 0));
         let result = self.interpreter.interpret(expr, Env::default(), 0);
+
         self.interpreter.print_log();
         Ok(serializer.serialize(result?))
     }

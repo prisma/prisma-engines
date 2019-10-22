@@ -1,4 +1,4 @@
-use crate::{InterpreterError, QueryParserError, QueryGraphError, QueryGraphBuilderError};
+use crate::{InterpreterError, QueryGraphBuilderError, QueryGraphError, QueryParserError};
 use connector::error::ConnectorError;
 use failure::Fail;
 use prisma_models::DomainError;
@@ -49,6 +49,13 @@ impl From<QueryGraphError> for CoreError {
 impl From<ConnectorError> for CoreError {
     fn from(e: ConnectorError) -> CoreError {
         CoreError::ConnectorError(e)
+    }
+}
+
+// temporary
+impl Into<ConnectorError> for CoreError {
+    fn into(self) -> ConnectorError {
+        ConnectorError::CoreError(format!("{}", self))
     }
 }
 

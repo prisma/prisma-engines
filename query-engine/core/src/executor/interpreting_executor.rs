@@ -2,7 +2,7 @@ use super::{pipeline::QueryPipeline, QueryExecutor};
 use crate::{
     CoreResult, IrSerializer, QueryDocument, QueryGraph, QueryGraphBuilder, QueryInterpreter, QuerySchemaRef, Response,
 };
-use connector::{Connector, TransactionLike};
+use connector::{Connector, Result as ConnectorResult, TransactionLike};
 
 /// Central query executor and main entry point into the query core.
 /// Interprets the full query tree to return a result.
@@ -25,15 +25,15 @@ where
         }
     }
 
-    pub fn with_interpreter<'a, F>(&self, f: F) -> CoreResult<Response>
+    pub fn with_interpreter<'a, F>(&self, f: F) -> ConnectorResult<Response>
     where
-        F: FnOnce(QueryInterpreter) -> CoreResult<Response>,
+        F: FnOnce(QueryInterpreter) -> ConnectorResult<Response>,
     {
         let res = self.connector.with_transaction(|tx: &mut dyn TransactionLike| {
             let interpreter = QueryInterpreter::new(tx);
 
-            Ok(f(interpreter))
-        })?;
+            f(interpreter).map_err(|err| err.into())
+        });
 
         res
     }
@@ -48,12 +48,16 @@ where
         let queries: Vec<(QueryGraph, IrSerializer)> = QueryGraphBuilder::new(query_schema).build(query_doc)?;
 
         // Create pipelines for all separate queries
-        queries
+        Ok(queries
             .into_iter()
             .map(|(query_graph, info)| {
-                self.with_interpreter(|interpreter| QueryPipeline::new(query_graph, interpreter, info).execute())
+                self.with_interpreter(|interpreter| {
+                    QueryPipeline::new(query_graph, interpreter, info)
+                        .execute()
+                        .map_err(|err| err.into())
+                })
             })
-            .collect()
+            .collect::<ConnectorResult<Vec<Response>>>()?)
     }
 
     fn primary_connector(&self) -> &'static str {
