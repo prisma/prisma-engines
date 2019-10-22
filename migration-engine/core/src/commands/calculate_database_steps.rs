@@ -51,7 +51,7 @@ impl<'a> MigrationCommand<'a> for CalculateDatabaseStepsCommand<'a> {
         Ok(MigrationStepsResultOutput {
             datamodel: datamodel::render_schema_ast_to_string(&next_datamodel_ast).unwrap(),
             datamodel_steps: self.input.steps_to_apply.clone(),
-            database_steps: database_steps_json,
+            database_steps: serde_json::Value::Array(database_steps_json),
             errors: Vec::new(),
             warnings,
             general_errors: Vec::new(),

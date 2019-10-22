@@ -2,7 +2,7 @@ use super::MigrationStepsResultOutput;
 use crate::commands::command::*;
 use crate::migration_engine::MigrationEngine;
 use crate::*;
-use datamodel::ast::parser::parse;
+use datamodel::ast::{parser::parse, SchemaAst};
 use migration_connector::*;
 
 pub struct InferMigrationStepsCommand<'a> {
@@ -26,6 +26,8 @@ impl<'a> MigrationCommand<'a> for InferMigrationStepsCommand<'a> {
 
         let connector = engine.connector();
         let migration_persistence = connector.migration_persistence();
+        let database_migration_inferrer = connector.database_migration_inferrer();
+
         let current_datamodel_ast = migration_persistence.current_datamodel_ast();
         let assumed_datamodel_ast = engine
             .datamodel_calculator()
@@ -39,31 +41,49 @@ impl<'a> MigrationCommand<'a> for InferMigrationStepsCommand<'a> {
             .datamodel_migration_steps_inferrer()
             .infer(&assumed_datamodel_ast, &next_datamodel_ast);
 
-        let database_migration = connector.database_migration_inferrer().infer(
-            &assumed_datamodel,
-            &next_datamodel,
-            &model_migration_steps,
-        )?;
+        let database_migration =
+            database_migration_inferrer.infer(&assumed_datamodel, &next_datamodel, &model_migration_steps)?;
 
         let DestructiveChangeDiagnostics { warnings, errors: _ } =
             connector.destructive_changes_checker().check(&database_migration)?;
 
-        let database_steps_json = connector
-            .database_migration_step_applier()
-            .render_steps_pretty(&database_migration)?;
+        let (returned_datamodel_steps, returned_database_migration) = if self.input.is_watch_migration() {
+            let database_steps = connector
+                .database_migration_step_applier()
+                .render_steps_pretty(&database_migration)?;
 
-        let returned_datamodel_steps = if self.input.is_watch_migration() {
-            model_migration_steps
+            (model_migration_steps, database_steps)
         } else {
-            let mut steps = migration_persistence.load_all_datamodel_steps_from_all_current_watch_migrations();
-            steps.append(&mut model_migration_steps.clone());
-            steps
+            let last_non_watch_applied_migration = migration_persistence.last_non_watch_applied_migration();
+            let last_non_watch_datamodel_ast = last_non_watch_applied_migration
+                .as_ref()
+                .map(|m| m.datamodel_ast())
+                .unwrap_or_else(SchemaAst::empty);
+            let last_non_watch_datamodel = last_non_watch_applied_migration
+                .map(|m| m.datamodel)
+                .unwrap_or_else(Datamodel::empty);
+            let datamodel_steps = engine
+                .datamodel_migration_steps_inferrer()
+                .infer(&last_non_watch_datamodel_ast, &next_datamodel_ast);
+
+            // The database migration since the last non-watch migration, so we can render all the steps applied
+            // in watch mode to the migrations folder.
+            let full_database_migration = database_migration_inferrer.infer_from_datamodels(
+                &last_non_watch_datamodel,
+                &next_datamodel,
+                &datamodel_steps,
+            )?;
+            let database_steps = connector
+                .database_migration_step_applier()
+                .render_steps_pretty(&full_database_migration)?;
+
+            (datamodel_steps, database_steps)
         };
 
         Ok(MigrationStepsResultOutput {
             datamodel: datamodel::render_datamodel_to_string(&next_datamodel).unwrap(),
             datamodel_steps: returned_datamodel_steps,
-            database_steps: database_steps_json,
+            database_steps: serde_json::Value::Array(returned_database_migration),
             errors: vec![],
             warnings,
             general_errors: vec![],

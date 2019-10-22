@@ -1,7 +1,7 @@
 use super::MigrationStepsResultOutput;
 use crate::commands::command::*;
 use crate::migration_engine::MigrationEngine;
-use datamodel::Datamodel;
+use datamodel::{ast::SchemaAst, Datamodel};
 use migration_connector::*;
 
 pub struct ApplyMigrationCommand<'a> {
@@ -48,7 +48,10 @@ impl<'a> ApplyMigrationCommand<'a> {
         let migration_persistence = connector.migration_persistence();
 
         let current_datamodel = migration_persistence.current_datamodel();
-        let last_non_watch_datamodel = migration_persistence.last_non_watch_datamodel_ast();
+        let last_non_watch_datamodel = migration_persistence
+            .last_non_watch_migration()
+            .map(|m| m.datamodel_ast())
+            .unwrap_or_else(SchemaAst::empty);
         let next_datamodel_ast = engine
             .datamodel_calculator()
             .infer(&last_non_watch_datamodel, self.input.steps.as_slice());
@@ -124,7 +127,7 @@ impl<'a> ApplyMigrationCommand<'a> {
         Ok(MigrationStepsResultOutput {
             datamodel: datamodel::render_datamodel_to_string(&next_datamodel).unwrap(),
             datamodel_steps: self.input.steps.clone(),
-            database_steps: database_steps_json_pretty,
+            database_steps: serde_json::Value::Array(database_steps_json_pretty),
             errors,
             warnings,
             general_errors: Vec::new(),

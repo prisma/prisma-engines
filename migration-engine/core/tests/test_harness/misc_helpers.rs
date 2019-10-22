@@ -23,6 +23,13 @@ impl TestSetup {
             database: Arc::clone(&self.database),
         }
     }
+
+    pub fn is_sqlite(&self) -> bool {
+        match self.sql_family {
+            SqlFamily::Sqlite => true,
+            _ => false,
+        }
+    }
 }
 
 pub fn parse(datamodel_string: &str) -> SchemaAst {

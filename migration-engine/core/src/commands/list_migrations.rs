@@ -46,7 +46,7 @@ where
     Ok(ListMigrationStepsOutput {
         id: migration.name,
         datamodel_steps: migration.datamodel_steps,
-        database_steps: database_steps_json,
+        database_steps: serde_json::Value::Array(database_steps_json),
         status: migration.status,
         datamodel: engine.render_datamodel(&migration.datamodel),
     })
