@@ -187,7 +187,7 @@ impl Into<ast::Argument> for &Argument {
 pub struct DirectiveLocator {
     #[serde(flatten)]
     pub location: DirectiveLocation,
-    pub r#directive: String,
+    pub directive: String,
     /// The arguments of the directive are required to match directives that can be repeated,
     /// like `@@unique` on a model. This is `None` when matching can be done without comparing
     /// the arguments, and `Some` when a directive should be matched exactly.
@@ -203,14 +203,16 @@ impl DirectiveLocator {
 
         match &self.arguments {
             Some(arguments) => {
-                directive.arguments.len() == arguments.len()
-                    && directive
-                        .arguments
+                if directive.arguments.len() != arguments.len() {
+                    return false;
+                }
+
+                directive.arguments.iter().all(|directive_argument| {
+                    arguments
                         .iter()
-                        .zip(arguments.iter())
-                        .all(|(directive_argument, self_argument)| {
-                            self_argument.matches_ast_argument(directive_argument)
-                        })
+                        .find(|self_argument| self_argument.matches_ast_argument(directive_argument))
+                        .is_some()
+                })
             }
             None => true,
         }
