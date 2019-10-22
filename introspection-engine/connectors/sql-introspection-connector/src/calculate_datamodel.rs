@@ -2,7 +2,7 @@ use crate::SqlIntrospectionResult;
 use datamodel::{
     common::{names::NameNormalizer, PrismaType, PrismaValue},
     dml, Datamodel, Field, FieldArity, FieldType, IdInfo, IdStrategy, IndexDefinition, Model, OnDeleteStrategy,
-    RelationInfo, ScalarListStrategy,
+    RelationInfo, ScalarListStrategy, WithDatabaseName,
 };
 use log::debug;
 use prisma_inflector;
@@ -93,12 +93,17 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
                 .as_ref()
                 .and_then(|default| calculate_default(default, &column.tpe.family));
 
-            //Todo should relationfields be unique if the foreign key field has a unique constraint
-            let is_unique = if id_info.is_some() {
-                false
-            } else {
-                table.is_column_unique(&column)
+            let is_unique = match field_type {
+                datamodel::dml::FieldType::Relation(..) => false,
+                _ => {
+                    if id_info.is_some() {
+                        false
+                    } else {
+                        table.is_column_unique(&column.name)
+                    }
+                }
             };
+
             let field = Field {
                 name: column.name.clone(),
                 arity,
@@ -184,7 +189,11 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
                         });
 
                         let arity = match relation_field.arity {
-                            FieldArity::Required | FieldArity::Optional if relation_field.is_unique => {
+                            FieldArity::Required | FieldArity::Optional
+                                if schema.table_bang(&model.name).is_column_unique(
+                                    &relation_field.database_name().as_ref().unwrap_or(&relation_field.name),
+                                ) =>
+                            {
                                 FieldArity::Optional
                             }
                             FieldArity::Required | FieldArity::Optional => FieldArity::List,
@@ -324,6 +333,20 @@ fn parse_int(value: &str) -> Option<i32> {
     }
 }
 
+fn parse_bool(value: &str) -> Option<bool> {
+    debug!("Parsing bool '{}'", value);
+
+    //    if value.to_lowercase() == "true".to_string() {
+    //        Some(1)
+    //    } else if value.to_lowercase() == "false".to_string() {
+    //        Some(0)
+    //    } else {
+    //        None
+    //    }
+    //
+    value.parse().ok()
+}
+
 fn parse_float(value: &str) -> Option<f32> {
     debug!("Parsing float '{}'", value);
     let re_num = Regex::new(r"^'?([^']+)'?$").expect("compile regex");
@@ -347,7 +370,10 @@ fn parse_float(value: &str) -> Option<f32> {
 
 fn calculate_default(default: &str, tpe: &ColumnTypeFamily) -> Option<PrismaValue> {
     match tpe {
-        ColumnTypeFamily::Boolean => parse_int(default).map(|x| PrismaValue::Boolean(x != 0)), // Todo this does not work for mysql
+        ColumnTypeFamily::Boolean => match parse_int(default) {
+            Some(x) => Some(PrismaValue::Boolean(x != 0)),
+            None => parse_bool(default).map(|b| PrismaValue::Boolean(b)),
+        },
         ColumnTypeFamily::Int => parse_int(default).map(|x| PrismaValue::Int(x)),
         ColumnTypeFamily::Float => parse_float(default).map(|x| PrismaValue::Float(x)),
         ColumnTypeFamily::String => Some(PrismaValue::String(default.to_string())),

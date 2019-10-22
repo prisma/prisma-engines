@@ -51,7 +51,6 @@ fn introspecting_a_table_with_compound_primary_keys_must_work() {
                 authorId String
                 id Int
                 @@id([id, authorId])
-                @@unique([id, authorId], name: "sqlite_autoindex_Blog_1")
             }
         "#;
         let result = dbg!(introspect(test_setup));
@@ -136,13 +135,14 @@ fn introspecting_a_table_with_required_and_optional_columns_must_work() {
 }
 
 #[test]
+#[ignore]
 fn introspecting_a_table_with_datetime_default_values_should_work() {
     test_each_backend_with_ignores(vec![SqlFamily::Postgres, SqlFamily::Mysql], |test_setup, barrel| {
         let _setup_schema = barrel.execute(|migration| {
             migration.create_table("User", |t| {
                 t.add_column("id", types::primary());
                 t.add_column("name", types::text());
-                t.inject_custom("\"joined\" TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+                t.inject_custom("\"joined\" date DEFAULT CURRENT_DATE")
             });
         });
 
@@ -181,7 +181,7 @@ fn introspecting_a_table_with_default_values_should_work() {
                 float Float @default(5.3)
                 id Int @id
                 int Int @default(5)
-                string String @default("")
+                string String @default("Test")
             }
         "#;
         let result = dbg!(introspect(test_setup));
@@ -237,16 +237,280 @@ fn introspecting_a_table_with_a_multi_column_non_unique_index_should_work() {
     });
 }
 
-// sequence
-// unique with index
-// unique without index
+//relations
+#[test]
+fn introspecting_a_one_to_one_req_relation_should_work() {
+    test_each_backend_with_ignores(vec![SqlFamily::Postgres, SqlFamily::Mysql], |test_setup, barrel| {
+        let _setup_schema = barrel.execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+            });
+            migration.create_table("Post", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom(
+                    "user_id INTEGER NOT NULL UNIQUE,
+                        FOREIGN KEY(user_id) REFERENCES User(id)",
+                )
+            });
+        });
 
-// 1:1
-// 1:1!
-// 1:M
-// 1!:M
-// self
-// duplicate self
-// M:N prisma
-// M:N other
-// M:N extra fields
+        let dm = r#"
+            model User {
+               id Int @id
+               post Post? @relation("Post_user_id_User")
+            }
+            
+            model Post {
+               id Int @id
+               user_id User @relation("Post_user_id_User")
+            }
+        "#;
+        let result = dbg!(introspect(test_setup));
+        custom_assert(result, dm.to_string());
+    });
+}
+
+#[test]
+fn introspecting_a_one_to_one_relation_should_work() {
+    test_each_backend_with_ignores(vec![SqlFamily::Postgres, SqlFamily::Mysql], |test_setup, barrel| {
+        let _setup_schema = barrel.execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+            });
+            migration.create_table("Post", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom(
+                    "user_id INTEGER UNIQUE,
+                        FOREIGN KEY(user_id) REFERENCES User(id)",
+                )
+            });
+        });
+
+        let dm = r#"
+            model User {
+               id Int @id
+               post Post? @relation("Post_user_id_User")
+            }
+            
+            model Post {
+               id Int @id
+               user_id User? @relation("Post_user_id_User")
+            }
+        "#;
+        let result = dbg!(introspect(test_setup));
+        custom_assert(result, dm.to_string());
+    });
+}
+
+#[test]
+fn introspecting_a_one_to_many_relation_should_work() {
+    test_each_backend_with_ignores(vec![SqlFamily::Postgres, SqlFamily::Mysql], |test_setup, barrel| {
+        let _setup_schema = barrel.execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+            });
+            migration.create_table("Post", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom(
+                    "user_id INTEGER,
+                        FOREIGN KEY(user_id) REFERENCES User(id)",
+                )
+            });
+        });
+
+        let dm = r#"
+            model User {
+               id Int @id
+               posts Post[] @relation("Post_user_id_User")
+            }
+            
+            model Post {
+               id Int @id
+               user_id User? @relation("Post_user_id_User")
+            }
+        "#;
+        let result = dbg!(introspect(test_setup));
+        custom_assert(result, dm.to_string());
+    });
+}
+
+#[test]
+fn introspecting_a_one_req_to_many_relation_should_work() {
+    test_each_backend_with_ignores(vec![SqlFamily::Postgres, SqlFamily::Mysql], |test_setup, barrel| {
+        let _setup_schema = barrel.execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+            });
+            migration.create_table("Post", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom(
+                    "user_id INTEGER NOT NULL,
+                        FOREIGN KEY(user_id) REFERENCES User(id)",
+                )
+            });
+        });
+
+        let dm = r#"
+            model User {
+               id Int @id
+               posts Post[] @relation("Post_user_id_User")
+            }
+            
+            model Post {
+               id Int @id
+               user_id User @relation("Post_user_id_User")
+            }
+        "#;
+        let result = dbg!(introspect(test_setup));
+        custom_assert(result, dm.to_string());
+    });
+}
+
+#[test]
+fn introspecting_a_prisma_many_to_many_relation_should_work() {
+    test_each_backend_with_ignores(vec![SqlFamily::Postgres, SqlFamily::Mysql], |test_setup, barrel| {
+        let _setup_schema = barrel.execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+            });
+            migration.create_table("Post", |t| {
+                t.add_column("id", types::primary());
+            });
+            migration.create_table("_PostToUser", |t| {
+                t.inject_custom(
+                    "A TEXT NOT NULL,
+                          B TEXT NOT NULL,
+                          FOREIGN KEY (A) REFERENCES  User(id),
+                          FOREIGN KEY (B) REFERENCES  Post(id)",
+                )
+            });
+        });
+
+        let dm = r#"
+            model User {
+               id Int @id
+               posts Post[] @relation("_PostToUser")
+            }
+            
+            model Post {
+               id Int @id
+               users User[] @relation("_PostToUser")
+            }
+        "#;
+        let result = dbg!(introspect(test_setup));
+        custom_assert(result, dm.to_string());
+    });
+}
+
+// Todo
+#[test]
+fn introspecting_a_many_to_many_relation_should_work() {
+    test_each_backend_with_ignores(vec![SqlFamily::Postgres, SqlFamily::Mysql], |test_setup, barrel| {
+        let _setup_schema = barrel.execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+            });
+            migration.create_table("Post", |t| {
+                t.add_column("id", types::primary());
+            });
+            migration.create_table("PostsToUsers", |t| {
+                t.inject_custom(
+                    "user_id TEXT NOT NULL,
+                          post_id TEXT NOT NULL,
+                          FOREIGN KEY (user_id) REFERENCES  User(id),
+                          FOREIGN KEY (post_id) REFERENCES  Post(id)",
+                )
+            });
+        });
+
+        let dm = r#"
+            model User {
+               id Int @id
+               postsToUserses PostsToUsers[] @relation("PostsToUsers_user_id_User")
+            }
+            
+            model Post {
+               id Int @id
+               postsToUserses PostsToUsers[] @relation("Post_PostsToUsers_post_id", references: [post_id])
+            }
+            
+            model PostsToUsers {
+              post_id Post @relation("Post_PostsToUsers_post_id")
+              user_id User @relation("PostsToUsers_user_id_User")
+            }
+        "#;
+        let result = dbg!(introspect(test_setup));
+        custom_assert(result, dm.to_string());
+    });
+}
+
+#[test]
+fn introspecting_a_many_to_many_relation_with_extra_fields_should_work() {
+    test_each_backend_with_ignores(vec![SqlFamily::Postgres, SqlFamily::Mysql], |test_setup, barrel| {
+        let _setup_schema = barrel.execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+            });
+            migration.create_table("Post", |t| {
+                t.add_column("id", types::primary());
+            });
+            migration.create_table("PostsToUsers", |t| {
+                t.inject_custom(
+                    "date    date,
+                          user_id TEXT NOT NULL,
+                          post_id TEXT NOT NULL,
+                          FOREIGN KEY (user_id) REFERENCES  User(id),
+                          FOREIGN KEY (post_id) REFERENCES  Post(id)",
+                )
+            });
+        });
+
+        let dm = r#"
+            model User {
+               id Int @id
+               postsToUserses PostsToUsers[] @relation("PostsToUsers_user_id_User")
+            }
+            
+            model Post {
+               id Int @id
+               postsToUserses PostsToUsers[] @relation("Post_PostsToUsers_post_id", references: [post_id])
+            }
+            
+            model PostsToUsers {
+              date    DateTime?
+              post_id Post @relation("Post_PostsToUsers_post_id")
+              user_id User @relation("PostsToUsers_user_id_User")
+            }
+        "#;
+        let result = dbg!(introspect(test_setup));
+        custom_assert(result, dm.to_string());
+    });
+}
+#[test]
+fn introspecting_a_self_relation_should_work() {
+    test_each_backend_with_ignores(vec![SqlFamily::Postgres, SqlFamily::Mysql], |test_setup, barrel| {
+        let _setup_schema = barrel.execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom(
+                    "recruited_by INTEGER,
+                          direct_report INTEGER,
+                          FOREIGN KEY (recruited_by) REFERENCES User (id),
+                          FOREIGN KEY (direct_report) REFERENCES User (id)",
+                )
+            });
+        });
+
+        let dm = r#"
+            model User {
+                direct_report                 User?  @relation("User_User_direct_report")
+                id                            Int    @id
+                recruited_by                  User?  @relation("User_User_recruited_by")
+                users_User_User_direct_report User[] @relation("User_User_direct_report")
+                users_User_User_recruited_by  User[] @relation("User_User_recruited_by")
+            }
+        "#;
+        let result = dbg!(introspect(test_setup));
+        custom_assert(result, dm.to_string());
+    });
+}
