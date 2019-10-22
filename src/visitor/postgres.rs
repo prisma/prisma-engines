@@ -1,9 +1,9 @@
 use crate::{ast::*, visitor::Visitor};
-use tokio_postgres::types::{IsNull, Type};
+use bytes::BytesMut;
 use rust_decimal::Decimal;
 use std::{error::Error, str::FromStr};
 use tokio_postgres::types::ToSql;
-use bytes::BytesMut;
+use tokio_postgres::types::{IsNull, Type};
 
 /// A visitor to generate queries for the PostgreSQL database.
 ///

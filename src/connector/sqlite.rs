@@ -3,13 +3,13 @@ mod error;
 
 use crate::{
     ast::{Id, ParameterizedValue, Query},
-    connector::{metrics, queryable::*, ResultSet, DBIO, Transaction},
+    connector::{metrics, queryable::*, ResultSet, Transaction, DBIO},
     error::Error,
     visitor::{self, Visitor},
 };
-use rusqlite::NO_PARAMS;
-use std::{sync::Mutex, collections::HashSet, convert::TryFrom, path::PathBuf};
 use futures::future;
+use rusqlite::NO_PARAMS;
+use std::{collections::HashSet, convert::TryFrom, path::PathBuf, sync::Mutex};
 
 /// A connector interface for the SQLite database
 pub struct Sqlite {
@@ -65,8 +65,11 @@ impl TryFrom<&str> for SqliteParams {
                             #[cfg(not(feature = "tracing-log"))]
                             trace!("Discarding connection string param: {}", k);
                             #[cfg(feature = "tracing-log")]
-                            tracing::trace!(message = "Discarding connection string param", param = k.as_str());
-                        },
+                            tracing::trace!(
+                                message = "Discarding connection string param",
+                                param = k.as_str()
+                            );
+                        }
                     };
                 }
             }
@@ -143,12 +146,14 @@ impl Queryable for Sqlite {
     fn query<'a>(&'a self, q: Query<'a>) -> DBIO<'a, ResultSet> {
         let (sql, params) = visitor::Sqlite::build(q);
 
-        DBIO::new(async move {
-            self.query_raw(&sql, &params).await
-        })
+        DBIO::new(async move { self.query_raw(&sql, &params).await })
     }
 
-    fn query_raw<'a>(&'a self, sql: &'a str, params: &'a [ParameterizedValue]) -> DBIO<'a, ResultSet> {
+    fn query_raw<'a>(
+        &'a self,
+        sql: &'a str,
+        params: &'a [ParameterizedValue],
+    ) -> DBIO<'a, ResultSet> {
         metrics::query("sqlite.query_raw", sql, params, move || {
             let res = move || {
                 let client = self.client.lock().unwrap();
@@ -204,9 +209,7 @@ impl Queryable for Sqlite {
     }
 
     fn start_transaction<'b>(&'b self) -> DBIO<'b, Transaction<'b>> {
-        DBIO::new(async move {
-            Transaction::new(self).await
-        })
+        DBIO::new(async move { Transaction::new(self).await })
     }
 
     fn raw_cmd<'a>(&'a self, cmd: &'a str) -> DBIO<'a, ()> {
@@ -215,7 +218,7 @@ impl Queryable for Sqlite {
 
             match client.execute_batch(cmd) {
                 Ok(_) => future::ok(()),
-                Err(e) => future::err(e.into())
+                Err(e) => future::err(e.into()),
             }
         })
     }
@@ -241,7 +244,10 @@ mod tests {
     async fn should_provide_a_database_transaction() {
         let connection = Sqlite::new(String::from("db/test.db")).unwrap();
         let tx = connection.start_transaction().await.unwrap();
-        let res = tx.query_raw("SELECT * FROM sqlite_master", &[]).await.unwrap();
+        let res = tx
+            .query_raw("SELECT * FROM sqlite_master", &[])
+            .await
+            .unwrap();
 
         assert!(res.is_empty());
     }
@@ -269,7 +275,10 @@ mod tests {
         connection.query_raw(TABLE_DEF, &[]).await.unwrap();
         connection.query_raw(CREATE_USER, &[]).await.unwrap();
 
-        let rows = connection.query_raw("SELECT * FROM USER", &[]).await.unwrap();
+        let rows = connection
+            .query_raw("SELECT * FROM USER", &[])
+            .await
+            .unwrap();
         assert_eq!(rows.len(), 1);
 
         let row = rows.get(0).unwrap();

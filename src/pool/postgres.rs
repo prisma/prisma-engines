@@ -1,22 +1,18 @@
-use tokio_postgres::Config;
 use crate::{
-    connector::{postgres::SslParams, PostgreSql, DBIO, Queryable},
+    connector::{postgres::SslParams, PostgreSql, Queryable, DBIO},
     error::Error,
 };
-use tokio_resource_pool::{Manage, Status, RealDependencies, CheckOut};
+use tokio_postgres::Config;
+use tokio_resource_pool::{CheckOut, Manage, RealDependencies, Status};
 
 pub struct PostgresManager {
     config: Config,
     schema: Option<String>,
-    ssl_params: Option<SslParams>
+    ssl_params: Option<SslParams>,
 }
 
 impl PostgresManager {
-    pub fn new(
-        config: Config,
-        schema: Option<String>,
-        ssl_params: Option<SslParams>,
-    ) -> Self {
+    pub fn new(config: Config, schema: Option<String>, ssl_params: Option<SslParams>) -> Self {
         Self {
             config,
             schema,
@@ -38,9 +34,7 @@ impl Manage for PostgresManager {
         let schema = self.schema.clone();
         let ssl_params = self.ssl_params.clone();
 
-        DBIO::new(async move {
-            PostgreSql::new(config, schema, ssl_params).await
-        })
+        DBIO::new(async move { PostgreSql::new(config, schema, ssl_params).await })
     }
 
     fn status(&self, _: &Self::Resource) -> Status {

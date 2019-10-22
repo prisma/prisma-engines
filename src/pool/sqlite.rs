@@ -2,9 +2,9 @@ use crate::{
     connector::{Queryable, Sqlite, DBIO},
     error::Error,
 };
-use tokio_resource_pool::{Manage, Status, RealDependencies, CheckOut};
-use std::path::PathBuf;
 use futures::future;
+use std::path::PathBuf;
+use tokio_resource_pool::{CheckOut, Manage, RealDependencies, Status};
 
 pub struct SqliteManager {
     file_path: PathBuf,
@@ -27,7 +27,7 @@ impl Manage for SqliteManager {
     fn create(&self) -> Self::CreateFuture {
         match Sqlite::new(self.file_path.clone()) {
             Ok(conn) => DBIO::new(future::ok(conn)),
-            Err(e) => DBIO::new(future::err(e))
+            Err(e) => DBIO::new(future::err(e)),
         }
     }
 

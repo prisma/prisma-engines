@@ -29,6 +29,6 @@ pub use sqlite::*;
 
 pub(crate) mod metrics;
 pub use self::result_set::*;
-pub use queryable::*;
 pub use dbio::DBIO;
+pub use queryable::*;
 pub use transaction::*;

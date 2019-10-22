@@ -1,5 +1,8 @@
-use crate::{ast::{ParameterizedValue, Params}, connector::DBIO};
-use std::{time::Instant, future::Future};
+use crate::{
+    ast::{ParameterizedValue, Params},
+    connector::DBIO,
+};
+use std::{future::Future, time::Instant};
 
 pub(crate) fn query<'a, F, T, U>(
     tag: &'static str,

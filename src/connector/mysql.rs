@@ -95,25 +95,30 @@ impl TryFrom<Url> for MysqlParams {
                 }
                 "sslaccept" => {
                     match v.as_ref() {
-                        "strict" => { },
+                        "strict" => {}
                         "accept_invalid_certs" => {
                             ssl_opts.set_danger_accept_invalid_certs(true);
-                        },
+                        }
                         _ => {
                             #[cfg(not(feature = "tracing-log"))]
                             debug!("Unsupported SSL accept mode {}, defaulting to `strict`", v);
                             #[cfg(feature = "tracing-log")]
-                            tracing::debug!(message = "Unsupported SSL accept mode, defaulting to `strict`", mode = v.as_str());
+                            tracing::debug!(
+                                message = "Unsupported SSL accept mode, defaulting to `strict`",
+                                mode = v.as_str()
+                            );
                         }
                     };
-
                 }
                 _ => {
                     #[cfg(not(feature = "tracing-log"))]
                     trace!("Discarding connection string param: {}", k);
                     #[cfg(feature = "tracing-log")]
-                    tracing::trace!(message = "Discarding connection string param", param = k.as_str());
-                },
+                    tracing::trace!(
+                        message = "Discarding connection string param",
+                        param = k.as_str()
+                    );
+                }
             };
         }
 
@@ -150,7 +155,11 @@ impl Mysql {
         Self::new(params.config)
     }
 
-    fn execute_and_get_id<'a>(&'a self, sql: &'a str, params: &'a [ParameterizedValue]) -> DBIO<'a, Option<Id>> {
+    fn execute_and_get_id<'a>(
+        &'a self,
+        sql: &'a str,
+        params: &'a [ParameterizedValue],
+    ) -> DBIO<'a, Option<Id>> {
         metrics::query("mysql.execute", sql, params, move || {
             async move {
                 let conn = self.pool.get_conn().await?;
@@ -186,7 +195,11 @@ impl Queryable for Mysql {
             async move {
                 let conn = self.pool.get_conn().await?;
                 let results = conn.prep_exec(sql, conversion::conv_params(params)).await?;
-                let columns = results.columns_ref().iter().map(|s| s.name_str().into_owned()).collect();
+                let columns = results
+                    .columns_ref()
+                    .iter()
+                    .map(|s| s.name_str().into_owned())
+                    .collect();
 
                 let mut result_set = ResultSet::new(columns, Vec::new());
                 let (_, rows) = results.map_and_drop(|row| row.to_result_row()).await?;
@@ -200,11 +213,7 @@ impl Queryable for Mysql {
         })
     }
 
-    fn execute_raw<'a>(
-        &'a self,
-        sql: &'a str,
-        params: &'a [ParameterizedValue],
-    ) -> DBIO<'a, u64> {
+    fn execute_raw<'a>(&'a self, sql: &'a str, params: &'a [ParameterizedValue]) -> DBIO<'a, u64> {
         metrics::query("mysql.execute_raw", sql, params, move || {
             async move {
                 let conn = self.pool.get_conn().await?;
@@ -234,9 +243,7 @@ impl Queryable for Mysql {
     }
 
     fn start_transaction<'b>(&'b self) -> DBIO<'b, Transaction<'b>> {
-        DBIO::new(async move {
-            Transaction::new(self).await
-        })
+        DBIO::new(async move { Transaction::new(self).await })
     }
 
     fn raw_cmd<'a>(&'a self, cmd: &'a str) -> DBIO<'a, ()> {
@@ -332,7 +339,10 @@ VALUES (1, 'Joe', 27, 20000.00 );
         connection.query_raw(TABLE_DEF, &[]).await.unwrap();
         connection.query_raw(CREATE_USER, &[]).await.unwrap();
 
-        let rows = connection.query_raw("SELECT * FROM `user`", &[]).await.unwrap();
+        let rows = connection
+            .query_raw("SELECT * FROM `user`", &[])
+            .await
+            .unwrap();
         assert_eq!(rows.len(), 1);
 
         let row = rows.get(0).unwrap();

@@ -1,5 +1,6 @@
-use super::{ResultSet, DBIO, Transaction};
+use super::{ResultSet, Transaction, DBIO};
 use crate::ast::*;
+use std::ops::Deref;
 
 pub trait ToRow {
     fn to_result_row(&self) -> crate::Result<Vec<ParameterizedValue<'static>>>;
@@ -10,7 +11,10 @@ pub trait ToColumnNames {
 }
 
 /// Represents a connection or a transaction that can be queried.
-pub trait Queryable where Self: Sync {
+pub trait Queryable
+where
+    Self: Sync,
+{
     /// Executes the given query and returns the ID of the last inserted row.
     fn execute<'a>(&'a self, q: Query<'a>) -> DBIO<'a, Option<Id>>;
 
@@ -19,7 +23,11 @@ pub trait Queryable where Self: Sync {
 
     /// Executes a query given as SQL, interpolating the given parameters and
     /// returning a set of results.
-    fn query_raw<'a>(&'a self, sql: &'a str, params: &'a [ParameterizedValue<'a>]) -> DBIO<'a, ResultSet>;
+    fn query_raw<'a>(
+        &'a self,
+        sql: &'a str,
+        params: &'a [ParameterizedValue<'a>],
+    ) -> DBIO<'a, ResultSet>;
 
     /// Executes a query given as SQL, interpolating the given parameters and
     /// returning the number of affected rows.
@@ -72,5 +80,48 @@ pub trait Queryable where Self: Sync {
             self.execute(q.into()).await?;
             Ok(())
         })
+    }
+}
+
+impl<U, T> Queryable for U
+where
+    U: Deref<Target = T>,
+    T: Queryable + 'static,
+    Self: Sync,
+{
+    fn execute<'a>(&'a self, q: Query<'a>) -> DBIO<'a, Option<Id>> {
+        T::execute(self, q)
+    }
+
+    fn query<'a>(&'a self, q: Query<'a>) -> DBIO<'a, ResultSet> {
+        T::query(self, q)
+    }
+
+    fn query_raw<'a>(
+        &'a self,
+        sql: &'a str,
+        params: &'a [ParameterizedValue<'a>],
+    ) -> DBIO<'a, ResultSet> {
+        T::query_raw(self, sql, params)
+    }
+
+    fn execute_raw<'a>(&'a self, sql: &'a str, params: &'a [ParameterizedValue]) -> DBIO<'a, u64> {
+        T::execute_raw(self, sql, params)
+    }
+
+    fn turn_off_fk_constraints<'a>(&'a self) -> DBIO<'a, ()> {
+        T::turn_off_fk_constraints(self)
+    }
+
+    fn turn_on_fk_constraints<'a>(&'a self) -> DBIO<'a, ()> {
+        T::turn_on_fk_constraints(self)
+    }
+
+    fn start_transaction<'a>(&'a self) -> DBIO<'a, Transaction<'a>> {
+        T::start_transaction(self)
+    }
+
+    fn raw_cmd<'a>(&'a self, cmd: &'a str) -> DBIO<'a, ()> {
+        T::raw_cmd(self, cmd)
     }
 }

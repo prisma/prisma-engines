@@ -1,7 +1,4 @@
-use crate::{
-    ast::ParameterizedValue,
-    connector::queryable::ToRow,
-};
+use crate::{ast::ParameterizedValue, connector::queryable::ToRow};
 #[cfg(feature = "chrono-0_4")]
 use chrono::{DateTime, Duration, NaiveDateTime, Utc};
 use mysql_async as my;

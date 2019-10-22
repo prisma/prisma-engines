@@ -61,7 +61,7 @@ pub enum Error {
     ConnectTimeout,
 
     #[fail(display = "Operation timed out")]
-    Timeout
+    Timeout,
 }
 
 #[cfg(any(

@@ -88,24 +88,17 @@
 //! }
 //! ```
 pub mod ast;
-#[cfg(any(
-    feature = "mysql",
-    feature = "postgresql",
-    feature = "sqlite"
-))]
+#[cfg(any(feature = "mysql", feature = "postgresql", feature = "sqlite"))]
 pub mod connector;
 pub mod error;
 
-#[cfg(any(
-    feature = "mysql",
-    feature = "postgresql",
-    feature = "sqlite"
-))]
+#[cfg(any(feature = "mysql", feature = "postgresql", feature = "sqlite"))]
 pub mod pool;
 pub mod visitor;
 
 #[cfg(not(feature = "tracing-log"))]
-#[macro_use] extern crate log;
+#[macro_use]
+extern crate log;
 
 #[macro_use]
 extern crate metrics;

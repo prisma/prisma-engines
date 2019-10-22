@@ -67,7 +67,7 @@ impl From<tokio_postgres::error::Error> for Error {
 
                 match reason.as_str() {
                     "error connecting to server: timed out" => Error::ConnectTimeout, // sigh...
-                    _ => Error::QueryError(e.into())
+                    _ => Error::QueryError(e.into()),
                 }
             }
         }

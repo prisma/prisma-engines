@@ -47,7 +47,11 @@ impl<'a> Queryable for Transaction<'a> {
         self.inner.query(q)
     }
 
-    fn query_raw<'b>(&'b self, sql: &'b str, params: &'b [ParameterizedValue]) -> DBIO<'b, ResultSet> {
+    fn query_raw<'b>(
+        &'b self,
+        sql: &'b str,
+        params: &'b [ParameterizedValue],
+    ) -> DBIO<'b, ResultSet> {
         self.inner.query_raw(sql, params)
     }
 

@@ -4,20 +4,20 @@ use crate::{
 };
 #[cfg(feature = "chrono-0_4")]
 use chrono::{DateTime, NaiveDateTime, Utc};
-use tokio_postgres::{
-    Row as PostgresRow,
-    types::{self, FromSql, ToSql, Type as PostgresType},
-    Statement as PostgresStatement,
-};
 use rust_decimal::Decimal;
+use tokio_postgres::{
+    types::{self, FromSql, ToSql, Type as PostgresType},
+    Row as PostgresRow, Statement as PostgresStatement,
+};
 
 #[cfg(feature = "uuid-0_7")]
 use uuid::Uuid;
 
-pub fn conv_params<'a>(
-    params: &'a [ParameterizedValue<'a>],
-) -> Vec<&'a (dyn types::ToSql + Sync)> {
-    params.iter().map(|x| x as &(dyn ToSql + Sync)).collect::<Vec<_>>()
+pub fn conv_params<'a>(params: &'a [ParameterizedValue<'a>]) -> Vec<&'a (dyn types::ToSql + Sync)> {
+    params
+        .iter()
+        .map(|x| x as &(dyn ToSql + Sync))
+        .collect::<Vec<_>>()
 }
 
 #[cfg(feature = "uuid-0_7")]

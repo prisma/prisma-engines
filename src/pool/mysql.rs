@@ -4,8 +4,8 @@ use crate::{
     connector::{Mysql, Queryable, DBIO},
     error::Error,
 };
-use tokio_resource_pool::{Manage, Status, RealDependencies, CheckOut};
 use futures::future;
+use tokio_resource_pool::{CheckOut, Manage, RealDependencies, Status};
 
 pub struct MysqlManager {
     opts: OptsBuilder,
