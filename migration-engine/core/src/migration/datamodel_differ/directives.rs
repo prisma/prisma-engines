@@ -8,14 +8,6 @@ pub(crate) struct DirectiveDiffer<'a> {
 }
 
 impl<'a> DirectiveDiffer<'a> {
-    fn previous_arguments(&self) -> impl Iterator<Item = &ast::Argument> {
-        self.previous.arguments.iter()
-    }
-
-    fn next_arguments(&self) -> impl Iterator<Item = &ast::Argument> {
-        self.next.arguments.iter()
-    }
-
     pub(crate) fn deleted_arguments(&self) -> impl Iterator<Item = &ast::Argument> {
         self.previous_arguments().filter(move |previous_argument| {
             self.next_arguments()
@@ -38,6 +30,14 @@ impl<'a> DirectiveDiffer<'a> {
                 .find(|next_argument| arguments_match(previous_argument, next_argument))
                 .map(|next_argument| (previous_argument, next_argument))
         })
+    }
+
+    fn previous_arguments(&self) -> impl Iterator<Item = &ast::Argument> {
+        self.previous.arguments.iter()
+    }
+
+    fn next_arguments(&self) -> impl Iterator<Item = &ast::Argument> {
+        self.next.arguments.iter()
     }
 }
 

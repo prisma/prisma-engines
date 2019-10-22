@@ -9,14 +9,6 @@ pub(crate) struct EnumDiffer<'a> {
 }
 
 impl<'a> EnumDiffer<'a> {
-    fn previous_values(&self) -> impl Iterator<Item = &ast::EnumValue> {
-        self.previous.values.iter()
-    }
-
-    fn next_values(&self) -> impl Iterator<Item = &ast::EnumValue> {
-        self.next.values.iter()
-    }
-
     /// Iterator over the values present in `next` but not `previous`.
     pub(crate) fn created_values(&self) -> impl Iterator<Item = &ast::EnumValue> {
         self.next_values().filter(move |next_value| {
@@ -33,14 +25,6 @@ impl<'a> EnumDiffer<'a> {
                 .find(|next_value| values_match(previous_value, next_value))
                 .is_none()
         })
-    }
-
-    fn previous_directives(&self) -> impl Iterator<Item = &ast::Directive> {
-        self.previous.directives.iter()
-    }
-
-    fn next_directives(&self) -> impl Iterator<Item = &ast::Directive> {
-        self.next.directives.iter()
     }
 
     /// Enum directives (`@@`) created in `next`.
@@ -71,6 +55,22 @@ impl<'a> EnumDiffer<'a> {
                     next: next_directive,
                 })
         })
+    }
+
+    fn previous_values(&self) -> impl Iterator<Item = &ast::EnumValue> {
+        self.previous.values.iter()
+    }
+
+    fn next_values(&self) -> impl Iterator<Item = &ast::EnumValue> {
+        self.next.values.iter()
+    }
+
+    fn previous_directives(&self) -> impl Iterator<Item = &ast::Directive> {
+        self.previous.directives.iter()
+    }
+
+    fn next_directives(&self) -> impl Iterator<Item = &ast::Directive> {
+        self.next.directives.iter()
     }
 }
 

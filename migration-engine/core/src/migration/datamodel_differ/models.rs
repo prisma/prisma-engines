@@ -17,14 +17,6 @@ pub(crate) struct ModelDiffer<'a> {
 /// Repeated directives are directives that can appear multiple times in the same model definition, like `@@unique`.
 /// Most directives can appear only once, so we call them regular directives.
 impl<'a> ModelDiffer<'a> {
-    fn previous_fields(&self) -> impl Iterator<Item = &ast::Field> {
-        self.previous.fields.iter()
-    }
-
-    fn next_fields(&self) -> impl Iterator<Item = &ast::Field> {
-        self.next.fields.iter()
-    }
-
     /// Iterator over the fields present in `next` but not `previous`.
     pub(crate) fn created_fields(&self) -> impl Iterator<Item = &ast::Field> {
         self.next_fields().filter(move |next_field| {
@@ -53,14 +45,6 @@ impl<'a> ModelDiffer<'a> {
                     next: next_field,
                 })
         })
-    }
-
-    fn previous_regular_directives(&self) -> impl Iterator<Item = &ast::Directive> {
-        self.previous.directives.iter().filter(is_regular)
-    }
-
-    fn next_regular_directives(&self) -> impl Iterator<Item = &ast::Directive> {
-        self.next.directives.iter().filter(is_regular)
     }
 
     /// Regular model directives (`@@`) created in `next`.
@@ -94,14 +78,6 @@ impl<'a> ModelDiffer<'a> {
             })
     }
 
-    fn previous_repeated_directives(&self) -> impl Iterator<Item = &ast::Directive> {
-        self.previous.directives.iter().filter(is_repeated)
-    }
-
-    fn next_repeated_directives(&self) -> impl Iterator<Item = &ast::Directive> {
-        self.next.directives.iter().filter(is_repeated)
-    }
-
     pub(crate) fn created_repeated_directives(&self) -> impl Iterator<Item = &ast::Directive> {
         self.next_repeated_directives().filter(move |next_directive| {
             self.previous_repeated_directives()
@@ -116,6 +92,30 @@ impl<'a> ModelDiffer<'a> {
                 .find(|next_directive| directives_are_identical(previous_directive, next_directive))
                 .is_none()
         })
+    }
+
+    fn previous_fields(&self) -> impl Iterator<Item = &ast::Field> {
+        self.previous.fields.iter()
+    }
+
+    fn next_fields(&self) -> impl Iterator<Item = &ast::Field> {
+        self.next.fields.iter()
+    }
+
+    fn previous_regular_directives(&self) -> impl Iterator<Item = &ast::Directive> {
+        self.previous.directives.iter().filter(is_regular)
+    }
+
+    fn next_regular_directives(&self) -> impl Iterator<Item = &ast::Directive> {
+        self.next.directives.iter().filter(is_regular)
+    }
+
+    fn previous_repeated_directives(&self) -> impl Iterator<Item = &ast::Directive> {
+        self.previous.directives.iter().filter(is_repeated)
+    }
+
+    fn next_repeated_directives(&self) -> impl Iterator<Item = &ast::Directive> {
+        self.next.directives.iter().filter(is_repeated)
     }
 }
 

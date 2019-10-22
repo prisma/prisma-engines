@@ -8,16 +8,6 @@ pub(crate) struct TopDiffer<'a> {
 }
 
 impl<'a> TopDiffer<'a> {
-    /// Iterator over the models in `previous`.
-    fn previous_models(&self) -> impl Iterator<Item = &ast::Model> {
-        walk_models(self.previous)
-    }
-
-    /// Iterator over the models in `next`.
-    fn next_models(&self) -> impl Iterator<Item = &ast::Model> {
-        walk_models(self.next)
-    }
-
     /// Iterator over the models present in both `previous` and `next`.
     pub(crate) fn model_pairs(&self) -> impl Iterator<Item = ModelDiffer<'_>> {
         self.previous_models().filter_map(move |previous_model| {
@@ -48,16 +38,6 @@ impl<'a> TopDiffer<'a> {
         })
     }
 
-    /// Iterator over the enums in `previous`.
-    pub(crate) fn previous_enums(&self) -> impl Iterator<Item = &ast::Enum> {
-        walk_enums(self.previous)
-    }
-
-    /// Iterator over the enums in `next`.
-    pub(crate) fn next_enums(&self) -> impl Iterator<Item = &ast::Enum> {
-        walk_enums(self.next)
-    }
-
     /// Iterator over the enums present in both `previous` and `next`.
     pub(crate) fn enum_pairs(&self) -> impl Iterator<Item = EnumDiffer<'_>> {
         self.previous_enums().filter_map(move |previous_enum| {
@@ -86,6 +66,26 @@ impl<'a> TopDiffer<'a> {
                 .find(|next_enum| enums_match(previous_enum, next_enum))
                 .is_none()
         })
+    }
+
+    /// Iterator over the models in `previous`.
+    fn previous_models(&self) -> impl Iterator<Item = &ast::Model> {
+        walk_models(self.previous)
+    }
+
+    /// Iterator over the models in `next`.
+    fn next_models(&self) -> impl Iterator<Item = &ast::Model> {
+        walk_models(self.next)
+    }
+
+    /// Iterator over the enums in `previous`.
+    pub fn previous_enums(&self) -> impl Iterator<Item = &ast::Enum> {
+        walk_enums(self.previous)
+    }
+
+    /// Iterator over the enums in `next`.
+    pub fn next_enums(&self) -> impl Iterator<Item = &ast::Enum> {
+        walk_enums(self.next)
     }
 }
 

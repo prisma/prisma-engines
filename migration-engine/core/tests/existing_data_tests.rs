@@ -1,6 +1,6 @@
 mod test_harness;
 use migration_connector::MigrationWarning;
-use pretty_assertions::{assert_eq, assert_ne};
+use pretty_assertions::assert_eq;
 use prisma_query::ast::*;
 use sql_migration_connector::SqlFamily;
 use test_harness::*;
