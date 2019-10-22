@@ -20,6 +20,7 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
         let tables = self
             .get_table_names(schema)
             .into_iter()
+            .filter(|table| !is_system_table(&table))
             .map(|t| self.get_table(schema, &t))
             .collect();
         Ok(SqlSchema {
@@ -261,6 +262,8 @@ impl SqlSchemaDescriber {
         debug!("Got indices description results: {:?}", result_set);
         result_set
             .into_iter()
+            // Exclude primary keys, they are inferred separately.
+            .filter(|row| row.get("origin").and_then(|origin| origin.as_str()).unwrap() != "pk")
             .map(|row| {
                 let is_unique = row.get("unique").and_then(|x| x.as_bool()).expect("get unique");
                 let name = row.get("name").and_then(|x| x.to_string()).expect("get name");
@@ -317,11 +320,26 @@ fn get_column_type(tpe: &str) -> ColumnType {
         "float[]" => ColumnTypeFamily::Float,
         "integer[]" => ColumnTypeFamily::Int,
         "text[]" => ColumnTypeFamily::String,
-        _ => ColumnTypeFamily::Unknown
-//        x => panic!(format!("type '{}' is not supported here yet", x)),
+        _ => ColumnTypeFamily::Unknown, //        x => panic!(format!("type '{}' is not supported here yet", x)),
     };
     ColumnType {
         raw: tpe.to_string(),
         family: family,
     }
 }
+
+/// Returns whether a table is one of the SQLite system tables.
+fn is_system_table(table_name: &str) -> bool {
+    SQLITE_SYSTEM_TABLES
+        .iter()
+        .any(|system_table| table_name == *system_table)
+}
+
+/// See https://www.sqlite.org/fileformat2.html
+const SQLITE_SYSTEM_TABLES: &[&str] = &[
+    "sqlite_sequence",
+    "sqlite_stat1",
+    "sqlite_stat2",
+    "sqlite_stat3",
+    "sqlite_stat4",
+];
