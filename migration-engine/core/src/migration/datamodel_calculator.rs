@@ -415,7 +415,7 @@ fn find_directives_mut<'a>(
 
 fn find_directive_mut<'a>(
     datamodel: &'a mut ast::SchemaAst,
-    locator: &steps::DirectiveLocator,
+    locator: &steps::DirectiveLocation,
 ) -> Option<&'a mut ast::Directive> {
     find_directives_mut(datamodel, &locator.location)?
         .iter_mut()

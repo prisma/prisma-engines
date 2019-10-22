@@ -29,7 +29,7 @@ fn infer_CreateModel_if_it_does_not_exist_yet() {
             arity: FieldArity::Required,
         }),
         MigrationStep::CreateDirective(CreateDirective {
-            locator: DirectiveLocator {
+            locator: DirectiveLocation {
                 arguments: None,
                 directive: "id".to_owned(),
                 location: DirectiveType::Field {
@@ -90,7 +90,7 @@ fn infer_UpdateModel() {
 
     let steps = infer(&dm1, &dm2);
     let expected = &[MigrationStep::CreateDirective(CreateDirective {
-        locator: DirectiveLocator {
+        locator: DirectiveLocation {
             arguments: None,
             directive: "embedded".to_owned(),
             location: DirectiveType::Model {
@@ -157,7 +157,7 @@ fn infer_CreateField_with_default() {
             arity: FieldArity::Required,
         }),
         MigrationStep::CreateDirective(CreateDirective {
-            locator: DirectiveLocator {
+            locator: DirectiveLocation {
                 arguments: None,
                 location: DirectiveType::Field {
                     model: "Test".to_owned(),
@@ -167,7 +167,7 @@ fn infer_CreateField_with_default() {
             },
         }),
         MigrationStep::CreateDirectiveArgument(CreateDirectiveArgument {
-            directive_location: DirectiveLocator {
+            directive_location: DirectiveLocation {
                 arguments: None,
                 location: DirectiveType::Field {
                     model: "Test".to_owned(),
@@ -284,7 +284,7 @@ fn infer_UpdateField_simple() {
             arity: Some(FieldArity::Required),
         }),
         MigrationStep::CreateDirective(CreateDirective {
-            locator: DirectiveLocator {
+            locator: DirectiveLocation {
                 directive: "default".to_owned(),
                 arguments: None,
                 location: DirectiveType::Field {
@@ -294,7 +294,7 @@ fn infer_UpdateField_simple() {
             },
         }),
         MigrationStep::CreateDirectiveArgument(CreateDirectiveArgument {
-            directive_location: DirectiveLocator {
+            directive_location: DirectiveLocation {
                 arguments: None,
                 directive: "default".to_owned(),
                 location: DirectiveType::Field {
@@ -306,7 +306,7 @@ fn infer_UpdateField_simple() {
             value: MigrationExpression("false".to_owned()),
         }),
         MigrationStep::CreateDirective(CreateDirective {
-            locator: DirectiveLocator {
+            locator: DirectiveLocation {
                 arguments: None,
                 directive: "unique".to_owned(),
                 location: DirectiveType::Field {
@@ -447,7 +447,7 @@ fn infer_CreateDirective_on_field() {
 
     let steps = infer(&dm1, &dm2);
 
-    let locator = DirectiveLocator {
+    let locator = DirectiveLocation {
         directive: "map".to_owned(),
         arguments: None,
         location: DirectiveType::Field {
@@ -494,7 +494,7 @@ fn infer_CreateDirective_on_model() {
 
     let steps = infer(&dm1, &dm2);
 
-    let locator = DirectiveLocator {
+    let locator = DirectiveLocation {
         directive: "map".to_owned(),
         arguments: None,
         location: DirectiveType::Model {
@@ -540,7 +540,7 @@ fn infer_CreateDirective_on_model_repeated_directive() {
 
     let steps = infer(&dm1, &dm2);
 
-    let locator = DirectiveLocator {
+    let locator = DirectiveLocation {
         directive: "unique".to_owned(),
         arguments: Some(vec![Argument {
             name: "".to_owned(),
@@ -582,7 +582,7 @@ fn infer_CreateDirective_on_enum() {
 
     let steps = infer(&dm1, &dm2);
 
-    let locator = DirectiveLocator {
+    let locator = DirectiveLocation {
         directive: "map".to_owned(),
         arguments: None,
         location: DirectiveType::Enum {
@@ -626,7 +626,7 @@ fn infer_DeleteDirective_on_field() {
 
     let steps = infer(&dm1, &dm2);
 
-    let locator = DirectiveLocator {
+    let locator = DirectiveLocation {
         directive: "map".to_owned(),
         arguments: None,
         location: DirectiveType::Field {
@@ -664,7 +664,7 @@ fn infer_DeleteDirective_on_model() {
 
     let steps = infer(&dm1, &dm2);
 
-    let locator = DirectiveLocator {
+    let locator = DirectiveLocation {
         directive: "map".to_owned(),
         arguments: None,
         location: DirectiveType::Model {
@@ -701,7 +701,7 @@ fn infer_DeleteDirective_on_model_repeated_directive() {
 
     let steps = infer(&dm1, &dm2);
 
-    let locator = DirectiveLocator {
+    let locator = DirectiveLocation {
         directive: "unique".to_owned(),
         arguments: Some(vec![Argument {
             name: "".to_owned(),
@@ -746,7 +746,7 @@ fn infer_DeleteDirective_on_enum() {
 
     let steps = infer(&dm1, &dm2);
 
-    let locator = DirectiveLocator {
+    let locator = DirectiveLocation {
         directive: "map".to_owned(),
         arguments: None,
         location: DirectiveType::Enum {
@@ -781,7 +781,7 @@ fn infer_CreateDirectiveArgument_on_field() {
 
     let steps = infer(&dm1, &dm2);
 
-    let locator = DirectiveLocator {
+    let locator = DirectiveLocation {
         directive: "translate".to_owned(),
         arguments: None,
         location: DirectiveType::Field {
@@ -832,7 +832,7 @@ fn infer_CreateDirectiveArgument_on_model() {
 
     let steps = infer(&dm1, &dm2);
 
-    let locator = DirectiveLocator {
+    let locator = DirectiveLocation {
         arguments: None,
         directive: "randomDirective".to_owned(),
         location: DirectiveType::Model {
@@ -879,7 +879,7 @@ fn infer_CreateDirectiveArgument_on_enum() {
 
     let steps = infer(&dm1, &dm2);
 
-    let locator = DirectiveLocator {
+    let locator = DirectiveLocation {
         directive: "random".to_owned(),
         arguments: None,
         location: DirectiveType::Enum {
@@ -918,7 +918,7 @@ fn infer_DeleteDirectiveArgument_on_field() {
 
     let steps = infer(&dm1, &dm2);
 
-    let locator = DirectiveLocator {
+    let locator = DirectiveLocation {
         directive: "translate".to_owned(),
         arguments: None,
         location: DirectiveType::Field {
@@ -967,7 +967,7 @@ fn infer_DeleteDirectiveArgument_on_model() {
 
     let steps = infer(&dm1, &dm2);
 
-    let locator = DirectiveLocator {
+    let locator = DirectiveLocation {
         directive: "randomDirective".to_owned(),
         arguments: None,
         location: DirectiveType::Model {
@@ -1013,7 +1013,7 @@ fn infer_DeleteDirectiveArgument_on_enum() {
 
     let steps = infer(&dm1, &dm2);
 
-    let locator = DirectiveLocator {
+    let locator = DirectiveLocation {
         arguments: None,
         directive: "random".to_owned(),
         location: DirectiveType::Enum {
@@ -1051,7 +1051,7 @@ fn infer_UpdateDirectiveArgument_on_field() {
 
     let steps = infer(&dm1, &dm2);
 
-    let locator = DirectiveLocator {
+    let locator = DirectiveLocation {
         directive: "translate".to_owned(),
         arguments: None,
         location: DirectiveType::Field {
@@ -1104,7 +1104,7 @@ fn infer_UpdateDirectiveArgument_on_model() {
 
     let steps = infer(&dm1, &dm2);
 
-    let locator = DirectiveLocator {
+    let locator = DirectiveLocation {
         directive: "map".to_owned(),
         arguments: None,
         location: DirectiveType::Model {
@@ -1151,7 +1151,7 @@ fn infer_UpdateDirectiveArgument_on_enum() {
 
     let steps = infer(&dm1, &dm2);
 
-    let locator = DirectiveLocator {
+    let locator = DirectiveLocation {
         directive: "random".to_owned(),
         arguments: None,
         location: DirectiveType::Enum {

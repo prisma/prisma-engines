@@ -140,14 +140,14 @@ pub struct DeleteEnum {
 #[serde(rename_all = "camelCase")]
 pub struct CreateDirective {
     #[serde(flatten)]
-    pub locator: DirectiveLocator,
+    pub locator: DirectiveLocation,
 }
 
 #[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteDirective {
     #[serde(flatten)]
-    pub locator: DirectiveLocator,
+    pub locator: DirectiveLocation,
 }
 
 #[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
@@ -184,7 +184,7 @@ impl Into<ast::Argument> for &Argument {
 
 #[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
 #[serde(rename_all = "camelCase")]
-pub struct DirectiveLocator {
+pub struct DirectiveLocation {
     #[serde(flatten)]
     pub location: DirectiveType,
     pub directive: String,
@@ -195,7 +195,7 @@ pub struct DirectiveLocator {
     pub arguments: Option<Vec<Argument>>,
 }
 
-impl DirectiveLocator {
+impl DirectiveLocation {
     pub fn matches_ast_directive(&self, directive: &ast::Directive) -> bool {
         if self.directive != directive.name.name {
             return false;
@@ -231,7 +231,7 @@ pub enum DirectiveType {
 #[serde(rename_all = "camelCase")]
 pub struct CreateDirectiveArgument {
     #[serde(flatten)]
-    pub directive_location: DirectiveLocator,
+    pub directive_location: DirectiveLocation,
     // TODO: figure out whether we want this, or an option, for default arguments
     pub argument: String,
     pub value: MigrationExpression,
@@ -241,7 +241,7 @@ pub struct CreateDirectiveArgument {
 #[serde(rename_all = "camelCase")]
 pub struct DeleteDirectiveArgument {
     #[serde(flatten)]
-    pub directive_location: DirectiveLocator,
+    pub directive_location: DirectiveLocation,
     // TODO: figure out whether we want this, or an option, for default arguments
     pub argument: String,
 }
@@ -250,7 +250,7 @@ pub struct DeleteDirectiveArgument {
 #[serde(rename_all = "camelCase")]
 pub struct UpdateDirectiveArgument {
     #[serde(flatten)]
-    pub directive_location: DirectiveLocator,
+    pub directive_location: DirectiveLocation,
     pub argument: String,
     // TODO: figure out whether we want this, or an option, for default arguments
     pub new_value: MigrationExpression,
@@ -277,7 +277,7 @@ mod tests {
     #[test]
     fn directive_location_serialization_gives_expected_json_shape() {
         let create_directive = CreateDirective {
-            locator: DirectiveLocator {
+            locator: DirectiveLocation {
                 location: DirectiveType::Field {
                     model: "Cat".to_owned(),
                     field: "owner".to_owned(),

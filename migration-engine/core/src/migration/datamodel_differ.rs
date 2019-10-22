@@ -225,7 +225,7 @@ fn push_created_directive_with_arguments(
     directive: &ast::Directive,
 ) {
     let step = steps::CreateDirective {
-        locator: steps::DirectiveLocator {
+        locator: steps::DirectiveLocation {
             location: location.clone(),
             directive: directive.name.name.clone(),
             arguments: Some(directive.arguments.iter().map(steps::Argument::from).collect()),
@@ -236,7 +236,7 @@ fn push_created_directive_with_arguments(
 }
 
 fn push_created_directive(steps: &mut Steps, location: steps::DirectiveType, directive: &ast::Directive) {
-    let locator = steps::DirectiveLocator {
+    let locator = steps::DirectiveLocation {
         location,
         directive: directive.name.name.clone(),
         arguments: None,
@@ -265,7 +265,7 @@ fn push_deleted_directives<'a>(
 
 fn push_deleted_directive(steps: &mut Steps, location: steps::DirectiveType, directive: &ast::Directive) {
     let step = steps::DeleteDirective {
-        locator: steps::DirectiveLocator {
+        locator: steps::DirectiveLocation {
             location,
             directive: directive.name.name.clone(),
             arguments: None,
@@ -281,7 +281,7 @@ fn push_deleted_directive_with_arguments(
     directive: &ast::Directive,
 ) {
     let step = steps::DeleteDirective {
-        locator: steps::DirectiveLocator {
+        locator: steps::DirectiveLocation {
             location,
             directive: directive.name.name.clone(),
             arguments: Some(directive.arguments.iter().map(steps::Argument::from).collect()),
@@ -302,7 +302,7 @@ fn push_updated_directives<'a>(
 }
 
 fn push_updated_directive(steps: &mut Steps, location: steps::DirectiveType, directive: DirectiveDiffer<'_>) {
-    let locator = steps::DirectiveLocator {
+    let locator = steps::DirectiveLocation {
         arguments: None,
         directive: directive.previous.name.name.clone(),
         location: location.clone(),
@@ -323,7 +323,7 @@ fn push_updated_directive(steps: &mut Steps, location: steps::DirectiveType, dir
 
 fn push_created_directive_argument(
     steps: &mut Steps,
-    directive_location: &steps::DirectiveLocator,
+    directive_location: &steps::DirectiveLocation,
     argument: &ast::Argument,
 ) {
     let create_argument_step = steps::CreateDirectiveArgument {
@@ -337,7 +337,7 @@ fn push_created_directive_argument(
 
 fn push_updated_directive_argument(
     steps: &mut Steps,
-    directive_location: &steps::DirectiveLocator,
+    directive_location: &steps::DirectiveLocation,
     previous_argument: &ast::Argument,
     next_argument: &ast::Argument,
 ) {
@@ -357,7 +357,7 @@ fn push_updated_directive_argument(
     steps.push(MigrationStep::UpdateDirectiveArgument(update_argument_step));
 }
 
-fn push_deleted_directive_argument(steps: &mut Steps, directive_location: &steps::DirectiveLocator, argument: &str) {
+fn push_deleted_directive_argument(steps: &mut Steps, directive_location: &steps::DirectiveLocation, argument: &str) {
     let delete_argument_step = steps::DeleteDirectiveArgument {
         argument: argument.to_owned(),
         directive_location: directive_location.clone(),

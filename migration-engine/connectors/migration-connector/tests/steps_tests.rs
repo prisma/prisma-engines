@@ -198,7 +198,7 @@ fn CreateDirective_must_work() {
     "#;
 
     let expected_step = MigrationStep::CreateDirective(CreateDirective {
-        locator: DirectiveLocator {
+        locator: DirectiveLocation {
             directive: "map".to_owned(),
             arguments: None,
             location: DirectiveType::Model {
@@ -222,7 +222,7 @@ fn minimal_DeleteDirective_must_work() {
     "#;
 
     let expected_step = MigrationStep::DeleteDirective(DeleteDirective {
-        locator: DirectiveLocator {
+        locator: DirectiveLocation {
             directive: "map".to_owned(),
             location: DirectiveType::Field {
                 model: "Blog".to_owned(),
@@ -252,7 +252,7 @@ fn full_DeleteDirective_must_work() {
     "#;
 
     let expected_step = MigrationStep::DeleteDirective(DeleteDirective {
-        locator: DirectiveLocator {
+        locator: DirectiveLocation {
             directive: "unique".to_owned(),
             location: DirectiveType::Model {
                 model: "Blog".to_owned(),
@@ -280,7 +280,7 @@ fn UpdateDirectiveArgument_must_work() {
     "#;
 
     let expected_step = MigrationStep::UpdateDirectiveArgument(UpdateDirectiveArgument {
-        directive_location: DirectiveLocator {
+        directive_location: DirectiveLocation {
             directive: "map".to_owned(),
             location: DirectiveType::Enum {
                 r#enum: "CatMood".to_owned(),
@@ -307,7 +307,7 @@ fn CreateDirectiveArgument_must_work() {
     "#;
 
     let expected_step = MigrationStep::CreateDirectiveArgument(CreateDirectiveArgument {
-        directive_location: DirectiveLocator {
+        directive_location: DirectiveLocation {
             arguments: None,
             directive: "map".to_owned(),
             location: DirectiveType::Enum {
@@ -333,7 +333,7 @@ fn DeleteDirectiveArgument_must_work() {
     "#;
 
     let expected_step = MigrationStep::DeleteDirectiveArgument(DeleteDirectiveArgument {
-        directive_location: DirectiveLocator {
+        directive_location: DirectiveLocation {
             directive: "map".to_owned(),
             arguments: None,
             location: DirectiveType::Enum {
