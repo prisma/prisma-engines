@@ -464,8 +464,12 @@ impl QueryGraph {
     /// ```
     /// todo put if flow exception illustration here.
     fn swap_marked(&mut self) -> QueryGraphResult<()> {
-        println!("before swapping: {}", self);
-        let marked = std::mem::replace(&mut self.marked_node_pairs, vec![]);
+        let mut marked = std::mem::replace(&mut self.marked_node_pairs, vec![]);
+        marked.reverse(); // Todo: Marked operation order is currently breaking if done bottom-up. Investigate how to fix it.
+
+        if marked.len() > 0 {
+            println!("before swapping: {}", self);
+        }
 
         for (parent_node, child_node) in marked {
             // All parents of `parent_node` are becoming a parent of `child_node` as well, except flow nodes.
