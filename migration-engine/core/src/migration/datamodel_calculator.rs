@@ -52,11 +52,10 @@ fn apply_create_enum(datamodel: &mut ast::SchemaAst, step: &steps::CreateEnum) {
     let steps::CreateEnum { r#enum: name, values } = step;
 
     if let Some(_) = datamodel.find_enum(&name) {
-        Err::<(), _>(format_err!(
+        panic!(
             "The enum {} already exists in this Datamodel. It is not possible to create it once more.",
             name
-        ))
-        .unwrap();
+        );
     }
 
     let values = values
@@ -80,12 +79,10 @@ fn apply_create_enum(datamodel: &mut ast::SchemaAst, step: &steps::CreateEnum) {
 
 fn apply_create_field(datamodel: &mut ast::SchemaAst, step: &steps::CreateField) {
     if let Some(_) = datamodel.find_field(&step.model, &step.field) {
-        Err::<(), _>(format_err!(
+        panic!(
             "The field {} on model {} already exists in this Datamodel. It is not possible to create it once more.",
-            &step.field,
-            &step.model,
-        ))
-        .unwrap();
+            &step.field, &step.model,
+        )
     }
 
     let model = datamodel
@@ -181,11 +178,10 @@ fn apply_delete_model(datamodel: &mut ast::SchemaAst, step: &steps::DeleteModel)
 
 fn apply_update_field(datamodel: &mut ast::SchemaAst, step: &steps::UpdateField) {
     if let None = datamodel.find_model(&step.model) {
-        Err(format_err!(
+        panic!(
             "The model {} does not exist in this Datamodel. It is not possible to update a field in it.",
             &step.model
-        ))
-        .unwrap()
+        )
     }
 
     let field = datamodel
