@@ -1,7 +1,7 @@
 use super::{introspect_database, TestSetup};
 use migration_connector::*;
 use migration_core::{api::GenericApi, commands::*};
-use sql_migration_connector::SqlMigrationStep;
+use sql_migration_connector::{PrettySqlMigrationStep, SqlMigrationStep};
 use sql_schema_describer::*;
 
 #[derive(Debug)]
@@ -12,11 +12,9 @@ pub struct InferAndApplyOutput {
 
 impl InferAndApplyOutput {
     pub fn sql_migration(&self) -> Vec<SqlMigrationStep> {
-        let mut steps = self.migration_output.database_steps.clone();
-        steps.as_array_mut().unwrap().iter_mut().for_each(|value| {
-            value.as_object_mut().unwrap().remove("raw");
-        });
-        serde_json::from_value(steps).unwrap()
+        let steps: Vec<PrettySqlMigrationStep> =
+            serde_json::from_value(self.migration_output.database_steps.clone()).unwrap();
+        steps.into_iter().map(|pretty_step| pretty_step.step).collect()
     }
 }
 
@@ -36,12 +34,22 @@ pub fn infer_and_apply_with_migration_id(
         assume_to_be_applied: Vec::new(),
     };
 
-    let steps = run_infer_command(api, input);
+    let steps = run_infer_command(api, input).0.datamodel_steps;
 
     apply_migration(test_setup, api, steps, migration_id)
 }
 
-pub fn run_infer_command(api: &dyn GenericApi, input: InferMigrationStepsInput) -> Vec<MigrationStep> {
+#[derive(Debug)]
+pub struct InferOutput(pub MigrationStepsResultOutput);
+
+impl InferOutput {
+    pub fn sql_migration(&self) -> Vec<SqlMigrationStep> {
+        let steps: Vec<PrettySqlMigrationStep> = serde_json::from_value(self.0.database_steps.clone()).unwrap();
+        steps.into_iter().map(|pretty_step| pretty_step.step).collect()
+    }
+}
+
+pub fn run_infer_command(api: &dyn GenericApi, input: InferMigrationStepsInput) -> InferOutput {
     let output = api.infer_migration_steps(&input).expect("InferMigration failed");
 
     assert!(
@@ -49,7 +57,7 @@ pub fn run_infer_command(api: &dyn GenericApi, input: InferMigrationStepsInput) 
         format!("InferMigration returned unexpected errors: {:?}", output.general_errors)
     );
 
-    output.datamodel_steps
+    InferOutput(output)
 }
 
 pub fn apply_migration(
@@ -64,7 +72,7 @@ pub fn apply_migration(
         force: None,
     };
 
-    let migration_output = api.apply_migration(&input).expect("ApplyMigration failed");
+    let migration_output = dbg!(api.apply_migration(&input)).expect("ApplyMigration failed");
 
     assert!(
         migration_output.general_errors.is_empty(),
@@ -80,9 +88,17 @@ pub fn apply_migration(
     }
 }
 
-pub fn unapply_migration(test_setup: &TestSetup, api: &dyn GenericApi) -> SqlSchema {
-    let input = UnapplyMigrationInput {};
-    let _ = api.unapply_migration(&input);
+#[derive(Debug)]
+pub struct UnapplyOutput {
+    pub sql_schema: SqlSchema,
+    pub output: UnapplyMigrationOutput,
+}
 
-    introspect_database(test_setup, api)
+pub fn unapply_migration(test_setup: &TestSetup, api: &dyn GenericApi) -> UnapplyOutput {
+    let input = UnapplyMigrationInput {};
+    let output = api.unapply_migration(&input).unwrap();
+
+    let sql_schema = introspect_database(test_setup, api);
+
+    UnapplyOutput { sql_schema, output }
 }

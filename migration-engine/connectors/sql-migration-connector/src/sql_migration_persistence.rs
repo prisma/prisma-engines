@@ -205,6 +205,7 @@ impl SqlMigrationPersistence {
         }
     }
 }
+
 fn convert_parameterized_date_value(db_value: &ParameterizedValue) -> DateTime<Utc> {
     match db_value {
         ParameterizedValue::Integer(x) => timestamp_to_datetime(*x),
