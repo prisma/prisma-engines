@@ -72,4 +72,6 @@ pub trait DatabaseMigrationMarker: Debug {
     fn serialize(&self) -> serde_json::Value;
 }
 
+/// Shorthand for a [Result](https://doc.rust-lang.org/std/result/enum.Result.html) where the error
+/// variant is a [ConnectorError](/error/enum.ConnectorError.html).
 pub type ConnectorResult<T> = Result<T, ConnectorError>;

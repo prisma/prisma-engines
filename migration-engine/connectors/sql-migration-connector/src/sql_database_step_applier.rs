@@ -19,12 +19,13 @@ impl DatabaseMigrationStepApplier<SqlMigration> for SqlDatabaseStepApplier {
         Ok(self.apply_next_step(&database_migration.rollback, index)?)
     }
 
-    fn render_steps_pretty(&self, database_migration: &SqlMigration) -> ConnectorResult<serde_json::Value> {
-        Ok(render_steps_pretty(
-            &database_migration,
-            self.sql_family,
-            &self.schema_name,
-        )?)
+    fn render_steps_pretty(&self, database_migration: &SqlMigration) -> ConnectorResult<Vec<serde_json::Value>> {
+        Ok(
+            render_steps_pretty(&database_migration, self.sql_family, &self.schema_name)?
+                .into_iter()
+                .map(|pretty_step| serde_json::to_value(&pretty_step).unwrap())
+                .collect(),
+        )
     }
 }
 
@@ -53,22 +54,16 @@ fn render_steps_pretty(
     database_migration: &SqlMigration,
     sql_family: SqlFamily,
     schema_name: &str,
-) -> ConnectorResult<serde_json::Value> {
-    let jsons = database_migration
+) -> ConnectorResult<Vec<PrettySqlMigrationStep>> {
+    let steps = database_migration
         .corrected_steps
         .iter()
-        .map(|step| {
-            let cloned = step.clone();
-            let mut json_value = serde_json::to_value(&step).unwrap();
-            let json_object = json_value.as_object_mut().unwrap();
-            json_object.insert(
-                "raw".to_string(),
-                serde_json::Value::String(render_raw_sql(&cloned, sql_family, schema_name)),
-            );
-            json_value
+        .map(|step| PrettySqlMigrationStep {
+            step: step.clone(),
+            raw: render_raw_sql(&step, sql_family, schema_name),
         })
         .collect();
-    Ok(serde_json::Value::Array(jsons))
+    Ok(steps)
 }
 
 fn render_raw_sql(step: &SqlMigrationStep, sql_family: SqlFamily, schema_name: &str) -> String {

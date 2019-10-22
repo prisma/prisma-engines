@@ -1,10 +1,9 @@
 use crate::steps::*;
 use chrono::{DateTime, Utc};
 use datamodel::Datamodel;
-use serde::{Serialize};
+use serde::Serialize;
 
-
-/// This trait is implemented by each connector. It provides a generic API to store and retrieve [Migration](struct.Migration.html) records. 
+/// This trait is implemented by each connector. It provides a generic API to store and retrieve [Migration](struct.Migration.html) records.
 pub trait MigrationPersistence: Send + Sync + 'static {
     /// Initialize migration persistence state. E.g. create the migrations table in an SQL database.
     fn init(&self);
@@ -17,14 +16,23 @@ pub trait MigrationPersistence: Send + Sync + 'static {
         self.last().map(|m| m.datamodel).unwrap_or_else(Datamodel::empty)
     }
 
-    fn last_non_watch_datamodel(&self) -> Datamodel {
+    fn last_non_watch_applied_migration(&self) -> Option<Migration> {
+        self.load_all()
+            .into_iter()
+            .rev()
+            .find(|migration| !migration.is_watch_migration() && migration.status == MigrationStatus::MigrationSuccess)
+    }
+
+    fn last_non_watch_migration(&self) -> Option<Migration> {
         let mut all_migrations = self.load_all();
         all_migrations.reverse();
-        all_migrations
-            .into_iter()
-            .find(|m| !m.is_watch_migration())
+        all_migrations.into_iter().find(|m| !m.is_watch_migration())
+    }
+
+    fn last_non_watch_datamodel(&self) -> Datamodel {
+        self.last_non_watch_migration()
             .map(|m| m.datamodel)
-            .unwrap_or(Datamodel::empty())
+            .unwrap_or_else(Datamodel::empty)
     }
 
     /// Returns the last successful Migration.
@@ -33,10 +41,10 @@ pub trait MigrationPersistence: Send + Sync + 'static {
     /// Fetch a migration by name.
     fn by_name(&self, name: &str) -> Option<Migration>;
 
-    // this power the listMigrations command
+    /// This powers the listMigrations command.
     fn load_all(&self) -> Vec<Migration>;
 
-    // loads all current trailing watch migrations from Migration Event Log
+    /// Load all current trailing watch migrations from Migration Event Log.
     fn load_current_watch_migrations(&self) -> Vec<Migration> {
         let mut all_migrations = self.load_all();
         let mut result = Vec::new();
@@ -54,16 +62,7 @@ pub trait MigrationPersistence: Send + Sync + 'static {
         result
     }
 
-    fn load_all_datamodel_steps_from_all_current_watch_migrations(&self) -> Vec<MigrationStep> {
-        let all_watch_migrations = self.load_current_watch_migrations();
-        let mut all_steps_from_all_watch_migrations = Vec::new();
-        for mut migration in all_watch_migrations.into_iter() {
-            all_steps_from_all_watch_migrations.append(&mut migration.datamodel_steps);
-        }
-        all_steps_from_all_watch_migrations
-    }
-
-    // writes the migration to the Migration table
+    /// Write the migration to the Migration table.
     fn create(&self, migration: Migration) -> Migration;
 
     /// Used by the MigrationApplier to write the progress of a [Migration](struct.Migration.html)

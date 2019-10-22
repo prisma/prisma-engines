@@ -1,7 +1,6 @@
-#![allow(non_snake_case)]
-#![allow(unused)]
 mod test_harness;
-use pretty_assertions::{assert_eq, assert_ne};
+
+use pretty_assertions::assert_eq;
 use test_harness::*;
 
 #[test]
@@ -15,7 +14,7 @@ fn unapply_must_work() {
         "#;
 
         let result1 = infer_and_apply(test_setup, api, &dm1).sql_schema;
-        assert_eq!(result1.table_bang("Test").column("field").is_some(), true);
+        assert!(result1.table_bang("Test").column("field").is_some());
 
         let dm2 = r#"
             model Test {
@@ -24,9 +23,9 @@ fn unapply_must_work() {
         "#;
 
         let result2 = infer_and_apply(test_setup, api, &dm2).sql_schema;
-        assert_eq!(result2.table_bang("Test").column("field").is_some(), false);
+        assert!(result2.table_bang("Test").column("field").is_none());
 
-        let result3 = unapply_migration(test_setup, api);
+        let result3 = unapply_migration(test_setup, api).sql_schema;
         assert_eq!(result1, result3);
 
         // reapply the migration again

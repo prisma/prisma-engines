@@ -121,7 +121,7 @@ impl<'a> ApplyMigrationCommand<'a> {
         Ok(MigrationStepsResultOutput {
             datamodel: datamodel::render_datamodel_to_string(&next_datamodel).unwrap(),
             datamodel_steps: self.input.steps.clone(),
-            database_steps: database_steps_json_pretty,
+            database_steps: serde_json::Value::Array(database_steps_json_pretty),
             errors,
             warnings,
             general_errors: Vec::new(),
