@@ -1,7 +1,9 @@
 use crate::commands::command::*;
 use crate::migration_engine::MigrationEngine;
 use datamodel::dml::Datamodel;
+use log::*;
 use migration_connector::*;
+use serde::{Deserialize, Serialize};
 
 pub struct CalculateDatamodelCommand<'a> {
     input: &'a CalculateDatamodelInput,

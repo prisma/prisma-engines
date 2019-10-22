@@ -5,18 +5,12 @@ mod error;
 pub mod migration;
 pub mod migration_engine;
 
-#[macro_use]
-extern crate log;
-#[macro_use]
-extern crate serde_derive;
-#[macro_use]
-extern crate serde_json;
-
 use crate::api::RpcApi;
 use clap::{App, Arg, SubCommand};
 use cli::CliError;
 use commands::*;
 use datamodel::{self, error::ErrorCollection, Datamodel};
+use log::*;
 use std::{env, fs, io, io::Read};
 
 pub use error::Error;

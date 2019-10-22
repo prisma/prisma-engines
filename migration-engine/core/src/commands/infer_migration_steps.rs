@@ -2,7 +2,9 @@ use super::MigrationStepsResultOutput;
 use crate::commands::command::*;
 use crate::migration_engine::MigrationEngine;
 use crate::*;
+use log::*;
 use migration_connector::*;
+use serde::Deserialize;
 
 pub struct InferMigrationStepsCommand<'a> {
     input: &'a InferMigrationStepsInput,
