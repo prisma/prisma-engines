@@ -1,8 +1,7 @@
 #![warn(warnings)] // Todo deny warnings once done
 
-// Todo logging?
-// #[macro_use]
-// extern crate log;
+#[macro_use]
+extern crate log;
 
 #[macro_use]
 extern crate debug_stub_derive;

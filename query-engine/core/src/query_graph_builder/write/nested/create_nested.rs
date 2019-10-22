@@ -283,7 +283,7 @@ fn handle_one_to_one(
     // existing parent, either.
     // For the above reasons, the checks always live on `parent_node`.
     if !parent_is_create {
-        utils::insert_existing_1to1_related_model_checks(graph, &parent_node, parent_relation_field)?;
+        utils::insert_existing_1to1_related_model_checks(graph, &parent_node, parent_relation_field, false)?;
     }
 
     // If the relation is inlined on the parent, we swap the create and the parent to have the child ID for inlining.
@@ -294,7 +294,6 @@ fn handle_one_to_one(
         // We need to swap the read node and the parent because the inlining is done in the parent, and we need to fetch the ID first.
         graph.mark_nodes(&parent_node, &create_node);
         // let (parent_node, child_node) = utils::swap_nodes(graph, parent_node, create_node)?;
-
 
         (parent_node, create_node, relation_field_name)
     } else {

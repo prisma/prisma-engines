@@ -182,7 +182,7 @@ fn handle_one_to_many(
 /// │               │      ┌────────────────────────┐  │
 /// │               │    │ │   Update ex. parent    │◀─┘                         │
 /// │               │      └────────────────────────┘                      ┌───┐
-/// │               │    │         then                                    │ 1 │ │
+/// │               │    │                                                 │ 1 │ │
 /// │               │                                                      └───┘
 /// │               ▼    └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘
 /// │  ┌────────────────────────┐
@@ -256,12 +256,11 @@ fn handle_one_to_one(
 
     // We always start with the read node in a nested connect 1:1 scenario.
     graph.mark_nodes(&parent_node, &read_new_child_node);
-    // let (read_new_child_node, parent_node) = utils::swap_nodes(graph, parent_node, read_new_child_node)?;
 
     // Next is the check for (and possible disconnect of) an existing parent.
     // Those checks are performed on the new child node, hence we use the child relation field side ("backrelation").
     if parent_side_required || relation_inlined_parent {
-        utils::insert_existing_1to1_related_model_checks(graph, &read_new_child_node, &child_relation_field)?;
+        utils::insert_existing_1to1_related_model_checks(graph, &read_new_child_node, &child_relation_field, false)?;
     }
 
     let relation_field_name = if relation_inlined_parent {
@@ -273,15 +272,18 @@ fn handle_one_to_one(
     graph.create_edge(
         &parent_node,
         &read_new_child_node,
-        QueryGraphDependency::ParentIds(Box::new(|mut child_node, mut parent_ids| {
+        QueryGraphDependency::ParentIds(Box::new(move |mut child_node, mut parent_ids| {
             let parent_id = match parent_ids.pop() {
                 Some(pid) => Ok(pid),
                 None => Err(QueryGraphBuilderError::AssertionError(format!("[Query Graph] Expected a valid parent ID to be present for a nested connect on a one-to-one relation."))),
             }?;
 
             // This takes care of cases where the relation is inlined.
-            if let Node::Query(Query::Write(ref mut wq)) = child_node {
-                wq.inject_non_list_arg(relation_field_name, parent_id);
+            if relation_inlined_parent {
+                if let Node::Query(Query::Write(ref mut wq)) = child_node {
+                    info!("Injecting Parent -> ReadNewChild, Field: {}, Parent ID: {:?}, Evaluated child query: {:?}", relation_field_name, parent_id, wq);
+                    wq.inject_non_list_arg(relation_field_name, parent_id);
+                }
             }
 
             Ok(child_node)
@@ -292,8 +294,9 @@ fn handle_one_to_one(
     // Those checks are performed on the parent node model.
     // We only need to do those checks if the parent operation is not a create, the reason being that
     // if the parent is a create, it can't have an existing child already.
-    if parent_is_create && (child_side_required || !relation_inlined_parent) {
-        utils::insert_existing_1to1_related_model_checks(graph, &parent_node, parent_relation_field)?;
+    if !parent_is_create && (child_side_required || !relation_inlined_parent) {
+        dbg!(">>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+        utils::insert_existing_1to1_related_model_checks(graph, &parent_node, parent_relation_field, false)?;
     }
 
     // If the relation is inlined on the child, we also need to update the child to connect it to the parent.

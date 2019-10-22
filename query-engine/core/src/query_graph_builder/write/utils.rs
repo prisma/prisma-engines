@@ -182,31 +182,31 @@ pub fn insert_existing_1to1_related_model_checks(
     graph: &mut QueryGraph,
     parent_node: &NodeRef,
     parent_relation_field: &RelationFieldRef,
+    perform_relation_check: bool,
 ) -> QueryGraphBuilderResult<()> {
-    let parent_model = parent_relation_field.model();
-    let parent_model_id_field = parent_model.fields().id();
-    let parent_model_name = parent_model.name.clone();
+    let child_model = parent_relation_field.related_model();
+    let child_model_name = child_model.name.clone();
+    let child_model_id_field = child_model.fields().id();
     let parent_side_required = parent_relation_field.is_required;
     let relation_inlined_parent = parent_relation_field.relation_is_inlined_in_parent();
     let rf = Arc::clone(&parent_relation_field);
 
-    // Now check and disconnect the existing model, if necessary.
-    let read_existing_parent_query_node =
+    let read_existing_children =
         insert_find_children_by_parent_node(graph, &parent_node, &parent_relation_field, None)?;
 
     // If the parent side is required, we also fail during runtime before disconnecting, as that would violate the parent relation side.
-    let update_existing_parent_node = update_record_node_placeholder(graph, None, parent_model);
-    let relation_field_name = parent_relation_field.name.clone();
+    let update_existing_child = update_record_node_placeholder(graph, None, child_model);
+    let relation_field_name = parent_relation_field.related_field().name.clone();
     let if_node = graph.create_node(Flow::default_if());
 
     graph.create_edge(
-        &read_existing_parent_query_node,
+        &read_existing_children,
         &if_node,
-        QueryGraphDependency::ParentIds(Box::new(move |node, parent_ids| {
+        QueryGraphDependency::ParentIds(Box::new(move |node, child_ids| {
             if let Node::Flow(Flow::If(_)) = node {
                 // If the relation is inlined in the parent, we need to update the old parent and null out the relation (i.e. "disconnect").
                 Ok(Node::Flow(Flow::If(Box::new(move || {
-                    relation_inlined_parent && !parent_ids.is_empty()
+                    !relation_inlined_parent && !child_ids.is_empty()
                 }))))
             } else {
                 unreachable!()
@@ -214,26 +214,28 @@ pub fn insert_existing_1to1_related_model_checks(
         })),
     )?;
 
-    graph.create_edge(&if_node, &update_existing_parent_node, QueryGraphDependency::Then)?;
-    graph.create_edge(&read_existing_parent_query_node, &update_existing_parent_node, QueryGraphDependency::ParentIds(Box::new(move |mut child_node, mut parent_ids| {
+    graph.create_edge(&if_node, &update_existing_child, QueryGraphDependency::Then)?;
+    graph.create_edge(&read_existing_children, &update_existing_child, QueryGraphDependency::ParentIds(Box::new(move |mut child_node, mut child_ids| {
+            println!("[1:1 Checks] Relation field: {}, child ids: {:?}", &relation_field_name, &child_ids);
+
             // If the parent requires the connection, we need to make sure that there isn't a parent already connected
             // to the existing child, as that would violate the other parent's relation side.
-            if parent_ids.len() > 0 && parent_side_required {
+            if perform_relation_check && child_ids.len() > 0 && parent_side_required {
                 return Err(QueryGraphBuilderError::RelationViolation(rf.into()));
             }
 
             // This has to succeed or the if-then node wouldn't trigger.
-            let parent_id = match parent_ids.pop() {
+            let child_id = match child_ids.pop() {
                 Some(pid) => Ok(pid),
                 None => Err(QueryGraphBuilderError::AssertionError(format!("[Query Graph] Expected a valid parent ID to be present for a nested connect on a one-to-one relation, updating previous parent."))),
             }?;
 
             if let Node::Query(Query::Write(ref mut wq)) = child_node {
-                println!("[1:1 Checks] Injecting field '{}' with value '{:?}', to update existing parent node from read existing parent check (model: {}) ", &relation_field_name, &parent_id, parent_model_name);
+                println!("[1:1 Checks] Injecting field '{}' with value '{:?}', to update existing child node from read existing children check (model: {}) ", &relation_field_name, &child_id, child_model_name);
 
                 let finder = RecordFinder {
-                    field: parent_model_id_field,
-                    value: parent_id,
+                    field: child_model_id_field,
+                    value: child_id,
                 };
 
                 wq.inject_record_finder(finder);
