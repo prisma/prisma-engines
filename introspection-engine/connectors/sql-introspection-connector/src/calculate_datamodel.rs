@@ -1,5 +1,9 @@
 use crate::SqlIntrospectionResult;
-use datamodel::{common::{names::NameNormalizer, PrismaType, PrismaValue}, dml, Datamodel, Field, FieldArity, FieldType, IdInfo, IdStrategy, Model, OnDeleteStrategy, RelationInfo, ScalarListStrategy, IndexDefinition};
+use datamodel::{
+    common::{names::NameNormalizer, PrismaType, PrismaValue},
+    dml, Datamodel, Field, FieldArity, FieldType, IdInfo, IdStrategy, IndexDefinition, Model, OnDeleteStrategy,
+    RelationInfo, ScalarListStrategy,
+};
 use log::debug;
 use prisma_inflector;
 use regex::Regex;
@@ -111,17 +115,34 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
             model.add_field(field);
         }
 
-        let multi_field_indexes = table.indices.iter().filter(|i| i.columns.len() >1 );
-        for multi_field_index in multi_field_indexes {
-            if multi_field_index.tpe == IndexType::Unique{
-                let index : IndexDefinition = IndexDefinition{name: Some(multi_field_index.name.clone()), fields: multi_field_index.columns.clone(), tpe:  datamodel::dml::IndexType::Unique};
-                model.add_index(index)
+        for index in table.indices.iter() {
+            if index.columns.len() > 1 {
+                let tpe = if index.tpe == IndexType::Unique {
+                    datamodel::dml::IndexType::Unique
+                } else {
+                    datamodel::dml::IndexType::Normal
+                };
+
+                let index_definition: IndexDefinition = IndexDefinition {
+                    name: Some(index.name.clone()),
+                    fields: index.columns.clone(),
+                    tpe,
+                };
+                model.add_index(index_definition)
+            }
+            if index.columns.len() == 1 && index.tpe != IndexType::Unique {
+                let index_definition: IndexDefinition = IndexDefinition {
+                    name: Some(index.name.clone()),
+                    fields: index.columns.clone(),
+                    tpe: datamodel::dml::IndexType::Normal,
+                };
+                model.add_index(index_definition)
             }
         }
 
-       if table.primary_key_columns().len() > 1 {
-           model.id_fields = table.primary_key_columns();
-       }
+        if table.primary_key_columns().len() > 1 {
+            model.id_fields = table.primary_key_columns();
+        }
 
         data_model.add_model(model);
     }
@@ -163,7 +184,9 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
                         });
 
                         let arity = match relation_field.arity {
-                            FieldArity::Required | FieldArity::Optional if relation_field.is_unique=> FieldArity::Optional,
+                            FieldArity::Required | FieldArity::Optional if relation_field.is_unique => {
+                                FieldArity::Optional
+                            }
                             FieldArity::Required | FieldArity::Optional => FieldArity::List,
                             FieldArity::List => FieldArity::Optional,
                         };
@@ -209,11 +232,11 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
 
                 fields_to_be_added.push((
                     s.referenced_table.clone(),
-                    create_many_to_many_field(f, table.name.clone() , is_self_relation),
+                    create_many_to_many_field(f, table.name.clone(), is_self_relation),
                 ));
                 fields_to_be_added.push((
                     f.referenced_table.clone(),
-                    create_many_to_many_field(s, table.name.clone() , is_self_relation),
+                    create_many_to_many_field(s, table.name.clone(), is_self_relation),
                 ));
             }
             (_, _) => (),
@@ -324,7 +347,7 @@ fn parse_float(value: &str) -> Option<f32> {
 
 fn calculate_default(default: &str, tpe: &ColumnTypeFamily) -> Option<PrismaValue> {
     match tpe {
-        ColumnTypeFamily::Boolean => parse_int(default).map(|x| PrismaValue::Boolean(x != 0)),
+        ColumnTypeFamily::Boolean => parse_int(default).map(|x| PrismaValue::Boolean(x != 0)), // Todo this does not work for mysql
         ColumnTypeFamily::Int => parse_int(default).map(|x| PrismaValue::Int(x)),
         ColumnTypeFamily::Float => parse_float(default).map(|x| PrismaValue::Float(x)),
         ColumnTypeFamily::String => Some(PrismaValue::String(default.to_string())),
