@@ -21,7 +21,7 @@ pub fn create_id_directive_step(model: &str, field: &str) -> MigrationStep {
     MigrationStep::CreateDirective(CreateDirective {
         locator: DirectiveLocator {
             directive: "id".to_owned(),
-            location: DirectiveLocation::Field {
+            location: DirectiveType::Field {
                 model: model.to_owned(),
                 field: field.to_owned(),
             },

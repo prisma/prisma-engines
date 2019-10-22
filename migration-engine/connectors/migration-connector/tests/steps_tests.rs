@@ -201,7 +201,7 @@ fn CreateDirective_must_work() {
         locator: DirectiveLocator {
             directive: "map".to_owned(),
             arguments: None,
-            location: DirectiveLocation::Model {
+            location: DirectiveType::Model {
                 model: "Blog".to_owned(),
             },
         },
@@ -224,7 +224,7 @@ fn minimal_DeleteDirective_must_work() {
     let expected_step = MigrationStep::DeleteDirective(DeleteDirective {
         locator: DirectiveLocator {
             directive: "map".to_owned(),
-            location: DirectiveLocation::Field {
+            location: DirectiveType::Field {
                 model: "Blog".to_owned(),
                 field: "title".to_owned(),
             },
@@ -254,7 +254,7 @@ fn full_DeleteDirective_must_work() {
     let expected_step = MigrationStep::DeleteDirective(DeleteDirective {
         locator: DirectiveLocator {
             directive: "unique".to_owned(),
-            location: DirectiveLocation::Model {
+            location: DirectiveType::Model {
                 model: "Blog".to_owned(),
             },
             arguments: Some(vec![Argument {
@@ -282,7 +282,7 @@ fn UpdateDirectiveArgument_must_work() {
     let expected_step = MigrationStep::UpdateDirectiveArgument(UpdateDirectiveArgument {
         directive_location: DirectiveLocator {
             directive: "map".to_owned(),
-            location: DirectiveLocation::Enum {
+            location: DirectiveType::Enum {
                 r#enum: "CatMood".to_owned(),
             },
             arguments: None,
@@ -310,7 +310,7 @@ fn CreateDirectiveArgument_must_work() {
         directive_location: DirectiveLocator {
             arguments: None,
             directive: "map".to_owned(),
-            location: DirectiveLocation::Enum {
+            location: DirectiveType::Enum {
                 r#enum: "CatMood".to_owned(),
             },
         },
@@ -336,7 +336,7 @@ fn DeleteDirectiveArgument_must_work() {
         directive_location: DirectiveLocator {
             directive: "map".to_owned(),
             arguments: None,
-            location: DirectiveLocation::Enum {
+            location: DirectiveType::Enum {
                 r#enum: "CatMood".to_owned(),
             },
         },

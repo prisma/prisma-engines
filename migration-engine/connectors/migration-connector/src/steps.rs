@@ -186,7 +186,7 @@ impl Into<ast::Argument> for &Argument {
 #[serde(rename_all = "camelCase")]
 pub struct DirectiveLocator {
     #[serde(flatten)]
-    pub location: DirectiveLocation,
+    pub location: DirectiveType,
     pub directive: String,
     /// The arguments of the directive are required to match directives that can be repeated,
     /// like `@@unique` on a model. This is `None` when matching can be done without comparing
@@ -221,7 +221,7 @@ impl DirectiveLocator {
 
 #[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
 #[serde(rename_all = "camelCase", deny_unknown_fields, untagged)]
-pub enum DirectiveLocation {
+pub enum DirectiveType {
     Field { model: String, field: String },
     Model { model: String },
     Enum { r#enum: String },
@@ -278,7 +278,7 @@ mod tests {
     fn directive_location_serialization_gives_expected_json_shape() {
         let create_directive = CreateDirective {
             locator: DirectiveLocator {
-                location: DirectiveLocation::Field {
+                location: DirectiveType::Field {
                     model: "Cat".to_owned(),
                     field: "owner".to_owned(),
                 },

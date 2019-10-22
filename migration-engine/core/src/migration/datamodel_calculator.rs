@@ -402,12 +402,12 @@ fn new_span() -> ast::Span {
 
 fn find_directives_mut<'a>(
     datamodel: &'a mut ast::SchemaAst,
-    location: &steps::DirectiveLocation,
+    location: &steps::DirectiveType,
 ) -> Option<&'a mut Vec<ast::Directive>> {
     let directives = match location {
-        steps::DirectiveLocation::Field { model, field } => &mut datamodel.find_field_mut(&model, &field)?.directives,
-        steps::DirectiveLocation::Model { model } => &mut datamodel.find_model_mut(&model)?.directives,
-        steps::DirectiveLocation::Enum { r#enum } => &mut datamodel.find_enum_mut(&r#enum)?.directives,
+        steps::DirectiveType::Field { model, field } => &mut datamodel.find_field_mut(&model, &field)?.directives,
+        steps::DirectiveType::Model { model } => &mut datamodel.find_model_mut(&model)?.directives,
+        steps::DirectiveType::Enum { r#enum } => &mut datamodel.find_enum_mut(&r#enum)?.directives,
     };
 
     Some(directives)

@@ -32,7 +32,7 @@ fn infer_CreateModel_if_it_does_not_exist_yet() {
             locator: DirectiveLocator {
                 arguments: None,
                 directive: "id".to_owned(),
-                location: DirectiveLocation::Field {
+                location: DirectiveType::Field {
                     model: "Test".to_owned(),
                     field: "id".to_owned(),
                 },
@@ -93,7 +93,7 @@ fn infer_UpdateModel() {
         locator: DirectiveLocator {
             arguments: None,
             directive: "embedded".to_owned(),
-            location: DirectiveLocation::Model {
+            location: DirectiveType::Model {
                 model: "Post".to_owned(),
             },
         },
@@ -159,7 +159,7 @@ fn infer_CreateField_with_default() {
         MigrationStep::CreateDirective(CreateDirective {
             locator: DirectiveLocator {
                 arguments: None,
-                location: DirectiveLocation::Field {
+                location: DirectiveType::Field {
                     model: "Test".to_owned(),
                     field: "isReady".to_owned(),
                 },
@@ -169,7 +169,7 @@ fn infer_CreateField_with_default() {
         MigrationStep::CreateDirectiveArgument(CreateDirectiveArgument {
             directive_location: DirectiveLocator {
                 arguments: None,
-                location: DirectiveLocation::Field {
+                location: DirectiveType::Field {
                     model: "Test".to_owned(),
                     field: "isReady".to_owned(),
                 },
@@ -287,7 +287,7 @@ fn infer_UpdateField_simple() {
             locator: DirectiveLocator {
                 directive: "default".to_owned(),
                 arguments: None,
-                location: DirectiveLocation::Field {
+                location: DirectiveType::Field {
                     model: "Test".to_owned(),
                     field: "field".to_owned(),
                 },
@@ -297,7 +297,7 @@ fn infer_UpdateField_simple() {
             directive_location: DirectiveLocator {
                 arguments: None,
                 directive: "default".to_owned(),
-                location: DirectiveLocation::Field {
+                location: DirectiveType::Field {
                     model: "Test".to_owned(),
                     field: "field".to_owned(),
                 },
@@ -309,7 +309,7 @@ fn infer_UpdateField_simple() {
             locator: DirectiveLocator {
                 arguments: None,
                 directive: "unique".to_owned(),
-                location: DirectiveLocation::Field {
+                location: DirectiveType::Field {
                     model: "Test".to_owned(),
                     field: "field".to_owned(),
                 },
@@ -450,7 +450,7 @@ fn infer_CreateDirective_on_field() {
     let locator = DirectiveLocator {
         directive: "map".to_owned(),
         arguments: None,
-        location: DirectiveLocation::Field {
+        location: DirectiveType::Field {
             model: "User".to_owned(),
             field: "name".to_owned(),
         },
@@ -497,7 +497,7 @@ fn infer_CreateDirective_on_model() {
     let locator = DirectiveLocator {
         directive: "map".to_owned(),
         arguments: None,
-        location: DirectiveLocation::Model {
+        location: DirectiveType::Model {
             model: "User".to_owned(),
         },
     };
@@ -546,7 +546,7 @@ fn infer_CreateDirective_on_model_repeated_directive() {
             name: "".to_owned(),
             value: MigrationExpression("[name]".to_owned()),
         }]),
-        location: DirectiveLocation::Model {
+        location: DirectiveType::Model {
             model: "User".to_owned(),
         },
     };
@@ -585,7 +585,7 @@ fn infer_CreateDirective_on_enum() {
     let locator = DirectiveLocator {
         directive: "map".to_owned(),
         arguments: None,
-        location: DirectiveLocation::Enum {
+        location: DirectiveType::Enum {
             r#enum: "Color".to_owned(),
         },
     };
@@ -629,7 +629,7 @@ fn infer_DeleteDirective_on_field() {
     let locator = DirectiveLocator {
         directive: "map".to_owned(),
         arguments: None,
-        location: DirectiveLocation::Field {
+        location: DirectiveType::Field {
             model: "User".to_owned(),
             field: "name".to_owned(),
         },
@@ -667,7 +667,7 @@ fn infer_DeleteDirective_on_model() {
     let locator = DirectiveLocator {
         directive: "map".to_owned(),
         arguments: None,
-        location: DirectiveLocation::Model {
+        location: DirectiveType::Model {
             model: "User".to_owned(),
         },
     };
@@ -707,7 +707,7 @@ fn infer_DeleteDirective_on_model_repeated_directive() {
             name: "".to_owned(),
             value: MigrationExpression("[name]".to_owned()),
         }]),
-        location: DirectiveLocation::Model {
+        location: DirectiveType::Model {
             model: "User".to_owned(),
         },
     };
@@ -749,7 +749,7 @@ fn infer_DeleteDirective_on_enum() {
     let locator = DirectiveLocator {
         directive: "map".to_owned(),
         arguments: None,
-        location: DirectiveLocation::Enum {
+        location: DirectiveType::Enum {
             r#enum: "Color".to_owned(),
         },
     };
@@ -784,7 +784,7 @@ fn infer_CreateDirectiveArgument_on_field() {
     let locator = DirectiveLocator {
         directive: "translate".to_owned(),
         arguments: None,
-        location: DirectiveLocation::Field {
+        location: DirectiveType::Field {
             model: "User".to_owned(),
             field: "name".to_owned(),
         },
@@ -835,7 +835,7 @@ fn infer_CreateDirectiveArgument_on_model() {
     let locator = DirectiveLocator {
         arguments: None,
         directive: "randomDirective".to_owned(),
-        location: DirectiveLocation::Model {
+        location: DirectiveType::Model {
             model: "User".to_owned(),
         },
     };
@@ -882,7 +882,7 @@ fn infer_CreateDirectiveArgument_on_enum() {
     let locator = DirectiveLocator {
         directive: "random".to_owned(),
         arguments: None,
-        location: DirectiveLocation::Enum {
+        location: DirectiveType::Enum {
             r#enum: "EyeColor".to_owned(),
         },
     };
@@ -921,7 +921,7 @@ fn infer_DeleteDirectiveArgument_on_field() {
     let locator = DirectiveLocator {
         directive: "translate".to_owned(),
         arguments: None,
-        location: DirectiveLocation::Field {
+        location: DirectiveType::Field {
             model: "User".to_owned(),
             field: "name".to_owned(),
         },
@@ -970,7 +970,7 @@ fn infer_DeleteDirectiveArgument_on_model() {
     let locator = DirectiveLocator {
         directive: "randomDirective".to_owned(),
         arguments: None,
-        location: DirectiveLocation::Model {
+        location: DirectiveType::Model {
             model: "User".to_owned(),
         },
     };
@@ -1016,7 +1016,7 @@ fn infer_DeleteDirectiveArgument_on_enum() {
     let locator = DirectiveLocator {
         arguments: None,
         directive: "random".to_owned(),
-        location: DirectiveLocation::Enum {
+        location: DirectiveType::Enum {
             r#enum: "EyeColor".to_owned(),
         },
     };
@@ -1054,7 +1054,7 @@ fn infer_UpdateDirectiveArgument_on_field() {
     let locator = DirectiveLocator {
         directive: "translate".to_owned(),
         arguments: None,
-        location: DirectiveLocation::Field {
+        location: DirectiveType::Field {
             model: "User".to_owned(),
             field: "name".to_owned(),
         },
@@ -1107,7 +1107,7 @@ fn infer_UpdateDirectiveArgument_on_model() {
     let locator = DirectiveLocator {
         directive: "map".to_owned(),
         arguments: None,
-        location: DirectiveLocation::Model {
+        location: DirectiveType::Model {
             model: "User".to_owned(),
         },
     };
@@ -1154,7 +1154,7 @@ fn infer_UpdateDirectiveArgument_on_enum() {
     let locator = DirectiveLocator {
         directive: "random".to_owned(),
         arguments: None,
-        location: DirectiveLocation::Enum {
+        location: DirectiveType::Enum {
             r#enum: "EyeColor".to_owned(),
         },
     };
