@@ -76,7 +76,7 @@ impl SqlSchemaDescriber {
             .map(|row| {
                 debug!("Got column row {:?}", row);
                 let default_value = match row.get("dflt_value") {
-                    Some(ParameterizedValue::Text(v)) => Some(v.to_string()),
+                    Some(ParameterizedValue::Text(v)) => Some(v.to_string().replace("\"", "")),
                     Some(ParameterizedValue::Null) => None,
                     Some(p) => panic!(format!("expected a string value but got {:?}", p)),
                     None => panic!("couldn't get dflt_value column"),
