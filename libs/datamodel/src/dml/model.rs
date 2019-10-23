@@ -14,7 +14,9 @@ pub struct Model {
     pub database_name: Option<String>,
     /// Indicates if this model is embedded or not.
     pub is_embedded: bool,
+    /// Describes Composite Indexes
     pub indexes: Vec<IndexDefinition>,
+    /// Describes Composite Primary Keys
     pub id_fields: Vec<String>,
     /// Indicates if this model is generated.
     pub is_generated: bool,

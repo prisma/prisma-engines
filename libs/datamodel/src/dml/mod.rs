@@ -10,6 +10,7 @@ mod id;
 mod model;
 mod relation_info;
 mod scalar_list;
+
 mod traits;
 
 pub use self::datamodel::*;

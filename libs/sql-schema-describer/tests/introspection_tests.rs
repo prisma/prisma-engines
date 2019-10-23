@@ -474,11 +474,11 @@ fn column_uniqueness_must_be_detected() {
                 }
             );
             assert!(
-                user_table.is_column_unique(&user_table.columns[0]),
+                user_table.is_column_unique(&user_table.columns[0].name),
                 "Column 1 should return true for is_unique"
             );
             assert!(
-                user_table.is_column_unique(&user_table.columns[1]),
+                user_table.is_column_unique(&user_table.columns[1].name),
                 "Column 2 should return true for is_unique"
             );
         },
