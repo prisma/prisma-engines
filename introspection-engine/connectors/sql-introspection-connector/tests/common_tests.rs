@@ -29,7 +29,7 @@ fn introspecting_a_simple_table_with_gql_types_must_work() {
             }
         "#;
         let result = dbg!(introspect(test_setup));
-        custom_assert(result, dm.to_string());
+        custom_assert(&result, dm);
     });
 }
 
@@ -40,8 +40,6 @@ fn introspecting_a_table_with_compound_primary_keys_must_work() {
             migration.create_table("Blog", |t| {
                 t.add_column("id", types::integer());
                 t.add_column("authorId", types::text());
-
-                // Simulate how we create primary keys in the migrations engine.
                 t.inject_custom("PRIMARY KEY (\"id\", \"authorId\")");
             });
         });
@@ -54,7 +52,7 @@ fn introspecting_a_table_with_compound_primary_keys_must_work() {
             }
         "#;
         let result = dbg!(introspect(test_setup));
-        custom_assert(result, dm.to_string());
+        custom_assert(&result, dm);
     });
 }
 
@@ -65,8 +63,6 @@ fn introspecting_a_table_with_unique_index_must_work() {
             migration.create_table("Blog", |t| {
                 t.add_column("id", types::primary());
                 t.add_column("authorId", types::text());
-
-                // Simulate how we create primary keys in the migrations engine.
             });
             migration.inject_custom("Create Unique Index \"introspection-engine\".\"test\" on \"Blog\"( \"authorId\")");
         });
@@ -78,7 +74,7 @@ fn introspecting_a_table_with_unique_index_must_work() {
             }
         "#;
         let result = dbg!(introspect(test_setup));
-        custom_assert(result, dm.to_string());
+        custom_assert(&result, dm);
     });
 }
 
@@ -90,8 +86,6 @@ fn introspecting_a_table_with_multi_column_unique_index_must_work() {
                 t.add_column("id", types::primary());
                 t.add_column("firstname", types::text());
                 t.add_column("lastname", types::text());
-
-                // Simulate how we create primary keys in the migrations engine.
             });
             migration.inject_custom(
                 "Create Unique Index \"introspection-engine\".\"test\" on \"User\"( \"firstname\", \"lastname\")",
@@ -107,7 +101,7 @@ fn introspecting_a_table_with_multi_column_unique_index_must_work() {
             }
         "#;
         let result = dbg!(introspect(test_setup));
-        custom_assert(result, dm.to_string());
+        custom_assert(&result, dm);
     });
 }
 
@@ -130,7 +124,7 @@ fn introspecting_a_table_with_required_and_optional_columns_must_work() {
             }
         "#;
         let result = dbg!(introspect(test_setup));
-        custom_assert(result, dm.to_string());
+        custom_assert(&result, dm);
     });
 }
 
@@ -154,7 +148,7 @@ fn introspecting_a_table_with_datetime_default_values_should_work() {
             }
         "#;
         let result = dbg!(introspect(test_setup));
-        custom_assert(result, dm.to_string());
+        custom_assert(&result, dm);
     });
 }
 
@@ -185,7 +179,7 @@ fn introspecting_a_table_with_default_values_should_work() {
             }
         "#;
         let result = dbg!(introspect(test_setup));
-        custom_assert(result, dm.to_string());
+        custom_assert(&result, dm);
     });
 }
 
@@ -208,7 +202,7 @@ fn introspecting_a_table_with_a_non_unique_index_should_work() {
             }
         "#;
         let result = dbg!(introspect(test_setup));
-        custom_assert(result, dm.to_string());
+        custom_assert(&result, dm);
     });
 }
 
@@ -233,7 +227,7 @@ fn introspecting_a_table_with_a_multi_column_non_unique_index_should_work() {
             }
         "#;
         let result = dbg!(introspect(test_setup));
-        custom_assert(result, dm.to_string());
+        custom_assert(&result, dm);
     });
 }
 
@@ -257,16 +251,54 @@ fn introspecting_a_one_to_one_req_relation_should_work() {
         let dm = r#"
             model User {
                id Int @id
-               post Post? @relation("Post_user_id_User")
+               post Post? 
             }
             
             model Post {
                id Int @id
-               user_id User @relation("Post_user_id_User")
+               user_id User
             }
         "#;
         let result = dbg!(introspect(test_setup));
-        custom_assert(result, dm.to_string());
+        custom_assert(&result, dm);
+    });
+}
+
+#[test]
+fn introspecting_two_one_to_one_relations_between_the_same_models_should_work() {
+    test_each_backend_with_ignores(vec![SqlFamily::Postgres, SqlFamily::Mysql], |test_setup, barrel| {
+        let _setup_schema = barrel.execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom(
+                    "post_id INTEGER NOT NULL UNIQUE,
+                        FOREIGN KEY(post_id) REFERENCES Post(id)",
+                )
+            });
+            migration.create_table("Post", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom(
+                    "user_id INTEGER NOT NULL UNIQUE,
+                        FOREIGN KEY(user_id) REFERENCES User(id)",
+                )
+            });
+        });
+
+        let dm = r#"
+            model User {
+               id Int @id
+               post_id Post  @relation("PostToUser_post_id")
+               post Post?    @relation("Post_user_idToUser")
+            }
+            
+            model Post {
+               id Int @id
+               user_id User  @relation("Post_user_idToUser")
+               user    User? @relation("PostToUser_post_id", references: [post_id])
+            }
+        "#;
+        let result = dbg!(introspect(test_setup));
+        custom_assert(&result, dm);
     });
 }
 
@@ -289,16 +321,16 @@ fn introspecting_a_one_to_one_relation_should_work() {
         let dm = r#"
             model User {
                id Int @id
-               post Post? @relation("Post_user_id_User")
+               post Post? 
             }
             
             model Post {
                id Int @id
-               user_id User? @relation("Post_user_id_User")
+               user_id User?
             }
         "#;
         let result = dbg!(introspect(test_setup));
-        custom_assert(result, dm.to_string());
+        custom_assert(&result, dm);
     });
 }
 
@@ -321,16 +353,16 @@ fn introspecting_a_one_to_many_relation_should_work() {
         let dm = r#"
             model User {
                id Int @id
-               posts Post[] @relation("Post_user_id_User")
+               posts Post[] 
             }
             
             model Post {
                id Int @id
-               user_id User? @relation("Post_user_id_User")
+               user_id User?
             }
         "#;
         let result = dbg!(introspect(test_setup));
-        custom_assert(result, dm.to_string());
+        custom_assert(&result, dm);
     });
 }
 
@@ -353,16 +385,16 @@ fn introspecting_a_one_req_to_many_relation_should_work() {
         let dm = r#"
             model User {
                id Int @id
-               posts Post[] @relation("Post_user_id_User")
+               posts Post[] 
             }
             
             model Post {
                id Int @id
-               user_id User @relation("Post_user_id_User")
+               user_id User
             }
         "#;
         let result = dbg!(introspect(test_setup));
-        custom_assert(result, dm.to_string());
+        custom_assert(&result, dm);
     });
 }
 
@@ -389,16 +421,16 @@ fn introspecting_a_prisma_many_to_many_relation_should_work() {
         let dm = r#"
             model User {
                id Int @id
-               posts Post[] @relation("_PostToUser")
+               posts Post[] 
             }
             
             model Post {
                id Int @id
-               users User[] @relation("_PostToUser")
+               users User[] 
             }
         "#;
         let result = dbg!(introspect(test_setup));
-        custom_assert(result, dm.to_string());
+        custom_assert(&result, dm);
     });
 }
 
@@ -426,21 +458,21 @@ fn introspecting_a_many_to_many_relation_should_work() {
         let dm = r#"
             model User {
                id Int @id
-               postsToUserses PostsToUsers[] @relation("PostsToUsers_user_id_User")
+               postsToUserses PostsToUsers[] 
             }
             
             model Post {
                id Int @id
-               postsToUserses PostsToUsers[] @relation("Post_PostsToUsers_post_id", references: [post_id])
+               postsToUserses PostsToUsers[] @relation(references: [post_id])
             }
             
             model PostsToUsers {
-              post_id Post @relation("Post_PostsToUsers_post_id")
-              user_id User @relation("PostsToUsers_user_id_User")
+              post_id Post 
+              user_id User
             }
         "#;
         let result = dbg!(introspect(test_setup));
-        custom_assert(result, dm.to_string());
+        custom_assert(&result, dm);
     });
 }
 
@@ -468,22 +500,22 @@ fn introspecting_a_many_to_many_relation_with_extra_fields_should_work() {
         let dm = r#"
             model User {
                id Int @id
-               postsToUserses PostsToUsers[] @relation("PostsToUsers_user_id_User")
+               postsToUserses PostsToUsers[] 
             }
             
             model Post {
                id Int @id
-               postsToUserses PostsToUsers[] @relation("Post_PostsToUsers_post_id", references: [post_id])
+               postsToUserses PostsToUsers[] @relation(references: [post_id])
             }
             
             model PostsToUsers {
               date    DateTime?
-              post_id Post @relation("Post_PostsToUsers_post_id")
-              user_id User @relation("PostsToUsers_user_id_User")
+              post_id Post 
+              user_id User
             }
         "#;
         let result = dbg!(introspect(test_setup));
-        custom_assert(result, dm.to_string());
+        custom_assert(&result, dm);
     });
 }
 #[test]
@@ -503,14 +535,14 @@ fn introspecting_a_self_relation_should_work() {
 
         let dm = r#"
             model User {
-                direct_report                 User?  @relation("User_User_direct_report")
-                id                            Int    @id
-                recruited_by                  User?  @relation("User_User_recruited_by")
-                users_User_User_direct_report User[] @relation("User_User_direct_report")
-                users_User_User_recruited_by  User[] @relation("User_User_recruited_by")
+                direct_report                  User?  @relation("UserToUser_direct_report")
+                id                             Int    @id
+                recruited_by                   User?  @relation("UserToUser_recruited_by")
+                users_UserToUser_direct_report User[] @relation("UserToUser_direct_report")
+                users_UserToUser_recruited_by  User[] @relation("UserToUser_recruited_by")
             }
         "#;
         let result = dbg!(introspect(test_setup));
-        custom_assert(result, dm.to_string());
+        custom_assert(&result, dm);
     });
 }

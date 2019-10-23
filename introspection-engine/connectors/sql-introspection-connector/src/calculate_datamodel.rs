@@ -77,7 +77,7 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
         //Todo: This needs to filter out composite Foreign Key columns, they are merged into one new field
         for column in table.columns.iter() {
             debug!("Handling column {:?}", column);
-            let field_type = calculate_field_type(&column, &table);
+            let field_type = calculate_field_type(&schema, &column, &table);
             let arity = match column.arity {
                 ColumnArity::Required => FieldArity::Required,
                 ColumnArity::Nullable => FieldArity::Optional,
@@ -171,7 +171,7 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
             match &relation_field.field_type {
                 FieldType::Relation(relation_info) => {
                     if data_model
-                        .related_field_new(
+                        .related_field(
                             &model.name,
                             &relation_info.to,
                             &relation_info.name,
@@ -241,11 +241,11 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
 
                 fields_to_be_added.push((
                     s.referenced_table.clone(),
-                    create_many_to_many_field(f, table.name.clone(), is_self_relation),
+                    create_many_to_many_field(f, table.name[1..].to_string(), is_self_relation),
                 ));
                 fields_to_be_added.push((
                     f.referenced_table.clone(),
-                    create_many_to_many_field(s, table.name.clone(), is_self_relation),
+                    create_many_to_many_field(s, table.name[1..].to_string(), is_self_relation),
                 ));
             }
             (_, _) => (),
@@ -257,7 +257,11 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
         let model = table.name.split('_').nth(0).unwrap();
         let name = table.name.split('_').nth(1).unwrap();
 
-        let field_type = calculate_field_type(&table.columns.iter().find(|c| c.name == "value").unwrap(), &table);
+        let field_type = calculate_field_type(
+            schema,
+            &table.columns.iter().find(|c| c.name == "value").unwrap(),
+            &table,
+        );
 
         let field = Field {
             name: name.to_string(),
@@ -335,16 +339,7 @@ fn parse_int(value: &str) -> Option<i32> {
 
 fn parse_bool(value: &str) -> Option<bool> {
     debug!("Parsing bool '{}'", value);
-
-    //    if value.to_lowercase() == "true".to_string() {
-    //        Some(1)
-    //    } else if value.to_lowercase() == "false".to_string() {
-    //        Some(0)
-    //    } else {
-    //        None
-    //    }
-    //
-    value.parse().ok()
+    value.to_lowercase().parse().ok()
 }
 
 fn parse_float(value: &str) -> Option<f32> {
@@ -402,19 +397,43 @@ fn calc_id_info(column: &Column, table: &Table) -> Option<IdInfo> {
     })
 }
 
-fn not_many_to_many_relation_name(fk: &ForeignKey, table: &Table) -> String {
+fn calculate_relation_name(schema: &SqlSchema, fk: &ForeignKey, table: &Table) -> String {
+    //this is not called for prisma many to many relations. for them the name is just the name of the join table.
     let referenced_model = &fk.referenced_table;
     let model_with_fk = &table.name;
     let fk_column_name = fk.columns.get(0).unwrap();
 
-    if model_with_fk < referenced_model {
-        format!("{}_{}_{}", model_with_fk, fk_column_name, referenced_model)
+    let fk_to_same_model: Vec<&ForeignKey> = table
+        .foreign_keys
+        .iter()
+        .filter(|fk| fk.referenced_table == referenced_model.clone())
+        .collect();
+
+    let fk_from_other_model_to_this: Vec<&ForeignKey> = schema
+        .table_bang(referenced_model)
+        .foreign_keys
+        .iter()
+        .filter(|fk| fk.referenced_table == model_with_fk.clone())
+        .collect();
+
+    //unambiguous
+    if fk_to_same_model.len() < 2 && fk_from_other_model_to_this.len() == 0 {
+        if model_with_fk < referenced_model {
+            format!("{}To{}", model_with_fk, referenced_model)
+        } else {
+            format!("{}To{}", referenced_model, model_with_fk)
+        }
     } else {
-        format!("{}_{}_{}", referenced_model, model_with_fk, fk_column_name)
+        //ambiguous
+        if model_with_fk < referenced_model {
+            format!("{}_{}To{}", model_with_fk, fk_column_name, referenced_model)
+        } else {
+            format!("{}To{}_{}", referenced_model, model_with_fk, fk_column_name)
+        }
     }
 }
 
-fn calculate_field_type(column: &Column, table: &Table) -> FieldType {
+fn calculate_field_type(schema: &SqlSchema, column: &Column, table: &Table) -> FieldType {
     debug!("Calculating field type for '{}'", column.name);
     // Look for a foreign key referencing this column
     match table.foreign_keys.iter().find(|fk| fk.columns.contains(&column.name)) {
@@ -428,7 +447,7 @@ fn calculate_field_type(column: &Column, table: &Table) -> FieldType {
             let referenced_col = &fk.referenced_columns[idx];
 
             FieldType::Relation(RelationInfo {
-                name: not_many_to_many_relation_name(fk, table),
+                name: calculate_relation_name(schema, fk, table),
                 to: fk.referenced_table.clone(),
                 to_fields: vec![referenced_col.clone()],
                 on_delete: match fk.on_delete_action {

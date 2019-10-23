@@ -1,6 +1,5 @@
 use super::*;
 
-
 // TODO: Is schema the right name here?
 /// Represents a prisma-datamodel.
 #[derive(Debug, PartialEq, Clone)]
@@ -117,10 +116,10 @@ impl Datamodel {
         self.enums_mut().find(|m| m.name == *name)
     }
 
-   /// Finds a field with a certain relation guarantee.
+    /// Finds a field with a certain relation guarantee.
     /// exclude_field are necessary to avoid corner cases with self-relations (e.g. we must not recognize a field as its own related field).
-    pub fn related_field_new(&self,from: &str,  to: &str, name: &str, exclude_field: &str) -> Option<&Field> {
-       self.find_model(&to).and_then(|related_model|
+    pub fn related_field(&self, from: &str, to: &str, name: &str, exclude_field: &str) -> Option<&Field> {
+        self.find_model(&to).and_then(|related_model| {
             related_model.fields().find(|f| {
                 if let FieldType::Relation(rel_info) = &f.field_type {
                     if rel_info.to == from && rel_info.name == name && f.name != exclude_field {
@@ -129,6 +128,6 @@ impl Datamodel {
                 }
                 false
             })
-       )
+        })
     }
 }

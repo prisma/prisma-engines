@@ -27,7 +27,7 @@ pub struct BarrelMigrationExecutor {
 
 // test execution
 
-pub(crate) fn custom_assert(left: String, right: String) {
+pub(crate) fn custom_assert(left: &str, right: &str) {
     let parsed_expected = datamodel::parse_datamodel(&right).unwrap();
     let reformatted_expected =
         datamodel::render_datamodel_to_string(&parsed_expected).expect("Datamodel rendering failed");
