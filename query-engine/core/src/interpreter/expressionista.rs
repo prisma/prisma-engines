@@ -39,7 +39,7 @@ impl Expressionista {
         dbg!(&direct_children);
 
         // Find the positions of all result returning graph nodes.
-        let mut result_positions: Vec<usize> = direct_children
+        let result_positions: Vec<usize> = direct_children
             .iter()
             .enumerate()
             .filter_map(|(ix, (_, child_node))| {
@@ -53,24 +53,10 @@ impl Expressionista {
 
         dbg!(&result_positions);
 
-        let mut result_subgraphs: Vec<(EdgeRef, NodeRef)> = result_positions.into_iter().map(|pos| {
-            direct_children.remove(pos)
-        }).collect();
-
-
-
-        ///////////////////////////////////
-
-        // let mut result_scopes: Vec<Vec<(EdgeRef, NodeRef)>> = vec![];
-
-        // Start splitting of at the end to keep indices intact.
-        // result_positions.reverse();
-        // result_positions.iter().for_each(|pos| {
-        //     let scope = direct_children.split_off(*pos);
-        //     result_scopes.push(scope);
-        // });
-
-        // dbg!(&result_scopes);
+        let result_subgraphs: Vec<(EdgeRef, NodeRef)> = result_positions
+            .into_iter()
+            .map(|pos| direct_children.remove(pos))
+            .collect();
 
         // Because we split from right to left, everything remaining in `direct_children`
         // doesn't belong into results, and is executed before all result scopes.
@@ -81,8 +67,6 @@ impl Expressionista {
                 Self::build_expression(graph, &node, edges)
             })
             .collect::<InterpretationResult<Vec<Expression>>>()?;
-
-        //        dbg!("expressions of", node.id(), expressions.len());
 
         // Fold result scopes into one expression.
         if result_subgraphs.len() > 0 {
@@ -253,19 +237,16 @@ impl Expressionista {
 
     fn fold_result_scopes(
         graph: &mut QueryGraph,
-        mut result_subgraphs: Vec<(EdgeRef, NodeRef)>,
+        result_subgraphs: Vec<(EdgeRef, NodeRef)>,
     ) -> InterpretationResult<Expression> {
-        let mut bindings: Vec<Binding> = result_subgraphs
+        let bindings: Vec<Binding> = result_subgraphs
             .into_iter()
             .map(|(_, node)| {
                 let name = node.id();
                 let edges = graph.incoming_edges(&node);
                 let expr = Self::build_expression(graph, &node, edges)?;
 
-                Ok(Binding {
-                    name,
-                    expr,
-                })
+                Ok(Binding { name, expr })
             })
             .collect::<InterpretationResult<Vec<Binding>>>()?;
 
@@ -275,64 +256,9 @@ impl Expressionista {
             bindings,
             expressions: vec![Expression::GetFirstNonEmpty {
                 binding_names: result_binding_names,
-            }]
+            }],
         })
-
     }
-
-    // All result scopes are nested into each other to allow a final select at the end,
-    // resulting in a single expression.
-//     fn fold_result_scopes(
-//         graph: &mut QueryGraph,
-//         mut result_binding_names: Vec<String>,
-//         mut result_subgraphs: Vec<(EdgeRef, NodeRef)>,
-//     ) -> InterpretationResult<Expression> {
-//         let current_scope = result_scopes.split_off(0).pop().unwrap();
-//         let result_binding_name = current_scope.id();
-//         let has_sub_scopes = result_scopes.len() > 0; // todo necessary?
-//         let has_parent_scopes = result_binding_names.len() > 0;
-
-//         result_binding_names.push(result_binding_name.clone());
-
-//         let mut expressions: Vec<Expression> = current_scope
-//             .into_iter()
-//             .map(|(_, node)| {
-//                 let edges = graph.incoming_edges(&node);
-//                 Self::build_expression(graph, &node, edges)
-//             })
-//             .collect::<InterpretationResult<Vec<Expression>>>()?;
-
-//         // The first expression of every result scope is the one returning a potential result.
-//         let head = expressions.split_off(0).pop().unwrap();
-
-//         // If there are more scopes, build the nested ones.
-//         let last_expression = if has_sub_scopes {
-//             Self::fold_result_scopes(graph, result_binding_names, result_scopes)
-//         } else {
-//             // Else, build the final select if necessary
-//             Ok(Expression::GetFirstNonEmpty {
-//                 binding_names: result_binding_names,
-//             })
-//         }?;
-
-//         // When to bind the result expression to a Let:
-//         // - Result node has child expressions.
-//         // - Current scope has more subscopes.
-//         // - Current scope has parent scopes.
-//         if expressions.len() > 0 || has_sub_scopes || has_parent_scopes {
-//             expressions.push(last_expression);
-
-//             Ok(Expression::Let {
-//                 bindings: vec![Binding {
-//                     name: result_binding_name,
-//                     expr: head,
-//                 }],
-//                 expressions,
-//             })
-//         } else {
-//             Ok(head)
-//         }
-//     }
 }
 
 fn log_node_and_eges(prefix: &str, node: &NodeRef, parent_edges: &Vec<EdgeRef>) {

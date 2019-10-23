@@ -33,7 +33,7 @@ pub fn connect_nested_query(
         match field_name.as_str() {
             "create" => connect_nested_create(graph, parent, &parent_relation_field, value, &child_model)?,
             "update" => connect_nested_update(graph, &parent, &parent_relation_field, value, &child_model)?,
-            "upsert" => connect_nested_upsert(graph, parent, &parent_relation_field, value, &child_model)?,
+            "upsert" => connect_nested_upsert(graph, parent, &parent_relation_field, value)?,
             "delete" => connect_nested_delete(graph, &parent, &parent_relation_field, value, &child_model)?,
             "connect" => connect_nested_connect(graph, parent, &parent_relation_field, value, &child_model)?,
             "disconnect" => connect_nested_disconnect(graph, parent, &parent_relation_field, value, &child_model)?,

@@ -1,7 +1,7 @@
 //! Skeleton for QueryGraph invariance rules checker.
 //! Only basic POC rules jotted down at the moment, to be expanded later.
 use super::*;
-use itertools::Itertools;
+// use itertools::Itertools;
 
 /// Check validity of an edge creation.
 pub fn after_edge_creation(graph: &QueryGraph, edge: &EdgeRef) -> QueryGraphResult<()> {
@@ -53,7 +53,7 @@ fn disallow_self_edges(graph: &QueryGraph, edge: &EdgeRef) -> QueryGraphResult<(
 }
 
 /// Only allow multiple parent edges if all parents are ancestors of each other.
-fn only_allow_related_parents_edges(graph: &QueryGraph) -> QueryGraphResult<()> {
+fn only_allow_related_parents_edges(_graph: &QueryGraph) -> QueryGraphResult<()> {
     // for edge in graph.edges() {
     //     let target_node = graph.edge_target(&edge);
     //     let incoming_edges = graph.incoming_edges(&target_node);

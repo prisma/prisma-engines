@@ -6,7 +6,7 @@ use crate::{
     ParsedInputValue,
 };
 use connector::Filter;
-use prisma_models::{ModelRef, RelationFieldRef};
+use prisma_models::RelationFieldRef;
 use std::{convert::TryInto, sync::Arc};
 
 pub fn connect_nested_upsert(
@@ -14,11 +14,9 @@ pub fn connect_nested_upsert(
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
     value: ParsedInputValue,
-    child_model: &ModelRef,
 ) -> QueryGraphBuilderResult<()> {
     dbg!(&value);
     let model = parent_relation_field.related_model();
-    let relation = parent_relation_field.relation();
 
     for value in coerce_vec(value) {
         let mut as_map: ParsedInputMap = value.try_into()?;
@@ -45,7 +43,6 @@ pub fn connect_nested_upsert(
             &initial_read_node,
             &if_node,
             QueryGraphDependency::ParentIds(Box::new(|node, parent_ids| {
-                println!("IF gets called");
                 if let Node::Flow(Flow::If(_)) = node {
                     // Todo: This looks super unnecessary
                     Ok(Node::Flow(Flow::If(Box::new(move || !parent_ids.is_empty()))))
@@ -75,7 +72,6 @@ pub fn connect_nested_upsert(
         )?;
 
         graph.create_edge(&if_node, &update_node, QueryGraphDependency::Then)?;
-
         graph.create_edge(&if_node, &create_node, QueryGraphDependency::Else)?;
 
         if parent_relation_field.relation_is_inlined_in_child() {
@@ -84,7 +80,6 @@ pub fn connect_nested_upsert(
                 &parent_node,
                 &create_node,
                 QueryGraphDependency::ParentIds(Box::new(|mut child_node, mut parent_ids| {
-                    println!("THIS gets called");
                     let parent_id = match parent_ids.pop() {
                         Some(pid) => Ok(pid),
                         None => Err(QueryGraphBuilderError::AssertionError(format!(

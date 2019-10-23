@@ -492,7 +492,6 @@ class NestedDeleteMutationInsideUpdateSpec extends FlatSpec with Matchers with A
     }
   }
 
-  // transactionality again -.-
   "a PM to CM  relation" should "work" taggedAs (IgnoreMongo) in {
     schemaPMToCM.test { dataModel =>
       val project = SchemaDsl.fromStringV11() { dataModel }

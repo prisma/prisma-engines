@@ -17,7 +17,7 @@ use std::{convert::TryInto, sync::Arc};
 /// If the relation is not a list:
 /// - Just delete the one node that can be present, if desired (as it is a non-list, aka 1-to-1 relation).
 /// - The relation HAS to be inlined, because it is 1-to-1.
-/// - If the relation is inlined in the parent, we need to generate a read query to grab the id of the record we want to delete.
+/// - If the relation is inlined in the parent, we need to generate a read query to grab the ID of the record we want to delete.
 /// - If the relation is inlined but not in the parent, we can directly generate a delete on the record with the parent ID.
 pub fn connect_nested_delete(
     graph: &mut QueryGraph,
@@ -26,7 +26,6 @@ pub fn connect_nested_delete(
     value: ParsedInputValue,
     child_model: &ModelRef,
 ) -> QueryGraphBuilderResult<()> {
-    dbg!(&value);
     for value in utils::coerce_vec(value) {
         if relation_field.is_list {
             // Todo:
@@ -38,6 +37,7 @@ pub fn connect_nested_delete(
                 model: Arc::clone(&child_model),
                 filter: record_finder.into(),
             });
+
             let delete_many_node = graph.create_node(Query::Write(delete_many));
             let id_field = child_model.fields().id();
             let find_child_records_node =
@@ -46,10 +46,9 @@ pub fn connect_nested_delete(
             graph.create_edge(
                 &find_child_records_node,
                 &delete_many_node,
-                QueryGraphDependency::ParentIds(Box::new(move |mut node, mut parent_ids| {
+                QueryGraphDependency::ParentIds(Box::new(move |mut node, parent_ids| {
                     if let Node::Query(Query::Write(WriteQuery::DeleteManyRecords(ref mut ur))) = node {
-                        // TODO: we should not clone here
-                        let ids_filter = id_field.is_in(Some(parent_ids.clone()));
+                        let ids_filter = id_field.is_in(Some(parent_ids));
                         let new_filter = Filter::and(vec![ur.filter.clone(), ids_filter]);
 
                         ur.filter = new_filter;
@@ -60,7 +59,7 @@ pub fn connect_nested_delete(
             )?;
         } else {
             let val: PrismaValue = value.try_into()?;
-            let should_delete = if let PrismaValue::Boolean(b) = val { true } else { false };
+            let should_delete = if let PrismaValue::Boolean(b) = val { b } else { false };
 
             if should_delete {
                 let find_child_records_node =
@@ -126,10 +125,9 @@ pub fn connect_nested_delete_many(
         graph.create_edge(
             &find_child_records_node,
             &delete_many_node,
-            QueryGraphDependency::ParentIds(Box::new(move |mut node, mut parent_ids| {
+            QueryGraphDependency::ParentIds(Box::new(move |mut node, parent_ids| {
                 if let Node::Query(Query::Write(WriteQuery::DeleteManyRecords(ref mut ur))) = node {
-                    // TODO: we should not clone here
-                    let ids_filter = id_field.is_in(Some(parent_ids.clone()));
+                    let ids_filter = id_field.is_in(Some(parent_ids));
                     let new_filter = Filter::and(vec![ur.filter.clone(), ids_filter]);
 
                     ur.filter = new_filter;

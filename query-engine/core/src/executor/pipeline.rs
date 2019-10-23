@@ -1,4 +1,4 @@
-use crate::{format_expression, CoreResult, Env, Expressionista, IrSerializer, QueryGraph, QueryInterpreter, Response};
+use crate::{CoreResult, Env, Expressionista, IrSerializer, QueryGraph, QueryInterpreter, Response};
 
 pub struct QueryPipeline<'a> {
     graph: QueryGraph,

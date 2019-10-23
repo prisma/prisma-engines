@@ -14,8 +14,6 @@ pub fn connect_nested_set(
     value: ParsedInputValue,
     child_model: &ModelRef,
 ) -> QueryGraphBuilderResult<()> {
-    dbg!(&value);
-
     let mut finders = Vec::new();
     for value in utils::coerce_vec(value) {
         let record_finder = extract_record_finder(value, &child_model)?;
@@ -24,14 +22,16 @@ pub fn connect_nested_set(
 
     let child_read_query = utils::ids_read_query_infallible(&child_model, finders);
     let child_node = graph.create_node(child_read_query);
+
     graph.create_edge(&parent_node, &child_node, QueryGraphDependency::ExecutionOrder)?;
-    //    /connect::connect_records_node(graph, &parent_node, &child_node, &parent_relation_field, None, None)?;
+    // connect::connect_records_node(graph, &parent_node, &child_node, &parent_relation_field, None, None)?;
 
     let set = WriteQuery::SetRecords(SetRecords {
         parent: None,
         wheres: vec![],
         relation_field: Arc::clone(&parent_relation_field),
     });
+
     let set_node = graph.create_node(Query::Write(set));
 
     // Edge from parent to set.
@@ -64,7 +64,7 @@ pub fn connect_nested_set(
     graph.create_edge(
         &child_node,
         &set_node,
-        QueryGraphDependency::ParentIds(Box::new(|mut child_node, mut parent_ids| {
+        QueryGraphDependency::ParentIds(Box::new(|mut child_node, parent_ids| {
             if let Node::Query(Query::Write(WriteQuery::SetRecords(ref mut x))) = child_node {
                 x.wheres = parent_ids
                     .iter()

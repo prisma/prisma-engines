@@ -1,12 +1,11 @@
 use super::*;
 use crate::{
-    query_ast::*,
-    query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
+    query_graph::{NodeRef, QueryGraph, QueryGraphDependency},
     ParsedInputValue,
 };
 use connector::Filter;
 use prisma_models::{ModelRef, PrismaValue, RelationFieldRef};
-use std::{convert::TryInto, sync::Arc};
+use std::convert::TryInto;
 
 /// Handles nested connect cases.
 /// The resulting graph can take multiple forms, based on the relation type to the parent model.
@@ -26,7 +25,7 @@ pub fn connect_nested_disconnect(
         } else if relation.is_one_to_many() {
             handle_one_to_many(graph, parent_node, parent_relation_field, value, child_model)?;
         } else {
-            handle_one_to_one(graph, parent_node, parent_relation_field, value, child_model)?;
+            handle_one_to_one(graph, parent_node, parent_relation_field, value)?;
         }
     }
 
@@ -45,7 +44,7 @@ fn handle_many_to_many(
     let child_node = graph.create_node(child_read_query);
 
     graph.create_edge(&parent_node, &child_node, QueryGraphDependency::ExecutionOrder)?;
-    disconnect::disconnect_records_node(graph, &parent_node, &child_node, &parent_relation_field, None, None)?;
+    disconnect::disconnect_records_node(graph, &parent_node, &child_node, &parent_relation_field)?;
 
     Ok(())
 }
@@ -66,14 +65,8 @@ fn handle_one_to_many(
     let find_child_records_node =
         utils::insert_find_children_by_parent_node(graph, &parent_node, parent_relation_field, filter)?;
 
-    disconnect::disconnect_records_node(
-        graph,
-        &parent_node,
-        &find_child_records_node,
-        &parent_relation_field,
-        None,
-        None,
-    )?;
+    disconnect::disconnect_records_node(graph, &parent_node, &find_child_records_node, &parent_relation_field)?;
+
     Ok(())
 }
 
@@ -82,23 +75,15 @@ fn handle_one_to_one(
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
     value: ParsedInputValue,
-    child_model: &ModelRef,
 ) -> QueryGraphBuilderResult<()> {
     let val: PrismaValue = value.try_into()?;
-    let should_delete = if let PrismaValue::Boolean(b) = val { true } else { false };
+    let should_delete = if let PrismaValue::Boolean(b) = val { b } else { false };
 
     if should_delete {
         let find_child_records_node =
             utils::insert_find_children_by_parent_node(graph, &parent_node, parent_relation_field, Filter::empty())?;
 
-        disconnect::disconnect_records_node(
-            graph,
-            &parent_node,
-            &find_child_records_node,
-            &parent_relation_field,
-            None,
-            None,
-        )?;
+        disconnect::disconnect_records_node(graph, &parent_node, &find_child_records_node, &parent_relation_field)?;
     }
 
     Ok(())

@@ -326,21 +326,21 @@ impl QueryGraph {
             .collect()
     }
 
-    /// Returns all exclusive children of `node`.
-    /// An exclusive child has no other parents than `node`.
-    fn exclusive_child_pairs(&self, node: &NodeRef) -> Vec<(EdgeRef, NodeRef)> {
-        self.outgoing_edges(node)
-            .into_iter()
-            .filter_map(|edge| {
-                let target = self.edge_target(&edge);
-                if self.incoming_edges(&target).len() == 1 {
-                    Some((edge, target))
-                } else {
-                    None
-                }
-            })
-            .collect()
-    }
+    // /// Returns all exclusive children of `node`.
+    // /// An exclusive child has no other parents than `node`.
+    // fn exclusive_child_pairs(&self, node: &NodeRef) -> Vec<(EdgeRef, NodeRef)> {
+    //     self.outgoing_edges(node)
+    //         .into_iter()
+    //         .filter_map(|edge| {
+    //             let target = self.edge_target(&edge);
+    //             if self.incoming_edges(&target).len() == 1 {
+    //                 Some((edge, target))
+    //             } else {
+    //                 None
+    //             }
+    //         })
+    //         .collect()
+    // }
 
     /// Resolves and adds all source `NodeRef`s to the respective `EdgeRef`.
     pub fn zip_source_nodes(&self, edges: Vec<EdgeRef>) -> Vec<(EdgeRef, NodeRef)> {
@@ -383,14 +383,14 @@ impl QueryGraph {
         edges
     }
 
-    /// Returns all edges
-    fn edges(&self) -> Vec<EdgeRef> {
-        self.graph
-            .edge_indices()
-            .into_iter()
-            .map(|edge_ix| EdgeRef { edge_ix })
-            .collect()
-    }
+    // /// Returns all edges
+    // fn edges(&self) -> Vec<EdgeRef> {
+    //     self.graph
+    //         .edge_indices()
+    //         .into_iter()
+    //         .map(|edge_ix| EdgeRef { edge_ix })
+    //         .collect()
+    // }
 
     /// Marks a node pair for swapping.
     pub fn mark_nodes(&mut self, parent_node: &NodeRef, child_node: &NodeRef) {

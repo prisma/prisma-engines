@@ -117,10 +117,9 @@ pub fn connect_nested_update_many(
         graph.create_edge(
             &find_child_records_node,
             &update_many_node,
-            QueryGraphDependency::ParentIds(Box::new(move |mut node, mut parent_ids| {
+            QueryGraphDependency::ParentIds(Box::new(move |mut node, parent_ids| {
                 if let Node::Query(Query::Write(WriteQuery::UpdateManyRecords(ref mut ur))) = node {
-                    // TODO: we should not clone here
-                    let ids_filter = id_field.is_in(Some(parent_ids.clone()));
+                    let ids_filter = id_field.is_in(Some(parent_ids));
                     let new_filter = Filter::and(vec![ur.filter.clone(), ids_filter]);
 
                     ur.filter = new_filter;
@@ -130,5 +129,6 @@ pub fn connect_nested_update_many(
             })),
         )?;
     }
+
     Ok(())
 }

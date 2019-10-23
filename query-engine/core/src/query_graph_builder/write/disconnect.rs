@@ -6,8 +6,8 @@ use crate::{
 use prisma_models::RelationFieldRef;
 use std::{convert::TryInto, sync::Arc};
 
+/// Disconnects record IDs retrieved from `parent_node` and `child_node`.
 /// Adds a disconnect query node to the graph, together with required edges.
-/// Disconnects `parent` and `child`.
 ///
 /// A disconnect distinguishes between two cases:
 /// - Relation is many-to-many: Delete extra record (e.g. in a join table), `WriteQuery::Disconnect` query.
@@ -16,11 +16,9 @@ use std::{convert::TryInto, sync::Arc};
 /// Performs checks to make sure relations are not violated by the disconnect.
 pub fn disconnect_records_node(
     graph: &mut QueryGraph,
-    parent: &NodeRef,
-    child: &NodeRef,
+    parent_node: &NodeRef,
+    child_node: &NodeRef,
     relation_field: &RelationFieldRef,
-    parent_fn: Option<ParentIdsFn>,
-    child_fn: Option<ParentIdsFn>,
 ) -> QueryGraphBuilderResult<NodeRef> {
     let disconnect = WriteQuery::DisconnectRecords(DisconnectRecords {
         parent: None,
@@ -32,9 +30,9 @@ pub fn disconnect_records_node(
 
     // Edge from parent to disconnect.
     graph.create_edge(
-        parent,
+        parent_node,
         &disconnect_node,
-        QueryGraphDependency::ParentIds(parent_fn.unwrap_or_else(|| {
+        QueryGraphDependency::ParentIds(|| {
             Box::new(|mut child_node, mut parent_ids| {
                 let len = parent_ids.len();
                 if len == 0 {
@@ -55,12 +53,12 @@ pub fn disconnect_records_node(
                     Ok(child_node)
                 }
             })
-        })),
+        }),
     )?;
 
     // Edge from child to disconnect.
     graph.create_edge(
-        &child,
+        &child_node,
         &disconnect_node,
         QueryGraphDependency::ParentIds(child_fn.unwrap_or_else(|| {
             Box::new(|mut child_node, mut parent_ids| {
@@ -87,13 +85,4 @@ pub fn disconnect_records_node(
     )?;
 
     Ok(disconnect_node)
-}
-
-fn disconnect_m_to_n() -> () {
-    unimplemented!()
-}
-
-/// Implemented as an update on the
-fn disconnect_1_to_n() -> () {
-    unimplemented!()
 }
