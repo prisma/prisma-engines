@@ -4,7 +4,11 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use log::LevelFilter;
 use pretty_assertions::assert_eq;
 
-use datamodel::{common::{PrismaType, PrismaValue}, Datamodel, dml, Field, FieldArity, FieldType, IdInfo, IdStrategy, Model, OnDeleteStrategy, RelationInfo, ScalarListStrategy};
+use datamodel::{
+    common::{PrismaType, PrismaValue},
+    dml, Datamodel, Field, FieldArity, FieldType, IdInfo, IdStrategy, Model, OnDeleteStrategy, RelationInfo,
+    ScalarListStrategy,
+};
 use sql_introspection_connector::calculate_datamodel::calculate_model;
 use sql_schema_describer::*;
 
@@ -839,128 +843,117 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
     assert_eq!(data_model, ref_data_model);
 }
 
-
 #[test]
 fn multi_field_uniques_are_preserved_when_generating_data_model_from_a_schema() {
     setup();
 
     let ref_data_model = Datamodel {
-        models: vec![
-            Model {
-                database_name: None,
-                name: "User".to_string(),
-                documentation: None,
-                is_embedded: false,
-                fields: vec![
-                    Field {
-                        name: "id".to_string(),
-                        arity: FieldArity::Required,
-                        field_type: FieldType::Base(PrismaType::Int),
-                        database_name: None,
-                        default_value: None,
-                        is_unique: false,
-                        id_info: Some(IdInfo {
-                            strategy: IdStrategy::Auto,
-                            sequence: None,
-                        }),
-                        scalar_list_strategy: None,
-                        documentation: None,
-                        is_generated: false,
-                        is_updated_at: false,
-                    },
-                    Field {
-                        name: "name".to_string(),
-                        arity: FieldArity::Required,
-                        field_type: FieldType::Base(PrismaType::String),
-                        database_name: None,
-                        default_value: None,
-                        is_unique: false,
-                        id_info: None,
-                        scalar_list_strategy: None,
-                        documentation: None,
-                        is_generated: false,
-                        is_updated_at: false,
-                    },
-                    Field {
-                        name: "lastname".to_string(),
-                        arity: FieldArity::Required,
-                        field_type: FieldType::Base(PrismaType::String),
-                        database_name: None,
-                        default_value: None,
-                        is_unique: false,
-                        id_info: None,
-                        scalar_list_strategy: None,
-                        documentation: None,
-                        is_generated: false,
-                        is_updated_at: false,
-                    },
-                ],
-                is_generated: false,
-                indexes:               vec![  datamodel::dml::IndexDefinition {
-                            name: Some(
-                                "name_last_name_unique".to_string(),
-                            ),
-                            fields: vec![
-                                "name".to_string(),
-                                "lastname".to_string(),
-                            ],
-                            tpe: datamodel::dml::IndexType::Unique,
-                        },
-                ],
-                id_fields: vec![],
-            },
-        ],
+        models: vec![Model {
+            database_name: None,
+            name: "User".to_string(),
+            documentation: None,
+            is_embedded: false,
+            fields: vec![
+                Field {
+                    name: "id".to_string(),
+                    arity: FieldArity::Required,
+                    field_type: FieldType::Base(PrismaType::Int),
+                    database_name: None,
+                    default_value: None,
+                    is_unique: false,
+                    id_info: Some(IdInfo {
+                        strategy: IdStrategy::Auto,
+                        sequence: None,
+                    }),
+                    scalar_list_strategy: None,
+                    documentation: None,
+                    is_generated: false,
+                    is_updated_at: false,
+                },
+                Field {
+                    name: "name".to_string(),
+                    arity: FieldArity::Required,
+                    field_type: FieldType::Base(PrismaType::String),
+                    database_name: None,
+                    default_value: None,
+                    is_unique: false,
+                    id_info: None,
+                    scalar_list_strategy: None,
+                    documentation: None,
+                    is_generated: false,
+                    is_updated_at: false,
+                },
+                Field {
+                    name: "lastname".to_string(),
+                    arity: FieldArity::Required,
+                    field_type: FieldType::Base(PrismaType::String),
+                    database_name: None,
+                    default_value: None,
+                    is_unique: false,
+                    id_info: None,
+                    scalar_list_strategy: None,
+                    documentation: None,
+                    is_generated: false,
+                    is_updated_at: false,
+                },
+            ],
+            is_generated: false,
+            indexes: vec![datamodel::dml::IndexDefinition {
+                name: Some("name_last_name_unique".to_string()),
+                fields: vec!["name".to_string(), "lastname".to_string()],
+                tpe: datamodel::dml::IndexType::Unique,
+            }],
+            id_fields: vec![],
+        }],
         enums: vec![],
     };
 
     let schema = SqlSchema {
-        tables: vec![
-            Table {
-                name: "User".to_string(),
-                columns: vec![
-                    Column {
-                        name: "id".to_string(),
-                        tpe: ColumnType {
-                            raw: "integer".to_string(),
-                            family: ColumnTypeFamily::Int,
-                        },
-                        arity: ColumnArity::Required,
-                        default: None,
-                        auto_increment: true,
+        tables: vec![Table {
+            name: "User".to_string(),
+            columns: vec![
+                Column {
+                    name: "id".to_string(),
+                    tpe: ColumnType {
+                        raw: "integer".to_string(),
+                        family: ColumnTypeFamily::Int,
                     },
-                    Column {
-                        name: "name".to_string(),
-                        tpe: ColumnType {
-                            raw: "text".to_string(),
-                            family: ColumnTypeFamily::String,
-                        },
-                        arity: ColumnArity::Required,
-                        default: None,
-                        auto_increment: false,
+                    arity: ColumnArity::Required,
+                    default: None,
+                    auto_increment: true,
+                },
+                Column {
+                    name: "name".to_string(),
+                    tpe: ColumnType {
+                        raw: "text".to_string(),
+                        family: ColumnTypeFamily::String,
                     },
-                    Column {
-                        name: "lastname".to_string(),
-                        tpe: ColumnType {
-                            raw: "text".to_string(),
-                            family: ColumnTypeFamily::String,
-                        },
-                        arity: ColumnArity::Required,
-                        default: None,
-                        auto_increment: false,
+                    arity: ColumnArity::Required,
+                    default: None,
+                    auto_increment: false,
+                },
+                Column {
+                    name: "lastname".to_string(),
+                    tpe: ColumnType {
+                        raw: "text".to_string(),
+                        family: ColumnTypeFamily::String,
                     },
-                ],
-                indices: vec![Index{
-                    name: "name_last_name_unique".to_string(),
-                    columns:vec!["name".to_string(), "lastname".to_string()],
-                    tpe: IndexType::Unique
-                }],
-                primary_key: Some(PrimaryKey {
-                    columns: vec!["id".to_string()],
-                    sequence: None,
-                }),
-                foreign_keys: vec![],
-            }
-        ],
+                    arity: ColumnArity::Required,
+                    default: None,
+                    auto_increment: false,
+                },
+            ],
+            indices: vec![Index {
+                name: "name_last_name_unique".to_string(),
+                columns: vec!["name".to_string(), "lastname".to_string()],
+                tpe: IndexType::Unique,
+            }],
+            primary_key: Some(PrimaryKey {
+                columns: vec!["id".to_string()],
+                sequence: None,
+            }),
+            foreign_keys: vec![],
+        }],
         enums: vec![],
         sequences: vec![],
     };
@@ -968,8 +961,6 @@ fn multi_field_uniques_are_preserved_when_generating_data_model_from_a_schema() 
 
     assert_eq!(data_model, ref_data_model);
 }
-
-
 
 #[test]
 fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
@@ -1013,25 +1004,23 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                         is_updated_at: false,
                     },
                     Field {
-                    name: "users".to_string(),
-                    arity: FieldArity::List,
-                    field_type: FieldType::Relation(
-                        RelationInfo {
+                        name: "users".to_string(),
+                        arity: FieldArity::List,
+                        field_type: FieldType::Relation(RelationInfo {
                             to: "User".to_string(),
                             to_fields: vec!["city-id".to_string()],
-                            name: "City_User_city-id".to_string(),
+                            name: "CityToUser".to_string(),
                             on_delete: OnDeleteStrategy::None,
-                        },
-                    ),
-                    database_name: None,
-                    default_value: None,
-                    is_unique: false,
-                    id_info: None,
-                    scalar_list_strategy: None,
-                    documentation: None,
-                    is_generated: false,
-                    is_updated_at: false,
-                }
+                        }),
+                        database_name: None,
+                        default_value: None,
+                        is_unique: false,
+                        id_info: None,
+                        scalar_list_strategy: None,
+                        documentation: None,
+                        is_generated: false,
+                        is_updated_at: false,
+                    },
                 ],
                 is_generated: false,
                 indexes: vec![],
@@ -1060,7 +1049,7 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                         name: "city-id".to_string(),
                         arity: FieldArity::Required,
                         field_type: FieldType::Relation(RelationInfo {
-                            name: "City_User_city-id".to_string(),
+                            name: "CityToUser".to_string(),
                             to: "City".to_string(),
                             to_fields: vec!["id".to_string()],
                             on_delete: OnDeleteStrategy::None,
@@ -1144,7 +1133,7 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                 primary_key: None,
                 foreign_keys: vec![ForeignKey {
                     constraint_name: None,
-                    columns: vec!["city-id".to_string() ],
+                    columns: vec!["city-id".to_string()],
                     referenced_table: "City".to_string(),
                     on_delete_action: ForeignKeyAction::NoAction,
                     referenced_columns: vec!["id".to_string()],
