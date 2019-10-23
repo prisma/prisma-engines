@@ -220,37 +220,51 @@ fn handle_one_to_many(
 ///
 /// If the relation is inlined in the parent:
 /// ```text
-/// ┌────────────────┐
-/// │  Child Create  │
-/// └────────────────┘
-///          │
-///          ▼
-/// ┌────────────────┐
-/// │     Parent     │─────────┐
-/// └────────────────┘         │
-///          │                 │
-///          │  ┌ ─ ─ ─ ─ ─ ─ ─│─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┐
-///          │                 ▼
-///          │  │ ┌────────────────────────┐                            │
-///          │    │     Read ex. child     │──┐
-///          │  │ └────────────────────────┘  │                         │
-///          │                 │              │
-///          │  │              ▼              │(Fail on c > 0 if child  │
-///          │    ┌────────────────────────┐  │     side required)
-///          │  │ │ If c > 0 && c. inlined │  │                         │
-///          │    └────────────────────────┘  │
-///          │  │              │              │                         │
-///          │                 ▼              │
-///          │  │ ┌────────────────────────┐  │                         │
-///          │    │    Update ex. child    │◀─┘
-///          │  │ └────────────────────────┘                            │
-///          │
-///          │  └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘
-///          ▼
-///   ┌────────────┐
-///   │   Result   │
-///   └────────────┘
+///    ┌────────────────┐
+/// ┌──│  Child Create  │
+/// │  └────────────────┘
+/// │           │
+/// │           ▼
+/// │  ┌────────────────┐
+/// ├──│     Parent     │─────────┐
+/// │  └────────────────┘         │
+/// │           │                 │
+/// │           │                 │
+/// │           │  ┌ ─ ─ ─ ─ ─ ─ ─│─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┐
+/// │           │                 ▼
+/// │           │  │ ┌────────────────────────┐                            │
+/// │           │    │     Read ex. child     │──┐
+/// │           │  │ └────────────────────────┘  │                         │
+/// │           │                 │              │
+/// │           │  │              ▼              │(Fail on c > 0 if child  │
+/// │           │    ┌────────────────────────┐  │     side required)
+/// │           │  │ │ If c > 0 && c. inlined │  │                         │
+/// │           │    └────────────────────────┘  │
+/// │           │  │              │              │                         │
+/// │           │                 ▼              │
+/// │           │  │ ┌────────────────────────┐  │                         │
+/// │           │    │    Update ex. child    │◀─┘
+/// │           │  │ └────────────────────────┘                            │
+/// │           │
+/// │           │  └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘
+/// │           ▼
+/// │    ┌────────────┐
+/// │    │   Result   │
+/// │    └────────────┘
+/// │    ┌────────────┐
+/// └───▶│   Update   │ (if non-create)
+///      └────────────┘
 /// ```
+///
+/// Important: We can not inject from `Child Create` to `Parent` if `Parent` is a non-create, as it would cause
+/// the following issue (example):
+/// - Parent is an update, doesn't have a connected child on relation x.
+/// - Parent gets injected with a child on x, because that's what the neste dcreate is supposed to do.
+/// - The update runs, the relation is updated.
+/// - Now the check runs, because it's dependent on the parent's ID... but the check finds an existing child and fails...
+/// ... because we just updated the relation.
+///
+/// This is why we need to have an extra update at the end if it's inlined on the parent and a non-create.
 fn handle_one_to_one(
     graph: &mut QueryGraph,
     parent_node: NodeRef,
@@ -283,7 +297,7 @@ fn handle_one_to_one(
     // existing parent, either.
     // For the above reasons, the checks always live on `parent_node`.
     if !parent_is_create {
-        utils::insert_existing_1to1_related_model_checks(graph, &parent_node, parent_relation_field, false)?;
+        utils::insert_existing_1to1_related_model_checks(graph, &parent_node, parent_relation_field, true)?;
     }
 
     // If the relation is inlined on the parent, we swap the create and the parent to have the child ID for inlining.
@@ -303,10 +317,11 @@ fn handle_one_to_one(
         (parent_node, create_node, relation_field_name)
     };
 
+    let relation_field_name_pc = relation_field_name.clone();
     graph.create_edge(
         &parent_node,
         &child_node,
-        QueryGraphDependency::ParentIds(Box::new(|mut child_node, mut parent_ids| {
+        QueryGraphDependency::ParentIds(Box::new(move |mut child_node, mut parent_ids| {
             let parent_id = match parent_ids.pop() {
                 Some(pid) => Ok(pid),
                 None => Err(QueryGraphBuilderError::AssertionError(format!(
@@ -314,13 +329,60 @@ fn handle_one_to_one(
                 ))),
             }?;
 
-            if let Node::Query(Query::Write(ref mut wq)) = child_node {
-                wq.inject_non_list_arg(relation_field_name, parent_id);
+            // We ONLY inject creates here. Check doc comment for explanation.
+            if let Node::Query(Query::Write(WriteQuery::CreateRecord(ref mut cr))) = child_node {
+                cr.non_list_args.insert(relation_field_name_pc, parent_id);
             }
 
             Ok(child_node)
         })),
     )?;
+
+    // Relation is inlined on the Parent and a non-create.
+    // Create an update node for Parent to set the connection to the child.
+    // For explanation see doc comment.
+    if relation_inlined_parent && !parent_is_create {
+        let parent_model = parent_relation_field.model();
+        let parent_model_id = parent_model.fields().id();
+        let update_node = utils::update_record_node_placeholder(graph, None, parent_model);
+
+        graph.create_edge(
+            &child_node,
+            &update_node,
+            QueryGraphDependency::ParentIds(Box::new(|mut child_node, mut parent_ids| {
+                let parent_id = match parent_ids.pop() {
+                    Some(pid) => Ok(pid),
+                    None => Err(QueryGraphBuilderError::AssertionError(format!("[Query Graph] Expected a valid parent ID to be present for a nested create on a one-to-one relation, updating inlined on parent."))),
+                }?;
+
+                if let Node::Query(Query::Write(ref mut wq)) = child_node {
+                    wq.inject_non_list_arg(relation_field_name, parent_id);
+                }
+
+                Ok(child_node)
+            })),
+        )?;
+
+        graph.create_edge(
+            &parent_node,
+            &update_node,
+            QueryGraphDependency::ParentIds(Box::new(|mut child_node, mut parent_ids| {
+                let parent_id = match parent_ids.pop() {
+                    Some(pid) => Ok(pid),
+                    None => Err(QueryGraphBuilderError::AssertionError(format!("[Query Graph] Expected a valid parent ID to be present for a nested create on a one-to-one relation, updating inlined on parent."))),
+                }?;
+
+                if let Node::Query(Query::Write(ref mut wq)) = child_node {
+                    wq.inject_record_finder(RecordFinder {
+                        field: parent_model_id,
+                        value: parent_id,
+                    });
+                }
+
+                Ok(child_node)
+            })),
+        )?;
+    }
 
     Ok(())
 }

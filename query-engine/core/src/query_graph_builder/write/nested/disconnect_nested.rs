@@ -1,6 +1,6 @@
 use super::*;
 use crate::{
-    query_graph::{NodeRef, QueryGraph, QueryGraphDependency},
+    query_graph::{NodeRef, QueryGraph},
     ParsedInputValue,
 };
 use connector::Filter;
@@ -10,6 +10,7 @@ use std::convert::TryInto;
 /// Handles nested connect cases.
 /// The resulting graph can take multiple forms, based on the relation type to the parent model.
 /// Information on the graph shapes can be found on the individual handlers.
+/// Todo this is inefficient for multiple nested disconnects.
 pub fn connect_nested_disconnect(
     graph: &mut QueryGraph,
     parent_node: NodeRef,
@@ -40,12 +41,10 @@ fn handle_many_to_many(
     child_model: &ModelRef,
 ) -> QueryGraphBuilderResult<()> {
     let record_finder = extract_record_finder(value, &child_model)?;
-    let child_read_query = utils::id_read_query_infallible(&child_model, record_finder);
-    let child_node = graph.create_node(child_read_query);
+    let find_child_records_node =
+        utils::insert_find_children_by_parent_node(graph, &parent_node, parent_relation_field, record_finder)?;
 
-    graph.create_edge(&parent_node, &child_node, QueryGraphDependency::ExecutionOrder)?;
-    disconnect::disconnect_records_node(graph, &parent_node, &child_node, &parent_relation_field)?;
-
+    disconnect::disconnect_records_node(graph, &parent_node, &find_child_records_node, &parent_relation_field)?;
     Ok(())
 }
 
@@ -62,11 +61,11 @@ fn handle_one_to_many(
     } else {
         Filter::empty()
     };
+
     let find_child_records_node =
         utils::insert_find_children_by_parent_node(graph, &parent_node, parent_relation_field, filter)?;
 
     disconnect::disconnect_records_node(graph, &parent_node, &find_child_records_node, &parent_relation_field)?;
-
     Ok(())
 }
 
@@ -81,7 +80,7 @@ fn handle_one_to_one(
 
     if should_delete {
         let find_child_records_node =
-            utils::insert_find_children_by_parent_node(graph, &parent_node, parent_relation_field, Filter::empty())?;
+            utils::insert_find_children_by_parent_node(graph, &parent_node, parent_relation_field, None)?;
 
         disconnect::disconnect_records_node(graph, &parent_node, &find_child_records_node, &parent_relation_field)?;
     }

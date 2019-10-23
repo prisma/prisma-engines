@@ -294,7 +294,6 @@ class NestedCreateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
         errorCode = 3042,
         errorContains = "The change you are trying to make would violate the required relation 'ChildToParent' between Child and Parent"
       )
-
     }
   }
 

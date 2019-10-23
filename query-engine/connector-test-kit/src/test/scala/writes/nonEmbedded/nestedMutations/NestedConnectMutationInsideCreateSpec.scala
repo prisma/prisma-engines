@@ -56,7 +56,7 @@ class NestedConnectMutationInsideCreateSpec extends FlatSpec with Matchers with 
   }
 
   "a P1! to C1 relation with the child already in a relation" should "should fail on existing old parent" in {
-    schemaP1reqToC1opt.test { dataModel =>
+    schemaP1reqToC1opt.test(1) { dataModel =>
       val project = SchemaDsl.fromStringV11() { dataModel }
       database.setup(project)
 
