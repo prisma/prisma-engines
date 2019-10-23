@@ -2,6 +2,7 @@ use crate::commands::command::*;
 use crate::migration_engine::MigrationEngine;
 use migration_connector::steps::*;
 use migration_connector::*;
+use serde::Serialize;
 
 pub struct ListMigrationStepsCommand;
 
