@@ -59,8 +59,6 @@ impl CliCommand {
                 .expect("File should open read only");
             let input: DmmfFileToDmlInput = serde_json::from_reader(file)
                 .expect("File should be proper JSON");
-            println!("No. Models: {}",input.dmmf.models.len());
-            println!("No. Enums: {}",input.dmmf.enums.len());
 
             Some(Self::DmmfFileToDml(input))
         } else if matches.is_present("get_config") {
