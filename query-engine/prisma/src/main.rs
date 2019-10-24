@@ -71,6 +71,13 @@ fn main() -> Result<(), Box<dyn Error + Send + Sync + 'static>> {
                         .required(false),
                 )
                 .arg(
+                    Arg::with_name("dmmf_file_to_dml")
+                        .long("dmmf_file_to_dml")
+                        .help("Converts the given DMMF json file to a data model")
+                        .takes_value(true)
+                        .required(false),
+                )
+                .arg(
                     Arg::with_name("get_config")
                         .long("get_config")
                         .help("Get the configuration from the given data model")
