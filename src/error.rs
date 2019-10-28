@@ -62,6 +62,9 @@ pub enum Error {
 
     #[fail(display = "Operation timed out")]
     Timeout,
+
+    #[fail(display = "Error opening a TLS connection. {}", message)]
+    TlsError { message: String },
 }
 
 #[cfg(any(
