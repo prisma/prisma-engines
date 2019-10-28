@@ -19,7 +19,6 @@ impl Expressionista {
         node: &NodeRef,
         mut parent_edges: Vec<EdgeRef>,
     ) -> InterpretationResult<Expression> {
-        log_node_and_eges("build_expression", node, &parent_edges);
         match graph
             .node_content(node)
             .expect(&format!("Node content {} was empty", node.id()))
@@ -36,7 +35,6 @@ impl Expressionista {
     ) -> InterpretationResult<Expression> {
         // Child edges are ordered, evaluation order is low to high in the graph, unless other rules override.
         let mut direct_children = graph.direct_child_pairs(&node);
-        dbg!(&direct_children);
 
         // Find the positions of all result returning graph nodes.
         let result_positions: Vec<usize> = direct_children
@@ -50,8 +48,6 @@ impl Expressionista {
                 }
             })
             .collect();
-
-        dbg!(&result_positions);
 
         let result_subgraphs: Vec<(EdgeRef, NodeRef)> = result_positions
             .into_iter()
@@ -259,9 +255,4 @@ impl Expressionista {
             }],
         })
     }
-}
-
-fn log_node_and_eges(prefix: &str, node: &NodeRef, parent_edges: &Vec<EdgeRef>) {
-    let parent_edge_ids: Vec<String> = parent_edges.iter().map(|x| x.id()).collect();
-    println!("{} node: {} parents: {}", prefix, node.id(), parent_edge_ids.join(","));
 }

@@ -198,20 +198,12 @@ pub fn insert_existing_1to1_related_model_checks(
     let relation_field_name = parent_relation_field.related_field().name.clone();
     let if_node = graph.create_node(Flow::default_if());
 
-    let dbg_child_model_name = child_model_name.clone();
-    let dbg_relation_field_name = parent_relation_field.related_field().name.clone();
-
     graph.create_edge(
         &read_existing_children,
         &if_node,
         QueryGraphDependency::ParentIds(Box::new(move |node, child_ids| {
             // If the other side ("child") requires the connection, we need to make sure that there isn't a child already connected
             // to the parent, as that would violate the other childs relation side.
-            dbg!(&child_ids);
-            dbg!(child_side_required);
-            dbg!(dbg_child_model_name);
-            dbg!(dbg_relation_field_name);
-
             if perform_relation_check && child_ids.len() > 0 && child_side_required {
                 return Err(QueryGraphBuilderError::RelationViolation(rf.into()));
             }
@@ -236,8 +228,6 @@ pub fn insert_existing_1to1_related_model_checks(
             }?;
 
             if let Node::Query(Query::Write(ref mut wq)) = child_node {
-                println!("[1:1 Checks] Injecting field '{}' with value '{:?}', to update existing child node from read existing children check (model: {}) ", &relation_field_name, &child_id, child_model_name);
-
                 let finder = RecordFinder {
                     field: child_model_id_field,
                     value: child_id,

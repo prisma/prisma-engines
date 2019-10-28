@@ -41,7 +41,6 @@ fn if_flow_edge_rules(graph: &QueryGraph, edge: &EdgeRef) -> QueryGraphResult<()
 
 fn disallow_self_edges(graph: &QueryGraph, edge: &EdgeRef) -> QueryGraphResult<()> {
     if graph.edge_source(edge).id() == graph.edge_target(edge).id() {
-        println!("{}", graph);
         return Err(QueryGraphError::InvarianceViolation(format!(
             "Edge {} is an edge pointing to the same node it originated from (node {}). This is disallowed.",
             edge.id(),
@@ -75,7 +74,6 @@ fn only_allow_related_parents_edges(_graph: &QueryGraph) -> QueryGraphResult<()>
     //     let check = if failed_parent_combination.is_none() {
     //         Ok(())
     //     } else {
-    //         println!("{}", graph);
     //         let unwrapped = failed_parent_combination.unwrap();
     //         Err(QueryGraphError::InvarianceViolation(format!(
     //             "Edge {} from node {} to node {} violates constraint that all parents must be ancestors of each other.",

@@ -15,7 +15,6 @@ pub fn connect_nested_upsert(
     parent_relation_field: &RelationFieldRef,
     value: ParsedInputValue,
 ) -> QueryGraphBuilderResult<()> {
-    dbg!(&value);
     let model = parent_relation_field.related_model();
 
     for value in coerce_vec(value) {

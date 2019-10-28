@@ -26,13 +26,10 @@ pub fn connect_nested_create(
         .collect::<QueryGraphBuilderResult<Vec<NodeRef>>>()?;
 
     if relation.is_many_to_many() {
-        dbg!("n:m", parent_relation_field);
         handle_many_to_many(graph, parent_node, parent_relation_field, creates)?;
     } else if relation.is_one_to_many() {
-        dbg!("1:m", parent_relation_field);
         handle_one_to_many(graph, parent_node, parent_relation_field, creates)?;
     } else {
-        dbg!("1:1", parent_relation_field);
         handle_one_to_one(graph, parent_node, parent_relation_field, creates)?;
     }
 
@@ -135,7 +132,6 @@ fn handle_one_to_many(
         graph.mark_nodes(&parent_node, &create_node);
         // let (parent_node, child_node) = utils::swap_nodes(graph, parent_node, create_node)?;
 
-        dbg!("p inl", parent_node.id(), create_node.id());
         graph.create_edge(
             &parent_node,
             &create_node,
@@ -159,7 +155,6 @@ fn handle_one_to_many(
             // For the injection, we need the name of the field on the inlined side, in this case the child.
             let relation_field_name = parent_relation_field.related_field().name.clone();
 
-            dbg!("c inl", parent_node.id(), create_node.id());
             graph.create_edge(
                 &parent_node,
                 &create_node,

@@ -63,7 +63,7 @@ impl Env {
 
 pub struct QueryInterpreter<'a> {
     pub(crate) tx: &'a mut dyn TransactionLike,
-    log: String,
+    pub log: String,
 }
 
 impl<'a> QueryInterpreter<'a> {
@@ -140,10 +140,6 @@ impl<'a> QueryInterpreter<'a> {
                 }
             }
         }
-    }
-
-    pub fn print_log(&self) {
-        println!("{}", self.log);
     }
 
     fn log_line(&mut self, s: String, level: usize) {

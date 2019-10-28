@@ -262,14 +262,12 @@ impl QueryGraph {
     /// Removes the edge from the graph but leaves the graph intact by keeping the empty
     /// edge in the graph by plucking the content of the edge, but not the edge itself.
     pub fn pluck_edge(&mut self, edge: &EdgeRef) -> QueryGraphDependency {
-        println!("plucking edge: {}", edge.id());
         self.graph.edge_weight_mut(edge.edge_ix).unwrap().unset()
     }
 
     /// Removes the node from the graph but leaves the graph intact by keeping the empty
     /// node in the graph by plucking the content of the node, but not the node itself.
     pub fn pluck_node(&mut self, node: &NodeRef) -> Node {
-        println!("plucking node: {}", node.id());
         self.graph.node_weight_mut(node.node_ix).unwrap().unset()
     }
 
@@ -326,22 +324,6 @@ impl QueryGraph {
             .collect()
     }
 
-    // /// Returns all exclusive children of `node`.
-    // /// An exclusive child has no other parents than `node`.
-    // fn exclusive_child_pairs(&self, node: &NodeRef) -> Vec<(EdgeRef, NodeRef)> {
-    //     self.outgoing_edges(node)
-    //         .into_iter()
-    //         .filter_map(|edge| {
-    //             let target = self.edge_target(&edge);
-    //             if self.incoming_edges(&target).len() == 1 {
-    //                 Some((edge, target))
-    //             } else {
-    //                 None
-    //             }
-    //         })
-    //         .collect()
-    // }
-
     /// Resolves and adds all source `NodeRef`s to the respective `EdgeRef`.
     pub fn zip_source_nodes(&self, edges: Vec<EdgeRef>) -> Vec<(EdgeRef, NodeRef)> {
         edges
@@ -356,18 +338,9 @@ impl QueryGraph {
     /// Checks if `ancestor` is in any of the ancestor nodes of `successor_node`.
     /// Determined by trying to reach `successor_node` from `ancestor`.
     pub fn is_ancestor(&self, ancestor: &NodeRef, successor_node: &NodeRef) -> bool {
-        // TODO: this used to call exclusive_child_pairs. Discuss implications of this change with Dom
         self.child_pairs(ancestor)
             .into_iter()
-            .find(|(_, child_node)| {
-                //                println!(
-                //                    "ancestor {} has child {}, is_ancestor: {}",
-                //                    ancestor.id(),
-                //                    child_node.id(),
-                //                    child_node == successor_node
-                //                );
-                child_node == successor_node || self.is_ancestor(&child_node, &successor_node)
-            })
+            .find(|(_, child_node)| child_node == successor_node || self.is_ancestor(&child_node, &successor_node))
             .is_some()
     }
 
@@ -382,15 +355,6 @@ impl QueryGraph {
         edges.sort();
         edges
     }
-
-    // /// Returns all edges
-    // fn edges(&self) -> Vec<EdgeRef> {
-    //     self.graph
-    //         .edge_indices()
-    //         .into_iter()
-    //         .map(|edge_ix| EdgeRef { edge_ix })
-    //         .collect()
-    // }
 
     /// Marks a node pair for swapping.
     pub fn mark_nodes(&mut self, parent_node: &NodeRef, child_node: &NodeRef) {
@@ -407,7 +371,7 @@ impl QueryGraph {
     ///
     /// Any edge existing between `parent` and `child` will change direction and will point from `child` to `parent` instead.
     ///
-    /// Important exception: If a parent node is a `Flow` node, we need to completely remove the edge to the flow node and rewire it to the child.
+    /// **Important exception**: If a parent node is a `Flow` node, we need to completely remove the edge to the flow node and rewire it to the child.
     ///
     /// ## Example transformation
     /// Given the marked pairs `[(A, B), (B, C), (B, D)]` and a graph (depicting the state before the transformation):
@@ -465,7 +429,7 @@ impl QueryGraph {
     /// todo put if flow exception illustration here.
     fn swap_marked(&mut self) -> QueryGraphResult<()> {
         if self.marked_node_pairs.len() > 0 {
-            println!("before swapping: {}", self);
+            trace!("[Graph][Swap] Before shape: {}", self);
         }
 
         let mut marked = std::mem::replace(&mut self.marked_node_pairs, vec![]);
@@ -489,8 +453,8 @@ impl QueryGraph {
                     }
 
                     _ => {
-                        println!(
-                            "[Swap] Connecting parent of parent {} with child {}",
+                        trace!(
+                            "[Graph][Swap] Connecting parent of parent {} with child {}",
                             parent_of_parent_node.id(),
                             child_node.id()
                         );

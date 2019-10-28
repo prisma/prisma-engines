@@ -18,14 +18,13 @@ impl<'a> QueryPipeline<'a> {
     pub fn execute(mut self) -> CoreResult<Response> {
         // Run final validations and transformations.
         self.graph.finalize()?;
+        trace!("{}", self.graph);
 
         let serializer = self.serializer;
-
-        println!("{}", self.graph);
         let expr = Expressionista::translate(self.graph)?;
         let result = self.interpreter.interpret(expr, Env::default(), 0);
 
-        self.interpreter.print_log();
+        trace!("{}", self.interpreter.log);
         Ok(serializer.serialize(result?))
     }
 }
