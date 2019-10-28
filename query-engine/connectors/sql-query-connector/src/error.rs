@@ -136,8 +136,6 @@ impl From<prisma_query::error::Error> for SqlError {
             prisma_query::error::Error::IoError(e) => Self::ConnectionError(e.into()),
             prisma_query::error::Error::NotFound => Self::RecordDoesNotExist,
             prisma_query::error::Error::InvalidConnectionArguments => Self::InvalidConnectionArguments,
-            prisma_query::error::Error::ConnectTimeout => Self::ConnectionError(e.into()),
-            prisma_query::error::Error::Timeout => Self::ConnectionError(e.into()),
 
             prisma_query::error::Error::UniqueConstraintViolation { field_name } => {
                 Self::UniqueConstraintViolation { field_name }
@@ -146,10 +144,6 @@ impl From<prisma_query::error::Error> for SqlError {
             prisma_query::error::Error::NullConstraintViolation { field_name } => {
                 Self::NullConstraintViolation { field_name }
             }
-
-            prisma_query::error::Error::DatabaseDoesNotExist { db_name } => Self::DatabaseDoesNotExist { db_name },
-            prisma_query::error::Error::DatabaseAccessDenied { db_name } => Self::DatabaseAccessDenied { db_name },
-            prisma_query::error::Error::AuthenticationFailed { user } => Self::AuthenticationFailed { user },
 
             prisma_query::error::Error::ConnectionError(e) => Self::ConnectionError(e.into()),
             prisma_query::error::Error::ColumnReadFailure(e) => Self::ColumnReadFailure(e.into()),

@@ -1,9 +1,5 @@
 use super::SqlConnectorTransaction;
-use crate::{
-    error::SqlError,
-    query_builder::{DeleteActions, WriteQueryBuilder},
-    QueryExt,
-};
+use crate::{error::SqlError, query_builder::WriteQueryBuilder, QueryExt};
 use connector_interface::{error::ConnectorError, *};
 use prisma_models::*;
 use prisma_query::{connector::Queryable, error::Error as QueryError};
@@ -103,11 +99,6 @@ impl<T> WriteOperations for SqlConnectorTransaction<'_, T> {
         if count == 0 {
             return Ok(count);
         }
-
-        DeleteActions::check_relation_violations(Arc::clone(&model), ids.as_slice(), |select| {
-            let ids = self.inner.select_ids(select)?;
-            Ok(ids.into_iter().next())
-        })?;
 
         for delete in WriteQueryBuilder::delete_many(model, ids.as_slice()) {
             self.inner.delete(delete).map_err(SqlError::from)?;

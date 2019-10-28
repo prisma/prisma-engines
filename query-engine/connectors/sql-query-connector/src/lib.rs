@@ -12,18 +12,16 @@ mod error;
 mod filter_conversion;
 mod ordering;
 mod query_builder;
+mod query_ext;
 mod raw_query;
 mod row;
-mod operations;
-mod query_ext;
 
 use filter_conversion::*;
+use query_ext::QueryExt;
 use raw_query::*;
 use row::*;
-use query_ext::QueryExt;
 
 pub use database::*;
 pub use error::SqlError;
-pub use operations::*;
 
 type Result<T> = std::result::Result<T, error::SqlError>;
