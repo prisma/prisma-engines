@@ -43,6 +43,10 @@ pub enum Flow {
     /// Expresses a conditional control flow in the graph.
     /// Possible outgoing edges are `then` and `else`, each at most once, with `then` required to be present.
     If(Box<dyn FnOnce() -> bool>),
+
+    /// Empty node, will return empty result on interpretation.
+    /// Useful for checks that are only supposed to fail and noop on success.
+    Empty,
 }
 
 impl Flow {

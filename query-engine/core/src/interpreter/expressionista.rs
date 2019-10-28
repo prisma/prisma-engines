@@ -163,6 +163,7 @@ impl Expressionista {
         let flow: Flow = graph.pluck_node(node).try_into()?;
 
         match flow {
+            Flow::Empty => Ok(Expression::Sequence { seq: vec![] }),
             Flow::If(_) => {
                 let child_pairs = graph.child_pairs(node);
 
@@ -217,6 +218,8 @@ impl Expressionista {
                                                     else_: else_expr,
                                                 })
                                             }
+
+                                            _ => unreachable!(),
                                         }
                                     }),
                                 }

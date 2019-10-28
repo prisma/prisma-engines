@@ -4,6 +4,7 @@ use crate::{
     ParsedInputValue, QueryGraphBuilderError, QueryGraphBuilderResult,
 };
 use connector::{filter::RecordFinder, Filter, QueryArguments};
+use itertools::Itertools;
 use prisma_models::{ModelRef, PrismaArgs, PrismaValue, RelationFieldRef, SelectedFields};
 use std::{convert::TryInto, sync::Arc};
 
@@ -185,7 +186,6 @@ pub fn insert_existing_1to1_related_model_checks(
     perform_relation_check: bool,
 ) -> QueryGraphBuilderResult<()> {
     let child_model = parent_relation_field.related_model();
-    let child_model_name = child_model.name.clone();
     let child_model_id_field = child_model.fields().id();
     let child_side_required = parent_relation_field.related_field().is_required;
     let relation_inlined_parent = parent_relation_field.relation_is_inlined_in_parent();
@@ -241,4 +241,56 @@ pub fn insert_existing_1to1_related_model_checks(
         })))?;
 
     Ok(())
+}
+
+/// Checks all required, non-list relations pointing to the given `model` prior to a delete (`deleteOne` or `deleteMany`).
+/// Expects `parent_node` to return one or more IDs (for records of `model`) to be checked.
+///
+/// Inserts the following into the graph, attached to `parent_node`, assuming we have 2 relations
+/// pointing to `model` (e.g. originating from model `A` and `B`):
+/// ```text
+/// asd
+/// ```
+///
+/// Returns a `NodeRef` that returns an empty result to allow the caller to depend on the checks' execution before
+fn check_all_required_relations_deletion(
+    graph: &mut QueryGraph,
+    model: &ModelRef,
+    parent_node: &NodeRef,
+) -> QueryGraphBuilderResult<NodeRef> {
+    let internal_model = model.internal_data_model();
+    let relation_fields = internal_model.fields_requiring_model(model);
+    let mut check_nodes = vec![];
+    let noop_node = graph.create_node(Node::Flow(Flow::Empty));
+
+    // We know that the relation can't be a list and must be required on the related model for `model` (see fields_requiring_model).
+    // For all requiring models (RM), we use the field on `model` to query for existing RM records and error out if at least one exists.
+    for rf in relation_fields {
+        let relation_field = rf.related_field();
+        let read_node = insert_find_children_by_parent_node(graph, parent_node, &relation_field, None)?;
+
+        graph.create_edge(
+            &read_node,
+            &noop_node,
+            QueryGraphDependency::ParentIds(Box::new(move |node, parent_ids| {
+                if !parent_ids.is_empty() {
+                    return Err(QueryGraphBuilderError::RelationViolation((relation_field).into()));
+                }
+
+                Ok(node)
+            })),
+        )?;
+
+        check_nodes.push(read_node);
+    }
+
+    check_nodes.into_iter().fold1(|prev, next| {
+        graph
+            .create_edge(&prev, &next, QueryGraphDependency::ExecutionOrder)
+            .unwrap();
+
+        next
+    });
+
+    Ok(noop_node)
 }
