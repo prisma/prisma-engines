@@ -1,4 +1,5 @@
 use crate::*;
+use sql_connection::SyncSqlConnection;
 use sql_renderer::SqlRenderer;
 use sql_schema_describer::*;
 use std::sync::Arc;
@@ -6,7 +7,7 @@ use std::sync::Arc;
 pub struct SqlDatabaseStepApplier {
     pub sql_family: SqlFamily,
     pub schema_name: String,
-    pub conn: Arc<dyn MigrationDatabase + Send + Sync + 'static>,
+    pub conn: Arc<dyn SyncSqlConnection + Send + Sync + 'static>,
 }
 
 #[allow(unused, dead_code)]

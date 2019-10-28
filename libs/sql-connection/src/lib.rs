@@ -10,7 +10,7 @@ use tokio::runtime::Runtime;
 use tokio_resource_pool::{CheckOut, Manage};
 use url::Url;
 
-pub trait SyncSqlConnection: SqlConnection {
+pub trait SyncSqlConnection {
     fn execute(&self, db: &str, q: Query) -> Result<Option<Id>, QueryError>;
     fn query(&self, db: &str, q: Query) -> Result<ResultSet, QueryError>;
     fn query_raw(&self, db: &str, sql: &str, params: &[ParameterizedValue]) -> Result<ResultSet, QueryError>;
@@ -34,8 +34,7 @@ type SqlitePool = Pool<SqliteManager>;
 
 pub struct Sqlite {
     pool: SqlitePool,
-    // TODO: remove this before merging if it is used nowhere
-    _file_path: String,
+    file_path: String,
     // TODO: remove this when we remove the sync API
     runtime: Runtime,
 }
@@ -49,13 +48,17 @@ impl Sqlite {
 
         Ok(Self {
             pool,
-            _file_path: file_path,
+            file_path,
             runtime: default_runtime(),
         })
     }
 
     async fn get_connection(&self) -> Result<CheckOut<SqliteManager>, QueryError> {
         self.pool.check_out().await
+    }
+
+    pub fn file_path(&self) -> &str {
+        self.file_path.as_str()
     }
 }
 

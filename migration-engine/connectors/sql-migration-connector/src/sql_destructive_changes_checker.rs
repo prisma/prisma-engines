@@ -1,14 +1,12 @@
-use crate::{
-    DropColumn, DropTable, DropTables, MigrationDatabase, SqlError, SqlMigration, SqlMigrationStep, SqlResult,
-    TableChange,
-};
+use crate::{DropColumn, DropTable, DropTables, SqlError, SqlMigration, SqlMigrationStep, SqlResult, TableChange};
 use migration_connector::*;
 use prisma_query::ast::*;
+use sql_connection::SyncSqlConnection;
 use std::sync::Arc;
 
 pub struct SqlDestructiveChangesChecker {
     pub schema_name: String,
-    pub database: Arc<dyn MigrationDatabase + Send + Sync>,
+    pub database: Arc<dyn SyncSqlConnection + Send + Sync>,
 }
 
 impl SqlDestructiveChangesChecker {

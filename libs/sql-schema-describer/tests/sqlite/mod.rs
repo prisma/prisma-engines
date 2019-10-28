@@ -1,5 +1,6 @@
 use log::debug;
 use prisma_query::{ast::ParameterizedValue, connector::Queryable};
+use sql_connection::{Sqlite, SyncSqlConnection};
 use sql_schema_describer::*;
 use std::path::Path;
 use std::sync::{Arc, Mutex};
@@ -30,21 +31,22 @@ pub fn get_sqlite_describer(sql: &str) -> sqlite::SqlSchemaDescriber {
         std::fs::remove_file(database_file_path.clone()).expect("remove database file");
     }
 
-    let conn = rusqlite::Connection::open_in_memory().expect("opening SQLite connection should work");
-    conn.execute(
-        "ATTACH DATABASE ? as ?",
-        &vec![database_file_path.clone(), String::from(SCHEMA)],
-    )
-    .expect("attach SQLite database");
-    debug!("Executing migration: {}", sql);
-    conn.execute_batch(sql).expect("executing migration");
-    conn.close().expect("closing SQLite connection");
+    let conn = Sqlite::new(&database_file_path).unwrap();
+    // let conn = rusqlite::Connection::open_in_memory().expect("opening SQLite connection should work");
+    // conn.execute(
+    //     "ATTACH DATABASE ? as ?",
+    //     &vec![database_file_path.clone(), String::from(SCHEMA)],
+    // )
+    // .expect("attach SQLite database");
+    // debug!("Executing migration: {}", sql);
+    conn.execute_raw(SCHEMA, sql, &[]).expect("executing migration");
+    // conn.close().expect("closing SQLite connection");
 
-    let mut queryable =
-        prisma_query::connector::Sqlite::new(database_file_path).expect("opening prisma_query::connector::Sqlite");
-    queryable.attach_database(SCHEMA).expect("attaching database");
-    let int_conn = Arc::new(SqliteConnection {
-        client: Mutex::new(queryable),
-    });
-    sqlite::SqlSchemaDescriber::new(int_conn)
+    // let mut queryable =
+    //     prisma_query::connector::Sqlite::new(database_file_path).expect("opening prisma_query::connector::Sqlite");
+    // queryable.attach_database(SCHEMA).expect("attaching database");
+    // let int_conn = Arc::new(SqliteConnection {
+    //     client: Mutex::new(queryable),
+    // });
+    sqlite::SqlSchemaDescriber::new(Arc::new(conn))
 }

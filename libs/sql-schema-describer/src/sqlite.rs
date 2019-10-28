@@ -1,13 +1,13 @@
 //! SQLite description.
 use super::*;
-use crate::SqlConnection;
 use log::debug;
 use prisma_query::ast::ParameterizedValue;
+use sql_connection::SyncSqlConnection;
 use std::collections::HashMap;
 use std::sync::Arc;
 
 pub struct SqlSchemaDescriber {
-    conn: Arc<dyn SqlConnection>,
+    conn: Arc<dyn SyncSqlConnection + Send + Sync + 'static>,
 }
 
 impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
@@ -35,7 +35,7 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
 
 impl SqlSchemaDescriber {
     /// Constructor.
-    pub fn new(conn: Arc<dyn SqlConnection>) -> SqlSchemaDescriber {
+    pub fn new(conn: Arc<dyn SyncSqlConnection + Send + Sync + 'static>) -> SqlSchemaDescriber {
         SqlSchemaDescriber { conn }
     }
 

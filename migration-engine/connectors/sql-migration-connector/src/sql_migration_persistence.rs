@@ -1,4 +1,3 @@
-use super::MigrationDatabase;
 use super::SqlFamily;
 use barrel::types;
 use chrono::*;
@@ -6,11 +5,12 @@ use migration_connector::*;
 use prisma_query::ast::*;
 use prisma_query::connector::ResultSet;
 use serde_json;
+use sql_connection::SyncSqlConnection;
 use std::sync::Arc;
 
 pub struct SqlMigrationPersistence {
     pub sql_family: SqlFamily,
-    pub connection: Arc<dyn MigrationDatabase + Send + Sync + 'static>,
+    pub connection: Arc<dyn SyncSqlConnection + Send + Sync + 'static>,
     pub schema_name: String,
     pub file_path: Option<String>,
 }

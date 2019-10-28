@@ -1,8 +1,6 @@
 #[macro_use]
 extern crate log;
 
-pub mod migration_database;
-
 mod error;
 mod sql_database_migration_inferrer;
 mod sql_database_step_applier;
@@ -17,9 +15,9 @@ pub use error::*;
 pub use sql_migration::*;
 
 use migration_connector::*;
-use migration_database::*;
 use prisma_query::connector::{MysqlParams, PostgresParams};
 use serde_json;
+use sql_connection::{Mysql, Postgresql, Sqlite, SyncSqlConnection};
 use sql_database_migration_inferrer::*;
 use sql_database_step_applier::*;
 use sql_destructive_changes_checker::*;
@@ -36,7 +34,7 @@ pub struct SqlMigrationConnector {
     pub file_path: Option<String>,
     pub sql_family: SqlFamily,
     pub schema_name: String,
-    pub database: Arc<dyn MigrationDatabase + Send + Sync + 'static>,
+    pub database: Arc<dyn SyncSqlConnection + Send + Sync + 'static>,
     pub migration_persistence: Arc<dyn MigrationPersistence>,
     pub database_migration_inferrer: Arc<dyn DatabaseMigrationInferrer<SqlMigration>>,
     pub database_migration_step_applier: Arc<dyn DatabaseMigrationStepApplier<SqlMigration>>,
@@ -67,7 +65,7 @@ impl SqlMigrationConnector {
         let params = PostgresParams::try_from(url.clone())?;
 
         let schema = params.schema.clone();
-        let conn = PostgreSql::new(params, pooled)?;
+        let conn = Postgresql::new(params, pooled)?;
 
         Ok(Self::create_connector(
             url_str,
@@ -114,25 +112,12 @@ impl SqlMigrationConnector {
 
     fn create_connector(
         url: &str,
-        conn: Arc<dyn MigrationDatabase + Send + Sync + 'static>,
+        conn: Arc<dyn SyncSqlConnection + Send + Sync + 'static>,
         sql_family: SqlFamily,
         schema_name: String,
         file_path: Option<String>,
     ) -> Self {
-        let introspection_connection = Arc::new(MigrationDatabaseWrapper {
-            database: Arc::clone(&conn),
-        });
-        let inspector: Arc<dyn SqlSchemaDescriberBackend + Send + Sync + 'static> = match sql_family {
-            SqlFamily::Sqlite => Arc::new(sql_schema_describer::sqlite::SqlSchemaDescriber::new(
-                introspection_connection,
-            )),
-            SqlFamily::Postgres => Arc::new(sql_schema_describer::postgres::SqlSchemaDescriber::new(
-                introspection_connection,
-            )),
-            SqlFamily::Mysql => Arc::new(sql_schema_describer::mysql::SqlSchemaDescriber::new(
-                introspection_connection,
-            )),
-        };
+        let inspector = conn.clone();
 
         let migration_persistence = Arc::new(SqlMigrationPersistence {
             sql_family,

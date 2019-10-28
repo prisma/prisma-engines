@@ -2,6 +2,7 @@
 use failure::Fail;
 use prisma_query::ast::ParameterizedValue;
 use serde::{Deserialize, Serialize};
+use sql_connection::SyncSqlConnection;
 use std::collections::HashSet;
 use std::fmt;
 
@@ -29,6 +30,17 @@ pub trait SqlConnection: Send + Sync + 'static {
         schema: &str,
         params: &[ParameterizedValue],
     ) -> prisma_query::Result<prisma_query::connector::ResultSet>;
+}
+
+impl SqlConnection for dyn SyncSqlConnection + Send + Sync + 'static {
+    fn query_raw(
+        &self,
+        sql: &str,
+        schema: &str,
+        params: &[ParameterizedValue],
+    ) -> prisma_query::Result<prisma_query::connector::ResultSet> {
+        <Self as SyncSqlConnection>::query_raw(self, schema, sql, params)
+    }
 }
 
 /// A database description connector.
