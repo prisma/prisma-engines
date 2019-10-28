@@ -15,6 +15,7 @@ members = [
   "libs/datamodel",
   "libs/prisma-inflector",
   "libs/sql-schema-describer",
+  "libs/sql-connection",
   "libs/logger",
 ]
 

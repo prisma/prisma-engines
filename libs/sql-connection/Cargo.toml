@@ -1,0 +1,16 @@
+[package]
+name = "sql-connection"
+version = "0.1.0"
+authors = ["Tom Houlé <tom@tomhoule.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+prisma-query = { git = "https://github.com/prisma/prisma-query.git", branch = "async-await" }
+async-trait = "0.1.17"
+failure = "0.1.6"
+tokio-resource-pool = { git = "https://github.com/pimeys/tokio-resource-pool" }
+async-std = "0.99.10"
+url = "1.7.0"
+tokio = "0.2.0-alpha.6"
