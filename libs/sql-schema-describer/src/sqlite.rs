@@ -42,7 +42,7 @@ impl SqlSchemaDescriber {
     fn get_table_names(&self, schema: &str) -> Vec<String> {
         let sql = format!(r#"SELECT name FROM "{}".sqlite_master WHERE type='table'"#, schema);
         debug!("describing table names with query: '{}'", sql);
-        let result_set = self.conn.query_raw(&sql, schema, &[]).expect("get table names");
+        let result_set = self.conn.query_raw(schema, &sql, &[]).expect("get table names");
         let names = result_set
             .into_iter()
             .map(|row| row.get("name").and_then(|x| x.to_string()).unwrap())
@@ -69,7 +69,7 @@ impl SqlSchemaDescriber {
     fn get_columns(&self, schema: &str, table: &str) -> (Vec<Column>, Option<PrimaryKey>) {
         let sql = format!(r#"PRAGMA "{}".table_info ("{}")"#, schema, table);
         debug!("describing table columns, query: '{}'", sql);
-        let result_set = self.conn.query_raw(&sql, schema, &[]).unwrap();
+        let result_set = self.conn.query_raw(schema, &sql, &[]).unwrap();
         let mut pk_cols: HashMap<i64, String> = HashMap::new();
         let mut cols: Vec<Column> = result_set
             .into_iter()
@@ -166,7 +166,7 @@ impl SqlSchemaDescriber {
         debug!("describing table foreign keys, SQL: '{}'", sql);
         let result_set = self
             .conn
-            .query_raw(&sql, schema, &[])
+            .query_raw(schema, &sql, &[])
             .expect("querying for foreign keys");
 
         // Since one foreign key with multiple columns will be represented here as several
@@ -258,7 +258,7 @@ impl SqlSchemaDescriber {
     fn get_indices(&self, schema: &str, table: &str) -> Vec<Index> {
         let sql = format!(r#"PRAGMA "{}".index_list("{}");"#, schema, table);
         debug!("describing table indices, SQL: '{}'", sql);
-        let result_set = self.conn.query_raw(&sql, schema, &[]).expect("querying for indices");
+        let result_set = self.conn.query_raw(schema, &sql, &[]).expect("querying for indices");
         debug!("Got indices description results: {:?}", result_set);
         result_set
             .into_iter()
@@ -278,7 +278,7 @@ impl SqlSchemaDescriber {
 
                 let sql = format!(r#"PRAGMA "{}".index_info("{}");"#, schema, name);
                 debug!("describing table index '{}', SQL: '{}'", name, sql);
-                let result_set = self.conn.query_raw(&sql, schema, &[]).expect("querying for index info");
+                let result_set = self.conn.query_raw(schema, &sql, &[]).expect("querying for index info");
                 debug!("Got index description results: {:?}", result_set);
                 for row in result_set.into_iter() {
                     let pos = row.get("seqno").and_then(|x| x.as_i64()).expect("get seqno") as usize;

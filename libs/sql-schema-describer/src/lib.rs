@@ -21,28 +21,6 @@ pub enum SqlSchemaDescriberError {
 /// The result type.
 pub type SqlSchemaDescriberResult<T> = core::result::Result<T, SqlSchemaDescriberError>;
 
-/// Connection abstraction for the description backends.
-pub trait SqlConnection: Send + Sync + 'static {
-    /// Make raw SQL query.
-    fn query_raw(
-        &self,
-        sql: &str,
-        schema: &str,
-        params: &[ParameterizedValue],
-    ) -> prisma_query::Result<prisma_query::connector::ResultSet>;
-}
-
-impl SqlConnection for dyn SyncSqlConnection + Send + Sync + 'static {
-    fn query_raw(
-        &self,
-        sql: &str,
-        schema: &str,
-        params: &[ParameterizedValue],
-    ) -> prisma_query::Result<prisma_query::connector::ResultSet> {
-        <Self as SyncSqlConnection>::query_raw(self, schema, sql, params)
-    }
-}
-
 /// A database description connector.
 pub trait SqlSchemaDescriberBackend: Send + Sync + 'static {
     /// List the database's schemas.

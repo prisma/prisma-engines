@@ -1,10 +1,11 @@
 use super::*;
 use log::debug;
+use sql_connection::SyncSqlConnection;
 use std::collections::{BTreeMap, HashMap};
 use std::sync::Arc;
 
 pub struct SqlSchemaDescriber {
-    conn: Arc<dyn SqlConnection>,
+    conn: Arc<dyn SyncSqlConnection + Send + Sync + 'static>,
 }
 
 impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
@@ -29,7 +30,7 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
 
 impl SqlSchemaDescriber {
     /// Constructor.
-    pub fn new(conn: Arc<dyn SqlConnection>) -> SqlSchemaDescriber {
+    pub fn new(conn: Arc<dyn SyncSqlConnection + Send + Sync + 'static>) -> SqlSchemaDescriber {
         SqlSchemaDescriber { conn }
     }
 
@@ -42,7 +43,7 @@ impl SqlSchemaDescriber {
             ORDER BY table_name";
         let rows = self
             .conn
-            .query_raw(sql, schema, &[schema.into()])
+            .query_raw(schema, sql, &[schema.into()])
             .expect("get table names ");
         let names = rows
             .into_iter()
@@ -83,7 +84,7 @@ impl SqlSchemaDescriber {
 
         let rows = self
             .conn
-            .query_raw(sql, schema, &[schema.into(), table.into()])
+            .query_raw(schema, sql, &[schema.into(), table.into()])
             .expect("querying for columns");
         let cols = rows
             .into_iter()
@@ -162,7 +163,7 @@ impl SqlSchemaDescriber {
 
         let result_set = self
             .conn
-            .query_raw(sql, schema, &[schema.into(), table.into()])
+            .query_raw(schema, sql, &[schema.into(), table.into()])
             .expect("querying for foreign keys");
         let mut intermediate_fks: HashMap<String, ForeignKey> = HashMap::new();
         for row in result_set.into_iter() {
@@ -264,7 +265,7 @@ impl SqlSchemaDescriber {
         debug!("describing indices, SQL: {}", sql);
         let rows = self
             .conn
-            .query_raw(sql, schema, &[schema.into(), table_name.into()])
+            .query_raw(schema, sql, &[schema.into(), table_name.into()])
             .expect("querying for indices");
 
         // Multi-column indices will return more than one row (with different column_name values).

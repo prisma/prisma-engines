@@ -2,11 +2,12 @@
 use super::*;
 use log::debug;
 use regex::Regex;
+use sql_connection::SyncSqlConnection;
 use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
 
 pub struct SqlSchemaDescriber {
-    conn: Arc<dyn SqlConnection>,
+    conn: Arc<dyn SyncSqlConnection + Send + Sync + 'static>,
 }
 
 impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
@@ -33,7 +34,7 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
 
 impl SqlSchemaDescriber {
     /// Constructor.
-    pub fn new(conn: Arc<dyn SqlConnection>) -> SqlSchemaDescriber {
+    pub fn new(conn: Arc<dyn SyncSqlConnection + Send + Sync + 'static>) -> SqlSchemaDescriber {
         SqlSchemaDescriber { conn }
     }
 
@@ -46,7 +47,7 @@ impl SqlSchemaDescriber {
             ORDER BY table_name";
         let rows = self
             .conn
-            .query_raw(sql, schema, &[schema.into()])
+            .query_raw(schema, sql, &[schema.into()])
             .expect("get table names ");
         let names = rows
             .into_iter()
@@ -82,7 +83,7 @@ impl SqlSchemaDescriber {
             ORDER BY column_name";
         let rows = self
             .conn
-            .query_raw(&sql, schema, &[schema.into(), table.into()])
+            .query_raw(schema, &sql, &[schema.into(), table.into()])
             .expect("querying for columns");
         let cols = rows
             .into_iter()
@@ -188,7 +189,7 @@ impl SqlSchemaDescriber {
         // objects.
         let result_set = self
             .conn
-            .query_raw(&sql, schema, &[table.into(), schema.into()])
+            .query_raw(schema, &sql, &[table.into(), schema.into()])
             .expect("querying for foreign keys");
         let mut intermediate_fks: HashMap<i64, ForeignKey> = HashMap::new();
         for row in result_set.into_iter() {
@@ -293,7 +294,7 @@ impl SqlSchemaDescriber {
         debug!("Getting indices: {}", sql);
         let rows = self
             .conn
-            .query_raw(&sql, schema, &[schema.into(), table_name.into()])
+            .query_raw(schema, &sql, &[schema.into(), table_name.into()])
             .expect("querying for indices");
         let mut pk: Option<PrimaryKey> = None;
         let indices = rows
@@ -349,7 +350,7 @@ impl SqlSchemaDescriber {
             let re_seq = Regex::new("^(?:.+\\.)?\"?([^.\"]+)\"?").expect("compile regex");
             let rows = self
                 .conn
-                .query_raw(&sql, schema, &[])
+                .query_raw(schema, &sql, &[])
                 .expect("querying for sequence seeding primary key column");
             // Given the result rows, find any sequence
             rows.into_iter().fold(None, |_: Option<Sequence>, row| {
@@ -379,7 +380,7 @@ impl SqlSchemaDescriber {
                   WHERE sequence_schema = $1";
         let rows = self
             .conn
-            .query_raw(&sql, schema, &[schema.into()])
+            .query_raw(schema, &sql, &[schema.into()])
             .expect("querying for sequences");
         let sequences = rows
             .into_iter()
@@ -416,7 +417,7 @@ impl SqlSchemaDescriber {
             WHERE n.nspname = $1";
         let rows = self
             .conn
-            .query_raw(&sql, schema, &[schema.into()])
+            .query_raw(schema, &sql, &[schema.into()])
             .expect("querying for enums");
         let mut enum_values: HashMap<String, HashSet<String>> = HashMap::new();
         for row in rows.into_iter() {

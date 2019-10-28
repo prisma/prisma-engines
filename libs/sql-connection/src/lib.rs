@@ -1,3 +1,5 @@
+// #![deny(warnings, missing_docs, rust_2018_idioms)]
+
 use async_std::sync::{Mutex, MutexGuard};
 use prisma_query::{
     ast::*,
@@ -11,10 +13,10 @@ use tokio_resource_pool::{CheckOut, Manage};
 use url::Url;
 
 pub trait SyncSqlConnection {
-    fn execute(&self, db: &str, q: Query) -> Result<Option<Id>, QueryError>;
-    fn query(&self, db: &str, q: Query) -> Result<ResultSet, QueryError>;
-    fn query_raw(&self, db: &str, sql: &str, params: &[ParameterizedValue]) -> Result<ResultSet, QueryError>;
-    fn execute_raw(&self, db: &str, sql: &str, params: &[ParameterizedValue]) -> Result<u64, QueryError>;
+    fn execute(&self, db: &str, q: Query<'_>) -> Result<Option<Id>, QueryError>;
+    fn query(&self, db: &str, q: Query<'_>) -> Result<ResultSet, QueryError>;
+    fn query_raw(&self, db: &str, sql: &str, params: &[ParameterizedValue<'_>]) -> Result<ResultSet, QueryError>;
+    fn execute_raw(&self, db: &str, sql: &str, params: &[ParameterizedValue<'_>]) -> Result<u64, QueryError>;
 }
 
 #[async_trait::async_trait]
@@ -40,6 +42,7 @@ pub struct Sqlite {
 }
 
 impl Sqlite {
+    /// Create a connection pool to an SQLite database.
     pub fn new(url: &str) -> Result<Self, QueryError> {
         let params = SqliteParams::try_from(url)?;
         let file_path = params.file_path.to_str().unwrap().to_string();
@@ -53,62 +56,81 @@ impl Sqlite {
         })
     }
 
-    async fn get_connection(&self) -> Result<CheckOut<SqliteManager>, QueryError> {
-        self.pool.check_out().await
-    }
-
+    /// The filesystem path of connection's database.
     pub fn file_path(&self) -> &str {
         self.file_path.as_str()
+    }
+
+    async fn get_connection(&self, db: &str) -> Result<CheckOut<SqliteManager>, QueryError> {
+        let conn = self.pool.check_out().await?;
+
+        conn.execute_raw( "ATTACH DATABASE ? AS ?",
+            &[
+            ParameterizedValue::from(self.file_path.as_str()),
+            ParameterizedValue::from(db),
+            ],
+        ).await?;
+
+        Ok(conn)
+    }
+
+    async fn detach_database(&self, db: &str, conn: CheckOut<SqliteManager>) -> Result<(), QueryError> {
+        conn.execute_raw("DETACH DATABASE ?", &[ParameterizedValue::from(db)]).await?;
+        Ok(())
     }
 }
 
 #[async_trait::async_trait]
 impl SqlConnection for Sqlite {
-    async fn execute<'a>(&self, _: &str, q: Query<'a>) -> Result<Option<Id>, QueryError> {
-        let conn = self.get_connection().await?;
-        conn.execute(q).await
+    async fn execute<'a>(&self, db: &str, q: Query<'a>) -> Result<Option<Id>, QueryError> {
+        let conn = self.get_connection(db).await?;
+        let result = conn.execute(q).await;
+        self.detach_database(db, conn).await;
+        result
     }
 
-    async fn query<'a>(&self, _: &str, q: Query<'a>) -> Result<ResultSet, QueryError> {
-        let conn = self.get_connection().await?;
-        conn.query(q).await
+    async fn query<'a>(&self, db: &str, q: Query<'a>) -> Result<ResultSet, QueryError> {
+        let conn = self.get_connection(db).await?;
+        let result = conn.query(q).await;
+        self.detach_database(db, conn).await;
+        result
     }
 
     async fn query_raw<'a>(
         &self,
-        _: &str,
+        db: &str,
         sql: &str,
         params: &[ParameterizedValue<'a>],
     ) -> Result<ResultSet, QueryError> {
-        let conn = self.get_connection().await?;
-        conn.query_raw(sql, params).await
+        let conn = self.get_connection(db).await?;
+        let result = conn.query_raw(sql, params).await;
+        self.detach_database(db, conn).await;
+        result
     }
 
-    async fn execute_raw<'a>(&self, _: &str, sql: &str, params: &[ParameterizedValue<'a>]) -> Result<u64, QueryError> {
-        let conn = self.get_connection().await?;
-        conn.execute_raw(sql, params).await
+    async fn execute_raw<'a>(&self, db: &str, sql: &str, params: &[ParameterizedValue<'a>]) -> Result<u64, QueryError> {
+        let conn = self.get_connection(db).await?;
+        let result = conn.execute_raw(sql, params).await;
+        self.detach_database(db, conn).await;
+        result
     }
 }
 
 impl SyncSqlConnection for Sqlite {
-    fn execute(&self, _db: &str, q: Query) -> Result<Option<Id>, QueryError> {
-        let conn = self.runtime.block_on(self.get_connection())?;
-        self.runtime.block_on(conn.execute(q))
+    fn execute(&self, db: &str, q: Query<'_>) -> Result<Option<Id>, QueryError> {
+        self.runtime.block_on(<Self as SqlConnection>::execute(self, db, q))
     }
 
-    fn query(&self, _db: &str, q: Query) -> Result<ResultSet, QueryError> {
-        let conn = self.runtime.block_on(self.get_connection())?;
-        self.runtime.block_on(conn.query(q))
+    fn query(&self, db: &str, q: Query<'_>) -> Result<ResultSet, QueryError> {
+        self.runtime.block_on(<Self as SqlConnection>::query(self, db, q))
     }
 
-    fn query_raw(&self, _db: &str, sql: &str, params: &[ParameterizedValue]) -> Result<ResultSet, QueryError> {
-        let conn = self.runtime.block_on(self.get_connection())?;
-        self.runtime.block_on(conn.query_raw(sql, params))
+    fn query_raw(&self, db: &str, sql: &str, params: &[ParameterizedValue<'_>]) -> Result<ResultSet, QueryError> {
+        self.runtime.block_on(<Self as SqlConnection>::query_raw(self, db, sql, params))
     }
 
-    fn execute_raw(&self, _db: &str, sql: &str, params: &[ParameterizedValue]) -> Result<u64, QueryError> {
-        let conn = self.runtime.block_on(self.get_connection())?;
-        self.runtime.block_on(conn.execute_raw(sql, params))
+    fn execute_raw(&self, db: &str, sql: &str, params: &[ParameterizedValue<'_>]) -> Result<u64, QueryError> {
+        self.runtime.block_on(<Self as SqlConnection>::execute_raw(self, db, sql, params))
     }
 }
 
@@ -228,22 +250,22 @@ impl SqlConnection for Postgresql {
 }
 
 impl SyncSqlConnection for Postgresql {
-    fn execute(&self, _db: &str, q: Query) -> Result<Option<Id>, QueryError> {
+    fn execute(&self, _db: &str, q: Query<'_>) -> Result<Option<Id>, QueryError> {
         let conn = self.runtime.block_on(self.get_connection())?;
         self.runtime.block_on(conn.as_queryable().execute(q))
     }
 
-    fn query(&self, _db: &str, q: Query) -> Result<ResultSet, QueryError> {
+    fn query(&self, _db: &str, q: Query<'_>) -> Result<ResultSet, QueryError> {
         let conn = self.runtime.block_on(self.get_connection())?;
         self.runtime.block_on(conn.as_queryable().query(q))
     }
 
-    fn query_raw(&self, _db: &str, sql: &str, params: &[ParameterizedValue]) -> Result<ResultSet, QueryError> {
+    fn query_raw(&self, _db: &str, sql: &str, params: &[ParameterizedValue<'_>]) -> Result<ResultSet, QueryError> {
         let conn = self.runtime.block_on(self.get_connection())?;
         self.runtime.block_on(conn.as_queryable().query_raw(sql, params))
     }
 
-    fn execute_raw(&self, _db: &str, sql: &str, params: &[ParameterizedValue]) -> Result<u64, QueryError> {
+    fn execute_raw(&self, _db: &str, sql: &str, params: &[ParameterizedValue<'_>]) -> Result<u64, QueryError> {
         let conn = self.runtime.block_on(self.get_connection())?;
         self.runtime.block_on(conn.as_queryable().execute_raw(sql, params))
     }
@@ -310,22 +332,22 @@ impl SqlConnection for Mysql {
 }
 
 impl SyncSqlConnection for Mysql {
-    fn execute(&self, _db: &str, q: Query) -> Result<Option<Id>, QueryError> {
+    fn execute(&self, _db: &str, q: Query<'_>) -> Result<Option<Id>, QueryError> {
         let conn = self.runtime.block_on(self.get_connection())?;
         self.runtime.block_on(conn.as_queryable().execute(q))
     }
 
-    fn query(&self, _db: &str, q: Query) -> Result<ResultSet, QueryError> {
+    fn query(&self, _db: &str, q: Query<'_>) -> Result<ResultSet, QueryError> {
         let conn = self.runtime.block_on(self.get_connection())?;
         self.runtime.block_on(conn.as_queryable().query(q))
     }
 
-    fn query_raw(&self, _db: &str, sql: &str, params: &[ParameterizedValue]) -> Result<ResultSet, QueryError> {
+    fn query_raw(&self, _db: &str, sql: &str, params: &[ParameterizedValue<'_>]) -> Result<ResultSet, QueryError> {
         let conn = self.runtime.block_on(self.get_connection())?;
         self.runtime.block_on(conn.as_queryable().query_raw(sql, params))
     }
 
-    fn execute_raw(&self, _db: &str, sql: &str, params: &[ParameterizedValue]) -> Result<u64, QueryError> {
+    fn execute_raw(&self, _db: &str, sql: &str, params: &[ParameterizedValue<'_>]) -> Result<u64, QueryError> {
         let conn = self.runtime.block_on(self.get_connection())?;
         self.runtime.block_on(conn.as_queryable().execute_raw(sql, params))
     }
