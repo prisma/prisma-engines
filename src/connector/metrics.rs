@@ -34,7 +34,7 @@ where
                 tracing::info!(
                     query,
                     params = %Params(params),
-                    duration_ns = start.elapsed().as_nanos() as u64,
+                    duration_ms = start.elapsed().as_millis() as u64,
                 )
             }
         }
