@@ -63,6 +63,12 @@ impl From<tokio_postgres::error::Error> for Error {
                 Error::DatabaseAlreadyExists { db_name }
             }
             _ => {
+                // This is necessary, on top of the other conversions, for the cases where a
+                // native_tls error comes wrapped in a tokio_postgres error.
+                if let Some(tls_error) = try_extracting_tls_error(&e) {
+                    return tls_error;
+                }
+
                 let reason = format!("{}", e);
 
                 match reason.as_str() {
@@ -74,8 +80,24 @@ impl From<tokio_postgres::error::Error> for Error {
     }
 }
 
+fn try_extracting_tls_error(err: &tokio_postgres::error::Error) -> Option<Error> {
+    use std::error::Error;
+
+    err.source()
+        .and_then(|err| err.downcast_ref::<native_tls::Error>())
+        .map(|err| err.into())
+}
+
 impl From<native_tls::Error> for Error {
     fn from(e: native_tls::Error) -> Error {
-        Error::ConnectionError(e.into())
+        Error::from(&e)
+    }
+}
+
+impl From<&native_tls::Error> for Error {
+    fn from(e: &native_tls::Error) -> Error {
+        Error::TlsError {
+            message: format!("{}", e),
+        }
     }
 }
