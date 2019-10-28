@@ -76,7 +76,7 @@ impl SqlSchemaDescriber {
             .map(|row| {
                 debug!("Got column row {:?}", row);
                 let default_value = match row.get("dflt_value") {
-                    Some(ParameterizedValue::Text(v)) => Some(v.to_string()),
+                    Some(ParameterizedValue::Text(v)) => Some(v.to_string().replace("\"", "")),
                     Some(ParameterizedValue::Null) => None,
                     Some(p) => panic!(format!("expected a string value but got {:?}", p)),
                     None => panic!("couldn't get dflt_value column"),
@@ -309,18 +309,18 @@ fn get_column_type(tpe: &str) -> ColumnType {
         s if s.contains("char") => ColumnTypeFamily::String,
         s if s.contains("numeric") => ColumnTypeFamily::Float,
         "date" => ColumnTypeFamily::DateTime,
+        "datetime" => ColumnTypeFamily::DateTime,
         "binary" => ColumnTypeFamily::Binary,
         "double" => ColumnTypeFamily::Float,
         "binary[]" => ColumnTypeFamily::Binary,
         "boolean[]" => ColumnTypeFamily::Boolean,
         "date[]" => ColumnTypeFamily::DateTime,
-        "datetime" => ColumnTypeFamily::DateTime,
         "datetime[]" => ColumnTypeFamily::DateTime,
         "double[]" => ColumnTypeFamily::Float,
         "float[]" => ColumnTypeFamily::Float,
         "integer[]" => ColumnTypeFamily::Int,
         "text[]" => ColumnTypeFamily::String,
-        x => panic!(format!("type '{}' is not supported here yet", x)),
+        _ => ColumnTypeFamily::Unknown, //        x => panic!(format!("type '{}' is not supported here yet", x)),
     };
     ColumnType {
         raw: tpe.to_string(),
