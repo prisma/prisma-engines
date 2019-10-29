@@ -136,6 +136,7 @@ impl ValueValidator {
         }
     }
 
+    /// returns true if this argument is derived from an env() function
     pub fn is_from_env(&self) -> bool {
         match &self.value {
             MaybeExpression::Value(Some(_), _) => true,
