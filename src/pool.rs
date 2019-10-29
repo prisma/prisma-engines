@@ -8,7 +8,7 @@ mod sqlite;
 pub use mysql::MysqlManager;
 pub use postgres::PostgresManager;
 pub use sqlite::SqliteManager;
-pub use tokio_resource_pool::Pool;
+pub use tokio_resource_pool::{CheckOut, Manage, Pool};
 
 use crate::connector::{MysqlParams, PostgresParams, SqliteParams};
 use std::convert::TryFrom;
