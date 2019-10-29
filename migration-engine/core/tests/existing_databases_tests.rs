@@ -443,9 +443,7 @@ impl BarrelMigrationExecutor {
 }
 
 fn run_full_sql(database: &Arc<dyn SyncSqlConnection + Send + Sync>, full_sql: &str) {
-    for sql in full_sql.split(";") {
-        if sql != "" {
-            database.query_raw(SCHEMA_NAME, &sql, &[]).unwrap();
-        }
+    for sql in full_sql.split(";").filter(|sql| !sql.is_empty()) {
+        database.query_raw(SCHEMA_NAME, &sql, &[]).unwrap();
     }
 }

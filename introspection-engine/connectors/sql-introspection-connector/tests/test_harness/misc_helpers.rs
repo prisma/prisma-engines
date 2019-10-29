@@ -4,7 +4,7 @@ use introspection_connector::IntrospectionConnector;
 use pretty_assertions::assert_eq;
 use prisma_query::connector::{MysqlParams, PostgresParams};
 use sql_introspection_connector::*;
-use std::{convert::TryFrom, rc::Rc, sync::Arc};
+use std::{rc::Rc, sync::Arc};
 use url::Url;
 
 #[derive(Debug, Copy, Clone, PartialEq)]
