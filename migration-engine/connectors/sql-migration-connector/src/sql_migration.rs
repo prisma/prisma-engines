@@ -45,6 +45,15 @@ pub enum SqlMigrationStep {
     AlterIndex(AlterIndex),
 }
 
+/// A helper struct to serialize an [SqlMigrationStep](/sql-migration/enum.SqlMigrationStep.html)
+/// with an additional `raw` field containing the rendered SQL string for that step.
+#[derive(Debug, Serialize, Deserialize, PartialEq)]
+pub struct PrettySqlMigrationStep {
+    #[serde(flatten)]
+    pub step: SqlMigrationStep,
+    pub raw: String,
+}
+
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct CreateTable {
     pub table: Table,
@@ -71,6 +80,9 @@ pub enum TableChange {
     AddColumn(AddColumn),
     AlterColumn(AlterColumn),
     DropColumn(DropColumn),
+    /// This is actually producing SQL only on MySQL, where we have to drop the foreign key
+    /// constraint before any column that is part of it.
+    DropForeignKey(DropForeignKey),
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
@@ -87,6 +99,11 @@ pub struct DropColumn {
 pub struct AlterColumn {
     pub name: String,
     pub column: Column,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
+pub struct DropForeignKey {
+    pub constraint_name: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]

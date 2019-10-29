@@ -1,7 +1,8 @@
 use crate::commands::command::*;
 use crate::migration_engine::MigrationEngine;
-use chrono::*;
+use chrono::{DateTime, Utc};
 use migration_connector::*;
+use serde::{Deserialize, Serialize};
 
 pub struct MigrationProgressCommand<'a> {
     input: &'a MigrationProgressInput,

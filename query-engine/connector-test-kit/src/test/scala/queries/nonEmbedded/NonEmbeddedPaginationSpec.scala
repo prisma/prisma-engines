@@ -48,6 +48,28 @@ class NonEmbeddedPaginationSpecForUuids extends NonEmbeddedPaginationSpec {
   }
 }
 
+// TODO: the base spec assumes that ids are some kind of string. Hence this spec can't work right now.
+// TODO: This would be a lot easier to handle if the query engine would coerce strings to ints if possible.
+class NonEmbeddedPaginationSpecForInts extends NonEmbeddedPaginationSpec {
+  override lazy val project = SchemaDsl.fromStringV11() {
+    """
+      |model List {
+      |  id        Int      @id
+      |  createdAt DateTime @default(now())
+      |  name      String   @unique
+      |  todos     Todo[]
+      |}
+      |
+      |model Todo {
+      |  id        Int      @id
+      |  createdAt DateTime @default(now())
+      |  title     String   @unique
+      |  list      List     @relation(references: [id])
+      |}
+    """
+  }
+}
+
 trait NonEmbeddedPaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
 
   override def doNotRun = true // TODO: Dom must say whether we support pagination or not. Those tests rely on relay connections

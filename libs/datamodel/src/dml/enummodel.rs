@@ -1,4 +1,4 @@
-use super::traits::*;
+use super::*;
 
 /// Represents an enum in the datamodel.
 #[derive(Debug, PartialEq, Clone)]

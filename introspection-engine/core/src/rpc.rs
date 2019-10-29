@@ -29,7 +29,7 @@ impl Rpc for RpcImpl {
 
     fn introspect(&self, url: UrlInput) -> Result<String> {
         let data_model = Self::introspect_internal(url)?;
-        Ok(datamodel::render_to_string(&data_model).expect("Datamodel rendering failed"))
+        Ok(datamodel::render_datamodel_to_string(&data_model).expect("Datamodel rendering failed"))
     }
 }
 

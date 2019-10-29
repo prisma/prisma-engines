@@ -1,13 +1,14 @@
-mod traits;
-pub use traits::*;
 mod builtin;
+mod traits;
+
 use crate::ast;
 use crate::common::{
     value::{MaybeExpression, ValueValidator},
     PrismaType,
 };
-use crate::errors::ValidationError;
-pub use builtin::*;
+use crate::error::DatamodelError;
+
+use traits::*;
 
 // Client side funcs
 const BUILTIN_ENV_FUNCTIONAL: builtin::EnvFunctional = builtin::EnvFunctional {};
@@ -36,12 +37,12 @@ const BUILTIN_FUNCTIONALS: [&dyn Functional; 4] = [
 
 /// Evaluator for arbitrary expressions.
 pub struct FunctionalEvaluator {
-    value: ast::Value,
+    value: ast::Expression,
 }
 
 impl FunctionalEvaluator {
     /// Wraps a value into a function evaluator.
-    pub fn new(value: &ast::Value) -> FunctionalEvaluator {
+    pub fn new(value: &ast::Expression) -> FunctionalEvaluator {
         FunctionalEvaluator { value: value.clone() }
     }
 
@@ -51,9 +52,9 @@ impl FunctionalEvaluator {
     /// be identified and and executed.
     ///
     /// Otherwise, if the value is a constant, the value is returned as-is.
-    pub fn evaluate(&self) -> Result<MaybeExpression, ValidationError> {
+    pub fn evaluate(&self) -> Result<MaybeExpression, DatamodelError> {
         match &self.value {
-            ast::Value::Function(name, params, span) => self.evaluate_functional(&name, &params, *span),
+            ast::Expression::Function(name, params, span) => self.evaluate_functional(&name, &params, *span),
             _ => Ok(MaybeExpression::Value(None, self.value.clone())),
         }
     }
@@ -61,9 +62,9 @@ impl FunctionalEvaluator {
     fn evaluate_functional(
         &self,
         name: &str,
-        args: &[ast::Value],
+        args: &[ast::Expression],
         span: ast::Span,
-    ) -> Result<MaybeExpression, ValidationError> {
+    ) -> Result<MaybeExpression, DatamodelError> {
         for f in &BUILTIN_FUNCTIONALS {
             if f.name() == name {
                 let mut resolved_args: Vec<ValueValidator> = Vec::new();
@@ -76,6 +77,6 @@ impl FunctionalEvaluator {
             }
         }
 
-        Err(ValidationError::new_function_not_known_error(name, span))
+        Err(DatamodelError::new_function_not_known_error(name, span))
     }
 }

@@ -8,21 +8,19 @@ mod enummodel;
 mod field;
 mod id;
 mod model;
-mod relation;
-mod scalar;
+mod relation_info;
+mod scalar_list;
+
 mod traits;
 
 pub use self::datamodel::*;
-pub use comment::*;
 pub use enummodel::*;
 pub use field::*;
 pub use id::*;
 pub use model::*;
-pub use relation::*;
-pub use scalar::*;
+pub use relation_info::*;
+pub use scalar_list::*;
 pub use traits::*;
-
-pub mod validator;
 
 // Compatibility export.
 pub use crate::common::PrismaType as ScalarType;

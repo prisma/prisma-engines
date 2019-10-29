@@ -1,15 +1,37 @@
-use crate::{ast, common::argument::Arguments, common::value::ValueListValidator, configuration::Generator, errors::*};
+use crate::{ast, common::argument::Arguments, common::value::ValueListValidator, configuration::Generator, error::*};
 use std::collections::HashMap;
-
-pub struct GeneratorLoader {}
 
 const PROVIDER_KEY: &str = "provider";
 const OUTPUT_KEY: &str = "output";
 const BINARY_TARGETS_KEY: &str = "binaryTargets";
 const FIRST_CLASS_PROPERTIES: &[&str] = &[PROVIDER_KEY, OUTPUT_KEY, BINARY_TARGETS_KEY];
 
+pub struct GeneratorLoader {}
+
 impl GeneratorLoader {
-    pub fn lift_generator(ast_generator: &ast::GeneratorConfig) -> Result<Generator, ValidationError> {
+    pub fn load_generators_from_ast(ast_schema: &ast::SchemaAst) -> Result<Vec<Generator>, ErrorCollection> {
+        let mut generators: Vec<Generator> = vec![];
+        let mut errors = ErrorCollection::new();
+
+        for gen in &ast_schema.generators() {
+            match Self::lift_generator(&gen) {
+                Ok(loaded_gen) => generators.push(loaded_gen),
+                // Lift error.
+                Err(DatamodelError::ArgumentNotFound { argument_name, span }) => errors.push(
+                    DatamodelError::new_generator_argument_not_found_error(&argument_name, &gen.name.name, span),
+                ),
+                Err(err) => errors.push(err),
+            }
+        }
+
+        if errors.has_errors() {
+            Err(errors)
+        } else {
+            Ok(generators)
+        }
+    }
+
+    fn lift_generator(ast_generator: &ast::GeneratorConfig) -> Result<Generator, DatamodelError> {
         let mut args = Arguments::new(&ast_generator.properties, ast_generator.span);
 
         let provider = args.arg(PROVIDER_KEY)?.as_str()?;
@@ -45,7 +67,20 @@ impl GeneratorLoader {
         })
     }
 
-    pub fn lower_generator(generator: &Generator) -> ast::GeneratorConfig {
+    pub fn add_generators_to_ast(generators: &[Generator], ast_datamodel: &mut ast::SchemaAst) {
+        let mut tops: Vec<ast::Top> = Vec::new();
+
+        for generator in generators {
+            tops.push(ast::Top::Generator(Self::lower_generator(&generator)))
+        }
+
+        // Prepend generators.
+        tops.append(&mut ast_datamodel.tops);
+
+        ast_datamodel.tops = tops;
+    }
+
+    fn lower_generator(generator: &Generator) -> ast::GeneratorConfig {
         let mut arguments: Vec<ast::Argument> = Vec::new();
 
         arguments.push(ast::Argument::new_string("provider", &generator.provider));
@@ -54,10 +89,10 @@ impl GeneratorLoader {
             arguments.push(ast::Argument::new_string("output", &output));
         }
 
-        let platform_values: Vec<ast::Value> = generator
+        let platform_values: Vec<ast::Expression> = generator
             .binary_targets
             .iter()
-            .map(|p| ast::Value::StringValue(p.to_string(), ast::Span::empty()))
+            .map(|p| ast::Expression::StringValue(p.to_string(), ast::Span::empty()))
             .collect();
         if !platform_values.is_empty() {
             arguments.push(ast::Argument::new_array("binaryTargets", platform_values));
@@ -73,42 +108,5 @@ impl GeneratorLoader {
             documentation: generator.documentation.clone().map(|text| ast::Comment { text }),
             span: ast::Span::empty(),
         }
-    }
-
-    pub fn lift(ast_schema: &ast::Datamodel) -> Result<Vec<Generator>, ErrorCollection> {
-        let mut generators: Vec<Generator> = vec![];
-        let mut errors = ErrorCollection::new();
-
-        for ast_obj in &ast_schema.models {
-            if let ast::Top::Generator(gen) = ast_obj {
-                match Self::lift_generator(&gen) {
-                    Ok(loaded_gen) => generators.push(loaded_gen),
-                    // Lift error.
-                    Err(ValidationError::ArgumentNotFound { argument_name, span }) => errors.push(
-                        ValidationError::new_generator_argument_not_found_error(&argument_name, &gen.name.name, span),
-                    ),
-                    Err(err) => errors.push(err),
-                }
-            }
-        }
-
-        if errors.has_errors() {
-            Err(errors)
-        } else {
-            Ok(generators)
-        }
-    }
-
-    pub fn add_generators_to_ast(generators: &[Generator], ast_datamodel: &mut ast::Datamodel) {
-        let mut models: Vec<ast::Top> = Vec::new();
-
-        for generator in generators {
-            models.push(ast::Top::Generator(Self::lower_generator(&generator)))
-        }
-
-        // Prepend generstors.
-        models.append(&mut ast_datamodel.models);
-
-        ast_datamodel.models = models;
     }
 }

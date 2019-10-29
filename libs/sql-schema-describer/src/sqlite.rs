@@ -20,6 +20,7 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
         let tables = self
             .get_table_names(schema)
             .into_iter()
+            .filter(|table| !is_system_table(&table))
             .map(|t| self.get_table(schema, &t))
             .collect();
         Ok(SqlSchema {
@@ -75,7 +76,7 @@ impl SqlSchemaDescriber {
             .map(|row| {
                 debug!("Got column row {:?}", row);
                 let default_value = match row.get("dflt_value") {
-                    Some(ParameterizedValue::Text(v)) => Some(v.to_string()),
+                    Some(ParameterizedValue::Text(v)) => Some(v.to_string().replace("\"", "")),
                     Some(ParameterizedValue::Null) => None,
                     Some(p) => panic!(format!("expected a string value but got {:?}", p)),
                     None => panic!("couldn't get dflt_value column"),
@@ -239,6 +240,10 @@ impl SqlSchemaDescriber {
                     referenced_table: intermediate_fk.referenced_table.to_owned(),
                     referenced_columns,
                     on_delete_action: intermediate_fk.on_delete_action.to_owned(),
+
+                    // Not relevant in SQLite since we cannot ALTER or DROP foreign keys by
+                    // constraint name.
+                    constraint_name: None,
                 };
                 debug!("Detected foreign key {:?}", fk);
                 fk
@@ -257,6 +262,8 @@ impl SqlSchemaDescriber {
         debug!("Got indices description results: {:?}", result_set);
         result_set
             .into_iter()
+            // Exclude primary keys, they are inferred separately.
+            .filter(|row| row.get("origin").and_then(|origin| origin.as_str()).unwrap() != "pk")
             .map(|row| {
                 let is_unique = row.get("unique").and_then(|x| x.as_bool()).expect("get unique");
                 let name = row.get("name").and_then(|x| x.to_string()).expect("get name");
@@ -300,20 +307,39 @@ fn get_column_type(tpe: &str) -> ColumnType {
         "boolean" => ColumnTypeFamily::Boolean,
         "text" => ColumnTypeFamily::String,
         s if s.contains("char") => ColumnTypeFamily::String,
+        s if s.contains("numeric") => ColumnTypeFamily::Float,
         "date" => ColumnTypeFamily::DateTime,
+        "datetime" => ColumnTypeFamily::DateTime,
         "binary" => ColumnTypeFamily::Binary,
         "double" => ColumnTypeFamily::Float,
         "binary[]" => ColumnTypeFamily::Binary,
         "boolean[]" => ColumnTypeFamily::Boolean,
         "date[]" => ColumnTypeFamily::DateTime,
+        "datetime[]" => ColumnTypeFamily::DateTime,
         "double[]" => ColumnTypeFamily::Float,
         "float[]" => ColumnTypeFamily::Float,
         "integer[]" => ColumnTypeFamily::Int,
         "text[]" => ColumnTypeFamily::String,
-        x => panic!(format!("type '{}' is not supported here yet", x)),
+        _ => ColumnTypeFamily::Unknown, //        x => panic!(format!("type '{}' is not supported here yet", x)),
     };
     ColumnType {
         raw: tpe.to_string(),
         family: family,
     }
 }
+
+/// Returns whether a table is one of the SQLite system tables.
+fn is_system_table(table_name: &str) -> bool {
+    SQLITE_SYSTEM_TABLES
+        .iter()
+        .any(|system_table| table_name == *system_table)
+}
+
+/// See https://www.sqlite.org/fileformat2.html
+const SQLITE_SYSTEM_TABLES: &[&str] = &[
+    "sqlite_sequence",
+    "sqlite_stat1",
+    "sqlite_stat2",
+    "sqlite_stat3",
+    "sqlite_stat4",
+];

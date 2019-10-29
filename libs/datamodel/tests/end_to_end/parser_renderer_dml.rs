@@ -71,8 +71,8 @@ enum CategoryEnum {
 
 #[test]
 fn test_parser_renderer_via_dml() {
-    let dml = datamodel::parse(DATAMODEL_STRING).unwrap();
-    let rendered = datamodel::render(&dml).unwrap();
+    let dml = datamodel::parse_datamodel(DATAMODEL_STRING).unwrap();
+    let rendered = datamodel::render_datamodel_to_string(&dml).unwrap();
 
     print!("{}", rendered);
 
@@ -104,8 +104,8 @@ model Post {
 
 #[test]
 fn test_parser_renderer_many_to_many_via_dml() {
-    let dml = datamodel::parse(MANY_TO_MANY_DATAMODEL).unwrap();
-    let rendered = datamodel::render(&dml).unwrap();
+    let dml = datamodel::parse_datamodel(MANY_TO_MANY_DATAMODEL).unwrap();
+    let rendered = datamodel::render_datamodel_to_string(&dml).unwrap();
 
     print!("{}", rendered);
 
@@ -127,8 +127,8 @@ model User {
 
 #[test]
 fn test_parser_renderer_model_with_comments_via_dml() {
-    let dml = datamodel::parse(DATAMODEL_STRING_WITH_COMMENTS).unwrap();
-    let rendered = datamodel::render(&dml).unwrap();
+    let dml = datamodel::parse_datamodel(DATAMODEL_STRING_WITH_COMMENTS).unwrap();
+    let rendered = datamodel::render_datamodel_to_string(&dml).unwrap();
 
     print!("{}", rendered);
 

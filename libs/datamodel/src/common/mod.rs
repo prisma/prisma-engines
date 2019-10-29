@@ -1,6 +1,6 @@
 pub mod argument;
 pub mod functions;
-pub mod interpolation;
+mod interpolation;
 pub mod names;
 pub mod value;
 
@@ -11,7 +11,7 @@ pub use fromstr::FromStrAndSpan;
 pub use string_helper::WritableString;
 
 use crate::ast;
-use crate::errors::ValidationError;
+use crate::error::DatamodelError;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
@@ -27,7 +27,7 @@ pub enum PrismaType {
 }
 
 impl FromStrAndSpan for PrismaType {
-    fn from_str_and_span(s: &str, span: ast::Span) -> Result<Self, ValidationError> {
+    fn from_str_and_span(s: &str, span: ast::Span) -> Result<Self, DatamodelError> {
         match s {
             "Int" => Ok(PrismaType::Int),
             "Float" => Ok(PrismaType::Float),
@@ -35,7 +35,7 @@ impl FromStrAndSpan for PrismaType {
             "Boolean" => Ok(PrismaType::Boolean),
             "String" => Ok(PrismaType::String),
             "DateTime" => Ok(PrismaType::DateTime),
-            _ => Err(ValidationError::new_type_not_found_error(s, span)),
+            _ => Err(DatamodelError::new_type_not_found_error(s, span)),
         }
     }
 }

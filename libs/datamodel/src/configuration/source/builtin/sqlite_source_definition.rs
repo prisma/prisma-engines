@@ -1,12 +1,11 @@
 use super::{SqliteSource, SQLITE_SOURCE_NAME};
-use crate::{common::argument::Arguments, configuration::*, errors::ValidationError};
+use crate::{common::argument::Arguments, configuration::*, error::DatamodelError};
 
-#[derive(Default)]
 pub struct SqliteSourceDefinition {}
 
 impl SqliteSourceDefinition {
     pub fn new() -> Self {
-        Self::default()
+        Self {}
     }
 }
 
@@ -21,7 +20,7 @@ impl SourceDefinition for SqliteSourceDefinition {
         url: StringFromEnvVar,
         _arguments: &mut Arguments,
         documentation: &Option<String>,
-    ) -> Result<Box<dyn Source>, ValidationError> {
+    ) -> Result<Box<dyn Source>, DatamodelError> {
         Ok(Box::new(SqliteSource {
             name: String::from(name),
             url: url,

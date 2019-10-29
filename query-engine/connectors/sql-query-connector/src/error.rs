@@ -159,6 +159,7 @@ impl From<prisma_query::error::Error> for SqlError {
             e @ prisma_query::error::Error::DatabaseAlreadyExists { .. } => SqlError::ConnectionError(e.into()),
             e @ prisma_query::error::Error::ConnectTimeout { .. } => SqlError::ConnectionError(e.into()),
             e @ prisma_query::error::Error::Timeout => SqlError::ConnectionError(e.into()),
+            e @ prisma_query::error::Error::TlsError { .. } => Self::ConnectionError(e.into()),
         }
     }
 }

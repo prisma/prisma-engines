@@ -18,9 +18,25 @@ impl DatabaseMigrationInferrer<SqlMigration> for SqlDatabaseMigrationInferrer {
         &self,
         _previous: &Datamodel,
         next: &Datamodel,
-        _steps: &Vec<MigrationStep>,
+        _steps: &[MigrationStep],
     ) -> ConnectorResult<SqlMigration> {
         let current_database_schema: SqlSchema = self.introspect(&self.schema_name)?;
+        let expected_database_schema = SqlSchemaCalculator::calculate(next)?;
+        infer(
+            &current_database_schema,
+            &expected_database_schema,
+            &self.schema_name,
+            self.sql_family,
+        )
+    }
+
+    fn infer_from_datamodels(
+        &self,
+        previous: &Datamodel,
+        next: &Datamodel,
+        _steps: &[MigrationStep],
+    ) -> ConnectorResult<SqlMigration> {
+        let current_database_schema: SqlSchema = SqlSchemaCalculator::calculate(previous)?;
         let expected_database_schema = SqlSchemaCalculator::calculate(next)?;
         infer(
             &current_database_schema,
@@ -233,7 +249,9 @@ fn needs_fix(alter_table: &AlterTable) -> bool {
         }
         TableChange::DropColumn(_) => true,
         TableChange::AlterColumn(_) => true,
+        TableChange::DropForeignKey(_) => true,
     });
+
     change_that_does_not_work_on_sqlite.is_some()
 }
 

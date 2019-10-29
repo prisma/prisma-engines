@@ -35,8 +35,8 @@ pub enum CommandError {
     Input { code: i64, error: String },
 }
 
-impl From<datamodel::errors::ErrorCollection> for CommandError {
-    fn from(errors: datamodel::errors::ErrorCollection) -> CommandError {
+impl From<datamodel::error::ErrorCollection> for CommandError {
+    fn from(errors: datamodel::error::ErrorCollection) -> CommandError {
         let errors_str = errors
             .errors
             .into_iter()

@@ -1,6 +1,6 @@
 use crate::utilities;
 use core::{response_ir, CoreError};
-use datamodel::errors::ErrorCollection;
+use datamodel::error::ErrorCollection;
 use failure::{Error, Fail};
 use graphql_parser::query::ParseError as GqlParseError;
 use serde_json;

@@ -24,6 +24,8 @@ pub enum CliError {
     ConnectTimeout,
     #[fail(display = "Operation timed out")]
     Timeout,
+    #[fail(display = "Error opening a TLS connection. {}", _0)]
+    TlsError(String),
     #[fail(display = "Unknown error occured: {}", _0)]
     Other(String),
 }
@@ -37,6 +39,7 @@ impl From<ConnectorError> for CliError {
             ConnectorError::AuthenticationFailed { user } => CliError::AuthenticationFailed(user),
             ConnectorError::ConnectTimeout => CliError::ConnectTimeout,
             ConnectorError::Timeout => CliError::Timeout,
+            ConnectorError::TlsError { message } => CliError::TlsError(message),
             _ => CliError::ConnectionError,
         }
     }
@@ -88,7 +91,7 @@ fn create_conn(
 
             Ok((String::new(), Box::new(inner)))
         }
-        "postgresql" => {
+        "postgresql" | "postgres" => {
             let db_name = fetch_db_name(&url, "postgres");
 
             let connector = if admin_mode {
@@ -175,21 +178,27 @@ mod tests {
     }
 
     fn postgres_url(db: Option<&str>) -> String {
+        postgres_url_with_scheme(db, "postgresql")
+    }
+
+    fn postgres_url_with_scheme(db: Option<&str>, scheme: &str) -> String {
         match std::env::var("IS_BUILDKITE") {
             Ok(_) => format!(
-                "postgresql://postgres:prisma@test-db-postgres:5432/{}",
-                db.unwrap_or("postgres")
+                "{scheme}://postgres:prisma@test-db-postgres:5432/{db_name}",
+                scheme = scheme,
+                db_name = db.unwrap_or("postgres")
             ),
             _ => format!(
-                "postgresql://postgres:prisma@127.0.0.1:5432/{}?schema=migration-engine",
-                db.unwrap_or("postgres")
+                "{scheme}://postgres:prisma@127.0.0.1:5432/{db_name}?schema=migration-engine",
+                scheme = scheme,
+                db_name = db.unwrap_or("postgres")
             ),
         }
     }
 
     fn mysql_url(db: Option<&str>) -> String {
         match std::env::var("IS_BUILDKITE") {
-            Ok(_) => format!("mysql://root:prisma@test-db-mysql:3306/{}", db.unwrap_or("")),
+            Ok(_) => format!("mysql://root:prisma@test-db-mysql-5-7:3306/{}", db.unwrap_or("")),
             _ => format!("mysql://root:prisma@127.0.0.1:3306/{}", db.unwrap_or("")),
         }
     }
@@ -232,6 +241,17 @@ mod tests {
             assert_eq!(
                 Ok(String::from("Connection successful")),
                 super::run(&matches, &postgres_url(None))
+            );
+        })
+        .unwrap();
+    }
+
+    #[test]
+    fn test_connecting_with_a_working_psql_connection_string_with_postgres_scheme() {
+        with_cli(vec!["cli", "--can_connect_to_database"], |matches| {
+            assert_eq!(
+                Ok(String::from("Connection successful")),
+                super::run(&matches, &postgres_url_with_scheme(None, "postgres"))
             );
         })
         .unwrap();
@@ -315,6 +335,15 @@ mod tests {
     #[test]
     fn test_fetch_db_name() {
         let url: url::Url = "postgresql://postgres:prisma@127.0.0.1:5432/pgres?schema=test_schema"
+            .parse()
+            .unwrap();
+        let db_name = super::fetch_db_name(&url, "postgres");
+        assert_eq!(db_name, "pgres");
+    }
+
+    #[test]
+    fn test_fetch_db_name_with_postgres_scheme() {
+        let url: url::Url = "postgres://postgres:prisma@127.0.0.1:5432/pgres?schema=test_schema"
             .parse()
             .unwrap();
         let db_name = super::fetch_db_name(&url, "postgres");

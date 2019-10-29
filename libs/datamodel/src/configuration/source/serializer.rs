@@ -4,13 +4,26 @@ use crate::ast;
 pub struct SourceSerializer {}
 
 impl SourceSerializer {
-    pub fn source_to_ast(source: &dyn Source) -> ast::SourceConfig {
+    pub fn add_sources_to_ast(sources: &[Box<dyn Source>], ast_datamodel: &mut ast::SchemaAst) {
+        let mut tops: Vec<ast::Top> = Vec::new();
+
+        for source in sources {
+            tops.push(ast::Top::Source(Self::source_to_ast(&**source)))
+        }
+
+        // Prepend sources.
+        tops.append(&mut ast_datamodel.tops);
+
+        ast_datamodel.tops = tops;
+    }
+
+    fn source_to_ast(source: &dyn Source) -> ast::SourceConfig {
         let mut arguments: Vec<ast::Argument> = Vec::new();
 
         arguments.push(ast::Argument::new_string("provider", source.connector_type()));
         match source.url().from_env_var {
             Some(ref env_var) => {
-                let values = vec![ast::Value::StringValue(env_var.to_string(), ast::Span::empty())];
+                let values = vec![ast::Expression::StringValue(env_var.to_string(), ast::Span::empty())];
                 arguments.push(ast::Argument::new_function("url", "env", values));
             }
             None => {
@@ -28,18 +41,5 @@ impl SourceSerializer {
             documentation: source.documentation().clone().map(|text| ast::Comment { text }),
             span: ast::Span::empty(),
         }
-    }
-
-    pub fn add_sources_to_ast(sources: &[Box<dyn Source>], ast_datamodel: &mut ast::Datamodel) {
-        let mut models: Vec<ast::Top> = Vec::new();
-
-        for source in sources {
-            models.push(ast::Top::Source(Self::source_to_ast(&**source)))
-        }
-
-        // Prepend sources.
-        models.append(&mut ast_datamodel.models);
-
-        ast_datamodel.models = models;
     }
 }

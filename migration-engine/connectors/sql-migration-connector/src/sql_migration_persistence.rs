@@ -97,7 +97,7 @@ impl MigrationPersistence for SqlMigrationPersistence {
         let model_steps_json = serde_json::to_string(&migration.datamodel_steps).unwrap();
         let database_migration_json = serde_json::to_string(&migration.database_migration).unwrap();
         let errors_json = serde_json::to_string(&migration.errors).unwrap();
-        let serialized_datamodel = datamodel::render(&migration.datamodel).unwrap();
+        let serialized_datamodel = datamodel::render_datamodel_to_string(&migration.datamodel).unwrap();
 
         let insert = Insert::single_into(self.table())
             .value(NAME_COLUMN, migration.name)
@@ -205,6 +205,7 @@ impl SqlMigrationPersistence {
         }
     }
 }
+
 fn convert_parameterized_date_value(db_value: &ParameterizedValue) -> DateTime<Utc> {
     match db_value {
         ParameterizedValue::Integer(x) => timestamp_to_datetime(*x),
@@ -238,7 +239,7 @@ fn parse_rows_new(result_set: ResultSet) -> Vec<Migration> {
             };
 
             let datamodel_steps = serde_json::from_str(&datamodel_steps_json).unwrap();
-            let datamodel = datamodel::parse(&datamodel_string).unwrap();
+            let datamodel = datamodel::parse_datamodel(&datamodel_string).unwrap();
 
             let database_migration_json = serde_json::from_str(&database_migration_string).unwrap();
             let errors: Vec<String> = serde_json::from_str(&errors_json).unwrap();

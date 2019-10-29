@@ -1,7 +1,7 @@
 use crate::common::*;
 use datamodel::{
-    common::FromStrAndSpan, common::PrismaType, configuration::*, dml, errors::ValidationError, Arguments,
-    DirectiveValidator,
+    ast::Span, common::argument::Arguments, common::FromStrAndSpan, common::PrismaType, configuration::*, dml,
+    error::DatamodelError, validator::directive::DirectiveValidator,
 };
 
 //##########################
@@ -16,7 +16,7 @@ impl DirectiveValidator<dml::Field> for CustomDirective {
     fn directive_name(&self) -> &'static str {
         &"mapToBase"
     }
-    fn validate_and_apply(&self, _args: &mut Arguments, obj: &mut dml::Field) -> Result<(), ValidationError> {
+    fn validate_and_apply(&self, _args: &mut Arguments, obj: &mut dml::Field) -> Result<(), DatamodelError> {
         obj.field_type = dml::FieldType::Base(self.base_type);
         return Ok(());
     }
@@ -25,7 +25,7 @@ impl DirectiveValidator<dml::Field> for CustomDirective {
         &self,
         _obj: &dml::Field,
         _datamodel: &dml::Datamodel,
-    ) -> Result<Vec<datamodel::ast::Directive>, ValidationError> {
+    ) -> Result<Vec<datamodel::ast::Directive>, DatamodelError> {
         Ok(Vec::new())
     }
 }
@@ -43,7 +43,7 @@ impl CustomDbDefinition {
         CustomDbDefinition {}
     }
 
-    fn get_base_type(&self, arguments: &mut Arguments) -> Result<PrismaType, ValidationError> {
+    fn get_base_type(&self, arguments: &mut Arguments) -> Result<PrismaType, DatamodelError> {
         if let Ok(arg) = arguments.arg("base_type") {
             PrismaType::from_str_and_span(&arg.as_constant_literal()?, arg.span())
         } else {
@@ -63,7 +63,7 @@ impl SourceDefinition for CustomDbDefinition {
         url: StringFromEnvVar,
         arguments: &mut Arguments,
         documentation: &Option<String>,
-    ) -> Result<Box<dyn Source>, ValidationError> {
+    ) -> Result<Box<dyn Source>, DatamodelError> {
         Ok(Box::new(CustomDb {
             name: String::from(name),
             url: url,
@@ -186,7 +186,7 @@ model Post {
 fn serialize_sources_to_dmmf() {
     std::env::set_var("URL_CUSTOM_1", "https://localhost");
     let config =
-        datamodel::load_configuration_with_plugins(DATAMODEL, vec![Box::new(CustomDbDefinition::new())]).unwrap();
+        datamodel::parse_configuration_with_sources(DATAMODEL, vec![Box::new(CustomDbDefinition::new())]).unwrap();
     let rendered = datamodel::render_sources_to_json(&config.datasources);
 
     let expected = r#"[
@@ -217,6 +217,25 @@ fn serialize_sources_to_dmmf() {
     println!("{}", rendered);
 
     assert_eq_json(&rendered, expected);
+}
+
+#[test]
+fn must_forbid_env_functions_in_provider_field() {
+    let schema = r#"
+        datasource ds {
+            provider = env("DB_PROVIDER")
+            url = env("DB_URL")
+        }
+    "#;
+    std::env::set_var("DB_PROVIDER", "postgresql");
+    std::env::set_var("DB_URL", "https://localhost");
+    let config = datamodel::parse_configuration_with_sources(schema, vec![]);
+    assert!(config.is_err());
+    let errors = config.err().expect("This must error");
+    errors.assert_is(DatamodelError::new_functional_evaluation_error(
+        "A datasource must not use the env() function in the provider argument.",
+        Span::new(9, 108),
+    ));
 }
 
 fn assert_eq_json(a: &str, b: &str) {

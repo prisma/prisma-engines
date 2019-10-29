@@ -2,7 +2,9 @@ use super::MigrationStepsResultOutput;
 use crate::commands::command::*;
 use crate::migration_engine::MigrationEngine;
 use datamodel::Datamodel;
+use log::*;
 use migration_connector::*;
+use serde::Deserialize;
 
 pub struct ApplyMigrationCommand<'a> {
     input: &'a ApplyMigrationInput,
@@ -103,10 +105,7 @@ impl<'a> ApplyMigrationCommand<'a> {
 
         let diagnostics = connector.destructive_changes_checker().check(&database_migration)?;
 
-        // We always force the migrations for now to preserve backwards-compatibility (i.e. never
-        // cancelling migrations). Once the lift CLI is ready, the `force` option will default to
-        // `false`.
-        match (diagnostics.has_warnings(), self.input.force.unwrap_or(true)) {
+        match (diagnostics.has_warnings(), self.input.force.unwrap_or(false)) {
             // We have no warnings, or the force flag is passed.
             (false, _) | (true, true) => {
                 let saved_migration = migration_persistence.create(migration);
@@ -122,9 +121,9 @@ impl<'a> ApplyMigrationCommand<'a> {
         let DestructiveChangeDiagnostics { warnings, errors } = diagnostics;
 
         Ok(MigrationStepsResultOutput {
-            datamodel: datamodel::render(&next_datamodel).unwrap(),
+            datamodel: datamodel::render_datamodel_to_string(&next_datamodel).unwrap(),
             datamodel_steps: self.input.steps.clone(),
-            database_steps: database_steps_json_pretty,
+            database_steps: serde_json::Value::Array(database_steps_json_pretty),
             errors,
             warnings,
             general_errors: Vec::new(),

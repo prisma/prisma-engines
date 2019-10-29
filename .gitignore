@@ -2,6 +2,7 @@ db/*
 !.placeholder
 build/
 prisma.yml
+connector_to_test
 .DS_Store
 current_connector
 

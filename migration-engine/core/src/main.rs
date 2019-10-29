@@ -5,19 +5,13 @@ mod error;
 pub mod migration;
 pub mod migration_engine;
 
-#[macro_use]
-extern crate log;
-#[macro_use]
-extern crate serde_derive;
-#[macro_use]
-extern crate serde_json;
-
 use crate::api::RpcApi;
 use clap::{App, Arg, SubCommand};
-use commands::*;
-use datamodel::{self, Datamodel, errors::ErrorCollection};
-use std::{env, fs, io, io::Read};
 use cli::CliError;
+use commands::*;
+use datamodel::{self, error::ErrorCollection, Datamodel};
+use log::*;
+use std::{env, fs, io, io::Read};
 
 pub use error::Error;
 pub use migration_engine::*;
@@ -25,7 +19,7 @@ pub use migration_engine::*;
 pub type Result<T> = std::result::Result<T, Error>;
 
 pub(crate) fn parse_datamodel(datamodel: &str) -> CommandResult<Datamodel> {
-    let result = datamodel::parse_with_formatted_error(&datamodel, "datamodel file, line");
+    let result = datamodel::parse_datamodel_or_pretty_error(&datamodel, "datamodel file, line");
     result.map_err(|e| CommandError::Generic { code: 1001, error: e })
 }
 
@@ -113,26 +107,29 @@ fn main() {
             Ok(msg) => {
                 info!("{}", msg);
                 std::process::exit(0);
-            },
+            }
             Err(error) => {
                 error!("{}", error);
 
                 match error {
                     CliError::DatabaseDoesNotExist(_) => {
                         std::process::exit(1);
-                    },
+                    }
                     CliError::DatabaseAccessDenied(_) => {
                         std::process::exit(2);
-                    },
+                    }
                     CliError::AuthenticationFailed(_) => {
                         std::process::exit(3);
-                    },
+                    }
                     CliError::ConnectTimeout | CliError::Timeout => {
                         std::process::exit(4);
-                    },
+                    }
                     CliError::DatabaseAlreadyExists(_) => {
                         std::process::exit(5);
-                    },
+                    }
+                    CliError::TlsError(_) => {
+                        std::process::exit(6);
+                    }
                     _ => {
                         std::process::exit(255);
                     }

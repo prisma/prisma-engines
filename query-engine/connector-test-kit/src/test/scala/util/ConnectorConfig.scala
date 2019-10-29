@@ -36,7 +36,7 @@ object ConnectorConfig {
 
   lazy val mysqlHost = {
     if (EnvVars.isBuildkite) {
-      "test-db-mysql"
+      "test-db-mysql-5-7"
     } else {
       "127.0.0.1"
     }

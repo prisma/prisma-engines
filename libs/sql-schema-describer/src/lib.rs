@@ -145,10 +145,10 @@ impl Table {
         }
     }
 
-    pub fn is_column_unique(&self, column: &Column) -> bool {
-        self.indices
-            .iter()
-            .any(|index| index.tpe == IndexType::Unique && index.columns.contains(&column.name))
+    pub fn is_column_unique(&self, column_name: &String) -> bool {
+        self.indices.iter().any(|index| {
+            index.tpe == IndexType::Unique && index.columns.len() == 1 && index.columns.contains(column_name)
+        })
     }
 }
 /// The type of an index.
@@ -184,8 +184,8 @@ pub struct PrimaryKey {
 }
 
 impl PrimaryKey {
-    pub fn contains_column(&self, column: &String) -> bool {
-        self.columns.contains(column)
+    pub fn is_single_primary_key(&self, column: &String) -> bool {
+        self.columns.len() == 1 && self.columns.contains(column)
     }
 }
 
@@ -272,6 +272,8 @@ pub enum ColumnTypeFamily {
     TextSearch,
     /// Transaction ID types.
     TransactionId,
+    /// Unknown
+    Unknown,
 }
 
 impl fmt::Display for ColumnTypeFamily {
@@ -289,6 +291,7 @@ impl fmt::Display for ColumnTypeFamily {
             Self::LogSequenceNumber => "logSequenceNumber",
             Self::TextSearch => "textSearch",
             Self::TransactionId => "transactionId",
+            Self::Unknown => "unknown",
         };
         write!(f, "{}", str)
     }
@@ -332,6 +335,8 @@ pub enum ForeignKeyAction {
 #[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ForeignKey {
+    /// The database name of the foreign key constraint, when available.
+    pub constraint_name: Option<String>,
     /// Column names.
     pub columns: Vec<String>,
     /// Referenced table.

@@ -122,6 +122,11 @@ fn foreign_keys_must_work() {
                     indices: vec![],
                     primary_key: None,
                     foreign_keys: vec![ForeignKey {
+                        constraint_name: match db_type {
+                            DbType::Postgres => Some("User_city_fkey".to_owned()),
+                            DbType::MySql => Some("User_ibfk_1".to_owned()),
+                            DbType::Sqlite => None,
+                        },
                         columns: vec!["city".to_string()],
                         referenced_columns: vec!["id".to_string()],
                         referenced_table: "City".to_string(),
@@ -202,6 +207,11 @@ fn multi_column_foreign_keys_must_work() {
                     indices: vec![],
                     primary_key: None,
                     foreign_keys: vec![ForeignKey {
+                        constraint_name: match db_type {
+                            DbType::Postgres => Some("User_city_fkey".to_owned()),
+                            DbType::MySql => Some("User_ibfk_1".to_owned()),
+                            DbType::Sqlite => None,
+                        },
                         columns: vec!["city".to_string(), "city_name".to_string()],
                         referenced_columns: vec!["id".to_string(), "name".to_string()],
                         referenced_table: "City".to_string(),
@@ -275,14 +285,6 @@ fn composite_primary_keys_must_work() {
                 DbType::MySql => ("int", "varchar"),
                 DbType::Postgres => ("int4", "varchar"),
             };
-            let expected_indices = match db_type {
-                DbType::Sqlite => vec![Index {
-                    name: "sqlite_autoindex_User_1".to_string(),
-                    columns: vec!["id".to_string(), "name".to_string()],
-                    tpe: IndexType::Unique,
-                }],
-                _ => vec![],
-            };
             let mut expected_columns = vec![
                 Column {
                     name: "id".to_string(),
@@ -312,7 +314,7 @@ fn composite_primary_keys_must_work() {
                 &Table {
                     name: "User".to_string(),
                     columns: expected_columns,
-                    indices: expected_indices,
+                    indices: vec![],
                     primary_key: Some(PrimaryKey {
                         columns: vec!["id".to_string(), "name".to_string()],
                         sequence: None,
@@ -472,11 +474,11 @@ fn column_uniqueness_must_be_detected() {
                 }
             );
             assert!(
-                user_table.is_column_unique(&user_table.columns[0]),
+                user_table.is_column_unique(&user_table.columns[0].name),
                 "Column 1 should return true for is_unique"
             );
             assert!(
-                user_table.is_column_unique(&user_table.columns[1]),
+                user_table.is_column_unique(&user_table.columns[1].name),
                 "Column 2 should return true for is_unique"
             );
         },

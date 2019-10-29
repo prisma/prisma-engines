@@ -1,12 +1,11 @@
 use super::{MySqlSource, MYSQL_SOURCE_NAME};
-use crate::{common::argument::Arguments, configuration::*, errors::ValidationError};
+use crate::{common::argument::Arguments, configuration::*, error::DatamodelError};
 
-#[derive(Default)]
 pub struct MySqlSourceDefinition {}
 
 impl MySqlSourceDefinition {
     pub fn new() -> Self {
-        Self::default()
+        Self {}
     }
 }
 
@@ -21,7 +20,7 @@ impl SourceDefinition for MySqlSourceDefinition {
         url: StringFromEnvVar,
         _arguments: &mut Arguments,
         documentation: &Option<String>,
-    ) -> Result<Box<dyn Source>, ValidationError> {
+    ) -> Result<Box<dyn Source>, DatamodelError> {
         Ok(Box::new(MySqlSource {
             name: String::from(name),
             url: url,
