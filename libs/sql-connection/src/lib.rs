@@ -182,9 +182,9 @@ impl SyncSqlConnection for Sqlite {
     }
 }
 
-/// A handle to a database connection that works generically over a single connection behind a
-/// mutex or a prisma query connection pool.
-enum ConnectionHandle<C, P>
+/// A handle to a database connection pool that works generically over a pool of a single
+/// connection behind a mutex or a prisma query connection pool.
+enum ConnectionPool<C, P>
 where
     C: Queryable + Send + Sync,
     P: Manage<Resource = C>,
@@ -193,26 +193,27 @@ where
     Pool(Pool<P>),
 }
 
-impl<C, P> ConnectionHandle<C, P>
+impl<C, P> ConnectionPool<C, P>
 where
     C: Queryable + Send + 'static,
     P: Manage<Resource = C, Error = QueryError, CheckOut = CheckOut<P>> + Send + Sync,
 {
-    async fn get_connection<'a>(&'a self) -> Result<CH<'a, C, P>, QueryError> {
+    async fn get_connection<'a>(&'a self) -> Result<ConnectionHandle<'a, C, P>, QueryError> {
         match &self {
-            ConnectionHandle::Single(mutex) => {
+            ConnectionPool::Single(mutex) => {
                 let guard = mutex.lock().await;
-                Ok(CH::Single(guard))
+                Ok(ConnectionHandle::Single(guard))
             }
-            ConnectionHandle::Pool(pool) => {
+            ConnectionPool::Pool(pool) => {
                 let checkout: CheckOut<P> = pool.check_out().await?;
-                Ok(CH::PoolCheckout(checkout))
+                Ok(ConnectionHandle::PoolCheckout(checkout))
             }
         }
     }
 }
 
-enum CH<'a, C, P>
+/// A handle to a single connection from a [`ConnectionPool`](/enum.ConnectionPool.html)).
+enum ConnectionHandle<'a, C, P>
 where
     C: Queryable + Send + Sync + 'static,
     P: Manage<Resource = C, Error = QueryError, CheckOut = CheckOut<P>> + Send + Sync,
@@ -221,15 +222,15 @@ where
     PoolCheckout(CheckOut<P>),
 }
 
-impl<'a, C, P> CH<'a, C, P>
+impl<'a, C, P> ConnectionHandle<'a, C, P>
 where
     C: Queryable + Send,
     P: Manage<Resource = C, Error = QueryError, CheckOut = CheckOut<P>> + Send + Sync,
 {
     fn as_queryable(&self) -> &dyn Queryable {
         match self {
-            CH::Single(guard) => guard,
-            CH::PoolCheckout(co) => co,
+            ConnectionHandle::Single(guard) => guard,
+            ConnectionHandle::PoolCheckout(co) => co,
         }
     }
 }
@@ -239,14 +240,14 @@ where
 pub struct Postgresql {
     // TODO: remove this when we delete the sync interface
     runtime: Runtime,
-    conn: ConnectionHandle<connector::PostgreSql, PostgresManager>,
+    conn: ConnectionPool<connector::PostgreSql, PostgresManager>,
 }
 
 impl Postgresql {
     /// Create a new connection pool.
     pub fn new_pooled(url: Url) -> Result<Self, QueryError> {
         let pool = prisma_query::pool::postgres(url)?;
-        let handle = ConnectionHandle::Pool(pool);
+        let handle = ConnectionPool::Pool(pool);
 
         Ok(Postgresql {
             conn: handle,
@@ -258,12 +259,12 @@ impl Postgresql {
     pub fn new_unpooled(url: Url) -> Result<Self, QueryError> {
         let runtime = default_runtime();
         let conn = runtime.block_on(connector::PostgreSql::from_params(url.try_into()?))?;
-        let handle = ConnectionHandle::Single(Mutex::new(conn));
+        let handle = ConnectionPool::Single(Mutex::new(conn));
 
         Ok(Postgresql { conn: handle, runtime })
     }
 
-    async fn get_connection<'a>(&'a self) -> Result<CH<'a, connector::PostgreSql, PostgresManager>, QueryError> {
+    async fn get_connection<'a>(&'a self) -> Result<ConnectionHandle<'a, connector::PostgreSql, PostgresManager>, QueryError> {
         Ok(self.conn.get_connection().await?)
     }
 }
@@ -321,7 +322,7 @@ impl SyncSqlConnection for Postgresql {
 /// A connection, or pool of connections, to a MySQL database. It exposes both sync and async
 /// query interfaces.
 pub struct Mysql {
-    conn: ConnectionHandle<connector::Mysql, MysqlManager>,
+    conn: ConnectionPool<connector::Mysql, MysqlManager>,
     // TODO: remove this when we delete the sync interface
     runtime: Runtime,
 }
@@ -330,7 +331,7 @@ impl Mysql {
     /// Create a new single connection behind a mutex.
     pub fn new_unpooled(url: Url) -> Result<Self, QueryError> {
         let conn = connector::Mysql::from_params(url.try_into()?)?;
-        let handle = ConnectionHandle::Single(Mutex::new(conn));
+        let handle = ConnectionPool::Single(Mutex::new(conn));
 
         Ok(Mysql {
             conn: handle,
@@ -341,7 +342,7 @@ impl Mysql {
     /// Create a new connection pool.
     pub fn new_pooled(url: Url) -> Result<Self, QueryError> {
         let pool = prisma_query::pool::mysql(url)?;
-        let handle = ConnectionHandle::Pool(pool);
+        let handle = ConnectionPool::Pool(pool);
 
         Ok(Mysql {
             conn: handle,
@@ -349,7 +350,7 @@ impl Mysql {
         })
     }
 
-    async fn get_connection<'a>(&'a self) -> Result<CH<'a, connector::Mysql, MysqlManager>, QueryError> {
+    async fn get_connection<'a>(&'a self) -> Result<ConnectionHandle<'a, connector::Mysql, MysqlManager>, QueryError> {
         Ok(self.conn.get_connection().await?)
     }
 }
