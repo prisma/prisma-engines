@@ -2,7 +2,6 @@ use crate::test_harness::{Mysql, Postgresql, Sqlite, SyncSqlConnection};
 use barrel::{Migration, SqlVariant};
 use introspection_connector::IntrospectionConnector;
 use pretty_assertions::assert_eq;
-use prisma_query::connector::{MysqlParams, PostgresParams};
 use sql_introspection_connector::*;
 use std::{rc::Rc, sync::Arc};
 use url::Url;
@@ -59,7 +58,7 @@ pub(crate) fn test_each_backend_with_ignores<F>(ignores: Vec<SqlFamily>, test_fn
 where
     F: Fn(&TestSetup, &BarrelMigrationExecutor) -> () + std::panic::RefUnwindSafe,
 {
-    //     SQLite
+    // SQLite
     if !ignores.contains(&SqlFamily::Sqlite) {
         println!("Testing with SQLite now");
         let test_setup = get_sqlite();
@@ -74,7 +73,7 @@ where
     } else {
         println!("Ignoring SQLite")
     }
-    // POSTGRES
+    // Postgres
     if !ignores.contains(&SqlFamily::Postgres) {
         println!("Testing with Postgres now");
         let test_setup = get_postgres();

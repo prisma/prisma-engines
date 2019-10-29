@@ -107,18 +107,21 @@ impl Sqlite {
     async fn get_connection(&self, db: &str) -> Result<CheckOut<SqliteManager>, QueryError> {
         let conn = self.pool.check_out().await?;
 
-        conn.execute_raw( "ATTACH DATABASE ? AS ?",
+        conn.execute_raw(
+            "ATTACH DATABASE ? AS ?",
             &[
-            ParameterizedValue::from(self.file_path.as_str()),
-            ParameterizedValue::from(db),
+                ParameterizedValue::from(self.file_path.as_str()),
+                ParameterizedValue::from(db),
             ],
-        ).await?;
+        )
+        .await?;
 
         Ok(conn)
     }
 
     async fn detach_database(&self, db: &str, conn: CheckOut<SqliteManager>) -> Result<(), QueryError> {
-        conn.execute_raw("DETACH DATABASE ?", &[ParameterizedValue::from(db)]).await?;
+        conn.execute_raw("DETACH DATABASE ?", &[ParameterizedValue::from(db)])
+            .await?;
         Ok(())
     }
 }
@@ -169,11 +172,13 @@ impl SyncSqlConnection for Sqlite {
     }
 
     fn query_raw(&self, db: &str, sql: &str, params: &[ParameterizedValue<'_>]) -> Result<ResultSet, QueryError> {
-        self.runtime.block_on(<Self as SqlConnection>::query_raw(self, db, sql, params))
+        self.runtime
+            .block_on(<Self as SqlConnection>::query_raw(self, db, sql, params))
     }
 
     fn execute_raw(&self, db: &str, sql: &str, params: &[ParameterizedValue<'_>]) -> Result<u64, QueryError> {
-        self.runtime.block_on(<Self as SqlConnection>::execute_raw(self, db, sql, params))
+        self.runtime
+            .block_on(<Self as SqlConnection>::execute_raw(self, db, sql, params))
     }
 }
 
@@ -285,12 +290,7 @@ impl SqlConnection for Postgresql {
         conn.as_queryable().query_raw(sql, params).await
     }
 
-    async fn execute_raw<'a>(
-        &self,
-        _: &str,
-        sql: &str,
-        params: &[ParameterizedValue<'a>],
-    ) -> Result<u64, QueryError> {
+    async fn execute_raw<'a>(&self, _: &str, sql: &str, params: &[ParameterizedValue<'a>]) -> Result<u64, QueryError> {
         let conn = self.get_connection().await?;
         conn.as_queryable().execute_raw(sql, params).await
     }
