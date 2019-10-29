@@ -86,6 +86,7 @@ fn test_valid_multiparent() {
 
 #[should_panic]
 #[test]
+#[ignore]
 fn test_invalid_multiparent() {
     let mut graph = QueryGraph::new();
 
