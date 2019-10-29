@@ -373,7 +373,7 @@ class ScalarListsQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
 
   }
 
-  "Using Int ids" should "work with scalar lists" taggedAs (IgnoreMySql, IgnoreSQLite, IgnoreMongo) in {
+  "Using Int ids" should "work with scalar lists" taggedAs (IgnoreMongo) in {
 
     val project = SchemaDsl.fromStringV11() {
       s"""model Model{

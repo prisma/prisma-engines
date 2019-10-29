@@ -45,14 +45,14 @@ class DateTimeSpec extends FlatSpec with Matchers with ApiSpecBase {
 
   // https://tools.ietf.org/html/rfc3339 doesn't support 5-digit years. Therefore Rust date libraries will give a parse
   // error here.
-  "Using a date after 10000" should "work" taggedAs (IgnoreMySql, IgnoreSQLite, IgnorePostgres) in {
+  "Using a date after 10000" should "work" ignore {
 
     server.query(s"""mutation {createPerson(data: {name: "Fifth", born: "11979-01-01T10:33:59Z"}){name}}""", project)
     val res = server.query(s"""query {person(where:{name: "Fifth"}){name, born}}""", project)
     res.toString should be("""{"data":{"person":{"name":"Fifth","born":"11979-01-01T10:33:59.000Z"}}}""")
   }
 
-  "Using milliseconds in a date after 10000" should "work" taggedAs (IgnoreMySql, IgnoreSQLite, IgnorePostgres) in {
+  "Using milliseconds in a date after 10000" should "work" ignore  {
 
     server.query(s"""mutation {createPerson(data: {name: "Sixth", born: "11979-01-01T10:33:59.828Z"}){name}}""", project)
     val res = server.query(s"""query {person(where:{name: "Sixth"}){name, born}}""", project)
