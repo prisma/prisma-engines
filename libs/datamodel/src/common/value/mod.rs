@@ -136,6 +136,13 @@ impl ValueValidator {
         }
     }
 
+    pub fn is_from_env(&self) -> bool {
+        match &self.value {
+            MaybeExpression::Value(Some(_), _) => true,
+            _ => false,
+        }
+    }
+
     /// Tries to convert the wrapped value to a Prisma Integer.
     pub fn as_int(&self) -> Result<i32, DatamodelError> {
         match &self.value {
