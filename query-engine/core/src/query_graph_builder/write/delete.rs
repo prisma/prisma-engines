@@ -28,7 +28,6 @@ pub fn delete_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedF
     utils::insert_deletion_checks(graph, &model, &read_node, &delete_node)?;
 
     graph.create_edge(&read_node, &delete_node, QueryGraphDependency::ExecutionOrder)?;
-    graph.create_edge(&read_node, &delete_node, QueryGraphDependency::ExecutionOrder)?;
     graph.add_result_node(&read_node);
 
     Ok(())

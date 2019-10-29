@@ -25,21 +25,6 @@ pub fn node_is_create(graph: &QueryGraph, node: &NodeRef) -> bool {
     }
 }
 
-// pub fn id_read_query_infallible(model: &ModelRef, record_finder: RecordFinder) -> Query {
-//     let selected_fields: SelectedFields = model.fields().id().into();
-//     let read_query = ReadQuery::ManyRecordsQuery(ManyRecordsQuery {
-//         name: "id_read_query_infallible".into(), // this name only eases debugging
-//         alias: None,
-//         model: Arc::clone(&model),
-//         args: record_finder.into(),
-//         selected_fields,
-//         nested: vec![],
-//         selection_order: vec![],
-//     });
-
-//     Query::Read(read_query)
-// }
-
 /// Produces a non-failing read query that fetches IDs for a given Into<Filter> (e.g. Vec<RecordFinder>, Option<RecordFinder>, RecordFinder, ...).
 pub fn read_ids_infallible<T>(model: &ModelRef, filter: T) -> Query
 where
@@ -185,7 +170,6 @@ pub fn insert_existing_1to1_related_model_checks(
     graph: &mut QueryGraph,
     parent_node: &NodeRef,
     parent_relation_field: &RelationFieldRef,
-    perform_relation_check: bool,
 ) -> QueryGraphBuilderResult<()> {
     let child_model = parent_relation_field.related_model();
     let child_model_id_field = child_model.fields().id();
@@ -206,7 +190,7 @@ pub fn insert_existing_1to1_related_model_checks(
         QueryGraphDependency::ParentIds(Box::new(move |node, child_ids| {
             // If the other side ("child") requires the connection, we need to make sure that there isn't a child already connected
             // to the parent, as that would violate the other childs relation side.
-            if perform_relation_check && child_ids.len() > 0 && child_side_required {
+            if child_ids.len() > 0 && child_side_required {
                 return Err(QueryGraphBuilderError::RelationViolation(rf.into()));
             }
 

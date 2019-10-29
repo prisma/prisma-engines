@@ -17,14 +17,14 @@ impl Expressionista {
     fn build_expression(
         graph: &mut QueryGraph,
         node: &NodeRef,
-        mut parent_edges: Vec<EdgeRef>,
+        parent_edges: Vec<EdgeRef>,
     ) -> InterpretationResult<Expression> {
         match graph
             .node_content(node)
             .expect(&format!("Node content {} was empty", node.id()))
         {
             Node::Query(_) => Self::build_query_expression(graph, node, parent_edges),
-            Node::Flow(_) => Self::build_flow_expression(graph, node, parent_edges.pop()),
+            Node::Flow(_) => Self::build_flow_expression(graph, node, parent_edges),
         }
     }
 
@@ -72,8 +72,13 @@ impl Expressionista {
 
         let is_result = graph.is_result_node(&node);
         let node_id = node.id();
-        let query: Query = graph.pluck_node(&node).try_into()?;
-        let expr = Self::query_expression(graph, parent_edges, query);
+        let node = graph.pluck_node(&node);
+        let into_expr = Box::new(|node: Node| {
+            let query: Query = node.try_into()?;
+            Ok(Expression::Query { query })
+        });
+
+        let expr = Self::transform_node(graph, parent_edges, node, into_expr)?;
 
         if expressions.is_empty() {
             Ok(expr)
@@ -98,35 +103,32 @@ impl Expressionista {
         }
     }
 
-    /// Returns an `Expression::Query` directly, or indirectly via `Expression::Func`.
-    fn query_expression(graph: &mut QueryGraph, parent_edges: Vec<EdgeRef>, query: Query) -> Expression {
+    /// Runs transformer functions (e.g. `ParentIdsFn`) via `Expression::Func` if necessary, or if none present,
+    /// builds an expression directly. `into_expr` does the final expression building based on the node coming in.
+    fn transform_node(
+        graph: &mut QueryGraph,
+        parent_edges: Vec<EdgeRef>,
+        node: Node,
+        into_expr: Box<dyn FnOnce(Node) -> InterpretationResult<Expression>>,
+    ) -> InterpretationResult<Expression> {
         if parent_edges.is_empty() {
-            Expression::Query { query }
+            into_expr(node)
         } else {
             // Collect all parent ID dependency tuples (transformers).
-            let parent_id_deps: Vec<(String, Box<_>)> = parent_edges
-                .into_iter()
-                .filter_map(|edge| match graph.pluck_edge(&edge) {
-                    QueryGraphDependency::ParentIds(f) => {
-                        let parent_binding_name = graph.edge_source(&edge).id();
-                        Some((parent_binding_name, f))
-                    }
-                    _ => None,
-                })
-                .collect();
+            let parent_id_deps = Self::collect_parent_transformers(graph, parent_edges);
 
             // If there is at least one parent ID dependency we build a func to run the transformer(s),
             // else just render a flat query expression.
             if parent_id_deps.is_empty() {
-                Expression::Query { query }
+                into_expr(node)
             } else {
-                Expression::Func {
+                Ok(Expression::Func {
                     func: Box::new(move |env: Env| {
                         // Run transformers in order on the query to retrieve the final, transformed, query.
-                        let query: InterpretationResult<Query> =
+                        let node: InterpretationResult<Node> =
                             parent_id_deps
                                 .into_iter()
-                                .try_fold(query, |query, (parent_binding_name, f)| {
+                                .try_fold(node, |node, (parent_binding_name, f)| {
                                     let binding = match env.get(&parent_binding_name) {
                                         Some(binding) => Ok(binding),
                                         None => Err(InterpreterError::EnvVarNotFound(format!(
@@ -143,14 +145,12 @@ impl Expressionista {
                                     ))),
                                     }?;
 
-                                    let query: Query = f(query.into(), parent_ids)?.try_into()?;
-
-                                    Ok(query)
+                                    Ok(f(node, parent_ids)?)
                                 });
 
-                        Ok(Expression::Query { query: query? })
+                        into_expr(node?)
                     }),
-                }
+                })
             }
         }
     }
@@ -158,12 +158,23 @@ impl Expressionista {
     fn build_flow_expression(
         graph: &mut QueryGraph,
         node: &NodeRef,
-        parent_edge: Option<EdgeRef>,
+        mut parent_edges: Vec<EdgeRef>,
     ) -> InterpretationResult<Expression> {
         let flow: Flow = graph.pluck_node(node).try_into()?;
 
         match flow {
-            Flow::Empty => Ok(Expression::Sequence { seq: vec![] }),
+            flow @ Flow::Empty => {
+                let child_pairs = graph.direct_child_pairs(node);
+                let exprs: Vec<Expression> = child_pairs
+                    .into_iter()
+                    .map(|(_, node)| Self::build_expression(graph, &node, graph.incoming_edges(&node)))
+                    .collect::<InterpretationResult<_>>()?;
+
+                let into_expr = Box::new(move |_node: Node| Ok(Expression::Sequence { seq: exprs }));
+
+                Self::transform_node(graph, parent_edges, Node::Flow(flow), into_expr)
+            }
+
             Flow::If(_) => {
                 let child_pairs = graph.child_pairs(node);
 
@@ -186,7 +197,7 @@ impl Expressionista {
                     .map(|(_, node)| Self::build_expression(graph, &node, graph.incoming_edges(&node)))
                     .collect::<InterpretationResult<Vec<Expression>>>()?;
 
-                Ok(match parent_edge {
+                Ok(match parent_edges.pop() {
                     Some(p) => {
                         match graph.pluck_edge(&p) {
                             QueryGraphDependency::ParentIds(f) => {
@@ -233,6 +244,46 @@ impl Expressionista {
             }
         }
     }
+
+    fn collect_parent_transformers(graph: &mut QueryGraph, parent_edges: Vec<EdgeRef>) -> Vec<(String, ParentIdsFn)> {
+        parent_edges
+            .into_iter()
+            .filter_map(|edge| match graph.pluck_edge(&edge) {
+                QueryGraphDependency::ParentIds(f) => {
+                    let parent_binding_name = graph.edge_source(&edge).id();
+                    Some((parent_binding_name, f))
+                }
+                _ => None,
+            })
+            .collect()
+    }
+
+    // fn run_node_transformers(transformers: Vec<(String, ParentIdsFn)>) {
+    //     let query: InterpretationResult<Query> =
+    //         transformers
+    //             .into_iter()
+    //             .try_fold(query, |query, (parent_binding_name, f)| {
+    //                 let binding = match env.get(&parent_binding_name) {
+    //                     Some(binding) => Ok(binding),
+    //                     None => Err(InterpreterError::EnvVarNotFound(format!(
+    //                         "Expected parent binding '{}' to be present.",
+    //                         parent_binding_name
+    //                     ))),
+    //                 }?;
+
+    //                 let parent_ids = match binding.as_ids() {
+    //                     Some(ids) => Ok(ids),
+    //                     None => Err(InterpreterError::InterpretationError(format!(
+    //                         "Invalid parent result: Unable to transform binding '{}' into a set of IDs.",
+    //                         parent_binding_name
+    //                     ))),
+    //                 }?;
+
+    //                 let query: Query = f(query.into(), parent_ids)?.try_into()?;
+
+    //                 Ok(query)
+    //             });
+    // }
 
     fn fold_result_scopes(
         graph: &mut QueryGraph,

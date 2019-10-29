@@ -274,7 +274,7 @@ fn handle_one_to_one(
     // Next is the check for (and possible disconnect of) an existing parent.
     // Those checks are performed on the new child node, hence we use the child relation field side ("backrelation").
     if parent_side_required || relation_inlined_parent {
-        utils::insert_existing_1to1_related_model_checks(graph, &read_new_child_node, &child_relation_field, true)?;
+        utils::insert_existing_1to1_related_model_checks(graph, &read_new_child_node, &child_relation_field)?;
     }
 
     let relation_field_name = if relation_inlined_parent {
@@ -308,7 +308,7 @@ fn handle_one_to_one(
     // We only need to do those checks if the parent operation is not a create, the reason being that
     // if the parent is a create, it can't have an existing child already.
     if !parent_is_create && (child_side_required || !relation_inlined_parent) {
-        utils::insert_existing_1to1_related_model_checks(graph, &parent_node, parent_relation_field, true)?;
+        utils::insert_existing_1to1_related_model_checks(graph, &parent_node, parent_relation_field)?;
     }
 
     // If the relation is inlined on the child, we also need to update the child to connect it to the parent.
