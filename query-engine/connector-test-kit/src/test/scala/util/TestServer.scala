@@ -95,7 +95,7 @@ case class TestServer() extends PlayJsonExtensions {
     pb.environment.put("PRISMA_DML", envVar)
     pb.environment.put("PORT", port.toString)
     pb.environment.put("PRISMA_LOG_QUERIES", sys.env.getOrElse("PRISMA_LOG_QUERIES", "n"))
-    pb.environment.put("RUST_LOG", sys.env.getOrElse("RUST_LOG", "info"))
+    pb.environment.put("RUST_LOG", "trace")
 
     pb.directory(workingDir)
     pb.redirectErrorStream(true)

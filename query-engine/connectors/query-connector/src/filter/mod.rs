@@ -92,3 +92,10 @@ impl From<Option<RecordFinder>> for Filter {
         }
     }
 }
+
+impl From<Vec<RecordFinder>> for Filter {
+    fn from(record_finders: Vec<RecordFinder>) -> Self {
+        let as_filters: Vec<Filter> = record_finders.into_iter().map(|x| x.into()).collect();
+        Filter::or(as_filters).into()
+    }
+}

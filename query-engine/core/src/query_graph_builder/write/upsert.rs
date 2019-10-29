@@ -15,7 +15,7 @@ pub fn upsert_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedF
     let create_argument = field.arguments.lookup("create").unwrap();
     let update_argument = field.arguments.lookup("update").unwrap();
 
-    let child_read_query = utils::id_read_query_infallible(&model, record_finder.clone());
+    let child_read_query = utils::read_ids_infallible(&model, record_finder.clone());
     let initial_read_node = graph.create_node(child_read_query);
 
     let create_node = create::create_record_node(graph, Arc::clone(&model), create_argument.value.try_into()?)?;

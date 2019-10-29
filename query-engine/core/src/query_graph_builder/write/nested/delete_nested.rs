@@ -46,6 +46,8 @@ pub fn connect_nested_delete(
         let find_child_records_node =
             utils::insert_find_children_by_parent_node(graph, parent_node, parent_relation_field, or_filter)?;
 
+        utils::insert_deletion_checks(graph, child_model, &find_child_records_node, &delete_many_node)?;
+
         let relation_name = parent_relation_field.relation().name.clone();
         let parent_name = parent_relation_field.model().name.clone();
         let child_name = child_model.name.clone();
@@ -77,6 +79,7 @@ pub fn connect_nested_delete(
         let should_delete = if let PrismaValue::Boolean(b) = val { b } else { false };
 
         if should_delete {
+            let id_field = child_model.fields().id();
             let find_child_records_node =
                 utils::insert_find_children_by_parent_node(graph, parent_node, parent_relation_field, Filter::empty())?;
 
@@ -85,7 +88,7 @@ pub fn connect_nested_delete(
                 where_: None,
             })));
 
-            let id_field = child_model.fields().id();
+            utils::insert_deletion_checks(graph, child_model, &find_child_records_node, &delete_record_node)?;
 
             graph.create_edge(
                 &find_child_records_node,
@@ -135,6 +138,8 @@ pub fn connect_nested_delete_many(
 
         let delete_many_node = graph.create_node(Query::Write(delete_many));
         let id_field = child_model.fields().id();
+
+        utils::insert_deletion_checks(graph, child_model, &find_child_records_node, &delete_many_node)?;
 
         graph.create_edge(
             &find_child_records_node,

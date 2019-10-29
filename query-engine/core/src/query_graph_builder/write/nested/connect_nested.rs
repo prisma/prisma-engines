@@ -61,7 +61,7 @@ fn handle_many_to_many(
     child_model: &ModelRef,
 ) -> QueryGraphBuilderResult<()> {
     let record_finder = extract_record_finder(value, &child_model)?;
-    let child_read_query = utils::id_read_query_infallible(&child_model, record_finder);
+    let child_read_query = utils::read_ids_infallible(&child_model, record_finder);
     let child_node = graph.create_node(child_read_query);
 
     graph.create_edge(&parent_node, &child_node, QueryGraphDependency::ExecutionOrder)?;
@@ -115,7 +115,7 @@ fn handle_one_to_many(
 ) -> QueryGraphBuilderResult<()> {
     let record_finder = extract_record_finder(value, &child_model)?;
     let (parent_node, child_node, relation_field_name) = if parent_relation_field.relation_is_inlined_in_parent() {
-        let read_query = utils::id_read_query_infallible(&child_model, record_finder);
+        let read_query = utils::read_ids_infallible(&child_model, record_finder);
         let child_node = graph.create_node(read_query);
 
         // For the injection, we need the name of the field on the inlined side, in this case the parent.
@@ -265,7 +265,7 @@ fn handle_one_to_one(
     }
 
     let record_finder = extract_record_finder(value, &child_model)?;
-    let read_query = utils::id_read_query_infallible(&child_model, record_finder);
+    let read_query = utils::read_ids_infallible(&child_model, record_finder);
     let read_new_child_node = graph.create_node(read_query);
 
     // We always start with the read node in a nested connect 1:1 scenario.

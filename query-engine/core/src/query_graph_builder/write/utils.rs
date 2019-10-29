@@ -25,32 +25,34 @@ pub fn node_is_create(graph: &QueryGraph, node: &NodeRef) -> bool {
     }
 }
 
-/// Produces a non-failing ReadQuery for a given RecordFinder by using
-/// a ManyRecordsQuery instead of a find one (i.e. returns empty list instead of "not found" error).
-pub fn id_read_query_infallible(model: &ModelRef, record_finder: RecordFinder) -> Query {
+// pub fn id_read_query_infallible(model: &ModelRef, record_finder: RecordFinder) -> Query {
+//     let selected_fields: SelectedFields = model.fields().id().into();
+//     let read_query = ReadQuery::ManyRecordsQuery(ManyRecordsQuery {
+//         name: "id_read_query_infallible".into(), // this name only eases debugging
+//         alias: None,
+//         model: Arc::clone(&model),
+//         args: record_finder.into(),
+//         selected_fields,
+//         nested: vec![],
+//         selection_order: vec![],
+//     });
+
+//     Query::Read(read_query)
+// }
+
+/// Produces a non-failing read query that fetches IDs for a given Into<Filter> (e.g. Vec<RecordFinder>, Option<RecordFinder>, RecordFinder, ...).
+pub fn read_ids_infallible<T>(model: &ModelRef, filter: T) -> Query
+where
+    T: Into<Filter>,
+{
     let selected_fields: SelectedFields = model.fields().id().into();
+    let filter: Filter = filter.into();
+
     let read_query = ReadQuery::ManyRecordsQuery(ManyRecordsQuery {
-        name: "id_read_query_infallible".into(), // this name only eases debugging
+        name: "read_ids_infallible".into(), // this name only eases debugging
         alias: None,
         model: Arc::clone(&model),
-        args: record_finder.into(),
-        selected_fields,
-        nested: vec![],
-        selection_order: vec![],
-    });
-
-    Query::Read(read_query)
-}
-
-pub fn ids_read_query_infallible(model: &ModelRef, finders: Vec<RecordFinder>) -> Query {
-    let selected_fields: SelectedFields = model.fields().id().into();
-    let as_filters: Vec<Filter> = finders.into_iter().map(|x| x.into()).collect();
-
-    let read_query = ReadQuery::ManyRecordsQuery(ManyRecordsQuery {
-        name: "id_read_query_infallible".into(), // this name only eases debugging
-        alias: None,
-        model: Arc::clone(&model),
-        args: Filter::or(as_filters).into(),
+        args: filter.into(),
         selected_fields,
         nested: vec![],
         selection_order: vec![],
@@ -243,54 +245,92 @@ pub fn insert_existing_1to1_related_model_checks(
     Ok(())
 }
 
-/// Checks all required, non-list relations pointing to the given `model` prior to a delete (`deleteOne` or `deleteMany`).
+/// Inserts checks into the graph that check all required, non-list relations pointing to
+/// the given `model`. Those checks fail at runtime (edges to the `Empty` node) if one or more
+/// records are found. Checks are inserted between `parent_node` and `child_node`.
+///
+/// This function is usually part of a delete (`deleteOne` or `deleteMany`).
 /// Expects `parent_node` to return one or more IDs (for records of `model`) to be checked.
 ///
-/// Inserts the following into the graph, attached to `parent_node`, assuming we have 2 relations
-/// pointing to `model` (e.g. originating from model `A` and `B`):
-/// ```text
-/// asd
-/// ```
+/// ## Example for a standard delete scenario
+/// - We have 2 relations, from `A` and `B` to `model`.
+/// - This function inserts the nodes and edges in between `Find Record IDs` (`parent_node`) and
+///   `Delete` (`child_node`) into the graph (but not the edge from `Find` to `Delete`, assumed already existing here).
 ///
-/// Returns a `NodeRef` that returns an empty result to allow the caller to depend on the checks' execution before
-fn check_all_required_relations_deletion(
+/// ```text
+///    ┌────────────────────┐
+///    │ Find Record IDs to │
+/// ┌──│       Delete       │
+/// │  └────────────────────┘
+/// │             │
+/// │             ▼
+/// │  ┌────────────────────┐
+/// ├─▶│Find Connected Model│
+/// │  │         A          │──┐
+/// │  └────────────────────┘  │
+/// │             │            │
+/// │             ▼            │
+/// │  ┌────────────────────┐  │
+/// ├─▶│Find Connected Model│  │ Fail if > 0
+/// │  │         B          │  │
+/// │  └────────────────────┘  │
+/// │             │Fail if > 0 │
+/// │             ▼            │
+/// │  ┌────────────────────┐  │
+/// ├─▶│       Empty        │◀─┘
+/// │  └────────────────────┘
+/// │             │
+/// │             ▼
+/// │  ┌────────────────────┐
+/// └─▶│       Delete       │
+///    └────────────────────┘
+/// ```
+pub fn insert_deletion_checks(
     graph: &mut QueryGraph,
     model: &ModelRef,
     parent_node: &NodeRef,
-) -> QueryGraphBuilderResult<NodeRef> {
+    child_node: &NodeRef,
+) -> QueryGraphBuilderResult<()> {
     let internal_model = model.internal_data_model();
     let relation_fields = internal_model.fields_requiring_model(model);
     let mut check_nodes = vec![];
-    let noop_node = graph.create_node(Node::Flow(Flow::Empty));
 
-    // We know that the relation can't be a list and must be required on the related model for `model` (see fields_requiring_model).
-    // For all requiring models (RM), we use the field on `model` to query for existing RM records and error out if at least one exists.
-    for rf in relation_fields {
-        let relation_field = rf.related_field();
-        let read_node = insert_find_children_by_parent_node(graph, parent_node, &relation_field, None)?;
+    if relation_fields.len() > 0 {
+        let noop_node = graph.create_node(Node::Flow(Flow::Empty));
 
-        graph.create_edge(
-            &read_node,
-            &noop_node,
-            QueryGraphDependency::ParentIds(Box::new(move |node, parent_ids| {
-                if !parent_ids.is_empty() {
-                    return Err(QueryGraphBuilderError::RelationViolation((relation_field).into()));
-                }
+        // We know that the relation can't be a list and must be required on the related model for `model` (see fields_requiring_model).
+        // For all requiring models (RM), we use the field on `model` to query for existing RM records and error out if at least one exists.
+        for rf in relation_fields {
+            let relation_field = rf.related_field();
+            let read_node = insert_find_children_by_parent_node(graph, parent_node, &relation_field, None)?;
 
-                Ok(node)
-            })),
-        )?;
+            graph.create_edge(
+                &read_node,
+                &noop_node,
+                QueryGraphDependency::ParentIds(Box::new(move |node, parent_ids| {
+                    if !parent_ids.is_empty() {
+                        return Err(QueryGraphBuilderError::RelationViolation((relation_field).into()));
+                    }
 
-        check_nodes.push(read_node);
+                    Ok(node)
+                })),
+            )?;
+
+            check_nodes.push(read_node);
+        }
+
+        // Connects all `Find Connected Model` nodes with execution order dependency from the example in the docs.
+        check_nodes.into_iter().fold1(|prev, next| {
+            graph
+                .create_edge(&prev, &next, QueryGraphDependency::ExecutionOrder)
+                .unwrap();
+
+            next
+        });
+
+        // Edge from empty node to the child (delete).
+        graph.create_edge(&noop_node, child_node, QueryGraphDependency::ExecutionOrder)?;
     }
 
-    check_nodes.into_iter().fold1(|prev, next| {
-        graph
-            .create_edge(&prev, &next, QueryGraphDependency::ExecutionOrder)
-            .unwrap();
-
-        next
-    });
-
-    Ok(noop_node)
+    Ok(())
 }

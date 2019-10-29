@@ -20,7 +20,7 @@ pub fn connect_nested_set(
         finders.push(record_finder);
     }
 
-    let child_read_query = utils::ids_read_query_infallible(&child_model, finders);
+    let child_read_query = utils::read_ids_infallible(&child_model, finders);
     let child_node = graph.create_node(child_read_query);
 
     graph.create_edge(&parent_node, &child_node, QueryGraphDependency::ExecutionOrder)?;

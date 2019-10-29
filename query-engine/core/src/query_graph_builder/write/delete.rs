@@ -1,10 +1,10 @@
 use super::*;
 use crate::{
     query_ast::*,
-    query_graph::{NodeRef, QueryGraph, QueryGraphDependency},
+    query_graph::{QueryGraph, QueryGraphDependency},
     ArgumentListLookup, ParsedField, ReadOneRecordBuilder,
 };
-use connector::filter::{Filter, RecordFinder};
+use connector::filter::Filter;
 use prisma_models::ModelRef;
 use std::{convert::TryInto, sync::Arc};
 
@@ -18,10 +18,18 @@ pub fn delete_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedF
     read_query.inject_record_finder(record_finder.clone());
 
     let read_node = graph.create_node(Query::Read(read_query));
-    let delete_node = delete_record_node(graph, Some(record_finder), model)?;
+    let delete_query = Query::Write(WriteQuery::DeleteRecord(DeleteRecord {
+        model: Arc::clone(&model),
+        where_: Some(record_finder),
+    }));
 
-    graph.add_result_node(&read_node);
+    let delete_node = graph.create_node(delete_query);
+
+    utils::insert_deletion_checks(graph, &model, &read_node, &delete_node)?;
+
     graph.create_edge(&read_node, &delete_node, QueryGraphDependency::ExecutionOrder)?;
+    graph.create_edge(&read_node, &delete_node, QueryGraphDependency::ExecutionOrder)?;
+    graph.add_result_node(&read_node);
 
     Ok(())
 }
@@ -37,23 +45,21 @@ pub fn delete_many_records(
         None => Filter::empty(),
     };
 
-    let delete_many = WriteQuery::DeleteManyRecords(DeleteManyRecords { model, filter });
+    let read_query = utils::read_ids_infallible(&model, filter.clone());
+    let delete_many = WriteQuery::DeleteManyRecords(DeleteManyRecords {
+        model: Arc::clone(&model),
+        filter,
+    });
 
-    graph.create_node(Query::Write(delete_many));
+    let read_query_node = graph.create_node(read_query);
+    let delete_many_node = graph.create_node(Query::Write(delete_many));
+
+    utils::insert_deletion_checks(graph, &model, &read_query_node, &delete_many_node)?;
+    graph.create_edge(
+        &read_query_node,
+        &delete_many_node,
+        QueryGraphDependency::ExecutionOrder,
+    )?;
+
     Ok(())
-}
-
-/// Creates a delete record node and adds it to the graph.
-/// Returns a `NodeRef` of the created node.
-pub fn delete_record_node(
-    graph: &mut QueryGraph,
-    record_finder: Option<RecordFinder>,
-    model: ModelRef,
-) -> QueryGraphBuilderResult<NodeRef> {
-    let delete_query = Query::Write(WriteQuery::DeleteRecord(DeleteRecord {
-        model,
-        where_: record_finder,
-    }));
-
-    Ok(graph.create_node(delete_query))
 }
