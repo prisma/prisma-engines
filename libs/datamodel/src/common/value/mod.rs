@@ -125,6 +125,7 @@ impl ValueValidator {
         self.as_str_from_env().map(|tuple| tuple.1)
     }
 
+    /// returns a (Some(a), b) if the string was deducted from an env var
     pub fn as_str_from_env(&self) -> Result<(Option<String>, String), DatamodelError> {
         match &self.value {
             MaybeExpression::Value(env_var, ast::Expression::StringValue(value, _)) => {
@@ -132,6 +133,14 @@ impl ValueValidator {
             }
             MaybeExpression::Value(env_var, ast::Expression::Any(value, _)) => Ok((env_var.clone(), value.to_string())),
             _ => Err(self.construct_error("String")),
+        }
+    }
+
+    /// returns true if this argument is derived from an env() function
+    pub fn is_from_env(&self) -> bool {
+        match &self.value {
+            MaybeExpression::Value(Some(_), _) => true,
+            _ => false,
         }
     }
 
