@@ -352,14 +352,15 @@ VALUES (1, 'Joe', 27, 20000.00 );
         assert_eq!(row["salary"].as_f64(), Some(20000.0));
     }
 
-    #[test]
-    fn should_map_nonexisting_database_error() {
+    #[tokio::test]
+    async fn should_map_nonexisting_database_error() {
         let mut config = get_admin_config();
         config.db_name(Some("this_does_not_exist"));
 
-        let res = Mysql::new(config);
+        let conn = Mysql::new(config).unwrap();
+        let res = conn.query_raw( "SELECT 1 + 1", &[]).await;
 
-        assert!(res.is_err());
+        assert!(&res.is_err());
 
         match res.unwrap_err() {
             Error::DatabaseDoesNotExist { db_name } => {
