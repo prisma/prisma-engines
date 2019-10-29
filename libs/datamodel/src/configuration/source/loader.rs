@@ -27,7 +27,14 @@ impl SourceLoader {
         let mut args = Arguments::new(&ast_source.properties, ast_source.span);
         let (env_var_for_url, url) = args.arg("url")?.as_str_from_env()?;
         let provider_arg = args.arg("provider")?;
-        let provider = provider_arg.as_str()?;
+        let (env_var, provider) = provider_arg.as_str_from_env()?;
+
+        if env_var.is_some() {
+            return Err(DatamodelError::new_functional_evaluation_error(
+                &format!("A datasource must not use the env() function in the provider argument."),
+                ast_source.span,
+            ));
+        }
 
         if let Ok(arg) = args.arg("enabled") {
             if !(arg.as_bool()?) {
