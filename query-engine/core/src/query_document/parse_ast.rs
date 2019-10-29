@@ -1,8 +1,8 @@
 //! Parsed query document tree. Naming is WIP.
 //! Structures represent parsed and validated parts of the query document, used by the query builders.
+use crate::FieldRef;
 use prisma_models::PrismaValue;
 use std::collections::BTreeMap;
-use crate::FieldRef;
 
 pub type ParsedInputMap = BTreeMap<String, ParsedInputValue>;
 

@@ -1,15 +1,15 @@
+mod aggregate;
 mod many;
 mod one;
 mod related;
-mod aggregate;
 
+pub use aggregate::*;
 pub use many::*;
 pub use one::*;
 pub use related::*;
-pub use aggregate::*;
 
-use crate::{query_document::ParsedField, ReadQuery};
 use super::*;
+use crate::{query_document::ParsedField, ReadQuery};
 use prisma_models::{
     Field, ModelRef, RelationFieldRef, SelectedField, SelectedFields, SelectedRelationField, SelectedScalarField,
 };

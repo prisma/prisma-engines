@@ -64,7 +64,10 @@ impl DirectiveValidator<dml::Field> for RelationDirectiveValidator {
 
             relation_fields.sort();
             all_related_ids.sort();
-            if !relation_info.to_fields.is_empty() && relation_fields != all_related_ids && parent_model.name < related_model.name {
+            if !relation_info.to_fields.is_empty()
+                && relation_fields != all_related_ids
+                && parent_model.name < related_model.name
+            {
                 let mut related_fields: Vec<ast::Expression> = Vec::new();
                 for related_field in &relation_info.to_fields {
                     related_fields.push(ast::Expression::ConstantValue(

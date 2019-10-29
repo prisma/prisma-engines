@@ -8,7 +8,6 @@ pub use create_input_type_extension::*;
 pub use input_builder_extensions::*;
 pub use update_input_type_extension::*;
 
-
 pub trait InputTypeBuilderBase<'a>: CachedBuilder<InputObjectType> + InputBuilderExtensions {
     /// Builds scalar input fields using the mapper and the given, prefiltered, scalar fields.
     /// The mapper is responsible for mapping the fields to input types.

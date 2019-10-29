@@ -72,7 +72,12 @@ where
 }
 
 /// Field convenience wrapper function.
-pub fn field<T>(name: T, arguments: Vec<Argument>, field_type: OutputType, query_builder: Option<SchemaQueryBuilder>) -> Field
+pub fn field<T>(
+    name: T,
+    arguments: Vec<Argument>,
+    field_type: OutputType,
+    query_builder: Option<SchemaQueryBuilder>,
+) -> Field
 where
     T: Into<String>,
 {

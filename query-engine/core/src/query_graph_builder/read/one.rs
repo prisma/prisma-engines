@@ -1,5 +1,8 @@
 use super::*;
-use crate::{ReadQuery, RecordQuery, query_document::{ParsedField, ArgumentListLookup}};
+use crate::{
+    query_document::{ArgumentListLookup, ParsedField},
+    ReadQuery, RecordQuery,
+};
 use prisma_models::ModelRef;
 
 pub struct ReadOneRecordBuilder {

@@ -529,7 +529,7 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
                             parentsOpt Parent[]
                             otherReq   ReqOther @relation(references: [id])
                         }
-                       
+
                         model ReqOther{
                             id       String @id @default(cuid())
                             r        String @unique
@@ -703,10 +703,10 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
         |        create: [{text: "comment1"}, {text: "comment2"}]
         |      }
         |    }
-        |  ){ 
-        |    id 
+        |  ){
+        |    id
         |    comments { id }
-        |  } 
+        |  }
         |}""",
       project
     )
@@ -888,17 +888,17 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
     database.setup(project)
 
     val createResult = server.query(
-      """mutation { 
+      """mutation {
         |  createNote(
         |    data: {
         |      todo: {
         |        create: { title: "the title" }
         |      }
         |    }
-        |  ){ 
+        |  ){
         |    id
         |    todo { id }
-        |  } 
+        |  }
         |}""",
       project
     )
@@ -1086,7 +1086,7 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
         |  createTop(data: {
         |    nameTop: "the top",
         |    middles: {
-        |      create:[ 
+        |      create:[
         |        {
         |          nameMiddle: "the middle"
         |          bottoms: {
@@ -1371,7 +1371,7 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
          |        below{
          |           nameBelow
          |        }
-         |        
+         |
          |      }
          |    }
          |  }

@@ -18,7 +18,7 @@ class WhereUniqueSpec extends FlatSpec with Matchers with ApiSpecBase {
     .query(
       s"""mutation{createUser(
          |  data: {
-         |    unique:2, 
+         |    unique:2,
          |    email: "test@test.com"
          |})
          |{id}

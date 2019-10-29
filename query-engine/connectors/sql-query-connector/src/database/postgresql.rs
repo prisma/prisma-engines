@@ -1,7 +1,5 @@
 use super::transaction::SqlConnectorTransaction;
-use crate::{
-    query_builder::ManyRelatedRecordsWithRowNumber, FromSource, SqlError,
-};
+use crate::{query_builder::ManyRelatedRecordsWithRowNumber, FromSource, SqlError};
 use connector_interface::*;
 use datamodel::Source;
 use prisma_query::{

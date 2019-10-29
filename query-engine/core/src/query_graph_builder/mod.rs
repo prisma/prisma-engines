@@ -1,15 +1,15 @@
 //! Query graph builder module.
 //! tbd
 
-mod error;
 mod builder;
+mod error;
 mod read;
 mod utils;
 
 pub mod write;
 
-pub use error::*;
 pub use builder::*;
+pub use error::*;
 pub use read::*;
 pub use utils::*;
 

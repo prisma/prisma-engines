@@ -13,7 +13,7 @@ class DeleteManyMutationRelationsSpec extends FlatSpec with Matchers with ApiSpe
                             id String @id @default(cuid())
                             p  String @unique
                         }
-                        
+
                         model Child{
                             id        String @id @default(cuid())
                             c         String @unique
@@ -65,7 +65,7 @@ class DeleteManyMutationRelationsSpec extends FlatSpec with Matchers with ApiSpe
                             id String @id @default(cuid())
                             p  String @unique
                         }
-                        
+
                         model Child{
                             id        String @id @default(cuid())
                             c         String @unique
@@ -774,13 +774,13 @@ class DeleteManyMutationRelationsSpec extends FlatSpec with Matchers with ApiSpe
                        childrenOpt  Child[] @relation(references: [id])
                        stepChildOpt StepChild @relation(references: [id])
                    }
-  
+
                    model Child{
                        id         String  @id @default(cuid())
                        c          String  @unique
                        parentsOpt Parent[]
                    }
-                   
+
                    model StepChild{
                         id        String  @id @default(cuid())
                         s         String  @unique
@@ -793,13 +793,13 @@ class DeleteManyMutationRelationsSpec extends FlatSpec with Matchers with ApiSpe
                        childrenOpt  Child[]
                        stepChildOpt StepChild? @relation(references: [id])
                    }
-  
+
                    model Child{
                        id         String @id @default(cuid())
                        c          String @unique
                        parentsOpt Parent[]
                    }
-                   
+
                    model StepChild{
                         id        String  @id @default(cuid())
                         s         String  @unique

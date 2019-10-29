@@ -1,5 +1,5 @@
 // use std::fmt;
-use crate::{QueryParserError, QueryGraphError};
+use crate::{QueryGraphError, QueryParserError};
 use prisma_models::{DomainError, RelationFieldRef};
 
 #[derive(Debug)]

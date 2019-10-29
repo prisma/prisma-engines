@@ -30,10 +30,7 @@ impl Logger {
             _ => {
                 let drain = Json::new(std::io::stdout()).add_default_keys().build().fuse();
                 let drain = slog_envlogger::new(drain);
-                let drain = Async::new(drain)
-                    .chan_size(524288)
-                    .build()
-                    .fuse();
+                let drain = Async::new(drain).chan_size(524288).build().fuse();
 
                 let log = slog::Logger::root(drain, o!("application" => application));
 

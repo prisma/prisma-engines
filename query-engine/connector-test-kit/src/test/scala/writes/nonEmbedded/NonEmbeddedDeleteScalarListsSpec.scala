@@ -37,7 +37,7 @@ class NonEmbeddedDeleteScalarListsSpec extends FlatSpec with Matchers with ApiSp
         |    data: { name: "test", bottom: {create: {name: "test2", list: {set: [1,2,3]}} }}
         |  ){
         |    name
-        |    bottom{name, list} 
+        |    bottom{name, list}
         |  }
         |}
       """,

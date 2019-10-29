@@ -13,11 +13,7 @@
 //! arcs are dropped due to visitor operations, the schema can't be traversed anymore due to invalid references.
 //!
 use super::*;
-use std::{
-    cell::RefCell,
-    collections::HashMap,
-    fmt::Debug,
-};
+use std::{cell::RefCell, collections::HashMap, fmt::Debug};
 
 pub trait CachedBuilder<T: Debug> {
     /// Retrieve cache.

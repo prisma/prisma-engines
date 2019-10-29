@@ -91,7 +91,10 @@ impl FilterOp {
     }
 }
 
-pub fn extract_filter(value_map: BTreeMap<String, ParsedInputValue>, model: &ModelRef) -> QueryGraphBuilderResult<Filter> {
+pub fn extract_filter(
+    value_map: BTreeMap<String, ParsedInputValue>,
+    model: &ModelRef,
+) -> QueryGraphBuilderResult<Filter> {
     let filters = value_map
         .into_iter()
         .map(|(key, value): (String, ParsedInputValue)| {

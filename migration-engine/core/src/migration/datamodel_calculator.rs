@@ -208,12 +208,9 @@ fn apply_update_index(data_model: &mut Datamodel, step: &UpdateIndex) {
         step.model
     ));
 
-    let index_opt = model
-        .indexes
-        .iter_mut()
-        .find(|index| step.applies_to_index(index));
+    let index_opt = model.indexes.iter_mut().find(|index| step.applies_to_index(index));
 
     if let Some(index) = index_opt {
-            index.name = step.name.clone();
+        index.name = step.name.clone();
     }
 }

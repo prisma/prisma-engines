@@ -685,7 +685,7 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
       server.queryThatMustFail(
         s"""mutation {
          |  updateParent(
-         |  where: {p: "p2"} 
+         |  where: {p: "p2"}
          |  data:{
          |    childOpt: {connect: {c: "c1"}}
          |  }){
@@ -742,7 +742,7 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
         s"""
          |mutation {
          |  updateParent(
-         |  where: {p: "p2"} 
+         |  where: {p: "p2"}
          |  data:{
          |    childOpt: {connect: {c: "c1"}}
          |  }){

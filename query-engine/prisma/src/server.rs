@@ -8,8 +8,8 @@ use crate::{
     PrismaResult,
 };
 use actix_web::{http::Method, App, HttpRequest, HttpResponse, Json, Responder};
-use serde_json::json;
 use core::schema::QuerySchemaRenderer;
+use serde_json::json;
 use std::{sync::Arc, time::Instant};
 
 #[derive(RustEmbed)]
@@ -24,8 +24,7 @@ pub(crate) struct RequestContext {
 pub struct HttpServer;
 
 impl HttpServer {
-    pub fn run(address: (&'static str, u16), legacy_mode: bool) -> PrismaResult<()>
-    {
+    pub fn run(address: (&'static str, u16), legacy_mode: bool) -> PrismaResult<()> {
         let now = Instant::now();
 
         let sys = actix::System::new("prisma");
@@ -45,7 +44,9 @@ impl HttpServer {
                 .resource("/sdl", |r| r.method(Method::GET).with(Self::sdl_handler))
                 .resource("/dmmf", |r| r.method(Method::GET).with(Self::dmmf_handler))
                 .resource("/status", |r| r.method(Method::GET).with(Self::status_handler))
-                .resource("/server_info", |r| r.method(Method::GET).with(Self::server_info_handler))
+                .resource("/server_info", |r| {
+                    r.method(Method::GET).with(Self::server_info_handler)
+                })
         });
 
         server.bind(address)?.start();
@@ -111,9 +112,7 @@ impl HttpServer {
     fn status_handler<T>(_: HttpRequest<T>) -> impl Responder {
         let response = serde_json::to_string(&json!({ "status": "ok" })).unwrap();
 
-        HttpResponse::Ok()
-            .content_type("application/json")
-            .body(response)
+        HttpResponse::Ok().content_type("application/json").body(response)
     }
 
     fn server_info_handler(req: HttpRequest<Arc<RequestContext>>) -> impl Responder {

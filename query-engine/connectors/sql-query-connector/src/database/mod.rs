@@ -1,10 +1,10 @@
-mod transaction;
 mod mysql;
 mod postgresql;
 mod sqlite;
+mod transaction;
 
-use datamodel::Source;
 use connector_interface::Connector;
+use datamodel::Source;
 
 pub use mysql::*;
 pub use postgresql::*;

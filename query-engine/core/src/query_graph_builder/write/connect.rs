@@ -1,8 +1,7 @@
 use crate::{
     query_ast::*,
     query_graph::{Node, NodeRef, ParentIdsFn, QueryGraph, QueryGraphDependency},
-    QueryGraphBuilderError,
-    QueryGraphBuilderResult,
+    QueryGraphBuilderError, QueryGraphBuilderResult,
 };
 use prisma_models::RelationFieldRef;
 use std::{convert::TryInto, sync::Arc};

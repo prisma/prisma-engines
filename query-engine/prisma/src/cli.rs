@@ -4,9 +4,8 @@ use crate::{
 };
 use clap::ArgMatches;
 use core::{
-    QuerySchemaBuilder,
     schema::{QuerySchemaRef, SupportedCapabilities},
-    BuildMode,
+    BuildMode, QuerySchemaBuilder,
 };
 use serde::Deserialize;
 use std::sync::Arc;
