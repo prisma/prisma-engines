@@ -7,11 +7,10 @@ use prisma_query::{
     ast::*,
     connector::{self, Queryable, ResultSet, SqliteParams},
     error::Error as QueryError,
-    pool::{MysqlManager, Pool, PostgresManager, SqliteManager},
+    pool::{CheckOut, Manage, MysqlManager, Pool, PostgresManager, SqliteManager},
 };
 use std::convert::{TryFrom, TryInto};
 use tokio::runtime::Runtime;
-use tokio_resource_pool::{CheckOut, Manage};
 use url::Url;
 
 /// A generic synchronous SQL connection interface.

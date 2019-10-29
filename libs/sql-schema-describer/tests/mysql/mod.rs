@@ -1,5 +1,4 @@
 use log::debug;
-use prisma_query::connector::Queryable;
 use sql_connection::{Mysql, SyncSqlConnection};
 use sql_schema_describer::*;
 use std::sync::Arc;
