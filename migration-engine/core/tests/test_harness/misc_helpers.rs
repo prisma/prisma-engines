@@ -4,11 +4,10 @@ use migration_core::{
     api::{GenericApi, MigrationApi},
     commands::ResetCommand,
 };
-use prisma_query::connector::{MysqlParams, PostgresParams};
 use sql_connection::{Mysql, Postgresql, Sqlite, SyncSqlConnection};
 use sql_migration_connector::{SqlFamily, SqlMigrationConnector};
 use sql_schema_describer::{SqlSchema, SqlSchemaDescriberBackend};
-use std::{convert::TryFrom, rc::Rc, sync::Arc};
+use std::{rc::Rc, sync::Arc};
 use url::Url;
 
 pub const SCHEMA_NAME: &str = "migration-engine";
@@ -19,12 +18,6 @@ pub struct TestSetup {
 }
 
 impl TestSetup {
-    // pub fn database_wrapper(&self) -> MigrationDatabaseWrapper {
-    //     MigrationDatabaseWrapper {
-    //         database: Arc::clone(&self.database),
-    //     }
-    // }
-
     pub fn is_sqlite(&self) -> bool {
         match self.sql_family {
             SqlFamily::Sqlite => true,
@@ -176,17 +169,11 @@ pub fn introspect_database(test_setup: &TestSetup, api: &dyn GenericApi) -> SqlS
         .describe(&SCHEMA_NAME.to_string())
         .expect("Introspection failed");
 
-    // the presence of the _Migration table makes assertions harder. Therefore remove it from the result.
+    // The presence of the _Migration table makes assertions harder. Therefore remove it from the result.
     result.tables = result.tables.into_iter().filter(|t| t.name != "_Migration").collect();
 
     result
 }
-
-// pub fn database_wrapper(sql_family: SqlFamily, database_url: &str) -> MigrationDatabaseWrapper {
-//     MigrationDatabaseWrapper {
-//         database: database(sql_family, database_url).into(),
-//     }
-// }
 
 fn fetch_db_name(url: &Url, default: &str) -> String {
     let result = match url.path_segments() {

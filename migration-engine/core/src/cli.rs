@@ -2,7 +2,6 @@ use clap::ArgMatches;
 use failure::Fail;
 use itertools::Itertools;
 use migration_connector::*;
-use sql_connection::Postgresql;
 use sql_migration_connector::{SqlError, SqlMigrationConnector};
 use std::collections::HashMap;
 use url::Url;
@@ -155,9 +154,7 @@ fn create_postgres_admin_conn(mut url: Url) -> crate::Result<SqlMigrationConnect
 #[cfg(test)]
 mod tests {
     use super::CliError;
-    use prisma_query::connector::{MysqlParams, PostgresParams};
     use sql_connection::{Mysql, Postgresql, SyncSqlConnection};
-    use std::convert::TryFrom;
 
     fn with_cli<F>(matches: Vec<&str>, f: F) -> Result<(), Box<dyn std::any::Any + Send + 'static>>
     where

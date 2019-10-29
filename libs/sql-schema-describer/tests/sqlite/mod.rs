@@ -1,9 +1,8 @@
 use log::debug;
-use prisma_query::connector::Queryable;
 use sql_connection::{Sqlite, SyncSqlConnection};
 use sql_schema_describer::*;
 use std::path::Path;
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
 
 use super::SCHEMA;
 

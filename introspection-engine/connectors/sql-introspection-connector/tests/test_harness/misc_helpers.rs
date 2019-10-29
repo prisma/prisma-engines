@@ -188,8 +188,6 @@ fn fetch_db_name(url: &Url, default: &str) -> String {
 }
 
 fn get_sqlite() -> TestSetup {
-    // let wrapper = database_wrapper(SqlFamily::Sqlite, &sqlite_test_file());
-    // let database = Arc::clone(&wrapper.database);
     let database = database(SqlFamily::Sqlite, &sqlite_test_file());
 
     let database_file_path = sqlite_test_file();
@@ -204,7 +202,6 @@ fn get_sqlite() -> TestSetup {
 }
 
 fn get_postgres() -> TestSetup {
-    // let wrapper = database_wrapper(SqlFamily::Postgres, &postgres_url());
     let database = database(SqlFamily::Postgres, &postgres_url());
 
     let drop_schema = dbg!(format!("DROP SCHEMA IF EXISTS \"{}\" CASCADE;", SCHEMA_NAME));
@@ -223,8 +220,6 @@ fn get_postgres() -> TestSetup {
 }
 
 fn get_mysql() -> TestSetup {
-    // let wrapper = database_wrapper(SqlFamily::Mysql, &mysql_url());
-    // let database = Arc::clone(&wrapper.database);
     let database = database(SqlFamily::Mysql, &mysql_url());
 
     let drop_schema = dbg!(format!("DROP SCHEMA IF EXISTS \"{}\" CASCADE;", SCHEMA_NAME));

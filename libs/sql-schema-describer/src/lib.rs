@@ -1,8 +1,7 @@
 //! Database description.
+
 use failure::Fail;
-use prisma_query::ast::ParameterizedValue;
 use serde::{Deserialize, Serialize};
-use sql_connection::SyncSqlConnection;
 use std::collections::HashSet;
 use std::fmt;
 

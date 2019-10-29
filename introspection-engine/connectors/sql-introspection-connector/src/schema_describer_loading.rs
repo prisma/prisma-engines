@@ -1,10 +1,6 @@
 use crate::{SqlIntrospectionError, SqlIntrospectionResult};
-use prisma_query::ast::*;
-use prisma_query::connector::{PostgreSql, Queryable, Sqlite, SqliteParams};
 use sql_schema_describer::SqlSchemaDescriberBackend;
-use std::convert::TryFrom;
-use std::sync::{Arc, Mutex};
-use url::Url;
+use std::sync::Arc;
 
 pub fn load_describer(url_str: &str) -> SqlIntrospectionResult<Box<dyn SqlSchemaDescriberBackend>> {
     if url_str.starts_with("postgresql://") {

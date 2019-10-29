@@ -423,12 +423,12 @@ struct BarrelMigrationExecutor {
 }
 
 impl BarrelMigrationExecutor {
-    fn execute<F>(&self, mut migrationFn: F) -> SqlSchema
+    fn execute<F>(&self, mut migration_fn: F) -> SqlSchema
     where
         F: FnMut(&mut Migration) -> (),
     {
         let mut migration = Migration::new().schema(SCHEMA_NAME);
-        migrationFn(&mut migration);
+        migration_fn(&mut migration);
         let full_sql = dbg!(migration.make_from(self.sql_variant));
         run_full_sql(&self.database, &full_sql);
         let mut result = self
