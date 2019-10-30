@@ -8,19 +8,21 @@ pedantic:
 release:
 	cargo build --release
 
+dev-all:
+	docker-compose -f .buildkite/engine-build-cli/docker-test-setups/docker-compose.test.all.yml up -d --remove-orphans
+
 dev-sqlite:
+	make dev-all
 	echo 'sqlite' > current_connector
 
 dev-postgres:
-	docker-compose -f docker-compose/dev-postgres.yml up -d --remove-orphans
+	make dev-all
 	echo 'postgres' > current_connector
 
 dev-mysql:
-	docker-compose -f docker-compose/dev-mysql.yml up -d --remove-orphans
+	make dev-all
 	echo 'mysql' > current_connector
 
-dev-all:
-	docker-compose -f .buildkite/engine-build-cli/docker-test-setups/docker-compose.test.all.yml up -d --remove-orphans
 
 use-local-migration-engine:
 	cargo build --release
