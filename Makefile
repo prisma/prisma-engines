@@ -23,6 +23,10 @@ dev-mysql:
 	make dev-all
 	echo 'mysql' > current_connector
 
+dev-mysql8:
+	make dev-all
+	echo 'mysql8' > current_connector
+
 
 use-local-migration-engine:
 	cargo build --release

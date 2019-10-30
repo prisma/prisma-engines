@@ -21,7 +21,8 @@ object ConnectorConfig {
     connectorToTest match {
       case "sqlite"                  => ConnectorConfig("sqlite", "file://$DB_FILE")
       case "postgres" | "postgresql" => ConnectorConfig("postgresql", s"postgresql://postgres:prisma@$postgresHost:5432/db?schema=$$DB&connection_limit=1")
-      case "mysql"                   => ConnectorConfig("mysql", s"mysql://root:prisma@$mysqlHost:3306/$$DB?connection_limit=1")
+      case "mysql"                   => ConnectorConfig("mysql", s"mysql://root:prisma@$mysql_5_7_Host:3306/$$DB?connection_limit=1")
+      case "mysql8"                   => ConnectorConfig("mysql", s"mysql://root:prisma@$mysql_8_0_Host:$mysql_8_0_Port/$$DB?connection_limit=1")
       case x                         => sys.error(s"Connector $x is not supported yet.")
     }
   }
@@ -34,11 +35,27 @@ object ConnectorConfig {
     }
   }
 
-  lazy val mysqlHost = {
+  lazy val mysql_5_7_Host = {
     if (EnvVars.isBuildkite) {
       "test-db-mysql-5-7"
     } else {
       "127.0.0.1"
+    }
+  }
+
+  lazy val mysql_8_0_Host = {
+    if (EnvVars.isBuildkite) {
+      "test-db-mysql-8-0"
+    } else {
+      "127.0.0.1"
+    }
+  }
+
+  lazy val mysql_8_0_Port = {
+    if (EnvVars.isBuildkite) {
+      3306
+    } else {
+      3307
     }
   }
 }
