@@ -7,8 +7,11 @@ use crate::{
     },
     PrismaResult,
 };
-use actix_web::{http::Method, App, HttpRequest, HttpResponse, Json, Responder};
 use core::schema::QuerySchemaRenderer;
+use futures::stream::TryStreamExt;
+use hyper::header;
+use hyper::service::{make_service_fn, service_fn};
+use hyper::{Body, Error, Method, Request, Response, Server, StatusCode};
 use serde_json::json;
 use std::{sync::Arc, time::Instant};
 
@@ -24,106 +27,148 @@ pub(crate) struct RequestContext {
 pub struct HttpServer;
 
 impl HttpServer {
-    pub fn run(address: (&'static str, u16), legacy_mode: bool) -> PrismaResult<()> {
+    pub async fn run(address: ([u8; 4], u16), legacy_mode: bool) -> PrismaResult<()> {
         let now = Instant::now();
 
-        let sys = actix::System::new("prisma");
-        let context = PrismaContext::new(legacy_mode)?;
-
-        let request_context = Arc::new(RequestContext {
-            context: context,
+        let ctx = Arc::new(RequestContext {
+            context: PrismaContext::new(legacy_mode)?,
             graphql_request_handler: GraphQlRequestHandler,
         });
 
-        let server = actix_web::server::new(move || {
-            App::with_state(Arc::clone(&request_context))
-                .resource("/", |r| {
-                    r.method(Method::POST).with(Self::http_handler);
-                    r.method(Method::GET).with(Self::playground_handler);
-                })
-                .resource("/sdl", |r| r.method(Method::GET).with(Self::sdl_handler))
-                .resource("/dmmf", |r| r.method(Method::GET).with(Self::dmmf_handler))
-                .resource("/status", |r| r.method(Method::GET).with(Self::status_handler))
-                .resource("/server_info", |r| {
-                    r.method(Method::GET).with(Self::server_info_handler)
-                })
+        let service = make_service_fn(|_| {
+            let ctx = ctx.clone();
+
+            async { Ok::<_, Error>(service_fn(move |req| Self::routes(ctx.clone(), req))) }
         });
 
-        server.bind(address)?.start();
+        let address = address.into();
+        let server = Server::bind(&address).serve(service);
 
         trace!("Initialized in {}ms", now.elapsed().as_millis());
-        info!("Started http server on {}:{}", address.0, address.1);
+        info!("Started http server on {}:{}", address.ip(), address.port());
 
-        sys.run();
+        server.await.unwrap();
 
         Ok(())
     }
 
-    /// Main handler for query engine requests.
-    fn http_handler((json, req): (Json<Option<GraphQlBody>>, HttpRequest<Arc<RequestContext>>)) -> impl Responder {
-        let request_context = req.state();
-        let req: PrismaRequest<GraphQlBody> = PrismaRequest {
-            body: json.clone().unwrap(),
-            path: req.path().into(),
-            headers: req
-                .headers()
-                .iter()
-                .map(|(k, v)| (format!("{}", k), v.to_str().unwrap().into()))
-                .collect(),
+    async fn routes(ctx: Arc<RequestContext>, req: Request<Body>) -> std::result::Result<Response<Body>, Error> {
+        let res = match (req.method(), req.uri().path()) {
+            (&Method::POST, "/") => {
+                let (parts, chunks) = req.into_parts();
+                let body_bytes = chunks.try_concat().await?;
+
+                match serde_json::from_slice(body_bytes.as_ref()) {
+                    Ok(body) => {
+                        let req = PrismaRequest {
+                            body,
+                            path: parts.uri.path().into(),
+                            headers: parts
+                                .headers
+                                .iter()
+                                .map(|(k, v)| (format!("{}", k), v.to_str().unwrap().into()))
+                                .collect(),
+                        };
+
+                        Self::http_handler(req, ctx).await
+                    }
+                    Err(_) => {
+                        let mut bad_request = Response::default();
+                        *bad_request.status_mut() = StatusCode::BAD_REQUEST;
+                        bad_request
+                    }
+                }
+            }
+
+            (&Method::GET, "/") => Self::playground_handler(),
+            (&Method::GET, "/status") => Self::status_handler(),
+
+            (&Method::GET, "/sdl") => Self::sdl_handler(ctx),
+            (&Method::GET, "/dmmf") => Self::dmmf_handler(ctx),
+            (&Method::GET, "/server_info") => Self::server_info_handler(ctx),
+
+            _ => {
+                let mut not_found = Response::default();
+                *not_found.status_mut() = StatusCode::NOT_FOUND;
+                not_found
+            }
         };
 
-        let result = request_context
-            .graphql_request_handler
-            .handle(req, &request_context.context);
-
-        // TODO this copies the data for some reason.
-        serde_json::to_string(&result)
+        Ok(res)
     }
 
-    /// Serves playground html.
-    fn playground_handler<T>(_: HttpRequest<T>) -> impl Responder {
+    async fn http_handler(req: PrismaRequest<GraphQlBody>, cx: Arc<RequestContext>) -> Response<Body> {
+        let result = cx.graphql_request_handler.handle(req, &cx.context); //.await;
+        let bytes = serde_json::to_vec(&result).unwrap();
+
+        Response::builder()
+            .status(StatusCode::OK)
+            .header(header::CONTENT_TYPE, "application/json")
+            .body(Body::from(bytes))
+            .unwrap()
+    }
+
+    fn status_handler() -> Response<Body> {
+        let body_data = json!({"status": "ok"});
+        let bytes = serde_json::to_vec(&body_data).unwrap();
+
+        Response::builder()
+            .status(StatusCode::OK)
+            .header(header::CONTENT_TYPE, "application/json")
+            .body(Body::from(bytes))
+            .unwrap()
+    }
+
+    fn playground_handler() -> Response<Body> {
         let index_html = StaticFiles::get("playground.html").unwrap();
-        HttpResponse::Ok().content_type("text/html").body(index_html)
+
+        Response::builder()
+            .status(StatusCode::OK)
+            .header(header::CONTENT_TYPE, "text/html")
+            .body(Body::from(index_html.into_owned()))
+            .unwrap()
     }
 
     /// Handler for the playground to work with the SDL-rendered query schema.
     /// Serves a raw SDL string created from the query schema.
-    fn sdl_handler(req: HttpRequest<Arc<RequestContext>>) -> impl Responder {
-        let request_context = req.state();
+    fn sdl_handler(cx: Arc<RequestContext>) -> Response<Body> {
+        let rendered = GraphQLSchemaRenderer::render(Arc::clone(&cx.context.query_schema()));
 
-        let rendered = GraphQLSchemaRenderer::render(Arc::clone(request_context.context.query_schema()));
-        HttpResponse::Ok().content_type("application/text").body(rendered)
+        Response::builder()
+            .status(StatusCode::OK)
+            .header(header::CONTENT_TYPE, "application/text")
+            .body(Body::from(rendered))
+            .unwrap()
     }
 
     /// Renders the Data Model Meta Format.
     /// Only callable if prisma was initialized using a v2 data model.
-    fn dmmf_handler(req: HttpRequest<Arc<RequestContext>>) -> impl Responder {
-        let request_context = req.state();
-        let dmmf = dmmf::render_dmmf(
-            request_context.context.datamodel(),
-            Arc::clone(request_context.context.query_schema()),
-        );
-        let serialized = serde_json::to_string(&dmmf).unwrap();
+    fn dmmf_handler(cx: Arc<RequestContext>) -> Response<Body> {
+        let dmmf = dmmf::render_dmmf(cx.context.datamodel(), Arc::clone(cx.context.query_schema()));
 
-        HttpResponse::Ok().content_type("application/json").body(serialized)
+        let bytes = serde_json::to_vec(&dmmf).unwrap();
+
+        Response::builder()
+            .status(StatusCode::OK)
+            .header(header::CONTENT_TYPE, "application/json")
+            .body(Body::from(bytes))
+            .unwrap()
     }
 
     /// Simple status endpoint
-    fn status_handler<T>(_: HttpRequest<T>) -> impl Responder {
-        let response = serde_json::to_string(&json!({ "status": "ok" })).unwrap();
-
-        HttpResponse::Ok().content_type("application/json").body(response)
-    }
-
-    fn server_info_handler(req: HttpRequest<Arc<RequestContext>>) -> impl Responder {
-        let response = json!({
+    fn server_info_handler(cx: Arc<RequestContext>) -> Response<Body> {
+        let json = json!({
             "commit": env!("GIT_HASH"),
             "version": env!("CARGO_PKG_VERSION"),
-            "primary_connector": req.state().context.primary_connector(),
+            "primary_connector": cx.context.primary_connector(),
         });
 
-        HttpResponse::Ok()
-            .content_type("application/json")
-            .body(serde_json::to_string(&response).unwrap())
+        let bytes = serde_json::to_vec(&json).unwrap();
+
+        Response::builder()
+            .status(StatusCode::OK)
+            .header(header::CONTENT_TYPE, "application/json")
+            .body(Body::from(bytes))
+            .unwrap()
     }
 }

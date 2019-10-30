@@ -1,7 +1,6 @@
-extern crate log;
-extern crate slog;
 #[macro_use]
-extern crate slog_scope;
+extern crate log;
+
 #[macro_use]
 extern crate rust_embed;
 
@@ -26,7 +25,8 @@ use std::{env, error::Error, process};
 
 pub type PrismaResult<T> = Result<T, PrismaError>;
 
-fn main() -> Result<(), Box<dyn Error + Send + Sync + 'static>> {
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn Error + Send + Sync + 'static>> {
     let matches = ClapApp::new("Prisma Query Engine")
         .version(env!("CARGO_PKG_VERSION"))
         .arg(
@@ -104,10 +104,10 @@ fn main() -> Result<(), Box<dyn Error + Send + Sync + 'static>> {
             .and_then(|p| p.parse::<u16>().ok())
             .unwrap_or_else(|| 4466);
 
-        let address = ("0.0.0.0", port);
+        let address = ([0, 0, 0, 0], port);
         let legacy = matches.is_present("legacy");
 
-        if let Err(err) = HttpServer::run(address, legacy) {
+        if let Err(err) = HttpServer::run(address, legacy).await {
             info!("Encountered error during initialization:");
             err.pretty_print();
             process::exit(1);
