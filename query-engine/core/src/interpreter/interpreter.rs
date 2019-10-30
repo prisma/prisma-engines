@@ -4,7 +4,7 @@ use super::{
     InterpretationResult, InterpreterError,
 };
 use crate::{Query, QueryResult};
-use connector::TransactionLike;
+use connector::Transaction;
 use im::HashMap;
 use prisma_models::prelude::*;
 
@@ -62,12 +62,12 @@ impl Env {
 }
 
 pub struct QueryInterpreter<'a> {
-    pub(crate) tx: &'a mut dyn TransactionLike,
+    pub(crate) tx: Box<dyn Transaction<'a>>,
     pub log: String,
 }
 
 impl<'a> QueryInterpreter<'a> {
-    pub fn new(tx: &'a mut dyn TransactionLike) -> QueryInterpreter<'a> {
+    pub fn new(tx: Box<dyn Transaction>) -> QueryInterpreter {
         QueryInterpreter { tx, log: String::new() }
     }
 

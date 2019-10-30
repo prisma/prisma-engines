@@ -1,7 +1,5 @@
-// mod read;
-// mod write;
-
-use crate::{query_builder::read::ManyRelatedRecordsQueryBuilder, SqlError};
+use super::transaction::SqlConnectorTransaction;
+use crate::{query_builder::read::ManyRelatedRecordsQueryBuilder, QueryExt, SqlError};
 use connector_interface::{
     self as connector,
     filter::{Filter, RecordFinder},
@@ -11,35 +9,39 @@ use prisma_models::prelude::*;
 use prisma_query::connector::Queryable;
 use std::marker::PhantomData;
 
-pub struct SqlConnectorTransaction<'a, T> {
-    inner: prisma_query::connector::Transaction<'a>,
+pub struct SqlConnection<C, T> {
+    inner: C,
     _p: PhantomData<T>,
 }
 
-impl<'a, T> SqlConnectorTransaction<'a, T> {
-    pub fn new(tx: prisma_query::connector::Transaction<'a>) -> Self {
-        Self {
-            inner: tx,
-            _p: PhantomData,
-        }
+impl<'a, C, T> SqlConnection<C, T>
+where
+    C: QueryExt,
+    T: ManyRelatedRecordsQueryBuilder,
+{
+    pub fn new(inner: C) -> Self {
+        Self { inner, _p: PhantomData }
     }
 }
 
-impl<'a, T> Transaction<'a> for SqlConnectorTransaction<'a, T>
+impl<C, T> Connection for SqlConnection<C, T>
 where
+    C: QueryExt,
     T: ManyRelatedRecordsQueryBuilder + Send + Sync + 'static,
 {
-    fn commit(self) -> IO<'a, ()> {
-        IO::new(async move { Ok(self.inner.commit().await.map_err(SqlError::from)?) })
-    }
+    fn start_transaction<'a>(&'a self) -> IO<Box<dyn Transaction + 'a>> {
+        IO::new(async {
+            let fut_tx = self.inner.start_transaction();
+            let tx: prisma_query::connector::Transaction = fut_tx.await.map_err(SqlError::from)?;
 
-    fn rollback(&self) -> IO<()> {
-        IO::new(async move { Ok(self.inner.rollback().await.map_err(SqlError::from)?) })
+            Ok(Box::new(SqlConnectorTransaction::<T>::new(tx)) as Box<dyn Transaction + 'a>)
+        })
     }
 }
 
-impl<'a, T> ReadOperations for SqlConnectorTransaction<'a, T>
+impl<C, T> ReadOperations for SqlConnection<C, T>
 where
+    C: QueryExt,
     T: ManyRelatedRecordsQueryBuilder + Send + Sync + 'static,
 {
     fn get_single_record(
@@ -84,7 +86,7 @@ where
     }
 }
 
-impl<'a, T> WriteOperations for SqlConnectorTransaction<'a, T> {
+impl<T, C> WriteOperations for SqlConnection<T, C> {
     fn create_record(&mut self, model: ModelRef, args: WriteArgs) -> connector::Result<GraphqlId> {
         unimplemented!()
     }

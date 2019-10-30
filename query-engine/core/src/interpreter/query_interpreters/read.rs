@@ -1,10 +1,10 @@
 use crate::{interpreter::InterpretationResult, query_ast::*, result_ast::*};
-use connector::{self, QueryArguments, ScalarListValues, TransactionLike};
+use connector::{self, QueryArguments, ScalarListValues, Transaction};
 use prisma_models::{GraphqlId, ScalarField, SelectedFields};
 use std::sync::Arc;
 
 pub fn execute(
-    tx: &mut dyn TransactionLike,
+    tx: Box<dyn Transaction>,
     query: ReadQuery,
     parent_ids: &[GraphqlId],
 ) -> InterpretationResult<QueryResult> {
@@ -17,7 +17,7 @@ pub fn execute(
 }
 
 /// Queries a single record.
-fn read_one(tx: &mut dyn TransactionLike, query: RecordQuery) -> InterpretationResult<QueryResult> {
+fn read_one(tx: Box<dyn Transaction>, query: RecordQuery) -> InterpretationResult<QueryResult> {
     let selected_fields = inject_required_fields(query.selected_fields.clone());
     let scalars = tx.get_single_record(query.record_finder.as_ref().unwrap(), &selected_fields)?;
 
@@ -55,7 +55,7 @@ fn read_one(tx: &mut dyn TransactionLike, query: RecordQuery) -> InterpretationR
 }
 
 /// Queries a set of records.
-fn read_many(tx: &mut dyn TransactionLike, query: ManyRecordsQuery) -> InterpretationResult<QueryResult> {
+fn read_many(tx: Box<dyn Transaction>, query: ManyRecordsQuery) -> InterpretationResult<QueryResult> {
     let selected_fields = inject_required_fields(query.selected_fields.clone());
     let scalars = tx.get_many_records(Arc::clone(&query.model), query.args.clone(), &selected_fields)?;
 
@@ -83,7 +83,7 @@ fn read_many(tx: &mut dyn TransactionLike, query: ManyRecordsQuery) -> Interpret
 
 /// Queries related records for a set of parent IDs.
 fn read_related(
-    tx: &mut dyn TransactionLike,
+    tx: Box<dyn Transaction>,
     query: RelatedRecordsQuery,
     parent_ids: &[GraphqlId],
 ) -> InterpretationResult<QueryResult> {
@@ -122,14 +122,14 @@ fn read_related(
     }))
 }
 
-fn aggregate(tx: &mut dyn TransactionLike, query: AggregateRecordsQuery) -> InterpretationResult<QueryResult> {
+fn aggregate(tx: Box<dyn Transaction>, query: AggregateRecordsQuery) -> InterpretationResult<QueryResult> {
     let result = tx.count_by_model(query.model, QueryArguments::default())?;
     Ok(QueryResult::Count(result))
 }
 
 /// Resolves scalar lists for a list field for a set of parent IDs.
 fn resolve_scalar_list_fields(
-    tx: &mut dyn TransactionLike,
+    tx: Box<dyn Transaction>,
     record_ids: Vec<GraphqlId>,
     list_fields: Vec<Arc<ScalarField>>,
 ) -> connector::Result<Vec<(String, Vec<ScalarListValues>)>> {

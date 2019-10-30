@@ -2,7 +2,7 @@ use super::{pipeline::QueryPipeline, QueryExecutor};
 use crate::{
     CoreResult, IrSerializer, QueryDocument, QueryGraph, QueryGraphBuilder, QueryInterpreter, QuerySchemaRef, Response,
 };
-use connector::{Connector, Result as ConnectorResult, TransactionLike};
+use connector::{Connection, Connector, Transaction};
 use futures::future::{BoxFuture, FutureExt};
 
 /// Central query executor and main entry point into the query core.
@@ -25,19 +25,6 @@ where
             primary_connector,
         }
     }
-
-    pub fn with_interpreter<'a, F>(&self, f: F) -> ConnectorResult<Response>
-    where
-        F: FnOnce(QueryInterpreter) -> ConnectorResult<Response>,
-    {
-        let res = self.connector.with_transaction(|tx: &mut dyn TransactionLike| {
-            let interpreter = QueryInterpreter::new(tx);
-
-            f(interpreter).map_err(|err| err.into())
-        });
-
-        res
-    }
 }
 
 impl<C> QueryExecutor for InterpretingExecutor<C>
@@ -50,16 +37,24 @@ where
             let queries: Vec<(QueryGraph, IrSerializer)> = QueryGraphBuilder::new(query_schema).build(query_doc)?;
 
             // Create pipelines for all separate queries
-            Ok(queries
-                .into_iter()
-                .map(|(query_graph, info)| {
-                    self.with_interpreter(|interpreter| {
-                        QueryPipeline::new(query_graph, interpreter, info)
-                            .execute()
-                            .map_err(|err| err.into())
-                    })
-                })
-                .collect::<ConnectorResult<Vec<Response>>>()?)
+            let mut results = vec![];
+
+            for (query_graph, info) in queries {
+                let conn = self.connector.get_connection().await?;
+                let tx = conn.start_transaction().await?;
+                let interpreter = QueryInterpreter::new(tx);
+                let result = QueryPipeline::new(query_graph, interpreter, info).execute().await;
+
+                if result.is_ok() {
+                    tx.commit().await?;
+                } else {
+                    tx.rollback().await?;
+                }
+
+                results.push(result);
+            }
+
+            Ok(results)
         };
 
         fut.boxed()

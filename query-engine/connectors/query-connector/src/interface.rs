@@ -2,23 +2,17 @@ use crate::{Filter, QueryArguments, RecordFinder, WriteArgs};
 use prisma_models::*;
 
 pub trait Connector {
-    fn with_transaction<F, T>(&self, f: F) -> crate::Result<T>
-    where
-        F: FnOnce(&mut dyn TransactionLike) -> crate::Result<T>;
+    fn get_connection(&self) -> crate::IO<Box<dyn Connection>>;
 }
 
-pub trait TransactionLike: ReadOperations + WriteOperations {}
+pub trait Connection: ReadOperations + WriteOperations {
+    fn start_transaction<'a>(&'a self) -> crate::IO<Box<dyn Transaction + 'a>>;
+}
 
-// AdditionalOperations? MetaOperations? ...
-// pub trait UtilityOperations {
-//     fn execute_raw(&self, db_name: String, query: String) -> crate::Result<Value>;
-//     fn execute_raw(&self, db_name: String, query: String) -> connector_interface::Result<Value> {
-//         let result = self.inner.raw_json(RawQuery::from(query))?;
-//         Ok(result)
-//     }
-
-//     reset data
-// }
+pub trait Transaction<'a>: ReadOperations + WriteOperations {
+    fn commit(self) -> crate::IO<'a, ()>;
+    fn rollback(&self) -> crate::IO<()>;
+}
 
 pub trait ReadOperations {
     fn get_single_record(

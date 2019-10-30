@@ -3,9 +3,9 @@ use crate::{
     query_ast::*,
     QueryResult,
 };
-use connector::{Filter, TransactionLike, WriteArgs};
+use connector::{Filter, Transaction, WriteArgs};
 
-pub fn execute(tx: &mut dyn TransactionLike, write_query: WriteQuery) -> InterpretationResult<QueryResult> {
+pub fn execute(tx: Box<dyn Transaction>, write_query: WriteQuery) -> InterpretationResult<QueryResult> {
     match write_query {
         WriteQuery::CreateRecord(q) => create_one(tx, q),
         WriteQuery::UpdateRecord(q) => update_one(tx, q),
@@ -19,13 +19,13 @@ pub fn execute(tx: &mut dyn TransactionLike, write_query: WriteQuery) -> Interpr
     }
 }
 
-fn create_one(tx: &mut dyn TransactionLike, q: CreateRecord) -> InterpretationResult<QueryResult> {
+fn create_one(tx: Box<dyn Transaction>, q: CreateRecord) -> InterpretationResult<QueryResult> {
     let res = tx.create_record(q.model, WriteArgs::new(q.non_list_args, q.list_args))?;
 
     Ok(QueryResult::Id(res))
 }
 
-fn update_one(tx: &mut dyn TransactionLike, q: UpdateRecord) -> InterpretationResult<QueryResult> {
+fn update_one(tx: Box<dyn Transaction>, q: UpdateRecord) -> InterpretationResult<QueryResult> {
     let mut res = tx.update_records(
         q.model,
         Filter::from(q.where_),
@@ -35,7 +35,7 @@ fn update_one(tx: &mut dyn TransactionLike, q: UpdateRecord) -> InterpretationRe
     Ok(QueryResult::Id(res.pop().unwrap()))
 }
 
-fn delete_one(tx: &mut dyn TransactionLike, q: DeleteRecord) -> InterpretationResult<QueryResult> {
+fn delete_one(tx: Box<dyn Transaction>, q: DeleteRecord) -> InterpretationResult<QueryResult> {
     // We need to ensure that we have a record finder, else we delete everything (conversion to empty filter).
     let finder = match q.where_ {
         Some(f) => Ok(f),
@@ -49,19 +49,19 @@ fn delete_one(tx: &mut dyn TransactionLike, q: DeleteRecord) -> InterpretationRe
     Ok(QueryResult::Count(res))
 }
 
-fn update_many(tx: &mut dyn TransactionLike, q: UpdateManyRecords) -> InterpretationResult<QueryResult> {
+fn update_many(tx: Box<dyn Transaction>, q: UpdateManyRecords) -> InterpretationResult<QueryResult> {
     let res = tx.update_records(q.model, q.filter, WriteArgs::new(q.non_list_args, q.list_args))?;
 
     Ok(QueryResult::Count(res.len()))
 }
 
-fn delete_many(tx: &mut dyn TransactionLike, q: DeleteManyRecords) -> InterpretationResult<QueryResult> {
+fn delete_many(tx: Box<dyn Transaction>, q: DeleteManyRecords) -> InterpretationResult<QueryResult> {
     let res = tx.delete_records(q.model, q.filter)?;
 
     Ok(QueryResult::Count(res))
 }
 
-fn connect(tx: &mut dyn TransactionLike, q: ConnectRecords) -> InterpretationResult<QueryResult> {
+fn connect(tx: Box<dyn Transaction>, q: ConnectRecords) -> InterpretationResult<QueryResult> {
     tx.connect(
         q.relation_field,
         &q.parent.expect("Expected parent record ID to be set for connect"),
@@ -71,7 +71,7 @@ fn connect(tx: &mut dyn TransactionLike, q: ConnectRecords) -> InterpretationRes
     Ok(QueryResult::Unit)
 }
 
-fn disconnect(tx: &mut dyn TransactionLike, q: DisconnectRecords) -> InterpretationResult<QueryResult> {
+fn disconnect(tx: Box<dyn Transaction>, q: DisconnectRecords) -> InterpretationResult<QueryResult> {
     tx.disconnect(
         q.relation_field,
         &q.parent.expect("Expected parent record ID to be set for disconnect"),
@@ -81,7 +81,7 @@ fn disconnect(tx: &mut dyn TransactionLike, q: DisconnectRecords) -> Interpretat
     Ok(QueryResult::Unit)
 }
 
-fn set(tx: &mut dyn TransactionLike, q: SetRecords) -> InterpretationResult<QueryResult> {
+fn set(tx: Box<dyn Transaction>, q: SetRecords) -> InterpretationResult<QueryResult> {
     tx.set(
         q.relation_field,
         q.parent.expect("Expected parent record ID to be set for set"),
@@ -91,6 +91,6 @@ fn set(tx: &mut dyn TransactionLike, q: SetRecords) -> InterpretationResult<Quer
     Ok(QueryResult::Unit)
 }
 
-fn reset(_tx: &mut dyn TransactionLike, _q: ResetData) -> InterpretationResult<QueryResult> {
+fn reset(_tx: Box<dyn Transaction>, _q: ResetData) -> InterpretationResult<QueryResult> {
     unimplemented!()
 }
