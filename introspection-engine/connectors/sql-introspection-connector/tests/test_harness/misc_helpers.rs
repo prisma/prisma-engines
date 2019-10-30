@@ -120,9 +120,11 @@ impl BarrelMigrationExecutor {
 
 // get dbs
 
-pub fn database(sql_family: SqlFamily, database_url: &str) -> Box<dyn SyncSqlConnection + Send + Sync + 'static> {
-    match sql_family {
-        SqlFamily::Postgres => {
+pub fn database(database_url: &str) -> Box<dyn SyncSqlConnection + Send + Sync + 'static> {
+    let url: Url = database_url.parse().unwrap();
+
+    match url.scheme() {
+        "postgresql" | "postgres" => {
             let url = Url::parse(database_url).unwrap();
             let create_cmd = |name| format!("CREATE DATABASE \"{}\"", name);
 
@@ -132,8 +134,7 @@ pub fn database(sql_family: SqlFamily, database_url: &str) -> Box<dyn SyncSqlCon
 
             Box::new(conn)
         }
-        SqlFamily::Sqlite => Box::new(Sqlite::new(database_url).unwrap()),
-        SqlFamily::Mysql => {
+        "mysql" => {
             let url = Url::parse(database_url).unwrap();
             let create_cmd = |name| format!("CREATE DATABASE `{}`", name);
 
@@ -143,6 +144,8 @@ pub fn database(sql_family: SqlFamily, database_url: &str) -> Box<dyn SyncSqlCon
 
             Box::new(conn)
         }
+        "file" | "sqlite" => Box::new(Sqlite::new(database_url).unwrap()),
+        scheme => panic!("Unknown scheme `{}° in database URL: {}", scheme, url.as_str()),
     }
 }
 
@@ -187,10 +190,10 @@ fn fetch_db_name(url: &Url, default: &str) -> String {
 }
 
 fn get_sqlite() -> TestSetup {
-    let database = database(SqlFamily::Sqlite, &sqlite_test_file());
+    let database = database(&sqlite_test_url());
 
     let database_file_path = sqlite_test_file();
-    let _ = std::fs::remove_file(database_file_path.clone()); // ignore potential errors
+    std::fs::remove_file(database_file_path.clone()).ok(); // ignore potential errors
     let introspection_connector = SqlIntrospectionConnector::new(&sqlite_test_url()).unwrap();
 
     TestSetup {
@@ -201,13 +204,13 @@ fn get_sqlite() -> TestSetup {
 }
 
 fn get_postgres() -> TestSetup {
-    let database = database(SqlFamily::Postgres, &postgres_url());
+    let database = database(&postgres_url());
 
     let drop_schema = dbg!(format!("DROP SCHEMA IF EXISTS \"{}\" CASCADE;", SCHEMA_NAME));
-    let _ = database.query_raw(SCHEMA_NAME, &drop_schema, &[]);
+    database.query_raw(SCHEMA_NAME, &drop_schema, &[]).ok();
 
     let create_schema = dbg!(format!("CREATE SCHEMA IF NOT EXISTS \"{}\";", SCHEMA_NAME));
-    let _ = database.query_raw(SCHEMA_NAME, &create_schema, &[]);
+    database.query_raw(SCHEMA_NAME, &create_schema, &[]).ok();
 
     let introspection_connector = SqlIntrospectionConnector::new(&postgres_url()).unwrap();
 
@@ -219,10 +222,10 @@ fn get_postgres() -> TestSetup {
 }
 
 fn get_mysql() -> TestSetup {
-    let database = database(SqlFamily::Mysql, &mysql_url());
+    let database = database(&mysql_url());
 
     let drop_schema = dbg!(format!("DROP SCHEMA IF EXISTS \"{}\" CASCADE;", SCHEMA_NAME));
-    let _ = database.query_raw(SCHEMA_NAME, &drop_schema, &[]);
+    database.query_raw(SCHEMA_NAME, &drop_schema, &[]).ok();
 
     let introspection_connector = SqlIntrospectionConnector::new(&mysql_url()).unwrap();
 
