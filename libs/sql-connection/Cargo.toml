@@ -9,6 +9,5 @@ edition = "2018"
 [dependencies]
 prisma-query = { git = "https://github.com/prisma/prisma-query.git", branch = "async-await" }
 async-trait = "0.1.17"
-async-std = "0.99.10"
 url = "1.7.0"
 tokio = "0.2.0-alpha.6"

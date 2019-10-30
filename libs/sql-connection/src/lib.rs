@@ -2,7 +2,6 @@
 
 //! Shared SQL connection handling logic for the migration engine and the introspection engine.
 
-use async_std::sync::{Mutex, MutexGuard};
 use prisma_query::{
     ast::*,
     connector::{self, Queryable, ResultSet, SqliteParams},
@@ -183,13 +182,13 @@ impl SyncSqlConnection for Sqlite {
 }
 
 /// A handle to a database connection pool that works generically over a pool of a single
-/// connection behind a mutex or a prisma query connection pool.
+/// connection or a prisma query connection pool.
 enum ConnectionPool<C, P>
 where
     C: Queryable + Send + Sync,
     P: Manage<Resource = C>,
 {
-    Single(Mutex<C>),
+    Single(C),
     Pool(Pool<P>),
 }
 
@@ -200,9 +199,8 @@ where
 {
     async fn get_connection<'a>(&'a self) -> Result<ConnectionHandle<'a, C, P>, QueryError> {
         match &self {
-            ConnectionPool::Single(mutex) => {
-                let guard = mutex.lock().await;
-                Ok(ConnectionHandle::Single(guard))
+            ConnectionPool::Single(conn) => {
+                Ok(ConnectionHandle::Single(conn))
             }
             ConnectionPool::Pool(pool) => {
                 let checkout: CheckOut<P> = pool.check_out().await?;
@@ -218,7 +216,7 @@ where
     C: Queryable + Send + Sync + 'static,
     P: Manage<Resource = C, Error = QueryError, CheckOut = CheckOut<P>> + Send + Sync,
 {
-    Single(MutexGuard<'a, C>),
+    Single(&'a C),
     PoolCheckout(CheckOut<P>),
 }
 
@@ -255,11 +253,11 @@ impl Postgresql {
         })
     }
 
-    /// Create a new single connection behind a mutex.
+    /// Create a new single connection.
     pub fn new_unpooled(url: Url) -> Result<Self, QueryError> {
         let runtime = default_runtime();
         let conn = runtime.block_on(connector::PostgreSql::from_params(url.try_into()?))?;
-        let handle = ConnectionPool::Single(Mutex::new(conn));
+        let handle = ConnectionPool::Single(conn);
 
         Ok(Postgresql { conn: handle, runtime })
     }
@@ -328,10 +326,10 @@ pub struct Mysql {
 }
 
 impl Mysql {
-    /// Create a new single connection behind a mutex.
+    /// Create a new single connection.
     pub fn new_unpooled(url: Url) -> Result<Self, QueryError> {
         let conn = connector::Mysql::from_params(url.try_into()?)?;
-        let handle = ConnectionPool::Single(Mutex::new(conn));
+        let handle = ConnectionPool::Single(conn);
 
         Ok(Mysql {
             conn: handle,
