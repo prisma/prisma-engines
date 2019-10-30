@@ -24,7 +24,7 @@ pub(crate) fn parse_datamodel(datamodel: &str) -> CommandResult<Datamodel> {
 }
 
 pub(crate) fn pretty_print_errors(errors: ErrorCollection, datamodel: &str) {
-    let file_name = env::var("PRISMA_SDL_PATH").unwrap_or_else(|_| "schema.prisma".to_string());
+    let file_name = "schema.prisma".to_string();
 
     for error in errors.to_iter() {
         println!();
