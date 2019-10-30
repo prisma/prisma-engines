@@ -37,7 +37,8 @@ impl MigrationPersistence for SqlMigrationPersistence {
             }
         };
 
-        let _ = self.connection.query_raw(&self.schema_name, dbg!(&sql_str), &[]);
+        debug!("{}", &sql_str);
+        let _ = self.connection.query_raw(&self.schema_name, &sql_str, &[]);
     }
 
     fn reset(&self) {
