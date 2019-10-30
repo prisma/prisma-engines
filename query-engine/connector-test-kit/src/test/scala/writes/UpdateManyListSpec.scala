@@ -19,7 +19,7 @@ class UpdateManyListSpec extends FlatSpec with Matchers with ApiSpecBase {
         datetimes DateTime[] $scalarList
         enums     Tag[]      $scalarList
       }
-      
+
       enum Tag{
        A
        B

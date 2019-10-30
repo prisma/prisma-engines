@@ -287,7 +287,6 @@ class SelfRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "Filter Queries along ManyToMany self relations" should "succeed with {} filter _every" taggedAs (IgnoreMongo) in {
-
     val filterGroupies = s"""query{humans(
                                           where: {fans_every: {}
                                                 }
@@ -307,7 +306,6 @@ class SelfRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
   //Many to one
 
   "Filter Queries along ManyToOne self relations" should "succeed valid filter" in {
-
     val filterSingers = s"""query{humans(
                                           where: {singer:{
                                                      name: "kurt"

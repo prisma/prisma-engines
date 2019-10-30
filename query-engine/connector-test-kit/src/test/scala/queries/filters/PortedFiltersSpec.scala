@@ -9,28 +9,29 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
   //Mongo executes the query once as a find query and once using the aggregation framework
 
   val project: Project = ProjectDsl.fromString { """
-                                                    |model ScalarModel {
-                                                    |  id          String  @id @default(cuid())
-                                                    |  idTest      String?
-                                                    |  optString   String?
-                                                    |  optInt      Int?
-                                                    |  optFloat    Float?
-                                                    |  optBoolean  Boolean?
-                                                    |  optDateTime DateTime?
-                                                    |  optEnum     Enum?
-                                                    |  b           B?      @relation(references: [id])
-                                                    |}
-                                                    |
-                                                    |model B {
-                                                    | id  String @id @default(cuid())
-                                                    | int Int?   @unique
-                                                    |}
-                                                    |
-                                                    |enum Enum{
-                                                    | A
-                                                    | B
-                                                    |}
-                                                    |""" }
+    |model ScalarModel {
+    |  id          String  @id @default(cuid())
+    |  idTest      String?
+    |  optString   String?
+    |  optInt      Int?
+    |  optFloat    Float?
+    |  optBoolean  Boolean?
+    |  optDateTime DateTime?
+    |  optEnum     Enum?
+    |  b           B?      @relation(references: [id])
+    |}
+    |
+    |model B {
+    | id  String @id @default(cuid())
+    | int Int?   @unique
+    |}
+    |
+    |enum Enum{
+    | A
+    | B
+    |}
+    |"""
+  }
 
   override protected def beforeAll(): Unit = {
     super.beforeAll()

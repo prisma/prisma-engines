@@ -114,6 +114,10 @@ pub enum ConnectorError {
 
     #[fail(display = "Authentication failed for user '{}'", user)]
     AuthenticationFailed { user: String },
+
+    // Todo: Temporary!
+    #[fail(display = "CoreError '{}'", _0)]
+    CoreError(String),
 }
 
 impl From<DomainError> for ConnectorError {

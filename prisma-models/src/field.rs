@@ -150,3 +150,15 @@ impl FieldTemplate {
         }
     }
 }
+
+impl From<ScalarFieldRef> for Field {
+    fn from(sf: ScalarFieldRef) -> Self {
+        Field::Scalar(sf)
+    }
+}
+
+impl From<RelationFieldRef> for Field {
+    fn from(rf: RelationFieldRef) -> Self {
+        Field::Relation(rf)
+    }
+}

@@ -13,7 +13,7 @@ class DeleteManyMutationRelationsSpec extends FlatSpec with Matchers with ApiSpe
                             id String @id @default(cuid())
                             p  String @unique
                         }
-                        
+
                         model Child{
                             id        String @id @default(cuid())
                             c         String @unique
@@ -65,7 +65,7 @@ class DeleteManyMutationRelationsSpec extends FlatSpec with Matchers with ApiSpe
                             id String @id @default(cuid())
                             p  String @unique
                         }
-                        
+
                         model Child{
                             id        String @id @default(cuid())
                             c         String @unique
@@ -161,7 +161,7 @@ class DeleteManyMutationRelationsSpec extends FlatSpec with Matchers with ApiSpe
   }
 
   "a P1! to C1 relation" should "succeed when trying to delete the parent" in {
-    schemaP1reqToC1opt.test(1) { dataModel =>
+    schemaP1reqToC1opt.test { dataModel =>
       val project = ProjectDsl.fromString { dataModel }
 
       database.setup(project)
@@ -774,13 +774,13 @@ class DeleteManyMutationRelationsSpec extends FlatSpec with Matchers with ApiSpe
                        childrenOpt  Child[] @relation(references: [id])
                        stepChildOpt StepChild @relation(references: [id])
                    }
-  
+
                    model Child{
                        id         String  @id @default(cuid())
                        c          String  @unique
                        parentsOpt Parent[]
                    }
-                   
+
                    model StepChild{
                         id        String  @id @default(cuid())
                         s         String  @unique
@@ -793,13 +793,13 @@ class DeleteManyMutationRelationsSpec extends FlatSpec with Matchers with ApiSpe
                        childrenOpt  Child[]
                        stepChildOpt StepChild? @relation(references: [id])
                    }
-  
+
                    model Child{
                        id         String @id @default(cuid())
                        c          String @unique
                        parentsOpt Parent[]
                    }
-                   
+
                    model StepChild{
                         id        String  @id @default(cuid())
                         s         String  @unique

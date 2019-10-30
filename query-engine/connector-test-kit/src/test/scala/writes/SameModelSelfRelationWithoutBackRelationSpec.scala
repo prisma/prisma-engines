@@ -32,7 +32,7 @@ class SameModelSelfRelationWithoutBackRelationSpec extends FlatSpec with Matcher
       server.query(
         """mutation {
                    |  updatePost (
-                   |  
+                   |
                    |    where:{identifier: 1}
                    |    data: {
                    |      related: {

@@ -112,6 +112,7 @@ impl RelationField {
         }
     }
 
+    /// Inlined in self / model of self
     pub fn relation_is_inlined_in_parent(&self) -> bool {
         let relation = self.relation();
 
@@ -131,6 +132,10 @@ impl RelationField {
             }
             _ => false,
         }
+    }
+
+    pub fn relation_is_inlined_in_child(&self) -> bool {
+        self.relation().is_inline_relation() && !self.relation_is_inlined_in_parent()
     }
 
     pub fn opposite_column(&self) -> Column<'static> {

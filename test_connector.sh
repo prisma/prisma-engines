@@ -7,7 +7,7 @@ export PRISMA_BINARY_PATH=${ABSOLUTE_CARGO_TARGET_DIR}/release/prisma
 export MIGRATION_ENGINE_BINARY_PATH=${ABSOLUTE_CARGO_TARGET_DIR}/release/migration-engine
 
 echo "Will run tests against connector $CONNECTOR_TO_TEST"
-echo $CONNECTOR_TO_TEST > connector_to_test
+echo $CONNECTOR_TO_TEST > current_connector
 
 cargo build --release
 

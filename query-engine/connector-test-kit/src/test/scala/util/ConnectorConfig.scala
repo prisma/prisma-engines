@@ -10,13 +10,12 @@ case class ConnectorConfig(
       case "postgresql" => ConnectorCapabilities.postgres
       case "mysql"      => ConnectorCapabilities.mysql
     }
-
   }
 }
 
 object ConnectorConfig {
   lazy val instance: ConnectorConfig = {
-    val filePath        = EnvVars.serverRoot + "/connector_to_test"
+    val filePath        = EnvVars.serverRoot + "/current_connector"
     val connectorToTest = scala.io.Source.fromFile(filePath).mkString.lines.next().trim
 
     connectorToTest match {
@@ -25,7 +24,6 @@ object ConnectorConfig {
       case "mysql"                   => ConnectorConfig("mysql", s"mysql://root:prisma@$mysqlHost:3306/$$DB?connection_limit=1")
       case x                         => sys.error(s"Connector $x is not supported yet.")
     }
-
   }
 
   lazy val postgresHost = {

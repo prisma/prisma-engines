@@ -312,9 +312,9 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |  where: { p: "p1"}
          |  data:{
          |    childrenOpt: {upsert: [{
-         |    where: {c: "DOES NOT EXIST"}
-         |    update: {c: "DOES NOT MATTER"}
-         |    create :{c: "updated C"}
+         |      where: {c: "DOES NOT EXIST"}
+         |      update: {c: "DOES NOT MATTER"}
+         |      create :{c: "updated C"}
          |    }]}
          |  }){
          |    childrenOpt{
@@ -361,10 +361,10 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
         |        create: [{text: "comment1"}, {text: "comment2"}]
         |      }
         |    }
-        |  ){ 
-        |    id 
+        |  ){
+        |    id
         |    comments { id }
-        |  } 
+        |  }
         |}""".stripMargin,
       project
     )
@@ -424,10 +424,10 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
         |        create: [{text: "comment1"}]
         |      }
         |    }
-        |  ){ 
-        |    id 
+        |  ){
+        |    id
         |    comments { id }
-        |  } 
+        |  }
         |}""".stripMargin,
       project
     )
@@ -764,7 +764,7 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
         |  createTop(data: {
         |    nameTop: "the top",
         |    middles: {
-        |      create:[ 
+        |      create:[
         |        {
         |          nameMiddle: "the middle"
         |          bottoms: {
@@ -936,7 +936,7 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
         |  createTop(data: {
         |    nameTop: "the top",
         |    middles: {
-        |      create:[ 
+        |      create:[
         |        {
         |          nameMiddle: "the middle"
         |          bottoms: {
@@ -1235,11 +1235,11 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
 
     val result = server.query(updateMutation, project)
 
-    result.toString should be(
-      """{"data":{"updateTop":{"nameTop":"updated top","middles":[{"nameMiddle":"updated middle","bottom":{"nameBottom":"created bottom"}},{"nameMiddle":"the second middle","bottom":{"nameBottom":"the second bottom"}}]}}}""")
+    result should be(
+      """{"data":{"updateTop":{"nameTop":"updated top","middles":[{"nameMiddle":"the second middle","bottom":{"nameBottom":"the second bottom"}},{"nameMiddle":"updated middle","bottom":{"nameBottom":"created bottom"}}]}}}""".parseJson)
 
-    server.query("query{bottoms{nameBottom}}", project).toString should be(
-      """{"data":{"bottoms":[{"nameBottom":"the second bottom"},{"nameBottom":"created bottom"}]}}""")
+    server.query("query{bottoms{nameBottom}}", project) should be(
+      """{"data":{"bottoms":[{"nameBottom":"the second bottom"},{"nameBottom":"created bottom"}]}}""".parseJson)
   }
 
   "a deeply nested mutation" should "execute all levels of the mutation if there are model and node edges on the path  and back relations are missing and node edges follow model edges for update" in {
@@ -1320,7 +1320,7 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |        below{
          |           nameBelow
          |        }
-         |        
+         |
          |      }
          |    }
          |  }
@@ -1456,7 +1456,7 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
         |  createTop(data: {
         |    nameTop: "the top",
         |    middle: {
-        |      create: 
+        |      create:
         |        {
         |          nameMiddle: "the middle"
         |          bottom: {
@@ -1610,7 +1610,7 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
         |  createTop(data: {
         |    nameTop: "the top",
         |    middle: {
-        |      create: 
+        |      create:
         |        {
         |          nameMiddle: "the middle"
         |          bottom: {
@@ -1679,8 +1679,8 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
                                              |}
                                              |
                                              |model Bottom {
-                                             |  id         String @id @default(cuid())
-                                             |  nameBottom String @unique
+                                             |  id         String  @id @default(cuid())
+                                             |  nameBottom String  @unique
                                              |}""".stripMargin }
     database.setup(project)
 

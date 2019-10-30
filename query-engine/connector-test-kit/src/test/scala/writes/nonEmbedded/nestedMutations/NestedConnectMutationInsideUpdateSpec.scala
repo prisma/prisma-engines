@@ -685,7 +685,7 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
       server.queryThatMustFail(
         s"""mutation {
          |  updateParent(
-         |  where: {p: "p2"} 
+         |  where: {p: "p2"}
          |  data:{
          |    childOpt: {connect: {c: "c1"}}
          |  }){
@@ -705,7 +705,7 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
   }
 
   "a P1 to C1! relation with the child already in a relation" should "should not error when switching to a different parent" in {
-    schemaP1optToC1req.test { dataModel =>
+    schemaP1optToC1req.test(0) { dataModel =>
       val project = SchemaDsl.fromStringV11() { dataModel }
       database.setup(project)
 
@@ -742,7 +742,7 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
         s"""
          |mutation {
          |  updateParent(
-         |  where: {p: "p2"} 
+         |  where: {p: "p2"}
          |  data:{
          |    childOpt: {connect: {c: "c1"}}
          |  }){

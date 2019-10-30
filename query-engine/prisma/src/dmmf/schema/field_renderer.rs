@@ -35,7 +35,7 @@ impl DMMFFieldRenderer {
             output_type,
         };
 
-        ctx.add_mapping(field.name.clone(), field.operation.as_ref());
+        ctx.add_mapping(field.name.clone(), field.query_builder.as_ref());
         (DMMFFieldWrapper::Output(output_field), ctx)
     }
 

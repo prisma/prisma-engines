@@ -1,4 +1,6 @@
-use crate::{query_builder::ManyRelatedRecordsWithUnionAll, FromSource, SqlCapabilities, Transaction, Transactional};
+use super::transaction::SqlConnectorTransaction;
+use crate::{query_builder::ManyRelatedRecordsWithUnionAll, FromSource, SqlError};
+use connector_interface::Connector;
 use datamodel::Source;
 use prisma_query::{
     connector::{MysqlParams, Queryable},
@@ -23,18 +25,14 @@ impl FromSource for Mysql {
     }
 }
 
-impl SqlCapabilities for Mysql {
-    type ManyRelatedRecordsBuilder = ManyRelatedRecordsWithUnionAll;
-}
-
-impl Transactional for Mysql {
-    fn with_transaction<F, T>(&self, _: &str, f: F) -> crate::Result<T>
+impl Connector for Mysql {
+    fn with_transaction<F, T>(&self, f: F) -> connector_interface::Result<T>
     where
-        F: FnOnce(&mut dyn Transaction) -> crate::Result<T>,
+        F: FnOnce(&mut dyn connector_interface::TransactionLike) -> connector_interface::Result<T>,
     {
-        let mut conn = self.pool.get()?;
-        let mut tx = conn.start_transaction()?;
-
+        let mut conn = self.pool.get().map_err(SqlError::from)?;
+        let tx = conn.start_transaction().map_err(SqlError::from)?;
+        let mut tx = SqlConnectorTransaction::<ManyRelatedRecordsWithUnionAll>::new(tx);
         let result = f(&mut tx);
 
         if result.is_ok() {

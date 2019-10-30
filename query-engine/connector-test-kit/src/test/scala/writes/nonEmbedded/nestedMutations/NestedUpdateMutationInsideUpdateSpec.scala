@@ -31,10 +31,10 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
         |        create: [{text: "comment1"}, {text: "comment2"}]
         |      }
         |    }
-        |  ){ 
-        |    id 
+        |  ){
+        |    id
         |    comments { id }
-        |  } 
+        |  }
         |}""".stripMargin,
       project
     )
@@ -267,17 +267,17 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
     database.setup(project)
 
     val createResult = server.query(
-      """mutation { 
+      """mutation {
         |  createNote(
         |    data: {
         |      todo: {
         |        create: { title: "the title" }
         |      }
         |    }
-        |  ){ 
+        |  ){
         |    id
         |    todo { id }
-        |  } 
+        |  }
         |}""".stripMargin,
       project
     )
@@ -531,7 +531,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
         |  createTop(data: {
         |    nameTop: "the top",
         |    middles: {
-        |      create:[ 
+        |      create:[
         |        {
         |          nameMiddle: "the middle"
         |          bottoms: {
@@ -822,7 +822,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |        below{
          |           nameBelow
          |        }
-         |        
+         |
          |      }
          |    }
          |  }
@@ -933,7 +933,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |        below{
          |           nameBelow
          |        }
-         |        
+         |
          |      }
          |    }
          |  }
@@ -976,7 +976,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
         |  createTop(data: {
         |    nameTop: "the top",
         |    middle: {
-        |      create: 
+        |      create:
         |        {
         |          nameMiddle: "the middle"
         |          bottom: {
