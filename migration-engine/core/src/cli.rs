@@ -60,7 +60,6 @@ pub fn run(matches: &ArgMatches, datasource: &str) -> std::result::Result<String
         Ok("Connection successful".into())
     } else if matches.is_present("create_database") {
         let (db_name, conn) = create_conn(datasource, true).unwrap();
-        dbg!(&db_name);
         conn.create_database(&db_name)?;
         Ok(format!("Database '{}' created successfully.", db_name))
     } else {
@@ -104,10 +103,7 @@ fn create_conn(
             Ok((db_name, Box::new(connector)))
         }
         "mysql" => {
-            dbg!(&url);
             let db_name = fetch_db_name(&url, "mysql");
-
-            dbg!(&db_name);
 
             if admin_mode {
                 url.set_path("");
@@ -220,7 +216,6 @@ mod tests {
     }
 
     #[test]
-    #[ignore]
     fn test_connecting_with_a_working_mysql_connection_string() {
         with_cli(vec!["cli", "--can_connect_to_database"], |matches| {
             assert_eq!(
@@ -282,11 +277,8 @@ mod tests {
     }
 
     #[test]
-    #[ignore]
     fn test_create_mysql_database() {
         let url = mysql_url(Some("this_should_exist"));
-
-        dbg!("got here", &url);
 
         let res = with_cli(vec!["cli", "--create_database"], |matches| {
             assert_eq!(
@@ -294,14 +286,11 @@ mod tests {
                 super::run(&matches, &url)
             );
         });
-        dbg!("got here", &res);
 
         if let Ok(()) = res {
             let res = with_cli(vec!["cli", "--can_connect_to_database"], |matches| {
                 assert_eq!(Ok(String::from("Connection successful")), super::run(&matches, &url));
             });
-
-            dbg!("got here");
 
             {
                 let uri = url::Url::parse(&mysql_url(None)).unwrap();
@@ -329,10 +318,7 @@ mod tests {
 
         if let Ok(()) = res {
             let res = with_cli(vec!["cli", "--can_connect_to_database"], |matches| {
-                assert_eq!(
-                    Ok(String::from("Connection successful")),
-                    super::run(&matches, dbg!(&url))
-                );
+                assert_eq!(Ok(String::from("Connection successful")), super::run(&matches, &url));
             });
 
             {

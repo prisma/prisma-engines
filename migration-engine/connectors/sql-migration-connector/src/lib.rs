@@ -92,8 +92,11 @@ impl SqlMigrationConnector {
             Mysql::new_unpooled(url)?
         };
 
-        // Async MySQL connections are lazy.
-        dbg!(conn.execute_raw(schema.as_str(), "SELECT 1 + 1", &[]))?;
+        // Async MySQL connections are lazy - we have to run a query to confirm that the schema we
+        // connected to exists.
+        if !schema.is_empty() {
+            conn.execute_raw(schema.as_str(), "SELECT 1 + 1", &[])?;
+        }
 
         Ok(Self::create_connector(
             url_str,
@@ -180,7 +183,6 @@ impl MigrationConnector for SqlMigrationConnector {
     }
 
     fn create_database(&self, db_name: &str) -> ConnectorResult<()> {
-        dbg!(&db_name);
         match self.sql_family {
             SqlFamily::Postgres => {
                 self.database
@@ -190,11 +192,9 @@ impl MigrationConnector for SqlMigrationConnector {
             }
             SqlFamily::Sqlite => Ok(()),
             SqlFamily::Mysql => {
-                let result = self
-                    .database
+                self.database
                     .query_raw("", &format!("CREATE DATABASE `{}`", db_name), &[])?;
 
-                dbg!(&result);
                 Ok(())
             }
         }

@@ -97,8 +97,7 @@ where
     }
 
     // MYSQL
-    if !ignores.contains(&SqlFamily::Mysql) && false {
-        // TODO: reenable
+    if !ignores.contains(&SqlFamily::Mysql) {
         println!("--------------- Testing with MySQL now ---------------");
 
         let connector = mysql_migration_connector(&mysql_url());

@@ -9,7 +9,6 @@ use crate::common::*;
 use crate::mysql::*;
 
 #[test]
-#[ignore]
 fn all_mysql_column_types_must_work() {
     setup();
 
@@ -461,7 +460,6 @@ fn all_mysql_column_types_must_work() {
 }
 
 #[test]
-#[ignore]
 fn mysql_foreign_key_on_delete_must_be_handled() {
     setup();
 
@@ -580,7 +578,6 @@ fn mysql_foreign_key_on_delete_must_be_handled() {
 }
 
 #[test]
-#[ignore]
 fn mysql_multi_field_indexes_must_be_inferred() {
     setup();
 
@@ -608,7 +605,6 @@ fn mysql_multi_field_indexes_must_be_inferred() {
 }
 
 #[test]
-#[ignore]
 fn mysql_join_table_unique_indexes_must_be_inferred() {
     setup();
 

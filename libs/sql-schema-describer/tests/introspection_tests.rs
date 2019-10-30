@@ -557,9 +557,8 @@ where
         let mut migration = Migration::new().schema(SCHEMA);
         migration_fn(DbType::MySql, &mut migration);
         let full_sql = migration.make::<barrel::backend::MySql>();
-        // TODO: uncomment this
-        // let mut describer = get_mysql_describer(&full_sql);
+        let mut describer = get_mysql_describer(&full_sql);
 
-        // test_fn(DbType::MySql, &mut describer);
+        test_fn(DbType::MySql, &mut describer);
     }
 }
