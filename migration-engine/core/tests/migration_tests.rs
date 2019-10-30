@@ -240,7 +240,7 @@ fn changing_the_type_of_an_id_field_must_work() {
                 columns: vec![column.name.clone()],
                 referenced_table: "B".to_string(),
                 referenced_columns: vec!["id".to_string()],
-                on_delete_action: ForeignKeyAction::SetNull,
+                on_delete_action: ForeignKeyAction::Restrict,
             }]
         );
 
@@ -268,7 +268,7 @@ fn changing_the_type_of_an_id_field_must_work() {
                 columns: vec![column.name.clone()],
                 referenced_table: "B".to_string(),
                 referenced_columns: vec!["id".to_string()],
-                on_delete_action: ForeignKeyAction::SetNull,
+                on_delete_action: ForeignKeyAction::Restrict,
             }]
         );
     });
@@ -327,7 +327,7 @@ fn changing_a_relation_field_to_a_scalar_field_must_work() {
                 columns: vec![column.name.clone()],
                 referenced_table: "B".to_string(),
                 referenced_columns: vec!["id".to_string()],
-                on_delete_action: ForeignKeyAction::SetNull,
+                on_delete_action: ForeignKeyAction::Restrict,
             }]
         );
 
@@ -391,7 +391,7 @@ fn changing_a_scalar_field_to_a_relation_field_must_work() {
                 columns: vec![column.name.clone()],
                 referenced_table: "B".to_string(),
                 referenced_columns: vec!["id".to_string()],
-                on_delete_action: ForeignKeyAction::SetNull,
+                on_delete_action: ForeignKeyAction::Restrict,
             }]
         );
     });
@@ -560,7 +560,7 @@ fn adding_an_inline_relation_must_result_in_a_foreign_key_in_the_model_table() {
                 columns: vec![column.name.clone()],
                 referenced_table: "B".to_string(),
                 referenced_columns: vec!["id".to_string()],
-                on_delete_action: ForeignKeyAction::SetNull,
+                on_delete_action: ForeignKeyAction::Restrict,
             }]
         );
     });
@@ -594,7 +594,7 @@ fn specifying_a_db_name_for_an_inline_relation_must_work() {
                 columns: vec![column.name.clone()],
                 referenced_table: "B".to_string(),
                 referenced_columns: vec!["id".to_string()],
-                on_delete_action: ForeignKeyAction::SetNull,
+                on_delete_action: ForeignKeyAction::Restrict,
             }]
         );
     });
@@ -628,7 +628,7 @@ fn adding_an_inline_relation_to_a_model_with_an_exotic_id_type() {
                 columns: vec![column.name.clone()],
                 referenced_table: "B".to_string(),
                 referenced_columns: vec!["id".to_string()],
-                on_delete_action: ForeignKeyAction::SetNull,
+                on_delete_action: ForeignKeyAction::Restrict,
             }]
         );
     });
@@ -692,7 +692,7 @@ fn moving_an_inline_relation_to_the_other_side_must_work() {
                 columns: vec!["b".to_string()],
                 referenced_table: "B".to_string(),
                 referenced_columns: vec!["id".to_string()],
-                on_delete_action: ForeignKeyAction::SetNull,
+                on_delete_action: ForeignKeyAction::Restrict,
             }]
         );
 
@@ -719,7 +719,7 @@ fn moving_an_inline_relation_to_the_other_side_must_work() {
                 columns: vec!["a".to_string()],
                 referenced_table: "A".to_string(),
                 referenced_columns: vec!["id".to_string()],
-                on_delete_action: ForeignKeyAction::SetNull,
+                on_delete_action: ForeignKeyAction::Restrict,
             }]
         );
     });
