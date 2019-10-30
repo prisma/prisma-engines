@@ -3,6 +3,7 @@ use crate::{
     CoreResult, IrSerializer, QueryDocument, QueryGraph, QueryGraphBuilder, QueryInterpreter, QuerySchemaRef, Response,
 };
 use connector::{Connector, Result as ConnectorResult, TransactionLike};
+use futures::future::{BoxFuture, FutureExt};
 
 /// Central query executor and main entry point into the query core.
 /// Interprets the full query tree to return a result.
@@ -43,21 +44,25 @@ impl<C> QueryExecutor for InterpretingExecutor<C>
 where
     C: Connector + Send + Sync + 'static,
 {
-    fn execute(&self, query_doc: QueryDocument, query_schema: QuerySchemaRef) -> CoreResult<Vec<Response>> {
-        // Parse, validate, and extract query graphs from query document.
-        let queries: Vec<(QueryGraph, IrSerializer)> = QueryGraphBuilder::new(query_schema).build(query_doc)?;
+    fn execute(&self, query_doc: QueryDocument, query_schema: QuerySchemaRef) -> BoxFuture<CoreResult<Vec<Response>>> {
+        let fut = async move {
+            // Parse, validate, and extract query graphs from query document.
+            let queries: Vec<(QueryGraph, IrSerializer)> = QueryGraphBuilder::new(query_schema).build(query_doc)?;
 
-        // Create pipelines for all separate queries
-        Ok(queries
-            .into_iter()
-            .map(|(query_graph, info)| {
-                self.with_interpreter(|interpreter| {
-                    QueryPipeline::new(query_graph, interpreter, info)
-                        .execute()
-                        .map_err(|err| err.into())
+            // Create pipelines for all separate queries
+            Ok(queries
+                .into_iter()
+                .map(|(query_graph, info)| {
+                    self.with_interpreter(|interpreter| {
+                        QueryPipeline::new(query_graph, interpreter, info)
+                            .execute()
+                            .map_err(|err| err.into())
+                    })
                 })
-            })
-            .collect::<ConnectorResult<Vec<Response>>>()?)
+                .collect::<ConnectorResult<Vec<Response>>>()?)
+        };
+
+        fut.boxed()
     }
 
     fn primary_connector(&self) -> &'static str {

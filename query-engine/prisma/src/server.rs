@@ -98,7 +98,7 @@ impl HttpServer {
     }
 
     async fn http_handler(req: PrismaRequest<GraphQlBody>, cx: Arc<RequestContext>) -> Response<Body> {
-        let result = cx.graphql_request_handler.handle(req, &cx.context); //.await;
+        let result = cx.graphql_request_handler.handle(req, &cx.context).await;
         let bytes = serde_json::to_vec(&result).unwrap();
 
         Response::builder()
