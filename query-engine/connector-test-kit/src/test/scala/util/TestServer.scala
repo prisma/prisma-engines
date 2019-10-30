@@ -53,7 +53,6 @@ case class TestServer() extends PlayJsonExtensions {
       )
     }
 
-    // TODO: bring those error checks back
     // Ignore error codes for external tests (0) and containment checks ("")
     result.assertFailingResponse(0, errorCount, "")
     result
@@ -64,8 +63,10 @@ case class TestServer() extends PlayJsonExtensions {
       project: Project
   ): Future[JsValue] = {
     val (port, queryEngineProcess) = startQueryEngine(project)
+
     println(s"query engine started on port $port")
     println(s"Query: $query")
+
     Future {
       queryPrismaProcess(query, port)
     }.map(r => r.jsonBody.get)
@@ -93,12 +94,15 @@ case class TestServer() extends PlayJsonExtensions {
 
     pb.environment.put("PRISMA_DML", envVar)
     pb.environment.put("PORT", port.toString)
+    pb.environment.put("PRISMA_LOG_QUERIES", sys.env.getOrElse("PRISMA_LOG_QUERIES", "n"))
+    pb.environment.put("RUST_LOG", sys.env.getOrElse("RUST_LOG", "info"))
 
     pb.directory(workingDir)
     pb.redirectErrorStream(true)
     pb.redirectOutput(Redirect.INHERIT)
 
     val process = pb.start
+
     Thread.sleep(100) // Offsets process startup latency
     (port, process)
   }
@@ -112,6 +116,7 @@ case class TestServer() extends PlayJsonExtensions {
     con.setRequestProperty("Content-Type", "application/json")
 
     val body = Json.obj("query" -> query, "variables" -> Json.obj()).toString()
+
     con.setRequestProperty("Content-Length", Integer.toString(body.length))
     con.getOutputStream.write(body.getBytes(StandardCharsets.UTF_8))
 

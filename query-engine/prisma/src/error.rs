@@ -6,13 +6,10 @@ use graphql_parser::query::ParseError as GqlParseError;
 use serde_json;
 
 #[cfg(feature = "sql")]
-use sql_query_connector::SqlError;
+use sql_connector::SqlError;
 
 #[derive(Debug, Fail)]
 pub enum PrismaError {
-    #[fail(display = "{}", _0)]
-    QueryValidationError(String),
-
     #[fail(display = "{}", _0)]
     SerializationError(String),
 
@@ -40,6 +37,15 @@ pub enum PrismaError {
 
     #[fail(display = "Error in data model: {}", _0)]
     DatamodelError(ErrorCollection),
+
+    #[fail(display = "{}", _0)]
+    QueryConversionError(String),
+}
+
+impl From<CoreError> for PrismaError {
+    fn from(e: CoreError) -> Self {
+        PrismaError::CoreError(e)
+    }
 }
 
 impl From<ErrorCollection> for PrismaError {
@@ -79,12 +85,6 @@ impl PrettyPrint for PrismaError {
     }
 }
 
-impl From<CoreError> for PrismaError {
-    fn from(e: CoreError) -> PrismaError {
-        PrismaError::CoreError(e)
-    }
-}
-
 impl From<url::ParseError> for PrismaError {
     fn from(e: url::ParseError) -> PrismaError {
         PrismaError::ConfigurationError(format!("Error parsing connection string: {}", e))
@@ -117,7 +117,7 @@ impl From<base64::DecodeError> for PrismaError {
 
 impl From<GqlParseError> for PrismaError {
     fn from(e: GqlParseError) -> PrismaError {
-        PrismaError::QueryValidationError(format!("Error parsing GraphQL query: {}", e))
+        PrismaError::QueryConversionError(format!("Error parsing GraphQL query: {}", e))
     }
 }
 

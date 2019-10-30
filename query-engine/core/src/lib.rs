@@ -1,7 +1,7 @@
-#![warn(warnings)] // todo deny warnings once done
+#![warn(warnings)] // Todo deny warnings once done
 
-// #[macro_use]
-// extern crate log;
+#[macro_use]
+extern crate log;
 
 #[macro_use]
 extern crate debug_stub_derive;
@@ -9,46 +9,29 @@ extern crate debug_stub_derive;
 #[macro_use]
 extern crate lazy_static;
 
-mod error;
-
+pub mod error;
 pub mod executor;
-pub mod query_builders;
+pub mod interpreter;
+pub mod query_ast;
 pub mod query_document;
+pub mod query_graph;
+pub mod query_graph_builder;
 pub mod response_ir;
+pub mod result_ast;
 pub mod schema;
+pub mod schema_builder;
 
 pub use error::*;
-pub use executor::QueryExecutor;
+pub use executor::*;
+pub use interpreter::*;
+pub use query_ast::*;
+pub use query_document::*;
+pub use query_graph::*;
+pub use query_graph_builder::*;
+pub use response_ir::*;
+pub use result_ast::*;
 pub use schema::*;
+pub use schema_builder::*;
 
-use connector::{Query, ReadQueryResult, WriteQueryResult};
-
+/// Result type tying all sub-result type hierarchies of the core together.
 pub type CoreResult<T> = Result<T, CoreError>;
-
-/// Augments connector queries with additional information on how to resolve their results.
-/// This is intended to be a temporary type to work around current dependent execution limitations.
-pub type QueryPair = (Query, ResultResolutionStrategy);
-
-#[derive(Debug)]
-pub enum ResultResolutionStrategy {
-    /// Resolve the actual result by evaluating another query.
-    Dependent(Box<QueryPair>),
-
-    /// Serialize the result as-is into the specified output type.
-    Serialize(OutputTypeRef),
-}
-
-#[derive(Debug)]
-pub enum ResultPair {
-    Read(ReadQueryResult, OutputTypeRef),
-    Write(WriteQueryResultWrapper, OutputTypeRef),
-}
-
-/// Purely a workaround to not mess with the internals of the write query and result ASTs for now.
-/// Reason: We need the name information of the query for serialization purposes.
-#[derive(Debug)]
-pub struct WriteQueryResultWrapper {
-    pub name: String,
-    pub alias: Option<String>,
-    pub result: WriteQueryResult,
-}

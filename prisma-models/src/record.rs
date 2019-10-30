@@ -85,16 +85,12 @@ impl Record {
     }
 
     pub fn get_field_value(&self, field_names: &[String], field: &str) -> DomainResult<&PrismaValue> {
-        let index = field_names
-            .iter()
-            .position(|r| r == field)
-            .map(Ok)
-            .unwrap_or_else(|| {
-                Err(Error::FieldNotFound {
-                    name: field.to_string(),
-                    model: String::new(),
-                })
-            })?;
+        let index = field_names.iter().position(|r| r == field).map(Ok).unwrap_or_else(|| {
+            Err(Error::FieldNotFound {
+                name: field.to_string(),
+                model: String::new(),
+            })
+        })?;
 
         Ok(&self.values[index])
     }

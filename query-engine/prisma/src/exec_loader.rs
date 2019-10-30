@@ -1,16 +1,17 @@
 use crate::{PrismaError, PrismaResult};
-use core::executor::{QueryExecutor, ReadQueryExecutor, WriteQueryExecutor};
+use connector::Connector;
+use core::executor::{InterpretingExecutor, QueryExecutor};
 use datamodel::{
     configuration::{MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME},
     Source,
 };
-use std::{collections::HashMap, path::PathBuf, sync::Arc};
+use std::{collections::HashMap, path::PathBuf};
 use url::Url;
 
 #[cfg(feature = "sql")]
-use sql_query_connector::*;
+use sql_connector::*;
 
-pub fn load(source: &dyn Source) -> PrismaResult<QueryExecutor> {
+pub fn load(source: &dyn Source) -> PrismaResult<(String, Box<dyn QueryExecutor + Send + Sync + 'static>)> {
     match source.connector_type() {
         #[cfg(feature = "sql")]
         SQLITE_SOURCE_NAME => sqlite(source),
@@ -29,24 +30,19 @@ pub fn load(source: &dyn Source) -> PrismaResult<QueryExecutor> {
 }
 
 #[cfg(feature = "sql")]
-fn sqlite(source: &dyn Source) -> PrismaResult<QueryExecutor> {
+fn sqlite(source: &dyn Source) -> PrismaResult<(String, Box<dyn QueryExecutor + Send + Sync + 'static>)> {
     trace!("Loading SQLite connector...");
 
     let sqlite = Sqlite::from_source(source)?;
     let path = PathBuf::from(sqlite.file_path());
-    let db = SqlDatabase::new(sqlite);
-    let db_name = path.file_stem().unwrap(); // Safe due to previous validations.
+    let db_name = path.file_stem().unwrap().to_str().unwrap().to_owned(); // Safe due to previous validations.
 
     trace!("Loaded SQLite connector.");
-    Ok(sql_executor(
-        "sqlite",
-        db_name.to_os_string().into_string().unwrap(),
-        db,
-    ))
+    Ok((db_name, sql_executor("sqlite", sqlite)))
 }
 
 #[cfg(feature = "sql")]
-fn postgres(source: &dyn Source) -> PrismaResult<QueryExecutor> {
+fn postgres(source: &dyn Source) -> PrismaResult<(String, Box<dyn QueryExecutor + Send + Sync + 'static>)> {
     trace!("Loading Postgres connector...");
 
     let url = Url::parse(&source.url().value)?;
@@ -58,18 +54,16 @@ fn postgres(source: &dyn Source) -> PrismaResult<QueryExecutor> {
         .unwrap_or_else(|| String::from("public"));
 
     let psql = PostgreSql::from_source(source)?;
-    let db = SqlDatabase::new(psql);
 
     trace!("Loaded Postgres connector.");
-    Ok(sql_executor("postgres", db_name, db))
+    Ok((db_name, sql_executor("postgres", psql)))
 }
 
 #[cfg(feature = "sql")]
-fn mysql(source: &dyn Source) -> PrismaResult<QueryExecutor> {
+fn mysql(source: &dyn Source) -> PrismaResult<(String, Box<dyn QueryExecutor + Send + Sync + 'static>)> {
     trace!("Loading MySQL connector...");
 
-    let psql = Mysql::from_source(source)?;
-    let db = SqlDatabase::new(psql);
+    let mysql = Mysql::from_source(source)?;
     let url = Url::parse(&source.url().value)?;
     let err_str = "No database found in connection string";
 
@@ -77,26 +71,16 @@ fn mysql(source: &dyn Source) -> PrismaResult<QueryExecutor> {
         .path_segments()
         .ok_or_else(|| PrismaError::ConfigurationError(err_str.into()))?;
 
-    let db_name = db_name.next().expect(err_str);
+    let db_name = db_name.next().expect(err_str).to_owned();
 
     trace!("Loaded MySQL connector.");
-    Ok(sql_executor("mysql", db_name.into(), db))
+    Ok((db_name, sql_executor("mysql", mysql)))
 }
 
 #[cfg(feature = "sql")]
-fn sql_executor<T>(primary_connector: &'static str, db_name: String, connector: SqlDatabase<T>) -> QueryExecutor
+fn sql_executor<T>(primary_connector: &'static str, connector: T) -> Box<dyn QueryExecutor + Send + Sync + 'static>
 where
-    T: Transactional + SqlCapabilities + Send + Sync + 'static,
+    T: Connector + Send + Sync + 'static,
 {
-    let arc = Arc::new(connector);
-    let read_exec: ReadQueryExecutor = ReadQueryExecutor {
-        data_resolver: arc.clone(),
-    };
-
-    let write_exec: WriteQueryExecutor = WriteQueryExecutor {
-        db_name,
-        write_executor: arc,
-    };
-
-    QueryExecutor::new(primary_connector, read_exec, write_exec)
+    Box::new(InterpretingExecutor::new(connector, primary_connector))
 }

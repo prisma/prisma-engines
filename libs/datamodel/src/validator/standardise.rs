@@ -260,8 +260,8 @@ impl Standardiser {
                     &field_name,
                     dml::FieldType::Relation(missing_back_relation_field.relation_info),
                 );
-                back_relation_field.arity = missing_back_relation_field.arity;
 
+                back_relation_field.arity = missing_back_relation_field.arity;
                 model_mut.add_field(back_relation_field);
             }
         }

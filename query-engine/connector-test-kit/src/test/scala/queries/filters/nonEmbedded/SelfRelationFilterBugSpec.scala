@@ -45,7 +45,7 @@ class SelfRelationFilterBugSpec extends FlatSpec with Matchers with ApiSpecBase 
          |}"""
 
     val res1 = server.query(allCategories, project).toString
-    res1 should be("""{"data":{"allCategories":[{"name":"Sub","parent":{"name":"Root"}},{"name":"Root","parent":null}]}}""")
+    res1 should be("""{"data":{"allCategories":[{"name":"Root","parent":null},{"name":"Sub","parent":{"name":"Root"}}]}}""")
   }
 
   "Getting root categories categories" should "succeed" in {

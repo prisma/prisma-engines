@@ -1,17 +1,16 @@
-use std::sync::Arc;
-
-use core::{BuildMode, QueryExecutor, QuerySchemaBuilder, QuerySchemaRef, SupportedCapabilities};
-use prisma_models::InternalDataModelRef;
-
 use crate::{data_model_loader::*, exec_loader, PrismaError, PrismaResult};
+use core::{
+    schema::{QuerySchemaRef, SupportedCapabilities},
+    BuildMode, QueryExecutor, QuerySchemaBuilder,
+};
+// use prisma_models::InternalDataModelRef;
+use std::sync::Arc;
 
 /// Prisma request context containing all immutable state of the process.
 /// There is usually only one context initialized per process.
-#[derive(DebugStub)]
 pub struct PrismaContext {
-    /// Internal data model used throughout the query engine.
-    internal_data_model: InternalDataModelRef,
-
+    // Internal data model used throughout the query engine.
+    //internal_data_model: InternalDataModelRef,
     /// The api query schema.
     query_schema: QuerySchemaRef,
 
@@ -19,8 +18,7 @@ pub struct PrismaContext {
     dm: datamodel::Datamodel,
 
     /// Central query executor.
-    #[debug_stub = "#QueryExecutor#"]
-    executor: QueryExecutor,
+    pub executor: Box<dyn QueryExecutor + Send + Sync + 'static>,
 }
 
 impl PrismaContext {
@@ -43,8 +41,7 @@ impl PrismaContext {
         };
 
         // Load executor
-        let executor = exec_loader::load(&**data_source)?;
-        let db_name: String = executor.db_name();
+        let (db_name, executor) = exec_loader::load(&**data_source)?;
 
         // Build internal data model
         let internal_data_model = template.build(db_name);
@@ -56,7 +53,7 @@ impl PrismaContext {
         let query_schema: QuerySchemaRef = Arc::new(schema_builder.build());
 
         Ok(Self {
-            internal_data_model,
+            // internal_data_model,
             query_schema,
             dm,
             executor,
@@ -74,9 +71,4 @@ impl PrismaContext {
     pub fn primary_connector(&self) -> &'static str {
         self.executor.primary_connector()
     }
-
-    pub fn executor(&self) -> &QueryExecutor {
-        &self.executor
-    }
-
 }

@@ -240,7 +240,7 @@ class NonEmbeddedDeadlockSpec extends FlatSpec with Matchers with Retries with A
            a        String?
            comments Comment[] @relation(references: [id])
         }
-        
+
         model Comment {
            id   String @id @default(cuid())
            text String?
@@ -254,7 +254,7 @@ class NonEmbeddedDeadlockSpec extends FlatSpec with Matchers with Retries with A
            a        String?
            comments Comment[]
         }
-        
+
         model Comment {
            id   String  @id @default(cuid())
            text String?
@@ -268,7 +268,7 @@ class NonEmbeddedDeadlockSpec extends FlatSpec with Matchers with Retries with A
            a        String?
            comments Comment[]
         }
-        
+
         model Comment {
            id   String @id @default(cuid())
            text String?

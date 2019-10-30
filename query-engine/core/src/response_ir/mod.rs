@@ -1,25 +1,22 @@
 //! Prisma Response IR (Intermediate Representation).
 //!
-//! This module takes care of processing the results
+//! This module takes care of processing query execution results
 //! and transforming them into a different AST.
 //!
 //! This IR is meant for general processing and storage.
 //! It can also be easily serialized.
 //!
-//! The code itself can be considered WIP. It is clear when reading the code that there are missing abstractions
+//! Note: The code itself can be considered WIP. It is clear when reading the code that there are missing abstractions
 //! and a restructure might be necessary (good example is the default value handling sprinkled all over the place).
-mod read;
+mod internal;
 mod utils;
-mod write;
 
-pub use read::*;
-pub use utils::*;
-pub use write::*;
-
-use crate::{OutputType, ResultPair};
+use crate::{ExpressionResult, OutputType, OutputTypeRef};
 use indexmap::IndexMap;
+use internal::*;
 use prisma_models::PrismaValue;
 use std::{borrow::Borrow, sync::Arc};
+use utils::*;
 
 /// A `key -> value` map to an IR item
 pub type Map = IndexMap<String, Item>;
@@ -38,6 +35,8 @@ pub enum Response {
     Error(String),
 }
 
+// todo merge of responses
+
 /// An IR item that either expands to a subtype or leaf-record.
 #[derive(Debug, Clone)]
 pub enum Item {
@@ -51,68 +50,44 @@ pub enum Item {
     Ref(ItemRef),
 }
 
-/// An IR builder utility
-#[derive(Debug, Default)]
-pub struct ResultIrBuilder(Vec<ResultPair>);
+#[derive(Debug)]
+pub struct IrSerializer {
+    /// Serialization key for root DataItem
+    /// Note: This will change
+    pub key: String,
 
-impl ResultIrBuilder {
-    pub fn new() -> Self {
-        Self::default()
-    }
+    /// Output type describing the possible shape of the result
+    pub output_type: OutputTypeRef,
+}
 
-    /// Add a single query result to the builder
-    pub fn push(mut self, q: ResultPair) -> Self {
-        self.0.push(q);
-        self
-    }
-
-    /// Parse collected queries into the return wrapper type
-    pub fn build(self) -> Vec<Response> {
-        self.0
-            .into_iter()
-            .fold(vec![], |mut vec, res| {
-                match res {
-                    ResultPair::Write(r, typ) => {
-                        let name = r.alias.clone().unwrap_or_else(|| r.name.clone());
-                        let serialized = serialize_write(r.result, &typ);
-
-                        match serialized {
-                            Ok(result) => vec.push(Response::Data(name, result)),
-                            Err(err) => vec.push(Response::Error(format!("{}", err))),
-                        };
-                    }
-
-                    ResultPair::Read(r, typ) => {
-                        let name = r.alias.clone().unwrap_or_else(|| r.name.clone());
-                        let serialized = serialize_read(r, &typ, false, false);
-
-                        match serialized {
-                            Ok(result) => {
-                                // On the top level, each result pair boils down to a exactly a single serialized result.
-                                // All checks for lists and optionals have already been performed during the recursion,
-                                // so we just unpack the only result possible.
-                                let result = if result.is_empty() {
-                                    match typ.borrow() {
-                                        OutputType::Opt(_) => Item::Value(PrismaValue::Null),
-                                        OutputType::List(_) => Item::List(vec![]),
-                                        _ => unreachable!(),
-                                    }
-                                } else {
-                                    let (_, item) = result.into_iter().take(1).next().unwrap();
-                                    item
-                                };
-
-                                vec.push(Response::Data(name, result));
+impl IrSerializer {
+    pub fn serialize(&self, result: ExpressionResult) -> Response {
+        match result {
+            ExpressionResult::Query(r) => {
+                match serialize_internal(r, &self.output_type, false, false) {
+                    Ok(result) => {
+                        // On the top level, each result boils down to a exactly a single serialized result.
+                        // All checks for lists and optionals have already been performed during the recursion,
+                        // so we just unpack the only result possible.
+                        // Todo: The following checks feel out of place. This probably needs to be handled already one level deeper.
+                        let result = if result.is_empty() {
+                            match self.output_type.borrow() {
+                                OutputType::Opt(_) => Item::Value(PrismaValue::Null),
+                                OutputType::List(_) => Item::List(vec![]),
+                                _ => unreachable!(),
                             }
-
-                            Err(err) => vec.push(Response::Error(format!("{}", err))),
+                        } else {
+                            let (_, item) = result.into_iter().take(1).next().unwrap();
+                            item
                         };
-                    }
-                };
 
-                vec
-            })
-            .into_iter()
-            .collect()
+                        Response::Data(self.key.clone(), result)
+                    }
+                    Err(err) => Response::Error(format!("{}", err)),
+                }
+            }
+
+            ExpressionResult::Empty => panic!("Domain logic error: Attempted to serialize empty result."),
+        }
     }
 }

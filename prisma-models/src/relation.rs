@@ -286,8 +286,17 @@ impl Relation {
         }
     }
 
+    /// Practically deprecated with Prisma 2.
     pub fn is_many_to_many(&self) -> bool {
         self.field_a().is_list && self.field_b().is_list
+    }
+
+    pub fn is_one_to_one(&self) -> bool {
+        !self.field_a().is_list && !self.field_b().is_list
+    }
+
+    pub fn is_one_to_many(&self) -> bool {
+        !self.is_many_to_many() && !self.is_one_to_one()
     }
 
     pub fn id_column(&self) -> Option<Column<'static>> {

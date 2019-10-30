@@ -4,13 +4,11 @@ extern crate slog;
 extern crate slog_scope;
 #[macro_use]
 extern crate rust_embed;
-#[macro_use]
-extern crate debug_stub_derive;
 
 mod cli;
 mod context;
 mod data_model_loader;
-mod dmmf; // Temporary
+mod dmmf;
 mod error;
 mod exec_loader;
 mod request_handlers;

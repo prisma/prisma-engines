@@ -5,12 +5,14 @@ import util._
 import util.ConnectorCapability.{EmbeddedTypesCapability, JoinRelationLinksCapability}
 
 class CascadingDeleteSpec extends FlatSpec with Matchers with ApiSpecBase {
+
+  override def doNotRun = true
   override def runOnlyForCapabilities  = Set(JoinRelationLinksCapability)
   override def doNotRunForCapabilities = Set(EmbeddedTypesCapability)
 
   //region  TOP LEVEL DELETE
 
-  "P1!-C1! relation deleting the parent" should "work if parent is marked marked cascading" taggedAs (IgnoreSQLite, IgnorePostgres, IgnoreMySql) in { // TODO: Remove ignore when cascading again
+  "P1!-C1! relation deleting the parent" should "work if parent is marked marked cascading"  in {
     //         P-C
     val project = ProjectDsl.fromString {
       """
@@ -38,7 +40,7 @@ class CascadingDeleteSpec extends FlatSpec with Matchers with ApiSpecBase {
 
   }
 
-  "PM-CM relation deleting the parent" should "delete all children if the parent is marked cascading" taggedAs (IgnoreSQLite, IgnorePostgres, IgnoreMySql) in { // TODO: Remove SQLite ignore when cascading again
+  "PM-CM relation deleting the parent" should "delete all children if the parent is marked cascading"  in {
     //         P-C
     val project = ProjectDsl.fromString {
       """
@@ -67,7 +69,7 @@ class CascadingDeleteSpec extends FlatSpec with Matchers with ApiSpecBase {
 
   }
 
-  "PM-CM relation deleting the parent" should "succeed if both sides are marked cascading although that is a circle" taggedAs (IgnoreSQLite, IgnorePostgres, IgnoreMySql) in { // TODO: Remove SQLite ignore when cascading again
+  "PM-CM relation deleting the parent" should "succeed if both sides are marked cascading although that is a circle"  in {
     //         P-C
     val project = ProjectDsl.fromString {
       """
@@ -94,7 +96,7 @@ class CascadingDeleteSpec extends FlatSpec with Matchers with ApiSpecBase {
 
   }
 
-  "P1!-C1! relation deleting the parent" should "work if both sides are marked marked cascading" taggedAs (IgnoreSQLite, IgnorePostgres, IgnoreMySql) in { // TODO: Remove SQLite ignore when cascading again
+  "P1!-C1! relation deleting the parent" should "work if both sides are marked marked cascading"  in {
     //         P-C
     val project = ProjectDsl.fromString {
       """
@@ -121,7 +123,7 @@ class CascadingDeleteSpec extends FlatSpec with Matchers with ApiSpecBase {
 
   }
 
-  "P1!-C1! relation deleting the parent" should "error if only child is marked marked cascading" taggedAs (IgnoreSQLite, IgnorePostgres, IgnoreMySql) in { // TODO: Remove SQLite ignore when cascading again
+  "P1!-C1! relation deleting the parent" should "error if only child is marked marked cascading"  in {
     //         P-C
     val project = ProjectDsl.fromString {
       """
@@ -149,7 +151,7 @@ class CascadingDeleteSpec extends FlatSpec with Matchers with ApiSpecBase {
 
   }
 
-  "P1!-C1!-C1!-GC! relation deleting the parent and child and grandchild if marked cascading" should "work" taggedAs (IgnoreSQLite, IgnorePostgres, IgnoreMySql) in { // TODO: Remove SQLite ignore when cascading again
+  "P1!-C1!-C1!-GC! relation deleting the parent and child and grandchild if marked cascading" should "work"  in {
     //         P-C-GC
     val project = ProjectDsl.fromString {
       """
@@ -186,7 +188,7 @@ class CascadingDeleteSpec extends FlatSpec with Matchers with ApiSpecBase {
 
   }
 
-  "P1!-C1!-C1-GC relation deleting the parent and child marked cascading" should "work but preserve the grandchild" taggedAs (IgnoreSQLite, IgnorePostgres, IgnoreMySql) in { // TODO: Remove SQLite ignore when cascading again
+  "P1!-C1!-C1-GC relation deleting the parent and child marked cascading" should "work but preserve the grandchild"  in {
     //         P-C-GC
     val project = ProjectDsl.fromString {
       """
@@ -225,7 +227,7 @@ class CascadingDeleteSpec extends FlatSpec with Matchers with ApiSpecBase {
 
   }
 
-  "P1!-C1! relation deleting the parent marked cascading" should "error if the child is required in another non-cascading relation" taggedAs (IgnoreSQLite, IgnorePostgres, IgnoreMySql) in { // TODO: Remove SQLite ignore when cascading again
+  "P1!-C1! relation deleting the parent marked cascading" should "error if the child is required in another non-cascading relation"  in {
     //         P-C-GC
     val project = ProjectDsl.fromString {
       """
@@ -260,7 +262,7 @@ class CascadingDeleteSpec extends FlatSpec with Matchers with ApiSpecBase {
 
   }
 
-  "If the parent is not cascading nothing on the path" should "be deleted except for the parent" taggedAs (IgnoreSQLite, IgnorePostgres, IgnoreMySql) in { // TODO: Remove SQLite ignore when cascading again
+  "If the parent is not cascading nothing on the path" should "be deleted except for the parent"  in {
     //         P-C-GC
     val project = ProjectDsl.fromString {
       """
@@ -295,7 +297,7 @@ class CascadingDeleteSpec extends FlatSpec with Matchers with ApiSpecBase {
 
   }
 
-  "P1!-C1! PM-SC1! relation deleting the parent marked cascading" should "work" taggedAs (IgnoreSQLite, IgnorePostgres, IgnoreMySql) in { // TODO: Remove SQLite ignore when cascading again
+  "P1!-C1! PM-SC1! relation deleting the parent marked cascading" should "work"  in {
     //         P
     //       /   \
     //      C     SC
@@ -336,7 +338,7 @@ class CascadingDeleteSpec extends FlatSpec with Matchers with ApiSpecBase {
 
   }
 
-  "P!->C PM->SC relation without backrelations" should "work when deleting the parent marked cascading" taggedAs (IgnoreSQLite, IgnorePostgres, IgnoreMySql) in { // TODO: Remove SQLite ignore when cascading again
+  "P!->C PM->SC relation without backrelations" should "work when deleting the parent marked cascading"  in {
     //         P
     //       /   \      not a real circle since from the children there are no backrelations to the parent
     //      C  -  SC
@@ -379,7 +381,7 @@ class CascadingDeleteSpec extends FlatSpec with Matchers with ApiSpecBase {
 
   }
 
-  "A path that is interrupted since there are nodes missing" should "only cascade up until the gap" taggedAs (IgnoreSQLite, IgnorePostgres, IgnoreMySql) in { // TODO: Remove SQLite ignore when cascading again
+  "A path that is interrupted since there are nodes missing" should "only cascade up until the gap"  in {
     //         P-C-GC-|-D-E
     val project = ProjectDsl.fromString {
       """
@@ -433,7 +435,7 @@ class CascadingDeleteSpec extends FlatSpec with Matchers with ApiSpecBase {
 
   }
 
-  "A deep uninterrupted path" should "cascade all the way down" taggedAs (IgnoreSQLite, IgnorePostgres, IgnoreMySql) in { // TODO: Remove SQLite ignore when cascading again
+  "A deep uninterrupted path" should "cascade all the way down"  in {
     //         P-C-GC-D-E
     val project = ProjectDsl.fromString {
       """
@@ -487,7 +489,7 @@ class CascadingDeleteSpec extends FlatSpec with Matchers with ApiSpecBase {
 
   }
 
-  "A deep uninterrupted path" should "error on a required relation violation at the end" taggedAs (IgnoreSQLite, IgnorePostgres, IgnoreMySql) in { // TODO: Remove SQLite ignore when cascading again
+  "A deep uninterrupted path" should "error on a required relation violation at the end"  in {
     //         P-C-GC-D-E-F!
     val project = ProjectDsl.fromString {
       """
@@ -555,7 +557,7 @@ class CascadingDeleteSpec extends FlatSpec with Matchers with ApiSpecBase {
 
   }
 
-  "A required relation violation anywhere on the path" should "error and roll back all of the changes" taggedAs (IgnoreSQLite, IgnorePostgres, IgnoreMySql) in { // TODO: Remove SQLite ignore when cascading again
+  "A required relation violation anywhere on the path" should "error and roll back all of the changes"  in {
 
     /**           A           If cascading all the way down to D from A is fine, but deleting C would
       *          /            violate a required relation on E that is not cascading then this should
@@ -617,7 +619,7 @@ class CascadingDeleteSpec extends FlatSpec with Matchers with ApiSpecBase {
     )
   }
 
-  "A required relation violation on the parent" should "roll back all cascading deletes on the path" taggedAs (IgnoreSQLite, IgnorePostgres, IgnoreMySql) in { // TODO: Remove SQLite ignore when cascading again
+  "A required relation violation on the parent" should "roll back all cascading deletes on the path"  in {
 
     /**           A           If A!<->D! ia not marked cascading an existing D should cause all the deletes to fail
       *         / | :         even if A<->B, A<->C and C<->E could successfully cascade.
@@ -664,9 +666,9 @@ class CascadingDeleteSpec extends FlatSpec with Matchers with ApiSpecBase {
     database.setup(project)
 
     server.query(
-      """mutation{createA(data:{a:"a", 
+      """mutation{createA(data:{a:"a",
         |                       b: {create: {b: "b"}},
-        |                       c: {create:[{c: "c1", e: {create:{e: "e"}}},{c: "c2", e: {create:{e: "e2"}}}]}, 
+        |                       c: {create:[{c: "c1", e: {create:{e: "e"}}},{c: "c2", e: {create:{e: "e2"}}}]},
         |                       d: {create: {d: "d"}}
         |                      }){a}}""".stripMargin,
       project
@@ -681,7 +683,7 @@ class CascadingDeleteSpec extends FlatSpec with Matchers with ApiSpecBase {
 
   }
 
-  "Several relations between the same model" should "be handled correctly" taggedAs (IgnoreSQLite, IgnorePostgres, IgnoreMySql) in { // TODO: Remove SQLite ignore when cascading again
+  "Several relations between the same model" should "be handled correctly"  in {
 
     /**           A           If there are two relations between B and C and only one of them is marked
       *          /            cascading, then only the nodes connected to C's which are connected to B
@@ -742,7 +744,7 @@ class CascadingDeleteSpec extends FlatSpec with Matchers with ApiSpecBase {
 
   //region  NESTED DELETE
 
-  "NESTING P1!-C1! relation deleting the parent" should "work if parent is marked cascading but error on returning previous values" in { // TODO: Remove SQLite ignore when cascading again
+  "NESTING P1!-C1! relation deleting the parent" should "work if parent is marked cascading but error on returning previous values" in {
     //         P-C
     val project = ProjectDsl.fromString {
       """
@@ -773,7 +775,7 @@ class CascadingDeleteSpec extends FlatSpec with Matchers with ApiSpecBase {
     )
   }
 
-  "P1-C1-C1!-GC! relation updating the parent to delete the child and grandchild if marked cascading" should "work" taggedAs (IgnoreSQLite, IgnorePostgres, IgnoreMySql) in { // TODO: Remove SQLite ignore when cascading again
+  "P1-C1-C1!-GC! relation updating the parent to delete the child and grandchild if marked cascading" should "work"  in {
     //         P-C-GC
     val project = ProjectDsl.fromString {
       """
@@ -811,7 +813,7 @@ class CascadingDeleteSpec extends FlatSpec with Matchers with ApiSpecBase {
 
   }
 
-  "P1!-C1!-C1!-GC! relation updating the parent to delete the child and grandchild if marked cascading" should "error if the child is required on parent" in { // TODO: Remove SQLite ignore when cascading again
+  "P1!-C1!-C1!-GC! relation updating the parent to delete the child and grandchild if marked cascading" should "error if the child is required on parent" in {
     //         P-C-GC
     val project = ProjectDsl.fromString {
       """
@@ -849,7 +851,7 @@ class CascadingDeleteSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
   //endregion
 
-  "Self Relations" should "work" taggedAs (IgnoreSQLite, IgnorePostgres, IgnoreMySql) in {
+  "Self Relations" should "work"  in {
     val project = ProjectDsl.fromString { """model Folder {
                                              |  id String @id @default(cuid())
                                              |  name: String! @unique
@@ -882,7 +884,7 @@ class CascadingDeleteSpec extends FlatSpec with Matchers with ApiSpecBase {
     server.query("""query{folders{name}}""", project).toString should be("""{"data":{"folders":[]}}""")
   }
 
-  "Self Relations" should "work 2" taggedAs (IgnoreSQLite, IgnorePostgres, IgnoreMySql) in { // FIXME: Eats all the RAM // TODO: Remove SQLite ignore when cascading again
+  "Self Relations" should "work 2"  in { // FIXME: Eats all the RAM
     val project = ProjectDsl.fromString { """model Folder  {
                                              |  id String @id @default(cuid())
                                              |  name: String! @unique
@@ -915,7 +917,7 @@ class CascadingDeleteSpec extends FlatSpec with Matchers with ApiSpecBase {
     server.query("""query{folders{name}}""", project).toString should be("""{"data":{"folders":[]}}""")
   }
 
-  "Self Relations" should "work 3" taggedAs (IgnoreSQLite, IgnorePostgres, IgnoreMySql) in { // TODO: Remove SQLite ignore when cascading again
+  "Self Relations" should "work 3"  in {
     val project = ProjectDsl.fromString { """model Folder  {
                                              |  id String @id @default(cuid())
                                              |  name: String! @unique
@@ -946,7 +948,7 @@ class CascadingDeleteSpec extends FlatSpec with Matchers with ApiSpecBase {
     server.query("""query{folders{name}}""", project).toString should be("""{"data":{"folders":[]}}""")
   }
 
-  "Cascade on both sides" should "halt" taggedAs (IgnoreSQLite, IgnorePostgres, IgnoreMySql) in { // TODO: Remove SQLite ignore when cascading again
+  "Cascade on both sides" should "halt"  in {
     val project = ProjectDsl.fromString { """model User {
                                              |  id String @id @default(cuid())
                                              |  name: String! @unique
@@ -981,7 +983,7 @@ class CascadingDeleteSpec extends FlatSpec with Matchers with ApiSpecBase {
 
   }
 
-  "A deleteMany " should " work with cascading delete" taggedAs (IgnoreSQLite, IgnorePostgres, IgnoreMySql) in { // TODO: Remove SQLite ignore when cascading again
+  "A deleteMany " should " work with cascading delete"  in {
 
     val project: Project = setupForDeleteManys
 
@@ -995,7 +997,7 @@ class CascadingDeleteSpec extends FlatSpec with Matchers with ApiSpecBase {
 
   }
 
-  "A nested deleteMany " should " work with cascading delete" taggedAs (IgnoreSQLite, IgnorePostgres, IgnoreMySql) in { // TODO: Remove SQLite ignore when cascading again
+  "A nested deleteMany " should " work with cascading delete"  in {
 
     val project: Project = setupForDeleteManys
 

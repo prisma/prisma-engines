@@ -97,10 +97,10 @@ impl InternalDataModel {
         self.version.is_none()
     }
 
-    pub fn fields_requiring_model(&self, model: ModelRef) -> Vec<RelationFieldRef> {
+    pub fn fields_requiring_model(&self, model: &ModelRef) -> Vec<RelationFieldRef> {
         self.relation_fields()
             .iter()
-            .filter(|rf| rf.related_model() == model)
+            .filter(|rf| &rf.related_model() == model)
             .filter(|f| f.is_required && !f.is_list)
             .map(|f| Arc::clone(f))
             .collect()

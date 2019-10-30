@@ -14,7 +14,7 @@ class RelationGraphQLSpec extends FlatSpec with Matchers with ApiSpecBase {
                      ownerName String? @unique
                      cat       Cat?    @relation(references: [id])
                   }
-                  
+
                   model Cat{
                      id       String  @id @default(cuid())
                      catName  String? @unique
@@ -26,7 +26,7 @@ class RelationGraphQLSpec extends FlatSpec with Matchers with ApiSpecBase {
                      ownerName String? @unique
                      cat       Cat?
                   }
-                  
+
                   model Cat{
                      id      String  @id @default(cuid())
                      catName String? @unique

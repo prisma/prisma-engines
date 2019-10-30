@@ -1,5 +1,5 @@
-type 
-model 
+type
+model
 
 id: ID! @id
 id String @id @default(cuid())

@@ -215,8 +215,8 @@ class FilterSpec extends FlatSpec with Matchers with ApiSpecBase {
       s"""mutation createParkingLot{createParkingLot(
          |  data: {
          |    area: "PrenzlBerg",
-         |    unique:1, 
-         |    capacity: 12, 
+         |    unique:1,
+         |    capacity: 12,
          |    size: 300.5
          |})
          |{id}
@@ -229,8 +229,8 @@ class FilterSpec extends FlatSpec with Matchers with ApiSpecBase {
       s"""mutation createParkingLot{createParkingLot(
          |  data: {
          |    area: "Moabit",
-         |    unique:2, 
-         |    capacity: 34, 
+         |    unique:2,
+         |    capacity: 34,
          |    size: 100.5
          |})
          |{id}

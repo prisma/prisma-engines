@@ -1,6 +1,6 @@
 use crate::ConnectorResult;
-use std::marker::PhantomData;
 use serde::Serialize;
+use std::marker::PhantomData;
 
 /// Implementors of this trait are responsible for checking whether a migration could lead to data loss.
 ///

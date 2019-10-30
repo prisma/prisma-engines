@@ -16,13 +16,13 @@ class ExtendedPaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
         t       String   @unique
         middles Middle[] @relation(references: [id])
       }
-      
+
       model Middle {
         id      String   @id @default(cuid())
         m       String   @unique
         bottoms Bottom[] @relation(references: [id])
       }
-      
+
       model Bottom {
         id String @id @default(cuid())
         b  String @unique
@@ -35,13 +35,13 @@ class ExtendedPaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
         t       String   @unique
         middles Middle[]
       }
-      
+
       model Middle {
         id      String   @id @default(cuid())
         m       String   @unique
         bottoms Bottom[]
       }
-      
+
       model Bottom {
         id String @id @default(cuid())
         b  String @unique

@@ -1,6 +1,6 @@
 use crate::common::*;
 use datamodel::{
-    common::argument::Arguments, common::FromStrAndSpan, common::PrismaType, configuration::*, dml,
+    ast::Span, common::argument::Arguments, common::FromStrAndSpan, common::PrismaType, configuration::*, dml,
     error::DatamodelError, validator::directive::DirectiveValidator,
 };
 
@@ -217,6 +217,25 @@ fn serialize_sources_to_dmmf() {
     println!("{}", rendered);
 
     assert_eq_json(&rendered, expected);
+}
+
+#[test]
+fn must_forbid_env_functions_in_provider_field() {
+    let schema = r#"
+        datasource ds {
+            provider = env("DB_PROVIDER")
+            url = env("DB_URL")
+        }
+    "#;
+    std::env::set_var("DB_PROVIDER", "postgresql");
+    std::env::set_var("DB_URL", "https://localhost");
+    let config = datamodel::parse_configuration_with_sources(schema, vec![]);
+    assert!(config.is_err());
+    let errors = config.err().expect("This must error");
+    errors.assert_is(DatamodelError::new_functional_evaluation_error(
+        "A datasource must not use the env() function in the provider argument.",
+        Span::new(9, 108),
+    ));
 }
 
 fn assert_eq_json(a: &str, b: &str) {

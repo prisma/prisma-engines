@@ -87,22 +87,24 @@ impl RenderContext {
         self.schema.borrow_mut().output_types.push(output_type);
     }
 
-    pub fn add_mapping(&self, name: String, operation: Option<&ModelOperation>) {
+    pub fn add_mapping(&self, name: String, operation: Option<&SchemaQueryBuilder>) {
         operation.into_iter().for_each(|op| {
-            let model_name = op.model.name.clone();
-            let operation_str = format!("{}", op.operation);
-            let mut mappings = self.mappings.borrow_mut();
-            let mapping = mappings.iter().find(|mapping| mapping.model_name == model_name);
+            if let SchemaQueryBuilder::ModelQueryBuilder(m) = op {
+                let model_name = m.model.name.clone();
+                let tag_str = format!("{}", m.tag);
+                let mut mappings = self.mappings.borrow_mut();
+                let mapping = mappings.iter().find(|mapping| mapping.model_name == model_name);
 
-            match mapping {
-                Some(ref existing) => existing.add_operation(operation_str, name.clone()),
-                None => {
-                    let new_mapping = DMMFMapping::new(model_name);
+                match mapping {
+                    Some(ref existing) => existing.add_operation(tag_str, name.clone()),
+                    None => {
+                        let new_mapping = DMMFMapping::new(model_name);
 
-                    new_mapping.add_operation(operation_str, name.clone());
-                    mappings.push(new_mapping);
-                }
-            };
+                        new_mapping.add_operation(tag_str, name.clone());
+                        mappings.push(new_mapping);
+                    }
+                };
+            }
         });
     }
 }
