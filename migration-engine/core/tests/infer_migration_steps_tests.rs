@@ -32,7 +32,7 @@ fn assume_to_be_applied_must_work() {
             datamodel: dm1.to_string(),
         };
         let steps1 = run_infer_command(api, input1).0.datamodel_steps;
-        let expected_steps_1 = create_field_step("Blog", "field1", ScalarType::String);
+        let expected_steps_1 = create_field_step("Blog", "field1", "String");
         assert_eq!(steps1, &[expected_steps_1.clone()]);
 
         let dm2 = r#"
@@ -52,10 +52,7 @@ fn assume_to_be_applied_must_work() {
         // We are exiting watch mode, so the returned steps go back to the last non-watch migration.
         assert_eq!(
             steps2,
-            &[
-                expected_steps_1,
-                create_field_step("Blog", "field2", ScalarType::String)
-            ]
+            &[expected_steps_1, create_field_step("Blog", "field2", "String")]
         );
     });
 }
@@ -110,9 +107,9 @@ fn special_handling_of_watch_migrations() {
         assert_eq!(
             steps,
             &[
-                create_field_step("Blog", "field1", ScalarType::String),
-                create_field_step("Blog", "field2", ScalarType::String),
-                create_field_step("Blog", "field3", ScalarType::Int),
+                create_field_step("Blog", "field1", "String"),
+                create_field_step("Blog", "field2", "String"),
+                create_field_step("Blog", "field3", "Int"),
             ]
         );
     });

@@ -1,6 +1,6 @@
 use crate::steps::*;
 use chrono::{DateTime, Utc};
-use datamodel::Datamodel;
+use datamodel::{ast::SchemaAst, Datamodel};
 use serde::Serialize;
 
 /// This trait is implemented by each connector. It provides a generic API to store and retrieve [Migration](struct.Migration.html) records.
@@ -14,6 +14,12 @@ pub trait MigrationPersistence: Send + Sync + 'static {
     /// Returns the currently active Datamodel.
     fn current_datamodel(&self) -> Datamodel {
         self.last().map(|m| m.datamodel).unwrap_or_else(Datamodel::empty)
+    }
+
+    fn current_datamodel_ast(&self) -> SchemaAst {
+        self.last()
+            .and_then(|m| datamodel::ast::parser::parse(&m.datamodel_string).ok())
+            .unwrap_or_else(SchemaAst::empty)
     }
 
     fn last_non_watch_applied_migration(&self) -> Option<Migration> {
@@ -78,6 +84,7 @@ pub struct Migration {
     pub status: MigrationStatus,
     pub applied: usize,
     pub rolled_back: usize,
+    pub datamodel_string: String,
     pub datamodel: Datamodel,
     pub datamodel_steps: Vec<MigrationStep>,
     pub database_migration: serde_json::Value,
@@ -116,6 +123,7 @@ impl Migration {
             name: name,
             revision: 0,
             status: MigrationStatus::Pending,
+            datamodel_string: String::new(),
             applied: 0,
             rolled_back: 0,
             datamodel: Datamodel::empty(),
@@ -148,6 +156,12 @@ impl Migration {
         let naive = chrono::NaiveDateTime::from_timestamp(secs, nsecs);
         let datetime: DateTime<Utc> = DateTime::from_utc(naive, Utc);
         datetime
+    }
+
+    pub fn datamodel_ast(&self) -> SchemaAst {
+        datamodel::ast::parser::parse(&self.datamodel_string)
+            .ok()
+            .unwrap_or_else(SchemaAst::empty)
     }
 }
 
@@ -221,5 +235,9 @@ impl MigrationPersistence for EmptyMigrationPersistence {
 
     fn update(&self, _params: &MigrationUpdateParams) {
         unimplemented!("Not allowed on a EmptyMigrationPersistence")
+    }
+
+    fn current_datamodel_ast(&self) -> datamodel::ast::SchemaAst {
+        datamodel::ast::SchemaAst { tops: Vec::new() }
     }
 }

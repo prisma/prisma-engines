@@ -1,5 +1,4 @@
 use super::*;
-use serde::{Deserialize, Serialize};
 
 /// Represents a model in a prisma datamodel.
 #[derive(Debug, PartialEq, Clone)]
@@ -29,7 +28,7 @@ pub struct IndexDefinition {
     pub tpe: IndexType,
 }
 
-#[derive(Debug, PartialEq, Clone, Serialize, Deserialize, Copy)]
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub enum IndexType {
     Unique,
     Normal,

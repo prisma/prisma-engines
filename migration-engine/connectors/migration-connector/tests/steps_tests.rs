@@ -1,111 +1,80 @@
 #![allow(non_snake_case)]
 
-use datamodel::*;
+use datamodel::ast::FieldArity;
 use migration_connector::steps::*;
 
 #[test]
-fn minimal_CreateModel_must_work() {
-    let json = r#"{"stepType":"CreateModel","name":"Blog","embedded":false}"#;
-    let expected_struct = MigrationStep::CreateModel(CreateModel {
-        name: "Blog".to_string(),
-        db_name: None,
-        embedded: false,
-    });
-    assert_symmetric_serde(json, expected_struct);
-}
-
-#[test]
 fn full_CreateModel_must_work() {
-    let json = r#"{"stepType":"CreateModel","name":"Blog","dbName":"blog","embedded":true}"#;
+    let json = r#"{"stepType":"CreateModel","model":"Blog"}"#;
     let expected_struct = MigrationStep::CreateModel(CreateModel {
-        name: "Blog".to_string(),
-        db_name: Some("blog".to_string()),
-        embedded: true,
+        model: "Blog".to_string(),
     });
     assert_symmetric_serde(json, expected_struct);
 }
 
 #[test]
 fn minimal_UpdateModel_must_work() {
-    let json = r#"{"stepType":"UpdateModel","name":"Blog"}"#;
+    let json = r#"{"stepType":"UpdateModel","model":"Blog"}"#;
     let expected_struct = MigrationStep::UpdateModel(UpdateModel {
-        name: "Blog".to_string(),
+        model: "Blog".to_string(),
         new_name: None,
-        db_name: None,
-        embedded: None,
     });
     assert_symmetric_serde(json, expected_struct);
 }
 
 #[test]
 fn full_UpdateModel_must_work() {
-    let json = r#"{"stepType":"UpdateModel","name":"Blog","newName":"MyBlog","dbName":"blog","embedded":true}"#;
+    let json = r#"{"stepType":"UpdateModel","model":"Blog","newName":"MyBlog"}"#;
     let expected_struct = MigrationStep::UpdateModel(UpdateModel {
-        name: "Blog".to_string(),
+        model: "Blog".to_string(),
         new_name: Some("MyBlog".to_string()),
-        db_name: Some(Some("blog".to_string())),
-        embedded: Some(true),
     });
     assert_symmetric_serde(json, expected_struct);
 }
 
 #[test]
 fn DeleteModel_must_work() {
-    let json = r#"{"stepType":"DeleteModel","name":"Blog"}"#;
+    let json = r#"{"stepType":"DeleteModel","model":"Blog"}"#;
     let expected_struct = MigrationStep::DeleteModel(DeleteModel {
-        name: "Blog".to_string(),
+        model: "Blog".to_string(),
     });
     assert_symmetric_serde(json, expected_struct);
 }
 
 #[test]
 fn minimal_CreateField_must_work() {
-    let json =
-        r#"{"stepType":"CreateField","model":"Blog","name":"title","type":{"Base":"String"},"arity":"required","isUnique":false}"#;
+    let json = r#"
+            {
+                "stepType":"CreateField",
+                "model":"Blog",
+                "field":"title",
+                "type":"String",
+                "arity":"required"
+            }
+        "#;
     let expected_struct = MigrationStep::CreateField(CreateField {
         model: "Blog".to_string(),
-        name: "title".to_string(),
-        tpe: FieldType::Base(ScalarType::String),
+        field: "title".to_string(),
+        tpe: "String".to_owned(),
         arity: FieldArity::Required,
-        db_name: None,
-        is_created_at: None,
-        is_updated_at: None,
-        is_unique: false,
-        id: None,
-        default: None,
-        scalar_list: None,
     });
     assert_symmetric_serde(json, expected_struct);
 }
 
-// TODO: bring back once we have decided on field behavious
 #[test]
 fn full_CreateField_must_work() {
     let json = r#"{
             "stepType":"CreateField",
-            "model":"Blog",
-            "name":"title",
-            "type":{"Base":"String"},
-            "arity":"optional",
-            "dbName":"blog",
-            "isCreatedAt":true,
-            "isUpdatedAt":true,
-            "isUnique": true,
-            "default":{"String":"default"},
-            "scalarList": "Embedded"
+            "model": "Blog",
+            "field": "title",
+            "type": "String",
+            "arity": "optional"
         }"#;
     let expected_struct = MigrationStep::CreateField(CreateField {
         model: "Blog".to_string(),
-        name: "title".to_string(),
-        tpe: FieldType::Base(ScalarType::String),
+        field: "title".to_string(),
+        tpe: "String".to_owned(),
         arity: FieldArity::Optional,
-        db_name: Some("blog".to_string()),
-        is_created_at: Some(true),
-        is_updated_at: Some(true),
-        is_unique: true,
-        id: None, // TODO: adapt once added to CreateField
-        default: Some(Value::String("default".to_string())),
-        scalar_list: Some(ScalarListStrategy::Embedded),
     });
 
     assert_symmetric_serde(json, expected_struct);
@@ -113,204 +82,269 @@ fn full_CreateField_must_work() {
 
 #[test]
 fn minimal_UpdateField_must_work() {
-    let json = r#"{"stepType":"UpdateField","model":"Blog","name":"title"}"#;
+    let json = r#"{"stepType":"UpdateField","model":"Blog","field":"title"}"#;
     let expected_struct = MigrationStep::UpdateField(UpdateField {
         model: "Blog".to_string(),
-        name: "title".to_string(),
+        field: "title".to_string(),
         new_name: None,
         tpe: None,
         arity: None,
-        db_name: None,
-        is_created_at: None,
-        is_updated_at: None,
-        is_unique: None,
-        id_info: None,
-        default: None,
-        scalar_list: None,
     });
     assert_symmetric_serde(json, expected_struct);
 }
 
 #[test]
 fn full_UpdateField_must_work() {
-    let json = r#"{"stepType":"UpdateField","model":"Blog","name":"title","newName":"MyBlog","type":{"Base":"String"},"arity":"optional","dbName":"blog","isCreatedAt":true,"isUpdatedAt":true,"isUnique":true,"default":{"String":"default"},"scalarList":"Embedded"}"#;
+    let json = r#"
+        {
+            "stepType": "UpdateField",
+            "model": "Blog",
+            "field": "title",
+            "newName": "MyBlog",
+            "type": "String",
+            "arity": "optional"
+        }
+    "#;
     let expected_struct = MigrationStep::UpdateField(UpdateField {
         model: "Blog".to_string(),
-        name: "title".to_string(),
+        field: "title".to_string(),
         new_name: Some("MyBlog".to_string()),
-        tpe: Some(FieldType::Base(ScalarType::String)),
+        tpe: Some("String".to_owned()),
         arity: Some(FieldArity::Optional),
-        db_name: Some(Some("blog".to_string())),
-        is_created_at: Some(true),
-        is_updated_at: Some(true),
-        is_unique: Some(true),
-        id_info: None,
-        default: Some(Some(Value::String("default".to_string()))),
-        scalar_list: Some(Some(ScalarListStrategy::Embedded)),
     });
     assert_symmetric_serde(json, expected_struct);
 }
 
 #[test]
 fn DeleteField_must_work() {
-    let json = r#"{"stepType":"DeleteField","model":"Blog","name":"title"}"#;
+    let json = r#"{"stepType":"DeleteField","model":"Blog","field":"title"}"#;
     let expected_struct = MigrationStep::DeleteField(DeleteField {
         model: "Blog".to_string(),
-        name: "title".to_string(),
+        field: "title".to_string(),
     });
     assert_symmetric_serde(json, expected_struct);
 }
 
-// #[test]
-// fn CreateEnum_must_work() {
-//     let json = r#"{"stepType":"CreateEnum","name":"BlogCategory","values":["Politics","Tech"]}"#;
-//     let expected_struct = MigrationStep::CreateEnum(CreateEnum {
-//         name: "BlogCategory".to_string(),
-//         values: vec!["Politics".to_string(), "Tech".to_string()],
-//     });
-//     assert_symmetric_serde(json, expected_struct);
-// }
+#[test]
+fn CreateEnum_must_work() {
+    let json = r#"
+        {
+            "stepType": "CreateEnum",
+            "enum": "BlogCategory",
+            "values": ["Politics","Tech"]
+        }
+    "#;
+    let expected_struct = MigrationStep::CreateEnum(CreateEnum {
+        r#enum: "BlogCategory".to_string(),
+        values: vec!["Politics".to_string(), "Tech".to_string()],
+    });
+    assert_symmetric_serde(json, expected_struct);
+}
 
-// #[test]
-// fn minimal_UpdateEnum_must_work() {
-//     let json = r#"{"stepType":"UpdateEnum","name":"BlogCategory"}"#;
-//     let expected_struct = MigrationStep::UpdateEnum(UpdateEnum {
-//         name: "BlogCategory".to_string(),
-//         new_name: None,
-//         values: None,
-//     });
-//     assert_symmetric_serde(json, expected_struct);
-// }
+#[test]
+fn minimal_UpdateEnum_must_work() {
+    let json = r#"
+        {
+            "stepType": "UpdateEnum",
+            "enum": "BlogCategory"
+        }
+    "#;
+    let expected_struct = MigrationStep::UpdateEnum(UpdateEnum {
+        r#enum: "BlogCategory".to_string(),
+        new_name: None,
+        created_values: vec![],
+        deleted_values: vec![],
+    });
+    assert_symmetric_serde(json, expected_struct);
+}
 
-// #[test]
-// fn full_Update_Enum_must_work() {
-//     let json = r#"{"stepType":"UpdateEnum","name":"BlogCategory","newName":"MyBlogCategory","values":["Tech"]}"#;
-//     let expected_struct = MigrationStep::UpdateEnum(UpdateEnum {
-//         name: "BlogCategory".to_string(),
-//         new_name: Some("MyBlogCategory".to_string()),
-//         values: Some(vec!["Tech".to_string()]),
-//     });
-//     assert_symmetric_serde(json, expected_struct);
-// }
+#[test]
+fn full_Update_Enum_must_work() {
+    let json = r#"
+        {
+            "stepType": "UpdateEnum",
+            "enum": "BlogCategory",
+            "newName": "MyBlogCategory",
+            "createdValues": ["Tech"],
+            "deletedValues": ["Nology"]
+        }
+    "#;
+    let expected_struct = MigrationStep::UpdateEnum(UpdateEnum {
+        r#enum: "BlogCategory".to_string(),
+        new_name: Some("MyBlogCategory".to_string()),
+        created_values: vec!["Tech".to_string()],
+        deleted_values: vec!["Nology".to_string()],
+    });
+    assert_symmetric_serde(json, expected_struct);
+}
 
-// #[test]
-// fn DeleteEnum_must_work() {
-//     let json = r#"{"stepType":"DeleteEnum","name":"BlogCategory"}"#;
-//     let expected_struct = MigrationStep::DeleteEnum(DeleteEnum {
-//         name: "BlogCategory".to_string(),
-//     });
-//     assert_symmetric_serde(json, expected_struct);
-// }
+#[test]
+fn DeleteEnum_must_work() {
+    let json = r#"{"stepType":"DeleteEnum","enum":"BlogCategory"}"#;
+    let expected_struct = MigrationStep::DeleteEnum(DeleteEnum {
+        r#enum: "BlogCategory".to_string(),
+    });
+    assert_symmetric_serde(json, expected_struct);
+}
 
-// #[test]
-// fn minimal_CreateRelation_must_work() {
-//     let json = r#"{
-//         "stepType":"CreateRelation",
-//         "name":"BlogToPosts",
-//         "modelA": { "name":"Blog" },
-//         "modelB": { "name":"Post" }
-//     }"#;
-//     let expected_struct = MigrationStep::CreateRelation(CreateRelation {
-//         name: "BlogToPosts".to_string(),
-//         model_a: RelationFieldSpec {
-//             name: "Blog".to_string(),
-//             field: None,
-//             is_list: false,
-//             is_optional: false,
-//             on_delete: None,
-//             inline_link: None,
-//         },
-//         model_b: RelationFieldSpec {
-//             name: "Post".to_string(),
-//             field: None,
-//             is_list: false,
-//             is_optional: false,
-//             on_delete: None,
-//             inline_link: None,
-//         },
-//         table: None,
-//     });
-//     assert_symmetric_serde(json, expected_struct);
-// }
+#[test]
+fn CreateDirective_must_work() {
+    let json = r#"
+        {
+            "stepType": "CreateDirective",
+            "model": "Blog",
+            "directive": "map"
+        }
+    "#;
 
-// #[test]
-// fn full_CreateRelation_with_link_table_must_work() {
-//     let json = r#"{
-//         "stepType":"CreateRelation",
-//         "name":"BlogToPosts",
-//         "modelA": { "name":"Blog","field":"posts","isList":true,"onDelete":"SET_NULL","inlineLink":true},
-//         "modelB": { "name":"Post","field":"blog","isOptional":true,"onDelete":"CASCADE"},
-//         "table": { "modelAColumn":"blog", "modelBColumn":"post" }
-//     }"#;
-//     let expected_struct = MigrationStep::CreateRelation(CreateRelation {
-//         name: "BlogToPosts".to_string(),
-//         model_a: RelationFieldSpec {
-//             name: "Blog".to_string(),
-//             field: Some("posts".to_string()),
-//             is_list: Some(true),
-//             is_optional: false,
-//             on_delete: Some("SET_NULL".to_string()),
-//             inline_link: Some(true),
-//         },
-//         model_b: RelationFieldSpec {
-//             name: "Post".to_string(),
-//             field: Some("blog".to_string()),
-//             is_list: false,
-//             is_optional: Some(true),
-//             on_delete: Some("CASCADE".to_string()),
-//             inline_link: None,
-//         },
-//         table: Some(LinkTableSpec {
-//             model_a_column: Some("blog".to_string()),
-//             model_b_column: Some("post".to_string()),
-//         }),
-//     });
-//     assert_symmetric_serde(json, expected_struct);
-// }
+    let expected_step = MigrationStep::CreateDirective(CreateDirective {
+        locator: DirectiveLocation {
+            directive: "map".to_owned(),
+            arguments: None,
+            location: DirectiveType::Model {
+                model: "Blog".to_owned(),
+            },
+        },
+    });
 
-// #[test]
-// fn CreateRelation_forcing_the_link_table_must_work() {
-//     let json = r#"{
-//         "stepType":"CreateRelation",
-//         "name":"BlogToPosts",
-//         "modelA": { "name":"Blog" },
-//         "modelB": { "name":"Post" },
-//         "table": { }
-//     }"#;
-//     let expected_struct = MigrationStep::CreateRelation(CreateRelation {
-//         name: "BlogToPosts".to_string(),
-//         model_a: RelationFieldSpec {
-//             name: "Blog".to_string(),
-//             field: None,
-//             is_list: false,
-//             is_optional: false,
-//             on_delete: None,
-//             inline_link: None,
-//         },
-//         model_b: RelationFieldSpec {
-//             name: "Post".to_string(),
-//             field: None,
-//             is_list: false,
-//             is_optional: false,
-//             on_delete: None,
-//             inline_link: None,
-//         },
-//         table: Some(LinkTableSpec {
-//             model_a_column: None,
-//             model_b_column: None,
-//         }),
-//     });
-//     assert_symmetric_serde(json, expected_struct);
-// }
+    assert_symmetric_serde(json, expected_step);
+}
 
-// #[test]
-// fn DeletRelation_must_work() {
-//     let json = r#"{"stepType":"DeleteRelation","name":"BlogToPost"}"#;
-//     let expected_struct = MigrationStep::DeleteRelation(DeleteRelation {
-//         name: "BlogToPost".to_string(),
-//     });
-//     assert_symmetric_serde(json, expected_struct);
-// }
+#[test]
+fn minimal_DeleteDirective_must_work() {
+    let json = r#"
+        {
+            "stepType": "DeleteDirective",
+            "model": "Blog",
+            "field": "title",
+            "directive": "map"
+        }
+    "#;
+
+    let expected_step = MigrationStep::DeleteDirective(DeleteDirective {
+        locator: DirectiveLocation {
+            directive: "map".to_owned(),
+            location: DirectiveType::Field {
+                model: "Blog".to_owned(),
+                field: "title".to_owned(),
+            },
+            arguments: None,
+        },
+    });
+
+    assert_symmetric_serde(json, expected_step);
+}
+
+#[test]
+fn full_DeleteDirective_must_work() {
+    let json = r#"
+        {
+            "stepType": "DeleteDirective",
+            "model": "Blog",
+            "directive": "unique",
+            "arguments": [
+                {
+                    "name": "",
+                    "value": "[name, age]"
+                }
+            ]
+        }
+    "#;
+
+    let expected_step = MigrationStep::DeleteDirective(DeleteDirective {
+        locator: DirectiveLocation {
+            directive: "unique".to_owned(),
+            location: DirectiveType::Model {
+                model: "Blog".to_owned(),
+            },
+            arguments: Some(vec![Argument {
+                name: "".to_owned(),
+                value: MigrationExpression("[name, age]".to_owned()),
+            }]),
+        },
+    });
+
+    assert_symmetric_serde(json, expected_step);
+}
+
+#[test]
+fn UpdateDirectiveArgument_must_work() {
+    let json = r#"
+        {
+            "stepType": "UpdateDirectiveArgument",
+            "enum": "CatMood",
+            "directive": "map",
+            "argument": "name",
+            "newValue": "cat_mood"
+        }
+    "#;
+
+    let expected_step = MigrationStep::UpdateDirectiveArgument(UpdateDirectiveArgument {
+        directive_location: DirectiveLocation {
+            directive: "map".to_owned(),
+            location: DirectiveType::Enum {
+                r#enum: "CatMood".to_owned(),
+            },
+            arguments: None,
+        },
+        argument: "name".to_owned(),
+        new_value: MigrationExpression("cat_mood".to_owned()),
+    });
+
+    assert_symmetric_serde(json, expected_step);
+}
+
+#[test]
+fn CreateDirectiveArgument_must_work() {
+    let json = r#"
+        {
+            "stepType": "CreateDirectiveArgument",
+            "enum": "CatMood",
+            "directive": "map",
+            "argument": "name",
+            "value": "cat_mood"
+        }
+    "#;
+
+    let expected_step = MigrationStep::CreateDirectiveArgument(CreateDirectiveArgument {
+        directive_location: DirectiveLocation {
+            arguments: None,
+            directive: "map".to_owned(),
+            location: DirectiveType::Enum {
+                r#enum: "CatMood".to_owned(),
+            },
+        },
+        argument: "name".to_owned(),
+        value: MigrationExpression("cat_mood".to_owned()),
+    });
+
+    assert_symmetric_serde(json, expected_step);
+}
+
+#[test]
+fn DeleteDirectiveArgument_must_work() {
+    let json = r#"
+        {
+            "stepType": "DeleteDirectiveArgument",
+            "enum": "CatMood",
+            "directive": "map",
+            "argument": "name"
+        }
+    "#;
+
+    let expected_step = MigrationStep::DeleteDirectiveArgument(DeleteDirectiveArgument {
+        directive_location: DirectiveLocation {
+            directive: "map".to_owned(),
+            arguments: None,
+            location: DirectiveType::Enum {
+                r#enum: "CatMood".to_owned(),
+            },
+        },
+        argument: "name".to_owned(),
+    });
+
+    assert_symmetric_serde(json, expected_step);
+}
 
 fn assert_symmetric_serde(json: &str, expected: MigrationStep) {
     let serde_value: serde_json::Value = serde_json::from_str(&json).expect("The provided input was invalid json.");

@@ -1,7 +1,7 @@
 use super::*;
 
 /// An enum declaration.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Enum {
     /// The name of the enum.
     pub name: Identifier,
@@ -40,7 +40,7 @@ impl WithDocumentation for Enum {
 }
 
 /// An enum value definition.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct EnumValue {
     /// The name of the enum value.
     pub name: String,
