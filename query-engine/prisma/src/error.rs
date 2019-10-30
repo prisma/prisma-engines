@@ -1,4 +1,3 @@
-use crate::utilities;
 use core::{response_ir, CoreError};
 use datamodel::error::ErrorCollection;
 use failure::{Error, Fail};
@@ -71,7 +70,7 @@ impl PrettyPrint for PrismaError {
     fn pretty_print(&self) {
         match self {
             PrismaError::ConversionError(errors, dml_string) => {
-                let file_name = utilities::get_env("PRISMA_SDL_PATH").unwrap_or_else(|_| "schema.prisma".to_string());
+                let file_name = "schema.prisma".to_string();
 
                 for error in errors.to_iter() {
                     println!();
