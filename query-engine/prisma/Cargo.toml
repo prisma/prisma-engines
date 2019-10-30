@@ -16,7 +16,6 @@ hyper = { version = "0.13.0-alpha.4", features = ["unstable-stream"] }
 tokio = { version = "0.2.0-alpha.6", features = ["tracing"] }
 
 lazy_static = "1.3"
-logger = { path = "../../libs/logger" }
 prisma-inflector = { path = "../../libs/prisma-inflector" }
 datamodel = { path = "../../libs/datamodel" }
 prisma-models = { path = "../../prisma-models" }
