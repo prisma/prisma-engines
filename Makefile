@@ -22,6 +22,9 @@ dev-mysql:
 	cp dev-configs/mysql.yml prisma.yml
 	echo 'mysql' > current_connector
 
+dev-all:
+	docker-compose -f .buildkite/engine-build-cli/docker-test-setups/docker-compose.test.all.yml up -d --remove-orphans
+
 use-local-migration-engine:
 	cargo build --release
 	cp target/release/migration-engine $(PRISMA2_BINARY_PATH)/
