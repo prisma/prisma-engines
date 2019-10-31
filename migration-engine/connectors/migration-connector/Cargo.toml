@@ -5,7 +5,7 @@ authors = ["Marcus Böhm <boehm@prisma.io>"]
 edition = "2018"
 
 [dependencies]
-datamodel = { path = "../../../libs/datamodel" }
+datamodel = { path = "../../../libs/datamodel/core" }
 prisma-query = { git = "https://github.com/prisma/prisma-query" }
 chrono = { version = "0.4" }
 

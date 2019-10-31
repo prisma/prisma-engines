@@ -10,7 +10,7 @@ edition = "2018"
 introspection-connector = { path = "../introspection-connector" }
 sql-schema-describer = { path = "../../../libs/sql-schema-describer" }
 prisma-inflector = { path = "../../../libs/prisma-inflector" }
-datamodel = { path = "../../../libs/datamodel" }
+datamodel = { path = "../../../libs/datamodel/core" }
 prisma-query = { git = "https://github.com/prisma/prisma-query.git" }
 failure = "0.1"
 log = "0.4"

@@ -12,7 +12,7 @@ members = [
   "query-engine/core",
   "query-engine/prisma",
   "prisma-fmt",
-  "libs/datamodel",
+  "libs/datamodel/core",
   "libs/prisma-inflector",
   "libs/sql-schema-describer",
   "libs/logger",
