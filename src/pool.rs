@@ -15,9 +15,9 @@ use std::convert::TryFrom;
 use tokio_resource_pool::Builder;
 use url::Url;
 
-pub fn sqlite(path: &str) -> crate::Result<Pool<SqliteManager>> {
+pub fn sqlite(path: &str, db_name: &str) -> crate::Result<Pool<SqliteManager>> {
     let params = SqliteParams::try_from(path)?;
-    let manager = SqliteManager::new(params.file_path);
+    let manager = SqliteManager::new(params.file_path, db_name);
 
     #[cfg(not(feature = "tracing-log"))]
     {
