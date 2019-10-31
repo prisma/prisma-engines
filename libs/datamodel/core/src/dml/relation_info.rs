@@ -1,5 +1,3 @@
-use crate::common::FromStrAndSpan;
-use crate::error::DatamodelError;
 use crate::Parsable;
 
 /// Holds information about a relation field.

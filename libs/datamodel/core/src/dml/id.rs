@@ -1,5 +1,4 @@
 use super::*;
-use crate::error::DatamodelError;
 
 /// Represents a strategy for generating IDs.
 #[derive(Debug, Copy, PartialEq, Clone)]

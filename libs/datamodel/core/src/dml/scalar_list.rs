@@ -1,5 +1,3 @@
-use crate::common::FromStrAndSpan;
-use crate::error::DatamodelError;
 use crate::Parsable;
 
 /// Represents a strategy for embedding scalar lists.
