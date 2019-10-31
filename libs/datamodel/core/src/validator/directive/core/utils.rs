@@ -1,6 +1,6 @@
-use super::*;
 use crate::ast::Span;
 use crate::common::FromStrAndSpan;
+use crate::dml::Parsable;
 use crate::error::DatamodelError;
 
 impl<T> FromStrAndSpan for T

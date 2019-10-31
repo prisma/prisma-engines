@@ -6,7 +6,6 @@ mod comment;
 mod datamodel;
 mod enummodel;
 mod field;
-mod from_str_and_span_impl;
 mod id;
 mod model;
 mod relation_info;
