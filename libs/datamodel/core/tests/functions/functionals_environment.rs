@@ -1,5 +1,5 @@
 use crate::common::*;
-use datamodel::common::{PrismaType, PrismaValue};
+use datamodel::common::{PrismaValue, ScalarType};
 
 #[test]
 fn interpolate_environment_variables() {
@@ -18,7 +18,7 @@ fn interpolate_environment_variables() {
     user_model.assert_is_embedded(false);
     user_model
         .assert_has_field("firstName")
-        .assert_base_type(&PrismaType::String)
+        .assert_base_type(&ScalarType::String)
         .assert_default_value(PrismaValue::String(String::from("prisma-user")));
 }
 
@@ -41,7 +41,7 @@ fn interpolate_nested_environment_variables() {
     user_model.assert_is_embedded(false);
     user_model
         .assert_has_field("firstName")
-        .assert_base_type(&PrismaType::String)
+        .assert_base_type(&ScalarType::String)
         .assert_default_value(PrismaValue::String(String::from("prisma-user")));
 }
 
@@ -62,6 +62,6 @@ fn ducktype_environment_variables() {
     user_model.assert_is_embedded(false);
     user_model
         .assert_has_field("age")
-        .assert_base_type(&PrismaType::Int)
+        .assert_base_type(&ScalarType::Int)
         .assert_default_value(PrismaValue::Int(18));
 }

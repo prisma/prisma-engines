@@ -1,5 +1,5 @@
 use crate::common::*;
-use datamodel::common::PrismaType;
+use datamodel::common::ScalarType;
 
 #[test]
 fn parse_basic_model() {
@@ -16,10 +16,10 @@ fn parse_basic_model() {
     user_model.assert_is_embedded(false);
     user_model
         .assert_has_field("firstName")
-        .assert_base_type(&PrismaType::String);
+        .assert_base_type(&ScalarType::String);
     user_model
         .assert_has_field("lastName")
-        .assert_base_type(&PrismaType::String);
+        .assert_base_type(&ScalarType::String);
 }
 
 #[test]

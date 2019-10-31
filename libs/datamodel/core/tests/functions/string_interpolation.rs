@@ -1,7 +1,7 @@
 use crate::common::*;
 use datamodel::{
     ast::Span,
-    common::{PrismaType, PrismaValue},
+    common::{PrismaValue, ScalarType},
     dml,
     error::DatamodelError,
 };
@@ -21,7 +21,7 @@ fn interpolate_expressions_in_strings() {
     user_model.assert_is_embedded(false);
     user_model
         .assert_has_field("firstName")
-        .assert_base_type(&PrismaType::String)
+        .assert_base_type(&ScalarType::String)
         .assert_default_value(dml::Value::String(String::from("user_3")));
 }
 
@@ -40,7 +40,7 @@ fn dont_interpolate_escaped_expressions_in_strings() {
     user_model.assert_is_embedded(false);
     user_model
         .assert_has_field("firstName")
-        .assert_base_type(&PrismaType::String)
+        .assert_base_type(&ScalarType::String)
         .assert_default_value(dml::Value::String(String::from("user_${3}")));
 }
 
@@ -61,7 +61,7 @@ fn interpolate_functionals_in_strings() {
     user_model.assert_is_embedded(false);
     user_model
         .assert_has_field("firstName")
-        .assert_base_type(&PrismaType::String)
+        .assert_base_type(&ScalarType::String)
         .assert_default_value(dml::Value::String(String::from("user_prisma-user")));
 }
 
@@ -82,7 +82,7 @@ fn interpolate_nested_mess() {
     user_model.assert_is_embedded(false);
     user_model
         .assert_has_field("firstName")
-        .assert_base_type(&PrismaType::String)
+        .assert_base_type(&ScalarType::String)
         .assert_default_value(dml::Value::String(String::from("user_number_really?_3")));
 }
 
@@ -100,7 +100,7 @@ fn should_not_remove_whitespace() {
     user_model.assert_is_embedded(false);
     user_model
         .assert_has_field("firstName")
-        .assert_base_type(&PrismaType::String)
+        .assert_base_type(&ScalarType::String)
         .assert_default_value(PrismaValue::String(String::from("This is a string with whitespace")));
 }
 
@@ -118,7 +118,7 @@ fn should_not_try_to_interpret_comments_in_strings() {
     user_model.assert_is_embedded(false);
     user_model
         .assert_has_field("firstName")
-        .assert_base_type(&PrismaType::String)
+        .assert_base_type(&ScalarType::String)
         .assert_default_value(PrismaValue::String(String::from("This is a string with a // Comment")));
 }
 

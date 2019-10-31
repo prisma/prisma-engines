@@ -1,5 +1,5 @@
 use crate::common::*;
-use datamodel::common::{PrismaType, PrismaValue};
+use datamodel::common::{PrismaValue, ScalarType};
 
 #[test]
 fn should_apply_a_custom_type() {
@@ -16,11 +16,11 @@ fn should_apply_a_custom_type() {
     user_model
         .assert_has_field("id")
         .assert_is_id(true)
-        .assert_base_type(&PrismaType::String)
+        .assert_base_type(&ScalarType::String)
         .assert_id_sequence(None)
         .assert_default_value(PrismaValue::Expression(
             String::from("cuid"),
-            PrismaType::String,
+            ScalarType::String,
             Vec::new(),
         ));
 }
@@ -42,11 +42,11 @@ fn should_recursively_apply_a_custom_type() {
     user_model
         .assert_has_field("id")
         .assert_is_id(true)
-        .assert_base_type(&PrismaType::String)
+        .assert_base_type(&ScalarType::String)
         .assert_id_sequence(None)
         .assert_default_value(PrismaValue::Expression(
             String::from("cuid"),
-            PrismaType::String,
+            ScalarType::String,
             Vec::new(),
         ));
 }
@@ -70,22 +70,22 @@ fn should_be_able_to_handle_multiple_types() {
     user_model
         .assert_has_field("id")
         .assert_is_id(true)
-        .assert_base_type(&PrismaType::String)
+        .assert_base_type(&ScalarType::String)
         .assert_id_sequence(None)
         .assert_default_value(PrismaValue::Expression(
             String::from("cuid"),
-            PrismaType::String,
+            ScalarType::String,
             Vec::new(),
         ));
 
     user_model
         .assert_has_field("email")
         .assert_is_unique(true)
-        .assert_base_type(&PrismaType::String);
+        .assert_base_type(&ScalarType::String);
 
     user_model
         .assert_has_field("balance")
-        .assert_base_type(&PrismaType::Int)
+        .assert_base_type(&ScalarType::Int)
         .assert_default_value(PrismaValue::Int(0));
 }
 

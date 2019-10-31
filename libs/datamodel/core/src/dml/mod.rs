@@ -23,5 +23,5 @@ pub use scalar_list::*;
 pub use traits::*;
 
 // Compatibility export.
-pub use crate::common::PrismaType as ScalarType;
 pub use crate::common::PrismaValue as Value;
+pub use crate::common::ScalarType;

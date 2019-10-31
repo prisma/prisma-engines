@@ -1,5 +1,5 @@
 use crate::common::*;
-use datamodel::{ast, common::PrismaType, error::DatamodelError};
+use datamodel::{ast, common::ScalarType, error::DatamodelError};
 
 #[test]
 fn db_directive() {
@@ -43,12 +43,12 @@ fn unique_directive() {
 
     test_model
         .assert_has_field("id")
-        .assert_base_type(&PrismaType::Int)
+        .assert_base_type(&ScalarType::Int)
         .assert_is_unique(false)
         .assert_is_id(true);
     test_model
         .assert_has_field("unique")
-        .assert_base_type(&PrismaType::String)
+        .assert_base_type(&ScalarType::String)
         .assert_is_unique(true);
 }
 

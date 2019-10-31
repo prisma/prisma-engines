@@ -1,6 +1,6 @@
 use crate::SqlIntrospectionResult;
 use datamodel::{
-    common::{names::NameNormalizer, PrismaType, PrismaValue},
+    common::{names::NameNormalizer, PrismaValue, ScalarType},
     dml, Datamodel, Field, FieldArity, FieldType, IdInfo, IdStrategy, IndexDefinition, Model, OnDeleteStrategy,
     RelationInfo, ScalarListStrategy, WithDatabaseName,
 };
@@ -459,14 +459,14 @@ fn calculate_field_type(schema: &SqlSchema, column: &Column, table: &Table) -> F
         None => {
             debug!("Found no corresponding foreign key");
             match column.tpe.family {
-                ColumnTypeFamily::Boolean => FieldType::Base(PrismaType::Boolean),
-                ColumnTypeFamily::DateTime => FieldType::Base(PrismaType::DateTime),
-                ColumnTypeFamily::Float => FieldType::Base(PrismaType::Float),
-                ColumnTypeFamily::Int => FieldType::Base(PrismaType::Int),
-                ColumnTypeFamily::String => FieldType::Base(PrismaType::String),
+                ColumnTypeFamily::Boolean => FieldType::Base(ScalarType::Boolean),
+                ColumnTypeFamily::DateTime => FieldType::Base(ScalarType::DateTime),
+                ColumnTypeFamily::Float => FieldType::Base(ScalarType::Float),
+                ColumnTypeFamily::Int => FieldType::Base(ScalarType::Int),
+                ColumnTypeFamily::String => FieldType::Base(ScalarType::String),
                 // XXX: We made a conscious decision to punt on mapping of ColumnTypeFamily
                 // variants that don't yet have corresponding PrismaType variants
-                _ => FieldType::Base(PrismaType::String),
+                _ => FieldType::Base(ScalarType::String),
             }
         }
     }

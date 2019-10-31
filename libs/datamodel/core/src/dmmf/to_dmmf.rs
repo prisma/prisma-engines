@@ -1,5 +1,5 @@
 use super::*;
-use crate::common::PrismaType;
+use crate::common::ScalarType;
 use crate::dml;
 use serde_json;
 
@@ -89,7 +89,7 @@ fn get_field_type(field: &dml::Field) -> String {
     }
 }
 
-fn type_to_string(scalar: &PrismaType) -> String {
+fn type_to_string(scalar: &ScalarType) -> String {
     scalar.to_string()
 }
 
@@ -113,7 +113,7 @@ fn value_to_serde(value: &dml::Value) -> serde_json::Value {
     }
 }
 
-fn function_to_serde(name: &str, return_type: PrismaType, args: &Vec<dml::Value>) -> serde_json::Value {
+fn function_to_serde(name: &str, return_type: ScalarType, args: &Vec<dml::Value>) -> serde_json::Value {
     let func = Function {
         name: String::from(name),
         return_type: return_type.to_string(),

@@ -1,5 +1,5 @@
 use crate::common::*;
-use datamodel::common::PrismaType;
+use datamodel::common::ScalarType;
 
 #[test]
 fn should_apply_updated_at_directive() {
@@ -14,7 +14,7 @@ fn should_apply_updated_at_directive() {
     let user_model = schema.assert_has_model("User");
     user_model
         .assert_has_field("lastSeen")
-        .assert_base_type(&PrismaType::DateTime)
+        .assert_base_type(&ScalarType::DateTime)
         .assert_is_updated_at(true);
     user_model.assert_has_field("id").assert_is_updated_at(false);
 }

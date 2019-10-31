@@ -388,12 +388,12 @@ impl FieldExtensions for Field {
 
 fn default_migration_value(field_type: &FieldType, datamodel: &Datamodel) -> Value {
     match field_type {
-        FieldType::Base(PrismaType::Boolean) => Value::Boolean(false),
-        FieldType::Base(PrismaType::Int) => Value::Int(0),
-        FieldType::Base(PrismaType::Float) => Value::Float(0.0),
-        FieldType::Base(PrismaType::String) => Value::String("".to_string()),
-        FieldType::Base(PrismaType::Decimal) => Value::Decimal(0.0),
-        FieldType::Base(PrismaType::DateTime) => {
+        FieldType::Base(ScalarType::Boolean) => Value::Boolean(false),
+        FieldType::Base(ScalarType::Int) => Value::Int(0),
+        FieldType::Base(ScalarType::Float) => Value::Float(0.0),
+        FieldType::Base(ScalarType::String) => Value::String("".to_string()),
+        FieldType::Base(ScalarType::Decimal) => Value::Decimal(0.0),
+        FieldType::Base(ScalarType::DateTime) => {
             let naive = NaiveDateTime::from_timestamp(0, 0);
             let datetime: DateTime<Utc> = DateTime::from_utc(naive, Utc);
             PrismaValue::DateTime(datetime)

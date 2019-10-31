@@ -1,7 +1,7 @@
 use super::*;
 use crate::ast::Span;
 use crate::common::FromStrAndSpan;
-use crate::common::PrismaType;
+use crate::common::ScalarType;
 use crate::dml;
 use chrono::{DateTime, Utc};
 
@@ -72,12 +72,12 @@ fn default_value_from_serde(container: &Option<serde_json::Value>, field_type: &
     match (container, field_type) {
         // Scalar.
         (Some(value), dml::FieldType::Base(scalar_type)) => Some(match (value, scalar_type) {
-            (serde_json::Value::Bool(val), PrismaType::Boolean) => dml::Value::Boolean(*val),
-            (serde_json::Value::String(val), PrismaType::String) => dml::Value::String(String::from(val.as_str())),
-            (serde_json::Value::Number(val), PrismaType::Float) => dml::Value::Float(val.as_f64().unwrap() as f32),
-            (serde_json::Value::Number(val), PrismaType::Int) => dml::Value::Int(val.as_i64().unwrap() as i32),
-            (serde_json::Value::Number(val), PrismaType::Decimal) => dml::Value::Decimal(val.as_f64().unwrap() as f32),
-            (serde_json::Value::String(val), PrismaType::DateTime) => {
+            (serde_json::Value::Bool(val), ScalarType::Boolean) => dml::Value::Boolean(*val),
+            (serde_json::Value::String(val), ScalarType::String) => dml::Value::String(String::from(val.as_str())),
+            (serde_json::Value::Number(val), ScalarType::Float) => dml::Value::Float(val.as_f64().unwrap() as f32),
+            (serde_json::Value::Number(val), ScalarType::Int) => dml::Value::Int(val.as_i64().unwrap() as i32),
+            (serde_json::Value::Number(val), ScalarType::Decimal) => dml::Value::Decimal(val.as_f64().unwrap() as f32),
+            (serde_json::Value::String(val), ScalarType::DateTime) => {
                 dml::Value::DateTime(String::from(val.as_str()).parse::<DateTime<Utc>>().unwrap())
             }
             // Function.
@@ -96,11 +96,11 @@ fn default_value_from_serde(container: &Option<serde_json::Value>, field_type: &
     }
 }
 
-fn type_from_string(scalar: &str) -> PrismaType {
-    PrismaType::from_str_and_span(scalar, Span::empty()).unwrap()
+fn type_from_string(scalar: &str) -> ScalarType {
+    ScalarType::from_str_and_span(scalar, Span::empty()).unwrap()
 }
 
-fn function_from_dmmf(func: &Function, expected_type: PrismaType) -> dml::Value {
+fn function_from_dmmf(func: &Function, expected_type: ScalarType) -> dml::Value {
     if !func.args.is_empty() {
         panic!("Function argument deserialization is not supported with DMMF. There are no type annotations yet, so it's not clear which is meant.");
     }

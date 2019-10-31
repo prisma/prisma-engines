@@ -4,7 +4,7 @@ mod traits;
 use crate::ast;
 use crate::common::{
     value::{MaybeExpression, ValueValidator},
-    PrismaType,
+    ScalarType,
 };
 use crate::error::DatamodelError;
 
@@ -16,15 +16,15 @@ const BUILTIN_ENV_FUNCTIONAL: builtin::EnvFunctional = builtin::EnvFunctional {}
 // Server side funcs
 const BUILTIN_NOW_FUNCTIONAL: builtin::ServerSideTrivialFunctional = builtin::ServerSideTrivialFunctional {
     name: "now",
-    return_type: PrismaType::DateTime,
+    return_type: ScalarType::DateTime,
 };
 const BUILTIN_CUID_FUNCTIONAL: builtin::ServerSideTrivialFunctional = builtin::ServerSideTrivialFunctional {
     name: "cuid",
-    return_type: PrismaType::String,
+    return_type: ScalarType::String,
 };
 const BUILTIN_UUID_FUNCTIONAL: builtin::ServerSideTrivialFunctional = builtin::ServerSideTrivialFunctional {
     name: "uuid",
-    return_type: PrismaType::String,
+    return_type: ScalarType::String,
 };
 
 /// Array of all builtin functionals.

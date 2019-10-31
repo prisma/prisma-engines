@@ -1,6 +1,6 @@
 use crate::common::*;
 use chrono::{DateTime, Utc};
-use datamodel::common::{PrismaType, PrismaValue};
+use datamodel::common::{PrismaValue, ScalarType};
 
 #[test]
 fn should_set_default_for_all_scalar_types() {
@@ -20,27 +20,27 @@ fn should_set_default_for_all_scalar_types() {
     let user_model = datamodel.assert_has_model("Model");
     user_model
         .assert_has_field("int")
-        .assert_base_type(&PrismaType::Int)
+        .assert_base_type(&ScalarType::Int)
         .assert_default_value(PrismaValue::Int(3));
     user_model
         .assert_has_field("float")
-        .assert_base_type(&PrismaType::Float)
+        .assert_base_type(&ScalarType::Float)
         .assert_default_value(PrismaValue::Float(3.14));
     user_model
         .assert_has_field("decimal")
-        .assert_base_type(&PrismaType::Decimal)
+        .assert_base_type(&ScalarType::Decimal)
         .assert_default_value(PrismaValue::Decimal(3.15));
     user_model
         .assert_has_field("string")
-        .assert_base_type(&PrismaType::String)
+        .assert_base_type(&ScalarType::String)
         .assert_default_value(PrismaValue::String(String::from("String")));
     user_model
         .assert_has_field("boolean")
-        .assert_base_type(&PrismaType::Boolean)
+        .assert_base_type(&ScalarType::Boolean)
         .assert_default_value(PrismaValue::Boolean(false));
     user_model
         .assert_has_field("dateTime")
-        .assert_base_type(&PrismaType::DateTime)
+        .assert_base_type(&ScalarType::DateTime)
         .assert_default_value(PrismaValue::DateTime(
             "2019-06-17T14:20:57Z".parse::<DateTime<Utc>>().unwrap(),
         ));

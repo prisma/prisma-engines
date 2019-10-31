@@ -16,7 +16,7 @@ use serde::{Deserialize, Serialize};
 
 /// Prisma's builtin base types.
 #[derive(Debug, Copy, PartialEq, Clone, Serialize, Deserialize)]
-pub enum PrismaType {
+pub enum ScalarType {
     Int,
     Float,
     Decimal,
@@ -25,29 +25,29 @@ pub enum PrismaType {
     DateTime,
 }
 
-impl PrismaType {
+impl ScalarType {
     pub fn from_str_and_span(s: &str, span: ast::Span) -> Result<Self, String> {
         match s {
-            "Int" => Ok(PrismaType::Int),
-            "Float" => Ok(PrismaType::Float),
-            "Decimal" => Ok(PrismaType::Decimal),
-            "Boolean" => Ok(PrismaType::Boolean),
-            "String" => Ok(PrismaType::String),
-            "DateTime" => Ok(PrismaType::DateTime),
+            "Int" => Ok(ScalarType::Int),
+            "Float" => Ok(ScalarType::Float),
+            "Decimal" => Ok(ScalarType::Decimal),
+            "Boolean" => Ok(ScalarType::Boolean),
+            "String" => Ok(ScalarType::String),
+            "DateTime" => Ok(ScalarType::DateTime),
             _ => Err(format!("type {} is not a know scalar type.", s)),
         }
     }
 }
 
-impl ToString for PrismaType {
+impl ToString for ScalarType {
     fn to_string(&self) -> String {
         match self {
-            PrismaType::Int => String::from("Int"),
-            PrismaType::Float => String::from("Float"),
-            PrismaType::Decimal => String::from("Decimal"),
-            PrismaType::Boolean => String::from("Boolean"),
-            PrismaType::String => String::from("String"),
-            PrismaType::DateTime => String::from("DateTime"),
+            ScalarType::Int => String::from("Int"),
+            ScalarType::Float => String::from("Float"),
+            ScalarType::Decimal => String::from("Decimal"),
+            ScalarType::Boolean => String::from("Boolean"),
+            ScalarType::String => String::from("String"),
+            ScalarType::DateTime => String::from("DateTime"),
         }
     }
 }
@@ -62,18 +62,18 @@ pub enum PrismaValue {
     String(String),
     DateTime(DateTime<Utc>),
     ConstantLiteral(String),
-    Expression(String, PrismaType, Vec<PrismaValue>),
+    Expression(String, ScalarType, Vec<PrismaValue>),
 }
 
 impl PrismaValue {
-    fn get_type(&self) -> PrismaType {
+    fn get_type(&self) -> ScalarType {
         match self {
-            PrismaValue::Int(_) => PrismaType::Int,
-            PrismaValue::Float(_) => PrismaType::Float,
-            PrismaValue::Decimal(_) => PrismaType::Decimal,
-            PrismaValue::Boolean(_) => PrismaType::Boolean,
-            PrismaValue::String(_) => PrismaType::String,
-            PrismaValue::DateTime(_) => PrismaType::DateTime,
+            PrismaValue::Int(_) => ScalarType::Int,
+            PrismaValue::Float(_) => ScalarType::Float,
+            PrismaValue::Decimal(_) => ScalarType::Decimal,
+            PrismaValue::Boolean(_) => ScalarType::Boolean,
+            PrismaValue::String(_) => ScalarType::String,
+            PrismaValue::DateTime(_) => ScalarType::DateTime,
             PrismaValue::Expression(_, t, _) => *t,
             PrismaValue::ConstantLiteral(_) => {
                 panic!("Constant literal values do not map to a base type and should never surface.")

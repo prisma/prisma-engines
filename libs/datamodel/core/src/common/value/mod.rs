@@ -5,7 +5,7 @@ use crate::error::DatamodelError;
 use super::functions::FunctionalEvaluator;
 use super::interpolation::StringInterpolator;
 use super::FromStrAndSpan;
-use super::{PrismaType, PrismaValue};
+use super::{PrismaValue, ScalarType};
 use chrono::{DateTime, Utc};
 use std::error;
 
@@ -70,15 +70,15 @@ impl ValueValidator {
 
     /// Attempts to parse the wrapped value
     /// to a given prisma type.
-    pub fn as_type(&self, scalar_type: PrismaType) -> Result<dml::Value, DatamodelError> {
+    pub fn as_type(&self, scalar_type: ScalarType) -> Result<dml::Value, DatamodelError> {
         match &self.value {
             MaybeExpression::Value(_, _) => match scalar_type {
-                PrismaType::Int => self.as_int().map(dml::Value::Int),
-                PrismaType::Float => self.as_float().map(dml::Value::Float),
-                PrismaType::Decimal => self.as_decimal().map(dml::Value::Decimal),
-                PrismaType::Boolean => self.as_bool().map(dml::Value::Boolean),
-                PrismaType::DateTime => self.as_date_time().map(dml::Value::DateTime),
-                PrismaType::String => self.as_str().map(dml::Value::String),
+                ScalarType::Int => self.as_int().map(dml::Value::Int),
+                ScalarType::Float => self.as_float().map(dml::Value::Float),
+                ScalarType::Decimal => self.as_decimal().map(dml::Value::Decimal),
+                ScalarType::Boolean => self.as_bool().map(dml::Value::Boolean),
+                ScalarType::DateTime => self.as_date_time().map(dml::Value::DateTime),
+                ScalarType::String => self.as_str().map(dml::Value::String),
             },
             MaybeExpression::Expression(expr, _) => {
                 if expr.get_type() == scalar_type {

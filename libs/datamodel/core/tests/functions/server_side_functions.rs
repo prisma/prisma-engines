@@ -1,5 +1,5 @@
 use crate::common::*;
-use datamodel::common::{PrismaType, PrismaValue};
+use datamodel::common::{PrismaValue, ScalarType};
 
 #[test]
 fn correctly_handle_server_side_now_function() {
@@ -17,10 +17,10 @@ fn correctly_handle_server_side_now_function() {
     user_model.assert_is_embedded(false);
     user_model
         .assert_has_field("signupDate")
-        .assert_base_type(&PrismaType::DateTime)
+        .assert_base_type(&ScalarType::DateTime)
         .assert_default_value(PrismaValue::Expression(
             String::from("now"),
-            PrismaType::DateTime,
+            ScalarType::DateTime,
             vec![],
         ));
 }
@@ -41,10 +41,10 @@ fn correctly_handle_server_side_cuid_function() {
     user_model.assert_is_embedded(false);
     user_model
         .assert_has_field("someId")
-        .assert_base_type(&PrismaType::String)
+        .assert_base_type(&ScalarType::String)
         .assert_default_value(PrismaValue::Expression(
             String::from("cuid"),
-            PrismaType::String,
+            ScalarType::String,
             vec![],
         ));
 }
@@ -65,10 +65,10 @@ fn correctly_handle_server_side_uuid_function() {
     user_model.assert_is_embedded(false);
     user_model
         .assert_has_field("someId")
-        .assert_base_type(&PrismaType::String)
+        .assert_base_type(&ScalarType::String)
         .assert_default_value(PrismaValue::Expression(
             String::from("uuid"),
-            PrismaType::String,
+            ScalarType::String,
             vec![],
         ));
 }

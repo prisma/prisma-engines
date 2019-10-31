@@ -2,7 +2,7 @@ use super::Functional;
 use crate::ast;
 use crate::common::{
     value::{MaybeExpression, ValueValidator},
-    PrismaType, PrismaValue,
+    PrismaValue, ScalarType,
 };
 use crate::error::DatamodelError;
 
@@ -38,12 +38,12 @@ impl Functional for EnvFunctional {
 pub struct ServerSideTrivialFunctional {
     // Needed for const initializer.
     pub(crate) name: &'static str,
-    pub(crate) return_type: PrismaType,
+    pub(crate) return_type: ScalarType,
 }
 
 impl ServerSideTrivialFunctional {
     #[allow(unused)]
-    pub fn new(name: &'static str, return_type: PrismaType) -> ServerSideTrivialFunctional {
+    pub fn new(name: &'static str, return_type: ScalarType) -> ServerSideTrivialFunctional {
         ServerSideTrivialFunctional { name, return_type }
     }
 }
