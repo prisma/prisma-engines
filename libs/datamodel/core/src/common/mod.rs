@@ -54,7 +54,7 @@ impl ToString for ScalarType {
 
 /// Value types for Prisma's builtin base types.
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
-pub enum PrismaValue {
+pub enum ScalarValue {
     Int(i32),
     Float(f32),
     Decimal(f32),
@@ -62,37 +62,37 @@ pub enum PrismaValue {
     String(String),
     DateTime(DateTime<Utc>),
     ConstantLiteral(String),
-    Expression(String, ScalarType, Vec<PrismaValue>),
+    Expression(String, ScalarType, Vec<ScalarValue>),
 }
 
-impl PrismaValue {
+impl ScalarValue {
     fn get_type(&self) -> ScalarType {
         match self {
-            PrismaValue::Int(_) => ScalarType::Int,
-            PrismaValue::Float(_) => ScalarType::Float,
-            PrismaValue::Decimal(_) => ScalarType::Decimal,
-            PrismaValue::Boolean(_) => ScalarType::Boolean,
-            PrismaValue::String(_) => ScalarType::String,
-            PrismaValue::DateTime(_) => ScalarType::DateTime,
-            PrismaValue::Expression(_, t, _) => *t,
-            PrismaValue::ConstantLiteral(_) => {
+            ScalarValue::Int(_) => ScalarType::Int,
+            ScalarValue::Float(_) => ScalarType::Float,
+            ScalarValue::Decimal(_) => ScalarType::Decimal,
+            ScalarValue::Boolean(_) => ScalarType::Boolean,
+            ScalarValue::String(_) => ScalarType::String,
+            ScalarValue::DateTime(_) => ScalarType::DateTime,
+            ScalarValue::Expression(_, t, _) => *t,
+            ScalarValue::ConstantLiteral(_) => {
                 panic!("Constant literal values do not map to a base type and should never surface.")
             }
         }
     }
 }
 
-impl ToString for PrismaValue {
+impl ToString for ScalarValue {
     fn to_string(&self) -> String {
         match self {
-            PrismaValue::Int(val) => val.to_string(),
-            PrismaValue::Float(val) => val.to_string(),
-            PrismaValue::Decimal(val) => val.to_string(),
-            PrismaValue::Boolean(val) => val.to_string(),
-            PrismaValue::String(val) => val.to_string(),
-            PrismaValue::DateTime(val) => val.to_string(),
-            PrismaValue::ConstantLiteral(val) => val.to_string(),
-            PrismaValue::Expression(_, t, _) => format!("Function<{}>", t.to_string()),
+            ScalarValue::Int(val) => val.to_string(),
+            ScalarValue::Float(val) => val.to_string(),
+            ScalarValue::Decimal(val) => val.to_string(),
+            ScalarValue::Boolean(val) => val.to_string(),
+            ScalarValue::String(val) => val.to_string(),
+            ScalarValue::DateTime(val) => val.to_string(),
+            ScalarValue::ConstantLiteral(val) => val.to_string(),
+            ScalarValue::Expression(_, t, _) => format!("Function<{}>", t.to_string()),
         }
     }
 }

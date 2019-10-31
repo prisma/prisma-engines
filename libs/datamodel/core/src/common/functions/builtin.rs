@@ -2,7 +2,7 @@ use super::Functional;
 use crate::ast;
 use crate::common::{
     value::{MaybeExpression, ValueValidator},
-    PrismaValue, ScalarType,
+    ScalarType, ScalarValue,
 };
 use crate::error::DatamodelError;
 
@@ -57,7 +57,7 @@ impl Functional for ServerSideTrivialFunctional {
         self.check_arg_count(values, 0, span)?;
 
         Ok(MaybeExpression::Expression(
-            PrismaValue::Expression(String::from(self.name()), self.return_type, vec![]),
+            ScalarValue::Expression(String::from(self.name()), self.return_type, vec![]),
             span,
         ))
     }

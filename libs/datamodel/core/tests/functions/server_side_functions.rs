@@ -1,5 +1,5 @@
 use crate::common::*;
-use datamodel::common::{PrismaValue, ScalarType};
+use datamodel::common::{ScalarType, ScalarValue};
 
 #[test]
 fn correctly_handle_server_side_now_function() {
@@ -18,7 +18,7 @@ fn correctly_handle_server_side_now_function() {
     user_model
         .assert_has_field("signupDate")
         .assert_base_type(&ScalarType::DateTime)
-        .assert_default_value(PrismaValue::Expression(
+        .assert_default_value(ScalarValue::Expression(
             String::from("now"),
             ScalarType::DateTime,
             vec![],
@@ -42,7 +42,7 @@ fn correctly_handle_server_side_cuid_function() {
     user_model
         .assert_has_field("someId")
         .assert_base_type(&ScalarType::String)
-        .assert_default_value(PrismaValue::Expression(
+        .assert_default_value(ScalarValue::Expression(
             String::from("cuid"),
             ScalarType::String,
             vec![],
@@ -66,7 +66,7 @@ fn correctly_handle_server_side_uuid_function() {
     user_model
         .assert_has_field("someId")
         .assert_base_type(&ScalarType::String)
-        .assert_default_value(PrismaValue::Expression(
+        .assert_default_value(ScalarValue::Expression(
             String::from("uuid"),
             ScalarType::String,
             vec![],

@@ -1,5 +1,5 @@
 use crate::common::*;
-use datamodel::common::{PrismaValue, ScalarType};
+use datamodel::common::{ScalarType, ScalarValue};
 
 #[test]
 fn should_apply_a_custom_type() {
@@ -18,7 +18,7 @@ fn should_apply_a_custom_type() {
         .assert_is_id(true)
         .assert_base_type(&ScalarType::String)
         .assert_id_sequence(None)
-        .assert_default_value(PrismaValue::Expression(
+        .assert_default_value(ScalarValue::Expression(
             String::from("cuid"),
             ScalarType::String,
             Vec::new(),
@@ -44,7 +44,7 @@ fn should_recursively_apply_a_custom_type() {
         .assert_is_id(true)
         .assert_base_type(&ScalarType::String)
         .assert_id_sequence(None)
-        .assert_default_value(PrismaValue::Expression(
+        .assert_default_value(ScalarValue::Expression(
             String::from("cuid"),
             ScalarType::String,
             Vec::new(),
@@ -72,7 +72,7 @@ fn should_be_able_to_handle_multiple_types() {
         .assert_is_id(true)
         .assert_base_type(&ScalarType::String)
         .assert_id_sequence(None)
-        .assert_default_value(PrismaValue::Expression(
+        .assert_default_value(ScalarValue::Expression(
             String::from("cuid"),
             ScalarType::String,
             Vec::new(),
@@ -86,7 +86,7 @@ fn should_be_able_to_handle_multiple_types() {
     user_model
         .assert_has_field("balance")
         .assert_base_type(&ScalarType::Int)
-        .assert_default_value(PrismaValue::Int(0));
+        .assert_default_value(ScalarValue::Int(0));
 }
 
 #[test]
@@ -113,5 +113,5 @@ fn should_be_able_to_define_custom_enum_types() {
     user_model
         .assert_has_field("role")
         .assert_enum_type("Role")
-        .assert_default_value(PrismaValue::ConstantLiteral(String::from("USER")));
+        .assert_default_value(ScalarValue::ConstantLiteral(String::from("USER")));
 }

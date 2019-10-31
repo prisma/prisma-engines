@@ -5,7 +5,7 @@ use log::LevelFilter;
 use pretty_assertions::assert_eq;
 
 use datamodel::{
-    common::{PrismaValue, ScalarType},
+    common::{ScalarType, ScalarValue},
     dml, Datamodel, Field, FieldArity, FieldType, IdInfo, IdStrategy, Model, OnDeleteStrategy, RelationInfo,
     ScalarListStrategy,
 };
@@ -272,7 +272,7 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
                     arity: FieldArity::Optional,
                     field_type: FieldType::Base(ScalarType::Int),
                     database_name: None,
-                    default_value: Some(PrismaValue::Int(1)),
+                    default_value: Some(ScalarValue::Int(1)),
                     is_unique: false,
                     id_info: None,
                     scalar_list_strategy: None,
@@ -285,7 +285,7 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
                     arity: FieldArity::Optional,
                     field_type: FieldType::Base(ScalarType::Boolean),
                     database_name: None,
-                    default_value: Some(PrismaValue::Boolean(true)),
+                    default_value: Some(ScalarValue::Boolean(true)),
                     is_unique: false,
                     id_info: None,
                     scalar_list_strategy: None,
@@ -298,7 +298,7 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
                     arity: FieldArity::Optional,
                     field_type: FieldType::Base(ScalarType::Float),
                     database_name: None,
-                    default_value: Some(PrismaValue::Float(1.0)),
+                    default_value: Some(ScalarValue::Float(1.0)),
                     is_unique: false,
                     id_info: None,
                     scalar_list_strategy: None,
@@ -311,7 +311,7 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
                     arity: FieldArity::Optional,
                     field_type: FieldType::Base(ScalarType::String),
                     database_name: None,
-                    default_value: Some(PrismaValue::String("default".to_string())),
+                    default_value: Some(ScalarValue::String("default".to_string())),
                     is_unique: false,
                     id_info: None,
                     scalar_list_strategy: None,

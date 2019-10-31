@@ -1,6 +1,6 @@
 use crate::SqlIntrospectionResult;
 use datamodel::{
-    common::{names::NameNormalizer, PrismaValue, ScalarType},
+    common::{names::NameNormalizer, ScalarType, ScalarValue},
     dml, Datamodel, Field, FieldArity, FieldType, IdInfo, IdStrategy, IndexDefinition, Model, OnDeleteStrategy,
     RelationInfo, ScalarListStrategy, WithDatabaseName,
 };
@@ -363,15 +363,15 @@ fn parse_float(value: &str) -> Option<f32> {
     }
 }
 
-fn calculate_default(default: &str, tpe: &ColumnTypeFamily) -> Option<PrismaValue> {
+fn calculate_default(default: &str, tpe: &ColumnTypeFamily) -> Option<ScalarValue> {
     match tpe {
         ColumnTypeFamily::Boolean => match parse_int(default) {
-            Some(x) => Some(PrismaValue::Boolean(x != 0)),
-            None => parse_bool(default).map(|b| PrismaValue::Boolean(b)),
+            Some(x) => Some(ScalarValue::Boolean(x != 0)),
+            None => parse_bool(default).map(|b| ScalarValue::Boolean(b)),
         },
-        ColumnTypeFamily::Int => parse_int(default).map(|x| PrismaValue::Int(x)),
-        ColumnTypeFamily::Float => parse_float(default).map(|x| PrismaValue::Float(x)),
-        ColumnTypeFamily::String => Some(PrismaValue::String(default.to_string())),
+        ColumnTypeFamily::Int => parse_int(default).map(|x| ScalarValue::Int(x)),
+        ColumnTypeFamily::Float => parse_float(default).map(|x| ScalarValue::Float(x)),
+        ColumnTypeFamily::String => Some(ScalarValue::String(default.to_string())),
         _ => None,
     }
 }

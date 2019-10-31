@@ -350,7 +350,7 @@ impl FieldExtensions for Field {
     fn migration_value_new(&self, datamodel: &Datamodel) -> Option<String> {
         let value = match &self.default_value {
             Some(x) => match x {
-                PrismaValue::Expression(_, _, _) => default_migration_value(&self.field_type, datamodel),
+                ScalarValue::Expression(_, _, _) => default_migration_value(&self.field_type, datamodel),
                 x => x.clone(),
             },
             None => default_migration_value(&self.field_type, datamodel),
@@ -396,7 +396,7 @@ fn default_migration_value(field_type: &FieldType, datamodel: &Datamodel) -> Val
         FieldType::Base(ScalarType::DateTime) => {
             let naive = NaiveDateTime::from_timestamp(0, 0);
             let datetime: DateTime<Utc> = DateTime::from_utc(naive, Utc);
-            PrismaValue::DateTime(datetime)
+            ScalarValue::DateTime(datetime)
         }
         FieldType::Enum(ref enum_name) => {
             let inum = datamodel

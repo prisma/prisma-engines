@@ -5,7 +5,7 @@ use crate::error::DatamodelError;
 use super::functions::FunctionalEvaluator;
 use super::interpolation::StringInterpolator;
 use super::FromStrAndSpan;
-use super::{PrismaValue, ScalarType};
+use super::{ScalarType, ScalarValue};
 use chrono::{DateTime, Utc};
 use std::error;
 
@@ -13,7 +13,7 @@ use std::error;
 pub enum MaybeExpression {
     // The Option is Some if the value came from an env var. The String is then the name of the env var.
     Value(Option<String>, ast::Expression),
-    Expression(PrismaValue, ast::Span),
+    Expression(ScalarValue, ast::Span),
 }
 
 /// Wraps a value and provides convenience methods for

@@ -1,5 +1,5 @@
 use super::*;
-use crate::common::{PrismaValue, ScalarType};
+use crate::common::{ScalarType, ScalarValue};
 
 /// Datamodel field arity.
 #[derive(Debug, PartialEq, Copy, Clone)]
@@ -52,7 +52,7 @@ pub struct Field {
     /// The database internal name.
     pub database_name: Option<String>,
     /// The default value.
-    pub default_value: Option<PrismaValue>,
+    pub default_value: Option<ScalarValue>,
     /// Indicates if the field is unique.
     pub is_unique: bool,
     /// If set, signals that this field is an id field, or
