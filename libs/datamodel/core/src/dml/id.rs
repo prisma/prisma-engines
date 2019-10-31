@@ -1,8 +1,5 @@
 use super::*;
-use crate::ast;
 use crate::error::DatamodelError;
-
-use crate::common::FromStrAndSpan;
 
 /// Represents a strategy for generating IDs.
 #[derive(Debug, Copy, PartialEq, Clone)]
@@ -11,13 +8,17 @@ pub enum IdStrategy {
     None,
 }
 
-impl FromStrAndSpan for IdStrategy {
-    fn from_str_and_span(s: &str, span: ast::Span) -> Result<Self, DatamodelError> {
+impl Parsable for IdStrategy {
+    fn parse(s: &str) -> Option<Self> {
         match s {
-            "AUTO" => Ok(IdStrategy::Auto),
-            "NONE" => Ok(IdStrategy::None),
-            _ => Err(DatamodelError::new_literal_parser_error("id strategy", s, span)),
+            "AUTO" => Some(IdStrategy::Auto),
+            "NONE" => Some(IdStrategy::None),
+            _ => None,
         }
+    }
+
+    fn descriptor() -> &'static str {
+        "id strategy"
     }
 }
 

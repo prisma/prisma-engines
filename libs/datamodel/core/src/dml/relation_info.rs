@@ -1,6 +1,6 @@
-use crate::ast;
 use crate::common::FromStrAndSpan;
 use crate::error::DatamodelError;
+use crate::Parsable;
 
 /// Holds information about a relation field.
 #[derive(Debug, PartialEq, Clone)]
@@ -54,13 +54,17 @@ pub enum OnDeleteStrategy {
     None,
 }
 
-impl FromStrAndSpan for OnDeleteStrategy {
-    fn from_str_and_span(s: &str, span: ast::Span) -> Result<Self, DatamodelError> {
+impl Parsable for OnDeleteStrategy {
+    fn parse(s: &str) -> Option<Self> {
         match s {
-            "CASCADE" => Ok(OnDeleteStrategy::Cascade),
-            "NONE" => Ok(OnDeleteStrategy::None),
-            _ => Err(DatamodelError::new_literal_parser_error("onDelete strategy", s, span)),
+            "CASCADE" => Some(OnDeleteStrategy::Cascade),
+            "NONE" => Some(OnDeleteStrategy::None),
+            _ => None,
         }
+    }
+
+    fn descriptor() -> &'static str {
+        "onDelete strategy"
     }
 }
 
