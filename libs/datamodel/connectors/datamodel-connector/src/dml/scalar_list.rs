@@ -1,4 +1,4 @@
-use crate::Parsable;
+use super::Parsable;
 
 /// Represents a strategy for embedding scalar lists.
 #[derive(Debug, Copy, PartialEq, Clone)]

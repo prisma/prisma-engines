@@ -1,4 +1,4 @@
-use crate::Parsable;
+use super::Parsable;
 
 /// Holds information about a relation field.
 #[derive(Debug, PartialEq, Clone)]
