@@ -59,11 +59,11 @@ impl DirectiveValidator<dml::Field> for SequenceDirectiveValidator {
                 args.push(ast::Argument::new_string("name", &seq_info.name));
                 args.push(ast::Argument::new(
                     "allocationSize",
-                    dml::Value::Int(seq_info.allocation_size).into(),
+                    dml::ScalarValue::Int(seq_info.allocation_size).into(),
                 ));
                 args.push(ast::Argument::new(
                     "initialValue",
-                    dml::Value::Int(seq_info.initial_value).into(),
+                    dml::ScalarValue::Int(seq_info.initial_value).into(),
                 ));
 
                 return Ok(vec![ast::Directive::new(self.directive_name(), args)]);

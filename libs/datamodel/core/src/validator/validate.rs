@@ -83,7 +83,7 @@ impl Validator {
         for id_field in model.singular_id_fields() {
             let is_valid = match (&id_field.default_value, &id_field.field_type, &id_field.arity) {
                 (
-                    Some(dml::Value::Expression(name, return_type, args)),
+                    Some(dml::ScalarValue::Expression(name, return_type, args)),
                     dml::FieldType::Base(dml::ScalarType::String),
                     dml::FieldArity::Required,
                 ) => {

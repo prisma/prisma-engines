@@ -93,27 +93,27 @@ fn type_to_string(scalar: &ScalarType) -> String {
     scalar.to_string()
 }
 
-fn default_value_to_serde(container: &Option<dml::Value>) -> Option<serde_json::Value> {
+fn default_value_to_serde(container: &Option<dml::ScalarValue>) -> Option<serde_json::Value> {
     match container {
         Some(value) => Some(value_to_serde(value)),
         None => None,
     }
 }
 
-fn value_to_serde(value: &dml::Value) -> serde_json::Value {
+fn value_to_serde(value: &dml::ScalarValue) -> serde_json::Value {
     match value {
-        dml::Value::Boolean(val) => serde_json::Value::Bool(*val),
-        dml::Value::String(val) => serde_json::Value::String(val.clone()),
-        dml::Value::ConstantLiteral(val) => serde_json::Value::String(val.clone()),
-        dml::Value::Float(val) => serde_json::Value::Number(serde_json::Number::from_f64(*val as f64).unwrap()),
-        dml::Value::Int(val) => serde_json::Value::Number(serde_json::Number::from_f64(*val as f64).unwrap()),
-        dml::Value::Decimal(val) => serde_json::Value::Number(serde_json::Number::from_f64(*val as f64).unwrap()),
-        dml::Value::DateTime(val) => serde_json::Value::String(val.to_rfc3339()),
-        dml::Value::Expression(name, return_type, args) => function_to_serde(&name, *return_type, &args),
+        dml::ScalarValue::Boolean(val) => serde_json::Value::Bool(*val),
+        dml::ScalarValue::String(val) => serde_json::Value::String(val.clone()),
+        dml::ScalarValue::ConstantLiteral(val) => serde_json::Value::String(val.clone()),
+        dml::ScalarValue::Float(val) => serde_json::Value::Number(serde_json::Number::from_f64(*val as f64).unwrap()),
+        dml::ScalarValue::Int(val) => serde_json::Value::Number(serde_json::Number::from_f64(*val as f64).unwrap()),
+        dml::ScalarValue::Decimal(val) => serde_json::Value::Number(serde_json::Number::from_f64(*val as f64).unwrap()),
+        dml::ScalarValue::DateTime(val) => serde_json::Value::String(val.to_rfc3339()),
+        dml::ScalarValue::Expression(name, return_type, args) => function_to_serde(&name, *return_type, &args),
     }
 }
 
-fn function_to_serde(name: &str, return_type: ScalarType, args: &Vec<dml::Value>) -> serde_json::Value {
+fn function_to_serde(name: &str, return_type: ScalarType, args: &Vec<dml::ScalarValue>) -> serde_json::Value {
     let func = Function {
         name: String::from(name),
         return_type: return_type.to_string(),

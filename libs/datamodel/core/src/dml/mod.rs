@@ -24,4 +24,4 @@ pub use traits::*;
 
 // Compatibility export.
 pub use crate::common::ScalarType;
-pub use crate::common::ScalarValue as Value;
+pub use crate::common::ScalarValue;

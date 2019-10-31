@@ -70,15 +70,15 @@ impl ValueValidator {
 
     /// Attempts to parse the wrapped value
     /// to a given prisma type.
-    pub fn as_type(&self, scalar_type: ScalarType) -> Result<dml::Value, DatamodelError> {
+    pub fn as_type(&self, scalar_type: ScalarType) -> Result<dml::ScalarValue, DatamodelError> {
         match &self.value {
             MaybeExpression::Value(_, _) => match scalar_type {
-                ScalarType::Int => self.as_int().map(dml::Value::Int),
-                ScalarType::Float => self.as_float().map(dml::Value::Float),
-                ScalarType::Decimal => self.as_decimal().map(dml::Value::Decimal),
-                ScalarType::Boolean => self.as_bool().map(dml::Value::Boolean),
-                ScalarType::DateTime => self.as_date_time().map(dml::Value::DateTime),
-                ScalarType::String => self.as_str().map(dml::Value::String),
+                ScalarType::Int => self.as_int().map(dml::ScalarValue::Int),
+                ScalarType::Float => self.as_float().map(dml::ScalarValue::Float),
+                ScalarType::Decimal => self.as_decimal().map(dml::ScalarValue::Decimal),
+                ScalarType::Boolean => self.as_bool().map(dml::ScalarValue::Boolean),
+                ScalarType::DateTime => self.as_date_time().map(dml::ScalarValue::DateTime),
+                ScalarType::String => self.as_str().map(dml::ScalarValue::String),
             },
             MaybeExpression::Expression(expr, _) => {
                 if expr.get_type() == scalar_type {
@@ -266,24 +266,28 @@ impl ValueListValidator for Vec<ValueValidator> {
     }
 }
 
-impl Into<ast::Expression> for dml::Value {
+impl Into<ast::Expression> for dml::ScalarValue {
     fn into(self) -> ast::Expression {
         (&self).into()
     }
 }
 
-impl Into<ast::Expression> for &dml::Value {
+impl Into<ast::Expression> for &dml::ScalarValue {
     fn into(self) -> ast::Expression {
         match self {
-            dml::Value::Boolean(true) => ast::Expression::BooleanValue(String::from("true"), ast::Span::empty()),
-            dml::Value::Boolean(false) => ast::Expression::BooleanValue(String::from("false"), ast::Span::empty()),
-            dml::Value::String(value) => ast::Expression::StringValue(value.clone(), ast::Span::empty()),
-            dml::Value::ConstantLiteral(value) => ast::Expression::ConstantValue(value.clone(), ast::Span::empty()),
-            dml::Value::DateTime(value) => ast::Expression::ConstantValue(value.to_rfc3339(), ast::Span::empty()),
-            dml::Value::Decimal(value) => ast::Expression::NumericValue(value.to_string(), ast::Span::empty()),
-            dml::Value::Float(value) => ast::Expression::NumericValue(value.to_string(), ast::Span::empty()),
-            dml::Value::Int(value) => ast::Expression::NumericValue(value.to_string(), ast::Span::empty()),
-            dml::Value::Expression(name, _, args) => ast::Expression::Function(
+            dml::ScalarValue::Boolean(true) => ast::Expression::BooleanValue(String::from("true"), ast::Span::empty()),
+            dml::ScalarValue::Boolean(false) => {
+                ast::Expression::BooleanValue(String::from("false"), ast::Span::empty())
+            }
+            dml::ScalarValue::String(value) => ast::Expression::StringValue(value.clone(), ast::Span::empty()),
+            dml::ScalarValue::ConstantLiteral(value) => {
+                ast::Expression::ConstantValue(value.clone(), ast::Span::empty())
+            }
+            dml::ScalarValue::DateTime(value) => ast::Expression::ConstantValue(value.to_rfc3339(), ast::Span::empty()),
+            dml::ScalarValue::Decimal(value) => ast::Expression::NumericValue(value.to_string(), ast::Span::empty()),
+            dml::ScalarValue::Float(value) => ast::Expression::NumericValue(value.to_string(), ast::Span::empty()),
+            dml::ScalarValue::Int(value) => ast::Expression::NumericValue(value.to_string(), ast::Span::empty()),
+            dml::ScalarValue::Expression(name, _, args) => ast::Expression::Function(
                 name.clone(),
                 args.iter().map(|a| a.into()).collect(),
                 ast::Span::empty(),
