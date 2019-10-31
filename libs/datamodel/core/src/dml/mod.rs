@@ -13,7 +13,7 @@ mod scalar_list;
 
 mod traits;
 
-pub use datamodel::*;
+pub use self::datamodel::*;
 pub use enummodel::*;
 pub use field::*;
 pub use id::*;

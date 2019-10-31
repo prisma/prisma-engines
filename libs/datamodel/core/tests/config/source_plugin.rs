@@ -1,7 +1,7 @@
 use crate::common::*;
 use datamodel::{
-    ast::Span, common::argument::Arguments, common::FromStrAndSpan, common::PrismaType, configuration::*, dml,
-    error::DatamodelError, validator::directive::DirectiveValidator,
+    ast::Span, common::argument::Arguments, common::PrismaType, configuration::*, dml, error::DatamodelError,
+    validator::directive::DirectiveValidator,
 };
 
 //##########################
@@ -45,7 +45,7 @@ impl CustomDbDefinition {
 
     fn get_base_type(&self, arguments: &mut Arguments) -> Result<PrismaType, DatamodelError> {
         if let Ok(arg) = arguments.arg("base_type") {
-            PrismaType::from_str_and_span(&arg.as_constant_literal()?, arg.span())
+            Ok(PrismaType::from_str_and_span(&arg.as_constant_literal()?, arg.span()).unwrap())
         } else {
             return Ok(PrismaType::String);
         }
