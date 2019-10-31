@@ -8,11 +8,10 @@
 mod interpreting_executor;
 mod pipeline;
 
-use futures::future::BoxFuture;
-
 pub use interpreting_executor::*;
 
 use crate::{query_document::QueryDocument, response_ir::Response, schema::QuerySchemaRef, CoreResult};
+use futures::future::BoxFuture;
 
 pub trait QueryExecutor {
     fn execute<'a>(
@@ -20,5 +19,6 @@ pub trait QueryExecutor {
         query_doc: QueryDocument,
         query_schema: QuerySchemaRef,
     ) -> BoxFuture<'a, CoreResult<Vec<Response>>>;
+
     fn primary_connector(&self) -> &'static str;
 }

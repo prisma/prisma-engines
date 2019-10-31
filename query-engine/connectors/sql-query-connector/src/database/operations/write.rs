@@ -4,7 +4,7 @@ use prisma_models::*;
 use prisma_query::{connector::Queryable, error::Error as QueryError};
 use std::sync::Arc;
 
-async fn create_record(
+pub async fn create_record(
     conn: &dyn QueryExt,
     model: ModelRef,
     args: WriteArgs,
@@ -55,7 +55,7 @@ async fn create_record(
     Ok(id)
 }
 
-async fn update_records(
+pub async fn update_records(
     conn: &dyn QueryExt,
     model: ModelRef,
     where_: Filter,
@@ -93,7 +93,11 @@ async fn update_records(
     Ok(ids)
 }
 
-async fn delete_records(conn: &dyn QueryExt, model: ModelRef, where_: Filter) -> connector_interface::Result<usize> {
+pub async fn delete_records(
+    conn: &dyn QueryExt,
+    model: ModelRef,
+    where_: Filter,
+) -> connector_interface::Result<usize> {
     let ids = conn.filter_ids(Arc::clone(&model), where_.clone()).await?;
     let ids: Vec<&GraphqlId> = ids.iter().map(|id| &*id).collect();
     let count = ids.len();
@@ -109,7 +113,7 @@ async fn delete_records(conn: &dyn QueryExt, model: ModelRef, where_: Filter) ->
     Ok(count)
 }
 
-async fn connect(
+pub async fn connect(
     conn: &dyn QueryExt,
     field: RelationFieldRef,
     parent_id: &GraphqlId,
@@ -121,7 +125,7 @@ async fn connect(
     Ok(())
 }
 
-async fn disconnect(
+pub async fn disconnect(
     conn: &dyn QueryExt,
     field: RelationFieldRef,
     parent_id: &GraphqlId,
@@ -133,7 +137,7 @@ async fn disconnect(
     Ok(())
 }
 
-async fn set(
+pub async fn set(
     conn: &dyn QueryExt,
     field: RelationFieldRef,
     parent_id: GraphqlId,

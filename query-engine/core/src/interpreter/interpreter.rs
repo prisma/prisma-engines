@@ -106,7 +106,10 @@ where
                 fut.boxed()
             }
 
-            Expression::Let { bindings, expressions } => {
+            Expression::Let {
+                bindings,
+                mut expressions,
+            } => {
                 let fut = async move {
                     let mut inner_env = env.clone();
                     self.log_line("LET".to_string(), level).await;
@@ -119,12 +122,12 @@ where
                         inner_env.insert(binding.name, result);
                     }
 
-                    // // the unwrapping improves the readability of the log significantly
-                    // let next_expression = if expressions.len() == 1 {
-                    //     expressions.pop().unwrap()
-                    // } else {
-                    let next_expression = Expression::Sequence { seq: expressions };
-                    // };
+                    // the unwrapping improves the readability of the log significantly
+                    let next_expression = if expressions.len() == 1 {
+                        expressions.pop().unwrap()
+                    } else {
+                        Expression::Sequence { seq: expressions }
+                    };
 
                     self.interpret(next_expression, inner_env, level + 1).await
                 };

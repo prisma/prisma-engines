@@ -6,7 +6,6 @@ use connector::Connector;
 use futures::future::{BoxFuture, FutureExt};
 
 /// Central query executor and main entry point into the query core.
-/// Interprets the full query tree to return a result.
 pub struct InterpretingExecutor<C> {
     connector: C,
     primary_connector: &'static str,
@@ -14,7 +13,6 @@ pub struct InterpretingExecutor<C> {
 
 // Todo:
 // - Partial execution semantics?
-// - ReadQueryResult + write query results should probably just be QueryResult
 impl<C> InterpretingExecutor<C>
 where
     C: Connector + Send + Sync,
