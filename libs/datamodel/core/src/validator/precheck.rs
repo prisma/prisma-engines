@@ -1,6 +1,5 @@
 use crate::{
     ast::{self, WithIdentifier, WithName},
-    common::FromStrAndSpan,
     dml,
     error::{DatamodelError, ErrorCollection},
 };
@@ -60,7 +59,7 @@ impl Precheck {
     }
 
     fn assert_is_not_a_reserved_scalar_type(identifier: &ast::Identifier, errors: &mut ErrorCollection) {
-        if dml::ScalarType::from_str_and_span(&identifier.name, identifier.span).is_ok() {
+        if dml::ScalarType::from_str(&identifier.name).is_ok() {
             errors.push(DatamodelError::new_reserved_scalar_type_error(
                 &identifier.name,
                 identifier.span,

@@ -10,7 +10,6 @@ mod string_helper;
 pub use fromstr::FromStrAndSpan;
 pub use string_helper::WritableString;
 
-use crate::ast;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
@@ -26,7 +25,7 @@ pub enum ScalarType {
 }
 
 impl ScalarType {
-    pub fn from_str_and_span(s: &str, span: ast::Span) -> Result<Self, String> {
+    pub fn from_str(s: &str) -> Result<Self, String> {
         match s {
             "Int" => Ok(ScalarType::Int),
             "Float" => Ok(ScalarType::Float),

@@ -45,7 +45,7 @@ impl CustomDbDefinition {
 
     fn get_base_type(&self, arguments: &mut Arguments) -> Result<ScalarType, DatamodelError> {
         if let Ok(arg) = arguments.arg("base_type") {
-            Ok(ScalarType::from_str_and_span(&arg.as_constant_literal()?, arg.span()).unwrap())
+            Ok(ScalarType::from_str(&arg.as_constant_literal()?).unwrap())
         } else {
             return Ok(ScalarType::String);
         }

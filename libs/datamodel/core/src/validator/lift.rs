@@ -2,7 +2,7 @@ use super::DirectiveBox;
 use crate::{
     ast,
     common::value::ValueValidator,
-    common::{FromStrAndSpan, ScalarType},
+    common::ScalarType,
     configuration, dml,
     error::{DatamodelError, ErrorCollection},
 };
@@ -167,7 +167,7 @@ impl LiftAstToDml {
     ) -> Result<(dml::FieldType, Vec<ast::Directive>), DatamodelError> {
         let type_name = &ast_field.field_type.name;
 
-        if let Ok(scalar_type) = ScalarType::from_str_and_span(type_name, ast_field.field_type.span) {
+        if let Ok(scalar_type) = ScalarType::from_str(type_name) {
             Ok((dml::FieldType::Base(scalar_type), vec![]))
         } else if ast_schema.find_model(type_name).is_some() {
             Ok((dml::FieldType::Relation(dml::RelationInfo::new(type_name)), vec![]))

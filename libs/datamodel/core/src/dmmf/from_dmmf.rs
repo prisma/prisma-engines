@@ -106,7 +106,7 @@ fn default_value_from_serde(
 }
 
 fn type_from_string(scalar: &str) -> ScalarType {
-    ScalarType::from_str_and_span(scalar, Span::empty()).unwrap()
+    ScalarType::from_str(scalar).unwrap()
 }
 
 fn function_from_dmmf(func: &Function, expected_type: ScalarType) -> dml::ScalarValue {
