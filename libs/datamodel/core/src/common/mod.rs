@@ -34,7 +34,7 @@ impl ScalarType {
             "Boolean" => Ok(ScalarType::Boolean),
             "String" => Ok(ScalarType::String),
             "DateTime" => Ok(ScalarType::DateTime),
-            _ => Err(format!("type {} is not a know scalar type.", s)),
+            _ => Err(format!("type {} is not a known scalar type.", s)),
         }
     }
 }
