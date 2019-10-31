@@ -17,14 +17,14 @@ impl<'a> Transaction<'a> {
     }
 
     /// Commit the changes to the database and consume the transaction.
-    pub async fn commit(self) -> crate::Result<()> {
+    pub async fn commit(&self) -> crate::Result<()> {
         self.inner.raw_cmd("COMMIT").await?;
 
         Ok(())
     }
 
     /// Rolls back the changes to the database.
-    pub async fn rollback(self) -> crate::Result<()> {
+    pub async fn rollback(&self) -> crate::Result<()> {
         self.inner.raw_cmd("ROLLBACK").await?;
 
         Ok(())
