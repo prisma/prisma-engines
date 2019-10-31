@@ -1,6 +1,4 @@
-// mod read;
-// mod write;
-
+use crate::database::operations::*;
 use crate::{query_builder::read::ManyRelatedRecordsQueryBuilder, SqlError};
 use connector_interface::{
     self as connector,
@@ -42,12 +40,12 @@ impl<'a, T> ReadOperations for SqlConnectorTransaction<'a, T>
 where
     T: ManyRelatedRecordsQueryBuilder + Send + Sync + 'static,
 {
-    fn get_single_record(
-        &self,
-        record_finder: &RecordFinder,
-        selected_fields: &SelectedFields,
-    ) -> connector::IO<Option<SingleRecord>> {
-        unimplemented!()
+    fn get_single_record<'b>(
+        &'b self,
+        record_finder: &'b RecordFinder,
+        selected_fields: &'b SelectedFields,
+    ) -> connector::IO<'b, Option<SingleRecord>> {
+        IO::new(async move { read::get_single_record(&self.inner, record_finder, selected_fields).await })
     }
 
     fn get_many_records(

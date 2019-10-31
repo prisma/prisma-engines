@@ -1,5 +1,5 @@
-use super::transaction::SqlConnectorTransaction;
-use crate::{FromSource, QueryExt, SqlError};
+use super::connection::SqlConnection;
+use crate::{query_builder::ManyRelatedRecordsWithRowNumber, FromSource, QueryExt, SqlError};
 use connector_interface::{Connection, Connector, IO};
 use datamodel::Source;
 use prisma_query::{
@@ -25,8 +25,9 @@ impl Sqlite {
 impl FromSource for Sqlite {
     fn from_source(source: &dyn Source) -> crate::Result<Self> {
         let params = SqliteParams::try_from(source.url().value.as_str())?;
+        let db_name = params.file_path.file_stem().unwrap().to_str().unwrap().to_owned();
         let file_path = params.file_path.to_str().unwrap().to_string();
-        let pool = pool::sqlite(&file_path)?;
+        let pool = pool::sqlite(&file_path, &db_name)?;
 
         Ok(Self { pool, file_path })
     }
@@ -36,8 +37,9 @@ impl Connector for Sqlite {
     fn get_connection<'a>(&'a self) -> IO<Box<dyn Connection + 'a>> {
         IO::new(async move {
             let conn = self.pool.check_out().await.map_err(SqlError::from)?;
-            unimplemented!();
-            // Ok(Box::new(conn) as Box<dyn Connection>)
+            let conn = SqlConnection::<_, ManyRelatedRecordsWithRowNumber>::new(conn);
+
+            Ok(Box::new(conn) as Box<dyn Connection>)
         })
     }
 }

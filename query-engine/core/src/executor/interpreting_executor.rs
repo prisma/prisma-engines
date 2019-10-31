@@ -54,7 +54,7 @@ where
                 if result.is_ok() {
                     tx.commit().await?;
                 } else {
-                    // tx.rollback().await?;
+                    tx.rollback().await?;
                 }
 
                 results.push(result?);

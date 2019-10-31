@@ -13,7 +13,7 @@ struct ScalarListElement {
     value: PrismaValue,
 }
 
-async fn get_single_record(
+pub async fn get_single_record(
     conn: &dyn QueryExt,
     record_finder: &RecordFinder,
     selected_fields: &SelectedFields,
@@ -33,7 +33,7 @@ async fn get_single_record(
     Ok(record)
 }
 
-async fn get_many_records(
+pub async fn get_many_records(
     conn: &dyn QueryExt,
     model: ModelRef,
     query_arguments: QueryArguments,
@@ -53,7 +53,7 @@ async fn get_many_records(
     Ok(ManyRecords { records, field_names })
 }
 
-async fn get_related_records<T>(
+pub async fn get_related_records<T>(
     conn: &dyn QueryExt,
     from_field: RelationFieldRef,
     from_record_ids: &[GraphqlId],
@@ -101,7 +101,7 @@ where
     })
 }
 
-async fn get_scalar_list_values(
+pub async fn get_scalar_list_values(
     conn: &dyn QueryExt,
     list_field: ScalarFieldRef,
     record_ids: Vec<GraphqlId>,
@@ -140,7 +140,7 @@ async fn get_scalar_list_values(
     Ok(list_values)
 }
 
-async fn count_by_model(
+pub async fn count_by_model(
     conn: &dyn QueryExt,
     model: ModelRef,
     query_arguments: QueryArguments,

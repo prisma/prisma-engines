@@ -1907,7 +1907,7 @@ dependencies = [
 [[package]]
 name = "prisma-query"
 version = "0.1.0"
-source = "git+https://github.com/prisma/prisma-query.git?branch=async-await#fc31df37389097cd60a254ee3f68fc117ca2f3d2"
+source = "git+https://github.com/prisma/prisma-query.git?branch=async-await#0db07a135bfb4d1a444684bffe506647d64d80ee"
 dependencies = [
  "async-std 0.99.11 (registry+https://github.com/rust-lang/crates.io-index)",
  "bytes 0.4.12 (registry+https://github.com/rust-lang/crates.io-index)",

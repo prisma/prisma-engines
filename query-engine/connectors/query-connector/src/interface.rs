@@ -15,11 +15,11 @@ pub trait Transaction<'a>: ReadOperations + WriteOperations + Send + Sync {
 }
 
 pub trait ReadOperations {
-    fn get_single_record(
-        &self,
-        record_finder: &RecordFinder,
-        selected_fields: &SelectedFields,
-    ) -> crate::IO<Option<SingleRecord>>;
+    fn get_single_record<'a>(
+        &'a self,
+        record_finder: &'a RecordFinder,
+        selected_fields: &'a SelectedFields,
+    ) -> crate::IO<'a, Option<SingleRecord>>;
 
     fn get_many_records(
         &self,
