@@ -2,7 +2,7 @@ use super::{pipeline::QueryPipeline, QueryExecutor};
 use crate::{
     CoreResult, IrSerializer, QueryDocument, QueryGraph, QueryGraphBuilder, QueryInterpreter, QuerySchemaRef, Response,
 };
-use connector::{Connection, Connector, Transaction};
+use connector::Connector;
 use futures::future::{BoxFuture, FutureExt};
 
 /// Central query executor and main entry point into the query core.
@@ -17,7 +17,7 @@ pub struct InterpretingExecutor<C> {
 // - ReadQueryResult + write query results should probably just be QueryResult
 impl<C> InterpretingExecutor<C>
 where
-    C: Connector + Send + Sync + 'static,
+    C: Connector + Send + Sync,
 {
     pub fn new(connector: C, primary_connector: &'static str) -> Self {
         InterpretingExecutor {
@@ -29,29 +29,35 @@ where
 
 impl<C> QueryExecutor for InterpretingExecutor<C>
 where
-    C: Connector + Send + Sync + 'static,
+    C: Connector + Send + Sync,
 {
-    fn execute(&self, query_doc: QueryDocument, query_schema: QuerySchemaRef) -> BoxFuture<CoreResult<Vec<Response>>> {
+    fn execute<'a>(
+        &'a self,
+        query_doc: QueryDocument,
+        query_schema: QuerySchemaRef,
+    ) -> BoxFuture<'a, CoreResult<Vec<Response>>> {
+        let conn_fut = self.connector.get_connection();
         let fut = async move {
+            let conn = conn_fut.await?;
+
             // Parse, validate, and extract query graphs from query document.
             let queries: Vec<(QueryGraph, IrSerializer)> = QueryGraphBuilder::new(query_schema).build(query_doc)?;
 
             // Create pipelines for all separate queries
-            let mut results = vec![];
+            let mut results: Vec<Response> = vec![];
 
             for (query_graph, info) in queries {
-                let conn = self.connector.get_connection().await?;
                 let tx = conn.start_transaction().await?;
-                let interpreter = QueryInterpreter::new(tx);
+                let interpreter = QueryInterpreter::new(&tx);
                 let result = QueryPipeline::new(query_graph, interpreter, info).execute().await;
 
                 if result.is_ok() {
                     tx.commit().await?;
                 } else {
-                    tx.rollback().await?;
+                    // tx.rollback().await?;
                 }
 
-                results.push(result);
+                results.push(result?);
             }
 
             Ok(results)

@@ -4,10 +4,14 @@ use prisma_models::*;
 use prisma_query::{connector::Queryable, error::Error as QueryError};
 use std::sync::Arc;
 
-fn create_record(conn: &dyn QueryExt, model: ModelRef, args: WriteArgs) -> connector_interface::Result<GraphqlId> {
+async fn create_record(
+    conn: &dyn QueryExt,
+    model: ModelRef,
+    args: WriteArgs,
+) -> connector_interface::Result<GraphqlId> {
     let (insert, returned_id) = WriteQueryBuilder::create_record(Arc::clone(&model), args.non_list_args().clone());
 
-    let last_id = match conn.insert(insert) {
+    let last_id = match conn.insert(insert).await {
         Ok(id) => id,
         Err(QueryError::UniqueConstraintViolation { field_name }) => {
             if field_name == "PRIMARY" {
@@ -44,20 +48,20 @@ fn create_record(conn: &dyn QueryExt, model: ModelRef, args: WriteArgs) -> conne
         let table = field.scalar_list_table();
 
         if let Some(insert) = WriteQueryBuilder::create_scalar_list_value(table.table(), &list_value, &id) {
-            conn.insert(insert).map_err(SqlError::from)?;
+            conn.insert(insert).await.map_err(SqlError::from)?;
         }
     }
 
     Ok(id)
 }
 
-fn update_records(
+async fn update_records(
     conn: &dyn QueryExt,
     model: ModelRef,
     where_: Filter,
     args: WriteArgs,
 ) -> connector_interface::Result<Vec<GraphqlId>> {
-    let ids = conn.filter_ids(Arc::clone(&model), where_.clone())?;
+    let ids = conn.filter_ids(Arc::clone(&model), where_.clone()).await?;
 
     if ids.len() == 0 {
         return Ok(vec![]);
@@ -69,7 +73,7 @@ fn update_records(
     };
 
     for update in updates {
-        conn.update(update).map_err(SqlError::from)?;
+        conn.update(update).await.map_err(SqlError::from)?;
     }
 
     for (field_name, list_value) in args.list_args() {
@@ -78,19 +82,19 @@ fn update_records(
         let (deletes, inserts) = WriteQueryBuilder::update_scalar_list_values(&table, &list_value, ids.to_vec());
 
         for delete in deletes {
-            conn.delete(delete).map_err(SqlError::from)?;
+            conn.delete(delete).await.map_err(SqlError::from)?;
         }
 
         for insert in inserts {
-            conn.insert(insert).map_err(SqlError::from)?;
+            conn.insert(insert).await.map_err(SqlError::from)?;
         }
     }
 
     Ok(ids)
 }
 
-fn delete_records(conn: &dyn QueryExt, model: ModelRef, where_: Filter) -> connector_interface::Result<usize> {
-    let ids = conn.filter_ids(Arc::clone(&model), where_.clone())?;
+async fn delete_records(conn: &dyn QueryExt, model: ModelRef, where_: Filter) -> connector_interface::Result<usize> {
+    let ids = conn.filter_ids(Arc::clone(&model), where_.clone()).await?;
     let ids: Vec<&GraphqlId> = ids.iter().map(|id| &*id).collect();
     let count = ids.len();
 
@@ -99,48 +103,48 @@ fn delete_records(conn: &dyn QueryExt, model: ModelRef, where_: Filter) -> conne
     }
 
     for delete in WriteQueryBuilder::delete_many(model, ids.as_slice()) {
-        conn.delete(delete).map_err(SqlError::from)?;
+        conn.delete(delete).await.map_err(SqlError::from)?;
     }
 
     Ok(count)
 }
 
-fn connect(
+async fn connect(
     conn: &dyn QueryExt,
     field: RelationFieldRef,
     parent_id: &GraphqlId,
     child_id: &GraphqlId,
 ) -> connector_interface::Result<()> {
     let query = WriteQueryBuilder::create_relation(field, parent_id, child_id);
-    conn.execute(query).unwrap();
+    conn.execute(query).await.map_err(SqlError::from)?;
 
     Ok(())
 }
 
-fn disconnect(
+async fn disconnect(
     conn: &dyn QueryExt,
     field: RelationFieldRef,
     parent_id: &GraphqlId,
     child_id: &GraphqlId,
 ) -> connector_interface::Result<()> {
     let query = WriteQueryBuilder::delete_relation(field, parent_id, child_id);
-    conn.execute(query).unwrap();
+    conn.execute(query).await.map_err(SqlError::from)?;
 
     Ok(())
 }
 
-fn set(
+async fn set(
     conn: &dyn QueryExt,
     field: RelationFieldRef,
     parent_id: GraphqlId,
     child_ids: Vec<GraphqlId>,
 ) -> connector_interface::Result<()> {
     let query = WriteQueryBuilder::delete_relation_by_parent(Arc::clone(&field), &parent_id);
-    conn.execute(query).unwrap();
+    conn.execute(query).await.map_err(SqlError::from)?;
 
     // TODO: we can avoid the multiple roundtrips in some cases
     for child_id in &child_ids {
-        conn.connect(Arc::clone(&field), &parent_id, child_id)?;
+        connect(conn, Arc::clone(&field), &parent_id, child_id).await?;
     }
     Ok(())
 }

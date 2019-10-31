@@ -23,7 +23,7 @@ impl FromSource for Mysql {
 }
 
 impl Connector for Mysql {
-    fn get_connection(&self) -> IO<Box<dyn Connection>> {
+    fn get_connection<'a>(&'a self) -> IO<Box<dyn Connection + 'a>> {
         IO::new(async move {
             let conn = self.pool.check_out().await.map_err(SqlError::from)?;
             let conn = SqlConnection::<_, ManyRelatedRecordsWithUnionAll>::new(conn);

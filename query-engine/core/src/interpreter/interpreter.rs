@@ -4,7 +4,9 @@ use super::{
     InterpretationResult, InterpreterError,
 };
 use crate::{Query, QueryResult};
+use async_std::sync::Mutex;
 use connector::Transaction;
+use futures::future::{BoxFuture, FutureExt};
 use im::HashMap;
 use prisma_models::prelude::*;
 
@@ -61,89 +63,150 @@ impl Env {
     }
 }
 
-pub struct QueryInterpreter<'a> {
-    pub(crate) tx: Box<dyn Transaction<'a>>,
-    pub log: String,
+pub struct QueryInterpreter<'a, 'b> {
+    pub(crate) tx: &'a Box<dyn Transaction<'b> + 'b>,
+    pub log: Mutex<String>,
 }
 
-impl<'a> QueryInterpreter<'a> {
-    pub fn new(tx: Box<dyn Transaction>) -> QueryInterpreter {
-        QueryInterpreter { tx, log: String::new() }
+impl<'a, 'b> QueryInterpreter<'a, 'b>
+where
+    'b: 'a,
+{
+    pub fn new(tx: &'a Box<dyn Transaction<'b> + 'b>) -> QueryInterpreter<'a, 'b> {
+        QueryInterpreter {
+            tx,
+            log: Mutex::new(String::new()),
+        }
     }
 
-    pub fn interpret(&mut self, exp: Expression, env: Env, level: usize) -> InterpretationResult<ExpressionResult> {
+    pub fn interpret(
+        &'a self,
+        exp: Expression,
+        env: Env,
+        level: usize,
+    ) -> BoxFuture<'a, InterpretationResult<ExpressionResult>> {
         match exp {
-            Expression::Func { func } => self.interpret(func(env.clone())?, env, level),
+            Expression::Func { func } => async move { self.interpret(func(env.clone())?, env, level).await }.boxed(),
+
+            Expression::Sequence { seq } if seq.is_empty() => async { Ok(ExpressionResult::Empty) }.boxed(),
 
             Expression::Sequence { seq } => {
-                self.log_line("SEQ".to_string(), level);
-                seq.into_iter()
-                    .map(|exp| self.interpret(exp, env.clone(), level + 1))
-                    .collect::<InterpretationResult<Vec<_>>>()
-                    .map(|mut results| results.pop().unwrap_or_else(|| ExpressionResult::Empty))
-            }
+                let fut = async move {
+                    self.log_line("SEQ".to_string(), level).await;
 
-            Expression::Let {
-                bindings,
-                mut expressions,
-            } => {
-                self.log_line("LET".to_string(), level);
-                let mut inner_env = env.clone();
-                for binding in bindings {
-                    self.log_line(format!("bind {} ", &binding.name), level + 1);
-                    let result = self.interpret(binding.expr, env.clone(), level + 2)?;
-                    inner_env.insert(binding.name, result);
-                }
-                // the unwrapping improves the readability of the log significantly
-                let next_expression = if expressions.len() == 1 {
-                    expressions.pop().unwrap()
-                } else {
-                    Expression::Sequence { seq: expressions }
+                    let mut results = vec![];
+
+                    for expr in seq {
+                        results.push(self.interpret(expr, env.clone(), level + 1).await?);
+                    }
+
+                    Ok(results.pop().unwrap())
                 };
-                self.interpret(next_expression, inner_env, level + 1)
+
+                fut.boxed()
             }
 
-            Expression::Query { query } => match query {
-                Query::Read(read) => {
-                    self.log_line(format!("READ {}", read), level);
-                    Ok(read::execute(self.tx, read, &[]).map(|res| ExpressionResult::Query(res))?)
-                }
+            Expression::Let { bindings, expressions } => {
+                let fut = async move {
+                    let mut inner_env = env.clone();
+                    self.log_line("LET".to_string(), level).await;
 
-                Query::Write(write) => {
-                    self.log_line(format!("WRITE {}", write), level);
-                    Ok(write::execute(self.tx, write).map(|res| ExpressionResult::Query(res))?)
-                }
-            },
+                    for binding in bindings {
+                        let log_line = format!("bind {} ", &binding.name);
+                        self.log_line(log_line, level + 1).await;
+
+                        let result = self.interpret(binding.expr, env.clone(), level + 2).await?;
+                        inner_env.insert(binding.name, result);
+                    }
+
+                    // // the unwrapping improves the readability of the log significantly
+                    // let next_expression = if expressions.len() == 1 {
+                    //     expressions.pop().unwrap()
+                    // } else {
+                    let next_expression = Expression::Sequence { seq: expressions };
+                    // };
+
+                    self.interpret(next_expression, inner_env, level + 1).await
+                };
+
+                fut.boxed()
+            }
+
+            Expression::Query { query } => {
+                let fut = async move {
+                    match query {
+                        Query::Read(read) => {
+                            let log_line = format!("READ {}", read);
+
+                            self.log_line(log_line, level).await;
+                            Ok(read::execute(self.tx, read, &[])
+                                .await
+                                .map(|res| ExpressionResult::Query(res))?)
+                        }
+
+                        Query::Write(write) => {
+                            let log_line = format!("WRITE {}", write);
+
+                            self.log_line(log_line, level).await;
+                            Ok(write::execute(self.tx, write)
+                                .await
+                                .map(|res| ExpressionResult::Query(res))?)
+                        }
+                    }
+                };
+                fut.boxed()
+            }
 
             Expression::Get { binding_name } => {
-                self.log_line(format!("GET {}", binding_name), level);
-                env.clone().remove(&binding_name)
+                let fut = async move {
+                    let log_line = format!("GET {}", binding_name);
+
+                    self.log_line(log_line, level).await;
+                    env.clone().remove(&binding_name)
+                };
+
+                fut.boxed()
             }
 
             Expression::GetFirstNonEmpty { binding_names } => {
-                self.log_line(format!("GET FIRST NON EMPTY {:?}", binding_names), level);
-                Ok(binding_names
-                    .into_iter()
-                    .find_map(|binding_name| match env.get(&binding_name) {
-                        Some(_) => Some(env.clone().remove(&binding_name).unwrap()),
-                        None => None,
-                    })
-                    .unwrap())
+                let fut = async move {
+                    let log_line = format!("GET FIRST NON EMPTY {:?}", binding_names);
+
+                    self.log_line(log_line, level).await;
+                    Ok(binding_names
+                        .into_iter()
+                        .find_map(|binding_name| match env.get(&binding_name) {
+                            Some(_) => Some(env.clone().remove(&binding_name).unwrap()),
+                            None => None,
+                        })
+                        .unwrap())
+                };
+
+                fut.boxed()
             }
 
-            Expression::If { func, then, else_ } => {
-                self.log_line("IF".to_string(), level);
-                if func() {
-                    self.interpret(Expression::Sequence { seq: then }, env, level + 1)
-                } else {
-                    self.interpret(Expression::Sequence { seq: else_ }, env, level + 1)
-                }
+            Expression::If {
+                func,
+                then,
+                else_: elze,
+            } => {
+                let fut = async move {
+                    self.log_line("IF".to_string(), level).await;
+
+                    if func() {
+                        self.interpret(Expression::Sequence { seq: then }, env, level + 1).await
+                    } else {
+                        self.interpret(Expression::Sequence { seq: elze }, env, level + 1).await
+                    }
+                };
+
+                fut.boxed()
             }
         }
     }
 
-    fn log_line(&mut self, s: String, level: usize) {
+    async fn log_line(&self, s: String, level: usize) {
         let log_line = format!("{:indent$}{}\n", "", s, indent = level * 2);
-        self.log.push_str(&log_line);
+        self.log.lock().await.push_str(&log_line);
     }
 }

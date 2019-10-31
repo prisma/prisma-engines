@@ -5,37 +5,53 @@ use crate::{
 };
 use connector::{Filter, Transaction, WriteArgs};
 
-pub fn execute(tx: Box<dyn Transaction>, write_query: WriteQuery) -> InterpretationResult<QueryResult> {
+pub async fn execute<'a, 'b>(
+    tx: &'a Box<dyn Transaction<'b> + 'b>,
+    write_query: WriteQuery,
+) -> InterpretationResult<QueryResult> {
     match write_query {
-        WriteQuery::CreateRecord(q) => create_one(tx, q),
-        WriteQuery::UpdateRecord(q) => update_one(tx, q),
-        WriteQuery::DeleteRecord(q) => delete_one(tx, q),
-        WriteQuery::UpdateManyRecords(q) => update_many(tx, q),
-        WriteQuery::DeleteManyRecords(q) => delete_many(tx, q),
-        WriteQuery::ConnectRecords(q) => connect(tx, q),
-        WriteQuery::DisconnectRecords(q) => disconnect(tx, q),
-        WriteQuery::SetRecords(q) => set(tx, q),
-        WriteQuery::ResetData(q) => reset(tx, q),
+        WriteQuery::CreateRecord(q) => create_one(tx, q).await,
+        WriteQuery::UpdateRecord(q) => update_one(tx, q).await,
+        WriteQuery::DeleteRecord(q) => delete_one(tx, q).await,
+        WriteQuery::UpdateManyRecords(q) => update_many(tx, q).await,
+        WriteQuery::DeleteManyRecords(q) => delete_many(tx, q).await,
+        WriteQuery::ConnectRecords(q) => connect(tx, q).await,
+        WriteQuery::DisconnectRecords(q) => disconnect(tx, q).await,
+        WriteQuery::SetRecords(q) => set(tx, q).await,
+        WriteQuery::ResetData(q) => reset(tx, q).await,
     }
 }
 
-fn create_one(tx: Box<dyn Transaction>, q: CreateRecord) -> InterpretationResult<QueryResult> {
-    let res = tx.create_record(q.model, WriteArgs::new(q.non_list_args, q.list_args))?;
+async fn create_one<'a, 'b>(
+    tx: &'a Box<dyn Transaction<'b> + 'b>,
+    q: CreateRecord,
+) -> InterpretationResult<QueryResult> {
+    let res = tx
+        .create_record(q.model, WriteArgs::new(q.non_list_args, q.list_args))
+        .await?;
 
     Ok(QueryResult::Id(res))
 }
 
-fn update_one(tx: Box<dyn Transaction>, q: UpdateRecord) -> InterpretationResult<QueryResult> {
-    let mut res = tx.update_records(
-        q.model,
-        Filter::from(q.where_),
-        WriteArgs::new(q.non_list_args, q.list_args),
-    )?;
+async fn update_one<'a, 'b>(
+    tx: &'a Box<dyn Transaction<'b> + 'b>,
+    q: UpdateRecord,
+) -> InterpretationResult<QueryResult> {
+    let mut res = tx
+        .update_records(
+            q.model,
+            Filter::from(q.where_),
+            WriteArgs::new(q.non_list_args, q.list_args),
+        )
+        .await?;
 
     Ok(QueryResult::Id(res.pop().unwrap()))
 }
 
-fn delete_one(tx: Box<dyn Transaction>, q: DeleteRecord) -> InterpretationResult<QueryResult> {
+async fn delete_one<'a, 'b>(
+    tx: &'a Box<dyn Transaction<'b> + 'b>,
+    q: DeleteRecord,
+) -> InterpretationResult<QueryResult> {
     // We need to ensure that we have a record finder, else we delete everything (conversion to empty filter).
     let finder = match q.where_ {
         Some(f) => Ok(f),
@@ -44,53 +60,70 @@ fn delete_one(tx: Box<dyn Transaction>, q: DeleteRecord) -> InterpretationResult
         )),
     }?;
 
-    let res = tx.delete_records(q.model, Filter::from(finder))?;
+    let res = tx.delete_records(q.model, Filter::from(finder)).await?;
 
     Ok(QueryResult::Count(res))
 }
 
-fn update_many(tx: Box<dyn Transaction>, q: UpdateManyRecords) -> InterpretationResult<QueryResult> {
-    let res = tx.update_records(q.model, q.filter, WriteArgs::new(q.non_list_args, q.list_args))?;
+async fn update_many<'a, 'b>(
+    tx: &'a Box<dyn Transaction<'b> + 'b>,
+    q: UpdateManyRecords,
+) -> InterpretationResult<QueryResult> {
+    let res = tx
+        .update_records(q.model, q.filter, WriteArgs::new(q.non_list_args, q.list_args))
+        .await?;
 
     Ok(QueryResult::Count(res.len()))
 }
 
-fn delete_many(tx: Box<dyn Transaction>, q: DeleteManyRecords) -> InterpretationResult<QueryResult> {
-    let res = tx.delete_records(q.model, q.filter)?;
+async fn delete_many<'a, 'b>(
+    tx: &'a Box<dyn Transaction<'b> + 'b>,
+    q: DeleteManyRecords,
+) -> InterpretationResult<QueryResult> {
+    let res = tx.delete_records(q.model, q.filter).await?;
 
     Ok(QueryResult::Count(res))
 }
 
-fn connect(tx: Box<dyn Transaction>, q: ConnectRecords) -> InterpretationResult<QueryResult> {
+async fn connect<'a, 'b>(
+    tx: &'a Box<dyn Transaction<'b> + 'b>,
+    q: ConnectRecords,
+) -> InterpretationResult<QueryResult> {
     tx.connect(
         q.relation_field,
         &q.parent.expect("Expected parent record ID to be set for connect"),
         &q.child.expect("Expected child record ID to be set for connect"),
-    )?;
+    )
+    .await?;
 
     Ok(QueryResult::Unit)
 }
 
-fn disconnect(tx: Box<dyn Transaction>, q: DisconnectRecords) -> InterpretationResult<QueryResult> {
+async fn disconnect<'a, 'b>(
+    tx: &'a Box<dyn Transaction<'b> + 'b>,
+    q: DisconnectRecords,
+) -> InterpretationResult<QueryResult> {
     tx.disconnect(
         q.relation_field,
         &q.parent.expect("Expected parent record ID to be set for disconnect"),
         &q.child.expect("Expected child record ID to be set for disconnect"),
-    )?;
+    )
+    .await?;
 
     Ok(QueryResult::Unit)
 }
 
-fn set(tx: Box<dyn Transaction>, q: SetRecords) -> InterpretationResult<QueryResult> {
+async fn set<'a, 'b>(tx: &'a Box<dyn Transaction<'b> + 'b>, q: SetRecords) -> InterpretationResult<QueryResult> {
     tx.set(
         q.relation_field,
         q.parent.expect("Expected parent record ID to be set for set"),
         q.wheres,
-    )?;
+    )
+    .await?;
 
     Ok(QueryResult::Unit)
 }
 
-fn reset(_tx: Box<dyn Transaction>, _q: ResetData) -> InterpretationResult<QueryResult> {
+async fn reset<'a, 'b>(_tx: &'a Box<dyn Transaction<'b> + 'b>, _q: ResetData) -> InterpretationResult<QueryResult> {
     unimplemented!()
 }

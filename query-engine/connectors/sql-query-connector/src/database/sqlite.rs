@@ -26,13 +26,14 @@ impl FromSource for Sqlite {
     fn from_source(source: &dyn Source) -> crate::Result<Self> {
         let params = SqliteParams::try_from(source.url().value.as_str())?;
         let file_path = params.file_path.to_str().unwrap().to_string();
+        let pool = pool::sqlite(&file_path)?;
 
-        Self::new(file_path)
+        Ok(Self { pool, file_path })
     }
 }
 
 impl Connector for Sqlite {
-    fn get_connection(&self) -> IO<Box<dyn Connection>> {
+    fn get_connection<'a>(&'a self) -> IO<Box<dyn Connection + 'a>> {
         IO::new(async move {
             let conn = self.pool.check_out().await.map_err(SqlError::from)?;
             unimplemented!();
