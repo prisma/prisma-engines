@@ -7,6 +7,7 @@ edition = "2018"
 [dependencies]
 clap = "2.33.0"
 prisma-inflector = { path = "../../prisma-inflector" }
+datamodel-connector = { path = "../connectors/datamodel-connector" }
 # Temporary until PR is accepted.
 pest = { version = "2.1.0", package = 'pest_tmp' }
 pest_derive = { version = "2.1.0", package = 'pest_derive_tmp' }
