@@ -1,5 +1,4 @@
-mod test_harness;
-
+use crate::*;
 use barrel::types;
 use test_harness::*;
 
