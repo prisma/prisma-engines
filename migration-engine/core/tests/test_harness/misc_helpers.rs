@@ -296,9 +296,9 @@ pub fn postgres_url() -> String {
 
 pub fn mysql_url() -> String {
     dbg!(format!(
-        "mysql://root:prisma@{}:3306/{}?sslaccept=accept_invalid_certs",
-        db_host_mysql_5_7(),
-        SCHEMA_NAME
+        "mysql://root:prisma@{host}:3306/{schema_name}?sslaccept=accept_invalid_certs",
+        host = db_host_mysql_5_7(),
+        schema_name = SCHEMA_NAME
     ))
 }
 

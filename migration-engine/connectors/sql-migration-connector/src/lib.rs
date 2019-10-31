@@ -95,7 +95,7 @@ impl SqlMigrationConnector {
         // Async MySQL connections are lazy - we have to run a query to confirm that the schema we
         // connected to exists.
         if !schema.is_empty() {
-            conn.execute_raw(schema.as_str(), "SELECT 1 + 1", &[])?;
+            conn.query_raw(schema.as_str(), "SELECT 1 + 1", &[])?;
         }
 
         Ok(Self::create_connector(
