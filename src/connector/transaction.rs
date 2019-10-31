@@ -8,33 +8,26 @@ use crate::ast::*;
 /// transaction object will panic.
 pub struct Transaction<'a> {
     pub(crate) inner: &'a dyn Queryable,
-    done: bool,
 }
 
 impl<'a> Transaction<'a> {
     pub(crate) async fn new(inner: &'a dyn Queryable) -> crate::Result<Transaction<'a>> {
         inner.raw_cmd("BEGIN").await?;
-        Ok(Self { inner, done: false })
+        Ok(Self { inner })
     }
 
     /// Commit the changes to the database and consume the transaction.
-    pub async fn commit(mut self) -> crate::Result<()> {
-        self.done = true;
+    pub async fn commit(&self) -> crate::Result<()> {
         self.inner.raw_cmd("COMMIT").await?;
 
         Ok(())
     }
 
     /// Rolls back the changes to the database.
-    pub async fn rollback(&mut self) -> crate::Result<()> {
-        self.done = true;
+    pub async fn rollback(&self) -> crate::Result<()> {
         self.inner.raw_cmd("ROLLBACK").await?;
 
         Ok(())
-    }
-
-    pub fn is_done(&self) -> bool {
-        self.done
     }
 }
 
