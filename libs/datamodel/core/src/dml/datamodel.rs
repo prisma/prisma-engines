@@ -1,6 +1,5 @@
 use super::*;
 
-// TODO: Is schema the right name here?
 /// Represents a prisma-datamodel.
 #[derive(Debug, PartialEq, Clone)]
 pub struct Datamodel {

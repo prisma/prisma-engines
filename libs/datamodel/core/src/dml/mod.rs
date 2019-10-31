@@ -1,7 +1,3 @@
-// TODOs to answer together with rust teams:
-// * Should this structure be mutatble or immutable?
-// * Should this structure contain circular references? (Would make renaming models/fields MUCH easier)
-// * How do we handle ocnnector specific settings, like indeces? Maybe inheritance, traits and having a Connector<T>?
 mod comment;
 mod datamodel;
 mod enummodel;
