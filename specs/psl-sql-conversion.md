@@ -1,6 +1,6 @@
 # Implementation Spec: Mapping a Prisma Schema to a SQL Database
 
-The schema of the underlying database can be deducted from a Prisma schema. This document describes how this is done for SQL databases.
+The schema of the underlying database can be deducted from a [Prisma schema](https://github.com/prisma/specs/tree/master/schema). This document describes how this is done for SQL databases.
 
 
 ## Mapping Models
