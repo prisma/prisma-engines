@@ -1,66 +1,51 @@
-use super::PrismaConnectionManager;
+pub use mysql_async::OptsBuilder;
+
 use crate::{
-    connector::{metrics, Mysql, MysqlParams, Queryable},
+    connector::{Mysql, Queryable, DBIO},
     error::Error,
 };
-use failure::{Compat, Fail};
-use r2d2::ManageConnection;
-use std::convert::TryFrom;
+use futures::future;
+use tokio_resource_pool::{CheckOut, Manage, RealDependencies, Status};
 
-pub use mysql::OptsBuilder;
-pub use r2d2_mysql::MysqlConnectionManager;
+pub struct MysqlManager {
+    opts: OptsBuilder,
+}
 
-impl PrismaConnectionManager<MysqlConnectionManager> {
-    pub fn mysql(opts: OptsBuilder) -> Self {
-        Self {
-            inner: MysqlConnectionManager::new(opts),
-            file_path: None,
-            schema: None,
-        }
+impl MysqlManager {
+    pub fn new(opts: OptsBuilder) -> Self {
+        Self { opts }
     }
 }
 
-impl TryFrom<MysqlParams> for r2d2::Pool<PrismaConnectionManager<MysqlConnectionManager>> {
+impl Manage for MysqlManager {
+    type Resource = Mysql;
+    type Dependencies = RealDependencies;
+    type CheckOut = CheckOut<Self>;
     type Error = Error;
+    type CreateFuture = DBIO<'static, Self::Resource>;
+    type RecycleFuture = DBIO<'static, Option<Self::Resource>>;
 
-    fn try_from(params: MysqlParams) -> crate::Result<Self> {
-        let manager = PrismaConnectionManager::mysql(params.config);
-
-        let pool = r2d2::Pool::builder()
-            .max_size(params.connection_limit)
-            .test_on_check_out(false)
-            .build(manager)?;
-
-        Ok(pool)
-    }
-}
-
-impl ManageConnection for PrismaConnectionManager<MysqlConnectionManager> {
-    type Connection = Mysql;
-    type Error = Compat<Error>;
-
-    fn connect(&self) -> Result<Self::Connection, Self::Error> {
-        match metrics::connect("pool.mysql", || self.inner.connect()) {
-            Ok(client) => Ok(Mysql::from(client)),
-            Err(e) => Err(Error::from(e).compat()),
-        }
+    fn create(&self) -> Self::CreateFuture {
+        DBIO::new(match Mysql::new(self.opts.clone()) {
+            Ok(mysql) => future::ok(mysql),
+            Err(e) => future::err(e),
+        })
     }
 
-    fn is_valid(&self, conn: &mut Self::Connection) -> Result<(), Self::Error> {
-        match conn.query_raw("SELECT version()", &[]) {
-            Ok(_) => Ok(()),
-            Err(e) => Err(e.compat()),
-        }
+    fn status(&self, _: &Self::Resource) -> Status {
+        Status::Valid
     }
 
-    fn has_broken(&self, _: &mut Self::Connection) -> bool {
-        false
+    fn recycle(&self, connection: Self::Resource) -> Self::RecycleFuture {
+        DBIO::new(async {
+            connection.query_raw("", &[]).await?;
+            Ok(Some(connection))
+        })
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use std::env;
     use url::Url;
 
@@ -76,10 +61,9 @@ mod tests {
         );
 
         let url = Url::parse(&conn_string).unwrap();
-        let params = MysqlParams::try_from(url).unwrap();
-        let pool = r2d2::Pool::try_from(params).unwrap();
+        let pool = crate::pool::mysql(url).unwrap();
 
-        assert_eq!(num_cpus::get() * 2 + 4, pool.max_size() as usize);
+        assert_eq!(num_cpus::get_physical() * 2 + 1, pool.capacity());
     }
 
     #[test]
@@ -94,9 +78,8 @@ mod tests {
         );
 
         let url = Url::parse(&conn_string).unwrap();
-        let params = MysqlParams::try_from(url).unwrap();
-        let pool = r2d2::Pool::try_from(params).unwrap();
+        let pool = crate::pool::mysql(url).unwrap();
 
-        assert_eq!(10, pool.max_size());
+        assert_eq!(10, pool.capacity());
     }
 }

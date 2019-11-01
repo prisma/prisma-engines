@@ -76,40 +76,32 @@
 //! ```
 //! use prisma_query::{ast::*, connector::*};
 //!
-//! fn main() {
-//!     let mut conn = Sqlite::new("test.db").unwrap();
+//! #[tokio::main]
+//! async fn main() -> Result<(), prisma_query::error::Error> {
+//!     let mut conn = Sqlite::new("test.db")?;
 //!     let query = Select::default().value(1);
-//!     let result = conn.query(query.into()).unwrap();
+//!     let result = conn.query(query.into()).await?;
 //!
 //!     assert_eq!(
 //!         Some(1),
 //!         result.into_iter().nth(0).and_then(|row| row[0].as_i64()),
 //!     );
+//!
+//!     Ok(())
 //! }
 //! ```
 pub mod ast;
-#[cfg(any(
-    feature = "mysql-16",
-    feature = "postgresql-0_16",
-    feature = "rusqlite-0_19"
-))]
+#[cfg(any(feature = "mysql", feature = "postgresql", feature = "sqlite"))]
 pub mod connector;
 pub mod error;
-#[cfg(any(
-    feature = "mysql-16",
-    feature = "postgresql-0_16",
-    feature = "rusqlite-0_19"
-))]
+
+#[cfg(any(feature = "mysql", feature = "postgresql", feature = "sqlite"))]
 pub mod pool;
-#[cfg(any(
-    feature = "mysql-16",
-    feature = "postgresql-0_16",
-    feature = "rusqlite-0_19"
-))]
 pub mod visitor;
 
 #[cfg(not(feature = "tracing-log"))]
-#[macro_use] extern crate log;
+#[macro_use]
+extern crate log;
 
 #[macro_use]
 extern crate metrics;

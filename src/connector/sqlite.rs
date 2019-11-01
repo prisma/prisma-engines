@@ -3,23 +3,23 @@ mod error;
 
 use crate::{
     ast::{Id, ParameterizedValue, Query},
-    connector::{metrics, queryable::*, ResultSet, Transaction},
+    connector::{metrics, queryable::*, ResultSet, Transaction, DBIO},
     error::Error,
     visitor::{self, Visitor},
 };
+use futures::future;
 use rusqlite::NO_PARAMS;
-use std::{collections::HashSet, convert::TryFrom, path::PathBuf};
+use std::{collections::HashSet, convert::TryFrom, path::PathBuf, sync::Mutex};
 
 /// A connector interface for the SQLite database
 pub struct Sqlite {
-    pub(crate) client: rusqlite::Connection,
+    pub(crate) client: Mutex<rusqlite::Connection>,
     pub(crate) file_path: PathBuf,
 }
 
 pub struct SqliteParams {
     pub connection_limit: u32,
     pub file_path: PathBuf,
-    pub schema: Option<String>,
 }
 
 type ConnectionParams = (Vec<(String, String)>, Vec<(String, String)>);
@@ -31,7 +31,6 @@ impl TryFrom<&str> for SqliteParams {
         let path = path.trim_start_matches("file:");
         let path_parts: Vec<&str> = path.split('?').collect();
         let path = PathBuf::from(path_parts[0]);
-        let schema = path.file_stem().unwrap().to_str().unwrap().to_owned();
 
         if path.is_dir() {
             Err(Error::DatabaseUrlIsInvalid(
@@ -66,8 +65,11 @@ impl TryFrom<&str> for SqliteParams {
                             #[cfg(not(feature = "tracing-log"))]
                             trace!("Discarding connection string param: {}", k);
                             #[cfg(feature = "tracing-log")]
-                            tracing::trace!(message = "Discarding connection string param", param = k.as_str());
-                        },
+                            tracing::trace!(
+                                message = "Discarding connection string param",
+                                param = k.as_str()
+                            );
+                        }
                     };
                 }
             }
@@ -75,7 +77,6 @@ impl TryFrom<&str> for SqliteParams {
             Ok(Self {
                 connection_limit: u32::try_from(connection_limit).unwrap(),
                 file_path: path,
-                schema: Some(schema),
             })
         }
     }
@@ -86,7 +87,7 @@ impl TryFrom<&str> for Sqlite {
 
     fn try_from(path: &str) -> crate::Result<Self> {
         let params = SqliteParams::try_from(path)?;
-        let client = metrics::connect("sqlite", rusqlite::Connection::open_in_memory)?;
+        let client = Mutex::new(rusqlite::Connection::open_in_memory()?);
         let file_path = params.file_path;
 
         Ok(Sqlite { client, file_path })
@@ -102,7 +103,8 @@ impl Sqlite {
     }
 
     pub fn attach_database(&mut self, db_name: &str) -> crate::Result<()> {
-        let mut stmt = self.client.prepare("PRAGMA database_list")?;
+        let client = self.client.lock().unwrap();
+        let mut stmt = client.prepare("PRAGMA database_list")?;
 
         let databases: HashSet<String> = stmt
             .query_map(NO_PARAMS, |row| {
@@ -115,73 +117,109 @@ impl Sqlite {
 
         if !databases.contains(db_name) {
             rusqlite::Connection::execute(
-                &self.client,
+                &client,
                 "ATTACH DATABASE ? AS ?",
                 &[self.file_path.to_str().unwrap(), db_name],
             )?;
         }
 
-        rusqlite::Connection::execute(&self.client, "PRAGMA foreign_keys = ON", NO_PARAMS)?;
+        rusqlite::Connection::execute(&client, "PRAGMA foreign_keys = ON", NO_PARAMS)?;
 
         Ok(())
     }
 }
 
 impl Queryable for Sqlite {
-    fn execute(&mut self, q: Query) -> crate::Result<Option<Id>> {
-        let (sql, params) = visitor::Sqlite::build(q);
-        self.execute_raw(&sql, &params)?;
+    fn execute<'a>(&'a self, q: Query<'a>) -> DBIO<'a, Option<Id>> {
+        DBIO::new(async move {
+            let (sql, params) = visitor::Sqlite::build(q);
 
-        Ok(Some(Id::Int(self.client.last_insert_rowid() as usize)))
+            self.execute_raw(&sql, &params).await?;
+
+            let client = self.client.lock().unwrap();
+            let res = Some(Id::Int(client.last_insert_rowid() as usize));
+
+            Ok(res)
+        })
     }
 
-    fn query(&mut self, q: Query) -> crate::Result<ResultSet> {
+    fn query<'a>(&'a self, q: Query<'a>) -> DBIO<'a, ResultSet> {
         let (sql, params) = visitor::Sqlite::build(q);
-        self.query_raw(&sql, &params)
+
+        DBIO::new(async move { self.query_raw(&sql, &params).await })
     }
 
-    fn query_raw(&mut self, sql: &str, params: &[ParameterizedValue]) -> crate::Result<ResultSet> {
-        metrics::query("sqlite.query_raw", sql, params, || {
-            let mut stmt = self.client.prepare_cached(sql)?;
-            let mut rows = stmt.query(params)?;
+    fn query_raw<'a>(
+        &'a self,
+        sql: &'a str,
+        params: &'a [ParameterizedValue],
+    ) -> DBIO<'a, ResultSet> {
+        metrics::query("sqlite.query_raw", sql, params, move || {
+            let res = move || {
+                let client = self.client.lock().unwrap();
+                let mut stmt = client.prepare_cached(sql)?;
+                let mut rows = stmt.query(params)?;
 
-            let mut result = ResultSet::new(rows.to_column_names(), Vec::new());
+                let mut result = ResultSet::new(rows.to_column_names(), Vec::new());
 
-            while let Some(row) = rows.next()? {
-                result.rows.push(row.to_result_row()?);
+                while let Some(row) = rows.next()? {
+                    result.rows.push(row.to_result_row()?);
+                }
+
+                Ok(result)
+            };
+
+            match res() {
+                Ok(res) => future::ok(res),
+                Err(e) => future::err(e),
             }
-
-            Ok(result)
         })
     }
 
-    fn execute_raw(&mut self, sql: &str, params: &[ParameterizedValue]) -> crate::Result<u64> {
-        metrics::query("sqlite.execute_raw", sql, params, || {
-            let mut stmt = self.client.prepare_cached(sql)?;
-            let changes = stmt.execute(params)?;
+    fn execute_raw<'a>(&'a self, sql: &'a str, params: &'a [ParameterizedValue]) -> DBIO<'a, u64> {
+        metrics::query("sqlite.execute_raw", sql, params, move || {
+            let res = move || {
+                let client = self.client.lock().unwrap();
 
-            Ok(u64::try_from(changes).unwrap())
+                let mut stmt = client.prepare_cached(sql)?;
+                let changes = stmt.execute(params)?;
+
+                Ok(u64::try_from(changes).unwrap())
+            };
+
+            match res() {
+                Ok(res) => future::ok(res),
+                Err(e) => future::err(e),
+            }
         })
     }
 
-    fn turn_off_fk_constraints(&mut self) -> crate::Result<()> {
-        self.query_raw("PRAGMA foreign_keys = OFF", &[])?;
-        Ok(())
-    }
-
-    fn turn_on_fk_constraints(&mut self) -> crate::Result<()> {
-        self.query_raw("PRAGMA foreign_keys = ON", &[])?;
-        Ok(())
-    }
-
-    fn start_transaction<'b>(&'b mut self) -> crate::Result<Transaction<'b>> {
-        Ok(Transaction::new(self)?)
-    }
-
-    fn raw_cmd(&mut self, cmd: &str) -> crate::Result<()> {
-        metrics::query("sqlite.raw_cmd", cmd, &[], || {
-            self.client.execute_batch(cmd)?;
+    fn turn_off_fk_constraints(&self) -> DBIO<()> {
+        DBIO::new(async move {
+            self.query_raw("PRAGMA foreign_keys = OFF", &[]).await?;
             Ok(())
+        })
+    }
+
+    fn turn_on_fk_constraints(&self) -> DBIO<()> {
+        DBIO::new(async move {
+            self.query_raw("PRAGMA foreign_keys = ON", &[]).await?;
+            Ok(())
+        })
+    }
+
+    fn start_transaction<'b>(&'b self) -> DBIO<'b, Transaction<'b>> {
+        DBIO::new(async move { Transaction::new(self).await })
+    }
+
+    fn raw_cmd<'a>(&'a self, cmd: &'a str) -> DBIO<'a, ()> {
+        metrics::query("sqlite.raw_cmd", cmd, &[], move || {
+            let client = self.client.lock().unwrap();
+
+            match client.execute_batch(cmd) {
+                Ok(_) => future::ok(()),
+                Err(e) => future::err(e.into()),
+            }
         })
     }
 }
@@ -191,21 +229,25 @@ mod tests {
     use super::*;
     use crate::connector::Queryable;
 
-    #[test]
-    fn should_provide_a_database_connection() {
-        let mut connection = Sqlite::new(String::from("db/test.db")).unwrap();
+    #[tokio::test]
+    async fn should_provide_a_database_connection() {
+        let connection = Sqlite::new(String::from("db/test.db")).unwrap();
         let res = connection
             .query_raw("SELECT * FROM sqlite_master", &[])
+            .await
             .unwrap();
 
         assert!(res.is_empty());
     }
 
-    #[test]
-    fn should_provide_a_database_transaction() {
-        let mut connection = Sqlite::new(String::from("db/test.db")).unwrap();
-        let mut tx = connection.start_transaction().unwrap();
-        let res = tx.query_raw("SELECT * FROM sqlite_master", &[]).unwrap();
+    #[tokio::test]
+    async fn should_provide_a_database_transaction() {
+        let connection = Sqlite::new(String::from("db/test.db")).unwrap();
+        let tx = connection.start_transaction().await.unwrap();
+        let res = tx
+            .query_raw("SELECT * FROM sqlite_master", &[])
+            .await
+            .unwrap();
 
         assert!(res.is_empty());
     }
@@ -226,14 +268,17 @@ mod tests {
     VALUES (1, 'Joe', 27, 20000.00 );
     "#;
 
-    #[test]
-    fn should_map_columns_correctly() {
-        let mut connection = Sqlite::try_from("file:db/test.db").unwrap();
+    #[tokio::test]
+    async fn should_map_columns_correctly() {
+        let connection = Sqlite::try_from("file:db/test.db").unwrap();
 
-        connection.query_raw(TABLE_DEF, &[]).unwrap();
-        connection.query_raw(CREATE_USER, &[]).unwrap();
+        connection.query_raw(TABLE_DEF, &[]).await.unwrap();
+        connection.query_raw(CREATE_USER, &[]).await.unwrap();
 
-        let rows = connection.query_raw("SELECT * FROM USER", &[]).unwrap();
+        let rows = connection
+            .query_raw("SELECT * FROM USER", &[])
+            .await
+            .unwrap();
         assert_eq!(rows.len(), 1);
 
         let row = rows.get(0).unwrap();

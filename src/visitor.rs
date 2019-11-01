@@ -7,24 +7,24 @@
 //!
 //! For prelude, all important imports are in `prisma_query::visitor::*`;
 use crate::ast::*;
-use std::borrow::Cow;
+use std::{borrow::Cow, fmt};
 
-#[cfg(feature = "rusqlite-0_19")]
+#[cfg(feature = "sqlite")]
 mod sqlite;
 
-#[cfg(feature = "rusqlite-0_19")]
+#[cfg(feature = "sqlite")]
 pub use self::sqlite::Sqlite;
 
-#[cfg(feature = "postgresql-0_16")]
+#[cfg(feature = "postgresql")]
 mod postgres;
 
-#[cfg(feature = "postgresql-0_16")]
+#[cfg(feature = "postgresql")]
 pub use self::postgres::Postgres;
 
-#[cfg(feature = "mysql-16")]
+#[cfg(feature = "mysql")]
 mod mysql;
 
-#[cfg(feature = "mysql-16")]
+#[cfg(feature = "mysql")]
 pub use self::mysql::Mysql;
 
 /// A function travelling through the query AST, building the final query string
@@ -59,6 +59,18 @@ pub trait Visitor<'a> {
     where
         Q: Into<Query<'a>>;
 
+    /// Write to the query.
+    fn write<D: fmt::Display>(&mut self, s: D) -> fmt::Result;
+
+    fn surround_with<F>(&mut self, begin: &str, end: &str, f: F) -> fmt::Result
+    where
+        F: FnOnce(&mut Self) -> fmt::Result
+    {
+        self.write(begin)?;
+        f(self)?;
+        self.write(end)
+    }
+
     /// When called, the visitor decided to not render the parameter into the query,
     /// replacing it with the `C_PARAM`, calling `add_parameter` with the replaced value.
     fn add_parameter(&mut self, value: ParameterizedValue<'a>);
@@ -68,288 +80,314 @@ pub trait Visitor<'a> {
         &mut self,
         limit: Option<ParameterizedValue<'a>>,
         offset: Option<ParameterizedValue<'a>>,
-    ) -> Option<String>;
+    ) -> fmt::Result;
 
     /// A walk through an `INSERT` statement
-    fn visit_insert(&mut self, insert: Insert<'a>) -> String;
+    fn visit_insert(&mut self, insert: Insert<'a>) -> fmt::Result;
 
     /// What to use to substitute a parameter in the query.
-    fn parameter_substitution(&self) -> String;
+    fn parameter_substitution(&mut self) -> fmt::Result;
 
     /// What to use to substitute a parameter in the query.
-    fn visit_aggregate_to_string(&mut self, value: DatabaseValue<'a>) -> String;
+    fn visit_aggregate_to_string(&mut self, value: DatabaseValue<'a>) -> fmt::Result;
 
     /// A visit to a value we parameterize
-    fn visit_parameterized(&mut self, value: ParameterizedValue<'a>) -> String {
+    fn visit_parameterized(&mut self, value: ParameterizedValue<'a>) -> fmt::Result {
         self.add_parameter(value);
         self.parameter_substitution()
     }
 
     /// The join statements in the query
-    fn visit_joins(&mut self, joins: Vec<Join<'a>>) -> String {
-        let result = joins.into_iter().fold(Vec::new(), |mut acc, j| {
+    fn visit_joins(&mut self, joins: Vec<Join<'a>>) -> fmt::Result {
+        for j in joins {
             match j {
-                Join::Inner(data) => acc.push(format!("INNER JOIN {}", self.visit_join_data(data))),
+                Join::Inner(data) => {
+                    self.write(" INNER JOIN ")?;
+                    self.visit_join_data(data)?;
+                }
                 Join::LeftOuter(data) => {
-                    acc.push(format!("LEFT OUTER JOIN {}", self.visit_join_data(data)))
+                    self.write(" LEFT OUTER JOIN ")?;
+                    self.visit_join_data(data)?;
                 }
             }
+        }
 
-            acc
-        });
-
-        result.join(" ")
+        Ok(())
     }
 
-    fn visit_join_data(&mut self, data: JoinData<'a>) -> String {
-        format!(
-            "{} ON {}",
-            self.visit_table(data.table, true),
-            self.visit_conditions(data.conditions)
-        )
+    fn visit_join_data(&mut self, data: JoinData<'a>) -> fmt::Result {
+        self.visit_table(data.table, true)?;
+        self.write(" ON ")?;
+        self.visit_conditions(data.conditions)
     }
 
     /// A walk through a `SELECT` statement
-    fn visit_select(&mut self, select: Select<'a>) -> String {
-        let mut result = vec!["SELECT".to_string()];
+    fn visit_select(&mut self, select: Select<'a>) -> fmt::Result {
+        self.write("SELECT ")?;
 
         if let Some(table) = select.table {
             if select.columns.is_empty() {
                 match table.typ {
                     TableType::Query(_) => match table.alias {
                         Some(ref alias) => {
-                            result.push(format!("{}.*", Self::delimited_identifiers(vec![alias])))
+                            self.surround_with(Self::C_BACKTICK, Self::C_BACKTICK, |ref mut s| {
+                                s.write(alias)
+                            })?;
+                            self.write(".*")?;
                         }
-                        None => result.push(String::from("*")),
+                        None => self.write("*")?,
                     },
                     TableType::Table(_) => {
                         match table.alias.clone() {
-                            Some(ref alias) => result
-                                .push(format!("{}.*", Self::delimited_identifiers(vec![alias]))),
-                            None => result
-                                .push(format!("{}.*", self.visit_table(*table.clone(), false))),
+                            Some(ref alias) => {
+                                self.surround_with(Self::C_BACKTICK, Self::C_BACKTICK, |ref mut s| {
+                                    s.write(alias)
+                                })?;
+                                self.write(".*")?;
+                            }
+                            None => {
+                                self.visit_table(*table.clone(), false)?;
+                                self.write(".*")?;
+                            }
                         }
                     }
                 }
             } else {
-                result.push(self.visit_columns(select.columns));
+                self.visit_columns(select.columns)?;
             }
 
-            result.push(format!("FROM {}", self.visit_table(*table, true)));
+            self.write(" FROM ")?;
+            self.visit_table(*table, true)?;
 
             if !select.joins.is_empty() {
-                result.push(self.visit_joins(select.joins));
+                self.visit_joins(select.joins)?;
             }
 
             if let Some(conditions) = select.conditions {
-                result.push(format!("WHERE {}", self.visit_conditions(conditions)));
+                self.write(" WHERE ")?;
+                self.visit_conditions(conditions)?;
             }
             if !select.ordering.is_empty() {
-                result.push(format!("ORDER BY {}", self.visit_ordering(select.ordering)));
+                self.write(" ORDER BY ")?;
+                self.visit_ordering(select.ordering)?;
             }
             if !select.grouping.is_empty() {
-                result.push(format!("GROUP BY {}", self.visit_grouping(select.grouping)));
+                self.write(" GROUP BY ")?;
+                self.visit_grouping(select.grouping)?;
             }
 
-            if let Some(window) = self.visit_limit_and_offset(select.limit, select.offset) {
-                result.push(window);
-            }
+            self.visit_limit_and_offset(select.limit, select.offset)?;
         } else if select.columns.is_empty() {
-            result.push(String::from("*"));
+            self.write(" *")?;
         } else {
-            result.push(self.visit_columns(select.columns));
+            self.visit_columns(select.columns)?;
         }
 
-        result.join(" ")
+        Ok(())
     }
 
     /// A walk through an `UPDATE` statement
-    fn visit_update(&mut self, update: Update<'a>) -> String {
-        let mut result = vec![format!(
-            "UPDATE {} SET",
-            self.visit_table(update.table, true)
-        )];
+    fn visit_update(&mut self, update: Update<'a>) -> fmt::Result {
+        self.write("UPDATE ")?;
+        self.visit_table(update.table, true)?;
 
         {
+            self.write(" SET ")?;
             let pairs = update.columns.into_iter().zip(update.values.into_iter());
+            let len = pairs.len();
 
-            let assignments: Vec<String> = pairs
-                .map(|(key, value)| {
-                    format!(
-                        "{} = {}",
-                        self.visit_column(key),
-                        self.visit_database_value(value)
-                    )
-                })
-                .collect();
+            for (i, (key, value)) in pairs.enumerate() {
+                self.visit_column(key)?;
+                self.write(" = ")?;
+                self.visit_database_value(value)?;
 
-            result.push(assignments.join(", "));
+                if i < (len - 1) {
+                    self.write(", ")?;
+                }
+            }
         }
 
         if let Some(conditions) = update.conditions {
-            result.push(format!("WHERE {}", self.visit_conditions(conditions)));
+            self.write(" WHERE ")?;
+            self.visit_conditions(conditions)?;
         }
 
-        result.join(" ")
+        Ok(())
     }
 
     /// A walk through an `DELETE` statement
-    fn visit_delete(&mut self, delete: Delete<'a>) -> String {
-        let mut result = vec![format!(
-            "DELETE FROM {}",
-            self.visit_table(delete.table, true)
-        )];
+    fn visit_delete(&mut self, delete: Delete<'a>) -> fmt::Result {
+        self.write("DELETE FROM ")?;
+        self.visit_table(delete.table, true)?;
 
         if let Some(conditions) = delete.conditions {
-            result.push(format!("WHERE {}", self.visit_conditions(conditions)));
+            self.write(" WHERE ")?;
+            self.visit_conditions(conditions)?;
         }
 
-        result.join(" ")
+        Ok(())
     }
 
     /// A helper for delimiting an identifier, surrounding every part with `C_BACKTICK`
     /// and delimiting the values with a `.`
-    ///
-    /// ```rust
-    /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
-    /// assert_eq!(
-    ///     "`a`.`b`",
-    ///     Sqlite::delimited_identifiers(vec!["a".into(), "b".into()])
-    /// );
-    /// ```
-    fn delimited_identifiers(parts: Vec<&str>) -> String {
-        let mut result = Vec::new();
+    fn delimited_identifiers(&mut self, parts: &[&str]) -> fmt::Result {
+        let len = parts.len();
 
-        for part in parts.into_iter() {
-            result.push(format!("{}{}{}", Self::C_BACKTICK, part, Self::C_BACKTICK));
+        for (i, parts) in parts.into_iter().enumerate() {
+            self.surround_with(Self::C_BACKTICK, Self::C_BACKTICK, |ref mut s| s.write(parts))?;
+
+            if i < (len - 1) {
+                self.write(".")?;
+            }
         }
 
-        result.join(".")
+        Ok(())
     }
 
     /// A walk through a complete `Query` statement
-    fn visit_query(&mut self, query: Query<'a>) -> String {
+    fn visit_query(&mut self, query: Query<'a>) {
         match query {
-            Query::Select(select) => self.visit_select(select),
-            Query::Insert(insert) => self.visit_insert(*insert),
-            Query::Update(update) => self.visit_update(*update),
-            Query::Delete(delete) => self.visit_delete(*delete),
-            Query::UnionAll(union) => self.visit_union_all(union),
-            Query::Raw(string) => string.into_owned(),
+            Query::Select(select) => self.visit_select(select).unwrap(),
+            Query::Insert(insert) => self.visit_insert(*insert).unwrap(),
+            Query::Update(update) => self.visit_update(*update).unwrap(),
+            Query::Delete(delete) => self.visit_delete(*delete).unwrap(),
+            Query::UnionAll(union) => self.visit_union_all(union).unwrap(),
+            Query::Raw(string) => self.write(string).unwrap(),
         }
     }
 
     /// A walk through a union of `SELECT` statements
-    fn visit_union_all(&mut self, ua: UnionAll<'a>) -> String {
-        let selects: Vec<String> =
-            ua.0.into_iter()
-                .map(|s| format!("({})", self.visit_select(s)))
-                .collect();
+    fn visit_union_all(&mut self, ua: UnionAll<'a>) -> fmt::Result {
+        let len = ua.0.len();
 
-        selects.join(" UNION ALL ")
+        for (i, s) in ua.0.into_iter().enumerate() {
+            self.surround_with("(", ")", |ref mut se| se.visit_select(s))?;
+
+            if i < (len - 1) {
+                self.write(" UNION ALL ")?;
+            }
+        }
+
+        Ok(())
     }
 
     /// The selected columns
-    fn visit_columns(&mut self, columns: Vec<DatabaseValue<'a>>) -> String {
-        let mut values = Vec::new();
+    fn visit_columns(&mut self, columns: Vec<DatabaseValue<'a>>) -> fmt::Result {
+        let len = columns.len();
 
-        for column in columns.into_iter() {
-            values.push(self.visit_database_value(column));
+        for (i, column) in columns.into_iter().enumerate() {
+            self.visit_database_value(column)?;
+
+            if i < (len - 1) {
+                self.write(", ")?;
+            }
         }
 
-        values.join(", ")
+        Ok(())
     }
 
     /// A visit to a value used in an expression
-    fn visit_database_value(&mut self, value: DatabaseValue<'a>) -> String {
+    fn visit_database_value(&mut self, value: DatabaseValue<'a>) -> fmt::Result {
         match value {
             DatabaseValue::Parameterized(val) => self.visit_parameterized(val),
             DatabaseValue::Column(column) => self.visit_column(*column),
             DatabaseValue::Row(row) => self.visit_row(row),
-            DatabaseValue::Select(select) => format!("({})", self.visit_select(select)),
+            DatabaseValue::Select(select) => self.surround_with("(", ")", |ref mut s| {
+                s.visit_select(select)
+            }),
             DatabaseValue::Function(function) => self.visit_function(function),
             DatabaseValue::Asterisk(table) => match table {
-                Some(table) => format!("{}.*", self.visit_table(*table, false)),
-                None => String::from("*"),
+                Some(table) => {
+                    self.visit_table(*table, false)?;
+                    self.write(".*")
+                }
+                None => self.write("*"),
             },
         }
     }
 
     /// A database table identifier
-    fn visit_table(&mut self, table: Table<'a>, include_alias: bool) -> String {
-        let mut result = match table.typ {
+    fn visit_table(&mut self, table: Table<'a>, include_alias: bool) -> fmt::Result {
+        match table.typ {
             TableType::Table(table_name) => match table.database {
-                Some(database) => Self::delimited_identifiers(vec![&*database, &*table_name]),
-                None => Self::delimited_identifiers(vec![&*table_name]),
+                Some(database) => self.delimited_identifiers(&[&*database, &*table_name])?,
+                None => self.delimited_identifiers(&[&*table_name])?,
             },
-            TableType::Query(select) => format!("({})", self.visit_select(select)),
+            TableType::Query(select) => self.surround_with("(", ")", |ref mut s| s.visit_select(select))?,
         };
 
         if include_alias {
             if let Some(alias) = table.alias {
-                result.push_str(" AS ");
-                result.push_str(&Self::delimited_identifiers(vec![&*alias]));
+                self.write(" AS ")?;
+
+                self.delimited_identifiers(&[&*alias])?;
             };
         }
 
-        result
+        Ok(())
     }
 
     /// A database column identifier
-    fn visit_column(&mut self, column: Column<'a>) -> String {
-        let mut column_identifier = match column.table {
-            Some(table) => format!(
-                "{}.{}",
-                self.visit_table(table, false),
-                Self::delimited_identifiers(vec![&*column.name])
-            ),
-            _ => Self::delimited_identifiers(vec![&*column.name]),
+    fn visit_column(&mut self, column: Column<'a>) -> fmt::Result {
+        match column.table {
+            Some(table) => {
+                self.visit_table(table, false)?;
+                self.write(".")?;
+                self.delimited_identifiers(&[&*column.name])?;
+            },
+            _ => self.delimited_identifiers(&[&*column.name])?,
         };
 
         if let Some(alias) = column.alias {
-            column_identifier.push_str(" AS ");
-            column_identifier.push_str(&Self::delimited_identifiers(vec![&*alias]));
+            self.write(" AS ")?;
+            self.delimited_identifiers(&[&*alias])?;
         }
 
-        column_identifier
+        Ok(())
     }
 
     /// A row of data used as an expression
-    fn visit_row(&mut self, row: Row<'a>) -> String {
-        let mut values = Vec::new();
+    fn visit_row(&mut self, row: Row<'a>) -> fmt::Result {
+        self.surround_with("(", ")", |ref mut s| {
+            let len = row.values.len();
+            for (i, value) in row.values.into_iter().enumerate() {
+                s.visit_database_value(value)?;
 
-        for value in row.values.into_iter() {
-            values.push(self.visit_database_value(value));
-        }
+                if i < (len - 1) {
+                    s.write(",")?;
+                }
+            }
 
-        format!("({})", values.join(", "))
+            Ok(())
+        })
     }
 
     /// A walk through the query conditions
-    fn visit_conditions(&mut self, tree: ConditionTree<'a>) -> String {
+    fn visit_conditions(&mut self, tree: ConditionTree<'a>) -> fmt::Result {
         match tree {
-            ConditionTree::And(left, right) => format!(
-                "({} AND {})",
-                self.visit_expression(*left),
-                self.visit_expression(*right),
-            ),
-            ConditionTree::Or(left, right) => format!(
-                "({} OR {})",
-                self.visit_expression(*left),
-                self.visit_expression(*right),
-            ),
-            ConditionTree::Not(expression) => {
-                format!("(NOT {})", self.visit_expression(*expression))
-            }
+            ConditionTree::And(left, right) => self.surround_with("(", ")", |ref mut s| {
+                s.visit_expression(*left)?;
+                s.write(" AND ")?;
+                s.visit_expression(*right)
+            }),
+            ConditionTree::Or(left, right) => self.surround_with("(", ")", |ref mut s| {
+                s.visit_expression(*left)?;
+                s.write(" OR ")?;
+                s.visit_expression(*right)
+            }),
+            ConditionTree::Not(expression) => self.surround_with("(", ")", |ref mut s| {
+                s.write("NOT ")?;
+                s.visit_expression(*expression)
+            }),
             ConditionTree::Single(expression) => self.visit_expression(*expression),
-            ConditionTree::NoCondition => String::from("1=1"),
-            ConditionTree::NegativeCondition => String::from("1=0"),
+            ConditionTree::NoCondition => self.write("1=1"),
+            ConditionTree::NegativeCondition => self.write("1=0"),
         }
     }
 
     /// An expression that can either be a single value, a set of conditions or
     /// a comparison call
-    fn visit_expression(&mut self, expression: Expression<'a>) -> String {
+    fn visit_expression(&mut self, expression: Expression<'a>) -> fmt::Result {
         match expression {
             Expression::Value(value) => self.visit_database_value(*value),
             Expression::ConditionTree(tree) => self.visit_conditions(tree),
@@ -358,209 +396,243 @@ pub trait Visitor<'a> {
     }
 
     /// A comparison expression
-    fn visit_compare(&mut self, compare: Compare<'a>) -> String {
+    fn visit_compare(&mut self, compare: Compare<'a>) -> fmt::Result {
         match compare {
-            Compare::Equals(left, right) => format!(
-                "{} = {}",
-                self.visit_database_value(*left),
-                self.visit_database_value(*right),
-            ),
-            Compare::NotEquals(left, right) => format!(
-                "{} <> {}",
-                self.visit_database_value(*left),
-                self.visit_database_value(*right),
-            ),
-            Compare::LessThan(left, right) => format!(
-                "{} < {}",
-                self.visit_database_value(*left),
-                self.visit_database_value(*right),
-            ),
-            Compare::LessThanOrEquals(left, right) => format!(
-                "{} <= {}",
-                self.visit_database_value(*left),
-                self.visit_database_value(*right),
-            ),
-            Compare::GreaterThan(left, right) => format!(
-                "{} > {}",
-                self.visit_database_value(*left),
-                self.visit_database_value(*right),
-            ),
-            Compare::GreaterThanOrEquals(left, right) => format!(
-                "{} >= {}",
-                self.visit_database_value(*left),
-                self.visit_database_value(*right),
-            ),
+            Compare::Equals(left, right) => {
+                self.visit_database_value(*left)?;
+                self.write(" = ")?;
+                self.visit_database_value(*right)
+            },
+            Compare::NotEquals(left, right) => {
+                self.visit_database_value(*left)?;
+                self.write(" <> ")?;
+                self.visit_database_value(*right)
+            },
+            Compare::LessThan(left, right) => {
+                self.visit_database_value(*left)?;
+                self.write(" < ")?;
+                self.visit_database_value(*right)
+            },
+            Compare::LessThanOrEquals(left, right) => {
+                self.visit_database_value(*left)?;
+                self.write(" <= ")?;
+                self.visit_database_value(*right)
+            },
+            Compare::GreaterThan(left, right) => {
+                self.visit_database_value(*left)?;
+                self.write(" > ")?;
+                self.visit_database_value(*right)
+            },
+            Compare::GreaterThanOrEquals(left, right) => {
+                self.visit_database_value(*left)?;
+                self.write(" >= ")?;
+                self.visit_database_value(*right)
+            },
             Compare::In(left, right) => match *right {
-                DatabaseValue::Row(ref row) if row.is_empty() => String::from("1=0"),
-                _ => format!(
-                    "{} IN {}",
-                    self.visit_database_value(*left),
-                    self.visit_database_value(*right),
-                ),
+                DatabaseValue::Row(ref row) if row.is_empty() => self.write("1=0"),
+                _ => {
+                    self.visit_database_value(*left)?;
+                    self.write(" IN ")?;
+                    self.visit_database_value(*right)
+                },
             },
             Compare::NotIn(left, right) => match *right {
-                DatabaseValue::Row(ref row) if row.is_empty() => String::from("1=1"),
-                _ => format!(
-                    "{} NOT IN {}",
-                    self.visit_database_value(*left),
-                    self.visit_database_value(*right),
-                ),
+                DatabaseValue::Row(ref row) if row.is_empty() => self.write("1=1"),
+                _ => {
+                    self.visit_database_value(*left)?;
+                    self.write(" NOT IN ")?;
+                    self.visit_database_value(*right)
+                },
             },
             Compare::Like(left, right) => {
-                let expression = self.visit_database_value(*left);
+                self.visit_database_value(*left)?;
+
                 self.add_parameter(ParameterizedValue::Text(Cow::from(format!(
                     "{}{}{}",
                     Self::C_WILDCARD,
                     right,
                     Self::C_WILDCARD
                 ))));
-                format!("{} LIKE {}", expression, self.parameter_substitution())
+
+                self.write(" LIKE ")?;
+                self.parameter_substitution()
             }
             Compare::NotLike(left, right) => {
-                let expression = self.visit_database_value(*left);
+                self.visit_database_value(*left)?;
+
                 self.add_parameter(ParameterizedValue::Text(Cow::from(format!(
                     "{}{}{}",
                     Self::C_WILDCARD,
                     right,
                     Self::C_WILDCARD
                 ))));
-                format!("{} NOT LIKE {}", expression, self.parameter_substitution())
+
+                self.write(" NOT LIKE ")?;
+                self.parameter_substitution()
             }
             Compare::BeginsWith(left, right) => {
-                let expression = self.visit_database_value(*left);
+                self.visit_database_value(*left)?;
+
                 self.add_parameter(ParameterizedValue::Text(Cow::from(format!(
                     "{}{}",
                     right,
                     Self::C_WILDCARD
                 ))));
-                format!("{} LIKE {}", expression, self.parameter_substitution())
+
+                self.write(" LIKE ")?;
+                self.parameter_substitution()
             }
             Compare::NotBeginsWith(left, right) => {
-                let expression = self.visit_database_value(*left);
+                self.visit_database_value(*left)?;
+
                 self.add_parameter(ParameterizedValue::Text(Cow::from(format!(
                     "{}{}",
                     right,
                     Self::C_WILDCARD
                 ))));
-                format!("{} NOT LIKE {}", expression, self.parameter_substitution())
+
+                self.write(" NOT LIKE ")?;
+                self.parameter_substitution()
             }
             Compare::EndsInto(left, right) => {
-                let expression = self.visit_database_value(*left);
+                self.visit_database_value(*left)?;
+
                 self.add_parameter(ParameterizedValue::Text(Cow::from(format!(
                     "{}{}",
                     Self::C_WILDCARD,
-                    right
+                    right,
                 ))));
-                format!("{} LIKE {}", expression, self.parameter_substitution())
+
+                self.write(" LIKE ")?;
+                self.parameter_substitution()
             }
             Compare::NotEndsInto(left, right) => {
-                let expression = self.visit_database_value(*left);
+                self.visit_database_value(*left)?;
+
                 self.add_parameter(ParameterizedValue::Text(Cow::from(format!(
                     "{}{}",
                     Self::C_WILDCARD,
-                    right
+                    right,
                 ))));
-                format!("{} NOT LIKE {}", expression, self.parameter_substitution())
+
+                self.write(" NOT LIKE ")?;
+                self.parameter_substitution()
             }
-            Compare::Null(column) => format!("{} IS NULL", self.visit_database_value(*column)),
+            Compare::Null(column) => {
+                self.visit_database_value(*column)?;
+                self.write(" IS NULL")
+            }
             Compare::NotNull(column) => {
-                format!("{} IS NOT NULL", self.visit_database_value(*column))
+                self.visit_database_value(*column)?;
+                self.write(" IS NOT NULL")
             }
-            Compare::Between(val, left, right) => format!(
-                "{} BETWEEN {} AND {}",
-                self.visit_database_value(*val),
-                self.visit_database_value(*left),
+            Compare::Between(val, left, right) => {
+                self.visit_database_value(*val)?;
+                self.write(" BETWEEN ")?;
+                self.visit_database_value(*left)?;
+                self.write(" AND ")?;
                 self.visit_database_value(*right)
-            ),
-            Compare::NotBetween(val, left, right) => format!(
-                "{} NOT BETWEEN {} AND {}",
-                self.visit_database_value(*val),
-                self.visit_database_value(*left),
+            },
+            Compare::NotBetween(val, left, right) => {
+                self.visit_database_value(*val)?;
+                self.write(" NOT BETWEEN ")?;
+                self.visit_database_value(*left)?;
+                self.write(" AND ")?;
                 self.visit_database_value(*right)
-            ),
+            },
         }
     }
 
     /// A visit in the `ORDER BY` section of the query
-    fn visit_ordering(&mut self, ordering: Ordering<'a>) -> String {
-        let mut result = Vec::new();
+    fn visit_ordering(&mut self, ordering: Ordering<'a>) -> fmt::Result {
+        let len = ordering.0.len();
 
-        for (value, ordering) in ordering.0.into_iter() {
+        for (i, (value, ordering)) in ordering.0.into_iter().enumerate() {
             let direction = ordering.map(|dir| match dir {
                 Order::Asc => " ASC",
                 Order::Desc => " DESC",
             });
 
-            result.push(format!(
-                "{}{}",
-                self.visit_database_value(value),
-                direction.unwrap_or("")
-            ));
+            self.visit_database_value(value)?;
+            self.write(direction.unwrap_or(""))?;
+
+            if i < (len - 1) {
+                self.write(", ")?;
+            }
         }
 
-        result.join(", ")
+        Ok(())
     }
 
     /// A visit in the `GROUP BY` section of the query
-    fn visit_grouping(&mut self, grouping: Grouping<'a>) -> String {
-        let mut result = Vec::new();
+    fn visit_grouping(&mut self, grouping: Grouping<'a>) -> fmt::Result {
+        let len = grouping.0.len();
 
-        for value in grouping.0.into_iter() {
-            result.push(self.visit_database_value(value).to_string());
+        for (i, value) in grouping.0.into_iter().enumerate() {
+            self.visit_database_value(value)?;
+
+            if i < (len - 1) {
+                self.write(", ")?;
+            }
         }
 
-        result.join(", ")
+        Ok(())
     }
 
-    fn visit_function(&mut self, fun: Function<'a>) -> String {
-        let mut result = match fun.typ_ {
+    fn visit_function(&mut self, fun: Function<'a>) -> fmt::Result {
+        match fun.typ_ {
             FunctionType::RowNumber(fun_rownum) => {
                 if fun_rownum.over.is_empty() {
-                    String::from("ROW_NUMBER() OVER()")
+                    self.write("ROW_NUMBER() OVER()")?;
                 } else {
-                    format!(
-                        "ROW_NUMBER() OVER({})",
-                        self.visit_partitioning(fun_rownum.over)
-                    )
+                    self.write("ROW_NUMBER() OVER")?;
+                    self.surround_with("(", ")", |ref mut s| s.visit_partitioning(fun_rownum.over))?;
                 }
             }
             FunctionType::Count(fun_count) => {
                 if fun_count.exprs.is_empty() {
-                    String::from("COUNT(*)")
+                    self.write("COUNT(*)")?;
                 } else {
-                    format!("COUNT({})", self.visit_columns(fun_count.exprs))
+                    self.write("COUNT")?;
+                    self.surround_with("(", ")", |ref mut s| s.visit_columns(fun_count.exprs))?;
                 }
             }
             FunctionType::AggregateToString(agg) => {
-                self.visit_aggregate_to_string(agg.value.as_ref().clone())
+                self.visit_aggregate_to_string(agg.value.as_ref().clone())?;
             }
         };
 
         if let Some(alias) = fun.alias {
-            result.push_str(" AS ");
-            result.push_str(&Self::delimited_identifiers(vec![&*alias]));
+            self.write(" AS ")?;
+            self.delimited_identifiers(&[&*alias])?;
         }
 
-        result
+        Ok(())
     }
 
-    fn visit_partitioning(&mut self, over: Over<'a>) -> String {
-        let mut result = Vec::new();
-
+    fn visit_partitioning(&mut self, over: Over<'a>) -> fmt::Result {
         if !over.partitioning.is_empty() {
-            let mut parts = Vec::new();
+            let len = over.partitioning.len();
+            self.write("PARTITION BY ")?;
 
-            for partition in over.partitioning {
-                parts.push(self.visit_column(partition))
+            for (i, partition) in over.partitioning.into_iter().enumerate() {
+                self.visit_column(partition)?;
+
+                if i < (len - 1) {
+                    self.write(", ")?;
+                }
             }
 
-            result.push(format!("PARTITION BY {}", parts.join(", ")));
+            if !over.ordering.is_empty() {
+                self.write(" ")?;
+            }
         }
 
         if !over.ordering.is_empty() {
-            result.push(format!("ORDER BY {}", self.visit_ordering(over.ordering)));
+            self.write("ORDER BY ")?;
+            self.visit_ordering(over.ordering)?;
         }
 
-        result.join(" ")
+        Ok(())
     }
 }

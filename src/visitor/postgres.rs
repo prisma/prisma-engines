@@ -1,14 +1,16 @@
 use crate::{ast::*, visitor::Visitor};
-use postgres::types::{IsNull, Type};
+use bytes::BytesMut;
 use rust_decimal::Decimal;
-use std::{error::Error, str::FromStr};
+use std::{error::Error, str::FromStr, fmt::{self, Write}};
 use tokio_postgres::types::ToSql;
+use tokio_postgres::types::{IsNull, Type};
 
 /// A visitor to generate queries for the PostgreSQL database.
 ///
 /// The returned parameter values implement the `ToSql` trait from postgres and
 /// can be used directly with the database.
 pub struct Postgres<'a> {
+    query: String,
     parameters: Vec<ParameterizedValue<'a>>,
 }
 
@@ -21,88 +23,111 @@ impl<'a> Visitor<'a> for Postgres<'a> {
         Q: Into<Query<'a>>,
     {
         let mut postgres = Postgres {
-            parameters: Vec::new(),
+            query: String::with_capacity(4096),
+            parameters: Vec::with_capacity(128),
         };
 
-        let result = (
-            Postgres::visit_query(&mut postgres, query.into()),
-            postgres.parameters,
-        );
+        Postgres::visit_query(&mut postgres, query.into());
 
-        result
+        (
+            postgres.query,
+            postgres.parameters,
+        )
+    }
+
+    fn write<D: fmt::Display>(&mut self, s: D) -> fmt::Result {
+        write!(&mut self.query, "{}", s)
     }
 
     fn add_parameter(&mut self, value: ParameterizedValue<'a>) {
         self.parameters.push(value);
     }
 
-    fn parameter_substitution(&self) -> String {
-        format!("${}", self.parameters.len())
+    fn parameter_substitution(&mut self) -> fmt::Result {
+        self.write("$")?;
+        self.write(self.parameters.len())
     }
 
     fn visit_limit_and_offset(
         &mut self,
         limit: Option<ParameterizedValue<'a>>,
         offset: Option<ParameterizedValue<'a>>,
-    ) -> Option<String> {
+    ) -> fmt::Result {
         match (limit, offset) {
-            (Some(limit), Some(offset)) => Some(format!(
-                "LIMIT {} OFFSET {}",
-                self.visit_parameterized(limit),
+            (Some(limit), Some(offset)) => {
+                self.write(" LIMIT ")?;
+                self.visit_parameterized(limit)?;
+
+                self.write(" OFFSET ")?;
                 self.visit_parameterized(offset)
-            )),
-            (None, Some(offset)) => Some(format!("OFFSET {}", self.visit_parameterized(offset))),
-            (Some(limit), None) => Some(format!("LIMIT {}", self.visit_parameterized(limit))),
-            (None, None) => None,
+            },
+            (None, Some(offset)) => {
+                self.write(" OFFSET ")?;
+                self.visit_parameterized(offset)
+            },
+            (Some(limit), None) => {
+                self.write(" LIMIT ")?;
+                self.visit_parameterized(limit)
+            }
+            (None, None) => Ok(()),
         }
     }
 
-    fn visit_insert(&mut self, insert: Insert<'a>) -> String {
-        let mut result = vec![String::from("INSERT")];
-
-        result.push(format!("INTO {}", self.visit_table(insert.table, true)));
+    fn visit_insert(&mut self, insert: Insert<'a>) -> fmt::Result {
+        self.write("INSERT INTO ")?;
+        self.visit_table(insert.table, true)?;
 
         if insert.values.is_empty() {
-            result.push("DEFAULT VALUES".to_string());
+            self.write(" DEFAULT VALUES")?;
         } else {
-            let columns: Vec<String> = insert
-                .columns
-                .into_iter()
-                .map(|c| self.visit_column(c))
-                .collect();
+            let columns = insert.columns.len();
 
-            let values: Vec<String> = insert
-                .values
-                .into_iter()
-                .map(|row| self.visit_row(row))
-                .collect();
+            self.write(" (")?;
+            for (i, c) in insert.columns.into_iter().enumerate() {
+                self.visit_column(c)?;
 
-            result.push(format!(
-                "({}) VALUES {}",
-                columns.join(", "),
-                values.join(", "),
-            ))
+                if i < (columns - 1) {
+                    self.write(",")?;
+                }
+            }
+            self.write(")")?;
+
+            self.write(" VALUES ")?;
+            let values = insert.values.len();
+
+            for (i, row) in insert.values.into_iter().enumerate() {
+                self.visit_row(row)?;
+
+                if i < (values - 1) {
+                    self.write(", ")?;
+                }
+            }
         }
 
         if let Some(OnConflict::DoNothing) = insert.on_conflict {
-            result.push(String::from("ON CONFLICT DO NOTHING"));
+            self.write(" ON CONFLICT DO NOTHING")?;
         };
 
         if let Some(returning) = insert.returning {
             if !returning.is_empty() {
                 let values = returning.into_iter().map(|r| r.into()).collect();
-                result.push(format!("RETURNING {}", self.visit_columns(values)));
+                self.write(" RETURNING ")?;
+                self.visit_columns(values)?;
             }
         };
 
-        result.join(" ")
+        Ok(())
     }
 
-    fn visit_aggregate_to_string(&mut self, value: DatabaseValue<'a>) -> String {
-        format!(
-            "array_to_string(array_agg({}), ',')",
-            self.visit_database_value(value)
-        )
+    fn visit_aggregate_to_string(&mut self, value: DatabaseValue<'a>) -> fmt::Result {
+        self.write("ARRAY_TO_STRING")?;
+        self.write("(")?;
+        self.write("ARRAY_AGG")?;
+        self.write("(")?;
+        self.visit_database_value(value)?;
+        self.write(")")?;
+        self.write("','")?;
+        self.write(")")
     }
 }
 
@@ -110,7 +135,7 @@ impl<'a> ToSql for ParameterizedValue<'a> {
     fn to_sql(
         &self,
         ty: &Type,
-        out: &mut Vec<u8>,
+        out: &mut BytesMut,
     ) -> Result<IsNull, Box<dyn Error + 'static + Send + Sync>> {
         match self {
             ParameterizedValue::Null => Ok(IsNull::Yes),
@@ -147,7 +172,7 @@ impl<'a> ToSql for ParameterizedValue<'a> {
     fn to_sql_checked(
         &self,
         ty: &Type,
-        out: &mut Vec<u8>,
+        out: &mut BytesMut,
     ) -> Result<IsNull, Box<dyn Error + 'static + Send + Sync>> {
         match self {
             ParameterizedValue::Null => Ok(IsNull::Yes),
@@ -175,5 +200,94 @@ impl<'a> ToSql for ParameterizedValue<'a> {
             #[cfg(feature = "chrono-0_4")]
             ParameterizedValue::DateTime(value) => value.naive_utc().to_sql_checked(ty, out),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::visitor::*;
+
+    fn expected_values<'a, T>(
+        sql: &'static str,
+        params: Vec<T>,
+    ) -> (String, Vec<ParameterizedValue<'a>>)
+    where
+        T: Into<ParameterizedValue<'a>>,
+    {
+        (
+            String::from(sql),
+            params.into_iter().map(|p| p.into()).collect(),
+        )
+    }
+
+    fn default_params<'a>(
+        mut additional: Vec<ParameterizedValue<'a>>,
+    ) -> Vec<ParameterizedValue<'a>> {
+        let mut result = Vec::new();
+
+        for param in additional.drain(0..) {
+            result.push(param)
+        }
+
+        result
+    }
+
+    #[test]
+    fn test_single_row_insert_default_values() {
+        let query = Insert::single_into("users");
+        let (sql, params) = Postgres::build(query);
+
+        assert_eq!("INSERT INTO \"users\" DEFAULT VALUES", sql);
+        assert_eq!(default_params(vec![]), params);
+    }
+
+    #[test]
+    fn test_single_row_insert() {
+        let expected = expected_values("INSERT INTO \"users\" (\"foo\") VALUES ($1)", vec![10]);
+        let query = Insert::single_into("users").value("foo", 10);
+        let (sql, params) = Postgres::build(query);
+
+        assert_eq!(expected.0, sql);
+        assert_eq!(expected.1, params);
+    }
+
+    #[test]
+    fn test_multi_row_insert() {
+        let expected = expected_values("INSERT INTO \"users\" (\"foo\") VALUES ($1), ($2)", vec![10, 11]);
+        let query = Insert::multi_into("users", vec!["foo"]).values(vec![10]).values(vec![11]);
+        let (sql, params) = Postgres::build(query);
+
+        assert_eq!(expected.0, sql);
+        assert_eq!(expected.1, params);
+    }
+
+    #[test]
+    fn test_limit_and_offset_when_both_are_set() {
+        let expected = expected_values("SELECT \"users\".* FROM \"users\" LIMIT $1 OFFSET $2", vec![10, 2]);
+        let query = Select::from_table("users").limit(10).offset(2);
+        let (sql, params) = Postgres::build(query);
+
+        assert_eq!(expected.0, sql);
+        assert_eq!(expected.1, params);
+    }
+
+    #[test]
+    fn test_limit_and_offset_when_only_offset_is_set() {
+        let expected = expected_values("SELECT \"users\".* FROM \"users\" OFFSET $1", vec![10]);
+        let query = Select::from_table("users").offset(10);
+        let (sql, params) = Postgres::build(query);
+
+        assert_eq!(expected.0, sql);
+        assert_eq!(expected.1, params);
+    }
+
+    #[test]
+    fn test_limit_and_offset_when_only_limit_is_set() {
+        let expected = expected_values("SELECT \"users\".* FROM \"users\" LIMIT $1", vec![10]);
+        let query = Select::from_table("users").limit(10);
+        let (sql, params) = Postgres::build(query);
+
+        assert_eq!(expected.0, sql);
+        assert_eq!(expected.1, params);
     }
 }

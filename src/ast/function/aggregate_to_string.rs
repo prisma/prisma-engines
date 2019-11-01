@@ -11,8 +11,9 @@ pub struct AggregateToString<'a> {
 /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
 /// let query = Select::from_table("users").value(aggregate_to_string(Column::new("firstName")))
 ///     .group_by("firstName");
+///
 /// let (sql, _) = Sqlite::build(query);
-/// assert_eq!("SELECT group_concat(`firstName`) FROM `users` GROUP BY `firstName`", sql);
+/// assert_eq!("SELECT GROUP_CONCAT(`firstName`) FROM `users` GROUP BY `firstName`", sql);
 /// ```
 #[inline]
 pub fn aggregate_to_string<'a, T>(expr: T) -> AggregateToString<'a>

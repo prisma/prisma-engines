@@ -1,55 +1,46 @@
-use crate::ast::{ParameterizedValue, Params};
-use std::time::Instant;
+use crate::{
+    ast::{ParameterizedValue, Params},
+    connector::DBIO,
+};
+use std::{future::Future, time::Instant};
 
-pub(crate) fn query<'a, F, T>(
+pub(crate) fn query<'a, F, T, U>(
     tag: &'static str,
-    query: &str,
-    params: &[ParameterizedValue<'a>],
+    query: &'a str,
+    params: &'a [ParameterizedValue],
     f: F,
-) -> T
+) -> DBIO<'a, T>
 where
-    F: FnOnce() -> T,
+    F: FnOnce() -> U + Send + 'a,
+    U: Future<Output = crate::Result<T>> + Send,
 {
-    let start = Instant::now();
-    let res = f();
-    let end = Instant::now();
+    DBIO::new(async move {
+        let start = Instant::now();
+        let res = f().await;
+        let end = Instant::now();
 
-    if *crate::LOG_QUERIES {
-        #[cfg(not(feature = "tracing-log"))]
-        {
-            info!(
-                "query: \"{}\", params: {} (in {}ms)",
-                query,
-                Params(params),
-                start.elapsed().as_millis(),
-            );
+        if *crate::LOG_QUERIES {
+            #[cfg(not(feature = "tracing-log"))]
+            {
+                info!(
+                    "query: \"{}\", params: {} (in {}ms)",
+                    query,
+                    Params(params),
+                    start.elapsed().as_millis(),
+                );
+            }
+            #[cfg(feature = "tracing-log")]
+            {
+                tracing::info!(
+                    query,
+                    params = %Params(params),
+                    duration_ms = start.elapsed().as_millis() as u64,
+                )
+            }
         }
-        #[cfg(feature = "tracing-log")]
-        {
-            //let params: Vec<String> = params.iter().map(|p| format!("{}", p)).collect();
 
-            tracing::info!(
-                query,
-                params = %Params(params),
-                duration_ns = start.elapsed().as_nanos() as u64,
-            )
-        }
-    }
+        timing!(format!("{}.query.time", tag), start, end);
 
-    timing!(format!("{}.query.time", tag), start, end);
-
-    res
-}
-
-pub(crate) fn connect<F, T>(tag: &'static str, f: F) -> T
-where
-    F: FnOnce() -> T,
-{
-    let start = Instant::now();
-    let res = f();
-    let end = Instant::now();
-
-    timing!(format!("{}.connect.time", tag), start, end);
-
-    res
+        res
+    })
 }

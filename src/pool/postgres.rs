@@ -1,91 +1,51 @@
-use super::PrismaConnectionManager;
 use crate::{
-    connector::{metrics, PostgreSql, PostgresParams, Queryable, DEFAULT_SCHEMA},
+    connector::{postgres::SslParams, PostgreSql, Queryable, DBIO},
     error::Error,
 };
-use failure::{Compat, Fail};
-use native_tls::TlsConnector;
-use r2d2::ManageConnection;
-use std::convert::TryFrom;
-use tokio_postgres_native_tls::MakeTlsConnector;
-use url::Url;
+use tokio_postgres::Config;
+use tokio_resource_pool::{CheckOut, Manage, RealDependencies, Status};
 
-pub use postgres::Config;
-pub use r2d2_postgres::PostgresConnectionManager;
-
-pub type PostgresManager = PostgresConnectionManager<MakeTlsConnector>;
-
-impl TryFrom<Url> for PrismaConnectionManager<PostgresManager> {
-    type Error = Error;
-
-    fn try_from(url: Url) -> crate::Result<Self> {
-        let params = PostgresParams::try_from(url)?;
-        Self::postgres(params.config, Some(params.schema))
-    }
+pub struct PostgresManager {
+    config: Config,
+    schema: Option<String>,
+    ssl_params: Option<SslParams>,
 }
 
-impl TryFrom<PostgresParams> for r2d2::Pool<PrismaConnectionManager<PostgresManager>> {
-    type Error = Error;
-
-    fn try_from(params: PostgresParams) -> crate::Result<Self> {
-        let manager =
-            PrismaConnectionManager::postgres(params.config, Some(params.schema)).unwrap();
-
-        let pool = r2d2::Pool::builder()
-            .max_size(params.connection_limit)
-            .test_on_check_out(false)
-            .build(manager)?;
-
-        Ok(pool)
-    }
-}
-
-impl PrismaConnectionManager<PostgresManager> {
-    pub fn postgres(opts: postgres::Config, schema: Option<String>) -> crate::Result<Self> {
-        let mut tls_builder = TlsConnector::builder();
-        tls_builder.danger_accept_invalid_certs(true); // For Heroku
-
-        let tls = MakeTlsConnector::new(tls_builder.build()?);
-
-        Ok(Self {
-            inner: PostgresConnectionManager::new(opts, tls),
-            file_path: None,
+impl PostgresManager {
+    pub fn new(config: Config, schema: Option<String>, ssl_params: Option<SslParams>) -> Self {
+        Self {
+            config,
             schema,
-        })
+            ssl_params,
+        }
     }
 }
 
-impl ManageConnection for PrismaConnectionManager<PostgresManager> {
-    type Connection = PostgreSql;
-    type Error = Compat<Error>;
+impl Manage for PostgresManager {
+    type Resource = PostgreSql;
+    type Dependencies = RealDependencies;
+    type CheckOut = CheckOut<Self>;
+    type Error = Error;
+    type CreateFuture = DBIO<'static, Self::Resource>;
+    type RecycleFuture = DBIO<'static, Option<Self::Resource>>;
 
-    fn connect(&self) -> Result<Self::Connection, Self::Error> {
-        match metrics::connect("pool.postgres", || self.inner.connect()) {
-            Ok(mut client) => {
-                let schema = self
-                    .schema
-                    .as_ref()
-                    .map(|s| s.as_str())
-                    .unwrap_or(DEFAULT_SCHEMA);
+    fn create(&self) -> Self::CreateFuture {
+        let config = self.config.clone();
+        let schema = self.schema.clone();
+        let ssl_params = self.ssl_params.clone();
 
-                match client.execute(format!("SET search_path = \"{}\"", schema).as_str(), &[]) {
-                    Ok(_) => Ok(PostgreSql::from(client)),
-                    Err(e) => Err(Error::from(e).compat()),
-                }
-            }
-            Err(e) => Err(Error::from(e).compat()),
-        }
+        DBIO::new(async move { PostgreSql::new(config, schema, ssl_params).await })
     }
 
-    fn is_valid(&self, conn: &mut Self::Connection) -> Result<(), Self::Error> {
-        match conn.query_raw("", &[]) {
-            Ok(_) => Ok(()),
-            Err(e) => Err(e.compat()),
-        }
+    fn status(&self, _: &Self::Resource) -> Status {
+        Status::Valid
     }
 
-    fn has_broken(&self, _: &mut Self::Connection) -> bool {
-        false
+    fn recycle(&self, connection: Self::Resource) -> Self::RecycleFuture {
+        DBIO::new(async {
+            connection.query_raw("", &[]).await?;
+            Ok(Some(connection))
+        })
     }
 }
 
@@ -107,10 +67,9 @@ mod tests {
         );
 
         let url = Url::parse(&conn_string).unwrap();
-        let params = PostgresParams::try_from(url).unwrap();
-        let pool = r2d2::Pool::try_from(params).unwrap();
+        let pool = crate::pool::postgres(url).unwrap();
 
-        assert_eq!(num_cpus::get() * 2 + 4, pool.max_size() as usize);
+        assert_eq!(num_cpus::get_physical() * 2 + 1, pool.capacity());
     }
 
     #[test]
@@ -125,14 +84,13 @@ mod tests {
         );
 
         let url = Url::parse(&conn_string).unwrap();
-        let params = PostgresParams::try_from(url).unwrap();
-        let pool = r2d2::Pool::try_from(params).unwrap();
+        let pool = crate::pool::postgres(url).unwrap();
 
-        assert_eq!(10, pool.max_size());
+        assert_eq!(10, pool.capacity());
     }
 
-    #[test]
-    fn test_custom_search_path() {
+    #[tokio::test]
+    async fn test_custom_search_path() {
         let conn_string = format!(
             "postgresql://{}:{}@{}:{}/{}?schema=musti-test",
             env::var("TEST_PG_USER").unwrap(),
@@ -143,11 +101,10 @@ mod tests {
         );
 
         let url = Url::parse(&conn_string).unwrap();
-        let params = PostgresParams::try_from(url).unwrap();
-        let pool = r2d2::Pool::try_from(params).unwrap();
+        let pool = crate::pool::postgres(url).unwrap();
 
-        let mut conn = pool.get().unwrap();
-        let result_set = conn.query_raw("SHOW search_path", &[]).unwrap();
+        let conn = pool.check_out().await.unwrap();
+        let result_set = conn.query_raw("SHOW search_path", &[]).await.unwrap();
         let row = result_set.first().unwrap();
 
         assert_eq!(Some("\"musti-test\""), row[0].as_str());

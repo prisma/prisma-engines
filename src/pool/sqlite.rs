@@ -1,98 +1,70 @@
-use super::PrismaConnectionManager;
 use crate::{
-    connector::{metrics, Queryable, Sqlite, SqliteParams},
+    connector::{Queryable, Sqlite, DBIO},
     error::Error,
 };
-use failure::{Compat, Fail};
-use r2d2::ManageConnection;
-use std::convert::TryFrom;
+use futures::future;
+use std::path::PathBuf;
+use tokio_resource_pool::{CheckOut, Manage, RealDependencies, Status};
 
-pub use r2d2_sqlite::SqliteConnectionManager;
+pub struct SqliteManager {
+    file_path: PathBuf,
+    db_name: String,
+}
 
-impl TryFrom<SqliteParams> for r2d2::Pool<PrismaConnectionManager<SqliteConnectionManager>> {
+impl SqliteManager {
+    pub fn new(file_path: PathBuf, db_name: &str) -> Self {
+        Self {
+            file_path,
+            db_name: db_name.to_owned(),
+        }
+    }
+}
+
+impl Manage for SqliteManager {
+    type Resource = Sqlite;
+    type Dependencies = RealDependencies;
+    type CheckOut = CheckOut<Self>;
     type Error = Error;
+    type CreateFuture = DBIO<'static, Self::Resource>;
+    type RecycleFuture = DBIO<'static, Option<Self::Resource>>;
 
-    fn try_from(params: SqliteParams) -> crate::Result<Self> {
-        let manager =
-            PrismaConnectionManager::sqlite(params.schema, params.file_path.to_str().unwrap())?;
-
-        let pool = r2d2::Pool::builder()
-            .max_size(params.connection_limit)
-            .test_on_check_out(false)
-            .build(manager)?;
-
-        Ok(pool)
+    fn create(&self) -> Self::CreateFuture {
+        match Sqlite::new(self.file_path.clone()) {
+            Ok(mut conn) => match conn.attach_database(&self.db_name) {
+                Ok(_) => DBIO::new(future::ok(conn)),
+                Err(e) => DBIO::new(future::err(e)),
+            },
+            Err(e) => DBIO::new(future::err(e)),
+        }
     }
-}
 
-impl PrismaConnectionManager<SqliteConnectionManager> {
-    pub fn sqlite(db_name: Option<String>, path: &str) -> crate::Result<Self> {
-        let params = SqliteParams::try_from(path)?;
+    fn status(&self, _: &Self::Resource) -> Status {
+        Status::Valid
+    }
 
-        Ok(Self {
-            inner: SqliteConnectionManager::memory(),
-            file_path: Some(params.file_path),
-            schema: db_name,
+    fn recycle(&self, connection: Self::Resource) -> Self::RecycleFuture {
+        DBIO::new(async {
+            connection.query_raw("SELECT 1", &[]).await?;
+            Ok(Some(connection))
         })
-    }
-}
-
-impl ManageConnection for PrismaConnectionManager<SqliteConnectionManager> {
-    type Connection = Sqlite;
-    type Error = Compat<Error>;
-
-    fn connect(&self) -> Result<Self::Connection, Self::Error> {
-        match metrics::connect("pool.sqlite", || self.inner.connect()) {
-            Ok(client) => {
-                let mut sqlite = Sqlite {
-                    client,
-                    file_path: self.file_path.clone().unwrap(),
-                };
-
-                if let Some(ref schema) = self.schema {
-                    sqlite
-                        .attach_database(schema)
-                        .map_err(|err| Error::from(err).compat())?;
-                }
-
-                Ok(sqlite)
-            }
-            Err(e) => Err(Error::from(e).compat()),
-        }
-    }
-
-    fn is_valid(&self, conn: &mut Self::Connection) -> Result<(), Self::Error> {
-        match conn.query_raw("SELECT 1", &[]) {
-            Ok(_) => Ok(()),
-            Err(e) => Err(e.compat()),
-        }
-    }
-
-    fn has_broken(&self, _: &mut Self::Connection) -> bool {
-        false
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-
     #[test]
     fn test_default_connection_limit() {
         let conn_string = format!("file:db/test.db",);
-        let params = SqliteParams::try_from(conn_string.as_str()).unwrap();
-        let pool = r2d2::Pool::try_from(params).unwrap();
+        let pool = crate::pool::sqlite(&conn_string, "test").unwrap();
 
-        assert_eq!(num_cpus::get() * 2 + 4, pool.max_size() as usize);
+        assert_eq!(num_cpus::get_physical() * 2 + 1, pool.capacity());
     }
 
     #[test]
     fn test_custom_connection_limit() {
         let conn_string = format!("file:db/test.db?connection_limit=10",);
+        let pool = crate::pool::sqlite(&conn_string, "test").unwrap();
 
-        let params = SqliteParams::try_from(conn_string.as_str()).unwrap();
-        let pool = r2d2::Pool::try_from(params).unwrap();
-
-        assert_eq!(10, pool.max_size());
+        assert_eq!(10, pool.capacity());
     }
 }
