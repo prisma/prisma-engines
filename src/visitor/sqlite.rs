@@ -25,7 +25,7 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
     {
         let mut sqlite = Sqlite {
             query: String::with_capacity(4096),
-            parameters: Vec::with_capacity(1024),
+            parameters: Vec::with_capacity(128),
         };
 
         Sqlite::visit_query(&mut sqlite, query.into());

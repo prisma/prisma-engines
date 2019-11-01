@@ -24,7 +24,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
     {
         let mut postgres = Postgres {
             query: String::with_capacity(4096),
-            parameters: Vec::with_capacity(1024),
+            parameters: Vec::with_capacity(128),
         };
 
         Postgres::visit_query(&mut postgres, query.into());

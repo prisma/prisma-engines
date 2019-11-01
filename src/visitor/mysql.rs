@@ -23,7 +23,7 @@ impl<'a> Visitor<'a> for Mysql<'a> {
     {
         let mut mysql = Mysql {
             query: String::with_capacity(4096),
-            parameters: Vec::with_capacity(1024),
+            parameters: Vec::with_capacity(128),
         };
 
         Mysql::visit_query(&mut mysql, query.into());
