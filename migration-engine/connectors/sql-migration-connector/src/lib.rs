@@ -108,15 +108,15 @@ impl SqlMigrationConnector {
     }
 
     pub fn sqlite(url: &str) -> crate::Result<Self> {
-        let conn = Sqlite::new(url)?;
+        let schema_name = "lift";
+        let conn = Sqlite::new(url, schema_name)?;
         let file_path = conn.file_path().to_owned();
-        let schema = String::from("lift");
 
         Ok(Self::create_connector(
             url,
             Arc::new(conn),
             SqlFamily::Sqlite,
-            schema,
+            schema_name.to_owned(),
             Some(file_path),
         ))
     }

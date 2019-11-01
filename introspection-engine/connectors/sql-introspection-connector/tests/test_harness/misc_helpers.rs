@@ -144,7 +144,7 @@ pub fn database(database_url: &str) -> Box<dyn SyncSqlConnection + Send + Sync +
 
             Box::new(conn)
         }
-        "file" | "sqlite" => Box::new(Sqlite::new(database_url).unwrap()),
+        "file" | "sqlite" => Box::new(Sqlite::new(database_url, "introspection-engine").unwrap()),
         scheme => panic!("Unknown scheme `{}° in database URL: {}", scheme, url.as_str()),
     }
 }

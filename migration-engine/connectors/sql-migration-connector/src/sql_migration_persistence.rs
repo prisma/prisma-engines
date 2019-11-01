@@ -50,17 +50,34 @@ impl MigrationPersistence for SqlMigrationPersistence {
                 let sql_str = format!(r#"DROP SCHEMA "{}" CASCADE;"#, self.schema_name);
                 debug!("{}", sql_str);
 
-                let _ = self.connection.query_raw(&self.schema_name, &sql_str, &[]);
+                self.connection.query_raw(&self.schema_name, &sql_str, &[]).ok();
             }
             SqlFamily::Sqlite => {
                 if let Some(ref file_path) = self.file_path {
-                    let _ = std::fs::remove_file(file_path); // ignore potential errors
+                    self.connection
+                        .execute_raw(
+                            &self.schema_name,
+                            "DETACH DATABASE ?",
+                            &[ParameterizedValue::from(self.schema_name.as_str())],
+                        )
+                        .ok();
+                    std::fs::remove_file(file_path).ok(); // ignore potential errors
+                    self.connection
+                        .execute_raw(
+                            &self.schema_name,
+                            "ATTACH DATABASE ? AS ?",
+                            &[
+                                ParameterizedValue::from(file_path.as_str()),
+                                ParameterizedValue::from(self.schema_name.as_str()),
+                            ],
+                        )
+                        .unwrap();
                 }
             }
             SqlFamily::Mysql => {
                 let sql_str = format!(r#"DROP SCHEMA `{}`;"#, self.schema_name);
                 debug!("{}", sql_str);
-                let _ = self.connection.query_raw(&self.schema_name, &sql_str, &[]);
+                self.connection.query_raw(&self.schema_name, &sql_str, &[]).ok();
             }
         }
     }

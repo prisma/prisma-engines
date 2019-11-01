@@ -9,7 +9,7 @@ pub fn load_describer(url_str: &str) -> SqlIntrospectionResult<Box<dyn SqlSchema
             Arc::new(wrapper),
         )))
     } else if url_str.starts_with("file:") {
-        let wrapper = sql_connection::Sqlite::new(url_str)?;
+        let wrapper = sql_connection::Sqlite::new(url_str, "introspection-engine")?;
         Ok(Box::new(sql_schema_describer::sqlite::SqlSchemaDescriber::new(
             Arc::new(wrapper),
         )))

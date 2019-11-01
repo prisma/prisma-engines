@@ -10,7 +10,7 @@ use sql_schema_describer::{SqlSchema, SqlSchemaDescriberBackend};
 use std::{rc::Rc, sync::Arc};
 use url::Url;
 
-pub const SCHEMA_NAME: &str = "migration-engine";
+pub const SCHEMA_NAME: &str = "lift";
 
 pub struct TestSetup {
     pub sql_family: SqlFamily,
@@ -129,7 +129,7 @@ where
     if !ignores.contains(&SqlFamily::Sqlite) {
         println!("--------------- Testing with SQLite now ---------------");
 
-        let connector = SqlMigrationConnector::sqlite(&sqlite_test_file()).unwrap();
+        let connector = SqlMigrationConnector::sqlite(dbg!(&sqlite_test_file())).unwrap();
         let test_setup = TestSetup {
             sql_family: SqlFamily::Sqlite,
             database: Arc::clone(&connector.database),
@@ -226,7 +226,7 @@ pub fn database(sql_family: SqlFamily, database_url: &str) -> Arc<dyn SyncSqlCon
 
             Arc::new(conn)
         }
-        SqlFamily::Sqlite => Arc::new(Sqlite::new(database_url).unwrap()),
+        SqlFamily::Sqlite => Arc::new(Sqlite::new(database_url, SCHEMA_NAME).unwrap()),
         SqlFamily::Mysql => {
             let url = Url::parse(database_url).unwrap();
             let create_cmd = |name| format!("CREATE DATABASE `{}`", name);

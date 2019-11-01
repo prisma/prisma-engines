@@ -1,4 +1,4 @@
-#![deny(warnings, missing_docs, rust_2018_idioms)]
+#![deny(missing_docs, rust_2018_idioms)]
 
 //! Shared SQL connection handling logic for the migration engine and the introspection engine.
 
@@ -85,11 +85,14 @@ pub struct Sqlite {
 
 impl Sqlite {
     /// Create a connection pool to an SQLite database.
-    pub fn new(url: &str) -> Result<Self, QueryError> {
+    ///
+    /// - `url` is the url or file path for the database.
+    /// - `db_name` is the name the database will be attached to for all the connections in the pool.
+    pub fn new(url: &str, db_name: &str) -> Result<Self, QueryError> {
         let params = SqliteParams::try_from(url)?;
         let file_path = params.file_path.to_str().unwrap().to_string();
 
-        let pool = prisma_query::pool::sqlite(url)?;
+        let pool = prisma_query::pool::sqlite(url, db_name)?;
 
         Ok(Self {
             pool,
@@ -103,61 +106,37 @@ impl Sqlite {
         self.file_path.as_str()
     }
 
-    async fn get_connection(&self, db: &str) -> Result<CheckOut<SqliteManager>, QueryError> {
-        let conn = self.pool.check_out().await?;
-
-        conn.execute_raw(
-            "ATTACH DATABASE ? AS ?",
-            &[
-                ParameterizedValue::from(self.file_path.as_str()),
-                ParameterizedValue::from(db),
-            ],
-        )
-        .await?;
-
-        Ok(conn)
+    async fn get_connection(&self) -> Result<CheckOut<SqliteManager>, QueryError> {
+        Ok(self.pool.check_out().await?)
     }
 
-    async fn detach_database(&self, db: &str, conn: CheckOut<SqliteManager>) -> Result<(), QueryError> {
-        conn.execute_raw("DETACH DATABASE ?", &[ParameterizedValue::from(db)])
-            .await?;
-        Ok(())
-    }
 }
 
 #[async_trait::async_trait]
 impl SqlConnection for Sqlite {
-    async fn execute<'a>(&self, db: &str, q: Query<'a>) -> Result<Option<Id>, QueryError> {
-        let conn = self.get_connection(db).await?;
-        let result = conn.execute(q).await;
-        self.detach_database(db, conn).await?;
-        result
+    async fn execute<'a>(&self, _db: &str, q: Query<'a>) -> Result<Option<Id>, QueryError> {
+        let conn = self.get_connection().await?;
+        conn.execute(q).await
     }
 
-    async fn query<'a>(&self, db: &str, q: Query<'a>) -> Result<ResultSet, QueryError> {
-        let conn = self.get_connection(db).await?;
-        let result = conn.query(q).await;
-        self.detach_database(db, conn).await?;
-        result
+    async fn query<'a>(&self, _db: &str, q: Query<'a>) -> Result<ResultSet, QueryError> {
+        let conn = self.get_connection().await?;
+        conn.query(q).await
     }
 
     async fn query_raw<'a>(
         &self,
-        db: &str,
+        _db: &str,
         sql: &str,
         params: &[ParameterizedValue<'a>],
     ) -> Result<ResultSet, QueryError> {
-        let conn = self.get_connection(db).await?;
-        let result = conn.query_raw(sql, params).await;
-        self.detach_database(db, conn).await?;
-        result
+        let conn = self.get_connection().await?;
+        conn.query_raw(sql, params).await
     }
 
-    async fn execute_raw<'a>(&self, db: &str, sql: &str, params: &[ParameterizedValue<'a>]) -> Result<u64, QueryError> {
-        let conn = self.get_connection(db).await?;
-        let result = conn.execute_raw(sql, params).await;
-        self.detach_database(db, conn).await?;
-        result
+    async fn execute_raw<'a>(&self, _db: &str, sql: &str, params: &[ParameterizedValue<'a>]) -> Result<u64, QueryError> {
+        let conn = self.get_connection().await?;
+        conn.execute_raw(sql, params).await
     }
 }
 
