@@ -23,15 +23,6 @@ pub enum MigrationStep {
     DeleteEnum(DeleteEnum),
 }
 
-/// Deserializes the cases `undefined`, `null` and `Some(T)` into an `Option<Option<T>>`.
-fn some_option<'de, T, D>(deserializer: D) -> Result<Option<Option<T>>, D::Error>
-where
-    T: Deserialize<'de>,
-    D: Deserializer<'de>,
-{
-    Option::<T>::deserialize(deserializer).map(Some)
-}
-
 #[derive(Debug, Deserialize, Serialize, PartialEq, Eq, Hash, Clone)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct CreateModel {
