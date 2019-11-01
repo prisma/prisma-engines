@@ -1,7 +1,7 @@
 //! Datamodel migration steps.
 
 use datamodel::ast;
-use serde::{Deserialize, Deserializer, Serialize};
+use serde::{Deserialize, Serialize};
 
 /// An atomic change to a [Datamodel AST](datamodel/ast/struct.Datamodel.html).
 #[derive(Debug, Deserialize, Serialize, Clone, PartialEq)]
@@ -21,15 +21,6 @@ pub enum MigrationStep {
     CreateEnum(CreateEnum),
     UpdateEnum(UpdateEnum),
     DeleteEnum(DeleteEnum),
-}
-
-/// Deserializes the cases `undefined`, `null` and `Some(T)` into an `Option<Option<T>>`.
-fn some_option<'de, T, D>(deserializer: D) -> Result<Option<Option<T>>, D::Error>
-where
-    T: Deserialize<'de>,
-    D: Deserializer<'de>,
-{
-    Option::<T>::deserialize(deserializer).map(Some)
 }
 
 #[derive(Debug, Deserialize, Serialize, PartialEq, Eq, Hash, Clone)]

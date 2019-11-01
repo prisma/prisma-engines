@@ -1,147 +1,170 @@
 use crate::{interpreter::InterpretationResult, query_ast::*, result_ast::*};
-use connector::{self, QueryArguments, ScalarListValues, TransactionLike};
+use connector::{self, QueryArguments, ScalarListValues, ReadOperations, ConnectionLike};
+use futures::future::{BoxFuture, FutureExt};
 use prisma_models::{GraphqlId, ScalarField, SelectedFields};
 use std::sync::Arc;
 
-pub fn execute(
-    tx: &mut dyn TransactionLike,
+pub fn execute<'a, 'b>(
+    tx: &'a ConnectionLike<'a, 'b>,
     query: ReadQuery,
-    parent_ids: &[GraphqlId],
-) -> InterpretationResult<QueryResult> {
-    match query {
-        ReadQuery::RecordQuery(q) => read_one(tx, q),
-        ReadQuery::ManyRecordsQuery(q) => read_many(tx, q),
-        ReadQuery::RelatedRecordsQuery(q) => read_related(tx, q, parent_ids),
-        ReadQuery::AggregateRecordsQuery(q) => aggregate(tx, q),
-    }
+    parent_ids: &'a [GraphqlId],
+) -> BoxFuture<'a, InterpretationResult<QueryResult>> {
+    let fut = async move {
+        match query {
+            ReadQuery::RecordQuery(q) => read_one(tx, q).await,
+            ReadQuery::ManyRecordsQuery(q) => read_many(tx, q).await,
+            ReadQuery::RelatedRecordsQuery(q) => read_related(tx, q, parent_ids).await,
+            ReadQuery::AggregateRecordsQuery(q) => aggregate(tx, q).await,
+        }
+    };
+
+    fut.boxed()
 }
 
 /// Queries a single record.
-fn read_one(tx: &mut dyn TransactionLike, query: RecordQuery) -> InterpretationResult<QueryResult> {
-    let selected_fields = inject_required_fields(query.selected_fields.clone());
-    let scalars = tx.get_single_record(query.record_finder.as_ref().unwrap(), &selected_fields)?;
+fn read_one<'conn, 'tx>(
+    tx: &'conn ConnectionLike<'conn, 'tx>,
+    query: RecordQuery,
+) -> BoxFuture<'conn, InterpretationResult<QueryResult>> {
+    let fut = async move {
+        let selected_fields = inject_required_fields(query.selected_fields.clone());
+        let scalars = tx
+            .get_single_record(query.record_finder.as_ref().unwrap(), &selected_fields)
+            .await?;
 
-    let model = Arc::clone(&query.record_finder.unwrap().field.model());
-    let id_field = model.fields().id().name.clone();
+        let model = Arc::clone(&query.record_finder.unwrap().field.model());
+        let id_field = model.fields().id().name.clone();
 
-    match scalars {
-        Some(record) => {
-            let ids = vec![record.collect_id(&id_field)?];
-            let list_fields = selected_fields.scalar_lists();
-            let lists = resolve_scalar_list_fields(tx, ids.clone(), list_fields)?;
-            let nested: Vec<QueryResult> = query
-                .nested
-                .into_iter()
-                .map(|q| execute(tx, q, &ids))
-                .collect::<InterpretationResult<Vec<QueryResult>>>()?;
+        match scalars {
+            Some(record) => {
+                let ids = vec![record.collect_id(&id_field)?];
+                let list_fields = selected_fields.scalar_lists();
+                let lists = resolve_scalar_list_fields(tx, ids.clone(), list_fields).await?;
+                let nested: Vec<QueryResult> = process_nested(tx, query.nested, &ids).await?;
 
-            Ok(QueryResult::RecordSelection(RecordSelection {
+                Ok(QueryResult::RecordSelection(RecordSelection {
+                    name: query.name,
+                    fields: query.selection_order,
+                    scalars: record.into(),
+                    nested,
+                    lists,
+                    id_field,
+                    ..Default::default()
+                }))
+            }
+
+            None => Ok(QueryResult::RecordSelection(RecordSelection {
                 name: query.name,
                 fields: query.selection_order,
-                scalars: record.into(),
-                nested,
-                lists,
                 id_field,
                 ..Default::default()
-            }))
+            })),
         }
-        None => Ok(QueryResult::RecordSelection(RecordSelection {
-            name: query.name,
-            fields: query.selection_order,
-            id_field,
-            ..Default::default()
-        })),
-    }
+    };
+
+    fut.boxed()
 }
 
 /// Queries a set of records.
-fn read_many(tx: &mut dyn TransactionLike, query: ManyRecordsQuery) -> InterpretationResult<QueryResult> {
-    let selected_fields = inject_required_fields(query.selected_fields.clone());
-    let scalars = tx.get_many_records(Arc::clone(&query.model), query.args.clone(), &selected_fields)?;
+fn read_many<'a, 'b>(
+    tx: &'a ConnectionLike<'a, 'b>,
+    query: ManyRecordsQuery,
+) -> BoxFuture<'a, InterpretationResult<QueryResult>> {
+    let fut = async move {
+        let selected_fields = inject_required_fields(query.selected_fields.clone());
+        let scalars = tx
+            .get_many_records(Arc::clone(&query.model), query.args.clone(), &selected_fields)
+            .await?;
 
-    let model = Arc::clone(&query.model);
-    let id_field = model.fields().id().name.clone();
-    let ids = scalars.collect_ids(&id_field)?;
-    let list_fields = selected_fields.scalar_lists();
-    let lists = resolve_scalar_list_fields(tx, ids.clone(), list_fields)?;
-    let nested: Vec<QueryResult> = query
-        .nested
-        .into_iter()
-        .map(|q| execute(tx, q, &ids))
-        .collect::<InterpretationResult<Vec<QueryResult>>>()?;
+        let model = Arc::clone(&query.model);
+        let id_field = model.fields().id().name.clone();
+        let ids = scalars.collect_ids(&id_field)?;
+        let list_fields = selected_fields.scalar_lists();
+        let lists = resolve_scalar_list_fields(tx, ids.clone(), list_fields).await?;
+        let nested: Vec<QueryResult> = process_nested(tx, query.nested, &ids).await?;
 
-    Ok(QueryResult::RecordSelection(RecordSelection {
-        name: query.name,
-        fields: query.selection_order,
-        query_arguments: query.args,
-        scalars,
-        nested,
-        lists,
-        id_field,
-    }))
+        Ok(QueryResult::RecordSelection(RecordSelection {
+            name: query.name,
+            fields: query.selection_order,
+            query_arguments: query.args,
+            scalars,
+            nested,
+            lists,
+            id_field,
+        }))
+    };
+
+    fut.boxed()
 }
 
 /// Queries related records for a set of parent IDs.
-fn read_related(
-    tx: &mut dyn TransactionLike,
+fn read_related<'a, 'b>(
+    tx: &'a ConnectionLike<'a, 'b>,
     query: RelatedRecordsQuery,
-    parent_ids: &[GraphqlId],
-) -> InterpretationResult<QueryResult> {
-    let selected_fields = inject_required_fields(query.selected_fields.clone());
-    let parent_ids = match query.parent_ids {
-        Some(ref ids) => ids,
-        None => parent_ids,
+    parent_ids: &'a [GraphqlId],
+) -> BoxFuture<'a, InterpretationResult<QueryResult>> {
+    let fut = async move {
+        let selected_fields = inject_required_fields(query.selected_fields.clone());
+        let parent_ids = match query.parent_ids {
+            Some(ref ids) => ids,
+            None => parent_ids,
+        };
+
+        let scalars = tx
+            .get_related_records(
+                Arc::clone(&query.parent_field),
+                parent_ids,
+                query.args.clone(),
+                &selected_fields,
+            )
+            .await?;
+
+        let model = Arc::clone(&query.parent_field.related_model());
+        let id_field = model.fields().id().name.clone();
+        let ids = scalars.collect_ids(&id_field)?;
+        let list_fields = selected_fields.scalar_lists();
+        let lists = resolve_scalar_list_fields(tx, ids.clone(), list_fields).await?;
+        let nested: Vec<QueryResult> = process_nested(tx, query.nested, &ids).await?;
+
+        Ok(QueryResult::RecordSelection(RecordSelection {
+            name: query.name,
+            fields: query.selection_order,
+            query_arguments: query.args,
+            scalars,
+            nested,
+            lists,
+            id_field,
+        }))
     };
 
-    let scalars = tx.get_related_records(
-        Arc::clone(&query.parent_field),
-        parent_ids,
-        query.args.clone(),
-        &selected_fields,
-    )?;
-
-    let model = Arc::clone(&query.parent_field.related_model());
-    let id_field = model.fields().id().name.clone();
-    let ids = scalars.collect_ids(&id_field)?;
-    let list_fields = selected_fields.scalar_lists();
-    let lists = resolve_scalar_list_fields(tx, ids.clone(), list_fields)?;
-    let nested: Vec<QueryResult> = query
-        .nested
-        .into_iter()
-        .map(|q| execute(tx, q, &ids))
-        .collect::<InterpretationResult<Vec<QueryResult>>>()?;
-
-    Ok(QueryResult::RecordSelection(RecordSelection {
-        name: query.name,
-        fields: query.selection_order,
-        query_arguments: query.args,
-        scalars,
-        nested,
-        lists,
-        id_field,
-    }))
+    fut.boxed()
 }
 
-fn aggregate(tx: &mut dyn TransactionLike, query: AggregateRecordsQuery) -> InterpretationResult<QueryResult> {
-    let result = tx.count_by_model(query.model, QueryArguments::default())?;
+async fn aggregate<'a, 'b>(
+    tx: &'a ConnectionLike<'a, 'b>,
+    query: AggregateRecordsQuery,
+) -> InterpretationResult<QueryResult> {
+    let result = tx.count_by_model(query.model, QueryArguments::default()).await?;
     Ok(QueryResult::Count(result))
 }
 
 /// Resolves scalar lists for a list field for a set of parent IDs.
-fn resolve_scalar_list_fields(
-    tx: &mut dyn TransactionLike,
+async fn resolve_scalar_list_fields<'a, 'b>(
+    tx: &'a ConnectionLike<'a, 'b>,
     record_ids: Vec<GraphqlId>,
     list_fields: Vec<Arc<ScalarField>>,
 ) -> connector::Result<Vec<(String, Vec<ScalarListValues>)>> {
     if !list_fields.is_empty() {
-        list_fields
-            .into_iter()
-            .map(|list_field| {
-                let name = list_field.name.clone();
-                tx.get_scalar_list_values(list_field, record_ids.clone())
-                    .map(|r| (name, r))
-            })
-            .collect::<connector::Result<Vec<(String, Vec<_>)>>>()
+        let mut results = vec![];
+
+        for list_field in list_fields {
+            let name = list_field.name.clone();
+            let r = tx.get_scalar_list_values(list_field, record_ids.clone()).await?;
+
+            results.push((name, r));
+        }
+
+        Ok(results)
     } else {
         Ok(vec![])
     }
@@ -163,4 +186,23 @@ fn inject_required_fields(mut selected_fields: SelectedFields) -> SelectedFields
     }
 
     selected_fields
+}
+
+fn process_nested<'a, 'b>(
+    tx: &'a ConnectionLike<'a, 'b>,
+    nested: Vec<ReadQuery>,
+    parent_ids: &'a [GraphqlId],
+) -> BoxFuture<'a, InterpretationResult<Vec<QueryResult>>> {
+    let fut = async move {
+        let mut results = vec![];
+
+        for query in nested {
+            let result = execute(tx, query, &parent_ids).await?;
+            results.push(result);
+        }
+
+        Ok(results)
+    };
+
+    fut.boxed()
 }

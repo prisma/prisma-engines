@@ -1,13 +1,13 @@
 use crate::{CoreResult, Env, Expressionista, IrSerializer, QueryGraph, QueryInterpreter, Response};
 
-pub struct QueryPipeline<'a> {
+pub struct QueryPipeline<'conn, 'tx> {
     graph: QueryGraph,
-    interpreter: QueryInterpreter<'a>,
+    interpreter: QueryInterpreter<'conn, 'tx>,
     serializer: IrSerializer,
 }
 
-impl<'a> QueryPipeline<'a> {
-    pub fn new(graph: QueryGraph, interpreter: QueryInterpreter<'a>, serializer: IrSerializer) -> Self {
+impl<'conn, 'tx> QueryPipeline<'conn, 'tx> {
+    pub fn new(graph: QueryGraph, interpreter: QueryInterpreter<'conn, 'tx>, serializer: IrSerializer) -> Self {
         Self {
             graph,
             interpreter,
@@ -15,16 +15,16 @@ impl<'a> QueryPipeline<'a> {
         }
     }
 
-    pub fn execute(mut self) -> CoreResult<Response> {
+    pub async fn execute(mut self) -> CoreResult<Response> {
         // Run final validations and transformations.
         self.graph.finalize()?;
         trace!("{}", self.graph);
 
         let serializer = self.serializer;
         let expr = Expressionista::translate(self.graph)?;
-        let result = self.interpreter.interpret(expr, Env::default(), 0);
+        let result = self.interpreter.interpret(expr, Env::default(), 0).await;
 
-        trace!("{}", self.interpreter.log);
+        trace!("{}", self.interpreter.log.lock().await);
         Ok(serializer.serialize(result?))
     }
 }

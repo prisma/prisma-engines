@@ -1,8 +1,6 @@
 #[macro_use]
 extern crate log;
 
-pub mod migration_database;
-
 mod error;
 mod sql_database_migration_inferrer;
 mod sql_database_step_applier;
@@ -17,9 +15,9 @@ pub use error::*;
 pub use sql_migration::*;
 
 use migration_connector::*;
-use migration_database::*;
 use prisma_query::connector::{MysqlParams, PostgresParams};
 use serde_json;
+use sql_connection::{Mysql, Postgresql, Sqlite, SyncSqlConnection};
 use sql_database_migration_inferrer::*;
 use sql_database_step_applier::*;
 use sql_destructive_changes_checker::*;
@@ -36,7 +34,7 @@ pub struct SqlMigrationConnector {
     pub file_path: Option<String>,
     pub sql_family: SqlFamily,
     pub schema_name: String,
-    pub database: Arc<dyn MigrationDatabase + Send + Sync + 'static>,
+    pub database: Arc<dyn SyncSqlConnection + Send + Sync + 'static>,
     pub migration_persistence: Arc<dyn MigrationPersistence>,
     pub database_migration_inferrer: Arc<dyn DatabaseMigrationInferrer<SqlMigration>>,
     pub database_migration_step_applier: Arc<dyn DatabaseMigrationStepApplier<SqlMigration>>,
@@ -67,7 +65,18 @@ impl SqlMigrationConnector {
         let params = PostgresParams::try_from(url.clone())?;
 
         let schema = params.schema.clone();
-        let conn = PostgreSql::new(params, pooled)?;
+
+        let conn = if pooled {
+            let pool = Postgresql::new_pooled(url.clone())?;
+
+            // Postgres connection pools are lazy, we need to query to fail early when the database
+            // is not reachable.
+            pool.query_raw("SELECT 1", &[])?;
+
+            pool
+        } else {
+            Postgresql::new_unpooled(url.clone())?
+        };
 
         Ok(Self::create_connector(
             url_str,
@@ -80,14 +89,21 @@ impl SqlMigrationConnector {
 
     pub fn mysql(url_str: &str, pooled: bool) -> crate::Result<Self> {
         let url = Url::parse(url_str)?;
+        let params = MysqlParams::try_from(url.clone())?;
 
-        let schema = {
-            let params = MysqlParams::try_from(url.clone())?;
-            params.dbname.clone()
+        let schema = params.dbname.clone();
+
+        let conn = if pooled {
+            Mysql::new_pooled(url)?
+        } else {
+            Mysql::new_unpooled(url)?
         };
 
-        let params = MysqlParams::try_from(url)?;
-        let conn = Mysql::new(params, pooled)?;
+        // Async MySQL connections are lazy - we have to run a query to confirm that the schema we
+        // connected to exists.
+        if !schema.is_empty() {
+            conn.query_raw("SELECT 1 + 1", &[])?;
+        }
 
         Ok(Self::create_connector(
             url_str,
@@ -99,39 +115,32 @@ impl SqlMigrationConnector {
     }
 
     pub fn sqlite(url: &str) -> crate::Result<Self> {
-        let conn = Sqlite::new(url)?;
-        let file_path = conn.file_path.clone();
-        let schema = String::from("lift");
+        let schema_name = "lift";
+        let conn = Sqlite::new(url, schema_name)?;
+        let file_path = conn.file_path().to_owned();
 
         Ok(Self::create_connector(
             url,
             Arc::new(conn),
             SqlFamily::Sqlite,
-            schema,
+            schema_name.to_owned(),
             Some(file_path),
         ))
     }
 
     fn create_connector(
         url: &str,
-        conn: Arc<dyn MigrationDatabase + Send + Sync + 'static>,
+        conn: Arc<dyn SyncSqlConnection + Send + Sync + 'static>,
         sql_family: SqlFamily,
         schema_name: String,
         file_path: Option<String>,
     ) -> Self {
-        let introspection_connection = Arc::new(MigrationDatabaseWrapper {
-            database: Arc::clone(&conn),
-        });
         let inspector: Arc<dyn SqlSchemaDescriberBackend + Send + Sync + 'static> = match sql_family {
-            SqlFamily::Sqlite => Arc::new(sql_schema_describer::sqlite::SqlSchemaDescriber::new(
-                introspection_connection,
-            )),
-            SqlFamily::Postgres => Arc::new(sql_schema_describer::postgres::SqlSchemaDescriber::new(
-                introspection_connection,
-            )),
-            SqlFamily::Mysql => Arc::new(sql_schema_describer::mysql::SqlSchemaDescriber::new(
-                introspection_connection,
-            )),
+            SqlFamily::Mysql => Arc::new(sql_schema_describer::mysql::SqlSchemaDescriber::new(Arc::clone(&conn))),
+            SqlFamily::Postgres => Arc::new(sql_schema_describer::postgres::SqlSchemaDescriber::new(Arc::clone(
+                &conn,
+            ))),
+            SqlFamily::Sqlite => Arc::new(sql_schema_describer::sqlite::SqlSchemaDescriber::new(Arc::clone(&conn))),
         };
 
         let migration_persistence = Arc::new(SqlMigrationPersistence {
@@ -184,14 +193,14 @@ impl MigrationConnector for SqlMigrationConnector {
         match self.sql_family {
             SqlFamily::Postgres => {
                 self.database
-                    .query_raw("", &format!("CREATE DATABASE \"{}\"", db_name), &[])?;
+                    .query_raw(&format!("CREATE DATABASE \"{}\"", db_name), &[])?;
 
                 Ok(())
             }
             SqlFamily::Sqlite => Ok(()),
             SqlFamily::Mysql => {
                 self.database
-                    .query_raw("", &format!("CREATE DATABASE `{}`", db_name), &[])?;
+                    .query_raw(&format!("CREATE DATABASE `{}`", db_name), &[])?;
 
                 Ok(())
             }
@@ -217,7 +226,7 @@ impl MigrationConnector for SqlMigrationConnector {
 
                 debug!("{}", schema_sql);
 
-                self.database.query_raw("", &schema_sql, &[])?;
+                self.database.query_raw(&schema_sql, &[])?;
             }
             SqlFamily::Mysql => {
                 let schema_sql = format!(
@@ -227,7 +236,7 @@ impl MigrationConnector for SqlMigrationConnector {
 
                 debug!("{}", schema_sql);
 
-                self.database.query_raw("", &schema_sql, &[])?;
+                self.database.query_raw(&schema_sql, &[])?;
             }
         }
 

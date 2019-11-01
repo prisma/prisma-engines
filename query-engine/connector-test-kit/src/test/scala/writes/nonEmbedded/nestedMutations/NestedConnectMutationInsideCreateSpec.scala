@@ -98,7 +98,7 @@ class NestedConnectMutationInsideCreateSpec extends FlatSpec with Matchers with 
         errorContains = "The change you are trying to make would violate the required relation 'ChildToParent' between Child and Parent"
       )
 
-    //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(1) }
+    // ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(1) }
 
     }
   }

@@ -1,20 +1,18 @@
-use crate::{
-    DropColumn, DropTable, DropTables, MigrationDatabase, SqlError, SqlMigration, SqlMigrationStep, SqlResult,
-    TableChange,
-};
+use crate::{DropColumn, DropTable, DropTables, SqlError, SqlMigration, SqlMigrationStep, SqlResult, TableChange};
 use migration_connector::*;
 use prisma_query::ast::*;
+use sql_connection::SyncSqlConnection;
 use std::sync::Arc;
 
 pub struct SqlDestructiveChangesChecker {
     pub schema_name: String,
-    pub database: Arc<dyn MigrationDatabase + Send + Sync>,
+    pub database: Arc<dyn SyncSqlConnection + Send + Sync>,
 }
 
 impl SqlDestructiveChangesChecker {
     fn check_table_drop(&self, table_name: &str, diagnostics: &mut DestructiveChangeDiagnostics) -> SqlResult<()> {
         let query = Select::from_table((self.schema_name.as_str(), table_name)).value(count(asterisk()));
-        let result_set = self.database.query(&self.schema_name, query.into())?;
+        let result_set = self.database.query(query.into())?;
         let first_row = result_set.first().ok_or_else(|| {
             SqlError::Generic("No row was returned when checking for existing rows in dropped table.".to_owned())
         })?;
@@ -48,7 +46,7 @@ impl SqlDestructiveChangesChecker {
 
         let values_count: i64 = self
             .database
-            .query(&self.schema_name, query.into())
+            .query(query.into())
             .map_err(SqlError::from)
             .and_then(|result_set| {
                 result_set

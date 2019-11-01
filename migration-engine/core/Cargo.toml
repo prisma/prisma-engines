@@ -9,6 +9,7 @@ migration-connector = { path = "../connectors/migration-connector" }
 datamodel = { path = "../../libs/datamodel" }
 prisma-models = { path = "../../prisma-models" }
 sql-migration-connector = { path = "../connectors/sql-migration-connector" }
+sql-connection = { path = "../../libs/sql-connection" }
 clap = "2.33"
 itertools = "0.8"
 

@@ -2,8 +2,6 @@ use crate::*;
 use barrel::types;
 use test_harness::*;
 
-pub const SCHEMA_NAME: &str = "introspection-engine";
-
 #[test]
 fn introspecting_a_simple_table_with_gql_types_must_work() {
     test_each_backend_with_ignores(vec![SqlFamily::Postgres, SqlFamily::Mysql], |test_setup, barrel| {

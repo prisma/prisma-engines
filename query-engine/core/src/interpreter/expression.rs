@@ -7,7 +7,7 @@ pub enum Expression {
     },
 
     Func {
-        func: Box<dyn FnOnce(Env) -> InterpretationResult<Expression>>,
+        func: Box<dyn FnOnce(Env) -> InterpretationResult<Expression> + Send + Sync + 'static>,
     },
 
     Query {
@@ -28,7 +28,7 @@ pub enum Expression {
     },
 
     If {
-        func: Box<dyn FnOnce() -> bool>,
+        func: Box<dyn FnOnce() -> bool + Send + Sync + 'static>,
         then: Vec<Expression>,
         else_: Vec<Expression>,
     },
