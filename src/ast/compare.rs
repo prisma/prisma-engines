@@ -193,7 +193,7 @@ pub trait Comparable<'a> {
     /// let query = Select::from_table("users").so_that("foo".in_selection(vec![1, 2]));
     /// let (sql, params) = Sqlite::build(query);
     ///
-    /// assert_eq!("SELECT `users`.* FROM `users` WHERE `foo` IN (?, ?)", sql);
+    /// assert_eq!("SELECT `users`.* FROM `users` WHERE `foo` IN (?,?)", sql);
     /// assert_eq!(vec![
     ///     ParameterizedValue::Integer(1),
     ///     ParameterizedValue::Integer(2),
@@ -210,7 +210,7 @@ pub trait Comparable<'a> {
     /// let query = Select::from_table("users").so_that("foo".not_in_selection(vec![1, 2]));
     /// let (sql, params) = Sqlite::build(query);
     ///
-    /// assert_eq!("SELECT `users`.* FROM `users` WHERE `foo` NOT IN (?, ?)", sql);
+    /// assert_eq!("SELECT `users`.* FROM `users` WHERE `foo` NOT IN (?,?)", sql);
     ///
     /// assert_eq!(vec![
     ///     ParameterizedValue::Integer(1),

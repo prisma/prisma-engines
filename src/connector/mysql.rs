@@ -358,7 +358,7 @@ VALUES (1, 'Joe', 27, 20000.00 );
         config.db_name(Some("this_does_not_exist"));
 
         let conn = Mysql::new(config).unwrap();
-        let res = conn.query_raw( "SELECT 1 + 1", &[]).await;
+        let res = conn.query_raw("SELECT 1 + 1", &[]).await;
 
         assert!(&res.is_err());
 

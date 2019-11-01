@@ -4,12 +4,14 @@ use rusqlite::{
     types::{Null, ToSql, ToSqlOutput},
     Error as RusqlError,
 };
+use std::fmt::{self, Write};
 
 /// A visitor to generate queries for the SQLite database.
 ///
 /// The returned parameter values implement the `ToSql` trait from rusqlite and
 /// can be used directly with the database.
 pub struct Sqlite<'a> {
+    query: String,
     parameters: Vec<ParameterizedValue<'a>>,
 }
 
@@ -22,52 +24,63 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
         Q: Into<Query<'a>>,
     {
         let mut sqlite = Sqlite {
-            parameters: Vec::new(),
+            query: String::with_capacity(4096),
+            parameters: Vec::with_capacity(1024),
         };
 
-        let result = (
-            Sqlite::visit_query(&mut sqlite, query.into()),
-            sqlite.parameters,
-        );
+        Sqlite::visit_query(&mut sqlite, query.into());
 
-        result
+        (
+            sqlite.query,
+            sqlite.parameters,
+        )
     }
 
-    fn visit_insert(&mut self, insert: Insert<'a>) -> String {
-        let mut result = match insert.on_conflict {
-            Some(OnConflict::DoNothing) => vec![String::from("INSERT OR IGNORE")],
-            None => vec![String::from("INSERT")],
+    fn write<D: fmt::Display>(&mut self, s: D) -> fmt::Result {
+        write!(&mut self.query, "{}", s)
+    }
+
+    fn visit_insert(&mut self, insert: Insert<'a>) -> fmt::Result {
+        match insert.on_conflict {
+            Some(OnConflict::DoNothing) => self.write("INSERT OR IGNORE")?,
+            None => self.write("INSERT")?,
         };
 
-        result.push(format!("INTO {}", self.visit_table(insert.table, true)));
+        self.write(" INTO ")?;
+        self.visit_table(insert.table, true)?;
 
         if insert.values.is_empty() {
-            result.push("DEFAULT VALUES".to_string());
+            self.write(" DEFAULT VALUES")?;
         } else {
-            let columns: Vec<String> = insert
-                .columns
-                .into_iter()
-                .map(|c| self.visit_column(c))
-                .collect();
+            let columns = insert.columns.len();
 
-            let values: Vec<String> = insert
-                .values
-                .into_iter()
-                .map(|row| self.visit_row(row))
-                .collect();
+            self.write(" (")?;
+            for (i, c) in insert.columns.into_iter().enumerate() {
+                self.visit_column(c)?;
 
-            result.push(format!(
-                "({}) VALUES {}",
-                columns.join(", "),
-                values.join(", "),
-            ))
+                if i < (columns - 1) {
+                    self.write(", ")?;
+                }
+            }
+            self.write(")")?;
+
+            self.write(" VALUES ")?;
+            let values = insert.values.len();
+
+            for (i, row) in insert.values.into_iter().enumerate() {
+                self.visit_row(row)?;
+
+                if i < (values - 1) {
+                    self.write(", ")?;
+                }
+            }
         }
 
-        result.join(" ")
+        Ok(())
     }
 
-    fn parameter_substitution(&self) -> String {
-        String::from("?")
+    fn parameter_substitution(&mut self) -> fmt::Result {
+        self.write("?")
     }
 
     fn add_parameter(&mut self, value: ParameterizedValue<'a>) {
@@ -78,25 +91,36 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
         &mut self,
         limit: Option<ParameterizedValue<'a>>,
         offset: Option<ParameterizedValue<'a>>,
-    ) -> Option<String> {
+    ) -> fmt::Result {
         match (limit, offset) {
-            (Some(limit), Some(offset)) => Some(format!(
-                "LIMIT {} OFFSET {}",
-                self.visit_parameterized(limit),
+            (Some(limit), Some(offset)) => {
+                self.write(" LIMIT ")?;
+                self.visit_parameterized(limit)?;
+
+                self.write(" OFFSET ")?;
                 self.visit_parameterized(offset)
-            )),
-            (None, Some(offset)) => Some(format!(
-                "LIMIT {} OFFSET {}",
-                self.visit_parameterized(ParameterizedValue::from(-1)),
+            },
+            (None, Some(offset)) => {
+                self.write(" LIMIT ")?;
+                self.visit_parameterized(ParameterizedValue::from(-1))?;
+
+                self.write(" OFFSET ")?;
                 self.visit_parameterized(offset)
-            )),
-            (Some(limit), None) => Some(format!("LIMIT {}", self.visit_parameterized(limit))),
-            (None, None) => None,
+            },
+            (Some(limit), None) => {
+                self.write(" LIMIT ")?;
+                self.visit_parameterized(limit)
+            }
+            (None, None) => Ok(()),
         }
     }
 
-    fn visit_aggregate_to_string(&mut self, value: DatabaseValue<'a>) -> String {
-        format!("group_concat({})", self.visit_database_value(value))
+    fn visit_aggregate_to_string(&mut self, value: DatabaseValue<'a>) -> fmt::Result {
+        self.write("GROUP_CONCAT")?;
+
+        self.write("(")?;
+        self.visit_database_value(value)?;
+        self.write(")")
     }
 }
 
