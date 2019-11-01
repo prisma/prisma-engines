@@ -3,7 +3,7 @@ use crate::{database::operations::*, query_builder::read::ManyRelatedRecordsQuer
 use connector_interface::{
     self as connector,
     filter::{Filter, RecordFinder},
-    Connection, QueryArguments, ReadOperations, ScalarListValues, Transaction, WriteArgs, WriteOperations, IO,
+    Connection, QueryArguments, ReadOperations, ScalarListValues, Transaction, WriteArgs, WriteOperations, IO, AllOperations
 };
 use prisma_models::prelude::*;
 use std::marker::PhantomData;
@@ -38,6 +38,12 @@ where
         })
     }
 }
+
+impl<C, T> AllOperations<'_> for SqlConnection<C, T>
+where
+    C: QueryExt + Send + Sync + 'static,
+    T: ManyRelatedRecordsQueryBuilder + Send + Sync + 'static,
+{}
 
 impl<C, T> ReadOperations for SqlConnection<C, T>
 where

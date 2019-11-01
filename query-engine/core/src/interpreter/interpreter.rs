@@ -5,7 +5,7 @@ use super::{
 };
 use crate::{Query, QueryResult};
 use async_std::sync::Mutex;
-use connector::Transaction;
+use connector::AllOperations;
 use futures::future::{BoxFuture, FutureExt};
 use im::HashMap;
 use prisma_models::prelude::*;
@@ -63,28 +63,28 @@ impl Env {
     }
 }
 
-pub struct QueryInterpreter<'a, 'b> {
-    pub(crate) tx: &'a Box<dyn Transaction<'b> + 'b>,
+pub struct QueryInterpreter<'conn, 'tx> {
+    pub(crate) tx: &'conn (dyn AllOperations<'tx> + 'tx),
     pub log: Mutex<String>,
 }
 
-impl<'a, 'b> QueryInterpreter<'a, 'b>
+impl<'conn, 'tx> QueryInterpreter<'conn, 'tx>
 where
-    'b: 'a,
+    'tx: 'conn
 {
-    pub fn new(tx: &'a Box<dyn Transaction<'b> + 'b>) -> QueryInterpreter<'a, 'b> {
-        QueryInterpreter {
+    pub fn new(tx: &'conn (dyn AllOperations<'tx> + 'tx)) -> QueryInterpreter<'conn, 'tx> {
+        Self {
             tx,
-            log: Mutex::new(String::new()),
+            log: Mutex::new(String::new())
         }
     }
 
     pub fn interpret(
-        &'a self,
+        &'conn self,
         exp: Expression,
         env: Env,
         level: usize,
-    ) -> BoxFuture<'a, InterpretationResult<ExpressionResult>> {
+    ) -> BoxFuture<'conn, InterpretationResult<ExpressionResult>> {
         match exp {
             Expression::Func { func } => async move { self.interpret(func(env.clone())?, env, level).await }.boxed(),
 

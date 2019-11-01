@@ -2,7 +2,7 @@ use super::{pipeline::QueryPipeline, QueryExecutor};
 use crate::{
     CoreResult, IrSerializer, QueryDocument, QueryGraph, QueryGraphBuilder, QueryInterpreter, QuerySchemaRef, Response,
 };
-use connector::Connector;
+use connector::{Connector, AllOperations};
 use futures::future::{BoxFuture, FutureExt};
 
 /// Central query executor and main entry point into the query core.
@@ -46,7 +46,7 @@ where
 
             for (query_graph, info) in queries {
                 let tx = conn.start_transaction().await?;
-                let interpreter = QueryInterpreter::new(&tx);
+                let interpreter = QueryInterpreter::new(tx.as_ref::<dyn AllOperations<'_>>());
                 let result = QueryPipeline::new(query_graph, interpreter, info).execute().await;
 
                 if result.is_ok() {
