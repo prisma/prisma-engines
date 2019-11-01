@@ -26,8 +26,8 @@ impl ValidationPipeline {
     pub fn with_sources(sources: &[Box<dyn configuration::Source>]) -> ValidationPipeline {
         ValidationPipeline {
             lifter: LiftAstToDml::with_sources(sources),
-            validator: Validator::with_sources(sources),
-            standardiser: Standardiser::with_sources(sources),
+            validator: Validator::new(),
+            standardiser: Standardiser::new(),
         }
     }
 

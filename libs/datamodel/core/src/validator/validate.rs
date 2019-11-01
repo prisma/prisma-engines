@@ -17,14 +17,6 @@ impl Validator {
         Self {}
     }
 
-    /// Creates a new instance, with all builtin directives and
-    /// the directives defined by the given sources registered.
-    ///
-    /// The directives defined by the given sources will be namespaced.
-    pub fn with_sources(_sources: &[Box<dyn configuration::Source>]) -> Validator {
-        Self::new()
-    }
-
     pub fn validate(&self, ast_schema: &ast::SchemaAst, schema: &mut dml::Datamodel) -> Result<(), ErrorCollection> {
         let mut errors = ErrorCollection::new();
 
