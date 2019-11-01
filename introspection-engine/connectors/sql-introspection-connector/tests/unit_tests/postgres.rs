@@ -158,7 +158,7 @@ fn introspecting_a_table_with_default_values_should_work() {
             migration.create_table("User", |t| {
                 t.add_column("a", types::text());
                 t.add_column("id", types::primary());
-                t.inject_custom("\"bool\" Boolean NOT NULL DEFAULT false"); //Todo validate the t/f synonyms against ddl containing them
+                t.inject_custom("\"bool\" Boolean NOT NULL DEFAULT false");
                 t.inject_custom("\"bool2\" Boolean NOT NULL DEFAULT 'off'");
                 t.inject_custom("\"float\" Float NOT NULL DEFAULT 5.3");
                 t.inject_custom("\"int\" INTEGER NOT NULL DEFAULT 5");
@@ -391,10 +391,12 @@ fn introspecting_a_prisma_many_to_many_relation_should_work() {
             });
             migration.create_table("_PostToUser", |t| {
                 t.inject_custom(
-                    "A INTEGER NOT NULL REFERENCES  \"User\"(\"id\"),
-                    B INTEGER NOT NULL REFERENCES  \"Post\"(\"id\")",
+                    "A INTEGER NOT NULL REFERENCES  \"Post\"(\"id\"),
+                    B INTEGER NOT NULL REFERENCES  \"User\"(\"id\")",
                 )
             });
+            migration
+                .inject_custom("CREATE UNIQUE INDEX test ON \"introspection-engine\".\"_PostToUser\" (\"a\", \"b\");")
         });
 
         let dm = r#"

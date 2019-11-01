@@ -16,6 +16,7 @@ fn is_migration_table(table: &Table) -> bool {
 fn is_prisma_join_table(table: &Table) -> bool {
     table.columns.len() == 2
         && table.foreign_keys.len() == 2
+        && table.foreign_keys[0].referenced_table < table.foreign_keys[1].referenced_table
         && table.name.starts_with("_")
         && table
             .columns
@@ -27,6 +28,9 @@ fn is_prisma_join_table(table: &Table) -> bool {
             .iter()
             .find(|column| column.name.to_lowercase() == "b")
             .is_some()
+        && table.indices.len() == 1
+        && table.indices[0].columns.len() == 2
+        && table.indices[0].tpe == IndexType::Unique
 }
 
 fn is_prisma_scalar_list_table(table: &Table) -> bool {
