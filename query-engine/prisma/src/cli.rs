@@ -82,7 +82,7 @@ impl CliCommand {
 
     fn dmmf_to_dml(input: DmmfToDmlInput) -> PrismaResult<()> {
         let datamodel = datamodel::json::dmmf::parse_from_dmmf(&input.dmmf);
-        let config = datamodel::config_from_mcf_json_value(input.config);
+        let config = datamodel::json::mcf::config_from_mcf_json_value(input.config);
         let serialized = datamodel::render_datamodel_and_config_to_string(&datamodel, &config)?;
 
         println!("{}", serialized);
@@ -92,7 +92,7 @@ impl CliCommand {
 
     fn get_config(input: GetConfigInput) -> PrismaResult<()> {
         let config = load_configuration(&input.datamodel)?;
-        let json = datamodel::config_to_mcf_json_value(&config);
+        let json = datamodel::json::mcf::config_to_mcf_json_value(&config);
         let serialized = serde_json::to_string(&json)?;
 
         println!("{}", serialized);

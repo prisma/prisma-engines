@@ -15,7 +15,7 @@ generator go {
 #[test]
 fn serialize_generators_to_cmf() {
     let config = datamodel::parse_configuration(DATAMODEL).unwrap();
-    let rendered = datamodel::generators_to_json(&config.generators);
+    let rendered = datamodel::json::mcf::generators_to_json(&config.generators);
 
     let expected = r#"[
   {

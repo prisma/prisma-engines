@@ -160,7 +160,7 @@ fn serialize_sources_to_dmmf() {
     std::env::set_var("URL_CUSTOM_1", "https://localhost");
     let config =
         datamodel::parse_configuration_with_sources(DATAMODEL, vec![Box::new(CustomDbDefinition::new())]).unwrap();
-    let rendered = datamodel::render_sources_to_json(&config.datasources);
+    let rendered = datamodel::json::mcf::render_sources_to_json(&config.datasources);
 
     let expected = r#"[
   {

@@ -264,10 +264,10 @@ fn dmmf_roundtrip(input: &str) -> String {
     let config = datamodel::parse_configuration(input).unwrap();
 
     let dmmf = datamodel::json::dmmf::render_to_dmmf(&dml);
-    let mcf = datamodel::config_to_mcf_json(&config);
+    let mcf = datamodel::json::mcf::config_to_mcf_json(&config);
 
     let dml2 = datamodel::json::dmmf::parse_from_dmmf(&dmmf);
-    let config = datamodel::config_from_mcf_json(&mcf);
+    let config = datamodel::json::mcf::config_from_mcf_json(&mcf);
 
     let rendered = datamodel::render_datamodel_and_config_to_string(&dml2, &config).unwrap();
 
