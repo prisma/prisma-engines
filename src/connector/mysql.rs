@@ -77,6 +77,7 @@ impl TryFrom<Url> for MysqlParams {
 
         let mut connection_limit = dbg!(num_cpus::get_physical() * 2 + 1);
         let mut ssl_opts = my::SslOpts::default();
+        let mut use_ssl = false;
 
         for (k, v) in unsupported.into_iter() {
             match k.as_ref() {
@@ -85,12 +86,15 @@ impl TryFrom<Url> for MysqlParams {
                     connection_limit = as_int;
                 }
                 "sslcert" => {
+                    use_ssl = true;
                     ssl_opts.set_root_cert_path(Some(Path::new(&v).to_path_buf()));
                 }
                 "sslidentity" => {
+                    use_ssl = true;
                     ssl_opts.set_pkcs12_path(Some(Path::new(&v).to_path_buf()));
                 }
                 "sslpassword" => {
+                    use_ssl = true;
                     ssl_opts.set_password(Some(v.to_string()));
                 }
                 "sslaccept" => {
@@ -128,11 +132,14 @@ impl TryFrom<Url> for MysqlParams {
         };
 
         config.db_name(Some(dbname));
-        config.ssl_opts(Some(ssl_opts));
         config.ip_or_hostname(url.host_str().unwrap_or("localhost"));
         config.tcp_port(url.port().unwrap_or(3306));
         config.stmt_cache_size(Some(1000));
         config.conn_ttl(Some(5000u32));
+
+        if use_ssl {
+            config.ssl_opts(Some(ssl_opts));
+        }
 
         Ok(Self {
             connection_limit: u32::try_from(connection_limit).unwrap(),
@@ -358,7 +365,7 @@ VALUES (1, 'Joe', 27, 20000.00 );
         config.db_name(Some("this_does_not_exist"));
 
         let conn = Mysql::new(config).unwrap();
-        let res = conn.query_raw( "SELECT 1 + 1", &[]).await;
+        let res = conn.query_raw("SELECT 1 + 1", &[]).await;
 
         assert!(&res.is_err());
 
