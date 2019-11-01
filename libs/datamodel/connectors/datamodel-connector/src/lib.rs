@@ -50,24 +50,40 @@ impl TypeAlias {
 pub trait RootType {
     fn name(&self) -> &str;
     // represents the number of arguments for the type
-    fn number_of_args(&self) -> i32;
+    fn number_of_args(&self) -> usize;
     // calculates the underlying raw type
-    fn raw_type(&self, args: &Vec<i32>) -> &str;
+    fn raw_type(&self, args: &Vec<i32>) -> String;
     fn photon_type(&self) -> scalars::ScalarType;
 }
 
 struct SimpleRootType {
     name: String,
     raw_type: String,
+    number_of_args: usize,
     photon_type: scalars::ScalarType,
 }
 
 impl SimpleRootType {
-    pub fn new(name: &str, raw_type: &str, photon_type: scalars::ScalarType) -> SimpleRootType {
+    pub fn without_args(name: &str, raw_type: &str, photon_type: scalars::ScalarType) -> SimpleRootType {
         SimpleRootType {
             name: name.to_string(),
             raw_type: raw_type.to_string(),
             photon_type,
+            number_of_args: 0,
+        }
+    }
+
+    pub fn with_args(
+        name: &str,
+        raw_type: &str,
+        photon_type: scalars::ScalarType,
+        number_of_args: usize,
+    ) -> SimpleRootType {
+        SimpleRootType {
+            name: name.to_string(),
+            raw_type: raw_type.to_string(),
+            photon_type,
+            number_of_args,
         }
     }
 }
@@ -77,12 +93,24 @@ impl RootType for SimpleRootType {
         &self.name
     }
 
-    fn number_of_args(&self) -> i32 {
-        0
+    fn number_of_args(&self) -> usize {
+        self.number_of_args
     }
 
-    fn raw_type(&self, args: &Vec<i32>) -> &str {
-        &self.raw_type
+    fn raw_type(&self, args: &Vec<i32>) -> String {
+        if self.number_of_args != args.len() {
+            panic!(
+                "Did not provide the required number of arguments. {} were required, but were {} provided.",
+                self.number_of_args,
+                args.len()
+            )
+        }
+        if args.is_empty() {
+            self.raw_type.to_string()
+        } else {
+            let args_as_strings: Vec<String> = args.iter().map(|x| x.to_string()).collect();
+            self.raw_type.to_string() + "(" + &args_as_strings.join(",") + ")"
+        }
     }
 
     fn photon_type(&self) -> ScalarType {
@@ -101,7 +129,7 @@ impl Type<'_> {
         self.root_type.photon_type()
     }
 
-    pub fn raw_type(&self) -> &str {
+    pub fn raw_type(&self) -> String {
         self.root_type.raw_type(&self.args)
     }
 }
@@ -152,25 +180,29 @@ impl SimpleConnector {
         /// Int4Range, Int8Range, NumRange, TSRange, TSTZRange, DateRange
         /// TXIDSnapshot
         let root_types: Vec<Box<dyn RootType>> = vec![
-            Box::new(SimpleRootType::new("BigInt", "bigint", ScalarType::Int)),
-            Box::new(SimpleRootType::new("BigSerial", "bigserial", ScalarType::Int)),
-            Box::new(SimpleRootType::new(
+            Box::new(SimpleRootType::without_args("BigInt", "bigint", ScalarType::Int)),
+            Box::new(SimpleRootType::without_args("BigSerial", "bigserial", ScalarType::Int)),
+            Box::new(SimpleRootType::without_args(
                 "DoublePrecision",
                 "double precision",
                 ScalarType::Float,
             )),
-            Box::new(SimpleRootType::new("Integer", "integer", ScalarType::Int)),
-            Box::new(SimpleRootType::new("Real", "real", ScalarType::Float)),
-            Box::new(SimpleRootType::new("SmallInt", "smallint", ScalarType::Int)),
-            Box::new(SimpleRootType::new("SmallSerial", "smallserial", ScalarType::Int)),
-            Box::new(SimpleRootType::new("Serial", "serial", ScalarType::Int)),
-            Box::new(SimpleRootType::new("Money", "money", ScalarType::Float)),
-            Box::new(SimpleRootType::new("Text", "text", ScalarType::String)),
-            Box::new(SimpleRootType::new("Char", "char", ScalarType::String)),
-            Box::new(SimpleRootType::new("Name", "name", ScalarType::String)),
-            Box::new(SimpleRootType::new("Boolean", "boolean", ScalarType::Boolean)),
-            Box::new(SimpleRootType::new("Boolean", "boolean", ScalarType::Boolean)),
-            Box::new(SimpleRootType::new("PGLSN", "pg_lsn", ScalarType::Int)),
+            Box::new(SimpleRootType::without_args("Integer", "integer", ScalarType::Int)),
+            Box::new(SimpleRootType::without_args("Real", "real", ScalarType::Float)),
+            Box::new(SimpleRootType::without_args("SmallInt", "smallint", ScalarType::Int)),
+            Box::new(SimpleRootType::without_args(
+                "SmallSerial",
+                "smallserial",
+                ScalarType::Int,
+            )),
+            Box::new(SimpleRootType::without_args("Serial", "serial", ScalarType::Int)),
+            Box::new(SimpleRootType::without_args("Money", "money", ScalarType::Float)),
+            Box::new(SimpleRootType::without_args("Text", "text", ScalarType::String)),
+            Box::new(SimpleRootType::without_args("Char", "char", ScalarType::String)),
+            Box::new(SimpleRootType::without_args("Name", "name", ScalarType::String)),
+            Box::new(SimpleRootType::without_args("Boolean", "boolean", ScalarType::Boolean)),
+            Box::new(SimpleRootType::without_args("Boolean", "boolean", ScalarType::Boolean)),
+            Box::new(SimpleRootType::without_args("PGLSN", "pg_lsn", ScalarType::Int)),
         ];
         SimpleConnector { aliases, root_types }
     }
