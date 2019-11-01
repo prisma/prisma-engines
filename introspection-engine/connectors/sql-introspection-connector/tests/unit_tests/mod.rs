@@ -1,4 +1,4 @@
 #![allow(dead_code)]
 
+mod postgres;
 mod sqlite;
-pub use sqlite::*;

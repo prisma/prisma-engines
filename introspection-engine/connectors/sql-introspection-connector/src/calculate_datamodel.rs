@@ -17,8 +17,16 @@ fn is_prisma_join_table(table: &Table) -> bool {
     table.columns.len() == 2
         && table.foreign_keys.len() == 2
         && table.name.starts_with("_")
-        && table.columns.iter().find(|column| column.name == "A").is_some()
-        && table.columns.iter().find(|column| column.name == "B").is_some()
+        && table
+            .columns
+            .iter()
+            .find(|column| column.name.to_lowercase() == "a")
+            .is_some()
+        && table
+            .columns
+            .iter()
+            .find(|column| column.name.to_lowercase() == "b")
+            .is_some()
 }
 
 fn is_prisma_scalar_list_table(table: &Table) -> bool {
