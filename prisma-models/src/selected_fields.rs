@@ -1,5 +1,5 @@
 use crate::{ModelRef, Relation, RelationField, ScalarField, TypeIdentifier};
-use once_cell::unsync::OnceCell;
+use once_cell::sync::OnceCell;
 use prisma_query::ast::Column;
 use std::sync::Arc;
 

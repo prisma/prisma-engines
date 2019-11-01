@@ -1,7 +1,10 @@
+mod connection;
 mod mysql;
 mod postgresql;
 mod sqlite;
 mod transaction;
+
+pub(crate) mod operations;
 
 use connector_interface::Connector;
 use datamodel::Source;

@@ -1,42 +1,47 @@
-use crate::database::operations::*;
-use crate::{query_builder::read::ManyRelatedRecordsQueryBuilder, SqlError};
+use super::transaction::SqlConnectorTransaction;
+use crate::{database::operations::*, query_builder::read::ManyRelatedRecordsQueryBuilder, QueryExt, SqlError};
 use connector_interface::{
     self as connector,
     filter::{Filter, RecordFinder},
-    QueryArguments, ReadOperations, ScalarListValues, Transaction, WriteArgs, WriteOperations, IO
+    Connection, QueryArguments, ReadOperations, ScalarListValues, Transaction, WriteArgs, WriteOperations, IO
 };
 use prisma_models::prelude::*;
 use std::marker::PhantomData;
 
-pub struct SqlConnectorTransaction<'a, T> {
-    inner: prisma_query::connector::Transaction<'a>,
+pub struct SqlConnection<C, T> {
+    inner: C,
     _p: PhantomData<T>,
 }
 
-impl<'a, T> SqlConnectorTransaction<'a, T> {
-    pub fn new(tx: prisma_query::connector::Transaction<'a>) -> Self {
-        Self {
-            inner: tx,
-            _p: PhantomData,
-        }
-    }
-}
-
-impl<'a, T> Transaction<'a> for SqlConnectorTransaction<'a, T>
+impl<'a, C, T> SqlConnection<C, T>
 where
+    C: QueryExt + Send + Sync + 'static,
     T: ManyRelatedRecordsQueryBuilder + Send + Sync + 'static,
 {
-    fn commit<'b>(&'b self) -> IO<'b, ()> {
-        IO::new(async move { Ok(self.inner.commit().await.map_err(SqlError::from)?) })
-    }
-
-    fn rollback<'b>(&'b self) -> IO<'b, ()> {
-        IO::new(async move { Ok(self.inner.rollback().await.map_err(SqlError::from)?) })
+    pub fn new(inner: C) -> Self {
+        Self { inner, _p: PhantomData }
     }
 }
 
-impl<'a, T> ReadOperations for SqlConnectorTransaction<'a, T>
+impl<C, T> Connection for SqlConnection<C, T>
 where
+    C: QueryExt + Send + Sync + 'static,
+    T: ManyRelatedRecordsQueryBuilder + Send + Sync + 'static,
+{
+    fn start_transaction<'a>(&'a self) -> IO<'a, Box<dyn Transaction<'a> + 'a>> {
+        let fut_tx = self.inner.start_transaction();
+
+        IO::new(async move {
+            let tx: prisma_query::connector::Transaction<'a> = fut_tx.await.map_err(SqlError::from)?;
+
+            Ok(Box::new(SqlConnectorTransaction::<T>::new(tx)) as Box<dyn Transaction<'a> + 'a>)
+        })
+    }
+}
+
+impl<C, T> ReadOperations for SqlConnection<C, T>
+where
+    C: QueryExt + Send + Sync + 'static,
     T: ManyRelatedRecordsQueryBuilder + Send + Sync + 'static,
 {
     fn get_single_record<'b>(
@@ -88,42 +93,43 @@ where
     }
 }
 
-impl<'a, T> WriteOperations for SqlConnectorTransaction<'a, T>
+impl<C, T> WriteOperations for SqlConnection<C, T>
 where
+    C: QueryExt + Send + Sync + 'static,
     T: ManyRelatedRecordsQueryBuilder + Send + Sync + 'static,
 {
-    fn create_record<'b>(&'b self, model: ModelRef, args: WriteArgs) -> connector::IO<GraphqlId> {
+    fn create_record<'a>(&'a self, model: ModelRef, args: WriteArgs) -> connector::IO<GraphqlId> {
         IO::new(async move { write::create_record(&self.inner, model, args).await })
     }
 
-    fn update_records<'b>(&'b self, model: ModelRef, where_: Filter, args: WriteArgs) -> connector::IO<Vec<GraphqlId>> {
+    fn update_records<'a>(&'a self, model: ModelRef, where_: Filter, args: WriteArgs) -> connector::IO<Vec<GraphqlId>> {
         IO::new(async move { write::update_records(&self.inner, model, where_, args).await })
     }
 
-    fn delete_records<'b>(&'b self, model: ModelRef, where_: Filter) -> connector::IO<usize> {
+    fn delete_records<'a>(&'a self, model: ModelRef, where_: Filter) -> connector::IO<usize> {
         IO::new(async move { write::delete_records(&self.inner, model, where_).await })
     }
 
-    fn connect<'b>(
-        &'b self,
+    fn connect<'a>(
+        &'a self,
         field: RelationFieldRef,
-        parent_id: &'b GraphqlId,
-        child_id: &'b GraphqlId,
+        parent_id: &'a GraphqlId,
+        child_id: &'a GraphqlId,
     ) -> connector::IO<()> {
         IO::new(async move { write::connect(&self.inner, field, parent_id, child_id).await })
     }
 
-    fn disconnect<'b>(
-        &'b self,
+    fn disconnect<'a>(
+        &'a self,
         field: RelationFieldRef,
-        parent_id: &'b GraphqlId,
-        child_id: &'b GraphqlId,
+        parent_id: &'a GraphqlId,
+        child_id: &'a GraphqlId,
     ) -> connector::IO<()> {
         IO::new(async move { write::disconnect(&self.inner, field, parent_id, child_id).await })
     }
 
-    fn set<'b>(
-        &'b self,
+    fn set<'a>(
+        &'a self,
         relation_field: RelationFieldRef,
         parent_id: GraphqlId,
         wheres: Vec<GraphqlId>,

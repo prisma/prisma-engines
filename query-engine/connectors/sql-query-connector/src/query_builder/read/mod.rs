@@ -78,6 +78,7 @@ impl SelectDefinition for QueryArguments {
 
 pub struct ReadQueryBuilder;
 
+#[allow(dead_code)]
 impl ReadQueryBuilder {
     pub fn get_records<T>(model: ModelRef, selected_fields: &SelectedFields, query: T) -> Select<'static>
     where

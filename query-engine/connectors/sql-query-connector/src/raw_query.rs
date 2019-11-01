@@ -1,5 +1,6 @@
 pub struct RawQuery(pub String);
 
+#[allow(dead_code)]
 impl RawQuery {
     pub fn is_select(&self) -> bool {
         let splitted: Vec<&str> = self.0.split(" ").collect();

@@ -52,13 +52,6 @@ impl From<ConnectorError> for CoreError {
     }
 }
 
-// temporary
-impl Into<ConnectorError> for CoreError {
-    fn into(self) -> ConnectorError {
-        ConnectorError::CoreError(format!("{}", self))
-    }
-}
-
 impl From<DomainError> for CoreError {
     fn from(e: DomainError) -> CoreError {
         CoreError::DomainError(e)

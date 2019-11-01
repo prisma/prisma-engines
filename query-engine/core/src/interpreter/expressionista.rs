@@ -109,7 +109,7 @@ impl Expressionista {
         graph: &mut QueryGraph,
         parent_edges: Vec<EdgeRef>,
         node: Node,
-        into_expr: Box<dyn FnOnce(Node) -> InterpretationResult<Expression>>,
+        into_expr: Box<dyn FnOnce(Node) -> InterpretationResult<Expression> + Send + Sync + 'static>,
     ) -> InterpretationResult<Expression> {
         if parent_edges.is_empty() {
             into_expr(node)
