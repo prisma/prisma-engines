@@ -97,16 +97,6 @@ class CreateMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
     res should be("""{"data":{"createScalarModel":{"optInt":null,"optBoolean":null,"optString":null,"optEnum":null,"optFloat":null}}}""".parseJson)
   }
 
-  "A Create Mutation" should "fail when text is over 256k long" in {
-    val reallyLongString = "1234567890" * 40000
-
-    server.queryThatMustFail(
-      s"""mutation {createScalarModel(data: {optString: "$reallyLongString", optInt: 1337, optFloat: 1.234, optBoolean: true, optEnum: A, optDateTime: "2016-07-31T23:59:01.000Z", }){optString, optInt, optFloat, optBoolean, optEnum, optDateTime }}""",
-      project = project,
-      errorCode = 3007
-    )
-  }
-
   "A Create Mutation" should "fail when a DateTime is invalid" in {
     server.queryThatMustFail(
       s"""mutation { createScalarModel(data:
