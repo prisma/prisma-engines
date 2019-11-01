@@ -55,7 +55,6 @@ impl SourceLoader {
                         from_env_var: env_var_for_url,
                         value: url,
                     },
-                    &mut Arguments::new(&ast_source.properties, ast_source.span),
                     &ast_source.documentation.clone().map(|comment| comment.text),
                 )?));
             }

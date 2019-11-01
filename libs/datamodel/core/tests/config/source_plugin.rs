@@ -3,6 +3,7 @@ use datamodel::{
     ast::Span, common::argument::Arguments, common::ScalarType, configuration::*, dml, error::DatamodelError,
     validator::directive::DirectiveValidator,
 };
+use pretty_assertions::assert_eq;
 
 //##########################
 // Directive implementation
@@ -14,7 +15,7 @@ struct CustomDirective {
 
 impl DirectiveValidator<dml::Field> for CustomDirective {
     fn directive_name(&self) -> &'static str {
-        &"mapToBase"
+        &"mapToInt"
     }
     fn validate_and_apply(&self, _args: &mut Arguments, obj: &mut dml::Field) -> Result<(), DatamodelError> {
         obj.field_type = dml::FieldType::Base(self.base_type);
@@ -42,14 +43,6 @@ impl CustomDbDefinition {
     pub fn new() -> CustomDbDefinition {
         CustomDbDefinition {}
     }
-
-    fn get_base_type(&self, arguments: &mut Arguments) -> Result<ScalarType, DatamodelError> {
-        if let Ok(arg) = arguments.arg("base_type") {
-            Ok(ScalarType::from_str(&arg.as_constant_literal()?).unwrap())
-        } else {
-            return Ok(ScalarType::String);
-        }
-    }
 }
 
 impl SourceDefinition for CustomDbDefinition {
@@ -61,13 +54,12 @@ impl SourceDefinition for CustomDbDefinition {
         &self,
         name: &str,
         url: StringFromEnvVar,
-        arguments: &mut Arguments,
         documentation: &Option<String>,
     ) -> Result<Box<dyn Source>, DatamodelError> {
         Ok(Box::new(CustomDb {
             name: String::from(name),
-            url: url,
-            base_type: self.get_base_type(arguments)?,
+            url,
+            base_type: ScalarType::Int,
             documentation: documentation.clone(),
         }))
     }
@@ -91,13 +83,7 @@ impl Source for CustomDb {
     fn name(&self) -> &String {
         &self.name
     }
-    fn config(&self) -> std::collections::HashMap<String, String> {
-        let mut config = std::collections::HashMap::new();
 
-        config.insert(String::from("base_type"), self.base_type.to_string());
-
-        config
-    }
     fn url(&self) -> &StringFromEnvVar {
         &self.url
     }
@@ -149,35 +135,31 @@ fn custom_plugin() {
     post_model
         .assert_has_field("comments")
         .assert_base_type(&ScalarType::Int);
-    post_model
-        .assert_has_field("likes")
-        .assert_base_type(&ScalarType::String);
+    post_model.assert_has_field("likes").assert_base_type(&ScalarType::Int);
 }
 
 const DATAMODEL: &str = r#"
 datasource custom_1 {
     provider = "customDemoSource"
     url = env("URL_CUSTOM_1")
-    base_type = Int
 }
 
 datasource custom_2 {
     provider = "customDemoSource"
     url = "https://localhost"
-    base_type = String
 }
 
 
 model User {
     id Int @id
-    firstName String @custom_1.mapToBase
-    lastName String @custom_1.mapToBase
+    firstName String @custom_1.mapToInt
+    lastName String @custom_1.mapToInt
     email String
 }
 
 model Post {
     id Int @id
-    likes Int @custom_2.mapToBase
+    likes String @custom_2.mapToInt
     comments Int
 }
 "#;
@@ -197,9 +179,7 @@ fn serialize_sources_to_dmmf() {
         "fromEnvVar": "URL_CUSTOM_1",
         "value": "https://localhost"       
     },
-    "config": {
-      "base_type": "Int"
-    }
+    "config": {}
   },
   {
     "name": "custom_2",
@@ -208,9 +188,7 @@ fn serialize_sources_to_dmmf() {
         "fromEnvVar": null,
         "value": "https://localhost"      
     },
-    "config": {
-      "base_type": "String"
-    }
+    "config": {}
   }
 ]"#;
 

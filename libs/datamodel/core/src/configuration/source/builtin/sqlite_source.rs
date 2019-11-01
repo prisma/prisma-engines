@@ -14,9 +14,7 @@ impl Source for SqliteSource {
     fn name(&self) -> &String {
         &self.name
     }
-    fn config(&self) -> std::collections::HashMap<String, String> {
-        std::collections::HashMap::new()
-    }
+
     fn url(&self) -> &StringFromEnvVar {
         &self.url
     }

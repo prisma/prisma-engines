@@ -31,10 +31,6 @@ impl SourceSerializer {
             }
         }
 
-        for (key, value) in &source.config() {
-            arguments.push(ast::Argument::new_string(&key, &value));
-        }
-
         ast::SourceConfig {
             name: ast::Identifier::new(source.name()),
             properties: arguments,

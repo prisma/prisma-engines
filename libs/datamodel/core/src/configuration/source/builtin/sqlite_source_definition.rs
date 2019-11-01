@@ -18,7 +18,6 @@ impl SourceDefinition for SqliteSourceDefinition {
         &self,
         name: &str,
         url: StringFromEnvVar,
-        _arguments: &mut Arguments,
         documentation: &Option<String>,
     ) -> Result<Box<dyn Source>, DatamodelError> {
         Ok(Box::new(SqliteSource {

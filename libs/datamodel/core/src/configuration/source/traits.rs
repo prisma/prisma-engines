@@ -21,10 +21,6 @@ pub trait Source {
 
     fn set_url(&mut self, url: &str);
 
-    /// Gets all custom configuration attributes.
-    // TODO: String is probably a bad choice. Prisma value would be better.
-    fn config(&self) -> HashMap<String, String>;
-
     /// Gets all field directives defined by this source.
     ///
     /// The directives returned here are unscoped.
@@ -55,7 +51,6 @@ pub trait SourceDefinition {
         &self,
         name: &str,
         url: StringFromEnvVar,
-        arguments: &mut Arguments,
         documentation: &Option<String>,
     ) -> Result<Box<dyn Source>, DatamodelError>;
 }

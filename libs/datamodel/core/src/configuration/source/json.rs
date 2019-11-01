@@ -8,7 +8,6 @@ pub struct SourceConfig {
     pub name: String,
     pub connector_type: String,
     pub url: StringFromEnvVar,
-    pub config: HashMap<String, String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub documentation: Option<String>,
 }
@@ -39,7 +38,6 @@ fn source_to_json_struct(source: &dyn configuration::Source) -> SourceConfig {
         connector_type: String::from(source.connector_type()),
         url: source.url().clone(),
         documentation: source.documentation().clone(),
-        config: source.config().clone(),
     }
 }
 
@@ -86,10 +84,6 @@ fn source_from_json(source: &SourceConfig, loader: &configuration::SourceLoader)
         None => {
             arguments.push(ast::Argument::new_string("url", &source.url.value));
         }
-    }
-
-    for (key, value) in &source.config {
-        arguments.push(ast::Argument::new_string(&key, &value));
     }
 
     let ast_source = ast::SourceConfig {

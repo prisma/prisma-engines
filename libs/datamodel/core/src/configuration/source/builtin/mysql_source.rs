@@ -16,10 +16,6 @@ impl Source for MySqlSource {
         &self.name
     }
 
-    fn config(&self) -> std::collections::HashMap<String, String> {
-        std::collections::HashMap::new()
-    }
-
     fn url(&self) -> &StringFromEnvVar {
         &self.url
     }
