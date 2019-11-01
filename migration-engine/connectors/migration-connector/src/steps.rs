@@ -1,7 +1,7 @@
 //! Datamodel migration steps.
 
 use datamodel::ast;
-use serde::{Deserialize, Deserializer, Serialize};
+use serde::{Deserialize, Serialize};
 
 /// An atomic change to a [Datamodel AST](datamodel/ast/struct.Datamodel.html).
 #[derive(Debug, Deserialize, Serialize, Clone, PartialEq)]

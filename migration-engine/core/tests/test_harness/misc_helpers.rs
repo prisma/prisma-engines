@@ -296,7 +296,7 @@ pub fn postgres_url() -> String {
 
 pub fn mysql_url() -> String {
     dbg!(format!(
-        "mysql://root:prisma@{host}:3306/{schema_name}?sslaccept=accept_invalid_certs",
+        "mysql://root:prisma@{host}:3306/{schema_name}",
         host = db_host_mysql_5_7(),
         schema_name = SCHEMA_NAME
     ))
@@ -305,7 +305,7 @@ pub fn mysql_url() -> String {
 pub fn mysql_8_url() -> String {
     let (host, port) = db_host_and_port_mysql_8_0();
     dbg!(format!(
-        "mysql://root:prisma@{host}:{port}/{schema_name}?sslaccept=accept_invalid_certs",
+        "mysql://root:prisma@{host}:{port}/{schema_name}",
         host = host,
         port = port,
         schema_name = SCHEMA_NAME

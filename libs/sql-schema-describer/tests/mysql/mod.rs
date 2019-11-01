@@ -17,7 +17,7 @@ fn mysql_url(schema: &str) -> String {
     debug!("Connecting to MySQL server at {}, port {}, user '{}'", host, port, user);
 
     format!(
-        "mysql://{user}:{password}@{host}:{port}/{schema}?sslaccept=accept_invalid_certs",
+        "mysql://{user}:{password}@{host}:{port}/{schema}",
         user = user,
         password = password,
         host = host,
