@@ -47,7 +47,7 @@ where
     test_each_connector_with_ignores(ignores, test_fn);
 }
 
-fn mysql_migration_connector(database_url: &str) -> SqlMigrationConnector {
+pub(super) fn mysql_migration_connector(database_url: &str) -> SqlMigrationConnector {
     match SqlMigrationConnector::mysql(database_url, true) {
         Ok(c) => c,
         Err(_) => {
@@ -63,6 +63,30 @@ fn mysql_migration_connector(database_url: &str) -> SqlMigrationConnector {
     }
 }
 
+pub(super) fn postgres_migration_connector(url: &str) -> SqlMigrationConnector {
+    match SqlMigrationConnector::postgres(&postgres_url(), true) {
+        Ok(c) => c,
+        Err(_) => {
+            let name_cmd = |name| format!("CREATE DATABASE \"{}\"", name);
+
+            let connect_cmd = |url: url::Url| Postgresql::new_pooled(url);
+
+            create_database(
+                url.parse().unwrap(),
+                "postgres",
+                "postgres",
+                name_cmd,
+                Rc::new(connect_cmd),
+            );
+            SqlMigrationConnector::postgres(&postgres_url(), true).unwrap()
+        }
+    }
+}
+
+pub(super) fn sqlite_migration_connector() -> SqlMigrationConnector {
+    SqlMigrationConnector::sqlite(&sqlite_test_file()).unwrap()
+}
+
 pub fn test_each_connector_with_ignores<I: AsRef<[SqlFamily]>, F>(ignores: I, test_fn: F)
 where
     F: Fn(&TestSetup, &dyn GenericApi) -> () + std::panic::RefUnwindSafe,
@@ -72,23 +96,13 @@ where
     if !ignores.contains(&SqlFamily::Postgres) {
         println!("--------------- Testing with Postgres now ---------------");
 
-        let connector = match SqlMigrationConnector::postgres(&postgres_url(), true) {
-            Ok(c) => c,
-            Err(_) => {
-                let url = Url::parse(&postgres_url()).unwrap();
-                let name_cmd = |name| format!("CREATE DATABASE \"{}\"", name);
-
-                let connect_cmd = |url| Postgresql::new_pooled(url);
-
-                create_database(url, "postgres", "postgres", name_cmd, Rc::new(connect_cmd));
-                SqlMigrationConnector::postgres(&postgres_url(), true).unwrap()
-            }
-        };
+        let connector = postgres_migration_connector(&postgres_url());
 
         let test_setup = TestSetup {
             sql_family: SqlFamily::Postgres,
             database: Arc::clone(&connector.database),
         };
+
         let api = test_api(connector);
 
         test_fn(&test_setup, &api);
@@ -129,7 +143,7 @@ where
     if !ignores.contains(&SqlFamily::Sqlite) {
         println!("--------------- Testing with SQLite now ---------------");
 
-        let connector = SqlMigrationConnector::sqlite(&sqlite_test_file()).unwrap();
+        let connector = sqlite_migration_connector();
         let test_setup = TestSetup {
             sql_family: SqlFamily::Sqlite,
             database: Arc::clone(&connector.database),
