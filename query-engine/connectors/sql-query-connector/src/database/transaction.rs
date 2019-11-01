@@ -3,7 +3,7 @@ use crate::{query_builder::read::ManyRelatedRecordsQueryBuilder, SqlError};
 use connector_interface::{
     self as connector,
     filter::{Filter, RecordFinder},
-    QueryArguments, ReadOperations, ScalarListValues, Transaction, WriteArgs, WriteOperations, IO, AllOperations
+    QueryArguments, ReadOperations, ScalarListValues, Transaction, WriteArgs, WriteOperations, IO
 };
 use prisma_models::prelude::*;
 use std::marker::PhantomData;
@@ -34,11 +34,6 @@ where
         IO::new(async move { Ok(self.inner.rollback().await.map_err(SqlError::from)?) })
     }
 }
-
-impl<'a, T> AllOperations<'a> for SqlConnectorTransaction<'a, T>
-where
-    T: ManyRelatedRecordsQueryBuilder + Send + Sync + 'static,
-{}
 
 impl<'a, T> ReadOperations for SqlConnectorTransaction<'a, T>
 where

@@ -1,11 +1,11 @@
 use crate::{interpreter::InterpretationResult, query_ast::*, result_ast::*};
-use connector::{self, QueryArguments, ScalarListValues, ReadOperations, AllOperations};
+use connector::{self, QueryArguments, ScalarListValues, ReadOperations, ConnectionLike};
 use futures::future::{BoxFuture, FutureExt};
 use prisma_models::{GraphqlId, ScalarField, SelectedFields};
 use std::sync::Arc;
 
 pub fn execute<'a, 'b>(
-    tx: &'a Box<dyn AllOperations<'b> + 'b>,
+    tx: &'a ConnectionLike<'a, 'b>,
     query: ReadQuery,
     parent_ids: &'a [GraphqlId],
 ) -> BoxFuture<'a, InterpretationResult<QueryResult>> {
@@ -22,10 +22,10 @@ pub fn execute<'a, 'b>(
 }
 
 /// Queries a single record.
-fn read_one<'a, 'b>(
-    tx: &'a Box<dyn AllOperations<'b> + 'b>,
+fn read_one<'conn, 'tx>(
+    tx: &'conn ConnectionLike<'conn, 'tx>,
     query: RecordQuery,
-) -> BoxFuture<'a, InterpretationResult<QueryResult>> {
+) -> BoxFuture<'conn, InterpretationResult<QueryResult>> {
     let fut = async move {
         let selected_fields = inject_required_fields(query.selected_fields.clone());
         let scalars = tx
@@ -67,7 +67,7 @@ fn read_one<'a, 'b>(
 
 /// Queries a set of records.
 fn read_many<'a, 'b>(
-    tx: &'a Box<dyn AllOperations<'b> + 'b>,
+    tx: &'a ConnectionLike<'a, 'b>,
     query: ManyRecordsQuery,
 ) -> BoxFuture<'a, InterpretationResult<QueryResult>> {
     let fut = async move {
@@ -99,7 +99,7 @@ fn read_many<'a, 'b>(
 
 /// Queries related records for a set of parent IDs.
 fn read_related<'a, 'b>(
-    tx: &'a Box<dyn AllOperations<'b> + 'b>,
+    tx: &'a ConnectionLike<'a, 'b>,
     query: RelatedRecordsQuery,
     parent_ids: &'a [GraphqlId],
 ) -> BoxFuture<'a, InterpretationResult<QueryResult>> {
@@ -141,7 +141,7 @@ fn read_related<'a, 'b>(
 }
 
 async fn aggregate<'a, 'b>(
-    tx: &'a Box<dyn AllOperations<'b> + 'b>,
+    tx: &'a ConnectionLike<'a, 'b>,
     query: AggregateRecordsQuery,
 ) -> InterpretationResult<QueryResult> {
     let result = tx.count_by_model(query.model, QueryArguments::default()).await?;
@@ -150,7 +150,7 @@ async fn aggregate<'a, 'b>(
 
 /// Resolves scalar lists for a list field for a set of parent IDs.
 async fn resolve_scalar_list_fields<'a, 'b>(
-    tx: &'a Box<dyn AllOperations<'b> + 'b>,
+    tx: &'a ConnectionLike<'a, 'b>,
     record_ids: Vec<GraphqlId>,
     list_fields: Vec<Arc<ScalarField>>,
 ) -> connector::Result<Vec<(String, Vec<ScalarListValues>)>> {
@@ -189,7 +189,7 @@ fn inject_required_fields(mut selected_fields: SelectedFields) -> SelectedFields
 }
 
 fn process_nested<'a, 'b>(
-    tx: &'a Box<dyn AllOperations<'b> + 'b>,
+    tx: &'a ConnectionLike<'a, 'b>,
     nested: Vec<ReadQuery>,
     parent_ids: &'a [GraphqlId],
 ) -> BoxFuture<'a, InterpretationResult<Vec<QueryResult>>> {
