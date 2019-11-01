@@ -1,4 +1,25 @@
-# Implementation Spec: Mapping a Prisma Schema to a SQL Database
+
+# Implementation Documentation: Mapping a Prisma Schema to a SQL Database
+
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+- [Mapping Models](#mapping-models)
+  - [Mapping a model with a single Id field](#mapping-a-model-with-a-single-id-field)
+  - [Mapping a model with a compound Id field](#mapping-a-model-with-a-compound-id-field)
+  - [Mapping a model with singular scalar fields](#mapping-a-model-with-singular-scalar-fields)
+  - [Mapping a model with scalar list fields](#mapping-a-model-with-scalar-list-fields)
+  - [Mapping a model with a unique field](#mapping-a-model-with-a-unique-field)
+  - [Mapping a model with a compound unique field](#mapping-a-model-with-a-compound-unique-field)
+- [Mapping Enums](#mapping-enums)
+- [Mapping Default Values](#mapping-default-values)
+- [Mapping Relations](#mapping-relations)
+  - [Mapping a one to one relation](#mapping-a-one-to-one-relation)
+  - [Mapping a one to many relation](#mapping-a-one-to-many-relation)
+  - [Mapping a many to many relation](#mapping-a-many-to-many-relation)
+  - [Mapping Self Relations and Ambigous Relations](#mapping-self-relations-and-ambigous-relations)
+  - [Mapping Compound Foreign Keys](#mapping-compound-foreign-keys)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 The schema of the underlying database can be deducted from a [Prisma schema](https://github.com/prisma/specs/tree/master/schema). This document describes how this is done for SQL databases.
 
@@ -50,6 +71,8 @@ CREATE TABLE "test"."Blog" (
   PRIMARY KEY ("id")
 );
 ```
+
+🚨 The `cuid()` and `uuid()` expressions have no manifestation in the database, and therefore can later not be inferred. 
 
 ### Mapping a model with a compound Id field
 Prisma Schema Example:
