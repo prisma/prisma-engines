@@ -3,10 +3,10 @@ use crate::{
     query_ast::*,
     QueryResult,
 };
-use connector::{Filter, Transaction, WriteArgs};
+use connector::{Filter, WriteOperations,  WriteArgs, ConnectionLike};
 
 pub async fn execute<'a, 'b>(
-    tx: &'a Box<dyn Transaction<'b> + 'b>,
+    tx: &'a ConnectionLike<'a, 'b>,
     write_query: WriteQuery,
 ) -> InterpretationResult<QueryResult> {
     match write_query {
@@ -23,7 +23,7 @@ pub async fn execute<'a, 'b>(
 }
 
 async fn create_one<'a, 'b>(
-    tx: &'a Box<dyn Transaction<'b> + 'b>,
+    tx: &'a ConnectionLike<'a, 'b>,
     q: CreateRecord,
 ) -> InterpretationResult<QueryResult> {
     let res = tx
@@ -34,7 +34,7 @@ async fn create_one<'a, 'b>(
 }
 
 async fn update_one<'a, 'b>(
-    tx: &'a Box<dyn Transaction<'b> + 'b>,
+    tx: &'a ConnectionLike<'a, 'b>,
     q: UpdateRecord,
 ) -> InterpretationResult<QueryResult> {
     let mut res = tx
@@ -49,7 +49,7 @@ async fn update_one<'a, 'b>(
 }
 
 async fn delete_one<'a, 'b>(
-    tx: &'a Box<dyn Transaction<'b> + 'b>,
+    tx: &'a ConnectionLike<'a, 'b>,
     q: DeleteRecord,
 ) -> InterpretationResult<QueryResult> {
     // We need to ensure that we have a record finder, else we delete everything (conversion to empty filter).
@@ -66,7 +66,7 @@ async fn delete_one<'a, 'b>(
 }
 
 async fn update_many<'a, 'b>(
-    tx: &'a Box<dyn Transaction<'b> + 'b>,
+    tx: &'a ConnectionLike<'a, 'b>,
     q: UpdateManyRecords,
 ) -> InterpretationResult<QueryResult> {
     let res = tx
@@ -77,7 +77,7 @@ async fn update_many<'a, 'b>(
 }
 
 async fn delete_many<'a, 'b>(
-    tx: &'a Box<dyn Transaction<'b> + 'b>,
+    tx: &'a ConnectionLike<'a, 'b>,
     q: DeleteManyRecords,
 ) -> InterpretationResult<QueryResult> {
     let res = tx.delete_records(q.model, q.filter).await?;
@@ -86,7 +86,7 @@ async fn delete_many<'a, 'b>(
 }
 
 async fn connect<'a, 'b>(
-    tx: &'a Box<dyn Transaction<'b> + 'b>,
+    tx: &'a ConnectionLike<'a, 'b>,
     q: ConnectRecords,
 ) -> InterpretationResult<QueryResult> {
     tx.connect(
@@ -100,7 +100,7 @@ async fn connect<'a, 'b>(
 }
 
 async fn disconnect<'a, 'b>(
-    tx: &'a Box<dyn Transaction<'b> + 'b>,
+    tx: &'a ConnectionLike<'a, 'b>,
     q: DisconnectRecords,
 ) -> InterpretationResult<QueryResult> {
     tx.disconnect(
@@ -113,7 +113,7 @@ async fn disconnect<'a, 'b>(
     Ok(QueryResult::Unit)
 }
 
-async fn set<'a, 'b>(tx: &'a Box<dyn Transaction<'b> + 'b>, q: SetRecords) -> InterpretationResult<QueryResult> {
+async fn set<'a, 'b>(tx: &'a ConnectionLike<'a, 'b>, q: SetRecords) -> InterpretationResult<QueryResult> {
     tx.set(
         q.relation_field,
         q.parent.expect("Expected parent record ID to be set for set"),
@@ -124,6 +124,6 @@ async fn set<'a, 'b>(tx: &'a Box<dyn Transaction<'b> + 'b>, q: SetRecords) -> In
     Ok(QueryResult::Unit)
 }
 
-async fn reset<'a, 'b>(_tx: &'a Box<dyn Transaction<'b> + 'b>, _q: ResetData) -> InterpretationResult<QueryResult> {
+async fn reset<'a, 'b>(_tx: &'a ConnectionLike<'a, 'b>, _q: ResetData) -> InterpretationResult<QueryResult> {
     unimplemented!()
 }

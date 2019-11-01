@@ -5,7 +5,7 @@ use super::{
 };
 use crate::{Query, QueryResult};
 use async_std::sync::Mutex;
-use connector::Transaction;
+use connector::ConnectionLike;
 use futures::future::{BoxFuture, FutureExt};
 use im::HashMap;
 use prisma_models::prelude::*;
@@ -63,28 +63,28 @@ impl Env {
     }
 }
 
-pub struct QueryInterpreter<'a, 'b> {
-    pub(crate) tx: &'a Box<dyn Transaction<'b> + 'b>,
+pub struct QueryInterpreter<'conn, 'tx> {
+    pub(crate) conn: ConnectionLike<'conn, 'tx>,
     pub log: Mutex<String>,
 }
 
-impl<'a, 'b> QueryInterpreter<'a, 'b>
+impl<'conn, 'tx> QueryInterpreter<'conn, 'tx>
 where
-    'b: 'a,
+    'tx: 'conn
 {
-    pub fn new(tx: &'a Box<dyn Transaction<'b> + 'b>) -> QueryInterpreter<'a, 'b> {
-        QueryInterpreter {
-            tx,
+    pub fn new(conn: ConnectionLike<'conn, 'tx>) -> QueryInterpreter<'conn, 'tx> {
+        Self {
+            conn,
             log: Mutex::new(String::new()),
         }
     }
 
     pub fn interpret(
-        &'a self,
+        &'conn self,
         exp: Expression,
         env: Env,
         level: usize,
-    ) -> BoxFuture<'a, InterpretationResult<ExpressionResult>> {
+    ) -> BoxFuture<'conn, InterpretationResult<ExpressionResult>> {
         match exp {
             Expression::Func { func } => async move { self.interpret(func(env.clone())?, env, level).await }.boxed(),
 
@@ -142,7 +142,7 @@ where
                             let log_line = format!("READ {}", read);
 
                             self.log_line(log_line, level).await;
-                            Ok(read::execute(self.tx, read, &[])
+                            Ok(read::execute(&self.conn, read, &[])
                                 .await
                                 .map(|res| ExpressionResult::Query(res))?)
                         }
@@ -151,7 +151,7 @@ where
                             let log_line = format!("WRITE {}", write);
 
                             self.log_line(log_line, level).await;
-                            Ok(write::execute(self.tx, write)
+                            Ok(write::execute(&self.conn, write)
                                 .await
                                 .map(|res| ExpressionResult::Query(res))?)
                         }

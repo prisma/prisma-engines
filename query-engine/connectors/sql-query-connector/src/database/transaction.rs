@@ -3,7 +3,7 @@ use crate::{query_builder::read::ManyRelatedRecordsQueryBuilder, SqlError};
 use connector_interface::{
     self as connector,
     filter::{Filter, RecordFinder},
-    QueryArguments, ReadOperations, ScalarListValues, Transaction, WriteArgs, WriteOperations, IO,
+    QueryArguments, ReadOperations, ScalarListValues, Transaction, WriteArgs, WriteOperations, IO
 };
 use prisma_models::prelude::*;
 use std::marker::PhantomData;

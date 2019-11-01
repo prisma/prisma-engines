@@ -6,8 +6,8 @@ pub struct QueryPipeline<'conn, 'tx> {
     serializer: IrSerializer,
 }
 
-impl<'conn, 'tx> QueryPipeline<'conn, 'tx> {
-    pub fn new(graph: QueryGraph, interpreter: QueryInterpreter<'conn, 'tx>, serializer: IrSerializer) -> Self {
+impl<'conn> QueryPipeline<'conn> {
+    pub fn new(graph: QueryGraph, interpreter: QueryInterpreter<'conn>, serializer: IrSerializer) -> Self {
         Self {
             graph,
             interpreter,
