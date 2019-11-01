@@ -22,6 +22,31 @@ impl SourceLoader {
         self.source_declarations.push(source_definition);
     }
 
+    /// Loads all source config blocks form the given AST,
+    /// and returns a Source instance for each.
+    pub fn load(&self, ast_schema: &ast::SchemaAst) -> Result<Vec<Box<dyn Source>>, ErrorCollection> {
+        let mut sources: Vec<Box<dyn Source>> = vec![];
+        let mut errors = ErrorCollection::new();
+
+        for src in &ast_schema.sources() {
+            match self.load_source(&src) {
+                Ok(Some(loaded_src)) => sources.push(loaded_src),
+                Ok(None) => { /* Source was disabled. */ }
+                // Lift error to source.
+                Err(DatamodelError::ArgumentNotFound { argument_name, span }) => errors.push(
+                    DatamodelError::new_source_argument_not_found_error(&argument_name, &src.name.name, span),
+                ),
+                Err(err) => errors.push(err),
+            }
+        }
+
+        if errors.has_errors() {
+            Err(errors)
+        } else {
+            Ok(sources)
+        }
+    }
+
     /// Internal: Loads a single source from a source config block in the datamodel.
     pub fn load_source(&self, ast_source: &ast::SourceConfig) -> Result<Option<Box<dyn Source>>, DatamodelError> {
         let mut args = Arguments::new(&ast_source.properties, ast_source.span);
@@ -64,30 +89,5 @@ impl SourceLoader {
             &provider,
             provider_arg.span(),
         ))
-    }
-
-    /// Loads all source config blocks form the given AST,
-    /// and returns a Source instance for each.
-    pub fn load(&self, ast_schema: &ast::SchemaAst) -> Result<Vec<Box<dyn Source>>, ErrorCollection> {
-        let mut sources: Vec<Box<dyn Source>> = vec![];
-        let mut errors = ErrorCollection::new();
-
-        for src in &ast_schema.sources() {
-            match self.load_source(&src) {
-                Ok(Some(loaded_src)) => sources.push(loaded_src),
-                Ok(None) => { /* Source was disabled. */ }
-                // Lift error to source.
-                Err(DatamodelError::ArgumentNotFound { argument_name, span }) => errors.push(
-                    DatamodelError::new_source_argument_not_found_error(&argument_name, &src.name.name, span),
-                ),
-                Err(err) => errors.push(err),
-            }
-        }
-
-        if errors.has_errors() {
-            Err(errors)
-        } else {
-            Ok(sources)
-        }
     }
 }
