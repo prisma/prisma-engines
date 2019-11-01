@@ -5,6 +5,7 @@ use std::convert::TryFrom;
 
 pub struct WriteQueryBuilder;
 
+#[allow(dead_code)]
 impl WriteQueryBuilder {
     const PARAMETER_LIMIT: usize = 10000;
 

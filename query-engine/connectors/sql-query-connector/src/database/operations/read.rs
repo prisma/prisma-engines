@@ -5,7 +5,6 @@ use crate::{
 use connector_interface::{error::ConnectorError, *};
 use itertools::Itertools;
 use prisma_models::*;
-use prisma_query::connector::Queryable;
 use std::convert::TryFrom;
 
 struct ScalarListElement {

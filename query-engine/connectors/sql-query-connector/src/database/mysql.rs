@@ -3,7 +3,6 @@ use crate::{query_builder::ManyRelatedRecordsWithUnionAll, FromSource, QueryExt,
 use connector_interface::{Connection, Connector, IO};
 use datamodel::Source;
 use prisma_query::pool::{self, MysqlManager};
-use std::convert::TryFrom;
 use tokio_resource_pool::{CheckOut, Pool};
 use url::Url;
 

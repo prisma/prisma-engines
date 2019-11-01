@@ -3,7 +3,7 @@ use crate::{query_builder::ManyRelatedRecordsWithRowNumber, FromSource, QueryExt
 use connector_interface::{Connection, Connector, IO};
 use datamodel::Source;
 use prisma_query::{
-    connector::{Queryable, SqliteParams},
+    connector::SqliteParams,
     pool::{self, SqliteManager},
 };
 use std::convert::TryFrom;

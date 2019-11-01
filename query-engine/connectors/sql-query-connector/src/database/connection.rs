@@ -6,7 +6,6 @@ use connector_interface::{
     Connection, QueryArguments, ReadOperations, ScalarListValues, Transaction, WriteArgs, WriteOperations, IO,
 };
 use prisma_models::prelude::*;
-use prisma_query::connector::Queryable;
 use std::marker::PhantomData;
 
 pub struct SqlConnection<C, T> {

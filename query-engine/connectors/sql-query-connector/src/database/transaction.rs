@@ -3,10 +3,9 @@ use crate::{query_builder::read::ManyRelatedRecordsQueryBuilder, SqlError};
 use connector_interface::{
     self as connector,
     filter::{Filter, RecordFinder},
-    Connection, QueryArguments, ReadOperations, ScalarListValues, Transaction, WriteArgs, WriteOperations, IO,
+    QueryArguments, ReadOperations, ScalarListValues, Transaction, WriteArgs, WriteOperations, IO,
 };
 use prisma_models::prelude::*;
-use prisma_query::connector::Queryable;
 use std::marker::PhantomData;
 
 pub struct SqlConnectorTransaction<'a, T> {
