@@ -1,5 +1,6 @@
 use crate::common::ErrorAsserts;
 use datamodel::error::DatamodelError;
+use pretty_assertions::assert_eq;
 
 #[test]
 fn serialize_builtin_sources_to_dmmf() {
@@ -35,8 +36,7 @@ fn serialize_builtin_sources_to_dmmf() {
     "url": {
       "fromEnvVar": null,
       "value": "https://localhost/postgres1"
-    },    
-    "config": {}
+    }
   },
   {
     "name": "pg2",
@@ -44,8 +44,7 @@ fn serialize_builtin_sources_to_dmmf() {
     "url": {
       "fromEnvVar": "pg2",
       "value": "https://localhost/postgres2"
-    },
-    "config": {}
+    }
   },
   {
     "name": "sqlite1",
@@ -53,8 +52,7 @@ fn serialize_builtin_sources_to_dmmf() {
     "url": {
       "fromEnvVar": null,
       "value": "https://localhost/sqlite1"
-    },
-    "config": {}
+    }
   },
   {
     "name": "mysql1",
@@ -62,8 +60,7 @@ fn serialize_builtin_sources_to_dmmf() {
     "url": {
       "fromEnvVar": null,
       "value": "https://localhost/mysql"
-    },
-    "config": {}
+    }
   }
 ]"#;
 

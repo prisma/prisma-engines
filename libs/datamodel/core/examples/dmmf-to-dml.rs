@@ -19,7 +19,7 @@ fn main() {
     let file_name = matches.value_of("INPUT").unwrap();
     let file = fs::read_to_string(&file_name).expect(&format!("Unable to open file {}", file_name));
 
-    let dml = datamodel::dmmf::parse_from_dmmf(&file);
+    let dml = datamodel::json::dmmf::parse_from_dmmf(&file);
 
     datamodel::render_datamodel_to(&mut std::io::stdout().lock(), &dml).unwrap();
 }

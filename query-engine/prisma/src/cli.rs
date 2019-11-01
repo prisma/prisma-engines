@@ -81,7 +81,7 @@ impl CliCommand {
     }
 
     fn dmmf_to_dml(input: DmmfToDmlInput) -> PrismaResult<()> {
-        let datamodel = datamodel::dmmf::parse_from_dmmf(&input.dmmf);
+        let datamodel = datamodel::json::dmmf::parse_from_dmmf(&input.dmmf);
         let config = datamodel::config_from_mcf_json_value(input.config);
         let serialized = datamodel::render_datamodel_and_config_to_string(&datamodel, &config)?;
 

@@ -52,8 +52,8 @@ pub mod ast;
 pub mod common;
 pub mod configuration;
 pub mod dml;
-pub mod dmmf;
 pub mod error;
+pub mod json;
 pub mod validator;
 
 pub use configuration::*;
