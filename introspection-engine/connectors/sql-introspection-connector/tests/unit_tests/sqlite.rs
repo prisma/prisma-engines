@@ -1,5 +1,4 @@
-mod test_harness;
-
+use crate::*;
 use barrel::types;
 use test_harness::*;
 
@@ -412,10 +411,12 @@ fn introspecting_a_prisma_many_to_many_relation_should_work() {
                 t.inject_custom(
                     "A TEXT NOT NULL,
                           B TEXT NOT NULL,
-                          FOREIGN KEY (A) REFERENCES  User(id),
-                          FOREIGN KEY (B) REFERENCES  Post(id)",
+                          FOREIGN KEY (A) REFERENCES  Post(id),
+                          FOREIGN KEY (B) REFERENCES  User(id)",
                 )
             });
+            migration
+                .inject_custom("CREATE UNIQUE INDEX \"introspection-engine\".test ON \"_PostToUser\" (\"A\", \"B\");")
         });
 
         let dm = r#"

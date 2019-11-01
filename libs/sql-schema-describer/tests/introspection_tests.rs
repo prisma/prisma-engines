@@ -342,7 +342,7 @@ fn indices_must_work() {
             let result = inspector.describe(&SCHEMA.to_string()).expect("describing");
             let user_table = result.get_table("User").expect("getting User table");
             let default = match db_type {
-                DbType::Postgres => Some(format!("nextval('\"{}\".\"User_id_seq\"'::regclass)", SCHEMA)),
+                DbType::Postgres => Some(format!("nextval(\"{}\".\"User_id_seq\"::regclass)", SCHEMA)),
                 _ => None,
             };
             let expected_columns = vec![

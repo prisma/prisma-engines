@@ -121,11 +121,16 @@ impl SqlSchemaDescriber {
                 } else {
                     ColumnArity::Nullable
                 };
-                let default = col.get("column_default").and_then(|x| x.to_string());
+
+                let default = col.get("column_default").and_then(|param_value| {
+                    param_value
+                        .to_string()
+                        .map(|x| x.replace("\'", "").replace("::text", ""))
+                });
                 let is_auto_increment = is_identity
                     || match default {
                         Some(ref val) => {
-                            val == &format!("nextval(\'\"{}\".\"{}_{}_seq\"\'::regclass)", schema, table, col_name,)
+                            val == &format!("nextval(\"{}\".\"{}_{}_seq\"::regclass)", schema, table, col_name,)
                         }
                         _ => false,
                     };
