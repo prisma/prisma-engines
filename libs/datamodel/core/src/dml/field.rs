@@ -1,5 +1,4 @@
 use super::*;
-use crate::scalars::{ScalarType, ScalarValue};
 
 /// Datamodel field arity.
 #[derive(Debug, PartialEq, Copy, Clone)]
