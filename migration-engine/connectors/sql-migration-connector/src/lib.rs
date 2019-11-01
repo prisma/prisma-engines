@@ -65,8 +65,15 @@ impl SqlMigrationConnector {
         let params = PostgresParams::try_from(url.clone())?;
 
         let schema = params.schema.clone();
+
         let conn = if pooled {
-            Postgresql::new_pooled(url.clone())?
+            let pool = Postgresql::new_pooled(url.clone())?;
+
+            // Postgres connection pools are lazy, we need to query to fail early when the database
+            // is not reachable.
+            pool.query_raw("SELECT 1", &[])?;
+
+            pool
         } else {
             Postgresql::new_unpooled(url.clone())?
         };

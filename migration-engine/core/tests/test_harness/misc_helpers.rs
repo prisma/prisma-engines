@@ -129,7 +129,7 @@ where
     if !ignores.contains(&SqlFamily::Sqlite) {
         println!("--------------- Testing with SQLite now ---------------");
 
-        let connector = SqlMigrationConnector::sqlite(dbg!(&sqlite_test_file())).unwrap();
+        let connector = SqlMigrationConnector::sqlite(&sqlite_test_file()).unwrap();
         let test_setup = TestSetup {
             sql_family: SqlFamily::Sqlite,
             database: Arc::clone(&connector.database),
