@@ -3,7 +3,7 @@ mod field_renderer;
 mod object_renderer;
 mod type_renderer;
 
-use core::schema::*;
+use query_core::schema::*;
 use enum_renderer::*;
 use field_renderer::*;
 use object_renderer::*;

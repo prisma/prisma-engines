@@ -1,4 +1,4 @@
-use core::{response_ir, CoreError};
+use query_core::{response_ir, CoreError};
 use datamodel::error::ErrorCollection;
 use failure::{Error, Fail};
 use graphql_parser::query::ParseError as GqlParseError;

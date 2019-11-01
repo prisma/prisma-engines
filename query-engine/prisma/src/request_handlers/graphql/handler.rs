@@ -1,10 +1,10 @@
 use super::protocol_adapter::GraphQLProtocolAdapter;
 use crate::{context::PrismaContext, serializers::json, PrismaRequest, PrismaResult, RequestHandler};
-use core::{response_ir, CoreError};
-use futures::future::{BoxFuture, FutureExt};
+use query_core::{response_ir, CoreError};
 use graphql_parser as gql;
 use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, sync::Arc};
+use async_trait::async_trait;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -17,23 +17,20 @@ pub struct GraphQlBody {
 pub struct GraphQlRequestHandler;
 
 #[allow(unused_variables)]
+#[async_trait]
 impl RequestHandler for GraphQlRequestHandler {
     type Body = GraphQlBody;
 
-    fn handle<'a, S>(&'a self, req: S, ctx: &'a PrismaContext) -> BoxFuture<'a, serde_json::Value>
+    async fn handle<S>(&self, req: S, ctx: &PrismaContext) -> serde_json::Value
     where
         S: Into<PrismaRequest<Self::Body>> + Send + Sync + 'static,
     {
-        let fut = async move {
-            let responses = match handle_graphql_query(req.into(), ctx).await {
-                Ok(responses) => responses,
-                Err(err) => vec![err.into()],
-            };
-
-            json::serialize(responses)
+        let responses = match handle_graphql_query(req.into(), ctx).await {
+            Ok(responses) => responses,
+            Err(err) => vec![err.into()],
         };
 
-        fut.boxed()
+        json::serialize(responses)
     }
 }
 

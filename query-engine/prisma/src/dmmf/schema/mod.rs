@@ -7,7 +7,7 @@ mod schema_renderer;
 mod type_renderer;
 
 use crate::dmmf::DMMFMapping;
-use core::schema::*;
+use query_core::schema::*;
 use enum_renderer::*;
 use field_renderer::*;
 use object_renderer::*;

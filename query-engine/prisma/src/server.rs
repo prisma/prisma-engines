@@ -7,7 +7,7 @@ use crate::{
     },
     PrismaResult,
 };
-use core::schema::QuerySchemaRenderer;
+use query_core::schema::QuerySchemaRenderer;
 use futures::stream::TryStreamExt;
 use hyper::header;
 use hyper::service::{make_service_fn, service_fn};

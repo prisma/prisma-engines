@@ -1,5 +1,5 @@
 use crate::{data_model_loader::*, exec_loader, PrismaError, PrismaResult};
-use core::{
+use query_core::{
     schema::{QuerySchemaRef, SupportedCapabilities},
     BuildMode, QueryExecutor, QuerySchemaBuilder,
 };

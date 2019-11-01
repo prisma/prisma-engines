@@ -11,14 +11,15 @@ mod pipeline;
 pub use interpreting_executor::*;
 
 use crate::{query_document::QueryDocument, response_ir::Response, schema::QuerySchemaRef, CoreResult};
-use futures::future::BoxFuture;
+use async_trait::async_trait;
 
+#[async_trait]
 pub trait QueryExecutor {
-    fn execute<'a>(
-        &'a self,
+    async fn execute(
+        &self,
         query_doc: QueryDocument,
         query_schema: QuerySchemaRef,
-    ) -> BoxFuture<'a, CoreResult<Vec<Response>>>;
+    ) -> CoreResult<Vec<Response>>;
 
     fn primary_connector(&self) -> &'static str;
 }

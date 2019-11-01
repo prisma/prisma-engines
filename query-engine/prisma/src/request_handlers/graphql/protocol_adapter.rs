@@ -1,5 +1,5 @@
 use crate::{error::PrismaError, PrismaResult};
-use core::query_document::*;
+use query_core::query_document::*;
 use graphql_parser::query::{
     Definition, Document, OperationDefinition, Selection as GqlSelection, SelectionSet, Value,
 };

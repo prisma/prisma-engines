@@ -24,3 +24,4 @@ petgraph = "0.4"
 im = "13.0"
 futures-preview = { version = "0.3.0-alpha.19", features = ["compat"] }
 async-std = { version = "0.99", features = ["unstable"] }
+async-trait = "0.1"

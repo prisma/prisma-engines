@@ -3,7 +3,7 @@ use crate::{
     dmmf, PrismaResult,
 };
 use clap::ArgMatches;
-use core::{
+use query_core::{
     schema::{QuerySchemaRef, SupportedCapabilities},
     BuildMode, QuerySchemaBuilder,
 };

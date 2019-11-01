@@ -3,7 +3,7 @@ use crate::{
     CoreResult, IrSerializer, QueryDocument, QueryGraph, QueryGraphBuilder, QueryInterpreter, QuerySchemaRef, Response,
 };
 use connector::{Connector, ConnectionLike};
-use futures::future::{BoxFuture, FutureExt};
+use async_trait::async_trait;
 
 /// Central query executor and main entry point into the query core.
 pub struct InterpretingExecutor<C> {
@@ -25,43 +25,39 @@ where
     }
 }
 
+#[async_trait]
 impl<C> QueryExecutor for InterpretingExecutor<C>
 where
     C: Connector + Send + Sync,
 {
-    fn execute<'a>(
-        &'a self,
+    async fn execute(
+        &self,
         query_doc: QueryDocument,
         query_schema: QuerySchemaRef,
-    ) -> BoxFuture<'a, CoreResult<Vec<Response>>> {
-        let conn_fut = self.connector.get_connection();
-        let fut = async move {
-            let conn = conn_fut.await?;
+    ) -> CoreResult<Vec<Response>> {
+        let conn = self.connector.get_connection().await?;
 
-            // Parse, validate, and extract query graphs from query document.
-            let queries: Vec<(QueryGraph, IrSerializer)> = QueryGraphBuilder::new(query_schema).build(query_doc)?;
+        // Parse, validate, and extract query graphs from query document.
+        let queries: Vec<(QueryGraph, IrSerializer)> = QueryGraphBuilder::new(query_schema).build(query_doc)?;
 
-            // Create pipelines for all separate queries
-            let mut results: Vec<Response> = vec![];
+        // Create pipelines for all separate queries
+        let mut results: Vec<Response> = vec![];
 
-            for (query_graph, info) in queries {
-                let tx = conn.start_transaction().await?;
-                let interpreter = QueryInterpreter::new(ConnectionLike::Transaction(tx.as_ref()));
-                let result = QueryPipeline::new(query_graph, interpreter, info).execute().await;
+        for (query_graph, info) in queries {
+            let tx = conn.start_transaction().await?;
+            let interpreter = QueryInterpreter::new(ConnectionLike::Transaction(tx.as_ref()));
+            let result = QueryPipeline::new(query_graph, interpreter, info).execute().await;
 
-                if result.is_ok() {
-                    tx.commit().await?;
-                } else {
-                    tx.rollback().await?;
-                }
-
-                results.push(result?);
+            if result.is_ok() {
+                tx.commit().await?;
+            } else {
+                tx.rollback().await?;
             }
 
-            Ok(results)
-        };
+            results.push(result?);
+        }
 
-        fut.boxed()
+        Ok(results)
     }
 
     fn primary_connector(&self) -> &'static str {
