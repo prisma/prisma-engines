@@ -25,15 +25,15 @@ impl DirectiveBox {
     /// The directives defined by the given sources will be namespaced.
     pub fn with_sources(sources: &[Box<dyn configuration::Source>]) -> DirectiveBox {
         sources.iter().fold(DirectiveBox::new(), |mut directives, source| {
-            directives
-                .enm
-                .add_all_scoped(source.get_enum_directives(), source.name());
-            directives
-                .field
-                .add_all_scoped(source.get_field_directives(), source.name());
-            directives
-                .model
-                .add_all_scoped(source.get_model_directives(), source.name());
+            //            directives
+            //                .enm
+            //                .add_all_scoped(source.get_enum_directives(), source.name());
+            //            directives
+            //                .field
+            //                .add_all_scoped(source.get_field_directives(), source.name());
+            //            directives
+            //                .model
+            //                .add_all_scoped(source.get_model_directives(), source.name());
 
             directives
         })

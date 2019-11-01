@@ -26,15 +26,6 @@ impl Source for SqliteSource {
         };
     }
 
-    fn get_field_directives(&self) -> Vec<Box<dyn DirectiveValidator<dml::Field>>> {
-        vec![]
-    }
-    fn get_model_directives(&self) -> Vec<Box<dyn DirectiveValidator<dml::Model>>> {
-        vec![]
-    }
-    fn get_enum_directives(&self) -> Vec<Box<dyn DirectiveValidator<dml::Enum>>> {
-        vec![]
-    }
     fn documentation(&self) -> &Option<String> {
         &self.documentation
     }

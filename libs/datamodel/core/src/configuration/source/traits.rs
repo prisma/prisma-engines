@@ -21,21 +21,6 @@ pub trait Source {
 
     fn set_url(&mut self, url: &str);
 
-    /// Gets all field directives defined by this source.
-    ///
-    /// The directives returned here are unscoped.
-    fn get_field_directives(&self) -> Vec<Box<dyn DirectiveValidator<dml::Field>>>;
-
-    /// Gets all model directives defined by this source.
-    ///
-    /// The directives returned here are unscoped.
-    fn get_model_directives(&self) -> Vec<Box<dyn DirectiveValidator<dml::Model>>>;
-
-    /// Gets all enum directives defined by this source.
-    ///
-    /// The directives returned here are unscoped.
-    fn get_enum_directives(&self) -> Vec<Box<dyn DirectiveValidator<dml::Enum>>>;
-
     /// Documentation of this source.
     fn documentation(&self) -> &Option<String>;
 }
