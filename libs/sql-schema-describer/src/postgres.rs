@@ -45,10 +45,7 @@ impl SqlSchemaDescriber {
             -- Views are not supported yet
             AND table_type = 'BASE TABLE'
             ORDER BY table_name";
-        let rows = self
-            .conn
-            .query_raw(schema, sql, &[schema.into()])
-            .expect("get table names ");
+        let rows = self.conn.query_raw(sql, &[schema.into()]).expect("get table names ");
         let names = rows
             .into_iter()
             .map(|row| {
@@ -83,7 +80,7 @@ impl SqlSchemaDescriber {
             ORDER BY column_name";
         let rows = self
             .conn
-            .query_raw(schema, &sql, &[schema.into(), table.into()])
+            .query_raw(&sql, &[schema.into(), table.into()])
             .expect("querying for columns");
         let cols = rows
             .into_iter()
@@ -189,7 +186,7 @@ impl SqlSchemaDescriber {
         // objects.
         let result_set = self
             .conn
-            .query_raw(schema, &sql, &[table.into(), schema.into()])
+            .query_raw(&sql, &[table.into(), schema.into()])
             .expect("querying for foreign keys");
         let mut intermediate_fks: HashMap<i64, ForeignKey> = HashMap::new();
         for row in result_set.into_iter() {
@@ -294,7 +291,7 @@ impl SqlSchemaDescriber {
         debug!("Getting indices: {}", sql);
         let rows = self
             .conn
-            .query_raw(schema, &sql, &[schema.into(), table_name.into()])
+            .query_raw(&sql, &[schema.into(), table_name.into()])
             .expect("querying for indices");
         let mut pk: Option<PrimaryKey> = None;
         let indices = rows
@@ -350,7 +347,7 @@ impl SqlSchemaDescriber {
             let re_seq = Regex::new("^(?:.+\\.)?\"?([^.\"]+)\"?").expect("compile regex");
             let rows = self
                 .conn
-                .query_raw(schema, &sql, &[])
+                .query_raw(&sql, &[])
                 .expect("querying for sequence seeding primary key column");
             // Given the result rows, find any sequence
             rows.into_iter().fold(None, |_: Option<Sequence>, row| {
@@ -380,7 +377,7 @@ impl SqlSchemaDescriber {
                   WHERE sequence_schema = $1";
         let rows = self
             .conn
-            .query_raw(schema, &sql, &[schema.into()])
+            .query_raw(&sql, &[schema.into()])
             .expect("querying for sequences");
         let sequences = rows
             .into_iter()
@@ -415,10 +412,7 @@ impl SqlSchemaDescriber {
             JOIN pg_enum e ON t.oid = e.enumtypid  
             JOIN pg_catalog.pg_namespace n ON n.oid = t.typnamespace
             WHERE n.nspname = $1";
-        let rows = self
-            .conn
-            .query_raw(schema, &sql, &[schema.into()])
-            .expect("querying for enums");
+        let rows = self.conn.query_raw(&sql, &[schema.into()]).expect("querying for enums");
         let mut enum_values: HashMap<String, HashSet<String>> = HashMap::new();
         for row in rows.into_iter() {
             debug!("Got enum row: {:?}", row);

@@ -296,7 +296,7 @@ mod tests {
                 let uri = url::Url::parse(&mysql_url(None)).unwrap();
                 let conn = Mysql::new_unpooled(uri).unwrap();
 
-                conn.execute_raw("", "DROP DATABASE `this_should_exist`", &[]).unwrap();
+                conn.execute_raw("DROP DATABASE `this_should_exist`", &[]).unwrap();
             }
 
             res.unwrap();
@@ -325,8 +325,7 @@ mod tests {
                 let uri = url::Url::parse(&postgres_url(None)).unwrap();
                 let conn = Postgresql::new_unpooled(uri).unwrap();
 
-                conn.execute_raw("", "DROP DATABASE \"this_should_exist\"", &[])
-                    .unwrap();
+                conn.execute_raw("DROP DATABASE \"this_should_exist\"", &[]).unwrap();
             }
 
             res.unwrap();

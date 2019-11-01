@@ -21,7 +21,7 @@ fn adding_a_required_field_if_there_is_data() {
         infer_and_apply(test_setup, api, &dm).sql_schema;
 
         let insert = Insert::single_into((SCHEMA_NAME, "Test")).value("id", "test");
-        test_setup.database.execute(SCHEMA_NAME, insert.into()).unwrap();
+        test_setup.database.execute(insert.into()).unwrap();
 
         let dm = r#"
             model Test {
@@ -61,7 +61,7 @@ fn adding_a_required_field_must_use_the_default_value_for_migrations() {
         let conn = &test_setup.database;
         let insert = Insert::single_into((SCHEMA_NAME, "Test")).value("id", "test");
 
-        conn.execute(SCHEMA_NAME, insert.into()).unwrap();
+        conn.execute(insert.into()).unwrap();
 
         let dm = r#"
             model Test {
@@ -95,7 +95,7 @@ fn adding_a_required_field_must_use_the_default_value_for_migrations() {
                 _ => (SCHEMA_NAME, "Test").into(),
             };
             let query = Select::from_table(table_for_select).so_that(conditions);
-            let result_set = conn.query(SCHEMA_NAME, query.into()).unwrap();
+            let result_set = conn.query(query.into()).unwrap();
             let row = result_set.into_iter().next().expect("query returned no results");
             assert_eq!(row["myint"].as_i64().unwrap(), 1);
             assert_eq!(row["string"].as_str().unwrap(), "test_string");
@@ -116,7 +116,7 @@ fn dropping_a_table_with_rows_should_warn() {
         let conn = &test_setup.database;
         let insert = Insert::single_into((SCHEMA_NAME, "Test")).value("id", "test");
 
-        conn.execute(SCHEMA_NAME, insert.into()).unwrap();
+        conn.execute(insert.into()).unwrap();
 
         let dm = "";
 
@@ -154,7 +154,7 @@ fn dropping_a_column_with_non_null_values_should_warn() {
             .values(("a", 7))
             .values(("b", 8));
 
-        test_setup.database.execute(SCHEMA_NAME, insert.into()).unwrap();
+        test_setup.database.execute(insert.into()).unwrap();
 
         // Drop the `favouriteAnimal` column.
         let dm = r#"

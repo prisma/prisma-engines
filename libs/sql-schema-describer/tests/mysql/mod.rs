@@ -32,9 +32,9 @@ pub fn get_mysql_describer(sql: &str) -> mysql::SqlSchemaDescriber {
     let url = mysql_url("");
     let conn = Mysql::new_unpooled(url.parse().unwrap()).unwrap();
 
-    conn.execute_raw("", &format!("DROP SCHEMA IF EXISTS `{}`", SCHEMA), &[])
+    conn.execute_raw(&format!("DROP SCHEMA IF EXISTS `{}`", SCHEMA), &[])
         .expect("dropping schema");
-    conn.execute_raw("", &format!("CREATE SCHEMA `{}`", SCHEMA), &[])
+    conn.execute_raw(&format!("CREATE SCHEMA `{}`", SCHEMA), &[])
         .expect("creating schema");
 
     // Migrate the database we just created.
@@ -47,7 +47,7 @@ pub fn get_mysql_describer(sql: &str) -> mysql::SqlSchemaDescriber {
     let statements: Vec<&str> = sql_string.split(";").filter(|s| !s.is_empty()).collect();
     for statement in statements {
         debug!("Executing migration statement: '{}'", statement);
-        conn.execute_raw("", &statement, &[])
+        conn.execute_raw(&statement, &[])
             .expect("executing migration statement");
     }
 

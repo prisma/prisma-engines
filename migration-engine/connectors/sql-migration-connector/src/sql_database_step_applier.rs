@@ -41,7 +41,7 @@ impl SqlDatabaseStepApplier {
         let sql_string = render_raw_sql(&step, self.sql_family, &self.schema_name);
         debug!("{}", sql_string);
 
-        let result = self.conn.query_raw(&self.schema_name, &sql_string, &[]);
+        let result = self.conn.query_raw(&sql_string, &[]);
 
         // TODO: this does not evaluate the results of SQLites PRAGMA foreign_key_check
         result?;

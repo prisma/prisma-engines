@@ -42,7 +42,7 @@ pub(crate) fn introspect(test_setup: &TestSetup) -> String {
 fn run_full_sql(database: &Arc<dyn SyncSqlConnection + Send + Sync>, full_sql: &str) {
     for sql in full_sql.split(";") {
         if sql != "" {
-            database.query_raw(SCHEMA_NAME, &sql, &[]).unwrap();
+            database.query_raw(&sql, &[]).unwrap();
         }
     }
 }
@@ -177,7 +177,7 @@ where
 
     let conn = f(url).unwrap();
 
-    conn.execute_raw("", &create_stmt(db_name), &[]).unwrap();
+    conn.execute_raw(&create_stmt(db_name), &[]).unwrap();
 }
 
 fn fetch_db_name(url: &Url, default: &str) -> String {
@@ -207,10 +207,10 @@ fn get_postgres() -> TestSetup {
     let database = database(&postgres_url());
 
     let drop_schema = dbg!(format!("DROP SCHEMA IF EXISTS \"{}\" CASCADE;", SCHEMA_NAME));
-    database.query_raw(SCHEMA_NAME, &drop_schema, &[]).ok();
+    database.query_raw(&drop_schema, &[]).ok();
 
     let create_schema = dbg!(format!("CREATE SCHEMA IF NOT EXISTS \"{}\";", SCHEMA_NAME));
-    database.query_raw(SCHEMA_NAME, &create_schema, &[]).ok();
+    database.query_raw(&create_schema, &[]).ok();
 
     let introspection_connector = SqlIntrospectionConnector::new(&postgres_url()).unwrap();
 
@@ -225,7 +225,7 @@ fn get_mysql() -> TestSetup {
     let database = database(&mysql_url());
 
     let drop_schema = dbg!(format!("DROP SCHEMA IF EXISTS \"{}\" CASCADE;", SCHEMA_NAME));
-    database.query_raw(SCHEMA_NAME, &drop_schema, &[]).ok();
+    database.query_raw(&drop_schema, &[]).ok();
 
     let introspection_connector = SqlIntrospectionConnector::new(&mysql_url()).unwrap();
 

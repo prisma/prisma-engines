@@ -95,7 +95,7 @@ impl SqlMigrationConnector {
         // Async MySQL connections are lazy - we have to run a query to confirm that the schema we
         // connected to exists.
         if !schema.is_empty() {
-            conn.query_raw(schema.as_str(), "SELECT 1 + 1", &[])?;
+            conn.query_raw("SELECT 1 + 1", &[])?;
         }
 
         Ok(Self::create_connector(
@@ -186,14 +186,14 @@ impl MigrationConnector for SqlMigrationConnector {
         match self.sql_family {
             SqlFamily::Postgres => {
                 self.database
-                    .query_raw("", &format!("CREATE DATABASE \"{}\"", db_name), &[])?;
+                    .query_raw(&format!("CREATE DATABASE \"{}\"", db_name), &[])?;
 
                 Ok(())
             }
             SqlFamily::Sqlite => Ok(()),
             SqlFamily::Mysql => {
                 self.database
-                    .query_raw("", &format!("CREATE DATABASE `{}`", db_name), &[])?;
+                    .query_raw(&format!("CREATE DATABASE `{}`", db_name), &[])?;
 
                 Ok(())
             }
@@ -219,7 +219,7 @@ impl MigrationConnector for SqlMigrationConnector {
 
                 debug!("{}", schema_sql);
 
-                self.database.query_raw("", &schema_sql, &[])?;
+                self.database.query_raw(&schema_sql, &[])?;
             }
             SqlFamily::Mysql => {
                 let schema_sql = format!(
@@ -229,7 +229,7 @@ impl MigrationConnector for SqlMigrationConnector {
 
                 debug!("{}", schema_sql);
 
-                self.database.query_raw("", &schema_sql, &[])?;
+                self.database.query_raw(&schema_sql, &[])?;
             }
         }
 

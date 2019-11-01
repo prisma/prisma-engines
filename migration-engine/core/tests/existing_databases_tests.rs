@@ -402,7 +402,7 @@ fn get_postgres() -> (Arc<dyn SqlSchemaDescriberBackend>, TestSetup) {
     let database = database(SqlFamily::Postgres, &postgres_url());
 
     let drop_schema = dbg!(format!("DROP SCHEMA IF EXISTS \"{}\" CASCADE;", SCHEMA_NAME));
-    database.query_raw(SCHEMA_NAME, &drop_schema, &[]).ok();
+    database.query_raw(&drop_schema, &[]).ok();
 
     let inspector = sql_schema_describer::postgres::SqlSchemaDescriber::new(Arc::clone(&database));
 
@@ -443,6 +443,6 @@ impl BarrelMigrationExecutor {
 
 fn run_full_sql(database: &Arc<dyn SyncSqlConnection + Send + Sync>, full_sql: &str) {
     for sql in full_sql.split(";").filter(|sql| !sql.is_empty()) {
-        database.query_raw(SCHEMA_NAME, &sql, &[]).unwrap();
+        database.query_raw(&sql, &[]).unwrap();
     }
 }

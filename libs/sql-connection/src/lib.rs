@@ -18,25 +18,25 @@ pub trait SyncSqlConnection {
     /// https://prisma.github.io/prisma-query/prisma_query/connector/trait.Queryable.html#tymethod.execute
     ///
     /// The `db` param is only used on SQLite to give a name to the attached database.
-    fn execute(&self, db: &str, q: Query<'_>) -> Result<Option<Id>, QueryError>;
+    fn execute(&self, q: Query<'_>) -> Result<Option<Id>, QueryError>;
 
     /// See
     /// https://prisma.github.io/prisma-query/prisma_query/connector/trait.Queryable.html#tymethod.query
     ///
     /// The `db` param is only used on SQLite to give a name to the attached database.
-    fn query(&self, db: &str, q: Query<'_>) -> Result<ResultSet, QueryError>;
+    fn query(&self, q: Query<'_>) -> Result<ResultSet, QueryError>;
 
     /// See
     /// https://prisma.github.io/prisma-query/prisma_query/connector/trait.Queryable.html#tymethod.query_raw
     ///
     /// The `db` param is only used on SQLite to give a name to the attached database.
-    fn query_raw(&self, db: &str, sql: &str, params: &[ParameterizedValue<'_>]) -> Result<ResultSet, QueryError>;
+    fn query_raw(&self, sql: &str, params: &[ParameterizedValue<'_>]) -> Result<ResultSet, QueryError>;
 
     /// See
     /// https://prisma.github.io/prisma-query/prisma_query/connector/trait.Queryable.html#tymethod.execute_raw
     ///
     /// The `db` param is only used on SQLite to give a name to the attached database.
-    fn execute_raw(&self, db: &str, sql: &str, params: &[ParameterizedValue<'_>]) -> Result<u64, QueryError>;
+    fn execute_raw(&self, sql: &str, params: &[ParameterizedValue<'_>]) -> Result<u64, QueryError>;
 }
 
 /// A generic asynchronous SQL connection interface.
@@ -46,13 +46,13 @@ pub trait SqlConnection: Send + Sync + 'static {
     /// https://prisma.github.io/prisma-query/prisma_query/connector/trait.Queryable.html#tymethod.execute
     ///
     /// The `db` param is only used on SQLite to give a name to the attached database.
-    async fn execute<'a>(&self, db: &str, q: Query<'a>) -> Result<Option<Id>, QueryError>;
+    async fn execute<'a>(&self, q: Query<'a>) -> Result<Option<Id>, QueryError>;
 
     /// See
     /// https://prisma.github.io/prisma-query/prisma_query/connector/trait.Queryable.html#tymethod.query
     ///
     /// The `db` param is only used on SQLite to give a name to the attached database.
-    async fn query<'a>(&self, db: &str, q: Query<'a>) -> Result<ResultSet, QueryError>;
+    async fn query<'a>(&self, q: Query<'a>) -> Result<ResultSet, QueryError>;
 
     /// See
     /// https://prisma.github.io/prisma-query/prisma_query/connector/trait.Queryable.html#tymethod.query_raw
@@ -60,7 +60,6 @@ pub trait SqlConnection: Send + Sync + 'static {
     /// The `db` param is only used on SQLite to give a name to the attached database.
     async fn query_raw<'a>(
         &self,
-        db: &str,
         sql: &str,
         params: &[ParameterizedValue<'a>],
     ) -> Result<ResultSet, QueryError>;
@@ -69,7 +68,7 @@ pub trait SqlConnection: Send + Sync + 'static {
     /// https://prisma.github.io/prisma-query/prisma_query/connector/trait.Queryable.html#tymethod.execute_raw
     ///
     /// The `db` param is only used on SQLite to give a name to the attached database.
-    async fn execute_raw<'a>(&self, db: &str, sql: &str, params: &[ParameterizedValue<'a>]) -> Result<u64, QueryError>;
+    async fn execute_raw<'a>(&self, sql: &str, params: &[ParameterizedValue<'a>]) -> Result<u64, QueryError>;
 }
 
 type SqlitePool = Pool<SqliteManager>;
@@ -114,19 +113,18 @@ impl Sqlite {
 
 #[async_trait::async_trait]
 impl SqlConnection for Sqlite {
-    async fn execute<'a>(&self, _db: &str, q: Query<'a>) -> Result<Option<Id>, QueryError> {
+    async fn execute<'a>(&self, q: Query<'a>) -> Result<Option<Id>, QueryError> {
         let conn = self.get_connection().await?;
         conn.execute(q).await
     }
 
-    async fn query<'a>(&self, _db: &str, q: Query<'a>) -> Result<ResultSet, QueryError> {
+    async fn query<'a>(&self, q: Query<'a>) -> Result<ResultSet, QueryError> {
         let conn = self.get_connection().await?;
         conn.query(q).await
     }
 
     async fn query_raw<'a>(
         &self,
-        _db: &str,
         sql: &str,
         params: &[ParameterizedValue<'a>],
     ) -> Result<ResultSet, QueryError> {
@@ -134,29 +132,29 @@ impl SqlConnection for Sqlite {
         conn.query_raw(sql, params).await
     }
 
-    async fn execute_raw<'a>(&self, _db: &str, sql: &str, params: &[ParameterizedValue<'a>]) -> Result<u64, QueryError> {
+    async fn execute_raw<'a>(&self, sql: &str, params: &[ParameterizedValue<'a>]) -> Result<u64, QueryError> {
         let conn = self.get_connection().await?;
         conn.execute_raw(sql, params).await
     }
 }
 
 impl SyncSqlConnection for Sqlite {
-    fn execute(&self, db: &str, q: Query<'_>) -> Result<Option<Id>, QueryError> {
-        self.runtime.block_on(<Self as SqlConnection>::execute(self, db, q))
+    fn execute(&self, q: Query<'_>) -> Result<Option<Id>, QueryError> {
+        self.runtime.block_on(<Self as SqlConnection>::execute(self, q))
     }
 
-    fn query(&self, db: &str, q: Query<'_>) -> Result<ResultSet, QueryError> {
-        self.runtime.block_on(<Self as SqlConnection>::query(self, db, q))
+    fn query(&self, q: Query<'_>) -> Result<ResultSet, QueryError> {
+        self.runtime.block_on(<Self as SqlConnection>::query(self, q))
     }
 
-    fn query_raw(&self, db: &str, sql: &str, params: &[ParameterizedValue<'_>]) -> Result<ResultSet, QueryError> {
+    fn query_raw(&self, sql: &str, params: &[ParameterizedValue<'_>]) -> Result<ResultSet, QueryError> {
         self.runtime
-            .block_on(<Self as SqlConnection>::query_raw(self, db, sql, params))
+            .block_on(<Self as SqlConnection>::query_raw(self, sql, params))
     }
 
-    fn execute_raw(&self, db: &str, sql: &str, params: &[ParameterizedValue<'_>]) -> Result<u64, QueryError> {
+    fn execute_raw(&self, sql: &str, params: &[ParameterizedValue<'_>]) -> Result<u64, QueryError> {
         self.runtime
-            .block_on(<Self as SqlConnection>::execute_raw(self, db, sql, params))
+            .block_on(<Self as SqlConnection>::execute_raw(self, sql, params))
     }
 }
 
@@ -248,19 +246,18 @@ impl Postgresql {
 
 #[async_trait::async_trait]
 impl SqlConnection for Postgresql {
-    async fn execute<'a>(&self, _: &str, q: Query<'a>) -> Result<Option<Id>, QueryError> {
+    async fn execute<'a>(&self, q: Query<'a>) -> Result<Option<Id>, QueryError> {
         let conn = self.get_connection().await?;
         conn.as_queryable().execute(q).await
     }
 
-    async fn query<'a>(&self, _: &str, q: Query<'a>) -> Result<ResultSet, QueryError> {
+    async fn query<'a>(&self, q: Query<'a>) -> Result<ResultSet, QueryError> {
         let conn = self.get_connection().await?;
         conn.as_queryable().query(q).await
     }
 
     async fn query_raw<'a>(
         &self,
-        _: &str,
         sql: &str,
         params: &[ParameterizedValue<'a>],
     ) -> Result<ResultSet, QueryError> {
@@ -268,29 +265,29 @@ impl SqlConnection for Postgresql {
         conn.as_queryable().query_raw(sql, params).await
     }
 
-    async fn execute_raw<'a>(&self, _: &str, sql: &str, params: &[ParameterizedValue<'a>]) -> Result<u64, QueryError> {
+    async fn execute_raw<'a>(&self, sql: &str, params: &[ParameterizedValue<'a>]) -> Result<u64, QueryError> {
         let conn = self.get_connection().await?;
         conn.as_queryable().execute_raw(sql, params).await
     }
 }
 
 impl SyncSqlConnection for Postgresql {
-    fn execute(&self, _db: &str, q: Query<'_>) -> Result<Option<Id>, QueryError> {
+    fn execute(&self, q: Query<'_>) -> Result<Option<Id>, QueryError> {
         let conn = self.runtime.block_on(self.get_connection())?;
         self.runtime.block_on(conn.as_queryable().execute(q))
     }
 
-    fn query(&self, _db: &str, q: Query<'_>) -> Result<ResultSet, QueryError> {
+    fn query(&self, q: Query<'_>) -> Result<ResultSet, QueryError> {
         let conn = self.runtime.block_on(self.get_connection())?;
         self.runtime.block_on(conn.as_queryable().query(q))
     }
 
-    fn query_raw(&self, _db: &str, sql: &str, params: &[ParameterizedValue<'_>]) -> Result<ResultSet, QueryError> {
+    fn query_raw(&self, sql: &str, params: &[ParameterizedValue<'_>]) -> Result<ResultSet, QueryError> {
         let conn = self.runtime.block_on(self.get_connection())?;
         self.runtime.block_on(conn.as_queryable().query_raw(sql, params))
     }
 
-    fn execute_raw(&self, _db: &str, sql: &str, params: &[ParameterizedValue<'_>]) -> Result<u64, QueryError> {
+    fn execute_raw(&self, sql: &str, params: &[ParameterizedValue<'_>]) -> Result<u64, QueryError> {
         let conn = self.runtime.block_on(self.get_connection())?;
         self.runtime.block_on(conn.as_queryable().execute_raw(sql, params))
     }
@@ -334,19 +331,18 @@ impl Mysql {
 
 #[async_trait::async_trait]
 impl SqlConnection for Mysql {
-    async fn execute<'a>(&self, _: &str, q: Query<'a>) -> Result<Option<Id>, QueryError> {
+    async fn execute<'a>(&self, q: Query<'a>) -> Result<Option<Id>, QueryError> {
         let conn = self.get_connection().await?;
         conn.as_queryable().execute(q).await
     }
 
-    async fn query<'a>(&self, _: &str, q: Query<'a>) -> Result<ResultSet, QueryError> {
+    async fn query<'a>(&self, q: Query<'a>) -> Result<ResultSet, QueryError> {
         let conn = self.get_connection().await?;
         conn.as_queryable().query(q).await
     }
 
     async fn query_raw<'a>(
         &self,
-        _: &str,
         sql: &str,
         params: &[ParameterizedValue<'a>],
     ) -> Result<ResultSet, QueryError> {
@@ -354,29 +350,29 @@ impl SqlConnection for Mysql {
         conn.as_queryable().query_raw(sql, params).await
     }
 
-    async fn execute_raw<'a>(&self, _: &str, sql: &str, params: &[ParameterizedValue<'a>]) -> Result<u64, QueryError> {
+    async fn execute_raw<'a>(&self, sql: &str, params: &[ParameterizedValue<'a>]) -> Result<u64, QueryError> {
         let conn = self.get_connection().await?;
         conn.as_queryable().execute_raw(sql, params).await
     }
 }
 
 impl SyncSqlConnection for Mysql {
-    fn execute(&self, _db: &str, q: Query<'_>) -> Result<Option<Id>, QueryError> {
+    fn execute(&self, q: Query<'_>) -> Result<Option<Id>, QueryError> {
         let conn = self.runtime.block_on(self.get_connection())?;
         self.runtime.block_on(conn.as_queryable().execute(q))
     }
 
-    fn query(&self, _db: &str, q: Query<'_>) -> Result<ResultSet, QueryError> {
+    fn query(&self, q: Query<'_>) -> Result<ResultSet, QueryError> {
         let conn = self.runtime.block_on(self.get_connection())?;
         self.runtime.block_on(conn.as_queryable().query(q))
     }
 
-    fn query_raw(&self, _db: &str, sql: &str, params: &[ParameterizedValue<'_>]) -> Result<ResultSet, QueryError> {
+    fn query_raw(&self, sql: &str, params: &[ParameterizedValue<'_>]) -> Result<ResultSet, QueryError> {
         let conn = self.runtime.block_on(self.get_connection())?;
         self.runtime.block_on(conn.as_queryable().query_raw(sql, params))
     }
 
-    fn execute_raw(&self, _db: &str, sql: &str, params: &[ParameterizedValue<'_>]) -> Result<u64, QueryError> {
+    fn execute_raw(&self, sql: &str, params: &[ParameterizedValue<'_>]) -> Result<u64, QueryError> {
         let conn = self.runtime.block_on(self.get_connection())?;
         self.runtime.block_on(conn.as_queryable().execute_raw(sql, params))
     }
