@@ -130,7 +130,7 @@ impl SqlSchemaDescriber {
                 let is_auto_increment = is_identity
                     || match default {
                         Some(ref val) => {
-                            val == &format!("nextval(\'\"{}\".\"{}_{}_seq\"\'::regclass)", schema, table, col_name,)
+                            val == &format!("nextval(\"{}\".\"{}_{}_seq\"::regclass)", schema, table, col_name,)
                         }
                         _ => false,
                     };

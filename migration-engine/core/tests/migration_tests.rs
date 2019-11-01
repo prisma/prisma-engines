@@ -107,7 +107,7 @@ fn adding_an_id_field_of_type_int_must_work() {
                 let sequence = result.get_sequence("Test_myId_seq").expect("sequence must exist");
                 let default = column.default.as_ref().expect("Must have nextval default");
                 assert_eq!(default.contains(&sequence.name), true);
-                assert_eq!(default, &format!("nextval('\"{}\"'::regclass)", sequence.name))
+                assert_eq!(default, &format!("nextval(\"{}\"::regclass)", sequence.name))
             }
             _ => assert_eq!(column.auto_increment, true),
         }
