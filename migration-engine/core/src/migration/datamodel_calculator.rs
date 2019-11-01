@@ -1,216 +1,419 @@
-use datamodel::*;
-use migration_connector::steps::*;
-
-// Macro to match all children in a parse tree
-macro_rules! set (
-    ($model:ident, $step:ident, $model_field:ident, $step_field:ident) => (
-        if let Some(val) = &$step.$step_field {
-            $model.$model_field = val.clone();
-        }
-    );
-);
+use datamodel::ast::{self, SchemaAst};
+use failure::format_err;
+use migration_connector::steps::{self, MigrationStep};
 
 pub trait DataModelCalculator: Send + Sync + 'static {
-    fn infer(&self, current: &Datamodel, steps: &Vec<MigrationStep>) -> Datamodel;
+    fn infer(&self, current: &SchemaAst, steps: &[MigrationStep]) -> SchemaAst;
 }
 
-pub struct DataModelCalculatorImpl {}
+pub struct DataModelCalculatorImpl;
+
 impl DataModelCalculator for DataModelCalculatorImpl {
-    fn infer(&self, current: &Datamodel, steps: &Vec<MigrationStep>) -> Datamodel {
-        let mut result = current.clone();
-        steps.into_iter().for_each(|step| match step {
-            MigrationStep::DeleteModel(x) => apply_delete_model(&mut result, x),
-            MigrationStep::UpdateModel(x) => apply_update_model(&mut result, x),
-            MigrationStep::CreateModel(x) => apply_create_model(&mut result, x),
-            MigrationStep::DeleteEnum(x) => apply_delete_enum(&mut result, x),
-            MigrationStep::UpdateEnum(x) => apply_update_enum(&mut result, x),
-            MigrationStep::CreateEnum(x) => apply_create_enum(&mut result, x),
-            MigrationStep::DeleteField(x) => apply_delete_field(&mut result, x),
-            MigrationStep::UpdateField(x) => apply_update_field(&mut result, x),
-            MigrationStep::CreateField(x) => apply_create_field(&mut result, x),
-            MigrationStep::CreateIndex(x) => apply_create_index(&mut result, x),
-            MigrationStep::DeleteIndex(x) => apply_delete_index(&mut result, x),
-            MigrationStep::UpdateIndex(x) => apply_update_index(&mut result, x),
-        });
-        result
+    fn infer(&self, current: &SchemaAst, steps: &[MigrationStep]) -> SchemaAst {
+        let cloned: SchemaAst = current.clone();
+        apply(cloned, steps).unwrap()
     }
 }
 
-fn apply_delete_model(data_model: &mut Datamodel, step: &DeleteModel) {
-    if !data_model.has_model(&step.name) {
-        panic!(
-            "The model {} does not exist in this Datamodel. It is not possible to delete it.",
-            &step.name
-        )
+fn apply(mut schema: SchemaAst, steps: &[MigrationStep]) -> crate::Result<SchemaAst> {
+    for step in steps {
+        apply_step(&mut schema, step);
     }
-    data_model.remove_model(&step.name);
+
+    Ok(schema)
 }
 
-fn apply_update_model(data_model: &mut Datamodel, step: &UpdateModel) {
-    let model = data_model.find_model_mut(&step.name).expect(&format!(
-        "The model {} does not exist in this Datamodel. It is not possible to update it.",
-        &step.name
-    ));
-
-    set!(model, step, name, new_name);
-    set!(model, step, is_embedded, embedded);
-    set!(model, step, database_name, db_name);
-}
-
-fn apply_create_model(data_model: &mut Datamodel, step: &CreateModel) {
-    if data_model.has_model(&step.name) {
-        panic!(
-            "The model {} already exists in this Datamodel. It is not possible to create it once more.",
-            &step.name
-        )
+fn apply_step(datamodel: &mut ast::SchemaAst, step: &MigrationStep) {
+    match step {
+        MigrationStep::CreateEnum(create_enum) => apply_create_enum(datamodel, create_enum),
+        MigrationStep::UpdateEnum(update_enum) => apply_update_enum(datamodel, update_enum),
+        MigrationStep::DeleteEnum(delete_enum) => apply_delete_enum(datamodel, delete_enum),
+        MigrationStep::CreateModel(create_model) => apply_create_model(datamodel, create_model),
+        MigrationStep::UpdateModel(update_model) => apply_update_model(datamodel, update_model),
+        MigrationStep::DeleteModel(delete_model) => apply_delete_model(datamodel, delete_model),
+        MigrationStep::CreateField(create_field) => apply_create_field(datamodel, create_field),
+        MigrationStep::UpdateField(update_field) => apply_update_field(datamodel, update_field),
+        MigrationStep::DeleteField(delete_field) => apply_delete_field(datamodel, delete_field),
+        MigrationStep::CreateDirective(create_directive) => apply_create_directive(datamodel, create_directive),
+        MigrationStep::DeleteDirective(delete_directive) => apply_delete_directive(datamodel, delete_directive),
+        MigrationStep::CreateDirectiveArgument(create_directive_argument) => {
+            apply_create_directive_argument(datamodel, create_directive_argument)
+        }
+        MigrationStep::DeleteDirectiveArgument(delete_directive_argument) => {
+            apply_delete_directive_argument(datamodel, delete_directive_argument)
+        }
+        MigrationStep::UpdateDirectiveArgument(update_directive_argument) => {
+            apply_update_directive_argument(datamodel, update_directive_argument)
+        }
     }
-    let mut model = Model::new(&step.name);
-    model.is_embedded = step.embedded;
-    model.database_name = step.db_name.clone();
-    data_model.add_model(model);
 }
 
-fn apply_delete_enum(data_model: &mut Datamodel, step: &DeleteEnum) {
-    if !data_model.has_enum(&step.name) {
-        panic!(
-            "The enum {} does not exist in this Datamodel. It is not possible to delete it.",
-            &step.name
-        )
-    }
-    data_model.remove_enum(&step.name);
-}
+fn apply_create_enum(datamodel: &mut ast::SchemaAst, step: &steps::CreateEnum) {
+    let steps::CreateEnum { r#enum: name, values } = step;
 
-fn apply_update_enum(data_model: &mut Datamodel, step: &UpdateEnum) {
-    let model = data_model.find_enum_mut(&step.name).expect(&format!(
-        "The enum {} does not exist in this Datamodel. It is not possible to update it.",
-        &step.name,
-    ));
-
-    set!(model, step, name, new_name);
-    set!(model, step, values, values);
-    set!(model, step, database_name, db_name);
-}
-
-fn apply_create_enum(data_model: &mut Datamodel, step: &CreateEnum) {
-    if data_model.has_enum(&step.name) {
+    if let Some(_) = datamodel.find_enum(&name) {
         panic!(
             "The enum {} already exists in this Datamodel. It is not possible to create it once more.",
-            &step.name
-        )
-    }
-    let mut en = Enum::new(&step.name, step.values.clone());
-    en.database_name = step.db_name.clone();
-    data_model.add_enum(en);
-}
-
-fn apply_delete_field(data_model: &mut Datamodel, step: &DeleteField) {
-    let model = data_model.models_mut().find(|m| m.name == step.model).expect(&format!(
-        "The model {} does not exist in this Datamodel. It is not possible to delete a field in it.",
-        step.model
-    ));
-    if model.find_field(&step.name).is_none() {
-        panic!(
-            "The field {} on model {} does not exist in this Datamodel. It is not possible to delete it.",
-            &step.name, &step.model
-        )
-    }
-    model.remove_field(&step.name);
-}
-
-fn apply_update_field(data_model: &mut Datamodel, step: &UpdateField) {
-    let model = data_model.find_model_mut(&step.model).expect(&format!(
-        "The model {} does not exist in this Datamodel. It is not possible to update a field in it.",
-        step.model
-    ));
-    let field = model.find_field_mut(&step.name).expect(&format!(
-        "The field {} on model {} does not exist in this Datamodel. It is not possible to update it.",
-        &step.name, &step.model
-    ));
-
-    set!(field, step, name, new_name);
-    set!(field, step, field_type, tpe);
-    set!(field, step, arity, arity);
-    set!(field, step, database_name, db_name);
-    set!(field, step, id_info, id_info);
-    set!(field, step, default_value, default);
-    set!(field, step, scalar_list_strategy, scalar_list);
-    set!(field, step, is_unique, is_unique);
-}
-
-fn apply_create_field(data_model: &mut Datamodel, step: &CreateField) {
-    let model = data_model.find_model_mut(&step.model).expect(&format!(
-        "The model {} does not exist in this Datamodel. It is not possible to create a field in it.",
-        step.model
-    ));
-    if model.find_field(&step.name).is_some() {
-        panic!(
-            "The field {} on model {} already exists in this Datamodel. It is not possible to create it once more.",
-            &step.name, &step.model
-        )
-    }
-    let mut field = Field::new(&step.name, step.tpe.clone());
-    field.arity = step.arity;
-    field.database_name = step.db_name.clone();
-    field.default_value = step.default.clone();
-    field.is_unique = step.is_unique;
-    field.id_info = step.id.clone();
-    field.scalar_list_strategy = step.scalar_list;
-
-    model.add_field(field);
-}
-
-fn apply_create_index(data_model: &mut Datamodel, step: &CreateIndex) {
-    let model = data_model.find_model_mut(&step.model).expect(&format!(
-        "The model {} does not exist in this Datamodel. It is not possible to create an index in it.",
-        step.model
-    ));
-
-    if model.indexes.iter().any(|index| step.applies_to_index(index)) {
-        panic!(
-            "The index {:?} on fields ({:?}) of model {} already exists in this Datamodel. It is not possible to create it once more.",
-            step.name, step.fields, model.name,
-        )
+            name
+        );
     }
 
-    let index = IndexDefinition {
-        name: step.name.clone(),
-        fields: step.fields.clone(),
-        tpe: step.tpe,
+    let values = values
+        .iter()
+        .map(|value_name| ast::EnumValue {
+            name: value_name.clone(),
+            span: new_span(),
+        })
+        .collect();
+
+    let new_enum = ast::Enum {
+        documentation: None,
+        name: new_ident(name.clone()),
+        span: new_span(),
+        values,
+        directives: vec![],
     };
 
-    model.add_index(index)
+    datamodel.tops.push(ast::Top::Enum(new_enum));
 }
 
-fn apply_delete_index(data_model: &mut Datamodel, step: &DeleteIndex) {
-    let model = data_model.find_model_mut(&step.model).expect(&format!(
-        "The model {} does not exist in this Datamodel. It is not possible to drop an index in it.",
-        step.model
-    ));
-
-    if model.indexes.iter().any(|index| step.applies_to_index(index)) {
-        let new_indexes = model
-            .indexes
-            .drain(..)
-            .filter(|index| !step.applies_to_index(index))
-            .collect();
-        model.indexes = new_indexes;
-    } else {
+fn apply_create_field(datamodel: &mut ast::SchemaAst, step: &steps::CreateField) {
+    if let Some(_) = datamodel.find_field(&step.model, &step.field) {
         panic!(
-            "The index {:?} on fields ({:?}) of model {} does not exist in this Datamodel. It is not possible to delete it.",
-            step.name, step.fields, model.name,
+            "The field {} on model {} already exists in this Datamodel. It is not possible to create it once more.",
+            &step.field, &step.model,
         )
     }
+
+    let model = datamodel
+        .find_model_mut(&step.model)
+        .ok_or_else(|| format_err!("CreateField on unknown model: `{}`", step.model))
+        .unwrap();
+
+    let steps::CreateField {
+        arity,
+        model: _,
+        field,
+        tpe,
+    } = step;
+
+    let field = ast::Field {
+        arity: arity.clone(),
+        name: new_ident(field.to_owned()),
+        documentation: None,
+        field_type: new_ident(tpe.clone()),
+        span: new_span(),
+        directives: Vec::new(),
+        default_value: None,
+    };
+    model.fields.push(field);
 }
 
-fn apply_update_index(data_model: &mut Datamodel, step: &UpdateIndex) {
-    let model = data_model.find_model_mut(&step.model).expect(&format!(
-        "The model {} does not exist in this Datamodel. It is not possible to rename an index in it.",
-        step.model
-    ));
-
-    let index_opt = model.indexes.iter_mut().find(|index| step.applies_to_index(index));
-
-    if let Some(index) = index_opt {
-        index.name = step.name.clone();
+fn apply_create_model(datamodel: &mut ast::SchemaAst, step: &steps::CreateModel) {
+    if let Some(_) = datamodel.find_model(&step.model) {
+        Err::<(), _>(format_err!(
+            "The model {} already exists in this Datamodel. It is not possible to create it once more.",
+            &step.model
+        ))
+        .unwrap();
     }
+
+    let model = ast::Model {
+        documentation: None,
+        name: new_ident(step.model.clone()),
+        span: new_span(),
+        fields: vec![],
+        directives: vec![],
+    };
+
+    datamodel.tops.push(ast::Top::Model(model));
+}
+
+fn apply_update_model(datamodel: &mut ast::SchemaAst, step: &steps::UpdateModel) {
+    let model = datamodel
+        .find_model_mut(&step.model)
+        .ok_or_else(|| {
+            format_err!(
+                "The model {} does not exist in this Datamodel. It is not possible to update it.",
+                &step.model
+            )
+        })
+        .unwrap();
+
+    apply_model_update(model, &step.new_name, update_model_name);
+}
+
+fn apply_model_update<T, F: Fn(&mut ast::Model, &T)>(model: &mut ast::Model, update: &Option<T>, apply_fn: F) {
+    if let Some(update) = update {
+        apply_fn(model, update)
+    }
+}
+
+fn update_model_name(model: &mut ast::Model, new_name: &String) {
+    model.name = new_ident(new_name.clone());
+}
+
+fn apply_delete_model(datamodel: &mut ast::SchemaAst, step: &steps::DeleteModel) {
+    datamodel
+        .find_model(&step.model)
+        .ok_or_else(|| {
+            format_err!(
+                "The model {} does not exist in this Datamodel. It is not possible to delete it.",
+                &step.model
+            )
+        })
+        .unwrap();
+
+    let new_models = datamodel
+        .tops
+        .drain(..)
+        .filter(|top| match top {
+            ast::Top::Model(model) => model.name.name != step.model,
+            _ => true,
+        })
+        .collect();
+
+    datamodel.tops = new_models;
+}
+
+fn apply_update_field(datamodel: &mut ast::SchemaAst, step: &steps::UpdateField) {
+    if let None = datamodel.find_model(&step.model) {
+        panic!(
+            "The model {} does not exist in this Datamodel. It is not possible to update a field in it.",
+            &step.model
+        )
+    }
+
+    let field = datamodel
+        .find_field_mut(&step.model, &step.field)
+        .ok_or_else(|| {
+            format_err!(
+                "The field {} on model {} does not exist in this Datamodel. It is not possible to update it.",
+                &step.field,
+                &step.model
+            )
+        })
+        .unwrap();
+
+    apply_field_update(field, &step.arity, update_field_arity);
+    apply_field_update(field, &step.tpe, update_field_type);
+    apply_field_update(field, &step.new_name, update_field_name);
+}
+
+fn apply_field_update<T, F: Fn(&mut ast::Field, &T)>(field: &mut ast::Field, update: &Option<T>, apply_fn: F) {
+    if let Some(update) = update {
+        apply_fn(field, update);
+    }
+}
+
+fn update_field_arity(field: &mut ast::Field, new_arity: &ast::FieldArity) {
+    field.arity = new_arity.clone();
+}
+
+fn update_field_type(field: &mut ast::Field, new_type: &String) {
+    field.field_type = new_ident(new_type.clone());
+}
+
+fn update_field_name(field: &mut ast::Field, new_name: &String) {
+    field.name = new_ident(new_name.clone());
+}
+
+fn apply_delete_field(datamodel: &mut ast::SchemaAst, step: &steps::DeleteField) {
+    datamodel
+        .find_model(&step.model)
+        .ok_or_else(|| {
+            format_err!(
+                "The model {} does not exist in this Datamodel. It is not possible to delete a field in it.",
+                &step.model
+            )
+        })
+        .unwrap();
+
+    datamodel
+        .find_field(&step.model, &step.field)
+        .ok_or_else(|| {
+            format_err!(
+                "The field {} on model {} does not exist in this Datamodel. It is not possible to delete it.",
+                &step.field,
+                &step.model
+            )
+        })
+        .unwrap();
+
+    let model = datamodel.find_model_mut(&step.model).unwrap();
+
+    let new_fields: Vec<_> = model
+        .fields
+        .drain(..)
+        .filter(|field| field.name.name != step.field)
+        .collect();
+
+    model.fields = new_fields;
+}
+
+fn apply_update_enum(datamodel: &mut ast::SchemaAst, step: &steps::UpdateEnum) {
+    let r#enum = datamodel
+        .find_enum_mut(&step.r#enum)
+        .ok_or_else(|| {
+            format_err!(
+                "The enum {} does not exist in this Datamodel. It is not possible to update it.",
+                &step.r#enum
+            )
+        })
+        .unwrap();
+
+    apply_enum_update(r#enum, &step.new_name, update_enum_name);
+    add_enum_values(r#enum, &step.created_values);
+    remove_enum_values(r#enum, &step.deleted_values);
+}
+
+fn apply_enum_update<T, F: Fn(&mut ast::Enum, &T)>(r#enum: &mut ast::Enum, update: &Option<T>, apply_fn: F) {
+    if let Some(update) = update {
+        apply_fn(r#enum, update);
+    }
+}
+
+fn update_enum_name(r#enum: &mut ast::Enum, new_name: &String) {
+    r#enum.name = new_ident(new_name.clone());
+}
+
+fn add_enum_values(r#enum: &mut ast::Enum, added_values: &[String]) {
+    r#enum
+        .values
+        .extend(added_values.iter().map(|added_name| ast::EnumValue {
+            name: added_name.clone(),
+            span: new_span(),
+        }))
+}
+
+fn remove_enum_values(r#enum: &mut ast::Enum, removed_values: &[String]) {
+    let new_values = r#enum
+        .values
+        .drain(..)
+        .filter(|value| {
+            removed_values
+                .iter()
+                .find(|removed_value| removed_value.as_str() == value.name.as_str())
+                .is_none()
+        })
+        .collect();
+
+    r#enum.values = new_values;
+}
+
+fn apply_delete_enum(datamodel: &mut ast::SchemaAst, step: &steps::DeleteEnum) {
+    datamodel
+        .find_enum(&step.r#enum)
+        .ok_or_else(|| {
+            format_err!(
+                "The enum {} does not exist in this Datamodel. It is not possible to delete it.",
+                &step.r#enum
+            )
+        })
+        .unwrap();
+
+    let new_tops = datamodel
+        .tops
+        .drain(..)
+        .filter(|top| match top {
+            ast::Top::Enum(r#enum) => r#enum.name.name != step.r#enum,
+            _ => true,
+        })
+        .collect();
+
+    datamodel.tops = new_tops;
+}
+
+fn apply_create_directive(datamodel: &mut ast::SchemaAst, step: &steps::CreateDirective) {
+    let directives = find_directives_mut(datamodel, &step.locator.location)
+        .ok_or_else(|| format_err!("CreateDirective on absent target: {:?}.", step))
+        .unwrap();
+
+    let new_directive = ast::Directive {
+        name: new_ident(step.locator.directive.clone()),
+        arguments: step
+            .locator
+            .arguments
+            .as_ref()
+            .map(|args| args.iter().map(|arg| arg.into()).collect())
+            .unwrap_or_else(Vec::new),
+        span: new_span(),
+    };
+
+    directives.push(new_directive);
+}
+
+fn apply_delete_directive(datamodel: &mut ast::SchemaAst, step: &steps::DeleteDirective) {
+    let directives = find_directives_mut(datamodel, &step.locator.location)
+        .ok_or_else(|| format_err!("DeleteDirective on absent target: {:?}.", step))
+        .unwrap();
+
+    let new_directives = directives
+        .drain(..)
+        .filter(|directive| !step.locator.matches_ast_directive(directive))
+        .collect();
+
+    *directives = new_directives;
+}
+
+fn apply_create_directive_argument(datamodel: &mut ast::SchemaAst, step: &steps::CreateDirectiveArgument) {
+    let directive = find_directive_mut(datamodel, &step.directive_location).unwrap();
+
+    directive.arguments.push(ast::Argument {
+        name: new_ident(step.argument.clone()),
+        span: new_span(),
+        value: step.value.to_ast_expression(),
+    });
+}
+
+fn apply_update_directive_argument(datamodel: &mut ast::SchemaAst, step: &steps::UpdateDirectiveArgument) {
+    let directive = find_directive_mut(datamodel, &step.directive_location).unwrap();
+
+    for argument in directive.arguments.iter_mut() {
+        if argument.name.name == step.argument {
+            argument.value = step.new_value.to_ast_expression();
+        }
+    }
+}
+
+fn apply_delete_directive_argument(datamodel: &mut ast::SchemaAst, step: &steps::DeleteDirectiveArgument) {
+    let directive = find_directive_mut(datamodel, &step.directive_location).unwrap();
+
+    let new_arguments = directive
+        .arguments
+        .drain(..)
+        .filter(|arg| arg.name.name != step.argument)
+        .collect();
+
+    directive.arguments = new_arguments;
+}
+
+fn new_ident(name: String) -> ast::Identifier {
+    ast::Identifier { name, span: new_span() }
+}
+
+fn new_span() -> ast::Span {
+    ast::Span::empty()
+}
+
+fn find_directives_mut<'a>(
+    datamodel: &'a mut ast::SchemaAst,
+    location: &steps::DirectiveType,
+) -> Option<&'a mut Vec<ast::Directive>> {
+    let directives = match location {
+        steps::DirectiveType::Field { model, field } => &mut datamodel.find_field_mut(&model, &field)?.directives,
+        steps::DirectiveType::Model { model } => &mut datamodel.find_model_mut(&model)?.directives,
+        steps::DirectiveType::Enum { r#enum } => &mut datamodel.find_enum_mut(&r#enum)?.directives,
+    };
+
+    Some(directives)
+}
+
+fn find_directive_mut<'a>(
+    datamodel: &'a mut ast::SchemaAst,
+    locator: &steps::DirectiveLocation,
+) -> Option<&'a mut ast::Directive> {
+    find_directives_mut(datamodel, &locator.location)?
+        .iter_mut()
+        .find(|directive| directive.name.name == locator.directive)
 }

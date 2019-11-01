@@ -322,6 +322,7 @@ fn renaming_a_field_where_the_column_was_already_renamed_must_work() {
         "#;
 
         let final_result = infer_and_apply(test_setup, api, &dm2).sql_schema;
+
         let final_column = final_result.table_bang("Blog").column_bang("new_title");
 
         assert_eq!(final_column.tpe.family, ColumnTypeFamily::Float);

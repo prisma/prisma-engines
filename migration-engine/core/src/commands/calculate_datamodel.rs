@@ -1,6 +1,6 @@
 use crate::commands::command::*;
 use crate::migration_engine::MigrationEngine;
-use datamodel::dml::Datamodel;
+use datamodel::ast::SchemaAst;
 use log::*;
 use migration_connector::*;
 use serde::{Deserialize, Serialize};
@@ -24,11 +24,11 @@ impl<'a> MigrationCommand<'a> for CalculateDatamodelCommand<'a> {
     {
         debug!("{:?}", self.input);
 
-        let base_datamodel = Datamodel::empty();
+        let base_datamodel = SchemaAst::empty();
         let datamodel = engine.datamodel_calculator().infer(&base_datamodel, &self.input.steps);
 
         Ok(CalculateDatamodelOutput {
-            datamodel: datamodel::render_datamodel_to_string(&datamodel).unwrap(),
+            datamodel: datamodel::render_schema_ast_to_string(&datamodel).unwrap(),
         })
     }
 }

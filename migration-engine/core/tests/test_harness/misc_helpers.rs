@@ -1,9 +1,8 @@
-use datamodel;
+use datamodel::ast::{parser, SchemaAst};
 use migration_connector::*;
 use migration_core::{
     api::{GenericApi, MigrationApi},
     commands::ResetCommand,
-    parse_datamodel,
 };
 use prisma_query::connector::{MysqlParams, PostgresParams};
 use sql_migration_connector::{migration_database::*, SqlFamily, SqlMigrationConnector};
@@ -33,8 +32,8 @@ impl TestSetup {
     }
 }
 
-pub fn parse(datamodel_string: &str) -> datamodel::Datamodel {
-    parse_datamodel(datamodel_string).unwrap()
+pub fn parse(datamodel_string: &str) -> SchemaAst {
+    parser::parse(datamodel_string).unwrap()
 }
 
 pub fn test_each_connector<F>(test_fn: F)

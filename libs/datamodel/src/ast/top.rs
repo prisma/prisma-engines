@@ -1,7 +1,7 @@
 use super::*;
 
 /// Enum for distinguishing between top-level entries
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Top {
     Enum(Enum),
     Model(Model),
@@ -52,6 +52,20 @@ impl Top {
             Top::Source(x) => &x.name.name,
             Top::Generator(x) => &x.name.name,
             Top::Type(x) => &x.name.name,
+        }
+    }
+
+    pub fn as_model(&self) -> Option<&Model> {
+        match self {
+            Top::Model(model) => Some(model),
+            _ => None,
+        }
+    }
+
+    pub fn as_enum(&self) -> Option<&Enum> {
+        match self {
+            Top::Enum(r#enum) => Some(r#enum),
+            _ => None,
         }
     }
 }

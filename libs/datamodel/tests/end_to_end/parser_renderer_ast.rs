@@ -1,4 +1,3 @@
-extern crate datamodel;
 use pretty_assertions::assert_eq;
 
 const DATAMODEL_STRING: &str = r#"model User {

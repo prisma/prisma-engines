@@ -40,6 +40,10 @@ impl Expression {
             Expression::Any(v, s) => Expression::Any(v.clone(), lift_span(&s, offset)),
         }
     }
+
+    pub fn render_to_string(&self) -> String {
+        crate::ast::renderer::Renderer::render_value_to_string(self)
+    }
 }
 
 impl ToString for Expression {
@@ -56,6 +60,20 @@ impl ToString for Expression {
     }
 }
 
+impl std::str::FromStr for Expression {
+    type Err = pest::error::Error<crate::ast::parser::Rule>;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        use super::parser::{parse_expression, PrismaDatamodelParser, Rule};
+        use pest::Parser;
+
+        // Unwrapping is safe because we know that an expression was parsed.
+        let pair = PrismaDatamodelParser::parse(Rule::expression, s)?.next().unwrap();
+
+        Ok(parse_expression(&pair))
+    }
+}
+
 /// Creates a friendly readable representation for a value's type.
 pub fn describe_value_type(val: &Expression) -> &'static str {
     match val {
@@ -66,5 +84,58 @@ pub fn describe_value_type(val: &Expression) -> &'static str {
         Expression::Function(_, _, _) => "functional",
         Expression::Array(_, _) => "array",
         Expression::Any(_, _) => "any",
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn ast_expression_from_str_works() {
+        let expression_str = r##"concatenateStrings(["meow", "woof", "honk"], 8)"##;
+        let expr: Expression = expression_str.parse().unwrap();
+
+        let func_arguments = match &expr {
+            Expression::Function(name, args, _span) => {
+                assert_eq!(name, "concatenateStrings");
+                args
+            }
+            _ => panic!(),
+        };
+
+        match func_arguments.get(1) {
+            Some(Expression::NumericValue(s, _)) => assert_eq!(s, "8"),
+            other => panic!("{:?}", other),
+        }
+
+        match func_arguments.get(0) {
+            Some(Expression::Array(strings, _)) => {
+                let strings = strings
+                    .into_iter()
+                    .map(|arg| match arg {
+                        Expression::StringValue(s, _) => s.as_str(),
+                        _ => unreachable!(),
+                    })
+                    .collect::<Vec<&str>>();
+
+                assert_eq!(strings.as_slice(), &["meow", "woof", "honk"]);
+            }
+            other => panic!("{:?}", other),
+        }
+    }
+
+    #[test]
+    fn ast_expression_from_str_does_not_panic_with_empty_strings() {
+        let expression_str = "";
+        let expr: Result<Expression, _> = expression_str.parse();
+        assert!(expr.is_err());
+    }
+
+    #[test]
+    fn ast_expression_render_to_string_works() {
+        let expression_str = r##"concatenateStrings(["meow", "woof", "honk"], 8)"##;
+        let parsed: Expression = expression_str.parse().unwrap();
+        assert_eq!(parsed.render_to_string(), expression_str);
     }
 }

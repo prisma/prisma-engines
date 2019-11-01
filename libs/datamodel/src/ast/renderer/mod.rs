@@ -295,7 +295,7 @@ impl<'a> Renderer<'a> {
         Self::render_value(target, &args.value);
     }
 
-    fn render_value_to_string(val: &ast::Expression) -> String {
+    pub(crate) fn render_value_to_string(val: &ast::Expression) -> String {
         let mut builder = StringBuilder::new();
         Self::render_value(&mut builder, val);
         builder.to_string()
@@ -316,7 +316,11 @@ impl<'a> Renderer<'a> {
     fn render_func(target: &mut dyn LineWriteable, name: &str, vals: &[ast::Expression]) {
         target.write(name);
         target.write("(");
-        for val in vals {
+        for (idx, val) in vals.iter().enumerate() {
+            if idx > 0 {
+                target.write(", ");
+            }
+
             Self::render_value(target, val);
         }
         target.write(")");
