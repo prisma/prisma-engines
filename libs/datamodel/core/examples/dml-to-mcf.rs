@@ -32,7 +32,7 @@ fn main() {
             }
         }
         Ok(config) => {
-            let json = serde_json::to_string_pretty(&datamodel::config_to_mcf_json_value(&config)).unwrap();
+            let json = serde_json::to_string_pretty(&datamodel::json::mcf::config_to_mcf_json_value(&config)).unwrap();
             println!("{}", json);
         }
     }

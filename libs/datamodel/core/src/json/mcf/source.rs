@@ -1,6 +1,5 @@
 use crate::{ast, configuration, get_builtin_sources, StringFromEnvVar};
 use serde_json;
-use std::collections::HashMap;
 
 #[serde(rename_all = "camelCase")]
 #[derive(Debug, serde::Serialize, serde::Deserialize)]

@@ -1,5 +1,5 @@
 use super::{SqliteSource, SQLITE_SOURCE_NAME};
-use crate::{common::argument::Arguments, configuration::*, error::DatamodelError};
+use crate::{configuration::*, error::DatamodelError};
 
 pub struct SqliteSourceDefinition {}
 

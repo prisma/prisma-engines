@@ -1,35 +1,32 @@
 use crate::common::*;
-use datamodel::{
-    ast::Span, common::argument::Arguments, common::ScalarType, configuration::*, dml, error::DatamodelError,
-    validator::directive::DirectiveValidator,
-};
+use datamodel::{ast::Span, common::ScalarType, configuration::*, error::DatamodelError};
 use pretty_assertions::assert_eq;
 
 //##########################
 // Directive implementation
 //##########################
 
-struct CustomDirective {
-    base_type: ScalarType,
-}
-
-impl DirectiveValidator<dml::Field> for CustomDirective {
-    fn directive_name(&self) -> &'static str {
-        &"mapToInt"
-    }
-    fn validate_and_apply(&self, _args: &mut Arguments, obj: &mut dml::Field) -> Result<(), DatamodelError> {
-        obj.field_type = dml::FieldType::Base(self.base_type);
-        return Ok(());
-    }
-
-    fn serialize(
-        &self,
-        _obj: &dml::Field,
-        _datamodel: &dml::Datamodel,
-    ) -> Result<Vec<datamodel::ast::Directive>, DatamodelError> {
-        Ok(Vec::new())
-    }
-}
+//struct CustomDirective {
+//    base_type: ScalarType,
+//}
+//
+//impl DirectiveValidator<dml::Field> for CustomDirective {
+//    fn directive_name(&self) -> &'static str {
+//        &"mapToInt"
+//    }
+//    fn validate_and_apply(&self, _args: &mut Arguments, obj: &mut dml::Field) -> Result<(), DatamodelError> {
+//        obj.field_type = dml::FieldType::Base(self.base_type);
+//        return Ok(());
+//    }
+//
+//    fn serialize(
+//        &self,
+//        _obj: &dml::Field,
+//        _datamodel: &dml::Datamodel,
+//    ) -> Result<Vec<datamodel::ast::Directive>, DatamodelError> {
+//        Ok(Vec::new())
+//    }
+//}
 
 //##########################
 // Definition Boilerplate
@@ -59,7 +56,7 @@ impl SourceDefinition for CustomDbDefinition {
         Ok(Box::new(CustomDb {
             name: String::from(name),
             url,
-            base_type: ScalarType::Int,
+            _base_type: ScalarType::Int,
             documentation: documentation.clone(),
         }))
     }
@@ -72,7 +69,7 @@ impl SourceDefinition for CustomDbDefinition {
 struct CustomDb {
     name: String,
     url: StringFromEnvVar,
-    base_type: ScalarType,
+    _base_type: ScalarType,
     documentation: Option<String>,
 }
 
@@ -105,6 +102,7 @@ impl Source for CustomDb {
 
 // TODO: decide whether we still need this
 #[ignore]
+#[test]
 fn custom_plugin() {
     std::env::set_var("URL_CUSTOM_1", "https://localhost");
     let schema = parse_with_plugins(DATAMODEL, vec![Box::new(CustomDbDefinition::new())]);

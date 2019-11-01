@@ -11,7 +11,7 @@ use cli::CliError;
 use commands::*;
 use datamodel::{self, error::ErrorCollection, Datamodel};
 use log::*;
-use std::{env, fs, io, io::Read};
+use std::{fs, io, io::Read};
 
 pub use error::Error;
 pub use migration_engine::*;
