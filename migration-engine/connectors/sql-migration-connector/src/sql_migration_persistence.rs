@@ -1,4 +1,3 @@
-use super::MigrationDatabase;
 use super::SqlFamily;
 use barrel::types;
 use chrono::*;
@@ -6,11 +5,12 @@ use migration_connector::*;
 use prisma_query::ast::*;
 use prisma_query::connector::ResultSet;
 use serde_json;
+use sql_connection::SyncSqlConnection;
 use std::sync::Arc;
 
 pub struct SqlMigrationPersistence {
     pub sql_family: SqlFamily,
-    pub connection: Arc<dyn MigrationDatabase + Send + Sync + 'static>,
+    pub connection: Arc<dyn SyncSqlConnection + Send + Sync + 'static>,
     pub schema_name: String,
     pub file_path: Option<String>,
 }
@@ -37,12 +37,12 @@ impl MigrationPersistence for SqlMigrationPersistence {
             }
         };
 
-        let _ = self.connection.query_raw(&self.schema_name, dbg!(&sql_str), &[]);
+        let _ = self.connection.query_raw(&sql_str, &[]);
     }
 
     fn reset(&self) {
         let sql_str = format!(r#"DELETE FROM "{}"."_Migration";"#, self.schema_name); // TODO: this is not vendor agnostic yet
-        let _ = self.connection.query_raw(&self.schema_name, &sql_str, &[]);
+        let _ = self.connection.query_raw(&sql_str, &[]);
 
         // TODO: this is the wrong place to do that
         match self.sql_family {
@@ -50,17 +50,32 @@ impl MigrationPersistence for SqlMigrationPersistence {
                 let sql_str = format!(r#"DROP SCHEMA "{}" CASCADE;"#, self.schema_name);
                 debug!("{}", sql_str);
 
-                let _ = self.connection.query_raw(&self.schema_name, &sql_str, &[]);
+                self.connection.query_raw(&sql_str, &[]).ok();
             }
             SqlFamily::Sqlite => {
                 if let Some(ref file_path) = self.file_path {
-                    let _ = std::fs::remove_file(file_path); // ignore potential errors
+                    self.connection
+                        .execute_raw(
+                            "DETACH DATABASE ?",
+                            &[ParameterizedValue::from(self.schema_name.as_str())],
+                        )
+                        .ok();
+                    std::fs::remove_file(file_path).ok(); // ignore potential errors
+                    self.connection
+                        .execute_raw(
+                            "ATTACH DATABASE ? AS ?",
+                            &[
+                                ParameterizedValue::from(file_path.as_str()),
+                                ParameterizedValue::from(self.schema_name.as_str()),
+                            ],
+                        )
+                        .unwrap();
                 }
             }
             SqlFamily::Mysql => {
                 let sql_str = format!(r#"DROP SCHEMA `{}`;"#, self.schema_name);
                 debug!("{}", sql_str);
-                let _ = self.connection.query_raw(&self.schema_name, &sql_str, &[]);
+                self.connection.query_raw(&sql_str, &[]).ok();
             }
         }
     }
@@ -71,14 +86,14 @@ impl MigrationPersistence for SqlMigrationPersistence {
             .so_that(conditions)
             .order_by(REVISION_COLUMN.descend());
 
-        let result_set = self.connection.query(&self.schema_name, query.into()).unwrap();
+        let result_set = self.connection.query(query.into()).unwrap();
         parse_rows_new(result_set).into_iter().next()
     }
 
     fn load_all(&self) -> Vec<Migration> {
         let query = Select::from_table(self.table()).order_by(REVISION_COLUMN.ascend());
 
-        let result_set = self.connection.query(&self.schema_name, query.into()).unwrap();
+        let result_set = self.connection.query(query.into()).unwrap();
         parse_rows_new(result_set)
     }
 
@@ -88,7 +103,7 @@ impl MigrationPersistence for SqlMigrationPersistence {
             .so_that(conditions)
             .order_by(REVISION_COLUMN.descend());
 
-        let result_set = self.connection.query(&self.schema_name, query.into()).unwrap();
+        let result_set = self.connection.query(query.into()).unwrap();
         parse_rows_new(result_set).into_iter().next()
     }
 
@@ -113,7 +128,7 @@ impl MigrationPersistence for SqlMigrationPersistence {
 
         match self.sql_family {
             SqlFamily::Sqlite | SqlFamily::Mysql => {
-                let id = self.connection.execute(&self.schema_name, insert.into()).unwrap();
+                let id = self.connection.execute(insert.into()).unwrap();
                 match id {
                     Some(prisma_query::ast::Id::Int(id)) => cloned.revision = id,
                     _ => panic!("This insert must return an int"),
@@ -121,10 +136,7 @@ impl MigrationPersistence for SqlMigrationPersistence {
             }
             SqlFamily::Postgres => {
                 let returning_insert = Insert::from(insert).returning(vec!["revision"]);
-                let result_set = self
-                    .connection
-                    .query(&self.schema_name, returning_insert.into())
-                    .unwrap();
+                let result_set = self.connection.query(returning_insert.into()).unwrap();
                 result_set.into_iter().next().map(|row| {
                     cloned.revision = row["revision"].as_i64().unwrap() as usize;
                 });
@@ -152,7 +164,7 @@ impl MigrationPersistence for SqlMigrationPersistence {
                     .and(REVISION_COLUMN.equals(params.revision)),
             );
 
-        let _ = self.connection.query(&self.schema_name, query.into()).unwrap();
+        self.connection.query(query.into()).unwrap();
     }
 }
 

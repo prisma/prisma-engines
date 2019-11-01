@@ -150,9 +150,7 @@ fn create_postgres_admin_conn(mut url: Url) -> crate::Result<SqlMigrationConnect
 #[cfg(test)]
 mod tests {
     use super::CliError;
-    use prisma_query::connector::{MysqlParams, PostgresParams};
-    use sql_migration_connector::migration_database::*;
-    use std::convert::TryFrom;
+    use sql_connection::{Mysql, Postgresql, SyncSqlConnection};
 
     fn with_cli<F>(matches: Vec<&str>, f: F) -> Result<(), Box<dyn std::any::Any + Send + 'static>>
     where
@@ -224,6 +222,8 @@ mod tests {
 
     #[test]
     fn test_connecting_with_a_non_working_mysql_connection_string() {
+        env_logger::init();
+
         let dm = mysql_url(Some("this_does_not_exist"));
 
         with_cli(vec!["cli", "--can_connect_to_database"], |matches| {
@@ -288,9 +288,9 @@ mod tests {
 
             {
                 let uri = url::Url::parse(&mysql_url(None)).unwrap();
-                let conn = Mysql::new(MysqlParams::try_from(uri).unwrap(), false).unwrap();
+                let conn = Mysql::new_unpooled(uri).unwrap();
 
-                conn.execute_raw("", "DROP DATABASE `this_should_exist`", &[]).unwrap();
+                conn.execute_raw("DROP DATABASE `this_should_exist`", &[]).unwrap();
             }
 
             res.unwrap();
@@ -312,18 +312,14 @@ mod tests {
 
         if let Ok(()) = res {
             let res = with_cli(vec!["cli", "--can_connect_to_database"], |matches| {
-                assert_eq!(
-                    Ok(String::from("Connection successful")),
-                    super::run(&matches, dbg!(&url))
-                );
+                assert_eq!(Ok(String::from("Connection successful")), super::run(&matches, &url));
             });
 
             {
                 let uri = url::Url::parse(&postgres_url(None)).unwrap();
-                let conn = PostgreSql::new(PostgresParams::try_from(uri).unwrap(), false).unwrap();
+                let conn = Postgresql::new_unpooled(uri).unwrap();
 
-                conn.execute_raw("", "DROP DATABASE \"this_should_exist\"", &[])
-                    .unwrap();
+                conn.execute_raw("DROP DATABASE \"this_should_exist\"", &[]).unwrap();
             }
 
             res.unwrap();

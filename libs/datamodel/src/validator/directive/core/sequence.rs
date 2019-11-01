@@ -29,7 +29,7 @@ impl DirectiveValidator<dml::Field> for SequenceDirectiveValidator {
             Err(err) => return Err(self.parser_error(&err)),
         }
 
-        match args.arg("initialValie")?.as_int() {
+        match args.arg("initialValue")?.as_int() {
             Ok(initial_value) => seq.initial_value = initial_value,
             Err(err) => return Err(self.parser_error(&err)),
         }

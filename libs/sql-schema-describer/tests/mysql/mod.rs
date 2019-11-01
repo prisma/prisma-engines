@@ -1,26 +1,11 @@
 use log::debug;
-use prisma_query::{ast::ParameterizedValue, connector::Queryable};
+use sql_connection::{Mysql, SyncSqlConnection};
 use sql_schema_describer::*;
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
 
 use super::SCHEMA;
 
-struct MySqlConnection {
-    client: Mutex<prisma_query::connector::Mysql>,
-}
-
-impl crate::SqlConnection for MySqlConnection {
-    fn query_raw(
-        &self,
-        sql: &str,
-        _: &str,
-        params: &[ParameterizedValue],
-    ) -> prisma_query::Result<prisma_query::connector::ResultSet> {
-        self.client.lock().expect("self.client.lock").query_raw(sql, params)
-    }
-}
-
-pub fn get_mysql_describer(sql: &str) -> mysql::SqlSchemaDescriber {
+fn mysql_url(schema: &str) -> String {
     let host = match std::env::var("IS_BUILDKITE") {
         Ok(_) => "test-db-mysql-5-7",
         Err(_) => "127.0.0.1",
@@ -31,18 +16,31 @@ pub fn get_mysql_describer(sql: &str) -> mysql::SqlSchemaDescriber {
 
     debug!("Connecting to MySQL server at {}, port {}, user '{}'", host, port, user);
 
-    let mut opts_builder = prisma_query::pool::mysql::OptsBuilder::new();
-    opts_builder
-        .ip_or_hostname(Some(host))
-        .tcp_port(port)
-        .user(Some(user))
-        .pass(Some(password));
-    let mut conn = prisma_query::connector::Mysql::new(opts_builder).expect("connect to MySQL");
+    format!(
+        "mysql://{user}:{password}@{host}:{port}/{schema}",
+        user = user,
+        password = password,
+        host = host,
+        port = port,
+        schema = schema
+    )
+}
+
+pub fn get_mysql_describer(sql: &str) -> mysql::SqlSchemaDescriber {
+    // Ensure the presence of an empty database.
+
+    let url = mysql_url("");
+    let conn = Mysql::new_unpooled(url.parse().unwrap()).unwrap();
 
     conn.execute_raw(&format!("DROP SCHEMA IF EXISTS `{}`", SCHEMA), &[])
         .expect("dropping schema");
     conn.execute_raw(&format!("CREATE SCHEMA `{}`", SCHEMA), &[])
         .expect("creating schema");
+
+    // Migrate the database we just created.
+
+    let url = mysql_url(SCHEMA);
+    let conn = Mysql::new_unpooled(url.parse().unwrap()).unwrap();
 
     debug!("Executing MySQL migrations: {}", sql);
     let sql_string = sql.to_string();
@@ -53,16 +51,5 @@ pub fn get_mysql_describer(sql: &str) -> mysql::SqlSchemaDescriber {
             .expect("executing migration statement");
     }
 
-    let mut opts_builder = prisma_query::pool::mysql::OptsBuilder::new();
-    opts_builder
-        .ip_or_hostname(Some(host))
-        .tcp_port(port)
-        .user(Some(user))
-        .pass(Some(password))
-        .db_name(Some(SCHEMA));
-    let conn = prisma_query::connector::Mysql::new(opts_builder).expect("connect to MySQL");
-
-    mysql::SqlSchemaDescriber::new(Arc::new(MySqlConnection {
-        client: Mutex::new(conn),
-    }))
+    mysql::SqlSchemaDescriber::new(Arc::new(conn))
 }

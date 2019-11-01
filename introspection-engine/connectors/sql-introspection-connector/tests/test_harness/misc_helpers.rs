@@ -1,10 +1,9 @@
-use crate::test_harness::{IntrospectionDatabase, IntrospectionDatabaseWrapper, Mysql, PostgreSql, Sqlite};
+use crate::test_harness::{Mysql, Postgresql, Sqlite, SyncSqlConnection};
 use barrel::{Migration, SqlVariant};
 use introspection_connector::IntrospectionConnector;
 use pretty_assertions::assert_eq;
-use prisma_query::connector::{MysqlParams, PostgresParams};
 use sql_introspection_connector::*;
-use std::{convert::TryFrom, rc::Rc, sync::Arc};
+use std::{rc::Rc, sync::Arc};
 use url::Url;
 
 #[derive(Debug, Copy, Clone, PartialEq)]
@@ -16,12 +15,12 @@ pub enum SqlFamily {
 
 pub struct TestSetup {
     pub sql_family: SqlFamily,
-    pub database: Arc<dyn IntrospectionDatabase + Send + Sync + 'static>,
+    pub database: Arc<dyn SyncSqlConnection + Send + Sync + 'static>,
     pub introspection_connector: Box<dyn IntrospectionConnector>,
 }
 
 pub struct BarrelMigrationExecutor {
-    database: Arc<dyn IntrospectionDatabase + Send + Sync>,
+    database: Arc<dyn SyncSqlConnection + Send + Sync>,
     sql_variant: barrel::backend::SqlVariant,
 }
 
@@ -40,10 +39,10 @@ pub(crate) fn introspect(test_setup: &TestSetup) -> String {
     datamodel::render_datamodel_to_string(&datamodel).expect("Datamodel rendering failed")
 }
 
-fn run_full_sql(database: &Arc<dyn IntrospectionDatabase + Send + Sync>, full_sql: &str) {
+fn run_full_sql(database: &Arc<dyn SyncSqlConnection + Send + Sync>, full_sql: &str) {
     for sql in full_sql.split(";") {
         if sql != "" {
-            database.query_raw(SCHEMA_NAME, &sql, &[]).unwrap();
+            database.query_raw(&sql, &[]).unwrap();
         }
     }
 }
@@ -59,7 +58,7 @@ pub(crate) fn test_each_backend_with_ignores<F>(ignores: Vec<SqlFamily>, test_fn
 where
     F: Fn(&TestSetup, &BarrelMigrationExecutor) -> () + std::panic::RefUnwindSafe,
 {
-    //     SQLite
+    // SQLite
     if !ignores.contains(&SqlFamily::Sqlite) {
         println!("Testing with SQLite now");
         let test_setup = get_sqlite();
@@ -74,7 +73,7 @@ where
     } else {
         println!("Ignoring SQLite")
     }
-    // POSTGRES
+    // Postgres
     if !ignores.contains(&SqlFamily::Postgres) {
         println!("Testing with Postgres now");
         let test_setup = get_postgres();
@@ -121,47 +120,38 @@ impl BarrelMigrationExecutor {
 
 // get dbs
 
-pub fn database(sql_family: SqlFamily, database_url: &str) -> Box<dyn IntrospectionDatabase + Send + Sync + 'static> {
-    match sql_family {
-        SqlFamily::Postgres => {
+pub fn database(database_url: &str) -> Box<dyn SyncSqlConnection + Send + Sync + 'static> {
+    let url: Url = database_url.parse().unwrap();
+
+    match url.scheme() {
+        "postgresql" | "postgres" => {
             let url = Url::parse(database_url).unwrap();
             let create_cmd = |name| format!("CREATE DATABASE \"{}\"", name);
 
-            let connect_cmd = |url| {
-                let params = PostgresParams::try_from(url)?;
-                PostgreSql::new(params, true)
-            };
+            let connect_cmd = |url| Postgresql::new_pooled(url);
 
             let conn = with_database(url, "postgres", "postgres", create_cmd, Rc::new(connect_cmd));
 
             Box::new(conn)
         }
-        SqlFamily::Sqlite => Box::new(Sqlite::new(database_url).unwrap()),
-        SqlFamily::Mysql => {
+        "mysql" => {
             let url = Url::parse(database_url).unwrap();
             let create_cmd = |name| format!("CREATE DATABASE `{}`", name);
 
-            let connect_cmd = |url| {
-                let params = MysqlParams::try_from(url)?;
-                Mysql::new(params, true)
-            };
+            let connect_cmd = |url| Mysql::new_pooled(url);
 
             let conn = with_database(url, "mysql", "/", create_cmd, Rc::new(connect_cmd));
 
             Box::new(conn)
         }
-    }
-}
-
-pub fn database_wrapper(sql_family: SqlFamily, database_url: &str) -> IntrospectionDatabaseWrapper {
-    IntrospectionDatabaseWrapper {
-        database: database(sql_family, database_url).into(),
+        "file" | "sqlite" => Box::new(Sqlite::new(database_url, "introspection-engine").unwrap()),
+        scheme => panic!("Unknown scheme `{}° in database URL: {}", scheme, url.as_str()),
     }
 }
 
 fn with_database<F, T, S>(url: Url, default_name: &str, root_path: &str, create_stmt: S, f: Rc<F>) -> T
 where
-    T: IntrospectionDatabase,
+    T: SyncSqlConnection,
     F: Fn(Url) -> Result<T, prisma_query::error::Error>,
     S: FnOnce(String) -> String,
 {
@@ -176,7 +166,7 @@ where
 
 fn create_database<F, T, S>(url: Url, default_name: &str, root_path: &str, create_stmt: S, f: Rc<F>)
 where
-    T: IntrospectionDatabase,
+    T: SyncSqlConnection,
     F: Fn(Url) -> Result<T, prisma_query::error::Error>,
     S: FnOnce(String) -> String,
 {
@@ -187,7 +177,7 @@ where
 
     let conn = f(url).unwrap();
 
-    conn.execute_raw("", &create_stmt(db_name), &[]).unwrap();
+    conn.execute_raw(&create_stmt(db_name), &[]).unwrap();
 }
 
 fn fetch_db_name(url: &Url, default: &str) -> String {
@@ -200,50 +190,47 @@ fn fetch_db_name(url: &Url, default: &str) -> String {
 }
 
 fn get_sqlite() -> TestSetup {
-    let wrapper = database_wrapper(SqlFamily::Sqlite, &sqlite_test_file());
-    let database = Arc::clone(&wrapper.database);
+    let database = database(&sqlite_test_url());
 
     let database_file_path = sqlite_test_file();
-    let _ = std::fs::remove_file(database_file_path.clone()); // ignore potential errors
+    std::fs::remove_file(database_file_path.clone()).ok(); // ignore potential errors
     let introspection_connector = SqlIntrospectionConnector::new(&sqlite_test_url()).unwrap();
 
     TestSetup {
-        database,
+        database: database.into(),
         sql_family: SqlFamily::Sqlite,
         introspection_connector: Box::new(introspection_connector),
     }
 }
 
 fn get_postgres() -> TestSetup {
-    let wrapper = database_wrapper(SqlFamily::Postgres, &postgres_url());
-    let database = Arc::clone(&wrapper.database);
+    let database = database(&postgres_url());
 
     let drop_schema = dbg!(format!("DROP SCHEMA IF EXISTS \"{}\" CASCADE;", SCHEMA_NAME));
-    let _ = database.query_raw(SCHEMA_NAME, &drop_schema, &[]);
+    database.query_raw(&drop_schema, &[]).ok();
 
     let create_schema = dbg!(format!("CREATE SCHEMA IF NOT EXISTS \"{}\";", SCHEMA_NAME));
-    let _ = database.query_raw(SCHEMA_NAME, &create_schema, &[]);
+    database.query_raw(&create_schema, &[]).ok();
 
     let introspection_connector = SqlIntrospectionConnector::new(&postgres_url()).unwrap();
 
     TestSetup {
-        database,
+        database: database.into(),
         sql_family: SqlFamily::Postgres,
         introspection_connector: Box::new(introspection_connector),
     }
 }
 
 fn get_mysql() -> TestSetup {
-    let wrapper = database_wrapper(SqlFamily::Mysql, &mysql_url());
-    let database = Arc::clone(&wrapper.database);
+    let database = database(&mysql_url());
 
     let drop_schema = dbg!(format!("DROP SCHEMA IF EXISTS \"{}\" CASCADE;", SCHEMA_NAME));
-    let _ = database.query_raw(SCHEMA_NAME, &drop_schema, &[]);
+    database.query_raw(&drop_schema, &[]).ok();
 
     let introspection_connector = SqlIntrospectionConnector::new(&mysql_url()).unwrap();
 
     TestSetup {
-        database,
+        database: database.into(),
         sql_family: SqlFamily::Mysql,
         introspection_connector: Box::new(introspection_connector),
     }
