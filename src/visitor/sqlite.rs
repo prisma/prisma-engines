@@ -574,4 +574,26 @@ mod tests {
         assert_eq!(42.69, person.age);
         assert_eq!(1, person.nice);
     }
+
+    use test::Bencher;
+
+    #[bench]
+    fn bench_select(b: &mut Bencher) {
+        b.iter(|| {
+            let conditions = "name"
+                .equals("Alice")
+                .and("age".less_than(100.0))
+                .and("nice".equals(1));
+
+            let query = Select::from_table("users")
+                .column("name")
+                .column("age")
+                .column("maritial_status")
+                .column("father")
+                .inner_join()
+                .so_that(conditions);
+
+            Sqlite::build(query);
+        })
+    }
 }

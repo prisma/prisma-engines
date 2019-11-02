@@ -34,13 +34,13 @@ where
     fn execute_raw<'a>(&'a self, sql: &'a str, params: &'a [ParameterizedValue]) -> DBIO<'a, u64>;
 
     /// Turns off all foreign key constraints.
-    fn turn_off_fk_constraints<'a>(&'a self) -> DBIO<'a, ()>;
+    fn turn_off_fk_constraints(&self) -> DBIO<()>;
 
     /// Turns on all foreign key constraints.
-    fn turn_on_fk_constraints<'a>(&'a self) -> DBIO<'a, ()>;
+    fn turn_on_fk_constraints(&self) -> DBIO<()>;
 
     /// Starts a new transaction
-    fn start_transaction<'a>(&'a self) -> DBIO<'a, Transaction<'a>>;
+    fn start_transaction(&self) -> DBIO<Transaction>;
 
     /// Runs a command in the database, for queries that can't be run using
     /// prepared statements.
@@ -109,15 +109,15 @@ where
         T::execute_raw(self, sql, params)
     }
 
-    fn turn_off_fk_constraints<'a>(&'a self) -> DBIO<'a, ()> {
+    fn turn_off_fk_constraints(&self) -> DBIO<()> {
         T::turn_off_fk_constraints(self)
     }
 
-    fn turn_on_fk_constraints<'a>(&'a self) -> DBIO<'a, ()> {
+    fn turn_on_fk_constraints(&self) -> DBIO<()> {
         T::turn_on_fk_constraints(self)
     }
 
-    fn start_transaction<'a>(&'a self) -> DBIO<'a, Transaction<'a>> {
+    fn start_transaction(&self) -> DBIO<Transaction> {
         T::start_transaction(self)
     }
 

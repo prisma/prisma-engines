@@ -208,7 +208,7 @@ impl Queryable for Sqlite {
         })
     }
 
-    fn start_transaction<'b>(&'b self) -> DBIO<'b, Transaction<'b>> {
+    fn start_transaction(&self) -> DBIO<Transaction> {
         DBIO::new(async move { Transaction::new(self).await })
     }
 

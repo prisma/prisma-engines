@@ -61,7 +61,7 @@ impl From<my::error::Error> for Error {
             }) if code == 1045 => {
                 let splitted: Vec<&str> = message.split_whitespace().collect();
                 let splitted: Vec<&str> = splitted[4].split('@').collect();
-                let splitted: Vec<&str> = splitted[0].split("'").collect();
+                let splitted: Vec<&str> = splitted[0].split('\'').collect();
                 let user: String = splitted[1].into();
 
                 Error::AuthenticationFailed { user }

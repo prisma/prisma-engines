@@ -52,11 +52,11 @@ impl<'a> Queryable for Transaction<'a> {
         self.inner.execute_raw(sql, params)
     }
 
-    fn turn_off_fk_constraints<'b>(&'b self) -> DBIO<'b, ()> {
+    fn turn_off_fk_constraints(&self) -> DBIO<()> {
         self.inner.turn_off_fk_constraints()
     }
 
-    fn turn_on_fk_constraints<'b>(&'b self) -> DBIO<'b, ()> {
+    fn turn_on_fk_constraints(&self) -> DBIO<()> {
         self.inner.turn_on_fk_constraints()
     }
 
@@ -64,7 +64,7 @@ impl<'a> Queryable for Transaction<'a> {
         self.inner.empty_tables(tables)
     }
 
-    fn start_transaction<'b>(&'b self) -> DBIO<'b, Transaction<'b>> {
+    fn start_transaction(&self) -> DBIO<Transaction> {
         panic!("Nested transactions are not supported")
     }
 

@@ -380,21 +380,21 @@ impl Queryable for PostgreSql {
         })
     }
 
-    fn turn_off_fk_constraints<'a>(&'a self) -> DBIO<'a, ()> {
+    fn turn_off_fk_constraints(&self) -> DBIO<()> {
         DBIO::new(async move {
             self.query_raw("SET CONSTRAINTS ALL DEFERRED", &[]).await?;
             Ok(())
         })
     }
 
-    fn turn_on_fk_constraints<'a>(&'a self) -> DBIO<'a, ()> {
+    fn turn_on_fk_constraints(&self) -> DBIO<()> {
         DBIO::new(async move {
             self.query_raw("SET CONSTRAINTS ALL IMMEDIATE", &[]).await?;
             Ok(())
         })
     }
 
-    fn start_transaction<'b>(&'b self) -> DBIO<'b, Transaction<'b>> {
+    fn start_transaction(&self) -> DBIO<Transaction> {
         DBIO::new(async move { Transaction::new(self).await })
     }
 

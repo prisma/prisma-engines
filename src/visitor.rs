@@ -233,7 +233,7 @@ pub trait Visitor<'a> {
     fn delimited_identifiers(&mut self, parts: &[&str]) -> fmt::Result {
         let len = parts.len();
 
-        for (i, parts) in parts.into_iter().enumerate() {
+        for (i, parts) in parts.iter().enumerate() {
             self.surround_with(Self::C_BACKTICK, Self::C_BACKTICK, |ref mut s| s.write(parts))?;
 
             if i < (len - 1) {

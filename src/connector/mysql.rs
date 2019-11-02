@@ -231,7 +231,7 @@ impl Queryable for Mysql {
         })
     }
 
-    fn turn_off_fk_constraints<'a>(&'a self) -> DBIO<'a, ()> {
+    fn turn_off_fk_constraints(&self) -> DBIO<()> {
         DBIO::new(async move {
             let conn = self.pool.get_conn().await?;
             conn.query("SET FOREIGN_KEY_CHECKS=0").await?;
@@ -240,7 +240,7 @@ impl Queryable for Mysql {
         })
     }
 
-    fn turn_on_fk_constraints<'a>(&'a self) -> DBIO<'a, ()> {
+    fn turn_on_fk_constraints(&self) -> DBIO<()> {
         DBIO::new(async move {
             let conn = self.pool.get_conn().await?;
             conn.query("SET FOREIGN_KEY_CHECKS=1").await?;
@@ -249,7 +249,7 @@ impl Queryable for Mysql {
         })
     }
 
-    fn start_transaction<'b>(&'b self) -> DBIO<'b, Transaction<'b>> {
+    fn start_transaction(&self) -> DBIO<Transaction> {
         DBIO::new(async move { Transaction::new(self).await })
     }
 
