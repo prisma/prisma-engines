@@ -49,7 +49,7 @@ where
 
     fn get_many_records<'b>(
         &'b self,
-        model: ModelRef,
+        model: &'b ModelRef,
         query_arguments: QueryArguments,
         selected_fields: &'b SelectedFields,
     ) -> connector::IO<'b, ManyRecords> {
@@ -58,7 +58,7 @@ where
 
     fn get_related_records<'b>(
         &'b self,
-        from_field: RelationFieldRef,
+        from_field: &'b RelationFieldRef,
         from_record_ids: &'b [GraphqlId],
         query_arguments: QueryArguments,
         selected_fields: &'b SelectedFields,
@@ -77,13 +77,13 @@ where
 
     fn get_scalar_list_values<'b>(
         &'b self,
-        list_field: ScalarFieldRef,
+        list_field: &'b ScalarFieldRef,
         record_ids: Vec<GraphqlId>,
     ) -> connector::IO<'b, Vec<ScalarListValues>> {
         IO::new(async move { read::get_scalar_list_values(&self.inner, list_field, record_ids).await })
     }
 
-    fn count_by_model<'b>(&'b self, model: ModelRef, query_arguments: QueryArguments) -> connector::IO<'b, usize> {
+    fn count_by_model<'b>(&'b self, model: &'b ModelRef, query_arguments: QueryArguments) -> connector::IO<'b, usize> {
         IO::new(async move { read::count_by_model(&self.inner, model, query_arguments).await })
     }
 }
@@ -92,21 +92,21 @@ impl<'a, T> WriteOperations for SqlConnectorTransaction<'a, T>
 where
     T: ManyRelatedRecordsQueryBuilder + Send + Sync + 'static,
 {
-    fn create_record<'b>(&'b self, model: ModelRef, args: WriteArgs) -> connector::IO<GraphqlId> {
+    fn create_record<'b>(&'b self, model: &'b ModelRef, args: WriteArgs) -> connector::IO<GraphqlId> {
         IO::new(async move { write::create_record(&self.inner, model, args).await })
     }
 
-    fn update_records<'b>(&'b self, model: ModelRef, where_: Filter, args: WriteArgs) -> connector::IO<Vec<GraphqlId>> {
+    fn update_records<'b>(&'b self, model: &'b ModelRef, where_: Filter, args: WriteArgs) -> connector::IO<Vec<GraphqlId>> {
         IO::new(async move { write::update_records(&self.inner, model, where_, args).await })
     }
 
-    fn delete_records<'b>(&'b self, model: ModelRef, where_: Filter) -> connector::IO<usize> {
+    fn delete_records<'b>(&'b self, model: &'b ModelRef, where_: Filter) -> connector::IO<usize> {
         IO::new(async move { write::delete_records(&self.inner, model, where_).await })
     }
 
     fn connect<'b>(
         &'b self,
-        field: RelationFieldRef,
+        field: &'b RelationFieldRef,
         parent_id: &'b GraphqlId,
         child_id: &'b GraphqlId,
     ) -> connector::IO<()> {
@@ -115,7 +115,7 @@ where
 
     fn disconnect<'b>(
         &'b self,
-        field: RelationFieldRef,
+        field: &'b RelationFieldRef,
         parent_id: &'b GraphqlId,
         child_id: &'b GraphqlId,
     ) -> connector::IO<()> {
@@ -124,7 +124,7 @@ where
 
     fn set<'b>(
         &'b self,
-        relation_field: RelationFieldRef,
+        relation_field: &'b RelationFieldRef,
         parent_id: GraphqlId,
         wheres: Vec<GraphqlId>,
     ) -> connector::IO<()> {

@@ -54,8 +54,8 @@ impl From<Vec<Arc<ScalarField>>> for SelectedFields {
     }
 }
 
-impl From<ModelRef> for SelectedFields {
-    fn from(model: ModelRef) -> SelectedFields {
+impl From<&ModelRef> for SelectedFields {
+    fn from(model: &ModelRef) -> SelectedFields {
         let fields = model
             .fields()
             .scalar_non_list()

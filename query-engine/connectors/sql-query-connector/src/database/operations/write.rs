@@ -6,10 +6,10 @@ use std::sync::Arc;
 
 pub async fn create_record(
     conn: &dyn QueryExt,
-    model: ModelRef,
+    model: &ModelRef,
     args: WriteArgs,
 ) -> connector_interface::Result<GraphqlId> {
-    let (insert, returned_id) = WriteQueryBuilder::create_record(Arc::clone(&model), args.non_list_args().clone());
+    let (insert, returned_id) = WriteQueryBuilder::create_record(model, args.non_list_args().clone());
 
     let last_id = match conn.insert(insert).await {
         Ok(id) => id,
@@ -57,11 +57,11 @@ pub async fn create_record(
 
 pub async fn update_records(
     conn: &dyn QueryExt,
-    model: ModelRef,
+    model: &ModelRef,
     where_: Filter,
     args: WriteArgs,
 ) -> connector_interface::Result<Vec<GraphqlId>> {
-    let ids = conn.filter_ids(Arc::clone(&model), where_.clone()).await?;
+    let ids = conn.filter_ids(model, where_.clone()).await?;
 
     if ids.len() == 0 {
         return Ok(vec![]);
@@ -69,7 +69,7 @@ pub async fn update_records(
 
     let updates = {
         let ids: Vec<&GraphqlId> = ids.iter().map(|id| &*id).collect();
-        WriteQueryBuilder::update_many(Arc::clone(&model), ids.as_slice(), args.non_list_args())?
+        WriteQueryBuilder::update_many(model, ids.as_slice(), args.non_list_args())?
     };
 
     for update in updates {
@@ -95,10 +95,10 @@ pub async fn update_records(
 
 pub async fn delete_records(
     conn: &dyn QueryExt,
-    model: ModelRef,
+    model: &ModelRef,
     where_: Filter,
 ) -> connector_interface::Result<usize> {
-    let ids = conn.filter_ids(Arc::clone(&model), where_.clone()).await?;
+    let ids = conn.filter_ids(model, where_.clone()).await?;
     let ids: Vec<&GraphqlId> = ids.iter().map(|id| &*id).collect();
     let count = ids.len();
 
@@ -115,7 +115,7 @@ pub async fn delete_records(
 
 pub async fn connect(
     conn: &dyn QueryExt,
-    field: RelationFieldRef,
+    field: &RelationFieldRef,
     parent_id: &GraphqlId,
     child_id: &GraphqlId,
 ) -> connector_interface::Result<()> {
@@ -127,7 +127,7 @@ pub async fn connect(
 
 pub async fn disconnect(
     conn: &dyn QueryExt,
-    field: RelationFieldRef,
+    field: &RelationFieldRef,
     parent_id: &GraphqlId,
     child_id: &GraphqlId,
 ) -> connector_interface::Result<()> {
@@ -139,16 +139,17 @@ pub async fn disconnect(
 
 pub async fn set(
     conn: &dyn QueryExt,
-    field: RelationFieldRef,
+    field: &RelationFieldRef,
     parent_id: GraphqlId,
     child_ids: Vec<GraphqlId>,
 ) -> connector_interface::Result<()> {
-    let query = WriteQueryBuilder::delete_relation_by_parent(Arc::clone(&field), &parent_id);
+    let query = WriteQueryBuilder::delete_relation_by_parent(field, &parent_id);
     conn.execute(query).await.map_err(SqlError::from)?;
 
     // TODO: we can avoid the multiple roundtrips in some cases
     for child_id in &child_ids {
-        connect(conn, Arc::clone(&field), &parent_id, child_id).await?;
+        connect(conn, field, &parent_id, child_id).await?;
     }
+
     Ok(())
 }

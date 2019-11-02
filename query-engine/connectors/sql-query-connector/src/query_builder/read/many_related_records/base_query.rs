@@ -5,21 +5,21 @@ use prisma_query::ast::{Aliasable, Comparable, ConditionTree, Joinable, Select};
 use std::sync::Arc;
 
 pub struct ManyRelatedRecordsBaseQuery<'a> {
-    pub from_field: Arc<RelationField>,
+    pub from_field: &'a RelationFieldRef,
     pub selected_fields: &'a SelectedFields,
     pub from_record_ids: &'a [GraphqlId],
-    pub query: Select<'static>,
+    pub query: Select<'a>,
     pub order_by: Option<OrderBy>,
     pub is_reverse_order: bool,
-    pub condition: ConditionTree<'static>,
-    pub cursor: ConditionTree<'static>,
+    pub condition: ConditionTree<'a>,
+    pub cursor: ConditionTree<'a>,
     pub window_limits: (i64, i64),
     pub skip_and_limit: SkipAndLimit,
 }
 
 impl<'a> ManyRelatedRecordsBaseQuery<'a> {
     pub fn new(
-        from_field: Arc<RelationField>,
+        from_field: &'a RelationFieldRef,
         from_record_ids: &'a [GraphqlId],
         query_arguments: QueryArguments,
         selected_fields: &'a SelectedFields,

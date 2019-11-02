@@ -32,7 +32,7 @@ fn read_one<'conn, 'tx>(
             .get_single_record(query.record_finder.as_ref().unwrap(), &selected_fields)
             .await?;
 
-        let model = Arc::clone(&query.record_finder.unwrap().field.model());
+        let model = query.record_finder.unwrap().field.model();
         let id_field = model.fields().id().name.clone();
 
         match scalars {
@@ -73,11 +73,10 @@ fn read_many<'a, 'b>(
     let fut = async move {
         let selected_fields = inject_required_fields(query.selected_fields.clone());
         let scalars = tx
-            .get_many_records(Arc::clone(&query.model), query.args.clone(), &selected_fields)
+            .get_many_records(&query.model, query.args.clone(), &selected_fields)
             .await?;
 
-        let model = Arc::clone(&query.model);
-        let id_field = model.fields().id().name.clone();
+        let id_field = query.model.fields().id().name.clone();
         let ids = scalars.collect_ids(&id_field)?;
         let list_fields = selected_fields.scalar_lists();
         let lists = resolve_scalar_list_fields(tx, ids.clone(), list_fields).await?;
@@ -112,14 +111,14 @@ fn read_related<'a, 'b>(
 
         let scalars = tx
             .get_related_records(
-                Arc::clone(&query.parent_field),
+                &query.parent_field,
                 parent_ids,
                 query.args.clone(),
                 &selected_fields,
             )
             .await?;
 
-        let model = Arc::clone(&query.parent_field.related_model());
+        let model = query.parent_field.related_model();
         let id_field = model.fields().id().name.clone();
         let ids = scalars.collect_ids(&id_field)?;
         let list_fields = selected_fields.scalar_lists();
@@ -144,7 +143,7 @@ async fn aggregate<'a, 'b>(
     tx: &'a ConnectionLike<'a, 'b>,
     query: AggregateRecordsQuery,
 ) -> InterpretationResult<QueryResult> {
-    let result = tx.count_by_model(query.model, QueryArguments::default()).await?;
+    let result = tx.count_by_model(&query.model, QueryArguments::default()).await?;
     Ok(QueryResult::Count(result))
 }
 
@@ -159,7 +158,7 @@ async fn resolve_scalar_list_fields<'a, 'b>(
 
         for list_field in list_fields {
             let name = list_field.name.clone();
-            let r = tx.get_scalar_list_values(list_field, record_ids.clone()).await?;
+            let r = tx.get_scalar_list_values(&list_field, record_ids.clone()).await?;
 
             results.push((name, r));
         }

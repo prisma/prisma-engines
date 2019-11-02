@@ -27,7 +27,7 @@ async fn create_one<'a, 'b>(
     q: CreateRecord,
 ) -> InterpretationResult<QueryResult> {
     let res = tx
-        .create_record(q.model, WriteArgs::new(q.non_list_args, q.list_args))
+        .create_record(&q.model, WriteArgs::new(q.non_list_args, q.list_args))
         .await?;
 
     Ok(QueryResult::Id(res))
@@ -39,7 +39,7 @@ async fn update_one<'a, 'b>(
 ) -> InterpretationResult<QueryResult> {
     let mut res = tx
         .update_records(
-            q.model,
+            &q.model,
             Filter::from(q.where_),
             WriteArgs::new(q.non_list_args, q.list_args),
         )
@@ -60,7 +60,7 @@ async fn delete_one<'a, 'b>(
         )),
     }?;
 
-    let res = tx.delete_records(q.model, Filter::from(finder)).await?;
+    let res = tx.delete_records(&q.model, Filter::from(finder)).await?;
 
     Ok(QueryResult::Count(res))
 }
@@ -70,7 +70,7 @@ async fn update_many<'a, 'b>(
     q: UpdateManyRecords,
 ) -> InterpretationResult<QueryResult> {
     let res = tx
-        .update_records(q.model, q.filter, WriteArgs::new(q.non_list_args, q.list_args))
+        .update_records(&q.model, q.filter, WriteArgs::new(q.non_list_args, q.list_args))
         .await?;
 
     Ok(QueryResult::Count(res.len()))
@@ -80,7 +80,7 @@ async fn delete_many<'a, 'b>(
     tx: &'a ConnectionLike<'a, 'b>,
     q: DeleteManyRecords,
 ) -> InterpretationResult<QueryResult> {
-    let res = tx.delete_records(q.model, q.filter).await?;
+    let res = tx.delete_records(&q.model, q.filter).await?;
 
     Ok(QueryResult::Count(res))
 }
@@ -90,7 +90,7 @@ async fn connect<'a, 'b>(
     q: ConnectRecords,
 ) -> InterpretationResult<QueryResult> {
     tx.connect(
-        q.relation_field,
+        &q.relation_field,
         &q.parent.expect("Expected parent record ID to be set for connect"),
         &q.child.expect("Expected child record ID to be set for connect"),
     )
@@ -104,7 +104,7 @@ async fn disconnect<'a, 'b>(
     q: DisconnectRecords,
 ) -> InterpretationResult<QueryResult> {
     tx.disconnect(
-        q.relation_field,
+        &q.relation_field,
         &q.parent.expect("Expected parent record ID to be set for disconnect"),
         &q.child.expect("Expected child record ID to be set for disconnect"),
     )
@@ -115,7 +115,7 @@ async fn disconnect<'a, 'b>(
 
 async fn set<'a, 'b>(tx: &'a ConnectionLike<'a, 'b>, q: SetRecords) -> InterpretationResult<QueryResult> {
     tx.set(
-        q.relation_field,
+        &q.relation_field,
         q.parent.expect("Expected parent record ID to be set for set"),
         q.wheres,
     )

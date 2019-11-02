@@ -58,8 +58,8 @@ pub trait QueryExt: Queryable + Send + Sync {
         use SqlError::*;
 
         let model = record_finder.field.model();
-        let selected_fields = SelectedFields::from(Arc::clone(&model));
-        let select = ReadQueryBuilder::get_records(model, &selected_fields, record_finder);
+        let selected_fields = SelectedFields::from(&model);
+        let select = ReadQueryBuilder::get_records(&model, &selected_fields, record_finder);
         let idents = selected_fields.type_identifiers();
 
         let row = self.find(select, idents.as_slice()).await.map_err(|e| match e {
@@ -101,7 +101,7 @@ pub trait QueryExt: Queryable + Send + Sync {
         let filter = Filter::from(record_finder.clone());
 
         let id = self
-            .filter_ids(model, filter)
+            .filter_ids(&model, filter)
             .await?
             .into_iter()
             .next()
@@ -111,7 +111,7 @@ pub trait QueryExt: Queryable + Send + Sync {
     }
 
     /// Read the all columns as an `GraphqlId`
-    async fn filter_ids(&self, model: ModelRef, filter: Filter) -> crate::Result<Vec<GraphqlId>> {
+    async fn filter_ids(&self, model: &ModelRef, filter: Filter) -> crate::Result<Vec<GraphqlId>> {
         let select = Select::from_table(model.table())
             .column(model.fields().id().as_column())
             .so_that(filter.aliased_cond(None));
@@ -136,13 +136,13 @@ pub trait QueryExt: Queryable + Send + Sync {
     /// the given parameters. A more restrictive version of `get_ids_by_parents`.
     async fn find_id_by_parent(
         &self,
-        parent_field: RelationFieldRef,
+        parent_field: &RelationFieldRef,
         parent_id: &GraphqlId,
         selector: &Option<RecordFinder>,
     ) -> crate::Result<GraphqlId> {
         let ids = self
             .filter_ids_by_parents(
-                Arc::clone(&parent_field),
+                parent_field,
                 vec![parent_id],
                 selector.clone().map(Filter::from),
             )
@@ -163,7 +163,7 @@ pub trait QueryExt: Queryable + Send + Sync {
     /// a `Filter` for extra filtering.
     async fn filter_ids_by_parents(
         &self,
-        parent_field: RelationFieldRef,
+        parent_field: &RelationFieldRef,
         parent_ids: Vec<&GraphqlId>,
         selector: Option<Filter>,
     ) -> crate::Result<Vec<GraphqlId>> {
