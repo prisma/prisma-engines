@@ -22,7 +22,9 @@ impl<'a> ToRow for SqliteRow<'a> {
                     _ => ParameterizedValue::Integer(i),
                 },
                 ValueRef::Real(f) => ParameterizedValue::Real(f),
-                ValueRef::Text(s) => ParameterizedValue::Text(s.to_string().into()),
+                ValueRef::Text(bytes) => {
+                    ParameterizedValue::Text(String::from_utf8(bytes.to_vec())?.into())
+                }
                 ValueRef::Blob(_) => panic!("Blobs not supprted, yet"),
             };
 
