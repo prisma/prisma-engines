@@ -5,7 +5,7 @@
 //! one. Everything related to the tree generation is in the
 //! [ast](../ast/index.html) module.
 //!
-//! For prelude, all important imports are in `prisma_query::visitor::*`;
+//! For prelude, all important imports are in `quaint::visitor::*`;
 use crate::ast::*;
 use std::{borrow::Cow, fmt};
 
@@ -42,7 +42,7 @@ pub trait Visitor<'a> {
     /// The point of entry for visiting query ASTs.
     ///
     /// ```
-    /// use prisma_query::{ast::*, visitor::*};
+    /// use quaint::{ast::*, visitor::*};
     ///
     /// fn main() {
     ///     let query = Select::from_table("cats");

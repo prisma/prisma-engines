@@ -21,7 +21,7 @@ pub trait Joinable<'a> {
     /// Add the `JOIN` conditions.
     ///
     /// ```rust
-    /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
     /// let join_data = "b".on(("b", "id").equals(Column::from(("a", "id"))));
     /// let query = Select::from_table("a").inner_join(join_data);
     /// let (sql, _) = Sqlite::build(query);

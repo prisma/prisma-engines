@@ -8,7 +8,7 @@ pub struct Count<'a> {
 /// Count of the underlying table where the given expression is not null.
 ///
 /// ```rust
-/// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
+/// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
 /// let query = Select::from_table("users").value(count(asterisk()));
 /// let (sql, _) = Sqlite::build(query);
 /// assert_eq!("SELECT COUNT(*) FROM `users`", sql);

@@ -5,7 +5,7 @@ pub trait Conjuctive<'a> {
     /// Builds an `AND` condition having `self` as the left leaf and `other` as the right.
     ///
     /// ```rust
-    /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
     /// assert_eq!(
     ///     "foo".equals("bar").and("wtf".less_than(3)),
     ///     ConditionTree::and("foo".equals("bar"), "wtf".less_than(3))
@@ -18,7 +18,7 @@ pub trait Conjuctive<'a> {
     /// Builds an `OR` condition having `self` as the left leaf and `other` as the right.
     ///
     /// ```rust
-    /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
     /// assert_eq!(
     ///     "foo".equals("bar").or("wtf".less_than(3)),
     ///     ConditionTree::or("foo".equals("bar"), "wtf".less_than(3))
@@ -31,7 +31,7 @@ pub trait Conjuctive<'a> {
     /// Builds a `NOT` condition having `self` as the condition.
     ///
     /// ```rust
-    /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
     /// assert_eq!(
     ///     "foo".equals("bar").not(),
     ///     ConditionTree::not("foo".equals("bar"))

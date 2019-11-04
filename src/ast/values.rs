@@ -316,7 +316,7 @@ pub enum DatabaseValue<'a> {
 /// A quick alias to create an asterisk to a table.
 ///
 /// ```rust
-/// # use prisma_query::ast::*;
+/// # use quaint::ast::*;
 /// assert_eq!(
 ///     asterisk(),
 ///     DatabaseValue::Asterisk(None)

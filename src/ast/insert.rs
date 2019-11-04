@@ -28,7 +28,7 @@ pub enum OnConflict {
     /// When a row already exists, do nothing.
     ///
     /// ```rust
-    /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
     /// let query: Insert = Insert::single_into("users").into();
     ///
     /// let (sql, _) = Sqlite::build(query.on_conflict(OnConflict::DoNothing));
@@ -94,7 +94,7 @@ impl<'a> Insert<'a> {
     /// Creates a new single row `INSERT` statement for the given table.
     ///
     /// ```rust
-    /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
     /// let query = Insert::single_into("users");
     /// let (sql, _) = Sqlite::build(query);
     ///
@@ -136,7 +136,7 @@ impl<'a> Insert<'a> {
     /// Sets the returned columns. Works only with PostgreSQL.
     ///
     /// ```rust
-    /// # use prisma_query::{ast::*, visitor::{Visitor, Postgres}};
+    /// # use quaint::{ast::*, visitor::{Visitor, Postgres}};
     /// let query = Insert::single_into("users");
     /// let insert = Insert::from(query).returning(vec!["id"]);
     /// let (sql, _) = Postgres::build(insert);
@@ -156,7 +156,7 @@ impl<'a> SingleRowInsert<'a> {
     /// Adds a new value to the `INSERT` statement
     ///
     /// ```rust
-    /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
     /// let query = Insert::single_into("users").value("foo", 10);
     /// let (sql, params) = Sqlite::build(query);
     ///
@@ -179,7 +179,7 @@ impl<'a> MultiRowInsert<'a> {
     /// Adds a new row to be inserted.
     ///
     /// ```rust
-    /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
     /// let query = Insert::multi_into("users", vec!["foo"])
     ///     .values(vec![1])
     ///     .values(vec![2]);

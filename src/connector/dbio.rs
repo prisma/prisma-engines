@@ -5,6 +5,8 @@ use std::{
     task::{Context, Poll},
 };
 
+/// The main unit of asynchronous IO. For now just a shell for a boxed `Future`,
+/// allowing access to the metrics and logging of IO.
 pub struct DBIO<'a, T>(BoxFuture<'a, crate::Result<T>>);
 
 impl<'a, T> DBIO<'a, T> {

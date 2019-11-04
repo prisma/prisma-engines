@@ -8,7 +8,7 @@ pub struct AggregateToString<'a> {
 /// Aggregates the given field into a string.
 ///
 /// ```rust
-/// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
+/// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
 /// let query = Select::from_table("users").value(aggregate_to_string(Column::new("firstName")))
 ///     .group_by("firstName");
 ///

@@ -34,7 +34,7 @@ impl<'a> Update<'a> {
     /// Add another column value assignment to the query
     ///
     /// ```rust
-    /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
     /// let query = Update::table("users").set("foo", 10).set("bar", false);
     /// let (sql, params) = Sqlite::build(query);
     ///
@@ -63,7 +63,7 @@ impl<'a> Update<'a> {
     /// [Comparable](trait.Comparable.html#required-methods) for more examples.
     ///
     /// ```rust
-    /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
     /// let query = Update::table("users").set("foo", 1).so_that("bar".equals(false));
     /// let (sql, params) = Sqlite::build(query);
     ///
@@ -81,7 +81,7 @@ impl<'a> Update<'a> {
     /// We can also use a nested `SELECT` in the conditions.
     ///
     /// ```rust
-    /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
     /// let select = Select::from_table("bars").column("id").so_that("uniq_val".equals(3));
     /// let query = Update::table("users").set("foo", 1).so_that("bar".equals(select));
     /// let (sql, params) = Sqlite::build(query);

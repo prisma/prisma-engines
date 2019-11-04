@@ -4,7 +4,7 @@
 //! without going into database-level specifics. Everything related to the
 //! actual query building is in the [visitor](../visitor/index.html) module.
 //!
-//! For prelude, all important imports are in `prisma_query::ast::*`.
+//! For prelude, all important imports are in `quaint::ast::*`.
 mod column;
 mod compare;
 mod conditions;

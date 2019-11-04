@@ -21,7 +21,7 @@ impl<'a> UnionAll<'a> {
     /// Creates a union with previous and given `SELECT` statement.
     ///
     /// ```rust
-    /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
     /// let s1 = Select::default().value(1);
     /// let s2 = Select::default().value(2);
     /// let (sql, params) = Sqlite::build(UnionAll::from(s1).union_all(s2));
