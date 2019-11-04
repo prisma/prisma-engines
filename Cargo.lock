@@ -1467,6 +1467,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "metrics-wrappers"
+version = "0.1.0"
+dependencies = [
+ "metrics 0.12.0 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
 name = "migration-connector"
 version = "0.1.0"
 dependencies = [
@@ -2188,6 +2195,7 @@ dependencies = [
  "metrics 0.12.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "metrics-core 0.5.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "metrics-runtime 0.12.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "metrics-wrappers 0.1.0",
  "prisma-inflector 0.1.0",
  "prisma-models 0.0.0",
  "quaint 0.1.0 (git+https://github.com/prisma/quaint.git)",

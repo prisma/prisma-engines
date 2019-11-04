@@ -16,7 +16,7 @@ use serde_json::json;
 use std::{sync::Arc, time::Instant};
 use metrics_runtime::{Receiver, Controller, observers::PrometheusBuilder};
 use metrics_core::{Builder, Observe, Drain};
-use metrics::{timing, counter};
+use metrics_wrappers::{timing, counter};
 
 #[derive(RustEmbed)]
 #[folder = "query-engine/prisma/static_files"]
