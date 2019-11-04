@@ -8,7 +8,7 @@ use super::{
 };
 use migration_connector::{MigrationPersistence, MigrationStep};
 use migration_core::{
-    api::GenericApi,
+    api::{GenericApi, MigrationApi},
     commands::{ApplyMigrationInput, InferMigrationStepsInput},
 };
 use sql_connection::SyncSqlConnection;
@@ -21,7 +21,7 @@ use std::sync::Arc;
 pub struct TestApi {
     sql_family: SqlFamily,
     database: Arc<dyn SyncSqlConnection + Send + Sync + 'static>,
-    api: Box<dyn GenericApi>,
+    api: MigrationApi<sql_migration_connector::SqlMigrationConnector, sql_migration_connector::SqlMigration>,
 }
 
 impl TestApi {
@@ -69,9 +69,18 @@ impl TestApi {
             assume_to_be_applied: Vec::new(),
         };
 
-        let steps = run_infer_command(self.api.as_ref(), input).0.datamodel_steps;
+        let steps = run_infer_command(&self.api, input).0.datamodel_steps;
 
         self.apply_migration(steps, migration_id)
+    }
+
+    pub fn execute_command<'a, C>(&self, input: &'a C::Input) -> Result<C::Output, user_facing_errors::Error>
+    where
+        C: migration_core::commands::MigrationCommand<'a>,
+    {
+        self.api
+            .handle_command::<C>(input)
+            .map_err(|err| self.api.render_error(err))
     }
 
     fn introspect_database(&self) -> SqlSchema {
@@ -105,7 +114,7 @@ pub fn mysql_8_test_api() -> TestApi {
     TestApi {
         sql_family: SqlFamily::Mysql,
         database: Arc::clone(&connector.database),
-        api: Box::new(test_api(connector)),
+        api: test_api(connector),
     }
 }
 
@@ -115,7 +124,7 @@ pub fn mysql_test_api() -> TestApi {
     TestApi {
         sql_family: SqlFamily::Mysql,
         database: Arc::clone(&connector.database),
-        api: Box::new(test_api(connector)),
+        api: test_api(connector),
     }
 }
 
@@ -125,7 +134,7 @@ pub fn postgres_test_api() -> TestApi {
     TestApi {
         sql_family: SqlFamily::Postgres,
         database: Arc::clone(&connector.database),
-        api: Box::new(test_api(connector)),
+        api: test_api(connector),
     }
 }
 
@@ -135,6 +144,6 @@ pub fn sqlite_test_api() -> TestApi {
     TestApi {
         sql_family: SqlFamily::Sqlite,
         database: Arc::clone(&connector.database),
-        api: Box::new(test_api(connector)),
+        api: test_api(connector),
     }
 }

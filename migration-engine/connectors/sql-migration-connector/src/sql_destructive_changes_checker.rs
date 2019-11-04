@@ -1,5 +1,6 @@
 use crate::{
-    AlterColumn, DropColumn, DropTable, DropTables, SqlError, SqlMigration, SqlMigrationStep, SqlResult, TableChange,
+    AlterColumn, ConnectionInfo, DropColumn, DropTable, DropTables, SqlError, SqlMigration, SqlMigrationStep,
+    SqlResult, TableChange,
 };
 use migration_connector::*;
 use quaint::ast::*;
@@ -7,6 +8,7 @@ use sql_connection::SyncSqlConnection;
 use std::sync::Arc;
 
 pub struct SqlDestructiveChangesChecker {
+    pub connection_info: ConnectionInfo,
     pub schema_name: String,
     pub database: Arc<dyn SyncSqlConnection + Send + Sync>,
 }
@@ -105,10 +107,8 @@ impl SqlDestructiveChangesChecker {
 
         Ok(())
     }
-}
 
-impl DestructiveChangesChecker<SqlMigration> for SqlDestructiveChangesChecker {
-    fn check(&self, database_migration: &SqlMigration) -> ConnectorResult<DestructiveChangeDiagnostics> {
+    fn check_impl(&self, database_migration: &SqlMigration) -> SqlResult<DestructiveChangeDiagnostics> {
         let mut diagnostics = DestructiveChangeDiagnostics::new();
 
         for step in &database_migration.original_steps {
@@ -156,5 +156,12 @@ impl DestructiveChangesChecker<SqlMigration> for SqlDestructiveChangesChecker {
         }
 
         Ok(diagnostics)
+    }
+}
+
+impl DestructiveChangesChecker<SqlMigration> for SqlDestructiveChangesChecker {
+    fn check(&self, database_migration: &SqlMigration) -> ConnectorResult<DestructiveChangeDiagnostics> {
+        self.check_impl(database_migration)
+            .map_err(|sql_error| sql_error.into_connector_error(&self.connection_info))
     }
 }

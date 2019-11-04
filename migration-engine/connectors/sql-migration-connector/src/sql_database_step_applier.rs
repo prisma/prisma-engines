@@ -5,23 +5,25 @@ use sql_schema_describer::*;
 use std::sync::Arc;
 
 pub struct SqlDatabaseStepApplier {
-    pub sql_family: SqlFamily,
+    pub connection_info: ConnectionInfo,
     pub schema_name: String,
     pub conn: Arc<dyn SyncSqlConnection + Send + Sync + 'static>,
 }
 
 impl DatabaseMigrationStepApplier<SqlMigration> for SqlDatabaseStepApplier {
     fn apply_step(&self, database_migration: &SqlMigration, index: usize) -> ConnectorResult<bool> {
-        Ok(self.apply_next_step(&database_migration.corrected_steps, index)?)
+        self.apply_next_step(&database_migration.corrected_steps, index)
+            .map_err(|sql_error| sql_error.into_connector_error(&self.connection_info))
     }
 
     fn unapply_step(&self, database_migration: &SqlMigration, index: usize) -> ConnectorResult<bool> {
-        Ok(self.apply_next_step(&database_migration.rollback, index)?)
+        self.apply_next_step(&database_migration.rollback, index)
+            .map_err(|sql_error| sql_error.into_connector_error(&self.connection_info))
     }
 
     fn render_steps_pretty(&self, database_migration: &SqlMigration) -> ConnectorResult<Vec<serde_json::Value>> {
         Ok(
-            render_steps_pretty(&database_migration, self.sql_family, &self.schema_name)?
+            render_steps_pretty(&database_migration, self.sql_family(), &self.schema_name)?
                 .into_iter()
                 .map(|pretty_step| serde_json::to_value(&pretty_step).unwrap())
                 .collect(),
@@ -37,7 +39,7 @@ impl SqlDatabaseStepApplier {
         }
 
         let step = &steps[index];
-        let sql_string = render_raw_sql(&step, self.sql_family, &self.schema_name);
+        let sql_string = render_raw_sql(&step, self.sql_family(), &self.schema_name);
         debug!("{}", sql_string);
 
         let result = self.conn.query_raw(&sql_string, &[]);
@@ -47,6 +49,10 @@ impl SqlDatabaseStepApplier {
 
         let has_more = steps.get(index + 1).is_some();
         Ok(has_more)
+    }
+
+    fn sql_family(&self) -> SqlFamily {
+        self.connection_info.sql_family()
     }
 }
 

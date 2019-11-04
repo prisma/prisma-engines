@@ -1,6 +1,7 @@
 use super::{GenericApi, MigrationApi};
 use crate::commands::*;
 use datamodel::configuration::{MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME};
+use failure::Fail;
 use futures::{
     future::{err, lazy, ok, poll_fn},
     Future,
@@ -142,56 +143,20 @@ impl RpcApi {
         cmd: RpcCommand,
         params: &Params,
     ) -> std::result::Result<serde_json::Value, JsonRpcError> {
-        let response_json = match cmd {
-            RpcCommand::InferMigrationSteps => {
-                let input: InferMigrationStepsInput = params.clone().parse()?;
-                let result = executor.infer_migration_steps(&input)?;
+        use std::panic::{catch_unwind, AssertUnwindSafe};
+        use std::result::Result;
 
-                serde_json::to_value(result).expect("Rendering of RPC response failed")
-            }
-            RpcCommand::ListMigrations => {
-                let result = executor.list_migrations(&serde_json::Value::Null)?;
-
-                serde_json::to_value(result).expect("Rendering of RPC response failed")
-            }
-            RpcCommand::MigrationProgress => {
-                let input: MigrationProgressInput = params.clone().parse()?;
-                let result = executor.migration_progress(&input)?;
-
-                serde_json::to_value(result).expect("Rendering of RPC response failed")
-            }
-            RpcCommand::ApplyMigration => {
-                let input: ApplyMigrationInput = params.clone().parse()?;
-                let result = executor.apply_migration(&input)?;
-
-                serde_json::to_value(result).expect("Rendering of RPC response failed")
-            }
-            RpcCommand::UnapplyMigration => {
-                let input: UnapplyMigrationInput = params.clone().parse()?;
-                let result = executor.unapply_migration(&input)?;
-
-                serde_json::to_value(result).expect("Rendering of RPC response failed")
-            }
-            RpcCommand::Reset => {
-                let result = executor.reset(&serde_json::Value::Null)?;
-
-                serde_json::to_value(result).expect("Rendering of RPC response failed")
-            }
-            RpcCommand::CalculateDatamodel => {
-                let input: CalculateDatamodelInput = params.clone().parse()?;
-                let result = executor.calculate_datamodel(&input)?;
-
-                serde_json::to_value(result).expect("Rendering of RPC response failed")
-            }
-            RpcCommand::CalculateDatabaseSteps => {
-                let input: CalculateDatabaseStepsInput = params.clone().parse()?;
-                let result = executor.calculate_database_steps(&input)?;
-
-                serde_json::to_value(result).expect("Rendering of RPC response failed")
-            }
+        let result: Result<Result<serde_json::Value, RunCommandError>, _> = {
+            let executor = AssertUnwindSafe(executor);
+            catch_unwind(|| Self::run_command(&executor, cmd, params))
         };
 
-        Ok(response_json)
+        match result {
+            Ok(Ok(result)) => Ok(result),
+            Ok(Err(RunCommandError::JsonRpcError(err))) => Err(err),
+            Ok(Err(RunCommandError::CrateError(err))) => Err(executor.render_jsonrpc_error(err)),
+            Err(panic) => Err(executor.render_panic(panic)),
+        }
     }
 
     fn create_async_handler(
@@ -208,34 +173,72 @@ impl RpcApi {
                 Ok(Err(val)) => err(val),
                 Err(val) => {
                     let e = crate::error::Error::from(val);
-                    err(JsonRpcError::from(e))
+                    err(super::error_rendering::render_jsonrpc_error(e))
                 }
             }
         })
     }
+
+    fn run_command(
+        executor: &Arc<dyn GenericApi>,
+        cmd: RpcCommand,
+        params: &Params,
+    ) -> std::result::Result<serde_json::Value, RunCommandError> {
+        use log::debug;
+        debug!("running the command");
+        match cmd {
+            RpcCommand::InferMigrationSteps => {
+                let input: InferMigrationStepsInput = params.clone().parse()?;
+                render(executor.infer_migration_steps(&input)?)
+            }
+            RpcCommand::ListMigrations => render(executor.list_migrations(&serde_json::Value::Null)?),
+            RpcCommand::MigrationProgress => {
+                let input: MigrationProgressInput = params.clone().parse()?;
+                render(executor.migration_progress(&input)?)
+            }
+            RpcCommand::ApplyMigration => {
+                let input: ApplyMigrationInput = params.clone().parse()?;
+                let result = executor.apply_migration(&input)?;
+                debug!("command result: {:?}", result);
+                render(result)
+            }
+            RpcCommand::UnapplyMigration => {
+                let input: UnapplyMigrationInput = params.clone().parse()?;
+                render(executor.unapply_migration(&input)?)
+            }
+            RpcCommand::Reset => render(executor.reset(&serde_json::Value::Null)?),
+            RpcCommand::CalculateDatamodel => {
+                let input: CalculateDatamodelInput = params.clone().parse()?;
+                render(executor.calculate_datamodel(&input)?)
+            }
+            RpcCommand::CalculateDatabaseSteps => {
+                let input: CalculateDatabaseStepsInput = params.clone().parse()?;
+                render(executor.calculate_database_steps(&input)?)
+            }
+        }
+    }
 }
 
-impl From<crate::error::Error> for JsonRpcError {
-    fn from(error: crate::error::Error) -> Self {
-        match error {
-            crate::error::Error::CommandError(command_error) => {
-                let json = serde_json::to_value(command_error).unwrap();
+fn render(result: impl serde::Serialize) -> std::result::Result<serde_json::Value, RunCommandError> {
+    Ok(serde_json::to_value(result).expect("Rendering of RPC response failed"))
+}
 
-                JsonRpcError {
-                    code: jsonrpc_core::types::error::ErrorCode::ServerError(4466),
-                    message: "An error happened. Check the data field for details.".to_string(),
-                    data: Some(json),
-                }
-            }
-            crate::error::Error::BlockingError(_) => JsonRpcError {
-                code: jsonrpc_core::types::error::ErrorCode::ServerError(4467),
-                message: "The RPC threadpool is exhausted. Add more worker threads.".to_string(),
-                data: None,
-            },
-            err => panic!(
-                "An unexpected error happened. Maybe we should build a handler for these kind of errors? {:?}",
-                err
-            ),
-        }
+#[derive(Debug, Fail)]
+enum RunCommandError {
+    #[fail(display = "{}", _0)]
+    JsonRpcError(JsonRpcError),
+    #[fail(display = "{}", _0)]
+    CrateError(crate::Error),
+}
+
+impl From<JsonRpcError> for RunCommandError {
+    fn from(e: JsonRpcError) -> Self {
+        RunCommandError::JsonRpcError(e)
+    }
+}
+
+impl From<crate::Error> for RunCommandError {
+    fn from(e: crate::Error) -> Self {
+        RunCommandError::CrateError(e)
     }
 }

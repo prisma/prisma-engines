@@ -1,5 +1,7 @@
+mod error_rendering;
 mod rpc;
 
+pub use error_rendering::render_error;
 pub use rpc::*;
 
 use crate::{commands::*, migration_engine::MigrationEngine};
@@ -49,6 +51,18 @@ pub trait GenericApi: Send + Sync + 'static {
     fn unapply_migration(&self, input: &UnapplyMigrationInput) -> crate::Result<UnapplyMigrationOutput>;
     fn migration_persistence(&self) -> Arc<dyn MigrationPersistence>;
     fn connector_type(&self) -> &'static str;
+
+    fn render_error(&self, error: crate::error::Error) -> user_facing_errors::Error {
+        error_rendering::render_error(error)
+    }
+
+    fn render_jsonrpc_error(&self, error: crate::error::Error) -> jsonrpc_core::error::Error {
+        error_rendering::render_jsonrpc_error(error)
+    }
+
+    fn render_panic(&self, panic: Box<dyn std::any::Any>) -> jsonrpc_core::error::Error {
+        error_rendering::render_panic(panic)
+    }
 }
 
 impl<C, D> GenericApi for MigrationApi<C, D>

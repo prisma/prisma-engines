@@ -1,4 +1,4 @@
-use failure::{Error, Fail};
+use failure::{err_msg, Error, Fail};
 use migration_connector::ConnectorError;
 
 pub type SqlResult<T> = Result<T, SqlError>;
@@ -9,7 +9,7 @@ pub enum SqlError {
     Generic(String),
 
     #[fail(display = "Error connecting to the database {}", _0)]
-    ConnectionError(&'static str),
+    ConnectionError(Error),
 
     #[fail(display = "Error querying the database: {}", _0)]
     QueryError(Error),
@@ -36,17 +36,38 @@ pub enum SqlError {
     TlsError { message: String },
 }
 
-impl From<SqlError> for ConnectorError {
-    fn from(error: SqlError) -> Self {
-        match error {
-            SqlError::DatabaseDoesNotExist { db_name } => Self::DatabaseDoesNotExist { db_name },
-            SqlError::DatabaseAccessDenied { db_name } => Self::DatabaseAccessDenied { db_name },
-            SqlError::DatabaseAlreadyExists { db_name } => Self::DatabaseAlreadyExists { db_name },
-            SqlError::AuthenticationFailed { user } => Self::AuthenticationFailed { user },
-            SqlError::ConnectTimeout => Self::ConnectTimeout,
-            SqlError::Timeout => Self::Timeout,
-            SqlError::TlsError { message } => Self::TlsError { message },
-            error => Self::QueryError(error.into()),
+impl SqlError {
+    pub(crate) fn into_connector_error(self, connection_info: &super::ConnectionInfo) -> ConnectorError {
+        match self {
+            SqlError::DatabaseDoesNotExist { db_name } => ConnectorError::DatabaseDoesNotExist {
+                db_name,
+                database_location: connection_info.database_location(),
+            },
+            SqlError::DatabaseAccessDenied { db_name } => ConnectorError::DatabaseAccessDenied {
+                database_name: db_name,
+                database_user: connection_info
+                    .username()
+                    .expect("database access denied without user")
+                    .into_owned(),
+            },
+            SqlError::DatabaseAlreadyExists { db_name } => ConnectorError::DatabaseAlreadyExists {
+                db_name,
+                database_host: connection_info.host().to_owned(),
+                database_port: connection_info.port().expect("database port not applicable"),
+            },
+            SqlError::AuthenticationFailed { user } => ConnectorError::AuthenticationFailed {
+                user,
+                host: connection_info.host().to_owned(),
+            },
+            SqlError::ConnectTimeout => ConnectorError::ConnectTimeout,
+            SqlError::Timeout => ConnectorError::Timeout,
+            SqlError::TlsError { message } => ConnectorError::TlsError { message },
+            SqlError::ConnectionError(err) => ConnectorError::ConnectionError {
+                host: connection_info.host().to_owned(),
+                port: connection_info.port(),
+                cause: failure::err_msg(err),
+            },
+            error => ConnectorError::QueryError(error.into()),
         }
     }
 }
@@ -55,9 +76,11 @@ impl From<quaint::error::Error> for SqlError {
     fn from(error: quaint::error::Error) -> Self {
         match error {
             quaint::error::Error::DatabaseDoesNotExist { db_name } => Self::DatabaseDoesNotExist { db_name },
+            quaint::error::Error::DatabaseAlreadyExists { db_name } => Self::DatabaseAlreadyExists { db_name },
             quaint::error::Error::DatabaseAccessDenied { db_name } => Self::DatabaseAccessDenied { db_name },
             quaint::error::Error::AuthenticationFailed { user } => Self::AuthenticationFailed { user },
             quaint::error::Error::ConnectTimeout => Self::ConnectTimeout,
+            quaint::error::Error::ConnectionError { .. } => Self::ConnectionError(error.into()),
             quaint::error::Error::Timeout => Self::Timeout,
             quaint::error::Error::TlsError { message } => Self::TlsError { message },
             e => SqlError::QueryError(e.into()),
@@ -79,6 +102,6 @@ impl From<String> for SqlError {
 
 impl From<url::ParseError> for SqlError {
     fn from(_: url::ParseError) -> Self {
-        SqlError::ConnectionError("Couldn't parse the connection string.")
+        SqlError::ConnectionError(err_msg("Couldn't parse the connection string."))
     }
 }

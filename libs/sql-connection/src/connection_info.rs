@@ -119,6 +119,24 @@ impl ConnectionInfo {
         }
     }
 
+    pub fn port(&self) -> Option<u16> {
+        match self {
+            ConnectionInfo::Postgres(url) => Some(url.port()),
+            ConnectionInfo::Mysql(url) => Some(url.port()),
+            ConnectionInfo::Sqlite { .. } => None,
+        }
+    }
+
+    /// A string describing the database location, meant for error messages. It will be the host
+    /// and port on MySQL/Postgres, and the file path on SQLite.
+    pub fn database_location(&self) -> String {
+        match self {
+            ConnectionInfo::Postgres(url) => format!("{}:{}", url.host(), url.port()),
+            ConnectionInfo::Mysql(url) => format!("{}:{}", url.host(), url.port()),
+            ConnectionInfo::Sqlite { file_path, .. } => file_path.clone(),
+        }
+    }
+
     pub fn sql_family(&self) -> SqlFamily {
         match self {
             ConnectionInfo::Postgres(_) => SqlFamily::Postgres,

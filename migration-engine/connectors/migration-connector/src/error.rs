@@ -9,19 +9,37 @@ pub enum ConnectorError {
     QueryError(Error),
 
     #[fail(display = "Database '{}' does not exist", db_name)]
-    DatabaseDoesNotExist { db_name: String },
+    DatabaseDoesNotExist { db_name: String, database_location: String },
 
-    #[fail(display = "Access denied to database '{}'", db_name)]
-    DatabaseAccessDenied { db_name: String },
+    #[fail(display = "Access denied to database '{}'", database_name)]
+    DatabaseAccessDenied {
+        database_name: String,
+        database_user: String,
+    },
 
     #[fail(display = "Database '{}' already exists", db_name)]
-    DatabaseAlreadyExists { db_name: String },
+    DatabaseAlreadyExists {
+        db_name: String,
+        database_host: String,
+        database_port: u16,
+    },
 
     #[fail(display = "Could not create the database. {}", explanation)]
     DatabaseCreationFailed { explanation: String },
 
     #[fail(display = "Authentication failed for user '{}'", user)]
-    AuthenticationFailed { user: String },
+    AuthenticationFailed { user: String, host: String },
+
+    #[fail(display = "The database URL is not valid")]
+    InvalidDatabaseUrl,
+
+    #[fail(display = "Failed to connect to the database at `{}`.", host)]
+    ConnectionError {
+        host: String,
+        port: Option<u16>,
+        #[fail(cause)]
+        cause: Error,
+    },
 
     #[fail(display = "Connect timed out")]
     ConnectTimeout,
@@ -31,19 +49,4 @@ pub enum ConnectorError {
 
     #[fail(display = "Error opening a TLS connection. {}", message)]
     TlsError { message: String },
-}
-
-impl From<quaint::error::Error> for ConnectorError {
-    fn from(e: quaint::error::Error) -> Self {
-        match e {
-            quaint::error::Error::DatabaseDoesNotExist { db_name } => Self::DatabaseDoesNotExist { db_name },
-            quaint::error::Error::DatabaseAccessDenied { db_name } => Self::DatabaseAccessDenied { db_name },
-            quaint::error::Error::DatabaseAlreadyExists { db_name } => Self::DatabaseAlreadyExists { db_name },
-            quaint::error::Error::AuthenticationFailed { user } => Self::AuthenticationFailed { user },
-            quaint::error::Error::ConnectTimeout => Self::ConnectTimeout,
-            quaint::error::Error::Timeout => Self::Timeout,
-            quaint::error::Error::TlsError { message } => Self::TlsError { message },
-            e => ConnectorError::QueryError(e.into()),
-        }
-    }
 }

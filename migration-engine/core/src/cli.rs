@@ -12,11 +12,18 @@ pub enum CliError {
     #[fail(display = "Database '{}' does not exist.", _0)]
     DatabaseDoesNotExist(String),
     #[fail(display = "Access denied to database '{}'", _0)]
-    DatabaseAccessDenied(String),
+    DatabaseAccessDenied {
+        database_name: String,
+        database_user: String,
+    },
     #[fail(display = "Authentication failed for user '{}'", _0)]
     AuthenticationFailed(String),
     #[fail(display = "Database '{}' already exists", _0)]
-    DatabaseAlreadyExists(String),
+    DatabaseAlreadyExists {
+        database_name: String,
+        database_host: String,
+        database_port: u16,
+    },
     #[fail(display = "Error connecting to the database")]
     ConnectionError,
     #[fail(display = "No command defined")]
@@ -32,13 +39,13 @@ pub enum CliError {
 }
 
 impl CliError {
-    pub(crate) fn exit_code(&self) -> i32 {
+    pub fn exit_code(&self) -> i32 {
         match self {
             CliError::DatabaseDoesNotExist(_) => 1,
-            CliError::DatabaseAccessDenied(_) => 2,
+            CliError::DatabaseAccessDenied { .. } => 2,
             CliError::AuthenticationFailed(_) => 3,
             CliError::ConnectTimeout | CliError::Timeout => 4,
-            CliError::DatabaseAlreadyExists(_) => 5,
+            CliError::DatabaseAlreadyExists { .. } => 5,
             CliError::TlsError(_) => 6,
             _ => 255,
         }
@@ -48,10 +55,24 @@ impl CliError {
 impl From<ConnectorError> for CliError {
     fn from(e: ConnectorError) -> Self {
         match e {
-            ConnectorError::DatabaseDoesNotExist { db_name } => Self::DatabaseDoesNotExist(db_name),
-            ConnectorError::DatabaseAccessDenied { db_name } => Self::DatabaseAccessDenied(db_name),
-            ConnectorError::DatabaseAlreadyExists { db_name } => CliError::DatabaseAlreadyExists(db_name),
-            ConnectorError::AuthenticationFailed { user } => CliError::AuthenticationFailed(user),
+            ConnectorError::DatabaseDoesNotExist { db_name, .. } => Self::DatabaseDoesNotExist(db_name),
+            ConnectorError::DatabaseAccessDenied {
+                database_name,
+                database_user,
+            } => Self::DatabaseAccessDenied {
+                database_name,
+                database_user,
+            },
+            ConnectorError::DatabaseAlreadyExists {
+                db_name,
+                database_host,
+                database_port,
+            } => CliError::DatabaseAlreadyExists {
+                database_name: db_name,
+                database_host,
+                database_port,
+            },
+            ConnectorError::AuthenticationFailed { user, .. } => CliError::AuthenticationFailed(user),
             ConnectorError::ConnectTimeout => CliError::ConnectTimeout,
             ConnectorError::Timeout => CliError::Timeout,
             ConnectorError::TlsError { message } => CliError::TlsError(message),
@@ -219,6 +240,38 @@ pub fn clap_app() -> clap::App<'static, 'static> {
         )
 }
 
+pub fn render_error(cli_error: CliError) -> user_facing_errors::Error {
+    use user_facing_errors::{Error, KnownError, UnknownError};
+
+    match cli_error {
+        CliError::DatabaseAlreadyExists {
+            database_name,
+            database_host,
+            database_port,
+        } => KnownError::new(user_facing_errors::common::DatabaseAlreadyExists {
+            database_host,
+            database_name,
+            database_port,
+        })
+        .map(Error::Known)
+        .unwrap(),
+        CliError::DatabaseAccessDenied {
+            database_name,
+            database_user,
+        } => KnownError::new(user_facing_errors::common::DatabaseAccessDenied {
+            database_name,
+            database_user,
+        })
+        .map(Error::Known)
+        .unwrap(),
+        _ => UnknownError {
+            message: cli_error.to_string(),
+            backtrace: None,
+        }
+        .into(),
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::CliError;
@@ -294,8 +347,6 @@ mod tests {
 
     #[test]
     fn test_connecting_with_a_non_working_mysql_connection_string() {
-        env_logger::init();
-
         let dm = mysql_url(Some("this_does_not_exist"));
 
         with_cli(vec!["cli", "--can_connect_to_database"], |matches| {

@@ -10,6 +10,7 @@ datamodel = { path = "../../libs/datamodel" }
 prisma-models = { path = "../../prisma-models" }
 sql-migration-connector = { path = "../connectors/sql-migration-connector" }
 sql-connection = { path = "../../libs/sql-connection" }
+user-facing-errors = { path = "../../libs/user-facing-errors" }
 clap = "2.33"
 itertools = "0.8"
 
@@ -37,6 +38,7 @@ barrel = { version = "0.6.3-alpha.0", features = ["sqlite3", "mysql", "pg"] }
 pretty_assertions = "0.6"
 sql-schema-describer = { path = "../../libs/sql-schema-describer" }
 migration-engine-macros = { path = "../macros" }
+user-facing-errors = { path = "../../libs/user-facing-errors" }
 
 [[bin]]
 name = "migration-engine"

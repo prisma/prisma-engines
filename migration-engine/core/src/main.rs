@@ -1,5 +1,5 @@
 pub mod api;
-mod cli;
+pub mod cli;
 pub mod commands;
 mod error;
 pub mod migration;
@@ -79,7 +79,10 @@ fn main() {
                     pretty_print_errors(errors, &datamodel);
                     std::process::exit(1);
                 }
-                Err(e) => panic!("{:?}", e),
+                Err(e) => {
+                    serde_json::to_writer(std::io::stdout(), &api::render_error(e)).expect("failed to write to stdout");
+                    std::process::exit(255);
+                }
             }
         }
     }

@@ -27,10 +27,10 @@ Please make sure your database server is running at `${database_host}`:`${databa
 )]
 pub struct DatabaseNotReachable {
     /// Database host URI
-    database_host: String,
+    pub database_host: String,
 
     /// Database port
-    database_port: String,
+    pub database_port: String,
 }
 
 #[derive(Debug, UserFacingError, Serialize)]
@@ -46,10 +46,10 @@ Please make sure your database server is running at `${database_host}`:`${databa
 )]
 pub struct DatabaseTimeout {
     /// Database host URI
-    database_host: String,
+    pub database_host: String,
 
     /// Database port
-    database_port: String,
+    pub database_port: String,
 }
 
 #[derive(Debug, UserFacingError, Serialize)]
@@ -60,14 +60,14 @@ pub struct DatabaseTimeout {
 pub struct DatabaseDoesNotExist {
     /// Database name for all data sources that support a database name
     /// SQLite: File name of the database.
-    database_name: String,
+    pub database_name: String,
 
     /// Postgres only: Database schema name
-    database_schema_name: Option<String>,
+    pub database_schema_name: Option<String>,
 
     /// All data sources that have a database host URI
     /// SQLite: Path to the database file
-    database_location: String,
+    pub database_location: String,
 }
 
 #[derive(Debug, UserFacingError, Serialize)]

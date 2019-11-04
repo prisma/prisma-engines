@@ -1,4 +1,5 @@
 #![allow(non_snake_case)]
+
 mod test_harness;
 
 use datamodel::ast::{parser, FieldArity, SchemaAst};

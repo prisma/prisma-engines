@@ -146,7 +146,7 @@ where
     }
 }
 
-pub fn test_api<C, D>(connector: C) -> impl GenericApi
+pub fn test_api<C, D>(connector: C) -> MigrationApi<C, D>
 where
     C: MigrationConnector<DatabaseMigration = D>,
     D: DatabaseMigrationMarker + Send + Sync + 'static,

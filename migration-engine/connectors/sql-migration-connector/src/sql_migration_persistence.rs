@@ -1,3 +1,4 @@
+use super::ConnectionInfo;
 use super::SqlFamily;
 use barrel::types;
 use chrono::*;
@@ -8,16 +9,15 @@ use sql_connection::SyncSqlConnection;
 use std::sync::Arc;
 
 pub struct SqlMigrationPersistence {
-    pub sql_family: SqlFamily,
+    pub connection_info: ConnectionInfo,
     pub connection: Arc<dyn SyncSqlConnection + Send + Sync + 'static>,
     pub schema_name: String,
-    pub file_path: Option<String>,
 }
 
 #[allow(unused, dead_code)]
 impl MigrationPersistence for SqlMigrationPersistence {
     fn init(&self) {
-        let sql_str = match self.sql_family {
+        let sql_str = match self.connection_info.sql_family() {
             SqlFamily::Sqlite => {
                 let mut m = barrel::Migration::new().schema(self.schema_name.clone());
                 m.create_table_if_not_exists(TABLE_NAME, migration_table_setup_sqlite);
@@ -41,37 +41,35 @@ impl MigrationPersistence for SqlMigrationPersistence {
 
     fn reset(&self) {
         let sql_str = format!(r#"DELETE FROM "{}"."_Migration";"#, self.schema_name); // TODO: this is not vendor agnostic yet
-        let _ = self.connection.query_raw(&sql_str, &[]);
+        self.connection.query_raw(&sql_str, &[]).ok();
 
         // TODO: this is the wrong place to do that
-        match self.sql_family {
-            SqlFamily::Postgres => {
+        match &self.connection_info {
+            ConnectionInfo::Postgres(_) => {
                 let sql_str = format!(r#"DROP SCHEMA "{}" CASCADE;"#, self.schema_name);
                 debug!("{}", sql_str);
 
                 self.connection.query_raw(&sql_str, &[]).ok();
             }
-            SqlFamily::Sqlite => {
-                if let Some(ref file_path) = self.file_path {
-                    self.connection
-                        .execute_raw(
-                            "DETACH DATABASE ?",
-                            &[ParameterizedValue::from(self.schema_name.as_str())],
-                        )
-                        .ok();
-                    std::fs::remove_file(file_path).ok(); // ignore potential errors
-                    self.connection
-                        .execute_raw(
-                            "ATTACH DATABASE ? AS ?",
-                            &[
-                                ParameterizedValue::from(file_path.as_str()),
-                                ParameterizedValue::from(self.schema_name.as_str()),
-                            ],
-                        )
-                        .unwrap();
-                }
+            ConnectionInfo::Sqlite { file_path, .. } => {
+                self.connection
+                    .execute_raw(
+                        "DETACH DATABASE ?",
+                        &[ParameterizedValue::from(self.schema_name.as_str())],
+                    )
+                    .ok();
+                std::fs::remove_file(file_path).ok(); // ignore potential errors
+                self.connection
+                    .execute_raw(
+                        "ATTACH DATABASE ? AS ?",
+                        &[
+                            ParameterizedValue::from(file_path.as_str()),
+                            ParameterizedValue::from(self.schema_name.as_str()),
+                        ],
+                    )
+                    .unwrap();
             }
-            SqlFamily::Mysql => {
+            ConnectionInfo::Mysql(_) => {
                 let sql_str = format!(r#"DROP SCHEMA `{}`;"#, self.schema_name);
                 debug!("{}", sql_str);
                 self.connection.query_raw(&sql_str, &[]).ok();
@@ -125,7 +123,7 @@ impl MigrationPersistence for SqlMigrationPersistence {
             .value(STARTED_AT_COLUMN, self.convert_datetime(migration.started_at))
             .value(FINISHED_AT_COLUMN, ParameterizedValue::Null);
 
-        match self.sql_family {
+        match self.connection_info.sql_family() {
             SqlFamily::Sqlite | SqlFamily::Mysql => {
                 let id = self.connection.execute(insert.into()).unwrap();
                 match id {
@@ -199,7 +197,7 @@ fn migration_table_setup(
 
 impl SqlMigrationPersistence {
     fn table(&self) -> Table {
-        match self.sql_family {
+        match self.connection_info.sql_family() {
             SqlFamily::Sqlite => {
                 // sqlite case. Otherwise quaint produces invalid SQL
                 TABLE_NAME.to_string().into()
@@ -209,7 +207,7 @@ impl SqlMigrationPersistence {
     }
 
     fn convert_datetime(&self, datetime: DateTime<Utc>) -> ParameterizedValue {
-        match self.sql_family {
+        match self.connection_info.sql_family() {
             SqlFamily::Sqlite => ParameterizedValue::Integer(datetime.timestamp_millis()),
             SqlFamily::Postgres => ParameterizedValue::DateTime(datetime),
             SqlFamily::Mysql => ParameterizedValue::DateTime(datetime),
