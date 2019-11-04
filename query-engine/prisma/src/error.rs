@@ -1,18 +1,14 @@
-use crate::utilities;
-use core::{response_ir, CoreError};
+use query_core::{response_ir, CoreError};
 use datamodel::error::ErrorCollection;
 use failure::{Error, Fail};
 use graphql_parser::query::ParseError as GqlParseError;
 use serde_json;
 
 #[cfg(feature = "sql")]
-use sql_query_connector::SqlError;
+use sql_connector::SqlError;
 
 #[derive(Debug, Fail)]
 pub enum PrismaError {
-    #[fail(display = "{}", _0)]
-    QueryValidationError(String),
-
     #[fail(display = "{}", _0)]
     SerializationError(String),
 
@@ -40,6 +36,15 @@ pub enum PrismaError {
 
     #[fail(display = "Error in data model: {}", _0)]
     DatamodelError(ErrorCollection),
+
+    #[fail(display = "{}", _0)]
+    QueryConversionError(String),
+}
+
+impl From<CoreError> for PrismaError {
+    fn from(e: CoreError) -> Self {
+        PrismaError::CoreError(e)
+    }
 }
 
 impl From<ErrorCollection> for PrismaError {
@@ -65,7 +70,7 @@ impl PrettyPrint for PrismaError {
     fn pretty_print(&self) {
         match self {
             PrismaError::ConversionError(errors, dml_string) => {
-                let file_name = utilities::get_env("PRISMA_SDL_PATH").unwrap_or_else(|_| "schema.prisma".to_string());
+                let file_name = "schema.prisma".to_string();
 
                 for error in errors.to_iter() {
                     println!();
@@ -76,12 +81,6 @@ impl PrettyPrint for PrismaError {
             }
             x => println!("{}", x),
         };
-    }
-}
-
-impl From<CoreError> for PrismaError {
-    fn from(e: CoreError) -> PrismaError {
-        PrismaError::CoreError(e)
     }
 }
 
@@ -117,7 +116,7 @@ impl From<base64::DecodeError> for PrismaError {
 
 impl From<GqlParseError> for PrismaError {
     fn from(e: GqlParseError) -> PrismaError {
-        PrismaError::QueryValidationError(format!("Error parsing GraphQL query: {}", e))
+        PrismaError::QueryConversionError(format!("Error parsing GraphQL query: {}", e))
     }
 }
 

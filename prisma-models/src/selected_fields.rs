@@ -1,6 +1,6 @@
 use crate::{ModelRef, Relation, RelationField, ScalarField, TypeIdentifier};
-use once_cell::unsync::OnceCell;
-use prisma_query::ast::Column;
+use once_cell::sync::OnceCell;
+use quaint::ast::Column;
 use std::sync::Arc;
 
 pub trait IntoSelectedFields {
@@ -54,8 +54,8 @@ impl From<Vec<Arc<ScalarField>>> for SelectedFields {
     }
 }
 
-impl From<ModelRef> for SelectedFields {
-    fn from(model: ModelRef) -> SelectedFields {
+impl From<&ModelRef> for SelectedFields {
+    fn from(model: &ModelRef) -> SelectedFields {
         let fields = model
             .fields()
             .scalar_non_list()

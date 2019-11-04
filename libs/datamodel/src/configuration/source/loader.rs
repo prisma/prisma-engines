@@ -29,6 +29,13 @@ impl SourceLoader {
         let provider_arg = args.arg("provider")?;
         let provider = provider_arg.as_str()?;
 
+        if provider_arg.is_from_env() {
+            return Err(DatamodelError::new_functional_evaluation_error(
+                &format!("A datasource must not use the env() function in the provider argument."),
+                ast_source.span,
+            ));
+        }
+
         if let Ok(arg) = args.arg("enabled") {
             if !(arg.as_bool()?) {
                 // This source was disabled.

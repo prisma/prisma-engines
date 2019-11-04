@@ -1,32 +1,22 @@
-use crate::{query_builder::ManyRelatedRecordsWithRowNumber, FromSource, SqlCapabilities, Transaction, Transactional};
+use super::connection::SqlConnection;
+use crate::{query_builder::ManyRelatedRecordsWithRowNumber, FromSource, QueryExt, SqlError};
+use connector_interface::{Connection, Connector, IO};
 use datamodel::Source;
-use prisma_query::{
-    ast::ParameterizedValue,
-    connector::{Queryable, SqliteParams},
-    pool::{sqlite::SqliteConnectionManager, PrismaConnectionManager},
+use quaint::{
+    connector::SqliteParams,
+    pool::{self, SqliteManager},
 };
-use std::{collections::HashSet, convert::TryFrom};
-
-type Pool = r2d2::Pool<PrismaConnectionManager<SqliteConnectionManager>>;
+use std::convert::TryFrom;
+use tokio_resource_pool::{CheckOut, Pool};
 
 pub struct Sqlite {
-    pool: Pool,
-    test_mode: bool,
+    pool: Pool<SqliteManager>,
     file_path: String,
 }
 
+impl QueryExt for CheckOut<SqliteManager> {}
+
 impl Sqlite {
-    pub fn new(file_path: String, connection_limit: u32, test_mode: bool) -> crate::Result<Self> {
-        let manager = PrismaConnectionManager::sqlite(None, &file_path)?;
-        let pool = r2d2::Pool::builder().max_size(connection_limit).build(manager)?;
-
-        Ok(Self {
-            pool,
-            test_mode,
-            file_path,
-        })
-    }
-
     pub fn file_path(&self) -> &str {
         self.file_path.as_str()
     }
@@ -35,68 +25,21 @@ impl Sqlite {
 impl FromSource for Sqlite {
     fn from_source(source: &dyn Source) -> crate::Result<Self> {
         let params = SqliteParams::try_from(source.url().value.as_str())?;
+        let db_name = params.file_path.file_stem().unwrap().to_str().unwrap().to_owned();
+        let file_path = params.file_path.to_str().unwrap().to_string();
+        let pool = pool::sqlite(&file_path, &db_name)?;
 
-        let file_path = params.file_path.clone();
-        let pool = r2d2::Pool::try_from(params).unwrap();
-
-        Ok(Sqlite {
-            pool,
-            test_mode: false,
-            file_path: file_path.to_str().unwrap().to_string(),
-        })
+        Ok(Self { pool, file_path })
     }
 }
 
-impl SqlCapabilities for Sqlite {
-    type ManyRelatedRecordsBuilder = ManyRelatedRecordsWithRowNumber;
-}
+impl Connector for Sqlite {
+    fn get_connection<'a>(&'a self) -> IO<Box<dyn Connection + 'a>> {
+        IO::new(async move {
+            let conn = self.pool.check_out().await.map_err(SqlError::from)?;
+            let conn = SqlConnection::<_, ManyRelatedRecordsWithRowNumber>::new(conn);
 
-impl Transactional for Sqlite {
-    fn with_transaction<F, T>(&self, db: &str, f: F) -> crate::Result<T>
-    where
-        F: FnOnce(&mut dyn Transaction) -> crate::Result<T>,
-    {
-        let mut conn = self.pool.get()?;
-
-        let databases: HashSet<String> = conn
-            .query_raw("PRAGMA database_list", &[])?
-            .into_iter()
-            .map(|rr| {
-                let db_name = rr.into_iter().nth(1).unwrap();
-
-                db_name.into_string().unwrap()
-            })
-            .collect();
-
-        if !databases.contains(db) {
-            // This is basically hacked until we have a full rust stack with a migration engine.
-            // Currently, the scala tests use the JNA library to write to the database.
-            conn.execute_raw(
-                "ATTACH DATABASE ? AS ?",
-                &[
-                    ParameterizedValue::from(self.file_path.as_ref()),
-                    ParameterizedValue::from(db),
-                ],
-            )?;
-        }
-
-        conn.execute_raw("PRAGMA foreign_keys = ON", &[])?;
-
-        let result = {
-            let mut tx = conn.start_transaction()?;
-            let result = f(&mut tx);
-
-            if result.is_ok() {
-                tx.commit()?;
-            }
-
-            result
-        };
-
-        if self.test_mode {
-            conn.execute_raw("DETACH DATABASE ?", &[ParameterizedValue::from(db)])?;
-        }
-
-        result
+            Ok(Box::new(conn) as Box<dyn Connection>)
+        })
     }
 }

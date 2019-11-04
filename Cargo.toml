@@ -15,7 +15,7 @@ members = [
   "libs/datamodel",
   "libs/prisma-inflector",
   "libs/sql-schema-describer",
-  "libs/logger",
+  "libs/sql-connection",
 ]
 
 [patch.crates-io]

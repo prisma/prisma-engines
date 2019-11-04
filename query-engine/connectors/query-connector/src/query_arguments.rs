@@ -52,6 +52,15 @@ impl From<RecordFinder> for QueryArguments {
     }
 }
 
+impl From<Option<RecordFinder>> for QueryArguments {
+    fn from(record_finder: Option<RecordFinder>) -> Self {
+        match record_finder {
+            Some(rf) => Self::from(rf),
+            None => Self::default(),
+        }
+    }
+}
+
 impl From<Filter> for QueryArguments {
     fn from(filter: Filter) -> Self {
         let mut query_arguments = Self::default();

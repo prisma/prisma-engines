@@ -14,7 +14,7 @@ class NonEmbeddedOrderBySpec extends FlatSpec with Matchers with ApiSpecBase {
         name  String  @unique
         todos Todo[]  @relation(references: [id])
       }
-      
+
       model  Todo {
         id    String @id @default(cuid())
         title String @unique
@@ -28,7 +28,7 @@ class NonEmbeddedOrderBySpec extends FlatSpec with Matchers with ApiSpecBase {
         name  String @unique
         todos Todo[]
       }
-      
+
       model  Todo {
         id    String @id @default(cuid())
         title String @unique

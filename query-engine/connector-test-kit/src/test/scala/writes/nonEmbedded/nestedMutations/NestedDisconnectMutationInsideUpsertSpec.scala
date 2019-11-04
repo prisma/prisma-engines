@@ -385,10 +385,10 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
         |        create: [{text: "comment1"}, {text: "comment2"}]
         |      }
         |    }
-        |  ){ 
-        |    id 
+        |  ){
+        |    id
         |    comments { id }
-        |  } 
+        |  }
         |}""",
       project
     )
@@ -564,17 +564,17 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
     database.setup(project)
 
     val createResult = server.query(
-      """mutation { 
+      """mutation {
         |  createNote(
         |    data: {
         |      todo: {
         |        create: { title: "the title" }
         |      }
         |    }
-        |  ){ 
+        |  ){
         |    id
         |    todo { id }
-        |  } 
+        |  }
         |}""",
       project
     )
@@ -854,7 +854,7 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
         |  createTop(data: {
         |    nameTop: "the top",
         |    middles: {
-        |      create:[ 
+        |      create:[
         |        {
         |          nameMiddle: "the middle"
         |          bottoms: {
@@ -1147,7 +1147,7 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
          |        below{
          |           nameBelow
          |        }
-         |        
+         |
          |      }
          |    }
          |  }
@@ -1189,7 +1189,7 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
         |  createTop(data: {
         |    nameTop: "the top",
         |    middle: {
-        |      create: 
+        |      create:
         |        {
         |          nameMiddle: "the middle"
         |          bottom: {

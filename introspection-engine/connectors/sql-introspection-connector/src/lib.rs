@@ -1,6 +1,8 @@
 pub mod calculate_datamodel; // only exported to be able to unit test it
+
 mod error;
 mod schema_describer_loading;
+
 use datamodel::Datamodel;
 use introspection_connector::{ConnectorResult, IntrospectionConnector};
 use sql_schema_describer::{SqlSchema, SqlSchemaDescriberBackend};

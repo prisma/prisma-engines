@@ -342,7 +342,7 @@ fn indices_must_work() {
             let result = inspector.describe(&SCHEMA.to_string()).expect("describing");
             let user_table = result.get_table("User").expect("getting User table");
             let default = match db_type {
-                DbType::Postgres => Some(format!("nextval('\"{}\".\"User_id_seq\"'::regclass)", SCHEMA)),
+                DbType::Postgres => Some(format!("nextval(\"{}\".\"User_id_seq\"::regclass)", SCHEMA)),
                 _ => None,
             };
             let expected_columns = vec![
@@ -533,6 +533,7 @@ where
 {
     // SQLite
     {
+        eprintln!("Testing on SQLite");
         let mut migration = Migration::new().schema(SCHEMA);
         migration_fn(DbType::Sqlite, &mut migration);
         let full_sql = migration.make::<barrel::backend::Sqlite>();
@@ -542,6 +543,7 @@ where
     }
     // Postgres
     {
+        eprintln!("Testing on Postgres");
         let mut migration = Migration::new().schema(SCHEMA);
         migration_fn(DbType::Postgres, &mut migration);
         let full_sql = migration.make::<barrel::backend::Pg>();
@@ -551,6 +553,7 @@ where
     }
     // MySQL
     {
+        eprintln!("Testing on MySQL");
         let mut migration = Migration::new().schema(SCHEMA);
         migration_fn(DbType::MySql, &mut migration);
         let full_sql = migration.make::<barrel::backend::MySql>();

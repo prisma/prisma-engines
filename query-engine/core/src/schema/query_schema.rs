@@ -1,4 +1,5 @@
 use super::*;
+use crate::{ParsedField, QueryGraph, QueryGraphBuilderResult};
 use once_cell::sync::OnceCell;
 use prisma_models::{EnumType, InternalDataModelRef, ModelRef, PrismaValue};
 use std::{
@@ -98,41 +99,6 @@ impl QuerySchema {
             _ => unreachable!(),
         }
     }
-
-    // WIP
-    // pub fn compact(mut self) -> Self {
-    //   // Check if there are empty input objects and clean up the AST is there are any.
-    //   let (valid_objects, empty_input_objects) = self.input_object_types.into_iter().partition(|i| i.is_empty());
-    //   self.input_object_types = valid_objects;
-
-    //   if empty_input_objects.len() > 0 {
-    //     // Walk the AST and discard any element where the weak ref upgrade fails.
-    //     self.visit_output_type(&self.query);
-    //     self.visit_output_type(&self.mutation);
-    //   }
-
-    //   self
-    // }
-
-    // fn visit_output_type(&self, out: &OutputType) -> VisitorOperation<OutputType> {
-    //   match out {
-    //     OutputType::Object(obj) => unimplemented!(),
-    //     OutputType::Enum(enum_type) => unimplemented!(),
-    //     OutputType::List(out) => unimplemented!(),
-    //     OutputType::Opt(out) => unimplemented!(),
-    //     OutputType::Scalar(s) => unimplemented!(),
-    //   }
-    // }
-
-    // fn visit(&mut self, visitor: impl SchemaAstVisitor) {
-    //   match visitor.visit_output_type(&self.query) {
-    //     VisitorOperation::Remove => unimplemented!(),
-    //     VisitorOperation::Replace(t) => unimplemented!(),
-    //     VisitorOperation::None => unimplemented!(),
-    //   };
-
-    //   visitor.visit_output_type(&self.mutation);
-    // }
 }
 
 #[derive(DebugStub)]
@@ -172,62 +138,93 @@ pub struct Field {
     pub name: String,
     pub arguments: Vec<Argument>,
     pub field_type: OutputTypeRef,
-    pub operation: Option<ModelOperation>,
+    pub query_builder: Option<SchemaQueryBuilder>,
 }
 
-/// Designates a specific top-level operation on a corresponding model.
-#[derive(Debug, Clone)]
-pub struct ModelOperation {
-    pub model: ModelRef,
-    pub operation: OperationTag,
+/// Todo rework description.
+/// A query builder allows to attach queries to the schema:
+/// on a field:
+/// - A `ModelQueryBuilder` builds queries specific to models, such as `findOne<Model>`.
+///   It requires additional context compared to a `GenericQueryBuilder`.
+///
+/// - A `GenericQueryBuilder` is a query builder that requires no additional context but
+///   the parsed query document data from the incoming query and is thus not associated to any particular
+///   model. The `ResetData` query is such an example.
+#[derive(Debug)]
+pub enum SchemaQueryBuilder {
+    ModelQueryBuilder(ModelQueryBuilder),
+    GenericQueryBuilder(GenericQueryBuilder),
 }
 
-impl ModelOperation {
-    pub fn new(model: ModelRef, operation: OperationTag) -> Self {
-        Self { model, operation }
+impl SchemaQueryBuilder {
+    pub fn build(&self, parsed_field: ParsedField) -> QueryGraphBuilderResult<QueryGraph> {
+        match self {
+            Self::ModelQueryBuilder(m) => m.build(parsed_field),
+            _ => unimplemented!(),
+        }
     }
 }
 
-/// Designates which operation is intended for a query and in case of non-read
-/// operations, which appropriate operation should be used to query the output.
-#[derive(Debug, Clone, PartialEq)]
-pub enum OperationTag {
-    /// Read operations.
-    FindOne,
-    FindMany,
+pub type QueryBuilderFn = dyn (Fn(ModelRef, ParsedField) -> QueryGraphBuilderResult<QueryGraph>) + Send + Sync;
 
-    /// Write operations with associated result operations.
-    CreateOne(Box<OperationTag>),
-    UpdateOne(Box<OperationTag>),
-    UpdateMany(Box<OperationTag>),
-    DeleteOne(Box<OperationTag>),
-    DeleteMany(Box<OperationTag>),
-    UpsertOne(Box<OperationTag>),
-    Aggregate(Box<OperationTag>),
+/// Designates a specific top-level operation on a corresponding model.
+#[derive(DebugStub)]
+pub struct ModelQueryBuilder {
+    pub model: ModelRef,
+    pub tag: QueryTag,
 
-    /// Marks an operation to write the result of the previous query directly
-    /// as map shaped as the defined output type of a query.
-    /// This is a temporary workaround until the serialization has been reworked.
-    CoerceResultToOutputType,
+    /// An associated builder is responsible for building queries
+    /// that the executer will execute. The result info is required
+    /// by the serialization to correctly build the response.
+    #[debug_stub = "#BuilderFn#"]
+    pub builder_fn: Box<QueryBuilderFn>,
 }
 
-impl fmt::Display for OperationTag {
+impl ModelQueryBuilder {
+    pub fn new(model: ModelRef, tag: QueryTag, builder_fn: Box<QueryBuilderFn>) -> Self {
+        Self { model, tag, builder_fn }
+    }
+
+    pub fn build(&self, parsed_field: ParsedField) -> QueryGraphBuilderResult<QueryGraph> {
+        (self.builder_fn)(Arc::clone(&self.model), parsed_field)
+    }
+}
+
+/// Designates top level model queries. Used for DMMF serialization.
+#[derive(Debug, Clone, PartialEq)]
+pub enum QueryTag {
+    FindOne,
+    FindMany,
+    CreateOne,
+    UpdateOne,
+    UpdateMany,
+    DeleteOne,
+    DeleteMany,
+    UpsertOne,
+    Aggregate,
+}
+
+impl fmt::Display for QueryTag {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let s = match self {
-            OperationTag::FindOne => "findOne",
-            OperationTag::FindMany => "findMany",
-            OperationTag::CreateOne(_) => "createOne",
-            OperationTag::UpdateOne(_) => "updateOne",
-            OperationTag::UpdateMany(_) => "updateMany",
-            OperationTag::DeleteOne(_) => "deleteOne",
-            OperationTag::DeleteMany(_) => "deleteMany",
-            OperationTag::UpsertOne(_) => "upsertOne",
-            OperationTag::Aggregate(_) => "aggregate",
-            OperationTag::CoerceResultToOutputType => unreachable!(), // Only top-level ops are reached.
+            QueryTag::FindOne => "findOne",
+            QueryTag::FindMany => "findMany",
+            QueryTag::CreateOne => "createOne",
+            QueryTag::UpdateOne => "updateOne",
+            QueryTag::UpdateMany => "updateMany",
+            QueryTag::DeleteOne => "deleteOne",
+            QueryTag::DeleteMany => "deleteMany",
+            QueryTag::UpsertOne => "upsertOne",
+            QueryTag::Aggregate => "aggregate",
         };
 
         s.fmt(f)
     }
+}
+
+#[derive(Debug, Clone)]
+pub struct GenericQueryBuilder {
+    // WIP
 }
 
 #[derive(Debug)]

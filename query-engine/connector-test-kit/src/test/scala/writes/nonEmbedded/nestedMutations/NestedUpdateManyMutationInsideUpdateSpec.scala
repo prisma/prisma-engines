@@ -34,7 +34,7 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    childOpt: {updateMany: {
          |        where:{c: "c"}
          |        data: {c: "newC"}
-         |    
+         |
          |    }}
          |  }){
          |    childOpt {

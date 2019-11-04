@@ -9,6 +9,7 @@ migration-connector = { path = "../connectors/migration-connector" }
 datamodel = { path = "../../libs/datamodel" }
 prisma-models = { path = "../../prisma-models" }
 sql-migration-connector = { path = "../connectors/sql-migration-connector" }
+sql-connection = { path = "../../libs/sql-connection" }
 clap = "2.33"
 itertools = "0.8"
 
@@ -31,10 +32,11 @@ tokio = "0.1"
 tokio-threadpool = "0.1"
 
 [dev-dependencies]
-prisma-query = { git = "https://github.com/prisma/prisma-query.git" }
+quaint = { git = "https://github.com/prisma/quaint.git" }
 barrel = { version = "0.6.3-alpha.0", features = ["sqlite3", "mysql", "pg"] }
 pretty_assertions = "0.6"
 sql-schema-describer = { path = "../../libs/sql-schema-describer" }
+migration-engine-macros = { path = "../macros" }
 
 [[bin]]
 name = "migration-engine"

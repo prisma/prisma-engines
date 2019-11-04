@@ -23,7 +23,7 @@ where
     pub fn new(connector: C) -> crate::Result<Self> {
         let engine = MigrationEngine {
             datamodel_migration_steps_inferrer: Arc::new(DataModelMigrationStepsInferrerImplWrapper {}),
-            datamodel_calculator: Arc::new(DataModelCalculatorImpl {}),
+            datamodel_calculator: Arc::new(DataModelCalculatorImpl),
             connector,
         };
 

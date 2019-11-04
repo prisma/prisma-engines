@@ -4,7 +4,7 @@
 use barrel::{types, Migration};
 use log::{debug, LevelFilter};
 use pretty_assertions::assert_eq;
-use prisma_query::connector::{Queryable, Sqlite as SqliteDatabaseClient};
+use quaint::connector::{Queryable, Sqlite as SqliteDatabaseClient};
 use sql_schema_describer::*;
 use std::collections::HashSet;
 use std::fs::File;

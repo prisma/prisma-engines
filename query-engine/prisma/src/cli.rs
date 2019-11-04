@@ -3,9 +3,9 @@ use crate::{
     dmmf, PrismaResult,
 };
 use clap::ArgMatches;
-use core::{
-    schema::{QuerySchemaBuilder, QuerySchemaRef, SupportedCapabilities},
-    BuildMode,
+use query_core::{
+    schema::{QuerySchemaRef, SupportedCapabilities},
+    BuildMode, QuerySchemaBuilder,
 };
 use serde::Deserialize;
 use std::sync::Arc;

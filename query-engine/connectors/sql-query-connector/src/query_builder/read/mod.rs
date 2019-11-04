@@ -6,43 +6,43 @@ use connector_interface::{
     QueryArguments,
 };
 use prisma_models::prelude::*;
-use prisma_query::ast::*;
+use quaint::ast::*;
 use std::sync::Arc;
 
 pub use many_related_records::*;
 
 pub trait SelectDefinition {
-    fn into_select(self, _: ModelRef) -> Select<'static>;
+    fn into_select(self, _: &ModelRef) -> Select<'static>;
 }
 
 impl SelectDefinition for Filter {
-    fn into_select(self, model: ModelRef) -> Select<'static> {
+    fn into_select(self, model: &ModelRef) -> Select<'static> {
         let args = QueryArguments::from(self);
         args.into_select(model)
     }
 }
 
 impl SelectDefinition for RecordFinder {
-    fn into_select(self, model: ModelRef) -> Select<'static> {
+    fn into_select(self, model: &ModelRef) -> Select<'static> {
         let args = QueryArguments::from(self);
         args.into_select(model)
     }
 }
 
 impl SelectDefinition for &RecordFinder {
-    fn into_select(self, model: ModelRef) -> Select<'static> {
+    fn into_select(self, model: &ModelRef) -> Select<'static> {
         self.clone().into_select(model)
     }
 }
 
 impl SelectDefinition for Select<'static> {
-    fn into_select(self, _: ModelRef) -> Select<'static> {
+    fn into_select(self, _: &ModelRef) -> Select<'static> {
         self
     }
 }
 
 impl SelectDefinition for QueryArguments {
-    fn into_select(self, model: ModelRef) -> Select<'static> {
+    fn into_select(self, model: &ModelRef) -> Select<'static> {
         let cursor: ConditionTree = CursorCondition::build(&self, Arc::clone(&model));
         let order_by = self.order_by;
         let ordering = Ordering::for_model(Arc::clone(&model), order_by.as_ref(), self.last.is_some());
@@ -78,8 +78,9 @@ impl SelectDefinition for QueryArguments {
 
 pub struct ReadQueryBuilder;
 
+#[allow(dead_code)]
 impl ReadQueryBuilder {
-    pub fn get_records<T>(model: ModelRef, selected_fields: &SelectedFields, query: T) -> Select<'static>
+    pub fn get_records<T>(model: &ModelRef, selected_fields: &SelectedFields, query: T) -> Select<'static>
     where
         T: SelectDefinition,
     {
@@ -90,7 +91,7 @@ impl ReadQueryBuilder {
     }
 
     pub fn get_scalar_list_values_by_record_ids(
-        list_field: ScalarFieldRef,
+        list_field: &ScalarFieldRef,
         record_ids: Vec<GraphqlId>,
     ) -> Select<'static> {
         let table = list_field.scalar_list_table().table();
@@ -104,7 +105,7 @@ impl ReadQueryBuilder {
             .so_that(vhere)
     }
 
-    pub fn count_by_model(model: ModelRef, query_arguments: QueryArguments) -> Select<'static> {
+    pub fn count_by_model(model: &ModelRef, query_arguments: QueryArguments) -> Select<'static> {
         let id_field = model.fields().id();
 
         let mut selected_fields = SelectedFields::default();

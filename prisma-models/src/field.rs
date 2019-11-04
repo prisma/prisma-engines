@@ -6,7 +6,7 @@ pub use scalar::*;
 
 use crate::prelude::*;
 use once_cell::sync::OnceCell;
-use prisma_query::ast::Column;
+use quaint::ast::Column;
 use std::{borrow::Cow, sync::Arc};
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -148,5 +148,17 @@ impl FieldTemplate {
                 Field::Relation(Arc::new(relation))
             }
         }
+    }
+}
+
+impl From<ScalarFieldRef> for Field {
+    fn from(sf: ScalarFieldRef) -> Self {
+        Field::Scalar(sf)
+    }
+}
+
+impl From<RelationFieldRef> for Field {
+    fn from(rf: RelationFieldRef) -> Self {
+        Field::Relation(rf)
     }
 }

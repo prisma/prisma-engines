@@ -68,6 +68,21 @@ pub fn parse_datamodel(datamodel_string: &str) -> Result<Datamodel, error::Error
     parse_datamodel_with_sources(datamodel_string, vec![])
 }
 
+/// Validates a [Schema AST](/ast/struct.SchemaAst.html) and returns its
+/// [Datamodel](/struct.Datamodel.html).
+pub fn lift_ast(ast: &ast::SchemaAst) -> Result<Datamodel, error::ErrorCollection> {
+    let mut errors = error::ErrorCollection::new();
+    let validator = ValidationPipeline::with_sources(&[]);
+
+    match validator.validate(&ast) {
+        Ok(src) => Ok(src),
+        Err(mut err) => {
+            errors.append(&mut err);
+            Err(errors)
+        }
+    }
+}
+
 /// Parses and validates a datamodel string, using core attributes only.
 /// In case of an error, a pretty, colorful string is returned.
 pub fn parse_datamodel_or_pretty_error(datamodel_string: &str, file_name: &str) -> Result<Datamodel, String> {
@@ -159,6 +174,13 @@ fn load_sources(
 pub fn render_datamodel_to_string(datamodel: &dml::Datamodel) -> Result<String, error::ErrorCollection> {
     let mut writable_string = common::WritableString::new();
     render_datamodel_to(&mut writable_string, datamodel)?;
+    Ok(writable_string.into())
+}
+
+/// Renders an AST to a string.
+pub fn render_schema_ast_to_string(schema: &SchemaAst) -> Result<String, error::ErrorCollection> {
+    let mut writable_string = common::WritableString::new();
+    render_schema_ast_to(&mut writable_string, &schema, 2);
     Ok(writable_string.into())
 }
 

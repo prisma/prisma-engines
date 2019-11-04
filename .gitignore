@@ -1,8 +1,8 @@
 db/*
 !.placeholder
 build/
-connector_to_test
 .DS_Store
+current_connector
 
 *.class
 *.log

@@ -37,7 +37,7 @@ impl RelationCompare for Arc<RelationField> {
     /// ```rust
     /// # use query_connector::{*, filter::*};
     /// # use prisma_models::*;
-    /// # use prisma_query::ast::*;
+    /// # use quaint::ast::*;
     /// # use serde_json;
     /// # use std::{fs::File, sync::Arc};
     /// #
@@ -88,7 +88,7 @@ impl RelationCompare for Arc<RelationField> {
     /// ```rust
     /// # use query_connector::{*, filter::*};
     /// # use prisma_models::*;
-    /// # use prisma_query::ast::*;
+    /// # use quaint::ast::*;
     /// # use serde_json;
     /// # use std::{fs::File, sync::Arc};
     /// #
@@ -139,7 +139,7 @@ impl RelationCompare for Arc<RelationField> {
     /// ```rust
     /// # use query_connector::{*, filter::*};
     /// # use prisma_models::*;
-    /// # use prisma_query::ast::*;
+    /// # use quaint::ast::*;
     /// # use serde_json;
     /// # use std::{fs::File, sync::Arc};
     /// #
@@ -190,7 +190,7 @@ impl RelationCompare for Arc<RelationField> {
     /// ```rust
     /// # use query_connector::{*, filter::*};
     /// # use prisma_models::*;
-    /// # use prisma_query::ast::*;
+    /// # use quaint::ast::*;
     /// # use serde_json;
     /// # use std::{fs::File, sync::Arc};
     /// #
@@ -241,7 +241,7 @@ impl RelationCompare for Arc<RelationField> {
     /// ```rust
     /// # use query_connector::{*, filter::*};
     /// # use prisma_models::*;
-    /// # use prisma_query::ast::*;
+    /// # use quaint::ast::*;
     /// # use serde_json;
     /// # use std::{fs::File, sync::Arc};
     /// #

@@ -37,7 +37,7 @@ class NonEmbeddedDeleteScalarListsSpec extends FlatSpec with Matchers with ApiSp
         |    data: { name: "test", bottom: {create: {name: "test2", list: {set: [1,2,3]}} }}
         |  ){
         |    name
-        |    bottom{name, list} 
+        |    bottom{name, list}
         |  }
         |}
       """,
@@ -49,7 +49,7 @@ class NonEmbeddedDeleteScalarListsSpec extends FlatSpec with Matchers with ApiSp
     res.toString should be("""{"data":{"updateTop":{"name":"test","bottom":null}}}""")
   }
 
-  "A cascading delete  mutation" should "also delete ListTable entries" taggedAs (IgnoreMongo, IgnoreSQLite, IgnorePostgres, IgnoreMySql) in { // TODO: Remove ignore when cascading again
+  "A cascading delete  mutation" should "also delete ListTable entries" ignore  { // TODO: Remove ignore when cascading again
 
     val project: Project = SchemaDsl.fromStringV11() {
       s"""model Top {

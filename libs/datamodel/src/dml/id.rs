@@ -1,12 +1,11 @@
 use super::*;
 use crate::ast;
 use crate::error::DatamodelError;
-use serde::{Deserialize, Serialize};
 
 use crate::common::FromStrAndSpan;
 
 /// Represents a strategy for generating IDs.
-#[derive(Debug, Copy, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Debug, Copy, PartialEq, Clone)]
 pub enum IdStrategy {
     Auto,
     None,
@@ -32,7 +31,7 @@ impl ToString for IdStrategy {
 }
 
 /// Represents a sequence. Can be used to seed IDs.
-#[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct Sequence {
     /// The name of the sequence.
     pub name: String,

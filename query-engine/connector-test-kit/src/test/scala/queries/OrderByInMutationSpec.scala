@@ -15,7 +15,7 @@ class OrderByInMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
           test String?
           bars Bar[]   @relation(references: [id])
       }
-      
+
       model Bar {
           id         String @id @default(cuid())
           quantity   Int
@@ -29,7 +29,7 @@ class OrderByInMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
           test String?
           bars Bar[]
       }
-      
+
       model Bar {
           id         String @id @default(cuid())
           quantity   Int

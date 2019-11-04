@@ -1,7 +1,7 @@
 use super::MigrationStepsResultOutput;
 use crate::commands::command::*;
 use crate::migration_engine::MigrationEngine;
-use datamodel::Datamodel;
+use datamodel::ast::SchemaAst;
 use log::*;
 use migration_connector::*;
 use serde::Deserialize;
@@ -27,13 +27,15 @@ impl<'a> MigrationCommand<'a> for CalculateDatabaseStepsCommand<'a> {
 
         let connector = engine.connector();
 
-        let assumed_datamodel = engine
+        let assumed_datamodel_ast = engine
             .datamodel_calculator()
-            .infer(&Datamodel::empty(), &self.input.assume_to_be_applied);
+            .infer(&SchemaAst::empty(), &self.input.assume_to_be_applied);
+        let assumed_datamodel = datamodel::lift_ast(&assumed_datamodel_ast)?;
 
-        let next_datamodel = engine
+        let next_datamodel_ast = engine
             .datamodel_calculator()
-            .infer(&assumed_datamodel, &self.input.steps_to_apply);
+            .infer(&assumed_datamodel_ast, &self.input.steps_to_apply);
+        let next_datamodel = datamodel::lift_ast(&next_datamodel_ast)?;
 
         let database_migration = connector.database_migration_inferrer().infer(
             &assumed_datamodel,
@@ -49,7 +51,7 @@ impl<'a> MigrationCommand<'a> for CalculateDatabaseStepsCommand<'a> {
             .render_steps_pretty(&database_migration)?;
 
         Ok(MigrationStepsResultOutput {
-            datamodel: datamodel::render_datamodel_to_string(&next_datamodel).unwrap(),
+            datamodel: datamodel::render_schema_ast_to_string(&next_datamodel_ast).unwrap(),
             datamodel_steps: self.input.steps_to_apply.clone(),
             database_steps: serde_json::Value::Array(database_steps_json),
             errors: Vec::new(),

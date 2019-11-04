@@ -1,10 +1,8 @@
 use super::*;
 use crate::common::{PrismaType, PrismaValue};
-use serde::{Deserialize, Serialize};
 
 /// Datamodel field arity.
-#[derive(Debug, PartialEq, Copy, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(Debug, PartialEq, Copy, Clone)]
 pub enum FieldArity {
     Required,
     Optional,
@@ -18,7 +16,7 @@ impl FieldArity {
 }
 
 /// Datamodel field type.
-#[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum FieldType {
     /// This is an enum field, with an enum of the given name.
     Enum(String),
@@ -34,7 +32,7 @@ pub enum FieldType {
 }
 
 /// Holds information about an id, or priamry key.
-#[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct IdInfo {
     /// The strategy which is used to generate the id field.
     pub strategy: IdStrategy,
