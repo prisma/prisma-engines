@@ -3,7 +3,7 @@ mod error;
 
 use mysql_async::{self as my, prelude::Queryable as _};
 use percent_encoding::percent_decode;
-use std::{convert::TryFrom, path::Path};
+use std::{convert::TryFrom, path::Path, time::Duration};
 use url::Url;
 
 use crate::{
@@ -135,7 +135,7 @@ impl TryFrom<Url> for MysqlParams {
         config.ip_or_hostname(url.host_str().unwrap_or("localhost"));
         config.tcp_port(url.port().unwrap_or(3306));
         config.stmt_cache_size(Some(1000));
-        config.conn_ttl(Some(5000u32));
+        config.conn_ttl(Some(Duration::from_secs(5)));
 
         if use_ssl {
             config.ssl_opts(Some(ssl_opts));
@@ -151,7 +151,8 @@ impl TryFrom<Url> for MysqlParams {
 
 impl Mysql {
     pub fn new(mut opts: my::OptsBuilder) -> crate::Result<Self> {
-        opts.pool_constraints(my::PoolConstraints::new(1, 1));
+        let pool_opts = my::PoolOptions::with_constraints(my::PoolConstraints::new(1, 1).unwrap());
+        opts.pool_options(pool_opts);
 
         Ok(Self {
             pool: my::Pool::new(opts),
