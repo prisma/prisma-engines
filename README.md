@@ -37,19 +37,19 @@ cargo build
 
 You can find the compiled binaries inside the newly created `./target/debug` directory:
 
-| Prisma Framework Component | Path to Binary |
-| --- | --- |
-| HTTP server + Query Engine | `./target/prisma/prisma` |
-| Migration Engine | `./target/migration-engine/migration-engine` |
-| Introspection Engine | `./target/introspection-engine/introspection-engine` |
-| Prisma Format  |  `./target/prisma-fmt/prisma-fmt` 
+| Prisma Framework Component | Path to Binary                                       |
+| -------------------------- | ---------------------------------------------------- |
+| HTTP server + Query Engine | `./target/prisma/prisma`                             |
+| Migration Engine           | `./target/migration-engine/migration-engine`         |
+| Introspection Engine       | `./target/introspection-engine/introspection-engine` |
+| Prisma Format              | `./target/prisma-fmt/prisma-fmt`                     |
 
 ## Coding Guidelines
 
-* Prevent compiler warnings
-* Use Rust formatting (`cargo fmt`)
+- Prevent compiler warnings
+- Use Rust formatting (`cargo fmt`)
 
 ## Testing
 
-* To compile all modules use the provided `build.sh` script
-* To test all modules use the provided `test.sh` script
+- To compile all modules use the provided `build.sh` script
+- To test all modules use the provided `test.sh` script
