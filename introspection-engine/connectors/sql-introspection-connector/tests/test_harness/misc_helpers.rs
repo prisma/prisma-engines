@@ -224,8 +224,10 @@ fn get_postgres() -> TestSetup {
 fn get_mysql() -> TestSetup {
     let database = database(&mysql_url());
 
-    let drop_schema = dbg!(format!("DROP SCHEMA IF EXISTS \"{}\" CASCADE;", SCHEMA_NAME));
-    database.query_raw(&drop_schema, &[]).ok();
+    let drop_database = dbg!(format!("DROP DATABASE IF EXISTS `{}`;", SCHEMA_NAME));
+    database.query_raw(&drop_database, &[]).ok();
+    let create_database = dbg!(format!("CREATE DATABASE `{}`;", SCHEMA_NAME));
+    database.query_raw(&create_database, &[]).ok();
 
     let introspection_connector = SqlIntrospectionConnector::new(&mysql_url()).unwrap();
 
@@ -259,11 +261,7 @@ pub fn postgres_url() -> String {
 }
 
 pub fn mysql_url() -> String {
-    dbg!(format!(
-        "mysql://root:prisma@{}:3306/{}",
-        db_host_mysql_5_7(),
-        SCHEMA_NAME
-    ))
+    dbg!(format!("mysql://root:prisma@{}:3306/", db_host_mysql_5_7()))
 }
 
 pub fn mysql_8_url() -> String {
