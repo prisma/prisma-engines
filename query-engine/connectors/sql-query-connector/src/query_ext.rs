@@ -10,7 +10,7 @@ use quaint::{
     connector::{self, Queryable},
 };
 use serde_json::{Map, Number, Value};
-use std::{convert::TryFrom, sync::Arc};
+use std::convert::TryFrom;
 
 impl<'t> QueryExt for connector::Transaction<'t> {}
 
