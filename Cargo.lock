@@ -2021,7 +2021,7 @@ dependencies = [
  "tracing 0.1.10 (registry+https://github.com/rust-lang/crates.io-index)",
  "tracing-attributes 0.1.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "tracing-log 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "tracing-subscriber 0.1.5 (git+https://github.com/tokio-rs/tracing)",
+ "tracing-subscriber 0.1.5 (git+https://github.com/pimeys/tracing?branch=end-json-map-correctly)",
  "url 2.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -3357,7 +3357,7 @@ dependencies = [
 [[package]]
 name = "tracing-log"
 version = "0.1.1"
-source = "git+https://github.com/tokio-rs/tracing#8720792dbdf3158c4dbfcaf879e28da7af67c3f7"
+source = "git+https://github.com/pimeys/tracing?branch=end-json-map-correctly#9c9bab7159cd7e0c5df8c78d1e5dde90a992741d"
 dependencies = [
  "lazy_static 1.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "log 0.4.8 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -3377,7 +3377,7 @@ dependencies = [
 [[package]]
 name = "tracing-serde"
 version = "0.1.0"
-source = "git+https://github.com/tokio-rs/tracing#8720792dbdf3158c4dbfcaf879e28da7af67c3f7"
+source = "git+https://github.com/pimeys/tracing?branch=end-json-map-correctly#9c9bab7159cd7e0c5df8c78d1e5dde90a992741d"
 dependencies = [
  "serde 1.0.102 (registry+https://github.com/rust-lang/crates.io-index)",
  "tracing-core 0.1.7 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -3386,7 +3386,7 @@ dependencies = [
 [[package]]
 name = "tracing-subscriber"
 version = "0.1.5"
-source = "git+https://github.com/tokio-rs/tracing#8720792dbdf3158c4dbfcaf879e28da7af67c3f7"
+source = "git+https://github.com/pimeys/tracing?branch=end-json-map-correctly#9c9bab7159cd7e0c5df8c78d1e5dde90a992741d"
 dependencies = [
  "ansi_term 0.11.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "chrono 0.4.9 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -3398,8 +3398,8 @@ dependencies = [
  "serde_json 1.0.41 (registry+https://github.com/rust-lang/crates.io-index)",
  "smallvec 0.6.12 (registry+https://github.com/rust-lang/crates.io-index)",
  "tracing-core 0.1.7 (registry+https://github.com/rust-lang/crates.io-index)",
- "tracing-log 0.1.1 (git+https://github.com/tokio-rs/tracing)",
- "tracing-serde 0.1.0 (git+https://github.com/tokio-rs/tracing)",
+ "tracing-log 0.1.1 (git+https://github.com/pimeys/tracing?branch=end-json-map-correctly)",
+ "tracing-serde 0.1.0 (git+https://github.com/pimeys/tracing?branch=end-json-map-correctly)",
 ]
 
 [[package]]
@@ -3944,10 +3944,10 @@ dependencies = [
 "checksum tracing 0.1.10 (registry+https://github.com/rust-lang/crates.io-index)" = "ff4e4f59e752cb3beb5b61c6d5e11191c7946231ba84faec2902c9efdd8691c5"
 "checksum tracing-attributes 0.1.5 (registry+https://github.com/rust-lang/crates.io-index)" = "a4263b12c3d3c403274493eb805966093b53214124796552d674ca1dd5d27c2b"
 "checksum tracing-core 0.1.7 (registry+https://github.com/rust-lang/crates.io-index)" = "bc913647c520c959b6d21e35ed8fa6984971deca9f0a2fcb8c51207e0c56af1d"
-"checksum tracing-log 0.1.1 (git+https://github.com/tokio-rs/tracing)" = "<none>"
+"checksum tracing-log 0.1.1 (git+https://github.com/pimeys/tracing?branch=end-json-map-correctly)" = "<none>"
 "checksum tracing-log 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)" = "5e0f8c7178e13481ff6765bd169b33e8d554c5d2bbede5e32c356194be02b9b9"
-"checksum tracing-serde 0.1.0 (git+https://github.com/tokio-rs/tracing)" = "<none>"
-"checksum tracing-subscriber 0.1.5 (git+https://github.com/tokio-rs/tracing)" = "<none>"
+"checksum tracing-serde 0.1.0 (git+https://github.com/pimeys/tracing?branch=end-json-map-correctly)" = "<none>"
+"checksum tracing-subscriber 0.1.5 (git+https://github.com/pimeys/tracing?branch=end-json-map-correctly)" = "<none>"
 "checksum try-lock 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)" = "e604eb7b43c06650e854be16a2a03155743d3752dd1c943f6829e26b7a36e382"
 "checksum twox-hash 1.5.0 (registry+https://github.com/rust-lang/crates.io-index)" = "3bfd5b7557925ce778ff9b9ef90e3ade34c524b5ff10e239c69a42d546d2af56"
 "checksum typenum 1.11.2 (registry+https://github.com/rust-lang/crates.io-index)" = "6d2783fe2d6b8c1101136184eb41be8b1ad379e4657050b8aaff0c79ee7575f9"
