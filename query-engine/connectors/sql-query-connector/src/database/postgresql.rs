@@ -2,7 +2,7 @@ use super::connection::SqlConnection;
 use crate::{query_builder::ManyRelatedRecordsWithRowNumber, FromSource, QueryExt, SqlError};
 use connector_interface::{Connection, Connector, IO};
 use datamodel::Source;
-use prisma_query::pool::{self, PostgresManager};
+use quaint::pool::{self, PostgresManager};
 use tokio_resource_pool::{CheckOut, Pool};
 
 pub struct PostgreSql {

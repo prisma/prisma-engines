@@ -1,7 +1,7 @@
 mod test_harness;
 use migration_connector::MigrationWarning;
 use pretty_assertions::assert_eq;
-use prisma_query::ast::*;
+use quaint::ast::*;
 use sql_migration_connector::SqlFamily;
 use test_harness::*;
 
@@ -89,7 +89,7 @@ fn adding_a_required_field_must_use_the_default_value_for_migrations() {
             let conditions = "id".equals("test");
             let table_for_select: Table = match test_setup.sql_family {
                 SqlFamily::Sqlite => {
-                    // sqlite case. Otherwise prisma-query produces invalid SQL
+                    // sqlite case. Otherwise quaint produces invalid SQL
                     "Test".into()
                 }
                 _ => (SCHEMA_NAME, "Test").into(),

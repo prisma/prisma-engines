@@ -9,12 +9,12 @@ use prisma_models::prelude::*;
 use std::marker::PhantomData;
 
 pub struct SqlConnectorTransaction<'a, T> {
-    inner: prisma_query::connector::Transaction<'a>,
+    inner: quaint::connector::Transaction<'a>,
     _p: PhantomData<T>,
 }
 
 impl<'a, T> SqlConnectorTransaction<'a, T> {
-    pub fn new(tx: prisma_query::connector::Transaction<'a>) -> Self {
+    pub fn new(tx: quaint::connector::Transaction<'a>) -> Self {
         Self {
             inner: tx,
             _p: PhantomData,

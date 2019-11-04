@@ -5,7 +5,7 @@ use connector_interface::{
 };
 use async_trait::async_trait;
 use prisma_models::*;
-use prisma_query::{
+use quaint::{
     ast::*,
     connector::{self, Queryable},
 };

@@ -8,7 +8,7 @@ pub use union_all::*;
 
 use crate::ordering::Ordering;
 use prisma_models::prelude::*;
-use prisma_query::ast::{Comparable, Conjuctive, Query};
+use quaint::ast::{Comparable, Conjuctive, Query};
 
 pub trait ManyRelatedRecordsQueryBuilder {
     const BASE_TABLE_ALIAS: &'static str = "prismaBaseTableAlias";

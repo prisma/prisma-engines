@@ -1,5 +1,5 @@
 use crate::ScalarField;
-use prisma_query::ast::*;
+use quaint::ast::*;
 
 #[derive(Debug, Clone)]
 pub struct ScalarListTable<'a> {
