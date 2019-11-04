@@ -6,7 +6,7 @@ use std::{convert::TryFrom, fmt, string::FromUtf8Error};
 use uuid::Uuid;
 
 #[cfg(feature = "sql")]
-use prisma_query::ast::*;
+use quaint::ast::*;
 
 pub type PrismaListValue = Option<Vec<PrismaValue>>;
 

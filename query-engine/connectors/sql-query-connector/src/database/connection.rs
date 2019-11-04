@@ -32,7 +32,7 @@ where
         let fut_tx = self.inner.start_transaction();
 
         IO::new(async move {
-            let tx: prisma_query::connector::Transaction<'a> = fut_tx.await.map_err(SqlError::from)?;
+            let tx: quaint::connector::Transaction<'a> = fut_tx.await.map_err(SqlError::from)?;
 
             Ok(Box::new(SqlConnectorTransaction::<T>::new(tx)) as Box<dyn Transaction<'a> + 'a>)
         })

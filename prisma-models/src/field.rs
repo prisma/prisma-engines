@@ -6,7 +6,7 @@ pub use scalar::*;
 
 use crate::prelude::*;
 use once_cell::sync::OnceCell;
-use prisma_query::ast::Column;
+use quaint::ast::Column;
 use std::{borrow::Cow, sync::Arc};
 
 #[derive(Debug, Deserialize, Serialize)]

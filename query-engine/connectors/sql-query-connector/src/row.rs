@@ -1,7 +1,7 @@
 use crate::error::SqlError;
 use chrono::{DateTime, Utc};
 use prisma_models::{EnumValue, GraphqlId, PrismaValue, Record, TypeIdentifier};
-use prisma_query::{
+use quaint::{
     ast::{DatabaseValue, ParameterizedValue},
     connector::ResultRow,
 };

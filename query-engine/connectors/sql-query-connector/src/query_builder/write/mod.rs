@@ -1,6 +1,6 @@
 use crate::error::SqlError;
 use prisma_models::prelude::*;
-use prisma_query::ast::*;
+use quaint::ast::*;
 use std::convert::TryFrom;
 
 pub struct WriteQueryBuilder;
