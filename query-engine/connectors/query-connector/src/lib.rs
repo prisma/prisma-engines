@@ -21,18 +21,26 @@ use std::{
     future::Future,
     pin::Pin,
     task::{Context, Poll},
+    time::Instant,
 };
+use metrics_wrappers::timing;
 
 pub type Result<T> = std::result::Result<T, error::ConnectorError>;
 
-pub struct IO<'a, T>(BoxFuture<'a, crate::Result<T>>);
+pub struct IO<'a, T> {
+    inner: BoxFuture<'a, crate::Result<T>>,
+    start_time: Instant,
+}
 
 impl<'a, T> IO<'a, T> {
     pub fn new<F>(inner: F) -> Self
     where
         F: Future<Output = crate::Result<T>> + Send + 'a,
     {
-        Self(inner.boxed())
+        Self {
+            inner: inner.boxed(),
+            start_time: Instant::now(),
+        }
     }
 }
 
@@ -40,6 +48,12 @@ impl<'a, T> Future for IO<'a, T> {
     type Output = crate::Result<T>;
 
     fn poll(mut self: Pin<&mut Self>, ctx: &mut Context<'_>) -> Poll<Self::Output> {
-        self.0.as_mut().poll(ctx)
+        match self.inner.as_mut().poll(ctx) {
+            Poll::Ready(t) => {
+                timing!("query-engine.sql.query_time", self.start_time, Instant::now());
+                Poll::Ready(t)
+            }
+            not_ready => not_ready,
+        }
     }
 }

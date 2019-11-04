@@ -2342,6 +2342,8 @@ dependencies = [
  "failure_derive 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "futures-preview 0.3.0-alpha.19 (registry+https://github.com/rust-lang/crates.io-index)",
  "itertools 0.8.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "metrics 0.12.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "metrics-wrappers 0.1.0",
  "once_cell 1.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "prisma-models 0.0.0",
  "quaint 0.1.0 (git+https://github.com/prisma/quaint.git)",

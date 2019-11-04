@@ -16,7 +16,7 @@ use serde_json::json;
 use std::{sync::Arc, time::Instant};
 use metrics_runtime::{Receiver, Controller, observers::PrometheusBuilder};
 use metrics_core::{Builder, Observe, Drain};
-use metrics_wrappers::{timing, counter};
+use metrics_wrappers::timing;
 
 #[derive(RustEmbed)]
 #[folder = "query-engine/prisma/static_files"]
@@ -89,7 +89,6 @@ impl HttpServer {
                 };
 
                 timing!("query-engine.response.time", start, Instant::now());
-                counter!("query-engine.request.count", 1);
 
                 res
             }
