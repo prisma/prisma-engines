@@ -33,16 +33,16 @@ pub enum ConnectorError {
     TlsError { message: String },
 }
 
-impl From<prisma_query::error::Error> for ConnectorError {
-    fn from(e: prisma_query::error::Error) -> Self {
+impl From<quaint::error::Error> for ConnectorError {
+    fn from(e: quaint::error::Error) -> Self {
         match e {
-            prisma_query::error::Error::DatabaseDoesNotExist { db_name } => Self::DatabaseDoesNotExist { db_name },
-            prisma_query::error::Error::DatabaseAccessDenied { db_name } => Self::DatabaseAccessDenied { db_name },
-            prisma_query::error::Error::DatabaseAlreadyExists { db_name } => Self::DatabaseAlreadyExists { db_name },
-            prisma_query::error::Error::AuthenticationFailed { user } => Self::AuthenticationFailed { user },
-            prisma_query::error::Error::ConnectTimeout => Self::ConnectTimeout,
-            prisma_query::error::Error::Timeout => Self::Timeout,
-            prisma_query::error::Error::TlsError { message } => Self::TlsError { message },
+            quaint::error::Error::DatabaseDoesNotExist { db_name } => Self::DatabaseDoesNotExist { db_name },
+            quaint::error::Error::DatabaseAccessDenied { db_name } => Self::DatabaseAccessDenied { db_name },
+            quaint::error::Error::DatabaseAlreadyExists { db_name } => Self::DatabaseAlreadyExists { db_name },
+            quaint::error::Error::AuthenticationFailed { user } => Self::AuthenticationFailed { user },
+            quaint::error::Error::ConnectTimeout => Self::ConnectTimeout,
+            quaint::error::Error::Timeout => Self::Timeout,
+            quaint::error::Error::TlsError { message } => Self::TlsError { message },
             e => ConnectorError::QueryError(e.into()),
         }
     }

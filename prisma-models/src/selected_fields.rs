@@ -1,6 +1,6 @@
 use crate::{ModelRef, Relation, RelationField, ScalarField, TypeIdentifier};
 use once_cell::sync::OnceCell;
-use prisma_query::ast::Column;
+use quaint::ast::Column;
 use std::sync::Arc;
 
 pub trait IntoSelectedFields {

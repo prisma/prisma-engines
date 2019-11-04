@@ -1,8 +1,7 @@
 use crate::{error::SqlError, query_builder::WriteQueryBuilder, QueryExt};
 use connector_interface::{error::ConnectorError, *};
 use prisma_models::*;
-use prisma_query::error::Error as QueryError;
-use std::sync::Arc;
+use quaint::error::Error as QueryError;
 
 pub async fn create_record(
     conn: &dyn QueryExt,

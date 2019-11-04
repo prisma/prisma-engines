@@ -1,6 +1,6 @@
 use crate::{DropColumn, DropTable, DropTables, SqlError, SqlMigration, SqlMigrationStep, SqlResult, TableChange};
 use migration_connector::*;
-use prisma_query::ast::*;
+use quaint::ast::*;
 use sql_connection::SyncSqlConnection;
 use std::sync::Arc;
 
@@ -41,7 +41,7 @@ impl SqlDestructiveChangesChecker {
         diagnostics: &mut DestructiveChangeDiagnostics,
     ) -> SqlResult<()> {
         let query = Select::from_table((self.schema_name.as_str(), table.name.as_str()))
-            .value(count(prisma_query::ast::Column::new(drop_column.name.as_str())))
+            .value(count(quaint::ast::Column::new(drop_column.name.as_str())))
             .so_that(drop_column.name.as_str().is_not_null());
 
         let values_count: i64 = self

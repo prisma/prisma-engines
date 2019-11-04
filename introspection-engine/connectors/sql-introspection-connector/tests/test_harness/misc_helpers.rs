@@ -152,7 +152,7 @@ pub fn database(database_url: &str) -> Box<dyn SyncSqlConnection + Send + Sync +
 fn with_database<F, T, S>(url: Url, default_name: &str, root_path: &str, create_stmt: S, f: Rc<F>) -> T
 where
     T: SyncSqlConnection,
-    F: Fn(Url) -> Result<T, prisma_query::error::Error>,
+    F: Fn(Url) -> Result<T, quaint::error::Error>,
     S: FnOnce(String) -> String,
 {
     match f(url.clone()) {
@@ -167,7 +167,7 @@ where
 fn create_database<F, T, S>(url: Url, default_name: &str, root_path: &str, create_stmt: S, f: Rc<F>)
 where
     T: SyncSqlConnection,
-    F: Fn(Url) -> Result<T, prisma_query::error::Error>,
+    F: Fn(Url) -> Result<T, quaint::error::Error>,
     S: FnOnce(String) -> String,
 {
     let db_name = fetch_db_name(&url, default_name);

@@ -2,7 +2,7 @@
 
 //! Shared SQL connection handling logic for the migration engine and the introspection engine.
 
-use prisma_query::{
+use quaint::{
     ast::*,
     connector::{self, Queryable, ResultSet, SqliteParams},
     error::Error as QueryError,
@@ -15,25 +15,25 @@ use url::Url;
 /// A generic synchronous SQL connection interface.
 pub trait SyncSqlConnection {
     /// See
-    /// https://prisma.github.io/prisma-query/prisma_query/connector/trait.Queryable.html#tymethod.execute
+    /// https://prisma.github.io/quaint/quaint/connector/trait.Queryable.html#tymethod.execute
     ///
     /// The `db` param is only used on SQLite to give a name to the attached database.
     fn execute(&self, q: Query<'_>) -> Result<Option<Id>, QueryError>;
 
     /// See
-    /// https://prisma.github.io/prisma-query/prisma_query/connector/trait.Queryable.html#tymethod.query
+    /// https://prisma.github.io/quaint/quaint/connector/trait.Queryable.html#tymethod.query
     ///
     /// The `db` param is only used on SQLite to give a name to the attached database.
     fn query(&self, q: Query<'_>) -> Result<ResultSet, QueryError>;
 
     /// See
-    /// https://prisma.github.io/prisma-query/prisma_query/connector/trait.Queryable.html#tymethod.query_raw
+    /// https://prisma.github.io/quaint/quaint/connector/trait.Queryable.html#tymethod.query_raw
     ///
     /// The `db` param is only used on SQLite to give a name to the attached database.
     fn query_raw(&self, sql: &str, params: &[ParameterizedValue<'_>]) -> Result<ResultSet, QueryError>;
 
     /// See
-    /// https://prisma.github.io/prisma-query/prisma_query/connector/trait.Queryable.html#tymethod.execute_raw
+    /// https://prisma.github.io/quaint/quaint/connector/trait.Queryable.html#tymethod.execute_raw
     ///
     /// The `db` param is only used on SQLite to give a name to the attached database.
     fn execute_raw(&self, sql: &str, params: &[ParameterizedValue<'_>]) -> Result<u64, QueryError>;
@@ -43,19 +43,19 @@ pub trait SyncSqlConnection {
 #[async_trait::async_trait]
 pub trait SqlConnection: Send + Sync + 'static {
     /// See
-    /// https://prisma.github.io/prisma-query/prisma_query/connector/trait.Queryable.html#tymethod.execute
+    /// https://prisma.github.io/quaint/quaint/connector/trait.Queryable.html#tymethod.execute
     ///
     /// The `db` param is only used on SQLite to give a name to the attached database.
     async fn execute<'a>(&self, q: Query<'a>) -> Result<Option<Id>, QueryError>;
 
     /// See
-    /// https://prisma.github.io/prisma-query/prisma_query/connector/trait.Queryable.html#tymethod.query
+    /// https://prisma.github.io/quaint/quaint/connector/trait.Queryable.html#tymethod.query
     ///
     /// The `db` param is only used on SQLite to give a name to the attached database.
     async fn query<'a>(&self, q: Query<'a>) -> Result<ResultSet, QueryError>;
 
     /// See
-    /// https://prisma.github.io/prisma-query/prisma_query/connector/trait.Queryable.html#tymethod.query_raw
+    /// https://prisma.github.io/quaint/quaint/connector/trait.Queryable.html#tymethod.query_raw
     ///
     /// The `db` param is only used on SQLite to give a name to the attached database.
     async fn query_raw<'a>(
@@ -65,7 +65,7 @@ pub trait SqlConnection: Send + Sync + 'static {
     ) -> Result<ResultSet, QueryError>;
 
     /// See
-    /// https://prisma.github.io/prisma-query/prisma_query/connector/trait.Queryable.html#tymethod.execute_raw
+    /// https://prisma.github.io/quaint/quaint/connector/trait.Queryable.html#tymethod.execute_raw
     ///
     /// The `db` param is only used on SQLite to give a name to the attached database.
     async fn execute_raw<'a>(&self, sql: &str, params: &[ParameterizedValue<'a>]) -> Result<u64, QueryError>;
@@ -91,7 +91,7 @@ impl Sqlite {
         let params = SqliteParams::try_from(url)?;
         let file_path = params.file_path.to_str().unwrap().to_string();
 
-        let pool = prisma_query::pool::sqlite(url, db_name)?;
+        let pool = quaint::pool::sqlite(url, db_name)?;
 
         Ok(Self {
             pool,
@@ -221,7 +221,7 @@ pub struct Postgresql {
 impl Postgresql {
     /// Create a new connection pool.
     pub fn new_pooled(url: Url) -> Result<Self, QueryError> {
-        let pool = prisma_query::pool::postgres(url)?;
+        let pool = quaint::pool::postgres(url)?;
         let handle = ConnectionPool::Pool(pool);
 
         Ok(Postgresql {
@@ -315,7 +315,7 @@ impl Mysql {
 
     /// Create a new connection pool.
     pub fn new_pooled(url: Url) -> Result<Self, QueryError> {
-        let pool = prisma_query::pool::mysql(url)?;
+        let pool = quaint::pool::mysql(url)?;
         let handle = ConnectionPool::Pool(pool);
 
         Ok(Mysql {

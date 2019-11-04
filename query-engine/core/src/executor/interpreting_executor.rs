@@ -44,17 +44,25 @@ where
         let mut results: Vec<Response> = vec![];
 
         for (query_graph, info) in queries {
-            let tx = conn.start_transaction().await?;
-            let interpreter = QueryInterpreter::new(ConnectionLike::Transaction(tx.as_ref()));
-            let result = QueryPipeline::new(query_graph, interpreter, info).execute().await;
+            let result = if query_graph.needs_transaction() {
+                let tx = conn.start_transaction().await?;
 
-            if result.is_ok() {
-                tx.commit().await?;
+                let interpreter = QueryInterpreter::new(ConnectionLike::Transaction(tx.as_ref()));
+                let result = QueryPipeline::new(query_graph, interpreter, info).execute().await;
+
+                if result.is_ok() {
+                    tx.commit().await?;
+                } else {
+                    tx.rollback().await?;
+                }
+
+                result?
             } else {
-                tx.rollback().await?;
-            }
+                let interpreter = QueryInterpreter::new(ConnectionLike::Connection(conn.as_ref()));
+                QueryPipeline::new(query_graph, interpreter, info).execute().await?
+            };
 
-            results.push(result?);
+            results.push(result);
         }
 
         Ok(results)

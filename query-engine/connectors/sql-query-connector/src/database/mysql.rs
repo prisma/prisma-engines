@@ -2,7 +2,7 @@ use super::connection::SqlConnection;
 use crate::{query_builder::ManyRelatedRecordsWithUnionAll, FromSource, QueryExt, SqlError};
 use connector_interface::{Connection, Connector, IO};
 use datamodel::Source;
-use prisma_query::pool::{self, MysqlManager};
+use quaint::pool::{self, MysqlManager};
 use tokio_resource_pool::{CheckOut, Pool};
 use url::Url;
 

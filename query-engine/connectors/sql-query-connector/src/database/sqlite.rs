@@ -2,7 +2,7 @@ use super::connection::SqlConnection;
 use crate::{query_builder::ManyRelatedRecordsWithRowNumber, FromSource, QueryExt, SqlError};
 use connector_interface::{Connection, Connector, IO};
 use datamodel::Source;
-use prisma_query::{
+use quaint::{
     connector::SqliteParams,
     pool::{self, SqliteManager},
 };

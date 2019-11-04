@@ -1,7 +1,7 @@
 //! SQLite description.
 use super::*;
 use log::debug;
-use prisma_query::ast::ParameterizedValue;
+use quaint::ast::ParameterizedValue;
 use sql_connection::SyncSqlConnection;
 use std::collections::HashMap;
 use std::sync::Arc;

@@ -1,4 +1,5 @@
 use super::{
+    command_helpers::run_infer_command,
     misc_helpers::{
         mysql_8_url, mysql_migration_connector, mysql_url, postgres_migration_connector, postgres_url,
         sqlite_migration_connector, test_api,
@@ -6,7 +7,10 @@ use super::{
     InferAndApplyOutput, SCHEMA_NAME,
 };
 use migration_connector::{MigrationPersistence, MigrationStep};
-use migration_core::{api::GenericApi, commands::ApplyMigrationInput};
+use migration_core::{
+    api::GenericApi,
+    commands::{ApplyMigrationInput, InferMigrationStepsInput},
+};
 use sql_connection::SyncSqlConnection;
 use sql_migration_connector::SqlFamily;
 use sql_schema_describer::*;
@@ -46,6 +50,20 @@ impl TestApi {
             sql_schema: self.introspect_database(),
             migration_output,
         }
+    }
+
+    pub fn infer_and_apply(&self, datamodel: &str) -> InferAndApplyOutput {
+        let migration_id = "the-migration-id";
+
+        let input = InferMigrationStepsInput {
+            migration_id: migration_id.to_string(),
+            datamodel: datamodel.to_string(),
+            assume_to_be_applied: Vec::new(),
+        };
+
+        let steps = run_infer_command(self.api.as_ref(), input).0.datamodel_steps;
+
+        self.apply_migration(steps, migration_id)
     }
 
     fn introspect_database(&self) -> SqlSchema {

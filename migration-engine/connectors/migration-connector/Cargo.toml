@@ -6,7 +6,7 @@ edition = "2018"
 
 [dependencies]
 datamodel = { path = "../../../libs/datamodel" }
-prisma-query = { git = "https://github.com/prisma/prisma-query" }
+quaint = { git = "https://github.com/prisma/quaint" }
 chrono = { version = "0.4" }
 
 serde = "1.0"

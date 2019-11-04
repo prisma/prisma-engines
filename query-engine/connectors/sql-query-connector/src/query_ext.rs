@@ -5,12 +5,12 @@ use connector_interface::{
 };
 use async_trait::async_trait;
 use prisma_models::*;
-use prisma_query::{
+use quaint::{
     ast::*,
     connector::{self, Queryable},
 };
 use serde_json::{Map, Number, Value};
-use std::{convert::TryFrom, sync::Arc};
+use std::convert::TryFrom;
 
 impl<'t> QueryExt for connector::Transaction<'t> {}
 

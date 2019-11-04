@@ -132,6 +132,10 @@ pub struct QueryGraph {
     marked_node_pairs: Vec<(NodeRef, NodeRef)>,
 
     finalized: bool,
+
+    /// For now a stupid marker if the query graph needs to be run inside a
+    /// transaction. Should happen if any of the queries is writing data.
+    needs_transaction: bool,
 }
 
 /// Implementation detail of the QueryGraph.
@@ -229,6 +233,16 @@ impl QueryGraph {
         let edge = EdgeRef { edge_ix };
 
         after_edge_creation(self, &edge).map(|_| edge)
+    }
+
+    /// Mark the query graph to need a transaction.
+    pub fn flag_transactional(&mut self) {
+        self.needs_transaction = true;
+    }
+
+    /// If true, the graph should be executed inside of a transaction.
+    pub fn needs_transaction(&self) -> bool {
+        self.needs_transaction
     }
 
     /// Returns a reference to the content of `node`, if the content is still present.

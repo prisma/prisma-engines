@@ -1,8 +1,7 @@
 use crate::{cursor_condition::CursorCondition, filter_conversion::AliasedCondition};
 use connector_interface::{QueryArguments, SkipAndLimit};
 use prisma_models::prelude::*;
-use prisma_query::ast::{Aliasable, Comparable, ConditionTree, Joinable, Select};
-use std::sync::Arc;
+use quaint::ast::{Aliasable, Comparable, ConditionTree, Joinable, Select};
 
 pub struct ManyRelatedRecordsBaseQuery<'a> {
     pub from_field: &'a RelationFieldRef,

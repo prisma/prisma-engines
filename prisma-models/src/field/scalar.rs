@@ -1,4 +1,4 @@
-use prisma_query::ast::*;
+use quaint::ast::*;
 
 use super::FieldManifestation;
 use crate::prelude::*;
