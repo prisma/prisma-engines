@@ -1,6 +1,6 @@
-//! # prisma-query
+//! # quaint
 //!
-//! prisma-query is an AST and database-specific visitors for creating SQL
+//! Quaint is an AST and database-specific visitors for creating SQL
 //! statements.
 //!
 //! Under construction and will go through several rounds of changes. Not meant
@@ -37,7 +37,7 @@
 //! The visitor returns the query as a string and its parameters as a vector.
 //!
 //! ```
-//! use prisma_query::{ast::*, visitor::{Sqlite, Visitor}};
+//! use quaint::{ast::*, visitor::{Sqlite, Visitor}};
 //!
 //! fn main() {
 //!     let conditions = "word"
@@ -74,10 +74,10 @@
 //! automatically.
 //!
 //! ```
-//! use prisma_query::{ast::*, connector::*};
+//! use quaint::{ast::*, connector::*};
 //!
 //! #[tokio::main]
-//! async fn main() -> Result<(), prisma_query::error::Error> {
+//! async fn main() -> Result<(), quaint::error::Error> {
 //!     let mut conn = Sqlite::new("test.db")?;
 //!     let query = Select::default().value(1);
 //!     let result = conn.query(query.into()).await?;
@@ -114,7 +114,7 @@ pub type Result<T> = std::result::Result<T, error::Error>;
 use lazy_static::lazy_static;
 
 lazy_static! {
-    static ref LOG_QUERIES: bool = std::env::var("PRISMA_LOG_QUERIES")
+    static ref LOG_QUERIES: bool = std::env::var("LOG_QUERIES")
         .map(|_| true)
         .unwrap_or(false);
 }

@@ -28,7 +28,7 @@ impl<'a> RowNumber<'a> {
 /// A number from 1 to n in specified order
 ///
 /// ```rust
-/// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
+/// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
 /// let fun = Function::from(row_number().order_by("created_at").partition_by("name"));
 ///
 /// let query = Select::from_table("users")

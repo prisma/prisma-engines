@@ -31,7 +31,7 @@ impl<'a> Select<'a> {
     /// Creates a new `SELECT` statement for the given table.
     ///
     /// ```rust
-    /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
     /// let query = Select::from_table("users");
     /// let (sql, _) = Sqlite::build(query);
     ///
@@ -41,7 +41,7 @@ impl<'a> Select<'a> {
     /// The table can be in multiple parts, defining the database.
     ///
     /// ```rust
-    /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
     /// let query = Select::from_table(("crm", "users"));
     /// let (sql, _) = Sqlite::build(query);
     ///
@@ -51,7 +51,7 @@ impl<'a> Select<'a> {
     /// It is also possible to use a nested `SELECT`.
     ///
     /// ```rust
-    /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
     /// let select = Table::from(Select::default().value(1)).alias("num");
     /// let query = Select::from_table(select.alias("num"));
     /// let (sql, params) = Sqlite::build(query);
@@ -73,7 +73,7 @@ impl<'a> Select<'a> {
     /// Selects a static value as the column.
     ///
     /// ```rust
-    /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
     /// let query = Select::default().value(1);
     /// let (sql, params) = Sqlite::build(query);
     ///
@@ -84,7 +84,7 @@ impl<'a> Select<'a> {
     /// Creating a qualified asterisk to a joined table:
     ///
     /// ```rust
-    /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
     /// let join = "dogs".on(("dogs", "slave_id").equals(Column::from(("cats", "master_id"))));
     ///
     /// let query = Select::from_table("cats")
@@ -110,7 +110,7 @@ impl<'a> Select<'a> {
     /// Adds a column to be selected.
     ///
     /// ```rust
-    /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
     /// let query = Select::from_table("users")
     ///     .column("name")
     ///     .column(("users", "id"))
@@ -131,7 +131,7 @@ impl<'a> Select<'a> {
     /// A bulk method to select multiple values.
     ///
     /// ```rust
-    /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
     /// let query = Select::from_table("users").columns(vec!["foo", "bar"]);
     /// let (sql, params) = Sqlite::build(query);
     ///
@@ -154,7 +154,7 @@ impl<'a> Select<'a> {
     /// [Comparable](trait.Comparable.html#required-methods) for more examples.
     ///
     /// ```rust
-    /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
     /// let query = Select::from_table("users").so_that("foo".equals("bar"));
     /// let (sql, params) = Sqlite::build(query);
     ///
@@ -175,7 +175,7 @@ impl<'a> Select<'a> {
     /// Adds `INNER JOIN` clause to the query.
     ///
     /// ```rust
-    /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
     /// let join = "posts".alias("p").on(("p", "user_id").equals(Column::from(("users", "id"))));
     /// let query = Select::from_table("users").inner_join(join);
     /// let (sql, _) = Sqlite::build(query);
@@ -196,7 +196,7 @@ impl<'a> Select<'a> {
     /// Adds `LEFT OUTER JOIN` clause to the query.
     ///
     /// ```rust
-    /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
     /// let join = "posts".alias("p").on(("p", "visible").equals(true));
     /// let query = Select::from_table("users").left_outer_join(join);
     /// let (sql, params) = Sqlite::build(query);
@@ -224,7 +224,7 @@ impl<'a> Select<'a> {
     /// Adds an ordering to the `ORDER BY` section.
     ///
     /// ```rust
-    /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
     /// let query = Select::from_table("users")
     ///     .order_by("foo")
     ///     .order_by("baz".ascend())
@@ -246,7 +246,7 @@ impl<'a> Select<'a> {
     /// This does not check if the grouping is actually valid in respect to aggregated columns.
     ///
     /// ```rust
-    /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
     /// let query = Select::from_table("users").column("foo").column("bar")
     ///     .group_by("foo")
     ///     .group_by("bar");
@@ -265,7 +265,7 @@ impl<'a> Select<'a> {
     /// Sets the `LIMIT` value.
     ///
     /// ```rust
-    /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
     /// let query = Select::from_table("users").limit(10);
     /// let (sql, params) = Sqlite::build(query);
     ///
@@ -279,7 +279,7 @@ impl<'a> Select<'a> {
     /// Sets the `OFFSET` value.
     ///
     /// ```rust
-    /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
     /// let query = Select::from_table("users").offset(10);
     /// let (sql, params) = Sqlite::build(query);
     ///

@@ -22,7 +22,7 @@ impl IntoIterator for ResultRow {
 /// through their position or using the column name.
 ///
 /// ```
-/// # use prisma_query::connector::*;
+/// # use quaint::connector::*;
 /// let names = vec!["id".to_string(), "name".to_string()];
 /// let rows = vec![vec!["1234".into(), "Musti".into()]];
 ///
@@ -74,7 +74,7 @@ impl<'a> ResultRowRef<'a> {
     /// that position.
     ///
     /// ```
-    /// # use prisma_query::connector::*;
+    /// # use quaint::connector::*;
     /// # let names = vec!["id".to_string(), "name".to_string()];
     /// # let rows = vec![vec!["1234".into(), "Musti".into()]];
     /// # let result_set = ResultSet::new(names, rows);
@@ -92,7 +92,7 @@ impl<'a> ResultRowRef<'a> {
     /// Take a value with the given column name from the row.
     ///
     /// ```
-    /// # use prisma_query::connector::*;
+    /// # use quaint::connector::*;
     /// # let names = vec!["id".to_string(), "name".to_string()];
     /// # let rows = vec![vec!["1234".into(), "Musti".into()]];
     /// # let result_set = ResultSet::new(names, rows);

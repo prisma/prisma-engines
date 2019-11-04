@@ -18,7 +18,7 @@ impl<'a> Delete<'a> {
     /// Creates a new `DELETE` statement for the given table.
     ///
     /// ```rust
-    /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
     /// let query = Delete::from_table("users");
     /// let (sql, _) = Sqlite::build(query);
     ///
@@ -39,7 +39,7 @@ impl<'a> Delete<'a> {
     /// [Comparable](trait.Comparable.html#required-methods) for more examples.
     ///
     /// ```rust
-    /// # use prisma_query::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
     /// let query = Delete::from_table("users").so_that("bar".equals(false));
     /// let (sql, params) = Sqlite::build(query);
     ///
