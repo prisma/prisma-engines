@@ -1,6 +1,7 @@
+use serde::Serialize;
 use user_facing_error_macros::*;
 
-#[derive(Debug, UserFacingError)]
+#[derive(Debug, UserFacingError, Serialize)]
 #[user_facing(
     code = "P1000",
     message = "\
@@ -16,7 +17,7 @@ pub struct IncorrectDatabaseCredentials {
     pub database_host: String,
 }
 
-#[derive(Debug, UserFacingError)]
+#[derive(Debug, UserFacingError, Serialize)]
 #[user_facing(
     code = "P1001",
     message = "\
@@ -32,7 +33,7 @@ pub struct DatabaseNotReachable {
     database_port: String,
 }
 
-#[derive(Debug, UserFacingError)]
+#[derive(Debug, UserFacingError, Serialize)]
 #[user_facing(
     code = "P1002",
     message = "\
@@ -51,7 +52,7 @@ pub struct DatabaseTimeout {
     database_port: String,
 }
 
-#[derive(Debug, UserFacingError)]
+#[derive(Debug, UserFacingError, Serialize)]
 #[user_facing(
     code = "P1003",
     message = "Database `${database_name}` does not exist on the database server at `${database_location}`."
@@ -69,7 +70,7 @@ pub struct DatabaseDoesNotExist {
     database_location: String,
 }
 
-#[derive(Debug, UserFacingError)]
+#[derive(Debug, UserFacingError, Serialize)]
 #[user_facing(
     code = "P1004",
     message = "The downloaded/provided binary `${binary_path}` is not compiled for platform `${platform}`"
@@ -82,7 +83,7 @@ pub struct IncompatibleBinary {
     platform: String,
 }
 
-#[derive(Debug, UserFacingError)]
+#[derive(Debug, UserFacingError, Serialize)]
 #[user_facing(
     code = "P1005",
     message = "Failed to spawn the binary `${binary_path}` process for platform `${platform}`"
@@ -95,7 +96,7 @@ pub struct UnableToStartTheQueryEngine {
     platform: String,
 }
 
-#[derive(Debug, UserFacingError)]
+#[derive(Debug, UserFacingError, Serialize)]
 #[user_facing(
     code = "P1006",
     message = "\
@@ -114,21 +115,21 @@ pub struct BinaryNotFound {
     generator_config: String,
 }
 
-#[derive(Debug, UserFacingError)]
+#[derive(Debug, UserFacingError, Serialize)]
 #[user_facing(
     code = "P1007",
     message = "Please try installing Prisma 2 CLI again with the `--unsafe-perm` option. <br /> Example: `npm i -g --unsafe-perm prisma2`"
 )]
 pub struct MissingWriteAccessToTheDownloadBinary;
 
-#[derive(Debug, UserFacingError)]
+#[derive(Debug, UserFacingError, Serialize)]
 #[user_facing(code = "P1008", message = "Operations timed out after `${time}`")]
 pub struct DatabaseOperationTimeout {
     /// Operation time in s or ms (if <1000ms)
     pub time: String,
 }
 
-#[derive(Debug, UserFacingError)]
+#[derive(Debug, UserFacingError, Serialize)]
 #[user_facing(
     code = "P1009",
     message = "Database `${database_name}` already exists on the database server at `${database_host}:${database_port}`"
@@ -145,7 +146,7 @@ pub struct DatabaseAlreadyExists {
     pub database_port: u16,
 }
 
-#[derive(Debug, UserFacingError)]
+#[derive(Debug, UserFacingError, Serialize)]
 #[user_facing(
     code = "P1010",
     message = "User `${database_user}` was denied access on the database `${database_name}`"
