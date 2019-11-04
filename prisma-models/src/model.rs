@@ -1,6 +1,6 @@
 use crate::prelude::*;
 use once_cell::sync::OnceCell;
-use prisma_query::ast::{Column, Table};
+use quaint::ast::{Column, Table};
 use std::sync::{Arc, Weak};
 use uuid::Uuid;
 

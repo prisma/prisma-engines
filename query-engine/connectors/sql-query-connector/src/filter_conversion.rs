@@ -1,6 +1,6 @@
 use connector_interface::filter::*;
 use prisma_models::prelude::*;
-use prisma_query::ast::*;
+use quaint::ast::*;
 
 #[derive(Clone, Copy, Debug)]
 /// A distinction in aliasing to separate the parent table and the joined data

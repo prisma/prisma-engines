@@ -15,7 +15,7 @@ pub use error::*;
 pub use sql_migration::*;
 
 use migration_connector::*;
-use prisma_query::connector::{MysqlParams, PostgresParams};
+use quaint::connector::{MysqlParams, PostgresParams};
 use serde_json;
 use sql_connection::{Mysql, Postgresql, Sqlite, SyncSqlConnection};
 use sql_database_migration_inferrer::*;

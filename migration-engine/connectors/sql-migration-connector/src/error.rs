@@ -51,15 +51,15 @@ impl From<SqlError> for ConnectorError {
     }
 }
 
-impl From<prisma_query::error::Error> for SqlError {
-    fn from(error: prisma_query::error::Error) -> Self {
+impl From<quaint::error::Error> for SqlError {
+    fn from(error: quaint::error::Error) -> Self {
         match error {
-            prisma_query::error::Error::DatabaseDoesNotExist { db_name } => Self::DatabaseDoesNotExist { db_name },
-            prisma_query::error::Error::DatabaseAccessDenied { db_name } => Self::DatabaseAccessDenied { db_name },
-            prisma_query::error::Error::AuthenticationFailed { user } => Self::AuthenticationFailed { user },
-            prisma_query::error::Error::ConnectTimeout => Self::ConnectTimeout,
-            prisma_query::error::Error::Timeout => Self::Timeout,
-            prisma_query::error::Error::TlsError { message } => Self::TlsError { message },
+            quaint::error::Error::DatabaseDoesNotExist { db_name } => Self::DatabaseDoesNotExist { db_name },
+            quaint::error::Error::DatabaseAccessDenied { db_name } => Self::DatabaseAccessDenied { db_name },
+            quaint::error::Error::AuthenticationFailed { user } => Self::AuthenticationFailed { user },
+            quaint::error::Error::ConnectTimeout => Self::ConnectTimeout,
+            quaint::error::Error::Timeout => Self::Timeout,
+            quaint::error::Error::TlsError { message } => Self::TlsError { message },
             e => SqlError::QueryError(e.into()),
         }
     }

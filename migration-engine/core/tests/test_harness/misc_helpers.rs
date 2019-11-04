@@ -200,7 +200,7 @@ fn fetch_db_name(url: &Url, default: &str) -> String {
 fn create_database<F, T, S>(url: Url, default_name: &str, root_path: &str, create_stmt: S, f: Rc<F>)
 where
     T: SyncSqlConnection,
-    F: Fn(Url) -> Result<T, prisma_query::error::Error>,
+    F: Fn(Url) -> Result<T, quaint::error::Error>,
     S: FnOnce(String) -> String,
 {
     let db_name = fetch_db_name(&url, default_name);
@@ -216,7 +216,7 @@ where
 fn with_database<F, T, S>(url: Url, default_name: &str, root_path: &str, create_stmt: S, f: Rc<F>) -> T
 where
     T: SyncSqlConnection,
-    F: Fn(Url) -> Result<T, prisma_query::error::Error>,
+    F: Fn(Url) -> Result<T, quaint::error::Error>,
     S: FnOnce(String) -> String,
 {
     match f(url.clone()) {

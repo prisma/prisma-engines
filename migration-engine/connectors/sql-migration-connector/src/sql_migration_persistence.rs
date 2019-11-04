@@ -2,8 +2,8 @@ use super::SqlFamily;
 use barrel::types;
 use chrono::*;
 use migration_connector::*;
-use prisma_query::ast::*;
-use prisma_query::connector::ResultSet;
+use quaint::ast::*;
+use quaint::connector::ResultSet;
 use serde_json;
 use sql_connection::SyncSqlConnection;
 use std::sync::Arc;
@@ -130,7 +130,7 @@ impl MigrationPersistence for SqlMigrationPersistence {
             SqlFamily::Sqlite | SqlFamily::Mysql => {
                 let id = self.connection.execute(insert.into()).unwrap();
                 match id {
-                    Some(prisma_query::ast::Id::Int(id)) => cloned.revision = id,
+                    Some(quaint::ast::Id::Int(id)) => cloned.revision = id,
                     _ => panic!("This insert must return an int"),
                 };
             }
@@ -202,7 +202,7 @@ impl SqlMigrationPersistence {
     fn table(&self) -> Table {
         match self.sql_family {
             SqlFamily::Sqlite => {
-                // sqlite case. Otherwise prisma-query produces invalid SQL
+                // sqlite case. Otherwise quaint produces invalid SQL
                 TABLE_NAME.to_string().into()
             }
             _ => (self.schema_name.to_string(), TABLE_NAME.to_string()).into(),

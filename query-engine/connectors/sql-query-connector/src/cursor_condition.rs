@@ -1,6 +1,6 @@
 use connector_interface::QueryArguments;
 use prisma_models::prelude::*;
-use prisma_query::ast::*;
+use quaint::ast::*;
 use std::sync::Arc;
 
 #[derive(Clone, Copy)]
