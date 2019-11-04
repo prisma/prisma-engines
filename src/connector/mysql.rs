@@ -75,7 +75,7 @@ impl TryFrom<Url> for MysqlParams {
             }
         }
 
-        let mut connection_limit = dbg!(num_cpus::get_physical() * 2 + 1);
+        let mut connection_limit = num_cpus::get_physical() * 2 + 1;
         let mut ssl_opts = my::SslOpts::default();
         let mut use_ssl = false;
 
