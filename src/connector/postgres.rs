@@ -15,6 +15,7 @@ use postgres_native_tls::MakeTlsConnector;
 use std::{borrow::Borrow, convert::TryFrom, time::Duration};
 use tokio_postgres::{config::SslMode, Client, Config};
 use url::Url;
+use std::borrow::Cow;
 
 pub(crate) const DEFAULT_SCHEMA: &str = "public";
 
@@ -113,6 +114,55 @@ impl SslParams {
 
 type ConnectionParams = (Vec<(String, String)>, Vec<(String, String)>);
 
+/// Wraps a connection url and exposes the parsing logic used by quaint, including default values.
+#[derive(Debug, Clone)]
+pub struct PostgresUrl(pub Url);
+
+impl PostgresUrl {
+    pub fn username<'a>(&'a self) -> Cow<'a, str> {
+        match percent_decode(self.0.username().as_bytes()).decode_utf8() {
+            Ok(username) => username,
+            Err(_) => {
+                #[cfg(not(feature = "tracing-log"))]
+                warn!("Couldn't decode username to UTF-8, using the non-decoded version.");
+                #[cfg(feature = "tracing-log")]
+                tracing::warn!("Couldn't decode username to UTF-8, using the non-decoded version.");
+
+                self.0.username().into()
+            }
+        }
+    }
+
+    pub fn host(&self) -> &str {
+        self.0.host_str().unwrap_or("localhost")
+    }
+
+    pub fn dbname(&self) -> &str {
+        match self.0.path_segments() {
+            Some(mut segments) => segments.next().unwrap_or("postgres"),
+            None => "postgres",
+        }
+    }
+
+    pub fn password<'a>(&'a self) -> Cow<'a, str> {
+        match self.0
+            .password()
+            .and_then(|pw| percent_decode(pw.as_bytes()).decode_utf8().ok())
+            {
+                Some(password) => {
+                    password
+                }
+                None => {
+                    self.0.password().unwrap_or("").into()
+                }
+            }
+    }
+
+    pub fn port(&self) -> u16 {
+        self.0.port().unwrap_or(5432)
+    }
+}
+
 impl TryFrom<Url> for PostgresParams {
     type Error = Error;
 
@@ -132,44 +182,15 @@ impl TryFrom<Url> for PostgresParams {
             url.query_pairs_mut().append_pair(&k, &v);
         });
 
+
+        let url = PostgresUrl(url);
         let mut config = Config::new();
 
-        match percent_decode(url.username().as_bytes()).decode_utf8() {
-            Ok(username) => {
-                config.user(username.borrow());
-            }
-            Err(_) => {
-                #[cfg(not(feature = "tracing-log"))]
-                warn!("Couldn't decode username to UTF-8, using the non-decoded version.");
-                #[cfg(feature = "tracing-log")]
-                tracing::warn!("Couldn't decode username to UTF-8, using the non-decoded version.");
-
-                config.user(url.username());
-            }
-        }
-
-        match url
-            .password()
-            .and_then(|pw| percent_decode(pw.as_bytes()).decode_utf8().ok())
-        {
-            Some(password) => {
-                let pw: &str = password.borrow();
-                config.password(pw);
-            }
-            None => {
-                config.password(url.password().unwrap_or(""));
-            }
-        }
-
-        config.host(url.host_str().unwrap_or("localhost"));
-        config.port(url.port().unwrap_or(5432));
-
-        let dbname = match url.path_segments() {
-            Some(mut segments) => segments.next().unwrap_or("postgres"),
-            None => "postgres",
-        };
-
-        config.dbname(dbname);
+        config.user(url.username().borrow());
+        config.password(url.password().borrow() as &str);
+        config.host(url.host());
+        config.port(url.port());
+        config.dbname(url.dbname());
         config.connect_timeout(Duration::from_millis(5000));
 
         let mut connection_limit = num_cpus::get_physical() * 2 + 1;
@@ -252,7 +273,7 @@ impl TryFrom<Url> for PostgresParams {
             connection_limit: u32::try_from(connection_limit).unwrap(),
             schema,
             config,
-            dbname: dbname.to_string(),
+            dbname: url.dbname().to_string(),
             ssl_params: SslParams {
                 ssl_accept_mode,
                 certificate_file,

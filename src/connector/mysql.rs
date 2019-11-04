@@ -1,6 +1,7 @@
 mod conversion;
 mod error;
 
+use std::borrow::Cow;
 use mysql_async::{self as my, prelude::Queryable as _};
 use percent_encoding::percent_decode;
 use std::{convert::TryFrom, path::Path, time::Duration};
@@ -28,6 +29,61 @@ pub struct MysqlParams {
 
 type ConnectionParams = (Vec<(String, String)>, Vec<(String, String)>);
 
+/// Wraps a connection url and exposes the parsing logic used by quaint, including default values.
+#[derive(Debug, Clone)]
+pub struct MysqlUrl(pub Url);
+
+impl MysqlUrl {
+    pub fn username<'a>(&'a self) -> Cow<'a, str> {
+        match percent_decode(self.0.username().as_bytes()).decode_utf8() {
+            Ok(username) => {
+                username
+            }
+            Err(_) => {
+                #[cfg(not(feature = "tracing-log"))]
+                warn!("Couldn't decode username to UTF-8, using the non-decoded version.");
+                #[cfg(feature = "tracing-log")]
+                tracing::warn!("Couldn't decode username to UTF-8, using the non-decoded version.");
+
+                self.0.username().into()
+            }
+        }
+
+    }
+
+    pub fn password<'a>(&'a self) -> Option<Cow<'a, str>> {
+        match self.0
+            .password()
+            .and_then(|pw| percent_decode(pw.as_bytes()).decode_utf8().ok())
+        {
+            Some(password) => {
+                Some(password)
+            }
+            None => {
+                self.0.password().map(|s| s.into())
+            }
+        }
+
+    }
+
+    pub fn dbname(&self) -> &str {
+        match self.0.path_segments() {
+            Some(mut segments) => segments.next().unwrap_or("mysql"),
+            None => "mysql",
+        }
+
+    }
+
+    pub fn host(&self) -> &str {
+        self.0.host_str().unwrap_or("localhost")
+    }
+
+    pub fn port(&self) -> u16 {
+        self.0.port().unwrap_or(3306)
+    }
+}
+
+
 impl TryFrom<Url> for MysqlParams {
     type Error = Error;
 
@@ -47,33 +103,11 @@ impl TryFrom<Url> for MysqlParams {
             url.query_pairs_mut().append_pair(&k, &v);
         });
 
+        let url = MysqlUrl(url);
         let mut config = my::OptsBuilder::new();
 
-        match percent_decode(url.username().as_bytes()).decode_utf8() {
-            Ok(username) => {
-                config.user(Some(username.into_owned()));
-            }
-            Err(_) => {
-                #[cfg(not(feature = "tracing-log"))]
-                warn!("Couldn't decode username to UTF-8, using the non-decoded version.");
-                #[cfg(feature = "tracing-log")]
-                tracing::warn!("Couldn't decode username to UTF-8, using the non-decoded version.");
-
-                config.user(Some(url.username()));
-            }
-        }
-
-        match url
-            .password()
-            .and_then(|pw| percent_decode(pw.as_bytes()).decode_utf8().ok())
-        {
-            Some(password) => {
-                config.pass(Some(password));
-            }
-            None => {
-                config.pass(url.password());
-            }
-        }
+        config.user(Some(url.username()));
+        config.pass(url.password());
 
         let mut connection_limit = num_cpus::get_physical() * 2 + 1;
         let mut ssl_opts = my::SslOpts::default();
@@ -126,14 +160,9 @@ impl TryFrom<Url> for MysqlParams {
             };
         }
 
-        let dbname = match url.path_segments() {
-            Some(mut segments) => segments.next().unwrap_or("mysql"),
-            None => "mysql",
-        };
-
-        config.db_name(Some(dbname));
-        config.ip_or_hostname(url.host_str().unwrap_or("localhost"));
-        config.tcp_port(url.port().unwrap_or(3306));
+        config.db_name(Some(url.dbname()));
+        config.ip_or_hostname(url.host());
+        config.tcp_port(url.port());
         config.stmt_cache_size(Some(1000));
         config.conn_ttl(Some(Duration::from_secs(5)));
 
@@ -144,7 +173,7 @@ impl TryFrom<Url> for MysqlParams {
         Ok(Self {
             connection_limit: u32::try_from(connection_limit).unwrap(),
             config,
-            dbname: dbname.to_string(),
+            dbname: url.dbname().to_string(),
         })
     }
 }
