@@ -35,6 +35,9 @@ indexmap = { version = "1.0", features = [ "serde-1" ] }
 itertools = "0.8"
 url = "2.1"
 clap = "2.33"
+metrics-runtime = "0.12"
+metrics-core = "0.5"
+metrics = "0.12"
 
 tracing = "0.1"
 tracing-log = "0.1"

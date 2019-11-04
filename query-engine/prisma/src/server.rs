@@ -14,6 +14,9 @@ use hyper::service::{make_service_fn, service_fn};
 use hyper::{Body, Error, Method, Request, Response, Server, StatusCode};
 use serde_json::json;
 use std::{sync::Arc, time::Instant};
+use metrics_runtime::{Receiver, Controller, observers::PrometheusBuilder};
+use metrics_core::{Builder, Observe, Drain};
+use metrics::{timing, counter};
 
 #[derive(RustEmbed)]
 #[folder = "query-engine/prisma/static_files"]
@@ -22,6 +25,7 @@ struct StaticFiles;
 pub(crate) struct RequestContext {
     context: PrismaContext,
     graphql_request_handler: GraphQlRequestHandler,
+    metrics_controller: Controller,
 }
 
 pub struct HttpServer;
@@ -29,11 +33,15 @@ pub struct HttpServer;
 impl HttpServer {
     pub async fn run(address: ([u8; 4], u16), legacy_mode: bool) -> PrismaResult<()> {
         let now = Instant::now();
+        let receiver = Receiver::builder().build().expect("Failed to create metrics receiver");
 
         let ctx = Arc::new(RequestContext {
             context: PrismaContext::new(legacy_mode)?,
             graphql_request_handler: GraphQlRequestHandler,
+            metrics_controller: receiver.controller(),
         });
+
+        receiver.install();
 
         let service = make_service_fn(|_| {
             let ctx = ctx.clone();
@@ -55,10 +63,11 @@ impl HttpServer {
     async fn routes(ctx: Arc<RequestContext>, req: Request<Body>) -> std::result::Result<Response<Body>, Error> {
         let res = match (req.method(), req.uri().path()) {
             (&Method::POST, "/") => {
+                let start = Instant::now();
                 let (parts, chunks) = req.into_parts();
                 let body_bytes = chunks.try_concat().await?;
 
-                match serde_json::from_slice(body_bytes.as_ref()) {
+                let res = match serde_json::from_slice(body_bytes.as_ref()) {
                     Ok(body) => {
                         let req = PrismaRequest {
                             body,
@@ -77,11 +86,17 @@ impl HttpServer {
                         *bad_request.status_mut() = StatusCode::BAD_REQUEST;
                         bad_request
                     }
-                }
+                };
+
+                timing!("query-engine.response.time", start, Instant::now());
+                counter!("query-engine.request.count", 1);
+
+                res
             }
 
             (&Method::GET, "/") => Self::playground_handler(),
             (&Method::GET, "/status") => Self::status_handler(),
+            (&Method::GET, "/metrics") => Self::metrics_handler(ctx),
 
             (&Method::GET, "/sdl") => Self::sdl_handler(ctx),
             (&Method::GET, "/dmmf") => Self::dmmf_handler(ctx),
@@ -169,6 +184,17 @@ impl HttpServer {
             .status(StatusCode::OK)
             .header(header::CONTENT_TYPE, "application/json")
             .body(Body::from(bytes))
+            .unwrap()
+    }
+
+    fn metrics_handler(cx: Arc<RequestContext>) -> Response<Body> {
+        let mut observer = PrometheusBuilder::new().build();
+        cx.metrics_controller.observe(&mut observer);
+
+        Response::builder()
+            .status(StatusCode::OK)
+            .header(header::CONTENT_TYPE, "application/text")
+            .body(Body::from(observer.drain()))
             .unwrap()
     }
 }
