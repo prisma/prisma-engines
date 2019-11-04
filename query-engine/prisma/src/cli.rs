@@ -33,7 +33,6 @@ pub struct GetConfigInput {
 
 pub enum CliCommand {
     Dmmf(BuildMode),
-    DmmfToDml(DmmfToDmlInput),
     DmmfFileToDml(DmmfFileToDmlInput),
     GetConfig(GetConfigInput),
 }
@@ -48,11 +47,6 @@ impl CliCommand {
             };
 
             Some(Self::Dmmf(build_mode))
-        } else if matches.is_present("dmmf_to_dml") {
-            let input = matches.value_of("dmmf_to_dml").unwrap();
-            let input: DmmfToDmlInput = serde_json::from_str(input).unwrap();
-
-            Some(Self::DmmfToDml(input))
         } else if matches.is_present("dmmf_file_to_dml") {
             let path = matches.value_of("dmmf_file_to_dml").unwrap();
             let file = File::open(path)
@@ -74,7 +68,6 @@ impl CliCommand {
     pub fn execute(self) -> PrismaResult<()> {
         match self {
             CliCommand::Dmmf(build_mode) => Self::dmmf(build_mode),
-            CliCommand::DmmfToDml(input) => Self::dmmf_to_dml(input),
             CliCommand::DmmfFileToDml(input) => Self::dmmf_file_to_dml(input),
             CliCommand::GetConfig(input) => Self::get_config(input),
         }

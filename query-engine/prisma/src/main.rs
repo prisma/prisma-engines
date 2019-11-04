@@ -81,16 +81,9 @@ async fn main() -> Result<(), AnyError> {
                         .required(false),
                 )
                 .arg(
-                    Arg::with_name("dmmf_to_dml")
-                        .long("dmmf_to_dml")
-                        .help("Convert the DMMF to a data model")
-                        .takes_value(true)
-                        .required(false),
-                )
-                .arg(
                     Arg::with_name("dmmf_file_to_dml")
                         .long("dmmf_file_to_dml")
-                        .help("Converts the given DMMF json file to a data model")
+                        .help("Converts the given DMMF JSON file to a data model")
                         .takes_value(true)
                         .required(false),
                 )
