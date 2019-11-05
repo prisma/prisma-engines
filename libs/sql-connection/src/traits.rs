@@ -5,7 +5,7 @@ use quaint::{
 };
 
 /// A generic synchronous SQL connection interface.
-pub trait SyncSqlConnection {
+pub trait SyncSqlConnection: 'static {
     /// See
     /// https://prisma.github.io/quaint/quaint/connector/trait.Queryable.html#tymethod.execute
     ///

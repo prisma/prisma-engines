@@ -12,19 +12,17 @@ mod sql_schema_calculator;
 mod sql_schema_differ;
 
 pub use error::*;
+pub use sql_connection::SqlFamily;
 pub use sql_migration::*;
 
 use migration_connector::*;
-use quaint::connector::{MysqlParams, PostgresParams};
-use serde_json;
-use sql_connection::{Mysql, Postgresql, Sqlite, SyncSqlConnection};
+use sql_connection::{GenericSqlConnection, SyncSqlConnection};
 use sql_database_migration_inferrer::*;
 use sql_database_step_applier::*;
 use sql_destructive_changes_checker::*;
 use sql_migration_persistence::*;
 use sql_schema_describer::SqlSchemaDescriberBackend;
-use std::{convert::TryFrom, fs, path::PathBuf, sync::Arc};
-use url::Url;
+use std::{fs, path::PathBuf, sync::Arc};
 
 pub type Result<T> = std::result::Result<T, SqlError>;
 
@@ -42,90 +40,43 @@ pub struct SqlMigrationConnector {
     pub database_introspector: Arc<dyn SqlSchemaDescriberBackend + Send + Sync + 'static>,
 }
 
-#[derive(Debug, Copy, Clone, PartialEq)]
-pub enum SqlFamily {
-    Sqlite,
-    Postgres,
-    Mysql,
-}
-
-impl SqlFamily {
-    fn connector_type_string(&self) -> &'static str {
-        match self {
-            SqlFamily::Postgres => "postgresql",
-            SqlFamily::Mysql => "mysql",
-            SqlFamily::Sqlite => "sqlite",
-        }
-    }
-}
-
 impl SqlMigrationConnector {
-    pub fn postgres(url_str: &str, pooled: bool) -> crate::Result<Self> {
-        let url = Url::parse(url_str)?;
-        let params = PostgresParams::try_from(url.clone())?;
-
-        let schema = params.schema.clone();
-
-        let conn = if pooled {
-            let pool = Postgresql::new_pooled(url.clone())?;
-
-            // Postgres connection pools are lazy, we need to query to fail early when the database
-            // is not reachable.
-            pool.query_raw("SELECT 1", &[])?;
-
-            pool
+    pub fn new(url_str: &str, pooled: bool) -> std::result::Result<Self, ConnectorError> {
+        let connection = if pooled {
+            GenericSqlConnection::new_pooled(url_str, Some("lift"))?
         } else {
-            Postgresql::new_unpooled(url.clone())?
+            GenericSqlConnection::new_unpooled(url_str, Some("lift"))?
         };
+
+        let schema_name = connection
+            .connection_info()
+            .schema_name()
+            .unwrap_or_else(|| "lift".to_owned());
+        let file_path = connection.connection_info().file_path().map(|s| s.to_owned());
+        let sql_family = connection.sql_family();
+        let connection = Arc::new(connection);
+
+        // async connections can be lazy, so we issue a simple query to fail early if the database
+        // is not reachable.
+        connection.query_raw("SELECT 1", &[])?;
 
         Ok(Self::create_connector(
             url_str,
-            Arc::new(conn),
-            SqlFamily::Postgres,
-            schema,
-            None,
+            connection,
+            sql_family,
+            schema_name,
+            file_path,
         ))
     }
 
-    pub fn mysql(url_str: &str, pooled: bool) -> crate::Result<Self> {
-        let url = Url::parse(url_str)?;
-        let params = MysqlParams::try_from(url.clone())?;
-
-        let schema = params.dbname.clone();
-
-        let conn = if pooled {
-            Mysql::new_pooled(url)?
-        } else {
-            Mysql::new_unpooled(url)?
-        };
-
-        // Async MySQL connections are lazy - we have to run a query to confirm that the schema we
-        // connected to exists.
-        if !schema.is_empty() {
-            conn.query_raw("SELECT 1 + 1", &[])?;
-        }
-
-        Ok(Self::create_connector(
-            url_str,
-            Arc::new(conn),
-            SqlFamily::Mysql,
-            schema,
-            None,
-        ))
+    pub fn postgres(url_str: &str, pooled: bool) -> std::result::Result<Self, ConnectorError> {
+        Self::new(url_str, pooled)
     }
-
-    pub fn sqlite(url: &str) -> crate::Result<Self> {
-        let schema_name = "lift";
-        let conn = Sqlite::new(url, schema_name)?;
-        let file_path = conn.file_path().to_owned();
-
-        Ok(Self::create_connector(
-            url,
-            Arc::new(conn),
-            SqlFamily::Sqlite,
-            schema_name.to_owned(),
-            Some(file_path),
-        ))
+    pub fn sqlite(url_str: &str) -> std::result::Result<Self, ConnectorError> {
+        Self::new(url_str, true)
+    }
+    pub fn mysql(url_str: &str, pooled: bool) -> std::result::Result<Self, ConnectorError> {
+        Self::new(url_str, pooled)
     }
 
     fn create_connector(

@@ -2,7 +2,7 @@ use clap::ArgMatches;
 use failure::Fail;
 use itertools::Itertools;
 use migration_connector::*;
-use sql_migration_connector::{SqlError, SqlMigrationConnector};
+use sql_migration_connector::SqlMigrationConnector;
 use std::collections::HashMap;
 use url::Url;
 
@@ -146,7 +146,7 @@ fn create_postgres_admin_conn(mut url: Url) -> crate::Result<SqlMigrationConnect
             url.set_path(database_name);
             match SqlMigrationConnector::postgres(url.as_str(), false) {
                 // If the database does not exist, try the next one.
-                Err(SqlError::DatabaseDoesNotExist { .. }) => None,
+                Err(migration_connector::ConnectorError::DatabaseDoesNotExist { .. }) => None,
                 // If the outcome is anything else, use this.
                 other_outcome => Some(other_outcome),
             }

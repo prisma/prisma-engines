@@ -1,7 +1,7 @@
 use crate::{pooling::*, traits::{SqlConnection, SyncSqlConnection}};
 use quaint::{
     ast::*,
-    connector::{self, ResultSet},
+    connector::{self, ResultSet, MysqlUrl},
     error::Error as QueryError,
     pool::{MysqlManager},
 };
@@ -13,6 +13,7 @@ use url::Url;
 /// query interfaces.
 pub struct Mysql {
     conn: ConnectionPool<connector::Mysql, MysqlManager>,
+    url: MysqlUrl,
     // TODO: remove this when we delete the sync interface
     runtime: Runtime,
 }
@@ -20,24 +21,30 @@ pub struct Mysql {
 impl Mysql {
     /// Create a new single connection.
     pub fn new_unpooled(url: Url) -> Result<Self, QueryError> {
-        let conn = connector::Mysql::from_params(url.try_into()?)?;
+        let conn = connector::Mysql::from_params(url.clone().try_into()?)?;
         let handle = ConnectionPool::Single(conn);
 
         Ok(Mysql {
             conn: handle,
+            url: MysqlUrl(url),
             runtime: super::default_runtime(),
         })
     }
 
     /// Create a new connection pool.
     pub fn new_pooled(url: Url) -> Result<Self, QueryError> {
-        let pool = quaint::pool::mysql(url)?;
+        let pool = quaint::pool::mysql(url.clone())?;
         let handle = ConnectionPool::Pool(pool);
 
         Ok(Mysql {
             conn: handle,
+            url: MysqlUrl(url),
             runtime: super::default_runtime(),
         })
+    }
+
+    pub(crate) fn url(&self) -> MysqlUrl {
+        self.url.clone()
     }
 
     async fn get_connection<'a>(&'a self) -> Result<ConnectionHandle<'a, connector::Mysql, MysqlManager>, QueryError> {

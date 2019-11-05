@@ -115,41 +115,39 @@ fn steps_equivalence_criteria_is_satisfied_when_leaving_watch_mode() {
     });
 }
 
-#[test]
-fn must_handle_additional_steps_when_transitioning_out_of_watch_mode() {
-    test_each_connector(|test_setup, api| {
-        let migration_persistence = api.migration_persistence();
+#[test_each_connector]
+fn must_handle_additional_steps_when_transitioning_out_of_watch_mode(api: &TestApi) {
+    let migration_persistence = api.migration_persistence();
 
-        let steps1 = vec![
-            create_model_step("Test"),
-            create_field_step("Test", "id", "Int"),
-            create_id_directive_step("Test", "id"),
-        ];
+    let steps1 = vec![
+        create_model_step("Test"),
+        create_field_step("Test", "id", "Int"),
+        create_id_directive_step("Test", "id"),
+    ];
 
-        let _ = apply_migration(test_setup, api, steps1.clone(), "watch-0001");
+    api.apply_migration(steps1.clone(), "watch-0001");
 
-        let steps2 = vec![create_field_step("Test", "field1", "String")];
-        let _ = apply_migration(test_setup, api, steps2.clone(), "watch-0002");
+    let steps2 = vec![create_field_step("Test", "field1", "String")];
+    api.apply_migration(steps2.clone(), "watch-0002");
 
-        let custom_migration_id = "a-custom-migration-id";
-        let additional_steps = vec![create_field_step("Test", "field2", "String")];
-        let mut final_steps = Vec::new();
+    let custom_migration_id = "a-custom-migration-id";
+    let additional_steps = vec![create_field_step("Test", "field2", "String")];
+    let mut final_steps = Vec::new();
 
-        final_steps.append(&mut steps1.clone());
-        final_steps.append(&mut steps2.clone());
-        final_steps.append(&mut additional_steps.clone());
+    final_steps.append(&mut steps1.clone());
+    final_steps.append(&mut steps2.clone());
+    final_steps.append(&mut additional_steps.clone());
 
-        let final_db_schema = apply_migration(test_setup, api, final_steps, custom_migration_id).sql_schema;
-        assert_eq!(final_db_schema.tables.len(), 1);
-        let table = final_db_schema.table_bang("Test");
-        assert_eq!(table.columns.len(), 3);
-        table.column_bang("id");
-        table.column_bang("field1");
-        table.column_bang("field2");
+    let final_db_schema = api.apply_migration(final_steps, custom_migration_id).sql_schema;
+    assert_eq!(final_db_schema.tables.len(), 1);
+    let table = final_db_schema.table_bang("Test");
+    assert_eq!(table.columns.len(), 3);
+    table.column_bang("id");
+    table.column_bang("field1");
+    table.column_bang("field2");
 
-        let migrations = migration_persistence.load_all();
-        assert_eq!(migrations[0].name, "watch-0001");
-        assert_eq!(migrations[1].name, "watch-0002");
-        assert_eq!(migrations[2].name, custom_migration_id);
-    });
+    let migrations = migration_persistence.load_all();
+    assert_eq!(migrations[0].name, "watch-0001");
+    assert_eq!(migrations[1].name, "watch-0002");
+    assert_eq!(migrations[2].name, custom_migration_id);
 }

@@ -9,6 +9,7 @@ use jsonrpc_core::types::error::Error as JsonRpcError;
 use jsonrpc_core::IoHandler;
 use jsonrpc_core::*;
 use jsonrpc_stdio_server::ServerBuilder;
+use sql_connection::SUPPORTED_SCHEMES as SUPPORTED_SQL_SCHEMES;
 use sql_migration_connector::SqlMigrationConnector;
 use std::{io, sync::Arc};
 use tokio_threadpool::blocking;
@@ -109,9 +110,7 @@ impl RpcApi {
         })?;
 
         let connector = match source.connector_type() {
-            "sqlite" => SqlMigrationConnector::sqlite(&source.url().value)?,
-            "postgresql" => SqlMigrationConnector::postgres(&source.url().value, true)?,
-            "mysql" => SqlMigrationConnector::mysql(&source.url().value, true)?,
+            scheme if SUPPORTED_SQL_SCHEMES.contains(&scheme) => SqlMigrationConnector::new(&source.url().value, true)?,
             x => unimplemented!("Connector {} is not supported yet", x),
         };
 

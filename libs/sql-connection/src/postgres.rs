@@ -1,7 +1,7 @@
 use crate::{pooling::*, traits::*};
 use quaint::{
     ast::*,
-    connector::{self, ResultSet},
+    connector::{self, ResultSet, PostgresUrl},
     error::Error as QueryError,
     pool::{PostgresManager},
 };
@@ -15,16 +15,18 @@ pub struct Postgresql {
     // TODO: remove this when we delete the sync interface
     runtime: Runtime,
     conn: ConnectionPool<connector::PostgreSql, PostgresManager>,
+    url: PostgresUrl,
 }
 
 impl Postgresql {
     /// Create a new connection pool.
     pub fn new_pooled(url: Url) -> Result<Self, QueryError> {
-        let pool = quaint::pool::postgres(url)?;
+        let pool = quaint::pool::postgres(url.clone())?;
         let handle = ConnectionPool::Pool(pool);
 
         Ok(Postgresql {
             conn: handle,
+            url: PostgresUrl(url),
             runtime: super::default_runtime(),
         })
     }
@@ -32,10 +34,17 @@ impl Postgresql {
     /// Create a new single connection.
     pub fn new_unpooled(url: Url) -> Result<Self, QueryError> {
         let runtime = super::default_runtime();
-        let conn = runtime.block_on(connector::PostgreSql::from_params(url.try_into()?))?;
+        let conn = runtime.block_on(connector::PostgreSql::from_params(url.clone().try_into()?))?;
         let handle = ConnectionPool::Single(conn);
 
-        Ok(Postgresql { conn: handle, runtime })
+        Ok(Postgresql { conn: handle, runtime,
+
+            url: PostgresUrl(url),
+        })
+    }
+
+    pub(crate) fn url(&self) -> PostgresUrl {
+        self.url.clone()
     }
 
     async fn get_connection<'a>(

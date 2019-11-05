@@ -2,16 +2,10 @@ use crate::test_harness::{Mysql, Postgresql, Sqlite, SyncSqlConnection};
 use barrel::{Migration, SqlVariant};
 use introspection_connector::IntrospectionConnector;
 use pretty_assertions::assert_eq;
+use sql_connection::SqlFamily;
 use sql_introspection_connector::*;
 use std::{rc::Rc, sync::Arc};
 use url::Url;
-
-#[derive(Debug, Copy, Clone, PartialEq)]
-pub enum SqlFamily {
-    Sqlite,
-    Postgres,
-    Mysql,
-}
 
 pub struct TestSetup {
     pub sql_family: SqlFamily,
