@@ -1,4 +1,6 @@
-use crate::{DropColumn, DropTable, DropTables, SqlError, SqlMigration, SqlMigrationStep, SqlResult, TableChange};
+use crate::{
+    AlterColumn, DropColumn, DropTable, DropTables, SqlError, SqlMigration, SqlMigrationStep, SqlResult, TableChange,
+};
 use migration_connector::*;
 use quaint::ast::*;
 use sql_connection::SyncSqlConnection;
@@ -33,16 +35,10 @@ impl SqlDestructiveChangesChecker {
         Ok(())
     }
 
-    /// Emit a warning when we drop a column that contains non-null values.
-    fn check_column_drop(
-        &self,
-        drop_column: &DropColumn,
-        table: &sql_schema_describer::Table,
-        diagnostics: &mut DestructiveChangeDiagnostics,
-    ) -> SqlResult<()> {
+    fn count_values_in_column(&self, column_name: &str, table: &sql_schema_describer::Table) -> SqlResult<i64> {
         let query = Select::from_table((self.schema_name.as_str(), table.name.as_str()))
-            .value(count(quaint::ast::Column::new(drop_column.name.as_str())))
-            .so_that(drop_column.name.as_str().is_not_null());
+            .value(count(quaint::ast::Column::new(column_name)))
+            .so_that(column_name.is_not_null());
 
         let values_count: i64 = self
             .database
@@ -59,6 +55,18 @@ impl SqlDestructiveChangesChecker {
                     })
             })?;
 
+        Ok(values_count)
+    }
+
+    /// Emit a warning when we drop a column that contains non-null values.
+    fn check_column_drop(
+        &self,
+        drop_column: &DropColumn,
+        table: &sql_schema_describer::Table,
+        diagnostics: &mut DestructiveChangeDiagnostics,
+    ) -> SqlResult<()> {
+        let values_count = self.count_values_in_column(&drop_column.name, table)?;
+
         if values_count > 0 {
             diagnostics.add_warning(MigrationWarning {
                 description: format!(
@@ -67,6 +75,31 @@ impl SqlDestructiveChangesChecker {
                     table_name=&table.name,
                     values_count=values_count,
                 )
+            })
+        }
+
+        Ok(())
+    }
+
+    /// Emit a warning when we alter a column that contains non-null values. We will implement
+    /// non-destructive alter column for a subset of changes in the future, but at the moment all
+    /// alter columns are destructive.
+    fn check_alter_column(
+        &self,
+        alter_column: &AlterColumn,
+        table: &sql_schema_describer::Table,
+        diagnostics: &mut DestructiveChangeDiagnostics,
+    ) -> SqlResult<()> {
+        let values_count = self.count_values_in_column(&alter_column.name, table)?;
+
+        if values_count > 0 {
+            diagnostics.add_warning(MigrationWarning {
+                description: format!(
+                                 "You are about to alter the column `{column_name}` on the `{table_name}` table, which still contains {values_count} non-null values. The data in that column will be lost.",
+                                 column_name=alter_column.name,
+                                 table_name=&table.name,
+                                 values_count=values_count,
+                             )
             })
         }
 
@@ -81,26 +114,27 @@ impl DestructiveChangesChecker<SqlMigration> for SqlDestructiveChangesChecker {
         for step in &database_migration.original_steps {
             match step {
                 SqlMigrationStep::AlterTable(alter_table) => {
+                    // The table in alter_table is the updated table, but we want to
+                    // check against the current state of the table.
+                    let before_table = database_migration
+                        .before
+                        .get_table(&alter_table.table.name)
+                        .ok_or_else(|| {
+                            SqlError::Generic(format!(
+                                "Internal Error: altering previously-unknown table {}",
+                                &alter_table.table.name
+                            ))
+                        })?;
+
                     alter_table
                         .changes
                         .iter()
                         .map(|change| match *change {
                             TableChange::DropColumn(ref drop_column) => {
-                                // The table in alter_table is the updated table, but we want to
-                                // check against the current state of the table.
-                                //
-                                // TODO: discuss whether Generic is the right error variant (should
-                                // we have an InvariantViolation variant or similar?)
-                                let before_table = database_migration
-                                    .before
-                                    .get_table(&alter_table.table.name)
-                                    .ok_or_else(|| {
-                                        SqlError::Generic(format!(
-                                            "Internal Error: dropping column {} on previously-unknown table {}",
-                                            drop_column.name, &alter_table.table.name
-                                        ))
-                                    })?;
                                 self.check_column_drop(drop_column, before_table, &mut diagnostics)
+                            }
+                            TableChange::AlterColumn(ref alter_column) => {
+                                self.check_alter_column(alter_column, before_table, &mut diagnostics)
                             }
                             _ => Ok(()),
                         })
