@@ -166,3 +166,76 @@ fn dropping_a_column_with_non_null_values_should_warn(api: &TestApi) {
             }]
         );
 }
+
+#[test_each_connector]
+fn altering_a_column_without_non_null_values_should_not_warn(api: &TestApi) {
+    let dm = r#"
+        model Test {
+            id String @id @default(cuid())
+            puppiesCount Int?
+        }
+    "#;
+
+    let original_database_schema = api.infer_and_apply(&dm).sql_schema;
+
+    let insert = Insert::multi_into((SCHEMA_NAME, "Test"), vec!["id"])
+        .values(vec!["a"])
+        .values(vec!["b"]);
+
+    api.database().execute(insert.into()).unwrap();
+
+    let dm2 = r#"
+        model Test {
+            id String @id @default(cuid())
+            puppiesCount Float?
+        }
+    "#;
+
+    let result = api.infer_and_apply(&dm2);
+    let final_database_schema = &result.sql_schema;
+
+    assert_ne!(&original_database_schema, final_database_schema);
+    assert!(result.migration_output.warnings.is_empty());
+}
+
+#[test_each_connector]
+fn altering_a_column_with_non_null_values_should_warn(api: &TestApi) {
+    let dm = r#"
+        model Test {
+            id String @id @default(cuid())
+            age Int?
+        }
+    "#;
+
+    let original_database_schema = api.infer_and_apply(&dm).sql_schema;
+
+    let insert = Insert::multi_into((SCHEMA_NAME, "Test"), vec!["id", "age"])
+        .values(("a", 12))
+        .values(("b", 22));
+
+    api.database().execute(insert.into()).unwrap();
+
+    let dm2 = r#"
+        model Test {
+            id String @id @default(cuid())
+            age Float?
+        }
+    "#;
+
+    let result = api.infer_and_apply(&dm2);
+    let final_database_schema = result.sql_schema;
+
+    // The schema should not change because the migration should not run if there are warnings
+    // and the force flag isn't passed.
+    assert_eq!(original_database_schema, final_database_schema);
+
+    assert_eq!(
+        result.migration_output.warnings,
+        &[MigrationWarning {
+            description:
+                "You are about to alter the column `age` on the `Test` table, which still contains 2 non-null values. \
+                 The data in that column will be lost."
+                    .to_owned()
+        }]
+    );
+}
