@@ -25,6 +25,14 @@ pub struct TestApi {
 }
 
 impl TestApi {
+    pub fn database(&self) -> &Arc<dyn SyncSqlConnection + Send + Sync + 'static> {
+        &self.database
+    }
+
+    pub fn is_sqlite(&self) -> bool {
+        self.sql_family == SqlFamily::Sqlite
+    }
+
     pub fn migration_persistence(&self) -> Arc<dyn MigrationPersistence> {
         self.api.migration_persistence()
     }
