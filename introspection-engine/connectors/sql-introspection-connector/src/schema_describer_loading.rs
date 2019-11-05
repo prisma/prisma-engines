@@ -4,12 +4,12 @@ use std::sync::Arc;
 
 pub fn load_describer(url_str: &str) -> SqlIntrospectionResult<Box<dyn SqlSchemaDescriberBackend>> {
     if url_str.starts_with("postgresql://") {
-        let wrapper = sql_connection::Postgresql::new_pooled(url_str.parse()?)?;
+        let wrapper = sql_connection::Postgresql::new(url_str.parse()?)?;
         Ok(Box::new(sql_schema_describer::postgres::SqlSchemaDescriber::new(
             Arc::new(wrapper),
         )))
     } else if url_str.starts_with("mysql://") {
-        let wrapper = sql_connection::Mysql::new_pooled(url_str.parse()?)?;
+        let wrapper = sql_connection::Mysql::new(url_str.parse()?)?;
         Ok(Box::new(sql_schema_describer::mysql::SqlSchemaDescriber::new(
             Arc::new(wrapper),
         )))

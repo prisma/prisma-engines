@@ -19,7 +19,7 @@ pub struct Postgresql {
 
 impl Postgresql {
     /// Create a new connection pool.
-    pub fn new_pooled(url: Url) -> Result<Self, QueryError> {
+    pub fn new(url: Url) -> Result<Self, QueryError> {
         let pool = quaint::pool::postgres(url.clone())?;
 
         Ok(Postgresql {

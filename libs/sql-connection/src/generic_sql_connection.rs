@@ -37,21 +37,15 @@ pub enum GenericSqlConnection {
 impl GenericSqlConnection {
     /// Create a pooled database connection. The `db_name` param is only used on SQLite if you want
     /// to provide a specific name for the bound database.
-    pub fn new_pooled(url_str: &str, db_name: Option<&str>) -> Result<Self, QuaintError> {
+    pub fn new(url_str: &str, db_name: Option<&str>) -> Result<Self, QuaintError> {
         let url: Url = url_str.parse().or_else(|_err| format!("file://{}", url_str).parse())?;
 
         match url.scheme() {
             "sqlite" | "file" => Ok(GenericSqlConnection::Sqlite(Sqlite::new(url_str, db_name.unwrap_or("db"))?)),
-            "postgres" | "postgresql" => Ok(GenericSqlConnection::Postgresql(Postgresql::new_pooled(url)?)),
-            "mysql" => Ok(GenericSqlConnection::Mysql(Mysql::new_pooled(url)?)),
+            "postgres" | "postgresql" => Ok(GenericSqlConnection::Postgresql(Postgresql::new(url)?)),
+            "mysql" => Ok(GenericSqlConnection::Mysql(Mysql::new(url)?)),
             scheme => panic!("Unsupported database URL scheme: {}", scheme),
         }
-    }
-
-    /// Create a single database connection. The `db_name` param is only used on SQLite if you want
-    /// to provide a specific name for the bound database.
-    pub fn new_unpooled(url_str: &str, db_name: Option<&str>) -> Result<Self, QuaintError> {
-        Self::new_pooled(url_str, db_name)
     }
 
     pub fn sql_family(&self) -> SqlFamily {

@@ -12,7 +12,7 @@ pub fn get_postgres_describer(sql: &str) -> postgres::SqlSchemaDescriber {
     };
 
     let url = format!("postgres://postgres:prisma@{}:5432/postgres", host);
-    let client = Postgresql::new_pooled(url.parse().unwrap()).unwrap();
+    let client = Postgresql::new(url.parse().unwrap()).unwrap();
 
     let drop_schema = format!("DROP SCHEMA IF EXISTS \"{}\" CASCADE;", SCHEMA);
     client.execute_raw(drop_schema.as_str(), &[]).expect("dropping schema");

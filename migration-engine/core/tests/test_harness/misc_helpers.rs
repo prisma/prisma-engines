@@ -48,28 +48,28 @@ where
 }
 
 pub(super) fn mysql_migration_connector(database_url: &str) -> SqlMigrationConnector {
-    match SqlMigrationConnector::mysql(database_url, true) {
+    match SqlMigrationConnector::new(database_url) {
         Ok(c) => c,
         Err(_) => {
             let url = Url::parse(database_url).unwrap();
 
             let name_cmd = |name| format!("CREATE DATABASE `{}`", name);
 
-            let connect_cmd = |url| Mysql::new_pooled(url);
+            let connect_cmd = |url| Mysql::new(url);
 
             create_database(url, "mysql", "/", name_cmd, Rc::new(connect_cmd));
-            SqlMigrationConnector::mysql(database_url, true).unwrap()
+            SqlMigrationConnector::new(database_url).unwrap()
         }
     }
 }
 
 pub(super) fn postgres_migration_connector(url: &str) -> SqlMigrationConnector {
-    match SqlMigrationConnector::postgres(&postgres_url(), true) {
+    match SqlMigrationConnector::new(&postgres_url()) {
         Ok(c) => c,
         Err(_) => {
             let name_cmd = |name| format!("CREATE DATABASE \"{}\"", name);
 
-            let connect_cmd = |url: url::Url| Postgresql::new_pooled(url);
+            let connect_cmd = |url: url::Url| Postgresql::new(url);
 
             create_database(
                 url.parse().unwrap(),
@@ -78,13 +78,13 @@ pub(super) fn postgres_migration_connector(url: &str) -> SqlMigrationConnector {
                 name_cmd,
                 Rc::new(connect_cmd),
             );
-            SqlMigrationConnector::postgres(&postgres_url(), true).unwrap()
+            SqlMigrationConnector::new(&postgres_url()).unwrap()
         }
     }
 }
 
 pub(super) fn sqlite_migration_connector() -> SqlMigrationConnector {
-    SqlMigrationConnector::sqlite(&sqlite_test_file()).unwrap()
+    SqlMigrationConnector::new(&sqlite_test_file()).unwrap()
 }
 
 pub fn test_each_connector_with_ignores<I: AsRef<[SqlFamily]>, F>(ignores: I, test_fn: F)
@@ -234,7 +234,7 @@ pub fn database(sql_family: SqlFamily, database_url: &str) -> Arc<dyn SyncSqlCon
             let url = Url::parse(database_url).unwrap();
             let create_cmd = |name| format!("CREATE DATABASE \"{}\"", name);
 
-            let connect_cmd = |url| Postgresql::new_pooled(url);
+            let connect_cmd = |url| Postgresql::new(url);
 
             let conn = with_database(url, "postgres", "postgres", create_cmd, Rc::new(connect_cmd));
 
@@ -245,7 +245,7 @@ pub fn database(sql_family: SqlFamily, database_url: &str) -> Arc<dyn SyncSqlCon
             let url = Url::parse(database_url).unwrap();
             let create_cmd = |name| format!("CREATE DATABASE `{}`", name);
 
-            let connect_cmd = |url| Mysql::new_pooled(url);
+            let connect_cmd = |url| Mysql::new(url);
 
             let conn = with_database(url, "mysql", "/", create_cmd, Rc::new(connect_cmd));
 

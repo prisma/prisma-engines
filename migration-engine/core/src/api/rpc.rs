@@ -110,7 +110,7 @@ impl RpcApi {
         })?;
 
         let connector = match source.connector_type() {
-            scheme if SUPPORTED_SQL_SCHEMES.contains(&scheme) => SqlMigrationConnector::new(&source.url().value, true)?,
+            scheme if SUPPORTED_SQL_SCHEMES.contains(&scheme) => SqlMigrationConnector::new(&source.url().value)?,
             x => unimplemented!("Connector {} is not supported yet", x),
         };
 

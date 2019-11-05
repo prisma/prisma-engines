@@ -19,7 +19,7 @@ pub struct Mysql {
 
 impl Mysql {
     /// Create a new connection pool.
-    pub fn new_pooled(url: Url) -> Result<Self, QueryError> {
+    pub fn new(url: Url) -> Result<Self, QueryError> {
         let pool = quaint::pool::mysql(url.clone())?;
 
         Ok(Mysql {
@@ -78,4 +78,3 @@ impl SyncSqlConnection for Mysql {
         self.runtime.block_on(conn.execute_raw(sql, params))
     }
 }
-

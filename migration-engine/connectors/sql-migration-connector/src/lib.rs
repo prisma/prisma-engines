@@ -41,12 +41,8 @@ pub struct SqlMigrationConnector {
 }
 
 impl SqlMigrationConnector {
-    pub fn new(url_str: &str, pooled: bool) -> std::result::Result<Self, ConnectorError> {
-        let connection = if pooled {
-            GenericSqlConnection::new_pooled(url_str, Some("lift"))?
-        } else {
-            GenericSqlConnection::new_unpooled(url_str, Some("lift"))?
-        };
+    pub fn new(url_str: &str) -> std::result::Result<Self, ConnectorError> {
+        let connection = GenericSqlConnection::new(url_str, Some("lift"))?;
 
         let schema_name = connection
             .connection_info()
@@ -67,16 +63,6 @@ impl SqlMigrationConnector {
             schema_name,
             file_path,
         ))
-    }
-
-    pub fn postgres(url_str: &str, pooled: bool) -> std::result::Result<Self, ConnectorError> {
-        Self::new(url_str, pooled)
-    }
-    pub fn sqlite(url_str: &str) -> std::result::Result<Self, ConnectorError> {
-        Self::new(url_str, true)
-    }
-    pub fn mysql(url_str: &str, pooled: bool) -> std::result::Result<Self, ConnectorError> {
-        Self::new(url_str, pooled)
     }
 
     fn create_connector(

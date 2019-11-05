@@ -122,7 +122,7 @@ pub fn database(database_url: &str) -> Box<dyn SyncSqlConnection + Send + Sync +
             let url = Url::parse(database_url).unwrap();
             let create_cmd = |name| format!("CREATE DATABASE \"{}\"", name);
 
-            let connect_cmd = |url| Postgresql::new_pooled(url);
+            let connect_cmd = |url| Postgresql::new(url);
 
             let conn = with_database(url, "postgres", "postgres", create_cmd, Rc::new(connect_cmd));
 
@@ -132,7 +132,7 @@ pub fn database(database_url: &str) -> Box<dyn SyncSqlConnection + Send + Sync +
             let url = Url::parse(database_url).unwrap();
             let create_cmd = |name| format!("CREATE DATABASE `{}`", name);
 
-            let connect_cmd = |url| Mysql::new_pooled(url);
+            let connect_cmd = |url| Mysql::new(url);
 
             let conn = with_database(url, "mysql", "/", create_cmd, Rc::new(connect_cmd));
 

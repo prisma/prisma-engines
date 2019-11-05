@@ -101,7 +101,7 @@ fn create_conn(
 
     match url.scheme() {
         "file" | "sqlite" => {
-            let inner = SqlMigrationConnector::sqlite(datasource)?;
+            let inner = SqlMigrationConnector::new(datasource)?;
 
             Ok((String::new(), Box::new(inner)))
         }
@@ -111,7 +111,7 @@ fn create_conn(
             let connector = if admin_mode {
                 create_postgres_admin_conn(url)?
             } else {
-                SqlMigrationConnector::postgres(url.as_str(), false)?
+                SqlMigrationConnector::new(url.as_str())?
             };
 
             Ok((db_name, Box::new(connector)))
@@ -123,7 +123,7 @@ fn create_conn(
                 url.set_path("");
             }
 
-            let inner = SqlMigrationConnector::mysql(url.as_str(), false)?;
+            let inner = SqlMigrationConnector::new(url.as_str())?;
             Ok((db_name, Box::new(inner)))
         }
         x => unimplemented!("Connector {} is not supported yet", x),
@@ -144,7 +144,7 @@ fn create_postgres_admin_conn(mut url: Url) -> crate::Result<SqlMigrationConnect
         .iter()
         .filter_map(|database_name| {
             url.set_path(database_name);
-            match SqlMigrationConnector::postgres(url.as_str(), false) {
+            match SqlMigrationConnector::new(url.as_str()) {
                 // If the database does not exist, try the next one.
                 Err(migration_connector::ConnectorError::DatabaseDoesNotExist { .. }) => None,
                 // If the outcome is anything else, use this.
@@ -358,7 +358,7 @@ mod tests {
 
             {
                 let uri = url::Url::parse(&mysql_url(None)).unwrap();
-                let conn = Mysql::new_pooled(uri).unwrap();
+                let conn = Mysql::new(uri).unwrap();
 
                 conn.execute_raw("DROP DATABASE `this_should_exist`", &[]).unwrap();
             }
@@ -387,7 +387,7 @@ mod tests {
 
             {
                 let uri = url::Url::parse(&postgres_url(None)).unwrap();
-                let conn = Postgresql::new_pooled(uri).unwrap();
+                let conn = Postgresql::new(uri).unwrap();
 
                 conn.execute_raw("DROP DATABASE \"this_should_exist\"", &[]).unwrap();
             }
