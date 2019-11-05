@@ -38,6 +38,16 @@ where
     }
 }
 
+impl<'a, A> From<(A,)> for Row<'a>
+where
+    A: Into<DatabaseValue<'a>>,
+{
+    #[inline]
+    fn from((val,): (A,)) -> Self {
+        Row::new().push(val)
+    }
+}
+
 impl<'a, A, B> From<(A, B)> for Row<'a>
 where
     A: Into<DatabaseValue<'a>>,
