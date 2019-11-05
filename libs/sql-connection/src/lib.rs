@@ -5,7 +5,6 @@
 mod connection_info;
 mod generic_sql_connection;
 mod mysql;
-mod pooling;
 mod postgres;
 mod sqlite;
 mod traits;
