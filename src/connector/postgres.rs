@@ -112,8 +112,6 @@ impl SslParams {
     }
 }
 
-type ConnectionParams = (Vec<(String, String)>, Vec<(String, String)>);
-
 /// Wraps a connection url and exposes the parsing logic used by quaint, including default values.
 #[derive(Debug, Clone)]
 pub struct PostgresUrl(pub Url);
@@ -161,52 +159,31 @@ impl PostgresUrl {
     pub fn port(&self) -> u16 {
         self.0.port().unwrap_or(5432)
     }
-}
 
-impl TryFrom<Url> for PostgresParams {
-    type Error = Error;
+    pub fn schema(&self) -> String {
+        self.0.query_pairs().find(|(key, _value)| key == "schema").map(|(_key, value)| value.into_owned()).unwrap_or_else(|| DEFAULT_SCHEMA.to_string())
+    }
 
-    fn try_from(mut url: Url) -> crate::Result<Self> {
-        let official = vec![];
+    pub fn default_connection_limit() -> usize {
+        num_cpus::get_physical() * 2 + 1
+    }
 
-        let (supported, unsupported): ConnectionParams = url
-            .query_pairs()
-            .map(|(k, v)| (String::from(k), String::from(v)))
-            .collect::<Vec<(String, String)>>()
-            .into_iter()
-            .partition(|(k, _)| official.contains(&k.as_str()));
-
-        url.query_pairs_mut().clear();
-
-        supported.into_iter().for_each(|(k, v)| {
-            url.query_pairs_mut().append_pair(&k, &v);
-        });
-
-
-        let url = PostgresUrl(url);
-        let mut config = Config::new();
-
-        config.user(url.username().borrow());
-        config.password(url.password().borrow() as &str);
-        config.host(url.host());
-        config.port(url.port());
-        config.dbname(url.dbname());
-        config.connect_timeout(Duration::from_millis(5000));
-
-        let mut connection_limit = num_cpus::get_physical() * 2 + 1;
+    pub fn query_params(&self) -> Result<PostgresUrlQueryParams, Error> {
+        let mut connection_limit = Self::default_connection_limit();
         let mut schema = String::from(DEFAULT_SCHEMA);
         let mut certificate_file = None;
         let mut identity_file = None;
         let mut identity_password = None;
         let mut ssl_accept_mode = SslAcceptMode::Strict;
+        let mut ssl_mode = SslMode::Prefer;
 
-        for (k, v) in unsupported.into_iter() {
+        for (k, v) in self.0.query_pairs() {
             match k.as_ref() {
                 "sslmode" => {
                     match v.as_ref() {
-                        "disable" => config.ssl_mode(SslMode::Disable),
-                        "prefer" => config.ssl_mode(SslMode::Prefer),
-                        "require" => config.ssl_mode(SslMode::Require),
+                        "disable" => { ssl_mode = SslMode::Disable},
+                        "prefer" => { ssl_mode = SslMode::Prefer },
+                        "require" => { ssl_mode = SslMode::Require },
                         _ => {
                             #[cfg(not(feature = "tracing-log"))]
                             debug!("Unsupported ssl mode {}, defaulting to 'prefer'", v);
@@ -215,8 +192,6 @@ impl TryFrom<Url> for PostgresParams {
                                 message = "Unsupported SSL mode, defaulting to `prefer`",
                                 mode = v.as_str()
                             );
-
-                            config.ssl_mode(SslMode::Prefer)
                         }
                     };
                 }
@@ -269,17 +244,51 @@ impl TryFrom<Url> for PostgresParams {
             };
         }
 
-        Ok(Self {
-            connection_limit: u32::try_from(connection_limit).unwrap(),
-            schema,
-            config,
-            dbname: url.dbname().to_string(),
+        Ok(PostgresUrlQueryParams {
             ssl_params: SslParams {
-                ssl_accept_mode,
                 certificate_file,
                 identity_file,
+                ssl_accept_mode,
                 identity_password,
             },
+            connection_limit,
+            schema,
+            ssl_mode,
+        })
+
+    }
+}
+
+pub struct PostgresUrlQueryParams {
+    ssl_params: SslParams,
+    connection_limit: usize,
+    schema: String,
+    ssl_mode: SslMode,
+}
+
+impl TryFrom<Url> for PostgresParams {
+    type Error = Error;
+
+    fn try_from(url: Url) -> crate::Result<Self> {
+        let url = PostgresUrl(url);
+        let query_params = url.query_params()?;
+
+        let mut config = Config::new();
+
+        config.user(url.username().borrow());
+        config.password(url.password().borrow() as &str);
+        config.host(url.host());
+        config.port(url.port());
+        config.dbname(url.dbname());
+        config.connect_timeout(Duration::from_millis(5000));
+        config.ssl_mode(query_params.ssl_mode);
+
+        Ok(Self {
+            connection_limit: u32::try_from(query_params.connection_limit).unwrap(),
+            schema: query_params.schema,
+            config,
+            dbname: url.dbname().to_string(),
+            ssl_params: query_params.ssl_params,
         })
     }
 }

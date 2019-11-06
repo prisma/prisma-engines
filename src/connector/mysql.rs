@@ -27,8 +27,6 @@ pub struct MysqlParams {
     pub config: my::OptsBuilder,
 }
 
-type ConnectionParams = (Vec<(String, String)>, Vec<(String, String)>);
-
 /// Wraps a connection url and exposes the parsing logic used by quaint, including default values.
 #[derive(Debug, Clone)]
 pub struct MysqlUrl(pub Url);
@@ -81,39 +79,13 @@ impl MysqlUrl {
     pub fn port(&self) -> u16 {
         self.0.port().unwrap_or(3306)
     }
-}
 
-
-impl TryFrom<Url> for MysqlParams {
-    type Error = Error;
-
-    fn try_from(mut url: Url) -> crate::Result<Self> {
-        let official = vec![];
-
-        let (supported, unsupported): ConnectionParams = url
-            .query_pairs()
-            .map(|(k, v)| (String::from(k), String::from(v)))
-            .collect::<Vec<(String, String)>>()
-            .into_iter()
-            .partition(|(k, _)| official.contains(&k.as_str()));
-
-        url.query_pairs_mut().clear();
-
-        supported.into_iter().for_each(|(k, v)| {
-            url.query_pairs_mut().append_pair(&k, &v);
-        });
-
-        let url = MysqlUrl(url);
-        let mut config = my::OptsBuilder::new();
-
-        config.user(Some(url.username()));
-        config.pass(url.password());
-
+    pub fn query_params(&self) -> Result<MysqlUrlQueryParams, Error> {
         let mut connection_limit = num_cpus::get_physical() * 2 + 1;
         let mut ssl_opts = my::SslOpts::default();
         let mut use_ssl = false;
 
-        for (k, v) in unsupported.into_iter() {
+        for (k, v) in self.0.query_pairs() {
             match k.as_ref() {
                 "connection_limit" => {
                     let as_int: usize = v.parse().map_err(|_| Error::InvalidConnectionArguments)?;
@@ -121,11 +93,11 @@ impl TryFrom<Url> for MysqlParams {
                 }
                 "sslcert" => {
                     use_ssl = true;
-                    ssl_opts.set_root_cert_path(Some(Path::new(&v).to_path_buf()));
+                    ssl_opts.set_root_cert_path(Some(Path::new(&*v).to_path_buf()));
                 }
                 "sslidentity" => {
                     use_ssl = true;
-                    ssl_opts.set_pkcs12_path(Some(Path::new(&v).to_path_buf()));
+                    ssl_opts.set_pkcs12_path(Some(Path::new(&*v).to_path_buf()));
                 }
                 "sslpassword" => {
                     use_ssl = true;
@@ -160,18 +132,44 @@ impl TryFrom<Url> for MysqlParams {
             };
         }
 
+        Ok(MysqlUrlQueryParams {
+            ssl_opts,
+            connection_limit,
+            use_ssl,
+        })
+
+    }
+}
+
+pub struct MysqlUrlQueryParams {
+    ssl_opts: my::SslOpts,
+    connection_limit: usize,
+    use_ssl: bool,
+}
+
+
+impl TryFrom<Url> for MysqlParams {
+    type Error = Error;
+
+    fn try_from(url: Url) -> crate::Result<Self> {
+        let url = MysqlUrl(url);
+        let query_params = url.query_params()?;
+        let mut config = my::OptsBuilder::new();
+
+        config.user(Some(url.username()));
+        config.pass(url.password());
         config.db_name(Some(url.dbname()));
         config.ip_or_hostname(url.host());
         config.tcp_port(url.port());
         config.stmt_cache_size(Some(1000));
         config.conn_ttl(Some(Duration::from_secs(5)));
 
-        if use_ssl {
-            config.ssl_opts(Some(ssl_opts));
+        if query_params.use_ssl {
+            config.ssl_opts(Some(query_params.ssl_opts));
         }
 
         Ok(Self {
-            connection_limit: u32::try_from(connection_limit).unwrap(),
+            connection_limit: u32::try_from(query_params.connection_limit).unwrap(),
             config,
             dbname: url.dbname().to_string(),
         })
