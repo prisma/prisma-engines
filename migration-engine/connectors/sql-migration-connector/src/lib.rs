@@ -49,7 +49,7 @@ impl SqlMigrationConnector {
             .schema_name()
             .unwrap_or_else(|| "lift".to_owned());
         let file_path = connection.connection_info().file_path().map(|s| s.to_owned());
-        let sql_family = connection.sql_family();
+        let sql_family = connection.connection_info().sql_family();
         let connection = Arc::new(connection);
 
         // async connections can be lazy, so we issue a simple query to fail early if the database

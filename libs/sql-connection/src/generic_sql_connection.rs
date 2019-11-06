@@ -27,14 +27,6 @@ impl GenericSqlConnection {
         }
     }
 
-    pub fn sql_family(&self) -> SqlFamily {
-        match self {
-            GenericSqlConnection::Postgresql(_) => SqlFamily::Postgres,
-            GenericSqlConnection::Mysql(_) => SqlFamily::Mysql,
-            GenericSqlConnection::Sqlite(_) => SqlFamily::Sqlite,
-        }
-    }
-
     pub fn connection_info(&self) -> ConnectionInfo {
         match self {
             GenericSqlConnection::Postgresql(pg) => ConnectionInfo::Postgres(pg.url()),
