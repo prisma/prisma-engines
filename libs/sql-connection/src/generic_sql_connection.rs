@@ -1,27 +1,6 @@
-use crate::{ConnectionInfo, Mysql, Postgresql, SqlConnection, Sqlite, SyncSqlConnection};
+use crate::{SqlFamily, ConnectionInfo, Mysql, Postgresql, SqlConnection, Sqlite, SyncSqlConnection};
 use quaint::{ast::*, connector::ResultSet, error::Error as QuaintError};
 use url::Url;
-
-/// Database URL schemes supported by GenericSqlConnection.
-pub const SUPPORTED_SCHEMES: &[&str] = &["sqlite", "file", "postgresql", "postgres", "mysql"];
-
-/// One of the supported SQL variants.
-#[derive(Debug, PartialEq, Clone, Copy)]
-pub enum SqlFamily {
-    Postgres,
-    Mysql,
-    Sqlite,
-}
-
-impl SqlFamily {
-    pub fn connector_type_string(&self) -> &'static str {
-        match self {
-            SqlFamily::Postgres => "postgresql",
-            SqlFamily::Mysql => "mysql",
-            SqlFamily::Sqlite => "sqlite",
-        }
-    }
-}
 
 /// A connection to a supported SQL database. This is mainly useful to abstract the _construction_
 /// of a SQL connection from a URL.
@@ -40,11 +19,11 @@ impl GenericSqlConnection {
     pub fn new(url_str: &str, db_name: Option<&str>) -> Result<Self, QuaintError> {
         let url: Url = url_str.parse().or_else(|_err| format!("file://{}", url_str).parse())?;
 
-        match url.scheme() {
-            "sqlite" | "file" => Ok(GenericSqlConnection::Sqlite(Sqlite::new(url_str, db_name.unwrap_or("db"))?)),
-            "postgres" | "postgresql" => Ok(GenericSqlConnection::Postgresql(Postgresql::new(url)?)),
-            "mysql" => Ok(GenericSqlConnection::Mysql(Mysql::new(url)?)),
-            scheme => panic!("Unsupported database URL scheme: {}", scheme),
+        match SqlFamily::from_scheme(url.scheme()) {
+            Some(SqlFamily::Postgres) => Ok(GenericSqlConnection::Postgresql(Postgresql::new(url)?)),
+            Some(SqlFamily::Mysql) => Ok(GenericSqlConnection::Mysql(Mysql::new(url)?)),
+            Some(SqlFamily::Sqlite) => Ok(GenericSqlConnection::Sqlite(Sqlite::new(url_str, db_name.unwrap_or("db"))?)),
+            None => panic!("Unsupported database URL scheme: {}", url.scheme()),
         }
     }
 
