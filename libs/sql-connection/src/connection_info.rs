@@ -28,7 +28,7 @@ impl ConnectionInfo {
     pub fn schema_name(&self) -> Option<String> {
         match self {
             ConnectionInfo::Postgres(url) => Some(url.schema()),
-            ConnectionInfo::Mysql(_) => None,
+            ConnectionInfo::Mysql(url) => Some(url.dbname().to_owned()),
             ConnectionInfo::Sqlite { .. } => None,
         }
     }
