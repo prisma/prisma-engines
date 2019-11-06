@@ -14,13 +14,6 @@ use std::fs::File;
 
 #[derive(Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-pub struct DmmfToDmlInput {
-    pub dmmf: String,
-    pub config: serde_json::Value,
-}
-
-#[derive(Deserialize, Debug)]
-#[serde(rename_all = "camelCase")]
 pub struct DmmfFileToDmlInput {
     pub dmmf: Datamodel,
     pub config: serde_json::Value,
@@ -35,7 +28,6 @@ pub struct GetConfigInput {
 pub enum CliCommand {
     Dmmf(BuildMode),
     DmmfFileToDml(DmmfFileToDmlInput),
-    DmmfToDml(DmmfToDmlInput),
     GetConfig(GetConfigInput),
 }
 
@@ -99,16 +91,6 @@ impl CliCommand {
 
         println!("{}", serialized);
 
-
-        Ok(())
-    }
-    
-    fn dmmf_to_dml(input: DmmfToDmlInput) -> PrismaResult<()> {
-        let datamodel = datamodel::dmmf::parse_from_dmmf(&input.dmmf);
-        let config = datamodel::config_from_mcf_json_value(input.config);
-        let serialized = datamodel::render_datamodel_and_config_to_string(&datamodel, &config)?;
-
-        println!("{}", serialized);
 
         Ok(())
     }
