@@ -40,7 +40,7 @@ impl GenericSqlConnection {
             GenericSqlConnection::Postgresql(pg) => ConnectionInfo::Postgres(pg.url()),
             GenericSqlConnection::Mysql(mysql) => ConnectionInfo::Mysql(mysql.url()),
             GenericSqlConnection::Sqlite(sqlite) => {
-                ConnectionInfo::Sqlite { file_path: sqlite.file_path().to_owned() }
+                ConnectionInfo::Sqlite { file_path: sqlite.file_path().to_owned(), db_name: Some(sqlite.db_name().to_owned()) }
             },
         }
     }

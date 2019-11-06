@@ -10,8 +10,10 @@ pub enum ConnectionInfo {
     Mysql(MysqlUrl),
     /// A SQLite connection URL.
     Sqlite {
-        /// The filesystem path of the SQLite databas.
+        /// The filesystem path of the SQLite database.
         file_path: String,
+        /// The name the database is bound to (with `ATTACH DATABASE`), if available.
+        db_name: Option<String>,
     },
 }
 
@@ -29,7 +31,7 @@ impl ConnectionInfo {
         match self {
             ConnectionInfo::Postgres(url) => Some(url.schema()),
             ConnectionInfo::Mysql(url) => Some(url.dbname().to_owned()),
-            ConnectionInfo::Sqlite { .. } => None,
+            ConnectionInfo::Sqlite { db_name, .. } => db_name.as_ref().map(|s| s.to_owned()),
         }
     }
 

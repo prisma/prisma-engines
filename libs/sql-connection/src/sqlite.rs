@@ -15,6 +15,7 @@ type SqlitePool = Pool<SqliteManager>;
 pub struct Sqlite {
     pool: SqlitePool,
     file_path: String,
+    db_name: String,
     // TODO: remove this when we remove the sync API
     runtime: Runtime,
 }
@@ -32,6 +33,7 @@ impl Sqlite {
 
         Ok(Self {
             pool,
+            db_name: db_name.to_owned(),
             file_path,
             runtime: super::default_runtime(),
         })
@@ -40,6 +42,11 @@ impl Sqlite {
     /// The filesystem path of connection's database.
     pub fn file_path(&self) -> &str {
         self.file_path.as_str()
+    }
+
+    /// The name the database is bound to (with `ATTACH DATABASE`).
+    pub fn db_name(&self) -> &str {
+        self.db_name.as_str()
     }
 
     async fn get_connection(&self) -> Result<CheckOut<SqliteManager>, QueryError> {
