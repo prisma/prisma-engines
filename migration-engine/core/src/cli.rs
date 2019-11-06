@@ -2,6 +2,7 @@ use clap::ArgMatches;
 use failure::Fail;
 use itertools::Itertools;
 use migration_connector::*;
+use sql_connection::SqlFamily;
 use sql_migration_connector::SqlMigrationConnector;
 use std::collections::HashMap;
 use url::Url;
@@ -98,14 +99,15 @@ fn create_conn(
     Box<dyn MigrationConnector<DatabaseMigration = impl DatabaseMigrationMarker>>,
 )> {
     let mut url = Url::parse(datasource).expect("Invalid url in the datasource");
+    let sql_family = SqlFamily::from_scheme(url.scheme());
 
-    match url.scheme() {
-        "file" | "sqlite" => {
+    match sql_family {
+        Some(SqlFamily::Sqlite) => {
             let inner = SqlMigrationConnector::new(datasource)?;
 
             Ok((String::new(), Box::new(inner)))
         }
-        "postgresql" | "postgres" => {
+        Some(SqlFamily::Postgres) => {
             let db_name = fetch_db_name(&url, "postgres");
 
             let connector = if admin_mode {
@@ -116,7 +118,7 @@ fn create_conn(
 
             Ok((db_name, Box::new(connector)))
         }
-        "mysql" => {
+        Some(SqlFamily::Mysql) => {
             let db_name = fetch_db_name(&url, "mysql");
 
             if admin_mode {
@@ -126,7 +128,7 @@ fn create_conn(
             let inner = SqlMigrationConnector::new(url.as_str())?;
             Ok((db_name, Box::new(inner)))
         }
-        x => unimplemented!("Connector {} is not supported yet", x),
+        None => unimplemented!("Connector {} is not supported yet", url.scheme()),
     }
 }
 

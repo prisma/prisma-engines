@@ -4,7 +4,6 @@ use futures::{
     future::{err, lazy, ok, poll_fn},
     Future,
 };
-use jsonrpc_core;
 use jsonrpc_core::types::error::Error as JsonRpcError;
 use jsonrpc_core::IoHandler;
 use jsonrpc_core::*;
