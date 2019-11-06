@@ -4,7 +4,6 @@ use chrono::*;
 use migration_connector::*;
 use quaint::ast::*;
 use quaint::connector::ResultSet;
-use serde_json;
 use sql_connection::SyncSqlConnection;
 use std::sync::Arc;
 
@@ -250,10 +249,12 @@ fn parse_rows_new(result_set: ResultSet) -> Vec<Migration> {
                 x => Some(convert_parameterized_date_value(x)),
             };
 
-            let datamodel_steps = serde_json::from_str(&datamodel_steps_json).unwrap();
+            let datamodel_steps =
+                serde_json::from_str(&datamodel_steps_json).expect("Error parsing the migration steps");
             let datamodel = datamodel::parse_datamodel(&datamodel_string).unwrap();
 
-            let database_migration_json = serde_json::from_str(&database_migration_string).unwrap();
+            let database_migration_json =
+                serde_json::from_str(&database_migration_string).expect("Error parsing the database migration steps");
             let errors: Vec<String> = serde_json::from_str(&errors_json).unwrap();
 
             Migration {
