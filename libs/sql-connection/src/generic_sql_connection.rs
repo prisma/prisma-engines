@@ -3,7 +3,7 @@ use quaint::{ast::*, connector::ResultSet, error::Error as QuaintError};
 use url::Url;
 
 /// Database URL schemes supported by GenericSqlConnection.
-pub const SUPPORTED_SCHEMES: &[&str] = &["sqlite", "file", "postgreql", "postgres", "mysql"];
+pub const SUPPORTED_SCHEMES: &[&str] = &["sqlite", "file", "postgresql", "postgres", "mysql"];
 
 /// One of the supported SQL variants.
 #[derive(Debug, PartialEq, Clone, Copy)]
