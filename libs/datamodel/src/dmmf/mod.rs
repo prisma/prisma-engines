@@ -5,6 +5,7 @@ use serde;
 use serde_json;
 
 pub use from_dmmf::parse_from_dmmf;
+pub use from_dmmf::schema_from_dmmf;
 pub use to_dmmf::render_to_dmmf;
 pub use to_dmmf::render_to_dmmf_value;
 

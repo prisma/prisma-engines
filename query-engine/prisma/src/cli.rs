@@ -9,11 +9,13 @@ use query_core::{
 };
 use serde::Deserialize;
 use std::sync::Arc;
+use datamodel::dmmf::Datamodel;
+use std::fs::File;
 
 #[derive(Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct DmmfToDmlInput {
-    pub dmmf: String,
+    pub dmmf: Datamodel,
     pub config: serde_json::Value,
 }
 
@@ -40,9 +42,11 @@ impl CliCommand {
 
             Some(Self::Dmmf(build_mode))
         } else if matches.is_present("dmmf_to_dml") {
-            let input = matches.value_of("dmmf_to_dml").unwrap();
-            let input: DmmfToDmlInput = serde_json::from_str(input).unwrap();
-
+            let path = matches.value_of("dmmf_to_dml").unwrap();
+            let file = File::open(path)
+                .expect("File should open read only");
+            let input: DmmfToDmlInput = serde_json::from_reader(file)
+                .expect("File should be proper JSON");
             Some(Self::DmmfToDml(input))
         } else if matches.is_present("get_config") {
             let input = matches.value_of("get_config").unwrap();
@@ -81,11 +85,12 @@ impl CliCommand {
     }
 
     fn dmmf_to_dml(input: DmmfToDmlInput) -> PrismaResult<()> {
-        let datamodel = datamodel::dmmf::parse_from_dmmf(&input.dmmf);
+        let datamodel = datamodel::dmmf::schema_from_dmmf(&input.dmmf);
         let config = datamodel::config_from_mcf_json_value(input.config);
         let serialized = datamodel::render_datamodel_and_config_to_string(&datamodel, &config)?;
 
         println!("{}", serialized);
+
 
         Ok(())
     }
