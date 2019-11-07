@@ -161,6 +161,62 @@ fn create_postgres_admin_conn(mut url: Url) -> crate::Result<SqlMigrationConnect
     Ok(inner)
 }
 
+pub fn clap_app() -> clap::App<'static, 'static> {
+    use clap::{App, Arg, SubCommand};
+    App::new("Prisma Migration Engine")
+        .version(env!("CARGO_PKG_VERSION"))
+        .arg(
+            Arg::with_name("datamodel_location")
+                .short("d")
+                .long("datamodel")
+                .value_name("FILE")
+                .help("Path to the datamodel.")
+                .takes_value(true)
+                .required(false),
+        )
+        .arg(
+            Arg::with_name("single_cmd")
+                .short("s")
+                .long("single_cmd")
+                .help("Run only a single command, then exit")
+                .takes_value(false)
+                .required(false),
+        )
+        .arg(
+            Arg::with_name("version")
+                .long("version")
+                .help("Prints the server commit ID")
+                .takes_value(false)
+                .required(false),
+        )
+        .subcommand(
+            SubCommand::with_name("cli")
+                .about("Doesn't start a server, but allows running specific commands against Prisma.")
+                .arg(
+                    Arg::with_name("datasource")
+                        .long("datasource")
+                        .short("d")
+                        .help("The connection string to the database")
+                        .takes_value(true)
+                        .required(true),
+                )
+                .arg(
+                    Arg::with_name("can_connect_to_database")
+                        .long("can_connect_to_database")
+                        .help("Does the database connection string work")
+                        .takes_value(false)
+                        .required(false),
+                )
+                .arg(
+                    Arg::with_name("create_database")
+                        .long("create_database")
+                        .help("Create an empty database defined in the configuration string.")
+                        .takes_value(false)
+                        .required(false),
+                ),
+        )
+}
+
 #[cfg(test)]
 mod tests {
     use super::CliError;

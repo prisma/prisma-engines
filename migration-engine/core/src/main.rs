@@ -6,8 +6,6 @@ pub mod migration;
 pub mod migration_engine;
 
 use crate::api::RpcApi;
-use clap::{App, Arg, SubCommand};
-use cli::CliError;
 use commands::*;
 use datamodel::{self, error::ErrorCollection, Datamodel};
 use log::*;
@@ -44,59 +42,7 @@ fn main() {
 
     env_logger::init();
 
-    let matches = App::new("Prisma Migration Engine")
-        .version(env!("CARGO_PKG_VERSION"))
-        .arg(
-            Arg::with_name("datamodel_location")
-                .short("d")
-                .long("datamodel")
-                .value_name("FILE")
-                .help("Path to the datamodel.")
-                .takes_value(true)
-                .required(false),
-        )
-        .arg(
-            Arg::with_name("single_cmd")
-                .short("s")
-                .long("single_cmd")
-                .help("Run only a single command, then exit")
-                .takes_value(false)
-                .required(false),
-        )
-        .arg(
-            Arg::with_name("version")
-                .long("version")
-                .help("Prints the server commit ID")
-                .takes_value(false)
-                .required(false),
-        )
-        .subcommand(
-            SubCommand::with_name("cli")
-                .about("Doesn't start a server, but allows running specific commands against Prisma.")
-                .arg(
-                    Arg::with_name("datasource")
-                        .long("datasource")
-                        .short("d")
-                        .help("The connection string to the database")
-                        .takes_value(true)
-                        .required(true),
-                )
-                .arg(
-                    Arg::with_name("can_connect_to_database")
-                        .long("can_connect_to_database")
-                        .help("Does the database connection string work")
-                        .takes_value(false)
-                        .required(false),
-                )
-                .arg(
-                    Arg::with_name("create_database")
-                        .long("create_database")
-                        .help("Create an empty database defined in the configuration string.")
-                        .takes_value(false)
-                        .required(false),
-                ),
-        )
-        .get_matches();
+    let matches = cli::clap_app().get_matches();
 
     if matches.is_present("version") {
         println!(env!("GIT_HASH"));
