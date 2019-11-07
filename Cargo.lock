@@ -979,6 +979,7 @@ version = "0.1.0"
 dependencies = [
  "datamodel 0.1.0",
  "failure 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serde 1.0.102 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]

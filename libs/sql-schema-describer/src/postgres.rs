@@ -15,6 +15,13 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
         Ok(vec![])
     }
 
+    fn get_metadata(&self, schema: &str) -> SqlSchemaDescriberResult<SQLMetadata> {
+        Result::Ok(SQLMetadata {
+            table_count: 10,
+            size_in_bytes: 1024,
+        })
+    }
+
     fn describe(&self, schema: &str) -> SqlSchemaDescriberResult<SqlSchema> {
         debug!("describing schema '{}'", schema);
         let sequences = self.get_sequences(schema)?;

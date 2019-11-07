@@ -1,6 +1,6 @@
 use crate::test_harness::{Mysql, Postgresql, Sqlite, SyncSqlConnection};
 use barrel::{Migration, SqlVariant};
-use introspection_connector::IntrospectionConnector;
+use introspection_connector::{DatabaseMetadata, IntrospectionConnector};
 use pretty_assertions::assert_eq;
 use sql_introspection_connector::*;
 use std::{rc::Rc, sync::Arc};
@@ -26,17 +26,24 @@ pub struct BarrelMigrationExecutor {
 
 // test execution
 
+pub(crate) fn introspect(test_setup: &TestSetup) -> String {
+    let datamodel = test_setup.introspection_connector.introspect(SCHEMA_NAME).unwrap();
+    datamodel::render_datamodel_to_string(&datamodel).expect("Datamodel rendering failed")
+}
+
+pub(crate) fn get_metadata(test_setup: &TestSetup) -> DatabaseMetadata {
+    let metadata = test_setup.introspection_connector.get_metadata(SCHEMA_NAME).unwrap();
+    metadata
+}
+
+// helpers
+
 pub(crate) fn custom_assert(left: &str, right: &str) {
     let parsed_expected = datamodel::parse_datamodel(&right).unwrap();
     let reformatted_expected =
         datamodel::render_datamodel_to_string(&parsed_expected).expect("Datamodel rendering failed");
 
     assert_eq!(left, reformatted_expected);
-}
-
-pub(crate) fn introspect(test_setup: &TestSetup) -> String {
-    let datamodel = test_setup.introspection_connector.introspect(SCHEMA_NAME).unwrap();
-    datamodel::render_datamodel_to_string(&datamodel).expect("Datamodel rendering failed")
 }
 
 fn run_full_sql(database: &Arc<dyn SyncSqlConnection + Send + Sync>, full_sql: &str) {
