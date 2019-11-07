@@ -1,3 +1,4 @@
+mod json_rpc_server;
 mod rpc;
 
 pub use rpc::*;

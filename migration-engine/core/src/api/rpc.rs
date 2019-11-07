@@ -1,17 +1,12 @@
+use super::json_rpc_server::ServerBuilder;
 use super::{GenericApi, MigrationApi};
 use crate::commands::*;
-use futures::{
-    future::{err, lazy, ok, poll_fn},
-    Future,
-};
-use jsonrpc_core;
+use futures01::Future;
 use jsonrpc_core::types::error::Error as JsonRpcError;
 use jsonrpc_core::IoHandler;
 use jsonrpc_core::*;
-use jsonrpc_stdio_server::ServerBuilder;
 use sql_migration_connector::SqlMigrationConnector;
 use std::{io, sync::Arc};
-use tokio_threadpool::blocking;
 
 pub struct RpcApi {
     io_handler: jsonrpc_core::IoHandler<()>,
@@ -79,7 +74,7 @@ impl RpcApi {
 
     /// Block the thread and handle IO in async until EOF.
     pub fn start_server(self) {
-        ServerBuilder::new(self.io_handler).build()
+        ServerBuilder::new(self.io_handler).start_stdio()
     }
 
     /// Handle one request
@@ -199,19 +194,13 @@ impl RpcApi {
         cmd: RpcCommand,
         params: Params,
     ) -> impl Future<Item = serde_json::Value, Error = JsonRpcError> {
+        use futures03::future::{FutureExt, TryFutureExt};
+
         let executor = Arc::clone(executor);
 
-        lazy(move || poll_fn(move || blocking(|| Self::create_sync_handler(&executor, cmd, &params)))).then(|res| {
-            match res {
-                // dumdidum futures 0.1 we love <3
-                Ok(Ok(val)) => ok(val),
-                Ok(Err(val)) => err(val),
-                Err(val) => {
-                    let e = crate::error::Error::from(val);
-                    err(JsonRpcError::from(e))
-                }
-            }
-        })
+        async_std::task::spawn_blocking(move || Self::create_sync_handler(&executor, cmd, &params))
+            .boxed()
+            .compat()
     }
 }
 
@@ -227,11 +216,6 @@ impl From<crate::error::Error> for JsonRpcError {
                     data: Some(json),
                 }
             }
-            crate::error::Error::BlockingError(_) => JsonRpcError {
-                code: jsonrpc_core::types::error::ErrorCode::ServerError(4467),
-                message: "The RPC threadpool is exhausted. Add more worker threads.".to_string(),
-                data: None,
-            },
             err => panic!(
                 "An unexpected error happened. Maybe we should build a handler for these kind of errors? {:?}",
                 err
