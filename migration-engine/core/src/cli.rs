@@ -30,6 +30,20 @@ pub enum CliError {
     Other(String),
 }
 
+impl CliError {
+    pub(crate) fn exit_code(&self) -> i32 {
+        match self {
+            CliError::DatabaseDoesNotExist(_) => 1,
+            CliError::DatabaseAccessDenied(_) => 2,
+            CliError::AuthenticationFailed(_) => 3,
+            CliError::ConnectTimeout | CliError::Timeout => 4,
+            CliError::DatabaseAlreadyExists(_) => 5,
+            CliError::TlsError(_) => 6,
+            _ => 255,
+        }
+    }
+}
+
 impl From<ConnectorError> for CliError {
     fn from(e: ConnectorError) -> Self {
         match e {
