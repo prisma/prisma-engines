@@ -27,5 +27,5 @@ postgres = { version = "0.16.0-rc.1", features = ["with-serde_json-1", "with-chr
 tokio-postgres = { version = "0.4.0-rc.2" }
 native-tls = { version = "0.2" }
 
-futures-preview = { version = "0.3.0-alpha.18", features = ["compat"] }
+futures = "0.3"
 tokio-resource-pool = { git = "https://github.com/pimeys/tokio-resource-pool" }
