@@ -111,29 +111,7 @@ fn main() {
             Err(error) => {
                 error!("{}", error);
 
-                match error {
-                    CliError::DatabaseDoesNotExist(_) => {
-                        std::process::exit(1);
-                    }
-                    CliError::DatabaseAccessDenied(_) => {
-                        std::process::exit(2);
-                    }
-                    CliError::AuthenticationFailed(_) => {
-                        std::process::exit(3);
-                    }
-                    CliError::ConnectTimeout | CliError::Timeout => {
-                        std::process::exit(4);
-                    }
-                    CliError::DatabaseAlreadyExists(_) => {
-                        std::process::exit(5);
-                    }
-                    CliError::TlsError(_) => {
-                        std::process::exit(6);
-                    }
-                    _ => {
-                        std::process::exit(255);
-                    }
-                }
+                std::process::exit(error.exit_code());
             }
         }
     } else {
