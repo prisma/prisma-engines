@@ -41,8 +41,22 @@ pub struct SqlMigrationConnector {
 }
 
 impl SqlMigrationConnector {
-    pub fn new(url_str: &str) -> std::result::Result<Self, ConnectorError> {
-        let connection = GenericSqlConnection::new(url_str, Some("lift"))?;
+    pub fn new_from_database_str(database_str: &str) -> std::result::Result<Self, ConnectorError> {
+        let connection = GenericSqlConnection::from_database_str(database_str, Some("lift"))?;
+
+        Self::create_connector(connection, database_str)
+    }
+
+    pub fn new(datasource: &dyn datamodel::Source) -> std::result::Result<Self, ConnectorError> {
+        let connection = GenericSqlConnection::from_datasource(datasource, Some("lift"))?;
+
+        Self::create_connector(connection, &datasource.url().value)
+    }
+
+    fn create_connector(connection: GenericSqlConnection, url: &str) -> std::result::Result<Self, ConnectorError> {
+        // async connections can be lazy, so we issue a simple query to fail early if the database
+        // is not reachable.
+        connection.query_raw("SELECT 1", &[])?;
 
         let schema_name = connection
             .connection_info()
@@ -50,28 +64,8 @@ impl SqlMigrationConnector {
             .unwrap_or_else(|| "lift".to_owned());
         let file_path = connection.connection_info().file_path().map(|s| s.to_owned());
         let sql_family = connection.connection_info().sql_family();
-        let connection = Arc::new(connection);
+        let conn = Arc::new(connection) as Arc<dyn SyncSqlConnection + Send + Sync>;
 
-        // async connections can be lazy, so we issue a simple query to fail early if the database
-        // is not reachable.
-        connection.query_raw("SELECT 1", &[])?;
-
-        Ok(Self::create_connector(
-            url_str,
-            connection,
-            sql_family,
-            schema_name,
-            file_path,
-        ))
-    }
-
-    fn create_connector(
-        url: &str,
-        conn: Arc<dyn SyncSqlConnection + Send + Sync + 'static>,
-        sql_family: SqlFamily,
-        schema_name: String,
-        file_path: Option<String>,
-    ) -> Self {
         let inspector: Arc<dyn SqlSchemaDescriberBackend + Send + Sync + 'static> = match sql_family {
             SqlFamily::Mysql => Arc::new(sql_schema_describer::mysql::SqlSchemaDescriber::new(Arc::clone(&conn))),
             SqlFamily::Postgres => Arc::new(sql_schema_describer::postgres::SqlSchemaDescriber::new(Arc::clone(
@@ -104,7 +98,7 @@ impl SqlMigrationConnector {
             database: Arc::clone(&conn),
         });
 
-        Self {
+        Ok(Self {
             url: url.to_string(),
             file_path,
             sql_family,
@@ -115,7 +109,7 @@ impl SqlMigrationConnector {
             database_migration_step_applier,
             destructive_changes_checker,
             database_introspector: Arc::clone(&inspector),
-        }
+        })
     }
 }
 

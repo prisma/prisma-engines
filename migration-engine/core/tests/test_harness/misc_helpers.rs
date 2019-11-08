@@ -48,7 +48,7 @@ where
 }
 
 pub(super) fn mysql_migration_connector(database_url: &str) -> SqlMigrationConnector {
-    match SqlMigrationConnector::new(database_url) {
+    match SqlMigrationConnector::new_from_database_str(database_url) {
         Ok(c) => c,
         Err(_) => {
             let url = Url::parse(database_url).unwrap();
@@ -58,13 +58,13 @@ pub(super) fn mysql_migration_connector(database_url: &str) -> SqlMigrationConne
             let connect_cmd = |url| Mysql::new(url);
 
             create_database(url, "mysql", "/", name_cmd, Rc::new(connect_cmd));
-            SqlMigrationConnector::new(database_url).unwrap()
+            SqlMigrationConnector::new_from_database_str(database_url).unwrap()
         }
     }
 }
 
 pub(super) fn postgres_migration_connector(url: &str) -> SqlMigrationConnector {
-    match SqlMigrationConnector::new(&postgres_url()) {
+    match SqlMigrationConnector::new_from_database_str(&postgres_url()) {
         Ok(c) => c,
         Err(_) => {
             let name_cmd = |name| format!("CREATE DATABASE \"{}\"", name);
@@ -78,13 +78,13 @@ pub(super) fn postgres_migration_connector(url: &str) -> SqlMigrationConnector {
                 name_cmd,
                 Rc::new(connect_cmd),
             );
-            SqlMigrationConnector::new(&postgres_url()).unwrap()
+            SqlMigrationConnector::new_from_database_str(&postgres_url()).unwrap()
         }
     }
 }
 
 pub(super) fn sqlite_migration_connector() -> SqlMigrationConnector {
-    SqlMigrationConnector::new(&sqlite_test_file()).unwrap()
+    SqlMigrationConnector::new_from_database_str(&sqlite_test_file()).unwrap()
 }
 
 pub fn test_each_connector_with_ignores<I: AsRef<[SqlFamily]>, F>(ignores: I, test_fn: F)

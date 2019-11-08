@@ -1,3 +1,4 @@
+use datamodel::{Source, configuration::{MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME}};
 use crate::{SqlFamily, ConnectionInfo, Mysql, Postgresql, SqlConnection, Sqlite, SyncSqlConnection};
 use quaint::{ast::*, connector::ResultSet, error::Error as QuaintError};
 use url::Url;
@@ -14,15 +15,39 @@ pub enum GenericSqlConnection {
 }
 
 impl GenericSqlConnection {
+    pub fn from_datasource(datasource: &dyn Source, db_name: Option<&str>) -> Result<Self, QuaintError> {
+        let url = &datasource.url().value;
+        match datasource.connector_type() {
+            c if c == MYSQL_SOURCE_NAME => {
+                Ok(GenericSqlConnection::Mysql(Mysql::new(url.parse()?)?))
+            }
+            c if c == POSTGRES_SOURCE_NAME => {
+                Ok(GenericSqlConnection::Postgresql(Postgresql::new(url.parse()?)?))
+            }
+            c if c == SQLITE_SOURCE_NAME => {
+                Ok(GenericSqlConnection::Sqlite(Sqlite::new(&url, db_name.unwrap_or("db"))?))
+            }
+            c => panic!("Unsuppored connectory type for SQL connection: {}", c)
+        }
+    }
+
     /// Create a pooled database connection. The `db_name` param is only used on SQLite if you want
     /// to provide a specific name for the bound database.
-    pub fn new(url_str: &str, db_name: Option<&str>) -> Result<Self, QuaintError> {
-        let url: Url = url_str.parse().or_else(|_err| format!("file://{}", url_str).parse())?;
+    pub fn from_database_str(url_str: &str, db_name: Option<&str>) -> Result<Self, QuaintError> {
+        let url_parse_result: Result<Url, _> = url_str.parse();
+        let db_name = db_name.unwrap_or("db");
+
+        // Non-URL database strings are interpreted as SQLite file paths.
+        if url_parse_result.is_err() {
+            return Ok(GenericSqlConnection::Sqlite(Sqlite::new(url_str, db_name)?))
+        }
+
+        let url = url_parse_result?;
 
         match SqlFamily::from_scheme(url.scheme()) {
             Some(SqlFamily::Postgres) => Ok(GenericSqlConnection::Postgresql(Postgresql::new(url)?)),
             Some(SqlFamily::Mysql) => Ok(GenericSqlConnection::Mysql(Mysql::new(url)?)),
-            Some(SqlFamily::Sqlite) => Ok(GenericSqlConnection::Sqlite(Sqlite::new(url_str, db_name.unwrap_or("db"))?)),
+            Some(SqlFamily::Sqlite) => Ok(GenericSqlConnection::Sqlite(Sqlite::new(url_str, db_name)?)),
             None => panic!("Unsupported database URL scheme: {}", url.scheme()),
         }
     }

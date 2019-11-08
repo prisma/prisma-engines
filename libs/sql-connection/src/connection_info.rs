@@ -1,9 +1,10 @@
 use crate::SqlFamily;
 use quaint::{
-    connector::{MysqlUrl, PostgresUrl},
+    connector::{MysqlUrl, PostgresUrl, SqliteParams},
     error::Error as QuaintError,
 };
 use std::borrow::Cow;
+use std::convert::TryFrom;
 use url::Url;
 
 /// General information about a SQL connection.
@@ -24,17 +25,32 @@ pub enum ConnectionInfo {
 
 impl ConnectionInfo {
     pub fn from_url_str(url_str: &str) -> Result<Self, QuaintError> {
-        let url: Url = url_str.parse().or_else(|_err| format!("file://{}", url_str).parse())?;
+        let url_result: Result<Url, _> = url_str.parse();
+
+        // Non-URL database strings are interpreted as SQLite file paths.
+        if url_result.is_err() {
+            let params = SqliteParams::try_from(url_str)?;
+            return Ok(ConnectionInfo::Sqlite {
+                file_path: params.file_path.to_string_lossy().into_owned(),
+                db_name: None,
+            });
+        }
+
+        let url = url_result?;
+
         let sql_family = SqlFamily::from_scheme(url.scheme()).ok_or_else(|| {
             QuaintError::DatabaseUrlIsInvalid(format!("{} is not a supported database URL scheme.", url.scheme()))
         })?;
 
         match sql_family {
             SqlFamily::Mysql => Ok(ConnectionInfo::Mysql(MysqlUrl(url))),
-            SqlFamily::Sqlite => Ok(ConnectionInfo::Sqlite {
-                file_path: url.path().to_owned(),
-                db_name: None,
-            }),
+            SqlFamily::Sqlite => {
+                let params = SqliteParams::try_from(url_str)?;
+                Ok(ConnectionInfo::Sqlite {
+                    file_path: params.file_path.to_string_lossy().into_owned(),
+                    db_name: None,
+                })
+            }
             SqlFamily::Postgres => Ok(ConnectionInfo::Postgres(PostgresUrl(url))),
         }
     }

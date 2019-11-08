@@ -103,7 +103,7 @@ fn create_conn(
 
     match sql_family {
         Some(SqlFamily::Sqlite) => {
-            let inner = SqlMigrationConnector::new(datasource)?;
+            let inner = SqlMigrationConnector::new_from_database_str(datasource)?;
 
             Ok((String::new(), Box::new(inner)))
         }
@@ -113,7 +113,7 @@ fn create_conn(
             let connector = if admin_mode {
                 create_postgres_admin_conn(url)?
             } else {
-                SqlMigrationConnector::new(url.as_str())?
+                SqlMigrationConnector::new_from_database_str(url.as_str())?
             };
 
             Ok((db_name, Box::new(connector)))
@@ -125,7 +125,7 @@ fn create_conn(
                 url.set_path("");
             }
 
-            let inner = SqlMigrationConnector::new(url.as_str())?;
+            let inner = SqlMigrationConnector::new_from_database_str(url.as_str())?;
             Ok((db_name, Box::new(inner)))
         }
         None => unimplemented!("Connector {} is not supported yet", url.scheme()),
@@ -146,7 +146,7 @@ fn create_postgres_admin_conn(mut url: Url) -> crate::Result<SqlMigrationConnect
         .iter()
         .filter_map(|database_name| {
             url.set_path(database_name);
-            match SqlMigrationConnector::new(url.as_str()) {
+            match SqlMigrationConnector::new_from_database_str(url.as_str()) {
                 // If the database does not exist, try the next one.
                 Err(migration_connector::ConnectorError::DatabaseDoesNotExist { .. }) => None,
                 // If the outcome is anything else, use this.
