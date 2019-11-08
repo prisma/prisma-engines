@@ -8,8 +8,7 @@ fn databases_for_mysql_should_work() {
     test_backend(SqlFamily::Mysql, |test_setup, barrel| {
         setup(barrel);
         let result = dbg!(list_databases(test_setup));
-        let vec: Vec<String> = Vec::new();
-        assert_eq!(result, vec);
+        assert!(result.contains(&"introspection-engine".to_string()));
     });
 }
 
@@ -18,8 +17,7 @@ fn databases_for_postgres_should_work() {
     test_backend(SqlFamily::Postgres, |test_setup, barrel| {
         setup(barrel);
         let result = dbg!(list_databases(test_setup));
-        let vec: Vec<String> = Vec::new();
-        assert_eq!(result, vec);
+        assert!(result.contains(&"introspection-engine".to_string()));
     });
 }
 
@@ -28,8 +26,7 @@ fn databases_for_sqlite_should_work() {
     test_backend(SqlFamily::Sqlite, |test_setup, barrel| {
         setup(barrel);
         let result = dbg!(list_databases(test_setup));
-        let vec: Vec<String> = Vec::new();
-        assert_eq!(result, vec);
+        assert!(result.contains(&"introspection-engine.db".to_string()));
     });
 }
 

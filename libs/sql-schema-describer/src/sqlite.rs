@@ -13,7 +13,8 @@ pub struct SqlSchemaDescriber {
 
 impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
     fn list_databases(&self) -> SqlSchemaDescriberResult<Vec<String>> {
-        Ok(vec![])
+        let databases = self.get_databases();
+        Result::Ok(databases)
     }
 
     fn get_metadata(&self, schema: &str) -> SqlSchemaDescriberResult<SQLMetadata> {
@@ -47,6 +48,24 @@ impl SqlSchemaDescriber {
     /// Constructor.
     pub fn new(conn: Arc<dyn SyncSqlConnection + Send + Sync + 'static>) -> SqlSchemaDescriber {
         SqlSchemaDescriber { conn }
+    }
+
+    fn get_databases(&self) -> Vec<String> {
+        debug!("Getting table names");
+        let sql = "PRAGMA database_list;";
+        let rows = self.conn.query_raw(sql, &[]).expect("get schema names ");
+        let names = rows
+            .into_iter()
+            .map(|row| {
+                row.get("file")
+                    .and_then(|x| x.to_string())
+                    .and_then(|x| x.split("/").last().map(|x| x.to_string()))
+                    .expect("convert schema names")
+            })
+            .collect();
+
+        debug!("Found schema names: {:?}", names);
+        names
     }
 
     fn get_table_names(&self, schema: &str) -> Vec<String> {
