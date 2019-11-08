@@ -348,7 +348,7 @@ where
         let (inspector, test_setup) = get_sqlite();
 
         println!("Running the test function now");
-        let connector = SqlMigrationConnector::sqlite(&sqlite_test_file()).unwrap();
+        let connector = SqlMigrationConnector::new_from_database_str(&sqlite_test_file()).unwrap();
         let api = test_api(connector);
 
         let barrel_migration_executor = BarrelMigrationExecutor {
@@ -367,7 +367,7 @@ where
         let (inspector, test_setup) = get_postgres();
 
         println!("Running the test function now");
-        let connector = SqlMigrationConnector::postgres(&postgres_url(), false).unwrap();
+        let connector = SqlMigrationConnector::new_from_database_str(&postgres_url()).unwrap();
         let api = test_api(connector);
 
         let barrel_migration_executor = BarrelMigrationExecutor {

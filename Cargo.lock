@@ -2694,6 +2694,7 @@ name = "sql-connection"
 version = "0.1.0"
 dependencies = [
  "async-trait 0.1.17 (registry+https://github.com/rust-lang/crates.io-index)",
+ "datamodel 0.1.0",
  "quaint 0.1.0 (git+https://github.com/prisma/quaint.git)",
  "tokio 0.2.0-alpha.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "url 1.7.2 (registry+https://github.com/rust-lang/crates.io-index)",

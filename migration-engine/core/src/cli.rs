@@ -2,7 +2,8 @@ use clap::ArgMatches;
 use failure::Fail;
 use itertools::Itertools;
 use migration_connector::*;
-use sql_migration_connector::{SqlError, SqlMigrationConnector};
+use sql_connection::SqlFamily;
+use sql_migration_connector::SqlMigrationConnector;
 use std::collections::HashMap;
 use url::Url;
 
@@ -98,35 +99,36 @@ fn create_conn(
     Box<dyn MigrationConnector<DatabaseMigration = impl DatabaseMigrationMarker>>,
 )> {
     let mut url = Url::parse(datasource).expect("Invalid url in the datasource");
+    let sql_family = SqlFamily::from_scheme(url.scheme());
 
-    match url.scheme() {
-        "file" | "sqlite" => {
-            let inner = SqlMigrationConnector::sqlite(datasource)?;
+    match sql_family {
+        Some(SqlFamily::Sqlite) => {
+            let inner = SqlMigrationConnector::new_from_database_str(datasource)?;
 
             Ok((String::new(), Box::new(inner)))
         }
-        "postgresql" | "postgres" => {
+        Some(SqlFamily::Postgres) => {
             let db_name = fetch_db_name(&url, "postgres");
 
             let connector = if admin_mode {
                 create_postgres_admin_conn(url)?
             } else {
-                SqlMigrationConnector::postgres(url.as_str(), false)?
+                SqlMigrationConnector::new_from_database_str(url.as_str())?
             };
 
             Ok((db_name, Box::new(connector)))
         }
-        "mysql" => {
+        Some(SqlFamily::Mysql) => {
             let db_name = fetch_db_name(&url, "mysql");
 
             if admin_mode {
                 url.set_path("");
             }
 
-            let inner = SqlMigrationConnector::mysql(url.as_str(), false)?;
+            let inner = SqlMigrationConnector::new_from_database_str(url.as_str())?;
             Ok((db_name, Box::new(inner)))
         }
-        x => unimplemented!("Connector {} is not supported yet", x),
+        None => unimplemented!("Connector {} is not supported yet", url.scheme()),
     }
 }
 
@@ -144,9 +146,9 @@ fn create_postgres_admin_conn(mut url: Url) -> crate::Result<SqlMigrationConnect
         .iter()
         .filter_map(|database_name| {
             url.set_path(database_name);
-            match SqlMigrationConnector::postgres(url.as_str(), false) {
+            match SqlMigrationConnector::new_from_database_str(url.as_str()) {
                 // If the database does not exist, try the next one.
-                Err(SqlError::DatabaseDoesNotExist { .. }) => None,
+                Err(migration_connector::ConnectorError::DatabaseDoesNotExist { .. }) => None,
                 // If the outcome is anything else, use this.
                 other_outcome => Some(other_outcome),
             }
@@ -358,7 +360,7 @@ mod tests {
 
             {
                 let uri = url::Url::parse(&mysql_url(None)).unwrap();
-                let conn = Mysql::new_unpooled(uri).unwrap();
+                let conn = Mysql::new(uri).unwrap();
 
                 conn.execute_raw("DROP DATABASE `this_should_exist`", &[]).unwrap();
             }
@@ -387,7 +389,7 @@ mod tests {
 
             {
                 let uri = url::Url::parse(&postgres_url(None)).unwrap();
-                let conn = Postgresql::new_unpooled(uri).unwrap();
+                let conn = Postgresql::new(uri).unwrap();
 
                 conn.execute_raw("DROP DATABASE \"this_should_exist\"", &[]).unwrap();
             }

@@ -30,7 +30,7 @@ pub fn get_mysql_describer(sql: &str) -> mysql::SqlSchemaDescriber {
     // Ensure the presence of an empty database.
 
     let url = mysql_url("");
-    let conn = Mysql::new_unpooled(url.parse().unwrap()).unwrap();
+    let conn = Mysql::new(url.parse().unwrap()).unwrap();
 
     conn.execute_raw(&format!("DROP SCHEMA IF EXISTS `{}`", SCHEMA), &[])
         .expect("dropping schema");
@@ -40,7 +40,7 @@ pub fn get_mysql_describer(sql: &str) -> mysql::SqlSchemaDescriber {
     // Migrate the database we just created.
 
     let url = mysql_url(SCHEMA);
-    let conn = Mysql::new_unpooled(url.parse().unwrap()).unwrap();
+    let conn = Mysql::new(url.parse().unwrap()).unwrap();
 
     debug!("Executing MySQL migrations: {}", sql);
     let sql_string = sql.to_string();

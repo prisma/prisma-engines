@@ -2,16 +2,10 @@ use crate::test_harness::{Mysql, Postgresql, Sqlite, SyncSqlConnection};
 use barrel::{Migration, SqlVariant};
 use introspection_connector::IntrospectionConnector;
 use pretty_assertions::assert_eq;
+use sql_connection::SqlFamily;
 use sql_introspection_connector::*;
 use std::{rc::Rc, sync::Arc};
 use url::Url;
-
-#[derive(Debug, Copy, Clone, PartialEq)]
-pub enum SqlFamily {
-    Sqlite,
-    Postgres,
-    Mysql,
-}
 
 pub struct TestSetup {
     pub sql_family: SqlFamily,
@@ -128,7 +122,7 @@ pub fn database(database_url: &str) -> Box<dyn SyncSqlConnection + Send + Sync +
             let url = Url::parse(database_url).unwrap();
             let create_cmd = |name| format!("CREATE DATABASE \"{}\"", name);
 
-            let connect_cmd = |url| Postgresql::new_pooled(url);
+            let connect_cmd = |url| Postgresql::new(url);
 
             let conn = with_database(url, "postgres", "postgres", create_cmd, Rc::new(connect_cmd));
 
@@ -138,7 +132,7 @@ pub fn database(database_url: &str) -> Box<dyn SyncSqlConnection + Send + Sync +
             let url = Url::parse(database_url).unwrap();
             let create_cmd = |name| format!("CREATE DATABASE `{}`", name);
 
-            let connect_cmd = |url| Mysql::new_pooled(url);
+            let connect_cmd = |url| Mysql::new(url);
 
             let conn = with_database(url, "mysql", "/", create_cmd, Rc::new(connect_cmd));
 

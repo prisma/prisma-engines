@@ -7,7 +7,8 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-quaint = { git = "https://github.com/prisma/quaint.git" }
 async-trait = "0.1.17"
-url = "1.7.0"
+datamodel = { path = "../datamodel" }
+quaint = { git = "https://github.com/prisma/quaint.git" }
 tokio = "0.2.0-alpha.6"
+url = "1.7.0"
