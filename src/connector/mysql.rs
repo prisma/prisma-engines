@@ -29,11 +29,26 @@ pub struct MysqlParams {
 
 /// Wraps a connection url and exposes the parsing logic used by quaint, including default values.
 #[derive(Debug, Clone)]
-pub struct MysqlUrl(pub Url);
+pub struct MysqlUrl{
+    url: Url,
+    query_params: MysqlUrlQueryParams,
+}
+
+
 
 impl MysqlUrl {
+    pub fn new(url: Url) -> Result<Self, Error> {
+        let query_params = Self::parse_query_params(&url)?;
+
+        Ok(Self { url, query_params, })
+    }
+
+    pub fn url(&self) -> &Url {
+        &self.url
+    }
+
     pub fn username<'a>(&'a self) -> Cow<'a, str> {
-        match percent_decode(self.0.username().as_bytes()).decode_utf8() {
+        match percent_decode(self.url.username().as_bytes()).decode_utf8() {
             Ok(username) => {
                 username
             }
@@ -43,14 +58,14 @@ impl MysqlUrl {
                 #[cfg(feature = "tracing-log")]
                 tracing::warn!("Couldn't decode username to UTF-8, using the non-decoded version.");
 
-                self.0.username().into()
+                self.url.username().into()
             }
         }
 
     }
 
     pub fn password<'a>(&'a self) -> Option<Cow<'a, str>> {
-        match self.0
+        match self.url
             .password()
             .and_then(|pw| percent_decode(pw.as_bytes()).decode_utf8().ok())
         {
@@ -58,14 +73,14 @@ impl MysqlUrl {
                 Some(password)
             }
             None => {
-                self.0.password().map(|s| s.into())
+                self.url.password().map(|s| s.into())
             }
         }
 
     }
 
     pub fn dbname(&self) -> &str {
-        match self.0.path_segments() {
+        match self.url.path_segments() {
             Some(mut segments) => segments.next().unwrap_or("mysql"),
             None => "mysql",
         }
@@ -73,19 +88,28 @@ impl MysqlUrl {
     }
 
     pub fn host(&self) -> &str {
-        self.0.host_str().unwrap_or("localhost")
+        self.url.host_str().unwrap_or("localhost")
+    }
+
+    pub fn socket(&self) -> &Option<String> {
+        &self.query_params.socket
     }
 
     pub fn port(&self) -> u16 {
-        self.0.port().unwrap_or(3306)
+        self.url.port().unwrap_or(3306)
     }
 
-    pub fn query_params(&self) -> Result<MysqlUrlQueryParams, Error> {
+    pub fn query_params(&self) -> &MysqlUrlQueryParams {
+        &self.query_params
+    }
+
+    fn parse_query_params(url: &Url) -> Result<MysqlUrlQueryParams, Error> {
         let mut connection_limit = num_cpus::get_physical() * 2 + 1;
         let mut ssl_opts = my::SslOpts::default();
         let mut use_ssl = false;
+        let mut socket = None;
 
-        for (k, v) in self.0.query_pairs() {
+        for (k, v) in url.query_pairs() {
             match k.as_ref() {
                 "connection_limit" => {
                     let as_int: usize = v.parse().map_err(|_| Error::InvalidConnectionArguments)?;
@@ -102,6 +126,9 @@ impl MysqlUrl {
                 "sslpassword" => {
                     use_ssl = true;
                     ssl_opts.set_password(Some(v.to_string()));
+                }
+                "socket" => {
+                    socket = Some(v.replace("(", "").replace(")", ""));
                 }
                 "sslaccept" => {
                     match v.as_ref() {
@@ -136,15 +163,18 @@ impl MysqlUrl {
             ssl_opts,
             connection_limit,
             use_ssl,
+            socket,
         })
 
     }
 }
 
+#[derive(Debug, Clone)]
 pub struct MysqlUrlQueryParams {
     ssl_opts: my::SslOpts,
     connection_limit: usize,
     use_ssl: bool,
+    socket: Option<String>,
 }
 
 
@@ -152,18 +182,28 @@ impl TryFrom<Url> for MysqlParams {
     type Error = Error;
 
     fn try_from(url: Url) -> crate::Result<Self> {
-        let url = MysqlUrl(url);
-        let query_params = url.query_params()?;
+        let url = MysqlUrl::new(url)?;
         let mut config = my::OptsBuilder::new();
 
         config.user(Some(url.username()));
         config.pass(url.password());
         config.db_name(Some(url.dbname()));
-        config.ip_or_hostname(url.host());
-        config.tcp_port(url.port());
+
+        match url.socket() {
+            Some(ref socket) => {
+                config.socket(Some(socket));
+            }
+            None => {
+                config.ip_or_hostname(url.host());
+                config.tcp_port(url.port());
+            }
+        }
+
         config.stmt_cache_size(Some(1000));
         config.conn_ttl(Some(Duration::from_secs(5)));
 
+        let dbname =  url.dbname().to_string();
+        let query_params = url.query_params;
         if query_params.use_ssl {
             config.ssl_opts(Some(query_params.ssl_opts));
         }
@@ -171,7 +211,7 @@ impl TryFrom<Url> for MysqlParams {
         Ok(Self {
             connection_limit: u32::try_from(query_params.connection_limit).unwrap(),
             config,
-            dbname: url.dbname().to_string(),
+            dbname,
         })
     }
 }
@@ -317,6 +357,13 @@ mod tests {
         config.pass(env::var("TEST_MYSQL_ROOT_PASSWORD").ok());
         config.user("root".into());
         config
+    }
+
+    #[test]
+    fn should_parse_socket_url() {
+        let url = MysqlUrl::new(Url::parse("mysql://root@localhost/dbname?socket=(/tmp/mysql.sock)").unwrap()).unwrap();
+        assert_eq!("dbname", url.dbname());
+        assert_eq!(&Some(String::from("/tmp/mysql.sock")), url.socket());
     }
 
     #[tokio::test]
