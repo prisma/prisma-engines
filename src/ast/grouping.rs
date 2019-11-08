@@ -1,6 +1,6 @@
 use crate::ast::{Column, DatabaseValue};
 
-pub type GroupByDefinition<'a> = (DatabaseValue<'a>);
+pub type GroupByDefinition<'a> = DatabaseValue<'a>;
 
 /// A list of definitions for the `GROUP BY` statement
 #[derive(Debug, Default, PartialEq, Clone)]
