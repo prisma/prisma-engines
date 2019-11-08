@@ -10,7 +10,17 @@ pub struct SqlSchemaDescriber {
 
 impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
     fn list_databases(&self) -> SqlSchemaDescriberResult<Vec<String>> {
-        Ok(vec![])
+        let databases = self.get_databases();
+        Ok(databases)
+    }
+
+    fn get_metadata(&self, schema: &str) -> SqlSchemaDescriberResult<SQLMetadata> {
+        let count = self.get_table_names(&schema).len();
+        let size = self.get_size(&schema);
+        Ok(SQLMetadata {
+            table_count: count,
+            size_in_bytes: size,
+        })
     }
 
     fn describe(&self, schema: &str) -> SqlSchemaDescriberResult<SqlSchema> {
@@ -34,6 +44,23 @@ impl SqlSchemaDescriber {
         SqlSchemaDescriber { conn }
     }
 
+    fn get_databases(&self) -> Vec<String> {
+        debug!("Getting table names");
+        let sql = "select schema_name from information_schema.schemata;";
+        let rows = self.conn.query_raw(sql, &[]).expect("get schema names ");
+        let names = rows
+            .into_iter()
+            .map(|row| {
+                row.get("schema_name")
+                    .and_then(|x| x.to_string())
+                    .expect("convert schema names")
+            })
+            .collect();
+
+        debug!("Found schema names: {:?}", names);
+        names
+    }
+
     fn get_table_names(&self, schema: &str) -> Vec<String> {
         debug!("Getting table names");
         let sql = "SELECT table_name as table_name FROM information_schema.tables
@@ -53,6 +80,22 @@ impl SqlSchemaDescriber {
 
         debug!("Found table names: {:?}", names);
         names
+    }
+
+    fn get_size(&self, schema: &str) -> usize {
+        debug!("Getting table names");
+        let sql = "SELECT 
+      SUM(data_length + index_length) as size 
+      FROM information_schema.TABLES 
+      WHERE table_schema = ?";
+        let result = self.conn.query_raw(sql, &[schema.into()]).expect("get db size ");
+        let size: String = result
+            .first()
+            .map(|row| row.get("size").and_then(|x| x.to_string()).expect("get db size"))
+            .unwrap();
+
+        debug!("Found db size: {:?}", size);
+        size.parse().unwrap()
     }
 
     fn get_table(&self, schema: &str, name: &str) -> Table {
