@@ -1,4 +1,5 @@
 use crate::error::Error;
+use failure::format_err;
 
 impl From<tokio_postgres::error::Error> for Error {
     fn from(e: tokio_postgres::error::Error) -> Error {
@@ -69,6 +70,11 @@ impl From<tokio_postgres::error::Error> for Error {
                     return tls_error;
                 }
 
+                // Same for IO errors.
+                if let Some(io_error) = try_extracting_io_error(&e) {
+                    return io_error;
+                }
+
                 let reason = format!("{}", e);
 
                 match reason.as_str() {
@@ -86,6 +92,14 @@ fn try_extracting_tls_error(err: &tokio_postgres::error::Error) -> Option<Error>
     err.source()
         .and_then(|err| err.downcast_ref::<native_tls::Error>())
         .map(|err| err.into())
+}
+
+fn try_extracting_io_error(err: &tokio_postgres::error::Error) -> Option<Error> {
+    use std::error::Error as _;
+
+    err.source()
+        .and_then(|err| err.downcast_ref::<std::io::Error>())
+        .map(|err| Error::ConnectionError(format_err!("{}", err)))
 }
 
 impl From<native_tls::Error> for Error {

@@ -1,11 +1,16 @@
 use crate::error::Error;
 use mysql_async as my;
+use std::io::ErrorKind as IoErrorKind;
 
 impl From<my::error::Error> for Error {
     fn from(e: my::error::Error) -> Error {
         use my::error::ServerError;
 
         match e {
+            my::error::Error::Io(io_error) => match io_error.kind() {
+                IoErrorKind::ConnectionRefused => Error::ConnectionError(io_error.into()),
+                _ => Error::QueryError(io_error.into()),
+            },
             my::error::Error::Driver(e) => Error::QueryError(e.into()),
             my::error::Error::Server(ServerError {
                 ref message, code, ..
