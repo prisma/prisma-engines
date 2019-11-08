@@ -25,9 +25,9 @@ Lift connects to the migration-engine and the starting point for requests is the
 [rpc
 api](https://github.com/prisma/prisma-engine/blob/master/migration-engine/core/src/api/rpc.rs).
 
-This section contains instructions for building the binaries that are powering the [Prisma Framework](https://github.com/prisma/prisma2) with a [**development**](https://doc.rust-lang.org/book/ch14-01-release-profiles.html) release profile (i.e. in _debug mode_).
-
 ## Building Binaries in Debug Mode
+
+This section contains instructions for building the binaries that are powering the [Prisma Framework](https://github.com/prisma/prisma2) with a [**development**](https://doc.rust-lang.org/book/ch14-01-release-profiles.html) release profile (i.e. in _debug mode_).
 
 ### 1. Clone the repository
 
