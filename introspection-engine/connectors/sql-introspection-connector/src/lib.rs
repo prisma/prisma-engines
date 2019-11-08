@@ -28,7 +28,7 @@ impl SqlIntrospectionConnector {
     fn get_metadata_internal(&self, database: &str) -> SqlIntrospectionResult<DatabaseMetadata> {
         let sql_metadata = self.describer.get_metadata(&database)?;
         let db_metadate = DatabaseMetadata {
-            model_count: sql_metadata.table_count,
+            table_count: sql_metadata.table_count,
             size_in_bytes: sql_metadata.size_in_bytes,
         };
         Ok(db_metadate)
@@ -43,6 +43,7 @@ impl IntrospectionConnector for SqlIntrospectionConnector {
     fn list_databases(&self) -> ConnectorResult<Vec<String>> {
         Ok(self.list_databases_internal()?)
     }
+
     fn get_metadata(&self, database: &str) -> ConnectorResult<DatabaseMetadata> {
         Ok(self.get_metadata_internal(&database)?)
     }

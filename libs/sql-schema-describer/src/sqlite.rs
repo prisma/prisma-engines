@@ -89,11 +89,7 @@ impl SqlSchemaDescriber {
             .first()
             .map(|row| {
                 row.get("size")
-                    .and_then(|x| {
-                        println!("{}", x);
-
-                        x.as_i64()
-                    })
+                    .and_then(|x| x.as_i64())
                     .expect("convert db size result")
             })
             .unwrap();

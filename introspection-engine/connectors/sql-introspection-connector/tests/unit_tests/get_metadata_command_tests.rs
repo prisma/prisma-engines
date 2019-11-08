@@ -8,7 +8,7 @@ fn metadate_for_mysql_should_work() {
     test_backend(SqlFamily::Mysql, |test_setup, barrel| {
         setup(barrel);
         let result = dbg!(get_metadata(test_setup));
-        assert_eq!(result.model_count, 3);
+        assert_eq!(result.table_count, 3);
         assert_eq!(result.size_in_bytes, 49152);
     });
 }
@@ -18,7 +18,7 @@ fn metadata_for_postgres_should_work() {
     test_backend(SqlFamily::Postgres, |test_setup, barrel| {
         setup(barrel);
         let result = dbg!(get_metadata(test_setup));
-        assert_eq!(result.model_count, 3);
+        assert_eq!(result.table_count, 3);
         assert_eq!(result.size_in_bytes, 40960);
     });
 }
@@ -28,7 +28,7 @@ fn metadata_for_sqlite_should_work() {
     test_backend(SqlFamily::Sqlite, |test_setup, barrel| {
         setup(barrel);
         let result = dbg!(get_metadata(test_setup));
-        assert_eq!(result.model_count, 3);
+        assert_eq!(result.table_count, 3);
         assert_eq!(result.size_in_bytes, 0); // page_size * page_count and count is 0
     });
 }
