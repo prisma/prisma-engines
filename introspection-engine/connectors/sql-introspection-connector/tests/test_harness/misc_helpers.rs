@@ -36,6 +36,11 @@ pub(crate) fn get_metadata(test_setup: &TestSetup) -> DatabaseMetadata {
     metadata
 }
 
+pub(crate) fn list_databases(test_setup: &TestSetup) -> Vec<String> {
+    let databases = test_setup.introspection_connector.list_databases().unwrap();
+    databases
+}
+
 // helpers
 
 pub(crate) fn custom_assert(left: &str, right: &str) {
@@ -59,6 +64,19 @@ where
     F: Fn(&TestSetup, &BarrelMigrationExecutor) -> () + std::panic::RefUnwindSafe,
 {
     test_each_backend_with_ignores(Vec::new(), test_fn);
+}
+
+pub(crate) fn test_backend<F>(backend: SqlFamily, test_fn: F)
+where
+    F: Fn(&TestSetup, &BarrelMigrationExecutor) -> () + std::panic::RefUnwindSafe,
+{
+    let ignores = match backend {
+        SqlFamily::Mysql => vec![SqlFamily::Postgres, SqlFamily::Sqlite],
+        SqlFamily::Postgres => vec![SqlFamily::Mysql, SqlFamily::Sqlite],
+        SqlFamily::Sqlite => vec![SqlFamily::Postgres, SqlFamily::Mysql],
+    };
+
+    test_each_backend_with_ignores(ignores, test_fn);
 }
 
 pub(crate) fn test_each_backend_with_ignores<F>(ignores: Vec<SqlFamily>, test_fn: F)

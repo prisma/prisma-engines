@@ -1,5 +1,6 @@
 //! SQLite description.
 use super::*;
+use failure::_core::convert::TryInto;
 use log::debug;
 use quaint::ast::ParameterizedValue;
 use sql_connection::SyncSqlConnection;
@@ -16,9 +17,11 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
     }
 
     fn get_metadata(&self, schema: &str) -> SqlSchemaDescriberResult<SQLMetadata> {
+        let count = self.get_table_names(&schema).len();
+        let size = self.get_size(&schema);
         Result::Ok(SQLMetadata {
-            table_count: 10,
-            size_in_bytes: 1024,
+            table_count: count,
+            size_in_bytes: size,
         })
     }
 
@@ -57,6 +60,26 @@ impl SqlSchemaDescriber {
             .collect();
         debug!("Found table names: {:?}", names);
         names
+    }
+
+    fn get_size(&self, _schema: &str) -> usize {
+        debug!("Getting db size");
+        let sql = format!(r#"SELECT page_count * page_size as size FROM pragma_page_count(), pragma_page_size();"#);
+        let result = self.conn.query_raw(&sql, &[]).expect("get db size ");
+        let size: i64 = result
+            .first()
+            .map(|row| {
+                row.get("size")
+                    .and_then(|x| {
+                        println!("{}", x);
+
+                        x.as_i64()
+                    })
+                    .expect("convert db size result")
+            })
+            .unwrap();
+
+        size.try_into().unwrap()
     }
 
     fn get_table(&self, schema: &str, name: &str) -> Table {

@@ -1,5 +1,6 @@
 //! Postgres description.
 use super::*;
+use failure::_core::convert::TryInto;
 use log::debug;
 use regex::Regex;
 use sql_connection::SyncSqlConnection;
@@ -12,13 +13,16 @@ pub struct SqlSchemaDescriber {
 
 impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
     fn list_databases(&self) -> SqlSchemaDescriberResult<Vec<String>> {
-        Ok(vec![])
+        let databases = self.get_databases();
+        Result::Ok(databases)
     }
 
     fn get_metadata(&self, schema: &str) -> SqlSchemaDescriberResult<SQLMetadata> {
+        let count = self.get_table_names(&schema).len();
+        let size = self.get_size(&schema);
         Result::Ok(SQLMetadata {
-            table_count: 10,
-            size_in_bytes: 1024,
+            table_count: count,
+            size_in_bytes: size,
         })
     }
 
@@ -45,6 +49,23 @@ impl SqlSchemaDescriber {
         SqlSchemaDescriber { conn }
     }
 
+    fn get_databases(&self) -> Vec<String> {
+        debug!("Getting table names");
+        let sql = "select schema_name from information_schema.schemata;";
+        let rows = self.conn.query_raw(sql, &[]).expect("get schema names ");
+        let names = rows
+            .into_iter()
+            .map(|row| {
+                row.get("schema_name")
+                    .and_then(|x| x.to_string())
+                    .expect("convert schema names")
+            })
+            .collect();
+
+        debug!("Found schema names: {:?}", names);
+        names
+    }
+
     fn get_table_names(&self, schema: &str) -> Vec<String> {
         debug!("Getting table names");
         let sql = "SELECT table_name as table_name FROM information_schema.tables
@@ -64,6 +85,26 @@ impl SqlSchemaDescriber {
 
         debug!("Found table names: {:?}", names);
         names
+    }
+
+    fn get_size(&self, schema: &str) -> usize {
+        debug!("Getting db size");
+        let sql =
+            "SELECT SUM(pg_total_relation_size(quote_ident(schemaname) || '.' || quote_ident(tablename)))::BIGINT as size
+             FROM pg_tables 
+             WHERE schemaname = $1::text";
+        let result = self.conn.query_raw(sql, &[schema.into()]).expect("get db size ");
+        let size: i64 = result
+            .first()
+            .map(|row| {
+                row.get("size")
+                    .and_then(|x| x.as_i64())
+                    .expect("convert db size result")
+            })
+            .unwrap();
+
+        debug!("Found db size: {:?}", size);
+        size.try_into().unwrap()
     }
 
     fn get_table(&self, schema: &str, name: &str, sequences: &Vec<Sequence>) -> Table {

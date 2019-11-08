@@ -24,6 +24,7 @@ pub type SqlSchemaDescriberResult<T> = core::result::Result<T, SqlSchemaDescribe
 pub trait SqlSchemaDescriberBackend: Send + Sync + 'static {
     /// List the database's schemas.
     fn list_databases(&self) -> SqlSchemaDescriberResult<Vec<String>>;
+    /// Get the databases metadata.
     fn get_metadata(&self, schema: &str) -> SqlSchemaDescriberResult<SQLMetadata>;
     /// Describe a database schema.
     fn describe(&self, schema: &str) -> SqlSchemaDescriberResult<SqlSchema>;
