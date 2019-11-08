@@ -1,10 +1,33 @@
-# Prisma Rust
+# Prisma Engines
 
-Development Stack: Rust & Cargo.
+The core stack for [Photon](https://github.com/prisma/photonjs/) and
+[Lift](https://github.com/prisma/lift/).
 
-## Building Binaries in Debug Mode
+## Code architecture
+
+Photon uses query-engine and its
+[main](https://github.com/prisma/prisma-engine/blob/master/query-engine/prisma/src/main.rs)
+is a good place to start digging into the code.
+
+The request basically flows from
+[server.rs](https://github.com/prisma/prisma-engine/blob/master/query-engine/prisma/src/server.rs)
+to [graphql
+handler](https://github.com/prisma/prisma-engine/blob/master/query-engine/prisma/src/request_handlers/graphql/handler.rs)
+and from there to [core
+executor](https://github.com/prisma/prisma-engine/blob/master/query-engine/core/src/executor/interpreting_executor.rs)
+down to the
+[connectors](https://github.com/prisma/prisma-engine/tree/master/query-engine/connectors/sql-query-connector/src).
+
+The SQL generation and SQL database abstractions are handled by the [quaint
+crate](https://github.com/prisma/quaint).
+
+Lift connects to the migration-engine and the starting point for requests is the
+[rpc
+api](https://github.com/prisma/prisma-engine/blob/master/migration-engine/core/src/api/rpc.rs).
 
 This section contains instructions for building the binaries that are powering the [Prisma Framework](https://github.com/prisma/prisma2) with a [**development**](https://doc.rust-lang.org/book/ch14-01-release-profiles.html) release profile (i.e. in _debug mode_).
+
+## Building Binaries in Debug Mode
 
 ### 1. Clone the repository
 

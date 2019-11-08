@@ -10,7 +10,7 @@ pub fn parse_from_dmmf(dmmf: &str) -> dml::Datamodel {
     schema_from_dmmf(&parsed_dmmf)
 }
 
-fn schema_from_dmmf(schema: &Datamodel) -> dml::Datamodel {
+pub fn schema_from_dmmf(schema: &Datamodel) -> dml::Datamodel {
     let mut datamodel = dml::Datamodel {
         models: vec![],
         enums: vec![],

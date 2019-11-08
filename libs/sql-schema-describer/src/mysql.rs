@@ -324,8 +324,10 @@ impl SqlSchemaDescriber {
         let indices = indexes_map
             .into_iter()
             .map(|(_k, v)| v)
-            // Remove foreign keys, because they are introspected separately.
-            .filter(|index| foreign_keys.iter().find(|fk| fk.columns == index.columns).is_none())
+            // Remove foreign keys, because they are introspected separately. But if there is a unique constraint on that column we need it to identify 1:1 relations
+            .filter(|index| {
+                foreign_keys.iter().find(|fk| fk.columns == index.columns).is_none() || index.tpe == IndexType::Unique
+            })
             .collect();
 
         debug!("Found table indices: {:?}, primary key: {:?}", indices, primary_key);
