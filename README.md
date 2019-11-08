@@ -60,12 +60,12 @@ cargo build
 
 You can find the compiled binaries inside the newly created `./target/debug` directory:
 
-| Prisma Framework Component | Path to Binary                                       |
-| -------------------------- | ---------------------------------------------------- |
-| HTTP server + Query Engine | `./target/prisma/prisma`                             |
-| Migration Engine           | `./target/migration-engine/migration-engine`         |
-| Introspection Engine       | `./target/introspection-engine/introspection-engine` |
-| Prisma Format              | `./target/prisma-fmt/prisma-fmt`                     |
+| Prisma Framework Component | Path to Binary                                             |
+| -------------------------- | ---------------------------------------------------------- |
+| HTTP server + Query Engine | `./target/debug/prisma/prisma`                             |
+| Migration Engine           | `./target/debug/migration-engine/migration-engine`         |
+| Introspection Engine       | `./target/debug/introspection-engine/introspection-engine` |
+| Prisma Format              | `./target/debug/prisma-fmt/prisma-fmt`                     |
 
 ## Coding Guidelines
 
