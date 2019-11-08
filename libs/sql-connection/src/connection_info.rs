@@ -1,4 +1,8 @@
 use crate::SqlFamily;
+use datamodel::{
+    configuration::{MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME},
+    Source,
+};
 use quaint::{
     connector::{MysqlUrl, PostgresUrl, SqliteParams},
     error::Error as QuaintError,
@@ -17,13 +21,30 @@ pub enum ConnectionInfo {
     /// A SQLite connection URL.
     Sqlite {
         /// The filesystem path of the SQLite database.
-        file_path: String,
+        file_path: PathBuf,
         /// The name the database is bound to (with `ATTACH DATABASE`), if available.
         db_name: Option<String>,
     },
 }
 
 impl ConnectionInfo {
+    pub fn from_datasource(datasource: &dyn Source) -> Result<Self, QuaintError> {
+        let url = &datasource.url().value;
+
+        match datasource.connector_type() {
+            c if c == MYSQL_SOURCE_NAME => Ok(ConnectionInfo::Mysql(MysqlUrl(url.parse()?))),
+            c if c == POSTGRES_SOURCE_NAME => Ok(ConnectionInfo::Postgres(PostgresUrl(url.parse()?))),
+            c if c == SQLITE_SOURCE_NAME => {
+                let params = SqliteParams::try_from(url.as_str())?;
+                Ok(ConnectionInfo::Sqlite {
+                    file_path: params.file_path,
+                    db_name: None,
+                })
+            }
+            c => panic!("Unsuppored connector type for SQL connection: {}", c),
+        }
+    }
+
     pub fn from_url_str(url_str: &str) -> Result<Self, QuaintError> {
         let url_result: Result<Url, _> = url_str.parse();
 
