@@ -1,10 +1,10 @@
 //! Postgres description.
 use super::*;
-use failure::_core::convert::TryInto;
 use log::debug;
 use regex::Regex;
 use sql_connection::SyncSqlConnection;
 use std::collections::{HashMap, HashSet};
+use std::convert::TryInto;
 use std::sync::Arc;
 
 pub struct SqlSchemaDescriber {

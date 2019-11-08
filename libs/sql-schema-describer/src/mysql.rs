@@ -11,13 +11,13 @@ pub struct SqlSchemaDescriber {
 impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
     fn list_databases(&self) -> SqlSchemaDescriberResult<Vec<String>> {
         let databases = self.get_databases();
-        Result::Ok(databases)
+        Ok(databases)
     }
 
     fn get_metadata(&self, schema: &str) -> SqlSchemaDescriberResult<SQLMetadata> {
         let count = self.get_table_names(&schema).len();
         let size = self.get_size(&schema);
-        Result::Ok(SQLMetadata {
+        Ok(SQLMetadata {
             table_count: count,
             size_in_bytes: size,
         })

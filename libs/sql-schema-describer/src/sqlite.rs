@@ -87,12 +87,8 @@ impl SqlSchemaDescriber {
         let result = self.conn.query_raw(&sql, &[]).expect("get db size ");
         let size: i64 = result
             .first()
-            .map(|row| {
-                row.get("size")
-                    .and_then(|x| x.as_i64())
-                    .expect("convert db size result")
-            })
-            .unwrap();
+            .and_then(|row| row.get("size")?.as_i64())
+            .expect("convert db size result");
 
         size.try_into().unwrap()
     }
