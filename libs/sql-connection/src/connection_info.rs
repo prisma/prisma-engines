@@ -21,7 +21,7 @@ pub enum ConnectionInfo {
     /// A SQLite connection URL.
     Sqlite {
         /// The filesystem path of the SQLite database.
-        file_path: PathBuf,
+        file_path: String,
         /// The name the database is bound to (with `ATTACH DATABASE`), if available.
         db_name: Option<String>,
     },
@@ -52,7 +52,7 @@ impl ConnectionInfo {
         if url_result.is_err() {
             let params = SqliteParams::try_from(url_str)?;
             return Ok(ConnectionInfo::Sqlite {
-                file_path: params.file_path.to_string_lossy().into_owned(),
+                file_path: params.file_path,
                 db_name: None,
             });
         }
@@ -68,7 +68,7 @@ impl ConnectionInfo {
             SqlFamily::Sqlite => {
                 let params = SqliteParams::try_from(url_str)?;
                 Ok(ConnectionInfo::Sqlite {
-                    file_path: params.file_path.to_string_lossy().into_owned(),
+                    file_path: params.file_path,
                     db_name: None,
                 })
             }
