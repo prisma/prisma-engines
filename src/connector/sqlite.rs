@@ -9,17 +9,22 @@ use crate::{
 };
 use futures::future;
 use rusqlite::NO_PARAMS;
-use std::{collections::HashSet, convert::TryFrom, path::PathBuf, sync::Mutex};
+use std::{collections::HashSet, convert::TryFrom, path::Path, sync::Mutex};
 
 /// A connector interface for the SQLite database
 pub struct Sqlite {
     pub(crate) client: Mutex<rusqlite::Connection>,
-    pub(crate) file_path: PathBuf,
+    /// This is not a `PathBuf` because we need to `ATTACH` the database to the path, and this can
+    /// only be done with UTF-8 paths.
+    pub(crate) file_path: String,
 }
+
 
 pub struct SqliteParams {
     pub connection_limit: u32,
-    pub file_path: PathBuf,
+    /// This is not a `PathBuf` because we need to `ATTACH` the database to the path, and this can
+    /// only be done with UTF-8 paths.
+    pub file_path: String,
 }
 
 type ConnectionParams = (Vec<(String, String)>, Vec<(String, String)>);
@@ -30,7 +35,8 @@ impl TryFrom<&str> for SqliteParams {
     fn try_from(path: &str) -> crate::Result<Self> {
         let path = path.trim_start_matches("file:");
         let path_parts: Vec<&str> = path.split('?').collect();
-        let path = PathBuf::from(path_parts[0]);
+        let path_str = path_parts[0];
+        let path = Path::new(path_str);
 
         if path.is_dir() {
             Err(Error::DatabaseUrlIsInvalid(
@@ -76,7 +82,7 @@ impl TryFrom<&str> for SqliteParams {
 
             Ok(Self {
                 connection_limit: u32::try_from(connection_limit).unwrap(),
-                file_path: path,
+                file_path: path_str.to_owned(),
             })
         }
     }
@@ -95,11 +101,9 @@ impl TryFrom<&str> for Sqlite {
 }
 
 impl Sqlite {
-    pub fn new<P>(file_path: P) -> crate::Result<Sqlite>
-    where
-        P: Into<PathBuf>,
+    pub fn new(file_path: &str) -> crate::Result<Sqlite>
     {
-        Self::try_from(file_path.into().to_str().unwrap())
+        Self::try_from(file_path)
     }
 
     pub fn attach_database(&mut self, db_name: &str) -> crate::Result<()> {
@@ -119,7 +123,7 @@ impl Sqlite {
             rusqlite::Connection::execute(
                 &client,
                 "ATTACH DATABASE ? AS ?",
-                &[self.file_path.to_str().unwrap(), db_name],
+                &[self.file_path.as_str(), db_name],
             )?;
         }
 
@@ -231,7 +235,7 @@ mod tests {
 
     #[tokio::test]
     async fn should_provide_a_database_connection() {
-        let connection = Sqlite::new(String::from("db/test.db")).unwrap();
+        let connection = Sqlite::new("db/test.db").unwrap();
         let res = connection
             .query_raw("SELECT * FROM sqlite_master", &[])
             .await
@@ -242,7 +246,7 @@ mod tests {
 
     #[tokio::test]
     async fn should_provide_a_database_transaction() {
-        let connection = Sqlite::new(String::from("db/test.db")).unwrap();
+        let connection = Sqlite::new("db/test.db").unwrap();
         let tx = connection.start_transaction().await.unwrap();
         let res = tx
             .query_raw("SELECT * FROM sqlite_master", &[])

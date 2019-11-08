@@ -3,16 +3,15 @@ use crate::{
     error::Error,
 };
 use futures::future;
-use std::path::PathBuf;
 use tokio_resource_pool::{CheckOut, Manage, RealDependencies, Status};
 
 pub struct SqliteManager {
-    file_path: PathBuf,
+    file_path: String,
     db_name: String,
 }
 
 impl SqliteManager {
-    pub fn new(file_path: PathBuf, db_name: &str) -> Self {
+    pub fn new(file_path: String, db_name: &str) -> Self {
         Self {
             file_path,
             db_name: db_name.to_owned(),
@@ -29,7 +28,7 @@ impl Manage for SqliteManager {
     type RecycleFuture = DBIO<'static, Option<Self::Resource>>;
 
     fn create(&self) -> Self::CreateFuture {
-        match Sqlite::new(self.file_path.clone()) {
+        match Sqlite::new(&self.file_path) {
             Ok(mut conn) => match conn.attach_database(&self.db_name) {
                 Ok(_) => DBIO::new(future::ok(conn)),
                 Err(e) => DBIO::new(future::err(e)),
