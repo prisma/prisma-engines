@@ -24,7 +24,7 @@ impl Postgresql {
 
         Ok(Postgresql {
             pool,
-            url: PostgresUrl(url),
+            url: PostgresUrl::new(url)?,
             runtime: super::default_runtime(),
         })
     }

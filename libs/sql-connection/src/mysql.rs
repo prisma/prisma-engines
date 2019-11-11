@@ -24,7 +24,7 @@ impl Mysql {
 
         Ok(Mysql {
             pool,
-            url: MysqlUrl(url),
+            url: MysqlUrl::new(url)?,
             runtime: super::default_runtime(),
         })
     }

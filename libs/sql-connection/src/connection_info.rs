@@ -32,8 +32,8 @@ impl ConnectionInfo {
         let url = &datasource.url().value;
 
         match datasource.connector_type() {
-            c if c == MYSQL_SOURCE_NAME => Ok(ConnectionInfo::Mysql(MysqlUrl(url.parse()?))),
-            c if c == POSTGRES_SOURCE_NAME => Ok(ConnectionInfo::Postgres(PostgresUrl(url.parse()?))),
+            c if c == MYSQL_SOURCE_NAME => Ok(ConnectionInfo::Mysql(MysqlUrl::new(url.parse()?)?)),
+            c if c == POSTGRES_SOURCE_NAME => Ok(ConnectionInfo::Postgres(PostgresUrl::new(url.parse()?)?)),
             c if c == SQLITE_SOURCE_NAME => {
                 let params = SqliteParams::try_from(url.as_str())?;
                 Ok(ConnectionInfo::Sqlite {
@@ -64,7 +64,7 @@ impl ConnectionInfo {
         })?;
 
         match sql_family {
-            SqlFamily::Mysql => Ok(ConnectionInfo::Mysql(MysqlUrl(url))),
+            SqlFamily::Mysql => Ok(ConnectionInfo::Mysql(MysqlUrl::new(url)?)),
             SqlFamily::Sqlite => {
                 let params = SqliteParams::try_from(url_str)?;
                 Ok(ConnectionInfo::Sqlite {
@@ -72,7 +72,7 @@ impl ConnectionInfo {
                     db_name: None,
                 })
             }
-            SqlFamily::Postgres => Ok(ConnectionInfo::Postgres(PostgresUrl(url))),
+            SqlFamily::Postgres => Ok(ConnectionInfo::Postgres(PostgresUrl::new(url)?)),
         }
     }
 
