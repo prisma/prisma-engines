@@ -1,21 +1,29 @@
 use datamodel::ast::{self, SchemaAst};
-use failure::format_err;
+use failure::{format_err, Fail};
 use migration_connector::steps::{self, MigrationStep};
 
 pub trait DataModelCalculator: Send + Sync + 'static {
-    fn infer(&self, current: &SchemaAst, steps: &[MigrationStep]) -> SchemaAst;
+    fn infer(&self, current: &SchemaAst, steps: &[MigrationStep]) -> Result<SchemaAst, CalculatorError>;
+}
+
+#[derive(Debug, Fail)]
+#[fail(display = "{}", _0)]
+pub struct CalculatorError(#[fail(cause)] failure::Error);
+
+impl From<failure::Error> for CalculatorError {
+    fn from(fe: failure::Error) -> Self {
+        CalculatorError(fe)
+    }
 }
 
 pub struct DataModelCalculatorImpl;
 
 impl DataModelCalculator for DataModelCalculatorImpl {
-    fn infer(&self, current: &SchemaAst, steps: &[MigrationStep]) -> SchemaAst {
+    fn infer(&self, current: &SchemaAst, steps: &[MigrationStep]) -> Result<SchemaAst, CalculatorError> {
         let cloned: SchemaAst = current.clone();
-        apply(cloned, steps).unwrap()
+        apply(cloned, steps)
     }
 }
-
-type CalculatorError = failure::Error;
 
 fn apply(mut schema: SchemaAst, steps: &[MigrationStep]) -> Result<SchemaAst, CalculatorError> {
     for step in steps {
@@ -59,7 +67,8 @@ fn apply_create_enum(datamodel: &mut ast::SchemaAst, step: &steps::CreateEnum) -
         return Err(format_err!(
             "The enum {} already exists in this Datamodel. It is not possible to create it once more.",
             name
-        ));
+        )
+        .into());
     }
 
     let values = values
@@ -89,7 +98,8 @@ fn apply_create_field(datamodel: &mut ast::SchemaAst, step: &steps::CreateField)
             "The field {} on model {} already exists in this Datamodel. It is not possible to create it once more.",
             &step.field,
             &step.model,
-        ));
+        )
+        .into());
     }
 
     let model = datamodel
@@ -122,7 +132,8 @@ fn apply_create_model(datamodel: &mut ast::SchemaAst, step: &steps::CreateModel)
         return Err(format_err!(
             "The model {} already exists in this Datamodel. It is not possible to create it once more.",
             &step.model
-        ));
+        )
+        .into());
     }
 
     let model = ast::Model {
@@ -188,7 +199,8 @@ fn apply_update_field(datamodel: &mut ast::SchemaAst, step: &steps::UpdateField)
         return Err(format_err!(
             "The model {} does not exist in this Datamodel. It is not possible to update a field in it.",
             &step.model
-        ));
+        )
+        .into());
     }
 
     let field = datamodel.find_field_mut(&step.model, &step.field).ok_or_else(|| {
