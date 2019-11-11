@@ -1,10 +1,19 @@
 #!/usr/bin/env bash
 
+if [[ "$OSTYPE" == "linux-gnu" ]]; then
+    OS=linux-amzn
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+    OS=darwin
+else
+    echo "Unhandled OS: '$OSTYPE'"
+    exit 1
+fi
+
 # Check if the system has engineer installed, if not, use a local copy.
 if ! type "engineer" > /dev/null; then
     set -e
     # Setup Prisma engine build & test tool (engineer).
-    curl --fail -sSL https://prisma-engineer.s3-eu-west-1.amazonaws.com/latest/engineer.gz --output engineer.gz
+    curl --fail -sSL "https://prisma-engineer.s3-eu-west-1.amazonaws.com/latest/$OS/engineer.gz" --output engineer.gz
     gzip -d engineer.gz
     chmod +x engineer
 
