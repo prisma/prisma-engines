@@ -37,16 +37,6 @@ where
     test_each_connector_with_ignores(Vec::new(), test_fn);
 }
 
-pub fn test_only_connector<F>(sql_family: SqlFamily, test_fn: F)
-where
-    F: Fn(&TestSetup, &dyn GenericApi) -> () + std::panic::RefUnwindSafe,
-{
-    let all = &[SqlFamily::Postgres, SqlFamily::Mysql, SqlFamily::Sqlite];
-    let ignores: Vec<SqlFamily> = all.iter().filter(|f| f != &&sql_family).map(|f| *f).collect();
-
-    test_each_connector_with_ignores(ignores, test_fn);
-}
-
 pub(super) fn mysql_migration_connector(database_url: &str) -> SqlMigrationConnector {
     match SqlMigrationConnector::new_from_database_str(database_url) {
         Ok(c) => c,
