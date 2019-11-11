@@ -145,9 +145,11 @@ impl PostgresUrl {
     }
 
     pub fn host(&self) -> &str {
-        match self.url.host_str() {
-            Some("") | None => &self.query_params.host,
-            Some(url) => url,
+        match (self.query_params.host.as_ref(), self.url.host_str()) {
+            (Some(host), _) => host.as_str(),
+            (None, Some("")) => "localhost",
+            (None, None) => "localhost",
+            (None, Some(host)) => host,
         }
     }
 
@@ -196,7 +198,7 @@ impl PostgresUrl {
         let mut identity_password = None;
         let mut ssl_accept_mode = SslAcceptMode::Strict;
         let mut ssl_mode = SslMode::Prefer;
-        let mut host = String::from("localhost");
+        let mut host = None;
 
         for (k, v) in url.query_pairs() {
             match k.as_ref() {
@@ -254,7 +256,7 @@ impl PostgresUrl {
                     connection_limit = as_int;
                 }
                 "host" => {
-                    host = v.to_string();
+                    host = Some(v.to_string());
                 }
                 _ => {
                     #[cfg(not(feature = "tracing-log"))]
@@ -290,7 +292,7 @@ pub struct PostgresUrlQueryParams {
     connection_limit: usize,
     schema: String,
     ssl_mode: SslMode,
-    host: String,
+    host: Option<String>,
 }
 
 impl TryFrom<Url> for PostgresParams {
@@ -361,6 +363,10 @@ impl PostgreSql {
 
     pub async fn from_params(params: PostgresParams) -> crate::Result<Self> {
         Self::new(params.config, Some(params.schema), Some(params.ssl_params)).await
+    }
+
+    pub async fn from_url(url: &str) -> crate::Result<Self> {
+        Self::from_params(PostgresParams::try_from(Url::parse(url)?)?).await
     }
 
     fn execute_and_get_id<'a>(

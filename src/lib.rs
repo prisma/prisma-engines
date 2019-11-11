@@ -78,7 +78,7 @@
 //!
 //! #[tokio::main]
 //! async fn main() -> Result<(), quaint::error::Error> {
-//!     let mut conn = Sqlite::new("test.db")?;
+//!     let conn = Sqlite::new("test.db")?;
 //!     let query = Select::default().value(1);
 //!     let result = conn.query(query.into()).await?;
 //!
