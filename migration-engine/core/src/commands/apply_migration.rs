@@ -56,7 +56,7 @@ impl<'a> ApplyMigrationCommand<'a> {
             .unwrap_or_else(SchemaAst::empty);
         let next_datamodel_ast = engine
             .datamodel_calculator()
-            .infer(&last_non_watch_datamodel, self.input.steps.as_slice());
+            .infer(&last_non_watch_datamodel, self.input.steps.as_slice())?;
         let next_datamodel = datamodel::lift_ast(&next_datamodel_ast)?;
 
         self.handle_migration(&engine, current_datamodel, next_datamodel)
@@ -74,7 +74,7 @@ impl<'a> ApplyMigrationCommand<'a> {
 
         let next_datamodel_ast = engine
             .datamodel_calculator()
-            .infer(&current_datamodel_ast, self.input.steps.as_slice());
+            .infer(&current_datamodel_ast, self.input.steps.as_slice())?;
         let next_datamodel = datamodel::lift_ast(&next_datamodel_ast)?;
 
         self.handle_migration(&engine, current_datamodel, next_datamodel)

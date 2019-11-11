@@ -1,3 +1,4 @@
+use crate::migration::datamodel_calculator::CalculatorError;
 use crate::migration_engine::MigrationEngine;
 use failure::Fail;
 use migration_connector::*;
@@ -59,6 +60,15 @@ impl From<migration_connector::ConnectorError> for CommandError {
         CommandError::Generic {
             code: 1000,
             error: format!("{:?}", error),
+        }
+    }
+}
+
+impl From<CalculatorError> for CommandError {
+    fn from(error: CalculatorError) -> Self {
+        CommandError::Generic {
+            code: 1,
+            error: format!("{}", error),
         }
     }
 }
