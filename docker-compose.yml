@@ -1,0 +1,45 @@
+version: "3"
+services:
+  postgres:
+    image: postgres:10.3
+    restart: always
+    command: postgres -c 'max_connections=1000'
+    environment:
+      POSTGRES_PASSWORD: "prisma"
+      PGDATA: "/pgtmpfs"
+    ports:
+      - "5432:5432"
+    networks:
+      - databases
+    tmpfs: /pgtmpfs
+
+  mysql-5-7:
+    image: mysql:5.7
+    command: mysqld
+    restart: always
+    environment:
+      MYSQL_USER: root
+      MYSQL_ROOT_PASSWORD: prisma
+      MYSQL_DATABASE: prisma
+    ports:
+      - "3306:3306"
+    networks:
+      - databases
+    tmpfs: /var/lib/mysql
+
+  mysql-8-0:
+    image: mysql:8.0
+    command: mysqld
+    restart: always
+    environment:
+      MYSQL_USER: root
+      MYSQL_ROOT_PASSWORD: prisma
+      MYSQL_DATABASE: prisma
+    ports:
+      - "3307:3306"
+    networks:
+      - databases
+    tmpfs: /var/lib/mysql8
+
+networks:
+  databases:
