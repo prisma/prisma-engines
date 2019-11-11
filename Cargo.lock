@@ -2141,7 +2141,7 @@ dependencies = [
 [[package]]
 name = "quaint"
 version = "0.1.0"
-source = "git+https://github.com/prisma/quaint.git#0401051a38c0f5d6b7ad1d7d9049d36e24779a95"
+source = "git+https://github.com/prisma/quaint.git#ab10f2d7ad6ec326bc2e4f7bc5e7d1ebfb073d51"
 dependencies = [
  "async-std 0.99.11 (registry+https://github.com/rust-lang/crates.io-index)",
  "bytes 0.4.12 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -3447,7 +3447,7 @@ name = "twox-hash"
 version = "1.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "rand 0.7.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "rand 0.4.6 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
