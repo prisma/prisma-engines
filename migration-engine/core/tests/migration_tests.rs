@@ -891,7 +891,6 @@ fn sqlite_must_recreate_multi_field_indexes() {
 
 #[test]
 fn removing_an_existing_unique_field_must_work() {
-    //    test_only_connector(SqlFamily::Postgres, |test_setup, api| {
     test_each_connector(|test_setup, api| {
         let dm1 = r#"
             model A {
@@ -959,7 +958,6 @@ fn adding_unique_to_an_existing_field_must_work() {
 
 #[test]
 fn removing_unique_from_an_existing_field_must_work() {
-    //    test_only_connector(SqlFamily::Postgres, |test_setup, api| {
     test_each_connector(|test_setup, api| {
         let dm1 = r#"
             model A {

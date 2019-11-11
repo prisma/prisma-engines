@@ -9,7 +9,6 @@ use syn::{parse_macro_input, AttributeArgs, Ident, ItemFn};
 #[derive(Debug, FromMeta)]
 struct TestOneConnectorArgs {
     /// The name of the connector to test.
-    #[darling(default)]
     connector: String,
 }
 
@@ -79,4 +78,32 @@ fn test_each_connector_wrapper_functions(
     }
 
     tests
+}
+
+#[proc_macro_attribute]
+pub fn test_one_connector(attr: TokenStream, input: TokenStream) -> TokenStream {
+    let attributes_meta: syn::AttributeArgs = parse_macro_input!(attr as AttributeArgs);
+    let args = TestOneConnectorArgs::from_list(&attributes_meta).unwrap();
+
+    let test_function = parse_macro_input!(input as ItemFn);
+
+    let test_impl_name = &test_function.sig.ident;
+    let test_fn_name = Ident::new(
+        &format!("{}_on_{}", &test_function.sig.ident, args.connector),
+        Span::call_site(),
+    );
+    let api_factory = Ident::new(&format!("{}_test_api", args.connector), Span::call_site());
+
+    let output = quote! {
+        #[test]
+        fn #test_fn_name() {
+            let api = #api_factory();
+
+            #test_impl_name(&api)
+        }
+
+        #test_function
+    };
+
+    output.into()
 }
