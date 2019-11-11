@@ -1,10 +1,9 @@
 use crate::ast;
 use crate::common::FromStrAndSpan;
 use crate::error::DatamodelError;
-use serde::{Deserialize, Serialize};
 
 /// Represents a strategy for embedding scalar lists.
-#[derive(Debug, Copy, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Debug, Copy, PartialEq, Clone)]
 pub enum ScalarListStrategy {
     Embedded,
     Relation,

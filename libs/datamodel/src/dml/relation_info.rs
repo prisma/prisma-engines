@@ -1,10 +1,9 @@
 use crate::ast;
 use crate::common::FromStrAndSpan;
 use crate::error::DatamodelError;
-use serde::{Deserialize, Serialize};
 
 /// Holds information about a relation field.
-#[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct RelationInfo {
     /// The target model of the relation.
     pub to: String,
@@ -49,7 +48,7 @@ impl RelationInfo {
 
 /// Describes what happens when related nodes
 /// are deleted.
-#[derive(Debug, Copy, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Debug, Copy, PartialEq, Clone)]
 pub enum OnDeleteStrategy {
     Cascade,
     None,

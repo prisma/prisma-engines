@@ -1,36 +1,24 @@
 pub mod graphql;
 
-pub use core::schema::QuerySchemaRenderer;
+pub use query_core::schema::QuerySchemaRenderer;
 pub use graphql::{GraphQlBody, GraphQlRequestHandler};
 
-use crate::{context::PrismaContext, server::RequestContext};
-use actix_web::HttpRequest;
+use crate::context::PrismaContext;
 use serde_json;
-use std::collections::HashMap;
-use std::sync::Arc;
+use std::{collections::HashMap, fmt::Debug};
+use async_trait::async_trait;
 
+#[async_trait]
 pub trait RequestHandler {
-    type Body;
+    type Body: Debug;
 
-    fn handle<S: Into<PrismaRequest<Self::Body>>>(&self, req: S, ctx: &PrismaContext) -> serde_json::Value;
+    async fn handle<S>(&self, req: S, ctx: &PrismaContext) -> serde_json::Value
+    where
+        S: Into<PrismaRequest<Self::Body>> + Send + Sync + 'static;
 }
 
 pub struct PrismaRequest<T> {
     pub body: T,
     pub headers: HashMap<String, String>,
     pub path: String,
-}
-
-impl From<(GraphQlBody, HttpRequest<Arc<RequestContext>>)> for PrismaRequest<GraphQlBody> {
-    fn from((gql, req): (GraphQlBody, HttpRequest<Arc<RequestContext>>)) -> Self {
-        PrismaRequest {
-            body: gql,
-            path: req.path().into(),
-            headers: req
-                .headers()
-                .iter()
-                .map(|(k, v)| (format!("{}", k), v.to_str().unwrap().into()))
-                .collect(),
-        }
-    }
 }

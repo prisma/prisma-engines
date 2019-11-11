@@ -107,7 +107,7 @@ fn adding_an_id_field_of_type_int_must_work() {
                 let sequence = result.get_sequence("Test_myId_seq").expect("sequence must exist");
                 let default = column.default.as_ref().expect("Must have nextval default");
                 assert_eq!(default.contains(&sequence.name), true);
-                assert_eq!(default, &format!("nextval('\"{}\"'::regclass)", sequence.name))
+                assert_eq!(default, &format!("nextval(\"{}\"::regclass)", sequence.name))
             }
             _ => assert_eq!(column.auto_increment, true),
         }
@@ -1325,29 +1325,27 @@ fn adding_a_scalar_list_for_a_modelwith_id_type_int_must_work() {
     });
 }
 
-#[test]
-fn updating_a_model_with_a_scalar_list_to_a_different_id_type_must_work() {
-    test_each_connector_with_ignores(vec![SqlFamily::Mysql], |test_setup, api| {
-        let dm = r#"
-            model A {
-                id Int @id
-                strings String[]
-            }
-        "#;
-        let result = infer_and_apply(test_setup, api, &dm).sql_schema;
-        let node_id_column = result.table_bang("A_strings").column_bang("nodeId");
-        assert_eq!(node_id_column.tpe.family, ColumnTypeFamily::Int);
+#[test_each_connector(ignore = "mysql")]
+fn updating_a_model_with_a_scalar_list_to_a_different_id_type_must_work(api: &TestApi) {
+    let dm = r#"
+        model A {
+            id Int @id
+            strings String[]
+        }
+    "#;
+    let result = api.infer_and_apply(&dm).sql_schema;
+    let node_id_column = result.table_bang("A_strings").column_bang("nodeId");
+    assert_eq!(node_id_column.tpe.family, ColumnTypeFamily::Int);
 
-        let dm = r#"
-            model A {
-                id String @id @default(cuid())
-                strings String[]
-            }
-        "#;
-        let result = infer_and_apply(test_setup, api, &dm).sql_schema;
-        let node_id_column = result.table_bang("A_strings").column_bang("nodeId");
-        assert_eq!(node_id_column.tpe.family, ColumnTypeFamily::String);
-    });
+    let dm = r#"
+        model A {
+            id String @id @default(cuid())
+            strings String[]
+        }
+    "#;
+    let result = api.infer_and_apply(&dm).sql_schema;
+    let node_id_column = result.table_bang("A_strings").column_bang("nodeId");
+    assert_eq!(node_id_column.tpe.family, ColumnTypeFamily::String);
 }
 
 #[test]

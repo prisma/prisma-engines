@@ -1,4 +1,6 @@
-default:
+default: build
+
+build:
 	cargo build
 
 # Build the crates with deny-warnings on to emulate CI
@@ -8,19 +10,26 @@ pedantic:
 release:
 	cargo build --release
 
+all-dbs:
+	docker-compose -f docker-compose.yml up  -d --remove-orphans mysql-5-7 postgres mysql-8-0
+
 dev-sqlite:
-	cp dev-configs/sqlite.yml prisma.yml
 	echo 'sqlite' > current_connector
 
 dev-postgres:
-	docker-compose -f docker-compose/dev-postgres.yml up -d --remove-orphans
-	cp dev-configs/postgres.yml prisma.yml
+	docker-compose -f docker-compose.yml up -d --remove-orphans postgres
 	echo 'postgres' > current_connector
 
 dev-mysql:
-	docker-compose -f docker-compose/dev-mysql.yml up -d --remove-orphans
-	cp dev-configs/mysql.yml prisma.yml
+	docker-compose -f docker-compose.yml up -d --remove-orphans mysql-5-7
 	echo 'mysql' > current_connector
+
+dev-mysql8:
+	docker-compose -f docker-compose.yml up -d --remove-orphans mysql-8-0
+	echo 'mysql8' > current_connector
+
+dev-down:
+	docker-compose -f docker-compose.yml down -v --remove-orphans
 
 use-local-migration-engine:
 	cargo build --release

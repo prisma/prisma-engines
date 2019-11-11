@@ -2,7 +2,8 @@ use clap::ArgMatches;
 use failure::Fail;
 use itertools::Itertools;
 use migration_connector::*;
-use sql_migration_connector::{SqlError, SqlMigrationConnector};
+use sql_connection::SqlFamily;
+use sql_migration_connector::SqlMigrationConnector;
 use std::collections::HashMap;
 use url::Url;
 
@@ -28,6 +29,20 @@ pub enum CliError {
     TlsError(String),
     #[fail(display = "Unknown error occured: {}", _0)]
     Other(String),
+}
+
+impl CliError {
+    pub(crate) fn exit_code(&self) -> i32 {
+        match self {
+            CliError::DatabaseDoesNotExist(_) => 1,
+            CliError::DatabaseAccessDenied(_) => 2,
+            CliError::AuthenticationFailed(_) => 3,
+            CliError::ConnectTimeout | CliError::Timeout => 4,
+            CliError::DatabaseAlreadyExists(_) => 5,
+            CliError::TlsError(_) => 6,
+            _ => 255,
+        }
+    }
 }
 
 impl From<ConnectorError> for CliError {
@@ -84,35 +99,36 @@ fn create_conn(
     Box<dyn MigrationConnector<DatabaseMigration = impl DatabaseMigrationMarker>>,
 )> {
     let mut url = Url::parse(datasource).expect("Invalid url in the datasource");
+    let sql_family = SqlFamily::from_scheme(url.scheme());
 
-    match url.scheme() {
-        "file" | "sqlite" => {
-            let inner = SqlMigrationConnector::sqlite(datasource)?;
+    match sql_family {
+        Some(SqlFamily::Sqlite) => {
+            let inner = SqlMigrationConnector::new_from_database_str(datasource)?;
 
             Ok((String::new(), Box::new(inner)))
         }
-        "postgresql" | "postgres" => {
+        Some(SqlFamily::Postgres) => {
             let db_name = fetch_db_name(&url, "postgres");
 
             let connector = if admin_mode {
                 create_postgres_admin_conn(url)?
             } else {
-                SqlMigrationConnector::postgres(url.as_str(), false)?
+                SqlMigrationConnector::new_from_database_str(url.as_str())?
             };
 
             Ok((db_name, Box::new(connector)))
         }
-        "mysql" => {
+        Some(SqlFamily::Mysql) => {
             let db_name = fetch_db_name(&url, "mysql");
 
             if admin_mode {
                 url.set_path("");
             }
 
-            let inner = SqlMigrationConnector::mysql(url.as_str(), false)?;
+            let inner = SqlMigrationConnector::new_from_database_str(url.as_str())?;
             Ok((db_name, Box::new(inner)))
         }
-        x => unimplemented!("Connector {} is not supported yet", x),
+        None => unimplemented!("Connector {} is not supported yet", url.scheme()),
     }
 }
 
@@ -130,9 +146,9 @@ fn create_postgres_admin_conn(mut url: Url) -> crate::Result<SqlMigrationConnect
         .iter()
         .filter_map(|database_name| {
             url.set_path(database_name);
-            match SqlMigrationConnector::postgres(url.as_str(), false) {
+            match SqlMigrationConnector::new_from_database_str(url.as_str()) {
                 // If the database does not exist, try the next one.
-                Err(SqlError::DatabaseDoesNotExist { .. }) => None,
+                Err(migration_connector::ConnectorError::DatabaseDoesNotExist { .. }) => None,
                 // If the outcome is anything else, use this.
                 other_outcome => Some(other_outcome),
             }
@@ -147,12 +163,66 @@ fn create_postgres_admin_conn(mut url: Url) -> crate::Result<SqlMigrationConnect
     Ok(inner)
 }
 
+pub fn clap_app() -> clap::App<'static, 'static> {
+    use clap::{App, Arg, SubCommand};
+    App::new("Prisma Migration Engine")
+        .version(env!("CARGO_PKG_VERSION"))
+        .arg(
+            Arg::with_name("datamodel_location")
+                .short("d")
+                .long("datamodel")
+                .value_name("FILE")
+                .help("Path to the datamodel.")
+                .takes_value(true)
+                .required(false),
+        )
+        .arg(
+            Arg::with_name("single_cmd")
+                .short("s")
+                .long("single_cmd")
+                .help("Run only a single command, then exit")
+                .takes_value(false)
+                .required(false),
+        )
+        .arg(
+            Arg::with_name("version")
+                .long("version")
+                .help("Prints the server commit ID")
+                .takes_value(false)
+                .required(false),
+        )
+        .subcommand(
+            SubCommand::with_name("cli")
+                .about("Doesn't start a server, but allows running specific commands against Prisma.")
+                .arg(
+                    Arg::with_name("datasource")
+                        .long("datasource")
+                        .short("d")
+                        .help("The connection string to the database")
+                        .takes_value(true)
+                        .required(true),
+                )
+                .arg(
+                    Arg::with_name("can_connect_to_database")
+                        .long("can_connect_to_database")
+                        .help("Does the database connection string work")
+                        .takes_value(false)
+                        .required(false),
+                )
+                .arg(
+                    Arg::with_name("create_database")
+                        .long("create_database")
+                        .help("Create an empty database defined in the configuration string.")
+                        .takes_value(false)
+                        .required(false),
+                ),
+        )
+}
+
 #[cfg(test)]
 mod tests {
     use super::CliError;
-    use prisma_query::connector::{MysqlParams, PostgresParams};
-    use sql_migration_connector::migration_database::*;
-    use std::convert::TryFrom;
+    use sql_connection::{Mysql, Postgresql, SyncSqlConnection};
 
     fn with_cli<F>(matches: Vec<&str>, f: F) -> Result<(), Box<dyn std::any::Any + Send + 'static>>
     where
@@ -224,6 +294,8 @@ mod tests {
 
     #[test]
     fn test_connecting_with_a_non_working_mysql_connection_string() {
+        env_logger::init();
+
         let dm = mysql_url(Some("this_does_not_exist"));
 
         with_cli(vec!["cli", "--can_connect_to_database"], |matches| {
@@ -288,9 +360,9 @@ mod tests {
 
             {
                 let uri = url::Url::parse(&mysql_url(None)).unwrap();
-                let conn = Mysql::new(MysqlParams::try_from(uri).unwrap(), false).unwrap();
+                let conn = Mysql::new(uri).unwrap();
 
-                conn.execute_raw("", "DROP DATABASE `this_should_exist`", &[]).unwrap();
+                conn.execute_raw("DROP DATABASE `this_should_exist`", &[]).unwrap();
             }
 
             res.unwrap();
@@ -312,18 +384,14 @@ mod tests {
 
         if let Ok(()) = res {
             let res = with_cli(vec!["cli", "--can_connect_to_database"], |matches| {
-                assert_eq!(
-                    Ok(String::from("Connection successful")),
-                    super::run(&matches, dbg!(&url))
-                );
+                assert_eq!(Ok(String::from("Connection successful")), super::run(&matches, &url));
             });
 
             {
                 let uri = url::Url::parse(&postgres_url(None)).unwrap();
-                let conn = PostgreSql::new(PostgresParams::try_from(uri).unwrap(), false).unwrap();
+                let conn = Postgresql::new(uri).unwrap();
 
-                conn.execute_raw("", "DROP DATABASE \"this_should_exist\"", &[])
-                    .unwrap();
+                conn.execute_raw("DROP DATABASE \"this_should_exist\"", &[]).unwrap();
             }
 
             res.unwrap();

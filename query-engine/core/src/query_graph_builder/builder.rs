@@ -38,7 +38,11 @@ impl QueryGraphBuilder {
     /// Maps a write operation to one or more queries.
     fn map_write_operation(&self, write_selection: Selection) -> QueryGraphBuilderResult<(QueryGraph, IrSerializer)> {
         let mutation_object = self.query_schema.mutation();
-        Self::process(write_selection, &mutation_object)
+
+        let (mut graph, ir_ser) = Self::process(write_selection, &mutation_object)?;
+        graph.flag_transactional();
+
+        Ok((graph, ir_ser))
     }
 
     fn process(

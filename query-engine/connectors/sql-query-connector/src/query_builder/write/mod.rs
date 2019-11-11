@@ -1,14 +1,15 @@
 use crate::error::SqlError;
 use prisma_models::prelude::*;
-use prisma_query::ast::*;
+use quaint::ast::*;
 use std::convert::TryFrom;
 
 pub struct WriteQueryBuilder;
 
+#[allow(dead_code)]
 impl WriteQueryBuilder {
     const PARAMETER_LIMIT: usize = 10000;
 
-    pub fn create_record(model: ModelRef, mut args: PrismaArgs) -> (Insert<'static>, Option<GraphqlId>) {
+    pub fn create_record(model: &ModelRef, mut args: PrismaArgs) -> (Insert<'static>, Option<GraphqlId>) {
         let id_field = model.fields().id();
 
         let return_id = match args.get_field_value(&id_field.name) {
@@ -43,7 +44,7 @@ impl WriteQueryBuilder {
         (Insert::from(insert).returning(vec![id_field.as_column()]), return_id)
     }
 
-    pub fn create_relation(field: RelationFieldRef, parent_id: &GraphqlId, child_id: &GraphqlId) -> Query<'static> {
+    pub fn create_relation(field: &RelationFieldRef, parent_id: &GraphqlId, child_id: &GraphqlId) -> Query<'static> {
         let relation = field.relation();
 
         match relation.inline_relation_column() {
@@ -84,7 +85,7 @@ impl WriteQueryBuilder {
         }
     }
 
-    pub fn delete_relation(field: RelationFieldRef, parent_id: &GraphqlId, child_id: &GraphqlId) -> Query<'static> {
+    pub fn delete_relation(field: &RelationFieldRef, parent_id: &GraphqlId, child_id: &GraphqlId) -> Query<'static> {
         let relation = field.relation();
 
         match relation.inline_relation_column() {
@@ -121,7 +122,7 @@ impl WriteQueryBuilder {
         }
     }
 
-    pub fn delete_relation_by_parent(field: RelationFieldRef, parent_id: &GraphqlId) -> Query<'static> {
+    pub fn delete_relation_by_parent(field: &RelationFieldRef, parent_id: &GraphqlId) -> Query<'static> {
         let relation = field.relation();
 
         match relation.inline_relation_column() {
@@ -185,7 +186,7 @@ impl WriteQueryBuilder {
     //     Self::update_many(model, &[id; 1], args).map(|updates| updates.into_iter().next())
     // }
 
-    pub fn update_many(model: ModelRef, ids: &[&GraphqlId], args: &PrismaArgs) -> crate::Result<Vec<Update<'static>>> {
+    pub fn update_many(model: &ModelRef, ids: &[&GraphqlId], args: &PrismaArgs) -> crate::Result<Vec<Update<'static>>> {
         if args.args.is_empty() || ids.is_empty() {
             return Ok(Vec::new());
         }
@@ -218,7 +219,7 @@ impl WriteQueryBuilder {
         Ok(result)
     }
 
-    pub fn delete_many(model: ModelRef, ids: &[&GraphqlId]) -> Vec<Delete<'static>> {
+    pub fn delete_many(model: &ModelRef, ids: &[&GraphqlId]) -> Vec<Delete<'static>> {
         let mut deletes = Vec::new();
 
         for chunk in ids.chunks(Self::PARAMETER_LIMIT).into_iter() {
@@ -266,7 +267,7 @@ impl WriteQueryBuilder {
         })
     }
 
-    pub fn truncate_tables(internal_data_model: InternalDataModelRef) -> Vec<Table<'static>> {
+    pub fn truncate_tables(internal_data_model: &InternalDataModelRef) -> Vec<Table<'static>> {
         let models = internal_data_model.models();
         let mut tables = Vec::new();
 

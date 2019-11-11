@@ -23,6 +23,7 @@ pub fn setup() {
         "error" => LevelFilter::Error,
         _ => LevelFilter::Warn,
     };
+
     fern::Dispatch::new()
         .format(|out, message, record| {
             out.finish(format_args!("[{}][{}] {}", record.target(), record.level(), message))

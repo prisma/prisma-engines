@@ -3,39 +3,55 @@ use crate::{
     query_ast::*,
     QueryResult,
 };
-use connector::{Filter, TransactionLike, WriteArgs};
+use connector::{Filter, WriteOperations,  WriteArgs, ConnectionLike};
 
-pub fn execute(tx: &mut dyn TransactionLike, write_query: WriteQuery) -> InterpretationResult<QueryResult> {
+pub async fn execute<'a, 'b>(
+    tx: &'a ConnectionLike<'a, 'b>,
+    write_query: WriteQuery,
+) -> InterpretationResult<QueryResult> {
     match write_query {
-        WriteQuery::CreateRecord(q) => create_one(tx, q),
-        WriteQuery::UpdateRecord(q) => update_one(tx, q),
-        WriteQuery::DeleteRecord(q) => delete_one(tx, q),
-        WriteQuery::UpdateManyRecords(q) => update_many(tx, q),
-        WriteQuery::DeleteManyRecords(q) => delete_many(tx, q),
-        WriteQuery::ConnectRecords(q) => connect(tx, q),
-        WriteQuery::DisconnectRecords(q) => disconnect(tx, q),
-        WriteQuery::SetRecords(q) => set(tx, q),
-        WriteQuery::ResetData(q) => reset(tx, q),
+        WriteQuery::CreateRecord(q) => create_one(tx, q).await,
+        WriteQuery::UpdateRecord(q) => update_one(tx, q).await,
+        WriteQuery::DeleteRecord(q) => delete_one(tx, q).await,
+        WriteQuery::UpdateManyRecords(q) => update_many(tx, q).await,
+        WriteQuery::DeleteManyRecords(q) => delete_many(tx, q).await,
+        WriteQuery::ConnectRecords(q) => connect(tx, q).await,
+        WriteQuery::DisconnectRecords(q) => disconnect(tx, q).await,
+        WriteQuery::SetRecords(q) => set(tx, q).await,
+        WriteQuery::ResetData(q) => reset(tx, q).await,
     }
 }
 
-fn create_one(tx: &mut dyn TransactionLike, q: CreateRecord) -> InterpretationResult<QueryResult> {
-    let res = tx.create_record(q.model, WriteArgs::new(q.non_list_args, q.list_args))?;
+async fn create_one<'a, 'b>(
+    tx: &'a ConnectionLike<'a, 'b>,
+    q: CreateRecord,
+) -> InterpretationResult<QueryResult> {
+    let res = tx
+        .create_record(&q.model, WriteArgs::new(q.non_list_args, q.list_args))
+        .await?;
 
     Ok(QueryResult::Id(res))
 }
 
-fn update_one(tx: &mut dyn TransactionLike, q: UpdateRecord) -> InterpretationResult<QueryResult> {
-    let mut res = tx.update_records(
-        q.model,
-        Filter::from(q.where_),
-        WriteArgs::new(q.non_list_args, q.list_args),
-    )?;
+async fn update_one<'a, 'b>(
+    tx: &'a ConnectionLike<'a, 'b>,
+    q: UpdateRecord,
+) -> InterpretationResult<QueryResult> {
+    let mut res = tx
+        .update_records(
+            &q.model,
+            Filter::from(q.where_),
+            WriteArgs::new(q.non_list_args, q.list_args),
+        )
+        .await?;
 
     Ok(QueryResult::Id(res.pop().unwrap()))
 }
 
-fn delete_one(tx: &mut dyn TransactionLike, q: DeleteRecord) -> InterpretationResult<QueryResult> {
+async fn delete_one<'a, 'b>(
+    tx: &'a ConnectionLike<'a, 'b>,
+    q: DeleteRecord,
+) -> InterpretationResult<QueryResult> {
     // We need to ensure that we have a record finder, else we delete everything (conversion to empty filter).
     let finder = match q.where_ {
         Some(f) => Ok(f),
@@ -44,53 +60,70 @@ fn delete_one(tx: &mut dyn TransactionLike, q: DeleteRecord) -> InterpretationRe
         )),
     }?;
 
-    let res = tx.delete_records(q.model, Filter::from(finder))?;
+    let res = tx.delete_records(&q.model, Filter::from(finder)).await?;
 
     Ok(QueryResult::Count(res))
 }
 
-fn update_many(tx: &mut dyn TransactionLike, q: UpdateManyRecords) -> InterpretationResult<QueryResult> {
-    let res = tx.update_records(q.model, q.filter, WriteArgs::new(q.non_list_args, q.list_args))?;
+async fn update_many<'a, 'b>(
+    tx: &'a ConnectionLike<'a, 'b>,
+    q: UpdateManyRecords,
+) -> InterpretationResult<QueryResult> {
+    let res = tx
+        .update_records(&q.model, q.filter, WriteArgs::new(q.non_list_args, q.list_args))
+        .await?;
 
     Ok(QueryResult::Count(res.len()))
 }
 
-fn delete_many(tx: &mut dyn TransactionLike, q: DeleteManyRecords) -> InterpretationResult<QueryResult> {
-    let res = tx.delete_records(q.model, q.filter)?;
+async fn delete_many<'a, 'b>(
+    tx: &'a ConnectionLike<'a, 'b>,
+    q: DeleteManyRecords,
+) -> InterpretationResult<QueryResult> {
+    let res = tx.delete_records(&q.model, q.filter).await?;
 
     Ok(QueryResult::Count(res))
 }
 
-fn connect(tx: &mut dyn TransactionLike, q: ConnectRecords) -> InterpretationResult<QueryResult> {
+async fn connect<'a, 'b>(
+    tx: &'a ConnectionLike<'a, 'b>,
+    q: ConnectRecords,
+) -> InterpretationResult<QueryResult> {
     tx.connect(
-        q.relation_field,
+        &q.relation_field,
         &q.parent.expect("Expected parent record ID to be set for connect"),
         &q.child.expect("Expected child record ID to be set for connect"),
-    )?;
+    )
+    .await?;
 
     Ok(QueryResult::Unit)
 }
 
-fn disconnect(tx: &mut dyn TransactionLike, q: DisconnectRecords) -> InterpretationResult<QueryResult> {
+async fn disconnect<'a, 'b>(
+    tx: &'a ConnectionLike<'a, 'b>,
+    q: DisconnectRecords,
+) -> InterpretationResult<QueryResult> {
     tx.disconnect(
-        q.relation_field,
+        &q.relation_field,
         &q.parent.expect("Expected parent record ID to be set for disconnect"),
         &q.child.expect("Expected child record ID to be set for disconnect"),
-    )?;
+    )
+    .await?;
 
     Ok(QueryResult::Unit)
 }
 
-fn set(tx: &mut dyn TransactionLike, q: SetRecords) -> InterpretationResult<QueryResult> {
+async fn set<'a, 'b>(tx: &'a ConnectionLike<'a, 'b>, q: SetRecords) -> InterpretationResult<QueryResult> {
     tx.set(
-        q.relation_field,
+        &q.relation_field,
         q.parent.expect("Expected parent record ID to be set for set"),
         q.wheres,
-    )?;
+    )
+    .await?;
 
     Ok(QueryResult::Unit)
 }
 
-fn reset(_tx: &mut dyn TransactionLike, _q: ResetData) -> InterpretationResult<QueryResult> {
+async fn reset<'a, 'b>(_tx: &'a ConnectionLike<'a, 'b>, _q: ResetData) -> InterpretationResult<QueryResult> {
     unimplemented!()
 }

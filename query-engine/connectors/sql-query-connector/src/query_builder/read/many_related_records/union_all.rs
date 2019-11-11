@@ -2,7 +2,7 @@ use super::*;
 use crate::ordering::Ordering;
 use connector_interface::SkipAndLimit;
 use prisma_models::prelude::*;
-use prisma_query::ast::*;
+use quaint::ast::*;
 
 pub struct ManyRelatedRecordsWithUnionAll;
 

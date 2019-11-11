@@ -18,8 +18,8 @@ impl From<url::ParseError> for SqlIntrospectionError {
     }
 }
 
-impl From<prisma_query::error::Error> for SqlIntrospectionError {
-    fn from(e: prisma_query::error::Error) -> Self {
+impl From<quaint::error::Error> for SqlIntrospectionError {
+    fn from(e: quaint::error::Error) -> Self {
         SqlIntrospectionError::Generic(e.into())
     }
 }

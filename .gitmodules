@@ -1,3 +1,0 @@
-[submodule ".buildkite/engine-build-cli"]
-	path = .buildkite/engine-build-cli
-	url = https://github.com/prisma/engine-build-cli.git

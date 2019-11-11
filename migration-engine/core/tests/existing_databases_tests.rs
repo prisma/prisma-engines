@@ -1,11 +1,12 @@
-#![allow(non_snake_case)]
 #![allow(unused)]
 mod test_harness;
+
 use barrel::{types, Migration, SqlVariant};
 use migration_core::api::GenericApi;
 use pretty_assertions::{assert_eq, assert_ne};
+use sql_connection::SyncSqlConnection;
 use sql_migration_connector::SqlFamily;
-use sql_migration_connector::{migration_database::MigrationDatabase, SqlMigrationConnector};
+use sql_migration_connector::SqlMigrationConnector;
 use sql_schema_describer::*;
 use std::sync::Arc;
 use test_harness::*;
@@ -321,6 +322,7 @@ fn renaming_a_field_where_the_column_was_already_renamed_must_work() {
         "#;
 
         let final_result = infer_and_apply(test_setup, api, &dm2).sql_schema;
+
         let final_column = final_result.table_bang("Blog").column_bang("new_title");
 
         assert_eq!(final_column.tpe.family, ColumnTypeFamily::Float);
@@ -345,7 +347,7 @@ where
         let (inspector, test_setup) = get_sqlite();
 
         println!("Running the test function now");
-        let connector = SqlMigrationConnector::sqlite(&sqlite_test_file()).unwrap();
+        let connector = SqlMigrationConnector::new_from_database_str(&sqlite_test_file()).unwrap();
         let api = test_api(connector);
 
         let barrel_migration_executor = BarrelMigrationExecutor {
@@ -364,7 +366,7 @@ where
         let (inspector, test_setup) = get_postgres();
 
         println!("Running the test function now");
-        let connector = SqlMigrationConnector::postgres(&postgres_url(), false).unwrap();
+        let connector = SqlMigrationConnector::new_from_database_str(&postgres_url()).unwrap();
         let api = test_api(connector);
 
         let barrel_migration_executor = BarrelMigrationExecutor {
@@ -380,36 +382,33 @@ where
 }
 
 fn get_sqlite() -> (Arc<dyn SqlSchemaDescriberBackend>, TestSetup) {
-    let wrapper = database_wrapper(SqlFamily::Sqlite, &sqlite_test_file());
-    let database = Arc::clone(&wrapper.database);
-
     let database_file_path = sqlite_test_file();
-    let _ = std::fs::remove_file(database_file_path.clone()); // ignore potential errors
+    std::fs::remove_file(database_file_path.clone()).ok(); // ignore potential errors
 
-    let inspector = sql_schema_describer::sqlite::SqlSchemaDescriber::new(Arc::new(wrapper));
+    let database = database(SqlFamily::Sqlite, &sqlite_test_file());
+    let inspector = sql_schema_describer::sqlite::SqlSchemaDescriber::new(Arc::clone(&database));
 
     (
         Arc::new(inspector),
         TestSetup {
-            database,
+            database: database.into(),
             sql_family: SqlFamily::Sqlite,
         },
     )
 }
 
 fn get_postgres() -> (Arc<dyn SqlSchemaDescriberBackend>, TestSetup) {
-    let wrapper = database_wrapper(SqlFamily::Postgres, &postgres_url());
-    let database = Arc::clone(&wrapper.database);
+    let database = database(SqlFamily::Postgres, &postgres_url());
 
     let drop_schema = dbg!(format!("DROP SCHEMA IF EXISTS \"{}\" CASCADE;", SCHEMA_NAME));
-    let _ = database.query_raw(SCHEMA_NAME, &drop_schema, &[]);
+    database.query_raw(&drop_schema, &[]).ok();
 
-    let inspector = sql_schema_describer::postgres::SqlSchemaDescriber::new(Arc::new(wrapper));
+    let inspector = sql_schema_describer::postgres::SqlSchemaDescriber::new(Arc::clone(&database));
 
     (
         Arc::new(inspector),
         TestSetup {
-            database,
+            database: database.into(),
             sql_family: SqlFamily::Postgres,
         },
     )
@@ -417,33 +416,32 @@ fn get_postgres() -> (Arc<dyn SqlSchemaDescriberBackend>, TestSetup) {
 
 struct BarrelMigrationExecutor {
     inspector: Arc<dyn SqlSchemaDescriberBackend>,
-    database: Arc<dyn MigrationDatabase + Send + Sync>,
+    database: Arc<dyn SyncSqlConnection + Send + Sync>,
     sql_variant: barrel::backend::SqlVariant,
 }
 
 impl BarrelMigrationExecutor {
-    fn execute<F>(&self, mut migrationFn: F) -> SqlSchema
+    fn execute<F>(&self, mut migration_fn: F) -> SqlSchema
     where
         F: FnMut(&mut Migration) -> (),
     {
         let mut migration = Migration::new().schema(SCHEMA_NAME);
-        migrationFn(&mut migration);
+        migration_fn(&mut migration);
         let full_sql = dbg!(migration.make_from(self.sql_variant));
         run_full_sql(&self.database, &full_sql);
         let mut result = self
             .inspector
             .describe(&SCHEMA_NAME.to_string())
             .expect("Introspection failed");
-        // the presence of the _Migration table makes assertions harder. Therefore remove it.
+
+        // The presence of the _Migration table makes assertions harder. Therefore remove it.
         result.tables = result.tables.into_iter().filter(|t| t.name != "_Migration").collect();
         result
     }
 }
 
-fn run_full_sql(database: &Arc<dyn MigrationDatabase + Send + Sync>, full_sql: &str) {
-    for sql in full_sql.split(";") {
-        if sql != "" {
-            database.query_raw(SCHEMA_NAME, &sql, &[]).unwrap();
-        }
+fn run_full_sql(database: &Arc<dyn SyncSqlConnection + Send + Sync>, full_sql: &str) {
+    for sql in full_sql.split(";").filter(|sql| !sql.is_empty()) {
+        database.query_raw(&sql, &[]).unwrap();
     }
 }

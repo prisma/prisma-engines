@@ -2,16 +2,28 @@
 use super::*;
 use log::debug;
 use regex::Regex;
+use sql_connection::SyncSqlConnection;
 use std::collections::{HashMap, HashSet};
+use std::convert::TryInto;
 use std::sync::Arc;
 
 pub struct SqlSchemaDescriber {
-    conn: Arc<dyn SqlConnection>,
+    conn: Arc<dyn SyncSqlConnection + Send + Sync + 'static>,
 }
 
 impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
     fn list_databases(&self) -> SqlSchemaDescriberResult<Vec<String>> {
-        Ok(vec![])
+        let databases = self.get_databases();
+        Result::Ok(databases)
+    }
+
+    fn get_metadata(&self, schema: &str) -> SqlSchemaDescriberResult<SQLMetadata> {
+        let count = self.get_table_names(&schema).len();
+        let size = self.get_size(&schema);
+        Result::Ok(SQLMetadata {
+            table_count: count,
+            size_in_bytes: size,
+        })
     }
 
     fn describe(&self, schema: &str) -> SqlSchemaDescriberResult<SqlSchema> {
@@ -33,8 +45,25 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
 
 impl SqlSchemaDescriber {
     /// Constructor.
-    pub fn new(conn: Arc<dyn SqlConnection>) -> SqlSchemaDescriber {
+    pub fn new(conn: Arc<dyn SyncSqlConnection + Send + Sync + 'static>) -> SqlSchemaDescriber {
         SqlSchemaDescriber { conn }
+    }
+
+    fn get_databases(&self) -> Vec<String> {
+        debug!("Getting table names");
+        let sql = "select schema_name from information_schema.schemata;";
+        let rows = self.conn.query_raw(sql, &[]).expect("get schema names ");
+        let names = rows
+            .into_iter()
+            .map(|row| {
+                row.get("schema_name")
+                    .and_then(|x| x.to_string())
+                    .expect("convert schema names")
+            })
+            .collect();
+
+        debug!("Found schema names: {:?}", names);
+        names
     }
 
     fn get_table_names(&self, schema: &str) -> Vec<String> {
@@ -44,10 +73,7 @@ impl SqlSchemaDescriber {
             -- Views are not supported yet
             AND table_type = 'BASE TABLE'
             ORDER BY table_name";
-        let rows = self
-            .conn
-            .query_raw(sql, schema, &[schema.into()])
-            .expect("get table names ");
+        let rows = self.conn.query_raw(sql, &[schema.into()]).expect("get table names ");
         let names = rows
             .into_iter()
             .map(|row| {
@@ -59,6 +85,26 @@ impl SqlSchemaDescriber {
 
         debug!("Found table names: {:?}", names);
         names
+    }
+
+    fn get_size(&self, schema: &str) -> usize {
+        debug!("Getting db size");
+        let sql =
+            "SELECT SUM(pg_total_relation_size(quote_ident(schemaname) || '.' || quote_ident(tablename)))::BIGINT as size
+             FROM pg_tables 
+             WHERE schemaname = $1::text";
+        let result = self.conn.query_raw(sql, &[schema.into()]).expect("get db size ");
+        let size: i64 = result
+            .first()
+            .map(|row| {
+                row.get("size")
+                    .and_then(|x| x.as_i64())
+                    .expect("convert db size result")
+            })
+            .unwrap();
+
+        debug!("Found db size: {:?}", size);
+        size.try_into().unwrap()
     }
 
     fn get_table(&self, schema: &str, name: &str, sequences: &Vec<Sequence>) -> Table {
@@ -82,7 +128,7 @@ impl SqlSchemaDescriber {
             ORDER BY column_name";
         let rows = self
             .conn
-            .query_raw(&sql, schema, &[schema.into(), table.into()])
+            .query_raw(&sql, &[schema.into(), table.into()])
             .expect("querying for columns");
         let cols = rows
             .into_iter()
@@ -121,11 +167,16 @@ impl SqlSchemaDescriber {
                 } else {
                     ColumnArity::Nullable
                 };
-                let default = col.get("column_default").and_then(|x| x.to_string());
+
+                let default = col.get("column_default").and_then(|param_value| {
+                    param_value
+                        .to_string()
+                        .map(|x| x.replace("\'", "").replace("::text", ""))
+                });
                 let is_auto_increment = is_identity
                     || match default {
                         Some(ref val) => {
-                            val == &format!("nextval(\'\"{}\".\"{}_{}_seq\"\'::regclass)", schema, table, col_name,)
+                            val == &format!("nextval(\"{}\".\"{}_{}_seq\"::regclass)", schema, table, col_name,)
                         }
                         _ => false,
                     };
@@ -183,7 +234,7 @@ impl SqlSchemaDescriber {
         // objects.
         let result_set = self
             .conn
-            .query_raw(&sql, schema, &[table.into(), schema.into()])
+            .query_raw(&sql, &[table.into(), schema.into()])
             .expect("querying for foreign keys");
         let mut intermediate_fks: HashMap<i64, ForeignKey> = HashMap::new();
         for row in result_set.into_iter() {
@@ -288,7 +339,7 @@ impl SqlSchemaDescriber {
         debug!("Getting indices: {}", sql);
         let rows = self
             .conn
-            .query_raw(&sql, schema, &[schema.into(), table_name.into()])
+            .query_raw(&sql, &[schema.into(), table_name.into()])
             .expect("querying for indices");
         let mut pk: Option<PrimaryKey> = None;
         let indices = rows
@@ -344,7 +395,7 @@ impl SqlSchemaDescriber {
             let re_seq = Regex::new("^(?:.+\\.)?\"?([^.\"]+)\"?").expect("compile regex");
             let rows = self
                 .conn
-                .query_raw(&sql, schema, &[])
+                .query_raw(&sql, &[])
                 .expect("querying for sequence seeding primary key column");
             // Given the result rows, find any sequence
             rows.into_iter().fold(None, |_: Option<Sequence>, row| {
@@ -374,7 +425,7 @@ impl SqlSchemaDescriber {
                   WHERE sequence_schema = $1";
         let rows = self
             .conn
-            .query_raw(&sql, schema, &[schema.into()])
+            .query_raw(&sql, &[schema.into()])
             .expect("querying for sequences");
         let sequences = rows
             .into_iter()
@@ -409,10 +460,7 @@ impl SqlSchemaDescriber {
             JOIN pg_enum e ON t.oid = e.enumtypid  
             JOIN pg_catalog.pg_namespace n ON n.oid = t.typnamespace
             WHERE n.nspname = $1";
-        let rows = self
-            .conn
-            .query_raw(&sql, schema, &[schema.into()])
-            .expect("querying for enums");
+        let rows = self.conn.query_raw(&sql, &[schema.into()]).expect("querying for enums");
         let mut enum_values: HashMap<String, HashSet<String>> = HashMap::new();
         for row in rows.into_iter() {
             debug!("Got enum row: {:?}", row);

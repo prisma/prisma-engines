@@ -1,6 +1,6 @@
 use crate::{PrismaError, PrismaResult};
 use connector::Connector;
-use core::executor::{InterpretingExecutor, QueryExecutor};
+use query_core::executor::{InterpretingExecutor, QueryExecutor};
 use datamodel::{
     configuration::{MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME},
     Source,

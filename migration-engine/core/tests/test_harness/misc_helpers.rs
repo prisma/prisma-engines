@@ -1,30 +1,23 @@
-use datamodel;
+use datamodel::ast::{parser, SchemaAst};
 use migration_connector::*;
 use migration_core::{
     api::{GenericApi, MigrationApi},
     commands::ResetCommand,
-    parse_datamodel,
 };
-use prisma_query::connector::{MysqlParams, PostgresParams};
-use sql_migration_connector::{migration_database::*, SqlFamily, SqlMigrationConnector};
+use sql_connection::{Mysql, Postgresql, Sqlite, SyncSqlConnection};
+use sql_migration_connector::{SqlFamily, SqlMigrationConnector};
 use sql_schema_describer::{SqlSchema, SqlSchemaDescriberBackend};
-use std::{convert::TryFrom, rc::Rc, sync::Arc};
+use std::{rc::Rc, sync::Arc};
 use url::Url;
 
-pub const SCHEMA_NAME: &str = "migration-engine";
+pub const SCHEMA_NAME: &str = "lift";
 
 pub struct TestSetup {
     pub sql_family: SqlFamily,
-    pub database: Arc<dyn MigrationDatabase + Send + Sync + 'static>,
+    pub database: Arc<dyn SyncSqlConnection + Send + Sync + 'static>,
 }
 
 impl TestSetup {
-    pub fn database_wrapper(&self) -> MigrationDatabaseWrapper {
-        MigrationDatabaseWrapper {
-            database: Arc::clone(&self.database),
-        }
-    }
-
     pub fn is_sqlite(&self) -> bool {
         match self.sql_family {
             SqlFamily::Sqlite => true,
@@ -33,8 +26,8 @@ impl TestSetup {
     }
 }
 
-pub fn parse(datamodel_string: &str) -> datamodel::Datamodel {
-    parse_datamodel(datamodel_string).unwrap()
+pub fn parse(datamodel_string: &str) -> SchemaAst {
+    parser::parse(datamodel_string).unwrap()
 }
 
 pub fn test_each_connector<F>(test_fn: F)
@@ -54,23 +47,44 @@ where
     test_each_connector_with_ignores(ignores, test_fn);
 }
 
-fn mysql_migration_connector(database_url: &str) -> SqlMigrationConnector {
-    match SqlMigrationConnector::mysql(database_url, true) {
+pub(super) fn mysql_migration_connector(database_url: &str) -> SqlMigrationConnector {
+    match SqlMigrationConnector::new_from_database_str(database_url) {
         Ok(c) => c,
         Err(_) => {
             let url = Url::parse(database_url).unwrap();
 
             let name_cmd = |name| format!("CREATE DATABASE `{}`", name);
 
-            let connect_cmd = |url| {
-                let params = MysqlParams::try_from(url)?;
-                Mysql::new(params, true)
-            };
+            let connect_cmd = |url| Mysql::new(url);
 
             create_database(url, "mysql", "/", name_cmd, Rc::new(connect_cmd));
-            SqlMigrationConnector::mysql(database_url, true).unwrap()
+            SqlMigrationConnector::new_from_database_str(database_url).unwrap()
         }
     }
+}
+
+pub(super) fn postgres_migration_connector(url: &str) -> SqlMigrationConnector {
+    match SqlMigrationConnector::new_from_database_str(&postgres_url()) {
+        Ok(c) => c,
+        Err(_) => {
+            let name_cmd = |name| format!("CREATE DATABASE \"{}\"", name);
+
+            let connect_cmd = |url: url::Url| Postgresql::new(url);
+
+            create_database(
+                url.parse().unwrap(),
+                "postgres",
+                "postgres",
+                name_cmd,
+                Rc::new(connect_cmd),
+            );
+            SqlMigrationConnector::new_from_database_str(&postgres_url()).unwrap()
+        }
+    }
+}
+
+pub(super) fn sqlite_migration_connector() -> SqlMigrationConnector {
+    SqlMigrationConnector::new_from_database_str(&sqlite_test_file()).unwrap()
 }
 
 pub fn test_each_connector_with_ignores<I: AsRef<[SqlFamily]>, F>(ignores: I, test_fn: F)
@@ -82,26 +96,13 @@ where
     if !ignores.contains(&SqlFamily::Postgres) {
         println!("--------------- Testing with Postgres now ---------------");
 
-        let connector = match SqlMigrationConnector::postgres(&postgres_url(), true) {
-            Ok(c) => c,
-            Err(_) => {
-                let url = Url::parse(&postgres_url()).unwrap();
-                let name_cmd = |name| format!("CREATE DATABASE \"{}\"", name);
-
-                let connect_cmd = |url| {
-                    let params = PostgresParams::try_from(url)?;
-                    PostgreSql::new(params, true)
-                };
-
-                create_database(url, "postgres", "postgres", name_cmd, Rc::new(connect_cmd));
-                SqlMigrationConnector::postgres(&postgres_url(), true).unwrap()
-            }
-        };
+        let connector = postgres_migration_connector(&postgres_url());
 
         let test_setup = TestSetup {
             sql_family: SqlFamily::Postgres,
             database: Arc::clone(&connector.database),
         };
+
         let api = test_api(connector);
 
         test_fn(&test_setup, &api);
@@ -142,7 +143,7 @@ where
     if !ignores.contains(&SqlFamily::Sqlite) {
         println!("--------------- Testing with SQLite now ---------------");
 
-        let connector = SqlMigrationConnector::sqlite(&sqlite_test_file()).unwrap();
+        let connector = sqlite_migration_connector();
         let test_setup = TestSetup {
             sql_family: SqlFamily::Sqlite,
             database: Arc::clone(&connector.database),
@@ -169,7 +170,7 @@ where
 }
 
 pub fn introspect_database(test_setup: &TestSetup, api: &dyn GenericApi) -> SqlSchema {
-    let db = Arc::new(test_setup.database_wrapper());
+    let db = Arc::clone(&test_setup.database);
     let inspector: Box<dyn SqlSchemaDescriberBackend> = match api.connector_type() {
         "postgresql" => Box::new(sql_schema_describer::postgres::SqlSchemaDescriber::new(db)),
         "sqlite" => Box::new(sql_schema_describer::sqlite::SqlSchemaDescriber::new(db)),
@@ -181,16 +182,10 @@ pub fn introspect_database(test_setup: &TestSetup, api: &dyn GenericApi) -> SqlS
         .describe(&SCHEMA_NAME.to_string())
         .expect("Introspection failed");
 
-    // the presence of the _Migration table makes assertions harder. Therefore remove it from the result.
+    // The presence of the _Migration table makes assertions harder. Therefore remove it from the result.
     result.tables = result.tables.into_iter().filter(|t| t.name != "_Migration").collect();
 
     result
-}
-
-pub fn database_wrapper(sql_family: SqlFamily, database_url: &str) -> MigrationDatabaseWrapper {
-    MigrationDatabaseWrapper {
-        database: database(sql_family, database_url).into(),
-    }
 }
 
 fn fetch_db_name(url: &Url, default: &str) -> String {
@@ -204,8 +199,8 @@ fn fetch_db_name(url: &Url, default: &str) -> String {
 
 fn create_database<F, T, S>(url: Url, default_name: &str, root_path: &str, create_stmt: S, f: Rc<F>)
 where
-    T: MigrationDatabase,
-    F: Fn(Url) -> Result<T, prisma_query::error::Error>,
+    T: SyncSqlConnection,
+    F: Fn(Url) -> Result<T, quaint::error::Error>,
     S: FnOnce(String) -> String,
 {
     let db_name = fetch_db_name(&url, default_name);
@@ -215,13 +210,13 @@ where
 
     let conn = f(url).unwrap();
 
-    conn.execute_raw("", &create_stmt(db_name), &[]).unwrap();
+    conn.execute_raw(&create_stmt(db_name), &[]).unwrap();
 }
 
 fn with_database<F, T, S>(url: Url, default_name: &str, root_path: &str, create_stmt: S, f: Rc<F>) -> T
 where
-    T: MigrationDatabase,
-    F: Fn(Url) -> Result<T, prisma_query::error::Error>,
+    T: SyncSqlConnection,
+    F: Fn(Url) -> Result<T, quaint::error::Error>,
     S: FnOnce(String) -> String,
 {
     match f(url.clone()) {
@@ -233,34 +228,28 @@ where
     }
 }
 
-pub fn database(sql_family: SqlFamily, database_url: &str) -> Box<dyn MigrationDatabase + Send + Sync + 'static> {
+pub fn database(sql_family: SqlFamily, database_url: &str) -> Arc<dyn SyncSqlConnection + Send + Sync + 'static> {
     match sql_family {
         SqlFamily::Postgres => {
             let url = Url::parse(database_url).unwrap();
             let create_cmd = |name| format!("CREATE DATABASE \"{}\"", name);
 
-            let connect_cmd = |url| {
-                let params = PostgresParams::try_from(url)?;
-                PostgreSql::new(params, true)
-            };
+            let connect_cmd = |url| Postgresql::new(url);
 
             let conn = with_database(url, "postgres", "postgres", create_cmd, Rc::new(connect_cmd));
 
-            Box::new(conn)
+            Arc::new(conn)
         }
-        SqlFamily::Sqlite => Box::new(Sqlite::new(database_url).unwrap()),
+        SqlFamily::Sqlite => Arc::new(Sqlite::new(database_url, SCHEMA_NAME).unwrap()),
         SqlFamily::Mysql => {
             let url = Url::parse(database_url).unwrap();
             let create_cmd = |name| format!("CREATE DATABASE `{}`", name);
 
-            let connect_cmd = |url| {
-                let params = MysqlParams::try_from(url)?;
-                Mysql::new(params, true)
-            };
+            let connect_cmd = |url| Mysql::new(url);
 
             let conn = with_database(url, "mysql", "/", create_cmd, Rc::new(connect_cmd));
 
-            Box::new(conn)
+            Arc::new(conn)
         }
     }
 }
@@ -321,9 +310,9 @@ pub fn postgres_url() -> String {
 
 pub fn mysql_url() -> String {
     dbg!(format!(
-        "mysql://root:prisma@{}:3306/{}",
-        db_host_mysql_5_7(),
-        SCHEMA_NAME
+        "mysql://root:prisma@{host}:3306/{schema_name}",
+        host = db_host_mysql_5_7(),
+        schema_name = SCHEMA_NAME
     ))
 }
 
