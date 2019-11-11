@@ -34,8 +34,6 @@ pub struct MysqlUrl{
     query_params: MysqlUrlQueryParams,
 }
 
-
-
 impl MysqlUrl {
     pub fn new(url: Url) -> Result<Self, Error> {
         let query_params = Self::parse_query_params(&url)?;
@@ -217,6 +215,7 @@ impl TryFrom<Url> for MysqlParams {
 }
 
 impl Mysql {
+    /// Create a new MySQL connection using `OptsBuilder` from the `mysql` crate.
     pub fn new(mut opts: my::OptsBuilder) -> crate::Result<Self> {
         let pool_opts = my::PoolOptions::with_constraints(my::PoolConstraints::new(1, 1).unwrap());
         opts.pool_options(pool_opts);
@@ -226,8 +225,14 @@ impl Mysql {
         })
     }
 
+    /// Create a new MySQL connection from [MysqlParams](trait.MysqlParams.html).
     pub fn from_params(params: MysqlParams) -> crate::Result<Self> {
         Self::new(params.config)
+    }
+
+    /// Create a new MySQL connection from a connection string.
+    pub fn from_url(url: &str) -> crate::Result<Self> {
+        Self::from_params(MysqlParams::try_from(Url::parse(url)?)?)
     }
 
     fn execute_and_get_id<'a>(
