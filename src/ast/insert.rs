@@ -173,6 +173,11 @@ impl<'a> SingleRowInsert<'a> {
 
         self
     }
+
+    /// Convert into a common `Insert` statement.
+    pub fn build(self) -> Insert<'a> {
+        Insert::from(self)
+    }
 }
 
 impl<'a> MultiRowInsert<'a> {
@@ -200,5 +205,10 @@ impl<'a> MultiRowInsert<'a> {
     {
         self.values.push(values.into());
         self
+    }
+
+    /// Convert into a common `Insert` statement.
+    pub fn build(self) -> Insert<'a> {
+        Insert::from(self)
     }
 }

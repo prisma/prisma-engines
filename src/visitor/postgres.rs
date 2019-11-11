@@ -142,6 +142,7 @@ impl<'a> ToSql for ParameterizedValue<'a> {
             ParameterizedValue::Integer(integer) => match *ty {
                 Type::INT2 => (*integer as i16).to_sql(ty, out),
                 Type::INT4 => (*integer as i32).to_sql(ty, out),
+                Type::TEXT => format!("{}", integer).to_sql(ty, out),
                 _ => (*integer as i64).to_sql(ty, out),
             },
             ParameterizedValue::Real(float) => match *ty {
@@ -179,6 +180,7 @@ impl<'a> ToSql for ParameterizedValue<'a> {
             ParameterizedValue::Integer(integer) => match *ty {
                 Type::INT2 => (*integer as i16).to_sql_checked(ty, out),
                 Type::INT4 => (*integer as i32).to_sql_checked(ty, out),
+                Type::TEXT => format!("{}", integer).to_sql(ty, out),
                 _ => integer.to_sql_checked(ty, out),
             },
             ParameterizedValue::Real(float) => match *ty {
