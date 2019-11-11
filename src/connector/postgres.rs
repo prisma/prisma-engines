@@ -114,11 +114,24 @@ impl SslParams {
 
 /// Wraps a connection url and exposes the parsing logic used by quaint, including default values.
 #[derive(Debug, Clone)]
-pub struct PostgresUrl(pub Url);
+pub struct PostgresUrl {
+    url: Url,
+    query_params: PostgresUrlQueryParams,
+}
 
 impl PostgresUrl {
+    pub fn new(url: Url) -> Result<Self, Error> {
+        let query_params = Self::parse_query_params(&url)?;
+
+        Ok(Self { url, query_params, })
+    }
+
+    pub fn url(&self) -> &Url {
+        &self.url
+    }
+
     pub fn username<'a>(&'a self) -> Cow<'a, str> {
-        match percent_decode(self.0.username().as_bytes()).decode_utf8() {
+        match percent_decode(self.url.username().as_bytes()).decode_utf8() {
             Ok(username) => username,
             Err(_) => {
                 #[cfg(not(feature = "tracing-log"))]
@@ -126,24 +139,27 @@ impl PostgresUrl {
                 #[cfg(feature = "tracing-log")]
                 tracing::warn!("Couldn't decode username to UTF-8, using the non-decoded version.");
 
-                self.0.username().into()
+                self.url.username().into()
             }
         }
     }
 
     pub fn host(&self) -> &str {
-        self.0.host_str().unwrap_or("localhost")
+        match self.url.host_str() {
+            Some("") | None => &self.query_params.host,
+            Some(url) => url,
+        }
     }
 
     pub fn dbname(&self) -> &str {
-        match self.0.path_segments() {
+        match self.url.path_segments() {
             Some(mut segments) => segments.next().unwrap_or("postgres"),
             None => "postgres",
         }
     }
 
     pub fn password<'a>(&'a self) -> Cow<'a, str> {
-        match self.0
+        match self.url
             .password()
             .and_then(|pw| percent_decode(pw.as_bytes()).decode_utf8().ok())
             {
@@ -151,24 +167,28 @@ impl PostgresUrl {
                     password
                 }
                 None => {
-                    self.0.password().unwrap_or("").into()
+                    self.url.password().unwrap_or("").into()
                 }
             }
     }
 
     pub fn port(&self) -> u16 {
-        self.0.port().unwrap_or(5432)
+        self.url.port().unwrap_or(5432)
     }
 
     pub fn schema(&self) -> String {
-        self.0.query_pairs().find(|(key, _value)| key == "schema").map(|(_key, value)| value.into_owned()).unwrap_or_else(|| DEFAULT_SCHEMA.to_string())
+        self.url.query_pairs().find(|(key, _value)| key == "schema").map(|(_key, value)| value.into_owned()).unwrap_or_else(|| DEFAULT_SCHEMA.to_string())
     }
 
     pub fn default_connection_limit() -> usize {
         num_cpus::get_physical() * 2 + 1
     }
 
-    pub fn query_params(&self) -> Result<PostgresUrlQueryParams, Error> {
+    pub fn query_params(&self) -> &PostgresUrlQueryParams {
+        &self.query_params
+    }
+
+    fn parse_query_params(url: &Url) -> Result<PostgresUrlQueryParams, Error> {
         let mut connection_limit = Self::default_connection_limit();
         let mut schema = String::from(DEFAULT_SCHEMA);
         let mut certificate_file = None;
@@ -176,8 +196,9 @@ impl PostgresUrl {
         let mut identity_password = None;
         let mut ssl_accept_mode = SslAcceptMode::Strict;
         let mut ssl_mode = SslMode::Prefer;
+        let mut host = String::from("localhost");
 
-        for (k, v) in self.0.query_pairs() {
+        for (k, v) in url.query_pairs() {
             match k.as_ref() {
                 "sslmode" => {
                     match v.as_ref() {
@@ -232,6 +253,9 @@ impl PostgresUrl {
                     let as_int: usize = v.parse().map_err(|_| Error::InvalidConnectionArguments)?;
                     connection_limit = as_int;
                 }
+                "host" => {
+                    host = v.to_string();
+                }
                 _ => {
                     #[cfg(not(feature = "tracing-log"))]
                     trace!("Discarding connection string param: {}", k);
@@ -254,24 +278,26 @@ impl PostgresUrl {
             connection_limit,
             schema,
             ssl_mode,
+            host,
         })
 
     }
 }
 
+#[derive(Debug, Clone)]
 pub struct PostgresUrlQueryParams {
     ssl_params: SslParams,
     connection_limit: usize,
     schema: String,
     ssl_mode: SslMode,
+    host: String,
 }
 
 impl TryFrom<Url> for PostgresParams {
     type Error = Error;
 
     fn try_from(url: Url) -> crate::Result<Self> {
-        let url = PostgresUrl(url);
-        let query_params = url.query_params()?;
+        let url = PostgresUrl::new(url)?;
 
         let mut config = Config::new();
 
@@ -281,13 +307,16 @@ impl TryFrom<Url> for PostgresParams {
         config.port(url.port());
         config.dbname(url.dbname());
         config.connect_timeout(Duration::from_millis(5000));
+
+        let dbname = url.dbname().to_string();
+        let query_params = url.query_params;
         config.ssl_mode(query_params.ssl_mode);
 
         Ok(Self {
             connection_limit: u32::try_from(query_params.connection_limit).unwrap(),
             schema: query_params.schema,
             config,
-            dbname: url.dbname().to_string(),
+            dbname,
             ssl_params: query_params.ssl_params,
         })
     }
@@ -446,6 +475,7 @@ mod tests {
     use crate::connector::Queryable;
     use std::env;
     use tokio_postgres as postgres;
+    use url::Url;
 
     #[allow(unused)]
     fn get_config() -> postgres::Config {
@@ -456,6 +486,20 @@ mod tests {
         config.password(env::var("TEST_PG_PASSWORD").unwrap());
         config.port(env::var("TEST_PG_PORT").unwrap().parse::<u16>().unwrap());
         config
+    }
+
+    #[test]
+    fn should_parse_socket_url() {
+        let url = PostgresUrl::new(Url::parse("postgresql:///dbname?host=/var/run/psql.sock").unwrap()).unwrap();
+        assert_eq!("dbname", url.dbname());
+        assert_eq!("/var/run/psql.sock", url.host());
+    }
+
+    #[test]
+    fn should_parse_default_host() {
+        let url = PostgresUrl::new(Url::parse("postgresql:///dbname").unwrap()).unwrap();
+        assert_eq!("dbname", url.dbname());
+        assert_eq!("localhost", url.host());
     }
 
     #[tokio::test]
