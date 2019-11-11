@@ -478,20 +478,13 @@ impl Queryable for PostgreSql {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::connector::Queryable;
+    use crate::{connector::Queryable, Quaint};
     use std::env;
-    use tokio_postgres as postgres;
     use url::Url;
+    use lazy_static::lazy_static;
 
-    #[allow(unused)]
-    fn get_config() -> postgres::Config {
-        let mut config = postgres::Config::new();
-        config.host(&env::var("TEST_PG_HOST").unwrap());
-        config.dbname(&env::var("TEST_PG_DB").unwrap());
-        config.user(&env::var("TEST_PG_USER").unwrap());
-        config.password(env::var("TEST_PG_PASSWORD").unwrap());
-        config.port(env::var("TEST_PG_PORT").unwrap().parse::<u16>().unwrap());
-        config
+    lazy_static! {
+        static ref CONN_STR: String = env::var("TEST_PSQL").unwrap();
     }
 
     #[test]
@@ -510,7 +503,8 @@ mod tests {
 
     #[tokio::test]
     async fn should_provide_a_database_connection() {
-        let connection = PostgreSql::new(get_config(), None, None).await.unwrap();
+        let pool = Quaint::new(&CONN_STR).unwrap();
+        let connection = pool.check_out().await.unwrap();
 
         let res = connection
             .query_raw(
@@ -526,7 +520,8 @@ mod tests {
 
     #[tokio::test]
     async fn should_provide_a_database_transaction() {
-        let connection = PostgreSql::new(get_config(), None, None).await.unwrap();
+        let pool = Quaint::new(&CONN_STR).unwrap();
+        let connection = pool.check_out().await.unwrap();
         let tx = connection.start_transaction().await.unwrap();
 
         let res = tx
@@ -561,7 +556,9 @@ mod tests {
 
     #[tokio::test]
     async fn should_map_columns_correctly() {
-        let connection = PostgreSql::new(get_config(), None, None).await.unwrap();
+        let pool = Quaint::new(&CONN_STR).unwrap();
+        let connection = pool.check_out().await.unwrap();
+
         connection.query_raw(DROP_TABLE, &[]).await.unwrap();
         connection.query_raw(TABLE_DEF, &[]).await.unwrap();
         connection.query_raw(CREATE_USER, &[]).await.unwrap();
@@ -582,20 +579,11 @@ mod tests {
 
     #[tokio::test]
     async fn test_custom_search_path() {
-        let conn_string = format!(
-            "postgresql://{}:{}@{}:{}/{}?schema=musti-test",
-            env::var("TEST_PG_USER").unwrap(),
-            env::var("TEST_PG_PASSWORD").unwrap(),
-            env::var("TEST_PG_HOST").unwrap(),
-            env::var("TEST_PG_PORT").unwrap(),
-            env::var("TEST_PG_DB").unwrap(),
-        );
+        let mut url = Url::parse(&CONN_STR).unwrap();
+        url.query_pairs_mut().append_pair("schema", "musti-test");
 
-        let url = Url::parse(&conn_string).unwrap();
-        let params = PostgresParams::try_from(url).unwrap();
-        let client = PostgreSql::new(params.config, Some(params.schema), Some(params.ssl_params))
-            .await
-            .unwrap();
+        let pool = Quaint::new(url.as_str()).unwrap();
+        let client = pool.check_out().await.unwrap();
 
         let result_set = client.query_raw("SHOW search_path", &[]).await.unwrap();
         let row = result_set.first().unwrap();
@@ -605,18 +593,20 @@ mod tests {
 
     #[tokio::test]
     async fn should_map_nonexisting_database_error() {
-        let mut config = get_config();
-        config.dbname("this_does_not_exist");
+        let mut url = Url::parse(&CONN_STR).unwrap();
+        url.set_path("this_does_not_exist");
 
-        let res = PostgreSql::new(config, None, None).await;
+        let pool = Quaint::new(url.as_str()).unwrap();
+        let res = pool.check_out().await;
 
         assert!(res.is_err());
 
-        match res.unwrap_err() {
-            Error::DatabaseDoesNotExist { db_name } => {
+        match res {
+            Ok(_) => unreachable!(),
+            Err(Error::DatabaseDoesNotExist { db_name }) => {
                 assert_eq!("this_does_not_exist", db_name.as_str())
             }
-            e => panic!("Expected `DatabaseDoesNotExist`, got {:?}", e),
+            Err(e) => panic!("Expected `DatabaseDoesNotExist`, got {:?}", e),
         }
     }
 

@@ -339,29 +339,14 @@ impl Queryable for Mysql {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crate::connector::Queryable;
-    use mysql_async::OptsBuilder;
+    use crate::{connector::Queryable, Quaint, error::Error};
+    use super::MysqlUrl;
     use std::env;
+    use lazy_static::lazy_static;
+    use url::Url;
 
-    fn get_config() -> OptsBuilder {
-        let mut config = OptsBuilder::new();
-        config.ip_or_hostname(env::var("TEST_MYSQL_HOST").unwrap());
-        config.tcp_port(env::var("TEST_MYSQL_PORT").unwrap().parse::<u16>().unwrap());
-        config.db_name(env::var("TEST_MYSQL_DB").ok());
-        config.pass(env::var("TEST_MYSQL_PASSWORD").ok());
-        config.user(env::var("TEST_MYSQL_USER").ok());
-        config
-    }
-
-    fn get_admin_config() -> OptsBuilder {
-        let mut config = OptsBuilder::new();
-        config.ip_or_hostname(env::var("TEST_MYSQL_HOST").unwrap());
-        config.tcp_port(env::var("TEST_MYSQL_PORT").unwrap().parse::<u16>().unwrap());
-        config.db_name(env::var("TEST_MYSQL_DB").ok());
-        config.pass(env::var("TEST_MYSQL_ROOT_PASSWORD").ok());
-        config.user("root".into());
-        config
+    lazy_static! {
+        static ref CONN_STR: String = env::var("TEST_MYSQL").unwrap();
     }
 
     #[test]
@@ -373,7 +358,8 @@ mod tests {
 
     #[tokio::test]
     async fn should_provide_a_database_connection() {
-        let connection = Mysql::new(get_config()).unwrap();
+        let pool = Quaint::new(&CONN_STR).unwrap();
+        let connection = pool.check_out().await.unwrap();
 
         let res = connection
             .query_raw(
@@ -388,7 +374,8 @@ mod tests {
 
     #[tokio::test]
     async fn should_provide_a_database_transaction() {
-        let connection = Mysql::new(get_config()).unwrap();
+        let pool = Quaint::new(&CONN_STR).unwrap();
+        let connection = pool.check_out().await.unwrap();
         let tx = connection.start_transaction().await.unwrap();
 
         let res = tx
@@ -420,7 +407,8 @@ VALUES (1, 'Joe', 27, 20000.00 );
 
     #[tokio::test]
     async fn should_map_columns_correctly() {
-        let connection = Mysql::new(get_config()).unwrap();
+        let pool = Quaint::new(&CONN_STR).unwrap();
+        let connection = pool.check_out().await.unwrap();
 
         connection.query_raw(DROP_TABLE, &[]).await.unwrap();
         connection.query_raw(TABLE_DEF, &[]).await.unwrap();
@@ -441,10 +429,13 @@ VALUES (1, 'Joe', 27, 20000.00 );
 
     #[tokio::test]
     async fn should_map_nonexisting_database_error() {
-        let mut config = get_admin_config();
-        config.db_name(Some("this_does_not_exist"));
+        let mut url = Url::parse(&CONN_STR).unwrap();
+        url.set_username("root").unwrap();
+        url.set_path("this_does_not_exist");
 
-        let conn = Mysql::new(config).unwrap();
+        let url = url.as_str().to_string();
+        let quaint = Quaint::new(&url).unwrap();
+        let conn = quaint.check_out().await.unwrap();
         let res = conn.query_raw("SELECT 1 + 1", &[]).await;
 
         assert!(&res.is_err());
