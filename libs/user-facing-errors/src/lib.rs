@@ -36,7 +36,17 @@ pub struct UnknownError {
 }
 
 impl UnknownError {
-    pub fn from_panic_payload(panic_payload: Box<dyn std::any::Any + Send + 'static>) -> Self {
+    /// Construct a new UnknownError from a `PanicInfo` in a panic hook. `UnknownError`s created
+    /// with this constructor will have a proper, useful backtrace.
+    pub fn new_in_panic_hook(panic_info: &std::panic::PanicInfo<'_>) -> Self {
+        let mut error = UnknownError::from_panic_payload(panic_info.payload());
+
+        error.backtrace = Some(format!("{:?}", backtrace::Backtrace::new()));
+
+        error
+    }
+
+    pub fn from_panic_payload(panic_payload: &(dyn std::any::Any + Send + 'static)) -> Self {
         let message: Option<String> = panic_payload
             .downcast_ref::<&str>()
             .map(|s| -> String { (*s).to_owned() })

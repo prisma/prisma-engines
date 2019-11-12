@@ -33,6 +33,20 @@ pub(crate) fn pretty_print_errors(errors: ErrorCollection, datamodel: &str) {
 }
 
 fn main() {
+    let original_hook = std::panic::take_hook();
+
+    std::panic::set_hook(Box::new(move |panic| {
+        let err = user_facing_errors::UnknownError::new_in_panic_hook(&panic);
+
+        match serde_json::to_writer(std::io::stderr(), &err) {
+            Ok(_) => eprintln!(),
+            Err(err) => {
+                log::error!("Failed to write JSON error to stderr: {}", err);
+                original_hook(panic)
+            }
+        }
+    }));
+
     env_logger::init();
 
     let matches = cli::clap_app().get_matches();
@@ -51,14 +65,16 @@ fn main() {
                 error!("{}", error);
                 let exit_code = error.exit_code();
                 serde_json::to_writer(std::io::stdout(), &cli::render_error(error)).expect("failed to write to stdout");
+                println!();
                 std::process::exit(exit_code);
             }
             Err(panic) => {
                 serde_json::to_writer(
                     std::io::stdout(),
-                    &user_facing_errors::UnknownError::from_panic_payload(panic),
+                    &user_facing_errors::UnknownError::from_panic_payload(panic.as_ref()),
                 )
                 .expect("failed to write to stdout");
+                println!();
                 std::process::exit(255);
             }
         }
@@ -83,6 +99,7 @@ fn main() {
                 }
                 Err(e) => {
                     serde_json::to_writer(std::io::stdout(), &api::render_error(e)).expect("failed to write to stdout");
+                    println!();
                     std::process::exit(255);
                 }
             }

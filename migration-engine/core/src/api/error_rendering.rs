@@ -79,7 +79,7 @@ pub(super) fn render_jsonrpc_error(crate_error: CrateError) -> JsonRpcError {
 }
 
 pub(crate) fn render_panic(panic: Box<dyn std::any::Any + Send + 'static>) -> JsonRpcError {
-    let error = user_facing_errors::UnknownError::from_panic_payload(panic);
+    let error = user_facing_errors::UnknownError::from_panic_payload(panic.as_ref());
     render_unknown_error_as_jsonrpc_error(error)
 }
 
