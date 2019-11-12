@@ -141,7 +141,7 @@ impl Quaint {
     ///
     /// - `sqlite`/`file` opens an SQLite connection
     /// - `mysql` opens a MySQL connection
-    /// - `postgres` / `postgresql` opens a PostgreSQL connection
+    /// - `postgres`/`postgresql` opens a PostgreSQL connection
     ///
     /// All parameters should be given in the query string format:
     /// `?key1=val1&key2=val2`. All parameters are optional.
