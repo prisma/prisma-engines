@@ -25,7 +25,10 @@ pub enum CliError {
         database_port: u16,
     },
     #[fail(display = "Error connecting to the database")]
-    ConnectionError,
+    ConnectionError {
+        database_host: String,
+        database_port: String,
+    },
     #[fail(display = "No command defined")]
     NoCommandDefined,
     #[fail(display = "Connect timed out")]
@@ -76,7 +79,11 @@ impl From<ConnectorError> for CliError {
             ConnectorError::ConnectTimeout => CliError::ConnectTimeout,
             ConnectorError::Timeout => CliError::Timeout,
             ConnectorError::TlsError { message } => CliError::TlsError(message),
-            _ => CliError::ConnectionError,
+            ConnectorError::ConnectionError { host, port, cause: _ } => CliError::ConnectionError {
+                database_host: host.clone(),
+                database_port: port.map(|p| format!("{}", p)).unwrap_or_else(|| "<port>".to_owned()),
+            },
+            other => CliError::Other(format!("{}", other)),
         }
     }
 }
@@ -261,6 +268,15 @@ pub fn render_error(cli_error: CliError) -> user_facing_errors::Error {
         } => KnownError::new(user_facing_errors::common::DatabaseAccessDenied {
             database_name,
             database_user,
+        })
+        .map(Error::Known)
+        .unwrap(),
+        CliError::ConnectionError {
+            database_host: host,
+            database_port: port,
+        } => KnownError::new(user_facing_errors::common::DatabaseNotReachable {
+            database_host: host.clone(),
+            database_port: port,
         })
         .map(Error::Known)
         .unwrap(),
