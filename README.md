@@ -25,10 +25,10 @@ Depending on how you invoked `cargo` in the previous step, you can find the comp
 
 | Prisma Framework Component | Path to Binary                                            |
 | -------------------------- | --------------------------------------------------------- |
-| Query Engine               | `./target/[debug|release]/prisma`                         |
-| Migration Engine           | `./target/[debug|release]/migration-engine`               |
-| Introspection Engine       | `./target/[debug|release]/introspection-engine`           |
-| Prisma Format              | `./target/[debug|release]/prisma-fmt`                     |
+| Query Engine               | ./target/\[debug|release\]/prisma                         |
+| Migration Engine           | ./target/\[debug|release\]/migration-engine               |
+| Introspection Engine       | ./target/\[debug|release\]/introspection-engine           |
+| Prisma Format              | ./target/\[debug|release\]/prisma-fmt                     |
 
 ## Testing
 
