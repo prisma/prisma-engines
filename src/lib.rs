@@ -269,6 +269,7 @@ impl Deref for PooledConnection {
     }
 }
 
+#[doc(hidden)]
 pub enum QuaintManager {
     #[cfg(feature = "mysql")]
     Mysql(mysql_async::OptsBuilder),
