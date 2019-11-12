@@ -129,23 +129,23 @@ pub struct DeleteManyRecords {
 #[derive(Debug, Clone)]
 pub struct ConnectRecords {
     pub parent: Option<GraphqlId>,
-    pub child: Option<GraphqlId>,
+    pub child: Vec<GraphqlId>,
     pub relation_field: RelationFieldRef,
 }
 
 #[derive(Debug, Clone)]
 pub struct DisconnectRecords {
     pub parent: Option<GraphqlId>,
-    pub child: Option<GraphqlId>,
+    pub child: Vec<GraphqlId>,
     pub relation_field: RelationFieldRef,
 }
 
-#[derive(Debug, Clone)]
-pub struct SetRecords {
-    pub parent: Option<GraphqlId>,
-    pub wheres: Vec<GraphqlId>,
-    pub relation_field: RelationFieldRef,
-}
+// #[derive(Debug, Clone)]
+// pub struct SetRecords {
+//     pub parent: Option<GraphqlId>,
+//     pub wheres: Vec<GraphqlId>,
+//     pub relation_field: RelationFieldRef,
+// }
 
 #[derive(Debug, Clone)]
 pub struct ResetData {
