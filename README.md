@@ -1,78 +1,39 @@
 # Prisma Engines
 
-The core stack for [Photon](https://github.com/prisma/photonjs/) and
-[Lift](https://github.com/prisma/lift/).
+This repository contains a collection of engines that power the core stack for the [Prisma Framework](https://github.com/prisma/prisma2), most prominently [Photon](https://github.com/prisma/photonjs/) and [Lift](https://github.com/prisma/lift/).
 
-## Code architecture
+The engines and their respective binary crates are:
+- Query engine: `prisma`
+- Migration engine: `migration-engine`
+- Introspection engine: `introspection-engine`
+- Prisma Format: `prisma-fmt`
 
-Photon uses query-engine and its
-[main](https://github.com/prisma/prisma-engine/blob/master/query-engine/prisma/src/main.rs)
-is a good place to start digging into the code.
+## Building Prisma Engines
 
-The request basically flows from
-[server.rs](https://github.com/prisma/prisma-engine/blob/master/query-engine/prisma/src/server.rs)
-to [graphql
-handler](https://github.com/prisma/prisma-engine/blob/master/query-engine/prisma/src/request_handlers/graphql/handler.rs)
-and from there to [core
-executor](https://github.com/prisma/prisma-engine/blob/master/query-engine/core/src/executor/interpreting_executor.rs)
-down to the
-[connectors](https://github.com/prisma/prisma-engine/tree/master/query-engine/connectors/sql-query-connector/src).
+**Prerequisites:**
+- Installed the stable Rust toolchain, at least version 1.39.0. You can get the toolchain at [rustup](https://rustup.rs/) or the package manager of your choice.
+- Linux only: OpenSSL is required to be installed.
 
-The SQL generation and SQL database abstractions are handled by the [quaint
-crate](https://github.com/prisma/quaint).
+**How to build:**
 
-Lift connects to the migration-engine and the starting point for requests is the
-[rpc
-api](https://github.com/prisma/prisma-engine/blob/master/migration-engine/core/src/api/rpc.rs).
+To build all engines, simply execute `cargo build` on the repository root. This builds non-production debug binaries.
+If you want to build the optimized binaries in release mode, the command is `cargo build --release`.
 
-## Building Binaries in Debug Mode
+Depending on how you invoked `cargo` in the previous step, you can find the compiled binaries inside the repository root in the `target/debug` (without `--release`) or `target/release` directories (with `--release`):
 
-This section contains instructions for building the binaries that are powering the [Prisma Framework](https://github.com/prisma/prisma2) with a [**development**](https://doc.rust-lang.org/book/ch14-01-release-profiles.html) release profile (i.e. in _debug mode_).
-
-### 1. Clone the repository
-
-First, you need to clone this repository and navigate into its root folder:
-
-```
-git clone git@github.com:prisma/prisma-engine.git
-cd prisma-engine
-```
-
-### 2. Switch to the beta version of Rust
-
-You can switch to Rust's beta version using the following command:
-
-```
-rustup default beta
-```
-
-Afterwards you can verify that the switch worked by running `rustc --version`. If your version includes `beta`, the switch was successful.
-
-### 3. Build binaries in development mode
-
-The development release profile is the default when you're building your code with [Cargo](https://doc.rust-lang.org/cargo/)'s `build` command. Therefore, you can build your project in debug mode as follows:
-
-```
-cargo build
-```
-
-### 4. Access the built binaries
-
-You can find the compiled binaries inside the newly created `./target/debug` directory:
-
-| Prisma Framework Component | Path to Binary                                             |
-| -------------------------- | ---------------------------------------------------------- |
-| HTTP server + Query Engine | `./target/debug/prisma/prisma`                             |
-| Migration Engine           | `./target/debug/migration-engine/migration-engine`         |
-| Introspection Engine       | `./target/debug/introspection-engine/introspection-engine` |
-| Prisma Format              | `./target/debug/prisma-fmt/prisma-fmt`                     |
-
-## Coding Guidelines
-
-- Prevent compiler warnings
-- Use Rust formatting (`cargo fmt`)
+| Prisma Framework Component | Path to Binary                                            |
+| -------------------------- | --------------------------------------------------------- |
+| Query Engine               | `./target/[debug|release]/prisma`                         |
+| Migration Engine           | `./target/[debug|release]/migration-engine`               |
+| Introspection Engine       | `./target/[debug|release]/introspection-engine`           |
+| Prisma Format              | `./target/[debug|release]/prisma-fmt`                     |
 
 ## Testing
 
-- To compile all modules use the provided `build.sh` script
-- To test all modules use the provided `test.sh` script
+There are two test suites for the engines: Unit tests and integration tests.
+
+Unit tests are implemented in the Rust code, and can be invoked with `cargo test -- --test-threads 1`.
+
+## WIP Coding Guidelines
+- Prevent compiler warnings
+- Use Rust formatting (`cargo fmt`)
