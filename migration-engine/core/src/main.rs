@@ -33,13 +33,6 @@ pub(crate) fn pretty_print_errors(errors: ErrorCollection, datamodel: &str) {
 }
 
 fn main() {
-    let orig_hook = std::panic::take_hook();
-
-    std::panic::set_hook(Box::new(move |info| {
-        orig_hook(info);
-        std::process::exit(255);
-    }));
-
     env_logger::init();
 
     let matches = cli::clap_app().get_matches();
@@ -49,15 +42,24 @@ fn main() {
     } else if let Some(matches) = matches.subcommand_matches("cli") {
         let datasource = matches.value_of("datasource").unwrap();
 
-        match cli::run(&matches, &datasource) {
-            Ok(msg) => {
+        match std::panic::catch_unwind(|| cli::run(&matches, &datasource)) {
+            Ok(Ok(msg)) => {
                 info!("{}", msg);
                 std::process::exit(0);
             }
-            Err(error) => {
+            Ok(Err(error)) => {
                 error!("{}", error);
-
-                std::process::exit(error.exit_code());
+                let exit_code = error.exit_code();
+                serde_json::to_writer(std::io::stdout(), &cli::render_error(error)).expect("failed to write to stdout");
+                std::process::exit(exit_code);
+            }
+            Err(panic) => {
+                serde_json::to_writer(
+                    std::io::stdout(),
+                    &user_facing_errors::UnknownError::from_panic_payload(panic),
+                )
+                .expect("failed to write to stdout");
+                std::process::exit(255);
             }
         }
     } else {

@@ -95,7 +95,7 @@ pub fn run(matches: &ArgMatches, datasource: &str) -> std::result::Result<String
         create_conn(datasource, false)?;
         Ok("Connection successful".into())
     } else if matches.is_present("create_database") {
-        let (db_name, conn) = create_conn(datasource, true).unwrap();
+        let (db_name, conn) = create_conn(datasource, true)?;
         conn.create_database(&db_name)?;
         Ok(format!("Database '{}' created successfully.", db_name))
     } else {

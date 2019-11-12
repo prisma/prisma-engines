@@ -166,16 +166,18 @@ impl RpcApi {
     ) -> impl Future<Item = serde_json::Value, Error = JsonRpcError> {
         let executor = Arc::clone(executor);
 
-        lazy(move || poll_fn(move || blocking(|| Self::create_sync_handler(&executor, cmd, &params)))).then(|res| {
-            match res {
-                // dumdidum futures 0.1 we love <3
-                Ok(Ok(val)) => ok(val),
-                Ok(Err(val)) => err(val),
-                Err(val) => {
-                    let e = crate::error::Error::from(val);
-                    err(super::error_rendering::render_jsonrpc_error(e))
+        lazy(move || {
+            poll_fn(move || blocking(|| Self::create_sync_handler(&executor, cmd, &params))).then(|res| {
+                match res {
+                    // dumdidum futures 0.1 we love <3
+                    Ok(Ok(val)) => ok(val),
+                    Ok(Err(val)) => err(val),
+                    Err(val) => {
+                        let e = crate::error::Error::from(val);
+                        err(super::error_rendering::render_jsonrpc_error(e))
+                    }
                 }
-            }
+            })
         })
     }
 
