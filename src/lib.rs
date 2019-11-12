@@ -43,9 +43,7 @@
 //! async fn main() -> Result<(), quaint::error::Error> {
 //!     let quaint = Quaint::new("sqlite:///tmp/test.db")?;
 //!     let conn = quaint.check_out().await?;
-//!
-//!     let query = Select::default().value(1);
-//!     let result = conn.query(query.into()).await?;
+//!     let result = conn.select(Select::default().value(1)).await?;
 //!
 //!     assert_eq!(
 //!         Some(1),

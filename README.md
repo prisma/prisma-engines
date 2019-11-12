@@ -8,6 +8,28 @@ Quaint is an abstraction over certain SQL databases. It provides:
 - Connectors to abstract over results and querying.
 - Pooling with [tokio-resource-pool](https://crates.io/crates/tokio-resource-pool)
 
+Example:
+
+``` rust
+//! use quaint::{ast::*, Quaint};
+//!
+//! #[tokio::main]
+//! async fn main() -> Result<(), quaint::error::Error> {
+//!     let quaint = Quaint::new("postgres://user:pass@localhost/mydb")?;
+//!     let conn = quaint.check_out().await?;
+//!
+//!     let query = Select::from_table("cats").so_that("name".equals("musti"));
+//!     let result = conn.select(query).await?;
+//!
+//!     assert_eq!(
+//!         Some(1),
+//!         result.into_iter().nth(0).and_then(|row| row[0].as_i64()),
+//!     );
+//!
+//!     Ok(())
+//! }
+```
+
 ### Documentation
 
 - [Master](https://prisma.github.io/quaint/quaint/index.html)

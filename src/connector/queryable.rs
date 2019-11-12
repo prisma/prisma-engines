@@ -61,6 +61,11 @@ where
         })
     }
 
+    // For selecting data returning the results.
+    fn select<'a>(&'a self, q: Select<'a>) -> DBIO<'a, ResultSet> {
+        self.query(q.into())
+    }
+
     /// For inserting data. Returns the ID of the last inserted row.
     fn insert<'a>(&'a self, q: Insert<'a>) -> DBIO<'a, Option<Id>> {
         self.execute(q.into())
