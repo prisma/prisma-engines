@@ -39,23 +39,33 @@ impl UnknownError {
     /// Construct a new UnknownError from a `PanicInfo` in a panic hook. `UnknownError`s created
     /// with this constructor will have a proper, useful backtrace.
     pub fn new_in_panic_hook(panic_info: &std::panic::PanicInfo<'_>) -> Self {
-        let mut error = UnknownError::from_panic_payload(panic_info.payload());
+        let message = Self::extract_panic_message(panic_info.payload()).unwrap_or_else(|| "<unknown panic>".to_owned());
+        let backtrace = Some(format!("{:?}", backtrace::Backtrace::new()));
+        let location = panic_info
+            .location()
+            .map(|loc| format!("{}", loc))
+            .unwrap_or_else(|| "<unknown location>".to_owned());
 
-        error.backtrace = Some(format!("{:?}", backtrace::Backtrace::new()));
-
-        error
+        UnknownError {
+            message: format!("[{}] {}", location, message),
+            backtrace,
+        }
     }
 
     pub fn from_panic_payload(panic_payload: &(dyn std::any::Any + Send + 'static)) -> Self {
-        let message: Option<String> = panic_payload
-            .downcast_ref::<&str>()
-            .map(|s| -> String { (*s).to_owned() })
-            .or_else(|| panic_payload.downcast_ref::<String>().map(|s| s.to_owned()));
+        let message = Self::extract_panic_message(panic_payload).unwrap_or_else(|| "<unknown panic>".to_owned());
 
         UnknownError {
-            message: message.unwrap_or_else(|| "unknown panic".to_owned()),
+            message,
             backtrace: None,
         }
+    }
+
+    fn extract_panic_message(panic_payload: &(dyn std::any::Any + Send + 'static)) -> Option<String> {
+        panic_payload
+            .downcast_ref::<&str>()
+            .map(|s| -> String { (*s).to_owned() })
+            .or_else(|| panic_payload.downcast_ref::<String>().map(|s| s.to_owned()))
     }
 }
 
