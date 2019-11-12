@@ -78,17 +78,8 @@ pub(super) fn render_jsonrpc_error(crate_error: CrateError) -> JsonRpcError {
     }
 }
 
-pub(crate) fn render_panic(panic: Box<dyn std::any::Any>) -> JsonRpcError {
-    let error_message: Option<String> = panic
-        .downcast_ref::<&'static str>()
-        .map(|s| (*s).to_owned())
-        .or_else(|| panic.downcast_ref::<String>().map(|s| s.to_owned()));
-
-    let error = user_facing_errors::UnknownError {
-        message: error_message.unwrap_or_else(|| "Error rendering Rust panic.".to_owned()),
-        backtrace: None,
-    };
-
+pub(crate) fn render_panic(panic: Box<dyn std::any::Any + Send + 'static>) -> JsonRpcError {
+    let error = user_facing_errors::UnknownError::from_panic_payload(panic);
     render_unknown_error_as_jsonrpc_error(error)
 }
 

@@ -60,7 +60,7 @@ pub trait GenericApi: Send + Sync + 'static {
         error_rendering::render_jsonrpc_error(error)
     }
 
-    fn render_panic(&self, panic: Box<dyn std::any::Any>) -> jsonrpc_core::error::Error {
+    fn render_panic(&self, panic: Box<dyn std::any::Any + Send + 'static>) -> jsonrpc_core::error::Error {
         error_rendering::render_panic(panic)
     }
 }

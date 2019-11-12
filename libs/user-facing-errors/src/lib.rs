@@ -35,6 +35,20 @@ pub struct UnknownError {
     pub backtrace: Option<String>,
 }
 
+impl UnknownError {
+    pub fn from_panic_payload(panic_payload: Box<dyn std::any::Any + Send + 'static>) -> Self {
+        let message: Option<String> = panic_payload
+            .downcast_ref::<&str>()
+            .map(|s| -> String { (*s).to_owned() })
+            .or_else(|| panic_payload.downcast_ref::<String>().map(|s| s.to_owned()));
+
+        UnknownError {
+            message: message.unwrap_or_else(|| "unknown panic".to_owned()),
+            backtrace: None,
+        }
+    }
+}
+
 #[derive(Serialize, PartialEq, Debug)]
 #[serde(untagged)]
 pub enum Error {
