@@ -117,7 +117,7 @@ use connector::{DBIO, Queryable};
 use error::Error;
 use tokio_resource_pool::{Builder, Pool, Status, CheckOut, Manage, RealDependencies};
 use futures::future;
-use std::convert::TryFrom;
+use std::{convert::TryFrom, ops::Deref};
 
 lazy_static! {
     static ref LOG_QUERIES: bool = std::env::var("LOG_QUERIES")
@@ -248,8 +248,24 @@ impl Quaint {
     }
 
     /// Reserve a connection from the pool.
-    pub async fn check_out(&self) -> crate::Result<CheckOut<QuaintManager>> {
-        self.inner.check_out().await
+    pub async fn check_out(&self) -> crate::Result<PooledConnection> {
+        Ok(PooledConnection {
+            inner: self.inner.check_out().await?,
+        })
+    }
+}
+
+/// A connection from the pool. Implements
+/// [Queryable](connector/trait.Queryable.html).
+pub struct PooledConnection {
+    inner: CheckOut<QuaintManager>,
+}
+
+impl Deref for PooledConnection {
+    type Target = Box<dyn Queryable + Send + Sync + 'static>;
+
+    fn deref(&self) -> &Self::Target {
+        self.inner.deref()
     }
 }
 
