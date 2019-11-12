@@ -8,7 +8,7 @@ class NestedSetMutationInsideUpdateSpec extends FlatSpec with Matchers with ApiS
   override def runOnlyForCapabilities: Set[ConnectorCapability] = Set(JoinRelationLinksCapability)
 
   "a PM to C1!  relation with the child already in a relation" should "be setable through a nested mutation by unique" in {
-    schemaPMToC1req.test { dataModel =>
+    schemaPMToC1req.test(0) { dataModel =>
       val project = SchemaDsl.fromStringV11() { dataModel }
       database.setup(project)
 
