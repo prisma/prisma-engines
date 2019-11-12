@@ -225,9 +225,9 @@ impl<'a> QuerySchemaBuilder<'a> {
         field(
             field_name,
             args,
-            OutputType::list(OutputType::opt(OutputType::object(
+            OutputType::list(OutputType::object(
                 self.object_type_builder.map_model_object_type(&model),
-            ))),
+            )),
             Some(SchemaQueryBuilder::ModelQueryBuilder(ModelQueryBuilder::new(
                 Arc::clone(&model),
                 QueryTag::FindMany,
