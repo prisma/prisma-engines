@@ -15,6 +15,7 @@ type SqlitePool = Pool<SqliteManager>;
 pub struct Sqlite {
     pool: SqlitePool,
     file_path: String,
+    db_name: String,
     // TODO: remove this when we remove the sync API
     runtime: Runtime,
 }
@@ -26,13 +27,14 @@ impl Sqlite {
     /// - `db_name` is the name the database will be attached to for all the connections in the pool.
     pub fn new(url: &str, db_name: &str) -> Result<Self, QueryError> {
         let params = SqliteParams::try_from(url)?;
-        let file_path = params.file_path.to_str().unwrap().to_string();
+        let file_path = params.file_path;
 
         let pool = quaint::pool::sqlite(url, db_name)?;
 
         Ok(Self {
             pool,
-            file_path,
+            db_name: db_name.to_owned(),
+            file_path: file_path.to_owned(),
             runtime: super::default_runtime(),
         })
     }
@@ -40,6 +42,11 @@ impl Sqlite {
     /// The filesystem path of connection's database.
     pub fn file_path(&self) -> &str {
         self.file_path.as_str()
+    }
+
+    /// The name the database is bound to (with `ATTACH DATABASE`).
+    pub fn db_name(&self) -> &str {
+        self.db_name.as_str()
     }
 
     async fn get_connection(&self) -> Result<CheckOut<SqliteManager>, QueryError> {

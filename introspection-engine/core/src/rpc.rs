@@ -1,6 +1,7 @@
 use crate::connector_loader::load_connector;
 use crate::CoreResult;
 use datamodel::Datamodel;
+use introspection_connector::DatabaseMetadata;
 use jsonrpc_core::*;
 use jsonrpc_derive::rpc;
 
@@ -46,18 +47,10 @@ impl RpcImpl {
         Ok(connector.list_databases()?)
     }
 
-    fn get_database_metadata_internal(_url: UrlInput) -> CoreResult<DatabaseMetadata> {
-        Ok(DatabaseMetadata {
-            model_count: 10,
-            size_in_bytes: 1234,
-        })
+    fn get_database_metadata_internal(url: UrlInput) -> CoreResult<DatabaseMetadata> {
+        let connector = load_connector(&url.url)?;
+        Ok(connector.get_metadata("")?)
     }
-}
-
-#[derive(Serialize, Deserialize)]
-pub struct DatabaseMetadata {
-    model_count: usize,
-    size_in_bytes: usize,
 }
 
 #[derive(Serialize, Deserialize)]

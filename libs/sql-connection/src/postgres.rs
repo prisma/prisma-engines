@@ -1,11 +1,10 @@
-use crate::{pooling::*, traits::*};
+use crate::{traits::*};
 use quaint::{
     ast::*,
-    connector::{self, ResultSet},
+    connector::{ResultSet, PostgresUrl, Queryable},
     error::Error as QueryError,
-    pool::{PostgresManager},
+    pool::{Pool, PostgresManager},
 };
-use std::convert::{TryInto};
 use tokio::runtime::Runtime;
 use url::Url;
 
@@ -14,78 +13,69 @@ use url::Url;
 pub struct Postgresql {
     // TODO: remove this when we delete the sync interface
     runtime: Runtime,
-    conn: ConnectionPool<connector::PostgreSql, PostgresManager>,
+    pool: Pool<PostgresManager>,
+    url: PostgresUrl,
 }
 
 impl Postgresql {
     /// Create a new connection pool.
-    pub fn new_pooled(url: Url) -> Result<Self, QueryError> {
-        let pool = quaint::pool::postgres(url)?;
-        let handle = ConnectionPool::Pool(pool);
+    pub fn new(url: Url) -> Result<Self, QueryError> {
+        let pool = quaint::pool::postgres(url.clone())?;
 
         Ok(Postgresql {
-            conn: handle,
+            pool,
+            url: PostgresUrl::new(url)?,
             runtime: super::default_runtime(),
         })
     }
 
-    /// Create a new single connection.
-    pub fn new_unpooled(url: Url) -> Result<Self, QueryError> {
-        let runtime = super::default_runtime();
-        let conn = runtime.block_on(connector::PostgreSql::from_params(url.try_into()?))?;
-        let handle = ConnectionPool::Single(conn);
-
-        Ok(Postgresql { conn: handle, runtime })
-    }
-
-    async fn get_connection<'a>(
-        &'a self,
-    ) -> Result<ConnectionHandle<'a, connector::PostgreSql, PostgresManager>, QueryError> {
-        Ok(self.conn.get_connection().await?)
+    pub(crate) fn url(&self) -> PostgresUrl {
+        self.url.clone()
     }
 }
+
 
 #[async_trait::async_trait]
 impl SqlConnection for Postgresql {
     async fn execute<'a>(&self, q: Query<'a>) -> Result<Option<Id>, QueryError> {
-        let conn = self.get_connection().await?;
-        conn.as_queryable().execute(q).await
+        let conn = self.pool.check_out().await?;
+        conn.execute(q).await
     }
 
     async fn query<'a>(&self, q: Query<'a>) -> Result<ResultSet, QueryError> {
-        let conn = self.get_connection().await?;
-        conn.as_queryable().query(q).await
+        let conn = self.pool.check_out().await?;
+        conn.query(q).await
     }
 
     async fn query_raw<'a>(&self, sql: &str, params: &[ParameterizedValue<'a>]) -> Result<ResultSet, QueryError> {
-        let conn = self.get_connection().await?;
-        conn.as_queryable().query_raw(sql, params).await
+        let conn = self.pool.check_out().await?;
+        conn.query_raw(sql, params).await
     }
 
     async fn execute_raw<'a>(&self, sql: &str, params: &[ParameterizedValue<'a>]) -> Result<u64, QueryError> {
-        let conn = self.get_connection().await?;
-        conn.as_queryable().execute_raw(sql, params).await
+        let conn = self.pool.check_out().await?;
+        conn.execute_raw(sql, params).await
     }
 }
 
 impl SyncSqlConnection for Postgresql {
     fn execute(&self, q: Query<'_>) -> Result<Option<Id>, QueryError> {
-        let conn = self.runtime.block_on(self.get_connection())?;
-        self.runtime.block_on(conn.as_queryable().execute(q))
+        let conn = self.runtime.block_on(self.pool.check_out())?;
+        self.runtime.block_on(conn.execute(q))
     }
 
     fn query(&self, q: Query<'_>) -> Result<ResultSet, QueryError> {
-        let conn = self.runtime.block_on(self.get_connection())?;
-        self.runtime.block_on(conn.as_queryable().query(q))
+        let conn = self.runtime.block_on(self.pool.check_out())?;
+        self.runtime.block_on(conn.query(q))
     }
 
     fn query_raw(&self, sql: &str, params: &[ParameterizedValue<'_>]) -> Result<ResultSet, QueryError> {
-        let conn = self.runtime.block_on(self.get_connection())?;
-        self.runtime.block_on(conn.as_queryable().query_raw(sql, params))
+        let conn = self.runtime.block_on(self.pool.check_out())?;
+        self.runtime.block_on(conn.query_raw(sql, params))
     }
 
     fn execute_raw(&self, sql: &str, params: &[ParameterizedValue<'_>]) -> Result<u64, QueryError> {
-        let conn = self.runtime.block_on(self.get_connection())?;
-        self.runtime.block_on(conn.as_queryable().execute_raw(sql, params))
+        let conn = self.runtime.block_on(self.pool.check_out())?;
+        self.runtime.block_on(conn.execute_raw(sql, params))
     }
 }

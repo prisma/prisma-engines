@@ -25,8 +25,8 @@ impl Sqlite {
 impl FromSource for Sqlite {
     fn from_source(source: &dyn Source) -> crate::Result<Self> {
         let params = SqliteParams::try_from(source.url().value.as_str())?;
-        let db_name = params.file_path.file_stem().unwrap().to_str().unwrap().to_owned();
-        let file_path = params.file_path.to_str().unwrap().to_string();
+        let db_name = std::path::Path::new(&params.file_path).file_stem().unwrap().to_str().unwrap().to_owned();
+        let file_path = params.file_path;
         let pool = pool::sqlite(&file_path, &db_name)?;
 
         Ok(Self { pool, file_path })

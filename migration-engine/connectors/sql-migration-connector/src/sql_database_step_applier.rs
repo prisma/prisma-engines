@@ -10,7 +10,6 @@ pub struct SqlDatabaseStepApplier {
     pub conn: Arc<dyn SyncSqlConnection + Send + Sync + 'static>,
 }
 
-#[allow(unused, dead_code)]
 impl DatabaseMigrationStepApplier<SqlMigration> for SqlDatabaseStepApplier {
     fn apply_step(&self, database_migration: &SqlMigration, index: usize) -> ConnectorResult<bool> {
         Ok(self.apply_next_step(&database_migration.corrected_steps, index)?)
