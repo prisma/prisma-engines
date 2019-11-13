@@ -25,6 +25,7 @@ pub struct SqliteParams {
     /// This is not a `PathBuf` because we need to `ATTACH` the database to the path, and this can
     /// only be done with UTF-8 paths.
     pub file_path: String,
+    pub db_name: Option<String>,
 }
 
 type ConnectionParams = (Vec<(String, String)>, Vec<(String, String)>);
@@ -45,6 +46,7 @@ impl TryFrom<&str> for SqliteParams {
         } else {
             let official = vec![];
             let mut connection_limit = num_cpus::get_physical() * 2 + 1;
+            let mut db_name = None;
 
             if path_parts.len() > 1 {
                 let (_, unsupported): ConnectionParams = path_parts
@@ -67,6 +69,9 @@ impl TryFrom<&str> for SqliteParams {
 
                             connection_limit = as_int;
                         }
+                        "db_name" => {
+                            db_name = Some(v.to_string());
+                        }
                         _ => {
                             #[cfg(not(feature = "tracing-log"))]
                             trace!("Discarding connection string param: {}", k);
@@ -83,6 +88,7 @@ impl TryFrom<&str> for SqliteParams {
             Ok(Self {
                 connection_limit: u32::try_from(connection_limit).unwrap(),
                 file_path: path_str.to_owned(),
+                db_name,
             })
         }
     }
