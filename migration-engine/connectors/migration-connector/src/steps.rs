@@ -22,8 +22,8 @@ pub enum MigrationStep {
     UpdateEnum(UpdateEnum),
     DeleteEnum(DeleteEnum),
     CreateCustomType(CreateCustomType),
+    DeleteCustomType(DeleteCustomType),
     // UpdateType(UpdateType),
-    // DeleteType(DeleteType),
 }
 
 #[derive(Debug, Deserialize, Serialize, PartialEq, Eq, Hash, Clone)]
@@ -270,6 +270,11 @@ pub struct CreateCustomType {
 
     pub r#type: String,
     pub arity: ast::FieldArity,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct DeleteCustomType {
+    pub custom_type: String,
 }
 
 #[cfg(test)]

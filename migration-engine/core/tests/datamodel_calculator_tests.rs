@@ -240,6 +240,18 @@ fn creating_a_custom_type_that_already_exists_must_error() {
     calculate(&dm, steps);
 }
 
+#[should_panic(expected = "The type Test does not exist in this Datamodel. It is not possible to delete it.")]
+#[test]
+fn deleting_a_custom_type_that_does_not_exist_must_error() {
+    let dm = parse("");
+
+    let steps = &[MigrationStep::DeleteCustomType(DeleteCustomType {
+        custom_type: "Test".to_owned(),
+    })];
+
+    calculate(&dm, steps);
+}
+
 #[should_panic(expected = "The enum Test already exists in this Datamodel. It is not possible to create it once more.")]
 #[test]
 fn creating_an_enum_that_already_exists_must_error() {

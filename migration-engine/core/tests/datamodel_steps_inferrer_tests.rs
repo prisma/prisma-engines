@@ -1237,6 +1237,19 @@ fn infer_CreateCustomType() {
     assert_eq!(steps, expected);
 }
 
+#[test]
+fn infer_DeleteCustomType() {
+    let dm1 = parse("type CUID = String @id @default(cuid())");
+    let dm2 = parse("");
+    let steps = infer(&dm1, &dm2);
+
+    let expected = &[MigrationStep::DeleteCustomType(DeleteCustomType {
+        custom_type: "CUID".to_owned(),
+    })];
+
+    assert_eq!(steps, expected);
+}
+
 fn infer(dm1: &SchemaAst, dm2: &SchemaAst) -> Vec<MigrationStep> {
     let inferrer = DataModelMigrationStepsInferrerImplWrapper {};
     inferrer.infer(&dm1, &dm2)

@@ -45,6 +45,7 @@ fn apply_step(datamodel: &mut ast::SchemaAst, step: &MigrationStep) -> Result<()
         MigrationStep::UpdateField(update_field) => apply_update_field(datamodel, update_field)?,
         MigrationStep::DeleteField(delete_field) => apply_delete_field(datamodel, delete_field)?,
         MigrationStep::CreateCustomType(create_custom_type) => apply_create_custom_type(datamodel, create_custom_type)?,
+        MigrationStep::DeleteCustomType(delete_custom_type) => apply_delete_custom_type(datamodel, delete_custom_type)?,
         MigrationStep::CreateDirective(create_directive) => apply_create_directive(datamodel, create_directive)?,
         MigrationStep::DeleteDirective(delete_directive) => apply_delete_directive(datamodel, delete_directive)?,
         MigrationStep::CreateDirectiveArgument(create_directive_argument) => {
@@ -432,6 +433,31 @@ fn apply_create_custom_type(
     };
 
     datamodel.tops.push(ast::Top::Type(custom_type));
+
+    Ok(())
+}
+
+fn apply_delete_custom_type(
+    datamodel: &mut ast::SchemaAst,
+    step: &steps::DeleteCustomType,
+) -> Result<(), CalculatorError> {
+    datamodel.find_custom_type(&step.custom_type).ok_or_else(|| {
+        format_err!(
+            "The type {} does not exist in this Datamodel. It is not possible to delete it.",
+            &step.custom_type
+        )
+    })?;
+
+    let new_tops = datamodel
+        .tops
+        .drain(..)
+        .filter(|top| match top {
+            ast::Top::Type(field) => field.name.name != step.custom_type,
+            _ => true,
+        })
+        .collect();
+
+    datamodel.tops = new_tops;
 
     Ok(())
 }

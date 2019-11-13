@@ -77,6 +77,15 @@ impl<'a> TopDiffer<'a> {
         })
     }
 
+    /// Iterator over the custom types present in `previous` but not `next`.
+    pub(crate) fn deleted_custom_types(&self) -> impl Iterator<Item = &ast::Field> {
+        self.previous_custom_types().filter(move |previous_custom_type| {
+            self.next_custom_types()
+                .find(|next_custom_type| custom_types_match(previous_custom_type, next_custom_type))
+                .is_none()
+        })
+    }
+
     /// Iterator over the models in `previous`.
     fn previous_models(&self) -> impl Iterator<Item = &ast::Model> {
         walk_models(self.previous)
