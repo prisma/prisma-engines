@@ -42,11 +42,11 @@ pub fn connect_nested_set(
             let len = parent_ids.len();
             if len == 0 {
                 Err(QueryGraphBuilderError::AssertionError(format!(
-                    "Required exactly one parent ID to be present for disconnect query, found none."
+                    "Required exactly one parent ID to be present for set query, found none."
                 )))
             } else if len > 1 {
                 Err(QueryGraphBuilderError::AssertionError(format!(
-                    "Required exactly one parent ID to be present for disconnect query, found {}.",
+                    "Required exactly one parent ID to be present for set query, found {}.",
                     len
                 )))
             } else {

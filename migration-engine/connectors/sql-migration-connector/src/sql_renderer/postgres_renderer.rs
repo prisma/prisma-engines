@@ -10,7 +10,7 @@ impl super::SqlRenderer for PostgresRenderer {
     fn render_column(&self, schema_name: &str, table: &Table, column: &Column, _add_fk_prefix: bool) -> String {
         let column_name = self.quote(&column.name);
         let tpe_str = self.render_column_type(&column.tpe);
-        let nullability_str = render_nullability(&table, &column);
+        let nullability_str = render_nullability(&column);
         let default_str = render_default(&column);
         let foreign_key = table.foreign_key_for_column(&column.name);
         let references_str = self.render_references(&schema_name, foreign_key);

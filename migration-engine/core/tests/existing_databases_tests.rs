@@ -152,8 +152,7 @@ fn creating_a_scalar_list_field_for_an_existing_table_must_work() {
         let mut result = barrel.execute(|migration| {
             migration.create_table("Blog_tags", |t| {
                 // TODO: barrel does not render this one correctly
-                // TODO: the column should not be nullable. We just set it nullable because of our current inline relation nullability hack
-                t.add_column("nodeId", types::foreign("Blog", "id").nullable(true));
+                t.add_column("nodeId", types::foreign("Blog", "id"));
                 t.add_column("position", types::integer());
                 t.add_column("value", types::text());
             });

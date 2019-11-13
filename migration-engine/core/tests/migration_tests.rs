@@ -240,7 +240,7 @@ fn changing_the_type_of_an_id_field_must_work() {
                 columns: vec![column.name.clone()],
                 referenced_table: "B".to_string(),
                 referenced_columns: vec!["id".to_string()],
-                on_delete_action: ForeignKeyAction::SetNull,
+                on_delete_action: ForeignKeyAction::Restrict,
             }]
         );
 
@@ -268,7 +268,7 @@ fn changing_the_type_of_an_id_field_must_work() {
                 columns: vec![column.name.clone()],
                 referenced_table: "B".to_string(),
                 referenced_columns: vec!["id".to_string()],
-                on_delete_action: ForeignKeyAction::SetNull,
+                on_delete_action: ForeignKeyAction::Restrict,
             }]
         );
     });
@@ -327,7 +327,7 @@ fn changing_a_relation_field_to_a_scalar_field_must_work() {
                 columns: vec![column.name.clone()],
                 referenced_table: "B".to_string(),
                 referenced_columns: vec!["id".to_string()],
-                on_delete_action: ForeignKeyAction::SetNull,
+                on_delete_action: ForeignKeyAction::Restrict,
             }]
         );
 
@@ -391,7 +391,7 @@ fn changing_a_scalar_field_to_a_relation_field_must_work() {
                 columns: vec![column.name.clone()],
                 referenced_table: "B".to_string(),
                 referenced_columns: vec!["id".to_string()],
-                on_delete_action: ForeignKeyAction::SetNull,
+                on_delete_action: ForeignKeyAction::Restrict,
             }]
         );
     });
@@ -538,30 +538,55 @@ fn adding_an_inline_relation_must_result_in_a_foreign_key_in_the_model_table() {
         let dm1 = r#"
             model A {
                 id Int @id
-                b B @relation(references: [id])
+                b  B   @relation(references: [id])
+                c  C?  @relation(references: [id])
             }
 
             model B {
                 id Int @id
             }
+            
+            model C {
+                id Int @id
+            }
         "#;
         let result = dbg!(infer_and_apply(test_setup, api, &dm1).sql_schema);
         let table = result.table_bang("A");
-        let column = table.column_bang("b");
-        assert_eq!(column.tpe.family, ColumnTypeFamily::Int);
+
+        let b_column = table.column_bang("b");
+        assert_eq!(b_column.tpe.family, ColumnTypeFamily::Int);
+        assert_eq!(b_column.arity, ColumnArity::Required);
+
+        let c_column = table.column_bang("c");
+        assert_eq!(c_column.tpe.family, ColumnTypeFamily::Int);
+        assert_eq!(c_column.arity, ColumnArity::Nullable);
+
         assert_eq!(
             table.foreign_keys,
-            &[ForeignKey {
-                constraint_name: match test_setup.sql_family {
-                    SqlFamily::Postgres => Some("A_b_fkey".to_owned()),
-                    SqlFamily::Mysql => Some("A_ibfk_1".to_owned()),
-                    SqlFamily::Sqlite => None,
+            &[
+                ForeignKey {
+                    constraint_name: match test_setup.sql_family {
+                        SqlFamily::Postgres => Some("A_b_fkey".to_owned()),
+                        SqlFamily::Mysql => Some("A_ibfk_1".to_owned()),
+                        SqlFamily::Sqlite => None,
+                    },
+                    columns: vec![b_column.name.clone()],
+                    referenced_table: "B".to_string(),
+                    referenced_columns: vec!["id".to_string()],
+                    on_delete_action: ForeignKeyAction::Restrict, // required relations can't set ON DELETE SET NULL
                 },
-                columns: vec![column.name.clone()],
-                referenced_table: "B".to_string(),
-                referenced_columns: vec!["id".to_string()],
-                on_delete_action: ForeignKeyAction::SetNull,
-            }]
+                ForeignKey {
+                    constraint_name: match test_setup.sql_family {
+                        SqlFamily::Postgres => Some("A_c_fkey".to_owned()),
+                        SqlFamily::Mysql => Some("A_ibfk_2".to_owned()),
+                        SqlFamily::Sqlite => None,
+                    },
+                    columns: vec![c_column.name.clone()],
+                    referenced_table: "C".to_string(),
+                    referenced_columns: vec!["id".to_string()],
+                    on_delete_action: ForeignKeyAction::SetNull,
+                }
+            ]
         );
     });
 }
@@ -594,7 +619,7 @@ fn specifying_a_db_name_for_an_inline_relation_must_work() {
                 columns: vec![column.name.clone()],
                 referenced_table: "B".to_string(),
                 referenced_columns: vec!["id".to_string()],
-                on_delete_action: ForeignKeyAction::SetNull,
+                on_delete_action: ForeignKeyAction::Restrict,
             }]
         );
     });
@@ -628,7 +653,7 @@ fn adding_an_inline_relation_to_a_model_with_an_exotic_id_type() {
                 columns: vec![column.name.clone()],
                 referenced_table: "B".to_string(),
                 referenced_columns: vec!["id".to_string()],
-                on_delete_action: ForeignKeyAction::SetNull,
+                on_delete_action: ForeignKeyAction::Restrict,
             }]
         );
     });
@@ -692,7 +717,7 @@ fn moving_an_inline_relation_to_the_other_side_must_work() {
                 columns: vec!["b".to_string()],
                 referenced_table: "B".to_string(),
                 referenced_columns: vec!["id".to_string()],
-                on_delete_action: ForeignKeyAction::SetNull,
+                on_delete_action: ForeignKeyAction::Restrict,
             }]
         );
 
@@ -719,7 +744,7 @@ fn moving_an_inline_relation_to_the_other_side_must_work() {
                 columns: vec!["a".to_string()],
                 referenced_table: "A".to_string(),
                 referenced_columns: vec!["id".to_string()],
-                on_delete_action: ForeignKeyAction::SetNull,
+                on_delete_action: ForeignKeyAction::Restrict,
             }]
         );
     });
