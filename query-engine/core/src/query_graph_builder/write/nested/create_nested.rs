@@ -64,9 +64,10 @@ fn handle_many_to_many(
     parent_relation_field: &RelationFieldRef,
     create_nodes: Vec<NodeRef>,
 ) -> QueryGraphBuilderResult<()> {
+    // Todo optimize with createmany
     for create_node in create_nodes {
         graph.create_edge(&parent_node, &create_node, QueryGraphDependency::ExecutionOrder)?;
-        connect::connect_records_node(graph, &parent_node, &create_node, &parent_relation_field, None, None)?;
+        connect::connect_records_node(graph, &parent_node, &create_node, &parent_relation_field, 1)?;
     }
 
     Ok(())

@@ -40,6 +40,7 @@ impl RecordFinderInjector for WriteQuery {
         match self {
             Self::UpdateRecord(ref mut ur) => ur.where_ = Some(rf),
             Self::DeleteRecord(ref mut dr) => dr.where_ = Some(rf),
+            Self::UpdateManyRecords(ref mut ur) => ur.filter = rf.into(),
             _ => unimplemented!(),
         }
     }

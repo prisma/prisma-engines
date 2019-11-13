@@ -128,7 +128,7 @@ impl Expressionista {
                         let node: InterpretationResult<Node> =
                             parent_id_deps
                                 .into_iter()
-                                .try_fold(node, |node, (parent_binding_name, f)| {
+                                .try_fold(node, |node, (parent_binding_name, dependency)| {
                                     let binding = match env.get(&parent_binding_name) {
                                         Some(binding) => Ok(binding),
                                         None => Err(InterpreterError::EnvVarNotFound(format!(
@@ -137,15 +137,24 @@ impl Expressionista {
                                         ))),
                                     }?;
 
-                                    let parent_ids = match binding.as_ids() {
-                                        Some(ids) => Ok(ids),
-                                        None => Err(InterpreterError::InterpretationError(format!(
-                                        "Invalid parent result: Unable to transform binding '{}' into a set of IDs.",
-                                        parent_binding_name
-                                    ))),
-                                    }?;
+                                    let res = match dependency {
+                                        QueryGraphDependency::ParentIds(f) => {
+                                            binding.as_ids().and_then(|parent_ids| Ok(f(node, parent_ids)?))
+                                        }
 
-                                    Ok(f(node, parent_ids)?)
+                                        QueryGraphDependency::ParentResult(f) => binding
+                                            .as_query_result()
+                                            .and_then(|query_result| Ok(f(node, query_result)?)),
+
+                                        _ => unreachable!(),
+                                    };
+
+                                    Ok(res.map_err(|err| {
+                                        InterpreterError::InterpretationError(format!(
+                                            "Error for binding '{}': {}",
+                                            parent_binding_name, err
+                                        ))
+                                    })?)
                                 });
 
                         into_expr(node?)
@@ -212,10 +221,12 @@ impl Expressionista {
                                             ))),
                                         }?;
 
-                                        let parent_ids = match binding.as_ids() {
-                                            Some(ids) => Ok(ids),
-                                            None => Err(InterpreterError::InterpretationError(format!("Invalid parent result: Unable to transform binding '{}' into a set of IDs.", parent_binding_name))),
-                                        }?;
+                                        let parent_ids = binding.as_ids().map_err(|err| {
+                                            InterpreterError::InterpretationError(format!(
+                                                "Error for binding '{}': {}",
+                                                parent_binding_name, err
+                                            ))
+                                        })?;
 
                                         // Todo: This still needs some interface polishing...
                                         let flow: Flow = f(flow.into(), parent_ids)?.try_into()?;
@@ -245,45 +256,26 @@ impl Expressionista {
         }
     }
 
-    fn collect_parent_transformers(graph: &mut QueryGraph, parent_edges: Vec<EdgeRef>) -> Vec<(String, ParentIdsFn)> {
+    /// Collects all edge dependencies that perform a node transformation based on the parent.
+    fn collect_parent_transformers(
+        graph: &mut QueryGraph,
+        parent_edges: Vec<EdgeRef>,
+    ) -> Vec<(String, QueryGraphDependency)> {
         parent_edges
             .into_iter()
             .filter_map(|edge| match graph.pluck_edge(&edge) {
-                QueryGraphDependency::ParentIds(f) => {
+                x @ QueryGraphDependency::ParentResult(_) => {
                     let parent_binding_name = graph.edge_source(&edge).id();
-                    Some((parent_binding_name, f))
+                    Some((parent_binding_name, x))
+                }
+                x @ QueryGraphDependency::ParentIds(_) => {
+                    let parent_binding_name = graph.edge_source(&edge).id();
+                    Some((parent_binding_name, x))
                 }
                 _ => None,
             })
             .collect()
     }
-
-    // fn run_node_transformers(transformers: Vec<(String, ParentIdsFn)>) {
-    //     let query: InterpretationResult<Query> =
-    //         transformers
-    //             .into_iter()
-    //             .try_fold(query, |query, (parent_binding_name, f)| {
-    //                 let binding = match env.get(&parent_binding_name) {
-    //                     Some(binding) => Ok(binding),
-    //                     None => Err(InterpreterError::EnvVarNotFound(format!(
-    //                         "Expected parent binding '{}' to be present.",
-    //                         parent_binding_name
-    //                     ))),
-    //                 }?;
-
-    //                 let parent_ids = match binding.as_ids() {
-    //                     Some(ids) => Ok(ids),
-    //                     None => Err(InterpreterError::InterpretationError(format!(
-    //                         "Invalid parent result: Unable to transform binding '{}' into a set of IDs.",
-    //                         parent_binding_name
-    //                     ))),
-    //                 }?;
-
-    //                 let query: Query = f(query.into(), parent_ids)?.try_into()?;
-
-    //                 Ok(query)
-    //             });
-    // }
 
     fn fold_result_scopes(
         graph: &mut QueryGraph,

@@ -94,7 +94,7 @@ pub fn connect_nested_upsert(
                 })),
             )?;
         } else {
-            connect::connect_records_node(graph, &parent_node, &create_node, &parent_relation_field, None, None)?;
+            connect::connect_records_node(graph, &parent_node, &create_node, &parent_relation_field, 1)?;
         }
     }
 

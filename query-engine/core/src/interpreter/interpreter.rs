@@ -18,8 +18,8 @@ pub enum ExpressionResult {
 
 impl ExpressionResult {
     /// Attempts to transform the result into a vector of IDs (as PrismaValue).
-    pub fn as_ids(&self) -> Option<Vec<PrismaValue>> {
-        match self {
+    pub fn as_ids(&self) -> InterpretationResult<Vec<PrismaValue>> {
+        let converted = match self {
             Self::Query(ref result) => match result {
                 QueryResult::Id(id) => Some(vec![id.clone().into()]),
 
@@ -37,7 +37,22 @@ impl ExpressionResult {
             },
 
             _ => None,
-        }
+        };
+
+        converted.ok_or(InterpreterError::InterpretationError(
+            "Unable to convert result into a set of IDs".to_owned(),
+        ))
+    }
+
+    pub fn as_query_result(&self) -> InterpretationResult<&QueryResult> {
+        let converted = match self {
+            Self::Query(ref q) => Some(q),
+            _ => None,
+        };
+
+        converted.ok_or(InterpreterError::InterpretationError(
+            "Unable to convert result into a query result".to_owned(),
+        ))
     }
 }
 
@@ -70,7 +85,7 @@ pub struct QueryInterpreter<'conn, 'tx> {
 
 impl<'conn, 'tx> QueryInterpreter<'conn, 'tx>
 where
-    'tx: 'conn
+    'tx: 'conn,
 {
     pub fn new(conn: ConnectionLike<'conn, 'tx>) -> QueryInterpreter<'conn, 'tx> {
         Self {

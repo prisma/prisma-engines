@@ -13,7 +13,7 @@ pub use error::*;
 pub use formatters::*;
 pub use transformers::*;
 
-use crate::{Query, QueryGraphBuilderResult};
+use crate::{Query, QueryGraphBuilderResult, QueryResult};
 use guard::*;
 use invariance_rules::*;
 use petgraph::{graph::*, visit::EdgeRef as PEdgeRef, *};
@@ -80,6 +80,7 @@ impl EdgeRef {
 }
 
 pub type ParentIdsFn = Box<dyn FnOnce(Node, Vec<PrismaValue>) -> QueryGraphBuilderResult<Node> + Send + Sync + 'static>;
+pub type ParentResultFn = Box<dyn FnOnce(Node, &QueryResult) -> QueryGraphBuilderResult<Node> + Send + Sync + 'static>;
 
 /// Stored on the edges of the QueryGraph, a QueryGraphDependency contains information on how children are connected to their parents,
 /// expressing for example the need for additional information from the parent to be able to execute at runtime.
@@ -87,9 +88,13 @@ pub enum QueryGraphDependency {
     /// Simple dependency indicating order of execution. Effectively a NOOP for now.
     ExecutionOrder,
 
-    /// Performs a transformation on a node based on the IDs of the parent result (as PrismaValues).
-    /// The result is typed to the builder result as the construction of the closures takes place in that module,
-    /// and it avoids ugly hacks to combine the error types.
+    /// Performs a transformation on the child node based on the raw parent query result.
+    /// Does not move the result to the closure, but provides a reference.
+    ParentResult(ParentResultFn),
+
+    /// More specialized version of `ParentResult`
+    /// Performs a transformation on the child node based on the IDs of the parent result (as PrismaValues).
+    /// Assumes that the parent result can be converted into IDs, else a runtime error will occur.
     ParentIds(ParentIdsFn),
 
     /// Only valid in the context of a `If` control flow node.

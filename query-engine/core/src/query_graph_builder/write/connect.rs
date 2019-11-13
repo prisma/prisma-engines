@@ -1,6 +1,6 @@
 use crate::{
     query_ast::*,
-    query_graph::{Node, NodeRef, ParentIdsFn, QueryGraph, QueryGraphDependency},
+    query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
     QueryGraphBuilderError, QueryGraphBuilderResult,
 };
 use prisma_models::RelationFieldRef;
@@ -12,8 +12,6 @@ use std::{convert::TryInto, sync::Arc};
 /// By default, the connect node assumes that both the parent and the child node results
 /// are convertible to IDs, as the edges perform a transformation on the connect node to
 /// inject the required IDs after the parents executed.
-///
-/// Optionally, `ParentIdsFn`s can be provided to override the default edges for parent and child, respectively.
 ///
 /// The resulting graph (dashed indicates that those nodes and edges are not created in this function):
 ///
@@ -41,8 +39,7 @@ pub fn connect_records_node(
     parent_node: &NodeRef,
     child_node: &NodeRef,
     relation_field: &RelationFieldRef,
-    parent_fn: Option<ParentIdsFn>,
-    child_fn: Option<ParentIdsFn>,
+    expected_connects: usize,
 ) -> QueryGraphBuilderResult<NodeRef> {
     assert!(relation_field.relation().is_many_to_many());
 
@@ -58,23 +55,21 @@ pub fn connect_records_node(
     graph.create_edge(
         parent_node,
         &connect_node,
-        QueryGraphDependency::ParentIds(parent_fn.unwrap_or_else(|| {
-            Box::new(|mut child_node, mut parent_ids| {
-                let len = parent_ids.len();
+        QueryGraphDependency::ParentIds(Box::new(|mut child_node, mut parent_ids| {
+            let len = parent_ids.len();
 
-                if len == 0 {
-                    return Err(QueryGraphBuilderError::AssertionError(format!(
-                        "Required exactly one parent ID to be present for connect query, found 0."
-                    )));
-                }
+            if len == 0 {
+                return Err(QueryGraphBuilderError::AssertionError(format!(
+                    "Required exactly one parent ID to be present for connect query, found 0."
+                )));
+            }
 
-                if let Node::Query(Query::Write(WriteQuery::ConnectRecords(ref mut c))) = child_node {
-                    let parent_id = parent_ids.pop().unwrap();
-                    c.parent_id = Some(parent_id.try_into()?);
-                }
+            if let Node::Query(Query::Write(WriteQuery::ConnectRecords(ref mut c))) = child_node {
+                let parent_id = parent_ids.pop().unwrap();
+                c.parent_id = Some(parent_id.try_into()?);
+            }
 
-                Ok(child_node)
-            })
+            Ok(child_node)
         })),
     )?;
 
@@ -82,22 +77,21 @@ pub fn connect_records_node(
     graph.create_edge(
         &child_node,
         &connect_node,
-        QueryGraphDependency::ParentIds(child_fn.unwrap_or_else(|| {
-            Box::new(|mut child_node, parent_ids| {
-                let len = parent_ids.len();
+        QueryGraphDependency::ParentIds(Box::new(move |mut child_node, parent_ids| {
+            let len = parent_ids.len();
 
-                if len == 0 {
-                    return Err(QueryGraphBuilderError::AssertionError(format!(
-                        "Required one or more child IDs to be present for connect query, found 0."
-                    )));
-                }
+            if len != expected_connects {
+                return Err(QueryGraphBuilderError::RecordNotFound(format!(
+                    "Expected {} records to be connected, found {}.",
+                    expected_connects, len,
+                )));
+            }
 
-                if let Node::Query(Query::Write(WriteQuery::ConnectRecords(ref mut c))) = child_node {
-                    c.child_ids = parent_ids.into_iter().map(|id| id.try_into().unwrap()).collect();
-                }
+            if let Node::Query(Query::Write(WriteQuery::ConnectRecords(ref mut c))) = child_node {
+                c.child_ids = parent_ids.into_iter().map(|id| id.try_into().unwrap()).collect();
+            }
 
-                Ok(child_node)
-            })
+            Ok(child_node)
         })),
     )?;
 
