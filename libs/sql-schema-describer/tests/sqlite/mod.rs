@@ -16,7 +16,7 @@ pub fn get_sqlite_describer(sql: &str) -> sqlite::SqlSchemaDescriber {
         std::fs::remove_file(database_file_path.clone()).expect("remove database file");
     }
 
-    let conn = Sqlite::new(&database_file_path, SCHEMA).unwrap();
+    let conn = Sqlite::new(&format!("file://{}", database_file_path), SCHEMA).unwrap();
     for statement in sql.split(";").filter(|statement| !statement.is_empty()) {
         conn.execute_raw(statement, &[]).expect("executing migration");
     }
