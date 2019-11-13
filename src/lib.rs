@@ -106,10 +106,7 @@ pub mod connector;
 pub mod error;
 pub mod visitor;
 pub mod prelude;
-
-mod pool;
-
-pub use pool::*;
+pub mod pool;
 
 pub type Result<T> = std::result::Result<T, error::Error>;
 

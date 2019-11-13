@@ -1,8 +1,5 @@
 pub use crate::{
     ast::*,
-    Quaint,
-    PooledConnection,
-    ConnectionInfo,
-    SqlFamily,
+    pool::*,
     connector::{Queryable, TransactionCapable, Transaction, ResultSet, DBIO, ResultRow},
 };
