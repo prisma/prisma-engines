@@ -74,7 +74,7 @@ impl Quaint {
     /// - `socket` needed when connecting to MySQL database through a unix
     ///   socket. When set, the host parameter is dismissed.
     pub fn new(url_str: &str) -> crate::Result<Self> {
-        let url = Url::parse(url_str)?;
+        let url = Url::parse(dbg!(url_str))?;
 
         let (manager, connection_limit) = match url.scheme() {
             #[cfg(feature = "sqlite")]
@@ -143,8 +143,70 @@ impl Quaint {
         })
     }
 
+    /// Info about the connection and underlying database.
     pub fn connection_info(&self) -> &ConnectionInfo {
         &self.connection_info
+    }
+}
+
+impl Queryable for Quaint {
+    fn execute<'a>(&'a self, q: ast::Query<'a>) -> DBIO<'a, Option<ast::Id>> {
+        DBIO::new(async move {
+            let conn = self.check_out().await?;
+            conn.execute(q).await
+        })
+    }
+
+    fn query<'a>(&'a self, q: ast::Query<'a>) -> DBIO<'a, connector::ResultSet> {
+        DBIO::new(async move {
+            let conn = self.check_out().await?;
+            conn.query(q).await
+        })
+    }
+
+    fn query_raw<'a>(
+        &'a self,
+        sql: &'a str,
+        params: &'a [ast::ParameterizedValue],
+    ) -> DBIO<'a, connector::ResultSet> {
+        DBIO::new(async move {
+            let conn = self.check_out().await?;
+            conn.query_raw(sql, params).await
+        })
+    }
+
+    fn execute_raw<'a>(&'a self, sql: &'a str, params: &'a [ast::ParameterizedValue]) -> DBIO<'a, u64> {
+        DBIO::new(async move {
+            let conn = self.check_out().await?;
+            conn.execute_raw(sql, params).await
+        })
+    }
+
+    fn turn_off_fk_constraints(&self) -> DBIO<()> {
+        DBIO::new(async move {
+            let conn = self.check_out().await?;
+            conn.turn_off_fk_constraints().await
+        })
+    }
+
+    fn turn_on_fk_constraints(&self) -> DBIO<()> {
+        DBIO::new(async move {
+            let conn = self.check_out().await?;
+            conn.turn_on_fk_constraints().await
+        })
+    }
+
+    /// Please reserve a connection using
+    /// [check_out](struct.Quaint.html#method.check_out). This method panics.
+    fn start_transaction(&self) -> DBIO<connector::Transaction> {
+        unimplemented!("Start the transaction by reserving a connection with `check_out`.")
+    }
+
+    fn raw_cmd<'a>(&'a self, cmd: &'a str) -> DBIO<'a, ()> {
+        DBIO::new(async move {
+            let conn = self.check_out().await?;
+            conn.raw_cmd(cmd).await
+        })
     }
 }
 
