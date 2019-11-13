@@ -4,6 +4,7 @@ pub mod common;
 pub mod introspection;
 pub mod migration_engine;
 pub mod quaint;
+pub mod query_engine;
 
 use serde::Serialize;
 
