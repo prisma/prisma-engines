@@ -605,6 +605,26 @@ fn infer_CreateDirective_on_enum() {
 }
 
 #[test]
+fn infer_CreateDirective_on_custom_type() {
+    let dm1 = parse(r#"type BlogPost = String @default("a")"#);
+    let dm2 = parse(r#"type BlogPost = String @customized @default("a")"#);
+
+    let steps = infer(&dm1, &dm2);
+
+    let locator = DirectiveLocation {
+        directive: "customized".to_owned(),
+        arguments: None,
+        location: DirectiveType::CustomType {
+            custom_type: "BlogPost".to_owned(),
+        },
+    };
+
+    let expected = &[MigrationStep::CreateDirective(CreateDirective { locator: locator })];
+
+    assert_eq!(steps, expected);
+}
+
+#[test]
 fn infer_DeleteDirective_on_field() {
     let dm1 = parse(
         r##"
@@ -760,6 +780,26 @@ fn infer_DeleteDirective_on_enum() {
 }
 
 #[test]
+fn infer_DeleteDirective_on_custom_type() {
+    let dm1 = parse(r#"type BlogPost = String @default("chimken")"#);
+    let dm2 = parse(r#"type BlogPost = String"#);
+
+    let steps = infer(&dm1, &dm2);
+
+    let locator = DirectiveLocation {
+        directive: "default".to_owned(),
+        arguments: None,
+        location: DirectiveType::CustomType {
+            custom_type: "BlogPost".to_owned(),
+        },
+    };
+
+    let expected = &[MigrationStep::DeleteDirective(DeleteDirective { locator })];
+
+    assert_eq!(steps, expected);
+}
+
+#[test]
 fn infer_CreateDirectiveArgument_on_field() {
     let dm1 = parse(
         r##"
@@ -891,6 +931,30 @@ fn infer_CreateDirectiveArgument_on_enum() {
         directive_location: locator,
         argument: "three".to_owned(),
         value: MigrationExpression("4".to_owned()),
+    })];
+
+    assert_eq!(steps, expected);
+}
+
+#[test]
+fn infer_CreateDirectiveArgument_on_custom_type() {
+    let dm1 = parse(r#"type BlogPost = String @customDirective(c: "d")"#);
+    let dm2 = parse(r#"type BlogPost = String @customDirective(a: "b", c: "d")"#);
+
+    let steps = infer(&dm1, &dm2);
+
+    let locator = DirectiveLocation {
+        directive: "customDirective".to_owned(),
+        arguments: None,
+        location: DirectiveType::CustomType {
+            custom_type: "BlogPost".to_owned(),
+        },
+    };
+
+    let expected = &[MigrationStep::CreateDirectiveArgument(CreateDirectiveArgument {
+        directive_location: locator,
+        argument: "a".to_owned(),
+        value: MigrationExpression("\"b\"".to_owned()),
     })];
 
     assert_eq!(steps, expected);
@@ -1030,6 +1094,29 @@ fn infer_DeleteDirectiveArgument_on_enum() {
 }
 
 #[test]
+fn infer_DeleteDirectiveArgument_on_custom_type() {
+    let dm1 = parse(r#"type BlogPost = String @customDirective(a: "b", c: "d")"#);
+    let dm2 = parse(r#"type BlogPost = String @customDirective(c: "d")"#);
+
+    let steps = infer(&dm1, &dm2);
+
+    let locator = DirectiveLocation {
+        arguments: None,
+        directive: "customDirective".to_owned(),
+        location: DirectiveType::CustomType {
+            custom_type: "BlogPost".to_owned(),
+        },
+    };
+
+    let expected = &[MigrationStep::DeleteDirectiveArgument(DeleteDirectiveArgument {
+        directive_location: locator,
+        argument: "a".to_owned(),
+    })];
+
+    assert_eq!(steps, expected);
+}
+
+#[test]
 fn infer_UpdateDirectiveArgument_on_field() {
     let dm1 = parse(
         r##"
@@ -1163,6 +1250,30 @@ fn infer_UpdateDirectiveArgument_on_enum() {
         directive_location: locator,
         argument: "one".to_owned(),
         new_value: MigrationExpression("\"three\"".to_owned()),
+    })];
+
+    assert_eq!(steps, expected);
+}
+
+#[test]
+fn infer_UpdateDirectiveArgument_on_custom_type() {
+    let dm1 = parse("type Text = String @default(\"chicken\")");
+    let dm2 = parse("type Text = String @default(\"\")");
+
+    let steps = infer(&dm1, &dm2);
+
+    let locator = DirectiveLocation {
+        directive: "default".to_owned(),
+        arguments: None,
+        location: DirectiveType::CustomType {
+            custom_type: "Text".to_owned(),
+        },
+    };
+
+    let expected = &[MigrationStep::UpdateDirectiveArgument(UpdateDirectiveArgument {
+        directive_location: locator,
+        argument: "".to_owned(),
+        new_value: MigrationExpression("\"\"".to_owned()),
     })];
 
     assert_eq!(steps, expected);

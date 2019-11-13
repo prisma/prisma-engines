@@ -23,7 +23,6 @@ pub enum MigrationStep {
     DeleteEnum(DeleteEnum),
     CreateCustomType(CreateCustomType),
     DeleteCustomType(DeleteCustomType),
-    // UpdateType(UpdateType),
 }
 
 #[derive(Debug, Deserialize, Serialize, PartialEq, Eq, Hash, Clone)]

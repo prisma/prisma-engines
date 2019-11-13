@@ -1,4 +1,4 @@
-use super::{EnumDiffer, ModelDiffer};
+use super::{EnumDiffer, FieldDiffer, ModelDiffer};
 use datamodel::ast::{self, Top};
 
 /// Implements the logic to diff top-level items in a pair of [Datamodel ASTs](/datamodel/ast/struct.Datamodel.html).
@@ -83,6 +83,17 @@ impl<'a> TopDiffer<'a> {
             self.next_custom_types()
                 .find(|next_custom_type| custom_types_match(previous_custom_type, next_custom_type))
                 .is_none()
+        })
+    }
+
+    pub(crate) fn custom_type_pairs(&self) -> impl Iterator<Item = FieldDiffer<'_>> {
+        self.previous_custom_types().filter_map(move |previous_custom_type| {
+            self.next_custom_types()
+                .find(|next_custom_type| custom_types_match(previous_custom_type, next_custom_type))
+                .map(|next_custom_type| FieldDiffer {
+                    previous: previous_custom_type,
+                    next: next_custom_type,
+                })
         })
     }
 

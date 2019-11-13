@@ -33,6 +33,7 @@ type Steps = Vec<MigrationStep>;
 fn push_custom_types(steps: &mut Steps, differ: &TopDiffer<'_>) {
     push_created_custom_types(steps, differ.created_custom_types());
     push_deleted_custom_types(steps, differ.deleted_custom_types());
+    push_updated_custom_types(steps, differ.custom_type_pairs());
 }
 
 fn push_created_custom_types<'a>(steps: &mut Steps, custom_types: impl Iterator<Item = &'a ast::Field>) {
@@ -61,6 +62,18 @@ fn push_deleted_custom_types<'a>(steps: &mut Steps, custom_types: impl Iterator<
         .map(MigrationStep::DeleteCustomType);
 
     steps.extend(delete_custom_type_steps)
+}
+
+fn push_updated_custom_types<'a>(steps: &mut Steps, custom_types: impl Iterator<Item = FieldDiffer<'a>>) {
+    for updated_custom_type in custom_types {
+        let location = steps::DirectiveType::CustomType {
+            custom_type: updated_custom_type.previous.name.name.clone(),
+        };
+
+        push_created_directives(steps, &location, updated_custom_type.created_directives());
+        push_updated_directives(steps, &location, updated_custom_type.directive_pairs());
+        push_deleted_directives(steps, &location, updated_custom_type.deleted_directives());
+    }
 }
 
 fn push_enums(steps: &mut Steps, differ: &TopDiffer<'_>) {
