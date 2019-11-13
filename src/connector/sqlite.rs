@@ -3,7 +3,7 @@ mod error;
 
 use crate::{
     ast::{Id, ParameterizedValue, Query},
-    connector::{metrics, queryable::*, ResultSet, Transaction, DBIO},
+    connector::{metrics, queryable::*, ResultSet, DBIO},
     error::Error,
     visitor::{self, Visitor},
 };
@@ -139,6 +139,8 @@ impl Sqlite {
     }
 }
 
+impl TransactionCapable for Sqlite {}
+
 impl Queryable for Sqlite {
     fn execute<'a>(&'a self, q: Query<'a>) -> DBIO<'a, Option<Id>> {
         DBIO::new(async move {
@@ -218,10 +220,6 @@ impl Queryable for Sqlite {
         })
     }
 
-    fn start_transaction(&self) -> DBIO<Transaction> {
-        DBIO::new(async move { Transaction::new(self).await })
-    }
-
     fn raw_cmd<'a>(&'a self, cmd: &'a str) -> DBIO<'a, ()> {
         metrics::query("sqlite.raw_cmd", cmd, &[], move || {
             let client = self.client.lock().unwrap();
@@ -237,7 +235,7 @@ impl Queryable for Sqlite {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::connector::Queryable;
+    use crate::connector::{Queryable, TransactionCapable};
 
     #[tokio::test]
     async fn should_provide_a_database_connection() {

@@ -5,7 +5,7 @@ pub use connection_info::*;
 use url::Url;
 use crate::{
     ast,
-    connector::{self, DBIO, Queryable},
+    connector::{self, DBIO, Queryable, TransactionCapable},
     error::Error,
 };
 use tokio_resource_pool::{Builder, Pool, Status, CheckOut, Manage, RealDependencies};
@@ -196,12 +196,6 @@ impl Queryable for Quaint {
         })
     }
 
-    /// Please reserve a connection using
-    /// [check_out](struct.Quaint.html#method.check_out). This method panics.
-    fn start_transaction(&self) -> DBIO<connector::Transaction> {
-        unimplemented!("Start the transaction by reserving a connection with `check_out`.")
-    }
-
     fn raw_cmd<'a>(&'a self, cmd: &'a str) -> DBIO<'a, ()> {
         DBIO::new(async move {
             let conn = self.check_out().await?;
@@ -215,6 +209,8 @@ impl Queryable for Quaint {
 pub struct PooledConnection {
     inner: CheckOut<QuaintManager>,
 }
+
+impl TransactionCapable for PooledConnection {}
 
 impl Queryable for PooledConnection {
     fn execute<'a>(&'a self, q: ast::Query<'a>) -> DBIO<'a, Option<ast::Id>> {
@@ -243,10 +239,6 @@ impl Queryable for PooledConnection {
 
     fn turn_on_fk_constraints(&self) -> DBIO<()> {
         self.inner.turn_on_fk_constraints()
-    }
-
-    fn start_transaction(&self) -> DBIO<connector::Transaction> {
-        self.inner.start_transaction()
     }
 
     fn raw_cmd<'a>(&'a self, cmd: &'a str) -> DBIO<'a, ()> {

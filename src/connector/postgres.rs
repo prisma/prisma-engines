@@ -3,7 +3,7 @@ mod error;
 
 use crate::{
     ast::{Id, ParameterizedValue, Query},
-    connector::{metrics, queryable::*, ResultSet, Transaction, DBIO},
+    connector::{metrics, queryable::*, ResultSet, DBIO},
     error::Error,
     visitor::{self, Visitor},
 };
@@ -393,6 +393,8 @@ impl PostgreSql {
     }
 }
 
+impl TransactionCapable for PostgreSql {}
+
 impl Queryable for PostgreSql {
     fn execute<'a>(&'a self, q: Query<'a>) -> DBIO<'a, Option<Id>> {
         DBIO::new(async move {
@@ -457,10 +459,6 @@ impl Queryable for PostgreSql {
             self.query_raw("SET CONSTRAINTS ALL IMMEDIATE", &[]).await?;
             Ok(())
         })
-    }
-
-    fn start_transaction(&self) -> DBIO<Transaction> {
-        DBIO::new(async move { Transaction::new(self).await })
     }
 
     fn raw_cmd<'a>(&'a self, cmd: &'a str) -> DBIO<'a, ()> {

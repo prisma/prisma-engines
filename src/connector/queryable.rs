@@ -1,6 +1,5 @@
 use super::{ResultSet, Transaction, DBIO};
 use crate::ast::*;
-use std::ops::Deref;
 
 pub trait ToRow {
     fn to_result_row(&self) -> crate::Result<Vec<ParameterizedValue<'static>>>;
@@ -38,9 +37,6 @@ where
 
     /// Turns on all foreign key constraints.
     fn turn_on_fk_constraints(&self) -> DBIO<()>;
-
-    /// Starts a new transaction
-    fn start_transaction(&self) -> DBIO<Transaction>;
 
     /// Runs a command in the database, for queries that can't be run using
     /// prepared statements.
@@ -88,45 +84,13 @@ where
     }
 }
 
-impl<U, T> Queryable for U
+/// A thing that can start a new transaction.
+pub trait TransactionCapable: Queryable
 where
-    U: Deref<Target = T>,
-    T: Queryable + 'static,
-    Self: Sync,
+    Self: Sized + Sync
 {
-    fn execute<'a>(&'a self, q: Query<'a>) -> DBIO<'a, Option<Id>> {
-        T::execute(self, q)
-    }
-
-    fn query<'a>(&'a self, q: Query<'a>) -> DBIO<'a, ResultSet> {
-        T::query(self, q)
-    }
-
-    fn query_raw<'a>(
-        &'a self,
-        sql: &'a str,
-        params: &'a [ParameterizedValue<'a>],
-    ) -> DBIO<'a, ResultSet> {
-        T::query_raw(self, sql, params)
-    }
-
-    fn execute_raw<'a>(&'a self, sql: &'a str, params: &'a [ParameterizedValue]) -> DBIO<'a, u64> {
-        T::execute_raw(self, sql, params)
-    }
-
-    fn turn_off_fk_constraints(&self) -> DBIO<()> {
-        T::turn_off_fk_constraints(self)
-    }
-
-    fn turn_on_fk_constraints(&self) -> DBIO<()> {
-        T::turn_on_fk_constraints(self)
-    }
-
+    /// Starts a new transaction
     fn start_transaction(&self) -> DBIO<Transaction> {
-        T::start_transaction(self)
-    }
-
-    fn raw_cmd<'a>(&'a self, cmd: &'a str) -> DBIO<'a, ()> {
-        T::raw_cmd(self, cmd)
+        DBIO::new(async move { Transaction::new(self).await })
     }
 }

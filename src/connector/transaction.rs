@@ -64,10 +64,6 @@ impl<'a> Queryable for Transaction<'a> {
         self.inner.empty_tables(tables)
     }
 
-    fn start_transaction(&self) -> DBIO<Transaction> {
-        panic!("Nested transactions are not supported")
-    }
-
     fn raw_cmd<'b>(&'b self, cmd: &'b str) -> DBIO<'b, ()> {
         self.inner.raw_cmd(cmd)
     }

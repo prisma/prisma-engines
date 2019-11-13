@@ -9,7 +9,7 @@ use url::Url;
 
 use crate::{
     ast::{Id, ParameterizedValue, Query},
-    connector::{metrics, queryable::*, ResultSet, Transaction, DBIO},
+    connector::{metrics, queryable::*, ResultSet, DBIO},
     error::Error,
     visitor::{self, Visitor},
 };
@@ -251,6 +251,8 @@ impl Mysql {
     }
 }
 
+impl TransactionCapable for Mysql { }
+
 impl Queryable for Mysql {
     fn execute<'a>(&'a self, q: Query<'a>) -> DBIO<'a, Option<Id>> {
         DBIO::new(async move {
@@ -322,10 +324,6 @@ impl Queryable for Mysql {
         })
     }
 
-    fn start_transaction(&self) -> DBIO<Transaction> {
-        DBIO::new(async move { Transaction::new(self).await })
-    }
-
     fn raw_cmd<'a>(&'a self, cmd: &'a str) -> DBIO<'a, ()> {
         metrics::query("mysql.raw_cmd", cmd, &[], move || {
             async move {
@@ -339,7 +337,7 @@ impl Queryable for Mysql {
 
 #[cfg(test)]
 mod tests {
-    use crate::{connector::Queryable, Quaint, error::Error};
+    use crate::{connector::{Queryable, TransactionCapable}, Quaint, error::Error};
     use super::MysqlUrl;
     use std::env;
     use lazy_static::lazy_static;
