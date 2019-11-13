@@ -1,9 +1,8 @@
 use crate::{traits::{SqlConnection, SyncSqlConnection}};
 use quaint::{
-    ast::*,
-    connector::{ResultSet, MysqlUrl, Queryable},
+    prelude::*,
+    connector::MysqlUrl,
     error::Error as QueryError,
-    pool::{Pool, MysqlManager},
 };
 use tokio::runtime::Runtime;
 use url::Url;
@@ -11,7 +10,7 @@ use url::Url;
 /// A connection, or pool of connections, to a MySQL database. It exposes both sync and async
 /// query interfaces.
 pub struct Mysql {
-    pool: Pool<MysqlManager>,
+    pool: Quaint,
     url: MysqlUrl,
     // TODO: remove this when we delete the sync interface
     runtime: Runtime,
@@ -20,7 +19,7 @@ pub struct Mysql {
 impl Mysql {
     /// Create a new connection pool.
     pub fn new(url: Url) -> Result<Self, QueryError> {
-        let pool = quaint::pool::mysql(url.clone())?;
+        let pool = Quaint::new(url.as_str())?;
 
         Ok(Mysql {
             pool,

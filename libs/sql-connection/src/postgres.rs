@@ -1,9 +1,8 @@
 use crate::{traits::*};
 use quaint::{
-    ast::*,
-    connector::{ResultSet, PostgresUrl, Queryable},
+    prelude::*,
+    connector::PostgresUrl,
     error::Error as QueryError,
-    pool::{Pool, PostgresManager},
 };
 use tokio::runtime::Runtime;
 use url::Url;
@@ -13,14 +12,14 @@ use url::Url;
 pub struct Postgresql {
     // TODO: remove this when we delete the sync interface
     runtime: Runtime,
-    pool: Pool<PostgresManager>,
+    pool: Quaint,
     url: PostgresUrl,
 }
 
 impl Postgresql {
     /// Create a new connection pool.
     pub fn new(url: Url) -> Result<Self, QueryError> {
-        let pool = quaint::pool::postgres(url.clone())?;
+        let pool = Quaint::new(url.as_str())?;
 
         Ok(Postgresql {
             pool,

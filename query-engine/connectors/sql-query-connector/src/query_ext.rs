@@ -7,12 +7,14 @@ use async_trait::async_trait;
 use prisma_models::*;
 use quaint::{
     ast::*,
+    PooledConnection,
     connector::{self, Queryable},
 };
 use serde_json::{Map, Number, Value};
 use std::convert::TryFrom;
 
 impl<'t> QueryExt for connector::Transaction<'t> {}
+impl QueryExt for PooledConnection {}
 
 /// Functions for querying data.
 /// Basically represents a connection wrapper?
