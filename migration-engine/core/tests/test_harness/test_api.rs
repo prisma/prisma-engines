@@ -1,5 +1,5 @@
 use super::{
-    command_helpers::run_infer_command,
+    command_helpers::{run_infer_command, InferOutput},
     misc_helpers::{
         mysql_8_url, mysql_migration_connector, mysql_url, postgres_migration_connector, postgres_url,
         sqlite_migration_connector, test_api,
@@ -67,15 +67,23 @@ impl TestApi {
     pub fn infer_and_apply(&self, datamodel: &str) -> InferAndApplyOutput {
         let migration_id = "the-migration-id";
 
+        self.infer_and_apply_with_migration_id(datamodel, migration_id)
+    }
+
+    pub fn infer_and_apply_with_migration_id(&self, datamodel: &str, migration_id: &str) -> InferAndApplyOutput {
         let input = InferMigrationStepsInput {
             migration_id: migration_id.to_string(),
             datamodel: datamodel.to_string(),
             assume_to_be_applied: Vec::new(),
         };
 
-        let steps = run_infer_command(self.api.as_ref(), input).0.datamodel_steps;
+        let steps = self.run_infer_command(input).0.datamodel_steps;
 
         self.apply_migration(steps, migration_id)
+    }
+
+    pub fn run_infer_command(&self, input: InferMigrationStepsInput) -> InferOutput {
+        run_infer_command(self.api.as_ref(), input)
     }
 
     pub fn unapply_migration(&self) -> UnapplyOutput {

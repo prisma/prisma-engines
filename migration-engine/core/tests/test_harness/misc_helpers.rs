@@ -30,13 +30,6 @@ pub fn parse(datamodel_string: &str) -> SchemaAst {
     parser::parse(datamodel_string).unwrap()
 }
 
-pub fn test_each_connector<F>(test_fn: F)
-where
-    F: Fn(&TestSetup, &dyn GenericApi) -> () + std::panic::RefUnwindSafe,
-{
-    test_each_connector_with_ignores(Vec::new(), test_fn);
-}
-
 pub(super) fn mysql_migration_connector(database_url: &str) -> SqlMigrationConnector {
     match SqlMigrationConnector::new_from_database_str(database_url) {
         Ok(c) => c,
