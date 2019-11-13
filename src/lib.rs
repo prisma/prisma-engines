@@ -37,7 +37,7 @@
 //! automatically.
 //!
 //! ```
-//! use quaint::{ast::*, Quaint};
+//! use quaint::prelude::*;
 //!
 //! #[tokio::main]
 //! async fn main() -> Result<(), quaint::error::Error> {
@@ -65,7 +65,7 @@
 //! The visitor returns the query as a string and its parameters as a vector.
 //!
 //! ```
-//! use quaint::{ast::*, visitor::{Sqlite, Visitor}};
+//! use quaint::{prelude::*, visitor::{Sqlite, Visitor}};
 //!
 //! fn main() {
 //!     let conditions = "word"
