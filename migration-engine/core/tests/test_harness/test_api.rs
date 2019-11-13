@@ -2,7 +2,7 @@ use super::{
     command_helpers::run_infer_command,
     misc_helpers::{
         mysql_8_url, mysql_migration_connector, mysql_url, postgres_migration_connector, postgres_url,
-        sqlite_migration_connector, test_api,
+        sqlite_migration_connector, sqlite_test_file, test_api,
     },
     InferAndApplyOutput, SCHEMA_NAME,
 };
@@ -11,7 +11,7 @@ use migration_core::{
     api::{GenericApi, MigrationApi},
     commands::{ApplyMigrationInput, InferMigrationStepsInput},
 };
-use sql_connection::SyncSqlConnection;
+use sql_connection::{ConnectionInfo, SyncSqlConnection};
 use sql_migration_connector::SqlFamily;
 use sql_schema_describer::*;
 use std::sync::Arc;
@@ -22,6 +22,7 @@ pub struct TestApi {
     sql_family: SqlFamily,
     database: Arc<dyn SyncSqlConnection + Send + Sync + 'static>,
     api: MigrationApi<sql_migration_connector::SqlMigrationConnector, sql_migration_connector::SqlMigration>,
+    connection_info: Option<ConnectionInfo>,
 }
 
 impl TestApi {
@@ -35,6 +36,10 @@ impl TestApi {
 
     pub fn migration_persistence(&self) -> Arc<dyn MigrationPersistence> {
         self.api.migration_persistence()
+    }
+
+    pub fn connection_info(&self) -> Option<&ConnectionInfo> {
+        self.connection_info.as_ref()
     }
 
     pub fn apply_migration(&self, steps: Vec<MigrationStep>, migration_id: &str) -> InferAndApplyOutput {
@@ -109,9 +114,11 @@ impl TestApi {
 }
 
 pub fn mysql_8_test_api() -> TestApi {
+    let connection_info = ConnectionInfo::from_url_str(&mysql_8_url()).unwrap();
     let connector = mysql_migration_connector(&mysql_8_url());
 
     TestApi {
+        connection_info: Some(connection_info),
         sql_family: SqlFamily::Mysql,
         database: Arc::clone(&connector.database),
         api: test_api(connector),
@@ -119,9 +126,11 @@ pub fn mysql_8_test_api() -> TestApi {
 }
 
 pub fn mysql_test_api() -> TestApi {
+    let connection_info = ConnectionInfo::from_url_str(&mysql_url()).unwrap();
     let connector = mysql_migration_connector(&mysql_url());
 
     TestApi {
+        connection_info: Some(connection_info),
         sql_family: SqlFamily::Mysql,
         database: Arc::clone(&connector.database),
         api: test_api(connector),
@@ -129,9 +138,11 @@ pub fn mysql_test_api() -> TestApi {
 }
 
 pub fn postgres_test_api() -> TestApi {
+    let connection_info = ConnectionInfo::from_url_str(&postgres_url()).unwrap();
     let connector = postgres_migration_connector(&postgres_url());
 
     TestApi {
+        connection_info: Some(connection_info),
         sql_family: SqlFamily::Postgres,
         database: Arc::clone(&connector.database),
         api: test_api(connector),
@@ -139,9 +150,11 @@ pub fn postgres_test_api() -> TestApi {
 }
 
 pub fn sqlite_test_api() -> TestApi {
+    let connection_info = ConnectionInfo::from_url_str(&sqlite_test_file()).unwrap();
     let connector = sqlite_migration_connector();
 
     TestApi {
+        connection_info: Some(connection_info),
         sql_family: SqlFamily::Sqlite,
         database: Arc::clone(&connector.database),
         api: test_api(connector),

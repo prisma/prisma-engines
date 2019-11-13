@@ -30,12 +30,15 @@ fn authentication_failure_must_return_a_known_error_on_postgres() {
 
     let error = RpcApi::new_async(&dm).map(|_| ()).unwrap_err();
 
+    let user = url.username();
+    let host = url.host().unwrap().to_string();
+
     let json_error = serde_json::to_value(&render_error(error)).unwrap();
     let expected = json!({
-        "message": "Authentication failed against database server at `127.0.0.1`, the provided database credentials for `postgres` are not valid.\n\nPlease make sure to provide valid database credentials for the database server at `127.0.0.1`.",
+        "message": format!("Authentication failed against database server at `{host}`, the provided database credentials for `postgres` are not valid.\n\nPlease make sure to provide valid database credentials for the database server at `{host}`.", host = host),
         "meta": {
-            "database_user": "postgres",
-            "database_host": "127.0.0.1",
+            "database_user": user,
+            "database_host": host,
         },
         "error_code": "P1000"
     });
@@ -61,12 +64,15 @@ fn authentication_failure_must_return_a_known_error_on_mysql() {
 
     let error = RpcApi::new_async(&dm).map(|_| ()).unwrap_err();
 
+    let user = url.username();
+    let host = url.host().unwrap().to_string();
+
     let json_error = serde_json::to_value(&render_error(error)).unwrap();
     let expected = json!({
-        "message": "Authentication failed against database server at `127.0.0.1`, the provided database credentials for `root` are not valid.\n\nPlease make sure to provide valid database credentials for the database server at `127.0.0.1`.",
+        "message": format!("Authentication failed against database server at `{host}`, the provided database credentials for `{user}` are not valid.\n\nPlease make sure to provide valid database credentials for the database server at `{host}`.", host = host, user = user),
         "meta": {
-            "database_user": "root",
-            "database_host": "127.0.0.1",
+            "database_user": user,
+            "database_host": host,
         },
         "error_code": "P1000"
     });
@@ -92,12 +98,15 @@ fn unreachable_database_must_return_a_proper_error_on_mysql() {
 
     let error = RpcApi::new_async(&dm).map(|_| ()).unwrap_err();
 
+    let port = url.port().unwrap().to_string();
+    let host = url.host().unwrap().to_string();
+
     let json_error = serde_json::to_value(&render_error(error)).unwrap();
     let expected = json!({
-        "message": "Can't reach database server at `127.0.0.1`:`8787`\n\nPlease make sure your database server is running at `127.0.0.1`:`8787`.",
+        "message": format!("Can't reach database server at `{host}`:`{port}`\n\nPlease make sure your database server is running at `{host}`:`{port}`.", host = host, port = port),
         "meta": {
-            "database_port": "8787",
-            "database_host": "127.0.0.1",
+            "database_port": port,
+            "database_host": host,
         },
         "error_code": "P1001"
     });
@@ -123,12 +132,15 @@ fn unreachable_database_must_return_a_proper_error_on_postgres() {
 
     let error = RpcApi::new_async(&dm).map(|_| ()).unwrap_err();
 
+    let host = url.host().unwrap().to_string();
+    let port = url.port().unwrap().to_string();
+
     let json_error = serde_json::to_value(&render_error(error)).unwrap();
     let expected = json!({
-        "message": "Can't reach database server at `127.0.0.1`:`8787`\n\nPlease make sure your database server is running at `127.0.0.1`:`8787`.",
+        "message": format!("Can't reach database server at `{host}`:`{port}`\n\nPlease make sure your database server is running at `{host}`:`{port}`.", host = host, port = port),
         "meta": {
-            "database_port": "8787",
-            "database_host": "127.0.0.1",
+            "database_port": port,
+            "database_host": host,
         },
         "error_code": "P1001"
     });
@@ -139,8 +151,9 @@ fn unreachable_database_must_return_a_proper_error_on_postgres() {
 #[test]
 fn database_does_not_exist_must_return_a_proper_error() {
     let mut url: Url = mysql_url().parse().unwrap();
+    let database_name = "notmydatabase";
 
-    url.set_path("notmydatabase");
+    url.set_path(database_name);
 
     let dm = format!(
         r#"
@@ -154,13 +167,15 @@ fn database_does_not_exist_must_return_a_proper_error() {
 
     let error = RpcApi::new_async(&dm).map(|_| ()).unwrap_err();
 
+    let database_location = format!("{}:{}", url.host().unwrap(), url.port().unwrap());
+
     let json_error = serde_json::to_value(&render_error(error)).unwrap();
     let expected = json!({
-        "message": "Database `notmydatabase` does not exist on the database server at `127.0.0.1:3306`.",
+        "message": format!("Database `{database_name}` does not exist on the database server at `{database_location}`.", database_name = database_name, database_location = database_location),
         "meta": {
-            "database_name": "notmydatabase",
+            "database_name": database_name,
             "database_schema_name": null,
-            "database_location": "127.0.0.1:3306",
+            "database_location": database_location,
         },
         "error_code": "P1003"
     });
@@ -170,20 +185,22 @@ fn database_does_not_exist_must_return_a_proper_error() {
 
 #[test]
 fn database_already_exists_must_return_a_proper_error() {
-    let error = get_cli_error(&[
-        "migration-engine",
-        "cli",
-        "--datasource",
-        &postgres_url(),
-        "--create_database",
-    ]);
+    let url = postgres_url();
+    let error = get_cli_error(&["migration-engine", "cli", "--datasource", &url, "--create_database"]);
+
+    let (host, port) = {
+        let url = Url::parse(&url).unwrap();
+        (url.host().unwrap().to_string(), url.port().unwrap())
+    };
+
     let json_error = serde_json::to_value(&error).unwrap();
+
     let expected = json!({
-        "message": "Database `test-db` already exists on the database server at `127.0.0.1:5432`",
+        "message": format!("Database `test-db` already exists on the database server at `{host}:{port}`", host = host, port = port),
         "meta": {
             "database_name": "test-db",
-            "database_host": "127.0.0.1",
-            "database_port": 5432,
+            "database_host": host,
+            "database_port": port,
         },
         "error_code": "P1009"
     });
