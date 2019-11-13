@@ -109,7 +109,7 @@ pub mod prelude;
 
 mod pool;
 
-pub use pool::{Quaint, PooledConnection, ConnectionInfo};
+pub use pool::*;
 
 pub type Result<T> = std::result::Result<T, error::Error>;
 
