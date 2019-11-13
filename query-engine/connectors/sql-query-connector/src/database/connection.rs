@@ -3,7 +3,7 @@ use crate::{database::operations::*, query_builder::read::ManyRelatedRecordsQuer
 use connector_interface::{
     self as connector,
     filter::{Filter, RecordFinder},
-    Connection, QueryArguments, ReadOperations, ScalarListValues, Transaction, WriteArgs, WriteOperations, IO
+    Connection, QueryArguments, ReadOperations, ScalarListValues, Transaction, WriteArgs, WriteOperations, IO,
 };
 use prisma_models::prelude::*;
 use std::marker::PhantomData;
@@ -102,7 +102,12 @@ where
         IO::new(async move { write::create_record(&self.inner, model, args).await })
     }
 
-    fn update_records<'a>(&'a self, model: &'a ModelRef, where_: Filter, args: WriteArgs) -> connector::IO<Vec<GraphqlId>> {
+    fn update_records<'a>(
+        &'a self,
+        model: &'a ModelRef,
+        where_: Filter,
+        args: WriteArgs,
+    ) -> connector::IO<Vec<GraphqlId>> {
         IO::new(async move { write::update_records(&self.inner, model, where_, args).await })
     }
 
@@ -128,12 +133,12 @@ where
         IO::new(async move { write::disconnect(&self.inner, field, parent_id, child_id).await })
     }
 
-    fn set<'a>(
-        &'a self,
-        relation_field: &'a RelationFieldRef,
-        parent_id: GraphqlId,
-        wheres: Vec<GraphqlId>,
-    ) -> connector::IO<()> {
-        IO::new(async move { write::set(&self.inner, relation_field, parent_id, wheres).await })
-    }
+    // fn set<'a>(
+    //     &'a self,
+    //     relation_field: &'a RelationFieldRef,
+    //     parent_id: GraphqlId,
+    //     wheres: Vec<GraphqlId>,
+    // ) -> connector::IO<()> {
+    //     IO::new(async move { write::set(&self.inner, relation_field, parent_id, wheres).await })
+    // }
 }

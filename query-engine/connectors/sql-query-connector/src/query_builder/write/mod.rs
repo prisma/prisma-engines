@@ -44,82 +44,97 @@ impl WriteQueryBuilder {
         (Insert::from(insert).returning(vec![id_field.as_column()]), return_id)
     }
 
-    pub fn create_relation(field: &RelationFieldRef, parent_id: &GraphqlId, child_id: &GraphqlId) -> Query<'static> {
+    pub fn create_relation_table_records(
+        field: &RelationFieldRef,
+        parent_id: &GraphqlId,
+        child_ids: &[&GraphqlId],
+    ) -> Query<'static> {
         let relation = field.relation();
 
-        match relation.inline_relation_column() {
-            Some(column) => {
-                let referencing_column = column.name.to_string();
+        // match relation.inline_relation_column() {
+        //     Some(column) => {
+        //         let referencing_column = column.name.to_string();
 
-                let (update_id, link_id) = match field.relation_is_inlined_in_parent() {
-                    true => (parent_id, child_id),
-                    false => (child_id, parent_id),
-                };
+        //         let (update_id, link_id) = match field.relation_is_inlined_in_parent() {
+        //             true => (parent_id, child_id),
+        //             false => (child_id, parent_id),
+        //         };
 
-                let update_condition = match field.relation_is_inlined_in_parent() {
-                    true => field.model().fields().id().as_column().equals(update_id),
-                    false => field.related_model().fields().id().as_column().equals(update_id),
-                };
+        //         let update_condition = match field.relation_is_inlined_in_parent() {
+        //             true => field.model().fields().id().as_column().equals(update_id),
+        //             false => field.related_model().fields().id().as_column().equals(update_id),
+        //         };
 
-                Update::table(relation.relation_table())
-                    .set(referencing_column, link_id.clone())
-                    .so_that(update_condition)
-                    .into()
-            }
-            None => {
-                let relation = field.relation();
-                let parent_column = field.relation_column();
-                let child_column = field.opposite_column();
+        //         Update::table(relation.relation_table())
+        //             .set(referencing_column, link_id.clone())
+        //             .so_that(update_condition)
+        //             .into()
+        //     }
+        //     None => {
+        let relation = field.relation();
+        let parent_column = field.relation_column();
+        let child_column = field.opposite_column();
 
-                let insert = Insert::single_into(relation.relation_table())
-                    .value(parent_column.name.to_string(), parent_id.clone())
-                    .value(child_column.name.to_string(), child_id.clone());
+        let insert = Insert::multi_into(relation.relation_table());
 
-                let insert: Insert = match relation.id_column() {
-                    Some(id_column) => insert.value(id_column, cuid::cuid().unwrap()).into(),
-                    None => insert.into(),
-                };
+        let columns = vec![parent_column.name.to_string(), child_column.name.to_string()];
 
-                insert.on_conflict(OnConflict::DoNothing).into()
-            }
-        }
+        let insert = Insert::single_into(relation.relation_table(), columns);
+
+        // .value(parent_column.name.to_string(), parent_id.clone())
+        // .value(child_column.name.to_string(), child_id.clone());
+
+        // let insert: Insert = match relation.id_column() {
+        //     Some(id_column) => insert.value(id_column, cuid::cuid().unwrap()).into(),
+        //     None => insert.into(),
+        // };
+
+        // insert.on_conflict(OnConflict::DoNothing).into()
+        //         }
+        //     }
+
+        unimplemented!();
     }
 
-    pub fn delete_relation(field: &RelationFieldRef, parent_id: &GraphqlId, child_id: &GraphqlId) -> Query<'static> {
+    pub fn delete_relation_table_records(
+        field: &RelationFieldRef,
+        parent_id: &GraphqlId,
+        child_ids: &[&GraphqlId],
+    ) -> Query<'static> {
         let relation = field.relation();
 
-        match relation.inline_relation_column() {
-            Some(column) => {
-                let referencing_column = column.name.to_string();
+        // match relation.inline_relation_column() {
+        //     Some(column) => {
+        //         let referencing_column = column.name.to_string();
 
-                let (update_id, _) = match field.relation_is_inlined_in_parent() {
-                    true => (parent_id, child_id),
-                    false => (child_id, parent_id),
-                };
+        //         let (update_id, _) = match field.relation_is_inlined_in_parent() {
+        //             true => (parent_id, child_id),
+        //             false => (child_id, parent_id),
+        //         };
 
-                let update_condition = match field.relation_is_inlined_in_parent() {
-                    true => field.model().fields().id().as_column().equals(update_id),
-                    false => field.related_model().fields().id().as_column().equals(update_id),
-                };
+        //         let update_condition = match field.relation_is_inlined_in_parent() {
+        //             true => field.model().fields().id().as_column().equals(update_id),
+        //             false => field.related_model().fields().id().as_column().equals(update_id),
+        //         };
 
-                Update::table(relation.relation_table())
-                    .set(referencing_column, PrismaValue::Null)
-                    .so_that(update_condition)
-                    .into()
-            }
-            None => {
-                let relation = field.relation();
-                let parent_column = field.relation_column();
-                let child_column = field.opposite_column();
+        //         Update::table(relation.relation_table())
+        //             .set(referencing_column, PrismaValue::Null)
+        //             .so_that(update_condition)
+        //             .into()
+        //     }
+        // None => {
+        let relation = field.relation();
+        let parent_column = field.relation_column();
+        let child_column = field.opposite_column();
 
-                let parent_id_criteria = parent_column.equals(parent_id);
-                let child_id_criteria = child_column.equals(child_id);
+        let parent_id_criteria = parent_column.equals(parent_id);
+        let child_id_criteria = child_column.in_selection(child_ids);
 
-                Delete::from_table(relation.relation_table())
-                    .so_that(parent_id_criteria.and(child_id_criteria))
-                    .into()
-            }
-        }
+        Delete::from_table(relation.relation_table())
+            .so_that(parent_id_criteria.and(child_id_criteria))
+            .into()
+        // }
+        // }
     }
 
     pub fn delete_relation_by_parent(field: &RelationFieldRef, parent_id: &GraphqlId) -> Query<'static> {
@@ -181,10 +196,6 @@ impl WriteQueryBuilder {
 
         Some(result)
     }
-
-    // pub fn update_one(model: ModelRef, id: &GraphqlId, args: &PrismaArgs) -> crate::Result<Option<Update<'static>>> {
-    //     Self::update_many(model, &[id; 1], args).map(|updates| updates.into_iter().next())
-    // }
 
     pub fn update_many(model: &ModelRef, ids: &[&GraphqlId], args: &PrismaArgs) -> crate::Result<Vec<Update<'static>>> {
         if args.args.is_empty() || ids.is_empty() {

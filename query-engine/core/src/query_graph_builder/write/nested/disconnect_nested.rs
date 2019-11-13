@@ -10,7 +10,6 @@ use std::convert::TryInto;
 /// Handles nested connect cases.
 /// The resulting graph can take multiple forms, based on the relation type to the parent model.
 /// Information on the graph shapes can be found on the individual handlers.
-/// Todo this is inefficient for multiple nested disconnects.
 pub fn connect_nested_disconnect(
     graph: &mut QueryGraph,
     parent_node: NodeRef,

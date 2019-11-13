@@ -116,11 +116,11 @@ pub async fn connect(
     conn: &dyn QueryExt,
     field: &RelationFieldRef,
     parent_id: &GraphqlId,
-    child_id: &GraphqlId,
+    child_ids: &[&GraphqlId],
 ) -> connector_interface::Result<()> {
-    let query = WriteQueryBuilder::create_relation(field, parent_id, child_id);
-    conn.execute(query).await.map_err(SqlError::from)?;
+    let query = WriteQueryBuilder::create_relation_table_records(field, parent_id, child_ids);
 
+    conn.execute(query).await.map_err(SqlError::from)?;
     Ok(())
 }
 
@@ -128,27 +128,28 @@ pub async fn disconnect(
     conn: &dyn QueryExt,
     field: &RelationFieldRef,
     parent_id: &GraphqlId,
-    child_id: &GraphqlId,
+    child_ids: &[&GraphqlId],
 ) -> connector_interface::Result<()> {
-    let query = WriteQueryBuilder::delete_relation(field, parent_id, child_id);
-    conn.execute(query).await.map_err(SqlError::from)?;
+    let query = WriteQueryBuilder::delete_relation_records(field, parent_id, child_ids);
 
+    conn.execute(query).await.map_err(SqlError::from)?;
     Ok(())
 }
 
-pub async fn set(
-    conn: &dyn QueryExt,
-    field: &RelationFieldRef,
-    parent_id: GraphqlId,
-    child_ids: Vec<GraphqlId>,
-) -> connector_interface::Result<()> {
-    let query = WriteQueryBuilder::delete_relation_by_parent(field, &parent_id);
-    conn.execute(query).await.map_err(SqlError::from)?;
+// pub async fn set(
+//     conn: &dyn QueryExt,
+//     field: &RelationFieldRef,
+//     parent_id: GraphqlId,
+//     child_ids: Vec<GraphqlId>,
+// ) -> connector_interface::Result<()> {
+//     let query = WriteQueryBuilder::delete_relation_by_parent(field, &parent_id);
 
-    // TODO: we can avoid the multiple roundtrips in some cases
-    for child_id in &child_ids {
-        connect(conn, field, &parent_id, child_id).await?;
-    }
+//     conn.execute(query).await.map_err(SqlError::from)?;
 
-    Ok(())
-}
+//     // TODO: we can avoid the multiple roundtrips in some cases
+//     for child_id in &child_ids {
+//         connect(conn, field, &parent_id, child_id).await?;
+//     }
+
+//     Ok(())
+// }

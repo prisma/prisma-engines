@@ -54,6 +54,18 @@ where
 ///
 /// Returns a `NodeRef` to the newly created read node.
 ///
+/// The resulting graph is (dashed already exists, everything else is added):
+/// ```text
+/// ┌ ─ ─ ─ ─ ─ ─ ─ ─ ┐
+///       Parent
+/// └ ─ ─ ─ ─ ─ ─ ─ ─ ┘
+///          │
+///          ▼
+/// ┌─────────────────┐
+/// │  Read Children  │
+/// └─────────────────┘
+///```
+///
 /// ## Example
 /// Given two models, `Blog` and `Post`, where a blog has many posts, and a post has one block.
 ///
@@ -102,17 +114,11 @@ where
     Ok(read_parent_node)
 }
 
-// Creates an "empty" query node. Sometimes required for
-// Todo: Consider elevating the placeholder concept to the actual graph.
-// - Prevents accidential reads, could just error if placeholder hasn't been replaced during building.
-// - Definitely the cleaner solution.
-// pub fn insert_query_node_placeholder(graph: &mut QueryGraph) -> NodeRef {
-//     graph.create_node(Query::Read(ReadQuery::RecordQuery(RecordQuery::default())))
-// }
-
 /// Creates an update record query node and adds it to the query graph.
 /// Used to have a skeleton update node in the graph that can be further transformed during query execution based
 /// on available information.
+///
+/// No edges are created.
 pub fn update_record_node_placeholder(
     graph: &mut QueryGraph,
     record_finder: Option<RecordFinder>,

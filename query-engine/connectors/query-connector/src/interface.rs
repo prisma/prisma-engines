@@ -134,22 +134,22 @@ pub trait WriteOperations {
         &'a self,
         field: &'a RelationFieldRef,
         parent_id: &'a GraphqlId,
-        child_id: &'a GraphqlId,
+        child_ids: &'a [&'a GraphqlId],
     ) -> crate::IO<()>;
 
     fn disconnect<'a>(
         &'a self,
         field: &'a RelationFieldRef,
         parent_id: &'a GraphqlId,
-        child_id: &'a GraphqlId,
+        child_ids: &'a [&'a GraphqlId],
     ) -> crate::IO<()>;
 
-    fn set<'a>(
-        &'a self,
-        relation_field: &'a RelationFieldRef,
-        parent_id: GraphqlId,
-        wheres: Vec<GraphqlId>,
-    ) -> crate::IO<()>;
+    // fn set<'a>(
+    //     &'a self,
+    //     relation_field: &'a RelationFieldRef,
+    //     parent_id: GraphqlId,
+    //     wheres: Vec<GraphqlId>,
+    // ) -> crate::IO<()>;
 }
 
 impl<'conn, 'tx> WriteOperations for ConnectionLike<'conn, 'tx> {
@@ -178,11 +178,11 @@ impl<'conn, 'tx> WriteOperations for ConnectionLike<'conn, 'tx> {
         &'a self,
         field: &'a RelationFieldRef,
         parent_id: &'a GraphqlId,
-        child_id: &'a GraphqlId,
+        child_ids: &'a [&'a GraphqlId],
     ) -> crate::IO<()> {
         match self {
-            Self::Connection(c) => c.connect(field, parent_id, child_id),
-            Self::Transaction(tx) => tx.connect(field, parent_id, child_id),
+            Self::Connection(c) => c.connect(field, parent_id, child_ids),
+            Self::Transaction(tx) => tx.connect(field, parent_id, child_ids),
         }
     }
 
@@ -190,23 +190,23 @@ impl<'conn, 'tx> WriteOperations for ConnectionLike<'conn, 'tx> {
         &'a self,
         field: &'a RelationFieldRef,
         parent_id: &'a GraphqlId,
-        child_id: &'a GraphqlId,
+        child_ids: &'a [&'a GraphqlId],
     ) -> crate::IO<()> {
         match self {
-            Self::Connection(c) => c.disconnect(field, parent_id, child_id),
-            Self::Transaction(tx) => tx.disconnect(field, parent_id, child_id),
+            Self::Connection(c) => c.disconnect(field, parent_id, child_ids),
+            Self::Transaction(tx) => tx.disconnect(field, parent_id, child_ids),
         }
     }
 
-    fn set<'a>(
-        &'a self,
-        relation_field: &'a RelationFieldRef,
-        parent_id: GraphqlId,
-        wheres: Vec<GraphqlId>,
-    ) -> crate::IO<()> {
-        match self {
-            Self::Connection(c) => c.set(relation_field, parent_id, wheres),
-            Self::Transaction(tx) => tx.set(relation_field, parent_id, wheres),
-        }
-    }
+    // fn set<'a>(
+    //     &'a self,
+    //     relation_field: &'a RelationFieldRef,
+    //     parent_id: GraphqlId,
+    //     wheres: Vec<GraphqlId>,
+    // ) -> crate::IO<()> {
+    //     match self {
+    //         Self::Connection(c) => c.set(relation_field, parent_id, wheres),
+    //         Self::Transaction(tx) => tx.set(relation_field, parent_id, wheres),
+    //     }
+    // }
 }
