@@ -6,6 +6,7 @@ use connector_interface::{
     Connection, QueryArguments, ReadOperations, ScalarListValues, Transaction, WriteArgs, WriteOperations, IO
 };
 use prisma_models::prelude::*;
+use quaint::connector::TransactionCapable;
 use std::marker::PhantomData;
 
 pub struct SqlConnection<C, T> {
@@ -25,7 +26,7 @@ where
 
 impl<C, T> Connection for SqlConnection<C, T>
 where
-    C: QueryExt + Send + Sync + 'static,
+    C: QueryExt + TransactionCapable + Send + Sync + 'static,
     T: ManyRelatedRecordsQueryBuilder + Send + Sync + 'static,
 {
     fn start_transaction<'a>(&'a self) -> IO<'a, Box<dyn Transaction<'a> + 'a>> {

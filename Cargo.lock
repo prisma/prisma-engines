@@ -2110,7 +2110,7 @@ dependencies = [
 [[package]]
 name = "quaint"
 version = "0.1.0"
-source = "git+https://github.com/prisma/quaint.git#407487872fe354155b521fda017c14e6d9b292cc"
+source = "git+https://github.com/prisma/quaint.git#747f84609c2bfc03bdebdf6b14d8bc6106067d01"
 dependencies = [
  "async-std 0.99.12 (registry+https://github.com/rust-lang/crates.io-index)",
  "bytes 0.4.12 (registry+https://github.com/rust-lang/crates.io-index)",
