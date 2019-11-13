@@ -19,14 +19,16 @@ pub trait MigrationCommand {
 
 pub type CommandResult<T> = Result<T, CommandError>;
 
-#[derive(Debug, Serialize, Fail)]
-#[serde(tag = "type")]
+#[derive(Debug, Fail)]
 pub enum CommandError {
     #[fail(display = "Errors in datamodel. (code: {}, errors: {:?})", code, errors)]
     DataModelErrors { code: i64, errors: Vec<String> },
 
     #[fail(display = "Initialization error. (code: {}, error: {})", code, error)]
     InitializationError { code: i64, error: String },
+
+    #[fail(display = "Connector error. (error: {})", _0)]
+    ConnectorError(ConnectorError),
 
     #[fail(display = "Generic error. (code: {}, error: {})", code, error)]
     Generic { code: i64, error: String },
@@ -56,10 +58,7 @@ impl From<datamodel::error::ErrorCollection> for CommandError {
 
 impl From<migration_connector::ConnectorError> for CommandError {
     fn from(error: migration_connector::ConnectorError) -> CommandError {
-        CommandError::Generic {
-            code: 1000,
-            error: format!("{:?}", error),
-        }
+        CommandError::ConnectorError(error)
     }
 }
 

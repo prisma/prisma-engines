@@ -4,11 +4,15 @@ use migration_connector::steps::{DeleteModel, MigrationStep};
 use migration_core::{
     api::{render_error, RpcApi},
     cli,
-    commands::{ApplyMigrationCommand, ApplyMigrationInput},
+    commands::{ApplyMigrationCommand, ApplyMigrationInput, InferMigrationStepsCommand, InferMigrationStepsInput},
 };
 use pretty_assertions::assert_eq;
 use quaint::prelude::*;
 use serde_json::json;
+<<<<<<< HEAD
+=======
+use sql_connection::{SqlFamily, SyncSqlConnection};
+>>>>>>> 2cbb94f5... Render UniqueKeyViolation errors in the migration engine
 use test_harness::*;
 use url::Url;
 
@@ -299,6 +303,70 @@ async fn command_errors_must_return_an_unknown_error(api: &TestApi) {
     });
 
     assert_eq!(error, expected_error);
+}
+
+#[test_each_connector]
+fn unique_constraint_errors_in_migrations_must_return_a_known_error(api: &TestApi) {
+    use quaint::ast::*;
+
+    let dm = r#"
+        model Fruit {
+            id Int @id
+            name String
+        }
+    "#;
+
+    api.infer_and_apply(dm);
+
+    let insert = Insert::multi_into(api.render_table_name("Fruit"), vec!["name"])
+        .values(("banana",))
+        .values(("apple",))
+        .values(("banana",));
+
+    api.database().execute(insert.into()).unwrap();
+
+    let dm2 = r#"
+        model Fruit {
+            id Int @id
+            name String @unique
+        }
+    "#;
+
+    let infer_migration_steps_input = InferMigrationStepsInput {
+        assume_to_be_applied: vec![],
+        datamodel: dm2.to_owned(),
+        migration_id: "the-migration".to_owned(),
+    };
+
+    let steps = api
+        .execute_command::<InferMigrationStepsCommand>(&infer_migration_steps_input)
+        .unwrap()
+        .datamodel_steps;
+
+    let input = ApplyMigrationInput {
+        migration_id: "the-migration".to_owned(),
+        steps: steps,
+        force: Some(true),
+    };
+
+    let error = api.execute_command::<ApplyMigrationCommand>(&input).unwrap_err();
+
+    let json_error = serde_json::to_value(&error).unwrap();
+
+    let field_name = match api.sql_family() {
+        SqlFamily::Mysql => "Fruit.name",
+        _ => "name",
+    };
+
+    let expected_json = json!({
+        "message": format!("Unique constraint failed on the field: `{}`", field_name),
+        "meta": {
+            "field_name": field_name,
+        },
+        "error_code": "P2002",
+    });
+
+    assert_eq!(json_error, expected_json);
 }
 
 async fn get_cli_error(cli_args: &[&str]) -> user_facing_errors::Error {

@@ -1,3 +1,4 @@
+use crate::commands::CommandError;
 use crate::error::Error as CrateError;
 use failure::Fail as _;
 use jsonrpc_core::types::Error as JsonRpcError;
@@ -65,5 +66,58 @@ fn fallback_jsonrpc_error(err: impl std::error::Error) -> JsonRpcError {
         code: jsonrpc_core::types::error::ErrorCode::ServerError(4466),
         message: "The migration engine encountered an error and failed to render it.".to_string(),
         data: Some(serde_json::json!({ "backtrace": null, "message": format!("{}", err) })),
+    }
+}
+
+fn render_connector_error(connector_error: &ConnectorError) -> Result<Error, serde_json::Error> {
+    match connector_error {
+        ConnectorError::AuthenticationFailed { user, host } => {
+            KnownError::new(user_facing_errors::common::IncorrectDatabaseCredentials {
+                database_user: user.clone(),
+                database_host: host.clone(),
+            })
+            .map(Error::Known)
+        }
+
+        ConnectorError::ConnectionError { host, port, .. } => {
+            KnownError::new(user_facing_errors::common::DatabaseNotReachable {
+                database_host: host.clone(),
+                database_port: port
+                    .map(|port| format!("{}", port))
+                    .unwrap_or_else(|| format!("<unknown>")),
+            })
+            .map(Error::Known)
+        }
+
+        ConnectorError::DatabaseDoesNotExist {
+            db_name,
+            database_location,
+        } => KnownError::new(user_facing_errors::common::DatabaseDoesNotExist {
+            database_name: db_name.clone(),
+            database_location: database_location.clone(),
+            database_schema_name: None,
+        })
+        .map(Error::Known),
+
+        ConnectorError::DatabaseAccessDenied {
+            database_user,
+            database_name,
+        } => KnownError::new(user_facing_errors::common::DatabaseAccessDenied {
+            database_user: database_user.clone(),
+            database_name: database_name.clone(),
+        })
+        .map(Error::Known),
+
+        ConnectorError::UniqueConstraintViolation { field_name } => {
+            KnownError::new(user_facing_errors::query_engine::UniqueKeyViolation {
+                field_name: field_name.clone(),
+            })
+            .map(Error::Known)
+        }
+        _ => Ok(UnknownError {
+            message: format!("{}", connector_error),
+            backtrace: connector_error.backtrace().map(|bt| format!("{}", bt)),
+        }
+        .into()),
     }
 }

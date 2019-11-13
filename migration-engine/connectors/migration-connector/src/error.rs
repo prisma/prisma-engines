@@ -72,4 +72,7 @@ pub enum ErrorKind {
 
     #[fail(display = "Error opening a TLS connection. {}", message)]
     TlsError { message: String },
+
+    #[fail(display = "Unique constraint violation.")]
+    UniqueConstraintViolation { field_name: String },
 }

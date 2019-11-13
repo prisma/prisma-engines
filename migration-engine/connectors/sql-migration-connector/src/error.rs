@@ -55,6 +55,9 @@ pub enum SqlError {
 
     #[fail(display = "Error opening a TLS connection. {}", message)]
     TlsError { message: String },
+
+    #[fail(display = "Unique constraint violation")]
+    UniqueConstraintViolation { field_name: String },
 }
 
 impl SqlError {
@@ -87,7 +90,10 @@ impl SqlError {
                     cause: cause.into(),
                 },
             },
-            error => ConnectorError::from_kind(ErrorKind::QueryError(error.into())),
+            SqlError::UniqueConstraintViolation { field_name } => {
+                ConnectorError::UniqueConstraintViolation { field_name }
+            }
+            error => ConnectorError::QueryError(error.into()),
         }
     }
 }
@@ -117,6 +123,9 @@ impl From<quaint::error::Error> for SqlError {
             quaint::error::Error::TlsError { message } => Self::TlsError {
                 message: message.clone(),
             },
+            quaint::error::Error::UniqueConstraintViolation { field_name } => {
+                Self::UniqueConstraintViolation { field_name }
+            }
             _ => SqlError::QueryError(error.into()),
         }
     }
