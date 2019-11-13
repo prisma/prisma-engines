@@ -9,10 +9,6 @@ use migration_core::{
 use pretty_assertions::assert_eq;
 use quaint::prelude::*;
 use serde_json::json;
-<<<<<<< HEAD
-=======
-use sql_connection::{SqlFamily, SyncSqlConnection};
->>>>>>> 2cbb94f5... Render UniqueKeyViolation errors in the migration engine
 use test_harness::*;
 use url::Url;
 
@@ -298,7 +294,7 @@ async fn command_errors_must_return_an_unknown_error(api: &TestApi) {
     let error = api.execute_command::<ApplyMigrationCommand>(&input).await.unwrap_err();
 
     let expected_error = user_facing_errors::Error::Unknown(user_facing_errors::UnknownError {
-        message: "Failure during a migration command: Generic error. (code: 1, error: The model abcd does not exist in this Datamodel. It is not possible to delete it.)".to_owned(),
+        message: "Failure during a migration command: Generic error. (error: The model abcd does not exist in this Datamodel. It is not possible to delete it.)".to_owned(),
         backtrace: None,
     });
 

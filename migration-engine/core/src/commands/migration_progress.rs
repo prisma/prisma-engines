@@ -30,8 +30,8 @@ impl<'a> MigrationCommand for MigrationProgressCommand<'a> {
                     &cmd.input.migration_id
                 );
 
-                CommandError::Input { code: 1002, error }
-            })?;
+            CommandError::Input { error }
+        })?;
 
         Ok(MigrationProgressOutput {
             status: migration.status,
