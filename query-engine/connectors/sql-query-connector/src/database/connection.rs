@@ -34,7 +34,6 @@ where
 
         IO::new(async move {
             let tx: quaint::connector::Transaction<'a> = fut_tx.await.map_err(SqlError::from)?;
-
             Ok(Box::new(SqlConnectorTransaction::<T>::new(tx)) as Box<dyn Transaction<'a> + 'a>)
         })
     }

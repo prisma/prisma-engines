@@ -4,7 +4,7 @@ use connector_interface::{Connection, Connector, IO};
 use datamodel::Source;
 use quaint::{
     connector::SqliteParams,
-    Quaint,
+    pool::Quaint,
 };
 use std::convert::TryFrom;
 use url::Url;

@@ -12,9 +12,9 @@ mod sql_schema_calculator;
 mod sql_schema_differ;
 
 pub use error::*;
-pub use sql_connection::SqlFamily;
 pub use sql_migration::*;
 
+use quaint::pool::SqlFamily;
 use migration_connector::*;
 use sql_connection::{GenericSqlConnection, SyncSqlConnection};
 use sql_database_migration_inferrer::*;
