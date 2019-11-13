@@ -47,7 +47,7 @@ impl WriteQueryBuilder {
     pub fn create_relation_table_records(
         field: &RelationFieldRef,
         parent_id: &GraphqlId,
-        child_ids: &[&GraphqlId],
+        child_ids: &[GraphqlId],
     ) -> Query<'static> {
         let relation = field.relation();
 
@@ -74,12 +74,9 @@ impl WriteQueryBuilder {
         let relation = field.relation();
         let parent_column = field.relation_column();
         let child_column = field.opposite_column();
-
-        let insert = Insert::multi_into(relation.relation_table());
-
         let columns = vec![parent_column.name.to_string(), child_column.name.to_string()];
 
-        let insert = Insert::single_into(relation.relation_table(), columns);
+        let insert = Insert::multi_into(relation.relation_table(), columns);
 
         // .value(parent_column.name.to_string(), parent_id.clone())
         // .value(child_column.name.to_string(), child_id.clone());
@@ -99,7 +96,7 @@ impl WriteQueryBuilder {
     pub fn delete_relation_table_records(
         field: &RelationFieldRef,
         parent_id: &GraphqlId,
-        child_ids: &[&GraphqlId],
+        child_ids: &[GraphqlId],
     ) -> Query<'static> {
         let relation = field.relation();
 
@@ -128,7 +125,7 @@ impl WriteQueryBuilder {
         let child_column = field.opposite_column();
 
         let parent_id_criteria = parent_column.equals(parent_id);
-        let child_id_criteria = child_column.in_selection(child_ids);
+        let child_id_criteria = child_column.in_selection(child_ids.to_owned());
 
         Delete::from_table(relation.relation_table())
             .so_that(parent_id_criteria.and(child_id_criteria))

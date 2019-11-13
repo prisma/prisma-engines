@@ -114,29 +114,27 @@ where
     Ok(read_parent_node)
 }
 
-/// Creates an update record query node and adds it to the query graph.
+/// Creates an update many records query node and adds it to the query graph.
 /// Used to have a skeleton update node in the graph that can be further transformed during query execution based
 /// on available information.
 ///
 /// No edges are created.
-pub fn update_record_node_placeholder(
-    graph: &mut QueryGraph,
-    record_finder: Option<RecordFinder>,
-    model: ModelRef,
-) -> NodeRef {
+pub fn update_records_node_placeholder<T>(graph: &mut QueryGraph, filter: T, model: ModelRef) -> NodeRef
+where
+    T: Into<Filter>,
+{
     let mut args = PrismaArgs::new();
 
-    // args.insert(field.name(), value);
     args.update_datetimes(Arc::clone(&model), false);
 
-    let ur = UpdateRecord {
+    let ur = UpdateManyRecords {
         model,
-        where_: record_finder,
+        filter: filter.into(),
         non_list_args: args,
         list_args: vec![],
     };
 
-    graph.create_node(Query::Write(WriteQuery::UpdateRecord(ur)))
+    graph.create_node(Query::Write(WriteQuery::UpdateManyRecords(ur)))
 }
 
 /// Inserts checks and disconnects for existing models for a 1:1 relation.
@@ -186,7 +184,7 @@ pub fn insert_existing_1to1_related_model_checks(
     let read_existing_children =
         insert_find_children_by_parent_node(graph, &parent_node, &parent_relation_field, None)?;
 
-    let update_existing_child = update_record_node_placeholder(graph, None, child_model);
+    let update_existing_child = update_records_node_placeholder(graph, None, child_model);
     let relation_field_name = parent_relation_field.related_field().name.clone();
     let if_node = graph.create_node(Flow::default_if());
 

@@ -3,7 +3,7 @@ use crate::{query_builder::read::ManyRelatedRecordsQueryBuilder, SqlError};
 use connector_interface::{
     self as connector,
     filter::{Filter, RecordFinder},
-    QueryArguments, ReadOperations, ScalarListValues, Transaction, WriteArgs, WriteOperations, IO
+    QueryArguments, ReadOperations, ScalarListValues, Transaction, WriteArgs, WriteOperations, IO,
 };
 use prisma_models::prelude::*;
 use std::marker::PhantomData;
@@ -96,7 +96,12 @@ where
         IO::new(async move { write::create_record(&self.inner, model, args).await })
     }
 
-    fn update_records<'b>(&'b self, model: &'b ModelRef, where_: Filter, args: WriteArgs) -> connector::IO<Vec<GraphqlId>> {
+    fn update_records<'b>(
+        &'b self,
+        model: &'b ModelRef,
+        where_: Filter,
+        args: WriteArgs,
+    ) -> connector::IO<Vec<GraphqlId>> {
         IO::new(async move { write::update_records(&self.inner, model, where_, args).await })
     }
 
@@ -108,26 +113,17 @@ where
         &'b self,
         field: &'b RelationFieldRef,
         parent_id: &'b GraphqlId,
-        child_id: &'b GraphqlId,
+        child_ids: &'b [GraphqlId],
     ) -> connector::IO<()> {
-        IO::new(async move { write::connect(&self.inner, field, parent_id, child_id).await })
+        IO::new(async move { write::connect(&self.inner, field, parent_id, child_ids).await })
     }
 
     fn disconnect<'b>(
         &'b self,
         field: &'b RelationFieldRef,
         parent_id: &'b GraphqlId,
-        child_id: &'b GraphqlId,
+        child_ids: &'b [GraphqlId],
     ) -> connector::IO<()> {
-        IO::new(async move { write::disconnect(&self.inner, field, parent_id, child_id).await })
-    }
-
-    fn set<'b>(
-        &'b self,
-        relation_field: &'b RelationFieldRef,
-        parent_id: GraphqlId,
-        wheres: Vec<GraphqlId>,
-    ) -> connector::IO<()> {
-        IO::new(async move { write::set(&self.inner, relation_field, parent_id, wheres).await })
+        IO::new(async move { write::disconnect(&self.inner, field, parent_id, child_ids).await })
     }
 }

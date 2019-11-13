@@ -12,7 +12,6 @@ pub enum WriteQuery {
     DeleteManyRecords(DeleteManyRecords),
     ConnectRecords(ConnectRecords),
     DisconnectRecords(DisconnectRecords),
-    SetRecords(SetRecords),
     ResetData(ResetData),
 }
 
@@ -85,7 +84,6 @@ impl std::fmt::Display for WriteQuery {
             Self::DeleteManyRecords(q) => write!(f, "DeleteManyRecords: {}", q.model.name),
             Self::ConnectRecords(_) => write!(f, "ConnectRecords"),
             Self::DisconnectRecords(_) => write!(f, "DisconnectRecords"),
-            Self::SetRecords(_) => write!(f, "SetRecords"),
             Self::ResetData(_) => write!(f, "ResetData"),
         }
     }
@@ -128,24 +126,17 @@ pub struct DeleteManyRecords {
 
 #[derive(Debug, Clone)]
 pub struct ConnectRecords {
-    pub parent: Option<GraphqlId>,
-    pub child: Vec<GraphqlId>,
+    pub parent_id: Option<GraphqlId>,
+    pub child_ids: Vec<GraphqlId>,
     pub relation_field: RelationFieldRef,
 }
 
 #[derive(Debug, Clone)]
 pub struct DisconnectRecords {
-    pub parent: Option<GraphqlId>,
-    pub child: Vec<GraphqlId>,
+    pub parent_id: Option<GraphqlId>,
+    pub child_ids: Vec<GraphqlId>,
     pub relation_field: RelationFieldRef,
 }
-
-// #[derive(Debug, Clone)]
-// pub struct SetRecords {
-//     pub parent: Option<GraphqlId>,
-//     pub wheres: Vec<GraphqlId>,
-//     pub relation_field: RelationFieldRef,
-// }
 
 #[derive(Debug, Clone)]
 pub struct ResetData {

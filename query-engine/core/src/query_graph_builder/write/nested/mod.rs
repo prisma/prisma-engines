@@ -2,7 +2,6 @@ mod connect_nested;
 mod create_nested;
 mod delete_nested;
 mod disconnect_nested;
-mod set_nested;
 mod update_nested;
 mod upsert_nested;
 
@@ -18,7 +17,6 @@ use connector::filter::RecordFinder;
 use create_nested::*;
 use delete_nested::*;
 use prisma_models::RelationFieldRef;
-use set_nested::*;
 use update_nested::*;
 
 pub fn connect_nested_query(
@@ -37,7 +35,6 @@ pub fn connect_nested_query(
             "delete" => connect_nested_delete(graph, &parent, &parent_relation_field, value, &child_model)?,
             "connect" => connect_nested_connect(graph, parent, &parent_relation_field, value, &child_model)?,
             "disconnect" => connect_nested_disconnect(graph, parent, &parent_relation_field, value, &child_model)?,
-            "set" => connect_nested_set(graph, parent, &parent_relation_field, value, &child_model)?,
             "updateMany" => connect_nested_update_many(graph, &parent, &parent_relation_field, value, &child_model)?,
             "deleteMany" => connect_nested_delete_many(graph, &parent, &parent_relation_field, value, &child_model)?,
             _ => (),

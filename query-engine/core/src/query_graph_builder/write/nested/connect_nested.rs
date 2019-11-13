@@ -17,16 +17,20 @@ pub fn connect_nested_connect(
     value: ParsedInputValue,
     child_model: &ModelRef,
 ) -> QueryGraphBuilderResult<()> {
-    for value in utils::coerce_vec(value) {
-        let relation = parent_relation_field.relation();
+    let relation = parent_relation_field.relation();
 
-        if relation.is_many_to_many() {
-            handle_many_to_many(graph, parent_node, parent_relation_field, value, child_model)?;
-        } else if relation.is_one_to_many() {
-            handle_one_to_many(graph, parent_node, parent_relation_field, value, child_model)?;
-        } else {
-            handle_one_to_one(graph, parent_node, parent_relation_field, value, child_model)?;
-        }
+    // Build all finders upfront.
+    let finders: Vec<RecordFinder> = utils::coerce_vec(value)
+        .into_iter()
+        .map(|value: ParsedInputValue| extract_record_finder(value, &child_model))
+        .collect::<QueryGraphBuilderResult<Vec<RecordFinder>>>()?;
+
+    if relation.is_many_to_many() {
+        handle_many_to_many(graph, parent_node, parent_relation_field, finders, child_model)?;
+    } else if relation.is_one_to_many() {
+        handle_one_to_many(graph, parent_node, parent_relation_field, finders, child_model)?;
+    } else {
+        handle_one_to_one(graph, parent_node, parent_relation_field, finders, child_model)?;
     }
 
     Ok(())
@@ -36,32 +40,33 @@ pub fn connect_nested_connect(
 /// This is the least complicated case, as it doesn't involve
 /// checking for relation violations or updating inlined relations.
 ///
-/// (illustration simplified, `Parent` / `Result` exemplary)
-///
 ///```text
-///    ┌────────────┐
-/// ┌──│   Parent   │───────┐
-/// │  └────────────┘       │
-/// │         │             │
-/// │         ▼             ▼
-/// │  ┌────────────┐   ┌──────┐
-/// │  │ Read Child │   │Result│
-/// │  └────────────┘   └──────┘
-/// │         │
-/// │         ▼
-/// │  ┌────────────┐
-/// └─▶│  Connect   │
-///    └────────────┘
+///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ┐
+/// ┌──      Parent       ─ ─ ─ ─ ─ ┐
+/// │  └ ─ ─ ─ ─ ─ ─ ─ ─ ┘
+/// │           │                   │
+/// │
+/// │           │                   │
+/// │           ▼                   ▼
+/// │  ┌ ─ ─ ─ ─ ─ ─ ─ ─ ┐   ┌ ─ ─ ─ ─ ─ ─
+/// │         Child              Result   │
+/// │  └ ─ ─ ─ ─ ─ ─ ─ ─ ┘   └ ─ ─ ─ ─ ─ ─
+/// │           │
+/// │           │
+/// │           │
+/// │           ▼
+/// │  ┌─────────────────┐
+/// └─▶│     Connect     │
+///    └─────────────────┘
 /// ```
 fn handle_many_to_many(
     graph: &mut QueryGraph,
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
-    value: ParsedInputValue,
+    finders: Vec<RecordFinder>,
     child_model: &ModelRef,
 ) -> QueryGraphBuilderResult<()> {
-    let record_finder = extract_record_finder(value, &child_model)?;
-    let child_read_query = utils::read_ids_infallible(&child_model, record_finder);
+    let child_read_query = utils::read_ids_infallible(&child_model, finders);
     let child_node = graph.create_node(child_read_query);
 
     graph.create_edge(&parent_node, &child_node, QueryGraphDependency::ExecutionOrder)?;
@@ -72,62 +77,65 @@ fn handle_many_to_many(
 
 /// Handles a one-to-many nested connect.
 /// There are two cases: Either the relation side is inlined on the parent or the child.
+/// It is always assumed that side of inlining is the many side. This means that the operation
+/// coming first (as shown in the graphs below) can only ever return one record, to be injected into all
+/// records returned from the second operation.
 ///
-/// (illustrations simplified, `Parent` / `Result` exemplary)
-///
-/// In case of the parent, we need to create a graph that has a read node
+/// If the relation is inlined in the paretn, we need to create a graph that has a read node
 /// for the child first and then the parent operation to have the child ID ready:
-///
 /// ```text
-/// ┌────────────┐
-/// │ Read Child │
-/// └────────────┘
-///        │
-///        ▼
-/// ┌────────────┐
-/// │   Parent   │
-/// └────────────┘
-///        │
-///        ▼
-/// ┌────────────┐
-/// │   Result   │
-/// └────────────┘
-/// ```
+/// ┌─────────────────┐
+/// │  Read Children  │
+/// └─────────────────┘
+///          │
+///          │
+///          ▼
+/// ┌ ─ ─ ─ ─ ─ ─ ─ ─ ┐
+///       Parent
+/// └ ─ ─ ─ ─ ─ ─ ─ ─ ┘
+///          │
 ///
-/// In case of the child, we can have the parent first, then do an update on the child to
-/// insert the parent ID into the inline relation field.
-/// ```text
-/// ┌────────────┐
-/// │   Parent   │─────────┐
-/// └────────────┘         │
-///        │               │
-///        ▼               ▼
-/// ┌────────────┐  ┌────────────┐
-/// │Update Child│  │   Result   │
-/// └────────────┘  └────────────┘
+///          ▼
+/// ┌ ─ ─ ─ ─ ─ ─ ─ ─ ┐
+///       Result
+/// └ ─ ─ ─ ─ ─ ─ ─ ─ ┘
 /// ```
+/// The ID of the child is injected into the parent operation. This can be more than one record getting updated.
+///
+/// In case the relation is inline in the child, we can have the parent execute first,
+/// then do an update on the child to insert the parent ID into the inline relation field.
+/// ```text
+/// ┌ ─ ─ ─ ─ ─ ─ ─ ─ ┐
+///       Parent       ─ ─ ─ ─ ─ ┐
+/// └ ─ ─ ─ ─ ─ ─ ─ ─ ┘
+///          │                   │
+///          │
+///          ▼                   ▼
+/// ┌─────────────────┐   ┌ ─ ─ ─ ─ ─ ─
+/// │ Update Children │       Result   │
+/// └─────────────────┘   └ ─ ─ ─ ─ ─ ─
+/// ```
+/// The ID of the parent is injected into the child operation. This can be more than one record getting updated.
 fn handle_one_to_many(
     graph: &mut QueryGraph,
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
-    value: ParsedInputValue,
+    mut child_finders: Vec<RecordFinder>,
     child_model: &ModelRef,
 ) -> QueryGraphBuilderResult<()> {
-    let record_finder = extract_record_finder(value, &child_model)?;
     let (parent_node, child_node, relation_field_name) = if parent_relation_field.relation_is_inlined_in_parent() {
-        let read_query = utils::read_ids_infallible(&child_model, record_finder);
+        let read_query = utils::read_ids_infallible(&child_model, child_finders.pop());
         let child_node = graph.create_node(read_query);
 
         // For the injection, we need the name of the field on the inlined side, in this case the parent.
         let relation_field_name = parent_relation_field.name.clone();
 
-        // We need to swap the read node and the parent because the inlining is done in the parent, and we need to fetch the ID first.
+        // We need to swap the read node and the parent because the inlining is done in the parent, and we need to fetch the IDs first.
         graph.mark_nodes(&parent_node, &child_node);
-        // let (parent_node, child_node) = utils::swap_nodes(graph, parent_node, child_node)?;
 
         (parent_node, child_node, relation_field_name)
     } else {
-        let update_node = utils::update_record_node_placeholder(graph, Some(record_finder), Arc::clone(child_model));
+        let update_node = utils::update_records_node_placeholder(graph, child_finders, Arc::clone(child_model));
 
         // For the injection, we need the name of the field on the inlined side, in this case the child.
         let relation_field_name = parent_relation_field.related_field().name.clone();
@@ -162,7 +170,6 @@ fn handle_one_to_many(
 /// that we don't violate relation requirements.
 ///
 /// The full graph that can be created by this handler looks like this:
-/// (Either [1] or [2] are in the graph at the same time, not both)
 /// ```text
 ///    ┌────────────────────────┐
 /// ┌──│     Read New Child     │───────┐
@@ -246,7 +253,7 @@ fn handle_one_to_one(
     graph: &mut QueryGraph,
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
-    value: ParsedInputValue,
+    mut finders: Vec<RecordFinder>,
     child_model: &ModelRef,
 ) -> QueryGraphBuilderResult<()> {
     let parent_is_create = utils::node_is_create(graph, &parent_node);
@@ -264,7 +271,7 @@ fn handle_one_to_one(
         ));
     }
 
-    let record_finder = extract_record_finder(value, &child_model)?;
+    let record_finder = finders.pop();
     let read_query = utils::read_ids_infallible(&child_model, record_finder);
     let read_new_child_node = graph.create_node(read_query);
 
@@ -313,7 +320,7 @@ fn handle_one_to_one(
 
     // If the relation is inlined on the child, we also need to update the child to connect it to the parent.
     if !relation_inlined_parent {
-        let update_node = utils::update_record_node_placeholder(graph, None, Arc::clone(child_model));
+        let update_node = utils::update_records_node_placeholder(graph, None, Arc::clone(child_model));
         let relation_field_name = child_relation_field.name.clone();
         let child_model_id = child_model.fields().id();
 
@@ -359,7 +366,7 @@ fn handle_one_to_one(
         let parent_model = parent_relation_field.model();
         let relation_field_name = parent_relation_field.name.clone();
         let parent_model_id = parent_model.fields().id();
-        let update_node = utils::update_record_node_placeholder(graph, None, parent_model);
+        let update_node = utils::update_records_node_placeholder(graph, None, parent_model);
 
         graph.create_edge(
             &read_new_child_node,

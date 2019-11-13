@@ -339,7 +339,7 @@ fn handle_one_to_one(
     if relation_inlined_parent && !parent_is_create {
         let parent_model = parent_relation_field.model();
         let parent_model_id = parent_model.fields().id();
-        let update_node = utils::update_record_node_placeholder(graph, None, parent_model);
+        let update_node = utils::update_records_node_placeholder(graph, None, parent_model);
 
         graph.create_edge(
             &child_node,

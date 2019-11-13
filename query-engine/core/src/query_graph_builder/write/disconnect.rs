@@ -31,27 +31,29 @@ pub fn disconnect_records_node(
     }
 }
 
-/// Handles a many to many disconnect of `Parent` and `Child`.
-/// Assumes that `Parent` and `Child` return IDs.
+/// Creates a disconnect node in the graph and creates edges to `parent_node` and `child_node`.
+/// The disconnect edges assume that both the parent and the child node results
+/// are convertible to IDs, as the edges perform a transformation on the disconnect node to
+/// inject the required IDs after the parents executed.
 ///
-/// ## Graph
-/// - Adds `Disconnect` to the given nodes.
-/// - Illustration assumes that `Parent` and `Child` are connected in some way: The edge is not created in this function.
-///
+/// The resulting graph:
+/// (dashed indicates that those nodes and edges are not created in this function)
 /// ```text
-///    ┌────────────────┐
-/// ┌──│     Parent     │
-/// │  └────────────────┘
+///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ┐
+/// ┌──      Parent
+/// │  └ ─ ─ ─ ─ ─ ─ ─ ─ ┘
+/// │           │
+/// │
 /// │           │
 /// │           ▼
-/// │  ┌────────────────┐
-/// │  │     Child      │
-/// │  └────────────────┘
+/// │  ┌ ─ ─ ─ ─ ─ ─ ─ ─ ┐
+/// │         Child
+/// │  └ ─ ─ ─ ─ ─ ─ ─ ─ ┘
 /// │           │
 /// │           ▼
-/// │  ┌────────────────┐
-/// └─▶│   Disconnect   │
-///    └────────────────┘
+/// │  ┌─────────────────┐
+/// └─▶│   Disconnect    │
+///    └─────────────────┘
 /// ```
 fn handle_many_to_many(
     graph: &mut QueryGraph,
@@ -60,8 +62,8 @@ fn handle_many_to_many(
     parent_relation_field: &RelationFieldRef,
 ) -> QueryGraphBuilderResult<NodeRef> {
     let disconnect = WriteQuery::DisconnectRecords(DisconnectRecords {
-        parent: None,
-        child: None,
+        parent_id: None,
+        child_ids: vec![],
         relation_field: Arc::clone(parent_relation_field),
     });
 
@@ -80,7 +82,7 @@ fn handle_many_to_many(
             }?;
 
             if let Node::Query(Query::Write(WriteQuery::DisconnectRecords(ref mut c))) = child_node {
-                c.parent = Some(parent_id.try_into()?);
+                c.parent_id = Some(parent_id.try_into()?);
             }
 
             Ok(child_node)
@@ -95,27 +97,23 @@ fn handle_many_to_many(
     graph.create_edge(
         &child_node,
         &disconnect_node,
-        QueryGraphDependency::ParentIds(Box::new(|mut child_node, mut parent_ids| {
+        QueryGraphDependency::ParentIds(Box::new(|mut child_node, parent_ids| {
             let len = parent_ids.len();
+
             if len == 0 {
-                Err(QueryGraphBuilderError::RecordsNotConnected {
+                return Err(QueryGraphBuilderError::RecordsNotConnected {
                     relation_name,
                     parent_name,
                     child_name,
-                })
-            } else if len > 1 {
-                Err(QueryGraphBuilderError::AssertionError(format!(
-                    "Required exactly one child ID to be present for connect query, found {}.",
-                    len
-                )))
-            } else {
-                if let Node::Query(Query::Write(WriteQuery::DisconnectRecords(ref mut c))) = child_node {
-                    let child_id = parent_ids.pop().unwrap();
-                    c.child = Some(child_id.try_into()?);
-                }
-
-                Ok(child_node)
+                });
             }
+
+            if let Node::Query(Query::Write(WriteQuery::DisconnectRecords(ref mut c))) = child_node {
+                let child_ids = parent_ids.into_iter().map(|id| id.try_into().unwrap()).collect();
+                c.child_ids = child_ids;
+            }
+
+            Ok(child_node)
         })),
     )?;
 
@@ -124,21 +122,23 @@ fn handle_many_to_many(
 
 /// Handles a one to many or one to one disconnect.
 /// Depending on where the relation is inlined, an update node will be inserted:
+/// (dashed indicates that those nodes and edges are not created in this function)
 /// ```text
 /// Inlined on child:        Inlined on parent:
-/// ┌────────────────┐       ┌────────────────┐
-/// │     Child      │       │     Parent     │
-/// └────────────────┘       └────────────────┘
+///
+/// ┌ ─ ─ ─ ─ ─ ─ ─ ─ ┐      ┌ ─ ─ ─ ─ ─ ─ ─ ─ ┐
+///        Child                   Parent
+/// └ ─ ─ ─ ─ ─ ─ ─ ─ ┘      └ ─ ─ ─ ─ ─ ─ ─ ─ ┘
 ///          │                        │
 ///          ▼                        ▼
-/// ┌────────────────┐       ┌────────────────┐
-/// │  Update Child  │       │ Update Parent  │
-/// └────────────────┘       └────────────────┘
+/// ┌─────────────────┐      ┌─────────────────┐
+/// │  Update Child   │      │  Update Parent  │
+/// └─────────────────┘      └─────────────────┘
 /// ```
 ///
 /// Assumes that both `Parent` and `Child` return IDs.
 /// We need to check that _both_ actually do return IDs to ensure that they're connected,
-/// regardless of which ID is used in the end to perform the update.`
+/// regardless of which ID is used in the end to perform the update.
 fn handle_one_to_x(
     graph: &mut QueryGraph,
     parent_node: &NodeRef,
@@ -181,7 +181,7 @@ fn handle_one_to_x(
             )
         };
 
-    let update_node = utils::update_record_node_placeholder(graph, None, model_to_update);
+    let update_node = utils::update_records_node_placeholder(graph, None, model_to_update);
     let relation_name = parent_relation_field.relation().name.clone();
     let parent_name = parent_relation_field.model().name.clone();
     let child_name = parent_relation_field.related_model().name.clone();

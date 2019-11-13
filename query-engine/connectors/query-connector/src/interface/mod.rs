@@ -78,20 +78,13 @@ pub trait WriteOperations {
         &'a self,
         field: &'a RelationFieldRef,
         parent_id: &'a GraphqlId,
-        child_id: &'a GraphqlId,
+        child_ids: &'a [GraphqlId],
     ) -> crate::IO<()>;
 
     fn disconnect<'a>(
         &'a self,
         field: &'a RelationFieldRef,
         parent_id: &'a GraphqlId,
-        child_id: &'a GraphqlId,
-    ) -> crate::IO<()>;
-
-    fn set<'a>(
-        &'a self,
-        relation_field: &'a RelationFieldRef,
-        parent_id: GraphqlId,
-        wheres: Vec<GraphqlId>,
+        child_ids: &'a [GraphqlId],
     ) -> crate::IO<()>;
 }

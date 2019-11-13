@@ -116,7 +116,7 @@ pub async fn connect(
     conn: &dyn QueryExt,
     field: &RelationFieldRef,
     parent_id: &GraphqlId,
-    child_ids: &[&GraphqlId],
+    child_ids: &[GraphqlId],
 ) -> connector_interface::Result<()> {
     let query = WriteQueryBuilder::create_relation_table_records(field, parent_id, child_ids);
 
@@ -128,9 +128,9 @@ pub async fn disconnect(
     conn: &dyn QueryExt,
     field: &RelationFieldRef,
     parent_id: &GraphqlId,
-    child_ids: &[&GraphqlId],
+    child_ids: &[GraphqlId],
 ) -> connector_interface::Result<()> {
-    let query = WriteQueryBuilder::delete_relation_records(field, parent_id, child_ids);
+    let query = WriteQueryBuilder::delete_relation_table_records(field, parent_id, child_ids);
 
     conn.execute(query).await.map_err(SqlError::from)?;
     Ok(())
