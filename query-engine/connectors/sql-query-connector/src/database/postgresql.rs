@@ -1,22 +1,16 @@
 use super::connection::SqlConnection;
-use crate::{query_builder::ManyRelatedRecordsWithRowNumber, FromSource, QueryExt, SqlError};
+use crate::{query_builder::ManyRelatedRecordsWithRowNumber, FromSource, SqlError};
 use connector_interface::{Connection, Connector, IO};
 use datamodel::Source;
-use quaint::pool::{self, PostgresManager};
-use tokio_resource_pool::{CheckOut, Pool};
+use quaint::Quaint;
 
 pub struct PostgreSql {
-    pool: Pool<PostgresManager>,
+    pool: Quaint,
 }
-
-impl QueryExt for CheckOut<PostgresManager> {}
 
 impl FromSource for PostgreSql {
     fn from_source(source: &dyn Source) -> crate::Result<Self> {
-        let url = url::Url::parse(&source.url().value)?;
-        let pool = pool::postgres(url)?;
-
-        Ok(PostgreSql { pool })
+        Ok(PostgreSql { pool: Quaint::new(&source.url().value)? })
     }
 }
 

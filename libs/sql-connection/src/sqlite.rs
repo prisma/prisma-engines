@@ -1,19 +1,17 @@
 use crate::traits::{SqlConnection, SyncSqlConnection};
 use quaint::{
-    ast::*,
-    connector::{Queryable, ResultSet, SqliteParams},
+    prelude::*,
+    connector::SqliteParams,
     error::Error as QueryError,
-    pool::{CheckOut, Pool, SqliteManager},
 };
-use std::convert::{TryFrom};
+use std::convert::TryFrom;
 use tokio::runtime::Runtime;
-
-type SqlitePool = Pool<SqliteManager>;
+use url::Url;
 
 /// A pooled of connections to an SQLite database. It exposes both sync and async query
 /// interfaces.
 pub struct Sqlite {
-    pool: SqlitePool,
+    pool: Quaint,
     file_path: String,
     db_name: String,
     // TODO: remove this when we remove the sync API
@@ -29,7 +27,13 @@ impl Sqlite {
         let params = SqliteParams::try_from(url)?;
         let file_path = params.file_path;
 
-        let pool = quaint::pool::sqlite(url, db_name)?;
+        let url_with_db = {
+            let mut url = Url::parse(url)?;
+            url.query_pairs_mut().append_pair("db_name", db_name);
+            url
+        };
+
+        let pool = Quaint::new(url_with_db.as_str())?;
 
         Ok(Self {
             pool,
@@ -49,7 +53,7 @@ impl Sqlite {
         self.db_name.as_str()
     }
 
-    async fn get_connection(&self) -> Result<CheckOut<SqliteManager>, QueryError> {
+    async fn get_connection(&self) -> Result<PooledConnection, QueryError> {
         Ok(self.pool.check_out().await?)
     }
 }
