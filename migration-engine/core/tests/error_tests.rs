@@ -281,7 +281,7 @@ fn database_access_denied_must_return_a_proper_error_in_rpc() {
 }
 
 #[test_one_connector(connector = "postgres")]
-fn command_errors_must_return_an_unknown_error(api: &TestApi) {
+fn command_errors_must_return_unknown_errors(api: &TestApi) {
     let input = ApplyMigrationInput {
         migration_id: "the-migration".to_owned(),
         steps: vec![MigrationStep::DeleteModel(DeleteModel {
@@ -293,7 +293,7 @@ fn command_errors_must_return_an_unknown_error(api: &TestApi) {
     let error = api.execute_command::<ApplyMigrationCommand>(&input).unwrap_err();
 
     let expected_error = user_facing_errors::Error::Unknown(user_facing_errors::UnknownError {
-        message: "Failure during a migration command: Generic error. (code: 1, error: The model abcd does not exist in this Datamodel. It is not possible to delete it.)".to_owned(),
+        message: "Failure during a migration command: Generic error. (error: The model abcd does not exist in this Datamodel. It is not possible to delete it.)".to_owned(),
         backtrace: None,
     });
 
