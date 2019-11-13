@@ -7,7 +7,7 @@ pub trait Connector {
     fn type_aliases(&self) -> &Vec<TypeAlias>;
     fn root_types(&self) -> &Vec<Box<dyn RootType>>;
 
-    fn calculate_type(&self, name: &str, args: Vec<i32>) -> Type {
+    fn calculate_type(&self, name: &str, args: Vec<i32>) -> FieldType {
         // TODO: recurse through type constructors and find it
         match self.get_type_alias(name) {
             Some(alias) => self.calculate_type(&alias.aliased_to, args),
@@ -15,7 +15,7 @@ pub trait Connector {
                 let root_type = self
                     .get_root_type(&name)
                     .expect(&format!("Did not find root type for name {}", &name));
-                Type {
+                FieldType {
                     name: name.to_string(),
                     args,
                     root_type,
@@ -51,9 +51,10 @@ pub trait RootType {
     fn name(&self) -> &str;
     // represents the number of arguments for the type
     fn number_of_args(&self) -> usize;
-    // calculates the underlying raw type
-    fn raw_type(&self, args: &Vec<i32>) -> String;
-    fn photon_type(&self) -> scalars::ScalarType;
+    // calculates the underlying datasource type
+    fn datasource_type(&self, args: &Vec<i32>) -> String;
+
+    fn prisma_type(&self) -> scalars::ScalarType;
 }
 
 struct SimpleRootType {
@@ -97,7 +98,7 @@ impl RootType for SimpleRootType {
         self.number_of_args
     }
 
-    fn raw_type(&self, args: &Vec<i32>) -> String {
+    fn datasource_type(&self, args: &Vec<i32>) -> String {
         if self.number_of_args != args.len() {
             panic!(
                 "Did not provide the required number of arguments. {} were required, but were {} provided.",
@@ -113,24 +114,24 @@ impl RootType for SimpleRootType {
         }
     }
 
-    fn photon_type(&self) -> ScalarType {
+    fn prisma_type(&self) -> ScalarType {
         self.photon_type
     }
 }
 
 // TODO: this might not be needed within this interface
-pub struct Type<'a> {
+pub struct FieldType<'a> {
     name: String,
     args: Vec<i32>,
     root_type: &'a Box<dyn RootType>,
 }
-impl Type<'_> {
-    pub fn photon_type(&self) -> scalars::ScalarType {
-        self.root_type.photon_type()
+impl FieldType<'_> {
+    pub fn prisma_type(&self) -> scalars::ScalarType {
+        self.root_type.prisma_type()
     }
 
-    pub fn raw_type(&self) -> String {
-        self.root_type.raw_type(&self.args)
+    pub fn datasource_type(&self) -> String {
+        self.root_type.datasource_type(&self.args)
     }
 }
 
