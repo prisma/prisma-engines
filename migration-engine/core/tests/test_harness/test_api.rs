@@ -37,6 +37,10 @@ impl TestApi {
         self.api.migration_persistence()
     }
 
+    pub fn sql_family(&self) -> SqlFamily {
+        self.sql_family
+    }
+
     pub fn apply_migration(&self, steps: Vec<MigrationStep>, migration_id: &str) -> InferAndApplyOutput {
         let input = ApplyMigrationInput {
             migration_id: migration_id.to_string(),
