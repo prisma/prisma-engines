@@ -1,5 +1,6 @@
 use failure::{err_msg, Error, Fail};
 use migration_connector::ConnectorError;
+use quaint::error::Error as QuaintError;
 
 pub type SqlResult<T> = Result<T, SqlError>;
 
@@ -34,6 +35,9 @@ pub enum SqlError {
 
     #[fail(display = "Error opening a TLS connection. {}", message)]
     TlsError { message: String },
+
+    #[fail(display = "Unique constraint violation")]
+    UniqueConstraintViolation { field_name: String },
 }
 
 impl SqlError {
@@ -67,22 +71,26 @@ impl SqlError {
                 port: connection_info.port(),
                 cause: failure::err_msg(err),
             },
+            SqlError::UniqueConstraintViolation { field_name } => {
+                ConnectorError::UniqueConstraintViolation { field_name }
+            }
             error => ConnectorError::QueryError(error.into()),
         }
     }
 }
 
-impl From<quaint::error::Error> for SqlError {
-    fn from(error: quaint::error::Error) -> Self {
+impl From<QuaintError> for SqlError {
+    fn from(error: QuaintError) -> Self {
         match error {
-            quaint::error::Error::DatabaseDoesNotExist { db_name } => Self::DatabaseDoesNotExist { db_name },
-            quaint::error::Error::DatabaseAlreadyExists { db_name } => Self::DatabaseAlreadyExists { db_name },
-            quaint::error::Error::DatabaseAccessDenied { db_name } => Self::DatabaseAccessDenied { db_name },
-            quaint::error::Error::AuthenticationFailed { user } => Self::AuthenticationFailed { user },
-            quaint::error::Error::ConnectTimeout => Self::ConnectTimeout,
-            quaint::error::Error::ConnectionError { .. } => Self::ConnectionError(error.into()),
-            quaint::error::Error::Timeout => Self::Timeout,
-            quaint::error::Error::TlsError { message } => Self::TlsError { message },
+            QuaintError::DatabaseDoesNotExist { db_name } => Self::DatabaseDoesNotExist { db_name },
+            QuaintError::DatabaseAlreadyExists { db_name } => Self::DatabaseAlreadyExists { db_name },
+            QuaintError::DatabaseAccessDenied { db_name } => Self::DatabaseAccessDenied { db_name },
+            QuaintError::AuthenticationFailed { user } => Self::AuthenticationFailed { user },
+            QuaintError::ConnectTimeout => Self::ConnectTimeout,
+            QuaintError::ConnectionError { .. } => Self::ConnectionError(error.into()),
+            QuaintError::Timeout => Self::Timeout,
+            QuaintError::TlsError { message } => Self::TlsError { message },
+            QuaintError::UniqueConstraintViolation { field_name } => Self::UniqueConstraintViolation { field_name },
             e => SqlError::QueryError(e.into()),
         }
     }
