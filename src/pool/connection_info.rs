@@ -41,9 +41,10 @@ impl ConnectionInfo {
             SqlFamily::Mysql => Ok(ConnectionInfo::Mysql(MysqlUrl::new(url)?)),
             SqlFamily::Sqlite => {
                 let params = SqliteParams::try_from(url_str)?;
+
                 Ok(ConnectionInfo::Sqlite {
                     file_path: params.file_path,
-                    db_name: None,
+                    db_name: params.db_name,
                 })
             }
             SqlFamily::Postgres => Ok(ConnectionInfo::Postgres(PostgresUrl::new(url)?)),
