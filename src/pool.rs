@@ -1,3 +1,7 @@
+mod connection_info;
+
+pub use connection_info::*;
+
 use url::Url;
 use crate::{
     ast,
@@ -12,6 +16,7 @@ use std::convert::TryFrom;
 /// pooling.
 pub struct Quaint {
     inner: Pool<QuaintManager>,
+    connection_info: ConnectionInfo,
 }
 
 impl Quaint {
@@ -122,6 +127,7 @@ impl Quaint {
 
         Ok(Self {
             inner: Builder::new().build(connection_limit as usize, manager),
+            connection_info: ConnectionInfo::from_url(url_str)?,
         })
     }
 
@@ -135,6 +141,10 @@ impl Quaint {
         Ok(PooledConnection {
             inner: self.inner.check_out().await?,
         })
+    }
+
+    pub fn connection_info(&self) -> &ConnectionInfo {
+        &self.connection_info
     }
 }
 
