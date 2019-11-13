@@ -91,12 +91,6 @@
 //!     );
 //! }
 //! ```
-pub mod ast;
-pub mod connector;
-pub mod error;
-
-pub mod visitor;
-
 #[cfg(not(feature = "tracing-log"))]
 #[macro_use]
 extern crate log;
@@ -106,6 +100,12 @@ extern crate metrics;
 
 #[macro_use]
 extern crate debug_stub_derive;
+
+pub mod ast;
+pub mod connector;
+pub mod error;
+pub mod visitor;
+pub mod prelude;
 
 pub type Result<T> = std::result::Result<T, error::Error>;
 
