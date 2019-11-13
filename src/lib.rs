@@ -285,7 +285,7 @@ pub enum QuaintManager {
 }
 
 impl Manage for QuaintManager {
-    type Resource = Box<dyn Queryable + Send + Sync + 'static>;
+    type Resource = Box<dyn Queryable + Send + Sync>;
     type Dependencies = RealDependencies;
     type CheckOut = CheckOut<Self>;
     type Error = Error;
