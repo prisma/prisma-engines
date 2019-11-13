@@ -42,6 +42,10 @@ impl TestApi {
         self.connection_info.as_ref()
     }
 
+    pub fn sql_family(&self) -> SqlFamily {
+        self.sql_family
+    }
+
     /// Render a table name with the required prefixing for use with quaint query building.
     pub fn render_table_name(&self, table_name: &str) -> quaint::ast::Table {
         match self.connection_info.as_ref().and_then(|ci| ci.schema_name()) {
