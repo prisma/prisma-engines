@@ -74,23 +74,28 @@ impl WriteQueryBuilder {
         let relation = field.relation();
         let parent_column = field.relation_column();
         let child_column = field.opposite_column();
-        let columns = vec![parent_column.name.to_string(), child_column.name.to_string()];
 
+        let mut columns = vec![parent_column.name.to_string(), child_column.name.to_string()];
+        if let Some(id_col) = relation.id_column() {
+            columns.push(id_col.name.to_string());
+        };
+
+        let generate_ids = relation.id_column().is_some();
         let insert = Insert::multi_into(relation.relation_table(), columns);
+        let insert: MultiRowInsert = child_ids
+            .into_iter()
+            .fold(insert, |insert, child_id| {
+                if generate_ids {
+                    insert.values((parent_id.clone(), child_id.clone(), cuid::cuid().unwrap()))
+                } else {
+                    insert.values((parent_id.clone(), child_id.clone()))
+                }
+            })
+            .into();
 
-        // .value(parent_column.name.to_string(), parent_id.clone())
-        // .value(child_column.name.to_string(), child_id.clone());
-
-        // let insert: Insert = match relation.id_column() {
-        //     Some(id_column) => insert.value(id_column, cuid::cuid().unwrap()).into(),
-        //     None => insert.into(),
-        // };
-
-        // insert.on_conflict(OnConflict::DoNothing).into()
-        //         }
+        insert.build().on_conflict(OnConflict::DoNothing).into()
         //     }
-
-        unimplemented!();
+        // }
     }
 
     pub fn delete_relation_table_records(
