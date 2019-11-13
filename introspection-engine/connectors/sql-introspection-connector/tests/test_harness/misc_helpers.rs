@@ -267,7 +267,7 @@ pub fn sqlite_test_url() -> String {
 pub fn sqlite_test_file() -> String {
     let server_root = std::env::var("SERVER_ROOT").expect("Env var SERVER_ROOT required but not found.");
     let database_folder_path = format!("{}/db", server_root);
-    let file_path = format!("file://{}/{}.db", database_folder_path, SCHEMA_NAME);
+    let file_path = format!("{}/{}.db", database_folder_path, SCHEMA_NAME);
     file_path
 }
 
