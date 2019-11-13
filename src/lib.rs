@@ -319,10 +319,10 @@ impl Manage for QuaintManager {
             Self::Mysql(opts) => {
                 use crate::connector::Mysql;
 
-                DBIO::new(match Mysql::new(opts.clone()) {
-                    Ok(mysql) => future::ok(Box::new(mysql) as Self::Resource),
-                    Err(e) => future::err(e),
-                })
+                match Mysql::new(opts.clone()) {
+                    Ok(mysql) => DBIO::new(future::ok(Box::new(mysql) as Self::Resource)),
+                    Err(e) => DBIO::new(future::err(e)),
+                }
             },
             #[cfg(feature = "postgresql")]
             Self::Postgres { config, schema, ssl_params, } => {
