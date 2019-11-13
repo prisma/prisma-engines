@@ -260,7 +260,7 @@ pub struct PooledConnection {
 }
 
 impl Deref for PooledConnection {
-    type Target = Box<dyn Queryable + Send + Sync + 'static>;
+    type Target = Box<dyn Queryable + Send + Sync>;
 
     fn deref(&self) -> &Self::Target {
         self.inner.deref()
