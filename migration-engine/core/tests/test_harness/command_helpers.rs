@@ -87,18 +87,3 @@ pub fn apply_migration(
         migration_output,
     }
 }
-
-#[derive(Debug)]
-pub struct UnapplyOutput {
-    pub sql_schema: SqlSchema,
-    pub output: UnapplyMigrationOutput,
-}
-
-pub fn unapply_migration(test_setup: &TestSetup, api: &dyn GenericApi) -> UnapplyOutput {
-    let input = UnapplyMigrationInput {};
-    let output = api.unapply_migration(&input).unwrap();
-
-    let sql_schema = introspect_database(test_setup, api);
-
-    UnapplyOutput { sql_schema, output }
-}

@@ -9,7 +9,7 @@ use super::{
 use migration_connector::{MigrationPersistence, MigrationStep};
 use migration_core::{
     api::GenericApi,
-    commands::{ApplyMigrationInput, InferMigrationStepsInput},
+    commands::{ApplyMigrationInput, InferMigrationStepsInput, UnapplyMigrationInput, UnapplyMigrationOutput},
 };
 use sql_connection::SyncSqlConnection;
 use sql_migration_connector::SqlFamily;
@@ -78,6 +78,15 @@ impl TestApi {
         self.apply_migration(steps, migration_id)
     }
 
+    pub fn unapply_migration(&self) -> UnapplyOutput {
+        let input = UnapplyMigrationInput {};
+        let output = self.api.unapply_migration(&input).unwrap();
+
+        let sql_schema = self.introspect_database();
+
+        UnapplyOutput { sql_schema, output }
+    }
+
     fn introspect_database(&self) -> SqlSchema {
         let inspector: Box<dyn SqlSchemaDescriberBackend> = match self.api.connector_type() {
             "postgresql" => Box::new(sql_schema_describer::postgres::SqlSchemaDescriber::new(Arc::clone(
@@ -141,4 +150,10 @@ pub fn sqlite_test_api() -> TestApi {
         database: Arc::clone(&connector.database),
         api: Box::new(test_api(connector)),
     }
+}
+
+#[derive(Debug)]
+pub struct UnapplyOutput {
+    pub sql_schema: SqlSchema,
+    pub output: UnapplyMigrationOutput,
 }
