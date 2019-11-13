@@ -51,6 +51,14 @@ impl TestApi {
         self.sql_family
     }
 
+    /// Render a table name with the required prefixing for use with quaint query building.
+    pub fn render_table_name(&self, table_name: &str) -> quaint::ast::Table {
+        match self.connection_info.as_ref().and_then(|ci| ci.schema_name()) {
+            Some(schema_name) => (schema_name, table_name.to_owned()).into(),
+            None => table_name.to_owned().into(),
+        }
+    }
+
     pub async fn apply_migration(&self, steps: Vec<MigrationStep>, migration_id: &str) -> InferAndApplyOutput {
         let input = ApplyMigrationInput {
             migration_id: migration_id.to_string(),
