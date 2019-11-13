@@ -44,6 +44,7 @@ fn apply_step(datamodel: &mut ast::SchemaAst, step: &MigrationStep) -> Result<()
         MigrationStep::CreateField(create_field) => apply_create_field(datamodel, create_field)?,
         MigrationStep::UpdateField(update_field) => apply_update_field(datamodel, update_field)?,
         MigrationStep::DeleteField(delete_field) => apply_delete_field(datamodel, delete_field)?,
+        MigrationStep::CreateCustomType(create_custom_type) => apply_create_custom_type(datamodel, create_custom_type)?,
         MigrationStep::CreateDirective(create_directive) => apply_create_directive(datamodel, create_directive)?,
         MigrationStep::DeleteDirective(delete_directive) => apply_delete_directive(datamodel, delete_directive)?,
         MigrationStep::CreateDirectiveArgument(create_directive_argument) => {
@@ -408,6 +409,33 @@ fn apply_delete_directive_argument(datamodel: &mut ast::SchemaAst, step: &steps:
     directive.arguments = new_arguments;
 }
 
+fn apply_create_custom_type(
+    datamodel: &mut ast::SchemaAst,
+    step: &steps::CreateCustomType,
+) -> Result<(), CalculatorError> {
+    if let Some(_) = datamodel.find_custom_type(&step.custom_type) {
+        return Err(format_err!(
+            "The type {} already exists in this Datamodel. It is not possible to create it once more.",
+            &step.custom_type
+        )
+        .into());
+    }
+
+    let custom_type = ast::Field {
+        documentation: None,
+        name: new_ident(step.custom_type.clone()),
+        span: new_span(),
+        default_value: None,
+        arity: step.arity.clone(),
+        directives: vec![],
+        field_type: new_ident(step.r#type.clone()),
+    };
+
+    datamodel.tops.push(ast::Top::Type(custom_type));
+
+    Ok(())
+}
+
 fn new_ident(name: String) -> ast::Identifier {
     ast::Identifier { name, span: new_span() }
 }
@@ -424,6 +452,9 @@ fn find_directives_mut<'a>(
         steps::DirectiveType::Field { model, field } => &mut datamodel.find_field_mut(&model, &field)?.directives,
         steps::DirectiveType::Model { model } => &mut datamodel.find_model_mut(&model)?.directives,
         steps::DirectiveType::Enum { r#enum } => &mut datamodel.find_enum_mut(&r#enum)?.directives,
+        steps::DirectiveType::CustomType { custom_type } => {
+            &mut datamodel.find_custom_type_mut(&custom_type)?.directives
+        }
     };
 
     Some(directives)

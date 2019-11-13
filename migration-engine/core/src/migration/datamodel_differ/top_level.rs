@@ -68,6 +68,15 @@ impl<'a> TopDiffer<'a> {
         })
     }
 
+    /// Iterator over the custom types present in `next` but not `previous`.
+    pub(crate) fn created_custom_types(&self) -> impl Iterator<Item = &ast::Field> {
+        self.next_custom_types().filter(move |next_custom_type| {
+            self.previous_custom_types()
+                .find(|previous_custom_type| custom_types_match(previous_custom_type, next_custom_type))
+                .is_none()
+        })
+    }
+
     /// Iterator over the models in `previous`.
     fn previous_models(&self) -> impl Iterator<Item = &ast::Model> {
         walk_models(self.previous)
@@ -87,6 +96,16 @@ impl<'a> TopDiffer<'a> {
     pub fn next_enums(&self) -> impl Iterator<Item = &ast::Enum> {
         walk_enums(self.next)
     }
+
+    /// Iterator over the custom types in `previous`.
+    pub fn previous_custom_types(&self) -> impl Iterator<Item = &ast::Field> {
+        walk_custom_types(self.previous)
+    }
+
+    /// Iterator over the custom types in `next`.
+    pub fn next_custom_types(&self) -> impl Iterator<Item = &ast::Field> {
+        walk_custom_types(self.next)
+    }
 }
 
 fn walk_enums(ast: &ast::SchemaAst) -> impl Iterator<Item = &ast::Enum> {
@@ -102,6 +121,14 @@ fn walk_models(ast: &ast::SchemaAst) -> impl Iterator<Item = &ast::Model> {
 }
 
 fn models_match(previous: &ast::Model, next: &ast::Model) -> bool {
+    previous.name.name == next.name.name
+}
+
+fn walk_custom_types(ast: &ast::SchemaAst) -> impl Iterator<Item = &ast::Field> {
+    ast.tops.iter().filter_map(Top::as_custom_type)
+}
+
+fn custom_types_match(previous: &ast::Field, next: &ast::Field) -> bool {
     previous.name.name == next.name.name
 }
 

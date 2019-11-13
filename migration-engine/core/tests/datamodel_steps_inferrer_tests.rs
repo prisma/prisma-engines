@@ -1168,6 +1168,75 @@ fn infer_UpdateDirectiveArgument_on_enum() {
     assert_eq!(steps, expected);
 }
 
+#[test]
+fn infer_CreateCustomType() {
+    let dm1 = parse("");
+    let dm2 = parse(
+        r#"
+            type CUID = String @id @default(cuid())
+
+            model User {
+                id CUID
+                age Float
+            }
+        "#,
+    );
+
+    let steps = infer(&dm1, &dm2);
+
+    let directive_type = DirectiveType::CustomType {
+        custom_type: "CUID".to_owned(),
+    };
+
+    let expected = &[
+        MigrationStep::CreateCustomType(CreateCustomType {
+            custom_type: "CUID".to_owned(),
+            r#type: "String".to_owned(),
+            arity: FieldArity::Required,
+        }),
+        MigrationStep::CreateDirective(CreateDirective {
+            locator: DirectiveLocation {
+                location: directive_type.clone(),
+                directive: "id".to_owned(),
+                arguments: None,
+            },
+        }),
+        MigrationStep::CreateDirective(CreateDirective {
+            locator: DirectiveLocation {
+                location: directive_type.clone(),
+                directive: "default".to_owned(),
+                arguments: None,
+            },
+        }),
+        MigrationStep::CreateDirectiveArgument(CreateDirectiveArgument {
+            directive_location: DirectiveLocation {
+                location: directive_type,
+                directive: "default".to_owned(),
+                arguments: None,
+            },
+            argument: "".to_owned(),
+            value: MigrationExpression("cuid()".to_owned()),
+        }),
+        MigrationStep::CreateModel(CreateModel {
+            model: "User".to_string(),
+        }),
+        MigrationStep::CreateField(CreateField {
+            model: "User".to_string(),
+            field: "id".to_owned(),
+            tpe: "CUID".to_owned(),
+            arity: FieldArity::Required,
+        }),
+        MigrationStep::CreateField(CreateField {
+            model: "User".to_string(),
+            field: "age".to_owned(),
+            tpe: "Float".to_owned(),
+            arity: FieldArity::Required,
+        }),
+    ];
+
+    assert_eq!(steps, expected);
+}
+
 fn infer(dm1: &SchemaAst, dm2: &SchemaAst) -> Vec<MigrationStep> {
     let inferrer = DataModelMigrationStepsInferrerImplWrapper {};
     inferrer.infer(&dm1, &dm2)

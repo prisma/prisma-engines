@@ -226,6 +226,20 @@ fn creating_a_field_that_already_exists_must_error() {
     calculate(&dm, steps);
 }
 
+#[should_panic(expected = "The type Test already exists in this Datamodel. It is not possible to create it once more.")]
+#[test]
+fn creating_a_custom_type_that_already_exists_must_error() {
+    let dm = parse("type Test = Float");
+
+    let steps = &[MigrationStep::CreateCustomType(CreateCustomType {
+        custom_type: "Test".to_owned(),
+        r#type: "Test".to_string(),
+        arity: FieldArity::Required,
+    })];
+
+    calculate(&dm, steps);
+}
+
 #[should_panic(expected = "The enum Test already exists in this Datamodel. It is not possible to create it once more.")]
 #[test]
 fn creating_an_enum_that_already_exists_must_error() {

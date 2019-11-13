@@ -21,6 +21,9 @@ pub enum MigrationStep {
     CreateEnum(CreateEnum),
     UpdateEnum(UpdateEnum),
     DeleteEnum(DeleteEnum),
+    CreateCustomType(CreateCustomType),
+    // UpdateType(UpdateType),
+    // DeleteType(DeleteType),
 }
 
 #[derive(Debug, Deserialize, Serialize, PartialEq, Eq, Hash, Clone)]
@@ -213,6 +216,7 @@ impl DirectiveLocation {
 #[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
 #[serde(rename_all = "camelCase", deny_unknown_fields, untagged)]
 pub enum DirectiveType {
+    CustomType { custom_type: String },
     Field { model: String, field: String },
     Model { model: String },
     Enum { r#enum: String },
@@ -258,6 +262,14 @@ impl MigrationExpression {
     pub fn from_ast_expression(expr: &ast::Expression) -> Self {
         MigrationExpression(expr.render_to_string())
     }
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct CreateCustomType {
+    pub custom_type: String,
+
+    pub r#type: String,
+    pub arity: ast::FieldArity,
 }
 
 #[cfg(test)]

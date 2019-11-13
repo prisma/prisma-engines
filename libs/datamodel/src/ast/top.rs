@@ -68,4 +68,11 @@ impl Top {
             _ => None,
         }
     }
+
+    pub fn as_custom_type(&self) -> Option<&Field> {
+        match self {
+            Top::Type(r#type) => Some(r#type),
+            _ => None,
+        }
+    }
 }

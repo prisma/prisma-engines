@@ -1391,3 +1391,17 @@ fn removing_a_relation_field_must_work(api: &TestApi) {
 
     assert!(address_name_field.is_none());
 }
+
+#[test_each_connector]
+fn simple_custom_types_in_migrations_must_work(api: &TestApi) {
+    let dm1 = r#"
+        type CUID = String @id @default(cuid())
+
+        model User {
+            id CUID
+            age Float
+        }
+    "#;
+
+    api.infer_and_apply(dm1);
+}

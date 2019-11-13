@@ -21,6 +21,7 @@ pub(crate) fn diff(previous: &ast::SchemaAst, next: &ast::SchemaAst) -> Vec<Migr
     let mut steps = Vec::new();
     let differ = TopDiffer { previous, next };
 
+    push_custom_types(&mut steps, &differ);
     push_enums(&mut steps, &differ);
     push_models(&mut steps, &differ);
 
@@ -28,6 +29,28 @@ pub(crate) fn diff(previous: &ast::SchemaAst, next: &ast::SchemaAst) -> Vec<Migr
 }
 
 type Steps = Vec<MigrationStep>;
+
+fn push_custom_types(steps: &mut Steps, differ: &TopDiffer<'_>) {
+    push_created_custom_types(steps, differ.created_custom_types());
+}
+
+fn push_created_custom_types<'a>(steps: &mut Steps, custom_types: impl Iterator<Item = &'a ast::Field>) {
+    for created_custom_type in custom_types {
+        let create_custom_type_step = steps::CreateCustomType {
+            custom_type: created_custom_type.name.name.clone(),
+            r#type: created_custom_type.field_type.name.clone(),
+            arity: created_custom_type.arity.clone(),
+        };
+
+        steps.push(MigrationStep::CreateCustomType(create_custom_type_step));
+
+        let location = steps::DirectiveType::CustomType {
+            custom_type: created_custom_type.name.name.clone(),
+        };
+
+        push_created_directives(steps, &location, created_custom_type.directives.iter())
+    }
+}
 
 fn push_enums(steps: &mut Steps, differ: &TopDiffer<'_>) {
     push_created_enums(steps, differ.created_enums());
