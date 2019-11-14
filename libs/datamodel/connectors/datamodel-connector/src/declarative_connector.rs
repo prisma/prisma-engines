@@ -1,4 +1,4 @@
-use super::{Connector, FieldType, ScalarType};
+use super::{Connector, ScalarFieldType, ScalarType};
 
 pub struct DeclarativeConnector {
     pub type_aliases: Vec<TypeAlias>,
@@ -6,7 +6,7 @@ pub struct DeclarativeConnector {
 }
 
 impl Connector for DeclarativeConnector {
-    fn calculate_type(&self, name: &str, args: Vec<i32>) -> FieldType {
+    fn calculate_type(&self, name: &str, args: Vec<i32>) -> ScalarFieldType {
         match self.get_type_alias(name) {
             Some(alias) => self.calculate_type(&alias.aliased_to, args),
             None => {
@@ -15,7 +15,7 @@ impl Connector for DeclarativeConnector {
                     .expect(&format!("Did not find type constructor for name {}", &name));
                 let datasource_type = constructor.datasource_type(&args);
 
-                FieldType {
+                ScalarFieldType {
                     name: name.to_string(),
                     prisma_type: constructor.prisma_type,
                     datasource_type,
