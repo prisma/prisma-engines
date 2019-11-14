@@ -6,7 +6,7 @@ use migration_connector::*;
 use test_harness::*;
 
 #[test_each_connector]
-fn single_watch_migrations_must_work(api: &TestApi) {
+async fn single_watch_migrations_must_work(api: &TestApi) {
     let migration_persistence = api.migration_persistence();
 
     let steps = vec![
@@ -36,7 +36,7 @@ fn single_watch_migrations_must_work(api: &TestApi) {
 }
 
 #[test_each_connector]
-fn multiple_watch_migrations_must_work(api: &TestApi) {
+async fn multiple_watch_migrations_must_work(api: &TestApi) {
     let migration_persistence = api.migration_persistence();
 
     let steps1 = vec![
@@ -81,7 +81,7 @@ fn multiple_watch_migrations_must_work(api: &TestApi) {
 }
 
 #[test_each_connector]
-fn steps_equivalence_criteria_is_satisfied_when_leaving_watch_mode(api: &TestApi) {
+async fn steps_equivalence_criteria_is_satisfied_when_leaving_watch_mode(api: &TestApi) {
     let migration_persistence = api.migration_persistence();
 
     let steps1 = vec![
@@ -112,7 +112,7 @@ fn steps_equivalence_criteria_is_satisfied_when_leaving_watch_mode(api: &TestApi
 }
 
 #[test_each_connector]
-fn must_handle_additional_steps_when_transitioning_out_of_watch_mode(api: &TestApi) {
+async fn must_handle_additional_steps_when_transitioning_out_of_watch_mode(api: &TestApi) {
     let migration_persistence = api.migration_persistence();
 
     let steps1 = vec![

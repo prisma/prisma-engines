@@ -12,7 +12,7 @@ use std::sync::Arc;
 use test_harness::*;
 
 #[test_each_connector]
-fn adding_a_model_for_an_existing_table_must_work(api: &TestApi) {
+async fn adding_a_model_for_an_existing_table_must_work(api: &TestApi) {
     let initial_result = api.barrel().execute(|migration| {
         migration.create_table("Blog", |t| {
             t.add_column("id", types::primary());
@@ -35,7 +35,7 @@ fn bigint_columns_must_work() {
 }
 
 #[test_each_connector]
-fn removing_a_model_for_a_table_that_is_already_deleted_must_work(api: &TestApi) {
+async fn removing_a_model_for_a_table_that_is_already_deleted_must_work(api: &TestApi) {
     let dm1 = r#"
             model Blog {
                 id Int @id
@@ -64,7 +64,7 @@ fn removing_a_model_for_a_table_that_is_already_deleted_must_work(api: &TestApi)
 }
 
 #[test_each_connector]
-fn creating_a_field_for_an_existing_column_with_a_compatible_type_must_work(api: &TestApi) {
+async fn creating_a_field_for_an_existing_column_with_a_compatible_type_must_work(api: &TestApi) {
     let initial_result = api.barrel().execute(|migration| {
         migration.create_table("Blog", |t| {
             t.add_column("id", types::primary());
@@ -82,7 +82,7 @@ fn creating_a_field_for_an_existing_column_with_a_compatible_type_must_work(api:
 }
 
 #[test_each_connector]
-fn creating_a_field_for_an_existing_column_and_changing_its_type_must_work(api: &TestApi) {
+async fn creating_a_field_for_an_existing_column_and_changing_its_type_must_work(api: &TestApi) {
     let initial_result = api.barrel().execute(|migration| {
         migration.create_table("Blog", |t| {
             t.add_column("id", types::primary());
@@ -110,7 +110,7 @@ fn creating_a_field_for_an_existing_column_and_changing_its_type_must_work(api: 
 }
 
 #[test_each_connector]
-fn creating_a_field_for_an_existing_column_and_simultaneously_making_it_optional(api: &TestApi) {
+async fn creating_a_field_for_an_existing_column_and_simultaneously_making_it_optional(api: &TestApi) {
     let initial_result = api.barrel().execute(|migration| {
         migration.create_table("Blog", |t| {
             t.add_column("id", types::primary());
@@ -132,7 +132,7 @@ fn creating_a_field_for_an_existing_column_and_simultaneously_making_it_optional
 }
 
 #[test_each_connector(ignore = "mysql")]
-fn creating_a_scalar_list_field_for_an_existing_table_must_work(api: &TestApi) {
+async fn creating_a_scalar_list_field_for_an_existing_table_must_work(api: &TestApi) {
     let dm1 = r#"
             model Blog {
                 id Int @id
@@ -185,7 +185,7 @@ fn creating_a_scalar_list_field_for_an_existing_table_must_work(api: &TestApi) {
 }
 
 #[test_each_connector]
-fn delete_a_field_for_a_non_existent_column_must_work(api: &TestApi) {
+async fn delete_a_field_for_a_non_existent_column_must_work(api: &TestApi) {
     let dm1 = r#"
             model Blog {
                 id Int @id
@@ -214,7 +214,7 @@ fn delete_a_field_for_a_non_existent_column_must_work(api: &TestApi) {
 }
 
 #[test_each_connector]
-fn deleting_a_scalar_list_field_for_a_non_existent_list_table_must_work(api: &TestApi) {
+async fn deleting_a_scalar_list_field_for_a_non_existent_list_table_must_work(api: &TestApi) {
     let dm1 = r#"
             model Blog {
                 id Int @id
@@ -239,7 +239,7 @@ fn deleting_a_scalar_list_field_for_a_non_existent_list_table_must_work(api: &Te
 }
 
 #[test_each_connector]
-fn updating_a_field_for_a_non_existent_column(api: &TestApi) {
+async fn updating_a_field_for_a_non_existent_column(api: &TestApi) {
     let dm1 = r#"
             model Blog {
                 id Int @id
@@ -278,7 +278,7 @@ fn updating_a_field_for_a_non_existent_column(api: &TestApi) {
 }
 
 #[test_each_connector]
-fn renaming_a_field_where_the_column_was_already_renamed_must_work(api: &TestApi) {
+async fn renaming_a_field_where_the_column_was_already_renamed_must_work(api: &TestApi) {
     let dm1 = r#"
             model Blog {
                 id Int @id

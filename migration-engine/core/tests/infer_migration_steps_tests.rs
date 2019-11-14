@@ -11,7 +11,7 @@ use sql_schema_describer::Table;
 use test_harness::*;
 
 #[test_each_connector]
-fn assume_to_be_applied_must_work(api: &TestApi) {
+async fn assume_to_be_applied_must_work(api: &TestApi) {
     let dm0 = r#"
             model Blog {
                 id Int @id
@@ -57,7 +57,7 @@ fn assume_to_be_applied_must_work(api: &TestApi) {
 }
 
 #[test_each_connector]
-fn special_handling_of_watch_migrations(api: &TestApi) {
+async fn special_handling_of_watch_migrations(api: &TestApi) {
     let dm = r#"
             model Blog {
                 id Int @id
@@ -118,7 +118,7 @@ fn special_handling_of_watch_migrations(api: &TestApi) {
 ///
 /// Relevant issue: https://github.com/prisma/lift/issues/167
 #[test_each_connector]
-fn watch_migrations_must_be_returned_when_transitioning_out_of_watch_mode(api: &TestApi) {
+async fn watch_migrations_must_be_returned_when_transitioning_out_of_watch_mode(api: &TestApi) {
     let dm = r#"
             model Blog {
                 id Int @id
@@ -178,7 +178,7 @@ fn watch_migrations_must_be_returned_when_transitioning_out_of_watch_mode(api: &
 }
 
 #[test_each_connector]
-fn watch_migrations_must_be_returned_in_addition_to_regular_inferred_steps_when_transitioning_out_of_watch_mode(
+async fn watch_migrations_must_be_returned_in_addition_to_regular_inferred_steps_when_transitioning_out_of_watch_mode(
     api: &TestApi,
 ) {
     let dm = r#"

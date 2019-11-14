@@ -6,7 +6,7 @@ use quaint::ast::*;
 use test_harness::*;
 
 #[test_each_connector]
-fn adding_a_required_field_if_there_is_data(api: &TestApi) {
+async fn adding_a_required_field_if_there_is_data(api: &TestApi) {
     let dm = r#"
             model Test {
                 id String @id @default(cuid())
@@ -42,7 +42,7 @@ fn adding_a_required_field_if_there_is_data(api: &TestApi) {
 }
 
 #[test_each_connector]
-fn adding_a_required_field_must_use_the_default_value_for_migrations(api: &TestApi) {
+async fn adding_a_required_field_must_use_the_default_value_for_migrations(api: &TestApi) {
     let dm = r#"
             model Test {
                 id String @id @default(cuid())
@@ -94,7 +94,7 @@ fn adding_a_required_field_must_use_the_default_value_for_migrations(api: &TestA
 }
 
 #[test_each_connector]
-fn dropping_a_table_with_rows_should_warn(api: &TestApi) {
+async fn dropping_a_table_with_rows_should_warn(api: &TestApi) {
     let dm = r#"
         model Test {
             id String @id @default(cuid())
@@ -127,7 +127,7 @@ fn dropping_a_table_with_rows_should_warn(api: &TestApi) {
 }
 
 #[test_each_connector]
-fn dropping_a_column_with_non_null_values_should_warn(api: &TestApi) {
+async fn dropping_a_column_with_non_null_values_should_warn(api: &TestApi) {
     let dm = r#"
             model Test {
                 id String @id @default(cuid())
@@ -168,7 +168,7 @@ fn dropping_a_column_with_non_null_values_should_warn(api: &TestApi) {
 }
 
 #[test_each_connector]
-fn altering_a_column_without_non_null_values_should_not_warn(api: &TestApi) {
+async fn altering_a_column_without_non_null_values_should_not_warn(api: &TestApi) {
     let dm = r#"
         model Test {
             id String @id @default(cuid())
@@ -199,7 +199,7 @@ fn altering_a_column_without_non_null_values_should_not_warn(api: &TestApi) {
 }
 
 #[test_each_connector]
-fn altering_a_column_with_non_null_values_should_warn(api: &TestApi) {
+async fn altering_a_column_with_non_null_values_should_warn(api: &TestApi) {
     let dm = r#"
         model Test {
             id String @id @default(cuid())

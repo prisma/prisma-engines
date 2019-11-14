@@ -8,14 +8,14 @@ use quaint::prelude::SqlFamily;
 use test_harness::*;
 
 #[test_each_connector]
-fn last_should_return_none_if_there_is_no_migration(api: &TestApi) {
+async fn last_should_return_none_if_there_is_no_migration(api: &TestApi) {
     let persistence = api.migration_persistence();
     let result = persistence.last();
     assert_eq!(result.is_some(), false);
 }
 
 #[test_each_connector]
-fn last_must_return_none_if_there_is_no_successful_migration(api: &TestApi) {
+async fn last_must_return_none_if_there_is_no_successful_migration(api: &TestApi) {
     let persistence = api.migration_persistence();
     persistence.create(Migration::new("my_migration".to_string()));
     let loaded = persistence.last();
@@ -23,14 +23,14 @@ fn last_must_return_none_if_there_is_no_successful_migration(api: &TestApi) {
 }
 
 #[test_each_connector]
-fn load_all_should_return_empty_if_there_is_no_migration(api: &TestApi) {
+async fn load_all_should_return_empty_if_there_is_no_migration(api: &TestApi) {
     let persistence = api.migration_persistence();
     let result = persistence.load_all();
     assert_eq!(result.is_empty(), true);
 }
 
 #[test_each_connector]
-fn load_all_must_return_all_created_migrations(api: &TestApi) {
+async fn load_all_must_return_all_created_migrations(api: &TestApi) {
     let persistence = api.migration_persistence();
     let migration1 = persistence.create(Migration::new("migration_1".to_string()));
     let migration2 = persistence.create(Migration::new("migration_2".to_string()));
@@ -47,7 +47,7 @@ fn load_all_must_return_all_created_migrations(api: &TestApi) {
 }
 
 #[test_each_connector]
-fn create_should_allow_to_create_a_new_migration(api: &TestApi) {
+async fn create_should_allow_to_create_a_new_migration(api: &TestApi) {
     let datamodel = datamodel::parse_datamodel(
         r#"
                 model Test {
@@ -83,7 +83,7 @@ fn create_should_allow_to_create_a_new_migration(api: &TestApi) {
 }
 
 #[test_each_connector]
-fn create_should_increment_revisions(api: &TestApi) {
+async fn create_should_increment_revisions(api: &TestApi) {
     let persistence = api.migration_persistence();
     let migration1 = persistence.create(Migration::new("migration_1".to_string()));
     let migration2 = persistence.create(Migration::new("migration_2".to_string()));
@@ -91,7 +91,7 @@ fn create_should_increment_revisions(api: &TestApi) {
 }
 
 #[test_each_connector]
-fn update_must_work(api: &TestApi) {
+async fn update_must_work(api: &TestApi) {
     let persistence = api.migration_persistence();
     let migration = persistence.create(Migration::new("my_migration".to_string()));
 

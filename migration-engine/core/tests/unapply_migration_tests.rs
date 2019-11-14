@@ -4,7 +4,7 @@ use pretty_assertions::assert_eq;
 use test_harness::*;
 
 #[test_each_connector]
-fn unapply_must_work(api: &TestApi) {
+async fn unapply_must_work(api: &TestApi) {
     let dm1 = r#"
             model Test {
                 id String @id @default(cuid())
