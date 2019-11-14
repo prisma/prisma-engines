@@ -11,8 +11,8 @@ use migration_core::{
     api::{GenericApi, MigrationApi},
     commands::{ApplyMigrationInput, InferMigrationStepsInput},
 };
-use sql_connection::{ConnectionInfo, SyncSqlConnection};
-use sql_migration_connector::SqlFamily;
+use quaint::prelude::{ConnectionInfo, SqlFamily};
+use sql_connection::SyncSqlConnection;
 use sql_schema_describer::*;
 use std::sync::Arc;
 
@@ -40,6 +40,10 @@ impl TestApi {
 
     pub fn connection_info(&self) -> Option<&ConnectionInfo> {
         self.connection_info.as_ref()
+    }
+
+    pub fn sql_family(&self) -> SqlFamily {
+        self.sql_family
     }
 
     pub fn apply_migration(&self, steps: Vec<MigrationStep>, migration_id: &str) -> InferAndApplyOutput {
@@ -114,7 +118,7 @@ impl TestApi {
 }
 
 pub fn mysql_8_test_api() -> TestApi {
-    let connection_info = ConnectionInfo::from_url_str(&mysql_8_url()).unwrap();
+    let connection_info = ConnectionInfo::from_url(&mysql_8_url()).unwrap();
     let connector = mysql_migration_connector(&mysql_8_url());
 
     TestApi {
@@ -126,7 +130,7 @@ pub fn mysql_8_test_api() -> TestApi {
 }
 
 pub fn mysql_test_api() -> TestApi {
-    let connection_info = ConnectionInfo::from_url_str(&mysql_url()).unwrap();
+    let connection_info = ConnectionInfo::from_url(&mysql_url()).unwrap();
     let connector = mysql_migration_connector(&mysql_url());
 
     TestApi {
@@ -138,7 +142,7 @@ pub fn mysql_test_api() -> TestApi {
 }
 
 pub fn postgres_test_api() -> TestApi {
-    let connection_info = ConnectionInfo::from_url_str(&postgres_url()).unwrap();
+    let connection_info = ConnectionInfo::from_url(&postgres_url()).unwrap();
     let connector = postgres_migration_connector(&postgres_url());
 
     TestApi {
@@ -150,7 +154,7 @@ pub fn postgres_test_api() -> TestApi {
 }
 
 pub fn sqlite_test_api() -> TestApi {
-    let connection_info = ConnectionInfo::from_url_str(&sqlite_test_file()).unwrap();
+    let connection_info = ConnectionInfo::from_url(&sqlite_test_file()).unwrap();
     let connector = sqlite_migration_connector();
 
     TestApi {

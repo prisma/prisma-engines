@@ -12,11 +12,11 @@ mod sql_schema_calculator;
 mod sql_schema_differ;
 
 pub use error::*;
-pub use sql_connection::SqlFamily;
 pub use sql_migration::*;
 
 use migration_connector::*;
-use sql_connection::{ConnectionInfo, GenericSqlConnection, SyncSqlConnection};
+use quaint::prelude::{ConnectionInfo, SqlFamily};
+use sql_connection::{GenericSqlConnection, SyncSqlConnection};
 use sql_database_migration_inferrer::*;
 use sql_database_step_applier::*;
 use sql_destructive_changes_checker::*;
@@ -41,7 +41,7 @@ pub struct SqlMigrationConnector {
 impl SqlMigrationConnector {
     pub fn new_from_database_str(database_str: &str) -> std::result::Result<Self, ConnectorError> {
         let connection_info =
-            ConnectionInfo::from_url_str(database_str).map_err(|_err| ConnectorError::InvalidDatabaseUrl)?;
+            ConnectionInfo::from_url(database_str).map_err(|_err| ConnectorError::InvalidDatabaseUrl)?;
 
         let connection = GenericSqlConnection::from_database_str(database_str, Some("lift"))
             .map_err(SqlError::from)
@@ -52,7 +52,7 @@ impl SqlMigrationConnector {
 
     pub fn new(datasource: &dyn datamodel::Source) -> std::result::Result<Self, ConnectorError> {
         let connection_info =
-            ConnectionInfo::from_datasource(datasource).map_err(|_err| ConnectorError::InvalidDatabaseUrl)?;
+            ConnectionInfo::from_url(&datasource.url().value).map_err(|_err| ConnectorError::InvalidDatabaseUrl)?;
 
         let connection = GenericSqlConnection::from_datasource(datasource, Some("lift"))
             .map_err(SqlError::from)
@@ -74,7 +74,7 @@ impl SqlMigrationConnector {
             .schema_name()
             .unwrap_or_else(|| "lift".to_owned());
         let sql_family = connection.connection_info().sql_family();
-        let connection_info = connection.connection_info();
+        let connection_info = connection.connection_info().clone();
 
         let conn = Arc::new(connection) as Arc<dyn SyncSqlConnection + Send + Sync>;
 
@@ -181,7 +181,7 @@ impl MigrationConnector for SqlMigrationConnector {
     type DatabaseMigration = SqlMigration;
 
     fn connector_type(&self) -> &'static str {
-        self.connection_info.sql_family().connector_type_string()
+        self.connection_info.sql_family().as_str()
     }
 
     fn create_database(&self, db_name: &str) -> ConnectorResult<()> {

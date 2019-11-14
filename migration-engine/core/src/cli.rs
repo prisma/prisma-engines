@@ -2,7 +2,7 @@ use clap::ArgMatches;
 use failure::Fail;
 use itertools::Itertools;
 use migration_connector::*;
-use sql_connection::SqlFamily;
+use quaint::prelude::SqlFamily;
 use sql_migration_connector::SqlMigrationConnector;
 use std::collections::HashMap;
 use url::Url;
@@ -291,7 +291,7 @@ pub fn render_error(cli_error: CliError) -> user_facing_errors::Error {
 #[cfg(test)]
 mod tests {
     use super::CliError;
-    use sql_connection::{Mysql, Postgresql, SyncSqlConnection};
+    use sql_connection::{GenericSqlConnection, SyncSqlConnection};
 
     fn with_cli<F>(matches: Vec<&str>, f: F) -> Result<(), Box<dyn std::any::Any + Send + 'static>>
     where
@@ -426,8 +426,8 @@ mod tests {
             });
 
             {
-                let uri = url::Url::parse(&mysql_url(None)).unwrap();
-                let conn = Mysql::new(uri).unwrap();
+                let uri = mysql_url(None);
+                let conn = GenericSqlConnection::from_database_str(&uri, None).unwrap();
 
                 conn.execute_raw("DROP DATABASE `this_should_exist`", &[]).unwrap();
             }
@@ -455,8 +455,8 @@ mod tests {
             });
 
             {
-                let uri = url::Url::parse(&postgres_url(None)).unwrap();
-                let conn = Postgresql::new(uri).unwrap();
+                let uri = postgres_url(None);
+                let conn = GenericSqlConnection::from_database_str(&uri, None).unwrap();
 
                 conn.execute_raw("DROP DATABASE \"this_should_exist\"", &[]).unwrap();
             }

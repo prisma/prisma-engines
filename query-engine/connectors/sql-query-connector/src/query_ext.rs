@@ -7,7 +7,7 @@ use async_trait::async_trait;
 use prisma_models::*;
 use quaint::{
     ast::*,
-    PooledConnection,
+    pool::PooledConnection,
     connector::{self, Queryable},
 };
 use serde_json::{Map, Number, Value};

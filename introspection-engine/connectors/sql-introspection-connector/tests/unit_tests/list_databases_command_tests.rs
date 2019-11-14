@@ -1,4 +1,5 @@
-use crate::{list_databases, test_backend, BarrelMigrationExecutor, SqlFamily};
+use crate::{list_databases, test_backend, BarrelMigrationExecutor};
+use quaint::pool::SqlFamily;
 use barrel::types;
 
 pub const SCHEMA_NAME: &str = "introspection-engine";

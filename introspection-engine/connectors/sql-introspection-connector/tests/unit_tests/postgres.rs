@@ -1,4 +1,5 @@
 use crate::*;
+use quaint::pool::SqlFamily;
 use barrel::types;
 use test_harness::*;
 
