@@ -52,3 +52,9 @@ choice.
 
 - See `.envrc` for connection params. Override variables if different. MySQL and
   PostgreSQL needs to be running for tests to succeed.
+  
+Then:
+  
+``` sh
+> cargo test
+```
