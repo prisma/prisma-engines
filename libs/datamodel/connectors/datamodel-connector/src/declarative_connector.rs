@@ -79,15 +79,15 @@ impl FieldTypeConstructor {
         }
     }
 
-    fn name(&self) -> &str {
+    pub fn name(&self) -> &str {
         &self.name
     }
 
-    fn number_of_args(&self) -> usize {
+    pub fn number_of_args(&self) -> usize {
         self.number_of_args
     }
 
-    fn datasource_type(&self, args: &Vec<i32>) -> String {
+    pub fn datasource_type(&self, args: &Vec<i32>) -> String {
         if self.number_of_args != args.len() {
             panic!(
                 "Did not provide the required number of arguments. {} were required, but were {} provided.",
@@ -103,7 +103,7 @@ impl FieldTypeConstructor {
         }
     }
 
-    fn prisma_type(&self) -> ScalarType {
+    pub fn prisma_type(&self) -> ScalarType {
         self.prisma_type
     }
 }

@@ -10,6 +10,7 @@ pub trait Connector {
     fn calculate_type(&self, name: &str, args: Vec<i32>) -> ScalarFieldType;
 }
 
+#[derive(Debug, Clone, PartialEq)]
 pub struct ScalarFieldType {
     name: String,
     prisma_type: scalars::ScalarType,

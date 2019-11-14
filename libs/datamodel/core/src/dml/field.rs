@@ -1,4 +1,5 @@
 use super::*;
+use datamodel_connector::ScalarFieldType;
 
 /// Datamodel field arity.
 #[derive(Debug, PartialEq, Copy, Clone)]
@@ -22,10 +23,7 @@ pub enum FieldType {
     /// This is a relation field.
     Relation(RelationInfo),
     /// Connector specific field type.
-    ConnectorSpecific {
-        base_type: ScalarType,
-        connector_type: Option<String>,
-    },
+    ConnectorSpecific { connector_type: ScalarFieldType },
     /// Base (built-in scalar) type.
     Base(ScalarType),
 }
