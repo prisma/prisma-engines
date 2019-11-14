@@ -19,6 +19,10 @@ pub enum ConnectionInfo {
 }
 
 impl ConnectionInfo {
+    /// Parse `ConnectionInfo` out from an SQL connection string.
+    ///
+    /// Will fail if URI is invalid or the scheme points to an unsupported
+    /// database.
     pub fn from_url(url_str: &str) -> crate::Result<Self> {
         let url_result: Result<Url, _> = url_str.parse();
 
@@ -60,6 +64,8 @@ impl ConnectionInfo {
         }
     }
 
+    /// Will be the database name for MySQL and SQLite, pointing to an actual
+    /// schema in PostgreSQL.
     pub fn schema_name(&self) -> Option<String> {
         match self {
             ConnectionInfo::Postgres(url) => Some(url.schema()),
@@ -86,6 +92,7 @@ impl ConnectionInfo {
         }
     }
 
+    /// The database file for SQLite, otherwise `None`.
     pub fn file_path(&self) -> Option<&str> {
         match self {
             ConnectionInfo::Postgres(_) => None,
@@ -94,6 +101,7 @@ impl ConnectionInfo {
         }
     }
 
+    /// The family of databases connected.
     pub fn sql_family(&self) -> SqlFamily {
         match self {
             ConnectionInfo::Postgres(_) => SqlFamily::Postgres,
@@ -112,7 +120,8 @@ pub enum SqlFamily {
 }
 
 impl SqlFamily {
-    pub fn connector_type_string(&self) -> &'static str {
+    /// Get a string representation of the family.
+    pub fn as_str(&self) -> &'static str {
         match self {
             SqlFamily::Postgres => "postgresql",
             SqlFamily::Mysql => "mysql",
@@ -120,6 +129,7 @@ impl SqlFamily {
         }
     }
 
+    /// Convert url scheme to an SqlFamily.
     pub fn from_scheme(url_scheme: &str) -> Option<Self> {
         match url_scheme {
             "sqlite" | "file" => Some(SqlFamily::Sqlite),
@@ -129,6 +139,7 @@ impl SqlFamily {
         }
     }
 
+    /// Check if a family exists for the given scheme.
     pub fn scheme_is_supported(url_scheme: &str) -> bool {
         Self::from_scheme(url_scheme).is_some()
     }
