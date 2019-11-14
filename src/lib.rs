@@ -111,7 +111,7 @@ pub mod pool;
 pub type Result<T> = std::result::Result<T, error::Error>;
 
 use lazy_static::lazy_static;
-use pool::{QuaintManager, ConnectionInfo, PooledConnection};
+use pool::{QuaintManager, ConnectionInfo, PooledConnection, SqlFamily};
 use connector::{DBIO, Queryable};
 use url::Url;
 use tokio_resource_pool::{Builder, Pool};
@@ -221,24 +221,12 @@ impl Quaint {
             _ => { unimplemented!("Supported url schemes: file or sqlite, mysql, postgres or postgresql.") }
         };
 
-        #[cfg(not(feature = "tracing-log"))]
-        {
-            info!(
-                "Starting a Quaint pool with {} connections.",
-                connection_limit,
-            );
-        }
-        #[cfg(feature = "tracing-log")]
-        {
-            tracing::info!(
-                "Starting a Quaint pool with {} connections.",
-                connection_limit,
-            )
-        }
+        let connection_info = ConnectionInfo::from_url(url_str)?;
+        Self::log_start(connection_info.sql_family(), connection_limit);
 
         Ok(Self {
             inner: Builder::new().build(connection_limit as usize, manager),
-            connection_info: ConnectionInfo::from_url(url_str)?,
+            connection_info,
         })
     }
 
@@ -258,6 +246,18 @@ impl Quaint {
     pub fn connection_info(&self) -> &ConnectionInfo {
         &self.connection_info
     }
+
+    fn log_start(family: SqlFamily, connection_limit: u32) {
+        #[cfg(not(feature = "tracing-log"))]
+        {
+            info!("Starting a {} pool with {} connections.", family, connection_limit);
+        }
+        #[cfg(feature = "tracing-log")]
+        {
+            tracing::info!("Starting a {} pool with {} connections.", family, connection_limit);
+        }
+    }
+
 }
 
 impl Queryable for Quaint {

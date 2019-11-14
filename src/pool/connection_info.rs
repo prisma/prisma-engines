@@ -1,6 +1,6 @@
 use crate::{connector::{PostgresUrl, MysqlUrl, SqliteParams}, error::Error};
 use url::Url;
-use std::{convert::TryFrom, borrow::Cow};
+use std::{convert::TryFrom, borrow::Cow, fmt};
 
 /// General information about a SQL connection.
 #[derive(Debug, Clone)]
@@ -142,5 +142,11 @@ impl SqlFamily {
     /// Check if a family exists for the given scheme.
     pub fn scheme_is_supported(url_scheme: &str) -> bool {
         Self::from_scheme(url_scheme).is_some()
+    }
+}
+
+impl fmt::Display for SqlFamily {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.as_str())
     }
 }

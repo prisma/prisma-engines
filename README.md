@@ -47,3 +47,8 @@ async fn main() -> Result<(), quaint::error::Error> {
 
 For type-safe database abstraction, [Diesel](https://diesel.rs/) is an excellent
 choice.
+
+### Testing:
+
+- See `.envrc` for connection params. Override variables if different. MySQL and
+  PostgreSQL needs to be running for tests to succeed.
