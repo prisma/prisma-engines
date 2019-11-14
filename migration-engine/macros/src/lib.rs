@@ -12,7 +12,7 @@ struct TestOneConnectorArgs {
     connector: String,
 }
 
-const CONNECTOR_NAMES: &[&'static str] = &["postgres", "mysql", "sqlite"];
+const CONNECTOR_NAMES: &[&'static str] = &["postgres", "mysql", "mysql_8", "sqlite"];
 
 #[derive(Debug, FromMeta)]
 struct TestEachConnectorArgs {
@@ -26,7 +26,7 @@ impl TestEachConnectorArgs {
         let ignore = self.ignore.as_ref().map(String::as_str);
 
         CONNECTOR_NAMES.iter().filter(move |connector_name| match ignore {
-            Some(ignore) => connector_name != &&ignore,
+            Some(ignore) => !connector_name.starts_with(&ignore),
             None => true,
         })
     }
