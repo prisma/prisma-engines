@@ -1,5 +1,5 @@
 use super::common::*;
-use crate::{ast, common::names::*, configuration, dml, error::ErrorCollection, OnDeleteStrategy};
+use crate::{ast, common::names::*, dml, error::ErrorCollection, OnDeleteStrategy};
 use prisma_inflector;
 
 /// Helper for standardsing a datamodel.

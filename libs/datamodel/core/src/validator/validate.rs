@@ -1,5 +1,5 @@
 use crate::{
-    ast, configuration, dml,
+    ast, dml,
     error::{DatamodelError, ErrorCollection},
 };
 

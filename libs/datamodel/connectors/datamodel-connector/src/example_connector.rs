@@ -28,19 +28,19 @@ impl ExampleConnector {
             TypeAlias::new("Bool", "Boolean"),
             TypeAlias::new("VarBit", "BitVarying"),
         ];
-        /// missing because of interpolation:
-        /// Numeric, Character, CharacterVarying, Timestamp, TimestampWithTimeZone, Time
-        /// Bit, BitVarying
-        ///
-        /// types for which photon types are unclear:
-        /// ByteA, Date, TimeTZ
-        /// Point, Line, LSeg, Box, Path, Polygon, Circle
-        /// CIDR, INet, Macaddr
-        /// TSVector, TSQuery
-        /// UUID
-        /// XML, JSON, JSONB
-        /// Int4Range, Int8Range, NumRange, TSRange, TSTZRange, DateRange
-        /// TXIDSnapshot
+        // missing because of interpolation:
+        // Numeric, Character, CharacterVarying, Timestamp, TimestampWithTimeZone, Time
+        // Bit, BitVarying
+        //
+        // types for which photon types are unclear:
+        // ByteA, Date, TimeTZ
+        // Point, Line, LSeg, Box, Path, Polygon, Circle
+        // CIDR, INet, Macaddr
+        // TSVector, TSQuery
+        // UUID
+        // XML, JSON, JSONB
+        // Int4Range, Int8Range, NumRange, TSRange, TSTZRange, DateRange
+        // TXIDSnapshot
         let field_type_constructors = vec![
             FieldTypeConstructor::without_args("BigInt", "bigint", ScalarType::Int),
             FieldTypeConstructor::without_args("BigSerial", "bigserial", ScalarType::Int),

@@ -1,1 +1,2 @@
+#[allow(unused)]
 enum ConnectorError {}
