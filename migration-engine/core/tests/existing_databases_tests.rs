@@ -5,7 +5,7 @@ use barrel::{types, Migration, SqlVariant};
 use migration_core::api::GenericApi;
 use pretty_assertions::{assert_eq, assert_ne};
 use sql_connection::SyncSqlConnection;
-use sql_migration_connector::SqlFamily;
+use quaint::prelude::SqlFamily;
 use sql_migration_connector::SqlMigrationConnector;
 use sql_schema_describer::*;
 use std::sync::Arc;

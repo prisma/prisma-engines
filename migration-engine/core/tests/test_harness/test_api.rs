@@ -12,7 +12,7 @@ use migration_core::{
     commands::{ApplyMigrationInput, InferMigrationStepsInput, UnapplyMigrationInput, UnapplyMigrationOutput},
 };
 use sql_connection::SyncSqlConnection;
-use sql_migration_connector::SqlFamily;
+use quaint::prelude::SqlFamily;
 use sql_schema_describer::*;
 use std::sync::Arc;
 

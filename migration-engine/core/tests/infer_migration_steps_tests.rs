@@ -5,7 +5,8 @@ use datamodel::dml::*;
 use migration_connector::MigrationStep;
 use migration_core::commands::*;
 use pretty_assertions::{assert_eq, assert_ne};
-use sql_migration_connector::{AlterTable, CreateTable, PrettySqlMigrationStep, SqlFamily, SqlMigrationStep};
+use sql_migration_connector::{AlterTable, CreateTable, PrettySqlMigrationStep, SqlMigrationStep};
+use quaint::prelude::SqlFamily;
 use sql_schema_describer::Table;
 use test_harness::*;
 
