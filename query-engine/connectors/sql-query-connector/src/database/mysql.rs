@@ -2,7 +2,7 @@ use super::connection::SqlConnection;
 use crate::{query_builder::ManyRelatedRecordsWithUnionAll, FromSource, SqlError};
 use connector_interface::{Connection, Connector, IO};
 use datamodel::Source;
-use quaint::pool::Quaint;
+use quaint::Quaint;
 
 pub struct Mysql {
     pool: Quaint,

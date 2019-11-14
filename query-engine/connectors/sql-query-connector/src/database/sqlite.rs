@@ -2,10 +2,7 @@ use super::connection::SqlConnection;
 use crate::{query_builder::ManyRelatedRecordsWithRowNumber, FromSource, SqlError};
 use connector_interface::{Connection, Connector, IO};
 use datamodel::Source;
-use quaint::{
-    connector::SqliteParams,
-    pool::Quaint,
-};
+use quaint::{connector::SqliteParams, Quaint};
 use std::convert::TryFrom;
 use url::Url;
 
