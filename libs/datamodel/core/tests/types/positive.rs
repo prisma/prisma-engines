@@ -118,11 +118,36 @@ fn should_be_able_to_define_custom_enum_types() {
 }
 
 #[test]
+#[ignore]
 fn should_handle_type_mappings() {
     let dml = r#"
         model Blog {
             id     Int    @id
             bigInt BigInt
+        }
+    "#;
+
+    let datamodel = parse(dml);
+
+    let user_model = datamodel.assert_has_model("Blog");
+
+    user_model
+        .assert_has_field("bigInt")
+        .assert_connector_type(&ScalarFieldType::new("BigInt", ScalarType::Int, "bigint"));
+}
+
+#[test]
+#[ignore]
+fn should_handle_type_specifications() {
+    let dml = r#"
+        datasource pg {
+          provider = "postgres"
+          url = "postgresql://"
+        }
+        
+        model Blog {
+            id     Int @id
+            bigInt Int @pg.BigInt
         }
     "#;
 

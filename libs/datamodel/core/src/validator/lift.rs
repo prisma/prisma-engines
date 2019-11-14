@@ -17,6 +17,8 @@ pub struct LiftAstToDml {
     directives: DirectiveBox,
 }
 
+const USE_CONNECTORS_FOR_CUSTOM_TYPES: bool = false; // FEATURE FLAG
+
 impl LiftAstToDml {
     /// Creates a new instance, with all builtin directives registered.
     pub fn new() -> Self {
@@ -169,7 +171,24 @@ impl LiftAstToDml {
         let type_name = &ast_field.field_type.name;
 
         if let Ok(scalar_type) = ScalarType::from_str(type_name) {
-            Ok((dml::FieldType::Base(scalar_type), vec![]))
+            if USE_CONNECTORS_FOR_CUSTOM_TYPES {
+                let pg_connector = ExampleConnector::postgres();
+                let args = vec![]; // TODO: figure out args
+                let pg_type_specification = ast_field
+                    .directives
+                    .iter()
+                    .find(|dir| dir.name.name.starts_with("pg.")) // we use find because there should be at max 1.
+                    .map(|dir| dir.name.name.trim_start_matches("pg."));
+
+                if let Some(x) = pg_type_specification.and_then(|ts| pg_connector.calculate_type(&ts, args)) {
+                    let field_type = dml::FieldType::ConnectorSpecific(x);
+                    Ok((field_type, vec![]))
+                } else {
+                    Ok((dml::FieldType::Base(scalar_type), vec![]))
+                }
+            } else {
+                Ok((dml::FieldType::Base(scalar_type), vec![]))
+            }
         } else if ast_schema.find_model(type_name).is_some() {
             Ok((dml::FieldType::Relation(dml::RelationInfo::new(type_name)), vec![]))
         } else if ast_schema.find_enum(type_name).is_some() {
@@ -199,7 +218,6 @@ impl LiftAstToDml {
             ));
         }
 
-        let use_connectors = true; // FEATURE FLAG
         if let Some(custom_type) = ast_schema.find_type_alias(&type_name) {
             checked_types.push(custom_type.name.name.clone());
             let (field_type, mut attrs) = self.lift_field_type(custom_type, ast_schema, checked_types)?;
@@ -213,10 +231,11 @@ impl LiftAstToDml {
 
             attrs.append(&mut custom_type.directives.clone());
             Ok((field_type, attrs))
-        } else if use_connectors {
-            let connector = ExampleConnector::postgres();
+        } else if USE_CONNECTORS_FOR_CUSTOM_TYPES {
+            let pg_connector = ExampleConnector::postgres();
             let args = vec![]; // TODO: figure out args
-            if let Some(x) = connector.calculate_type(&ast_field.field_type.name, args) {
+
+            if let Some(x) = pg_connector.calculate_type(&ast_field.field_type.name, args) {
                 let field_type = dml::FieldType::ConnectorSpecific(x);
                 Ok((field_type, vec![]))
             } else {
