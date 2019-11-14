@@ -1,5 +1,5 @@
 [package]
-name = "migration-engine-macros"
+name = "test-macros"
 version = "0.1.0"
 authors = ["Tom Houlé <tom@tomhoule.com>"]
 edition = "2018"
