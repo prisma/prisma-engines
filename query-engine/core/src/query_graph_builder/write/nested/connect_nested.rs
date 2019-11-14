@@ -109,6 +109,8 @@ fn handle_many_to_many(
 /// ```
 /// The ID of the child is injected into the parent operation. This can be more than one record getting updated.
 ///
+/// ---
+///
 /// In case the relation is inline in the child, we can have the parent execute first,
 /// then do an update on the child to insert the parent ID into the inline relation field.
 /// ```text
