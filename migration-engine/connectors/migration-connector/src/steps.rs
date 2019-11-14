@@ -276,6 +276,7 @@ pub struct CreateTypeAlias {
 pub struct UpdateTypeAlias {
     pub type_alias: String,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub r#type: Option<String>,
 }
 
