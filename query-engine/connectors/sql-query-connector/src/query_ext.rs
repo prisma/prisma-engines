@@ -3,21 +3,25 @@ use connector_interface::{
     error::RecordFinderInfo,
     filter::{Filter, RecordFinder},
 };
+use async_trait::async_trait;
 use prisma_models::*;
-use prisma_query::{
+use quaint::{
     ast::*,
+    pool::PooledConnection,
     connector::{self, Queryable},
 };
 use serde_json::{Map, Number, Value};
-use std::{convert::TryFrom, sync::Arc};
+use std::convert::TryFrom;
 
 impl<'t> QueryExt for connector::Transaction<'t> {}
+impl QueryExt for PooledConnection {}
 
 /// Functions for querying data.
 /// Basically represents a connection wrapper?
-pub trait QueryExt: Queryable {
-    fn filter(&mut self, q: Query, idents: &[TypeIdentifier]) -> crate::Result<Vec<SqlRow>> {
-        let result_set = self.query(q)?;
+#[async_trait]
+pub trait QueryExt: Queryable + Send + Sync {
+    async fn filter(&self, q: Query<'_>, idents: &[TypeIdentifier]) -> crate::Result<Vec<SqlRow>> {
+        let result_set = self.query(q).await?;
         let mut sql_rows = Vec::new();
 
         for row in result_set {
@@ -27,9 +31,9 @@ pub trait QueryExt: Queryable {
         Ok(sql_rows)
     }
 
-    fn raw_json(&mut self, q: RawQuery) -> crate::Result<Value> {
+    async fn raw_json(&self, q: RawQuery) -> crate::Result<Value> {
         if q.is_select() {
-            let result_set = self.query_raw(q.0.as_str(), &[])?;
+            let result_set = self.query_raw(q.0.as_str(), &[]).await?;
             let columns: Vec<String> = result_set.columns().map(ToString::to_string).collect();
             let mut result = Vec::new();
 
@@ -46,21 +50,21 @@ pub trait QueryExt: Queryable {
 
             Ok(Value::Array(result))
         } else {
-            let changes = self.execute_raw(q.0.as_str(), &[])?;
+            let changes = self.execute_raw(q.0.as_str(), &[]).await?;
             Ok(Value::Number(Number::from(changes)))
         }
     }
 
     /// Find one full record selecting all scalar fields.
-    fn find_record(&mut self, record_finder: &RecordFinder) -> crate::Result<SingleRecord> {
+    async fn find_record(&self, record_finder: &RecordFinder) -> crate::Result<SingleRecord> {
         use SqlError::*;
 
         let model = record_finder.field.model();
-        let selected_fields = SelectedFields::from(Arc::clone(&model));
-        let select = ReadQueryBuilder::get_records(model, &selected_fields, record_finder);
+        let selected_fields = SelectedFields::from(&model);
+        let select = ReadQueryBuilder::get_records(&model, &selected_fields, record_finder);
         let idents = selected_fields.type_identifiers();
 
-        let row = self.find(select, idents.as_slice()).map_err(|e| match e {
+        let row = self.find(select, idents.as_slice()).await.map_err(|e| match e {
             RecordDoesNotExist => RecordNotFoundForWhere(RecordFinderInfo::from(record_finder)),
             e => e,
         })?;
@@ -71,28 +75,36 @@ pub trait QueryExt: Queryable {
     }
 
     /// Select one row from the database.
-    fn find(&mut self, q: Select, idents: &[TypeIdentifier]) -> crate::Result<SqlRow> {
-        self.filter(q.limit(1).into(), idents)?
+    async fn find(&self, q: Select<'_>, idents: &[TypeIdentifier]) -> crate::Result<SqlRow> {
+        self.filter(q.limit(1).into(), idents)
+            .await?
             .into_iter()
             .next()
             .ok_or(SqlError::RecordDoesNotExist)
     }
 
     /// Read the first column from the first row as an integer.
-    fn find_int(&mut self, q: Select) -> crate::Result<i64> {
+    async fn find_int(&self, q: Select<'_>) -> crate::Result<i64> {
         // UNWRAP: A dataset will always have at least one column, even if it contains no data.
-        let id = self.find(q, &[TypeIdentifier::Int])?.values.into_iter().next().unwrap();
+        let id = self
+            .find(q, &[TypeIdentifier::Int])
+            .await?
+            .values
+            .into_iter()
+            .next()
+            .unwrap();
 
         Ok(i64::try_from(id)?)
     }
 
     /// Read the first column from the first row as an `GraphqlId`.
-    fn find_id(&mut self, record_finder: &RecordFinder) -> crate::Result<GraphqlId> {
+    async fn find_id(&self, record_finder: &RecordFinder) -> crate::Result<GraphqlId> {
         let model = record_finder.field.model();
         let filter = Filter::from(record_finder.clone());
 
         let id = self
-            .filter_ids(model, filter)?
+            .filter_ids(&model, filter)
+            .await?
             .into_iter()
             .next()
             .ok_or_else(|| SqlError::RecordNotFoundForWhere(RecordFinderInfo::from(record_finder)))?;
@@ -101,16 +113,16 @@ pub trait QueryExt: Queryable {
     }
 
     /// Read the all columns as an `GraphqlId`
-    fn filter_ids(&mut self, model: ModelRef, filter: Filter) -> crate::Result<Vec<GraphqlId>> {
+    async fn filter_ids(&self, model: &ModelRef, filter: Filter) -> crate::Result<Vec<GraphqlId>> {
         let select = Select::from_table(model.table())
             .column(model.fields().id().as_column())
             .so_that(filter.aliased_cond(None));
 
-        self.select_ids(select)
+        self.select_ids(select).await
     }
 
-    fn select_ids(&mut self, select: Select) -> crate::Result<Vec<GraphqlId>> {
-        let mut rows = self.filter(select.into(), &[TypeIdentifier::GraphQLID])?;
+    async fn select_ids(&self, select: Select<'_>) -> crate::Result<Vec<GraphqlId>> {
+        let mut rows = self.filter(select.into(), &[TypeIdentifier::GraphQLID]).await?;
         let mut result = Vec::new();
 
         for mut row in rows.drain(0..) {
@@ -124,17 +136,19 @@ pub trait QueryExt: Queryable {
 
     /// Find a child of a parent. Will return an error if no child found with
     /// the given parameters. A more restrictive version of `get_ids_by_parents`.
-    fn find_id_by_parent(
-        &mut self,
-        parent_field: RelationFieldRef,
+    async fn find_id_by_parent(
+        &self,
+        parent_field: &RelationFieldRef,
         parent_id: &GraphqlId,
         selector: &Option<RecordFinder>,
     ) -> crate::Result<GraphqlId> {
-        let ids = self.filter_ids_by_parents(
-            Arc::clone(&parent_field),
-            vec![parent_id],
-            selector.clone().map(Filter::from),
-        )?;
+        let ids = self
+            .filter_ids_by_parents(
+                parent_field,
+                vec![parent_id],
+                selector.clone().map(Filter::from),
+            )
+            .await?;
 
         let id = ids.into_iter().next().ok_or_else(|| SqlError::RecordsNotConnected {
             relation_name: parent_field.relation().name.clone(),
@@ -149,9 +163,9 @@ pub trait QueryExt: Queryable {
 
     /// Find all children record id's with the given parent id's, optionally given
     /// a `Filter` for extra filtering.
-    fn filter_ids_by_parents(
-        &mut self,
-        parent_field: RelationFieldRef,
+    async fn filter_ids_by_parents(
+        &self,
+        parent_field: &RelationFieldRef,
         parent_ids: Vec<&GraphqlId>,
         selector: Option<Filter>,
     ) -> crate::Result<Vec<GraphqlId>> {
@@ -183,6 +197,6 @@ pub trait QueryExt: Queryable {
             .column(related_model.fields().id().as_column())
             .so_that(conditions);
 
-        self.select_ids(select)
+        self.select_ids(select).await
     }
 }

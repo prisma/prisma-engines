@@ -1,43 +1,26 @@
-use super::transaction::SqlConnectorTransaction;
+use super::connection::SqlConnection;
 use crate::{query_builder::ManyRelatedRecordsWithRowNumber, FromSource, SqlError};
-use connector_interface::*;
+use connector_interface::{Connection, Connector, IO};
 use datamodel::Source;
-use prisma_query::{
-    connector::{PostgresParams, Queryable},
-    pool::{postgres::PostgresManager, PrismaConnectionManager},
-};
-use std::convert::TryFrom;
-
-type Pool = r2d2::Pool<PrismaConnectionManager<PostgresManager>>;
+use quaint::Quaint;
 
 pub struct PostgreSql {
-    pool: Pool,
+    pool: Quaint,
 }
 
 impl FromSource for PostgreSql {
     fn from_source(source: &dyn Source) -> crate::Result<Self> {
-        let url = url::Url::parse(&source.url().value)?;
-        let params = PostgresParams::try_from(url)?;
-        let pool = r2d2::Pool::try_from(params).unwrap();
-
-        Ok(PostgreSql { pool })
+        Ok(PostgreSql { pool: Quaint::new(&source.url().value)? })
     }
 }
 
 impl Connector for PostgreSql {
-    fn with_transaction<F, T>(&self, f: F) -> connector_interface::Result<T>
-    where
-        F: FnOnce(&mut dyn connector_interface::TransactionLike) -> connector_interface::Result<T>,
-    {
-        let mut conn = self.pool.get().map_err(SqlError::from)?;
-        let tx = conn.start_transaction().map_err(SqlError::from)?;
-        let mut tx = SqlConnectorTransaction::<ManyRelatedRecordsWithRowNumber>::new(tx);
-        let result = f(&mut tx);
+    fn get_connection<'a>(&'a self) -> IO<Box<dyn Connection + 'a>> {
+        IO::new(async move {
+            let conn = self.pool.check_out().await.map_err(SqlError::from)?;
+            let conn = SqlConnection::<_, ManyRelatedRecordsWithRowNumber>::new(conn);
 
-        if result.is_ok() {
-            tx.commit()?;
-        }
-
-        result
+            Ok(Box::new(conn) as Box<dyn Connection>)
+        })
     }
 }

@@ -1,18 +1,29 @@
 //! SQLite description.
 use super::*;
-use crate::SqlConnection;
+use failure::_core::convert::TryInto;
 use log::debug;
-use prisma_query::ast::ParameterizedValue;
+use quaint::ast::ParameterizedValue;
+use sql_connection::SyncSqlConnection;
 use std::collections::HashMap;
 use std::sync::Arc;
 
 pub struct SqlSchemaDescriber {
-    conn: Arc<dyn SqlConnection>,
+    conn: Arc<dyn SyncSqlConnection + Send + Sync + 'static>,
 }
 
 impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
     fn list_databases(&self) -> SqlSchemaDescriberResult<Vec<String>> {
-        Ok(vec![])
+        let databases = self.get_databases();
+        Result::Ok(databases)
+    }
+
+    fn get_metadata(&self, schema: &str) -> SqlSchemaDescriberResult<SQLMetadata> {
+        let count = self.get_table_names(&schema).len();
+        let size = self.get_size(&schema);
+        Result::Ok(SQLMetadata {
+            table_count: count,
+            size_in_bytes: size,
+        })
     }
 
     fn describe(&self, schema: &str) -> SqlSchemaDescriberResult<SqlSchema> {
@@ -35,14 +46,32 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
 
 impl SqlSchemaDescriber {
     /// Constructor.
-    pub fn new(conn: Arc<dyn SqlConnection>) -> SqlSchemaDescriber {
+    pub fn new(conn: Arc<dyn SyncSqlConnection + Send + Sync + 'static>) -> SqlSchemaDescriber {
         SqlSchemaDescriber { conn }
+    }
+
+    fn get_databases(&self) -> Vec<String> {
+        debug!("Getting table names");
+        let sql = "PRAGMA database_list;";
+        let rows = self.conn.query_raw(sql, &[]).expect("get schema names ");
+        let names = rows
+            .into_iter()
+            .map(|row| {
+                row.get("file")
+                    .and_then(|x| x.to_string())
+                    .and_then(|x| x.split("/").last().map(|x| x.to_string()))
+                    .expect("convert schema names")
+            })
+            .collect();
+
+        debug!("Found schema names: {:?}", names);
+        names
     }
 
     fn get_table_names(&self, schema: &str) -> Vec<String> {
         let sql = format!(r#"SELECT name FROM "{}".sqlite_master WHERE type='table'"#, schema);
         debug!("describing table names with query: '{}'", sql);
-        let result_set = self.conn.query_raw(&sql, schema, &[]).expect("get table names");
+        let result_set = self.conn.query_raw(&sql, &[]).expect("get table names");
         let names = result_set
             .into_iter()
             .map(|row| row.get("name").and_then(|x| x.to_string()).unwrap())
@@ -50,6 +79,18 @@ impl SqlSchemaDescriber {
             .collect();
         debug!("Found table names: {:?}", names);
         names
+    }
+
+    fn get_size(&self, _schema: &str) -> usize {
+        debug!("Getting db size");
+        let sql = format!(r#"SELECT page_count * page_size as size FROM pragma_page_count(), pragma_page_size();"#);
+        let result = self.conn.query_raw(&sql, &[]).expect("get db size ");
+        let size: i64 = result
+            .first()
+            .and_then(|row| row.get("size")?.as_i64())
+            .expect("convert db size result");
+
+        size.try_into().unwrap()
     }
 
     fn get_table(&self, schema: &str, name: &str) -> Table {
@@ -69,7 +110,7 @@ impl SqlSchemaDescriber {
     fn get_columns(&self, schema: &str, table: &str) -> (Vec<Column>, Option<PrimaryKey>) {
         let sql = format!(r#"PRAGMA "{}".table_info ("{}")"#, schema, table);
         debug!("describing table columns, query: '{}'", sql);
-        let result_set = self.conn.query_raw(&sql, schema, &[]).unwrap();
+        let result_set = self.conn.query_raw(&sql, &[]).unwrap();
         let mut pk_cols: HashMap<i64, String> = HashMap::new();
         let mut cols: Vec<Column> = result_set
             .into_iter()
@@ -164,10 +205,7 @@ impl SqlSchemaDescriber {
 
         let sql = format!(r#"PRAGMA "{}".foreign_key_list("{}");"#, schema, table);
         debug!("describing table foreign keys, SQL: '{}'", sql);
-        let result_set = self
-            .conn
-            .query_raw(&sql, schema, &[])
-            .expect("querying for foreign keys");
+        let result_set = self.conn.query_raw(&sql, &[]).expect("querying for foreign keys");
 
         // Since one foreign key with multiple columns will be represented here as several
         // rows with the same ID, we have to use an intermediate representation that gets
@@ -258,7 +296,7 @@ impl SqlSchemaDescriber {
     fn get_indices(&self, schema: &str, table: &str) -> Vec<Index> {
         let sql = format!(r#"PRAGMA "{}".index_list("{}");"#, schema, table);
         debug!("describing table indices, SQL: '{}'", sql);
-        let result_set = self.conn.query_raw(&sql, schema, &[]).expect("querying for indices");
+        let result_set = self.conn.query_raw(&sql, &[]).expect("querying for indices");
         debug!("Got indices description results: {:?}", result_set);
         result_set
             .into_iter()
@@ -278,7 +316,7 @@ impl SqlSchemaDescriber {
 
                 let sql = format!(r#"PRAGMA "{}".index_info("{}");"#, schema, name);
                 debug!("describing table index '{}', SQL: '{}'", name, sql);
-                let result_set = self.conn.query_raw(&sql, schema, &[]).expect("querying for index info");
+                let result_set = self.conn.query_raw(&sql, &[]).expect("querying for index info");
                 debug!("Got index description results: {:?}", result_set);
                 for row in result_set.into_iter() {
                     let pos = row.get("seqno").and_then(|x| x.as_i64()).expect("get seqno") as usize;

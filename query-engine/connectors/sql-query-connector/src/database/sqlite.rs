@@ -1,17 +1,13 @@
-use super::transaction::SqlConnectorTransaction;
+use super::connection::SqlConnection;
 use crate::{query_builder::ManyRelatedRecordsWithRowNumber, FromSource, SqlError};
-use connector_interface::Connector;
+use connector_interface::{Connection, Connector, IO};
 use datamodel::Source;
-use prisma_query::{
-    connector::{Queryable, SqliteParams},
-    pool::{sqlite::SqliteConnectionManager, PrismaConnectionManager},
-};
+use quaint::{connector::SqliteParams, Quaint};
 use std::convert::TryFrom;
-
-type Pool = r2d2::Pool<PrismaConnectionManager<SqliteConnectionManager>>;
+use url::Url;
 
 pub struct Sqlite {
-    pool: Pool,
+    pool: Quaint,
     file_path: String,
 }
 
@@ -24,31 +20,28 @@ impl Sqlite {
 impl FromSource for Sqlite {
     fn from_source(source: &dyn Source) -> crate::Result<Self> {
         let params = SqliteParams::try_from(source.url().value.as_str())?;
-        let file_path = params.file_path.clone();
-        let pool = r2d2::Pool::try_from(params).unwrap();
-        let sqlite = Sqlite {
-            pool,
-            file_path: file_path.to_str().unwrap().to_string(),
+        let db_name = std::path::Path::new(&params.file_path).file_stem().unwrap().to_str().unwrap().to_owned();
+        let file_path = params.file_path;
+
+        let url_with_db = {
+            let mut url = Url::parse(&source.url().value)?;
+            url.query_pairs_mut().append_pair("db_name", &db_name);
+            url
         };
 
-        Ok(sqlite)
+        let pool = Quaint::new(url_with_db.as_str())?;
+
+        Ok(Self { pool, file_path })
     }
 }
 
 impl Connector for Sqlite {
-    fn with_transaction<F, T>(&self, f: F) -> connector_interface::Result<T>
-    where
-        F: FnOnce(&mut dyn connector_interface::TransactionLike) -> connector_interface::Result<T>,
-    {
-        let mut conn = self.pool.get().map_err(SqlError::from)?;
-        let tx = conn.start_transaction().map_err(SqlError::from)?;
-        let mut connector_transaction = SqlConnectorTransaction::<ManyRelatedRecordsWithRowNumber>::new(tx);
-        let result = f(&mut connector_transaction);
+    fn get_connection<'a>(&'a self) -> IO<Box<dyn Connection + 'a>> {
+        IO::new(async move {
+            let conn = self.pool.check_out().await.map_err(SqlError::from)?;
+            let conn = SqlConnection::<_, ManyRelatedRecordsWithRowNumber>::new(conn);
 
-        if result.is_ok() {
-            connector_transaction.commit()?;
-        }
-
-        result
+            Ok(Box::new(conn) as Box<dyn Connection>)
+        })
     }
 }

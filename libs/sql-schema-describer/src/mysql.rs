@@ -1,15 +1,26 @@
 use super::*;
 use log::debug;
+use sql_connection::SyncSqlConnection;
 use std::collections::{BTreeMap, HashMap};
 use std::sync::Arc;
 
 pub struct SqlSchemaDescriber {
-    conn: Arc<dyn SqlConnection>,
+    conn: Arc<dyn SyncSqlConnection + Send + Sync + 'static>,
 }
 
 impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
     fn list_databases(&self) -> SqlSchemaDescriberResult<Vec<String>> {
-        Ok(vec![])
+        let databases = self.get_databases();
+        Ok(databases)
+    }
+
+    fn get_metadata(&self, schema: &str) -> SqlSchemaDescriberResult<SQLMetadata> {
+        let count = self.get_table_names(&schema).len();
+        let size = self.get_size(&schema);
+        Ok(SQLMetadata {
+            table_count: count,
+            size_in_bytes: size,
+        })
     }
 
     fn describe(&self, schema: &str) -> SqlSchemaDescriberResult<SqlSchema> {
@@ -29,8 +40,25 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
 
 impl SqlSchemaDescriber {
     /// Constructor.
-    pub fn new(conn: Arc<dyn SqlConnection>) -> SqlSchemaDescriber {
+    pub fn new(conn: Arc<dyn SyncSqlConnection + Send + Sync + 'static>) -> SqlSchemaDescriber {
         SqlSchemaDescriber { conn }
+    }
+
+    fn get_databases(&self) -> Vec<String> {
+        debug!("Getting table names");
+        let sql = "select schema_name from information_schema.schemata;";
+        let rows = self.conn.query_raw(sql, &[]).expect("get schema names ");
+        let names = rows
+            .into_iter()
+            .map(|row| {
+                row.get("schema_name")
+                    .and_then(|x| x.to_string())
+                    .expect("convert schema names")
+            })
+            .collect();
+
+        debug!("Found schema names: {:?}", names);
+        names
     }
 
     fn get_table_names(&self, schema: &str) -> Vec<String> {
@@ -40,10 +68,7 @@ impl SqlSchemaDescriber {
             -- Views are not supported yet
             AND table_type = 'BASE TABLE'
             ORDER BY table_name";
-        let rows = self
-            .conn
-            .query_raw(sql, schema, &[schema.into()])
-            .expect("get table names ");
+        let rows = self.conn.query_raw(sql, &[schema.into()]).expect("get table names ");
         let names = rows
             .into_iter()
             .map(|row| {
@@ -55,6 +80,22 @@ impl SqlSchemaDescriber {
 
         debug!("Found table names: {:?}", names);
         names
+    }
+
+    fn get_size(&self, schema: &str) -> usize {
+        debug!("Getting table names");
+        let sql = "SELECT 
+      SUM(data_length + index_length) as size 
+      FROM information_schema.TABLES 
+      WHERE table_schema = ?";
+        let result = self.conn.query_raw(sql, &[schema.into()]).expect("get db size ");
+        let size: String = result
+            .first()
+            .map(|row| row.get("size").and_then(|x| x.to_string()).expect("get db size"))
+            .unwrap();
+
+        debug!("Found db size: {:?}", size);
+        size.parse().unwrap()
     }
 
     fn get_table(&self, schema: &str, name: &str) -> Table {
@@ -83,7 +124,7 @@ impl SqlSchemaDescriber {
 
         let rows = self
             .conn
-            .query_raw(sql, schema, &[schema.into(), table.into()])
+            .query_raw(sql, &[schema.into(), table.into()])
             .expect("querying for columns");
         let cols = rows
             .into_iter()
@@ -162,7 +203,7 @@ impl SqlSchemaDescriber {
 
         let result_set = self
             .conn
-            .query_raw(sql, schema, &[schema.into(), table.into()])
+            .query_raw(sql, &[schema.into(), table.into()])
             .expect("querying for foreign keys");
         let mut intermediate_fks: HashMap<String, ForeignKey> = HashMap::new();
         for row in result_set.into_iter() {
@@ -264,7 +305,7 @@ impl SqlSchemaDescriber {
         debug!("describing indices, SQL: {}", sql);
         let rows = self
             .conn
-            .query_raw(sql, schema, &[schema.into(), table_name.into()])
+            .query_raw(sql, &[schema.into(), table_name.into()])
             .expect("querying for indices");
 
         // Multi-column indices will return more than one row (with different column_name values).
@@ -326,8 +367,10 @@ impl SqlSchemaDescriber {
         let indices = indexes_map
             .into_iter()
             .map(|(_k, v)| v)
-            // Remove foreign keys, because they are introspected separately.
-            .filter(|index| foreign_keys.iter().find(|fk| fk.columns == index.columns).is_none())
+            // Remove foreign keys, because they are introspected separately. But if there is a unique constraint on that column we need it to identify 1:1 relations
+            .filter(|index| {
+                foreign_keys.iter().find(|fk| fk.columns == index.columns).is_none() || index.tpe == IndexType::Unique
+            })
             .collect();
 
         debug!("Found table indices: {:?}, primary key: {:?}", indices, primary_key);

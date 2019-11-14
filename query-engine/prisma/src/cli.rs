@@ -3,30 +3,25 @@ use crate::{
     dmmf, PrismaResult,
 };
 use clap::ArgMatches;
-use core::{
+use datamodel::json::dmmf::Datamodel;
+use query_core::{
     schema::{QuerySchemaRef, SupportedCapabilities},
     BuildMode, QuerySchemaBuilder,
 };
 use serde::Deserialize;
-use std::sync::Arc;
+use std::{fs::File, io::Read, sync::Arc};
 
 #[derive(Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct DmmfToDmlInput {
-    pub dmmf: String,
+    pub dmmf: Datamodel,
     pub config: serde_json::Value,
-}
-
-#[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct GetConfigInput {
-    pub datamodel: String,
 }
 
 pub enum CliCommand {
     Dmmf(BuildMode),
     DmmfToDml(DmmfToDmlInput),
-    GetConfig(GetConfigInput),
+    GetConfig(String),
 }
 
 impl CliCommand {
@@ -40,15 +35,18 @@ impl CliCommand {
 
             Some(Self::Dmmf(build_mode))
         } else if matches.is_present("dmmf_to_dml") {
-            let input = matches.value_of("dmmf_to_dml").unwrap();
-            let input: DmmfToDmlInput = serde_json::from_str(input).unwrap();
-
+            let path = matches.value_of("dmmf_to_dml").unwrap();
+            let file = File::open(path).expect("File should open read only");
+            let input: DmmfToDmlInput = serde_json::from_reader(file).expect("File should be proper JSON");
             Some(Self::DmmfToDml(input))
         } else if matches.is_present("get_config") {
-            let input = matches.value_of("get_config").unwrap();
-            let input: GetConfigInput = serde_json::from_str(input).unwrap();
+            let path = matches.value_of("get_config").unwrap();
+            let mut file = File::open(path).expect("File should open read only");
 
-            Some(Self::GetConfig(input))
+            let mut datamodel = String::new();
+            file.read_to_string(&mut datamodel).expect("Couldn't read file");
+
+            Some(Self::GetConfig(datamodel))
         } else {
             None
         }
@@ -81,7 +79,7 @@ impl CliCommand {
     }
 
     fn dmmf_to_dml(input: DmmfToDmlInput) -> PrismaResult<()> {
-        let datamodel = datamodel::json::dmmf::parse_from_dmmf(&input.dmmf);
+        let datamodel = datamodel::json::dmmf::schema_from_dmmf(&input.dmmf);
         let config = datamodel::json::mcf::config_from_mcf_json_value(input.config);
         let serialized = datamodel::render_datamodel_and_config_to_string(&datamodel, &config)?;
 
@@ -90,8 +88,8 @@ impl CliCommand {
         Ok(())
     }
 
-    fn get_config(input: GetConfigInput) -> PrismaResult<()> {
-        let config = load_configuration(&input.datamodel)?;
+    fn get_config(input: String) -> PrismaResult<()> {
+        let config = load_configuration(&input)?;
         let json = datamodel::json::mcf::config_to_mcf_json_value(&config);
         let serialized = serde_json::to_string(&json)?;
 

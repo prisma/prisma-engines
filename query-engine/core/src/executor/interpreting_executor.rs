@@ -2,10 +2,10 @@ use super::{pipeline::QueryPipeline, QueryExecutor};
 use crate::{
     CoreResult, IrSerializer, QueryDocument, QueryGraph, QueryGraphBuilder, QueryInterpreter, QuerySchemaRef, Response,
 };
-use connector::{Connector, Result as ConnectorResult, TransactionLike};
+use connector::{Connector, ConnectionLike};
+use async_trait::async_trait;
 
 /// Central query executor and main entry point into the query core.
-/// Interprets the full query tree to return a result.
 pub struct InterpretingExecutor<C> {
     connector: C,
     primary_connector: &'static str,
@@ -13,10 +13,9 @@ pub struct InterpretingExecutor<C> {
 
 // Todo:
 // - Partial execution semantics?
-// - ReadQueryResult + write query results should probably just be QueryResult
 impl<C> InterpretingExecutor<C>
 where
-    C: Connector + Send + Sync + 'static,
+    C: Connector + Send + Sync,
 {
     pub fn new(connector: C, primary_connector: &'static str) -> Self {
         InterpretingExecutor {
@@ -24,40 +23,49 @@ where
             primary_connector,
         }
     }
-
-    pub fn with_interpreter<'a, F>(&self, f: F) -> ConnectorResult<Response>
-    where
-        F: FnOnce(QueryInterpreter) -> ConnectorResult<Response>,
-    {
-        let res = self.connector.with_transaction(|tx: &mut dyn TransactionLike| {
-            let interpreter = QueryInterpreter::new(tx);
-
-            f(interpreter).map_err(|err| err.into())
-        });
-
-        res
-    }
 }
 
+#[async_trait]
 impl<C> QueryExecutor for InterpretingExecutor<C>
 where
-    C: Connector + Send + Sync + 'static,
+    C: Connector + Send + Sync,
 {
-    fn execute(&self, query_doc: QueryDocument, query_schema: QuerySchemaRef) -> CoreResult<Vec<Response>> {
+    async fn execute(
+        &self,
+        query_doc: QueryDocument,
+        query_schema: QuerySchemaRef,
+    ) -> CoreResult<Vec<Response>> {
+        let conn = self.connector.get_connection().await?;
+
         // Parse, validate, and extract query graphs from query document.
         let queries: Vec<(QueryGraph, IrSerializer)> = QueryGraphBuilder::new(query_schema).build(query_doc)?;
 
         // Create pipelines for all separate queries
-        Ok(queries
-            .into_iter()
-            .map(|(query_graph, info)| {
-                self.with_interpreter(|interpreter| {
-                    QueryPipeline::new(query_graph, interpreter, info)
-                        .execute()
-                        .map_err(|err| err.into())
-                })
-            })
-            .collect::<ConnectorResult<Vec<Response>>>()?)
+        let mut results: Vec<Response> = vec![];
+
+        for (query_graph, info) in queries {
+            let result = if query_graph.needs_transaction() {
+                let tx = conn.start_transaction().await?;
+
+                let interpreter = QueryInterpreter::new(ConnectionLike::Transaction(tx.as_ref()));
+                let result = QueryPipeline::new(query_graph, interpreter, info).execute().await;
+
+                if result.is_ok() {
+                    tx.commit().await?;
+                } else {
+                    tx.rollback().await?;
+                }
+
+                result?
+            } else {
+                let interpreter = QueryInterpreter::new(ConnectionLike::Connection(conn.as_ref()));
+                QueryPipeline::new(query_graph, interpreter, info).execute().await?
+            };
+
+            results.push(result);
+        }
+
+        Ok(results)
     }
 
     fn primary_connector(&self) -> &'static str {

@@ -29,12 +29,12 @@ impl<'a> MigrationCommand<'a> for CalculateDatabaseStepsCommand<'a> {
 
         let assumed_datamodel_ast = engine
             .datamodel_calculator()
-            .infer(&SchemaAst::empty(), &self.input.assume_to_be_applied);
+            .infer(&SchemaAst::empty(), &self.input.assume_to_be_applied)?;
         let assumed_datamodel = datamodel::lift_ast(&assumed_datamodel_ast)?;
 
         let next_datamodel_ast = engine
             .datamodel_calculator()
-            .infer(&assumed_datamodel_ast, &self.input.steps_to_apply);
+            .infer(&assumed_datamodel_ast, &self.input.steps_to_apply)?;
         let next_datamodel = datamodel::lift_ast(&next_datamodel_ast)?;
 
         let database_migration = connector.database_migration_inferrer().infer(

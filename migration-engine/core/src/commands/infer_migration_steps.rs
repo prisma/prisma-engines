@@ -33,7 +33,7 @@ impl<'a> MigrationCommand<'a> for InferMigrationStepsCommand<'a> {
         let current_datamodel_ast = migration_persistence.current_datamodel_ast();
         let assumed_datamodel_ast = engine
             .datamodel_calculator()
-            .infer(&current_datamodel_ast, self.input.assume_to_be_applied.as_slice());
+            .infer(&current_datamodel_ast, self.input.assume_to_be_applied.as_slice())?;
         let assumed_datamodel = datamodel::lift_ast(&assumed_datamodel_ast)?;
 
         let next_datamodel = parse_datamodel(&self.input.datamodel)?;

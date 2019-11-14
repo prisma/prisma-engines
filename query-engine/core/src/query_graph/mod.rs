@@ -42,7 +42,7 @@ impl From<Flow> for Node {
 pub enum Flow {
     /// Expresses a conditional control flow in the graph.
     /// Possible outgoing edges are `then` and `else`, each at most once, with `then` required to be present.
-    If(Box<dyn FnOnce() -> bool>),
+    If(Box<dyn FnOnce() -> bool + Send + Sync + 'static>),
 
     /// Empty node, will return empty result on interpretation.
     /// Useful for checks that are only supposed to fail and noop on success.
@@ -79,7 +79,7 @@ impl EdgeRef {
     }
 }
 
-pub type ParentIdsFn = Box<dyn FnOnce(Node, Vec<PrismaValue>) -> QueryGraphBuilderResult<Node>>;
+pub type ParentIdsFn = Box<dyn FnOnce(Node, Vec<PrismaValue>) -> QueryGraphBuilderResult<Node> + Send + Sync + 'static>;
 
 /// Stored on the edges of the QueryGraph, a QueryGraphDependency contains information on how children are connected to their parents,
 /// expressing for example the need for additional information from the parent to be able to execute at runtime.
@@ -132,6 +132,10 @@ pub struct QueryGraph {
     marked_node_pairs: Vec<(NodeRef, NodeRef)>,
 
     finalized: bool,
+
+    /// For now a stupid marker if the query graph needs to be run inside a
+    /// transaction. Should happen if any of the queries is writing data.
+    needs_transaction: bool,
 }
 
 /// Implementation detail of the QueryGraph.
@@ -229,6 +233,16 @@ impl QueryGraph {
         let edge = EdgeRef { edge_ix };
 
         after_edge_creation(self, &edge).map(|_| edge)
+    }
+
+    /// Mark the query graph to need a transaction.
+    pub fn flag_transactional(&mut self) {
+        self.needs_transaction = true;
+    }
+
+    /// If true, the graph should be executed inside of a transaction.
+    pub fn needs_transaction(&self) -> bool {
+        self.needs_transaction
     }
 
     /// Returns a reference to the content of `node`, if the content is still present.

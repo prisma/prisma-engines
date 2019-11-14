@@ -1,6 +1,6 @@
 mod schema;
 
-use core::schema::{QuerySchemaRef, QuerySchemaRenderer};
+use query_core::schema::{QuerySchemaRef, QuerySchemaRenderer};
 use datamodel;
 use schema::*;
 use serde::{ser::SerializeMap, Serialize, Serializer};

@@ -216,10 +216,7 @@ fn all_postgres_column_types_must_work() {
                 family: ColumnTypeFamily::Int,
             },
             arity: ColumnArity::Required,
-            default: Some(format!(
-                "nextval(\'\"{}\".\"User_primary_col_seq\"\'::regclass)",
-                SCHEMA
-            )),
+            default: Some(format!("nextval(\"{}\".\"User_primary_col_seq\"::regclass)", SCHEMA)),
             auto_increment: true,
         },
         Column {
@@ -259,10 +256,7 @@ fn all_postgres_column_types_must_work() {
                 family: ColumnTypeFamily::Int,
             },
             arity: ColumnArity::Required,
-            default: Some(format!(
-                "nextval(\'\"{}\".\"User_bigserial_col_seq\"\'::regclass)",
-                SCHEMA
-            )),
+            default: Some(format!("nextval(\"{}\".\"User_bigserial_col_seq\"::regclass)", SCHEMA)),
             auto_increment: true,
         },
         Column {
@@ -403,7 +397,7 @@ fn all_postgres_column_types_must_work() {
             },
             arity: ColumnArity::Required,
             default: Some(format!(
-                "nextval('\"{}\".\"User_smallserial_col_seq\"'::regclass)",
+                "nextval(\"{}\".\"User_smallserial_col_seq\"::regclass)",
                 SCHEMA
             )),
             auto_increment: true,
@@ -415,7 +409,7 @@ fn all_postgres_column_types_must_work() {
                 family: ColumnTypeFamily::Int,
             },
             arity: ColumnArity::Required,
-            default: Some(format!("nextval('\"{}\".\"User_serial_col_seq\"'::regclass)", SCHEMA)),
+            default: Some(format!("nextval(\"{}\".\"User_serial_col_seq\"::regclass)", SCHEMA)),
             auto_increment: true,
         },
         Column {

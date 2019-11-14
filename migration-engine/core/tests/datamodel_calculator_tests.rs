@@ -379,6 +379,14 @@ fn test(dm1: SchemaAst, dm2: SchemaAst) {
 }
 
 fn calculate(schema: &SchemaAst, steps: impl AsRef<[MigrationStep]>) -> SchemaAst {
+    calculate_impl(schema, steps).unwrap()
+}
+
+fn calculate_error(schema: &SchemaAst, steps: impl AsRef<[MigrationStep]>) -> String {
+    format!("{}", calculate_impl(schema, steps).unwrap_err())
+}
+
+fn calculate_impl(schema: &SchemaAst, steps: impl AsRef<[MigrationStep]>) -> Result<SchemaAst, CalculatorError> {
     let calc = DataModelCalculatorImpl {};
     calc.infer(schema, steps.as_ref())
 }

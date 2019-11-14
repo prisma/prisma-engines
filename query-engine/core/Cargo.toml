@@ -11,19 +11,17 @@ prisma-inflector = { path = "../../libs/prisma-inflector" }
 connector = { path = "../connectors/query-connector", package = "query-connector" }
 failure = "0.1"
 failure_derive = "0.1"
-lazy_static = "1.3"
+lazy_static = "1.4"
 uuid = "0.7"
 indexmap = "1.0"
 itertools = "0.8"
-# serde = { version = "1.0", features = [ "rc" ] }
 serde_json = "1.0"
 chrono = "0.4"
-once_cell = "0.2"
+once_cell = "1.2"
 debug_stub_derive = "0.3"
 log = "0.4"
 petgraph = "0.4"
 im = "13.0"
-
-[dependencies.rust-inflector]
-version = "0.11"
-package = "Inflector"
+futures = "0.3"
+async-std = { version = "0.99", features = ["unstable"] }
+async-trait = "0.1"

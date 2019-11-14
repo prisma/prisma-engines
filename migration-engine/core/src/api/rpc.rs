@@ -1,10 +1,10 @@
 use super::{GenericApi, MigrationApi};
 use crate::commands::*;
+use datamodel::configuration::{MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME};
 use futures::{
     future::{err, lazy, ok, poll_fn},
     Future,
 };
-use jsonrpc_core;
 use jsonrpc_core::types::error::Error as JsonRpcError;
 use jsonrpc_core::IoHandler;
 use jsonrpc_core::*;
@@ -109,9 +109,9 @@ impl RpcApi {
         })?;
 
         let connector = match source.connector_type() {
-            "sqlite" => SqlMigrationConnector::sqlite(&source.url().value)?,
-            "postgresql" => SqlMigrationConnector::postgres(&source.url().value, true)?,
-            "mysql" => SqlMigrationConnector::mysql(&source.url().value, true)?,
+            scheme if [MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME].contains(&scheme) => {
+                SqlMigrationConnector::new(source.as_ref())?
+            }
             x => unimplemented!("Connector {} is not supported yet", x),
         };
 

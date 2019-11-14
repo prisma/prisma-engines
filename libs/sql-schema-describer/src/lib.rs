@@ -1,6 +1,6 @@
 //! Database description.
+
 use failure::Fail;
-use prisma_query::ast::ParameterizedValue;
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 use std::fmt;
@@ -20,23 +20,20 @@ pub enum SqlSchemaDescriberError {
 /// The result type.
 pub type SqlSchemaDescriberResult<T> = core::result::Result<T, SqlSchemaDescriberError>;
 
-/// Connection abstraction for the description backends.
-pub trait SqlConnection: Send + Sync + 'static {
-    /// Make raw SQL query.
-    fn query_raw(
-        &self,
-        sql: &str,
-        schema: &str,
-        params: &[ParameterizedValue],
-    ) -> prisma_query::Result<prisma_query::connector::ResultSet>;
-}
-
 /// A database description connector.
 pub trait SqlSchemaDescriberBackend: Send + Sync + 'static {
     /// List the database's schemas.
     fn list_databases(&self) -> SqlSchemaDescriberResult<Vec<String>>;
+    /// Get the databases metadata.
+    fn get_metadata(&self, schema: &str) -> SqlSchemaDescriberResult<SQLMetadata>;
     /// Describe a database schema.
     fn describe(&self, schema: &str) -> SqlSchemaDescriberResult<SqlSchema>;
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct SQLMetadata {
+    pub table_count: usize,
+    pub size_in_bytes: usize,
 }
 
 /// The result of describing a database schema.

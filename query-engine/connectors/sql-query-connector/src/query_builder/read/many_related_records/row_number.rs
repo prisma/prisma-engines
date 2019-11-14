@@ -1,7 +1,7 @@
 use super::*;
 use crate::ordering::Ordering;
 use prisma_models::prelude::*;
-use prisma_query::ast::{row_number, Aliasable, Comparable, Conjuctive, Function, Select, Table};
+use quaint::ast::{row_number, Aliasable, Comparable, Conjuctive, Function, Select, Table};
 
 pub struct ManyRelatedRecordsWithRowNumber;
 

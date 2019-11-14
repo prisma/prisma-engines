@@ -1,5 +1,5 @@
-mod test_harness;
-
+use crate::*;
+use quaint::pool::SqlFamily;
 use barrel::types;
 use test_harness::*;
 
@@ -7,7 +7,7 @@ pub const SCHEMA_NAME: &str = "introspection-engine";
 
 #[test]
 fn introspecting_a_simple_table_with_gql_types_must_work() {
-    test_each_backend_with_ignores(vec![SqlFamily::Postgres, SqlFamily::Mysql], |test_setup, barrel| {
+    test_each_backend_with_ignores(vec![SqlFamily::Sqlite, SqlFamily::Postgres], |test_setup, barrel| {
         let _setup_schema = barrel.execute(|migration| {
             migration.create_table("Blog", |t| {
                 t.add_column("bool", types::boolean());
@@ -35,12 +35,12 @@ fn introspecting_a_simple_table_with_gql_types_must_work() {
 
 #[test]
 fn introspecting_a_table_with_compound_primary_keys_must_work() {
-    test_each_backend_with_ignores(vec![SqlFamily::Postgres, SqlFamily::Mysql], |test_setup, barrel| {
+    test_each_backend_with_ignores(vec![SqlFamily::Sqlite, SqlFamily::Postgres], |test_setup, barrel| {
         let _setup_schema = barrel.execute(|migration| {
             migration.create_table("Blog", |t| {
                 t.add_column("id", types::integer());
-                t.add_column("authorId", types::text());
-                t.inject_custom("PRIMARY KEY (\"id\", \"authorId\")");
+                t.add_column("authorId", types::varchar(10));
+                t.inject_custom("PRIMARY KEY (`id`, `authorId`)");
             });
         });
 
@@ -58,19 +58,19 @@ fn introspecting_a_table_with_compound_primary_keys_must_work() {
 
 #[test]
 fn introspecting_a_table_with_unique_index_must_work() {
-    test_each_backend_with_ignores(vec![SqlFamily::Postgres, SqlFamily::Mysql], |test_setup, barrel| {
+    test_each_backend_with_ignores(vec![SqlFamily::Sqlite, SqlFamily::Postgres], |test_setup, barrel| {
         let _setup_schema = barrel.execute(|migration| {
             migration.create_table("Blog", |t| {
                 t.add_column("id", types::primary());
-                t.add_column("authorId", types::text());
+                t.add_column("authorId", types::varchar(10));
             });
-            migration.inject_custom("Create Unique Index \"introspection-engine\".\"test\" on \"Blog\"( \"authorId\")");
+            migration.inject_custom("Create Unique Index `test` on `introspection-engine`.`Blog`( `authorId`)");
         });
 
         let dm = r#"
             model Blog {
                 authorId String @unique
-                id Int @id
+                id      Int @id
             }
         "#;
         let result = dbg!(introspect(test_setup));
@@ -80,22 +80,21 @@ fn introspecting_a_table_with_unique_index_must_work() {
 
 #[test]
 fn introspecting_a_table_with_multi_column_unique_index_must_work() {
-    test_each_backend_with_ignores(vec![SqlFamily::Postgres, SqlFamily::Mysql], |test_setup, barrel| {
+    test_each_backend_with_ignores(vec![SqlFamily::Sqlite, SqlFamily::Postgres], |test_setup, barrel| {
         let _setup_schema = barrel.execute(|migration| {
             migration.create_table("User", |t| {
                 t.add_column("id", types::primary());
-                t.add_column("firstname", types::text());
-                t.add_column("lastname", types::text());
+                t.add_column("firstname", types::varchar(10));
+                t.add_column("lastname", types::varchar(10));
             });
-            migration.inject_custom(
-                "Create Unique Index \"introspection-engine\".\"test\" on \"User\"( \"firstname\", \"lastname\")",
-            );
+            migration
+                .inject_custom("Create Unique Index `test` on `introspection-engine`.`User`( `firstname`, `lastname`)");
         });
 
         let dm = r#"
             model User {
                 firstname String
-                id Int @id
+                id      Int @id
                 lastname String
                 @@unique([firstname, lastname], name: "test")
             }
@@ -107,7 +106,7 @@ fn introspecting_a_table_with_multi_column_unique_index_must_work() {
 
 #[test]
 fn introspecting_a_table_with_required_and_optional_columns_must_work() {
-    test_each_backend_with_ignores(vec![SqlFamily::Postgres, SqlFamily::Mysql], |test_setup, barrel| {
+    test_each_backend_with_ignores(vec![SqlFamily::Sqlite, SqlFamily::Postgres], |test_setup, barrel| {
         let _setup_schema = barrel.execute(|migration| {
             migration.create_table("User", |t| {
                 t.add_column("id", types::primary());
@@ -118,7 +117,7 @@ fn introspecting_a_table_with_required_and_optional_columns_must_work() {
 
         let dm = r#"
             model User {
-                id Int @id
+                id      Int @id
                 optionalname String?
                 requiredname String
             }
@@ -131,18 +130,18 @@ fn introspecting_a_table_with_required_and_optional_columns_must_work() {
 #[test]
 #[ignore]
 fn introspecting_a_table_with_datetime_default_values_should_work() {
-    test_each_backend_with_ignores(vec![SqlFamily::Postgres, SqlFamily::Mysql], |test_setup, barrel| {
+    test_each_backend_with_ignores(vec![SqlFamily::Sqlite, SqlFamily::Postgres], |test_setup, barrel| {
         let _setup_schema = barrel.execute(|migration| {
             migration.create_table("User", |t| {
                 t.add_column("id", types::primary());
                 t.add_column("name", types::text());
-                t.inject_custom("\"joined\" date DEFAULT CURRENT_DATE")
+                t.inject_custom("`joined` date DEFAULT CURRENT_DATE")
             });
         });
 
         let dm = r#"
             model User {
-                id Int @id
+                id      Int @id
                 joined DateTime? @default(now())
                 name String
             }
@@ -154,16 +153,16 @@ fn introspecting_a_table_with_datetime_default_values_should_work() {
 
 #[test]
 fn introspecting_a_table_with_default_values_should_work() {
-    test_each_backend_with_ignores(vec![SqlFamily::Postgres, SqlFamily::Mysql], |test_setup, barrel| {
+    test_each_backend_with_ignores(vec![SqlFamily::Sqlite, SqlFamily::Postgres], |test_setup, barrel| {
         let _setup_schema = barrel.execute(|migration| {
             migration.create_table("User", |t| {
                 t.add_column("a", types::text());
                 t.add_column("id", types::primary());
-                t.inject_custom("\"bool\" Boolean NOT NULL DEFAULT false");
-                t.inject_custom("\"bool2\" Boolean NOT NULL DEFAULT 0");
-                t.inject_custom("\"float\" Float NOT NULL DEFAULT 5.3");
-                t.inject_custom("\"int\" INTEGER NOT NULL DEFAULT 5");
-                t.inject_custom("\"string\" TEXT NOT NULL DEFAULT \"Test\"");
+                t.inject_custom("`bool` Boolean NOT NULL DEFAULT false");
+                t.inject_custom("`bool2` Boolean NOT NULL DEFAULT 0");
+                t.inject_custom("`float` Float NOT NULL DEFAULT 5.3");
+                t.inject_custom("`int` INTEGER NOT NULL DEFAULT 5");
+                t.inject_custom("`string` VARCHAR(4) NOT NULL DEFAULT 'Test'");
             });
         });
 
@@ -173,7 +172,7 @@ fn introspecting_a_table_with_default_values_should_work() {
                 bool Boolean @default(false)
                 bool2 Boolean @default(false)
                 float Float @default(5.3)
-                id Int @id
+                id      Int @id
                 int Int @default(5)
                 string String @default("Test")
             }
@@ -185,19 +184,19 @@ fn introspecting_a_table_with_default_values_should_work() {
 
 #[test]
 fn introspecting_a_table_with_a_non_unique_index_should_work() {
-    test_each_backend_with_ignores(vec![SqlFamily::Postgres, SqlFamily::Mysql], |test_setup, barrel| {
+    test_each_backend_with_ignores(vec![SqlFamily::Sqlite, SqlFamily::Postgres], |test_setup, barrel| {
         let _setup_schema = barrel.execute(|migration| {
             migration.create_table("User", |t| {
-                t.add_column("a", types::text());
+                t.add_column("a", types::varchar(10));
                 t.add_column("id", types::primary());
             });
-            migration.inject_custom("Create Index \"introspection-engine\".\"test\" on \"User\"(\"a\")");
+            migration.inject_custom("Create Index `test` on `introspection-engine`.`User`(`a`)");
         });
 
         let dm = r#"
             model User {
                 a String
-                id Int @id
+                id      Int @id
                 @@index([a], name: "test")
             }
         "#;
@@ -208,21 +207,21 @@ fn introspecting_a_table_with_a_non_unique_index_should_work() {
 
 #[test]
 fn introspecting_a_table_with_a_multi_column_non_unique_index_should_work() {
-    test_each_backend_with_ignores(vec![SqlFamily::Postgres, SqlFamily::Mysql], |test_setup, barrel| {
+    test_each_backend_with_ignores(vec![SqlFamily::Sqlite, SqlFamily::Postgres], |test_setup, barrel| {
         let _setup_schema = barrel.execute(|migration| {
             migration.create_table("User", |t| {
-                t.add_column("a", types::text());
-                t.add_column("b", types::text());
+                t.add_column("a", types::varchar(10));
+                t.add_column("b", types::varchar(10));
                 t.add_column("id", types::primary());
             });
-            migration.inject_custom("Create Index \"introspection-engine\".\"test\" on \"User\"(\"a\",\"b\")");
+            migration.inject_custom("Create Index `test` on `introspection-engine`.`User`(`a`,`b`)");
         });
 
         let dm = r#"
             model User {
                 a String
                 b String
-                id Int @id
+                id      Int @id
                 @@index([a,b], name: "test")
             }
         "#;
@@ -234,7 +233,7 @@ fn introspecting_a_table_with_a_multi_column_non_unique_index_should_work() {
 //relations
 #[test]
 fn introspecting_a_one_to_one_req_relation_should_work() {
-    test_each_backend_with_ignores(vec![SqlFamily::Postgres, SqlFamily::Mysql], |test_setup, barrel| {
+    test_each_backend_with_ignores(vec![SqlFamily::Sqlite, SqlFamily::Postgres], |test_setup, barrel| {
         let _setup_schema = barrel.execute(|migration| {
             migration.create_table("User", |t| {
                 t.add_column("id", types::primary());
@@ -243,20 +242,20 @@ fn introspecting_a_one_to_one_req_relation_should_work() {
                 t.add_column("id", types::primary());
                 t.inject_custom(
                     "user_id INTEGER NOT NULL UNIQUE,
-                        FOREIGN KEY(user_id) REFERENCES User(id)",
+                FOREIGN KEY (`user_id`) REFERENCES `User`(`id`)",
                 )
             });
         });
 
         let dm = r#"
-            model User {
-               id Int @id
-               post Post? 
-            }
-            
-            model Post {
-               id Int @id
+              model Post {
+               id      Int @id
                user_id User
+            }
+          
+            model User {
+               id      Int @id
+               post Post? 
             }
         "#;
         let result = dbg!(introspect(test_setup));
@@ -266,35 +265,31 @@ fn introspecting_a_one_to_one_req_relation_should_work() {
 
 #[test]
 fn introspecting_two_one_to_one_relations_between_the_same_models_should_work() {
-    test_each_backend_with_ignores(vec![SqlFamily::Postgres, SqlFamily::Mysql], |test_setup, barrel| {
+    test_each_backend_with_ignores(vec![SqlFamily::Sqlite, SqlFamily::Postgres], |test_setup, barrel| {
         let _setup_schema = barrel.execute(|migration| {
             migration.create_table("User", |t| {
                 t.add_column("id", types::primary());
-                t.inject_custom(
-                    "post_id INTEGER NOT NULL UNIQUE,
-                        FOREIGN KEY(post_id) REFERENCES Post(id)",
-                )
             });
             migration.create_table("Post", |t| {
                 t.add_column("id", types::primary());
-                t.inject_custom(
-                    "user_id INTEGER NOT NULL UNIQUE,
-                        FOREIGN KEY(user_id) REFERENCES User(id)",
-                )
+                t.inject_custom("user_id INTEGER NOT NULL UNIQUE,\
+                 FOREIGN KEY(`user_id`) REFERENCES `User`(`id`)")
             });
+            migration.inject_custom("ALTER TABLE `introspection-engine`.`User` ADD Column `post_id` INTEGER NOT NULL UNIQUE ");
+            migration.inject_custom("ALTER TABLE `introspection-engine`.`User` ADD CONSTRAINT `post_fk` FOREIGN KEY(`post_id`) REFERENCES `Post`(`id`)");
         });
 
         let dm = r#"
-            model User {
-               id Int @id
-               post_id Post  @relation("PostToUser_post_id")
-               post Post?    @relation("Post_user_idToUser")
-            }
-            
             model Post {
-               id Int @id
+               id      Int @id
                user_id User  @relation("Post_user_idToUser")
                user    User? @relation("PostToUser_post_id", references: [post_id])
+            }
+        
+            model User {
+               id      Int @id
+               post_id Post  @relation("PostToUser_post_id")
+               post Post?    @relation("Post_user_idToUser")
             }
         "#;
         let result = dbg!(introspect(test_setup));
@@ -304,7 +299,7 @@ fn introspecting_two_one_to_one_relations_between_the_same_models_should_work() 
 
 #[test]
 fn introspecting_a_one_to_one_relation_should_work() {
-    test_each_backend_with_ignores(vec![SqlFamily::Postgres, SqlFamily::Mysql], |test_setup, barrel| {
+    test_each_backend_with_ignores(vec![SqlFamily::Sqlite, SqlFamily::Postgres], |test_setup, barrel| {
         let _setup_schema = barrel.execute(|migration| {
             migration.create_table("User", |t| {
                 t.add_column("id", types::primary());
@@ -312,21 +307,21 @@ fn introspecting_a_one_to_one_relation_should_work() {
             migration.create_table("Post", |t| {
                 t.add_column("id", types::primary());
                 t.inject_custom(
-                    "user_id INTEGER UNIQUE,
-                        FOREIGN KEY(user_id) REFERENCES User(id)",
-                )
+                    "user_id INTEGER UNIQUE,\
+                     FOREIGN KEY (`user_id`) REFERENCES `User`(`id`)",
+                );
             });
         });
 
-        let dm = r#"
-            model User {
-               id Int @id
-               post Post? 
+        let dm = r#"        
+            model Post {
+               id      Int @id
+               user_id User?
             }
             
-            model Post {
-               id Int @id
-               user_id User?
+            model User {
+               id      Int @id
+               post Post? 
             }
         "#;
         let result = dbg!(introspect(test_setup));
@@ -336,7 +331,7 @@ fn introspecting_a_one_to_one_relation_should_work() {
 
 #[test]
 fn introspecting_a_one_to_many_relation_should_work() {
-    test_each_backend_with_ignores(vec![SqlFamily::Postgres, SqlFamily::Mysql], |test_setup, barrel| {
+    test_each_backend_with_ignores(vec![SqlFamily::Sqlite, SqlFamily::Postgres], |test_setup, barrel| {
         let _setup_schema = barrel.execute(|migration| {
             migration.create_table("User", |t| {
                 t.add_column("id", types::primary());
@@ -344,21 +339,21 @@ fn introspecting_a_one_to_many_relation_should_work() {
             migration.create_table("Post", |t| {
                 t.add_column("id", types::primary());
                 t.inject_custom(
-                    "user_id INTEGER,
-                        FOREIGN KEY(user_id) REFERENCES User(id)",
-                )
+                    "user_id INTEGER,\
+                     FOREIGN KEY (`user_id`) REFERENCES `User`(`id`)",
+                );
             });
         });
 
-        let dm = r#"
-            model User {
-               id Int @id
-               posts Post[] 
+        let dm = r#"  
+            model Post {
+               id      Int @id
+               user_id User?
             }
             
-            model Post {
-               id Int @id
-               user_id User?
+            model User {
+               id      Int @id
+               posts Post[] 
             }
         "#;
         let result = dbg!(introspect(test_setup));
@@ -368,7 +363,7 @@ fn introspecting_a_one_to_many_relation_should_work() {
 
 #[test]
 fn introspecting_a_one_req_to_many_relation_should_work() {
-    test_each_backend_with_ignores(vec![SqlFamily::Postgres, SqlFamily::Mysql], |test_setup, barrel| {
+    test_each_backend_with_ignores(vec![SqlFamily::Sqlite, SqlFamily::Postgres], |test_setup, barrel| {
         let _setup_schema = barrel.execute(|migration| {
             migration.create_table("User", |t| {
                 t.add_column("id", types::primary());
@@ -376,23 +371,23 @@ fn introspecting_a_one_req_to_many_relation_should_work() {
             migration.create_table("Post", |t| {
                 t.add_column("id", types::primary());
                 t.inject_custom(
-                    "user_id INTEGER NOT NULL,
-                        FOREIGN KEY(user_id) REFERENCES User(id)",
-                )
+                    "user_id INTEGER NOT NULL,\
+                     FOREIGN KEY (`user_id`) REFERENCES `User`(`id`)",
+                );
             });
         });
 
         let dm = r#"
-            model User {
-               id Int @id
-               posts Post[] 
-            }
-            
             model Post {
-               id Int @id
+               id      Int @id
                user_id User
             }
-        "#;
+            
+            model User {
+               id      Int @id
+               posts Post[] 
+            }
+       "#;
         let result = dbg!(introspect(test_setup));
         custom_assert(&result, dm);
     });
@@ -400,7 +395,7 @@ fn introspecting_a_one_req_to_many_relation_should_work() {
 
 #[test]
 fn introspecting_a_prisma_many_to_many_relation_should_work() {
-    test_each_backend_with_ignores(vec![SqlFamily::Postgres, SqlFamily::Mysql], |test_setup, barrel| {
+    test_each_backend_with_ignores(vec![SqlFamily::Sqlite, SqlFamily::Postgres], |test_setup, barrel| {
         let _setup_schema = barrel.execute(|migration| {
             migration.create_table("User", |t| {
                 t.add_column("id", types::primary());
@@ -410,23 +405,24 @@ fn introspecting_a_prisma_many_to_many_relation_should_work() {
             });
             migration.create_table("_PostToUser", |t| {
                 t.inject_custom(
-                    "A TEXT NOT NULL,
-                          B TEXT NOT NULL,
-                          FOREIGN KEY (A) REFERENCES  User(id),
-                          FOREIGN KEY (B) REFERENCES  Post(id)",
+                    "A INTEGER NOT NULL,
+                     B INTEGER NOT NULL,
+                     FOREIGN KEY (`A`) REFERENCES  `Post`(`id`),
+                     FOREIGN KEY (`B`) REFERENCES  `User`(`id`)",
                 )
             });
+            migration.inject_custom("CREATE UNIQUE INDEX test ON `introspection-engine`.`_PostToUser` (`A`, `B`);")
         });
 
         let dm = r#"
-            model User {
-               id Int @id
-               posts Post[] 
+            model Post {
+               id      Int @id
+               users User[] 
             }
             
-            model Post {
-               id Int @id
-               users User[] 
+            model User {
+               id      Int @id
+               posts Post[] 
             }
         "#;
         let result = dbg!(introspect(test_setup));
@@ -437,7 +433,7 @@ fn introspecting_a_prisma_many_to_many_relation_should_work() {
 // Todo
 #[test]
 fn introspecting_a_many_to_many_relation_should_work() {
-    test_each_backend_with_ignores(vec![SqlFamily::Postgres, SqlFamily::Mysql], |test_setup, barrel| {
+    test_each_backend_with_ignores(vec![SqlFamily::Sqlite, SqlFamily::Postgres], |test_setup, barrel| {
         let _setup_schema = barrel.execute(|migration| {
             migration.create_table("User", |t| {
                 t.add_column("id", types::primary());
@@ -447,28 +443,28 @@ fn introspecting_a_many_to_many_relation_should_work() {
             });
             migration.create_table("PostsToUsers", |t| {
                 t.inject_custom(
-                    "user_id TEXT NOT NULL,
-                          post_id TEXT NOT NULL,
-                          FOREIGN KEY (user_id) REFERENCES  User(id),
-                          FOREIGN KEY (post_id) REFERENCES  Post(id)",
+                    "user_id INTEGER NOT NULL,
+                     post_id INTEGER NOT NULL,
+                     FOREIGN KEY (`user_id`) REFERENCES  `User`(`id`),
+                     FOREIGN KEY (`post_id`) REFERENCES  `Post`(`id`)",
                 )
             });
         });
 
         let dm = r#"
-            model User {
-               id Int @id
-               postsToUserses PostsToUsers[] 
-            }
-            
             model Post {
-               id Int @id
+               id      Int @id
                postsToUserses PostsToUsers[] @relation(references: [post_id])
             }
-            
+
             model PostsToUsers {
               post_id Post 
               user_id User
+            }
+            
+            model User {
+               id      Int @id
+               postsToUserses PostsToUsers[] 
             }
         "#;
         let result = dbg!(introspect(test_setup));
@@ -478,7 +474,7 @@ fn introspecting_a_many_to_many_relation_should_work() {
 
 #[test]
 fn introspecting_a_many_to_many_relation_with_extra_fields_should_work() {
-    test_each_backend_with_ignores(vec![SqlFamily::Postgres, SqlFamily::Mysql], |test_setup, barrel| {
+    test_each_backend_with_ignores(vec![SqlFamily::Sqlite, SqlFamily::Postgres], |test_setup, barrel| {
         let _setup_schema = barrel.execute(|migration| {
             migration.create_table("User", |t| {
                 t.add_column("id", types::primary());
@@ -489,22 +485,17 @@ fn introspecting_a_many_to_many_relation_with_extra_fields_should_work() {
             migration.create_table("PostsToUsers", |t| {
                 t.inject_custom(
                     "date    date,
-                          user_id TEXT NOT NULL,
-                          post_id TEXT NOT NULL,
-                          FOREIGN KEY (user_id) REFERENCES  User(id),
-                          FOREIGN KEY (post_id) REFERENCES  Post(id)",
+                     user_id INTEGER NOT NULL,
+                     post_id INTEGER NOT NULL,
+                     FOREIGN KEY (`user_id`) REFERENCES  `User`(`id`),
+                     FOREIGN KEY (`post_id`) REFERENCES  `Post`(`id`)",
                 )
             });
         });
 
         let dm = r#"
-            model User {
-               id Int @id
-               postsToUserses PostsToUsers[] 
-            }
-            
             model Post {
-               id Int @id
+               id      Int @id
                postsToUserses PostsToUsers[] @relation(references: [post_id])
             }
             
@@ -513,6 +504,11 @@ fn introspecting_a_many_to_many_relation_with_extra_fields_should_work() {
               post_id Post 
               user_id User
             }
+            
+            model User {
+               id      Int @id
+               postsToUserses PostsToUsers[] 
+            }
         "#;
         let result = dbg!(introspect(test_setup));
         custom_assert(&result, dm);
@@ -520,15 +516,15 @@ fn introspecting_a_many_to_many_relation_with_extra_fields_should_work() {
 }
 #[test]
 fn introspecting_a_self_relation_should_work() {
-    test_each_backend_with_ignores(vec![SqlFamily::Postgres, SqlFamily::Mysql], |test_setup, barrel| {
+    test_each_backend_with_ignores(vec![SqlFamily::Sqlite, SqlFamily::Postgres], |test_setup, barrel| {
         let _setup_schema = barrel.execute(|migration| {
             migration.create_table("User", |t| {
                 t.add_column("id", types::primary());
                 t.inject_custom(
-                    "recruited_by INTEGER,
-                          direct_report INTEGER,
-                          FOREIGN KEY (recruited_by) REFERENCES User (id),
-                          FOREIGN KEY (direct_report) REFERENCES User (id)",
+                    "recruited_by INTEGER, 
+                     direct_report INTEGER,
+                     FOREIGN KEY (`recruited_by`) REFERENCES `User` (`id`),
+                     FOREIGN KEY (`direct_report`) REFERENCES `User` (`id`)",
                 )
             });
         });
@@ -536,7 +532,7 @@ fn introspecting_a_self_relation_should_work() {
         let dm = r#"
             model User {
                 direct_report                  User?  @relation("UserToUser_direct_report")
-                id                             Int    @id
+                id      Int @id
                 recruited_by                   User?  @relation("UserToUser_recruited_by")
                 users_UserToUser_direct_report User[] @relation("UserToUser_direct_report")
                 users_UserToUser_recruited_by  User[] @relation("UserToUser_recruited_by")
@@ -546,3 +542,7 @@ fn introspecting_a_self_relation_should_work() {
         custom_assert(&result, dm);
     });
 }
+
+// enums
+
+// native arrays

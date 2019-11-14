@@ -129,37 +129,37 @@ impl From<SqlError> for ConnectorError {
     }
 }
 
-impl From<prisma_query::error::Error> for SqlError {
-    fn from(e: prisma_query::error::Error) -> Self {
+impl From<quaint::error::Error> for SqlError {
+    fn from(e: quaint::error::Error) -> Self {
         match e {
-            prisma_query::error::Error::QueryError(e) => Self::QueryError(e.into()),
-            prisma_query::error::Error::IoError(e) => Self::ConnectionError(e.into()),
-            prisma_query::error::Error::NotFound => Self::RecordDoesNotExist,
-            prisma_query::error::Error::InvalidConnectionArguments => Self::InvalidConnectionArguments,
+            quaint::error::Error::QueryError(e) => Self::QueryError(e.into()),
+            quaint::error::Error::IoError(e) => Self::ConnectionError(e.into()),
+            quaint::error::Error::NotFound => Self::RecordDoesNotExist,
+            quaint::error::Error::InvalidConnectionArguments => Self::InvalidConnectionArguments,
 
-            prisma_query::error::Error::UniqueConstraintViolation { field_name } => {
+            quaint::error::Error::UniqueConstraintViolation { field_name } => {
                 Self::UniqueConstraintViolation { field_name }
             }
 
-            prisma_query::error::Error::NullConstraintViolation { field_name } => {
+            quaint::error::Error::NullConstraintViolation { field_name } => {
                 Self::NullConstraintViolation { field_name }
             }
 
-            prisma_query::error::Error::ConnectionError(e) => Self::ConnectionError(e.into()),
-            prisma_query::error::Error::ColumnReadFailure(e) => Self::ColumnReadFailure(e.into()),
-            prisma_query::error::Error::ColumnNotFound(_) => Self::ColumnDoesNotExist,
+            quaint::error::Error::ConnectionError(e) => Self::ConnectionError(e.into()),
+            quaint::error::Error::ColumnReadFailure(e) => Self::ColumnReadFailure(e.into()),
+            quaint::error::Error::ColumnNotFound(_) => Self::ColumnDoesNotExist,
 
-            e @ prisma_query::error::Error::ConversionError(_) => SqlError::ConversionError(e.into()),
-            e @ prisma_query::error::Error::ResultIndexOutOfBounds { .. } => SqlError::QueryError(e.into()),
-            e @ prisma_query::error::Error::ResultTypeMismatch { .. } => SqlError::QueryError(e.into()),
-            e @ prisma_query::error::Error::DatabaseUrlIsInvalid { .. } => SqlError::ConnectionError(e.into()),
-            e @ prisma_query::error::Error::DatabaseDoesNotExist { .. } => SqlError::ConnectionError(e.into()),
-            e @ prisma_query::error::Error::AuthenticationFailed { .. } => SqlError::ConnectionError(e.into()),
-            e @ prisma_query::error::Error::DatabaseAccessDenied { .. } => SqlError::ConnectionError(e.into()),
-            e @ prisma_query::error::Error::DatabaseAlreadyExists { .. } => SqlError::ConnectionError(e.into()),
-            e @ prisma_query::error::Error::ConnectTimeout { .. } => SqlError::ConnectionError(e.into()),
-            e @ prisma_query::error::Error::Timeout => SqlError::ConnectionError(e.into()),
-            e @ prisma_query::error::Error::TlsError { .. } => Self::ConnectionError(e.into()),
+            e @ quaint::error::Error::ConversionError(_) => SqlError::ConversionError(e.into()),
+            e @ quaint::error::Error::ResultIndexOutOfBounds { .. } => SqlError::QueryError(e.into()),
+            e @ quaint::error::Error::ResultTypeMismatch { .. } => SqlError::QueryError(e.into()),
+            e @ quaint::error::Error::DatabaseUrlIsInvalid { .. } => SqlError::ConnectionError(e.into()),
+            e @ quaint::error::Error::DatabaseDoesNotExist { .. } => SqlError::ConnectionError(e.into()),
+            e @ quaint::error::Error::AuthenticationFailed { .. } => SqlError::ConnectionError(e.into()),
+            e @ quaint::error::Error::DatabaseAccessDenied { .. } => SqlError::ConnectionError(e.into()),
+            e @ quaint::error::Error::DatabaseAlreadyExists { .. } => SqlError::ConnectionError(e.into()),
+            e @ quaint::error::Error::ConnectTimeout { .. } => SqlError::ConnectionError(e.into()),
+            e @ quaint::error::Error::Timeout => SqlError::ConnectionError(e.into()),
+            e @ quaint::error::Error::TlsError { .. } => Self::ConnectionError(e.into()),
         }
     }
 }
@@ -173,12 +173,6 @@ impl From<DomainError> for SqlError {
 impl From<serde_json::error::Error> for SqlError {
     fn from(e: serde_json::error::Error) -> SqlError {
         SqlError::ConversionError(e.into())
-    }
-}
-
-impl From<r2d2::Error> for SqlError {
-    fn from(e: r2d2::Error) -> SqlError {
-        SqlError::ConnectionError(e.into())
     }
 }
 
