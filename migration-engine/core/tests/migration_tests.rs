@@ -2,8 +2,8 @@
 #![allow(unused)]
 mod test_harness;
 use pretty_assertions::{assert_eq, assert_ne};
-use sql_migration_connector::{AlterIndex, CreateIndex, DropIndex, SqlMigrationStep};
 use quaint::prelude::SqlFamily;
+use sql_migration_connector::{AlterIndex, CreateIndex, DropIndex, SqlMigrationStep};
 use sql_schema_describer::*;
 use test_harness::*;
 
@@ -1393,7 +1393,7 @@ fn removing_a_relation_field_must_work(api: &TestApi) {
 }
 
 #[test_each_connector]
-fn simple_custom_types_in_migrations_must_work(api: &TestApi) {
+fn simple_type_aliases_in_migrations_must_work(api: &TestApi) {
     let dm1 = r#"
         type CUID = String @id @default(cuid())
 

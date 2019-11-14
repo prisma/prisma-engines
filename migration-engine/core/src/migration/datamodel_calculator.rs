@@ -44,9 +44,9 @@ fn apply_step(datamodel: &mut ast::SchemaAst, step: &MigrationStep) -> Result<()
         MigrationStep::CreateField(create_field) => apply_create_field(datamodel, create_field)?,
         MigrationStep::UpdateField(update_field) => apply_update_field(datamodel, update_field)?,
         MigrationStep::DeleteField(delete_field) => apply_delete_field(datamodel, delete_field)?,
-        MigrationStep::CreateCustomType(create_custom_type) => apply_create_custom_type(datamodel, create_custom_type)?,
-        MigrationStep::UpdateCustomType(update_custom_type) => apply_update_custom_type(datamodel, update_custom_type)?,
-        MigrationStep::DeleteCustomType(delete_custom_type) => apply_delete_custom_type(datamodel, delete_custom_type)?,
+        MigrationStep::CreateTypeAlias(create_type_alias) => apply_create_type_alias(datamodel, create_type_alias)?,
+        MigrationStep::UpdateTypeAlias(update_type_alias) => apply_update_type_alias(datamodel, update_type_alias)?,
+        MigrationStep::DeleteTypeAlias(delete_type_alias) => apply_delete_type_alias(datamodel, delete_type_alias)?,
         MigrationStep::CreateDirective(create_directive) => apply_create_directive(datamodel, create_directive)?,
         MigrationStep::DeleteDirective(delete_directive) => apply_delete_directive(datamodel, delete_directive)?,
         MigrationStep::CreateDirectiveArgument(create_directive_argument) => {
@@ -411,21 +411,21 @@ fn apply_delete_directive_argument(datamodel: &mut ast::SchemaAst, step: &steps:
     directive.arguments = new_arguments;
 }
 
-fn apply_create_custom_type(
+fn apply_create_type_alias(
     datamodel: &mut ast::SchemaAst,
-    step: &steps::CreateCustomType,
+    step: &steps::CreateTypeAlias,
 ) -> Result<(), CalculatorError> {
-    if let Some(_) = datamodel.find_custom_type(&step.custom_type) {
+    if let Some(_) = datamodel.find_type_alias(&step.type_alias) {
         return Err(format_err!(
             "The type {} already exists in this Datamodel. It is not possible to create it once more.",
-            &step.custom_type
+            &step.type_alias
         )
         .into());
     }
 
-    let custom_type = ast::Field {
+    let type_alias = ast::Field {
         documentation: None,
-        name: new_ident(step.custom_type.clone()),
+        name: new_ident(step.type_alias.clone()),
         span: new_span(),
         default_value: None,
         arity: step.arity.clone(),
@@ -433,34 +433,34 @@ fn apply_create_custom_type(
         field_type: new_ident(step.r#type.clone()),
     };
 
-    datamodel.tops.push(ast::Top::Type(custom_type));
+    datamodel.tops.push(ast::Top::Type(type_alias));
 
     Ok(())
 }
 
-fn apply_update_custom_type(
+fn apply_update_type_alias(
     datamodel: &mut ast::SchemaAst,
-    step: &steps::UpdateCustomType,
+    step: &steps::UpdateTypeAlias,
 ) -> Result<(), CalculatorError> {
-    let custom_type = datamodel
-        .find_custom_type_mut(&step.custom_type)
-        .ok_or_else(|| format_err!("UpdateCustomType on unknown custom type `{}`", &step.custom_type))?;
+    let type_alias = datamodel
+        .find_type_alias_mut(&step.type_alias)
+        .ok_or_else(|| format_err!("UpdateTypeAlias on unknown custom type `{}`", &step.type_alias))?;
 
     if let Some(r#type) = step.r#type.as_ref() {
-        custom_type.field_type = new_ident(r#type.clone())
+        type_alias.field_type = new_ident(r#type.clone())
     }
 
     Ok(())
 }
 
-fn apply_delete_custom_type(
+fn apply_delete_type_alias(
     datamodel: &mut ast::SchemaAst,
-    step: &steps::DeleteCustomType,
+    step: &steps::DeleteTypeAlias,
 ) -> Result<(), CalculatorError> {
-    datamodel.find_custom_type(&step.custom_type).ok_or_else(|| {
+    datamodel.find_type_alias(&step.type_alias).ok_or_else(|| {
         format_err!(
             "The type {} does not exist in this Datamodel. It is not possible to delete it.",
-            &step.custom_type
+            &step.type_alias
         )
     })?;
 
@@ -468,7 +468,7 @@ fn apply_delete_custom_type(
         .tops
         .drain(..)
         .filter(|top| match top {
-            ast::Top::Type(field) => field.name.name != step.custom_type,
+            ast::Top::Type(field) => field.name.name != step.type_alias,
             _ => true,
         })
         .collect();
@@ -494,9 +494,7 @@ fn find_directives_mut<'a>(
         steps::DirectiveType::Field { model, field } => &mut datamodel.find_field_mut(&model, &field)?.directives,
         steps::DirectiveType::Model { model } => &mut datamodel.find_model_mut(&model)?.directives,
         steps::DirectiveType::Enum { r#enum } => &mut datamodel.find_enum_mut(&r#enum)?.directives,
-        steps::DirectiveType::CustomType { custom_type } => {
-            &mut datamodel.find_custom_type_mut(&custom_type)?.directives
-        }
+        steps::DirectiveType::TypeAlias { type_alias } => &mut datamodel.find_type_alias_mut(&type_alias)?.directives,
     };
 
     Some(directives)

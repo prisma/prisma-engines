@@ -605,7 +605,7 @@ fn infer_CreateDirective_on_enum() {
 }
 
 #[test]
-fn infer_CreateDirective_on_custom_type() {
+fn infer_CreateDirective_on_type_alias() {
     let dm1 = parse(r#"type BlogPost = String @default("a")"#);
     let dm2 = parse(r#"type BlogPost = String @customized @default("a")"#);
 
@@ -614,8 +614,8 @@ fn infer_CreateDirective_on_custom_type() {
     let locator = DirectiveLocation {
         directive: "customized".to_owned(),
         arguments: None,
-        location: DirectiveType::CustomType {
-            custom_type: "BlogPost".to_owned(),
+        location: DirectiveType::TypeAlias {
+            type_alias: "BlogPost".to_owned(),
         },
     };
 
@@ -780,7 +780,7 @@ fn infer_DeleteDirective_on_enum() {
 }
 
 #[test]
-fn infer_DeleteDirective_on_custom_type() {
+fn infer_DeleteDirective_on_type_alias() {
     let dm1 = parse(r#"type BlogPost = String @default("chimken")"#);
     let dm2 = parse(r#"type BlogPost = String"#);
 
@@ -789,8 +789,8 @@ fn infer_DeleteDirective_on_custom_type() {
     let locator = DirectiveLocation {
         directive: "default".to_owned(),
         arguments: None,
-        location: DirectiveType::CustomType {
-            custom_type: "BlogPost".to_owned(),
+        location: DirectiveType::TypeAlias {
+            type_alias: "BlogPost".to_owned(),
         },
     };
 
@@ -937,7 +937,7 @@ fn infer_CreateDirectiveArgument_on_enum() {
 }
 
 #[test]
-fn infer_CreateDirectiveArgument_on_custom_type() {
+fn infer_CreateDirectiveArgument_on_type_alias() {
     let dm1 = parse(r#"type BlogPost = String @customDirective(c: "d")"#);
     let dm2 = parse(r#"type BlogPost = String @customDirective(a: "b", c: "d")"#);
 
@@ -946,8 +946,8 @@ fn infer_CreateDirectiveArgument_on_custom_type() {
     let locator = DirectiveLocation {
         directive: "customDirective".to_owned(),
         arguments: None,
-        location: DirectiveType::CustomType {
-            custom_type: "BlogPost".to_owned(),
+        location: DirectiveType::TypeAlias {
+            type_alias: "BlogPost".to_owned(),
         },
     };
 
@@ -1094,7 +1094,7 @@ fn infer_DeleteDirectiveArgument_on_enum() {
 }
 
 #[test]
-fn infer_DeleteDirectiveArgument_on_custom_type() {
+fn infer_DeleteDirectiveArgument_on_type_alias() {
     let dm1 = parse(r#"type BlogPost = String @customDirective(a: "b", c: "d")"#);
     let dm2 = parse(r#"type BlogPost = String @customDirective(c: "d")"#);
 
@@ -1103,8 +1103,8 @@ fn infer_DeleteDirectiveArgument_on_custom_type() {
     let locator = DirectiveLocation {
         arguments: None,
         directive: "customDirective".to_owned(),
-        location: DirectiveType::CustomType {
-            custom_type: "BlogPost".to_owned(),
+        location: DirectiveType::TypeAlias {
+            type_alias: "BlogPost".to_owned(),
         },
     };
 
@@ -1256,7 +1256,7 @@ fn infer_UpdateDirectiveArgument_on_enum() {
 }
 
 #[test]
-fn infer_UpdateDirectiveArgument_on_custom_type() {
+fn infer_UpdateDirectiveArgument_on_type_alias() {
     let dm1 = parse("type Text = String @default(\"chicken\")");
     let dm2 = parse("type Text = String @default(\"\")");
 
@@ -1265,8 +1265,8 @@ fn infer_UpdateDirectiveArgument_on_custom_type() {
     let locator = DirectiveLocation {
         directive: "default".to_owned(),
         arguments: None,
-        location: DirectiveType::CustomType {
-            custom_type: "Text".to_owned(),
+        location: DirectiveType::TypeAlias {
+            type_alias: "Text".to_owned(),
         },
     };
 
@@ -1280,7 +1280,7 @@ fn infer_UpdateDirectiveArgument_on_custom_type() {
 }
 
 #[test]
-fn infer_CreateCustomType() {
+fn infer_CreateTypeAlias() {
     let dm1 = parse("");
     let dm2 = parse(
         r#"
@@ -1295,13 +1295,13 @@ fn infer_CreateCustomType() {
 
     let steps = infer(&dm1, &dm2);
 
-    let directive_type = DirectiveType::CustomType {
-        custom_type: "CUID".to_owned(),
+    let directive_type = DirectiveType::TypeAlias {
+        type_alias: "CUID".to_owned(),
     };
 
     let expected = &[
-        MigrationStep::CreateCustomType(CreateCustomType {
-            custom_type: "CUID".to_owned(),
+        MigrationStep::CreateTypeAlias(CreateTypeAlias {
+            type_alias: "CUID".to_owned(),
             r#type: "String".to_owned(),
             arity: FieldArity::Required,
         }),
@@ -1349,27 +1349,27 @@ fn infer_CreateCustomType() {
 }
 
 #[test]
-fn infer_DeleteCustomType() {
+fn infer_DeleteTypeAlias() {
     let dm1 = parse("type CUID = String @id @default(cuid())");
     let dm2 = parse("");
     let steps = infer(&dm1, &dm2);
 
-    let expected = &[MigrationStep::DeleteCustomType(DeleteCustomType {
-        custom_type: "CUID".to_owned(),
+    let expected = &[MigrationStep::DeleteTypeAlias(DeleteTypeAlias {
+        type_alias: "CUID".to_owned(),
     })];
 
     assert_eq!(steps, expected);
 }
 
 #[test]
-fn infer_UpdateCustomType() {
+fn infer_UpdateTypeAlias() {
     let dm1 = parse("type Age = Int");
     let dm2 = parse("type Age = Float");
 
     let steps = infer(&dm1, &dm2);
 
-    let expected = &[MigrationStep::UpdateCustomType(UpdateCustomType {
-        custom_type: "Age".to_owned(),
+    let expected = &[MigrationStep::UpdateTypeAlias(UpdateTypeAlias {
+        type_alias: "Age".to_owned(),
         r#type: Some("Float".to_owned()),
     })];
 

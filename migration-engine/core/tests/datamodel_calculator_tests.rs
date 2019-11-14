@@ -228,11 +228,11 @@ fn creating_a_field_that_already_exists_must_error() {
 
 #[should_panic(expected = "The type Test already exists in this Datamodel. It is not possible to create it once more.")]
 #[test]
-fn creating_a_custom_type_that_already_exists_must_error() {
+fn creating_a_type_alias_that_already_exists_must_error() {
     let dm = parse("type Test = Float");
 
-    let steps = &[MigrationStep::CreateCustomType(CreateCustomType {
-        custom_type: "Test".to_owned(),
+    let steps = &[MigrationStep::CreateTypeAlias(CreateTypeAlias {
+        type_alias: "Test".to_owned(),
         r#type: "Test".to_string(),
         arity: FieldArity::Required,
     })];
@@ -242,11 +242,11 @@ fn creating_a_custom_type_that_already_exists_must_error() {
 
 #[should_panic(expected = "The type Test does not exist in this Datamodel. It is not possible to delete it.")]
 #[test]
-fn deleting_a_custom_type_that_does_not_exist_must_error() {
+fn deleting_a_type_alias_that_does_not_exist_must_error() {
     let dm = parse("");
 
-    let steps = &[MigrationStep::DeleteCustomType(DeleteCustomType {
-        custom_type: "Test".to_owned(),
+    let steps = &[MigrationStep::DeleteTypeAlias(DeleteTypeAlias {
+        type_alias: "Test".to_owned(),
     })];
 
     calculate(&dm, steps);

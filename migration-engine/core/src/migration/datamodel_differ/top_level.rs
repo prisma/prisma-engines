@@ -69,30 +69,30 @@ impl<'a> TopDiffer<'a> {
     }
 
     /// Iterator over the custom types present in `next` but not `previous`.
-    pub(crate) fn created_custom_types(&self) -> impl Iterator<Item = &ast::Field> {
-        self.next_custom_types().filter(move |next_custom_type| {
-            self.previous_custom_types()
-                .find(|previous_custom_type| custom_types_match(previous_custom_type, next_custom_type))
+    pub(crate) fn created_type_aliases(&self) -> impl Iterator<Item = &ast::Field> {
+        self.next_type_aliases().filter(move |next_type_alias| {
+            self.previous_type_aliases()
+                .find(|previous_type_alias| type_aliases_match(previous_type_alias, next_type_alias))
                 .is_none()
         })
     }
 
     /// Iterator over the custom types present in `previous` but not `next`.
-    pub(crate) fn deleted_custom_types(&self) -> impl Iterator<Item = &ast::Field> {
-        self.previous_custom_types().filter(move |previous_custom_type| {
-            self.next_custom_types()
-                .find(|next_custom_type| custom_types_match(previous_custom_type, next_custom_type))
+    pub(crate) fn deleted_type_aliases(&self) -> impl Iterator<Item = &ast::Field> {
+        self.previous_type_aliases().filter(move |previous_type_alias| {
+            self.next_type_aliases()
+                .find(|next_type_alias| type_aliases_match(previous_type_alias, next_type_alias))
                 .is_none()
         })
     }
 
-    pub(crate) fn custom_type_pairs(&self) -> impl Iterator<Item = FieldDiffer<'_>> {
-        self.previous_custom_types().filter_map(move |previous_custom_type| {
-            self.next_custom_types()
-                .find(|next_custom_type| custom_types_match(previous_custom_type, next_custom_type))
-                .map(|next_custom_type| FieldDiffer {
-                    previous: previous_custom_type,
-                    next: next_custom_type,
+    pub(crate) fn type_alias_pairs(&self) -> impl Iterator<Item = FieldDiffer<'_>> {
+        self.previous_type_aliases().filter_map(move |previous_type_alias| {
+            self.next_type_aliases()
+                .find(|next_type_alias| type_aliases_match(previous_type_alias, next_type_alias))
+                .map(|next_type_alias| FieldDiffer {
+                    previous: previous_type_alias,
+                    next: next_type_alias,
                 })
         })
     }
@@ -118,13 +118,13 @@ impl<'a> TopDiffer<'a> {
     }
 
     /// Iterator over the custom types in `previous`.
-    pub fn previous_custom_types(&self) -> impl Iterator<Item = &ast::Field> {
-        walk_custom_types(self.previous)
+    pub fn previous_type_aliases(&self) -> impl Iterator<Item = &ast::Field> {
+        walk_type_aliases(self.previous)
     }
 
     /// Iterator over the custom types in `next`.
-    pub fn next_custom_types(&self) -> impl Iterator<Item = &ast::Field> {
-        walk_custom_types(self.next)
+    pub fn next_type_aliases(&self) -> impl Iterator<Item = &ast::Field> {
+        walk_type_aliases(self.next)
     }
 }
 
@@ -144,11 +144,11 @@ fn models_match(previous: &ast::Model, next: &ast::Model) -> bool {
     previous.name.name == next.name.name
 }
 
-fn walk_custom_types(ast: &ast::SchemaAst) -> impl Iterator<Item = &ast::Field> {
-    ast.tops.iter().filter_map(Top::as_custom_type)
+fn walk_type_aliases(ast: &ast::SchemaAst) -> impl Iterator<Item = &ast::Field> {
+    ast.tops.iter().filter_map(Top::as_type_alias)
 }
 
-fn custom_types_match(previous: &ast::Field, next: &ast::Field) -> bool {
+fn type_aliases_match(previous: &ast::Field, next: &ast::Field) -> bool {
     previous.name.name == next.name.name
 }
 

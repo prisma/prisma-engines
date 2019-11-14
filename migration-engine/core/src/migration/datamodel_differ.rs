@@ -21,7 +21,7 @@ pub(crate) fn diff(previous: &ast::SchemaAst, next: &ast::SchemaAst) -> Vec<Migr
     let mut steps = Vec::new();
     let differ = TopDiffer { previous, next };
 
-    push_custom_types(&mut steps, &differ);
+    push_type_aliases(&mut steps, &differ);
     push_enums(&mut steps, &differ);
     push_models(&mut steps, &differ);
 
@@ -30,61 +30,61 @@ pub(crate) fn diff(previous: &ast::SchemaAst, next: &ast::SchemaAst) -> Vec<Migr
 
 type Steps = Vec<MigrationStep>;
 
-fn push_custom_types(steps: &mut Steps, differ: &TopDiffer<'_>) {
-    push_created_custom_types(steps, differ.created_custom_types());
-    push_deleted_custom_types(steps, differ.deleted_custom_types());
-    push_updated_custom_types(steps, differ.custom_type_pairs());
+fn push_type_aliases(steps: &mut Steps, differ: &TopDiffer<'_>) {
+    push_created_type_aliases(steps, differ.created_type_aliases());
+    push_deleted_type_aliases(steps, differ.deleted_type_aliases());
+    push_updated_type_aliases(steps, differ.type_alias_pairs());
 }
 
-fn push_created_custom_types<'a>(steps: &mut Steps, custom_types: impl Iterator<Item = &'a ast::Field>) {
-    for created_custom_type in custom_types {
-        let create_custom_type_step = steps::CreateCustomType {
-            custom_type: created_custom_type.name.name.clone(),
-            r#type: created_custom_type.field_type.name.clone(),
-            arity: created_custom_type.arity.clone(),
+fn push_created_type_aliases<'a>(steps: &mut Steps, type_aliases: impl Iterator<Item = &'a ast::Field>) {
+    for created_type_alias in type_aliases {
+        let create_type_alias_step = steps::CreateTypeAlias {
+            type_alias: created_type_alias.name.name.clone(),
+            r#type: created_type_alias.field_type.name.clone(),
+            arity: created_type_alias.arity.clone(),
         };
 
-        steps.push(MigrationStep::CreateCustomType(create_custom_type_step));
+        steps.push(MigrationStep::CreateTypeAlias(create_type_alias_step));
 
-        let location = steps::DirectiveType::CustomType {
-            custom_type: created_custom_type.name.name.clone(),
+        let location = steps::DirectiveType::TypeAlias {
+            type_alias: created_type_alias.name.name.clone(),
         };
 
-        push_created_directives(steps, &location, created_custom_type.directives.iter())
+        push_created_directives(steps, &location, created_type_alias.directives.iter())
     }
 }
 
-fn push_deleted_custom_types<'a>(steps: &mut Steps, custom_types: impl Iterator<Item = &'a ast::Field>) {
-    let delete_custom_type_steps = custom_types
-        .map(|deleted_custom_type| steps::DeleteCustomType {
-            custom_type: deleted_custom_type.name.name.clone(),
+fn push_deleted_type_aliases<'a>(steps: &mut Steps, type_aliases: impl Iterator<Item = &'a ast::Field>) {
+    let delete_type_alias_steps = type_aliases
+        .map(|deleted_type_alias| steps::DeleteTypeAlias {
+            type_alias: deleted_type_alias.name.name.clone(),
         })
-        .map(MigrationStep::DeleteCustomType);
+        .map(MigrationStep::DeleteTypeAlias);
 
-    steps.extend(delete_custom_type_steps)
+    steps.extend(delete_type_alias_steps)
 }
 
-fn push_updated_custom_types<'a>(steps: &mut Steps, custom_types: impl Iterator<Item = FieldDiffer<'a>>) {
-    for updated_custom_type in custom_types {
-        let location = steps::DirectiveType::CustomType {
-            custom_type: updated_custom_type.previous.name.name.clone(),
+fn push_updated_type_aliases<'a>(steps: &mut Steps, type_aliases: impl Iterator<Item = FieldDiffer<'a>>) {
+    for updated_type_alias in type_aliases {
+        let location = steps::DirectiveType::TypeAlias {
+            type_alias: updated_type_alias.previous.name.name.clone(),
         };
 
-        let step = steps::UpdateCustomType {
-            custom_type: updated_custom_type.previous.name.name.clone(),
+        let step = steps::UpdateTypeAlias {
+            type_alias: updated_type_alias.previous.name.name.clone(),
             r#type: diff_value(
-                &updated_custom_type.previous.field_type.name,
-                &updated_custom_type.next.field_type.name,
+                &updated_type_alias.previous.field_type.name,
+                &updated_type_alias.next.field_type.name,
             ),
         };
 
         if step.is_any_option_set() {
-            steps.push(MigrationStep::UpdateCustomType(step));
+            steps.push(MigrationStep::UpdateTypeAlias(step));
         }
 
-        push_created_directives(steps, &location, updated_custom_type.created_directives());
-        push_updated_directives(steps, &location, updated_custom_type.directive_pairs());
-        push_deleted_directives(steps, &location, updated_custom_type.deleted_directives());
+        push_created_directives(steps, &location, updated_type_alias.created_directives());
+        push_updated_directives(steps, &location, updated_type_alias.directive_pairs());
+        push_deleted_directives(steps, &location, updated_type_alias.deleted_directives());
     }
 }
 

@@ -21,9 +21,9 @@ pub enum MigrationStep {
     CreateEnum(CreateEnum),
     UpdateEnum(UpdateEnum),
     DeleteEnum(DeleteEnum),
-    CreateCustomType(CreateCustomType),
-    UpdateCustomType(UpdateCustomType),
-    DeleteCustomType(DeleteCustomType),
+    CreateTypeAlias(CreateTypeAlias),
+    UpdateTypeAlias(UpdateTypeAlias),
+    DeleteTypeAlias(DeleteTypeAlias),
 }
 
 #[derive(Debug, Deserialize, Serialize, PartialEq, Eq, Hash, Clone)]
@@ -216,7 +216,7 @@ impl DirectiveLocation {
 #[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
 #[serde(rename_all = "camelCase", deny_unknown_fields, untagged)]
 pub enum DirectiveType {
-    CustomType { custom_type: String },
+    TypeAlias { type_alias: String },
     Field { model: String, field: String },
     Model { model: String },
     Enum { r#enum: String },
@@ -265,29 +265,29 @@ impl MigrationExpression {
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct CreateCustomType {
-    pub custom_type: String,
+pub struct CreateTypeAlias {
+    pub type_alias: String,
 
     pub r#type: String,
     pub arity: ast::FieldArity,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct UpdateCustomType {
-    pub custom_type: String,
+pub struct UpdateTypeAlias {
+    pub type_alias: String,
 
     pub r#type: Option<String>,
 }
 
-impl UpdateCustomType {
+impl UpdateTypeAlias {
     pub fn is_any_option_set(&self) -> bool {
         self.r#type.is_some()
     }
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct DeleteCustomType {
-    pub custom_type: String,
+pub struct DeleteTypeAlias {
+    pub type_alias: String,
 }
 
 #[cfg(test)]
