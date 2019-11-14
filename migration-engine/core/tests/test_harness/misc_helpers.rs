@@ -6,25 +6,10 @@ use migration_core::{
 };
 use sql_connection::{Mysql, Postgresql, Sqlite, SyncSqlConnection};
 use sql_migration_connector::{SqlFamily, SqlMigrationConnector};
-use sql_schema_describer::{SqlSchema, SqlSchemaDescriberBackend};
 use std::{rc::Rc, sync::Arc};
 use url::Url;
 
 pub const SCHEMA_NAME: &str = "lift";
-
-pub struct TestSetup {
-    pub sql_family: SqlFamily,
-    pub database: Arc<dyn SyncSqlConnection + Send + Sync + 'static>,
-}
-
-impl TestSetup {
-    pub fn is_sqlite(&self) -> bool {
-        match self.sql_family {
-            SqlFamily::Sqlite => true,
-            _ => false,
-        }
-    }
-}
 
 pub fn parse(datamodel_string: &str) -> SchemaAst {
     parser::parse(datamodel_string).unwrap()
@@ -70,75 +55,6 @@ pub(super) fn sqlite_migration_connector() -> SqlMigrationConnector {
     SqlMigrationConnector::new_from_database_str(&sqlite_test_file()).unwrap()
 }
 
-pub fn test_each_connector_with_ignores<I: AsRef<[SqlFamily]>, F>(ignores: I, test_fn: F)
-where
-    F: Fn(&TestSetup, &dyn GenericApi) -> () + std::panic::RefUnwindSafe,
-{
-    let ignores: &[SqlFamily] = ignores.as_ref();
-    // POSTGRES
-    if !ignores.contains(&SqlFamily::Postgres) {
-        println!("--------------- Testing with Postgres now ---------------");
-
-        let connector = postgres_migration_connector(&postgres_url());
-
-        let test_setup = TestSetup {
-            sql_family: SqlFamily::Postgres,
-            database: Arc::clone(&connector.database),
-        };
-
-        let api = test_api(connector);
-
-        test_fn(&test_setup, &api);
-    } else {
-        println!("--------------- Ignoring Postgres ---------------")
-    }
-
-    // MYSQL
-    if !ignores.contains(&SqlFamily::Mysql) {
-        println!("--------------- Testing with MySQL now ---------------");
-
-        let connector = mysql_migration_connector(&mysql_url());
-
-        let test_setup = TestSetup {
-            sql_family: SqlFamily::Mysql,
-            database: Arc::clone(&connector.database),
-        };
-        let api = test_api(connector);
-
-        test_fn(&test_setup, &api);
-
-        println!("--------------- Testing with MySQL 8 now ---------------");
-
-        let connector = mysql_migration_connector(&mysql_8_url());
-
-        let test_setup = TestSetup {
-            sql_family: SqlFamily::Mysql,
-            database: Arc::clone(&connector.database),
-        };
-        let api = test_api(connector);
-
-        test_fn(&test_setup, &api);
-    } else {
-        println!("--------------- Ignoring MySQL ---------------")
-    }
-
-    // SQLite
-    if !ignores.contains(&SqlFamily::Sqlite) {
-        println!("--------------- Testing with SQLite now ---------------");
-
-        let connector = sqlite_migration_connector();
-        let test_setup = TestSetup {
-            sql_family: SqlFamily::Sqlite,
-            database: Arc::clone(&connector.database),
-        };
-        let api = test_api(connector);
-
-        test_fn(&test_setup, &api);
-    } else {
-        println!("--------------- Ignoring SQLite ---------------")
-    }
-}
-
 pub fn test_api<C, D>(connector: C) -> impl GenericApi
 where
     C: MigrationConnector<DatabaseMigration = D>,
@@ -150,25 +66,6 @@ where
         .expect("Engine reset failed");
 
     api
-}
-
-pub fn introspect_database(test_setup: &TestSetup, api: &dyn GenericApi) -> SqlSchema {
-    let db = Arc::clone(&test_setup.database);
-    let inspector: Box<dyn SqlSchemaDescriberBackend> = match api.connector_type() {
-        "postgresql" => Box::new(sql_schema_describer::postgres::SqlSchemaDescriber::new(db)),
-        "sqlite" => Box::new(sql_schema_describer::sqlite::SqlSchemaDescriber::new(db)),
-        "mysql" => Box::new(sql_schema_describer::mysql::SqlSchemaDescriber::new(db)),
-        _ => unimplemented!(),
-    };
-
-    let mut result = inspector
-        .describe(&SCHEMA_NAME.to_string())
-        .expect("Introspection failed");
-
-    // The presence of the _Migration table makes assertions harder. Therefore remove it from the result.
-    result.tables = result.tables.into_iter().filter(|t| t.name != "_Migration").collect();
-
-    result
 }
 
 fn fetch_db_name(url: &Url, default: &str) -> String {
