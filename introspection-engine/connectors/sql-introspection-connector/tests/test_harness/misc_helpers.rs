@@ -1,41 +1,8 @@
 use crate::test_harness::{GenericSqlConnection, SyncSqlConnection};
-use barrel::{Migration, SqlVariant};
-use introspection_connector::{DatabaseMetadata, IntrospectionConnector};
+use barrel::Migration;
 use pretty_assertions::assert_eq;
-use quaint::pool::SqlFamily;
-use sql_introspection_connector::*;
 use std::{rc::Rc, sync::Arc};
 use url::Url;
-
-pub struct TestSetup {
-    pub sql_family: SqlFamily,
-    pub database: Arc<dyn SyncSqlConnection + Send + Sync + 'static>,
-    pub introspection_connector: Box<dyn IntrospectionConnector>,
-}
-
-pub struct BarrelMigrationExecutor {
-    pub(super) database: Arc<dyn SyncSqlConnection + Send + Sync>,
-    pub(super) sql_variant: barrel::backend::SqlVariant,
-}
-
-// test execution
-
-pub(crate) fn introspect(test_setup: &TestSetup) -> String {
-    let datamodel = test_setup.introspection_connector.introspect(SCHEMA_NAME).unwrap();
-    datamodel::render_datamodel_to_string(&datamodel).expect("Datamodel rendering failed")
-}
-
-pub(crate) fn get_metadata(test_setup: &TestSetup) -> DatabaseMetadata {
-    let metadata = test_setup.introspection_connector.get_metadata(SCHEMA_NAME).unwrap();
-    metadata
-}
-
-pub(crate) fn list_databases(test_setup: &TestSetup) -> Vec<String> {
-    let databases = test_setup.introspection_connector.list_databases().unwrap();
-    databases
-}
-
-// helpers
 
 pub(crate) fn custom_assert(left: &str, right: &str) {
     let parsed_expected = datamodel::parse_datamodel(&right).unwrap();
@@ -53,77 +20,12 @@ fn run_full_sql(database: &Arc<dyn SyncSqlConnection + Send + Sync>, full_sql: &
     }
 }
 
-pub(crate) fn test_each_backend<F>(test_fn: F)
-where
-    F: Fn(&TestSetup, &BarrelMigrationExecutor) -> () + std::panic::RefUnwindSafe,
-{
-    test_each_backend_with_ignores(Vec::new(), test_fn);
-}
-
-pub(crate) fn test_backend<F>(backend: SqlFamily, test_fn: F)
-where
-    F: Fn(&TestSetup, &BarrelMigrationExecutor) -> () + std::panic::RefUnwindSafe,
-{
-    let ignores = match backend {
-        SqlFamily::Mysql => vec![SqlFamily::Postgres, SqlFamily::Sqlite],
-        SqlFamily::Postgres => vec![SqlFamily::Mysql, SqlFamily::Sqlite],
-        SqlFamily::Sqlite => vec![SqlFamily::Postgres, SqlFamily::Mysql],
-    };
-
-    test_each_backend_with_ignores(ignores, test_fn);
-}
-
-pub(crate) fn test_each_backend_with_ignores<F>(ignores: Vec<SqlFamily>, test_fn: F)
-where
-    F: Fn(&TestSetup, &BarrelMigrationExecutor) -> () + std::panic::RefUnwindSafe,
-{
-    // SQLite
-    if !ignores.contains(&SqlFamily::Sqlite) {
-        println!("Testing with SQLite now");
-        let test_setup = get_sqlite();
-
-        println!("Running the test function now");
-        let barrel_migration_executor = BarrelMigrationExecutor {
-            database: Arc::clone(&test_setup.database),
-            sql_variant: SqlVariant::Sqlite,
-        };
-
-        test_fn(&test_setup, &barrel_migration_executor);
-    } else {
-        println!("Ignoring SQLite")
-    }
-    // Postgres
-    if !ignores.contains(&SqlFamily::Postgres) {
-        println!("Testing with Postgres now");
-        let test_setup = get_postgres();
-
-        println!("Running the test function now");
-        let barrel_migration_executor = BarrelMigrationExecutor {
-            database: Arc::clone(&test_setup.database),
-            sql_variant: SqlVariant::Pg,
-        };
-
-        test_fn(&test_setup, &barrel_migration_executor);
-    } else {
-        println!("Ignoring Postgres")
-    }
-    // MySQL
-    if !ignores.contains(&SqlFamily::Mysql) {
-        println!("Testing with MySql now");
-        let test_setup = get_mysql();
-        println!("Running the test function now");
-        let barrel_migration_executor = BarrelMigrationExecutor {
-            database: Arc::clone(&test_setup.database),
-            sql_variant: SqlVariant::Mysql,
-        };
-
-        test_fn(&test_setup, &barrel_migration_executor);
-    } else {
-        println!("Ignoring MySql")
-    }
-}
-
 // barrel
+
+pub struct BarrelMigrationExecutor {
+    pub(super) database: Arc<dyn SyncSqlConnection + Send + Sync>,
+    pub(super) sql_variant: barrel::backend::SqlVariant,
+}
 
 impl BarrelMigrationExecutor {
     pub fn execute<F>(&self, mut migration_fn: F)
@@ -208,55 +110,6 @@ fn fetch_db_name(url: &Url, default: &str) -> String {
     };
 
     String::from(result)
-}
-
-fn get_sqlite() -> TestSetup {
-    let database = database(&sqlite_test_url());
-
-    let database_file_path = sqlite_test_file();
-    std::fs::remove_file(database_file_path.clone()).ok(); // ignore potential errors
-    let introspection_connector = SqlIntrospectionConnector::new(&sqlite_test_url()).unwrap();
-
-    TestSetup {
-        database: database.into(),
-        sql_family: SqlFamily::Sqlite,
-        introspection_connector: Box::new(introspection_connector),
-    }
-}
-
-fn get_postgres() -> TestSetup {
-    let database = database(&postgres_url());
-
-    let drop_schema = dbg!(format!("DROP SCHEMA IF EXISTS \"{}\" CASCADE;", SCHEMA_NAME));
-    database.query_raw(&drop_schema, &[]).ok();
-
-    let create_schema = dbg!(format!("CREATE SCHEMA IF NOT EXISTS \"{}\";", SCHEMA_NAME));
-    database.query_raw(&create_schema, &[]).ok();
-
-    let introspection_connector = SqlIntrospectionConnector::new(&postgres_url()).unwrap();
-
-    TestSetup {
-        database: database.into(),
-        sql_family: SqlFamily::Postgres,
-        introspection_connector: Box::new(introspection_connector),
-    }
-}
-
-fn get_mysql() -> TestSetup {
-    let database = database(&mysql_url());
-
-    let drop_database = dbg!(format!("DROP DATABASE IF EXISTS `{}`;", SCHEMA_NAME));
-    database.query_raw(&drop_database, &[]).ok();
-    let create_database = dbg!(format!("CREATE DATABASE `{}`;", SCHEMA_NAME));
-    database.query_raw(&create_database, &[]).ok();
-
-    let introspection_connector = SqlIntrospectionConnector::new(&mysql_url()).unwrap();
-
-    TestSetup {
-        database: database.into(),
-        sql_family: SqlFamily::Mysql,
-        introspection_connector: Box::new(introspection_connector),
-    }
 }
 
 // urls
