@@ -106,11 +106,7 @@ impl MysqlUrl {
         self.url.port().unwrap_or(3306)
     }
 
-    /// If not set, the default connection limit is the number of physical cpus
-    /// times two plus one.
-    ///
-    /// Modeled after the [HikariCP Pool Sizing page](https://github.com/brettwooldridge/HikariCP/wiki/About-Pool-Sizing)
-    pub fn default_connection_limit() -> usize {
+    fn default_connection_limit() -> usize {
         num_cpus::get_physical() * 2 + 1
     }
 

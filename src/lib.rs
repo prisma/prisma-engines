@@ -148,7 +148,9 @@ impl Quaint {
     /// Common parameters:
     ///
     /// - `connection_limit` defines the number of connections opened to the
-    /// database.
+    /// database. If not set, defaults to the [HikariCP
+    /// Recommendation](https://github.com/brettwooldridge/HikariCP/wiki/About-Pool-Sizing):
+    /// `physical_cpus * 2 + 1`.
     ///
     /// SQLite:
     ///
@@ -230,7 +232,7 @@ impl Quaint {
         })
     }
 
-    /// The number of capacity in the pool of connections.
+    /// The number of connections in the pool.
     pub fn capacity(&self) -> usize {
         self.inner.capacity()
     }
