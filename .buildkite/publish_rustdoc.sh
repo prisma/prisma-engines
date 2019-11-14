@@ -28,7 +28,7 @@ else
 
     echo
     echo "Pushing docs..."
-    git push --quiet origin gh-pages > /dev/null 2>&1
+    git push -f --quiet origin gh-pages > /dev/null 2>&1
     echo
     echo "Docs published."
     echo
