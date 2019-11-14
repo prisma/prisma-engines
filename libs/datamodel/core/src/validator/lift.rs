@@ -199,8 +199,7 @@ impl LiftAstToDml {
             ));
         }
 
-        let connector = ExampleConnector::postgres();
-
+        let use_connectors = true; // FEATURE FLAG
         if let Some(custom_type) = ast_schema.find_type_alias(&type_name) {
             checked_types.push(custom_type.name.name.clone());
             let (field_type, mut attrs) = self.lift_field_type(custom_type, ast_schema, checked_types)?;
@@ -214,7 +213,8 @@ impl LiftAstToDml {
 
             attrs.append(&mut custom_type.directives.clone());
             Ok((field_type, attrs))
-        } else {
+        } else if use_connectors {
+            let connector = ExampleConnector::postgres();
             let args = vec![]; // TODO: figure out args
             if let Some(x) = connector.calculate_type(&ast_field.field_type.name, args) {
                 let field_type = dml::FieldType::ConnectorSpecific(x);
@@ -225,6 +225,11 @@ impl LiftAstToDml {
                     ast_field.field_type.span,
                 ))
             }
+        } else {
+            Err(DatamodelError::new_type_not_found_error(
+                type_name,
+                ast_field.field_type.span,
+            ))
         }
     }
 }
