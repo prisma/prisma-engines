@@ -9,8 +9,8 @@ impl ExampleConnector {
             TypeAlias::new("String", "Text"),
             //            TypeAlias::new("Boolean", "Boolean"),
             TypeAlias::new("Int", "Integer"),
-            TypeAlias::new("String", "Text"),
-            TypeAlias::new("String", "Text"),
+            TypeAlias::new("Float", "Real"),
+            TypeAlias::new("DateTime", "Timestamp"),
             // custom types
             TypeAlias::new("Int8", "BigInt"),
             TypeAlias::new("Serial8", "BigSerial"),
