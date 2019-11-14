@@ -29,22 +29,26 @@ pub struct MysqlParams {
 
 /// Wraps a connection url and exposes the parsing logic used by quaint, including default values.
 #[derive(Debug, Clone)]
-pub struct MysqlUrl{
+pub struct MysqlUrl {
     url: Url,
     query_params: MysqlUrlQueryParams,
 }
 
 impl MysqlUrl {
+    /// Parse `Url` to `MysqlUrl`. Returns error for mistyped connection
+    /// parameters.
     pub fn new(url: Url) -> Result<Self, Error> {
         let query_params = Self::parse_query_params(&url)?;
 
         Ok(Self { url, query_params, })
     }
 
+    /// The bare `Url` to the database.
     pub fn url(&self) -> &Url {
         &self.url
     }
 
+    /// The percent-decoded database username.
     pub fn username<'a>(&'a self) -> Cow<'a, str> {
         match percent_decode(self.url.username().as_bytes()).decode_utf8() {
             Ok(username) => {
@@ -62,7 +66,8 @@ impl MysqlUrl {
 
     }
 
-    pub fn password<'a>(&'a self) -> Option<Cow<'a, str>> {
+    /// The percent-decoded database password.
+    pub fn password(&self) -> Option<Cow<str>> {
         match self.url
             .password()
             .and_then(|pw| percent_decode(pw.as_bytes()).decode_utf8().ok())
@@ -77,6 +82,7 @@ impl MysqlUrl {
 
     }
 
+    /// Name of the database connected. Defaults to `mysql`.
     pub fn dbname(&self) -> &str {
         match self.url.path_segments() {
             Some(mut segments) => segments.next().unwrap_or("mysql"),
@@ -85,24 +91,31 @@ impl MysqlUrl {
 
     }
 
+    /// The database host. If `socket` and `host` are not set, defaults to `localhost`.
     pub fn host(&self) -> &str {
         self.url.host_str().unwrap_or("localhost")
     }
 
+    /// If set, connected to the database through a Unix socket.
     pub fn socket(&self) -> &Option<String> {
         &self.query_params.socket
     }
 
+    /// The database port, defaults to `3306`.
     pub fn port(&self) -> u16 {
         self.url.port().unwrap_or(3306)
     }
 
-    pub fn query_params(&self) -> &MysqlUrlQueryParams {
-        &self.query_params
+    /// If not set, the default connection limit is the number of physical cpus
+    /// times two plus one.
+    ///
+    /// Modeled after the [HikariCP Pool Sizing page](https://github.com/brettwooldridge/HikariCP/wiki/About-Pool-Sizing)
+    pub fn default_connection_limit() -> usize {
+        num_cpus::get_physical() * 2 + 1
     }
 
     fn parse_query_params(url: &Url) -> Result<MysqlUrlQueryParams, Error> {
-        let mut connection_limit = num_cpus::get_physical() * 2 + 1;
+        let mut connection_limit = Self::default_connection_limit();
         let mut ssl_opts = my::SslOpts::default();
         let mut use_ssl = false;
         let mut socket = None;
@@ -168,7 +181,7 @@ impl MysqlUrl {
 }
 
 #[derive(Debug, Clone)]
-pub struct MysqlUrlQueryParams {
+pub(crate) struct MysqlUrlQueryParams {
     ssl_opts: my::SslOpts,
     connection_limit: usize,
     use_ssl: bool,

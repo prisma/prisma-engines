@@ -120,16 +120,20 @@ pub struct PostgresUrl {
 }
 
 impl PostgresUrl {
+    /// Parse `Url` to `PostgresUrl`. Returns error for mistyped connection
+    /// parameters.
     pub fn new(url: Url) -> Result<Self, Error> {
         let query_params = Self::parse_query_params(&url)?;
 
         Ok(Self { url, query_params, })
     }
 
+    /// The bare `Url` to the database.
     pub fn url(&self) -> &Url {
         &self.url
     }
 
+    /// The percent-decoded database username.
     pub fn username<'a>(&'a self) -> Cow<'a, str> {
         match percent_decode(self.url.username().as_bytes()).decode_utf8() {
             Ok(username) => username,
@@ -144,6 +148,11 @@ impl PostgresUrl {
         }
     }
 
+    /// The database host. Taken first from the `host` query parameter, then
+    /// from the `host` part of the URL. For socket connections, the query
+    /// parameter must be used.
+    ///
+    /// If none of them are set, defaults to `localhost`.
     pub fn host(&self) -> &str {
         match (self.query_params.host.as_ref(), self.url.host_str()) {
             (Some(host), _) => host.as_str(),
@@ -153,6 +162,7 @@ impl PostgresUrl {
         }
     }
 
+    /// Name of the database connected. Defaults to `postgres`.
     pub fn dbname(&self) -> &str {
         match self.url.path_segments() {
             Some(mut segments) => segments.next().unwrap_or("postgres"),
@@ -160,7 +170,8 @@ impl PostgresUrl {
         }
     }
 
-    pub fn password<'a>(&'a self) -> Cow<'a, str> {
+    /// The percent-decoded database password.
+    pub fn password(&self) -> Cow<str> {
         match self.url
             .password()
             .and_then(|pw| percent_decode(pw.as_bytes()).decode_utf8().ok())
@@ -174,20 +185,22 @@ impl PostgresUrl {
             }
     }
 
+    /// The database port, defaults to `5432`.
     pub fn port(&self) -> u16 {
         self.url.port().unwrap_or(5432)
     }
 
+    /// The database schema, defaults to `public`.
     pub fn schema(&self) -> String {
         self.url.query_pairs().find(|(key, _value)| key == "schema").map(|(_key, value)| value.into_owned()).unwrap_or_else(|| DEFAULT_SCHEMA.to_string())
     }
 
+    /// If not set, the default connection limit is the number of physical cpus
+    /// times two plus one.
+    ///
+    /// Modeled after the [HikariCP Pool Sizing page](https://github.com/brettwooldridge/HikariCP/wiki/About-Pool-Sizing)
     pub fn default_connection_limit() -> usize {
         num_cpus::get_physical() * 2 + 1
-    }
-
-    pub fn query_params(&self) -> &PostgresUrlQueryParams {
-        &self.query_params
     }
 
     fn parse_query_params(url: &Url) -> Result<PostgresUrlQueryParams, Error> {
@@ -287,7 +300,7 @@ impl PostgresUrl {
 }
 
 #[derive(Debug, Clone)]
-pub struct PostgresUrlQueryParams {
+pub(crate) struct PostgresUrlQueryParams {
     ssl_params: SslParams,
     connection_limit: usize,
     schema: String,
@@ -325,6 +338,7 @@ impl TryFrom<Url> for PostgresParams {
 }
 
 impl PostgreSql {
+    /// Create a new connection to the database.
     pub async fn new(
         config: Config,
         schema: Option<String>,
@@ -361,10 +375,12 @@ impl PostgreSql {
         })
     }
 
+    /// Create a new connection to the database through `PostgresParams`.
     pub async fn from_params(params: PostgresParams) -> crate::Result<Self> {
         Self::new(params.config, Some(params.schema), Some(params.ssl_params)).await
     }
 
+    /// Create a new connection to the database through a connection string.
     pub async fn from_url(url: &str) -> crate::Result<Self> {
         Self::from_params(PostgresParams::try_from(Url::parse(url)?)?).await
     }
