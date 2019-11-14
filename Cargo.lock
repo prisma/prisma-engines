@@ -2110,7 +2110,7 @@ dependencies = [
 [[package]]
 name = "quaint"
 version = "0.1.0"
-source = "git+https://github.com/prisma/quaint.git#407487872fe354155b521fda017c14e6d9b292cc"
+source = "git+https://github.com/prisma/quaint.git#429a47f779b1b1e523f2589166ab1094564e3e50"
 dependencies = [
  "async-std 0.99.12 (registry+https://github.com/rust-lang/crates.io-index)",
  "bytes 0.4.12 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -3344,7 +3344,7 @@ dependencies = [
 [[package]]
 name = "tracing-log"
 version = "0.1.1"
-source = "git+https://github.com/tokio-rs/tracing#bec40bc9624bcf4d26d3a5c622fdbefe4b853854"
+source = "git+https://github.com/tokio-rs/tracing#16fee661ac1f5dd175491e611ff4c08b33c070fa"
 dependencies = [
  "lazy_static 1.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "log 0.4.8 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -3364,7 +3364,7 @@ dependencies = [
 [[package]]
 name = "tracing-serde"
 version = "0.1.0"
-source = "git+https://github.com/tokio-rs/tracing#bec40bc9624bcf4d26d3a5c622fdbefe4b853854"
+source = "git+https://github.com/tokio-rs/tracing#16fee661ac1f5dd175491e611ff4c08b33c070fa"
 dependencies = [
  "serde 1.0.102 (registry+https://github.com/rust-lang/crates.io-index)",
  "tracing-core 0.1.7 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -3373,7 +3373,7 @@ dependencies = [
 [[package]]
 name = "tracing-subscriber"
 version = "0.1.5"
-source = "git+https://github.com/tokio-rs/tracing#bec40bc9624bcf4d26d3a5c622fdbefe4b853854"
+source = "git+https://github.com/tokio-rs/tracing#16fee661ac1f5dd175491e611ff4c08b33c070fa"
 dependencies = [
  "ansi_term 0.11.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "chrono 0.4.9 (registry+https://github.com/rust-lang/crates.io-index)",

@@ -4,8 +4,9 @@ use migration_core::{
     api::{GenericApi, MigrationApi},
     commands::ResetCommand,
 };
-use sql_connection::{Mysql, Postgresql, Sqlite, SyncSqlConnection};
-use sql_migration_connector::{SqlFamily, SqlMigrationConnector};
+use sql_connection::{GenericSqlConnection, SyncSqlConnection};
+use quaint::pool::SqlFamily;
+use sql_migration_connector::{SqlMigrationConnector};
 use sql_schema_describer::{SqlSchema, SqlSchemaDescriberBackend};
 use std::{rc::Rc, sync::Arc};
 use url::Url;
@@ -42,10 +43,8 @@ pub(super) fn mysql_migration_connector(database_url: &str) -> SqlMigrationConne
         Ok(c) => c,
         Err(_) => {
             let url = Url::parse(database_url).unwrap();
-
             let name_cmd = |name| format!("CREATE DATABASE `{}`", name);
-
-            let connect_cmd = |url| Mysql::new(url);
+            let connect_cmd = |url: url::Url| GenericSqlConnection::from_database_str(url.as_str(), None);
 
             create_database(url, "mysql", "/", name_cmd, Rc::new(connect_cmd));
             SqlMigrationConnector::new_from_database_str(database_url).unwrap()
@@ -58,8 +57,7 @@ pub(super) fn postgres_migration_connector(url: &str) -> SqlMigrationConnector {
         Ok(c) => c,
         Err(_) => {
             let name_cmd = |name| format!("CREATE DATABASE \"{}\"", name);
-
-            let connect_cmd = |url: url::Url| Postgresql::new(url);
+            let connect_cmd = |url: url::Url| GenericSqlConnection::from_database_str(url.as_str(), None);
 
             create_database(
                 url.parse().unwrap(),
@@ -224,18 +222,18 @@ pub fn database(sql_family: SqlFamily, database_url: &str) -> Arc<dyn SyncSqlCon
             let url = Url::parse(database_url).unwrap();
             let create_cmd = |name| format!("CREATE DATABASE \"{}\"", name);
 
-            let connect_cmd = |url| Postgresql::new(url);
+            let connect_cmd = |url: url::Url| GenericSqlConnection::from_database_str(url.as_str(), None);
 
             let conn = with_database(url, "postgres", "postgres", create_cmd, Rc::new(connect_cmd));
 
             Arc::new(conn)
         }
-        SqlFamily::Sqlite => Arc::new(Sqlite::new(database_url, SCHEMA_NAME).unwrap()),
+        SqlFamily::Sqlite => Arc::new(GenericSqlConnection::from_database_str(database_url, Some(SCHEMA_NAME)).unwrap()),
         SqlFamily::Mysql => {
             let url = Url::parse(database_url).unwrap();
             let create_cmd = |name| format!("CREATE DATABASE `{}`", name);
 
-            let connect_cmd = |url| Mysql::new(url);
+            let connect_cmd = |url: url::Url| GenericSqlConnection::from_database_str(url.as_str(), None);
 
             let conn = with_database(url, "mysql", "/", create_cmd, Rc::new(connect_cmd));
 

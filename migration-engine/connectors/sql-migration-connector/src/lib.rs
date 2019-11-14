@@ -12,9 +12,9 @@ mod sql_schema_calculator;
 mod sql_schema_differ;
 
 pub use error::*;
-pub use sql_connection::SqlFamily;
 pub use sql_migration::*;
 
+use quaint::pool::SqlFamily;
 use migration_connector::*;
 use sql_connection::{GenericSqlConnection, SyncSqlConnection};
 use sql_database_migration_inferrer::*;
@@ -117,7 +117,7 @@ impl MigrationConnector for SqlMigrationConnector {
     type DatabaseMigration = SqlMigration;
 
     fn connector_type(&self) -> &'static str {
-        self.sql_family.connector_type_string()
+        self.sql_family.as_str()
     }
 
     fn create_database(&self, db_name: &str) -> ConnectorResult<()> {

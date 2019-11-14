@@ -1,5 +1,5 @@
 use log::debug;
-use sql_connection::{Postgresql, SyncSqlConnection};
+use sql_connection::{SyncSqlConnection, GenericSqlConnection};
 use sql_schema_describer::*;
 use std::sync::Arc;
 
@@ -12,7 +12,7 @@ pub fn get_postgres_describer(sql: &str) -> postgres::SqlSchemaDescriber {
     };
 
     let url = format!("postgres://postgres:prisma@{}:5432/postgres", host);
-    let client = Postgresql::new(url.parse().unwrap()).unwrap();
+    let client = GenericSqlConnection::from_database_str(&url, None).unwrap();
 
     let drop_schema = format!("DROP SCHEMA IF EXISTS \"{}\" CASCADE;", SCHEMA);
     client.execute_raw(drop_schema.as_str(), &[]).expect("dropping schema");

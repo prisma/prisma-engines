@@ -2,7 +2,8 @@
 #![allow(unused)]
 mod test_harness;
 use pretty_assertions::{assert_eq, assert_ne};
-use sql_migration_connector::{AlterIndex, CreateIndex, DropIndex, SqlFamily, SqlMigrationStep};
+use sql_migration_connector::{AlterIndex, CreateIndex, DropIndex, SqlMigrationStep};
+use quaint::prelude::SqlFamily;
 use sql_schema_describer::*;
 use test_harness::*;
 
