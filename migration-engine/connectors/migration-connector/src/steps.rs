@@ -21,6 +21,9 @@ pub enum MigrationStep {
     CreateEnum(CreateEnum),
     UpdateEnum(UpdateEnum),
     DeleteEnum(DeleteEnum),
+    CreateTypeAlias(CreateTypeAlias),
+    UpdateTypeAlias(UpdateTypeAlias),
+    DeleteTypeAlias(DeleteTypeAlias),
 }
 
 #[derive(Debug, Deserialize, Serialize, PartialEq, Eq, Hash, Clone)]
@@ -213,6 +216,7 @@ impl DirectiveLocation {
 #[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
 #[serde(rename_all = "camelCase", deny_unknown_fields, untagged)]
 pub enum DirectiveType {
+    TypeAlias { type_alias: String },
     Field { model: String, field: String },
     Model { model: String },
     Enum { r#enum: String },
@@ -258,6 +262,33 @@ impl MigrationExpression {
     pub fn from_ast_expression(expr: &ast::Expression) -> Self {
         MigrationExpression(expr.render_to_string())
     }
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct CreateTypeAlias {
+    pub type_alias: String,
+
+    pub r#type: String,
+    pub arity: ast::FieldArity,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct UpdateTypeAlias {
+    pub type_alias: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub r#type: Option<String>,
+}
+
+impl UpdateTypeAlias {
+    pub fn is_any_option_set(&self) -> bool {
+        self.r#type.is_some()
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct DeleteTypeAlias {
+    pub type_alias: String,
 }
 
 #[cfg(test)]

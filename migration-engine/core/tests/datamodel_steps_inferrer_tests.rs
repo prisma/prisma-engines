@@ -605,6 +605,26 @@ fn infer_CreateDirective_on_enum() {
 }
 
 #[test]
+fn infer_CreateDirective_on_type_alias() {
+    let dm1 = parse(r#"type BlogPost = String @default("a")"#);
+    let dm2 = parse(r#"type BlogPost = String @customized @default("a")"#);
+
+    let steps = infer(&dm1, &dm2);
+
+    let locator = DirectiveLocation {
+        directive: "customized".to_owned(),
+        arguments: None,
+        location: DirectiveType::TypeAlias {
+            type_alias: "BlogPost".to_owned(),
+        },
+    };
+
+    let expected = &[MigrationStep::CreateDirective(CreateDirective { locator: locator })];
+
+    assert_eq!(steps, expected);
+}
+
+#[test]
 fn infer_DeleteDirective_on_field() {
     let dm1 = parse(
         r##"
@@ -760,6 +780,26 @@ fn infer_DeleteDirective_on_enum() {
 }
 
 #[test]
+fn infer_DeleteDirective_on_type_alias() {
+    let dm1 = parse(r#"type BlogPost = String @default("chimken")"#);
+    let dm2 = parse(r#"type BlogPost = String"#);
+
+    let steps = infer(&dm1, &dm2);
+
+    let locator = DirectiveLocation {
+        directive: "default".to_owned(),
+        arguments: None,
+        location: DirectiveType::TypeAlias {
+            type_alias: "BlogPost".to_owned(),
+        },
+    };
+
+    let expected = &[MigrationStep::DeleteDirective(DeleteDirective { locator })];
+
+    assert_eq!(steps, expected);
+}
+
+#[test]
 fn infer_CreateDirectiveArgument_on_field() {
     let dm1 = parse(
         r##"
@@ -891,6 +931,30 @@ fn infer_CreateDirectiveArgument_on_enum() {
         directive_location: locator,
         argument: "three".to_owned(),
         value: MigrationExpression("4".to_owned()),
+    })];
+
+    assert_eq!(steps, expected);
+}
+
+#[test]
+fn infer_CreateDirectiveArgument_on_type_alias() {
+    let dm1 = parse(r#"type BlogPost = String @customDirective(c: "d")"#);
+    let dm2 = parse(r#"type BlogPost = String @customDirective(a: "b", c: "d")"#);
+
+    let steps = infer(&dm1, &dm2);
+
+    let locator = DirectiveLocation {
+        directive: "customDirective".to_owned(),
+        arguments: None,
+        location: DirectiveType::TypeAlias {
+            type_alias: "BlogPost".to_owned(),
+        },
+    };
+
+    let expected = &[MigrationStep::CreateDirectiveArgument(CreateDirectiveArgument {
+        directive_location: locator,
+        argument: "a".to_owned(),
+        value: MigrationExpression("\"b\"".to_owned()),
     })];
 
     assert_eq!(steps, expected);
@@ -1030,6 +1094,29 @@ fn infer_DeleteDirectiveArgument_on_enum() {
 }
 
 #[test]
+fn infer_DeleteDirectiveArgument_on_type_alias() {
+    let dm1 = parse(r#"type BlogPost = String @customDirective(a: "b", c: "d")"#);
+    let dm2 = parse(r#"type BlogPost = String @customDirective(c: "d")"#);
+
+    let steps = infer(&dm1, &dm2);
+
+    let locator = DirectiveLocation {
+        arguments: None,
+        directive: "customDirective".to_owned(),
+        location: DirectiveType::TypeAlias {
+            type_alias: "BlogPost".to_owned(),
+        },
+    };
+
+    let expected = &[MigrationStep::DeleteDirectiveArgument(DeleteDirectiveArgument {
+        directive_location: locator,
+        argument: "a".to_owned(),
+    })];
+
+    assert_eq!(steps, expected);
+}
+
+#[test]
 fn infer_UpdateDirectiveArgument_on_field() {
     let dm1 = parse(
         r##"
@@ -1163,6 +1250,127 @@ fn infer_UpdateDirectiveArgument_on_enum() {
         directive_location: locator,
         argument: "one".to_owned(),
         new_value: MigrationExpression("\"three\"".to_owned()),
+    })];
+
+    assert_eq!(steps, expected);
+}
+
+#[test]
+fn infer_UpdateDirectiveArgument_on_type_alias() {
+    let dm1 = parse("type Text = String @default(\"chicken\")");
+    let dm2 = parse("type Text = String @default(\"\")");
+
+    let steps = infer(&dm1, &dm2);
+
+    let locator = DirectiveLocation {
+        directive: "default".to_owned(),
+        arguments: None,
+        location: DirectiveType::TypeAlias {
+            type_alias: "Text".to_owned(),
+        },
+    };
+
+    let expected = &[MigrationStep::UpdateDirectiveArgument(UpdateDirectiveArgument {
+        directive_location: locator,
+        argument: "".to_owned(),
+        new_value: MigrationExpression("\"\"".to_owned()),
+    })];
+
+    assert_eq!(steps, expected);
+}
+
+#[test]
+fn infer_CreateTypeAlias() {
+    let dm1 = parse("");
+    let dm2 = parse(
+        r#"
+            type CUID = String @id @default(cuid())
+
+            model User {
+                id CUID
+                age Float
+            }
+        "#,
+    );
+
+    let steps = infer(&dm1, &dm2);
+
+    let directive_type = DirectiveType::TypeAlias {
+        type_alias: "CUID".to_owned(),
+    };
+
+    let expected = &[
+        MigrationStep::CreateTypeAlias(CreateTypeAlias {
+            type_alias: "CUID".to_owned(),
+            r#type: "String".to_owned(),
+            arity: FieldArity::Required,
+        }),
+        MigrationStep::CreateDirective(CreateDirective {
+            locator: DirectiveLocation {
+                location: directive_type.clone(),
+                directive: "id".to_owned(),
+                arguments: None,
+            },
+        }),
+        MigrationStep::CreateDirective(CreateDirective {
+            locator: DirectiveLocation {
+                location: directive_type.clone(),
+                directive: "default".to_owned(),
+                arguments: None,
+            },
+        }),
+        MigrationStep::CreateDirectiveArgument(CreateDirectiveArgument {
+            directive_location: DirectiveLocation {
+                location: directive_type,
+                directive: "default".to_owned(),
+                arguments: None,
+            },
+            argument: "".to_owned(),
+            value: MigrationExpression("cuid()".to_owned()),
+        }),
+        MigrationStep::CreateModel(CreateModel {
+            model: "User".to_string(),
+        }),
+        MigrationStep::CreateField(CreateField {
+            model: "User".to_string(),
+            field: "id".to_owned(),
+            tpe: "CUID".to_owned(),
+            arity: FieldArity::Required,
+        }),
+        MigrationStep::CreateField(CreateField {
+            model: "User".to_string(),
+            field: "age".to_owned(),
+            tpe: "Float".to_owned(),
+            arity: FieldArity::Required,
+        }),
+    ];
+
+    assert_eq!(steps, expected);
+}
+
+#[test]
+fn infer_DeleteTypeAlias() {
+    let dm1 = parse("type CUID = String @id @default(cuid())");
+    let dm2 = parse("");
+    let steps = infer(&dm1, &dm2);
+
+    let expected = &[MigrationStep::DeleteTypeAlias(DeleteTypeAlias {
+        type_alias: "CUID".to_owned(),
+    })];
+
+    assert_eq!(steps, expected);
+}
+
+#[test]
+fn infer_UpdateTypeAlias() {
+    let dm1 = parse("type Age = Int");
+    let dm2 = parse("type Age = Float");
+
+    let steps = infer(&dm1, &dm2);
+
+    let expected = &[MigrationStep::UpdateTypeAlias(UpdateTypeAlias {
+        type_alias: "Age".to_owned(),
+        r#type: Some("Float".to_owned()),
     })];
 
     assert_eq!(steps, expected);
