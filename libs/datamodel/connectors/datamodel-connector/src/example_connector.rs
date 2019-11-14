@@ -1,24 +1,10 @@
-use super::*;
+use super::{declarative_connector::*, ScalarType};
 
-/// Postgres Example Impl
-struct SimpleConnector {
-    aliases: Vec<TypeAlias>,
-    field_type_constructors: Vec<FieldTypeConstructor>,
-}
+struct ExampleConnector {}
 
-impl Connector for SimpleConnector {
-    fn type_aliases(&self) -> &Vec<TypeAlias> {
-        &self.aliases
-    }
-
-    fn field_type_constructors(&self) -> &Vec<FieldTypeConstructor> {
-        &self.field_type_constructors
-    }
-}
-
-impl SimpleConnector {
-    pub fn postgres() -> SimpleConnector {
-        let aliases = vec![
+impl ExampleConnector {
+    pub fn postgres() -> DeclarativeConnector {
+        let type_aliases = vec![
             // standard types
             TypeAlias::new("String", "Text"),
             //            TypeAlias::new("Boolean", "Boolean"),
@@ -72,8 +58,8 @@ impl SimpleConnector {
             FieldTypeConstructor::without_args("Boolean", "boolean", ScalarType::Boolean),
             FieldTypeConstructor::without_args("PGLSN", "pg_lsn", ScalarType::Int),
         ];
-        SimpleConnector {
-            aliases,
+        DeclarativeConnector {
+            type_aliases,
             field_type_constructors,
         }
     }
