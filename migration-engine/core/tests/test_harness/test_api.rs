@@ -95,8 +95,20 @@ impl TestApi {
         UnapplyOutput { sql_schema, output }
     }
 
-    fn introspect_database(&self) -> SqlSchema {
-        let inspector: Box<dyn SqlSchemaDescriberBackend> = match self.api.connector_type() {
+    pub fn barrel(&self) -> BarrelMigrationExecutor {
+        BarrelMigrationExecutor {
+            inspector: self.inspector(),
+            database: Arc::clone(&self.database),
+            sql_variant: match self.sql_family {
+                SqlFamily::Mysql => barrel::SqlVariant::Mysql,
+                SqlFamily::Postgres => barrel::SqlVariant::Pg,
+                SqlFamily::Sqlite => barrel::SqlVariant::Sqlite,
+            },
+        }
+    }
+
+    fn inspector(&self) -> Box<dyn SqlSchemaDescriberBackend> {
+        match self.api.connector_type() {
             "postgresql" => Box::new(sql_schema_describer::postgres::SqlSchemaDescriber::new(Arc::clone(
                 &self.database,
             ))),
@@ -107,9 +119,12 @@ impl TestApi {
                 &self.database,
             ))),
             _ => unimplemented!(),
-        };
+        }
+    }
 
-        let mut result = inspector
+    fn introspect_database(&self) -> SqlSchema {
+        let mut result = self
+            .inspector()
             .describe(&SCHEMA_NAME.to_string())
             .expect("Introspection failed");
 
@@ -157,6 +172,40 @@ pub fn sqlite_test_api() -> TestApi {
         sql_family: SqlFamily::Sqlite,
         database: Arc::clone(&connector.database),
         api: Box::new(test_api(connector)),
+    }
+}
+
+pub struct BarrelMigrationExecutor {
+    inspector: Box<dyn SqlSchemaDescriberBackend>,
+    database: Arc<dyn SyncSqlConnection + Send + Sync>,
+    sql_variant: barrel::backend::SqlVariant,
+}
+
+impl BarrelMigrationExecutor {
+    pub fn execute<F>(&self, mut migration_fn: F) -> SqlSchema
+    where
+        F: FnMut(&mut barrel::Migration) -> (),
+    {
+        use barrel::Migration;
+
+        let mut migration = Migration::new().schema(SCHEMA_NAME);
+        migration_fn(&mut migration);
+        let full_sql = migration.make_from(self.sql_variant);
+        run_full_sql(&self.database, &full_sql);
+        let mut result = self
+            .inspector
+            .describe(&SCHEMA_NAME.to_string())
+            .expect("Introspection failed");
+
+        // The presence of the _Migration table makes assertions harder. Therefore remove it.
+        result.tables = result.tables.into_iter().filter(|t| t.name != "_Migration").collect();
+        result
+    }
+}
+
+fn run_full_sql(database: &Arc<dyn SyncSqlConnection + Send + Sync>, full_sql: &str) {
+    for sql in full_sql.split(";").filter(|sql| !sql.is_empty()) {
+        database.query_raw(&sql, &[]).unwrap();
     }
 }
 
