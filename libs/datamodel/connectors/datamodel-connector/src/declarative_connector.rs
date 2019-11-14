@@ -1,18 +1,16 @@
 use super::{Connector, ScalarFieldType, ScalarType};
 
+#[derive(Debug)]
 pub struct DeclarativeConnector {
     pub type_aliases: Vec<TypeAlias>,
     pub field_type_constructors: Vec<FieldTypeConstructor>,
 }
 
 impl Connector for DeclarativeConnector {
-    fn calculate_type(&self, name: &str, args: Vec<i32>) -> ScalarFieldType {
+    fn calculate_type(&self, name: &str, args: Vec<i32>) -> Option<ScalarFieldType> {
         match self.get_type_alias(name) {
             Some(alias) => self.calculate_type(&alias.aliased_to, args),
-            None => {
-                let constructor = self
-                    .get_field_type_constructor(&name)
-                    .expect(&format!("Did not find type constructor for name {}", &name));
+            None => self.get_field_type_constructor(&name).map(|constructor| {
                 let datasource_type = constructor.datasource_type(&args);
 
                 ScalarFieldType {
@@ -20,7 +18,7 @@ impl Connector for DeclarativeConnector {
                     prisma_type: constructor.prisma_type,
                     datasource_type,
                 }
-            }
+            }),
         }
     }
 }
@@ -31,10 +29,11 @@ impl DeclarativeConnector {
     }
 
     fn get_field_type_constructor(&self, name: &str) -> Option<&FieldTypeConstructor> {
-        self.field_type_constructors.iter().find(|rt| rt.name() == name)
+        self.field_type_constructors.iter().find(|rt| &rt.name == name)
     }
 }
 
+#[derive(Debug)]
 pub struct TypeAlias {
     name: String,
     aliased_to: String,
@@ -48,6 +47,7 @@ impl TypeAlias {
     }
 }
 
+#[derive(Debug)]
 pub struct FieldTypeConstructor {
     name: String,
     datasource_type: String,

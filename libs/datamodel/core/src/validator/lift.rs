@@ -6,6 +6,7 @@ use crate::{
     configuration, dml,
     error::{DatamodelError, ErrorCollection},
 };
+use datamodel_connector::{Connector, ExampleConnector};
 
 /// Helper for lifting a datamodel.
 ///
@@ -198,6 +199,8 @@ impl LiftAstToDml {
             ));
         }
 
+        let connector = ExampleConnector::postgres();
+
         if let Some(custom_type) = ast_schema.find_type_alias(&type_name) {
             checked_types.push(custom_type.name.name.clone());
             let (field_type, mut attrs) = self.lift_field_type(custom_type, ast_schema, checked_types)?;
@@ -212,10 +215,16 @@ impl LiftAstToDml {
             attrs.append(&mut custom_type.directives.clone());
             Ok((field_type, attrs))
         } else {
-            Err(DatamodelError::new_type_not_found_error(
-                type_name,
-                ast_field.field_type.span,
-            ))
+            let args = vec![]; // TODO: figure out args
+            if let Some(x) = connector.calculate_type(&ast_field.field_type.name, args) {
+                let field_type = dml::FieldType::ConnectorSpecific(x);
+                Ok((field_type, vec![]))
+            } else {
+                Err(DatamodelError::new_type_not_found_error(
+                    type_name,
+                    ast_field.field_type.span,
+                ))
+            }
         }
     }
 }

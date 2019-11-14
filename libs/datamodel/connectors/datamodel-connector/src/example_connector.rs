@@ -1,6 +1,6 @@
 use super::{declarative_connector::*, ScalarType};
 
-struct ExampleConnector {}
+pub struct ExampleConnector {}
 
 impl ExampleConnector {
     #[allow(unused)]

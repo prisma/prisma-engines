@@ -85,7 +85,7 @@ fn get_field_type(field: &dml::Field) -> String {
         dml::FieldType::Relation(relation_info) => relation_info.to.clone(),
         dml::FieldType::Enum(t) => t.clone(),
         dml::FieldType::Base(t) => type_to_string(t),
-        dml::FieldType::ConnectorSpecific { connector_type: t, .. } => type_to_string(&t.prisma_type()),
+        dml::FieldType::ConnectorSpecific(sft) => type_to_string(&sft.prisma_type()),
     }
 }
 

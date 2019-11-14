@@ -1,5 +1,6 @@
 use crate::common::*;
 use datamodel::common::{ScalarType, ScalarValue};
+use datamodel_connector::ScalarFieldType;
 
 #[test]
 fn should_apply_a_custom_type() {
@@ -114,4 +115,22 @@ fn should_be_able_to_define_custom_enum_types() {
         .assert_has_field("role")
         .assert_enum_type("Role")
         .assert_default_value(ScalarValue::ConstantLiteral(String::from("USER")));
+}
+
+#[test]
+fn should_handle_type_mappings() {
+    let dml = r#"
+        model Blog {
+            id     Int    @id
+            bigInt BigInt
+        }
+    "#;
+
+    let datamodel = parse(dml);
+
+    let user_model = datamodel.assert_has_model("Blog");
+
+    user_model
+        .assert_has_field("bigInt")
+        .assert_connector_type(&ScalarFieldType::new("BigInt", ScalarType::Int, "bigint"));
 }

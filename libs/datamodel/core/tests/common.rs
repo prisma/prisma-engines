@@ -2,10 +2,12 @@ extern crate datamodel;
 
 use self::datamodel::IndexDefinition;
 use datamodel::{common::ScalarType, configuration::SourceDefinition, dml, error::*};
+use datamodel_connector::ScalarFieldType;
 
 pub trait FieldAsserts {
     fn assert_base_type(&self, t: &ScalarType) -> &Self;
     fn assert_enum_type(&self, en: &str) -> &Self;
+    fn assert_connector_type(&self, sft: &ScalarFieldType) -> &Self;
     fn assert_relation_name(&self, t: &str) -> &Self;
     fn assert_relation_to(&self, t: &str) -> &Self;
     fn assert_relation_delete_strategy(&self, t: dml::OnDeleteStrategy) -> &Self;
@@ -51,6 +53,16 @@ impl FieldAsserts for dml::Field {
             assert_eq!(base_type, t);
         } else {
             panic!("Scalar expected, but found {:?}", self.field_type);
+        }
+
+        self
+    }
+
+    fn assert_connector_type(&self, sft: &ScalarFieldType) -> &Self {
+        if let dml::FieldType::ConnectorSpecific(t) = &self.field_type {
+            assert_eq!(t, sft);
+        } else {
+            panic!("Connector Specific Type expected, but found {:?}", self.field_type);
         }
 
         self

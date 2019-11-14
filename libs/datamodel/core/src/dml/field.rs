@@ -23,7 +23,7 @@ pub enum FieldType {
     /// This is a relation field.
     Relation(RelationInfo),
     /// Connector specific field type.
-    ConnectorSpecific { connector_type: ScalarFieldType },
+    ConnectorSpecific(ScalarFieldType),
     /// Base (built-in scalar) type.
     Base(ScalarType),
 }
