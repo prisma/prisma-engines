@@ -1,6 +1,9 @@
-use crate::{connector::{PostgresUrl, MysqlUrl, SqliteParams}, error::Error};
+use crate::{
+    connector::{MysqlUrl, PostgresUrl, SqliteParams},
+    error::Error,
+};
+use std::{borrow::Cow, convert::TryFrom, fmt};
 use url::Url;
-use std::{convert::TryFrom, borrow::Cow, fmt};
 
 /// General information about a SQL connection.
 #[derive(Debug, Clone)]
@@ -38,7 +41,10 @@ impl ConnectionInfo {
         let url = url_result?;
 
         let sql_family = SqlFamily::from_scheme(url.scheme()).ok_or_else(|| {
-            Error::DatabaseUrlIsInvalid(format!("{} is not a supported database URL scheme.", url.scheme()))
+            Error::DatabaseUrlIsInvalid(format!(
+                "{} is not a supported database URL scheme.",
+                url.scheme()
+            ))
         })?;
 
         match sql_family {
@@ -107,6 +113,25 @@ impl ConnectionInfo {
             ConnectionInfo::Postgres(_) => SqlFamily::Postgres,
             ConnectionInfo::Mysql(_) => SqlFamily::Mysql,
             ConnectionInfo::Sqlite { .. } => SqlFamily::Sqlite,
+        }
+    }
+
+    /// The provided database port, if applicable.
+    pub fn port(&self) -> Option<u16> {
+        match self {
+            ConnectionInfo::Postgres(url) => Some(url.port()),
+            ConnectionInfo::Mysql(url) => Some(url.port()),
+            ConnectionInfo::Sqlite { .. } => None,
+        }
+    }
+
+    /// A string describing the database location, meant for error messages. It will be the host
+    /// and port on MySQL/Postgres, and the file path on SQLite.
+    pub fn database_location(&self) -> String {
+        match self {
+            ConnectionInfo::Postgres(url) => format!("{}:{}", url.host(), url.port()),
+            ConnectionInfo::Mysql(url) => format!("{}:{}", url.host(), url.port()),
+            ConnectionInfo::Sqlite { file_path, .. } => file_path.clone(),
         }
     }
 }
