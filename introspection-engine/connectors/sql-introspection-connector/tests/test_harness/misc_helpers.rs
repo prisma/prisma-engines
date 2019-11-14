@@ -14,8 +14,8 @@ pub struct TestSetup {
 }
 
 pub struct BarrelMigrationExecutor {
-    database: Arc<dyn SyncSqlConnection + Send + Sync>,
-    sql_variant: barrel::backend::SqlVariant,
+    pub(super) database: Arc<dyn SyncSqlConnection + Send + Sync>,
+    pub(super) sql_variant: barrel::backend::SqlVariant,
 }
 
 // test execution
@@ -163,7 +163,9 @@ pub fn database(database_url: &str) -> Box<dyn SyncSqlConnection + Send + Sync +
 
             Box::new(conn)
         }
-        "file" | "sqlite" => Box::new(GenericSqlConnection::from_database_str(database_url, Some("introspection-engine")).unwrap()),
+        "file" | "sqlite" => {
+            Box::new(GenericSqlConnection::from_database_str(database_url, Some("introspection-engine")).unwrap())
+        }
         scheme => panic!("Unknown scheme `{}° in database URL: {}", scheme, url.as_str()),
     }
 }

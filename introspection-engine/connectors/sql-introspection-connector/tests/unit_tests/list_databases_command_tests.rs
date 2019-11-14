@@ -1,34 +1,33 @@
-use crate::{list_databases, test_backend, BarrelMigrationExecutor};
-use quaint::pool::SqlFamily;
+use crate::{test_harness::*, test_one_connector, BarrelMigrationExecutor};
 use barrel::types;
 
 pub const SCHEMA_NAME: &str = "introspection-engine";
 
-#[test]
-fn databases_for_mysql_should_work() {
-    test_backend(SqlFamily::Mysql, |test_setup, barrel| {
-        setup(barrel);
-        let result = dbg!(list_databases(test_setup));
-        assert!(result.contains(&"introspection-engine".to_string()));
-    });
+#[test_one_connector(connector = "mysql")]
+fn databases_for_mysql_should_work(api: &TestApi) {
+    // test_backend(SqlFamily::Mysql, |test_setup, barrel| {
+    let barrel = api.barrel();
+    setup(&barrel);
+    let result = dbg!(api.list_databases());
+    assert!(result.contains(&"introspection-engine".to_string()));
+    // });
 }
 
-#[test]
-fn databases_for_postgres_should_work() {
-    test_backend(SqlFamily::Postgres, |test_setup, barrel| {
-        setup(barrel);
-        let result = dbg!(list_databases(test_setup));
-        assert!(result.contains(&"introspection-engine".to_string()));
-    });
+#[test_one_connector(connector = "postgres")]
+fn databases_for_postgres_should_work(api: &TestApi) {
+    let barrel = api.barrel();
+    setup(&barrel);
+    let result = dbg!(api.list_databases());
+    assert!(result.contains(&"introspection-engine".to_string()));
+    // });
 }
 
-#[test]
-fn databases_for_sqlite_should_work() {
-    test_backend(SqlFamily::Sqlite, |test_setup, barrel| {
-        setup(barrel);
-        let result = dbg!(list_databases(test_setup));
-        assert!(result.contains(&"introspection-engine.db".to_string()));
-    });
+#[test_one_connector(connector = "sqlite")]
+fn databases_for_sqlite_should_work(api: &TestApi) {
+    let barrel = api.barrel();
+    setup(&barrel);
+    let result = dbg!(api.list_databases());
+    assert!(result.contains(&"introspection-engine.db".to_string()));
 }
 
 fn setup(barrel: &BarrelMigrationExecutor) {

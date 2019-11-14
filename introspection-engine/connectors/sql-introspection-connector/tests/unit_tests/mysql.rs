@@ -1,24 +1,24 @@
 use crate::*;
-use quaint::pool::SqlFamily;
 use barrel::types;
+use quaint::pool::SqlFamily;
 use test_harness::*;
 
 pub const SCHEMA_NAME: &str = "introspection-engine";
 
-#[test]
-fn introspecting_a_simple_table_with_gql_types_must_work() {
-    test_each_backend_with_ignores(vec![SqlFamily::Sqlite, SqlFamily::Postgres], |test_setup, barrel| {
-        let _setup_schema = barrel.execute(|migration| {
-            migration.create_table("Blog", |t| {
-                t.add_column("bool", types::boolean());
-                t.add_column("float", types::float());
-                t.add_column("date", types::date());
-                t.add_column("id", types::primary());
-                t.add_column("int", types::integer());
-                t.add_column("string", types::text());
-            });
+#[test_one_connector(connector = "mysql")]
+fn introspecting_a_simple_table_with_gql_types_must_work(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel.execute(|migration| {
+        migration.create_table("Blog", |t| {
+            t.add_column("bool", types::boolean());
+            t.add_column("float", types::float());
+            t.add_column("date", types::date());
+            t.add_column("id", types::primary());
+            t.add_column("int", types::integer());
+            t.add_column("string", types::text());
         });
-        let dm = r#"
+    });
+    let dm = r#"
             model Blog {
                 bool    Boolean
                 date    DateTime
@@ -28,9 +28,8 @@ fn introspecting_a_simple_table_with_gql_types_must_work() {
                 string  String
             }
         "#;
-        let result = dbg!(introspect(test_setup));
-        custom_assert(&result, dm);
-    });
+    let result = dbg!(api.introspect());
+    custom_assert(&result, dm);
 }
 
 #[test]
