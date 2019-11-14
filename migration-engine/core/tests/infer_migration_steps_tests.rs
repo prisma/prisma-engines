@@ -1,13 +1,10 @@
 #![allow(non_snake_case)]
-#![allow(unused)]
+
 mod test_harness;
-use datamodel::dml::*;
-use migration_connector::MigrationStep;
+
 use migration_core::commands::*;
-use pretty_assertions::{assert_eq, assert_ne};
-use sql_migration_connector::{AlterTable, CreateTable, PrettySqlMigrationStep, SqlMigrationStep};
-use quaint::prelude::SqlFamily;
-use sql_schema_describer::Table;
+use pretty_assertions::{assert_eq};
+use sql_migration_connector::{PrettySqlMigrationStep};
 use test_harness::*;
 
 #[test_each_connector]
@@ -18,7 +15,7 @@ async fn assume_to_be_applied_must_work(api: &TestApi) {
             }
         "#;
 
-    api.infer_and_apply_with_migration_id(&dm0, "mig0000");
+    api.infer_and_apply_with_migration_id(&dm0, "mig0000").await;
 
     let dm1 = r#"
             model Blog {
@@ -31,7 +28,7 @@ async fn assume_to_be_applied_must_work(api: &TestApi) {
         assume_to_be_applied: Vec::new(),
         datamodel: dm1.to_string(),
     };
-    let steps1 = api.run_infer_command(input1).0.datamodel_steps;
+    let steps1 = api.run_infer_command(input1).await.0.datamodel_steps;
     let expected_steps_1 = create_field_step("Blog", "field1", "String");
     assert_eq!(steps1, &[expected_steps_1.clone()]);
 
@@ -47,7 +44,7 @@ async fn assume_to_be_applied_must_work(api: &TestApi) {
         assume_to_be_applied: steps1,
         datamodel: dm2.to_string(),
     };
-    let steps2 = api.run_infer_command(input2).0.datamodel_steps;
+    let steps2 = api.run_infer_command(input2).await.0.datamodel_steps;
 
     // We are exiting watch mode, so the returned steps go back to the last non-watch migration.
     assert_eq!(
@@ -64,7 +61,7 @@ async fn special_handling_of_watch_migrations(api: &TestApi) {
             }
         "#;
 
-    api.infer_and_apply_with_migration_id(&dm, "mig00");
+    api.infer_and_apply_with_migration_id(&dm, "mig00").await;
 
     let dm = r#"
             model Blog {
@@ -73,7 +70,7 @@ async fn special_handling_of_watch_migrations(api: &TestApi) {
             }
         "#;
 
-    api.infer_and_apply_with_migration_id(&dm, "watch01");
+    api.infer_and_apply_with_migration_id(&dm, "watch01").await;
 
     let dm = r#"
             model Blog {
@@ -83,7 +80,7 @@ async fn special_handling_of_watch_migrations(api: &TestApi) {
             }
         "#;
 
-    api.infer_and_apply_with_migration_id(&dm, "watch02");
+    api.infer_and_apply_with_migration_id(&dm, "watch02").await;
 
     let dm = r#"
             model Blog {
@@ -100,7 +97,7 @@ async fn special_handling_of_watch_migrations(api: &TestApi) {
         datamodel: dm.to_string(),
     };
 
-    let steps = api.run_infer_command(input).0.datamodel_steps;
+    let steps = api.run_infer_command(input).await.0.datamodel_steps;
 
     assert_eq!(
         steps,
@@ -125,7 +122,7 @@ async fn watch_migrations_must_be_returned_when_transitioning_out_of_watch_mode(
             }
         "#;
 
-    api.infer_and_apply_with_migration_id(&dm, "mig00");
+    api.infer_and_apply_with_migration_id(&dm, "mig00").await;
 
     let dm = r#"
             model Blog {
@@ -136,7 +133,7 @@ async fn watch_migrations_must_be_returned_when_transitioning_out_of_watch_mode(
 
     let mut applied_database_steps: Vec<PrettySqlMigrationStep> = Vec::new();
 
-    let output = api.infer_and_apply_with_migration_id(&dm, "watch01").migration_output;
+    let output = api.infer_and_apply_with_migration_id(&dm, "watch01").await.migration_output;
     applied_database_steps
         .extend(serde_json::from_value::<Vec<PrettySqlMigrationStep>>(output.database_steps).unwrap());
 
@@ -156,7 +153,7 @@ async fn watch_migrations_must_be_returned_when_transitioning_out_of_watch_mode(
             }
         "#;
 
-    let output = api.infer_and_apply_with_migration_id(&dm, "watch02").migration_output;
+    let output = api.infer_and_apply_with_migration_id(&dm, "watch02").await.migration_output;
     applied_database_steps
         .extend(serde_json::from_value::<Vec<PrettySqlMigrationStep>>(output.database_steps).unwrap());
 
@@ -169,7 +166,7 @@ async fn watch_migrations_must_be_returned_when_transitioning_out_of_watch_mode(
         datamodel: dm.to_string(),
     };
 
-    let output = api.run_infer_command(input);
+    let output = api.run_infer_command(input).await;
     let returned_steps: Vec<PrettySqlMigrationStep> = serde_json::from_value(output.0.database_steps).unwrap();
 
     let expected_steps_count = if api.is_sqlite() { 9 } else { 3 }; // one AlterTable, two CreateTables
@@ -189,7 +186,7 @@ async fn watch_migrations_must_be_returned_in_addition_to_regular_inferred_steps
 
     let mut applied_database_steps: Vec<PrettySqlMigrationStep> = Vec::new();
 
-    api.infer_and_apply_with_migration_id(&dm, "mig00");
+    api.infer_and_apply_with_migration_id(&dm, "mig00").await;
 
     let dm = r#"
             model Blog {
@@ -198,7 +195,7 @@ async fn watch_migrations_must_be_returned_in_addition_to_regular_inferred_steps
             }
         "#;
 
-    let output = api.infer_and_apply_with_migration_id(&dm, "watch01").migration_output;
+    let output = api.infer_and_apply_with_migration_id(&dm, "watch01").await.migration_output;
     applied_database_steps
         .extend(serde_json::from_value::<Vec<PrettySqlMigrationStep>>(output.database_steps).unwrap());
 
@@ -218,7 +215,7 @@ async fn watch_migrations_must_be_returned_in_addition_to_regular_inferred_steps
             }
         "#;
 
-    let output = api.infer_and_apply_with_migration_id(&dm, "watch02").migration_output;
+    let output = api.infer_and_apply_with_migration_id(&dm, "watch02").await.migration_output;
     applied_database_steps
         .extend(serde_json::from_value::<Vec<PrettySqlMigrationStep>>(output.database_steps).unwrap());
 
@@ -251,7 +248,7 @@ async fn watch_migrations_must_be_returned_in_addition_to_regular_inferred_steps
         datamodel: dm.to_string(),
     };
 
-    let output = api.run_infer_command(input);
+    let output = api.run_infer_command(input).await;
     let returned_steps: Vec<PrettySqlMigrationStep> = serde_json::from_value(output.0.database_steps).unwrap();
 
     let expected_steps_count = if api.is_sqlite() {
