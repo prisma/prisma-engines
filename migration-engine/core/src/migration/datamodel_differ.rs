@@ -70,6 +70,18 @@ fn push_updated_custom_types<'a>(steps: &mut Steps, custom_types: impl Iterator<
             custom_type: updated_custom_type.previous.name.name.clone(),
         };
 
+        let step = steps::UpdateCustomType {
+            custom_type: updated_custom_type.previous.name.name.clone(),
+            r#type: diff_value(
+                &updated_custom_type.previous.field_type.name,
+                &updated_custom_type.next.field_type.name,
+            ),
+        };
+
+        if step.is_any_option_set() {
+            steps.push(MigrationStep::UpdateCustomType(step));
+        }
+
         push_created_directives(steps, &location, updated_custom_type.created_directives());
         push_updated_directives(steps, &location, updated_custom_type.directive_pairs());
         push_deleted_directives(steps, &location, updated_custom_type.deleted_directives());

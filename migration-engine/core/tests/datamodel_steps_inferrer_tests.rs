@@ -1361,6 +1361,21 @@ fn infer_DeleteCustomType() {
     assert_eq!(steps, expected);
 }
 
+#[test]
+fn infer_UpdateCustomType() {
+    let dm1 = parse("type Age = Int");
+    let dm2 = parse("type Age = Float");
+
+    let steps = infer(&dm1, &dm2);
+
+    let expected = &[MigrationStep::UpdateCustomType(UpdateCustomType {
+        custom_type: "Age".to_owned(),
+        r#type: Some("Float".to_owned()),
+    })];
+
+    assert_eq!(steps, expected);
+}
+
 fn infer(dm1: &SchemaAst, dm2: &SchemaAst) -> Vec<MigrationStep> {
     let inferrer = DataModelMigrationStepsInferrerImplWrapper {};
     inferrer.infer(&dm1, &dm2)
