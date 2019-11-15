@@ -395,8 +395,8 @@ fn introspecting_a_prisma_many_to_many_relation_should_work(api: &TestApi) {
             t.inject_custom(
                 "A TEXT NOT NULL,
                           B TEXT NOT NULL,
-                          FOREIGN KEY (A) REFERENCES  Post(id),
-                          FOREIGN KEY (B) REFERENCES  User(id)",
+                          FOREIGN KEY (A) REFERENCES  Post(id) ON DELETE CASCADE,
+                          FOREIGN KEY (B) REFERENCES  User(id) ON DELETE CASCADE",
             )
         });
         migration.inject_custom("CREATE UNIQUE INDEX \"introspection-engine\".test ON \"_PostToUser\" (\"A\", \"B\");")
@@ -432,8 +432,8 @@ fn introspecting_a_many_to_many_relation_should_work(api: &TestApi) {
             t.inject_custom(
                 "user_id TEXT NOT NULL,
                           post_id TEXT NOT NULL,
-                          FOREIGN KEY (user_id) REFERENCES  User(id),
-                          FOREIGN KEY (post_id) REFERENCES  Post(id)",
+                          FOREIGN KEY (user_id) REFERENCES  User(id) ON DELETE CASCADE,
+                          FOREIGN KEY (post_id) REFERENCES  Post(id) ON DELETE CASCADE",
             )
         });
     });
@@ -441,12 +441,12 @@ fn introspecting_a_many_to_many_relation_should_work(api: &TestApi) {
     let dm = r#"
             model User {
                id Int @id
-               postsToUserses PostsToUsers[] 
+               postsToUserses PostsToUsers[] @relation(onDelete: CASCADE)
             }
             
             model Post {
                id Int @id
-               postsToUserses PostsToUsers[] @relation(references: [post_id])
+               postsToUserses PostsToUsers[] @relation(references: [post_id], onDelete: CASCADE)
             }
             
             model PostsToUsers {
@@ -522,6 +522,39 @@ fn introspecting_a_self_relation_should_work(api: &TestApi) {
                 recruited_by                   User?  @relation("UserToUser_recruited_by")
                 users_UserToUser_direct_report User[] @relation("UserToUser_direct_report")
                 users_UserToUser_recruited_by  User[] @relation("UserToUser_recruited_by")
+            }
+        "#;
+    let result = dbg!(api.introspect());
+    custom_assert(&result, dm);
+}
+
+// on delete cascade
+
+#[test_one_connector(connector = "sqlite")]
+fn introspecting_cascading_delete_behaviour_should_work(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel.execute(|migration| {
+        migration.create_table("User", |t| {
+            t.add_column("id", types::primary());
+        });
+        migration.create_table("Post", |t| {
+            t.add_column("id", types::primary());
+            t.inject_custom(
+                "user_id INTEGER,\
+                 FOREIGN KEY (user_id) REFERENCES User(id) ON DELETE CASCADE",
+            );
+        });
+    });
+
+    let dm = r#"
+            model User {
+               id      Int @id
+               posts Post[] @relation(onDelete: CASCADE)
+            }
+            
+            model Post {
+               id      Int @id
+               user_id User?
             }
         "#;
     let result = dbg!(api.introspect());
