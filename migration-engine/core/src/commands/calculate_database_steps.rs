@@ -39,7 +39,7 @@ impl<'a> MigrationCommand for CalculateDatabaseStepsCommand<'a> {
             &assumed_datamodel,
             &next_datamodel,
             &cmd.input.steps_to_apply,
-        )?;
+        ).await?;
 
         let DestructiveChangeDiagnostics { warnings, errors: _ } =
             connector.destructive_changes_checker().check(&database_migration)?;

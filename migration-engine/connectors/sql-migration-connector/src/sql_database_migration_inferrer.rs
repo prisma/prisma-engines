@@ -13,8 +13,9 @@ pub struct SqlDatabaseMigrationInferrer {
     pub schema_name: String,
 }
 
+#[async_trait::async_trait]
 impl DatabaseMigrationInferrer<SqlMigration> for SqlDatabaseMigrationInferrer {
-    fn infer(
+    async fn infer(
         &self,
         _previous: &Datamodel,
         next: &Datamodel,
@@ -34,7 +35,7 @@ impl DatabaseMigrationInferrer<SqlMigration> for SqlDatabaseMigrationInferrer {
         result.map_err(|sql_error| sql_error.into_connector_error(&self.connection_info))
     }
 
-    fn infer_from_datamodels(
+    async fn infer_from_datamodels(
         &self,
         previous: &Datamodel,
         next: &Datamodel,

@@ -28,15 +28,15 @@ impl<'a> MigrationCommand for ApplyMigrationCommand<'a> {
 
         match migration_persistence.last() {
             Some(ref last_migration) if last_migration.is_watch_migration() && !cmd.input.is_watch_migration() => {
-                cmd.handle_transition_out_of_watch_mode(&engine)
+                cmd.handle_transition_out_of_watch_mode(&engine).await
             }
-            _ => cmd.handle_normal_migration(&engine),
+            _ => cmd.handle_normal_migration(&engine).await,
         }
     }
 }
 
 impl<'a> ApplyMigrationCommand<'a> {
-    fn handle_transition_out_of_watch_mode<C, D>(
+    async fn handle_transition_out_of_watch_mode<C, D>(
         &self,
         engine: &MigrationEngine<C, D>,
     ) -> CommandResult<MigrationStepsResultOutput>
@@ -57,10 +57,10 @@ impl<'a> ApplyMigrationCommand<'a> {
             .infer(&last_non_watch_datamodel, self.input.steps.as_slice())?;
         let next_datamodel = datamodel::lift_ast(&next_datamodel_ast)?;
 
-        self.handle_migration(&engine, current_datamodel, next_datamodel)
+        self.handle_migration(&engine, current_datamodel, next_datamodel).await
     }
 
-    fn handle_normal_migration<C, D>(&self, engine: &MigrationEngine<C, D>) -> CommandResult<MigrationStepsResultOutput>
+    async fn handle_normal_migration<C, D>(&self, engine: &MigrationEngine<C, D>) -> CommandResult<MigrationStepsResultOutput>
     where
         C: MigrationConnector<DatabaseMigration = D>,
         D: DatabaseMigrationMarker + Send + Sync + 'static,
@@ -75,10 +75,10 @@ impl<'a> ApplyMigrationCommand<'a> {
             .infer(&current_datamodel_ast, self.input.steps.as_slice())?;
         let next_datamodel = datamodel::lift_ast(&next_datamodel_ast)?;
 
-        self.handle_migration(&engine, current_datamodel, next_datamodel)
+        self.handle_migration(&engine, current_datamodel, next_datamodel).await
     }
 
-    fn handle_migration<C, D>(
+    async fn handle_migration<C, D>(
         &self,
         engine: &MigrationEngine<C, D>,
         current_datamodel: Datamodel,
@@ -94,7 +94,7 @@ impl<'a> ApplyMigrationCommand<'a> {
         let database_migration =
             connector
                 .database_migration_inferrer()
-                .infer(&current_datamodel, &next_datamodel, &self.input.steps)?; // TODO: those steps are a lie right now. Does not matter because we don't use them at the moment.
+                .infer(&current_datamodel, &next_datamodel, &self.input.steps).await?; // TODO: those steps are a lie right now. Does not matter because we don't use them at the moment.
 
         let database_steps_json_pretty = connector
             .database_migration_step_applier()
