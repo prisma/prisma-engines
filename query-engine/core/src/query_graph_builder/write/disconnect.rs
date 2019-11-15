@@ -15,7 +15,7 @@ use std::{convert::TryInto, sync::Arc};
 ///
 /// The resulting graph (dashed indicates that those nodes and edges are not created in this function):
 /// ```text
-///   ┌ ─ ─ ─ ─ ─ ─ ─ ─ ┐
+///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ┐
 /// ┌──      Parent       ─ ─ ─ ─ ─
 /// │  └ ─ ─ ─ ─ ─ ─ ─ ─ ┘         │
 /// │           │
