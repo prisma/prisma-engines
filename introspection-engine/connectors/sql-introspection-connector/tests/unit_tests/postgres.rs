@@ -392,7 +392,6 @@ fn introspecting_a_prisma_many_to_many_relation_should_work(api: &TestApi) {
     custom_assert(&result, dm);
 }
 
-// Todo
 #[test_one_connector(connector = "postgres")]
 fn introspecting_a_many_to_many_relation_should_work(api: &TestApi) {
     let barrel = api.barrel();
@@ -405,8 +404,8 @@ fn introspecting_a_many_to_many_relation_should_work(api: &TestApi) {
         });
         migration.create_table("PostsToUsers", |t| {
             t.inject_custom(
-                "user_id INTEGER NOT NULL REFERENCES  \"User\"(\"id\"),
-                    post_id INTEGER NOT NULL REFERENCES  \"Post\"(\"id\")",
+                "user_id INTEGER NOT NULL REFERENCES  \"User\"(\"id\") ON DELETE CASCADE,
+                    post_id INTEGER NOT NULL REFERENCES  \"Post\"(\"id\") ON DELETE CASCADE",
             )
         });
     });
@@ -414,7 +413,7 @@ fn introspecting_a_many_to_many_relation_should_work(api: &TestApi) {
     let dm = r#"
             model Post {
                id      Int @id(strategy: NONE) @sequence(name: "Post_id_seq", allocationSize: 1, initialValue: 1)
-               postsToUserses PostsToUsers[] @relation(references: [post_id])
+               postsToUserses PostsToUsers[] @relation(references: [post_id], onDelete: CASCADE)
             }
 
             model PostsToUsers {
@@ -424,7 +423,7 @@ fn introspecting_a_many_to_many_relation_should_work(api: &TestApi) {
             
             model User {
                id      Int @id(strategy: NONE) @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
-               postsToUserses PostsToUsers[] 
+               postsToUserses PostsToUsers[] @relation( onDelete: CASCADE)
             }
         "#;
     let result = dbg!(api.introspect());

@@ -428,8 +428,8 @@ fn introspecting_a_many_to_many_relation_should_work(api: &TestApi) {
             t.inject_custom(
                 "user_id INTEGER NOT NULL,
                      post_id INTEGER NOT NULL,
-                     FOREIGN KEY (`user_id`) REFERENCES  `User`(`id`),
-                     FOREIGN KEY (`post_id`) REFERENCES  `Post`(`id`)",
+                     FOREIGN KEY (`user_id`) REFERENCES  `User`(`id`) ON DELETE CASCADE,
+                     FOREIGN KEY (`post_id`) REFERENCES  `Post`(`id`) ON DELETE CASCADE",
             )
         });
     });
@@ -437,7 +437,7 @@ fn introspecting_a_many_to_many_relation_should_work(api: &TestApi) {
     let dm = r#"
             model Post {
                id      Int @id
-               postsToUserses PostsToUsers[] @relation(references: [post_id])
+               postsToUserses PostsToUsers[] @relation(references: [post_id], onDelete: CASCADE)
             }
 
             model PostsToUsers {
@@ -447,7 +447,7 @@ fn introspecting_a_many_to_many_relation_should_work(api: &TestApi) {
             
             model User {
                id      Int @id
-               postsToUserses PostsToUsers[] 
+               postsToUserses PostsToUsers[] @relation(onDelete: CASCADE)
             }
         "#;
     let result = dbg!(api.introspect());
