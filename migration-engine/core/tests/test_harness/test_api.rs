@@ -46,7 +46,7 @@ impl TestApi {
         self.sql_family
     }
 
-    pub fn apply_migration(&self, steps: Vec<MigrationStep>, migration_id: &str) -> InferAndApplyOutput {
+    pub async fn apply_migration(&self, steps: Vec<MigrationStep>, migration_id: &str) -> InferAndApplyOutput {
         let input = ApplyMigrationInput {
             migration_id: migration_id.to_string(),
             steps,
@@ -69,22 +69,22 @@ impl TestApi {
         }
     }
 
-    pub fn infer_and_apply(&self, datamodel: &str) -> InferAndApplyOutput {
+    pub async fn infer_and_apply(&self, datamodel: &str) -> InferAndApplyOutput {
         let migration_id = "the-migration-id";
 
-        self.infer_and_apply_with_migration_id(datamodel, migration_id)
+        self.infer_and_apply_with_migration_id(datamodel, migration_id).await
     }
 
-    pub fn infer_and_apply_with_migration_id(&self, datamodel: &str, migration_id: &str) -> InferAndApplyOutput {
+    pub async fn infer_and_apply_with_migration_id(&self, datamodel: &str, migration_id: &str) -> InferAndApplyOutput {
         let input = InferMigrationStepsInput {
             migration_id: migration_id.to_string(),
             datamodel: datamodel.to_string(),
             assume_to_be_applied: Vec::new(),
         };
 
-        let steps = self.run_infer_command(input).0.datamodel_steps;
+        let steps = self.run_infer_command(input).await.0.datamodel_steps;
 
-        self.apply_migration(steps, migration_id)
+        self.apply_migration(steps, migration_id).await
     }
 
     pub fn execute_command<'a, C>(&self, input: &'a C::Input) -> Result<C::Output, user_facing_errors::Error>
@@ -96,11 +96,11 @@ impl TestApi {
             .map_err(|err| self.api.render_error(err))
     }
 
-    pub fn run_infer_command(&self, input: InferMigrationStepsInput) -> InferOutput {
+    pub async fn run_infer_command(&self, input: InferMigrationStepsInput) -> InferOutput {
         run_infer_command(&self.api, input)
     }
 
-    pub fn unapply_migration(&self) -> UnapplyOutput {
+    pub async fn unapply_migration(&self) -> UnapplyOutput {
         let input = UnapplyMigrationInput {};
         let output = self.api.unapply_migration(&input).unwrap();
 

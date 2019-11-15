@@ -8,7 +8,7 @@ use sql_schema_describer::*;
 use test_harness::*;
 
 #[test_each_connector]
-fn adding_a_scalar_field_must_work(api: &TestApi) {
+async fn adding_a_scalar_field_must_work(api: &TestApi) {
     let dm2 = r#"
         model Test {
             id String @id @default(cuid())
@@ -25,7 +25,7 @@ fn adding_a_scalar_field_must_work(api: &TestApi) {
             B
         }
     "#;
-    let result = api.infer_and_apply(&dm2).sql_schema;
+    let result = api.infer_and_apply(&dm2).await.sql_schema;
     let table = result.table_bang("Test");
     table.columns.iter().for_each(|c| assert_eq!(c.is_required(), true));
 
@@ -62,39 +62,39 @@ fn adding_a_scalar_field_must_work(api: &TestApi) {
 //}
 
 #[test_each_connector]
-fn adding_an_optional_field_must_work(api: &TestApi) {
+async fn adding_an_optional_field_must_work(api: &TestApi) {
     let dm2 = r#"
         model Test {
             id String @id @default(cuid())
             field String?
         }
     "#;
-    let result = api.infer_and_apply(&dm2).sql_schema;
+    let result = api.infer_and_apply(&dm2).await.sql_schema;
     let column = result.table_bang("Test").column_bang("field");
     assert_eq!(column.is_required(), false);
 }
 
 #[test_each_connector]
-fn adding_an_id_field_with_a_special_name_must_work(api: &TestApi) {
+async fn adding_an_id_field_with_a_special_name_must_work(api: &TestApi) {
     let dm2 = r#"
             model Test {
                 specialName String @id @default(cuid())
             }
         "#;
-    let result = api.infer_and_apply(&dm2).sql_schema;
+    let result = api.infer_and_apply(&dm2).await.sql_schema;
     let column = result.table_bang("Test").column("specialName");
     assert_eq!(column.is_some(), true);
 }
 
 #[test_each_connector]
-fn adding_an_id_field_of_type_int_must_work(api: &TestApi) {
+async fn adding_an_id_field_of_type_int_must_work(api: &TestApi) {
     let dm2 = r#"
         model Test {
             myId Int @id
         }
     "#;
 
-    let result = api.infer_and_apply(&dm2).sql_schema;
+    let result = api.infer_and_apply(&dm2).await.sql_schema;
     let column = result.table_bang("Test").column_bang("myId");
 
     match api.sql_family() {
@@ -109,14 +109,14 @@ fn adding_an_id_field_of_type_int_must_work(api: &TestApi) {
 }
 
 #[test_each_connector]
-fn removing_a_scalar_field_must_work(api: &TestApi) {
+async fn removing_a_scalar_field_must_work(api: &TestApi) {
     let dm1 = r#"
             model Test {
                 id String @id @default(cuid())
                 field String
             }
         "#;
-    let result = api.infer_and_apply(&dm1).sql_schema;
+    let result = api.infer_and_apply(&dm1).await.sql_schema;
     let column1 = result.table_bang("Test").column("field");
     assert_eq!(column1.is_some(), true);
 
@@ -125,20 +125,20 @@ fn removing_a_scalar_field_must_work(api: &TestApi) {
                 id String @id @default(cuid())
             }
         "#;
-    let result = api.infer_and_apply(&dm2).sql_schema;
+    let result = api.infer_and_apply(&dm2).await.sql_schema;
     let column2 = result.table_bang("Test").column("field");
     assert_eq!(column2.is_some(), false);
 }
 
 #[test_each_connector]
-fn can_handle_reserved_sql_keywords_for_model_name(api: &TestApi) {
+async fn can_handle_reserved_sql_keywords_for_model_name(api: &TestApi) {
     let dm1 = r#"
             model Group {
                 id String @id @default(cuid())
                 field String
             }
         "#;
-    let result = api.infer_and_apply(&dm1).sql_schema;
+    let result = api.infer_and_apply(&dm1).await.sql_schema;
     let column = result.table_bang("Group").column_bang("field");
     assert_eq!(column.tpe.family, ColumnTypeFamily::String);
 
@@ -148,20 +148,20 @@ fn can_handle_reserved_sql_keywords_for_model_name(api: &TestApi) {
                 field Int
             }
         "#;
-    let result = api.infer_and_apply(&dm2).sql_schema;
+    let result = api.infer_and_apply(&dm2).await.sql_schema;
     let column = result.table_bang("Group").column_bang("field");
     assert_eq!(column.tpe.family, ColumnTypeFamily::Int);
 }
 
 #[test_each_connector]
-fn can_handle_reserved_sql_keywords_for_field_name(api: &TestApi) {
+async fn can_handle_reserved_sql_keywords_for_field_name(api: &TestApi) {
     let dm1 = r#"
             model Test {
                 id String @id @default(cuid())
                 Group String
             }
         "#;
-    let result = api.infer_and_apply(&dm1).sql_schema;
+    let result = api.infer_and_apply(&dm1).await.sql_schema;
     let column = result.table_bang("Test").column_bang("Group");
     assert_eq!(column.tpe.family, ColumnTypeFamily::String);
 
@@ -171,20 +171,20 @@ fn can_handle_reserved_sql_keywords_for_field_name(api: &TestApi) {
                 Group Int
             }
         "#;
-    let result = api.infer_and_apply(&dm2).sql_schema;
+    let result = api.infer_and_apply(&dm2).await.sql_schema;
     let column = result.table_bang("Test").column_bang("Group");
     assert_eq!(column.tpe.family, ColumnTypeFamily::Int);
 }
 
 #[test_each_connector]
-fn update_type_of_scalar_field_must_work(api: &TestApi) {
+async fn update_type_of_scalar_field_must_work(api: &TestApi) {
     let dm1 = r#"
             model Test {
                 id String @id @default(cuid())
                 field String
             }
         "#;
-    let result = api.infer_and_apply(&dm1).sql_schema;
+    let result = api.infer_and_apply(&dm1).await.sql_schema;
     let column1 = result.table_bang("Test").column_bang("field");
     assert_eq!(column1.tpe.family, ColumnTypeFamily::String);
 
@@ -194,13 +194,13 @@ fn update_type_of_scalar_field_must_work(api: &TestApi) {
                 field Int
             }
         "#;
-    let result = api.infer_and_apply(&dm2).sql_schema;
+    let result = api.infer_and_apply(&dm2).await.sql_schema;
     let column2 = result.table_bang("Test").column_bang("field");
     assert_eq!(column2.tpe.family, ColumnTypeFamily::Int);
 }
 
 #[test_each_connector]
-fn changing_the_type_of_an_id_field_must_work(api: &TestApi) {
+async fn changing_the_type_of_an_id_field_must_work(api: &TestApi) {
     let dm1 = r#"
             model A {
                 id Int @id
@@ -210,7 +210,7 @@ fn changing_the_type_of_an_id_field_must_work(api: &TestApi) {
                 id Int @id
             }
         "#;
-    let result = api.infer_and_apply(&dm1).sql_schema;
+    let result = api.infer_and_apply(&dm1).await.sql_schema;
     let table = result.table_bang("A");
     let column = table.column_bang("b");
     assert_eq!(column.tpe.family, ColumnTypeFamily::Int);
@@ -238,7 +238,7 @@ fn changing_the_type_of_an_id_field_must_work(api: &TestApi) {
                 id String @id @default(cuid())
             }
         "#;
-    let result = api.infer_and_apply(&dm2).sql_schema;
+    let result = api.infer_and_apply(&dm2).await.sql_schema;
     let table = result.table_bang("A");
     let column = table.column_bang("b");
     assert_eq!(column.tpe.family, ColumnTypeFamily::String);
@@ -259,14 +259,14 @@ fn changing_the_type_of_an_id_field_must_work(api: &TestApi) {
 }
 
 #[test_each_connector]
-fn updating_db_name_of_a_scalar_field_must_work(api: &TestApi) {
+async fn updating_db_name_of_a_scalar_field_must_work(api: &TestApi) {
     let dm1 = r#"
             model A {
                 id String @id @default(cuid())
                 field String @map(name:"name1")
             }
         "#;
-    let result = api.infer_and_apply(&dm1).sql_schema;
+    let result = api.infer_and_apply(&dm1).await.sql_schema;
     assert_eq!(result.table_bang("A").column("name1").is_some(), true);
 
     let dm2 = r#"
@@ -275,14 +275,14 @@ fn updating_db_name_of_a_scalar_field_must_work(api: &TestApi) {
                 field String @map(name:"name2")
             }
         "#;
-    let result = api.infer_and_apply(&dm2).sql_schema;
+    let result = api.infer_and_apply(&dm2).await.sql_schema;
     assert_eq!(result.table_bang("A").column("name1").is_some(), false);
     assert_eq!(result.table_bang("A").column("name2").is_some(), true);
 }
 
 // this relies on link: INLINE which we don't support yet
 #[test_each_connector(ignore = "mysql")]
-fn changing_a_relation_field_to_a_scalar_field_must_work(api: &TestApi) {
+async fn changing_a_relation_field_to_a_scalar_field_must_work(api: &TestApi) {
     let dm1 = r#"
             model A {
                 id Int @id
@@ -293,7 +293,7 @@ fn changing_a_relation_field_to_a_scalar_field_must_work(api: &TestApi) {
                 a A // remove this once the implicit back relation field is implemented
             }
         "#;
-    let result = api.infer_and_apply(&dm1).sql_schema;
+    let result = api.infer_and_apply(&dm1).await.sql_schema;
     let table = result.table_bang("A");
     let column = table.column_bang("b");
     assert_eq!(column.tpe.family, ColumnTypeFamily::Int);
@@ -321,7 +321,7 @@ fn changing_a_relation_field_to_a_scalar_field_must_work(api: &TestApi) {
                 id Int @id
             }
         "#;
-    let result = api.infer_and_apply(&dm2).sql_schema;
+    let result = api.infer_and_apply(&dm2).await.sql_schema;
     let table = result.table_bang("A");
     let column = table.column_bang("b");
     assert_eq!(column.tpe.family, ColumnTypeFamily::String);
@@ -329,7 +329,7 @@ fn changing_a_relation_field_to_a_scalar_field_must_work(api: &TestApi) {
 }
 
 #[test_each_connector]
-fn changing_a_scalar_field_to_a_relation_field_must_work(api: &TestApi) {
+async fn changing_a_scalar_field_to_a_relation_field_must_work(api: &TestApi) {
     let dm1 = r#"
             model A {
                 id Int @id
@@ -339,7 +339,7 @@ fn changing_a_scalar_field_to_a_relation_field_must_work(api: &TestApi) {
                 id Int @id
             }
         "#;
-    let result = api.infer_and_apply(&dm1).sql_schema;
+    let result = api.infer_and_apply(&dm1).await.sql_schema;
     let table = result.table_bang("A");
     let column = table.column_bang("b");
     assert_eq!(column.tpe.family, ColumnTypeFamily::String);
@@ -355,7 +355,7 @@ fn changing_a_scalar_field_to_a_relation_field_must_work(api: &TestApi) {
                 a A // remove this once the implicit back relation field is implemented
             }
         "#;
-    let result = api.infer_and_apply(&dm2).sql_schema;
+    let result = api.infer_and_apply(&dm2).await.sql_schema;
     let table = result.table_bang("A");
     let column = result.table_bang("A").column_bang("b");
     assert_eq!(column.tpe.family, ColumnTypeFamily::Int);
@@ -376,7 +376,7 @@ fn changing_a_scalar_field_to_a_relation_field_must_work(api: &TestApi) {
 }
 
 #[test_each_connector]
-fn adding_a_many_to_many_relation_must_result_in_a_prisma_style_relation_table(api: &TestApi) {
+async fn adding_a_many_to_many_relation_must_result_in_a_prisma_style_relation_table(api: &TestApi) {
     // TODO: one model should have an id of different type. Not possible right now due to barrel limitation.
 
     let dm1 = r#"
@@ -389,7 +389,7 @@ fn adding_a_many_to_many_relation_must_result_in_a_prisma_style_relation_table(a
                 as A[]
             }
         "#;
-    let result = api.infer_and_apply(&dm1).sql_schema;
+    let result = api.infer_and_apply(&dm1).await.sql_schema;
     let relation_table = result.table_bang("_AToB");
     println!("{:?}", relation_table.foreign_keys);
     assert_eq!(relation_table.columns.len(), 2);
@@ -429,7 +429,7 @@ fn adding_a_many_to_many_relation_must_result_in_a_prisma_style_relation_table(a
 }
 
 #[test_each_connector]
-fn adding_a_many_to_many_relation_with_custom_name_must_work(api: &TestApi) {
+async fn adding_a_many_to_many_relation_with_custom_name_must_work(api: &TestApi) {
     let dm1 = r#"
             model A {
                 id Int @id
@@ -441,7 +441,7 @@ fn adding_a_many_to_many_relation_with_custom_name_must_work(api: &TestApi) {
             }
         "#;
 
-    let result = api.infer_and_apply(&dm1).sql_schema;
+    let result = api.infer_and_apply(&dm1).await.sql_schema;
     let relation_table = result.table_bang("_my_relation");
     assert_eq!(relation_table.columns.len(), 2);
 
@@ -508,7 +508,7 @@ fn providing_an_explicit_link_table_must_work() {
 }
 
 #[test_each_connector]
-fn adding_an_inline_relation_must_result_in_a_foreign_key_in_the_model_table(api: &TestApi) {
+async fn adding_an_inline_relation_must_result_in_a_foreign_key_in_the_model_table(api: &TestApi) {
     let dm1 = r#"
             model A {
                 id Int @id
@@ -519,7 +519,7 @@ fn adding_an_inline_relation_must_result_in_a_foreign_key_in_the_model_table(api
                 id Int @id
             }
         "#;
-    let result = api.infer_and_apply(&dm1).sql_schema;
+    let result = api.infer_and_apply(&dm1).await.sql_schema;
     let table = result.table_bang("A");
     let column = table.column_bang("b");
     assert_eq!(column.tpe.family, ColumnTypeFamily::Int);
@@ -540,7 +540,7 @@ fn adding_an_inline_relation_must_result_in_a_foreign_key_in_the_model_table(api
 }
 
 #[test_each_connector]
-fn specifying_a_db_name_for_an_inline_relation_must_work(api: &TestApi) {
+async fn specifying_a_db_name_for_an_inline_relation_must_work(api: &TestApi) {
     let dm1 = r#"
             model A {
                 id Int @id
@@ -551,7 +551,7 @@ fn specifying_a_db_name_for_an_inline_relation_must_work(api: &TestApi) {
                 id Int @id
             }
         "#;
-    let result = api.infer_and_apply(&dm1).sql_schema;
+    let result = api.infer_and_apply(&dm1).await.sql_schema;
     let table = result.table_bang("A");
     let column = table.column_bang("b_column");
     assert_eq!(column.tpe.family, ColumnTypeFamily::Int);
@@ -572,7 +572,7 @@ fn specifying_a_db_name_for_an_inline_relation_must_work(api: &TestApi) {
 }
 
 #[test_each_connector]
-fn adding_an_inline_relation_to_a_model_with_an_exotic_id_type(api: &TestApi) {
+async fn adding_an_inline_relation_to_a_model_with_an_exotic_id_type(api: &TestApi) {
     let dm1 = r#"
             model A {
                 id Int @id
@@ -583,7 +583,7 @@ fn adding_an_inline_relation_to_a_model_with_an_exotic_id_type(api: &TestApi) {
                 id String @id @default(cuid())
             }
         "#;
-    let result = api.infer_and_apply(&dm1).sql_schema;
+    let result = api.infer_and_apply(&dm1).await.sql_schema;
     let table = result.table_bang("A");
     let column = table.column_bang("b");
     assert_eq!(column.tpe.family, ColumnTypeFamily::String);
@@ -604,7 +604,7 @@ fn adding_an_inline_relation_to_a_model_with_an_exotic_id_type(api: &TestApi) {
 }
 
 #[test_each_connector(ignore = "mysql")]
-fn removing_an_inline_relation_must_work(api: &TestApi) {
+async fn removing_an_inline_relation_must_work(api: &TestApi) {
     let dm1 = r#"
             model A {
                 id Int @id
@@ -615,7 +615,7 @@ fn removing_an_inline_relation_must_work(api: &TestApi) {
                 id Int @id
             }
         "#;
-    let result = api.infer_and_apply(&dm1).sql_schema;
+    let result = api.infer_and_apply(&dm1).await.sql_schema;
     let column = result.table_bang("A").column("b");
     assert_eq!(column.is_some(), true);
 
@@ -628,13 +628,13 @@ fn removing_an_inline_relation_must_work(api: &TestApi) {
                 id Int @id
             }
         "#;
-    let result = api.infer_and_apply(&dm2).sql_schema;
+    let result = api.infer_and_apply(&dm2).await.sql_schema;
     let column = result.table_bang("A").column("b");
     assert_eq!(column.is_some(), false);
 }
 
 #[test_each_connector(ignore = "mysql")]
-fn moving_an_inline_relation_to_the_other_side_must_work(api: &TestApi) {
+async fn moving_an_inline_relation_to_the_other_side_must_work(api: &TestApi) {
     let dm1 = r#"
             model A {
                 id Int @id
@@ -645,7 +645,7 @@ fn moving_an_inline_relation_to_the_other_side_must_work(api: &TestApi) {
                 id Int @id
             }
         "#;
-    let result = api.infer_and_apply(&dm1).sql_schema;
+    let result = api.infer_and_apply(&dm1).await.sql_schema;
     let table = result.table_bang("A");
     assert_eq!(
         table.foreign_keys,
@@ -672,7 +672,7 @@ fn moving_an_inline_relation_to_the_other_side_must_work(api: &TestApi) {
                 a A @relation(references: [id])
             }
         "#;
-    let result = api.infer_and_apply(&dm2).sql_schema;
+    let result = api.infer_and_apply(&dm2).await.sql_schema;
     let table = result.table_bang("B");
     assert_eq!(
         table.foreign_keys,
@@ -691,21 +691,21 @@ fn moving_an_inline_relation_to_the_other_side_must_work(api: &TestApi) {
 }
 
 #[test_each_connector]
-fn adding_a_new_unique_field_must_work(api: &TestApi) {
+async fn adding_a_new_unique_field_must_work(api: &TestApi) {
     let dm1 = r#"
             model A {
                 id Int @id
                 field String @unique
             }
         "#;
-    let result = api.infer_and_apply(&dm1).sql_schema;
+    let result = api.infer_and_apply(&dm1).await.sql_schema;
     let index = result.table_bang("A").indices.iter().find(|i| i.columns == &["field"]);
     assert!(index.is_some());
     assert_eq!(index.unwrap().tpe, IndexType::Unique);
 }
 
 #[test_each_connector]
-fn adding_new_fields_with_multi_column_unique_must_work(api: &TestApi) {
+async fn adding_new_fields_with_multi_column_unique_must_work(api: &TestApi) {
     let dm1 = r#"
             model A {
                 id Int @id
@@ -715,7 +715,7 @@ fn adding_new_fields_with_multi_column_unique_must_work(api: &TestApi) {
                 @@unique([field, secondField])
             }
         "#;
-    let result = api.infer_and_apply(&dm1).sql_schema;
+    let result = api.infer_and_apply(&dm1).await.sql_schema;
     let index = result
         .table_bang("A")
         .indices
@@ -726,14 +726,14 @@ fn adding_new_fields_with_multi_column_unique_must_work(api: &TestApi) {
 }
 
 #[test_each_connector]
-fn unique_in_conjunction_with_custom_column_name_must_work(api: &TestApi) {
+async fn unique_in_conjunction_with_custom_column_name_must_work(api: &TestApi) {
     let dm1 = r#"
             model A {
                 id Int @id
                 field String @unique @map("custom_field_name")
             }
         "#;
-    let result = api.infer_and_apply(&dm1).sql_schema;
+    let result = api.infer_and_apply(&dm1).await.sql_schema;
     let index = result
         .table_bang("A")
         .indices
@@ -744,7 +744,7 @@ fn unique_in_conjunction_with_custom_column_name_must_work(api: &TestApi) {
 }
 
 #[test_each_connector]
-fn multi_column_unique_in_conjunction_with_custom_column_name_must_work(api: &TestApi) {
+async fn multi_column_unique_in_conjunction_with_custom_column_name_must_work(api: &TestApi) {
     let dm1 = r#"
             model A {
                 id Int @id
@@ -754,7 +754,7 @@ fn multi_column_unique_in_conjunction_with_custom_column_name_must_work(api: &Te
                 @@unique([field, secondField])
             }
         "#;
-    let result = api.infer_and_apply(&dm1).sql_schema;
+    let result = api.infer_and_apply(&dm1).await.sql_schema;
     let index = result
         .table_bang("A")
         .indices
@@ -765,7 +765,7 @@ fn multi_column_unique_in_conjunction_with_custom_column_name_must_work(api: &Te
 }
 
 #[test_each_connector]
-fn sqlite_must_recreate_indexes(api: &TestApi) {
+async fn sqlite_must_recreate_indexes(api: &TestApi) {
     // SQLite must go through a complicated migration procedure which requires dropping and recreating indexes. This test checks that.
     // We run them still against each connector.
     let dm1 = r#"
@@ -774,7 +774,7 @@ fn sqlite_must_recreate_indexes(api: &TestApi) {
                 field String @unique
             }
         "#;
-    let result = api.infer_and_apply(&dm1).sql_schema;
+    let result = api.infer_and_apply(&dm1).await.sql_schema;
     let index = result
         .table_bang("A")
         .indices
@@ -790,7 +790,7 @@ fn sqlite_must_recreate_indexes(api: &TestApi) {
                 other String
             }
         "#;
-    let result = api.infer_and_apply(&dm2).sql_schema;
+    let result = api.infer_and_apply(&dm2).await.sql_schema;
     let index = result
         .table_bang("A")
         .indices
@@ -801,7 +801,7 @@ fn sqlite_must_recreate_indexes(api: &TestApi) {
 }
 
 #[test_each_connector]
-fn sqlite_must_recreate_multi_field_indexes(api: &TestApi) {
+async fn sqlite_must_recreate_multi_field_indexes(api: &TestApi) {
     // SQLite must go through a complicated migration procedure which requires dropping and recreating indexes. This test checks that.
     // We run them still against each connector.
     let dm1 = r#"
@@ -813,7 +813,7 @@ fn sqlite_must_recreate_multi_field_indexes(api: &TestApi) {
                 @@unique([field, secondField])
             }
         "#;
-    let result = api.infer_and_apply(&dm1).sql_schema;
+    let result = api.infer_and_apply(&dm1).await.sql_schema;
     let index = result
         .table_bang("A")
         .indices
@@ -832,7 +832,7 @@ fn sqlite_must_recreate_multi_field_indexes(api: &TestApi) {
                 @@unique([field, secondField])
             }
         "#;
-    let result = api.infer_and_apply(&dm2).sql_schema;
+    let result = api.infer_and_apply(&dm2).await.sql_schema;
     let index = result
         .table_bang("A")
         .indices
@@ -843,14 +843,14 @@ fn sqlite_must_recreate_multi_field_indexes(api: &TestApi) {
 }
 
 #[test_each_connector]
-fn removing_an_existing_unique_field_must_work(api: &TestApi) {
+async fn removing_an_existing_unique_field_must_work(api: &TestApi) {
     let dm1 = r#"
             model A {
                 id    Int    @id
                 field String @unique
             }
         "#;
-    let result = api.infer_and_apply(&dm1).sql_schema;
+    let result = api.infer_and_apply(&dm1).await.sql_schema;
     let index = result
         .table_bang("A")
         .indices
@@ -864,7 +864,7 @@ fn removing_an_existing_unique_field_must_work(api: &TestApi) {
                 id    Int    @id
             }
         "#;
-    let result = api.infer_and_apply(&dm2).sql_schema;
+    let result = api.infer_and_apply(&dm2).await.sql_schema;
     let index = result
         .table_bang("A")
         .indices
@@ -874,14 +874,14 @@ fn removing_an_existing_unique_field_must_work(api: &TestApi) {
 }
 
 #[test_each_connector]
-fn adding_unique_to_an_existing_field_must_work(api: &TestApi) {
+async fn adding_unique_to_an_existing_field_must_work(api: &TestApi) {
     let dm1 = r#"
             model A {
                 id    Int    @id
                 field String
             }
         "#;
-    let result = api.infer_and_apply(&dm1).sql_schema;
+    let result = api.infer_and_apply(&dm1).await.sql_schema;
     let index = result
         .table_bang("A")
         .indices
@@ -895,7 +895,7 @@ fn adding_unique_to_an_existing_field_must_work(api: &TestApi) {
                 field String @unique
             }
         "#;
-    let result = api.infer_and_apply(&dm2).sql_schema;
+    let result = api.infer_and_apply(&dm2).await.sql_schema;
     let index = result
         .table_bang("A")
         .indices
@@ -906,14 +906,14 @@ fn adding_unique_to_an_existing_field_must_work(api: &TestApi) {
 }
 
 #[test_each_connector]
-fn removing_unique_from_an_existing_field_must_work(api: &TestApi) {
+async fn removing_unique_from_an_existing_field_must_work(api: &TestApi) {
     let dm1 = r#"
             model A {
                 id    Int    @id
                 field String @unique
             }
         "#;
-    let result = api.infer_and_apply(&dm1).sql_schema;
+    let result = api.infer_and_apply(&dm1).await.sql_schema;
     let index = result.table_bang("A").indices.iter().find(|i| i.columns == &["field"]);
     assert!(index.is_some());
     assert_eq!(index.unwrap().tpe, IndexType::Unique);
@@ -924,13 +924,13 @@ fn removing_unique_from_an_existing_field_must_work(api: &TestApi) {
                 field String
             }
         "#;
-    let result = api.infer_and_apply(&dm2).sql_schema;
+    let result = api.infer_and_apply(&dm2).await.sql_schema;
     let index = result.table_bang("A").indices.iter().find(|i| i.columns == &["field"]);
     assert!(!index.is_some());
 }
 
 #[test_each_connector]
-fn removing_multi_field_unique_index_must_work(api: &TestApi) {
+async fn removing_multi_field_unique_index_must_work(api: &TestApi) {
     let dm1 = r#"
             model A {
                 id    Int    @id
@@ -940,7 +940,7 @@ fn removing_multi_field_unique_index_must_work(api: &TestApi) {
                 @@unique([field, secondField])
             }
         "#;
-    let result = api.infer_and_apply(&dm1).sql_schema;
+    let result = api.infer_and_apply(&dm1).await.sql_schema;
     let index = result
         .table_bang("A")
         .indices
@@ -956,7 +956,7 @@ fn removing_multi_field_unique_index_must_work(api: &TestApi) {
                 secondField Int
             }
         "#;
-    let result = api.infer_and_apply(&dm2).sql_schema;
+    let result = api.infer_and_apply(&dm2).await.sql_schema;
     let index = result
         .table_bang("A")
         .indices
@@ -966,7 +966,7 @@ fn removing_multi_field_unique_index_must_work(api: &TestApi) {
 }
 
 #[test_each_connector]
-fn index_renaming_must_work(api: &TestApi) {
+async fn index_renaming_must_work(api: &TestApi) {
     let dm1 = r#"
             model A {
                 id Int @id
@@ -976,7 +976,7 @@ fn index_renaming_must_work(api: &TestApi) {
                 @@unique([field, secondField], name: "customName")
             }
         "#;
-    let result = api.infer_and_apply(&dm1).sql_schema;
+    let result = api.infer_and_apply(&dm1).await.sql_schema;
     let index = result
         .table_bang("A")
         .indices
@@ -994,7 +994,7 @@ fn index_renaming_must_work(api: &TestApi) {
                 @@unique([field, secondField], name: "customNameA")
             }
         "#;
-    let result = api.infer_and_apply(&dm2);
+    let result = api.infer_and_apply(&dm2).await;
     let indexes = result
         .sql_schema
         .table_bang("A")
@@ -1016,7 +1016,7 @@ fn index_renaming_must_work(api: &TestApi) {
 }
 
 #[test_each_connector]
-fn index_renaming_must_work_when_renaming_to_default(api: &TestApi) {
+async fn index_renaming_must_work_when_renaming_to_default(api: &TestApi) {
     let dm1 = r#"
             model A {
                 id Int @id
@@ -1026,7 +1026,7 @@ fn index_renaming_must_work_when_renaming_to_default(api: &TestApi) {
                 @@unique([field, secondField], name: "customName")
             }
         "#;
-    let result = api.infer_and_apply(&dm1);
+    let result = api.infer_and_apply(&dm1).await;
     let index = result
         .sql_schema
         .table_bang("A")
@@ -1045,7 +1045,7 @@ fn index_renaming_must_work_when_renaming_to_default(api: &TestApi) {
                 @@unique([field, secondField])
             }
         "#;
-    let result = api.infer_and_apply(&dm2);
+    let result = api.infer_and_apply(&dm2).await;
     let indexes = result
         .sql_schema
         .table_bang("A")
@@ -1067,7 +1067,7 @@ fn index_renaming_must_work_when_renaming_to_default(api: &TestApi) {
 }
 
 #[test_each_connector]
-fn index_renaming_must_work_when_renaming_to_custom(api: &TestApi) {
+async fn index_renaming_must_work_when_renaming_to_custom(api: &TestApi) {
     let dm1 = r#"
             model A {
                 id Int @id
@@ -1077,7 +1077,7 @@ fn index_renaming_must_work_when_renaming_to_custom(api: &TestApi) {
                 @@unique([field, secondField])
             }
         "#;
-    let result = api.infer_and_apply(&dm1);
+    let result = api.infer_and_apply(&dm1).await;
     let index = result
         .sql_schema
         .table_bang("A")
@@ -1096,7 +1096,7 @@ fn index_renaming_must_work_when_renaming_to_custom(api: &TestApi) {
                 @@unique([field, secondField], name: "somethingCustom")
             }
         "#;
-    let result = api.infer_and_apply(&dm2);
+    let result = api.infer_and_apply(&dm2).await;
     let indexes = result
         .sql_schema
         .table_bang("A")
@@ -1118,7 +1118,7 @@ fn index_renaming_must_work_when_renaming_to_custom(api: &TestApi) {
 }
 
 #[test_each_connector]
-fn index_updates_with_rename_must_work(api: &TestApi) {
+async fn index_updates_with_rename_must_work(api: &TestApi) {
     let dm1 = r#"
             model A {
                 id Int @id
@@ -1128,7 +1128,7 @@ fn index_updates_with_rename_must_work(api: &TestApi) {
                 @@unique([field, secondField], name: "customName")
             }
         "#;
-    let result = api.infer_and_apply(&dm1).sql_schema;
+    let result = api.infer_and_apply(&dm1).await.sql_schema;
     let index = result
         .table_bang("A")
         .indices
@@ -1146,7 +1146,7 @@ fn index_updates_with_rename_must_work(api: &TestApi) {
                 @@unique([field, id], name: "customNameA")
             }
         "#;
-    let result = api.infer_and_apply(&dm2);
+    let result = api.infer_and_apply(&dm2).await;
     let indexes = result
         .sql_schema
         .table_bang("A")
@@ -1177,7 +1177,7 @@ fn index_updates_with_rename_must_work(api: &TestApi) {
 }
 
 #[test_each_connector]
-fn dropping_a_model_with_a_multi_field_unique_index_must_work(api: &TestApi) {
+async fn dropping_a_model_with_a_multi_field_unique_index_must_work(api: &TestApi) {
     let dm1 = r#"
             model A {
                 id Int @id
@@ -1187,7 +1187,7 @@ fn dropping_a_model_with_a_multi_field_unique_index_must_work(api: &TestApi) {
                 @@unique([field, secondField], name: "customName")
             }
         "#;
-    let result = api.infer_and_apply(&dm1).sql_schema;
+    let result = api.infer_and_apply(&dm1).await.sql_schema;
     let index = result
         .table_bang("A")
         .indices
@@ -1201,7 +1201,7 @@ fn dropping_a_model_with_a_multi_field_unique_index_must_work(api: &TestApi) {
 }
 
 #[test_each_connector]
-fn adding_a_scalar_list_for_a_modelwith_id_type_int_must_work(api: &TestApi) {
+async fn adding_a_scalar_list_for_a_modelwith_id_type_int_must_work(api: &TestApi) {
     let dm1 = r#"
             model A {
                 id Int @id
@@ -1214,7 +1214,7 @@ fn adding_a_scalar_list_for_a_modelwith_id_type_int_must_work(api: &TestApi) {
               ERROR
             }
         "#;
-    let result = api.infer_and_apply(&dm1).sql_schema;
+    let result = api.infer_and_apply(&dm1).await.sql_schema;
     let scalar_list_table_for_strings = result.table_bang("A_strings");
     let node_id_column = scalar_list_table_for_strings.column_bang("nodeId");
     assert_eq!(node_id_column.tpe.family, ColumnTypeFamily::Int);
@@ -1232,14 +1232,14 @@ fn adding_a_scalar_list_for_a_modelwith_id_type_int_must_work(api: &TestApi) {
 }
 
 #[test_each_connector(ignore = "mysql")]
-fn updating_a_model_with_a_scalar_list_to_a_different_id_type_must_work(api: &TestApi) {
+async fn updating_a_model_with_a_scalar_list_to_a_different_id_type_must_work(api: &TestApi) {
     let dm = r#"
         model A {
             id Int @id
             strings String[]
         }
     "#;
-    let result = api.infer_and_apply(&dm).sql_schema;
+    let result = api.infer_and_apply(&dm).await.sql_schema;
     let node_id_column = result.table_bang("A_strings").column_bang("nodeId");
     assert_eq!(node_id_column.tpe.family, ColumnTypeFamily::Int);
 
@@ -1249,13 +1249,13 @@ fn updating_a_model_with_a_scalar_list_to_a_different_id_type_must_work(api: &Te
             strings String[]
         }
     "#;
-    let result = api.infer_and_apply(&dm).sql_schema;
+    let result = api.infer_and_apply(&dm).await.sql_schema;
     let node_id_column = result.table_bang("A_strings").column_bang("nodeId");
     assert_eq!(node_id_column.tpe.family, ColumnTypeFamily::String);
 }
 
 #[test_each_connector]
-fn reserved_sql_key_words_must_work(api: &TestApi) {
+async fn reserved_sql_key_words_must_work(api: &TestApi) {
     // Group is a reserved keyword
     let sql_family = api.sql_family();
     let dm = r#"
@@ -1265,7 +1265,7 @@ fn reserved_sql_key_words_must_work(api: &TestApi) {
                 childGroups Group[] @relation(name: "ChildGroups")
             }
         "#;
-    let result = api.infer_and_apply(&dm).sql_schema;
+    let result = api.infer_and_apply(&dm).await.sql_schema;
 
     let table = result.table_bang("Group");
     let relation_column = table.column_bang("parent");
@@ -1286,7 +1286,7 @@ fn reserved_sql_key_words_must_work(api: &TestApi) {
 }
 
 #[test_each_connector]
-fn migrations_with_many_to_many_related_models_must_not_recreate_indexes(api: &TestApi) {
+async fn migrations_with_many_to_many_related_models_must_not_recreate_indexes(api: &TestApi) {
     // test case for https://github.com/prisma/lift/issues/148
     let dm_1 = r#"
             model User {
@@ -1304,7 +1304,7 @@ fn migrations_with_many_to_many_related_models_must_not_recreate_indexes(api: &T
                 profiles    Profile[]
             }
         "#;
-    let sql_schema = api.infer_and_apply(&dm_1).sql_schema;
+    let sql_schema = api.infer_and_apply(&dm_1).await.sql_schema;
 
     let index = sql_schema
         .table_bang("_ProfileToSkill")
@@ -1332,7 +1332,7 @@ fn migrations_with_many_to_many_related_models_must_not_recreate_indexes(api: &T
             }
         "#;
 
-    let result = api.infer_and_apply(&dm_1);
+    let result = api.infer_and_apply(&dm_1).await;
     let sql_schema = result.sql_schema;
 
     let index = sql_schema
@@ -1345,7 +1345,7 @@ fn migrations_with_many_to_many_related_models_must_not_recreate_indexes(api: &T
 }
 
 #[test_each_connector]
-fn removing_a_relation_field_must_work(api: &TestApi) {
+async fn removing_a_relation_field_must_work(api: &TestApi) {
     let sql_family = api.sql_family();
 
     let dm_1 = r#"
@@ -1360,7 +1360,7 @@ fn removing_a_relation_field_must_work(api: &TestApi) {
             }
         "#;
 
-    let sql_schema = api.infer_and_apply(&dm_1).sql_schema;
+    let sql_schema = api.infer_and_apply(&dm_1).await.sql_schema;
 
     let address_name_field = sql_schema
         .table_bang("User")
@@ -1381,7 +1381,7 @@ fn removing_a_relation_field_must_work(api: &TestApi) {
             }
         "#;
 
-    let sql_schema = api.infer_and_apply(&dm_2).sql_schema;
+    let sql_schema = api.infer_and_apply(&dm_2).await.sql_schema;
 
     let address_name_field = sql_schema
         .table_bang("User")
@@ -1393,7 +1393,7 @@ fn removing_a_relation_field_must_work(api: &TestApi) {
 }
 
 #[test_each_connector]
-fn simple_type_aliases_in_migrations_must_work(api: &TestApi) {
+async fn simple_type_aliases_in_migrations_must_work(api: &TestApi) {
     let dm1 = r#"
         type CUID = String @id @default(cuid())
 

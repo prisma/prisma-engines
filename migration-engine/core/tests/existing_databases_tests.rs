@@ -12,7 +12,7 @@ use std::sync::Arc;
 use test_harness::*;
 
 #[test_each_connector]
-fn adding_a_model_for_an_existing_table_must_work(api: &TestApi) {
+async fn adding_a_model_for_an_existing_table_must_work(api: &TestApi) {
     let initial_result = api.barrel().execute(|migration| {
         migration.create_table("Blog", |t| {
             t.add_column("id", types::primary());
@@ -24,7 +24,7 @@ fn adding_a_model_for_an_existing_table_must_work(api: &TestApi) {
                 id Int @id
             }
         "#;
-    let result = api.infer_and_apply(&dm).sql_schema;
+    let result = api.infer_and_apply(&dm).await.sql_schema;
 
     assert_eq!(initial_result, result);
 }
@@ -35,7 +35,7 @@ fn bigint_columns_must_work() {
 }
 
 #[test_each_connector]
-fn removing_a_model_for_a_table_that_is_already_deleted_must_work(api: &TestApi) {
+async fn removing_a_model_for_a_table_that_is_already_deleted_must_work(api: &TestApi) {
     let dm1 = r#"
             model Blog {
                 id Int @id
@@ -45,7 +45,7 @@ fn removing_a_model_for_a_table_that_is_already_deleted_must_work(api: &TestApi)
                 id Int @id
             }
         "#;
-    let initial_result = api.infer_and_apply(&dm1).sql_schema;
+    let initial_result = api.infer_and_apply(&dm1).await.sql_schema;
     assert!(initial_result.has_table("Post"));
 
     let result = api.barrel().execute(|migration| {
@@ -59,12 +59,12 @@ fn removing_a_model_for_a_table_that_is_already_deleted_must_work(api: &TestApi)
                 id Int @id
             }
         "#;
-    let final_result = api.infer_and_apply(&dm2).sql_schema;
+    let final_result = api.infer_and_apply(&dm2).await.sql_schema;
     assert_eq!(result, final_result);
 }
 
 #[test_each_connector]
-fn creating_a_field_for_an_existing_column_with_a_compatible_type_must_work(api: &TestApi) {
+async fn creating_a_field_for_an_existing_column_with_a_compatible_type_must_work(api: &TestApi) {
     let initial_result = api.barrel().execute(|migration| {
         migration.create_table("Blog", |t| {
             t.add_column("id", types::primary());
@@ -77,12 +77,12 @@ fn creating_a_field_for_an_existing_column_with_a_compatible_type_must_work(api:
                 title String
             }
         "#;
-    let result = api.infer_and_apply(&dm).sql_schema;
+    let result = api.infer_and_apply(&dm).await.sql_schema;
     assert_eq!(initial_result, result);
 }
 
 #[test_each_connector]
-fn creating_a_field_for_an_existing_column_and_changing_its_type_must_work(api: &TestApi) {
+async fn creating_a_field_for_an_existing_column_and_changing_its_type_must_work(api: &TestApi) {
     let initial_result = api.barrel().execute(|migration| {
         migration.create_table("Blog", |t| {
             t.add_column("id", types::primary());
@@ -99,7 +99,7 @@ fn creating_a_field_for_an_existing_column_and_changing_its_type_must_work(api: 
                 title String @unique
             }
         "#;
-    let result = api.infer_and_apply(&dm).sql_schema;
+    let result = api.infer_and_apply(&dm).await.sql_schema;
     let table = result.table_bang("Blog");
     let column = table.column_bang("title");
     assert_eq!(column.tpe.family, ColumnTypeFamily::String);
@@ -110,7 +110,7 @@ fn creating_a_field_for_an_existing_column_and_changing_its_type_must_work(api: 
 }
 
 #[test_each_connector]
-fn creating_a_field_for_an_existing_column_and_simultaneously_making_it_optional(api: &TestApi) {
+async fn creating_a_field_for_an_existing_column_and_simultaneously_making_it_optional(api: &TestApi) {
     let initial_result = api.barrel().execute(|migration| {
         migration.create_table("Blog", |t| {
             t.add_column("id", types::primary());
@@ -126,19 +126,19 @@ fn creating_a_field_for_an_existing_column_and_simultaneously_making_it_optional
                 title String?
             }
         "#;
-    let result = api.infer_and_apply(&dm).sql_schema;
+    let result = api.infer_and_apply(&dm).await.sql_schema;
     let column = result.table_bang("Blog").column_bang("title");
     assert_eq!(column.is_required(), false);
 }
 
 #[test_each_connector(ignore = "mysql")]
-fn creating_a_scalar_list_field_for_an_existing_table_must_work(api: &TestApi) {
+async fn creating_a_scalar_list_field_for_an_existing_table_must_work(api: &TestApi) {
     let dm1 = r#"
             model Blog {
                 id Int @id
             }
         "#;
-    let initial_result = api.infer_and_apply(&dm1).sql_schema;
+    let initial_result = api.infer_and_apply(&dm1).await.sql_schema;
     assert!(!initial_result.has_table("Blog_tags"));
 
     let mut result = api.barrel().execute(|migration| {
@@ -173,7 +173,7 @@ fn creating_a_scalar_list_field_for_an_existing_table_must_work(api: &TestApi) {
                 tags String[]
             }
         "#;
-    let mut final_result = api.infer_and_apply(&dm2).sql_schema;
+    let mut final_result = api.infer_and_apply(&dm2).await.sql_schema;
     for table in &mut final_result.tables {
         if table.name == "Blog_tags" {
             // can't set that properly up again
@@ -185,14 +185,14 @@ fn creating_a_scalar_list_field_for_an_existing_table_must_work(api: &TestApi) {
 }
 
 #[test_each_connector]
-fn delete_a_field_for_a_non_existent_column_must_work(api: &TestApi) {
+async fn delete_a_field_for_a_non_existent_column_must_work(api: &TestApi) {
     let dm1 = r#"
             model Blog {
                 id Int @id
                 title String
             }
         "#;
-    let initial_result = api.infer_and_apply(&dm1).sql_schema;
+    let initial_result = api.infer_and_apply(&dm1).await.sql_schema;
     assert_eq!(initial_result.table_bang("Blog").column("title").is_some(), true);
 
     let result = api.barrel().execute(|migration| {
@@ -209,19 +209,19 @@ fn delete_a_field_for_a_non_existent_column_must_work(api: &TestApi) {
                 id Int @id
             }
         "#;
-    let final_result = api.infer_and_apply(&dm2).sql_schema;
+    let final_result = api.infer_and_apply(&dm2).await.sql_schema;
     assert_eq!(result, final_result);
 }
 
 #[test_each_connector]
-fn deleting_a_scalar_list_field_for_a_non_existent_list_table_must_work(api: &TestApi) {
+async fn deleting_a_scalar_list_field_for_a_non_existent_list_table_must_work(api: &TestApi) {
     let dm1 = r#"
             model Blog {
                 id Int @id
                 tags String[]
             }
         "#;
-    let initial_result = api.infer_and_apply(&dm1).sql_schema;
+    let initial_result = api.infer_and_apply(&dm1).await.sql_schema;
     assert!(initial_result.has_table("Blog_tags"));
 
     let result = api.barrel().execute(|migration| {
@@ -234,19 +234,19 @@ fn deleting_a_scalar_list_field_for_a_non_existent_list_table_must_work(api: &Te
                 id Int @id
             }
         "#;
-    let final_result = api.infer_and_apply(&dm2).sql_schema;
+    let final_result = api.infer_and_apply(&dm2).await.sql_schema;
     assert_eq!(result, final_result);
 }
 
 #[test_each_connector]
-fn updating_a_field_for_a_non_existent_column(api: &TestApi) {
+async fn updating_a_field_for_a_non_existent_column(api: &TestApi) {
     let dm1 = r#"
             model Blog {
                 id Int @id
                 title String
             }
         "#;
-    let initial_result = api.infer_and_apply(&dm1).sql_schema;
+    let initial_result = api.infer_and_apply(&dm1).await.sql_schema;
     let initial_column = initial_result.table_bang("Blog").column_bang("title");
     assert_eq!(initial_column.tpe.family, ColumnTypeFamily::String);
 
@@ -265,7 +265,7 @@ fn updating_a_field_for_a_non_existent_column(api: &TestApi) {
                 title Int @unique
             }
         "#;
-    let final_result = api.infer_and_apply(&dm2).sql_schema;
+    let final_result = api.infer_and_apply(&dm2).await.sql_schema;
     let final_column = final_result.table_bang("Blog").column_bang("title");
     assert_eq!(final_column.tpe.family, ColumnTypeFamily::Int);
     let index = final_result
@@ -278,14 +278,14 @@ fn updating_a_field_for_a_non_existent_column(api: &TestApi) {
 }
 
 #[test_each_connector]
-fn renaming_a_field_where_the_column_was_already_renamed_must_work(api: &TestApi) {
+async fn renaming_a_field_where_the_column_was_already_renamed_must_work(api: &TestApi) {
     let dm1 = r#"
             model Blog {
                 id Int @id
                 title String
             }
         "#;
-    let initial_result = api.infer_and_apply(&dm1).sql_schema;
+    let initial_result = api.infer_and_apply(&dm1).await.sql_schema;
     let initial_column = initial_result.table_bang("Blog").column_bang("title");
     assert_eq!(initial_column.tpe.family, ColumnTypeFamily::String);
 
@@ -306,7 +306,7 @@ fn renaming_a_field_where_the_column_was_already_renamed_must_work(api: &TestApi
             }
         "#;
 
-    let final_result = api.infer_and_apply(&dm2).sql_schema;
+    let final_result = api.infer_and_apply(&dm2).await.sql_schema;
 
     let final_column = final_result.table_bang("Blog").column_bang("new_title");
 

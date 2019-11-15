@@ -7,6 +7,10 @@ use sql_migration_connector::SqlMigrationConnector;
 use std::{rc::Rc, sync::Arc};
 use url::Url;
 
+// To be enabled when we asyncify the migration engine.
+// pub static TEST_ASYNC_RUNTIME: Lazy<tokio02::runtime::Runtime> =
+//     Lazy::new(|| tokio02::runtime::Runtime::new().expect("failed to start tokio test runtime"));
+
 pub const SCHEMA_NAME: &str = "lift";
 
 pub fn parse(datamodel_string: &str) -> SchemaAst {
