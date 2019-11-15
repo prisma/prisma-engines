@@ -59,12 +59,15 @@ where
     C: MigrationConnector<DatabaseMigration = D>,
     D: DatabaseMigrationMarker + Send + Sync + 'static,
 {
-    let api = MigrationApi::new(connector).unwrap();
+    let fut = async {
+        let api = MigrationApi::new(connector).await.unwrap();
 
-    async_std::task::block_on(api.handle_command::<ResetCommand>(&serde_json::Value::Null))
-        .expect("Engine reset failed");
-
-    api
+        api.handle_command::<ResetCommand>(&serde_json::Value::Null)
+            .await
+            .expect("Engine reset failed");
+        api
+    };
+    async_std::task::block_on(fut)
 }
 
 fn fetch_db_name(url: &Url, default: &str) -> String {

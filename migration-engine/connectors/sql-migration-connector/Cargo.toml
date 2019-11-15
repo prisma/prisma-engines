@@ -5,6 +5,7 @@ authors = ["Marcus Böhm <boehm@prisma.io>"]
 edition = "2018"
 
 [dependencies]
+async-trait = "0.1.17"
 migration-connector = { path = "../migration-connector" }
 sql-schema-describer = { path = "../../../libs/sql-schema-describer" }
 datamodel = { path = "../../../libs/datamodel" }

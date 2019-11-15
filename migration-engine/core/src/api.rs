@@ -21,8 +21,8 @@ where
     C: MigrationConnector<DatabaseMigration = D>,
     D: DatabaseMigrationMarker + Send + Sync + 'static,
 {
-    pub fn new(connector: C) -> crate::Result<Self> {
-        let engine = MigrationEngine::new(connector)?;
+    pub async fn new(connector: C) -> crate::Result<Self> {
+        let engine = MigrationEngine::new(connector).await?;
 
         Ok(Self { engine })
     }

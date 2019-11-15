@@ -20,25 +20,25 @@ where
     C: MigrationConnector<DatabaseMigration = D>,
     D: DatabaseMigrationMarker + 'static,
 {
-    pub fn new(connector: C) -> crate::Result<Self> {
+    pub async fn new(connector: C) -> crate::Result<Self> {
         let engine = MigrationEngine {
             datamodel_migration_steps_inferrer: Arc::new(DataModelMigrationStepsInferrerImplWrapper {}),
             datamodel_calculator: Arc::new(DataModelCalculatorImpl),
             connector,
         };
 
-        engine.init()?;
+        engine.init().await?;
 
         Ok(engine)
     }
 
-    pub fn init(&self) -> CommandResult<()> {
-        self.connector().initialize()?;
+    pub async fn init(&self) -> CommandResult<()> {
+        self.connector().initialize().await?;
         Ok(())
     }
 
-    pub fn reset(&self) -> CommandResult<()> {
-        self.connector().reset()?;
+    pub async fn reset(&self) -> CommandResult<()> {
+        self.connector().reset().await?;
         Ok(())
     }
 

@@ -97,13 +97,13 @@ impl From<crate::Error> for CliError {
     }
 }
 
-pub fn run(matches: &ArgMatches, datasource: &str) -> std::result::Result<String, CliError> {
+pub async fn run(matches: &ArgMatches<'_>, datasource: &str) -> std::result::Result<String, CliError> {
     if matches.is_present("can_connect_to_database") {
         create_conn(datasource, false)?;
         Ok("Connection successful".into())
     } else if matches.is_present("create_database") {
         let (db_name, conn) = create_conn(datasource, true)?;
-        conn.create_database(&db_name)?;
+        conn.create_database(&db_name).await?;
         Ok(format!("Database '{}' created successfully.", db_name))
     } else {
         Err(CliError::NoCommandDefined)
@@ -292,6 +292,11 @@ pub fn render_error(cli_error: CliError) -> user_facing_errors::Error {
 mod tests {
     use super::CliError;
     use sql_connection::{GenericSqlConnection, SyncSqlConnection};
+    use clap::ArgMatches;
+
+    fn run_sync(matches: &ArgMatches<'_>, datasource: &str) -> Result<String, CliError> {
+        async_std::task::block_on(super::run(matches, datasource))
+    }
 
     fn with_cli<F>(matches: Vec<&str>, f: F) -> Result<(), Box<dyn std::any::Any + Send + 'static>>
     where
@@ -345,7 +350,7 @@ mod tests {
     #[test]
     fn test_with_missing_command() {
         with_cli(vec!["cli"], |matches| {
-            assert_eq!(Err(CliError::NoCommandDefined), super::run(&matches, &mysql_url(None)));
+            assert_eq!(Err(CliError::NoCommandDefined), run_sync(&matches, &mysql_url(None)));
         })
         .unwrap();
     }
@@ -355,7 +360,7 @@ mod tests {
         with_cli(vec!["cli", "--can_connect_to_database"], |matches| {
             assert_eq!(
                 Ok(String::from("Connection successful")),
-                super::run(&matches, &mysql_url(None))
+                run_sync(&matches, &mysql_url(None))
             );
         })
         .unwrap();
@@ -368,7 +373,7 @@ mod tests {
         with_cli(vec!["cli", "--can_connect_to_database"], |matches| {
             assert_eq!(
                 Err(CliError::DatabaseDoesNotExist(String::from("this_does_not_exist"))),
-                super::run(&matches, &dm)
+                run_sync(&matches, &dm)
             );
         })
         .unwrap();
@@ -379,7 +384,7 @@ mod tests {
         with_cli(vec!["cli", "--can_connect_to_database"], |matches| {
             assert_eq!(
                 Ok(String::from("Connection successful")),
-                super::run(&matches, &postgres_url(None))
+                run_sync(&matches, &postgres_url(None))
             );
         })
         .unwrap();
@@ -390,7 +395,7 @@ mod tests {
         with_cli(vec!["cli", "--can_connect_to_database"], |matches| {
             assert_eq!(
                 Ok(String::from("Connection successful")),
-                super::run(&matches, &postgres_url_with_scheme(None, "postgres"))
+                run_sync(&matches, &postgres_url_with_scheme(None, "postgres"))
             );
         })
         .unwrap();
@@ -403,7 +408,7 @@ mod tests {
         with_cli(vec!["cli", "--can_connect_to_database"], |matches| {
             assert_eq!(
                 Err(CliError::DatabaseDoesNotExist(String::from("this_does_not_exist"))),
-                super::run(&matches, &dm)
+                run_sync(&matches, &dm)
             );
         })
         .unwrap();
@@ -416,13 +421,13 @@ mod tests {
         let res = with_cli(vec!["cli", "--create_database"], |matches| {
             assert_eq!(
                 Ok(String::from("Database 'this_should_exist' created successfully.")),
-                super::run(&matches, &url)
+                run_sync(&matches, &url)
             );
         });
 
         if let Ok(()) = res {
             let res = with_cli(vec!["cli", "--can_connect_to_database"], |matches| {
-                assert_eq!(Ok(String::from("Connection successful")), super::run(&matches, &url));
+                assert_eq!(Ok(String::from("Connection successful")), run_sync(&matches, &url));
             });
 
             {
@@ -445,13 +450,13 @@ mod tests {
         let res = with_cli(vec!["cli", "--create_database"], |matches| {
             assert_eq!(
                 Ok(String::from("Database 'this_should_exist' created successfully.")),
-                super::run(&matches, &url)
+                run_sync(&matches, &url)
             );
         });
 
         if let Ok(()) = res {
             let res = with_cli(vec!["cli", "--can_connect_to_database"], |matches| {
-                assert_eq!(Ok(String::from("Connection successful")), super::run(&matches, &url));
+                assert_eq!(Ok(String::from("Connection successful")), run_sync(&matches, &url));
             });
 
             {

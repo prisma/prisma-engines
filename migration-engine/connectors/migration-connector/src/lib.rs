@@ -22,6 +22,7 @@ use std::sync::Arc;
 
 /// The top-level trait for connectors. This is the abstraction the migration engine core relies on to
 /// interface with different database backends.
+#[async_trait::async_trait]
 pub trait MigrationConnector: Send + Sync + 'static {
     /// The data structure containing the concrete migration steps for the connector. A migration is
     /// assumed to consist of multiple steps.
@@ -34,13 +35,13 @@ pub trait MigrationConnector: Send + Sync + 'static {
     fn connector_type(&self) -> &'static str;
 
     /// Create a new database with the passed in name.
-    fn create_database(&self, create: &str) -> ConnectorResult<()>;
+    async fn create_database(&self, create: &str) -> ConnectorResult<()>;
 
     /// Hook to perform connector-specific initialization.
-    fn initialize(&self) -> ConnectorResult<()>;
+    async fn initialize(&self) -> ConnectorResult<()>;
 
     /// Drop all database state.
-    fn reset(&self) -> ConnectorResult<()>;
+    async fn reset(&self) -> ConnectorResult<()>;
 
     /// See [MigrationPersistence](trait.MigrationPersistence.html).
     fn migration_persistence(&self) -> Arc<dyn MigrationPersistence>;

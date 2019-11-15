@@ -5,6 +5,7 @@ mod error;
 pub mod migration;
 pub mod migration_engine;
 
+use futures03::FutureExt;
 use crate::api::RpcApi;
 use commands::*;
 use datamodel::{self, error::ErrorCollection, Datamodel};
@@ -57,7 +58,7 @@ async fn main() {
     } else if let Some(matches) = matches.subcommand_matches("cli") {
         let datasource = matches.value_of("datasource").unwrap();
 
-        match std::panic::catch_unwind(|| cli::run(&matches, &datasource)) {
+        match std::panic::AssertUnwindSafe(cli::run(&matches, &datasource)).catch_unwind().await {
             Ok(Ok(msg)) => {
                 info!("{}", msg);
                 std::process::exit(0);
@@ -87,12 +88,12 @@ async fn main() {
         file.read_to_string(&mut datamodel).unwrap();
 
         if matches.is_present("single_cmd") {
-            let api = RpcApi::new(&datamodel).unwrap();
+            let api = RpcApi::new(&datamodel).await.unwrap();
             let response = api.handle().unwrap();
 
             println!("{}", response);
         } else {
-            match RpcApi::new(&datamodel) {
+            match RpcApi::new(&datamodel).await {
                 Ok(api) => api.start_server().await,
                 Err(Error::DatamodelError(errors)) => {
                     pretty_print_errors(errors, &datamodel);

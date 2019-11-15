@@ -12,8 +12,8 @@ use sql_connection::SyncSqlConnection;
 use test_harness::*;
 use url::Url;
 
-#[test]
-fn authentication_failure_must_return_a_known_error_on_postgres() {
+#[async_attributes::test]
+async fn authentication_failure_must_return_a_known_error_on_postgres() {
     let mut url: Url = postgres_url().parse().unwrap();
 
     url.set_password(Some("obviously-not-right")).unwrap();
@@ -28,7 +28,7 @@ fn authentication_failure_must_return_a_known_error_on_postgres() {
         url
     );
 
-    let error = RpcApi::new(&dm).map(|_| ()).unwrap_err();
+    let error = RpcApi::new(&dm).await.map(|_| ()).unwrap_err();
 
     let user = url.username();
     let host = url.host().unwrap().to_string();
@@ -46,8 +46,8 @@ fn authentication_failure_must_return_a_known_error_on_postgres() {
     assert_eq!(json_error, expected);
 }
 
-#[test]
-fn authentication_failure_must_return_a_known_error_on_mysql() {
+#[async_attributes::test]
+async fn authentication_failure_must_return_a_known_error_on_mysql() {
     let mut url: Url = mysql_url().parse().unwrap();
 
     url.set_password(Some("obviously-not-right")).unwrap();
@@ -62,7 +62,7 @@ fn authentication_failure_must_return_a_known_error_on_mysql() {
         url
     );
 
-    let error = RpcApi::new(&dm).map(|_| ()).unwrap_err();
+    let error = RpcApi::new(&dm).await.map(|_| ()).unwrap_err();
 
     let user = url.username();
     let host = url.host().unwrap().to_string();
@@ -80,8 +80,8 @@ fn authentication_failure_must_return_a_known_error_on_mysql() {
     assert_eq!(json_error, expected);
 }
 
-#[test]
-fn unreachable_database_must_return_a_proper_error_on_mysql() {
+#[async_attributes::test]
+async fn unreachable_database_must_return_a_proper_error_on_mysql() {
     let mut url: Url = mysql_url().parse().unwrap();
 
     url.set_port(Some(8787)).unwrap();
@@ -96,7 +96,7 @@ fn unreachable_database_must_return_a_proper_error_on_mysql() {
         url
     );
 
-    let error = RpcApi::new(&dm).map(|_| ()).unwrap_err();
+    let error = RpcApi::new(&dm).await.map(|_| ()).unwrap_err();
 
     let port = url.port().unwrap().to_string();
     let host = url.host().unwrap().to_string();
@@ -114,8 +114,8 @@ fn unreachable_database_must_return_a_proper_error_on_mysql() {
     assert_eq!(json_error, expected);
 }
 
-#[test]
-fn unreachable_database_must_return_a_proper_error_on_postgres() {
+#[async_attributes::test]
+async fn unreachable_database_must_return_a_proper_error_on_postgres() {
     let mut url: Url = postgres_url().parse().unwrap();
 
     url.set_port(Some(8787)).unwrap();
@@ -130,7 +130,7 @@ fn unreachable_database_must_return_a_proper_error_on_postgres() {
         url
     );
 
-    let error = RpcApi::new(&dm).map(|_| ()).unwrap_err();
+    let error = RpcApi::new(&dm).await.map(|_| ()).unwrap_err();
 
     let host = url.host().unwrap().to_string();
     let port = url.port().unwrap().to_string();
@@ -148,8 +148,8 @@ fn unreachable_database_must_return_a_proper_error_on_postgres() {
     assert_eq!(json_error, expected);
 }
 
-#[test]
-fn database_does_not_exist_must_return_a_proper_error() {
+#[async_attributes::test]
+async fn database_does_not_exist_must_return_a_proper_error() {
     let mut url: Url = mysql_url().parse().unwrap();
     let database_name = "notmydatabase";
 
@@ -165,7 +165,7 @@ fn database_does_not_exist_must_return_a_proper_error() {
         url
     );
 
-    let error = RpcApi::new(&dm).map(|_| ()).unwrap_err();
+    let error = RpcApi::new(&dm).await.map(|_| ()).unwrap_err();
 
     let database_location = format!("{}:{}", url.host().unwrap(), url.port().unwrap());
 
@@ -183,10 +183,10 @@ fn database_does_not_exist_must_return_a_proper_error() {
     assert_eq!(json_error, expected);
 }
 
-#[test]
-fn database_already_exists_must_return_a_proper_error() {
+#[async_attributes::test]
+async fn database_already_exists_must_return_a_proper_error() {
     let url = postgres_url();
-    let error = get_cli_error(&["migration-engine", "cli", "--datasource", &url, "--create_database"]);
+    let error = get_cli_error(&["migration-engine", "cli", "--datasource", &url, "--create_database"]).await;
 
     let (host, port) = {
         let url = Url::parse(&url).unwrap();
@@ -208,8 +208,8 @@ fn database_already_exists_must_return_a_proper_error() {
     assert_eq!(json_error, expected);
 }
 
-#[test]
-fn database_access_denied_must_return_a_proper_error_in_cli() {
+#[async_attributes::test]
+async fn database_access_denied_must_return_a_proper_error_in_cli() {
     let conn = sql_connection::GenericSqlConnection::from_database_str(&mysql_url(), None).unwrap();
 
     conn.execute_raw("DROP USER IF EXISTS jeanmichel", &[]).unwrap();
@@ -227,7 +227,7 @@ fn database_access_denied_must_return_a_proper_error_in_cli() {
         "--datasource",
         url.as_str(),
         "--can_connect_to_database",
-    ]);
+    ]).await;
 
     let json_error = serde_json::to_value(&error).unwrap();
     let expected = json!({
@@ -242,8 +242,8 @@ fn database_access_denied_must_return_a_proper_error_in_cli() {
     assert_eq!(json_error, expected);
 }
 
-#[test]
-fn database_access_denied_must_return_a_proper_error_in_rpc() {
+#[async_attributes::test]
+async fn database_access_denied_must_return_a_proper_error_in_rpc() {
     let conn = sql_connection::GenericSqlConnection::from_database_str(&mysql_url(), None).unwrap();
 
     conn.execute_raw("DROP USER IF EXISTS jeanmichel", &[]).unwrap();
@@ -265,7 +265,7 @@ fn database_access_denied_must_return_a_proper_error_in_rpc() {
         url,
     );
 
-    let error = RpcApi::new(&dm).map(|_| ()).unwrap_err();
+    let error = RpcApi::new(&dm).await.map(|_| ()).unwrap_err();
     let json_error = serde_json::to_value(&render_error(error)).unwrap();
 
     let expected = json!({
@@ -300,12 +300,13 @@ async fn command_errors_must_return_an_unknown_error(api: &TestApi) {
     assert_eq!(error, expected_error);
 }
 
-fn get_cli_error(cli_args: &[&str]) -> user_facing_errors::Error {
+async fn get_cli_error(cli_args: &[&str]) -> user_facing_errors::Error {
     let app = cli::clap_app();
     let matches = app.get_matches_from(cli_args);
     let cli_matches = matches.subcommand_matches("cli").expect("cli subcommand is passed");
     let database_url = cli_matches.value_of("datasource").expect("datasource is provided");
     cli::run(&cli_matches, database_url)
+        .await
         .map_err(|err| cli::render_error(err))
         .unwrap_err()
 }

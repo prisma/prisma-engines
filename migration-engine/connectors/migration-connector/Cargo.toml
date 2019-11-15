@@ -5,6 +5,7 @@ authors = ["Marcus Böhm <boehm@prisma.io>"]
 edition = "2018"
 
 [dependencies]
+async-trait = "0.1.17"
 datamodel = { path = "../../../libs/datamodel" }
 chrono = { version = "0.4" }
 

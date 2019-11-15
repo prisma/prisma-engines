@@ -177,6 +177,7 @@ impl SqlMigrationConnector {
     }
 }
 
+#[async_trait::async_trait]
 impl MigrationConnector for SqlMigrationConnector {
     type DatabaseMigration = SqlMigration;
 
@@ -184,17 +185,17 @@ impl MigrationConnector for SqlMigrationConnector {
         self.connection_info.sql_family().as_str()
     }
 
-    fn create_database(&self, db_name: &str) -> ConnectorResult<()> {
+    async fn create_database(&self, db_name: &str) -> ConnectorResult<()> {
         self.create_database_impl(db_name)
             .map_err(|sql_error| sql_error.into_connector_error(&self.connection_info))
     }
 
-    fn initialize(&self) -> ConnectorResult<()> {
+    async fn initialize(&self) -> ConnectorResult<()> {
         self.initialize_impl()
             .map_err(|sql_error| sql_error.into_connector_error(&self.connection_info))
     }
 
-    fn reset(&self) -> ConnectorResult<()> {
+    async fn reset(&self) -> ConnectorResult<()> {
         self.migration_persistence.reset();
         Ok(())
     }

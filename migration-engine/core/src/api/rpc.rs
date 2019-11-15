@@ -54,8 +54,25 @@ static AVAILABLE_COMMANDS: &[RpcCommand] = &[
 ];
 
 impl RpcApi {
-    pub fn new(datamodel: &str) -> crate::Result<Self> {
-        let mut rpc_api = Self::new_impl(datamodel)?;
+    pub async fn new(datamodel: &str) -> crate::Result<Self> {
+        let config = datamodel::parse_configuration(datamodel)?;
+
+        let source = config.datasources.first().ok_or(CommandError::DataModelErrors {
+            code: 1000,
+            errors: vec!["There is no datasource in the configuration.".to_string()],
+        })?;
+
+        let connector = match source.connector_type() {
+            scheme if [MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME].contains(&scheme) => {
+                SqlMigrationConnector::new(source.as_ref())?
+            }
+            x => unimplemented!("Connector {} is not supported yet", x),
+        };
+
+        let mut rpc_api = Self {
+            io_handler: IoHandler::default(),
+            executor: Arc::new(MigrationApi::new(connector).await?),
+        };
 
         for cmd in AVAILABLE_COMMANDS {
             rpc_api.add_command_handler(*cmd);
@@ -85,27 +102,6 @@ impl RpcApi {
             .ok_or_else(|| io::Error::new(io::ErrorKind::InvalidInput, "Reading from stdin failed."))?;
 
         Ok(result)
-    }
-
-    fn new_impl(datamodel: &str) -> crate::Result<RpcApi> {
-        let config = datamodel::parse_configuration(datamodel)?;
-
-        let source = config.datasources.first().ok_or(CommandError::DataModelErrors {
-            code: 1000,
-            errors: vec!["There is no datasource in the configuration.".to_string()],
-        })?;
-
-        let connector = match source.connector_type() {
-            scheme if [MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME].contains(&scheme) => {
-                SqlMigrationConnector::new(source.as_ref())?
-            }
-            x => unimplemented!("Connector {} is not supported yet", x),
-        };
-
-        Ok(Self {
-            io_handler: IoHandler::default(),
-            executor: Arc::new(MigrationApi::new(connector)?),
-        })
     }
 
     fn add_command_handler(&mut self, cmd: RpcCommand) {
