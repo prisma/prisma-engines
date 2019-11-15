@@ -14,7 +14,7 @@ impl<'a> MigrationCommand for ListMigrationStepsCommand {
     async fn execute<C, D>(_input: &Self::Input, engine: &MigrationEngine<C, D>) -> CommandResult<Self::Output>
     where
         C: MigrationConnector<DatabaseMigration = D>,
-        D: DatabaseMigrationMarker + 'static,
+        D: DatabaseMigrationMarker + Send + Sync + 'static,
     {
         let migration_persistence = engine.connector().migration_persistence();
         let mut result = Vec::new();

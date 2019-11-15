@@ -28,7 +28,7 @@ pub trait MigrationConnector: Send + Sync + 'static {
     /// assumed to consist of multiple steps.
     ///
     /// For example, in the SQL connector, a step would represent an SQL statement like `CREATE TABLE`.
-    type DatabaseMigration: DatabaseMigrationMarker + 'static;
+    type DatabaseMigration: DatabaseMigrationMarker + Send + Sync + 'static;
 
     /// A string that should identify what database backend is being used. Note that this is not necessarily
     /// the connector name. The SQL connector for example can return "postgresql", "mysql" or "sqlite".
@@ -60,7 +60,7 @@ pub trait MigrationConnector: Send + Sync + 'static {
     fn deserialize_database_migration(&self, json: serde_json::Value) -> Self::DatabaseMigration;
 
     /// See [MigrationStepApplier](trait.MigrationStepApplier.html).
-    fn migration_applier(&self) -> Box<dyn MigrationApplier<Self::DatabaseMigration>> {
+    fn migration_applier(&self) -> Box<dyn MigrationApplier<Self::DatabaseMigration> + Send + Sync> {
         let applier = MigrationApplierImpl {
             migration_persistence: self.migration_persistence(),
             step_applier: self.database_migration_step_applier(),
@@ -69,7 +69,7 @@ pub trait MigrationConnector: Send + Sync + 'static {
     }
 }
 
-pub trait DatabaseMigrationMarker: Debug {
+pub trait DatabaseMigrationMarker: Debug + Send + Sync {
     fn serialize(&self) -> serde_json::Value;
 }
 

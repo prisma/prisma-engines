@@ -116,7 +116,7 @@ impl<'a> ApplyMigrationCommand<'a> {
 
                 connector
                     .migration_applier()
-                    .apply(&saved_migration, &database_migration)?;
+                    .apply(&saved_migration, &database_migration).await?;
             }
             // We have warnings, but no force flag was passed.
             (true, false) => (),

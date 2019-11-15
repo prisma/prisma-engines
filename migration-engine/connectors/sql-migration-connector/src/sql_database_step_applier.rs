@@ -10,14 +10,17 @@ pub struct SqlDatabaseStepApplier {
     pub conn: Arc<dyn SyncSqlConnection + Send + Sync + 'static>,
 }
 
+#[async_trait::async_trait]
 impl DatabaseMigrationStepApplier<SqlMigration> for SqlDatabaseStepApplier {
-    fn apply_step(&self, database_migration: &SqlMigration, index: usize) -> ConnectorResult<bool> {
+    async fn apply_step(&self, database_migration: &SqlMigration, index: usize) -> ConnectorResult<bool> {
         self.apply_next_step(&database_migration.corrected_steps, index)
+            .await
             .map_err(|sql_error| sql_error.into_connector_error(&self.connection_info))
     }
 
-    fn unapply_step(&self, database_migration: &SqlMigration, index: usize) -> ConnectorResult<bool> {
+    async fn unapply_step(&self, database_migration: &SqlMigration, index: usize) -> ConnectorResult<bool> {
         self.apply_next_step(&database_migration.rollback, index)
+            .await
             .map_err(|sql_error| sql_error.into_connector_error(&self.connection_info))
     }
 
@@ -32,7 +35,7 @@ impl DatabaseMigrationStepApplier<SqlMigration> for SqlDatabaseStepApplier {
 }
 
 impl SqlDatabaseStepApplier {
-    fn apply_next_step(&self, steps: &Vec<SqlMigrationStep>, index: usize) -> SqlResult<bool> {
+    async fn apply_next_step(&self, steps: &Vec<SqlMigrationStep>, index: usize) -> SqlResult<bool> {
         let has_this_one = steps.get(index).is_some();
         if !has_this_one {
             return Ok(false);

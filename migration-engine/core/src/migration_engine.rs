@@ -18,7 +18,7 @@ where
 impl<C, D> MigrationEngine<C, D>
 where
     C: MigrationConnector<DatabaseMigration = D>,
-    D: DatabaseMigrationMarker + 'static,
+    D: DatabaseMigrationMarker + Send + Sync + 'static,
 {
     pub async fn new(connector: C) -> crate::Result<Self> {
         let engine = MigrationEngine {
