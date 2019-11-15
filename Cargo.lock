@@ -40,6 +40,15 @@ version = "0.9.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
+name = "async-attributes"
+version = "1.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+dependencies = [
+ "quote 1.0.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "syn 1.0.8 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
 name = "async-macros"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -873,6 +882,7 @@ name = "futures-util"
 version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
+ "futures 0.1.29 (registry+https://github.com/rust-lang/crates.io-index)",
  "futures-channel 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "futures-core 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "futures-io 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1401,7 +1411,9 @@ dependencies = [
 name = "migration-core"
 version = "0.1.0"
 dependencies = [
+ "async-attributes 1.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "async-std 1.0.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "async-trait 0.1.17 (registry+https://github.com/rust-lang/crates.io-index)",
  "barrel 0.6.3-alpha.0 (git+https://github.com/aknuds1/barrel.git)",
  "boolinator 2.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "chrono 0.4.9 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1409,7 +1421,7 @@ dependencies = [
  "datamodel 0.1.0",
  "env_logger 0.6.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "failure 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)",
- "futures 0.1.29 (registry+https://github.com/rust-lang/crates.io-index)",
+ "futures 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "itertools 0.8.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "jsonrpc-core 13.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "jsonrpc-stdio-server 13.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1424,8 +1436,6 @@ dependencies = [
  "sql-migration-connector 0.1.0",
  "sql-schema-describer 0.1.0",
  "test-macros 0.1.0",
- "tokio 0.1.22 (registry+https://github.com/rust-lang/crates.io-index)",
- "tokio-threadpool 0.1.16 (registry+https://github.com/rust-lang/crates.io-index)",
  "url 1.7.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "user-facing-errors 0.1.0",
 ]
@@ -3658,6 +3668,7 @@ dependencies = [
 "checksum antidote 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)" = "34fde25430d87a9388dadbe6e34d7f72a462c8b43ac8d309b42b0a8505d7e2a5"
 "checksum arrayvec 0.4.12 (registry+https://github.com/rust-lang/crates.io-index)" = "cd9fd44efafa8690358b7408d253adf110036b88f55672a933f01d616ad9b1b9"
 "checksum ascii 0.9.3 (registry+https://github.com/rust-lang/crates.io-index)" = "eab1c04a571841102f5345a8fc0f6bb3d31c315dec879b5c6e42e40ce7ffa34e"
+"checksum async-attributes 1.1.1 (registry+https://github.com/rust-lang/crates.io-index)" = "efd3d156917d94862e779f356c5acae312b08fd3121e792c857d7928c8088423"
 "checksum async-macros 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)" = "e421d59b24c1feea2496e409b3e0a8de23e5fc130a2ddc0b012e551f3b272bba"
 "checksum async-std 0.99.12 (registry+https://github.com/rust-lang/crates.io-index)" = "44501a9f7961bb539b67be0c428b3694e26557046a52759ca7eaf790030a64cc"
 "checksum async-std 1.0.1 (registry+https://github.com/rust-lang/crates.io-index)" = "f6ee33a6cfdd96bfde032d14b29905244a70868bd8dda1f3b13504d6cbc3b7bc"

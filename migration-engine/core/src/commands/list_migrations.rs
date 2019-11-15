@@ -6,15 +6,12 @@ use serde::Serialize;
 
 pub struct ListMigrationStepsCommand;
 
-impl<'a> MigrationCommand<'a> for ListMigrationStepsCommand {
+#[async_trait::async_trait]
+impl<'a> MigrationCommand for ListMigrationStepsCommand {
     type Input = serde_json::Value;
     type Output = Vec<ListMigrationStepsOutput>;
 
-    fn new(_: &'a Self::Input) -> Box<Self> {
-        Box::new(ListMigrationStepsCommand {})
-    }
-
-    fn execute<C, D>(&self, engine: &MigrationEngine<C, D>) -> CommandResult<Self::Output>
+    async fn execute<C, D>(_input: &Self::Input, engine: &MigrationEngine<C, D>) -> CommandResult<Self::Output>
     where
         C: MigrationConnector<DatabaseMigration = D>,
         D: DatabaseMigrationMarker + 'static,

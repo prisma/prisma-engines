@@ -118,6 +118,7 @@ pub fn test_one_connector(attr: TokenStream, input: TokenStream) -> TokenStream 
 
     let test_function = parse_macro_input!(input as ItemFn);
 
+    let async_test: bool = test_function.sig.asyncness.is_some();
     let test_impl_name = &test_function.sig.ident;
     let test_fn_name = Ident::new(
         &format!("{}_on_{}", &test_function.sig.ident, args.connector),
@@ -125,15 +126,28 @@ pub fn test_one_connector(attr: TokenStream, input: TokenStream) -> TokenStream 
     );
     let api_factory = Ident::new(&format!("{}_test_api", args.connector), Span::call_site());
 
-    let output = quote! {
-        #[test]
-        fn #test_fn_name() {
-            let api = #api_factory();
+    let output = if async_test {
+        quote! {
+            #[test]
+            fn #test_fn_name() {
+                let api = #api_factory();
 
-            #test_impl_name(&api)
+                async_std::task::block_on(#test_impl_name(&api))
+            }
+
+            #test_function
         }
+    } else {
+        quote! {
+            #[test]
+            fn #test_fn_name() {
+                let api = #api_factory();
 
-        #test_function
+                #test_impl_name(&api)
+            }
+
+            #test_function
+        }
     };
 
     output.into()

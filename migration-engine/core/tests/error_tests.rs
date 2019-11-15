@@ -28,7 +28,7 @@ fn authentication_failure_must_return_a_known_error_on_postgres() {
         url
     );
 
-    let error = RpcApi::new_async(&dm).map(|_| ()).unwrap_err();
+    let error = RpcApi::new(&dm).map(|_| ()).unwrap_err();
 
     let user = url.username();
     let host = url.host().unwrap().to_string();
@@ -62,7 +62,7 @@ fn authentication_failure_must_return_a_known_error_on_mysql() {
         url
     );
 
-    let error = RpcApi::new_async(&dm).map(|_| ()).unwrap_err();
+    let error = RpcApi::new(&dm).map(|_| ()).unwrap_err();
 
     let user = url.username();
     let host = url.host().unwrap().to_string();
@@ -96,7 +96,7 @@ fn unreachable_database_must_return_a_proper_error_on_mysql() {
         url
     );
 
-    let error = RpcApi::new_async(&dm).map(|_| ()).unwrap_err();
+    let error = RpcApi::new(&dm).map(|_| ()).unwrap_err();
 
     let port = url.port().unwrap().to_string();
     let host = url.host().unwrap().to_string();
@@ -130,7 +130,7 @@ fn unreachable_database_must_return_a_proper_error_on_postgres() {
         url
     );
 
-    let error = RpcApi::new_async(&dm).map(|_| ()).unwrap_err();
+    let error = RpcApi::new(&dm).map(|_| ()).unwrap_err();
 
     let host = url.host().unwrap().to_string();
     let port = url.port().unwrap().to_string();
@@ -165,7 +165,7 @@ fn database_does_not_exist_must_return_a_proper_error() {
         url
     );
 
-    let error = RpcApi::new_async(&dm).map(|_| ()).unwrap_err();
+    let error = RpcApi::new(&dm).map(|_| ()).unwrap_err();
 
     let database_location = format!("{}:{}", url.host().unwrap(), url.port().unwrap());
 
@@ -265,7 +265,7 @@ fn database_access_denied_must_return_a_proper_error_in_rpc() {
         url,
     );
 
-    let error = RpcApi::new_async(&dm).map(|_| ()).unwrap_err();
+    let error = RpcApi::new(&dm).map(|_| ()).unwrap_err();
     let json_error = serde_json::to_value(&render_error(error)).unwrap();
 
     let expected = json!({
@@ -281,7 +281,7 @@ fn database_access_denied_must_return_a_proper_error_in_rpc() {
 }
 
 #[test_one_connector(connector = "postgres")]
-fn command_errors_must_return_an_unknown_error(api: &TestApi) {
+async fn command_errors_must_return_an_unknown_error(api: &TestApi) {
     let input = ApplyMigrationInput {
         migration_id: "the-migration".to_owned(),
         steps: vec![MigrationStep::DeleteModel(DeleteModel {
@@ -290,7 +290,7 @@ fn command_errors_must_return_an_unknown_error(api: &TestApi) {
         force: Some(true),
     };
 
-    let error = api.execute_command::<ApplyMigrationCommand>(&input).unwrap_err();
+    let error = api.execute_command::<ApplyMigrationCommand>(&input).await.unwrap_err();
 
     let expected_error = user_facing_errors::Error::Unknown(user_facing_errors::UnknownError {
         message: "Failure during a migration command: Generic error. (code: 1, error: The model abcd does not exist in this Datamodel. It is not possible to delete it.)".to_owned(),

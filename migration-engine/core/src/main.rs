@@ -32,7 +32,8 @@ pub(crate) fn pretty_print_errors(errors: ErrorCollection, datamodel: &str) {
     }
 }
 
-fn main() {
+#[async_attributes::main]
+async fn main() {
     let original_hook = std::panic::take_hook();
 
     std::panic::set_hook(Box::new(move |panic| {
@@ -86,13 +87,13 @@ fn main() {
         file.read_to_string(&mut datamodel).unwrap();
 
         if matches.is_present("single_cmd") {
-            let api = RpcApi::new_sync(&datamodel).unwrap();
+            let api = RpcApi::new(&datamodel).unwrap();
             let response = api.handle().unwrap();
 
             println!("{}", response);
         } else {
-            match RpcApi::new_async(&datamodel) {
-                Ok(api) => api.start_server(),
+            match RpcApi::new(&datamodel) {
+                Ok(api) => api.start_server().await,
                 Err(Error::DatamodelError(errors)) => {
                     pretty_print_errors(errors, &datamodel);
                     std::process::exit(1);

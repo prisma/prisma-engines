@@ -8,20 +8,18 @@ pub struct UnapplyMigrationCommand<'a> {
     input: &'a UnapplyMigrationInput,
 }
 
-impl<'a> MigrationCommand<'a> for UnapplyMigrationCommand<'a> {
+#[async_trait::async_trait]
+impl<'a> MigrationCommand for UnapplyMigrationCommand<'a> {
     type Input = UnapplyMigrationInput;
     type Output = UnapplyMigrationOutput;
 
-    fn new(input: &'a Self::Input) -> Box<Self> {
-        Box::new(UnapplyMigrationCommand { input })
-    }
-
-    fn execute<C, D>(&self, engine: &MigrationEngine<C, D>) -> CommandResult<Self::Output>
+    async fn execute<C, D>(input: &Self::Input, engine: &MigrationEngine<C, D>) -> CommandResult<Self::Output>
     where
         C: MigrationConnector<DatabaseMigration = D>,
         D: DatabaseMigrationMarker + 'static,
     {
-        debug!("{:?}", self.input);
+        let cmd = UnapplyMigrationCommand { input };
+        debug!("{:?}", cmd.input);
         let connector = engine.connector();
 
         let result = match connector.migration_persistence().last() {

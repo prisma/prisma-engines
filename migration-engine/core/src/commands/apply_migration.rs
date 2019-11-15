@@ -10,29 +10,27 @@ pub struct ApplyMigrationCommand<'a> {
     input: &'a ApplyMigrationInput,
 }
 
-impl<'a> MigrationCommand<'a> for ApplyMigrationCommand<'a> {
+#[async_trait::async_trait]
+impl<'a> MigrationCommand for ApplyMigrationCommand<'a> {
     type Input = ApplyMigrationInput;
     type Output = MigrationStepsResultOutput;
 
-    fn new(input: &'a Self::Input) -> Box<Self> {
-        Box::new(ApplyMigrationCommand { input })
-    }
-
-    fn execute<C, D>(&self, engine: &MigrationEngine<C, D>) -> CommandResult<Self::Output>
+    async fn execute<C, D>(input:&Self::Input, engine: &MigrationEngine<C, D>) -> CommandResult<Self::Output>
     where
         C: MigrationConnector<DatabaseMigration = D>,
         D: DatabaseMigrationMarker + Send + Sync + 'static,
     {
-        debug!("{:?}", self.input);
+        let cmd = ApplyMigrationCommand { input };
+        debug!("{:?}", cmd.input);
 
         let connector = engine.connector();
         let migration_persistence = connector.migration_persistence();
 
         match migration_persistence.last() {
-            Some(ref last_migration) if last_migration.is_watch_migration() && !self.input.is_watch_migration() => {
-                self.handle_transition_out_of_watch_mode(&engine)
+            Some(ref last_migration) if last_migration.is_watch_migration() && !cmd.input.is_watch_migration() => {
+                cmd.handle_transition_out_of_watch_mode(&engine)
             }
-            _ => self.handle_normal_migration(&engine),
+            _ => cmd.handle_normal_migration(&engine),
         }
     }
 }

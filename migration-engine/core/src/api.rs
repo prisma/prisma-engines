@@ -27,28 +27,29 @@ where
         Ok(Self { engine })
     }
 
-    pub fn handle_command<'a, E>(&self, input: &'a E::Input) -> crate::Result<E::Output>
+    pub async fn handle_command<'a, E>(&'a self, input: &'a E::Input) -> crate::Result<E::Output>
     where
-        E: MigrationCommand<'a>,
+        E: MigrationCommand,
     {
-        Ok(E::new(input).execute(&self.engine)?)
+        Ok(E::execute(input, &self.engine).await?)
     }
 }
 
 // This is here only to get rid of the generic type parameters due to neon not
 // liking them in the exported class.
+#[async_trait::async_trait]
 pub trait GenericApi: Send + Sync + 'static {
-    fn apply_migration(&self, input: &ApplyMigrationInput) -> crate::Result<MigrationStepsResultOutput>;
-    fn calculate_database_steps(
+    async fn apply_migration(&self, input: &ApplyMigrationInput) -> crate::Result<MigrationStepsResultOutput>;
+    async fn calculate_database_steps(
         &self,
         input: &CalculateDatabaseStepsInput,
     ) -> crate::Result<MigrationStepsResultOutput>;
-    fn calculate_datamodel(&self, input: &CalculateDatamodelInput) -> crate::Result<CalculateDatamodelOutput>;
-    fn infer_migration_steps(&self, input: &InferMigrationStepsInput) -> crate::Result<MigrationStepsResultOutput>;
-    fn list_migrations(&self, input: &serde_json::Value) -> crate::Result<Vec<ListMigrationStepsOutput>>;
-    fn migration_progress(&self, input: &MigrationProgressInput) -> crate::Result<MigrationProgressOutput>;
-    fn reset(&self, input: &serde_json::Value) -> crate::Result<serde_json::Value>;
-    fn unapply_migration(&self, input: &UnapplyMigrationInput) -> crate::Result<UnapplyMigrationOutput>;
+    async fn calculate_datamodel(&self, input: &CalculateDatamodelInput) -> crate::Result<CalculateDatamodelOutput>;
+    async fn infer_migration_steps(&self, input: &InferMigrationStepsInput) -> crate::Result<MigrationStepsResultOutput>;
+    async fn list_migrations(&self, input: &serde_json::Value) -> crate::Result<Vec<ListMigrationStepsOutput>>;
+    async fn migration_progress(&self, input: &MigrationProgressInput) -> crate::Result<MigrationProgressOutput>;
+    async fn reset(&self, input: &serde_json::Value) -> crate::Result<serde_json::Value>;
+    async fn unapply_migration(&self, input: &UnapplyMigrationInput) -> crate::Result<UnapplyMigrationOutput>;
     fn migration_persistence(&self) -> Arc<dyn MigrationPersistence>;
     fn connector_type(&self) -> &'static str;
 
@@ -65,44 +66,45 @@ pub trait GenericApi: Send + Sync + 'static {
     }
 }
 
+#[async_trait::async_trait]
 impl<C, D> GenericApi for MigrationApi<C, D>
 where
     C: MigrationConnector<DatabaseMigration = D>,
     D: DatabaseMigrationMarker + Send + Sync + 'static,
 {
-    fn apply_migration(&self, input: &ApplyMigrationInput) -> crate::Result<MigrationStepsResultOutput> {
-        self.handle_command::<ApplyMigrationCommand>(input)
+    async fn apply_migration(&self, input: &ApplyMigrationInput) -> crate::Result<MigrationStepsResultOutput> {
+        self.handle_command::<ApplyMigrationCommand>(input).await
     }
 
-    fn calculate_database_steps(
+    async fn calculate_database_steps(
         &self,
         input: &CalculateDatabaseStepsInput,
     ) -> crate::Result<MigrationStepsResultOutput> {
-        self.handle_command::<CalculateDatabaseStepsCommand>(input)
+        self.handle_command::<CalculateDatabaseStepsCommand>(input).await
     }
 
-    fn calculate_datamodel(&self, input: &CalculateDatamodelInput) -> crate::Result<CalculateDatamodelOutput> {
-        self.handle_command::<CalculateDatamodelCommand>(input)
+    async fn calculate_datamodel(&self, input: &CalculateDatamodelInput) -> crate::Result<CalculateDatamodelOutput> {
+        self.handle_command::<CalculateDatamodelCommand>(input).await
     }
 
-    fn infer_migration_steps(&self, input: &InferMigrationStepsInput) -> crate::Result<MigrationStepsResultOutput> {
-        self.handle_command::<InferMigrationStepsCommand>(input)
+    async fn infer_migration_steps(&self, input: &InferMigrationStepsInput) -> crate::Result<MigrationStepsResultOutput> {
+        self.handle_command::<InferMigrationStepsCommand>(input).await
     }
 
-    fn list_migrations(&self, input: &serde_json::Value) -> crate::Result<Vec<ListMigrationStepsOutput>> {
-        self.handle_command::<ListMigrationStepsCommand>(input)
+    async fn list_migrations(&self, input: &serde_json::Value) -> crate::Result<Vec<ListMigrationStepsOutput>> {
+        self.handle_command::<ListMigrationStepsCommand>(input).await
     }
 
-    fn migration_progress(&self, input: &MigrationProgressInput) -> crate::Result<MigrationProgressOutput> {
-        self.handle_command::<MigrationProgressCommand>(input)
+    async fn migration_progress(&self, input: &MigrationProgressInput) -> crate::Result<MigrationProgressOutput> {
+        self.handle_command::<MigrationProgressCommand>(input).await
     }
 
-    fn reset(&self, input: &serde_json::Value) -> crate::Result<serde_json::Value> {
-        self.handle_command::<ResetCommand>(input)
+    async fn reset(&self, input: &serde_json::Value) -> crate::Result<serde_json::Value> {
+        self.handle_command::<ResetCommand>(input).await
     }
 
-    fn unapply_migration(&self, input: &UnapplyMigrationInput) -> crate::Result<UnapplyMigrationOutput> {
-        self.handle_command::<UnapplyMigrationCommand>(input)
+    async fn unapply_migration(&self, input: &UnapplyMigrationInput) -> crate::Result<UnapplyMigrationOutput> {
+        self.handle_command::<UnapplyMigrationCommand>(input).await
     }
 
     fn migration_persistence(&self) -> Arc<dyn MigrationPersistence> {

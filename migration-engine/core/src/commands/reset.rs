@@ -5,15 +5,12 @@ use serde_json::json;
 
 pub struct ResetCommand;
 
-impl<'a> MigrationCommand<'a> for ResetCommand {
+#[async_trait::async_trait]
+impl<'a> MigrationCommand for ResetCommand {
     type Input = serde_json::Value;
     type Output = serde_json::Value;
 
-    fn new(_: &'a Self::Input) -> Box<Self> {
-        Box::new(Self)
-    }
-
-    fn execute<C, D>(&self, engine: &MigrationEngine<C, D>) -> CommandResult<Self::Output>
+    async fn execute<C, D>(_input: &Self::Input, engine: &MigrationEngine<C, D>) -> CommandResult<Self::Output>
     where
         C: MigrationConnector<DatabaseMigration = D>,
         D: DatabaseMigrationMarker + 'static,

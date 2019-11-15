@@ -8,26 +8,23 @@ pub struct MigrationProgressCommand<'a> {
     input: &'a MigrationProgressInput,
 }
 
-#[allow(unused)]
-impl<'a> MigrationCommand<'a> for MigrationProgressCommand<'a> {
+#[async_trait::async_trait]
+impl<'a> MigrationCommand for MigrationProgressCommand<'a> {
     type Input = MigrationProgressInput;
     type Output = MigrationProgressOutput;
 
-    fn new(input: &'a Self::Input) -> Box<Self> {
-        Box::new(MigrationProgressCommand { input })
-    }
-
-    fn execute<C, D>(&self, engine: &MigrationEngine<C, D>) -> CommandResult<Self::Output>
+    async fn execute<C, D>(input: &Self::Input, engine: &MigrationEngine<C, D>) -> CommandResult<Self::Output>
     where
         C: MigrationConnector<DatabaseMigration = D>,
         D: DatabaseMigrationMarker + 'static,
     {
+        let cmd = MigrationProgressCommand { input };
         let migration_persistence = engine.connector().migration_persistence();
 
-        let migration = migration_persistence.by_name(&self.input.migration_id).ok_or_else(|| {
+        let migration = migration_persistence.by_name(&cmd.input.migration_id).ok_or_else(|| {
             let error = format!(
                 "Could not load migration from database. Migration name was: {}",
-                &self.input.migration_id
+                &cmd.input.migration_id
             );
 
             CommandError::Input { code: 1002, error }

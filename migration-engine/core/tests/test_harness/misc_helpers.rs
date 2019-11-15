@@ -61,7 +61,7 @@ where
 {
     let api = MigrationApi::new(connector).unwrap();
 
-    api.handle_command::<ResetCommand>(&serde_json::Value::Null)
+    async_std::task::block_on(api.handle_command::<ResetCommand>(&serde_json::Value::Null))
         .expect("Engine reset failed");
 
     api

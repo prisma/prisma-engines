@@ -53,7 +53,7 @@ impl TestApi {
             force: None,
         };
 
-        let migration_output = self.api.apply_migration(&input).expect("ApplyMigration failed");
+        let migration_output = self.api.apply_migration(&input).await.expect("ApplyMigration failed");
 
         assert!(
             migration_output.general_errors.is_empty(),
@@ -87,22 +87,23 @@ impl TestApi {
         self.apply_migration(steps, migration_id).await
     }
 
-    pub fn execute_command<'a, C>(&self, input: &'a C::Input) -> Result<C::Output, user_facing_errors::Error>
+    pub async fn execute_command<'a, C>(&self, input: &'a C::Input) -> Result<C::Output, user_facing_errors::Error>
     where
-        C: migration_core::commands::MigrationCommand<'a>,
+        C: migration_core::commands::MigrationCommand,
     {
         self.api
             .handle_command::<C>(input)
+            .await
             .map_err(|err| self.api.render_error(err))
     }
 
     pub async fn run_infer_command(&self, input: InferMigrationStepsInput) -> InferOutput {
-        run_infer_command(&self.api, input)
+        run_infer_command(&self.api, input).await
     }
 
     pub async fn unapply_migration(&self) -> UnapplyOutput {
         let input = UnapplyMigrationInput {};
-        let output = self.api.unapply_migration(&input).unwrap();
+        let output = self.api.unapply_migration(&input).await.unwrap();
 
         let sql_schema = self.introspect_database();
 
