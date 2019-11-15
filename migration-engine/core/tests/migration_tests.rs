@@ -1,7 +1,7 @@
 #![allow(non_snake_case)]
-#![allow(unused)]
+
 mod test_harness;
-use pretty_assertions::{assert_eq, assert_ne};
+use pretty_assertions::{assert_eq};
 use quaint::prelude::SqlFamily;
 use sql_migration_connector::{AlterIndex, CreateIndex, DropIndex, SqlMigrationStep};
 use sql_schema_describer::*;
@@ -1197,7 +1197,7 @@ async fn dropping_a_model_with_a_multi_field_unique_index_must_work(api: &TestAp
     assert_eq!(index.unwrap().tpe, IndexType::Unique);
 
     let dm2 = "";
-    api.infer_and_apply(&dm2);
+    api.infer_and_apply(&dm2).await;
 }
 
 #[test_each_connector]
@@ -1268,7 +1268,6 @@ async fn reserved_sql_key_words_must_work(api: &TestApi) {
     let result = api.infer_and_apply(&dm).await.sql_schema;
 
     let table = result.table_bang("Group");
-    let relation_column = table.column_bang("parent");
     assert_eq!(
         table.foreign_keys,
         vec![ForeignKey {
@@ -1332,7 +1331,7 @@ async fn migrations_with_many_to_many_related_models_must_not_recreate_indexes(a
             }
         "#;
 
-    let result = api.infer_and_apply(&dm_1).await;
+    let result = api.infer_and_apply(&dm_2).await;
     let sql_schema = result.sql_schema;
 
     let index = sql_schema
@@ -1346,8 +1345,6 @@ async fn migrations_with_many_to_many_related_models_must_not_recreate_indexes(a
 
 #[test_each_connector]
 async fn removing_a_relation_field_must_work(api: &TestApi) {
-    let sql_family = api.sql_family();
-
     let dm_1 = r#"
             model User {
                 id        String  @default(cuid()) @id
@@ -1403,5 +1400,5 @@ async fn simple_type_aliases_in_migrations_must_work(api: &TestApi) {
         }
     "#;
 
-    api.infer_and_apply(dm1);
+    api.infer_and_apply(dm1).await;
 }

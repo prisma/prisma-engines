@@ -21,7 +21,7 @@ impl<'a> MigrationCommand for MigrationProgressCommand<'a> {
         let cmd = MigrationProgressCommand { input };
         let migration_persistence = engine.connector().migration_persistence();
 
-        let migration = migration_persistence.by_name(&cmd.input.migration_id).ok_or_else(|| {
+        let migration = migration_persistence.by_name(&cmd.input.migration_id).await.ok_or_else(|| {
             let error = format!(
                 "Could not load migration from database. Migration name was: {}",
                 &cmd.input.migration_id

@@ -26,7 +26,6 @@ use std::{fs, path::PathBuf, sync::Arc};
 
 pub type Result<T> = std::result::Result<T, SqlError>;
 
-#[allow(unused, dead_code)]
 pub struct SqlMigrationConnector {
     pub connection_info: ConnectionInfo,
     pub schema_name: String,
@@ -140,7 +139,7 @@ impl SqlMigrationConnector {
         }
     }
 
-    fn initialize_impl(&self) -> SqlResult<()> {
+    async fn initialize_impl(&self) -> SqlResult<()> {
         // TODO: this code probably does not ever do anything. The schema/db creation happens already in the helper functions above.
         match &self.connection_info {
             ConnectionInfo::Sqlite { file_path, .. } => {
@@ -171,7 +170,7 @@ impl SqlMigrationConnector {
             }
         }
 
-        self.migration_persistence.init();
+        self.migration_persistence.init().await;
 
         Ok(())
     }
@@ -192,11 +191,12 @@ impl MigrationConnector for SqlMigrationConnector {
 
     async fn initialize(&self) -> ConnectorResult<()> {
         self.initialize_impl()
+            .await
             .map_err(|sql_error| sql_error.into_connector_error(&self.connection_info))
     }
 
     async fn reset(&self) -> ConnectorResult<()> {
-        self.migration_persistence.reset();
+        self.migration_persistence.reset().await;
         Ok(())
     }
 

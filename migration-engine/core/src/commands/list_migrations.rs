@@ -19,7 +19,7 @@ impl<'a> MigrationCommand for ListMigrationStepsCommand {
         let migration_persistence = engine.connector().migration_persistence();
         let mut result = Vec::new();
 
-        for migration in migration_persistence.load_all().into_iter() {
+        for migration in migration_persistence.load_all().await.into_iter() {
             result.push(convert_migration_to_list_migration_steps_output(&engine, migration)?);
         }
 

@@ -1,14 +1,8 @@
-#![allow(unused)]
 mod test_harness;
 
-use barrel::{types, Migration, SqlVariant};
-use migration_core::api::GenericApi;
-use pretty_assertions::{assert_eq, assert_ne};
-use sql_connection::SyncSqlConnection;
-use quaint::prelude::SqlFamily;
-use sql_migration_connector::SqlMigrationConnector;
+use barrel::{types};
+use pretty_assertions::{assert_eq};
 use sql_schema_describer::*;
-use std::sync::Arc;
 use test_harness::*;
 
 #[test_each_connector]

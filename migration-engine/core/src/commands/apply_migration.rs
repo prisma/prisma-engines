@@ -26,7 +26,7 @@ impl<'a> MigrationCommand for ApplyMigrationCommand<'a> {
         let connector = engine.connector();
         let migration_persistence = connector.migration_persistence();
 
-        match migration_persistence.last() {
+        match migration_persistence.last().await {
             Some(ref last_migration) if last_migration.is_watch_migration() && !cmd.input.is_watch_migration() => {
                 cmd.handle_transition_out_of_watch_mode(&engine).await
             }
@@ -47,9 +47,10 @@ impl<'a> ApplyMigrationCommand<'a> {
         let connector = engine.connector();
         let migration_persistence = connector.migration_persistence();
 
-        let current_datamodel = migration_persistence.current_datamodel();
+        let current_datamodel = migration_persistence.current_datamodel().await;
         let last_non_watch_datamodel = migration_persistence
             .last_non_watch_migration()
+            .await
             .map(|m| m.datamodel_ast())
             .unwrap_or_else(SchemaAst::empty);
         let next_datamodel_ast = engine
@@ -67,8 +68,8 @@ impl<'a> ApplyMigrationCommand<'a> {
     {
         let connector = engine.connector();
         let migration_persistence = connector.migration_persistence();
-        let current_datamodel = migration_persistence.current_datamodel();
-        let current_datamodel_ast = migration_persistence.current_datamodel_ast();
+        let current_datamodel = migration_persistence.current_datamodel().await;
+        let current_datamodel_ast = migration_persistence.current_datamodel_ast().await;
 
         let next_datamodel_ast = engine
             .datamodel_calculator()
@@ -112,7 +113,7 @@ impl<'a> ApplyMigrationCommand<'a> {
         match (diagnostics.has_warnings(), self.input.force.unwrap_or(false)) {
             // We have no warnings, or the force flag is passed.
             (false, _) | (true, true) => {
-                let saved_migration = migration_persistence.create(migration);
+                let saved_migration = migration_persistence.create(migration).await;
 
                 connector
                     .migration_applier()
