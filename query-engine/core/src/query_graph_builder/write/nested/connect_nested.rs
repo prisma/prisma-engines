@@ -4,6 +4,7 @@ use crate::{
     query_graph::{Flow, Node, NodeRef, QueryGraph, QueryGraphDependency},
     ParsedInputValue, QueryResult,
 };
+use itertools::Itertools;
 use prisma_models::{ModelRef, RelationFieldRef};
 use std::sync::Arc;
 
@@ -23,17 +24,18 @@ pub fn connect_nested_connect(
     let finders: Vec<RecordFinder> = utils::coerce_vec(value)
         .into_iter()
         .map(|value: ParsedInputValue| extract_record_finder(value, &child_model))
-        .collect::<QueryGraphBuilderResult<Vec<RecordFinder>>>()?;
+        .collect::<QueryGraphBuilderResult<Vec<RecordFinder>>>()?
+        .into_iter()
+        .unique()
+        .collect();
 
     if relation.is_many_to_many() {
-        handle_many_to_many(graph, parent_node, parent_relation_field, finders, child_model)?;
+        handle_many_to_many(graph, parent_node, parent_relation_field, finders, child_model)
     } else if relation.is_one_to_many() {
-        handle_one_to_many(graph, parent_node, parent_relation_field, finders, child_model)?;
+        handle_one_to_many(graph, parent_node, parent_relation_field, finders, child_model)
     } else {
-        handle_one_to_one(graph, parent_node, parent_relation_field, finders, child_model)?;
+        handle_one_to_one(graph, parent_node, parent_relation_field, finders, child_model)
     }
-
-    Ok(())
 }
 
 /// Handles a many-to-many nested connect.
