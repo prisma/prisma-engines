@@ -198,7 +198,7 @@ impl LiftAstToDml {
             ));
         }
 
-        if let Some(custom_type) = ast_schema.find_custom_type(&type_name) {
+        if let Some(custom_type) = ast_schema.find_type_alias(&type_name) {
             checked_types.push(custom_type.name.name.clone());
             let (field_type, mut attrs) = self.lift_field_type(custom_type, ast_schema, checked_types)?;
 

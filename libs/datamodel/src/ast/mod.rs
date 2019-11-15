@@ -63,8 +63,15 @@ impl SchemaAst {
         })
     }
 
-    pub fn find_custom_type(&self, type_name: &str) -> Option<&Field> {
+    pub fn find_type_alias(&self, type_name: &str) -> Option<&Field> {
         self.types().into_iter().find(|t| t.name.name == type_name)
+    }
+
+    pub fn find_type_alias_mut(&mut self, type_name: &str) -> Option<&mut Field> {
+        self.tops.iter_mut().find_map(|top| match top {
+            Top::Type(custom_type) if custom_type.name.name == type_name => Some(custom_type),
+            _ => None,
+        })
     }
 
     pub fn find_enum(&self, enum_name: &str) -> Option<&Enum> {
