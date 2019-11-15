@@ -29,7 +29,8 @@ failure = "0.1"
 jsonrpc-core = "13.0"
 jsonrpc-stdio-server = "13.0"
 
-futures03 = { package = "futures", version = "0.3", features = ["compat"] }
+futures = { package = "futures", version = "0.3", features = ["compat"] }
+tokio = { package = "tokio", version = "0.2.0-alpha.6" }
 async-trait = "0.1.17"
 async-std = "1.0"
 async-attributes = "*"
@@ -40,11 +41,7 @@ pretty_assertions = "0.6"
 sql-schema-describer = { path = "../../libs/sql-schema-describer" }
 user-facing-errors = { path = "../../libs/user-facing-errors" }
 test-macros = { path = "../../libs/test-macros" }
-
-# When we asyncify the migration engine, we will swap async-std and tokio,
-# because our blocking SQL connections are already spawning tokio.
-# tokio02 = { package = "tokio", version = "0.2.0-alpha.6" }
-# once_cell = "1.2.0"
+once_cell = "1.2.0"
 
 [[bin]]
 name = "migration-engine"

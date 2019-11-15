@@ -5,7 +5,7 @@ mod error;
 pub mod migration;
 pub mod migration_engine;
 
-use futures03::FutureExt;
+use futures::FutureExt;
 use crate::api::RpcApi;
 use commands::*;
 use datamodel::{self, error::ErrorCollection, Datamodel};
@@ -33,7 +33,7 @@ pub(crate) fn pretty_print_errors(errors: ErrorCollection, datamodel: &str) {
     }
 }
 
-#[async_attributes::main]
+#[tokio::main]
 async fn main() {
     let original_hook = std::panic::take_hook();
 

@@ -16,7 +16,7 @@ pub use sql_migration::*;
 
 use migration_connector::*;
 use quaint::prelude::{ConnectionInfo, SqlFamily};
-use sql_connection::{GenericSqlConnection, SyncSqlConnection};
+use sql_connection::{GenericSqlConnection, SqlConnection};
 use sql_database_migration_inferrer::*;
 use sql_database_step_applier::*;
 use sql_destructive_changes_checker::*;
@@ -29,7 +29,7 @@ pub type Result<T> = std::result::Result<T, SqlError>;
 pub struct SqlMigrationConnector {
     pub connection_info: ConnectionInfo,
     pub schema_name: String,
-    pub database: Arc<dyn SyncSqlConnection + Send + Sync + 'static>,
+    pub database: Arc<dyn SqlConnection + Send + Sync + 'static>,
     pub migration_persistence: Arc<dyn MigrationPersistence>,
     pub database_migration_inferrer: Arc<dyn DatabaseMigrationInferrer<SqlMigration>>,
     pub database_migration_step_applier: Arc<dyn DatabaseMigrationStepApplier<SqlMigration>>,
@@ -38,7 +38,7 @@ pub struct SqlMigrationConnector {
 }
 
 impl SqlMigrationConnector {
-    pub fn new_from_database_str(database_str: &str) -> std::result::Result<Self, ConnectorError> {
+    pub async fn new_from_database_str(database_str: &str) -> std::result::Result<Self, ConnectorError> {
         let connection_info =
             ConnectionInfo::from_url(database_str).map_err(|_err| ConnectorError::InvalidDatabaseUrl)?;
 
@@ -46,10 +46,10 @@ impl SqlMigrationConnector {
             .map_err(SqlError::from)
             .map_err(|err| err.into_connector_error(&connection_info))?;
 
-        Self::create_connector(connection)
+        Self::create_connector(connection).await
     }
 
-    pub fn new(datasource: &dyn datamodel::Source) -> std::result::Result<Self, ConnectorError> {
+    pub async fn new(datasource: &dyn datamodel::Source) -> std::result::Result<Self, ConnectorError> {
         let connection_info =
             ConnectionInfo::from_url(&datasource.url().value).map_err(|_err| ConnectorError::InvalidDatabaseUrl)?;
 
@@ -57,14 +57,15 @@ impl SqlMigrationConnector {
             .map_err(SqlError::from)
             .map_err(|err| err.into_connector_error(&connection_info))?;
 
-        Self::create_connector(connection)
+        Self::create_connector(connection).await
     }
 
-    fn create_connector(connection: GenericSqlConnection) -> std::result::Result<Self, ConnectorError> {
+    async fn create_connector(connection: GenericSqlConnection) -> std::result::Result<Self, ConnectorError> {
         // async connections can be lazy, so we issue a simple query to fail early if the database
         // is not reachable.
         connection
             .query_raw("SELECT 1", &[])
+            .await
             .map_err(SqlError::from)
             .map_err(|err| err.into_connector_error(&connection.connection_info()))?;
 
@@ -75,14 +76,17 @@ impl SqlMigrationConnector {
         let sql_family = connection.connection_info().sql_family();
         let connection_info = connection.connection_info().clone();
 
-        let conn = Arc::new(connection) as Arc<dyn SyncSqlConnection + Send + Sync>;
+        let conn = Arc::new(connection) as Arc<dyn SqlConnection + Send + Sync>;
 
-        let inspector: Arc<dyn SqlSchemaDescriberBackend + Send + Sync + 'static> = match sql_family {
-            SqlFamily::Mysql => Arc::new(sql_schema_describer::mysql::SqlSchemaDescriber::new(Arc::clone(&conn))),
-            SqlFamily::Postgres => Arc::new(sql_schema_describer::postgres::SqlSchemaDescriber::new(Arc::clone(
-                &conn,
-            ))),
-            SqlFamily::Sqlite => Arc::new(sql_schema_describer::sqlite::SqlSchemaDescriber::new(Arc::clone(&conn))),
+        let inspector: Arc<dyn SqlSchemaDescriberBackend + Send + Sync + 'static> = {
+            unimplemented!()
+            // match sql_family {
+            // SqlFamily::Mysql => Arc::new(sql_schema_describer::mysql::SqlSchemaDescriber::new(Arc::clone(&conn))),
+            // SqlFamily::Postgres => Arc::new(sql_schema_describer::postgres::SqlSchemaDescriber::new(Arc::clone(
+            //     &conn,
+            // ))),
+            // SqlFamily::Sqlite => Arc::new(sql_schema_describer::sqlite::SqlSchemaDescriber::new(Arc::clone(&conn))),
+        // };
         };
 
         let migration_persistence = Arc::new(SqlMigrationPersistence {
@@ -121,18 +125,20 @@ impl SqlMigrationConnector {
         })
     }
 
-    fn create_database_impl(&self, db_name: &str) -> SqlResult<()> {
+    async fn create_database_impl(&self, db_name: &str) -> SqlResult<()> {
         match self.connection_info.sql_family() {
             SqlFamily::Postgres => {
+                let query = format!("CREATE DATABASE \"{}\"", db_name);
                 self.database
-                    .query_raw(&format!("CREATE DATABASE \"{}\"", db_name), &[])?;
+                    .query_raw(&query, &[]).await?;
 
                 Ok(())
             }
             SqlFamily::Sqlite => Ok(()),
             SqlFamily::Mysql => {
+                let query = format!("CREATE DATABASE `{}`", db_name);
                 self.database
-                    .query_raw(&format!("CREATE DATABASE `{}`", db_name), &[])?;
+                    .query_raw(&query, &[]).await?;
 
                 Ok(())
             }
@@ -156,7 +162,7 @@ impl SqlMigrationConnector {
 
                 debug!("{}", schema_sql);
 
-                self.database.query_raw(&schema_sql, &[])?;
+                self.database.query_raw(&schema_sql, &[]).await?;
             }
             ConnectionInfo::Mysql(_) => {
                 let schema_sql = format!(
@@ -166,7 +172,7 @@ impl SqlMigrationConnector {
 
                 debug!("{}", schema_sql);
 
-                self.database.query_raw(&schema_sql, &[])?;
+                self.database.query_raw(&schema_sql, &[]).await?;
             }
         }
 
@@ -186,6 +192,7 @@ impl MigrationConnector for SqlMigrationConnector {
 
     async fn create_database(&self, db_name: &str) -> ConnectorResult<()> {
         self.create_database_impl(db_name)
+            .await
             .map_err(|sql_error| sql_error.into_connector_error(&self.connection_info))
     }
 

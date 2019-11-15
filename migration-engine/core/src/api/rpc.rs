@@ -2,10 +2,9 @@ use super::{GenericApi, MigrationApi};
 use crate::commands::*;
 use datamodel::configuration::{MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME};
 use failure::Fail;
-use futures03::{FutureExt, TryFutureExt};
+use futures::{FutureExt, TryFutureExt};
 use jsonrpc_core::types::error::Error as JsonRpcError;
-use jsonrpc_core::IoHandler;
-use jsonrpc_core::*;
+use jsonrpc_core::{Params, IoHandler};
 use jsonrpc_stdio_server::ServerBuilder;
 use sql_migration_connector::SqlMigrationConnector;
 use std::{io, sync::Arc};
@@ -64,7 +63,7 @@ impl RpcApi {
 
         let connector = match source.connector_type() {
             scheme if [MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME].contains(&scheme) => {
-                SqlMigrationConnector::new(source.as_ref())?
+                SqlMigrationConnector::new(source.as_ref()).await?
             }
             x => unimplemented!("Connector {} is not supported yet", x),
         };
@@ -124,7 +123,6 @@ impl RpcApi {
         params: &Params,
     ) -> std::result::Result<serde_json::Value, JsonRpcError> {
         use std::panic::{AssertUnwindSafe};
-        use std::result::Result;
 
         let result: Result<Result<serde_json::Value, RunCommandError>, _> = AssertUnwindSafe(Self::run_command(&executor, cmd, params)).catch_unwind().await;
 

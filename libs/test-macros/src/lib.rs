@@ -97,11 +97,12 @@ fn test_each_connector_async_wrapper_functions(
         let test = quote! {
             #[test]
             fn #connector_test_fn_name() {
-                let api = #connector_api_factory();
+                let fut = async {
+                    let api = #connector_api_factory().await;
+                    #test_fn_name(&api).await
+                };
 
-                async_std::task::block_on(#test_fn_name(&api))
-                // To be enabled when we asyncify the migration engine.
-                // TEST_ASYNC_RUNTIME.block_on(#test_fn_name(&api))
+                TEST_ASYNC_RUNTIME.block_on(fut)
             }
         };
 
@@ -130,9 +131,13 @@ pub fn test_one_connector(attr: TokenStream, input: TokenStream) -> TokenStream 
         quote! {
             #[test]
             fn #test_fn_name() {
-                let api = #api_factory();
+                let fut = async {
+                    let api = #api_factory().await;
 
-                async_std::task::block_on(#test_impl_name(&api))
+                    #test_impl_name(&api).await
+                };
+
+                TEST_ASYNC_RUNTIME.block_on(fut)
             }
 
             #test_function

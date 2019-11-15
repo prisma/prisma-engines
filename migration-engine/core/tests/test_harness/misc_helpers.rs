@@ -2,14 +2,14 @@ use datamodel::ast::{parser, SchemaAst};
 use migration_connector::*;
 use migration_core::{api::MigrationApi, commands::ResetCommand};
 use quaint::pool::SqlFamily;
-use sql_connection::{GenericSqlConnection, SyncSqlConnection};
+use sql_connection::{GenericSqlConnection, SqlConnection};
 use sql_migration_connector::SqlMigrationConnector;
 use std::{rc::Rc, sync::Arc};
 use url::Url;
+use once_cell::sync::Lazy;
 
-// To be enabled when we asyncify the migration engine.
-// pub static TEST_ASYNC_RUNTIME: Lazy<tokio02::runtime::Runtime> =
-//     Lazy::new(|| tokio02::runtime::Runtime::new().expect("failed to start tokio test runtime"));
+pub static TEST_ASYNC_RUNTIME: Lazy<tokio::runtime::Runtime> =
+    Lazy::new(|| tokio::runtime::Runtime::new().expect("failed to start tokio test runtime"));
 
 pub const SCHEMA_NAME: &str = "lift";
 
@@ -17,22 +17,22 @@ pub fn parse(datamodel_string: &str) -> SchemaAst {
     parser::parse(datamodel_string).unwrap()
 }
 
-pub(super) fn mysql_migration_connector(database_url: &str) -> SqlMigrationConnector {
-    match SqlMigrationConnector::new_from_database_str(database_url) {
+pub(super) async fn mysql_migration_connector(database_url: &str) -> SqlMigrationConnector {
+    match SqlMigrationConnector::new_from_database_str(database_url).await {
         Ok(c) => c,
         Err(_) => {
             let url = Url::parse(database_url).unwrap();
             let name_cmd = |name| format!("CREATE DATABASE `{}`", name);
             let connect_cmd = |url: url::Url| GenericSqlConnection::from_database_str(url.as_str(), None);
 
-            create_database(url, "mysql", "/", name_cmd, Rc::new(connect_cmd));
-            SqlMigrationConnector::new_from_database_str(database_url).unwrap()
+            create_database(url, "mysql", "/", name_cmd, Rc::new(connect_cmd)).await;
+            SqlMigrationConnector::new_from_database_str(database_url).await.unwrap()
         }
     }
 }
 
-pub(super) fn postgres_migration_connector(url: &str) -> SqlMigrationConnector {
-    match SqlMigrationConnector::new_from_database_str(&postgres_url()) {
+pub(super) async fn postgres_migration_connector(url: &str) -> SqlMigrationConnector {
+    match SqlMigrationConnector::new_from_database_str(&postgres_url()).await {
         Ok(c) => c,
         Err(_) => {
             let name_cmd = |name| format!("CREATE DATABASE \"{}\"", name);
@@ -44,30 +44,28 @@ pub(super) fn postgres_migration_connector(url: &str) -> SqlMigrationConnector {
                 "postgres",
                 name_cmd,
                 Rc::new(connect_cmd),
-            );
-            SqlMigrationConnector::new_from_database_str(&postgres_url()).unwrap()
+            ).await;
+            SqlMigrationConnector::new_from_database_str(&postgres_url()).await.unwrap()
         }
     }
 }
 
-pub(super) fn sqlite_migration_connector() -> SqlMigrationConnector {
-    SqlMigrationConnector::new_from_database_str(&sqlite_test_file()).unwrap()
+pub(super) async fn sqlite_migration_connector() -> SqlMigrationConnector {
+    SqlMigrationConnector::new_from_database_str(&sqlite_test_file()).await.unwrap()
 }
 
-pub fn test_api<C, D>(connector: C) -> MigrationApi<C, D>
+pub async fn test_api<C, D>(connector: C) -> MigrationApi<C, D>
 where
     C: MigrationConnector<DatabaseMigration = D>,
     D: DatabaseMigrationMarker + Send + Sync + 'static,
 {
-    let fut = async {
-        let api = MigrationApi::new(connector).await.unwrap();
+    let api = MigrationApi::new(connector).await.unwrap();
 
-        api.handle_command::<ResetCommand>(&serde_json::Value::Null)
-            .await
-            .expect("Engine reset failed");
-        api
-    };
-    async_std::task::block_on(fut)
+    api.handle_command::<ResetCommand>(&serde_json::Value::Null)
+        .await
+        .expect("Engine reset failed");
+
+    api
 }
 
 fn fetch_db_name(url: &Url, default: &str) -> String {
@@ -79,9 +77,9 @@ fn fetch_db_name(url: &Url, default: &str) -> String {
     String::from(result)
 }
 
-fn create_database<F, T, S>(url: Url, default_name: &str, root_path: &str, create_stmt: S, f: Rc<F>)
+async fn create_database<F, T, S>(url: Url, default_name: &str, root_path: &str, create_stmt: S, f: Rc<F>)
 where
-    T: SyncSqlConnection,
+    T: SqlConnection,
     F: Fn(Url) -> Result<T, quaint::error::Error>,
     S: FnOnce(String) -> String,
 {
@@ -92,25 +90,25 @@ where
 
     let conn = f(url).unwrap();
 
-    conn.execute_raw(&create_stmt(db_name), &[]).unwrap();
+    conn.execute_raw(&create_stmt(db_name), &[]).await.unwrap();
 }
 
-fn with_database<F, T, S>(url: Url, default_name: &str, root_path: &str, create_stmt: S, f: Rc<F>) -> T
+async fn with_database<F, T, S>(url: Url, default_name: &str, root_path: &str, create_stmt: S, f: Rc<F>) -> T
 where
-    T: SyncSqlConnection,
+    T: SqlConnection,
     F: Fn(Url) -> Result<T, quaint::error::Error>,
     S: FnOnce(String) -> String,
 {
     match f(url.clone()) {
         Ok(conn) => conn,
         Err(_) => {
-            create_database(url.clone(), default_name, root_path, create_stmt, f.clone());
+            create_database(url.clone(), default_name, root_path, create_stmt, f.clone()).await;
             f(url).unwrap()
         }
     }
 }
 
-pub fn database(sql_family: SqlFamily, database_url: &str) -> Arc<dyn SyncSqlConnection + Send + Sync + 'static> {
+pub async fn database(sql_family: SqlFamily, database_url: &str) -> Arc<dyn SqlConnection + Send + Sync + 'static> {
     match sql_family {
         SqlFamily::Postgres => {
             let url = Url::parse(database_url).unwrap();
@@ -118,12 +116,14 @@ pub fn database(sql_family: SqlFamily, database_url: &str) -> Arc<dyn SyncSqlCon
 
             let connect_cmd = |url: url::Url| GenericSqlConnection::from_database_str(url.as_str(), None);
 
-            let conn = with_database(url, "postgres", "postgres", create_cmd, Rc::new(connect_cmd));
+            let conn = with_database(url, "postgres", "postgres", create_cmd, Rc::new(connect_cmd)).await;
 
             Arc::new(conn)
         }
         SqlFamily::Sqlite => {
-            Arc::new(GenericSqlConnection::from_database_str(database_url, Some(SCHEMA_NAME)).unwrap())
+            let conn = GenericSqlConnection::from_database_str(database_url, Some(SCHEMA_NAME)).unwrap();
+            let arc = Arc::new(conn) as Arc<dyn SqlConnection + Send + Sync + 'static>;
+            arc
         }
         SqlFamily::Mysql => {
             let url = Url::parse(database_url).unwrap();
@@ -131,7 +131,7 @@ pub fn database(sql_family: SqlFamily, database_url: &str) -> Arc<dyn SyncSqlCon
 
             let connect_cmd = |url: url::Url| GenericSqlConnection::from_database_str(url.as_str(), None);
 
-            let conn = with_database(url, "mysql", "/", create_cmd, Rc::new(connect_cmd));
+            let conn = with_database(url, "mysql", "/", create_cmd, Rc::new(connect_cmd)).await;
 
             Arc::new(conn)
         }

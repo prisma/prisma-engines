@@ -12,7 +12,7 @@ use migration_core::{
     commands::{ApplyMigrationInput, InferMigrationStepsInput, UnapplyMigrationInput, UnapplyMigrationOutput},
 };
 use quaint::prelude::{ConnectionInfo, SqlFamily};
-use sql_connection::SyncSqlConnection;
+use sql_connection::SqlConnection;
 use sql_schema_describer::*;
 use std::sync::Arc;
 
@@ -20,13 +20,13 @@ use std::sync::Arc;
 /// connectors.
 pub struct TestApi {
     sql_family: SqlFamily,
-    database: Arc<dyn SyncSqlConnection + Send + Sync + 'static>,
+    database: Arc<dyn SqlConnection + Send + Sync + 'static>,
     api: MigrationApi<sql_migration_connector::SqlMigrationConnector, sql_migration_connector::SqlMigration>,
     connection_info: Option<ConnectionInfo>,
 }
 
 impl TestApi {
-    pub fn database(&self) -> &Arc<dyn SyncSqlConnection + Send + Sync + 'static> {
+    pub fn database(&self) -> &Arc<dyn SqlConnection + Send + Sync + 'static> {
         &self.database
     }
 
@@ -123,18 +123,19 @@ impl TestApi {
     }
 
     fn inspector(&self) -> Box<dyn SqlSchemaDescriberBackend> {
-        match self.api.connector_type() {
-            "postgresql" => Box::new(sql_schema_describer::postgres::SqlSchemaDescriber::new(Arc::clone(
-                &self.database,
-            ))),
-            "sqlite" => Box::new(sql_schema_describer::sqlite::SqlSchemaDescriber::new(Arc::clone(
-                &self.database,
-            ))),
-            "mysql" => Box::new(sql_schema_describer::mysql::SqlSchemaDescriber::new(Arc::clone(
-                &self.database,
-            ))),
-            _ => unimplemented!(),
-        }
+        unimplemented!()
+        // match self.api.connector_type() {
+        //     "postgresql" => Box::new(sql_schema_describer::postgres::SqlSchemaDescriber::new(Arc::clone(
+        //         &self.database,
+        //     ))),
+        //     "sqlite" => Box::new(sql_schema_describer::sqlite::SqlSchemaDescriber::new(Arc::clone(
+        //         &self.database,
+        //     ))),
+        //     "mysql" => Box::new(sql_schema_describer::mysql::SqlSchemaDescriber::new(Arc::clone(
+        //         &self.database,
+        //     ))),
+        //     _ => unimplemented!(),
+        // }
     }
 
     fn introspect_database(&self) -> SqlSchema {
@@ -150,62 +151,62 @@ impl TestApi {
     }
 }
 
-pub fn mysql_8_test_api() -> TestApi {
+pub async fn mysql_8_test_api() -> TestApi {
     let connection_info = ConnectionInfo::from_url(&mysql_8_url()).unwrap();
-    let connector = mysql_migration_connector(&mysql_8_url());
+    let connector = mysql_migration_connector(&mysql_8_url()).await;
 
     TestApi {
         connection_info: Some(connection_info),
         sql_family: SqlFamily::Mysql,
         database: Arc::clone(&connector.database),
-        api: test_api(connector),
+        api: test_api(connector).await,
     }
 }
 
-pub fn mysql_test_api() -> TestApi {
+pub async fn mysql_test_api() -> TestApi {
     let connection_info = ConnectionInfo::from_url(&mysql_url()).unwrap();
-    let connector = mysql_migration_connector(&mysql_url());
+    let connector = mysql_migration_connector(&mysql_url()).await;
 
     TestApi {
         connection_info: Some(connection_info),
         sql_family: SqlFamily::Mysql,
         database: Arc::clone(&connector.database),
-        api: test_api(connector),
+        api: test_api(connector).await,
     }
 }
 
-pub fn postgres_test_api() -> TestApi {
+pub async fn postgres_test_api() -> TestApi {
     let connection_info = ConnectionInfo::from_url(&postgres_url()).unwrap();
-    let connector = postgres_migration_connector(&postgres_url());
+    let connector = postgres_migration_connector(&postgres_url()).await;
 
     TestApi {
         connection_info: Some(connection_info),
         sql_family: SqlFamily::Postgres,
         database: Arc::clone(&connector.database),
-        api: test_api(connector),
+        api: test_api(connector).await,
     }
 }
 
-pub fn sqlite_test_api() -> TestApi {
+pub async fn sqlite_test_api() -> TestApi {
     let connection_info = ConnectionInfo::from_url(&sqlite_test_file()).unwrap();
-    let connector = sqlite_migration_connector();
+    let connector = sqlite_migration_connector().await;
 
     TestApi {
         connection_info: Some(connection_info),
         sql_family: SqlFamily::Sqlite,
         database: Arc::clone(&connector.database),
-        api: test_api(connector),
+        api: test_api(connector).await,
     }
 }
 
 pub struct BarrelMigrationExecutor {
     inspector: Box<dyn SqlSchemaDescriberBackend>,
-    database: Arc<dyn SyncSqlConnection + Send + Sync>,
+    database: Arc<dyn SqlConnection + Send + Sync>,
     sql_variant: barrel::backend::SqlVariant,
 }
 
 impl BarrelMigrationExecutor {
-    pub fn execute<F>(&self, mut migration_fn: F) -> SqlSchema
+    pub async fn execute<F>(&self, mut migration_fn: F) -> SqlSchema
     where
         F: FnMut(&mut barrel::Migration) -> (),
     {
@@ -214,7 +215,7 @@ impl BarrelMigrationExecutor {
         let mut migration = Migration::new().schema(SCHEMA_NAME);
         migration_fn(&mut migration);
         let full_sql = migration.make_from(self.sql_variant);
-        run_full_sql(&self.database, &full_sql);
+        run_full_sql(&self.database, &full_sql).await;
         let mut result = self
             .inspector
             .describe(&SCHEMA_NAME.to_string())
@@ -226,9 +227,9 @@ impl BarrelMigrationExecutor {
     }
 }
 
-fn run_full_sql(database: &Arc<dyn SyncSqlConnection + Send + Sync>, full_sql: &str) {
+async fn run_full_sql(database: &Arc<dyn SqlConnection + Send + Sync>, full_sql: &str) {
     for sql in full_sql.split(";").filter(|sql| !sql.is_empty()) {
-        database.query_raw(&sql, &[]).unwrap();
+        database.query_raw(&sql, &[]).await.unwrap();
     }
 }
 
