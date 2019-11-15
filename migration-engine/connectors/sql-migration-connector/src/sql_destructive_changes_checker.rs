@@ -159,8 +159,9 @@ impl SqlDestructiveChangesChecker {
     }
 }
 
+#[async_trait::async_trait]
 impl DestructiveChangesChecker<SqlMigration> for SqlDestructiveChangesChecker {
-    fn check(&self, database_migration: &SqlMigration) -> ConnectorResult<DestructiveChangeDiagnostics> {
+    async fn check(&self, database_migration: &SqlMigration) -> ConnectorResult<DestructiveChangeDiagnostics> {
         self.check_impl(database_migration)
             .map_err(|sql_error| sql_error.into_connector_error(&self.connection_info))
     }

@@ -107,7 +107,7 @@ impl<'a> ApplyMigrationCommand<'a> {
         migration.database_migration = database_migration_json;
         migration.datamodel = next_datamodel.clone();
 
-        let diagnostics = connector.destructive_changes_checker().check(&database_migration)?;
+        let diagnostics = connector.destructive_changes_checker().check(&database_migration).await?;
 
         match (diagnostics.has_warnings(), self.input.force.unwrap_or(false)) {
             // We have no warnings, or the force flag is passed.

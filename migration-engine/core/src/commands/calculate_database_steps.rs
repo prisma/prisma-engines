@@ -42,7 +42,7 @@ impl<'a> MigrationCommand for CalculateDatabaseStepsCommand<'a> {
         ).await?;
 
         let DestructiveChangeDiagnostics { warnings, errors: _ } =
-            connector.destructive_changes_checker().check(&database_migration)?;
+            connector.destructive_changes_checker().check(&database_migration).await?;
 
         let database_steps_json = connector
             .database_migration_step_applier()

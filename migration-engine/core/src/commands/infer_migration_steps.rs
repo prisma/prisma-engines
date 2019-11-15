@@ -45,7 +45,7 @@ impl<'a> MigrationCommand for InferMigrationStepsCommand<'a> {
             database_migration_inferrer.infer(&assumed_datamodel, &next_datamodel, &model_migration_steps).await?;
 
         let DestructiveChangeDiagnostics { warnings, errors: _ } =
-            connector.destructive_changes_checker().check(&database_migration)?;
+            connector.destructive_changes_checker().check(&database_migration).await?;
 
         let (returned_datamodel_steps, returned_database_migration) = if cmd.input.is_watch_migration() {
             let database_steps = connector

@@ -6,11 +6,12 @@ use std::marker::PhantomData;
 ///
 /// The type parameter is the connector's [DatabaseMigration](trait.MigrationConnector.html#associatedtype.DatabaseMigration)
 /// type.
+#[async_trait::async_trait]
 pub trait DestructiveChangesChecker<T>: Send + Sync + 'static
 where
     T: Send + Sync + 'static,
 {
-    fn check(&self, database_migration: &T) -> ConnectorResult<DestructiveChangeDiagnostics>;
+    async fn check(&self, database_migration: &T) -> ConnectorResult<DestructiveChangeDiagnostics>;
 }
 
 /// The errors and warnings emitted by the [DestructiveChangesChecker](trait.DestructiveChangesChecker.html).
@@ -68,11 +69,12 @@ impl<T> EmptyDestructiveChangesChecker<T> {
     }
 }
 
+#[async_trait::async_trait]
 impl<T> DestructiveChangesChecker<T> for EmptyDestructiveChangesChecker<T>
 where
     T: Send + Sync + 'static,
 {
-    fn check(&self, _database_migration: &T) -> ConnectorResult<DestructiveChangeDiagnostics> {
+    async fn check(&self, _database_migration: &T) -> ConnectorResult<DestructiveChangeDiagnostics> {
         Ok(DestructiveChangeDiagnostics::new())
     }
 }
