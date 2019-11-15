@@ -335,10 +335,10 @@ impl DatamodelFieldExtensions for dml::Field {
                 dml::ScalarType::Float => TypeIdentifier::Float,
                 dml::ScalarType::Int => TypeIdentifier::Int,
                 dml::ScalarType::String => match self.default_value {
-                    Some(datamodel::common::PrismaValue::Expression(ref expr, _, _)) if expr == "cuid" => {
+                    Some(datamodel::common::ScalarValue::Expression(ref expr, _, _)) if expr == "cuid" => {
                         TypeIdentifier::GraphQLID
                     }
-                    Some(datamodel::common::PrismaValue::Expression(ref expr, _, _)) if expr == "uuid" => {
+                    Some(datamodel::common::ScalarValue::Expression(ref expr, _, _)) if expr == "uuid" => {
                         TypeIdentifier::UUID
                     }
                     _ => TypeIdentifier::String,
@@ -389,7 +389,7 @@ impl DatamodelFieldExtensions for dml::Field {
             })
             // case: @default(now())
             .or_else(|| match self.default_value {
-                Some(datamodel::common::PrismaValue::Expression(ref expr, _, _)) if expr == "now" => {
+                Some(datamodel::common::ScalarValue::Expression(ref expr, _, _)) if expr == "now" => {
                     Some(FieldBehaviour::CreatedAt)
                 }
                 _ => None,
@@ -434,16 +434,16 @@ impl DatamodelFieldExtensions for dml::Field {
 
     fn default_value(&self) -> Option<PrismaValue> {
         self.default_value.as_ref().and_then(|v| match v {
-            datamodel::common::PrismaValue::Boolean(x) => Some(PrismaValue::Boolean(*x)),
-            datamodel::common::PrismaValue::Int(x) => Some(PrismaValue::Int(i64::from(*x))),
-            datamodel::common::PrismaValue::Float(x) => Some(PrismaValue::Float(f64::from(*x))),
-            datamodel::common::PrismaValue::String(x) => Some(PrismaValue::String(x.clone())),
-            datamodel::common::PrismaValue::DateTime(x) => Some(PrismaValue::DateTime(*x)),
-            datamodel::common::PrismaValue::Decimal(x) => Some(PrismaValue::Float(f64::from(*x))), // TODO: not sure if this mapping is correct
-            datamodel::common::PrismaValue::ConstantLiteral(x) => {
+            datamodel::common::ScalarValue::Boolean(x) => Some(PrismaValue::Boolean(*x)),
+            datamodel::common::ScalarValue::Int(x) => Some(PrismaValue::Int(i64::from(*x))),
+            datamodel::common::ScalarValue::Float(x) => Some(PrismaValue::Float(f64::from(*x))),
+            datamodel::common::ScalarValue::String(x) => Some(PrismaValue::String(x.clone())),
+            datamodel::common::ScalarValue::DateTime(x) => Some(PrismaValue::DateTime(*x)),
+            datamodel::common::ScalarValue::Decimal(x) => Some(PrismaValue::Float(f64::from(*x))), // TODO: not sure if this mapping is correct
+            datamodel::common::ScalarValue::ConstantLiteral(x) => {
                 Some(PrismaValue::Enum(EnumValue::string(x.clone(), x.clone())))
             }
-            datamodel::common::PrismaValue::Expression(_, _, _) => None, // expressions are handled in the behaviour function right now
+            datamodel::common::ScalarValue::Expression(_, _, _) => None, // expressions are handled in the behaviour function right now
         })
     }
 }

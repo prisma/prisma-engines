@@ -1,6 +1,6 @@
 use crate::SqlIntrospectionResult;
 use datamodel::{
-    common::{names::NameNormalizer, PrismaType, PrismaValue},
+    common::{names::NameNormalizer, ScalarType, ScalarValue},
     dml, Datamodel, Field, FieldArity, FieldType, IdInfo, IdStrategy, IndexDefinition, Model, OnDeleteStrategy,
     RelationInfo, ScalarListStrategy, WithDatabaseName,
 };
@@ -385,15 +385,15 @@ fn parse_float(value: &str) -> Option<f32> {
     }
 }
 
-fn calculate_default(default: &str, tpe: &ColumnTypeFamily) -> Option<PrismaValue> {
+fn calculate_default(default: &str, tpe: &ColumnTypeFamily) -> Option<ScalarValue> {
     match tpe {
         ColumnTypeFamily::Boolean => match parse_int(default) {
-            Some(x) => Some(PrismaValue::Boolean(x != 0)),
-            None => parse_bool(default).map(|b| PrismaValue::Boolean(b)),
+            Some(x) => Some(ScalarValue::Boolean(x != 0)),
+            None => parse_bool(default).map(|b| ScalarValue::Boolean(b)),
         },
-        ColumnTypeFamily::Int => parse_int(default).map(|x| PrismaValue::Int(x)),
-        ColumnTypeFamily::Float => parse_float(default).map(|x| PrismaValue::Float(x)),
-        ColumnTypeFamily::String => Some(PrismaValue::String(default.to_string())),
+        ColumnTypeFamily::Int => parse_int(default).map(|x| ScalarValue::Int(x)),
+        ColumnTypeFamily::Float => parse_float(default).map(|x| ScalarValue::Float(x)),
+        ColumnTypeFamily::String => Some(ScalarValue::String(default.to_string())),
         _ => None,
     }
 }
@@ -478,14 +478,14 @@ fn calculate_field_type(schema: &SqlSchema, column: &Column, table: &Table) -> F
         None => {
             debug!("Found no corresponding foreign key");
             match column.tpe.family {
-                ColumnTypeFamily::Boolean => FieldType::Base(PrismaType::Boolean),
-                ColumnTypeFamily::DateTime => FieldType::Base(PrismaType::DateTime),
-                ColumnTypeFamily::Float => FieldType::Base(PrismaType::Float),
-                ColumnTypeFamily::Int => FieldType::Base(PrismaType::Int),
-                ColumnTypeFamily::String => FieldType::Base(PrismaType::String),
+                ColumnTypeFamily::Boolean => FieldType::Base(ScalarType::Boolean),
+                ColumnTypeFamily::DateTime => FieldType::Base(ScalarType::DateTime),
+                ColumnTypeFamily::Float => FieldType::Base(ScalarType::Float),
+                ColumnTypeFamily::Int => FieldType::Base(ScalarType::Int),
+                ColumnTypeFamily::String => FieldType::Base(ScalarType::String),
                 // XXX: We made a conscious decision to punt on mapping of ColumnTypeFamily
                 // variants that don't yet have corresponding PrismaType variants
-                _ => FieldType::Base(PrismaType::String),
+                _ => FieldType::Base(ScalarType::String),
             }
         }
     }
