@@ -193,11 +193,21 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
                     {
                         let other_model = data_model.find_model(&relation_info.to).unwrap();
 
+                        let table = schema.table_bang(model.name.as_str());
+                        let fk = table.foreign_key_for_column(relation_field.name.as_str());
+                        let on_delete = match fk {
+                            None => OnDeleteStrategy::None,
+                            Some(fk) => match fk.on_delete_action {
+                                ForeignKeyAction::Cascade => OnDeleteStrategy::Cascade,
+                                _ => OnDeleteStrategy::None,
+                            },
+                        };
+
                         let field_type = FieldType::Relation(RelationInfo {
                             name: relation_info.name.clone(),
                             to: model.name.clone(),
                             to_fields: vec![relation_field.name.clone()],
-                            on_delete: OnDeleteStrategy::None,
+                            on_delete,
                         });
 
                         let arity = match relation_field.arity {
@@ -462,10 +472,7 @@ fn calculate_field_type(schema: &SqlSchema, column: &Column, table: &Table) -> F
                 name: calculate_relation_name(schema, fk, table),
                 to: fk.referenced_table.clone(),
                 to_fields: vec![referenced_col.clone()],
-                on_delete: match fk.on_delete_action {
-                    ForeignKeyAction::Cascade => OnDeleteStrategy::Cascade,
-                    _ => OnDeleteStrategy::None,
-                },
+                on_delete: OnDeleteStrategy::None,
             })
         }
         None => {
