@@ -76,9 +76,3 @@ impl From<String> for SqlError {
         SqlError::Generic(error)
     }
 }
-
-impl From<url::ParseError> for SqlError {
-    fn from(_: url::ParseError) -> Self {
-        SqlError::ConnectionError("Couldn't parse the connection string.")
-    }
-}
