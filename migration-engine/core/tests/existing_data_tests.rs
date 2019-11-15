@@ -6,7 +6,7 @@ use quaint::ast::*;
 use test_harness::*;
 
 #[test_each_connector]
-fn adding_a_required_field_if_there_is_data(api: &TestApi) {
+async fn adding_a_required_field_if_there_is_data(api: &TestApi) {
     let dm = r#"
             model Test {
                 id String @id @default(cuid())
@@ -17,7 +17,7 @@ fn adding_a_required_field_if_there_is_data(api: &TestApi) {
                 A
             }
         "#;
-    api.infer_and_apply(&dm).sql_schema;
+    api.infer_and_apply(&dm).await.sql_schema;
 
     let insert = Insert::single_into((SCHEMA_NAME, "Test")).value("id", "test");
     api.database().execute(insert.into()).unwrap();
@@ -38,11 +38,11 @@ fn adding_a_required_field_if_there_is_data(api: &TestApi) {
                 A
             }
         "#;
-    api.infer_and_apply(&dm);
+    api.infer_and_apply(&dm).await;
 }
 
 #[test_each_connector]
-fn adding_a_required_field_must_use_the_default_value_for_migrations(api: &TestApi) {
+async fn adding_a_required_field_must_use_the_default_value_for_migrations(api: &TestApi) {
     let dm = r#"
             model Test {
                 id String @id @default(cuid())
@@ -53,7 +53,7 @@ fn adding_a_required_field_must_use_the_default_value_for_migrations(api: &TestA
                 A
             }
         "#;
-    api.infer_and_apply(&dm);
+    api.infer_and_apply(&dm).await;
 
     let conn = api.database();
     let insert = Insert::single_into((SCHEMA_NAME, "Test")).value("id", "test");
@@ -79,7 +79,7 @@ fn adding_a_required_field_must_use_the_default_value_for_migrations(api: &TestA
                 C
             }
         "#;
-    api.infer_and_apply(&dm);
+    api.infer_and_apply(&dm).await;
 
     // TODO: those assertions somehow fail with column not found on SQLite. I could observe the correct data in the db file though.
     if !api.is_sqlite() {
@@ -94,13 +94,13 @@ fn adding_a_required_field_must_use_the_default_value_for_migrations(api: &TestA
 }
 
 #[test_each_connector]
-fn dropping_a_table_with_rows_should_warn(api: &TestApi) {
+async fn dropping_a_table_with_rows_should_warn(api: &TestApi) {
     let dm = r#"
         model Test {
             id String @id @default(cuid())
         }
     "#;
-    let original_database_schema = api.infer_and_apply(&dm).sql_schema;
+    let original_database_schema = api.infer_and_apply(&dm).await.sql_schema;
 
     let conn = api.database();
     let insert = Insert::single_into((SCHEMA_NAME, "Test")).value("id", "test");
@@ -112,7 +112,7 @@ fn dropping_a_table_with_rows_should_warn(api: &TestApi) {
     let InferAndApplyOutput {
         migration_output,
         sql_schema: final_database_schema,
-    } = api.infer_and_apply(&dm);
+    } = api.infer_and_apply(&dm).await;
 
     // The schema should not change because the migration should not run if there are warnings
     // and the force flag isn't passed.
@@ -127,7 +127,7 @@ fn dropping_a_table_with_rows_should_warn(api: &TestApi) {
 }
 
 #[test_each_connector]
-fn dropping_a_column_with_non_null_values_should_warn(api: &TestApi) {
+async fn dropping_a_column_with_non_null_values_should_warn(api: &TestApi) {
     let dm = r#"
             model Test {
                 id String @id @default(cuid())
@@ -135,7 +135,7 @@ fn dropping_a_column_with_non_null_values_should_warn(api: &TestApi) {
             }
         "#;
 
-    let original_database_schema = api.infer_and_apply(&dm).sql_schema;
+    let original_database_schema = api.infer_and_apply(&dm).await.sql_schema;
 
     let insert = Insert::multi_into((SCHEMA_NAME, "Test"), vec!["id", "puppiesCount"])
         .values(("a", 7))
@@ -153,7 +153,7 @@ fn dropping_a_column_with_non_null_values_should_warn(api: &TestApi) {
     let InferAndApplyOutput {
         migration_output,
         sql_schema: final_database_schema,
-    } = api.infer_and_apply(&dm);
+    } = api.infer_and_apply(&dm).await;
 
     // The schema should not change because the migration should not run if there are warnings
     // and the force flag isn't passed.
@@ -168,7 +168,7 @@ fn dropping_a_column_with_non_null_values_should_warn(api: &TestApi) {
 }
 
 #[test_each_connector]
-fn altering_a_column_without_non_null_values_should_not_warn(api: &TestApi) {
+async fn altering_a_column_without_non_null_values_should_not_warn(api: &TestApi) {
     let dm = r#"
         model Test {
             id String @id @default(cuid())
@@ -176,7 +176,7 @@ fn altering_a_column_without_non_null_values_should_not_warn(api: &TestApi) {
         }
     "#;
 
-    let original_database_schema = api.infer_and_apply(&dm).sql_schema;
+    let original_database_schema = api.infer_and_apply(&dm).await.sql_schema;
 
     let insert = Insert::multi_into((SCHEMA_NAME, "Test"), vec!["id"])
         .values(vec!["a"])
@@ -191,7 +191,7 @@ fn altering_a_column_without_non_null_values_should_not_warn(api: &TestApi) {
         }
     "#;
 
-    let result = api.infer_and_apply(&dm2);
+    let result = api.infer_and_apply(&dm2).await;
     let final_database_schema = &result.sql_schema;
 
     assert_ne!(&original_database_schema, final_database_schema);
@@ -199,7 +199,7 @@ fn altering_a_column_without_non_null_values_should_not_warn(api: &TestApi) {
 }
 
 #[test_each_connector]
-fn altering_a_column_with_non_null_values_should_warn(api: &TestApi) {
+async fn altering_a_column_with_non_null_values_should_warn(api: &TestApi) {
     let dm = r#"
         model Test {
             id String @id @default(cuid())
@@ -207,7 +207,7 @@ fn altering_a_column_with_non_null_values_should_warn(api: &TestApi) {
         }
     "#;
 
-    let original_database_schema = api.infer_and_apply(&dm).sql_schema;
+    let original_database_schema = api.infer_and_apply(&dm).await.sql_schema;
 
     let insert = Insert::multi_into((SCHEMA_NAME, "Test"), vec!["id", "age"])
         .values(("a", 12))
@@ -222,7 +222,7 @@ fn altering_a_column_with_non_null_values_should_warn(api: &TestApi) {
         }
     "#;
 
-    let result = api.infer_and_apply(&dm2);
+    let result = api.infer_and_apply(&dm2).await;
     let final_database_schema = result.sql_schema;
 
     // The schema should not change because the migration should not run if there are warnings
