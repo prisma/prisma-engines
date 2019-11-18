@@ -1,4 +1,3 @@
-use crate::SqlConnection;
 use datamodel::{
     configuration::{MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME},
     Source,
@@ -21,9 +20,7 @@ impl GenericSqlConnection {
             c => panic!("Unsuppored connectory type for SQL connection: {}", c),
         };
 
-        Ok(Self {
-            pool,
-        })
+        Ok(Self { pool })
     }
 
     /// Create a pooled database connection. The `db_name` param is only used on SQLite if you want
@@ -34,9 +31,7 @@ impl GenericSqlConnection {
         // Non-URL database strings are interpreted as SQLite file paths.
         if url_parse_result.is_err() {
             let pool = Quaint::new(&Self::url_with_db(&format!("file://{}", url_str), db_name)?)?;
-            return Ok(Self {
-                pool,
-            });
+            return Ok(Self { pool });
         }
 
         let url = url_parse_result?;
@@ -48,9 +43,7 @@ impl GenericSqlConnection {
             None => panic!("Unsupported database URL scheme: {}", url.scheme()),
         };
 
-        Ok(Self {
-            pool,
-        })
+        Ok(Self { pool })
     }
 
     pub fn connection_info(&self) -> &ConnectionInfo {
@@ -64,21 +57,32 @@ impl GenericSqlConnection {
     }
 }
 
-#[async_trait::async_trait]
-impl SqlConnection for GenericSqlConnection {
-    async fn execute<'a>(&self, q: Query<'a>) -> Result<Option<Id>, QuaintError> {
-        self.pool.execute(q).await
+impl Queryable for GenericSqlConnection {
+    fn execute<'a>(&'a self, q: Query<'a>) -> DBIO<'a, Option<Id>> {
+        self.pool.execute(q)
     }
 
-    async fn query<'a>(&self, q: Query<'a>) -> Result<ResultSet, QuaintError> {
-        self.pool.query(q).await
+    fn query<'a>(&'a self, q: Query<'a>) -> DBIO<'a, ResultSet> {
+        self.pool.query(q)
     }
 
-    async fn query_raw<'a>(&self, sql: &str, params: &[ParameterizedValue<'a>]) -> Result<ResultSet, QuaintError> {
-        self.pool.query_raw(sql, params).await
+    fn query_raw<'a>(&'a self, sql: &'a str, params: &'a [ParameterizedValue<'a>]) -> DBIO<'a, ResultSet> {
+        self.pool.query_raw(sql, params)
     }
 
-    async fn execute_raw<'a>(&self, sql: &str, params: &[ParameterizedValue<'a>]) -> Result<u64, QuaintError> {
-        self.pool.execute_raw(sql, params).await
+    fn execute_raw<'a>(&'a self, sql: &'a str, params: &'a [ParameterizedValue<'a>]) -> DBIO<'a, u64> {
+        self.pool.execute_raw(sql, params)
+    }
+
+    fn turn_off_fk_constraints<'a>(&'a self) -> DBIO<'a, ()> {
+        self.pool.turn_off_fk_constraints()
+    }
+
+    fn turn_on_fk_constraints<'a>(&'a self) -> DBIO<'a, ()> {
+        self.pool.turn_on_fk_constraints()
+    }
+
+    fn raw_cmd<'a>(&'a self, cmd: &'a str) -> DBIO<'a, ()> {
+        self.pool.raw_cmd(cmd)
     }
 }

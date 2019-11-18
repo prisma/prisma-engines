@@ -1,4 +1,4 @@
-use crate::test_harness::{GenericSqlConnection, SqlConnection};
+use crate::test_harness::{GenericSqlConnection, Queryable};
 use barrel::Migration;
 use once_cell::sync::Lazy;
 use pretty_assertions::assert_eq;
@@ -16,7 +16,7 @@ pub(crate) fn custom_assert(left: &str, right: &str) {
     assert_eq!(left, reformatted_expected);
 }
 
-async fn run_full_sql(database: &Arc<dyn SqlConnection + Send + Sync>, full_sql: &str) {
+async fn run_full_sql(database: &Arc<dyn Queryable + Send + Sync>, full_sql: &str) {
     for sql in full_sql.split(";") {
         if sql != "" {
             database.query_raw(&sql, &[]).await.unwrap();
@@ -27,7 +27,7 @@ async fn run_full_sql(database: &Arc<dyn SqlConnection + Send + Sync>, full_sql:
 // barrel
 
 pub struct BarrelMigrationExecutor {
-    pub(super) database: Arc<dyn SqlConnection + Send + Sync>,
+    pub(super) database: Arc<dyn Queryable + Send + Sync>,
     pub(super) sql_variant: barrel::backend::SqlVariant,
 }
 
@@ -45,10 +45,10 @@ impl BarrelMigrationExecutor {
 
 // get dbs
 
-pub async fn database(database_url: &str) -> Box<dyn SqlConnection + Send + Sync + 'static> {
+pub async fn database(database_url: &str) -> Box<dyn Queryable + Send + Sync + 'static> {
     let url: Url = database_url.parse().unwrap();
 
-    let boxed: Box<dyn SqlConnection + Send + Sync + 'static> = match url.scheme() {
+    let boxed: Box<dyn Queryable + Send + Sync + 'static> = match url.scheme() {
         "postgresql" | "postgres" => {
             let url = Url::parse(database_url).unwrap();
             let create_cmd = |name| format!("CREATE DATABASE \"{}\"", name);
@@ -80,7 +80,7 @@ pub async fn database(database_url: &str) -> Box<dyn SqlConnection + Send + Sync
 
 async fn with_database<F, T, S>(url: Url, default_name: &str, root_path: &str, create_stmt: S, f: Rc<F>) -> T
 where
-    T: SqlConnection,
+    T: Queryable,
     F: Fn(Url) -> Result<T, quaint::error::Error>,
     S: FnOnce(String) -> String,
 {
@@ -95,7 +95,7 @@ where
 
 async fn create_database<F, T, S>(url: Url, default_name: &str, root_path: &str, create_stmt: S, f: Rc<F>)
 where
-    T: SqlConnection,
+    T: Queryable,
     F: Fn(Url) -> Result<T, quaint::error::Error>,
     S: FnOnce(String) -> String,
 {

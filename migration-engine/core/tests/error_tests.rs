@@ -8,7 +8,7 @@ use migration_core::{
 };
 use pretty_assertions::assert_eq;
 use serde_json::json;
-use sql_connection::SqlConnection;
+use quaint::prelude::Queryable;
 use test_harness::*;
 use url::Url;
 

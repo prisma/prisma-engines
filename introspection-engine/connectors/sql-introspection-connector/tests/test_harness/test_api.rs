@@ -1,13 +1,13 @@
 use super::misc_helpers::*;
 use introspection_connector::{DatabaseMetadata, IntrospectionConnector};
 use quaint::prelude::SqlFamily;
-use sql_connection::SqlConnection;
+use sql_connection::Queryable;
 use sql_introspection_connector::SqlIntrospectionConnector;
 use std::sync::Arc;
 
 pub struct TestApi {
     sql_family: SqlFamily,
-    database: Arc<dyn SqlConnection + Send + Sync + 'static>,
+    database: Arc<dyn Queryable + Send + Sync + 'static>,
     introspection_connector: SqlIntrospectionConnector,
 }
 

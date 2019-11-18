@@ -2,13 +2,13 @@
 use super::*;
 use log::debug;
 use regex::Regex;
-use sql_connection::SqlConnection;
+use quaint::prelude::Queryable;
 use std::collections::{HashMap, HashSet};
 use std::convert::TryInto;
 use std::sync::Arc;
 
 pub struct SqlSchemaDescriber {
-    conn: Arc<dyn SqlConnection + Send + Sync + 'static>,
+    conn: Arc<dyn Queryable + Send + Sync + 'static>,
 }
 
 #[async_trait::async_trait]
@@ -49,7 +49,7 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
 
 impl SqlSchemaDescriber {
     /// Constructor.
-    pub fn new(conn: Arc<dyn SqlConnection + Send + Sync + 'static>) -> SqlSchemaDescriber {
+    pub fn new(conn: Arc<dyn Queryable + Send + Sync + 'static>) -> SqlSchemaDescriber {
         SqlSchemaDescriber { conn }
     }
 

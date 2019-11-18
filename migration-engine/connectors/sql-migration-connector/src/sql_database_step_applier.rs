@@ -1,5 +1,5 @@
 use crate::*;
-use sql_connection::SqlConnection;
+use quaint::prelude::Queryable;
 use sql_renderer::SqlRenderer;
 use sql_schema_describer::*;
 use std::sync::Arc;
@@ -7,7 +7,7 @@ use std::sync::Arc;
 pub struct SqlDatabaseStepApplier {
     pub connection_info: ConnectionInfo,
     pub schema_name: String,
-    pub conn: Arc<dyn SqlConnection + Send + Sync + 'static>,
+    pub conn: Arc<dyn Queryable + Send + Sync + 'static>,
 }
 
 #[async_trait::async_trait]

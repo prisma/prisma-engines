@@ -1,16 +1,13 @@
-use super::ConnectionInfo;
-use super::SqlFamily;
 use barrel::types;
 use chrono::*;
 use migration_connector::*;
 use quaint::ast::*;
-use quaint::connector::ResultSet;
-use sql_connection::SqlConnection;
+use quaint::{prelude::{ConnectionInfo, SqlFamily}, connector::{Queryable, ResultSet}};
 use std::sync::Arc;
 
 pub struct SqlMigrationPersistence {
     pub connection_info: ConnectionInfo,
-    pub connection: Arc<dyn SqlConnection + Send + Sync + 'static>,
+    pub connection: Arc<dyn Queryable + Send + Sync + 'static>,
     pub schema_name: String,
 }
 

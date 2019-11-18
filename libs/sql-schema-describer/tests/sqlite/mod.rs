@@ -1,5 +1,5 @@
 use log::debug;
-use sql_connection::{GenericSqlConnection, SqlConnection};
+use sql_connection::{GenericSqlConnection, Queryable};
 use sql_schema_describer::*;
 use std::path::Path;
 use std::sync::Arc;

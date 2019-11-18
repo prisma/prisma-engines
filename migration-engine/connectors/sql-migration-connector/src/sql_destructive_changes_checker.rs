@@ -3,14 +3,13 @@ use crate::{
     SqlResult, TableChange,
 };
 use migration_connector::*;
-use quaint::ast::*;
-use sql_connection::SqlConnection;
+use quaint::{prelude::Queryable, ast::*};
 use std::sync::Arc;
 
 pub struct SqlDestructiveChangesChecker {
     pub connection_info: ConnectionInfo,
     pub schema_name: String,
-    pub database: Arc<dyn SqlConnection + Send + Sync>,
+    pub database: Arc<dyn Queryable + Send + Sync>,
 }
 
 impl SqlDestructiveChangesChecker {

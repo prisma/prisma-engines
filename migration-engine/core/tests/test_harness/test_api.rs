@@ -11,8 +11,7 @@ use migration_core::{
     api::{GenericApi, MigrationApi},
     commands::{ApplyMigrationInput, InferMigrationStepsInput, UnapplyMigrationInput, UnapplyMigrationOutput},
 };
-use quaint::prelude::{ConnectionInfo, SqlFamily};
-use sql_connection::SqlConnection;
+use quaint::prelude::{ConnectionInfo, SqlFamily, Queryable};
 use sql_schema_describer::*;
 use std::sync::Arc;
 
@@ -20,13 +19,13 @@ use std::sync::Arc;
 /// connectors.
 pub struct TestApi {
     sql_family: SqlFamily,
-    database: Arc<dyn SqlConnection + Send + Sync + 'static>,
+    database: Arc<dyn Queryable + Send + Sync + 'static>,
     api: MigrationApi<sql_migration_connector::SqlMigrationConnector, sql_migration_connector::SqlMigration>,
     connection_info: Option<ConnectionInfo>,
 }
 
 impl TestApi {
-    pub fn database(&self) -> &Arc<dyn SqlConnection + Send + Sync + 'static> {
+    pub fn database(&self) -> &Arc<dyn Queryable + Send + Sync + 'static> {
         &self.database
     }
 
@@ -201,7 +200,7 @@ pub async fn sqlite_test_api() -> TestApi {
 
 pub struct BarrelMigrationExecutor {
     inspector: Box<dyn SqlSchemaDescriberBackend>,
-    database: Arc<dyn SqlConnection + Send + Sync>,
+    database: Arc<dyn Queryable + Send + Sync>,
     sql_variant: barrel::backend::SqlVariant,
 }
 
@@ -228,7 +227,7 @@ impl BarrelMigrationExecutor {
     }
 }
 
-async fn run_full_sql(database: &Arc<dyn SqlConnection + Send + Sync>, full_sql: &str) {
+async fn run_full_sql(database: &Arc<dyn Queryable + Send + Sync>, full_sql: &str) {
     for sql in full_sql.split(";").filter(|sql| !sql.is_empty()) {
         database.query_raw(&sql, &[]).await.unwrap();
     }

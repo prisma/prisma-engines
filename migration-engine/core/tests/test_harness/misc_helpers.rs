@@ -3,7 +3,7 @@ use migration_connector::*;
 use migration_core::{api::MigrationApi, commands::ResetCommand};
 use once_cell::sync::Lazy;
 use quaint::pool::SqlFamily;
-use sql_connection::{GenericSqlConnection, SqlConnection};
+use sql_connection::{GenericSqlConnection, Queryable};
 use sql_migration_connector::SqlMigrationConnector;
 use std::{rc::Rc, sync::Arc};
 use url::Url;
@@ -86,7 +86,7 @@ fn fetch_db_name(url: &Url, default: &str) -> String {
 
 async fn create_database<F, T, S>(url: Url, default_name: &str, root_path: &str, create_stmt: S, f: Rc<F>)
 where
-    T: SqlConnection,
+    T: Queryable,
     F: Fn(Url) -> Result<T, quaint::error::Error>,
     S: FnOnce(String) -> String,
 {
@@ -102,7 +102,7 @@ where
 
 async fn with_database<F, T, S>(url: Url, default_name: &str, root_path: &str, create_stmt: S, f: Rc<F>) -> T
 where
-    T: SqlConnection,
+    T: Queryable,
     F: Fn(Url) -> Result<T, quaint::error::Error>,
     S: FnOnce(String) -> String,
 {
@@ -115,7 +115,7 @@ where
     }
 }
 
-pub async fn database(sql_family: SqlFamily, database_url: &str) -> Arc<dyn SqlConnection + Send + Sync + 'static> {
+pub async fn database(sql_family: SqlFamily, database_url: &str) -> Arc<dyn Queryable + Send + Sync + 'static> {
     match sql_family {
         SqlFamily::Postgres => {
             let url = Url::parse(database_url).unwrap();
@@ -129,7 +129,7 @@ pub async fn database(sql_family: SqlFamily, database_url: &str) -> Arc<dyn SqlC
         }
         SqlFamily::Sqlite => {
             let conn = GenericSqlConnection::from_database_str(database_url, Some(SCHEMA_NAME)).unwrap();
-            let arc = Arc::new(conn) as Arc<dyn SqlConnection + Send + Sync + 'static>;
+            let arc = Arc::new(conn) as Arc<dyn Queryable + Send + Sync + 'static>;
             arc
         }
         SqlFamily::Mysql => {

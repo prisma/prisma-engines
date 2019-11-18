@@ -16,7 +16,7 @@ pub use sql_migration::*;
 
 use migration_connector::*;
 use quaint::prelude::{ConnectionInfo, SqlFamily};
-use sql_connection::{GenericSqlConnection, SqlConnection};
+use sql_connection::{GenericSqlConnection, Queryable};
 use sql_database_migration_inferrer::*;
 use sql_database_step_applier::*;
 use sql_destructive_changes_checker::*;
@@ -29,7 +29,7 @@ pub type Result<T> = std::result::Result<T, SqlError>;
 pub struct SqlMigrationConnector {
     pub connection_info: ConnectionInfo,
     pub schema_name: String,
-    pub database: Arc<dyn SqlConnection + Send + Sync + 'static>,
+    pub database: Arc<dyn Queryable + Send + Sync + 'static>,
     pub migration_persistence: Arc<dyn MigrationPersistence>,
     pub database_migration_inferrer: Arc<dyn DatabaseMigrationInferrer<SqlMigration>>,
     pub database_migration_step_applier: Arc<dyn DatabaseMigrationStepApplier<SqlMigration>>,
@@ -76,7 +76,7 @@ impl SqlMigrationConnector {
         let sql_family = connection.connection_info().sql_family();
         let connection_info = connection.connection_info().clone();
 
-        let conn = Arc::new(connection) as Arc<dyn SqlConnection + Send + Sync>;
+        let conn = Arc::new(connection) as Arc<dyn Queryable + Send + Sync>;
 
         let inspector: Arc<dyn SqlSchemaDescriberBackend + Send + Sync + 'static> = match sql_family {
             SqlFamily::Mysql => Arc::new(sql_schema_describer::mysql::SqlSchemaDescriber::new(Arc::clone(&conn))),

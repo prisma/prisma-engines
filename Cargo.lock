@@ -2061,7 +2061,7 @@ dependencies = [
 [[package]]
 name = "quaint"
 version = "0.1.0"
-source = "git+https://github.com/prisma/quaint.git#3decd87951ad6e39061b84c7896d6e41d61e40a2"
+source = "git+https://github.com/prisma/quaint.git#3de870b9d81f891e1f209420a25750be8daca3e1"
 dependencies = [
  "async-std 0.99.12 (registry+https://github.com/rust-lang/crates.io-index)",
  "bytes 0.4.12 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -2579,7 +2579,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 name = "sql-connection"
 version = "0.1.0"
 dependencies = [
- "async-trait 0.1.17 (registry+https://github.com/rust-lang/crates.io-index)",
  "datamodel 0.1.0",
  "quaint 0.1.0 (git+https://github.com/prisma/quaint.git)",
  "url 1.7.2 (registry+https://github.com/rust-lang/crates.io-index)",
