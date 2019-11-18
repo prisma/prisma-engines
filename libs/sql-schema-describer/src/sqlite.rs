@@ -2,8 +2,7 @@
 use super::*;
 use failure::_core::convert::TryInto;
 use log::debug;
-use quaint::ast::ParameterizedValue;
-use sql_connection::Queryable;
+use quaint::{prelude::Queryable, ast::ParameterizedValue};
 use std::collections::HashMap;
 use std::sync::Arc;
 

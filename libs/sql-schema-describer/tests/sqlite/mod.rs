@@ -1,5 +1,5 @@
 use log::debug;
-use sql_connection::{GenericSqlConnection, Queryable};
+use quaint::prelude::*;
 use sql_schema_describer::*;
 use std::path::Path;
 use std::sync::Arc;
@@ -17,7 +17,7 @@ pub async fn get_sqlite_describer(sql: &str) -> sqlite::SqlSchemaDescriber {
     }
 
     let conn =
-        GenericSqlConnection::from_database_str(&format!("file://{}", database_file_path), Some(SCHEMA)).unwrap();
+        Quaint::new(&format!("file://{}?db_name={}", database_file_path, SCHEMA)).unwrap();
     for statement in sql.split(";").filter(|statement| !statement.is_empty()) {
         conn.execute_raw(statement, &[]).await.expect("executing migration");
     }

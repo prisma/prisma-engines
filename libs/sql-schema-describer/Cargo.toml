@@ -14,7 +14,6 @@ itertools = "0.8"
 url = "1.7.2"
 log = "0.4"
 regex = "1.2"
-sql-connection = { path = "../sql-connection" }
 async-trait = "0.1.17"
 futures = { package = "futures", version = "0.3", features = ["compat"] }
 

@@ -1,6 +1,6 @@
 use super::*;
 use log::debug;
-use sql_connection::Queryable;
+use quaint::prelude::Queryable;
 use std::collections::{BTreeMap, HashMap};
 use std::sync::Arc;
 
