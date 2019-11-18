@@ -20,13 +20,6 @@ pub struct LiftAstToDml {
 const USE_CONNECTORS_FOR_CUSTOM_TYPES: bool = false; // FEATURE FLAG
 
 impl LiftAstToDml {
-    /// Creates a new instance, with all builtin directives registered.
-    pub fn new() -> Self {
-        Self {
-            directives: DirectiveBox::new(),
-        }
-    }
-
     /// Creates a new instance, with all builtin directives and
     /// the directives defined by the given sources registered.
     ///

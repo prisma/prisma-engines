@@ -3,7 +3,6 @@ use crate::{
     error::{DatamodelError, ErrorCollection},
     FieldArity,
 };
-use serde_json::error::Category::Data;
 
 /// Helper for validating a datamodel.
 ///

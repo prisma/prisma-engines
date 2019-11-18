@@ -1,6 +1,6 @@
 use crate::error::DatamodelError;
 use crate::StringFromEnvVar;
-use datamodel_connector::{Connector, DeclarativeConnector};
+use datamodel_connector::Connector;
 
 // TODO: Probably rename everything. Terminology here is messy.
 
@@ -22,13 +22,7 @@ pub trait Source {
     /// Documentation of this source.
     fn documentation(&self) -> &Option<String>;
 
-    fn connector(&self) -> Box<dyn Connector> {
-        Box::new(DeclarativeConnector {
-            type_aliases: vec![],
-            field_type_constructors: vec![],
-            supports_scalar_lists: false,
-        })
-    }
+    fn connector(&self) -> Box<dyn Connector>;
 }
 
 /// Trait for source definitions.

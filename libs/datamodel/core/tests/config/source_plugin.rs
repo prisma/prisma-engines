@@ -1,5 +1,6 @@
 use crate::common::*;
 use datamodel::{ast::Span, common::ScalarType, configuration::*, error::DatamodelError};
+use datamodel_connector::{Connector, ExampleConnector};
 use pretty_assertions::assert_eq;
 
 //##########################
@@ -93,6 +94,10 @@ impl Source for CustomDb {
 
     fn documentation(&self) -> &Option<String> {
         &self.documentation
+    }
+
+    fn connector(&self) -> Box<dyn Connector> {
+        Box::new(ExampleConnector::empty())
     }
 }
 
