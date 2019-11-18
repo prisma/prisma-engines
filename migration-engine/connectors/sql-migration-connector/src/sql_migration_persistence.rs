@@ -36,7 +36,7 @@ impl MigrationPersistence for SqlMigrationPersistence {
             }
         };
 
-        let _ = self.connection.query_raw(&sql_str, &[]);
+        self.connection.query_raw(&sql_str, &[]).await.ok();
     }
 
     async fn reset(&self) {

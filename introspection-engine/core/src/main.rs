@@ -13,7 +13,7 @@ extern crate serde_derive;
 
 fn main() {
     let mut io_handler = IoHandler::new();
-    io_handler.extend_with(RpcImpl {}.to_delegate());
+    io_handler.extend_with(RpcImpl::new().to_delegate());
 
     let server = ServerBuilder::new(io_handler);
     server.build();

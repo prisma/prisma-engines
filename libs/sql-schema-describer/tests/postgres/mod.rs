@@ -1,11 +1,11 @@
 use log::debug;
-use sql_connection::{SyncSqlConnection, GenericSqlConnection};
+use sql_connection::{GenericSqlConnection, SqlConnection};
 use sql_schema_describer::*;
 use std::sync::Arc;
 
 use super::SCHEMA;
 
-pub fn get_postgres_describer(sql: &str) -> postgres::SqlSchemaDescriber {
+pub async fn get_postgres_describer(sql: &str) -> postgres::SqlSchemaDescriber {
     let host = match std::env::var("IS_BUILDKITE") {
         Ok(_) => "test-db-postgres",
         Err(_) => "127.0.0.1",
@@ -15,11 +15,15 @@ pub fn get_postgres_describer(sql: &str) -> postgres::SqlSchemaDescriber {
     let client = GenericSqlConnection::from_database_str(&url, None).unwrap();
 
     let drop_schema = format!("DROP SCHEMA IF EXISTS \"{}\" CASCADE;", SCHEMA);
-    client.execute_raw(drop_schema.as_str(), &[]).expect("dropping schema");
+    client
+        .execute_raw(drop_schema.as_str(), &[])
+        .await
+        .expect("dropping schema");
 
     debug!("Creating Postgres schema '{}'", SCHEMA);
     client
         .execute_raw(format!("CREATE SCHEMA \"{}\";", SCHEMA).as_str(), &[])
+        .await
         .expect("creating schema");
 
     let sql_string = sql.to_string();
@@ -28,6 +32,7 @@ pub fn get_postgres_describer(sql: &str) -> postgres::SqlSchemaDescriber {
         debug!("Executing migration statement: '{}'", statement);
         client
             .execute_raw(statement, &[])
+            .await
             .expect("executing migration statement");
     }
 

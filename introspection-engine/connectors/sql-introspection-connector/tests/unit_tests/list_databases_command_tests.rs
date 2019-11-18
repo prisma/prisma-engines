@@ -4,26 +4,26 @@ use barrel::types;
 pub const SCHEMA_NAME: &str = "introspection-engine";
 
 #[test_one_connector(connector = "mysql")]
-fn databases_for_mysql_should_work(api: &TestApi) {
+async fn databases_for_mysql_should_work(api: &TestApi) {
     let barrel = api.barrel();
     setup(&barrel);
-    let result = dbg!(api.list_databases());
+    let result = dbg!(api.list_databases().await);
     assert!(result.contains(&"introspection-engine".to_string()));
 }
 
 #[test_one_connector(connector = "postgres")]
-fn databases_for_postgres_should_work(api: &TestApi) {
+async fn databases_for_postgres_should_work(api: &TestApi) {
     let barrel = api.barrel();
     setup(&barrel);
-    let result = dbg!(api.list_databases());
+    let result = dbg!(api.list_databases().await);
     assert!(result.contains(&"introspection-engine".to_string()));
 }
 
 #[test_one_connector(connector = "sqlite")]
-fn databases_for_sqlite_should_work(api: &TestApi) {
+async fn databases_for_sqlite_should_work(api: &TestApi) {
     let barrel = api.barrel();
     setup(&barrel);
-    let result = dbg!(api.list_databases());
+    let result = dbg!(api.list_databases().await);
     assert!(result.contains(&"introspection-engine.db".to_string()));
 }
 

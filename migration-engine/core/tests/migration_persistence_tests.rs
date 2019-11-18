@@ -103,7 +103,7 @@ async fn update_must_work(api: &TestApi) {
     params.finished_at = Some(Migration::timestamp_without_nanos());
     params.new_name = "my_new_migration_name".to_string();
 
-    persistence.update(&params);
+    persistence.update(&params).await;
 
     let loaded = persistence.last().await.unwrap();
     assert_eq!(loaded.status, params.status);

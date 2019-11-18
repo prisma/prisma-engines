@@ -306,6 +306,13 @@ mod tests {
         TEST_ASYNC_RUNTIME.block_on(super::run(matches, datasource))
     }
 
+    async fn run(args: &[&str], datasource: &str) -> Result<String, CliError> {
+        let mut complete_args = vec!["me", "cli", "--datasource", datasource];
+        complete_args.extend(args);
+        let matches = super::clap_app().get_matches_from(complete_args);
+        super::run(&matches.subcommand_matches("cli").unwrap(), datasource).await
+    }
+
     fn with_cli<F>(matches: Vec<&str>, f: F) -> Result<(), Box<dyn std::any::Any + Send + 'static>>
     where
         F: FnOnce(&clap::ArgMatches) -> () + std::panic::UnwindSafe,
@@ -422,21 +429,20 @@ mod tests {
         .unwrap();
     }
 
-    #[async_attributes::test]
+    #[tokio::test]
     async fn test_create_mysql_database() {
         let url = mysql_url(Some("this_should_exist"));
 
-        let res = with_cli(vec!["cli", "--create_database"], |matches| {
-            assert_eq!(
-                Ok(String::from("Database 'this_should_exist' created successfully.")),
-                run_sync(&matches, &url)
-            );
-        });
+        let res = run(&["--create_database"], &url).await;
 
-        if let Ok(()) = res {
-            let res = with_cli(vec!["cli", "--can_connect_to_database"], |matches| {
-                assert_eq!(Ok(String::from("Connection successful")), run_sync(&matches, &url));
-            });
+        assert_eq!(
+            Ok(String::from("Database 'this_should_exist' created successfully.")),
+            res
+        );
+
+        if let Ok(_) = res {
+            let res = run(&["--can_connect_to_database"], &url).await;
+            assert_eq!(Ok(String::from("Connection successful")), res);
 
             {
                 let uri = mysql_url(None);
@@ -451,21 +457,20 @@ mod tests {
         }
     }
 
-    #[async_attributes::test]
+    #[tokio::test]
     async fn test_create_psql_database() {
         let url = postgres_url(Some("this_should_exist"));
 
-        let res = with_cli(vec!["cli", "--create_database"], |matches| {
-            assert_eq!(
-                Ok(String::from("Database 'this_should_exist' created successfully.")),
-                run_sync(&matches, &url)
-            );
-        });
+        let res = run(&["--create_database"], &url).await;
 
-        if let Ok(()) = res {
-            let res = with_cli(vec!["cli", "--can_connect_to_database"], |matches| {
-                assert_eq!(Ok(String::from("Connection successful")), run_sync(&matches, &url));
-            });
+        assert_eq!(
+            Ok(String::from("Database 'this_should_exist' created successfully.")),
+            res
+        );
+
+        if let Ok(_) = res {
+            let res = run(&["--can_connect_to_database"], &url).await;
+            assert_eq!(Ok(String::from("Connection successful")), res);
 
             {
                 let uri = postgres_url(None);

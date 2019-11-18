@@ -6,12 +6,13 @@ use serde::*;
 
 pub type ConnectorResult<T> = Result<T, ConnectorError>;
 
+#[async_trait::async_trait]
 pub trait IntrospectionConnector: Send + Sync + 'static {
-    fn list_databases(&self) -> ConnectorResult<Vec<String>>;
+    async fn list_databases(&self) -> ConnectorResult<Vec<String>>;
 
-    fn get_metadata(&self, database: &str) -> ConnectorResult<DatabaseMetadata>;
+    async fn get_metadata(&self, database: &str) -> ConnectorResult<DatabaseMetadata>;
 
-    fn introspect(&self, database: &str) -> ConnectorResult<Datamodel>;
+    async fn introspect(&self, database: &str) -> ConnectorResult<Datamodel>;
 }
 
 #[derive(Serialize, Deserialize, Debug)]

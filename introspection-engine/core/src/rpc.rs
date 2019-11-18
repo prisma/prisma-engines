@@ -3,6 +3,7 @@ use crate::CoreResult;
 use datamodel::Datamodel;
 use introspection_connector::DatabaseMetadata;
 use jsonrpc_core::*;
+use tokio::runtime::Runtime;
 use jsonrpc_derive::rpc;
 
 #[rpc]
@@ -17,39 +18,45 @@ pub trait Rpc {
     fn introspect(&self, url: UrlInput) -> Result<String>;
 }
 
-pub struct RpcImpl {}
+pub struct RpcImpl {
+    runtime: Runtime,
+}
 
 impl Rpc for RpcImpl {
     fn list_databases(&self, url: UrlInput) -> Result<Vec<String>> {
-        Ok(Self::list_databases_internal(url)?)
+        Ok(self.runtime.block_on(Self::list_databases_internal(url))?)
     }
 
     fn get_database_metadata(&self, url: UrlInput) -> Result<DatabaseMetadata> {
-        Ok(Self::get_database_metadata_internal(url)?)
+        Ok(self.runtime.block_on(Self::get_database_metadata_internal(url))?)
     }
 
     fn introspect(&self, url: UrlInput) -> Result<String> {
-        let data_model = Self::introspect_internal(url)?;
+        let data_model = self.runtime.block_on(Self::introspect_internal(url))?;
         Ok(datamodel::render_datamodel_to_string(&data_model).expect("Datamodel rendering failed"))
     }
 }
 
 impl RpcImpl {
-    fn introspect_internal(url: UrlInput) -> CoreResult<Datamodel> {
+    pub(crate) fn new() -> Self {
+        RpcImpl { runtime: Runtime::new().unwrap() }
+    }
+
+    async fn introspect_internal(url: UrlInput) -> CoreResult<Datamodel> {
         let connector = load_connector(&url.url)?;
         // FIXME: parse URL correctly via a to be built lib and pass database param;
-        let data_model = connector.introspect("")?;
+        let data_model = connector.introspect("").await?;
         Ok(data_model)
     }
 
-    fn list_databases_internal(url: UrlInput) -> CoreResult<Vec<String>> {
+    async fn list_databases_internal(url: UrlInput) -> CoreResult<Vec<String>> {
         let connector = load_connector(&url.url)?;
-        Ok(connector.list_databases()?)
+        Ok(connector.list_databases().await?)
     }
 
-    fn get_database_metadata_internal(url: UrlInput) -> CoreResult<DatabaseMetadata> {
+    async fn get_database_metadata_internal(url: UrlInput) -> CoreResult<DatabaseMetadata> {
         let connector = load_connector(&url.url)?;
-        Ok(connector.get_metadata("")?)
+        Ok(connector.get_metadata("").await?)
     }
 }
 

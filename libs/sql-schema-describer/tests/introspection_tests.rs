@@ -1,6 +1,8 @@
 use barrel::{types, Migration};
 use pretty_assertions::assert_eq;
 use sql_schema_describer::{SqlSchemaDescriberBackend, *};
+use futures::FutureExt;
+use std::pin::Pin;
 
 mod common;
 mod mysql;
@@ -47,7 +49,8 @@ fn is_required_must_work() {
             });
         },
         |db_type, inspector| {
-            let result = inspector.describe(SCHEMA).expect("describing");
+            async move {
+            let result = inspector.describe(SCHEMA).await.expect("describing");
             let user_table = result.get_table("User").expect("getting User table");
             let expected_columns = vec![
                 Column {
@@ -72,6 +75,7 @@ fn is_required_must_work() {
                 },
             ];
             assert_eq!(user_table.columns, expected_columns);
+            }.boxed()
         },
     );
 }
@@ -97,7 +101,8 @@ fn foreign_keys_must_work() {
             });
         },
         |db_type, inspector| {
-            let schema = inspector.describe(SCHEMA).expect("describe failed");
+            async move {
+            let schema = inspector.describe(SCHEMA).await.expect("describe failed");
             let user_table = schema.get_table("User").expect("couldn't get User table");
             let expected_columns = vec![Column {
                 name: "city".to_string(),
@@ -134,6 +139,7 @@ fn foreign_keys_must_work() {
                     }],
                 }
             );
+            }.boxed()
         },
     );
 }
@@ -169,7 +175,8 @@ fn multi_column_foreign_keys_must_work() {
             });
         },
         |db_type, inspector| {
-            let schema = inspector.describe(SCHEMA).expect("describe failed");
+            async move {
+            let schema = inspector.describe(SCHEMA).await.expect("describe failed");
             let user_table = schema.get_table("User").expect("couldn't get User table");
             let expected_columns = vec![
                 Column {
@@ -219,6 +226,7 @@ fn multi_column_foreign_keys_must_work() {
                     },],
                 }
             );
+            }.boxed()
         },
     );
 }
@@ -234,7 +242,8 @@ fn names_with_hyphens_must_work() {
             });
         },
         |db_type, inspector| {
-            let result = inspector.describe(SCHEMA).expect("describing");
+            async move {
+            let result = inspector.describe(SCHEMA).await.expect("describing");
             let user_table = result.get_table("User-table").expect("getting User table");
             let expected_columns = vec![Column {
                 name: "column-1".to_string(),
@@ -247,6 +256,7 @@ fn names_with_hyphens_must_work() {
                 auto_increment: false,
             }];
             assert_eq!(user_table.columns, expected_columns);
+            }.boxed()
         },
     );
 }
@@ -278,7 +288,8 @@ fn composite_primary_keys_must_work() {
             migration.inject_custom(&sql);
         },
         |db_type, inspector| {
-            let schema = inspector.describe(SCHEMA).expect("describe failed");
+            async move {
+            let schema = inspector.describe(SCHEMA).await.expect("describe failed");
             let table = schema.get_table("User").expect("couldn't get User table");
             let (exp_int, exp_varchar) = match db_type {
                 DbType::Sqlite => ("INTEGER", "VARCHAR(255)"),
@@ -322,6 +333,7 @@ fn composite_primary_keys_must_work() {
                     foreign_keys: vec![],
                 }
             );
+            }.boxed()
         },
     );
 }
@@ -339,7 +351,8 @@ fn indices_must_work() {
             });
         },
         |db_type, inspector| {
-            let result = inspector.describe(&SCHEMA.to_string()).expect("describing");
+            async move {
+            let result = inspector.describe(&SCHEMA.to_string()).await.expect("describing");
             let user_table = result.get_table("User").expect("getting User table");
             let default = match db_type {
                 DbType::Postgres => Some(format!("nextval(\"{}\".\"User_id_seq\"::regclass)", SCHEMA)),
@@ -392,6 +405,7 @@ fn indices_must_work() {
                     foreign_keys: vec![],
                 }
             );
+            }.boxed()
         },
     );
 }
@@ -414,7 +428,8 @@ fn column_uniqueness_must_be_detected() {
             migration.inject_custom(index_sql);
         },
         |db_type, inspector| {
-            let result = inspector.describe(&SCHEMA.to_string()).expect("describing");
+            async move {
+            let result = inspector.describe(&SCHEMA.to_string()).await.expect("describing");
             let user_table = result.get_table("User").expect("getting User table");
             let expected_columns = vec![
                 Column {
@@ -481,6 +496,7 @@ fn column_uniqueness_must_be_detected() {
                 user_table.is_column_unique(&user_table.columns[1].name),
                 "Column 2 should return true for is_unique"
             );
+            }.boxed()
         },
     );
 }
@@ -496,7 +512,8 @@ fn defaults_must_work() {
             });
         },
         |db_type, inspector| {
-            let result = inspector.describe(&SCHEMA.to_string()).expect("describing");
+            async move {
+            let result = inspector.describe(&SCHEMA.to_string()).await.expect("describing");
             let user_table = result.get_table("User").expect("getting User table");
             let default = match db_type {
                 DbType::Sqlite => "'1'".to_string(),
@@ -522,6 +539,7 @@ fn defaults_must_work() {
                     foreign_keys: vec![],
                 }
             );
+            }.boxed()
         },
     );
 }
@@ -529,17 +547,19 @@ fn defaults_must_work() {
 fn test_each_backend<MigrationFn, TestFn>(mut migration_fn: MigrationFn, test_fn: TestFn)
 where
     MigrationFn: FnMut(DbType, &mut Migration) -> (),
-    TestFn: Fn(DbType, &mut dyn SqlSchemaDescriberBackend) -> (),
+    TestFn: for<'a> Fn(DbType, &'a mut dyn SqlSchemaDescriberBackend) -> Pin<Box<dyn std::future::Future<Output = ()> + 'a>>,
 {
+    let runtime = tokio_runtime();
     // SQLite
     {
         eprintln!("Testing on SQLite");
         let mut migration = Migration::new().schema(SCHEMA);
         migration_fn(DbType::Sqlite, &mut migration);
         let full_sql = migration.make::<barrel::backend::Sqlite>();
-        let mut describer = get_sqlite_describer(&full_sql);
+        let mut describer = runtime.block_on(get_sqlite_describer(&full_sql));
 
-        test_fn(DbType::Sqlite, &mut describer);
+        let fut = test_fn(DbType::Sqlite, &mut describer);
+        runtime.block_on(fut);
     }
     // Postgres
     {
@@ -547,9 +567,9 @@ where
         let mut migration = Migration::new().schema(SCHEMA);
         migration_fn(DbType::Postgres, &mut migration);
         let full_sql = migration.make::<barrel::backend::Pg>();
-        let mut describer = get_postgres_describer(&full_sql);
+        let mut describer = runtime.block_on(get_postgres_describer(&full_sql));
 
-        test_fn(DbType::Postgres, &mut describer);
+        runtime.block_on(test_fn(DbType::Postgres, &mut describer));
     }
     // MySQL
     {
@@ -557,8 +577,12 @@ where
         let mut migration = Migration::new().schema(SCHEMA);
         migration_fn(DbType::MySql, &mut migration);
         let full_sql = migration.make::<barrel::backend::MySql>();
-        let mut describer = get_mysql_describer(&full_sql);
+        let mut describer = runtime.block_on(get_mysql_describer(&full_sql));
 
-        test_fn(DbType::MySql, &mut describer);
+        runtime.block_on(test_fn(DbType::MySql, &mut describer));
     }
+}
+
+fn tokio_runtime() -> tokio::runtime::Runtime {
+    tokio::runtime::Runtime::new().unwrap()
 }

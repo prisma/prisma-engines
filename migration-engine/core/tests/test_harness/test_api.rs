@@ -64,7 +64,7 @@ impl TestApi {
         );
 
         InferAndApplyOutput {
-            sql_schema: self.introspect_database(),
+            sql_schema: self.introspect_database().await,
             migration_output,
         }
     }
@@ -84,7 +84,7 @@ impl TestApi {
 
         let steps = self.run_infer_command(input).await.0.datamodel_steps;
 
-        self.apply_migration(steps, migration_id).await
+       self.apply_migration(steps, migration_id).await
     }
 
     pub async fn execute_command<'a, C>(&self, input: &'a C::Input) -> Result<C::Output, user_facing_errors::Error>
@@ -105,7 +105,7 @@ impl TestApi {
         let input = UnapplyMigrationInput {};
         let output = self.api.unapply_migration(&input).await.unwrap();
 
-        let sql_schema = self.introspect_database();
+        let sql_schema = self.introspect_database().await;
 
         UnapplyOutput { sql_schema, output }
     }
@@ -123,25 +123,25 @@ impl TestApi {
     }
 
     fn inspector(&self) -> Box<dyn SqlSchemaDescriberBackend> {
-        unimplemented!()
-        // match self.api.connector_type() {
-        //     "postgresql" => Box::new(sql_schema_describer::postgres::SqlSchemaDescriber::new(Arc::clone(
-        //         &self.database,
-        //     ))),
-        //     "sqlite" => Box::new(sql_schema_describer::sqlite::SqlSchemaDescriber::new(Arc::clone(
-        //         &self.database,
-        //     ))),
-        //     "mysql" => Box::new(sql_schema_describer::mysql::SqlSchemaDescriber::new(Arc::clone(
-        //         &self.database,
-        //     ))),
-        //     _ => unimplemented!(),
-        // }
+        match self.api.connector_type() {
+            "postgresql" => Box::new(sql_schema_describer::postgres::SqlSchemaDescriber::new(Arc::clone(
+                &self.database,
+            ))),
+            "sqlite" => Box::new(sql_schema_describer::sqlite::SqlSchemaDescriber::new(Arc::clone(
+                &self.database,
+            ))),
+            "mysql" => Box::new(sql_schema_describer::mysql::SqlSchemaDescriber::new(Arc::clone(
+                &self.database,
+            ))),
+            _ => unimplemented!(),
+        }
     }
 
-    fn introspect_database(&self) -> SqlSchema {
+    async fn introspect_database(&self) -> SqlSchema {
         let mut result = self
             .inspector()
             .describe(&SCHEMA_NAME.to_string())
+            .await
             .expect("Introspection failed");
 
         // the presence of the _Migration table makes assertions harder. Therefore remove it from the result.
@@ -219,6 +219,7 @@ impl BarrelMigrationExecutor {
         let mut result = self
             .inspector
             .describe(&SCHEMA_NAME.to_string())
+            .await
             .expect("Introspection failed");
 
         // The presence of the _Migration table makes assertions harder. Therefore remove it.

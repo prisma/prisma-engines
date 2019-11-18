@@ -1,5 +1,5 @@
 use log::debug;
-use sql_connection::{SyncSqlConnection, GenericSqlConnection};
+use sql_connection::{GenericSqlConnection, SqlConnection};
 use sql_schema_describer::*;
 use std::sync::Arc;
 
@@ -26,15 +26,17 @@ fn mysql_url(schema: &str) -> String {
     )
 }
 
-pub fn get_mysql_describer(sql: &str) -> mysql::SqlSchemaDescriber {
+pub async fn get_mysql_describer(sql: &str) -> mysql::SqlSchemaDescriber {
     // Ensure the presence of an empty database.
 
     let url = mysql_url("");
     let conn = GenericSqlConnection::from_database_str(&url, None).unwrap();
 
     conn.execute_raw(&format!("DROP SCHEMA IF EXISTS `{}`", SCHEMA), &[])
+        .await
         .expect("dropping schema");
     conn.execute_raw(&format!("CREATE SCHEMA `{}`", SCHEMA), &[])
+        .await
         .expect("creating schema");
 
     // Migrate the database we just created.
@@ -48,6 +50,7 @@ pub fn get_mysql_describer(sql: &str) -> mysql::SqlSchemaDescriber {
     for statement in statements {
         debug!("Executing migration statement: '{}'", statement);
         conn.execute_raw(&statement, &[])
+            .await
             .expect("executing migration statement");
     }
 

@@ -12,7 +12,7 @@ use sql_connection::SqlConnection;
 use test_harness::*;
 use url::Url;
 
-#[async_attributes::test]
+#[tokio::test]
 async fn authentication_failure_must_return_a_known_error_on_postgres() {
     let mut url: Url = postgres_url().parse().unwrap();
 
@@ -46,7 +46,7 @@ async fn authentication_failure_must_return_a_known_error_on_postgres() {
     assert_eq!(json_error, expected);
 }
 
-#[async_attributes::test]
+#[tokio::test]
 async fn authentication_failure_must_return_a_known_error_on_mysql() {
     let mut url: Url = mysql_url().parse().unwrap();
 
@@ -80,7 +80,7 @@ async fn authentication_failure_must_return_a_known_error_on_mysql() {
     assert_eq!(json_error, expected);
 }
 
-#[async_attributes::test]
+#[tokio::test]
 async fn unreachable_database_must_return_a_proper_error_on_mysql() {
     let mut url: Url = mysql_url().parse().unwrap();
 
@@ -114,7 +114,7 @@ async fn unreachable_database_must_return_a_proper_error_on_mysql() {
     assert_eq!(json_error, expected);
 }
 
-#[async_attributes::test]
+#[tokio::test]
 async fn unreachable_database_must_return_a_proper_error_on_postgres() {
     let mut url: Url = postgres_url().parse().unwrap();
 
@@ -148,7 +148,7 @@ async fn unreachable_database_must_return_a_proper_error_on_postgres() {
     assert_eq!(json_error, expected);
 }
 
-#[async_attributes::test]
+#[tokio::test]
 async fn database_does_not_exist_must_return_a_proper_error() {
     let mut url: Url = mysql_url().parse().unwrap();
     let database_name = "notmydatabase";
@@ -183,7 +183,7 @@ async fn database_does_not_exist_must_return_a_proper_error() {
     assert_eq!(json_error, expected);
 }
 
-#[async_attributes::test]
+#[tokio::test]
 async fn database_already_exists_must_return_a_proper_error() {
     let url = postgres_url();
     let error = get_cli_error(&["migration-engine", "cli", "--datasource", &url, "--create_database"]).await;
@@ -208,7 +208,7 @@ async fn database_already_exists_must_return_a_proper_error() {
     assert_eq!(json_error, expected);
 }
 
-#[async_attributes::test]
+#[tokio::test]
 async fn database_access_denied_must_return_a_proper_error_in_cli() {
     let conn = sql_connection::GenericSqlConnection::from_database_str(&mysql_url(), None).unwrap();
 
@@ -243,7 +243,7 @@ async fn database_access_denied_must_return_a_proper_error_in_cli() {
     assert_eq!(json_error, expected);
 }
 
-#[async_attributes::test]
+#[tokio::test]
 async fn database_access_denied_must_return_a_proper_error_in_rpc() {
     let conn = sql_connection::GenericSqlConnection::from_database_str(&mysql_url(), None).unwrap();
 

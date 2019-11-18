@@ -7,6 +7,7 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+async-trait = "0.1.17"
 introspection-connector = { path = "../introspection-connector" }
 sql-schema-describer = { path = "../../../libs/sql-schema-describer" }
 prisma-inflector = { path = "../../../libs/prisma-inflector" }
@@ -23,4 +24,5 @@ fern = "0.5"
 pretty_assertions = "0.6"
 barrel = { version = "0.6.3-alpha.0", features = ["sqlite3", "mysql", "pg"] }
 test-macros = { path = "../../../libs/test-macros" }
-
+tokio = { package = "tokio", version = "0.2.0-alpha.6" }
+once_cell = "1.2.0"

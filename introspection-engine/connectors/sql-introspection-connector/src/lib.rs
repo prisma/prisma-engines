@@ -21,12 +21,12 @@ impl SqlIntrospectionConnector {
         Ok(SqlIntrospectionConnector { describer })
     }
 
-    fn list_databases_internal(&self) -> SqlIntrospectionResult<Vec<String>> {
-        Ok(self.describer.list_databases()?)
+    async fn list_databases_internal(&self) -> SqlIntrospectionResult<Vec<String>> {
+        Ok(self.describer.list_databases().await?)
     }
 
-    fn get_metadata_internal(&self, database: &str) -> SqlIntrospectionResult<DatabaseMetadata> {
-        let sql_metadata = self.describer.get_metadata(&database)?;
+    async fn get_metadata_internal(&self, database: &str) -> SqlIntrospectionResult<DatabaseMetadata> {
+        let sql_metadata = self.describer.get_metadata(&database).await?;
         let db_metadate = DatabaseMetadata {
             table_count: sql_metadata.table_count,
             size_in_bytes: sql_metadata.size_in_bytes,
@@ -34,22 +34,23 @@ impl SqlIntrospectionConnector {
         Ok(db_metadate)
     }
 
-    fn describe(&self, database: &str) -> SqlIntrospectionResult<SqlSchema> {
-        Ok(self.describer.describe(&database)?)
+    async fn describe(&self, database: &str) -> SqlIntrospectionResult<SqlSchema> {
+        Ok(self.describer.describe(&database).await?)
     }
 }
 
+#[async_trait::async_trait]
 impl IntrospectionConnector for SqlIntrospectionConnector {
-    fn list_databases(&self) -> ConnectorResult<Vec<String>> {
-        Ok(self.list_databases_internal()?)
+    async fn list_databases(&self) -> ConnectorResult<Vec<String>> {
+        Ok(self.list_databases_internal().await?)
     }
 
-    fn get_metadata(&self, database: &str) -> ConnectorResult<DatabaseMetadata> {
-        Ok(self.get_metadata_internal(&database)?)
+    async fn get_metadata(&self, database: &str) -> ConnectorResult<DatabaseMetadata> {
+        Ok(self.get_metadata_internal(&database).await?)
     }
 
-    fn introspect(&self, database: &str) -> ConnectorResult<Datamodel> {
-        let sql_schema = self.describe(database)?;
+    async fn introspect(&self, database: &str) -> ConnectorResult<Datamodel> {
+        let sql_schema = self.describe(database).await?;
         let data_model = calculate_datamodel::calculate_model(&sql_schema).unwrap();
         Ok(data_model)
     }

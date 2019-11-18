@@ -5,7 +5,7 @@ use test_harness::*;
 pub const SCHEMA_NAME: &str = "introspection-engine";
 
 #[test_one_connector(connector = "mysql")]
-fn introspecting_a_simple_table_with_gql_types_must_work(api: &TestApi) {
+async fn introspecting_a_simple_table_with_gql_types_must_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel.execute(|migration| {
         migration.create_table("Blog", |t| {
@@ -16,7 +16,7 @@ fn introspecting_a_simple_table_with_gql_types_must_work(api: &TestApi) {
             t.add_column("int", types::integer());
             t.add_column("string", types::text());
         });
-    });
+    }).await;
     let dm = r#"
             model Blog {
                 bool    Boolean
@@ -27,12 +27,12 @@ fn introspecting_a_simple_table_with_gql_types_must_work(api: &TestApi) {
                 string  String
             }
         "#;
-    let result = dbg!(api.introspect());
+    let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
 
 #[test_one_connector(connector = "mysql")]
-fn introspecting_a_table_with_compound_primary_keys_must_work(api: &TestApi) {
+async fn introspecting_a_table_with_compound_primary_keys_must_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel.execute(|migration| {
         migration.create_table("Blog", |t| {
@@ -40,7 +40,7 @@ fn introspecting_a_table_with_compound_primary_keys_must_work(api: &TestApi) {
             t.add_column("authorId", types::varchar(10));
             t.inject_custom("PRIMARY KEY (`id`, `authorId`)");
         });
-    });
+    }).await;
 
     let dm = r#"
             model Blog {
@@ -49,12 +49,12 @@ fn introspecting_a_table_with_compound_primary_keys_must_work(api: &TestApi) {
                 @@id([id, authorId])
             }
         "#;
-    let result = dbg!(api.introspect());
+    let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
 
 #[test_one_connector(connector = "mysql")]
-fn introspecting_a_table_with_unique_index_must_work(api: &TestApi) {
+async fn introspecting_a_table_with_unique_index_must_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel.execute(|migration| {
         migration.create_table("Blog", |t| {
@@ -62,7 +62,7 @@ fn introspecting_a_table_with_unique_index_must_work(api: &TestApi) {
             t.add_column("authorId", types::varchar(10));
         });
         migration.inject_custom("Create Unique Index `test` on `introspection-engine`.`Blog`( `authorId`)");
-    });
+    }).await;
 
     let dm = r#"
             model Blog {
@@ -70,12 +70,12 @@ fn introspecting_a_table_with_unique_index_must_work(api: &TestApi) {
                 id      Int @id
             }
         "#;
-    let result = dbg!(api.introspect());
+    let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
 
 #[test_one_connector(connector = "mysql")]
-fn introspecting_a_table_with_multi_column_unique_index_must_work(api: &TestApi) {
+async fn introspecting_a_table_with_multi_column_unique_index_must_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel.execute(|migration| {
         migration.create_table("User", |t| {
@@ -85,7 +85,7 @@ fn introspecting_a_table_with_multi_column_unique_index_must_work(api: &TestApi)
         });
         migration
             .inject_custom("Create Unique Index `test` on `introspection-engine`.`User`( `firstname`, `lastname`)");
-    });
+    }).await;
 
     let dm = r#"
             model User {
@@ -95,12 +95,12 @@ fn introspecting_a_table_with_multi_column_unique_index_must_work(api: &TestApi)
                 @@unique([firstname, lastname], name: "test")
             }
         "#;
-    let result = dbg!(api.introspect());
+    let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
 
 #[test_one_connector(connector = "mysql")]
-fn introspecting_a_table_with_required_and_optional_columns_must_work(api: &TestApi) {
+async fn introspecting_a_table_with_required_and_optional_columns_must_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel.execute(|migration| {
         migration.create_table("User", |t| {
@@ -108,7 +108,7 @@ fn introspecting_a_table_with_required_and_optional_columns_must_work(api: &Test
             t.add_column("requiredname", types::text().nullable(false));
             t.add_column("optionalname", types::text().nullable(true));
         });
-    });
+    }).await;
 
     let dm = r#"
             model User {
@@ -117,7 +117,7 @@ fn introspecting_a_table_with_required_and_optional_columns_must_work(api: &Test
                 requiredname String
             }
         "#;
-    let result = dbg!(api.introspect());
+    let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
 
@@ -131,7 +131,7 @@ fn introspecting_a_table_with_required_and_optional_columns_must_work(api: &Test
 //            t.add_column("name", types::text());
 //            t.inject_custom("`joined` date DEFAULT CURRENT_DATE")
 //        });
-//    });
+//    }).await;
 //
 //    let dm = r#"
 //            model User {
@@ -140,12 +140,12 @@ fn introspecting_a_table_with_required_and_optional_columns_must_work(api: &Test
 //                name String
 //            }
 //        "#;
-//    let result = dbg!(api.introspect());
+//    let result = dbg!(api.introspect().await);
 //    custom_assert(&result, dm);
 //}
 
 #[test_one_connector(connector = "mysql")]
-fn introspecting_a_table_with_default_values_should_work(api: &TestApi) {
+async fn introspecting_a_table_with_default_values_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel.execute(|migration| {
         migration.create_table("User", |t| {
@@ -157,7 +157,7 @@ fn introspecting_a_table_with_default_values_should_work(api: &TestApi) {
             t.inject_custom("`int` INTEGER NOT NULL DEFAULT 5");
             t.inject_custom("`string` VARCHAR(4) NOT NULL DEFAULT 'Test'");
         });
-    });
+    }).await;
 
     let dm = r#"
             model User {
@@ -170,12 +170,12 @@ fn introspecting_a_table_with_default_values_should_work(api: &TestApi) {
                 string String @default("Test")
             }
         "#;
-    let result = dbg!(api.introspect());
+    let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
 
 #[test_one_connector(connector = "mysql")]
-fn introspecting_a_table_with_a_non_unique_index_should_work(api: &TestApi) {
+async fn introspecting_a_table_with_a_non_unique_index_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel.execute(|migration| {
         migration.create_table("User", |t| {
@@ -183,7 +183,7 @@ fn introspecting_a_table_with_a_non_unique_index_should_work(api: &TestApi) {
             t.add_column("id", types::primary());
         });
         migration.inject_custom("Create Index `test` on `introspection-engine`.`User`(`a`)");
-    });
+    }).await;
 
     let dm = r#"
             model User {
@@ -192,12 +192,12 @@ fn introspecting_a_table_with_a_non_unique_index_should_work(api: &TestApi) {
                 @@index([a], name: "test")
             }
         "#;
-    let result = dbg!(api.introspect());
+    let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
 
 #[test_one_connector(connector = "mysql")]
-fn introspecting_a_table_with_a_multi_column_non_unique_index_should_work(api: &TestApi) {
+async fn introspecting_a_table_with_a_multi_column_non_unique_index_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel.execute(|migration| {
         migration.create_table("User", |t| {
@@ -206,7 +206,7 @@ fn introspecting_a_table_with_a_multi_column_non_unique_index_should_work(api: &
             t.add_column("id", types::primary());
         });
         migration.inject_custom("Create Index `test` on `introspection-engine`.`User`(`a`,`b`)");
-    });
+    }).await;
 
     let dm = r#"
             model User {
@@ -216,13 +216,13 @@ fn introspecting_a_table_with_a_multi_column_non_unique_index_should_work(api: &
                 @@index([a,b], name: "test")
             }
         "#;
-    let result = dbg!(api.introspect());
+    let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
 
 //relations
 #[test_one_connector(connector = "mysql")]
-fn introspecting_a_one_to_one_req_relation_should_work(api: &TestApi) {
+async fn introspecting_a_one_to_one_req_relation_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel.execute(|migration| {
         migration.create_table("User", |t| {
@@ -235,7 +235,7 @@ fn introspecting_a_one_to_one_req_relation_should_work(api: &TestApi) {
                 FOREIGN KEY (`user_id`) REFERENCES `User`(`id`)",
             )
         });
-    });
+    }).await;
 
     let dm = r#"
               model Post {
@@ -248,12 +248,12 @@ fn introspecting_a_one_to_one_req_relation_should_work(api: &TestApi) {
                post Post? 
             }
         "#;
-    let result = dbg!(api.introspect());
+    let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
 
 #[test_one_connector(connector = "mysql")]
-fn introspecting_two_one_to_one_relations_between_the_same_models_should_work(api: &TestApi) {
+async fn introspecting_two_one_to_one_relations_between_the_same_models_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel.execute(|migration| {
             migration.create_table("User", |t| {
@@ -266,7 +266,7 @@ fn introspecting_two_one_to_one_relations_between_the_same_models_should_work(ap
             });
             migration.inject_custom("ALTER TABLE `introspection-engine`.`User` ADD Column `post_id` INTEGER NOT NULL UNIQUE ");
             migration.inject_custom("ALTER TABLE `introspection-engine`.`User` ADD CONSTRAINT `post_fk` FOREIGN KEY(`post_id`) REFERENCES `Post`(`id`)");
-        });
+        }).await;
 
     let dm = r#"
             model Post {
@@ -281,12 +281,12 @@ fn introspecting_two_one_to_one_relations_between_the_same_models_should_work(ap
                post Post?    @relation("Post_user_idToUser")
             }
         "#;
-    let result = dbg!(api.introspect());
+    let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
 
 #[test_one_connector(connector = "mysql")]
-fn introspecting_a_one_to_one_relation_should_work(api: &TestApi) {
+async fn introspecting_a_one_to_one_relation_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel.execute(|migration| {
         migration.create_table("User", |t| {
@@ -299,7 +299,7 @@ fn introspecting_a_one_to_one_relation_should_work(api: &TestApi) {
                  FOREIGN KEY (`user_id`) REFERENCES `User`(`id`)",
             );
         });
-    });
+    }).await;
 
     let dm = r#"        
             model Post {
@@ -312,12 +312,12 @@ fn introspecting_a_one_to_one_relation_should_work(api: &TestApi) {
                post Post? 
             }
         "#;
-    let result = dbg!(api.introspect());
+    let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
 
 #[test_one_connector(connector = "mysql")]
-fn introspecting_a_one_to_many_relation_should_work(api: &TestApi) {
+async fn introspecting_a_one_to_many_relation_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel.execute(|migration| {
         migration.create_table("User", |t| {
@@ -330,7 +330,7 @@ fn introspecting_a_one_to_many_relation_should_work(api: &TestApi) {
                  FOREIGN KEY (`user_id`) REFERENCES `User`(`id`)",
             );
         });
-    });
+    }).await;
 
     let dm = r#"  
             model Post {
@@ -343,12 +343,12 @@ fn introspecting_a_one_to_many_relation_should_work(api: &TestApi) {
                posts Post[] 
             }
         "#;
-    let result = dbg!(api.introspect());
+    let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
 
 #[test_one_connector(connector = "mysql")]
-fn introspecting_a_one_req_to_many_relation_should_work(api: &TestApi) {
+async fn introspecting_a_one_req_to_many_relation_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel.execute(|migration| {
         migration.create_table("User", |t| {
@@ -361,7 +361,7 @@ fn introspecting_a_one_req_to_many_relation_should_work(api: &TestApi) {
                  FOREIGN KEY (`user_id`) REFERENCES `User`(`id`)",
             );
         });
-    });
+    }).await;
 
     let dm = r#"
             model Post {
@@ -374,12 +374,12 @@ fn introspecting_a_one_req_to_many_relation_should_work(api: &TestApi) {
                posts Post[] 
             }
        "#;
-    let result = dbg!(api.introspect());
+    let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
 
 #[test_one_connector(connector = "mysql")]
-fn introspecting_a_prisma_many_to_many_relation_should_work(api: &TestApi) {
+async fn introspecting_a_prisma_many_to_many_relation_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel.execute(|migration| {
         migration.create_table("User", |t| {
@@ -397,7 +397,7 @@ fn introspecting_a_prisma_many_to_many_relation_should_work(api: &TestApi) {
             )
         });
         migration.inject_custom("CREATE UNIQUE INDEX test ON `introspection-engine`.`_PostToUser` (`A`, `B`);")
-    });
+    }).await;
 
     let dm = r#"
             model Post {
@@ -410,12 +410,12 @@ fn introspecting_a_prisma_many_to_many_relation_should_work(api: &TestApi) {
                posts Post[] 
             }
         "#;
-    let result = dbg!(api.introspect());
+    let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
 
 #[test_one_connector(connector = "mysql")]
-fn introspecting_a_many_to_many_relation_should_work(api: &TestApi) {
+async fn introspecting_a_many_to_many_relation_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel.execute(|migration| {
         migration.create_table("User", |t| {
@@ -432,7 +432,7 @@ fn introspecting_a_many_to_many_relation_should_work(api: &TestApi) {
                      FOREIGN KEY (`post_id`) REFERENCES  `Post`(`id`) ON DELETE CASCADE",
             )
         });
-    });
+    }).await;
 
     let dm = r#"
             model Post {
@@ -450,12 +450,12 @@ fn introspecting_a_many_to_many_relation_should_work(api: &TestApi) {
                postsToUserses PostsToUsers[] @relation(onDelete: CASCADE)
             }
         "#;
-    let result = dbg!(api.introspect());
+    let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
 
 #[test_one_connector(connector = "mysql")]
-fn introspecting_a_many_to_many_relation_with_extra_fields_should_work(api: &TestApi) {
+async fn introspecting_a_many_to_many_relation_with_extra_fields_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel.execute(|migration| {
         migration.create_table("User", |t| {
@@ -473,7 +473,7 @@ fn introspecting_a_many_to_many_relation_with_extra_fields_should_work(api: &Tes
                      FOREIGN KEY (`post_id`) REFERENCES  `Post`(`id`)",
             )
         });
-    });
+    }).await;
 
     let dm = r#"
             model Post {
@@ -492,11 +492,11 @@ fn introspecting_a_many_to_many_relation_with_extra_fields_should_work(api: &Tes
                postsToUserses PostsToUsers[] 
             }
         "#;
-    let result = dbg!(api.introspect());
+    let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
 #[test_one_connector(connector = "mysql")]
-fn introspecting_a_self_relation_should_work(api: &TestApi) {
+async fn introspecting_a_self_relation_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel.execute(|migration| {
         migration.create_table("User", |t| {
@@ -508,7 +508,7 @@ fn introspecting_a_self_relation_should_work(api: &TestApi) {
                      FOREIGN KEY (`direct_report`) REFERENCES `User` (`id`)",
             )
         });
-    });
+    }).await;
 
     let dm = r#"
             model User {
@@ -519,14 +519,14 @@ fn introspecting_a_self_relation_should_work(api: &TestApi) {
                 users_UserToUser_recruited_by  User[] @relation("UserToUser_recruited_by")
             }
         "#;
-    let result = dbg!(api.introspect());
+    let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
 
 // on delete cascade
 
 #[test_one_connector(connector = "mysql")]
-fn introspecting_cascading_delete_behaviour_should_work(api: &TestApi) {
+async fn introspecting_cascading_delete_behaviour_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel.execute(|migration| {
         migration.create_table("User", |t| {
@@ -539,7 +539,7 @@ fn introspecting_cascading_delete_behaviour_should_work(api: &TestApi) {
                  FOREIGN KEY (`user_id`) REFERENCES `User`(`id`) ON DELETE CASCADE",
             );
         });
-    });
+    }).await;
 
     let dm = r#"  
             model Post {
@@ -552,7 +552,7 @@ fn introspecting_cascading_delete_behaviour_should_work(api: &TestApi) {
                posts Post[] @relation(onDelete: CASCADE)
             }
         "#;
-    let result = dbg!(api.introspect());
+    let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
 
