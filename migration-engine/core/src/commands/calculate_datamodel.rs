@@ -23,9 +23,7 @@ impl<'a> MigrationCommand for CalculateDatamodelCommand<'a> {
         debug!("{:?}", cmd.input);
 
         let base_datamodel = SchemaAst::empty();
-        let datamodel = engine
-            .datamodel_calculator()
-            .infer(&base_datamodel, &cmd.input.steps)?;
+        let datamodel = engine.datamodel_calculator().infer(&base_datamodel, &cmd.input.steps)?;
 
         Ok(CalculateDatamodelOutput {
             datamodel: datamodel::render_schema_ast_to_string(&datamodel).unwrap(),

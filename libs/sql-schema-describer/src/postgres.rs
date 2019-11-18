@@ -77,7 +77,11 @@ impl SqlSchemaDescriber {
             -- Views are not supported yet
             AND table_type = 'BASE TABLE'
             ORDER BY table_name";
-        let rows = self.conn.query_raw(sql, &[schema.into()]).await.expect("get table names ");
+        let rows = self
+            .conn
+            .query_raw(sql, &[schema.into()])
+            .await
+            .expect("get table names ");
         let names = rows
             .into_iter()
             .map(|row| {
@@ -353,29 +357,29 @@ impl SqlSchemaDescriber {
         let mut indices = Vec::new();
 
         for index in rows {
-                debug!("Got index: {:?}", index);
-                let is_pk = index
-                    .get("is_primary_key")
-                    .and_then(|x| x.as_bool())
-                    .expect("get is_primary_key");
-                // TODO: Implement and use as_slice instead of into_vec, to avoid cloning
-                let columns = index
-                    .get("column_names")
-                    .and_then(|x| x.clone().into_vec::<String>())
-                    .expect("column_names");
-                if is_pk {
-                    pk = Some(self.infer_primary_key(schema, table_name, columns, sequences).await);
-                } else {
-                    let is_unique = index.get("is_unique").and_then(|x| x.as_bool()).expect("is_unique");
-                    indices.push(Index {
-                        name: index.get("name").and_then(|x| x.to_string()).expect("name"),
-                        columns,
-                        tpe: match is_unique {
-                            true => IndexType::Unique,
-                            false => IndexType::Normal,
-                        },
-                    })
-                }
+            debug!("Got index: {:?}", index);
+            let is_pk = index
+                .get("is_primary_key")
+                .and_then(|x| x.as_bool())
+                .expect("get is_primary_key");
+            // TODO: Implement and use as_slice instead of into_vec, to avoid cloning
+            let columns = index
+                .get("column_names")
+                .and_then(|x| x.clone().into_vec::<String>())
+                .expect("column_names");
+            if is_pk {
+                pk = Some(self.infer_primary_key(schema, table_name, columns, sequences).await);
+            } else {
+                let is_unique = index.get("is_unique").and_then(|x| x.as_bool()).expect("is_unique");
+                indices.push(Index {
+                    name: index.get("name").and_then(|x| x.to_string()).expect("name"),
+                    columns,
+                    tpe: match is_unique {
+                        true => IndexType::Unique,
+                        false => IndexType::Normal,
+                    },
+                })
+            }
         }
 
         debug!("Found table indices: {:?}, primary key: {:?}", indices, pk);
@@ -468,7 +472,11 @@ impl SqlSchemaDescriber {
             JOIN pg_enum e ON t.oid = e.enumtypid  
             JOIN pg_catalog.pg_namespace n ON n.oid = t.typnamespace
             WHERE n.nspname = $1";
-        let rows = self.conn.query_raw(&sql, &[schema.into()]).await.expect("querying for enums");
+        let rows = self
+            .conn
+            .query_raw(&sql, &[schema.into()])
+            .await
+            .expect("querying for enums");
         let mut enum_values: HashMap<String, HashSet<String>> = HashMap::new();
         for row in rows.into_iter() {
             debug!("Got enum row: {:?}", row);

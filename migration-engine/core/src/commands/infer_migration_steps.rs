@@ -41,11 +41,14 @@ impl<'a> MigrationCommand for InferMigrationStepsCommand<'a> {
             .datamodel_migration_steps_inferrer()
             .infer(&assumed_datamodel_ast, &next_datamodel_ast);
 
-        let database_migration =
-            database_migration_inferrer.infer(&assumed_datamodel, &next_datamodel, &model_migration_steps).await?;
+        let database_migration = database_migration_inferrer
+            .infer(&assumed_datamodel, &next_datamodel, &model_migration_steps)
+            .await?;
 
-        let DestructiveChangeDiagnostics { warnings, errors: _ } =
-            connector.destructive_changes_checker().check(&database_migration).await?;
+        let DestructiveChangeDiagnostics { warnings, errors: _ } = connector
+            .destructive_changes_checker()
+            .check(&database_migration)
+            .await?;
 
         let (returned_datamodel_steps, returned_database_migration) = if cmd.input.is_watch_migration() {
             let database_steps = connector
@@ -68,11 +71,9 @@ impl<'a> MigrationCommand for InferMigrationStepsCommand<'a> {
 
             // The database migration since the last non-watch migration, so we can render all the steps applied
             // in watch mode to the migrations folder.
-            let full_database_migration = database_migration_inferrer.infer_from_datamodels(
-                &last_non_watch_datamodel,
-                &next_datamodel,
-                &datamodel_steps,
-            ).await?;
+            let full_database_migration = database_migration_inferrer
+                .infer_from_datamodels(&last_non_watch_datamodel, &next_datamodel, &datamodel_steps)
+                .await?;
             let database_steps = connector
                 .database_migration_step_applier()
                 .render_steps_pretty(&full_database_migration)?;

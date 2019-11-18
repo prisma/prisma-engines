@@ -27,8 +27,7 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
     async fn describe(&self, schema: &str) -> SqlSchemaDescriberResult<SqlSchema> {
         debug!("describing schema '{}'", schema);
 
-        let table_names = self
-            .get_table_names(schema).await;
+        let table_names = self.get_table_names(schema).await;
 
         let mut tables = Vec::with_capacity(table_names.len());
 
@@ -74,7 +73,11 @@ impl SqlSchemaDescriber {
             -- Views are not supported yet
             AND table_type = 'BASE TABLE'
             ORDER BY table_name";
-        let rows = self.conn.query_raw(sql, &[schema.into()]).await.expect("get table names ");
+        let rows = self
+            .conn
+            .query_raw(sql, &[schema.into()])
+            .await
+            .expect("get table names ");
         let names = rows
             .into_iter()
             .map(|row| {

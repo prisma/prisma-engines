@@ -5,10 +5,10 @@ mod error;
 pub mod migration;
 pub mod migration_engine;
 
-use futures::FutureExt;
 use crate::api::RpcApi;
 use commands::*;
 use datamodel::{self, error::ErrorCollection, Datamodel};
+use futures::FutureExt;
 use log::*;
 use std::{fs, io, io::Read};
 
@@ -58,7 +58,10 @@ async fn main() {
     } else if let Some(matches) = matches.subcommand_matches("cli") {
         let datasource = matches.value_of("datasource").unwrap();
 
-        match std::panic::AssertUnwindSafe(cli::run(&matches, &datasource)).catch_unwind().await {
+        match std::panic::AssertUnwindSafe(cli::run(&matches, &datasource))
+            .catch_unwind()
+            .await
+        {
             Ok(Ok(msg)) => {
                 info!("{}", msg);
                 std::process::exit(0);

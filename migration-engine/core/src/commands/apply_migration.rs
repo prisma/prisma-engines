@@ -15,7 +15,7 @@ impl<'a> MigrationCommand for ApplyMigrationCommand<'a> {
     type Input = ApplyMigrationInput;
     type Output = MigrationStepsResultOutput;
 
-    async fn execute<C, D>(input:&Self::Input, engine: &MigrationEngine<C, D>) -> CommandResult<Self::Output>
+    async fn execute<C, D>(input: &Self::Input, engine: &MigrationEngine<C, D>) -> CommandResult<Self::Output>
     where
         C: MigrationConnector<DatabaseMigration = D>,
         D: DatabaseMigrationMarker + Send + Sync + 'static,
@@ -61,7 +61,10 @@ impl<'a> ApplyMigrationCommand<'a> {
         self.handle_migration(&engine, current_datamodel, next_datamodel).await
     }
 
-    async fn handle_normal_migration<C, D>(&self, engine: &MigrationEngine<C, D>) -> CommandResult<MigrationStepsResultOutput>
+    async fn handle_normal_migration<C, D>(
+        &self,
+        engine: &MigrationEngine<C, D>,
+    ) -> CommandResult<MigrationStepsResultOutput>
     where
         C: MigrationConnector<DatabaseMigration = D>,
         D: DatabaseMigrationMarker + Send + Sync + 'static,
@@ -92,10 +95,10 @@ impl<'a> ApplyMigrationCommand<'a> {
         let connector = engine.connector();
         let migration_persistence = connector.migration_persistence();
 
-        let database_migration =
-            connector
-                .database_migration_inferrer()
-                .infer(&current_datamodel, &next_datamodel, &self.input.steps).await?; // TODO: those steps are a lie right now. Does not matter because we don't use them at the moment.
+        let database_migration = connector
+            .database_migration_inferrer()
+            .infer(&current_datamodel, &next_datamodel, &self.input.steps)
+            .await?; // TODO: those steps are a lie right now. Does not matter because we don't use them at the moment.
 
         let database_steps_json_pretty = connector
             .database_migration_step_applier()
@@ -108,7 +111,10 @@ impl<'a> ApplyMigrationCommand<'a> {
         migration.database_migration = database_migration_json;
         migration.datamodel = next_datamodel.clone();
 
-        let diagnostics = connector.destructive_changes_checker().check(&database_migration).await?;
+        let diagnostics = connector
+            .destructive_changes_checker()
+            .check(&database_migration)
+            .await?;
 
         match (diagnostics.has_warnings(), self.input.force.unwrap_or(false)) {
             // We have no warnings, or the force flag is passed.
@@ -117,7 +123,8 @@ impl<'a> ApplyMigrationCommand<'a> {
 
                 connector
                     .migration_applier()
-                    .apply(&saved_migration, &database_migration).await?;
+                    .apply(&saved_migration, &database_migration)
+                    .await?;
             }
             // We have warnings, but no force flag was passed.
             (true, false) => (),

@@ -29,9 +29,7 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
 
     async fn describe(&self, schema: &str) -> SqlSchemaDescriberResult<SqlSchema> {
         debug!("describing schema '{}'", schema);
-        let table_names: Vec<String> = self
-            .get_table_names(schema)
-            .await;
+        let table_names: Vec<String> = self.get_table_names(schema).await;
 
         let mut tables = Vec::with_capacity(table_names.len());
 
@@ -305,37 +303,37 @@ impl SqlSchemaDescriber {
         debug!("Got indices description results: {:?}", result_set);
 
         let mut indices = Vec::new();
-        let filtered_rows = result_set.into_iter()
+        let filtered_rows = result_set
+            .into_iter()
             // Exclude primary keys, they are inferred separately.
             .filter(|row| row.get("origin").and_then(|origin| origin.as_str()).unwrap() != "pk");
 
         for row in filtered_rows {
+            let is_unique = row.get("unique").and_then(|x| x.as_bool()).expect("get unique");
+            let name = row.get("name").and_then(|x| x.to_string()).expect("get name");
+            let mut index = Index {
+                name: name.clone(),
+                tpe: match is_unique {
+                    true => IndexType::Unique,
+                    false => IndexType::Normal,
+                },
+                columns: vec![],
+            };
 
-                let is_unique = row.get("unique").and_then(|x| x.as_bool()).expect("get unique");
-                let name = row.get("name").and_then(|x| x.to_string()).expect("get name");
-                let mut index = Index {
-                    name: name.clone(),
-                    tpe: match is_unique {
-                        true => IndexType::Unique,
-                        false => IndexType::Normal,
-                    },
-                    columns: vec![],
-                };
-
-                let sql = format!(r#"PRAGMA "{}".index_info("{}");"#, schema, name);
-                debug!("describing table index '{}', SQL: '{}'", name, sql);
-                let result_set = self.conn.query_raw(&sql, &[]).await.expect("querying for index info");
-                debug!("Got index description results: {:?}", result_set);
-                for row in result_set.into_iter() {
-                    let pos = row.get("seqno").and_then(|x| x.as_i64()).expect("get seqno") as usize;
-                    let col_name = row.get("name").and_then(|x| x.to_string()).expect("get name");
-                    if index.columns.len() <= pos {
-                        index.columns.resize(pos + 1, "".to_string());
-                    }
-                    index.columns[pos] = col_name;
+            let sql = format!(r#"PRAGMA "{}".index_info("{}");"#, schema, name);
+            debug!("describing table index '{}', SQL: '{}'", name, sql);
+            let result_set = self.conn.query_raw(&sql, &[]).await.expect("querying for index info");
+            debug!("Got index description results: {:?}", result_set);
+            for row in result_set.into_iter() {
+                let pos = row.get("seqno").and_then(|x| x.as_i64()).expect("get seqno") as usize;
+                let col_name = row.get("name").and_then(|x| x.to_string()).expect("get name");
+                if index.columns.len() <= pos {
+                    index.columns.resize(pos + 1, "".to_string());
                 }
+                index.columns[pos] = col_name;
+            }
 
-                indices.push(index)
+            indices.push(index)
         }
 
         indices

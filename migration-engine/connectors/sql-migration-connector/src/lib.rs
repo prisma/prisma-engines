@@ -78,8 +78,7 @@ impl SqlMigrationConnector {
 
         let conn = Arc::new(connection) as Arc<dyn SqlConnection + Send + Sync>;
 
-        let inspector: Arc<dyn SqlSchemaDescriberBackend + Send + Sync + 'static> = 
-            match sql_family {
+        let inspector: Arc<dyn SqlSchemaDescriberBackend + Send + Sync + 'static> = match sql_family {
             SqlFamily::Mysql => Arc::new(sql_schema_describer::mysql::SqlSchemaDescriber::new(Arc::clone(&conn))),
             SqlFamily::Postgres => Arc::new(sql_schema_describer::postgres::SqlSchemaDescriber::new(Arc::clone(
                 &conn,
@@ -127,16 +126,14 @@ impl SqlMigrationConnector {
         match self.connection_info.sql_family() {
             SqlFamily::Postgres => {
                 let query = format!("CREATE DATABASE \"{}\"", db_name);
-                self.database
-                    .query_raw(&query, &[]).await?;
+                self.database.query_raw(&query, &[]).await?;
 
                 Ok(())
             }
             SqlFamily::Sqlite => Ok(()),
             SqlFamily::Mysql => {
                 let query = format!("CREATE DATABASE `{}`", db_name);
-                self.database
-                    .query_raw(&query, &[]).await?;
+                self.database.query_raw(&query, &[]).await?;
 
                 Ok(())
             }

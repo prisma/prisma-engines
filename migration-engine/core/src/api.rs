@@ -45,7 +45,10 @@ pub trait GenericApi: Send + Sync + 'static {
         input: &CalculateDatabaseStepsInput,
     ) -> crate::Result<MigrationStepsResultOutput>;
     async fn calculate_datamodel(&self, input: &CalculateDatamodelInput) -> crate::Result<CalculateDatamodelOutput>;
-    async fn infer_migration_steps(&self, input: &InferMigrationStepsInput) -> crate::Result<MigrationStepsResultOutput>;
+    async fn infer_migration_steps(
+        &self,
+        input: &InferMigrationStepsInput,
+    ) -> crate::Result<MigrationStepsResultOutput>;
     async fn list_migrations(&self, input: &serde_json::Value) -> crate::Result<Vec<ListMigrationStepsOutput>>;
     async fn migration_progress(&self, input: &MigrationProgressInput) -> crate::Result<MigrationProgressOutput>;
     async fn reset(&self, input: &serde_json::Value) -> crate::Result<serde_json::Value>;
@@ -87,7 +90,10 @@ where
         self.handle_command::<CalculateDatamodelCommand>(input).await
     }
 
-    async fn infer_migration_steps(&self, input: &InferMigrationStepsInput) -> crate::Result<MigrationStepsResultOutput> {
+    async fn infer_migration_steps(
+        &self,
+        input: &InferMigrationStepsInput,
+    ) -> crate::Result<MigrationStepsResultOutput> {
         self.handle_command::<InferMigrationStepsCommand>(input).await
     }
 

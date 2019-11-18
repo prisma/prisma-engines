@@ -4,7 +4,7 @@ use datamodel::configuration::{MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_S
 use failure::Fail;
 use futures::{FutureExt, TryFutureExt};
 use jsonrpc_core::types::error::Error as JsonRpcError;
-use jsonrpc_core::{Params, IoHandler};
+use jsonrpc_core::{IoHandler, Params};
 use jsonrpc_stdio_server::ServerBuilder;
 use sql_migration_connector::SqlMigrationConnector;
 use std::{io, sync::Arc};
@@ -109,9 +109,7 @@ impl RpcApi {
         self.io_handler.add_method(cmd.name(), move |params: Params| {
             let cmd = cmd.clone();
             let executor = Arc::clone(&executor);
-            let fut = async move {
-                Self::create_handler(&executor, cmd, &params).await
-            };
+            let fut = async move { Self::create_handler(&executor, cmd, &params).await };
 
             fut.boxed().compat()
         });
@@ -122,9 +120,12 @@ impl RpcApi {
         cmd: RpcCommand,
         params: &Params,
     ) -> std::result::Result<serde_json::Value, JsonRpcError> {
-        use std::panic::{AssertUnwindSafe};
+        use std::panic::AssertUnwindSafe;
 
-        let result: Result<Result<serde_json::Value, RunCommandError>, _> = AssertUnwindSafe(Self::run_command(&executor, cmd, params)).catch_unwind().await;
+        let result: Result<Result<serde_json::Value, RunCommandError>, _> =
+            AssertUnwindSafe(Self::run_command(&executor, cmd, params))
+                .catch_unwind()
+                .await;
 
         match result {
             Ok(Ok(result)) => Ok(result),

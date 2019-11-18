@@ -56,7 +56,8 @@ impl MigrationPersistence for SqlMigrationPersistence {
                     .execute_raw(
                         "DETACH DATABASE ?",
                         &[ParameterizedValue::from(self.schema_name.as_str())],
-                    ).await
+                    )
+                    .await
                     .ok();
                 std::fs::remove_file(file_path).ok(); // ignore potential errors
                 self.connection
@@ -66,7 +67,8 @@ impl MigrationPersistence for SqlMigrationPersistence {
                             ParameterizedValue::from(file_path.as_str()),
                             ParameterizedValue::from(self.schema_name.as_str()),
                         ],
-                    ).await
+                    )
+                    .await
                     .unwrap();
             }
             ConnectionInfo::Mysql(_) => {

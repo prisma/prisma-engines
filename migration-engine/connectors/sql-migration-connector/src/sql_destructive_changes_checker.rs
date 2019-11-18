@@ -14,7 +14,11 @@ pub struct SqlDestructiveChangesChecker {
 }
 
 impl SqlDestructiveChangesChecker {
-    async fn check_table_drop(&self, table_name: &str, diagnostics: &mut DestructiveChangeDiagnostics) -> SqlResult<()> {
+    async fn check_table_drop(
+        &self,
+        table_name: &str,
+        diagnostics: &mut DestructiveChangeDiagnostics,
+    ) -> SqlResult<()> {
         let query = Select::from_table((self.schema_name.as_str(), table_name)).value(count(asterisk()));
         let result_set = self.database.query(query.into()).await?;
         let first_row = result_set.first().ok_or_else(|| {
@@ -130,15 +134,16 @@ impl SqlDestructiveChangesChecker {
                     for change in &alter_table.changes {
                         match *change {
                             TableChange::DropColumn(ref drop_column) => {
-                                self.check_column_drop(drop_column, before_table, &mut diagnostics).await?
+                                self.check_column_drop(drop_column, before_table, &mut diagnostics)
+                                    .await?
                             }
                             TableChange::AlterColumn(ref alter_column) => {
-                                self.check_alter_column(alter_column, before_table, &mut diagnostics).await?
+                                self.check_alter_column(alter_column, before_table, &mut diagnostics)
+                                    .await?
                             }
-                            _ => ()
+                            _ => (),
                         }
                     }
-
                 }
                 // Here, check for each table we are going to delete if it is empty. If
                 // not, return a warning.

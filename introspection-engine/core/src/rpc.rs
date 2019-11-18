@@ -3,8 +3,8 @@ use crate::CoreResult;
 use datamodel::Datamodel;
 use introspection_connector::DatabaseMetadata;
 use jsonrpc_core::*;
-use tokio::runtime::Runtime;
 use jsonrpc_derive::rpc;
+use tokio::runtime::Runtime;
 
 #[rpc]
 pub trait Rpc {
@@ -39,7 +39,9 @@ impl Rpc for RpcImpl {
 
 impl RpcImpl {
     pub(crate) fn new() -> Self {
-        RpcImpl { runtime: Runtime::new().unwrap() }
+        RpcImpl {
+            runtime: Runtime::new().unwrap(),
+        }
     }
 
     async fn introspect_internal(url: UrlInput) -> CoreResult<Datamodel> {

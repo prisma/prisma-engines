@@ -1,7 +1,7 @@
 #![allow(non_snake_case)]
 
 mod test_harness;
-use pretty_assertions::{assert_eq};
+use pretty_assertions::assert_eq;
 use quaint::prelude::SqlFamily;
 use sql_migration_connector::{AlterIndex, CreateIndex, DropIndex, SqlMigrationStep};
 use sql_schema_describer::*;

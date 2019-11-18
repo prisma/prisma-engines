@@ -1,9 +1,9 @@
 use crate::test_harness::{GenericSqlConnection, SqlConnection};
 use barrel::Migration;
+use once_cell::sync::Lazy;
 use pretty_assertions::assert_eq;
 use std::{rc::Rc, sync::Arc};
 use url::Url;
-use once_cell::sync::Lazy;
 
 pub static TEST_ASYNC_RUNTIME: Lazy<tokio::runtime::Runtime> =
     Lazy::new(|| tokio::runtime::Runtime::new().expect("failed to start tokio test runtime"));

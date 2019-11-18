@@ -228,7 +228,8 @@ async fn database_access_denied_must_return_a_proper_error_in_cli() {
         "--datasource",
         url.as_str(),
         "--can_connect_to_database",
-    ]).await;
+    ])
+    .await;
 
     let json_error = serde_json::to_value(&error).unwrap();
     let expected = json!({

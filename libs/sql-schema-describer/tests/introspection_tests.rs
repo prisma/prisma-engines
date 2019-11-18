@@ -1,7 +1,7 @@
 use barrel::{types, Migration};
+use futures::FutureExt;
 use pretty_assertions::assert_eq;
 use sql_schema_describer::{SqlSchemaDescriberBackend, *};
-use futures::FutureExt;
 use std::pin::Pin;
 
 mod common;
@@ -50,32 +50,33 @@ fn is_required_must_work() {
         },
         |db_type, inspector| {
             async move {
-            let result = inspector.describe(SCHEMA).await.expect("describing");
-            let user_table = result.get_table("User").expect("getting User table");
-            let expected_columns = vec![
-                Column {
-                    name: "column1".to_string(),
-                    tpe: ColumnType {
-                        raw: int_type(db_type),
-                        family: ColumnTypeFamily::Int,
+                let result = inspector.describe(SCHEMA).await.expect("describing");
+                let user_table = result.get_table("User").expect("getting User table");
+                let expected_columns = vec![
+                    Column {
+                        name: "column1".to_string(),
+                        tpe: ColumnType {
+                            raw: int_type(db_type),
+                            family: ColumnTypeFamily::Int,
+                        },
+                        arity: ColumnArity::Required,
+                        default: None,
+                        auto_increment: false,
                     },
-                    arity: ColumnArity::Required,
-                    default: None,
-                    auto_increment: false,
-                },
-                Column {
-                    name: "column2".to_string(),
-                    tpe: ColumnType {
-                        raw: int_type(db_type),
-                        family: ColumnTypeFamily::Int,
+                    Column {
+                        name: "column2".to_string(),
+                        tpe: ColumnType {
+                            raw: int_type(db_type),
+                            family: ColumnTypeFamily::Int,
+                        },
+                        arity: ColumnArity::Nullable,
+                        default: None,
+                        auto_increment: false,
                     },
-                    arity: ColumnArity::Nullable,
-                    default: None,
-                    auto_increment: false,
-                },
-            ];
-            assert_eq!(user_table.columns, expected_columns);
-            }.boxed()
+                ];
+                assert_eq!(user_table.columns, expected_columns);
+            }
+                .boxed()
         },
     );
 }
@@ -102,44 +103,45 @@ fn foreign_keys_must_work() {
         },
         |db_type, inspector| {
             async move {
-            let schema = inspector.describe(SCHEMA).await.expect("describe failed");
-            let user_table = schema.get_table("User").expect("couldn't get User table");
-            let expected_columns = vec![Column {
-                name: "city".to_string(),
-                tpe: ColumnType {
-                    raw: int_type(db_type),
-                    family: ColumnTypeFamily::Int,
-                },
-                arity: ColumnArity::Required,
-                default: None,
-                auto_increment: false,
-            }];
+                let schema = inspector.describe(SCHEMA).await.expect("describe failed");
+                let user_table = schema.get_table("User").expect("couldn't get User table");
+                let expected_columns = vec![Column {
+                    name: "city".to_string(),
+                    tpe: ColumnType {
+                        raw: int_type(db_type),
+                        family: ColumnTypeFamily::Int,
+                    },
+                    arity: ColumnArity::Required,
+                    default: None,
+                    auto_increment: false,
+                }];
 
-            let on_delete_action = match db_type {
-                DbType::MySql => ForeignKeyAction::Restrict,
-                _ => ForeignKeyAction::NoAction,
-            };
-            assert_eq!(
-                user_table,
-                &Table {
-                    name: "User".to_string(),
-                    columns: expected_columns,
-                    indices: vec![],
-                    primary_key: None,
-                    foreign_keys: vec![ForeignKey {
-                        constraint_name: match db_type {
-                            DbType::Postgres => Some("User_city_fkey".to_owned()),
-                            DbType::MySql => Some("User_ibfk_1".to_owned()),
-                            DbType::Sqlite => None,
-                        },
-                        columns: vec!["city".to_string()],
-                        referenced_columns: vec!["id".to_string()],
-                        referenced_table: "City".to_string(),
-                        on_delete_action,
-                    }],
-                }
-            );
-            }.boxed()
+                let on_delete_action = match db_type {
+                    DbType::MySql => ForeignKeyAction::Restrict,
+                    _ => ForeignKeyAction::NoAction,
+                };
+                assert_eq!(
+                    user_table,
+                    &Table {
+                        name: "User".to_string(),
+                        columns: expected_columns,
+                        indices: vec![],
+                        primary_key: None,
+                        foreign_keys: vec![ForeignKey {
+                            constraint_name: match db_type {
+                                DbType::Postgres => Some("User_city_fkey".to_owned()),
+                                DbType::MySql => Some("User_ibfk_1".to_owned()),
+                                DbType::Sqlite => None,
+                            },
+                            columns: vec!["city".to_string()],
+                            referenced_columns: vec!["id".to_string()],
+                            referenced_table: "City".to_string(),
+                            on_delete_action,
+                        }],
+                    }
+                );
+            }
+                .boxed()
         },
     );
 }
@@ -176,57 +178,58 @@ fn multi_column_foreign_keys_must_work() {
         },
         |db_type, inspector| {
             async move {
-            let schema = inspector.describe(SCHEMA).await.expect("describe failed");
-            let user_table = schema.get_table("User").expect("couldn't get User table");
-            let expected_columns = vec![
-                Column {
-                    name: "city".to_string(),
-                    tpe: ColumnType {
-                        raw: int_type(db_type),
-                        family: ColumnTypeFamily::Int,
-                    },
-                    arity: ColumnArity::Required,
-                    default: None,
-                    auto_increment: false,
-                },
-                Column {
-                    name: "city_name".to_string(),
-                    tpe: ColumnType {
-                        raw: varchar_type(db_type, 255),
-                        family: ColumnTypeFamily::String,
-                    },
-                    arity: ColumnArity::Required,
-                    default: None,
-                    auto_increment: false,
-                },
-            ];
-
-            let on_delete_action = match db_type {
-                DbType::MySql => ForeignKeyAction::Restrict,
-                _ => ForeignKeyAction::NoAction,
-            };
-
-            assert_eq!(
-                user_table,
-                &Table {
-                    name: "User".to_string(),
-                    columns: expected_columns,
-                    indices: vec![],
-                    primary_key: None,
-                    foreign_keys: vec![ForeignKey {
-                        constraint_name: match db_type {
-                            DbType::Postgres => Some("User_city_fkey".to_owned()),
-                            DbType::MySql => Some("User_ibfk_1".to_owned()),
-                            DbType::Sqlite => None,
+                let schema = inspector.describe(SCHEMA).await.expect("describe failed");
+                let user_table = schema.get_table("User").expect("couldn't get User table");
+                let expected_columns = vec![
+                    Column {
+                        name: "city".to_string(),
+                        tpe: ColumnType {
+                            raw: int_type(db_type),
+                            family: ColumnTypeFamily::Int,
                         },
-                        columns: vec!["city".to_string(), "city_name".to_string()],
-                        referenced_columns: vec!["id".to_string(), "name".to_string()],
-                        referenced_table: "City".to_string(),
-                        on_delete_action,
-                    },],
-                }
-            );
-            }.boxed()
+                        arity: ColumnArity::Required,
+                        default: None,
+                        auto_increment: false,
+                    },
+                    Column {
+                        name: "city_name".to_string(),
+                        tpe: ColumnType {
+                            raw: varchar_type(db_type, 255),
+                            family: ColumnTypeFamily::String,
+                        },
+                        arity: ColumnArity::Required,
+                        default: None,
+                        auto_increment: false,
+                    },
+                ];
+
+                let on_delete_action = match db_type {
+                    DbType::MySql => ForeignKeyAction::Restrict,
+                    _ => ForeignKeyAction::NoAction,
+                };
+
+                assert_eq!(
+                    user_table,
+                    &Table {
+                        name: "User".to_string(),
+                        columns: expected_columns,
+                        indices: vec![],
+                        primary_key: None,
+                        foreign_keys: vec![ForeignKey {
+                            constraint_name: match db_type {
+                                DbType::Postgres => Some("User_city_fkey".to_owned()),
+                                DbType::MySql => Some("User_ibfk_1".to_owned()),
+                                DbType::Sqlite => None,
+                            },
+                            columns: vec!["city".to_string(), "city_name".to_string()],
+                            referenced_columns: vec!["id".to_string(), "name".to_string()],
+                            referenced_table: "City".to_string(),
+                            on_delete_action,
+                        },],
+                    }
+                );
+            }
+                .boxed()
         },
     );
 }
@@ -243,20 +246,21 @@ fn names_with_hyphens_must_work() {
         },
         |db_type, inspector| {
             async move {
-            let result = inspector.describe(SCHEMA).await.expect("describing");
-            let user_table = result.get_table("User-table").expect("getting User table");
-            let expected_columns = vec![Column {
-                name: "column-1".to_string(),
-                tpe: ColumnType {
-                    raw: int_type(db_type),
-                    family: ColumnTypeFamily::Int,
-                },
-                arity: ColumnArity::Required,
-                default: None,
-                auto_increment: false,
-            }];
-            assert_eq!(user_table.columns, expected_columns);
-            }.boxed()
+                let result = inspector.describe(SCHEMA).await.expect("describing");
+                let user_table = result.get_table("User-table").expect("getting User table");
+                let expected_columns = vec![Column {
+                    name: "column-1".to_string(),
+                    tpe: ColumnType {
+                        raw: int_type(db_type),
+                        family: ColumnTypeFamily::Int,
+                    },
+                    arity: ColumnArity::Required,
+                    default: None,
+                    auto_increment: false,
+                }];
+                assert_eq!(user_table.columns, expected_columns);
+            }
+                .boxed()
         },
     );
 }
@@ -289,51 +293,52 @@ fn composite_primary_keys_must_work() {
         },
         |db_type, inspector| {
             async move {
-            let schema = inspector.describe(SCHEMA).await.expect("describe failed");
-            let table = schema.get_table("User").expect("couldn't get User table");
-            let (exp_int, exp_varchar) = match db_type {
-                DbType::Sqlite => ("INTEGER", "VARCHAR(255)"),
-                DbType::MySql => ("int", "varchar"),
-                DbType::Postgres => ("int4", "varchar"),
-            };
-            let mut expected_columns = vec![
-                Column {
-                    name: "id".to_string(),
-                    tpe: ColumnType {
-                        raw: exp_int.to_string(),
-                        family: ColumnTypeFamily::Int,
+                let schema = inspector.describe(SCHEMA).await.expect("describe failed");
+                let table = schema.get_table("User").expect("couldn't get User table");
+                let (exp_int, exp_varchar) = match db_type {
+                    DbType::Sqlite => ("INTEGER", "VARCHAR(255)"),
+                    DbType::MySql => ("int", "varchar"),
+                    DbType::Postgres => ("int4", "varchar"),
+                };
+                let mut expected_columns = vec![
+                    Column {
+                        name: "id".to_string(),
+                        tpe: ColumnType {
+                            raw: exp_int.to_string(),
+                            family: ColumnTypeFamily::Int,
+                        },
+                        arity: ColumnArity::Required,
+                        default: None,
+                        auto_increment: false,
                     },
-                    arity: ColumnArity::Required,
-                    default: None,
-                    auto_increment: false,
-                },
-                Column {
-                    name: "name".to_string(),
-                    tpe: ColumnType {
-                        raw: exp_varchar.to_string(),
-                        family: ColumnTypeFamily::String,
+                    Column {
+                        name: "name".to_string(),
+                        tpe: ColumnType {
+                            raw: exp_varchar.to_string(),
+                            family: ColumnTypeFamily::String,
+                        },
+                        arity: ColumnArity::Required,
+                        default: None,
+                        auto_increment: false,
                     },
-                    arity: ColumnArity::Required,
-                    default: None,
-                    auto_increment: false,
-                },
-            ];
-            expected_columns.sort_unstable_by_key(|c| c.name.to_owned());
+                ];
+                expected_columns.sort_unstable_by_key(|c| c.name.to_owned());
 
-            assert_eq!(
-                table,
-                &Table {
-                    name: "User".to_string(),
-                    columns: expected_columns,
-                    indices: vec![],
-                    primary_key: Some(PrimaryKey {
-                        columns: vec!["id".to_string(), "name".to_string()],
-                        sequence: None,
-                    }),
-                    foreign_keys: vec![],
-                }
-            );
-            }.boxed()
+                assert_eq!(
+                    table,
+                    &Table {
+                        name: "User".to_string(),
+                        columns: expected_columns,
+                        indices: vec![],
+                        primary_key: Some(PrimaryKey {
+                            columns: vec!["id".to_string(), "name".to_string()],
+                            sequence: None,
+                        }),
+                        foreign_keys: vec![],
+                    }
+                );
+            }
+                .boxed()
         },
     );
 }
@@ -352,60 +357,61 @@ fn indices_must_work() {
         },
         |db_type, inspector| {
             async move {
-            let result = inspector.describe(&SCHEMA.to_string()).await.expect("describing");
-            let user_table = result.get_table("User").expect("getting User table");
-            let default = match db_type {
-                DbType::Postgres => Some(format!("nextval(\"{}\".\"User_id_seq\"::regclass)", SCHEMA)),
-                _ => None,
-            };
-            let expected_columns = vec![
-                Column {
-                    name: "count".to_string(),
-                    tpe: ColumnType {
-                        raw: int_type(db_type),
-                        family: ColumnTypeFamily::Int,
-                    },
-                    arity: ColumnArity::Required,
-                    default: None,
-                    auto_increment: false,
-                },
-                Column {
-                    name: "id".to_string(),
-                    tpe: ColumnType {
-                        raw: int_type(db_type),
-                        family: ColumnTypeFamily::Int,
-                    },
-                    arity: ColumnArity::Required,
-                    default,
-                    auto_increment: true,
-                },
-            ];
-            let pk_sequence = match db_type {
-                DbType::Postgres => Some(Sequence {
-                    name: "User_id_seq".to_string(),
-                    allocation_size: 1,
-                    initial_value: 1,
-                }),
-                _ => None,
-            };
-            assert_eq!(
-                user_table,
-                &Table {
-                    name: "User".to_string(),
-                    columns: expected_columns,
-                    indices: vec![Index {
+                let result = inspector.describe(&SCHEMA.to_string()).await.expect("describing");
+                let user_table = result.get_table("User").expect("getting User table");
+                let default = match db_type {
+                    DbType::Postgres => Some(format!("nextval(\"{}\".\"User_id_seq\"::regclass)", SCHEMA)),
+                    _ => None,
+                };
+                let expected_columns = vec![
+                    Column {
                         name: "count".to_string(),
-                        columns: vec!["count".to_string()],
-                        tpe: IndexType::Normal,
-                    },],
-                    primary_key: Some(PrimaryKey {
-                        columns: vec!["id".to_string()],
-                        sequence: pk_sequence,
+                        tpe: ColumnType {
+                            raw: int_type(db_type),
+                            family: ColumnTypeFamily::Int,
+                        },
+                        arity: ColumnArity::Required,
+                        default: None,
+                        auto_increment: false,
+                    },
+                    Column {
+                        name: "id".to_string(),
+                        tpe: ColumnType {
+                            raw: int_type(db_type),
+                            family: ColumnTypeFamily::Int,
+                        },
+                        arity: ColumnArity::Required,
+                        default,
+                        auto_increment: true,
+                    },
+                ];
+                let pk_sequence = match db_type {
+                    DbType::Postgres => Some(Sequence {
+                        name: "User_id_seq".to_string(),
+                        allocation_size: 1,
+                        initial_value: 1,
                     }),
-                    foreign_keys: vec![],
-                }
-            );
-            }.boxed()
+                    _ => None,
+                };
+                assert_eq!(
+                    user_table,
+                    &Table {
+                        name: "User".to_string(),
+                        columns: expected_columns,
+                        indices: vec![Index {
+                            name: "count".to_string(),
+                            columns: vec!["count".to_string()],
+                            tpe: IndexType::Normal,
+                        },],
+                        primary_key: Some(PrimaryKey {
+                            columns: vec!["id".to_string()],
+                            sequence: pk_sequence,
+                        }),
+                        foreign_keys: vec![],
+                    }
+                );
+            }
+                .boxed()
         },
     );
 }
@@ -429,74 +435,75 @@ fn column_uniqueness_must_be_detected() {
         },
         |db_type, inspector| {
             async move {
-            let result = inspector.describe(&SCHEMA.to_string()).await.expect("describing");
-            let user_table = result.get_table("User").expect("getting User table");
-            let expected_columns = vec![
-                Column {
-                    name: "uniq1".to_string(),
-                    tpe: ColumnType {
-                        raw: int_type(db_type),
-                        family: ColumnTypeFamily::Int,
+                let result = inspector.describe(&SCHEMA.to_string()).await.expect("describing");
+                let user_table = result.get_table("User").expect("getting User table");
+                let expected_columns = vec![
+                    Column {
+                        name: "uniq1".to_string(),
+                        tpe: ColumnType {
+                            raw: int_type(db_type),
+                            family: ColumnTypeFamily::Int,
+                        },
+                        arity: ColumnArity::Required,
+                        default: None,
+                        auto_increment: false,
                     },
-                    arity: ColumnArity::Required,
-                    default: None,
-                    auto_increment: false,
-                },
-                Column {
-                    name: "uniq2".to_string(),
-                    tpe: ColumnType {
-                        raw: int_type(db_type),
-                        family: ColumnTypeFamily::Int,
+                    Column {
+                        name: "uniq2".to_string(),
+                        tpe: ColumnType {
+                            raw: int_type(db_type),
+                            family: ColumnTypeFamily::Int,
+                        },
+                        arity: ColumnArity::Required,
+                        default: None,
+                        auto_increment: false,
                     },
-                    arity: ColumnArity::Required,
-                    default: None,
-                    auto_increment: false,
-                },
-            ];
-            let mut expected_indices = vec![Index {
-                name: "uniq".to_string(),
-                columns: vec!["uniq2".to_string()],
-                tpe: IndexType::Unique,
-            }];
-            match db_type {
-                DbType::MySql => expected_indices.push(Index {
-                    name: "uniq1".to_string(),
-                    columns: vec!["uniq1".to_string()],
+                ];
+                let mut expected_indices = vec![Index {
+                    name: "uniq".to_string(),
+                    columns: vec!["uniq2".to_string()],
                     tpe: IndexType::Unique,
-                }),
-                DbType::Postgres => expected_indices.insert(
-                    0,
-                    Index {
-                        name: "User_uniq1_key".to_string(),
+                }];
+                match db_type {
+                    DbType::MySql => expected_indices.push(Index {
+                        name: "uniq1".to_string(),
                         columns: vec!["uniq1".to_string()],
                         tpe: IndexType::Unique,
-                    },
-                ),
-                DbType::Sqlite => expected_indices.push(Index {
-                    name: "sqlite_autoindex_User_1".to_string(),
-                    columns: vec!["uniq1".to_string()],
-                    tpe: IndexType::Unique,
-                }),
-            };
-            assert_eq!(
-                user_table,
-                &Table {
-                    name: "User".to_string(),
-                    columns: expected_columns,
-                    indices: expected_indices,
-                    primary_key: None,
-                    foreign_keys: vec![],
-                }
-            );
-            assert!(
-                user_table.is_column_unique(&user_table.columns[0].name),
-                "Column 1 should return true for is_unique"
-            );
-            assert!(
-                user_table.is_column_unique(&user_table.columns[1].name),
-                "Column 2 should return true for is_unique"
-            );
-            }.boxed()
+                    }),
+                    DbType::Postgres => expected_indices.insert(
+                        0,
+                        Index {
+                            name: "User_uniq1_key".to_string(),
+                            columns: vec!["uniq1".to_string()],
+                            tpe: IndexType::Unique,
+                        },
+                    ),
+                    DbType::Sqlite => expected_indices.push(Index {
+                        name: "sqlite_autoindex_User_1".to_string(),
+                        columns: vec!["uniq1".to_string()],
+                        tpe: IndexType::Unique,
+                    }),
+                };
+                assert_eq!(
+                    user_table,
+                    &Table {
+                        name: "User".to_string(),
+                        columns: expected_columns,
+                        indices: expected_indices,
+                        primary_key: None,
+                        foreign_keys: vec![],
+                    }
+                );
+                assert!(
+                    user_table.is_column_unique(&user_table.columns[0].name),
+                    "Column 1 should return true for is_unique"
+                );
+                assert!(
+                    user_table.is_column_unique(&user_table.columns[1].name),
+                    "Column 2 should return true for is_unique"
+                );
+            }
+                .boxed()
         },
     );
 }
@@ -513,33 +520,34 @@ fn defaults_must_work() {
         },
         |db_type, inspector| {
             async move {
-            let result = inspector.describe(&SCHEMA.to_string()).await.expect("describing");
-            let user_table = result.get_table("User").expect("getting User table");
-            let default = match db_type {
-                DbType::Sqlite => "'1'".to_string(),
-                _ => "1".to_string(),
-            };
-            let expected_columns = vec![Column {
-                name: "id".to_string(),
-                tpe: ColumnType {
-                    raw: int_type(db_type),
-                    family: ColumnTypeFamily::Int,
-                },
-                arity: ColumnArity::Nullable,
-                default: Some(default),
-                auto_increment: false,
-            }];
-            assert_eq!(
-                user_table,
-                &Table {
-                    name: "User".to_string(),
-                    columns: expected_columns,
-                    indices: vec![],
-                    primary_key: None,
-                    foreign_keys: vec![],
-                }
-            );
-            }.boxed()
+                let result = inspector.describe(&SCHEMA.to_string()).await.expect("describing");
+                let user_table = result.get_table("User").expect("getting User table");
+                let default = match db_type {
+                    DbType::Sqlite => "'1'".to_string(),
+                    _ => "1".to_string(),
+                };
+                let expected_columns = vec![Column {
+                    name: "id".to_string(),
+                    tpe: ColumnType {
+                        raw: int_type(db_type),
+                        family: ColumnTypeFamily::Int,
+                    },
+                    arity: ColumnArity::Nullable,
+                    default: Some(default),
+                    auto_increment: false,
+                }];
+                assert_eq!(
+                    user_table,
+                    &Table {
+                        name: "User".to_string(),
+                        columns: expected_columns,
+                        indices: vec![],
+                        primary_key: None,
+                        foreign_keys: vec![],
+                    }
+                );
+            }
+                .boxed()
         },
     );
 }
@@ -547,7 +555,10 @@ fn defaults_must_work() {
 fn test_each_backend<MigrationFn, TestFn>(mut migration_fn: MigrationFn, test_fn: TestFn)
 where
     MigrationFn: FnMut(DbType, &mut Migration) -> (),
-    TestFn: for<'a> Fn(DbType, &'a mut dyn SqlSchemaDescriberBackend) -> Pin<Box<dyn std::future::Future<Output = ()> + 'a>>,
+    TestFn: for<'a> Fn(
+        DbType,
+        &'a mut dyn SqlSchemaDescriberBackend,
+    ) -> Pin<Box<dyn std::future::Future<Output = ()> + 'a>>,
 {
     let runtime = tokio_runtime();
     // SQLite

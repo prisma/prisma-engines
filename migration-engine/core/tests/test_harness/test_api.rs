@@ -84,7 +84,7 @@ impl TestApi {
 
         let steps = self.run_infer_command(input).await.0.datamodel_steps;
 
-       self.apply_migration(steps, migration_id).await
+        self.apply_migration(steps, migration_id).await
     }
 
     pub async fn execute_command<'a, C>(&self, input: &'a C::Input) -> Result<C::Output, user_facing_errors::Error>

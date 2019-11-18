@@ -35,14 +35,15 @@ impl<'a> MigrationCommand for CalculateDatabaseStepsCommand<'a> {
             .infer(&assumed_datamodel_ast, &cmd.input.steps_to_apply)?;
         let next_datamodel = datamodel::lift_ast(&next_datamodel_ast)?;
 
-        let database_migration = connector.database_migration_inferrer().infer(
-            &assumed_datamodel,
-            &next_datamodel,
-            &cmd.input.steps_to_apply,
-        ).await?;
+        let database_migration = connector
+            .database_migration_inferrer()
+            .infer(&assumed_datamodel, &next_datamodel, &cmd.input.steps_to_apply)
+            .await?;
 
-        let DestructiveChangeDiagnostics { warnings, errors: _ } =
-            connector.destructive_changes_checker().check(&database_migration).await?;
+        let DestructiveChangeDiagnostics { warnings, errors: _ } = connector
+            .destructive_changes_checker()
+            .check(&database_migration)
+            .await?;
 
         let database_steps_json = connector
             .database_migration_step_applier()

@@ -680,7 +680,8 @@ async fn postgres_enums_must_work() {
     let inspector = get_postgres_describer(&format!(
         "CREATE TYPE \"{}\".\"mood\" AS ENUM ('sad', 'ok', 'happy')",
         SCHEMA
-    )).await;
+    ))
+    .await;
 
     let schema = inspector.describe(SCHEMA).await.expect("describing");
     let got_enum = schema.get_enum("mood").expect("get enum");

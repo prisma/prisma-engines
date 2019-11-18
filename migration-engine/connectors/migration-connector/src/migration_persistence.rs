@@ -39,7 +39,8 @@ pub trait MigrationPersistence: Send + Sync + 'static {
     }
 
     async fn last_non_watch_datamodel(&self) -> Datamodel {
-        self.last_non_watch_migration().await
+        self.last_non_watch_migration()
+            .await
             .map(|m| m.datamodel)
             .unwrap_or_else(Datamodel::empty)
     }

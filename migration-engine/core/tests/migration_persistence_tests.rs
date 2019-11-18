@@ -3,7 +3,7 @@
 mod test_harness;
 
 use migration_connector::{steps::CreateEnum, *};
-use pretty_assertions::{assert_eq};
+use pretty_assertions::assert_eq;
 use quaint::prelude::SqlFamily;
 use test_harness::*;
 

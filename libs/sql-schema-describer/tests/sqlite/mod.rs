@@ -16,7 +16,8 @@ pub async fn get_sqlite_describer(sql: &str) -> sqlite::SqlSchemaDescriber {
         std::fs::remove_file(database_file_path.clone()).expect("remove database file");
     }
 
-    let conn = GenericSqlConnection::from_database_str(&format!("file://{}", database_file_path), Some(SCHEMA)).unwrap();
+    let conn =
+        GenericSqlConnection::from_database_str(&format!("file://{}", database_file_path), Some(SCHEMA)).unwrap();
     for statement in sql.split(";").filter(|statement| !statement.is_empty()) {
         conn.execute_raw(statement, &[]).await.expect("executing migration");
     }

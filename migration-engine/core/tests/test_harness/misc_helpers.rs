@@ -1,12 +1,12 @@
 use datamodel::ast::{parser, SchemaAst};
 use migration_connector::*;
 use migration_core::{api::MigrationApi, commands::ResetCommand};
+use once_cell::sync::Lazy;
 use quaint::pool::SqlFamily;
 use sql_connection::{GenericSqlConnection, SqlConnection};
 use sql_migration_connector::SqlMigrationConnector;
 use std::{rc::Rc, sync::Arc};
 use url::Url;
-use once_cell::sync::Lazy;
 
 pub static TEST_ASYNC_RUNTIME: Lazy<tokio::runtime::Runtime> =
     Lazy::new(|| tokio::runtime::Runtime::new().expect("failed to start tokio test runtime"));
@@ -26,7 +26,9 @@ pub(super) async fn mysql_migration_connector(database_url: &str) -> SqlMigratio
             let connect_cmd = |url: url::Url| GenericSqlConnection::from_database_str(url.as_str(), None);
 
             create_database(url, "mysql", "/", name_cmd, Rc::new(connect_cmd)).await;
-            SqlMigrationConnector::new_from_database_str(database_url).await.unwrap()
+            SqlMigrationConnector::new_from_database_str(database_url)
+                .await
+                .unwrap()
         }
     }
 }
@@ -44,14 +46,19 @@ pub(super) async fn postgres_migration_connector(url: &str) -> SqlMigrationConne
                 "postgres",
                 name_cmd,
                 Rc::new(connect_cmd),
-            ).await;
-            SqlMigrationConnector::new_from_database_str(&postgres_url()).await.unwrap()
+            )
+            .await;
+            SqlMigrationConnector::new_from_database_str(&postgres_url())
+                .await
+                .unwrap()
         }
     }
 }
 
 pub(super) async fn sqlite_migration_connector() -> SqlMigrationConnector {
-    SqlMigrationConnector::new_from_database_str(&sqlite_test_file()).await.unwrap()
+    SqlMigrationConnector::new_from_database_str(&sqlite_test_file())
+        .await
+        .unwrap()
 }
 
 pub async fn test_api<C, D>(connector: C) -> MigrationApi<C, D>

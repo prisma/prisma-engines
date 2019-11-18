@@ -119,13 +119,7 @@ fn fetch_db_name(url: &Url, default: &str) -> String {
     String::from(result)
 }
 
-async fn create_conn(
-    datasource: &str,
-    admin_mode: bool,
-) -> crate::Result<(
-    String,
-    Box<SqlMigrationConnector>,
-)> {
+async fn create_conn(datasource: &str, admin_mode: bool) -> crate::Result<(String, Box<SqlMigrationConnector>)> {
     let mut url = Url::parse(datasource).expect("Invalid url in the datasource");
     let sql_family = SqlFamily::from_scheme(url.scheme());
 
@@ -180,7 +174,7 @@ async fn create_postgres_admin_conn(mut url: Url) -> crate::Result<SqlMigrationC
             // If the outcome is anything else, use this.
             other_outcome => {
                 connector = Some(other_outcome);
-                break
+                break;
             }
         }
     }
@@ -295,9 +289,9 @@ pub fn render_error(cli_error: CliError) -> user_facing_errors::Error {
 #[cfg(test)]
 mod tests {
     use super::CliError;
-    use sql_connection::{GenericSqlConnection, SqlConnection};
     use clap::ArgMatches;
     use once_cell::sync::Lazy;
+    use sql_connection::{GenericSqlConnection, SqlConnection};
 
     static TEST_ASYNC_RUNTIME: Lazy<tokio::runtime::Runtime> =
         Lazy::new(|| tokio::runtime::Runtime::new().expect("failed to start tokio test runtime"));
@@ -448,7 +442,9 @@ mod tests {
                 let uri = mysql_url(None);
                 let conn = GenericSqlConnection::from_database_str(&uri, None).unwrap();
 
-                conn.execute_raw("DROP DATABASE `this_should_exist`", &[]).await.unwrap();
+                conn.execute_raw("DROP DATABASE `this_should_exist`", &[])
+                    .await
+                    .unwrap();
             }
 
             res.unwrap();
@@ -476,7 +472,9 @@ mod tests {
                 let uri = postgres_url(None);
                 let conn = GenericSqlConnection::from_database_str(&uri, None).unwrap();
 
-                conn.execute_raw("DROP DATABASE \"this_should_exist\"", &[]).await.unwrap();
+                conn.execute_raw("DROP DATABASE \"this_should_exist\"", &[])
+                    .await
+                    .unwrap();
             }
 
             res.unwrap();

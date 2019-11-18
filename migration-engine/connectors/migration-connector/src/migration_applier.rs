@@ -4,7 +4,8 @@ use std::sync::Arc;
 /// Apply and unapply migrations on the connector's database.
 #[async_trait::async_trait]
 pub trait MigrationApplier<T>
-where T: Send + Sync + 'static
+where
+    T: Send + Sync + 'static,
 {
     async fn apply(&self, migration: &Migration, database_migration: &T) -> ConnectorResult<()>;
 
@@ -12,7 +13,8 @@ where T: Send + Sync + 'static
 }
 
 pub struct MigrationApplierImpl<T>
-where T: Send + Sync + 'static
+where
+    T: Send + Sync + 'static,
 {
     pub migration_persistence: Arc<dyn MigrationPersistence>,
     pub step_applier: Arc<dyn DatabaseMigrationStepApplier<T>>,
@@ -20,7 +22,8 @@ where T: Send + Sync + 'static
 
 #[async_trait::async_trait]
 impl<T> MigrationApplier<T> for MigrationApplierImpl<T>
-where T: Send + Sync + 'static
+where
+    T: Send + Sync + 'static,
 {
     async fn apply(&self, migration: &Migration, database_migration: &T) -> ConnectorResult<()> {
         assert_eq!(migration.status, MigrationStatus::Pending); // what other states are valid here?
@@ -70,9 +73,14 @@ where T: Send + Sync + 'static
 }
 
 impl<T> MigrationApplierImpl<T>
-where T: Send + Sync + 'static
+where
+    T: Send + Sync + 'static,
 {
-    async fn go_forward(&self, migration_updates: &mut MigrationUpdateParams, database_migration: &T) -> ConnectorResult<()> {
+    async fn go_forward(
+        &self,
+        migration_updates: &mut MigrationUpdateParams,
+        database_migration: &T,
+    ) -> ConnectorResult<()> {
         let mut step = 0;
         while self.step_applier.apply_step(&database_migration, step).await? {
             step += 1;
