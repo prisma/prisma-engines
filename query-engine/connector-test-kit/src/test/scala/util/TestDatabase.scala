@@ -35,7 +35,7 @@ case class MigrationEngine(project: Project) {
   def inferMigrationSteps(): MigrationStepsResultOutput = {
     val params = InferMigrationStepsInput(
       migrationId = migrationId,
-      datamodel = project.dataModel,
+      datamodel = project.dataModelWithDataSourceConfig,
       assumeToBeApplied = Vector.empty
     )
     sendRpcCall[InferMigrationStepsInput, MigrationStepsResultOutput]("inferMigrationSteps", params)
