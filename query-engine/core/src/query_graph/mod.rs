@@ -23,8 +23,15 @@ use std::borrow::Borrow;
 pub type QueryGraphResult<T> = std::result::Result<T, QueryGraphError>;
 
 pub enum Node {
+    /// Nodes representing actual queries to the underlying connector.
     Query(Query),
+
+    /// Flow control nodes.
     Flow(Flow),
+
+    /// Empty node, will return empty result on interpretation.
+    /// Useful for checks that are only supposed to fail and noop on success.
+    FixedResult(),
 }
 
 impl From<Query> for Node {
@@ -43,10 +50,6 @@ pub enum Flow {
     /// Expresses a conditional control flow in the graph.
     /// Possible outgoing edges are `then` and `else`, each at most once, with `then` required to be present.
     If(Box<dyn FnOnce() -> bool + Send + Sync + 'static>),
-
-    /// Empty node, will return empty result on interpretation.
-    /// Useful for checks that are only supposed to fail and noop on success.
-    Empty,
 }
 
 impl Flow {
@@ -85,7 +88,7 @@ pub type ParentResultFn = Box<dyn FnOnce(Node, &QueryResult) -> QueryGraphBuilde
 /// Stored on the edges of the QueryGraph, a QueryGraphDependency contains information on how children are connected to their parents,
 /// expressing for example the need for additional information from the parent to be able to execute at runtime.
 pub enum QueryGraphDependency {
-    /// Simple dependency indicating order of execution. Effectively a NOOP for now.
+    /// Simple dependency indicating order of execution. Effectively an ordering and reachability tool for now.
     ExecutionOrder,
 
     /// Performs a transformation on the child node based on the raw parent query result.

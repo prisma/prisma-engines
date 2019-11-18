@@ -149,13 +149,14 @@ fn handle_many_to_many(
     Ok(())
 }
 
+/// Set only works on lists. This means implicitly that `parent` can never be the inlined side.
 fn handle_one_to_many(
     graph: &mut QueryGraph,
     parent_node: &NodeRef,
     parent_relation_field: &RelationFieldRef,
     finders: Vec<RecordFinder>,
 ) -> QueryGraphBuilderResult<()> {
-    unimplemented!();
+    unimplemented!()
 }
 
 // let mut finders = Vec::new();

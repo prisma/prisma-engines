@@ -13,7 +13,12 @@ use prisma_models::prelude::*;
 #[derive(Debug, Clone)]
 pub enum ExpressionResult {
     Query(QueryResult),
+    // Computation(ComputationResult),
     Empty,
+}
+
+pub enum ComputationResult {
+    List(Vec<PrismaValue>),
 }
 
 impl ExpressionResult {
