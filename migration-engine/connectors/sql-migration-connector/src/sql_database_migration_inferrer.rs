@@ -22,7 +22,7 @@ impl DatabaseMigrationInferrer<SqlMigration> for SqlDatabaseMigrationInferrer {
         _steps: &[MigrationStep],
     ) -> ConnectorResult<SqlMigration> {
         let result: SqlResult<SqlMigration> = (|| {
-            let current_database_schema: SqlSchema = self.introspect(&self.schema_name)?;
+            let current_database_schema: SqlSchema = self.introspect(&self.schema_name).await?;
             let expected_database_schema = SqlSchemaCalculator::calculate(next)?;
             infer(
                 &current_database_schema,
@@ -57,8 +57,8 @@ impl DatabaseMigrationInferrer<SqlMigration> for SqlDatabaseMigrationInferrer {
 }
 
 impl SqlDatabaseMigrationInferrer {
-    fn introspect(&self, schema: &str) -> SqlResult<SqlSchema> {
-        Ok(self.introspector.describe(&schema)?)
+    async fn introspect(&self, schema: &str) -> SqlResult<SqlSchema> {
+        Ok(self.introspector.describe(&schema).await?)
     }
 
     fn sql_family(&self) -> SqlFamily {

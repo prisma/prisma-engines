@@ -78,15 +78,13 @@ impl SqlMigrationConnector {
 
         let conn = Arc::new(connection) as Arc<dyn SqlConnection + Send + Sync>;
 
-        let inspector: Arc<dyn SqlSchemaDescriberBackend + Send + Sync + 'static> = {
-            unimplemented!()
-            // match sql_family {
-            // SqlFamily::Mysql => Arc::new(sql_schema_describer::mysql::SqlSchemaDescriber::new(Arc::clone(&conn))),
-            // SqlFamily::Postgres => Arc::new(sql_schema_describer::postgres::SqlSchemaDescriber::new(Arc::clone(
-            //     &conn,
-            // ))),
-            // SqlFamily::Sqlite => Arc::new(sql_schema_describer::sqlite::SqlSchemaDescriber::new(Arc::clone(&conn))),
-        // };
+        let inspector: Arc<dyn SqlSchemaDescriberBackend + Send + Sync + 'static> = 
+            match sql_family {
+            SqlFamily::Mysql => Arc::new(sql_schema_describer::mysql::SqlSchemaDescriber::new(Arc::clone(&conn))),
+            SqlFamily::Postgres => Arc::new(sql_schema_describer::postgres::SqlSchemaDescriber::new(Arc::clone(
+                &conn,
+            ))),
+            SqlFamily::Sqlite => Arc::new(sql_schema_describer::sqlite::SqlSchemaDescriber::new(Arc::clone(&conn))),
         };
 
         let migration_persistence = Arc::new(SqlMigrationPersistence {

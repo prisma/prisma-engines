@@ -2663,10 +2663,12 @@ dependencies = [
 name = "sql-schema-describer"
 version = "0.1.0"
 dependencies = [
+ "async-trait 0.1.17 (registry+https://github.com/rust-lang/crates.io-index)",
  "barrel 0.6.3-alpha.0 (git+https://github.com/aknuds1/barrel.git)",
  "chrono 0.4.9 (registry+https://github.com/rust-lang/crates.io-index)",
  "failure 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "fern 0.5.9 (registry+https://github.com/rust-lang/crates.io-index)",
+ "futures 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "itertools 0.8.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "log 0.4.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "pretty_assertions 0.6.1 (registry+https://github.com/rust-lang/crates.io-index)",

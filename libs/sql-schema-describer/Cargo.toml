@@ -15,6 +15,8 @@ url = "1.7.2"
 log = "0.4"
 regex = "1.2"
 sql-connection = { path = "../sql-connection" }
+async-trait = "0.1.17"
+futures = { package = "futures", version = "0.3", features = ["compat"] }
 
 [dev-dependencies]
 barrel = { version = "0.6.3-alpha.0", features = ["sqlite3", "mysql", "pg"] }
