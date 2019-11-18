@@ -1,14 +1,14 @@
-use crate::{error::*, query_builder::ReadQueryBuilder, AliasedCondition, RawQuery, SqlRow, ToSqlRow};
+use crate::{error::*, query_builder::read, AliasedCondition, RawQuery, SqlRow, ToSqlRow};
+use async_trait::async_trait;
 use connector_interface::{
     error::RecordFinderInfo,
     filter::{Filter, RecordFinder},
 };
-use async_trait::async_trait;
 use prisma_models::*;
 use quaint::{
     ast::*,
-    pool::PooledConnection,
     connector::{self, Queryable},
+    pool::PooledConnection,
 };
 use serde_json::{Map, Number, Value};
 use std::convert::TryFrom;
@@ -61,7 +61,7 @@ pub trait QueryExt: Queryable + Send + Sync {
 
         let model = record_finder.field.model();
         let selected_fields = SelectedFields::from(&model);
-        let select = ReadQueryBuilder::get_records(&model, &selected_fields, record_finder);
+        let select = read::get_records(&model, &selected_fields, record_finder);
         let idents = selected_fields.type_identifiers();
 
         let row = self.find(select, idents.as_slice()).await.map_err(|e| match e {
@@ -143,11 +143,7 @@ pub trait QueryExt: Queryable + Send + Sync {
         selector: &Option<RecordFinder>,
     ) -> crate::Result<GraphqlId> {
         let ids = self
-            .filter_ids_by_parents(
-                parent_field,
-                vec![parent_id],
-                selector.clone().map(Filter::from),
-            )
+            .filter_ids_by_parents(parent_field, vec![parent_id], selector.clone().map(Filter::from))
             .await?;
 
         let id = ids.into_iter().next().ok_or_else(|| SqlError::RecordsNotConnected {

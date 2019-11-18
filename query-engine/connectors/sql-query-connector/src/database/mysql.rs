@@ -10,7 +10,9 @@ pub struct Mysql {
 
 impl FromSource for Mysql {
     fn from_source(source: &dyn Source) -> crate::Result<Self> {
-        Ok(Mysql { pool: Quaint::new(&source.url().value)? })
+        Ok(Mysql {
+            pool: Quaint::new(&source.url().value)?,
+        })
     }
 }
 
