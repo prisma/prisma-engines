@@ -76,49 +76,40 @@ impl SelectDefinition for QueryArguments {
     }
 }
 
-pub struct ReadQueryBuilder;
+pub fn get_records<T>(model: &ModelRef, selected_fields: &SelectedFields, query: T) -> Select<'static>
+where
+    T: SelectDefinition,
+{
+    selected_fields
+        .columns()
+        .into_iter()
+        .fold(query.into_select(model), |acc, col| acc.column(col.clone()))
+}
 
-#[allow(dead_code)]
-impl ReadQueryBuilder {
-    pub fn get_records<T>(model: &ModelRef, selected_fields: &SelectedFields, query: T) -> Select<'static>
-    where
-        T: SelectDefinition,
-    {
-        selected_fields
-            .columns()
-            .into_iter()
-            .fold(query.into_select(model), |acc, col| acc.column(col.clone()))
-    }
+pub fn get_scalar_list_values_by_record_ids(
+    list_field: &ScalarFieldRef,
+    record_ids: Vec<GraphqlId>,
+) -> Select<'static> {
+    let table = list_field.scalar_list_table().table();
 
-    pub fn get_scalar_list_values_by_record_ids(
-        list_field: &ScalarFieldRef,
-        record_ids: Vec<GraphqlId>,
-    ) -> Select<'static> {
-        let table = list_field.scalar_list_table().table();
+    // I vant to saak your blaad... - Vlad the Impaler
+    let vhere = "nodeId".in_selection(record_ids);
 
-        // I vant to saak your blaad... - Vlad the Impaler
-        let vhere = "nodeId".in_selection(record_ids);
+    Select::from_table(table)
+        .column("nodeId")
+        .column("value")
+        .so_that(vhere)
+}
 
-        Select::from_table(table)
-            .column("nodeId")
-            .column("value")
-            .so_that(vhere)
-    }
+pub fn count_by_model(model: &ModelRef, query_arguments: QueryArguments) -> Select<'static> {
+    let id_field = model.fields().id();
 
-    pub fn count_by_model(model: &ModelRef, query_arguments: QueryArguments) -> Select<'static> {
-        let id_field = model.fields().id();
+    let mut selected_fields = SelectedFields::default();
+    selected_fields.add_scalar(id_field.clone());
 
-        let mut selected_fields = SelectedFields::default();
-        selected_fields.add_scalar(id_field.clone());
+    let base_query = get_records(model, &selected_fields, query_arguments);
+    let table = Table::from(base_query).alias("sub");
+    let column = Column::from(("sub", id_field.db_name().to_string()));
 
-        let base_query = Self::get_records(model, &selected_fields, query_arguments);
-        let table = Table::from(base_query).alias("sub");
-        let column = Column::from(("sub", id_field.db_name().to_string()));
-
-        Select::from_table(table).value(count(column))
-    }
-
-    pub fn count_by_table(database: &str, table: &str) -> Select<'static> {
-        Select::from_table((database.to_string(), table.to_string())).value(count(asterisk()))
-    }
+    Select::from_table(table).value(count(column))
 }

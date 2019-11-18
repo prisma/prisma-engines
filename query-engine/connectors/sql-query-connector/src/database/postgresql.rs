@@ -10,7 +10,9 @@ pub struct PostgreSql {
 
 impl FromSource for PostgreSql {
     fn from_source(source: &dyn Source) -> crate::Result<Self> {
-        Ok(PostgreSql { pool: Quaint::new(&source.url().value)? })
+        Ok(PostgreSql {
+            pool: Quaint::new(&source.url().value)?,
+        })
     }
 }
 

@@ -3,7 +3,7 @@ use crate::{database::operations::*, query_builder::read::ManyRelatedRecordsQuer
 use connector_interface::{
     self as connector,
     filter::{Filter, RecordFinder},
-    Connection, QueryArguments, ReadOperations, ScalarListValues, Transaction, WriteArgs, WriteOperations, IO
+    Connection, QueryArguments, ReadOperations, ScalarListValues, Transaction, WriteArgs, WriteOperations, IO,
 };
 use prisma_models::prelude::*;
 use quaint::connector::TransactionCapable;
@@ -102,7 +102,12 @@ where
         IO::new(async move { write::create_record(&self.inner, model, args).await })
     }
 
-    fn update_records<'a>(&'a self, model: &'a ModelRef, where_: Filter, args: WriteArgs) -> connector::IO<Vec<GraphqlId>> {
+    fn update_records<'a>(
+        &'a self,
+        model: &'a ModelRef,
+        where_: Filter,
+        args: WriteArgs,
+    ) -> connector::IO<Vec<GraphqlId>> {
         IO::new(async move { write::update_records(&self.inner, model, where_, args).await })
     }
 
