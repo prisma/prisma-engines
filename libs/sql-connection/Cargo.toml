@@ -10,5 +10,4 @@ edition = "2018"
 async-trait = "0.1.17"
 datamodel = { path = "../datamodel/core" }
 quaint = { git = "https://github.com/prisma/quaint.git" }
-tokio = "0.2.0-alpha.6"
 url = "1.7.0"

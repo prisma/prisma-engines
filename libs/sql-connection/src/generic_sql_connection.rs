@@ -4,12 +4,10 @@ use datamodel::{
     Source,
 };
 use quaint::{error::Error as QuaintError, prelude::*};
-use tokio::runtime::Runtime;
 use url::Url;
 
 pub struct GenericSqlConnection {
     pool: Quaint,
-    // runtime: Runtime,
 }
 
 impl GenericSqlConnection {
@@ -25,7 +23,6 @@ impl GenericSqlConnection {
 
         Ok(Self {
             pool,
-            // runtime: super::default_runtime(),
         })
     }
 
@@ -39,7 +36,6 @@ impl GenericSqlConnection {
             let pool = Quaint::new(&Self::url_with_db(&format!("file://{}", url_str), db_name)?)?;
             return Ok(Self {
                 pool,
-                // runtime: super::default_runtime(),
             });
         }
 
@@ -54,7 +50,6 @@ impl GenericSqlConnection {
 
         Ok(Self {
             pool,
-            // runtime: super::default_runtime(),
         })
     }
 
@@ -87,25 +82,3 @@ impl SqlConnection for GenericSqlConnection {
         self.pool.execute_raw(sql, params).await
     }
 }
-
-// impl SyncSqlConnection for GenericSqlConnection {
-//     fn execute(&self, q: Query<'_>) -> Result<Option<Id>, QuaintError> {
-//         let conn = self.runtime.block_on(self.pool.check_out())?;
-//         self.runtime.block_on(conn.execute(q))
-//     }
-
-//     fn query(&self, q: Query<'_>) -> Result<ResultSet, QuaintError> {
-//         let conn = self.runtime.block_on(self.pool.check_out())?;
-//         self.runtime.block_on(conn.query(q))
-//     }
-
-//     fn query_raw(&self, sql: &str, params: &[ParameterizedValue<'_>]) -> Result<ResultSet, QuaintError> {
-//         let conn = self.runtime.block_on(self.pool.check_out())?;
-//         self.runtime.block_on(conn.query_raw(sql, params))
-//     }
-
-//     fn execute_raw(&self, sql: &str, params: &[ParameterizedValue<'_>]) -> Result<u64, QuaintError> {
-//         let conn = self.runtime.block_on(self.pool.check_out())?;
-//         self.runtime.block_on(conn.execute_raw(sql, params))
-//     }
-// }
