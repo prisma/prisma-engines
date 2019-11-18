@@ -291,7 +291,7 @@ mod tests {
     use super::CliError;
     use clap::ArgMatches;
     use once_cell::sync::Lazy;
-    use sql_connection::{GenericSqlConnection, SqlConnection};
+    use quaint::prelude::*;
 
     static TEST_ASYNC_RUNTIME: Lazy<tokio::runtime::Runtime> =
         Lazy::new(|| tokio::runtime::Runtime::new().expect("failed to start tokio test runtime"));
@@ -440,7 +440,7 @@ mod tests {
 
             {
                 let uri = mysql_url(None);
-                let conn = GenericSqlConnection::from_database_str(&uri, None).unwrap();
+                let conn = Quaint::new(&uri).unwrap();
 
                 conn.execute_raw("DROP DATABASE `this_should_exist`", &[])
                     .await
@@ -470,7 +470,7 @@ mod tests {
 
             {
                 let uri = postgres_url(None);
-                let conn = GenericSqlConnection::from_database_str(&uri, None).unwrap();
+                let conn = Quaint::new(&uri).unwrap();
 
                 conn.execute_raw("DROP DATABASE \"this_should_exist\"", &[])
                     .await
