@@ -56,8 +56,11 @@ object ConnectorCapabilities {
   def apply(capabilities: ConnectorCapability*): ConnectorCapabilities = ConnectorCapabilities(Set(capabilities: _*))
 
   lazy val sqlite: ConnectorCapabilities = ConnectorCapabilities(sqlShared)
-  lazy val postgres: ConnectorCapabilities = ConnectorCapabilities(sqlShared)
   lazy val mysql: ConnectorCapabilities = ConnectorCapabilities(sqlShared)
+  lazy val postgres: ConnectorCapabilities = {
+    val extra = Set(EmbeddedScalarListsCapability)
+    ConnectorCapabilities(sqlShared ++ extra)
+  }
 
   private lazy val sqlShared: Set[ConnectorCapability] = {
     Set(
@@ -66,12 +69,9 @@ object ConnectorCapabilities {
       JoinRelationLinksCapability,
       RelationLinkTableCapability,
       MigrationsCapability,
-      NonEmbeddedScalarListCapability,
-//      NodeQueryCapability,
       IntrospectionCapability,
       SupportsExistingDatabasesCapability,
       IntIdCapability,
-      NonEmbeddedScalarListCapability,
       RawAccessCapability,
       IdSequenceCapability,
       Prisma2Capability,
