@@ -4,7 +4,7 @@ pub use connection_info::*;
 
 use crate::{
     ast,
-    connector::{self, Queryable, TransactionCapable, DBIO},
+    connector::{self, DBIO, Queryable, TransactionCapable, MysqlUrl},
     error::Error,
 };
 use futures::future;
@@ -59,7 +59,7 @@ impl Queryable for PooledConnection {
 #[doc(hidden)]
 pub enum QuaintManager {
     #[cfg(feature = "mysql")]
-    Mysql(mysql_async::OptsBuilder),
+    Mysql(MysqlUrl),
     #[cfg(feature = "postgresql")]
     Postgres {
         config: tokio_postgres::Config,
@@ -98,10 +98,10 @@ impl Manage for QuaintManager {
                 }
             }
             #[cfg(feature = "mysql")]
-            Self::Mysql(opts) => {
+            Self::Mysql(url) => {
                 use crate::connector::Mysql;
 
-                match Mysql::new(opts.clone()) {
+                match Mysql::new(url.clone()) {
                     Ok(mysql) => DBIO::new(future::ok(Box::new(mysql) as Self::Resource)),
                     Err(e) => DBIO::new(future::err(e)),
                 }

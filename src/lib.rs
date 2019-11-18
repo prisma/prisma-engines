@@ -201,11 +201,12 @@ impl Quaint {
             }
             #[cfg(feature = "mysql")]
             "mysql" => {
-                let params = connector::MysqlParams::try_from(url)?;
-                let manager = QuaintManager::Mysql(params.config);
+                let url = connector::MysqlUrl::new(url)?;
+                let connection_limit = url.connection_limit();
+                let manager = QuaintManager::Mysql(url.clone());
 
-                (manager, params.connection_limit)
-            }
+                (manager, connection_limit as u32)
+            },
             #[cfg(feature = "postgresql")]
             "postgres" | "postgresql" => {
                 let params = connector::PostgresParams::try_from(url)?;
