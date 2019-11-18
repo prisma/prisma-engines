@@ -1,4 +1,4 @@
-use crate::test_harness::{GenericSqlConnection, Queryable};
+use quaint::prelude::*;
 use barrel::Migration;
 use once_cell::sync::Lazy;
 use pretty_assertions::assert_eq;
@@ -53,7 +53,7 @@ pub async fn database(database_url: &str) -> Box<dyn Queryable + Send + Sync + '
             let url = Url::parse(database_url).unwrap();
             let create_cmd = |name| format!("CREATE DATABASE \"{}\"", name);
 
-            let connect_cmd = |url: Url| GenericSqlConnection::from_database_str(url.as_str(), None);
+            let connect_cmd = |url: Url| Quaint::new(url.as_str());
 
             let conn = with_database(url, "postgres", "postgres", create_cmd, Rc::new(connect_cmd)).await;
 
@@ -63,14 +63,16 @@ pub async fn database(database_url: &str) -> Box<dyn Queryable + Send + Sync + '
             let url = Url::parse(database_url).unwrap();
             let create_cmd = |name| format!("CREATE DATABASE `{}`", name);
 
-            let connect_cmd = |url: Url| GenericSqlConnection::from_database_str(url.as_str(), None);
+            let connect_cmd = |url: Url| Quaint::new(url.as_str());
 
             let conn = with_database(url, "mysql", "/", create_cmd, Rc::new(connect_cmd)).await;
 
             Box::new(conn)
         }
         "file" | "sqlite" => {
-            Box::new(GenericSqlConnection::from_database_str(database_url, Some("introspection-engine")).unwrap())
+            let mut url = url.clone();
+            url.set_query(Some("db_name=introspection-engine"));
+            Box::new(Quaint::new(url.as_str()).unwrap())
         }
         scheme => panic!("Unknown scheme `{}° in database URL: {}", scheme, url.as_str()),
     };

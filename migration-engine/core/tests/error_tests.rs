@@ -8,7 +8,7 @@ use migration_core::{
 };
 use pretty_assertions::assert_eq;
 use serde_json::json;
-use quaint::prelude::Queryable;
+use quaint::prelude::*;
 use test_harness::*;
 use url::Url;
 
@@ -210,7 +210,7 @@ async fn database_already_exists_must_return_a_proper_error() {
 
 #[tokio::test]
 async fn database_access_denied_must_return_a_proper_error_in_cli() {
-    let conn = sql_connection::GenericSqlConnection::from_database_str(&mysql_url(), None).unwrap();
+    let conn = Quaint::new(&mysql_url()).unwrap();
 
     conn.execute_raw("DROP USER IF EXISTS jeanmichel", &[]).await.unwrap();
     conn.execute_raw("CREATE USER jeanmichel IDENTIFIED BY '1234'", &[])
@@ -246,7 +246,7 @@ async fn database_access_denied_must_return_a_proper_error_in_cli() {
 
 #[tokio::test]
 async fn database_access_denied_must_return_a_proper_error_in_rpc() {
-    let conn = sql_connection::GenericSqlConnection::from_database_str(&mysql_url(), None).unwrap();
+    let conn = Quaint::new(&mysql_url()).unwrap();
 
     conn.execute_raw("DROP USER IF EXISTS jeanmichel", &[]).await.unwrap();
     conn.execute_raw("CREATE USER jeanmichel IDENTIFIED BY '1234'", &[])

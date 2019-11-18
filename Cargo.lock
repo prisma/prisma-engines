@@ -1412,7 +1412,6 @@ dependencies = [
  "quaint 0.1.0 (git+https://github.com/prisma/quaint.git)",
  "serde 1.0.102 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_json 1.0.41 (registry+https://github.com/rust-lang/crates.io-index)",
- "sql-connection 0.1.0",
  "sql-migration-connector 0.1.0",
  "sql-schema-describer 0.1.0",
  "test-macros 0.1.0",
@@ -2576,15 +2575,6 @@ version = "0.5.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
-name = "sql-connection"
-version = "0.1.0"
-dependencies = [
- "datamodel 0.1.0",
- "quaint 0.1.0 (git+https://github.com/prisma/quaint.git)",
- "url 1.7.2 (registry+https://github.com/rust-lang/crates.io-index)",
-]
-
-[[package]]
 name = "sql-introspection-connector"
 version = "0.1.0"
 dependencies = [
@@ -2600,7 +2590,6 @@ dependencies = [
  "prisma-inflector 0.1.0",
  "quaint 0.1.0 (git+https://github.com/prisma/quaint.git)",
  "regex 1.3.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "sql-connection 0.1.0",
  "sql-schema-describer 0.1.0",
  "test-macros 0.1.0",
  "tokio 0.2.0-alpha.6 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -2623,7 +2612,6 @@ dependencies = [
  "quaint 0.1.0 (git+https://github.com/prisma/quaint.git)",
  "serde 1.0.102 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_json 1.0.41 (registry+https://github.com/rust-lang/crates.io-index)",
- "sql-connection 0.1.0",
  "sql-schema-describer 0.1.0",
 ]
 

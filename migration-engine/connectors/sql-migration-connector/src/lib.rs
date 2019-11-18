@@ -15,8 +15,7 @@ pub use error::*;
 pub use sql_migration::*;
 
 use migration_connector::*;
-use quaint::prelude::{ConnectionInfo, SqlFamily};
-use sql_connection::{GenericSqlConnection, Queryable};
+use quaint::prelude::{ConnectionInfo, SqlFamily, Queryable, Quaint};
 use sql_database_migration_inferrer::*;
 use sql_database_step_applier::*;
 use sql_destructive_changes_checker::*;
@@ -38,29 +37,18 @@ pub struct SqlMigrationConnector {
 }
 
 impl SqlMigrationConnector {
-    pub async fn new_from_database_str(database_str: &str) -> std::result::Result<Self, ConnectorError> {
+    pub async fn new(database_str: &str) -> std::result::Result<Self, ConnectorError> {
         let connection_info =
             ConnectionInfo::from_url(database_str).map_err(|_err| ConnectorError::InvalidDatabaseUrl)?;
 
-        let connection = GenericSqlConnection::from_database_str(database_str, Some("lift"))
+        let connection = Quaint::new(database_str)
             .map_err(SqlError::from)
             .map_err(|err| err.into_connector_error(&connection_info))?;
 
         Self::create_connector(connection).await
     }
 
-    pub async fn new(datasource: &dyn datamodel::Source) -> std::result::Result<Self, ConnectorError> {
-        let connection_info =
-            ConnectionInfo::from_url(&datasource.url().value).map_err(|_err| ConnectorError::InvalidDatabaseUrl)?;
-
-        let connection = GenericSqlConnection::from_datasource(datasource, Some("lift"))
-            .map_err(SqlError::from)
-            .map_err(|err| err.into_connector_error(&connection_info))?;
-
-        Self::create_connector(connection).await
-    }
-
-    async fn create_connector(connection: GenericSqlConnection) -> std::result::Result<Self, ConnectorError> {
+    async fn create_connector(connection: Quaint) -> std::result::Result<Self, ConnectorError> {
         // async connections can be lazy, so we issue a simple query to fail early if the database
         // is not reachable.
         connection

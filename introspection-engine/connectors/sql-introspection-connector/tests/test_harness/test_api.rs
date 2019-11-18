@@ -1,7 +1,6 @@
 use super::misc_helpers::*;
 use introspection_connector::{DatabaseMetadata, IntrospectionConnector};
-use quaint::prelude::SqlFamily;
-use sql_connection::Queryable;
+use quaint::prelude::{Queryable, SqlFamily};
 use sql_introspection_connector::SqlIntrospectionConnector;
 use std::sync::Arc;
 

@@ -2,8 +2,7 @@ use datamodel::ast::{parser, SchemaAst};
 use migration_connector::*;
 use migration_core::{api::MigrationApi, commands::ResetCommand};
 use once_cell::sync::Lazy;
-use quaint::pool::SqlFamily;
-use sql_connection::{GenericSqlConnection, Queryable};
+use quaint::{prelude::*, pool::SqlFamily};
 use sql_migration_connector::SqlMigrationConnector;
 use std::{rc::Rc, sync::Arc};
 use url::Url;
@@ -18,15 +17,15 @@ pub fn parse(datamodel_string: &str) -> SchemaAst {
 }
 
 pub(super) async fn mysql_migration_connector(database_url: &str) -> SqlMigrationConnector {
-    match SqlMigrationConnector::new_from_database_str(database_url).await {
+    match SqlMigrationConnector::new(database_url).await {
         Ok(c) => c,
         Err(_) => {
             let url = Url::parse(database_url).unwrap();
             let name_cmd = |name| format!("CREATE DATABASE `{}`", name);
-            let connect_cmd = |url: url::Url| GenericSqlConnection::from_database_str(url.as_str(), None);
+            let connect_cmd = |url: url::Url| Quaint::new(url.as_str());
 
             create_database(url, "mysql", "/", name_cmd, Rc::new(connect_cmd)).await;
-            SqlMigrationConnector::new_from_database_str(database_url)
+            SqlMigrationConnector::new(database_url)
                 .await
                 .unwrap()
         }
@@ -34,11 +33,11 @@ pub(super) async fn mysql_migration_connector(database_url: &str) -> SqlMigratio
 }
 
 pub(super) async fn postgres_migration_connector(url: &str) -> SqlMigrationConnector {
-    match SqlMigrationConnector::new_from_database_str(&postgres_url()).await {
+    match SqlMigrationConnector::new(&postgres_url()).await {
         Ok(c) => c,
         Err(_) => {
             let name_cmd = |name| format!("CREATE DATABASE \"{}\"", name);
-            let connect_cmd = |url: url::Url| GenericSqlConnection::from_database_str(url.as_str(), None);
+            let connect_cmd = |url: url::Url| Quaint::new(url.as_str());
 
             create_database(
                 url.parse().unwrap(),
@@ -48,7 +47,7 @@ pub(super) async fn postgres_migration_connector(url: &str) -> SqlMigrationConne
                 Rc::new(connect_cmd),
             )
             .await;
-            SqlMigrationConnector::new_from_database_str(&postgres_url())
+            SqlMigrationConnector::new(&postgres_url())
                 .await
                 .unwrap()
         }
@@ -56,7 +55,7 @@ pub(super) async fn postgres_migration_connector(url: &str) -> SqlMigrationConne
 }
 
 pub(super) async fn sqlite_migration_connector() -> SqlMigrationConnector {
-    SqlMigrationConnector::new_from_database_str(&sqlite_test_file())
+    SqlMigrationConnector::new(&sqlite_test_file())
         .await
         .unwrap()
 }
@@ -121,14 +120,14 @@ pub async fn database(sql_family: SqlFamily, database_url: &str) -> Arc<dyn Quer
             let url = Url::parse(database_url).unwrap();
             let create_cmd = |name| format!("CREATE DATABASE \"{}\"", name);
 
-            let connect_cmd = |url: url::Url| GenericSqlConnection::from_database_str(url.as_str(), None);
+            let connect_cmd = |url: url::Url| Quaint::new(url.as_str());
 
             let conn = with_database(url, "postgres", "postgres", create_cmd, Rc::new(connect_cmd)).await;
 
             Arc::new(conn)
         }
         SqlFamily::Sqlite => {
-            let conn = GenericSqlConnection::from_database_str(database_url, Some(SCHEMA_NAME)).unwrap();
+            let conn = Quaint::new(&format!("{}?db_name={}", database_url, SCHEMA_NAME)).unwrap();
             let arc = Arc::new(conn) as Arc<dyn Queryable + Send + Sync + 'static>;
             arc
         }
@@ -136,7 +135,7 @@ pub async fn database(sql_family: SqlFamily, database_url: &str) -> Arc<dyn Quer
             let url = Url::parse(database_url).unwrap();
             let create_cmd = |name| format!("CREATE DATABASE `{}`", name);
 
-            let connect_cmd = |url: url::Url| GenericSqlConnection::from_database_str(url.as_str(), None);
+            let connect_cmd = |url: url::Url| Quaint::new(url.as_str());
 
             let conn = with_database(url, "mysql", "/", create_cmd, Rc::new(connect_cmd)).await;
 

@@ -63,7 +63,7 @@ impl RpcApi {
 
         let connector = match source.connector_type() {
             scheme if [MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME].contains(&scheme) => {
-                SqlMigrationConnector::new(source.as_ref()).await?
+                SqlMigrationConnector::new(&source.url().value).await?
             }
             x => unimplemented!("Connector {} is not supported yet", x),
         };

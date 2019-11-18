@@ -18,4 +18,3 @@ itertools = "0.8"
 log = "0.4"
 failure = "0.1"
 quaint = { git = "https://github.com/prisma/quaint.git" }
-sql-connection = { path  = "../../../libs/sql-connection" }
