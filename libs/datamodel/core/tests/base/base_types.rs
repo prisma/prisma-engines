@@ -115,3 +115,41 @@ fn scalar_list_types_are_not_supported_by_default() {
         DatamodelError::new_scalar_list_fields_are_not_supported("Post", "enums", Span::new(134, 151)),
     );
 }
+
+#[test]
+fn scalar_list_types_are_not_supported_by_mysql() {
+    let dml = r#"
+    datasource mysql {
+        provider = "mysql"
+        url = "mysql://asdlj"
+    }
+    
+    model Post {
+        id Int @id
+        text String
+        photo String?
+        comments String[]
+        enums    Enum[]
+    }
+    
+    enum Enum {
+        A
+        B
+        C
+    }
+    "#;
+
+    let errors = parse_error(dml);
+
+    errors.assert_length(2);
+
+    errors.assert_is_at(
+        0,
+        DatamodelError::new_scalar_list_fields_are_not_supported("Post", "comments", Span::new(178, 195)),
+    );
+
+    errors.assert_is_at(
+        1,
+        DatamodelError::new_scalar_list_fields_are_not_supported("Post", "enums", Span::new(204, 219)),
+    );
+}
