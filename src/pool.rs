@@ -4,7 +4,7 @@ pub use connection_info::*;
 
 use crate::{
     ast,
-    connector::{self, DBIO, Queryable, TransactionCapable, MysqlUrl},
+    connector::{self, DBIO, Queryable, TransactionCapable, MysqlUrl, PostgresUrl},
     error::Error,
 };
 use futures::future;
@@ -60,12 +60,10 @@ impl Queryable for PooledConnection {
 pub enum QuaintManager {
     #[cfg(feature = "mysql")]
     Mysql(MysqlUrl),
+
     #[cfg(feature = "postgresql")]
-    Postgres {
-        config: tokio_postgres::Config,
-        schema: String,
-        ssl_params: crate::connector::postgres::SslParams,
-    },
+    Postgres(PostgresUrl),
+
     #[cfg(feature = "sqlite")]
     Sqlite {
         file_path: String,
@@ -97,6 +95,7 @@ impl Manage for QuaintManager {
                     Err(e) => DBIO::new(future::err(e)),
                 }
             }
+
             #[cfg(feature = "mysql")]
             Self::Mysql(url) => {
                 use crate::connector::Mysql;
@@ -105,21 +104,16 @@ impl Manage for QuaintManager {
                     Ok(mysql) => DBIO::new(future::ok(Box::new(mysql) as Self::Resource)),
                     Err(e) => DBIO::new(future::err(e)),
                 }
-            }
+            },
+
             #[cfg(feature = "postgresql")]
-            Self::Postgres {
-                config,
-                schema,
-                ssl_params,
-            } => {
+            Self::Postgres(url) => {
                 use crate::connector::PostgreSql;
 
-                let config = config.clone();
-                let schema = schema.clone();
-                let ssl_params = ssl_params.clone();
+                let url: PostgresUrl = url.clone();
 
                 DBIO::new(async move {
-                    let conn = PostgreSql::new(config, Some(schema), Some(ssl_params)).await?;
+                    let conn = PostgreSql::new(url).await?;
 
                     Ok(Box::new(conn) as Self::Resource)
                 })

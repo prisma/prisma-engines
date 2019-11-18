@@ -209,15 +209,11 @@ impl Quaint {
             },
             #[cfg(feature = "postgresql")]
             "postgres" | "postgresql" => {
-                let params = connector::PostgresParams::try_from(url)?;
+                let url = connector::PostgresUrl::new(url)?;
+                let connection_limit = url.connection_limit();
+                let manager = QuaintManager::Postgres(url);
 
-                let manager = QuaintManager::Postgres {
-                    config: params.config,
-                    schema: params.schema,
-                    ssl_params: params.ssl_params,
-                };
-
-                (manager, params.connection_limit)
+                (manager, connection_limit as u32)
             }
             _ => unimplemented!(
                 "Supported url schemes: file or sqlite, mysql, postgres or postgresql."
