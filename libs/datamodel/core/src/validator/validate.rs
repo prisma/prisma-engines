@@ -1,20 +1,24 @@
 use crate::{
-    ast, dml,
+    ast, configuration, dml,
     error::{DatamodelError, ErrorCollection},
+    FieldArity,
 };
+use serde_json::error::Category::Data;
 
 /// Helper for validating a datamodel.
 ///
 /// When validating, we check if the datamodel is valid, and generate errors otherwise.
-pub struct Validator {}
+pub struct Validator<'a> {
+    source: Option<&'a Box<dyn configuration::Source>>,
+}
 
 /// State error message. Seeing this error means something went really wrong internally. It's the datamodel equivalent of a bluescreen.
 const STATE_ERROR: &str = "Failed lookup of model, field or optional property during internal processing. This means that the internal representation was mutated incorrectly.";
 
-impl Validator {
+impl<'a> Validator<'a> {
     /// Creates a new instance, with all builtin directives registered.
-    pub fn new() -> Validator {
-        Self {}
+    pub fn new(source: Option<&'a Box<dyn configuration::Source>>) -> Validator {
+        Self { source }
     }
 
     pub fn validate(&self, ast_schema: &ast::SchemaAst, schema: &mut dml::Datamodel) -> Result<(), ErrorCollection> {
@@ -34,6 +38,43 @@ impl Validator {
             }
             if let Err(err) = self.validate_embedded_types_have_no_back_relation(ast_schema, schema, model) {
                 errors.push(err);
+            }
+
+            if let Err(ref mut the_errors) =
+                self.validate_field_arities(ast_schema.find_model(&model.name).expect(STATE_ERROR), model)
+            {
+                errors.append(the_errors);
+            }
+        }
+
+        if errors.has_errors() {
+            Err(errors)
+        } else {
+            Ok(())
+        }
+    }
+
+    fn validate_field_arities(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), ErrorCollection> {
+        let mut errors = ErrorCollection::new();
+
+        // TODO: this is really ugly
+        let scalar_lists_are_supported = match self.source {
+            Some(source) => source.connector().supports_scalar_lists(),
+            None => false,
+        };
+        for field in model.fields() {
+            if field.arity == FieldArity::List && !scalar_lists_are_supported && !field.field_type.is_relation() {
+                let ast_field = ast_model
+                    .fields
+                    .iter()
+                    .find(|ast_field| ast_field.name.name == field.name)
+                    .unwrap();
+
+                errors.push(DatamodelError::new_scalar_list_fields_are_not_supported(
+                    &model.name,
+                    &field.name,
+                    ast_field.span,
+                ));
             }
         }
 

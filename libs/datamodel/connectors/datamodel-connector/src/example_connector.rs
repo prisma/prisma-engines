@@ -3,7 +3,6 @@ use super::{declarative_connector::*, ScalarType};
 pub struct ExampleConnector {}
 
 impl ExampleConnector {
-    #[allow(unused)]
     pub fn postgres() -> DeclarativeConnector {
         let type_aliases = vec![
             // standard types
@@ -62,6 +61,7 @@ impl ExampleConnector {
         DeclarativeConnector {
             type_aliases,
             field_type_constructors,
+            supports_scalar_lists: true,
         }
     }
 }

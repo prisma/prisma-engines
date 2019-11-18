@@ -6,10 +6,13 @@ pub mod scalars;
 mod declarative_connector;
 mod example_connector;
 
+pub use declarative_connector::DeclarativeConnector;
 pub use example_connector::ExampleConnector;
 
 pub trait Connector {
     fn calculate_type(&self, name: &str, args: Vec<i32>) -> Option<ScalarFieldType>;
+
+    fn supports_scalar_lists(&self) -> bool;
 }
 
 #[derive(Debug, Clone, PartialEq)]

@@ -28,6 +28,15 @@ pub enum FieldType {
     Base(ScalarType),
 }
 
+impl FieldType {
+    pub fn is_relation(&self) -> bool {
+        match self {
+            Self::Relation(_) => true,
+            _ => false,
+        }
+    }
+}
+
 /// Holds information about an id, or priamry key.
 #[derive(Debug, PartialEq, Clone)]
 pub struct IdInfo {

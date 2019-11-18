@@ -2,31 +2,22 @@ use super::*;
 use crate::{ast, configuration, dml, error::ErrorCollection};
 
 /// Wrapper for all lift and validation steps
-pub struct ValidationPipeline {
+pub struct ValidationPipeline<'a> {
     lifter: LiftAstToDml,
-    validator: Validator,
+    validator: Validator<'a>,
     standardiser: Standardiser,
 }
 
-impl ValidationPipeline {
-    /// Creates a new instance, with all builtin directives registered.
-    #[allow(unused)]
-    fn new() -> Self {
-        Self {
-            lifter: LiftAstToDml::new(),
-            validator: Validator::new(),
-            standardiser: Standardiser::new(),
-        }
-    }
-
+impl<'a> ValidationPipeline<'a> {
     /// Creates a new instance, with all builtin directives and
     /// the directives defined by the given sources registered.
     ///
     /// The directives defined by the given sources will be namespaced.
-    pub fn with_sources(sources: &[Box<dyn configuration::Source>]) -> ValidationPipeline {
+    pub fn with_sources(sources: &'a [Box<dyn configuration::Source>]) -> ValidationPipeline<'a> {
+        let source = sources.first();
         ValidationPipeline {
             lifter: LiftAstToDml::with_sources(sources),
-            validator: Validator::new(),
+            validator: Validator::new(source),
             standardiser: Standardiser::new(),
         }
     }
