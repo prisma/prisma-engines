@@ -64,7 +64,7 @@ pub trait Visitor<'a> {
 
     fn surround_with<F>(&mut self, begin: &str, end: &str, f: F) -> fmt::Result
     where
-        F: FnOnce(&mut Self) -> fmt::Result
+        F: FnOnce(&mut Self) -> fmt::Result,
     {
         self.write(begin)?;
         f(self)?;
@@ -137,20 +137,18 @@ pub trait Visitor<'a> {
                         }
                         None => self.write("*")?,
                     },
-                    TableType::Table(_) => {
-                        match table.alias.clone() {
-                            Some(ref alias) => {
-                                self.surround_with(Self::C_BACKTICK, Self::C_BACKTICK, |ref mut s| {
-                                    s.write(alias)
-                                })?;
-                                self.write(".*")?;
-                            }
-                            None => {
-                                self.visit_table(*table.clone(), false)?;
-                                self.write(".*")?;
-                            }
+                    TableType::Table(_) => match table.alias.clone() {
+                        Some(ref alias) => {
+                            self.surround_with(Self::C_BACKTICK, Self::C_BACKTICK, |ref mut s| {
+                                s.write(alias)
+                            })?;
+                            self.write(".*")?;
                         }
-                    }
+                        None => {
+                            self.visit_table(*table.clone(), false)?;
+                            self.write(".*")?;
+                        }
+                    },
                 }
             } else {
                 self.visit_columns(select.columns)?;
@@ -234,7 +232,9 @@ pub trait Visitor<'a> {
         let len = parts.len();
 
         for (i, parts) in parts.iter().enumerate() {
-            self.surround_with(Self::C_BACKTICK, Self::C_BACKTICK, |ref mut s| s.write(parts))?;
+            self.surround_with(Self::C_BACKTICK, Self::C_BACKTICK, |ref mut s| {
+                s.write(parts)
+            })?;
 
             if i < (len - 1) {
                 self.write(".")?;
@@ -292,9 +292,9 @@ pub trait Visitor<'a> {
             DatabaseValue::Parameterized(val) => self.visit_parameterized(val),
             DatabaseValue::Column(column) => self.visit_column(*column),
             DatabaseValue::Row(row) => self.visit_row(row),
-            DatabaseValue::Select(select) => self.surround_with("(", ")", |ref mut s| {
-                s.visit_select(select)
-            }),
+            DatabaseValue::Select(select) => {
+                self.surround_with("(", ")", |ref mut s| s.visit_select(select))
+            }
             DatabaseValue::Function(function) => self.visit_function(function),
             DatabaseValue::Asterisk(table) => match table {
                 Some(table) => {
@@ -313,7 +313,9 @@ pub trait Visitor<'a> {
                 Some(database) => self.delimited_identifiers(&[&*database, &*table_name])?,
                 None => self.delimited_identifiers(&[&*table_name])?,
             },
-            TableType::Query(select) => self.surround_with("(", ")", |ref mut s| s.visit_select(select))?,
+            TableType::Query(select) => {
+                self.surround_with("(", ")", |ref mut s| s.visit_select(select))?
+            }
         };
 
         if include_alias {
@@ -334,7 +336,7 @@ pub trait Visitor<'a> {
                 self.visit_table(table, false)?;
                 self.write(".")?;
                 self.delimited_identifiers(&[&*column.name])?;
-            },
+            }
             _ => self.delimited_identifiers(&[&*column.name])?,
         };
 
@@ -402,39 +404,39 @@ pub trait Visitor<'a> {
                 self.visit_database_value(*left)?;
                 self.write(" = ")?;
                 self.visit_database_value(*right)
-            },
+            }
             Compare::NotEquals(left, right) => {
                 self.visit_database_value(*left)?;
                 self.write(" <> ")?;
                 self.visit_database_value(*right)
-            },
+            }
             Compare::LessThan(left, right) => {
                 self.visit_database_value(*left)?;
                 self.write(" < ")?;
                 self.visit_database_value(*right)
-            },
+            }
             Compare::LessThanOrEquals(left, right) => {
                 self.visit_database_value(*left)?;
                 self.write(" <= ")?;
                 self.visit_database_value(*right)
-            },
+            }
             Compare::GreaterThan(left, right) => {
                 self.visit_database_value(*left)?;
                 self.write(" > ")?;
                 self.visit_database_value(*right)
-            },
+            }
             Compare::GreaterThanOrEquals(left, right) => {
                 self.visit_database_value(*left)?;
                 self.write(" >= ")?;
                 self.visit_database_value(*right)
-            },
+            }
             Compare::In(left, right) => match *right {
                 DatabaseValue::Row(ref row) if row.is_empty() => self.write("1=0"),
                 _ => {
                     self.visit_database_value(*left)?;
                     self.write(" IN ")?;
                     self.visit_database_value(*right)
-                },
+                }
             },
             Compare::NotIn(left, right) => match *right {
                 DatabaseValue::Row(ref row) if row.is_empty() => self.write("1=1"),
@@ -442,7 +444,7 @@ pub trait Visitor<'a> {
                     self.visit_database_value(*left)?;
                     self.write(" NOT IN ")?;
                     self.visit_database_value(*right)
-                },
+                }
             },
             Compare::Like(left, right) => {
                 self.visit_database_value(*left)?;
@@ -532,14 +534,14 @@ pub trait Visitor<'a> {
                 self.visit_database_value(*left)?;
                 self.write(" AND ")?;
                 self.visit_database_value(*right)
-            },
+            }
             Compare::NotBetween(val, left, right) => {
                 self.visit_database_value(*val)?;
                 self.write(" NOT BETWEEN ")?;
                 self.visit_database_value(*left)?;
                 self.write(" AND ")?;
                 self.visit_database_value(*right)
-            },
+            }
         }
     }
 
@@ -586,7 +588,9 @@ pub trait Visitor<'a> {
                     self.write("ROW_NUMBER() OVER()")?;
                 } else {
                     self.write("ROW_NUMBER() OVER")?;
-                    self.surround_with("(", ")", |ref mut s| s.visit_partitioning(fun_rownum.over))?;
+                    self.surround_with("(", ")", |ref mut s| {
+                        s.visit_partitioning(fun_rownum.over)
+                    })?;
                 }
             }
             FunctionType::Count(fun_count) => {

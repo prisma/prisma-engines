@@ -30,10 +30,7 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
 
         Sqlite::visit_query(&mut sqlite, query.into());
 
-        (
-            sqlite.query,
-            sqlite.parameters,
-        )
+        (sqlite.query, sqlite.parameters)
     }
 
     fn write<D: fmt::Display>(&mut self, s: D) -> fmt::Result {
@@ -99,14 +96,14 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
 
                 self.write(" OFFSET ")?;
                 self.visit_parameterized(offset)
-            },
+            }
             (None, Some(offset)) => {
                 self.write(" LIMIT ")?;
                 self.visit_parameterized(ParameterizedValue::from(-1))?;
 
                 self.write(" OFFSET ")?;
                 self.visit_parameterized(offset)
-            },
+            }
             (Some(limit), None) => {
                 self.write(" LIMIT ")?;
                 self.visit_parameterized(limit)

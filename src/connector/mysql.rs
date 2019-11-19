@@ -1,9 +1,9 @@
 mod conversion;
 mod error;
 
-use std::borrow::Cow;
 use mysql_async::{self as my, prelude::Queryable as _};
 use percent_encoding::percent_decode;
+use std::borrow::Cow;
 use std::{convert::TryFrom, path::Path, time::Duration};
 use url::Url;
 
@@ -40,7 +40,7 @@ impl MysqlUrl {
     pub fn new(url: Url) -> Result<Self, Error> {
         let query_params = Self::parse_query_params(&url)?;
 
-        Ok(Self { url, query_params, })
+        Ok(Self { url, query_params })
     }
 
     /// The bare `Url` to the database.
@@ -51,9 +51,7 @@ impl MysqlUrl {
     /// The percent-decoded database username.
     pub fn username<'a>(&'a self) -> Cow<'a, str> {
         match percent_decode(self.url.username().as_bytes()).decode_utf8() {
-            Ok(username) => {
-                username
-            }
+            Ok(username) => username,
             Err(_) => {
                 #[cfg(not(feature = "tracing-log"))]
                 warn!("Couldn't decode username to UTF-8, using the non-decoded version.");
@@ -63,23 +61,18 @@ impl MysqlUrl {
                 self.url.username().into()
             }
         }
-
     }
 
     /// The percent-decoded database password.
     pub fn password(&self) -> Option<Cow<str>> {
-        match self.url
+        match self
+            .url
             .password()
             .and_then(|pw| percent_decode(pw.as_bytes()).decode_utf8().ok())
         {
-            Some(password) => {
-                Some(password)
-            }
-            None => {
-                self.url.password().map(|s| s.into())
-            }
+            Some(password) => Some(password),
+            None => self.url.password().map(|s| s.into()),
         }
-
     }
 
     /// Name of the database connected. Defaults to `mysql`.
@@ -88,7 +81,6 @@ impl MysqlUrl {
             Some(mut segments) => segments.next().unwrap_or("mysql"),
             None => "mysql",
         }
-
     }
 
     /// The database host. If `socket` and `host` are not set, defaults to `localhost`.
@@ -172,7 +164,6 @@ impl MysqlUrl {
             use_ssl,
             socket,
         })
-
     }
 }
 
@@ -183,7 +174,6 @@ pub(crate) struct MysqlUrlQueryParams {
     use_ssl: bool,
     socket: Option<String>,
 }
-
 
 impl TryFrom<Url> for MysqlParams {
     type Error = Error;
@@ -209,7 +199,7 @@ impl TryFrom<Url> for MysqlParams {
         config.stmt_cache_size(Some(1000));
         config.conn_ttl(Some(Duration::from_secs(5)));
 
-        let dbname =  url.dbname().to_string();
+        let dbname = url.dbname().to_string();
         let query_params = url.query_params;
         if query_params.use_ssl {
             config.ssl_opts(Some(query_params.ssl_opts));
@@ -260,7 +250,7 @@ impl Mysql {
     }
 }
 
-impl TransactionCapable for Mysql { }
+impl TransactionCapable for Mysql {}
 
 impl Queryable for Mysql {
     fn execute<'a>(&'a self, q: Query<'a>) -> DBIO<'a, Option<Id>> {
@@ -293,7 +283,9 @@ impl Queryable for Mysql {
                     .collect();
 
                 let mut result_set = ResultSet::new(columns, Vec::new());
-                let (_, rows) = results.map_and_drop(|row| row.to_result_row()).await?;
+                let (_, rows) = results
+                    .map_and_drop(|mut row| row.take_result_row())
+                    .await?;
 
                 for row in rows.into_iter() {
                     result_set.rows.push(row?);
@@ -346,10 +338,14 @@ impl Queryable for Mysql {
 
 #[cfg(test)]
 mod tests {
-    use crate::{connector::{Queryable, TransactionCapable}, Quaint, error::Error};
     use super::MysqlUrl;
-    use std::env;
+    use crate::{
+        connector::{Queryable, TransactionCapable},
+        error::Error,
+        Quaint,
+    };
     use lazy_static::lazy_static;
+    use std::env;
     use url::Url;
 
     lazy_static! {
@@ -358,7 +354,10 @@ mod tests {
 
     #[test]
     fn should_parse_socket_url() {
-        let url = MysqlUrl::new(Url::parse("mysql://root@localhost/dbname?socket=(/tmp/mysql.sock)").unwrap()).unwrap();
+        let url = MysqlUrl::new(
+            Url::parse("mysql://root@localhost/dbname?socket=(/tmp/mysql.sock)").unwrap(),
+        )
+        .unwrap();
         assert_eq!("dbname", url.dbname());
         assert_eq!(&Some(String::from("/tmp/mysql.sock")), url.socket());
     }

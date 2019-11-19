@@ -12,10 +12,10 @@ use futures::future::FutureExt;
 use native_tls::{Certificate, Identity, TlsConnector};
 use percent_encoding::percent_decode;
 use postgres_native_tls::MakeTlsConnector;
+use std::borrow::Cow;
 use std::{borrow::Borrow, convert::TryFrom, time::Duration};
 use tokio_postgres::{config::SslMode, Client, Config};
 use url::Url;
-use std::borrow::Cow;
 
 pub(crate) const DEFAULT_SCHEMA: &str = "public";
 
@@ -125,7 +125,7 @@ impl PostgresUrl {
     pub fn new(url: Url) -> Result<Self, Error> {
         let query_params = Self::parse_query_params(&url)?;
 
-        Ok(Self { url, query_params, })
+        Ok(Self { url, query_params })
     }
 
     /// The bare `Url` to the database.
@@ -172,17 +172,14 @@ impl PostgresUrl {
 
     /// The percent-decoded database password.
     pub fn password(&self) -> Cow<str> {
-        match self.url
+        match self
+            .url
             .password()
             .and_then(|pw| percent_decode(pw.as_bytes()).decode_utf8().ok())
-            {
-                Some(password) => {
-                    password
-                }
-                None => {
-                    self.url.password().unwrap_or("").into()
-                }
-            }
+        {
+            Some(password) => password,
+            None => self.url.password().unwrap_or("").into(),
+        }
     }
 
     /// The database port, defaults to `5432`.
@@ -192,7 +189,11 @@ impl PostgresUrl {
 
     /// The database schema, defaults to `public`.
     pub fn schema(&self) -> String {
-        self.url.query_pairs().find(|(key, _value)| key == "schema").map(|(_key, value)| value.into_owned()).unwrap_or_else(|| DEFAULT_SCHEMA.to_string())
+        self.url
+            .query_pairs()
+            .find(|(key, _value)| key == "schema")
+            .map(|(_key, value)| value.into_owned())
+            .unwrap_or_else(|| DEFAULT_SCHEMA.to_string())
     }
 
     fn default_connection_limit() -> usize {
@@ -213,9 +214,9 @@ impl PostgresUrl {
             match k.as_ref() {
                 "sslmode" => {
                     match v.as_ref() {
-                        "disable" => { ssl_mode = SslMode::Disable},
-                        "prefer" => { ssl_mode = SslMode::Prefer },
-                        "require" => { ssl_mode = SslMode::Require },
+                        "disable" => ssl_mode = SslMode::Disable,
+                        "prefer" => ssl_mode = SslMode::Prefer,
+                        "require" => ssl_mode = SslMode::Require,
                         _ => {
                             #[cfg(not(feature = "tracing-log"))]
                             debug!("Unsupported ssl mode {}, defaulting to 'prefer'", v);
@@ -291,7 +292,6 @@ impl PostgresUrl {
             ssl_mode,
             host,
         })
-
     }
 }
 
@@ -437,7 +437,7 @@ impl Queryable for PostgreSql {
                 let mut result = ResultSet::new(stmt.to_column_names(), Vec::new());
 
                 for row in rows {
-                    result.rows.push(row.to_result_row()?);
+                    result.rows.push(row.get_result_row()?);
                 }
 
                 Ok(result)
@@ -489,9 +489,9 @@ impl Queryable for PostgreSql {
 mod tests {
     use super::*;
     use crate::{connector::Queryable, Quaint};
+    use lazy_static::lazy_static;
     use std::env;
     use url::Url;
-    use lazy_static::lazy_static;
 
     lazy_static! {
         static ref CONN_STR: String = env::var("TEST_PSQL").unwrap();
@@ -499,7 +499,9 @@ mod tests {
 
     #[test]
     fn should_parse_socket_url() {
-        let url = PostgresUrl::new(Url::parse("postgresql:///dbname?host=/var/run/psql.sock").unwrap()).unwrap();
+        let url =
+            PostgresUrl::new(Url::parse("postgresql:///dbname?host=/var/run/psql.sock").unwrap())
+                .unwrap();
         assert_eq!("dbname", url.dbname());
         assert_eq!("/var/run/psql.sock", url.host());
     }

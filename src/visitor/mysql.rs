@@ -28,10 +28,7 @@ impl<'a> Visitor<'a> for Mysql<'a> {
 
         Mysql::visit_query(&mut mysql, query.into());
 
-        (
-            mysql.query,
-            mysql.parameters,
-        )
+        (mysql.query, mysql.parameters)
     }
 
     fn write<D: fmt::Display>(&mut self, s: D) -> fmt::Result {
@@ -96,7 +93,7 @@ impl<'a> Visitor<'a> for Mysql<'a> {
 
                 self.write(" OFFSET ")?;
                 self.visit_parameterized(offset)
-            },
+            }
             (None, Some(ParameterizedValue::Integer(offset))) if offset < 1 => Ok(()),
             (None, Some(offset)) => {
                 self.write(" LIMIT ")?;
@@ -104,7 +101,7 @@ impl<'a> Visitor<'a> for Mysql<'a> {
 
                 self.write(" OFFSET ")?;
                 self.visit_parameterized(offset)
-            },
+            }
             (Some(limit), None) => {
                 self.write(" LIMIT ")?;
                 self.visit_parameterized(limit)
@@ -205,7 +202,9 @@ mod tests {
     #[test]
     fn test_multi_row_insert() {
         let expected = expected_values("INSERT INTO `users` (`foo`) VALUES (?), (?)", vec![10, 11]);
-        let query = Insert::multi_into("users", vec!["foo"]).values(vec![10]).values(vec![11]);
+        let query = Insert::multi_into("users", vec!["foo"])
+            .values(vec![10])
+            .values(vec![11]);
         let (sql, params) = Mysql::build(query);
 
         assert_eq!(expected.0, sql);
@@ -214,7 +213,10 @@ mod tests {
 
     #[test]
     fn test_limit_and_offset_when_both_are_set() {
-        let expected = expected_values("SELECT `users`.* FROM `users` LIMIT ? OFFSET ?", vec![10, 2]);
+        let expected = expected_values(
+            "SELECT `users`.* FROM `users` LIMIT ? OFFSET ?",
+            vec![10, 2],
+        );
         let query = Select::from_table("users").limit(10).offset(2);
         let (sql, params) = Mysql::build(query);
 
@@ -226,7 +228,7 @@ mod tests {
     fn test_limit_and_offset_when_only_offset_is_set() {
         let expected = expected_values(
             "SELECT `users`.* FROM `users` LIMIT ? OFFSET ?",
-            vec![9_223_372_036_854_775_807i64,10]
+            vec![9_223_372_036_854_775_807i64, 10],
         );
 
         let query = Select::from_table("users").offset(10);
