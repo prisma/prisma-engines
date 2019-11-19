@@ -1,8 +1,12 @@
 use super::{ResultSet, Transaction, DBIO};
 use crate::ast::*;
 
-pub trait ToRow {
-    fn to_result_row(&self) -> crate::Result<Vec<ParameterizedValue<'static>>>;
+pub trait GetRow {
+    fn get_result_row(&self) -> crate::Result<Vec<ParameterizedValue<'static>>>;
+}
+
+pub trait TakeRow {
+    fn take_result_row(&mut self) -> crate::Result<Vec<ParameterizedValue<'static>>>;
 }
 
 pub trait ToColumnNames {
@@ -30,7 +34,11 @@ where
 
     /// Executes a query given as SQL, interpolating the given parameters and
     /// returning the number of affected rows.
-    fn execute_raw<'a>(&'a self, sql: &'a str, params: &'a [ParameterizedValue<'a>]) -> DBIO<'a, u64>;
+    fn execute_raw<'a>(
+        &'a self,
+        sql: &'a str,
+        params: &'a [ParameterizedValue<'a>],
+    ) -> DBIO<'a, u64>;
 
     /// Turns off all foreign key constraints.
     fn turn_off_fk_constraints(&self) -> DBIO<()>;
@@ -87,7 +95,7 @@ where
 /// A thing that can start a new transaction.
 pub trait TransactionCapable: Queryable
 where
-    Self: Sized + Sync
+    Self: Sized + Sync,
 {
     /// Starts a new transaction
     fn start_transaction(&self) -> DBIO<Transaction> {

@@ -1,7 +1,11 @@
 use crate::{ast::*, visitor::Visitor};
 use bytes::BytesMut;
 use rust_decimal::Decimal;
-use std::{error::Error, str::FromStr, fmt::{self, Write}};
+use std::{
+    error::Error,
+    fmt::{self, Write},
+    str::FromStr,
+};
 use tokio_postgres::types::ToSql;
 use tokio_postgres::types::{IsNull, Type};
 
@@ -29,10 +33,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
 
         Postgres::visit_query(&mut postgres, query.into());
 
-        (
-            postgres.query,
-            postgres.parameters,
-        )
+        (postgres.query, postgres.parameters)
     }
 
     fn write<D: fmt::Display>(&mut self, s: D) -> fmt::Result {
@@ -60,11 +61,11 @@ impl<'a> Visitor<'a> for Postgres<'a> {
 
                 self.write(" OFFSET ")?;
                 self.visit_parameterized(offset)
-            },
+            }
             (None, Some(offset)) => {
                 self.write(" OFFSET ")?;
                 self.visit_parameterized(offset)
-            },
+            }
             (Some(limit), None) => {
                 self.write(" LIMIT ")?;
                 self.visit_parameterized(limit)
@@ -255,8 +256,13 @@ mod tests {
 
     #[test]
     fn test_multi_row_insert() {
-        let expected = expected_values("INSERT INTO \"users\" (\"foo\") VALUES ($1), ($2)", vec![10, 11]);
-        let query = Insert::multi_into("users", vec!["foo"]).values(vec![10]).values(vec![11]);
+        let expected = expected_values(
+            "INSERT INTO \"users\" (\"foo\") VALUES ($1), ($2)",
+            vec![10, 11],
+        );
+        let query = Insert::multi_into("users", vec!["foo"])
+            .values(vec![10])
+            .values(vec![11]);
         let (sql, params) = Postgres::build(query);
 
         assert_eq!(expected.0, sql);
@@ -265,7 +271,10 @@ mod tests {
 
     #[test]
     fn test_limit_and_offset_when_both_are_set() {
-        let expected = expected_values("SELECT \"users\".* FROM \"users\" LIMIT $1 OFFSET $2", vec![10, 2]);
+        let expected = expected_values(
+            "SELECT \"users\".* FROM \"users\" LIMIT $1 OFFSET $2",
+            vec![10, 2],
+        );
         let query = Select::from_table("users").limit(10).offset(2);
         let (sql, params) = Postgres::build(query);
 

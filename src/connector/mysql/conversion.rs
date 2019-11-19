@@ -1,6 +1,6 @@
-use crate::{ast::ParameterizedValue, connector::queryable::ToRow};
+use crate::{ast::ParameterizedValue, connector::queryable::TakeRow};
 #[cfg(feature = "chrono-0_4")]
-use chrono::{DateTime, Duration, NaiveDateTime, Utc};
+use chrono::{DateTime, Duration, NaiveDate, NaiveDateTime, NaiveTime, Utc};
 use mysql_async as my;
 
 pub fn conv_params<'a>(params: &[ParameterizedValue<'a>]) -> my::Params {
@@ -13,12 +13,10 @@ pub fn conv_params<'a>(params: &[ParameterizedValue<'a>]) -> my::Params {
     }
 }
 
-impl ToRow for my::Row {
-    fn to_result_row<'b>(&'b self) -> crate::Result<Vec<ParameterizedValue<'static>>> {
-        fn convert(row: &my::Row, i: usize) -> crate::Result<ParameterizedValue<'static>> {
-            // TODO: It would prob. be better to inver via Column::column_type()
-            let raw_value = row.get(i).unwrap_or(my::Value::NULL);
-            let res = match raw_value {
+impl TakeRow for my::Row {
+    fn take_result_row<'b>(&'b mut self) -> crate::Result<Vec<ParameterizedValue<'static>>> {
+        fn convert(row: &mut my::Row, i: usize) -> crate::Result<ParameterizedValue<'static>> {
+            let res = match row.take(i).unwrap_or(my::Value::NULL) {
                 my::Value::NULL => ParameterizedValue::Null,
                 my::Value::Bytes(b) => {
                     ParameterizedValue::Text(String::from_utf8(b.to_vec())?.into())
@@ -28,9 +26,14 @@ impl ToRow for my::Row {
                 my::Value::UInt(i) => ParameterizedValue::Integer(i as i64),
                 my::Value::Float(f) => ParameterizedValue::Real(f),
                 #[cfg(feature = "chrono-0_4")]
-                my::Value::Date(..) => {
-                    let ts: NaiveDateTime = row.get(i).unwrap();
-                    ParameterizedValue::DateTime(DateTime::<Utc>::from_utc(ts, Utc))
+                my::Value::Date(year, month, day, hour, min, sec, micro) => {
+                    let time =
+                        NaiveTime::from_hms_micro(hour as u32, min as u32, sec as u32, micro);
+
+                    let date = NaiveDate::from_ymd(year as i32, month as u32, day as u32);
+                    let dt = NaiveDateTime::new(date, time);
+
+                    ParameterizedValue::DateTime(DateTime::<Utc>::from_utc(dt, Utc))
                 }
                 #[cfg(feature = "chrono-0_4")]
                 my::Value::Time(is_neg, days, hours, minutes, seconds, micros) => {

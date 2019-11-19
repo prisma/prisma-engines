@@ -1,6 +1,6 @@
 use crate::{
     ast::{Id, ParameterizedValue},
-    connector::queryable::{ToColumnNames, ToRow},
+    connector::queryable::{GetRow, ToColumnNames},
 };
 #[cfg(feature = "chrono-0_4")]
 use chrono::{DateTime, NaiveDateTime, Utc};
@@ -59,8 +59,8 @@ impl<'a> FromSql<'a> for Id {
     }
 }
 
-impl ToRow for PostgresRow {
-    fn to_result_row<'b>(&'b self) -> crate::Result<Vec<ParameterizedValue<'static>>> {
+impl GetRow for PostgresRow {
+    fn get_result_row<'b>(&'b self) -> crate::Result<Vec<ParameterizedValue<'static>>> {
         fn convert(row: &PostgresRow, i: usize) -> crate::Result<ParameterizedValue<'static>> {
             let result = match *row.columns()[i].type_() {
                 PostgresType::BOOL => match row.try_get(i)? {

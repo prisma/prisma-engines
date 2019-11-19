@@ -104,23 +104,21 @@ extern crate debug_stub_derive;
 pub mod ast;
 pub mod connector;
 pub mod error;
-pub mod visitor;
-pub mod prelude;
 pub mod pool;
+pub mod prelude;
+pub mod visitor;
 
 pub type Result<T> = std::result::Result<T, error::Error>;
 
+use connector::{Queryable, DBIO};
 use lazy_static::lazy_static;
-use pool::{QuaintManager, ConnectionInfo, PooledConnection, SqlFamily};
-use connector::{DBIO, Queryable};
-use url::Url;
-use tokio_resource_pool::{Builder, Pool};
+use pool::{ConnectionInfo, PooledConnection, QuaintManager, SqlFamily};
 use std::convert::TryFrom;
+use tokio_resource_pool::{Builder, Pool};
+use url::Url;
 
 lazy_static! {
-    static ref LOG_QUERIES: bool = std::env::var("LOG_QUERIES")
-        .map(|_| true)
-        .unwrap_or(false);
+    static ref LOG_QUERIES: bool = std::env::var("LOG_QUERIES").map(|_| true).unwrap_or(false);
 }
 
 /// The main entry point and an abstraction over database connections and
@@ -200,14 +198,14 @@ impl Quaint {
                 };
 
                 (manager, params.connection_limit)
-            },
+            }
             #[cfg(feature = "mysql")]
             "mysql" => {
                 let params = connector::MysqlParams::try_from(url)?;
                 let manager = QuaintManager::Mysql(params.config);
 
                 (manager, params.connection_limit)
-            },
+            }
             #[cfg(feature = "postgresql")]
             "postgres" | "postgresql" => {
                 let params = connector::PostgresParams::try_from(url)?;
@@ -220,7 +218,9 @@ impl Quaint {
 
                 (manager, params.connection_limit)
             }
-            _ => { unimplemented!("Supported url schemes: file or sqlite, mysql, postgres or postgresql.") }
+            _ => unimplemented!(
+                "Supported url schemes: file or sqlite, mysql, postgres or postgresql."
+            ),
         };
 
         let connection_info = ConnectionInfo::from_url(url_str)?;
@@ -252,14 +252,20 @@ impl Quaint {
     fn log_start(family: SqlFamily, connection_limit: u32) {
         #[cfg(not(feature = "tracing-log"))]
         {
-            info!("Starting a {} pool with {} connections.", family, connection_limit);
+            info!(
+                "Starting a {} pool with {} connections.",
+                family, connection_limit
+            );
         }
         #[cfg(feature = "tracing-log")]
         {
-            tracing::info!("Starting a {} pool with {} connections.", family, connection_limit);
+            tracing::info!(
+                "Starting a {} pool with {} connections.",
+                family,
+                connection_limit
+            );
         }
     }
-
 }
 
 impl Queryable for Quaint {
@@ -288,7 +294,11 @@ impl Queryable for Quaint {
         })
     }
 
-    fn execute_raw<'a>(&'a self, sql: &'a str, params: &'a [ast::ParameterizedValue]) -> DBIO<'a, u64> {
+    fn execute_raw<'a>(
+        &'a self,
+        sql: &'a str,
+        params: &'a [ast::ParameterizedValue],
+    ) -> DBIO<'a, u64> {
         DBIO::new(async move {
             let conn = self.check_out().await?;
             conn.execute_raw(sql, params).await

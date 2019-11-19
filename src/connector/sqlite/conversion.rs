@@ -1,11 +1,11 @@
 use crate::{
     ast::ParameterizedValue,
-    connector::queryable::{ToColumnNames, ToRow},
+    connector::queryable::{GetRow, ToColumnNames},
 };
 use rusqlite::{types::ValueRef, Row as SqliteRow, Rows as SqliteRows};
 
-impl<'a> ToRow for SqliteRow<'a> {
-    fn to_result_row<'b>(&'b self) -> crate::Result<Vec<ParameterizedValue<'static>>> {
+impl<'a> GetRow for SqliteRow<'a> {
+    fn get_result_row<'b>(&'b self) -> crate::Result<Vec<ParameterizedValue<'static>>> {
         let mut row = Vec::new();
 
         for (i, column) in self.columns().iter().enumerate() {

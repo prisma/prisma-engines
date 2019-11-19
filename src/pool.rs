@@ -4,11 +4,11 @@ pub use connection_info::*;
 
 use crate::{
     ast,
-    connector::{self, DBIO, Queryable, TransactionCapable},
+    connector::{self, Queryable, TransactionCapable, DBIO},
     error::Error,
 };
-use tokio_resource_pool::{Status, CheckOut, Manage, RealDependencies};
 use futures::future;
+use tokio_resource_pool::{CheckOut, Manage, RealDependencies, Status};
 
 /// A connection from the pool. Implements
 /// [Queryable](connector/trait.Queryable.html).
@@ -35,7 +35,11 @@ impl Queryable for PooledConnection {
         self.inner.query_raw(sql, params)
     }
 
-    fn execute_raw<'a>(&'a self, sql: &'a str, params: &'a [ast::ParameterizedValue]) -> DBIO<'a, u64> {
+    fn execute_raw<'a>(
+        &'a self,
+        sql: &'a str,
+        params: &'a [ast::ParameterizedValue],
+    ) -> DBIO<'a, u64> {
         self.inner.execute_raw(sql, params)
     }
 
@@ -66,7 +70,7 @@ pub enum QuaintManager {
     Sqlite {
         file_path: String,
         db_name: Option<String>,
-    }
+    },
 }
 
 impl Manage for QuaintManager {
@@ -84,20 +88,14 @@ impl Manage for QuaintManager {
                 use crate::connector::Sqlite;
 
                 match Sqlite::new(&file_path) {
-                    Ok(mut conn) => {
-                        match db_name {
-                            Some(ref name) => {
-                                match conn.attach_database(name) {
-                                    Ok(_) => DBIO::new(future::ok(Box::new(conn) as Self::Resource)),
-                                    Err(e) => DBIO::new(future::err(e)),
-                                }
-                            }
-                            None => {
-                                DBIO::new(future::ok(Box::new(conn) as Self::Resource))
-                            }
-                        }
-                    }
-                    Err(e) => DBIO::new(future::err(e))
+                    Ok(mut conn) => match db_name {
+                        Some(ref name) => match conn.attach_database(name) {
+                            Ok(_) => DBIO::new(future::ok(Box::new(conn) as Self::Resource)),
+                            Err(e) => DBIO::new(future::err(e)),
+                        },
+                        None => DBIO::new(future::ok(Box::new(conn) as Self::Resource)),
+                    },
+                    Err(e) => DBIO::new(future::err(e)),
                 }
             }
             #[cfg(feature = "mysql")]
@@ -108,9 +106,13 @@ impl Manage for QuaintManager {
                     Ok(mysql) => DBIO::new(future::ok(Box::new(mysql) as Self::Resource)),
                     Err(e) => DBIO::new(future::err(e)),
                 }
-            },
+            }
             #[cfg(feature = "postgresql")]
-            Self::Postgres { config, schema, ssl_params, } => {
+            Self::Postgres {
+                config,
+                schema,
+                ssl_params,
+            } => {
                 use crate::connector::PostgreSql;
 
                 let config = config.clone();
@@ -123,7 +125,6 @@ impl Manage for QuaintManager {
                     Ok(Box::new(conn) as Self::Resource)
                 })
             }
-
         }
     }
 
@@ -141,14 +142,13 @@ impl Manage for QuaintManager {
 
 #[cfg(test)]
 mod tests {
-    use std::env;
     use crate::Quaint;
+    use std::env;
 
     #[test]
     #[cfg(feature = "mysql")]
     fn mysql_default_connection_limit() {
-        let conn_string = env::var("TEST_MYSQL")
-            .expect("TEST_MYSQL connection string not set.");
+        let conn_string = env::var("TEST_MYSQL").expect("TEST_MYSQL connection string not set.");
 
         let pool = Quaint::new(&conn_string).unwrap();
 
@@ -171,8 +171,7 @@ mod tests {
     #[test]
     #[cfg(feature = "postgresql")]
     fn psql_default_connection_limit() {
-        let conn_string = env::var("TEST_PSQL")
-            .expect("TEST_PSQL connection string not set.");
+        let conn_string = env::var("TEST_PSQL").expect("TEST_PSQL connection string not set.");
 
         let pool = Quaint::new(&conn_string).unwrap();
 

@@ -19,7 +19,6 @@ pub struct Sqlite {
     pub(crate) file_path: String,
 }
 
-
 pub struct SqliteParams {
     pub connection_limit: u32,
     /// This is not a `PathBuf` because we need to `ATTACH` the database to the path, and this can
@@ -107,8 +106,7 @@ impl TryFrom<&str> for Sqlite {
 }
 
 impl Sqlite {
-    pub fn new(file_path: &str) -> crate::Result<Sqlite>
-    {
+    pub fn new(file_path: &str) -> crate::Result<Sqlite> {
         Self::try_from(file_path)
     }
 
@@ -175,7 +173,7 @@ impl Queryable for Sqlite {
                 let mut result = ResultSet::new(rows.to_column_names(), Vec::new());
 
                 while let Some(row) = rows.next()? {
-                    result.rows.push(row.to_result_row()?);
+                    result.rows.push(row.get_result_row()?);
                 }
 
                 Ok(result)

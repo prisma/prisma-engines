@@ -1,13 +1,6 @@
 pub use crate::{
-    Quaint,
     ast::*,
+    connector::{Queryable, ResultRow, ResultSet, Transaction, TransactionCapable, DBIO},
     pool::*,
-    connector::{
-        Queryable,
-        TransactionCapable,
-        Transaction,
-        ResultSet,
-        DBIO,
-        ResultRow,
-    },
+    Quaint,
 };
