@@ -35,7 +35,12 @@ impl TryFrom<&str> for SqliteParams {
     type Error = Error;
 
     fn try_from(path: &str) -> crate::Result<Self> {
-        let path = path.trim_start_matches("file:");
+        let path = if path.starts_with("file:") {
+            path.trim_start_matches("file:")
+        } else {
+            path.trim_start_matches("sqlite:")
+        };
+
         let path_parts: Vec<&str> = path.split('?').collect();
         let path_str = path_parts[0];
         let path = Path::new(path_str);
@@ -238,8 +243,22 @@ mod tests {
     use crate::connector::{Queryable, TransactionCapable};
 
     #[test]
-    fn sqlite_params_from_str_should_resolve_path_correctly() {
+    fn sqlite_params_from_str_should_resolve_path_correctly_with_file_scheme() {
         let path = "file:dev.db";
+        let params = SqliteParams::try_from(path).unwrap();
+        assert_eq!(params.file_path, "dev.db");
+    }
+
+    #[test]
+    fn sqlite_params_from_str_should_resolve_path_correctly_with_sqlite_scheme() {
+        let path = "sqlite:dev.db";
+        let params = SqliteParams::try_from(path).unwrap();
+        assert_eq!(params.file_path, "dev.db");
+    }
+
+    #[test]
+    fn sqlite_params_from_str_should_resolve_path_correctly_with_no_scheme() {
+        let path = "dev.db";
         let params = SqliteParams::try_from(path).unwrap();
         assert_eq!(params.file_path, "dev.db");
     }
