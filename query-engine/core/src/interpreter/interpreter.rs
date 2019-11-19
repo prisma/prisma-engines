@@ -13,12 +13,22 @@ use prisma_models::prelude::*;
 #[derive(Debug, Clone)]
 pub enum ExpressionResult {
     Query(QueryResult),
-    // Computation(ComputationResult),
+    Computation(ComputationResult),
     Empty,
 }
 
+#[derive(Debug, Clone)]
 pub enum ComputationResult {
-    List(Vec<PrismaValue>),
+    Diff(DiffResult),
+}
+
+/// Diff of two prisma value vectors A and B:
+/// `left` contains all elements that are in A but not in B.
+/// `right` contains all elements that are in B but not in A.
+#[derive(Debug, Clone)]
+pub struct DiffResult {
+    pub left: Vec<GraphqlId>,
+    pub right: Vec<GraphqlId>,
 }
 
 impl ExpressionResult {
@@ -59,6 +69,17 @@ impl ExpressionResult {
             "Unable to convert result into a query result".to_owned(),
         ))
     }
+
+    pub fn as_diff_result(&self) -> InterpretationResult<&DiffResult> {
+        let converted = match self {
+            Self::Computation(ComputationResult::Diff(ref d)) => Some(d),
+            _ => None,
+        };
+
+        converted.ok_or(InterpreterError::InterpretationError(
+            "Unable to convert result into a computation result".to_owned(),
+        ))
+    }
 }
 
 #[derive(Default, Clone)]
@@ -82,7 +103,6 @@ impl Env {
         }
     }
 }
-
 pub struct QueryInterpreter<'conn, 'tx> {
     pub(crate) conn: ConnectionLike<'conn, 'tx>,
     pub log: Mutex<String>,
@@ -224,7 +244,11 @@ where
                 };
 
                 fut.boxed()
-            }
+            },
+
+            Expression::Return { result } => async move {
+                Ok(result)
+            }.boxed()
         }
     }
 

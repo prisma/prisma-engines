@@ -1,17 +1,7 @@
-use super::{Env, InterpretationResult};
+use super::{Env, ExpressionResult, InterpretationResult};
 use crate::Query;
 
 pub enum Expression {
-    // A general function concept will replace most other parts in the future.
-    FnDef {
-        parameters: Vec<Parameter>,
-        body: Box<Expression>,
-    },
-
-    Fn {
-        arguments: Vec<Value>,
-    },
-
     Sequence {
         seq: Vec<Expression>,
     },
@@ -42,29 +32,13 @@ pub enum Expression {
         then: Vec<Expression>,
         else_: Vec<Expression>,
     },
+
+    Return {
+        result: ExpressionResult,
+    },
 }
 
 pub struct Binding {
     pub name: String,
     pub expr: Expression,
-}
-
-// Everything below is experimental.
-
-pub struct Parameter {
-    name: String,
-    typ: Typ,
-}
-
-trait TypeCoercion<T> {
-    fn coerce(self, param: &Parameter) -> T;
-}
-
-pub enum Value {}
-
-// Reuse schema types?
-pub enum Typ {
-    String,
-    Int,
-    List(Vec<Typ>),
 }

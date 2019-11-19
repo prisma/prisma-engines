@@ -284,7 +284,7 @@ pub fn insert_deletion_checks(
     let mut check_nodes = vec![];
 
     if relation_fields.len() > 0 {
-        let noop_node = graph.create_node(Node::Flow(Flow::Empty));
+        let noop_node = graph.create_node(Node::Empty);
 
         // We know that the relation can't be a list and must be required on the related model for `model` (see fields_requiring_model).
         // For all requiring models (RM), we use the field on `model` to query for existing RM records and error out if at least one exists.

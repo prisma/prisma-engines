@@ -1,7 +1,7 @@
 use super::*;
 use crate::{
     query_ast::*,
-    query_graph::{Flow, Node, NodeRef, QueryGraph, QueryGraphDependency},
+    query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
     ParsedInputValue, QueryResult,
 };
 use itertools::Itertools;
@@ -174,7 +174,7 @@ fn handle_one_to_many(
     } else {
         let expected_id_count = child_finders.len();
         let update_node = utils::update_records_node_placeholder(graph, child_finders, Arc::clone(child_model));
-        let check_node = graph.create_node(Node::Flow(Flow::Empty));
+        let check_node = graph.create_node(Node::Empty);
 
         // For the injection, we need the name of the field on the inlined side, in this case the child.
         let relation_field_name = parent_relation_field.related_field().name.clone();
@@ -202,7 +202,9 @@ fn handle_one_to_many(
         graph.create_edge(
             &update_node,
             &check_node,
-            QueryGraphDependency::ParentResult(Box::new(move |node, query_result| {
+            QueryGraphDependency::ParentResult(Box::new(move |node, parent_result| {
+                let query_result = parent_result.as_query_result().unwrap();
+
                 if let QueryResult::Count(c) = query_result {
                     if c != &expected_id_count {
                         return Err(QueryGraphBuilderError::RecordNotFound(format!(

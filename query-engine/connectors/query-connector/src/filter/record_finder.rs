@@ -48,12 +48,3 @@ impl PartialEq for RecordFinder {
         self.field.name == other.field.name && self.value == other.value
     }
 }
-
-// trait Deduplicate<T>
-// where
-//     T: PartialEq,
-// {
-//     fn deduplicate(self) -> Self;
-// }
-
-// impl Deduplicate<T> for Vec<T> {}
