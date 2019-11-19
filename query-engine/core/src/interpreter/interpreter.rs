@@ -4,8 +4,8 @@ use super::{
     InterpretationResult, InterpreterError,
 };
 use crate::{Query, QueryResult};
-use async_std::sync::Mutex;
 use connector::ConnectionLike;
+use crossbeam_queue::SegQueue;
 use futures::future::{BoxFuture, FutureExt};
 use im::HashMap;
 use prisma_models::prelude::*;
@@ -65,18 +65,18 @@ impl Env {
 
 pub struct QueryInterpreter<'conn, 'tx> {
     pub(crate) conn: ConnectionLike<'conn, 'tx>,
-    pub log: Mutex<String>,
+    log: SegQueue<String>,
 }
 
 impl<'conn, 'tx> QueryInterpreter<'conn, 'tx>
 where
-    'tx: 'conn
+    'tx: 'conn,
 {
     pub fn new(conn: ConnectionLike<'conn, 'tx>) -> QueryInterpreter<'conn, 'tx> {
-        Self {
-            conn,
-            log: Mutex::new(String::new()),
-        }
+        let log = SegQueue::new();
+        log.push("\n".to_string());
+
+        Self { conn, log }
     }
 
     pub fn interpret(
@@ -86,15 +86,19 @@ where
         level: usize,
     ) -> BoxFuture<'conn, InterpretationResult<ExpressionResult>> {
         match exp {
-            Expression::Func { func } => async move { self.interpret(func(env.clone())?, env, level).await }.boxed(),
+            Expression::Func { func } => {
+                let expr = func(env.clone());
+
+                async move { self.interpret(expr?, env, level).await }.boxed()
+            }
 
             Expression::Sequence { seq } if seq.is_empty() => async { Ok(ExpressionResult::Empty) }.boxed(),
 
             Expression::Sequence { seq } => {
                 let fut = async move {
-                    self.log_line("SEQ".to_string(), level).await;
+                    self.log_line("SEQ", level);
 
-                    let mut results = vec![];
+                    let mut results = Vec::with_capacity(seq.len());
 
                     for expr in seq {
                         results.push(self.interpret(expr, env.clone(), level + 1).await?);
@@ -112,11 +116,11 @@ where
             } => {
                 let fut = async move {
                     let mut inner_env = env.clone();
-                    self.log_line("LET".to_string(), level).await;
+                    self.log_line("LET", level);
 
                     for binding in bindings {
                         let log_line = format!("bind {} ", &binding.name);
-                        self.log_line(log_line, level + 1).await;
+                        self.log_line(log_line, level + 1);
 
                         let result = self.interpret(binding.expr, env.clone(), level + 2).await?;
                         inner_env.insert(binding.name, result);
@@ -139,18 +143,15 @@ where
                 let fut = async move {
                     match query {
                         Query::Read(read) => {
-                            let log_line = format!("READ {}", read);
+                            self.log_line(format!("READ {}", read), level);
 
-                            self.log_line(log_line, level).await;
                             Ok(read::execute(&self.conn, read, &[])
                                 .await
                                 .map(|res| ExpressionResult::Query(res))?)
                         }
 
                         Query::Write(write) => {
-                            let log_line = format!("WRITE {}", write);
-
-                            self.log_line(log_line, level).await;
+                            self.log_line(format!("WRITE {}", write), level);
                             Ok(write::execute(&self.conn, write)
                                 .await
                                 .map(|res| ExpressionResult::Query(res))?)
@@ -160,22 +161,16 @@ where
                 fut.boxed()
             }
 
-            Expression::Get { binding_name } => {
-                let fut = async move {
-                    let log_line = format!("GET {}", binding_name);
-
-                    self.log_line(log_line, level).await;
-                    env.clone().remove(&binding_name)
-                };
-
-                fut.boxed()
+            Expression::Get { binding_name } => async move {
+                self.log_line(format!("GET {}", binding_name), level);
+                env.clone().remove(&binding_name)
             }
+                .boxed(),
 
             Expression::GetFirstNonEmpty { binding_names } => {
                 let fut = async move {
-                    let log_line = format!("GET FIRST NON EMPTY {:?}", binding_names);
+                    self.log_line(format!("GET FIRST NON EMPTY {:?}", binding_names), level);
 
-                    self.log_line(log_line, level).await;
                     Ok(binding_names
                         .into_iter()
                         .find_map(|binding_name| match env.get(&binding_name) {
@@ -194,7 +189,7 @@ where
                 else_: elze,
             } => {
                 let fut = async move {
-                    self.log_line("IF".to_string(), level).await;
+                    self.log_line("IF", level);
 
                     if func() {
                         self.interpret(Expression::Sequence { seq: then }, env, level + 1).await
@@ -208,8 +203,18 @@ where
         }
     }
 
-    async fn log_line(&self, s: String, level: usize) {
-        let log_line = format!("{:indent$}{}\n", "", s, indent = level * 2);
-        self.log.lock().await.push_str(&log_line);
+    pub fn log_output(&self) -> String {
+        let mut output = String::with_capacity(self.log.len() * 30);
+
+        while let Ok(s) = self.log.pop() {
+            output.push_str(&s);
+        }
+
+        output
+    }
+
+    fn log_line<S: AsRef<str>>(&self, s: S, level: usize) {
+        self.log
+            .push(format!("{:indent$}{}\n", "", s.as_ref(), indent = level * 2));
     }
 }
