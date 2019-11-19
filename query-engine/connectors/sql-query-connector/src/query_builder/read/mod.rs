@@ -1,6 +1,6 @@
 mod many_related_records;
 
-use crate::{cursor_condition::CursorCondition, filter_conversion::AliasedCondition, ordering::Ordering};
+use crate::{cursor_condition, filter_conversion::AliasedCondition, ordering::Ordering};
 use connector_interface::{
     filter::{Filter, RecordFinder},
     QueryArguments,
@@ -43,7 +43,7 @@ impl SelectDefinition for Select<'static> {
 
 impl SelectDefinition for QueryArguments {
     fn into_select(self, model: &ModelRef) -> Select<'static> {
-        let cursor: ConditionTree = CursorCondition::build(&self, Arc::clone(&model));
+        let cursor: ConditionTree = cursor_condition::build(&self, Arc::clone(&model));
         let order_by = self.order_by;
         let ordering = Ordering::for_model(Arc::clone(&model), order_by.as_ref(), self.last.is_some());
 
