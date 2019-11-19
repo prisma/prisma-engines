@@ -2,15 +2,15 @@ use datamodel::ast::{parser, SchemaAst};
 use migration_connector::*;
 use migration_core::{api::MigrationApi, commands::ResetCommand};
 use once_cell::sync::Lazy;
-use quaint::{prelude::*, pool::SqlFamily};
+use quaint::{prelude::*};
 use sql_migration_connector::SqlMigrationConnector;
-use std::{rc::Rc, sync::Arc};
+use std::{rc::Rc};
 use url::Url;
 
 pub static TEST_ASYNC_RUNTIME: Lazy<tokio::runtime::Runtime> =
     Lazy::new(|| tokio::runtime::Runtime::new().expect("failed to start tokio test runtime"));
 
-pub const SCHEMA_NAME: &str = "lift";
+const SCHEMA_NAME: &str = "lift";
 
 pub fn parse(datamodel_string: &str) -> SchemaAst {
     parser::parse(datamodel_string).unwrap()
@@ -97,51 +97,6 @@ where
     let conn = f(url).unwrap();
 
     conn.execute_raw(&create_stmt(db_name), &[]).await.unwrap();
-}
-
-async fn with_database<F, T, S>(url: Url, default_name: &str, root_path: &str, create_stmt: S, f: Rc<F>) -> T
-where
-    T: Queryable,
-    F: Fn(Url) -> Result<T, quaint::error::Error>,
-    S: FnOnce(String) -> String,
-{
-    match f(url.clone()) {
-        Ok(conn) => conn,
-        Err(_) => {
-            create_database(url.clone(), default_name, root_path, create_stmt, f.clone()).await;
-            f(url).unwrap()
-        }
-    }
-}
-
-pub async fn database(sql_family: SqlFamily, database_url: &str) -> Arc<dyn Queryable + Send + Sync + 'static> {
-    match sql_family {
-        SqlFamily::Postgres => {
-            let url = Url::parse(database_url).unwrap();
-            let create_cmd = |name| format!("CREATE DATABASE \"{}\"", name);
-
-            let connect_cmd = |url: url::Url| Quaint::new(url.as_str());
-
-            let conn = with_database(url, "postgres", "postgres", create_cmd, Rc::new(connect_cmd)).await;
-
-            Arc::new(conn)
-        }
-        SqlFamily::Sqlite => {
-            let conn = Quaint::new(&format!("{}?db_name={}", database_url, SCHEMA_NAME)).unwrap();
-            let arc = Arc::new(conn) as Arc<dyn Queryable + Send + Sync + 'static>;
-            arc
-        }
-        SqlFamily::Mysql => {
-            let url = Url::parse(database_url).unwrap();
-            let create_cmd = |name| format!("CREATE DATABASE `{}`", name);
-
-            let connect_cmd = |url: url::Url| Quaint::new(url.as_str());
-
-            let conn = with_database(url, "mysql", "/", create_cmd, Rc::new(connect_cmd)).await;
-
-            Arc::new(conn)
-        }
-    }
 }
 
 pub fn sqlite_test_config() -> String {

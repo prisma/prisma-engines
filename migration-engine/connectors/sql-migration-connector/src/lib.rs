@@ -59,8 +59,7 @@ impl SqlMigrationConnector {
 
         let schema_name = connection
             .connection_info()
-            .schema_name()
-            .unwrap_or_else(|| "lift".to_owned());
+            .schema_name().to_owned();
         let sql_family = connection.connection_info().sql_family();
         let connection_info = connection.connection_info().clone();
 
