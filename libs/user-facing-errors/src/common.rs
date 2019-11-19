@@ -30,7 +30,7 @@ pub struct DatabaseNotReachable {
     pub database_host: String,
 
     /// Database port
-    pub database_port: String,
+    pub database_port: u16,
 }
 
 #[derive(Debug, UserFacingError, Serialize)]
@@ -58,7 +58,7 @@ pub enum DatabaseDoesNotExist {
     #[user_facing(
         message = "Database ${database_file_name} does not exist on the database server at ${database_file_path}"
     )]
-    SQlite {
+    Sqlite {
         database_file_name: String,
         database_file_path: String,
     },
@@ -69,7 +69,7 @@ pub enum DatabaseDoesNotExist {
         database_name: String,
         database_schema_name: String,
         database_host: String,
-        database_port: u32,
+        database_port: u16,
     },
     #[user_facing(
         message = "Database `${database_name}` does not exist on the database server at `${database_host}:${database_port}`."
@@ -77,7 +77,7 @@ pub enum DatabaseDoesNotExist {
     Mysql {
         database_name: String,
         database_host: String,
-        database_port: u32,
+        database_port: u16,
     },
 }
 
@@ -178,7 +178,7 @@ mod tests {
 
     #[test]
     fn database_does_not_exist_formats_properly() {
-        let sqlite_err = DatabaseDoesNotExist::SQlite {
+        let sqlite_err = DatabaseDoesNotExist::Sqlite {
             database_file_path: "/tmp/dev.db".into(),
             database_file_name: "dev.db".into(),
         };
