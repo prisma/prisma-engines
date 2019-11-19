@@ -237,6 +237,13 @@ mod tests {
     use super::*;
     use crate::connector::{Queryable, TransactionCapable};
 
+    #[test]
+    fn sqlite_params_from_str_should_resolve_path_correctly() {
+        let path = "file:dev.db";
+        let params = SqliteParams::try_from(path).unwrap();
+        assert_eq!(params.file_path, "dev.db");
+    }
+
     #[tokio::test]
     async fn should_provide_a_database_connection() {
         let connection = Sqlite::new("db/test.db").unwrap();
