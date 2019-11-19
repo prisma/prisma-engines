@@ -3,6 +3,7 @@
 pub mod common;
 pub mod introspection;
 pub mod migration_engine;
+pub mod quaint;
 
 use serde::Serialize;
 
