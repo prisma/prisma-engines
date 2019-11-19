@@ -4,7 +4,7 @@ use super::{
         mysql_8_url, mysql_migration_connector, mysql_url, postgres_migration_connector, postgres_url,
         sqlite_migration_connector, sqlite_test_file, test_api,
     },
-    InferAndApplyOutput, SCHEMA_NAME,
+    InferAndApplyOutput
 };
 use migration_connector::{MigrationPersistence, MigrationStep};
 use migration_core::{
@@ -25,6 +25,10 @@ pub struct TestApi {
 }
 
 impl TestApi {
+    pub fn schema_name(&self) -> &str {
+        self.connection_info.as_ref().unwrap().schema_name()
+    }
+
     pub fn database(&self) -> &Arc<dyn Queryable + Send + Sync + 'static> {
         &self.database
     }
@@ -111,6 +115,7 @@ impl TestApi {
 
     pub fn barrel(&self) -> BarrelMigrationExecutor {
         BarrelMigrationExecutor {
+            schema_name: self.connection_info().unwrap().schema_name().to_owned(),
             inspector: self.inspector(),
             database: Arc::clone(&self.database),
             sql_variant: match self.sql_family {
@@ -139,7 +144,7 @@ impl TestApi {
     async fn introspect_database(&self) -> SqlSchema {
         let mut result = self
             .inspector()
-            .describe(&SCHEMA_NAME.to_string())
+            .describe(self.connection_info().unwrap().schema_name())
             .await
             .expect("Introspection failed");
 
@@ -202,6 +207,7 @@ pub struct BarrelMigrationExecutor {
     inspector: Box<dyn SqlSchemaDescriberBackend>,
     database: Arc<dyn Queryable + Send + Sync>,
     sql_variant: barrel::backend::SqlVariant,
+    schema_name: String,
 }
 
 impl BarrelMigrationExecutor {
@@ -211,13 +217,13 @@ impl BarrelMigrationExecutor {
     {
         use barrel::Migration;
 
-        let mut migration = Migration::new().schema(SCHEMA_NAME);
+        let mut migration = Migration::new().schema(&self.schema_name);
         migration_fn(&mut migration);
         let full_sql = migration.make_from(self.sql_variant);
         run_full_sql(&self.database, &full_sql).await;
         let mut result = self
             .inspector
-            .describe(&SCHEMA_NAME.to_string())
+            .describe(&self.schema_name)
             .await
             .expect("Introspection failed");
 

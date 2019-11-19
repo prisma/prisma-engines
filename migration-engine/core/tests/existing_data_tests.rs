@@ -19,7 +19,7 @@ async fn adding_a_required_field_if_there_is_data(api: &TestApi) {
         "#;
     api.infer_and_apply(&dm).await.sql_schema;
 
-    let insert = Insert::single_into((SCHEMA_NAME, "Test")).value("id", "test");
+    let insert = Insert::single_into((api.schema_name(), "Test")).value("id", "test");
     api.database().execute(insert.into()).await.unwrap();
 
     let dm = r#"
@@ -56,7 +56,7 @@ async fn adding_a_required_field_must_use_the_default_value_for_migrations(api: 
     api.infer_and_apply(&dm).await;
 
     let conn = api.database();
-    let insert = Insert::single_into((SCHEMA_NAME, "Test")).value("id", "test");
+    let insert = Insert::single_into((api.schema_name(), "Test")).value("id", "test");
 
     conn.execute(insert.into()).await.unwrap();
 
@@ -84,7 +84,7 @@ async fn adding_a_required_field_must_use_the_default_value_for_migrations(api: 
     // TODO: those assertions somehow fail with column not found on SQLite. I could observe the correct data in the db file though.
     if !api.is_sqlite() {
         let conditions = "id".equals("test");
-        let table_for_select: Table = (SCHEMA_NAME, "Test").into();
+        let table_for_select: Table = (api.schema_name(), "Test").into();
         let query = Select::from_table(table_for_select).so_that(conditions);
         let result_set = conn.query(query.into()).await.unwrap();
         let row = result_set.into_iter().next().expect("query returned no results");
@@ -103,7 +103,7 @@ async fn dropping_a_table_with_rows_should_warn(api: &TestApi) {
     let original_database_schema = api.infer_and_apply(&dm).await.sql_schema;
 
     let conn = api.database();
-    let insert = Insert::single_into((SCHEMA_NAME, "Test")).value("id", "test");
+    let insert = Insert::single_into((api.schema_name(), "Test")).value("id", "test");
 
     conn.execute(insert.into()).await.unwrap();
 
@@ -137,7 +137,7 @@ async fn dropping_a_column_with_non_null_values_should_warn(api: &TestApi) {
 
     let original_database_schema = api.infer_and_apply(&dm).await.sql_schema;
 
-    let insert = Insert::multi_into((SCHEMA_NAME, "Test"), vec!["id", "puppiesCount"])
+    let insert = Insert::multi_into((api.schema_name(), "Test"), vec!["id", "puppiesCount"])
         .values(("a", 7))
         .values(("b", 8));
 
@@ -178,7 +178,7 @@ async fn altering_a_column_without_non_null_values_should_not_warn(api: &TestApi
 
     let original_database_schema = api.infer_and_apply(&dm).await.sql_schema;
 
-    let insert = Insert::multi_into((SCHEMA_NAME, "Test"), vec!["id"])
+    let insert = Insert::multi_into((api.schema_name(), "Test"), vec!["id"])
         .values(vec!["a"])
         .values(vec!["b"]);
 
@@ -209,7 +209,7 @@ async fn altering_a_column_with_non_null_values_should_warn(api: &TestApi) {
 
     let original_database_schema = api.infer_and_apply(&dm).await.sql_schema;
 
-    let insert = Insert::multi_into((SCHEMA_NAME, "Test"), vec!["id", "age"])
+    let insert = Insert::multi_into((api.schema_name(), "Test"), vec!["id", "age"])
         .values(("a", 12))
         .values(("b", 22));
 
