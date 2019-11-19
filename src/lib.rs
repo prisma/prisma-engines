@@ -41,7 +41,7 @@
 //!
 //! #[tokio::main]
 //! async fn main() -> Result<(), quaint::error::Error> {
-//!     let quaint = Quaint::new("sqlite:///tmp/test.db")?;
+//!     let quaint = Quaint::new("file:///tmp/example.db")?;
 //!     let conn = quaint.check_out().await?;
 //!     let result = conn.select(Select::default().value(1)).await?;
 //!
