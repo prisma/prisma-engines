@@ -175,3 +175,21 @@ impl fmt::Display for SqlFamily {
         write!(f, "{}", self.as_str())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn sqlite_connection_info_from_str_interprets_relative_path_correctly() {
+        let conn_info = ConnectionInfo::from_url("file:dev.db").unwrap();
+
+        match conn_info {
+            ConnectionInfo::Sqlite {
+                file_path,
+                db_name: _,
+            } => assert_eq!(file_path, "dev.db"),
+            _ => panic!("wrong"),
+        }
+    }
+}
