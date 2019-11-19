@@ -6,7 +6,6 @@ pub use scalar::*;
 
 use crate::prelude::*;
 use once_cell::sync::OnceCell;
-use quaint::ast::Column;
 use std::{borrow::Cow, sync::Arc};
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -63,13 +62,6 @@ impl Field {
         match self {
             Field::Scalar(ref sf) => &sf.name,
             Field::Relation(ref rf) => &rf.name,
-        }
-    }
-
-    pub fn as_column(&self) -> Column {
-        match self {
-            Field::Scalar(ref sf) => sf.as_column(),
-            Field::Relation(ref rf) => rf.as_column(),
         }
     }
 

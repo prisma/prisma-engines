@@ -178,7 +178,7 @@ impl AliasedCondition for ScalarFilter {
 impl AliasedCondition for RelationFilter {
     /// Conversion from a `RelationFilter` to a query condition tree. Aliased when in a nested `SELECT`.
     fn aliased_cond(self, alias: Option<Alias>) -> ConditionTree<'static> {
-        let id = self.field.model().id_column();
+        let id = self.field.model().fields().id().as_column();
 
         let column = match alias {
             Some(ref alias) => id.table(alias.dec().to_string(None)),
@@ -243,7 +243,7 @@ impl AliasedSelect for RelationFilter {
 
                 let conditions = tree.invert_if(condition.invert_of_subselect());
 
-                Select::from_table(relation.relation_table().alias(alias.to_string(None)))
+                Select::from_table(relation.as_table().alias(alias.to_string(None)))
                     .column(this_column)
                     .so_that(conditions)
             }
@@ -253,17 +253,19 @@ impl AliasedSelect for RelationFilter {
                 let id_column = self
                     .field
                     .related_model()
-                    .id_column()
+                    .fields()
+                    .id()
+                    .as_column()
                     .table(alias.to_string(Some(AliasMode::Join)));
 
                 let join = self
                     .field
                     .related_model()
-                    .table()
+                    .as_table()
                     .alias(alias.to_string(Some(AliasMode::Join)))
                     .on(id_column.equals(other_column));
 
-                let table = relation.relation_table().alias(alias.to_string(Some(AliasMode::Table)));
+                let table = relation.as_table().alias(alias.to_string(Some(AliasMode::Table)));
 
                 Select::from_table(table)
                     .column(this_column)
@@ -288,7 +290,7 @@ impl AliasedCondition for OneRelationIsNullFilter {
                 .column_for_relation_side(self.field.relation_side)
                 .opt_table(alias.clone());
 
-            let table = Table::from(relation.relation_table());
+            let table = Table::from(relation.as_table());
             let relation_table = match alias {
                 Some(ref alias) => table.alias(alias.to_string()),
                 None => table,
@@ -297,7 +299,8 @@ impl AliasedCondition for OneRelationIsNullFilter {
             let select = Select::from_table(relation_table)
                 .column(column.clone())
                 .so_that(column.is_not_null());
-            let id_column = self.field.model().id_column().opt_table(alias.clone());
+
+            let id_column = self.field.model().fields().id().as_column().opt_table(alias.clone());
 
             id_column.not_in_selection(select)
         };

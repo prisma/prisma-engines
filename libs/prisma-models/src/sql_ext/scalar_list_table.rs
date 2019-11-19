@@ -1,5 +1,5 @@
 use crate::ScalarField;
-use quaint::ast::*;
+use quaint::ast::{Column, Table};
 
 #[derive(Debug, Clone)]
 pub struct ScalarListTable<'a> {
