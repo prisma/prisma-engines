@@ -1,8 +1,5 @@
-use quaint::ast::*;
-
 use super::FieldManifestation;
 use crate::prelude::*;
-// use serde::Deserializer;
 use std::sync::{Arc, Weak};
 
 static ID_FIELD: &str = "id";
@@ -142,17 +139,6 @@ impl ScalarField {
         self.manifestation.as_ref().map(|mf| mf.db_name.as_ref())
     }
 
-    pub fn as_column(&self) -> Column<'static> {
-        (
-            (
-                self.internal_data_model().db_name.clone(),
-                self.model().db_name().to_string(),
-            ),
-            self.db_name().to_string(),
-        )
-            .into()
-    }
-
     pub fn id_behaviour_clone(&self) -> Option<FieldBehaviour> {
         if self.is_id() {
             self.behaviour.clone()
@@ -169,9 +155,5 @@ impl ScalarField {
             },
             _ => None,
         }
-    }
-
-    pub fn scalar_list_table(&self) -> ScalarListTable {
-        ScalarListTable::new(self)
     }
 }

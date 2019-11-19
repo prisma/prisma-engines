@@ -6,7 +6,7 @@ edition = "2018"
 
 [dependencies]
 connector-interface = { path = "../query-connector", package = "query-connector" }
-prisma-models = { path = "../../../prisma-models" }
+prisma-models = { path = "../../../libs/prisma-models", features = ["sql-ext"] }
 itertools = "0.8"
 chrono = { version = "0.4", features = ["serde"] }
 quaint = { git = "https://github.com/prisma/quaint.git" }

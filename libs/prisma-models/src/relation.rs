@@ -1,6 +1,5 @@
 use crate::prelude::*;
 use once_cell::sync::OnceCell;
-use quaint::ast::{Column, Table};
 use std::sync::{Arc, Weak};
 
 pub type RelationRef = Arc<Relation>;
@@ -35,13 +34,6 @@ pub struct InlineRelation {
     #[serde(rename = "inTableOfModelId")]
     pub in_table_of_model_name: String,
     pub referencing_column: String,
-}
-
-impl InlineRelation {
-    fn referencing_column(&self, table: Table<'static>) -> Column<'static> {
-        let column = Column::from(self.referencing_column.clone());
-        column.table(table)
-    }
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone, PartialEq)]
@@ -146,17 +138,6 @@ impl Relation {
         self.model_a_name == self.model_b_name
     }
 
-    /// A helper function to decide actions based on the `Relation` type. Inline
-    /// relation will return a column for updates, a relation table gives back
-    /// `None`.
-    pub fn inline_relation_column(&self) -> Option<Column<'static>> {
-        if let Some(mani) = self.inline_manifestation() {
-            Some(Column::from(mani.referencing_column.clone()).table(self.relation_table()))
-        } else {
-            None
-        }
-    }
-
     /// A pointer to the first `Model` in the `Relation`.
     pub fn model_a(&self) -> ModelRef {
         self.model_a
@@ -211,81 +192,6 @@ impl Relation {
             .expect("Field B deleted without deleting the relations in internal_data_model.")
     }
 
-    #[allow(clippy::if_same_then_else)]
-    pub fn model_a_column(&self) -> Column<'static> {
-        use RelationLinkManifestation::*;
-
-        match self.manifestation {
-            Some(RelationTable(ref m)) => m.model_a_column.clone().into(),
-            Some(Inline(ref m)) => {
-                let model_a = self.model_a();
-                let model_b = self.model_b();
-
-                if self.is_self_relation() && self.field_a().is_hidden {
-                    model_a.fields().id().as_column()
-                } else if self.is_self_relation() && self.field_b().is_hidden {
-                    model_b.fields().id().as_column()
-                } else if self.is_self_relation() {
-                    m.referencing_column(self.relation_table())
-                } else if m.in_table_of_model_name == model_a.name && !self.is_self_relation() {
-                    model_a.fields().id().as_column()
-                } else {
-                    m.referencing_column(self.relation_table())
-                }
-            }
-            None => Self::MODEL_A_DEFAULT_COLUMN.into(),
-        }
-    }
-
-    #[allow(clippy::if_same_then_else)]
-    pub fn model_b_column(&self) -> Column<'static> {
-        use RelationLinkManifestation::*;
-
-        match self.manifestation {
-            Some(RelationTable(ref m)) => m.model_b_column.clone().into(),
-            Some(Inline(ref m)) => {
-                let model_b = self.model_b();
-
-                if self.is_self_relation() && (self.field_a().is_hidden || self.field_b().is_hidden) {
-                    m.referencing_column(self.relation_table())
-                } else if self.is_self_relation() {
-                    model_b.fields().id().as_column()
-                } else if m.in_table_of_model_name == model_b.name && !self.is_self_relation() {
-                    model_b.fields().id().as_column()
-                } else {
-                    m.referencing_column(self.relation_table())
-                }
-            }
-            None => Self::MODEL_B_DEFAULT_COLUMN.into(),
-        }
-    }
-
-    /// The `Table` with the foreign keys are written. Can either be:
-    ///
-    /// - A separate table for many-to-many relations.
-    /// - One of the model tables for one-to-many or one-to-one relations.
-    /// - A separate relation table for all relations, if using the deprecated
-    ///   data model syntax.
-    pub fn relation_table(&self) -> Table<'static> {
-        use RelationLinkManifestation::*;
-
-        match self.manifestation {
-            Some(RelationTable(ref m)) => {
-                let db = self.model_a().internal_data_model().db_name.clone();
-                (db, m.table.clone()).into()
-            }
-            Some(Inline(ref m)) => self
-                .internal_data_model()
-                .find_model(&m.in_table_of_model_name)
-                .unwrap()
-                .table(),
-            None => {
-                let db = self.model_a().internal_data_model().db_name.clone();
-                (db, format!("_{}", self.name)).into()
-            }
-        }
-    }
-
     /// Practically deprecated with Prisma 2.
     pub fn is_many_to_many(&self) -> bool {
         self.field_a().is_list && self.field_b().is_list
@@ -299,27 +205,13 @@ impl Relation {
         !self.is_many_to_many() && !self.is_one_to_one()
     }
 
-    pub fn id_column(&self) -> Option<Column<'static>> {
+    pub fn relation_table_has_3_columns(&self) -> bool {
         use RelationLinkManifestation::*;
 
         match self.manifestation {
-            None => Some("id".into()),
-            Some(RelationTable(ref m)) => m.id_column.as_ref().map(|s| {
-                let st: String = s.clone();
-                st.into()
-            }),
-            _ => None,
-        }
-    }
-
-    pub fn relation_table_has_3_columns(&self) -> bool {
-        self.id_column().is_some()
-    }
-
-    pub fn column_for_relation_side(&self, side: RelationSide) -> Column<'static> {
-        match side {
-            RelationSide::A => self.model_a_column(),
-            RelationSide::B => self.model_b_column(),
+            None => true,
+            Some(RelationTable(ref m)) => m.id_column.as_ref().map(|_| true).unwrap_or(false),
+            _ => false,
         }
     }
 
@@ -349,7 +241,7 @@ impl Relation {
         }
     }
 
-    fn internal_data_model(&self) -> InternalDataModelRef {
+    pub fn internal_data_model(&self) -> InternalDataModelRef {
         self.internal_data_model
             .upgrade()
             .expect("InternalDataModel does not exist anymore. Parent internal_data_model is deleted without deleting the child internal_data_model.")

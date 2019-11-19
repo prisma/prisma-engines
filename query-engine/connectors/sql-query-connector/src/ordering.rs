@@ -1,4 +1,4 @@
-use prisma_models::prelude::*;
+use prisma_models::*;
 use quaint::ast::*;
 
 pub type OrderVec<'a> = Vec<(DatabaseValue<'a>, Option<Order>)>;

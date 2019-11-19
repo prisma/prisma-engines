@@ -6,7 +6,7 @@ edition = "2018"
 
 [features]
 default = ["sql", "graphql"]
-sql = ["sql-connector", "quaint"]
+sql = ["sql-connector"]
 graphql = ["graphql-parser"]
 
 [dependencies]
@@ -19,11 +19,10 @@ async-trait = "0.1"
 lazy_static = "1.4"
 prisma-inflector = { path = "../../libs/prisma-inflector" }
 datamodel = { path = "../../libs/datamodel/core" }
-prisma-models = { path = "../../prisma-models" }
+prisma-models = { path = "../../libs/prisma-models" }
 query-core = { path = "../core" }
 connector = { path = "../connectors/query-connector", package = "query-connector" }
 sql-connector = { path = "../connectors/sql-query-connector", optional = true, package = "sql-query-connector" }
-quaint = { git = "https://github.com/prisma/quaint", optional = true }
 graphql-parser = { version = "0.2.2", optional = true }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = { version = "1.0", features = [ "preserve_order" ] }
