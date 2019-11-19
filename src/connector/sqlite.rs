@@ -11,6 +11,8 @@ use futures::future;
 use rusqlite::NO_PARAMS;
 use std::{collections::HashSet, convert::TryFrom, path::Path, sync::Mutex};
 
+const DEFAULT_SCHEMA_NAME: &str = "quaint";
+
 /// A connector interface for the SQLite database
 pub struct Sqlite {
     pub(crate) client: Mutex<rusqlite::Connection>,
@@ -24,7 +26,7 @@ pub struct SqliteParams {
     /// This is not a `PathBuf` because we need to `ATTACH` the database to the path, and this can
     /// only be done with UTF-8 paths.
     pub file_path: String,
-    pub db_name: Option<String>,
+    pub db_name: String,
 }
 
 type ConnectionParams = (Vec<(String, String)>, Vec<(String, String)>);
@@ -87,7 +89,7 @@ impl TryFrom<&str> for SqliteParams {
             Ok(Self {
                 connection_limit: u32::try_from(connection_limit).unwrap(),
                 file_path: path_str.to_owned(),
-                db_name,
+                db_name: db_name.unwrap_or_else(|| DEFAULT_SCHEMA_NAME.to_owned()),
             })
         }
     }

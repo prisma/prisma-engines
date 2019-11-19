@@ -17,7 +17,7 @@ pub enum ConnectionInfo {
         /// The filesystem path of the SQLite database.
         file_path: String,
         /// The name the database is bound to (with `ATTACH DATABASE`), if available.
-        db_name: Option<String>,
+        db_name: String,
     },
 }
 
@@ -34,7 +34,7 @@ impl ConnectionInfo {
             let params = SqliteParams::try_from(url_str)?;
             return Ok(ConnectionInfo::Sqlite {
                 file_path: params.file_path,
-                db_name: None,
+                db_name: params.db_name.clone(),
             });
         }
 
@@ -70,13 +70,16 @@ impl ConnectionInfo {
         }
     }
 
-    /// Will be the database name for MySQL and SQLite, pointing to an actual
-    /// schema in PostgreSQL.
-    pub fn schema_name(&self) -> Option<String> {
+    /// This is what item names are prefixed with in queries.
+    ///
+    /// - In SQLite, this is the schema name that the database file was attached as.
+    /// - In Postgres, it is the selected schema inside the current database.
+    /// - In MySQL, it is the database name.
+    pub fn schema_name(&self) -> &str {
         match self {
-            ConnectionInfo::Postgres(url) => Some(url.schema()),
-            ConnectionInfo::Mysql(url) => Some(url.dbname().to_owned()),
-            ConnectionInfo::Sqlite { db_name, .. } => db_name.as_ref().map(|s| s.to_owned()),
+            ConnectionInfo::Postgres(url) => url.schema(),
+            ConnectionInfo::Mysql(url) => url.dbname(),
+            ConnectionInfo::Sqlite { db_name, .. } => db_name,
         }
     }
 
