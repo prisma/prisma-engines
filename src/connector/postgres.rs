@@ -188,12 +188,8 @@ impl PostgresUrl {
     }
 
     /// The database schema, defaults to `public`.
-    pub fn schema(&self) -> String {
-        self.url
-            .query_pairs()
-            .find(|(key, _value)| key == "schema")
-            .map(|(_key, value)| value.into_owned())
-            .unwrap_or_else(|| DEFAULT_SCHEMA.to_string())
+    pub fn schema(&self) -> &str {
+        &self.query_params.schema
     }
 
     fn default_connection_limit() -> usize {
