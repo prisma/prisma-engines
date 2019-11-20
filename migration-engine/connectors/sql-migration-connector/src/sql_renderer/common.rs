@@ -1,8 +1,7 @@
 use sql_schema_describer::*;
 
-pub fn render_nullability(table: &Table, column: &Column) -> &'static str {
-    // TODO: bring back when the query planning for writes is done
-    if column.is_required() && !table.is_part_of_foreign_key(&column.name) {
+pub fn render_nullability(column: &Column) -> &'static str {
+    if column.is_required() {
         "NOT NULL"
     } else {
         ""

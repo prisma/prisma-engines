@@ -142,13 +142,9 @@ impl<'a> SqlSchemaDiffer<'a> {
                 let previous_fk = previous.foreign_key_for_column(&previous_column.name);
                 let next_fk = next.foreign_key_for_column(&next_column.name);
 
-                // TODO: use differs function again
-                let is_fk_case = previous_fk.is_some() && next_fk.is_some(); // to cater for the temporary ignorance of NOT NULL constraint
-                let differs_in_something = previous_column.name != next_column.name
-                    || previous_column.tpe.family != next_column.tpe.family
-                    || (previous_column.arity != next_column.arity && !is_fk_case);
-
-                if differs_in_something || foreign_key_changed(previous_fk, next_fk) {
+                if previous_column.differs_in_something_except_default(next_column)
+                    || foreign_key_changed(previous_fk, next_fk)
+                {
                     let change = AlterColumn {
                         name: previous_column.name.clone(),
                         column: next_column.clone(),

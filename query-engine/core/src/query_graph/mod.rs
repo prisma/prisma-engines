@@ -1,5 +1,7 @@
 //! Query graph abstraction for simple high-level query representation and manipulation.
 //! Wraps Petgraph crate graph.
+//!
+//! Considered not stable. Will change in the future.
 mod error;
 mod formatters;
 mod guard;
@@ -13,18 +15,29 @@ pub use error::*;
 pub use formatters::*;
 pub use transformers::*;
 
-use crate::{Query, QueryGraphBuilderResult};
+use crate::{interpreter::ExpressionResult, Query, QueryGraphBuilderResult};
 use guard::*;
 use invariance_rules::*;
 use petgraph::{graph::*, visit::EdgeRef as PEdgeRef, *};
-use prisma_models::PrismaValue;
-use std::borrow::Borrow;
+use prisma_models::{GraphqlId, PrismaValue};
+use std::{borrow::Borrow, collections::HashSet};
 
 pub type QueryGraphResult<T> = std::result::Result<T, QueryGraphError>;
 
 pub enum Node {
+    /// Nodes representing actual queries to the underlying connector.
     Query(Query),
+
+    /// Flow control nodes.
     Flow(Flow),
+
+    // Todo this strongly indicates that the query graph has to change, probably towards a true AST for the interpretation,
+    // instead of this unsatisfying in-between of high-level abstraction over the incoming query and concrete interpreter actions.
+    /// A general computation to perform. As opposed to `Query`, this doesn't invoke the connector.
+    Computation(Computation),
+
+    /// Empty node.
+    Empty,
 }
 
 impl From<Query> for Node {
@@ -43,16 +56,31 @@ pub enum Flow {
     /// Expresses a conditional control flow in the graph.
     /// Possible outgoing edges are `then` and `else`, each at most once, with `then` required to be present.
     If(Box<dyn FnOnce() -> bool + Send + Sync + 'static>),
-
-    /// Empty node, will return empty result on interpretation.
-    /// Useful for checks that are only supposed to fail and noop on success.
-    Empty,
 }
 
 impl Flow {
     pub fn default_if() -> Self {
         Self::If(Box::new(|| true))
     }
+}
+
+// Current limitation: We need to narrow it down to GraphqlID diffs for Hash and EQ.
+pub enum Computation {
+    Diff(DiffNode),
+}
+
+impl Computation {
+    pub fn empty_diff() -> Self {
+        Self::Diff(DiffNode {
+            left: HashSet::new(),
+            right: HashSet::new(),
+        })
+    }
+}
+
+pub struct DiffNode {
+    pub left: HashSet<GraphqlId>,
+    pub right: HashSet<GraphqlId>,
 }
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
@@ -80,16 +108,22 @@ impl EdgeRef {
 }
 
 pub type ParentIdsFn = Box<dyn FnOnce(Node, Vec<PrismaValue>) -> QueryGraphBuilderResult<Node> + Send + Sync + 'static>;
+pub type ParentResultFn =
+    Box<dyn FnOnce(Node, &ExpressionResult) -> QueryGraphBuilderResult<Node> + Send + Sync + 'static>;
 
 /// Stored on the edges of the QueryGraph, a QueryGraphDependency contains information on how children are connected to their parents,
 /// expressing for example the need for additional information from the parent to be able to execute at runtime.
 pub enum QueryGraphDependency {
-    /// Simple dependency indicating order of execution. Effectively a NOOP for now.
+    /// Simple dependency indicating order of execution. Effectively an ordering and reachability tool for now.
     ExecutionOrder,
 
-    /// Performs a transformation on a node based on the IDs of the parent result (as PrismaValues).
-    /// The result is typed to the builder result as the construction of the closures takes place in that module,
-    /// and it avoids ugly hacks to combine the error types.
+    /// Performs a transformation on the child node based on the raw parent query result.
+    /// Does not move the result to the closure, but provides a reference.
+    ParentResult(ParentResultFn),
+
+    /// More specialized version of `ParentResult`
+    /// Performs a transformation on the child node based on the IDs of the parent result (as PrismaValues).
+    /// Assumes that the parent result can be converted into IDs, else a runtime error will occur.
     ParentIds(ParentIdsFn),
 
     /// Only valid in the context of a `If` control flow node.

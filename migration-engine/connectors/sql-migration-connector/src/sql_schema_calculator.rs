@@ -192,27 +192,31 @@ impl<'a> SqlSchemaCalculator<'a> {
                 match &relation.manifestation {
                     TempManifestationHolder::Inline {
                         in_table_of_model,
-                        column,
+                        column: column_name,
                     } if in_table_of_model == &model_table.model.name => {
                         let (model, related_model) = if model_table.model == relation.model_a {
                             (&relation.model_a, &relation.model_b)
                         } else {
                             (&relation.model_b, &relation.model_a)
                         };
-                        let field = model.fields().find(|f| &f.db_name() == column).unwrap();
-                        let foreign_key = sql::ForeignKey {
-                            constraint_name: None,
-                            columns: vec![column.to_string()],
-                            referenced_table: related_model.db_name(),
-                            referenced_columns: vec![related_model.id_field()?.db_name()],
-                            on_delete_action: sql::ForeignKeyAction::SetNull,
-                        };
+                        let field = model.fields().find(|f| &f.db_name() == column_name).unwrap();
                         let column = sql::Column {
-                            name: column.to_string(),
+                            name: column_name.to_string(),
                             tpe: column_type(related_model.id_field()?),
                             arity: column_arity(&field),
                             default: None,
                             auto_increment: false,
+                        };
+                        let foreign_key = sql::ForeignKey {
+                            constraint_name: None,
+                            columns: vec![column_name.to_string()],
+                            referenced_table: related_model.db_name(),
+                            referenced_columns: vec![related_model.id_field()?.db_name()],
+                            on_delete_action: if column.is_required() {
+                                sql::ForeignKeyAction::Restrict
+                            } else {
+                                sql::ForeignKeyAction::SetNull
+                            },
                         };
                         model_table.table.columns.push(column);
                         model_table.table.foreign_keys.push(foreign_key)

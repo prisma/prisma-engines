@@ -3,7 +3,7 @@ use crate::{
     query_ast::*,
     QueryResult,
 };
-use connector::{Filter, WriteOperations,  WriteArgs, ConnectionLike};
+use connector::{ConnectionLike, Filter, WriteArgs, WriteOperations};
 
 pub async fn execute<'a, 'b>(
     tx: &'a ConnectionLike<'a, 'b>,
@@ -17,15 +17,12 @@ pub async fn execute<'a, 'b>(
         WriteQuery::DeleteManyRecords(q) => delete_many(tx, q).await,
         WriteQuery::ConnectRecords(q) => connect(tx, q).await,
         WriteQuery::DisconnectRecords(q) => disconnect(tx, q).await,
-        WriteQuery::SetRecords(q) => set(tx, q).await,
+        // WriteQuery::SetRecords(q) => set(tx, q).await,
         WriteQuery::ResetData(q) => reset(tx, q).await,
     }
 }
 
-async fn create_one<'a, 'b>(
-    tx: &'a ConnectionLike<'a, 'b>,
-    q: CreateRecord,
-) -> InterpretationResult<QueryResult> {
+async fn create_one<'a, 'b>(tx: &'a ConnectionLike<'a, 'b>, q: CreateRecord) -> InterpretationResult<QueryResult> {
     let res = tx
         .create_record(&q.model, WriteArgs::new(q.non_list_args, q.list_args))
         .await?;
@@ -33,10 +30,7 @@ async fn create_one<'a, 'b>(
     Ok(QueryResult::Id(res))
 }
 
-async fn update_one<'a, 'b>(
-    tx: &'a ConnectionLike<'a, 'b>,
-    q: UpdateRecord,
-) -> InterpretationResult<QueryResult> {
+async fn update_one<'a, 'b>(tx: &'a ConnectionLike<'a, 'b>, q: UpdateRecord) -> InterpretationResult<QueryResult> {
     let mut res = tx
         .update_records(
             &q.model,
@@ -48,10 +42,7 @@ async fn update_one<'a, 'b>(
     Ok(QueryResult::Id(res.pop().unwrap()))
 }
 
-async fn delete_one<'a, 'b>(
-    tx: &'a ConnectionLike<'a, 'b>,
-    q: DeleteRecord,
-) -> InterpretationResult<QueryResult> {
+async fn delete_one<'a, 'b>(tx: &'a ConnectionLike<'a, 'b>, q: DeleteRecord) -> InterpretationResult<QueryResult> {
     // We need to ensure that we have a record finder, else we delete everything (conversion to empty filter).
     let finder = match q.where_ {
         Some(f) => Ok(f),
@@ -85,39 +76,22 @@ async fn delete_many<'a, 'b>(
     Ok(QueryResult::Count(res))
 }
 
-async fn connect<'a, 'b>(
-    tx: &'a ConnectionLike<'a, 'b>,
-    q: ConnectRecords,
-) -> InterpretationResult<QueryResult> {
+async fn connect<'a, 'b>(tx: &'a ConnectionLike<'a, 'b>, q: ConnectRecords) -> InterpretationResult<QueryResult> {
     tx.connect(
         &q.relation_field,
-        &q.parent.expect("Expected parent record ID to be set for connect"),
-        &q.child.expect("Expected child record ID to be set for connect"),
+        &q.parent_id.expect("Expected parent record ID to be set for connect"),
+        &q.child_ids,
     )
     .await?;
 
     Ok(QueryResult::Unit)
 }
 
-async fn disconnect<'a, 'b>(
-    tx: &'a ConnectionLike<'a, 'b>,
-    q: DisconnectRecords,
-) -> InterpretationResult<QueryResult> {
+async fn disconnect<'a, 'b>(tx: &'a ConnectionLike<'a, 'b>, q: DisconnectRecords) -> InterpretationResult<QueryResult> {
     tx.disconnect(
         &q.relation_field,
-        &q.parent.expect("Expected parent record ID to be set for disconnect"),
-        &q.child.expect("Expected child record ID to be set for disconnect"),
-    )
-    .await?;
-
-    Ok(QueryResult::Unit)
-}
-
-async fn set<'a, 'b>(tx: &'a ConnectionLike<'a, 'b>, q: SetRecords) -> InterpretationResult<QueryResult> {
-    tx.set(
-        &q.relation_field,
-        q.parent.expect("Expected parent record ID to be set for set"),
-        q.wheres,
+        &q.parent_id.expect("Expected parent record ID to be set for disconnect"),
+        &q.child_ids,
     )
     .await?;
 
