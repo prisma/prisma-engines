@@ -24,3 +24,4 @@ im = "13.0"
 futures = "0.3"
 async-std = { version = "0.99", features = ["unstable"] }
 async-trait = "0.1"
+crossbeam-queue = "0.2"
