@@ -1,7 +1,26 @@
 use failure::{Error, Fail};
+use user_facing_errors::KnownError;
 
 #[derive(Debug, Fail)]
-pub enum ConnectorError {
+#[fail(display = "{}", kind)]
+pub struct ConnectorError {
+    /// An optional error already rendered for users in case the migration core does not handle it.
+    pub user_facing_error: Option<KnownError>,
+    /// The error information for internal use.
+    pub kind: ErrorKind,
+}
+
+impl ConnectorError {
+    pub fn from_kind(kind: ErrorKind) -> Self {
+        ConnectorError {
+            user_facing_error: None,
+            kind,
+        }
+    }
+}
+
+#[derive(Debug, Fail)]
+pub enum ErrorKind {
     #[fail(display = "{}", _0)]
     Generic(Error),
 
@@ -9,26 +28,19 @@ pub enum ConnectorError {
     QueryError(Error),
 
     #[fail(display = "Database '{}' does not exist", db_name)]
-    DatabaseDoesNotExist { db_name: String, database_location: String },
+    DatabaseDoesNotExist { db_name: String },
 
     #[fail(display = "Access denied to database '{}'", database_name)]
-    DatabaseAccessDenied {
-        database_name: String,
-        database_user: String,
-    },
+    DatabaseAccessDenied { database_name: String },
 
     #[fail(display = "Database '{}' already exists", db_name)]
-    DatabaseAlreadyExists {
-        db_name: String,
-        database_host: String,
-        database_port: u16,
-    },
+    DatabaseAlreadyExists { db_name: String },
 
     #[fail(display = "Could not create the database. {}", explanation)]
     DatabaseCreationFailed { explanation: String },
 
     #[fail(display = "Authentication failed for user '{}'", user)]
-    AuthenticationFailed { user: String, host: String },
+    AuthenticationFailed { user: String },
 
     #[fail(display = "The database URL is not valid")]
     InvalidDatabaseUrl,
@@ -36,7 +48,6 @@ pub enum ConnectorError {
     #[fail(display = "Failed to connect to the database at `{}`.", host)]
     ConnectionError {
         host: String,
-        port: Option<u16>,
         #[fail(cause)]
         cause: Error,
     },

@@ -15,11 +15,7 @@ pub use error::*;
 pub use sql_migration::*;
 
 use migration_connector::*;
-<<<<<<< HEAD
 use quaint::prelude::{ConnectionInfo, SqlFamily};
-=======
-use quaint::pool::SqlFamily;
->>>>>>> origin/master
 use sql_connection::{GenericSqlConnection, SyncSqlConnection};
 use sql_database_migration_inferrer::*;
 use sql_database_step_applier::*;
@@ -44,8 +40,8 @@ pub struct SqlMigrationConnector {
 
 impl SqlMigrationConnector {
     pub fn new_from_database_str(database_str: &str) -> std::result::Result<Self, ConnectorError> {
-        let connection_info =
-            ConnectionInfo::from_url(database_str).map_err(|_err| ConnectorError::InvalidDatabaseUrl)?;
+        let connection_info = ConnectionInfo::from_url(database_str)
+            .map_err(|_err| ConnectorError::from_kind(ErrorKind::InvalidDatabaseUrl))?;
 
         let connection = GenericSqlConnection::from_database_str(database_str, Some("lift"))
             .map_err(SqlError::from)
@@ -55,8 +51,8 @@ impl SqlMigrationConnector {
     }
 
     pub fn new(datasource: &dyn datamodel::Source) -> std::result::Result<Self, ConnectorError> {
-        let connection_info =
-            ConnectionInfo::from_url(&datasource.url().value).map_err(|_err| ConnectorError::InvalidDatabaseUrl)?;
+        let connection_info = ConnectionInfo::from_url(&datasource.url().value)
+            .map_err(|_err| ConnectorError::from_kind(ErrorKind::InvalidDatabaseUrl))?;
 
         let connection = GenericSqlConnection::from_datasource(datasource, Some("lift"))
             .map_err(SqlError::from)
@@ -74,7 +70,7 @@ impl SqlMigrationConnector {
             .map_err(|err| err.into_connector_error(&connection.connection_info()))?;
 
         let schema_name = connection.connection_info().schema_name().to_owned();
-        let file_path = connection.connection_info().file_path().map(|s| s.to_owned());
+
         let sql_family = connection.connection_info().sql_family();
         let connection_info = connection.connection_info().clone();
 

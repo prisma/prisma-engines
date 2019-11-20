@@ -98,15 +98,15 @@ fn unreachable_database_must_return_a_proper_error_on_mysql() {
 
     let error = RpcApi::new_async(&dm).map(|_| ()).unwrap_err();
 
-    let port = url.port().unwrap().to_string();
+    let port = url.port().unwrap();
     let host = url.host().unwrap().to_string();
 
     let json_error = serde_json::to_value(&render_error(error)).unwrap();
     let expected = json!({
         "message": format!("Can't reach database server at `{host}`:`{port}`\n\nPlease make sure your database server is running at `{host}`:`{port}`.", host = host, port = port),
         "meta": {
-            "database_port": port,
             "database_host": host,
+            "database_port": port,
         },
         "error_code": "P1001"
     });
@@ -133,14 +133,14 @@ fn unreachable_database_must_return_a_proper_error_on_postgres() {
     let error = RpcApi::new_async(&dm).map(|_| ()).unwrap_err();
 
     let host = url.host().unwrap().to_string();
-    let port = url.port().unwrap().to_string();
+    let port = url.port().unwrap();
 
     let json_error = serde_json::to_value(&render_error(error)).unwrap();
     let expected = json!({
         "message": format!("Can't reach database server at `{host}`:`{port}`\n\nPlease make sure your database server is running at `{host}`:`{port}`.", host = host, port = port),
         "meta": {
-            "database_port": port,
             "database_host": host,
+            "database_port": port,
         },
         "error_code": "P1001"
     });
@@ -167,15 +167,13 @@ fn database_does_not_exist_must_return_a_proper_error() {
 
     let error = RpcApi::new_async(&dm).map(|_| ()).unwrap_err();
 
-    let database_location = format!("{}:{}", url.host().unwrap(), url.port().unwrap());
-
     let json_error = serde_json::to_value(&render_error(error)).unwrap();
     let expected = json!({
-        "message": format!("Database `{database_name}` does not exist on the database server at `{database_location}`.", database_name = database_name, database_location = database_location),
+        "message": format!("Database `{database_name}` does not exist on the database server at `{database_host}:{database_port}`.", database_name = database_name, database_host = url.host().unwrap(), database_port = url.port().unwrap()),
         "meta": {
             "database_name": database_name,
-            "database_schema_name": null,
-            "database_location": database_location,
+            "database_host": format!("{}", url.host().unwrap()),
+            "database_port": url.port().unwrap(),
         },
         "error_code": "P1003"
     });
