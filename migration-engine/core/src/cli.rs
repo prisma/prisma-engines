@@ -276,7 +276,7 @@ pub fn render_error(cli_error: CliError) -> user_facing_errors::Error {
             database_port: port,
         } => KnownError::new(user_facing_errors::common::DatabaseNotReachable {
             database_host: host.clone(),
-            database_port: port,
+            database_port: port.parse().unwrap_or(0),
         })
         .map(Error::Known)
         .unwrap(),

@@ -16,19 +16,17 @@ pub fn render_error(crate_error: CrateError) -> Error {
         CrateError::ConnectorError(ConnectorError::ConnectionError { host, port, .. }) => {
             KnownError::new(user_facing_errors::common::DatabaseNotReachable {
                 database_host: host.clone(),
-                database_port: port
-                    .map(|port| format!("{}", port))
-                    .unwrap_or_else(|| format!("<unknown>")),
+                database_port: port.unwrap(),
             })
             .map(Error::Known)
         }
         CrateError::ConnectorError(ConnectorError::DatabaseDoesNotExist {
             db_name,
             database_location,
-        }) => KnownError::new(user_facing_errors::common::DatabaseDoesNotExist {
+        }) => KnownError::new(user_facing_errors::common::DatabaseDoesNotExist::Mysql {
             database_name: db_name.clone(),
-            database_location: database_location.clone(),
-            database_schema_name: None,
+            database_host: database_location.clone(),
+            database_port: 000,
         })
         .map(Error::Known),
         CrateError::ConnectorError(ConnectorError::DatabaseAccessDenied {
