@@ -1089,6 +1089,7 @@ dependencies = [
  "datamodel 0.1.0",
  "failure 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.102 (registry+https://github.com/rust-lang/crates.io-index)",
+ "user-facing-errors 0.1.0",
 ]
 
 [[package]]
@@ -2592,6 +2593,7 @@ dependencies = [
  "test-macros 0.1.0",
  "tokio 0.2.0-alpha.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "url 1.7.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "user-facing-errors 0.1.0",
 ]
 
 [[package]]

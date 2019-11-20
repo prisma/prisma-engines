@@ -1,7 +1,7 @@
 mod error;
 
 use datamodel::Datamodel;
-pub use error::ConnectorError;
+pub use error::{ConnectorError, ErrorKind};
 use serde::*;
 
 pub type ConnectorResult<T> = Result<T, ConnectorError>;

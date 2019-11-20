@@ -40,7 +40,7 @@ impl SqlMigrationConnector {
     pub async fn new(database_str: &str) -> std::result::Result<Self, ConnectorError> {
         let connection_info =
             ConnectionInfo::from_url(database_str)
-            .map_err(|_err| ConnectorError::from_kind(ErrorKind::InvalidDatabaseUrl))?;
+            .map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
 
         let connection = Quaint::new(database_str)
             .map_err(SqlError::from)

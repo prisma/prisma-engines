@@ -12,3 +12,4 @@ datamodel = { path = "../../../libs/datamodel/core" }
 failure = "0.1"
 
 serde = { version = "1.0", features = ["derive"]}
+user-facing-errors = { path = "../../../libs/user-facing-errors" }

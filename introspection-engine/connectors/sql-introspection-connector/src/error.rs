@@ -1,6 +1,8 @@
 use failure::{Error, Fail};
-use introspection_connector::ConnectorError;
+use introspection_connector::{ConnectorError, ErrorKind};
+use quaint::{error::Error as QuaintError, prelude::ConnectionInfo};
 use std::error::Error as StdError; // just bringing the trait functions into scope
+use user_facing_errors::KnownError;
 
 #[derive(Debug, Fail)]
 pub enum SqlIntrospectionError {
@@ -8,6 +10,8 @@ pub enum SqlIntrospectionError {
     InvalidUrl { message: String },
     #[fail(display = "{}", _0)]
     Generic(Error),
+    #[fail(display = "{}", _0)]
+    Quaint(QuaintError),
 }
 
 impl From<url::ParseError> for SqlIntrospectionError {
@@ -30,8 +34,21 @@ impl From<sql_schema_describer::SqlSchemaDescriberError> for SqlIntrospectionErr
     }
 }
 
-impl From<SqlIntrospectionError> for ConnectorError {
-    fn from(error: SqlIntrospectionError) -> Self {
-        ConnectorError::Generic(error.into())
+impl SqlIntrospectionError {
+    pub(crate) fn into_connector_error(self, connection_info: &ConnectionInfo) -> ConnectorError {
+        let user_facing = match &self {
+            SqlIntrospectionError::Quaint(quaint_error) => {
+                user_facing_errors::quaint::render_quaint_error(quaint_error, connection_info)
+            }
+            err => KnownError::new(user_facing_errors::introspection::IntrospectionFailed {
+                introspection_error: format!("{}", err),
+            })
+            .ok(),
+        };
+
+        ConnectorError {
+            user_facing,
+            kind: ErrorKind::Generic(self.into()),
+        }
     }
 }
