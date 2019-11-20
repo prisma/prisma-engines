@@ -15,7 +15,11 @@ pub use error::*;
 pub use sql_migration::*;
 
 use migration_connector::*;
+<<<<<<< HEAD
 use quaint::prelude::{ConnectionInfo, SqlFamily};
+=======
+use quaint::pool::SqlFamily;
+>>>>>>> origin/master
 use sql_connection::{GenericSqlConnection, SyncSqlConnection};
 use sql_database_migration_inferrer::*;
 use sql_database_step_applier::*;
@@ -69,10 +73,8 @@ impl SqlMigrationConnector {
             .map_err(SqlError::from)
             .map_err(|err| err.into_connector_error(&connection.connection_info()))?;
 
-        let schema_name = connection
-            .connection_info()
-            .schema_name()
-            .unwrap_or_else(|| "lift".to_owned());
+        let schema_name = connection.connection_info().schema_name().to_owned();
+        let file_path = connection.connection_info().file_path().map(|s| s.to_owned());
         let sql_family = connection.connection_info().sql_family();
         let connection_info = connection.connection_info().clone();
 
