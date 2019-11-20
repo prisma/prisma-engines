@@ -17,7 +17,7 @@ pub fn render_quaint_error(quaint_error: &QuaintError, connection_info: &Connect
         (QuaintError::DatabaseDoesNotExist { .. }, ConnectionInfo::Postgres(url)) => {
             KnownError::new(common::DatabaseDoesNotExist::Postgres {
                 database_name: url.dbname().to_owned(),
-                database_schema_name: url.schema(),
+                database_schema_name: url.schema().to_owned(),
                 database_host: url.host().to_owned(),
                 database_port: url.port(),
             })

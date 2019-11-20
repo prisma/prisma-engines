@@ -53,6 +53,7 @@ pub struct DatabaseTimeout {
 }
 
 #[derive(Debug, UserFacingError, Serialize)]
+#[serde(untagged)]
 #[user_facing(code = "P1003")]
 pub enum DatabaseDoesNotExist {
     #[user_facing(
