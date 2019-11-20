@@ -37,6 +37,10 @@ impl TestApi {
         self.sql_family == SqlFamily::Sqlite
     }
 
+    pub fn is_mysql(&self) -> bool {
+        self.sql_family == SqlFamily::Mysql
+    }
+
     pub fn migration_persistence(&self) -> Arc<dyn MigrationPersistence> {
         self.api.migration_persistence()
     }
