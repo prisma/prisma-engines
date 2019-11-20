@@ -1402,3 +1402,38 @@ async fn simple_type_aliases_in_migrations_must_work(api: &TestApi) {
 
     api.infer_and_apply(dm1).await;
 }
+
+#[test_each_connector]
+async fn model_with_multiple_indexes_works(api: &TestApi) {
+    let dm = r#"
+    model User {
+      id         Int       @id @unique
+    }
+
+    model Post {
+      id        Int       @id @unique
+    }
+
+    model Comment {
+      id        Int       @id @unique
+    }
+
+    model Like {
+      id        Int       @id @unique
+      user      User
+      post      Post
+      comment   Comment
+
+      @@index([post])
+      @@index([user])
+      @@index([comment])
+    }
+    "#;
+
+    let sql_schema = api.infer_and_apply(dm).await.sql_schema;
+
+    let like_indexes_count = sql_schema.table_bang("Like").indices.len();
+    let expected_indexes_count = if api.is_mysql() { 1 } else { 4 }; // 3 explicit indexes + PK, or only PK on mysql
+
+    assert_eq!(like_indexes_count, expected_indexes_count);
+}

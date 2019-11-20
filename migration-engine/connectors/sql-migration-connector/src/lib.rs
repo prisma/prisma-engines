@@ -15,16 +15,7 @@ pub use error::*;
 pub use sql_migration::*;
 
 use migration_connector::*;
-<<<<<<< HEAD
 use quaint::prelude::{ConnectionInfo, SqlFamily, Queryable, Quaint};
-=======
-<<<<<<< HEAD
-use quaint::prelude::{ConnectionInfo, SqlFamily};
-=======
-use quaint::pool::SqlFamily;
->>>>>>> origin/master
-use sql_connection::{GenericSqlConnection, SyncSqlConnection};
->>>>>>> migration-engine/errors-spec
 use sql_database_migration_inferrer::*;
 use sql_database_step_applier::*;
 use sql_destructive_changes_checker::*;
