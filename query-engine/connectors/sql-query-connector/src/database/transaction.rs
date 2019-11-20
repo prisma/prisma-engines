@@ -3,7 +3,7 @@ use crate::{query_builder::read::ManyRelatedRecordsQueryBuilder, SqlError};
 use connector_interface::{
     self as connector,
     filter::{Filter, RecordFinder},
-    QueryArguments, ReadOperations, ScalarListValues, Transaction, WriteArgs, WriteOperations, IO
+    QueryArguments, ReadOperations, ScalarListValues, Transaction, WriteArgs, WriteOperations, IO,
 };
 use prisma_models::prelude::*;
 use std::marker::PhantomData;
@@ -96,7 +96,12 @@ where
         IO::new(async move { write::create_record(&self.inner, model, args).await })
     }
 
-    fn update_records<'b>(&'b self, model: &'b ModelRef, where_: Filter, args: WriteArgs) -> connector::IO<Vec<GraphqlId>> {
+    fn update_records<'b>(
+        &'b self,
+        model: &'b ModelRef,
+        where_: Filter,
+        args: WriteArgs,
+    ) -> connector::IO<Vec<GraphqlId>> {
         IO::new(async move { write::update_records(&self.inner, model, where_, args).await })
     }
 

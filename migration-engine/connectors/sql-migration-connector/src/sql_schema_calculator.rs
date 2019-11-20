@@ -323,7 +323,7 @@ pub trait FieldExtensions {
 
     fn db_name(&self) -> String;
 
-    fn migration_value(&self, datamodel: &Datamodel) -> Value;
+    fn migration_value(&self, datamodel: &Datamodel) -> ScalarValue;
 
     fn migration_value_new(&self, datamodel: &Datamodel) -> Option<String>;
 }
@@ -345,7 +345,7 @@ impl FieldExtensions for Field {
         self.database_name.clone().unwrap_or_else(|| self.name.clone())
     }
 
-    fn migration_value(&self, datamodel: &Datamodel) -> Value {
+    fn migration_value(&self, datamodel: &Datamodel) -> ScalarValue {
         self.default_value
             .clone()
             .unwrap_or_else(|| default_migration_value(&self.field_type, datamodel))
@@ -354,31 +354,31 @@ impl FieldExtensions for Field {
     fn migration_value_new(&self, datamodel: &Datamodel) -> Option<String> {
         let value = match &self.default_value {
             Some(x) => match x {
-                PrismaValue::Expression(_, _, _) => default_migration_value(&self.field_type, datamodel),
+                ScalarValue::Expression(_, _, _) => default_migration_value(&self.field_type, datamodel),
                 x => x.clone(),
             },
             None => default_migration_value(&self.field_type, datamodel),
         };
         let result = match value {
-            Value::Boolean(x) => {
+            ScalarValue::Boolean(x) => {
                 if x {
                     "true".to_string()
                 } else {
                     "false".to_string()
                 }
             }
-            Value::Int(x) => format!("{}", x),
-            Value::Float(x) => format!("{}", x),
-            Value::Decimal(x) => format!("{}", x),
-            Value::String(x) => format!("{}", x),
+            ScalarValue::Int(x) => format!("{}", x),
+            ScalarValue::Float(x) => format!("{}", x),
+            ScalarValue::Decimal(x) => format!("{}", x),
+            ScalarValue::String(x) => format!("{}", x),
 
-            Value::DateTime(x) => {
+            ScalarValue::DateTime(x) => {
                 let mut raw = format!("{}", x); // this will produce a String 1970-01-01 00:00:00 UTC
                 raw.truncate(raw.len() - 4); // strip the UTC suffix
                 format!("{}", raw)
             }
-            Value::ConstantLiteral(x) => format!("{}", x), // this represents enum values
-            Value::Expression(_, _, _) => {
+            ScalarValue::ConstantLiteral(x) => format!("{}", x), // this represents enum values
+            ScalarValue::Expression(_, _, _) => {
                 unreachable!("expressions must have been filtered out in the preceding pattern match")
             }
         };
@@ -390,17 +390,17 @@ impl FieldExtensions for Field {
     }
 }
 
-fn default_migration_value(field_type: &FieldType, datamodel: &Datamodel) -> Value {
+fn default_migration_value(field_type: &FieldType, datamodel: &Datamodel) -> ScalarValue {
     match field_type {
-        FieldType::Base(PrismaType::Boolean) => Value::Boolean(false),
-        FieldType::Base(PrismaType::Int) => Value::Int(0),
-        FieldType::Base(PrismaType::Float) => Value::Float(0.0),
-        FieldType::Base(PrismaType::String) => Value::String("".to_string()),
-        FieldType::Base(PrismaType::Decimal) => Value::Decimal(0.0),
-        FieldType::Base(PrismaType::DateTime) => {
+        FieldType::Base(ScalarType::Boolean) => ScalarValue::Boolean(false),
+        FieldType::Base(ScalarType::Int) => ScalarValue::Int(0),
+        FieldType::Base(ScalarType::Float) => ScalarValue::Float(0.0),
+        FieldType::Base(ScalarType::String) => ScalarValue::String("".to_string()),
+        FieldType::Base(ScalarType::Decimal) => ScalarValue::Decimal(0.0),
+        FieldType::Base(ScalarType::DateTime) => {
             let naive = NaiveDateTime::from_timestamp(0, 0);
             let datetime: DateTime<Utc> = DateTime::from_utc(naive, Utc);
-            PrismaValue::DateTime(datetime)
+            ScalarValue::DateTime(datetime)
         }
         FieldType::Enum(ref enum_name) => {
             let inum = datamodel
@@ -410,7 +410,7 @@ fn default_migration_value(field_type: &FieldType, datamodel: &Datamodel) -> Val
                 .values
                 .first()
                 .expect(&format!("Enum {} did not contain any values.", enum_name));
-            Value::String(first_value.to_string())
+            ScalarValue::String(first_value.to_string())
         }
         _ => unimplemented!("this functions must only be called for scalar fields"),
     }

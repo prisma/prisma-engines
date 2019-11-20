@@ -5,7 +5,7 @@ authors = ["Marcus Böhm <boehm@prisma.io>"]
 edition = "2018"
 
 [dependencies]
-datamodel = { path = "../../../libs/datamodel" }
+datamodel = { path = "../../../libs/datamodel/core" }
 quaint = { git = "https://github.com/prisma/quaint" }
 chrono = { version = "0.4" }
 

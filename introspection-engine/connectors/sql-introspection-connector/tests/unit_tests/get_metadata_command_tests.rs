@@ -1,36 +1,35 @@
-use crate::{get_metadata, test_backend, BarrelMigrationExecutor, SqlFamily};
+use crate::test_harness::test_api::*;
+use crate::{test_one_connector, BarrelMigrationExecutor, TestApi};
 use barrel::types;
 
 pub const SCHEMA_NAME: &str = "introspection-engine";
 
-#[test]
-fn metadate_for_mysql_should_work() {
-    test_backend(SqlFamily::Mysql, |test_setup, barrel| {
-        setup(barrel);
-        let result = dbg!(get_metadata(test_setup));
-        assert_eq!(result.table_count, 3);
-        assert_eq!(result.size_in_bytes, 49152);
-    });
+#[test_one_connector(connector = "mysql")]
+fn metadata_for_mysql_should_work(api: &TestApi) {
+    let barrel = api.barrel();
+    setup(&barrel);
+    let result = dbg!(api.get_metadata());
+    assert_eq!(result.table_count, 3);
+    assert_eq!(result.size_in_bytes, 49152);
 }
 
-#[test]
-fn metadata_for_postgres_should_work() {
-    test_backend(SqlFamily::Postgres, |test_setup, barrel| {
-        setup(barrel);
-        let result = dbg!(get_metadata(test_setup));
-        assert_eq!(result.table_count, 3);
-        assert_eq!(result.size_in_bytes, 40960);
-    });
+#[test_one_connector(connector = "postgres")]
+
+fn metadata_for_postgres_should_work(api: &TestApi) {
+    let barrel = api.barrel();
+    setup(&barrel);
+    let result = dbg!(api.get_metadata());
+    assert_eq!(result.table_count, 3);
+    assert_eq!(result.size_in_bytes, 40960);
 }
 
-#[test]
-fn metadata_for_sqlite_should_work() {
-    test_backend(SqlFamily::Sqlite, |test_setup, barrel| {
-        setup(barrel);
-        let result = dbg!(get_metadata(test_setup));
-        assert_eq!(result.table_count, 3);
-        assert_eq!(result.size_in_bytes, 0); // page_size * page_count and count is 0
-    });
+#[test_one_connector(connector = "sqlite")]
+fn metadata_for_sqlite_should_work(api: &TestApi) {
+    let barrel = api.barrel();
+    setup(&barrel);
+    let result = dbg!(api.get_metadata());
+    assert_eq!(result.table_count, 3);
+    assert_eq!(result.size_in_bytes, 0); // page_size * page_count and count is 0
 }
 
 fn setup(barrel: &BarrelMigrationExecutor) {

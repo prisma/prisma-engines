@@ -1,4 +1,4 @@
-use crate::{cursor_condition::CursorCondition, filter_conversion::AliasedCondition};
+use crate::{cursor_condition, filter_conversion::AliasedCondition};
 use connector_interface::{QueryArguments, SkipAndLimit};
 use prisma_models::prelude::*;
 use quaint::ast::{Aliasable, Comparable, ConditionTree, Joinable, Select};
@@ -23,7 +23,7 @@ impl<'a> ManyRelatedRecordsBaseQuery<'a> {
         query_arguments: QueryArguments,
         selected_fields: &'a SelectedFields,
     ) -> ManyRelatedRecordsBaseQuery<'a> {
-        let cursor = CursorCondition::build(&query_arguments, from_field.related_model());
+        let cursor = cursor_condition::build(&query_arguments, from_field.related_model());
         let window_limits = query_arguments.window_limits();
         let skip_and_limit = query_arguments.skip_and_limit();
 
@@ -33,13 +33,13 @@ impl<'a> ManyRelatedRecordsBaseQuery<'a> {
             .unwrap_or(ConditionTree::NoCondition);
 
         let opposite_column = from_field.opposite_column().table(Relation::TABLE_ALIAS);
-        let select = Select::from_table(from_field.related_model().table());
+        let select = Select::from_table(from_field.related_model().as_table());
 
         let join = from_field
             .relation()
-            .relation_table()
+            .as_table()
             .alias(Relation::TABLE_ALIAS)
-            .on(from_field.related_model().id_column().equals(opposite_column));
+            .on(from_field.related_model().fields().id().as_column().equals(opposite_column));
 
         let query = selected_fields
             .columns()

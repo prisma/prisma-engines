@@ -1,0 +1,11 @@
+[package]
+name = "datamodel-connector"
+version = "0.1.0"
+authors = ["Marcus Böhm <boehm@prisma.io>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+chrono = { version = "0.4.6", features = ["serde"] }
+serde = { version = "1.0.90", features = ["derive"] }

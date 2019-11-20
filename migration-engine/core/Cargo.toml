@@ -6,15 +6,15 @@ edition = "2018"
 
 [dependencies]
 migration-connector = { path = "../connectors/migration-connector" }
-datamodel = { path = "../../libs/datamodel" }
-prisma-models = { path = "../../prisma-models" }
+datamodel = { path = "../../libs/datamodel/core" }
+prisma-models = { path = "../../libs/prisma-models" }
+quaint = { git = "https://github.com/prisma/quaint.git" }
 sql-migration-connector = { path = "../connectors/sql-migration-connector" }
 sql-connection = { path = "../../libs/sql-connection" }
 clap = "2.33"
 itertools = "0.8"
 
 chrono = { version = "0.4", features = ["serde"] }
-boolinator = "2.4.0"
 url = "1.7"
 log = "0.4"
 env_logger = "0.6"
@@ -32,11 +32,17 @@ tokio = "0.1"
 tokio-threadpool = "0.1"
 
 [dev-dependencies]
-quaint = { git = "https://github.com/prisma/quaint.git" }
 barrel = { version = "0.6.3-alpha.0", features = ["sqlite3", "mysql", "pg"] }
 pretty_assertions = "0.6"
 sql-schema-describer = { path = "../../libs/sql-schema-describer" }
-migration-engine-macros = { path = "../macros" }
+test-macros = { path = "../../libs/test-macros" }
+
+# When we asyncify the migration engine, we will swap async-std and tokio,
+# because our blocking SQL connections are already spawning tokio.
+# tokio02 = { package = "tokio", version = "0.2.0-alpha.6" }
+# once_cell = "1.2.0"
+
+async-std = "1.0"
 
 [[bin]]
 name = "migration-engine"

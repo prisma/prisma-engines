@@ -1,4 +1,4 @@
-use super::{EnumDiffer, ModelDiffer};
+use super::{EnumDiffer, FieldDiffer, ModelDiffer};
 use datamodel::ast::{self, Top};
 
 /// Implements the logic to diff top-level items in a pair of [Datamodel ASTs](/datamodel/ast/struct.Datamodel.html).
@@ -68,6 +68,35 @@ impl<'a> TopDiffer<'a> {
         })
     }
 
+    /// Iterator over the custom types present in `next` but not `previous`.
+    pub(crate) fn created_type_aliases(&self) -> impl Iterator<Item = &ast::Field> {
+        self.next_type_aliases().filter(move |next_type_alias| {
+            self.previous_type_aliases()
+                .find(|previous_type_alias| type_aliases_match(previous_type_alias, next_type_alias))
+                .is_none()
+        })
+    }
+
+    /// Iterator over the custom types present in `previous` but not `next`.
+    pub(crate) fn deleted_type_aliases(&self) -> impl Iterator<Item = &ast::Field> {
+        self.previous_type_aliases().filter(move |previous_type_alias| {
+            self.next_type_aliases()
+                .find(|next_type_alias| type_aliases_match(previous_type_alias, next_type_alias))
+                .is_none()
+        })
+    }
+
+    pub(crate) fn type_alias_pairs(&self) -> impl Iterator<Item = FieldDiffer<'_>> {
+        self.previous_type_aliases().filter_map(move |previous_type_alias| {
+            self.next_type_aliases()
+                .find(|next_type_alias| type_aliases_match(previous_type_alias, next_type_alias))
+                .map(|next_type_alias| FieldDiffer {
+                    previous: previous_type_alias,
+                    next: next_type_alias,
+                })
+        })
+    }
+
     /// Iterator over the models in `previous`.
     fn previous_models(&self) -> impl Iterator<Item = &ast::Model> {
         walk_models(self.previous)
@@ -87,6 +116,16 @@ impl<'a> TopDiffer<'a> {
     pub fn next_enums(&self) -> impl Iterator<Item = &ast::Enum> {
         walk_enums(self.next)
     }
+
+    /// Iterator over the custom types in `previous`.
+    pub fn previous_type_aliases(&self) -> impl Iterator<Item = &ast::Field> {
+        walk_type_aliases(self.previous)
+    }
+
+    /// Iterator over the custom types in `next`.
+    pub fn next_type_aliases(&self) -> impl Iterator<Item = &ast::Field> {
+        walk_type_aliases(self.next)
+    }
 }
 
 fn walk_enums(ast: &ast::SchemaAst) -> impl Iterator<Item = &ast::Enum> {
@@ -102,6 +141,14 @@ fn walk_models(ast: &ast::SchemaAst) -> impl Iterator<Item = &ast::Model> {
 }
 
 fn models_match(previous: &ast::Model, next: &ast::Model) -> bool {
+    previous.name.name == next.name.name
+}
+
+fn walk_type_aliases(ast: &ast::SchemaAst) -> impl Iterator<Item = &ast::Field> {
+    ast.tops.iter().filter_map(Top::as_type_alias)
+}
+
+fn type_aliases_match(previous: &ast::Field, next: &ast::Field) -> bool {
     previous.name.name == next.name.name
 }
 

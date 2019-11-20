@@ -1,6 +1,5 @@
 [workspace]
 members = [
-  "prisma-models",
   "introspection-engine/core",
   "introspection-engine/connectors/introspection-connector",
   "introspection-engine/connectors/sql-introspection-connector",
@@ -12,10 +11,12 @@ members = [
   "query-engine/core",
   "query-engine/prisma",
   "prisma-fmt",
-  "libs/datamodel",
+  "libs/datamodel/core",
+  "libs/datamodel/connectors/datamodel-connector",
   "libs/prisma-inflector",
   "libs/sql-schema-describer",
   "libs/sql-connection",
+  "libs/prisma-models",
 ]
 
 [patch.crates-io]

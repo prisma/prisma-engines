@@ -5,7 +5,7 @@ use log::LevelFilter;
 use pretty_assertions::assert_eq;
 
 use datamodel::{
-    common::{PrismaType, PrismaValue},
+    common::{ScalarType, ScalarValue},
     dml, Datamodel, Field, FieldArity, FieldType, IdInfo, IdStrategy, Model, OnDeleteStrategy, RelationInfo,
     ScalarListStrategy,
 };
@@ -76,14 +76,14 @@ fn a_data_model_can_be_generated_from_a_schema() {
                 .iter()
                 .map(|col_type| {
                     let field_type = match col_type {
-                        ColumnTypeFamily::Boolean => FieldType::Base(PrismaType::Boolean),
-                        ColumnTypeFamily::DateTime => FieldType::Base(PrismaType::DateTime),
-                        ColumnTypeFamily::Float => FieldType::Base(PrismaType::Float),
-                        ColumnTypeFamily::Int => FieldType::Base(PrismaType::Int),
-                        ColumnTypeFamily::String => FieldType::Base(PrismaType::String),
+                        ColumnTypeFamily::Boolean => FieldType::Base(ScalarType::Boolean),
+                        ColumnTypeFamily::DateTime => FieldType::Base(ScalarType::DateTime),
+                        ColumnTypeFamily::Float => FieldType::Base(ScalarType::Float),
+                        ColumnTypeFamily::Int => FieldType::Base(ScalarType::Int),
+                        ColumnTypeFamily::String => FieldType::Base(ScalarType::String),
                         // XXX: We made a conscious decision to punt on mapping of ColumnTypeFamily
                         // variants that don't yet have corresponding PrismaType variants
-                        _ => FieldType::Base(PrismaType::String),
+                        _ => FieldType::Base(ScalarType::String),
                     };
                     Field {
                         name: col_type.to_string(),
@@ -149,7 +149,7 @@ fn arity_is_preserved_when_generating_data_model_from_a_schema() {
                 Field {
                     name: "optional".to_string(),
                     arity: FieldArity::Optional,
-                    field_type: FieldType::Base(PrismaType::Int),
+                    field_type: FieldType::Base(ScalarType::Int),
                     database_name: None,
                     default_value: None,
                     is_unique: false,
@@ -162,7 +162,7 @@ fn arity_is_preserved_when_generating_data_model_from_a_schema() {
                 Field {
                     name: "required".to_string(),
                     arity: FieldArity::Required,
-                    field_type: FieldType::Base(PrismaType::Int),
+                    field_type: FieldType::Base(ScalarType::Int),
                     database_name: None,
                     default_value: None,
                     is_unique: false,
@@ -175,7 +175,7 @@ fn arity_is_preserved_when_generating_data_model_from_a_schema() {
                 Field {
                     name: "list".to_string(),
                     arity: FieldArity::List,
-                    field_type: FieldType::Base(PrismaType::Int),
+                    field_type: FieldType::Base(ScalarType::Int),
                     database_name: None,
                     default_value: None,
                     is_unique: false,
@@ -257,7 +257,7 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
                 Field {
                     name: "no-default".to_string(),
                     arity: FieldArity::Optional,
-                    field_type: FieldType::Base(PrismaType::Int),
+                    field_type: FieldType::Base(ScalarType::Int),
                     database_name: None,
                     default_value: None,
                     is_unique: false,
@@ -270,9 +270,9 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
                 Field {
                     name: "int-default".to_string(),
                     arity: FieldArity::Optional,
-                    field_type: FieldType::Base(PrismaType::Int),
+                    field_type: FieldType::Base(ScalarType::Int),
                     database_name: None,
-                    default_value: Some(PrismaValue::Int(1)),
+                    default_value: Some(ScalarValue::Int(1)),
                     is_unique: false,
                     id_info: None,
                     scalar_list_strategy: None,
@@ -283,9 +283,9 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
                 Field {
                     name: "bool-default".to_string(),
                     arity: FieldArity::Optional,
-                    field_type: FieldType::Base(PrismaType::Boolean),
+                    field_type: FieldType::Base(ScalarType::Boolean),
                     database_name: None,
-                    default_value: Some(PrismaValue::Boolean(true)),
+                    default_value: Some(ScalarValue::Boolean(true)),
                     is_unique: false,
                     id_info: None,
                     scalar_list_strategy: None,
@@ -296,9 +296,9 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
                 Field {
                     name: "float-default".to_string(),
                     arity: FieldArity::Optional,
-                    field_type: FieldType::Base(PrismaType::Float),
+                    field_type: FieldType::Base(ScalarType::Float),
                     database_name: None,
-                    default_value: Some(PrismaValue::Float(1.0)),
+                    default_value: Some(ScalarValue::Float(1.0)),
                     is_unique: false,
                     id_info: None,
                     scalar_list_strategy: None,
@@ -309,9 +309,9 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
                 Field {
                     name: "string-default".to_string(),
                     arity: FieldArity::Optional,
-                    field_type: FieldType::Base(PrismaType::String),
+                    field_type: FieldType::Base(ScalarType::String),
                     database_name: None,
-                    default_value: Some(PrismaValue::String("default".to_string())),
+                    default_value: Some(ScalarValue::String("default".to_string())),
                     is_unique: false,
                     id_info: None,
                     scalar_list_strategy: None,
@@ -409,7 +409,7 @@ fn primary_key_is_preserved_when_generating_data_model_from_a_schema() {
                 fields: vec![Field {
                     name: "primary".to_string(),
                     arity: FieldArity::Required,
-                    field_type: FieldType::Base(PrismaType::Int),
+                    field_type: FieldType::Base(ScalarType::Int),
                     database_name: None,
                     default_value: None,
                     is_unique: false,
@@ -435,7 +435,7 @@ fn primary_key_is_preserved_when_generating_data_model_from_a_schema() {
                 fields: vec![Field {
                     name: "primary".to_string(),
                     arity: FieldArity::Required,
-                    field_type: FieldType::Base(PrismaType::Int),
+                    field_type: FieldType::Base(ScalarType::Int),
                     database_name: None,
                     default_value: None,
                     is_unique: false,
@@ -461,7 +461,7 @@ fn primary_key_is_preserved_when_generating_data_model_from_a_schema() {
                 fields: vec![Field {
                     name: "primary".to_string(),
                     arity: FieldArity::Required,
-                    field_type: FieldType::Base(PrismaType::Int),
+                    field_type: FieldType::Base(ScalarType::Int),
                     database_name: None,
                     default_value: None,
                     is_unique: false,
@@ -572,7 +572,7 @@ fn uniqueness_is_preserved_when_generating_data_model_from_a_schema() {
                 Field {
                     name: "non-unique".to_string(),
                     arity: FieldArity::Optional,
-                    field_type: FieldType::Base(PrismaType::Int),
+                    field_type: FieldType::Base(ScalarType::Int),
                     database_name: None,
                     default_value: None,
                     is_unique: false,
@@ -585,7 +585,7 @@ fn uniqueness_is_preserved_when_generating_data_model_from_a_schema() {
                 Field {
                     name: "unique".to_string(),
                     arity: FieldArity::Required,
-                    field_type: FieldType::Base(PrismaType::Int),
+                    field_type: FieldType::Base(ScalarType::Int),
                     database_name: None,
                     default_value: None,
                     is_unique: true,
@@ -661,7 +661,7 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
                     Field {
                         name: "id".to_string(),
                         arity: FieldArity::Required,
-                        field_type: FieldType::Base(PrismaType::Int),
+                        field_type: FieldType::Base(ScalarType::Int),
                         database_name: None,
                         default_value: None,
                         is_unique: false,
@@ -677,7 +677,7 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
                     Field {
                         name: "name".to_string(),
                         arity: FieldArity::Required,
-                        field_type: FieldType::Base(PrismaType::String),
+                        field_type: FieldType::Base(ScalarType::String),
                         database_name: None,
                         default_value: None,
                         is_unique: false,
@@ -701,7 +701,7 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
                     Field {
                         name: "id".to_string(),
                         arity: FieldArity::Required,
-                        field_type: FieldType::Base(PrismaType::Int),
+                        field_type: FieldType::Base(ScalarType::Int),
                         database_name: None,
                         default_value: None,
                         is_unique: false,
@@ -857,7 +857,7 @@ fn multi_field_uniques_are_preserved_when_generating_data_model_from_a_schema() 
                 Field {
                     name: "id".to_string(),
                     arity: FieldArity::Required,
-                    field_type: FieldType::Base(PrismaType::Int),
+                    field_type: FieldType::Base(ScalarType::Int),
                     database_name: None,
                     default_value: None,
                     is_unique: false,
@@ -873,7 +873,7 @@ fn multi_field_uniques_are_preserved_when_generating_data_model_from_a_schema() 
                 Field {
                     name: "name".to_string(),
                     arity: FieldArity::Required,
-                    field_type: FieldType::Base(PrismaType::String),
+                    field_type: FieldType::Base(ScalarType::String),
                     database_name: None,
                     default_value: None,
                     is_unique: false,
@@ -886,7 +886,7 @@ fn multi_field_uniques_are_preserved_when_generating_data_model_from_a_schema() 
                 Field {
                     name: "lastname".to_string(),
                     arity: FieldArity::Required,
-                    field_type: FieldType::Base(PrismaType::String),
+                    field_type: FieldType::Base(ScalarType::String),
                     database_name: None,
                     default_value: None,
                     is_unique: false,
@@ -977,7 +977,7 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                     Field {
                         name: "id".to_string(),
                         arity: FieldArity::Required,
-                        field_type: FieldType::Base(PrismaType::Int),
+                        field_type: FieldType::Base(ScalarType::Int),
                         database_name: None,
                         default_value: None,
                         is_unique: false,
@@ -993,7 +993,7 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                     Field {
                         name: "name".to_string(),
                         arity: FieldArity::Required,
-                        field_type: FieldType::Base(PrismaType::String),
+                        field_type: FieldType::Base(ScalarType::String),
                         database_name: None,
                         default_value: None,
                         is_unique: false,
@@ -1035,7 +1035,7 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                     Field {
                         name: "id".to_string(),
                         arity: FieldArity::Required,
-                        field_type: FieldType::Base(PrismaType::Int),
+                        field_type: FieldType::Base(ScalarType::Int),
                         database_name: None,
                         default_value: None,
                         is_unique: false,

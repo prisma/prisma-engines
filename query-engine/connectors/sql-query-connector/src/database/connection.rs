@@ -3,9 +3,10 @@ use crate::{database::operations::*, query_builder::read::ManyRelatedRecordsQuer
 use connector_interface::{
     self as connector,
     filter::{Filter, RecordFinder},
-    Connection, QueryArguments, ReadOperations, ScalarListValues, Transaction, WriteArgs, WriteOperations, IO
+    Connection, QueryArguments, ReadOperations, ScalarListValues, Transaction, WriteArgs, WriteOperations, IO,
 };
 use prisma_models::prelude::*;
+use quaint::connector::TransactionCapable;
 use std::marker::PhantomData;
 
 pub struct SqlConnection<C, T> {
@@ -25,7 +26,7 @@ where
 
 impl<C, T> Connection for SqlConnection<C, T>
 where
-    C: QueryExt + Send + Sync + 'static,
+    C: QueryExt + TransactionCapable + Send + Sync + 'static,
     T: ManyRelatedRecordsQueryBuilder + Send + Sync + 'static,
 {
     fn start_transaction<'a>(&'a self) -> IO<'a, Box<dyn Transaction<'a> + 'a>> {
@@ -33,7 +34,6 @@ where
 
         IO::new(async move {
             let tx: quaint::connector::Transaction<'a> = fut_tx.await.map_err(SqlError::from)?;
-
             Ok(Box::new(SqlConnectorTransaction::<T>::new(tx)) as Box<dyn Transaction<'a> + 'a>)
         })
     }
@@ -102,7 +102,12 @@ where
         IO::new(async move { write::create_record(&self.inner, model, args).await })
     }
 
-    fn update_records<'a>(&'a self, model: &'a ModelRef, where_: Filter, args: WriteArgs) -> connector::IO<Vec<GraphqlId>> {
+    fn update_records<'a>(
+        &'a self,
+        model: &'a ModelRef,
+        where_: Filter,
+        args: WriteArgs,
+    ) -> connector::IO<Vec<GraphqlId>> {
         IO::new(async move { write::update_records(&self.inner, model, where_, args).await })
     }
 

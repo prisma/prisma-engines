@@ -3,13 +3,13 @@ use crate::{
     dmmf, PrismaResult,
 };
 use clap::ArgMatches;
+use datamodel::json::dmmf::Datamodel;
 use query_core::{
     schema::{QuerySchemaRef, SupportedCapabilities},
     BuildMode, QuerySchemaBuilder,
 };
 use serde::Deserialize;
-use std::{sync::Arc, fs::File, io::Read};
-use datamodel::dmmf::Datamodel;
+use std::{fs::File, io::Read, sync::Arc};
 
 #[derive(Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
@@ -36,10 +36,8 @@ impl CliCommand {
             Some(Self::Dmmf(build_mode))
         } else if matches.is_present("dmmf_to_dml") {
             let path = matches.value_of("dmmf_to_dml").unwrap();
-            let file = File::open(path)
-                .expect("File should open read only");
-            let input: DmmfToDmlInput = serde_json::from_reader(file)
-                .expect("File should be proper JSON");
+            let file = File::open(path).expect("File should open read only");
+            let input: DmmfToDmlInput = serde_json::from_reader(file).expect("File should be proper JSON");
             Some(Self::DmmfToDml(input))
         } else if matches.is_present("get_config") {
             let path = matches.value_of("get_config").unwrap();
@@ -81,19 +79,18 @@ impl CliCommand {
     }
 
     fn dmmf_to_dml(input: DmmfToDmlInput) -> PrismaResult<()> {
-        let datamodel = datamodel::dmmf::schema_from_dmmf(&input.dmmf);
-        let config = datamodel::config_from_mcf_json_value(input.config);
+        let datamodel = datamodel::json::dmmf::schema_from_dmmf(&input.dmmf);
+        let config = datamodel::json::mcf::config_from_mcf_json_value(input.config);
         let serialized = datamodel::render_datamodel_and_config_to_string(&datamodel, &config)?;
 
         println!("{}", serialized);
 
-
         Ok(())
     }
 
-    fn get_config(datamodel: String) -> PrismaResult<()> {
-        let config = load_configuration(&datamodel)?;
-        let json = datamodel::config_to_mcf_json_value(&config);
+    fn get_config(input: String) -> PrismaResult<()> {
+        let config = load_configuration(&input)?;
+        let json = datamodel::json::mcf::config_to_mcf_json_value(&config);
         let serialized = serde_json::to_string(&json)?;
 
         println!("{}", serialized);

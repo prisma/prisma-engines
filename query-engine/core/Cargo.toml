@@ -5,8 +5,7 @@ authors = ["Dominic Petrick <dompetrick@gmail.com>", "Katharina Fey <kookie@spac
 edition = "2018"
 
 [dependencies]
-graphql-parser = "0.2.2"
-prisma-models = { path = "../../prisma-models" }
+prisma-models = { path = "../../libs/prisma-models" }
 prisma-inflector = { path = "../../libs/prisma-inflector" }
 connector = { path = "../connectors/query-connector", package = "query-connector" }
 failure = "0.1"
