@@ -4,7 +4,7 @@ pub use connection_info::*;
 
 use crate::{
     ast,
-    connector::{self, DBIO, Queryable, TransactionCapable, MysqlUrl, PostgresUrl},
+    connector::{self, MysqlUrl, PostgresUrl, Queryable, TransactionCapable, DBIO},
     error::Error,
 };
 use futures::future;
@@ -65,10 +65,7 @@ pub enum QuaintManager {
     Postgres(PostgresUrl),
 
     #[cfg(feature = "sqlite")]
-    Sqlite {
-        file_path: String,
-        db_name: String,
-    },
+    Sqlite { file_path: String, db_name: String },
 }
 
 impl Manage for QuaintManager {
@@ -86,11 +83,9 @@ impl Manage for QuaintManager {
                 use crate::connector::Sqlite;
 
                 match Sqlite::new(&file_path) {
-                    Ok(mut conn) => {
-                         match conn.attach_database(db_name) {
-                            Ok(_) => DBIO::new(future::ok(Box::new(conn) as Self::Resource)),
-                            Err(e) => DBIO::new(future::err(e)),
-                        }
+                    Ok(mut conn) => match conn.attach_database(db_name) {
+                        Ok(_) => DBIO::new(future::ok(Box::new(conn) as Self::Resource)),
+                        Err(e) => DBIO::new(future::err(e)),
                     },
                     Err(e) => DBIO::new(future::err(e)),
                 }
@@ -104,7 +99,7 @@ impl Manage for QuaintManager {
                     Ok(mysql) => DBIO::new(future::ok(Box::new(mysql) as Self::Resource)),
                     Err(e) => DBIO::new(future::err(e)),
                 }
-            },
+            }
 
             #[cfg(feature = "postgresql")]
             Self::Postgres(url) => {

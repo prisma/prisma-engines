@@ -206,7 +206,7 @@ impl Quaint {
                 let manager = QuaintManager::Mysql(url.clone());
 
                 (manager, connection_limit as u32)
-            },
+            }
             #[cfg(feature = "postgresql")]
             "postgres" | "postgresql" => {
                 let url = connector::PostgresUrl::new(url)?;

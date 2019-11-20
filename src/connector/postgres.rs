@@ -12,7 +12,10 @@ use futures::future::FutureExt;
 use native_tls::{Certificate, Identity, TlsConnector};
 use percent_encoding::percent_decode;
 use postgres_native_tls::MakeTlsConnector;
-use std::{borrow::{Cow, Borrow}, time::Duration};
+use std::{
+    borrow::{Borrow, Cow},
+    time::Duration,
+};
 use tokio_postgres::{config::SslMode, Client, Config};
 use url::Url;
 
