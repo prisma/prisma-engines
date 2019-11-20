@@ -1,18 +1,20 @@
-use crate::{error::*, query_builder::ReadQueryBuilder, AliasedCondition, RawQuery, SqlRow, ToSqlRow};
+use crate::{error::*, query_builder::read, AliasedCondition, RawQuery, SqlRow, ToSqlRow};
+use async_trait::async_trait;
 use connector_interface::{
     error::RecordFinderInfo,
     filter::{Filter, RecordFinder},
 };
-use async_trait::async_trait;
 use prisma_models::*;
 use quaint::{
     ast::*,
     connector::{self, Queryable},
+    pool::PooledConnection,
 };
 use serde_json::{Map, Number, Value};
 use std::convert::TryFrom;
 
 impl<'t> QueryExt for connector::Transaction<'t> {}
+impl QueryExt for PooledConnection {}
 
 /// Functions for querying data.
 /// Basically represents a connection wrapper?
@@ -59,7 +61,7 @@ pub trait QueryExt: Queryable + Send + Sync {
 
         let model = record_finder.field.model();
         let selected_fields = SelectedFields::from(&model);
-        let select = ReadQueryBuilder::get_records(&model, &selected_fields, record_finder);
+        let select = read::get_records(&model, &selected_fields, record_finder);
         let idents = selected_fields.type_identifiers();
 
         let row = self.find(select, idents.as_slice()).await.map_err(|e| match e {
@@ -112,7 +114,7 @@ pub trait QueryExt: Queryable + Send + Sync {
 
     /// Read the all columns as an `GraphqlId`
     async fn filter_ids(&self, model: &ModelRef, filter: Filter) -> crate::Result<Vec<GraphqlId>> {
-        let select = Select::from_table(model.table())
+        let select = Select::from_table(model.as_table())
             .column(model.fields().id().as_column())
             .so_that(filter.aliased_cond(None));
 
@@ -141,11 +143,7 @@ pub trait QueryExt: Queryable + Send + Sync {
         selector: &Option<RecordFinder>,
     ) -> crate::Result<GraphqlId> {
         let ids = self
-            .filter_ids_by_parents(
-                parent_field,
-                vec![parent_id],
-                selector.clone().map(Filter::from),
-            )
+            .filter_ids_by_parents(parent_field, vec![parent_id], selector.clone().map(Filter::from))
             .await?;
 
         let id = ids.into_iter().next().ok_or_else(|| SqlError::RecordsNotConnected {
@@ -172,7 +170,7 @@ pub trait QueryExt: Queryable + Send + Sync {
         let child_id_field = relation.column_for_relation_side(parent_field.relation_side.opposite());
         let parent_id_field = relation.column_for_relation_side(parent_field.relation_side);
 
-        let subselect = Select::from_table(relation.relation_table())
+        let subselect = Select::from_table(relation.as_table())
             .column(child_id_field)
             .so_that(parent_id_field.in_selection(parent_ids));
 
@@ -191,7 +189,7 @@ pub trait QueryExt: Queryable + Send + Sync {
             None => conditions.into(),
         };
 
-        let select = Select::from_table(related_model.table())
+        let select = Select::from_table(related_model.as_table())
             .column(related_model.fields().id().as_column())
             .so_that(conditions);
 

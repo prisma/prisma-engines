@@ -7,6 +7,7 @@ import util._
 class NestedSetMutationInsideUpdateSpec extends FlatSpec with Matchers with ApiSpecBase with SchemaBaseV11 {
   override def runOnlyForCapabilities: Set[ConnectorCapability] = Set(JoinRelationLinksCapability)
 
+<<<<<<< HEAD
   "a PM to C1!  relation with the child already in a relation" should "be setable through a nested mutation by unique" in {
     schemaPMToC1req.test { dataModel =>
       val project = SchemaDsl.fromStringV11() { dataModel }
@@ -102,6 +103,8 @@ class NestedSetMutationInsideUpdateSpec extends FlatSpec with Matchers with ApiS
     }
   }
 
+=======
+>>>>>>> migration-engine/reenable-not-null-constraints-for-required-relations
   "a PM to C1  relation with the child already in a relation" should "be setable through a nested mutation by unique" in {
     schemaPMToC1opt.test { dataModel =>
       val project = SchemaDsl.fromStringV11() { dataModel }

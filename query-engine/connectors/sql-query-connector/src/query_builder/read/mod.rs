@@ -1,11 +1,11 @@
 mod many_related_records;
 
-use crate::{cursor_condition::CursorCondition, filter_conversion::AliasedCondition, ordering::Ordering};
+use crate::{cursor_condition, filter_conversion::AliasedCondition, ordering::Ordering};
 use connector_interface::{
     filter::{Filter, RecordFinder},
     QueryArguments,
 };
-use prisma_models::prelude::*;
+use prisma_models::*;
 use quaint::ast::*;
 use std::sync::Arc;
 
@@ -43,7 +43,7 @@ impl SelectDefinition for Select<'static> {
 
 impl SelectDefinition for QueryArguments {
     fn into_select(self, model: &ModelRef) -> Select<'static> {
-        let cursor: ConditionTree = CursorCondition::build(&self, Arc::clone(&model));
+        let cursor: ConditionTree = cursor_condition::build(&self, Arc::clone(&model));
         let order_by = self.order_by;
         let ordering = Ordering::for_model(Arc::clone(&model), order_by.as_ref(), self.last.is_some());
 
@@ -63,7 +63,7 @@ impl SelectDefinition for QueryArguments {
             None => (self.skip.unwrap_or(0), None),
         };
 
-        let select_ast = Select::from_table(model.table())
+        let select_ast = Select::from_table(model.as_table())
             .so_that(conditions)
             .offset(skip as usize);
 
@@ -76,49 +76,40 @@ impl SelectDefinition for QueryArguments {
     }
 }
 
-pub struct ReadQueryBuilder;
+pub fn get_records<T>(model: &ModelRef, selected_fields: &SelectedFields, query: T) -> Select<'static>
+where
+    T: SelectDefinition,
+{
+    selected_fields
+        .columns()
+        .into_iter()
+        .fold(query.into_select(model), |acc, col| acc.column(col))
+}
 
-#[allow(dead_code)]
-impl ReadQueryBuilder {
-    pub fn get_records<T>(model: &ModelRef, selected_fields: &SelectedFields, query: T) -> Select<'static>
-    where
-        T: SelectDefinition,
-    {
-        selected_fields
-            .columns()
-            .into_iter()
-            .fold(query.into_select(model), |acc, col| acc.column(col.clone()))
-    }
+pub fn get_scalar_list_values_by_record_ids(
+    list_field: &ScalarFieldRef,
+    record_ids: Vec<GraphqlId>,
+) -> Select<'static> {
+    let table = list_field.scalar_list_table().table();
 
-    pub fn get_scalar_list_values_by_record_ids(
-        list_field: &ScalarFieldRef,
-        record_ids: Vec<GraphqlId>,
-    ) -> Select<'static> {
-        let table = list_field.scalar_list_table().table();
+    // I vant to saak your blaad... - Vlad the Impaler
+    let vhere = "nodeId".in_selection(record_ids);
 
-        // I vant to saak your blaad... - Vlad the Impaler
-        let vhere = "nodeId".in_selection(record_ids);
+    Select::from_table(table)
+        .column("nodeId")
+        .column("value")
+        .so_that(vhere)
+}
 
-        Select::from_table(table)
-            .column("nodeId")
-            .column("value")
-            .so_that(vhere)
-    }
+pub fn count_by_model(model: &ModelRef, query_arguments: QueryArguments) -> Select<'static> {
+    let id_field = model.fields().id();
 
-    pub fn count_by_model(model: &ModelRef, query_arguments: QueryArguments) -> Select<'static> {
-        let id_field = model.fields().id();
+    let mut selected_fields = SelectedFields::default();
+    selected_fields.add_scalar(id_field.clone());
 
-        let mut selected_fields = SelectedFields::default();
-        selected_fields.add_scalar(id_field.clone());
+    let base_query = get_records(model, &selected_fields, query_arguments);
+    let table = Table::from(base_query).alias("sub");
+    let column = Column::from(("sub", id_field.db_name().to_string()));
 
-        let base_query = Self::get_records(model, &selected_fields, query_arguments);
-        let table = Table::from(base_query).alias("sub");
-        let column = Column::from(("sub", id_field.db_name().to_string()));
-
-        Select::from_table(table).value(count(column))
-    }
-
-    pub fn count_by_table(database: &str, table: &str) -> Select<'static> {
-        Select::from_table((database.to_string(), table.to_string())).value(count(asterisk()))
-    }
+    Select::from_table(table).value(count(column))
 }

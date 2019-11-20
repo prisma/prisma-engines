@@ -1,5 +1,5 @@
 use super::{
-    command_helpers::run_infer_command,
+    command_helpers::{run_infer_command, InferOutput},
     misc_helpers::{
         mysql_8_url, mysql_migration_connector, mysql_url, postgres_migration_connector, postgres_url,
         sqlite_migration_connector, test_api,
@@ -9,10 +9,10 @@ use super::{
 use migration_connector::{MigrationPersistence, MigrationStep};
 use migration_core::{
     api::GenericApi,
-    commands::{ApplyMigrationInput, InferMigrationStepsInput},
+    commands::{ApplyMigrationInput, InferMigrationStepsInput, UnapplyMigrationInput, UnapplyMigrationOutput},
 };
+use quaint::prelude::SqlFamily;
 use sql_connection::SyncSqlConnection;
-use sql_migration_connector::SqlFamily;
 use sql_schema_describer::*;
 use std::sync::Arc;
 
@@ -37,7 +37,11 @@ impl TestApi {
         self.api.migration_persistence()
     }
 
-    pub fn apply_migration(&self, steps: Vec<MigrationStep>, migration_id: &str) -> InferAndApplyOutput {
+    pub fn sql_family(&self) -> SqlFamily {
+        self.sql_family
+    }
+
+    pub async fn apply_migration(&self, steps: Vec<MigrationStep>, migration_id: &str) -> InferAndApplyOutput {
         let input = ApplyMigrationInput {
             migration_id: migration_id.to_string(),
             steps,
@@ -60,22 +64,51 @@ impl TestApi {
         }
     }
 
-    pub fn infer_and_apply(&self, datamodel: &str) -> InferAndApplyOutput {
+    pub async fn infer_and_apply(&self, datamodel: &str) -> InferAndApplyOutput {
         let migration_id = "the-migration-id";
 
+        self.infer_and_apply_with_migration_id(datamodel, migration_id).await
+    }
+
+    pub async fn infer_and_apply_with_migration_id(&self, datamodel: &str, migration_id: &str) -> InferAndApplyOutput {
         let input = InferMigrationStepsInput {
             migration_id: migration_id.to_string(),
             datamodel: datamodel.to_string(),
             assume_to_be_applied: Vec::new(),
         };
 
-        let steps = run_infer_command(self.api.as_ref(), input).0.datamodel_steps;
+        let steps = self.run_infer_command(input).await.0.datamodel_steps;
 
-        self.apply_migration(steps, migration_id)
+        self.apply_migration(steps, migration_id).await
     }
 
-    fn introspect_database(&self) -> SqlSchema {
-        let inspector: Box<dyn SqlSchemaDescriberBackend> = match self.api.connector_type() {
+    pub async fn run_infer_command(&self, input: InferMigrationStepsInput) -> InferOutput {
+        run_infer_command(self.api.as_ref(), input)
+    }
+
+    pub async fn unapply_migration(&self) -> UnapplyOutput {
+        let input = UnapplyMigrationInput {};
+        let output = self.api.unapply_migration(&input).unwrap();
+
+        let sql_schema = self.introspect_database();
+
+        UnapplyOutput { sql_schema, output }
+    }
+
+    pub fn barrel(&self) -> BarrelMigrationExecutor {
+        BarrelMigrationExecutor {
+            inspector: self.inspector(),
+            database: Arc::clone(&self.database),
+            sql_variant: match self.sql_family {
+                SqlFamily::Mysql => barrel::SqlVariant::Mysql,
+                SqlFamily::Postgres => barrel::SqlVariant::Pg,
+                SqlFamily::Sqlite => barrel::SqlVariant::Sqlite,
+            },
+        }
+    }
+
+    fn inspector(&self) -> Box<dyn SqlSchemaDescriberBackend> {
+        match self.api.connector_type() {
             "postgresql" => Box::new(sql_schema_describer::postgres::SqlSchemaDescriber::new(Arc::clone(
                 &self.database,
             ))),
@@ -86,9 +119,12 @@ impl TestApi {
                 &self.database,
             ))),
             _ => unimplemented!(),
-        };
+        }
+    }
 
-        let mut result = inspector
+    fn introspect_database(&self) -> SqlSchema {
+        let mut result = self
+            .inspector()
             .describe(&SCHEMA_NAME.to_string())
             .expect("Introspection failed");
 
@@ -137,4 +173,44 @@ pub fn sqlite_test_api() -> TestApi {
         database: Arc::clone(&connector.database),
         api: Box::new(test_api(connector)),
     }
+}
+
+pub struct BarrelMigrationExecutor {
+    inspector: Box<dyn SqlSchemaDescriberBackend>,
+    database: Arc<dyn SyncSqlConnection + Send + Sync>,
+    sql_variant: barrel::backend::SqlVariant,
+}
+
+impl BarrelMigrationExecutor {
+    pub fn execute<F>(&self, mut migration_fn: F) -> SqlSchema
+    where
+        F: FnMut(&mut barrel::Migration) -> (),
+    {
+        use barrel::Migration;
+
+        let mut migration = Migration::new().schema(SCHEMA_NAME);
+        migration_fn(&mut migration);
+        let full_sql = migration.make_from(self.sql_variant);
+        run_full_sql(&self.database, &full_sql);
+        let mut result = self
+            .inspector
+            .describe(&SCHEMA_NAME.to_string())
+            .expect("Introspection failed");
+
+        // The presence of the _Migration table makes assertions harder. Therefore remove it.
+        result.tables = result.tables.into_iter().filter(|t| t.name != "_Migration").collect();
+        result
+    }
+}
+
+fn run_full_sql(database: &Arc<dyn SyncSqlConnection + Send + Sync>, full_sql: &str) {
+    for sql in full_sql.split(";").filter(|sql| !sql.is_empty()) {
+        database.query_raw(&sql, &[]).unwrap();
+    }
+}
+
+#[derive(Debug)]
+pub struct UnapplyOutput {
+    pub sql_schema: SqlSchema,
+    pub output: UnapplyMigrationOutput,
 }

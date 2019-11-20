@@ -1,4 +1,4 @@
-use crate::{error::SqlError, query_builder::WriteQueryBuilder, QueryExt};
+use crate::{error::SqlError, query_builder::write, QueryExt};
 use connector_interface::{error::ConnectorError, *};
 use prisma_models::*;
 use quaint::error::Error as QueryError;
@@ -8,7 +8,7 @@ pub async fn create_record(
     model: &ModelRef,
     args: WriteArgs,
 ) -> connector_interface::Result<GraphqlId> {
-    let (insert, returned_id) = WriteQueryBuilder::create_record(model, args.non_list_args().clone());
+    let (insert, returned_id) = write::create_record(model, args.non_list_args().clone());
 
     let last_id = match conn.insert(insert).await {
         Ok(id) => id,
@@ -46,7 +46,7 @@ pub async fn create_record(
         let field = model.fields().find_from_scalar(field_name.as_ref()).unwrap();
         let table = field.scalar_list_table();
 
-        if let Some(insert) = WriteQueryBuilder::create_scalar_list_value(table.table(), &list_value, &id) {
+        if let Some(insert) = write::create_scalar_list_value(table.table(), &list_value, &id) {
             conn.insert(insert).await.map_err(SqlError::from)?;
         }
     }
@@ -68,7 +68,7 @@ pub async fn update_records(
 
     let updates = {
         let ids: Vec<&GraphqlId> = ids.iter().map(|id| &*id).collect();
-        WriteQueryBuilder::update_many(model, ids.as_slice(), args.non_list_args())?
+        write::update_many(model, ids.as_slice(), args.non_list_args())?
     };
 
     for update in updates {
@@ -78,7 +78,7 @@ pub async fn update_records(
     for (field_name, list_value) in args.list_args() {
         let field = model.fields().find_from_scalar(field_name.as_ref()).unwrap();
         let table = field.scalar_list_table();
-        let (deletes, inserts) = WriteQueryBuilder::update_scalar_list_values(&table, &list_value, ids.to_vec());
+        let (deletes, inserts) = write::update_scalar_list_values(&table, &list_value, ids.to_vec());
 
         for delete in deletes {
             conn.delete(delete).await.map_err(SqlError::from)?;
@@ -105,7 +105,7 @@ pub async fn delete_records(
         return Ok(count);
     }
 
-    for delete in WriteQueryBuilder::delete_many(model, ids.as_slice()) {
+    for delete in write::delete_many(model, ids.as_slice()) {
         conn.delete(delete).await.map_err(SqlError::from)?;
     }
 
@@ -118,7 +118,7 @@ pub async fn connect(
     parent_id: &GraphqlId,
     child_ids: &[GraphqlId],
 ) -> connector_interface::Result<()> {
-    let query = WriteQueryBuilder::create_relation_table_records(field, parent_id, child_ids);
+    let query = write::create_relation_table_records(field, parent_id, child_ids);
 
     conn.execute(query).await.map_err(SqlError::from)?;
     Ok(())
@@ -130,26 +130,8 @@ pub async fn disconnect(
     parent_id: &GraphqlId,
     child_ids: &[GraphqlId],
 ) -> connector_interface::Result<()> {
-    let query = WriteQueryBuilder::delete_relation_table_records(field, parent_id, child_ids);
+    let query = write::delete_relation_table_records(field, parent_id, child_ids);
 
     conn.execute(query).await.map_err(SqlError::from)?;
     Ok(())
 }
-
-// pub async fn set(
-//     conn: &dyn QueryExt,
-//     field: &RelationFieldRef,
-//     parent_id: GraphqlId,
-//     child_ids: Vec<GraphqlId>,
-// ) -> connector_interface::Result<()> {
-//     let query = WriteQueryBuilder::delete_relation_by_parent(field, &parent_id);
-
-//     conn.execute(query).await.map_err(SqlError::from)?;
-
-//     // TODO: we can avoid the multiple roundtrips in some cases
-//     for child_id in &child_ids {
-//         connect(conn, field, &parent_id, child_id).await?;
-//     }
-
-//     Ok(())
-// }

@@ -1,5 +1,5 @@
 use crate::{
-    query_builder::read::{ManyRelatedRecordsBaseQuery, ManyRelatedRecordsQueryBuilder, ReadQueryBuilder},
+    query_builder::read::{self, ManyRelatedRecordsBaseQuery, ManyRelatedRecordsQueryBuilder},
     QueryExt, SqlError,
 };
 use connector_interface::{error::ConnectorError, *};
@@ -18,7 +18,7 @@ pub async fn get_single_record(
     selected_fields: &SelectedFields,
 ) -> connector_interface::Result<Option<SingleRecord>> {
     let model = record_finder.field.model();
-    let query = ReadQueryBuilder::get_records(&model, selected_fields, record_finder);
+    let query = read::get_records(&model, selected_fields, record_finder);
     let field_names = selected_fields.names();
     let idents = selected_fields.type_identifiers();
 
@@ -41,7 +41,7 @@ pub async fn get_many_records(
 ) -> connector_interface::Result<ManyRecords> {
     let field_names = selected_fields.names();
     let idents = selected_fields.type_identifiers();
-    let query = ReadQueryBuilder::get_records(model, selected_fields, query_arguments);
+    let query = read::get_records(model, selected_fields, query_arguments);
 
     let records = conn
         .filter(query.into(), idents.as_slice())
@@ -107,7 +107,7 @@ pub async fn get_scalar_list_values(
     record_ids: Vec<GraphqlId>,
 ) -> connector_interface::Result<Vec<ScalarListValues>> {
     let type_identifier = list_field.type_identifier;
-    let query = ReadQueryBuilder::get_scalar_list_values_by_record_ids(list_field, record_ids);
+    let query = read::get_scalar_list_values_by_record_ids(list_field, record_ids);
     let rows = conn
         .filter(query.into(), &[TypeIdentifier::GraphQLID, type_identifier])
         .await?;
@@ -145,7 +145,7 @@ pub async fn count_by_model(
     model: &ModelRef,
     query_arguments: QueryArguments,
 ) -> connector_interface::Result<usize> {
-    let query = ReadQueryBuilder::count_by_model(model, query_arguments);
+    let query = read::count_by_model(model, query_arguments);
     let result = conn.find_int(query).await? as usize;
 
     Ok(result)

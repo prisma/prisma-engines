@@ -7,7 +7,7 @@ pub use row_number::*;
 pub use union_all::*;
 
 use crate::ordering::Ordering;
-use prisma_models::prelude::*;
+use prisma_models::*;
 use quaint::ast::{Comparable, Conjuctive, Query};
 
 pub trait ManyRelatedRecordsQueryBuilder {

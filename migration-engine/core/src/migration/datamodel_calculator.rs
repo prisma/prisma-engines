@@ -44,6 +44,9 @@ fn apply_step(datamodel: &mut ast::SchemaAst, step: &MigrationStep) -> Result<()
         MigrationStep::CreateField(create_field) => apply_create_field(datamodel, create_field)?,
         MigrationStep::UpdateField(update_field) => apply_update_field(datamodel, update_field)?,
         MigrationStep::DeleteField(delete_field) => apply_delete_field(datamodel, delete_field)?,
+        MigrationStep::CreateTypeAlias(create_type_alias) => apply_create_type_alias(datamodel, create_type_alias)?,
+        MigrationStep::UpdateTypeAlias(update_type_alias) => apply_update_type_alias(datamodel, update_type_alias)?,
+        MigrationStep::DeleteTypeAlias(delete_type_alias) => apply_delete_type_alias(datamodel, delete_type_alias)?,
         MigrationStep::CreateDirective(create_directive) => apply_create_directive(datamodel, create_directive)?,
         MigrationStep::DeleteDirective(delete_directive) => apply_delete_directive(datamodel, delete_directive)?,
         MigrationStep::CreateDirectiveArgument(create_directive_argument) => {
@@ -408,6 +411,73 @@ fn apply_delete_directive_argument(datamodel: &mut ast::SchemaAst, step: &steps:
     directive.arguments = new_arguments;
 }
 
+fn apply_create_type_alias(
+    datamodel: &mut ast::SchemaAst,
+    step: &steps::CreateTypeAlias,
+) -> Result<(), CalculatorError> {
+    if let Some(_) = datamodel.find_type_alias(&step.type_alias) {
+        return Err(format_err!(
+            "The type {} already exists in this Datamodel. It is not possible to create it once more.",
+            &step.type_alias
+        )
+        .into());
+    }
+
+    let type_alias = ast::Field {
+        documentation: None,
+        name: new_ident(step.type_alias.clone()),
+        span: new_span(),
+        default_value: None,
+        arity: step.arity.clone(),
+        directives: vec![],
+        field_type: new_ident(step.r#type.clone()),
+    };
+
+    datamodel.tops.push(ast::Top::Type(type_alias));
+
+    Ok(())
+}
+
+fn apply_update_type_alias(
+    datamodel: &mut ast::SchemaAst,
+    step: &steps::UpdateTypeAlias,
+) -> Result<(), CalculatorError> {
+    let type_alias = datamodel
+        .find_type_alias_mut(&step.type_alias)
+        .ok_or_else(|| format_err!("UpdateTypeAlias on unknown custom type `{}`", &step.type_alias))?;
+
+    if let Some(r#type) = step.r#type.as_ref() {
+        type_alias.field_type = new_ident(r#type.clone())
+    }
+
+    Ok(())
+}
+
+fn apply_delete_type_alias(
+    datamodel: &mut ast::SchemaAst,
+    step: &steps::DeleteTypeAlias,
+) -> Result<(), CalculatorError> {
+    datamodel.find_type_alias(&step.type_alias).ok_or_else(|| {
+        format_err!(
+            "The type {} does not exist in this Datamodel. It is not possible to delete it.",
+            &step.type_alias
+        )
+    })?;
+
+    let new_tops = datamodel
+        .tops
+        .drain(..)
+        .filter(|top| match top {
+            ast::Top::Type(field) => field.name.name != step.type_alias,
+            _ => true,
+        })
+        .collect();
+
+    datamodel.tops = new_tops;
+
+    Ok(())
+}
+
 fn new_ident(name: String) -> ast::Identifier {
     ast::Identifier { name, span: new_span() }
 }
@@ -424,6 +494,7 @@ fn find_directives_mut<'a>(
         steps::DirectiveType::Field { model, field } => &mut datamodel.find_field_mut(&model, &field)?.directives,
         steps::DirectiveType::Model { model } => &mut datamodel.find_model_mut(&model)?.directives,
         steps::DirectiveType::Enum { r#enum } => &mut datamodel.find_enum_mut(&r#enum)?.directives,
+        steps::DirectiveType::TypeAlias { type_alias } => &mut datamodel.find_type_alias_mut(&type_alias)?.directives,
     };
 
     Some(directives)
