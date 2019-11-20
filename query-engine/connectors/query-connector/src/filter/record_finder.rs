@@ -1,5 +1,8 @@
 use prisma_models::prelude::*;
-use std::sync::Arc;
+use std::{
+    hash::{Hash, Hasher},
+    sync::Arc,
+};
 
 /// Designates a specific record to find by a field and a value that field should have.
 #[derive(Debug, Clone)]
@@ -29,5 +32,19 @@ impl RecordFinder {
             field,
             value: value.into(),
         }
+    }
+}
+
+impl Hash for RecordFinder {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.field.name.hash(state);
+    }
+}
+
+impl Eq for RecordFinder {}
+
+impl PartialEq for RecordFinder {
+    fn eq(&self, other: &Self) -> bool {
+        self.field.name == other.field.name && self.value == other.value
     }
 }

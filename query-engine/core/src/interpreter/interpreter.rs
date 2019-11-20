@@ -13,13 +13,28 @@ use prisma_models::prelude::*;
 #[derive(Debug, Clone)]
 pub enum ExpressionResult {
     Query(QueryResult),
+    Computation(ComputationResult),
     Empty,
+}
+
+#[derive(Debug, Clone)]
+pub enum ComputationResult {
+    Diff(DiffResult),
+}
+
+/// Diff of two prisma value vectors A and B:
+/// `left` contains all elements that are in A but not in B.
+/// `right` contains all elements that are in B but not in A.
+#[derive(Debug, Clone)]
+pub struct DiffResult {
+    pub left: Vec<GraphqlId>,
+    pub right: Vec<GraphqlId>,
 }
 
 impl ExpressionResult {
     /// Attempts to transform the result into a vector of IDs (as PrismaValue).
-    pub fn as_ids(&self) -> Option<Vec<PrismaValue>> {
-        match self {
+    pub fn as_ids(&self) -> InterpretationResult<Vec<PrismaValue>> {
+        let converted = match self {
             Self::Query(ref result) => match result {
                 QueryResult::Id(id) => Some(vec![id.clone().into()]),
 
@@ -37,7 +52,33 @@ impl ExpressionResult {
             },
 
             _ => None,
-        }
+        };
+
+        converted.ok_or(InterpreterError::InterpretationError(
+            "Unable to convert result into a set of IDs".to_owned(),
+        ))
+    }
+
+    pub fn as_query_result(&self) -> InterpretationResult<&QueryResult> {
+        let converted = match self {
+            Self::Query(ref q) => Some(q),
+            _ => None,
+        };
+
+        converted.ok_or(InterpreterError::InterpretationError(
+            "Unable to convert result into a query result".to_owned(),
+        ))
+    }
+
+    pub fn as_diff_result(&self) -> InterpretationResult<&DiffResult> {
+        let converted = match self {
+            Self::Computation(ComputationResult::Diff(ref d)) => Some(d),
+            _ => None,
+        };
+
+        converted.ok_or(InterpreterError::InterpretationError(
+            "Unable to convert result into a computation result".to_owned(),
+        ))
     }
 }
 
@@ -62,7 +103,6 @@ impl Env {
         }
     }
 }
-
 pub struct QueryInterpreter<'conn, 'tx> {
     pub(crate) conn: ConnectionLike<'conn, 'tx>,
     pub log: Mutex<String>,
@@ -70,7 +110,7 @@ pub struct QueryInterpreter<'conn, 'tx> {
 
 impl<'conn, 'tx> QueryInterpreter<'conn, 'tx>
 where
-    'tx: 'conn
+    'tx: 'conn,
 {
     pub fn new(conn: ConnectionLike<'conn, 'tx>) -> QueryInterpreter<'conn, 'tx> {
         Self {
@@ -204,7 +244,11 @@ where
                 };
 
                 fut.boxed()
-            }
+            },
+
+            Expression::Return { result } => async move {
+                Ok(result)
+            }.boxed()
         }
     }
 
