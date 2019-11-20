@@ -72,9 +72,16 @@ impl<'conn, 'tx> QueryInterpreter<'conn, 'tx>
 where
     'tx: 'conn,
 {
+    fn log_enabled() -> bool {
+        log::max_level() == log::LevelFilter::Trace
+    }
+
     pub fn new(conn: ConnectionLike<'conn, 'tx>) -> QueryInterpreter<'conn, 'tx> {
         let log = SegQueue::new();
-        log.push("\n".to_string());
+
+        if Self::log_enabled() {
+            log.push("\n".to_string());
+        }
 
         Self { conn, log }
     }
@@ -96,7 +103,7 @@ where
 
             Expression::Sequence { seq } => {
                 let fut = async move {
-                    self.log_line("SEQ", level);
+                    self.log_line(level, || "SEQ");
 
                     let mut results = Vec::with_capacity(seq.len());
 
@@ -116,11 +123,10 @@ where
             } => {
                 let fut = async move {
                     let mut inner_env = env.clone();
-                    self.log_line("LET", level);
+                    self.log_line(level, || "LET");
 
                     for binding in bindings {
-                        let log_line = format!("bind {} ", &binding.name);
-                        self.log_line(log_line, level + 1);
+                        self.log_line(level + 1, || format!("bind {} ", &binding.name));
 
                         let result = self.interpret(binding.expr, env.clone(), level + 2).await?;
                         inner_env.insert(binding.name, result);
@@ -143,7 +149,7 @@ where
                 let fut = async move {
                     match query {
                         Query::Read(read) => {
-                            self.log_line(format!("READ {}", read), level);
+                            self.log_line(level, || format!("READ {}", read));
 
                             Ok(read::execute(&self.conn, read, &[])
                                 .await
@@ -151,7 +157,7 @@ where
                         }
 
                         Query::Write(write) => {
-                            self.log_line(format!("WRITE {}", write), level);
+                            self.log_line(level, || format!("WRITE {}", write));
                             Ok(write::execute(&self.conn, write)
                                 .await
                                 .map(|res| ExpressionResult::Query(res))?)
@@ -162,14 +168,14 @@ where
             }
 
             Expression::Get { binding_name } => async move {
-                self.log_line(format!("GET {}", binding_name), level);
+                self.log_line(level, || format!("GET {}", binding_name));
                 env.clone().remove(&binding_name)
             }
                 .boxed(),
 
             Expression::GetFirstNonEmpty { binding_names } => {
                 let fut = async move {
-                    self.log_line(format!("GET FIRST NON EMPTY {:?}", binding_names), level);
+                    self.log_line(level, || format!("GET FIRST NON EMPTY {:?}", binding_names));
 
                     Ok(binding_names
                         .into_iter()
@@ -189,7 +195,7 @@ where
                 else_: elze,
             } => {
                 let fut = async move {
-                    self.log_line("IF", level);
+                    self.log_line(level, || "IF");
 
                     if func() {
                         self.interpret(Expression::Sequence { seq: then }, env, level + 1).await
@@ -213,8 +219,14 @@ where
         output
     }
 
-    fn log_line<S: AsRef<str>>(&self, s: S, level: usize) {
-        self.log
-            .push(format!("{:indent$}{}\n", "", s.as_ref(), indent = level * 2));
+    fn log_line<F, S>(&self, level: usize, f: F)
+    where
+        S: AsRef<str>,
+        F: FnOnce() -> S,
+    {
+        if Self::log_enabled() {
+            self.log
+                .push(format!("{:indent$}{}\n", "", f().as_ref(), indent = level * 2));
+        }
     }
 }
