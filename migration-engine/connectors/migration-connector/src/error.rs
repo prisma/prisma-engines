@@ -1,4 +1,5 @@
-use failure::{Error, Fail};
+use failure::{format_err, Error, Fail};
+use std::fmt::Display;
 use user_facing_errors::KnownError;
 
 #[derive(Debug, Fail)]
@@ -15,6 +16,17 @@ impl ConnectorError {
         ConnectorError {
             user_facing_error: None,
             kind,
+        }
+    }
+
+    pub fn url_parse_error(err: impl Display, url: &str) -> Self {
+        ConnectorError {
+            user_facing_error: None,
+            kind: ErrorKind::Generic(format_err!(
+                "Could not parse the database connection string `{}`: {}",
+                url,
+                err
+            )),
         }
     }
 }

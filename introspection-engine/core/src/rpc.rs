@@ -1,6 +1,5 @@
 use crate::connector_loader::load_connector;
-use crate::CoreResult;
-use datamodel::Datamodel;
+use crate::{error::CoreError};
 use introspection_connector::DatabaseMetadata;
 use jsonrpc_core::*;
 use jsonrpc_derive::rpc;
@@ -24,16 +23,15 @@ pub struct RpcImpl {
 
 impl Rpc for RpcImpl {
     fn list_databases(&self, url: UrlInput) -> Result<Vec<String>> {
-        Ok(self.runtime.block_on(Self::list_databases_internal(url))?)
+        self.runtime.block_on(Self::list_databases_internal(url))
     }
 
     fn get_database_metadata(&self, url: UrlInput) -> Result<DatabaseMetadata> {
-        Ok(self.runtime.block_on(Self::get_database_metadata_internal(url))?)
+        self.runtime.block_on(Self::get_database_metadata_internal(url))
     }
 
     fn introspect(&self, url: UrlInput) -> Result<String> {
-        let data_model = self.runtime.block_on(Self::introspect_internal(url))?;
-        Ok(datamodel::render_datamodel_to_string(&data_model).expect("Datamodel rendering failed"))
+        self.runtime.block_on(Self::introspect_internal(url))
     }
 }
 
@@ -44,21 +42,20 @@ impl RpcImpl {
         }
     }
 
-    async fn introspect_internal(url: UrlInput) -> CoreResult<Datamodel> {
+    async fn introspect_internal(url: UrlInput) -> Result<String> {
         let connector = load_connector(&url.url)?;
-        // FIXME: parse URL correctly via a to be built lib and pass database param;
-        let data_model = connector.introspect("").await?;
-        Ok(data_model)
+        let data_model = connector.introspect("").await.map_err(CoreError::from)?;
+        Ok(datamodel::render_datamodel_to_string(&data_model).map_err(CoreError::from)?)
     }
 
-    async fn list_databases_internal(url: UrlInput) -> CoreResult<Vec<String>> {
+    async fn list_databases_internal(url: UrlInput) -> Result<Vec<String>> {
         let connector = load_connector(&url.url)?;
-        Ok(connector.list_databases().await?)
+        Ok(connector.list_databases().await.map_err(CoreError::from)?)
     }
 
-    async fn get_database_metadata_internal(url: UrlInput) -> CoreResult<DatabaseMetadata> {
+    async fn get_database_metadata_internal(url: UrlInput) -> Result<DatabaseMetadata> {
         let connector = load_connector(&url.url)?;
-        Ok(connector.get_metadata("").await?)
+        Ok(connector.get_metadata("").await.map_err(CoreError::from)?)
     }
 }
 
