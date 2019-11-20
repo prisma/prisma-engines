@@ -50,7 +50,6 @@ pub async fn database(database_url: &str) -> Box<dyn Queryable + Send + Sync + '
 
     let boxed: Box<dyn Queryable + Send + Sync + 'static> = match url.scheme() {
         "postgresql" | "postgres" => {
-            let url = Url::parse(database_url).unwrap();
             let create_cmd = |name| format!("CREATE DATABASE \"{}\"", name);
 
             let connect_cmd = |url: Url| Quaint::new(url.as_str());
@@ -60,7 +59,6 @@ pub async fn database(database_url: &str) -> Box<dyn Queryable + Send + Sync + '
             Box::new(conn)
         }
         "mysql" => {
-            let url = Url::parse(database_url).unwrap();
             let create_cmd = |name| format!("CREATE DATABASE `{}`", name);
 
             let connect_cmd = |url: Url| Quaint::new(url.as_str());
@@ -70,8 +68,6 @@ pub async fn database(database_url: &str) -> Box<dyn Queryable + Send + Sync + '
             Box::new(conn)
         }
         "file" | "sqlite" => {
-            let mut url = url.clone();
-            url.set_query(Some("db_name=introspection-engine"));
             Box::new(Quaint::new(url.as_str()).unwrap())
         }
         scheme => panic!("Unknown scheme `{}° in database URL: {}", scheme, url.as_str()),
@@ -124,7 +120,7 @@ fn fetch_db_name(url: &Url, default: &str) -> String {
 pub const SCHEMA_NAME: &str = "introspection-engine";
 
 pub fn sqlite_test_url() -> String {
-    format!("file:{}", sqlite_test_file())
+    format!("file:{}?db_name={}", sqlite_test_file(), SCHEMA_NAME)
 }
 
 pub fn sqlite_test_file() -> String {

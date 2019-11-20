@@ -2,7 +2,6 @@ mod connector_loader;
 mod error;
 mod rpc;
 
-use error::*;
 use rpc::{Rpc, RpcImpl};
 
 use jsonrpc_core::*;

@@ -1109,6 +1109,7 @@ dependencies = [
  "serde_json 1.0.41 (registry+https://github.com/rust-lang/crates.io-index)",
  "sql-introspection-connector 0.1.0",
  "tokio 0.2.0-alpha.6 (registry+https://github.com/rust-lang/crates.io-index)",
+ "user-facing-errors 0.1.0",
 ]
 
 [[package]]
