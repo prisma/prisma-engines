@@ -150,8 +150,9 @@ impl<'a> Select<'a> {
         self
     }
 
-    /// Adds `WHERE` conditions to the query. See
-    /// [Comparable](trait.Comparable.html#required-methods) for more examples.
+    /// Adds `WHERE` conditions to the query, replacing the previous conditions.
+    /// See [Comparable](trait.Comparable.html#required-methods) for more
+    /// examples.
     ///
     /// ```rust
     /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
@@ -170,6 +171,70 @@ impl<'a> Select<'a> {
     {
         self.conditions = Some(conditions.into());
         self
+    }
+
+    /// Adds an additional `WHERE` condition to the query combining the possible
+    /// previous condition with `AND`. See
+    /// [Comparable](trait.Comparable.html#required-methods) for more examples.
+    ///
+    /// ```rust
+    /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
+    /// let query = Select::from_table("users")
+    ///     .so_that("foo".equals("bar"))
+    ///     .and_where("lol".equals("wtf"));
+    ///
+    /// let (sql, params) = Sqlite::build(query);
+    ///
+    /// assert_eq!("SELECT `users`.* FROM `users` WHERE (`foo` = ? AND `lol` = ?)", sql);
+    ///
+    /// assert_eq!(vec![
+    ///    ParameterizedValue::from("bar"),
+    ///    ParameterizedValue::from("wtf"),
+    /// ], params);
+    /// ```
+    pub fn and_where<T>(mut self, conditions: T) -> Self
+    where
+        T: Into<ConditionTree<'a>>,
+    {
+        match self.conditions {
+            Some(previous) => {
+                self.conditions = Some(previous.and(conditions.into()));
+                self
+            }
+            None => self.so_that(conditions),
+        }
+    }
+
+    /// Adds an additional `WHERE` condition to the query combining the possible
+    /// previous condition with `OR`. See
+    /// [Comparable](trait.Comparable.html#required-methods) for more examples.
+    ///
+    /// ```rust
+    /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
+    /// let query = Select::from_table("users")
+    ///     .so_that("foo".equals("bar"))
+    ///     .or_where("lol".equals("wtf"));
+    ///
+    /// let (sql, params) = Sqlite::build(query);
+    ///
+    /// assert_eq!("SELECT `users`.* FROM `users` WHERE (`foo` = ? OR `lol` = ?)", sql);
+    ///
+    /// assert_eq!(vec![
+    ///    ParameterizedValue::from("bar"),
+    ///    ParameterizedValue::from("wtf"),
+    /// ], params);
+    /// ```
+    pub fn or_where<T>(mut self, conditions: T) -> Self
+    where
+        T: Into<ConditionTree<'a>>,
+    {
+        match self.conditions {
+            Some(previous) => {
+                self.conditions = Some(previous.or(conditions.into()));
+                self
+            }
+            None => self.so_that(conditions),
+        }
     }
 
     /// Adds `INNER JOIN` clause to the query.
