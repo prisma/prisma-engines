@@ -12,8 +12,10 @@ use futures::future::FutureExt;
 use native_tls::{Certificate, Identity, TlsConnector};
 use percent_encoding::percent_decode;
 use postgres_native_tls::MakeTlsConnector;
-use std::borrow::Cow;
-use std::{borrow::Borrow, convert::TryFrom, time::Duration};
+use std::{
+    borrow::{Borrow, Cow},
+    time::Duration,
+};
 use tokio_postgres::{config::SslMode, Client, Config};
 use url::Url;
 
@@ -24,15 +26,6 @@ pub(crate) const DEFAULT_SCHEMA: &str = "public";
 pub struct PostgreSql {
     #[debug_stub = "postgres::Client"]
     client: Mutex<Client>,
-}
-
-#[derive(DebugStub)]
-pub struct PostgresParams {
-    pub connection_limit: u32,
-    pub dbname: String,
-    pub schema: String,
-    pub config: Config,
-    pub ssl_params: SslParams,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -289,6 +282,29 @@ impl PostgresUrl {
             host,
         })
     }
+
+    pub(crate) fn ssl_params(&self) -> &SslParams {
+        &self.query_params.ssl_params
+    }
+
+    pub(crate) fn connection_limit(&self) -> usize {
+        self.query_params.connection_limit
+    }
+
+    pub(crate) fn to_config(&self) -> Config {
+        let mut config = Config::new();
+
+        config.user(self.username().borrow());
+        config.password(self.password().borrow() as &str);
+        config.host(self.host());
+        config.port(self.port());
+        config.dbname(self.dbname());
+        config.connect_timeout(Duration::from_millis(5000));
+
+        config.ssl_mode(self.query_params.ssl_mode);
+
+        config
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -300,46 +316,19 @@ pub(crate) struct PostgresUrlQueryParams {
     host: Option<String>,
 }
 
-impl TryFrom<Url> for PostgresParams {
-    type Error = Error;
-
-    fn try_from(url: Url) -> crate::Result<Self> {
-        let url = PostgresUrl::new(url)?;
-
-        let mut config = Config::new();
-
-        config.user(url.username().borrow());
-        config.password(url.password().borrow() as &str);
-        config.host(url.host());
-        config.port(url.port());
-        config.dbname(url.dbname());
-        config.connect_timeout(Duration::from_millis(5000));
-
-        let dbname = url.dbname().to_string();
-        let query_params = url.query_params;
-        config.ssl_mode(query_params.ssl_mode);
-
-        Ok(Self {
-            connection_limit: u32::try_from(query_params.connection_limit).unwrap(),
-            schema: query_params.schema,
-            config,
-            dbname,
-            ssl_params: query_params.ssl_params,
-        })
-    }
-}
-
 impl PostgreSql {
     /// Create a new connection to the database.
     pub async fn new(
-        config: Config,
-        schema: Option<String>,
-        ssl_params: Option<SslParams>,
+        url: PostgresUrl,
+        // schema: Option<String>,
+        // ssl_params: Option<SslParams>,
     ) -> crate::Result<Self> {
+        let config = url.to_config();
         let mut tls_builder = TlsConnector::builder();
 
-        if let Some(params) = ssl_params {
-            let auth = params.into_auth().await?;
+        {
+            let ssl_params = url.ssl_params();
+            let auth = ssl_params.to_owned().into_auth().await?;
 
             if let Some(certificate) = auth.certificate {
                 tls_builder.add_root_certificate(certificate);
@@ -352,29 +341,19 @@ impl PostgreSql {
             if let Some(identity) = auth.identity {
                 tls_builder.identity(identity);
             }
-        };
+        }
 
         let tls = MakeTlsConnector::new(tls_builder.build()?);
         let (client, conn) = config.connect(tls).await?;
         tokio::spawn(conn.map(|r| r.unwrap()));
 
-        let schema = schema.unwrap_or_else(|| String::from(DEFAULT_SCHEMA));
+        let schema = url.schema();
         let path = format!("SET search_path = \"{}\"", schema);
         client.execute(path.as_str(), &[]).await?;
 
         Ok(Self {
             client: Mutex::new(client),
         })
-    }
-
-    /// Create a new connection to the database through `PostgresParams`.
-    pub async fn from_params(params: PostgresParams) -> crate::Result<Self> {
-        Self::new(params.config, Some(params.schema), Some(params.ssl_params)).await
-    }
-
-    /// Create a new connection to the database through a connection string.
-    pub async fn from_url(url: &str) -> crate::Result<Self> {
-        Self::from_params(PostgresParams::try_from(Url::parse(url)?)?).await
     }
 
     fn execute_and_get_id<'a>(
@@ -616,15 +595,5 @@ mod tests {
             }
             Err(e) => panic!("Expected `DatabaseDoesNotExist`, got {:?}", e),
         }
-    }
-
-    #[test]
-    fn postgres_params_from_url_should_capture_database_name() {
-        let url: Url = "postgresql://postgres:prisma@127.0.0.1:5432/pgress?schema=test_schema"
-            .parse()
-            .unwrap();
-        let params = PostgresParams::try_from(url).unwrap();
-        assert_eq!(params.dbname, "pgress");
-        assert_eq!(params.schema, "test_schema");
     }
 }

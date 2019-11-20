@@ -3,8 +3,7 @@ mod error;
 
 use mysql_async::{self as my, prelude::Queryable as _};
 use percent_encoding::percent_decode;
-use std::borrow::Cow;
-use std::{convert::TryFrom, path::Path, time::Duration};
+use std::{borrow::Cow, path::Path, time::Duration};
 use url::Url;
 
 use crate::{
@@ -18,13 +17,7 @@ use crate::{
 #[derive(Debug)]
 pub struct Mysql {
     pub(crate) pool: my::Pool,
-}
-
-#[derive(Debug)]
-pub struct MysqlParams {
-    pub connection_limit: u32,
-    pub dbname: String,
-    pub config: my::OptsBuilder,
+    pub(crate) url: MysqlUrl,
 }
 
 /// Wraps a connection url and exposes the parsing logic used by quaint, including default values.
@@ -165,6 +158,37 @@ impl MysqlUrl {
             socket,
         })
     }
+
+    pub(crate) fn connection_limit(&self) -> usize {
+        self.query_params.connection_limit
+    }
+
+    pub(crate) fn to_opts_builder(&self) -> my::OptsBuilder {
+        let mut config = my::OptsBuilder::new();
+
+        config.user(Some(self.username()));
+        config.pass(self.password());
+        config.db_name(Some(self.dbname()));
+
+        match self.socket() {
+            Some(ref socket) => {
+                config.socket(Some(socket));
+            }
+            None => {
+                config.ip_or_hostname(self.host());
+                config.tcp_port(self.port());
+            }
+        }
+
+        config.stmt_cache_size(Some(1000));
+        config.conn_ttl(Some(Duration::from_secs(5)));
+
+        if self.query_params.use_ssl {
+            config.ssl_opts(Some(self.query_params.ssl_opts.clone()));
+        }
+
+        config
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -175,63 +199,17 @@ pub(crate) struct MysqlUrlQueryParams {
     socket: Option<String>,
 }
 
-impl TryFrom<Url> for MysqlParams {
-    type Error = Error;
-
-    fn try_from(url: Url) -> crate::Result<Self> {
-        let url = MysqlUrl::new(url)?;
-        let mut config = my::OptsBuilder::new();
-
-        config.user(Some(url.username()));
-        config.pass(url.password());
-        config.db_name(Some(url.dbname()));
-
-        match url.socket() {
-            Some(ref socket) => {
-                config.socket(Some(socket));
-            }
-            None => {
-                config.ip_or_hostname(url.host());
-                config.tcp_port(url.port());
-            }
-        }
-
-        config.stmt_cache_size(Some(1000));
-        config.conn_ttl(Some(Duration::from_secs(5)));
-
-        let dbname = url.dbname().to_string();
-        let query_params = url.query_params;
-        if query_params.use_ssl {
-            config.ssl_opts(Some(query_params.ssl_opts));
-        }
-
-        Ok(Self {
-            connection_limit: u32::try_from(query_params.connection_limit).unwrap(),
-            config,
-            dbname,
-        })
-    }
-}
-
 impl Mysql {
     /// Create a new MySQL connection using `OptsBuilder` from the `mysql` crate.
-    pub fn new(mut opts: my::OptsBuilder) -> crate::Result<Self> {
+    pub fn new(url: MysqlUrl) -> crate::Result<Self> {
+        let mut opts = url.to_opts_builder();
         let pool_opts = my::PoolOptions::with_constraints(my::PoolConstraints::new(1, 1).unwrap());
         opts.pool_options(pool_opts);
 
         Ok(Self {
+            url,
             pool: my::Pool::new(opts),
         })
-    }
-
-    /// Create a new MySQL connection from [MysqlParams](trait.MysqlParams.html).
-    pub fn from_params(params: MysqlParams) -> crate::Result<Self> {
-        Self::new(params.config)
-    }
-
-    /// Create a new MySQL connection from a connection string.
-    pub fn from_url(url: &str) -> crate::Result<Self> {
-        Self::from_params(MysqlParams::try_from(Url::parse(url)?)?)
     }
 
     fn execute_and_get_id<'a>(

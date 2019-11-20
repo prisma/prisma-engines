@@ -4,7 +4,7 @@ pub use connection_info::*;
 
 use crate::{
     ast,
-    connector::{self, Queryable, TransactionCapable, DBIO},
+    connector::{self, MysqlUrl, PostgresUrl, Queryable, TransactionCapable, DBIO},
     error::Error,
 };
 use futures::future;
@@ -59,18 +59,13 @@ impl Queryable for PooledConnection {
 #[doc(hidden)]
 pub enum QuaintManager {
     #[cfg(feature = "mysql")]
-    Mysql(mysql_async::OptsBuilder),
+    Mysql(MysqlUrl),
+
     #[cfg(feature = "postgresql")]
-    Postgres {
-        config: tokio_postgres::Config,
-        schema: String,
-        ssl_params: crate::connector::postgres::SslParams,
-    },
+    Postgres(PostgresUrl),
+
     #[cfg(feature = "sqlite")]
-    Sqlite {
-        file_path: String,
-        db_name: String,
-    },
+    Sqlite { file_path: String, db_name: String },
 }
 
 impl Manage for QuaintManager {
@@ -88,38 +83,32 @@ impl Manage for QuaintManager {
                 use crate::connector::Sqlite;
 
                 match Sqlite::new(&file_path) {
-                    Ok(mut conn) => {
-                         match conn.attach_database(db_name) {
-                            Ok(_) => DBIO::new(future::ok(Box::new(conn) as Self::Resource)),
-                            Err(e) => DBIO::new(future::err(e)),
-                        }
+                    Ok(mut conn) => match conn.attach_database(db_name) {
+                        Ok(_) => DBIO::new(future::ok(Box::new(conn) as Self::Resource)),
+                        Err(e) => DBIO::new(future::err(e)),
                     },
                     Err(e) => DBIO::new(future::err(e)),
                 }
             }
+
             #[cfg(feature = "mysql")]
-            Self::Mysql(opts) => {
+            Self::Mysql(url) => {
                 use crate::connector::Mysql;
 
-                match Mysql::new(opts.clone()) {
+                match Mysql::new(url.clone()) {
                     Ok(mysql) => DBIO::new(future::ok(Box::new(mysql) as Self::Resource)),
                     Err(e) => DBIO::new(future::err(e)),
                 }
             }
+
             #[cfg(feature = "postgresql")]
-            Self::Postgres {
-                config,
-                schema,
-                ssl_params,
-            } => {
+            Self::Postgres(url) => {
                 use crate::connector::PostgreSql;
 
-                let config = config.clone();
-                let schema = schema.clone();
-                let ssl_params = ssl_params.clone();
+                let url: PostgresUrl = url.clone();
 
                 DBIO::new(async move {
-                    let conn = PostgreSql::new(config, Some(schema), Some(ssl_params)).await?;
+                    let conn = PostgreSql::new(url).await?;
 
                     Ok(Box::new(conn) as Self::Resource)
                 })
