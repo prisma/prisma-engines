@@ -5,7 +5,7 @@ use connector_interface::{
     filter::{Filter, RecordFinder},
     QueryArguments,
 };
-use prisma_models::prelude::*;
+use prisma_models::*;
 use quaint::ast::*;
 use std::sync::Arc;
 
@@ -63,7 +63,7 @@ impl SelectDefinition for QueryArguments {
             None => (self.skip.unwrap_or(0), None),
         };
 
-        let select_ast = Select::from_table(model.table())
+        let select_ast = Select::from_table(model.as_table())
             .so_that(conditions)
             .offset(skip as usize);
 
@@ -83,7 +83,7 @@ where
     selected_fields
         .columns()
         .into_iter()
-        .fold(query.into_select(model), |acc, col| acc.column(col.clone()))
+        .fold(query.into_select(model), |acc, col| acc.column(col))
 }
 
 pub fn get_scalar_list_values_by_record_ids(

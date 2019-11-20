@@ -5,8 +5,8 @@ authors = ["Dominic Petrick <petrick@prisma.io>", "Julius de Bruijn <bruijn@pris
 edition = "2018"
 
 [features]
-default = ["sql"]
-sql = ["quaint"]
+default = []
+sql-ext = ["quaint"]
 
 [dependencies]
 once_cell = "1.2"
@@ -22,5 +22,5 @@ failure = "0.1"
 failure_derive = "0.1"
 rand = "0.6"
 quaint = { git = "https://github.com/prisma/quaint.git", optional = true }
-datamodel = { path = "../libs/datamodel/core" }
+datamodel = { path = "../datamodel/core" }
 itertools = "0.8"

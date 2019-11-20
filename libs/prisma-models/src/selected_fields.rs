@@ -1,6 +1,4 @@
-use crate::{ModelRef, Relation, RelationField, ScalarField, TypeIdentifier};
-use once_cell::sync::OnceCell;
-use quaint::ast::Column;
+use crate::{ModelRef, RelationField, ScalarField, TypeIdentifier};
 use std::sync::Arc;
 
 pub trait IntoSelectedFields {
@@ -14,7 +12,6 @@ pub struct SelectedFields {
 
     /// FIXME: naming
     pub from_field: Option<Arc<RelationField>>,
-    columns: OnceCell<Vec<Column<'static>>>,
 }
 
 #[derive(Debug, Clone)]
@@ -81,13 +78,10 @@ impl SelectedFields {
             acc
         });
 
-        let columns = OnceCell::new();
-
         SelectedFields {
             scalar,
             relation,
             from_field,
-            columns,
         }
     }
 
@@ -96,40 +90,7 @@ impl SelectedFields {
     }
 
     pub fn add_scalar(&mut self, field: Arc<ScalarField>) {
-        self.columns = OnceCell::new();
         self.scalar.push(SelectedScalarField { field });
-    }
-
-    pub fn columns(&self) -> &[Column<'static>] {
-        self.columns
-            .get_or_init(|| {
-                let mut result: Vec<Column<'static>> = self.scalar_non_list().iter().map(|f| f.as_column()).collect();
-
-                for rf in self.relation_inlined().iter() {
-                    result.push(rf.as_column());
-                }
-
-                if let Some(ref from_field) = self.from_field {
-                    let relation = from_field.relation();
-
-                    result.push(
-                        relation
-                            .column_for_relation_side(from_field.relation_side.opposite())
-                            .alias(Self::RELATED_MODEL_ALIAS)
-                            .table(Relation::TABLE_ALIAS),
-                    );
-
-                    result.push(
-                        relation
-                            .column_for_relation_side(from_field.relation_side)
-                            .alias(Self::PARENT_MODEL_ALIAS)
-                            .table(Relation::TABLE_ALIAS),
-                    );
-                };
-
-                result
-            })
-            .as_slice()
     }
 
     pub fn names(&self) -> Vec<String> {
@@ -171,7 +132,7 @@ impl SelectedFields {
             .expect("Expected at least one field to be present.")
     }
 
-    fn relation_inlined(&self) -> Vec<Arc<RelationField>> {
+    pub fn relation_inlined(&self) -> Vec<Arc<RelationField>> {
         self.relation
             .iter()
             .map(|rf| Arc::clone(&rf.field))

@@ -7,7 +7,6 @@ pub struct DatamodelConverter<'a> {
     relations: Vec<TempRelationHolder>,
 }
 
-#[allow(unused)]
 impl<'a> DatamodelConverter<'a> {
     pub fn convert_string(datamodel: String) -> InternalDataModelTemplate {
         let datamodel = datamodel::parse_datamodel(&datamodel).unwrap();
@@ -85,7 +84,7 @@ impl<'a> DatamodelConverter<'a> {
                         relation_side: relation.relation_side(field),
                     })
                 }
-                ti => FieldTemplate::Scalar(ScalarFieldTemplate {
+                _ => FieldTemplate::Scalar(ScalarFieldTemplate {
                     name: field.name.clone(),
                     type_identifier: field.type_identifier(),
                     is_required: field.is_required(),

@@ -1,5 +1,5 @@
 use connector_interface::QueryArguments;
-use prisma_models::prelude::*;
+use prisma_models::*;
 use quaint::ast::*;
 use std::sync::Arc;
 
@@ -28,7 +28,7 @@ pub fn build(query_arguments: &QueryArguments, model: ModelRef) -> ConditionTree
                 let model_id = model.fields().id();
                 let where_condition = model_id.as_column().equals(id.clone());
 
-                let select_query = Select::from_table(model.table())
+                let select_query = Select::from_table(model.as_table())
                     .column(field.as_column())
                     .so_that(ConditionTree::single(where_condition));
 
