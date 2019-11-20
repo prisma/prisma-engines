@@ -33,13 +33,13 @@ impl<'a> ManyRelatedRecordsBaseQuery<'a> {
             .unwrap_or(ConditionTree::NoCondition);
 
         let opposite_column = from_field.opposite_column().table(Relation::TABLE_ALIAS);
-        let select = Select::from_table(from_field.related_model().table());
+        let select = Select::from_table(from_field.related_model().as_table());
 
         let join = from_field
             .relation()
-            .relation_table()
+            .as_table()
             .alias(Relation::TABLE_ALIAS)
-            .on(from_field.related_model().id_column().equals(opposite_column));
+            .on(from_field.related_model().fields().id().as_column().equals(opposite_column));
 
         let query = selected_fields
             .columns()

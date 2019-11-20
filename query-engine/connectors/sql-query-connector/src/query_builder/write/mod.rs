@@ -1,5 +1,5 @@
 use crate::error::SqlError;
-use prisma_models::prelude::*;
+use prisma_models::*;
 use quaint::ast::*;
 use std::convert::TryFrom;
 
@@ -31,7 +31,7 @@ pub fn create_record(model: &ModelRef, mut args: PrismaArgs) -> (Insert<'static>
         .iter()
         .map(|field| (field.db_name(), args.take_field_value(field.name()).unwrap()));
 
-    let base = Insert::single_into(model.table());
+    let base = Insert::single_into(model.as_table());
 
     let insert = fields
         .into_iter()
@@ -57,7 +57,7 @@ pub fn create_relation(field: &RelationFieldRef, parent_id: &GraphqlId, child_id
                 false => field.related_model().fields().id().as_column().equals(update_id),
             };
 
-            Update::table(relation.relation_table())
+            Update::table(relation.as_table())
                 .set(referencing_column, link_id.clone())
                 .so_that(update_condition)
                 .into()
@@ -67,7 +67,7 @@ pub fn create_relation(field: &RelationFieldRef, parent_id: &GraphqlId, child_id
             let parent_column = field.relation_column();
             let child_column = field.opposite_column();
 
-            let insert = Insert::single_into(relation.relation_table())
+            let insert = Insert::single_into(relation.as_table())
                 .value(parent_column.name.to_string(), parent_id.clone())
                 .value(child_column.name.to_string(), child_id.clone());
 
@@ -98,7 +98,7 @@ pub fn delete_relation(field: &RelationFieldRef, parent_id: &GraphqlId, child_id
                 false => field.related_model().fields().id().as_column().equals(update_id),
             };
 
-            Update::table(relation.relation_table())
+            Update::table(relation.as_table())
                 .set(referencing_column, PrismaValue::Null)
                 .so_that(update_condition)
                 .into()
@@ -111,7 +111,7 @@ pub fn delete_relation(field: &RelationFieldRef, parent_id: &GraphqlId, child_id
             let parent_id_criteria = parent_column.equals(parent_id);
             let child_id_criteria = child_column.equals(child_id);
 
-            Delete::from_table(relation.relation_table())
+            Delete::from_table(relation.as_table())
                 .so_that(parent_id_criteria.and(child_id_criteria))
                 .into()
         }
@@ -130,7 +130,7 @@ pub fn delete_relation_by_parent(field: &RelationFieldRef, parent_id: &GraphqlId
                 referencing_column.equals(parent_id)
             };
 
-            Update::table(relation.relation_table())
+            Update::table(relation.as_table())
                 .set(referencing_column_name, PrismaValue::Null)
                 .so_that(update_condition)
                 .into()
@@ -140,7 +140,7 @@ pub fn delete_relation_by_parent(field: &RelationFieldRef, parent_id: &GraphqlId
             let parent_column = field.relation_column();
             let parent_id_criteria = parent_column.equals(parent_id);
 
-            Delete::from_table(relation.relation_table())
+            Delete::from_table(relation.as_table())
                 .so_that(parent_id_criteria)
                 .into()
         }
@@ -184,7 +184,7 @@ pub fn update_many(model: &ModelRef, ids: &[&GraphqlId], args: &PrismaArgs) -> c
     }
 
     let fields = model.fields();
-    let mut query = Update::table(model.table());
+    let mut query = Update::table(model.as_table());
 
     for (name, value) in args.args.iter() {
         let field = fields.find_from_all(&name).unwrap();
@@ -222,7 +222,7 @@ pub fn delete_many(model: &ModelRef, ids: &[&GraphqlId]) -> Vec<Delete<'static>>
         }
 
         let condition = model.fields().id().as_column().in_selection(chunk.to_vec());
-        deletes.push(Delete::from_table(model.table()).so_that(condition));
+        deletes.push(Delete::from_table(model.as_table()).so_that(condition));
     }
 
     deletes

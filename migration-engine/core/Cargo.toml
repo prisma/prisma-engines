@@ -7,7 +7,7 @@ edition = "2018"
 [dependencies]
 migration-connector = { path = "../connectors/migration-connector" }
 datamodel = { path = "../../libs/datamodel/core" }
-prisma-models = { path = "../../prisma-models" }
+prisma-models = { path = "../../libs/prisma-models" }
 quaint = { git = "https://github.com/prisma/quaint.git" }
 sql-migration-connector = { path = "../connectors/sql-migration-connector" }
 sql-connection = { path = "../../libs/sql-connection" }
@@ -16,7 +16,6 @@ clap = "2.33"
 itertools = "0.8"
 
 chrono = { version = "0.4", features = ["serde"] }
-boolinator = "2.4.0"
 url = "1.7"
 log = "0.4"
 env_logger = "0.6"

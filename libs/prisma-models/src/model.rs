@@ -1,6 +1,5 @@
 use crate::prelude::*;
 use once_cell::sync::OnceCell;
-use quaint::ast::{Column, Table};
 use std::sync::{Arc, Weak};
 use uuid::Uuid;
 
@@ -76,10 +75,6 @@ impl Model {
         }
     }
 
-    pub fn table(&self) -> Table<'static> {
-        (self.internal_data_model().db_name.clone(), self.db_name().to_string()).into()
-    }
-
     pub fn fields(&self) -> &Fields {
         self.fields
             .get()
@@ -103,9 +98,5 @@ impl Model {
         self.internal_data_model
             .upgrade()
             .expect("InternalDataModel does not exist anymore. Parent internal_data_model is deleted without deleting the child internal_data_model.")
-    }
-
-    pub fn id_column(&self) -> Column<'static> {
-        self.fields().id().as_column()
     }
 }

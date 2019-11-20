@@ -19,8 +19,10 @@ mod prisma_value;
 mod project;
 mod record;
 mod relation;
-mod scalar_list_table;
 mod selected_fields;
+
+#[cfg(feature = "sql-ext")]
+pub mod sql_ext;
 
 pub mod prelude;
 
@@ -38,7 +40,9 @@ pub use prisma_value::*;
 pub use project::*;
 pub use record::*;
 pub use relation::*;
-pub use scalar_list_table::*;
 pub use selected_fields::*;
+
+#[cfg(feature = "sql-ext")]
+pub use sql_ext::*;
 
 pub type DomainResult<T> = Result<T, DomainError>;
