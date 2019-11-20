@@ -1,6 +1,6 @@
 extern crate proc_macro;
 
-use darling::FromDeriveInput;
+use darling::{FromDeriveInput, FromVariant};
 use once_cell::sync::Lazy;
 use proc_macro::TokenStream;
 use proc_macro2::{Ident, Span};
@@ -12,6 +12,15 @@ use syn::DeriveInput;
 #[proc_macro_derive(UserFacingError, attributes(user_facing))]
 pub fn derive_user_facing_error(input: TokenStream) -> TokenStream {
     let input = syn::parse_macro_input!(input as DeriveInput);
+
+    match &input.data {
+        syn::Data::Struct(_data) => user_error_derive_on_struct(&input),
+        syn::Data::Enum(data) => user_error_derive_on_enum(&input, data),
+        _ => panic!("derive works only on structs and enums"),
+    }
+}
+
+fn user_error_derive_on_struct(input: &DeriveInput) -> TokenStream {
     let input = UserErrorDeriveInput::from_derive_input(&input);
 
     if let Err(err) = input.as_ref() {
@@ -47,6 +56,73 @@ pub fn derive_user_facing_error(input: TokenStream) -> TokenStream {
     };
 
     output.into()
+}
+
+fn user_error_derive_on_enum(input: &DeriveInput, data: &syn::DataEnum) -> TokenStream {
+    let attributes = UserErrorEnumDeriveInput::from_derive_input(&input);
+
+    if let Err(err) = attributes.as_ref() {
+        panic!("{}", err);
+    }
+
+    let attributes = attributes.unwrap();
+    let ident = &attributes.ident;
+    let error_code = &attributes.code;
+
+    let message_variants = data
+        .variants
+        .iter()
+        .map(|variant| enum_variant_match_branch(ident, variant));
+
+    let output = quote! {
+        impl crate::UserFacingError for #ident {
+            const ERROR_CODE: &'static str = #error_code;
+
+            fn message(&self) -> String {
+                match self {
+                    #(#message_variants)*
+                }
+            }
+        }
+    };
+
+    output.into()
+}
+
+fn enum_variant_match_branch(enum_ident: &syn::Ident, variant: &syn::Variant) -> impl quote::ToTokens {
+    let parsed_variant = UserErrorEnumVariantAttributes::from_variant(variant).unwrap();
+    let variant_ident = &parsed_variant.ident;
+    let message_template = parsed_variant.message.value().replace("${", "{");
+
+    let variant_field_names: Vec<&syn::Ident> = match &variant.fields {
+        syn::Fields::Named(fields) => fields.named.iter().map(|f| f.ident.as_ref().unwrap()).collect(),
+        _ => panic!("Enum variant fields of user facing errors must be named."),
+    };
+
+    quote! {
+        #enum_ident::#variant_ident { #(#variant_field_names),* } => format!(
+            #message_template,
+            #(#variant_field_names = #variant_field_names),*
+        ),
+    }
+}
+
+#[derive(Debug, FromDeriveInput)]
+#[darling(attributes(user_facing))]
+struct UserErrorEnumDeriveInput {
+    /// The name of the enum.
+    ident: syn::Ident,
+    /// The error code.
+    code: String,
+}
+
+#[derive(Debug, FromVariant)]
+#[darling(attributes(user_facing))]
+struct UserErrorEnumVariantAttributes {
+    /// The name of the enum.
+    ident: syn::Ident,
+    /// The error message format string.
+    message: syn::LitStr,
 }
 
 #[derive(Debug, FromDeriveInput)]

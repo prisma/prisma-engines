@@ -3,6 +3,7 @@
 pub mod common;
 pub mod introspection;
 pub mod migration_engine;
+pub mod quaint;
 
 use serde::Serialize;
 
@@ -14,9 +15,9 @@ pub trait UserFacingError: serde::Serialize {
 
 #[derive(Serialize, PartialEq, Debug)]
 pub struct KnownError {
-    message: String,
-    meta: serde_json::Value,
-    error_code: &'static str,
+    pub message: String,
+    pub meta: serde_json::Value,
+    pub error_code: &'static str,
 }
 
 impl KnownError {

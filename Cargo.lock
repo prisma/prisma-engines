@@ -1378,6 +1378,7 @@ dependencies = [
  "failure 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.102 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_json 1.0.41 (registry+https://github.com/rust-lang/crates.io-index)",
+ "user-facing-errors 0.1.0",
 ]
 
 [[package]]
@@ -2610,6 +2611,7 @@ dependencies = [
  "serde 1.0.102 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_json 1.0.41 (registry+https://github.com/rust-lang/crates.io-index)",
  "sql-schema-describer 0.1.0",
+ "user-facing-errors 0.1.0",
 ]
 
 [[package]]
@@ -3407,6 +3409,7 @@ name = "user-facing-errors"
 version = "0.1.0"
 dependencies = [
  "backtrace 0.3.40 (registry+https://github.com/rust-lang/crates.io-index)",
+ "quaint 0.1.0 (git+https://github.com/prisma/quaint.git)",
  "serde 1.0.102 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_json 1.0.41 (registry+https://github.com/rust-lang/crates.io-index)",
  "user-facing-error-macros 0.1.0",

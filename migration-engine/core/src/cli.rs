@@ -7,36 +7,22 @@ use sql_migration_connector::SqlMigrationConnector;
 use std::collections::HashMap;
 use url::Url;
 
-#[derive(Debug, Fail, PartialEq)]
+#[derive(Debug, Fail)]
 pub enum CliError {
-    #[fail(display = "Database '{}' does not exist.", _0)]
-    DatabaseDoesNotExist(String),
-    #[fail(display = "Access denied to database '{}'", _0)]
-    DatabaseAccessDenied {
-        database_name: String,
-        database_user: String,
+    #[fail(display = "Known error: {:?}", _0)]
+    Known {
+        error: user_facing_errors::KnownError,
+        exit_code: i32,
     },
-    #[fail(display = "Authentication failed for user '{}'", _0)]
-    AuthenticationFailed(String),
-    #[fail(display = "Database '{}' already exists", _0)]
-    DatabaseAlreadyExists {
-        database_name: String,
-        database_host: String,
-        database_port: u16,
+    #[fail(display = "{}", _0)]
+    Unknown {
+        error: migration_connector::ErrorKind,
+        exit_code: i32,
     },
-    #[fail(display = "Error connecting to the database")]
-    ConnectionError {
-        database_host: String,
-        database_port: String,
-    },
+
     #[fail(display = "No command defined")]
     NoCommandDefined,
-    #[fail(display = "Connect timed out")]
-    ConnectTimeout,
-    #[fail(display = "Operation timed out")]
-    Timeout,
-    #[fail(display = "Error opening a TLS connection. {}", _0)]
-    TlsError(String),
+
     #[fail(display = "Unknown error occured: {}", _0)]
     Other(String),
 }
@@ -44,46 +30,52 @@ pub enum CliError {
 impl CliError {
     pub fn exit_code(&self) -> i32 {
         match self {
-            CliError::DatabaseDoesNotExist(_) => 1,
-            CliError::DatabaseAccessDenied { .. } => 2,
-            CliError::AuthenticationFailed(_) => 3,
-            CliError::ConnectTimeout | CliError::Timeout => 4,
-            CliError::DatabaseAlreadyExists { .. } => 5,
-            CliError::TlsError(_) => 6,
+            CliError::Known { exit_code, .. } => *exit_code,
+            CliError::Unknown { exit_code, .. } => *exit_code,
             _ => 255,
         }
+    }
+
+    /// The errors spec error code, if applicable
+    #[cfg(test)]
+    fn error_code(&self) -> Option<&str> {
+        match self {
+            CliError::Known {
+                error: user_facing_errors::KnownError { error_code, .. },
+                ..
+            } => Some(error_code),
+            _ => None,
+        }
+    }
+}
+
+pub fn exit_code(error_kind: &migration_connector::ErrorKind) -> i32 {
+    match error_kind {
+        ErrorKind::DatabaseDoesNotExist { .. } => 1,
+        ErrorKind::DatabaseAccessDenied { .. } => 2,
+        ErrorKind::AuthenticationFailed { .. } => 3,
+        ErrorKind::ConnectTimeout | ErrorKind::Timeout => 4,
+        ErrorKind::DatabaseAlreadyExists { .. } => 5,
+        ErrorKind::TlsError { .. } => 6,
+        _ => 255,
     }
 }
 
 impl From<ConnectorError> for CliError {
     fn from(e: ConnectorError) -> Self {
-        match e {
-            ConnectorError::DatabaseDoesNotExist { db_name, .. } => Self::DatabaseDoesNotExist(db_name),
-            ConnectorError::DatabaseAccessDenied {
-                database_name,
-                database_user,
-            } => Self::DatabaseAccessDenied {
-                database_name,
-                database_user,
+        let ConnectorError {
+            user_facing_error,
+            kind: error_kind,
+        } = e;
+
+        let exit_code = exit_code(&error_kind);
+
+        match user_facing_error {
+            Some(error) => CliError::Known { error, exit_code },
+            None => CliError::Unknown {
+                error: error_kind,
+                exit_code,
             },
-            ConnectorError::DatabaseAlreadyExists {
-                db_name,
-                database_host,
-                database_port,
-            } => CliError::DatabaseAlreadyExists {
-                database_name: db_name,
-                database_host,
-                database_port,
-            },
-            ConnectorError::AuthenticationFailed { user, .. } => CliError::AuthenticationFailed(user),
-            ConnectorError::ConnectTimeout => CliError::ConnectTimeout,
-            ConnectorError::Timeout => CliError::Timeout,
-            ConnectorError::TlsError { message } => CliError::TlsError(message),
-            ConnectorError::ConnectionError { host, port, cause: _ } => CliError::ConnectionError {
-                database_host: host.clone(),
-                database_port: port.map(|p| format!("{}", p)).unwrap_or_else(|| "<port>".to_owned()),
-            },
-            other => CliError::Other(format!("{}", other)),
         }
     }
 }
@@ -170,7 +162,15 @@ async fn create_postgres_admin_conn(mut url: Url) -> crate::Result<SqlMigrationC
         url.set_path(database_name);
         match SqlMigrationConnector::new(url.as_str()).await {
             // If the database does not exist, try the next one.
-            Err(migration_connector::ConnectorError::DatabaseDoesNotExist { .. }) => (),
+            Err(err) => {
+                match &err.kind {
+                    migration_connector::ErrorKind::DatabaseDoesNotExist { .. } => (),
+                    _other_outcome => {
+                        connector = Some(Err(err));
+                        break;
+                    }
+                }
+            }
             // If the outcome is anything else, use this.
             other_outcome => {
                 connector = Some(other_outcome);
@@ -181,9 +181,9 @@ async fn create_postgres_admin_conn(mut url: Url) -> crate::Result<SqlMigrationC
 
     let connector = connector
         .ok_or_else(|| {
-            ConnectorError::DatabaseCreationFailed {
+            ConnectorError::from_kind(ErrorKind::DatabaseCreationFailed {
                 explanation: "Prisma could not connect to a default database (`postgres` or `template1`), it cannot create the specified database.".to_owned()
-            }
+            })
         })??;
 
     Ok(connector)
@@ -246,41 +246,13 @@ pub fn clap_app() -> clap::App<'static, 'static> {
 }
 
 pub fn render_error(cli_error: CliError) -> user_facing_errors::Error {
-    use user_facing_errors::{Error, KnownError, UnknownError};
+    use user_facing_errors::UnknownError;
 
     match cli_error {
-        CliError::DatabaseAlreadyExists {
-            database_name,
-            database_host,
-            database_port,
-        } => KnownError::new(user_facing_errors::common::DatabaseAlreadyExists {
-            database_host,
-            database_name,
-            database_port,
-        })
-        .map(Error::Known)
-        .unwrap(),
-        CliError::DatabaseAccessDenied {
-            database_name,
-            database_user,
-        } => KnownError::new(user_facing_errors::common::DatabaseAccessDenied {
-            database_name,
-            database_user,
-        })
-        .map(Error::Known)
-        .unwrap(),
-        CliError::ConnectionError {
-            database_host: host,
-            database_port: port,
-        } => KnownError::new(user_facing_errors::common::DatabaseNotReachable {
-            database_host: host.clone(),
-            database_port: port,
-        })
-        .map(Error::Known)
-        .unwrap(),
-        _ => UnknownError {
-            message: cli_error.to_string(),
-            backtrace: None,
+        CliError::Known { error, .. } => error.into(),
+        other => UnknownError {
+            message: format!("{}", other),
+            backtrace: other.backtrace().map(|bt| format!("{}", bt)),
         }
         .into(),
     }
@@ -359,7 +331,10 @@ mod tests {
     #[test]
     fn test_with_missing_command() {
         with_cli(vec!["cli"], |matches| {
-            assert_eq!(Err(CliError::NoCommandDefined), run_sync(&matches, &mysql_url(None)));
+            assert_eq!(
+                "No command defined",
+                &run_sync(&matches, &mysql_url(None)).unwrap_err().to_string()
+            );
         })
         .unwrap();
     }
@@ -368,9 +343,9 @@ mod tests {
     fn test_connecting_with_a_working_mysql_connection_string() {
         with_cli(vec!["cli", "--can_connect_to_database"], |matches| {
             assert_eq!(
-                Ok(String::from("Connection successful")),
-                run_sync(&matches, &mysql_url(None))
-            );
+                String::from("Connection successful"),
+                run_sync(&matches, &mysql_url(None)).unwrap()
+            )
         })
         .unwrap();
     }
@@ -380,10 +355,7 @@ mod tests {
         let dm = mysql_url(Some("this_does_not_exist"));
 
         with_cli(vec!["cli", "--can_connect_to_database"], |matches| {
-            assert_eq!(
-                Err(CliError::DatabaseDoesNotExist(String::from("this_does_not_exist"))),
-                run_sync(&matches, &dm)
-            );
+            assert_eq!("P1003", run_sync(&matches, &dm).unwrap_err().error_code().unwrap());
         })
         .unwrap();
     }
@@ -392,8 +364,8 @@ mod tests {
     fn test_connecting_with_a_working_psql_connection_string() {
         with_cli(vec!["cli", "--can_connect_to_database"], |matches| {
             assert_eq!(
-                Ok(String::from("Connection successful")),
-                run_sync(&matches, &postgres_url(None))
+                String::from("Connection successful"),
+                run_sync(&matches, &postgres_url(None)).unwrap()
             );
         })
         .unwrap();
@@ -403,8 +375,8 @@ mod tests {
     fn test_connecting_with_a_working_psql_connection_string_with_postgres_scheme() {
         with_cli(vec!["cli", "--can_connect_to_database"], |matches| {
             assert_eq!(
-                Ok(String::from("Connection successful")),
-                run_sync(&matches, &postgres_url_with_scheme(None, "postgres"))
+                String::from("Connection successful"),
+                run_sync(&matches, &postgres_url_with_scheme(None, "postgres")).unwrap()
             );
         })
         .unwrap();
@@ -415,10 +387,7 @@ mod tests {
         let dm = postgres_url(Some("this_does_not_exist"));
 
         with_cli(vec!["cli", "--can_connect_to_database"], |matches| {
-            assert_eq!(
-                Err(CliError::DatabaseDoesNotExist(String::from("this_does_not_exist"))),
-                run_sync(&matches, &dm)
-            );
+            assert_eq!("P1003", run_sync(&matches, &dm).unwrap_err().error_code().unwrap());
         })
         .unwrap();
     }
@@ -430,13 +399,13 @@ mod tests {
         let res = run(&["--create_database"], &url).await;
 
         assert_eq!(
-            Ok(String::from("Database 'this_should_exist' created successfully.")),
-            res
+            "Database 'this_should_exist' created successfully.",
+            res.as_ref().unwrap()
         );
 
         if let Ok(_) = res {
             let res = run(&["--can_connect_to_database"], &url).await;
-            assert_eq!(Ok(String::from("Connection successful")), res);
+            assert_eq!("Connection successful", res.as_ref().unwrap());
 
             {
                 let uri = mysql_url(None);
@@ -460,13 +429,13 @@ mod tests {
         let res = run(&["--create_database"], &url).await;
 
         assert_eq!(
-            Ok(String::from("Database 'this_should_exist' created successfully.")),
-            res
+            "Database 'this_should_exist' created successfully.",
+            res.as_ref().unwrap()
         );
 
         if let Ok(_) = res {
             let res = run(&["--can_connect_to_database"], &url).await;
-            assert_eq!(Ok(String::from("Connection successful")), res);
+            assert_eq!("Connection successful", res.as_ref().unwrap());
 
             {
                 let uri = postgres_url(None);

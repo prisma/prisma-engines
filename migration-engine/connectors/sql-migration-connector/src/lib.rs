@@ -39,7 +39,8 @@ pub struct SqlMigrationConnector {
 impl SqlMigrationConnector {
     pub async fn new(database_str: &str) -> std::result::Result<Self, ConnectorError> {
         let connection_info =
-            ConnectionInfo::from_url(database_str).map_err(|_err| ConnectorError::InvalidDatabaseUrl)?;
+            ConnectionInfo::from_url(database_str)
+            .map_err(|_err| ConnectorError::from_kind(ErrorKind::InvalidDatabaseUrl))?;
 
         let connection = Quaint::new(database_str)
             .map_err(SqlError::from)
@@ -58,7 +59,7 @@ impl SqlMigrationConnector {
             .map_err(|err| err.into_connector_error(&connection.connection_info()))?;
 
         let schema_name = connection.connection_info().schema_name().to_owned();
-        let file_path = connection.connection_info().file_path().map(|s| s.to_owned());
+
         let sql_family = connection.connection_info().sql_family();
         let connection_info = connection.connection_info().clone();
 

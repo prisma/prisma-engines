@@ -30,7 +30,7 @@ pub struct DatabaseNotReachable {
     pub database_host: String,
 
     /// Database port
-    pub database_port: String,
+    pub database_port: u16,
 }
 
 #[derive(Debug, UserFacingError, Serialize)]
@@ -53,21 +53,33 @@ pub struct DatabaseTimeout {
 }
 
 #[derive(Debug, UserFacingError, Serialize)]
-#[user_facing(
-    code = "P1003",
-    message = "Database `${database_name}` does not exist on the database server at `${database_location}`."
-)]
-pub struct DatabaseDoesNotExist {
-    /// Database name for all data sources that support a database name
-    /// SQLite: File name of the database.
-    pub database_name: String,
-
-    /// Postgres only: Database schema name
-    pub database_schema_name: Option<String>,
-
-    /// All data sources that have a database host URI
-    /// SQLite: Path to the database file
-    pub database_location: String,
+#[serde(untagged)]
+#[user_facing(code = "P1003")]
+pub enum DatabaseDoesNotExist {
+    #[user_facing(
+        message = "Database ${database_file_name} does not exist on the database server at ${database_file_path}"
+    )]
+    Sqlite {
+        database_file_name: String,
+        database_file_path: String,
+    },
+    #[user_facing(
+        message = "Database `${database_name}.${database_schema_name}` does not exist on the database server at `${database_host}:${database_port}`."
+    )]
+    Postgres {
+        database_name: String,
+        database_schema_name: String,
+        database_host: String,
+        database_port: u16,
+    },
+    #[user_facing(
+        message = "Database `${database_name}` does not exist on the database server at `${database_host}:${database_port}`."
+    )]
+    Mysql {
+        database_name: String,
+        database_host: String,
+        database_port: u16,
+    },
 }
 
 #[derive(Debug, UserFacingError, Serialize)]
@@ -158,4 +170,34 @@ pub struct DatabaseAccessDenied {
     /// Database name, append `database_schema_name` when applicable
     /// `database_schema_name`: Database schema name (For Postgres for example)
     pub database_name: String,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::UserFacingError;
+
+    #[test]
+    fn database_does_not_exist_formats_properly() {
+        let sqlite_err = DatabaseDoesNotExist::Sqlite {
+            database_file_path: "/tmp/dev.db".into(),
+            database_file_name: "dev.db".into(),
+        };
+
+        assert_eq!(
+            sqlite_err.message(),
+            "Database dev.db does not exist on the database server at /tmp/dev.db"
+        );
+
+        let mysql_err = DatabaseDoesNotExist::Mysql {
+            database_name: "root".into(),
+            database_host: "localhost".into(),
+            database_port: 8888,
+        };
+
+        assert_eq!(
+            mysql_err.message(),
+            "Database `root` does not exist on the database server at `localhost:8888`."
+        );
+    }
 }

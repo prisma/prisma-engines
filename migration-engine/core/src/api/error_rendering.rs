@@ -2,52 +2,14 @@ use crate::error::Error as CrateError;
 use failure::Fail as _;
 use jsonrpc_core::types::Error as JsonRpcError;
 use migration_connector::ConnectorError;
-use user_facing_errors::{Error, KnownError, UnknownError};
+use user_facing_errors::{Error, UnknownError};
 
 pub fn render_error(crate_error: CrateError) -> Error {
-    let result: Result<Error, _> = match &crate_error {
-        CrateError::ConnectorError(ConnectorError::AuthenticationFailed { user, host }) => {
-            KnownError::new(user_facing_errors::common::IncorrectDatabaseCredentials {
-                database_user: user.clone(),
-                database_host: host.clone(),
-            })
-            .map(Error::Known)
-        }
-        CrateError::ConnectorError(ConnectorError::ConnectionError { host, port, .. }) => {
-            KnownError::new(user_facing_errors::common::DatabaseNotReachable {
-                database_host: host.clone(),
-                database_port: port
-                    .map(|port| format!("{}", port))
-                    .unwrap_or_else(|| format!("<unknown>")),
-            })
-            .map(Error::Known)
-        }
-        CrateError::ConnectorError(ConnectorError::DatabaseDoesNotExist {
-            db_name,
-            database_location,
-        }) => KnownError::new(user_facing_errors::common::DatabaseDoesNotExist {
-            database_name: db_name.clone(),
-            database_location: database_location.clone(),
-            database_schema_name: None,
-        })
-        .map(Error::Known),
-        CrateError::ConnectorError(ConnectorError::DatabaseAccessDenied {
-            database_user,
-            database_name,
-        }) => KnownError::new(user_facing_errors::common::DatabaseAccessDenied {
-            database_user: database_user.clone(),
-            database_name: database_name.clone(),
-        })
-        .map(Error::Known),
-        err => Ok(UnknownError {
-            message: format!("{}", err),
-            backtrace: None,
-        }
-        .into()),
-    };
-
-    match result {
-        Ok(error) => error,
+    match crate_error {
+        CrateError::ConnectorError(ConnectorError {
+            user_facing_error: Some(user_facing_error),
+            ..
+        }) => user_facing_error.into(),
         _ => UnknownError {
             message: format!("{}", crate_error),
             backtrace: crate_error.backtrace().map(|bt| format!("{}", bt)),
