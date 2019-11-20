@@ -115,7 +115,7 @@ impl Expressionista {
     ) -> InterpretationResult<Expression> {
         let child_pairs = graph.direct_child_pairs(node);
 
-        let mut exprs: Vec<Expression> = child_pairs
+        let exprs: Vec<Expression> = child_pairs
             .into_iter()
             .map(|(_, node)| Self::build_expression(graph, &node, graph.incoming_edges(&node)))
             .collect::<InterpretationResult<_>>()?;
@@ -177,12 +177,10 @@ impl Expressionista {
     fn build_flow_expression(
         graph: &mut QueryGraph,
         node: &NodeRef,
-        mut parent_edges: Vec<EdgeRef>,
+        parent_edges: Vec<EdgeRef>,
     ) -> InterpretationResult<Expression> {
-        let flow: Flow = graph.pluck_node(node).try_into()?;
-
-        match flow {
-            Flow::If(_) => {
+        match graph.node_content(node).unwrap() {
+            Node::Flow(Flow::If(_)) => {
                 let child_pairs = graph.child_pairs(node);
 
                 // Graph validation guarantees this succeeds.
@@ -204,53 +202,23 @@ impl Expressionista {
                     .map(|(_, node)| Self::build_expression(graph, &node, graph.incoming_edges(&node)))
                     .collect::<InterpretationResult<Vec<Expression>>>()?;
 
-                Ok(match parent_edges.pop() {
-                    Some(p) => {
-                        match graph.pluck_edge(&p) {
-                            QueryGraphDependency::ParentIds(f) => {
-                                let parent_binding_name = graph.edge_source(&p).id();
-                                Expression::Func {
-                                    func: Box::new(move |env| {
-                                        let binding = match env.get(&parent_binding_name) {
-                                            Some(binding) => Ok(binding),
-                                            None => Err(InterpreterError::EnvVarNotFound(format!(
-                                                "Expected parent binding '{}' to be present.",
-                                                parent_binding_name
-                                            ))),
-                                        }?;
-
-                                        let parent_ids = binding.as_ids().map_err(|err| {
-                                            InterpreterError::InterpretationError(format!(
-                                                "Error for binding '{}': {}",
-                                                parent_binding_name, err
-                                            ))
-                                        })?;
-
-                                        // Todo: This still needs some interface polishing...
-                                        let flow: Flow = f(flow.into(), parent_ids)?.try_into()?;
-                                        match flow {
-                                            Flow::If(cond_fn) => {
-                                                // Todo: Maybe this construct points to a misconception: That the if node needs to be actually in the program.
-                                                // At this point here, we could evaluate the condition already and decide which branch to return.
-                                                Ok(Expression::If {
-                                                    func: cond_fn,
-                                                    then: vec![then_expr],
-                                                    else_: else_expr,
-                                                })
-                                            }
-
-                                            _ => unreachable!(),
-                                        }
-                                    }),
-                                }
-                            }
-                            _ => unimplemented!(),
+                let node = graph.pluck_node(node);
+                let into_expr = Box::new(move |node: Node| {
+                    let flow: Flow = node.try_into()?;
+                    match flow {
+                        Flow::If(cond_fn) => {
+                            Ok(Expression::If {
+                                func: cond_fn,
+                                then: vec![then_expr],
+                                else_: else_expr,
+                            })
                         }
                     }
+                });
 
-                    None => unimplemented!(),
-                })
+                Self::transform_node(graph, parent_edges, node, into_expr)
             }
+            _ => unreachable!(),
         }
     }
 
