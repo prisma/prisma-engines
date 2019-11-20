@@ -11,7 +11,6 @@ async-trait = "0.1.17"
 introspection-connector = { path = "../connectors/introspection-connector" }
 sql-introspection-connector = { path = "../connectors/sql-introspection-connector" }
 datamodel = { path = "../../libs/datamodel/core" }
-url = "1.7"
 failure = "0.1"
 
 jsonrpc-core = "13.0"
