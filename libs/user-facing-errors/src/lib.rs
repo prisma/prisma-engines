@@ -6,6 +6,7 @@ pub mod migration_engine;
 pub mod quaint;
 pub mod query_engine;
 
+use failure::Fail;
 use serde::Serialize;
 
 pub trait UserFacingError: serde::Serialize {
@@ -38,6 +39,13 @@ pub struct UnknownError {
 }
 
 impl UnknownError {
+    pub fn from_fail(err: impl Fail) -> Self {
+        UnknownError {
+            message: format!("{}", err),
+            backtrace: err.backtrace().map(|bt| bt.to_string()),
+        }
+    }
+
     /// Construct a new UnknownError from a `PanicInfo` in a panic hook. `UnknownError`s created
     /// with this constructor will have a proper, useful backtrace.
     pub fn new_in_panic_hook(panic_info: &std::panic::PanicInfo<'_>) -> Self {
@@ -76,6 +84,15 @@ impl UnknownError {
 pub enum Error {
     Known(KnownError),
     Unknown(UnknownError),
+}
+
+impl Error {
+    pub fn message(&self) -> &str {
+        match self {
+            Error::Known(err) => &err.message,
+            Error::Unknown(err) => &err.message,
+        }
+    }
 }
 
 impl From<UnknownError> for Error {

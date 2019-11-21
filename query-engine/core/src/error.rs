@@ -69,3 +69,9 @@ impl From<InterpreterError> for CoreError {
         CoreError::InterpreterError(e)
     }
 }
+
+impl From<CoreError> for user_facing_errors::Error {
+    fn from(err: CoreError) -> user_facing_errors::Error {
+        user_facing_errors::UnknownError::from_fail(err).into()
+    }
+}
