@@ -7,8 +7,8 @@ use migration_core::{
     commands::{ApplyMigrationCommand, ApplyMigrationInput},
 };
 use pretty_assertions::assert_eq;
-use serde_json::json;
 use quaint::prelude::*;
+use serde_json::json;
 use test_harness::*;
 use url::Url;
 

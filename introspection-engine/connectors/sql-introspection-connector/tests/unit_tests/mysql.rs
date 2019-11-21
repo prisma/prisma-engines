@@ -64,7 +64,10 @@ async fn introspecting_a_table_with_unique_index_must_work(api: &TestApi) {
                 t.add_column("id", types::primary());
                 t.add_column("authorId", types::varchar(10));
             });
-            migration.inject_custom(format!("Create Unique Index `test` on `{}`.`Blog`( `authorId`)", SCHEMA_NAME));
+            migration.inject_custom(format!(
+                "Create Unique Index `test` on `{}`.`Blog`( `authorId`)",
+                SCHEMA_NAME
+            ));
         })
         .await;
 
@@ -88,8 +91,10 @@ async fn introspecting_a_table_with_multi_column_unique_index_must_work(api: &Te
                 t.add_column("firstname", types::varchar(10));
                 t.add_column("lastname", types::varchar(10));
             });
-            migration
-                .inject_custom(format!("Create Unique Index `test` on `{}`.`User`( `firstname`, `lastname`)", SCHEMA_NAME));
+            migration.inject_custom(format!(
+                "Create Unique Index `test` on `{}`.`User`( `firstname`, `lastname`)",
+                SCHEMA_NAME
+            ));
         })
         .await;
 
@@ -271,18 +276,28 @@ async fn introspecting_a_one_to_one_req_relation_should_work(api: &TestApi) {
 #[test_one_connector(connector = "mysql")]
 async fn introspecting_two_one_to_one_relations_between_the_same_models_should_work(api: &TestApi) {
     let barrel = api.barrel();
-    let _setup_schema = barrel.execute(|migration| {
+    let _setup_schema = barrel
+        .execute(|migration| {
             migration.create_table("User", |t| {
                 t.add_column("id", types::primary());
             });
             migration.create_table("Post", |t| {
                 t.add_column("id", types::primary());
-                t.inject_custom("user_id INTEGER NOT NULL UNIQUE,\
-                 FOREIGN KEY(`user_id`) REFERENCES `User`(`id`)")
+                t.inject_custom(
+                    "user_id INTEGER NOT NULL UNIQUE,\
+                     FOREIGN KEY(`user_id`) REFERENCES `User`(`id`)",
+                )
             });
-            migration.inject_custom(format!("ALTER TABLE `{}`.`User` ADD Column `post_id` INTEGER NOT NULL UNIQUE ", SCHEMA_NAME));
-            migration.inject_custom(format!("ALTER TABLE `{}`.`User` ADD CONSTRAINT `post_fk` FOREIGN KEY(`post_id`) REFERENCES `Post`(`id`)", SCHEMA_NAME));
-        }).await;
+            migration.inject_custom(format!(
+                "ALTER TABLE `{}`.`User` ADD Column `post_id` INTEGER NOT NULL UNIQUE ",
+                SCHEMA_NAME
+            ));
+            migration.inject_custom(format!(
+                "ALTER TABLE `{}`.`User` ADD CONSTRAINT `post_fk` FOREIGN KEY(`post_id`) REFERENCES `Post`(`id`)",
+                SCHEMA_NAME
+            ));
+        })
+        .await;
 
     let dm = r#"
             model Post {
@@ -419,7 +434,10 @@ async fn introspecting_a_prisma_many_to_many_relation_should_work(api: &TestApi)
                      FOREIGN KEY (`B`) REFERENCES  `User`(`id`) ON DELETE CASCADE",
                 )
             });
-            migration.inject_custom(format!("CREATE UNIQUE INDEX test ON `{schema_name}`.`_PostToUser` (`A`, `B`);", schema_name = SCHEMA_NAME))
+            migration.inject_custom(format!(
+                "CREATE UNIQUE INDEX test ON `{schema_name}`.`_PostToUser` (`A`, `B`);",
+                schema_name = SCHEMA_NAME
+            ))
         })
         .await;
 
@@ -565,13 +583,10 @@ async fn introspecting_cascading_delete_behaviour_should_work(api: &TestApi) {
             });
             migration.create_table("Post", |t| {
                 t.add_column("id", types::primary());
-                t.inject_custom(
-                    "user_id INTEGER, FOREIGN KEY (`user_id`) REFERENCES `User`(`id`) ON DELETE CASCADE",
-                );
+                t.inject_custom("user_id INTEGER, FOREIGN KEY (`user_id`) REFERENCES `User`(`id`) ON DELETE CASCADE");
             });
         })
         .await;
-
 
     let dm = r#"  
             model Post {
@@ -591,4 +606,3 @@ async fn introspecting_cascading_delete_behaviour_should_work(api: &TestApi) {
 // enums
 
 // native arrays
-

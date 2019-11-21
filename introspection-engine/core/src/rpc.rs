@@ -1,5 +1,5 @@
 use crate::connector_loader::load_connector;
-use crate::{error::CoreError};
+use crate::error::CoreError;
 use introspection_connector::DatabaseMetadata;
 use jsonrpc_core::*;
 use jsonrpc_derive::rpc;

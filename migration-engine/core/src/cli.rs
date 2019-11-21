@@ -162,15 +162,13 @@ async fn create_postgres_admin_conn(mut url: Url) -> crate::Result<SqlMigrationC
         url.set_path(database_name);
         match SqlMigrationConnector::new(url.as_str()).await {
             // If the database does not exist, try the next one.
-            Err(err) => {
-                match &err.kind {
-                    migration_connector::ErrorKind::DatabaseDoesNotExist { .. } => (),
-                    _other_outcome => {
-                        connector = Some(Err(err));
-                        break;
-                    }
+            Err(err) => match &err.kind {
+                migration_connector::ErrorKind::DatabaseDoesNotExist { .. } => (),
+                _other_outcome => {
+                    connector = Some(Err(err));
+                    break;
                 }
-            }
+            },
             // If the outcome is anything else, use this.
             other_outcome => {
                 connector = Some(other_outcome);

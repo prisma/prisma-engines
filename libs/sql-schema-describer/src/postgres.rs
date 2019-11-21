@@ -1,8 +1,8 @@
 //! Postgres description.
 use super::*;
 use log::debug;
-use regex::Regex;
 use quaint::prelude::Queryable;
+use regex::Regex;
 use std::collections::{HashMap, HashSet};
 use std::convert::TryInto;
 use std::sync::Arc;

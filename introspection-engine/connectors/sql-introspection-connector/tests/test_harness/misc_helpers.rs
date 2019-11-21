@@ -1,9 +1,9 @@
-use quaint::prelude::*;
 use barrel::Migration;
 use once_cell::sync::Lazy;
+use quaint::prelude::*;
 use std::{rc::Rc, sync::Arc};
-use url::Url;
 use test_setup::*;
+use url::Url;
 
 pub static TEST_ASYNC_RUNTIME: Lazy<tokio::runtime::Runtime> =
     Lazy::new(|| tokio::runtime::Runtime::new().expect("failed to start tokio test runtime"));
@@ -48,7 +48,6 @@ impl BarrelMigrationExecutor {
         let full_sql = migration.make_from(self.sql_variant);
         run_full_sql(&self.database, &full_sql).await;
     }
-
 }
 
 // get dbs
@@ -75,9 +74,7 @@ pub async fn database(database_url: &str) -> Box<dyn Queryable + Send + Sync + '
 
             Box::new(conn)
         }
-        "file" | "sqlite" => {
-            Box::new(Quaint::new(url.as_str()).unwrap())
-        }
+        "file" | "sqlite" => Box::new(Quaint::new(url.as_str()).unwrap()),
         scheme => panic!("Unknown scheme `{}° in database URL: {}", scheme, url.as_str()),
     };
 

@@ -36,5 +36,4 @@ impl AsColumn for ScalarField {
 
         Column::from(((db, table), col))
     }
-
 }

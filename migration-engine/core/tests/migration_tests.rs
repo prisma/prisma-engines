@@ -525,44 +525,44 @@ async fn adding_an_inline_relation_must_result_in_a_foreign_key_in_the_model_tab
             }
         "#;
 
-        let result = api.infer_and_apply(&dm1).await.sql_schema;
-        let table = result.table_bang("A");
+    let result = api.infer_and_apply(&dm1).await.sql_schema;
+    let table = result.table_bang("A");
 
-        let b_column = table.column_bang("b");
-        assert_eq!(b_column.tpe.family, ColumnTypeFamily::Int);
-        assert_eq!(b_column.arity, ColumnArity::Required);
+    let b_column = table.column_bang("b");
+    assert_eq!(b_column.tpe.family, ColumnTypeFamily::Int);
+    assert_eq!(b_column.arity, ColumnArity::Required);
 
-        let c_column = table.column_bang("c");
-        assert_eq!(c_column.tpe.family, ColumnTypeFamily::Int);
-        assert_eq!(c_column.arity, ColumnArity::Nullable);
+    let c_column = table.column_bang("c");
+    assert_eq!(c_column.tpe.family, ColumnTypeFamily::Int);
+    assert_eq!(c_column.arity, ColumnArity::Nullable);
 
-        assert_eq!(
-            table.foreign_keys,
-            &[
-                ForeignKey {
-                    constraint_name: match api.sql_family() {
-                        SqlFamily::Postgres => Some("A_b_fkey".to_owned()),
-                        SqlFamily::Mysql => Some("A_ibfk_1".to_owned()),
-                        SqlFamily::Sqlite => None,
-                    },
-                    columns: vec![b_column.name.clone()],
-                    referenced_table: "B".to_string(),
-                    referenced_columns: vec!["id".to_string()],
-                    on_delete_action: ForeignKeyAction::Restrict, // required relations can't set ON DELETE SET NULL
+    assert_eq!(
+        table.foreign_keys,
+        &[
+            ForeignKey {
+                constraint_name: match api.sql_family() {
+                    SqlFamily::Postgres => Some("A_b_fkey".to_owned()),
+                    SqlFamily::Mysql => Some("A_ibfk_1".to_owned()),
+                    SqlFamily::Sqlite => None,
                 },
-                ForeignKey {
-                    constraint_name: match api.sql_family() {
-                        SqlFamily::Postgres => Some("A_c_fkey".to_owned()),
-                        SqlFamily::Mysql => Some("A_ibfk_2".to_owned()),
-                        SqlFamily::Sqlite => None,
-                    },
-                    columns: vec![c_column.name.clone()],
-                    referenced_table: "C".to_string(),
-                    referenced_columns: vec!["id".to_string()],
-                    on_delete_action: ForeignKeyAction::SetNull,
-                }
-            ]
-        );
+                columns: vec![b_column.name.clone()],
+                referenced_table: "B".to_string(),
+                referenced_columns: vec!["id".to_string()],
+                on_delete_action: ForeignKeyAction::Restrict, // required relations can't set ON DELETE SET NULL
+            },
+            ForeignKey {
+                constraint_name: match api.sql_family() {
+                    SqlFamily::Postgres => Some("A_c_fkey".to_owned()),
+                    SqlFamily::Mysql => Some("A_ibfk_2".to_owned()),
+                    SqlFamily::Sqlite => None,
+                },
+                columns: vec![c_column.name.clone()],
+                referenced_table: "C".to_string(),
+                referenced_columns: vec!["id".to_string()],
+                on_delete_action: ForeignKeyAction::SetNull,
+            }
+        ]
+    );
 }
 
 #[test_each_connector]

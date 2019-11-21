@@ -1,4 +1,4 @@
-use crate::{AsColumn, RelationExt, Relation, SelectedFields};
+use crate::{AsColumn, Relation, RelationExt, SelectedFields};
 use quaint::ast::Column;
 
 pub trait SelectedFieldsExt {

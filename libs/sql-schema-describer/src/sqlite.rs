@@ -2,7 +2,7 @@
 use super::*;
 use failure::_core::convert::TryInto;
 use log::debug;
-use quaint::{prelude::Queryable, ast::ParameterizedValue};
+use quaint::{ast::ParameterizedValue, prelude::Queryable};
 use std::collections::HashMap;
 use std::sync::Arc;
 

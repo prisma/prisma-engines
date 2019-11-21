@@ -15,7 +15,7 @@ pub use error::*;
 pub use sql_migration::*;
 
 use migration_connector::*;
-use quaint::prelude::{ConnectionInfo, SqlFamily, Queryable, Quaint};
+use quaint::prelude::{ConnectionInfo, Quaint, Queryable, SqlFamily};
 use sql_database_migration_inferrer::*;
 use sql_database_step_applier::*;
 use sql_destructive_changes_checker::*;
@@ -39,8 +39,7 @@ pub struct SqlMigrationConnector {
 impl SqlMigrationConnector {
     pub async fn new(database_str: &str) -> std::result::Result<Self, ConnectorError> {
         let connection_info =
-            ConnectionInfo::from_url(database_str)
-            .map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
+            ConnectionInfo::from_url(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
 
         let connection = Quaint::new(database_str)
             .map_err(SqlError::from)

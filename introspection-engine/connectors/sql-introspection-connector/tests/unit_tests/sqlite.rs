@@ -64,7 +64,10 @@ async fn introspecting_a_table_with_unique_index_must_work(api: &TestApi) {
                 t.add_column("id", types::primary());
                 t.add_column("authorId", types::text());
             });
-            migration.inject_custom(format!("Create Unique Index \"{}\".\"test\" on \"Blog\"( \"authorId\")", SCHEMA_NAME));
+            migration.inject_custom(format!(
+                "Create Unique Index \"{}\".\"test\" on \"Blog\"( \"authorId\")",
+                SCHEMA_NAME
+            ));
         })
         .await;
 
@@ -88,9 +91,10 @@ async fn introspecting_a_table_with_multi_column_unique_index_must_work(api: &Te
                 t.add_column("firstname", types::text());
                 t.add_column("lastname", types::text());
             });
-            migration.inject_custom(
-                format!("Create Unique Index \"{}\".\"test\" on \"User\"( \"firstname\", \"lastname\")", SCHEMA_NAME)
-            );
+            migration.inject_custom(format!(
+                "Create Unique Index \"{}\".\"test\" on \"User\"( \"firstname\", \"lastname\")",
+                SCHEMA_NAME
+            ));
         })
         .await;
 
@@ -219,7 +223,10 @@ async fn introspecting_a_table_with_a_multi_column_non_unique_index_should_work(
                 t.add_column("b", types::text());
                 t.add_column("id", types::primary());
             });
-            migration.inject_custom(format!("Create Index \"{}\".\"test\" on \"User\"(\"a\",\"b\")", SCHEMA_NAME));
+            migration.inject_custom(format!(
+                "Create Index \"{}\".\"test\" on \"User\"(\"a\",\"b\")",
+                SCHEMA_NAME
+            ));
         })
         .await;
 
@@ -426,8 +433,10 @@ async fn introspecting_a_prisma_many_to_many_relation_should_work(api: &TestApi)
                           FOREIGN KEY (B) REFERENCES  User(id) ON DELETE CASCADE",
                 )
             });
-            migration
-                .inject_custom(format!("CREATE UNIQUE INDEX \"{}\".test ON \"_PostToUser\" (\"A\", \"B\");", SCHEMA_NAME))
+            migration.inject_custom(format!(
+                "CREATE UNIQUE INDEX \"{}\".test ON \"_PostToUser\" (\"A\", \"B\");",
+                SCHEMA_NAME
+            ))
         })
         .await;
 

@@ -2,7 +2,10 @@ use barrel::types;
 use chrono::*;
 use migration_connector::*;
 use quaint::ast::*;
-use quaint::{prelude::{ConnectionInfo, SqlFamily}, connector::{Queryable, ResultSet}};
+use quaint::{
+    connector::{Queryable, ResultSet},
+    prelude::{ConnectionInfo, SqlFamily},
+};
 use std::sync::Arc;
 
 pub struct SqlMigrationPersistence {

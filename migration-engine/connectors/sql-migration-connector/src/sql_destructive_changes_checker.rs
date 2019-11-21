@@ -3,7 +3,7 @@ use crate::{
     SqlResult, TableChange,
 };
 use migration_connector::*;
-use quaint::{prelude::Queryable, ast::*};
+use quaint::{ast::*, prelude::Queryable};
 use std::sync::Arc;
 
 pub struct SqlDestructiveChangesChecker {

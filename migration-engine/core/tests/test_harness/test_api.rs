@@ -1,17 +1,14 @@
 use super::{
     command_helpers::{run_infer_command, InferOutput},
-    misc_helpers::{
-        mysql_migration_connector, postgres_migration_connector, 
-        sqlite_migration_connector, test_api,
-    },
-    InferAndApplyOutput
+    misc_helpers::{mysql_migration_connector, postgres_migration_connector, sqlite_migration_connector, test_api},
+    InferAndApplyOutput,
 };
 use migration_connector::{MigrationPersistence, MigrationStep};
 use migration_core::{
     api::{GenericApi, MigrationApi},
     commands::{ApplyMigrationInput, InferMigrationStepsInput, UnapplyMigrationInput, UnapplyMigrationOutput},
 };
-use quaint::prelude::{ConnectionInfo, SqlFamily, Queryable};
+use quaint::prelude::{ConnectionInfo, Queryable, SqlFamily};
 use sql_schema_describer::*;
 use std::sync::Arc;
 use test_setup::*;

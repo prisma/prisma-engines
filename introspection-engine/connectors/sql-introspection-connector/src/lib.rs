@@ -4,8 +4,8 @@ mod error;
 mod schema_describer_loading;
 
 use datamodel::Datamodel;
+use introspection_connector::{ConnectorError, ConnectorResult, DatabaseMetadata, IntrospectionConnector};
 use quaint::prelude::ConnectionInfo;
-use introspection_connector::{ConnectorResult, ConnectorError, DatabaseMetadata, IntrospectionConnector};
 use sql_schema_describer::{SqlSchema, SqlSchemaDescriberBackend};
 use std::future::Future;
 
@@ -20,16 +20,25 @@ pub struct SqlIntrospectionConnector {
 
 impl SqlIntrospectionConnector {
     pub async fn new(url: &str) -> ConnectorResult<SqlIntrospectionConnector> {
-        let (describer, connection_info) = schema_describer_loading::load_describer(&url).await
-            .map_err(|quaint_error| {
-            ConnectionInfo::from_url(url).map(|connection_info| SqlIntrospectionError::Quaint(quaint_error).into_connector_error(&connection_info)).unwrap_or_else(|err| ConnectorError::url_parse_error(err, url))
-            })
-        ?;
-        Ok(SqlIntrospectionConnector { describer, connection_info })
+        let (describer, connection_info) =
+            schema_describer_loading::load_describer(&url)
+                .await
+                .map_err(|quaint_error| {
+                    ConnectionInfo::from_url(url)
+                        .map(|connection_info| {
+                            SqlIntrospectionError::Quaint(quaint_error).into_connector_error(&connection_info)
+                        })
+                        .unwrap_or_else(|err| ConnectorError::url_parse_error(err, url))
+                })?;
+        Ok(SqlIntrospectionConnector {
+            describer,
+            connection_info,
+        })
     }
 
-    async fn catch<O>(&self, fut: impl Future<Output=Result<O, SqlIntrospectionError>>) -> ConnectorResult<O> {
-        fut.await.map_err(|sql_introspection_error| sql_introspection_error.into_connector_error(&self.connection_info))
+    async fn catch<O>(&self, fut: impl Future<Output = Result<O, SqlIntrospectionError>>) -> ConnectorResult<O> {
+        fut.await
+            .map_err(|sql_introspection_error| sql_introspection_error.into_connector_error(&self.connection_info))
     }
 
     async fn list_databases_internal(&self) -> SqlIntrospectionResult<Vec<String>> {

@@ -1,5 +1,5 @@
 use crate::{interpreter::InterpretationResult, query_ast::*, result_ast::*};
-use connector::{self, QueryArguments, ScalarListValues, ReadOperations, ConnectionLike};
+use connector::{self, ConnectionLike, QueryArguments, ReadOperations, ScalarListValues};
 use futures::future::{BoxFuture, FutureExt};
 use prisma_models::{GraphqlId, ScalarField, SelectedFields};
 use std::sync::Arc;
@@ -110,12 +110,7 @@ fn read_related<'a, 'b>(
         };
 
         let scalars = tx
-            .get_related_records(
-                &query.parent_field,
-                parent_ids,
-                query.args.clone(),
-                &selected_fields,
-            )
+            .get_related_records(&query.parent_field, parent_ids, query.args.clone(), &selected_fields)
             .await?;
 
         let model = query.parent_field.related_model();

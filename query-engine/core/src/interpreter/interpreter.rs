@@ -245,11 +245,9 @@ where
                 };
 
                 fut.boxed()
-            },
+            }
 
-            Expression::Return { result } => async move {
-                Ok(result)
-            }.boxed()
+            Expression::Return { result } => async move { Ok(result) }.boxed(),
         }
     }
 

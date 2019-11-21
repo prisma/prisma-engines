@@ -655,28 +655,30 @@ async fn constraints_from_other_databases_should_not_be_introspected() {
     });
     other_migration.create_table("Post", |t| {
         t.add_column("id", types::primary());
-        t.inject_custom(
-            "user_id INTEGER, FOREIGN KEY (`user_id`) REFERENCES `User`(`id`) ON DELETE CASCADE"
-        );
+        t.inject_custom("user_id INTEGER, FOREIGN KEY (`user_id`) REFERENCES `User`(`id`) ON DELETE CASCADE");
     });
 
     let full_sql = other_migration.make::<barrel::backend::MySql>();
     let inspector = get_mysql_describer_for_schema(&full_sql, "other_schema").await;
 
-    let schema = inspector.describe(&"other_schema".to_string()).await.expect("describing");
+    let schema = inspector
+        .describe(&"other_schema".to_string())
+        .await
+        .expect("describing");
     let table = schema.table_bang("Post");
 
     let fks = &table.foreign_keys;
 
-    assert_eq!(fks, &[
-        ForeignKey {
+    assert_eq!(
+        fks,
+        &[ForeignKey {
             constraint_name: Some("Post_ibfk_1".into()),
             columns: vec!["user_id".into()],
             referenced_table: "User".into(),
             referenced_columns: vec!["id".into()],
             on_delete_action: ForeignKeyAction::Cascade,
-        }
-    ]);
+        }]
+    );
 
     // Now the migration in the current database.
 
@@ -688,11 +690,8 @@ async fn constraints_from_other_databases_should_not_be_introspected() {
 
     migration.create_table("Post", |t| {
         t.add_column("id", types::primary());
-        t.inject_custom(
-            "user_id INTEGER, FOREIGN KEY (`user_id`) REFERENCES `User`(`id`) ON DELETE RESTRICT"
-        );
+        t.inject_custom("user_id INTEGER, FOREIGN KEY (`user_id`) REFERENCES `User`(`id`) ON DELETE RESTRICT");
     });
-
 
     let full_sql = migration.make::<barrel::backend::MySql>();
     let inspector = get_mysql_describer_for_schema(&full_sql, SCHEMA).await;
@@ -701,13 +700,14 @@ async fn constraints_from_other_databases_should_not_be_introspected() {
 
     let fks = &table.foreign_keys;
 
-    assert_eq!(fks, &[
-        ForeignKey {
+    assert_eq!(
+        fks,
+        &[ForeignKey {
             constraint_name: Some("Post_ibfk_1".into()),
             columns: vec!["user_id".into()],
             referenced_table: "User".into(),
             referenced_columns: vec!["id".into()],
             on_delete_action: ForeignKeyAction::Restrict,
-        }
-    ]);
+        }]
+    );
 }
