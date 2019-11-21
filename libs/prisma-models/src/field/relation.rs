@@ -119,7 +119,6 @@ impl RelationField {
             Some(RelationLinkManifestation::Inline(ref m)) => {
                 let is_self_rel = relation.is_self_relation();
 
-
                 if is_self_rel && self.is_hidden {
                     false
                 } else if is_self_rel && (self.relation_side == RelationSide::B || self.related_field().is_hidden) {
