@@ -1980,6 +1980,7 @@ dependencies = [
  "tracing-log 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "tracing-subscriber 0.2.0-alpha.1 (git+https://github.com/pimeys/tracing?branch=fix-type-annotations)",
  "url 2.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "user-facing-errors 0.1.0",
 ]
 
 [[package]]
@@ -2130,7 +2131,9 @@ dependencies = [
  "prisma-inflector 0.1.0",
  "prisma-models 0.0.0",
  "query-connector 0.1.0",
+ "serde 1.0.103 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_json 1.0.42 (registry+https://github.com/rust-lang/crates.io-index)",
+ "user-facing-errors 0.1.0",
  "uuid 0.7.4 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -3447,6 +3450,7 @@ name = "user-facing-errors"
 version = "0.1.0"
 dependencies = [
  "backtrace 0.3.40 (registry+https://github.com/rust-lang/crates.io-index)",
+ "failure 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "quaint 0.1.0 (git+https://github.com/prisma/quaint.git)",
  "serde 1.0.103 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_json 1.0.42 (registry+https://github.com/rust-lang/crates.io-index)",

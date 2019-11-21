@@ -41,5 +41,7 @@ tracing-subscriber = { git = "https://github.com/pimeys/tracing", branch = "fix-
 tracing-attributes = "0.1"
 log = "0.4"
 
+user-facing-errors = { path = "../../libs/user-facing-errors" }
+
 [build-dependencies]
 rustc_version = "0.2.3"

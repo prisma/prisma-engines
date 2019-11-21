@@ -20,9 +20,7 @@ pub fn serialize(responses: Vec<Response>) -> Value {
                 data_envelope.insert(name, serialize_item(item));
             }
             Response::Error(err) => {
-                let mut error_map = Map::new();
-                error_map.insert("error".into(), Value::String(err.clone()));
-                errors.push(Value::Object(error_map));
+                errors.push(serde_json::to_value(&err).unwrap());
             }
         }
     }
