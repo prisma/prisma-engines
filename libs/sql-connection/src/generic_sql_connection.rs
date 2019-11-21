@@ -21,7 +21,7 @@ impl GenericSqlConnection {
                 Quaint::new(url)?
             }
             c if c == SQLITE_SOURCE_NAME => {
-                Quaint::new(&Self::url_with_db(url, db_name)?)?
+                Quaint::new(&Self::url_with_db(url, db_name))?
             }
             c => panic!("Unsuppored connectory type for SQL connection: {}", c)
         };
@@ -36,7 +36,7 @@ impl GenericSqlConnection {
 
         // Non-URL database strings are interpreted as SQLite file paths.
         if url_parse_result.is_err() {
-            let pool = Quaint::new(&Self::url_with_db(&format!("file://{}", url_str), db_name)?)?;
+            let pool = Quaint::new(&Self::url_with_db(&format!("file://{}", url_str), db_name))?;
             return Ok(Self { pool, runtime: super::default_runtime(), })
         }
 
@@ -45,7 +45,7 @@ impl GenericSqlConnection {
         let pool = match SqlFamily::from_scheme(url.scheme()) {
             Some(SqlFamily::Postgres) => Quaint::new(url_str)?,
             Some(SqlFamily::Mysql) => Quaint::new(url_str)?,
-            Some(SqlFamily::Sqlite) => Quaint::new(&Self::url_with_db(url_str, db_name)?)?,
+            Some(SqlFamily::Sqlite) => Quaint::new(&Self::url_with_db(url_str, db_name))?,
             None => panic!("Unsupported database URL scheme: {}", url.scheme()),
         };
 
@@ -56,10 +56,21 @@ impl GenericSqlConnection {
         self.pool.connection_info()
     }
 
-    fn url_with_db(url: &str, db_name: Option<&str>) -> Result<String, QuaintError> {
-        let mut url = Url::parse(url)?;
-        url.query_pairs_mut().append_pair("db_name", db_name.unwrap_or("db"));
-        Ok(url.as_str().to_string())
+    fn url_with_db(file_path: &str, db_name: Option<&str>) -> String {
+        let db_name = db_name.unwrap_or("default-db-name");
+        let mut splitted = file_path.split("?");
+        let url = splitted.next().unwrap();
+        let params = splitted.next();
+
+        let mut params: Vec<&str> = match params {
+            Some(params) => params.split("&").collect(),
+            None => Vec::with_capacity(1),
+        };
+
+        let db_name_param = format!("db_name={}", db_name);
+        params.push(&db_name_param);
+
+        format!("{}?{}", url, params.join("&"))
     }
 }
 
