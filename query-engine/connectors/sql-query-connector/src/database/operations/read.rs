@@ -25,6 +25,7 @@ pub async fn get_single_record(
     let record = (match conn.find(query, idents.as_slice()).await {
         Ok(result) => Ok(Some(result)),
         Err(_e @ SqlError::RecordNotFoundForWhere(_)) => Ok(None),
+        Err(_e @ SqlError::RecordDoesNotExist) => Ok(None),
         Err(e) => Err(e),
     })?
     .map(Record::from)

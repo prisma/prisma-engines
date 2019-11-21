@@ -150,18 +150,16 @@ async fn creating_a_scalar_list_field_for_an_existing_table_must_work(api: &Test
     let initial_result = api.infer_and_apply(&dm1).await.sql_schema;
     assert!(!initial_result.has_table("Blog_tags"));
 
-    let mut result = api
-        .barrel()
-        .execute(|migration| {
-            migration.create_table("Blog_tags", |t| {
-                // TODO: barrel does not render this one correctly
-                // TODO: the column should not be nullable. We just set it nullable because of our current inline relation nullability hack
-                t.add_column("nodeId", types::foreign("Blog", "id").nullable(true));
-                t.add_column("position", types::integer());
-                t.add_column("value", types::text());
-            });
-        })
-        .await;
+    let mut result = api.barrel().execute(|migration| {
+        migration.create_table("Blog_tags", |t| {
+            // TODO: barrel does not render this one correctly
+            t.add_column("nodeId", types::foreign("Blog", "id"));
+            t.add_column("position", types::integer());
+            t.add_column("value", types::text());
+        });
+    }).await;
+
+
     // hacks for things i can't set in barrel due to limitations
     for table in &mut result.tables {
         if table.name == "Blog_tags" {

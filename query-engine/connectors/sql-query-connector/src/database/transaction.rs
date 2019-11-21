@@ -113,26 +113,17 @@ where
         &'b self,
         field: &'b RelationFieldRef,
         parent_id: &'b GraphqlId,
-        child_id: &'b GraphqlId,
+        child_ids: &'b [GraphqlId],
     ) -> connector::IO<()> {
-        IO::new(async move { write::connect(&self.inner, field, parent_id, child_id).await })
+        IO::new(async move { write::connect(&self.inner, field, parent_id, child_ids).await })
     }
 
     fn disconnect<'b>(
         &'b self,
         field: &'b RelationFieldRef,
         parent_id: &'b GraphqlId,
-        child_id: &'b GraphqlId,
+        child_ids: &'b [GraphqlId],
     ) -> connector::IO<()> {
-        IO::new(async move { write::disconnect(&self.inner, field, parent_id, child_id).await })
-    }
-
-    fn set<'b>(
-        &'b self,
-        relation_field: &'b RelationFieldRef,
-        parent_id: GraphqlId,
-        wheres: Vec<GraphqlId>,
-    ) -> connector::IO<()> {
-        IO::new(async move { write::set(&self.inner, relation_field, parent_id, wheres).await })
+        IO::new(async move { write::disconnect(&self.inner, field, parent_id, child_ids).await })
     }
 }

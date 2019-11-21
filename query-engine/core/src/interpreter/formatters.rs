@@ -44,6 +44,7 @@ pub fn format_expression(expr: &Expression, indent: usize) -> String {
             then: _,
             else_: _,
         } => add_indent(indent, "if (Fn env)"),
+        Expression::Return { result } => add_indent(indent, format!("Return {:?}", result)),
     }
 }
 
