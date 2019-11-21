@@ -218,6 +218,7 @@ impl SqlSchemaDescriber {
             .expect("querying for foreign keys");
         let mut intermediate_fks: HashMap<String, ForeignKey> = HashMap::new();
         for row in result_set.into_iter() {
+            dbg!(&row);
             debug!("Got description FK row {:#?}", row);
             let constraint_name = row
                 .get("constraint_name")

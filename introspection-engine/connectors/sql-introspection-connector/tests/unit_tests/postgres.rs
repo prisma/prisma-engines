@@ -2,8 +2,6 @@ use crate::*;
 use barrel::types;
 use test_harness::*;
 
-pub const SCHEMA_NAME: &str = "introspection-engine";
-
 #[test_one_connector(connector = "postgres")]
 async fn introspecting_a_simple_table_with_gql_types_must_work(api: &TestApi) {
     let barrel = api.barrel();
@@ -66,7 +64,7 @@ async fn introspecting_a_table_with_unique_index_must_work(api: &TestApi) {
                 t.add_column("id", types::primary());
                 t.add_column("authorId", types::text());
             });
-            migration.inject_custom("Create Unique Index \"test\" on \"introspection-engine\".\"Blog\"( \"authorId\")");
+            migration.inject_custom(format!("Create Unique Index \"test\" on \"{}\".\"Blog\"( \"authorId\")", SCHEMA_NAME));
         })
         .await;
 
@@ -91,7 +89,10 @@ async fn introspecting_a_table_with_multi_column_unique_index_must_work(api: &Te
                 t.add_column("lastname", types::text());
             });
             migration.inject_custom(
-                "Create Unique Index \"test\" on \"introspection-engine\".\"User\"( \"firstname\", \"lastname\")",
+                format!(
+                "Create Unique Index \"test\" on \"{}\".\"User\"( \"firstname\", \"lastname\")",
+                SCHEMA_NAME,
+                )
             );
         })
         .await;
@@ -192,7 +193,7 @@ async fn introspecting_a_table_with_a_non_unique_index_should_work(api: &TestApi
                 t.add_column("a", types::text());
                 t.add_column("id", types::primary());
             });
-            migration.inject_custom("Create Index \"test\" on \"introspection-engine\".\"User\"(\"a\")");
+            migration.inject_custom(format!("Create Index \"test\" on \"{}\".\"User\"(\"a\")", SCHEMA_NAME));
         })
         .await;
 
@@ -217,7 +218,7 @@ async fn introspecting_a_table_with_a_multi_column_non_unique_index_should_work(
                 t.add_column("b", types::text());
                 t.add_column("id", types::primary());
             });
-            migration.inject_custom("Create Index \"test\" on \"introspection-engine\".\"User\"(\"a\",\"b\")");
+            migration.inject_custom(format!("Create Index \"test\" on \"{}\".\"User\"(\"a\",\"b\")", SCHEMA_NAME));
         })
         .await;
 
@@ -275,7 +276,7 @@ async fn introspecting_two_one_to_one_relations_between_the_same_models_should_w
                 t.add_column("id", types::primary());
                 t.inject_custom("user_id INTEGER NOT NULL UNIQUE REFERENCES \"User\"(\"id\")")
             });
-            migration.inject_custom("ALTER TABLE \"introspection-engine\".\"User\" ADD Column \"post_id\" INTEGER NOT NULL UNIQUE REFERENCES \"Post\"(\"id\")")
+            migration.inject_custom(format!("ALTER TABLE \"{}\".\"User\" ADD Column \"post_id\" INTEGER NOT NULL UNIQUE REFERENCES \"Post\"(\"id\")", SCHEMA_NAME))
         }).await;
 
     let dm = r#"
@@ -400,7 +401,7 @@ async fn introspecting_a_prisma_many_to_many_relation_should_work(api: &TestApi)
                 )
             });
             migration
-                .inject_custom("CREATE UNIQUE INDEX test ON \"introspection-engine\".\"_PostToUser\" (\"a\", \"b\");")
+                .inject_custom(format!("CREATE UNIQUE INDEX test ON \"{}\".\"_PostToUser\" (\"a\", \"b\");", SCHEMA_NAME))
         })
         .await;
 

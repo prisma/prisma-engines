@@ -6,11 +6,10 @@ use quaint::{prelude::*};
 use sql_migration_connector::SqlMigrationConnector;
 use std::{rc::Rc};
 use url::Url;
+use test_setup::*;
 
 pub static TEST_ASYNC_RUNTIME: Lazy<tokio::runtime::Runtime> =
     Lazy::new(|| tokio::runtime::Runtime::new().expect("failed to start tokio test runtime"));
-
-const SCHEMA_NAME: &str = "lift";
 
 pub fn parse(datamodel_string: &str) -> SchemaAst {
     parser::parse(datamodel_string).unwrap()
@@ -55,7 +54,7 @@ pub(super) async fn postgres_migration_connector(url: &str) -> SqlMigrationConne
 }
 
 pub(super) async fn sqlite_migration_connector() -> SqlMigrationConnector {
-    SqlMigrationConnector::new(&sqlite_test_file())
+    SqlMigrationConnector::new(&sqlite_test_url())
         .await
         .unwrap()
 }
@@ -97,97 +96,4 @@ where
     let conn = f(url).unwrap();
 
     conn.execute_raw(&create_stmt(db_name), &[]).await.unwrap();
-}
-
-pub fn sqlite_test_config() -> String {
-    format!(
-        r#"
-        datasource my_db {{
-            provider = "sqlite"
-            url = "file:{}"
-            default = true
-        }}
-    "#,
-        sqlite_test_file()
-    )
-}
-
-pub fn sqlite_test_file() -> String {
-    let server_root = std::env::var("SERVER_ROOT").expect("Env var SERVER_ROOT required but not found.");
-    let database_folder_path = format!("{}/db", server_root);
-    let file_path = format!("file://{}/{}.db", database_folder_path, SCHEMA_NAME);
-    file_path
-}
-
-pub fn postgres_test_config() -> String {
-    format!(
-        r#"
-        datasource my_db {{
-            provider = "postgresql"
-            url = "{}"
-            default = true
-        }}
-    "#,
-        postgres_url()
-    )
-}
-
-pub fn mysql_test_config() -> String {
-    format!(
-        r#"
-        datasource my_db {{
-            provider = "mysql"
-            url = "{}"
-            default = true
-        }}
-    "#,
-        mysql_url()
-    )
-}
-
-pub fn postgres_url() -> String {
-    dbg!(format!(
-        "postgresql://postgres:prisma@{}:5432/test-db?schema={}",
-        db_host_postgres(),
-        SCHEMA_NAME
-    ))
-}
-
-pub fn mysql_url() -> String {
-    dbg!(format!(
-        "mysql://root:prisma@{host}:3306/{schema_name}",
-        host = db_host_mysql_5_7(),
-        schema_name = SCHEMA_NAME
-    ))
-}
-
-pub fn mysql_8_url() -> String {
-    let (host, port) = db_host_and_port_mysql_8_0();
-    dbg!(format!(
-        "mysql://root:prisma@{host}:{port}/{schema_name}",
-        host = host,
-        port = port,
-        schema_name = SCHEMA_NAME
-    ))
-}
-
-fn db_host_postgres() -> String {
-    match std::env::var("IS_BUILDKITE") {
-        Ok(_) => "test-db-postgres".to_string(),
-        Err(_) => "127.0.0.1".to_string(),
-    }
-}
-
-fn db_host_and_port_mysql_8_0() -> (String, usize) {
-    match std::env::var("IS_BUILDKITE") {
-        Ok(_) => ("test-db-mysql-8-0".to_string(), 3306),
-        Err(_) => ("127.0.0.1".to_string(), 3307),
-    }
-}
-
-fn db_host_mysql_5_7() -> String {
-    match std::env::var("IS_BUILDKITE") {
-        Ok(_) => "test-db-mysql-5-7".to_string(),
-        Err(_) => "127.0.0.1".to_string(),
-    }
 }

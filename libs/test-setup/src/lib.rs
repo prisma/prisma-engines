@@ -23,7 +23,11 @@ pub fn postgres_url() -> String {
 }
 
 pub fn mysql_url() -> String {
-    dbg!(format!("mysql://root:prisma@{}:3306/", db_host_mysql_5_7()))
+    dbg!(format!(
+        "mysql://root:prisma@{host}:3306/{schema_name}",
+        host = db_host_mysql_5_7(),
+        schema_name = SCHEMA_NAME
+    ))
 }
 
 pub fn mysql_8_url() -> String {
@@ -55,4 +59,43 @@ fn db_host_mysql_5_7() -> String {
         Ok(_) => "test-db-mysql-5-7".to_string(),
         Err(_) => "127.0.0.1".to_string(),
     }
+}
+
+pub fn postgres_test_config() -> String {
+    format!(
+        r#"
+        datasource my_db {{
+            provider = "postgresql"
+            url = "{}"
+            default = true
+        }}
+    "#,
+        postgres_url()
+    )
+}
+
+pub fn mysql_test_config() -> String {
+    format!(
+        r#"
+        datasource my_db {{
+            provider = "mysql"
+            url = "{}"
+            default = true
+        }}
+    "#,
+        mysql_url()
+    )
+}
+
+pub fn sqlite_test_config() -> String {
+    format!(
+        r#"
+        datasource my_db {{
+            provider = "sqlite"
+            url = "file:{}"
+            default = true
+        }}
+    "#,
+        sqlite_test_file()
+    )
 }

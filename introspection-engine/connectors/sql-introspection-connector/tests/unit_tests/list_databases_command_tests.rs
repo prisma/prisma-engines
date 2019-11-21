@@ -1,14 +1,12 @@
 use crate::{test_harness::*, test_one_connector, BarrelMigrationExecutor};
 use barrel::types;
 
-pub const SCHEMA_NAME: &str = "introspection-engine";
-
 #[test_one_connector(connector = "mysql")]
 async fn databases_for_mysql_should_work(api: &TestApi) {
     let barrel = api.barrel();
     setup(&barrel);
     let result = dbg!(api.list_databases().await);
-    assert!(result.contains(&"introspection-engine".to_string()));
+    assert!(result.contains(&SCHEMA_NAME.to_string()));
 }
 
 #[test_one_connector(connector = "postgres")]
@@ -16,7 +14,7 @@ async fn databases_for_postgres_should_work(api: &TestApi) {
     let barrel = api.barrel();
     setup(&barrel);
     let result = dbg!(api.list_databases().await);
-    assert!(result.contains(&"introspection-engine".to_string()));
+    assert!(result.contains(&SCHEMA_NAME.to_string()));
 }
 
 #[test_one_connector(connector = "sqlite")]
@@ -24,7 +22,7 @@ async fn databases_for_sqlite_should_work(api: &TestApi) {
     let barrel = api.barrel();
     setup(&barrel);
     let result = dbg!(api.list_databases().await);
-    assert!(result.contains(&"introspection-engine.db".to_string()));
+    assert!(result.contains(&format!("{}.db", SCHEMA_NAME)));
 }
 
 fn setup(barrel: &BarrelMigrationExecutor) {

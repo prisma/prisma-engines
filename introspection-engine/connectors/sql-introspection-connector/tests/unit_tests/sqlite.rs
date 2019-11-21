@@ -64,7 +64,7 @@ async fn introspecting_a_table_with_unique_index_must_work(api: &TestApi) {
                 t.add_column("id", types::primary());
                 t.add_column("authorId", types::text());
             });
-            migration.inject_custom("Create Unique Index \"introspection-engine\".\"test\" on \"Blog\"( \"authorId\")");
+            migration.inject_custom(format!("Create Unique Index \"{}\".\"test\" on \"Blog\"( \"authorId\")", SCHEMA_NAME));
         })
         .await;
 
@@ -89,7 +89,7 @@ async fn introspecting_a_table_with_multi_column_unique_index_must_work(api: &Te
                 t.add_column("lastname", types::text());
             });
             migration.inject_custom(
-                "Create Unique Index \"introspection-engine\".\"test\" on \"User\"( \"firstname\", \"lastname\")",
+                format!("Create Unique Index \"{}\".\"test\" on \"User\"( \"firstname\", \"lastname\")", SCHEMA_NAME)
             );
         })
         .await;
@@ -194,7 +194,7 @@ async fn introspecting_a_table_with_a_non_unique_index_should_work(api: &TestApi
                 t.add_column("a", types::text());
                 t.add_column("id", types::primary());
             });
-            migration.inject_custom("Create Index \"introspection-engine\".\"test\" on \"User\"(\"a\")");
+            migration.inject_custom(format!("Create Index \"{}\".\"test\" on \"User\"(\"a\")", SCHEMA_NAME));
         })
         .await;
 
@@ -219,7 +219,7 @@ async fn introspecting_a_table_with_a_multi_column_non_unique_index_should_work(
                 t.add_column("b", types::text());
                 t.add_column("id", types::primary());
             });
-            migration.inject_custom("Create Index \"introspection-engine\".\"test\" on \"User\"(\"a\",\"b\")");
+            migration.inject_custom(format!("Create Index \"{}\".\"test\" on \"User\"(\"a\",\"b\")", SCHEMA_NAME));
         })
         .await;
 
@@ -427,7 +427,7 @@ async fn introspecting_a_prisma_many_to_many_relation_should_work(api: &TestApi)
                 )
             });
             migration
-                .inject_custom("CREATE UNIQUE INDEX \"introspection-engine\".test ON \"_PostToUser\" (\"A\", \"B\");")
+                .inject_custom(format!("CREATE UNIQUE INDEX \"{}\".test ON \"_PostToUser\" (\"A\", \"B\");", SCHEMA_NAME))
         })
         .await;
 

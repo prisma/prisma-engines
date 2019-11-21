@@ -1412,6 +1412,7 @@ dependencies = [
  "sql-migration-connector 0.1.0",
  "sql-schema-describer 0.1.0",
  "test-macros 0.1.0",
+ "test-setup 0.1.0",
  "tokio 0.2.0-alpha.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "url 1.7.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "user-facing-errors 0.1.0",

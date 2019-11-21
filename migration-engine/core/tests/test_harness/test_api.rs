@@ -1,8 +1,8 @@
 use super::{
     command_helpers::{run_infer_command, InferOutput},
     misc_helpers::{
-        mysql_8_url, mysql_migration_connector, mysql_url, postgres_migration_connector, postgres_url,
-        sqlite_migration_connector, sqlite_test_file, test_api,
+        mysql_migration_connector, postgres_migration_connector, 
+        sqlite_migration_connector, test_api,
     },
     InferAndApplyOutput
 };
@@ -14,6 +14,7 @@ use migration_core::{
 use quaint::prelude::{ConnectionInfo, SqlFamily, Queryable};
 use sql_schema_describer::*;
 use std::sync::Arc;
+use test_setup::*;
 
 /// A handle to all the context needed for end-to-end testing of the migration engine across
 /// connectors.
@@ -196,7 +197,7 @@ pub async fn postgres_test_api() -> TestApi {
 }
 
 pub async fn sqlite_test_api() -> TestApi {
-    let connection_info = ConnectionInfo::from_url(&sqlite_test_file()).unwrap();
+    let connection_info = ConnectionInfo::from_url(&sqlite_test_url()).unwrap();
     let connector = sqlite_migration_connector().await;
 
     TestApi {

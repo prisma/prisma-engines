@@ -2,8 +2,6 @@ use crate::test_harness::*;
 use crate::{test_one_connector, BarrelMigrationExecutor, TestApi};
 use barrel::types;
 
-pub const SCHEMA_NAME: &str = "introspection-engine";
-
 #[test_one_connector(connector = "mysql")]
 async fn metadata_for_mysql_should_work(api: &TestApi) {
     let barrel = api.barrel();

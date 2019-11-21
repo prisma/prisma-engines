@@ -17,7 +17,7 @@ impl TestApi {
     }
 
     pub async fn introspect(&self) -> String {
-        let datamodel = self.introspection_connector.introspect(SCHEMA_NAME).await.unwrap();
+        let datamodel = dbg!(self.introspection_connector.introspect(SCHEMA_NAME).await).unwrap();
         datamodel::render_datamodel_to_string(&datamodel).expect("Datamodel rendering failed")
     }
 
