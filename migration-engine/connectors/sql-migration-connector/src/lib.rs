@@ -15,8 +15,7 @@ pub use error::*;
 pub use sql_migration::*;
 
 use migration_connector::*;
-use quaint::prelude::{ConnectionInfo, SqlFamily};
-use sql_connection::{GenericSqlConnection, SyncSqlConnection};
+use quaint::prelude::{ConnectionInfo, SqlFamily, Queryable, Quaint};
 use sql_database_migration_inferrer::*;
 use sql_database_step_applier::*;
 use sql_destructive_changes_checker::*;
@@ -26,11 +25,10 @@ use std::{fs, path::PathBuf, sync::Arc};
 
 pub type Result<T> = std::result::Result<T, SqlError>;
 
-#[allow(unused, dead_code)]
 pub struct SqlMigrationConnector {
     pub connection_info: ConnectionInfo,
     pub schema_name: String,
-    pub database: Arc<dyn SyncSqlConnection + Send + Sync + 'static>,
+    pub database: Arc<dyn Queryable + Send + Sync + 'static>,
     pub migration_persistence: Arc<dyn MigrationPersistence>,
     pub database_migration_inferrer: Arc<dyn DatabaseMigrationInferrer<SqlMigration>>,
     pub database_migration_step_applier: Arc<dyn DatabaseMigrationStepApplier<SqlMigration>>,
@@ -39,33 +37,24 @@ pub struct SqlMigrationConnector {
 }
 
 impl SqlMigrationConnector {
-    pub fn new_from_database_str(database_str: &str) -> std::result::Result<Self, ConnectorError> {
-        let connection_info = ConnectionInfo::from_url(database_str)
-            .map_err(|_err| ConnectorError::from_kind(ErrorKind::InvalidDatabaseUrl))?;
+    pub async fn new(database_str: &str) -> std::result::Result<Self, ConnectorError> {
+        let connection_info =
+            ConnectionInfo::from_url(database_str)
+            .map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
 
-        let connection = GenericSqlConnection::from_database_str(database_str, Some("lift"))
+        let connection = Quaint::new(database_str)
             .map_err(SqlError::from)
             .map_err(|err| err.into_connector_error(&connection_info))?;
 
-        Self::create_connector(connection)
+        Self::create_connector(connection).await
     }
 
-    pub fn new(datasource: &dyn datamodel::Source) -> std::result::Result<Self, ConnectorError> {
-        let connection_info = ConnectionInfo::from_url(&datasource.url().value)
-            .map_err(|_err| ConnectorError::from_kind(ErrorKind::InvalidDatabaseUrl))?;
-
-        let connection = GenericSqlConnection::from_datasource(datasource, Some("lift"))
-            .map_err(SqlError::from)
-            .map_err(|err| err.into_connector_error(&connection_info))?;
-
-        Self::create_connector(connection)
-    }
-
-    fn create_connector(connection: GenericSqlConnection) -> std::result::Result<Self, ConnectorError> {
+    async fn create_connector(connection: Quaint) -> std::result::Result<Self, ConnectorError> {
         // async connections can be lazy, so we issue a simple query to fail early if the database
         // is not reachable.
         connection
             .query_raw("SELECT 1", &[])
+            .await
             .map_err(SqlError::from)
             .map_err(|err| err.into_connector_error(&connection.connection_info()))?;
 
@@ -74,7 +63,7 @@ impl SqlMigrationConnector {
         let sql_family = connection.connection_info().sql_family();
         let connection_info = connection.connection_info().clone();
 
-        let conn = Arc::new(connection) as Arc<dyn SyncSqlConnection + Send + Sync>;
+        let conn = Arc::new(connection) as Arc<dyn Queryable + Send + Sync>;
 
         let inspector: Arc<dyn SqlSchemaDescriberBackend + Send + Sync + 'static> = match sql_family {
             SqlFamily::Mysql => Arc::new(sql_schema_describer::mysql::SqlSchemaDescriber::new(Arc::clone(&conn))),
@@ -120,25 +109,25 @@ impl SqlMigrationConnector {
         })
     }
 
-    fn create_database_impl(&self, db_name: &str) -> SqlResult<()> {
+    async fn create_database_impl(&self, db_name: &str) -> SqlResult<()> {
         match self.connection_info.sql_family() {
             SqlFamily::Postgres => {
-                self.database
-                    .query_raw(&format!("CREATE DATABASE \"{}\"", db_name), &[])?;
+                let query = format!("CREATE DATABASE \"{}\"", db_name);
+                self.database.query_raw(&query, &[]).await?;
 
                 Ok(())
             }
             SqlFamily::Sqlite => Ok(()),
             SqlFamily::Mysql => {
-                self.database
-                    .query_raw(&format!("CREATE DATABASE `{}`", db_name), &[])?;
+                let query = format!("CREATE DATABASE `{}`", db_name);
+                self.database.query_raw(&query, &[]).await?;
 
                 Ok(())
             }
         }
     }
 
-    fn initialize_impl(&self) -> SqlResult<()> {
+    async fn initialize_impl(&self) -> SqlResult<()> {
         // TODO: this code probably does not ever do anything. The schema/db creation happens already in the helper functions above.
         match &self.connection_info {
             ConnectionInfo::Sqlite { file_path, .. } => {
@@ -155,7 +144,7 @@ impl SqlMigrationConnector {
 
                 debug!("{}", schema_sql);
 
-                self.database.query_raw(&schema_sql, &[])?;
+                self.database.query_raw(&schema_sql, &[]).await?;
             }
             ConnectionInfo::Mysql(_) => {
                 let schema_sql = format!(
@@ -165,16 +154,17 @@ impl SqlMigrationConnector {
 
                 debug!("{}", schema_sql);
 
-                self.database.query_raw(&schema_sql, &[])?;
+                self.database.query_raw(&schema_sql, &[]).await?;
             }
         }
 
-        self.migration_persistence.init();
+        self.migration_persistence.init().await;
 
         Ok(())
     }
 }
 
+#[async_trait::async_trait]
 impl MigrationConnector for SqlMigrationConnector {
     type DatabaseMigration = SqlMigration;
 
@@ -182,18 +172,20 @@ impl MigrationConnector for SqlMigrationConnector {
         self.connection_info.sql_family().as_str()
     }
 
-    fn create_database(&self, db_name: &str) -> ConnectorResult<()> {
+    async fn create_database(&self, db_name: &str) -> ConnectorResult<()> {
         self.create_database_impl(db_name)
+            .await
             .map_err(|sql_error| sql_error.into_connector_error(&self.connection_info))
     }
 
-    fn initialize(&self) -> ConnectorResult<()> {
+    async fn initialize(&self) -> ConnectorResult<()> {
         self.initialize_impl()
+            .await
             .map_err(|sql_error| sql_error.into_connector_error(&self.connection_info))
     }
 
-    fn reset(&self) -> ConnectorResult<()> {
-        self.migration_persistence.reset();
+    async fn reset(&self) -> ConnectorResult<()> {
+        self.migration_persistence.reset().await;
         Ok(())
     }
 

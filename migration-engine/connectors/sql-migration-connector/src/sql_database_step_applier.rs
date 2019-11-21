@@ -1,5 +1,5 @@
 use crate::*;
-use sql_connection::SyncSqlConnection;
+use quaint::prelude::Queryable;
 use sql_renderer::SqlRenderer;
 use sql_schema_describer::*;
 use std::sync::Arc;
@@ -7,17 +7,20 @@ use std::sync::Arc;
 pub struct SqlDatabaseStepApplier {
     pub connection_info: ConnectionInfo,
     pub schema_name: String,
-    pub conn: Arc<dyn SyncSqlConnection + Send + Sync + 'static>,
+    pub conn: Arc<dyn Queryable + Send + Sync + 'static>,
 }
 
+#[async_trait::async_trait]
 impl DatabaseMigrationStepApplier<SqlMigration> for SqlDatabaseStepApplier {
-    fn apply_step(&self, database_migration: &SqlMigration, index: usize) -> ConnectorResult<bool> {
+    async fn apply_step(&self, database_migration: &SqlMigration, index: usize) -> ConnectorResult<bool> {
         self.apply_next_step(&database_migration.corrected_steps, index)
+            .await
             .map_err(|sql_error| sql_error.into_connector_error(&self.connection_info))
     }
 
-    fn unapply_step(&self, database_migration: &SqlMigration, index: usize) -> ConnectorResult<bool> {
+    async fn unapply_step(&self, database_migration: &SqlMigration, index: usize) -> ConnectorResult<bool> {
         self.apply_next_step(&database_migration.rollback, index)
+            .await
             .map_err(|sql_error| sql_error.into_connector_error(&self.connection_info))
     }
 
@@ -32,7 +35,7 @@ impl DatabaseMigrationStepApplier<SqlMigration> for SqlDatabaseStepApplier {
 }
 
 impl SqlDatabaseStepApplier {
-    fn apply_next_step(&self, steps: &Vec<SqlMigrationStep>, index: usize) -> SqlResult<bool> {
+    async fn apply_next_step(&self, steps: &Vec<SqlMigrationStep>, index: usize) -> SqlResult<bool> {
         let has_this_one = steps.get(index).is_some();
         if !has_this_one {
             return Ok(false);
@@ -42,7 +45,7 @@ impl SqlDatabaseStepApplier {
         let sql_string = render_raw_sql(&step, self.sql_family(), &self.schema_name);
         debug!("{}", sql_string);
 
-        let result = self.conn.query_raw(&sql_string, &[]);
+        let result = self.conn.query_raw(&sql_string, &[]).await;
 
         // TODO: this does not evaluate the results of SQLites PRAGMA foreign_key_check
         result?;

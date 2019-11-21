@@ -6,13 +6,12 @@ use serde::de::DeserializeOwned;
 use serde::Serialize;
 use std::convert::From;
 
-pub trait MigrationCommand<'a> {
-    type Input: DeserializeOwned + 'a;
-    type Output: Serialize;
+#[async_trait::async_trait]
+pub trait MigrationCommand {
+    type Input: DeserializeOwned;
+    type Output: Serialize + 'static;
 
-    fn new(input: &'a Self::Input) -> Box<Self>;
-
-    fn execute<C, D>(&self, engine: &MigrationEngine<C, D>) -> CommandResult<Self::Output>
+    async fn execute<C, D>(input: &Self::Input, engine: &MigrationEngine<C, D>) -> CommandResult<Self::Output>
     where
         C: MigrationConnector<DatabaseMigration = D>,
         D: DatabaseMigrationMarker + Send + Sync + 'static;

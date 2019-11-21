@@ -5,6 +5,7 @@ authors = ["Marcus Böhm <boehm@prisma.io>"]
 edition = "2018"
 
 [dependencies]
+async-trait = "0.1.17"
 migration-connector = { path = "../migration-connector" }
 sql-schema-describer = { path = "../../../libs/sql-schema-describer" }
 datamodel = { path = "../../../libs/datamodel/core" }
@@ -17,5 +18,4 @@ itertools = "0.8"
 log = "0.4"
 failure = "0.1"
 quaint = { git = "https://github.com/prisma/quaint.git" }
-sql-connection = { path  = "../../../libs/sql-connection" }
 user-facing-errors = { path = "../../../libs/user-facing-errors" }

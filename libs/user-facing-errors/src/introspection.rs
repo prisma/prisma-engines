@@ -8,5 +8,5 @@ use user_facing_error_macros::*;
 )]
 pub struct IntrospectionFailed {
     /// Generic error received from the introspection engine. Indicator of why an introspection failed.
-    introspection_error: String,
+    pub introspection_error: String,
 }

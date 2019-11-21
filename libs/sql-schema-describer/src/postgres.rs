@@ -2,39 +2,43 @@
 use super::*;
 use log::debug;
 use regex::Regex;
-use sql_connection::SyncSqlConnection;
+use quaint::prelude::Queryable;
 use std::collections::{HashMap, HashSet};
 use std::convert::TryInto;
 use std::sync::Arc;
 
 pub struct SqlSchemaDescriber {
-    conn: Arc<dyn SyncSqlConnection + Send + Sync + 'static>,
+    conn: Arc<dyn Queryable + Send + Sync + 'static>,
 }
 
+#[async_trait::async_trait]
 impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
-    fn list_databases(&self) -> SqlSchemaDescriberResult<Vec<String>> {
-        let databases = self.get_databases();
+    async fn list_databases(&self) -> SqlSchemaDescriberResult<Vec<String>> {
+        let databases = self.get_databases().await;
         Result::Ok(databases)
     }
 
-    fn get_metadata(&self, schema: &str) -> SqlSchemaDescriberResult<SQLMetadata> {
-        let count = self.get_table_names(&schema).len();
-        let size = self.get_size(&schema);
+    async fn get_metadata(&self, schema: &str) -> SqlSchemaDescriberResult<SQLMetadata> {
+        let count = self.get_table_names(&schema).await.len();
+        let size = self.get_size(&schema).await;
         Result::Ok(SQLMetadata {
             table_count: count,
             size_in_bytes: size,
         })
     }
 
-    fn describe(&self, schema: &str) -> SqlSchemaDescriberResult<SqlSchema> {
+    async fn describe(&self, schema: &str) -> SqlSchemaDescriberResult<SqlSchema> {
         debug!("describing schema '{}'", schema);
-        let sequences = self.get_sequences(schema)?;
-        let tables = self
-            .get_table_names(schema)
-            .into_iter()
-            .map(|t| self.get_table(schema, &t, &sequences))
-            .collect();
-        let enums = self.get_enums(schema)?;
+        let sequences = self.get_sequences(schema).await?;
+        let table_names = self.get_table_names(schema).await;
+
+        let mut tables = Vec::with_capacity(table_names.len());
+
+        for table_name in &table_names {
+            tables.push(self.get_table(schema, &table_name, &sequences).await);
+        }
+
+        let enums = self.get_enums(schema).await?;
         Ok(SqlSchema {
             enums,
             sequences,
@@ -45,14 +49,14 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
 
 impl SqlSchemaDescriber {
     /// Constructor.
-    pub fn new(conn: Arc<dyn SyncSqlConnection + Send + Sync + 'static>) -> SqlSchemaDescriber {
+    pub fn new(conn: Arc<dyn Queryable + Send + Sync + 'static>) -> SqlSchemaDescriber {
         SqlSchemaDescriber { conn }
     }
 
-    fn get_databases(&self) -> Vec<String> {
+    async fn get_databases(&self) -> Vec<String> {
         debug!("Getting table names");
         let sql = "select schema_name from information_schema.schemata;";
-        let rows = self.conn.query_raw(sql, &[]).expect("get schema names ");
+        let rows = self.conn.query_raw(sql, &[]).await.expect("get schema names ");
         let names = rows
             .into_iter()
             .map(|row| {
@@ -66,14 +70,18 @@ impl SqlSchemaDescriber {
         names
     }
 
-    fn get_table_names(&self, schema: &str) -> Vec<String> {
+    async fn get_table_names(&self, schema: &str) -> Vec<String> {
         debug!("Getting table names");
         let sql = "SELECT table_name as table_name FROM information_schema.tables
             WHERE table_schema = $1
             -- Views are not supported yet
             AND table_type = 'BASE TABLE'
             ORDER BY table_name";
-        let rows = self.conn.query_raw(sql, &[schema.into()]).expect("get table names ");
+        let rows = self
+            .conn
+            .query_raw(sql, &[schema.into()])
+            .await
+            .expect("get table names ");
         let names = rows
             .into_iter()
             .map(|row| {
@@ -87,13 +95,13 @@ impl SqlSchemaDescriber {
         names
     }
 
-    fn get_size(&self, schema: &str) -> usize {
+    async fn get_size(&self, schema: &str) -> usize {
         debug!("Getting db size");
         let sql =
             "SELECT SUM(pg_total_relation_size(quote_ident(schemaname) || '.' || quote_ident(tablename)))::BIGINT as size
              FROM pg_tables 
              WHERE schemaname = $1::text";
-        let result = self.conn.query_raw(sql, &[schema.into()]).expect("get db size ");
+        let result = self.conn.query_raw(sql, &[schema.into()]).await.expect("get db size ");
         let size: i64 = result
             .first()
             .map(|row| {
@@ -107,11 +115,11 @@ impl SqlSchemaDescriber {
         size.try_into().unwrap()
     }
 
-    fn get_table(&self, schema: &str, name: &str, sequences: &Vec<Sequence>) -> Table {
+    async fn get_table(&self, schema: &str, name: &str, sequences: &Vec<Sequence>) -> Table {
         debug!("Getting table '{}'", name);
-        let columns = self.get_columns(schema, name);
-        let (indices, primary_key) = self.get_indices(schema, name, sequences);
-        let foreign_keys = self.get_foreign_keys(schema, name);
+        let columns = self.get_columns(schema, name).await;
+        let (indices, primary_key) = self.get_indices(schema, name, sequences).await;
+        let foreign_keys = self.get_foreign_keys(schema, name).await;
         Table {
             name: name.to_string(),
             columns,
@@ -121,7 +129,7 @@ impl SqlSchemaDescriber {
         }
     }
 
-    fn get_columns(&self, schema: &str, table: &str) -> Vec<Column> {
+    async fn get_columns(&self, schema: &str, table: &str) -> Vec<Column> {
         let sql = "SELECT column_name, udt_name, column_default, is_nullable, is_identity, data_type
             FROM information_schema.columns
             WHERE table_schema = $1 AND table_name = $2
@@ -129,6 +137,7 @@ impl SqlSchemaDescriber {
         let rows = self
             .conn
             .query_raw(&sql, &[schema.into(), table.into()])
+            .await
             .expect("querying for columns");
         let cols = rows
             .into_iter()
@@ -194,7 +203,7 @@ impl SqlSchemaDescriber {
         cols
     }
 
-    fn get_foreign_keys(&self, schema: &str, table: &str) -> Vec<ForeignKey> {
+    async fn get_foreign_keys(&self, schema: &str, table: &str) -> Vec<ForeignKey> {
         let sql = "SELECT 
                 con.oid as \"con_id\",
                 att2.attname as \"child_column\", 
@@ -235,6 +244,7 @@ impl SqlSchemaDescriber {
         let result_set = self
             .conn
             .query_raw(&sql, &[table.into(), schema.into()])
+            .await
             .expect("querying for foreign keys");
         let mut intermediate_fks: HashMap<i64, ForeignKey> = HashMap::new();
         for row in result_set.into_iter() {
@@ -302,7 +312,7 @@ impl SqlSchemaDescriber {
         fks
     }
 
-    fn get_indices(
+    async fn get_indices(
         &self,
         schema: &str,
         table_name: &str,
@@ -340,43 +350,43 @@ impl SqlSchemaDescriber {
         let rows = self
             .conn
             .query_raw(&sql, &[schema.into(), table_name.into()])
+            .await
             .expect("querying for indices");
         let mut pk: Option<PrimaryKey> = None;
-        let indices = rows
-            .into_iter()
-            .filter_map(|index| {
-                debug!("Got index: {:?}", index);
-                let is_pk = index
-                    .get("is_primary_key")
-                    .and_then(|x| x.as_bool())
-                    .expect("get is_primary_key");
-                // TODO: Implement and use as_slice instead of into_vec, to avoid cloning
-                let columns = index
-                    .get("column_names")
-                    .and_then(|x| x.clone().into_vec::<String>())
-                    .expect("column_names");
-                if is_pk {
-                    pk = Some(self.infer_primary_key(schema, table_name, columns, sequences));
-                    None
-                } else {
-                    let is_unique = index.get("is_unique").and_then(|x| x.as_bool()).expect("is_unique");
-                    Some(Index {
-                        name: index.get("name").and_then(|x| x.to_string()).expect("name"),
-                        columns,
-                        tpe: match is_unique {
-                            true => IndexType::Unique,
-                            false => IndexType::Normal,
-                        },
-                    })
-                }
-            })
-            .collect();
+
+        let mut indices = Vec::new();
+
+        for index in rows {
+            debug!("Got index: {:?}", index);
+            let is_pk = index
+                .get("is_primary_key")
+                .and_then(|x| x.as_bool())
+                .expect("get is_primary_key");
+            // TODO: Implement and use as_slice instead of into_vec, to avoid cloning
+            let columns = index
+                .get("column_names")
+                .and_then(|x| x.clone().into_vec::<String>())
+                .expect("column_names");
+            if is_pk {
+                pk = Some(self.infer_primary_key(schema, table_name, columns, sequences).await);
+            } else {
+                let is_unique = index.get("is_unique").and_then(|x| x.as_bool()).expect("is_unique");
+                indices.push(Index {
+                    name: index.get("name").and_then(|x| x.to_string()).expect("name"),
+                    columns,
+                    tpe: match is_unique {
+                        true => IndexType::Unique,
+                        false => IndexType::Normal,
+                    },
+                })
+            }
+        }
 
         debug!("Found table indices: {:?}, primary key: {:?}", indices, pk);
         (indices, pk)
     }
 
-    fn infer_primary_key(
+    async fn infer_primary_key(
         &self,
         schema: &str,
         table_name: &str,
@@ -396,6 +406,7 @@ impl SqlSchemaDescriber {
             let rows = self
                 .conn
                 .query_raw(&sql, &[])
+                .await
                 .expect("querying for sequence seeding primary key column");
             // Given the result rows, find any sequence
             rows.into_iter().fold(None, |_: Option<Sequence>, row| {
@@ -418,7 +429,7 @@ impl SqlSchemaDescriber {
         PrimaryKey { columns, sequence }
     }
 
-    fn get_sequences(&self, schema: &str) -> SqlSchemaDescriberResult<Vec<Sequence>> {
+    async fn get_sequences(&self, schema: &str) -> SqlSchemaDescriberResult<Vec<Sequence>> {
         debug!("Getting sequences");
         let sql = "SELECT start_value, sequence_name
                   FROM information_schema.sequences
@@ -426,6 +437,7 @@ impl SqlSchemaDescriber {
         let rows = self
             .conn
             .query_raw(&sql, &[schema.into()])
+            .await
             .expect("querying for sequences");
         let sequences = rows
             .into_iter()
@@ -453,14 +465,18 @@ impl SqlSchemaDescriber {
         Ok(sequences)
     }
 
-    fn get_enums(&self, schema: &str) -> SqlSchemaDescriberResult<Vec<Enum>> {
+    async fn get_enums(&self, schema: &str) -> SqlSchemaDescriberResult<Vec<Enum>> {
         debug!("Getting enums");
         let sql = "SELECT t.typname as name, e.enumlabel as value
             FROM pg_type t 
             JOIN pg_enum e ON t.oid = e.enumtypid  
             JOIN pg_catalog.pg_namespace n ON n.oid = t.typnamespace
             WHERE n.nspname = $1";
-        let rows = self.conn.query_raw(&sql, &[schema.into()]).expect("querying for enums");
+        let rows = self
+            .conn
+            .query_raw(&sql, &[schema.into()])
+            .await
+            .expect("querying for enums");
         let mut enum_values: HashMap<String, HashSet<String>> = HashMap::new();
         for row in rows.into_iter() {
             debug!("Got enum row: {:?}", row);

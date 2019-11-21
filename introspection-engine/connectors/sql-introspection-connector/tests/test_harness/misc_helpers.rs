@@ -1,8 +1,12 @@
-use crate::test_harness::{GenericSqlConnection, SyncSqlConnection};
+use quaint::prelude::*;
 use barrel::Migration;
+use once_cell::sync::Lazy;
 use pretty_assertions::assert_eq;
 use std::{rc::Rc, sync::Arc};
 use url::Url;
+
+pub static TEST_ASYNC_RUNTIME: Lazy<tokio::runtime::Runtime> =
+    Lazy::new(|| tokio::runtime::Runtime::new().expect("failed to start tokio test runtime"));
 
 pub(crate) fn custom_assert(left: &str, right: &str) {
     let parsed_expected = datamodel::parse_datamodel(&right).unwrap();
@@ -12,10 +16,10 @@ pub(crate) fn custom_assert(left: &str, right: &str) {
     assert_eq!(left, reformatted_expected);
 }
 
-fn run_full_sql(database: &Arc<dyn SyncSqlConnection + Send + Sync>, full_sql: &str) {
+async fn run_full_sql(database: &Arc<dyn Queryable + Send + Sync>, full_sql: &str) {
     for sql in full_sql.split(";") {
         if sql != "" {
-            database.query_raw(&sql, &[]).unwrap();
+            database.query_raw(&sql, &[]).await.unwrap();
         }
     }
 }
@@ -23,73 +27,73 @@ fn run_full_sql(database: &Arc<dyn SyncSqlConnection + Send + Sync>, full_sql: &
 // barrel
 
 pub struct BarrelMigrationExecutor {
-    pub(super) database: Arc<dyn SyncSqlConnection + Send + Sync>,
+    pub(super) database: Arc<dyn Queryable + Send + Sync>,
     pub(super) sql_variant: barrel::backend::SqlVariant,
 }
 
 impl BarrelMigrationExecutor {
-    pub fn execute<F>(&self, mut migration_fn: F)
+    pub async fn execute<F>(&self, mut migration_fn: F)
     where
         F: FnMut(&mut Migration) -> (),
     {
         let mut migration = Migration::new().schema(SCHEMA_NAME);
         migration_fn(&mut migration);
         let full_sql = dbg!(migration.make_from(self.sql_variant));
-        run_full_sql(&self.database, &full_sql);
+        run_full_sql(&self.database, &full_sql).await;
     }
 }
 
 // get dbs
 
-pub fn database(database_url: &str) -> Box<dyn SyncSqlConnection + Send + Sync + 'static> {
+pub async fn database(database_url: &str) -> Box<dyn Queryable + Send + Sync + 'static> {
     let url: Url = database_url.parse().unwrap();
 
-    match url.scheme() {
+    let boxed: Box<dyn Queryable + Send + Sync + 'static> = match url.scheme() {
         "postgresql" | "postgres" => {
-            let url = Url::parse(database_url).unwrap();
             let create_cmd = |name| format!("CREATE DATABASE \"{}\"", name);
 
-            let connect_cmd = |url: Url| GenericSqlConnection::from_database_str(url.as_str(), None);
+            let connect_cmd = |url: Url| Quaint::new(url.as_str());
 
-            let conn = with_database(url, "postgres", "postgres", create_cmd, Rc::new(connect_cmd));
+            let conn = with_database(url, "postgres", "postgres", create_cmd, Rc::new(connect_cmd)).await;
 
             Box::new(conn)
         }
         "mysql" => {
-            let url = Url::parse(database_url).unwrap();
             let create_cmd = |name| format!("CREATE DATABASE `{}`", name);
 
-            let connect_cmd = |url: Url| GenericSqlConnection::from_database_str(url.as_str(), None);
+            let connect_cmd = |url: Url| Quaint::new(url.as_str());
 
-            let conn = with_database(url, "mysql", "/", create_cmd, Rc::new(connect_cmd));
+            let conn = with_database(url, "mysql", "/", create_cmd, Rc::new(connect_cmd)).await;
 
             Box::new(conn)
         }
         "file" | "sqlite" => {
-            Box::new(GenericSqlConnection::from_database_str(database_url, Some("introspection-engine")).unwrap())
+            Box::new(Quaint::new(url.as_str()).unwrap())
         }
         scheme => panic!("Unknown scheme `{}° in database URL: {}", scheme, url.as_str()),
-    }
+    };
+
+    boxed
 }
 
-fn with_database<F, T, S>(url: Url, default_name: &str, root_path: &str, create_stmt: S, f: Rc<F>) -> T
+async fn with_database<F, T, S>(url: Url, default_name: &str, root_path: &str, create_stmt: S, f: Rc<F>) -> T
 where
-    T: SyncSqlConnection,
+    T: Queryable,
     F: Fn(Url) -> Result<T, quaint::error::Error>,
     S: FnOnce(String) -> String,
 {
     match f(url.clone()) {
         Ok(conn) => conn,
         Err(_) => {
-            create_database(url.clone(), default_name, root_path, create_stmt, f.clone());
+            create_database(url.clone(), default_name, root_path, create_stmt, f.clone()).await;
             f(url).unwrap()
         }
     }
 }
 
-fn create_database<F, T, S>(url: Url, default_name: &str, root_path: &str, create_stmt: S, f: Rc<F>)
+async fn create_database<F, T, S>(url: Url, default_name: &str, root_path: &str, create_stmt: S, f: Rc<F>)
 where
-    T: SyncSqlConnection,
+    T: Queryable,
     F: Fn(Url) -> Result<T, quaint::error::Error>,
     S: FnOnce(String) -> String,
 {
@@ -100,7 +104,7 @@ where
 
     let conn = f(url).unwrap();
 
-    conn.execute_raw(&create_stmt(db_name), &[]).unwrap();
+    conn.execute_raw(&create_stmt(db_name), &[]).await.unwrap();
 }
 
 fn fetch_db_name(url: &Url, default: &str) -> String {
@@ -116,7 +120,7 @@ fn fetch_db_name(url: &Url, default: &str) -> String {
 pub const SCHEMA_NAME: &str = "introspection-engine";
 
 pub fn sqlite_test_url() -> String {
-    format!("file:{}", sqlite_test_file())
+    format!("file:{}?db_name={}", sqlite_test_file(), SCHEMA_NAME)
 }
 
 pub fn sqlite_test_file() -> String {

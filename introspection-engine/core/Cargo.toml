@@ -7,10 +7,10 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+async-trait = "0.1.17"
 introspection-connector = { path = "../connectors/introspection-connector" }
 sql-introspection-connector = { path = "../connectors/sql-introspection-connector" }
 datamodel = { path = "../../libs/datamodel/core" }
-url = "1.7"
 failure = "0.1"
 
 jsonrpc-core = "13.0"
@@ -22,6 +22,8 @@ serde = "1.0"
 serde_json = "1.0"
 serde_derive = "1.0"
 
+tokio = { package = "tokio", version = "0.2.0-alpha.6" }
+user-facing-errors = { path = "../../libs/user-facing-errors" }
 
 [[bin]]
 name = "introspection-engine"

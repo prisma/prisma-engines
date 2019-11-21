@@ -4,15 +4,14 @@ use super::{
         mysql_8_url, mysql_migration_connector, mysql_url, postgres_migration_connector, postgres_url,
         sqlite_migration_connector, sqlite_test_file, test_api,
     },
-    InferAndApplyOutput, SCHEMA_NAME,
+    InferAndApplyOutput
 };
 use migration_connector::{MigrationPersistence, MigrationStep};
 use migration_core::{
     api::{GenericApi, MigrationApi},
     commands::{ApplyMigrationInput, InferMigrationStepsInput, UnapplyMigrationInput, UnapplyMigrationOutput},
 };
-use quaint::prelude::{ConnectionInfo, SqlFamily};
-use sql_connection::SyncSqlConnection;
+use quaint::prelude::{ConnectionInfo, SqlFamily, Queryable};
 use sql_schema_describer::*;
 use std::sync::Arc;
 
@@ -20,18 +19,26 @@ use std::sync::Arc;
 /// connectors.
 pub struct TestApi {
     sql_family: SqlFamily,
-    database: Arc<dyn SyncSqlConnection + Send + Sync + 'static>,
+    database: Arc<dyn Queryable + Send + Sync + 'static>,
     api: MigrationApi<sql_migration_connector::SqlMigrationConnector, sql_migration_connector::SqlMigration>,
     connection_info: Option<ConnectionInfo>,
 }
 
 impl TestApi {
-    pub fn database(&self) -> &Arc<dyn SyncSqlConnection + Send + Sync + 'static> {
+    pub fn schema_name(&self) -> &str {
+        self.connection_info.as_ref().unwrap().schema_name()
+    }
+
+    pub fn database(&self) -> &Arc<dyn Queryable + Send + Sync + 'static> {
         &self.database
     }
 
     pub fn is_sqlite(&self) -> bool {
         self.sql_family == SqlFamily::Sqlite
+    }
+
+    pub fn is_mysql(&self) -> bool {
+        self.sql_family == SqlFamily::Mysql
     }
 
     pub fn migration_persistence(&self) -> Arc<dyn MigrationPersistence> {
@@ -53,7 +60,7 @@ impl TestApi {
             force: None,
         };
 
-        let migration_output = self.api.apply_migration(&input).expect("ApplyMigration failed");
+        let migration_output = self.api.apply_migration(&input).await.expect("ApplyMigration failed");
 
         assert!(
             migration_output.general_errors.is_empty(),
@@ -64,7 +71,7 @@ impl TestApi {
         );
 
         InferAndApplyOutput {
-            sql_schema: self.introspect_database(),
+            sql_schema: self.introspect_database().await,
             migration_output,
         }
     }
@@ -87,30 +94,32 @@ impl TestApi {
         self.apply_migration(steps, migration_id).await
     }
 
-    pub fn execute_command<'a, C>(&self, input: &'a C::Input) -> Result<C::Output, user_facing_errors::Error>
+    pub async fn execute_command<'a, C>(&self, input: &'a C::Input) -> Result<C::Output, user_facing_errors::Error>
     where
-        C: migration_core::commands::MigrationCommand<'a>,
+        C: migration_core::commands::MigrationCommand,
     {
         self.api
             .handle_command::<C>(input)
+            .await
             .map_err(|err| self.api.render_error(err))
     }
 
     pub async fn run_infer_command(&self, input: InferMigrationStepsInput) -> InferOutput {
-        run_infer_command(&self.api, input)
+        run_infer_command(&self.api, input).await
     }
 
     pub async fn unapply_migration(&self) -> UnapplyOutput {
         let input = UnapplyMigrationInput {};
-        let output = self.api.unapply_migration(&input).unwrap();
+        let output = self.api.unapply_migration(&input).await.unwrap();
 
-        let sql_schema = self.introspect_database();
+        let sql_schema = self.introspect_database().await;
 
         UnapplyOutput { sql_schema, output }
     }
 
     pub fn barrel(&self) -> BarrelMigrationExecutor {
         BarrelMigrationExecutor {
+            schema_name: self.connection_info().unwrap().schema_name().to_owned(),
             inspector: self.inspector(),
             database: Arc::clone(&self.database),
             sql_variant: match self.sql_family {
@@ -136,10 +145,11 @@ impl TestApi {
         }
     }
 
-    fn introspect_database(&self) -> SqlSchema {
+    async fn introspect_database(&self) -> SqlSchema {
         let mut result = self
             .inspector()
-            .describe(&SCHEMA_NAME.to_string())
+            .describe(self.connection_info().unwrap().schema_name())
+            .await
             .expect("Introspection failed");
 
         // the presence of the _Migration table makes assertions harder. Therefore remove it from the result.
@@ -149,74 +159,76 @@ impl TestApi {
     }
 }
 
-pub fn mysql_8_test_api() -> TestApi {
+pub async fn mysql_8_test_api() -> TestApi {
     let connection_info = ConnectionInfo::from_url(&mysql_8_url()).unwrap();
-    let connector = mysql_migration_connector(&mysql_8_url());
+    let connector = mysql_migration_connector(&mysql_8_url()).await;
 
     TestApi {
         connection_info: Some(connection_info),
         sql_family: SqlFamily::Mysql,
         database: Arc::clone(&connector.database),
-        api: test_api(connector),
+        api: test_api(connector).await,
     }
 }
 
-pub fn mysql_test_api() -> TestApi {
+pub async fn mysql_test_api() -> TestApi {
     let connection_info = ConnectionInfo::from_url(&mysql_url()).unwrap();
-    let connector = mysql_migration_connector(&mysql_url());
+    let connector = mysql_migration_connector(&mysql_url()).await;
 
     TestApi {
         connection_info: Some(connection_info),
         sql_family: SqlFamily::Mysql,
         database: Arc::clone(&connector.database),
-        api: test_api(connector),
+        api: test_api(connector).await,
     }
 }
 
-pub fn postgres_test_api() -> TestApi {
+pub async fn postgres_test_api() -> TestApi {
     let connection_info = ConnectionInfo::from_url(&postgres_url()).unwrap();
-    let connector = postgres_migration_connector(&postgres_url());
+    let connector = postgres_migration_connector(&postgres_url()).await;
 
     TestApi {
         connection_info: Some(connection_info),
         sql_family: SqlFamily::Postgres,
         database: Arc::clone(&connector.database),
-        api: test_api(connector),
+        api: test_api(connector).await,
     }
 }
 
-pub fn sqlite_test_api() -> TestApi {
+pub async fn sqlite_test_api() -> TestApi {
     let connection_info = ConnectionInfo::from_url(&sqlite_test_file()).unwrap();
-    let connector = sqlite_migration_connector();
+    let connector = sqlite_migration_connector().await;
 
     TestApi {
         connection_info: Some(connection_info),
         sql_family: SqlFamily::Sqlite,
         database: Arc::clone(&connector.database),
-        api: test_api(connector),
+        api: test_api(connector).await,
     }
 }
 
 pub struct BarrelMigrationExecutor {
     inspector: Box<dyn SqlSchemaDescriberBackend>,
-    database: Arc<dyn SyncSqlConnection + Send + Sync>,
+    database: Arc<dyn Queryable + Send + Sync>,
     sql_variant: barrel::backend::SqlVariant,
+    schema_name: String,
 }
 
 impl BarrelMigrationExecutor {
-    pub fn execute<F>(&self, mut migration_fn: F) -> SqlSchema
+    pub async fn execute<F>(&self, mut migration_fn: F) -> SqlSchema
     where
         F: FnMut(&mut barrel::Migration) -> (),
     {
         use barrel::Migration;
 
-        let mut migration = Migration::new().schema(SCHEMA_NAME);
+        let mut migration = Migration::new().schema(&self.schema_name);
         migration_fn(&mut migration);
         let full_sql = migration.make_from(self.sql_variant);
-        run_full_sql(&self.database, &full_sql);
+        run_full_sql(&self.database, &full_sql).await;
         let mut result = self
             .inspector
-            .describe(&SCHEMA_NAME.to_string())
+            .describe(&self.schema_name)
+            .await
             .expect("Introspection failed");
 
         // The presence of the _Migration table makes assertions harder. Therefore remove it.
@@ -225,9 +237,9 @@ impl BarrelMigrationExecutor {
     }
 }
 
-fn run_full_sql(database: &Arc<dyn SyncSqlConnection + Send + Sync>, full_sql: &str) {
+async fn run_full_sql(database: &Arc<dyn Queryable + Send + Sync>, full_sql: &str) {
     for sql in full_sql.split(";").filter(|sql| !sql.is_empty()) {
-        database.query_raw(&sql, &[]).unwrap();
+        database.query_raw(&sql, &[]).await.unwrap();
     }
 }
 

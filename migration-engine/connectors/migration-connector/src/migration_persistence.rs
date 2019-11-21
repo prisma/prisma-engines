@@ -4,55 +4,59 @@ use datamodel::{ast::SchemaAst, Datamodel};
 use serde::Serialize;
 
 /// This trait is implemented by each connector. It provides a generic API to store and retrieve [Migration](struct.Migration.html) records.
+#[async_trait::async_trait]
 pub trait MigrationPersistence: Send + Sync + 'static {
     /// Initialize migration persistence state. E.g. create the migrations table in an SQL database.
-    fn init(&self);
+    async fn init(&self);
 
     /// Drop all persisted state.
-    fn reset(&self);
+    async fn reset(&self);
 
     /// Returns the currently active Datamodel.
-    fn current_datamodel(&self) -> Datamodel {
-        self.last().map(|m| m.datamodel).unwrap_or_else(Datamodel::empty)
+    async fn current_datamodel(&self) -> Datamodel {
+        self.last().await.map(|m| m.datamodel).unwrap_or_else(Datamodel::empty)
     }
 
-    fn current_datamodel_ast(&self) -> SchemaAst {
+    async fn current_datamodel_ast(&self) -> SchemaAst {
         self.last()
+            .await
             .and_then(|m| datamodel::ast::parser::parse(&m.datamodel_string).ok())
             .unwrap_or_else(SchemaAst::empty)
     }
 
-    fn last_non_watch_applied_migration(&self) -> Option<Migration> {
+    async fn last_non_watch_applied_migration(&self) -> Option<Migration> {
         self.load_all()
+            .await
             .into_iter()
             .rev()
             .find(|migration| !migration.is_watch_migration() && migration.status == MigrationStatus::MigrationSuccess)
     }
 
-    fn last_non_watch_migration(&self) -> Option<Migration> {
-        let mut all_migrations = self.load_all();
+    async fn last_non_watch_migration(&self) -> Option<Migration> {
+        let mut all_migrations = self.load_all().await;
         all_migrations.reverse();
         all_migrations.into_iter().find(|m| !m.is_watch_migration())
     }
 
-    fn last_non_watch_datamodel(&self) -> Datamodel {
+    async fn last_non_watch_datamodel(&self) -> Datamodel {
         self.last_non_watch_migration()
+            .await
             .map(|m| m.datamodel)
             .unwrap_or_else(Datamodel::empty)
     }
 
     /// Returns the last successful Migration.
-    fn last(&self) -> Option<Migration>;
+    async fn last(&self) -> Option<Migration>;
 
     /// Fetch a migration by name.
-    fn by_name(&self, name: &str) -> Option<Migration>;
+    async fn by_name(&self, name: &str) -> Option<Migration>;
 
     /// This powers the listMigrations command.
-    fn load_all(&self) -> Vec<Migration>;
+    async fn load_all(&self) -> Vec<Migration>;
 
     /// Load all current trailing watch migrations from Migration Event Log.
-    fn load_current_watch_migrations(&self) -> Vec<Migration> {
-        let mut all_migrations = self.load_all();
+    async fn load_current_watch_migrations(&self) -> Vec<Migration> {
+        let mut all_migrations = self.load_all().await;
         let mut result = Vec::new();
         // start to take all migrations from the back until we hit a migration that is not watch
         all_migrations.reverse();
@@ -69,11 +73,11 @@ pub trait MigrationPersistence: Send + Sync + 'static {
     }
 
     /// Write the migration to the Migration table.
-    fn create(&self, migration: Migration) -> Migration;
+    async fn create(&self, migration: Migration) -> Migration;
 
     /// Used by the MigrationApplier to write the progress of a [Migration](struct.Migration.html)
     /// into the database.
-    fn update(&self, params: &MigrationUpdateParams);
+    async fn update(&self, params: &MigrationUpdateParams);
 }
 
 /// The representation of a migration as persisted through [MigrationPersistence](trait.MigrationPersistence.html).
@@ -212,32 +216,33 @@ impl MigrationStatus {
 /// A no-op implementor of [MigrationPersistence](trait.MigrationPersistence.html).
 pub struct EmptyMigrationPersistence {}
 
+#[async_trait::async_trait]
 impl MigrationPersistence for EmptyMigrationPersistence {
-    fn init(&self) {}
+    async fn init(&self) {}
 
-    fn reset(&self) {}
+    async fn reset(&self) {}
 
-    fn last(&self) -> Option<Migration> {
+    async fn last(&self) -> Option<Migration> {
         None
     }
 
-    fn by_name(&self, _name: &str) -> Option<Migration> {
+    async fn by_name(&self, _name: &str) -> Option<Migration> {
         None
     }
 
-    fn load_all(&self) -> Vec<Migration> {
+    async fn load_all(&self) -> Vec<Migration> {
         Vec::new()
     }
 
-    fn create(&self, _migration: Migration) -> Migration {
+    async fn create(&self, _migration: Migration) -> Migration {
         unimplemented!("Not allowed on a EmptyMigrationPersistence")
     }
 
-    fn update(&self, _params: &MigrationUpdateParams) {
+    async fn update(&self, _params: &MigrationUpdateParams) {
         unimplemented!("Not allowed on a EmptyMigrationPersistence")
     }
 
-    fn current_datamodel_ast(&self) -> datamodel::ast::SchemaAst {
+    async fn current_datamodel_ast(&self) -> datamodel::ast::SchemaAst {
         datamodel::ast::SchemaAst { tops: Vec::new() }
     }
 }

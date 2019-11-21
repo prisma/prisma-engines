@@ -8,6 +8,7 @@ pub mod migration_engine;
 use crate::api::RpcApi;
 use commands::*;
 use datamodel::{self, error::ErrorCollection, Datamodel};
+use futures::FutureExt;
 use log::*;
 use std::{fs, io, io::Read};
 
@@ -32,7 +33,8 @@ pub(crate) fn pretty_print_errors(errors: ErrorCollection, datamodel: &str) {
     }
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let original_hook = std::panic::take_hook();
 
     std::panic::set_hook(Box::new(move |panic| {
@@ -56,7 +58,10 @@ fn main() {
     } else if let Some(matches) = matches.subcommand_matches("cli") {
         let datasource = matches.value_of("datasource").unwrap();
 
-        match std::panic::catch_unwind(|| cli::run(&matches, &datasource)) {
+        match std::panic::AssertUnwindSafe(cli::run(&matches, &datasource))
+            .catch_unwind()
+            .await
+        {
             Ok(Ok(msg)) => {
                 info!("{}", msg);
                 std::process::exit(0);
@@ -86,13 +91,13 @@ fn main() {
         file.read_to_string(&mut datamodel).unwrap();
 
         if matches.is_present("single_cmd") {
-            let api = RpcApi::new_sync(&datamodel).unwrap();
+            let api = RpcApi::new(&datamodel).await.unwrap();
             let response = api.handle().unwrap();
 
             println!("{}", response);
         } else {
-            match RpcApi::new_async(&datamodel) {
-                Ok(api) => api.start_server(),
+            match RpcApi::new(&datamodel).await {
+                Ok(api) => api.start_server().await,
                 Err(Error::DatamodelError(errors)) => {
                     pretty_print_errors(errors, &datamodel);
                     std::process::exit(1);

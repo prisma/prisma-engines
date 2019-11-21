@@ -8,12 +8,12 @@ use migration_core::{
 };
 use pretty_assertions::assert_eq;
 use serde_json::json;
-use sql_connection::SyncSqlConnection;
+use quaint::prelude::*;
 use test_harness::*;
 use url::Url;
 
-#[test]
-fn authentication_failure_must_return_a_known_error_on_postgres() {
+#[tokio::test]
+async fn authentication_failure_must_return_a_known_error_on_postgres() {
     let mut url: Url = postgres_url().parse().unwrap();
 
     url.set_password(Some("obviously-not-right")).unwrap();
@@ -28,7 +28,7 @@ fn authentication_failure_must_return_a_known_error_on_postgres() {
         url
     );
 
-    let error = RpcApi::new_async(&dm).map(|_| ()).unwrap_err();
+    let error = RpcApi::new(&dm).await.map(|_| ()).unwrap_err();
 
     let user = url.username();
     let host = url.host().unwrap().to_string();
@@ -46,8 +46,8 @@ fn authentication_failure_must_return_a_known_error_on_postgres() {
     assert_eq!(json_error, expected);
 }
 
-#[test]
-fn authentication_failure_must_return_a_known_error_on_mysql() {
+#[tokio::test]
+async fn authentication_failure_must_return_a_known_error_on_mysql() {
     let mut url: Url = mysql_url().parse().unwrap();
 
     url.set_password(Some("obviously-not-right")).unwrap();
@@ -62,7 +62,7 @@ fn authentication_failure_must_return_a_known_error_on_mysql() {
         url
     );
 
-    let error = RpcApi::new_async(&dm).map(|_| ()).unwrap_err();
+    let error = RpcApi::new(&dm).await.map(|_| ()).unwrap_err();
 
     let user = url.username();
     let host = url.host().unwrap().to_string();
@@ -80,8 +80,8 @@ fn authentication_failure_must_return_a_known_error_on_mysql() {
     assert_eq!(json_error, expected);
 }
 
-#[test]
-fn unreachable_database_must_return_a_proper_error_on_mysql() {
+#[tokio::test]
+async fn unreachable_database_must_return_a_proper_error_on_mysql() {
     let mut url: Url = mysql_url().parse().unwrap();
 
     url.set_port(Some(8787)).unwrap();
@@ -96,7 +96,7 @@ fn unreachable_database_must_return_a_proper_error_on_mysql() {
         url
     );
 
-    let error = RpcApi::new_async(&dm).map(|_| ()).unwrap_err();
+    let error = RpcApi::new(&dm).await.map(|_| ()).unwrap_err();
 
     let port = url.port().unwrap();
     let host = url.host().unwrap().to_string();
@@ -114,8 +114,8 @@ fn unreachable_database_must_return_a_proper_error_on_mysql() {
     assert_eq!(json_error, expected);
 }
 
-#[test]
-fn unreachable_database_must_return_a_proper_error_on_postgres() {
+#[tokio::test]
+async fn unreachable_database_must_return_a_proper_error_on_postgres() {
     let mut url: Url = postgres_url().parse().unwrap();
 
     url.set_port(Some(8787)).unwrap();
@@ -130,7 +130,7 @@ fn unreachable_database_must_return_a_proper_error_on_postgres() {
         url
     );
 
-    let error = RpcApi::new_async(&dm).map(|_| ()).unwrap_err();
+    let error = RpcApi::new(&dm).await.map(|_| ()).unwrap_err();
 
     let host = url.host().unwrap().to_string();
     let port = url.port().unwrap();
@@ -148,8 +148,8 @@ fn unreachable_database_must_return_a_proper_error_on_postgres() {
     assert_eq!(json_error, expected);
 }
 
-#[test]
-fn database_does_not_exist_must_return_a_proper_error() {
+#[tokio::test]
+async fn database_does_not_exist_must_return_a_proper_error() {
     let mut url: Url = mysql_url().parse().unwrap();
     let database_name = "notmydatabase";
 
@@ -165,7 +165,7 @@ fn database_does_not_exist_must_return_a_proper_error() {
         url
     );
 
-    let error = RpcApi::new_async(&dm).map(|_| ()).unwrap_err();
+    let error = RpcApi::new(&dm).await.map(|_| ()).unwrap_err();
 
     let json_error = serde_json::to_value(&render_error(error)).unwrap();
     let expected = json!({
@@ -181,10 +181,10 @@ fn database_does_not_exist_must_return_a_proper_error() {
     assert_eq!(json_error, expected);
 }
 
-#[test]
-fn database_already_exists_must_return_a_proper_error() {
+#[tokio::test]
+async fn database_already_exists_must_return_a_proper_error() {
     let url = postgres_url();
-    let error = get_cli_error(&["migration-engine", "cli", "--datasource", &url, "--create_database"]);
+    let error = get_cli_error(&["migration-engine", "cli", "--datasource", &url, "--create_database"]).await;
 
     let (host, port) = {
         let url = Url::parse(&url).unwrap();
@@ -206,12 +206,13 @@ fn database_already_exists_must_return_a_proper_error() {
     assert_eq!(json_error, expected);
 }
 
-#[test]
-fn database_access_denied_must_return_a_proper_error_in_cli() {
-    let conn = sql_connection::GenericSqlConnection::from_database_str(&mysql_url(), None).unwrap();
+#[tokio::test]
+async fn database_access_denied_must_return_a_proper_error_in_cli() {
+    let conn = Quaint::new(&mysql_url()).unwrap();
 
-    conn.execute_raw("DROP USER IF EXISTS jeanmichel", &[]).unwrap();
+    conn.execute_raw("DROP USER IF EXISTS jeanmichel", &[]).await.unwrap();
     conn.execute_raw("CREATE USER jeanmichel IDENTIFIED BY '1234'", &[])
+        .await
         .unwrap();
 
     let mut url: Url = mysql_url().parse().unwrap();
@@ -225,7 +226,8 @@ fn database_access_denied_must_return_a_proper_error_in_cli() {
         "--datasource",
         url.as_str(),
         "--can_connect_to_database",
-    ]);
+    ])
+    .await;
 
     let json_error = serde_json::to_value(&error).unwrap();
     let expected = json!({
@@ -240,12 +242,13 @@ fn database_access_denied_must_return_a_proper_error_in_cli() {
     assert_eq!(json_error, expected);
 }
 
-#[test]
-fn database_access_denied_must_return_a_proper_error_in_rpc() {
-    let conn = sql_connection::GenericSqlConnection::from_database_str(&mysql_url(), None).unwrap();
+#[tokio::test]
+async fn database_access_denied_must_return_a_proper_error_in_rpc() {
+    let conn = Quaint::new(&mysql_url()).unwrap();
 
-    conn.execute_raw("DROP USER IF EXISTS jeanmichel", &[]).unwrap();
+    conn.execute_raw("DROP USER IF EXISTS jeanmichel", &[]).await.unwrap();
     conn.execute_raw("CREATE USER jeanmichel IDENTIFIED BY '1234'", &[])
+        .await
         .unwrap();
 
     let mut url: Url = mysql_url().parse().unwrap();
@@ -263,7 +266,7 @@ fn database_access_denied_must_return_a_proper_error_in_rpc() {
         url,
     );
 
-    let error = RpcApi::new_async(&dm).map(|_| ()).unwrap_err();
+    let error = RpcApi::new(&dm).await.map(|_| ()).unwrap_err();
     let json_error = serde_json::to_value(&render_error(error)).unwrap();
 
     let expected = json!({
@@ -279,7 +282,7 @@ fn database_access_denied_must_return_a_proper_error_in_rpc() {
 }
 
 #[test_one_connector(connector = "postgres")]
-fn command_errors_must_return_an_unknown_error(api: &TestApi) {
+async fn command_errors_must_return_an_unknown_error(api: &TestApi) {
     let input = ApplyMigrationInput {
         migration_id: "the-migration".to_owned(),
         steps: vec![MigrationStep::DeleteModel(DeleteModel {
@@ -288,7 +291,7 @@ fn command_errors_must_return_an_unknown_error(api: &TestApi) {
         force: Some(true),
     };
 
-    let error = api.execute_command::<ApplyMigrationCommand>(&input).unwrap_err();
+    let error = api.execute_command::<ApplyMigrationCommand>(&input).await.unwrap_err();
 
     let expected_error = user_facing_errors::Error::Unknown(user_facing_errors::UnknownError {
         message: "Failure during a migration command: Generic error. (code: 1, error: The model abcd does not exist in this Datamodel. It is not possible to delete it.)".to_owned(),
@@ -298,12 +301,13 @@ fn command_errors_must_return_an_unknown_error(api: &TestApi) {
     assert_eq!(error, expected_error);
 }
 
-fn get_cli_error(cli_args: &[&str]) -> user_facing_errors::Error {
+async fn get_cli_error(cli_args: &[&str]) -> user_facing_errors::Error {
     let app = cli::clap_app();
     let matches = app.get_matches_from(cli_args);
     let cli_matches = matches.subcommand_matches("cli").expect("cli subcommand is passed");
     let database_url = cli_matches.value_of("datasource").expect("datasource is provided");
     cli::run(&cli_matches, database_url)
+        .await
         .map_err(|err| cli::render_error(err))
         .unwrap_err()
 }

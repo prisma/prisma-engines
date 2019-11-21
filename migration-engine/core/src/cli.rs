@@ -89,13 +89,13 @@ impl From<crate::Error> for CliError {
     }
 }
 
-pub fn run(matches: &ArgMatches, datasource: &str) -> std::result::Result<String, CliError> {
+pub async fn run(matches: &ArgMatches<'_>, datasource: &str) -> std::result::Result<String, CliError> {
     if matches.is_present("can_connect_to_database") {
-        create_conn(datasource, false)?;
+        create_conn(datasource, false).await?;
         Ok("Connection successful".into())
     } else if matches.is_present("create_database") {
-        let (db_name, conn) = create_conn(datasource, true)?;
-        conn.create_database(&db_name)?;
+        let (db_name, conn) = create_conn(datasource, true).await?;
+        conn.create_database(&db_name).await?;
         Ok(format!("Database '{}' created successfully.", db_name))
     } else {
         Err(CliError::NoCommandDefined)
@@ -111,19 +111,13 @@ fn fetch_db_name(url: &Url, default: &str) -> String {
     String::from(result)
 }
 
-fn create_conn(
-    datasource: &str,
-    admin_mode: bool,
-) -> crate::Result<(
-    String,
-    Box<dyn MigrationConnector<DatabaseMigration = impl DatabaseMigrationMarker>>,
-)> {
+async fn create_conn(datasource: &str, admin_mode: bool) -> crate::Result<(String, Box<SqlMigrationConnector>)> {
     let mut url = Url::parse(datasource).expect("Invalid url in the datasource");
     let sql_family = SqlFamily::from_scheme(url.scheme());
 
     match sql_family {
         Some(SqlFamily::Sqlite) => {
-            let inner = SqlMigrationConnector::new_from_database_str(datasource)?;
+            let inner = SqlMigrationConnector::new(datasource).await?;
 
             Ok((String::new(), Box::new(inner)))
         }
@@ -131,9 +125,9 @@ fn create_conn(
             let db_name = fetch_db_name(&url, "postgres");
 
             let connector = if admin_mode {
-                create_postgres_admin_conn(url)?
+                create_postgres_admin_conn(url).await?
             } else {
-                SqlMigrationConnector::new_from_database_str(url.as_str())?
+                SqlMigrationConnector::new(url.as_str()).await?
             };
 
             Ok((db_name, Box::new(connector)))
@@ -145,7 +139,7 @@ fn create_conn(
                 url.set_path("");
             }
 
-            let inner = SqlMigrationConnector::new_from_database_str(url.as_str())?;
+            let inner = SqlMigrationConnector::new(url.as_str()).await?;
             Ok((db_name, Box::new(inner)))
         }
         None => unimplemented!("Connector {} is not supported yet", url.scheme()),
@@ -154,7 +148,7 @@ fn create_conn(
 
 /// Try to connect as an admin to a postgres database. We try to pick a default database from which
 /// we can create another database.
-fn create_postgres_admin_conn(mut url: Url) -> crate::Result<SqlMigrationConnector> {
+async fn create_postgres_admin_conn(mut url: Url) -> crate::Result<SqlMigrationConnector> {
     let candidate_default_databases = &["postgres", "template1"];
 
     let mut params: HashMap<String, String> = url.query_pairs().into_owned().collect();
@@ -162,21 +156,37 @@ fn create_postgres_admin_conn(mut url: Url) -> crate::Result<SqlMigrationConnect
     let params = params.into_iter().map(|(k, v)| format!("{}={}", k, v)).join("&");
     url.set_query(Some(&params));
 
+    let mut connector = None;
+
     for database_name in candidate_default_databases {
         url.set_path(database_name);
-        match SqlMigrationConnector::new_from_database_str(url.as_str()) {
+        match SqlMigrationConnector::new(url.as_str()).await {
             // If the database does not exist, try the next one.
-            Err(err) => match &err.kind {
-                migration_connector::ErrorKind::DatabaseDoesNotExist { .. } => (),
-                _ => return Err(err.into()),
-            },
-            Ok(connector) => return Ok(connector),
+            Err(err) => {
+                match &err.kind {
+                    migration_connector::ErrorKind::DatabaseDoesNotExist { .. } => (),
+                    _other_outcome => {
+                        connector = Some(Err(err));
+                        break;
+                    }
+                }
+            }
+            // If the outcome is anything else, use this.
+            other_outcome => {
+                connector = Some(other_outcome);
+                break;
+            }
         }
     }
 
-    Err(ConnectorError::from_kind(ErrorKind::DatabaseCreationFailed {
-            explanation: "Prisma could not connect to a default database (`postgres` or `template1`), it cannot create the specified database.".to_owned()
-            }))?
+    let connector = connector
+        .ok_or_else(|| {
+            ConnectorError::from_kind(ErrorKind::DatabaseCreationFailed {
+                explanation: "Prisma could not connect to a default database (`postgres` or `template1`), it cannot create the specified database.".to_owned()
+            })
+        })??;
+
+    Ok(connector)
 }
 
 pub fn clap_app() -> clap::App<'static, 'static> {
@@ -250,7 +260,24 @@ pub fn render_error(cli_error: CliError) -> user_facing_errors::Error {
 
 #[cfg(test)]
 mod tests {
-    use sql_connection::{GenericSqlConnection, SyncSqlConnection};
+    use super::CliError;
+    use clap::ArgMatches;
+    use once_cell::sync::Lazy;
+    use quaint::prelude::*;
+
+    static TEST_ASYNC_RUNTIME: Lazy<tokio::runtime::Runtime> =
+        Lazy::new(|| tokio::runtime::Runtime::new().expect("failed to start tokio test runtime"));
+
+    fn run_sync(matches: &ArgMatches<'_>, datasource: &str) -> Result<String, CliError> {
+        TEST_ASYNC_RUNTIME.block_on(super::run(matches, datasource))
+    }
+
+    async fn run(args: &[&str], datasource: &str) -> Result<String, CliError> {
+        let mut complete_args = vec!["me", "cli", "--datasource", datasource];
+        complete_args.extend(args);
+        let matches = super::clap_app().get_matches_from(complete_args);
+        super::run(&matches.subcommand_matches("cli").unwrap(), datasource).await
+    }
 
     fn with_cli<F>(matches: Vec<&str>, f: F) -> Result<(), Box<dyn std::any::Any + Send + 'static>>
     where
@@ -306,7 +333,7 @@ mod tests {
         with_cli(vec!["cli"], |matches| {
             assert_eq!(
                 "No command defined",
-                &super::run(&matches, &mysql_url(None)).unwrap_err().to_string()
+                &run_sync(&matches, &mysql_url(None)).unwrap_err().to_string()
             );
         })
         .unwrap();
@@ -317,7 +344,7 @@ mod tests {
         with_cli(vec!["cli", "--can_connect_to_database"], |matches| {
             assert_eq!(
                 String::from("Connection successful"),
-                super::run(&matches, &mysql_url(None)).unwrap()
+                run_sync(&matches, &mysql_url(None)).unwrap()
             )
         })
         .unwrap();
@@ -328,7 +355,7 @@ mod tests {
         let dm = mysql_url(Some("this_does_not_exist"));
 
         with_cli(vec!["cli", "--can_connect_to_database"], |matches| {
-            assert_eq!("P1003", super::run(&matches, &dm).unwrap_err().error_code().unwrap());
+            assert_eq!("P1003", run_sync(&matches, &dm).unwrap_err().error_code().unwrap());
         })
         .unwrap();
     }
@@ -338,7 +365,7 @@ mod tests {
         with_cli(vec!["cli", "--can_connect_to_database"], |matches| {
             assert_eq!(
                 String::from("Connection successful"),
-                super::run(&matches, &postgres_url(None)).unwrap()
+                run_sync(&matches, &postgres_url(None)).unwrap()
             );
         })
         .unwrap();
@@ -349,7 +376,7 @@ mod tests {
         with_cli(vec!["cli", "--can_connect_to_database"], |matches| {
             assert_eq!(
                 String::from("Connection successful"),
-                super::run(&matches, &postgres_url_with_scheme(None, "postgres")).unwrap()
+                run_sync(&matches, &postgres_url_with_scheme(None, "postgres")).unwrap()
             );
         })
         .unwrap();
@@ -360,35 +387,33 @@ mod tests {
         let dm = postgres_url(Some("this_does_not_exist"));
 
         with_cli(vec!["cli", "--can_connect_to_database"], |matches| {
-            assert_eq!("P1003", super::run(&matches, &dm).unwrap_err().error_code().unwrap());
+            assert_eq!("P1003", run_sync(&matches, &dm).unwrap_err().error_code().unwrap());
         })
         .unwrap();
     }
 
-    #[test]
-    fn test_create_mysql_database() {
+    #[tokio::test]
+    async fn test_create_mysql_database() {
         let url = mysql_url(Some("this_should_exist"));
 
-        let res = with_cli(vec!["cli", "--create_database"], |matches| {
-            assert_eq!(
-                String::from("Database 'this_should_exist' created successfully."),
-                super::run(&matches, &url).unwrap()
-            );
-        });
+        let res = run(&["--create_database"], &url).await;
 
-        if let Ok(()) = res {
-            let res = with_cli(vec!["cli", "--can_connect_to_database"], |matches| {
-                assert_eq!(
-                    String::from("Connection successful"),
-                    super::run(&matches, &url).unwrap()
-                );
-            });
+        assert_eq!(
+            "Database 'this_should_exist' created successfully.",
+            res.as_ref().unwrap()
+        );
+
+        if let Ok(_) = res {
+            let res = run(&["--can_connect_to_database"], &url).await;
+            assert_eq!("Connection successful", res.as_ref().unwrap());
 
             {
                 let uri = mysql_url(None);
-                let conn = GenericSqlConnection::from_database_str(&uri, None).unwrap();
+                let conn = Quaint::new(&uri).unwrap();
 
-                conn.execute_raw("DROP DATABASE `this_should_exist`", &[]).unwrap();
+                conn.execute_raw("DROP DATABASE `this_should_exist`", &[])
+                    .await
+                    .unwrap();
             }
 
             res.unwrap();
@@ -397,30 +422,28 @@ mod tests {
         }
     }
 
-    #[test]
-    fn test_create_psql_database() {
+    #[tokio::test]
+    async fn test_create_psql_database() {
         let url = postgres_url(Some("this_should_exist"));
 
-        let res = with_cli(vec!["cli", "--create_database"], |matches| {
-            assert_eq!(
-                String::from("Database 'this_should_exist' created successfully."),
-                super::run(&matches, &url).unwrap()
-            );
-        });
+        let res = run(&["--create_database"], &url).await;
 
-        if let Ok(()) = res {
-            let res = with_cli(vec!["cli", "--can_connect_to_database"], |matches| {
-                assert_eq!(
-                    String::from("Connection successful"),
-                    super::run(&matches, &url).unwrap()
-                );
-            });
+        assert_eq!(
+            "Database 'this_should_exist' created successfully.",
+            res.as_ref().unwrap()
+        );
+
+        if let Ok(_) = res {
+            let res = run(&["--can_connect_to_database"], &url).await;
+            assert_eq!("Connection successful", res.as_ref().unwrap());
 
             {
                 let uri = postgres_url(None);
-                let conn = GenericSqlConnection::from_database_str(&uri, None).unwrap();
+                let conn = Quaint::new(&uri).unwrap();
 
-                conn.execute_raw("DROP DATABASE \"this_should_exist\"", &[]).unwrap();
+                conn.execute_raw("DROP DATABASE \"this_should_exist\"", &[])
+                    .await
+                    .unwrap();
             }
 
             res.unwrap();

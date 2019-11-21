@@ -2,17 +2,12 @@ use super::{GenericApi, MigrationApi};
 use crate::commands::*;
 use datamodel::configuration::{MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME};
 use failure::Fail;
-use futures::{
-    future::{err, lazy, ok, poll_fn},
-    Future,
-};
+use futures::{FutureExt, TryFutureExt};
 use jsonrpc_core::types::error::Error as JsonRpcError;
-use jsonrpc_core::IoHandler;
-use jsonrpc_core::*;
+use jsonrpc_core::{IoHandler, Params};
 use jsonrpc_stdio_server::ServerBuilder;
 use sql_migration_connector::SqlMigrationConnector;
 use std::{io, sync::Arc};
-use tokio_threadpool::blocking;
 
 pub struct RpcApi {
     io_handler: jsonrpc_core::IoHandler<()>,
@@ -58,28 +53,35 @@ static AVAILABLE_COMMANDS: &[RpcCommand] = &[
 ];
 
 impl RpcApi {
-    pub fn new_async(datamodel: &str) -> crate::Result<Self> {
-        let mut rpc_api = Self::new(datamodel)?;
+    pub async fn new(datamodel: &str) -> crate::Result<Self> {
+        let config = datamodel::parse_configuration(datamodel)?;
+
+        let source = config.datasources.first().ok_or(CommandError::DataModelErrors {
+            code: 1000,
+            errors: vec!["There is no datasource in the configuration.".to_string()],
+        })?;
+
+        let connector = match source.connector_type() {
+            scheme if [MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME].contains(&scheme) => {
+                SqlMigrationConnector::new(&source.url().value).await?
+            }
+            x => unimplemented!("Connector {} is not supported yet", x),
+        };
+
+        let mut rpc_api = Self {
+            io_handler: IoHandler::default(),
+            executor: Arc::new(MigrationApi::new(connector).await?),
+        };
 
         for cmd in AVAILABLE_COMMANDS {
-            rpc_api.add_async_command_handler(*cmd);
-        }
-
-        Ok(rpc_api)
-    }
-
-    pub fn new_sync(datamodel: &str) -> crate::Result<Self> {
-        let mut rpc_api = Self::new(datamodel)?;
-
-        for cmd in AVAILABLE_COMMANDS {
-            rpc_api.add_sync_command_handler(*cmd);
+            rpc_api.add_command_handler(*cmd);
         }
 
         Ok(rpc_api)
     }
 
     /// Block the thread and handle IO in async until EOF.
-    pub fn start_server(self) {
+    pub async fn start_server(self) {
         ServerBuilder::new(self.io_handler).build()
     }
 
@@ -101,55 +103,29 @@ impl RpcApi {
         Ok(result)
     }
 
-    fn new(datamodel: &str) -> crate::Result<RpcApi> {
-        let config = datamodel::parse_configuration(datamodel)?;
-
-        let source = config.datasources.first().ok_or(CommandError::DataModelErrors {
-            code: 1000,
-            errors: vec!["There is no datasource in the configuration.".to_string()],
-        })?;
-
-        let connector = match source.connector_type() {
-            scheme if [MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME].contains(&scheme) => {
-                SqlMigrationConnector::new(source.as_ref())?
-            }
-            x => unimplemented!("Connector {} is not supported yet", x),
-        };
-
-        Ok(Self {
-            io_handler: IoHandler::default(),
-            executor: Arc::new(MigrationApi::new(connector)?),
-        })
-    }
-
-    fn add_sync_command_handler(&mut self, cmd: RpcCommand) {
+    fn add_command_handler(&mut self, cmd: RpcCommand) {
         let executor = Arc::clone(&self.executor);
 
         self.io_handler.add_method(cmd.name(), move |params: Params| {
-            Self::create_sync_handler(&executor, cmd, &params)
+            let cmd = cmd.clone();
+            let executor = Arc::clone(&executor);
+            let fut = async move { Self::create_handler(&executor, cmd, &params).await };
+
+            fut.boxed().compat()
         });
     }
 
-    fn add_async_command_handler(&mut self, cmd: RpcCommand) {
-        let executor = Arc::clone(&self.executor);
-
-        self.io_handler.add_method(cmd.name(), move |params: Params| {
-            Self::create_async_handler(&executor, cmd, params)
-        });
-    }
-
-    fn create_sync_handler(
+    async fn create_handler(
         executor: &Arc<dyn GenericApi>,
         cmd: RpcCommand,
         params: &Params,
     ) -> std::result::Result<serde_json::Value, JsonRpcError> {
-        use std::panic::{catch_unwind, AssertUnwindSafe};
-        use std::result::Result;
+        use std::panic::AssertUnwindSafe;
 
-        let result: Result<Result<serde_json::Value, RunCommandError>, _> = {
-            let executor = AssertUnwindSafe(executor);
-            catch_unwind(|| Self::run_command(&executor, cmd, params))
-        };
+        let result: Result<Result<serde_json::Value, RunCommandError>, _> =
+            AssertUnwindSafe(Self::run_command(&executor, cmd, params))
+                .catch_unwind()
+                .await;
 
         match result {
             Ok(Ok(result)) => Ok(result),
@@ -159,29 +135,7 @@ impl RpcApi {
         }
     }
 
-    fn create_async_handler(
-        executor: &Arc<dyn GenericApi>,
-        cmd: RpcCommand,
-        params: Params,
-    ) -> impl Future<Item = serde_json::Value, Error = JsonRpcError> {
-        let executor = Arc::clone(executor);
-
-        lazy(move || {
-            poll_fn(move || blocking(|| Self::create_sync_handler(&executor, cmd, &params))).then(|res| {
-                match res {
-                    // dumdidum futures 0.1 we love <3
-                    Ok(Ok(val)) => ok(val),
-                    Ok(Err(val)) => err(val),
-                    Err(val) => {
-                        let e = crate::error::Error::from(val);
-                        err(super::error_rendering::render_jsonrpc_error(e))
-                    }
-                }
-            })
-        })
-    }
-
-    fn run_command(
+    async fn run_command(
         executor: &Arc<dyn GenericApi>,
         cmd: RpcCommand,
         params: &Params,
@@ -191,31 +145,31 @@ impl RpcApi {
         match cmd {
             RpcCommand::InferMigrationSteps => {
                 let input: InferMigrationStepsInput = params.clone().parse()?;
-                render(executor.infer_migration_steps(&input)?)
+                render(executor.infer_migration_steps(&input).await?)
             }
-            RpcCommand::ListMigrations => render(executor.list_migrations(&serde_json::Value::Null)?),
+            RpcCommand::ListMigrations => render(executor.list_migrations(&serde_json::Value::Null).await?),
             RpcCommand::MigrationProgress => {
                 let input: MigrationProgressInput = params.clone().parse()?;
-                render(executor.migration_progress(&input)?)
+                render(executor.migration_progress(&input).await?)
             }
             RpcCommand::ApplyMigration => {
                 let input: ApplyMigrationInput = params.clone().parse()?;
-                let result = executor.apply_migration(&input)?;
+                let result = executor.apply_migration(&input).await?;
                 debug!("command result: {:?}", result);
                 render(result)
             }
             RpcCommand::UnapplyMigration => {
                 let input: UnapplyMigrationInput = params.clone().parse()?;
-                render(executor.unapply_migration(&input)?)
+                render(executor.unapply_migration(&input).await?)
             }
-            RpcCommand::Reset => render(executor.reset(&serde_json::Value::Null)?),
+            RpcCommand::Reset => render(executor.reset(&serde_json::Value::Null).await?),
             RpcCommand::CalculateDatamodel => {
                 let input: CalculateDatamodelInput = params.clone().parse()?;
-                render(executor.calculate_datamodel(&input)?)
+                render(executor.calculate_datamodel(&input).await?)
             }
             RpcCommand::CalculateDatabaseSteps => {
                 let input: CalculateDatabaseStepsInput = params.clone().parse()?;
-                render(executor.calculate_database_steps(&input)?)
+                render(executor.calculate_database_steps(&input).await?)
             }
         }
     }

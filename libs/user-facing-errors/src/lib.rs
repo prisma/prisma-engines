@@ -62,7 +62,7 @@ impl UnknownError {
         }
     }
 
-    fn extract_panic_message(panic_payload: &(dyn std::any::Any + Send + 'static)) -> Option<String> {
+    pub fn extract_panic_message(panic_payload: &(dyn std::any::Any + Send + 'static)) -> Option<String> {
         panic_payload
             .downcast_ref::<&str>()
             .map(|s| -> String { (*s).to_owned() })
