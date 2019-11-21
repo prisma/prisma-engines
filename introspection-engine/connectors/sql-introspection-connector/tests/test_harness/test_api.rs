@@ -3,6 +3,7 @@ use introspection_connector::{DatabaseMetadata, IntrospectionConnector};
 use quaint::prelude::{Queryable, SqlFamily};
 use sql_introspection_connector::SqlIntrospectionConnector;
 use std::sync::Arc;
+use test_setup::*;
 
 pub struct TestApi {
     sql_family: SqlFamily,
@@ -49,7 +50,7 @@ pub async fn mysql_test_api() -> TestApi {
     let create_database = dbg!(format!("CREATE DATABASE `{}`;", SCHEMA_NAME));
     database.query_raw(&create_database, &[]).await.ok();
 
-    let introspection_connector = SqlIntrospectionConnector::new(&mysql_url()).unwrap();
+    let introspection_connector = SqlIntrospectionConnector::new(&mysql_url()).await.unwrap();
 
     TestApi {
         database: database.into(),
@@ -67,7 +68,7 @@ pub async fn postgres_test_api() -> TestApi {
     let create_schema = dbg!(format!("CREATE SCHEMA IF NOT EXISTS \"{}\";", SCHEMA_NAME));
     database.query_raw(&create_schema, &[]).await.ok();
 
-    let introspection_connector = SqlIntrospectionConnector::new(&postgres_url()).unwrap();
+    let introspection_connector = SqlIntrospectionConnector::new(&postgres_url()).await.unwrap();
 
     TestApi {
         database: database.into(),
@@ -81,7 +82,7 @@ pub async fn sqlite_test_api() -> TestApi {
 
     let database_file_path = sqlite_test_file();
     std::fs::remove_file(database_file_path.clone()).ok(); // ignore potential errors
-    let introspection_connector = SqlIntrospectionConnector::new(&sqlite_test_url()).unwrap();
+    let introspection_connector = SqlIntrospectionConnector::new(&sqlite_test_url()).await.unwrap();
 
     TestApi {
         database: database.into(),

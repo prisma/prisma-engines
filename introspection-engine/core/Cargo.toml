@@ -25,6 +25,11 @@ serde_derive = "1.0"
 tokio = { package = "tokio", version = "0.2.0-alpha.6" }
 user-facing-errors = { path = "../../libs/user-facing-errors" }
 
+[dev-dependencies]
+pretty_assertions = "0.6.1"
+test-setup = { path = "../../libs/test-setup" }
+url = "2.1.0"
+
 [[bin]]
 name = "introspection-engine"
 path = "src/main.rs"
