@@ -185,7 +185,7 @@ impl Quaint {
     /// - `socket` needed when connecting to MySQL database through a unix
     ///   socket. When set, the host parameter is dismissed.
     pub fn new(url_str: &str) -> crate::Result<Self> {
-        let url = Url::parse(dbg!(url_str))?;
+        let url = Url::parse(url_str)?;
 
         let (manager, connection_limit) = match url.scheme() {
             #[cfg(feature = "sqlite")]
