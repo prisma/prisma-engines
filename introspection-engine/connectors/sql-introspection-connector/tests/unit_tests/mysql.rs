@@ -566,12 +566,12 @@ async fn introspecting_cascading_delete_behaviour_should_work(api: &TestApi) {
             migration.create_table("Post", |t| {
                 t.add_column("id", types::primary());
                 t.inject_custom(
-                    "user_id INTEGER,\
-                     FOREIGN KEY (`user_id`) REFERENCES `User`(`id`) ON DELETE CASCADE",
+                    "user_id INTEGER, FOREIGN KEY (`user_id`) REFERENCES `User`(`id`) ON DELETE CASCADE",
                 );
             });
         })
         .await;
+
 
     let dm = r#"  
             model Post {
@@ -591,3 +591,4 @@ async fn introspecting_cascading_delete_behaviour_should_work(api: &TestApi) {
 // enums
 
 // native arrays
+

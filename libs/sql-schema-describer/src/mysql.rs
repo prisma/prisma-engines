@@ -206,19 +206,22 @@ impl SqlSchemaDescriber {
             FROM information_schema.key_column_usage AS kcu
             INNER JOIN information_schema.referential_constraints AS rc ON
             kcu.constraint_name = rc.constraint_name
-            WHERE kcu.table_schema = ? AND kcu.table_name = ? AND
-            referenced_column_name IS NOT NULL
+            WHERE
+                kcu.table_schema = ?
+                AND kcu.table_name = ?
+                AND rc.constraint_schema = ?
+                AND referenced_column_name IS NOT NULL
         ";
+
         debug!("describing table foreign keys, SQL: '{}'", sql);
 
         let result_set = self
             .conn
-            .query_raw(sql, &[schema.into(), table.into()])
+            .query_raw(sql, &[schema.into(), table.into(), schema.into()])
             .await
             .expect("querying for foreign keys");
         let mut intermediate_fks: HashMap<String, ForeignKey> = HashMap::new();
         for row in result_set.into_iter() {
-            dbg!(&row);
             debug!("Got description FK row {:#?}", row);
             let constraint_name = row
                 .get("constraint_name")
@@ -254,6 +257,9 @@ impl SqlSchemaDescriber {
                 "no action" => ForeignKeyAction::NoAction,
                 s @ _ => panic!(format!("Unrecognized on delete action '{}'", s)),
             };
+
+            // Foreign keys covering multiple columns will return multiple rows, which we need to
+            // merge.
             match intermediate_fks.get_mut(&constraint_name) {
                 Some(fk) => {
                     let pos = ord_pos as usize - 1;
