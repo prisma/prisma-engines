@@ -22,6 +22,7 @@ serde = "1.0"
 serde_json = "1.0"
 serde_derive = "1.0"
 
+futures03 = { package = "futures", version = "0.3", features = ["compat"] }
 tokio = { package = "tokio", version = "0.2.0-alpha.6" }
 user-facing-errors = { path = "../../libs/user-facing-errors" }
 

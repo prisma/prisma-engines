@@ -1,5 +1,6 @@
 use failure::Fail;
 use introspection_connector::ConnectorError;
+use jsonrpc_core::types::error::Error as JsonRpcError;
 
 pub type CoreResult<T> = Result<T, CoreError>;
 
@@ -40,10 +41,19 @@ impl From<CoreError> for jsonrpc_core::types::error::Error {
             .into()
         });
 
-        jsonrpc_core::types::error::Error {
-            code: jsonrpc_core::ErrorCode::ServerError(1000),
-            message: format!("CoreError: {}", e),
-            data: Some(serde_json::to_value(&data).unwrap()),
-        }
+        render_jsonrpc_error(data, format!("CoreError: {}", e))
     }
+}
+
+pub(crate) fn render_jsonrpc_error(payload: impl serde::Serialize, message: String) -> JsonRpcError {
+    JsonRpcError {
+        code: jsonrpc_core::ErrorCode::ServerError(1000),
+        message,
+        data: Some(serde_json::to_value(payload).unwrap()),
+    }
+}
+
+pub(crate) fn render_panic(panic: Box<dyn std::any::Any + Send + 'static>) -> JsonRpcError {
+    let error = user_facing_errors::UnknownError::from_panic_payload(panic.as_ref());
+    render_jsonrpc_error(error, "Panicked during command handling.".into())
 }
