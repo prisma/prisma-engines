@@ -57,7 +57,11 @@ pub enum SqlError {
     TlsError { message: String },
 
     #[fail(display = "Unique constraint violation")]
-    UniqueConstraintViolation { field_name: String },
+    UniqueConstraintViolation {
+        field_name: String,
+        #[fail(cause)]
+        cause: QuaintError,
+    },
 }
 
 impl SqlError {
@@ -90,10 +94,14 @@ impl SqlError {
                     cause: cause.into(),
                 },
             },
-            SqlError::UniqueConstraintViolation { field_name } => {
-                ConnectorError::UniqueConstraintViolation { field_name }
-            }
-            error => ConnectorError::QueryError(error.into()),
+            SqlError::UniqueConstraintViolation { cause, .. } => ConnectorError {
+                user_facing_error: render_quaint_error(&cause, connection_info),
+                kind: ErrorKind::ConnectionError {
+                    host: connection_info.host().to_owned(),
+                    cause: cause.into(),
+                },
+            },
+            error => ConnectorError::from_kind(ErrorKind::QueryError(error.into())),
         }
     }
 }
@@ -123,9 +131,10 @@ impl From<quaint::error::Error> for SqlError {
             quaint::error::Error::TlsError { message } => Self::TlsError {
                 message: message.clone(),
             },
-            quaint::error::Error::UniqueConstraintViolation { field_name } => {
-                Self::UniqueConstraintViolation { field_name }
-            }
+            quaint::error::Error::UniqueConstraintViolation { field_name } => Self::UniqueConstraintViolation {
+                field_name: field_name.into(),
+                cause: error,
+            },
             _ => SqlError::QueryError(error.into()),
         }
     }

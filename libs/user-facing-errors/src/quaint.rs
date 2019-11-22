@@ -1,4 +1,4 @@
-use crate::{common, KnownError};
+use crate::{common, query_engine, KnownError};
 use quaint::{error::Error as QuaintError, prelude::ConnectionInfo};
 
 pub fn render_quaint_error(quaint_error: &QuaintError, connection_info: &ConnectionInfo) -> Option<KnownError> {
@@ -95,6 +95,13 @@ pub fn render_quaint_error(quaint_error: &QuaintError, connection_info: &Connect
             KnownError::new(common::DatabaseNotReachable {
                 database_port: url.port(),
                 database_host: url.host().to_owned(),
+            })
+            .ok()
+        }
+
+        (QuaintError::UniqueConstraintViolation { field_name }, _) => {
+            KnownError::new(query_engine::UniqueKeyViolation {
+                field_name: field_name.into(),
             })
             .ok()
         }

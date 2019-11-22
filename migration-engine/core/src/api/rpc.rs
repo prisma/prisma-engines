@@ -57,7 +57,6 @@ impl RpcApi {
         let config = datamodel::parse_configuration(datamodel)?;
 
         let source = config.datasources.first().ok_or(CommandError::DataModelErrors {
-            code: 1000,
             errors: vec!["There is no datasource in the configuration.".to_string()],
         })?;
 

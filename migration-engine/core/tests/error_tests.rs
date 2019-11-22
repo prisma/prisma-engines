@@ -302,7 +302,7 @@ async fn command_errors_must_return_an_unknown_error(api: &TestApi) {
 }
 
 #[test_each_connector]
-fn unique_constraint_errors_in_migrations_must_return_a_known_error(api: &TestApi) {
+async fn unique_constraint_errors_in_migrations_must_return_a_known_error(api: &TestApi) {
     use quaint::ast::*;
 
     let dm = r#"
@@ -312,14 +312,14 @@ fn unique_constraint_errors_in_migrations_must_return_a_known_error(api: &TestAp
         }
     "#;
 
-    api.infer_and_apply(dm);
+    api.infer_and_apply(dm).await;
 
     let insert = Insert::multi_into(api.render_table_name("Fruit"), vec!["name"])
         .values(("banana",))
         .values(("apple",))
         .values(("banana",));
 
-    api.database().execute(insert.into()).unwrap();
+    api.database().execute(insert.into()).await.unwrap();
 
     let dm2 = r#"
         model Fruit {
@@ -336,6 +336,7 @@ fn unique_constraint_errors_in_migrations_must_return_a_known_error(api: &TestAp
 
     let steps = api
         .execute_command::<InferMigrationStepsCommand>(&infer_migration_steps_input)
+        .await
         .unwrap()
         .datamodel_steps;
 
@@ -345,7 +346,7 @@ fn unique_constraint_errors_in_migrations_must_return_a_known_error(api: &TestAp
         force: Some(true),
     };
 
-    let error = api.execute_command::<ApplyMigrationCommand>(&input).unwrap_err();
+    let error = api.execute_command::<ApplyMigrationCommand>(&input).await.unwrap_err();
 
     let json_error = serde_json::to_value(&error).unwrap();
 
