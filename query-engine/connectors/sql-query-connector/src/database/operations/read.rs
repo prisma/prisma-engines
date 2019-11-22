@@ -2,7 +2,7 @@ use crate::{
     query_builder::read::{self, ManyRelatedRecordsBaseQuery, ManyRelatedRecordsQueryBuilder},
     QueryExt, SqlError,
 };
-use connector_interface::{error::ConnectorError, *};
+use connector_interface::{error::{ConnectorError, ErrorKind}, *};
 use itertools::Itertools;
 use prisma_models::*;
 use quaint::ast::*;
@@ -93,7 +93,7 @@ where
         .await?
         .into_iter()
         .map(|mut row| {
-            let parent_id = row.values.pop().ok_or(ConnectorError::ColumnDoesNotExist)?;
+            let parent_id = row.values.pop().ok_or(ConnectorError::from_kind(ErrorKind::ColumnDoesNotExist))?;
 
             // Relation id is always the second last value. We don't need it
             // here and we don't need it in the record.

@@ -15,6 +15,7 @@ uuid = "0.7"
 itertools = "0.8"
 chrono = { version = "0.4", features = ["serde"] }
 futures = "0.3"
+user-facing-errors = { path = "../../../libs/user-facing-errors" }
 
 [dev-dependencies]
 serde_json = "1"
