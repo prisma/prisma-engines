@@ -1,5 +1,5 @@
 use crate::{error::SqlError, query_builder::write, QueryExt};
-use connector_interface::{error::{ConnectorError, ErrorKind}, *};
+use connector_interface::*;
 use prisma_models::*;
 use quaint::error::Error as QueryError;
 
