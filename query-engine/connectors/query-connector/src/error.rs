@@ -2,6 +2,7 @@ use crate::filter::RecordFinder;
 use failure::{Error, Fail};
 use prisma_models::prelude::{DomainError, GraphqlId, ModelRef, PrismaValue};
 use std::fmt;
+use user_facing_errors::KnownError;
 
 #[derive(Debug)]
 pub struct RecordFinderInfo {
@@ -41,7 +42,25 @@ impl From<&RecordFinder> for RecordFinderInfo {
 }
 
 #[derive(Debug, Fail)]
-pub enum ConnectorError {
+#[fail(display = "{}", kind)]
+pub struct ConnectorError {
+    /// An optional error already rendered for users in case the migration core does not handle it.
+    pub user_facing_error: Option<KnownError>,
+    /// The error information for internal use.
+    pub kind: ErrorKind,
+}
+
+impl ConnectorError {
+    pub fn from_kind(kind: ErrorKind) -> Self {
+        ConnectorError {
+            user_facing_error: None,
+            kind,
+        }
+    }
+}
+
+#[derive(Debug, Fail)]
+pub enum ErrorKind {
     #[fail(display = "Unique constraint failed: {}", field_name)]
     UniqueConstraintViolation { field_name: String },
 
@@ -118,6 +137,6 @@ pub enum ConnectorError {
 
 impl From<DomainError> for ConnectorError {
     fn from(e: DomainError) -> ConnectorError {
-        ConnectorError::DomainError(e)
+        ConnectorError::from_kind(ErrorKind::DomainError(e))
     }
 }

@@ -1,5 +1,5 @@
 use crate::{error::SqlError, query_builder::write, QueryExt};
-use connector_interface::{error::ConnectorError, *};
+use connector_interface::{error::{ConnectorError, ErrorKind}, *};
 use prisma_models::*;
 use quaint::error::Error as QueryError;
 
@@ -14,24 +14,24 @@ pub async fn create_record(
         Ok(id) => id,
         Err(QueryError::UniqueConstraintViolation { field_name }) => {
             if field_name == "PRIMARY" {
-                return Err(ConnectorError::UniqueConstraintViolation {
+                return Err(ConnectorError::from_kind(ErrorKind::UniqueConstraintViolation {
                     field_name: format!("{}.{}", model.name, model.fields().id().name),
-                });
+                }));
             } else {
-                return Err(ConnectorError::UniqueConstraintViolation {
+                return Err(ConnectorError::from_kind(ErrorKind::UniqueConstraintViolation {
                     field_name: format!("{}.{}", model.name, field_name),
-                });
+                }));
             }
         }
         Err(QueryError::NullConstraintViolation { field_name }) => {
             if field_name == "PRIMARY" {
-                return Err(ConnectorError::NullConstraintViolation {
+                return Err(ConnectorError::from_kind(ErrorKind::NullConstraintViolation {
                     field_name: format!("{}.{}", model.name, model.fields().id().name),
-                });
+                }));
             } else {
-                return Err(ConnectorError::NullConstraintViolation {
+                return Err(ConnectorError::from_kind(ErrorKind::NullConstraintViolation {
                     field_name: format!("{}.{}", model.name, field_name),
-                });
+                }));
             }
         }
         Err(e) => return Err(SqlError::from(e).into()),

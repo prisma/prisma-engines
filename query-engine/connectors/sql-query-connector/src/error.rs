@@ -86,45 +86,55 @@ impl From<SqlError> for ConnectorError {
     fn from(sql: SqlError) -> Self {
         match sql {
             SqlError::UniqueConstraintViolation { field_name } => {
-                ConnectorError::UniqueConstraintViolation { field_name }
+                ConnectorError::from_kind(ErrorKind::UniqueConstraintViolation { field_name })
             }
-            SqlError::NullConstraintViolation { field_name } => ConnectorError::NullConstraintViolation { field_name },
-            SqlError::DatabaseDoesNotExist { db_name } => ConnectorError::DatabaseDoesNotExist { db_name },
-            SqlError::DatabaseAccessDenied { db_name } => ConnectorError::DatabaseAccessDenied { db_name },
-            SqlError::AuthenticationFailed { user } => ConnectorError::AuthenticationFailed { user },
-            SqlError::RecordDoesNotExist => ConnectorError::RecordDoesNotExist,
-            SqlError::ColumnDoesNotExist => ConnectorError::ColumnDoesNotExist,
-            SqlError::ConnectionError(e) => ConnectorError::ConnectionError(e),
-            SqlError::InvalidConnectionArguments => ConnectorError::InvalidConnectionArguments,
-            SqlError::ColumnReadFailure(e) => ConnectorError::ColumnReadFailure(e),
-            SqlError::FieldCannotBeNull { field } => ConnectorError::FieldCannotBeNull { field },
-            SqlError::DomainError(e) => ConnectorError::DomainError(e),
-            SqlError::RecordNotFoundForWhere(info) => ConnectorError::RecordNotFoundForWhere(info),
+            SqlError::NullConstraintViolation { field_name } => {
+                ConnectorError::from_kind(ErrorKind::NullConstraintViolation { field_name })
+            }
+            SqlError::DatabaseDoesNotExist { db_name } => {
+                ConnectorError::from_kind(ErrorKind::DatabaseDoesNotExist { db_name })
+            }
+            SqlError::DatabaseAccessDenied { db_name } => {
+                ConnectorError::from_kind(ErrorKind::DatabaseAccessDenied { db_name })
+            }
+            SqlError::AuthenticationFailed { user } => {
+                ConnectorError::from_kind(ErrorKind::AuthenticationFailed { user })
+            }
+            SqlError::RecordDoesNotExist => ConnectorError::from_kind(ErrorKind::RecordDoesNotExist),
+            SqlError::ColumnDoesNotExist => ConnectorError::from_kind(ErrorKind::ColumnDoesNotExist),
+            SqlError::ConnectionError(e) => ConnectorError::from_kind(ErrorKind::ConnectionError(e)),
+            SqlError::InvalidConnectionArguments => ConnectorError::from_kind(ErrorKind::InvalidConnectionArguments),
+            SqlError::ColumnReadFailure(e) => ConnectorError::from_kind(ErrorKind::ColumnReadFailure(e)),
+            SqlError::FieldCannotBeNull { field } => ConnectorError::from_kind(ErrorKind::FieldCannotBeNull { field }),
+            SqlError::DomainError(e) => ConnectorError::from_kind(ErrorKind::DomainError(e)),
+            SqlError::RecordNotFoundForWhere(info) => {
+                ConnectorError::from_kind(ErrorKind::RecordNotFoundForWhere(info))
+            }
             SqlError::RelationViolation {
                 relation_name,
                 model_a_name,
                 model_b_name,
-            } => ConnectorError::RelationViolation {
+            } => ConnectorError::from_kind(ErrorKind::RelationViolation {
                 relation_name,
                 model_a_name,
                 model_b_name,
-            },
+            }),
             SqlError::RecordsNotConnected {
                 relation_name,
                 parent_name,
                 parent_where,
                 child_name,
                 child_where,
-            } => ConnectorError::RecordsNotConnected {
+            } => ConnectorError::from_kind(ErrorKind::RecordsNotConnected {
                 relation_name,
                 parent_name,
                 parent_where,
                 child_name,
                 child_where,
-            },
-            SqlError::ConversionError(e) => ConnectorError::ConversionError(e),
-            SqlError::DatabaseCreationError(e) => ConnectorError::DatabaseCreationError(e),
-            SqlError::QueryError(e) => ConnectorError::QueryError(e),
+            }),
+            SqlError::ConversionError(e) => ConnectorError::from_kind(ErrorKind::ConversionError(e)),
+            SqlError::DatabaseCreationError(e) => ConnectorError::from_kind(ErrorKind::DatabaseCreationError(e)),
+            SqlError::QueryError(e) => ConnectorError::from_kind(ErrorKind::QueryError(e)),
         }
     }
 }
