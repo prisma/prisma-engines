@@ -35,20 +35,7 @@ pub(crate) fn pretty_print_errors(errors: ErrorCollection, datamodel: &str) {
 
 #[tokio::main]
 async fn main() {
-    let original_hook = std::panic::take_hook();
-
-    std::panic::set_hook(Box::new(move |panic| {
-        let err = user_facing_errors::UnknownError::new_in_panic_hook(&panic);
-
-        match serde_json::to_writer(std::io::stderr(), &err) {
-            Ok(_) => eprintln!(),
-            Err(err) => {
-                log::error!("Failed to write JSON error to stderr: {}", err);
-                original_hook(panic)
-            }
-        }
-    }));
-
+    user_facing_errors::set_panic_hook();
     env_logger::init();
 
     let matches = cli::clap_app().get_matches();
