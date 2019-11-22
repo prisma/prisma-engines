@@ -6,6 +6,10 @@ pub mod migration_engine;
 pub mod quaint;
 pub mod query_engine;
 
+pub use panic_hook::set_panic_hook;
+
+mod panic_hook;
+
 use failure::Fail;
 use serde::Serialize;
 
