@@ -2658,6 +2658,7 @@ dependencies = [
  "tokio-postgres 0.4.0-rc.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "tokio-resource-pool 0.5.0-alpha.1 (git+https://github.com/pimeys/tokio-resource-pool)",
  "url 1.7.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "user-facing-errors 0.1.0",
  "uuid 0.7.4 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
