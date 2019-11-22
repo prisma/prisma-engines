@@ -4,7 +4,7 @@
 mod builder;
 mod error;
 mod read;
-mod utils;
+pub(crate) mod utils;
 
 pub mod write;
 

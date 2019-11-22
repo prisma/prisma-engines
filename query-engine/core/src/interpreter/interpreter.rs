@@ -207,11 +207,14 @@ where
                 fut.boxed()
             }
 
-            Expression::Get { binding_name } => async move {
-                self.log_line(level, || format!("GET {}", binding_name));
-                env.clone().remove(&binding_name)
-            }
-                .boxed(),
+            Expression::Get { binding_name } => {
+                let fut = async move {
+                    self.log_line(level, || format!("GET {}", binding_name));
+                    env.clone().remove(&binding_name)
+                };
+
+                fut.boxed()
+            },
 
             Expression::GetFirstNonEmpty { binding_names } => {
                 let fut = async move {

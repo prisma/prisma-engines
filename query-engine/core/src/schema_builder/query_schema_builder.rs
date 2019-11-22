@@ -1,5 +1,16 @@
 use super::*;
-use crate::{query_graph_builder::*, Query, QueryGraph};
+use crate::{
+    query_graph_builder::{
+        utils::extract_query_args,
+        Builder,
+        ReadOneRecordBuilder,
+        ReadManyRecordsBuilder,
+        AggregateRecordsBuilder,
+        write,
+    },
+    Query,
+    QueryGraph
+};
 
 /// Build mode for schema generation.
 #[derive(Debug, Copy, Clone)]
@@ -231,9 +242,10 @@ impl<'a> QuerySchemaBuilder<'a> {
             Some(SchemaQueryBuilder::ModelQueryBuilder(ModelQueryBuilder::new(
                 Arc::clone(&model),
                 QueryTag::FindMany,
-                Box::new(|model, parsed_field| {
+                Box::new(|model, mut parsed_field| {
                     let mut graph = QueryGraph::new();
-                    let query = ReadManyRecordsBuilder::new(parsed_field, model).build()?;
+                    let args = extract_query_args(parsed_field.arguments.drain(0..).collect(), &model)?;
+                    let query = ReadManyRecordsBuilder::new(parsed_field, model, args).build()?;
 
                     graph.create_node(Query::Read(query));
                     Ok(graph)
@@ -288,8 +300,8 @@ impl<'a> QuerySchemaBuilder<'a> {
                 QueryTag::CreateOne,
                 Box::new(|model, parsed_field| {
                     let mut graph = QueryGraph::new();
-
                     write::create_record(&mut graph, model, parsed_field)?;
+
                     Ok(graph)
                 }),
             ))),

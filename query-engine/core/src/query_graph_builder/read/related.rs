@@ -1,5 +1,6 @@
 use super::*;
 use crate::{query_document::ParsedField, ReadQuery, RelatedRecordsQuery};
+use connector::QueryArguments;
 use prisma_models::{ModelRef, RelationFieldRef};
 
 pub struct ReadRelatedRecordsBuilder {
@@ -11,22 +12,37 @@ pub struct ReadRelatedRecordsBuilder {
 
     /// The parent field as parsed field in the query document.
     field: ParsedField,
+
+    /// Query filters, windowing et.al.
+    args: QueryArguments,
 }
 
 impl ReadRelatedRecordsBuilder {
-    pub fn new(model: ModelRef, parent: RelationFieldRef, field: ParsedField) -> Self {
-        Self { model, parent, field }
+    pub fn new(
+        model: ModelRef,
+        parent: RelationFieldRef,
+        field: ParsedField,
+        args: QueryArguments,
+    ) -> Self {
+        Self {
+            model,
+            parent,
+            field,
+            args,
+        }
     }
 }
 
 impl Builder<ReadQuery> for ReadRelatedRecordsBuilder {
     fn build(self) -> QueryGraphBuilderResult<ReadQuery> {
-        let args = utils::extract_query_args(self.field.arguments, &self.model)?;
+        let args = self.args;
         let name = self.field.name;
         let alias = self.field.alias;
+
         let sub_selections = self.field.nested_fields.unwrap().fields;
         let selection_order: Vec<String> = collect_selection_order(&sub_selections);
         let selected_fields = collect_selected_fields(&sub_selections, &self.model, Some(Arc::clone(&self.parent)));
+
         let nested = collect_nested_queries(sub_selections, &self.model)?;
         let parent_field = self.parent;
 

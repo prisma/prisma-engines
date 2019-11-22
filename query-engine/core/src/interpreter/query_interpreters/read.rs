@@ -109,14 +109,25 @@ fn read_related<'a, 'b>(
             None => parent_ids,
         };
 
-        let scalars = tx
-            .get_related_records(
+        let scalars = if query.can_skip_joins {
+            let model = query.parent_field.model();
+            let args = query.args.clone();
+
+            let records = tx.get_many_records(
+                &model,
+                args,
+                &selected_fields,
+            ).await?;
+
+            unimplemented!()
+        } else {
+            tx.get_related_records(
                 &query.parent_field,
                 parent_ids,
                 query.args.clone(),
                 &selected_fields,
-            )
-            .await?;
+            ).await?
+        };
 
         let model = query.parent_field.related_model();
         let id_field = model.fields().id().name.clone();

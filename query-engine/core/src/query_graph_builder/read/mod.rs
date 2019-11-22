@@ -45,45 +45,63 @@ pub fn collect_selection_order(from: &[ParsedField]) -> Vec<String> {
 }
 
 pub fn collect_selected_fields(
-    from: &[ParsedField],
+    parsed_fields: &[ParsedField],
     model: &ModelRef,
     parent: Option<RelationFieldRef>,
 ) -> SelectedFields {
-    let selected_fields = from
-        .iter()
-        .map(|selected_field| {
-            let model_field = model.fields().find_from_all(&selected_field.name).unwrap();
-            match model_field {
-                Field::Scalar(ref sf) => SelectedField::Scalar(SelectedScalarField { field: Arc::clone(sf) }),
-                Field::Relation(ref rf) => SelectedField::Relation(SelectedRelationField {
+    let mut selected_fields = Vec::with_capacity(parsed_fields.len());
+
+    for selected_field in parsed_fields {
+        let model_field = model.fields().find_from_all(&selected_field.name).unwrap();
+
+        match model_field {
+            Field::Scalar(ref sf) => selected_fields.push(SelectedField::Scalar(SelectedScalarField { field: Arc::clone(sf) })),
+            Field::Relation(ref rf) => {
+                let selected_fields = SelectedFields::new(vec![], None);
+
+                SelectedField::Relation(SelectedRelationField {
                     field: Arc::clone(rf),
-                    selected_fields: SelectedFields::new(vec![], None), // todo None here correct?
-                }),
-            }
-        })
-        .collect::<Vec<SelectedField>>();
+                    selected_fields, // todo None here correct?
+                })
+            },
+        };
+    }
 
     SelectedFields::new(selected_fields, parent)
 }
 
-pub fn collect_nested_queries(from: Vec<ParsedField>, model: &ModelRef) -> QueryGraphBuilderResult<Vec<ReadQuery>> {
-    from.into_iter()
-        .filter_map(|selected_field| {
-            let model_field = model.fields().find_from_all(&selected_field.name).unwrap();
-            match model_field {
-                Field::Scalar(_) => None,
-                Field::Relation(ref rf) => {
-                    let model = rf.related_model();
-                    let parent = Arc::clone(&rf);
+pub fn collect_nested_queries(fields: Vec<ParsedField>, model: &ModelRef) -> QueryGraphBuilderResult<Vec<ReadQuery>> {
+    let mut queries = Vec::with_capacity(fields.len());
 
-                    Some(ReadQueryBuilder::ReadRelatedRecordsBuilder(
-                        ReadRelatedRecordsBuilder::new(model, parent, selected_field),
-                    ))
-                }
-            }
-        })
-        .collect::<Vec<ReadQueryBuilder>>()
-        .into_iter()
-        .map(|builder| builder.build())
-        .collect::<QueryGraphBuilderResult<Vec<ReadQuery>>>()
+    for mut field in fields {
+        let model_field = model.fields().find_from_all(&field.name).unwrap();
+
+        if let Field::Relation(ref rf) = model_field {
+            let model = rf.related_model();
+            let parent = Arc::clone(&rf);
+            let args = utils::extract_query_args(field.arguments.drain(0..).collect(), &model)?;
+
+            let builder = if rf.relation().is_many_to_many() || args.is_with_pagination() {
+                ReadQueryBuilder::ReadRelatedRecordsBuilder(ReadRelatedRecordsBuilder::new(
+                    model,
+                    parent,
+                    field,
+                    args,
+                ))
+            } else if rf.relation_is_inlined_in_parent() {
+                ReadQueryBuilder::ReadManyRecordsBuilder(ReadManyRecordsBuilder::new(
+                    field,
+                    model,
+                    args,
+                    Some(parent),
+                ))
+            } else { // in child
+                unimplemented!()
+            };
+
+            queries.push(builder.build()?);
+        }
+    }
+
+    Ok(queries)
 }

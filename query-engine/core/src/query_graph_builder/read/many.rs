@@ -1,23 +1,37 @@
 use super::*;
 use crate::{query_document::ParsedField, ManyRecordsQuery, ReadQuery};
-use prisma_models::ModelRef;
+use connector::QueryArguments;
+use prisma_models::{ModelRef, RelationFieldRef};
 
 pub struct ReadManyRecordsBuilder {
     field: ParsedField,
     model: ModelRef,
+    args: QueryArguments,
+    parent_field: Option<RelationFieldRef>,
 }
 
 impl ReadManyRecordsBuilder {
-    pub fn new(field: ParsedField, model: ModelRef) -> Self {
-        Self { field, model }
+    pub fn new(
+        field: ParsedField,
+        model: ModelRef,
+        args: QueryArguments,
+        parent_field: Option<RelationFieldRef>,
+    ) -> Self {
+        Self {
+            field,
+            model,
+            args,
+            parent_field,
+        }
     }
 }
 
 impl Builder<ReadQuery> for ReadManyRecordsBuilder {
     fn build(self) -> QueryGraphBuilderResult<ReadQuery> {
-        let args = utils::extract_query_args(self.field.arguments, &self.model)?;
+        let args = self.args;
         let name = self.field.name;
         let alias = self.field.alias;
+
         let nested_fields = self.field.nested_fields.unwrap().fields;
         let selection_order: Vec<String> = collect_selection_order(&nested_fields);
         let selected_fields = collect_selected_fields(&nested_fields, &self.model, None);

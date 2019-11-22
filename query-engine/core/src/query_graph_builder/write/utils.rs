@@ -87,15 +87,20 @@ where
         Some(Arc::clone(parent_relation_field)),
     );
 
+    let args = filter.into();
+
+    let can_skip_joins = parent_relation_field.relation_is_inlined_in_child() && !args.is_with_pagination();
+
     let read_parent_node = graph.create_node(Query::Read(ReadQuery::RelatedRecordsQuery(RelatedRecordsQuery {
         name: "find_children_by_parent".to_owned(),
         alias: None,
         parent_field: Arc::clone(parent_relation_field),
         parent_ids: None,
-        args: filter.into(),
+        args,
         selected_fields,
         nested: vec![],
         selection_order: vec![],
+        can_skip_joins,
     })));
 
     graph.create_edge(
