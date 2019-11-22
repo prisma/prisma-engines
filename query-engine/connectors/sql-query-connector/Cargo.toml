@@ -22,6 +22,7 @@ cuid = { git = "https://github.com/prisma/cuid-rust" }
 rand = "0.6"
 log = "0.4"
 async-trait = "0.1"
+user-facing-errors = { path = "../../../libs/user-facing-errors" }
 
 tokio-postgres = { version = "0.4.0-rc.2" }
 

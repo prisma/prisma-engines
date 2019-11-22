@@ -1,8 +1,8 @@
 use super::connection::SqlConnection;
 use crate::{query_builder::ManyRelatedRecordsWithRowNumber, FromSource, SqlError};
-use connector_interface::{Connection, Connector, IO};
+use connector_interface::{Connection, Connector, error::ConnectorError, IO};
 use datamodel::Source;
-use quaint::{connector::SqliteParams, pooled::Quaint};
+use quaint::{connector::SqliteParams, prelude::ConnectionInfo, Quaint};
 use std::convert::TryFrom;
 use async_trait::async_trait;
 
@@ -14,6 +14,17 @@ pub struct Sqlite {
 impl Sqlite {
     pub fn file_path(&self) -> &str {
         self.file_path.as_str()
+    }
+
+    fn connection_info(&self) -> &ConnectionInfo {
+        self.pool.connection_info()
+    }
+
+    async fn catch<O>(&self, fut: impl std::future::Future<Output = Result<O, crate::SqlError>>) -> Result<O, ConnectorError> {
+        match fut.await {
+            Ok(o) => Ok(o),
+            Err(err) => Err(err.into_connector_error(self.connection_info())),
+        }
     }
 }
 
@@ -55,11 +66,11 @@ impl FromSource for Sqlite {
 
 impl Connector for Sqlite {
     fn get_connection<'a>(&'a self) -> IO<Box<dyn Connection + 'a>> {
-        IO::new(async move {
+        IO::new(self.catch(async move {
             let conn = self.pool.check_out().await.map_err(SqlError::from)?;
-            let conn = SqlConnection::<_, ManyRelatedRecordsWithRowNumber>::new(conn);
+            let conn = SqlConnection::<_, ManyRelatedRecordsWithRowNumber>::new(conn, self.connection_info());
 
             Ok(Box::new(conn) as Box<dyn Connection>)
-        })
+        }))
     }
 }
