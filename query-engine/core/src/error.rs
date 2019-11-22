@@ -72,6 +72,16 @@ impl From<InterpreterError> for CoreError {
 
 impl From<CoreError> for user_facing_errors::Error {
     fn from(err: CoreError) -> user_facing_errors::Error {
-        user_facing_errors::UnknownError::from_fail(err).into()
+        match err {
+            CoreError::ConnectorError(ConnectorError {
+                user_facing_error: Some(user_facing_error),
+                ..
+            })
+            | CoreError::InterpreterError(InterpreterError::ConnectorError(ConnectorError {
+                user_facing_error: Some(user_facing_error),
+                ..
+            })) => user_facing_error.into(),
+            _ => user_facing_errors::UnknownError::from_fail(err).into(),
+        }
     }
 }
