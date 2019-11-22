@@ -81,6 +81,15 @@ impl From<CoreError> for user_facing_errors::Error {
                 user_facing_error: Some(user_facing_error),
                 ..
             })) => user_facing_error.into(),
+            CoreError::QueryParserError(query_parser_error)
+            | CoreError::QueryGraphBuilderError(QueryGraphBuilderError::QueryParserError(query_parser_error)) => {
+                user_facing_errors::KnownError::new(user_facing_errors::query_engine::QueryValidationFailed {
+                    query_validation_error: format!("{}", query_parser_error),
+                    query_position: format!("{}", query_parser_error.location()),
+                })
+                .unwrap()
+                .into()
+            }
             _ => user_facing_errors::UnknownError::from_fail(err).into(),
         }
     }
