@@ -1,53 +1,35 @@
-use crate::{ModelRef, RelationField, ScalarField, TypeIdentifier};
-use std::sync::Arc;
+use crate::{ModelRef, RelationFieldRef, ScalarFieldRef, TypeIdentifier};
 
 pub trait IntoSelectedFields {
-    fn into_selected_fields(self, model: ModelRef, from_field: Option<Arc<RelationField>>) -> SelectedFields;
+    fn into_selected_fields(self, model: ModelRef) -> SelectedFields;
 }
 
 #[derive(Debug, Default, Clone)]
 pub struct SelectedFields {
-    pub scalar: Vec<SelectedScalarField>,
-    pub relation: Vec<SelectedRelationField>,
-
-    /// FIXME: naming
-    pub from_field: Option<Arc<RelationField>>,
+    fields: Vec<SelectedField>,
 }
 
 #[derive(Debug, Clone)]
 pub enum SelectedField {
-    Scalar(SelectedScalarField),
-    Relation(SelectedRelationField),
+    Scalar(ScalarFieldRef),
+    Relation(RelationFieldRef),
 }
 
-#[derive(Debug, Clone)]
-pub struct SelectedScalarField {
-    pub field: Arc<ScalarField>,
-}
-
-#[derive(Debug, Clone)]
-pub struct SelectedRelationField {
-    pub field: Arc<RelationField>,
-    pub selected_fields: SelectedFields,
-}
-
-impl From<Arc<ScalarField>> for SelectedField {
-    fn from(sf: Arc<ScalarField>) -> SelectedField {
-        SelectedField::Scalar(SelectedScalarField { field: sf })
+impl From<ScalarFieldRef> for SelectedField {
+    fn from(sf: ScalarFieldRef) -> SelectedField {
+        SelectedField::Scalar(sf)
     }
 }
 
-impl From<Arc<ScalarField>> for SelectedFields {
-    fn from(sf: Arc<ScalarField>) -> SelectedFields {
-        SelectedFields::new(vec![SelectedField::from(sf)], None)
+impl From<ScalarFieldRef> for SelectedFields {
+    fn from(sf: ScalarFieldRef) -> SelectedFields {
+        SelectedFields::new(vec![sf])
     }
 }
 
-impl From<Vec<Arc<ScalarField>>> for SelectedFields {
-    fn from(sfs: Vec<Arc<ScalarField>>) -> SelectedFields {
-        let fields = sfs.into_iter().map(SelectedField::from).collect();
-
-        SelectedFields::new(fields, None)
+impl From<Vec<ScalarFieldRef>> for SelectedFields {
+    fn from(sfs: Vec<ScalarFieldRef>) -> SelectedFields {
+        SelectedFields::new(sfs.into_iter().map(SelectedField::from))
     }
 }
 
@@ -57,31 +39,19 @@ impl From<&ModelRef> for SelectedFields {
             .fields()
             .scalar_non_list()
             .into_iter()
-            .map(SelectedField::from)
-            .collect();
+            .map(SelectedField::from);
 
-        SelectedFields::new(fields, None)
+        SelectedFields::new(fields)
     }
 }
 
 impl SelectedFields {
-    pub const RELATED_MODEL_ALIAS: &'static str = "__RelatedModel__";
-    pub const PARENT_MODEL_ALIAS: &'static str = "__ParentModel__";
-
-    pub fn new(fields: Vec<SelectedField>, from_field: Option<Arc<RelationField>>) -> SelectedFields {
-        let (scalar, relation) = fields.into_iter().fold((Vec::new(), Vec::new()), |mut acc, field| {
-            match field {
-                SelectedField::Scalar(sf) => acc.0.push(sf),
-                SelectedField::Relation(sf) => acc.1.push(sf),
-            }
-
-            acc
-        });
-
+    pub fn new<F>(fields: impl IntoIterator<Item = F>) -> SelectedFields
+    where
+        F: Into<SelectedField>,
+    {
         SelectedFields {
-            scalar,
-            relation,
-            from_field,
+            fields: fields.into_iter().map(Into::into).collect(),
         }
     }
 
@@ -89,84 +59,70 @@ impl SelectedFields {
         Self::from(model.fields().id())
     }
 
-    pub fn add_scalar(&mut self, field: Arc<ScalarField>) {
-        self.scalar.push(SelectedScalarField { field });
+    pub fn push<F>(&mut self, field: F)
+    where
+        F: Into<SelectedField>,
+    {
+        self.fields.push(field.into());
     }
 
-    pub fn names(&self) -> Vec<String> {
-        let mut result: Vec<String> = self.scalar_non_list().iter().map(|f| f.name.clone()).collect();
+    pub fn names(&self) -> impl Iterator<Item = &str> {
+        let scalars = self.scalar_non_list().map(|f| f.name.as_str());
+        let rels = self.relation_inlined().map(|f| f.name.as_str());
 
-        for rf in self.relation_inlined().iter() {
-            result.push(rf.name.clone());
-        }
-
-        if let Some(ref from_field) = self.from_field {
-            result.push(from_field.related_field().name.clone());
-            result.push(from_field.name.clone());
-        };
-
-        result
+        scalars.chain(rels)
     }
 
-    pub fn type_identifiers(&self) -> Vec<TypeIdentifier> {
-        let mut result: Vec<TypeIdentifier> = self.scalar_non_list().iter().map(|sf| sf.type_identifier).collect();
+    pub fn type_identifiers(&self) -> impl Iterator<Item = TypeIdentifier> + '_ {
+        let scalars = self.scalar_non_list().map(|sf| sf.type_identifier);
+        let rels = self.relation_inlined().map(|rf| rf.type_identifier);
 
-        for rf in self.relation_inlined().iter() {
-            result.push(rf.type_identifier);
-        }
-
-        // Related and parent id.
-        if self.from_field.is_some() {
-            result.push(TypeIdentifier::GraphQLID);
-            result.push(TypeIdentifier::GraphQLID);
-        };
-
-        result
+        scalars.chain(rels)
     }
 
-    pub fn model(&self) -> ModelRef {
-        self.scalar
-            .first()
-            .map(|s| s.field.model())
-            .or_else(|| self.relation.first().map(|r| r.field.model()))
-            .expect("Expected at least one field to be present.")
+    pub fn scalar_non_list(&self) -> impl Iterator<Item = &ScalarFieldRef> {
+        self.scalar().filter(|sf| !sf.is_list)
     }
 
-    pub fn relation_inlined(&self) -> Vec<Arc<RelationField>> {
-        self.relation
-            .iter()
-            .map(|rf| Arc::clone(&rf.field))
-            .filter(|rf| {
-                let relation = rf.relation();
-                let related = rf.related_field();
-                let is_inline = relation.is_inline_relation();
-                let is_self = relation.is_self_relation();
-
-                let is_intable = relation
-                    .inline_manifestation()
-                    .map(|mf| mf.in_table_of_model_name == rf.model().name)
-                    .unwrap_or(false);
-
-                (!rf.is_hidden && is_inline && is_self && rf.relation_side.is_b())
-                    || (related.is_hidden && is_inline && is_self && rf.relation_side.is_a())
-                    || (is_inline && !is_self && is_intable)
-            })
-            .collect()
+    pub fn scalar_lists(&self) -> impl Iterator<Item = &ScalarFieldRef> {
+        self.scalar().filter(|sf| sf.is_list)
     }
 
-    pub fn scalar_non_list(&self) -> Vec<Arc<ScalarField>> {
-        self.scalar
-            .iter()
-            .filter(|sf| !sf.field.is_list)
-            .map(|sf| sf.field.clone())
-            .collect()
+    pub(super) fn relation_inlined(&self) -> impl Iterator<Item = &RelationFieldRef> {
+        self.relation().filter(|rf| {
+            let relation = rf.relation();
+            let related = rf.related_field();
+            let is_inline = relation.is_inline_relation();
+            let is_self = relation.is_self_relation();
+
+            let is_intable = relation
+                .inline_manifestation()
+                .map(|mf| mf.in_table_of_model_name == rf.model().name)
+                .unwrap_or(false);
+
+            (!rf.is_hidden && is_inline && is_self && rf.relation_side.is_b())
+                || (related.is_hidden && is_inline && is_self && rf.relation_side.is_a())
+                || (is_inline && !is_self && is_intable)
+        })
     }
 
-    pub fn scalar_lists(&self) -> Vec<Arc<ScalarField>> {
-        self.scalar
-            .iter()
-            .filter(|sf| sf.field.is_list)
-            .map(|sf| sf.field.clone())
-            .collect()
+    fn scalar(&self) -> impl Iterator<Item = &ScalarFieldRef> {
+        self.fields.iter().filter_map(|f| {
+            if let SelectedField::Scalar(ref sf) = f {
+                Some(sf)
+            } else {
+                None
+            }
+        })
+    }
+
+    fn relation(&self) -> impl Iterator<Item = &RelationFieldRef> {
+        self.fields.iter().filter_map(|f| {
+            if let SelectedField::Relation(ref rf) = f {
+                Some(rf)
+            } else {
+                None
+            }
+        })
     }
 }
