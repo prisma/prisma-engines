@@ -1,4 +1,4 @@
-use crate::rpc::{RpcImpl, UrlInput};
+use crate::rpc::RpcImpl;
 use pretty_assertions::assert_eq;
 use serde_json::json;
 use test_setup::*;
@@ -10,7 +10,7 @@ async fn unreachable_database_must_return_a_proper_error_on_mysql() {
 
     url.set_port(Some(8787)).unwrap();
 
-    let error = RpcImpl::introspect_internal(UrlInput { url: url.to_string() })
+    let error = RpcImpl::introspect_internal(url.clone().into_string())
         .await
         .unwrap_err();
 
