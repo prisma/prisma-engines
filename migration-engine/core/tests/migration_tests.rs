@@ -1493,3 +1493,32 @@ async fn foreign_keys_of_inline_one_to_one_relations_have_a_unique_constraint(ap
 
     assert_eq!(box_table.indices, expected_indexes);
 }
+
+#[test_each_connector]
+async fn column_defaults_must_be_migrated(api: &TestApi) {
+    let dm1 = r#"
+        model Fruit {
+            id Int @id
+            name String @default("banana")
+        }
+    "#;
+
+    let schema = api.infer_and_apply(dm1).await.sql_schema;
+
+    let table = schema.table_bang("Fruit");
+    let column = table.column_bang("name");
+    assert_eq!(column.default.as_ref().map(String::as_str), Some( if api.is_sqlite() { "'banana'" } else { "banana" }));
+
+    let dm2 = r#"
+        model Fruit {
+            id Int @id
+            name String @default("mango")
+        }
+    "#;
+
+    let schema = api.infer_and_apply(dm2).await.sql_schema;
+
+    let table = schema.table_bang("Fruit");
+    let column = table.column_bang("name");
+    assert_eq!(column.default.as_ref().map(String::as_str), Some(if api.is_sqlite() { "'mango'" } else { "mango" }));
+}

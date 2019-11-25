@@ -2,6 +2,7 @@
 use super::*;
 use log::debug;
 use quaint::prelude::Queryable;
+use once_cell::sync::Lazy;
 use regex::Regex;
 use std::collections::{HashMap, HashSet};
 use std::convert::TryInto;
@@ -184,9 +185,7 @@ impl SqlSchemaDescriber {
                 });
                 let is_auto_increment = is_identity
                     || match default {
-                        Some(ref val) => {
-                            val == &format!("nextval(\"{}\".\"{}_{}_seq\"::regclass)", schema, table, col_name,)
-                        }
+                        Some(ref val) => is_autoincrement(val, schema, table, col_name),
                         _ => false,
                     };
                 Column {
@@ -547,4 +546,17 @@ fn get_column_type(udt: &str) -> ColumnType {
         raw: udt.to_string(),
         family: family,
     }
+}
+
+static POSTGRES_AUTOINCREMENT: Lazy<Regex> = Lazy::new(|| {
+    Regex::new(r#"nextval("(?P<schema>.*)"."(?P<table_name>[a-zA-Z0-9_]+)_(?P<col_name>[a-zA-Z0-9_]+)_seq(?:_[0-9]+)?::regclass)"#).unwrap()
+});
+
+fn is_autoincrement(value: &str, schema: &str, table: &str, col_name: &str) -> bool {
+    POSTGRES_AUTOINCREMENT
+        .captures(value)
+        .and_then(|captures| {
+            captures.name("schema").map(|matched_schema| matched_schema == schema)
+        )
+        .unwrap_or(false)
 }

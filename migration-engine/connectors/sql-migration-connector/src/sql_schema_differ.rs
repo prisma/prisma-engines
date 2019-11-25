@@ -1,6 +1,10 @@
+mod column;
+mod table;
+
 use crate::*;
 use log::debug;
 use sql_schema_describer::*;
+use table::TableDiffer;
 
 const MIGRATION_TABLE_NAME: &str = "_Migration";
 
@@ -91,11 +95,16 @@ impl<'a> SqlSchemaDiffer<'a> {
         let mut result = Vec::new();
         for previous_table in &self.previous.tables {
             if let Ok(next_table) = self.next.table(&previous_table.name) {
-                let mut changes = Vec::new();
-                changes.extend(Self::drop_foreign_keys(&previous_table, &next_table));
-                changes.append(&mut Self::drop_columns(&previous_table, &next_table));
-                changes.append(&mut Self::add_columns(&previous_table, &next_table));
-                changes.append(&mut Self::alter_columns(&previous_table, &next_table));
+                let differ = TableDiffer {
+                    previous: &previous_table,
+                    next: &next_table,
+                };
+
+                let changes: Vec<TableChange> = Self::drop_foreign_keys(&differ)
+                    .chain(Self::drop_columns(&differ))
+                    .chain(Self::add_columns(&differ))
+                    .chain(Self::alter_columns(&differ))
+                    .collect();
 
                 if !changes.is_empty() {
                     let update = AlterTable {
@@ -109,68 +118,53 @@ impl<'a> SqlSchemaDiffer<'a> {
         result
     }
 
-    fn drop_columns(previous: &Table, next: &Table) -> Vec<TableChange> {
-        let mut result = Vec::new();
-        for previous_column in &previous.columns {
-            if !next.has_column(&previous_column.name) {
-                let change = DropColumn {
-                    name: previous_column.name.clone(),
+    fn drop_columns<'b>(differ: &'b TableDiffer<'b>) -> impl Iterator<Item = TableChange> + 'b {
+        differ.dropped_columns().map(|column| {
+            let change = DropColumn {
+                name: column.name.clone(),
+            };
+
+            TableChange::DropColumn(change)
+        })
+    }
+
+    fn add_columns<'b>(differ: &'b TableDiffer<'_>) -> impl Iterator<Item = TableChange> + 'b {
+        differ.added_columns().map(|column| {
+            let change = AddColumn { column: column.clone() };
+
+            TableChange::AddColumn(change)
+        })
+    }
+
+    fn alter_columns<'b>(table_differ: &'b TableDiffer<'_>) -> impl Iterator<Item = TableChange> + 'b {
+        table_differ.column_pairs().filter_map(move |column_differ| {
+            let previous_fk = table_differ
+                .previous
+                .foreign_key_for_column(&column_differ.previous.name);
+
+            let next_fk = table_differ.next.foreign_key_for_column(&column_differ.next.name);
+
+            if column_differ.differs_in_something() || foreign_key_changed(previous_fk, next_fk) {
+                let change = AlterColumn {
+                    name: column_differ.previous.name.clone(),
+                    column: column_differ.next.clone(),
                 };
-                result.push(TableChange::DropColumn(change));
+
+                return Some(TableChange::AlterColumn(change));
             }
-        }
-        result
+
+            None
+        })
     }
 
-    fn add_columns(previous: &Table, next: &Table) -> Vec<TableChange> {
-        let mut result = Vec::new();
-        for next_column in &next.columns {
-            if !previous.has_column(&next_column.name) {
-                let change = AddColumn {
-                    column: next_column.clone(),
-                };
-                result.push(TableChange::AddColumn(change));
-            }
-        }
-        result
-    }
-
-    fn alter_columns(previous: &Table, next: &Table) -> Vec<TableChange> {
-        let mut result = Vec::new();
-        for next_column in &next.columns {
-            if let Some(previous_column) = previous.column(&next_column.name) {
-                let previous_fk = previous.foreign_key_for_column(&previous_column.name);
-                let next_fk = next.foreign_key_for_column(&next_column.name);
-
-                if previous_column.differs_in_something_except_default(next_column)
-                    || foreign_key_changed(previous_fk, next_fk)
-                {
-                    let change = AlterColumn {
-                        name: previous_column.name.clone(),
-                        column: next_column.clone(),
-                    };
-                    result.push(TableChange::AlterColumn(change));
-                }
-            }
-        }
-        result
-    }
-
-    fn drop_foreign_keys(previous: &'a Table, next: &'a Table) -> impl Iterator<Item = TableChange> + 'a {
-        previous
-            .foreign_keys
-            .iter()
-            .filter(move |previous_fk| {
-                next.foreign_keys
-                    .iter()
-                    .find(|next_fk| foreign_keys_match(previous_fk, next_fk))
-                    .is_none()
-            })
+    fn drop_foreign_keys<'b>(differ: &'b TableDiffer<'_>) -> impl Iterator<Item = TableChange> + 'b {
+        differ
+            .dropped_foreign_keys()
             .filter_map(|foreign_key| foreign_key.constraint_name.as_ref())
             .map(move |dropped_foreign_key_name| {
                 debug!(
                     "Dropping foreign key '{}' on table '{}'",
-                    &dropped_foreign_key_name, &previous.name
+                    &dropped_foreign_key_name, &differ.previous.name
                 );
                 let drop_step = DropForeignKey {
                     constraint_name: dropped_foreign_key_name.clone(),
