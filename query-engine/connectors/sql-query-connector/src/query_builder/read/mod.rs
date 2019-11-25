@@ -99,6 +99,8 @@ pub fn get_scalar_list_values_by_record_ids(
         .column("nodeId")
         .column("value")
         .so_that(vhere)
+        .order_by("nodeId".ascend())
+        .order_by("position".ascend())
 }
 
 pub fn count_by_model(model: &ModelRef, query_arguments: QueryArguments) -> Select<'static> {
