@@ -37,17 +37,9 @@ pub enum Compare<'a> {
     /// `value IS NOT NULL`
     NotNull(Box<DatabaseValue<'a>>),
     /// `value` BETWEEN `left` AND `right`
-    Between(
-        Box<DatabaseValue<'a>>,
-        Box<DatabaseValue<'a>>,
-        Box<DatabaseValue<'a>>,
-    ),
+    Between(Box<DatabaseValue<'a>>, Box<DatabaseValue<'a>>, Box<DatabaseValue<'a>>),
     /// `value` NOT BETWEEN `left` AND `right`
-    NotBetween(
-        Box<DatabaseValue<'a>>,
-        Box<DatabaseValue<'a>>,
-        Box<DatabaseValue<'a>>,
-    ),
+    NotBetween(Box<DatabaseValue<'a>>, Box<DatabaseValue<'a>>, Box<DatabaseValue<'a>>),
 }
 
 impl<'a> From<Compare<'a>> for ConditionTree<'a> {

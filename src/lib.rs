@@ -41,7 +41,7 @@
 //!
 //! #[tokio::main]
 //! async fn main() -> Result<(), quaint::error::Error> {
-//!     let quaint = Quaint::new("file:///tmp/example.db")?;
+//!     let quaint = Quaint::new("file:///tmp/example.db").await?;
 //!     let conn = quaint.check_out().await?;
 //!     let result = conn.select(Select::default().value(1)).await?;
 //!
@@ -112,9 +112,9 @@ pub type Result<T> = std::result::Result<T, error::Error>;
 
 use connector::{Queryable, DBIO};
 use lazy_static::lazy_static;
+use mobc::Pool;
 use pool::{ConnectionInfo, PooledConnection, QuaintManager, SqlFamily};
 use std::convert::TryFrom;
-use tokio_resource_pool::{Builder, Pool};
 use url::Url;
 
 lazy_static! {
@@ -184,7 +184,7 @@ impl Quaint {
     ///   lead to weakened security. Defaults to `strict`.
     /// - `socket` needed when connecting to MySQL database through a unix
     ///   socket. When set, the host parameter is dismissed.
-    pub fn new(url_str: &str) -> crate::Result<Self> {
+    pub async fn new(url_str: &str) -> crate::Result<Self> {
         let url = Url::parse(url_str)?;
 
         let (manager, connection_limit) = match url.scheme() {
@@ -215,29 +215,29 @@ impl Quaint {
 
                 (manager, connection_limit as u32)
             }
-            _ => unimplemented!(
-                "Supported url schemes: file or sqlite, mysql, postgres or postgresql."
-            ),
+            _ => unimplemented!("Supported url schemes: file or sqlite, mysql, postgres or postgresql."),
         };
 
         let connection_info = ConnectionInfo::from_url(url_str)?;
         Self::log_start(connection_info.sql_family(), connection_limit);
 
-        Ok(Self {
-            inner: Builder::new().build(connection_limit as usize, manager),
-            connection_info,
-        })
+        let inner = Pool::builder()
+            .max_size(connection_limit)
+            .build(manager)
+            .await?;
+
+        Ok(Self { inner, connection_info })
     }
 
     /// The number of connections in the pool.
-    pub fn capacity(&self) -> usize {
-        self.inner.capacity()
+    pub async fn capacity(&self) -> u32 {
+        self.inner.state().await.connections
     }
 
     /// Reserve a connection from the pool.
     pub async fn check_out(&self) -> crate::Result<PooledConnection> {
         Ok(PooledConnection {
-            inner: self.inner.check_out().await?,
+            inner: self.inner.get().await?,
         })
     }
 
@@ -249,18 +249,11 @@ impl Quaint {
     fn log_start(family: SqlFamily, connection_limit: u32) {
         #[cfg(not(feature = "tracing-log"))]
         {
-            info!(
-                "Starting a {} pool with {} connections.",
-                family, connection_limit
-            );
+            info!("Starting a {} pool with {} connections.", family, connection_limit);
         }
         #[cfg(feature = "tracing-log")]
         {
-            tracing::info!(
-                "Starting a {} pool with {} connections.",
-                family,
-                connection_limit
-            );
+            tracing::info!("Starting a {} pool with {} connections.", family, connection_limit);
         }
     }
 }
@@ -280,22 +273,14 @@ impl Queryable for Quaint {
         })
     }
 
-    fn query_raw<'a>(
-        &'a self,
-        sql: &'a str,
-        params: &'a [ast::ParameterizedValue],
-    ) -> DBIO<'a, connector::ResultSet> {
+    fn query_raw<'a>(&'a self, sql: &'a str, params: &'a [ast::ParameterizedValue]) -> DBIO<'a, connector::ResultSet> {
         DBIO::new(async move {
             let conn = self.check_out().await?;
             conn.query_raw(sql, params).await
         })
     }
 
-    fn execute_raw<'a>(
-        &'a self,
-        sql: &'a str,
-        params: &'a [ast::ParameterizedValue],
-    ) -> DBIO<'a, u64> {
+    fn execute_raw<'a>(&'a self, sql: &'a str, params: &'a [ast::ParameterizedValue]) -> DBIO<'a, u64> {
         DBIO::new(async move {
             let conn = self.check_out().await?;
             conn.execute_raw(sql, params).await

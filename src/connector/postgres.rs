@@ -91,11 +91,7 @@ impl SslParams {
 
         if let Some(ref identity_file) = self.identity_file {
             let db = fs::read(identity_file).await?;
-            let password = self
-                .identity_password
-                .as_ref()
-                .map(|s| s.as_str())
-                .unwrap_or("");
+            let password = self.identity_password.as_ref().map(|s| s.as_str()).unwrap_or("");
             let identity = Identity::from_pkcs12(&db, &password)?;
 
             auth.identity(identity);
@@ -261,10 +257,7 @@ impl PostgresUrl {
                     #[cfg(not(feature = "tracing-log"))]
                     trace!("Discarding connection string param: {}", k);
                     #[cfg(feature = "tracing-log")]
-                    tracing::trace!(
-                        message = "Discarding connection string param",
-                        param = k.as_str()
-                    );
+                    tracing::trace!(message = "Discarding connection string param", param = k.as_str());
                 }
             };
         }
@@ -334,9 +327,7 @@ impl PostgreSql {
                 tls_builder.add_root_certificate(certificate);
             }
 
-            tls_builder.danger_accept_invalid_certs(
-                auth.ssl_accept_mode == SslAcceptMode::AcceptInvalidCerts,
-            );
+            tls_builder.danger_accept_invalid_certs(auth.ssl_accept_mode == SslAcceptMode::AcceptInvalidCerts);
 
             if let Some(identity) = auth.identity {
                 tls_builder.identity(identity);
@@ -356,18 +347,12 @@ impl PostgreSql {
         })
     }
 
-    fn execute_and_get_id<'a>(
-        &'a self,
-        sql: &'a str,
-        params: &'a [ParameterizedValue],
-    ) -> DBIO<'a, Option<Id>> {
+    fn execute_and_get_id<'a>(&'a self, sql: &'a str, params: &'a [ParameterizedValue]) -> DBIO<'a, Option<Id>> {
         metrics::query("postgres.execute", sql, params, move || {
             async move {
                 let client = self.client.lock().await;
                 let stmt = client.prepare(sql).await?;
-                let rows = client
-                    .query(&stmt, conversion::conv_params(params).as_slice())
-                    .await?;
+                let rows = client.query(&stmt, conversion::conv_params(params).as_slice()).await?;
 
                 let id: Option<Id> = rows.into_iter().rev().next().map(|row| {
                     let id: Id = row.get(0);
@@ -396,18 +381,12 @@ impl Queryable for PostgreSql {
         DBIO::new(async move { self.query_raw(sql.as_str(), &params[..]).await })
     }
 
-    fn query_raw<'a>(
-        &'a self,
-        sql: &'a str,
-        params: &'a [ParameterizedValue],
-    ) -> DBIO<'a, ResultSet> {
+    fn query_raw<'a>(&'a self, sql: &'a str, params: &'a [ParameterizedValue]) -> DBIO<'a, ResultSet> {
         metrics::query("postgres.query_raw", sql, params, move || {
             async move {
                 let client = self.client.lock().await;
                 let stmt = client.prepare(sql).await?;
-                let rows = client
-                    .query(&stmt, conversion::conv_params(params).as_slice())
-                    .await?;
+                let rows = client.query(&stmt, conversion::conv_params(params).as_slice()).await?;
 
                 let mut result = ResultSet::new(stmt.to_column_names(), Vec::new());
 
@@ -474,9 +453,7 @@ mod tests {
 
     #[test]
     fn should_parse_socket_url() {
-        let url =
-            PostgresUrl::new(Url::parse("postgresql:///dbname?host=/var/run/psql.sock").unwrap())
-                .unwrap();
+        let url = PostgresUrl::new(Url::parse("postgresql:///dbname?host=/var/run/psql.sock").unwrap()).unwrap();
         assert_eq!("dbname", url.dbname());
         assert_eq!("/var/run/psql.sock", url.host());
     }
@@ -490,14 +467,11 @@ mod tests {
 
     #[tokio::test]
     async fn should_provide_a_database_connection() {
-        let pool = Quaint::new(&CONN_STR).unwrap();
+        let pool = Quaint::new(&CONN_STR).await.unwrap();
         let connection = pool.check_out().await.unwrap();
 
         let res = connection
-            .query_raw(
-                "select * from \"pg_catalog\".\"pg_am\" where amtype = 'x'",
-                &[],
-            )
+            .query_raw("select * from \"pg_catalog\".\"pg_am\" where amtype = 'x'", &[])
             .await
             .unwrap();
 
@@ -507,15 +481,12 @@ mod tests {
 
     #[tokio::test]
     async fn should_provide_a_database_transaction() {
-        let pool = Quaint::new(&CONN_STR).unwrap();
+        let pool = Quaint::new(&CONN_STR).await.unwrap();
         let connection = pool.check_out().await.unwrap();
         let tx = connection.start_transaction().await.unwrap();
 
         let res = tx
-            .query_raw(
-                "select * from \"pg_catalog\".\"pg_am\" where amtype = 'x'",
-                &[],
-            )
+            .query_raw("select * from \"pg_catalog\".\"pg_am\" where amtype = 'x'", &[])
             .await
             .unwrap();
 
@@ -543,17 +514,14 @@ mod tests {
 
     #[tokio::test]
     async fn should_map_columns_correctly() {
-        let pool = Quaint::new(&CONN_STR).unwrap();
+        let pool = Quaint::new(&CONN_STR).await.unwrap();
         let connection = pool.check_out().await.unwrap();
 
         connection.query_raw(DROP_TABLE, &[]).await.unwrap();
         connection.query_raw(TABLE_DEF, &[]).await.unwrap();
         connection.query_raw(CREATE_USER, &[]).await.unwrap();
 
-        let rows = connection
-            .query_raw("SELECT * FROM \"user\"", &[])
-            .await
-            .unwrap();
+        let rows = connection.query_raw("SELECT * FROM \"user\"", &[]).await.unwrap();
         assert_eq!(rows.len(), 1);
 
         let row = rows.get(0).unwrap();
@@ -569,7 +537,7 @@ mod tests {
         let mut url = Url::parse(&CONN_STR).unwrap();
         url.query_pairs_mut().append_pair("schema", "musti-test");
 
-        let pool = Quaint::new(url.as_str()).unwrap();
+        let pool = Quaint::new(url.as_str()).await.unwrap();
         let client = pool.check_out().await.unwrap();
 
         let result_set = client.query_raw("SHOW search_path", &[]).await.unwrap();
@@ -583,16 +551,13 @@ mod tests {
         let mut url = Url::parse(&CONN_STR).unwrap();
         url.set_path("this_does_not_exist");
 
-        let pool = Quaint::new(url.as_str()).unwrap();
-        let res = pool.check_out().await;
+        let res = Quaint::new(url.as_str()).await;
 
         assert!(res.is_err());
 
         match res {
             Ok(_) => unreachable!(),
-            Err(Error::DatabaseDoesNotExist { db_name }) => {
-                assert_eq!("this_does_not_exist", db_name.as_str())
-            }
+            Err(Error::DatabaseDoesNotExist { db_name }) => assert_eq!("this_does_not_exist", db_name.as_str()),
             Err(e) => panic!("Expected `DatabaseDoesNotExist`, got {:?}", e),
         }
     }

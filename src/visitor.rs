@@ -130,18 +130,14 @@ pub trait Visitor<'a> {
                 match table.typ {
                     TableType::Query(_) => match table.alias {
                         Some(ref alias) => {
-                            self.surround_with(Self::C_BACKTICK, Self::C_BACKTICK, |ref mut s| {
-                                s.write(alias)
-                            })?;
+                            self.surround_with(Self::C_BACKTICK, Self::C_BACKTICK, |ref mut s| s.write(alias))?;
                             self.write(".*")?;
                         }
                         None => self.write("*")?,
                     },
                     TableType::Table(_) => match table.alias.clone() {
                         Some(ref alias) => {
-                            self.surround_with(Self::C_BACKTICK, Self::C_BACKTICK, |ref mut s| {
-                                s.write(alias)
-                            })?;
+                            self.surround_with(Self::C_BACKTICK, Self::C_BACKTICK, |ref mut s| s.write(alias))?;
                             self.write(".*")?;
                         }
                         None => {
@@ -232,9 +228,7 @@ pub trait Visitor<'a> {
         let len = parts.len();
 
         for (i, parts) in parts.iter().enumerate() {
-            self.surround_with(Self::C_BACKTICK, Self::C_BACKTICK, |ref mut s| {
-                s.write(parts)
-            })?;
+            self.surround_with(Self::C_BACKTICK, Self::C_BACKTICK, |ref mut s| s.write(parts))?;
 
             if i < (len - 1) {
                 self.write(".")?;
@@ -292,9 +286,7 @@ pub trait Visitor<'a> {
             DatabaseValue::Parameterized(val) => self.visit_parameterized(val),
             DatabaseValue::Column(column) => self.visit_column(*column),
             DatabaseValue::Row(row) => self.visit_row(row),
-            DatabaseValue::Select(select) => {
-                self.surround_with("(", ")", |ref mut s| s.visit_select(select))
-            }
+            DatabaseValue::Select(select) => self.surround_with("(", ")", |ref mut s| s.visit_select(select)),
             DatabaseValue::Function(function) => self.visit_function(function),
             DatabaseValue::Asterisk(table) => match table {
                 Some(table) => {
@@ -313,9 +305,7 @@ pub trait Visitor<'a> {
                 Some(database) => self.delimited_identifiers(&[&*database, &*table_name])?,
                 None => self.delimited_identifiers(&[&*table_name])?,
             },
-            TableType::Query(select) => {
-                self.surround_with("(", ")", |ref mut s| s.visit_select(select))?
-            }
+            TableType::Query(select) => self.surround_with("(", ")", |ref mut s| s.visit_select(select))?,
         };
 
         if include_alias {
@@ -588,9 +578,7 @@ pub trait Visitor<'a> {
                     self.write("ROW_NUMBER() OVER()")?;
                 } else {
                     self.write("ROW_NUMBER() OVER")?;
-                    self.surround_with("(", ")", |ref mut s| {
-                        s.visit_partitioning(fun_rownum.over)
-                    })?;
+                    self.surround_with("(", ")", |ref mut s| s.visit_partitioning(fun_rownum.over))?;
                 }
             }
             FunctionType::Count(fun_count) => {

@@ -6,7 +6,7 @@ Quaint is an abstraction over certain SQL databases. It provides:
 - An AST for building dynamic SQL queries.
 - Visitors for different databases to generate SQL strings.
 - Connectors to abstract over results and querying.
-- Pooling with [tokio-resource-pool](https://crates.io/crates/tokio-resource-pool)
+- Pooling with [mobc](https://crates.io/crates/mobc)
 
 Example:
 
@@ -15,7 +15,7 @@ use quaint::{ast::*, Quaint};
 
 #[tokio::main]
 async fn main() -> Result<(), quaint::error::Error> {
-    let quaint = Quaint::new("postgres://user:pass@localhost/mydb")?;
+    let quaint = Quaint::new("postgres://user:pass@localhost/mydb").await?;
     let conn = quaint.check_out().await?;
 
     let query = Select::from_table("cats").so_that("name".equals("musti"));

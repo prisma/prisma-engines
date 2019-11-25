@@ -37,9 +37,7 @@ impl ValueIndex<ResultRow, ParameterizedValue<'static>> for &str {
     }
 }
 
-impl<'a, I: ValueIndex<ResultRowRef<'a>, ParameterizedValue<'static>> + 'static> ops::Index<I>
-    for ResultRowRef<'a>
-{
+impl<'a, I: ValueIndex<ResultRowRef<'a>, ParameterizedValue<'static>> + 'static> ops::Index<I> for ResultRowRef<'a> {
     type Output = ParameterizedValue<'static>;
 
     fn index(&self, index: I) -> &ParameterizedValue<'static> {

@@ -32,9 +32,7 @@ where
 {
     #[inline]
     fn from(vector: Vec<T>) -> Row<'a> {
-        vector
-            .into_iter()
-            .fold(Row::new(), |row, v| row.push(v.into()))
+        vector.into_iter().fold(Row::new(), |row, v| row.push(v.into()))
     }
 }
 
@@ -80,11 +78,7 @@ where
 {
     #[inline]
     fn from(vals: (A, B, C, D)) -> Self {
-        Row::new()
-            .push(vals.0)
-            .push(vals.1)
-            .push(vals.2)
-            .push(vals.3)
+        Row::new().push(vals.0).push(vals.1).push(vals.2).push(vals.3)
     }
 }
 

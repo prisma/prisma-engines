@@ -39,10 +39,7 @@ pub enum Error {
     #[fail(display = "Error accessing result set, column not found: {}", _0)]
     ColumnNotFound(String),
 
-    #[fail(
-        display = "Error accessing result set, type mismatch, expected: {}",
-        _0
-    )]
+    #[fail(display = "Error accessing result set, type mismatch, expected: {}", _0)]
     ResultTypeMismatch(&'static str),
 
     #[fail(display = "The specified database url {} is invalid", _0)]
@@ -67,14 +64,12 @@ pub enum Error {
     TlsError { message: String },
 }
 
-#[cfg(any(
-    feature = "mysql-16",
-    feature = "postgresql-0_16",
-    feature = "rusqlite-0_19"
-))]
-impl From<r2d2::Error> for Error {
-    fn from(e: r2d2::Error) -> Error {
-        Error::ConnectionError(e.into())
+impl From<mobc::Error<failure::Compat<Error>>> for Error {
+    fn from(e: mobc::Error<failure::Compat<Error>>) -> Self {
+        match e {
+            mobc::Error::Inner(e) => e.into_inner(),
+            mobc::Error::Timeout => Self::Timeout,
+        }
     }
 }
 

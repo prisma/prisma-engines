@@ -377,9 +377,7 @@ impl<'a> TryFrom<ParameterizedValue<'a>> for String {
     type Error = Error;
 
     fn try_from(value: ParameterizedValue<'a>) -> Result<String, Self::Error> {
-        value
-            .into_string()
-            .ok_or(Error::ConversionError("Not a string"))
+        value.into_string().ok_or(Error::ConversionError("Not a string"))
     }
 }
 
@@ -396,9 +394,7 @@ impl<'a> TryFrom<ParameterizedValue<'a>> for DateTime<Utc> {
     type Error = Error;
 
     fn try_from(value: ParameterizedValue<'a>) -> Result<DateTime<Utc>, Self::Error> {
-        value
-            .as_datetime()
-            .ok_or(Error::ConversionError("Not a datetime"))
+        value.as_datetime().ok_or(Error::ConversionError("Not a datetime"))
     }
 }
 
@@ -597,11 +593,7 @@ impl<'a> Comparable<'a> for DatabaseValue<'a> {
         T: Into<DatabaseValue<'a>>,
         V: Into<DatabaseValue<'a>>,
     {
-        Compare::Between(
-            Box::new(self),
-            Box::new(left.into()),
-            Box::new(right.into()),
-        )
+        Compare::Between(Box::new(self), Box::new(left.into()), Box::new(right.into()))
     }
 
     #[inline]
@@ -610,11 +602,7 @@ impl<'a> Comparable<'a> for DatabaseValue<'a> {
         T: Into<DatabaseValue<'a>>,
         V: Into<DatabaseValue<'a>>,
     {
-        Compare::NotBetween(
-            Box::new(self),
-            Box::new(left.into()),
-            Box::new(right.into()),
-        )
+        Compare::NotBetween(Box::new(self), Box::new(left.into()), Box::new(right.into()))
     }
 }
 
