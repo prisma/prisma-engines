@@ -22,9 +22,7 @@ impl<'a> GetRow for SqliteRow<'a> {
                     _ => ParameterizedValue::Integer(i),
                 },
                 ValueRef::Real(f) => ParameterizedValue::Real(f),
-                ValueRef::Text(bytes) => {
-                    ParameterizedValue::Text(String::from_utf8(bytes.to_vec())?.into())
-                }
+                ValueRef::Text(bytes) => ParameterizedValue::Text(String::from_utf8(bytes.to_vec())?.into()),
                 ValueRef::Blob(_) => panic!("Blobs not supprted, yet"),
             };
 

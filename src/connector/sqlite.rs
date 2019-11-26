@@ -46,9 +46,7 @@ impl TryFrom<&str> for SqliteParams {
         let path = Path::new(path_str);
 
         if path.is_dir() {
-            Err(Error::DatabaseUrlIsInvalid(
-                path.to_str().unwrap().to_string(),
-            ))
+            Err(Error::DatabaseUrlIsInvalid(path.to_str().unwrap().to_string()))
         } else {
             let official = vec![];
             let mut connection_limit = num_cpus::get_physical() * 2 + 1;
@@ -70,8 +68,7 @@ impl TryFrom<&str> for SqliteParams {
                 for (k, v) in unsupported.into_iter() {
                     match k.as_ref() {
                         "connection_limit" => {
-                            let as_int: usize =
-                                v.parse().map_err(|_| Error::InvalidConnectionArguments)?;
+                            let as_int: usize = v.parse().map_err(|_| Error::InvalidConnectionArguments)?;
 
                             connection_limit = as_int;
                         }
@@ -82,10 +79,7 @@ impl TryFrom<&str> for SqliteParams {
                             #[cfg(not(feature = "tracing-log"))]
                             trace!("Discarding connection string param: {}", k);
                             #[cfg(feature = "tracing-log")]
-                            tracing::trace!(
-                                message = "Discarding connection string param",
-                                param = k.as_str()
-                            );
+                            tracing::trace!(message = "Discarding connection string param", param = k.as_str());
                         }
                     };
                 }
@@ -131,11 +125,7 @@ impl Sqlite {
             .collect();
 
         if !databases.contains(db_name) {
-            rusqlite::Connection::execute(
-                &client,
-                "ATTACH DATABASE ? AS ?",
-                &[self.file_path.as_str(), db_name],
-            )?;
+            rusqlite::Connection::execute(&client, "ATTACH DATABASE ? AS ?", &[self.file_path.as_str(), db_name])?;
         }
 
         rusqlite::Connection::execute(&client, "PRAGMA foreign_keys = ON", NO_PARAMS)?;
@@ -166,11 +156,7 @@ impl Queryable for Sqlite {
         DBIO::new(async move { self.query_raw(&sql, &params).await })
     }
 
-    fn query_raw<'a>(
-        &'a self,
-        sql: &'a str,
-        params: &'a [ParameterizedValue],
-    ) -> DBIO<'a, ResultSet> {
+    fn query_raw<'a>(&'a self, sql: &'a str, params: &'a [ParameterizedValue]) -> DBIO<'a, ResultSet> {
         metrics::query("sqlite.query_raw", sql, params, move || {
             let res = move || {
                 let client = self.client.lock().unwrap();
@@ -266,10 +252,7 @@ mod tests {
     #[tokio::test]
     async fn should_provide_a_database_connection() {
         let connection = Sqlite::new("db/test.db").unwrap();
-        let res = connection
-            .query_raw("SELECT * FROM sqlite_master", &[])
-            .await
-            .unwrap();
+        let res = connection.query_raw("SELECT * FROM sqlite_master", &[]).await.unwrap();
 
         assert!(res.is_empty());
     }
@@ -278,10 +261,7 @@ mod tests {
     async fn should_provide_a_database_transaction() {
         let connection = Sqlite::new("db/test.db").unwrap();
         let tx = connection.start_transaction().await.unwrap();
-        let res = tx
-            .query_raw("SELECT * FROM sqlite_master", &[])
-            .await
-            .unwrap();
+        let res = tx.query_raw("SELECT * FROM sqlite_master", &[]).await.unwrap();
 
         assert!(res.is_empty());
     }
@@ -309,10 +289,7 @@ mod tests {
         connection.query_raw(TABLE_DEF, &[]).await.unwrap();
         connection.query_raw(CREATE_USER, &[]).await.unwrap();
 
-        let rows = connection
-            .query_raw("SELECT * FROM USER", &[])
-            .await
-            .unwrap();
+        let rows = connection.query_raw("SELECT * FROM USER", &[]).await.unwrap();
         assert_eq!(rows.len(), 1);
 
         let row = rows.get(0).unwrap();

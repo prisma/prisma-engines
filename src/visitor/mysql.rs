@@ -134,9 +134,7 @@ impl<'a> From<ParameterizedValue<'a>> for MyValue {
             #[cfg(feature = "array")]
             ParameterizedValue::Array(_) => unimplemented!("Arrays are not supported for mysql."),
             #[cfg(feature = "uuid-0_7")]
-            ParameterizedValue::Uuid(u) => {
-                MyValue::Bytes(u.to_hyphenated().to_string().into_bytes())
-            }
+            ParameterizedValue::Uuid(u) => MyValue::Bytes(u.to_hyphenated().to_string().into_bytes()),
             #[cfg(feature = "chrono-0_4")]
             ParameterizedValue::DateTime(dt) => MyValue::Date(
                 dt.year() as u16,
@@ -155,22 +153,14 @@ impl<'a> From<ParameterizedValue<'a>> for MyValue {
 mod tests {
     use crate::visitor::*;
 
-    fn expected_values<'a, T>(
-        sql: &'static str,
-        params: Vec<T>,
-    ) -> (String, Vec<ParameterizedValue<'a>>)
+    fn expected_values<'a, T>(sql: &'static str, params: Vec<T>) -> (String, Vec<ParameterizedValue<'a>>)
     where
         T: Into<ParameterizedValue<'a>>,
     {
-        (
-            String::from(sql),
-            params.into_iter().map(|p| p.into()).collect(),
-        )
+        (String::from(sql), params.into_iter().map(|p| p.into()).collect())
     }
 
-    fn default_params<'a>(
-        mut additional: Vec<ParameterizedValue<'a>>,
-    ) -> Vec<ParameterizedValue<'a>> {
+    fn default_params<'a>(mut additional: Vec<ParameterizedValue<'a>>) -> Vec<ParameterizedValue<'a>> {
         let mut result = Vec::new();
 
         for param in additional.drain(0..) {
@@ -213,10 +203,7 @@ mod tests {
 
     #[test]
     fn test_limit_and_offset_when_both_are_set() {
-        let expected = expected_values(
-            "SELECT `users`.* FROM `users` LIMIT ? OFFSET ?",
-            vec![10, 2],
-        );
+        let expected = expected_values("SELECT `users`.* FROM `users` LIMIT ? OFFSET ?", vec![10, 2]);
         let query = Select::from_table("users").limit(10).offset(2);
         let (sql, params) = Mysql::build(query);
 

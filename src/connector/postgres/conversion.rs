@@ -14,10 +14,7 @@ use tokio_postgres::{
 use uuid::Uuid;
 
 pub fn conv_params<'a>(params: &'a [ParameterizedValue<'a>]) -> Vec<&'a (dyn types::ToSql + Sync)> {
-    params
-        .iter()
-        .map(|x| x as &(dyn ToSql + Sync))
-        .collect::<Vec<_>>()
+    params.iter().map(|x| x as &(dyn ToSql + Sync)).collect::<Vec<_>>()
 }
 
 #[cfg(feature = "uuid-0_7")]
@@ -38,10 +35,7 @@ fn accepts(ty: &PostgresType) -> bool {
 }
 
 impl<'a> FromSql<'a> for Id {
-    fn from_sql(
-        ty: &PostgresType,
-        raw: &'a [u8],
-    ) -> Result<Id, Box<dyn std::error::Error + Sync + Send>> {
+    fn from_sql(ty: &PostgresType, raw: &'a [u8]) -> Result<Id, Box<dyn std::error::Error + Sync + Send>> {
         let res = match *ty {
             PostgresType::INT2 => Id::Int(i16::from_sql(ty, raw)? as usize),
             PostgresType::INT4 => Id::Int(i32::from_sql(ty, raw)? as usize),
@@ -156,9 +150,7 @@ impl GetRow for PostgresRow {
                     Some(val) => {
                         let val: Vec<i64> = val;
                         ParameterizedValue::Array(
-                            val.into_iter()
-                                .map(|x| ParameterizedValue::Integer(x as i64))
-                                .collect(),
+                            val.into_iter().map(|x| ParameterizedValue::Integer(x as i64)).collect(),
                         )
                     }
                     None => ParameterizedValue::Null,
@@ -179,11 +171,7 @@ impl GetRow for PostgresRow {
                 PostgresType::FLOAT8_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<f64> = val;
-                        ParameterizedValue::Array(
-                            val.into_iter()
-                                .map(|x| ParameterizedValue::Real(x as f64))
-                                .collect(),
-                        )
+                        ParameterizedValue::Array(val.into_iter().map(|x| ParameterizedValue::Real(x as f64)).collect())
                     }
                     None => ParameterizedValue::Null,
                 },
@@ -191,9 +179,7 @@ impl GetRow for PostgresRow {
                 PostgresType::BOOL_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<bool> = val;
-                        ParameterizedValue::Array(
-                            val.into_iter().map(ParameterizedValue::Boolean).collect(),
-                        )
+                        ParameterizedValue::Array(val.into_iter().map(ParameterizedValue::Boolean).collect())
                     }
                     None => ParameterizedValue::Null,
                 },
@@ -203,9 +189,7 @@ impl GetRow for PostgresRow {
                         let val: Vec<NaiveDateTime> = val;
                         ParameterizedValue::Array(
                             val.into_iter()
-                                .map(|x| {
-                                    ParameterizedValue::DateTime(DateTime::<Utc>::from_utc(x, Utc))
-                                })
+                                .map(|x| ParameterizedValue::DateTime(DateTime::<Utc>::from_utc(x, Utc)))
                                 .collect(),
                         )
                     }
@@ -224,19 +208,19 @@ impl GetRow for PostgresRow {
                     None => ParameterizedValue::Null,
                 },
                 #[cfg(feature = "array")]
-                PostgresType::TEXT_ARRAY
-                | PostgresType::NAME_ARRAY
-                | PostgresType::VARCHAR_ARRAY => match row.try_get(i)? {
-                    Some(val) => {
-                        let val: Vec<&str> = val;
-                        ParameterizedValue::Array(
-                            val.into_iter()
-                                .map(|x| ParameterizedValue::Text(String::from(x).into()))
-                                .collect(),
-                        )
+                PostgresType::TEXT_ARRAY | PostgresType::NAME_ARRAY | PostgresType::VARCHAR_ARRAY => {
+                    match row.try_get(i)? {
+                        Some(val) => {
+                            let val: Vec<&str> = val;
+                            ParameterizedValue::Array(
+                                val.into_iter()
+                                    .map(|x| ParameterizedValue::Text(String::from(x).into()))
+                                    .collect(),
+                            )
+                        }
+                        None => ParameterizedValue::Null,
                     }
-                    None => ParameterizedValue::Null,
-                },
+                }
                 PostgresType::OID => match row.try_get(i)? {
                     Some(val) => {
                         let val: u32 = val;

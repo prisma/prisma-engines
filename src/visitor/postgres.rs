@@ -133,11 +133,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
 }
 
 impl<'a> ToSql for ParameterizedValue<'a> {
-    fn to_sql(
-        &self,
-        ty: &Type,
-        out: &mut BytesMut,
-    ) -> Result<IsNull, Box<dyn Error + 'static + Send + Sync>> {
+    fn to_sql(&self, ty: &Type, out: &mut BytesMut) -> Result<IsNull, Box<dyn Error + 'static + Send + Sync>> {
         match self {
             ParameterizedValue::Null => Ok(IsNull::Yes),
             ParameterizedValue::Integer(integer) => match *ty {
@@ -171,11 +167,7 @@ impl<'a> ToSql for ParameterizedValue<'a> {
         true // Please check later should we make this to be more restricted
     }
 
-    fn to_sql_checked(
-        &self,
-        ty: &Type,
-        out: &mut BytesMut,
-    ) -> Result<IsNull, Box<dyn Error + 'static + Send + Sync>> {
+    fn to_sql_checked(&self, ty: &Type, out: &mut BytesMut) -> Result<IsNull, Box<dyn Error + 'static + Send + Sync>> {
         match self {
             ParameterizedValue::Null => Ok(IsNull::Yes),
             ParameterizedValue::Integer(integer) => match *ty {
@@ -210,22 +202,14 @@ impl<'a> ToSql for ParameterizedValue<'a> {
 mod tests {
     use crate::visitor::*;
 
-    fn expected_values<'a, T>(
-        sql: &'static str,
-        params: Vec<T>,
-    ) -> (String, Vec<ParameterizedValue<'a>>)
+    fn expected_values<'a, T>(sql: &'static str, params: Vec<T>) -> (String, Vec<ParameterizedValue<'a>>)
     where
         T: Into<ParameterizedValue<'a>>,
     {
-        (
-            String::from(sql),
-            params.into_iter().map(|p| p.into()).collect(),
-        )
+        (String::from(sql), params.into_iter().map(|p| p.into()).collect())
     }
 
-    fn default_params<'a>(
-        mut additional: Vec<ParameterizedValue<'a>>,
-    ) -> Vec<ParameterizedValue<'a>> {
+    fn default_params<'a>(mut additional: Vec<ParameterizedValue<'a>>) -> Vec<ParameterizedValue<'a>> {
         let mut result = Vec::new();
 
         for param in additional.drain(0..) {
@@ -256,10 +240,7 @@ mod tests {
 
     #[test]
     fn test_multi_row_insert() {
-        let expected = expected_values(
-            "INSERT INTO \"users\" (\"foo\") VALUES ($1), ($2)",
-            vec![10, 11],
-        );
+        let expected = expected_values("INSERT INTO \"users\" (\"foo\") VALUES ($1), ($2)", vec![10, 11]);
         let query = Insert::multi_into("users", vec!["foo"])
             .values(vec![10])
             .values(vec![11]);
@@ -271,10 +252,7 @@ mod tests {
 
     #[test]
     fn test_limit_and_offset_when_both_are_set() {
-        let expected = expected_values(
-            "SELECT \"users\".* FROM \"users\" LIMIT $1 OFFSET $2",
-            vec![10, 2],
-        );
+        let expected = expected_values("SELECT \"users\".* FROM \"users\" LIMIT $1 OFFSET $2", vec![10, 2]);
         let query = Select::from_table("users").limit(10).offset(2);
         let (sql, params) = Postgres::build(query);
 

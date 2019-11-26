@@ -41,10 +41,7 @@ impl ConnectionInfo {
         let url = url_result?;
 
         let sql_family = SqlFamily::from_scheme(url.scheme()).ok_or_else(|| {
-            Error::DatabaseUrlIsInvalid(format!(
-                "{} is not a supported database URL scheme.",
-                url.scheme()
-            ))
+            Error::DatabaseUrlIsInvalid(format!("{} is not a supported database URL scheme.", url.scheme()))
         })?;
 
         match sql_family {
@@ -188,10 +185,7 @@ mod tests {
         let conn_info = ConnectionInfo::from_url("file:dev.db").unwrap();
 
         match conn_info {
-            ConnectionInfo::Sqlite {
-                file_path,
-                db_name: _,
-            } => assert_eq!(file_path, "dev.db"),
+            ConnectionInfo::Sqlite { file_path, db_name: _ } => assert_eq!(file_path, "dev.db"),
             _ => panic!("wrong"),
         }
     }

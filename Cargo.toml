@@ -18,12 +18,12 @@ documentation = "https://docs.rs/quaint/"
 
 [features]
 default = ["sqlite", "json-1", "postgresql", "uuid-0_7", "chrono-0_4", "mysql" ]
-sqlite = ["rusqlite", "libsqlite3-sys", "tokio-resource-pool"]
+sqlite = ["rusqlite", "libsqlite3-sys", "mobc"]
 json-1 = ["serde_json"]
-postgresql = ["rust_decimal", "native-tls", "tokio-postgres", "postgres-native-tls", "array", "tokio-resource-pool"]
+postgresql = ["rust_decimal", "native-tls", "tokio-postgres", "postgres-native-tls", "array", "mobc"]
 uuid-0_7 = ["uuid"]
 chrono-0_4 = ["chrono"]
-mysql = ["mysql_async", "tokio-resource-pool"]
+mysql = ["mysql_async", "mobc"]
 tracing-log = ["tracing", "tracing-core"]
 array = []
 
@@ -55,8 +55,8 @@ log = { version = "0.4", features = ["release_max_level_trace"] }
 tracing = { version = "0.1", optional = true }
 tracing-core = { version = "0.1", optional = true }
 
-tokio = "=0.2.0-alpha.6"
-tokio-resource-pool = { git = "https://github.com/pimeys/tokio-resource-pool", optional = true }
+mobc = { version = "0.2", optional = true }
 futures = "0.3"
 async-std = "0.99.10"
 bytes = "0.4"
+tokio = "=0.2.0-alpha.6"

@@ -134,8 +134,8 @@ impl<'a> ToSql for ParameterizedValue<'a> {
             ParameterizedValue::Array(_) => unimplemented!("Arrays are not supported for sqlite."),
             #[cfg(feature = "json-1")]
             ParameterizedValue::Json(value) => {
-                let stringified = serde_json::to_string(value)
-                    .map_err(|err| RusqlError::ToSqlConversionFailure(Box::new(err)))?;
+                let stringified =
+                    serde_json::to_string(value).map_err(|err| RusqlError::ToSqlConversionFailure(Box::new(err)))?;
                 ToSqlOutput::from(stringified)
             }
             #[cfg(feature = "uuid-0_7")]
@@ -152,22 +152,14 @@ impl<'a> ToSql for ParameterizedValue<'a> {
 mod tests {
     use crate::visitor::*;
 
-    fn expected_values<'a, T>(
-        sql: &'static str,
-        params: Vec<T>,
-    ) -> (String, Vec<ParameterizedValue<'a>>)
+    fn expected_values<'a, T>(sql: &'static str, params: Vec<T>) -> (String, Vec<ParameterizedValue<'a>>)
     where
         T: Into<ParameterizedValue<'a>>,
     {
-        (
-            String::from(sql),
-            params.into_iter().map(|p| p.into()).collect(),
-        )
+        (String::from(sql), params.into_iter().map(|p| p.into()).collect())
     }
 
-    fn default_params<'a>(
-        mut additional: Vec<ParameterizedValue<'a>>,
-    ) -> Vec<ParameterizedValue<'a>> {
+    fn default_params<'a>(mut additional: Vec<ParameterizedValue<'a>>) -> Vec<ParameterizedValue<'a>> {
         let mut result = Vec::new();
 
         for param in additional.drain(0..) {
@@ -214,9 +206,7 @@ mod tests {
     #[test]
     fn test_select_fields_from() {
         let expected_sql = "SELECT `paw`, `nose` FROM `cat`.`musti`";
-        let query = Select::from_table(("cat", "musti"))
-            .column("paw")
-            .column("nose");
+        let query = Select::from_table(("cat", "musti")).column("paw").column("nose");
         let (sql, params) = Sqlite::build(query);
 
         assert_eq!(expected_sql, sql);
@@ -225,10 +215,7 @@ mod tests {
 
     #[test]
     fn test_select_where_equals() {
-        let expected = expected_values(
-            "SELECT `naukio`.* FROM `naukio` WHERE `word` = ?",
-            vec!["meow"],
-        );
+        let expected = expected_values("SELECT `naukio`.* FROM `naukio` WHERE `word` = ?", vec!["meow"]);
 
         let query = Select::from_table("naukio").so_that("word".equals("meow"));
         let (sql, params) = Sqlite::build(query);
@@ -239,10 +226,7 @@ mod tests {
 
     #[test]
     fn test_select_where_like() {
-        let expected = expected_values(
-            "SELECT `naukio`.* FROM `naukio` WHERE `word` LIKE ?",
-            vec!["%meow%"],
-        );
+        let expected = expected_values("SELECT `naukio`.* FROM `naukio` WHERE `word` LIKE ?", vec!["%meow%"]);
 
         let query = Select::from_table("naukio").so_that("word".like("meow"));
         let (sql, params) = Sqlite::build(query);
@@ -267,10 +251,7 @@ mod tests {
 
     #[test]
     fn test_select_where_begins_with() {
-        let expected = expected_values(
-            "SELECT `naukio`.* FROM `naukio` WHERE `word` LIKE ?",
-            vec!["meow%"],
-        );
+        let expected = expected_values("SELECT `naukio`.* FROM `naukio` WHERE `word` LIKE ?", vec!["meow%"]);
 
         let query = Select::from_table("naukio").so_that("word".begins_with("meow"));
         let (sql, params) = Sqlite::build(query);
@@ -281,10 +262,7 @@ mod tests {
 
     #[test]
     fn test_select_where_not_begins_with() {
-        let expected = expected_values(
-            "SELECT `naukio`.* FROM `naukio` WHERE `word` NOT LIKE ?",
-            vec!["meow%"],
-        );
+        let expected = expected_values("SELECT `naukio`.* FROM `naukio` WHERE `word` NOT LIKE ?", vec!["meow%"]);
 
         let query = Select::from_table("naukio").so_that("word".not_begins_with("meow"));
         let (sql, params) = Sqlite::build(query);
@@ -295,10 +273,7 @@ mod tests {
 
     #[test]
     fn test_select_where_ends_into() {
-        let expected = expected_values(
-            "SELECT `naukio`.* FROM `naukio` WHERE `word` LIKE ?",
-            vec!["%meow"],
-        );
+        let expected = expected_values("SELECT `naukio`.* FROM `naukio` WHERE `word` LIKE ?", vec!["%meow"]);
 
         let query = Select::from_table("naukio").so_that("word".ends_into("meow"));
         let (sql, params) = Sqlite::build(query);
@@ -309,10 +284,7 @@ mod tests {
 
     #[test]
     fn test_select_where_not_ends_into() {
-        let expected = expected_values(
-            "SELECT `naukio`.* FROM `naukio` WHERE `word` NOT LIKE ?",
-            vec!["%meow"],
-        );
+        let expected = expected_values("SELECT `naukio`.* FROM `naukio` WHERE `word` NOT LIKE ?", vec!["%meow"]);
 
         let query = Select::from_table("naukio").so_that("word".not_ends_into("meow"));
         let (sql, params) = Sqlite::build(query);
@@ -323,8 +295,7 @@ mod tests {
 
     #[test]
     fn test_select_and() {
-        let expected_sql =
-            "SELECT `naukio`.* FROM `naukio` WHERE ((`word` = ? AND `age` < ?) AND `paw` = ?)";
+        let expected_sql = "SELECT `naukio`.* FROM `naukio` WHERE ((`word` = ? AND `age` < ?) AND `paw` = ?)";
 
         let expected_params = vec![
             ParameterizedValue::Text(Cow::from("meow")),
@@ -332,10 +303,7 @@ mod tests {
             ParameterizedValue::Text(Cow::from("warm")),
         ];
 
-        let conditions = "word"
-            .equals("meow")
-            .and("age".less_than(10))
-            .and("paw".equals("warm"));
+        let conditions = "word".equals("meow").and("age".less_than(10)).and("paw".equals("warm"));
 
         let query = Select::from_table("naukio").so_that(conditions);
 
@@ -347,8 +315,7 @@ mod tests {
 
     #[test]
     fn test_select_and_different_execution_order() {
-        let expected_sql =
-            "SELECT `naukio`.* FROM `naukio` WHERE (`word` = ? AND (`age` < ? AND `paw` = ?))";
+        let expected_sql = "SELECT `naukio`.* FROM `naukio` WHERE (`word` = ? AND (`age` < ? AND `paw` = ?))";
 
         let expected_params = vec![
             ParameterizedValue::Text(Cow::from("meow")),
@@ -356,9 +323,7 @@ mod tests {
             ParameterizedValue::Text(Cow::from("warm")),
         ];
 
-        let conditions = "word"
-            .equals("meow")
-            .and("age".less_than(10).and("paw".equals("warm")));
+        let conditions = "word".equals("meow").and("age".less_than(10).and("paw".equals("warm")));
 
         let query = Select::from_table("naukio").so_that(conditions);
 
@@ -370,8 +335,7 @@ mod tests {
 
     #[test]
     fn test_select_or() {
-        let expected_sql =
-            "SELECT `naukio`.* FROM `naukio` WHERE ((`word` = ? OR `age` < ?) AND `paw` = ?)";
+        let expected_sql = "SELECT `naukio`.* FROM `naukio` WHERE ((`word` = ? OR `age` < ?) AND `paw` = ?)";
 
         let expected_params = vec![
             ParameterizedValue::Text(Cow::from("meow")),
@@ -379,10 +343,7 @@ mod tests {
             ParameterizedValue::Text(Cow::from("warm")),
         ];
 
-        let conditions = "word"
-            .equals("meow")
-            .or("age".less_than(10))
-            .and("paw".equals("warm"));
+        let conditions = "word".equals("meow").or("age".less_than(10)).and("paw".equals("warm"));
 
         let query = Select::from_table("naukio").so_that(conditions);
 
@@ -394,8 +355,7 @@ mod tests {
 
     #[test]
     fn test_select_negation() {
-        let expected_sql =
-            "SELECT `naukio`.* FROM `naukio` WHERE (NOT ((`word` = ? OR `age` < ?) AND `paw` = ?))";
+        let expected_sql = "SELECT `naukio`.* FROM `naukio` WHERE (NOT ((`word` = ? OR `age` < ?) AND `paw` = ?))";
 
         let expected_params = vec![
             ParameterizedValue::Text(Cow::from("meow")),
@@ -419,8 +379,7 @@ mod tests {
 
     #[test]
     fn test_with_raw_condition_tree() {
-        let expected_sql =
-            "SELECT `naukio`.* FROM `naukio` WHERE (NOT ((`word` = ? OR `age` < ?) AND `paw` = ?))";
+        let expected_sql = "SELECT `naukio`.* FROM `naukio` WHERE (NOT ((`word` = ? OR `age` < ?) AND `paw` = ?))";
 
         let expected_params = vec![
             ParameterizedValue::Text(Cow::from("meow")),
@@ -443,8 +402,7 @@ mod tests {
 
     #[test]
     fn test_simple_inner_join() {
-        let expected_sql =
-            "SELECT `users`.* FROM `users` INNER JOIN `posts` ON `users`.`id` = `posts`.`user_id`";
+        let expected_sql = "SELECT `users`.* FROM `users` INNER JOIN `posts` ON `users`.`id` = `posts`.`user_id`";
 
         let query = Select::from_table("users")
             .inner_join("posts".on(("users", "id").equals(Column::from(("posts", "user_id")))));
@@ -467,20 +425,15 @@ mod tests {
         let (sql, params) = Sqlite::build(query);
 
         assert_eq!(expected_sql, sql);
-        assert_eq!(
-            default_params(vec![ParameterizedValue::Boolean(true),]),
-            params
-        );
+        assert_eq!(default_params(vec![ParameterizedValue::Boolean(true),]), params);
     }
 
     #[test]
     fn test_simple_left_join() {
-        let expected_sql =
-            "SELECT `users`.* FROM `users` LEFT OUTER JOIN `posts` ON `users`.`id` = `posts`.`user_id`";
+        let expected_sql = "SELECT `users`.* FROM `users` LEFT OUTER JOIN `posts` ON `users`.`id` = `posts`.`user_id`";
 
-        let query = Select::from_table("users").left_outer_join(
-            "posts".on(("users", "id").equals(Column::from(("posts", "user_id")))),
-        );
+        let query = Select::from_table("users")
+            .left_outer_join("posts".on(("users", "id").equals(Column::from(("posts", "user_id")))));
         let (sql, _) = Sqlite::build(query);
 
         assert_eq!(expected_sql, sql);
@@ -500,10 +453,7 @@ mod tests {
         let (sql, params) = Sqlite::build(query);
 
         assert_eq!(expected_sql, sql);
-        assert_eq!(
-            default_params(vec![ParameterizedValue::Boolean(true),]),
-            params
-        );
+        assert_eq!(default_params(vec![ParameterizedValue::Boolean(true),]), params);
     }
 
     #[test]
@@ -540,10 +490,7 @@ mod tests {
     fn bind_test_1() {
         let conn = sqlite_harness();
 
-        let conditions = "name"
-            .equals("Alice")
-            .and("age".less_than(100.0))
-            .and("nice".equals(1));
+        let conditions = "name".equals("Alice").and("age".less_than(100.0)).and("nice".equals(1));
         let query = Select::from_table("users").so_that(conditions);
         let (sql_str, params) = Sqlite::build(query);
 

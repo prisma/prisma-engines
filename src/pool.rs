@@ -2,18 +2,24 @@ mod connection_info;
 
 pub use connection_info::*;
 
+#[cfg(feature = "mysql")]
+use crate::connector::MysqlUrl;
+#[cfg(feature = "postgresql")]
+use crate::connector::PostgresUrl;
+
 use crate::{
     ast,
-    connector::{self, MysqlUrl, PostgresUrl, Queryable, TransactionCapable, DBIO},
+    connector::{self, Queryable, TransactionCapable, DBIO},
     error::Error,
 };
-use futures::future;
-use tokio_resource_pool::{CheckOut, Manage, RealDependencies, Status};
+use failure::{Compat, Fail};
+use futures::{future, future::FutureExt};
+use mobc::{runtime::DefaultExecutor, AnyFuture, ConnectionManager, PooledConnection as MobcPooled};
 
 /// A connection from the pool. Implements
 /// [Queryable](connector/trait.Queryable.html).
 pub struct PooledConnection {
-    pub(crate) inner: CheckOut<QuaintManager>,
+    pub(crate) inner: MobcPooled<QuaintManager>,
 }
 
 impl TransactionCapable for PooledConnection {}
@@ -27,19 +33,11 @@ impl Queryable for PooledConnection {
         self.inner.query(q)
     }
 
-    fn query_raw<'a>(
-        &'a self,
-        sql: &'a str,
-        params: &'a [ast::ParameterizedValue],
-    ) -> DBIO<'a, connector::ResultSet> {
+    fn query_raw<'a>(&'a self, sql: &'a str, params: &'a [ast::ParameterizedValue]) -> DBIO<'a, connector::ResultSet> {
         self.inner.query_raw(sql, params)
     }
 
-    fn execute_raw<'a>(
-        &'a self,
-        sql: &'a str,
-        params: &'a [ast::ParameterizedValue],
-    ) -> DBIO<'a, u64> {
+    fn execute_raw<'a>(&'a self, sql: &'a str, params: &'a [ast::ParameterizedValue]) -> DBIO<'a, u64> {
         self.inner.execute_raw(sql, params)
     }
 
@@ -68,15 +66,16 @@ pub enum QuaintManager {
     Sqlite { file_path: String, db_name: String },
 }
 
-impl Manage for QuaintManager {
-    type Resource = Box<dyn Queryable + Send + Sync>;
-    type Dependencies = RealDependencies;
-    type CheckOut = CheckOut<Self>;
-    type Error = Error;
-    type CreateFuture = DBIO<'static, Self::Resource>;
-    type RecycleFuture = DBIO<'static, Option<Self::Resource>>;
+impl ConnectionManager for QuaintManager {
+    type Connection = Box<dyn Queryable + Send + Sync>;
+    type Executor = DefaultExecutor;
+    type Error = Compat<Error>;
 
-    fn create(&self) -> Self::CreateFuture {
+    fn get_executor(&self) -> Self::Executor {
+        DefaultExecutor::current()
+    }
+
+    fn connect(&self) -> AnyFuture<Self::Connection, Self::Error> {
         match self {
             #[cfg(feature = "sqlite")]
             Self::Sqlite { file_path, db_name } => {
@@ -84,10 +83,10 @@ impl Manage for QuaintManager {
 
                 match Sqlite::new(&file_path) {
                     Ok(mut conn) => match conn.attach_database(db_name) {
-                        Ok(_) => DBIO::new(future::ok(Box::new(conn) as Self::Resource)),
-                        Err(e) => DBIO::new(future::err(e)),
+                        Ok(_) => future::ok(Box::new(conn) as Self::Connection).boxed(),
+                        Err(e) => future::err(e.compat()).boxed(),
                     },
-                    Err(e) => DBIO::new(future::err(e)),
+                    Err(e) => future::err(e.compat()).boxed(),
                 }
             }
 
@@ -96,8 +95,8 @@ impl Manage for QuaintManager {
                 use crate::connector::Mysql;
 
                 match Mysql::new(url.clone()) {
-                    Ok(mysql) => DBIO::new(future::ok(Box::new(mysql) as Self::Resource)),
-                    Err(e) => DBIO::new(future::err(e)),
+                    Ok(mysql) => future::ok(Box::new(mysql) as Self::Connection).boxed(),
+                    Err(e) => future::err(e.compat()).boxed(),
                 }
             }
 
@@ -107,24 +106,25 @@ impl Manage for QuaintManager {
 
                 let url: PostgresUrl = url.clone();
 
-                DBIO::new(async move {
-                    let conn = PostgreSql::new(url).await?;
-
-                    Ok(Box::new(conn) as Self::Resource)
-                })
+                async move {
+                    let conn = PostgreSql::new(url).await.map_err(|e| e.compat())?;
+                    Ok(Box::new(conn) as Self::Connection)
+                }
+                    .boxed()
             }
         }
     }
 
-    fn status(&self, _: &Self::Resource) -> Status {
-        Status::Valid
+    fn is_valid(&self, conn: Self::Connection) -> AnyFuture<Self::Connection, Self::Error> {
+        async move {
+            conn.query_raw("SELECT 1", &[]).await.map_err(|e| e.compat())?;
+            Ok(conn)
+        }
+            .boxed()
     }
 
-    fn recycle(&self, conn: Self::Resource) -> Self::RecycleFuture {
-        DBIO::new(async {
-            conn.query_raw("SELECT 1", &[]).await?;
-            Ok(Some(conn))
-        })
+    fn has_broken(&self, _: &mut Option<Self::Connection>) -> bool {
+        false
     }
 }
 
@@ -133,67 +133,67 @@ mod tests {
     use crate::Quaint;
     use std::env;
 
-    #[test]
+    #[tokio::test]
     #[cfg(feature = "mysql")]
-    fn mysql_default_connection_limit() {
+    async fn mysql_default_connection_limit() {
         let conn_string = env::var("TEST_MYSQL").expect("TEST_MYSQL connection string not set.");
 
-        let pool = Quaint::new(&conn_string).unwrap();
+        let pool = Quaint::new(&conn_string).await.unwrap();
 
-        assert_eq!(num_cpus::get_physical() * 2 + 1, pool.capacity());
+        assert_eq!(num_cpus::get_physical() * 2 + 1, pool.capacity().await as usize);
     }
 
-    #[test]
+    #[tokio::test]
     #[cfg(feature = "mysql")]
-    fn mysql_custom_connection_limit() {
+    async fn mysql_custom_connection_limit() {
         let conn_string = format!(
             "{}?connection_limit=10",
             env::var("TEST_MYSQL").expect("TEST_MYSQL connection string not set.")
         );
 
-        let pool = Quaint::new(&conn_string).unwrap();
+        let pool = Quaint::new(&conn_string).await.unwrap();
 
-        assert_eq!(10, pool.capacity());
+        assert_eq!(10, pool.capacity().await as usize);
     }
 
-    #[test]
+    #[tokio::test]
     #[cfg(feature = "postgresql")]
-    fn psql_default_connection_limit() {
+    async fn psql_default_connection_limit() {
         let conn_string = env::var("TEST_PSQL").expect("TEST_PSQL connection string not set.");
 
-        let pool = Quaint::new(&conn_string).unwrap();
+        let pool = Quaint::new(&conn_string).await.unwrap();
 
-        assert_eq!(num_cpus::get_physical() * 2 + 1, pool.capacity());
+        assert_eq!(num_cpus::get_physical() * 2 + 1, pool.capacity().await as usize);
     }
 
-    #[test]
+    #[tokio::test]
     #[cfg(feature = "postgresql")]
-    fn psql_custom_connection_limit() {
+    async fn psql_custom_connection_limit() {
         let conn_string = format!(
             "{}?connection_limit=10",
             env::var("TEST_PSQL").expect("TEST_PSQL connection string not set.")
         );
 
-        let pool = Quaint::new(&conn_string).unwrap();
+        let pool = Quaint::new(&conn_string).await.unwrap();
 
-        assert_eq!(10, pool.capacity());
+        assert_eq!(10, pool.capacity().await as usize);
     }
 
-    #[test]
+    #[tokio::test]
     #[cfg(feature = "sqlite")]
-    fn test_default_connection_limit() {
+    async fn test_default_connection_limit() {
         let conn_string = format!("file:db/test.db",);
-        let pool = Quaint::new(&conn_string).unwrap();
+        let pool = Quaint::new(&conn_string).await.unwrap();
 
-        assert_eq!(num_cpus::get_physical() * 2 + 1, pool.capacity());
+        assert_eq!(num_cpus::get_physical() * 2 + 1, pool.capacity().await as usize);
     }
 
-    #[test]
+    #[tokio::test]
     #[cfg(feature = "sqlite")]
-    fn test_custom_connection_limit() {
+    async fn test_custom_connection_limit() {
         let conn_string = format!("file:db/test.db?connection_limit=10",);
-        let pool = Quaint::new(&conn_string).unwrap();
+        let pool = Quaint::new(&conn_string).await.unwrap();
 
-        assert_eq!(10, pool.capacity());
+        assert_eq!(10, pool.capacity().await as usize);
     }
 }

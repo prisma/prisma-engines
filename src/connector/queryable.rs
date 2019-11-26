@@ -26,19 +26,11 @@ where
 
     /// Executes a query given as SQL, interpolating the given parameters and
     /// returning a set of results.
-    fn query_raw<'a>(
-        &'a self,
-        sql: &'a str,
-        params: &'a [ParameterizedValue<'a>],
-    ) -> DBIO<'a, ResultSet>;
+    fn query_raw<'a>(&'a self, sql: &'a str, params: &'a [ParameterizedValue<'a>]) -> DBIO<'a, ResultSet>;
 
     /// Executes a query given as SQL, interpolating the given parameters and
     /// returning the number of affected rows.
-    fn execute_raw<'a>(
-        &'a self,
-        sql: &'a str,
-        params: &'a [ParameterizedValue<'a>],
-    ) -> DBIO<'a, u64>;
+    fn execute_raw<'a>(&'a self, sql: &'a str, params: &'a [ParameterizedValue<'a>]) -> DBIO<'a, u64>;
 
     /// Turns off all foreign key constraints.
     fn turn_off_fk_constraints(&self) -> DBIO<()>;

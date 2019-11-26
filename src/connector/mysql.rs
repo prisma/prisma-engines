@@ -143,10 +143,7 @@ impl MysqlUrl {
                     #[cfg(not(feature = "tracing-log"))]
                     trace!("Discarding connection string param: {}", k);
                     #[cfg(feature = "tracing-log")]
-                    tracing::trace!(
-                        message = "Discarding connection string param",
-                        param = k.as_str()
-                    );
+                    tracing::trace!(message = "Discarding connection string param", param = k.as_str());
                 }
             };
         }
@@ -212,11 +209,7 @@ impl Mysql {
         })
     }
 
-    fn execute_and_get_id<'a>(
-        &'a self,
-        sql: &'a str,
-        params: &'a [ParameterizedValue],
-    ) -> DBIO<'a, Option<Id>> {
+    fn execute_and_get_id<'a>(&'a self, sql: &'a str, params: &'a [ParameterizedValue]) -> DBIO<'a, Option<Id>> {
         metrics::query("mysql.execute", sql, params, move || {
             async move {
                 let conn = self.pool.get_conn().await?;
@@ -245,11 +238,7 @@ impl Queryable for Mysql {
         })
     }
 
-    fn query_raw<'a>(
-        &'a self,
-        sql: &'a str,
-        params: &'a [ParameterizedValue],
-    ) -> DBIO<'a, ResultSet> {
+    fn query_raw<'a>(&'a self, sql: &'a str, params: &'a [ParameterizedValue]) -> DBIO<'a, ResultSet> {
         metrics::query("mysql.query_raw", sql, params, move || {
             async move {
                 let conn = self.pool.get_conn().await?;
@@ -261,9 +250,7 @@ impl Queryable for Mysql {
                     .collect();
 
                 let mut result_set = ResultSet::new(columns, Vec::new());
-                let (_, rows) = results
-                    .map_and_drop(|mut row| row.take_result_row())
-                    .await?;
+                let (_, rows) = results.map_and_drop(|mut row| row.take_result_row()).await?;
 
                 for row in rows.into_iter() {
                     result_set.rows.push(row?);
@@ -332,17 +319,14 @@ mod tests {
 
     #[test]
     fn should_parse_socket_url() {
-        let url = MysqlUrl::new(
-            Url::parse("mysql://root@localhost/dbname?socket=(/tmp/mysql.sock)").unwrap(),
-        )
-        .unwrap();
+        let url = MysqlUrl::new(Url::parse("mysql://root@localhost/dbname?socket=(/tmp/mysql.sock)").unwrap()).unwrap();
         assert_eq!("dbname", url.dbname());
         assert_eq!(&Some(String::from("/tmp/mysql.sock")), url.socket());
     }
 
     #[tokio::test]
     async fn should_provide_a_database_connection() {
-        let pool = Quaint::new(&CONN_STR).unwrap();
+        let pool = Quaint::new(&CONN_STR).await.unwrap();
         let connection = pool.check_out().await.unwrap();
 
         let res = connection
@@ -358,7 +342,7 @@ mod tests {
 
     #[tokio::test]
     async fn should_provide_a_database_transaction() {
-        let pool = Quaint::new(&CONN_STR).unwrap();
+        let pool = Quaint::new(&CONN_STR).await.unwrap();
         let connection = pool.check_out().await.unwrap();
         let tx = connection.start_transaction().await.unwrap();
 
@@ -391,17 +375,14 @@ VALUES (1, 'Joe', 27, 20000.00 );
 
     #[tokio::test]
     async fn should_map_columns_correctly() {
-        let pool = Quaint::new(&CONN_STR).unwrap();
+        let pool = Quaint::new(&CONN_STR).await.unwrap();
         let connection = pool.check_out().await.unwrap();
 
         connection.query_raw(DROP_TABLE, &[]).await.unwrap();
         connection.query_raw(TABLE_DEF, &[]).await.unwrap();
         connection.query_raw(CREATE_USER, &[]).await.unwrap();
 
-        let rows = connection
-            .query_raw("SELECT * FROM `user`", &[])
-            .await
-            .unwrap();
+        let rows = connection.query_raw("SELECT * FROM `user`", &[]).await.unwrap();
         assert_eq!(rows.len(), 1);
 
         let row = rows.get(0).unwrap();
@@ -418,16 +399,14 @@ VALUES (1, 'Joe', 27, 20000.00 );
         url.set_path("this_does_not_exist");
 
         let url = url.as_str().to_string();
-        let quaint = Quaint::new(&url).unwrap();
+        let quaint = Quaint::new(&url).await.unwrap();
         let conn = quaint.check_out().await.unwrap();
         let res = conn.query_raw("SELECT 1 + 1", &[]).await;
 
         assert!(&res.is_err());
 
         match res.unwrap_err() {
-            Error::DatabaseDoesNotExist { db_name } => {
-                assert_eq!("this_does_not_exist", db_name.as_str())
-            }
+            Error::DatabaseDoesNotExist { db_name } => assert_eq!("this_does_not_exist", db_name.as_str()),
             e => panic!("Expected `DatabaseDoesNotExist`, got {:?}", e),
         }
     }
