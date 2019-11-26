@@ -326,7 +326,7 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    }
          |    ]}
          |  }){
-         |    childrenOpt {
+         |    childrenOpt (orderBy: id_ASC){
          |      c
          |      test
          |    }
@@ -340,7 +340,7 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
       //dataResolver(project).countByTable(project.schema.getModelByName_!("Parent").dbName).await should be(2)
       //dataResolver(project).countByTable(project.schema.getModelByName_!("Child").dbName).await should be(4)
 
-      server.query("query{parents{p,childrenOpt{c, test}}}", project).toString() should be(
+      server.query("query{parents{p,childrenOpt(orderBy: id_ASC){c, test}}}", project).toString() should be(
         """{"data":{"parents":[{"p":"p1","childrenOpt":[{"c":"c1","test":"updated2"},{"c":"c2","test":"updated1"}]},{"p":"p2","childrenOpt":[{"c":"c3","test":null},{"c":"c4","test":null}]}]}}""")
     }
   }

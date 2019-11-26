@@ -32,7 +32,7 @@ class CombiningDifferentNestedMutationsSpec extends FlatSpec with Matchers with 
         |      create: [{c: "c1"},{c: "c2"}]
         |    }
         |  }){
-        |    childrenOpt{
+        |    childrenOpt(orderBy: id_ASC){
         |       c
         |    }
         |  }
@@ -52,7 +52,7 @@ class CombiningDifferentNestedMutationsSpec extends FlatSpec with Matchers with 
         |    update: [{where: {c: "c3"} data: {c: "cUpdated"}}]
         |    }
         |  }){
-        |    childrenOpt{
+        |    childrenOpt(orderBy: id_ASC){
         |       c
         |    }
         |  }
@@ -64,7 +64,7 @@ class CombiningDifferentNestedMutationsSpec extends FlatSpec with Matchers with 
 
 //      // ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(4) }
 
-      server.query(s"""query{children{c, parentsOpt{p}}}""", project).toString should be(
+      server.query(s"""query{children(orderBy: id_ASC){c, parentsOpt(orderBy: id_ASC){p}}}""", project).toString should be(
         """{"data":{"children":[{"c":"c1","parentsOpt":[{"p":"p1"}]},{"c":"c2","parentsOpt":[{"p":"p1"}]},{"c":"cUpdated","parentsOpt":[{"p":"p1"}]},{"c":"c4","parentsOpt":[{"p":"p1"}]}]}}""")
 
     }
@@ -185,7 +185,7 @@ class CombiningDifferentNestedMutationsSpec extends FlatSpec with Matchers with 
         |      create: [{c: "c1"},{c: "c2"}]
         |    }
         |  }){
-        |    childrenOpt{
+        |    childrenOpt(orderBy: id_ASC){
         |       c
         |    }
         |  }
@@ -211,7 +211,7 @@ class CombiningDifferentNestedMutationsSpec extends FlatSpec with Matchers with 
         |              ]
         |    }
         |  }){
-        |    childrenOpt{
+        |    childrenOpt(orderBy: id_ASC){
         |       c
         |    }
         |  }
@@ -223,7 +223,7 @@ class CombiningDifferentNestedMutationsSpec extends FlatSpec with Matchers with 
 
       // ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(5) }
 
-      server.query(s"""query{children{c, parentsOpt{p}}}""", project).toString should be(
+      server.query(s"""query{children(orderBy: id_ASC){c, parentsOpt(orderBy: id_ASC){p}}}""", project).toString should be(
         """{"data":{"children":[{"c":"c1","parentsOpt":[{"p":"p1"}]},{"c":"c2","parentsOpt":[{"p":"p1"}]},{"c":"cUpdated","parentsOpt":[{"p":"p1"}]},{"c":"c4","parentsOpt":[{"p":"p1"}]},{"c":"cNew","parentsOpt":[{"p":"p1"}]}]}}""")
     }
   }
