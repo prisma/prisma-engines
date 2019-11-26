@@ -1,7 +1,3 @@
-mod connection_info;
-
-pub use connection_info::*;
-
 #[cfg(feature = "mysql")]
 use crate::connector::MysqlUrl;
 #[cfg(feature = "postgresql")]
@@ -130,7 +126,7 @@ impl ConnectionManager for QuaintManager {
 
 #[cfg(test)]
 mod tests {
-    use crate::Quaint;
+    use crate::prelude::*;
     use std::env;
 
     #[tokio::test]

@@ -133,7 +133,7 @@ impl<'a> Insert<'a> {
         self
     }
 
-    /// Sets the returned columns. Works only with PostgreSQL.
+    /// Sets the returned columns.
     ///
     /// ```rust
     /// # use quaint::{ast::*, visitor::{Visitor, Postgres}};
@@ -143,6 +143,7 @@ impl<'a> Insert<'a> {
     ///
     /// assert_eq!("INSERT INTO \"users\" DEFAULT VALUES RETURNING \"id\"", sql);
     /// ```
+    #[cfg(feature = "postgresql")]
     pub fn returning<K>(mut self, columns: Vec<K>) -> Self
     where
         K: Into<Column<'a>>,

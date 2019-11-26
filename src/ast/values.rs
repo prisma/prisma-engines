@@ -24,7 +24,7 @@ pub enum ParameterizedValue<'a> {
     Text(Cow<'a, str>),
     Boolean(bool),
     Char(char),
-    #[cfg(feature = "array")]
+    #[cfg(all(feature = "array", feature = "postgresql"))]
     Array(Vec<ParameterizedValue<'a>>),
     #[cfg(feature = "json-1")]
     Json(Value),
@@ -233,7 +233,7 @@ impl<'a> ParameterizedValue<'a> {
     }
 
     /// `true` if the `ParameterizedValue` is a DateTime.
-    #[cfg(feature = "uuid-0_7")]
+    #[cfg(feature = "chrono-0_4")]
     pub fn is_datetime(&self) -> bool {
         match self {
             ParameterizedValue::DateTime(_) => true,
@@ -278,6 +278,7 @@ impl<'a> ParameterizedValue<'a> {
     }
 
     /// Returns a Vec<T> if the value is an array of T, otherwise `None`.
+    #[cfg(all(feature = "array", feature = "postgresql"))]
     pub fn into_vec<T>(self) -> Option<Vec<T>>
     where
         // Implement From<ParameterizedValue>
@@ -606,9 +607,10 @@ impl<'a> Comparable<'a> for DatabaseValue<'a> {
     }
 }
 
-#[cfg(test)]
+#[cfg(all(test, feature = "array", feature = "postgresql"))]
 mod tests {
     use super::*;
+    #[cfg(feature = "chrono-0_4")]
     use std::str::FromStr;
 
     #[test]
@@ -648,6 +650,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(feature = "chrono-0_4")]
     fn a_parameterized_value_of_datetimes_can_be_converted_into_a_vec() {
         let datetime = DateTime::from_str("2019-07-27T05:30:30Z").expect("parsing date/time");
         let pv = ParameterizedValue::Array(vec![ParameterizedValue::DateTime(datetime)]);

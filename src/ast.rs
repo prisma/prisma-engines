@@ -45,5 +45,6 @@ pub use select::Select;
 pub use table::*;
 pub use union_all::UnionAll;
 pub use update::*;
+#[cfg(any(feature = "sqlite", feature = "mysql", feature = "postgresql"))]
 pub(crate) use values::Params;
 pub use values::{asterisk, DatabaseValue, ParameterizedValue};

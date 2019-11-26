@@ -1,7 +1,8 @@
 use crate::{ast::ParameterizedValue, connector::queryable::TakeRow};
 #[cfg(feature = "chrono-0_4")]
-use chrono::{DateTime, Duration, NaiveDate, NaiveDateTime, NaiveTime, Utc};
+use chrono::{DateTime, Datelike, Duration, NaiveDate, NaiveDateTime, NaiveTime, Timelike, Utc};
 use mysql_async as my;
+use mysql_async::Value as MyValue;
 
 pub fn conv_params<'a>(params: &[ParameterizedValue<'a>]) -> my::Params {
     if params.is_empty() {
@@ -69,5 +70,38 @@ impl TakeRow for my::Row {
         }
 
         Ok(row)
+    }
+}
+
+impl<'a> From<ParameterizedValue<'a>> for MyValue {
+    fn from(pv: ParameterizedValue<'a>) -> MyValue {
+        match pv {
+            ParameterizedValue::Null => MyValue::NULL,
+            ParameterizedValue::Integer(i) => MyValue::Int(i),
+            ParameterizedValue::Real(f) => MyValue::Float(f),
+            ParameterizedValue::Text(s) => MyValue::Bytes((&*s).as_bytes().to_vec()),
+            ParameterizedValue::Boolean(b) => MyValue::Int(b as i64),
+            ParameterizedValue::Char(c) => MyValue::Bytes(vec![c as u8]),
+            #[cfg(feature = "json-1")]
+            ParameterizedValue::Json(json) => {
+                let s = serde_json::to_string(&json).expect("Cannot convert JSON to String.");
+
+                MyValue::Bytes(s.into_bytes())
+            }
+            #[cfg(feature = "array")]
+            ParameterizedValue::Array(_) => unimplemented!("Arrays are not supported for mysql."),
+            #[cfg(feature = "uuid-0_7")]
+            ParameterizedValue::Uuid(u) => MyValue::Bytes(u.to_hyphenated().to_string().into_bytes()),
+            #[cfg(feature = "chrono-0_4")]
+            ParameterizedValue::DateTime(dt) => MyValue::Date(
+                dt.year() as u16,
+                dt.month() as u8,
+                dt.day() as u8,
+                dt.hour() as u8,
+                dt.minute() as u8,
+                dt.second() as u8,
+                dt.timestamp_subsec_micros(),
+            ),
+        }
     }
 }

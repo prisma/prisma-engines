@@ -1,9 +1,5 @@
 use crate::{ast::*, visitor::Visitor};
 
-use rusqlite::{
-    types::{Null, ToSql, ToSqlOutput},
-    Error as RusqlError,
-};
 use std::fmt::{self, Write};
 
 /// A visitor to generate queries for the SQLite database.
@@ -118,33 +114,6 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
         self.write("(")?;
         self.visit_database_value(value)?;
         self.write(")")
-    }
-}
-
-impl<'a> ToSql for ParameterizedValue<'a> {
-    fn to_sql(&self) -> Result<ToSqlOutput, RusqlError> {
-        let value = match self {
-            ParameterizedValue::Null => ToSqlOutput::from(Null),
-            ParameterizedValue::Integer(integer) => ToSqlOutput::from(*integer),
-            ParameterizedValue::Real(float) => ToSqlOutput::from(*float),
-            ParameterizedValue::Text(cow) => ToSqlOutput::from(&**cow),
-            ParameterizedValue::Boolean(boo) => ToSqlOutput::from(*boo),
-            ParameterizedValue::Char(c) => ToSqlOutput::from(*c as u8),
-            #[cfg(feature = "array")]
-            ParameterizedValue::Array(_) => unimplemented!("Arrays are not supported for sqlite."),
-            #[cfg(feature = "json-1")]
-            ParameterizedValue::Json(value) => {
-                let stringified =
-                    serde_json::to_string(value).map_err(|err| RusqlError::ToSqlConversionFailure(Box::new(err)))?;
-                ToSqlOutput::from(stringified)
-            }
-            #[cfg(feature = "uuid-0_7")]
-            ParameterizedValue::Uuid(value) => ToSqlOutput::from(value.to_hyphenated().to_string()),
-            #[cfg(feature = "chrono-0_4")]
-            ParameterizedValue::DateTime(value) => ToSqlOutput::from(value.timestamp_millis()),
-        };
-
-        Ok(value)
     }
 }
 
@@ -465,6 +434,7 @@ mod tests {
         assert_eq!(expected_sql, sql);
     }
 
+    #[cfg(feature = "sqlite")]
     fn sqlite_harness() -> ::rusqlite::Connection {
         let conn = ::rusqlite::Connection::open_in_memory().unwrap();
 
@@ -487,6 +457,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(feature = "sqlite")]
     fn bind_test_1() {
         let conn = sqlite_harness();
 

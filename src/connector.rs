@@ -27,6 +27,9 @@ pub use self::postgres::*;
 #[cfg(feature = "sqlite")]
 pub use sqlite::*;
 
+mod connection_info;
+pub use connection_info::*;
+
 pub(crate) mod metrics;
 pub use self::result_set::*;
 pub use dbio::DBIO;

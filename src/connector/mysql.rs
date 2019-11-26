@@ -134,7 +134,7 @@ impl MysqlUrl {
                             #[cfg(feature = "tracing-log")]
                             tracing::debug!(
                                 message = "Unsupported SSL accept mode, defaulting to `strict`",
-                                mode = v.as_str()
+                                mode = &*v
                             );
                         }
                     };
@@ -143,7 +143,7 @@ impl MysqlUrl {
                     #[cfg(not(feature = "tracing-log"))]
                     trace!("Discarding connection string param: {}", k);
                     #[cfg(feature = "tracing-log")]
-                    tracing::trace!(message = "Discarding connection string param", param = k.as_str());
+                    tracing::trace!(message = "Discarding connection string param", param = &*k);
                 }
             };
         }
@@ -156,6 +156,7 @@ impl MysqlUrl {
         })
     }
 
+    #[cfg(feature = "pooled")]
     pub(crate) fn connection_limit(&self) -> usize {
         self.query_params.connection_limit
     }
@@ -304,11 +305,7 @@ impl Queryable for Mysql {
 #[cfg(test)]
 mod tests {
     use super::MysqlUrl;
-    use crate::{
-        connector::{Queryable, TransactionCapable},
-        error::Error,
-        Quaint,
-    };
+    use crate::{error::Error, prelude::*};
     use lazy_static::lazy_static;
     use std::env;
     use url::Url;
@@ -326,8 +323,7 @@ mod tests {
 
     #[tokio::test]
     async fn should_provide_a_database_connection() {
-        let pool = Quaint::new(&CONN_STR).await.unwrap();
-        let connection = pool.check_out().await.unwrap();
+        let connection = Quaint::new(&CONN_STR).await.unwrap();
 
         let res = connection
             .query_raw(
@@ -341,9 +337,10 @@ mod tests {
     }
 
     #[tokio::test]
+    #[cfg(feature = "pooled")]
     async fn should_provide_a_database_transaction() {
-        let pool = Quaint::new(&CONN_STR).await.unwrap();
-        let connection = pool.check_out().await.unwrap();
+        let quaint = Quaint::new(&CONN_STR).await.unwrap();
+        let connection = quaint.check_out().await.unwrap();
         let tx = connection.start_transaction().await.unwrap();
 
         let res = tx
@@ -375,8 +372,7 @@ VALUES (1, 'Joe', 27, 20000.00 );
 
     #[tokio::test]
     async fn should_map_columns_correctly() {
-        let pool = Quaint::new(&CONN_STR).await.unwrap();
-        let connection = pool.check_out().await.unwrap();
+        let connection = Quaint::new(&CONN_STR).await.unwrap();
 
         connection.query_raw(DROP_TABLE, &[]).await.unwrap();
         connection.query_raw(TABLE_DEF, &[]).await.unwrap();
@@ -399,8 +395,7 @@ VALUES (1, 'Joe', 27, 20000.00 );
         url.set_path("this_does_not_exist");
 
         let url = url.as_str().to_string();
-        let quaint = Quaint::new(&url).await.unwrap();
-        let conn = quaint.check_out().await.unwrap();
+        let conn = Quaint::new(&url).await.unwrap();
         let res = conn.query_raw("SELECT 1 + 1", &[]).await;
 
         assert!(&res.is_err());
