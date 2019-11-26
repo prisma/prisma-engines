@@ -6,7 +6,7 @@ use uuid::Uuid;
 pub type ModelRef = Arc<Model>;
 pub type ModelWeakRef = Weak<Model>;
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct ModelTemplate {
     pub name: String,
     pub is_embedded: bool,

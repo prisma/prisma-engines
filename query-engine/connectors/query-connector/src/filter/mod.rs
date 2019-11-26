@@ -10,6 +10,7 @@ mod relation;
 mod scalar;
 
 pub use list::*;
+use prisma_models::prelude::*;
 pub use record_finder::*;
 pub use relation::*;
 pub use scalar::*;
@@ -102,4 +103,88 @@ impl From<Vec<RecordFinder>> for Filter {
             Filter::or(as_filters).into()
         }
     }
+}
+
+/// Creates a test data model for the unit tests in this module.
+pub fn test_data_model() -> InternalDataModelRef {
+    let user_field_templates = vec![
+        FieldTemplate::Scalar(ScalarFieldTemplate {
+            name: "id".to_owned(),
+            type_identifier: TypeIdentifier::GraphQLID,
+            is_required: true,
+            is_list: false,
+            is_unique: false,
+            is_hidden: false,
+            is_auto_generated: false,
+            manifestation: None,
+            behaviour: None,
+            default_value: None,
+            internal_enum: None,
+        }),
+        FieldTemplate::Scalar(ScalarFieldTemplate {
+            name: "name".to_owned(),
+            type_identifier: TypeIdentifier::String,
+            is_required: false,
+            is_list: false,
+            is_unique: false,
+            is_hidden: false,
+            is_auto_generated: false,
+            manifestation: None,
+            behaviour: None,
+            default_value: None,
+            internal_enum: None,
+        }),
+        FieldTemplate::Relation(RelationFieldTemplate {
+            name: "sites".to_owned(),
+            type_identifier: TypeIdentifier::String,
+            is_required: false,
+            is_list: false,
+            is_unique: false,
+            is_hidden: false,
+            is_auto_generated: false,
+            manifestation: None,
+            relation_name: "bar".to_owned(),
+            relation_side: RelationSide::A,
+        }),
+    ];
+
+    let site_field_templates = vec![FieldTemplate::Scalar(ScalarFieldTemplate {
+        name: "name".to_owned(),
+        type_identifier: TypeIdentifier::String,
+        is_required: false,
+        is_list: false,
+        is_unique: false,
+        is_hidden: false,
+        is_auto_generated: false,
+        manifestation: None,
+        behaviour: None,
+        default_value: None,
+        internal_enum: None,
+    })];
+
+    let model_templates = vec![
+        ModelTemplate {
+            name: "User".to_owned(),
+            is_embedded: false,
+            fields: user_field_templates,
+            manifestation: None,
+            indexes: vec![],
+        },
+        ModelTemplate {
+            name: "Site".to_owned(),
+            is_embedded: false,
+            fields: site_field_templates,
+            manifestation: None,
+            indexes: vec![],
+        },
+    ];
+
+    let project_template = InternalDataModelTemplate {
+        models: model_templates,
+        relations: vec![],
+        enums: vec![],
+        version: None,
+    };
+
+    project_template.build("some_db_name".to_owned())
 }
