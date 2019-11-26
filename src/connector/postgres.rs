@@ -440,7 +440,7 @@ impl Queryable for PostgreSql {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::prelude::*;
+    use crate::{connector::Queryable, single::Quaint};
     use lazy_static::lazy_static;
     use std::env;
     use url::Url;
@@ -473,21 +473,6 @@ mod tests {
             .unwrap();
 
         // No results expected.
-        assert!(res.is_empty());
-    }
-
-    #[tokio::test]
-    #[cfg(feature = "pooled")]
-    async fn should_provide_a_database_transaction() {
-        let quaint = Quaint::new(&CONN_STR).await.unwrap();
-        let connection = quaint.check_out().await.unwrap();
-        let tx = connection.start_transaction().await.unwrap();
-
-        let res = tx
-            .query_raw("select * from \"pg_catalog\".\"pg_am\" where amtype = 'x'", &[])
-            .await
-            .unwrap();
-
         assert!(res.is_empty());
     }
 

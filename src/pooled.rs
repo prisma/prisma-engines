@@ -2,10 +2,7 @@ mod manager;
 
 pub use manager::{PooledConnection, QuaintManager};
 
-use crate::{
-    ast,
-    connector::{self, ConnectionInfo, Queryable, SqlFamily, DBIO},
-};
+use crate::connector::{ConnectionInfo, SqlFamily};
 use mobc::Pool;
 use std::convert::TryFrom;
 use url::Url;
@@ -140,56 +137,5 @@ impl Quaint {
         {
             tracing::info!("Starting a {} pool with {} connections.", family, connection_limit);
         }
-    }
-}
-
-impl Queryable for Quaint {
-    fn execute<'a>(&'a self, q: ast::Query<'a>) -> DBIO<'a, Option<ast::Id>> {
-        DBIO::new(async move {
-            let conn = self.check_out().await?;
-            conn.execute(q).await
-        })
-    }
-
-    fn query<'a>(&'a self, q: ast::Query<'a>) -> DBIO<'a, connector::ResultSet> {
-        DBIO::new(async move {
-            let conn = self.check_out().await?;
-            conn.query(q).await
-        })
-    }
-
-    fn query_raw<'a>(&'a self, sql: &'a str, params: &'a [ast::ParameterizedValue]) -> DBIO<'a, connector::ResultSet> {
-        DBIO::new(async move {
-            let conn = self.check_out().await?;
-            conn.query_raw(sql, params).await
-        })
-    }
-
-    fn execute_raw<'a>(&'a self, sql: &'a str, params: &'a [ast::ParameterizedValue]) -> DBIO<'a, u64> {
-        DBIO::new(async move {
-            let conn = self.check_out().await?;
-            conn.execute_raw(sql, params).await
-        })
-    }
-
-    fn turn_off_fk_constraints(&self) -> DBIO<()> {
-        DBIO::new(async move {
-            let conn = self.check_out().await?;
-            conn.turn_off_fk_constraints().await
-        })
-    }
-
-    fn turn_on_fk_constraints(&self) -> DBIO<()> {
-        DBIO::new(async move {
-            let conn = self.check_out().await?;
-            conn.turn_on_fk_constraints().await
-        })
-    }
-
-    fn raw_cmd<'a>(&'a self, cmd: &'a str) -> DBIO<'a, ()> {
-        DBIO::new(async move {
-            let conn = self.check_out().await?;
-            conn.raw_cmd(cmd).await
-        })
     }
 }
