@@ -206,10 +206,7 @@ impl PostgresUrl {
                             #[cfg(not(feature = "tracing-log"))]
                             debug!("Unsupported ssl mode {}, defaulting to 'prefer'", v);
                             #[cfg(feature = "tracing-log")]
-                            tracing::debug!(
-                                message = "Unsupported SSL mode, defaulting to `prefer`",
-                                mode = v.as_str()
-                            );
+                            tracing::debug!(message = "Unsupported SSL mode, defaulting to `prefer`", mode = &*v);
                         }
                     };
                 }
@@ -236,7 +233,7 @@ impl PostgresUrl {
                             #[cfg(feature = "tracing-log")]
                             tracing::debug!(
                                 message = "Unsupported SSL accept mode, defaulting to `strict`",
-                                mode = v.as_str()
+                                mode = &*v
                             );
 
                             ssl_accept_mode = SslAcceptMode::Strict;
@@ -257,7 +254,7 @@ impl PostgresUrl {
                     #[cfg(not(feature = "tracing-log"))]
                     trace!("Discarding connection string param: {}", k);
                     #[cfg(feature = "tracing-log")]
-                    tracing::trace!(message = "Discarding connection string param", param = k.as_str());
+                    tracing::trace!(message = "Discarding connection string param", param = &*k);
                 }
             };
         }
@@ -280,6 +277,7 @@ impl PostgresUrl {
         &self.query_params.ssl_params
     }
 
+    #[cfg(feature = "pooled")]
     pub(crate) fn connection_limit(&self) -> usize {
         self.query_params.connection_limit
     }
@@ -442,7 +440,7 @@ impl Queryable for PostgreSql {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{connector::Queryable, Quaint};
+    use crate::prelude::*;
     use lazy_static::lazy_static;
     use std::env;
     use url::Url;
@@ -467,8 +465,7 @@ mod tests {
 
     #[tokio::test]
     async fn should_provide_a_database_connection() {
-        let pool = Quaint::new(&CONN_STR).await.unwrap();
-        let connection = pool.check_out().await.unwrap();
+        let connection = Quaint::new(&CONN_STR).await.unwrap();
 
         let res = connection
             .query_raw("select * from \"pg_catalog\".\"pg_am\" where amtype = 'x'", &[])
@@ -480,9 +477,10 @@ mod tests {
     }
 
     #[tokio::test]
+    #[cfg(feature = "pooled")]
     async fn should_provide_a_database_transaction() {
-        let pool = Quaint::new(&CONN_STR).await.unwrap();
-        let connection = pool.check_out().await.unwrap();
+        let quaint = Quaint::new(&CONN_STR).await.unwrap();
+        let connection = quaint.check_out().await.unwrap();
         let tx = connection.start_transaction().await.unwrap();
 
         let res = tx
@@ -514,8 +512,7 @@ mod tests {
 
     #[tokio::test]
     async fn should_map_columns_correctly() {
-        let pool = Quaint::new(&CONN_STR).await.unwrap();
-        let connection = pool.check_out().await.unwrap();
+        let connection = Quaint::new(&CONN_STR).await.unwrap();
 
         connection.query_raw(DROP_TABLE, &[]).await.unwrap();
         connection.query_raw(TABLE_DEF, &[]).await.unwrap();
@@ -537,8 +534,7 @@ mod tests {
         let mut url = Url::parse(&CONN_STR).unwrap();
         url.query_pairs_mut().append_pair("schema", "musti-test");
 
-        let pool = Quaint::new(url.as_str()).await.unwrap();
-        let client = pool.check_out().await.unwrap();
+        let client = Quaint::new(url.as_str()).await.unwrap();
 
         let result_set = client.query_raw("SHOW search_path", &[]).await.unwrap();
         let row = result_set.first().unwrap();

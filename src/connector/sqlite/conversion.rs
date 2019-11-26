@@ -2,7 +2,10 @@ use crate::{
     ast::ParameterizedValue,
     connector::queryable::{GetRow, ToColumnNames},
 };
-use rusqlite::{types::ValueRef, Row as SqliteRow, Rows as SqliteRows};
+use rusqlite::{
+    types::{Null, ToSql, ToSqlOutput, ValueRef},
+    Error as RusqlError, Row as SqliteRow, Rows as SqliteRows,
+};
 
 impl<'a> GetRow for SqliteRow<'a> {
     fn get_result_row<'b>(&'b self) -> crate::Result<Vec<ParameterizedValue<'static>>> {
@@ -44,5 +47,32 @@ impl<'a> ToColumnNames for SqliteRows<'a> {
         }
 
         names
+    }
+}
+
+impl<'a> ToSql for ParameterizedValue<'a> {
+    fn to_sql(&self) -> Result<ToSqlOutput, RusqlError> {
+        let value = match self {
+            ParameterizedValue::Null => ToSqlOutput::from(Null),
+            ParameterizedValue::Integer(integer) => ToSqlOutput::from(*integer),
+            ParameterizedValue::Real(float) => ToSqlOutput::from(*float),
+            ParameterizedValue::Text(cow) => ToSqlOutput::from(&**cow),
+            ParameterizedValue::Boolean(boo) => ToSqlOutput::from(*boo),
+            ParameterizedValue::Char(c) => ToSqlOutput::from(*c as u8),
+            #[cfg(feature = "array")]
+            ParameterizedValue::Array(_) => unimplemented!("Arrays are not supported for sqlite."),
+            #[cfg(feature = "json-1")]
+            ParameterizedValue::Json(value) => {
+                let stringified =
+                    serde_json::to_string(value).map_err(|err| RusqlError::ToSqlConversionFailure(Box::new(err)))?;
+                ToSqlOutput::from(stringified)
+            }
+            #[cfg(feature = "uuid-0_7")]
+            ParameterizedValue::Uuid(value) => ToSqlOutput::from(value.to_hyphenated().to_string()),
+            #[cfg(feature = "chrono-0_4")]
+            ParameterizedValue::DateTime(value) => ToSqlOutput::from(value.timestamp_millis()),
+        };
+
+        Ok(value)
     }
 }

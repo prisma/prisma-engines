@@ -63,9 +63,3 @@ impl From<my::error::Error> for Error {
         }
     }
 }
-
-impl From<std::string::FromUtf8Error> for Error {
-    fn from(e: std::string::FromUtf8Error) -> Error {
-        Error::QueryError(e.into())
-    }
-}

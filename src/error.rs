@@ -64,6 +64,7 @@ pub enum Error {
     TlsError { message: String },
 }
 
+#[cfg(feature = "pooled")]
 impl From<mobc::Error<failure::Compat<Error>>> for Error {
     fn from(e: mobc::Error<failure::Compat<Error>>) -> Self {
         match e {
@@ -82,5 +83,11 @@ impl From<url::ParseError> for Error {
 impl From<io::Error> for Error {
     fn from(e: io::Error) -> Error {
         Error::IoError(e.into())
+    }
+}
+
+impl From<std::string::FromUtf8Error> for Error {
+    fn from(e: std::string::FromUtf8Error) -> Error {
+        Error::QueryError(e.into())
     }
 }

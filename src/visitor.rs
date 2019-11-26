@@ -6,26 +6,16 @@
 //! [ast](../ast/index.html) module.
 //!
 //! For prelude, all important imports are in `quaint::visitor::*`;
-use crate::ast::*;
-use std::{borrow::Cow, fmt};
-
-#[cfg(feature = "sqlite")]
+mod mysql;
+mod postgres;
 mod sqlite;
 
-#[cfg(feature = "sqlite")]
+pub use self::mysql::Mysql;
+pub use self::postgres::Postgres;
 pub use self::sqlite::Sqlite;
 
-#[cfg(feature = "postgresql")]
-mod postgres;
-
-#[cfg(feature = "postgresql")]
-pub use self::postgres::Postgres;
-
-#[cfg(feature = "mysql")]
-mod mysql;
-
-#[cfg(feature = "mysql")]
-pub use self::mysql::Mysql;
+use crate::ast::*;
+use std::{borrow::Cow, fmt};
 
 /// A function travelling through the query AST, building the final query string
 /// and gathering parameters sent to the database together with the query.
