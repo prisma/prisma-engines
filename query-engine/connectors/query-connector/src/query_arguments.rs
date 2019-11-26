@@ -19,6 +19,26 @@ pub struct QueryArguments {
 }
 
 impl QueryArguments {
+    fn needs_reversed_order(&self) -> bool {
+        self.last.is_some()
+    }
+
+    fn needs_implicit_ordering(&self) -> bool {
+        self.skip.is_some()
+            || self.after.is_some()
+            || self.first.is_some()
+            || self.before.is_some()
+            || self.last.is_some()
+            || self.order_by.is_some()
+    }
+
+    pub fn ordering_directions(&self) -> OrderDirections {
+        OrderDirections {
+            needs_implicit_id_ordering: self.needs_implicit_ordering(),
+            needs_to_be_reverse_order: self.needs_reversed_order(),
+        }
+    }
+
     pub fn is_with_pagination(&self) -> bool {
         self.last.or(self.first).or(self.skip).is_some()
     }
@@ -55,4 +75,9 @@ where
         query_arguments.filter = Some(filter.into());
         query_arguments
     }
+}
+
+pub struct OrderDirections {
+    pub needs_implicit_id_ordering: bool,
+    pub needs_to_be_reverse_order: bool,
 }

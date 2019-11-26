@@ -30,7 +30,7 @@ impl ManyRelatedRecordsQueryBuilder for ManyRelatedRecordsWithRowNumber {
             Self::BASE_TABLE_ALIAS,
             SelectedFields::RELATED_MODEL_ALIAS,
             base.order_by.as_ref(),
-            base.is_reverse_order,
+            base.order_directions,
         );
 
         let row_number_part: Function = order_columns
