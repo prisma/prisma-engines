@@ -5,8 +5,7 @@ use std::sync::{Arc, Weak};
 pub type InternalDataModelRef = Arc<InternalDataModel>;
 pub type InternalDataModelWeakRef = Weak<InternalDataModel>;
 
-#[derive(Debug, Deserialize, Serialize, Default)]
-#[serde(rename_all = "camelCase")]
+#[derive(Debug, Default)]
 pub struct InternalDataModelTemplate {
     pub models: Vec<ModelTemplate>,
     pub relations: Vec<RelationTemplate>,
@@ -31,8 +30,7 @@ pub struct InternalDataModel {
     relation_fields: OnceCell<Vec<RelationFieldRef>>,
 }
 
-#[derive(Debug, Deserialize, Serialize, PartialEq)]
-#[serde(rename_all = "camelCase")]
+#[derive(Debug, PartialEq)]
 pub struct InternalEnum {
     pub name: String,
     pub values: Vec<String>,
@@ -126,8 +124,6 @@ impl From<&InternalDataModelRef> for Project {
         Self {
             id: data_model.db_name.clone(),
             internal_data_model,
-            // This does _not_ seem correct
-            revision: Default::default(),
         }
     }
 }

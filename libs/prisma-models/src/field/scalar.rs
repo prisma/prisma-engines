@@ -10,8 +10,7 @@ static CREATED_AT_FIELD: &str = "createdAt";
 pub type ScalarFieldRef = Arc<ScalarField>;
 pub type ScalarFieldWeak = Weak<ScalarField>;
 
-#[derive(Debug, Deserialize, Serialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(Debug)]
 pub struct ScalarFieldTemplate {
     pub name: String,
     pub type_identifier: TypeIdentifier,
@@ -23,8 +22,6 @@ pub struct ScalarFieldTemplate {
     pub manifestation: Option<FieldManifestation>,
     pub behaviour: Option<FieldBehaviour>,
     pub default_value: Option<PrismaValue>,
-
-    #[serde(rename = "enum")]
     pub internal_enum: Option<InternalEnum>,
 }
 
@@ -39,15 +36,15 @@ pub struct ScalarField {
     pub manifestation: Option<FieldManifestation>,
     pub internal_enum: Option<InternalEnum>,
     pub behaviour: Option<FieldBehaviour>,
+    pub default_value: Option<PrismaValue>,
+
     #[debug_stub = "#ModelWeakRef#"]
     pub model: ModelWeakRef,
-    pub default_value: Option<PrismaValue>,
 
     pub(crate) is_unique: bool,
 }
 
-#[derive(Debug, Deserialize, Serialize, Clone, Eq, PartialEq)]
-#[serde(rename_all = "camelCase", tag = "type")]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub enum FieldBehaviour {
     CreatedAt,
     UpdatedAt,
@@ -60,21 +57,20 @@ pub enum FieldBehaviour {
     },
 }
 
-#[derive(Debug, Deserialize, Serialize, Clone, Copy, Eq, PartialEq)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq)]
 pub enum IdStrategy {
     Auto,
     None,
     Sequence,
 }
 
-#[derive(Debug, Deserialize, Serialize, Clone, Copy, Eq, PartialEq)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq)]
 pub enum ScalarListStrategy {
     Embedded,
     Relation,
 }
 
-#[derive(Debug, Deserialize, Serialize, Clone, Eq, PartialEq)]
-#[serde(rename_all = "camelCase")]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub struct Sequence {
     pub name: String,
     pub initial_value: i32,

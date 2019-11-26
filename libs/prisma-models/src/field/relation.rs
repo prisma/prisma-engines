@@ -6,8 +6,7 @@ use std::sync::{Arc, Weak};
 pub type RelationFieldRef = Arc<RelationField>;
 pub type RelationFieldWeak = Weak<RelationField>;
 
-#[derive(Debug, Deserialize, Serialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(Debug)]
 pub struct RelationFieldTemplate {
     pub name: String,
     pub type_identifier: TypeIdentifier,
@@ -31,14 +30,15 @@ pub struct RelationField {
     pub is_auto_generated: bool,
     pub relation_name: String,
     pub relation_side: RelationSide,
+    pub relation: OnceCell<RelationWeakRef>,
+
     #[debug_stub = "#ModelWeakRef#"]
     pub model: ModelWeakRef,
-    pub relation: OnceCell<RelationWeakRef>,
 
     pub(crate) is_unique: bool,
 }
 
-#[derive(Clone, Copy, Debug, Deserialize, Serialize, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum RelationSide {
     A,
     B,

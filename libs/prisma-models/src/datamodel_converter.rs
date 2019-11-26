@@ -51,6 +51,7 @@ impl<'a> DatamodelConverter<'a> {
                 is_embedded: model.is_embedded,
                 fields: self.convert_fields(model),
                 manifestation: model.database_name.clone(),
+                indexes: self.convert_indexes(model),
             })
             .collect()
     }
@@ -111,6 +112,21 @@ impl<'a> DatamodelConverter<'a> {
                 manifestation: Some(r.manifestation()),
                 model_a_name: r.model_a.name.clone(),
                 model_b_name: r.model_b.name.clone(),
+            })
+            .collect()
+    }
+
+    fn convert_indexes(&self, model: &dml::Model) -> Vec<IndexTemplate> {
+        model
+            .indexes
+            .iter()
+            .map(|i| IndexTemplate {
+                name: i.name.clone(),
+                fields: i.fields.clone(),
+                typ: match i.tpe {
+                    dml::IndexType::Unique => IndexType::Unique,
+                    dml::IndexType::Normal => IndexType::Normal,
+                },
             })
             .collect()
     }

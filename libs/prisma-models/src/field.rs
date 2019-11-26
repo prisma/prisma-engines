@@ -8,8 +8,7 @@ use crate::prelude::*;
 use once_cell::sync::OnceCell;
 use std::{borrow::Cow, sync::Arc};
 
-#[derive(Debug, Deserialize, Serialize)]
-#[serde(rename_all = "camelCase", untagged)]
+#[derive(Debug)]
 pub enum FieldTemplate {
     Relation(RelationFieldTemplate),
     Scalar(ScalarFieldTemplate),
@@ -21,13 +20,12 @@ pub enum Field {
     Scalar(ScalarFieldRef),
 }
 
-#[derive(Debug, Deserialize, Serialize, PartialEq)]
-#[serde(rename_all = "camelCase")]
+#[derive(Debug, PartialEq)]
 pub struct FieldManifestation {
     pub db_name: String,
 }
 
-#[derive(Clone, Copy, Debug, Deserialize, Serialize, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum TypeIdentifier {
     String,
     Float,

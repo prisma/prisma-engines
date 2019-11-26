@@ -6,22 +6,23 @@ use uuid::Uuid;
 pub type ModelRef = Arc<Model>;
 pub type ModelWeakRef = Weak<Model>;
 
-#[derive(Debug, Deserialize, Serialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(Debug)]
 pub struct ModelTemplate {
     pub name: String,
     pub is_embedded: bool,
     pub fields: Vec<FieldTemplate>,
     pub manifestation: Option<String>,
+    pub indexes: Vec<IndexTemplate>,
 }
 
 #[derive(DebugStub)]
 pub struct Model {
     pub name: String,
     pub is_embedded: bool,
-    manifestation: Option<String>,
 
+    manifestation: Option<String>,
     fields: OnceCell<Fields>,
+    indexes: OnceCell<Vec<Index>>,
 
     #[debug_stub = "#InternalDataModelWeakRef#"]
     pub internal_data_model: InternalDataModelWeakRef,
@@ -33,6 +34,7 @@ impl ModelTemplate {
             name: self.name,
             is_embedded: self.is_embedded,
             fields: OnceCell::new(),
+            indexes: OnceCell::new(),
             manifestation: self.manifestation,
             internal_data_model,
         });
@@ -45,9 +47,11 @@ impl ModelTemplate {
             Arc::downgrade(&model),
         );
 
+        let indexes = self.indexes.into_iter().map(|i| i.build(&fields.scalar())).collect();
+
         // The model is created here and fields WILL BE UNSET before now!
         model.fields.set(fields).unwrap();
-
+        model.indexes.set(indexes).unwrap();
         model
     }
 }
