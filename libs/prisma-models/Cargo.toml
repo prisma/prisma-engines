@@ -21,6 +21,11 @@ chrono = { version = "0.4", features = ["serde"] }
 failure = "0.1"
 failure_derive = "0.1"
 rand = "0.6"
-quaint = { git = "https://github.com/prisma/quaint.git", optional = true }
 datamodel = { path = "../datamodel/core" }
 itertools = "0.8"
+
+[dependencies.quaint]
+git = "https://github.com/prisma/quaint.git"
+default-features = false
+features = ["sqlite", "json-1", "postgresql", "uuid-0_7", "chrono-0_4", "mysql"]
+optional = true

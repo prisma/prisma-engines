@@ -78,10 +78,11 @@ pub async fn postgres_test_api() -> TestApi {
 }
 
 pub async fn sqlite_test_api() -> TestApi {
-    let database = database(&sqlite_test_url()).await;
-
     let database_file_path = sqlite_test_file();
     std::fs::remove_file(database_file_path.clone()).ok(); // ignore potential errors
+
+    let database = database(&sqlite_test_url()).await;
+
     let introspection_connector = SqlIntrospectionConnector::new(&sqlite_test_url()).await.unwrap();
 
     TestApi {

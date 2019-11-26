@@ -1,13 +1,13 @@
 use quaint::{
     error::Error as QuaintError,
     prelude::{ConnectionInfo, Queryable, SqlFamily},
-    Quaint,
+    single::Quaint,
 };
 use sql_schema_describer::SqlSchemaDescriberBackend;
 use std::sync::Arc;
 
 pub async fn load_describer(url: &str) -> Result<(Box<dyn SqlSchemaDescriberBackend>, ConnectionInfo), QuaintError> {
-    let wrapper = Quaint::new(&url)?;
+    let wrapper = Quaint::new(&url).await?;
 
     wrapper.query_raw("SELECT 1", &[]).await?;
 

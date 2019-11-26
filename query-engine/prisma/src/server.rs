@@ -31,7 +31,7 @@ impl HttpServer {
         let now = Instant::now();
 
         let ctx = Arc::new(RequestContext {
-            context: PrismaContext::new(legacy_mode)?,
+            context: PrismaContext::new(legacy_mode).await?,
             graphql_request_handler: GraphQlRequestHandler,
         });
 
