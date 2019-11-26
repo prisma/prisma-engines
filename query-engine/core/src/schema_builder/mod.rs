@@ -19,7 +19,7 @@ use utils::*;
 /// Common module imports shared accross submodules.
 use crate::schema::*;
 use prisma_models::{
-    EnumType, EnumValue, Field as ModelField, FieldBehaviour, IdStrategy, InternalDataModelRef, ModelRef,
+    EnumType, EnumValue, Field as ModelField, FieldBehaviour, IdStrategy, Index, InternalDataModelRef, ModelRef,
     RelationFieldRef, ScalarField, ScalarFieldRef, SortOrder, TypeIdentifier,
 };
 use std::sync::{Arc, Weak};

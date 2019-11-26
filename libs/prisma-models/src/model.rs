@@ -86,6 +86,20 @@ impl Model {
             .unwrap()
     }
 
+    pub fn indexes(&self) -> &[Index] {
+        self.indexes
+            .get()
+            .ok_or_else(|| String::from("Model indexes must be set!"))
+            .unwrap()
+    }
+
+    pub fn unique_indexes(&self) -> Vec<&Index> {
+        self.indexes()
+            .into_iter()
+            .filter(|index| index.typ == IndexType::Unique)
+            .collect()
+    }
+
     pub fn is_legacy(&self) -> bool {
         self.internal_data_model().is_legacy()
     }

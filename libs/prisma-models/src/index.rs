@@ -34,7 +34,13 @@ pub struct Index {
     pub typ: IndexType,
 }
 
-#[derive(Debug, Copy, Clone)]
+impl Index {
+    pub fn fields(&self) -> Vec<ScalarFieldRef> {
+        self.fields.iter().map(|sf| sf.upgrade().unwrap()).collect()
+    }
+}
+
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub enum IndexType {
     Unique,
     Normal,
