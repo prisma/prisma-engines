@@ -37,7 +37,7 @@
 //! automatically.
 //!
 //! ```
-//! use quaint::prelude::*;
+//! use quaint::{prelude::*, pooled::Quaint};
 //!
 //! #[tokio::main]
 //! async fn main() -> Result<(), quaint::error::Error> {

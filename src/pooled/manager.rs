@@ -126,7 +126,7 @@ impl ConnectionManager for QuaintManager {
 
 #[cfg(test)]
 mod tests {
-    use crate::prelude::*;
+    use crate::pooled::Quaint;
     use std::env;
 
     #[tokio::test]
