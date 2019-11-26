@@ -1,10 +1,11 @@
 mod manager;
 
+pub use manager::{PooledConnection, QuaintManager};
+
 use crate::{
     ast,
     connector::{self, ConnectionInfo, Queryable, SqlFamily, DBIO},
 };
-use manager::{PooledConnection, QuaintManager};
 use mobc::Pool;
 use std::convert::TryFrom;
 use url::Url;
