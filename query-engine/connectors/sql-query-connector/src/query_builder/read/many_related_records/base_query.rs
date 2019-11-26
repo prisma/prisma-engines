@@ -8,7 +8,6 @@ pub struct ManyRelatedRecordsBaseQuery<'a> {
     pub selected_fields: &'a SelectedFields,
     pub from_record_ids: &'a [GraphqlId],
     pub query: Select<'a>,
-    pub order_by: Option<OrderBy>,
     pub order_directions: OrderDirections,
     pub condition: ConditionTree<'a>,
     pub cursor: ConditionTree<'a>,
@@ -27,12 +26,13 @@ impl<'a> ManyRelatedRecordsBaseQuery<'a> {
         let window_limits = query_arguments.window_limits();
         let skip_and_limit = query_arguments.skip_and_limit();
 
-        let order_directions = query_arguments.ordering_directions();
         let condition = query_arguments
             .filter
+            .clone()
             .map(|f| f.aliased_cond(None))
             .unwrap_or(ConditionTree::NoCondition);
 
+        let order_directions = query_arguments.ordering_directions();
         let opposite_column = from_field.opposite_column().table(Relation::TABLE_ALIAS);
         let select = Select::from_table(from_field.related_model().as_table());
 
@@ -53,14 +53,11 @@ impl<'a> ManyRelatedRecordsBaseQuery<'a> {
             .fold(select, |acc, col| acc.column(col.clone()))
             .inner_join(join);
 
-        let order_by = query_arguments.order_by;
-
         Self {
             from_field,
             selected_fields,
             from_record_ids,
             query,
-            order_by,
             order_directions,
             condition,
             cursor,

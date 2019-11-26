@@ -907,7 +907,7 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
     result.toString should be(
       """{"data":{"updateTop":{"nameTop":"updated top","middles":[{"nameMiddle":"updated middle","bottoms":[{"nameBottom":"the bottom"},{"nameBottom":"the second bottom"},{"nameBottom":"created bottom"}]},{"nameMiddle":"the second middle","bottoms":[{"nameBottom":"the third bottom"},{"nameBottom":"the fourth bottom"}]}]}}}""")
 
-    server.query("query{bottoms{nameBottom}}", project).toString should be(
+    server.query("query{bottoms(orderBy: id_ASC){nameBottom}}", project).toString should be(
       """{"data":{"bottoms":[{"nameBottom":"the bottom"},{"nameBottom":"the second bottom"},{"nameBottom":"the third bottom"},{"nameBottom":"the fourth bottom"},{"nameBottom":"created bottom"}]}}""")
   }
 

@@ -6,7 +6,7 @@ use quaint::ast::{row_number, Aliasable, Comparable, Conjuctive, Function, Selec
 pub struct ManyRelatedRecordsWithRowNumber;
 
 impl ManyRelatedRecordsQueryBuilder for ManyRelatedRecordsWithRowNumber {
-    fn with_pagination<'a>(base: ManyRelatedRecordsBaseQuery<'a>) -> Query {
+    fn with_pagination(base: ManyRelatedRecordsBaseQuery) -> Query {
         let conditions = base
             .from_field
             .relation_column()
@@ -17,7 +17,7 @@ impl ManyRelatedRecordsQueryBuilder for ManyRelatedRecordsWithRowNumber {
 
         let mut base_query = base.query.so_that(conditions);
 
-        if let Some(order_by) = base.order_by.as_ref() {
+        if let Some(order_by) = &base.order_directions.primary_order_by {
             let column = order_by.field.as_column();
 
             if !base.selected_fields.columns().contains(&column) {
@@ -29,7 +29,6 @@ impl ManyRelatedRecordsQueryBuilder for ManyRelatedRecordsWithRowNumber {
             Self::BASE_TABLE_ALIAS,
             Self::BASE_TABLE_ALIAS,
             SelectedFields::RELATED_MODEL_ALIAS,
-            base.order_by.as_ref(),
             base.order_directions,
         );
 

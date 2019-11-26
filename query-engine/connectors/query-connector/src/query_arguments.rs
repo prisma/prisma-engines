@@ -34,8 +34,9 @@ impl QueryArguments {
 
     pub fn ordering_directions(&self) -> OrderDirections {
         OrderDirections {
-            needs_implicit_id_ordering: self.needs_implicit_ordering(),
             needs_to_be_reverse_order: self.needs_reversed_order(),
+            needs_implicit_id_ordering: self.needs_implicit_ordering(),
+            primary_order_by: self.order_by.clone(),
         }
     }
 
@@ -80,4 +81,5 @@ where
 pub struct OrderDirections {
     pub needs_implicit_id_ordering: bool,
     pub needs_to_be_reverse_order: bool,
+    pub primary_order_by: Option<OrderBy>,
 }
