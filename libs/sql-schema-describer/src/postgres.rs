@@ -100,7 +100,7 @@ impl SqlSchemaDescriber {
         debug!("Getting db size");
         let sql =
             "SELECT SUM(pg_total_relation_size(quote_ident(schemaname) || '.' || quote_ident(tablename)))::BIGINT as size
-             FROM pg_tables 
+             FROM pg_tables
              WHERE schemaname = $1::text";
         let result = self.conn.query_raw(sql, &[schema.into()]).await.expect("get db size ");
         let size: i64 = result
@@ -185,7 +185,7 @@ impl SqlSchemaDescriber {
                 });
                 let is_auto_increment = is_identity
                     || match default {
-                        Some(ref val) => is_autoincrement(val, schema, table, col_name),
+                        Some(ref val) => is_autoincrement(val, schema, table, &col_name),
                         _ => false,
                     };
                 Column {
@@ -205,17 +205,17 @@ impl SqlSchemaDescriber {
     async fn get_foreign_keys(&self, schema: &str, table: &str) -> Vec<ForeignKey> {
         let sql = "SELECT 
                 con.oid as \"con_id\",
-                att2.attname as \"child_column\", 
-                cl.relname as \"parent_table\", 
+                att2.attname as \"child_column\",
+                cl.relname as \"parent_table\",
                 att.attname as \"parent_column\",
                 con.confdeltype,
                 conname as constraint_name
             FROM
-            (SELECT 
-                    unnest(con1.conkey) as \"parent\", 
-                    unnest(con1.confkey) as \"child\", 
+            (SELECT
+                    unnest(con1.conkey) as \"parent\",
+                    unnest(con1.confkey) as \"child\",
                     con1.oid,
-                    con1.confrelid, 
+                    con1.confrelid,
                     con1.conrelid,
                     con1.conname,
                     con1.confdeltype
@@ -467,8 +467,8 @@ impl SqlSchemaDescriber {
     async fn get_enums(&self, schema: &str) -> SqlSchemaDescriberResult<Vec<Enum>> {
         debug!("Getting enums");
         let sql = "SELECT t.typname as name, e.enumlabel as value
-            FROM pg_type t 
-            JOIN pg_enum e ON t.oid = e.enumtypid  
+            FROM pg_type t
+            JOIN pg_enum e ON t.oid = e.enumtypid
             JOIN pg_catalog.pg_namespace n ON n.oid = t.typnamespace
             WHERE n.nspname = $1";
         let rows = self
@@ -548,15 +548,73 @@ fn get_column_type(udt: &str) -> ColumnType {
     }
 }
 
-static POSTGRES_AUTOINCREMENT: Lazy<Regex> = Lazy::new(|| {
-    Regex::new(r#"nextval("(?P<schema>.*)"."(?P<table_name>[a-zA-Z0-9_]+)_(?P<col_name>[a-zA-Z0-9_]+)_seq(?:_[0-9]+)?::regclass)"#).unwrap()
+static AUTOINCREMENT_REGEX: Lazy<Regex> = Lazy::new(|| {
+    Regex::new(
+        r#"nextval\((?:"(?P<schema_name>.+)".)?"(?P<table_name>.+)_(?P<column_name>.+)_seq(?:[0-9]+)?"::regclass\)"#,
+    )
+    .unwrap()
 });
 
-fn is_autoincrement(value: &str, schema: &str, table: &str, col_name: &str) -> bool {
-    POSTGRES_AUTOINCREMENT
+fn is_autoincrement(value: &str, schema_name: &str, table_name: &str, column_name: &str) -> bool {
+    AUTOINCREMENT_REGEX
         .captures(value)
         .and_then(|captures| {
-            captures.name("schema").map(|matched_schema| matched_schema == schema)
-        )
+            captures
+                .name("schema_name")
+                .map(|matched| matched.as_str())
+                .or(Some(schema_name))
+                .filter(|matched| *matched == schema_name)
+                .and_then(|_| {
+                    captures
+                        .name("table_name")
+                        .filter(|matched| matched.as_str() == table_name)
+                })
+                .and_then(|_| {
+                    captures
+                        .name("column_name")
+                        .filter(|matched| matched.as_str() == column_name)
+                })
+                .map(|_| true)
+        })
         .unwrap_or(false)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn postgres_is_autoincrement_works() {
+        let schema_name = "prisma";
+        let table_name = "Test";
+        let col_name = "id";
+
+        let non_autoincrement = "_seq";
+        assert!(!is_autoincrement(non_autoincrement, schema_name, table_name, col_name));
+
+        let autoincrement = format!(
+            r#"nextval("{}"."{}_{}_seq"::regclass)"#,
+            schema_name, table_name, col_name
+        );
+        assert!(is_autoincrement(&autoincrement, schema_name, table_name, col_name));
+
+        let autoincrement_with_number = format!(
+            r#"nextval("{}"."{}_{}_seq1"::regclass)"#,
+            schema_name, table_name, col_name
+        );
+        assert!(is_autoincrement(
+            &autoincrement_with_number,
+            schema_name,
+            table_name,
+            col_name
+        ));
+
+        let autoincrement_without_schema = format!(r#"nextval("{}_{}_seq1"::regclass)"#, table_name, col_name);
+        assert!(is_autoincrement(
+            &autoincrement_without_schema,
+            schema_name,
+            table_name,
+            col_name
+        ));
+    }
 }
