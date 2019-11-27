@@ -10,7 +10,7 @@ use url::Url;
 
 /// The main entry point and an abstraction over a database connection.
 pub struct Quaint {
-    pub inner: Mutex<Box<dyn Queryable + Send + Sync>>,
+    inner: Mutex<Box<dyn Queryable + Send + Sync>>,
     connection_info: ConnectionInfo,
 }
 
