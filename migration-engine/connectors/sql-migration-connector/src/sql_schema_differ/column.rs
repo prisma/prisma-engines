@@ -1,5 +1,6 @@
 use sql_schema_describer::Column;
 
+#[derive(Debug)]
 pub(crate) struct ColumnDiffer<'a> {
     pub(crate) previous: &'a Column,
     pub(crate) next: &'a Column,
@@ -12,6 +13,6 @@ impl<'a> ColumnDiffer<'a> {
             // || self.previous.tpe != self.next.tpe
             || self.previous.tpe.family != self.next.tpe.family
             || self.previous.arity != self.next.arity
-            || self.previous.default != self.next.default
+            || (!self.previous.auto_increment && (self.previous.default != self.next.default))
     }
 }
