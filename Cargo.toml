@@ -56,7 +56,7 @@ log = { version = "0.4", features = ["release_max_level_trace"] }
 tracing = { version = "0.1", optional = true }
 tracing-core = { version = "0.1", optional = true }
 
-mobc = { version = "0.2", optional = true }
+mobc = { git = "https://github.com/pimeys/mobc", optional = true, branch = "debug-log-removal" }
 futures = "0.3"
 async-std = "0.99.10"
 bytes = { version = "0.4", optional = true }
