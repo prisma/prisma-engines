@@ -273,24 +273,6 @@ impl Queryable for Mysql {
         })
     }
 
-    fn turn_off_fk_constraints(&self) -> DBIO<()> {
-        DBIO::new(async move {
-            let conn = self.pool.get_conn().await?;
-            conn.query("SET FOREIGN_KEY_CHECKS=0").await?;
-
-            Ok(())
-        })
-    }
-
-    fn turn_on_fk_constraints(&self) -> DBIO<()> {
-        DBIO::new(async move {
-            let conn = self.pool.get_conn().await?;
-            conn.query("SET FOREIGN_KEY_CHECKS=1").await?;
-
-            Ok(())
-        })
-    }
-
     fn raw_cmd<'a>(&'a self, cmd: &'a str) -> DBIO<'a, ()> {
         metrics::query("mysql.raw_cmd", cmd, &[], move || {
             async move {

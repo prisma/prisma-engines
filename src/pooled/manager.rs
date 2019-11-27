@@ -37,14 +37,6 @@ impl Queryable for PooledConnection {
         self.inner.execute_raw(sql, params)
     }
 
-    fn turn_off_fk_constraints(&self) -> DBIO<()> {
-        self.inner.turn_off_fk_constraints()
-    }
-
-    fn turn_on_fk_constraints(&self) -> DBIO<()> {
-        self.inner.turn_on_fk_constraints()
-    }
-
     fn raw_cmd<'a>(&'a self, cmd: &'a str) -> DBIO<'a, ()> {
         self.inner.raw_cmd(cmd)
     }

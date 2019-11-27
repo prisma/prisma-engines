@@ -411,20 +411,6 @@ impl Queryable for PostgreSql {
         })
     }
 
-    fn turn_off_fk_constraints(&self) -> DBIO<()> {
-        DBIO::new(async move {
-            self.query_raw("SET CONSTRAINTS ALL DEFERRED", &[]).await?;
-            Ok(())
-        })
-    }
-
-    fn turn_on_fk_constraints(&self) -> DBIO<()> {
-        DBIO::new(async move {
-            self.query_raw("SET CONSTRAINTS ALL IMMEDIATE", &[]).await?;
-            Ok(())
-        })
-    }
-
     fn raw_cmd<'a>(&'a self, cmd: &'a str) -> DBIO<'a, ()> {
         metrics::query("postgres.raw_cmd", cmd, &[], move || {
             async move {

@@ -197,20 +197,6 @@ impl Queryable for Sqlite {
         })
     }
 
-    fn turn_off_fk_constraints(&self) -> DBIO<()> {
-        DBIO::new(async move {
-            self.query_raw("PRAGMA foreign_keys = OFF", &[]).await?;
-            Ok(())
-        })
-    }
-
-    fn turn_on_fk_constraints(&self) -> DBIO<()> {
-        DBIO::new(async move {
-            self.query_raw("PRAGMA foreign_keys = ON", &[]).await?;
-            Ok(())
-        })
-    }
-
     fn raw_cmd<'a>(&'a self, cmd: &'a str) -> DBIO<'a, ()> {
         metrics::query("sqlite.raw_cmd", cmd, &[], move || {
             let client = self.client.lock().unwrap();

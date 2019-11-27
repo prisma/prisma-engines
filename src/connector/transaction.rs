@@ -48,18 +48,6 @@ impl<'a> Queryable for Transaction<'a> {
         self.inner.execute_raw(sql, params)
     }
 
-    fn turn_off_fk_constraints(&self) -> DBIO<()> {
-        self.inner.turn_off_fk_constraints()
-    }
-
-    fn turn_on_fk_constraints(&self) -> DBIO<()> {
-        self.inner.turn_on_fk_constraints()
-    }
-
-    fn empty_tables<'b>(&'b self, tables: Vec<Table<'b>>) -> DBIO<'b, ()> {
-        self.inner.empty_tables(tables)
-    }
-
     fn raw_cmd<'b>(&'b self, cmd: &'b str) -> DBIO<'b, ()> {
         self.inner.raw_cmd(cmd)
     }

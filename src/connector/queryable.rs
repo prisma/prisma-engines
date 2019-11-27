@@ -32,30 +32,9 @@ where
     /// returning the number of affected rows.
     fn execute_raw<'a>(&'a self, sql: &'a str, params: &'a [ParameterizedValue<'a>]) -> DBIO<'a, u64>;
 
-    /// Turns off all foreign key constraints.
-    fn turn_off_fk_constraints(&self) -> DBIO<()>;
-
-    /// Turns on all foreign key constraints.
-    fn turn_on_fk_constraints(&self) -> DBIO<()>;
-
     /// Runs a command in the database, for queries that can't be run using
     /// prepared statements.
     fn raw_cmd<'a>(&'a self, cmd: &'a str) -> DBIO<'a, ()>;
-
-    /// Empties the given set of tables.
-    fn empty_tables<'a>(&'a self, tables: Vec<Table<'a>>) -> DBIO<'a, ()> {
-        DBIO::new(async move {
-            self.turn_off_fk_constraints().await?;
-
-            for table in tables.into_iter() {
-                self.query(Delete::from_table(table).into()).await?;
-            }
-
-            self.turn_on_fk_constraints().await?;
-
-            Ok(())
-        })
-    }
 
     // For selecting data returning the results.
     fn select<'a>(&'a self, q: Select<'a>) -> DBIO<'a, ResultSet> {

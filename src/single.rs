@@ -135,14 +135,6 @@ impl Queryable for Quaint {
         DBIO::new(async move { self.inner.lock().await.execute_raw(sql, params).await })
     }
 
-    fn turn_off_fk_constraints(&self) -> DBIO<()> {
-        DBIO::new(async move { self.inner.lock().await.turn_off_fk_constraints().await })
-    }
-
-    fn turn_on_fk_constraints(&self) -> DBIO<()> {
-        DBIO::new(async move { self.inner.lock().await.turn_on_fk_constraints().await })
-    }
-
     fn raw_cmd<'a>(&'a self, cmd: &'a str) -> DBIO<'a, ()> {
         DBIO::new(async move { self.inner.lock().await.raw_cmd(cmd).await })
     }
