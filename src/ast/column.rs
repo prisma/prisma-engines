@@ -9,6 +9,17 @@ pub struct Column<'a> {
     pub(crate) alias: Option<Cow<'a, str>>,
 }
 
+#[macro_export]
+macro_rules! col {
+    ($e1:expr) => {
+        DatabaseValue::from(Column::from($e1))
+    };
+
+    ($e1:expr, $e2:expr) => {
+        DatabaseValue::from(Column::from(($e1, $e2)))
+    };
+}
+
 impl<'a> From<Column<'a>> for DatabaseValue<'a> {
     #[inline]
     fn from(col: Column<'a>) -> Self {

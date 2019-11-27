@@ -1,3 +1,4 @@
+pub use crate::{val, col};
 pub use crate::ast::*;
 #[cfg(any(feature = "sqlite", feature = "mysql", feature = "postgresql"))]
 pub use crate::connector::{

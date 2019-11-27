@@ -212,7 +212,7 @@ impl Queryable for Sqlite {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::connector::{Queryable, TransactionCapable};
+    use crate::{ast::*, connector::{Queryable, TransactionCapable}, val};
 
     #[test]
     fn sqlite_params_from_str_should_resolve_path_correctly_with_file_scheme() {
@@ -283,5 +283,104 @@ mod tests {
         assert_eq!(row["NAME"].as_str(), Some("Joe"));
         assert_eq!(row["AGE"].as_i64(), Some(27));
         assert_eq!(row["SALARY"].as_f64(), Some(20000.0));
+    }
+
+    #[tokio::test]
+    async fn op_test_add_one_level() {
+        let connection = Sqlite::try_from("file:db/test.db").unwrap();
+        let q = Select::default().value(val!(2) + val!(1));
+
+        let rows = connection.select(q).await.unwrap();
+        let row = rows.get(0).unwrap();
+
+        assert_eq!(row[0].as_i64(), Some(3));
+    }
+
+    #[tokio::test]
+    async fn op_test_add_two_levels() {
+        let connection = Sqlite::try_from("file:db/test.db").unwrap();
+        let q = Select::default().value(val!(2) + val!(val!(3) + val!(2)));
+
+        let rows = connection.select(q).await.unwrap();
+        let row = rows.get(0).unwrap();
+
+        assert_eq!(row[0].as_i64(), Some(7));
+    }
+
+    #[tokio::test]
+    async fn op_test_sub_one_level() {
+        let connection = Sqlite::try_from("file:db/test.db").unwrap();
+        let q = Select::default().value(val!(2) - val!(1));
+
+        let rows = connection.select(q).await.unwrap();
+        let row = rows.get(0).unwrap();
+
+        assert_eq!(row[0].as_i64(), Some(1));
+    }
+
+    #[tokio::test]
+    async fn op_test_sub_three_items() {
+        let connection = Sqlite::try_from("file:db/test.db").unwrap();
+        let q = Select::default().value(val!(2) - val!(1) - val!(1));
+
+        let rows = connection.select(q).await.unwrap();
+        let row = rows.get(0).unwrap();
+
+        assert_eq!(row[0].as_i64(), Some(0));
+    }
+
+    #[tokio::test]
+    async fn op_test_sub_two_levels() {
+        let connection = Sqlite::try_from("file:db/test.db").unwrap();
+        let q = Select::default().value(val!(2) - val!(val!(3) + val!(1)));
+
+        let rows = connection.select(q).await.unwrap();
+        let row = rows.get(0).unwrap();
+
+        assert_eq!(row[0].as_i64(), Some(-2));
+    }
+
+    #[tokio::test]
+    async fn op_test_mul_one_level() {
+        let connection = Sqlite::try_from("file:db/test.db").unwrap();
+        let q = Select::default().value(val!(6) * val!(6));
+
+        let rows = connection.select(q).await.unwrap();
+        let row = rows.get(0).unwrap();
+
+        assert_eq!(row[0].as_i64(), Some(36));
+    }
+
+    #[tokio::test]
+    async fn op_test_mul_two_levels() {
+        let connection = Sqlite::try_from("file:db/test.db").unwrap();
+        let q = Select::default().value(val!(6) * (val!(6) - val!(1)));
+
+        let rows = connection.select(q).await.unwrap();
+        let row = rows.get(0).unwrap();
+
+        assert_eq!(row[0].as_i64(), Some(30));
+    }
+
+    #[tokio::test]
+    async fn op_multiple_operations() {
+        let connection = Sqlite::try_from("file:db/test.db").unwrap();
+        let q = Select::default().value(val!(4) - val!(2) * val!(2));
+
+        let rows = connection.select(q).await.unwrap();
+        let row = rows.get(0).unwrap();
+
+        assert_eq!(row[0].as_i64(), Some(0));
+    }
+
+    #[tokio::test]
+    async fn op_test_div_one_level() {
+        let connection = Sqlite::try_from("file:db/test.db").unwrap();
+        let q = Select::default().value(val!(6) / val!(3));
+
+        let rows = connection.select(q).await.unwrap();
+        let row = rows.get(0).unwrap();
+
+        assert_eq!(row[0].as_i64(), Some(2));
     }
 }

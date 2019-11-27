@@ -270,6 +270,39 @@ pub trait Visitor<'a> {
         Ok(())
     }
 
+    fn visit_operation(&mut self, op: SqlOp<'a>) -> fmt::Result {
+        match op {
+            SqlOp::Add(left, right) => {
+                self.surround_with("(", ")", |ref mut se| {
+                    se.visit_database_value(left)?;
+                    se.write(" + ")?;
+                    se.visit_database_value(right)
+                })
+            },
+            SqlOp::Sub(left, right) => {
+                self.surround_with("(", ")", |ref mut se| {
+                    se.visit_database_value(left)?;
+                    se.write(" - ")?;
+                    se.visit_database_value(right)
+                })
+            },
+            SqlOp::Mul(left, right) => {
+                self.surround_with("(", ")", |ref mut se| {
+                    se.visit_database_value(left)?;
+                    se.write(" * ")?;
+                    se.visit_database_value(right)
+                })
+            },
+            SqlOp::Div(left, right) => {
+                self.surround_with("(", ")", |ref mut se| {
+                    se.visit_database_value(left)?;
+                    se.write(" / ")?;
+                    se.visit_database_value(right)
+                })
+            },
+        }
+    }
+
     /// A visit to a value used in an expression
     fn visit_database_value(&mut self, value: DatabaseValue<'a>) -> fmt::Result {
         match value {
@@ -278,6 +311,7 @@ pub trait Visitor<'a> {
             DatabaseValue::Row(row) => self.visit_row(row),
             DatabaseValue::Select(select) => self.surround_with("(", ")", |ref mut s| s.visit_select(select)),
             DatabaseValue::Function(function) => self.visit_function(function),
+            DatabaseValue::Op(op) => self.visit_operation(*op),
             DatabaseValue::Asterisk(table) => match table {
                 Some(table) => {
                     self.visit_table(*table, false)?;
