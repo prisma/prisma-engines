@@ -84,20 +84,22 @@ impl<'a> Select<'a> {
     /// Creating a qualified asterisk to a joined table:
     ///
     /// ```rust
-    /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # use quaint::{col, val, ast::*, visitor::{Visitor, Sqlite}};
     /// let join = "dogs".on(("dogs", "slave_id").equals(Column::from(("cats", "master_id"))));
     ///
     /// let query = Select::from_table("cats")
     ///     .value(Table::from("cats").asterisk())
-    ///     .value(Table::from("dogs").asterisk())
+    ///     .value(col!("dogs", "age") - val!(4))
     ///     .inner_join(join);
     ///
-    /// let (sql, _) = Sqlite::build(query);
+    /// let (sql, params) = Sqlite::build(query);
     ///
     /// assert_eq!(
-    ///     "SELECT `cats`.*, `dogs`.* FROM `cats` INNER JOIN `dogs` ON `dogs`.`slave_id` = `cats`.`master_id`",
+    ///     "SELECT `cats`.*, (`dogs`.`age` - ?) FROM `cats` INNER JOIN `dogs` ON `dogs`.`slave_id` = `cats`.`master_id`",
     ///     sql
     /// );
+    ///
+    /// assert_eq!(vec![ParameterizedValue::from(4)], params);
     /// ```
     pub fn value<T>(mut self, value: T) -> Self
     where

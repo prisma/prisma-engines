@@ -25,6 +25,7 @@ mod table;
 mod union_all;
 mod update;
 mod values;
+mod ops;
 
 pub use column::Column;
 pub use compare::{Comparable, Compare};
@@ -45,6 +46,8 @@ pub use select::Select;
 pub use table::*;
 pub use union_all::UnionAll;
 pub use update::*;
+pub use ops::*;
+
 #[cfg(any(feature = "sqlite", feature = "mysql", feature = "postgresql"))]
 pub(crate) use values::Params;
 pub use values::{asterisk, DatabaseValue, ParameterizedValue};

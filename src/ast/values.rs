@@ -312,6 +312,8 @@ pub enum DatabaseValue<'a> {
     Function(Function<'a>),
     /// A qualified asterisk to a table
     Asterisk(Option<Box<Table<'a>>>),
+    /// An operation: sum, sub, mul or div.
+    Op(Box<SqlOp<'a>>),
 }
 
 /// A quick alias to create an asterisk to a table.
@@ -399,6 +401,13 @@ impl<'a> TryFrom<ParameterizedValue<'a>> for DateTime<Utc> {
     }
 }
 
+#[macro_export]
+macro_rules! val {
+    ($val:expr) => {
+        DatabaseValue::from($val)
+    };
+}
+
 macro_rules! parameterized_value {
     ($kind:ident,$paramkind:ident) => {
         impl<'a> From<$kind> for ParameterizedValue<'a> {
@@ -443,6 +452,13 @@ macro_rules! database_value {
 
 database_value!(Row, Row);
 database_value!(Function, Function);
+
+impl<'a> From<SqlOp<'a>> for DatabaseValue<'a> {
+    #[inline]
+    fn from(p: SqlOp<'a>) -> Self {
+        Self::Op(Box::new(p))
+    }
+}
 
 impl<'a, T> From<T> for DatabaseValue<'a>
 where
