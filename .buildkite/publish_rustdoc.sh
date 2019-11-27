@@ -24,7 +24,7 @@ then
     echo "Nothing to do"
 else
     git add -A .
-    git commit -m "Rebuild pages at ${BUILDKITE_COMMIT}"
+    git commit -m "[skip ci] Rebuild pages at ${BUILDKITE_COMMIT}"
 
     echo
     echo "Pushing docs..."
