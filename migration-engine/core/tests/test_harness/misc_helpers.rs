@@ -2,9 +2,9 @@ use datamodel::ast::{parser, SchemaAst};
 use migration_connector::*;
 use migration_core::{api::MigrationApi, commands::ResetCommand};
 use once_cell::sync::Lazy;
-use quaint::prelude::*;
+use quaint::{prelude::*, single::Quaint};
 use sql_migration_connector::SqlMigrationConnector;
-use std::rc::Rc;
+use std::{future::Future, rc::Rc};
 use test_setup::*;
 use url::Url;
 
@@ -21,7 +21,7 @@ pub(super) async fn mysql_migration_connector(database_url: &str) -> SqlMigratio
         Err(_) => {
             let url = Url::parse(database_url).unwrap();
             let name_cmd = |name| format!("CREATE DATABASE `{}`", name);
-            let connect_cmd = |url: url::Url| Quaint::new(url.as_str());
+            let connect_cmd = |url: url::Url| async move { Quaint::new(url.as_str()).await };
 
             create_database(url, "mysql", "/", name_cmd, Rc::new(connect_cmd)).await;
             SqlMigrationConnector::new(database_url).await.unwrap()
@@ -34,7 +34,7 @@ pub(super) async fn postgres_migration_connector(url: &str) -> SqlMigrationConne
         Ok(c) => c,
         Err(_) => {
             let name_cmd = |name| format!("CREATE DATABASE \"{}\"", name);
-            let connect_cmd = |url: url::Url| Quaint::new(url.as_str());
+            let connect_cmd = |url: url::Url| async move { Quaint::new(url.as_str()).await };
 
             create_database(
                 url.parse().unwrap(),
@@ -76,10 +76,11 @@ fn fetch_db_name(url: &Url, default: &str) -> String {
     String::from(result)
 }
 
-async fn create_database<F, T, S>(url: Url, default_name: &str, root_path: &str, create_stmt: S, f: Rc<F>)
+async fn create_database<F, T, S, U>(url: Url, default_name: &str, root_path: &str, create_stmt: S, f: Rc<F>)
 where
     T: Queryable,
-    F: Fn(Url) -> Result<T, quaint::error::Error>,
+    F: Fn(Url) -> U,
+    U: Future<Output = Result<T, quaint::error::Error>>,
     S: FnOnce(String) -> String,
 {
     let db_name = fetch_db_name(&url, default_name);
@@ -87,7 +88,7 @@ where
     let mut url = url.clone();
     url.set_path(root_path);
 
-    let conn = f(url).unwrap();
+    let conn = f(url).await.unwrap();
 
     conn.execute_raw(&create_stmt(db_name), &[]).await.unwrap();
 }

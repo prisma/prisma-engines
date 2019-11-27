@@ -1,5 +1,5 @@
 use log::debug;
-use quaint::prelude::*;
+use quaint::{prelude::*, single::Quaint};
 use sql_schema_describer::*;
 use std::path::Path;
 use std::sync::Arc;
@@ -16,7 +16,10 @@ pub async fn get_sqlite_describer(sql: &str) -> sqlite::SqlSchemaDescriber {
         std::fs::remove_file(database_file_path.clone()).expect("remove database file");
     }
 
-    let conn = Quaint::new(&format!("file://{}?db_name={}", database_file_path, SCHEMA)).unwrap();
+    let conn = Quaint::new(&format!("file://{}?db_name={}", database_file_path, SCHEMA))
+        .await
+        .unwrap();
+
     for statement in sql.split(";").filter(|statement| !statement.is_empty()) {
         conn.execute_raw(statement, &[]).await.expect("executing migration");
     }

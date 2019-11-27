@@ -6,7 +6,7 @@ use crate::StringFromEnvVar;
 /// Trait for custom sources.
 ///
 /// A source is basically the datamodel equivalent of a connector.
-pub trait Source {
+pub trait Source: Send + Sync {
     /// Gets the name of the implementing connector.
     fn connector_type(&self) -> &str;
 
@@ -34,5 +34,5 @@ pub trait SourceDefinition {
         name: &str,
         url: StringFromEnvVar,
         documentation: &Option<String>,
-    ) -> Result<Box<dyn Source>, DatamodelError>;
+    ) -> Result<Box<dyn Source + Send + Sync>, DatamodelError>;
 }

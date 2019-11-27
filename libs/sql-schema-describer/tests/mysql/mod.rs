@@ -1,5 +1,5 @@
 use log::debug;
-use quaint::prelude::*;
+use quaint::{prelude::*, single::Quaint};
 use sql_schema_describer::*;
 use std::sync::Arc;
 
@@ -34,7 +34,7 @@ pub async fn get_mysql_describer_for_schema(sql: &str, schema: &str) -> mysql::S
     // Ensure the presence of an empty database.
 
     let url = mysql_url("");
-    let conn = Quaint::new(&url).unwrap();
+    let conn = Quaint::new(&url).await.unwrap();
 
     conn.execute_raw(&format!("DROP SCHEMA IF EXISTS `{}`", schema), &[])
         .await
@@ -46,7 +46,7 @@ pub async fn get_mysql_describer_for_schema(sql: &str, schema: &str) -> mysql::S
     // Migrate the database we just created.
 
     let url = mysql_url(schema);
-    let conn = Quaint::new(&url).unwrap();
+    let conn = Quaint::new(&url).await.unwrap();
 
     debug!("Executing MySQL migrations: {}", sql);
     let sql_string = sql.to_string();

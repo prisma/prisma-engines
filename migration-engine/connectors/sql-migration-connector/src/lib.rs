@@ -15,7 +15,10 @@ pub use error::*;
 pub use sql_migration::*;
 
 use migration_connector::*;
-use quaint::prelude::{ConnectionInfo, Quaint, Queryable, SqlFamily};
+use quaint::{
+    prelude::{ConnectionInfo, Queryable, SqlFamily},
+    single::Quaint,
+};
 use sql_database_migration_inferrer::*;
 use sql_database_step_applier::*;
 use sql_destructive_changes_checker::*;
@@ -42,6 +45,7 @@ impl SqlMigrationConnector {
             ConnectionInfo::from_url(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
 
         let connection = Quaint::new(database_str)
+            .await
             .map_err(SqlError::from)
             .map_err(|err| err.into_connector_error(&connection_info))?;
 

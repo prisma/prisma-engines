@@ -1,5 +1,5 @@
 use log::debug;
-use quaint::prelude::*;
+use quaint::{prelude::*, single::Quaint};
 use sql_schema_describer::*;
 use std::sync::Arc;
 
@@ -12,7 +12,7 @@ pub async fn get_postgres_describer(sql: &str) -> postgres::SqlSchemaDescriber {
     };
 
     let url = format!("postgres://postgres:prisma@{}:5432/postgres", host);
-    let client = Quaint::new(&url).unwrap();
+    let client = Quaint::new(&url).await.unwrap();
 
     let drop_schema = format!("DROP SCHEMA IF EXISTS \"{}\" CASCADE;", SCHEMA);
     client

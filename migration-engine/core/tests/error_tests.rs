@@ -7,7 +7,7 @@ use migration_core::{
     commands::{ApplyMigrationCommand, ApplyMigrationInput, InferMigrationStepsCommand, InferMigrationStepsInput},
 };
 use pretty_assertions::assert_eq;
-use quaint::prelude::*;
+use quaint::{prelude::*, single::Quaint};
 use serde_json::json;
 use test_harness::*;
 use url::Url;
@@ -208,7 +208,7 @@ async fn database_already_exists_must_return_a_proper_error() {
 
 #[tokio::test]
 async fn database_access_denied_must_return_a_proper_error_in_cli() {
-    let conn = Quaint::new(&mysql_url()).unwrap();
+    let conn = Quaint::new(&mysql_url()).await.unwrap();
 
     conn.execute_raw("DROP USER IF EXISTS jeanmichel", &[]).await.unwrap();
     conn.execute_raw("CREATE USER jeanmichel IDENTIFIED BY '1234'", &[])
@@ -244,7 +244,7 @@ async fn database_access_denied_must_return_a_proper_error_in_cli() {
 
 #[tokio::test]
 async fn database_access_denied_must_return_a_proper_error_in_rpc() {
-    let conn = Quaint::new(&mysql_url()).unwrap();
+    let conn = Quaint::new(&mysql_url()).await.unwrap();
 
     conn.execute_raw("DROP USER IF EXISTS jeanmichel", &[]).await.unwrap();
     conn.execute_raw("CREATE USER jeanmichel IDENTIFIED BY '1234'", &[])

@@ -2,9 +2,10 @@ use super::connection::SqlConnection;
 use crate::{query_builder::ManyRelatedRecordsWithRowNumber, FromSource, SqlError};
 use connector_interface::{Connection, Connector, IO};
 use datamodel::Source;
-use quaint::{connector::SqliteParams, Quaint};
+use quaint::{connector::SqliteParams, pooled::Quaint};
 use std::convert::TryFrom;
 use url::Url;
+use async_trait::async_trait;
 
 pub struct Sqlite {
     pool: Quaint,
@@ -17,8 +18,9 @@ impl Sqlite {
     }
 }
 
+#[async_trait]
 impl FromSource for Sqlite {
-    fn from_source(source: &dyn Source) -> crate::Result<Self> {
+    async fn from_source(source: &dyn Source) -> crate::Result<Sqlite> {
         let params = SqliteParams::try_from(source.url().value.as_str())?;
         let db_name = std::path::Path::new(&params.file_path)
             .file_stem()
@@ -34,9 +36,9 @@ impl FromSource for Sqlite {
             url
         };
 
-        let pool = Quaint::new(url_with_db.as_str())?;
+        let pool = Quaint::new(url_with_db.as_str()).await?;
 
-        Ok(Self { pool, file_path })
+        Ok(Sqlite { pool, file_path })
     }
 }
 

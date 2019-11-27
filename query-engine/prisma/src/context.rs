@@ -27,7 +27,7 @@ impl PrismaContext {
     /// 1. The data model. This has different options on how to initialize. See data_model_loader module. The Prisma configuration (prisma.yml) is used as fallback.
     /// 2. The data model is converted to the internal data model.
     /// 3. The api query schema is constructed from the internal data model.
-    pub fn new(legacy: bool) -> PrismaResult<Self> {
+    pub async fn new(legacy: bool) -> PrismaResult<Self> {
         // Load data model in order of precedence.
         let (v2components, template) = load_data_model_components()?;
 
@@ -41,7 +41,7 @@ impl PrismaContext {
         };
 
         // Load executor
-        let (db_name, executor) = exec_loader::load(&**data_source)?;
+        let (db_name, executor) = exec_loader::load(&**data_source).await?;
 
         // Build internal data model
         let internal_data_model = template.build(db_name);
