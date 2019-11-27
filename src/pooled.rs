@@ -1,3 +1,4 @@
+//! A connection pool to a SQL database.
 mod manager;
 
 pub use manager::{PooledConnection, QuaintManager};

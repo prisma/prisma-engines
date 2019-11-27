@@ -1,15 +1,16 @@
 //! # quaint
 //!
-//! Quaint is an AST and database-specific visitors for creating SQL
-//! statements.
+//! A database client abstraction for reading and writing to a SQL database in a
+//! safe manner.
 //!
 //! Under construction and will go through several rounds of changes. Not meant
 //! for production use in the current form.
 //!
 //! ### Goals
 //!
-//! - Query generation when the database and conditions are not known beforehand.
-//! - Parameterized queries when possible.
+//! - Query generation when the database and conditions are not known at compile
+//!   time.
+//! - Parameterized queries.
 //! - A modular design, separate AST for query building and visitors for
 //!   different databases.
 //! - Database support behind a feature flag.
@@ -23,6 +24,49 @@
 //! - SQLite
 //! - PostgreSQL
 //! - MySQL
+//!
+//! ### Methods of connecting
+//!
+//! Quaint provides two options to connect to the underlying database.
+//!
+//! The [single connection method](single/struct.Quaint.html):
+//!
+//! ``` rust
+//! use quaint::{prelude::*, single::Quaint};
+//!
+//! #[tokio::main]
+//! async fn main() -> Result<(), quaint::error::Error> {
+//!     let conn = Quaint::new("file:///tmp/example.db").await?;
+//!     let result = conn.select(Select::default().value(1)).await?;
+//!
+//!     assert_eq!(
+//!         Some(1),
+//!         result.into_iter().nth(0).and_then(|row| row[0].as_i64()),
+//!     );
+//!
+//!     Ok(())
+//! }
+//! ```
+//!
+//! The [pooled method](pooled/struct.Quaint.html):
+//!
+//! ``` rust
+//! use quaint::{prelude::*, pooled::Quaint};
+//!
+//! #[tokio::main]
+//! async fn main() -> Result<(), quaint::error::Error> {
+//!     let pool = Quaint::new("file:///tmp/example.db").await?;
+//!     let conn = pool.check_out().await?;
+//!     let result = conn.select(Select::default().value(1)).await?;
+//!
+//!     assert_eq!(
+//!         Some(1),
+//!         result.into_iter().nth(0).and_then(|row| row[0].as_i64()),
+//!     );
+//!
+//!     Ok(())
+//! }
+//! ```
 //!
 //! ## Examples
 //!
@@ -54,7 +98,7 @@
 //! }
 //! ```
 //!
-//! ### Building an SQL query string
+//! ### Using the AST module
 //!
 //! The crate can be used as an SQL string builder using the [ast](ast/index.html) and
 //! [visitor](visitor/index.html) modules.

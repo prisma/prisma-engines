@@ -1,3 +1,5 @@
+//! A single connection abstraction to a SQL database.
+
 use crate::{
     ast,
     connector::{self, ConnectionInfo, Queryable, SqlFamily, TransactionCapable, DBIO},
