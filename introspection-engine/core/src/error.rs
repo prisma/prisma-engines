@@ -52,8 +52,3 @@ pub(crate) fn render_jsonrpc_error(payload: impl serde::Serialize, message: Stri
         data: Some(serde_json::to_value(payload).unwrap()),
     }
 }
-
-pub(crate) fn render_panic(panic: Box<dyn std::any::Any + Send + 'static>) -> JsonRpcError {
-    let error = user_facing_errors::UnknownError::from_panic_payload(panic.as_ref());
-    render_jsonrpc_error(error, "Panicked during command handling.".into())
-}

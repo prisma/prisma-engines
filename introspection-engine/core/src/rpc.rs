@@ -1,5 +1,5 @@
 use crate::connector_loader::load_connector;
-use crate::error::{render_panic, CoreError};
+use crate::error::{CoreError};
 use introspection_connector::DatabaseMetadata;
 use jsonrpc_core::*;
 use jsonrpc_derive::rpc;
@@ -61,13 +61,9 @@ impl RpcImpl {
 
     /// Will also catch panics.
     fn block_on<O>(&self, fut: impl StdFuture<Output = Result<O>>) -> Result<O> {
-        use std::panic::{AssertUnwindSafe};
-        use futures03::FutureExt;
-
-        match self.runtime.block_on(AssertUnwindSafe(fut).catch_unwind()) {
-            Ok(Ok(o)) => Ok(o),
-            Ok(Err(err)) => Err(err),
-            Err(err) => Err(render_panic(err)),
+        match self.runtime.block_on(fut) {
+            Ok(o) => Ok(o),
+            Err(err) => Err(err),
         }
     }
 }

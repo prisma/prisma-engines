@@ -119,18 +119,13 @@ impl RpcApi {
         cmd: RpcCommand,
         params: &Params,
     ) -> std::result::Result<serde_json::Value, JsonRpcError> {
-        use std::panic::AssertUnwindSafe;
-
-        let result: Result<Result<serde_json::Value, RunCommandError>, _> =
-            AssertUnwindSafe(Self::run_command(&executor, cmd, params))
-                .catch_unwind()
-                .await;
+        let result: Result<serde_json::Value, RunCommandError> =
+            Self::run_command(&executor, cmd, params).await;
 
         match result {
-            Ok(Ok(result)) => Ok(result),
-            Ok(Err(RunCommandError::JsonRpcError(err))) => Err(err),
-            Ok(Err(RunCommandError::CrateError(err))) => Err(executor.render_jsonrpc_error(err)),
-            Err(panic) => Err(executor.render_panic(panic)),
+            Ok(result) => Ok(result),
+            Err(RunCommandError::JsonRpcError(err)) => Err(err),
+            Err(RunCommandError::CrateError(err)) => Err(executor.render_jsonrpc_error(err)),
         }
     }
 
