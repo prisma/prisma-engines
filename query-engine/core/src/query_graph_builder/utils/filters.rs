@@ -1,7 +1,10 @@
 use super::*;
-use crate::query_document::ParsedInputValue;
+use crate::{
+    query_document::{ParsedInputMap, ParsedInputValue},
+    schema_builder::compound_field_name,
+};
 use connector::{filter::Filter, RelationCompare, ScalarCompare};
-use prisma_models::{Field, ModelRef, PrismaListValue, PrismaValue};
+use prisma_models::{Field, ModelRef, PrismaListValue, PrismaValue, RelationFieldRef, ScalarFieldRef};
 use std::{collections::BTreeMap, convert::TryFrom, convert::TryInto};
 
 lazy_static! {
@@ -109,6 +112,7 @@ pub fn extract_filter(
                             .collect(),
 
                         ParsedInputValue::Map(map) => extract_filter(map, model).map(|res| vec![res]),
+
                         _ => unreachable!(),
                     };
 
@@ -122,49 +126,21 @@ pub fn extract_filter(
                 op => {
                     let op_name: &'static str = op.suffix();
                     let field_name = key.trim_end_matches(op_name);
-                    let field = model.fields().find_from_all(&field_name).unwrap();
 
-                    match field {
-                        Field::Scalar(s) => {
-                            let value: PrismaValue = value.try_into()?;
-                            Ok(match op {
-                                FilterOp::In => s.is_in(PrismaListValue::try_from(value)?),
-                                FilterOp::NotIn => s.not_in(PrismaListValue::try_from(value)?),
-                                FilterOp::Not => s.not_equals(value),
-                                FilterOp::Lt => s.less_than(value),
-                                FilterOp::Lte => s.less_than_or_equals(value),
-                                FilterOp::Gt => s.greater_than(value),
-                                FilterOp::Gte => s.greater_than_or_equals(value),
-                                FilterOp::Contains => s.contains(value),
-                                FilterOp::NotContains => s.not_contains(value),
-                                FilterOp::StartsWith => s.starts_with(value),
-                                FilterOp::NotStartsWith => s.not_starts_with(value),
-                                FilterOp::EndsWith => s.ends_with(value),
-                                FilterOp::NotEndsWith => s.not_ends_with(value),
-                                FilterOp::Field => s.equals(value),
-                                _ => unreachable!(),
-                            })
-                        }
-                        Field::Relation(r) => {
-                            let value: Option<BTreeMap<String, ParsedInputValue>> = value.try_into()?;
-
-                            Ok(match (op, value) {
-                                (FilterOp::Some, Some(value)) => {
-                                    r.at_least_one_related(extract_filter(value, &r.related_model())?)
-                                }
-                                (FilterOp::None, Some(value)) => {
-                                    r.no_related(extract_filter(value, &r.related_model())?)
-                                }
-                                (FilterOp::Every, Some(value)) => {
-                                    r.every_related(extract_filter(value, &r.related_model())?)
-                                }
-                                (FilterOp::Field, Some(value)) => {
-                                    r.to_one_related(extract_filter(value, &r.related_model())?)
-                                }
-                                (FilterOp::Field, None) => r.one_relation_is_null(),
-                                _ => unreachable!(),
-                            })
-                        }
+                    // Always try to resolve regular fields first. If that fails, try to resolve compound fields.
+                    match model.fields().find_from_all(&field_name) {
+                        Ok(field) => match field {
+                            Field::Scalar(field) => handle_scalar_field(field, value, &op),
+                            Field::Relation(field) => handle_relation_field(field, value, &op),
+                        },
+                        Err(_) => find_index_fields(&field_name, &model)
+                            .and_then(|fields| handle_compound_field(fields, value))
+                            .map_err(|_| {
+                                QueryGraphBuilderError::AssertionError(format!(
+                                    "Unable to resolve field {} to a field or index on model {}",
+                                    field_name, model.name
+                                ))
+                            }),
                     }
                 }
             }
@@ -172,4 +148,73 @@ pub fn extract_filter(
         .collect::<QueryGraphBuilderResult<Vec<Filter>>>()?;
 
     Ok(Filter::and(filters))
+}
+
+fn handle_scalar_field(
+    field: &ScalarFieldRef,
+    value: ParsedInputValue,
+    op: &FilterOp,
+) -> QueryGraphBuilderResult<Filter> {
+    let value: PrismaValue = value.try_into()?;
+    Ok(match op {
+        FilterOp::In => field.is_in(PrismaListValue::try_from(value)?),
+        FilterOp::NotIn => field.not_in(PrismaListValue::try_from(value)?),
+        FilterOp::Not => field.not_equals(value),
+        FilterOp::Lt => field.less_than(value),
+        FilterOp::Lte => field.less_than_or_equals(value),
+        FilterOp::Gt => field.greater_than(value),
+        FilterOp::Gte => field.greater_than_or_equals(value),
+        FilterOp::Contains => field.contains(value),
+        FilterOp::NotContains => field.not_contains(value),
+        FilterOp::StartsWith => field.starts_with(value),
+        FilterOp::NotStartsWith => field.not_starts_with(value),
+        FilterOp::EndsWith => field.ends_with(value),
+        FilterOp::NotEndsWith => field.not_ends_with(value),
+        FilterOp::Field => field.equals(value),
+        _ => unreachable!(),
+    })
+}
+
+fn handle_relation_field(
+    field: &RelationFieldRef,
+    value: ParsedInputValue,
+    op: &FilterOp,
+) -> QueryGraphBuilderResult<Filter> {
+    let value: Option<BTreeMap<String, ParsedInputValue>> = value.try_into()?;
+
+    Ok(match (op, value) {
+        (FilterOp::Some, Some(value)) => field.at_least_one_related(extract_filter(value, &field.related_model())?),
+        (FilterOp::None, Some(value)) => field.no_related(extract_filter(value, &field.related_model())?),
+        (FilterOp::Every, Some(value)) => field.every_related(extract_filter(value, &field.related_model())?),
+        (FilterOp::Field, Some(value)) => field.to_one_related(extract_filter(value, &field.related_model())?),
+        (FilterOp::Field, None) => field.one_relation_is_null(),
+        _ => unreachable!(),
+    })
+}
+
+fn handle_compound_field(fields: Vec<ScalarFieldRef>, value: ParsedInputValue) -> QueryGraphBuilderResult<Filter> {
+    let mut value: ParsedInputMap = value.try_into()?;
+
+    let filters: Vec<Filter> = fields
+        .into_iter()
+        .map(|field| {
+            let value: PrismaValue = value.remove(&field.name).unwrap().try_into()?;
+            Ok(field.equals(value))
+        })
+        .collect::<QueryGraphBuilderResult<Vec<_>>>()?;
+
+    Ok(Filter::And(filters))
+}
+
+/// Attempts to match a given name to the (schema) name of a compound indexes on the model and returns the first match.
+fn find_index_fields(name: &str, model: &ModelRef) -> QueryGraphBuilderResult<Vec<ScalarFieldRef>> {
+    model
+        .unique_indexes()
+        .into_iter()
+        .find(|index| &compound_field_name(index) == name)
+        .map(|index| index.fields())
+        .ok_or(QueryGraphBuilderError::AssertionError(format!(
+            "Unable to resolve {} to an index on model {}",
+            name, model.name
+        )))
 }

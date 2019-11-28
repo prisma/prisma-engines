@@ -14,7 +14,6 @@ use filter_arguments::*;
 use filter_type_builder::*;
 use input_type_builder::*;
 use object_type_builder::*;
-use utils::*;
 
 /// Common module imports shared accross submodules.
 use crate::schema::*;
@@ -25,3 +24,4 @@ use prisma_models::{
 use std::sync::{Arc, Weak};
 
 pub use query_schema_builder::*;
+pub use utils::*;

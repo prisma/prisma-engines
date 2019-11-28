@@ -111,12 +111,7 @@ pub trait InputTypeBuilderBase<'a>: CachedBuilder<InputObjectType> + InputBuilde
             .into_iter()
             .map(|index| {
                 let typ = self.compound_field_unique_object_type(index);
-                let name = index.name.clone().unwrap_or_else(|| {
-                    let index_fields = index.fields();
-                    let field_names: Vec<&str> = index_fields.iter().map(|sf| sf.name.as_ref()).collect();
-
-                    field_names.join("_")
-                });
+                let name = compound_field_name(index);
 
                 input_field(name, InputType::object(typ), None)
             })
