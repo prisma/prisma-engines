@@ -10,9 +10,9 @@ pub type ConnectorResult<T> = Result<T, ConnectorError>;
 pub trait IntrospectionConnector: Send + Sync + 'static {
     async fn list_databases(&self) -> ConnectorResult<Vec<String>>;
 
-    async fn get_metadata(&self, database: &str) -> ConnectorResult<DatabaseMetadata>;
+    async fn get_metadata(&self) -> ConnectorResult<DatabaseMetadata>;
 
-    async fn introspect(&self, database: &str) -> ConnectorResult<Datamodel>;
+    async fn introspect(&self) -> ConnectorResult<Datamodel>;
 }
 
 #[derive(Serialize, Deserialize, Debug)]

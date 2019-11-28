@@ -76,7 +76,6 @@ fn create_many_to_many_field(foreign_key: &ForeignKey, relation_name: String, is
 /// Calculate a data model from a database schema.
 pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> {
     debug!("Calculating data model");
-    dbg!(schema);
 
     let mut data_model = Datamodel::new();
     for table in schema

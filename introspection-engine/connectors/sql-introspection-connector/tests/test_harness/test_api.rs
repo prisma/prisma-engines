@@ -17,12 +17,12 @@ impl TestApi {
     }
 
     pub async fn introspect(&self) -> String {
-        let datamodel = dbg!(self.introspection_connector.introspect(SCHEMA_NAME).await).unwrap();
+        let datamodel = dbg!(self.introspection_connector.introspect().await).unwrap();
         datamodel::render_datamodel_to_string(&datamodel).expect("Datamodel rendering failed")
     }
 
     pub async fn get_metadata(&self) -> DatabaseMetadata {
-        let metadata = self.introspection_connector.get_metadata(SCHEMA_NAME).await.unwrap();
+        let metadata = self.introspection_connector.get_metadata().await.unwrap();
         metadata
     }
 
