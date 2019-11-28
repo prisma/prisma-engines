@@ -130,7 +130,6 @@ pub trait InputTypeBuilderBase<'a>: CachedBuilder<InputObjectType> + InputBuilde
 
     /// Generates and caches an object type for a unique index.
     fn compound_field_unique_object_type(&self, index: &Index) -> InputObjectTypeRef {
-        dbg!(index);
         let name = index.name.as_ref().map(|n| capitalize(n)).unwrap_or_else(|| {
             let index_fields = index.fields();
             let field_names: Vec<String> = index_fields.iter().map(|sf| capitalize(&sf.name)).collect();

@@ -4,7 +4,7 @@ use crate::{
     query_graph::{Flow, Node, QueryGraph, QueryGraphDependency},
     ArgumentListLookup, ParsedField, ReadOneRecordBuilder,
 };
-use connector::filter::RecordFinder;
+use connector::ScalarCompare;
 use prisma_models::ModelRef;
 use std::{convert::TryInto, sync::Arc};
 
@@ -49,14 +49,13 @@ pub fn upsert_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedF
     )?;
 
     graph.create_edge(&if_node, &update_node, QueryGraphDependency::Then)?;
-
     graph.create_edge(&if_node, &create_node, QueryGraphDependency::Else)?;
 
     let id_field = model.fields().id();
     graph.create_edge(
         &update_node,
         &read_node_update,
-        QueryGraphDependency::ParentIds(Box::new(|mut node, mut parent_ids| {
+        QueryGraphDependency::ParentIds(Box::new(move |mut node, mut parent_ids| {
             let parent_id = match parent_ids.pop() {
                 Some(pid) => Ok(pid),
                 None => Err(QueryGraphBuilderError::AssertionError(format!(
@@ -65,12 +64,7 @@ pub fn upsert_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedF
             }?;
 
             if let Node::Query(Query::Read(ReadQuery::RecordQuery(ref mut rq))) = node {
-                let finder = RecordFinder {
-                    field: id_field,
-                    value: parent_id,
-                };
-
-                rq.record_finder = Some(finder);
+                rq.add_filter(id_field.equals(parent_id));
             };
 
             Ok(node)
@@ -82,7 +76,7 @@ pub fn upsert_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedF
     graph.create_edge(
         &create_node,
         &read_node_create,
-        QueryGraphDependency::ParentIds(Box::new(|mut node, mut parent_ids| {
+        QueryGraphDependency::ParentIds(Box::new(move |mut node, mut parent_ids| {
             let parent_id = match parent_ids.pop() {
                 Some(pid) => Ok(pid),
                 None => Err(QueryGraphBuilderError::AssertionError(format!(
@@ -91,12 +85,7 @@ pub fn upsert_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedF
             }?;
 
             if let Node::Query(Query::Read(ReadQuery::RecordQuery(ref mut rq))) = node {
-                let finder = RecordFinder {
-                    field: id_field,
-                    value: parent_id,
-                };
-
-                rq.record_finder = Some(finder);
+                rq.add_filter(id_field.equals(parent_id));
             };
 
             Ok(node)

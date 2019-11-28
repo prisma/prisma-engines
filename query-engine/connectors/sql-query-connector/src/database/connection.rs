@@ -2,7 +2,7 @@ use super::transaction::SqlConnectorTransaction;
 use crate::{database::operations::*, query_builder::read::ManyRelatedRecordsQueryBuilder, QueryExt, SqlError};
 use connector_interface::{
     self as connector,
-    filter::{Filter, RecordFinder},
+    filter::Filter,
     Connection, QueryArguments, ReadOperations, ScalarListValues, Transaction, WriteArgs, WriteOperations, IO,
 };
 use prisma_models::prelude::*;
@@ -46,10 +46,11 @@ where
 {
     fn get_single_record<'b>(
         &'b self,
-        record_finder: &'b RecordFinder,
+        model: &'b ModelRef,
+        filter: &'b Filter,
         selected_fields: &'b SelectedFields,
     ) -> connector::IO<'b, Option<SingleRecord>> {
-        IO::new(async move { read::get_single_record(&self.inner, record_finder, selected_fields).await })
+        IO::new(async move { read::get_single_record(&self.inner, model, filter, selected_fields).await })
     }
 
     fn get_many_records<'b>(

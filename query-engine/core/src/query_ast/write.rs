@@ -39,7 +39,7 @@ impl RecordFinderInjector for WriteQuery {
     fn inject_record_finder(&mut self, rf: RecordFinder) {
         match self {
             Self::UpdateRecord(ref mut ur) => ur.where_ = Some(rf),
-            Self::DeleteRecord(ref mut dr) => dr.where_ = Some(rf),
+            Self::DeleteRecord(ref mut dr) => dr.where_ = Some(rf.into()),
             Self::UpdateManyRecords(ref mut ur) => ur.filter = rf.into(),
             _ => unimplemented!(),
         }
@@ -67,16 +67,7 @@ impl std::fmt::Display for WriteQuery {
                 q.non_list_args,
                 q.list_args,
             ),
-            Self::DeleteRecord(q) => write!(
-                f,
-                "DeleteRecord: {:?}",
-                q.where_.as_ref().map(|finder| format!(
-                    "{}, {} = {:?}",
-                    finder.field.model().name,
-                    finder.field.name,
-                    finder.value
-                ))
-            ),
+            Self::DeleteRecord(q) => write!(f, "DeleteRecord: {}, {:?}", q.model.name, q.where_),
             Self::UpdateManyRecords(q) => write!(
                 f,
                 "UpdateManyRecords(model: {}, non-list-args: {:?}, list_args: {:?})",
@@ -116,7 +107,7 @@ pub struct UpdateManyRecords {
 #[derive(Debug, Clone)]
 pub struct DeleteRecord {
     pub model: ModelRef,
-    pub where_: Option<RecordFinder>,
+    pub where_: Option<Filter>,
 }
 
 #[derive(Debug, Clone)]

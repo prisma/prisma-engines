@@ -15,11 +15,11 @@ struct ScalarListElement {
 
 pub async fn get_single_record(
     conn: &dyn QueryExt,
-    record_finder: &RecordFinder,
+    model: &ModelRef,
+    filter: &Filter,
     selected_fields: &SelectedFields,
 ) -> connector_interface::Result<Option<SingleRecord>> {
-    let model = record_finder.field.model();
-    let query = read::get_records(&model, selected_fields, record_finder);
+    let query = read::get_records(&model, selected_fields, filter);
     let field_names = selected_fields.names();
     let idents = selected_fields.type_identifiers();
 

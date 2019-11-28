@@ -1,5 +1,6 @@
 //! Parsed query document tree. Naming is WIP.
 //! Structures represent parsed and validated parts of the query document, used by the query builders.
+use super::{QueryParserError, QueryParserResult};
 use crate::FieldRef;
 use prisma_models::PrismaValue;
 use std::collections::BTreeMap;
@@ -42,5 +43,27 @@ pub trait ArgumentListLookup {
 impl ArgumentListLookup for Vec<ParsedArgument> {
     fn lookup(&mut self, name: &str) -> Option<ParsedArgument> {
         self.iter().position(|arg| arg.name == name).map(|pos| self.remove(pos))
+    }
+}
+
+/// Note: Assertions should live on the schema level and run through the validation as any other check.
+///       This requires a slightly larger refactoring.
+pub trait InputAssertions: Sized {
+    /// Asserts the exact size of the underlying input.
+    fn assert_size(self, size: usize) -> QueryParserResult<Self>;
+}
+
+impl InputAssertions for ParsedInputMap {
+    fn assert_size(self, size: usize) -> QueryParserResult<Self> {
+        if self.len() != size {
+            Err(QueryParserError::AssertionError(format!(
+                "Expected object to have exactly {} key-value pairs, got: {} ({})",
+                size,
+                self.len(),
+                self.iter().map(|v| v.0.as_str()).collect::<Vec<&str>>().join(", ")
+            )))
+        } else {
+            Ok(self)
+        }
     }
 }
