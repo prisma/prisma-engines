@@ -118,8 +118,8 @@ pub fn test_one_connector(attr: TokenStream, input: TokenStream) -> TokenStream 
 
     let test_function = parse_macro_input!(input as ItemFn);
 
-    let test_impl_name = &test_function.sig.ident;
-    let test_fn_name = Ident::new(
+    let test_fn_name = &test_function.sig.ident;
+    let connector_test_fn_name = Ident::new(
         &format!("{}_on_{}", &test_function.sig.ident, args.connector),
         Span::call_site(),
     );
@@ -127,10 +127,10 @@ pub fn test_one_connector(attr: TokenStream, input: TokenStream) -> TokenStream 
 
     let output = quote! {
         #[test]
-        fn #test_fn_name() {
+        fn #connector_test_fn_name() {
             let api = #api_factory();
 
-            #test_impl_name(&api)
+            #test_fn_name(&api);
         }
 
         #test_function

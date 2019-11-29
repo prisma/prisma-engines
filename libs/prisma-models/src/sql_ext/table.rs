@@ -1,5 +1,5 @@
-use quaint::ast::Table;
 use crate::Model;
+use quaint::ast::Table;
 
 pub trait AsTable {
     fn as_table(&self) -> Table<'static>;

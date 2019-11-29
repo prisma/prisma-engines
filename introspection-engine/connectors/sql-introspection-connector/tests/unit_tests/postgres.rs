@@ -2,8 +2,6 @@ use crate::*;
 use barrel::types;
 use test_harness::*;
 
-pub const SCHEMA_NAME: &str = "introspection-engine";
-
 #[test_one_connector(connector = "postgres")]
 fn introspecting_a_simple_table_with_gql_types_must_work(api: &TestApi) {
     let barrel = api.barrel();

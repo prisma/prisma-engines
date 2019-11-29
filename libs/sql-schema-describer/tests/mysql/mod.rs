@@ -1,5 +1,5 @@
 use log::debug;
-use sql_connection::{SyncSqlConnection, GenericSqlConnection};
+use sql_connection::{GenericSqlConnection, SyncSqlConnection};
 use sql_schema_describer::*;
 use std::sync::Arc;
 

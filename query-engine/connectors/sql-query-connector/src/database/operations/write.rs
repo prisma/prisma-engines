@@ -75,7 +75,6 @@ pub async fn update_records(
         conn.update(update).await.map_err(SqlError::from)?;
     }
 
-
     for (field_name, list_value) in args.list_args() {
         let field = model.fields().find_from_scalar(field_name.as_ref()).unwrap();
         let table = field.scalar_list_table();

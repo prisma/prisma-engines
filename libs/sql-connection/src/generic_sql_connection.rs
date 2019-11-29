@@ -1,8 +1,11 @@
-use datamodel::{Source, configuration::{MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME}};
 use crate::{SqlConnection, SyncSqlConnection};
-use quaint::{prelude::*, error::Error as QuaintError};
-use url::Url;
+use datamodel::{
+    configuration::{MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME},
+    Source,
+};
+use quaint::{error::Error as QuaintError, prelude::*};
 use tokio::runtime::Runtime;
+use url::Url;
 
 pub struct GenericSqlConnection {
     pool: Quaint,
@@ -14,19 +17,16 @@ impl GenericSqlConnection {
         let url = &datasource.url().value;
 
         let pool = match datasource.connector_type() {
-            c if c == MYSQL_SOURCE_NAME => {
-                Quaint::new(url)?
-            }
-            c if c == POSTGRES_SOURCE_NAME => {
-                Quaint::new(url)?
-            }
-            c if c == SQLITE_SOURCE_NAME => {
-                Quaint::new(&Self::url_with_db(url, db_name))?
-            }
-            c => panic!("Unsuppored connectory type for SQL connection: {}", c)
+            c if c == MYSQL_SOURCE_NAME => Quaint::new(url)?,
+            c if c == POSTGRES_SOURCE_NAME => Quaint::new(url)?,
+            c if c == SQLITE_SOURCE_NAME => Quaint::new(&Self::url_with_db(url, db_name))?,
+            c => panic!("Unsuppored connectory type for SQL connection: {}", c),
         };
 
-        Ok(Self { pool, runtime: super::default_runtime(), })
+        Ok(Self {
+            pool,
+            runtime: super::default_runtime(),
+        })
     }
 
     /// Create a pooled database connection. The `db_name` param is only used on SQLite if you want
@@ -37,7 +37,10 @@ impl GenericSqlConnection {
         // Non-URL database strings are interpreted as SQLite file paths.
         if url_parse_result.is_err() {
             let pool = Quaint::new(&Self::url_with_db(&format!("file://{}", url_str), db_name))?;
-            return Ok(Self { pool, runtime: super::default_runtime(), })
+            return Ok(Self {
+                pool,
+                runtime: super::default_runtime(),
+            });
         }
 
         let url = url_parse_result?;
@@ -49,7 +52,10 @@ impl GenericSqlConnection {
             None => panic!("Unsupported database URL scheme: {}", url.scheme()),
         };
 
-        Ok(Self { pool, runtime: super::default_runtime(), })
+        Ok(Self {
+            pool,
+            runtime: super::default_runtime(),
+        })
     }
 
     pub fn connection_info(&self) -> &ConnectionInfo {

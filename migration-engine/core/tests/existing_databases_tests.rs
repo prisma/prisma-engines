@@ -3,8 +3,8 @@ mod test_harness;
 use barrel::{types, Migration, SqlVariant};
 use migration_core::api::GenericApi;
 use pretty_assertions::{assert_eq, assert_ne};
-use sql_connection::SyncSqlConnection;
 use quaint::prelude::SqlFamily;
+use sql_connection::SyncSqlConnection;
 use sql_migration_connector::SqlMigrationConnector;
 use sql_schema_describer::*;
 use std::sync::Arc;
@@ -187,21 +187,28 @@ async fn delete_a_field_for_a_non_existent_column_must_work(api: &TestApi) {
     assert_eq!(result, final_result);
 }
 
+
+//postgres only
 #[test_each_connector]
-async fn deleting_a_scalar_list_field_for_a_non_existent_list_table_must_work(api: &TestApi) {
+async fn deleting_a_scalar_list_field_must_work(api: &TestApi) {
+
     let dm1 = r#"
             model Blog {
                 id Int @id
                 tags String[]
             }
         "#;
+
     let initial_result = api.infer_and_apply(&dm1).await.sql_schema;
-    assert!(initial_result.has_table("Blog_tags"));
+
 
     let result = api.barrel().execute(|migration| {
-        migration.drop_table("Blog_tags");
+        // sqlite does not support dropping columns. So we are emulating it..
+        migration.drop_table("Blog");
+        migration.create_table("Blog", |t| {
+            t.add_column("id", types::primary());
+        });
     });
-    assert!(!result.has_table("Blog_tags"));
 
     let dm2 = r#"
             model Blog {

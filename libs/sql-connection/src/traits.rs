@@ -1,8 +1,4 @@
-use quaint::{
-    ast::*,
-    connector::{ResultSet},
-    error::Error as QueryError,
-};
+use quaint::{ast::*, connector::ResultSet, error::Error as QueryError};
 
 /// A generic synchronous SQL connection interface.
 pub trait SyncSqlConnection {

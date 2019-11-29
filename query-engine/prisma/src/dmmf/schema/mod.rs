@@ -7,11 +7,11 @@ mod schema_renderer;
 mod type_renderer;
 
 use crate::dmmf::DMMFMapping;
-use query_core::schema::*;
 use enum_renderer::*;
 use field_renderer::*;
 use object_renderer::*;
 use prisma_models::EnumType;
+use query_core::schema::*;
 use schema_renderer::*;
 use std::{
     cell::RefCell,
