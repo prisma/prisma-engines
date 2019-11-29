@@ -4,7 +4,7 @@ mod write;
 pub use read::*;
 pub use write::*;
 
-use connector::filter::{Filter, RecordFinder};
+use connector::filter::Filter;
 
 #[derive(Debug, Clone)]
 pub enum Query {
@@ -46,19 +46,6 @@ pub trait FilteredQuery {
 
     fn default_filter_behaviour(inner_filters: Vec<Filter>) -> Filter {
         Filter::Or(inner_filters)
-    }
-}
-
-pub trait RecordFinderInjector {
-    fn inject_record_finder(&mut self, rf: RecordFinder);
-}
-
-impl RecordFinderInjector for Query {
-    fn inject_record_finder(&mut self, rf: RecordFinder) {
-        match self {
-            Self::Write(ref mut wq) => wq.inject_record_finder(rf),
-            Self::Read(_) => unimplemented!(),
-        }
     }
 }
 

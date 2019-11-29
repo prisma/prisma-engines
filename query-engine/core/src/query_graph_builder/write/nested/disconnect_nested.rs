@@ -1,9 +1,9 @@
 use super::*;
 use crate::{
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
-    ParsedInputValue, Query, RecordFinderInjector, WriteQuery,
+    FilteredQuery, ParsedInputValue, Query, WriteQuery,
 };
-use connector::Filter;
+use connector::{Filter, ScalarCompare};
 use itertools::Itertools;
 use prisma_models::{ModelRef, PrismaValue, RelationFieldRef};
 use std::convert::TryInto;
@@ -203,7 +203,7 @@ fn handle_one_to_x(
     graph.create_edge(
         node_to_attach,
         &update_node,
-        QueryGraphDependency::ParentIds(Box::new(|mut child_node, mut parent_ids| {
+        QueryGraphDependency::ParentIds(Box::new(move |mut child_node, mut parent_ids| {
             if parent_ids.len() == 0 {
                 return Err(QueryGraphBuilderError::RecordsNotConnected {
                     relation_name,
@@ -225,10 +225,8 @@ fn handle_one_to_x(
                         .into()
                 }
 
-                Node::Query(Query::Write(ref mut wq)) => wq.inject_record_finder(RecordFinder {
-                    field: id_field,
-                    value: parent_ids.pop().unwrap(),
-                }),
+                Node::Query(Query::Write(ref mut wq)) => wq.add_filter(id_field.equals(parent_ids.pop().unwrap())),
+
                 _ => unimplemented!(),
             };
 

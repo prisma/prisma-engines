@@ -102,10 +102,7 @@ pub fn connect_nested_delete(
                     }?;
 
                     if let Node::Query(Query::Write(ref mut wq)) = node {
-                        wq.inject_record_finder(RecordFinder {
-                            field: id_field,
-                            value: parent_id,
-                        });
+                        wq.add_filter(id_field.equals(parent_id));
                     }
 
                     Ok(node)

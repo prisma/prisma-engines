@@ -1,9 +1,11 @@
 use super::*;
 use crate::{
     query_ast::*,
+    query_document::*,
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
     ParsedInputValue, QueryResult,
 };
+use connector::{Filter, ScalarCompare};
 use itertools::Itertools;
 use prisma_models::{ModelRef, RelationFieldRef};
 use std::sync::Arc;
@@ -20,12 +22,13 @@ pub fn connect_nested_connect(
     child_model: &ModelRef,
 ) -> QueryGraphBuilderResult<()> {
     let relation = parent_relation_field.relation();
+    let values = utils::coerce_vec(value);
 
     // Build all finders upfront.
-    let finders: Vec<RecordFinder> = utils::coerce_vec(value)
+    let filters: Vec<Filter> = utils::coerce_vec(value)
         .into_iter()
-        .map(|value: ParsedInputValue| extract_record_finder(value, &child_model))
-        .collect::<QueryGraphBuilderResult<Vec<RecordFinder>>>()?
+        .map(|value: ParsedInputValue| extract_filter(value.try_into()?, &child_model)?.assert_size(1)?)
+        .collect::<QueryGraphBuilderResult<Vec<Filter>>>()?
         .into_iter()
         .unique()
         .collect();
@@ -385,17 +388,14 @@ fn handle_one_to_one(
         graph.create_edge(
             &read_new_child_node,
             &update_node,
-            QueryGraphDependency::ParentIds(Box::new(|mut child_node, mut parent_ids| {
+            QueryGraphDependency::ParentIds(Box::new(move |mut child_node, mut parent_ids| {
                 let parent_id = match parent_ids.pop() {
                     Some(pid) => Ok(pid),
                     None => Err(QueryGraphBuilderError::AssertionError(format!("[Query Graph] Expected a valid parent ID to be present for a nested connect on a one-to-one relation, updating inlined on child."))),
                 }?;
 
                 if let Node::Query(Query::Write(ref mut wq)) = child_node {
-                    wq.inject_record_finder(RecordFinder {
-                        field: child_model_id,
-                        value: parent_id,
-                    });
+                    wq.add_filter(child_model_id.equals(parent_id));
                 }
 
                 Ok(child_node)
@@ -446,17 +446,14 @@ fn handle_one_to_one(
         graph.create_edge(
             &parent_node,
             &update_node,
-            QueryGraphDependency::ParentIds(Box::new(|mut child_node, mut parent_ids| {
+            QueryGraphDependency::ParentIds(Box::new(move |mut child_node, mut parent_ids| {
                 let parent_id = match parent_ids.pop() {
                     Some(pid) => Ok(pid),
                     None => Err(QueryGraphBuilderError::AssertionError(format!("[Query Graph] Expected a valid parent ID to be present for a nested connect on a one-to-one relation, updating inlined on parent."))),
                 }?;
 
                 if let Node::Query(Query::Write(ref mut wq)) = child_node {
-                    wq.inject_record_finder(RecordFinder {
-                        field: parent_model_id,
-                        value: parent_id,
-                    });
+                    wq.add_filter(parent_model_id.equals(parent_id));
                 }
 
                 Ok(child_node)

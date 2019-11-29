@@ -60,7 +60,7 @@ pub fn connect_nested_update(
         graph.create_edge(
             &find_child_records_node,
             &update_node,
-            QueryGraphDependency::ParentIds(Box::new(|mut node, mut parent_ids| {
+            QueryGraphDependency::ParentIds(Box::new(move |mut node, mut parent_ids| {
                 let parent_id = match parent_ids.pop() {
                     Some(pid) => Ok(pid),
                     None => Err(QueryGraphBuilderError::AssertionError(format!(
@@ -69,10 +69,7 @@ pub fn connect_nested_update(
                 }?;
 
                 if let Node::Query(Query::Write(WriteQuery::UpdateRecord(ref mut ur))) = node {
-                    ur.where_ = Some(RecordFinder {
-                        field: id_field,
-                        value: parent_id,
-                    });
+                    ur.add_filter(id_field.equals(parent_id));
                 }
 
                 Ok(node)

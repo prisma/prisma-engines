@@ -4,6 +4,7 @@ use crate::{
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
     ParsedInputValue,
 };
+use connector::ScalarCompare;
 use prisma_models::{ModelRef, RelationFieldRef};
 use std::{convert::TryInto, sync::Arc};
 
@@ -362,17 +363,14 @@ fn handle_one_to_one(
         graph.create_edge(
             &parent_node,
             &update_node,
-            QueryGraphDependency::ParentIds(Box::new(|mut child_node, mut parent_ids| {
+            QueryGraphDependency::ParentIds(Box::new(move |mut child_node, mut parent_ids| {
                 let parent_id = match parent_ids.pop() {
                     Some(pid) => Ok(pid),
                     None => Err(QueryGraphBuilderError::AssertionError(format!("[Query Graph] Expected a valid parent ID to be present for a nested create on a one-to-one relation, updating inlined on parent."))),
                 }?;
 
                 if let Node::Query(Query::Write(ref mut wq)) = child_node {
-                    wq.inject_record_finder(RecordFinder {
-                        field: parent_model_id,
-                        value: parent_id,
-                    });
+                    wq.add_filter(parent_model_id.equals(parent_id));
                 }
 
                 Ok(child_node)

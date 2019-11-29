@@ -3,7 +3,7 @@ use crate::{
     query_graph::{Flow, Node, NodeRef, QueryGraph, QueryGraphDependency},
     ParsedInputValue, QueryGraphBuilderError, QueryGraphBuilderResult,
 };
-use connector::{filter::RecordFinder, Filter, QueryArguments};
+use connector::{Filter, QueryArguments, ScalarCompare};
 use itertools::Itertools;
 use prisma_models::{ModelRef, PrismaArgs, PrismaValue, RelationFieldRef, SelectedFields};
 use std::{convert::TryInto, sync::Arc};
@@ -218,12 +218,7 @@ pub fn insert_existing_1to1_related_model_checks(
             }?;
 
             if let Node::Query(Query::Write(ref mut wq)) = child_node {
-                let finder = RecordFinder {
-                    field: child_model_id_field,
-                    value: child_id,
-                };
-
-                wq.inject_record_finder(finder);
+                wq.add_filter(child_model_id_field.equals(child_id));
                 wq.inject_non_list_arg(relation_field_name, PrismaValue::Null);
             }
 

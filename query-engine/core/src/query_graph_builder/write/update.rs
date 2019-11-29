@@ -4,10 +4,7 @@ use crate::{
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
     ArgumentListLookup, ParsedField, ParsedInputMap, ReadOneRecordBuilder,
 };
-use connector::{
-    filter::{Filter, RecordFinder},
-    ScalarCompare,
-};
+use connector::{filter::Filter, ScalarCompare};
 use prisma_models::ModelRef;
 use std::{convert::TryInto, sync::Arc};
 use write_arguments::*;
@@ -85,12 +82,15 @@ pub fn update_many_records(
 }
 
 /// Creates an update record query node and adds it to the query graph.
-pub fn update_record_node(
+pub fn update_record_node<T>(
     graph: &mut QueryGraph,
-    record_finder: Option<RecordFinder>,
+    filter: T,
     model: ModelRef,
     data_map: ParsedInputMap,
-) -> QueryGraphBuilderResult<NodeRef> {
+) -> QueryGraphBuilderResult<NodeRef>
+where
+    T: Into<Filter>,
+{
     let update_args = WriteArguments::from(&model, data_map)?;
     let list_causes_update = !update_args.list.is_empty();
     let mut non_list_args = update_args.non_list;
@@ -99,7 +99,7 @@ pub fn update_record_node(
 
     let ur = UpdateRecord {
         model,
-        where_: record_finder,
+        where_: filter.into(),
         non_list_args,
         list_args: update_args.list,
     };

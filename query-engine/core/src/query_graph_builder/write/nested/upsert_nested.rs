@@ -5,6 +5,7 @@ use crate::{
     query_graph::{Flow, Node, NodeRef, QueryGraph, QueryGraphDependency},
     ParsedInputValue,
 };
+use connector::ScalarCompare;
 use prisma_models::RelationFieldRef;
 use std::{convert::TryInto, sync::Arc};
 
@@ -128,7 +129,7 @@ pub fn connect_nested_upsert(
         graph.create_edge(
             &read_children_node,
             &update_node,
-            QueryGraphDependency::ParentIds(Box::new(|mut node, mut parent_ids| {
+            QueryGraphDependency::ParentIds(Box::new(move |mut node, mut parent_ids| {
                 if let Node::Query(Query::Write(WriteQuery::UpdateRecord(ref mut x))) = node {
                     let parent_id = match parent_ids.pop() {
                         Some(pid) => Ok(pid),
@@ -137,8 +138,7 @@ pub fn connect_nested_upsert(
                         ))),
                     }?;
 
-                    let finder = RecordFinder::new(id_field, parent_id);
-                    x.where_ = Some(finder);
+                    x.add_filter(id_field.equals(parent_id));
                 }
                 Ok(node)
             })),
@@ -164,7 +164,7 @@ pub fn connect_nested_upsert(
                 graph.create_edge(
                     &parent_node,
                     &update_node,
-                    QueryGraphDependency::ParentIds(Box::new(|mut child_node, mut parent_ids| {
+                    QueryGraphDependency::ParentIds(Box::new(move |mut child_node, mut parent_ids| {
                         let parent_id = match parent_ids.pop() {
                             Some(pid) => Ok(pid),
                             None => Err(QueryGraphBuilderError::AssertionError(format!(
@@ -173,7 +173,7 @@ pub fn connect_nested_upsert(
                         }?;
 
                         if let Node::Query(Query::Write(ref mut wq)) = child_node {
-                            wq.inject_record_finder((id_field, parent_id).into());
+                            wq.add_filter(id_field.equals(parent_id));
                         }
 
                         Ok(child_node)
