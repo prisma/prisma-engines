@@ -23,9 +23,8 @@ impl WriteArguments {
                         let vals: ParsedInputMap = v.try_into()?;
                         let set_value: PrismaValue =
                             vals.into_iter().find(|(k, _)| k == "set").unwrap().1.try_into()?;
-                        let list_value: PrismaListValue = set_value.try_into()?;
 
-                        args.list.push((sf.name.clone(), list_value))
+                        args.non_list.insert(sf.name.clone(), set_value)
                     }
 
                     Field::Scalar(sf) => {

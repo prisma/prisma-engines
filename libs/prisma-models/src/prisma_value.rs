@@ -5,7 +5,7 @@ use serde_json::Value;
 use std::{convert::TryFrom, fmt, string::FromUtf8Error};
 use uuid::Uuid;
 
-pub type PrismaListValue = Option<Vec<PrismaValue>>;
+pub type PrismaListValue = Vec<PrismaValue>;
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Hash, Clone)]
 pub enum GraphqlId {
@@ -163,7 +163,7 @@ impl TryFrom<PrismaValue> for PrismaListValue {
     fn try_from(s: PrismaValue) -> DomainResult<PrismaListValue> {
         match s {
             PrismaValue::List(l) => Ok(l),
-            PrismaValue::Null => Ok(None),
+            PrismaValue::Null => Ok(Vec::new()),
             _ => Err(DomainError::ConversionFailure("PrismaValue", "PrismaListValue")),
         }
     }

@@ -20,7 +20,7 @@ impl TryInto<PrismaValue> for ParsedInputValue {
                 .into_iter()
                 .map(|val| val.try_into())
                 .collect::<QueryParserResult<Vec<PrismaValue>>>()
-                .map(|vec| PrismaValue::List(Some(vec))),
+                .map(|vec| PrismaValue::List(vec)),
 
             v => Err(QueryParserError::AssertionError(format!(
                 "Attempted conversion of ParsedInputValue ({:?}) into PrismaValue failed.",

@@ -40,8 +40,7 @@ impl<'a> From<PrismaValue> for DatabaseValue<'a> {
             PrismaValue::Null => DatabaseValue::Parameterized(ParameterizedValue::Null),
             PrismaValue::Uuid(u) => u.to_string().into(),
             PrismaValue::GraphqlId(id) => id.into(),
-            PrismaValue::List(Some(l)) => l.into(),
-            PrismaValue::List(_) => panic!("List values are not supported here"),
+            PrismaValue::List(l) => l.into(),
         }
     }
 }
@@ -54,10 +53,7 @@ impl<'a> From<ParameterizedValue<'a>> for PrismaValue {
             ParameterizedValue::Real(f) => PrismaValue::Float(f),
             ParameterizedValue::Text(s) => PrismaValue::String(s.into_owned()),
             ParameterizedValue::Boolean(b) => PrismaValue::Boolean(b),
-            ParameterizedValue::Array(v) => {
-                let lst = v.into_iter().map(PrismaValue::from).collect();
-                PrismaValue::List(Some(lst))
-            }
+            ParameterizedValue::Array(v) => PrismaValue::List(v.into_iter().map(PrismaValue::from).collect()),
             ParameterizedValue::Json(val) => PrismaValue::Json(val),
             ParameterizedValue::Uuid(uuid) => PrismaValue::Uuid(uuid),
             ParameterizedValue::DateTime(dt) => PrismaValue::DateTime(dt),

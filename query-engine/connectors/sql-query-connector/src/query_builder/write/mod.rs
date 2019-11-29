@@ -87,37 +87,6 @@ pub fn delete_relation_table_records(
         .into()
 }
 
-pub fn create_scalar_list_value(
-    scalar_list_table: Table<'static>,
-    list_value: &PrismaListValue,
-    id: &GraphqlId,
-) -> Option<Insert<'static>> {
-    let list_value = match list_value {
-        Some(l) if l.is_empty() => return None,
-        None => return None,
-        Some(l) => l,
-    };
-
-    let positions = (1..=list_value.len()).map(|v| (v * 1000) as i64);
-    let values = list_value.iter().zip(positions);
-
-    let columns = vec![
-        ScalarListTable::POSITION_FIELD_NAME,
-        ScalarListTable::VALUE_FIELD_NAME,
-        ScalarListTable::NODE_ID_FIELD_NAME,
-    ];
-
-    let insert = Insert::multi_into(scalar_list_table, columns);
-
-    let result = values
-        .fold(insert, |acc, (value, position)| {
-            acc.values((position, value.clone(), id.clone()))
-        })
-        .into();
-
-    Some(result)
-}
-
 pub fn update_many(model: &ModelRef, ids: &[&GraphqlId], args: &PrismaArgs) -> crate::Result<Vec<Update<'static>>> {
     if args.args.is_empty() || ids.is_empty() {
         return Ok(Vec::new());
@@ -166,37 +135,6 @@ pub fn delete_many(model: &ModelRef, ids: &[&GraphqlId]) -> Vec<Delete<'static>>
     }
 
     deletes
-}
-
-pub fn update_scalar_list_values(
-    scalar_list_table: &ScalarListTable,
-    list_value: &PrismaListValue,
-    ids: Vec<GraphqlId>,
-) -> (Vec<Delete<'static>>, Vec<Insert<'static>>) {
-    if ids.is_empty() {
-        return (Vec::new(), Vec::new());
-    }
-
-    let deletes = {
-        let ids: Vec<&GraphqlId> = ids.iter().map(|id| &*id).collect();
-        delete_scalar_list_values(scalar_list_table, ids.as_slice())
-    };
-
-    let inserts = match list_value {
-        Some(l) if l.is_empty() => Vec::new(),
-        _ => ids
-            .iter()
-            .flat_map(|id| create_scalar_list_value(scalar_list_table.table(), list_value, id))
-            .collect(),
-    };
-
-    (deletes, inserts)
-}
-
-pub fn delete_scalar_list_values(scalar_list_table: &ScalarListTable, ids: &[&GraphqlId]) -> Vec<Delete<'static>> {
-    delete_in_chunks(scalar_list_table.table(), ids, |chunk| {
-        ScalarListTable::NODE_ID_FIELD_NAME.in_selection(chunk.to_vec())
-    })
 }
 
 fn delete_in_chunks<F>(table: Table<'static>, ids: &[&GraphqlId], conditions: F) -> Vec<Delete<'static>>
