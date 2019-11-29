@@ -10,7 +10,7 @@ async fn unreachable_database_must_return_a_proper_error_on_mysql() {
 
     url.set_port(Some(8787)).unwrap();
 
-    let error = RpcImpl::introspect_internal(url.clone().into_string())
+    let error = RpcImpl::introspect_internal(url.as_str())
         .await
         .unwrap_err();
 
