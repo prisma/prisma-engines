@@ -81,7 +81,7 @@ class OrderBySpec extends FlatSpec with Matchers with ApiSpecBase {
     result.toString should be("""{"data":{"needsTiebreakers":[{"order":1},{"order":2},{"order":3},{"order":4},{"order":5},{"order":6},{"order":7}]}}""")
   }
 
-  "The order when giving an order by ASC that is unique" should "be by Id ascending and therefore oldest first" in {
+  "The order when giving an order by ASC that is unique" should "be correct and the query should not include an ordering with the id tiebreaker" in {
     val result = server.query(
       """
         |{

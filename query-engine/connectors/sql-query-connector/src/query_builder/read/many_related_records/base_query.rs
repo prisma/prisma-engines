@@ -26,13 +26,12 @@ impl<'a> ManyRelatedRecordsBaseQuery<'a> {
         let window_limits = query_arguments.window_limits();
         let skip_and_limit = query_arguments.skip_and_limit();
 
+        let order_directions = query_arguments.ordering_directions();
         let condition = query_arguments
             .filter
-            .clone()
             .map(|f| f.aliased_cond(None))
             .unwrap_or(ConditionTree::NoCondition);
 
-        let order_directions = query_arguments.ordering_directions();
         let opposite_column = from_field.opposite_column().table(Relation::TABLE_ALIAS);
         let select = Select::from_table(from_field.related_model().as_table());
 
