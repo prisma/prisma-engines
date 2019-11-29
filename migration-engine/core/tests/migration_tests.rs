@@ -530,11 +530,11 @@ async fn adding_an_inline_relation_must_result_in_a_foreign_key_in_the_model_tab
 
         let b_column = table.column_bang("b");
         assert_eq!(b_column.tpe.family, ColumnTypeFamily::Int);
-        assert_eq!(b_column.arity, ColumnArity::Required);
+        assert_eq!(b_column.tpe.arity, ColumnArity::Required);
 
         let c_column = table.column_bang("c");
         assert_eq!(c_column.tpe.family, ColumnTypeFamily::Int);
-        assert_eq!(c_column.arity, ColumnArity::Nullable);
+        assert_eq!(c_column.tpe.arity, ColumnArity::Nullable);
 
         assert_eq!(
             table.foreign_keys,

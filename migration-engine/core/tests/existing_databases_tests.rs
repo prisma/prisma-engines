@@ -1,6 +1,5 @@
 #![allow(unused)]
 mod test_harness;
-
 use barrel::{types, Migration, SqlVariant};
 use migration_core::api::GenericApi;
 use pretty_assertions::{assert_eq, assert_ne};
@@ -9,6 +8,7 @@ use quaint::prelude::SqlFamily;
 use sql_migration_connector::SqlMigrationConnector;
 use sql_schema_describer::*;
 use std::sync::Arc;
+
 use test_harness::*;
 
 #[test_each_connector]
@@ -131,7 +131,7 @@ async fn creating_a_field_for_an_existing_column_and_simultaneously_making_it_op
     assert_eq!(column.is_required(), false);
 }
 
-#[test_each_connector(ignore = "mysql")]
+#[test_one_connector(connector = "postgres")]
 async fn creating_a_scalar_list_field_for_an_existing_table_must_work(api: &TestApi) {
     let dm1 = r#"
             model Blog {
@@ -142,30 +142,11 @@ async fn creating_a_scalar_list_field_for_an_existing_table_must_work(api: &Test
     assert!(!initial_result.has_table("Blog_tags"));
 
     let mut result = api.barrel().execute(|migration| {
-        migration.create_table("Blog_tags", |t| {
-            // TODO: barrel does not render this one correctly
-            t.add_column("nodeId", types::foreign("Blog", "id"));
-            t.add_column("position", types::integer());
-            t.add_column("value", types::text());
+        migration.change_table("Blog", |t| {
+            let inner = types::text();
+            t.add_column("tags", types::array(&inner));
         });
     });
-
-    // hacks for things i can't set in barrel due to limitations
-    for table in &mut result.tables {
-        if table.name == "Blog_tags" {
-            for fk in &mut table.foreign_keys {
-                if fk.columns == &["nodeId"] {
-                    fk.on_delete_action = ForeignKeyAction::Cascade
-                }
-            }
-            //                table.primary_key = Some(PrimaryKey {
-            //                    columns: vec!["nodeId".to_string(), "position".to_string()],
-            //                    sequence: None,
-            //                });
-        }
-    }
-
-    assert!(result.has_table("Blog_tags"));
 
     let dm2 = r#"
             model Blog {
@@ -174,13 +155,6 @@ async fn creating_a_scalar_list_field_for_an_existing_table_must_work(api: &Test
             }
         "#;
     let mut final_result = api.infer_and_apply(&dm2).await.sql_schema;
-    for table in &mut final_result.tables {
-        if table.name == "Blog_tags" {
-            // can't set that properly up again
-            table.indices = vec![];
-            table.primary_key = None;
-        }
-    }
     assert_eq!(result, final_result);
 }
 

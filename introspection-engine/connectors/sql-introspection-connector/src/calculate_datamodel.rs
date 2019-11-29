@@ -80,7 +80,7 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
         for column in table.columns.iter() {
             debug!("Handling column {:?}", column);
             let field_type = calculate_field_type(&schema, &column, &table);
-            let arity = match column.arity {
+            let arity = match column.tpe.arity {
                 ColumnArity::Required => FieldArity::Required,
                 ColumnArity::Nullable => FieldArity::Optional,
                 ColumnArity::List => FieldArity::List,

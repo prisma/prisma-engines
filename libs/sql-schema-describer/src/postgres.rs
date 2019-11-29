@@ -159,14 +159,14 @@ impl SqlSchemaDescriber {
                     "yes" => false,
                     x => panic!(format!("unrecognized is_nullable variant '{}'", x)),
                 };
-                let tpe = get_column_type(udt.as_ref());
-                let arity = if tpe.raw.starts_with("_") {
+                let arity = if udt.starts_with("_") {
                     ColumnArity::List
                 } else if is_required {
                     ColumnArity::Required
                 } else {
                     ColumnArity::Nullable
                 };
+                let tpe = get_column_type(udt.as_ref(), arity);
 
                 let default = col.get("column_default").and_then(|param_value| {
                     param_value
@@ -183,7 +183,6 @@ impl SqlSchemaDescriber {
                 Column {
                     name: col_name,
                     tpe,
-                    arity,
                     default,
                     auto_increment: is_auto_increment,
                 }
@@ -482,7 +481,7 @@ impl SqlSchemaDescriber {
     }
 }
 
-fn get_column_type(udt: &str) -> ColumnType {
+fn get_column_type(udt: &str, arity: ColumnArity) -> ColumnType {
     let family = match udt {
         "int2" => ColumnTypeFamily::Int,
         "int4" => ColumnTypeFamily::Int,
@@ -530,5 +529,6 @@ fn get_column_type(udt: &str) -> ColumnType {
     ColumnType {
         raw: udt.to_string(),
         family: family,
+        arity,
     }
 }

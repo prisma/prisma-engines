@@ -55,8 +55,9 @@ fn is_required_must_work() {
                     tpe: ColumnType {
                         raw: int_type(db_type),
                         family: ColumnTypeFamily::Int,
+                        arity: ColumnArity::Required,
                     },
-                    arity: ColumnArity::Required,
+
                     default: None,
                     auto_increment: false,
                 },
@@ -65,8 +66,9 @@ fn is_required_must_work() {
                     tpe: ColumnType {
                         raw: int_type(db_type),
                         family: ColumnTypeFamily::Int,
+                        arity: ColumnArity::Nullable,
                     },
-                    arity: ColumnArity::Nullable,
+
                     default: None,
                     auto_increment: false,
                 },
@@ -104,8 +106,9 @@ fn foreign_keys_must_work() {
                 tpe: ColumnType {
                     raw: int_type(db_type),
                     family: ColumnTypeFamily::Int,
+                    arity: ColumnArity::Required,
                 },
-                arity: ColumnArity::Required,
+
                 default: None,
                 auto_increment: false,
             }];
@@ -177,8 +180,9 @@ fn multi_column_foreign_keys_must_work() {
                     tpe: ColumnType {
                         raw: int_type(db_type),
                         family: ColumnTypeFamily::Int,
+                        arity: ColumnArity::Required,
                     },
-                    arity: ColumnArity::Required,
+
                     default: None,
                     auto_increment: false,
                 },
@@ -187,8 +191,9 @@ fn multi_column_foreign_keys_must_work() {
                     tpe: ColumnType {
                         raw: varchar_type(db_type, 255),
                         family: ColumnTypeFamily::String,
+                        arity: ColumnArity::Required,
                     },
-                    arity: ColumnArity::Required,
+
                     default: None,
                     auto_increment: false,
                 },
@@ -241,8 +246,9 @@ fn names_with_hyphens_must_work() {
                 tpe: ColumnType {
                     raw: int_type(db_type),
                     family: ColumnTypeFamily::Int,
+                    arity: ColumnArity::Required,
                 },
-                arity: ColumnArity::Required,
+
                 default: None,
                 auto_increment: false,
             }];
@@ -291,8 +297,9 @@ fn composite_primary_keys_must_work() {
                     tpe: ColumnType {
                         raw: exp_int.to_string(),
                         family: ColumnTypeFamily::Int,
+                        arity: ColumnArity::Required,
                     },
-                    arity: ColumnArity::Required,
+
                     default: None,
                     auto_increment: false,
                 },
@@ -301,8 +308,9 @@ fn composite_primary_keys_must_work() {
                     tpe: ColumnType {
                         raw: exp_varchar.to_string(),
                         family: ColumnTypeFamily::String,
+                        arity: ColumnArity::Required,
                     },
-                    arity: ColumnArity::Required,
+
                     default: None,
                     auto_increment: false,
                 },
@@ -351,8 +359,9 @@ fn indices_must_work() {
                     tpe: ColumnType {
                         raw: int_type(db_type),
                         family: ColumnTypeFamily::Int,
+                        arity: ColumnArity::Required,
                     },
-                    arity: ColumnArity::Required,
+
                     default: None,
                     auto_increment: false,
                 },
@@ -361,8 +370,9 @@ fn indices_must_work() {
                     tpe: ColumnType {
                         raw: int_type(db_type),
                         family: ColumnTypeFamily::Int,
+                        arity: ColumnArity::Required,
                     },
-                    arity: ColumnArity::Required,
+
                     default,
                     auto_increment: true,
                 },
@@ -422,8 +432,9 @@ fn column_uniqueness_must_be_detected() {
                     tpe: ColumnType {
                         raw: int_type(db_type),
                         family: ColumnTypeFamily::Int,
+                        arity: ColumnArity::Required,
                     },
-                    arity: ColumnArity::Required,
+
                     default: None,
                     auto_increment: false,
                 },
@@ -432,8 +443,9 @@ fn column_uniqueness_must_be_detected() {
                     tpe: ColumnType {
                         raw: int_type(db_type),
                         family: ColumnTypeFamily::Int,
+                        arity: ColumnArity::Required,
                     },
-                    arity: ColumnArity::Required,
+
                     default: None,
                     auto_increment: false,
                 },
@@ -507,8 +519,9 @@ fn defaults_must_work() {
                 tpe: ColumnType {
                     raw: int_type(db_type),
                     family: ColumnTypeFamily::Int,
+                    arity: ColumnArity::Nullable,
                 },
-                arity: ColumnArity::Nullable,
+
                 default: Some(default),
                 auto_increment: false,
             }];
