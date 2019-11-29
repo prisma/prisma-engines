@@ -86,6 +86,7 @@ impl Validator {
                     name_eq && type_eq && args_eq
                 }
                 (None, dml::FieldType::Base(dml::ScalarType::Int), dml::FieldArity::Required) => true,
+                (None, dml::FieldType::Base(dml::ScalarType::String), dml::FieldArity::Required) => true,
                 _ => false,
             };
 
