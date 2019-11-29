@@ -5,17 +5,18 @@ use jsonrpc_core::*;
 use jsonrpc_derive::rpc;
 use tokio::runtime::Runtime;
 use std::future::Future as StdFuture;
+use serde_derive::*;
 
 #[rpc]
 pub trait Rpc {
     #[rpc(name = "listDatabases")]
-    fn list_databases(&self, connection_string: String) -> Result<Vec<String>>;
+    fn list_databases(&self, url: UrlInput) -> Result<Vec<String>>;
 
     #[rpc(name = "getDatabaseMetadata")]
-    fn get_database_metadata(&self, connection_string: String) -> Result<DatabaseMetadata>;
+    fn get_database_metadata(&self, url: UrlInput) -> Result<DatabaseMetadata>;
 
     #[rpc(name = "introspect")]
-    fn introspect(&self, connection_string: String) -> Result<String>;
+    fn introspect(&self, url: UrlInput) -> Result<String>;
 }
 
 pub(crate) struct RpcImpl {
@@ -23,16 +24,16 @@ pub(crate) struct RpcImpl {
 }
 
 impl Rpc for RpcImpl {
-    fn list_databases(&self, connection_string: String) -> Result<Vec<String>> {
-        self.block_on(Self::list_databases_internal(connection_string))
+    fn list_databases(&self, url: UrlInput) -> Result<Vec<String>> {
+        self.block_on(Self::list_databases_internal(&url.url))
     }
 
-    fn get_database_metadata(&self, connection_string: String) -> Result<DatabaseMetadata> {
-        self.block_on(Self::get_database_metadata_internal(connection_string))
+    fn get_database_metadata(&self, url: UrlInput) -> Result<DatabaseMetadata> {
+        self.block_on(Self::get_database_metadata_internal(&url.url))
     }
 
-    fn introspect(&self, connection_string: String) -> Result<String> {
-        self.block_on(Self::introspect_internal(connection_string))
+    fn introspect(&self, url: UrlInput) -> Result<String> {
+        self.block_on(Self::introspect_internal(&url.url))
     }
 }
 
@@ -43,19 +44,19 @@ impl RpcImpl {
         }
     }
 
-    pub(crate) async fn introspect_internal(connection_string: String) -> Result<String> {
-        let connector = load_connector(connection_string.as_str()).await?;
+    pub(crate) async fn introspect_internal(connection_string: &str) -> Result<String> {
+        let connector = load_connector(connection_string).await?;
         let data_model = connector.introspect().await.map_err(CoreError::from)?;
         Ok(datamodel::render_datamodel_to_string(&data_model).map_err(CoreError::from)?)
     }
 
-    pub(crate) async fn list_databases_internal(connection_string: String) -> Result<Vec<String>> {
-        let connector = load_connector(connection_string.as_str()).await?;
+    pub(crate) async fn list_databases_internal(connection_string:  &str) -> Result<Vec<String>> {
+        let connector = load_connector(connection_string).await?;
         Ok(connector.list_databases().await.map_err(CoreError::from)?)
     }
 
-    pub(crate) async fn get_database_metadata_internal(connection_string: String) -> Result<DatabaseMetadata> {
-        let connector = load_connector(connection_string.as_str()).await?;
+    pub(crate) async fn get_database_metadata_internal(connection_string:  &str) -> Result<DatabaseMetadata> {
+        let connector = load_connector(connection_string).await?;
         Ok(connector.get_metadata().await.map_err(CoreError::from)?)
     }
 
@@ -66,4 +67,9 @@ impl RpcImpl {
             Err(err) => Err(err),
         }
     }
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct UrlInput {
+    pub(crate) url: String,
 }
