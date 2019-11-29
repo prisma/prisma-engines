@@ -14,7 +14,7 @@ pub struct SqlSchemaDescriber {
 impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
     fn list_databases(&self) -> SqlSchemaDescriberResult<Vec<String>> {
         let databases = self.get_databases();
-        Result::Ok(databases)
+        Ok(databases)
     }
 
     fn get_metadata(&self, schema: &str) -> SqlSchemaDescriberResult<SQLMetadata> {
@@ -525,7 +525,7 @@ fn get_column_type(udt: &str) -> ColumnType {
         "_int4" => ColumnTypeFamily::Int,
         "_text" => ColumnTypeFamily::String,
         "_varchar" => ColumnTypeFamily::String,
-        x => panic!(format!("type '{}' is not supported here yet.", x)),
+        x => ColumnTypeFamily::Unknown, // panic!(format!("type '{}' is not supported here yet.", x)),
     };
     ColumnType {
         raw: udt.to_string(),

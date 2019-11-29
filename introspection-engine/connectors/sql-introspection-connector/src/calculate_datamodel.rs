@@ -2,7 +2,7 @@ use crate::SqlIntrospectionResult;
 use datamodel::{
     common::{names::NameNormalizer, ScalarType, ScalarValue},
     dml, Datamodel, Field, FieldArity, FieldType, IdInfo, IdStrategy, IndexDefinition, Model, OnDeleteStrategy,
-    RelationInfo, ScalarListStrategy, WithDatabaseName,
+    RelationInfo, WithDatabaseName,
 };
 use log::debug;
 use prisma_inflector;
@@ -33,14 +33,6 @@ fn is_prisma_join_table(table: &Table) -> bool {
         && table.indices[0].tpe == IndexType::Unique
 }
 
-fn is_prisma_scalar_list_table(table: &Table) -> bool {
-    table.name.contains("_")
-        && table.columns.len() == 3
-        && table.columns.iter().find(|column| column.name == "nodeId").is_some()
-        && table.columns.iter().find(|column| column.name == "position").is_some()
-        && table.columns.iter().find(|column| column.name == "value").is_some()
-}
-
 fn create_many_to_many_field(foreign_key: &ForeignKey, relation_name: String, is_self_relation: bool) -> Field {
     let inflector = prisma_inflector::default();
 
@@ -66,7 +58,6 @@ fn create_many_to_many_field(foreign_key: &ForeignKey, relation_name: String, is
         default_value: None,
         is_unique: false,
         id_info: None,
-        scalar_list_strategy: None,
         documentation: None,
         is_generated: false,
         is_updated_at: false,
@@ -83,7 +74,6 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
         .iter()
         .filter(|table| !is_migration_table(&table))
         .filter(|table| !is_prisma_join_table(&table))
-        .filter(|table| !is_prisma_scalar_list_table(&table))
     {
         let mut model = Model::new(&table.name);
         //Todo: This needs to filter out composite Foreign Key columns, they are merged into one new field
@@ -96,10 +86,6 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
                 ColumnArity::List => FieldArity::List,
             };
             let id_info = calc_id_info(&column, &table);
-            let scalar_list_strategy = match arity {
-                FieldArity::List => Some(ScalarListStrategy::Embedded),
-                _ => None,
-            };
             let default_value = column
                 .default
                 .as_ref()
@@ -124,7 +110,6 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
                 default_value,
                 is_unique,
                 id_info,
-                scalar_list_strategy,
                 documentation: None,
                 is_generated: false,
                 is_updated_at: false,
@@ -238,7 +223,6 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
                             default_value: None,
                             is_unique: false,
                             id_info: None,
-                            scalar_list_strategy: None,
                             documentation: None,
                             is_generated: false,
                             is_updated_at: false,
@@ -272,34 +256,6 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
             }
             (_, _) => (),
         }
-    }
-
-    // add scalar lists fields
-    for table in schema.tables.iter().filter(|table| is_prisma_scalar_list_table(&table)) {
-        let model = table.name.split('_').nth(0).unwrap();
-        let name = table.name.split('_').nth(1).unwrap();
-
-        let field_type = calculate_field_type(
-            schema,
-            &table.columns.iter().find(|c| c.name == "value").unwrap(),
-            &table,
-        );
-
-        let field = Field {
-            name: name.to_string(),
-            arity: FieldArity::List,
-            field_type,
-            database_name: None,
-            default_value: None,
-            is_unique: false,
-            id_info: None,
-            scalar_list_strategy: Some(ScalarListStrategy::Relation),
-            documentation: None,
-            is_generated: false,
-            is_updated_at: false,
-        };
-
-        fields_to_be_added.push((model.to_owned(), field));
     }
 
     let mut duplicated_relation_fields = Vec::new();

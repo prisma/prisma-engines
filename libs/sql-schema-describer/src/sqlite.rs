@@ -14,7 +14,7 @@ pub struct SqlSchemaDescriber {
 impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
     fn list_databases(&self) -> SqlSchemaDescriberResult<Vec<String>> {
         let databases = self.get_databases();
-        Result::Ok(databases)
+        Ok(databases)
     }
 
     fn get_metadata(&self, schema: &str) -> SqlSchemaDescriberResult<SQLMetadata> {
