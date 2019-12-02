@@ -8,8 +8,8 @@ mod mysql;
 use crate::common::*;
 use crate::mysql::*;
 
-#[test]
-fn all_mysql_column_types_must_work() {
+#[tokio::test]
+async fn all_mysql_column_types_must_work() {
     setup();
 
     let mut migration = Migration::new().schema(SCHEMA);
@@ -55,8 +55,8 @@ fn all_mysql_column_types_must_work() {
     });
 
     let full_sql = migration.make::<barrel::backend::MySql>();
-    let inspector = get_mysql_describer(&full_sql);
-    let result = inspector.describe(&SCHEMA.to_string()).expect("describing");
+    let inspector = get_mysql_describer(&full_sql).await;
+    let result = inspector.describe(&SCHEMA.to_string()).await.expect("describing");
     let mut table = result.get_table("User").expect("couldn't get User table").to_owned();
     // Ensure columns are sorted as expected when comparing
     table.columns.sort_unstable_by_key(|c| c.name.to_owned());
@@ -497,8 +497,8 @@ fn all_mysql_column_types_must_work() {
     );
 }
 
-#[test]
-fn mysql_foreign_key_on_delete_must_be_handled() {
+#[tokio::test]
+async fn mysql_foreign_key_on_delete_must_be_handled() {
     setup();
 
     // NB: We don't test the SET DEFAULT variety since it isn't supported on InnoDB and will
@@ -514,9 +514,9 @@ fn mysql_foreign_key_on_delete_must_be_handled() {
         )",
         SCHEMA
     );
-    let inspector = get_mysql_describer(&sql);
+    let inspector = get_mysql_describer(&sql).await;
 
-    let schema = inspector.describe(SCHEMA).expect("describing");
+    let schema = inspector.describe(SCHEMA).await.expect("describing");
     let mut table = schema.get_table("User").expect("get User table").to_owned();
     table.foreign_keys.sort_unstable_by_key(|fk| fk.columns.clone());
 
@@ -616,8 +616,8 @@ fn mysql_foreign_key_on_delete_must_be_handled() {
     );
 }
 
-#[test]
-fn mysql_multi_field_indexes_must_be_inferred() {
+#[tokio::test]
+async fn mysql_multi_field_indexes_must_be_inferred() {
     setup();
 
     let mut migration = Migration::new().schema(SCHEMA);
@@ -629,8 +629,8 @@ fn mysql_multi_field_indexes_must_be_inferred() {
     });
 
     let full_sql = migration.make::<barrel::backend::MySql>();
-    let inspector = get_mysql_describer(&full_sql);
-    let result = inspector.describe(&SCHEMA.to_string()).expect("describing");
+    let inspector = get_mysql_describer(&full_sql).await;
+    let result = inspector.describe(&SCHEMA.to_string()).await.expect("describing");
     let table = result.get_table("Employee").expect("couldn't get Employee table");
 
     assert_eq!(
@@ -643,8 +643,8 @@ fn mysql_multi_field_indexes_must_be_inferred() {
     );
 }
 
-#[test]
-fn mysql_join_table_unique_indexes_must_be_inferred() {
+#[tokio::test]
+async fn mysql_join_table_unique_indexes_must_be_inferred() {
     setup();
 
     let mut migration = Migration::new().schema(SCHEMA);
@@ -667,8 +667,8 @@ fn mysql_join_table_unique_indexes_must_be_inferred() {
     });
 
     let full_sql = migration.make::<barrel::backend::MySql>();
-    let inspector = get_mysql_describer(&full_sql);
-    let result = inspector.describe(&SCHEMA.to_string()).expect("describing");
+    let inspector = get_mysql_describer(&full_sql).await;
+    let result = inspector.describe(&SCHEMA.to_string()).await.expect("describing");
     let table = result.get_table("CatToHuman").expect("couldn't get CatToHuman table");
 
     assert_eq!(
@@ -677,6 +677,76 @@ fn mysql_join_table_unique_indexes_must_be_inferred() {
             name: "cat_and_human_index".into(),
             columns: vec!["cat".to_owned(), "human".to_owned()],
             tpe: IndexType::Unique
+        }]
+    );
+}
+
+// When multiple databases exist on a mysql instance, and they share names for foreign key
+// constraints, introspecting one database should not yield constraints from the other.
+#[tokio::test]
+async fn constraints_from_other_databases_should_not_be_introspected() {
+    setup();
+
+    let mut other_migration = Migration::new().schema("other_schema");
+
+    other_migration.create_table("User", |t| {
+        t.add_column("id", types::primary());
+    });
+    other_migration.create_table("Post", |t| {
+        t.add_column("id", types::primary());
+        t.inject_custom("user_id INTEGER, FOREIGN KEY (`user_id`) REFERENCES `User`(`id`) ON DELETE CASCADE");
+    });
+
+    let full_sql = other_migration.make::<barrel::backend::MySql>();
+    let inspector = get_mysql_describer_for_schema(&full_sql, "other_schema").await;
+
+    let schema = inspector
+        .describe(&"other_schema".to_string())
+        .await
+        .expect("describing");
+    let table = schema.table_bang("Post");
+
+    let fks = &table.foreign_keys;
+
+    assert_eq!(
+        fks,
+        &[ForeignKey {
+            constraint_name: Some("Post_ibfk_1".into()),
+            columns: vec!["user_id".into()],
+            referenced_table: "User".into(),
+            referenced_columns: vec!["id".into()],
+            on_delete_action: ForeignKeyAction::Cascade,
+        }]
+    );
+
+    // Now the migration in the current database.
+
+    let mut migration = Migration::new().schema(SCHEMA);
+
+    migration.create_table("User", |t| {
+        t.add_column("id", types::primary());
+    });
+
+    migration.create_table("Post", |t| {
+        t.add_column("id", types::primary());
+        t.inject_custom("user_id INTEGER, FOREIGN KEY (`user_id`) REFERENCES `User`(`id`) ON DELETE RESTRICT");
+    });
+
+    let full_sql = migration.make::<barrel::backend::MySql>();
+    let inspector = get_mysql_describer_for_schema(&full_sql, SCHEMA).await;
+    let schema = inspector.describe(&SCHEMA.to_string()).await.expect("describing");
+    let table = schema.table_bang("Post");
+
+    let fks = &table.foreign_keys;
+
+    assert_eq!(
+        fks,
+        &[ForeignKey {
+            constraint_name: Some("Post_ibfk_1".into()),
+            columns: vec!["user_id".into()],
+            referenced_table: "User".into(),
+            referenced_columns: vec!["id".into()],
+            on_delete_action: ForeignKeyAction::Restrict,
         }]
     );
 }

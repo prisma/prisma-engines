@@ -8,8 +8,8 @@ mod sqlite;
 use common::*;
 use sqlite::*;
 
-#[test]
-fn sqlite_column_types_must_work() {
+#[tokio::test]
+async fn sqlite_column_types_must_work() {
     setup();
 
     let mut migration = Migration::new().schema(SCHEMA);
@@ -21,8 +21,8 @@ fn sqlite_column_types_must_work() {
     });
 
     let full_sql = migration.make::<barrel::backend::Sqlite>();
-    let inspector = get_sqlite_describer(&full_sql);
-    let result = inspector.describe(SCHEMA).expect("describing");
+    let inspector = get_sqlite_describer(&full_sql).await;
+    let result = inspector.describe(SCHEMA).await.expect("describing");
     let table = result.get_table("User").expect("couldn't get User table");
     let mut expected_columns = vec![
         Column {
@@ -83,8 +83,8 @@ fn sqlite_column_types_must_work() {
     );
 }
 
-#[test]
-fn sqlite_foreign_key_on_delete_must_be_handled() {
+#[tokio::test]
+async fn sqlite_foreign_key_on_delete_must_be_handled() {
     setup();
 
     let sql = format!(
@@ -99,9 +99,9 @@ fn sqlite_foreign_key_on_delete_must_be_handled() {
         )",
         SCHEMA
     );
-    let inspector = get_sqlite_describer(&sql);
+    let inspector = get_sqlite_describer(&sql).await;
 
-    let schema = inspector.describe(SCHEMA).expect("describing");
+    let schema = inspector.describe(SCHEMA).await.expect("describing");
     let mut table = schema.get_table("User").expect("get User table").to_owned();
     table.foreign_keys.sort_unstable_by_key(|fk| fk.columns.clone());
 
@@ -217,8 +217,8 @@ fn sqlite_foreign_key_on_delete_must_be_handled() {
     );
 }
 
-#[test]
-fn sqlite_text_primary_keys_must_be_inferred_on_table_and_not_as_separate_indexes() {
+#[tokio::test]
+async fn sqlite_text_primary_keys_must_be_inferred_on_table_and_not_as_separate_indexes() {
     setup();
 
     let mut migration = Migration::new().schema(SCHEMA);
@@ -233,8 +233,8 @@ fn sqlite_text_primary_keys_must_be_inferred_on_table_and_not_as_separate_indexe
     });
     let full_sql = migration.make::<barrel::backend::Sqlite>();
 
-    let inspector = get_sqlite_describer(&full_sql);
-    let result = inspector.describe(SCHEMA).expect("describing");
+    let inspector = get_sqlite_describer(&full_sql).await;
+    let result = inspector.describe(SCHEMA).await.expect("describing");
 
     let table = result.get_table("User").expect("couldn't get User table");
 

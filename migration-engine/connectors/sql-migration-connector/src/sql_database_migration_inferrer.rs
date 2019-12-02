@@ -8,48 +8,64 @@ use sql_schema_describer::*;
 use std::sync::Arc;
 
 pub struct SqlDatabaseMigrationInferrer {
-    pub sql_family: SqlFamily,
+    pub connection_info: ConnectionInfo,
     pub introspector: Arc<dyn SqlSchemaDescriberBackend + Send + Sync + 'static>,
     pub schema_name: String,
 }
 
+#[async_trait::async_trait]
 impl DatabaseMigrationInferrer<SqlMigration> for SqlDatabaseMigrationInferrer {
-    fn infer(
+    async fn infer(
         &self,
         _previous: &Datamodel,
         next: &Datamodel,
         _steps: &[MigrationStep],
     ) -> ConnectorResult<SqlMigration> {
-        let current_database_schema: SqlSchema = self.introspect(&self.schema_name)?;
-        let expected_database_schema = SqlSchemaCalculator::calculate(next)?;
-        infer(
-            &current_database_schema,
-            &expected_database_schema,
-            &self.schema_name,
-            self.sql_family,
-        )
+        let result: SqlResult<SqlMigration> = (|| {
+            async {
+                let current_database_schema: SqlSchema = self.introspect(&self.schema_name).await?;
+                let expected_database_schema = SqlSchemaCalculator::calculate(next)?;
+                infer(
+                    &current_database_schema,
+                    &expected_database_schema,
+                    &self.schema_name,
+                    self.sql_family(),
+                )
+            }
+        })()
+        .await;
+
+        result.map_err(|sql_error| sql_error.into_connector_error(&self.connection_info))
     }
 
-    fn infer_from_datamodels(
+    async fn infer_from_datamodels(
         &self,
         previous: &Datamodel,
         next: &Datamodel,
         _steps: &[MigrationStep],
     ) -> ConnectorResult<SqlMigration> {
-        let current_database_schema: SqlSchema = SqlSchemaCalculator::calculate(previous)?;
-        let expected_database_schema = SqlSchemaCalculator::calculate(next)?;
-        infer(
-            &current_database_schema,
-            &expected_database_schema,
-            &self.schema_name,
-            self.sql_family,
-        )
+        let result: SqlResult<SqlMigration> = (|| {
+            let current_database_schema: SqlSchema = SqlSchemaCalculator::calculate(previous)?;
+            let expected_database_schema = SqlSchemaCalculator::calculate(next)?;
+            infer(
+                &current_database_schema,
+                &expected_database_schema,
+                &self.schema_name,
+                self.sql_family(),
+            )
+        })();
+
+        result.map_err(|sql_error| sql_error.into_connector_error(&self.connection_info))
     }
 }
 
 impl SqlDatabaseMigrationInferrer {
-    fn introspect(&self, schema: &str) -> SqlResult<SqlSchema> {
-        Ok(self.introspector.describe(&schema)?)
+    async fn introspect(&self, schema: &str) -> SqlResult<SqlSchema> {
+        Ok(self.introspector.describe(&schema).await?)
+    }
+
+    fn sql_family(&self) -> SqlFamily {
+        self.connection_info.sql_family()
     }
 }
 
@@ -58,7 +74,7 @@ fn infer(
     expected_database_schema: &SqlSchema,
     schema_name: &str,
     sql_family: SqlFamily,
-) -> ConnectorResult<SqlMigration> {
+) -> SqlResult<SqlMigration> {
     let (original_steps, corrected_steps) = infer_database_migration_steps_and_fix(
         &current_database_schema,
         &expected_database_schema,

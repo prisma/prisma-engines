@@ -21,13 +21,14 @@ pub enum SqlSchemaDescriberError {
 pub type SqlSchemaDescriberResult<T> = core::result::Result<T, SqlSchemaDescriberError>;
 
 /// A database description connector.
+#[async_trait::async_trait]
 pub trait SqlSchemaDescriberBackend: Send + Sync + 'static {
     /// List the database's schemas.
-    fn list_databases(&self) -> SqlSchemaDescriberResult<Vec<String>>;
+    async fn list_databases(&self) -> SqlSchemaDescriberResult<Vec<String>>;
     /// Get the databases metadata.
-    fn get_metadata(&self, schema: &str) -> SqlSchemaDescriberResult<SQLMetadata>;
+    async fn get_metadata(&self, schema: &str) -> SqlSchemaDescriberResult<SQLMetadata>;
     /// Describe a database schema.
-    fn describe(&self, schema: &str) -> SqlSchemaDescriberResult<SqlSchema>;
+    async fn describe(&self, schema: &str) -> SqlSchemaDescriberResult<SqlSchema>;
 }
 
 #[derive(Serialize, Deserialize)]

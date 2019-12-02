@@ -3,18 +3,20 @@ use barrel::types;
 use test_harness::*;
 
 #[test_one_connector(connector = "sqlite")]
-fn introspecting_a_simple_table_with_gql_types_must_work(api: &TestApi) {
+async fn introspecting_a_simple_table_with_gql_types_must_work(api: &TestApi) {
     let barrel = api.barrel();
-    let _setup_schema = barrel.execute(|migration| {
-        migration.create_table("Blog", |t| {
-            t.add_column("bool", types::boolean());
-            t.add_column("float", types::float());
-            t.add_column("date", types::date());
-            t.add_column("id", types::primary());
-            t.add_column("int", types::integer());
-            t.add_column("string", types::text());
-        });
-    });
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("Blog", |t| {
+                t.add_column("bool", types::boolean());
+                t.add_column("float", types::float());
+                t.add_column("date", types::date());
+                t.add_column("id", types::primary());
+                t.add_column("int", types::integer());
+                t.add_column("string", types::text());
+            });
+        })
+        .await;
     let dm = r#"
             model Blog {
                 bool    Boolean
@@ -25,20 +27,22 @@ fn introspecting_a_simple_table_with_gql_types_must_work(api: &TestApi) {
                 string  String
             }
         "#;
-    let result = dbg!(api.introspect());
+    let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
 
 #[test_one_connector(connector = "sqlite")]
-fn introspecting_a_table_with_compound_primary_keys_must_work(api: &TestApi) {
+async fn introspecting_a_table_with_compound_primary_keys_must_work(api: &TestApi) {
     let barrel = api.barrel();
-    let _setup_schema = barrel.execute(|migration| {
-        migration.create_table("Blog", |t| {
-            t.add_column("id", types::integer());
-            t.add_column("authorId", types::text());
-            t.inject_custom("PRIMARY KEY (\"id\", \"authorId\")");
-        });
-    });
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("Blog", |t| {
+                t.add_column("id", types::integer());
+                t.add_column("authorId", types::text());
+                t.inject_custom("PRIMARY KEY (\"id\", \"authorId\")");
+            });
+        })
+        .await;
 
     let dm = r#"
             model Blog {
@@ -47,20 +51,25 @@ fn introspecting_a_table_with_compound_primary_keys_must_work(api: &TestApi) {
                 @@id([id, authorId])
             }
         "#;
-    let result = dbg!(api.introspect());
+    let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
 
 #[test_one_connector(connector = "sqlite")]
-fn introspecting_a_table_with_unique_index_must_work(api: &TestApi) {
+async fn introspecting_a_table_with_unique_index_must_work(api: &TestApi) {
     let barrel = api.barrel();
-    let _setup_schema = barrel.execute(|migration| {
-        migration.create_table("Blog", |t| {
-            t.add_column("id", types::primary());
-            t.add_column("authorId", types::text());
-        });
-        migration.inject_custom("Create Unique Index \"introspection-engine\".\"test\" on \"Blog\"( \"authorId\")");
-    });
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("Blog", |t| {
+                t.add_column("id", types::primary());
+                t.add_column("authorId", types::text());
+            });
+            migration.inject_custom(format!(
+                "Create Unique Index \"{}\".\"test\" on \"Blog\"( \"authorId\")",
+                SCHEMA_NAME
+            ));
+        })
+        .await;
 
     let dm = r#"
             model Blog {
@@ -68,23 +77,26 @@ fn introspecting_a_table_with_unique_index_must_work(api: &TestApi) {
                 id Int @id
             }
         "#;
-    let result = dbg!(api.introspect());
+    let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
 
 #[test_one_connector(connector = "sqlite")]
-fn introspecting_a_table_with_multi_column_unique_index_must_work(api: &TestApi) {
+async fn introspecting_a_table_with_multi_column_unique_index_must_work(api: &TestApi) {
     let barrel = api.barrel();
-    let _setup_schema = barrel.execute(|migration| {
-        migration.create_table("User", |t| {
-            t.add_column("id", types::primary());
-            t.add_column("firstname", types::text());
-            t.add_column("lastname", types::text());
-        });
-        migration.inject_custom(
-            "Create Unique Index \"introspection-engine\".\"test\" on \"User\"( \"firstname\", \"lastname\")",
-        );
-    });
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+                t.add_column("firstname", types::text());
+                t.add_column("lastname", types::text());
+            });
+            migration.inject_custom(format!(
+                "Create Unique Index \"{}\".\"test\" on \"User\"( \"firstname\", \"lastname\")",
+                SCHEMA_NAME
+            ));
+        })
+        .await;
 
     let dm = r#"
             model User {
@@ -94,20 +106,22 @@ fn introspecting_a_table_with_multi_column_unique_index_must_work(api: &TestApi)
                 @@unique([firstname, lastname], name: "test")
             }
         "#;
-    let result = dbg!(api.introspect());
+    let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
 
 #[test_one_connector(connector = "sqlite")]
-fn introspecting_a_table_with_required_and_optional_columns_must_work(api: &TestApi) {
+async fn introspecting_a_table_with_required_and_optional_columns_must_work(api: &TestApi) {
     let barrel = api.barrel();
-    let _setup_schema = barrel.execute(|migration| {
-        migration.create_table("User", |t| {
-            t.add_column("id", types::primary());
-            t.add_column("requiredname", types::text().nullable(false));
-            t.add_column("optionalname", types::text().nullable(true));
-        });
-    });
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+                t.add_column("requiredname", types::text().nullable(false));
+                t.add_column("optionalname", types::text().nullable(true));
+            });
+        })
+        .await;
 
     let dm = r#"
             model User {
@@ -116,7 +130,7 @@ fn introspecting_a_table_with_required_and_optional_columns_must_work(api: &Test
                 requiredname String
             }
         "#;
-    let result = dbg!(api.introspect());
+    let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
 
@@ -139,24 +153,26 @@ fn introspecting_a_table_with_required_and_optional_columns_must_work(api: &Test
 //                name String
 //            }
 //        "#;
-//    let result = dbg!(api.introspect());
+//    let result = dbg!(api.introspect().await);
 //    custom_assert(&result, dm);
 //}
 
 #[test_one_connector(connector = "sqlite")]
-fn introspecting_a_table_with_default_values_should_work(api: &TestApi) {
+async fn introspecting_a_table_with_default_values_should_work(api: &TestApi) {
     let barrel = api.barrel();
-    let _setup_schema = barrel.execute(|migration| {
-        migration.create_table("User", |t| {
-            t.add_column("a", types::text());
-            t.add_column("id", types::primary());
-            t.inject_custom("\"bool\" Boolean NOT NULL DEFAULT false");
-            t.inject_custom("\"bool2\" Boolean NOT NULL DEFAULT 0");
-            t.inject_custom("\"float\" Float NOT NULL DEFAULT 5.3");
-            t.inject_custom("\"int\" INTEGER NOT NULL DEFAULT 5");
-            t.inject_custom("\"string\" TEXT NOT NULL DEFAULT \"Test\"");
-        });
-    });
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("a", types::text());
+                t.add_column("id", types::primary());
+                t.inject_custom("\"bool\" Boolean NOT NULL DEFAULT false");
+                t.inject_custom("\"bool2\" Boolean NOT NULL DEFAULT 0");
+                t.inject_custom("\"float\" Float NOT NULL DEFAULT 5.3");
+                t.inject_custom("\"int\" INTEGER NOT NULL DEFAULT 5");
+                t.inject_custom("\"string\" TEXT NOT NULL DEFAULT \"Test\"");
+            });
+        })
+        .await;
 
     let dm = r#"
             model User {
@@ -169,20 +185,22 @@ fn introspecting_a_table_with_default_values_should_work(api: &TestApi) {
                 string String @default("Test")
             }
         "#;
-    let result = dbg!(api.introspect());
+    let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
 
 #[test_one_connector(connector = "sqlite")]
-fn introspecting_a_table_with_a_non_unique_index_should_work(api: &TestApi) {
+async fn introspecting_a_table_with_a_non_unique_index_should_work(api: &TestApi) {
     let barrel = api.barrel();
-    let _setup_schema = barrel.execute(|migration| {
-        migration.create_table("User", |t| {
-            t.add_column("a", types::text());
-            t.add_column("id", types::primary());
-        });
-        migration.inject_custom("Create Index \"introspection-engine\".\"test\" on \"User\"(\"a\")");
-    });
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("a", types::text());
+                t.add_column("id", types::primary());
+            });
+            migration.inject_custom(format!("Create Index \"{}\".\"test\" on \"User\"(\"a\")", SCHEMA_NAME));
+        })
+        .await;
 
     let dm = r#"
             model User {
@@ -191,21 +209,26 @@ fn introspecting_a_table_with_a_non_unique_index_should_work(api: &TestApi) {
                 @@index([a], name: "test")
             }
         "#;
-    let result = dbg!(api.introspect());
+    let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
 
 #[test_one_connector(connector = "sqlite")]
-fn introspecting_a_table_with_a_multi_column_non_unique_index_should_work(api: &TestApi) {
+async fn introspecting_a_table_with_a_multi_column_non_unique_index_should_work(api: &TestApi) {
     let barrel = api.barrel();
-    let _setup_schema = barrel.execute(|migration| {
-        migration.create_table("User", |t| {
-            t.add_column("a", types::text());
-            t.add_column("b", types::text());
-            t.add_column("id", types::primary());
-        });
-        migration.inject_custom("Create Index \"introspection-engine\".\"test\" on \"User\"(\"a\",\"b\")");
-    });
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("a", types::text());
+                t.add_column("b", types::text());
+                t.add_column("id", types::primary());
+            });
+            migration.inject_custom(format!(
+                "Create Index \"{}\".\"test\" on \"User\"(\"a\",\"b\")",
+                SCHEMA_NAME
+            ));
+        })
+        .await;
 
     let dm = r#"
             model User {
@@ -215,26 +238,28 @@ fn introspecting_a_table_with_a_multi_column_non_unique_index_should_work(api: &
                 @@index([a,b], name: "test")
             }
         "#;
-    let result = dbg!(api.introspect());
+    let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
 
 //relations
 #[test_one_connector(connector = "sqlite")]
-fn introspecting_a_one_to_one_req_relation_should_work(api: &TestApi) {
+async fn introspecting_a_one_to_one_req_relation_should_work(api: &TestApi) {
     let barrel = api.barrel();
-    let _setup_schema = barrel.execute(|migration| {
-        migration.create_table("User", |t| {
-            t.add_column("id", types::primary());
-        });
-        migration.create_table("Post", |t| {
-            t.add_column("id", types::primary());
-            t.inject_custom(
-                "user_id INTEGER NOT NULL UNIQUE,
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+            });
+            migration.create_table("Post", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom(
+                    "user_id INTEGER NOT NULL UNIQUE,
                         FOREIGN KEY(user_id) REFERENCES User(id)",
-            )
-        });
-    });
+                )
+            });
+        })
+        .await;
 
     let dm = r#"
             model User {
@@ -247,29 +272,31 @@ fn introspecting_a_one_to_one_req_relation_should_work(api: &TestApi) {
                user_id User
             }
         "#;
-    let result = dbg!(api.introspect());
+    let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
 
 #[test_one_connector(connector = "sqlite")]
-fn introspecting_two_one_to_one_relations_between_the_same_models_should_work(api: &TestApi) {
+async fn introspecting_two_one_to_one_relations_between_the_same_models_should_work(api: &TestApi) {
     let barrel = api.barrel();
-    let _setup_schema = barrel.execute(|migration| {
-        migration.create_table("User", |t| {
-            t.add_column("id", types::primary());
-            t.inject_custom(
-                "post_id INTEGER NOT NULL UNIQUE,
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom(
+                    "post_id INTEGER NOT NULL UNIQUE,
                         FOREIGN KEY(post_id) REFERENCES Post(id)",
-            )
-        });
-        migration.create_table("Post", |t| {
-            t.add_column("id", types::primary());
-            t.inject_custom(
-                "user_id INTEGER NOT NULL UNIQUE,
+                )
+            });
+            migration.create_table("Post", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom(
+                    "user_id INTEGER NOT NULL UNIQUE,
                         FOREIGN KEY(user_id) REFERENCES User(id)",
-            )
-        });
-    });
+                )
+            });
+        })
+        .await;
 
     let dm = r#"
             model User {
@@ -284,25 +311,27 @@ fn introspecting_two_one_to_one_relations_between_the_same_models_should_work(ap
                user    User? @relation("PostToUser_post_id", references: [post_id])
             }
         "#;
-    let result = dbg!(api.introspect());
+    let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
 
 #[test_one_connector(connector = "sqlite")]
-fn introspecting_a_one_to_one_relation_should_work(api: &TestApi) {
+async fn introspecting_a_one_to_one_relation_should_work(api: &TestApi) {
     let barrel = api.barrel();
-    let _setup_schema = barrel.execute(|migration| {
-        migration.create_table("User", |t| {
-            t.add_column("id", types::primary());
-        });
-        migration.create_table("Post", |t| {
-            t.add_column("id", types::primary());
-            t.inject_custom(
-                "user_id INTEGER UNIQUE,
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+            });
+            migration.create_table("Post", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom(
+                    "user_id INTEGER UNIQUE,
                         FOREIGN KEY(user_id) REFERENCES User(id)",
-            )
-        });
-    });
+                )
+            });
+        })
+        .await;
 
     let dm = r#"
             model User {
@@ -315,25 +344,27 @@ fn introspecting_a_one_to_one_relation_should_work(api: &TestApi) {
                user_id User?
             }
         "#;
-    let result = dbg!(api.introspect());
+    let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
 
 #[test_one_connector(connector = "sqlite")]
-fn introspecting_a_one_to_many_relation_should_work(api: &TestApi) {
+async fn introspecting_a_one_to_many_relation_should_work(api: &TestApi) {
     let barrel = api.barrel();
-    let _setup_schema = barrel.execute(|migration| {
-        migration.create_table("User", |t| {
-            t.add_column("id", types::primary());
-        });
-        migration.create_table("Post", |t| {
-            t.add_column("id", types::primary());
-            t.inject_custom(
-                "user_id INTEGER,
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+            });
+            migration.create_table("Post", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom(
+                    "user_id INTEGER,
                         FOREIGN KEY(user_id) REFERENCES User(id)",
-            )
-        });
-    });
+                )
+            });
+        })
+        .await;
 
     let dm = r#"
             model User {
@@ -346,25 +377,27 @@ fn introspecting_a_one_to_many_relation_should_work(api: &TestApi) {
                user_id User?
             }
         "#;
-    let result = dbg!(api.introspect());
+    let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
 
 #[test_one_connector(connector = "sqlite")]
-fn introspecting_a_one_req_to_many_relation_should_work(api: &TestApi) {
+async fn introspecting_a_one_req_to_many_relation_should_work(api: &TestApi) {
     let barrel = api.barrel();
-    let _setup_schema = barrel.execute(|migration| {
-        migration.create_table("User", |t| {
-            t.add_column("id", types::primary());
-        });
-        migration.create_table("Post", |t| {
-            t.add_column("id", types::primary());
-            t.inject_custom(
-                "user_id INTEGER NOT NULL,
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+            });
+            migration.create_table("Post", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom(
+                    "user_id INTEGER NOT NULL,
                         FOREIGN KEY(user_id) REFERENCES User(id)",
-            )
-        });
-    });
+                )
+            });
+        })
+        .await;
 
     let dm = r#"
             model User {
@@ -377,30 +410,35 @@ fn introspecting_a_one_req_to_many_relation_should_work(api: &TestApi) {
                user_id User
             }
         "#;
-    let result = dbg!(api.introspect());
+    let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
 
 #[test_one_connector(connector = "sqlite")]
-fn introspecting_a_prisma_many_to_many_relation_should_work(api: &TestApi) {
+async fn introspecting_a_prisma_many_to_many_relation_should_work(api: &TestApi) {
     let barrel = api.barrel();
-    let _setup_schema = barrel.execute(|migration| {
-        migration.create_table("User", |t| {
-            t.add_column("id", types::primary());
-        });
-        migration.create_table("Post", |t| {
-            t.add_column("id", types::primary());
-        });
-        migration.create_table("_PostToUser", |t| {
-            t.inject_custom(
-                "A TEXT NOT NULL,
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+            });
+            migration.create_table("Post", |t| {
+                t.add_column("id", types::primary());
+            });
+            migration.create_table("_PostToUser", |t| {
+                t.inject_custom(
+                    "A TEXT NOT NULL,
                           B TEXT NOT NULL,
                           FOREIGN KEY (A) REFERENCES  Post(id) ON DELETE CASCADE,
                           FOREIGN KEY (B) REFERENCES  User(id) ON DELETE CASCADE",
-            )
-        });
-        migration.inject_custom("CREATE UNIQUE INDEX \"introspection-engine\".test ON \"_PostToUser\" (\"A\", \"B\");")
-    });
+                )
+            });
+            migration.inject_custom(format!(
+                "CREATE UNIQUE INDEX \"{}\".test ON \"_PostToUser\" (\"A\", \"B\");",
+                SCHEMA_NAME
+            ))
+        })
+        .await;
 
     let dm = r#"
             model User {
@@ -413,30 +451,32 @@ fn introspecting_a_prisma_many_to_many_relation_should_work(api: &TestApi) {
                users User[] 
             }
         "#;
-    let result = dbg!(api.introspect());
+    let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
 
 // Todo
 #[test_one_connector(connector = "sqlite")]
-fn introspecting_a_many_to_many_relation_should_work(api: &TestApi) {
+async fn introspecting_a_many_to_many_relation_should_work(api: &TestApi) {
     let barrel = api.barrel();
-    let _setup_schema = barrel.execute(|migration| {
-        migration.create_table("User", |t| {
-            t.add_column("id", types::primary());
-        });
-        migration.create_table("Post", |t| {
-            t.add_column("id", types::primary());
-        });
-        migration.create_table("PostsToUsers", |t| {
-            t.inject_custom(
-                "user_id TEXT NOT NULL,
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+            });
+            migration.create_table("Post", |t| {
+                t.add_column("id", types::primary());
+            });
+            migration.create_table("PostsToUsers", |t| {
+                t.inject_custom(
+                    "user_id TEXT NOT NULL,
                           post_id TEXT NOT NULL,
                           FOREIGN KEY (user_id) REFERENCES  User(id) ON DELETE CASCADE,
                           FOREIGN KEY (post_id) REFERENCES  Post(id) ON DELETE CASCADE",
-            )
-        });
-    });
+                )
+            });
+        })
+        .await;
 
     let dm = r#"
             model User {
@@ -454,30 +494,32 @@ fn introspecting_a_many_to_many_relation_should_work(api: &TestApi) {
               user_id User
             }
         "#;
-    let result = dbg!(api.introspect());
+    let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
 
 #[test_one_connector(connector = "sqlite")]
-fn introspecting_a_many_to_many_relation_with_extra_fields_should_work(api: &TestApi) {
+async fn introspecting_a_many_to_many_relation_with_extra_fields_should_work(api: &TestApi) {
     let barrel = api.barrel();
-    let _setup_schema = barrel.execute(|migration| {
-        migration.create_table("User", |t| {
-            t.add_column("id", types::primary());
-        });
-        migration.create_table("Post", |t| {
-            t.add_column("id", types::primary());
-        });
-        migration.create_table("PostsToUsers", |t| {
-            t.inject_custom(
-                "date    date,
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+            });
+            migration.create_table("Post", |t| {
+                t.add_column("id", types::primary());
+            });
+            migration.create_table("PostsToUsers", |t| {
+                t.inject_custom(
+                    "date    date,
                           user_id TEXT NOT NULL,
                           post_id TEXT NOT NULL,
                           FOREIGN KEY (user_id) REFERENCES  User(id),
                           FOREIGN KEY (post_id) REFERENCES  Post(id)",
-            )
-        });
-    });
+                )
+            });
+        })
+        .await;
 
     let dm = r#"
             model User {
@@ -496,24 +538,26 @@ fn introspecting_a_many_to_many_relation_with_extra_fields_should_work(api: &Tes
               user_id User
             }
         "#;
-    let result = dbg!(api.introspect());
+    let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
 
 #[test_one_connector(connector = "sqlite")]
-fn introspecting_a_self_relation_should_work(api: &TestApi) {
+async fn introspecting_a_self_relation_should_work(api: &TestApi) {
     let barrel = api.barrel();
-    let _setup_schema = barrel.execute(|migration| {
-        migration.create_table("User", |t| {
-            t.add_column("id", types::primary());
-            t.inject_custom(
-                "recruited_by INTEGER,
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom(
+                    "recruited_by INTEGER,
                           direct_report INTEGER,
                           FOREIGN KEY (recruited_by) REFERENCES User (id),
                           FOREIGN KEY (direct_report) REFERENCES User (id)",
-            )
-        });
-    });
+                )
+            });
+        })
+        .await;
 
     let dm = r#"
             model User {
@@ -524,27 +568,29 @@ fn introspecting_a_self_relation_should_work(api: &TestApi) {
                 users_UserToUser_recruited_by  User[] @relation("UserToUser_recruited_by")
             }
         "#;
-    let result = dbg!(api.introspect());
+    let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
 
 // on delete cascade
 
 #[test_one_connector(connector = "sqlite")]
-fn introspecting_cascading_delete_behaviour_should_work(api: &TestApi) {
+async fn introspecting_cascading_delete_behaviour_should_work(api: &TestApi) {
     let barrel = api.barrel();
-    let _setup_schema = barrel.execute(|migration| {
-        migration.create_table("User", |t| {
-            t.add_column("id", types::primary());
-        });
-        migration.create_table("Post", |t| {
-            t.add_column("id", types::primary());
-            t.inject_custom(
-                "user_id INTEGER,\
-                 FOREIGN KEY (user_id) REFERENCES User(id) ON DELETE CASCADE",
-            );
-        });
-    });
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+            });
+            migration.create_table("Post", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom(
+                    "user_id INTEGER,\
+                     FOREIGN KEY (user_id) REFERENCES User(id) ON DELETE CASCADE",
+                );
+            });
+        })
+        .await;
 
     let dm = r#"
             model User {
@@ -557,6 +603,6 @@ fn introspecting_cascading_delete_behaviour_should_work(api: &TestApi) {
                user_id User?
             }
         "#;
-    let result = dbg!(api.introspect());
+    let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }

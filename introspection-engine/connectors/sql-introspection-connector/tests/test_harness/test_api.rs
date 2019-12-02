@@ -1,28 +1,28 @@
 use super::misc_helpers::*;
 use introspection_connector::{DatabaseMetadata, IntrospectionConnector};
-use quaint::prelude::SqlFamily;
-use sql_connection::SyncSqlConnection;
+use quaint::prelude::{Queryable, SqlFamily};
 use sql_introspection_connector::SqlIntrospectionConnector;
 use std::sync::Arc;
+use test_setup::*;
 
 pub struct TestApi {
     sql_family: SqlFamily,
-    database: Arc<dyn SyncSqlConnection + Send + Sync + 'static>,
+    database: Arc<dyn Queryable + Send + Sync + 'static>,
     introspection_connector: SqlIntrospectionConnector,
 }
 
 impl TestApi {
-    pub fn list_databases(&self) -> Vec<String> {
-        self.introspection_connector.list_databases().unwrap()
+    pub async fn list_databases(&self) -> Vec<String> {
+        self.introspection_connector.list_databases().await.unwrap()
     }
 
-    pub fn introspect(&self) -> String {
-        let datamodel = self.introspection_connector.introspect(SCHEMA_NAME).unwrap();
+    pub async fn introspect(&self) -> String {
+        let datamodel = dbg!(self.introspection_connector.introspect().await).unwrap();
         datamodel::render_datamodel_to_string(&datamodel).expect("Datamodel rendering failed")
     }
 
-    pub fn get_metadata(&self) -> DatabaseMetadata {
-        let metadata = self.introspection_connector.get_metadata(SCHEMA_NAME).unwrap();
+    pub async fn get_metadata(&self) -> DatabaseMetadata {
+        let metadata = self.introspection_connector.get_metadata().await.unwrap();
         metadata
     }
 
@@ -42,15 +42,15 @@ impl TestApi {
     }
 }
 
-pub fn mysql_test_api() -> TestApi {
-    let database = database(&mysql_url());
+pub async fn mysql_test_api() -> TestApi {
+    let database = database(&mysql_url()).await;
 
     let drop_database = dbg!(format!("DROP DATABASE IF EXISTS `{}`;", SCHEMA_NAME));
-    database.query_raw(&drop_database, &[]).ok();
+    database.query_raw(&drop_database, &[]).await.ok();
     let create_database = dbg!(format!("CREATE DATABASE `{}`;", SCHEMA_NAME));
-    database.query_raw(&create_database, &[]).ok();
+    database.query_raw(&create_database, &[]).await.ok();
 
-    let introspection_connector = SqlIntrospectionConnector::new(&mysql_url()).unwrap();
+    let introspection_connector = SqlIntrospectionConnector::new(&mysql_url()).await.unwrap();
 
     TestApi {
         database: database.into(),
@@ -59,16 +59,16 @@ pub fn mysql_test_api() -> TestApi {
     }
 }
 
-pub fn postgres_test_api() -> TestApi {
-    let database = database(&postgres_url());
+pub async fn postgres_test_api() -> TestApi {
+    let database = database(&postgres_url()).await;
 
     let drop_schema = dbg!(format!("DROP SCHEMA IF EXISTS \"{}\" CASCADE;", SCHEMA_NAME));
-    database.query_raw(&drop_schema, &[]).ok();
+    database.query_raw(&drop_schema, &[]).await.ok();
 
     let create_schema = dbg!(format!("CREATE SCHEMA IF NOT EXISTS \"{}\";", SCHEMA_NAME));
-    database.query_raw(&create_schema, &[]).ok();
+    database.query_raw(&create_schema, &[]).await.ok();
 
-    let introspection_connector = SqlIntrospectionConnector::new(&postgres_url()).unwrap();
+    let introspection_connector = SqlIntrospectionConnector::new(&postgres_url()).await.unwrap();
 
     TestApi {
         database: database.into(),
@@ -77,12 +77,13 @@ pub fn postgres_test_api() -> TestApi {
     }
 }
 
-pub fn sqlite_test_api() -> TestApi {
-    let database = database(&sqlite_test_url());
-
+pub async fn sqlite_test_api() -> TestApi {
     let database_file_path = sqlite_test_file();
     std::fs::remove_file(database_file_path.clone()).ok(); // ignore potential errors
-    let introspection_connector = SqlIntrospectionConnector::new(&sqlite_test_url()).unwrap();
+
+    let database = database(&sqlite_test_url()).await;
+
+    let introspection_connector = SqlIntrospectionConnector::new(&sqlite_test_url()).await.unwrap();
 
     TestApi {
         database: database.into(),

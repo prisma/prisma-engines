@@ -11,7 +11,7 @@ use crate::{utilities, PrismaError, PrismaResult};
 /// Wrapper type to unclutter the interface
 pub struct DatamodelV2Components {
     pub datamodel: Datamodel,
-    pub data_sources: Vec<Box<dyn Source>>,
+    pub data_sources: Vec<Box<dyn Source + Send + Sync>>,
 }
 
 /// Private helper trait for operations on PrismaResult<Option<T>>.
