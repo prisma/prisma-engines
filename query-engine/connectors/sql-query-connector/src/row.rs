@@ -69,15 +69,7 @@ impl ToSqlRow for ResultRow {
                         return Err(SqlError::ConversionError(error.into()));
                     }
                 },
-                TypeIdentifier::Json => match p_value {
-                    ParameterizedValue::Null => PrismaValue::Null,
-                    ParameterizedValue::Text(json) => PrismaValue::Json(serde_json::from_str(json.borrow())?),
-                    ParameterizedValue::Json(json) => PrismaValue::Json(json),
-                    _ => {
-                        let error = io::Error::new(io::ErrorKind::InvalidData, "Json value not stored as text or json");
-                        return Err(SqlError::ConversionError(error.into()));
-                    }
-                },
+                TypeIdentifier::Json => unimplemented!(),
                 TypeIdentifier::UUID => match p_value {
                     ParameterizedValue::Null => PrismaValue::Null,
                     ParameterizedValue::Text(uuid) => PrismaValue::Uuid(Uuid::parse_str(&uuid)?),

@@ -25,21 +25,23 @@ pub fn connect_nested_connect(
     let values = utils::coerce_vec(value);
 
     // Build all finders upfront.
-    let filters: Vec<Filter> = utils::coerce_vec(value)
-        .into_iter()
-        .unique()
-        .map(|value: ParsedInputValue| extract_filter(value.try_into()?, &child_model)?.assert_size(1)?)
-        .collect::<QueryGraphBuilderResult<Vec<Filter>>>()?
-        .into_iter()
-        .collect();
+    // let filters: Vec<Filter> = utils::coerce_vec(value)
+    //     .into_iter()
+    //     .unique()
+    //     .map(|value: ParsedInputValue| extract_filter(value.try_into()?, &child_model)?.assert_size(1)?)
+    //     .collect::<QueryGraphBuilderResult<Vec<Filter>>>()?
+    //     .into_iter()
+    //     .collect();
 
-    if relation.is_many_to_many() {
-        handle_many_to_many(graph, parent_node, parent_relation_field, finders, child_model)
-    } else if relation.is_one_to_many() {
-        handle_one_to_many(graph, parent_node, parent_relation_field, finders, child_model)
-    } else {
-        handle_one_to_one(graph, parent_node, parent_relation_field, finders, child_model)
-    }
+    // if relation.is_many_to_many() {
+    //     handle_many_to_many(graph, parent_node, parent_relation_field, finders, child_model)
+    // } else if relation.is_one_to_many() {
+    //     handle_one_to_many(graph, parent_node, parent_relation_field, finders, child_model)
+    // } else {
+    //     handle_one_to_one(graph, parent_node, parent_relation_field, finders, child_model)
+    // }
+    //
+    unimplemented!()
 }
 
 /// Handles a many-to-many nested connect.
@@ -72,19 +74,20 @@ fn handle_many_to_many(
     filter: Filter,
     child_model: &ModelRef,
 ) -> QueryGraphBuilderResult<()> {
-    let child_read_query = utils::read_ids_infallible(&child_model, finders);
-    let child_node = graph.create_node(child_read_query);
+    unimplemented!()
+    // let child_read_query = utils::read_ids_infallible(&child_model, finders);
+    // let child_node = graph.create_node(child_read_query);
 
-    graph.create_edge(&parent_node, &child_node, QueryGraphDependency::ExecutionOrder)?;
-    connect::connect_records_node(
-        graph,
-        &parent_node,
-        &child_node,
-        &parent_relation_field,
-        expected_connects,
-    )?;
+    // graph.create_edge(&parent_node, &child_node, QueryGraphDependency::ExecutionOrder)?;
+    // connect::connect_records_node(
+    //     graph,
+    //     &parent_node,
+    //     &child_node,
+    //     &parent_relation_field,
+    //     expected_connects,
+    // )?;
 
-    Ok(())
+    // Ok(())
 }
 
 /// Handles a one-to-many nested connect.

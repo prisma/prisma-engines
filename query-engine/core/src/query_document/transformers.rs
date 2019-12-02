@@ -8,7 +8,6 @@ use super::*;
 use chrono::prelude::*;
 use prisma_models::{EnumValue, EnumValueWrapper, GraphqlId, OrderBy, PrismaValue};
 use rust_decimal::prelude::ToPrimitive;
-use serde_json::Value;
 use std::convert::TryInto;
 
 impl TryInto<PrismaValue> for ParsedInputValue {
@@ -174,23 +173,6 @@ impl TryInto<Option<DateTime<Utc>>> for ParsedInputValue {
             PrismaValue::Null => Ok(None),
             v => Err(QueryParserError::AssertionError(format!(
                 "Attempted conversion of non-DateTime Prisma value type ({:?}) into DateTime failed.",
-                v
-            ))),
-        }
-    }
-}
-
-impl TryInto<Option<Value>> for ParsedInputValue {
-    type Error = QueryParserError;
-
-    fn try_into(self) -> QueryParserResult<Option<Value>> {
-        let prisma_value: PrismaValue = self.try_into()?;
-
-        match prisma_value {
-            PrismaValue::Json(j) => Ok(Some(j)),
-            PrismaValue::Null => Ok(None),
-            v => Err(QueryParserError::AssertionError(format!(
-                "Attempted conversion of non-JSON Prisma value type ({:?}) into JSON failed.",
                 v
             ))),
         }

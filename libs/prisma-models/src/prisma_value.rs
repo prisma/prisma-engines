@@ -2,7 +2,6 @@ use crate::{DomainError, DomainResult, EnumValue};
 use chrono::prelude::*;
 use rust_decimal::{prelude::FromPrimitive, Decimal};
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
 use std::{convert::TryFrom, fmt, string::FromUtf8Error};
 use uuid::Uuid;
 
@@ -32,9 +31,6 @@ pub enum PrismaValue {
 
     #[serde(rename = "enum")]
     Enum(EnumValue),
-
-    #[serde(rename = "json")]
-    Json(Value),
 
     #[serde(rename = "int")]
     Int(i64),
@@ -69,7 +65,6 @@ impl fmt::Display for PrismaValue {
             PrismaValue::Boolean(x) => x.fmt(f),
             PrismaValue::DateTime(x) => x.fmt(f),
             PrismaValue::Enum(x) => x.as_string().fmt(f),
-            PrismaValue::Json(x) => x.fmt(f),
             PrismaValue::Int(x) => x.fmt(f),
             PrismaValue::Null => "null".fmt(f),
             PrismaValue::Uuid(x) => x.fmt(f),

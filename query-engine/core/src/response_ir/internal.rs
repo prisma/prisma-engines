@@ -364,7 +364,7 @@ fn serialize_scalar(value: PrismaValue, typ: &OutputTypeRef) -> CoreResult<Item>
 
                 (ScalarType::Boolean, PrismaValue::Boolean(b)) => PrismaValue::Boolean(b),
                 (ScalarType::DateTime, PrismaValue::DateTime(dt)) => PrismaValue::DateTime(dt),
-                (ScalarType::Json, PrismaValue::Json(j)) => PrismaValue::Json(j),
+                (ScalarType::Json, _) => unimplemented!(),
                 (ScalarType::UUID, PrismaValue::Uuid(u)) => PrismaValue::Uuid(u),
 
                 (st, pv) => {

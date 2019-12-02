@@ -35,7 +35,6 @@ impl<'a> From<PrismaValue> for DatabaseValue<'a> {
             PrismaValue::Boolean(b) => b.into(),
             PrismaValue::DateTime(d) => d.into(),
             PrismaValue::Enum(e) => e.as_string().into(),
-            PrismaValue::Json(j) => j.to_string().into(),
             PrismaValue::Int(i) => (i as i64).into(),
             PrismaValue::Null => DatabaseValue::Parameterized(ParameterizedValue::Null),
             PrismaValue::Uuid(u) => u.to_string().into(),
@@ -58,7 +57,7 @@ impl<'a> From<ParameterizedValue<'a>> for PrismaValue {
                 let lst = v.into_iter().map(PrismaValue::from).collect();
                 PrismaValue::List(Some(lst))
             }
-            ParameterizedValue::Json(val) => PrismaValue::Json(val),
+            ParameterizedValue::Json(val) => PrismaValue::String(val.to_string()),
             ParameterizedValue::Uuid(uuid) => PrismaValue::Uuid(uuid),
             ParameterizedValue::DateTime(dt) => PrismaValue::DateTime(dt),
             ParameterizedValue::Char(c) => PrismaValue::String(c.to_string()),
