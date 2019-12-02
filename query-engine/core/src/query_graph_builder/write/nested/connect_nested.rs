@@ -27,10 +27,10 @@ pub fn connect_nested_connect(
     // Build all finders upfront.
     let filters: Vec<Filter> = utils::coerce_vec(value)
         .into_iter()
+        .unique()
         .map(|value: ParsedInputValue| extract_filter(value.try_into()?, &child_model)?.assert_size(1)?)
         .collect::<QueryGraphBuilderResult<Vec<Filter>>>()?
         .into_iter()
-        .unique()
         .collect();
 
     if relation.is_many_to_many() {
@@ -69,10 +69,9 @@ fn handle_many_to_many(
     graph: &mut QueryGraph,
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
-    finders: Vec<RecordFinder>,
+    filter: Filter,
     child_model: &ModelRef,
 ) -> QueryGraphBuilderResult<()> {
-    let expected_connects = finders.len();
     let child_read_query = utils::read_ids_infallible(&child_model, finders);
     let child_node = graph.create_node(child_read_query);
 

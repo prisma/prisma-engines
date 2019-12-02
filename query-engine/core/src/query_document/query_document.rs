@@ -37,7 +37,7 @@ pub struct Selection {
     pub nested_selections: Vec<Selection>,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum QueryValue {
     Int(i64),
     Float(f64),

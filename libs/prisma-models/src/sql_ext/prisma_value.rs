@@ -31,7 +31,7 @@ impl<'a> From<PrismaValue> for DatabaseValue<'a> {
     fn from(pv: PrismaValue) -> Self {
         match pv {
             PrismaValue::String(s) => s.into(),
-            PrismaValue::Float(f) => (f as f64).into(),
+            PrismaValue::Float(d) => d.into(),
             PrismaValue::Boolean(b) => b.into(),
             PrismaValue::DateTime(d) => d.into(),
             PrismaValue::Enum(e) => e.as_string().into(),
@@ -51,7 +51,7 @@ impl<'a> From<ParameterizedValue<'a>> for PrismaValue {
         match pv {
             ParameterizedValue::Null => PrismaValue::Null,
             ParameterizedValue::Integer(i) => PrismaValue::Int(i),
-            ParameterizedValue::Real(f) => PrismaValue::Float(f),
+            ParameterizedValue::Real(d) => PrismaValue::Float(d),
             ParameterizedValue::Text(s) => PrismaValue::String(s.into_owned()),
             ParameterizedValue::Boolean(b) => PrismaValue::Boolean(b),
             ParameterizedValue::Array(v) => {

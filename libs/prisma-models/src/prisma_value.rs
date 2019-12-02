@@ -1,5 +1,6 @@
 use crate::{DomainError, DomainResult, EnumValue};
 use chrono::prelude::*;
+use rust_decimal::{prelude::FromPrimitive, Decimal};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::{convert::TryFrom, fmt, string::FromUtf8Error};
@@ -21,7 +22,7 @@ pub enum PrismaValue {
     String(String),
 
     #[serde(rename = "float")]
-    Float(f64),
+    Float(Decimal),
 
     #[serde(rename = "bool")]
     Boolean(bool),
@@ -97,15 +98,23 @@ impl From<String> for PrismaValue {
     }
 }
 
-impl From<f64> for PrismaValue {
-    fn from(f: f64) -> Self {
-        PrismaValue::Float(f)
+impl TryFrom<f64> for PrismaValue {
+    type Error = DomainError;
+
+    fn try_from(f: f64) -> DomainResult<PrismaValue> {
+        Decimal::from_f64(f)
+            .map(|d| PrismaValue::Float(d))
+            .ok_or(DomainError::ConversionFailure("f32", "Decimal"))
     }
 }
 
-impl From<f32> for PrismaValue {
-    fn from(f: f32) -> Self {
-        PrismaValue::Float(f64::from(f))
+impl TryFrom<f32> for PrismaValue {
+    type Error = DomainError;
+
+    fn try_from(f: f32) -> DomainResult<PrismaValue> {
+        Decimal::from_f32(f)
+            .map(|d| PrismaValue::Float(d))
+            .ok_or(DomainError::ConversionFailure("f64", "Decimal"))
     }
 }
 
