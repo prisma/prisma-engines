@@ -6,6 +6,7 @@ use rusqlite::{
     types::{Null, ToSql, ToSqlOutput, ValueRef},
     Error as RusqlError, Row as SqliteRow, Rows as SqliteRows,
 };
+use rust_decimal::prelude::ToPrimitive;
 
 impl<'a> GetRow for SqliteRow<'a> {
     fn get_result_row<'b>(&'b self) -> crate::Result<Vec<ParameterizedValue<'static>>> {
@@ -24,7 +25,7 @@ impl<'a> GetRow for SqliteRow<'a> {
                     }
                     _ => ParameterizedValue::Integer(i),
                 },
-                ValueRef::Real(f) => ParameterizedValue::Real(f),
+                ValueRef::Real(f) => ParameterizedValue::from(f),
                 ValueRef::Text(bytes) => ParameterizedValue::Text(String::from_utf8(bytes.to_vec())?.into()),
                 ValueRef::Blob(_) => panic!("Blobs not supprted, yet"),
             };
@@ -55,7 +56,7 @@ impl<'a> ToSql for ParameterizedValue<'a> {
         let value = match self {
             ParameterizedValue::Null => ToSqlOutput::from(Null),
             ParameterizedValue::Integer(integer) => ToSqlOutput::from(*integer),
-            ParameterizedValue::Real(float) => ToSqlOutput::from(*float),
+            ParameterizedValue::Real(d) => ToSqlOutput::from((*d).to_f64().expect("Decimal is not a f64.")),
             ParameterizedValue::Text(cow) => ToSqlOutput::from(&**cow),
             ParameterizedValue::Boolean(boo) => ToSqlOutput::from(*boo),
             ParameterizedValue::Char(c) => ToSqlOutput::from(*c as u8),

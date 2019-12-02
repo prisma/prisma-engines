@@ -5,7 +5,7 @@ use crate::{
 use bytes::BytesMut;
 #[cfg(feature = "chrono-0_4")]
 use chrono::{DateTime, NaiveDateTime, Utc};
-use rust_decimal::Decimal;
+use rust_decimal::{prelude::FromPrimitive, Decimal};
 use std::{error::Error, str::FromStr};
 use tokio_postgres::{
     types::{self, FromSql, IsNull, ToSql, Type as PostgresType},
@@ -87,21 +87,20 @@ impl GetRow for PostgresRow {
                 PostgresType::NUMERIC => match row.try_get(i)? {
                     Some(val) => {
                         let val: Decimal = val;
-                        let val: f64 = val.to_string().parse().unwrap();
                         ParameterizedValue::Real(val)
                     }
                     None => ParameterizedValue::Null,
                 },
                 PostgresType::FLOAT4 => match row.try_get(i)? {
                     Some(val) => {
-                        let val: f32 = val;
-                        ParameterizedValue::Real(f64::from(val))
+                        let val: Decimal = Decimal::from_f32(val).expect("f32 is not a Decimal");
+                        ParameterizedValue::Real(val)
                     }
                     None => ParameterizedValue::Null,
                 },
                 PostgresType::FLOAT8 => match row.try_get(i)? {
                     Some(val) => {
-                        let val: f64 = val;
+                        let val: Decimal = Decimal::from_f64(val).expect("f64 is not a Decimal");
                         ParameterizedValue::Real(val)
                     }
                     None => ParameterizedValue::Null,
@@ -161,11 +160,7 @@ impl GetRow for PostgresRow {
                 PostgresType::FLOAT4_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<f32> = val;
-                        ParameterizedValue::Array(
-                            val.into_iter()
-                                .map(|x| ParameterizedValue::Real(f64::from(x)))
-                                .collect(),
-                        )
+                        ParameterizedValue::Array(val.into_iter().map(|x| ParameterizedValue::from(x)).collect())
                     }
                     None => ParameterizedValue::Null,
                 },
@@ -173,7 +168,7 @@ impl GetRow for PostgresRow {
                 PostgresType::FLOAT8_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<f64> = val;
-                        ParameterizedValue::Array(val.into_iter().map(|x| ParameterizedValue::Real(x as f64)).collect())
+                        ParameterizedValue::Array(val.into_iter().map(|x| ParameterizedValue::from(x)).collect())
                     }
                     None => ParameterizedValue::Null,
                 },

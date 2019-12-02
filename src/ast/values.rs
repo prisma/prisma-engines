@@ -1,5 +1,9 @@
 use crate::ast::*;
 use crate::error::Error;
+use rust_decimal::{
+    prelude::{FromPrimitive, ToPrimitive},
+    Decimal,
+};
 use std::{
     borrow::{Borrow, Cow},
     convert::TryFrom,
@@ -20,7 +24,7 @@ use chrono::{DateTime, Utc};
 pub enum ParameterizedValue<'a> {
     Null,
     Integer(i64),
-    Real(f64),
+    Real(Decimal),
     Text(Cow<'a, str>),
     Boolean(bool),
     Char(char),
@@ -91,7 +95,7 @@ impl<'a> From<ParameterizedValue<'a>> for Value {
         match pv {
             ParameterizedValue::Null => Value::Null,
             ParameterizedValue::Integer(i) => Value::Number(Number::from(i)),
-            ParameterizedValue::Real(f) => Value::Number(Number::from_f64(f).unwrap()),
+            ParameterizedValue::Real(d) => serde_json::to_value(d).unwrap(),
             ParameterizedValue::Text(cow) => Value::String(cow.into_owned()),
             ParameterizedValue::Boolean(b) => Value::Bool(b),
             ParameterizedValue::Char(c) => {
@@ -186,10 +190,18 @@ impl<'a> ParameterizedValue<'a> {
         }
     }
 
-    /// Returns a f64 if the value is a real value, otherwise `None`.
+    /// Returns a f64 if the value is a real value and the underlying decimal can be converted, otherwise `None`.
     pub fn as_f64(&self) -> Option<f64> {
         match self {
-            ParameterizedValue::Real(f) => Some(*f),
+            ParameterizedValue::Real(d) => d.to_f64(),
+            _ => None,
+        }
+    }
+
+    /// Returns a decimal if the value is a real value, otherwise `None`.
+    pub fn as_decimal(&self) -> Option<Decimal> {
+        match self {
+            ParameterizedValue::Real(d) => Some(*d),
             _ => None,
         }
     }
@@ -368,11 +380,22 @@ impl<'a> TryFrom<ParameterizedValue<'a>> for i64 {
     }
 }
 
+impl<'a> TryFrom<ParameterizedValue<'a>> for Decimal {
+    type Error = Error;
+
+    fn try_from(value: ParameterizedValue<'a>) -> Result<Decimal, Self::Error> {
+        value.as_decimal().ok_or(Error::ConversionError("Not a decimal"))
+    }
+}
+
 impl<'a> TryFrom<ParameterizedValue<'a>> for f64 {
     type Error = Error;
 
     fn try_from(value: ParameterizedValue<'a>) -> Result<f64, Self::Error> {
-        value.as_f64().ok_or(Error::ConversionError("Not an f64"))
+        value
+            .as_decimal()
+            .and_then(|d| d.to_f64())
+            .ok_or(Error::ConversionError("Not a f64"))
     }
 }
 
@@ -419,8 +442,8 @@ macro_rules! parameterized_value {
 }
 
 parameterized_value!(i64, Integer);
-parameterized_value!(f64, Real);
 parameterized_value!(bool, Boolean);
+parameterized_value!(Decimal, Real);
 
 #[cfg(feature = "json-1")]
 parameterized_value!(Value, Json);
@@ -433,6 +456,22 @@ impl<'a> From<DateTime<Utc>> for ParameterizedValue<'a> {
     #[inline]
     fn from(that: DateTime<Utc>) -> Self {
         ParameterizedValue::DateTime(that)
+    }
+}
+
+impl<'a> From<f64> for ParameterizedValue<'a> {
+    #[inline]
+    fn from(that: f64) -> Self {
+        let dec = Decimal::from_f64(that).expect("f64 is not a Decimal");
+        ParameterizedValue::Real(dec)
+    }
+}
+
+impl<'a> From<f32> for ParameterizedValue<'a> {
+    #[inline]
+    fn from(that: f32) -> Self {
+        let dec = Decimal::from_f32(that).expect("f32 is not a Decimal");
+        ParameterizedValue::Real(dec)
     }
 }
 
@@ -640,7 +679,7 @@ mod tests {
 
     #[test]
     fn a_parameterized_value_of_reals_can_be_converted_into_a_vec() {
-        let pv = ParameterizedValue::Array(vec![ParameterizedValue::Real(1.0)]);
+        let pv = ParameterizedValue::Array(vec![ParameterizedValue::from(1.0)]);
 
         let values: Vec<f64> = pv.into_vec().expect("convert into Vec<f64>");
 
