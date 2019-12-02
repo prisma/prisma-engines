@@ -1,23 +1,20 @@
-#![allow(unused)]
 mod test_harness;
 
-use barrel::{types, Migration, SqlVariant};
-use migration_core::api::GenericApi;
-use pretty_assertions::{assert_eq, assert_ne};
-use sql_connection::SyncSqlConnection;
-use quaint::prelude::SqlFamily;
-use sql_migration_connector::SqlMigrationConnector;
+use barrel::types;
+use pretty_assertions::assert_eq;
 use sql_schema_describer::*;
-use std::sync::Arc;
 use test_harness::*;
 
 #[test_each_connector]
 async fn adding_a_model_for_an_existing_table_must_work(api: &TestApi) {
-    let initial_result = api.barrel().execute(|migration| {
-        migration.create_table("Blog", |t| {
-            t.add_column("id", types::primary());
-        });
-    });
+    let initial_result = api
+        .barrel()
+        .execute(|migration| {
+            migration.create_table("Blog", |t| {
+                t.add_column("id", types::primary());
+            });
+        })
+        .await;
 
     let dm = r#"
             model Blog {
@@ -48,9 +45,12 @@ async fn removing_a_model_for_a_table_that_is_already_deleted_must_work(api: &Te
     let initial_result = api.infer_and_apply(&dm1).await.sql_schema;
     assert!(initial_result.has_table("Post"));
 
-    let result = api.barrel().execute(|migration| {
-        migration.drop_table("Post");
-    });
+    let result = api
+        .barrel()
+        .execute(|migration| {
+            migration.drop_table("Post");
+        })
+        .await;
 
     assert!(!result.has_table("Post"));
 
@@ -65,12 +65,15 @@ async fn removing_a_model_for_a_table_that_is_already_deleted_must_work(api: &Te
 
 #[test_each_connector]
 async fn creating_a_field_for_an_existing_column_with_a_compatible_type_must_work(api: &TestApi) {
-    let initial_result = api.barrel().execute(|migration| {
-        migration.create_table("Blog", |t| {
-            t.add_column("id", types::primary());
-            t.add_column("title", types::text());
-        });
-    });
+    let initial_result = api
+        .barrel()
+        .execute(|migration| {
+            migration.create_table("Blog", |t| {
+                t.add_column("id", types::primary());
+                t.add_column("title", types::text());
+            });
+        })
+        .await;
     let dm = r#"
             model Blog {
                 id Int @id
@@ -83,12 +86,15 @@ async fn creating_a_field_for_an_existing_column_with_a_compatible_type_must_wor
 
 #[test_each_connector]
 async fn creating_a_field_for_an_existing_column_and_changing_its_type_must_work(api: &TestApi) {
-    let initial_result = api.barrel().execute(|migration| {
-        migration.create_table("Blog", |t| {
-            t.add_column("id", types::primary());
-            t.add_column("title", types::integer().nullable(true));
-        });
-    });
+    let initial_result = api
+        .barrel()
+        .execute(|migration| {
+            migration.create_table("Blog", |t| {
+                t.add_column("id", types::primary());
+                t.add_column("title", types::integer().nullable(true));
+            });
+        })
+        .await;
     let initial_column = initial_result.table_bang("Blog").column_bang("title");
     assert_eq!(initial_column.tpe.family, ColumnTypeFamily::Int);
     assert_eq!(initial_column.is_required(), false);
@@ -111,12 +117,15 @@ async fn creating_a_field_for_an_existing_column_and_changing_its_type_must_work
 
 #[test_each_connector]
 async fn creating_a_field_for_an_existing_column_and_simultaneously_making_it_optional(api: &TestApi) {
-    let initial_result = api.barrel().execute(|migration| {
-        migration.create_table("Blog", |t| {
-            t.add_column("id", types::primary());
-            t.add_column("title", types::text());
-        });
-    });
+    let initial_result = api
+        .barrel()
+        .execute(|migration| {
+            migration.create_table("Blog", |t| {
+                t.add_column("id", types::primary());
+                t.add_column("title", types::text());
+            });
+        })
+        .await;
     let initial_column = initial_result.table_bang("Blog").column_bang("title");
     assert_eq!(initial_column.is_required(), true);
 
@@ -141,14 +150,17 @@ async fn creating_a_scalar_list_field_for_an_existing_table_must_work(api: &Test
     let initial_result = api.infer_and_apply(&dm1).await.sql_schema;
     assert!(!initial_result.has_table("Blog_tags"));
 
-    let mut result = api.barrel().execute(|migration| {
-        migration.create_table("Blog_tags", |t| {
-            // TODO: barrel does not render this one correctly
-            t.add_column("nodeId", types::foreign("Blog", "id"));
-            t.add_column("position", types::integer());
-            t.add_column("value", types::text());
-        });
-    });
+    let mut result = api
+        .barrel()
+        .execute(|migration| {
+            migration.create_table("Blog_tags", |t| {
+                // TODO: barrel does not render this one correctly
+                t.add_column("nodeId", types::foreign("Blog", "id"));
+                t.add_column("position", types::integer());
+                t.add_column("value", types::text());
+            });
+        })
+        .await;
 
     // hacks for things i can't set in barrel due to limitations
     for table in &mut result.tables {
@@ -195,13 +207,16 @@ async fn delete_a_field_for_a_non_existent_column_must_work(api: &TestApi) {
     let initial_result = api.infer_and_apply(&dm1).await.sql_schema;
     assert_eq!(initial_result.table_bang("Blog").column("title").is_some(), true);
 
-    let result = api.barrel().execute(|migration| {
-        // sqlite does not support dropping columns. So we are emulating it..
-        migration.drop_table("Blog");
-        migration.create_table("Blog", |t| {
-            t.add_column("id", types::primary());
-        });
-    });
+    let result = api
+        .barrel()
+        .execute(|migration| {
+            // sqlite does not support dropping columns. So we are emulating it..
+            migration.drop_table("Blog");
+            migration.create_table("Blog", |t| {
+                t.add_column("id", types::primary());
+            });
+        })
+        .await;
     assert_eq!(result.table_bang("Blog").column("title").is_some(), false);
 
     let dm2 = r#"
@@ -224,9 +239,12 @@ async fn deleting_a_scalar_list_field_for_a_non_existent_list_table_must_work(ap
     let initial_result = api.infer_and_apply(&dm1).await.sql_schema;
     assert!(initial_result.has_table("Blog_tags"));
 
-    let result = api.barrel().execute(|migration| {
-        migration.drop_table("Blog_tags");
-    });
+    let result = api
+        .barrel()
+        .execute(|migration| {
+            migration.drop_table("Blog_tags");
+        })
+        .await;
     assert!(!result.has_table("Blog_tags"));
 
     let dm2 = r#"
@@ -250,13 +268,16 @@ async fn updating_a_field_for_a_non_existent_column(api: &TestApi) {
     let initial_column = initial_result.table_bang("Blog").column_bang("title");
     assert_eq!(initial_column.tpe.family, ColumnTypeFamily::String);
 
-    let result = api.barrel().execute(|migration| {
-        // sqlite does not support dropping columns. So we are emulating it..
-        migration.drop_table("Blog");
-        migration.create_table("Blog", |t| {
-            t.add_column("id", types::primary());
-        });
-    });
+    let result = api
+        .barrel()
+        .execute(|migration| {
+            // sqlite does not support dropping columns. So we are emulating it..
+            migration.drop_table("Blog");
+            migration.create_table("Blog", |t| {
+                t.add_column("id", types::primary());
+            });
+        })
+        .await;
     assert_eq!(result.table_bang("Blog").column("title").is_some(), false);
 
     let dm2 = r#"
@@ -289,14 +310,17 @@ async fn renaming_a_field_where_the_column_was_already_renamed_must_work(api: &T
     let initial_column = initial_result.table_bang("Blog").column_bang("title");
     assert_eq!(initial_column.tpe.family, ColumnTypeFamily::String);
 
-    let result = api.barrel().execute(|migration| {
-        // sqlite does not support renaming columns. So we are emulating it..
-        migration.drop_table("Blog");
-        migration.create_table("Blog", |t| {
-            t.add_column("id", types::primary());
-            t.add_column("new_title", types::text());
-        });
-    });
+    let result = api
+        .barrel()
+        .execute(|migration| {
+            // sqlite does not support renaming columns. So we are emulating it..
+            migration.drop_table("Blog");
+            migration.create_table("Blog", |t| {
+                t.add_column("id", types::primary());
+                t.add_column("new_title", types::text());
+            });
+        })
+        .await;
     assert_eq!(result.table_bang("Blog").column("new_title").is_some(), true);
 
     let dm2 = r#"

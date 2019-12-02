@@ -206,13 +206,11 @@ impl Expressionista {
                 let into_expr = Box::new(move |node: Node| {
                     let flow: Flow = node.try_into()?;
                     match flow {
-                        Flow::If(cond_fn) => {
-                            Ok(Expression::If {
-                                func: cond_fn,
-                                then: vec![then_expr],
-                                else_: else_expr,
-                            })
-                        }
+                        Flow::If(cond_fn) => Ok(Expression::If {
+                            func: cond_fn,
+                            then: vec![then_expr],
+                            else_: else_expr,
+                        }),
                     }
                 });
 

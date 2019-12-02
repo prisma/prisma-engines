@@ -4,7 +4,7 @@ use crate::ast;
 pub struct SourceSerializer {}
 
 impl SourceSerializer {
-    pub fn add_sources_to_ast(sources: &[Box<dyn Source>], ast_datamodel: &mut ast::SchemaAst) {
+    pub fn add_sources_to_ast(sources: &[Box<dyn Source + Send + Sync>], ast_datamodel: &mut ast::SchemaAst) {
         let mut tops: Vec<ast::Top> = Vec::new();
 
         for source in sources {

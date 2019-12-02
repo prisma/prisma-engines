@@ -24,8 +24,8 @@ impl SourceLoader {
 
     /// Loads all source config blocks form the given AST,
     /// and returns a Source instance for each.
-    pub fn load(&self, ast_schema: &ast::SchemaAst) -> Result<Vec<Box<dyn Source>>, ErrorCollection> {
-        let mut sources: Vec<Box<dyn Source>> = vec![];
+    pub fn load(&self, ast_schema: &ast::SchemaAst) -> Result<Vec<Box<dyn Source + Send + Sync>>, ErrorCollection> {
+        let mut sources: Vec<Box<dyn Source + Send + Sync>> = vec![];
         let mut errors = ErrorCollection::new();
 
         for src in &ast_schema.sources() {
@@ -48,7 +48,10 @@ impl SourceLoader {
     }
 
     /// Internal: Loads a single source from a source config block in the datamodel.
-    pub fn load_source(&self, ast_source: &ast::SourceConfig) -> Result<Option<Box<dyn Source>>, DatamodelError> {
+    pub fn load_source(
+        &self,
+        ast_source: &ast::SourceConfig,
+    ) -> Result<Option<Box<dyn Source + Send + Sync>>, DatamodelError> {
         let mut args = Arguments::new(&ast_source.properties, ast_source.span);
         let (env_var_for_url, url) = args.arg("url")?.as_str_from_env()?;
         let provider_arg = args.arg("provider")?;

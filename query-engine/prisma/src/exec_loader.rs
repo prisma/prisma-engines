@@ -1,26 +1,28 @@
 use crate::{PrismaError, PrismaResult};
 use connector::Connector;
-use query_core::executor::{InterpretingExecutor, QueryExecutor};
 use datamodel::{
     configuration::{MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME},
     Source,
 };
+use query_core::executor::{InterpretingExecutor, QueryExecutor};
 use std::{collections::HashMap, path::PathBuf};
 use url::Url;
 
 #[cfg(feature = "sql")]
 use sql_connector::*;
 
-pub fn load(source: &dyn Source) -> PrismaResult<(String, Box<dyn QueryExecutor + Send + Sync + 'static>)> {
+pub async fn load(
+    source: &(dyn Source + Send + Sync),
+) -> PrismaResult<(String, Box<dyn QueryExecutor + Send + Sync + 'static>)> {
     match source.connector_type() {
         #[cfg(feature = "sql")]
-        SQLITE_SOURCE_NAME => sqlite(source),
+        SQLITE_SOURCE_NAME => sqlite(source).await,
 
         #[cfg(feature = "sql")]
-        MYSQL_SOURCE_NAME => mysql(source),
+        MYSQL_SOURCE_NAME => mysql(source).await,
 
         #[cfg(feature = "sql")]
-        POSTGRES_SOURCE_NAME => postgres(source),
+        POSTGRES_SOURCE_NAME => postgres(source).await,
 
         x => Err(PrismaError::ConfigurationError(format!(
             "Unsupported connector type: {}",
@@ -30,10 +32,12 @@ pub fn load(source: &dyn Source) -> PrismaResult<(String, Box<dyn QueryExecutor 
 }
 
 #[cfg(feature = "sql")]
-fn sqlite(source: &dyn Source) -> PrismaResult<(String, Box<dyn QueryExecutor + Send + Sync + 'static>)> {
+async fn sqlite(
+    source: &(dyn Source + Send + Sync),
+) -> PrismaResult<(String, Box<dyn QueryExecutor + Send + Sync + 'static>)> {
     trace!("Loading SQLite connector...");
 
-    let sqlite = Sqlite::from_source(source)?;
+    let sqlite = Sqlite::from_source(source).await?;
     let path = PathBuf::from(sqlite.file_path());
     let db_name = path.file_stem().unwrap().to_str().unwrap().to_owned(); // Safe due to previous validations.
 
@@ -42,7 +46,9 @@ fn sqlite(source: &dyn Source) -> PrismaResult<(String, Box<dyn QueryExecutor + 
 }
 
 #[cfg(feature = "sql")]
-fn postgres(source: &dyn Source) -> PrismaResult<(String, Box<dyn QueryExecutor + Send + Sync + 'static>)> {
+async fn postgres(
+    source: &(dyn Source + Send + Sync),
+) -> PrismaResult<(String, Box<dyn QueryExecutor + Send + Sync + 'static>)> {
     trace!("Loading Postgres connector...");
 
     let url = Url::parse(&source.url().value)?;
@@ -53,17 +59,19 @@ fn postgres(source: &dyn Source) -> PrismaResult<(String, Box<dyn QueryExecutor 
         .map(ToString::to_string)
         .unwrap_or_else(|| String::from("public"));
 
-    let psql = PostgreSql::from_source(source)?;
+    let psql = PostgreSql::from_source(source).await?;
 
     trace!("Loaded Postgres connector.");
     Ok((db_name, sql_executor("postgres", psql)))
 }
 
 #[cfg(feature = "sql")]
-fn mysql(source: &dyn Source) -> PrismaResult<(String, Box<dyn QueryExecutor + Send + Sync + 'static>)> {
+async fn mysql(
+    source: &(dyn Source + Send + Sync),
+) -> PrismaResult<(String, Box<dyn QueryExecutor + Send + Sync + 'static>)> {
     trace!("Loading MySQL connector...");
 
-    let mysql = Mysql::from_source(source)?;
+    let mysql = Mysql::from_source(source).await?;
     let url = Url::parse(&source.url().value)?;
     let err_str = "No database found in connection string";
 

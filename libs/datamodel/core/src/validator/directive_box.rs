@@ -23,7 +23,7 @@ impl DirectiveBox {
     /// the directives defined by the given sources registered.
     ///
     /// The directives defined by the given sources will be namespaced.
-    pub fn with_sources(_sources: &[Box<dyn configuration::Source>]) -> DirectiveBox {
+    pub fn with_sources(_sources: &[Box<dyn configuration::Source + Send + Sync>]) -> DirectiveBox {
         //        sources.iter().fold(DirectiveBox::new(), |mut directives, source| {
         //            //            directives
         //            //                .enm

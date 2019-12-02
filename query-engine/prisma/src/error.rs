@@ -1,7 +1,7 @@
-use query_core::{response_ir, CoreError};
 use datamodel::error::ErrorCollection;
 use failure::{Error, Fail};
 use graphql_parser::query::ParseError as GqlParseError;
+use query_core::{response_ir, CoreError};
 use serde_json;
 
 #[cfg(feature = "sql")]

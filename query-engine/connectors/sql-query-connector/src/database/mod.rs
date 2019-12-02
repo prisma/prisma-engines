@@ -8,13 +8,15 @@ pub(crate) mod operations;
 
 use connector_interface::Connector;
 use datamodel::Source;
+use async_trait::async_trait;
 
 pub use mysql::*;
 pub use postgresql::*;
 pub use sqlite::*;
 
+#[async_trait]
 pub trait FromSource {
-    fn from_source(source: &dyn Source) -> crate::Result<Self>
+    async fn from_source(source: &dyn Source) -> crate::Result<Self>
     where
         Self: Connector + Sized;
 }

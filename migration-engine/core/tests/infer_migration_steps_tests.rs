@@ -3,8 +3,8 @@
 mod test_harness;
 
 use migration_core::commands::*;
-use pretty_assertions::{assert_eq};
-use sql_migration_connector::{PrettySqlMigrationStep};
+use pretty_assertions::assert_eq;
+use sql_migration_connector::PrettySqlMigrationStep;
 use test_harness::*;
 
 #[test_each_connector]
@@ -133,7 +133,10 @@ async fn watch_migrations_must_be_returned_when_transitioning_out_of_watch_mode(
 
     let mut applied_database_steps: Vec<PrettySqlMigrationStep> = Vec::new();
 
-    let output = api.infer_and_apply_with_migration_id(&dm, "watch01").await.migration_output;
+    let output = api
+        .infer_and_apply_with_migration_id(&dm, "watch01")
+        .await
+        .migration_output;
     applied_database_steps
         .extend(serde_json::from_value::<Vec<PrettySqlMigrationStep>>(output.database_steps).unwrap());
 
@@ -153,7 +156,10 @@ async fn watch_migrations_must_be_returned_when_transitioning_out_of_watch_mode(
             }
         "#;
 
-    let output = api.infer_and_apply_with_migration_id(&dm, "watch02").await.migration_output;
+    let output = api
+        .infer_and_apply_with_migration_id(&dm, "watch02")
+        .await
+        .migration_output;
     applied_database_steps
         .extend(serde_json::from_value::<Vec<PrettySqlMigrationStep>>(output.database_steps).unwrap());
 
@@ -195,7 +201,10 @@ async fn watch_migrations_must_be_returned_in_addition_to_regular_inferred_steps
             }
         "#;
 
-    let output = api.infer_and_apply_with_migration_id(&dm, "watch01").await.migration_output;
+    let output = api
+        .infer_and_apply_with_migration_id(&dm, "watch01")
+        .await
+        .migration_output;
     applied_database_steps
         .extend(serde_json::from_value::<Vec<PrettySqlMigrationStep>>(output.database_steps).unwrap());
 
@@ -215,7 +224,10 @@ async fn watch_migrations_must_be_returned_in_addition_to_regular_inferred_steps
             }
         "#;
 
-    let output = api.infer_and_apply_with_migration_id(&dm, "watch02").await.migration_output;
+    let output = api
+        .infer_and_apply_with_migration_id(&dm, "watch02")
+        .await
+        .migration_output;
     applied_database_steps
         .extend(serde_json::from_value::<Vec<PrettySqlMigrationStep>>(output.database_steps).unwrap());
 

@@ -20,7 +20,7 @@ impl LowerDmlToAst {
     ///
     /// The directives defined by the given sources will be namespaced.
     #[allow(unused)]
-    fn with_sources(sources: &[Box<dyn configuration::Source>]) -> LowerDmlToAst {
+    fn with_sources(sources: &[Box<dyn configuration::Source + Send + Sync>]) -> LowerDmlToAst {
         LowerDmlToAst {
             directives: DirectiveBox::with_sources(sources),
         }

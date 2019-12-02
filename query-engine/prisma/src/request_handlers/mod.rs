@@ -1,12 +1,12 @@
 pub mod graphql;
 
-pub use query_core::schema::QuerySchemaRenderer;
 pub use graphql::{GraphQlBody, GraphQlRequestHandler};
+pub use query_core::schema::QuerySchemaRenderer;
 
 use crate::context::PrismaContext;
+use async_trait::async_trait;
 use serde_json;
 use std::{collections::HashMap, fmt::Debug};
-use async_trait::async_trait;
 
 #[async_trait]
 pub trait RequestHandler {
