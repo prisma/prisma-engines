@@ -1,9 +1,5 @@
 use log::debug;
-<<<<<<< HEAD
-use sql_connection::{GenericSqlConnection, SyncSqlConnection};
-=======
 use quaint::{prelude::*, single::Quaint};
->>>>>>> master
 use sql_schema_describer::*;
 use std::sync::Arc;
 

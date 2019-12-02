@@ -571,7 +571,7 @@ async fn introspecting_cascading_delete_behaviour_should_work(api: &TestApi) {
 // native arrays
 
 #[test_one_connector(connector = "postgres")]
-fn introspecting_native_arrays_should_work(api: &TestApi) {
+async fn introspecting_native_arrays_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel.execute(|migration| {
         migration.create_table("Post", |t| {
@@ -586,6 +586,6 @@ fn introspecting_native_arrays_should_work(api: &TestApi) {
                ints Int []
             }
         "#;
-    let result = dbg!(api.introspect());
+    let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }

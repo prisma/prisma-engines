@@ -530,19 +530,11 @@ async fn adding_an_inline_relation_must_result_in_a_foreign_key_in_the_model_tab
 
     let b_column = table.column_bang("b");
     assert_eq!(b_column.tpe.family, ColumnTypeFamily::Int);
-<<<<<<< HEAD
     assert_eq!(b_column.tpe.arity, ColumnArity::Required);
 
     let c_column = table.column_bang("c");
     assert_eq!(c_column.tpe.family, ColumnTypeFamily::Int);
     assert_eq!(c_column.tpe.arity, ColumnArity::Nullable);
-=======
-    assert_eq!(b_column.arity, ColumnArity::Required);
-
-    let c_column = table.column_bang("c");
-    assert_eq!(c_column.tpe.family, ColumnTypeFamily::Int);
-    assert_eq!(c_column.arity, ColumnArity::Nullable);
->>>>>>> master
 
     assert_eq!(
         table.foreign_keys,
@@ -552,7 +544,6 @@ async fn adding_an_inline_relation_must_result_in_a_foreign_key_in_the_model_tab
                     SqlFamily::Postgres => Some("A_b_fkey".to_owned()),
                     SqlFamily::Mysql => Some("A_ibfk_1".to_owned()),
                     SqlFamily::Sqlite => None,
-<<<<<<< HEAD
                 },
                 columns: vec![b_column.name.clone()],
                 referenced_table: "B".to_string(),
@@ -565,20 +556,6 @@ async fn adding_an_inline_relation_must_result_in_a_foreign_key_in_the_model_tab
                     SqlFamily::Mysql => Some("A_ibfk_2".to_owned()),
                     SqlFamily::Sqlite => None,
                 },
-=======
-                },
-                columns: vec![b_column.name.clone()],
-                referenced_table: "B".to_string(),
-                referenced_columns: vec!["id".to_string()],
-                on_delete_action: ForeignKeyAction::Restrict, // required relations can't set ON DELETE SET NULL
-            },
-            ForeignKey {
-                constraint_name: match api.sql_family() {
-                    SqlFamily::Postgres => Some("A_c_fkey".to_owned()),
-                    SqlFamily::Mysql => Some("A_ibfk_2".to_owned()),
-                    SqlFamily::Sqlite => None,
-                },
->>>>>>> master
                 columns: vec![c_column.name.clone()],
                 referenced_table: "C".to_string(),
                 referenced_columns: vec!["id".to_string()],

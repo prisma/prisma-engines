@@ -11,6 +11,7 @@ use quaint::{prelude::*, single::Quaint};
 use serde_json::json;
 use test_harness::*;
 use url::Url;
+use test_setup::{postgres_url, mysql_url};
 
 #[tokio::test]
 async fn authentication_failure_must_return_a_known_error_on_postgres() {
