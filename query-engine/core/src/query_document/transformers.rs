@@ -7,6 +7,7 @@
 use super::*;
 use chrono::prelude::*;
 use prisma_models::{EnumValue, EnumValueWrapper, GraphqlId, OrderBy, PrismaValue};
+use rust_decimal::prelude::ToPrimitive;
 use serde_json::Value;
 use std::convert::TryInto;
 
@@ -135,7 +136,7 @@ impl TryInto<Option<f64>> for ParsedInputValue {
         let prisma_value: PrismaValue = self.try_into()?;
 
         match prisma_value {
-            PrismaValue::Float(f) => Ok(Some(f)),
+            PrismaValue::Float(d) => Ok(d.to_f64()),
             PrismaValue::Null => Ok(None),
             v => Err(QueryParserError::AssertionError(format!(
                 "Attempted conversion of non-float Prisma value type ({:?}) into float failed.",

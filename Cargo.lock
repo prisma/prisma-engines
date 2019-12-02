@@ -2149,6 +2149,7 @@ dependencies = [
  "prisma-inflector 0.1.0",
  "prisma-models 0.0.0",
  "query-connector 0.1.0",
+ "rust_decimal 1.0.2 (git+https://github.com/pimeys/rust-decimal.git?branch=tokio-postgres)",
  "serde_json 1.0.42 (registry+https://github.com/rust-lang/crates.io-index)",
  "uuid 0.7.4 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
@@ -2671,6 +2672,7 @@ dependencies = [
  "quaint 0.1.0 (git+https://github.com/prisma/quaint.git)",
  "query-connector 0.1.0",
  "rand 0.6.5 (registry+https://github.com/rust-lang/crates.io-index)",
+ "rust_decimal 1.0.2 (git+https://github.com/pimeys/rust-decimal.git?branch=tokio-postgres)",
  "serde 1.0.103 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_json 1.0.42 (registry+https://github.com/rust-lang/crates.io-index)",
  "tokio-postgres 0.4.0-rc.3 (registry+https://github.com/rust-lang/crates.io-index)",

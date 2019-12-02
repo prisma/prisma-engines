@@ -20,12 +20,12 @@ pub enum Field {
     Scalar(ScalarFieldRef),
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq, Hash)]
 pub struct FieldManifestation {
     pub db_name: String,
 }
 
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum TypeIdentifier {
     String,
     Float,

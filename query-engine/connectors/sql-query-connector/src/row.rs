@@ -5,6 +5,7 @@ use quaint::{
     ast::{DatabaseValue, ParameterizedValue},
     connector::ResultRow,
 };
+use rust_decimal::{prelude::FromPrimitive, Decimal};
 use std::{borrow::Borrow, io};
 use uuid::Uuid;
 
@@ -115,7 +116,9 @@ impl ToSqlRow for ResultRow {
                 TypeIdentifier::Float => match p_value {
                     ParameterizedValue::Null => PrismaValue::Null,
                     ParameterizedValue::Real(f) => PrismaValue::Float(f),
-                    ParameterizedValue::Integer(i) => PrismaValue::Float(i as f64),
+                    ParameterizedValue::Integer(i) => {
+                        PrismaValue::Float(Decimal::from_f64(i as f64).expect("f64 was not a Decimal."))
+                    }
                     ParameterizedValue::Text(s) => PrismaValue::Float(s.parse().unwrap()),
                     _ => {
                         let error = io::Error::new(

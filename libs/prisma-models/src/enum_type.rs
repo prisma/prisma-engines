@@ -20,7 +20,7 @@ impl EnumType {
 
 /// Values in enums are solved with an enum rather than a trait or generic
 /// to avoid cluttering all type defs in this file, essentially.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct EnumValue {
     pub name: String,
     pub value: EnumValueWrapper,
@@ -98,17 +98,17 @@ impl<'de> Visitor<'de> for EnumValueVisitor {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Eq, Hash, PartialEq)]
 pub enum EnumValueWrapper {
     OrderBy(OrderBy),
     String(String),
 }
 
-impl PartialEq for EnumValueWrapper {
-    fn eq(&self, _other: &Self) -> bool {
-        false // WIP
-    }
-}
+// impl PartialEq for EnumValueWrapper {
+//     fn eq(&self, _other: &Self) -> bool {
+//         false // WIP
+//     }
+// }
 
 impl From<&InternalEnum> for EnumType {
     fn from(internal_enum: &InternalEnum) -> EnumType {

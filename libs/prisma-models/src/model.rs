@@ -1,6 +1,9 @@
 use crate::prelude::*;
 use once_cell::sync::OnceCell;
-use std::sync::{Arc, Weak};
+use std::{
+    hash::{Hash, Hasher},
+    sync::{Arc, Weak},
+};
 use uuid::Uuid;
 
 pub type ModelRef = Arc<Model>;
@@ -55,6 +58,15 @@ impl ModelTemplate {
         model
     }
 }
+
+impl Hash for Model {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        // Names are unique in the data model.
+        self.name.hash(state);
+    }
+}
+
+impl Eq for Model {}
 
 impl PartialEq for Model {
     fn eq(&self, other: &Model) -> bool {

@@ -15,7 +15,7 @@ pub enum GraphqlId {
     UUID(Uuid),
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Clone, Eq, Hash)]
 #[serde(tag = "gcValueType", content = "value")]
 pub enum PrismaValue {
     #[serde(rename = "string")]

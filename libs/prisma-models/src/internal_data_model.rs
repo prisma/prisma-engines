@@ -30,7 +30,7 @@ pub struct InternalDataModel {
     relation_fields: OnceCell<Vec<RelationFieldRef>>,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq, Hash)]
 pub struct InternalEnum {
     pub name: String,
     pub values: Vec<String>,

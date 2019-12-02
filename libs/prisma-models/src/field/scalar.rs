@@ -1,6 +1,9 @@
 use super::FieldManifestation;
 use crate::prelude::*;
-use std::sync::{Arc, Weak};
+use std::{
+    hash::{Hash, Hasher},
+    sync::{Arc, Weak},
+};
 
 static ID_FIELD: &str = "id";
 static EMBEDDED_ID_FIELD: &str = "_id";
@@ -44,7 +47,43 @@ pub struct ScalarField {
     pub(crate) is_unique: bool,
 }
 
-#[derive(Debug, Clone, Eq, PartialEq)]
+impl Eq for ScalarField {}
+
+impl Hash for ScalarField {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.name.hash(state);
+        self.type_identifier.hash(state);
+        self.is_required.hash(state);
+        self.is_list.hash(state);
+        self.is_hidden.hash(state);
+        self.is_auto_generated.hash(state);
+        self.manifestation.hash(state);
+        self.internal_enum.hash(state);
+        self.behaviour.hash(state);
+        self.default_value.hash(state);
+        self.is_unique.hash(state);
+        self.model().hash(state);
+    }
+}
+
+impl PartialEq for ScalarField {
+    fn eq(&self, other: &Self) -> bool {
+        self.name == other.name
+            && self.type_identifier == other.type_identifier
+            && self.is_required == other.is_required
+            && self.is_list == other.is_list
+            && self.is_hidden == other.is_hidden
+            && self.is_auto_generated == other.is_auto_generated
+            && self.manifestation == other.manifestation
+            && self.internal_enum == other.internal_enum
+            && self.behaviour == other.behaviour
+            && self.default_value == other.default_value
+            && self.is_unique == other.is_unique
+            && self.model() == other.model()
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum FieldBehaviour {
     CreatedAt,
     UpdatedAt,
@@ -57,20 +96,20 @@ pub enum FieldBehaviour {
     },
 }
 
-#[derive(Debug, Clone, Copy, Eq, PartialEq)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
 pub enum IdStrategy {
     Auto,
     None,
     Sequence,
 }
 
-#[derive(Debug, Clone, Copy, Eq, PartialEq)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
 pub enum ScalarListStrategy {
     Embedded,
     Relation,
 }
 
-#[derive(Debug, Clone, Eq, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq, Hash)]
 pub struct Sequence {
     pub name: String,
     pub initial_value: i32,
