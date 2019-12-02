@@ -27,10 +27,13 @@ fn read_one<'conn, 'tx>(
     query: RecordQuery,
 ) -> BoxFuture<'conn, InterpretationResult<QueryResult>> {
     let fut = async move {
+
         let selected_fields = inject_required_fields(query.selected_fields.clone());
         let scalars = tx
             .get_single_record(query.record_finder.as_ref().unwrap(), &selected_fields)
             .await?;
+
+        dbg!(&scalars);
 
         let model = query.record_finder.unwrap().field.model();
         let id_field = model.fields().id().name.clone();
@@ -38,16 +41,13 @@ fn read_one<'conn, 'tx>(
         match scalars {
             Some(record) => {
                 let ids = vec![record.collect_id(&id_field)?];
-                let list_fields = selected_fields.scalar_lists();
-                let lists = resolve_scalar_list_fields(tx, ids.clone(), list_fields).await?;
-                let nested: Vec<QueryResult> = process_nested(tx, query.nested, &ids).await?;
+                 let nested: Vec<QueryResult> = process_nested(tx, query.nested, &ids).await?;
 
                 Ok(QueryResult::RecordSelection(RecordSelection {
                     name: query.name,
                     fields: query.selection_order,
                     scalars: record.into(),
                     nested,
-                    lists,
                     id_field,
                     ..Default::default()
                 }))
@@ -78,8 +78,6 @@ fn read_many<'a, 'b>(
 
         let id_field = query.model.fields().id().name.clone();
         let ids = scalars.collect_ids(&id_field)?;
-        let list_fields = selected_fields.scalar_lists();
-        let lists = resolve_scalar_list_fields(tx, ids.clone(), list_fields).await?;
         let nested: Vec<QueryResult> = process_nested(tx, query.nested, &ids).await?;
 
         Ok(QueryResult::RecordSelection(RecordSelection {
@@ -88,7 +86,6 @@ fn read_many<'a, 'b>(
             query_arguments: query.args,
             scalars,
             nested,
-            lists,
             id_field,
         }))
     };
@@ -116,9 +113,7 @@ fn read_related<'a, 'b>(
         let model = query.parent_field.related_model();
         let id_field = model.fields().id().name.clone();
         let ids = scalars.collect_ids(&id_field)?;
-        let list_fields = selected_fields.scalar_lists();
-        let lists = resolve_scalar_list_fields(tx, ids.clone(), list_fields).await?;
-        let nested: Vec<QueryResult> = process_nested(tx, query.nested, &ids).await?;
+         let nested: Vec<QueryResult> = process_nested(tx, query.nested, &ids).await?;
 
         Ok(QueryResult::RecordSelection(RecordSelection {
             name: query.name,
@@ -126,7 +121,6 @@ fn read_related<'a, 'b>(
             query_arguments: query.args,
             scalars,
             nested,
-            lists,
             id_field,
         }))
     };
@@ -140,28 +134,6 @@ async fn aggregate<'a, 'b>(
 ) -> InterpretationResult<QueryResult> {
     let result = tx.count_by_model(&query.model, QueryArguments::default()).await?;
     Ok(QueryResult::Count(result))
-}
-
-/// Resolves scalar lists for a list field for a set of parent IDs.
-async fn resolve_scalar_list_fields<'a, 'b>(
-    tx: &'a ConnectionLike<'a, 'b>,
-    record_ids: Vec<GraphqlId>,
-    list_fields: Vec<Arc<ScalarField>>,
-) -> connector::Result<Vec<(String, Vec<ScalarListValues>)>> {
-    if !list_fields.is_empty() {
-        let mut results = vec![];
-
-        for list_field in list_fields {
-            let name = list_field.name.clone();
-            let r = tx.get_scalar_list_values(&list_field, record_ids.clone()).await?;
-
-            results.push((name, r));
-        }
-
-        Ok(results)
-    } else {
-        Ok(vec![])
-    }
 }
 
 /// Injects fields required for querying, if they're not already in the selection set.

@@ -25,9 +25,6 @@ pub struct RecordSelection {
     // Todo this is only here because reads are still resolved in one go
     pub nested: Vec<QueryResult>,
 
-    /// Scalar list results, field names mapped to their results
-    pub lists: Vec<(String, Vec<ScalarListValues>)>,
-
     /// Required for result processing
     pub query_arguments: QueryArguments,
 

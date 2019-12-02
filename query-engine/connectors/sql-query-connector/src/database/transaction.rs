@@ -75,14 +75,6 @@ where
         })
     }
 
-    fn get_scalar_list_values<'b>(
-        &'b self,
-        list_field: &'b ScalarFieldRef,
-        record_ids: Vec<GraphqlId>,
-    ) -> connector::IO<'b, Vec<ScalarListValues>> {
-        IO::new(async move { read::get_scalar_list_values(&self.inner, list_field, record_ids).await })
-    }
-
     fn count_by_model<'b>(&'b self, model: &'b ModelRef, query_arguments: QueryArguments) -> connector::IO<'b, usize> {
         IO::new(async move { read::count_by_model(&self.inner, model, query_arguments).await })
     }

@@ -48,13 +48,6 @@ pub trait ReadOperations {
         selected_fields: &'a SelectedFields,
     ) -> crate::IO<'a, ManyRecords>;
 
-    // This method is temporary
-    fn get_scalar_list_values<'a>(
-        &'a self,
-        list_field: &'a ScalarFieldRef,
-        record_ids: Vec<GraphqlId>,
-    ) -> crate::IO<'a, Vec<ScalarListValues>>;
-
     // This will eventually become a more generic `aggregate`
     fn count_by_model<'a>(&'a self, model: &'a ModelRef, query_arguments: QueryArguments) -> crate::IO<'a, usize>;
 }

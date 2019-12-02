@@ -1226,7 +1226,7 @@ async fn dropping_a_model_with_a_multi_field_unique_index_must_work(api: &TestAp
     api.infer_and_apply(&dm2).await;
 }
 
-#[test_each_connector]
+#[test_one_connector(connector="postgres")]
 async fn adding_a_scalar_list_for_a_modelwith_id_type_int_must_work(api: &TestApi) {
     let dm1 = r#"
             model A {
@@ -1241,43 +1241,16 @@ async fn adding_a_scalar_list_for_a_modelwith_id_type_int_must_work(api: &TestAp
             }
         "#;
     let result = api.infer_and_apply(&dm1).await.sql_schema;
-    let scalar_list_table_for_strings = result.table_bang("A_strings");
-    let node_id_column = scalar_list_table_for_strings.column_bang("nodeId");
-    assert_eq!(node_id_column.tpe.family, ColumnTypeFamily::Int);
-    assert_eq!(
-        scalar_list_table_for_strings.primary_key_columns(),
-        vec!["nodeId", "position"]
-    );
-    let scalar_list_table_for_enums = result.table_bang("A_enums");
-    let node_id_column = scalar_list_table_for_enums.column_bang("nodeId");
-    assert_eq!(node_id_column.tpe.family, ColumnTypeFamily::Int);
-    assert_eq!(
-        scalar_list_table_for_enums.primary_key_columns(),
-        vec!["nodeId", "position"]
-    );
-}
 
-#[test_each_connector(ignore = "mysql")]
-async fn updating_a_model_with_a_scalar_list_to_a_different_id_type_must_work(api: &TestApi) {
-    let dm = r#"
-        model A {
-            id Int @id
-            strings String[]
-        }
-    "#;
-    let result = api.infer_and_apply(&dm).await.sql_schema;
-    let node_id_column = result.table_bang("A_strings").column_bang("nodeId");
-    assert_eq!(node_id_column.tpe.family, ColumnTypeFamily::Int);
 
-    let dm = r#"
-        model A {
-            id String @id @default(cuid())
-            strings String[]
-        }
-    "#;
-    let result = api.infer_and_apply(&dm).await.sql_schema;
-    let node_id_column = result.table_bang("A_strings").column_bang("nodeId");
-    assert_eq!(node_id_column.tpe.family, ColumnTypeFamily::String);
+    let table_for_A = result.table_bang("A");
+    let string_column = table_for_A.column_bang("strings");
+    assert_eq!(string_column.tpe.family, ColumnTypeFamily::String);
+    assert_eq!(string_column.tpe.arity, ColumnArity::List);
+
+    let enum_column = table_for_A.column_bang("enums");
+    assert_eq!(enum_column.tpe.family, ColumnTypeFamily::String);
+    assert_eq!(enum_column.tpe.arity, ColumnArity::List);
 }
 
 #[test_each_connector]

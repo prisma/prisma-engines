@@ -125,9 +125,11 @@ pub fn extract_filter(
                     let field = model.fields().find_from_all(&field_name).unwrap();
 
                     match field {
-                        Field::Scalar(s) if !field.is_list() => {
+                        Field::Scalar(s) => {
                             let value: PrismaValue = value.try_into()?;
                             Ok(match op {
+                                FilterOp::In => s.is_in(PrismaListValue::try_from(value)?),
+                                FilterOp::NotIn => s.not_in(PrismaListValue::try_from(value)?),
                                 FilterOp::Not => s.not_equals(value),
                                 FilterOp::Lt => s.less_than(value),
                                 FilterOp::Lte => s.less_than_or_equals(value),
@@ -140,15 +142,6 @@ pub fn extract_filter(
                                 FilterOp::EndsWith => s.ends_with(value),
                                 FilterOp::NotEndsWith => s.not_ends_with(value),
                                 FilterOp::Field => s.equals(value),
-                                _ => unreachable!(),
-                            })
-                        }
-                        Field::Scalar(s) if field.is_list() => {
-                            let value: PrismaValue = value.try_into()?;
-                            let list_value: PrismaListValue = PrismaListValue::try_from(value)?;
-                            Ok(match op {
-                                FilterOp::In => s.is_in(list_value),
-                                FilterOp::NotIn => s.not_in(list_value),
                                 _ => unreachable!(),
                             })
                         }

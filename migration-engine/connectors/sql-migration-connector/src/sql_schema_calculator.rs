@@ -133,14 +133,20 @@ impl<'a> SqlSchemaCalculator<'a> {
                         in_table_of_model,
                         column: column_name,
                     } if in_table_of_model == &model_table.model.name => {
-                        let (_, related_model) = if model_table.model == relation.model_a {
+                        let (model, related_model) = if model_table.model == relation.model_a {
                             (&relation.model_a, &relation.model_b)
                         } else {
                             (&relation.model_b, &relation.model_a)
                         };
+
+                        let field = model.fields().find(|f| &f.db_name() == column_name).unwrap();
+
                         let column = sql::Column {
                             name: column_name.to_string(),
-                            tpe: column_type(related_model.id_field()?),
+                            tpe: column_type_for_scalar_type(
+                                scalar_type_for_field(related_model.id_field()?),
+                                column_arity(&field),
+                            ),
                             default: None,
                             auto_increment: false,
                         };
@@ -360,9 +366,13 @@ fn is_scalar(field: &Field) -> bool {
 }
 
 fn column_type(field: &Field) -> sql::ColumnType {
+    column_type_for_scalar_type(scalar_type_for_field(field), column_arity(field))
+}
+
+fn scalar_type_for_field(field: &Field) -> &ScalarType {
     match &field.field_type {
-        FieldType::Base(ref scalar) => column_type_for_scalar_type(&scalar, column_arity(field)),
-        FieldType::Enum(_) => column_type_for_scalar_type(&ScalarType::String, column_arity(field)),
+        FieldType::Base(ref scalar) => &scalar,
+        FieldType::Enum(_) => &ScalarType::String,
         x => panic!(format!(
             "This field type is not suported here. Field type is {:?} on field {}",
             x, field.name
