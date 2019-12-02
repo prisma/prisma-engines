@@ -11,52 +11,53 @@ pub struct InferMigrationStepsCommand<'a> {
     input: &'a InferMigrationStepsInput,
 }
 
-impl<'a> MigrationCommand<'a> for InferMigrationStepsCommand<'a> {
+#[async_trait::async_trait]
+impl<'a> MigrationCommand for InferMigrationStepsCommand<'a> {
     type Input = InferMigrationStepsInput;
     type Output = MigrationStepsResultOutput;
 
-    fn new(input: &'a Self::Input) -> Box<Self> {
-        Box::new(InferMigrationStepsCommand { input })
-    }
-
-    fn execute<C, D>(&self, engine: &MigrationEngine<C, D>) -> CommandResult<Self::Output>
+    async fn execute<C, D>(input: &Self::Input, engine: &MigrationEngine<C, D>) -> CommandResult<Self::Output>
     where
         C: MigrationConnector<DatabaseMigration = D>,
         D: DatabaseMigrationMarker + Sync + Send + 'static,
     {
-        debug!("{:?}", self.input);
+        let cmd = InferMigrationStepsCommand { input };
+        debug!("{:?}", cmd.input);
 
         let connector = engine.connector();
         let migration_persistence = connector.migration_persistence();
         let database_migration_inferrer = connector.database_migration_inferrer();
 
-        let current_datamodel_ast = migration_persistence.current_datamodel_ast();
+        let current_datamodel_ast = migration_persistence.current_datamodel_ast().await;
         let assumed_datamodel_ast = engine
             .datamodel_calculator()
-            .infer(&current_datamodel_ast, self.input.assume_to_be_applied.as_slice())?;
+            .infer(&current_datamodel_ast, cmd.input.assume_to_be_applied.as_slice())?;
         let assumed_datamodel = datamodel::lift_ast(&assumed_datamodel_ast)?;
 
-        let next_datamodel = parse_datamodel(&self.input.datamodel)?;
-        let next_datamodel_ast = parse(&self.input.datamodel)?;
+        let next_datamodel = parse_datamodel(&cmd.input.datamodel)?;
+        let next_datamodel_ast = parse(&cmd.input.datamodel)?;
 
         let model_migration_steps = engine
             .datamodel_migration_steps_inferrer()
             .infer(&assumed_datamodel_ast, &next_datamodel_ast);
 
-        let database_migration =
-            database_migration_inferrer.infer(&assumed_datamodel, &next_datamodel, &model_migration_steps)?;
+        let database_migration = database_migration_inferrer
+            .infer(&assumed_datamodel, &next_datamodel, &model_migration_steps)
+            .await?;
 
-        let DestructiveChangeDiagnostics { warnings, errors: _ } =
-            connector.destructive_changes_checker().check(&database_migration)?;
+        let DestructiveChangeDiagnostics { warnings, errors: _ } = connector
+            .destructive_changes_checker()
+            .check(&database_migration)
+            .await?;
 
-        let (returned_datamodel_steps, returned_database_migration) = if self.input.is_watch_migration() {
+        let (returned_datamodel_steps, returned_database_migration) = if cmd.input.is_watch_migration() {
             let database_steps = connector
                 .database_migration_step_applier()
                 .render_steps_pretty(&database_migration)?;
 
             (model_migration_steps, database_steps)
         } else {
-            let last_non_watch_applied_migration = migration_persistence.last_non_watch_applied_migration();
+            let last_non_watch_applied_migration = migration_persistence.last_non_watch_applied_migration().await;
             let last_non_watch_datamodel_ast = last_non_watch_applied_migration
                 .as_ref()
                 .map(|m| m.datamodel_ast())
@@ -70,11 +71,9 @@ impl<'a> MigrationCommand<'a> for InferMigrationStepsCommand<'a> {
 
             // The database migration since the last non-watch migration, so we can render all the steps applied
             // in watch mode to the migrations folder.
-            let full_database_migration = database_migration_inferrer.infer_from_datamodels(
-                &last_non_watch_datamodel,
-                &next_datamodel,
-                &datamodel_steps,
-            )?;
+            let full_database_migration = database_migration_inferrer
+                .infer_from_datamodels(&last_non_watch_datamodel, &next_datamodel, &datamodel_steps)
+                .await?;
             let database_steps = connector
                 .database_migration_step_applier()
                 .render_steps_pretty(&full_database_migration)?;

@@ -15,11 +15,7 @@ use async_trait::async_trait;
 
 #[async_trait]
 pub trait QueryExecutor {
-    async fn execute(
-        &self,
-        query_doc: QueryDocument,
-        query_schema: QuerySchemaRef,
-    ) -> CoreResult<Vec<Response>>;
+    async fn execute(&self, query_doc: QueryDocument, query_schema: QuerySchemaRef) -> CoreResult<Vec<Response>>;
 
     fn primary_connector(&self) -> &'static str;
 }

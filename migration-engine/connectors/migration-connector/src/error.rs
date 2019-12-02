@@ -1,7 +1,38 @@
-use failure::{Error, Fail};
+use failure::{format_err, Error, Fail};
+use std::fmt::Display;
+use user_facing_errors::KnownError;
 
 #[derive(Debug, Fail)]
-pub enum ConnectorError {
+#[fail(display = "{}", kind)]
+pub struct ConnectorError {
+    /// An optional error already rendered for users in case the migration core does not handle it.
+    pub user_facing_error: Option<KnownError>,
+    /// The error information for internal use.
+    pub kind: ErrorKind,
+}
+
+impl ConnectorError {
+    pub fn from_kind(kind: ErrorKind) -> Self {
+        ConnectorError {
+            user_facing_error: None,
+            kind,
+        }
+    }
+
+    pub fn url_parse_error(err: impl Display, url: &str) -> Self {
+        ConnectorError {
+            user_facing_error: None,
+            kind: ErrorKind::Generic(format_err!(
+                "Could not parse the database connection string `{}`: {}",
+                url,
+                err
+            )),
+        }
+    }
+}
+
+#[derive(Debug, Fail)]
+pub enum ErrorKind {
     #[fail(display = "{}", _0)]
     Generic(Error),
 
@@ -11,8 +42,8 @@ pub enum ConnectorError {
     #[fail(display = "Database '{}' does not exist", db_name)]
     DatabaseDoesNotExist { db_name: String },
 
-    #[fail(display = "Access denied to database '{}'", db_name)]
-    DatabaseAccessDenied { db_name: String },
+    #[fail(display = "Access denied to database '{}'", database_name)]
+    DatabaseAccessDenied { database_name: String },
 
     #[fail(display = "Database '{}' already exists", db_name)]
     DatabaseAlreadyExists { db_name: String },
@@ -23,6 +54,16 @@ pub enum ConnectorError {
     #[fail(display = "Authentication failed for user '{}'", user)]
     AuthenticationFailed { user: String },
 
+    #[fail(display = "The database URL is not valid")]
+    InvalidDatabaseUrl,
+
+    #[fail(display = "Failed to connect to the database at `{}`.", host)]
+    ConnectionError {
+        host: String,
+        #[fail(cause)]
+        cause: Error,
+    },
+
     #[fail(display = "Connect timed out")]
     ConnectTimeout,
 
@@ -31,19 +72,7 @@ pub enum ConnectorError {
 
     #[fail(display = "Error opening a TLS connection. {}", message)]
     TlsError { message: String },
-}
 
-impl From<quaint::error::Error> for ConnectorError {
-    fn from(e: quaint::error::Error) -> Self {
-        match e {
-            quaint::error::Error::DatabaseDoesNotExist { db_name } => Self::DatabaseDoesNotExist { db_name },
-            quaint::error::Error::DatabaseAccessDenied { db_name } => Self::DatabaseAccessDenied { db_name },
-            quaint::error::Error::DatabaseAlreadyExists { db_name } => Self::DatabaseAlreadyExists { db_name },
-            quaint::error::Error::AuthenticationFailed { user } => Self::AuthenticationFailed { user },
-            quaint::error::Error::ConnectTimeout => Self::ConnectTimeout,
-            quaint::error::Error::Timeout => Self::Timeout,
-            quaint::error::Error::TlsError { message } => Self::TlsError { message },
-            e => ConnectorError::QueryError(e.into()),
-        }
-    }
+    #[fail(display = "Unique constraint violation.")]
+    UniqueConstraintViolation { field_name: String },
 }

@@ -120,6 +120,7 @@ pub fn parse_datamodel_with_sources(
             Vec::new()
         }
     };
+
     let validator = ValidationPipeline::with_sources(&sources);
 
     match validator.validate(&ast) {
@@ -154,11 +155,13 @@ pub fn parse_configuration_with_sources(
 fn load_sources(
     schema_ast: &SchemaAst,
     source_definitions: Vec<Box<dyn configuration::SourceDefinition>>,
-) -> Result<Vec<Box<dyn Source>>, error::ErrorCollection> {
+) -> Result<Vec<Box<dyn Source + Send + Sync>>, error::ErrorCollection> {
     let mut source_loader = SourceLoader::new();
+
     for source in get_builtin_sources() {
         source_loader.add_source_definition(source);
     }
+
     for source in source_definitions {
         source_loader.add_source_definition(source);
     }
@@ -211,9 +214,12 @@ pub fn render_datamodel_and_config_to(
     config: &configuration::Configuration,
 ) -> Result<(), error::ErrorCollection> {
     let mut lowered = validator::LowerDmlToAst::new().lower(datamodel)?;
-    SourceSerializer::add_sources_to_ast(&config.datasources, &mut lowered);
+
+    SourceSerializer::add_sources_to_ast(config.datasources.as_slice(), &mut lowered);
     GeneratorLoader::add_generators_to_ast(&config.generators, &mut lowered);
+
     render_schema_ast_to(stream, &lowered, 2);
+
     Ok(())
 }
 

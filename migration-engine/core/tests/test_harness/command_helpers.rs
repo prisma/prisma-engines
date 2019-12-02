@@ -26,8 +26,8 @@ impl InferOutput {
     }
 }
 
-pub fn run_infer_command(api: &dyn GenericApi, input: InferMigrationStepsInput) -> InferOutput {
-    let output = api.infer_migration_steps(&input).expect("InferMigration failed");
+pub(super) async fn run_infer_command(api: &dyn GenericApi, input: InferMigrationStepsInput) -> InferOutput {
+    let output = api.infer_migration_steps(&input).await.expect("InferMigration failed");
 
     assert!(
         output.general_errors.is_empty(),

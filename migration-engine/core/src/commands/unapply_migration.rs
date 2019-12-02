@@ -8,23 +8,21 @@ pub struct UnapplyMigrationCommand<'a> {
     input: &'a UnapplyMigrationInput,
 }
 
-impl<'a> MigrationCommand<'a> for UnapplyMigrationCommand<'a> {
+#[async_trait::async_trait]
+impl<'a> MigrationCommand for UnapplyMigrationCommand<'a> {
     type Input = UnapplyMigrationInput;
     type Output = UnapplyMigrationOutput;
 
-    fn new(input: &'a Self::Input) -> Box<Self> {
-        Box::new(UnapplyMigrationCommand { input })
-    }
-
-    fn execute<C, D>(&self, engine: &MigrationEngine<C, D>) -> CommandResult<Self::Output>
+    async fn execute<C, D>(input: &Self::Input, engine: &MigrationEngine<C, D>) -> CommandResult<Self::Output>
     where
         C: MigrationConnector<DatabaseMigration = D>,
         D: DatabaseMigrationMarker + 'static,
     {
-        debug!("{:?}", self.input);
+        let cmd = UnapplyMigrationCommand { input };
+        debug!("{:?}", cmd.input);
         let connector = engine.connector();
 
-        let result = match connector.migration_persistence().last() {
+        let result = match connector.migration_persistence().last().await {
             None => UnapplyMigrationOutput {
                 rolled_back: "not-applicable".to_string(),
                 active: None,
@@ -36,9 +34,10 @@ impl<'a> MigrationCommand<'a> for UnapplyMigrationCommand<'a> {
 
                 connector
                     .migration_applier()
-                    .unapply(&migration_to_rollback, &database_migration)?;
+                    .unapply(&migration_to_rollback, &database_migration)
+                    .await?;
 
-                let new_active_migration = connector.migration_persistence().last().map(|m| m.name);
+                let new_active_migration = connector.migration_persistence().last().await.map(|m| m.name);
 
                 UnapplyMigrationOutput {
                     rolled_back: migration_to_rollback.name,

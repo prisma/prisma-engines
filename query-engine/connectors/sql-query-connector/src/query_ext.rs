@@ -8,7 +8,7 @@ use prisma_models::*;
 use quaint::{
     ast::*,
     connector::{self, Queryable},
-    pool::PooledConnection,
+    pooled::PooledConnection,
 };
 use serde_json::{Map, Number, Value};
 use std::convert::TryFrom;

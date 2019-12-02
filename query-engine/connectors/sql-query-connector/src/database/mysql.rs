@@ -1,17 +1,19 @@
 use super::connection::SqlConnection;
 use crate::{query_builder::ManyRelatedRecordsWithUnionAll, FromSource, SqlError};
+use async_trait::async_trait;
 use connector_interface::{Connection, Connector, IO};
 use datamodel::Source;
-use quaint::Quaint;
+use quaint::pooled::Quaint;
 
 pub struct Mysql {
     pool: Quaint,
 }
 
+#[async_trait]
 impl FromSource for Mysql {
-    fn from_source(source: &dyn Source) -> crate::Result<Self> {
+    async fn from_source(source: &dyn Source) -> crate::Result<Self> {
         Ok(Mysql {
-            pool: Quaint::new(&source.url().value)?,
+            pool: Quaint::new(&source.url().value).await?,
         })
     }
 }
