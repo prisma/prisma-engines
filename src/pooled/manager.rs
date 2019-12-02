@@ -9,7 +9,7 @@ use crate::{
     error::Error,
 };
 use failure::{Compat, Fail};
-use futures::{future, future::FutureExt};
+use futures::{future::FutureExt};
 use mobc::{runtime::DefaultExecutor, AnyFuture, ConnectionManager, PooledConnection as MobcPooled};
 
 /// A connection from the pool. Implements
@@ -71,10 +71,10 @@ impl ConnectionManager for QuaintManager {
 
                 match Sqlite::new(&file_path) {
                     Ok(mut conn) => match conn.attach_database(db_name) {
-                        Ok(_) => future::ok(Box::new(conn) as Self::Connection).boxed(),
-                        Err(e) => future::err(e.compat()).boxed(),
+                        Ok(_) => futures::future::ok(Box::new(conn) as Self::Connection).boxed(),
+                        Err(e) => futures::future::err(e.compat()).boxed(),
                     },
-                    Err(e) => future::err(e.compat()).boxed(),
+                    Err(e) => futures::future::err(e.compat()).boxed(),
                 }
             }
 
@@ -83,8 +83,8 @@ impl ConnectionManager for QuaintManager {
                 use crate::connector::Mysql;
 
                 match Mysql::new(url.clone()) {
-                    Ok(mysql) => future::ok(Box::new(mysql) as Self::Connection).boxed(),
-                    Err(e) => future::err(e.compat()).boxed(),
+                    Ok(mysql) => futures::future::ok(Box::new(mysql) as Self::Connection).boxed(),
+                    Err(e) => futures::future::err(e.compat()).boxed(),
                 }
             }
 
@@ -94,11 +94,12 @@ impl ConnectionManager for QuaintManager {
 
                 let url: PostgresUrl = url.clone();
 
-                async move {
+                let fut = async move {
                     let conn = PostgreSql::new(url).await.map_err(|e| e.compat())?;
                     Ok(Box::new(conn) as Self::Connection)
-                }
-                    .boxed()
+                };
+
+                fut.boxed()
             }
         }
     }
@@ -119,12 +120,11 @@ impl ConnectionManager for QuaintManager {
 #[cfg(test)]
 mod tests {
     use crate::pooled::Quaint;
-    use std::env;
 
     #[tokio::test]
     #[cfg(feature = "mysql")]
     async fn mysql_default_connection_limit() {
-        let conn_string = env::var("TEST_MYSQL").expect("TEST_MYSQL connection string not set.");
+        let conn_string = std::env::var("TEST_MYSQL").expect("TEST_MYSQL connection string not set.");
 
         let pool = Quaint::new(&conn_string).await.unwrap();
 
@@ -136,7 +136,7 @@ mod tests {
     async fn mysql_custom_connection_limit() {
         let conn_string = format!(
             "{}?connection_limit=10",
-            env::var("TEST_MYSQL").expect("TEST_MYSQL connection string not set.")
+            std::env::var("TEST_MYSQL").expect("TEST_MYSQL connection string not set.")
         );
 
         let pool = Quaint::new(&conn_string).await.unwrap();
@@ -147,7 +147,7 @@ mod tests {
     #[tokio::test]
     #[cfg(feature = "postgresql")]
     async fn psql_default_connection_limit() {
-        let conn_string = env::var("TEST_PSQL").expect("TEST_PSQL connection string not set.");
+        let conn_string = std::env::var("TEST_PSQL").expect("TEST_PSQL connection string not set.");
 
         let pool = Quaint::new(&conn_string).await.unwrap();
 
@@ -159,7 +159,7 @@ mod tests {
     async fn psql_custom_connection_limit() {
         let conn_string = format!(
             "{}?connection_limit=10",
-            env::var("TEST_PSQL").expect("TEST_PSQL connection string not set.")
+            std::env::var("TEST_PSQL").expect("TEST_PSQL connection string not set.")
         );
 
         let pool = Quaint::new(&conn_string).await.unwrap();

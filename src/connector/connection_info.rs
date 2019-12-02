@@ -1,15 +1,15 @@
 use crate::error::Error;
-use std::{borrow::Cow, convert::TryFrom, fmt};
+use std::{borrow::Cow, fmt};
 use url::Url;
 
 #[cfg(feature = "mysql")]
 use crate::connector::MysqlUrl;
-
 #[cfg(feature = "postgresql")]
 use crate::connector::PostgresUrl;
-
 #[cfg(feature = "sqlite")]
 use crate::connector::SqliteParams;
+#[cfg(feature = "sqlite")]
+use std::convert::TryFrom;
 
 /// General information about a SQL connection.
 #[derive(Debug, Clone)]
@@ -35,53 +35,19 @@ impl ConnectionInfo {
     ///
     /// Will fail if URI is invalid or the scheme points to an unsupported
     /// database.
-    #[cfg(not(feature = "sqlite"))]
     pub fn from_url(url_str: &str) -> crate::Result<Self> {
         let url_result: Result<Url, _> = url_str.parse();
 
         // Non-URL database strings are interpreted as SQLite file paths.
-        if url_result.is_err() {
-            let params = SqliteParams::try_from(url_str)?;
-            return Ok(ConnectionInfo::Sqlite {
-                file_path: params.file_path,
-                db_name: params.db_name.clone(),
-            });
-        }
-
-        let url = url_result?;
-
-        let sql_family = SqlFamily::from_scheme(url.scheme()).ok_or_else(|| {
-            Error::DatabaseUrlIsInvalid(format!("{} is not a supported database URL scheme.", url.scheme()))
-        })?;
-
-        match sql_family {
-            #[cfg(feature = "mysql")]
-            SqlFamily::Mysql => Ok(ConnectionInfo::Mysql(MysqlUrl::new(url)?)),
-            #[cfg(feature = "sqlite")]
-            SqlFamily::Sqlite => {
+        #[cfg(feature = "sqlite")]
+        {
+            if url_result.is_err() {
                 let params = SqliteParams::try_from(url_str)?;
-
-                Ok(ConnectionInfo::Sqlite {
+                return Ok(ConnectionInfo::Sqlite {
                     file_path: params.file_path,
-                    db_name: params.db_name,
-                })
+                    db_name: params.db_name.clone(),
+                });
             }
-            #[cfg(feature = "postgresql")]
-            SqlFamily::Postgres => Ok(ConnectionInfo::Postgres(PostgresUrl::new(url)?)),
-        }
-    }
-
-    #[cfg(feature = "sqlite")]
-    pub fn from_url(url_str: &str) -> crate::Result<Self> {
-        let url_result: Result<Url, _> = url_str.parse();
-
-        // Non-URL database strings are interpreted as SQLite file paths.
-        if url_result.is_err() {
-            let params = SqliteParams::try_from(url_str)?;
-            return Ok(ConnectionInfo::Sqlite {
-                file_path: params.file_path,
-                db_name: params.db_name.clone(),
-            });
         }
 
         let url = url_result?;
@@ -260,6 +226,7 @@ impl fmt::Display for SqlFamily {
 
 #[cfg(test)]
 mod tests {
+    #[cfg(feature = "sqlite")]
     use super::*;
 
     #[test]

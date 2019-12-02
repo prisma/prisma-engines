@@ -5,8 +5,10 @@ use crate::{
     connector::{self, ConnectionInfo, Queryable, SqlFamily, TransactionCapable, DBIO},
 };
 use futures::lock::Mutex;
-use std::convert::TryFrom;
 use url::Url;
+
+#[cfg(feature = "sqlite")]
+use std::convert::TryFrom;
 
 /// The main entry point and an abstraction over a database connection.
 pub struct Quaint {
