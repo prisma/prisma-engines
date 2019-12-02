@@ -22,10 +22,10 @@ impl Mysql {
 #[async_trait]
 impl FromSource for Mysql {
     async fn from_source(source: &dyn Source) -> crate::Result<Self> {
-        let pool = Quaint::new(&source.url().value)?;
+        let pool = Quaint::new(&source.url().value).await?;
         let connection_info = pool.connection_info().to_owned();
         Ok(Mysql {
-            pool: Quaint::new(&source.url().value).await?,
+            pool,
             connection_info,
         })
     }

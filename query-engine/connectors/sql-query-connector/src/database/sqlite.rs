@@ -2,7 +2,7 @@ use super::connection::SqlConnection;
 use crate::{query_builder::ManyRelatedRecordsWithRowNumber, FromSource, SqlError};
 use connector_interface::{Connection, Connector, error::ConnectorError, IO};
 use datamodel::Source;
-use quaint::{connector::SqliteParams, prelude::ConnectionInfo, Quaint};
+use quaint::{connector::SqliteParams, prelude::ConnectionInfo, pooled::Quaint};
 use std::convert::TryFrom;
 use async_trait::async_trait;
 
