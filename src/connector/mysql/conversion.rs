@@ -3,6 +3,7 @@ use crate::{ast::ParameterizedValue, connector::queryable::TakeRow};
 use chrono::{DateTime, Datelike, Duration, NaiveDate, NaiveDateTime, NaiveTime, Timelike, Utc};
 use mysql_async as my;
 use mysql_async::Value as MyValue;
+use rust_decimal::prelude::ToPrimitive;
 
 pub fn conv_params<'a>(params: &[ParameterizedValue<'a>]) -> my::Params {
     if params.is_empty() {
@@ -23,7 +24,7 @@ impl TakeRow for my::Row {
                 my::Value::Int(i) => ParameterizedValue::Integer(i),
                 // TOOD: This is unsafe
                 my::Value::UInt(i) => ParameterizedValue::Integer(i as i64),
-                my::Value::Float(f) => ParameterizedValue::Real(f),
+                my::Value::Float(f) => ParameterizedValue::from(f),
                 #[cfg(feature = "chrono-0_4")]
                 my::Value::Date(year, month, day, hour, min, sec, micro) => {
                     let time = NaiveTime::from_hms_micro(hour as u32, min as u32, sec as u32, micro);
@@ -50,8 +51,9 @@ impl TakeRow for my::Row {
 
                     let duration = time.to_std().unwrap();
                     let f_time = duration.as_secs() as f64 + f64::from(duration.subsec_micros()) * 1e-6;
+                    let f_time = if is_neg { -f_time } else { f_time };
 
-                    ParameterizedValue::Real(if is_neg { -f_time } else { f_time })
+                    ParameterizedValue::from(f_time)
                 }
                 #[cfg(not(feature = "chrono-0_4"))]
                 typ => panic!(
@@ -78,7 +80,7 @@ impl<'a> From<ParameterizedValue<'a>> for MyValue {
         match pv {
             ParameterizedValue::Null => MyValue::NULL,
             ParameterizedValue::Integer(i) => MyValue::Int(i),
-            ParameterizedValue::Real(f) => MyValue::Float(f),
+            ParameterizedValue::Real(f) => MyValue::Float(f.to_f64().expect("Decimal is not a f64.")),
             ParameterizedValue::Text(s) => MyValue::Bytes((&*s).as_bytes().to_vec()),
             ParameterizedValue::Boolean(b) => MyValue::Int(b as i64),
             ParameterizedValue::Char(c) => MyValue::Bytes(vec![c as u8]),
