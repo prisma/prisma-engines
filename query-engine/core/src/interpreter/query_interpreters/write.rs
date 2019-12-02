@@ -27,7 +27,7 @@ async fn create_one<'a, 'b>(tx: &'a ConnectionLike<'a, 'b>, q: CreateRecord) -> 
         .create_record(&q.model, WriteArgs::new(q.non_list_args, q.list_args))
         .await?;
 
-    Ok(QueryResult::Id(res))
+    Ok(QueryResult::Id(Some(res)))
 }
 
 async fn update_one<'a, 'b>(tx: &'a ConnectionLike<'a, 'b>, q: UpdateRecord) -> InterpretationResult<QueryResult> {
@@ -39,7 +39,7 @@ async fn update_one<'a, 'b>(tx: &'a ConnectionLike<'a, 'b>, q: UpdateRecord) -> 
         )
         .await?;
 
-    Ok(QueryResult::Id(res.pop().unwrap()))
+    Ok(QueryResult::Id(res.pop()))
 }
 
 async fn delete_one<'a, 'b>(tx: &'a ConnectionLike<'a, 'b>, q: DeleteRecord) -> InterpretationResult<QueryResult> {

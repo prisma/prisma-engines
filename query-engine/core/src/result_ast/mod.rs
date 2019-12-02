@@ -3,7 +3,7 @@ use prisma_models::{GraphqlId, ManyRecords};
 
 #[derive(Debug, Clone)]
 pub enum QueryResult {
-    Id(GraphqlId),
+    Id(Option<GraphqlId>),
     Count(usize),
     RecordSelection(RecordSelection),
     Unit,

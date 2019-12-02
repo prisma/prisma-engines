@@ -4,7 +4,6 @@ use connector_interface::{Connection, Connector, IO};
 use datamodel::Source;
 use quaint::{connector::SqliteParams, pooled::Quaint};
 use std::convert::TryFrom;
-use url::Url;
 use async_trait::async_trait;
 
 pub struct Sqlite {
@@ -22,18 +21,30 @@ impl Sqlite {
 impl FromSource for Sqlite {
     async fn from_source(source: &dyn Source) -> crate::Result<Sqlite> {
         let params = SqliteParams::try_from(source.url().value.as_str())?;
-        let db_name = std::path::Path::new(&params.file_path)
-            .file_stem()
-            .unwrap()
-            .to_str()
-            .unwrap()
-            .to_owned();
+
         let file_path = params.file_path;
 
         let url_with_db = {
-            let mut url = Url::parse(&source.url().value)?;
-            url.query_pairs_mut().append_pair("db_name", &db_name);
-            url
+            let db_name = std::path::Path::new(&file_path)
+                .file_stem()
+                .unwrap()
+                .to_str()
+                .unwrap()
+                .to_owned();
+
+            let mut splitted = source.url().value.split("?");
+            let url = splitted.next().unwrap();
+            let params = splitted.next();
+
+            let mut params: Vec<&str> = match params {
+                Some(params) => params.split("&").collect(),
+                None => Vec::with_capacity(1),
+            };
+
+            let db_name_param = format!("db_name={}", db_name);
+            params.push(&db_name_param);
+
+            format!("{}?{}", url, params.join("&"))
         };
 
         let pool = Quaint::new(url_with_db.as_str()).await?;

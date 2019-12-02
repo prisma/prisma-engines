@@ -95,7 +95,7 @@ class ScalarListsQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     val id = server
       .query(
         s"""mutation {
-           |  createModel(data: {ints: { set: [1,2] }, strings: { set: ["short", "looooooooooong"] }}) {
+           |  createModel(data: {ints: { set: [3,5,2,1] }, strings: { set: ["short", "looooooooooong"] }}) {
            |    id
            |  }
            |}""".stripMargin,
@@ -106,7 +106,7 @@ class ScalarListsQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     server
       .query(
         s"""mutation {
-           |  updateModel(where: {id: "$id"} data: {ints: { set: [2,1] }}) {
+           |  updateModel(where: {id: "$id"} data: {ints: { set: [2,5,1,3] }}) {
            |    id
            |    ints
            |    strings
@@ -125,7 +125,7 @@ class ScalarListsQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       project
     )
 
-    result.toString should equal("""{"data":{"model":{"ints":[2,1],"strings":["short","looooooooooong"]}}}""")
+    result.toString should equal("""{"data":{"model":{"ints":[2,5,1,3],"strings":["short","looooooooooong"]}}}""")
   }
 
   "full scalar list" should "return full list for strings" in {

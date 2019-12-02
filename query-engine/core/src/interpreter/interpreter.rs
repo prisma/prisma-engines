@@ -36,7 +36,7 @@ impl ExpressionResult {
     pub fn as_ids(&self) -> InterpretationResult<Vec<PrismaValue>> {
         let converted = match self {
             Self::Query(ref result) => match result {
-                QueryResult::Id(id) => Some(vec![id.clone().into()]),
+                QueryResult::Id(id) => Some(id.clone().map(|id| vec![id.into()]).unwrap_or_else(|| vec![])),
 
                 // We always select IDs, the unwraps are safe.
                 QueryResult::RecordSelection(rs) => Some(
@@ -151,6 +151,7 @@ where
                         results.push(self.interpret(expr, env.clone(), level + 1).await?);
                     }
 
+                    // Last result gets returned
                     Ok(results.pop().unwrap())
                 };
 
