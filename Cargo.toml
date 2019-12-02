@@ -21,7 +21,7 @@ pooled = ["mobc"]
 default = ["sqlite", "json-1", "postgresql", "uuid-0_7", "chrono-0_4", "mysql", "pooled"]
 sqlite = ["rusqlite", "libsqlite3-sys"]
 json-1 = ["serde_json"]
-postgresql = ["rust_decimal", "native-tls", "tokio-postgres", "postgres-native-tls", "array", "bytes"]
+postgresql = ["rust_decimal/postgres", "native-tls", "tokio-postgres", "postgres-native-tls", "array", "bytes"]
 uuid-0_7 = ["uuid"]
 chrono-0_4 = ["chrono"]
 mysql = ["mysql_async"]
@@ -41,7 +41,7 @@ num_cpus = "1.11"
 uuid = { version = "0.7", optional = true }
 chrono = { version = "0.4", optional = true }
 serde_json = { version = "1.0", optional = true }
-rust_decimal = { git = "https://github.com/pimeys/rust-decimal.git", branch = "tokio-postgres", optional = true, features = ["postgres"] }
+rust_decimal = { git = "https://github.com/pimeys/rust-decimal.git", branch = "tokio-postgres" }
 
 rusqlite = { version = "0.20", features = ["chrono", "bundled"], optional = true }
 libsqlite3-sys = { version = "0.16", default-features = false, features = ["bundled"], optional = true }
