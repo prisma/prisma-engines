@@ -21,6 +21,12 @@ impl From<ScalarFieldRef> for SelectedField {
     }
 }
 
+impl From<RelationFieldRef> for SelectedField {
+    fn from(rf: RelationFieldRef) -> SelectedField {
+        SelectedField::Relation(rf)
+    }
+}
+
 impl From<ScalarFieldRef> for SelectedFields {
     fn from(sf: ScalarFieldRef) -> SelectedFields {
         SelectedFields::new(vec![sf])

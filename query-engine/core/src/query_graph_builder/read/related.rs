@@ -18,12 +18,7 @@ pub struct ReadRelatedRecordsBuilder {
 }
 
 impl ReadRelatedRecordsBuilder {
-    pub fn new(
-        model: ModelRef,
-        parent: RelationFieldRef,
-        field: ParsedField,
-        args: QueryArguments,
-    ) -> Self {
+    pub fn new(model: ModelRef, parent: RelationFieldRef, field: ParsedField, args: QueryArguments) -> Self {
         Self {
             model,
             parent,

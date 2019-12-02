@@ -76,7 +76,7 @@ impl SelectDefinition for QueryArguments {
     }
 }
 
-pub fn get_records<T>(model: &ModelRef, selected_fields: &SelectedFields, query: T) -> Select<'static>
+pub fn get_records<T>(model: &ModelRef, columns: &SelectedFields, query: T) -> Select<'static>
 where
     T: SelectDefinition,
 {

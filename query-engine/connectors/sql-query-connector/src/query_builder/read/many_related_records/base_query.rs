@@ -39,7 +39,12 @@ impl<'a> ManyRelatedRecordsBaseQuery<'a> {
             .relation()
             .as_table()
             .alias(Relation::TABLE_ALIAS)
-            .on(from_field.related_model().fields().id().as_column().equals(opposite_column));
+            .on(from_field
+                .related_model()
+                .fields()
+                .id()
+                .as_column()
+                .equals(opposite_column));
 
         let query = selected_fields
             .columns()

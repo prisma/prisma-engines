@@ -5,8 +5,8 @@ use crate::{
 use connector_interface::{error::ConnectorError, *};
 use itertools::Itertools;
 use prisma_models::*;
-use std::convert::TryFrom;
 use quaint::ast::*;
+use std::convert::TryFrom;
 
 struct ScalarListElement {
     record_id: GraphqlId,
@@ -65,11 +65,15 @@ pub async fn get_related_records<T>(
 where
     T: ManyRelatedRecordsQueryBuilder,
 {
-    let idents = selected_fields.type_identifiers();
-    let field_names = selected_fields.names();
+    let mut idents: Vec<TypeIdentifier> = selected_fields.type_identifiers().collect();
+    idents.push(TypeIdentifier::GraphQLID);
+    idents.push(TypeIdentifier::GraphQLID);
 
-    let can_skip_joins =
-        from_field.relation_is_inlined_in_child() && !query_arguments.is_with_pagination();
+    let mut field_names: Vec<&str> = selected_fields.names().collect();
+    field_names.push(from_field.related_field().name.as_str());
+    field_names.push(from_field.name.as_str());
+
+    let can_skip_joins = from_field.relation_is_inlined_in_child() && !query_arguments.is_with_pagination();
 
     let query = if can_skip_joins {
         let model = from_field.related_model();

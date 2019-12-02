@@ -10,9 +10,7 @@ pub use related::*;
 
 use super::*;
 use crate::{query_document::ParsedField, ReadQuery};
-use prisma_models::{
-    Field, ModelRef, RelationFieldRef, SelectedField, SelectedFields, SelectedRelationField, SelectedScalarField,
-};
+use prisma_models::{Field, ModelRef, RelationFieldRef, SelectedField, SelectedFields};
 use std::sync::Arc;
 
 pub enum ReadQueryBuilder {
@@ -55,19 +53,18 @@ pub fn collect_selected_fields(
         let model_field = model.fields().find_from_all(&selected_field.name).unwrap();
 
         match model_field {
-            Field::Scalar(ref sf) => selected_fields.push(SelectedField::Scalar(SelectedScalarField { field: Arc::clone(sf) })),
-            Field::Relation(ref rf) => {
-                let selected_fields = SelectedFields::new(vec![], None);
-
-                SelectedField::Relation(SelectedRelationField {
-                    field: Arc::clone(rf),
-                    selected_fields, // todo None here correct?
-                })
-            },
-        };
+            Field::Scalar(ref sf) => selected_fields.push(SelectedField::from(Arc::clone(sf))),
+            Field::Relation(ref rf) => selected_fields.push(SelectedField::from(Arc::clone(rf))),
+        }
     }
 
-    SelectedFields::new(selected_fields, parent)
+    if let Some(ref rf) = parent {
+        let relation = rf.relation();
+
+        if rf.relation
+    };
+
+    SelectedFields::new(selected_fields)
 }
 
 pub fn collect_nested_queries(fields: Vec<ParsedField>, model: &ModelRef) -> QueryGraphBuilderResult<Vec<ReadQuery>> {
@@ -82,20 +79,11 @@ pub fn collect_nested_queries(fields: Vec<ParsedField>, model: &ModelRef) -> Que
             let args = utils::extract_query_args(field.arguments.drain(0..).collect(), &model)?;
 
             let builder = if rf.relation().is_many_to_many() || args.is_with_pagination() {
-                ReadQueryBuilder::ReadRelatedRecordsBuilder(ReadRelatedRecordsBuilder::new(
-                    model,
-                    parent,
-                    field,
-                    args,
-                ))
+                ReadQueryBuilder::ReadRelatedRecordsBuilder(ReadRelatedRecordsBuilder::new(model, parent, field, args))
             } else if rf.relation_is_inlined_in_parent() {
-                ReadQueryBuilder::ReadManyRecordsBuilder(ReadManyRecordsBuilder::new(
-                    field,
-                    model,
-                    args,
-                    Some(parent),
-                ))
-            } else { // in child
+                ReadQueryBuilder::ReadManyRecordsBuilder(ReadManyRecordsBuilder::new(field, model, args, Some(parent)))
+            } else {
+                // in child
                 unimplemented!()
             };
 
