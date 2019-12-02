@@ -46,8 +46,6 @@ type AnyError = Box<dyn Error + Send + Sync + 'static>;
 
 #[tokio::main]
 async fn main() -> Result<(), AnyError> {
-    user_facing_errors::set_panic_hook();
-
     let matches = ClapApp::new("Prisma Query Engine")
         .version(env!("CARGO_PKG_VERSION"))
         .arg(
