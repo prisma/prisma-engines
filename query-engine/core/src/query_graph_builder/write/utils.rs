@@ -182,9 +182,9 @@ pub fn insert_existing_1to1_related_model_checks(
     let rf = Arc::clone(&parent_relation_field);
 
     let read_existing_children =
-        insert_find_children_by_parent_node(graph, &parent_node, &parent_relation_field, None)?;
+        insert_find_children_by_parent_node(graph, &parent_node, &parent_relation_field, Filter::empty())?;
 
-    let update_existing_child = update_records_node_placeholder(graph, None, child_model);
+    let update_existing_child = update_records_node_placeholder(graph, Filter::empty(), child_model);
     let relation_field_name = parent_relation_field.related_field().name.clone();
     let if_node = graph.create_node(Flow::default_if());
 
@@ -285,7 +285,7 @@ pub fn insert_deletion_checks(
         // For all requiring models (RM), we use the field on `model` to query for existing RM records and error out if at least one exists.
         for rf in relation_fields {
             let relation_field = rf.related_field();
-            let read_node = insert_find_children_by_parent_node(graph, parent_node, &relation_field, None)?;
+            let read_node = insert_find_children_by_parent_node(graph, parent_node, &relation_field, Filter::empty())?;
 
             graph.create_edge(
                 &read_node,

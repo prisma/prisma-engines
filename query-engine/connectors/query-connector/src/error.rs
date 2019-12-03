@@ -1,4 +1,4 @@
-use crate::filter::RecordFinder;
+use crate::filter::{Filter, RecordFinder};
 use failure::{Error, Fail};
 use prisma_models::prelude::{DomainError, GraphqlId, ModelRef, PrismaValue};
 use std::fmt;
@@ -73,7 +73,7 @@ pub enum ConnectorError {
     DomainError(DomainError),
 
     #[fail(display = "Record not found: {}", _0)]
-    RecordNotFoundForWhere(RecordFinderInfo),
+    RecordNotFoundForWhere(Filter),
 
     #[fail(
         display = "Violating a relation {} between {} and {}",

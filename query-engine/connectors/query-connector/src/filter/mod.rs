@@ -9,8 +9,10 @@ mod record_finder;
 mod relation;
 mod scalar;
 
-pub use list::*;
 use prisma_models::prelude::*;
+use std::fmt;
+
+pub use list::*;
 pub use record_finder::*;
 pub use relation::*;
 pub use scalar::*;
@@ -26,6 +28,7 @@ pub enum Filter {
     Relation(RelationFilter),
     NodeSubscription,
     BoolFilter(bool),
+    Empty,
 }
 
 impl Filter {
@@ -42,7 +45,25 @@ impl Filter {
     }
 
     pub fn empty() -> Self {
-        Filter::BoolFilter(true)
+        Filter::Empty
+    }
+
+    /// Returns the size of the topmost filter elements (does not recursively compute the size).
+    pub fn size(&self) -> usize {
+        match self {
+            Self::And(v) => v.len(),
+            Self::Or(v) => v.len(),
+            Self::Not(v) => v.len(),
+            Self::Empty => 0,
+            _ => 1,
+        }
+    }
+}
+
+// WIP
+impl fmt::Display for Filter {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{:?}", self)
     }
 }
 
@@ -85,25 +106,25 @@ impl From<RecordFinder> for Filter {
     }
 }
 
-impl From<Option<RecordFinder>> for Filter {
-    fn from(record_finder: Option<RecordFinder>) -> Self {
-        match record_finder {
-            Some(rf) => Self::from(rf),
-            None => Self::empty(),
-        }
-    }
-}
+// impl<T> From<Option<T>> for Filter where T: Into<Filter> {
+//     fn from(record_finder: Option<RecordFinder>) -> Self {
+//         match record_finder {
+//             Some(rf) => Self::from(rf),
+//             None => Self::empty(),
+//         }
+//     }
+// }
 
-impl From<Vec<RecordFinder>> for Filter {
-    fn from(record_finders: Vec<RecordFinder>) -> Self {
-        if record_finders.is_empty() {
-            Self::empty()
-        } else {
-            let as_filters: Vec<Filter> = record_finders.into_iter().map(|x| x.into()).collect();
-            Filter::or(as_filters).into()
-        }
-    }
-}
+// impl From<Vec<RecordFinder>> for Filter {
+//     fn from(record_finders: Vec<RecordFinder>) -> Self {
+//         if record_finders.is_empty() {
+//             Self::empty()
+//         } else {
+//             let as_filters: Vec<Filter> = record_finders.into_iter().map(|x| x.into()).collect();
+//             Filter::or(as_filters).into()
+//         }
+//     }
+// }
 
 /// Creates a test data model for the unit tests in this module.
 pub fn test_data_model() -> InternalDataModelRef {

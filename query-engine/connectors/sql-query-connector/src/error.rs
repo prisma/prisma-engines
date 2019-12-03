@@ -1,4 +1,4 @@
-use connector_interface::error::*;
+use connector_interface::{error::*, Filter};
 use failure::{Error, Fail};
 use prisma_models::prelude::DomainError;
 use std::string::FromUtf8Error;
@@ -36,7 +36,7 @@ pub enum SqlError {
     DomainError(DomainError),
 
     #[fail(display = "Record not found: {}", _0)]
-    RecordNotFoundForWhere(RecordFinderInfo),
+    RecordNotFoundForWhere(Filter),
 
     #[fail(
         display = "Violating a relation {} between {} and {}",

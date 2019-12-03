@@ -97,21 +97,26 @@ impl FilterOp {
 pub fn extract_filter(
     value_map: BTreeMap<String, ParsedInputValue>,
     model: &ModelRef,
+    match_suffix: bool,
 ) -> QueryGraphBuilderResult<Filter> {
     let filters = value_map
         .into_iter()
         .map(|(key, value): (String, ParsedInputValue)| {
-            let op = FilterOp::find_op(key.as_str()).unwrap();
+            let op = if match_suffix {
+                FilterOp::find_op(key.as_str()).unwrap()
+            } else {
+                FilterOp::Field
+            };
 
             match op {
                 op if (op == FilterOp::NestedAnd || op == FilterOp::NestedOr || op == FilterOp::NestedNot) => {
                     let value: QueryGraphBuilderResult<Vec<Filter>> = match value {
                         ParsedInputValue::List(values) => values
                             .into_iter()
-                            .map(|val| extract_filter(val.try_into()?, model))
+                            .map(|val| extract_filter(val.try_into()?, model, match_suffix))
                             .collect(),
 
-                        ParsedInputValue::Map(map) => extract_filter(map, model).map(|res| vec![res]),
+                        ParsedInputValue::Map(map) => extract_filter(map, model, match_suffix).map(|res| vec![res]),
 
                         _ => unreachable!(),
                     };
@@ -131,7 +136,7 @@ pub fn extract_filter(
                     match model.fields().find_from_all(&field_name) {
                         Ok(field) => match field {
                             Field::Scalar(field) => handle_scalar_field(field, value, &op),
-                            Field::Relation(field) => handle_relation_field(field, value, &op),
+                            Field::Relation(field) => handle_relation_field(field, value, &op, match_suffix),
                         },
                         Err(_) => find_index_fields(&field_name, &model)
                             .and_then(|fields| handle_compound_field(fields, value))
@@ -179,14 +184,21 @@ fn handle_relation_field(
     field: &RelationFieldRef,
     value: ParsedInputValue,
     op: &FilterOp,
+    match_suffix: bool,
 ) -> QueryGraphBuilderResult<Filter> {
     let value: Option<BTreeMap<String, ParsedInputValue>> = value.try_into()?;
 
     Ok(match (op, value) {
-        (FilterOp::Some, Some(value)) => field.at_least_one_related(extract_filter(value, &field.related_model())?),
-        (FilterOp::None, Some(value)) => field.no_related(extract_filter(value, &field.related_model())?),
-        (FilterOp::Every, Some(value)) => field.every_related(extract_filter(value, &field.related_model())?),
-        (FilterOp::Field, Some(value)) => field.to_one_related(extract_filter(value, &field.related_model())?),
+        (FilterOp::Some, Some(value)) => {
+            field.at_least_one_related(extract_filter(value, &field.related_model(), match_suffix)?)
+        }
+        (FilterOp::None, Some(value)) => field.no_related(extract_filter(value, &field.related_model(), match_suffix)?),
+        (FilterOp::Every, Some(value)) => {
+            field.every_related(extract_filter(value, &field.related_model(), match_suffix)?)
+        }
+        (FilterOp::Field, Some(value)) => {
+            field.to_one_related(extract_filter(value, &field.related_model(), match_suffix)?)
+        }
         (FilterOp::Field, None) => field.one_relation_is_null(),
         _ => unreachable!(),
     })

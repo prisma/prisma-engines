@@ -21,7 +21,11 @@ impl Builder<ReadQuery> for ReadOneRecordBuilder {
         let filter = match self.field.arguments.lookup("where") {
             Some(where_arg) => {
                 let arg: ParsedInputMap = where_arg.value.try_into()?;
-                Some(utils::extract_filter(arg.assert_size(1)?, &self.model)?)
+
+                arg.assert_size(1)?;
+                arg.assert_non_null()?;
+
+                Some(utils::extract_filter(arg, &self.model, false)?)
             }
             None => None,
         };

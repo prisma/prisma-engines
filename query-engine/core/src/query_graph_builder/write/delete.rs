@@ -11,7 +11,7 @@ use std::{convert::TryInto, sync::Arc};
 /// Creates a top level delete record query and adds it to the query graph.
 pub fn delete_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedField) -> QueryGraphBuilderResult<()> {
     let where_arg = field.arguments.lookup("where").unwrap();
-    let filter = extract_filter(where_arg.value.try_into()?, &model)?;
+    let filter = extract_filter(where_arg.value.try_into()?, &model, false)?;
 
     // Prefetch read query for the delete
     let mut read_query = ReadOneRecordBuilder::new(field, Arc::clone(&model)).build()?;
@@ -52,7 +52,7 @@ pub fn delete_many_records(
     mut field: ParsedField,
 ) -> QueryGraphBuilderResult<()> {
     let filter = match field.arguments.lookup("where") {
-        Some(where_arg) => extract_filter(where_arg.value.try_into()?, &model)?,
+        Some(where_arg) => extract_filter(where_arg.value.try_into()?, &model, true)?,
         None => Filter::empty(),
     };
 

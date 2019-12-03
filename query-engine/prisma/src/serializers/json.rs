@@ -4,6 +4,7 @@ use crate::PrismaResult;
 use indexmap::IndexMap;
 use prisma_models::{GraphqlId, PrismaValue};
 use query_core::response_ir::{Item, Response};
+use rust_decimal::prelude::ToPrimitive;
 use serde_json::{Map, Number, Value};
 use std::sync::Arc;
 
@@ -66,7 +67,8 @@ fn serialize_list(list: Vec<Item>) -> Vec<Value> {
 fn serialize_prisma_value(value: PrismaValue) -> PrismaResult<Value> {
     Ok(match value {
         PrismaValue::String(x) => Value::String(x),
-        PrismaValue::Float(x) => serde_json::to_value(x).expect("Unable to serialize Decimal to JSON."),
+        PrismaValue::Float(x) => serde_json::to_value(x.to_f64().expect("Decimal is not a f64."))
+            .expect("Unable to serialize Decimal to JSON."),
         PrismaValue::Boolean(x) => Value::Bool(x),
         PrismaValue::DateTime(date) => Value::String(format!("{}", date.format("%Y-%m-%dT%H:%M:%S%.3fZ"))),
         PrismaValue::Enum(x) => Value::String(x.as_string()),

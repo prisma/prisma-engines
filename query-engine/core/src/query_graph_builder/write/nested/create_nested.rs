@@ -4,7 +4,7 @@ use crate::{
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
     ParsedInputValue,
 };
-use connector::ScalarCompare;
+use connector::{Filter, ScalarCompare};
 use prisma_models::{ModelRef, RelationFieldRef};
 use std::{convert::TryInto, sync::Arc};
 
@@ -341,7 +341,7 @@ fn handle_one_to_one(
     if relation_inlined_parent && !parent_is_create {
         let parent_model = parent_relation_field.model();
         let parent_model_id = parent_model.fields().id();
-        let update_node = utils::update_records_node_placeholder(graph, None, parent_model);
+        let update_node = utils::update_records_node_placeholder(graph, Filter::empty(), parent_model);
 
         graph.create_edge(
             &child_node,

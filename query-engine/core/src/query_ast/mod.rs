@@ -32,6 +32,7 @@ pub trait FilteredQuery {
                 v.push(filter);
                 None
             }
+            Some(Filter::Empty) => Some(filter),
             Some(other) => Some(Self::default_filter_behaviour(vec![other.clone(), filter])),
             None => Some(filter),
         };

@@ -1,8 +1,7 @@
-use crate::{error::*, query_builder::read, AliasedCondition, RawQuery, SqlRow, ToSqlRow};
+use crate::{error::*, AliasedCondition, RawQuery, SqlRow, ToSqlRow};
 use async_trait::async_trait;
 use connector_interface::{
-    error::RecordFinderInfo,
-    filter::{Filter, RecordFinder},
+    filter::{Filter},
 };
 use prisma_models::*;
 use quaint::{
@@ -55,25 +54,6 @@ pub trait QueryExt: Queryable + Send + Sync {
         }
     }
 
-    /// Find one full record selecting all scalar fields.
-    async fn find_record(&self, record_finder: &RecordFinder) -> crate::Result<SingleRecord> {
-        use SqlError::*;
-
-        let model = record_finder.field.model();
-        let selected_fields = SelectedFields::from(&model);
-        let select = read::get_records(&model, &selected_fields, record_finder);
-        let idents = selected_fields.type_identifiers();
-
-        let row = self.find(select, idents.as_slice()).await.map_err(|e| match e {
-            RecordDoesNotExist => RecordNotFoundForWhere(RecordFinderInfo::from(record_finder)),
-            e => e,
-        })?;
-
-        let record = Record::from(row);
-
-        Ok(SingleRecord::new(record, selected_fields.names()))
-    }
-
     /// Select one row from the database.
     async fn find(&self, q: Select<'_>, idents: &[TypeIdentifier]) -> crate::Result<SqlRow> {
         self.filter(q.limit(1).into(), idents)
@@ -95,21 +75,6 @@ pub trait QueryExt: Queryable + Send + Sync {
             .unwrap();
 
         Ok(i64::try_from(id)?)
-    }
-
-    /// Read the first column from the first row as an `GraphqlId`.
-    async fn find_id(&self, record_finder: &RecordFinder) -> crate::Result<GraphqlId> {
-        let model = record_finder.field.model();
-        let filter = Filter::from(record_finder.clone());
-
-        let id = self
-            .filter_ids(&model, filter)
-            .await?
-            .into_iter()
-            .next()
-            .ok_or_else(|| SqlError::RecordNotFoundForWhere(RecordFinderInfo::from(record_finder)))?;
-
-        Ok(id)
     }
 
     /// Read the all columns as an `GraphqlId`

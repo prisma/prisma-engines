@@ -3,9 +3,9 @@ use crate::query_graph_builder::write::utils::coerce_vec;
 use crate::{
     query_ast::*,
     query_graph::{Flow, Node, NodeRef, QueryGraph, QueryGraphDependency},
-    ParsedInputValue,
+    InputAssertions, ParsedInputMap, ParsedInputValue,
 };
-use connector::ScalarCompare;
+use connector::{Filter, ScalarCompare};
 use prisma_models::RelationFieldRef;
 use std::{convert::TryInto, sync::Arc};
 
@@ -98,18 +98,27 @@ pub fn connect_nested_upsert(
         let update_input = as_map.remove("update").expect("update argument is missing");
 
         // Read child(ren) node
-        let finder: Option<RecordFinder> = if parent_relation_field.is_list {
-            let where_input = as_map.remove("where").expect("where argument is missing");
-            Some(extract_record_finder(where_input, &child_model)?)
+        let filter: Filter = if parent_relation_field.is_list {
+            let where_input: ParsedInputMap = as_map.remove("where").expect("where argument is missing").try_into()?;
+
+            where_input.assert_size(1)?;
+            where_input.assert_non_null()?;
+
+            extract_filter(where_input, &child_model, false)?
         } else {
-            None
+            Filter::empty()
         };
 
         let read_children_node =
-            utils::insert_find_children_by_parent_node(graph, &parent_node, parent_relation_field, finder)?;
+            utils::insert_find_children_by_parent_node(graph, &parent_node, parent_relation_field, filter)?;
 
         let create_node = create::create_record_node(graph, Arc::clone(&child_model), create_input.try_into()?)?;
-        let update_node = update::update_record_node(graph, None, Arc::clone(&child_model), update_input.try_into()?)?;
+        let update_node = update::update_record_node(
+            graph,
+            Filter::empty(),
+            Arc::clone(&child_model),
+            update_input.try_into()?,
+        )?;
         let if_node = graph.create_node(Flow::default_if());
 
         graph.create_edge(
@@ -157,7 +166,8 @@ pub fn connect_nested_upsert(
                 let related_field_name = parent_relation_field.name.clone();
 
                 // Update parent node
-                let update_node = utils::update_records_node_placeholder(graph, None, Arc::clone(&parent_model));
+                let update_node =
+                    utils::update_records_node_placeholder(graph, Filter::empty(), Arc::clone(&parent_model));
                 let id_field = parent_model.fields().id();
 
                 // Edge to retrieve the finder

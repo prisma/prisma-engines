@@ -2,29 +2,28 @@ use super::*;
 use crate::{
     query_ast::*,
     query_graph::{Flow, Node, QueryGraph, QueryGraphDependency},
-    ArgumentListLookup, ParsedField, ReadOneRecordBuilder,
+    ArgumentListLookup, InputAssertions, ParsedField, ParsedInputMap, ReadOneRecordBuilder,
 };
 use connector::ScalarCompare;
 use prisma_models::ModelRef;
 use std::{convert::TryInto, sync::Arc};
 
 pub fn upsert_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedField) -> QueryGraphBuilderResult<()> {
-    let where_arg = field.arguments.lookup("where").unwrap();
-    let record_finder = extract_record_finder(where_arg.value, &model)?;
+    let where_arg: ParsedInputMap = field.arguments.lookup("where").unwrap().value.try_into()?;
+
+    where_arg.assert_size(1)?;
+    where_arg.assert_non_null()?;
+
+    let filter = extract_filter(where_arg, &model, false)?;
 
     let create_argument = field.arguments.lookup("create").unwrap();
     let update_argument = field.arguments.lookup("update").unwrap();
 
-    let child_read_query = utils::read_ids_infallible(&model, record_finder.clone());
+    let child_read_query = utils::read_ids_infallible(&model, filter.clone());
     let initial_read_node = graph.create_node(child_read_query);
 
     let create_node = create::create_record_node(graph, Arc::clone(&model), create_argument.value.try_into()?)?;
-    let update_node = update::update_record_node(
-        graph,
-        Some(record_finder),
-        Arc::clone(&model),
-        update_argument.value.try_into()?,
-    )?;
+    let update_node = update::update_record_node(graph, filter, Arc::clone(&model), update_argument.value.try_into()?)?;
 
     let read_query = ReadOneRecordBuilder::new(field, Arc::clone(&model)).build()?;
     let read_node_create = graph.create_node(Query::Read(read_query.clone()));

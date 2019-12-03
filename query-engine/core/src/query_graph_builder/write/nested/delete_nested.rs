@@ -123,7 +123,7 @@ pub fn connect_nested_delete_many(
 ) -> QueryGraphBuilderResult<()> {
     for value in utils::coerce_vec(value) {
         let as_map: ParsedInputMap = value.try_into()?;
-        let filter = extract_filter(as_map, child_model)?;
+        let filter = extract_filter(as_map, child_model, true)?;
 
         let find_child_records_node =
             utils::insert_find_children_by_parent_node(graph, parent, parent_relation_field, filter.clone())?;

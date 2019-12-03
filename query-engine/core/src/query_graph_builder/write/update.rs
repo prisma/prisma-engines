@@ -2,7 +2,7 @@ use super::*;
 use crate::{
     query_ast::*,
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
-    ArgumentListLookup, ParsedField, ParsedInputMap, ReadOneRecordBuilder,
+    ArgumentListLookup, InputAssertions, ParsedField, ParsedInputMap, ReadOneRecordBuilder,
 };
 use connector::{filter::Filter, ScalarCompare};
 use prisma_models::ModelRef;
@@ -14,14 +14,18 @@ pub fn update_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedF
     let id_field = model.fields().id();
 
     // "where"
-    let where_arg = field.arguments.lookup("where").unwrap();
-    let record_finder = extract_record_finder(where_arg.value, &model)?;
+    let where_arg: ParsedInputMap = field.arguments.lookup("where").unwrap().value.try_into()?;
+
+    where_arg.assert_size(1)?;
+    where_arg.assert_non_null()?;
+
+    let filter = extract_filter(where_arg, &model, false)?;
 
     // "data"
     let data_argument = field.arguments.lookup("data").unwrap();
     let data_map: ParsedInputMap = data_argument.value.try_into()?;
 
-    let update_node = update_record_node(graph, Some(record_finder), Arc::clone(&model), data_map)?;
+    let update_node = update_record_node(graph, filter, Arc::clone(&model), data_map)?;
 
     let read_query = ReadOneRecordBuilder::new(field, model).build()?;
     let read_node = graph.create_node(Query::Read(read_query));
@@ -56,7 +60,7 @@ pub fn update_many_records(
     mut field: ParsedField,
 ) -> QueryGraphBuilderResult<()> {
     let filter = match field.arguments.lookup("where") {
-        Some(where_arg) => extract_filter(where_arg.value.try_into()?, &model)?,
+        Some(where_arg) => extract_filter(where_arg.value.try_into()?, &model, true)?,
         None => Filter::empty(),
     };
 

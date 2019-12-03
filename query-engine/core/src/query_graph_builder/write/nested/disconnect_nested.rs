@@ -1,7 +1,7 @@
 use super::*;
 use crate::{
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
-    FilteredQuery, ParsedInputValue, Query, WriteQuery,
+    FilteredQuery, InputAssertions, ParsedInputMap, ParsedInputValue, Query, WriteQuery,
 };
 use connector::{Filter, ScalarCompare};
 use itertools::Itertools;
@@ -22,18 +22,25 @@ pub fn connect_nested_disconnect(
     let relation = parent_relation_field.relation();
 
     if relation.is_many_to_many() {
-        // Build all finders upfront.
-        let finders: Vec<RecordFinder> = utils::coerce_vec(value)
+        // Build all filters upfront.
+        let filters: Vec<Filter> = utils::coerce_vec(value)
             .into_iter()
-            .map(|value: ParsedInputValue| extract_record_finder(value, &child_model))
-            .collect::<QueryGraphBuilderResult<Vec<RecordFinder>>>()?
+            .map(|value: ParsedInputValue| {
+                let value: ParsedInputMap = value.try_into()?;
+
+                value.assert_size(1)?;
+                value.assert_non_null()?;
+
+                extract_filter(value, &child_model, false)
+            })
+            .collect::<QueryGraphBuilderResult<Vec<Filter>>>()?
             .into_iter()
             .unique()
             .collect();
 
-        handle_many_to_many(graph, &parent_node, parent_relation_field, finders)
+        handle_many_to_many(graph, &parent_node, parent_relation_field, Filter::or(filters))
     } else {
-        let finders: Vec<RecordFinder> = if relation.is_one_to_one() {
+        let filter: Filter = if relation.is_one_to_one() {
             // One-to-one relations simply specify if they want to disconnect the child or not as a bool.
             let val: PrismaValue = value.try_into()?;
             let should_delete = if let PrismaValue::Boolean(b) = val { b } else { false };
@@ -42,24 +49,33 @@ pub fn connect_nested_disconnect(
                 return Ok(());
             }
 
-            vec![]
+            Filter::empty()
         } else {
             // One-to-many specify a number of finders if the parent side is the to-one.
             // todo check if this if else is really still required.
             if parent_relation_field.is_list {
-                utils::coerce_vec(value)
+                let filters = utils::coerce_vec(value)
                     .into_iter()
-                    .map(|value: ParsedInputValue| extract_record_finder(value, &child_model))
-                    .collect::<QueryGraphBuilderResult<Vec<RecordFinder>>>()?
+                    .map(|value: ParsedInputValue| {
+                        let value: ParsedInputMap = value.try_into()?;
+
+                        value.assert_size(1)?;
+                        value.assert_non_null()?;
+
+                        extract_filter(value, &child_model, false)
+                    })
+                    .collect::<QueryGraphBuilderResult<Vec<Filter>>>()?
                     .into_iter()
                     .unique()
-                    .collect()
+                    .collect();
+
+                Filter::or(filters)
             } else {
-                vec![]
+                Filter::empty()
             }
         };
 
-        handle_one_to_x(graph, &parent_node, parent_relation_field, finders)
+        handle_one_to_x(graph, &parent_node, parent_relation_field, filter)
     }
 }
 
@@ -95,10 +111,9 @@ fn handle_many_to_many(
     graph: &mut QueryGraph,
     parent_node: &NodeRef,
     parent_relation_field: &RelationFieldRef,
-    finders: Vec<RecordFinder>,
+    filter: Filter,
 ) -> QueryGraphBuilderResult<()> {
-    let expected_disconnects = std::cmp::max(finders.len(), 1);
-    let filter: Filter = finders.into();
+    let expected_disconnects = std::cmp::max(filter.size(), 1);
     let find_child_records_node =
         utils::insert_find_children_by_parent_node(graph, parent_node, parent_relation_field, filter)?;
 
@@ -148,13 +163,13 @@ fn handle_one_to_x(
     graph: &mut QueryGraph,
     parent_node: &NodeRef,
     parent_relation_field: &RelationFieldRef,
-    finders: Vec<RecordFinder>,
+    filter: Filter,
 ) -> QueryGraphBuilderResult<()> {
-    let finders_len = finders.len();
+    let filter_size = filter.size();
 
     // Fetches children to be disconnected.
     let find_child_records_node =
-        utils::insert_find_children_by_parent_node(graph, &parent_node, parent_relation_field, finders)?;
+        utils::insert_find_children_by_parent_node(graph, &parent_node, parent_relation_field, filter)?;
 
     let child_relation_field = parent_relation_field.related_field();
 
@@ -177,7 +192,7 @@ fn handle_one_to_x(
                 parent_model,
                 relation_field_name,
                 parent_model_id,
-                std::cmp::max(finders_len, 1),
+                std::cmp::max(filter_size, 1),
             )
         } else {
             let child_model = child_relation_field.model();
@@ -194,7 +209,7 @@ fn handle_one_to_x(
             )
         };
 
-    let update_node = utils::update_records_node_placeholder(graph, None, model_to_update);
+    let update_node = utils::update_records_node_placeholder(graph, Filter::empty(), model_to_update);
     let relation_name = parent_relation_field.relation().name.clone();
     let parent_name = parent_relation_field.model().name.clone();
     let child_name = parent_relation_field.related_model().name.clone();
@@ -215,14 +230,12 @@ fn handle_one_to_x(
             // Handle finder / filter injection
             match child_node {
                 Node::Query(Query::Write(WriteQuery::UpdateManyRecords(ref mut ur))) => {
-                    ur.filter = parent_ids
-                        .into_iter()
-                        .map(|id| RecordFinder {
-                            field: id_field.clone(),
-                            value: id,
-                        })
-                        .collect::<Vec<RecordFinder>>()
-                        .into()
+                    ur.filter = Filter::or(
+                        parent_ids
+                            .into_iter()
+                            .map(|id| id_field.clone().equals(id))
+                            .collect::<Vec<Filter>>(),
+                    )
                 }
 
                 Node::Query(Query::Write(ref mut wq)) => wq.add_filter(id_field.equals(parent_ids.pop().unwrap())),
