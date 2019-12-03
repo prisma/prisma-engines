@@ -488,7 +488,7 @@ impl FieldAssertions for ScalarField {
     }
 
     fn assert_unique(&self) -> &Self {
-        assert!(self.is_unique());
+        assert!(self.unique());
         self
     }
 }

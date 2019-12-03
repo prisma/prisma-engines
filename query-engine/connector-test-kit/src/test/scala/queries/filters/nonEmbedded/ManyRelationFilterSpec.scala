@@ -81,18 +81,18 @@ class ManyRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "simple scalar filter" should "work" in {
-    server.query(query = """{blogs{posts(where:{popularity_gte: 5}){title}}}""", project = project).toString should be(
+    server.query(query = """{blogs{posts(where:{popularity_gte: 5},orderBy: id_ASC){title}}}""", project = project).toString should be(
       """{"data":{"blogs":[{"posts":[{"title":"post 1"}]},{"posts":[{"title":"post 3"}]}]}}""")
   }
 
   "1 level 1-relation filter" should "work" in {
-    server.query(query = """{posts(where:{blog:{name: "blog 1"}}){title}}""", project = project).toString should be(
+    server.query(query = """{posts(where:{blog:{name: "blog 1"}},orderBy: id_ASC){title}}""", project = project).toString should be(
       """{"data":{"posts":[{"title":"post 1"},{"title":"post 2"}]}}""")
   }
 
   "1 level m-relation filter" should "work for _some" in {
 
-    server.query(query = """{blogs(where:{posts_some:{popularity_gte: 5}}){name}}""", project = project).toString should be(
+    server.query(query = """{blogs(where:{posts_some:{popularity_gte: 5}},orderBy: id_ASC){name}}""", project = project).toString should be(
       """{"data":{"blogs":[{"name":"blog 1"},{"name":"blog 2"}]}}""")
 
     server.query(query = """{blogs(where:{posts_some:{popularity_gte: 50}}){name}}""", project = project).toString should be(
@@ -110,7 +110,7 @@ class ManyRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "1 level m-relation filter" should "work for _every " taggedAs (IgnoreMongo) in {
-    server.query(query = """{blogs(where:{posts_every:{popularity_gte: 2}}){name}}""", project = project).toString should be(
+    server.query(query = """{blogs(where:{posts_every:{popularity_gte: 2}},orderBy: id_ASC){name}}""", project = project).toString should be(
       """{"data":{"blogs":[{"name":"blog 1"},{"name":"blog 2"}]}}""")
 
     server.query(query = """{blogs(where:{posts_every:{popularity_gte: 3}}){name}}""", project = project).toString should be(
@@ -135,14 +135,14 @@ class ManyRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
 
   "2 level m-relation filter" should "work for _every, _some and _none" taggedAs (IgnoreMongo) in {
     // some|every
-    server.query(query = """{blogs(where:{posts_some:{comments_every: {likes_gte: 0}}}){name}}""", project = project).toString should be(
+    server.query(query = """{blogs(where:{posts_some:{comments_every: {likes_gte: 0}}},orderBy: id_ASC){name}}""", project = project).toString should be(
       """{"data":{"blogs":[{"name":"blog 1"},{"name":"blog 2"}]}}""")
 
     server.query(query = """{blogs(where:{posts_some:{comments_every: {likes: 0}}}){name}}""", project = project).toString should be(
       """{"data":{"blogs":[]}}""")
 
     // some|none
-    server.query(query = """{blogs(where:{posts_some:{comments_none: {likes: 0}}}){name}}""", project = project).toString should be(
+    server.query(query = """{blogs(where:{posts_some:{comments_none: {likes: 0}}},orderBy: id_ASC){name}}""", project = project).toString should be(
       """{"data":{"blogs":[{"name":"blog 1"},{"name":"blog 2"}]}}""")
 
     server.query(query = """{blogs(where:{posts_some:{comments_none: {likes_gte: 0}}}){name}}""", project = project).toString should be(
@@ -156,7 +156,7 @@ class ManyRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
       """{"data":{"blogs":[]}}""")
 
     // every|every
-    server.query(query = """{blogs(where:{posts_every:{comments_every: {likes_gte: 0}}}){name}}""", project = project).toString should be(
+    server.query(query = """{blogs(where:{posts_every:{comments_every: {likes_gte: 0}}},orderBy: id_ASC){name}}""", project = project).toString should be(
       """{"data":{"blogs":[{"name":"blog 1"},{"name":"blog 2"}]}}""")
 
     server.query(query = """{blogs(where:{posts_every:{comments_every: {likes: 0}}}){name}}""", project = project).toString should be(
@@ -184,7 +184,7 @@ class ManyRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
       """{"data":{"blogs":[]}}""")
 
     // none|none
-    server.query(query = """{blogs(where:{posts_none:{comments_none: {likes_gte: 0}}}){name}}""", project = project).toString should be(
+    server.query(query = """{blogs(where:{posts_none:{comments_none: {likes_gte: 0}}},orderBy: id_ASC){name}}""", project = project).toString should be(
       """{"data":{"blogs":[{"name":"blog 1"},{"name":"blog 2"}]}}""")
 
     server.query(query = """{blogs(where:{posts_none:{comments_none: {likes_gte: 11}}}){name}}""", project = project).toString should be(
@@ -256,13 +256,13 @@ class ManyRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
       server.query(s""" mutation {updateAUser(where: { name: "Author1"}, data:{posts:{connect:[{title: "Title1"},{title: "Title2"}]}}) {name}} """, project)
       server.query(s""" mutation {updateAUser(where: { name: "Author2"}, data:{posts:{connect:[{title: "Title1"},{title: "Title2"}]}}) {name}} """, project)
 
-      server.query("""query{aUsers{name, posts{title}}}""", project).toString should be(
+      server.query("""query{aUsers (orderBy: id_ASC){name, posts(orderBy: id_ASC){title}}}""", project).toString should be(
         """{"data":{"aUsers":[{"name":"Author1","posts":[{"title":"Title1"},{"title":"Title2"}]},{"name":"Author2","posts":[{"title":"Title1"},{"title":"Title2"}]}]}}""")
 
-      server.query("""query{posts {title, authors {name}}}""", project).toString should be(
+      server.query("""query{posts(orderBy: id_ASC) {title, authors (orderBy: id_ASC){name}}}""", project).toString should be(
         """{"data":{"posts":[{"title":"Title1","authors":[{"name":"Author1"},{"name":"Author2"}]},{"title":"Title2","authors":[{"name":"Author1"},{"name":"Author2"}]}]}}""")
 
-      val res = server.query("""query{aUsers(where:{name_starts_with: "Author2", posts_some:{title_ends_with: "1"}}){name, posts{title}}}""", project)
+      val res = server.query("""query{aUsers(where:{name_starts_with: "Author2", posts_some:{title_ends_with: "1"}},orderBy: id_ASC){name, posts(orderBy: id_ASC){title}}}""", project)
       res.toString should be("""{"data":{"aUsers":[{"name":"Author2","posts":[{"title":"Title1"},{"title":"Title2"}]}]}}""")
     }
 
