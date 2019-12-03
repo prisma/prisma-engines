@@ -270,6 +270,10 @@ impl TempRelationHolder {
         "B".to_string()
     }
 
+    pub fn is_one_to_one(&self) -> bool {
+        !self.field_a.is_list() && !self.field_b.is_list()
+    }
+
     fn is_many_to_many(&self) -> bool {
         self.field_a.is_list() && self.field_b.is_list()
     }

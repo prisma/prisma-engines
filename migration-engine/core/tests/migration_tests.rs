@@ -1463,3 +1463,33 @@ async fn model_with_multiple_indexes_works(api: &TestApi) {
 
     assert_eq!(like_indexes_count, expected_indexes_count);
 }
+
+#[test_each_connector]
+async fn foreign_keys_of_inline_one_to_one_relations_have_a_unique_constraint(api: &TestApi) {
+    let dm = r#"
+        model Cat {
+            id Int @id
+            box Box
+        }
+
+        model Box {
+            id Int @id
+            cat Cat
+        }
+    "#;
+
+    let schema = api.infer_and_apply(dm).await.sql_schema;
+
+    let box_table = schema.table_bang("Box");
+
+
+    let expected_indexes = &[
+        Index {
+            name: "Box_cat".into(),
+            columns: vec!["cat".into()],
+            tpe: IndexType::Unique,
+        }
+    ];
+
+    assert_eq!(box_table.indices, expected_indexes);
+}
