@@ -539,7 +539,7 @@ async fn introspecting_a_self_relation_should_work(api: &TestApi) {
 #[test_one_connector(connector = "postgres")]
 async fn introspecting_cascading_delete_behaviour_should_work(api: &TestApi) {
     let barrel = api.barrel();
-    let _setup_schema = barrel
+    barrel
         .execute(|migration| {
             migration.create_table("User", |t| {
                 t.add_column("id", types::primary());
@@ -558,7 +558,7 @@ async fn introspecting_cascading_delete_behaviour_should_work(api: &TestApi) {
             }
             
             model User {
-               id      Int @id @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
+               id    Int @id @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
                posts Post[] @relation(onDelete: CASCADE)
             }
         "#;
