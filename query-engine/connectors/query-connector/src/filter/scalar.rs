@@ -3,13 +3,13 @@ use crate::compare::ScalarCompare;
 use prisma_models::{PrismaValue, ScalarField};
 use std::sync::Arc;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ScalarFilter {
     pub field: Arc<ScalarField>,
     pub condition: ScalarCondition,
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ScalarCondition {
     Equals(PrismaValue),
     NotEquals(PrismaValue),

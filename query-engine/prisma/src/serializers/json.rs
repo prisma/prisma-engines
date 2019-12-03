@@ -12,8 +12,6 @@ pub fn serialize(responses: Vec<Response>) -> Value {
     let mut data_envelope = Map::new();
     let mut errors: Vec<Value> = Vec::new();
 
-    // let mut serialization_cache: HashMap<ItemRef, > = HashMap::new();
-
     for response in responses {
         match response {
             Response::Data(name, item) => {
@@ -30,6 +28,7 @@ pub fn serialize(responses: Vec<Response>) -> Value {
     if !errors.is_empty() {
         outer_envelope.insert("errors".into(), Value::Array(errors));
     }
+
     outer_envelope.insert("data".into(), Value::Object(data_envelope));
 
     Value::Object(outer_envelope)

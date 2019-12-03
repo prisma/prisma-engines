@@ -49,7 +49,6 @@ impl FilteredQuery for WriteQuery {
     fn set_filter(&mut self, filter: Filter) {
         match self {
             Self::UpdateRecord(q) => q.set_filter(filter),
-            Self::UpdateRecord(q) => q.set_filter(filter),
             Self::DeleteManyRecords(q) => q.set_filter(filter),
             Self::DeleteRecord(q) => q.set_filter(filter),
             Self::UpdateManyRecords(q) => q.set_filter(filter),

@@ -15,7 +15,7 @@ pub use record_finder::*;
 pub use relation::*;
 pub use scalar::*;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Eq, Hash, PartialEq)]
 pub enum Filter {
     And(Vec<Filter>),
     Or(Vec<Filter>),

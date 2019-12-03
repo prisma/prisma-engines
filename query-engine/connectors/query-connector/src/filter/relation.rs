@@ -3,14 +3,14 @@ use crate::filter::Filter;
 use prisma_models::RelationField;
 use std::sync::Arc;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct RelationFilter {
     pub field: Arc<RelationField>,
     pub nested_filter: Box<Filter>,
     pub condition: RelationCondition,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct OneRelationIsNullFilter {
     pub field: Arc<RelationField>,
 }
@@ -20,7 +20,7 @@ pub enum RelationCondition {
     EveryRelatedRecord,
     AtLeastOneRelatedRecord,
     NoRelatedRecord,
-    ToOneRelatedRecord, // TODO: This is needed for Mongo and should be discussed with Matthias
+    ToOneRelatedRecord,
 }
 
 impl RelationCondition {
