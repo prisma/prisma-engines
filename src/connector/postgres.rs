@@ -191,7 +191,7 @@ impl PostgresUrl {
         let mut certificate_file = None;
         let mut identity_file = None;
         let mut identity_password = None;
-        let mut ssl_accept_mode = SslAcceptMode::Strict;
+        let mut ssl_accept_mode = SslAcceptMode::AcceptInvalidCerts;
         let mut ssl_mode = SslMode::Prefer;
         let mut host = None;
 
