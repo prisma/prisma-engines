@@ -1,4 +1,4 @@
-use connector::{QueryArguments, ScalarListValues};
+use connector::QueryArguments;
 use prisma_models::{GraphqlId, ManyRecords};
 
 #[derive(Debug, Clone)]

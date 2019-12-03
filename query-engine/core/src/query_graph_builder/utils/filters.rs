@@ -165,7 +165,6 @@ pub fn extract_filter(
                                 _ => unreachable!(),
                             })
                         }
-                        _ => unreachable!(), //Check
                     }
                 }
             }

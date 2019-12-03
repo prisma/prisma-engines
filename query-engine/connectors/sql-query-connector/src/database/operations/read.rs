@@ -3,15 +3,9 @@ use crate::{
     QueryExt, SqlError,
 };
 use connector_interface::{error::ConnectorError, *};
-use itertools::Itertools;
 use prisma_models::*;
 use quaint::ast::*;
 use std::convert::TryFrom;
-
-struct ScalarListElement {
-    record_id: GraphqlId,
-    value: PrismaValue,
-}
 
 pub async fn get_single_record(
     conn: &dyn QueryExt,

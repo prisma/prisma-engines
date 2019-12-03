@@ -1,8 +1,7 @@
 use crate::{interpreter::InterpretationResult, query_ast::*, result_ast::*};
-use connector::{self, ConnectionLike, QueryArguments, ReadOperations, ScalarListValues};
+use connector::{self, ConnectionLike, QueryArguments, ReadOperations};
 use futures::future::{BoxFuture, FutureExt};
-use prisma_models::{GraphqlId, ScalarField, SelectedFields};
-use std::sync::Arc;
+use prisma_models::{GraphqlId, SelectedFields};
 
 pub fn execute<'a, 'b>(
     tx: &'a ConnectionLike<'a, 'b>,

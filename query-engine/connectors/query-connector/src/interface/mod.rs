@@ -52,12 +52,6 @@ pub trait ReadOperations {
     fn count_by_model<'a>(&'a self, model: &'a ModelRef, query_arguments: QueryArguments) -> crate::IO<'a, usize>;
 }
 
-#[derive(Debug, Clone)]
-pub struct ScalarListValues {
-    pub record_id: GraphqlId,
-    pub values: Vec<PrismaValue>,
-}
-
 pub trait WriteOperations {
     fn create_record<'a>(&'a self, model: &'a ModelRef, args: WriteArgs) -> crate::IO<GraphqlId>;
 

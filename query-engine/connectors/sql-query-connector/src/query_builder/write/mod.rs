@@ -124,25 +124,9 @@ pub fn delete_many(model: &ModelRef, ids: &[&GraphqlId]) -> Vec<Delete<'static>>
     let mut deletes = Vec::new();
 
     for chunk in ids.chunks(PARAMETER_LIMIT).into_iter() {
-        for lf in model.fields().scalar_list() {
-            let scalar_list_table = lf.scalar_list_table();
-            let condition = scalar_list_table.node_id_column().in_selection(chunk.to_vec());
-            deletes.push(Delete::from_table(scalar_list_table.table()).so_that(condition));
-        }
-
         let condition = model.fields().id().as_column().in_selection(chunk.to_vec());
         deletes.push(Delete::from_table(model.as_table()).so_that(condition));
     }
 
     deletes
-}
-
-fn delete_in_chunks<F>(table: Table<'static>, ids: &[&GraphqlId], conditions: F) -> Vec<Delete<'static>>
-where
-    F: Fn(&[&GraphqlId]) -> Compare<'static>,
-{
-    ids.chunks(PARAMETER_LIMIT)
-        .into_iter()
-        .map(|chunk| Delete::from_table(table.clone()).so_that(conditions(chunk)))
-        .collect()
 }

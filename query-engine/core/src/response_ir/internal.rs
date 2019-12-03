@@ -3,9 +3,8 @@ use crate::{
     schema::{IntoArc, ObjectTypeStrongRef, OutputType, OutputTypeRef, ScalarType},
     CoreError, CoreResult, QueryResult, RecordSelection,
 };
-use connector::ScalarListValues;
 use indexmap::IndexMap;
-use prisma_models::{GraphqlId, PrismaValue};
+use prisma_models::{EnumType, EnumValue, GraphqlId, PrismaValue};
 use std::{borrow::Borrow, collections::HashMap, convert::TryFrom};
 
 /// A grouping of items to their parent record.
@@ -246,7 +245,7 @@ fn process_nested_results(
     // Parse and validate all nested objects with their respective output type.
     // Unwraps are safe due to query validation.
     for nested_result in nested {
-        // todo Workaroun, tb changed with flat reads.
+        // todo Workaround, tb changed with flat reads.
         if let QueryResult::RecordSelection(ref rs) = nested_result {
             let name = rs.name.clone();
             let field = enclosing_type.find_field(&name).unwrap();
@@ -272,14 +271,7 @@ fn serialize_scalar(value: PrismaValue, typ: &OutputTypeRef) -> CoreResult<Item>
                 ))),
             },
 
-            PrismaValue::Enum(ref ev) => match et.value_for(&ev.name) {
-                Some(_) => Ok(Item::Value(PrismaValue::Enum(ev.clone()))),
-                None => Err(CoreError::SerializationError(format!(
-                    "Enum value '{}' not found on enum '{}'",
-                    ev.as_string(),
-                    et.name
-                ))),
-            },
+            PrismaValue::Enum(ref ev) => convert_enum_to_item(&ev, et),
 
             val => Err(CoreError::SerializationError(format!(
                 "Attempted to serialize non-enum-compatible value '{}' with enum '{:?}'",
@@ -290,8 +282,21 @@ fn serialize_scalar(value: PrismaValue, typ: &OutputTypeRef) -> CoreResult<Item>
             OutputType::Scalar(subtype) => {
                 let items = unwrap_prisma_value(value)
                     .into_iter()
-                    .map(|v| convertPrismaValue(v, subtype))
+                    .map(|v| convert_prisma_value(v, subtype))
                     .map(|pv| pv.map(|x| Item::Value(x)))
+                    .collect::<Result<Vec<Item>, CoreError>>()?;
+                Ok(Item::List(items))
+            }
+            OutputType::Enum(subtype) => {
+                let items = unwrap_prisma_value(value)
+                    .into_iter()
+                    .map(|v| match v {
+                        PrismaValue::Enum(ref ev) => convert_enum_to_item(ev, subtype),
+                        val => Err(CoreError::SerializationError(format!(
+                            "Attempted to serialize non-enum-compatible value '{}' with enum '{:?}'",
+                            val, subtype
+                        ))),
+                    })
                     .collect::<Result<Vec<Item>, CoreError>>()?;
                 Ok(Item::List(items))
             }
@@ -300,7 +305,7 @@ fn serialize_scalar(value: PrismaValue, typ: &OutputTypeRef) -> CoreResult<Item>
                 arc_type
             ))),
         },
-        (_, OutputType::Scalar(st)) => Ok(Item::Value(convertPrismaValue(value, st)?)),
+        (_, OutputType::Scalar(st)) => Ok(Item::Value(convert_prisma_value(value, st)?)),
         (pv, ot) => Err(CoreError::SerializationError(format!(
             "Attempted to serialize scalar '{}' with non-scalar compatible type '{:?}'",
             pv, ot
@@ -308,14 +313,25 @@ fn serialize_scalar(value: PrismaValue, typ: &OutputTypeRef) -> CoreResult<Item>
     }
 }
 
-fn unwrap_prisma_value(pv: PrismaValue) -> Vec<PrismaValue> {
-    match pv {
-        PrismaValue::List(l) => l,
-        _ => panic!("We want lists!"),
+fn convert_enum_to_item(ev: &EnumValue, et: &EnumType) -> Result<Item, CoreError> {
+    match et.value_for(&ev.name) {
+        Some(_) => Ok(Item::Value(PrismaValue::Enum(ev.clone()))),
+        None => Err(CoreError::SerializationError(format!(
+            "Enum value '{}' not found on enum '{}'",
+            ev.as_string(),
+            et.name
+        ))),
     }
 }
 
-fn convertPrismaValue(value: PrismaValue, st: &ScalarType) -> Result<PrismaValue, CoreError> {
+fn unwrap_prisma_value(pv: PrismaValue) -> Vec<PrismaValue> {
+    match pv {
+        PrismaValue::List(Some(l)) => l,
+        _ => panic!("We want Some lists!"),
+    }
+}
+
+fn convert_prisma_value(value: PrismaValue, st: &ScalarType) -> Result<PrismaValue, CoreError> {
     let item_value = match (st, value) {
         (ScalarType::String, PrismaValue::String(s)) => PrismaValue::String(s),
 

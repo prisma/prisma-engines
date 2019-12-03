@@ -27,26 +27,6 @@ impl<'a> From<&GraphqlId> for DatabaseValue<'a> {
     }
 }
 
-//impl<'a> From<PrismaValue> for DatabaseValue<'a> {
-//    fn from(pv: PrismaValue) -> Self {
-//        match pv {
-//            PrismaValue::String(s) => s.into(),
-//            PrismaValue::Float(f) => (f as f64).into(),
-//            PrismaValue::Boolean(b) => b.into(),
-//            PrismaValue::DateTime(d) => d.into(),
-//            PrismaValue::Enum(e) => e.as_string().into(),
-//            PrismaValue::Json(j) => j.to_string().into(),
-//            PrismaValue::Int(i) => (i as i64).into(),
-//            PrismaValue::Null => DatabaseValue::Parameterized(ParameterizedValue::Null),
-//            PrismaValue::Uuid(u) => u.to_string().into(),
-//            PrismaValue::GraphqlId(id) => id.into(),
-//            PrismaValue::List(l) => {
-//                DatabaseValue::Parameterized(ParameterizedValue::Array(l.into_iter().map(|x| x.into()).collect()))
-//            }
-//        }
-//    }
-//}
-
 impl<'a> From<ParameterizedValue<'a>> for PrismaValue {
     fn from(pv: ParameterizedValue<'a>) -> Self {
         match pv {
@@ -55,7 +35,7 @@ impl<'a> From<ParameterizedValue<'a>> for PrismaValue {
             ParameterizedValue::Real(f) => PrismaValue::Float(f),
             ParameterizedValue::Text(s) => PrismaValue::String(s.into_owned()),
             ParameterizedValue::Boolean(b) => PrismaValue::Boolean(b),
-            ParameterizedValue::Array(v) => PrismaValue::List(v.into_iter().map(PrismaValue::from).collect()),
+            ParameterizedValue::Array(v) => PrismaValue::List(Some(v.into_iter().map(PrismaValue::from).collect())),
             ParameterizedValue::Json(val) => PrismaValue::Json(val),
             ParameterizedValue::Uuid(uuid) => PrismaValue::Uuid(uuid),
             ParameterizedValue::DateTime(dt) => PrismaValue::DateTime(dt),
@@ -77,7 +57,8 @@ impl<'a> From<PrismaValue> for ParameterizedValue<'a> {
             PrismaValue::Null => ParameterizedValue::Null,
             PrismaValue::Uuid(u) => u.to_string().into(),
             PrismaValue::GraphqlId(id) => id.into(),
-            PrismaValue::List(l) => ParameterizedValue::Array(l.into_iter().map(|x| x.into()).collect()),
+            PrismaValue::List(Some(l)) => ParameterizedValue::Array(l.into_iter().map(|x| x.into()).collect()),
+            PrismaValue::List(None) => unreachable!(),
         }
     }
 }

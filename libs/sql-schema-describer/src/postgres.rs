@@ -540,7 +540,7 @@ fn get_column_type(udt: &str, arity: ColumnArity) -> ColumnType {
         "_int4" => ColumnTypeFamily::Int,
         "_text" => ColumnTypeFamily::String,
         "_varchar" => ColumnTypeFamily::String,
-        x => ColumnTypeFamily::Unknown, // panic!(format!("type '{}' is not supported here yet.", x)),
+        _ => ColumnTypeFamily::Unknown, // panic!(format!("type '{}' is not supported here yet.", x)),
     };
     ColumnType {
         raw: udt.to_string(),

@@ -64,17 +64,12 @@ class NonEmbeddedDeadlockSpec extends FlatSpec with Matchers with Retries with A
   }
 
   "updating single item many times with scalar list values" should "not cause deadlocks" in {
-    val scalarListStrategy = if (capabilities.has(NonEmbeddedScalarListCapability)) {
-      "@scalarList(strategy: RELATION)"
-    } else {
-      ""
-    }
     val project = SchemaDsl.fromStringV11() {
       s"""
         |model Todo {
         |   id   String @id @default(cuid())
         |   a    String?
-        |   tags String[] $scalarListStrategy
+        |   tags String[]
         |}
         """
     }

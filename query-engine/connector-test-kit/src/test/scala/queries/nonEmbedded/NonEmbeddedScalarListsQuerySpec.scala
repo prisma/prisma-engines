@@ -23,14 +23,14 @@ class NonEmbeddedScalarListsQuerySpec extends FlatSpec with Matchers with ApiSpe
 
       val s2 = s"""model List{
                   |   id String @id @default(cuid())
-                  |   todos Todo[] @scalarList(strategy: RELATION)
-                  |   listInts Int[] @scalarList(strategy: RELATION)
+                  |   todos Todo[]
+                  |   listInts Int[]
                   |}
                   |
                   |model Todo{
                   |   id String @id @default(cuid())
-                  |   lists List[] @scalarList(strategy: RELATION)
-                  |   todoInts Int[] @scalarList(strategy: RELATION)
+                  |   lists List[]
+                  |   todoInts Int[]
                   |}"""
       TestDataModels(mongo = Vector(s1), sql = Vector(s2))
     }
@@ -73,20 +73,20 @@ class NonEmbeddedScalarListsQuerySpec extends FlatSpec with Matchers with ApiSpe
       val s2 = s"""model List{
                   |   id String @id @default(cuid())
                   |   todo Todo? @relation(references: [id])
-                  |   listInts Int[] @scalarList(strategy: RELATION)
+                  |   listInts Int[]
                   |}
                   |
                   |model Todo{
                   |   id String @id @default(cuid())
                   |   list List?
                   |   tag Tag? @relation(references: [id])
-                  |   todoInts Int[] @scalarList(strategy: RELATION)
+                  |   todoInts Int[]
                   |}
                   |
                   |model Tag{
                   |   id String @id @default(cuid())
                   |   todo Todo?
-                  |   tagInts Int[] @scalarList(strategy: RELATION)
+                  |   tagInts Int[]
                   |}
                   |"""
       TestDataModels(mongo = Vector(s1), sql = Vector(s2))
@@ -134,7 +134,7 @@ class NonEmbeddedScalarListsQuerySpec extends FlatSpec with Matchers with ApiSpe
                   |   id String @id @default(cuid())
                   |   todo Todo? @relation(references: [id])
                   |   uList String @unique
-                  |   listInts Int[] @scalarList(strategy: RELATION)
+                  |   listInts Int[]
                   |}
                   |
                   |model Todo{
@@ -142,14 +142,14 @@ class NonEmbeddedScalarListsQuerySpec extends FlatSpec with Matchers with ApiSpe
                   |   uTodo String @unique
                   |   list List?
                   |   tag Tag? @relation(references: [id])
-                  |   todoInts Int[] @scalarList(strategy: RELATION)
+                  |   todoInts Int[]
                   |}
                   |
                   |model Tag{
                   |   id String @id @default(cuid())
                   |   uTag String @unique
                   |   todo Todo?
-                  |   tagInts Int[] @scalarList(strategy: RELATION)
+                  |   tagInts Int[]
                   |}
                   |"""
       TestDataModels(mongo = Vector(s1), sql = Vector(s2))
@@ -197,14 +197,14 @@ class NonEmbeddedScalarListsQuerySpec extends FlatSpec with Matchers with ApiSpe
                   |   id String @id @default(cuid())
                   |   todo Todo? @relation(references: [id])
                   |   uList String @unique
-                  |   listInts Int[] @scalarList(strategy: RELATION)
+                  |   listInts Int[]
                   |}
                   |
                   |model Todo{
                   |   id String @id @default(cuid())
                   |   uTodo String @unique
                   |   list List?
-                  |   todoInts Int[] @scalarList(strategy: RELATION)
+                  |   todoInts Int[]
                   |}
                   |"""
       TestDataModels(mongo = Vector(s1), sql = Vector(s2))

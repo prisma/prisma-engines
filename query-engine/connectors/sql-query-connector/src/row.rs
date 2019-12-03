@@ -34,12 +34,13 @@ impl ToSqlRow for ResultRow {
         let row_width = idents.len();
         for (i, p_value) in self.into_iter().enumerate().take(row_width) {
             let pv = match idents[i] {
-                (type_identifier, FieldArity::List) => match p_value {
+                (type_identifier, FieldArity::List) if type_identifier != TypeIdentifier::Relation => match p_value {
                     ParameterizedValue::Array(l) => l
                         .into_iter()
                         .map(|p_value| row_value_to_prisma_value(p_value, type_identifier))
                         .collect::<crate::Result<Vec<_>>>()
-                        .map(|vec| PrismaValue::List(vec)),
+                        .map(|vec| PrismaValue::List(Some(vec))),
+                    ParameterizedValue::Null => Ok(PrismaValue::List(Some(Vec::new()))),
                     _ => {
                         let error = io::Error::new(
                             io::ErrorKind::InvalidData,

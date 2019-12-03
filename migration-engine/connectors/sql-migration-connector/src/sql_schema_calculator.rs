@@ -357,14 +357,6 @@ fn default_migration_value(field_type: &FieldType, datamodel: &Datamodel) -> Sca
     }
 }
 
-fn is_scalar(field: &Field) -> bool {
-    match field.field_type {
-        FieldType::Base(_) => true,
-        FieldType::Enum(_) => true,
-        _ => false,
-    }
-}
-
 fn column_type(field: &Field) -> sql::ColumnType {
     column_type_for_scalar_type(scalar_type_for_field(field), column_arity(field))
 }
