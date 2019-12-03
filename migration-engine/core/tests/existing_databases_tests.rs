@@ -1,13 +1,9 @@
-mod test_harness;
-use barrel::{types, Migration, SqlVariant};
-use migration_core::api::GenericApi;
-use pretty_assertions::{assert_eq, assert_ne};
-use quaint::prelude::SqlFamily;
-use sql_migration_connector::SqlMigrationConnector;
-use sql_schema_describer::*;
-use std::sync::Arc;
+use barrel::types;
+use pretty_assertions::assert_eq;
 use sql_schema_describer::*;
 use test_harness::*;
+
+mod test_harness;
 
 #[test_each_connector]
 async fn adding_a_model_for_an_existing_table_must_work(api: &TestApi) {
@@ -154,7 +150,7 @@ async fn creating_a_scalar_list_field_for_an_existing_table_must_work(api: &Test
     let initial_result = api.infer_and_apply(&dm1).await.sql_schema;
     assert!(!initial_result.has_table("Blog_tags"));
 
-    let mut result = api.barrel().execute(|migration| {
+    let result = api.barrel().execute(|migration| {
         migration.change_table("Blog", |t| {
             let inner = types::text();
             t.add_column("tags", types::array(&inner));
@@ -167,7 +163,7 @@ async fn creating_a_scalar_list_field_for_an_existing_table_must_work(api: &Test
                 tags String[]
             }
         "#;
-    let mut final_result = api.infer_and_apply(&dm2).await.sql_schema;
+    let final_result = api.infer_and_apply(&dm2).await.sql_schema;
     assert_eq!(result, final_result);
 }
 
@@ -214,7 +210,7 @@ async fn deleting_a_scalar_list_field_must_work(api: &TestApi) {
             }
         "#;
 
-    let initial_result = api.infer_and_apply(&dm1).await.sql_schema;
+    let _ = api.infer_and_apply(&dm1).await.sql_schema;
 
     let result = api.barrel().execute(|migration| {
         // sqlite does not support dropping columns. So we are emulating it..

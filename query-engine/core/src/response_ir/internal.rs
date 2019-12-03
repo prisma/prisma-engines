@@ -134,7 +134,6 @@ fn serialize_record_selection(
 /// Doesn't validate the shape of the result set ("unchecked" result).
 /// Returns a vector of serialized objects (as Item::Map), grouped into a map by parent, if present.
 fn serialize_objects(mut result: RecordSelection, typ: ObjectTypeStrongRef) -> CoreResult<UncheckedItemsWithParents> {
-    dbg!(&result);
     // The way our query execution works, we only need to look at nested + lists if we hit an object.
     // Move nested out of result for separate processing.
     let nested = std::mem::replace(&mut result.nested, vec![]);

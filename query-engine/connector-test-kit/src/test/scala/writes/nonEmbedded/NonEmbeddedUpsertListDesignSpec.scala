@@ -12,28 +12,28 @@ class NonEmbeddedUpsertListDesignSpec extends FlatSpec with Matchers with ApiSpe
     val dm1 = s"""model List{
                  |   id String @id @default(cuid())
                  |   uList String? @unique
-                 |   listInts Int[] $scalarListDirective
+                 |   listInts Int[]
                  |   todo Todo? @relation(references: [id])
                  |}
                  |
                  |model Todo{
                  |   id String @id @default(cuid())
                  |   uTodo String? @unique
-                 |   todoInts Int[] $scalarListDirective
+                 |   todoInts Int[]
                  |   list List?
                  |}"""
 
     val dm2 = s"""model List{
                  |   id String @id @default(cuid())
                  |   uList String? @unique
-                 |   listInts Int[] $scalarListDirective
+                 |   listInts Int[]
                  |   todo Todo?
                  |}
                  |
                  |model Todo{
                  |   id String @id @default(cuid())
                  |   uTodo String? @unique
-                 |   todoInts Int[] $scalarListDirective
+                 |   todoInts Int[]
                  |   list List? @relation(references: [id])
                  |}"""
 
@@ -44,42 +44,42 @@ class NonEmbeddedUpsertListDesignSpec extends FlatSpec with Matchers with ApiSpe
     val dm1 = s"""model List{
                      id String @id @default(cuid())
                      uList String? @unique
-                     listInts Int[] $scalarListDirective
+                     listInts Int[]
                      todoes Todo[] @relation(references: [id])
                   }
 
                   model Todo{
                      id String @id @default(cuid())
                      uTodo String? @unique
-                     todoInts Int[] $scalarListDirective
+                     todoInts Int[]
                      lists List[]
                   }"""
 
     val dm2 = s"""model List{
                      id String @id @default(cuid())
                      uList String? @unique
-                     listInts Int[] $scalarListDirective
+                     listInts Int[]
                      todoes Todo[]
                   }
 
                   model Todo{
                      id String @id @default(cuid())
                      uTodo String? @unique
-                     todoInts Int[] $scalarListDirective
+                     todoInts Int[]
                      lists List[] @relation(references: [id])
                   }"""
 
     val dm3 = s"""model List{
                      id String @id @default(cuid())
                      uList String? @unique
-                     listInts Int[] $scalarListDirective
+                     listInts Int[]
                      todoes Todo[]
                   }
 
                   model Todo{
                      id String @id @default(cuid())
                      uTodo String? @unique
-                     todoInts Int[] $scalarListDirective
+                     todoInts Int[]
                      lists List[]
                   }"""
 
@@ -90,42 +90,42 @@ class NonEmbeddedUpsertListDesignSpec extends FlatSpec with Matchers with ApiSpe
     val dm1 = s"""model List{
                      id String @id @default(cuid())
                      uList String? @unique
-                     listInts Int[] $scalarListDirective
+                     listInts Int[]
                      todoes Todo[] @relation(references: [id])
                   }
 
                   model Todo{
                      id String @id @default(cuid())
                      uTodo String? @unique
-                     todoInts Int[] $scalarListDirective
+                     todoInts Int[]
                      list List?
                   }"""
 
     val dm2 = s"""model List{
                      id String @id @default(cuid())
                      uList String? @unique
-                     listInts Int[] $scalarListDirective
+                     listInts Int[]
                      todoes Todo[]
                   }
 
                   model Todo{
                      id String @id @default(cuid())
                      uTodo String? @unique
-                     todoInts Int[] $scalarListDirective
+                     todoInts Int[]
                      list List? @relation(references: [id])
                   }"""
 
     val dm3 = s"""model List{
                      id String @id @default(cuid())
                      uList String? @unique
-                     listInts Int[] $scalarListDirective
+                     listInts Int[]
                      todoes Todo[]
                   }
 
                   model Todo{
                      id String @id @default(cuid())
                      uTodo String? @unique
-                     todoInts Int[] $scalarListDirective
+                     todoInts Int[]
                      list List?
                   }"""
 

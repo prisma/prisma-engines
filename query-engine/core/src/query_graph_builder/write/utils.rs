@@ -125,13 +125,12 @@ where
 {
     let mut args = PrismaArgs::new();
 
-    args.update_datetimes(Arc::clone(&model), false);
+    args.update_datetimes(Arc::clone(&model));
 
     let ur = UpdateManyRecords {
         model,
         filter: filter.into(),
-        non_list_args: args,
-        list_args: vec![],
+        args: args,
     };
 
     graph.create_node(Query::Write(WriteQuery::UpdateManyRecords(ur)))

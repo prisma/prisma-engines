@@ -1,12 +1,11 @@
 use super::*;
 use crate::query_document::{ParsedInputMap, ParsedInputValue};
-use prisma_models::{Field, ModelRef, PrismaArgs, PrismaListValue, PrismaValue, RelationFieldRef};
+use prisma_models::{Field, ModelRef, PrismaArgs, PrismaValue, RelationFieldRef};
 use std::{convert::TryInto, sync::Arc};
 
 #[derive(Default, Debug)]
 pub struct WriteArguments {
-    pub non_list: PrismaArgs,
-    pub list: Vec<(String, PrismaListValue)>,
+    pub args: PrismaArgs,
     pub nested: Vec<(RelationFieldRef, ParsedInputMap)>,
 }
 
@@ -24,12 +23,12 @@ impl WriteArguments {
                         let set_value: PrismaValue =
                             vals.into_iter().find(|(k, _)| k == "set").unwrap().1.try_into()?;
 
-                        args.non_list.insert(sf.name.clone(), set_value)
+                        args.args.insert(sf.name.clone(), set_value)
                     }
 
                     Field::Scalar(sf) => {
                         let value: PrismaValue = v.try_into()?;
-                        args.non_list.insert(sf.name.clone(), value)
+                        args.args.insert(sf.name.clone(), value)
                     }
 
                     Field::Relation(ref rf) => {

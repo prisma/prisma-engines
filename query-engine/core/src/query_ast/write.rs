@@ -19,15 +19,15 @@ impl WriteQuery {
     pub fn inject_non_list_arg(&mut self, key: String, value: PrismaValue) {
         match self {
             Self::CreateRecord(x) => {
-                x.non_list_args.insert(key, value);
+                x.args.insert(key, value);
             }
 
             Self::UpdateRecord(x) => {
-                x.non_list_args.insert(key, value);
+                x.args.insert(key, value);
             }
 
             Self::UpdateManyRecords(x) => {
-                x.non_list_args.insert(key, value);
+                x.args.insert(key, value);
             }
 
             _ => (),
@@ -49,14 +49,10 @@ impl RecordFinderInjector for WriteQuery {
 impl std::fmt::Display for WriteQuery {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            Self::CreateRecord(q) => write!(
-                f,
-                "CreateRecord(model: {}, non-list-args: {:?}, list_args: {:?})",
-                q.model.name, q.non_list_args, q.list_args,
-            ),
+            Self::CreateRecord(q) => write!(f, "CreateRecord(model: {}, args: {:?})", q.model.name, q.args,),
             Self::UpdateRecord(q) => write!(
                 f,
-                "UpdateRecord(model: {}, finder: {:?}, non-list-args: {:?}, list_args: {:?})",
+                "UpdateRecord(model: {}, finder: {:?}, args: {:?})",
                 q.model.name,
                 q.where_.as_ref().map(|finder| format!(
                     "{}, {} = {:?}",
@@ -64,8 +60,7 @@ impl std::fmt::Display for WriteQuery {
                     finder.field.name,
                     finder.value
                 ),),
-                q.non_list_args,
-                q.list_args,
+                q.args,
             ),
             Self::DeleteRecord(q) => write!(
                 f,
@@ -77,11 +72,7 @@ impl std::fmt::Display for WriteQuery {
                     finder.value
                 ))
             ),
-            Self::UpdateManyRecords(q) => write!(
-                f,
-                "UpdateManyRecords(model: {}, non-list-args: {:?}, list_args: {:?})",
-                q.model.name, q.non_list_args, q.list_args
-            ),
+            Self::UpdateManyRecords(q) => write!(f, "UpdateManyRecords(model: {}, args: {:?})", q.model.name, q.args),
             Self::DeleteManyRecords(q) => write!(f, "DeleteManyRecords: {}", q.model.name),
             Self::ConnectRecords(_) => write!(f, "ConnectRecords"),
             Self::DisconnectRecords(_) => write!(f, "DisconnectRecords"),
@@ -93,24 +84,21 @@ impl std::fmt::Display for WriteQuery {
 #[derive(Debug, Clone)]
 pub struct CreateRecord {
     pub model: ModelRef,
-    pub non_list_args: PrismaArgs,
-    pub list_args: Vec<(String, PrismaListValue)>,
+    pub args: PrismaArgs,
 }
 
 #[derive(Debug, Clone)]
 pub struct UpdateRecord {
     pub model: ModelRef,
     pub where_: Option<RecordFinder>,
-    pub non_list_args: PrismaArgs,
-    pub list_args: Vec<(String, PrismaListValue)>,
+    pub args: PrismaArgs,
 }
 
 #[derive(Debug, Clone)]
 pub struct UpdateManyRecords {
     pub model: ModelRef,
     pub filter: Filter,
-    pub non_list_args: PrismaArgs,
-    pub list_args: Vec<(String, PrismaListValue)>,
+    pub args: PrismaArgs,
 }
 
 #[derive(Debug, Clone)]

@@ -32,8 +32,6 @@ fn read_one<'conn, 'tx>(
             .get_single_record(query.record_finder.as_ref().unwrap(), &selected_fields)
             .await?;
 
-        dbg!(&scalars);
-
         let model = query.record_finder.unwrap().field.model();
         let id_field = model.fields().id().name.clone();
 

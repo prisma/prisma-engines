@@ -578,7 +578,7 @@ async fn introspecting_native_arrays_should_work(api: &TestApi) {
             t.add_column("id", types::primary());
             t.inject_custom("ints INTEGER [12]");
         });
-    });
+    }).await;
 
     let dm = r#"  
             model Post {
