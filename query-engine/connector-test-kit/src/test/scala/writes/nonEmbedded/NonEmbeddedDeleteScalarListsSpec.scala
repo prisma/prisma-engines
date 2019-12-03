@@ -1,7 +1,7 @@
 package writes.nonEmbedded
 
 import org.scalatest.{FlatSpec, Matchers}
-import util.ConnectorCapability.{JoinRelationLinksCapability, NonEmbeddedScalarListCapability, ScalarListsCapability}
+import util.ConnectorCapability.{JoinRelationLinksCapability, ScalarListsCapability}
 import util._
 
 class NonEmbeddedDeleteScalarListsSpec extends FlatSpec with Matchers with ApiSpecBase {

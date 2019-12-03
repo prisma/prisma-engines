@@ -2,7 +2,7 @@ package writes.nonEmbedded
 
 import org.scalatest.time.{Seconds, Span}
 import org.scalatest.{FlatSpec, Matchers, Retries}
-import util.ConnectorCapability.{JoinRelationLinksCapability, NonEmbeddedScalarListCapability, ScalarListsCapability}
+import util.ConnectorCapability.{JoinRelationLinksCapability, ScalarListsCapability}
 import util._
 
 import scala.concurrent.Future

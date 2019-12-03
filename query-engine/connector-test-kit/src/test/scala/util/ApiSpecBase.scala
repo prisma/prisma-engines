@@ -2,7 +2,7 @@ package util
 
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, Suite}
 import play.api.libs.json.JsString
-import util.ConnectorCapability.{Prisma2Capability, RelationLinkListCapability}
+import util.ConnectorCapability. RelationLinkListCapability
 
 import scala.concurrent.ExecutionContext
 
