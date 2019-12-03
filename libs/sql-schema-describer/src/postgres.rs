@@ -401,7 +401,6 @@ impl SqlSchemaDescriber {
                 "Querying for sequence seeding primary key column '{}': '{}'",
                 columns[0], sql
             );
-            let re_seq = Regex::new("^(?:.+\\.)?\"?([^.\"]+)\"?").expect("compile regex");
             let rows = self
                 .conn
                 .query_raw(&sql, &[])
@@ -412,7 +411,7 @@ impl SqlSchemaDescriber {
                 row.get("sequence")
                     .and_then(|x| x.to_string())
                     .and_then(|sequence_name| {
-                        let captures = re_seq.captures(&sequence_name).expect("get captures");
+                        let captures = RE_SEQ.captures(&sequence_name).expect("get captures");
                         let sequence_name = captures.get(1).expect("get capture").as_str();
                         debug!("Found sequence name corresponding to primary key: {}", sequence_name);
                         sequences.iter().find(|s| &s.name == sequence_name).map(|sequence| {
@@ -547,6 +546,10 @@ fn get_column_type(udt: &str) -> ColumnType {
         family: family,
     }
 }
+
+static RE_SEQ: Lazy<Regex> = Lazy::new(|| {
+    Regex::new("^(?:.+\\.)?\"?([^.\"]+)\"?").expect("compile regex")
+});
 
 static AUTOINCREMENT_REGEX: Lazy<Regex> = Lazy::new(|| {
     Regex::new(
