@@ -17,7 +17,7 @@ impl TestApi {
     }
 
     pub async fn introspect(&self) -> String {
-        let datamodel = dbg!(self.introspection_connector.introspect().await).unwrap();
+        let datamodel = self.introspection_connector.introspect().await.unwrap();
         datamodel::render_datamodel_to_string(&datamodel).expect("Datamodel rendering failed")
     }
 
@@ -45,7 +45,7 @@ impl TestApi {
 pub async fn mysql_test_api() -> TestApi {
     let database = database(&mysql_url()).await;
 
-    let drop_database = dbg!(format!("DROP DATABASE IF EXISTS `{}`;", SCHEMA_NAME));
+    let drop_database = format!("DROP DATABASE IF EXISTS `{}`;", SCHEMA_NAME);
     database.query_raw(&drop_database, &[]).await.ok();
     let create_database = dbg!(format!("CREATE DATABASE `{}`;", SCHEMA_NAME));
     database.query_raw(&create_database, &[]).await.ok();

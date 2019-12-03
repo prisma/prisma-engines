@@ -553,11 +553,12 @@ static RE_SEQ: Lazy<Regex> = Lazy::new(|| {
 
 static AUTOINCREMENT_REGEX: Lazy<Regex> = Lazy::new(|| {
     Regex::new(
-        r#"nextval\((?:"(?P<schema_name>.+)".)?"(?P<table_name>.+)_(?P<column_name>.+)_seq(?:[0-9]+)?"::regclass\)"#,
+        r#"nextval\((?:"(?P<schema_name>.+)"\.)?"(?P<table_and_column_name>.+)_seq(?:[0-9]+)?"::regclass\)"#,
     )
     .unwrap()
 });
 
+/// Returns whether a particular sequence (`value`) matches the provided column info.
 fn is_autoincrement(value: &str, schema_name: &str, table_name: &str, column_name: &str) -> bool {
     AUTOINCREMENT_REGEX
         .captures(value)
@@ -569,13 +570,21 @@ fn is_autoincrement(value: &str, schema_name: &str, table_name: &str, column_nam
                 .filter(|matched| *matched == schema_name)
                 .and_then(|_| {
                     captures
-                        .name("table_name")
-                        .filter(|matched| matched.as_str() == table_name)
-                })
-                .and_then(|_| {
-                    captures
-                        .name("column_name")
-                        .filter(|matched| matched.as_str() == column_name)
+                        .name("table_and_column_name")
+                        .filter(|matched| {
+                            let expected_len = table_name.len() + column_name.len() + 1;
+
+                            if matched.as_str().len() != expected_len {
+                                return false
+                            }
+
+                            let table_name_segments = table_name.split('_');
+                            let column_name_segments = column_name.split('_');
+                            let matched_segments = matched.as_str().split('_');
+                            matched_segments.zip(table_name_segments.chain(column_name_segments)).all(|(found, expected)| {
+                                found == expected
+                            })
+                        })
                 })
                 .map(|_| true)
         })
@@ -619,5 +628,25 @@ mod tests {
             table_name,
             col_name
         ));
+
+        // The table and column names contain underscores, so it's impossible to say from the sequence where one starts and the other ends.
+        let autoincrement_with_ambiguous_table_and_column_names = r#"nextval("compound_table_compound_column_name_seq"::regclass)"#;
+        assert!(is_autoincrement(
+            &autoincrement_with_ambiguous_table_and_column_names,
+            "<ignored>",
+            "compound_table",
+            "compound_column_name",
+        ));
+
+        // The table and column names contain underscores, so it's impossible to say from the sequence where one starts and the other ends.
+        // But this one has extra text between table and column names, so it should not match.
+        let autoincrement_with_ambiguous_table_and_column_names = r#"nextval("compound_table_something_compound_column_name_seq"::regclass)"#;
+        assert!(!is_autoincrement(
+            &autoincrement_with_ambiguous_table_and_column_names,
+            "<ignored>",
+            "compound_table",
+            "compound_column_name",
+        ));
+
     }
 }
