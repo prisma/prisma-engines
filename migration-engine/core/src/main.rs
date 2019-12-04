@@ -9,7 +9,6 @@ use crate::api::RpcApi;
 use commands::*;
 use datamodel::{self, error::ErrorCollection, Datamodel};
 use futures::FutureExt;
-use log::*;
 use std::{fs, io, io::Read};
 
 pub use error::Error;
@@ -44,7 +43,7 @@ async fn main() {
         match serde_json::to_writer(std::io::stderr(), &err) {
             Ok(_) => eprintln!(),
             Err(err) => {
-                log::error!("Failed to write JSON error to stderr: {}", err);
+                tracing::error!("Failed to write JSON error to stderr: {}", err);
                 original_hook(panic)
             }
         }
@@ -66,11 +65,11 @@ async fn main() {
             .await
         {
             Ok(Ok(msg)) => {
-                info!("{}", msg);
+                tracing::info!("{}", msg);
                 std::process::exit(0);
             }
             Ok(Err(error)) => {
-                error!("{}", error);
+                tracing::error!("{}", error);
                 let exit_code = error.exit_code();
                 serde_json::to_writer(std::io::stdout(), &cli::render_error(error)).expect("failed to write to stdout");
                 println!();
@@ -116,10 +115,7 @@ async fn main() {
 }
 
 fn init_logger() -> StdResult<(), failure::Error> {
-    use tracing_log::LogTracer;
     use tracing_subscriber::{EnvFilter, FmtSubscriber};
-
-    LogTracer::init()?;
 
     let subscriber = FmtSubscriber::builder()
                 .with_env_filter(EnvFilter::from_default_env())

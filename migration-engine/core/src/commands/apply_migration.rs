@@ -2,7 +2,6 @@ use super::MigrationStepsResultOutput;
 use crate::commands::command::*;
 use crate::migration_engine::MigrationEngine;
 use datamodel::{ast::SchemaAst, Datamodel};
-use log::*;
 use migration_connector::*;
 use serde::Deserialize;
 
@@ -21,7 +20,7 @@ impl<'a> MigrationCommand for ApplyMigrationCommand<'a> {
         D: DatabaseMigrationMarker + Send + Sync + 'static,
     {
         let cmd = ApplyMigrationCommand { input };
-        debug!("{:?}", cmd.input);
+        tracing::debug!("{:?}", cmd.input);
 
         let connector = engine.connector();
         let migration_persistence = connector.migration_persistence();
@@ -119,6 +118,7 @@ impl<'a> ApplyMigrationCommand<'a> {
         match (diagnostics.has_warnings(), self.input.force.unwrap_or(false)) {
             // We have no warnings, or the force flag is passed.
             (false, _) | (true, true) => {
+                tracing::trace!("Applying the migration");
                 let saved_migration = migration_persistence.create(migration).await;
 
                 connector
@@ -127,7 +127,7 @@ impl<'a> ApplyMigrationCommand<'a> {
                     .await?;
             }
             // We have warnings, but no force flag was passed.
-            (true, false) => (),
+            (true, false) => tracing::trace!("The force flag was not passed, the migration will not be applied."),
         }
 
         let DestructiveChangeDiagnostics { warnings, errors } = diagnostics;

@@ -15,7 +15,6 @@ itertools = "0.8"
 
 chrono = { version = "0.4", features = ["serde"] }
 url = "1.7"
-log = "0.4"
 
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
@@ -30,8 +29,7 @@ tokio = { package = "tokio", version = "0.2.0-alpha.6" }
 async-trait = "0.1.17"
 async-std = "1.0"
 tracing = "0.1.10"
-tracing-log = "0.1.1"
-tracing-subscriber = "0.1.6"
+tracing-subscriber = { version = "0.1.6", features = ["tracing-log"] }
 tracing-futures = "0.2.0"
 
 [dependencies.quaint]

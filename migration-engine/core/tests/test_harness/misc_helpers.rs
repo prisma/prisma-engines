@@ -108,7 +108,7 @@ pub struct PrintWriter;
 
 impl std::io::Write for PrintWriter {
     fn write(&mut self, buf: &[u8]) -> Result<usize, std::io::Error> {
-        eprint!("{}", std::str::from_utf8(buf).unwrap());
+        eprint!("{}", std::str::from_utf8(buf).unwrap_or("<invalid UTF-8>"));
         Ok(buf.len())
     }
 
