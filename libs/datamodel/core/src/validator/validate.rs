@@ -86,12 +86,13 @@ impl Validator {
                     name_eq && type_eq && args_eq
                 }
                 (None, dml::FieldType::Base(dml::ScalarType::Int), dml::FieldArity::Required) => true,
+                (None, dml::FieldType::Base(dml::ScalarType::String), dml::FieldArity::Required) => true,
                 _ => false,
             };
 
             if !is_valid {
                 return Err(DatamodelError::new_model_validation_error(
-                    "Invalid ID field. ID field must be one of: Int @id, String @id @default(cuid()), String @id @default(uuid()).",
+                    "Invalid ID field. ID field must be one of: Int @id, String @id, String @id @default(cuid()), String @id @default(uuid()).",
                     &model.name,
                     ast_schema.find_field(&model.name, &id_field.name).expect(STATE_ERROR).span));
             }

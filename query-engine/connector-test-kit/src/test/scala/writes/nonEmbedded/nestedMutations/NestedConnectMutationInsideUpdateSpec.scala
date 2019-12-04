@@ -1152,7 +1152,7 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
          |  data:{
          |    childrenOpt: {connect: [{c: "c1"}, {c: "c2"}]}
          |  }){
-         |    childrenOpt{
+         |    childrenOpt(orderBy: id_ASC){
          |      c
          |    }
          |  }

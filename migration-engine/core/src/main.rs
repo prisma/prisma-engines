@@ -47,6 +47,8 @@ async fn main() {
                 original_hook(panic)
             }
         }
+
+        std::process::exit(255)
     }));
 
     env_logger::init();

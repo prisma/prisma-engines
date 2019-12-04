@@ -162,7 +162,7 @@ impl ScalarField {
         }
     }
 
-    pub fn is_unique(&self) -> bool {
+    pub fn unique(&self) -> bool {
         self.is_unique || self.is_id()
     }
 
