@@ -118,16 +118,18 @@ impl<'a> ApplyMigrationCommand<'a> {
         match (diagnostics.has_warnings(), self.input.force.unwrap_or(false)) {
             // We have no warnings, or the force flag is passed.
             (false, _) | (true, true) => {
-                tracing::trace!("Applying the migration");
+                tracing::debug!("Applying the migration");
                 let saved_migration = migration_persistence.create(migration).await;
 
                 connector
                     .migration_applier()
                     .apply(&saved_migration, &database_migration)
                     .await?;
+
+                tracing::debug!("Migration applied");
             }
             // We have warnings, but no force flag was passed.
-            (true, false) => tracing::trace!("The force flag was not passed, the migration will not be applied."),
+            (true, false) => tracing::debug!("The force flag was not passed, the migration will not be applied."),
         }
 
         let DestructiveChangeDiagnostics { warnings, errors } = diagnostics;
