@@ -117,6 +117,39 @@ fn should_allow_string_ids_with_uuid() {
 }
 
 #[test]
+fn should_allow_string_ids_without_default() {
+    let dml = r#"
+    model Model {
+        id String @id
+    }
+    "#;
+
+    let datamodel = parse(dml);
+    let user_model = datamodel.assert_has_model("Model");
+    user_model
+        .assert_has_field("id")
+        .assert_is_id(true)
+        .assert_base_type(&ScalarType::String);
+}
+
+#[test]
+fn should_allow_string_ids_without_default_with_strategy_none() {
+    let dml = r#"
+    model Model {
+        id String @id(strategy: NONE)
+    }
+    "#;
+
+    let datamodel = parse(dml);
+    let user_model = datamodel.assert_has_model("Model");
+    user_model
+        .assert_has_field("id")
+        .assert_is_id(true)
+        .assert_base_type(&ScalarType::String)
+        .assert_id_strategy(IdStrategy::None);
+}
+
+#[test]
 fn multi_field_ids_must_work() {
     let dml = r#"
     model Model {
