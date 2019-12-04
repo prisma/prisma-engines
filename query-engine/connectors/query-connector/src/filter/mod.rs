@@ -5,7 +5,6 @@
 //! [RelationCompare](/query-connector/trait.RelationCompare.html).
 
 mod list;
-mod record_finder;
 mod relation;
 mod scalar;
 
@@ -13,7 +12,6 @@ use prisma_models::prelude::*;
 use std::fmt;
 
 pub use list::*;
-pub use record_finder::*;
 pub use relation::*;
 pub use scalar::*;
 
@@ -96,35 +94,6 @@ impl From<bool> for Filter {
         Filter::BoolFilter(b)
     }
 }
-
-impl From<RecordFinder> for Filter {
-    fn from(record_finder: RecordFinder) -> Self {
-        Filter::Scalar(ScalarFilter {
-            field: record_finder.field,
-            condition: ScalarCondition::Equals(record_finder.value),
-        })
-    }
-}
-
-// impl<T> From<Option<T>> for Filter where T: Into<Filter> {
-//     fn from(record_finder: Option<RecordFinder>) -> Self {
-//         match record_finder {
-//             Some(rf) => Self::from(rf),
-//             None => Self::empty(),
-//         }
-//     }
-// }
-
-// impl From<Vec<RecordFinder>> for Filter {
-//     fn from(record_finders: Vec<RecordFinder>) -> Self {
-//         if record_finders.is_empty() {
-//             Self::empty()
-//         } else {
-//             let as_filters: Vec<Filter> = record_finders.into_iter().map(|x| x.into()).collect();
-//             Filter::or(as_filters).into()
-//         }
-//     }
-// }
 
 /// Creates a test data model for the unit tests in this module.
 pub fn test_data_model() -> InternalDataModelRef {

@@ -55,9 +55,9 @@ pub enum SqlError {
     RecordsNotConnected {
         relation_name: String,
         parent_name: String,
-        parent_where: Option<Box<RecordFinderInfo>>,
+        // parent_where: Option<Box<RecordFinderInfo>>,
         child_name: String,
-        child_where: Option<Box<RecordFinderInfo>>,
+        // child_where: Option<Box<RecordFinderInfo>>,
     },
 
     #[fail(display = "Conversion error: {}", _0)]
@@ -112,15 +112,15 @@ impl From<SqlError> for ConnectorError {
             SqlError::RecordsNotConnected {
                 relation_name,
                 parent_name,
-                parent_where,
+                // parent_where,
                 child_name,
-                child_where,
+                // child_where,
             } => ConnectorError::RecordsNotConnected {
                 relation_name,
                 parent_name,
-                parent_where,
+                // parent_where,
                 child_name,
-                child_where,
+                // child_where,
             },
             SqlError::ConversionError(e) => ConnectorError::ConversionError(e),
             SqlError::DatabaseCreationError(e) => ConnectorError::DatabaseCreationError(e),

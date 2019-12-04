@@ -1,7 +1,7 @@
-use super::*;
 use crate::{
     query_document::{ParsedInputMap, ParsedInputValue},
     schema_builder::compound_field_name,
+    QueryGraphBuilderError, QueryGraphBuilderResult,
 };
 use connector::{filter::Filter, RelationCompare, ScalarCompare};
 use prisma_models::{Field, ModelRef, PrismaListValue, PrismaValue, RelationFieldRef, ScalarFieldRef};

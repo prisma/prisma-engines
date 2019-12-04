@@ -25,7 +25,7 @@ pub fn node_is_create(graph: &QueryGraph, node: &NodeRef) -> bool {
     }
 }
 
-/// Produces a non-failing read query that fetches IDs for a given Into<Filter> (e.g. Vec<RecordFinder>, Option<RecordFinder>, RecordFinder, ...).
+/// Produces a non-failing read query that fetches IDs for a given filterable.
 pub fn read_ids_infallible<T>(model: &ModelRef, filter: T) -> Query
 where
     T: Into<Filter>,

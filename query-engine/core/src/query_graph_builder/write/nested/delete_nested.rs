@@ -2,7 +2,7 @@ use super::*;
 use crate::{
     query_ast::*,
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
-    ParsedInputValue,
+    InputAssertions, ParsedInputMap, ParsedInputValue,
 };
 use connector::{Filter, ScalarCompare};
 use prisma_models::{ModelRef, PrismaValue, RelationFieldRef};
@@ -31,7 +31,14 @@ pub fn connect_nested_delete(
     if parent_relation_field.is_list {
         let filters: Vec<Filter> = utils::coerce_vec(value)
             .into_iter()
-            .map(|value| Ok(extract_record_finder(value, &child_model)?.into()))
+            .map(|value: ParsedInputValue| {
+                let value: ParsedInputMap = value.try_into()?;
+
+                value.assert_size(1)?;
+                value.assert_non_null()?;
+
+                extract_filter(value, &child_model, false)
+            })
             .collect::<QueryGraphBuilderResult<Vec<Filter>>>()?;
 
         let filter_len = filters.len();

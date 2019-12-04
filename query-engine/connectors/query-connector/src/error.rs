@@ -1,44 +1,6 @@
-use crate::filter::{Filter, RecordFinder};
+use crate::filter::Filter;
 use failure::{Error, Fail};
-use prisma_models::prelude::{DomainError, GraphqlId, ModelRef, PrismaValue};
-use std::fmt;
-
-#[derive(Debug)]
-pub struct RecordFinderInfo {
-    pub model: String,
-    pub field: String,
-    pub value: PrismaValue,
-}
-
-impl RecordFinderInfo {
-    pub fn for_id(model: ModelRef, value: &GraphqlId) -> Self {
-        Self {
-            model: model.name.clone(),
-            field: model.fields().id().name.clone(),
-            value: PrismaValue::from(value.clone()),
-        }
-    }
-}
-
-impl fmt::Display for RecordFinderInfo {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(
-            f,
-            "field {} in model {} with value {}",
-            self.model, self.field, self.value
-        )
-    }
-}
-
-impl From<&RecordFinder> for RecordFinderInfo {
-    fn from(ns: &RecordFinder) -> Self {
-        Self {
-            model: ns.field.model().name.clone(),
-            field: ns.field.name.clone(),
-            value: ns.value.clone(),
-        }
-    }
-}
+use prisma_models::prelude::DomainError;
 
 #[derive(Debug, Fail)]
 pub enum ConnectorError {
@@ -92,9 +54,9 @@ pub enum ConnectorError {
     RecordsNotConnected {
         relation_name: String,
         parent_name: String,
-        parent_where: Option<Box<RecordFinderInfo>>,
+        // parent_where: Option<Box<RecordFinderInfo>>,
         child_name: String,
-        child_where: Option<Box<RecordFinderInfo>>,
+        // child_where: Option<Box<RecordFinderInfo>>,
     },
 
     #[fail(display = "Conversion error: {}", _0)]

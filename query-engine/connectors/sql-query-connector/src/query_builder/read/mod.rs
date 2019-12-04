@@ -1,10 +1,7 @@
 mod many_related_records;
 
 use crate::{cursor_condition, filter_conversion::AliasedCondition, ordering::Ordering};
-use connector_interface::{
-    filter::{Filter, RecordFinder},
-    QueryArguments,
-};
+use connector_interface::{filter::Filter, QueryArguments};
 use prisma_models::*;
 use quaint::ast::*;
 use std::sync::Arc;
@@ -26,19 +23,6 @@ impl SelectDefinition for &Filter {
     fn into_select(self, model: &ModelRef) -> Select<'static> {
         let args = QueryArguments::from(self.clone());
         args.into_select(model)
-    }
-}
-
-impl SelectDefinition for RecordFinder {
-    fn into_select(self, model: &ModelRef) -> Select<'static> {
-        let args = QueryArguments::from(self);
-        args.into_select(model)
-    }
-}
-
-impl SelectDefinition for &RecordFinder {
-    fn into_select(self, model: &ModelRef) -> Select<'static> {
-        self.clone().into_select(model)
     }
 }
 
