@@ -98,7 +98,7 @@ where
         input: &InferMigrationStepsInput,
     ) -> crate::Result<MigrationStepsResultOutput> {
         self.handle_command::<InferMigrationStepsCommand>(input)
-            .instrument(tracing::info_span!("ApplyMigration", migration_id = input.migration_id.as_str()))
+            .instrument(tracing::info_span!("InferMigrationSteps", migration_id = input.migration_id.as_str()))
             .await
     }
 
