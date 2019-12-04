@@ -11,17 +11,17 @@ pub struct SourceConfig {
     pub documentation: Option<String>,
 }
 
-pub fn render_sources_to_json_value(sources: &[Box<dyn configuration::Source>]) -> serde_json::Value {
+pub fn render_sources_to_json_value(sources: &[Box<dyn configuration::Source + Send + Sync>]) -> serde_json::Value {
     let res = sources_to_json_structs(sources);
     serde_json::to_value(&res).expect("Failed to render JSON.")
 }
 
-pub fn render_sources_to_json(sources: &[Box<dyn configuration::Source>]) -> String {
+pub fn render_sources_to_json(sources: &[Box<dyn configuration::Source + Send + Sync>]) -> String {
     let res = sources_to_json_structs(sources);
     serde_json::to_string_pretty(&res).expect("Failed to render JSON.")
 }
 
-fn sources_to_json_structs(sources: &[Box<dyn configuration::Source>]) -> Vec<SourceConfig> {
+fn sources_to_json_structs(sources: &[Box<dyn configuration::Source + Send + Sync>]) -> Vec<SourceConfig> {
     let mut res: Vec<SourceConfig> = Vec::new();
 
     for source in sources {
@@ -43,7 +43,7 @@ fn source_to_json_struct(source: &dyn configuration::Source) -> SourceConfig {
 pub fn sources_from_json_value_with_plugins(
     json: serde_json::Value,
     source_definitions: Vec<Box<dyn configuration::SourceDefinition>>,
-) -> Vec<Box<dyn configuration::Source>> {
+) -> Vec<Box<dyn configuration::Source + Send + Sync>> {
     let json_sources = serde_json::from_value::<Vec<SourceConfig>>(json).expect("Failed to parse JSON");
     sources_from_vec(json_sources, source_definitions)
 }
@@ -51,7 +51,7 @@ pub fn sources_from_json_value_with_plugins(
 fn sources_from_vec(
     sources: Vec<SourceConfig>,
     source_definitions: Vec<Box<dyn configuration::SourceDefinition>>,
-) -> Vec<Box<dyn configuration::Source>> {
+) -> Vec<Box<dyn configuration::Source + Send + Sync>> {
     let mut res = Vec::new();
     let mut source_loader = configuration::SourceLoader::new();
     for source in get_builtin_sources() {
@@ -68,7 +68,10 @@ fn sources_from_vec(
     res
 }
 
-fn source_from_json(source: &SourceConfig, loader: &configuration::SourceLoader) -> Box<dyn configuration::Source> {
+fn source_from_json(
+    source: &SourceConfig,
+    loader: &configuration::SourceLoader,
+) -> Box<dyn configuration::Source + Send + Sync> {
     // Loader only works on AST. We should change that.
     // TODO: This is code duplication with source serializer, the format is very similar.
     // Maybe we can impl the Source trait.

@@ -8,7 +8,7 @@ use prisma_models::*;
 use quaint::{
     ast::*,
     connector::{self, Queryable},
-    pool::PooledConnection,
+    pooled::PooledConnection,
 };
 use serde_json::{Map, Number, Value};
 use std::convert::TryFrom;
@@ -114,7 +114,7 @@ pub trait QueryExt: Queryable + Send + Sync {
 
     /// Read the all columns as an `GraphqlId`
     async fn filter_ids(&self, model: &ModelRef, filter: Filter) -> crate::Result<Vec<GraphqlId>> {
-        let select = Select::from_table(model.table())
+        let select = Select::from_table(model.as_table())
             .column(model.fields().id().as_column())
             .so_that(filter.aliased_cond(None));
 
@@ -170,7 +170,7 @@ pub trait QueryExt: Queryable + Send + Sync {
         let child_id_field = relation.column_for_relation_side(parent_field.relation_side.opposite());
         let parent_id_field = relation.column_for_relation_side(parent_field.relation_side);
 
-        let subselect = Select::from_table(relation.relation_table())
+        let subselect = Select::from_table(relation.as_table())
             .column(child_id_field)
             .so_that(parent_id_field.in_selection(parent_ids));
 
@@ -189,7 +189,7 @@ pub trait QueryExt: Queryable + Send + Sync {
             None => conditions.into(),
         };
 
-        let select = Select::from_table(related_model.table())
+        let select = Select::from_table(related_model.as_table())
             .column(related_model.fields().id().as_column())
             .so_that(conditions);
 

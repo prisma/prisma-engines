@@ -1,7 +1,7 @@
 #![allow(non_snake_case)]
-#![allow(unused)]
+
 mod test_harness;
-use pretty_assertions::{assert_eq, assert_ne};
+use pretty_assertions::assert_eq;
 use quaint::prelude::SqlFamily;
 use sql_migration_connector::{AlterIndex, CreateIndex, DropIndex, SqlMigrationStep};
 use sql_schema_describer::*;
@@ -225,7 +225,7 @@ async fn changing_the_type_of_an_id_field_must_work(api: &TestApi) {
             columns: vec![column.name.clone()],
             referenced_table: "B".to_string(),
             referenced_columns: vec!["id".to_string()],
-            on_delete_action: ForeignKeyAction::SetNull,
+            on_delete_action: ForeignKeyAction::Restrict,
         }]
     );
 
@@ -253,7 +253,7 @@ async fn changing_the_type_of_an_id_field_must_work(api: &TestApi) {
             columns: vec![column.name.clone()],
             referenced_table: "B".to_string(),
             referenced_columns: vec!["id".to_string()],
-            on_delete_action: ForeignKeyAction::SetNull,
+            on_delete_action: ForeignKeyAction::Restrict,
         }]
     );
 }
@@ -308,7 +308,7 @@ async fn changing_a_relation_field_to_a_scalar_field_must_work(api: &TestApi) {
             columns: vec![column.name.clone()],
             referenced_table: "B".to_string(),
             referenced_columns: vec!["id".to_string()],
-            on_delete_action: ForeignKeyAction::SetNull,
+            on_delete_action: ForeignKeyAction::Restrict,
         }]
     );
 
@@ -370,7 +370,7 @@ async fn changing_a_scalar_field_to_a_relation_field_must_work(api: &TestApi) {
             columns: vec![column.name.clone()],
             referenced_table: "B".to_string(),
             referenced_columns: vec!["id".to_string()],
-            on_delete_action: ForeignKeyAction::SetNull,
+            on_delete_action: ForeignKeyAction::Restrict,
         }]
     );
 }
@@ -512,30 +512,56 @@ async fn adding_an_inline_relation_must_result_in_a_foreign_key_in_the_model_tab
     let dm1 = r#"
             model A {
                 id Int @id
-                b B @relation(references: [id])
+                b  B   @relation(references: [id])
+                c  C?  @relation(references: [id])
             }
 
             model B {
                 id Int @id
             }
+
+            model C {
+                id Int @id
+            }
         "#;
+
     let result = api.infer_and_apply(&dm1).await.sql_schema;
     let table = result.table_bang("A");
-    let column = table.column_bang("b");
-    assert_eq!(column.tpe.family, ColumnTypeFamily::Int);
+
+    let b_column = table.column_bang("b");
+    assert_eq!(b_column.tpe.family, ColumnTypeFamily::Int);
+    assert_eq!(b_column.arity, ColumnArity::Required);
+
+    let c_column = table.column_bang("c");
+    assert_eq!(c_column.tpe.family, ColumnTypeFamily::Int);
+    assert_eq!(c_column.arity, ColumnArity::Nullable);
+
     assert_eq!(
         table.foreign_keys,
-        &[ForeignKey {
-            constraint_name: match api.sql_family() {
-                SqlFamily::Postgres => Some("A_b_fkey".to_owned()),
-                SqlFamily::Mysql => Some("A_ibfk_1".to_owned()),
-                SqlFamily::Sqlite => None,
+        &[
+            ForeignKey {
+                constraint_name: match api.sql_family() {
+                    SqlFamily::Postgres => Some("A_b_fkey".to_owned()),
+                    SqlFamily::Mysql => Some("A_ibfk_1".to_owned()),
+                    SqlFamily::Sqlite => None,
+                },
+                columns: vec![b_column.name.clone()],
+                referenced_table: "B".to_string(),
+                referenced_columns: vec!["id".to_string()],
+                on_delete_action: ForeignKeyAction::Restrict, // required relations can't set ON DELETE SET NULL
             },
-            columns: vec![column.name.clone()],
-            referenced_table: "B".to_string(),
-            referenced_columns: vec!["id".to_string()],
-            on_delete_action: ForeignKeyAction::SetNull,
-        }]
+            ForeignKey {
+                constraint_name: match api.sql_family() {
+                    SqlFamily::Postgres => Some("A_c_fkey".to_owned()),
+                    SqlFamily::Mysql => Some("A_ibfk_2".to_owned()),
+                    SqlFamily::Sqlite => None,
+                },
+                columns: vec![c_column.name.clone()],
+                referenced_table: "C".to_string(),
+                referenced_columns: vec!["id".to_string()],
+                on_delete_action: ForeignKeyAction::SetNull,
+            }
+        ]
     );
 }
 
@@ -566,7 +592,7 @@ async fn specifying_a_db_name_for_an_inline_relation_must_work(api: &TestApi) {
             columns: vec![column.name.clone()],
             referenced_table: "B".to_string(),
             referenced_columns: vec!["id".to_string()],
-            on_delete_action: ForeignKeyAction::SetNull,
+            on_delete_action: ForeignKeyAction::Restrict,
         }]
     );
 }
@@ -598,7 +624,7 @@ async fn adding_an_inline_relation_to_a_model_with_an_exotic_id_type(api: &TestA
             columns: vec![column.name.clone()],
             referenced_table: "B".to_string(),
             referenced_columns: vec!["id".to_string()],
-            on_delete_action: ForeignKeyAction::SetNull,
+            on_delete_action: ForeignKeyAction::Restrict,
         }]
     );
 }
@@ -658,7 +684,7 @@ async fn moving_an_inline_relation_to_the_other_side_must_work(api: &TestApi) {
             columns: vec!["b".to_string()],
             referenced_table: "B".to_string(),
             referenced_columns: vec!["id".to_string()],
-            on_delete_action: ForeignKeyAction::SetNull,
+            on_delete_action: ForeignKeyAction::Restrict,
         }]
     );
 
@@ -685,7 +711,7 @@ async fn moving_an_inline_relation_to_the_other_side_must_work(api: &TestApi) {
             columns: vec!["a".to_string()],
             referenced_table: "A".to_string(),
             referenced_columns: vec!["id".to_string()],
-            on_delete_action: ForeignKeyAction::SetNull,
+            on_delete_action: ForeignKeyAction::Restrict,
         }]
     );
 }
@@ -1197,7 +1223,7 @@ async fn dropping_a_model_with_a_multi_field_unique_index_must_work(api: &TestAp
     assert_eq!(index.unwrap().tpe, IndexType::Unique);
 
     let dm2 = "";
-    api.infer_and_apply(&dm2);
+    api.infer_and_apply(&dm2).await;
 }
 
 #[test_each_connector]
@@ -1268,7 +1294,6 @@ async fn reserved_sql_key_words_must_work(api: &TestApi) {
     let result = api.infer_and_apply(&dm).await.sql_schema;
 
     let table = result.table_bang("Group");
-    let relation_column = table.column_bang("parent");
     assert_eq!(
         table.foreign_keys,
         vec![ForeignKey {
@@ -1332,7 +1357,7 @@ async fn migrations_with_many_to_many_related_models_must_not_recreate_indexes(a
             }
         "#;
 
-    let result = api.infer_and_apply(&dm_1).await;
+    let result = api.infer_and_apply(&dm_2).await;
     let sql_schema = result.sql_schema;
 
     let index = sql_schema
@@ -1346,8 +1371,6 @@ async fn migrations_with_many_to_many_related_models_must_not_recreate_indexes(a
 
 #[test_each_connector]
 async fn removing_a_relation_field_must_work(api: &TestApi) {
-    let sql_family = api.sql_family();
-
     let dm_1 = r#"
             model User {
                 id        String  @default(cuid()) @id
@@ -1403,5 +1426,70 @@ async fn simple_type_aliases_in_migrations_must_work(api: &TestApi) {
         }
     "#;
 
-    api.infer_and_apply(dm1);
+    api.infer_and_apply(dm1).await;
+}
+
+#[test_each_connector]
+async fn model_with_multiple_indexes_works(api: &TestApi) {
+    let dm = r#"
+    model User {
+      id         Int       @id @unique
+    }
+
+    model Post {
+      id        Int       @id @unique
+    }
+
+    model Comment {
+      id        Int       @id @unique
+    }
+
+    model Like {
+      id        Int       @id @unique
+      user      User
+      post      Post
+      comment   Comment
+
+      @@index([post])
+      @@index([user])
+      @@index([comment])
+    }
+    "#;
+
+    let sql_schema = api.infer_and_apply(dm).await.sql_schema;
+
+    let like_indexes_count = sql_schema.table_bang("Like").indices.len();
+    let expected_indexes_count = if api.is_mysql() { 1 } else { 4 }; // 3 explicit indexes + PK, or only PK on mysql
+
+    assert_eq!(like_indexes_count, expected_indexes_count);
+}
+
+#[test_each_connector]
+async fn foreign_keys_of_inline_one_to_one_relations_have_a_unique_constraint(api: &TestApi) {
+    let dm = r#"
+        model Cat {
+            id Int @id
+            box Box
+        }
+
+        model Box {
+            id Int @id
+            cat Cat
+        }
+    "#;
+
+    let schema = api.infer_and_apply(dm).await.sql_schema;
+
+    let box_table = schema.table_bang("Box");
+
+
+    let expected_indexes = &[
+        Index {
+            name: "Box_cat".into(),
+            columns: vec!["cat".into()],
+            tpe: IndexType::Unique,
+        }
+    ];
+
+    assert_eq!(box_table.indices, expected_indexes);
 }

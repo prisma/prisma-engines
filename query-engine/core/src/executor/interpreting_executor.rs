@@ -2,8 +2,8 @@ use super::{pipeline::QueryPipeline, QueryExecutor};
 use crate::{
     CoreResult, IrSerializer, QueryDocument, QueryGraph, QueryGraphBuilder, QueryInterpreter, QuerySchemaRef, Response,
 };
-use connector::{Connector, ConnectionLike};
 use async_trait::async_trait;
+use connector::{ConnectionLike, Connector};
 
 /// Central query executor and main entry point into the query core.
 pub struct InterpretingExecutor<C> {
@@ -30,11 +30,7 @@ impl<C> QueryExecutor for InterpretingExecutor<C>
 where
     C: Connector + Send + Sync,
 {
-    async fn execute(
-        &self,
-        query_doc: QueryDocument,
-        query_schema: QuerySchemaRef,
-    ) -> CoreResult<Vec<Response>> {
+    async fn execute(&self, query_doc: QueryDocument, query_schema: QuerySchemaRef) -> CoreResult<Vec<Response>> {
         let conn = self.connector.get_connection().await?;
 
         // Parse, validate, and extract query graphs from query document.

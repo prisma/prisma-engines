@@ -103,19 +103,19 @@ impl<'a> ModelDiffer<'a> {
     }
 
     fn previous_regular_directives(&self) -> impl Iterator<Item = &ast::Directive> {
-        self.previous.directives.iter().filter(is_regular)
+        self.previous.directives.iter().filter(directive_is_regular)
     }
 
     fn next_regular_directives(&self) -> impl Iterator<Item = &ast::Directive> {
-        self.next.directives.iter().filter(is_regular)
+        self.next.directives.iter().filter(directive_is_regular)
     }
 
     fn previous_repeated_directives(&self) -> impl Iterator<Item = &ast::Directive> {
-        self.previous.directives.iter().filter(is_repeated)
+        self.previous.directives.iter().filter(directive_is_repeated)
     }
 
     fn next_repeated_directives(&self) -> impl Iterator<Item = &ast::Directive> {
-        self.next.directives.iter().filter(is_repeated)
+        self.next.directives.iter().filter(directive_is_repeated)
     }
 }
 
@@ -127,12 +127,12 @@ fn fields_match(previous: &ast::Field, next: &ast::Field) -> bool {
 const REPEATED_MODEL_DIRECTIVES: &[&str] = &["unique", "index"];
 
 /// See ModelDiffer docs.
-fn is_regular(directive: &&ast::Directive) -> bool {
-    !is_repeated(directive)
+pub(super) fn directive_is_regular(directive: &&ast::Directive) -> bool {
+    !directive_is_repeated(directive)
 }
 
 /// See ModelDiffer docs.
-fn is_repeated(directive: &&ast::Directive) -> bool {
+pub(super) fn directive_is_repeated(directive: &&ast::Directive) -> bool {
     REPEATED_MODEL_DIRECTIVES.contains(&directive.name.name.as_str())
 }
 

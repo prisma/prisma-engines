@@ -10,7 +10,7 @@ class OrderBySpec extends FlatSpec with Matchers with ApiSpecBase {
       |model NeedsTiebreaker {
       |  id    String @id @default(cuid())
       |  name  String
-      |  order Int
+      |  order Int @unique
       |}
     """
   }
@@ -21,7 +21,9 @@ class OrderBySpec extends FlatSpec with Matchers with ApiSpecBase {
     createNeedsTiebreakers()
   }
 
-  "The order when not giving an order by" should "be by Id ascending and therefore oldest first" in {
+
+   // we are no longer using id ordering by default
+  "The order when not giving an order by" should "be by Id ascending and therefore oldest first" ignore {
     val resultWithOrderByImplicitlySpecified = server.query(
       """
         |{
@@ -69,6 +71,21 @@ class OrderBySpec extends FlatSpec with Matchers with ApiSpecBase {
       """
         |{
         |  needsTiebreakers(orderBy: name_ASC) {
+        |    order
+        |  }
+        |}
+      """,
+      project
+    )
+
+    result.toString should be("""{"data":{"needsTiebreakers":[{"order":1},{"order":2},{"order":3},{"order":4},{"order":5},{"order":6},{"order":7}]}}""")
+  }
+
+  "The order when giving an order by ASC that is unique" should "be correct and the query should not include an ordering with the id tiebreaker" in {
+    val result = server.query(
+      """
+        |{
+        |  needsTiebreakers(orderBy: order_ASC) {
         |    order
         |  }
         |}

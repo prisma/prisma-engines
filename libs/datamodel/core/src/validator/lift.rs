@@ -24,7 +24,7 @@ impl LiftAstToDml {
     /// the directives defined by the given sources registered.
     ///
     /// The directives defined by the given sources will be namespaced.
-    pub fn with_sources(sources: &[Box<dyn configuration::Source>]) -> LiftAstToDml {
+    pub fn with_sources(sources: &[Box<dyn configuration::Source + Send + Sync>]) -> LiftAstToDml {
         LiftAstToDml {
             directives: DirectiveBox::with_sources(sources),
         }

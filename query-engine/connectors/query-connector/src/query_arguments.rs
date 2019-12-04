@@ -1,4 +1,4 @@
-use crate::filter::{Filter, RecordFinder};
+use crate::filter::Filter;
 use prisma_models::*;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -19,6 +19,27 @@ pub struct QueryArguments {
 }
 
 impl QueryArguments {
+    fn needs_reversed_order(&self) -> bool {
+        self.last.is_some()
+    }
+
+    fn needs_implicit_ordering(&self) -> bool {
+        self.skip.is_some()
+            || self.after.is_some()
+            || self.first.is_some()
+            || self.before.is_some()
+            || self.last.is_some()
+            || self.order_by.is_some()
+    }
+
+    pub fn ordering_directions(&self) -> OrderDirections {
+        OrderDirections {
+            needs_to_be_reverse_order: self.needs_reversed_order(),
+            needs_implicit_id_ordering: self.needs_implicit_ordering(),
+            primary_order_by: self.order_by.clone(),
+        }
+    }
+
     pub fn is_with_pagination(&self) -> bool {
         self.last.or(self.first).or(self.skip).is_some()
     }
@@ -46,25 +67,19 @@ impl QueryArguments {
     }
 }
 
-impl From<RecordFinder> for QueryArguments {
-    fn from(record_finder: RecordFinder) -> Self {
-        QueryArguments::from(Filter::from(record_finder))
-    }
-}
-
-impl From<Option<RecordFinder>> for QueryArguments {
-    fn from(record_finder: Option<RecordFinder>) -> Self {
-        match record_finder {
-            Some(rf) => Self::from(rf),
-            None => Self::default(),
-        }
-    }
-}
-
-impl From<Filter> for QueryArguments {
-    fn from(filter: Filter) -> Self {
+impl<T> From<T> for QueryArguments
+where
+    T: Into<Filter>,
+{
+    fn from(filter: T) -> Self {
         let mut query_arguments = Self::default();
-        query_arguments.filter = Some(filter);
+        query_arguments.filter = Some(filter.into());
         query_arguments
     }
+}
+
+pub struct OrderDirections {
+    pub needs_implicit_id_ordering: bool,
+    pub needs_to_be_reverse_order: bool,
+    pub primary_order_by: Option<OrderBy>,
 }

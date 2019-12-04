@@ -172,7 +172,17 @@ fn push_created_models<'a>(steps: &mut Steps, models: impl Iterator<Item = &'a a
         steps.push(MigrationStep::CreateModel(create_model_step));
 
         push_created_fields(steps, &created_model.name.name, created_model.fields.iter());
-        push_created_directives(steps, &directive_location, created_model.directives.iter());
+
+        push_created_directives(
+            steps,
+            &directive_location,
+            created_model.directives.iter().filter(models::directive_is_regular),
+        );
+        push_created_directives_with_arguments(
+            steps,
+            &directive_location,
+            created_model.directives.iter().filter(models::directive_is_repeated),
+        );
     }
 }
 
@@ -275,6 +285,16 @@ fn push_created_directives<'a>(
 ) {
     for directive in directives {
         push_created_directive(steps, location.clone(), directive);
+    }
+}
+
+fn push_created_directives_with_arguments<'a>(
+    steps: &mut Steps,
+    location: &steps::DirectiveType,
+    directives: impl Iterator<Item = &'a ast::Directive>,
+) {
+    for directive in directives {
+        push_created_directive_with_arguments(steps, location.clone(), directive);
     }
 }
 

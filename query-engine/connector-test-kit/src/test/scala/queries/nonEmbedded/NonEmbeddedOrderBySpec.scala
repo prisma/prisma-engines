@@ -39,7 +39,8 @@ class NonEmbeddedOrderBySpec extends FlatSpec with Matchers with ApiSpecBase {
     TestDataModels(mongo = Vector(s1), sql = Vector(s2))
   }
 
-  "The order when not using order by" should "be the same no matter if pagination is used or not" in {
+//  this is not the intended behaviour anymore since we remove implicit ordering by id
+  "The order when not using order by" should "be the same no matter if pagination is used or not" ignore {
     testDataModels.testV11 { project =>
       createLists(project)
       createTodos(project)

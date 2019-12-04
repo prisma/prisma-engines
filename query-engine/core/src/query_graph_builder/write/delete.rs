@@ -27,7 +27,19 @@ pub fn delete_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedF
 
     utils::insert_deletion_checks(graph, &model, &read_node, &delete_node)?;
 
-    graph.create_edge(&read_node, &delete_node, QueryGraphDependency::ExecutionOrder)?;
+    graph.create_edge(
+        &read_node,
+        &delete_node,
+        QueryGraphDependency::ParentIds(Box::new(|node, parent_ids| {
+            if parent_ids.len() > 0 {
+                Ok(node)
+            } else {
+                Err(QueryGraphBuilderError::RecordNotFound(
+                    "Record to delete does not exist.".to_owned(),
+                ))
+            }
+        })),
+    )?;
     graph.add_result_node(&read_node);
 
     Ok(())

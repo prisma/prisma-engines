@@ -48,7 +48,7 @@ fn setup() {
 fn a_data_model_can_be_generated_from_a_schema() {
     setup();
 
-    let col_types = vec![
+    let col_types = &[
         ColumnTypeFamily::Int,
         ColumnTypeFamily::Float,
         ColumnTypeFamily::Boolean,

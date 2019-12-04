@@ -88,6 +88,7 @@ impl IrSerializer {
             }
 
             ExpressionResult::Empty => panic!("Domain logic error: Attempted to serialize empty result."),
+            ExpressionResult::Computation(_) => panic!("Domain logic error: Attempted to serialize non-query result."),
         }
     }
 }

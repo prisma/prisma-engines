@@ -53,7 +53,7 @@ impl SourceDefinition for CustomDbDefinition {
         name: &str,
         url: StringFromEnvVar,
         documentation: &Option<String>,
-    ) -> Result<Box<dyn Source>, DatamodelError> {
+    ) -> Result<Box<dyn Source + Send + Sync>, DatamodelError> {
         Ok(Box::new(CustomDb {
             name: String::from(name),
             url,

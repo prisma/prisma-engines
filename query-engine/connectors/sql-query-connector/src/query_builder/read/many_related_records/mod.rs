@@ -7,7 +7,7 @@ pub use row_number::*;
 pub use union_all::*;
 
 use crate::ordering::Ordering;
-use prisma_models::prelude::*;
+use prisma_models::*;
 use quaint::ast::{Comparable, Conjuctive, Query};
 
 pub trait ManyRelatedRecordsQueryBuilder {
@@ -27,7 +27,7 @@ pub trait ManyRelatedRecordsQueryBuilder {
             .and(base.cursor);
 
         let opposite_column = base.from_field.opposite_column().table(Relation::TABLE_ALIAS);
-        let order_columns = Ordering::internal(opposite_column, base.order_by.as_ref(), base.is_reverse_order);
+        let order_columns = Ordering::internal(opposite_column, base.order_directions);
 
         order_columns
             .into_iter()

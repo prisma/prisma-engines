@@ -5,6 +5,7 @@ use crate::{
 use connector_interface::{error::ConnectorError, *};
 use itertools::Itertools;
 use prisma_models::*;
+use quaint::ast::*;
 use std::convert::TryFrom;
 
 struct ScalarListElement {
@@ -25,6 +26,7 @@ pub async fn get_single_record(
     let record = (match conn.find(query, idents.as_slice()).await {
         Ok(result) => Ok(Some(result)),
         Err(_e @ SqlError::RecordNotFoundForWhere(_)) => Ok(None),
+        Err(_e @ SqlError::RecordDoesNotExist) => Ok(None),
         Err(e) => Err(e),
     })?
     .map(Record::from)
@@ -66,7 +68,16 @@ where
     let idents = selected_fields.type_identifiers();
     let field_names = selected_fields.names();
 
-    let query = {
+    let can_skip_joins = from_field.relation_is_inlined_in_child() && !query_arguments.is_with_pagination();
+
+    let query = if can_skip_joins {
+        let model = from_field.related_model();
+
+        let select = read::get_records(&model, selected_fields, query_arguments)
+            .and_where(from_field.relation_column().in_selection(from_record_ids.to_owned()));
+
+        Query::from(select)
+    } else {
         let is_with_pagination = query_arguments.is_with_pagination();
         let base = ManyRelatedRecordsBaseQuery::new(from_field, from_record_ids, query_arguments, selected_fields);
 

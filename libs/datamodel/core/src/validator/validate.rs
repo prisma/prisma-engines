@@ -8,7 +8,7 @@ use crate::{
 ///
 /// When validating, we check if the datamodel is valid, and generate errors otherwise.
 pub struct Validator<'a> {
-    source: Option<&'a Box<dyn configuration::Source>>,
+    source: Option<&'a Box<dyn configuration::Source + Send + Sync>>,
 }
 
 /// State error message. Seeing this error means something went really wrong internally. It's the datamodel equivalent of a bluescreen.
@@ -16,7 +16,7 @@ const STATE_ERROR: &str = "Failed lookup of model, field or optional property du
 
 impl<'a> Validator<'a> {
     /// Creates a new instance, with all builtin directives registered.
-    pub fn new(source: Option<&'a Box<dyn configuration::Source>>) -> Validator {
+    pub fn new(source: Option<&'a Box<dyn configuration::Source + Send + Sync>>) -> Validator {
         Self { source }
     }
 
@@ -126,12 +126,13 @@ impl<'a> Validator<'a> {
                     name_eq && type_eq && args_eq
                 }
                 (None, dml::FieldType::Base(dml::ScalarType::Int), dml::FieldArity::Required) => true,
+                (None, dml::FieldType::Base(dml::ScalarType::String), dml::FieldArity::Required) => true,
                 _ => false,
             };
 
             if !is_valid {
                 return Err(DatamodelError::new_model_validation_error(
-                    "Invalid ID field. ID field must be one of: Int @id, String @id @default(cuid()), String @id @default(uuid()).",
+                    "Invalid ID field. ID field must be one of: Int @id, String @id, String @id @default(cuid()), String @id @default(uuid()).",
                     &model.name,
                     ast_schema.find_field(&model.name, &id_field.name).expect(STATE_ERROR).span));
             }

@@ -22,25 +22,26 @@ use std::sync::Arc;
 
 /// The top-level trait for connectors. This is the abstraction the migration engine core relies on to
 /// interface with different database backends.
+#[async_trait::async_trait]
 pub trait MigrationConnector: Send + Sync + 'static {
     /// The data structure containing the concrete migration steps for the connector. A migration is
     /// assumed to consist of multiple steps.
     ///
     /// For example, in the SQL connector, a step would represent an SQL statement like `CREATE TABLE`.
-    type DatabaseMigration: DatabaseMigrationMarker + 'static;
+    type DatabaseMigration: DatabaseMigrationMarker + Send + Sync + 'static;
 
     /// A string that should identify what database backend is being used. Note that this is not necessarily
     /// the connector name. The SQL connector for example can return "postgresql", "mysql" or "sqlite".
     fn connector_type(&self) -> &'static str;
 
     /// Create a new database with the passed in name.
-    fn create_database(&self, create: &str) -> ConnectorResult<()>;
+    async fn create_database(&self, create: &str) -> ConnectorResult<()>;
 
     /// Hook to perform connector-specific initialization.
-    fn initialize(&self) -> ConnectorResult<()>;
+    async fn initialize(&self) -> ConnectorResult<()>;
 
     /// Drop all database state.
-    fn reset(&self) -> ConnectorResult<()>;
+    async fn reset(&self) -> ConnectorResult<()>;
 
     /// See [MigrationPersistence](trait.MigrationPersistence.html).
     fn migration_persistence(&self) -> Arc<dyn MigrationPersistence>;
@@ -59,7 +60,7 @@ pub trait MigrationConnector: Send + Sync + 'static {
     fn deserialize_database_migration(&self, json: serde_json::Value) -> Self::DatabaseMigration;
 
     /// See [MigrationStepApplier](trait.MigrationStepApplier.html).
-    fn migration_applier(&self) -> Box<dyn MigrationApplier<Self::DatabaseMigration>> {
+    fn migration_applier(&self) -> Box<dyn MigrationApplier<Self::DatabaseMigration> + Send + Sync> {
         let applier = MigrationApplierImpl {
             migration_persistence: self.migration_persistence(),
             step_applier: self.database_migration_step_applier(),
@@ -68,7 +69,7 @@ pub trait MigrationConnector: Send + Sync + 'static {
     }
 }
 
-pub trait DatabaseMigrationMarker: Debug {
+pub trait DatabaseMigrationMarker: Debug + Send + Sync {
     fn serialize(&self) -> serde_json::Value;
 }
 

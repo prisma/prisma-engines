@@ -75,6 +75,7 @@ pub async fn update_records(
         conn.update(update).await.map_err(SqlError::from)?;
     }
 
+
     for (field_name, list_value) in args.list_args() {
         let field = model.fields().find_from_scalar(field_name.as_ref()).unwrap();
         let table = field.scalar_list_table();
@@ -116,11 +117,11 @@ pub async fn connect(
     conn: &dyn QueryExt,
     field: &RelationFieldRef,
     parent_id: &GraphqlId,
-    child_id: &GraphqlId,
+    child_ids: &[GraphqlId],
 ) -> connector_interface::Result<()> {
-    let query = write::create_relation(field, parent_id, child_id);
-    conn.execute(query).await.map_err(SqlError::from)?;
+    let query = write::create_relation_table_records(field, parent_id, child_ids);
 
+    conn.execute(query).await.map_err(SqlError::from)?;
     Ok(())
 }
 
@@ -128,27 +129,10 @@ pub async fn disconnect(
     conn: &dyn QueryExt,
     field: &RelationFieldRef,
     parent_id: &GraphqlId,
-    child_id: &GraphqlId,
+    child_ids: &[GraphqlId],
 ) -> connector_interface::Result<()> {
-    let query = write::delete_relation(field, parent_id, child_id);
+    let query = write::delete_relation_table_records(field, parent_id, child_ids);
+
     conn.execute(query).await.map_err(SqlError::from)?;
-
-    Ok(())
-}
-
-pub async fn set(
-    conn: &dyn QueryExt,
-    field: &RelationFieldRef,
-    parent_id: GraphqlId,
-    child_ids: Vec<GraphqlId>,
-) -> connector_interface::Result<()> {
-    let query = write::delete_relation_by_parent(field, &parent_id);
-    conn.execute(query).await.map_err(SqlError::from)?;
-
-    // TODO: we can avoid the multiple roundtrips in some cases
-    for child_id in &child_ids {
-        connect(conn, field, &parent_id, child_id).await?;
-    }
-
     Ok(())
 }

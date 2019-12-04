@@ -1,11 +1,11 @@
 mod many_related_records;
 
-use crate::{cursor_condition::CursorCondition, filter_conversion::AliasedCondition, ordering::Ordering};
+use crate::{cursor_condition, filter_conversion::AliasedCondition, ordering::Ordering};
 use connector_interface::{
     filter::{Filter, RecordFinder},
     QueryArguments,
 };
-use prisma_models::prelude::*;
+use prisma_models::*;
 use quaint::ast::*;
 use std::sync::Arc;
 
@@ -43,9 +43,9 @@ impl SelectDefinition for Select<'static> {
 
 impl SelectDefinition for QueryArguments {
     fn into_select(self, model: &ModelRef) -> Select<'static> {
-        let cursor: ConditionTree = CursorCondition::build(&self, Arc::clone(&model));
-        let order_by = self.order_by;
-        let ordering = Ordering::for_model(Arc::clone(&model), order_by.as_ref(), self.last.is_some());
+        let cursor: ConditionTree = cursor_condition::build(&self, Arc::clone(&model));
+        let ordering_directions = self.ordering_directions();
+        let ordering = Ordering::for_model(Arc::clone(&model), ordering_directions);
 
         let filter: ConditionTree = self
             .filter
@@ -63,7 +63,7 @@ impl SelectDefinition for QueryArguments {
             None => (self.skip.unwrap_or(0), None),
         };
 
-        let select_ast = Select::from_table(model.table())
+        let select_ast = Select::from_table(model.as_table())
             .so_that(conditions)
             .offset(skip as usize);
 
@@ -83,7 +83,7 @@ where
     selected_fields
         .columns()
         .into_iter()
-        .fold(query.into_select(model), |acc, col| acc.column(col.clone()))
+        .fold(query.into_select(model), |acc, col| acc.column(col))
 }
 
 pub fn get_scalar_list_values_by_record_ids(
@@ -99,6 +99,8 @@ pub fn get_scalar_list_values_by_record_ids(
         .column("nodeId")
         .column("value")
         .so_that(vhere)
+        .order_by("nodeId".ascend())
+        .order_by("position".ascend())
 }
 
 pub fn count_by_model(model: &ModelRef, query_arguments: QueryArguments) -> Select<'static> {

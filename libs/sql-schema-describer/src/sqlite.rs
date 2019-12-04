@@ -2,38 +2,40 @@
 use super::*;
 use failure::_core::convert::TryInto;
 use log::debug;
-use quaint::ast::ParameterizedValue;
-use sql_connection::SyncSqlConnection;
+use quaint::{ast::ParameterizedValue, prelude::Queryable};
 use std::collections::HashMap;
 use std::sync::Arc;
 
 pub struct SqlSchemaDescriber {
-    conn: Arc<dyn SyncSqlConnection + Send + Sync + 'static>,
+    conn: Arc<dyn Queryable + Send + Sync + 'static>,
 }
 
+#[async_trait::async_trait]
 impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
-    fn list_databases(&self) -> SqlSchemaDescriberResult<Vec<String>> {
-        let databases = self.get_databases();
+    async fn list_databases(&self) -> SqlSchemaDescriberResult<Vec<String>> {
+        let databases = self.get_databases().await;
         Result::Ok(databases)
     }
 
-    fn get_metadata(&self, schema: &str) -> SqlSchemaDescriberResult<SQLMetadata> {
-        let count = self.get_table_names(&schema).len();
-        let size = self.get_size(&schema);
-        Result::Ok(SQLMetadata {
+    async fn get_metadata(&self, schema: &str) -> SqlSchemaDescriberResult<SQLMetadata> {
+        let count = self.get_table_names(&schema).await.len();
+        let size = self.get_size(&schema).await;
+        Ok(SQLMetadata {
             table_count: count,
             size_in_bytes: size,
         })
     }
 
-    fn describe(&self, schema: &str) -> SqlSchemaDescriberResult<SqlSchema> {
+    async fn describe(&self, schema: &str) -> SqlSchemaDescriberResult<SqlSchema> {
         debug!("describing schema '{}'", schema);
-        let tables = self
-            .get_table_names(schema)
-            .into_iter()
-            .filter(|table| !is_system_table(&table))
-            .map(|t| self.get_table(schema, &t))
-            .collect();
+        let table_names: Vec<String> = self.get_table_names(schema).await;
+
+        let mut tables = Vec::with_capacity(table_names.len());
+
+        for table_name in table_names.iter().filter(|table| !is_system_table(&table)) {
+            tables.push(self.get_table(schema, table_name).await)
+        }
+
         Ok(SqlSchema {
             // There's no enum type in SQLite.
             enums: vec![],
@@ -46,14 +48,14 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
 
 impl SqlSchemaDescriber {
     /// Constructor.
-    pub fn new(conn: Arc<dyn SyncSqlConnection + Send + Sync + 'static>) -> SqlSchemaDescriber {
+    pub fn new(conn: Arc<dyn Queryable + Send + Sync + 'static>) -> SqlSchemaDescriber {
         SqlSchemaDescriber { conn }
     }
 
-    fn get_databases(&self) -> Vec<String> {
+    async fn get_databases(&self) -> Vec<String> {
         debug!("Getting table names");
         let sql = "PRAGMA database_list;";
-        let rows = self.conn.query_raw(sql, &[]).expect("get schema names ");
+        let rows = self.conn.query_raw(sql, &[]).await.expect("get schema names ");
         let names = rows
             .into_iter()
             .map(|row| {
@@ -68,10 +70,10 @@ impl SqlSchemaDescriber {
         names
     }
 
-    fn get_table_names(&self, schema: &str) -> Vec<String> {
+    async fn get_table_names(&self, schema: &str) -> Vec<String> {
         let sql = format!(r#"SELECT name FROM "{}".sqlite_master WHERE type='table'"#, schema);
         debug!("describing table names with query: '{}'", sql);
-        let result_set = self.conn.query_raw(&sql, &[]).expect("get table names");
+        let result_set = self.conn.query_raw(&sql, &[]).await.expect("get table names");
         let names = result_set
             .into_iter()
             .map(|row| row.get("name").and_then(|x| x.to_string()).unwrap())
@@ -81,10 +83,10 @@ impl SqlSchemaDescriber {
         names
     }
 
-    fn get_size(&self, _schema: &str) -> usize {
+    async fn get_size(&self, _schema: &str) -> usize {
         debug!("Getting db size");
         let sql = format!(r#"SELECT page_count * page_size as size FROM pragma_page_count(), pragma_page_size();"#);
-        let result = self.conn.query_raw(&sql, &[]).expect("get db size ");
+        let result = self.conn.query_raw(&sql, &[]).await.expect("get db size ");
         let size: i64 = result
             .first()
             .and_then(|row| row.get("size")?.as_i64())
@@ -93,11 +95,11 @@ impl SqlSchemaDescriber {
         size.try_into().unwrap()
     }
 
-    fn get_table(&self, schema: &str, name: &str) -> Table {
+    async fn get_table(&self, schema: &str, name: &str) -> Table {
         debug!("describing table '{}' in schema '{}", name, schema);
-        let (columns, primary_key) = self.get_columns(schema, name);
-        let foreign_keys = self.get_foreign_keys(schema, name);
-        let indices = self.get_indices(schema, name);
+        let (columns, primary_key) = self.get_columns(schema, name).await;
+        let foreign_keys = self.get_foreign_keys(schema, name).await;
+        let indices = self.get_indices(schema, name).await;
         Table {
             name: name.to_string(),
             columns,
@@ -107,10 +109,10 @@ impl SqlSchemaDescriber {
         }
     }
 
-    fn get_columns(&self, schema: &str, table: &str) -> (Vec<Column>, Option<PrimaryKey>) {
+    async fn get_columns(&self, schema: &str, table: &str) -> (Vec<Column>, Option<PrimaryKey>) {
         let sql = format!(r#"PRAGMA "{}".table_info ("{}")"#, schema, table);
         debug!("describing table columns, query: '{}'", sql);
-        let result_set = self.conn.query_raw(&sql, &[]).unwrap();
+        let result_set = self.conn.query_raw(&sql, &[]).await.unwrap();
         let mut pk_cols: HashMap<i64, String> = HashMap::new();
         let mut cols: Vec<Column> = result_set
             .into_iter()
@@ -195,7 +197,7 @@ impl SqlSchemaDescriber {
         (cols, primary_key)
     }
 
-    fn get_foreign_keys(&self, schema: &str, table: &str) -> Vec<ForeignKey> {
+    async fn get_foreign_keys(&self, schema: &str, table: &str) -> Vec<ForeignKey> {
         struct IntermediateForeignKey {
             pub columns: HashMap<i64, String>,
             pub referenced_table: String,
@@ -205,7 +207,7 @@ impl SqlSchemaDescriber {
 
         let sql = format!(r#"PRAGMA "{}".foreign_key_list("{}");"#, schema, table);
         debug!("describing table foreign keys, SQL: '{}'", sql);
-        let result_set = self.conn.query_raw(&sql, &[]).expect("querying for foreign keys");
+        let result_set = self.conn.query_raw(&sql, &[]).await.expect("querying for foreign keys");
 
         // Since one foreign key with multiple columns will be represented here as several
         // rows with the same ID, we have to use an intermediate representation that gets
@@ -293,43 +295,47 @@ impl SqlSchemaDescriber {
         fks
     }
 
-    fn get_indices(&self, schema: &str, table: &str) -> Vec<Index> {
+    async fn get_indices(&self, schema: &str, table: &str) -> Vec<Index> {
         let sql = format!(r#"PRAGMA "{}".index_list("{}");"#, schema, table);
         debug!("describing table indices, SQL: '{}'", sql);
-        let result_set = self.conn.query_raw(&sql, &[]).expect("querying for indices");
+        let result_set = self.conn.query_raw(&sql, &[]).await.expect("querying for indices");
         debug!("Got indices description results: {:?}", result_set);
-        result_set
+
+        let mut indices = Vec::new();
+        let filtered_rows = result_set
             .into_iter()
             // Exclude primary keys, they are inferred separately.
-            .filter(|row| row.get("origin").and_then(|origin| origin.as_str()).unwrap() != "pk")
-            .map(|row| {
-                let is_unique = row.get("unique").and_then(|x| x.as_bool()).expect("get unique");
-                let name = row.get("name").and_then(|x| x.to_string()).expect("get name");
-                let mut index = Index {
-                    name: name.clone(),
-                    tpe: match is_unique {
-                        true => IndexType::Unique,
-                        false => IndexType::Normal,
-                    },
-                    columns: vec![],
-                };
+            .filter(|row| row.get("origin").and_then(|origin| origin.as_str()).unwrap() != "pk");
 
-                let sql = format!(r#"PRAGMA "{}".index_info("{}");"#, schema, name);
-                debug!("describing table index '{}', SQL: '{}'", name, sql);
-                let result_set = self.conn.query_raw(&sql, &[]).expect("querying for index info");
-                debug!("Got index description results: {:?}", result_set);
-                for row in result_set.into_iter() {
-                    let pos = row.get("seqno").and_then(|x| x.as_i64()).expect("get seqno") as usize;
-                    let col_name = row.get("name").and_then(|x| x.to_string()).expect("get name");
-                    if index.columns.len() <= pos {
-                        index.columns.resize(pos + 1, "".to_string());
-                    }
-                    index.columns[pos] = col_name;
+        for row in filtered_rows {
+            let is_unique = row.get("unique").and_then(|x| x.as_bool()).expect("get unique");
+            let name = row.get("name").and_then(|x| x.to_string()).expect("get name");
+            let mut index = Index {
+                name: name.clone(),
+                tpe: match is_unique {
+                    true => IndexType::Unique,
+                    false => IndexType::Normal,
+                },
+                columns: vec![],
+            };
+
+            let sql = format!(r#"PRAGMA "{}".index_info("{}");"#, schema, name);
+            debug!("describing table index '{}', SQL: '{}'", name, sql);
+            let result_set = self.conn.query_raw(&sql, &[]).await.expect("querying for index info");
+            debug!("Got index description results: {:?}", result_set);
+            for row in result_set.into_iter() {
+                let pos = row.get("seqno").and_then(|x| x.as_i64()).expect("get seqno") as usize;
+                let col_name = row.get("name").and_then(|x| x.to_string()).expect("get name");
+                if index.columns.len() <= pos {
+                    index.columns.resize(pos + 1, "".to_string());
                 }
+                index.columns[pos] = col_name;
+            }
 
-                index
-            })
-            .collect()
+            indices.push(index)
+        }
+
+        indices
     }
 }
 

@@ -54,6 +54,18 @@ where
 ///
 /// Returns a `NodeRef` to the newly created read node.
 ///
+/// The resulting graph is (dashed already exists, everything else is added):
+/// ```text
+/// ┌ ─ ─ ─ ─ ─ ─ ─ ─ ┐
+///       Parent
+/// └ ─ ─ ─ ─ ─ ─ ─ ─ ┘
+///          │
+///          ▼
+/// ┌─────────────────┐
+/// │  Read Children  │
+/// └─────────────────┘
+///```
+///
 /// ## Example
 /// Given two models, `Blog` and `Post`, where a blog has many posts, and a post has one block.
 ///
@@ -102,35 +114,27 @@ where
     Ok(read_parent_node)
 }
 
-// Creates an "empty" query node. Sometimes required for
-// Todo: Consider elevating the placeholder concept to the actual graph.
-// - Prevents accidential reads, could just error if placeholder hasn't been replaced during building.
-// - Definitely the cleaner solution.
-// pub fn insert_query_node_placeholder(graph: &mut QueryGraph) -> NodeRef {
-//     graph.create_node(Query::Read(ReadQuery::RecordQuery(RecordQuery::default())))
-// }
-
-/// Creates an update record query node and adds it to the query graph.
+/// Creates an update many records query node and adds it to the query graph.
 /// Used to have a skeleton update node in the graph that can be further transformed during query execution based
 /// on available information.
-pub fn update_record_node_placeholder(
-    graph: &mut QueryGraph,
-    record_finder: Option<RecordFinder>,
-    model: ModelRef,
-) -> NodeRef {
+///
+/// No edges are created.
+pub fn update_records_node_placeholder<T>(graph: &mut QueryGraph, filter: T, model: ModelRef) -> NodeRef
+where
+    T: Into<Filter>,
+{
     let mut args = PrismaArgs::new();
 
-    // args.insert(field.name(), value);
     args.update_datetimes(Arc::clone(&model), false);
 
-    let ur = UpdateRecord {
+    let ur = UpdateManyRecords {
         model,
-        where_: record_finder,
+        filter: filter.into(),
         non_list_args: args,
         list_args: vec![],
     };
 
-    graph.create_node(Query::Write(WriteQuery::UpdateRecord(ur)))
+    graph.create_node(Query::Write(WriteQuery::UpdateManyRecords(ur)))
 }
 
 /// Inserts checks and disconnects for existing models for a 1:1 relation.
@@ -180,7 +184,7 @@ pub fn insert_existing_1to1_related_model_checks(
     let read_existing_children =
         insert_find_children_by_parent_node(graph, &parent_node, &parent_relation_field, None)?;
 
-    let update_existing_child = update_record_node_placeholder(graph, None, child_model);
+    let update_existing_child = update_records_node_placeholder(graph, None, child_model);
     let relation_field_name = parent_relation_field.related_field().name.clone();
     let if_node = graph.create_node(Flow::default_if());
 
@@ -280,7 +284,7 @@ pub fn insert_deletion_checks(
     let mut check_nodes = vec![];
 
     if relation_fields.len() > 0 {
-        let noop_node = graph.create_node(Node::Flow(Flow::Empty));
+        let noop_node = graph.create_node(Node::Empty);
 
         // We know that the relation can't be a list and must be required on the related model for `model` (see fields_requiring_model).
         // For all requiring models (RM), we use the field on `model` to query for existing RM records and error out if at least one exists.

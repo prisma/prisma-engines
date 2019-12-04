@@ -1,5 +1,5 @@
 use crate::error::SqlError;
-use prisma_models::prelude::*;
+use prisma_models::*;
 use quaint::ast::*;
 use std::convert::TryFrom;
 
@@ -31,7 +31,7 @@ pub fn create_record(model: &ModelRef, mut args: PrismaArgs) -> (Insert<'static>
         .iter()
         .map(|field| (field.db_name(), args.take_field_value(field.name()).unwrap()));
 
-    let base = Insert::single_into(model.table());
+    let base = Insert::single_into(model.as_table());
 
     let insert = fields
         .into_iter()
@@ -40,111 +40,51 @@ pub fn create_record(model: &ModelRef, mut args: PrismaArgs) -> (Insert<'static>
     (Insert::from(insert).returning(vec![id_field.as_column()]), return_id)
 }
 
-pub fn create_relation(field: &RelationFieldRef, parent_id: &GraphqlId, child_id: &GraphqlId) -> Query<'static> {
+pub fn create_relation_table_records(
+    field: &RelationFieldRef,
+    parent_id: &GraphqlId,
+    child_ids: &[GraphqlId],
+) -> Query<'static> {
     let relation = field.relation();
+    let parent_column = field.relation_column();
+    let child_column = field.opposite_column();
 
-    match relation.inline_relation_column() {
-        Some(column) => {
-            let referencing_column = column.name.to_string();
+    let mut columns = vec![parent_column.name.to_string(), child_column.name.to_string()];
+    if let Some(id_col) = relation.id_column() {
+        columns.push(id_col.name.to_string());
+    };
 
-            let (update_id, link_id) = match field.relation_is_inlined_in_parent() {
-                true => (parent_id, child_id),
-                false => (child_id, parent_id),
-            };
-
-            let update_condition = match field.relation_is_inlined_in_parent() {
-                true => field.model().fields().id().as_column().equals(update_id),
-                false => field.related_model().fields().id().as_column().equals(update_id),
-            };
-
-            Update::table(relation.relation_table())
-                .set(referencing_column, link_id.clone())
-                .so_that(update_condition)
-                .into()
-        }
-        None => {
-            let relation = field.relation();
-            let parent_column = field.relation_column();
-            let child_column = field.opposite_column();
-
-            let insert = Insert::single_into(relation.relation_table())
-                .value(parent_column.name.to_string(), parent_id.clone())
-                .value(child_column.name.to_string(), child_id.clone());
-
-            let insert: Insert = match relation.id_column() {
-                Some(id_column) => insert.value(id_column, cuid::cuid().unwrap()).into(),
-                None => insert.into(),
-            };
-
-            insert.on_conflict(OnConflict::DoNothing).into()
-        }
-    }
-}
-
-pub fn delete_relation(field: &RelationFieldRef, parent_id: &GraphqlId, child_id: &GraphqlId) -> Query<'static> {
-    let relation = field.relation();
-
-    match relation.inline_relation_column() {
-        Some(column) => {
-            let referencing_column = column.name.to_string();
-
-            let (update_id, _) = match field.relation_is_inlined_in_parent() {
-                true => (parent_id, child_id),
-                false => (child_id, parent_id),
-            };
-
-            let update_condition = match field.relation_is_inlined_in_parent() {
-                true => field.model().fields().id().as_column().equals(update_id),
-                false => field.related_model().fields().id().as_column().equals(update_id),
-            };
-
-            Update::table(relation.relation_table())
-                .set(referencing_column, PrismaValue::Null)
-                .so_that(update_condition)
-                .into()
-        }
-        None => {
-            let relation = field.relation();
-            let parent_column = field.relation_column();
-            let child_column = field.opposite_column();
-
-            let parent_id_criteria = parent_column.equals(parent_id);
-            let child_id_criteria = child_column.equals(child_id);
-
-            Delete::from_table(relation.relation_table())
-                .so_that(parent_id_criteria.and(child_id_criteria))
-                .into()
-        }
-    }
-}
-
-pub fn delete_relation_by_parent(field: &RelationFieldRef, parent_id: &GraphqlId) -> Query<'static> {
-    let relation = field.relation();
-
-    match relation.inline_relation_column() {
-        Some(referencing_column) => {
-            let referencing_column_name = referencing_column.name.to_string();
-            let update_condition = if field.relation_is_inlined_in_parent() {
-                field.model().fields().id().as_column().equals(parent_id)
+    let generate_ids = relation.id_column().is_some();
+    let insert = Insert::multi_into(relation.as_table(), columns);
+    let insert: MultiRowInsert = child_ids
+        .into_iter()
+        .fold(insert, |insert, child_id| {
+            if generate_ids {
+                insert.values((parent_id.clone(), child_id.clone(), cuid::cuid().unwrap()))
             } else {
-                referencing_column.equals(parent_id)
-            };
+                insert.values((parent_id.clone(), child_id.clone()))
+            }
+        })
+        .into();
 
-            Update::table(relation.relation_table())
-                .set(referencing_column_name, PrismaValue::Null)
-                .so_that(update_condition)
-                .into()
-        }
-        None => {
-            let relation = field.relation();
-            let parent_column = field.relation_column();
-            let parent_id_criteria = parent_column.equals(parent_id);
+    insert.build().on_conflict(OnConflict::DoNothing).into()
+}
 
-            Delete::from_table(relation.relation_table())
-                .so_that(parent_id_criteria)
-                .into()
-        }
-    }
+pub fn delete_relation_table_records(
+    field: &RelationFieldRef,
+    parent_id: &GraphqlId,
+    child_ids: &[GraphqlId],
+) -> Query<'static> {
+    let relation = field.relation();
+    let parent_column = field.relation_column();
+    let child_column = field.opposite_column();
+
+    let parent_id_criteria = parent_column.equals(parent_id);
+    let child_id_criteria = child_column.in_selection(child_ids.to_owned());
+
+    Delete::from_table(relation.as_table())
+        .so_that(parent_id_criteria.and(child_id_criteria))
+        .into()
 }
 
 pub fn create_scalar_list_value(
@@ -184,7 +124,7 @@ pub fn update_many(model: &ModelRef, ids: &[&GraphqlId], args: &PrismaArgs) -> c
     }
 
     let fields = model.fields();
-    let mut query = Update::table(model.table());
+    let mut query = Update::table(model.as_table());
 
     for (name, value) in args.args.iter() {
         let field = fields.find_from_all(&name).unwrap();
@@ -222,7 +162,7 @@ pub fn delete_many(model: &ModelRef, ids: &[&GraphqlId]) -> Vec<Delete<'static>>
         }
 
         let condition = model.fields().id().as_column().in_selection(chunk.to_vec());
-        deletes.push(Delete::from_table(model.table()).so_that(condition));
+        deletes.push(Delete::from_table(model.as_table()).so_that(condition));
     }
 
     deletes

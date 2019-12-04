@@ -3,11 +3,11 @@ mod field_renderer;
 mod object_renderer;
 mod type_renderer;
 
-use query_core::schema::*;
 use enum_renderer::*;
 use field_renderer::*;
 use object_renderer::*;
 use prisma_models::EnumType;
+use query_core::schema::*;
 use std::{
     cell::RefCell,
     collections::HashMap,

@@ -54,7 +54,14 @@ impl Display for Flow {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             Self::If(_) => write!(f, "(If (condition func)"),
-            Self::Empty => write!(f, "Empty"),
+        }
+    }
+}
+
+impl Display for Computation {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Self::Diff(_) => write!(f, "Diff"),
         }
     }
 }
@@ -64,6 +71,8 @@ impl Display for Node {
         match self {
             Self::Query(q) => write!(f, "{}", q),
             Self::Flow(flow) => write!(f, "{}", flow),
+            Self::Computation(c) => write!(f, "{}", c),
+            Self::Empty => write!(f, "Empty"),
         }
     }
 }
@@ -84,6 +93,7 @@ impl Display for QueryGraphDependency {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             Self::ExecutionOrder => write!(f, "ExecutionOrder"),
+            Self::ParentResult(_) => write!(f, "ParentResult"),
             Self::ParentIds(_) => write!(f, "ParentIds"),
             Self::Then => write!(f, "Then"),
             Self::Else => write!(f, "Else"),

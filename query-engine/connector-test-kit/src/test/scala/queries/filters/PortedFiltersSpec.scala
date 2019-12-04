@@ -111,7 +111,7 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
     createTest("id5", "foo bar barz", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
 
     val res =
-      server.query(query = """{scalarModels(where: {optBoolean: false, OR: [{optString_starts_with: "foo"}, {idTest_ends_with: "5"}]}){idTest}}""",
+      server.query(query = """{scalarModels(where: {optBoolean: false, OR: [{optString_starts_with: "foo"}, {idTest_ends_with: "5"}]},orderBy: id_ASC){idTest}}""",
                    project = project)
 
     res.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"},{"idTest":"id3"},{"idTest":"id4"},{"idTest":"id5"}]}}""")
@@ -127,7 +127,7 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
 
     val res =
       server.query(
-        query = """{scalarModels(where: {OR: [{optString_starts_with: "foo", OR: [{optBoolean: false},{idTest_ends_with: "5"}]}]}){idTest}}""",
+        query = """{scalarModels(where: {OR: [{optString_starts_with: "foo", OR: [{optBoolean: false},{idTest_ends_with: "5"}]}]},orderBy: id_ASC){idTest}}""",
         project = project
       )
 
@@ -141,26 +141,26 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
     createTest("id2", optString = "foo bar", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
     createTest("id3", optString = null, 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
 
-    val filterOnNull  = server.query(query = """{scalarModels(where: {optString: null}){idTest}}""", project = project)
-    val filterOnNull2 = server.query(query = """{scalarModels(where: {b: {int:1},optString: null}){idTest}}""", project = project)
+    val filterOnNull  = server.query(query = """{scalarModels(where: {optString: null} ,orderBy: id_ASC){idTest}}""", project = project)
+    val filterOnNull2 = server.query(query = """{scalarModels(where: {b: {int:1},optString: null},orderBy: id_ASC){idTest}}""", project = project)
 
     filterOnNull.toString() should be("""{"data":{"scalarModels":[{"idTest":"id1"},{"idTest":"id3"}]}}""")
     filterOnNull2.toString() should be("""{"data":{"scalarModels":[{"idTest":"id1"},{"idTest":"id3"}]}}""")
 
-    val filterOnNotNull  = server.query(query = """{scalarModels(where: {optString_not: null}){idTest}}""", project = project)
-    val filterOnNotNull2 = server.query(query = """{scalarModels(where: {b: {int:1},optString_not: null}){idTest}}""", project = project)
+    val filterOnNotNull  = server.query(query = """{scalarModels(where: {optString_not: null},orderBy: id_ASC){idTest}}""", project = project)
+    val filterOnNotNull2 = server.query(query = """{scalarModels(where: {b: {int:1},optString_not: null},orderBy: id_ASC){idTest}}""", project = project)
 
     filterOnNotNull.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"}]}}""")
     filterOnNotNull2.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"}]}}""")
 
-    val filterOnInNull  = server.query(query = """{scalarModels(where: {optString_in: null}){idTest}}""", project = project)
-    val filterOnInNull2 = server.query(query = """{scalarModels(where: {b: {int:1}, optString_in: null}){idTest}}""", project = project)
+    val filterOnInNull  = server.query(query = """{scalarModels(where: {optString_in: null},orderBy: id_ASC){idTest}}""", project = project)
+    val filterOnInNull2 = server.query(query = """{scalarModels(where: {b: {int:1}, optString_in: null},orderBy: id_ASC){idTest}}""", project = project)
 
     filterOnInNull.toString() should be("""{"data":{"scalarModels":[{"idTest":"id1"},{"idTest":"id3"}]}}""")
     filterOnInNull2.toString() should be("""{"data":{"scalarModels":[{"idTest":"id1"},{"idTest":"id3"}]}}""")
 
-    val filterOnNotInNull  = server.query(query = """{scalarModels(where: {optString_not_in: null}){idTest}}""", project = project)
-    val filterOnNotInNull2 = server.query(query = """{scalarModels(where: {b: {int:1}, optString_not_in: null}){idTest}}""", project = project)
+    val filterOnNotInNull  = server.query(query = """{scalarModels(where: {optString_not_in: null},orderBy: id_ASC){idTest}}""", project = project)
+    val filterOnNotInNull2 = server.query(query = """{scalarModels(where: {b: {int:1}, optString_not_in: null},orderBy: id_ASC){idTest}}""", project = project)
 
     filterOnNotInNull.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"}]}}""")
     filterOnNotInNull2.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"}]}}""")
@@ -187,8 +187,8 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
     createTest("id2", "foo bar", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
     createTest("id3", "foo bar barz", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
 
-    val res  = server.query(query = """{scalarModels(where: {optString_not: "bar"}){idTest}}""", project = project)
-    val res2 = server.query(query = """{scalarModels(where: {b: {int:1}, optString_not: "bar"}){idTest}}""", project = project)
+    val res  = server.query(query = """{scalarModels(where: {optString_not: "bar"}, orderBy: id_ASC){idTest}}""", project = project)
+    val res2 = server.query(query = """{scalarModels(where: {b: {int:1}, optString_not: "bar"}, orderBy: id_ASC){idTest}}""", project = project)
 
     res.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"},{"idTest":"id3"}]}}""")
     res2.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"},{"idTest":"id3"}]}}""")
@@ -211,8 +211,8 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
     createTest("id2", "foo bar", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
     createTest("id3", "foo bar barz", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
 
-    val res  = server.query(query = """{scalarModels(where: {optString_not_contains: "bara"}){idTest}}""", project = project)
-    val res2 = server.query(query = """{scalarModels(where: {b: {int:1}, optString_not_contains: "bara"}){idTest}}""", project = project)
+    val res  = server.query(query = """{scalarModels(where: {optString_not_contains: "bara"},orderBy: id_ASC){idTest}}""", project = project)
+    val res2 = server.query(query = """{scalarModels(where: {b: {int:1}, optString_not_contains: "bara"},orderBy: id_ASC){idTest}}""", project = project)
 
     res.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"},{"idTest":"id3"}]}}""")
     res2.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"},{"idTest":"id3"}]}}""")
@@ -235,8 +235,8 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
     createTest("id2", "foo bar", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
     createTest("id3", "foo bar barz", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
 
-    val res  = server.query(query = """{scalarModels(where: {optString_not_starts_with: "bar"}){idTest}}""", project = project)
-    val res2 = server.query(query = """{scalarModels(where: {b: {int:1}, optString_not_starts_with: "bar"}){idTest}}""", project = project)
+    val res  = server.query(query = """{scalarModels(where: {optString_not_starts_with: "bar"},orderBy: id_ASC){idTest}}""", project = project)
+    val res2 = server.query(query = """{scalarModels(where: {b: {int:1}, optString_not_starts_with: "bar"},orderBy: id_ASC){idTest}}""", project = project)
 
     res.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"},{"idTest":"id3"}]}}""")
     res2.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"},{"idTest":"id3"}]}}""")
@@ -247,8 +247,8 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
     createTest("id2", "foo bar", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
     createTest("id3", "foo bar bar", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
 
-    val res  = server.query(query = """{scalarModels(where: {optString_ends_with: "bara"}){idTest}}""", project = project)
-    val res2 = server.query(query = """{scalarModels(where: {b: {int:1}, optString_ends_with: "bara"}){idTest}}""", project = project)
+    val res  = server.query(query = """{scalarModels(where: {optString_ends_with: "bara"},orderBy: id_ASC){idTest}}""", project = project)
+    val res2 = server.query(query = """{scalarModels(where: {b: {int:1}, optString_ends_with: "bara"},orderBy: id_ASC){idTest}}""", project = project)
 
     res.toString() should be("""{"data":{"scalarModels":[{"idTest":"id1"}]}}""")
     res2.toString() should be("""{"data":{"scalarModels":[{"idTest":"id1"}]}}""")
@@ -259,8 +259,8 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
     createTest("id2", "foo bar", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
     createTest("id3", "foo bar bar", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
 
-    val res  = server.query(query = """{scalarModels(where: {optString_not_ends_with: "bara"}){idTest}}""", project = project)
-    val res2 = server.query(query = """{scalarModels(where: {b: {int:1}, optString_not_ends_with: "bara"}){idTest}}""", project = project)
+    val res  = server.query(query = """{scalarModels(where: {optString_not_ends_with: "bara"},orderBy: id_ASC){idTest}}""", project = project)
+    val res2 = server.query(query = """{scalarModels(where: {b: {int:1}, optString_not_ends_with: "bara"},orderBy: id_ASC){idTest}}""", project = project)
 
     res.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"},{"idTest":"id3"}]}}""")
     res2.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"},{"idTest":"id3"}]}}""")
@@ -283,8 +283,8 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
     createTest("id2", "2", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
     createTest("id3", "3", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
 
-    val res  = server.query(query = """{scalarModels(where: {optString_lte: "2"}){idTest}}""", project = project)
-    val res2 = server.query(query = """{scalarModels(where: {b: {int:1}, optString_lte: "2"}){idTest}}""", project = project)
+    val res  = server.query(query = """{scalarModels(where: {optString_lte: "2"},orderBy: id_ASC){idTest}}""", project = project)
+    val res2 = server.query(query = """{scalarModels(where: {b: {int:1}, optString_lte: "2"},orderBy: id_ASC){idTest}}""", project = project)
 
     res.toString() should be("""{"data":{"scalarModels":[{"idTest":"id1"},{"idTest":"id2"}]}}""")
     res2.toString() should be("""{"data":{"scalarModels":[{"idTest":"id1"},{"idTest":"id2"}]}}""")
@@ -307,8 +307,8 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
     createTest("id2", "2", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
     createTest("id3", "3", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
 
-    val res  = server.query(query = """{scalarModels(where: {optString_gte: "2"}){idTest}}""", project = project)
-    val res2 = server.query(query = """{scalarModels(where: {b: {int:1}, optString_gte: "2"}){idTest}}""", project = project)
+    val res  = server.query(query = """{scalarModels(where: {optString_gte: "2"},orderBy: id_ASC){idTest}}""", project = project)
+    val res2 = server.query(query = """{scalarModels(where: {b: {int:1}, optString_gte: "2"},orderBy: id_ASC){idTest}}""", project = project)
 
     res.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"},{"idTest":"id3"}]}}""")
     res2.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"},{"idTest":"id3"}]}}""")
@@ -329,8 +329,8 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
     resB.toString() should be("""{"data":{"scalarModels":[{"idTest":"id1"}]}}""")
     resB2.toString() should be("""{"data":{"scalarModels":[{"idTest":"id1"}]}}""")
 
-    val resC  = server.query(query = """{scalarModels(where: {optString_in: ["a","abc"]}){idTest}}""", project = project)
-    val resC2 = server.query(query = """{scalarModels(where: {b: {int:1}, optString_in: ["a","abc"]}){idTest}}""", project = project)
+    val resC  = server.query(query = """{scalarModels(where: {optString_in: ["a","abc"]},orderBy: id_ASC){idTest}}""", project = project)
+    val resC2 = server.query(query = """{scalarModels(where: {b: {int:1}, optString_in: ["a","abc"]},orderBy: id_ASC){idTest}}""", project = project)
     resC.toString() should be("""{"data":{"scalarModels":[{"idTest":"id1"},{"idTest":"id3"}]}}""")
     resC2.toString() should be("""{"data":{"scalarModels":[{"idTest":"id1"},{"idTest":"id3"}]}}""")
 
@@ -345,12 +345,12 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
     createTest("id2", "ab", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
     createTest("id3", "abc", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
 
-    val resA  = server.query(query = """{scalarModels(where: {optString_not_in: ["a"]}){idTest}}""", project = project)
-    val resA2 = server.query(query = """{scalarModels(where: {b: {int:1}, optString_not_in: ["a"]}){idTest}}""", project = project)
+    val resA  = server.query(query = """{scalarModels(where: {optString_not_in: ["a"]},orderBy: id_ASC){idTest}}""", project = project)
+    val resA2 = server.query(query = """{scalarModels(where: {b: {int:1}, optString_not_in: ["a"]},orderBy: id_ASC){idTest}}""", project = project)
     resA.toString should be("""{"data":{"scalarModels":[{"idTest":"id2"},{"idTest":"id3"}]}}""")
 
-    val resB  = server.query(query = """{scalarModels(orderBy: idTest_ASC, where: {optString_not_in: []}){idTest}}""", project = project)
-    val resB2 = server.query(query = """{scalarModels(orderBy: idTest_ASC, where: {b: {int:1}, optString_not_in: []}){idTest}}""", project = project)
+    val resB  = server.query(query = """{scalarModels(orderBy: idTest_ASC, where: {optString_not_in: []},orderBy: id_ASC){idTest}}""", project = project)
+    val resB2 = server.query(query = """{scalarModels(orderBy: idTest_ASC, where: {b: {int:1}, optString_not_in: []},orderBy: id_ASC){idTest}}""", project = project)
     resB.toString should be("""{"data":{"scalarModels":[{"idTest":"id1"},{"idTest":"id2"},{"idTest":"id3"}]}}""")
     resB2.toString should be("""{"data":{"scalarModels":[{"idTest":"id1"},{"idTest":"id2"},{"idTest":"id3"}]}}""")
   }
@@ -375,8 +375,8 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
     createTest("id2", "ab", 2, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
     createTest("id3", "abc", 3, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
 
-    val res  = server.query(query = """{scalarModels(where: {optInt_not: 1}){idTest}}""", project = project)
-    val res2 = server.query(query = """{scalarModels(where: {b: {int:1}, optInt_not: 1}){idTest}}""", project = project)
+    val res  = server.query(query = """{scalarModels(where: {optInt_not: 1},orderBy: id_ASC){idTest}}""", project = project)
+    val res2 = server.query(query = """{scalarModels(where: {b: {int:1}, optInt_not: 1},orderBy: id_ASC){idTest}}""", project = project)
 
     res.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"},{"idTest":"id3"}]}}""")
     res2.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"},{"idTest":"id3"}]}}""")
@@ -387,8 +387,8 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
     createTest("id2", "2", 2, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
     createTest("id3", "3", 3, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
 
-    val res  = server.query(query = """{scalarModels(where: {optInt_lt: 2}){idTest}}""", project = project)
-    val res2 = server.query(query = """{scalarModels(where: {b: {int:1}, optInt_lt: 2}){idTest}}""", project = project)
+    val res  = server.query(query = """{scalarModels(where: {optInt_lt: 2},orderBy: id_ASC){idTest}}""", project = project)
+    val res2 = server.query(query = """{scalarModels(where: {b: {int:1}, optInt_lt: 2},orderBy: id_ASC){idTest}}""", project = project)
 
     res.toString() should be("""{"data":{"scalarModels":[{"idTest":"id1"}]}}""")
     res2.toString() should be("""{"data":{"scalarModels":[{"idTest":"id1"}]}}""")
@@ -399,8 +399,8 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
     createTest("id2", "2", 2, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
     createTest("id3", "3", 3, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
 
-    val res  = server.query(query = """{scalarModels(where: {optInt_lte: 2}){idTest}}""", project = project)
-    val res2 = server.query(query = """{scalarModels(where: {b: {int:1}, optInt_lte: 2}){idTest}}""", project = project)
+    val res  = server.query(query = """{scalarModels(where: {optInt_lte: 2},orderBy: id_ASC){idTest}}""", project = project)
+    val res2 = server.query(query = """{scalarModels(where: {b: {int:1}, optInt_lte: 2},orderBy: id_ASC){idTest}}""", project = project)
 
     res.toString() should be("""{"data":{"scalarModels":[{"idTest":"id1"},{"idTest":"id2"}]}}""")
     res2.toString() should be("""{"data":{"scalarModels":[{"idTest":"id1"},{"idTest":"id2"}]}}""")
@@ -423,8 +423,8 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
     createTest("id2", "2", 2, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
     createTest("id3", "3", 3, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
 
-    val res  = server.query(query = """{scalarModels(where: {optInt_gte: 2}){idTest}}""", project = project)
-    val res2 = server.query(query = """{scalarModels(where: {b: {int:1}, optInt_gte: 2}){idTest}}""", project = project)
+    val res  = server.query(query = """{scalarModels(where: {optInt_gte: 2},orderBy: id_ASC){idTest}}""", project = project)
+    val res2 = server.query(query = """{scalarModels(where: {b: {int:1}, optInt_gte: 2},orderBy: id_ASC){idTest}}""", project = project)
 
     res.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"},{"idTest":"id3"}]}}""")
     res2.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"},{"idTest":"id3"}]}}""")
@@ -447,8 +447,8 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
     createTest("id2", "ab", 2, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
     createTest("id3", "abc", 3, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
 
-    val res  = server.query(query = """{scalarModels(where: {optInt_not_in: [1]}){idTest}}""", project = project)
-    val res2 = server.query(query = """{scalarModels(where: {b: {int:1}, optInt_not_in: [1]}){idTest}}""", project = project)
+    val res  = server.query(query = """{scalarModels(where: {optInt_not_in: [1]},orderBy: id_ASC){idTest}}""", project = project)
+    val res2 = server.query(query = """{scalarModels(where: {b: {int:1}, optInt_not_in: [1]},orderBy: id_ASC){idTest}}""", project = project)
 
     res.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"},{"idTest":"id3"}]}}""")
     res2.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"},{"idTest":"id3"}]}}""")
@@ -474,8 +474,8 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
     createTest("id2", "ab", 2, 2, optBoolean = false, "A", "2016-09-23T12:29:32.342")
     createTest("id3", "abc", 3, 3, optBoolean = false, "A", "2016-09-23T12:29:32.342")
 
-    val res  = server.query(query = """{scalarModels(where: {optFloat_not: 1}){idTest}}""", project = project)
-    val res2 = server.query(query = """{scalarModels(where: {b: {int:1}, optFloat_not: 1}){idTest}}""", project = project)
+    val res  = server.query(query = """{scalarModels(where: {optFloat_not: 1},orderBy: id_ASC){idTest}}""", project = project)
+    val res2 = server.query(query = """{scalarModels(where: {b: {int:1}, optFloat_not: 1},orderBy: id_ASC){idTest}}""", project = project)
 
     res.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"},{"idTest":"id3"}]}}""")
     res2.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"},{"idTest":"id3"}]}}""")
@@ -486,8 +486,8 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
     createTest("id2", "2", 2, 2, optBoolean = false, "A", "2016-09-23T12:29:32.342")
     createTest("id3", "3", 3, 3, optBoolean = false, "A", "2016-09-23T12:29:32.342")
 
-    val res  = server.query(query = """{scalarModels(where: {optFloat_lt: 2}){idTest}}""", project = project)
-    val res2 = server.query(query = """{scalarModels(where: {b: {int:1}, optFloat_lt: 2}){idTest}}""", project = project)
+    val res  = server.query(query = """{scalarModels(where: {optFloat_lt: 2},orderBy: id_ASC){idTest}}""", project = project)
+    val res2 = server.query(query = """{scalarModels(where: {b: {int:1}, optFloat_lt: 2},orderBy: id_ASC){idTest}}""", project = project)
 
     res.toString() should be("""{"data":{"scalarModels":[{"idTest":"id1"}]}}""")
     res2.toString() should be("""{"data":{"scalarModels":[{"idTest":"id1"}]}}""")
@@ -498,8 +498,8 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
     createTest("id2", "2", 2, 2, optBoolean = false, "A", "2016-09-23T12:29:32.342")
     createTest("id3", "3", 3, 3, optBoolean = false, "A", "2016-09-23T12:29:32.342")
 
-    val res  = server.query(query = """{scalarModels(where: {optFloat_lte: 2}){idTest}}""", project = project)
-    val res2 = server.query(query = """{scalarModels(where: {b: {int:1}, optFloat_lte: 2}){idTest}}""", project = project)
+    val res  = server.query(query = """{scalarModels(where: {optFloat_lte: 2},orderBy: id_ASC){idTest}}""", project = project)
+    val res2 = server.query(query = """{scalarModels(where: {b: {int:1}, optFloat_lte: 2},orderBy: id_ASC){idTest}}""", project = project)
 
     res.toString() should be("""{"data":{"scalarModels":[{"idTest":"id1"},{"idTest":"id2"}]}}""")
     res2.toString() should be("""{"data":{"scalarModels":[{"idTest":"id1"},{"idTest":"id2"}]}}""")
@@ -522,8 +522,8 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
     createTest("id2", "2", 2, 2, optBoolean = false, "A", "2016-09-23T12:29:32.342")
     createTest("id3", "3", 3, 3, optBoolean = false, "A", "2016-09-23T12:29:32.342")
 
-    val res  = server.query(query = """{scalarModels(where: {optFloat_gte: 2}){idTest}}""", project = project)
-    val res2 = server.query(query = """{scalarModels(where: {b: {int:1}, optFloat_gte: 2}){idTest}}""", project = project)
+    val res  = server.query(query = """{scalarModels(where: {optFloat_gte: 2},orderBy: id_ASC){idTest}}""", project = project)
+    val res2 = server.query(query = """{scalarModels(where: {b: {int:1}, optFloat_gte: 2},orderBy: id_ASC){idTest}}""", project = project)
 
     res.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"},{"idTest":"id3"}]}}""")
     res2.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"},{"idTest":"id3"}]}}""")
@@ -546,8 +546,8 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
     createTest("id2", "ab", 2, 2, optBoolean = false, "A", "2016-09-23T12:29:32.342")
     createTest("id3", "abc", 3, 3, optBoolean = false, "A", "2016-09-23T12:29:32.342")
 
-    val res  = server.query(query = """{scalarModels(where: {optFloat_not_in: [1]}){idTest}}""", project = project)
-    val res2 = server.query(query = """{scalarModels(where: {b: {int:1}, optFloat_not_in: [1]}){idTest}}""", project = project)
+    val res  = server.query(query = """{scalarModels(where: {optFloat_not_in: [1]},orderBy: id_ASC){idTest}}""", project = project)
+    val res2 = server.query(query = """{scalarModels(where: {b: {int:1}, optFloat_not_in: [1]},orderBy: id_ASC){idTest}}""", project = project)
 
     res.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"},{"idTest":"id3"}]}}""")
     res2.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"},{"idTest":"id3"}]}}""")
@@ -573,8 +573,8 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
     createTest("id2", "foo bar", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
     createTest("id3", "foo bar barz", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
 
-    val res  = server.query(query = """{scalarModels(where: {optBoolean_not: true}){idTest}}""", project = project)
-    val res2 = server.query(query = """{scalarModels(where: {b: {int:1}, optBoolean_not: true}){idTest}}""", project = project)
+    val res  = server.query(query = """{scalarModels(where: {optBoolean_not: true},orderBy: id_ASC){idTest}}""", project = project)
+    val res2 = server.query(query = """{scalarModels(where: {b: {int:1}, optBoolean_not: true},orderBy: id_ASC){idTest}}""", project = project)
 
     res.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"},{"idTest":"id3"}]}}""")
     res2.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"},{"idTest":"id3"}]}}""")
@@ -600,8 +600,8 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
     createTest("id2", "2", 2, 2, optBoolean = false, "A", "2016-09-24T12:29:32.342")
     createTest("id3", "3", 3, 3, optBoolean = false, "A", "2016-09-25T12:29:32.342")
 
-    val res  = server.query(query = """{scalarModels(where: {optDateTime_not: "2016-09-24T12:29:32.342Z"}){idTest}}""", project = project)
-    val res2 = server.query(query = """{scalarModels(where: {b: {int:1}, optDateTime_not: "2016-09-24T12:29:32.342Z"}){idTest}}""", project = project)
+    val res  = server.query(query = """{scalarModels(where: {optDateTime_not: "2016-09-24T12:29:32.342Z"},orderBy: id_ASC){idTest}}""", project = project)
+    val res2 = server.query(query = """{scalarModels(where: {b: {int:1}, optDateTime_not: "2016-09-24T12:29:32.342Z"},orderBy: id_ASC){idTest}}""", project = project)
 
     res.toString() should be("""{"data":{"scalarModels":[{"idTest":"id1"},{"idTest":"id3"}]}}""")
     res2.toString() should be("""{"data":{"scalarModels":[{"idTest":"id1"},{"idTest":"id3"}]}}""")
@@ -624,8 +624,8 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
     createTest("id2", "2", 2, 2, optBoolean = false, "A", "2016-09-24T12:29:32.342")
     createTest("id3", "3", 3, 3, optBoolean = false, "A", "2016-09-25T12:29:32.342")
 
-    val res  = server.query(query = """{scalarModels(where: {optDateTime_lte: "2016-09-24T12:29:32.342Z"}){idTest}}""", project = project)
-    val res2 = server.query(query = """{scalarModels(where: {b: {int:1}, optDateTime_lte: "2016-09-24T12:29:32.342Z"}){idTest}}""", project = project)
+    val res  = server.query(query = """{scalarModels(where: {optDateTime_lte: "2016-09-24T12:29:32.342Z"},orderBy: id_ASC){idTest}}""", project = project)
+    val res2 = server.query(query = """{scalarModels(where: {b: {int:1}, optDateTime_lte: "2016-09-24T12:29:32.342Z"},orderBy: id_ASC){idTest}}""", project = project)
 
     res.toString() should be("""{"data":{"scalarModels":[{"idTest":"id1"},{"idTest":"id2"}]}}""")
     res2.toString() should be("""{"data":{"scalarModels":[{"idTest":"id1"},{"idTest":"id2"}]}}""")
@@ -648,8 +648,8 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
     createTest("id2", "2", 2, 2, optBoolean = false, "A", "2016-09-24T12:29:32.342")
     createTest("id3", "3", 3, 3, optBoolean = false, "A", "2016-09-25T12:29:32.342")
 
-    val res  = server.query(query = """{scalarModels(where: {optDateTime_gte: "2016-09-24T12:29:32.342Z"}){idTest}}""", project = project)
-    val res2 = server.query(query = """{scalarModels(where: {b: {int:1}, optDateTime_gte: "2016-09-24T12:29:32.342Z"}){idTest}}""", project = project)
+    val res  = server.query(query = """{scalarModels(where: {optDateTime_gte: "2016-09-24T12:29:32.342Z"},orderBy: id_ASC){idTest}}""", project = project)
+    val res2 = server.query(query = """{scalarModels(where: {b: {int:1}, optDateTime_gte: "2016-09-24T12:29:32.342Z"},orderBy: id_ASC){idTest}}""", project = project)
 
     res.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"},{"idTest":"id3"}]}}""")
     res2.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"},{"idTest":"id3"}]}}""")
@@ -672,8 +672,8 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
     createTest("id2", "2", 2, 2, optBoolean = false, "A", "2016-09-24T12:29:32.342")
     createTest("id3", "3", 3, 3, optBoolean = false, "A", "2016-09-25T12:29:32.342")
 
-    val res  = server.query(query = """{scalarModels(where: {optDateTime_not_in: ["2016-09-24T12:29:32.342Z"]}){idTest}}""", project = project)
-    val res2 = server.query(query = """{scalarModels(where: {b: {int:1}, optDateTime_not_in: ["2016-09-24T12:29:32.342Z"]}){idTest}}""", project = project)
+    val res  = server.query(query = """{scalarModels(where: {optDateTime_not_in: ["2016-09-24T12:29:32.342Z"]},orderBy: id_ASC){idTest}}""", project = project)
+    val res2 = server.query(query = """{scalarModels(where: {b: {int:1}, optDateTime_not_in: ["2016-09-24T12:29:32.342Z"]},orderBy: id_ASC){idTest}}""", project = project)
 
     res.toString() should be("""{"data":{"scalarModels":[{"idTest":"id1"},{"idTest":"id3"}]}}""")
     res2.toString() should be("""{"data":{"scalarModels":[{"idTest":"id1"},{"idTest":"id3"}]}}""")
@@ -699,8 +699,8 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
     createTest("id2", "2", 2, 2, optBoolean = false, "B", "2016-09-24T12:29:32.342")
     createTest("id3", "3", 3, 3, optBoolean = false, "B", "2016-09-25T12:29:32.342")
 
-    val res  = server.query(query = """{scalarModels(where: {optEnum_not: A}){idTest}}""", project = project)
-    val res2 = server.query(query = """{scalarModels(where: {b: {int:1}, optEnum_not: A}){idTest}}""", project = project)
+    val res  = server.query(query = """{scalarModels(where: {optEnum_not: A},orderBy: id_ASC){idTest}}""", project = project)
+    val res2 = server.query(query = """{scalarModels(where: {b: {int:1}, optEnum_not: A},orderBy: id_ASC){idTest}}""", project = project)
 
     res.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"},{"idTest":"id3"}]}}""")
     res2.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"},{"idTest":"id3"}]}}""")
@@ -723,8 +723,8 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
     createTest("id2", "2", 2, 2, optBoolean = false, "B", "2016-09-24T12:29:32.342")
     createTest("id3", "3", 3, 3, optBoolean = false, "B", "2016-09-25T12:29:32.342")
 
-    val res  = server.query(query = """{scalarModels(where: {optEnum_not_in: [A]}){idTest}}""", project = project)
-    val res2 = server.query(query = """{scalarModels(where: {b: {int:1}, optEnum_not_in: [A]}){idTest}}""", project = project)
+    val res  = server.query(query = """{scalarModels(where: {optEnum_not_in: [A]},orderBy: id_ASC){idTest}}""", project = project)
+    val res2 = server.query(query = """{scalarModels(where: {b: {int:1}, optEnum_not_in: [A]},orderBy: id_ASC){idTest}}""", project = project)
 
     res.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"},{"idTest":"id3"}]}}""")
     res2.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"},{"idTest":"id3"}]}}""")

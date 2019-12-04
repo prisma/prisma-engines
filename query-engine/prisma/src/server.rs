@@ -7,11 +7,11 @@ use crate::{
     },
     PrismaResult,
 };
-use query_core::schema::QuerySchemaRenderer;
 use futures::stream::TryStreamExt;
 use hyper::header;
 use hyper::service::{make_service_fn, service_fn};
 use hyper::{Body, Error, Method, Request, Response, Server, StatusCode};
+use query_core::schema::QuerySchemaRenderer;
 use serde_json::json;
 use std::{sync::Arc, time::Instant};
 
@@ -31,7 +31,7 @@ impl HttpServer {
         let now = Instant::now();
 
         let ctx = Arc::new(RequestContext {
-            context: PrismaContext::new(legacy_mode)?,
+            context: PrismaContext::new(legacy_mode).await?,
             graphql_request_handler: GraphQlRequestHandler,
         });
 

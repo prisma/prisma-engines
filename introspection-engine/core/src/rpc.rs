@@ -1,9 +1,11 @@
 use crate::connector_loader::load_connector;
-use crate::CoreResult;
-use datamodel::Datamodel;
+use crate::error::{CoreError};
 use introspection_connector::DatabaseMetadata;
 use jsonrpc_core::*;
 use jsonrpc_derive::rpc;
+use tokio::runtime::Runtime;
+use std::future::Future as StdFuture;
+use serde_derive::*;
 
 #[rpc]
 pub trait Rpc {
@@ -17,43 +19,57 @@ pub trait Rpc {
     fn introspect(&self, url: UrlInput) -> Result<String>;
 }
 
-pub struct RpcImpl {}
+pub(crate) struct RpcImpl {
+    runtime: Runtime,
+}
 
 impl Rpc for RpcImpl {
     fn list_databases(&self, url: UrlInput) -> Result<Vec<String>> {
-        Ok(Self::list_databases_internal(url)?)
+        self.block_on(Self::list_databases_internal(&url.url))
     }
 
     fn get_database_metadata(&self, url: UrlInput) -> Result<DatabaseMetadata> {
-        Ok(Self::get_database_metadata_internal(url)?)
+        self.block_on(Self::get_database_metadata_internal(&url.url))
     }
 
     fn introspect(&self, url: UrlInput) -> Result<String> {
-        let data_model = Self::introspect_internal(url)?;
-        Ok(datamodel::render_datamodel_to_string(&data_model).expect("Datamodel rendering failed"))
+        self.block_on(Self::introspect_internal(&url.url))
     }
 }
 
 impl RpcImpl {
-    fn introspect_internal(url: UrlInput) -> CoreResult<Datamodel> {
-        let connector = load_connector(&url.url)?;
-        // FIXME: parse URL correctly via a to be built lib and pass database param;
-        let data_model = connector.introspect("")?;
-        Ok(data_model)
+    pub(crate) fn new() -> Self {
+        RpcImpl {
+            runtime: Runtime::new().unwrap(),
+        }
     }
 
-    fn list_databases_internal(url: UrlInput) -> CoreResult<Vec<String>> {
-        let connector = load_connector(&url.url)?;
-        Ok(connector.list_databases()?)
+    pub(crate) async fn introspect_internal(connection_string: &str) -> Result<String> {
+        let connector = load_connector(connection_string).await?;
+        let data_model = connector.introspect().await.map_err(CoreError::from)?;
+        Ok(datamodel::render_datamodel_to_string(&data_model).map_err(CoreError::from)?)
     }
 
-    fn get_database_metadata_internal(url: UrlInput) -> CoreResult<DatabaseMetadata> {
-        let connector = load_connector(&url.url)?;
-        Ok(connector.get_metadata("")?)
+    pub(crate) async fn list_databases_internal(connection_string:  &str) -> Result<Vec<String>> {
+        let connector = load_connector(connection_string).await?;
+        Ok(connector.list_databases().await.map_err(CoreError::from)?)
+    }
+
+    pub(crate) async fn get_database_metadata_internal(connection_string:  &str) -> Result<DatabaseMetadata> {
+        let connector = load_connector(connection_string).await?;
+        Ok(connector.get_metadata().await.map_err(CoreError::from)?)
+    }
+
+    /// Will also catch panics.
+    fn block_on<O>(&self, fut: impl StdFuture<Output = Result<O>>) -> Result<O> {
+        match self.runtime.block_on(fut) {
+            Ok(o) => Ok(o),
+            Err(err) => Err(err),
+        }
     }
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct UrlInput {
-    url: String,
+    pub(crate) url: String,
 }

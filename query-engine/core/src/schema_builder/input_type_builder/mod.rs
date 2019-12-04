@@ -97,7 +97,7 @@ pub trait InputTypeBuilderBase<'a>: CachedBuilder<InputObjectType> + InputBuilde
             .fields()
             .scalar()
             .iter()
-            .filter(|f| (f.is_unique() && !f.is_hidden) || f.is_id())
+            .filter(|f| (f.unique() && !f.is_hidden) || f.is_id())
             .map(|f| Arc::clone(f))
             .collect();
 

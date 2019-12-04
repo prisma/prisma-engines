@@ -1,5 +1,5 @@
 pub mod api;
-mod cli;
+pub mod cli;
 pub mod commands;
 mod error;
 pub mod migration;
@@ -8,6 +8,7 @@ pub mod migration_engine;
 use crate::api::RpcApi;
 use commands::*;
 use datamodel::{self, error::ErrorCollection, Datamodel};
+use futures::FutureExt;
 use log::*;
 use std::{fs, io, io::Read};
 
@@ -18,7 +19,7 @@ pub type Result<T> = std::result::Result<T, Error>;
 
 pub(crate) fn parse_datamodel(datamodel: &str) -> CommandResult<Datamodel> {
     let result = datamodel::parse_datamodel_or_pretty_error(&datamodel, "datamodel file, line");
-    result.map_err(|e| CommandError::Generic { code: 1001, error: e })
+    result.map_err(|e| CommandError::DataModelErrors { errors: vec![e] })
 }
 
 pub(crate) fn pretty_print_errors(errors: ErrorCollection, datamodel: &str) {
@@ -32,12 +33,22 @@ pub(crate) fn pretty_print_errors(errors: ErrorCollection, datamodel: &str) {
     }
 }
 
-fn main() {
-    let orig_hook = std::panic::take_hook();
+#[tokio::main]
+async fn main() {
+    let original_hook = std::panic::take_hook();
 
-    std::panic::set_hook(Box::new(move |info| {
-        orig_hook(info);
-        std::process::exit(255);
+    std::panic::set_hook(Box::new(move |panic| {
+        let err = user_facing_errors::UnknownError::new_in_panic_hook(&panic);
+
+        match serde_json::to_writer(std::io::stderr(), &err) {
+            Ok(_) => eprintln!(),
+            Err(err) => {
+                log::error!("Failed to write JSON error to stderr: {}", err);
+                original_hook(panic)
+            }
+        }
+
+        std::process::exit(255)
     }));
 
     env_logger::init();
@@ -49,15 +60,29 @@ fn main() {
     } else if let Some(matches) = matches.subcommand_matches("cli") {
         let datasource = matches.value_of("datasource").unwrap();
 
-        match cli::run(&matches, &datasource) {
-            Ok(msg) => {
+        match std::panic::AssertUnwindSafe(cli::run(&matches, &datasource))
+            .catch_unwind()
+            .await
+        {
+            Ok(Ok(msg)) => {
                 info!("{}", msg);
                 std::process::exit(0);
             }
-            Err(error) => {
+            Ok(Err(error)) => {
                 error!("{}", error);
-
-                std::process::exit(error.exit_code());
+                let exit_code = error.exit_code();
+                serde_json::to_writer(std::io::stdout(), &cli::render_error(error)).expect("failed to write to stdout");
+                println!();
+                std::process::exit(exit_code);
+            }
+            Err(panic) => {
+                serde_json::to_writer(
+                    std::io::stdout(),
+                    &user_facing_errors::UnknownError::from_panic_payload(panic.as_ref()),
+                )
+                .expect("failed to write to stdout");
+                println!();
+                std::process::exit(255);
             }
         }
     } else {
@@ -68,18 +93,22 @@ fn main() {
         file.read_to_string(&mut datamodel).unwrap();
 
         if matches.is_present("single_cmd") {
-            let api = RpcApi::new_sync(&datamodel).unwrap();
+            let api = RpcApi::new(&datamodel).await.unwrap();
             let response = api.handle().unwrap();
 
             println!("{}", response);
         } else {
-            match RpcApi::new_async(&datamodel) {
-                Ok(api) => api.start_server(),
+            match RpcApi::new(&datamodel).await {
+                Ok(api) => api.start_server().await,
                 Err(Error::DatamodelError(errors)) => {
                     pretty_print_errors(errors, &datamodel);
                     std::process::exit(1);
                 }
-                Err(e) => panic!("{:?}", e),
+                Err(e) => {
+                    serde_json::to_writer(std::io::stdout(), &api::render_error(e)).expect("failed to write to stdout");
+                    println!();
+                    std::process::exit(255);
+                }
             }
         }
     }

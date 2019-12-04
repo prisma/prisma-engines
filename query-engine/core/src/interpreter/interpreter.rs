@@ -4,8 +4,8 @@ use super::{
     InterpretationResult, InterpreterError,
 };
 use crate::{Query, QueryResult};
-use async_std::sync::Mutex;
 use connector::ConnectionLike;
+use crossbeam_queue::SegQueue;
 use futures::future::{BoxFuture, FutureExt};
 use im::HashMap;
 use prisma_models::prelude::*;
@@ -13,15 +13,30 @@ use prisma_models::prelude::*;
 #[derive(Debug, Clone)]
 pub enum ExpressionResult {
     Query(QueryResult),
+    Computation(ComputationResult),
     Empty,
+}
+
+#[derive(Debug, Clone)]
+pub enum ComputationResult {
+    Diff(DiffResult),
+}
+
+/// Diff of two prisma value vectors A and B:
+/// `left` contains all elements that are in A but not in B.
+/// `right` contains all elements that are in B but not in A.
+#[derive(Debug, Clone)]
+pub struct DiffResult {
+    pub left: Vec<GraphqlId>,
+    pub right: Vec<GraphqlId>,
 }
 
 impl ExpressionResult {
     /// Attempts to transform the result into a vector of IDs (as PrismaValue).
-    pub fn as_ids(&self) -> Option<Vec<PrismaValue>> {
-        match self {
+    pub fn as_ids(&self) -> InterpretationResult<Vec<PrismaValue>> {
+        let converted = match self {
             Self::Query(ref result) => match result {
-                QueryResult::Id(id) => Some(vec![id.clone().into()]),
+                QueryResult::Id(id) => Some(id.clone().map(|id| vec![id.into()]).unwrap_or_else(|| vec![])),
 
                 // We always select IDs, the unwraps are safe.
                 QueryResult::RecordSelection(rs) => Some(
@@ -37,7 +52,33 @@ impl ExpressionResult {
             },
 
             _ => None,
-        }
+        };
+
+        converted.ok_or(InterpreterError::InterpretationError(
+            "Unable to convert result into a set of IDs".to_owned(),
+        ))
+    }
+
+    pub fn as_query_result(&self) -> InterpretationResult<&QueryResult> {
+        let converted = match self {
+            Self::Query(ref q) => Some(q),
+            _ => None,
+        };
+
+        converted.ok_or(InterpreterError::InterpretationError(
+            "Unable to convert result into a query result".to_owned(),
+        ))
+    }
+
+    pub fn as_diff_result(&self) -> InterpretationResult<&DiffResult> {
+        let converted = match self {
+            Self::Computation(ComputationResult::Diff(ref d)) => Some(d),
+            _ => None,
+        };
+
+        converted.ok_or(InterpreterError::InterpretationError(
+            "Unable to convert result into a computation result".to_owned(),
+        ))
     }
 }
 
@@ -62,21 +103,27 @@ impl Env {
         }
     }
 }
-
 pub struct QueryInterpreter<'conn, 'tx> {
     pub(crate) conn: ConnectionLike<'conn, 'tx>,
-    pub log: Mutex<String>,
+    log: SegQueue<String>,
 }
 
 impl<'conn, 'tx> QueryInterpreter<'conn, 'tx>
 where
-    'tx: 'conn
+    'tx: 'conn,
 {
+    fn log_enabled() -> bool {
+        log::max_level() == log::LevelFilter::Trace
+    }
+
     pub fn new(conn: ConnectionLike<'conn, 'tx>) -> QueryInterpreter<'conn, 'tx> {
-        Self {
-            conn,
-            log: Mutex::new(String::new()),
+        let log = SegQueue::new();
+
+        if Self::log_enabled() {
+            log.push("\n".to_string());
         }
+
+        Self { conn, log }
     }
 
     pub fn interpret(
@@ -86,20 +133,25 @@ where
         level: usize,
     ) -> BoxFuture<'conn, InterpretationResult<ExpressionResult>> {
         match exp {
-            Expression::Func { func } => async move { self.interpret(func(env.clone())?, env, level).await }.boxed(),
+            Expression::Func { func } => {
+                let expr = func(env.clone());
+
+                async move { self.interpret(expr?, env, level).await }.boxed()
+            }
 
             Expression::Sequence { seq } if seq.is_empty() => async { Ok(ExpressionResult::Empty) }.boxed(),
 
             Expression::Sequence { seq } => {
                 let fut = async move {
-                    self.log_line("SEQ".to_string(), level).await;
+                    self.log_line(level, || "SEQ");
 
-                    let mut results = vec![];
+                    let mut results = Vec::with_capacity(seq.len());
 
                     for expr in seq {
                         results.push(self.interpret(expr, env.clone(), level + 1).await?);
                     }
 
+                    // Last result gets returned
                     Ok(results.pop().unwrap())
                 };
 
@@ -112,11 +164,10 @@ where
             } => {
                 let fut = async move {
                     let mut inner_env = env.clone();
-                    self.log_line("LET".to_string(), level).await;
+                    self.log_line(level, || "LET");
 
                     for binding in bindings {
-                        let log_line = format!("bind {} ", &binding.name);
-                        self.log_line(log_line, level + 1).await;
+                        self.log_line(level + 1, || format!("bind {} ", &binding.name));
 
                         let result = self.interpret(binding.expr, env.clone(), level + 2).await?;
                         inner_env.insert(binding.name, result);
@@ -139,18 +190,15 @@ where
                 let fut = async move {
                     match query {
                         Query::Read(read) => {
-                            let log_line = format!("READ {}", read);
+                            self.log_line(level, || format!("READ {}", read));
 
-                            self.log_line(log_line, level).await;
                             Ok(read::execute(&self.conn, read, &[])
                                 .await
                                 .map(|res| ExpressionResult::Query(res))?)
                         }
 
                         Query::Write(write) => {
-                            let log_line = format!("WRITE {}", write);
-
-                            self.log_line(log_line, level).await;
+                            self.log_line(level, || format!("WRITE {}", write));
                             Ok(write::execute(&self.conn, write)
                                 .await
                                 .map(|res| ExpressionResult::Query(res))?)
@@ -160,22 +208,16 @@ where
                 fut.boxed()
             }
 
-            Expression::Get { binding_name } => {
-                let fut = async move {
-                    let log_line = format!("GET {}", binding_name);
-
-                    self.log_line(log_line, level).await;
-                    env.clone().remove(&binding_name)
-                };
-
-                fut.boxed()
+            Expression::Get { binding_name } => async move {
+                self.log_line(level, || format!("GET {}", binding_name));
+                env.clone().remove(&binding_name)
             }
+                .boxed(),
 
             Expression::GetFirstNonEmpty { binding_names } => {
                 let fut = async move {
-                    let log_line = format!("GET FIRST NON EMPTY {:?}", binding_names);
+                    self.log_line(level, || format!("GET FIRST NON EMPTY {:?}", binding_names));
 
-                    self.log_line(log_line, level).await;
                     Ok(binding_names
                         .into_iter()
                         .find_map(|binding_name| match env.get(&binding_name) {
@@ -194,7 +236,7 @@ where
                 else_: elze,
             } => {
                 let fut = async move {
-                    self.log_line("IF".to_string(), level).await;
+                    self.log_line(level, || "IF");
 
                     if func() {
                         self.interpret(Expression::Sequence { seq: then }, env, level + 1).await
@@ -205,11 +247,29 @@ where
 
                 fut.boxed()
             }
+
+            Expression::Return { result } => async move { Ok(result) }.boxed(),
         }
     }
 
-    async fn log_line(&self, s: String, level: usize) {
-        let log_line = format!("{:indent$}{}\n", "", s, indent = level * 2);
-        self.log.lock().await.push_str(&log_line);
+    pub fn log_output(&self) -> String {
+        let mut output = String::with_capacity(self.log.len() * 30);
+
+        while let Ok(s) = self.log.pop() {
+            output.push_str(&s);
+        }
+
+        output
+    }
+
+    fn log_line<F, S>(&self, level: usize, f: F)
+    where
+        S: AsRef<str>,
+        F: FnOnce() -> S,
+    {
+        if Self::log_enabled() {
+            self.log
+                .push(format!("{:indent$}{}\n", "", f().as_ref(), indent = level * 2));
+        }
     }
 }

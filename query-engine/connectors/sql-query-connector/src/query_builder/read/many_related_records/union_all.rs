@@ -7,7 +7,7 @@ use quaint::ast::*;
 pub struct ManyRelatedRecordsWithUnionAll;
 
 impl ManyRelatedRecordsQueryBuilder for ManyRelatedRecordsWithUnionAll {
-    fn with_pagination<'a>(base: ManyRelatedRecordsBaseQuery<'a>) -> Query {
+    fn with_pagination(base: ManyRelatedRecordsBaseQuery) -> Query {
         let distinct_ids = {
             let mut ids = base.from_record_ids.to_vec();
             ids.dedup();
@@ -15,11 +15,7 @@ impl ManyRelatedRecordsQueryBuilder for ManyRelatedRecordsWithUnionAll {
             ids
         };
 
-        let order_columns = Ordering::internal(
-            SelectedFields::RELATED_MODEL_ALIAS,
-            base.order_by.as_ref(),
-            base.is_reverse_order,
-        );
+        let order_columns = Ordering::internal(SelectedFields::RELATED_MODEL_ALIAS, base.order_directions);
 
         let base_condition = base.condition.and(base.cursor);
         let from_field = base.from_field;

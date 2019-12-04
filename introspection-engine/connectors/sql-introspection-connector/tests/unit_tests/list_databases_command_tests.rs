@@ -1,30 +1,28 @@
 use crate::{test_harness::*, test_one_connector, BarrelMigrationExecutor};
 use barrel::types;
 
-pub const SCHEMA_NAME: &str = "introspection-engine";
-
 #[test_one_connector(connector = "mysql")]
-fn databases_for_mysql_should_work(api: &TestApi) {
+async fn databases_for_mysql_should_work(api: &TestApi) {
     let barrel = api.barrel();
     setup(&barrel);
-    let result = dbg!(api.list_databases());
-    assert!(result.contains(&"introspection-engine".to_string()));
+    let result = dbg!(api.list_databases().await);
+    assert!(result.contains(&SCHEMA_NAME.to_string()));
 }
 
 #[test_one_connector(connector = "postgres")]
-fn databases_for_postgres_should_work(api: &TestApi) {
+async fn databases_for_postgres_should_work(api: &TestApi) {
     let barrel = api.barrel();
     setup(&barrel);
-    let result = dbg!(api.list_databases());
-    assert!(result.contains(&"introspection-engine".to_string()));
+    let result = dbg!(api.list_databases().await);
+    assert!(result.contains(&SCHEMA_NAME.to_string()));
 }
 
 #[test_one_connector(connector = "sqlite")]
-fn databases_for_sqlite_should_work(api: &TestApi) {
+async fn databases_for_sqlite_should_work(api: &TestApi) {
     let barrel = api.barrel();
     setup(&barrel);
-    let result = dbg!(api.list_databases());
-    assert!(result.contains(&"introspection-engine.db".to_string()));
+    let result = dbg!(api.list_databases().await);
+    assert!(result.contains(&format!("{}.db", SCHEMA_NAME)));
 }
 
 fn setup(barrel: &BarrelMigrationExecutor) {

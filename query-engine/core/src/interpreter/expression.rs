@@ -1,4 +1,4 @@
-use super::{Env, InterpretationResult};
+use super::{Env, ExpressionResult, InterpretationResult};
 use crate::Query;
 
 pub enum Expression {
@@ -31,6 +31,10 @@ pub enum Expression {
         func: Box<dyn FnOnce() -> bool + Send + Sync + 'static>,
         then: Vec<Expression>,
         else_: Vec<Expression>,
+    },
+
+    Return {
+        result: ExpressionResult,
     },
 }
 

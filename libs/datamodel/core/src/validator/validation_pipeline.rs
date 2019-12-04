@@ -13,7 +13,7 @@ impl<'a> ValidationPipeline<'a> {
     /// the directives defined by the given sources registered.
     ///
     /// The directives defined by the given sources will be namespaced.
-    pub fn with_sources(sources: &'a [Box<dyn configuration::Source>]) -> ValidationPipeline<'a> {
+    pub fn with_sources(sources: &'a [Box<dyn configuration::Source + Send + Sync>]) -> ValidationPipeline<'a> {
         let source = sources.first();
         ValidationPipeline {
             lifter: LiftAstToDml::with_sources(sources),

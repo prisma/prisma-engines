@@ -1,12 +1,12 @@
 #![allow(non_snake_case)]
-#![allow(unused)]
+
 mod test_harness;
 
 use datamodel::ast::{FieldArity, SchemaAst};
 use migration_connector::steps::*;
 use migration_core::migration::datamodel_calculator::*;
 use migration_core::migration::datamodel_migration_steps_inferrer::*;
-use pretty_assertions::{assert_eq, assert_ne};
+use pretty_assertions::assert_eq;
 use test_harness::parse;
 
 // TODO: We could unify the tests for inferrer and calculator.
@@ -183,9 +183,6 @@ fn add_DeleteEnum_to_existing_schema() {
     test(dm1, dm2);
 }
 
-#[should_panic(
-    expected = "The model Test already exists in this Datamodel. It is not possible to create it once more."
-)]
 #[test]
 fn creating_a_model_that_already_exists_must_error() {
     let dm = parse(
@@ -200,12 +197,12 @@ fn creating_a_model_that_already_exists_must_error() {
         model: "Test".to_string(),
     })];
 
-    calculate(&dm, steps);
+    assert_eq!(
+        "The model Test already exists in this Datamodel. It is not possible to create it once more.",
+        calculate_error(&dm, steps)
+    );
 }
 
-#[should_panic(
-    expected = "The field id on model Test already exists in this Datamodel. It is not possible to create it once more."
-)]
 #[test]
 fn creating_a_field_that_already_exists_must_error() {
     let dm = parse(
@@ -223,10 +220,12 @@ fn creating_a_field_that_already_exists_must_error() {
         arity: FieldArity::Required,
     })];
 
-    calculate(&dm, steps);
+    assert_eq!(
+        "The field id on model Test already exists in this Datamodel. It is not possible to create it once more.",
+        calculate_error(&dm, steps),
+    )
 }
 
-#[should_panic(expected = "The type Test already exists in this Datamodel. It is not possible to create it once more.")]
 #[test]
 fn creating_a_type_alias_that_already_exists_must_error() {
     let dm = parse("type Test = Float");
@@ -237,10 +236,12 @@ fn creating_a_type_alias_that_already_exists_must_error() {
         arity: FieldArity::Required,
     })];
 
-    calculate(&dm, steps);
+    assert_eq!(
+        "The type Test already exists in this Datamodel. It is not possible to create it once more.",
+        calculate_error(&dm, steps),
+    );
 }
 
-#[should_panic(expected = "The type Test does not exist in this Datamodel. It is not possible to delete it.")]
 #[test]
 fn deleting_a_type_alias_that_does_not_exist_must_error() {
     let dm = parse("");
@@ -249,10 +250,12 @@ fn deleting_a_type_alias_that_does_not_exist_must_error() {
         type_alias: "Test".to_owned(),
     })];
 
-    calculate(&dm, steps);
+    assert_eq!(
+        "The type Test does not exist in this Datamodel. It is not possible to delete it.",
+        calculate_error(&dm, steps),
+    );
 }
 
-#[should_panic(expected = "The enum Test already exists in this Datamodel. It is not possible to create it once more.")]
 #[test]
 fn creating_an_enum_that_already_exists_must_error() {
     let dm = parse(
@@ -269,10 +272,12 @@ fn creating_an_enum_that_already_exists_must_error() {
         values: Vec::new(),
     })];
 
-    calculate(&dm, steps);
+    assert_eq!(
+        "The enum Test already exists in this Datamodel. It is not possible to create it once more.",
+        calculate_error(&dm, steps)
+    );
 }
 
-#[should_panic(expected = "The model Test does not exist in this Datamodel. It is not possible to delete it.")]
 #[test]
 fn deleting_a_model_that_does_not_exist_must_error() {
     let dm = SchemaAst::empty();
@@ -280,12 +285,12 @@ fn deleting_a_model_that_does_not_exist_must_error() {
         model: "Test".to_string(),
     })];
 
-    calculate(&dm, steps);
+    assert_eq!(
+        "The model Test does not exist in this Datamodel. It is not possible to delete it.",
+        calculate_error(&dm, steps),
+    );
 }
 
-#[should_panic(
-    expected = "The model Test does not exist in this Datamodel. It is not possible to delete a field in it."
-)]
 #[test]
 fn deleting_a_field_that_does_not_exist_must_error() {
     let dm = SchemaAst::empty();
@@ -294,12 +299,12 @@ fn deleting_a_field_that_does_not_exist_must_error() {
         field: "id".to_string(),
     })];
 
-    calculate(&dm, steps);
+    assert_eq!(
+        "The model Test does not exist in this Datamodel. It is not possible to delete a field in it.",
+        calculate_error(&dm, steps),
+    )
 }
 
-#[should_panic(
-    expected = "The field my_field on model Test does not exist in this Datamodel. It is not possible to delete it."
-)]
 #[test]
 fn deleting_a_field_that_does_not_exist_2_must_error() {
     let dm = parse(
@@ -314,10 +319,12 @@ fn deleting_a_field_that_does_not_exist_2_must_error() {
         field: "my_field".to_string(),
     })];
 
-    calculate(&dm, steps);
+    assert_eq!(
+        "The field my_field on model Test does not exist in this Datamodel. It is not possible to delete it.",
+        calculate_error(&dm, steps),
+    );
 }
 
-#[should_panic(expected = "The enum Test does not exist in this Datamodel. It is not possible to delete it.")]
 #[test]
 fn deleting_an_enum_that_does_not_exist_must_error() {
     let dm = SchemaAst::empty();
@@ -325,10 +332,12 @@ fn deleting_an_enum_that_does_not_exist_must_error() {
         r#enum: "Test".to_string(),
     })];
 
-    calculate(&dm, steps);
+    assert_eq!(
+        "The enum Test does not exist in this Datamodel. It is not possible to delete it.",
+        calculate_error(&dm, steps),
+    );
 }
 
-#[should_panic(expected = "The model Test does not exist in this Datamodel. It is not possible to update it.")]
 #[test]
 fn updating_a_model_that_does_not_exist_must_error() {
     let dm = SchemaAst::empty();
@@ -337,12 +346,12 @@ fn updating_a_model_that_does_not_exist_must_error() {
         new_name: None,
     })];
 
-    calculate(&dm, steps);
+    assert_eq!(
+        calculate_error(&dm, steps),
+        "The model Test does not exist in this Datamodel. It is not possible to update it."
+    );
 }
 
-#[should_panic(
-    expected = "The model Test does not exist in this Datamodel. It is not possible to update a field in it."
-)]
 #[test]
 fn updating_a_field_that_does_not_exist_must_error() {
     let dm = SchemaAst::empty();
@@ -354,12 +363,12 @@ fn updating_a_field_that_does_not_exist_must_error() {
         arity: None,
     })];
 
-    calculate(&dm, steps);
+    assert_eq!(
+        calculate_error(&dm, steps),
+        "The model Test does not exist in this Datamodel. It is not possible to update a field in it."
+    );
 }
 
-#[should_panic(
-    expected = "The field myField on model Test does not exist in this Datamodel. It is not possible to update it."
-)]
 #[test]
 fn updating_a_field_that_does_not_exist_must_error_2() {
     let dm = parse(
@@ -377,10 +386,12 @@ fn updating_a_field_that_does_not_exist_must_error_2() {
         arity: None,
     })];
 
-    calculate(&dm, steps);
+    assert_eq!(
+        calculate_error(&dm, steps),
+        "The field myField on model Test does not exist in this Datamodel. It is not possible to update it."
+    );
 }
 
-#[should_panic(expected = "The enum Test does not exist in this Datamodel. It is not possible to update it.")]
 #[test]
 fn updating_an_enum_that_does_not_exist_must_error() {
     let dm = SchemaAst::empty();
@@ -391,7 +402,10 @@ fn updating_an_enum_that_does_not_exist_must_error() {
         deleted_values: vec![],
     })];
 
-    calculate(&dm, steps);
+    assert_eq!(
+        calculate_error(&dm, steps),
+        "The enum Test does not exist in this Datamodel. It is not possible to update it."
+    );
 }
 
 // This tests use inferrer to create an end-to-end situation.

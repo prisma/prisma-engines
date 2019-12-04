@@ -1,5 +1,5 @@
-use crate::{cursor_condition::CursorCondition, filter_conversion::AliasedCondition};
-use connector_interface::{QueryArguments, SkipAndLimit};
+use crate::{cursor_condition, filter_conversion::AliasedCondition};
+use connector_interface::{OrderDirections, QueryArguments, SkipAndLimit};
 use prisma_models::prelude::*;
 use quaint::ast::{Aliasable, Comparable, ConditionTree, Joinable, Select};
 
@@ -8,8 +8,7 @@ pub struct ManyRelatedRecordsBaseQuery<'a> {
     pub selected_fields: &'a SelectedFields,
     pub from_record_ids: &'a [GraphqlId],
     pub query: Select<'a>,
-    pub order_by: Option<OrderBy>,
-    pub is_reverse_order: bool,
+    pub order_directions: OrderDirections,
     pub condition: ConditionTree<'a>,
     pub cursor: ConditionTree<'a>,
     pub window_limits: (i64, i64),
@@ -23,23 +22,29 @@ impl<'a> ManyRelatedRecordsBaseQuery<'a> {
         query_arguments: QueryArguments,
         selected_fields: &'a SelectedFields,
     ) -> ManyRelatedRecordsBaseQuery<'a> {
-        let cursor = CursorCondition::build(&query_arguments, from_field.related_model());
+        let cursor = cursor_condition::build(&query_arguments, from_field.related_model());
         let window_limits = query_arguments.window_limits();
         let skip_and_limit = query_arguments.skip_and_limit();
 
+        let order_directions = query_arguments.ordering_directions();
         let condition = query_arguments
             .filter
             .map(|f| f.aliased_cond(None))
             .unwrap_or(ConditionTree::NoCondition);
 
         let opposite_column = from_field.opposite_column().table(Relation::TABLE_ALIAS);
-        let select = Select::from_table(from_field.related_model().table());
+        let select = Select::from_table(from_field.related_model().as_table());
 
         let join = from_field
             .relation()
-            .relation_table()
+            .as_table()
             .alias(Relation::TABLE_ALIAS)
-            .on(from_field.related_model().id_column().equals(opposite_column));
+            .on(from_field
+                .related_model()
+                .fields()
+                .id()
+                .as_column()
+                .equals(opposite_column));
 
         let query = selected_fields
             .columns()
@@ -47,16 +52,12 @@ impl<'a> ManyRelatedRecordsBaseQuery<'a> {
             .fold(select, |acc, col| acc.column(col.clone()))
             .inner_join(join);
 
-        let order_by = query_arguments.order_by;
-        let is_reverse_order = query_arguments.last.is_some();
-
         Self {
             from_field,
             selected_fields,
             from_record_ids,
             query,
-            order_by,
-            is_reverse_order,
+            order_directions,
             condition,
             cursor,
             window_limits,

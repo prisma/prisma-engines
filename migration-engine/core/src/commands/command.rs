@@ -6,13 +6,12 @@ use serde::de::DeserializeOwned;
 use serde::Serialize;
 use std::convert::From;
 
-pub trait MigrationCommand<'a> {
-    type Input: DeserializeOwned + 'a;
-    type Output: Serialize;
+#[async_trait::async_trait]
+pub trait MigrationCommand {
+    type Input: DeserializeOwned;
+    type Output: Serialize + 'static;
 
-    fn new(input: &'a Self::Input) -> Box<Self>;
-
-    fn execute<C, D>(&self, engine: &MigrationEngine<C, D>) -> CommandResult<Self::Output>
+    async fn execute<C, D>(input: &Self::Input, engine: &MigrationEngine<C, D>) -> CommandResult<Self::Output>
     where
         C: MigrationConnector<DatabaseMigration = D>,
         D: DatabaseMigrationMarker + Send + Sync + 'static;
@@ -20,20 +19,22 @@ pub trait MigrationCommand<'a> {
 
 pub type CommandResult<T> = Result<T, CommandError>;
 
-#[derive(Debug, Serialize, Fail)]
-#[serde(tag = "type")]
+#[derive(Debug, Fail)]
 pub enum CommandError {
-    #[fail(display = "Errors in datamodel. (code: {}, errors: {:?})", code, errors)]
-    DataModelErrors { code: i64, errors: Vec<String> },
+    #[fail(display = "Errors in datamodel. (errors: {:?})", errors)]
+    DataModelErrors { errors: Vec<String> },
 
-    #[fail(display = "Initialization error. (code: {}, error: {})", code, error)]
-    InitializationError { code: i64, error: String },
+    #[fail(display = "Initialization error. (error: {})", error)]
+    InitializationError { error: String },
 
-    #[fail(display = "Generic error. (code: {}, error: {})", code, error)]
-    Generic { code: i64, error: String },
+    #[fail(display = "Connector error. (error: {})", _0)]
+    ConnectorError(ConnectorError),
 
-    #[fail(display = "Error in command input. (code: {}, error: {})", code, error)]
-    Input { code: i64, error: String },
+    #[fail(display = "Generic error. (error: {})", error)]
+    Generic { error: String },
+
+    #[fail(display = "Error in command input. (error: {})", error)]
+    Input { error: String },
 }
 
 impl From<datamodel::error::ErrorCollection> for CommandError {
@@ -48,26 +49,19 @@ impl From<datamodel::error::ErrorCollection> for CommandError {
                 format!("{}", e)
             })
             .collect();
-        CommandError::DataModelErrors {
-            code: 1001,
-            errors: errors_str,
-        }
+        CommandError::DataModelErrors { errors: errors_str }
     }
 }
 
 impl From<migration_connector::ConnectorError> for CommandError {
     fn from(error: migration_connector::ConnectorError) -> CommandError {
-        CommandError::Generic {
-            code: 1000,
-            error: format!("{:?}", error),
-        }
+        CommandError::ConnectorError(error)
     }
 }
 
 impl From<CalculatorError> for CommandError {
     fn from(error: CalculatorError) -> Self {
         CommandError::Generic {
-            code: 1,
             error: format!("{}", error),
         }
     }
