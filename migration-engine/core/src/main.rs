@@ -16,6 +16,7 @@ pub use error::Error;
 pub use migration_engine::*;
 
 pub type Result<T> = std::result::Result<T, Error>;
+type StdResult<O, E> = std::result::Result<O, E>;
 
 pub(crate) fn parse_datamodel(datamodel: &str) -> CommandResult<Datamodel> {
     let result = datamodel::parse_datamodel_or_pretty_error(&datamodel, "datamodel file, line");
@@ -51,7 +52,7 @@ async fn main() {
         std::process::exit(255)
     }));
 
-    env_logger::init();
+    init_logger().unwrap();
 
     let matches = cli::clap_app().get_matches();
 
@@ -112,4 +113,19 @@ async fn main() {
             }
         }
     }
+}
+
+fn init_logger() -> StdResult<(), failure::Error> {
+    use tracing_log::LogTracer;
+    use tracing_subscriber::{EnvFilter, FmtSubscriber};
+
+    LogTracer::init()?;
+
+    let subscriber = FmtSubscriber::builder()
+                .with_env_filter(EnvFilter::from_default_env())
+                .finish();
+
+    tracing::subscriber::set_global_default(subscriber)?;
+
+    Ok(())
 }

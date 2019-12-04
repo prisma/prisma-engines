@@ -7,7 +7,7 @@ use pretty_assertions::assert_eq;
 use sql_migration_connector::PrettySqlMigrationStep;
 use test_harness::*;
 
-#[test_each_connector]
+#[test_each_connector(log="info,[ApplyMigration{migration_id=mig0001}]=debug")]
 async fn assume_to_be_applied_must_work(api: &TestApi) {
     let dm0 = r#"
             model Blog {

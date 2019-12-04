@@ -7,6 +7,7 @@ pub use rpc::*;
 use crate::{commands::*, migration_engine::MigrationEngine};
 use migration_connector::*;
 use std::sync::Arc;
+use tracing_futures::Instrument;
 
 pub struct MigrationApi<C, D>
 where
@@ -76,7 +77,9 @@ where
     D: DatabaseMigrationMarker + Send + Sync + 'static,
 {
     async fn apply_migration(&self, input: &ApplyMigrationInput) -> crate::Result<MigrationStepsResultOutput> {
-        self.handle_command::<ApplyMigrationCommand>(input).await
+        self.handle_command::<ApplyMigrationCommand>(input)
+            .instrument(tracing::info_span!("ApplyMigration", migration_id = input.migration_id.as_str()))
+            .await
     }
 
     async fn calculate_database_steps(
@@ -94,7 +97,9 @@ where
         &self,
         input: &InferMigrationStepsInput,
     ) -> crate::Result<MigrationStepsResultOutput> {
-        self.handle_command::<InferMigrationStepsCommand>(input).await
+        self.handle_command::<InferMigrationStepsCommand>(input)
+            .instrument(tracing::info_span!("ApplyMigration", migration_id = input.migration_id.as_str()))
+            .await
     }
 
     async fn list_migrations(&self, input: &serde_json::Value) -> crate::Result<Vec<ListMigrationStepsOutput>> {

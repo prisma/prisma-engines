@@ -19,6 +19,8 @@ struct TestEachConnectorArgs {
     /// Comma-separated list of connectors to exclude.
     #[darling(default)]
     ignore: Option<String>,
+    #[darling(default)]
+    log: Option<String>,
 }
 
 impl TestEachConnectorArgs {
@@ -67,12 +69,34 @@ fn test_each_connector_wrapper_functions(
         let connector_test_fn_name = Ident::new(&format!("{}_on_{}", test_fn_name, connector), Span::call_site());
         let connector_api_factory = Ident::new(&format!("{}_test_api", connector), Span::call_site());
 
+        let test_fn_call = args
+            .log
+            .as_ref()
+            .map(|log_config| {
+                quote! {
+                    let filter = tracing_subscriber::EnvFilter::new(#log_config);
+                    let subscriber = tracing_subscriber::FmtSubscriber::builder()
+                        .with_env_filter(filter)
+                        .with_writer(print_writer)
+                        .finish();
+
+                    tracing::subscriber::with_default(subscriber, || {
+                        #test_fn_name(&api)
+                    })
+                }
+            })
+            .unwrap_or_else(|| {
+                quote! {
+                    #test_fn_name(&api)
+                }
+            });
+
         let test = quote! {
             #[test]
             fn #connector_test_fn_name() {
                 let api = #connector_api_factory();
 
-                #test_fn_name(&api)
+                #test_fn_call
             }
         };
 
@@ -90,6 +114,28 @@ fn test_each_connector_async_wrapper_functions(
 
     let mut tests = Vec::with_capacity(CONNECTOR_NAMES.len());
 
+    let test_fn_call = args
+        .log
+        .as_ref()
+        .map(|log_config| {
+            quote! {
+                use tracing_futures::WithSubscriber;
+
+                let filter = tracing_subscriber::EnvFilter::new(#log_config);
+                let subscriber = tracing_subscriber::FmtSubscriber::builder()
+                    .with_env_filter(filter)
+                    .with_writer(print_writer)
+                    .finish();
+
+                #test_fn_name(&api).with_subscriber(subscriber).await
+            }
+        })
+        .unwrap_or_else(|| {
+            quote! {
+                #test_fn_name(&api).await
+            }
+        });
+
     for connector in args.connectors_to_test() {
         let connector_test_fn_name = Ident::new(&format!("{}_on_{}", test_fn_name, connector), Span::call_site());
         let connector_api_factory = Ident::new(&format!("{}_test_api", connector), Span::call_site());
@@ -99,7 +145,7 @@ fn test_each_connector_async_wrapper_functions(
             fn #connector_test_fn_name() {
                 let fut = async {
                     let api = #connector_api_factory().await;
-                    #test_fn_name(&api).await
+                    #test_fn_call
                 };
 
                 TEST_ASYNC_RUNTIME.block_on(fut)
