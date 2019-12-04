@@ -52,7 +52,7 @@ impl Quaint {
     /// - `sslaccept` either `strict` or `accept_invalid_certs`. If strict, the
     ///   certificate needs to be valid and in the CA certificates.
     ///   `accept_invalid_certs` accepts any certificate from the server and can
-    ///   lead to weakened security. Defaults to `strict`.
+    ///   lead to weakened security. Defaults to `accept_invalid_certs`.
     /// - `schema` the default search path.
     /// - `host` additionally the host can be given as a parameter, typically in
     ///   cases when connectiong to the database through a unix socket to
