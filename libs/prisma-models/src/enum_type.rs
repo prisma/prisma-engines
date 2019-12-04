@@ -104,12 +104,6 @@ pub enum EnumValueWrapper {
     String(String),
 }
 
-// impl PartialEq for EnumValueWrapper {
-//     fn eq(&self, _other: &Self) -> bool {
-//         false // WIP
-//     }
-// }
-
 impl From<&InternalEnum> for EnumType {
     fn from(internal_enum: &InternalEnum) -> EnumType {
         let values = internal_enum

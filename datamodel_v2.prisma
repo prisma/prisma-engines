@@ -55,7 +55,6 @@ model Customer {
   Email String
   SupportRep Employee? @map(name: "SupportRepId")
   Invoices Invoice[]
-  @@unique([FirstName, LastName])
 }
 
 model Employee {
