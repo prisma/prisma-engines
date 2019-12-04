@@ -195,7 +195,7 @@ class MultiFieldUniqueQuerySpec extends FlatSpec with Matchers with ApiSpecBase 
     )
   }
 
-  "Querying a multi-field-unique schema with a ludicrous number of fields" should "succeed" in {
+  "Querying a multi-field-unique schema with a ludicrous number of fields" should "succeed" taggedAs IgnoreMySql in {
     val project = SchemaDsl.fromStringV11() { """model User {
                                                 |  id        String @id @default(cuid())
                                                 |  a String
