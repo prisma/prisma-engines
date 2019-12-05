@@ -65,9 +65,15 @@ pub enum SqlError {
 impl SqlError {
     pub(crate) fn into_connector_error(self, connection_info: &quaint::prelude::ConnectionInfo) -> ConnectorError {
         match self {
-            SqlError::UniqueConstraintViolation { field_name } => {
-                ConnectorError::from_kind(ErrorKind::UniqueConstraintViolation { field_name })
-            }
+            SqlError::UniqueConstraintViolation { field_name } => ConnectorError {
+                user_facing_error: user_facing_errors::KnownError::new(
+                    user_facing_errors::query_engine::UniqueKeyViolation {
+                        field_name: field_name.clone(),
+                    },
+                )
+                .ok(),
+                kind: ErrorKind::UniqueConstraintViolation { field_name },
+            },
             SqlError::NullConstraintViolation { field_name } => {
                 ConnectorError::from_kind(ErrorKind::NullConstraintViolation { field_name })
             }
