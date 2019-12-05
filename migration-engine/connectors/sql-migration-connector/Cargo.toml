@@ -23,5 +23,4 @@ tracing-futures = "0.2.0"
 
 [dependencies.quaint]
 git = "https://github.com/prisma/quaint.git"
-default-features = false
-features = ["sqlite", "json-1", "postgresql", "uuid-0_7", "chrono-0_4", "mysql"]
+features = ["single"]

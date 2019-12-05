@@ -265,11 +265,13 @@ mod tests {
     use once_cell::sync::Lazy;
     use quaint::{prelude::*, single::Quaint};
 
-    static TEST_ASYNC_RUNTIME: Lazy<tokio::runtime::Runtime> =
-        Lazy::new(|| tokio::runtime::Runtime::new().expect("failed to start tokio test runtime"));
+    static TEST_ASYNC_RUNTIME: Lazy<std::sync::Mutex<tokio::runtime::Runtime>> = Lazy::new(|| {
+        std::sync::Mutex::new(tokio::runtime::Runtime::new().expect("failed to start tokio test runtime"))
+    });
 
     fn run_sync(matches: &ArgMatches<'_>, datasource: &str) -> Result<String, CliError> {
-        TEST_ASYNC_RUNTIME.block_on(super::run(matches, datasource))
+        let mut rt = TEST_ASYNC_RUNTIME.lock().unwrap();
+        rt.block_on(super::run(matches, datasource))
     }
 
     async fn run(args: &[&str], datasource: &str) -> Result<String, CliError> {

@@ -2,12 +2,13 @@ use barrel::Migration;
 use once_cell::sync::Lazy;
 use quaint::{connector::Queryable, single::Quaint};
 use std::future::Future;
-use std::{rc::Rc, sync::Arc};
+use std::{rc::Rc, sync::{Arc, Mutex}};
 use test_setup::*;
 use url::Url;
+use tokio::runtime::Runtime;
 
-pub static TEST_ASYNC_RUNTIME: Lazy<tokio::runtime::Runtime> =
-    Lazy::new(|| tokio::runtime::Runtime::new().expect("failed to start tokio test runtime"));
+pub static TEST_ASYNC_RUNTIME: Lazy<Mutex<Runtime>> =
+    Lazy::new(|| Mutex::new(Runtime::new().expect("failed to start tokio test runtime")));
 
 pub(crate) fn custom_assert(left: &str, right: &str) {
     let parsed_expected = datamodel::parse_datamodel(&right).unwrap();

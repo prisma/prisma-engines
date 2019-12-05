@@ -20,14 +20,13 @@ user-facing-errors = { path = "../../../libs/user-facing-errors" }
 
 [dependencies.quaint]
 git = "https://github.com/prisma/quaint.git"
-default-features = false
-features = ["sqlite", "json-1", "postgresql", "uuid-0_7", "chrono-0_4", "mysql"]
+features = ["single"]
 
 [dev-dependencies]
 fern = "0.5"
 barrel = { version = "0.6.3-alpha.0", features = ["sqlite3", "mysql", "pg"] }
 test-macros = { path = "../../../libs/test-macros" }
 test-setup = { path = "../../../libs/test-setup" }
-tokio = { package = "tokio", version = "0.2.0-alpha.6" }
+tokio = { version = "0.2", features = ["rt-threaded"] }
 once_cell = "1.2.0"
 pretty_assertions = "0.6.1"
