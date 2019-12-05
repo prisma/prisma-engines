@@ -432,7 +432,7 @@ mod tests {
     use url::Url;
 
     lazy_static! {
-        static ref CONN_STR: String = env::var("TEST_PSQL").unwrap();
+        static ref CONN_STR: String = env::var("TEST_PSQL").expect("TEST_PSQL env var");
     }
 
     #[test]
@@ -526,6 +526,22 @@ mod tests {
             Ok(_) => unreachable!(),
             Err(Error::DatabaseDoesNotExist { db_name }) => assert_eq!("this_does_not_exist", db_name.as_str()),
             Err(e) => panic!("Expected `DatabaseDoesNotExist`, got {:?}", e),
+        }
+    }
+
+    #[tokio::test]
+    async fn should_map_tls_errors() {
+        let mut url = Url::parse(&CONN_STR).expect("parsing url");
+        url.set_query(Some("sslmode=require&sslaccept=strict"));
+
+        let res = Quaint::new(url.as_str()).await;
+
+        assert!(res.is_err());
+
+        match res {
+            Ok(_) => unreachable!(),
+            Err(Error::TlsError { .. }) => (),
+            Err(other) => panic!("{:#?}", other),
         }
     }
 }

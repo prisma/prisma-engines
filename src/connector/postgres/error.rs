@@ -79,6 +79,10 @@ impl From<tokio_postgres::error::Error> for Error {
 
                 match reason.as_str() {
                     "error connecting to server: timed out" => Error::ConnectTimeout, // sigh...
+                    // https://github.com/sfackler/rust-postgres/blob/0c84ed9f8201f4e5b4803199a24afa2c9f3723b2/tokio-postgres/src/connect_tls.rs#L37
+                    "error performing TLS handshake: server does not support TLS" => {
+                        Error::TlsError { message: reason }
+                    } // double sigh
                     _ => Error::QueryError(e.into()),
                 }
             }
