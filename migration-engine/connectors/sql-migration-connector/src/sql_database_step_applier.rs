@@ -3,6 +3,7 @@ use quaint::prelude::Queryable;
 use sql_renderer::SqlRenderer;
 use sql_schema_describer::*;
 use std::sync::Arc;
+use tracing_futures::Instrument;
 
 pub struct SqlDatabaseStepApplier {
     pub connection_info: ConnectionInfo,
@@ -13,12 +14,15 @@ pub struct SqlDatabaseStepApplier {
 #[async_trait::async_trait]
 impl DatabaseMigrationStepApplier<SqlMigration> for SqlDatabaseStepApplier {
     async fn apply_step(&self, database_migration: &SqlMigration, index: usize) -> ConnectorResult<bool> {
-        dbg!(self.apply_next_step(&database_migration.corrected_steps, index).await)
+        self.apply_next_step(&database_migration.corrected_steps, index)
+            .instrument(tracing::debug_span!("ApplySqlStep", index))
+            .await
             .map_err(|sql_error| sql_error.into_connector_error(&self.connection_info))
     }
 
     async fn unapply_step(&self, database_migration: &SqlMigration, index: usize) -> ConnectorResult<bool> {
         self.apply_next_step(&database_migration.rollback, index)
+            .instrument(tracing::debug_span!("UnapplySqlStep", index))
             .await
             .map_err(|sql_error| sql_error.into_connector_error(&self.connection_info))
     }
