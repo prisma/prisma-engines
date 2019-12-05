@@ -101,12 +101,55 @@ pub trait InputTypeBuilderBase<'a>: CachedBuilder<InputObjectType> + InputBuilde
             .map(|f| Arc::clone(f))
             .collect();
 
-        let fields: Vec<InputField> = unique_fields
+        let mut fields: Vec<InputField> = unique_fields
             .into_iter()
             .map(|f| input_field(f.name.clone(), self.map_optional_input_type(f), None))
             .collect();
 
+        let compound_fields: Vec<InputField> = model
+            .unique_indexes()
+            .into_iter()
+            .map(|index| {
+                let typ = self.compound_field_unique_object_type(index);
+                let name = compound_field_name(index);
+
+                input_field(name, InputType::object(typ), None)
+            })
+            .collect();
+
+        fields.extend(compound_fields);
         input_object.set_fields(fields);
+
+        Arc::downgrade(&input_object)
+    }
+
+    /// Generates and caches an object type for a unique index.
+    fn compound_field_unique_object_type(&self, index: &Index) -> InputObjectTypeRef {
+        let name = index.name.as_ref().map(|n| capitalize(n)).unwrap_or_else(|| {
+            let index_fields = index.fields();
+            let field_names: Vec<String> = index_fields.iter().map(|sf| capitalize(&sf.name)).collect();
+
+            field_names.join("")
+        });
+
+        let name = format!("{}CompoundUniqueInput", name);
+        return_cached!(self.get_cache(), &name);
+
+        let input_object = Arc::new(init_input_object_type(name.clone()));
+        self.cache(name, Arc::clone(&input_object));
+
+        let index_fields = index.fields();
+        let object_fields = index_fields
+            .into_iter()
+            .map(|field| {
+                let name = field.name.clone();
+                let typ = self.map_required_input_type(field);
+
+                input_field(name, typ, None)
+            })
+            .collect();
+
+        input_object.set_fields(object_fields);
         Arc::downgrade(&input_object)
     }
 

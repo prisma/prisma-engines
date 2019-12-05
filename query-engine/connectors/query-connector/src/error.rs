@@ -1,45 +1,7 @@
-use crate::filter::RecordFinder;
+use crate::filter::Filter;
 use failure::{Error, Fail};
-use prisma_models::prelude::{DomainError, GraphqlId, ModelRef, PrismaValue};
-use std::fmt;
+use prisma_models::prelude::DomainError;
 use user_facing_errors::KnownError;
-
-#[derive(Debug)]
-pub struct RecordFinderInfo {
-    pub model: String,
-    pub field: String,
-    pub value: PrismaValue,
-}
-
-impl RecordFinderInfo {
-    pub fn for_id(model: ModelRef, value: &GraphqlId) -> Self {
-        Self {
-            model: model.name.clone(),
-            field: model.fields().id().name.clone(),
-            value: PrismaValue::from(value.clone()),
-        }
-    }
-}
-
-impl fmt::Display for RecordFinderInfo {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(
-            f,
-            "field {} in model {} with value {}",
-            self.model, self.field, self.value
-        )
-    }
-}
-
-impl From<&RecordFinder> for RecordFinderInfo {
-    fn from(ns: &RecordFinder) -> Self {
-        Self {
-            model: ns.field.model().name.clone(),
-            field: ns.field.name.clone(),
-            value: ns.value.clone(),
-        }
-    }
-}
 
 #[derive(Debug, Fail)]
 #[fail(display = "{}", kind)]
@@ -92,7 +54,7 @@ pub enum ErrorKind {
     DomainError(DomainError),
 
     #[fail(display = "Record not found: {}", _0)]
-    RecordNotFoundForWhere(RecordFinderInfo),
+    RecordNotFoundForWhere(Filter),
 
     #[fail(
         display = "Violating a relation {} between {} and {}",
@@ -111,9 +73,7 @@ pub enum ErrorKind {
     RecordsNotConnected {
         relation_name: String,
         parent_name: String,
-        parent_where: Option<Box<RecordFinderInfo>>,
         child_name: String,
-        child_where: Option<Box<RecordFinderInfo>>,
     },
 
     #[fail(display = "Conversion error: {}", _0)]

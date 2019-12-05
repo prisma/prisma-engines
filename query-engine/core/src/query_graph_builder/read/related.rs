@@ -21,7 +21,7 @@ impl ReadRelatedRecordsBuilder {
 
 impl Builder<ReadQuery> for ReadRelatedRecordsBuilder {
     fn build(self) -> QueryGraphBuilderResult<ReadQuery> {
-        let args = utils::extract_query_args(self.field.arguments, &self.model)?;
+        let args = extractors::extract_query_args(self.field.arguments, &self.model)?;
         let name = self.field.name;
         let alias = self.field.alias;
         let sub_selections = self.field.nested_fields.unwrap().fields;

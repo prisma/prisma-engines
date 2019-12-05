@@ -5,26 +5,17 @@ use std::sync::{Arc, Weak};
 pub type ProjectRef = Arc<Project>;
 pub type ProjectWeakRef = Weak<Project>;
 
-#[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(Debug)]
 pub struct ProjectTemplate {
     pub id: String,
-    #[serde(rename = "schema")]
     pub internal_data_model: InternalDataModelTemplate,
-
-    #[serde(default)]
     pub manifestation: ProjectManifestation,
-
-    // todo: what is this?
-    #[serde(default)]
-    pub revision: Revision,
 }
 
 #[derive(Debug)]
 pub struct Project {
     pub id: String,
     pub internal_data_model: OnceCell<InternalDataModelRef>,
-    pub revision: Revision,
 }
 
 impl Into<ProjectRef> for ProjectTemplate {
@@ -33,7 +24,6 @@ impl Into<ProjectRef> for ProjectTemplate {
         let project = Arc::new(Project {
             id: self.id,
             internal_data_model: OnceCell::new(),
-            revision: self.revision,
         });
 
         project
@@ -115,20 +105,4 @@ pub enum FunctionType {
 pub struct ProjectManifestation {
     pub database: Option<String>,
     pub schema: Option<String>,
-}
-
-#[cfg(test)]
-mod tests {
-    use crate::prelude::*;
-    use serde_json;
-    use std::fs::File;
-
-    #[test]
-    #[ignore]
-    fn test_relation_internal_data_model() {
-        let file = File::open("./relation_schema.json").unwrap();
-        let project_template: ProjectTemplate = serde_json::from_reader(file).unwrap();
-        let _project: ProjectRef = project_template.into();
-        assert!(true)
-    }
 }

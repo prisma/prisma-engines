@@ -14,7 +14,6 @@ use crate::{
     ParsedInputMap,
 };
 use connect_nested::*;
-use connector::filter::RecordFinder;
 use create_nested::*;
 use delete_nested::*;
 use prisma_models::RelationFieldRef;

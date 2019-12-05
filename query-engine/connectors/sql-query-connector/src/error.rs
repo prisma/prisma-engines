@@ -1,4 +1,4 @@
-use connector_interface::error::*;
+use connector_interface::{error::*, Filter};
 use failure::{Error, Fail};
 use prisma_models::prelude::DomainError;
 use quaint::error::Error as QuaintError;
@@ -34,7 +34,7 @@ pub enum SqlError {
     DomainError(DomainError),
 
     #[fail(display = "Record not found: {}", _0)]
-    RecordNotFoundForWhere(RecordFinderInfo),
+    RecordNotFoundForWhere(Filter),
 
     #[fail(
         display = "Violating a relation {} between {} and {}",
@@ -53,9 +53,9 @@ pub enum SqlError {
     RecordsNotConnected {
         relation_name: String,
         parent_name: String,
-        parent_where: Option<Box<RecordFinderInfo>>,
+        // parent_where: Option<Box<RecordFinderInfo>>,
         child_name: String,
-        child_where: Option<Box<RecordFinderInfo>>,
+        // child_where: Option<Box<RecordFinderInfo>>,
     },
 
     #[fail(display = "Conversion error: {}", _0)]
@@ -95,15 +95,11 @@ impl SqlError {
             SqlError::RecordsNotConnected {
                 relation_name,
                 parent_name,
-                parent_where,
                 child_name,
-                child_where,
             } => ConnectorError::from_kind(ErrorKind::RecordsNotConnected {
                 relation_name,
                 parent_name,
-                parent_where,
                 child_name,
-                child_where,
             }),
             SqlError::ConversionError(e) => ConnectorError::from_kind(ErrorKind::ConversionError(e)),
             SqlError::QueryError(e) => ConnectorError::from_kind(ErrorKind::QueryError(e)),

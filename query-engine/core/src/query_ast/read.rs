@@ -1,6 +1,6 @@
 //! Prisma read query AST
-use super::RecordFinderInjector;
-use connector::{filter::RecordFinder, QueryArguments};
+use super::FilteredQuery;
+use connector::{filter::Filter, QueryArguments};
 use prisma_models::prelude::*;
 use std::fmt::Display;
 
@@ -23,10 +23,17 @@ impl ReadQuery {
     }
 }
 
-impl RecordFinderInjector for ReadQuery {
-    fn inject_record_finder(&mut self, rf: RecordFinder) {
+impl FilteredQuery for ReadQuery {
+    fn get_filter(&mut self) -> Option<&mut Filter> {
         match self {
-            Self::RecordQuery(ref mut rq) => rq.record_finder = Some(rf),
+            Self::RecordQuery(q) => q.get_filter(),
+            _ => unimplemented!(),
+        }
+    }
+
+    fn set_filter(&mut self, filter: Filter) {
+        match self {
+            Self::RecordQuery(q) => q.set_filter(filter),
             _ => unimplemented!(),
         }
     }
@@ -35,17 +42,7 @@ impl RecordFinderInjector for ReadQuery {
 impl Display for ReadQuery {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            Self::RecordQuery(q) => write!(
-                f,
-                "RecordQuery(name: '{}', finder: {:?})",
-                q.name,
-                q.record_finder.as_ref().map(|finder| format!(
-                    "{}, {} = {:?}",
-                    finder.field.model().name,
-                    finder.field.name,
-                    finder.value
-                ))
-            ),
+            Self::RecordQuery(q) => write!(f, "RecordQuery(name: '{}', filter: {:?})", q.name, q.filter),
             Self::ManyRecordsQuery(q) => write!(f, "ManyRecordsQuery(name: '{}', model: {})", q.name, q.model.name),
             Self::RelatedRecordsQuery(q) => write!(
                 f,
@@ -59,11 +56,12 @@ impl Display for ReadQuery {
     }
 }
 
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Clone)]
 pub struct RecordQuery {
     pub name: String,
     pub alias: Option<String>,
-    pub record_finder: Option<RecordFinder>,
+    pub model: ModelRef,
+    pub filter: Option<Filter>,
     pub selected_fields: SelectedFields,
     pub nested: Vec<ReadQuery>,
     pub selection_order: Vec<String>,
@@ -97,4 +95,14 @@ pub struct AggregateRecordsQuery {
     pub name: String,
     pub alias: Option<String>,
     pub model: ModelRef,
+}
+
+impl FilteredQuery for RecordQuery {
+    fn get_filter(&mut self) -> Option<&mut Filter> {
+        self.filter.as_mut()
+    }
+
+    fn set_filter(&mut self, filter: Filter) {
+        self.filter = Some(filter)
+    }
 }

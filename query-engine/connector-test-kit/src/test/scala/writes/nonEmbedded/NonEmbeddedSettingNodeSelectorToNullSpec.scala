@@ -31,7 +31,7 @@ class NonEmbeddedSettingNodeSelectorToNullSpec extends FlatSpec with Matchers wi
         |    b: "abc"
         |    key: "abc"
         |    c: {
-        |       create:{ c: "C"}
+        |       create:{ c: "C" }
         |    }
         |  }) {
         |    id

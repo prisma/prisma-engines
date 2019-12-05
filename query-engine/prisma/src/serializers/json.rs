@@ -1,9 +1,10 @@
 //! Json serialisation for query engine IR
 
-use crate::{PrismaError, PrismaResult};
+use crate::PrismaResult;
 use indexmap::IndexMap;
 use prisma_models::{GraphqlId, PrismaValue};
 use query_core::response_ir::{Item, Response};
+use rust_decimal::prelude::ToPrimitive;
 use serde_json::{Map, Number, Value};
 use std::sync::Arc;
 
@@ -11,8 +12,6 @@ pub fn serialize(responses: Vec<Response>) -> Value {
     let mut outer_envelope = Map::new();
     let mut data_envelope = Map::new();
     let mut errors: Vec<Value> = Vec::new();
-
-    // let mut serialization_cache: HashMap<ItemRef, > = HashMap::new();
 
     for response in responses {
         match response {
@@ -28,6 +27,7 @@ pub fn serialize(responses: Vec<Response>) -> Value {
     if !errors.is_empty() {
         outer_envelope.insert("errors".into(), Value::Array(errors));
     }
+
     outer_envelope.insert("data".into(), Value::Object(data_envelope));
 
     Value::Object(outer_envelope)
@@ -65,14 +65,11 @@ fn serialize_list(list: Vec<Item>) -> Vec<Value> {
 fn serialize_prisma_value(value: PrismaValue) -> PrismaResult<Value> {
     Ok(match value {
         PrismaValue::String(x) => Value::String(x),
-        PrismaValue::Float(x) => Value::Number(match Number::from_f64(x) {
-            Some(num) => num,
-            None => return Err(PrismaError::SerializationError("`f64` number was invalid".into())),
-        }),
+        PrismaValue::Float(x) => serde_json::to_value(x.to_f64().expect("Decimal is not a f64."))
+            .expect("Unable to serialize Decimal to JSON."),
         PrismaValue::Boolean(x) => Value::Bool(x),
         PrismaValue::DateTime(date) => Value::String(format!("{}", date.format("%Y-%m-%dT%H:%M:%S%.3fZ"))),
         PrismaValue::Enum(x) => Value::String(x.as_string()),
-        PrismaValue::Json(x) => x,
         PrismaValue::Int(x) => Value::Number(Number::from(x)),
         PrismaValue::Null => Value::Null,
         PrismaValue::Uuid(x) => Value::String(x.to_hyphenated().to_string()),

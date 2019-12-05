@@ -5,16 +5,17 @@
 //! [RelationCompare](/query-connector/trait.RelationCompare.html).
 
 mod list;
-mod record_finder;
 mod relation;
 mod scalar;
 
+use prisma_models::prelude::*;
+use std::fmt;
+
 pub use list::*;
-pub use record_finder::*;
 pub use relation::*;
 pub use scalar::*;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Eq, Hash, PartialEq)]
 pub enum Filter {
     And(Vec<Filter>),
     Or(Vec<Filter>),
@@ -25,6 +26,7 @@ pub enum Filter {
     Relation(RelationFilter),
     NodeSubscription,
     BoolFilter(bool),
+    Empty,
 }
 
 impl Filter {
@@ -41,7 +43,25 @@ impl Filter {
     }
 
     pub fn empty() -> Self {
-        Filter::BoolFilter(true)
+        Filter::Empty
+    }
+
+    /// Returns the size of the topmost filter elements (does not recursively compute the size).
+    pub fn size(&self) -> usize {
+        match self {
+            Self::And(v) => v.len(),
+            Self::Or(v) => v.len(),
+            Self::Not(v) => v.len(),
+            Self::Empty => 0,
+            _ => 1,
+        }
+    }
+}
+
+// WIP
+impl fmt::Display for Filter {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{:?}", self)
     }
 }
 
@@ -75,31 +95,86 @@ impl From<bool> for Filter {
     }
 }
 
-impl From<RecordFinder> for Filter {
-    fn from(record_finder: RecordFinder) -> Self {
-        Filter::Scalar(ScalarFilter {
-            field: record_finder.field,
-            condition: ScalarCondition::Equals(record_finder.value),
-        })
-    }
-}
+/// Creates a test data model for the unit tests in this module.
+pub fn test_data_model() -> InternalDataModelRef {
+    let user_field_templates = vec![
+        FieldTemplate::Scalar(ScalarFieldTemplate {
+            name: "id".to_owned(),
+            type_identifier: TypeIdentifier::GraphQLID,
+            is_required: true,
+            is_list: false,
+            is_unique: false,
+            is_hidden: false,
+            is_auto_generated: false,
+            manifestation: None,
+            behaviour: None,
+            default_value: None,
+            internal_enum: None,
+        }),
+        FieldTemplate::Scalar(ScalarFieldTemplate {
+            name: "name".to_owned(),
+            type_identifier: TypeIdentifier::String,
+            is_required: false,
+            is_list: false,
+            is_unique: false,
+            is_hidden: false,
+            is_auto_generated: false,
+            manifestation: None,
+            behaviour: None,
+            default_value: None,
+            internal_enum: None,
+        }),
+        FieldTemplate::Relation(RelationFieldTemplate {
+            name: "sites".to_owned(),
+            type_identifier: TypeIdentifier::String,
+            is_required: false,
+            is_list: false,
+            is_unique: false,
+            is_hidden: false,
+            is_auto_generated: false,
+            manifestation: None,
+            relation_name: "bar".to_owned(),
+            relation_side: RelationSide::A,
+        }),
+    ];
 
-impl From<Option<RecordFinder>> for Filter {
-    fn from(record_finder: Option<RecordFinder>) -> Self {
-        match record_finder {
-            Some(rf) => Self::from(rf),
-            None => Self::empty(),
-        }
-    }
-}
+    let site_field_templates = vec![FieldTemplate::Scalar(ScalarFieldTemplate {
+        name: "name".to_owned(),
+        type_identifier: TypeIdentifier::String,
+        is_required: false,
+        is_list: false,
+        is_unique: false,
+        is_hidden: false,
+        is_auto_generated: false,
+        manifestation: None,
+        behaviour: None,
+        default_value: None,
+        internal_enum: None,
+    })];
 
-impl From<Vec<RecordFinder>> for Filter {
-    fn from(record_finders: Vec<RecordFinder>) -> Self {
-        if record_finders.is_empty() {
-            Self::empty()
-        } else {
-            let as_filters: Vec<Filter> = record_finders.into_iter().map(|x| x.into()).collect();
-            Filter::or(as_filters).into()
-        }
-    }
+    let model_templates = vec![
+        ModelTemplate {
+            name: "User".to_owned(),
+            is_embedded: false,
+            fields: user_field_templates,
+            manifestation: None,
+            indexes: vec![],
+        },
+        ModelTemplate {
+            name: "Site".to_owned(),
+            is_embedded: false,
+            fields: site_field_templates,
+            manifestation: None,
+            indexes: vec![],
+        },
+    ];
+
+    let project_template = InternalDataModelTemplate {
+        models: model_templates,
+        relations: vec![],
+        enums: vec![],
+        version: None,
+    };
+
+    project_template.build("some_db_name".to_owned())
 }

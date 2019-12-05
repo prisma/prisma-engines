@@ -1,11 +1,14 @@
 use super::*;
 use crate::{
     query_ast::*,
+    query_document::*,
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
-    ParsedInputValue, QueryResult,
+    ParsedInputMap, ParsedInputValue, QueryResult,
 };
+use connector::{Filter, ScalarCompare};
 use itertools::Itertools;
 use prisma_models::{ModelRef, RelationFieldRef};
+use std::convert::TryInto;
 use std::sync::Arc;
 
 /// Handles nested connect cases.
@@ -21,21 +24,30 @@ pub fn connect_nested_connect(
 ) -> QueryGraphBuilderResult<()> {
     let relation = parent_relation_field.relation();
 
-    // Build all finders upfront.
-    let finders: Vec<RecordFinder> = utils::coerce_vec(value)
+    // Build all filters upfront.
+    let filters: Vec<Filter> = utils::coerce_vec(value)
         .into_iter()
-        .map(|value: ParsedInputValue| extract_record_finder(value, &child_model))
-        .collect::<QueryGraphBuilderResult<Vec<RecordFinder>>>()?
+        .map(|value: ParsedInputValue| {
+            let value: ParsedInputMap = value.try_into()?;
+
+            value.assert_size(1)?;
+            value.assert_non_null()?;
+
+            extract_filter(value, &child_model, false)
+        })
+        .collect::<QueryGraphBuilderResult<Vec<Filter>>>()?
         .into_iter()
         .unique()
         .collect();
 
+    let filter = Filter::or(filters);
+
     if relation.is_many_to_many() {
-        handle_many_to_many(graph, parent_node, parent_relation_field, finders, child_model)
+        handle_many_to_many(graph, parent_node, parent_relation_field, filter, child_model)
     } else if relation.is_one_to_many() {
-        handle_one_to_many(graph, parent_node, parent_relation_field, finders, child_model)
+        handle_one_to_many(graph, parent_node, parent_relation_field, filter, child_model)
     } else {
-        handle_one_to_one(graph, parent_node, parent_relation_field, finders, child_model)
+        handle_one_to_one(graph, parent_node, parent_relation_field, filter, child_model)
     }
 }
 
@@ -66,11 +78,11 @@ fn handle_many_to_many(
     graph: &mut QueryGraph,
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
-    finders: Vec<RecordFinder>,
+    filter: Filter,
     child_model: &ModelRef,
 ) -> QueryGraphBuilderResult<()> {
-    let expected_connects = finders.len();
-    let child_read_query = utils::read_ids_infallible(&child_model, finders);
+    let expected_connects = filter.size();
+    let child_read_query = utils::read_ids_infallible(&child_model, filter);
     let child_node = graph.create_node(child_read_query);
 
     graph.create_edge(&parent_node, &child_node, QueryGraphDependency::ExecutionOrder)?;
@@ -140,11 +152,11 @@ fn handle_one_to_many(
     graph: &mut QueryGraph,
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
-    mut child_finders: Vec<RecordFinder>,
+    child_filter: Filter,
     child_model: &ModelRef,
 ) -> QueryGraphBuilderResult<()> {
     if parent_relation_field.relation_is_inlined_in_parent() {
-        let read_query = utils::read_ids_infallible(&child_model, child_finders.pop());
+        let read_query = utils::read_ids_infallible(&child_model, child_filter);
         let child_node = graph.create_node(read_query);
 
         // For the injection, we need the name of the field on the inlined side, in this case the parent.
@@ -172,8 +184,8 @@ fn handle_one_to_many(
                 })),
             )?;
     } else {
-        let expected_id_count = child_finders.len();
-        let update_node = utils::update_records_node_placeholder(graph, child_finders, Arc::clone(child_model));
+        let expected_id_count = child_filter.size();
+        let update_node = utils::update_records_node_placeholder(graph, child_filter, Arc::clone(child_model));
         let check_node = graph.create_node(Node::Empty);
 
         // For the injection, we need the name of the field on the inlined side, in this case the child.
@@ -311,7 +323,7 @@ fn handle_one_to_one(
     graph: &mut QueryGraph,
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
-    mut finders: Vec<RecordFinder>,
+    filter: Filter,
     child_model: &ModelRef,
 ) -> QueryGraphBuilderResult<()> {
     let parent_is_create = utils::node_is_create(graph, &parent_node);
@@ -329,8 +341,7 @@ fn handle_one_to_one(
         ));
     }
 
-    let record_finder = finders.pop();
-    let read_query = utils::read_ids_infallible(&child_model, record_finder);
+    let read_query = utils::read_ids_infallible(&child_model, filter);
     let read_new_child_node = graph.create_node(read_query);
 
     // We always start with the read node in a nested connect 1:1 scenario.
@@ -378,24 +389,21 @@ fn handle_one_to_one(
 
     // If the relation is inlined on the child, we also need to update the child to connect it to the parent.
     if !relation_inlined_parent {
-        let update_node = utils::update_records_node_placeholder(graph, None, Arc::clone(child_model));
+        let update_node = utils::update_records_node_placeholder(graph, Filter::empty(), Arc::clone(child_model));
         let relation_field_name = child_relation_field.name.clone();
         let child_model_id = child_model.fields().id();
 
         graph.create_edge(
             &read_new_child_node,
             &update_node,
-            QueryGraphDependency::ParentIds(Box::new(|mut child_node, mut parent_ids| {
+            QueryGraphDependency::ParentIds(Box::new(move |mut child_node, mut parent_ids| {
                 let parent_id = match parent_ids.pop() {
                     Some(pid) => Ok(pid),
                     None => Err(QueryGraphBuilderError::AssertionError(format!("[Query Graph] Expected a valid parent ID to be present for a nested connect on a one-to-one relation, updating inlined on child."))),
                 }?;
 
                 if let Node::Query(Query::Write(ref mut wq)) = child_node {
-                    wq.inject_record_finder(RecordFinder {
-                        field: child_model_id,
-                        value: parent_id,
-                    });
+                    wq.add_filter(child_model_id.equals(parent_id));
                 }
 
                 Ok(child_node)
@@ -424,7 +432,7 @@ fn handle_one_to_one(
         let parent_model = parent_relation_field.model();
         let relation_field_name = parent_relation_field.name.clone();
         let parent_model_id = parent_model.fields().id();
-        let update_node = utils::update_records_node_placeholder(graph, None, parent_model);
+        let update_node = utils::update_records_node_placeholder(graph, Filter::empty(), parent_model);
 
         graph.create_edge(
             &read_new_child_node,
@@ -446,17 +454,14 @@ fn handle_one_to_one(
         graph.create_edge(
             &parent_node,
             &update_node,
-            QueryGraphDependency::ParentIds(Box::new(|mut child_node, mut parent_ids| {
+            QueryGraphDependency::ParentIds(Box::new(move |mut child_node, mut parent_ids| {
                 let parent_id = match parent_ids.pop() {
                     Some(pid) => Ok(pid),
                     None => Err(QueryGraphBuilderError::AssertionError(format!("[Query Graph] Expected a valid parent ID to be present for a nested connect on a one-to-one relation, updating inlined on parent."))),
                 }?;
 
                 if let Node::Query(Query::Write(ref mut wq)) = child_node {
-                    wq.inject_record_finder(RecordFinder {
-                        field: parent_model_id,
-                        value: parent_id,
-                    });
+                    wq.add_filter(parent_model_id.equals(parent_id));
                 }
 
                 Ok(child_node)

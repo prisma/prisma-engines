@@ -3,15 +3,15 @@
 
 mod builder;
 mod error;
+mod extractors;
 mod read;
-mod utils;
 
 pub mod write;
 
 pub use builder::*;
 pub use error::*;
+pub use extractors::*;
 pub use read::*;
-pub use utils::*;
 
 /// Query graph builder sub-result type.
 pub type QueryGraphBuilderResult<T> = Result<T, QueryGraphBuilderError>;
