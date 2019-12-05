@@ -53,8 +53,8 @@ pub enum SqlError {
     #[fail(display = "Operation timed out")]
     Timeout,
 
-    #[fail(display = "Error opening a TLS connection. {}", message)]
-    TlsError { message: String },
+    #[fail(display = "Error opening a TLS connection. {}", cause)]
+    TlsError { cause: QuaintError },
 
     #[fail(display = "Unique constraint violation")]
     UniqueConstraintViolation {
@@ -66,6 +66,7 @@ pub enum SqlError {
 
 impl SqlError {
     pub(crate) fn into_connector_error(self, connection_info: &super::ConnectionInfo) -> ConnectorError {
+        dbg!(&self);
         match self {
             SqlError::DatabaseDoesNotExist { db_name, cause } => ConnectorError {
                 user_facing_error: render_quaint_error(&cause, connection_info),
@@ -86,7 +87,12 @@ impl SqlError {
             },
             SqlError::ConnectTimeout => ConnectorError::from_kind(ErrorKind::ConnectTimeout),
             SqlError::Timeout => ConnectorError::from_kind(ErrorKind::Timeout),
-            SqlError::TlsError { message } => ConnectorError::from_kind(ErrorKind::TlsError { message }),
+            SqlError::TlsError { cause } => ConnectorError {
+                user_facing_error: render_quaint_error(&cause, connection_info),
+                kind: ErrorKind::TlsError {
+                    message: format!("{}", cause),
+                },
+            },
             SqlError::ConnectionError { cause } => ConnectorError {
                 user_facing_error: render_quaint_error(&cause, connection_info),
                 kind: ErrorKind::ConnectionError {
@@ -108,6 +114,7 @@ impl SqlError {
 
 impl From<quaint::error::Error> for SqlError {
     fn from(error: quaint::error::Error) -> Self {
+        dbg!(&error);
         match &error {
             quaint::error::Error::DatabaseDoesNotExist { db_name } => Self::DatabaseDoesNotExist {
                 db_name: db_name.clone(),
@@ -128,9 +135,7 @@ impl From<quaint::error::Error> for SqlError {
             quaint::error::Error::ConnectTimeout => Self::ConnectTimeout,
             quaint::error::Error::ConnectionError { .. } => Self::ConnectionError { cause: error },
             quaint::error::Error::Timeout => Self::Timeout,
-            quaint::error::Error::TlsError { message } => Self::TlsError {
-                message: message.clone(),
-            },
+            quaint::error::Error::TlsError { .. } => Self::TlsError { cause: error },
             quaint::error::Error::UniqueConstraintViolation { field_name } => Self::UniqueConstraintViolation {
                 field_name: field_name.into(),
                 cause: error,
