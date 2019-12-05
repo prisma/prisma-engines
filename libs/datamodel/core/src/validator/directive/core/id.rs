@@ -13,20 +13,17 @@ impl DirectiveValidator<dml::Field> for IdDirectiveValidator {
     fn validate_and_apply(&self, args: &mut Args, obj: &mut dml::Field) -> Result<(), DatamodelError> {
         let strategy = match obj.field_type {
             dml::FieldType::Base(dml::ScalarType::Int) => dml::IdStrategy::Auto,
+            _ if obj.default_value.is_some() => dml::IdStrategy::Auto,
             _ => dml::IdStrategy::None,
         };
 
-        let mut id_info = dml::IdInfo {
+        let id_info = dml::IdInfo {
             strategy,
             sequence: None,
         };
 
         if obj.arity != dml::FieldArity::Required {
             return self.error("Fields that are marked as id must be required.", args.span());
-        }
-
-        if let Ok(arg) = args.arg("strategy") {
-            id_info.strategy = arg.parse_literal::<dml::IdStrategy>()?
         }
 
         obj.id_info = Some(id_info);

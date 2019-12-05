@@ -40,7 +40,7 @@ pub trait CreateInputTypeBuilderExtension<'a>: InputTypeBuilderBase<'a> {
 
                         (Some(FieldBehaviour::Id { strategy: IdStrategy::None, .. }), TypeIdentifier::GraphQLID) => self.map_required_input_type(f),
                         (Some(FieldBehaviour::Id { strategy: IdStrategy::None, .. }), TypeIdentifier::UUID)      => self.map_required_input_type(f),
-                        (Some(FieldBehaviour::Id { strategy: IdStrategy::None, .. }), TypeIdentifier::String)      => self.map_required_input_type(f),
+                        (Some(FieldBehaviour::Id { strategy: IdStrategy::None, .. }), TypeIdentifier::String)    => self.map_required_input_type(f),
 
                         _ => unreachable!(),
                     }
@@ -79,7 +79,7 @@ pub trait CreateInputTypeBuilderExtension<'a>: InputTypeBuilderBase<'a> {
                 let related_model = rf.related_model();
                 let related_field = rf.related_field();
 
-                // Comput input object name
+                // Compute input object name
                 let arity_part = if rf.is_list { "Many" } else { "One" };
                 let without_part = if !related_field.is_hidden {
                     format!("Without{}", capitalize(rf.name.clone()))
