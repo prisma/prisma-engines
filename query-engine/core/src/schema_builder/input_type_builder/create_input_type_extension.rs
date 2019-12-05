@@ -145,21 +145,21 @@ pub trait CreateInputTypeBuilderExtension<'a>: InputTypeBuilderBase<'a> {
             _ if !field.is_id()                                                                      => true,
 
 
-            (Some(FieldBehaviour::Id { strategy: IdStrategy::Auto, .. }), TypeIdentifier::UUID)      => true,
-            (Some(FieldBehaviour::Id { strategy: IdStrategy::Auto, .. }), TypeIdentifier::GraphQLID) => true,
-            (None, TypeIdentifier::UUID)                                                             => true,  //can probably go away
+            (Some(FieldBehaviour::Id { strategy: IdStrategy::Auto, .. }), TypeIdentifier::UUID)      => true,  //id String    @id @default(uuid())
+            (Some(FieldBehaviour::Id { strategy: IdStrategy::Auto, .. }), TypeIdentifier::GraphQLID) => true,  //id String    @id @default(cuid())
+
+            (Some(FieldBehaviour::Id { strategy: IdStrategy::None, .. }), TypeIdentifier::String)    => true,  //id String    @id
+            (Some(FieldBehaviour::Id { strategy: IdStrategy::None, .. }), TypeIdentifier::UUID)      => true,  //
+            (Some(FieldBehaviour::Id { strategy: IdStrategy::None, .. }), TypeIdentifier::GraphQLID) => true,  // 
+
+            (Some(FieldBehaviour::Id { strategy: IdStrategy::Auto, .. }), TypeIdentifier::Int)       => false, //id Int       @id @default(autoincrement())
+            (Some(FieldBehaviour::Id { strategy: IdStrategy::None, .. }), TypeIdentifier::Int)       => false, //id Int       @id  
+            (Some(FieldBehaviour::Id { strategy: IdStrategy::Sequence, .. }), TypeIdentifier::Int)   => false, //id Int       @id @sequence...
+
             (None, TypeIdentifier::GraphQLID)                                                        => true,  //can probably go away
-
-            (Some(FieldBehaviour::Id { strategy: IdStrategy::None, .. }), TypeIdentifier::String)    => true,
-            (Some(FieldBehaviour::Id { strategy: IdStrategy::None, .. }), TypeIdentifier::UUID)      => true,
-            (Some(FieldBehaviour::Id { strategy: IdStrategy::None, .. }), TypeIdentifier::GraphQLID) => true,
-
-            (Some(FieldBehaviour::Id { strategy: IdStrategy::Auto, .. }), TypeIdentifier::Int)       => false,
+            (None, TypeIdentifier::UUID)                                                             => true,  //can probably go away
             (None, TypeIdentifier::Int)                                                              => false, //can probably go away
-            (Some(FieldBehaviour::Id { strategy: IdStrategy::None, .. }), TypeIdentifier::Int)       => false,
-            (Some(FieldBehaviour::Id { strategy: IdStrategy::Sequence, .. }), TypeIdentifier::Int)   => false,
-
-            x => panic!("Id Behaviour unhandled does this work: {:?}", x),
+            x => panic!("Id Behaviour unhandled: {:?}", x),
         }
     }
 }
