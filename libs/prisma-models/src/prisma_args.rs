@@ -44,27 +44,28 @@ impl PrismaArgs {
 
     pub fn add_datetimes(&mut self, model: ModelRef) {
         let now = PrismaValue::DateTime(Utc::now());
+        let created_at_field = model.fields().created_at();
+        let updated_at_field = model.fields().updated_at();
 
-        match (model.fields().created_at(), model.fields().updated_at()) {
-            (Some(created_at), Some(updated_at)) => {
-                self.args.insert(created_at.name.clone(), now.clone());
-                self.args.insert(updated_at.name.clone(), now);
+        if let Some(f) = created_at_field {
+            if let None = self.args.get(&f.name) {
+                self.args.insert(f.name.clone(), now.clone());
             }
-            (Some(created_at), None) => {
-                self.args.insert(created_at.name.clone(), now);
+        }
+
+        if let Some(f) = updated_at_field {
+            if let None = self.args.get(&f.name) {
+                self.args.insert(f.name.clone(), now.clone());
             }
-            (None, Some(updated_at)) => {
-                self.args.insert(updated_at.name.clone(), now);
-            }
-            (None, None) => (),
         }
     }
 
     pub fn update_datetimes(&mut self, model: ModelRef, list_causes_update: bool) {
         if !self.args.is_empty() || list_causes_update {
             if let Some(field) = model.fields().updated_at() {
-                self.args
-                    .insert(field.name.to_string(), PrismaValue::DateTime(Utc::now()));
+                if let None = self.args.get(&field.name) {
+                    self.args.insert(field.name.clone(), PrismaValue::DateTime(Utc::now()));
+                }
             }
         }
     }

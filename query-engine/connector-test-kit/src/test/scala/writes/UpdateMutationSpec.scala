@@ -225,4 +225,56 @@ class UpdateMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
 
     createdAt should not be updatedAt
   }
+
+  "UpdatedAt and createdAt" should "be mutable with an update" in {
+    val project = ProjectDsl.fromString {
+      """
+        |model User {
+        |  id        String   @id @default(cuid())
+        |  name      String
+        |  createdAt DateTime @default(now())
+        |  updatedAt DateTime @updatedAt
+        |}
+      """.stripMargin
+    }
+    database.setup(project)
+
+    val userId = server
+      .query(
+        s"""mutation {
+         |  createUser(
+         |    data:{
+         |      name: "Staplerfahrer Klaus"
+         |    }
+         |  ){
+         |    id
+         |  }
+         |}""".stripMargin,
+        project = project
+      )
+      .pathAsString("data.createUser.id")
+
+    val res = server
+      .query(
+        s"""mutation {
+         |  updateUser(
+         |    where: {
+         |      id: "$userId"
+         |    }
+         |    data:{
+         |      createdAt: "2000-01-01T00:00:00Z"
+         |      updatedAt: "2001-01-01T00:00:00Z"
+         |    }
+         |  ){
+         |    createdAt
+         |    updatedAt
+         |  }
+         |}""".stripMargin,
+        project = project
+      )
+
+    // We currently have a datetime precision of 3, so Prisma will add .000
+    res.pathAsString("data.updateUser.createdAt") should be("2000-01-01T00:00:00.000Z")
+    res.pathAsString("data.updateUser.updatedAt") should be("2001-01-01T00:00:00.000Z")
+  }
 }
