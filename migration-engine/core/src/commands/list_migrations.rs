@@ -18,9 +18,8 @@ impl<'a> MigrationCommand for ListMigrationsCommand {
     {
         let migration_persistence = engine.connector().migration_persistence();
 
-        let result: CommandResult<Self::Output> = migration_persistence
-            .load_all()
-            .await
+        let result: CommandResult<Self::Output> = migration_persistence.load_all()
+            .await?
             .into_iter()
             .map(|migration| convert_migration_to_list_migration_steps_output(&engine, migration))
             .collect();
