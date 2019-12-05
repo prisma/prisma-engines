@@ -140,9 +140,14 @@ async fn creating_a_field_for_an_existing_column_and_simultaneously_making_it_op
     assert_eq!(column.is_required(), false);
 }
 
-#[test_each_connector(ignore = "mysql")]
+#[test_one_connector(connector = "postgres")]
 async fn creating_a_scalar_list_field_for_an_existing_table_must_work(api: &TestApi) {
     let dm1 = r#"
+            datasource pg {
+              provider = "postgres"
+              url = "postgres://localhost:5432"
+            }
+
             model Blog {
                 id Int @id
             }
@@ -180,6 +185,11 @@ async fn creating_a_scalar_list_field_for_an_existing_table_must_work(api: &Test
     assert!(result.has_table("Blog_tags"));
 
     let dm2 = r#"
+            datasource pg {
+              provider = "postgres"
+              url = "postgres://localhost:5432"
+            }
+
             model Blog {
                 id Int @id
                 tags String[]
@@ -228,9 +238,14 @@ async fn delete_a_field_for_a_non_existent_column_must_work(api: &TestApi) {
     assert_eq!(result, final_result);
 }
 
-#[test_each_connector]
+#[test_one_connector(connector = "postgres")]
 async fn deleting_a_scalar_list_field_for_a_non_existent_list_table_must_work(api: &TestApi) {
     let dm1 = r#"
+            datasource pg {
+              provider = "postgres"
+              url = "postgres://localhost:5432"
+            }
+
             model Blog {
                 id Int @id
                 tags String[]
@@ -248,6 +263,11 @@ async fn deleting_a_scalar_list_field_for_a_non_existent_list_table_must_work(ap
     assert!(!result.has_table("Blog_tags"));
 
     let dm2 = r#"
+            datasource pg {
+              provider = "postgres"
+              url = "postgres://localhost:5432"
+            }
+
             model Blog {
                 id Int @id
             }

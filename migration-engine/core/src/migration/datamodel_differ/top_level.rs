@@ -20,6 +20,14 @@ impl<'a> TopDiffer<'a> {
         })
     }
 
+    pub(crate) fn created_datasources(&self) -> impl Iterator<Item = &ast::SourceConfig> {
+        self.next_sources().filter(move |next| {
+            self.previous_sources()
+                .find(|previous| sources_match(previous, next))
+                .is_none()
+        })
+    }
+
     /// Iterator over the models present in `next` but not `previous`.
     pub(crate) fn created_models(&self) -> impl Iterator<Item = &ast::Model> {
         self.next_models().filter(move |next_model| {
@@ -97,6 +105,14 @@ impl<'a> TopDiffer<'a> {
         })
     }
 
+    fn previous_sources(&self) -> impl Iterator<Item = &ast::SourceConfig> {
+        walk_sources(self.previous)
+    }
+
+    fn next_sources(&self) -> impl Iterator<Item = &ast::SourceConfig> {
+        walk_sources(self.next)
+    }
+
     /// Iterator over the models in `previous`.
     fn previous_models(&self) -> impl Iterator<Item = &ast::Model> {
         walk_models(self.previous)
@@ -126,6 +142,14 @@ impl<'a> TopDiffer<'a> {
     pub fn next_type_aliases(&self) -> impl Iterator<Item = &ast::Field> {
         walk_type_aliases(self.next)
     }
+}
+
+fn walk_sources(ast: &ast::SchemaAst) -> impl Iterator<Item = &ast::SourceConfig> {
+    ast.tops.iter().filter_map(Top::as_source)
+}
+
+fn sources_match(previous: &ast::SourceConfig, next: &ast::SourceConfig) -> bool {
+    previous.name.name == next.name.name
 }
 
 fn walk_enums(ast: &ast::SchemaAst) -> impl Iterator<Item = &ast::Enum> {

@@ -75,4 +75,11 @@ impl Top {
             _ => None,
         }
     }
+
+    pub fn as_source(&self) -> Option<&SourceConfig> {
+        match self {
+            Top::Source(source) => Some(source),
+            _ => None,
+        }
+    }
 }

@@ -1,6 +1,6 @@
-use datamodel::ast::{self, SchemaAst};
+use datamodel::ast::{self, ArgumentContainer, SchemaAst};
 use failure::{format_err, Fail};
-use migration_connector::steps::{self, MigrationStep};
+use migration_connector::steps::{self, CreateSource, MigrationStep};
 
 pub trait DataModelCalculator: Send + Sync + 'static {
     fn infer(&self, current: &SchemaAst, steps: &[MigrationStep]) -> Result<SchemaAst, CalculatorError>;
@@ -58,7 +58,30 @@ fn apply_step(datamodel: &mut ast::SchemaAst, step: &MigrationStep) -> Result<()
         MigrationStep::UpdateDirectiveArgument(update_directive_argument) => {
             apply_update_directive_argument(datamodel, update_directive_argument)
         }
+        MigrationStep::CreateSource(create_source) => apply_create_source(datamodel, create_source)?,
     };
+
+    Ok(())
+}
+
+fn apply_create_source(datamodel: &mut ast::SchemaAst, step: &CreateSource) -> Result<(), CalculatorError> {
+    let steps::CreateSource { name } = step;
+    if let Some(_) = datamodel.find_source(name) {
+        return Err(format_err!(
+            "The datasource {} already exists in this Schema. It is not possible to create it once more.",
+            name
+        )
+        .into());
+    }
+
+    let new_source = ast::SourceConfig {
+        documentation: None,
+        name: new_ident(name.clone()),
+        span: new_span(),
+        properties: Vec::new(),
+    };
+
+    datamodel.tops.push(ast::Top::Source(new_source));
 
     Ok(())
 }
@@ -347,7 +370,7 @@ fn apply_create_directive(
         .ok_or_else(|| format_err!("CreateDirective on absent target: {:?}.", step))?;
 
     let new_directive = ast::Directive {
-        name: new_ident(step.locator.directive.clone()),
+        name: new_ident(step.locator.argument_container.clone()),
         arguments: step
             .locator
             .arguments
@@ -380,9 +403,11 @@ fn apply_delete_directive(
 }
 
 fn apply_create_directive_argument(datamodel: &mut ast::SchemaAst, step: &steps::CreateDirectiveArgument) {
-    let directive = find_directive_mut(datamodel, &step.directive_location).unwrap();
+    let mut argument_container = find_argument_container(datamodel, &step.directive_location).unwrap();
 
-    directive.arguments.push(ast::Argument {
+    eprintln!("applying {:?}", step);
+
+    argument_container.arguments().push(ast::Argument {
         name: new_ident(step.argument.clone()),
         span: new_span(),
         value: step.value.to_ast_expression(),
@@ -390,9 +415,9 @@ fn apply_create_directive_argument(datamodel: &mut ast::SchemaAst, step: &steps:
 }
 
 fn apply_update_directive_argument(datamodel: &mut ast::SchemaAst, step: &steps::UpdateDirectiveArgument) {
-    let directive = find_directive_mut(datamodel, &step.directive_location).unwrap();
+    let mut argument_container = find_argument_container(datamodel, &step.directive_location).unwrap();
 
-    for argument in directive.arguments.iter_mut() {
+    for argument in argument_container.arguments().iter_mut() {
         if argument.name.name == step.argument {
             argument.value = step.new_value.to_ast_expression();
         }
@@ -400,15 +425,15 @@ fn apply_update_directive_argument(datamodel: &mut ast::SchemaAst, step: &steps:
 }
 
 fn apply_delete_directive_argument(datamodel: &mut ast::SchemaAst, step: &steps::DeleteDirectiveArgument) {
-    let directive = find_directive_mut(datamodel, &step.directive_location).unwrap();
+    let mut argument_container = find_argument_container(datamodel, &step.directive_location).unwrap();
 
-    let new_arguments = directive
-        .arguments
+    let new_arguments = argument_container
+        .arguments()
         .drain(..)
         .filter(|arg| arg.name.name != step.argument)
         .collect();
 
-    directive.arguments = new_arguments;
+    argument_container.set_arguments(new_arguments)
 }
 
 fn apply_create_type_alias(
@@ -486,25 +511,41 @@ fn new_span() -> ast::Span {
     ast::Span::empty()
 }
 
-fn find_directives_mut<'a>(
-    datamodel: &'a mut ast::SchemaAst,
-    location: &steps::DirectiveType,
-) -> Option<&'a mut Vec<ast::Directive>> {
-    let directives = match location {
-        steps::DirectiveType::Field { model, field } => &mut datamodel.find_field_mut(&model, &field)?.directives,
-        steps::DirectiveType::Model { model } => &mut datamodel.find_model_mut(&model)?.directives,
-        steps::DirectiveType::Enum { r#enum } => &mut datamodel.find_enum_mut(&r#enum)?.directives,
-        steps::DirectiveType::TypeAlias { type_alias } => &mut datamodel.find_type_alias_mut(&type_alias)?.directives,
-    };
-
-    Some(directives)
+fn find_argument_container<'schema>(
+    datamodel: &'schema mut ast::SchemaAst,
+    locator: &steps::ArgumentLocation,
+) -> Option<ArgumentContainer<'schema>> {
+    match locator.location {
+        steps::ArgumentType::Datasource | steps::ArgumentType::Generator => datamodel
+            .find_source_mut(&locator.argument_container)
+            .map(|sc| ArgumentContainer::SourceConfig(sc)),
+        _ => find_directive_mut(datamodel, locator).map(|d| ArgumentContainer::Directive(d)),
+    }
 }
 
 fn find_directive_mut<'a>(
     datamodel: &'a mut ast::SchemaAst,
-    locator: &steps::DirectiveLocation,
+    locator: &steps::ArgumentLocation,
 ) -> Option<&'a mut ast::Directive> {
     find_directives_mut(datamodel, &locator.location)?
         .iter_mut()
-        .find(|directive| directive.name.name == locator.directive)
+        .find(|directive| directive.name.name == locator.argument_container)
+}
+
+fn find_directives_mut<'a>(
+    datamodel: &'a mut ast::SchemaAst,
+    location: &steps::ArgumentType,
+) -> Option<&'a mut Vec<ast::Directive>> {
+    let directives = match location {
+        steps::ArgumentType::FieldDirective { model, field } => {
+            &mut datamodel.find_field_mut(&model, &field)?.directives
+        }
+        steps::ArgumentType::ModelDirective { model } => &mut datamodel.find_model_mut(&model)?.directives,
+        steps::ArgumentType::EnumDirective { r#enum } => &mut datamodel.find_enum_mut(&r#enum)?.directives,
+        steps::ArgumentType::TypeAlias { type_alias } => &mut datamodel.find_type_alias_mut(&type_alias)?.directives,
+        steps::ArgumentType::Datasource => unreachable!(),
+        steps::ArgumentType::Generator => unreachable!(),
+    };
+
+    Some(directives)
 }

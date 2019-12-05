@@ -24,6 +24,7 @@ pub enum MigrationStep {
     CreateTypeAlias(CreateTypeAlias),
     UpdateTypeAlias(UpdateTypeAlias),
     DeleteTypeAlias(DeleteTypeAlias),
+    CreateSource(CreateSource),
 }
 
 #[derive(Debug, Deserialize, Serialize, PartialEq, Eq, Hash, Clone)]
@@ -134,14 +135,14 @@ pub struct DeleteEnum {
 #[serde(rename_all = "camelCase")]
 pub struct CreateDirective {
     #[serde(flatten)]
-    pub locator: DirectiveLocation,
+    pub locator: ArgumentLocation,
 }
 
 #[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteDirective {
     #[serde(flatten)]
-    pub locator: DirectiveLocation,
+    pub locator: ArgumentLocation,
 }
 
 #[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
@@ -178,10 +179,10 @@ impl Into<ast::Argument> for &Argument {
 
 #[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
 #[serde(rename_all = "camelCase")]
-pub struct DirectiveLocation {
+pub struct ArgumentLocation {
     #[serde(flatten)]
-    pub location: DirectiveType,
-    pub directive: String,
+    pub location: ArgumentType,
+    pub argument_container: String,
     /// The arguments of the directive are required to match directives that can be repeated,
     /// like `@@unique` on a model. This is `None` when matching can be done without comparing
     /// the arguments, and `Some` when a directive should be matched exactly.
@@ -189,9 +190,9 @@ pub struct DirectiveLocation {
     pub arguments: Option<Vec<Argument>>,
 }
 
-impl DirectiveLocation {
+impl ArgumentLocation {
     pub fn matches_ast_directive(&self, directive: &ast::Directive) -> bool {
-        if self.directive != directive.name.name {
+        if self.argument_container != directive.name.name {
             return false;
         }
 
@@ -214,19 +215,21 @@ impl DirectiveLocation {
 }
 
 #[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
-#[serde(rename_all = "camelCase", deny_unknown_fields, untagged)]
-pub enum DirectiveType {
+#[serde(rename_all = "camelCase", deny_unknown_fields, tag = "argumentType")]
+pub enum ArgumentType {
     TypeAlias { type_alias: String },
-    Field { model: String, field: String },
-    Model { model: String },
-    Enum { r#enum: String },
+    FieldDirective { model: String, field: String },
+    ModelDirective { model: String },
+    EnumDirective { r#enum: String },
+    Datasource,
+    Generator,
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateDirectiveArgument {
     #[serde(flatten)]
-    pub directive_location: DirectiveLocation,
+    pub directive_location: ArgumentLocation,
     // TODO: figure out whether we want this, or an option, for default arguments
     pub argument: String,
     pub value: MigrationExpression,
@@ -236,7 +239,7 @@ pub struct CreateDirectiveArgument {
 #[serde(rename_all = "camelCase")]
 pub struct DeleteDirectiveArgument {
     #[serde(flatten)]
-    pub directive_location: DirectiveLocation,
+    pub directive_location: ArgumentLocation,
     // TODO: figure out whether we want this, or an option, for default arguments
     pub argument: String,
 }
@@ -245,7 +248,7 @@ pub struct DeleteDirectiveArgument {
 #[serde(rename_all = "camelCase")]
 pub struct UpdateDirectiveArgument {
     #[serde(flatten)]
-    pub directive_location: DirectiveLocation,
+    pub directive_location: ArgumentLocation,
     pub argument: String,
     // TODO: figure out whether we want this, or an option, for default arguments
     pub new_value: MigrationExpression,
@@ -291,6 +294,11 @@ pub struct DeleteTypeAlias {
     pub type_alias: String,
 }
 
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct CreateSource {
+    pub name: String,
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -299,12 +307,12 @@ mod tests {
     #[test]
     fn directive_location_serialization_gives_expected_json_shape() {
         let create_directive = CreateDirective {
-            locator: DirectiveLocation {
-                location: DirectiveType::Field {
+            locator: ArgumentLocation {
+                location: ArgumentType::FieldDirective {
                     model: "Cat".to_owned(),
                     field: "owner".to_owned(),
                 },
-                directive: "status".to_owned(),
+                argument_container: "status".to_owned(),
                 arguments: None,
             },
         };

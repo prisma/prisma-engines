@@ -23,6 +23,7 @@ pub(crate) fn diff(previous: &ast::SchemaAst, next: &ast::SchemaAst) -> Vec<Migr
 
     push_type_aliases(&mut steps, &differ);
     push_enums(&mut steps, &differ);
+    push_datasources(&mut steps, &differ);
     push_models(&mut steps, &differ);
 
     steps
@@ -46,7 +47,7 @@ fn push_created_type_aliases<'a>(steps: &mut Steps, type_aliases: impl Iterator<
 
         steps.push(MigrationStep::CreateTypeAlias(create_type_alias_step));
 
-        let location = steps::DirectiveType::TypeAlias {
+        let location = steps::ArgumentType::TypeAlias {
             type_alias: created_type_alias.name.name.clone(),
         };
 
@@ -66,7 +67,7 @@ fn push_deleted_type_aliases<'a>(steps: &mut Steps, type_aliases: impl Iterator<
 
 fn push_updated_type_aliases<'a>(steps: &mut Steps, type_aliases: impl Iterator<Item = FieldDiffer<'a>>) {
     for updated_type_alias in type_aliases {
-        let location = steps::DirectiveType::TypeAlias {
+        let location = steps::ArgumentType::TypeAlias {
             type_alias: updated_type_alias.previous.name.name.clone(),
         };
 
@@ -103,7 +104,7 @@ fn push_created_enums<'a>(steps: &mut Steps, enums: impl Iterator<Item = &'a ast
 
         steps.push(MigrationStep::CreateEnum(create_enum_step));
 
-        let location = steps::DirectiveType::Enum {
+        let location = steps::ArgumentType::EnumDirective {
             r#enum: r#enum.name.name.clone(),
         };
 
@@ -143,13 +144,40 @@ fn push_updated_enums<'a>(steps: &mut Steps, enums: impl Iterator<Item = EnumDif
             steps.push(MigrationStep::UpdateEnum(update_enum_step));
         }
 
-        let location = steps::DirectiveType::Enum {
+        let location = steps::ArgumentType::EnumDirective {
             r#enum: updated_enum.previous.name.name.clone(),
         };
 
         push_created_directives(steps, &location, updated_enum.created_directives());
         push_updated_directives(steps, &location, updated_enum.directive_pairs());
         push_deleted_directives(steps, &location, updated_enum.deleted_directives());
+    }
+}
+
+fn push_datasources(steps: &mut Steps, differ: &TopDiffer<'_>) {
+    push_created_sources(steps, differ.created_datasources());
+}
+
+fn push_created_sources<'a>(steps: &mut Steps, sources: impl Iterator<Item = &'a ast::SourceConfig>) {
+    for created_source in sources {
+        let location = steps::ArgumentType::Datasource {};
+        let create_source_step = steps::CreateSource {
+            name: created_source.name.name.clone(),
+        };
+
+        steps.push(MigrationStep::CreateSource(create_source_step));
+
+        //        push_created_directives(steps, &arguments_location, created_source.properties.iter());
+
+        let locator = steps::ArgumentLocation {
+            location,
+            argument_container: created_source.name.name.clone(),
+            arguments: None,
+        };
+
+        for argument in &created_source.properties {
+            push_created_directive_argument(steps, &locator, argument);
+        }
     }
 }
 
@@ -161,7 +189,7 @@ fn push_models(steps: &mut Steps, differ: &TopDiffer<'_>) {
 
 fn push_created_models<'a>(steps: &mut Steps, models: impl Iterator<Item = &'a ast::Model>) {
     for created_model in models {
-        let directive_location = steps::DirectiveType::Model {
+        let directive_location = steps::ArgumentType::ModelDirective {
             model: created_model.name.name.clone(),
         };
 
@@ -204,7 +232,7 @@ fn push_updated_models<'a>(steps: &mut Steps, models: impl Iterator<Item = Model
         push_deleted_fields(steps, model_name, model.deleted_fields());
         push_updated_fields(steps, model_name, model.field_pairs());
 
-        let directive_location = steps::DirectiveType::Model {
+        let directive_location = steps::ArgumentType::ModelDirective {
             model: model_name.clone(),
         };
 
@@ -233,7 +261,7 @@ fn push_created_fields<'a>(steps: &mut Steps, model_name: &'a str, fields: impl 
 
         steps.push(MigrationStep::CreateField(create_field_step));
 
-        let directive_location = steps::DirectiveType::Field {
+        let directive_location = steps::ArgumentType::FieldDirective {
             model: model_name.to_owned(),
             field: field.name.name.clone(),
         };
@@ -267,7 +295,7 @@ fn push_updated_fields<'a>(steps: &mut Steps, model_name: &'a str, fields: impl 
             steps.push(MigrationStep::UpdateField(update_field_step));
         }
 
-        let directive_location = steps::DirectiveType::Field {
+        let directive_location = steps::ArgumentType::FieldDirective {
             model: model_name.to_owned(),
             field: field.previous.name.name.clone(),
         };
@@ -280,7 +308,7 @@ fn push_updated_fields<'a>(steps: &mut Steps, model_name: &'a str, fields: impl 
 
 fn push_created_directives<'a>(
     steps: &mut Steps,
-    location: &steps::DirectiveType,
+    location: &steps::ArgumentType,
     directives: impl Iterator<Item = &'a ast::Directive>,
 ) {
     for directive in directives {
@@ -290,7 +318,7 @@ fn push_created_directives<'a>(
 
 fn push_created_directives_with_arguments<'a>(
     steps: &mut Steps,
-    location: &steps::DirectiveType,
+    location: &steps::ArgumentType,
     directives: impl Iterator<Item = &'a ast::Directive>,
 ) {
     for directive in directives {
@@ -298,15 +326,11 @@ fn push_created_directives_with_arguments<'a>(
     }
 }
 
-fn push_created_directive_with_arguments(
-    steps: &mut Steps,
-    location: steps::DirectiveType,
-    directive: &ast::Directive,
-) {
+fn push_created_directive_with_arguments(steps: &mut Steps, location: steps::ArgumentType, directive: &ast::Directive) {
     let step = steps::CreateDirective {
-        locator: steps::DirectiveLocation {
+        locator: steps::ArgumentLocation {
             location: location.clone(),
-            directive: directive.name.name.clone(),
+            argument_container: directive.name.name.clone(),
             arguments: Some(directive.arguments.iter().map(steps::Argument::from).collect()),
         },
     };
@@ -314,10 +338,10 @@ fn push_created_directive_with_arguments(
     steps.push(MigrationStep::CreateDirective(step));
 }
 
-fn push_created_directive(steps: &mut Steps, location: steps::DirectiveType, directive: &ast::Directive) {
-    let locator = steps::DirectiveLocation {
+fn push_created_directive(steps: &mut Steps, location: steps::ArgumentType, directive: &ast::Directive) {
+    let locator = steps::ArgumentLocation {
         location,
-        directive: directive.name.name.clone(),
+        argument_container: directive.name.name.clone(),
         arguments: None,
     };
 
@@ -334,7 +358,7 @@ fn push_created_directive(steps: &mut Steps, location: steps::DirectiveType, dir
 
 fn push_deleted_directives<'a>(
     steps: &mut Steps,
-    location: &steps::DirectiveType,
+    location: &steps::ArgumentType,
     directives: impl Iterator<Item = &'a ast::Directive>,
 ) {
     for directive in directives {
@@ -342,11 +366,11 @@ fn push_deleted_directives<'a>(
     }
 }
 
-fn push_deleted_directive(steps: &mut Steps, location: steps::DirectiveType, directive: &ast::Directive) {
+fn push_deleted_directive(steps: &mut Steps, location: steps::ArgumentType, directive: &ast::Directive) {
     let step = steps::DeleteDirective {
-        locator: steps::DirectiveLocation {
+        locator: steps::ArgumentLocation {
             location,
-            directive: directive.name.name.clone(),
+            argument_container: directive.name.name.clone(),
             arguments: None,
         },
     };
@@ -354,15 +378,11 @@ fn push_deleted_directive(steps: &mut Steps, location: steps::DirectiveType, dir
     steps.push(MigrationStep::DeleteDirective(step));
 }
 
-fn push_deleted_directive_with_arguments(
-    steps: &mut Steps,
-    location: steps::DirectiveType,
-    directive: &ast::Directive,
-) {
+fn push_deleted_directive_with_arguments(steps: &mut Steps, location: steps::ArgumentType, directive: &ast::Directive) {
     let step = steps::DeleteDirective {
-        locator: steps::DirectiveLocation {
+        locator: steps::ArgumentLocation {
             location,
-            directive: directive.name.name.clone(),
+            argument_container: directive.name.name.clone(),
             arguments: Some(directive.arguments.iter().map(steps::Argument::from).collect()),
         },
     };
@@ -372,7 +392,7 @@ fn push_deleted_directive_with_arguments(
 
 fn push_updated_directives<'a>(
     steps: &mut Steps,
-    location: &steps::DirectiveType,
+    location: &steps::ArgumentType,
     directives: impl Iterator<Item = DirectiveDiffer<'a>>,
 ) {
     for directive in directives {
@@ -380,10 +400,10 @@ fn push_updated_directives<'a>(
     }
 }
 
-fn push_updated_directive(steps: &mut Steps, location: steps::DirectiveType, directive: DirectiveDiffer<'_>) {
-    let locator = steps::DirectiveLocation {
+fn push_updated_directive(steps: &mut Steps, location: steps::ArgumentType, directive: DirectiveDiffer<'_>) {
+    let locator = steps::ArgumentLocation {
         arguments: None,
-        directive: directive.previous.name.name.clone(),
+        argument_container: directive.previous.name.name.clone(),
         location: location.clone(),
     };
 
@@ -402,7 +422,7 @@ fn push_updated_directive(steps: &mut Steps, location: steps::DirectiveType, dir
 
 fn push_created_directive_argument(
     steps: &mut Steps,
-    directive_location: &steps::DirectiveLocation,
+    directive_location: &steps::ArgumentLocation,
     argument: &ast::Argument,
 ) {
     let create_argument_step = steps::CreateDirectiveArgument {
@@ -416,7 +436,7 @@ fn push_created_directive_argument(
 
 fn push_updated_directive_argument(
     steps: &mut Steps,
-    directive_location: &steps::DirectiveLocation,
+    directive_location: &steps::ArgumentLocation,
     previous_argument: &ast::Argument,
     next_argument: &ast::Argument,
 ) {
@@ -436,7 +456,7 @@ fn push_updated_directive_argument(
     steps.push(MigrationStep::UpdateDirectiveArgument(update_argument_step));
 }
 
-fn push_deleted_directive_argument(steps: &mut Steps, directive_location: &steps::DirectiveLocation, argument: &str) {
+fn push_deleted_directive_argument(steps: &mut Steps, directive_location: &steps::ArgumentLocation, argument: &str) {
     let delete_argument_step = steps::DeleteDirectiveArgument {
         argument: argument.to_owned(),
         directive_location: directive_location.clone(),

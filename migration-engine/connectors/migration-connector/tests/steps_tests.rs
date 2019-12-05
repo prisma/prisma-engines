@@ -198,10 +198,10 @@ fn CreateDirective_must_work() {
     "#;
 
     let expected_step = MigrationStep::CreateDirective(CreateDirective {
-        locator: DirectiveLocation {
-            directive: "map".to_owned(),
+        locator: ArgumentLocation {
+            argument_container: "map".to_owned(),
             arguments: None,
-            location: DirectiveType::Model {
+            location: ArgumentType::ModelDirective {
                 model: "Blog".to_owned(),
             },
         },
@@ -222,9 +222,9 @@ fn minimal_DeleteDirective_must_work() {
     "#;
 
     let expected_step = MigrationStep::DeleteDirective(DeleteDirective {
-        locator: DirectiveLocation {
-            directive: "map".to_owned(),
-            location: DirectiveType::Field {
+        locator: ArgumentLocation {
+            argument_container: "map".to_owned(),
+            location: ArgumentType::FieldDirective {
                 model: "Blog".to_owned(),
                 field: "title".to_owned(),
             },
@@ -252,9 +252,9 @@ fn full_DeleteDirective_must_work() {
     "#;
 
     let expected_step = MigrationStep::DeleteDirective(DeleteDirective {
-        locator: DirectiveLocation {
-            directive: "unique".to_owned(),
-            location: DirectiveType::Model {
+        locator: ArgumentLocation {
+            argument_container: "unique".to_owned(),
+            location: ArgumentType::ModelDirective {
                 model: "Blog".to_owned(),
             },
             arguments: Some(vec![Argument {
@@ -280,9 +280,9 @@ fn UpdateDirectiveArgument_must_work() {
     "#;
 
     let expected_step = MigrationStep::UpdateDirectiveArgument(UpdateDirectiveArgument {
-        directive_location: DirectiveLocation {
-            directive: "map".to_owned(),
-            location: DirectiveType::Enum {
+        directive_location: ArgumentLocation {
+            argument_container: "map".to_owned(),
+            location: ArgumentType::EnumDirective {
                 r#enum: "CatMood".to_owned(),
             },
             arguments: None,
@@ -307,10 +307,10 @@ fn CreateDirectiveArgument_must_work() {
     "#;
 
     let expected_step = MigrationStep::CreateDirectiveArgument(CreateDirectiveArgument {
-        directive_location: DirectiveLocation {
+        directive_location: ArgumentLocation {
             arguments: None,
-            directive: "map".to_owned(),
-            location: DirectiveType::Enum {
+            argument_container: "map".to_owned(),
+            location: ArgumentType::EnumDirective {
                 r#enum: "CatMood".to_owned(),
             },
         },
@@ -333,10 +333,10 @@ fn DeleteDirectiveArgument_must_work() {
     "#;
 
     let expected_step = MigrationStep::DeleteDirectiveArgument(DeleteDirectiveArgument {
-        directive_location: DirectiveLocation {
-            directive: "map".to_owned(),
+        directive_location: ArgumentLocation {
+            argument_container: "map".to_owned(),
             arguments: None,
-            location: DirectiveType::Enum {
+            location: ArgumentType::EnumDirective {
                 r#enum: "CatMood".to_owned(),
             },
         },
