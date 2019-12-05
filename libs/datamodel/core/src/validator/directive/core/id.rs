@@ -11,8 +11,13 @@ impl DirectiveValidator<dml::Field> for IdDirectiveValidator {
     }
 
     fn validate_and_apply(&self, args: &mut Args, obj: &mut dml::Field) -> Result<(), DatamodelError> {
+        let strategy = match obj.field_type {
+            dml::FieldType::Base(dml::ScalarType::Int) => dml::IdStrategy::Auto,
+            _ => dml::IdStrategy::None,
+        };
+
         let mut id_info = dml::IdInfo {
-            strategy: dml::IdStrategy::Auto,
+            strategy,
             sequence: None,
         };
 
