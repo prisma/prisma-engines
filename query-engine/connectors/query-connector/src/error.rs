@@ -1,9 +1,28 @@
 use crate::filter::Filter;
 use failure::{Error, Fail};
 use prisma_models::prelude::DomainError;
+use user_facing_errors::KnownError;
 
 #[derive(Debug, Fail)]
-pub enum ConnectorError {
+#[fail(display = "{}", kind)]
+pub struct ConnectorError {
+    /// An optional error already rendered for users in case the migration core does not handle it.
+    pub user_facing_error: Option<KnownError>,
+    /// The error information for internal use.
+    pub kind: ErrorKind,
+}
+
+impl ConnectorError {
+    pub fn from_kind(kind: ErrorKind) -> Self {
+        ConnectorError {
+            user_facing_error: None,
+            kind,
+        }
+    }
+}
+
+#[derive(Debug, Fail)]
+pub enum ErrorKind {
     #[fail(display = "Unique constraint failed: {}", field_name)]
     UniqueConstraintViolation { field_name: String },
 
@@ -54,9 +73,7 @@ pub enum ConnectorError {
     RecordsNotConnected {
         relation_name: String,
         parent_name: String,
-        // parent_where: Option<Box<RecordFinderInfo>>,
         child_name: String,
-        // child_where: Option<Box<RecordFinderInfo>>,
     },
 
     #[fail(display = "Conversion error: {}", _0)]
@@ -80,6 +97,6 @@ pub enum ConnectorError {
 
 impl From<DomainError> for ConnectorError {
     fn from(e: DomainError) -> ConnectorError {
-        ConnectorError::DomainError(e)
+        ConnectorError::from_kind(ErrorKind::DomainError(e))
     }
 }

@@ -28,6 +28,31 @@ pub enum QueryParserError {
 }
 
 impl QueryParserError {
+    pub(crate) fn location(&self) -> String {
+        let mut node = self;
+
+        std::iter::from_fn(|| match node {
+            QueryParserError::FieldValidationError {
+                field_name: name,
+                inner,
+            }
+            | QueryParserError::ArgumentValidationError { argument: name, inner }
+            | QueryParserError::ObjectValidationError {
+                object_name: name,
+                inner,
+            } => {
+                node = inner.as_ref();
+                Some(name)
+            }
+            _ => None,
+        })
+        .fold(String::with_capacity(32), |mut path, elem| {
+            path.push_str(".");
+            path.push_str(elem);
+            path
+        })
+    }
+
     pub fn format(&self, ident: usize) -> String {
         match self {
             // Validation root
