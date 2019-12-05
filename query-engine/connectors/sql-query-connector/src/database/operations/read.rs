@@ -2,7 +2,7 @@ use crate::{
     query_builder::read::{self, ManyRelatedRecordsBaseQuery, ManyRelatedRecordsQueryBuilder},
     QueryExt, SqlError,
 };
-use connector_interface::{error::ConnectorError, *};
+use connector_interface::*;
 use itertools::Itertools;
 use prisma_models::*;
 use quaint::ast::*;
@@ -17,7 +17,7 @@ pub async fn get_single_record(
     conn: &dyn QueryExt,
     record_finder: &RecordFinder,
     selected_fields: &SelectedFields,
-) -> connector_interface::Result<Option<SingleRecord>> {
+) -> crate::Result<Option<SingleRecord>> {
     let model = record_finder.field.model();
     let query = read::get_records(&model, selected_fields, record_finder);
     let field_names = selected_fields.names();
@@ -40,7 +40,7 @@ pub async fn get_many_records(
     model: &ModelRef,
     query_arguments: QueryArguments,
     selected_fields: &SelectedFields,
-) -> connector_interface::Result<ManyRecords> {
+) -> crate::Result<ManyRecords> {
     let field_names = selected_fields.names();
     let idents = selected_fields.type_identifiers();
     let query = read::get_records(model, selected_fields, query_arguments);
@@ -61,7 +61,7 @@ pub async fn get_related_records<T>(
     from_record_ids: &[GraphqlId],
     query_arguments: QueryArguments,
     selected_fields: &SelectedFields,
-) -> connector_interface::Result<ManyRecords>
+) -> crate::Result<ManyRecords>
 where
     T: ManyRelatedRecordsQueryBuilder,
 {
@@ -88,12 +88,12 @@ where
         }
     };
 
-    let records: Result<Vec<Record>> = conn
+    let records: crate::Result<Vec<Record>> = conn
         .filter(query, idents.as_slice())
         .await?
         .into_iter()
         .map(|mut row| {
-            let parent_id = row.values.pop().ok_or(ConnectorError::ColumnDoesNotExist)?;
+            let parent_id = row.values.pop().ok_or(SqlError::ColumnDoesNotExist)?;
 
             // Relation id is always the second last value. We don't need it
             // here and we don't need it in the record.
@@ -116,7 +116,7 @@ pub async fn get_scalar_list_values(
     conn: &dyn QueryExt,
     list_field: &ScalarFieldRef,
     record_ids: Vec<GraphqlId>,
-) -> connector_interface::Result<Vec<ScalarListValues>> {
+) -> crate::Result<Vec<ScalarListValues>> {
     let type_identifier = list_field.type_identifier;
     let query = read::get_scalar_list_values_by_record_ids(list_field, record_ids);
     let rows = conn
@@ -136,7 +136,7 @@ pub async fn get_scalar_list_values(
                 value,
             })
         })
-        .collect::<connector_interface::Result<Vec<ScalarListElement>>>()?;
+        .collect::<crate::Result<Vec<ScalarListElement>>>()?;
 
     let mut list_values = Vec::new();
 
@@ -155,7 +155,7 @@ pub async fn count_by_model(
     conn: &dyn QueryExt,
     model: &ModelRef,
     query_arguments: QueryArguments,
-) -> connector_interface::Result<usize> {
+) -> crate::Result<usize> {
     let query = read::count_by_model(model, query_arguments);
     let result = conn.find_int(query).await? as usize;
 
