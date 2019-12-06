@@ -729,7 +729,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |   }
          |  ) {
          |    nameTop
-         |    middles {
+         |    middles (orderBy: id_ASC) {
          |      nameMiddle
          |      bottom {
          |        nameBottom
