@@ -11,17 +11,19 @@ impl DirectiveValidator<dml::Field> for IdDirectiveValidator {
     }
 
     fn validate_and_apply(&self, args: &mut Args, obj: &mut dml::Field) -> Result<(), DatamodelError> {
-        let mut id_info = dml::IdInfo {
-            strategy: dml::IdStrategy::Auto,
+        let strategy = match obj.field_type {
+            dml::FieldType::Base(dml::ScalarType::Int) => dml::IdStrategy::Auto,
+            _ if obj.default_value.is_some() => dml::IdStrategy::Auto,
+            _ => dml::IdStrategy::None,
+        };
+
+        let id_info = dml::IdInfo {
+            strategy,
             sequence: None,
         };
 
         if obj.arity != dml::FieldArity::Required {
             return self.error("Fields that are marked as id must be required.", args.span());
-        }
-
-        if let Ok(arg) = args.arg("strategy") {
-            id_info.strategy = arg.parse_literal::<dml::IdStrategy>()?
         }
 
         obj.id_info = Some(id_info);
@@ -34,13 +36,8 @@ impl DirectiveValidator<dml::Field> for IdDirectiveValidator {
         field: &dml::Field,
         _datamodel: &dml::Datamodel,
     ) -> Result<Vec<ast::Directive>, DatamodelError> {
-        if let Some(id_info) = &field.id_info {
-            let mut args = Vec::new();
-
-            if id_info.strategy != dml::IdStrategy::Auto {
-                args.push(ast::Argument::new_constant("strategy", &id_info.strategy.to_string()));
-            }
-            return Ok(vec![ast::Directive::new(self.directive_name(), args)]);
+        if let Some(_) = &field.id_info {
+            return Ok(vec![ast::Directive::new(self.directive_name(), Vec::new())]);
         }
 
         Ok(vec![])

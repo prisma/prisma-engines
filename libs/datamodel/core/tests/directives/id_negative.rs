@@ -21,23 +21,6 @@ fn id_should_error_if_the_field_is_not_required() {
     ));
 }
 
-#[test]
-fn id_should_error_if_an_unknown_strategy_is_used() {
-    let dml = r#"
-    model Model {
-        id Int @id(strategy: FOO)
-    }
-    "#;
-
-    let errors = parse_error(dml);
-
-    errors.assert_is(DatamodelError::new_literal_parser_error(
-        "id strategy",
-        "FOO",
-        Span::new(48, 51),
-    ));
-}
-
 // DISABLED until we decide on this.
 #[test]
 fn id_should_error_on_model_without_id() {
