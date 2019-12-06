@@ -364,7 +364,7 @@ fn get_column_type(tpe: &str) -> ColumnType {
         "float[]" => ColumnTypeFamily::Float,
         "integer[]" => ColumnTypeFamily::Int,
         "text[]" => ColumnTypeFamily::String,
-        _ => ColumnTypeFamily::Unknown, //        x => panic!(format!("type '{}' is not supported here yet", x)),
+        _ => ColumnTypeFamily::Unknown,
     };
     ColumnType {
         raw: tpe.to_string(),
