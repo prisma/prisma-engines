@@ -12,6 +12,7 @@ introspection-connector = { path = "../connectors/introspection-connector" }
 sql-introspection-connector = { path = "../connectors/sql-introspection-connector" }
 datamodel = { path = "../../libs/datamodel/core" }
 failure = "0.1"
+clap = "2.33"
 
 jsonrpc-core = "13.0"
 jsonrpc-stdio-server = "13.0"
