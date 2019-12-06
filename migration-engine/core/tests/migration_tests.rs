@@ -272,7 +272,7 @@ async fn changing_the_type_of_an_id_field_must_work(api: &TestApi) {
                 id String @id @default(cuid())
             }
         "#;
-    let result = api.infer_and_apply(&dm2).await.sql_schema;
+    let result = dbg!(api.infer_and_apply(&dm2).await).sql_schema;
     let table = result.table_bang("A");
     let column = table.column_bang("b");
     assert_eq!(column.tpe.family, ColumnTypeFamily::String);
