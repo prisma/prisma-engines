@@ -66,7 +66,6 @@ pub enum SqlError {
 
 impl SqlError {
     pub(crate) fn into_connector_error(self, connection_info: &super::ConnectionInfo) -> ConnectorError {
-        dbg!(&self);
         match self {
             SqlError::DatabaseDoesNotExist { db_name, cause } => ConnectorError {
                 user_facing_error: render_quaint_error(&cause, connection_info),
@@ -114,7 +113,6 @@ impl SqlError {
 
 impl From<quaint::error::Error> for SqlError {
     fn from(error: quaint::error::Error) -> Self {
-        dbg!(&error);
         match &error {
             quaint::error::Error::DatabaseDoesNotExist { db_name } => Self::DatabaseDoesNotExist {
                 db_name: db_name.clone(),
