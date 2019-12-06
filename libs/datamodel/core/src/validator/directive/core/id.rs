@@ -1,6 +1,7 @@
 use crate::error::DatamodelError;
 use crate::validator::directive::{Args, DirectiveValidator};
 use crate::{ast, dml};
+use datamodel_connector::scalars::ScalarValue;
 
 /// Prismas builtin `@primary` directive.
 pub struct IdDirectiveValidator {}
@@ -11,9 +12,11 @@ impl DirectiveValidator<dml::Field> for IdDirectiveValidator {
     }
 
     fn validate_and_apply(&self, args: &mut Args, obj: &mut dml::Field) -> Result<(), DatamodelError> {
-        let strategy = match obj.field_type {
-            dml::FieldType::Base(dml::ScalarType::Int) => dml::IdStrategy::Auto,
-            _ if obj.default_value.is_some() => dml::IdStrategy::Auto,
+        let strategy = match (&obj.field_type, &obj.default_value) {
+            (dml::FieldType::Base(dml::ScalarType::Int), _) => dml::IdStrategy::Auto,
+            (dml::FieldType::Base(dml::ScalarType::String), Some(ScalarValue::Expression(_, _, _))) => {
+                dml::IdStrategy::Auto
+            }
             _ => dml::IdStrategy::None,
         };
 
