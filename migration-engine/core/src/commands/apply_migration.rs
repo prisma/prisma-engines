@@ -58,7 +58,8 @@ impl<'a> ApplyMigrationCommand<'a> {
             .datamodel_calculator()
             .infer(&last_non_watch_datamodel, self.input.steps.as_slice())?;
 
-        self.handle_migration(&engine, current_datamodel, next_datamodel_ast).await
+        self.handle_migration(&engine, current_datamodel, next_datamodel_ast)
+            .await
     }
 
     async fn handle_normal_migration<C, D>(
@@ -78,7 +79,8 @@ impl<'a> ApplyMigrationCommand<'a> {
             .datamodel_calculator()
             .infer(&current_datamodel_ast, self.input.steps.as_slice())?;
 
-        self.handle_migration(&engine, current_datamodel, next_datamodel_ast).await
+        self.handle_migration(&engine, current_datamodel, next_datamodel_ast)
+            .await
     }
 
     async fn handle_migration<C, D>(

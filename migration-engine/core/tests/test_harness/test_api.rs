@@ -86,7 +86,10 @@ impl TestApi {
     }
 
     pub async fn infer_and_apply(&self, datamodel: &str) -> InferAndApplyOutput {
-        let migration_id = format!("migration-{}", MIGRATION_ID_COUNTER.fetch_add(1, std::sync::atomic::Ordering::Relaxed));
+        let migration_id = format!(
+            "migration-{}",
+            MIGRATION_ID_COUNTER.fetch_add(1, std::sync::atomic::Ordering::Relaxed)
+        );
 
         self.infer_and_apply_with_migration_id(datamodel, &migration_id).await
     }

@@ -369,7 +369,14 @@ async fn unique_constraint_errors_in_migrations_must_return_a_known_error(api: &
 #[test_one_connector(connector = "postgres")]
 async fn tls_errors_must_be_mapped_in_the_cli(_api: &TestApi) {
     let url = format!("{}&sslmode=require&sslaccept=strict", postgres_url());
-    let error = get_cli_error(&["migration-engine", "cli", "--datasource", &url, "--can_connect_to_database"]).await;
+    let error = get_cli_error(&[
+        "migration-engine",
+        "cli",
+        "--datasource",
+        &url,
+        "--can_connect_to_database",
+    ])
+    .await;
 
     let json_error = serde_json::to_value(&error).unwrap();
 

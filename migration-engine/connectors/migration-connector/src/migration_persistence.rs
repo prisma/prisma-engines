@@ -155,7 +155,9 @@ impl Migration {
     }
 
     pub fn datamodel(&self) -> Datamodel {
-        datamodel::lift_ast(&self.datamodel_ast()).ok().unwrap_or_else(Datamodel::empty)
+        datamodel::lift_ast(&self.datamodel_ast())
+            .ok()
+            .unwrap_or_else(Datamodel::empty)
     }
 }
 

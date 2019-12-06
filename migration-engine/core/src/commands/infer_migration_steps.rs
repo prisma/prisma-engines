@@ -5,9 +5,9 @@ use crate::commands::command::*;
 use crate::migration_engine::MigrationEngine;
 use crate::*;
 use datamodel::ast::{parser::parse, SchemaAst};
-use tracing::debug;
 use migration_connector::*;
 use serde::Deserialize;
+use tracing::debug;
 
 pub struct InferMigrationStepsCommand<'a> {
     input: &'a InferMigrationStepsInput,

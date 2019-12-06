@@ -119,8 +119,7 @@ impl RpcApi {
         cmd: RpcCommand,
         params: &Params,
     ) -> std::result::Result<serde_json::Value, JsonRpcError> {
-        let result: Result<serde_json::Value, RunCommandError> =
-            Self::run_command(&executor, cmd, params).await;
+        let result: Result<serde_json::Value, RunCommandError> = Self::run_command(&executor, cmd, params).await;
 
         match result {
             Ok(result) => Ok(result),

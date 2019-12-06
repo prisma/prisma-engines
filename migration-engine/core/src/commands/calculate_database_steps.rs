@@ -4,9 +4,9 @@ use super::MigrationStepsResultOutput;
 use crate::commands::command::*;
 use crate::migration_engine::MigrationEngine;
 use datamodel::ast::SchemaAst;
-use tracing::debug;
 use migration_connector::*;
 use serde::Deserialize;
+use tracing::debug;
 
 pub struct CalculateDatabaseStepsCommand<'a> {
     input: &'a CalculateDatabaseStepsInput,

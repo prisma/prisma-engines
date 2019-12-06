@@ -78,7 +78,10 @@ where
 {
     async fn apply_migration(&self, input: &ApplyMigrationInput) -> crate::Result<MigrationStepsResultOutput> {
         self.handle_command::<ApplyMigrationCommand>(input)
-            .instrument(tracing::info_span!("ApplyMigration", migration_id = input.migration_id.as_str()))
+            .instrument(tracing::info_span!(
+                "ApplyMigration",
+                migration_id = input.migration_id.as_str()
+            ))
             .await
     }
 
@@ -102,7 +105,10 @@ where
         input: &InferMigrationStepsInput,
     ) -> crate::Result<MigrationStepsResultOutput> {
         self.handle_command::<InferMigrationStepsCommand>(input)
-            .instrument(tracing::info_span!("InferMigrationSteps", migration_id = input.migration_id.as_str()))
+            .instrument(tracing::info_span!(
+                "InferMigrationSteps",
+                migration_id = input.migration_id.as_str()
+            ))
             .await
     }
 
@@ -114,7 +120,10 @@ where
 
     async fn migration_progress(&self, input: &MigrationProgressInput) -> crate::Result<MigrationProgressOutput> {
         self.handle_command::<MigrationProgressCommand>(input)
-            .instrument(tracing::info_span!("MigrationProgress", migration_id = input.migration_id.as_str()))
+            .instrument(tracing::info_span!(
+                "MigrationProgress",
+                migration_id = input.migration_id.as_str()
+            ))
             .await
     }
 
