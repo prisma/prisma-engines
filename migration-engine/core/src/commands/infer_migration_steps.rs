@@ -65,7 +65,7 @@ impl<'a> MigrationCommand for InferMigrationStepsCommand<'a> {
                 .map(|m| m.datamodel_ast())
                 .unwrap_or_else(SchemaAst::empty);
             let last_non_watch_datamodel = last_non_watch_applied_migration
-                .map(|m| m.datamodel)
+                .map(|m| m.datamodel())
                 .unwrap_or_else(Datamodel::empty);
             let datamodel_steps = engine
                 .datamodel_migration_steps_inferrer()
