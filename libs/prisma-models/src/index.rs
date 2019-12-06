@@ -10,14 +10,22 @@ pub struct IndexTemplate {
 
 impl IndexTemplate {
     pub fn build(self, fields: &[ScalarFieldRef]) -> Index {
-        let fields = self
-            .fields
-            .into_iter()
-            .map(|name| {
-                let field = fields.iter().find(|sf| sf.name == name).unwrap();
-                Arc::downgrade(field)
-            })
-            .collect();
+        let fields = match self.typ {
+            IndexType::Unique => self
+                .fields
+                .into_iter()
+                .map(|name| {
+                    let field = fields
+                        .iter()
+                        .find(|sf| sf.name == name)
+                        .expect(&format!("Unable to resolve scalar field '{}'", name));
+
+                    Arc::downgrade(field)
+                })
+                .collect(),
+
+            IndexType::Normal => vec![],
+        };
 
         Index {
             name: self.name,
