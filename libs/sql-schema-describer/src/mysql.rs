@@ -437,7 +437,7 @@ fn get_column_type(data_type: &str) -> ColumnType {
         "multipolygon" => ColumnTypeFamily::Geometric,
         "geometrycollection" => ColumnTypeFamily::Geometric,
         "json" => ColumnTypeFamily::Json,
-        x => panic!(format!("type '{}' is not supported here yet.", x)),
+        _ => ColumnTypeFamily::Unknown,
     };
     ColumnType {
         raw: data_type.to_string(),
