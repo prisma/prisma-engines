@@ -107,6 +107,14 @@ impl SqlDestructiveChangesChecker {
                                  values_count=values_count,
                              )
             })
+        } else if table.is_part_of_foreign_key(&alter_column.column.name) && alter_column.column.default.is_none() {
+            diagnostics.add_warning(MigrationWarning {
+                description: format!(
+                    "The migration is about to remove a default value on the foreign key field `{}.{}`.",
+                    table.name,
+                    alter_column.name,
+                )
+            })
         }
 
         Ok(())
