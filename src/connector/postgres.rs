@@ -7,14 +7,14 @@ use crate::{
     error::Error,
     visitor::{self, Visitor},
 };
-use async_std::{fs, sync::Mutex};
-use futures::future::FutureExt;
+use futures::{future::FutureExt, lock::Mutex};
 use native_tls::{Certificate, Identity, TlsConnector};
 use percent_encoding::percent_decode;
 use postgres_native_tls::MakeTlsConnector;
 use std::{
     borrow::{Borrow, Cow},
     time::Duration,
+    fs,
 };
 use tokio_postgres::{config::SslMode, Client, Config};
 use url::Url;
@@ -85,12 +85,12 @@ impl SslParams {
         auth.accept_mode(self.ssl_accept_mode);
 
         if let Some(ref cert_file) = self.certificate_file {
-            let cert = fs::read(cert_file).await?;
+            let cert = fs::read(cert_file)?;
             auth.certificate(Certificate::from_pem(&cert)?);
         }
 
         if let Some(ref identity_file) = self.identity_file {
-            let db = fs::read(identity_file).await?;
+            let db = fs::read(identity_file)?;
             let password = self.identity_password.as_ref().map(|s| s.as_str()).unwrap_or("");
             let identity = Identity::from_pkcs12(&db, &password)?;
 

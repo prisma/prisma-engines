@@ -5,8 +5,10 @@ pub use manager::{PooledConnection, QuaintManager};
 
 use crate::connector::{ConnectionInfo, SqlFamily};
 use mobc::Pool;
-use std::convert::TryFrom;
 use url::Url;
+
+#[cfg(feature = "sqlite")]
+use std::convert::TryFrom;
 
 /// The main entry point and an abstraction over database connections and
 pub struct Quaint {
