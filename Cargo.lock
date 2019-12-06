@@ -1089,12 +1089,8 @@ dependencies = [
 name = "introspection-core"
 version = "0.1.0"
 dependencies = [
-<<<<<<< HEAD
- "async-trait 0.1.19 (registry+https://github.com/rust-lang/crates.io-index)",
- "clap 2.33.0 (registry+https://github.com/rust-lang/crates.io-index)",
-=======
  "async-trait 0.1.21 (registry+https://github.com/rust-lang/crates.io-index)",
->>>>>>> master
+ "clap 2.33.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "datamodel 0.1.0",
  "failure 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "futures 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)",
