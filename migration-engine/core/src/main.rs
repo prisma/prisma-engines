@@ -42,7 +42,7 @@ async fn main() {
     if matches.is_present("version") {
         println!(env!("GIT_HASH"));
     } else if let Some(matches) = matches.subcommand_matches("cli") {
-        tracing::info!(msg = "Starting migration engine CLI", git_hash = env!("GIT_HASH"));
+        tracing::info!(git_hash = env!("GIT_HASH"), "Starting migration engine CLI");
         let datasource = matches.value_of("datasource").unwrap();
 
         match std::panic::AssertUnwindSafe(cli::run(&matches, &datasource))
@@ -71,7 +71,7 @@ async fn main() {
             }
         }
     } else {
-        tracing::info!(msg = "Starting migration engine RPC server", git_hash = env!("GIT_HASH"));
+        tracing::info!(git_hash = env!("GIT_HASH"), "Starting migration engine RPC server");
         let dml_loc = matches.value_of("datamodel_location").unwrap();
         let mut file = fs::File::open(&dml_loc).unwrap();
 

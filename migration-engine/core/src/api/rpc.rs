@@ -134,7 +134,7 @@ impl RpcApi {
         cmd: RpcCommand,
         params: &Params,
     ) -> std::result::Result<serde_json::Value, RunCommandError> {
-        tracing::debug!("running the command");
+        tracing::debug!(?cmd, "running the command");
         match cmd {
             RpcCommand::InferMigrationSteps => {
                 let input: InferMigrationStepsInput = params.clone().parse()?;

@@ -1,3 +1,5 @@
+//! The InferMigrationSteps RPC method.
+
 use super::MigrationStepsResultOutput;
 use crate::commands::command::*;
 use crate::migration_engine::MigrationEngine;
@@ -22,7 +24,7 @@ impl<'a> MigrationCommand for InferMigrationStepsCommand<'a> {
         D: DatabaseMigrationMarker + Sync + Send + 'static,
     {
         let cmd = InferMigrationStepsCommand { input };
-        debug!("{:?}", cmd.input);
+        debug!(?cmd.input);
 
         let connector = engine.connector();
         let migration_persistence = connector.migration_persistence();
@@ -80,6 +82,8 @@ impl<'a> MigrationCommand for InferMigrationStepsCommand<'a> {
 
             (datamodel_steps, database_steps)
         };
+
+        debug!(?returned_datamodel_steps);
 
         Ok(MigrationStepsResultOutput {
             datamodel: datamodel::render_datamodel_to_string(&next_datamodel).unwrap(),

@@ -1,3 +1,5 @@
+//! The CalculateDatabaseSteps RPC method.
+
 use super::MigrationStepsResultOutput;
 use crate::commands::command::*;
 use crate::migration_engine::MigrationEngine;
@@ -21,7 +23,7 @@ impl<'a> MigrationCommand for CalculateDatabaseStepsCommand<'a> {
         D: DatabaseMigrationMarker + Send + Sync + 'static,
     {
         let cmd = CalculateDatabaseStepsCommand { input };
-        debug!("{:?}", cmd.input);
+        debug!(command_input = ?cmd.input);
 
         let connector = engine.connector();
 
