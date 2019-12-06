@@ -44,10 +44,12 @@ impl SqlMigrationConnector {
         let connection_info =
             ConnectionInfo::from_url(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
 
+            dbg!("here");
         let connection = Quaint::new(database_str)
             .await
-            .map_err(SqlError::from)
-            .map_err(|err| err.into_connector_error(&connection_info))?;
+            .map_err(|err| SqlError::from(dbg!(err)))
+            .map_err(|err| dbg!(err).into_connector_error(&connection_info))?;
+            dbg!("here");
 
         Self::create_connector(connection).await
     }
@@ -55,11 +57,13 @@ impl SqlMigrationConnector {
     async fn create_connector(connection: Quaint) -> std::result::Result<Self, ConnectorError> {
         // async connections can be lazy, so we issue a simple query to fail early if the database
         // is not reachable.
+        dbg!("here");
         connection
             .query_raw("SELECT 1", &[])
             .await
             .map_err(SqlError::from)
             .map_err(|err| err.into_connector_error(&connection.connection_info()))?;
+        dbg!("here");
 
         let schema_name = connection.connection_info().schema_name().to_owned();
 
@@ -99,6 +103,8 @@ impl SqlMigrationConnector {
             schema_name: schema_name.clone(),
             database: Arc::clone(&conn),
         });
+
+        dbg!("here");
 
         Ok(Self {
             connection_info,
