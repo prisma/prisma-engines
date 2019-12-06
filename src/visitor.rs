@@ -272,34 +272,31 @@ pub trait Visitor<'a> {
 
     fn visit_operation(&mut self, op: SqlOp<'a>) -> fmt::Result {
         match op {
-            SqlOp::Add(left, right) => {
-                self.surround_with("(", ")", |ref mut se| {
-                    se.visit_database_value(left)?;
-                    se.write(" + ")?;
-                    se.visit_database_value(right)
-                })
-            },
-            SqlOp::Sub(left, right) => {
-                self.surround_with("(", ")", |ref mut se| {
-                    se.visit_database_value(left)?;
-                    se.write(" - ")?;
-                    se.visit_database_value(right)
-                })
-            },
-            SqlOp::Mul(left, right) => {
-                self.surround_with("(", ")", |ref mut se| {
-                    se.visit_database_value(left)?;
-                    se.write(" * ")?;
-                    se.visit_database_value(right)
-                })
-            },
-            SqlOp::Div(left, right) => {
-                self.surround_with("(", ")", |ref mut se| {
-                    se.visit_database_value(left)?;
-                    se.write(" / ")?;
-                    se.visit_database_value(right)
-                })
-            },
+            SqlOp::Add(left, right) => self.surround_with("(", ")", |ref mut se| {
+                se.visit_database_value(left)?;
+                se.write(" + ")?;
+                se.visit_database_value(right)
+            }),
+            SqlOp::Sub(left, right) => self.surround_with("(", ")", |ref mut se| {
+                se.visit_database_value(left)?;
+                se.write(" - ")?;
+                se.visit_database_value(right)
+            }),
+            SqlOp::Mul(left, right) => self.surround_with("(", ")", |ref mut se| {
+                se.visit_database_value(left)?;
+                se.write(" * ")?;
+                se.visit_database_value(right)
+            }),
+            SqlOp::Div(left, right) => self.surround_with("(", ")", |ref mut se| {
+                se.visit_database_value(left)?;
+                se.write(" / ")?;
+                se.visit_database_value(right)
+            }),
+            SqlOp::Rem(left, right) => self.surround_with("(", ")", |ref mut se| {
+                se.visit_database_value(left)?;
+                se.write(" % ")?;
+                se.visit_database_value(right)
+            }),
         }
     }
 

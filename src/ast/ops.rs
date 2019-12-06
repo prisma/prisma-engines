@@ -1,5 +1,5 @@
 use crate::ast::DatabaseValue;
-use std::ops::{Add, Sub, Mul, Div};
+use std::ops::{Add, Div, Mul, Rem, Sub};
 
 /// Calculation operations in SQL queries.
 #[derive(Debug, PartialEq, Clone)]
@@ -8,6 +8,7 @@ pub enum SqlOp<'a> {
     Sub(DatabaseValue<'a>, DatabaseValue<'a>),
     Mul(DatabaseValue<'a>, DatabaseValue<'a>),
     Div(DatabaseValue<'a>, DatabaseValue<'a>),
+    Rem(DatabaseValue<'a>, DatabaseValue<'a>),
 }
 
 impl<'a> Add for DatabaseValue<'a> {
@@ -39,5 +40,13 @@ impl<'a> Div for DatabaseValue<'a> {
 
     fn div(self, other: Self) -> Self {
         SqlOp::Div(self, other).into()
+    }
+}
+
+impl<'a> Rem for DatabaseValue<'a> {
+    type Output = DatabaseValue<'a>;
+
+    fn rem(self, other: Self) -> Self {
+        SqlOp::Rem(self, other).into()
     }
 }
