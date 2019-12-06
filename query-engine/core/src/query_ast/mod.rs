@@ -4,7 +4,7 @@ mod write;
 pub use read::*;
 pub use write::*;
 
-use connector::filter::RecordFinder;
+use connector::filter::Filter;
 
 #[derive(Debug, Clone)]
 pub enum Query {
@@ -12,16 +12,41 @@ pub enum Query {
     Write(WriteQuery),
 }
 
-pub trait RecordFinderInjector {
-    fn inject_record_finder(&mut self, rf: RecordFinder);
-}
+pub trait FilteredQuery {
+    fn add_filter<T>(&mut self, filter: T)
+    where
+        T: Into<Filter>,
+    {
+        let filter = filter.into();
+        let existing_filter = self.get_filter();
+        let filter = match existing_filter {
+            Some(Filter::And(ref mut v)) => {
+                v.push(filter);
+                None
+            }
+            Some(Filter::Or(ref mut v)) => {
+                v.push(filter);
+                None
+            }
+            Some(Filter::Not(ref mut v)) => {
+                v.push(filter);
+                None
+            }
+            Some(Filter::Empty) => Some(filter),
+            Some(other) => Some(Self::default_filter_behaviour(vec![other.clone(), filter])),
+            None => Some(filter),
+        };
 
-impl RecordFinderInjector for Query {
-    fn inject_record_finder(&mut self, rf: RecordFinder) {
-        match self {
-            Self::Read(ref mut rq) => rq.inject_record_finder(rf),
-            Self::Write(ref mut wq) => wq.inject_record_finder(rf),
+        if let Some(filter) = filter {
+            self.set_filter(filter);
         }
+    }
+
+    fn get_filter(&mut self) -> Option<&mut Filter>;
+    fn set_filter(&mut self, filter: Filter);
+
+    fn default_filter_behaviour(inner_filters: Vec<Filter>) -> Filter {
+        Filter::Or(inner_filters)
     }
 }
 

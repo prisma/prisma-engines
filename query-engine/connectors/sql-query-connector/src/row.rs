@@ -5,6 +5,7 @@ use quaint::{
     ast::{DatabaseValue, ParameterizedValue},
     connector::ResultRow,
 };
+use rust_decimal::{prelude::FromPrimitive, Decimal};
 use std::{borrow::Borrow, io};
 use uuid::Uuid;
 
@@ -68,15 +69,7 @@ impl ToSqlRow for ResultRow {
                         return Err(SqlError::ConversionError(error.into()));
                     }
                 },
-                TypeIdentifier::Json => match p_value {
-                    ParameterizedValue::Null => PrismaValue::Null,
-                    ParameterizedValue::Text(json) => PrismaValue::Json(serde_json::from_str(json.borrow())?),
-                    ParameterizedValue::Json(json) => PrismaValue::Json(json),
-                    _ => {
-                        let error = io::Error::new(io::ErrorKind::InvalidData, "Json value not stored as text or json");
-                        return Err(SqlError::ConversionError(error.into()));
-                    }
-                },
+                TypeIdentifier::Json => unimplemented!(),
                 TypeIdentifier::UUID => match p_value {
                     ParameterizedValue::Null => PrismaValue::Null,
                     ParameterizedValue::Text(uuid) => PrismaValue::Uuid(Uuid::parse_str(&uuid)?),
@@ -115,7 +108,9 @@ impl ToSqlRow for ResultRow {
                 TypeIdentifier::Float => match p_value {
                     ParameterizedValue::Null => PrismaValue::Null,
                     ParameterizedValue::Real(f) => PrismaValue::Float(f),
-                    ParameterizedValue::Integer(i) => PrismaValue::Float(i as f64),
+                    ParameterizedValue::Integer(i) => {
+                        PrismaValue::Float(Decimal::from_f64(i as f64).expect("f64 was not a Decimal."))
+                    }
                     ParameterizedValue::Text(s) => PrismaValue::Float(s.parse().unwrap()),
                     _ => {
                         let error = io::Error::new(

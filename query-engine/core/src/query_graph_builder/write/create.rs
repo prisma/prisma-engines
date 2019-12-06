@@ -4,7 +4,7 @@ use crate::{
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
     ArgumentListLookup, ParsedField, ParsedInputMap, ReadOneRecordBuilder,
 };
-use connector::filter::RecordFinder;
+use connector::ScalarCompare;
 use prisma_models::ModelRef;
 use std::{convert::TryInto, sync::Arc};
 use write_arguments::*;
@@ -24,7 +24,7 @@ pub fn create_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedF
     graph.create_edge(
         &create_node,
         &read_node,
-        QueryGraphDependency::ParentIds(Box::new(|mut node, mut parent_ids| {
+        QueryGraphDependency::ParentIds(Box::new(move |mut node, mut parent_ids| {
             let parent_id = match parent_ids.pop() {
                 Some(pid) => Ok(pid),
                 None => Err(QueryGraphBuilderError::AssertionError(format!(
@@ -33,12 +33,7 @@ pub fn create_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedF
             }?;
 
             if let Node::Query(Query::Read(ReadQuery::RecordQuery(ref mut rq))) = node {
-                let finder = RecordFinder {
-                    field: id_field,
-                    value: parent_id,
-                };
-
-                rq.record_finder = Some(finder);
+                rq.add_filter(id_field.equals(parent_id));
             };
 
             Ok(node)

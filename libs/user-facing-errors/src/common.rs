@@ -172,6 +172,12 @@ pub struct DatabaseAccessDenied {
     pub database_name: String,
 }
 
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(code = "P1011", message = "Error opening a TLS connection: ${message}")]
+pub struct TlsConnectionError {
+    pub message: String,
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

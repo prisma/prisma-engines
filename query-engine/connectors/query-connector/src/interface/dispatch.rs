@@ -3,12 +3,13 @@ use super::*;
 impl<'conn, 'tx> ReadOperations for ConnectionLike<'conn, 'tx> {
     fn get_single_record<'a>(
         &'a self,
-        record_finder: &'a RecordFinder,
+        model: &'a ModelRef,
+        filter: &'a Filter,
         selected_fields: &'a SelectedFields,
     ) -> crate::IO<'a, Option<SingleRecord>> {
         match self {
-            Self::Connection(c) => c.get_single_record(record_finder, selected_fields),
-            Self::Transaction(tx) => tx.get_single_record(record_finder, selected_fields),
+            Self::Connection(c) => c.get_single_record(model, filter, selected_fields),
+            Self::Transaction(tx) => tx.get_single_record(model, filter, selected_fields),
         }
     }
 

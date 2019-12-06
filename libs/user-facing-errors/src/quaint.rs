@@ -106,6 +106,11 @@ pub fn render_quaint_error(quaint_error: &QuaintError, connection_info: &Connect
             .ok()
         }
 
+        (QuaintError::TlsError { message }, _) => KnownError::new(common::TlsConnectionError {
+            message: message.into(),
+        })
+        .ok(),
+
         _ => None,
     }
 }

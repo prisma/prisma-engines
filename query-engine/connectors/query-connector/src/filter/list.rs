@@ -3,13 +3,13 @@ use crate::compare::ScalarListCompare;
 use prisma_models::{PrismaValue, ScalarField};
 use std::sync::Arc;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ScalarListFilter {
     pub field: Arc<ScalarField>,
     pub condition: ScalarListCondition,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ScalarListCondition {
     /// List contains the given value
     Contains(PrismaValue),

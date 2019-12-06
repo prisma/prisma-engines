@@ -34,7 +34,7 @@ async fn update_one<'a, 'b>(tx: &'a ConnectionLike<'a, 'b>, q: UpdateRecord) -> 
     let mut res = tx
         .update_records(
             &q.model,
-            Filter::from(q.where_),
+            q.where_,
             WriteArgs::new(q.non_list_args, q.list_args),
         )
         .await?;

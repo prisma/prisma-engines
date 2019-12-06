@@ -6,6 +6,10 @@ use crate::{
 use connector::ScalarListValues;
 use indexmap::IndexMap;
 use prisma_models::{GraphqlId, PrismaValue};
+use rust_decimal::{
+    prelude::{FromPrimitive, ToPrimitive},
+    Decimal,
+};
 use std::{borrow::Borrow, collections::HashMap, convert::TryFrom};
 
 /// A grouping of items to their parent record.
@@ -337,11 +341,15 @@ fn serialize_scalar(value: PrismaValue, typ: &OutputTypeRef) -> CoreResult<Item>
                 (ScalarType::ID, PrismaValue::GraphqlId(id)) => PrismaValue::GraphqlId(id),
                 (ScalarType::ID, val) => PrismaValue::GraphqlId(GraphqlId::try_from(val)?),
 
-                (ScalarType::Int, PrismaValue::Float(f)) => PrismaValue::Int(f as i64),
+                (ScalarType::Int, PrismaValue::Float(f)) => {
+                    PrismaValue::Int(f.to_i64().expect("Unable to convert Decimal to i64."))
+                }
                 (ScalarType::Int, PrismaValue::Int(i)) => PrismaValue::Int(i),
 
                 (ScalarType::Float, PrismaValue::Float(f)) => PrismaValue::Float(f),
-                (ScalarType::Float, PrismaValue::Int(i)) => PrismaValue::Float(i as f64),
+                (ScalarType::Float, PrismaValue::Int(i)) => {
+                    PrismaValue::Float(Decimal::from_i64(i).expect("Unable to convert i64 to Decimal."))
+                }
 
                 (ScalarType::Enum(ref et), PrismaValue::Enum(ref ev)) => match et.value_for(&ev.name) {
                     Some(_) => PrismaValue::Enum(ev.clone()),
@@ -356,7 +364,7 @@ fn serialize_scalar(value: PrismaValue, typ: &OutputTypeRef) -> CoreResult<Item>
 
                 (ScalarType::Boolean, PrismaValue::Boolean(b)) => PrismaValue::Boolean(b),
                 (ScalarType::DateTime, PrismaValue::DateTime(dt)) => PrismaValue::DateTime(dt),
-                (ScalarType::Json, PrismaValue::Json(j)) => PrismaValue::Json(j),
+                (ScalarType::Json, _) => unimplemented!(),
                 (ScalarType::UUID, PrismaValue::Uuid(u)) => PrismaValue::Uuid(u),
 
                 (st, pv) => {

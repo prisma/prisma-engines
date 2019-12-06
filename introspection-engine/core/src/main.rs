@@ -18,6 +18,11 @@ fn main() {
         let mut io_handler = IoHandler::new();
         io_handler.extend_with(RpcImpl::new().to_delegate());
 
+        user_facing_errors::set_panic_hook();
+
+        let mut io_handler = IoHandler::new();
+        io_handler.extend_with(RpcImpl::new().to_delegate());
+
         let server = ServerBuilder::new(io_handler);
         server.build();
     }

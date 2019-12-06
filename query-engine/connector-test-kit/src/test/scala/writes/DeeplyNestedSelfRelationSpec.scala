@@ -67,4 +67,86 @@ class DeeplyNestedSelfRelationSpec extends FlatSpec with Matchers with ApiSpecBa
     query.toString should be("""{"data":{"users":[{"name":"A"},{"name":"B"},{"name":"C"}]}}""")
 
   }
+
+  "Regression #249" should "not fail" in {
+    val project = SchemaDsl.fromStringV11() { """
+                                                |model User {
+                                                |  id       String @default(cuid()) @id
+                                                |  name     String
+                                                |  comments Comment[]
+                                                |}
+                                                |
+                                                |model Comment {
+                                                |  id         String    @default(cuid()) @id
+                                                |  createdAt  DateTime  @default(now())
+                                                |  updatedAt  DateTime  @updatedAt
+                                                |  value      String
+                                                |  author     User
+                                                |  children   Comment[] @relation("comment_children", onDelete: CASCADE)
+                                                |}
+                                              """.stripMargin }
+    database.setup(project)
+
+    val commentId = server
+      .query(
+        s"""mutation {
+           |  createComment(data: {
+           |    value: "Test"
+           |    author: {
+           |      create: {
+           |        name: "Big Bird"
+           |      }
+           |    }
+           |  }) {
+           |    id
+           |  }
+           |}""".stripMargin,
+        project
+      )
+      .pathAsString("data.createComment.id")
+
+    val otherUserId = server
+      .query(
+        s"""mutation {
+           |  createUser(data: {
+           |    name: "Cookie Monster"
+           |  }) {
+           |    id
+           |  }
+           |}""".stripMargin,
+        project
+      )
+      .pathAsString("data.createUser.id")
+
+    val result = server
+      .query(
+        s"""mutation {
+           |  updateComment(where: {
+           |    id: "$commentId"
+           |  }
+           |  data: {
+           |    children: {
+           |      create: {
+           |        value: "NOMNOMNOM"
+           |          author: {
+           |          connect: {
+           |            id: "$otherUserId"
+           |          }
+           |        }
+           |      }
+           |    }
+           |  }) {
+           |    id
+           |    children {
+           |      author {
+           |        id
+           |      }
+           |    }
+           |  }
+           |}""".stripMargin,
+        project
+      )
+
+    result.pathAsSeq("data.updateComment.children").head.pathAsString("author.id") should equal(otherUserId)
+  }
 }

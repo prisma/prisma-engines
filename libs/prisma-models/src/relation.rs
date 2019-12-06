@@ -5,8 +5,7 @@ use std::sync::{Arc, Weak};
 pub type RelationRef = Arc<Relation>;
 pub type RelationWeakRef = Weak<Relation>;
 
-#[derive(Debug, Deserialize, Serialize, Clone, Copy, PartialEq, Eq)]
-#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum OnDelete {
     SetNull,
     Cascade,
@@ -28,16 +27,13 @@ impl OnDelete {
     }
 }
 
-#[derive(Debug, Deserialize, Serialize, Clone, PartialEq)]
-#[serde(rename_all = "camelCase")]
+#[derive(Debug, Clone, PartialEq)]
 pub struct InlineRelation {
-    #[serde(rename = "inTableOfModelId")]
     pub in_table_of_model_name: String,
     pub referencing_column: String,
 }
 
-#[derive(Debug, Deserialize, Serialize, Clone, PartialEq)]
-#[serde(rename_all = "camelCase")]
+#[derive(Debug, Clone, PartialEq)]
 pub struct RelationTable {
     pub table: String,
     pub model_a_column: String,
@@ -45,24 +41,19 @@ pub struct RelationTable {
     pub id_column: Option<String>,
 }
 
-#[derive(Debug, Deserialize, Serialize, Clone, PartialEq)]
-#[serde(rename_all = "snake_case", tag = "relationManifestationType")]
+#[derive(Debug, Clone, PartialEq)]
 pub enum RelationLinkManifestation {
     Inline(InlineRelation),
     RelationTable(RelationTable),
 }
 
-#[derive(Debug, Deserialize, Serialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(Debug)]
 pub struct RelationTemplate {
     pub name: String,
     pub model_a_on_delete: OnDelete,
     pub model_b_on_delete: OnDelete,
     pub manifestation: Option<RelationLinkManifestation>, // TODO: remove the option after the switch to v2 is completed
-
-    #[serde(rename = "modelAId")]
     pub model_a_name: String,
-    #[serde(rename = "modelBId")]
     pub model_b_name: String,
 }
 

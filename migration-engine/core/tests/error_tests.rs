@@ -366,6 +366,24 @@ async fn unique_constraint_errors_in_migrations_must_return_a_known_error(api: &
     assert_eq!(json_error, expected_json);
 }
 
+#[test_one_connector(connector = "postgres")]
+async fn tls_errors_must_be_mapped_in_the_cli(_api: &TestApi) {
+    let url = format!("{}&sslmode=require&sslaccept=strict", postgres_url());
+    let error = get_cli_error(&["migration-engine", "cli", "--datasource", &url, "--can_connect_to_database"]).await;
+
+    let json_error = serde_json::to_value(&error).unwrap();
+
+    let expected = json!({
+        "message": format!("Error opening a TLS connection: error performing TLS handshake: server does not support TLS"),
+        "meta": {
+            "message": "error performing TLS handshake: server does not support TLS",
+        },
+        "error_code": "P1011"
+    });
+
+    assert_eq!(json_error, expected);
+}
+
 async fn get_cli_error(cli_args: &[&str]) -> user_facing_errors::Error {
     let app = cli::clap_app();
     let matches = app.get_matches_from(cli_args);

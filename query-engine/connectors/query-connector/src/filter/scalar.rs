@@ -3,13 +3,13 @@ use crate::compare::ScalarCompare;
 use prisma_models::{PrismaValue, ScalarField};
 use std::sync::Arc;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ScalarFilter {
     pub field: Arc<ScalarField>,
     pub condition: ScalarCondition,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ScalarCondition {
     Equals(PrismaValue),
     NotEquals(PrismaValue),
@@ -56,8 +56,7 @@ impl ScalarCompare for Arc<ScalarField> {
     /// # use prisma_models::*;
     /// # use std::{fs::File, sync::Arc};
     /// #
-    /// # let tmp: InternalDataModelTemplate = serde_json::from_reader(File::open("../sql-query-connector/test_schema.json").unwrap()).unwrap();
-    /// # let schema = tmp.build(String::from("test"));
+    /// # let schema = test_data_model();
     /// # let model = schema.find_model("User").unwrap();
     /// #
     /// let field = model.fields().find_from_scalar("name").unwrap();
@@ -87,8 +86,7 @@ impl ScalarCompare for Arc<ScalarField> {
     /// # use prisma_models::*;
     /// # use std::{fs::File, sync::Arc};
     /// #
-    /// # let tmp: InternalDataModelTemplate = serde_json::from_reader(File::open("../sql-query-connector/test_schema.json").unwrap()).unwrap();
-    /// # let schema = tmp.build(String::from("test"));
+    /// # let schema = test_data_model();
     /// # let model = schema.find_model("User").unwrap();
     /// #
     /// let field = model.fields().find_from_scalar("name").unwrap();
@@ -118,8 +116,7 @@ impl ScalarCompare for Arc<ScalarField> {
     /// # use prisma_models::*;
     /// # use std::{fs::File, sync::Arc};
     /// #
-    /// # let tmp: InternalDataModelTemplate = serde_json::from_reader(File::open("../sql-query-connector/test_schema.json").unwrap()).unwrap();
-    /// # let schema = tmp.build(String::from("test"));
+    /// # let schema = test_data_model();
     /// # let model = schema.find_model("User").unwrap();
     /// #
     /// let field = model.fields().find_from_scalar("name").unwrap();
@@ -149,8 +146,7 @@ impl ScalarCompare for Arc<ScalarField> {
     /// # use prisma_models::*;
     /// # use std::{fs::File, sync::Arc};
     /// #
-    /// # let tmp: InternalDataModelTemplate = serde_json::from_reader(File::open("../sql-query-connector/test_schema.json").unwrap()).unwrap();
-    /// # let schema = tmp.build(String::from("test"));
+    /// # let schema = test_data_model();
     /// # let model = schema.find_model("User").unwrap();
     /// #
     /// let field = model.fields().find_from_scalar("name").unwrap();
@@ -180,8 +176,7 @@ impl ScalarCompare for Arc<ScalarField> {
     /// # use prisma_models::*;
     /// # use std::{fs::File, sync::Arc};
     /// #
-    /// # let tmp: InternalDataModelTemplate = serde_json::from_reader(File::open("../sql-query-connector/test_schema.json").unwrap()).unwrap();
-    /// # let schema = tmp.build(String::from("test"));
+    /// # let schema = test_data_model();
     /// # let model = schema.find_model("User").unwrap();
     /// #
     /// let field = model.fields().find_from_scalar("name").unwrap();
@@ -211,8 +206,7 @@ impl ScalarCompare for Arc<ScalarField> {
     /// # use prisma_models::*;
     /// # use std::{fs::File, sync::Arc};
     /// #
-    /// # let tmp: InternalDataModelTemplate = serde_json::from_reader(File::open("../sql-query-connector/test_schema.json").unwrap()).unwrap();
-    /// # let schema = tmp.build(String::from("test"));
+    /// # let schema = test_data_model();
     /// # let model = schema.find_model("User").unwrap();
     /// #
     /// let field = model.fields().find_from_scalar("name").unwrap();
@@ -242,8 +236,7 @@ impl ScalarCompare for Arc<ScalarField> {
     /// # use prisma_models::*;
     /// # use std::{fs::File, sync::Arc};
     /// #
-    /// # let tmp: InternalDataModelTemplate = serde_json::from_reader(File::open("../sql-query-connector/test_schema.json").unwrap()).unwrap();
-    /// # let schema = tmp.build(String::from("test"));
+    /// # let schema = test_data_model();
     /// # let model = schema.find_model("User").unwrap();
     /// #
     /// let field = model.fields().find_from_scalar("name").unwrap();
@@ -273,8 +266,7 @@ impl ScalarCompare for Arc<ScalarField> {
     /// # use prisma_models::*;
     /// # use std::{fs::File, sync::Arc};
     /// #
-    /// # let tmp: InternalDataModelTemplate = serde_json::from_reader(File::open("../sql-query-connector/test_schema.json").unwrap()).unwrap();
-    /// # let schema = tmp.build(String::from("test"));
+    /// # let schema = test_data_model();
     /// # let model = schema.find_model("User").unwrap();
     /// #
     /// let field = model.fields().find_from_scalar("name").unwrap();
@@ -304,8 +296,7 @@ impl ScalarCompare for Arc<ScalarField> {
     /// # use prisma_models::*;
     /// # use std::{fs::File, sync::Arc};
     /// #
-    /// # let tmp: InternalDataModelTemplate = serde_json::from_reader(File::open("../sql-query-connector/test_schema.json").unwrap()).unwrap();
-    /// # let schema = tmp.build(String::from("test"));
+    /// # let schema = test_data_model();
     /// # let model = schema.find_model("User").unwrap();
     /// #
     /// let field = model.fields().find_from_scalar("id").unwrap();
@@ -335,8 +326,7 @@ impl ScalarCompare for Arc<ScalarField> {
     /// # use prisma_models::*;
     /// # use std::{fs::File, sync::Arc};
     /// #
-    /// # let tmp: InternalDataModelTemplate = serde_json::from_reader(File::open("../sql-query-connector/test_schema.json").unwrap()).unwrap();
-    /// # let schema = tmp.build(String::from("test"));
+    /// # let schema = test_data_model();
     /// # let model = schema.find_model("User").unwrap();
     /// #
     /// let field = model.fields().find_from_scalar("id").unwrap();
@@ -366,8 +356,7 @@ impl ScalarCompare for Arc<ScalarField> {
     /// # use prisma_models::*;
     /// # use std::{fs::File, sync::Arc};
     /// #
-    /// # let tmp: InternalDataModelTemplate = serde_json::from_reader(File::open("../sql-query-connector/test_schema.json").unwrap()).unwrap();
-    /// # let schema = tmp.build(String::from("test"));
+    /// # let schema = test_data_model();
     /// # let model = schema.find_model("User").unwrap();
     /// #
     /// let field = model.fields().find_from_scalar("id").unwrap();
@@ -397,8 +386,7 @@ impl ScalarCompare for Arc<ScalarField> {
     /// # use prisma_models::*;
     /// # use std::{fs::File, sync::Arc};
     /// #
-    /// # let tmp: InternalDataModelTemplate = serde_json::from_reader(File::open("../sql-query-connector/test_schema.json").unwrap()).unwrap();
-    /// # let schema = tmp.build(String::from("test"));
+    /// # let schema = test_data_model();
     /// # let model = schema.find_model("User").unwrap();
     /// #
     /// let field = model.fields().find_from_scalar("id").unwrap();
