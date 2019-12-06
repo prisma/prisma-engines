@@ -5,27 +5,47 @@ authors = []
 edition = "2018"
 
 [dependencies]
-connector-interface = { path = "../query-connector", package = "query-connector" }
-prisma-models = { path = "../../../libs/prisma-models", features = ["sql-ext"] }
 itertools = "0.8"
-chrono = { version = "0.4", features = ["serde"] }
-quaint = { git = "https://github.com/prisma/quaint.git" }
-datamodel = { path = "../../../libs/datamodel/core" }
-serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 parking_lot = "0.7"
 uuid = "0.7"
 failure = "0.1"
 url = "1.7"
 failure_derive = "0.1"
-cuid = { git = "https://github.com/prisma/cuid-rust" }
 rand = "0.6"
 log = "0.4"
 async-trait = "0.1"
-rust_decimal = { git = "https://github.com/pimeys/rust-decimal.git", branch = "tokio-postgres" }
-user-facing-errors = { path = "../../../libs/user-facing-errors" }
-
-tokio-postgres = { version = "0.4.0-rc.2" }
-
 futures = "0.3"
-tokio-resource-pool = { git = "https://github.com/pimeys/tokio-resource-pool" }
+
+[dependencies.rust_decimal]
+git = "https://github.com/pimeys/rust-decimal.git"
+branch = "async-await-psql"
+
+[dependencies.quaint]
+git = "https://github.com/prisma/quaint.git"
+features = ["full"]
+
+[dependencies.connector-interface]
+path = "../query-connector"
+package = "query-connector"
+
+[dependencies.prisma-models]
+path = "../../../libs/prisma-models"
+features = ["sql-ext"]
+
+[dependencies.chrono]
+version = "0.4"
+features = ["serde"]
+
+[dependencies.datamodel]
+path = "../../../libs/datamodel/core"
+
+[dependencies.serde]
+version = "1.0"
+features = ["derive"]
+
+[dependencies.cuid]
+git = "https://github.com/prisma/cuid-rust"
+
+[dependencies.user-facing-errors]
+path = "../../../libs/user-facing-errors"

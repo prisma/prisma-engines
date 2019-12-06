@@ -16,5 +16,3 @@ log = "0.4.8"
 
 [dependencies.quaint]
 git = "https://github.com/prisma/quaint.git"
-default-features = false
-features = ["sqlite", "json-1", "postgresql", "uuid-0_7", "chrono-0_4", "mysql"]

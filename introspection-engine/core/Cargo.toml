@@ -4,28 +4,29 @@ version = "0.1.0"
 authors = ["Marcus Böhm <boehm@prisma.io>"]
 edition = "2018"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
+# Please keep the pyramid form
 [dependencies]
-async-trait = "0.1.17"
-introspection-connector = { path = "../connectors/introspection-connector" }
-sql-introspection-connector = { path = "../connectors/sql-introspection-connector" }
-datamodel = { path = "../../libs/datamodel/core" }
-failure = "0.1"
 clap = "2.33"
-
-jsonrpc-core = "13.0"
-jsonrpc-stdio-server = "13.0"
-jsonrpc-derive = "13.0"
-jsonrpc-core-client = "13.0"
-
 serde = "1.0"
+futures = "0.3"
+failure = "0.1"
+
 serde_json = "1.0"
 serde_derive = "1.0"
+jsonrpc-core = "13.0"
+async-trait = "0.1.17"
+jsonrpc-derive = "13.0"
+jsonrpc-core-client = "13.0"
+jsonrpc-stdio-server = "13.0"
 
-futures03 = { package = "futures", version = "0.3", features = ["compat"] }
-tokio = { package = "tokio", version = "0.2.0-alpha.6" }
+datamodel = { path = "../../libs/datamodel/core" }
 user-facing-errors = { path = "../../libs/user-facing-errors" }
+introspection-connector = { path = "../connectors/introspection-connector" }
+sql-introspection-connector = { path = "../connectors/sql-introspection-connector" }
+
+[dependencies.tokio]
+version = "0.2"
+features = ["macros", "rt-threaded"]
 
 [dev-dependencies]
 pretty_assertions = "0.6.1"

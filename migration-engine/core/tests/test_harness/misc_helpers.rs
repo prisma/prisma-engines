@@ -4,12 +4,13 @@ use migration_core::{api::MigrationApi, commands::ResetCommand};
 use once_cell::sync::Lazy;
 use quaint::{prelude::*, single::Quaint};
 use sql_migration_connector::SqlMigrationConnector;
-use std::{future::Future, rc::Rc};
+use std::{future::Future, rc::Rc, sync::Mutex};
 use test_setup::*;
 use url::Url;
+use tokio::runtime::Runtime;
 
-pub static TEST_ASYNC_RUNTIME: Lazy<tokio::runtime::Runtime> =
-    Lazy::new(|| tokio::runtime::Runtime::new().expect("failed to start tokio test runtime"));
+pub static TEST_ASYNC_RUNTIME: Lazy<Mutex<Runtime>> =
+    Lazy::new(|| Mutex::new(Runtime::new().expect("failed to start tokio test runtime")));
 
 pub fn parse(datamodel_string: &str) -> SchemaAst {
     parser::parse(datamodel_string).unwrap()

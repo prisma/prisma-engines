@@ -560,7 +560,7 @@ where
         &'a mut dyn SqlSchemaDescriberBackend,
     ) -> Pin<Box<dyn std::future::Future<Output = ()> + 'a>>,
 {
-    let runtime = tokio_runtime();
+    let mut runtime = tokio_runtime();
     // SQLite
     {
         eprintln!("Testing on SQLite");

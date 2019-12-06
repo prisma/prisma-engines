@@ -24,8 +24,8 @@ failure = "0.1"
 jsonrpc-core = "13.0"
 jsonrpc-stdio-server = "13.0"
 
-futures = { package = "futures", version = "0.3", features = ["compat"] }
-tokio = { package = "tokio", version = "0.2.0-alpha.6" }
+futures = "0.3"
+tokio = { version = "0.2", features = ["rt-threaded", "macros"] }
 async-trait = "0.1.17"
 async-std = "1.0"
 tracing = "0.1.10"
@@ -34,8 +34,6 @@ tracing-futures = "0.2.0"
 
 [dependencies.quaint]
 git = "https://github.com/prisma/quaint.git"
-default-features = false
-features = ["sqlite", "json-1", "postgresql", "uuid-0_7", "chrono-0_4", "mysql"]
 
 [dev-dependencies]
 barrel = { version = "0.6.3-alpha.0", features = ["sqlite3", "mysql", "pg"] }
