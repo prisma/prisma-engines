@@ -6,6 +6,7 @@ use quaint::prelude::SqlFamily;
 use sql_migration_connector::{AlterIndex, CreateIndex, DropIndex, SqlMigrationStep};
 use sql_schema_describer::*;
 use test_harness::*;
+use migration_core::commands::{InferMigrationStepsCommand, InferMigrationStepsInput, CalculateDatabaseStepsCommand, CalculateDatabaseStepsInput};
 
 #[test_each_connector]
 async fn adding_a_scalar_field_must_work(api: &TestApi) {
@@ -1494,6 +1495,54 @@ async fn foreign_keys_of_inline_one_to_one_relations_have_a_unique_constraint(ap
     assert_eq!(box_table.indices, expected_indexes);
 }
 
+#[test_each_connector(log="debug")]
+async fn calculate_database_steps_with_infer_after_an_apply_must_work(api: &TestApi) {
+    let dm1 = r#"
+        type CUID = String @id @default(cuid())
+
+        model User {
+            id CUID
+        }
+    "#;
+
+    let infer_input = InferMigrationStepsInput {
+        assume_to_be_applied: Vec::new(),
+        datamodel: dm1.to_owned(),
+        migration_id: "mig02".to_owned(),
+    };
+
+    let output = api.execute_command::<InferMigrationStepsCommand>(&infer_input).await.unwrap();
+    let steps = output.datamodel_steps;
+
+    api.infer_and_apply(dm1).await;
+
+    let dm2 = r#"
+        type CUID = String @id @default(cuid())
+
+        model User {
+            id CUID
+            name String
+        }
+    "#;
+
+    let infer_input = InferMigrationStepsInput {
+        assume_to_be_applied: Vec::new(),
+        datamodel: dm2.to_owned(),
+        migration_id: "mig02".to_owned(),
+    };
+
+    let output = api.execute_command::<InferMigrationStepsCommand>(&infer_input).await.unwrap();
+    let new_steps = output.datamodel_steps.clone();
+
+    let calculate_input = CalculateDatabaseStepsInput {
+        assume_to_be_applied: steps,
+        steps_to_apply: new_steps.clone(),
+    };
+
+    let result = api.execute_command::<CalculateDatabaseStepsCommand>(dbg!(&calculate_input)).await.unwrap();
+
+    assert_eq!(result.datamodel_steps, new_steps);
+}
 #[test_each_connector]
 async fn column_defaults_must_be_migrated(api: &TestApi) {
     let dm1 = r#"
