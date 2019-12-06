@@ -134,7 +134,7 @@ fn should_allow_int_ids_with_static_default() {
         .assert_is_id(true)
         .assert_id_strategy(IdStrategy::Auto)
         .assert_default_value(ScalarValue::Int(0))
-        .assert_base_type(&ScalarType::String);
+        .assert_base_type(&ScalarType::Int);
 }
 
 #[test]
