@@ -147,8 +147,13 @@ fn test_each_connector_async_wrapper_functions(
                     let api = #connector_api_factory().await;
                     #test_fn_call
                 };
-                let mut rt = TEST_ASYNC_RUNTIME.lock().unwrap();
-                rt.block_on(fut)
+
+                tokio::runtime::Builder::new()
+                    .basic_scheduler()
+                    .enable_all()
+                    .build()
+                    .unwrap()
+                    .block_on(fut)
             }
         };
 
@@ -183,8 +188,13 @@ pub fn test_one_connector(attr: TokenStream, input: TokenStream) -> TokenStream 
                     #test_impl_name(&api).await
                 };
 
-                let mut rt = TEST_ASYNC_RUNTIME.lock().unwrap();
-                rt.block_on(fut)
+
+                tokio::runtime::Builder::new()
+                    .basic_scheduler()
+                    .enable_all()
+                    .build()
+                    .unwrap()
+                    .block_on(fut)
             }
 
             #test_function
