@@ -102,6 +102,42 @@ fn should_allow_string_ids_without_default() {
 }
 
 #[test]
+fn should_allow_string_ids_with_static_default() {
+    let dml = r#"
+    model Model {
+        id String @id @default("")
+    }
+    "#;
+
+    let datamodel = parse(dml);
+    let user_model = datamodel.assert_has_model("Model");
+    user_model
+        .assert_has_field("id")
+        .assert_is_id(true)
+        .assert_id_strategy(IdStrategy::None)
+        .assert_default_value(ScalarValue::String(String::from("")))
+        .assert_base_type(&ScalarType::String);
+}
+
+#[test]
+fn should_allow_int_ids_with_static_default() {
+    let dml = r#"
+    model Model {
+        id Int @id @default(0)
+    }
+    "#;
+
+    let datamodel = parse(dml);
+    let user_model = datamodel.assert_has_model("Model");
+    user_model
+        .assert_has_field("id")
+        .assert_is_id(true)
+        .assert_id_strategy(IdStrategy::Auto)
+        .assert_default_value(ScalarValue::Int(0))
+        .assert_base_type(&ScalarType::Int);
+}
+
+#[test]
 fn multi_field_ids_must_work() {
     let dml = r#"
     model Model {

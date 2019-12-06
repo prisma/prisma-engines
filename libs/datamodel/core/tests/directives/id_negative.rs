@@ -97,7 +97,7 @@ fn it_must_error_when_multi_field_is_referring_to_undefined_fields() {
 }
 
 const ID_TYPE_ERROR: &str =
-    "Invalid ID field. ID field must be one of: Int @id, String @id, String @id @default(cuid()), String @id @default(uuid()).";
+    "Invalid ID field. ID field must be one of: Int @id or Int @id @default(`Integer`) for Int fields or String @id or String @id @default(`cuid()`|`uuid()`|`String`) for String fields.";
 
 #[test]
 fn id_should_error_if_the_id_field_is_not_of_valid_type() {
@@ -139,35 +139,5 @@ fn id_should_error_if_the_id_field_is_not_of_valid_type() {
     errors.assert_is_at(
         3,
         DatamodelError::new_model_validation_error(ID_TYPE_ERROR, "Model4", Span::new(173, 187)),
-    );
-}
-
-#[test]
-fn id_should_error_if_string_id_field_has_incorrect_default_value() {
-    let dml = r#"
-    model Model1 {
-        id String @id
-    }
-
-    model Model2 {
-        id String @id @default("hello")
-    }
-
-    model Model3 {
-        id String @id @default("cuid")
-    }
-    "#;
-
-    let errors = parse_error(dml);
-    dbg!(&errors);
-
-    errors.assert_is_at(
-        0,
-        DatamodelError::new_model_validation_error(ID_TYPE_ERROR, "Model2", Span::new(76, 107)),
-    );
-
-    errors.assert_is_at(
-        1,
-        DatamodelError::new_model_validation_error(ID_TYPE_ERROR, "Model3", Span::new(142, 172)),
     );
 }
