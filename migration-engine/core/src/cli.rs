@@ -127,10 +127,8 @@ async fn create_conn(datasource: &str, admin_mode: bool) -> crate::Result<(Strin
             let connector = if admin_mode {
                 create_postgres_admin_conn(url).await?
             } else {
-                dbg!("here");
                 SqlMigrationConnector::new(url.as_str()).await?
             };
-            dbg!("here");
 
             Ok((db_name, Box::new(connector)))
         }
