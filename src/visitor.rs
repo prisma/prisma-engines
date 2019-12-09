@@ -159,6 +159,10 @@ pub trait Visitor<'a> {
                 self.write(" GROUP BY ")?;
                 self.visit_grouping(select.grouping)?;
             }
+            if let Some(conditions) = select.having {
+                self.write(" HAVING ")?;
+                self.visit_conditions(conditions)?;
+            }
 
             self.visit_limit_and_offset(select.limit, select.offset)?;
         } else if select.columns.is_empty() {

@@ -8,6 +8,7 @@ pub struct Select<'a> {
     pub(crate) conditions: Option<ConditionTree<'a>>,
     pub(crate) ordering: Ordering<'a>,
     pub(crate) grouping: Grouping<'a>,
+    pub(crate) having: Option<ConditionTree<'a>>,
     pub(crate) limit: Option<ParameterizedValue<'a>>,
     pub(crate) offset: Option<ParameterizedValue<'a>>,
     pub(crate) joins: Vec<Join<'a>>,
@@ -326,6 +327,27 @@ impl<'a> Select<'a> {
         T: IntoGroupByDefinition<'a>,
     {
         self.grouping = self.grouping.append(value.into_group_by_definition());
+        self
+    }
+
+    /// Adds group conditions to a query. Should be combined together with a
+    /// [group_by](struct.Select.html#method.group_by) statement.
+    ///
+    /// ```rust
+    /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
+    /// let query = Select::from_table("users").column("foo").column("bar")
+    ///     .group_by("foo")
+    ///     .having("foo".greater_than(100));
+    ///
+    /// let (sql, params) = Sqlite::build(query);
+    ///
+    /// assert_eq!("SELECT `foo`, `bar` FROM `users` GROUP BY `foo` HAVING `foo` > ?", sql);
+    /// assert_eq!(vec![ParameterizedValue::from(100)], params);
+    pub fn having<T>(mut self, conditions: T) -> Self
+    where
+        T: Into<ConditionTree<'a>>,
+    {
+        self.having = Some(conditions.into());
         self
     }
 
