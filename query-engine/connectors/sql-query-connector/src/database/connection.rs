@@ -1,12 +1,11 @@
 use super::transaction::SqlConnectorTransaction;
 use crate::{database::operations::*, query_builder::read::ManyRelatedRecordsQueryBuilder, QueryExt, SqlError};
 use connector_interface::{
-    self as connector,
-    filter::Filter,
-    Connection, QueryArguments, ReadOperations, ScalarListValues, Transaction, WriteArgs, WriteOperations, IO,
+    self as connector, filter::Filter, Connection, QueryArguments, ReadOperations, ScalarListValues, Transaction,
+    WriteArgs, WriteOperations, IO,
 };
 use prisma_models::prelude::*;
-use quaint::{prelude::ConnectionInfo, connector::TransactionCapable};
+use quaint::{connector::TransactionCapable, prelude::ConnectionInfo};
 use std::marker::PhantomData;
 
 pub struct SqlConnection<'a, C, T> {
@@ -21,10 +20,17 @@ where
     T: ManyRelatedRecordsQueryBuilder + Send + Sync + 'static,
 {
     pub fn new(inner: C, connection_info: &'a ConnectionInfo) -> Self {
-        Self { inner, connection_info, _p: PhantomData }
+        Self {
+            inner,
+            connection_info,
+            _p: PhantomData,
+        }
     }
 
-    async fn catch<O>(&self, fut: impl std::future::Future<Output = Result<O, SqlError>>) -> Result<O, connector_interface::error::ConnectorError> {
+    async fn catch<O>(
+        &self,
+        fut: impl std::future::Future<Output = Result<O, SqlError>>,
+    ) -> Result<O, connector_interface::error::ConnectorError> {
         match fut.await {
             Ok(o) => Ok(o),
             Err(err) => Err(err.into_connector_error(&self.connection_info)),
@@ -37,8 +43,7 @@ where
     C: QueryExt + TransactionCapable + Send + Sync + 'static,
     T: ManyRelatedRecordsQueryBuilder + Send + Sync + 'static,
 {
-    fn start_transaction<'a>(&'a self) -> IO<'a, Box<dyn Transaction<'a> + 'a>>
-    {
+    fn start_transaction<'a>(&'a self) -> IO<'a, Box<dyn Transaction<'a> + 'a>> {
         let fut_tx = self.inner.start_transaction();
         let connection_info = self.connection_info;
 
@@ -69,7 +74,11 @@ where
         query_arguments: QueryArguments,
         selected_fields: &'b SelectedFields,
     ) -> connector::IO<'b, ManyRecords> {
-        IO::new(self.catch(async move { read::get_many_records(&self.inner, model, query_arguments, selected_fields).await }))
+        IO::new(
+            self.catch(
+                async move { read::get_many_records(&self.inner, model, query_arguments, selected_fields).await },
+            ),
+        )
     }
 
     fn get_related_records<'b>(

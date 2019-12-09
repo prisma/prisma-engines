@@ -62,7 +62,11 @@ impl SqlMigrationConnector {
             Ok(connection)
         };
 
-        let connection = tokio::time::timeout(CONNECTION_TIMEOUT, connection_fut).await.map_err(|_elapsed| SqlError::from(quaint::error::Error::ConnectTimeout).into_connector_error(&connection_info))??;
+        let connection = tokio::time::timeout(CONNECTION_TIMEOUT, connection_fut)
+            .await
+            .map_err(|_elapsed| {
+                SqlError::from(quaint::error::Error::ConnectTimeout).into_connector_error(&connection_info)
+            })??;
 
         let schema_name = connection.connection_info().schema_name().to_owned();
 

@@ -72,7 +72,14 @@ async fn creating_a_field_for_an_existing_column_with_a_compatible_type_must_wor
             migration.create_table("Blog", move |t| {
                 t.add_column("id", types::primary());
                 // We add a default because the migration engine always adds defaults to facilitate migration of required columns.
-                t.add_column("title", if is_mysql { types::varchar(181).default("") } else { types::text().default("") });
+                t.add_column(
+                    "title",
+                    if is_mysql {
+                        types::varchar(181).default("")
+                    } else {
+                        types::text().default("")
+                    },
+                );
             });
         })
         .await;

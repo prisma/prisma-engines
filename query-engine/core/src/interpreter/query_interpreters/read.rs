@@ -30,9 +30,7 @@ fn read_one<'conn, 'tx>(
         let selected_fields = inject_required_fields(query.selected_fields.clone());
         let model = query.model;
         let filter = query.filter.expect("Expected filter to be set for ReadOne query.");
-        let scalars = tx
-            .get_single_record(&model, &filter, &selected_fields)
-            .await?;
+        let scalars = tx.get_single_record(&model, &filter, &selected_fields).await?;
 
         let id_field = model.fields().id().name.clone();
 

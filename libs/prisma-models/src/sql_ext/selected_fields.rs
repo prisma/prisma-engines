@@ -7,11 +7,7 @@ pub trait SelectedFieldsExt {
 
 impl SelectedFieldsExt for SelectedFields {
     fn columns(&self) -> Vec<Column<'static>> {
-        let mut result: Vec<Column<'static>> = self
-            .scalar_non_list()
-            .iter()
-            .map(|f| f.as_column())
-            .collect();
+        let mut result: Vec<Column<'static>> = self.scalar_non_list().iter().map(|f| f.as_column()).collect();
 
         for rf in self.relation_inlined().iter() {
             result.push(rf.as_column());
@@ -24,7 +20,7 @@ impl SelectedFieldsExt for SelectedFields {
                 result.push(
                     relation
                         .column_for_relation_side(from_field.relation_side.opposite())
-                        .alias(SelectedFields::RELATED_MODEL_ALIAS)
+                        .alias(SelectedFields::RELATED_MODEL_ALIAS),
                 );
 
                 result.push(

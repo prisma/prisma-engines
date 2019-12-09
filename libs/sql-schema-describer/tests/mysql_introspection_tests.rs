@@ -17,7 +17,8 @@ async fn all_mysql_column_types_must_work() {
         t.add_column("primary_col", types::primary());
         t.add_column("int_col", types::custom("int"));
         t.add_column("smallint_col", types::custom("smallint"));
-        t.add_column("tinyint_col", types::custom("tinyint"));
+        t.add_column("tinyint4_col", types::custom("tinyint(4)"));
+        t.add_column("tinyint1_col", types::custom("tinyint(1)"));
         t.add_column("mediumint_col", types::custom("mediumint"));
         t.add_column("bigint_col", types::custom("bigint"));
         t.add_column("decimal_col", types::custom("decimal"));
@@ -92,7 +93,17 @@ async fn all_mysql_column_types_must_work() {
             auto_increment: false,
         },
         Column {
-            name: "tinyint_col".to_string(),
+            name: "tinyint4_col".to_string(),
+            tpe: ColumnType {
+                raw: "tinyint".to_string(),
+                family: ColumnTypeFamily::Int,
+            },
+            arity: ColumnArity::Required,
+            default: None,
+            auto_increment: false,
+        },
+        Column {
+            name: "tinyint1_col".to_string(),
             tpe: ColumnType {
                 raw: "tinyint".to_string(),
                 family: ColumnTypeFamily::Boolean,

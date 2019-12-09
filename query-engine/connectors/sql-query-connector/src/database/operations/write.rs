@@ -3,11 +3,7 @@ use connector_interface::*;
 use prisma_models::*;
 use quaint::error::Error as QueryError;
 
-pub async fn create_record(
-    conn: &dyn QueryExt,
-    model: &ModelRef,
-    args: WriteArgs,
-) -> crate::Result<GraphqlId> {
+pub async fn create_record(conn: &dyn QueryExt, model: &ModelRef, args: WriteArgs) -> crate::Result<GraphqlId> {
     let (insert, returned_id) = write::create_record(model, args.non_list_args().clone());
 
     let last_id = match conn.insert(insert).await {
@@ -75,7 +71,6 @@ pub async fn update_records(
         conn.update(update).await?;
     }
 
-
     for (field_name, list_value) in args.list_args() {
         let field = model.fields().find_from_scalar(field_name.as_ref()).unwrap();
         let table = field.scalar_list_table();
@@ -93,11 +88,7 @@ pub async fn update_records(
     Ok(ids)
 }
 
-pub async fn delete_records(
-    conn: &dyn QueryExt,
-    model: &ModelRef,
-    where_: Filter,
-) -> crate::Result<usize> {
+pub async fn delete_records(conn: &dyn QueryExt, model: &ModelRef, where_: Filter) -> crate::Result<usize> {
     let ids = conn.filter_ids(model, where_.clone()).await?;
     let ids: Vec<&GraphqlId> = ids.iter().map(|id| &*id).collect();
     let count = ids.len();

@@ -32,11 +32,7 @@ async fn create_one<'a, 'b>(tx: &'a ConnectionLike<'a, 'b>, q: CreateRecord) -> 
 
 async fn update_one<'a, 'b>(tx: &'a ConnectionLike<'a, 'b>, q: UpdateRecord) -> InterpretationResult<QueryResult> {
     let mut res = tx
-        .update_records(
-            &q.model,
-            q.where_,
-            WriteArgs::new(q.non_list_args, q.list_args),
-        )
+        .update_records(&q.model, q.where_, WriteArgs::new(q.non_list_args, q.list_args))
         .await?;
 
     Ok(QueryResult::Id(res.pop()))

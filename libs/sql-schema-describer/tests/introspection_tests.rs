@@ -76,7 +76,7 @@ fn is_required_must_work() {
                 ];
                 assert_eq!(user_table.columns, expected_columns);
             }
-                .boxed()
+            .boxed()
         },
     );
 }
@@ -141,7 +141,7 @@ fn foreign_keys_must_work() {
                     }
                 );
             }
-                .boxed()
+            .boxed()
         },
     );
 }
@@ -229,7 +229,7 @@ fn multi_column_foreign_keys_must_work() {
                     }
                 );
             }
-                .boxed()
+            .boxed()
         },
     );
 }
@@ -260,7 +260,7 @@ fn names_with_hyphens_must_work() {
                 }];
                 assert_eq!(user_table.columns, expected_columns);
             }
-                .boxed()
+            .boxed()
         },
     );
 }
@@ -338,7 +338,7 @@ fn composite_primary_keys_must_work() {
                     }
                 );
             }
-                .boxed()
+            .boxed()
         },
     );
 }
@@ -411,7 +411,7 @@ fn indices_must_work() {
                     }
                 );
             }
-                .boxed()
+            .boxed()
         },
     );
 }
@@ -503,7 +503,7 @@ fn column_uniqueness_must_be_detected() {
                     "Column 2 should return true for is_unique"
                 );
             }
-                .boxed()
+            .boxed()
         },
     );
 }
@@ -547,7 +547,7 @@ fn defaults_must_work() {
                     }
                 );
             }
-                .boxed()
+            .boxed()
         },
     );
 }
