@@ -95,8 +95,16 @@ pub trait Visitor<'a> {
                     self.write(" INNER JOIN ")?;
                     self.visit_join_data(data)?;
                 }
-                Join::LeftOuter(data) => {
-                    self.write(" LEFT OUTER JOIN ")?;
+                Join::Left(data) => {
+                    self.write(" LEFT JOIN ")?;
+                    self.visit_join_data(data)?;
+                }
+                Join::Right(data) => {
+                    self.write(" RIGHT JOIN ")?;
+                    self.visit_join_data(data)?;
+                }
+                Join::Full(data) => {
+                    self.write(" FULL JOIN ")?;
                     self.visit_join_data(data)?;
                 }
             }

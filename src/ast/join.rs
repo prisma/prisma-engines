@@ -12,8 +12,12 @@ pub struct JoinData<'a> {
 pub enum Join<'a> {
     /// Implements an `INNER JOIN` with given `JoinData`.
     Inner(JoinData<'a>),
-    /// Implements an `LEFT OUTER JOIN` with given `JoinData`.
-    LeftOuter(JoinData<'a>),
+    /// Implements an `LEFT JOIN` with given `JoinData`.
+    Left(JoinData<'a>),
+    /// Implements an `RIGHT JOIN` with given `JoinData`.
+    Right(JoinData<'a>),
+    /// Implements an `FULL JOIN` with given `JoinData`.
+    Full(JoinData<'a>),
 }
 
 /// An item that can be joined.

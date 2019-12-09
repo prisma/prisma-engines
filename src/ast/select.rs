@@ -261,16 +261,16 @@ impl<'a> Select<'a> {
         self
     }
 
-    /// Adds `LEFT OUTER JOIN` clause to the query.
+    /// Adds `LEFT JOIN` clause to the query.
     ///
     /// ```rust
     /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
     /// let join = "posts".alias("p").on(("p", "visible").equals(true));
-    /// let query = Select::from_table("users").left_outer_join(join);
+    /// let query = Select::from_table("users").left_join(join);
     /// let (sql, params) = Sqlite::build(query);
     ///
     /// assert_eq!(
-    ///     "SELECT `users`.* FROM `users` LEFT OUTER JOIN `posts` AS `p` ON `p`.`visible` = ?",
+    ///     "SELECT `users`.* FROM `users` LEFT JOIN `posts` AS `p` ON `p`.`visible` = ?",
     ///     sql
     /// );
     ///
@@ -281,11 +281,67 @@ impl<'a> Select<'a> {
     ///     params
     /// );
     /// ```
-    pub fn left_outer_join<J>(mut self, join: J) -> Self
+    pub fn left_join<J>(mut self, join: J) -> Self
     where
         J: Into<JoinData<'a>>,
     {
-        self.joins.push(Join::LeftOuter(join.into()));
+        self.joins.push(Join::Left(join.into()));
+        self
+    }
+
+    /// Adds `RIGHT JOIN` clause to the query.
+    ///
+    /// ```rust
+    /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
+    /// let join = "posts".alias("p").on(("p", "visible").equals(true));
+    /// let query = Select::from_table("users").right_join(join);
+    /// let (sql, params) = Sqlite::build(query);
+    ///
+    /// assert_eq!(
+    ///     "SELECT `users`.* FROM `users` RIGHT JOIN `posts` AS `p` ON `p`.`visible` = ?",
+    ///     sql
+    /// );
+    ///
+    /// assert_eq!(
+    ///     vec![
+    ///         ParameterizedValue::from(true),
+    ///     ],
+    ///     params
+    /// );
+    /// ```
+    pub fn right_join<J>(mut self, join: J) -> Self
+    where
+        J: Into<JoinData<'a>>,
+    {
+        self.joins.push(Join::Right(join.into()));
+        self
+    }
+
+    /// Adds `FULL JOIN` clause to the query.
+    ///
+    /// ```rust
+    /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
+    /// let join = "posts".alias("p").on(("p", "visible").equals(true));
+    /// let query = Select::from_table("users").full_join(join);
+    /// let (sql, params) = Sqlite::build(query);
+    ///
+    /// assert_eq!(
+    ///     "SELECT `users`.* FROM `users` FULL JOIN `posts` AS `p` ON `p`.`visible` = ?",
+    ///     sql
+    /// );
+    ///
+    /// assert_eq!(
+    ///     vec![
+    ///         ParameterizedValue::from(true),
+    ///     ],
+    ///     params
+    /// );
+    /// ```
+    pub fn full_join<J>(mut self, join: J) -> Self
+    where
+        J: Into<JoinData<'a>>,
+    {
+        self.joins.push(Join::Full(join.into()));
         self
     }
 
