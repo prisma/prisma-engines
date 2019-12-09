@@ -1,8 +1,8 @@
 //! Postgres description.
 use super::*;
 use log::debug;
-use quaint::prelude::Queryable;
 use once_cell::sync::Lazy;
+use quaint::prelude::Queryable;
 use regex::Regex;
 use std::collections::{HashMap, HashSet};
 use std::convert::TryInto;
@@ -131,7 +131,7 @@ impl SqlSchemaDescriber {
     }
 
     async fn get_columns(&self, schema: &str, table: &str) -> Vec<Column> {
-        let sql = "SELECT column_name, udt_name, column_default, is_nullable, is_identity, data_type
+        let sql = "SELECT column_name, data_type, udt_name as full_column_type, column_default, is_nullable, is_identity, data_type
             FROM information_schema.columns
             WHERE table_schema = $1 AND table_name = $2
             ORDER BY column_name";
@@ -148,7 +148,11 @@ impl SqlSchemaDescriber {
                     .get("column_name")
                     .and_then(|x| x.to_string())
                     .expect("get column name");
-                let udt = col.get("udt_name").and_then(|x| x.to_string()).expect("get udt_name");
+                let data_type = col.get("data_type").and_then(|x| x.to_string()).expect("get data_type");
+                let full_data_type = col
+                    .get("full_column_type")
+                    .and_then(|x| x.to_string())
+                    .expect("get full_column_type aka udt_name");
                 let is_identity_str = col
                     .get("is_identity")
                     .and_then(|x| x.to_string())
@@ -169,7 +173,7 @@ impl SqlSchemaDescriber {
                     "yes" => false,
                     x => panic!(format!("unrecognized is_nullable variant '{}'", x)),
                 };
-                let tpe = get_column_type(udt.as_ref());
+                let tpe = get_column_type(data_type.as_ref(), full_data_type.as_ref());
                 let arity = if tpe.raw.starts_with("_") {
                     ColumnArity::List
                 } else if is_required {
@@ -496,8 +500,8 @@ impl SqlSchemaDescriber {
     }
 }
 
-fn get_column_type(udt: &str) -> ColumnType {
-    let family = match udt {
+fn get_column_type(_data_type: &str, full_data_type: &str) -> ColumnType {
+    let family = match full_data_type {
         "int2" => ColumnTypeFamily::Int,
         "int4" => ColumnTypeFamily::Int,
         "int8" => ColumnTypeFamily::Int,
@@ -542,20 +546,16 @@ fn get_column_type(udt: &str) -> ColumnType {
         _ => ColumnTypeFamily::Unknown,
     };
     ColumnType {
-        raw: udt.to_string(),
+        raw: full_data_type.to_string(),
         family: family,
     }
 }
 
-static RE_SEQ: Lazy<Regex> = Lazy::new(|| {
-    Regex::new("^(?:.+\\.)?\"?([^.\"]+)\"?").expect("compile regex")
-});
+static RE_SEQ: Lazy<Regex> = Lazy::new(|| Regex::new("^(?:.+\\.)?\"?([^.\"]+)\"?").expect("compile regex"));
 
 static AUTOINCREMENT_REGEX: Lazy<Regex> = Lazy::new(|| {
-    Regex::new(
-        r#"nextval\((?:"(?P<schema_name>.+)"\.)?"(?P<table_and_column_name>.+)_seq(?:[0-9]+)?"::regclass\)"#,
-    )
-    .unwrap()
+    Regex::new(r#"nextval\((?:"(?P<schema_name>.+)"\.)?"(?P<table_and_column_name>.+)_seq(?:[0-9]+)?"::regclass\)"#)
+        .unwrap()
 });
 
 /// Returns whether a particular sequence (`value`) matches the provided column info.
@@ -569,22 +569,20 @@ fn is_autoincrement(value: &str, schema_name: &str, table_name: &str, column_nam
                 .or(Some(schema_name))
                 .filter(|matched| *matched == schema_name)
                 .and_then(|_| {
-                    captures
-                        .name("table_and_column_name")
-                        .filter(|matched| {
-                            let expected_len = table_name.len() + column_name.len() + 1;
+                    captures.name("table_and_column_name").filter(|matched| {
+                        let expected_len = table_name.len() + column_name.len() + 1;
 
-                            if matched.as_str().len() != expected_len {
-                                return false
-                            }
+                        if matched.as_str().len() != expected_len {
+                            return false;
+                        }
 
-                            let table_name_segments = table_name.split('_');
-                            let column_name_segments = column_name.split('_');
-                            let matched_segments = matched.as_str().split('_');
-                            matched_segments.zip(table_name_segments.chain(column_name_segments)).all(|(found, expected)| {
-                                found == expected
-                            })
-                        })
+                        let table_name_segments = table_name.split('_');
+                        let column_name_segments = column_name.split('_');
+                        let matched_segments = matched.as_str().split('_');
+                        matched_segments
+                            .zip(table_name_segments.chain(column_name_segments))
+                            .all(|(found, expected)| found == expected)
+                    })
                 })
                 .map(|_| true)
         })
@@ -630,7 +628,8 @@ mod tests {
         ));
 
         // The table and column names contain underscores, so it's impossible to say from the sequence where one starts and the other ends.
-        let autoincrement_with_ambiguous_table_and_column_names = r#"nextval("compound_table_compound_column_name_seq"::regclass)"#;
+        let autoincrement_with_ambiguous_table_and_column_names =
+            r#"nextval("compound_table_compound_column_name_seq"::regclass)"#;
         assert!(is_autoincrement(
             &autoincrement_with_ambiguous_table_and_column_names,
             "<ignored>",
@@ -640,13 +639,13 @@ mod tests {
 
         // The table and column names contain underscores, so it's impossible to say from the sequence where one starts and the other ends.
         // But this one has extra text between table and column names, so it should not match.
-        let autoincrement_with_ambiguous_table_and_column_names = r#"nextval("compound_table_something_compound_column_name_seq"::regclass)"#;
+        let autoincrement_with_ambiguous_table_and_column_names =
+            r#"nextval("compound_table_something_compound_column_name_seq"::regclass)"#;
         assert!(!is_autoincrement(
             &autoincrement_with_ambiguous_table_and_column_names,
             "<ignored>",
             "compound_table",
             "compound_column_name",
         ));
-
     }
 }
