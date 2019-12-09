@@ -208,18 +208,6 @@ impl Column {
     pub fn is_required(&self) -> bool {
         self.arity == ColumnArity::Required
     }
-
-    pub fn differs_in_something_except_default(&self, other: &Column) -> bool {
-        let result = self.name != other.name
-            || self.tpe.family != other.tpe.family // TODO: must respect full type
-            || self.arity != other.arity;
-        //|| self.auto_increment != other.auto_increment;
-
-        //        if result {
-        //            println!("differs_in_something_except_default \n {:?} \n {:?}", &self, &other);
-        //        }
-        result
-    }
 }
 
 /// The type of a column.
