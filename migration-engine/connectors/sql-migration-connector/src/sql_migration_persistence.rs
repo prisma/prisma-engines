@@ -111,11 +111,10 @@ impl MigrationPersistence for SqlMigrationPersistence {
         let model_steps_json = serde_json::to_string(&migration.datamodel_steps).unwrap();
         let database_migration_json = serde_json::to_string(&migration.database_migration).unwrap();
         let errors_json = serde_json::to_string(&migration.errors).unwrap();
-        let serialized_datamodel = datamodel::render_datamodel_to_string(&migration.datamodel).unwrap();
 
         let insert = Insert::single_into(self.table())
+            .value(DATAMODEL_COLUMN, migration.datamodel_string)
             .value(NAME_COLUMN, migration.name)
-            .value(DATAMODEL_COLUMN, serialized_datamodel)
             .value(STATUS_COLUMN, migration.status.code())
             .value(APPLIED_COLUMN, migration.applied)
             .value(ROLLED_BACK_COLUMN, migration.rolled_back)
@@ -251,7 +250,6 @@ fn parse_rows_new(result_set: ResultSet) -> Vec<Migration> {
 
             let datamodel_steps =
                 serde_json::from_str(&datamodel_steps_json).expect("Error parsing the migration steps");
-            let datamodel = datamodel::parse_datamodel(&datamodel_string).unwrap();
 
             let database_migration_json =
                 serde_json::from_str(&database_migration_string).expect("Error parsing the database migration steps");
@@ -261,7 +259,6 @@ fn parse_rows_new(result_set: ResultSet) -> Vec<Migration> {
                 name: row[NAME_COLUMN].to_string().unwrap(),
                 revision: row[REVISION_COLUMN].as_i64().unwrap() as usize,
                 datamodel_string,
-                datamodel,
                 status: MigrationStatus::from_str(row[STATUS_COLUMN].to_string().unwrap()),
                 applied: row[APPLIED_COLUMN].as_i64().unwrap() as usize,
                 rolled_back: row[ROLLED_BACK_COLUMN].as_i64().unwrap() as usize,

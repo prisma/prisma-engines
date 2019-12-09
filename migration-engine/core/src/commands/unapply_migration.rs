@@ -1,8 +1,8 @@
 use crate::commands::command::*;
 use crate::migration_engine::MigrationEngine;
-use tracing::debug;
 use migration_connector::*;
 use serde::{Deserialize, Serialize};
+use tracing::debug;
 
 pub struct UnapplyMigrationCommand<'a> {
     input: &'a UnapplyMigrationInput,

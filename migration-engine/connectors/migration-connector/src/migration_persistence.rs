@@ -12,11 +12,6 @@ pub trait MigrationPersistence: Send + Sync + 'static {
     /// Drop all persisted state.
     async fn reset(&self);
 
-    /// Returns the currently active Datamodel.
-    async fn current_datamodel(&self) -> Datamodel {
-        self.last().await.map(|m| m.datamodel).unwrap_or_else(Datamodel::empty)
-    }
-
     async fn current_datamodel_ast(&self) -> SchemaAst {
         self.last()
             .await
@@ -36,13 +31,6 @@ pub trait MigrationPersistence: Send + Sync + 'static {
         let mut all_migrations = self.load_all().await;
         all_migrations.reverse();
         all_migrations.into_iter().find(|m| !m.is_watch_migration())
-    }
-
-    async fn last_non_watch_datamodel(&self) -> Datamodel {
-        self.last_non_watch_migration()
-            .await
-            .map(|m| m.datamodel)
-            .unwrap_or_else(Datamodel::empty)
     }
 
     /// Returns the last successful Migration.
@@ -89,7 +77,6 @@ pub struct Migration {
     pub applied: usize,
     pub rolled_back: usize,
     pub datamodel_string: String,
-    pub datamodel: Datamodel,
     pub datamodel_steps: Vec<MigrationStep>,
     pub database_migration: serde_json::Value,
     pub errors: Vec<String>,
@@ -130,7 +117,6 @@ impl Migration {
             datamodel_string: String::new(),
             applied: 0,
             rolled_back: 0,
-            datamodel: Datamodel::empty(),
             datamodel_steps: Vec::new(),
             database_migration: serde_json::to_value("{}").unwrap(),
             errors: Vec::new(),
@@ -166,6 +152,12 @@ impl Migration {
         datamodel::ast::parser::parse(&self.datamodel_string)
             .ok()
             .unwrap_or_else(SchemaAst::empty)
+    }
+
+    pub fn datamodel(&self) -> Datamodel {
+        datamodel::lift_ast(&self.datamodel_ast())
+            .ok()
+            .unwrap_or_else(Datamodel::empty)
     }
 }
 

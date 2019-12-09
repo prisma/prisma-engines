@@ -13,6 +13,9 @@ use sql_schema_describer::*;
 use std::sync::Arc;
 use test_setup::*;
 
+/// An atomic counter to generate unique migration IDs in tests.
+static MIGRATION_ID_COUNTER: std::sync::atomic::AtomicUsize = std::sync::atomic::AtomicUsize::new(0);
+
 /// A handle to all the context needed for end-to-end testing of the migration engine across
 /// connectors.
 pub struct TestApi {
@@ -83,9 +86,12 @@ impl TestApi {
     }
 
     pub async fn infer_and_apply(&self, datamodel: &str) -> InferAndApplyOutput {
-        let migration_id = "the-migration-id";
+        let migration_id = format!(
+            "migration-{}",
+            MIGRATION_ID_COUNTER.fetch_add(1, std::sync::atomic::Ordering::Relaxed)
+        );
 
-        self.infer_and_apply_with_migration_id(datamodel, migration_id).await
+        self.infer_and_apply_with_migration_id(datamodel, &migration_id).await
     }
 
     pub async fn infer_and_apply_with_migration_id(&self, datamodel: &str, migration_id: &str) -> InferAndApplyOutput {
