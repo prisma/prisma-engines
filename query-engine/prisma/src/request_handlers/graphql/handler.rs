@@ -25,15 +25,20 @@ impl RequestHandler for GraphQlRequestHandler {
     where
         S: Into<PrismaRequest<Self::Body>> + Send + Sync + 'static,
     {
-        use std::panic::AssertUnwindSafe;
         use futures::FutureExt;
-        use user_facing_errors::{UnknownError, Error};
+        use std::panic::AssertUnwindSafe;
+        use user_facing_errors::{Error, UnknownError};
 
-        let responses = match AssertUnwindSafe(handle_graphql_query(req.into(), ctx)).catch_unwind().await {
+        let responses = match AssertUnwindSafe(handle_graphql_query(req.into(), ctx))
+            .catch_unwind()
+            .await
+        {
             Ok(Ok(responses)) => responses,
             Ok(Err(err)) => vec![err.into()],
             // panicked
-            Err(err) => vec![response_ir::Response::Error(response_ir::ResponseError::from(Error::Unknown(UnknownError::from_panic_payload(&err))))],
+            Err(err) => vec![response_ir::Response::Error(response_ir::ResponseError::from(
+                Error::Unknown(UnknownError::from_panic_payload(&err)),
+            ))],
         };
 
         json::serialize(responses)

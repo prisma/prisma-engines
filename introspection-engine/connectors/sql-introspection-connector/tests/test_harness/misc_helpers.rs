@@ -1,10 +1,10 @@
 use barrel::Migration;
+use pretty_assertions::assert_eq;
 use quaint::{connector::Queryable, single::Quaint};
 use std::future::Future;
-use std::{rc::Rc, sync::{Arc}};
+use std::{rc::Rc, sync::Arc};
 use test_setup::*;
 use url::Url;
-use pretty_assertions::assert_eq;
 
 pub(crate) fn custom_assert(left: &str, right: &str) {
     let parsed_expected = datamodel::parse_datamodel(&right).unwrap();

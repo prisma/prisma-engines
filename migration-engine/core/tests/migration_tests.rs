@@ -1552,7 +1552,6 @@ async fn calculate_database_steps_with_infer_after_an_apply_must_work(api: &Test
     assert_eq!(result.datamodel_steps, new_steps);
 }
 
-
 #[test_each_connector]
 async fn column_defaults_must_be_migrated(api: &TestApi) {
     let dm1 = r#"
@@ -1566,7 +1565,10 @@ async fn column_defaults_must_be_migrated(api: &TestApi) {
 
     let table = schema.table_bang("Fruit");
     let column = table.column_bang("name");
-    assert_eq!(column.default.as_ref().map(String::as_str), Some( if api.is_sqlite() { "'banana'" } else { "banana" }));
+    assert_eq!(
+        column.default.as_ref().map(String::as_str),
+        Some(if api.is_sqlite() { "'banana'" } else { "banana" })
+    );
 
     let dm2 = r#"
         model Fruit {
@@ -1579,5 +1581,8 @@ async fn column_defaults_must_be_migrated(api: &TestApi) {
 
     let table = schema.table_bang("Fruit");
     let column = table.column_bang("name");
-    assert_eq!(column.default.as_ref().map(String::as_str), Some(if api.is_sqlite() { "'mango'" } else { "mango" }));
+    assert_eq!(
+        column.default.as_ref().map(String::as_str),
+        Some(if api.is_sqlite() { "'mango'" } else { "mango" })
+    );
 }

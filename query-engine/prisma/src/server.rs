@@ -8,10 +8,10 @@ use crate::{
     PrismaResult,
 };
 use futures::stream::StreamExt;
+use http::header::CONTENT_LENGTH;
 use hyper::header;
 use hyper::service::{make_service_fn, service_fn};
 use hyper::{Body, Error, Method, Request, Response, Server, StatusCode};
-use http::header::CONTENT_LENGTH;
 use query_core::schema::QuerySchemaRenderer;
 use serde_json::json;
 use std::{sync::Arc, time::Instant};
