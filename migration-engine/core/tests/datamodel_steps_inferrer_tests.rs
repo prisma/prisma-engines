@@ -1391,6 +1391,58 @@ fn infer_UpdateTypeAlias() {
     assert_eq!(steps, expected);
 }
 
+#[test]
+fn infer_CreateSource() {
+    let dm1 = parse("");
+    let dm2 = parse(
+        r#"
+        datasource pg { 
+            provider = "postgres"
+            url = "postgresql://some-host:1234"
+        }"#,
+    );
+
+    let steps = infer(&dm1, &dm2);
+
+    let location = ArgumentLocation {
+        argument_container: "pg".to_owned(),
+        argument_type: ArgumentType::Datasource,
+        arguments: None,
+    };
+    let expected = &[
+        MigrationStep::CreateSource(CreateSource { name: "pg".to_owned() }),
+        MigrationStep::CreateArgument(CreateArgument {
+            location: location.clone(),
+            argument: "provider".to_owned(),
+            value: MigrationExpression("\"postgres\"".to_owned()),
+        }),
+        MigrationStep::CreateArgument(CreateArgument {
+            location: location.clone(),
+            argument: "url".to_owned(),
+            value: MigrationExpression("\"postgresql://some-host:1234\"".to_owned()),
+        }),
+    ];
+
+    assert_eq!(steps, expected);
+}
+
+#[test]
+fn infer_DeleteSource() {
+    let dm1 = parse(
+        r#"
+        datasource pg { 
+            provider = "postgres"
+            url = "postgresql://some-host:1234"
+        }"#,
+    );
+    let dm2 = parse("");
+
+    let steps = infer(&dm1, &dm2);
+    let expected = &[MigrationStep::DeleteSource(DeleteSource { name: "pg".to_owned() })];
+
+    assert_eq!(steps, expected);
+}
+
 fn infer(dm1: &SchemaAst, dm2: &SchemaAst) -> Vec<MigrationStep> {
     let inferrer = DataModelMigrationStepsInferrerImplWrapper {};
     inferrer.infer(&dm1, &dm2)
