@@ -1226,9 +1226,14 @@ async fn dropping_a_model_with_a_multi_field_unique_index_must_work(api: &TestAp
     api.infer_and_apply(&dm2).await;
 }
 
-#[test_each_connector]
+#[test_one_connector(connector = "postgres")]
 async fn adding_a_scalar_list_for_a_modelwith_id_type_int_must_work(api: &TestApi) {
     let dm1 = r#"
+            datasource pg {
+                      provider = "postgres"
+                      url = "postgres://localhost:5432"
+            }
+
             model A {
                 id Int @id
                 strings String[]
@@ -1257,9 +1262,14 @@ async fn adding_a_scalar_list_for_a_modelwith_id_type_int_must_work(api: &TestAp
     );
 }
 
-#[test_each_connector(ignore = "mysql")]
+#[test_one_connector(connector = "postgres")]
 async fn updating_a_model_with_a_scalar_list_to_a_different_id_type_must_work(api: &TestApi) {
     let dm = r#"
+        datasource pg {
+              provider = "postgres"
+              url = "postgres://localhost:5432"
+        }
+
         model A {
             id Int @id
             strings String[]
@@ -1270,6 +1280,11 @@ async fn updating_a_model_with_a_scalar_list_to_a_different_id_type_must_work(ap
     assert_eq!(node_id_column.tpe.family, ColumnTypeFamily::Int);
 
     let dm = r#"
+        datasource pg {
+              provider = "postgres"
+              url = "postgres://localhost:5432"
+        }
+        
         model A {
             id String @id @default(cuid())
             strings String[]
