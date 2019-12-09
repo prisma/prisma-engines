@@ -1,4 +1,4 @@
-use crate::ast::{Delete, Insert, Select, UnionAll, Update};
+use crate::ast::{Delete, Insert, Select, Union, Update};
 use std::borrow::Cow;
 
 /// A database query
@@ -9,7 +9,7 @@ pub enum Query<'a> {
     Insert(Box<Insert<'a>>),
     Update(Box<Update<'a>>),
     Delete(Box<Delete<'a>>),
-    UnionAll(UnionAll<'a>),
+    Union(Union<'a>),
     Raw(Cow<'a, str>),
 }
 
@@ -55,8 +55,8 @@ impl<'a> Query<'a> {
         }
     }
 
-    pub fn is_union_all(&self) -> bool {
-        if let Query::UnionAll(_) = self {
+    pub fn is_union(&self) -> bool {
+        if let Query::Union(_) = self {
             true
         } else {
             false

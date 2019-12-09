@@ -247,20 +247,25 @@ pub trait Visitor<'a> {
             Query::Insert(insert) => self.visit_insert(*insert).unwrap(),
             Query::Update(update) => self.visit_update(*update).unwrap(),
             Query::Delete(delete) => self.visit_delete(*delete).unwrap(),
-            Query::UnionAll(union) => self.visit_union_all(union).unwrap(),
+            Query::Union(union) => self.visit_union(union).unwrap(),
             Query::Raw(string) => self.write(string).unwrap(),
         }
     }
 
     /// A walk through a union of `SELECT` statements
-    fn visit_union_all(&mut self, ua: UnionAll<'a>) -> fmt::Result {
-        let len = ua.0.len();
+    fn visit_union(&mut self, mut ua: Union<'a>) -> fmt::Result {
+        let len = ua.selects.len();
+        let mut types = ua.types.drain(0..);
 
-        for (i, s) in ua.0.into_iter().enumerate() {
-            self.surround_with("(", ")", |ref mut se| se.visit_select(s))?;
+        for (i, sel) in ua.selects.into_iter().enumerate() {
+            self.surround_with("(", ")", |ref mut se| se.visit_select(sel))?;
 
             if i < (len - 1) {
-                self.write(" UNION ALL ")?;
+                let typ = types.next().unwrap();
+
+                self.write(" ")?;
+                self.write(typ)?;
+                self.write(" ")?;
             }
         }
 
