@@ -28,6 +28,14 @@ impl<'a> TopDiffer<'a> {
         })
     }
 
+    pub(crate) fn deleted_datasources(&self) -> impl Iterator<Item = &ast::SourceConfig> {
+        self.previous_sources().filter(move |next| {
+            self.next_sources()
+                .find(|previous| sources_match(previous, next))
+                .is_none()
+        })
+    }
+
     /// Iterator over the models present in `next` but not `previous`.
     pub(crate) fn created_models(&self) -> impl Iterator<Item = &ast::Model> {
         self.next_models().filter(move |next_model| {

@@ -25,6 +25,7 @@ pub enum MigrationStep {
     UpdateTypeAlias(UpdateTypeAlias),
     DeleteTypeAlias(DeleteTypeAlias),
     CreateSource(CreateSource),
+    DeleteSource(DeleteSource),
 }
 
 #[derive(Debug, Deserialize, Serialize, PartialEq, Eq, Hash, Clone)]
@@ -291,6 +292,11 @@ pub struct DeleteTypeAlias {
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct CreateSource {
+    pub name: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct DeleteSource {
     pub name: String,
 }
 

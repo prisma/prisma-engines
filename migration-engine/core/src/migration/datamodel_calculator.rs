@@ -1,6 +1,6 @@
 use datamodel::ast::{self, ArgumentContainer, SchemaAst};
 use failure::{format_err, Fail};
-use migration_connector::steps::{self, CreateSource, MigrationStep};
+use migration_connector::steps::{self, CreateSource, DeleteSource, MigrationStep};
 
 pub trait DataModelCalculator: Send + Sync + 'static {
     fn infer(&self, current: &SchemaAst, steps: &[MigrationStep]) -> Result<SchemaAst, CalculatorError>;
@@ -63,6 +63,7 @@ fn apply_step(datamodel: &mut ast::SchemaAst, step: &MigrationStep) -> Result<()
             apply_update_directive_argument(datamodel, update_directive_argument)
         }
         MigrationStep::CreateSource(create_source) => apply_create_source(datamodel, create_source)?,
+        MigrationStep::DeleteSource(delete_source) => apply_delete_source(datamodel, delete_source)?,
     };
 
     Ok(())
@@ -86,6 +87,28 @@ fn apply_create_source(datamodel: &mut ast::SchemaAst, step: &CreateSource) -> R
     };
 
     datamodel.tops.push(ast::Top::Source(new_source));
+
+    Ok(())
+}
+
+fn apply_delete_source(datamodel: &mut ast::SchemaAst, step: &DeleteSource) -> Result<(), CalculatorError> {
+    datamodel.find_model(&step.name).ok_or_else(|| {
+        format_err!(
+            "The source {} does not exist in this Schema. It is not possible to delete it.",
+            &step.name
+        )
+    })?;
+
+    let new_sources = datamodel
+        .tops
+        .drain(..)
+        .filter(|top| match top {
+            ast::Top::Source(source) => source.name.name != step.name,
+            _ => true,
+        })
+        .collect();
+
+    datamodel.tops = new_sources;
 
     Ok(())
 }
