@@ -11,6 +11,8 @@ use rpc::{Rpc, RpcImpl};
 
 fn main() {
     let matches = cli::clap_app().get_matches();
+    std::env::set_var("RUST_LOG", "debug");
+    init_logger();
 
     if matches.is_present("version") {
         println!(env!("GIT_HASH"));
@@ -26,4 +28,13 @@ fn main() {
         let server = ServerBuilder::new(io_handler);
         server.build();
     }
+}
+
+fn init_logger() {
+    use tracing_subscriber::{EnvFilter, FmtSubscriber};
+
+    FmtSubscriber::builder()
+        .with_env_filter(EnvFilter::from_default_env())
+        .with_writer(std::io::stderr)
+        .init()
 }
