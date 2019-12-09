@@ -209,6 +209,7 @@ async fn delete_a_field_for_a_non_existent_column_must_work(api: &TestApi) {
     assert_eq!(result, final_result);
 }
 
+#[test_one_connector(connector = "postgres")]
 async fn deleting_a_scalar_list_field_for_a_non_existent_column_must_work(api: &TestApi) {
     let dm1 = r#"
             datasource pg {
