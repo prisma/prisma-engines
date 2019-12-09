@@ -1,5 +1,5 @@
 use crate::test_harness::*;
-use crate::{test_one_connector, BarrelMigrationExecutor, TestApi};
+use crate::{test_one_connector,BarrelMigrationExecutor, TestApi};
 use barrel::types;
 
 #[test_one_connector(connector = "mysql")]
@@ -10,6 +10,7 @@ async fn metadata_for_mysql_should_work(api: &TestApi) {
     assert_eq!(result.table_count, 3);
     assert_eq!(result.size_in_bytes, 49152);
 }
+
 
 #[test_one_connector(connector = "postgres")]
 

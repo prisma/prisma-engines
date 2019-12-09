@@ -53,7 +53,7 @@ impl SqlSchemaDescriber {
     }
 
     async fn get_databases(&self) -> Vec<String> {
-        debug!("Getting table names");
+        debug!("Getting databases");
         let sql = "PRAGMA database_list;";
         let rows = self.conn.query_raw(sql, &[]).await.expect("get schema names ");
         let names = rows
@@ -89,8 +89,12 @@ impl SqlSchemaDescriber {
         let result = self.conn.query_raw(&sql, &[]).await.expect("get db size ");
         let size: i64 = result
             .first()
-            .and_then(|row| row.get("size")?.as_i64())
-            .expect("convert db size result");
+            .map(|row| {
+                row.get("size")
+                    .and_then(|x| x.as_i64())
+                    .unwrap_or(0)
+            })
+            .unwrap();
 
         size.try_into().unwrap()
     }

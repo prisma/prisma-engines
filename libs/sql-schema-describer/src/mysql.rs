@@ -3,6 +3,7 @@ use log::debug;
 use quaint::prelude::Queryable;
 use std::collections::{BTreeMap, HashMap};
 use std::sync::Arc;
+use failure::_core::convert::TryInto;
 
 pub struct SqlSchemaDescriber {
     conn: Arc<dyn Queryable + Send + Sync + 'static>,
@@ -50,7 +51,7 @@ impl SqlSchemaDescriber {
     }
 
     async fn get_databases(&self) -> Vec<String> {
-        debug!("Getting table names");
+        debug!("Getting databases");
         let sql = "select schema_name from information_schema.schemata;";
         let rows = self.conn.query_raw(sql, &[]).await.expect("get schema names ");
         let names = rows
@@ -92,19 +93,23 @@ impl SqlSchemaDescriber {
     }
 
     async fn get_size(&self, schema: &str) -> usize {
-        debug!("Getting table names");
+        debug!("Getting db size");
         let sql = "SELECT 
       SUM(data_length + index_length) as size 
       FROM information_schema.TABLES 
       WHERE table_schema = ?";
         let result = self.conn.query_raw(sql, &[schema.into()]).await.expect("get db size ");
-        let size: String = result
+        let size: i64 = result
             .first()
-            .map(|row| row.get("size").and_then(|x| x.to_string()).expect("get db size"))
+            .map(|row| {
+                row.get("size")
+                    .and_then(|x| x.as_i64())
+                    .unwrap_or(0)
+            })
             .unwrap();
 
         debug!("Found db size: {:?}", size);
-        size.parse().unwrap()
+        size.try_into().unwrap()
     }
 
     async fn get_table(&self, schema: &str, name: &str) -> Table {

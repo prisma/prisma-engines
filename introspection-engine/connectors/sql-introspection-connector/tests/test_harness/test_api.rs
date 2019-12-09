@@ -59,6 +59,23 @@ pub async fn mysql_test_api() -> TestApi {
     }
 }
 
+pub async fn mysql_8_test_api() -> TestApi {
+    let database = database(&mysql_url()).await;
+
+    let drop_database = format!("DROP DATABASE IF EXISTS `{}`;", SCHEMA_NAME);
+    database.query_raw(&drop_database, &[]).await.ok();
+    let create_database = dbg!(format!("CREATE DATABASE `{}`;", SCHEMA_NAME));
+    database.query_raw(&create_database, &[]).await.ok();
+
+    let introspection_connector = SqlIntrospectionConnector::new(&mysql_8_url()).await.unwrap();
+
+    TestApi {
+        database: database.into(),
+        sql_family: SqlFamily::Mysql,
+        introspection_connector,
+    }
+}
+
 pub async fn postgres_test_api() -> TestApi {
     let database = database(&postgres_url()).await;
 
