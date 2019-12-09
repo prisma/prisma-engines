@@ -152,14 +152,12 @@ impl SqlSchemaDescriber {
                     "yes" => false,
                     x => panic!(format!("unrecognized is_nullable variant '{}'", x)),
                 };
-                let tpe = get_column_type(data_type.as_ref());
-                let arity = if tpe.raw.starts_with("_") {
-                    ColumnArity::List
-                } else if is_required {
+                let arity = if is_required {
                     ColumnArity::Required
                 } else {
                     ColumnArity::Nullable
                 };
+                let tpe = get_column_type(data_type.as_ref(), arity);
                 let extra = col
                     .get("extra")
                     .and_then(|x| x.to_string())
@@ -175,7 +173,6 @@ impl SqlSchemaDescriber {
                         .and_then(|x| x.to_string())
                         .expect("get column name"),
                     tpe,
-                    arity,
                     default: col.get("column_default").and_then(|x| x.to_string()),
                     auto_increment: auto_increment,
                 }
@@ -397,7 +394,7 @@ impl SqlSchemaDescriber {
     }
 }
 
-fn get_column_type(data_type: &str) -> ColumnType {
+fn get_column_type(data_type: &str, arity: ColumnArity) -> ColumnType {
     let family = match data_type {
         "int" => ColumnTypeFamily::Int,
         "smallint" => ColumnTypeFamily::Int,
@@ -437,10 +434,11 @@ fn get_column_type(data_type: &str) -> ColumnType {
         "multipolygon" => ColumnTypeFamily::Geometric,
         "geometrycollection" => ColumnTypeFamily::Geometric,
         "json" => ColumnTypeFamily::Json,
-        x => panic!(format!("type '{}' is not supported here yet.", x)),
+        _ => ColumnTypeFamily::Unknown, // panic!(format!("type '{}' is not supported here yet.", x)),
     };
     ColumnType {
         raw: data_type.to_string(),
         family: family,
+        arity,
     }
 }

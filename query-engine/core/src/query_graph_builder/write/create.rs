@@ -54,15 +54,11 @@ pub fn create_record_node(
     data_map: ParsedInputMap,
 ) -> QueryGraphBuilderResult<NodeRef> {
     let create_args = WriteArguments::from(&model, data_map)?;
-    let mut non_list_args = create_args.non_list;
+    let mut args = create_args.args;
 
-    non_list_args.add_datetimes(Arc::clone(&model));
+    args.add_datetimes(Arc::clone(&model));
 
-    let cr = CreateRecord {
-        model,
-        non_list_args,
-        list_args: create_args.list,
-    };
+    let cr = CreateRecord { model, args };
 
     let create_node = graph.create_node(Query::Write(WriteQuery::CreateRecord(cr)));
 

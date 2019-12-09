@@ -64,8 +64,8 @@ fn database_schema_is_serializable() {
                         tpe: ColumnType {
                             raw: "integer".to_string(),
                             family: ColumnTypeFamily::Int,
+                            arity: ColumnArity::Required,
                         },
-                        arity: ColumnArity::Required,
                         default: None,
                         auto_increment: true,
                     },
@@ -74,8 +74,8 @@ fn database_schema_is_serializable() {
                         tpe: ColumnType {
                             raw: "varchar(255)".to_string(),
                             family: ColumnTypeFamily::String,
+                            arity: ColumnArity::Nullable,
                         },
-                        arity: ColumnArity::Nullable,
                         default: Some("default value".to_string()),
                         auto_increment: false,
                     },
@@ -84,8 +84,8 @@ fn database_schema_is_serializable() {
                         tpe: ColumnType {
                             raw: "integer".to_string(),
                             family: ColumnTypeFamily::Int,
+                            arity: ColumnArity::Required,
                         },
-                        arity: ColumnArity::Required,
                         default: None,
                         auto_increment: false,
                     },
@@ -114,8 +114,8 @@ fn database_schema_is_serializable() {
                     tpe: ColumnType {
                         raw: "integer".to_string(),
                         family: ColumnTypeFamily::Int,
+                        arity: ColumnArity::Required,
                     },
-                    arity: ColumnArity::Required,
                     default: None,
                     auto_increment: true,
                 }],
@@ -161,8 +161,8 @@ fn database_schema_without_primary_key_is_serializable() {
                 tpe: ColumnType {
                     raw: "integer".to_string(),
                     family: ColumnTypeFamily::Int,
+                    arity: ColumnArity::Nullable,
                 },
-                arity: ColumnArity::Nullable,
                 default: None,
                 auto_increment: false,
             }],
@@ -211,8 +211,8 @@ fn database_schema_is_serializable_for_every_column_type_family() {
         tpe: ColumnType {
             raw: "raw type".to_string(),
             family: family.to_owned(),
+            arity: ColumnArity::Nullable,
         },
-        arity: ColumnArity::Nullable,
         default: None,
         auto_increment: false,
     })
@@ -253,8 +253,8 @@ fn database_schema_is_serializable_for_every_column_arity() {
             tpe: ColumnType {
                 raw: "int".to_string(),
                 family: ColumnTypeFamily::Int,
+                arity: arity.to_owned(),
             },
-            arity: arity.to_owned(),
             default: None,
             auto_increment: false,
         })
@@ -296,8 +296,8 @@ fn database_schema_is_serializable_for_every_foreign_key_action() {
                     tpe: ColumnType {
                         raw: "int".to_string(),
                         family: ColumnTypeFamily::Int,
+                        arity: ColumnArity::Nullable,
                     },
-                    arity: ColumnArity::Nullable,
                     auto_increment: false,
                     default: None,
                 },
@@ -306,8 +306,8 @@ fn database_schema_is_serializable_for_every_foreign_key_action() {
                     tpe: ColumnType {
                         raw: "int".to_string(),
                         family: ColumnTypeFamily::Int,
+                        arity: ColumnArity::Nullable,
                     },
-                    arity: ColumnArity::Nullable,
                     auto_increment: false,
                     default: None,
                 },
@@ -316,8 +316,8 @@ fn database_schema_is_serializable_for_every_foreign_key_action() {
                     tpe: ColumnType {
                         raw: "int".to_string(),
                         family: ColumnTypeFamily::Int,
+                        arity: ColumnArity::Nullable,
                     },
-                    arity: ColumnArity::Nullable,
                     auto_increment: false,
                     default: None,
                 },
@@ -326,8 +326,8 @@ fn database_schema_is_serializable_for_every_foreign_key_action() {
                     tpe: ColumnType {
                         raw: "int".to_string(),
                         family: ColumnTypeFamily::Int,
+                        arity: ColumnArity::Nullable,
                     },
-                    arity: ColumnArity::Nullable,
                     auto_increment: false,
                     default: None,
                 },
@@ -336,8 +336,8 @@ fn database_schema_is_serializable_for_every_foreign_key_action() {
                     tpe: ColumnType {
                         raw: "int".to_string(),
                         family: ColumnTypeFamily::Int,
+                        arity: ColumnArity::Nullable,
                     },
-                    arity: ColumnArity::Nullable,
                     auto_increment: false,
                     default: None,
                 },

@@ -27,13 +27,19 @@ impl super::SqlRenderer for PostgresRenderer {
         }
     }
 
+    //Render the Arity here
     fn render_column_type(&self, t: &ColumnType) -> String {
+        let array = match t.arity {
+            ColumnArity::List => "[]",
+            _ => "",
+        };
+
         match &t.family {
-            ColumnTypeFamily::Boolean => format!("boolean"),
-            ColumnTypeFamily::DateTime => format!("timestamp(3)"),
-            ColumnTypeFamily::Float => format!("Decimal(65,30)"),
-            ColumnTypeFamily::Int => format!("integer"),
-            ColumnTypeFamily::String => format!("text"),
+            ColumnTypeFamily::Boolean => format!("boolean {}", array),
+            ColumnTypeFamily::DateTime => format!("timestamp(3) {}", array),
+            ColumnTypeFamily::Float => format!("Decimal(65,30) {}", array),
+            ColumnTypeFamily::Int => format!("integer {}", array),
+            ColumnTypeFamily::String => format!("text {}", array),
             x => unimplemented!("{:?} not handled yet", x),
         }
     }

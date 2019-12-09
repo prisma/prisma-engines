@@ -261,7 +261,7 @@ fn needs_fix(alter_table: &AlterTable) -> bool {
             // sqlite does not allow adding not null columns without a default value even if the table is empty
             // hence we just use our normal migration process
             // https://laracasts.com/discuss/channels/general-discussion/migrations-sqlite-general-error-1-cannot-add-a-not-null-column-with-default-value-null
-            add_column.column.arity == ColumnArity::Required
+            add_column.column.tpe.arity == ColumnArity::Required
         }
         TableChange::DropColumn(_) => true,
         TableChange::AlterColumn(_) => true,

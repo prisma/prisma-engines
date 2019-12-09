@@ -3,7 +3,7 @@ use crate::{query_builder::read::ManyRelatedRecordsQueryBuilder, SqlError};
 use connector_interface::{
     self as connector,
     filter::{Filter, RecordFinder},
-    QueryArguments, ReadOperations, ScalarListValues, Transaction, WriteArgs, WriteOperations, IO,
+    QueryArguments, ReadOperations, Transaction, WriteArgs, WriteOperations, IO,
 };
 use prisma_models::prelude::*;
 use std::marker::PhantomData;
@@ -73,14 +73,6 @@ where
             )
             .await
         })
-    }
-
-    fn get_scalar_list_values<'b>(
-        &'b self,
-        list_field: &'b ScalarFieldRef,
-        record_ids: Vec<GraphqlId>,
-    ) -> connector::IO<'b, Vec<ScalarListValues>> {
-        IO::new(async move { read::get_scalar_list_values(&self.inner, list_field, record_ids).await })
     }
 
     fn count_by_model<'b>(&'b self, model: &'b ModelRef, query_arguments: QueryArguments) -> connector::IO<'b, usize> {

@@ -13,7 +13,7 @@ pub struct SqlDatabaseStepApplier {
 #[async_trait::async_trait]
 impl DatabaseMigrationStepApplier<SqlMigration> for SqlDatabaseStepApplier {
     async fn apply_step(&self, database_migration: &SqlMigration, index: usize) -> ConnectorResult<bool> {
-        dbg!(self.apply_next_step(&database_migration.corrected_steps, index).await)
+        self.apply_next_step(&database_migration.corrected_steps, index).await
             .map_err(|sql_error| sql_error.into_connector_error(&self.connection_info))
     }
 

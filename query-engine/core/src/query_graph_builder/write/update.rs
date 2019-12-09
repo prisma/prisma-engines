@@ -69,17 +69,11 @@ pub fn update_many_records(
     let data_map: ParsedInputMap = data_argument.value.try_into()?;
     let update_args = WriteArguments::from(&model, data_map)?;
 
-    let list_causes_update = !update_args.list.is_empty();
-    let mut non_list_args = update_args.non_list;
+    let mut args = update_args.args;
 
-    non_list_args.update_datetimes(Arc::clone(&model), list_causes_update);
+    args.update_datetimes(Arc::clone(&model));
 
-    let update_many = WriteQuery::UpdateManyRecords(UpdateManyRecords {
-        model,
-        filter,
-        non_list_args,
-        list_args: update_args.list,
-    });
+    let update_many = WriteQuery::UpdateManyRecords(UpdateManyRecords { model, filter, args });
 
     graph.create_node(Query::Write(update_many));
 
@@ -94,16 +88,14 @@ pub fn update_record_node(
     data_map: ParsedInputMap,
 ) -> QueryGraphBuilderResult<NodeRef> {
     let update_args = WriteArguments::from(&model, data_map)?;
-    let list_causes_update = !update_args.list.is_empty();
-    let mut non_list_args = update_args.non_list;
+    let mut args = update_args.args;
 
-    non_list_args.update_datetimes(Arc::clone(&model), list_causes_update);
+    args.update_datetimes(Arc::clone(&model));
 
     let ur = UpdateRecord {
         model,
         where_: record_finder,
-        non_list_args,
-        list_args: update_args.list,
+        args,
     };
 
     let node = graph.create_node(Query::Write(WriteQuery::UpdateRecord(ur)));

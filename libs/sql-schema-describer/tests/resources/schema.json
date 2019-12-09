@@ -7,9 +7,9 @@
           "name": "column1",
           "tpe": {
             "raw": "integer",
-            "family": "int"
+            "family": "int",
+          "arity": "required"
           },
-          "arity": "required",
           "default": null,
           "autoIncrement": true
         },
@@ -17,9 +17,9 @@
           "name": "column2",
           "tpe": {
             "raw": "varchar(255)",
-            "family": "string"
+            "family": "string",
+          "arity": "nullable"
           },
-          "arity": "nullable",
           "default": "default value",
           "autoIncrement": false
         },
@@ -27,9 +27,9 @@
           "name": "column3",
           "tpe": {
             "raw": "integer",
-            "family": "int"
+            "family": "int",
+          "arity": "required"
           },
-          "arity": "required",
           "default": null,
           "autoIncrement": false
         }
@@ -68,9 +68,9 @@
           "name": "id",
           "tpe": {
             "raw": "integer",
-            "family": "int"
+            "family": "int",
+          "arity": "required"
           },
-          "arity": "required",
           "default": null,
           "autoIncrement": true
         }

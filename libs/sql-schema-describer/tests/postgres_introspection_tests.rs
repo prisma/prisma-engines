@@ -74,8 +74,8 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 raw: "_bytea".into(),
                 family: ColumnTypeFamily::Binary,
+                arity: ColumnArity::List,
             },
-            arity: ColumnArity::List,
             default: None,
             auto_increment: false,
         },
@@ -84,8 +84,8 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 raw: "_bool".into(),
                 family: ColumnTypeFamily::Boolean,
+                arity: ColumnArity::List,
             },
-            arity: ColumnArity::List,
             default: None,
             auto_increment: false,
         },
@@ -94,8 +94,8 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 raw: "_date".into(),
                 family: ColumnTypeFamily::DateTime,
+                arity: ColumnArity::List,
             },
-            arity: ColumnArity::List,
             default: None,
             auto_increment: false,
         },
@@ -104,8 +104,8 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 raw: "_float8".into(),
                 family: ColumnTypeFamily::Float,
+                arity: ColumnArity::List,
             },
-            arity: ColumnArity::List,
             default: None,
             auto_increment: false,
         },
@@ -114,8 +114,8 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 raw: "_float8".into(),
                 family: ColumnTypeFamily::Float,
+                arity: ColumnArity::List,
             },
-            arity: ColumnArity::List,
             default: None,
             auto_increment: false,
         },
@@ -124,8 +124,8 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 raw: "_int4".into(),
                 family: ColumnTypeFamily::Int,
+                arity: ColumnArity::List,
             },
-            arity: ColumnArity::List,
             default: None,
             auto_increment: false,
         },
@@ -134,8 +134,8 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 raw: "_text".into(),
                 family: ColumnTypeFamily::String,
+                arity: ColumnArity::List,
             },
-            arity: ColumnArity::List,
             default: None,
             auto_increment: false,
         },
@@ -144,8 +144,8 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 raw: "_varchar".into(),
                 family: ColumnTypeFamily::String,
+                arity: ColumnArity::List,
             },
-            arity: ColumnArity::List,
             default: None,
             auto_increment: false,
         },
@@ -154,8 +154,8 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 raw: "bytea".into(),
                 family: ColumnTypeFamily::Binary,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
         },
@@ -164,8 +164,8 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 raw: "bool".into(),
                 family: ColumnTypeFamily::Boolean,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
         },
@@ -174,8 +174,9 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 raw: "date".into(),
                 family: ColumnTypeFamily::DateTime,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -184,8 +185,9 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 raw: "float8".into(),
                 family: ColumnTypeFamily::Float,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -194,8 +196,9 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 raw: "float8".into(),
                 family: ColumnTypeFamily::Float,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -204,8 +207,9 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 raw: "int4".into(),
                 family: ColumnTypeFamily::Int,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -214,8 +218,9 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 raw: "int4".into(),
                 family: ColumnTypeFamily::Int,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: Some(format!("nextval(\"{}\".\"User_primary_col_seq\"::regclass)", SCHEMA)),
             auto_increment: true,
         },
@@ -224,8 +229,9 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 raw: "text".into(),
                 family: ColumnTypeFamily::String,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -234,8 +240,9 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 raw: "varchar".into(),
                 family: ColumnTypeFamily::String,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -244,8 +251,9 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 raw: "int8".into(),
                 family: ColumnTypeFamily::Int,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -254,8 +262,9 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 raw: "int8".into(),
                 family: ColumnTypeFamily::Int,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: Some(format!("nextval(\"{}\".\"User_bigserial_col_seq\"::regclass)", SCHEMA)),
             auto_increment: true,
         },
@@ -264,8 +273,9 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 raw: "bit".into(),
                 family: ColumnTypeFamily::Binary,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -274,8 +284,9 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 raw: "varbit".into(),
                 family: ColumnTypeFamily::Binary,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -284,8 +295,9 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 raw: "box".into(),
                 family: ColumnTypeFamily::Geometric,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -294,8 +306,9 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 raw: "bpchar".into(),
                 family: ColumnTypeFamily::String,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -304,8 +317,9 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 raw: "circle".into(),
                 family: ColumnTypeFamily::Geometric,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -314,8 +328,9 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 raw: "interval".into(),
                 family: ColumnTypeFamily::DateTime,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -324,8 +339,9 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 raw: "line".into(),
                 family: ColumnTypeFamily::Geometric,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -334,8 +350,9 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 raw: "lseg".into(),
                 family: ColumnTypeFamily::Geometric,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -344,8 +361,9 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 raw: "numeric".into(),
                 family: ColumnTypeFamily::Float,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -354,8 +372,9 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 raw: "path".into(),
                 family: ColumnTypeFamily::Geometric,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -364,8 +383,9 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 raw: "pg_lsn".into(),
                 family: ColumnTypeFamily::LogSequenceNumber,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -374,8 +394,9 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 raw: "polygon".into(),
                 family: ColumnTypeFamily::Geometric,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -384,8 +405,9 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 raw: "int2".into(),
                 family: ColumnTypeFamily::Int,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -394,8 +416,9 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 raw: "int2".into(),
                 family: ColumnTypeFamily::Int,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: Some(format!(
                 "nextval(\"{}\".\"User_smallserial_col_seq\"::regclass)",
                 SCHEMA
@@ -407,8 +430,9 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 raw: "int4".into(),
                 family: ColumnTypeFamily::Int,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: Some(format!("nextval(\"{}\".\"User_serial_col_seq\"::regclass)", SCHEMA)),
             auto_increment: true,
         },
@@ -417,8 +441,9 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 raw: "time".into(),
                 family: ColumnTypeFamily::DateTime,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -427,8 +452,9 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 raw: "timetz".into(),
                 family: ColumnTypeFamily::DateTime,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -437,8 +463,9 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 raw: "timestamp".into(),
                 family: ColumnTypeFamily::DateTime,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -447,8 +474,9 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 raw: "timestamptz".into(),
                 family: ColumnTypeFamily::DateTime,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -457,8 +485,9 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 raw: "tsquery".into(),
                 family: ColumnTypeFamily::TextSearch,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -467,8 +496,9 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 raw: "tsvector".into(),
                 family: ColumnTypeFamily::TextSearch,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -477,8 +507,9 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 raw: "txid_snapshot".into(),
                 family: ColumnTypeFamily::TransactionId,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -487,8 +518,9 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 raw: "json".into(),
                 family: ColumnTypeFamily::Json,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -497,8 +529,9 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 raw: "jsonb".into(),
                 family: ColumnTypeFamily::Json,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -507,8 +540,9 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 raw: "uuid".into(),
                 family: ColumnTypeFamily::Uuid,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -571,8 +605,8 @@ async fn postgres_foreign_key_on_delete_must_be_handled() {
                     tpe: ColumnType {
                         raw: "int4".into(),
                         family: ColumnTypeFamily::Int,
+                        arity: ColumnArity::Nullable,
                     },
-                    arity: ColumnArity::Nullable,
                     default: None,
                     auto_increment: false,
                 },
@@ -581,8 +615,8 @@ async fn postgres_foreign_key_on_delete_must_be_handled() {
                     tpe: ColumnType {
                         raw: "int4".into(),
                         family: ColumnTypeFamily::Int,
+                        arity: ColumnArity::Nullable,
                     },
-                    arity: ColumnArity::Nullable,
                     default: None,
                     auto_increment: false,
                 },
@@ -591,8 +625,8 @@ async fn postgres_foreign_key_on_delete_must_be_handled() {
                     tpe: ColumnType {
                         raw: "int4".into(),
                         family: ColumnTypeFamily::Int,
+                        arity: ColumnArity::Nullable,
                     },
-                    arity: ColumnArity::Nullable,
                     default: None,
                     auto_increment: false,
                 },
@@ -601,8 +635,8 @@ async fn postgres_foreign_key_on_delete_must_be_handled() {
                     tpe: ColumnType {
                         raw: "int4".into(),
                         family: ColumnTypeFamily::Int,
+                        arity: ColumnArity::Nullable,
                     },
-                    arity: ColumnArity::Nullable,
                     default: None,
                     auto_increment: false,
                 },
@@ -611,8 +645,8 @@ async fn postgres_foreign_key_on_delete_must_be_handled() {
                     tpe: ColumnType {
                         raw: "int4".into(),
                         family: ColumnTypeFamily::Int,
+                        arity: ColumnArity::Nullable,
                     },
-                    arity: ColumnArity::Nullable,
                     default: None,
                     auto_increment: false,
                 },
@@ -621,8 +655,9 @@ async fn postgres_foreign_key_on_delete_must_be_handled() {
                     tpe: ColumnType {
                         raw: "int4".into(),
                         family: ColumnTypeFamily::Int,
+                        arity: ColumnArity::Required,
                     },
-                    arity: ColumnArity::Required,
+
                     default: None,
                     auto_increment: false,
                 },

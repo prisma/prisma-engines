@@ -404,16 +404,6 @@ impl DatamodelFieldExtensions for dml::Field {
                     None
                 }
             })
-            .or_else(|| {
-                self.scalar_list_strategy.map(|sls| match sls {
-                    datamodel::ScalarListStrategy::Embedded => FieldBehaviour::ScalarList {
-                        strategy: ScalarListStrategy::Embedded,
-                    },
-                    datamodel::ScalarListStrategy::Relation => FieldBehaviour::ScalarList {
-                        strategy: ScalarListStrategy::Relation,
-                    },
-                })
-            })
     }
 
     fn final_db_name(&self) -> String {

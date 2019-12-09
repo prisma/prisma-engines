@@ -64,9 +64,6 @@ pub struct Field {
     /// If set, signals that this field is an id field, or
     /// primary key.
     pub id_info: Option<IdInfo>,
-    /// Strategy for representing scalar lists. Only valid if
-    /// the field arity is list and the type is scalar.
-    pub scalar_list_strategy: Option<ScalarListStrategy>,
     /// Comments associated with this field.
     pub documentation: Option<String>,
     /// If set, signals that this field was internally generated
@@ -106,7 +103,6 @@ impl Field {
             default_value: None,
             is_unique: false,
             id_info: None,
-            scalar_list_strategy: None,
             documentation: None,
             is_generated: false,
             is_updated_at: false,
@@ -122,7 +118,6 @@ impl Field {
             default_value: None,
             is_unique: false,
             id_info: None,
-            scalar_list_strategy: None,
             documentation: None,
             is_generated: true,
             is_updated_at: false,
