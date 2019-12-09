@@ -6,7 +6,7 @@ async fn databases_for_mysql_should_work(api: &TestApi) {
     let barrel = api.barrel();
     setup(&barrel);
     let result = dbg!(api.list_databases().await);
-    assert!(result.contains(&SCHEMA_NAME.to_string()));
+    assert!(result.contains(&api.db_name().to_string()));
 }
 
 #[test_one_connector(connector = "postgres")]
@@ -22,7 +22,7 @@ async fn databases_for_sqlite_should_work(api: &TestApi) {
     let barrel = api.barrel();
     setup(&barrel);
     let result = dbg!(api.list_databases().await);
-    assert!(result.contains(&format!("{}.db", SCHEMA_NAME)));
+    assert!(result.contains(&format!("{}.db", "databases_for_sqlite_should_work")));
 }
 
 fn setup(barrel: &BarrelMigrationExecutor) {

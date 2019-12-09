@@ -31,6 +31,7 @@ impl ManyRelatedRecordsQueryBuilder for ManyRelatedRecordsWithUnionAll {
         let base_query = order_columns.into_iter().fold(base_query, |acc, ord| acc.order_by(ord));
         let mut distinct_ids = distinct_ids.into_iter();
 
+
         let build_cond = |id| {
             let conditions = base_condition
                 .clone()

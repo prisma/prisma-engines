@@ -13,7 +13,6 @@ use crate::common::*;
 use crate::mysql::*;
 use crate::postgres::*;
 use crate::sqlite::*;
-
 #[derive(Debug, PartialEq, Copy, Clone)]
 enum DbType {
     Postgres,
@@ -39,18 +38,19 @@ fn varchar_type(db_type: DbType, length: u64) -> String {
 
 #[test]
 fn is_required_must_work() {
-    setup();
+    let db_name = "is_required_must_work";
 
     test_each_backend(
+        db_name,
         |_, migration| {
             migration.create_table("User", |t| {
                 t.add_column("column1", types::integer().nullable(false));
                 t.add_column("column2", types::integer().nullable(true));
             });
         },
-        |db_type, inspector| {
+        |db_type, inspector, schema_name| {
             async move {
-                let result = inspector.describe(SCHEMA).await.expect("describing");
+                let result = inspector.describe(schema_name).await.expect("describing");
                 let user_table = result.get_table("User").expect("getting User table");
                 let expected_columns = vec![
                     Column {
@@ -83,9 +83,10 @@ fn is_required_must_work() {
 
 #[test]
 fn foreign_keys_must_work() {
-    setup();
+    let db_name = "foreign_keys_must_work"; 
 
     test_each_backend(
+        db_name,
         |db_type, migration| {
             migration.create_table("City", |t| {
                 t.add_column("id", types::primary());
@@ -101,9 +102,9 @@ fn foreign_keys_must_work() {
                 }
             });
         },
-        |db_type, inspector| {
+        |db_type, inspector, schema_name| {
             async move {
-                let schema = inspector.describe(SCHEMA).await.expect("describe failed");
+                let schema = inspector.describe(schema_name).await.expect("describe failed");
                 let user_table = schema.get_table("User").expect("couldn't get User table");
                 let expected_columns = vec![Column {
                     name: "city".to_string(),
@@ -148,9 +149,10 @@ fn foreign_keys_must_work() {
 
 #[test]
 fn multi_column_foreign_keys_must_work() {
-    setup();
+    let db_name = "multi_column_foreign_keys_must_work";
 
     test_each_backend(
+        db_name,
         |db_type, migration| {
             migration.create_table("City", move |t| {
                 t.add_column("id", types::primary());
@@ -176,9 +178,9 @@ fn multi_column_foreign_keys_must_work() {
                 }
             });
         },
-        |db_type, inspector| {
+        |db_type, inspector, schema_name| {
             async move {
-                let schema = inspector.describe(SCHEMA).await.expect("describe failed");
+                let schema = inspector.describe(schema_name).await.expect("describe failed");
                 let user_table = schema.get_table("User").expect("couldn't get User table");
                 let expected_columns = vec![
                     Column {
@@ -236,17 +238,19 @@ fn multi_column_foreign_keys_must_work() {
 
 #[test]
 fn names_with_hyphens_must_work() {
-    setup();
+
+    let db_name = "names_with_hyphens_must_work";
 
     test_each_backend(
+        db_name,
         |_, migration| {
             migration.create_table("User-table", |t| {
                 t.add_column("column-1", types::integer().nullable(false));
             });
         },
-        |db_type, inspector| {
+        |db_type, inspector, schema_name| {
             async move {
-                let result = inspector.describe(SCHEMA).await.expect("describing");
+                let result = inspector.describe(schema_name).await.expect("describing");
                 let user_table = result.get_table("User-table").expect("getting User table");
                 let expected_columns = vec![Column {
                     name: "column-1".to_string(),
@@ -267,9 +271,10 @@ fn names_with_hyphens_must_work() {
 
 #[test]
 fn composite_primary_keys_must_work() {
-    setup();
+    let db_name = "composite_primary_keys_must_work";
 
     test_each_backend(
+        "composite_primary_keys_must_work",
         |db_type, migration| {
             let sql = match db_type {
                 DbType::MySql => format!(
@@ -278,7 +283,7 @@ fn composite_primary_keys_must_work() {
                         name VARCHAR(255) NOT NULL,
                         PRIMARY KEY(id, name)
                     )",
-                    SCHEMA
+                    db_name
                 ),
                 _ => format!(
                     "CREATE TABLE \"{0}\".\"User\" (
@@ -291,9 +296,9 @@ fn composite_primary_keys_must_work() {
             };
             migration.inject_custom(&sql);
         },
-        |db_type, inspector| {
+        |db_type, inspector, schema_name| {
             async move {
-                let schema = inspector.describe(SCHEMA).await.expect("describe failed");
+                let schema = inspector.describe(schema_name).await.expect("describe failed");
                 let table = schema.get_table("User").expect("couldn't get User table");
                 let (exp_int, exp_varchar) = match db_type {
                     DbType::Sqlite => ("INTEGER", "VARCHAR(255)"),
@@ -345,9 +350,9 @@ fn composite_primary_keys_must_work() {
 
 #[test]
 fn indices_must_work() {
-    setup();
 
     test_each_backend(
+        "indices_must_work",
         |_, migration| {
             migration.create_table("User", move |t| {
                 t.add_column("id", types::primary());
@@ -355,9 +360,9 @@ fn indices_must_work() {
                 t.add_index("count", types::index(vec!["count"]));
             });
         },
-        |db_type, inspector| {
+        |db_type, inspector, schema_name| {
             async move {
-                let result = inspector.describe(&SCHEMA.to_string()).await.expect("describing");
+                let result = inspector.describe(schema_name).await.expect("describing");
                 let user_table = result.get_table("User").expect("getting User table");
                 let default = match db_type {
                     DbType::Postgres => Some(format!("nextval(\"{}\".\"User_id_seq\"::regclass)", SCHEMA)),
@@ -418,24 +423,25 @@ fn indices_must_work() {
 
 #[test]
 fn column_uniqueness_must_be_detected() {
-    setup();
+    let db_name = "column_uniqueness_must_be_detected";
 
     test_each_backend(
+        db_name,
         |db_type, migration| {
             migration.create_table("User", move |t| {
                 t.add_column("uniq1", types::integer().unique(true));
                 t.add_column("uniq2", types::integer());
             });
             let index_sql = match db_type {
-                DbType::MySql => format!("CREATE UNIQUE INDEX `uniq` ON `{}`.`User` (uniq2)", SCHEMA),
+                DbType::MySql => format!("CREATE UNIQUE INDEX `uniq` ON `{}`.`User` (uniq2)", db_name),
                 DbType::Sqlite => format!("CREATE UNIQUE INDEX \"{}\".\"uniq\" ON \"User\" (uniq2)", SCHEMA),
                 DbType::Postgres => format!("CREATE UNIQUE INDEX \"uniq\" ON \"{}\".\"User\" (uniq2)", SCHEMA),
             };
             migration.inject_custom(index_sql);
         },
-        |db_type, inspector| {
+        |db_type, inspector, schema_name| {
             async move {
-                let result = inspector.describe(&SCHEMA.to_string()).await.expect("describing");
+                let result = inspector.describe(schema_name).await.expect("describing");
                 let user_table = result.get_table("User").expect("getting User table");
                 let expected_columns = vec![
                     Column {
@@ -510,17 +516,18 @@ fn column_uniqueness_must_be_detected() {
 
 #[test]
 fn defaults_must_work() {
-    setup();
+    let db_name = "defaults_must_work";
 
     test_each_backend(
+        db_name,
         |_, migration| {
             migration.create_table("User", move |t| {
                 t.add_column("id", types::integer().default(1).nullable(true));
             });
         },
-        |db_type, inspector| {
+        |db_type, inspector, schema_name| {
             async move {
-                let result = inspector.describe(&SCHEMA.to_string()).await.expect("describing");
+                let result = inspector.describe(schema_name).await.expect("describing");
                 let user_table = result.get_table("User").expect("getting User table");
                 let default = match db_type {
                     DbType::Sqlite => "'1'".to_string(),
@@ -552,12 +559,13 @@ fn defaults_must_work() {
     );
 }
 
-fn test_each_backend<MigrationFn, TestFn>(mut migration_fn: MigrationFn, test_fn: TestFn)
+fn test_each_backend<MigrationFn, TestFn>(db_name: &str, mut migration_fn: MigrationFn, test_fn: TestFn)
 where
     MigrationFn: FnMut(DbType, &mut Migration) -> (),
     TestFn: for<'a> Fn(
         DbType,
         &'a mut dyn SqlSchemaDescriberBackend,
+        &'a str,
     ) -> Pin<Box<dyn std::future::Future<Output = ()> + 'a>>,
 {
     let mut runtime = tokio_runtime();
@@ -567,9 +575,9 @@ where
         let mut migration = Migration::new().schema(SCHEMA);
         migration_fn(DbType::Sqlite, &mut migration);
         let full_sql = migration.make::<barrel::backend::Sqlite>();
-        let mut describer = runtime.block_on(get_sqlite_describer(&full_sql));
+        let mut describer = runtime.block_on(get_sqlite_describer(&full_sql, db_name));
 
-        let fut = test_fn(DbType::Sqlite, &mut describer);
+        let fut = test_fn(DbType::Sqlite, &mut describer, SCHEMA);
         runtime.block_on(fut);
     }
     // Postgres
@@ -578,19 +586,21 @@ where
         let mut migration = Migration::new().schema(SCHEMA);
         migration_fn(DbType::Postgres, &mut migration);
         let full_sql = migration.make::<barrel::backend::Pg>();
-        let mut describer = runtime.block_on(get_postgres_describer(&full_sql));
+        let mut describer = runtime.block_on(get_postgres_describer(&full_sql, db_name));
 
-        runtime.block_on(test_fn(DbType::Postgres, &mut describer));
+        runtime.block_on(test_fn(DbType::Postgres, &mut describer, SCHEMA));
     }
     // MySQL
     {
         eprintln!("Testing on MySQL");
-        let mut migration = Migration::new().schema(SCHEMA);
+        let mut migration = Migration::new().schema(db_name);
         migration_fn(DbType::MySql, &mut migration);
         let full_sql = migration.make::<barrel::backend::MySql>();
-        let mut describer = runtime.block_on(get_mysql_describer(&full_sql));
-
-        runtime.block_on(test_fn(DbType::MySql, &mut describer));
+        
+        runtime.block_on(async {
+            let mut describer = get_mysql_describer_for_schema(&full_sql, db_name).await;
+            test_fn(DbType::MySql, &mut describer, db_name).await
+        });
     }
 }
 

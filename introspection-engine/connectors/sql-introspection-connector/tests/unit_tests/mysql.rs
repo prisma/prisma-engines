@@ -6,7 +6,7 @@ use test_harness::*;
 async fn introspecting_a_simple_table_with_gql_types_must_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
-        .execute(|migration| {
+        .execute_with_schema(|migration| {
             migration.create_table("Blog", |t| {
                 t.add_column("bool", types::boolean());
                 t.add_column("float", types::float());
@@ -15,7 +15,7 @@ async fn introspecting_a_simple_table_with_gql_types_must_work(api: &TestApi) {
                 t.add_column("int", types::integer());
                 t.add_column("string", types::text());
             });
-        })
+        }, api.db_name())
         .await;
     let dm = r#"
             model Blog {
@@ -35,13 +35,13 @@ async fn introspecting_a_simple_table_with_gql_types_must_work(api: &TestApi) {
 async fn introspecting_a_table_with_compound_primary_keys_must_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
-        .execute(|migration| {
+        .execute_with_schema(|migration| {
             migration.create_table("Blog", |t| {
                 t.add_column("id", types::integer());
                 t.add_column("authorId", types::varchar(10));
                 t.inject_custom("PRIMARY KEY (`id`, `authorId`)");
             });
-        })
+        }, api.db_name())
         .await;
 
     let dm = r#"
@@ -59,16 +59,16 @@ async fn introspecting_a_table_with_compound_primary_keys_must_work(api: &TestAp
 async fn introspecting_a_table_with_unique_index_must_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
-        .execute(|migration| {
+        .execute_with_schema(|migration| {
             migration.create_table("Blog", |t| {
                 t.add_column("id", types::primary());
                 t.add_column("authorId", types::varchar(10));
             });
             migration.inject_custom(format!(
                 "Create Unique Index `test` on `{}`.`Blog`( `authorId`)",
-                SCHEMA_NAME
+                api.db_name()
             ));
-        })
+        }, api.db_name())
         .await;
 
     let dm = r#"
@@ -85,7 +85,7 @@ async fn introspecting_a_table_with_unique_index_must_work(api: &TestApi) {
 async fn introspecting_a_table_with_multi_column_unique_index_must_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
-        .execute(|migration| {
+        .execute_with_schema(|migration| {
             migration.create_table("User", |t| {
                 t.add_column("id", types::primary());
                 t.add_column("firstname", types::varchar(10));
@@ -93,9 +93,9 @@ async fn introspecting_a_table_with_multi_column_unique_index_must_work(api: &Te
             });
             migration.inject_custom(format!(
                 "Create Unique Index `test` on `{}`.`User`( `firstname`, `lastname`)",
-                SCHEMA_NAME
+                api.db_name()
             ));
-        })
+        }, api.db_name())
         .await;
 
     let dm = r#"
@@ -114,13 +114,13 @@ async fn introspecting_a_table_with_multi_column_unique_index_must_work(api: &Te
 async fn introspecting_a_table_with_required_and_optional_columns_must_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
-        .execute(|migration| {
+        .execute_with_schema(|migration| {
             migration.create_table("User", |t| {
                 t.add_column("id", types::primary());
                 t.add_column("requiredname", types::text().nullable(false));
                 t.add_column("optionalname", types::text().nullable(true));
             });
-        })
+        }, api.db_name())
         .await;
 
     let dm = r#"
@@ -138,7 +138,7 @@ async fn introspecting_a_table_with_required_and_optional_columns_must_work(api:
 //#[ignore]
 //fn introspecting_a_table_with_datetime_default_values_should_work(api: &TestApi) {
 //    let barrel = api.barrel();
-//    let _setup_schema = barrel.execute(|migration| {
+//    let _setup_schema = barrel.execute_with_schema(, api.db_name(|migration| ){
 //        migration.create_table("User", |t| {
 //            t.add_column("id", types::primary());
 //            t.add_column("name", types::text());
@@ -161,7 +161,7 @@ async fn introspecting_a_table_with_required_and_optional_columns_must_work(api:
 async fn introspecting_a_table_with_default_values_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
-        .execute(|migration| {
+        .execute_with_schema(|migration| {
             migration.create_table("User", |t| {
                 t.add_column("a", types::text());
                 t.add_column("id", types::primary());
@@ -171,7 +171,7 @@ async fn introspecting_a_table_with_default_values_should_work(api: &TestApi) {
                 t.inject_custom("`int` INTEGER NOT NULL DEFAULT 5");
                 t.inject_custom("`string` VARCHAR(4) NOT NULL DEFAULT 'Test'");
             });
-        })
+        }, api.db_name())
         .await;
 
     let dm = r#"
@@ -193,13 +193,13 @@ async fn introspecting_a_table_with_default_values_should_work(api: &TestApi) {
 async fn introspecting_a_table_with_a_non_unique_index_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
-        .execute(|migration| {
+        .execute_with_schema(|migration| {
             migration.create_table("User", |t| {
                 t.add_column("a", types::varchar(10));
                 t.add_column("id", types::primary());
             });
-            migration.inject_custom(format!("Create Index `test` on `{}`.`User`(`a`)", SCHEMA_NAME));
-        })
+            migration.inject_custom(format!("Create Index `test` on `{}`.`User`(`a`)", api.db_name()));
+        }, api.db_name())
         .await;
 
     let dm = r#"
@@ -217,14 +217,14 @@ async fn introspecting_a_table_with_a_non_unique_index_should_work(api: &TestApi
 async fn introspecting_a_table_with_a_multi_column_non_unique_index_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
-        .execute(|migration| {
+        .execute_with_schema(|migration| {
             migration.create_table("User", |t| {
                 t.add_column("a", types::varchar(10));
                 t.add_column("b", types::varchar(10));
                 t.add_column("id", types::primary());
             });
-            migration.inject_custom(format!("Create Index `test` on `{}`.`User`(`a`,`b`)", SCHEMA_NAME));
-        })
+            migration.inject_custom(format!("Create Index `test` on `{}`.`User`(`a`,`b`)", api.db_name()));
+        }, api.db_name())
         .await;
 
     let dm = r#"
@@ -244,7 +244,7 @@ async fn introspecting_a_table_with_a_multi_column_non_unique_index_should_work(
 async fn introspecting_a_one_to_one_req_relation_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
-        .execute(|migration| {
+        .execute_with_schema(|migration| {
             migration.create_table("User", |t| {
                 t.add_column("id", types::primary());
             });
@@ -255,7 +255,7 @@ async fn introspecting_a_one_to_one_req_relation_should_work(api: &TestApi) {
                 FOREIGN KEY (`user_id`) REFERENCES `User`(`id`)",
                 )
             });
-        })
+        }, api.db_name())
         .await;
 
     let dm = r#"
@@ -277,7 +277,7 @@ async fn introspecting_a_one_to_one_req_relation_should_work(api: &TestApi) {
 async fn introspecting_two_one_to_one_relations_between_the_same_models_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
-        .execute(|migration| {
+        .execute_with_schema(|migration| {
             migration.create_table("User", |t| {
                 t.add_column("id", types::primary());
             });
@@ -290,13 +290,13 @@ async fn introspecting_two_one_to_one_relations_between_the_same_models_should_w
             });
             migration.inject_custom(format!(
                 "ALTER TABLE `{}`.`User` ADD Column `post_id` INTEGER NOT NULL UNIQUE ",
-                SCHEMA_NAME
+                api.db_name(),
             ));
             migration.inject_custom(format!(
                 "ALTER TABLE `{}`.`User` ADD CONSTRAINT `post_fk` FOREIGN KEY(`post_id`) REFERENCES `Post`(`id`)",
-                SCHEMA_NAME
+                api.db_name(),
             ));
-        })
+        }, api.db_name())
         .await;
 
     let dm = r#"
@@ -320,7 +320,7 @@ async fn introspecting_two_one_to_one_relations_between_the_same_models_should_w
 async fn introspecting_a_one_to_one_relation_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
-        .execute(|migration| {
+        .execute_with_schema(|migration| {
             migration.create_table("User", |t| {
                 t.add_column("id", types::primary());
             });
@@ -331,7 +331,7 @@ async fn introspecting_a_one_to_one_relation_should_work(api: &TestApi) {
                      FOREIGN KEY (`user_id`) REFERENCES `User`(`id`)",
                 );
             });
-        })
+        }, api.db_name())
         .await;
 
     let dm = r#"        
@@ -353,7 +353,7 @@ async fn introspecting_a_one_to_one_relation_should_work(api: &TestApi) {
 async fn introspecting_a_one_to_many_relation_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
-        .execute(|migration| {
+        .execute_with_schema(|migration| {
             migration.create_table("User", |t| {
                 t.add_column("id", types::primary());
             });
@@ -364,7 +364,7 @@ async fn introspecting_a_one_to_many_relation_should_work(api: &TestApi) {
                      FOREIGN KEY (`user_id`) REFERENCES `User`(`id`)",
                 );
             });
-        })
+        }, api.db_name())
         .await;
 
     let dm = r#"  
@@ -386,7 +386,7 @@ async fn introspecting_a_one_to_many_relation_should_work(api: &TestApi) {
 async fn introspecting_a_one_req_to_many_relation_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
-        .execute(|migration| {
+        .execute_with_schema(|migration| {
             migration.create_table("User", |t| {
                 t.add_column("id", types::primary());
             });
@@ -397,7 +397,7 @@ async fn introspecting_a_one_req_to_many_relation_should_work(api: &TestApi) {
                      FOREIGN KEY (`user_id`) REFERENCES `User`(`id`)",
                 );
             });
-        })
+        }, api.db_name())
         .await;
 
     let dm = r#"
@@ -419,7 +419,7 @@ async fn introspecting_a_one_req_to_many_relation_should_work(api: &TestApi) {
 async fn introspecting_a_prisma_many_to_many_relation_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
-        .execute(|migration| {
+        .execute_with_schema(|migration| {
             migration.create_table("User", |t| {
                 t.add_column("id", types::primary());
             });
@@ -436,9 +436,9 @@ async fn introspecting_a_prisma_many_to_many_relation_should_work(api: &TestApi)
             });
             migration.inject_custom(format!(
                 "CREATE UNIQUE INDEX test ON `{schema_name}`.`_PostToUser` (`A`, `B`);",
-                schema_name = SCHEMA_NAME
+                schema_name = api.db_name()
             ))
-        })
+        }, api.db_name())
         .await;
 
     let dm = r#"
@@ -460,7 +460,7 @@ async fn introspecting_a_prisma_many_to_many_relation_should_work(api: &TestApi)
 async fn introspecting_a_many_to_many_relation_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
-        .execute(|migration| {
+        .execute_with_schema(|migration| {
             migration.create_table("User", |t| {
                 t.add_column("id", types::primary());
             });
@@ -475,7 +475,7 @@ async fn introspecting_a_many_to_many_relation_should_work(api: &TestApi) {
                      FOREIGN KEY (`post_id`) REFERENCES  `Post`(`id`) ON DELETE CASCADE",
                 )
             });
-        })
+        }, api.db_name())
         .await;
 
     let dm = r#"
@@ -502,7 +502,7 @@ async fn introspecting_a_many_to_many_relation_should_work(api: &TestApi) {
 async fn introspecting_a_many_to_many_relation_with_extra_fields_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
-        .execute(|migration| {
+        .execute_with_schema(|migration| {
             migration.create_table("User", |t| {
                 t.add_column("id", types::primary());
             });
@@ -518,7 +518,7 @@ async fn introspecting_a_many_to_many_relation_with_extra_fields_should_work(api
                      FOREIGN KEY (`post_id`) REFERENCES  `Post`(`id`)",
                 )
             });
-        })
+        }, api.db_name())
         .await;
 
     let dm = r#"
@@ -545,7 +545,7 @@ async fn introspecting_a_many_to_many_relation_with_extra_fields_should_work(api
 async fn introspecting_a_self_relation_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
-        .execute(|migration| {
+        .execute_with_schema(|migration| {
             migration.create_table("User", |t| {
                 t.add_column("id", types::primary());
                 t.inject_custom(
@@ -555,7 +555,7 @@ async fn introspecting_a_self_relation_should_work(api: &TestApi) {
                      FOREIGN KEY (`direct_report`) REFERENCES `User` (`id`)",
                 )
             });
-        })
+        }, api.db_name())
         .await;
 
     let dm = r#"
@@ -577,7 +577,7 @@ async fn introspecting_a_self_relation_should_work(api: &TestApi) {
 async fn introspecting_cascading_delete_behaviour_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
-        .execute(|migration| {
+        .execute_with_schema(|migration| {
             migration.create_table("User", |t| {
                 t.add_column("id", types::primary());
             });
@@ -585,7 +585,7 @@ async fn introspecting_cascading_delete_behaviour_should_work(api: &TestApi) {
                 t.add_column("id", types::primary());
                 t.inject_custom("user_id INTEGER, FOREIGN KEY (`user_id`) REFERENCES `User`(`id`) ON DELETE CASCADE");
             });
-        })
+        }, api.db_name())
         .await;
 
     let dm = r#"  

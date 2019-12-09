@@ -15,42 +15,8 @@ use std::{thread, time};
 
 const SCHEMA: &str = "DatabaseInspectorTest";
 
-static IS_SETUP: AtomicBool = AtomicBool::new(false);
-
-fn setup() {
-    let is_setup = IS_SETUP.load(Ordering::Relaxed);
-    if is_setup {
-        return;
-    }
-
-    let log_level = match std::env::var("TEST_LOG")
-        .unwrap_or("warn".to_string())
-        .to_lowercase()
-        .as_ref()
-    {
-        "trace" => LevelFilter::Trace,
-        "debug" => LevelFilter::Debug,
-        "info" => LevelFilter::Info,
-        "warn" => LevelFilter::Warn,
-        "error" => LevelFilter::Error,
-        _ => LevelFilter::Warn,
-    };
-    fern::Dispatch::new()
-        .format(|out, message, record| {
-            out.finish(format_args!("[{}][{}] {}", record.target(), record.level(), message))
-        })
-        .level(log_level)
-        .chain(std::io::stdout())
-        .apply()
-        .expect("fern configuration");
-
-    IS_SETUP.store(true, Ordering::Relaxed);
-}
-
 #[test]
 fn database_schema_is_serializable() {
-    setup();
-
     let mut enum_values = HashSet::new();
     enum_values.insert("option1".to_string());
     enum_values.insert("option2".to_string());
@@ -151,8 +117,6 @@ fn database_schema_is_serializable() {
 
 #[test]
 fn database_schema_without_primary_key_is_serializable() {
-    setup();
-
     let schema = SqlSchema {
         tables: vec![Table {
             name: "table1".to_string(),
@@ -187,8 +151,6 @@ fn database_schema_without_primary_key_is_serializable() {
 
 #[test]
 fn database_schema_is_serializable_for_every_column_type_family() {
-    setup();
-
     // Add a column of every column type family
     let mut columns: Vec<Column> = vec![
         ColumnTypeFamily::Int,
@@ -242,8 +204,6 @@ fn database_schema_is_serializable_for_every_column_type_family() {
 
 #[test]
 fn database_schema_is_serializable_for_every_column_arity() {
-    setup();
-
     // Add a column of every arity
     let mut columns: Vec<Column> = vec![ColumnArity::Required, ColumnArity::Nullable, ColumnArity::List]
         .iter()
@@ -284,8 +244,6 @@ fn database_schema_is_serializable_for_every_column_arity() {
 
 #[test]
 fn database_schema_is_serializable_for_every_foreign_key_action() {
-    setup();
-
     // Add a foreign key of every possible action
     let schema = SqlSchema {
         tables: vec![Table {
