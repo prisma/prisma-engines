@@ -58,7 +58,7 @@ impl<'a> ApplyMigrationCommand<'a> {
             .infer(&last_non_watch_datamodel, self.input.steps.as_slice())?;
         let next_datamodel = datamodel::lift_ast(&next_datamodel_ast)?;
 
-        self.handle_migration(&engine, current_datamodel, next_datamodel).await
+        self.handle_migration(&engine, current_datamodel, next_datamodel, next_datamodel_ast).await
     }
 
     async fn handle_normal_migration<C, D>(
@@ -79,7 +79,7 @@ impl<'a> ApplyMigrationCommand<'a> {
             .infer(&current_datamodel_ast, self.input.steps.as_slice())?;
         let next_datamodel = datamodel::lift_ast(&next_datamodel_ast)?;
 
-        self.handle_migration(&engine, current_datamodel, next_datamodel).await
+        self.handle_migration(&engine, current_datamodel, next_datamodel, next_datamodel_ast).await
     }
 
     async fn handle_migration<C, D>(
@@ -87,6 +87,7 @@ impl<'a> ApplyMigrationCommand<'a> {
         engine: &MigrationEngine<C, D>,
         current_datamodel: Datamodel,
         next_datamodel: Datamodel,
+        next_schema_ast: SchemaAst,
     ) -> CommandResult<MigrationStepsResultOutput>
     where
         C: MigrationConnector<DatabaseMigration = D>,
@@ -109,7 +110,7 @@ impl<'a> ApplyMigrationCommand<'a> {
         let mut migration = Migration::new(self.input.migration_id.clone());
         migration.datamodel_steps = self.input.steps.clone();
         migration.database_migration = database_migration_json;
-        migration.datamodel = next_datamodel.clone();
+        migration.datamodel = next_schema_ast;
 
         let diagnostics = connector
             .destructive_changes_checker()

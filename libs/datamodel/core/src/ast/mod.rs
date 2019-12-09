@@ -41,7 +41,7 @@ pub use traits::*;
 
 /// A prisma schema.
 /// Schema = Datamodel + Generators + Datasources
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct SchemaAst {
     /// All models, enums, datasources, generators or type aliases
     pub tops: Vec<Top>,

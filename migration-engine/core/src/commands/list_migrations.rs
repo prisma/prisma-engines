@@ -46,7 +46,7 @@ where
         datamodel_steps: migration.datamodel_steps,
         database_steps: serde_json::Value::Array(database_steps_json),
         status: migration.status,
-        datamodel: engine.render_datamodel(&migration.datamodel),
+        datamodel: engine.render_schema_ast(&migration.datamodel),
     })
 }
 

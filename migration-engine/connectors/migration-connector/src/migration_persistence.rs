@@ -14,7 +14,7 @@ pub trait MigrationPersistence: Send + Sync + 'static {
 
     /// Returns the currently active Datamodel.
     async fn current_datamodel(&self) -> Datamodel {
-        self.last().await.map(|m| m.datamodel).unwrap_or_else(Datamodel::empty)
+        self.last().await.map(|m| m.parse_datamodel()).unwrap_or_else(Datamodel::empty)
     }
 
     async fn current_datamodel_ast(&self) -> SchemaAst {
@@ -41,7 +41,7 @@ pub trait MigrationPersistence: Send + Sync + 'static {
     async fn last_non_watch_datamodel(&self) -> Datamodel {
         self.last_non_watch_migration()
             .await
-            .map(|m| m.datamodel)
+            .map(|m| m.parse_datamodel())
             .unwrap_or_else(Datamodel::empty)
     }
 
@@ -81,7 +81,7 @@ pub trait MigrationPersistence: Send + Sync + 'static {
 }
 
 /// The representation of a migration as persisted through [MigrationPersistence](trait.MigrationPersistence.html).
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct Migration {
     pub name: String,
     pub revision: usize,
@@ -89,12 +89,18 @@ pub struct Migration {
     pub applied: usize,
     pub rolled_back: usize,
     pub datamodel_string: String,
-    pub datamodel: Datamodel,
+    pub datamodel: SchemaAst,
     pub datamodel_steps: Vec<MigrationStep>,
     pub database_migration: serde_json::Value,
     pub errors: Vec<String>,
     pub started_at: DateTime<Utc>,
     pub finished_at: Option<DateTime<Utc>>,
+}
+
+impl Migration {
+    pub fn parse_datamodel(&self) -> Datamodel {
+        datamodel::lift_ast(&self.datamodel).unwrap()
+    }
 }
 
 /// Updates to be made to a persisted [Migration](struct.Migration.html).
@@ -130,7 +136,7 @@ impl Migration {
             datamodel_string: String::new(),
             applied: 0,
             rolled_back: 0,
-            datamodel: Datamodel::empty(),
+            datamodel: SchemaAst::empty(),
             datamodel_steps: Vec::new(),
             database_migration: serde_json::to_value("{}").unwrap(),
             errors: Vec::new(),

@@ -133,6 +133,10 @@ pub fn parse_datamodel_with_sources(
     }
 }
 
+pub fn parse_schema_ast(datamodel_string: &str) -> Result<SchemaAst, error::ErrorCollection> {
+    ast::parser::parse(datamodel_string)
+}
+
 /// Loads all configuration blocks from a datamodel using the built-in source definitions.
 pub fn parse_configuration(datamodel_string: &str) -> Result<Configuration, error::ErrorCollection> {
     parse_configuration_with_sources(datamodel_string, vec![])

@@ -111,7 +111,7 @@ impl MigrationPersistence for SqlMigrationPersistence {
         let model_steps_json = serde_json::to_string(&migration.datamodel_steps).unwrap();
         let database_migration_json = serde_json::to_string(&migration.database_migration).unwrap();
         let errors_json = serde_json::to_string(&migration.errors).unwrap();
-        let serialized_datamodel = datamodel::render_datamodel_to_string(&migration.datamodel).unwrap();
+        let serialized_datamodel = datamodel::render_schema_ast_to_string(&migration.datamodel).unwrap();
 
         let insert = Insert::single_into(self.table())
             .value(NAME_COLUMN, migration.name)
@@ -251,7 +251,8 @@ fn parse_rows_new(result_set: ResultSet) -> Vec<Migration> {
 
             let datamodel_steps =
                 serde_json::from_str(&datamodel_steps_json).expect("Error parsing the migration steps");
-            let datamodel = datamodel::parse_datamodel(&datamodel_string).unwrap();
+            let datamodel = datamodel::parse_schema_ast(&datamodel_string).unwrap();
+
 
             let database_migration_json =
                 serde_json::from_str(&database_migration_string).expect("Error parsing the database migration steps");

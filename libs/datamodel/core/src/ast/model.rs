@@ -1,7 +1,7 @@
 use super::*;
 
 /// A model declaration.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct Model {
     /// The name of the model.
     pub name: Identifier,

@@ -48,7 +48,7 @@ async fn load_all_must_return_all_created_migrations(api: &TestApi) {
 
 #[test_each_connector]
 async fn create_should_allow_to_create_a_new_migration(api: &TestApi) {
-    let datamodel = datamodel::parse_datamodel(
+    let datamodel = datamodel::parse_schema_ast(
         r#"
                 model Test {
                     id String @id @default(cuid())
