@@ -89,7 +89,6 @@ pub struct Migration {
     pub applied: usize,
     pub rolled_back: usize,
     pub datamodel_string: String,
-    pub datamodel: SchemaAst,
     pub datamodel_steps: Vec<MigrationStep>,
     pub database_migration: serde_json::Value,
     pub errors: Vec<String>,
@@ -99,7 +98,11 @@ pub struct Migration {
 
 impl Migration {
     pub fn parse_datamodel(&self) -> Datamodel {
-        datamodel::lift_ast(&self.datamodel).unwrap()
+        datamodel::parse_datamodel(&self.datamodel_string).unwrap()
+    }
+
+    pub fn parse_schema_ast(&self) -> SchemaAst {
+        datamodel::parse_schema_ast(&self.datamodel_string).unwrap()
     }
 }
 
@@ -136,7 +139,6 @@ impl Migration {
             datamodel_string: String::new(),
             applied: 0,
             rolled_back: 0,
-            datamodel: SchemaAst::empty(),
             datamodel_steps: Vec::new(),
             database_migration: serde_json::to_value("{}").unwrap(),
             errors: Vec::new(),

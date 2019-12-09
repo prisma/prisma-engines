@@ -110,7 +110,7 @@ impl<'a> ApplyMigrationCommand<'a> {
         let mut migration = Migration::new(self.input.migration_id.clone());
         migration.datamodel_steps = self.input.steps.clone();
         migration.database_migration = database_migration_json;
-        migration.datamodel = next_schema_ast;
+        migration.datamodel_string = datamodel::render_schema_ast_to_string(&next_schema_ast)?;
 
         let diagnostics = connector
             .destructive_changes_checker()

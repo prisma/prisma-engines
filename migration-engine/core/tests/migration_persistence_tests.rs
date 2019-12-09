@@ -48,18 +48,9 @@ async fn load_all_must_return_all_created_migrations(api: &TestApi) {
 
 #[test_each_connector]
 async fn create_should_allow_to_create_a_new_migration(api: &TestApi) {
-    let datamodel = datamodel::parse_schema_ast(
-        r#"
-                model Test {
-                    id String @id @default(cuid())
-                }
-            "#,
-    )
-    .unwrap();
     let persistence = api.migration_persistence();
     let mut migration = Migration::new("my_migration".to_string());
     migration.status = MigrationStatus::MigrationSuccess;
-    migration.datamodel = datamodel;
     migration.datamodel_steps = vec![MigrationStep::CreateEnum(CreateEnum {
         r#enum: "MyEnum".to_string(),
         values: vec!["A".to_string(), "B".to_string()],
@@ -71,9 +62,6 @@ async fn create_should_allow_to_create_a_new_migration(api: &TestApi) {
 
     assert_eq!(result, migration);
     let mut loaded = persistence.last().await.unwrap();
-
-    // TODO: fix this
-    loaded.datamodel_string = "".into();
 
     if api.sql_family() == SqlFamily::Mysql {
         // TODO: mysql currently looses milli seconds on loading
