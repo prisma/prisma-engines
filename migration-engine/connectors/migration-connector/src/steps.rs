@@ -134,15 +134,13 @@ pub struct DeleteEnum {
 #[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateDirective {
-    #[serde(flatten)]
-    pub locator: ArgumentLocation,
+    pub location: ArgumentLocation,
 }
 
 #[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteDirective {
-    #[serde(flatten)]
-    pub locator: ArgumentLocation,
+    pub location: ArgumentLocation,
 }
 
 #[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
@@ -181,7 +179,7 @@ impl Into<ast::Argument> for &Argument {
 #[serde(rename_all = "camelCase")]
 pub struct ArgumentLocation {
     #[serde(flatten)]
-    pub location: ArgumentType,
+    pub argument_type: ArgumentType,
     pub argument_container: String,
     /// The arguments of the directive are required to match directives that can be repeated,
     /// like `@@unique` on a model. This is `None` when matching can be done without comparing
@@ -215,7 +213,7 @@ impl ArgumentLocation {
 }
 
 #[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
-#[serde(rename_all = "camelCase", deny_unknown_fields, tag = "argumentType")]
+#[serde(deny_unknown_fields, tag = "argumentType")]
 pub enum ArgumentType {
     TypeAlias { type_alias: String },
     FieldDirective { model: String, field: String },
@@ -228,8 +226,7 @@ pub enum ArgumentType {
 #[derive(Debug, Deserialize, Serialize, Clone, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateDirectiveArgument {
-    #[serde(flatten)]
-    pub directive_location: ArgumentLocation,
+    pub location: ArgumentLocation,
     // TODO: figure out whether we want this, or an option, for default arguments
     pub argument: String,
     pub value: MigrationExpression,
@@ -238,8 +235,7 @@ pub struct CreateDirectiveArgument {
 #[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteDirectiveArgument {
-    #[serde(flatten)]
-    pub directive_location: ArgumentLocation,
+    pub location: ArgumentLocation,
     // TODO: figure out whether we want this, or an option, for default arguments
     pub argument: String,
 }
@@ -247,8 +243,7 @@ pub struct DeleteDirectiveArgument {
 #[derive(Debug, Deserialize, Serialize, Clone, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateDirectiveArgument {
-    #[serde(flatten)]
-    pub directive_location: ArgumentLocation,
+    pub location: ArgumentLocation,
     pub argument: String,
     // TODO: figure out whether we want this, or an option, for default arguments
     pub new_value: MigrationExpression,
@@ -307,8 +302,8 @@ mod tests {
     #[test]
     fn directive_location_serialization_gives_expected_json_shape() {
         let create_directive = CreateDirective {
-            locator: ArgumentLocation {
-                location: ArgumentType::FieldDirective {
+            location: ArgumentLocation {
+                argument_type: ArgumentType::FieldDirective {
                     model: "Cat".to_owned(),
                     field: "owner".to_owned(),
                 },
@@ -318,10 +313,14 @@ mod tests {
         };
 
         let serialized_step = serde_json::to_value(&create_directive).unwrap();
+
         let expected_json = json!({
-            "model": "Cat",
-            "field": "owner",
-            "directive": "status",
+            "location": {
+                "argumentType": "FieldDirective",
+                "model": "Cat",
+                "field": "owner",
+                "argumentContainer": "status",
+            }
         });
 
         assert_eq!(serialized_step, expected_json);

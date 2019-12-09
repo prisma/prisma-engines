@@ -192,16 +192,19 @@ fn CreateDirective_must_work() {
     let json = r#"
         {
             "stepType": "CreateDirective",
-            "model": "Blog",
-            "directive": "map"
+            "location": {
+                "argumentType": "ModelDirective",
+                "model": "Blog",
+                "argumentContainer": "map"
+            }
         }
     "#;
 
     let expected_step = MigrationStep::CreateDirective(CreateDirective {
-        locator: ArgumentLocation {
+        location: ArgumentLocation {
             argument_container: "map".to_owned(),
             arguments: None,
-            location: ArgumentType::ModelDirective {
+            argument_type: ArgumentType::ModelDirective {
                 model: "Blog".to_owned(),
             },
         },
@@ -215,16 +218,19 @@ fn minimal_DeleteDirective_must_work() {
     let json = r#"
         {
             "stepType": "DeleteDirective",
-            "model": "Blog",
-            "field": "title",
-            "directive": "map"
+            "location": {
+                "argumentType": "FieldDirective",
+                "model": "Blog",
+                "field": "title",
+                "argumentContainer": "map"
+            }
         }
     "#;
 
     let expected_step = MigrationStep::DeleteDirective(DeleteDirective {
-        locator: ArgumentLocation {
+        location: ArgumentLocation {
             argument_container: "map".to_owned(),
-            location: ArgumentType::FieldDirective {
+            argument_type: ArgumentType::FieldDirective {
                 model: "Blog".to_owned(),
                 field: "title".to_owned(),
             },
@@ -240,21 +246,24 @@ fn full_DeleteDirective_must_work() {
     let json = r#"
         {
             "stepType": "DeleteDirective",
-            "model": "Blog",
-            "directive": "unique",
-            "arguments": [
-                {
-                    "name": "",
-                    "value": "[name, age]"
-                }
-            ]
+            "location": {
+                "argumentType": "ModelDirective",
+                "model": "Blog",
+                "argumentContainer": "unique",
+                "arguments": [
+                    {
+                        "name": "",
+                        "value": "[name, age]"
+                    }
+                ]
+            }
         }
     "#;
 
     let expected_step = MigrationStep::DeleteDirective(DeleteDirective {
-        locator: ArgumentLocation {
+        location: ArgumentLocation {
             argument_container: "unique".to_owned(),
-            location: ArgumentType::ModelDirective {
+            argument_type: ArgumentType::ModelDirective {
                 model: "Blog".to_owned(),
             },
             arguments: Some(vec![Argument {
@@ -272,17 +281,20 @@ fn UpdateDirectiveArgument_must_work() {
     let json = r#"
         {
             "stepType": "UpdateDirectiveArgument",
-            "enum": "CatMood",
-            "directive": "map",
+            "location": {
+                "argumentType": "EnumDirective",
+                "enum": "CatMood",
+                "argumentContainer": "map"
+            },            
             "argument": "name",
             "newValue": "cat_mood"
         }
     "#;
 
     let expected_step = MigrationStep::UpdateDirectiveArgument(UpdateDirectiveArgument {
-        directive_location: ArgumentLocation {
+        location: ArgumentLocation {
             argument_container: "map".to_owned(),
-            location: ArgumentType::EnumDirective {
+            argument_type: ArgumentType::EnumDirective {
                 r#enum: "CatMood".to_owned(),
             },
             arguments: None,
@@ -299,18 +311,21 @@ fn CreateDirectiveArgument_must_work() {
     let json = r#"
         {
             "stepType": "CreateDirectiveArgument",
-            "enum": "CatMood",
-            "directive": "map",
+            "location": {
+                "argumentType": "EnumDirective",
+                "enum": "CatMood",
+                "argumentContainer": "map"
+            },
             "argument": "name",
             "value": "cat_mood"
         }
     "#;
 
     let expected_step = MigrationStep::CreateDirectiveArgument(CreateDirectiveArgument {
-        directive_location: ArgumentLocation {
+        location: ArgumentLocation {
             arguments: None,
             argument_container: "map".to_owned(),
-            location: ArgumentType::EnumDirective {
+            argument_type: ArgumentType::EnumDirective {
                 r#enum: "CatMood".to_owned(),
             },
         },
@@ -326,17 +341,20 @@ fn DeleteDirectiveArgument_must_work() {
     let json = r#"
         {
             "stepType": "DeleteDirectiveArgument",
-            "enum": "CatMood",
-            "directive": "map",
+            "location": {
+                "argumentType": "EnumDirective",
+                "enum": "CatMood",
+                "argumentContainer": "map"
+            },
             "argument": "name"
         }
     "#;
 
     let expected_step = MigrationStep::DeleteDirectiveArgument(DeleteDirectiveArgument {
-        directive_location: ArgumentLocation {
+        location: ArgumentLocation {
             argument_container: "map".to_owned(),
             arguments: None,
-            location: ArgumentType::EnumDirective {
+            argument_type: ArgumentType::EnumDirective {
                 r#enum: "CatMood".to_owned(),
             },
         },

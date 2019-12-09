@@ -366,13 +366,13 @@ fn apply_create_directive(
     datamodel: &mut ast::SchemaAst,
     step: &steps::CreateDirective,
 ) -> Result<(), CalculatorError> {
-    let directives = find_directives_mut(datamodel, &step.locator.location)
+    let directives = find_directives_mut(datamodel, &step.location.argument_type)
         .ok_or_else(|| format_err!("CreateDirective on absent target: {:?}.", step))?;
 
     let new_directive = ast::Directive {
-        name: new_ident(step.locator.argument_container.clone()),
+        name: new_ident(step.location.argument_container.clone()),
         arguments: step
-            .locator
+            .location
             .arguments
             .as_ref()
             .map(|args| args.iter().map(|arg| arg.into()).collect())
@@ -389,12 +389,12 @@ fn apply_delete_directive(
     datamodel: &mut ast::SchemaAst,
     step: &steps::DeleteDirective,
 ) -> Result<(), CalculatorError> {
-    let directives = find_directives_mut(datamodel, &step.locator.location)
+    let directives = find_directives_mut(datamodel, &step.location.argument_type)
         .ok_or_else(|| format_err!("DeleteDirective on absent target: {:?}.", step))?;
 
     let new_directives = directives
         .drain(..)
-        .filter(|directive| !step.locator.matches_ast_directive(directive))
+        .filter(|directive| !step.location.matches_ast_directive(directive))
         .collect();
 
     *directives = new_directives;
@@ -403,7 +403,7 @@ fn apply_delete_directive(
 }
 
 fn apply_create_directive_argument(datamodel: &mut ast::SchemaAst, step: &steps::CreateDirectiveArgument) {
-    let mut argument_container = find_argument_container(datamodel, &step.directive_location).unwrap();
+    let mut argument_container = find_argument_container(datamodel, &step.location).unwrap();
 
     eprintln!("applying {:?}", step);
 
@@ -415,7 +415,7 @@ fn apply_create_directive_argument(datamodel: &mut ast::SchemaAst, step: &steps:
 }
 
 fn apply_update_directive_argument(datamodel: &mut ast::SchemaAst, step: &steps::UpdateDirectiveArgument) {
-    let mut argument_container = find_argument_container(datamodel, &step.directive_location).unwrap();
+    let mut argument_container = find_argument_container(datamodel, &step.location).unwrap();
 
     for argument in argument_container.arguments().iter_mut() {
         if argument.name.name == step.argument {
@@ -425,7 +425,7 @@ fn apply_update_directive_argument(datamodel: &mut ast::SchemaAst, step: &steps:
 }
 
 fn apply_delete_directive_argument(datamodel: &mut ast::SchemaAst, step: &steps::DeleteDirectiveArgument) {
-    let mut argument_container = find_argument_container(datamodel, &step.directive_location).unwrap();
+    let mut argument_container = find_argument_container(datamodel, &step.location).unwrap();
 
     let new_arguments = argument_container
         .arguments()
@@ -515,7 +515,7 @@ fn find_argument_container<'schema>(
     datamodel: &'schema mut ast::SchemaAst,
     locator: &steps::ArgumentLocation,
 ) -> Option<ArgumentContainer<'schema>> {
-    match locator.location {
+    match locator.argument_type {
         steps::ArgumentType::Datasource | steps::ArgumentType::Generator => datamodel
             .find_source_mut(&locator.argument_container)
             .map(|sc| ArgumentContainer::SourceConfig(sc)),
@@ -527,7 +527,7 @@ fn find_directive_mut<'a>(
     datamodel: &'a mut ast::SchemaAst,
     locator: &steps::ArgumentLocation,
 ) -> Option<&'a mut ast::Directive> {
-    find_directives_mut(datamodel, &locator.location)?
+    find_directives_mut(datamodel, &locator.argument_type)?
         .iter_mut()
         .find(|directive| directive.name.name == locator.argument_container)
 }
