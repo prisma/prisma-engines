@@ -327,7 +327,7 @@ fn push_created_directives_with_arguments<'a>(
 }
 
 fn push_created_directive_with_arguments(steps: &mut Steps, location: steps::ArgumentType, directive: &ast::Directive) {
-    let step = steps::CreateDirective {
+    let step = steps::CreateArgumentContainer {
         location: steps::ArgumentLocation {
             argument_type: location.clone(),
             argument_container: directive.name.name.clone(),
@@ -335,7 +335,7 @@ fn push_created_directive_with_arguments(steps: &mut Steps, location: steps::Arg
         },
     };
 
-    steps.push(MigrationStep::CreateDirective(step));
+    steps.push(MigrationStep::CreateArgumentContainer(step));
 }
 
 fn push_created_directive(steps: &mut Steps, location: steps::ArgumentType, directive: &ast::Directive) {
@@ -345,11 +345,11 @@ fn push_created_directive(steps: &mut Steps, location: steps::ArgumentType, dire
         arguments: None,
     };
 
-    let step = steps::CreateDirective {
+    let step = steps::CreateArgumentContainer {
         location: locator.clone(),
     };
 
-    steps.push(MigrationStep::CreateDirective(step));
+    steps.push(MigrationStep::CreateArgumentContainer(step));
 
     for argument in &directive.arguments {
         push_created_directive_argument(steps, &locator, argument);
@@ -367,7 +367,7 @@ fn push_deleted_directives<'a>(
 }
 
 fn push_deleted_directive(steps: &mut Steps, location: steps::ArgumentType, directive: &ast::Directive) {
-    let step = steps::DeleteDirective {
+    let step = steps::DeleteArgumentContainer {
         location: steps::ArgumentLocation {
             argument_type: location,
             argument_container: directive.name.name.clone(),
@@ -375,11 +375,11 @@ fn push_deleted_directive(steps: &mut Steps, location: steps::ArgumentType, dire
         },
     };
 
-    steps.push(MigrationStep::DeleteDirective(step));
+    steps.push(MigrationStep::DeleteArgumentContainer(step));
 }
 
 fn push_deleted_directive_with_arguments(steps: &mut Steps, location: steps::ArgumentType, directive: &ast::Directive) {
-    let step = steps::DeleteDirective {
+    let step = steps::DeleteArgumentContainer {
         location: steps::ArgumentLocation {
             argument_type: location,
             argument_container: directive.name.name.clone(),
@@ -387,7 +387,7 @@ fn push_deleted_directive_with_arguments(steps: &mut Steps, location: steps::Arg
         },
     };
 
-    steps.push(MigrationStep::DeleteDirective(step));
+    steps.push(MigrationStep::DeleteArgumentContainer(step));
 }
 
 fn push_updated_directives<'a>(
@@ -425,13 +425,13 @@ fn push_created_directive_argument(
     directive_location: &steps::ArgumentLocation,
     argument: &ast::Argument,
 ) {
-    let create_argument_step = steps::CreateDirectiveArgument {
+    let create_argument_step = steps::CreateArgument {
         argument: argument.name.name.clone(),
         value: steps::MigrationExpression::from_ast_expression(&argument.value),
         location: directive_location.clone(),
     };
 
-    steps.push(MigrationStep::CreateDirectiveArgument(create_argument_step));
+    steps.push(MigrationStep::CreateArgument(create_argument_step));
 }
 
 fn push_updated_directive_argument(
@@ -447,22 +447,22 @@ fn push_updated_directive_argument(
         return;
     }
 
-    let update_argument_step = steps::UpdateDirectiveArgument {
+    let update_argument_step = steps::UpdateArgument {
         argument: next_argument.name.name.clone(),
         new_value: next_value,
         location: directive_location.clone(),
     };
 
-    steps.push(MigrationStep::UpdateDirectiveArgument(update_argument_step));
+    steps.push(MigrationStep::UpdateArgument(update_argument_step));
 }
 
 fn push_deleted_directive_argument(steps: &mut Steps, directive_location: &steps::ArgumentLocation, argument: &str) {
-    let delete_argument_step = steps::DeleteDirectiveArgument {
+    let delete_argument_step = steps::DeleteArgument {
         argument: argument.to_owned(),
         location: directive_location.clone(),
     };
 
-    steps.push(MigrationStep::DeleteDirectiveArgument(delete_argument_step));
+    steps.push(MigrationStep::DeleteArgument(delete_argument_step));
 }
 
 fn diff_value<T: PartialEq + Clone>(current: &T, updated: &T) -> Option<T> {

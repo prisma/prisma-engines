@@ -188,10 +188,10 @@ fn DeleteEnum_must_work() {
 }
 
 #[test]
-fn CreateDirective_must_work() {
+fn CreateArgumentContainer_must_work() {
     let json = r#"
         {
-            "stepType": "CreateDirective",
+            "stepType": "CreateArgumentContainer",
             "location": {
                 "argumentType": "ModelDirective",
                 "model": "Blog",
@@ -200,7 +200,7 @@ fn CreateDirective_must_work() {
         }
     "#;
 
-    let expected_step = MigrationStep::CreateDirective(CreateDirective {
+    let expected_step = MigrationStep::CreateArgumentContainer(CreateArgumentContainer {
         location: ArgumentLocation {
             argument_container: "map".to_owned(),
             arguments: None,
@@ -214,10 +214,10 @@ fn CreateDirective_must_work() {
 }
 
 #[test]
-fn minimal_DeleteDirective_must_work() {
+fn minimal_DeleteArgumentContainer_must_work() {
     let json = r#"
         {
-            "stepType": "DeleteDirective",
+            "stepType": "DeleteArgumentContainer",
             "location": {
                 "argumentType": "FieldDirective",
                 "model": "Blog",
@@ -227,7 +227,7 @@ fn minimal_DeleteDirective_must_work() {
         }
     "#;
 
-    let expected_step = MigrationStep::DeleteDirective(DeleteDirective {
+    let expected_step = MigrationStep::DeleteArgumentContainer(DeleteArgumentContainer {
         location: ArgumentLocation {
             argument_container: "map".to_owned(),
             argument_type: ArgumentType::FieldDirective {
@@ -242,10 +242,10 @@ fn minimal_DeleteDirective_must_work() {
 }
 
 #[test]
-fn full_DeleteDirective_must_work() {
+fn full_DeleteArgumentContainer_must_work() {
     let json = r#"
         {
-            "stepType": "DeleteDirective",
+            "stepType": "DeleteArgumentContainer",
             "location": {
                 "argumentType": "ModelDirective",
                 "model": "Blog",
@@ -260,7 +260,7 @@ fn full_DeleteDirective_must_work() {
         }
     "#;
 
-    let expected_step = MigrationStep::DeleteDirective(DeleteDirective {
+    let expected_step = MigrationStep::DeleteArgumentContainer(DeleteArgumentContainer {
         location: ArgumentLocation {
             argument_container: "unique".to_owned(),
             argument_type: ArgumentType::ModelDirective {
@@ -277,10 +277,10 @@ fn full_DeleteDirective_must_work() {
 }
 
 #[test]
-fn UpdateDirectiveArgument_must_work() {
+fn UpdateArgument_must_work() {
     let json = r#"
         {
-            "stepType": "UpdateDirectiveArgument",
+            "stepType": "UpdateArgument",
             "location": {
                 "argumentType": "EnumDirective",
                 "enum": "CatMood",
@@ -291,7 +291,7 @@ fn UpdateDirectiveArgument_must_work() {
         }
     "#;
 
-    let expected_step = MigrationStep::UpdateDirectiveArgument(UpdateDirectiveArgument {
+    let expected_step = MigrationStep::UpdateArgument(UpdateArgument {
         location: ArgumentLocation {
             argument_container: "map".to_owned(),
             argument_type: ArgumentType::EnumDirective {
@@ -307,10 +307,10 @@ fn UpdateDirectiveArgument_must_work() {
 }
 
 #[test]
-fn CreateDirectiveArgument_must_work() {
+fn CreateArgument_must_work() {
     let json = r#"
         {
-            "stepType": "CreateDirectiveArgument",
+            "stepType": "CreateArgument",
             "location": {
                 "argumentType": "EnumDirective",
                 "enum": "CatMood",
@@ -321,7 +321,7 @@ fn CreateDirectiveArgument_must_work() {
         }
     "#;
 
-    let expected_step = MigrationStep::CreateDirectiveArgument(CreateDirectiveArgument {
+    let expected_step = MigrationStep::CreateArgument(CreateArgument {
         location: ArgumentLocation {
             arguments: None,
             argument_container: "map".to_owned(),
@@ -337,10 +337,10 @@ fn CreateDirectiveArgument_must_work() {
 }
 
 #[test]
-fn DeleteDirectiveArgument_must_work() {
+fn DeleteArgument_must_work() {
     let json = r#"
         {
-            "stepType": "DeleteDirectiveArgument",
+            "stepType": "DeleteArgument",
             "location": {
                 "argumentType": "EnumDirective",
                 "enum": "CatMood",
@@ -350,7 +350,7 @@ fn DeleteDirectiveArgument_must_work() {
         }
     "#;
 
-    let expected_step = MigrationStep::DeleteDirectiveArgument(DeleteDirectiveArgument {
+    let expected_step = MigrationStep::DeleteArgument(DeleteArgument {
         location: ArgumentLocation {
             argument_container: "map".to_owned(),
             arguments: None,

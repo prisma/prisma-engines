@@ -10,11 +10,11 @@ pub enum MigrationStep {
     CreateModel(CreateModel),
     UpdateModel(UpdateModel),
     DeleteModel(DeleteModel),
-    CreateDirective(CreateDirective),
-    DeleteDirective(DeleteDirective),
-    CreateDirectiveArgument(CreateDirectiveArgument),
-    UpdateDirectiveArgument(UpdateDirectiveArgument),
-    DeleteDirectiveArgument(DeleteDirectiveArgument),
+    CreateArgumentContainer(CreateArgumentContainer),
+    DeleteArgumentContainer(DeleteArgumentContainer),
+    CreateArgument(CreateArgument),
+    UpdateArgument(UpdateArgument),
+    DeleteArgument(DeleteArgument),
     CreateField(CreateField),
     DeleteField(DeleteField),
     UpdateField(UpdateField),
@@ -133,13 +133,13 @@ pub struct DeleteEnum {
 
 #[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
 #[serde(rename_all = "camelCase")]
-pub struct CreateDirective {
+pub struct CreateArgumentContainer {
     pub location: ArgumentLocation,
 }
 
 #[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
 #[serde(rename_all = "camelCase")]
-pub struct DeleteDirective {
+pub struct DeleteArgumentContainer {
     pub location: ArgumentLocation,
 }
 
@@ -225,7 +225,7 @@ pub enum ArgumentType {
 
 #[derive(Debug, Deserialize, Serialize, Clone, PartialEq)]
 #[serde(rename_all = "camelCase")]
-pub struct CreateDirectiveArgument {
+pub struct CreateArgument {
     pub location: ArgumentLocation,
     // TODO: figure out whether we want this, or an option, for default arguments
     pub argument: String,
@@ -234,7 +234,7 @@ pub struct CreateDirectiveArgument {
 
 #[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
 #[serde(rename_all = "camelCase")]
-pub struct DeleteDirectiveArgument {
+pub struct DeleteArgument {
     pub location: ArgumentLocation,
     // TODO: figure out whether we want this, or an option, for default arguments
     pub argument: String,
@@ -242,7 +242,7 @@ pub struct DeleteDirectiveArgument {
 
 #[derive(Debug, Deserialize, Serialize, Clone, PartialEq)]
 #[serde(rename_all = "camelCase")]
-pub struct UpdateDirectiveArgument {
+pub struct UpdateArgument {
     pub location: ArgumentLocation,
     pub argument: String,
     // TODO: figure out whether we want this, or an option, for default arguments
@@ -301,7 +301,7 @@ mod tests {
 
     #[test]
     fn directive_location_serialization_gives_expected_json_shape() {
-        let create_directive = CreateDirective {
+        let create_directive = CreateArgumentContainer {
             location: ArgumentLocation {
                 argument_type: ArgumentType::FieldDirective {
                     model: "Cat".to_owned(),
@@ -325,7 +325,7 @@ mod tests {
 
         assert_eq!(serialized_step, expected_json);
 
-        let deserialized_step: CreateDirective = serde_json::from_value(expected_json).unwrap();
+        let deserialized_step: CreateArgumentContainer = serde_json::from_value(expected_json).unwrap();
         assert_eq!(create_directive, deserialized_step);
     }
 }
