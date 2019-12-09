@@ -17,7 +17,6 @@ pub async fn execute<'a, 'b>(
         WriteQuery::DeleteManyRecords(q) => delete_many(tx, q).await,
         WriteQuery::ConnectRecords(q) => connect(tx, q).await,
         WriteQuery::DisconnectRecords(q) => disconnect(tx, q).await,
-        // WriteQuery::SetRecords(q) => set(tx, q).await,
         WriteQuery::ResetData(q) => reset(tx, q).await,
     }
 }

@@ -51,6 +51,9 @@ impl ArgumentListLookup for Vec<ParsedArgument> {
 pub trait InputAssertions: Sized {
     /// Asserts the exact size of the underlying input.
     fn assert_size(&self, size: usize) -> QueryParserResult<()>;
+
+    /// Asserts that the given value is non-null. The exact definition of what is considered
+    /// null or non-null is dependent on the implementor.
     fn assert_non_null(&self) -> QueryParserResult<()>;
 }
 
