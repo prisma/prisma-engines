@@ -6,6 +6,7 @@ use jsonrpc_derive::rpc;
 use serde_derive::*;
 use std::{future::Future as StdFuture, sync::Mutex};
 use tokio::runtime::Runtime;
+use tracing_futures::Instrument;
 
 #[rpc]
 pub trait Rpc {
@@ -33,7 +34,7 @@ impl Rpc for RpcImpl {
     }
 
     fn introspect(&self, url: UrlInput) -> Result<String> {
-        self.block_on(Self::introspect_internal(&url.url))
+        self.block_on(Self::introspect_internal(&url.url).instrument(tracing::info_span!("Introspect", ?url)))
     }
 }
 
@@ -70,7 +71,7 @@ impl RpcImpl {
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct UrlInput {
     pub(crate) url: String,
 }

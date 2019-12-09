@@ -10,6 +10,9 @@ use syn::{parse_macro_input, AttributeArgs, Ident, ItemFn};
 struct TestOneConnectorArgs {
     /// The name of the connector to test.
     connector: String,
+
+    #[darling(default)]
+    log: Option<String>,
 }
 
 const CONNECTOR_NAMES: &[&'static str] = &["postgres", "mysql", "mysql_8", "sqlite"];
@@ -179,13 +182,34 @@ pub fn test_one_connector(attr: TokenStream, input: TokenStream) -> TokenStream 
     let api_factory = Ident::new(&format!("{}_test_api", args.connector), Span::call_site());
 
     let output = if async_test {
+        let test_fn_call = args
+            .log
+            .as_ref()
+            .map(|log_config| {
+                quote! {
+                    use tracing_futures::WithSubscriber;
+
+                    let filter = tracing_subscriber::EnvFilter::new(#log_config);
+                    let subscriber = tracing_subscriber::FmtSubscriber::builder()
+                        .with_env_filter(filter)
+                        .with_writer(print_writer)
+                        .finish();
+
+                    #test_impl_name(&api).with_subscriber(subscriber).await
+                }
+            })
+            .unwrap_or_else(|| {
+                quote! {
+                    #test_impl_name(&api).await
+                }
+            });
+
         quote! {
             #[test]
             fn #test_fn_name() {
                 let fut = async {
                     let api = #api_factory().await;
-
-                    #test_impl_name(&api).await
+                    #test_fn_call
                 };
 
 

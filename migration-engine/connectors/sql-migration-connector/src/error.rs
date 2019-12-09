@@ -48,7 +48,7 @@ pub enum SqlError {
     },
 
     #[fail(display = "Connect timed out")]
-    ConnectTimeout,
+    ConnectTimeout(#[fail(cause)] QuaintError),
 
     #[fail(display = "Operation timed out")]
     Timeout,
@@ -84,7 +84,10 @@ impl SqlError {
                 user_facing_error: render_quaint_error(&cause, connection_info),
                 kind: ErrorKind::AuthenticationFailed { user },
             },
-            SqlError::ConnectTimeout => ConnectorError::from_kind(ErrorKind::ConnectTimeout),
+            SqlError::ConnectTimeout(cause) => ConnectorError {
+                user_facing_error: render_quaint_error(&cause, connection_info),
+                kind: ErrorKind::ConnectTimeout,
+            },
             SqlError::Timeout => ConnectorError::from_kind(ErrorKind::Timeout),
             SqlError::TlsError { cause } => ConnectorError {
                 user_facing_error: render_quaint_error(&cause, connection_info),
@@ -130,7 +133,7 @@ impl From<quaint::error::Error> for SqlError {
                 user: user.clone(),
                 cause: error,
             },
-            quaint::error::Error::ConnectTimeout => Self::ConnectTimeout,
+            quaint::error::Error::ConnectTimeout => Self::ConnectTimeout(error),
             quaint::error::Error::ConnectionError { .. } => Self::ConnectionError { cause: error },
             quaint::error::Error::Timeout => Self::Timeout,
             quaint::error::Error::TlsError { .. } => Self::TlsError { cause: error },
