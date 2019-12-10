@@ -4,6 +4,7 @@ mod directives;
 mod enums;
 mod fields;
 mod models;
+mod source;
 mod top_level;
 
 use directives::DirectiveDiffer;
@@ -12,8 +13,9 @@ use fields::FieldDiffer;
 use models::ModelDiffer;
 use top_level::TopDiffer;
 
+use crate::migration::datamodel_differ::source::SourceArgumentsDiffer;
 use datamodel::ast;
-use migration_connector::steps::{self, MigrationStep};
+use migration_connector::steps::{self, ArgumentLocation, ArgumentType, MigrationStep};
 
 /// Diff two datamodels, returning the [MigrationStep](/struct.MigrationStep.html)s from `previous`
 /// to `next`.
@@ -157,6 +159,26 @@ fn push_updated_enums<'a>(steps: &mut Steps, enums: impl Iterator<Item = EnumDif
 fn push_datasources(steps: &mut Steps, differ: &TopDiffer<'_>) {
     push_created_sources(steps, differ.created_datasources());
     push_deleted_sources(steps, differ.deleted_datasources());
+    push_updated_sources(steps, differ.updated_datasources());
+}
+
+fn push_updated_sources<'a>(steps: &mut Steps, sources: impl Iterator<Item = SourceArgumentsDiffer<'a>>) {
+    for source in sources {
+        let location = ArgumentLocation {
+            argument_type: ArgumentType::Datasource,
+            argument_container: source.previous.name.name.to_owned(),
+            arguments: None,
+        };
+        for argument in source.created_arguments() {
+            push_created_argument(steps, &location.clone(), argument);
+        }
+        for argument in source.deleted_arguments() {
+            push_deleted_argument(steps, &location.clone(), &argument.name.name);
+        }
+        for (prev, next) in source.argument_pairs() {
+            push_updated_argument(steps, &location.clone(), prev, next)
+        }
+    }
 }
 
 fn push_created_sources<'a>(steps: &mut Steps, sources: impl Iterator<Item = &'a ast::SourceConfig>) {

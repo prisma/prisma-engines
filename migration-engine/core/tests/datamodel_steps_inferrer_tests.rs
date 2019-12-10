@@ -1443,6 +1443,54 @@ fn infer_DeleteSource() {
     assert_eq!(steps, expected);
 }
 
+#[test]
+fn infer_Arguments_on_Datasources() {
+    let dm1 = parse(
+        r#"
+        datasource pg { 
+            provider = "postgres"
+            url = "postgresql://some-host:1234"
+            a = 1
+            b = "1"
+        }"#,
+    );
+    let dm2 = parse(
+        r#"
+        datasource pg { 
+            provider = "postgres"
+            url = "postgresql://some-host:1234"
+            a = 2
+            c = true
+        }"#,
+    );
+
+    let location = ArgumentLocation {
+        argument_container: "pg".to_owned(),
+        argument_type: ArgumentType::Datasource,
+        arguments: None,
+    };
+
+    let steps = infer(&dm1, &dm2);
+    let expected = &[
+        MigrationStep::CreateArgument(CreateArgument {
+            location: location.clone(),
+            argument: "c".to_owned(),
+            value: MigrationExpression("true".to_owned()),
+        }),
+        MigrationStep::DeleteArgument(DeleteArgument {
+            location: location.clone(),
+            argument: "b".to_owned(),
+        }),
+        MigrationStep::UpdateArgument(UpdateArgument {
+            location: location.clone(),
+            argument: "a".to_owned(),
+            new_value: MigrationExpression("2".to_owned()),
+        }),
+    ];
+
+    assert_eq!(steps, expected);
+}
+
 fn infer(dm1: &SchemaAst, dm2: &SchemaAst) -> Vec<MigrationStep> {
     let inferrer = DataModelMigrationStepsInferrerImplWrapper {};
     inferrer.infer(&dm1, &dm2)

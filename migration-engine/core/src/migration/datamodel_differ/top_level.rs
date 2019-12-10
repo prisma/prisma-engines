@@ -1,4 +1,5 @@
 use super::{EnumDiffer, FieldDiffer, ModelDiffer};
+use crate::migration::datamodel_differ::source::SourceArgumentsDiffer;
 use datamodel::ast::{self, Top};
 
 /// Implements the logic to diff top-level items in a pair of [Datamodel ASTs](/datamodel/ast/struct.Datamodel.html).
@@ -20,22 +21,6 @@ impl<'a> TopDiffer<'a> {
         })
     }
 
-    pub(crate) fn created_datasources(&self) -> impl Iterator<Item = &ast::SourceConfig> {
-        self.next_sources().filter(move |next| {
-            self.previous_sources()
-                .find(|previous| sources_match(previous, next))
-                .is_none()
-        })
-    }
-
-    pub(crate) fn deleted_datasources(&self) -> impl Iterator<Item = &ast::SourceConfig> {
-        self.previous_sources().filter(move |next| {
-            self.next_sources()
-                .find(|previous| sources_match(previous, next))
-                .is_none()
-        })
-    }
-
     /// Iterator over the models present in `next` but not `previous`.
     pub(crate) fn created_models(&self) -> impl Iterator<Item = &ast::Model> {
         self.next_models().filter(move |next_model| {
@@ -50,6 +35,30 @@ impl<'a> TopDiffer<'a> {
         self.previous_models().filter(move |previous_model| {
             self.next_models()
                 .find(|next_model| models_match(previous_model, next_model))
+                .is_none()
+        })
+    }
+
+    pub(crate) fn updated_datasources(&self) -> impl Iterator<Item = SourceArgumentsDiffer<'_>> {
+        self.previous_sources().filter_map(move |previous| {
+            self.next_sources()
+                .find(|next| sources_match(previous, next))
+                .map(|next| SourceArgumentsDiffer { previous, next })
+        })
+    }
+
+    pub(crate) fn created_datasources(&self) -> impl Iterator<Item = &ast::SourceConfig> {
+        self.next_sources().filter(move |next| {
+            self.previous_sources()
+                .find(|previous| sources_match(previous, next))
+                .is_none()
+        })
+    }
+
+    pub(crate) fn deleted_datasources(&self) -> impl Iterator<Item = &ast::SourceConfig> {
+        self.previous_sources().filter(move |next| {
+            self.next_sources()
+                .find(|previous| sources_match(previous, next))
                 .is_none()
         })
     }
