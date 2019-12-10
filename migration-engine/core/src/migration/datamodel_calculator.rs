@@ -47,12 +47,8 @@ fn apply_step(datamodel: &mut ast::SchemaAst, step: &MigrationStep) -> Result<()
         MigrationStep::CreateTypeAlias(create_type_alias) => apply_create_type_alias(datamodel, create_type_alias)?,
         MigrationStep::UpdateTypeAlias(update_type_alias) => apply_update_type_alias(datamodel, update_type_alias)?,
         MigrationStep::DeleteTypeAlias(delete_type_alias) => apply_delete_type_alias(datamodel, delete_type_alias)?,
-        MigrationStep::CreateArgumentContainer(create_directive) => {
-            apply_create_directive(datamodel, create_directive)?
-        }
-        MigrationStep::DeleteArgumentContainer(delete_directive) => {
-            apply_delete_directive(datamodel, delete_directive)?
-        }
+        MigrationStep::CreateDirective(create_directive) => apply_create_directive(datamodel, create_directive)?,
+        MigrationStep::DeleteDirective(delete_directive) => apply_delete_directive(datamodel, delete_directive)?,
         MigrationStep::CreateArgument(create_directive_argument) => {
             apply_create_directive_argument(datamodel, create_directive_argument)
         }
@@ -391,10 +387,10 @@ fn apply_delete_enum(datamodel: &mut ast::SchemaAst, step: &steps::DeleteEnum) -
 
 fn apply_create_directive(
     datamodel: &mut ast::SchemaAst,
-    step: &steps::CreateArgumentContainer,
+    step: &steps::CreateDirective,
 ) -> Result<(), CalculatorError> {
     let directives = find_directives_mut(datamodel, &step.location.argument_type)
-        .ok_or_else(|| format_err!("CreateArgumentContainer on absent target: {:?}.", step))?;
+        .ok_or_else(|| format_err!("CreateDirective on absent target: {:?}.", step))?;
 
     let new_directive = ast::Directive {
         name: new_ident(step.location.argument_container.clone()),
@@ -414,10 +410,10 @@ fn apply_create_directive(
 
 fn apply_delete_directive(
     datamodel: &mut ast::SchemaAst,
-    step: &steps::DeleteArgumentContainer,
+    step: &steps::DeleteDirective,
 ) -> Result<(), CalculatorError> {
     let directives = find_directives_mut(datamodel, &step.location.argument_type)
-        .ok_or_else(|| format_err!("DeleteArgumentContainer on absent target: {:?}.", step))?;
+        .ok_or_else(|| format_err!("DeleteDirective on absent target: {:?}.", step))?;
 
     let new_directives = directives
         .drain(..)

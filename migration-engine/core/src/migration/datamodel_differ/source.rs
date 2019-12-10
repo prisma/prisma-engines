@@ -1,5 +1,4 @@
 use datamodel::ast;
-use migration_connector::steps::MigrationExpression;
 
 #[derive(Debug)]
 pub(crate) struct SourceArgumentsDiffer<'a> {
@@ -47,7 +46,7 @@ fn arguments_match(previous: &ast::Argument, next: &ast::Argument) -> bool {
 
 #[cfg(test)]
 mod tests {
-    use super::super::{ModelDiffer, TopDiffer};
+    use super::super::TopDiffer;
     use super::*;
     use datamodel::ast::parser::parse;
 

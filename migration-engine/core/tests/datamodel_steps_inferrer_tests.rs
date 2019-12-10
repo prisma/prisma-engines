@@ -29,7 +29,7 @@ fn infer_CreateModel_if_it_does_not_exist_yet() {
             tpe: "Int".to_owned(),
             arity: FieldArity::Required,
         }),
-        MigrationStep::CreateArgumentContainer(CreateArgumentContainer {
+        MigrationStep::CreateDirective(CreateDirective {
             location: ArgumentLocation {
                 arguments: None,
                 argument_container: "id".to_owned(),
@@ -90,7 +90,7 @@ fn infer_UpdateModel() {
     );
 
     let steps = infer(&dm1, &dm2);
-    let expected = &[MigrationStep::CreateArgumentContainer(CreateArgumentContainer {
+    let expected = &[MigrationStep::CreateDirective(CreateDirective {
         location: ArgumentLocation {
             arguments: None,
             argument_container: "embedded".to_owned(),
@@ -157,7 +157,7 @@ fn infer_CreateField_with_default() {
             tpe: "Boolean".to_owned(),
             arity: FieldArity::Required,
         }),
-        MigrationStep::CreateArgumentContainer(CreateArgumentContainer {
+        MigrationStep::CreateDirective(CreateDirective {
             location: ArgumentLocation {
                 arguments: None,
                 argument_type: ArgumentType::FieldDirective {
@@ -284,7 +284,7 @@ fn infer_UpdateField_simple() {
             tpe: Some("Boolean".to_owned()),
             arity: Some(FieldArity::Required),
         }),
-        MigrationStep::CreateArgumentContainer(CreateArgumentContainer {
+        MigrationStep::CreateDirective(CreateDirective {
             location: ArgumentLocation {
                 argument_container: "default".to_owned(),
                 arguments: None,
@@ -306,7 +306,7 @@ fn infer_UpdateField_simple() {
             argument: "".to_owned(),
             value: MigrationExpression("false".to_owned()),
         }),
-        MigrationStep::CreateArgumentContainer(CreateArgumentContainer {
+        MigrationStep::CreateDirective(CreateDirective {
             location: ArgumentLocation {
                 arguments: None,
                 argument_container: "unique".to_owned(),
@@ -427,7 +427,7 @@ fn infer_CreateField_on_self_relation() {
 }
 
 #[test]
-fn infer_CreateArgumentContainer_on_field() {
+fn infer_CreateDirective_on_field() {
     let dm1 = parse(
         r##"
         model User {
@@ -458,7 +458,7 @@ fn infer_CreateArgumentContainer_on_field() {
     };
 
     let expected = &[
-        MigrationStep::CreateArgumentContainer(CreateArgumentContainer {
+        MigrationStep::CreateDirective(CreateDirective {
             location: locator.clone(),
         }),
         MigrationStep::CreateArgument(CreateArgument {
@@ -472,7 +472,7 @@ fn infer_CreateArgumentContainer_on_field() {
 }
 
 #[test]
-fn infer_CreateArgumentContainer_on_model() {
+fn infer_CreateDirective_on_model() {
     let dm1 = parse(
         r##"
         model User {
@@ -504,7 +504,7 @@ fn infer_CreateArgumentContainer_on_model() {
     };
 
     let expected = &[
-        MigrationStep::CreateArgumentContainer(CreateArgumentContainer {
+        MigrationStep::CreateDirective(CreateDirective {
             location: locator.clone(),
         }),
         MigrationStep::CreateArgument(CreateArgument {
@@ -518,7 +518,7 @@ fn infer_CreateArgumentContainer_on_model() {
 }
 
 #[test]
-fn infer_CreateArgumentContainer_on_model_repeated_directive() {
+fn infer_CreateDirective_on_model_repeated_directive() {
     let dm1 = parse(
         r##"
         model User {
@@ -552,15 +552,13 @@ fn infer_CreateArgumentContainer_on_model_repeated_directive() {
         },
     };
 
-    let expected = &[MigrationStep::CreateArgumentContainer(CreateArgumentContainer {
-        location: locator,
-    })];
+    let expected = &[MigrationStep::CreateDirective(CreateDirective { location: locator })];
 
     assert_eq!(steps, expected);
 }
 
 #[test]
-fn infer_CreateArgumentContainer_on_enum() {
+fn infer_CreateDirective_on_enum() {
     let dm1 = parse(
         r##"
             enum Color {
@@ -594,7 +592,7 @@ fn infer_CreateArgumentContainer_on_enum() {
     };
 
     let expected = &[
-        MigrationStep::CreateArgumentContainer(CreateArgumentContainer {
+        MigrationStep::CreateDirective(CreateDirective {
             location: locator.clone(),
         }),
         MigrationStep::CreateArgument(CreateArgument {
@@ -608,7 +606,7 @@ fn infer_CreateArgumentContainer_on_enum() {
 }
 
 #[test]
-fn infer_CreateArgumentContainer_on_type_alias() {
+fn infer_CreateDirective_on_type_alias() {
     let dm1 = parse(r#"type BlogPost = String @default("a")"#);
     let dm2 = parse(r#"type BlogPost = String @customized @default("a")"#);
 
@@ -622,15 +620,13 @@ fn infer_CreateArgumentContainer_on_type_alias() {
         },
     };
 
-    let expected = &[MigrationStep::CreateArgumentContainer(CreateArgumentContainer {
-        location: locator,
-    })];
+    let expected = &[MigrationStep::CreateDirective(CreateDirective { location: locator })];
 
     assert_eq!(steps, expected);
 }
 
 #[test]
-fn infer_DeleteArgumentContainer_on_field() {
+fn infer_DeleteDirective_on_field() {
     let dm1 = parse(
         r##"
         model User {
@@ -660,15 +656,13 @@ fn infer_DeleteArgumentContainer_on_field() {
         },
     };
 
-    let expected = &[MigrationStep::DeleteArgumentContainer(DeleteArgumentContainer {
-        location: locator,
-    })];
+    let expected = &[MigrationStep::DeleteDirective(DeleteDirective { location: locator })];
 
     assert_eq!(steps, expected);
 }
 
 #[test]
-fn infer_DeleteArgumentContainer_on_model() {
+fn infer_DeleteDirective_on_model() {
     let dm1 = parse(
         r##"
         model User {
@@ -699,15 +693,13 @@ fn infer_DeleteArgumentContainer_on_model() {
         },
     };
 
-    let expected = &[MigrationStep::DeleteArgumentContainer(DeleteArgumentContainer {
-        location: locator,
-    })];
+    let expected = &[MigrationStep::DeleteDirective(DeleteDirective { location: locator })];
 
     assert_eq!(steps, expected);
 }
 
 #[test]
-fn infer_DeleteArgumentContainer_on_model_repeated_directive() {
+fn infer_DeleteDirective_on_model_repeated_directive() {
     let dm1 = parse(
         r##"
         model User {
@@ -741,15 +733,13 @@ fn infer_DeleteArgumentContainer_on_model_repeated_directive() {
         },
     };
 
-    let expected = &[MigrationStep::DeleteArgumentContainer(DeleteArgumentContainer {
-        location: locator,
-    })];
+    let expected = &[MigrationStep::DeleteDirective(DeleteDirective { location: locator })];
 
     assert_eq!(steps, expected);
 }
 
 #[test]
-fn infer_DeleteArgumentContainer_on_enum() {
+fn infer_DeleteDirective_on_enum() {
     let dm1 = parse(
         r##"
             enum Color {
@@ -785,15 +775,13 @@ fn infer_DeleteArgumentContainer_on_enum() {
         },
     };
 
-    let expected = &[MigrationStep::DeleteArgumentContainer(DeleteArgumentContainer {
-        location: locator,
-    })];
+    let expected = &[MigrationStep::DeleteDirective(DeleteDirective { location: locator })];
 
     assert_eq!(steps, expected);
 }
 
 #[test]
-fn infer_DeleteArgumentContainer_on_type_alias() {
+fn infer_DeleteDirective_on_type_alias() {
     let dm1 = parse(r#"type BlogPost = String @default("chimken")"#);
     let dm2 = parse(r#"type BlogPost = String"#);
 
@@ -807,9 +795,7 @@ fn infer_DeleteArgumentContainer_on_type_alias() {
         },
     };
 
-    let expected = &[MigrationStep::DeleteArgumentContainer(DeleteArgumentContainer {
-        location: locator,
-    })];
+    let expected = &[MigrationStep::DeleteDirective(DeleteDirective { location: locator })];
 
     assert_eq!(steps, expected);
 }
@@ -1320,14 +1306,14 @@ fn infer_CreateTypeAlias() {
             r#type: "String".to_owned(),
             arity: FieldArity::Required,
         }),
-        MigrationStep::CreateArgumentContainer(CreateArgumentContainer {
+        MigrationStep::CreateDirective(CreateDirective {
             location: ArgumentLocation {
                 argument_type: directive_type.clone(),
                 argument_container: "id".to_owned(),
                 arguments: None,
             },
         }),
-        MigrationStep::CreateArgumentContainer(CreateArgumentContainer {
+        MigrationStep::CreateDirective(CreateDirective {
             location: ArgumentLocation {
                 argument_type: directive_type.clone(),
                 argument_container: "default".to_owned(),

@@ -360,7 +360,7 @@ fn push_created_directives_with_arguments<'a>(
 }
 
 fn push_created_directive_with_arguments(steps: &mut Steps, location: steps::ArgumentType, directive: &ast::Directive) {
-    let step = steps::CreateArgumentContainer {
+    let step = steps::CreateDirective {
         location: steps::ArgumentLocation {
             argument_type: location.clone(),
             argument_container: directive.name.name.clone(),
@@ -368,7 +368,7 @@ fn push_created_directive_with_arguments(steps: &mut Steps, location: steps::Arg
         },
     };
 
-    steps.push(MigrationStep::CreateArgumentContainer(step));
+    steps.push(MigrationStep::CreateDirective(step));
 }
 
 fn push_created_directive(steps: &mut Steps, location: steps::ArgumentType, directive: &ast::Directive) {
@@ -378,11 +378,11 @@ fn push_created_directive(steps: &mut Steps, location: steps::ArgumentType, dire
         arguments: None,
     };
 
-    let step = steps::CreateArgumentContainer {
+    let step = steps::CreateDirective {
         location: locator.clone(),
     };
 
-    steps.push(MigrationStep::CreateArgumentContainer(step));
+    steps.push(MigrationStep::CreateDirective(step));
 
     for argument in &directive.arguments {
         push_created_argument(steps, &locator, argument);
@@ -400,7 +400,7 @@ fn push_deleted_directives<'a>(
 }
 
 fn push_deleted_directive(steps: &mut Steps, location: steps::ArgumentType, directive: &ast::Directive) {
-    let step = steps::DeleteArgumentContainer {
+    let step = steps::DeleteDirective {
         location: steps::ArgumentLocation {
             argument_type: location,
             argument_container: directive.name.name.clone(),
@@ -408,11 +408,11 @@ fn push_deleted_directive(steps: &mut Steps, location: steps::ArgumentType, dire
         },
     };
 
-    steps.push(MigrationStep::DeleteArgumentContainer(step));
+    steps.push(MigrationStep::DeleteDirective(step));
 }
 
 fn push_deleted_directive_with_arguments(steps: &mut Steps, location: steps::ArgumentType, directive: &ast::Directive) {
-    let step = steps::DeleteArgumentContainer {
+    let step = steps::DeleteDirective {
         location: steps::ArgumentLocation {
             argument_type: location,
             argument_container: directive.name.name.clone(),
@@ -420,7 +420,7 @@ fn push_deleted_directive_with_arguments(steps: &mut Steps, location: steps::Arg
         },
     };
 
-    steps.push(MigrationStep::DeleteArgumentContainer(step));
+    steps.push(MigrationStep::DeleteDirective(step));
 }
 
 fn push_updated_directives<'a>(

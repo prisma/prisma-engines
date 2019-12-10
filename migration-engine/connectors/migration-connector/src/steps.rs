@@ -10,8 +10,8 @@ pub enum MigrationStep {
     CreateModel(CreateModel),
     UpdateModel(UpdateModel),
     DeleteModel(DeleteModel),
-    CreateArgumentContainer(CreateArgumentContainer),
-    DeleteArgumentContainer(DeleteArgumentContainer),
+    CreateDirective(CreateDirective),
+    DeleteDirective(DeleteDirective),
     CreateArgument(CreateArgument),
     UpdateArgument(UpdateArgument),
     DeleteArgument(DeleteArgument),
@@ -134,13 +134,13 @@ pub struct DeleteEnum {
 
 #[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
 #[serde(rename_all = "camelCase")]
-pub struct CreateArgumentContainer {
+pub struct CreateDirective {
     pub location: ArgumentLocation,
 }
 
 #[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
 #[serde(rename_all = "camelCase")]
-pub struct DeleteArgumentContainer {
+pub struct DeleteDirective {
     pub location: ArgumentLocation,
 }
 
@@ -307,7 +307,7 @@ mod tests {
 
     #[test]
     fn directive_location_serialization_gives_expected_json_shape() {
-        let create_directive = CreateArgumentContainer {
+        let create_directive = CreateDirective {
             location: ArgumentLocation {
                 argument_type: ArgumentType::FieldDirective {
                     model: "Cat".to_owned(),
@@ -331,7 +331,7 @@ mod tests {
 
         assert_eq!(serialized_step, expected_json);
 
-        let deserialized_step: CreateArgumentContainer = serde_json::from_value(expected_json).unwrap();
+        let deserialized_step: CreateDirective = serde_json::from_value(expected_json).unwrap();
         assert_eq!(create_directive, deserialized_step);
     }
 }
