@@ -6,7 +6,7 @@ use url::Url;
 
 #[tokio::test]
 async fn unreachable_database_must_return_a_proper_error_on_mysql() {
-    let mut url: Url = mysql_url().parse().unwrap();
+    let mut url: Url = mysql_url("does-not-matter").parse().unwrap();
 
     url.set_port(Some(8787)).unwrap();
 
