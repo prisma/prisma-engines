@@ -1396,7 +1396,9 @@ fn infer_CreateSource() {
         arguments: None,
     };
     let expected = &[
-        MigrationStep::CreateSource(CreateSource { name: "pg".to_owned() }),
+        MigrationStep::CreateSource(CreateSource {
+            source: "pg".to_owned(),
+        }),
         MigrationStep::CreateArgument(CreateArgument {
             location: location.clone(),
             argument: "provider".to_owned(),
@@ -1424,7 +1426,9 @@ fn infer_DeleteSource() {
     let dm2 = parse("");
 
     let steps = infer(&dm1, &dm2);
-    let expected = &[MigrationStep::DeleteSource(DeleteSource { name: "pg".to_owned() })];
+    let expected = &[MigrationStep::DeleteSource(DeleteSource {
+        source: "pg".to_owned(),
+    })];
 
     assert_eq!(steps, expected);
 }

@@ -1,3 +1,4 @@
+use super::directives::arguments_match;
 use datamodel::ast;
 
 #[derive(Debug)]
@@ -38,10 +39,6 @@ impl<'a> SourceArgumentsDiffer<'a> {
     fn next_arguments(&self) -> impl Iterator<Item = &ast::Argument> {
         self.next.properties.iter()
     }
-}
-
-fn arguments_match(previous: &ast::Argument, next: &ast::Argument) -> bool {
-    previous.name.name == next.name.name
 }
 
 #[cfg(test)]

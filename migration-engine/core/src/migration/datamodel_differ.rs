@@ -185,7 +185,7 @@ fn push_created_sources<'a>(steps: &mut Steps, sources: impl Iterator<Item = &'a
     for created_source in sources {
         let location = steps::ArgumentType::Datasource {};
         let create_source_step = steps::CreateSource {
-            name: created_source.name.name.clone(),
+            source: created_source.name.name.clone(),
         };
 
         steps.push(MigrationStep::CreateSource(create_source_step));
@@ -207,7 +207,7 @@ fn push_created_sources<'a>(steps: &mut Steps, sources: impl Iterator<Item = &'a
 fn push_deleted_sources<'a>(steps: &mut Steps, sources: impl Iterator<Item = &'a ast::SourceConfig>) {
     let delete_source_steps = sources
         .map(|x| steps::DeleteSource {
-            name: x.name.name.clone(),
+            source: x.name.name.clone(),
         })
         .map(MigrationStep::DeleteSource);
 

@@ -61,6 +61,7 @@ impl<'a> Validator<'a> {
             Some(source) => source.connector().supports_scalar_lists(),
             None => false,
         };
+
         for field in model.fields() {
             if field.arity == FieldArity::List && !scalar_lists_are_supported && !field.field_type.is_relation() {
                 let ast_field = ast_model

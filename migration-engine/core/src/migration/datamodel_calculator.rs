@@ -66,7 +66,7 @@ fn apply_step(datamodel: &mut ast::SchemaAst, step: &MigrationStep) -> Result<()
 }
 
 fn apply_create_source(datamodel: &mut ast::SchemaAst, step: &CreateSource) -> Result<(), CalculatorError> {
-    let steps::CreateSource { name } = step;
+    let steps::CreateSource { source: name } = step;
     if let Some(_) = datamodel.find_source(name) {
         return Err(format_err!(
             "The datasource {} already exists in this Schema. It is not possible to create it once more.",
@@ -88,10 +88,10 @@ fn apply_create_source(datamodel: &mut ast::SchemaAst, step: &CreateSource) -> R
 }
 
 fn apply_delete_source(datamodel: &mut ast::SchemaAst, step: &DeleteSource) -> Result<(), CalculatorError> {
-    datamodel.find_model(&step.name).ok_or_else(|| {
+    datamodel.find_model(&step.source).ok_or_else(|| {
         format_err!(
             "The source {} does not exist in this Schema. It is not possible to delete it.",
-            &step.name
+            &step.source
         )
     })?;
 
@@ -99,7 +99,7 @@ fn apply_delete_source(datamodel: &mut ast::SchemaAst, step: &DeleteSource) -> R
         .tops
         .drain(..)
         .filter(|top| match top {
-            ast::Top::Source(source) => source.name.name != step.name,
+            ast::Top::Source(source) => source.name.name != step.source,
             _ => true,
         })
         .collect();
@@ -427,8 +427,6 @@ fn apply_delete_directive(
 
 fn apply_create_directive_argument(datamodel: &mut ast::SchemaAst, step: &steps::CreateArgument) {
     let mut argument_container = find_argument_container(datamodel, &step.location).unwrap();
-
-    eprintln!("applying {:?}", step);
 
     argument_container.arguments().push(ast::Argument {
         name: new_ident(step.argument.clone()),

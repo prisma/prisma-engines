@@ -292,12 +292,12 @@ pub struct DeleteTypeAlias {
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct CreateSource {
-    pub name: String,
+    pub source: String,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct DeleteSource {
-    pub name: String,
+    pub source: String,
 }
 
 #[cfg(test)]
