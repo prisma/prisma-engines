@@ -1,5 +1,31 @@
-use crate::{DomainError as Error, DomainResult, GraphqlId, PrismaValue};
+use crate::{DomainError as Error, DomainResult, Field, GraphqlId, PrismaValue};
 use std::convert::TryFrom;
+
+pub struct RecordIdentifier {
+    pub pairs: Vec<(Field, PrismaValue)>,
+}
+
+impl RecordIdentifier {
+    pub fn new(pairs: Vec<(Field, PrismaValue)>) -> Self {
+        Self { pairs }
+    }
+
+    pub fn add(&mut self, pair: (Field, PrismaValue)) {
+        self.pairs.push(pair);
+    }
+}
+
+impl Into<RecordIdentifier> for (Field, PrismaValue) {
+    fn into(self) -> RecordIdentifier {
+        RecordIdentifier::new(vec![self])
+    }
+}
+
+impl Into<RecordIdentifier> for Vec<(Field, PrismaValue)> {
+    fn into(self) -> RecordIdentifier {
+        RecordIdentifier::new(self)
+    }
+}
 
 #[derive(Debug, Clone)]
 pub struct SingleRecord {

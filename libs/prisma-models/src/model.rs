@@ -75,8 +75,8 @@ impl PartialEq for Model {
 }
 
 impl Model {
-    pub fn generate_id(&self) -> GraphqlId {
-        match self.fields().id().type_identifier {
+    pub fn generate_id(&self) -> Option<RecordIdentifier> {
+        self.fields().id().map(|id| match id.type_identifier {
             // This will panic when:
             //
             // - System time goes backwards
@@ -87,8 +87,18 @@ impl Model {
             TypeIdentifier::GraphQLID => GraphqlId::String(cuid::cuid().unwrap()),
             TypeIdentifier::UUID => GraphqlId::UUID(Uuid::new_v4()),
             TypeIdentifier::Int => panic!("Cannot generate integer ids."),
-            t => panic!("You shouldn't even use ids of type {:?}", t),
-        }
+
+            // All other ID types are rejected on data model construction.
+            _ => unreachable!(),
+        })
+    }
+
+    /// Returns the set of fields to be used as the primary identifier for a record of that model.
+    /// The implementation guarantees that the returned set of fields is deterministic for the same underlying data model.
+    pub fn primary_identifier(&self) -> Vec<Field> {
+        self.fields()
+            .id()
+            .or_else(|| self.fields().scalar().find(|sf| sf.is_unqiue()))
     }
 
     pub fn fields(&self) -> &Fields {

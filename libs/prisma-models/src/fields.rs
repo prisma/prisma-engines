@@ -8,7 +8,7 @@ use std::{
 #[derive(Debug)]
 pub struct Fields {
     pub all: Vec<Field>,
-    id: OnceCell<Weak<ScalarField>>,
+    id: OnceCell<Option<Weak<ScalarField>>>,
     scalar: OnceCell<Vec<Weak<ScalarField>>>,
     relation: OnceCell<Vec<Weak<RelationField>>>,
     model: ModelWeakRef,
@@ -29,19 +29,15 @@ impl Fields {
         }
     }
 
-    pub fn id(&self) -> Arc<ScalarField> {
+    pub fn id(&self) -> Option<Vec<Arc<ScalarField>>> {
         self.id
             .get_or_init(|| {
-                self.all
-                    .iter()
-                    .fold(None, |acc, field| match field {
-                        Field::Scalar(sf) if sf.is_id() => Some(Arc::downgrade(sf)),
-                        _ => acc,
-                    })
-                    .expect("No id field defined!")
+                self.all.iter().fold(None, |acc, field| match field {
+                    Field::Scalar(sf) if sf.is_id() => Some(Arc::downgrade(sf)),
+                    _ => acc,
+                })
             })
-            .upgrade()
-            .unwrap()
+            .and_then(|weak| weak.upgrade())
     }
 
     pub fn created_at(&self) -> &Option<Arc<ScalarField>> {
