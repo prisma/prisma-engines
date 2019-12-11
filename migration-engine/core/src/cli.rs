@@ -309,7 +309,7 @@ mod tests {
     fn postgres_url_with_scheme(db: Option<&str>, scheme: &str) -> String {
         match std::env::var("IS_BUILDKITE") {
             Ok(_) => format!(
-                "{scheme}://postgres:prisma@test-db-postgres:5432/{db_name}",
+                "{scheme}://postgres:prisma@test-db-postgres-10:5432/{db_name}",
                 scheme = scheme,
                 db_name = db.unwrap_or("postgres")
             ),

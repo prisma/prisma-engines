@@ -197,8 +197,60 @@ pub async fn mysql_test_api(db_name: &str) -> TestApi {
     }
 }
 
+pub async fn mariadb_test_api(db_name: &str) -> TestApi {
+    let url = mariadb_url(db_name);
+    let connection_info = ConnectionInfo::from_url(&url).unwrap();
+    let connector = mysql_migration_connector(&url).await;
+
+    TestApi {
+        connection_info: Some(connection_info),
+        sql_family: SqlFamily::Mysql,
+        database: Arc::clone(&connector.database),
+        api: test_api(connector).await,
+    }
+}
+
+pub async fn postgres9_test_api(db_name: &str) -> TestApi {
+    let url = postgres_9_url(db_name);
+    let connection_info = ConnectionInfo::from_url(&url).unwrap();
+    let connector = postgres_migration_connector(&url).await;
+
+    TestApi {
+        connection_info: Some(connection_info),
+        sql_family: SqlFamily::Postgres,
+        database: Arc::clone(&connector.database),
+        api: test_api(connector).await,
+    }
+}
+
 pub async fn postgres_test_api(db_name: &str) -> TestApi {
-    let url = postgres_url(db_name);
+    let url = postgres_10_url(db_name);
+    let connection_info = ConnectionInfo::from_url(&url).unwrap();
+    let connector = postgres_migration_connector(&url).await;
+
+    TestApi {
+        connection_info: Some(connection_info),
+        sql_family: SqlFamily::Postgres,
+        database: Arc::clone(&connector.database),
+        api: test_api(connector).await,
+    }
+}
+
+pub async fn postgres11_test_api(db_name: &str) -> TestApi {
+    let url = postgres_11_url(db_name);
+    let connection_info = ConnectionInfo::from_url(&url).unwrap();
+    let connector = postgres_migration_connector(&url).await;
+
+    TestApi {
+        connection_info: Some(connection_info),
+        sql_family: SqlFamily::Postgres,
+        database: Arc::clone(&connector.database),
+        api: test_api(connector).await,
+    }
+}
+
+pub async fn postgres12_test_api(db_name: &str) -> TestApi {
+    let url = postgres_12_url(db_name);
     let connection_info = ConnectionInfo::from_url(&url).unwrap();
     let connector = postgres_migration_connector(&url).await;
 

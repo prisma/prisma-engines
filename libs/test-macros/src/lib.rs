@@ -18,7 +18,11 @@ struct TestOneConnectorArgs {
 const CONNECTOR_NAMES: &[&'static str] = &[
     "mysql_8",
     "mysql",
+    "postgres9",
     "postgres",
+    "postgres11",
+    "postgres12",
+    //"mariadb", // SIGILL MFS
     "sqlite",
 ];
 
