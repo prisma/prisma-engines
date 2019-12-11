@@ -203,6 +203,20 @@ impl MigrationStatus {
             _ => panic!("MigrationStatus {:?} is not known", s),
         }
     }
+
+    pub fn is_success(&self) -> bool {
+        match self {
+            MigrationStatus::MigrationSuccess => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_pending(&self) -> bool {
+        match self {
+            MigrationStatus::Pending => true,
+            _ => false,
+        }
+    }
 }
 
 /// A no-op implementor of [MigrationPersistence](trait.MigrationPersistence.html).
