@@ -4,10 +4,9 @@ use quaint::{single::Quaint, prelude::{Queryable, SqlFamily}};
 use sql_introspection_connector::SqlIntrospectionConnector;
 use std::sync::Arc;
 use test_setup::*;
-use std::borrow::Cow;
 
 pub struct TestApi {
-    db_name: Cow<'static, str>,
+    db_name: &'static str,
     sql_family: SqlFamily,
     database: Arc<dyn Queryable + Send + Sync + 'static>,
     introspection_connector: SqlIntrospectionConnector,
@@ -76,7 +75,7 @@ pub async fn postgres_test_api(db_name: &'static str) -> TestApi {
     let introspection_connector = SqlIntrospectionConnector::new(&url).await.unwrap();
 
     TestApi {
-        db_name: Cow::Borrowed(db_name),
+        db_name,
         database: Arc::new(database),
         sql_family: SqlFamily::Postgres,
         introspection_connector: introspection_connector,
@@ -94,7 +93,7 @@ pub async fn sqlite_test_api(db_name: &'static str) -> TestApi {
     let introspection_connector = SqlIntrospectionConnector::new(&connection_string).await.unwrap();
 
     TestApi {
-        db_name: Cow::Borrowed(db_name),
+        db_name,
         database: Arc::new(database),
         sql_family: SqlFamily::Sqlite,
         introspection_connector,

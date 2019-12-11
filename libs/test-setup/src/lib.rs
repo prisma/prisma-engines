@@ -3,7 +3,6 @@
 
 use url::Url;
 use quaint::{prelude::Queryable, single::Quaint};
-use std::borrow::Cow;
 
 pub const SCHEMA_NAME: &str = "prisma-tests";
 
@@ -114,12 +113,11 @@ pub fn sqlite_test_config(db_name: &str) -> String {
 /// The maximum length of identifiers on mysql is 64 bytes.
 ///
 /// Source: https://dev.mysql.com/doc/mysql-reslimits-excerpt/5.5/en/identifier-length.html
-pub fn mysql_safe_identifier(identifier: &str) -> Cow<str> {
+pub fn mysql_safe_identifier(identifier: &str) -> &str {
     if identifier.len() < 64 {
-        identifier.into()
+        identifier
     } else {
-        let prefix = identifier.get(0..60).expect("mysql identifier truncation");
-        prefix.into()
+        identifier.get(0..63).expect("mysql identifier truncation")
     }
 }
 
