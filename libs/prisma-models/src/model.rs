@@ -15,6 +15,7 @@ pub struct ModelTemplate {
     pub is_embedded: bool,
     pub fields: Vec<FieldTemplate>,
     pub manifestation: Option<String>,
+    pub id_field_names: Vec<String>,
     pub indexes: Vec<IndexTemplate>,
 }
 
