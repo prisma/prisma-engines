@@ -443,6 +443,13 @@ mod tests {
     }
 
     #[test]
+    fn should_parse_escaped_url() {
+        let url = PostgresUrl::new(Url::parse("postgresql:///dbname?host=%2Fvar%2Frun%2Fpostgresql").unwrap()).unwrap();
+        assert_eq!("dbname", url.dbname());
+        assert_eq!("/var/run/postgresql", url.host());
+    }
+
+    #[test]
     fn should_parse_default_host() {
         let url = PostgresUrl::new(Url::parse("postgresql:///dbname").unwrap()).unwrap();
         assert_eq!("dbname", url.dbname());
