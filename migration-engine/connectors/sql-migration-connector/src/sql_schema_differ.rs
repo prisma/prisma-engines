@@ -36,14 +36,14 @@ impl SqlSchemaDiff {
     }
 }
 
-impl<'a> SqlSchemaDiffer<'a> {
+impl<'schema> SqlSchemaDiffer<'schema> {
     pub fn diff(previous: &SqlSchema, next: &SqlSchema) -> SqlSchemaDiff {
         let differ = SqlSchemaDiffer { previous, next };
         differ.diff_internal()
     }
 
     fn diff_internal(&self) -> SqlSchemaDiff {
-        let alter_indexes = self.alter_indexes();
+        let alter_indexes: Vec<_> = self.alter_indexes();
 
         SqlSchemaDiff {
             drop_tables: self.drop_tables(),
@@ -109,7 +109,7 @@ impl<'a> SqlSchemaDiffer<'a> {
         result
     }
 
-    fn drop_columns<'b>(differ: &'b TableDiffer<'b>) -> impl Iterator<Item = TableChange> + 'b {
+    fn drop_columns<'a>(differ: &'a TableDiffer<'schema>) -> impl Iterator<Item = TableChange> + 'a {
         differ.dropped_columns().map(|column| {
             let change = DropColumn {
                 name: column.name.clone(),
@@ -119,7 +119,7 @@ impl<'a> SqlSchemaDiffer<'a> {
         })
     }
 
-    fn add_columns<'b>(differ: &'b TableDiffer<'_>) -> impl Iterator<Item = TableChange> + 'b {
+    fn add_columns<'a>(differ: &'a TableDiffer<'schema>) -> impl Iterator<Item = TableChange> + 'a {
         differ.added_columns().map(|column| {
             let change = AddColumn { column: column.clone() };
 
@@ -127,7 +127,7 @@ impl<'a> SqlSchemaDiffer<'a> {
         })
     }
 
-    fn alter_columns<'b>(table_differ: &'b TableDiffer<'_>) -> impl Iterator<Item = TableChange> + 'b {
+    fn alter_columns<'a>(table_differ: &'a TableDiffer<'schema>) -> impl Iterator<Item = TableChange> + 'a {
         table_differ.column_pairs().filter_map(move |column_differ| {
             let previous_fk = table_differ
                 .previous
@@ -148,7 +148,7 @@ impl<'a> SqlSchemaDiffer<'a> {
         })
     }
 
-    fn drop_foreign_keys<'b>(differ: &'b TableDiffer<'_>) -> impl Iterator<Item = TableChange> + 'b {
+    fn drop_foreign_keys<'a>(differ: &'a TableDiffer<'schema>) -> impl Iterator<Item = TableChange> + 'a {
         differ
             .dropped_foreign_keys()
             .filter_map(|foreign_key| foreign_key.constraint_name.as_ref())
@@ -187,7 +187,7 @@ impl<'a> SqlSchemaDiffer<'a> {
         result
     }
 
-    fn drop_indexes<'b>(&'b self, alter_indexes: &'b [AlterIndex]) -> impl Iterator<Item = DropIndex> + 'b {
+    fn drop_indexes<'a>(&'a self, alter_indexes: &'a [AlterIndex]) -> impl Iterator<Item = DropIndex> + 'a {
         self.previous.tables.iter().flat_map(move |previous_table| {
             previous_table.indices.iter().filter_map(move |index| {
                 // TODO: must diff index settings
@@ -230,7 +230,7 @@ impl<'a> SqlSchemaDiffer<'a> {
     }
 
     /// An iterator over the tables that are present in both schemas.
-    fn table_pairs<'b>(&'b self) -> impl Iterator<Item = TableDiffer<'b>> {
+    fn table_pairs<'a>(&'a self) -> impl Iterator<Item = TableDiffer<'schema>> + 'a {
         self.previous.tables.iter().filter_map(move |previous_table| {
             self.next
                 .tables
@@ -243,37 +243,20 @@ impl<'a> SqlSchemaDiffer<'a> {
         })
     }
 
-    fn alter_indexes(&self) -> Vec<AlterIndex> {
-        self.table_pairs()
-            .flat_map(|differ| {
-                let next_table = differ.next;
-                differ
-                    .previous
-                    .indices
-                    .iter()
-                    .filter_map(move |previous_index| {
-                        next_table
-                            .indices
-                            .iter()
-                            .find(|next_index| {
-                                indexes_are_equivalent(previous_index, next_index)
-                                    && previous_index.name != next_index.name
-                            })
-                            .map(|renamed_index| (previous_index, renamed_index))
-                    })
-                    .map(move |(previous_index, renamed_index)| AlterIndex {
-                        index_name: previous_index.name.clone(),
-                        index_new_name: renamed_index.name.clone(),
-                        table: differ.next.name.clone(),
-                    })
+    fn alter_indexes<'a>(&'a self) -> Vec<AlterIndex> {
+        let mut alter_indexes = Vec::new();
+        self.table_pairs().for_each(|differ| {
+            differ.index_pairs().for_each(|(previous_index, renamed_index)| {
+                alter_indexes.push(AlterIndex {
+                    index_name: previous_index.name.clone(),
+                    index_new_name: renamed_index.name.clone(),
+                    table: differ.next.name.clone(),
+                })
             })
-            .collect()
-    }
-}
+        });
 
-/// Compare two SQL indexes and return whether they only differ by name or type.
-fn indexes_are_equivalent(first: &Index, second: &Index) -> bool {
-    first.columns == second.columns && first.tpe == second.tpe
+        alter_indexes
+    }
 }
 
 /// Compare two [ForeignKey](/sql-schema-describer/struct.ForeignKey.html)s and return whether a
