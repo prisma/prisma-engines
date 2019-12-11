@@ -22,7 +22,7 @@ mod query;
 mod row;
 mod select;
 mod table;
-mod union_all;
+mod union;
 mod update;
 mod values;
 mod ops;
@@ -44,7 +44,7 @@ pub use query::Query;
 pub use row::Row;
 pub use select::Select;
 pub use table::*;
-pub use union_all::UnionAll;
+pub use union::Union;
 pub use update::*;
 pub use ops::*;
 

@@ -8,6 +8,7 @@ pub struct Select<'a> {
     pub(crate) conditions: Option<ConditionTree<'a>>,
     pub(crate) ordering: Ordering<'a>,
     pub(crate) grouping: Grouping<'a>,
+    pub(crate) having: Option<ConditionTree<'a>>,
     pub(crate) limit: Option<ParameterizedValue<'a>>,
     pub(crate) offset: Option<ParameterizedValue<'a>>,
     pub(crate) joins: Vec<Join<'a>>,
@@ -260,16 +261,16 @@ impl<'a> Select<'a> {
         self
     }
 
-    /// Adds `LEFT OUTER JOIN` clause to the query.
+    /// Adds `LEFT JOIN` clause to the query.
     ///
     /// ```rust
     /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
     /// let join = "posts".alias("p").on(("p", "visible").equals(true));
-    /// let query = Select::from_table("users").left_outer_join(join);
+    /// let query = Select::from_table("users").left_join(join);
     /// let (sql, params) = Sqlite::build(query);
     ///
     /// assert_eq!(
-    ///     "SELECT `users`.* FROM `users` LEFT OUTER JOIN `posts` AS `p` ON `p`.`visible` = ?",
+    ///     "SELECT `users`.* FROM `users` LEFT JOIN `posts` AS `p` ON `p`.`visible` = ?",
     ///     sql
     /// );
     ///
@@ -280,11 +281,67 @@ impl<'a> Select<'a> {
     ///     params
     /// );
     /// ```
-    pub fn left_outer_join<J>(mut self, join: J) -> Self
+    pub fn left_join<J>(mut self, join: J) -> Self
     where
         J: Into<JoinData<'a>>,
     {
-        self.joins.push(Join::LeftOuter(join.into()));
+        self.joins.push(Join::Left(join.into()));
+        self
+    }
+
+    /// Adds `RIGHT JOIN` clause to the query.
+    ///
+    /// ```rust
+    /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
+    /// let join = "posts".alias("p").on(("p", "visible").equals(true));
+    /// let query = Select::from_table("users").right_join(join);
+    /// let (sql, params) = Sqlite::build(query);
+    ///
+    /// assert_eq!(
+    ///     "SELECT `users`.* FROM `users` RIGHT JOIN `posts` AS `p` ON `p`.`visible` = ?",
+    ///     sql
+    /// );
+    ///
+    /// assert_eq!(
+    ///     vec![
+    ///         ParameterizedValue::from(true),
+    ///     ],
+    ///     params
+    /// );
+    /// ```
+    pub fn right_join<J>(mut self, join: J) -> Self
+    where
+        J: Into<JoinData<'a>>,
+    {
+        self.joins.push(Join::Right(join.into()));
+        self
+    }
+
+    /// Adds `FULL JOIN` clause to the query.
+    ///
+    /// ```rust
+    /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
+    /// let join = "posts".alias("p").on(("p", "visible").equals(true));
+    /// let query = Select::from_table("users").full_join(join);
+    /// let (sql, params) = Sqlite::build(query);
+    ///
+    /// assert_eq!(
+    ///     "SELECT `users`.* FROM `users` FULL JOIN `posts` AS `p` ON `p`.`visible` = ?",
+    ///     sql
+    /// );
+    ///
+    /// assert_eq!(
+    ///     vec![
+    ///         ParameterizedValue::from(true),
+    ///     ],
+    ///     params
+    /// );
+    /// ```
+    pub fn full_join<J>(mut self, join: J) -> Self
+    where
+        J: Into<JoinData<'a>>,
+    {
+        self.joins.push(Join::Full(join.into()));
         self
     }
 
@@ -326,6 +383,27 @@ impl<'a> Select<'a> {
         T: IntoGroupByDefinition<'a>,
     {
         self.grouping = self.grouping.append(value.into_group_by_definition());
+        self
+    }
+
+    /// Adds group conditions to a query. Should be combined together with a
+    /// [group_by](struct.Select.html#method.group_by) statement.
+    ///
+    /// ```rust
+    /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
+    /// let query = Select::from_table("users").column("foo").column("bar")
+    ///     .group_by("foo")
+    ///     .having("foo".greater_than(100));
+    ///
+    /// let (sql, params) = Sqlite::build(query);
+    ///
+    /// assert_eq!("SELECT `foo`, `bar` FROM `users` GROUP BY `foo` HAVING `foo` > ?", sql);
+    /// assert_eq!(vec![ParameterizedValue::from(100)], params);
+    pub fn having<T>(mut self, conditions: T) -> Self
+    where
+        T: Into<ConditionTree<'a>>,
+    {
+        self.having = Some(conditions.into());
         self
     }
 

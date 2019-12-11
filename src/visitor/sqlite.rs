@@ -399,10 +399,10 @@ mod tests {
 
     #[test]
     fn test_simple_left_join() {
-        let expected_sql = "SELECT `users`.* FROM `users` LEFT OUTER JOIN `posts` ON `users`.`id` = `posts`.`user_id`";
+        let expected_sql = "SELECT `users`.* FROM `users` LEFT JOIN `posts` ON `users`.`id` = `posts`.`user_id`";
 
         let query = Select::from_table("users")
-            .left_outer_join("posts".on(("users", "id").equals(Column::from(("posts", "user_id")))));
+            .left_join("posts".on(("users", "id").equals(Column::from(("posts", "user_id")))));
         let (sql, _) = Sqlite::build(query);
 
         assert_eq!(expected_sql, sql);
@@ -411,9 +411,9 @@ mod tests {
     #[test]
     fn test_additional_condition_left_join() {
         let expected_sql =
-            "SELECT `users`.* FROM `users` LEFT OUTER JOIN `posts` ON (`users`.`id` = `posts`.`user_id` AND `posts`.`published` = ?)";
+            "SELECT `users`.* FROM `users` LEFT JOIN `posts` ON (`users`.`id` = `posts`.`user_id` AND `posts`.`published` = ?)";
 
-        let query = Select::from_table("users").left_outer_join(
+        let query = Select::from_table("users").left_join(
             "posts".on(("users", "id")
                 .equals(Column::from(("posts", "user_id")))
                 .and(("posts", "published").equals(true))),
