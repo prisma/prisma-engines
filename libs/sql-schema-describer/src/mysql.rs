@@ -52,7 +52,7 @@ impl SqlSchemaDescriber {
 
     async fn get_databases(&self) -> Vec<String> {
         debug!("Getting databases");
-        let sql = "select schema_name from information_schema.schemata;";
+        let sql = "select schema_name as schema_name from information_schema.schemata;";
         let rows = self.conn.query_raw(sql, &[]).await.expect("get schema names ");
         let names = rows
             .into_iter()
