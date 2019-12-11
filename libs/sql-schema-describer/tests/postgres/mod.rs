@@ -1,18 +1,18 @@
 use log::debug;
-use quaint::{prelude::*, single::Quaint};
+use quaint::{prelude::*};
 use sql_schema_describer::*;
 use std::sync::Arc;
 
 use super::SCHEMA;
 
-pub async fn get_postgres_describer(sql: &str) -> postgres::SqlSchemaDescriber {
+pub async fn get_postgres_describer(sql: &str, db_name: &str) -> postgres::SqlSchemaDescriber {
     let host = match std::env::var("IS_BUILDKITE") {
         Ok(_) => "test-db-postgres",
         Err(_) => "127.0.0.1",
     };
 
-    let url = format!("postgres://postgres:prisma@{}:5432/postgres", host);
-    let client = Quaint::new(&url).await.unwrap();
+    let url = format!("postgres://postgres:prisma@{}:5432/{}", host, db_name);
+    let client = test_setup::create_postgres_database(&url.parse().unwrap()).await.unwrap();
 
     let drop_schema = format!("DROP SCHEMA IF EXISTS \"{}\" CASCADE;", SCHEMA);
     client

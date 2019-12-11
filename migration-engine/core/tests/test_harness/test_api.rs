@@ -171,9 +171,10 @@ impl TestApi {
     }
 }
 
-pub async fn mysql_8_test_api() -> TestApi {
-    let connection_info = ConnectionInfo::from_url(&mysql_8_url()).unwrap();
-    let connector = mysql_migration_connector(&mysql_8_url()).await;
+pub async fn mysql_8_test_api(db_name: &str) -> TestApi {
+    let url = mysql_8_url(db_name);
+    let connection_info = ConnectionInfo::from_url(&url).unwrap();
+    let connector = mysql_migration_connector(&url).await;
 
     TestApi {
         connection_info: Some(connection_info),
@@ -183,9 +184,10 @@ pub async fn mysql_8_test_api() -> TestApi {
     }
 }
 
-pub async fn mysql_test_api() -> TestApi {
-    let connection_info = ConnectionInfo::from_url(&mysql_url()).unwrap();
-    let connector = mysql_migration_connector(&mysql_url()).await;
+pub async fn mysql_test_api(db_name: &str) -> TestApi {
+    let url = mysql_url(db_name);
+    let connection_info = ConnectionInfo::from_url(&url).unwrap();
+    let connector = mysql_migration_connector(&url).await;
 
     TestApi {
         connection_info: Some(connection_info),
@@ -195,9 +197,10 @@ pub async fn mysql_test_api() -> TestApi {
     }
 }
 
-pub async fn postgres_test_api() -> TestApi {
-    let connection_info = ConnectionInfo::from_url(&postgres_url()).unwrap();
-    let connector = postgres_migration_connector(&postgres_url()).await;
+pub async fn postgres_test_api(db_name: &str) -> TestApi {
+    let url = postgres_url(db_name);
+    let connection_info = ConnectionInfo::from_url(&url).unwrap();
+    let connector = postgres_migration_connector(&url).await;
 
     TestApi {
         connection_info: Some(connection_info),
@@ -207,9 +210,9 @@ pub async fn postgres_test_api() -> TestApi {
     }
 }
 
-pub async fn sqlite_test_api() -> TestApi {
-    let connection_info = ConnectionInfo::from_url(&sqlite_test_url()).unwrap();
-    let connector = sqlite_migration_connector().await;
+pub async fn sqlite_test_api(db_name: &str) -> TestApi {
+    let connection_info = ConnectionInfo::from_url(&sqlite_test_url(db_name)).unwrap();
+    let connector = sqlite_migration_connector(db_name).await;
 
     TestApi {
         connection_info: Some(connection_info),

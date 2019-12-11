@@ -1,10 +1,8 @@
 use barrel::Migration;
 use pretty_assertions::assert_eq;
-use quaint::{connector::Queryable, single::Quaint};
-use std::future::Future;
-use std::{rc::Rc, sync::Arc};
+use quaint::{connector::Queryable};
+use std::sync::Arc;
 use test_setup::*;
-use url::Url;
 
 pub(crate) fn custom_assert(left: &str, right: &str) {
     let parsed_expected = datamodel::parse_datamodel(&right).unwrap();
@@ -46,73 +44,4 @@ impl BarrelMigrationExecutor {
         let full_sql = migration.make_from(self.sql_variant);
         run_full_sql(&self.database, &full_sql).await;
     }
-}
-
-// get dbs
-
-pub async fn database(database_url: &str) -> Box<dyn Queryable + Send + Sync + 'static> {
-    let url: Url = database_url.parse().unwrap();
-
-    let boxed: Box<dyn Queryable + Send + Sync + 'static> = match url.scheme() {
-        "postgresql" | "postgres" => {
-            let create_cmd = |name| format!("CREATE DATABASE \"{}\"", name);
-            let connect_cmd = |url: Url| async move { Quaint::new(url.as_str()).await };
-            let conn = with_database(url, "postgres", "postgres", create_cmd, Rc::new(connect_cmd)).await;
-
-            Box::new(conn)
-        }
-        "mysql" => {
-            let create_cmd = |name| format!("CREATE DATABASE `{}`", name);
-            let connect_cmd = |url: Url| async move { Quaint::new(url.as_str()).await };
-            let conn = with_database(url, "mysql", "/", create_cmd, Rc::new(connect_cmd)).await;
-
-            Box::new(conn)
-        }
-        "file" | "sqlite" => Box::new(Quaint::new(url.as_str()).await.unwrap()),
-        scheme => panic!("Unknown scheme `{}° in database URL: {}", scheme, url.as_str()),
-    };
-
-    boxed
-}
-
-async fn with_database<F, T, S, U>(url: Url, default_name: &str, root_path: &str, create_stmt: S, f: Rc<F>) -> T
-where
-    T: Queryable,
-    F: Fn(Url) -> U,
-    U: Future<Output = Result<T, quaint::error::Error>>,
-    S: FnOnce(String) -> String,
-{
-    match f(url.clone()).await {
-        Ok(conn) => conn,
-        Err(_) => {
-            create_database(url.clone(), default_name, root_path, create_stmt, f.clone()).await;
-            f(url).await.unwrap()
-        }
-    }
-}
-
-async fn create_database<F, T, S, U>(url: Url, default_name: &str, root_path: &str, create_stmt: S, f: Rc<F>)
-where
-    T: Queryable,
-    F: Fn(Url) -> U,
-    U: Future<Output = Result<T, quaint::error::Error>>,
-    S: FnOnce(String) -> String,
-{
-    let db_name = fetch_db_name(&url, default_name);
-
-    let mut url = url.clone();
-    url.set_path(root_path);
-
-    let conn = f(url).await.unwrap();
-
-    conn.execute_raw(&create_stmt(db_name), &[]).await.unwrap();
-}
-
-fn fetch_db_name(url: &Url, default: &str) -> String {
-    let result = match url.path_segments() {
-        Some(mut segments) => segments.next().unwrap_or(default),
-        None => default,
-    };
-
-    String::from(result)
 }

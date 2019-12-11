@@ -15,7 +15,12 @@ struct TestOneConnectorArgs {
     log: Option<String>,
 }
 
-const CONNECTOR_NAMES: &[&'static str] = &["postgres", "mysql", "mysql_8", "sqlite"];
+const CONNECTOR_NAMES: &[&'static str] = &[
+    "mysql_8",
+    "mysql",
+    "postgres",
+    "sqlite",
+];
 
 #[derive(Debug, FromMeta)]
 struct TestEachConnectorArgs {
@@ -65,6 +70,7 @@ fn test_each_connector_wrapper_functions(
     test_function: &ItemFn,
 ) -> Vec<proc_macro2::TokenStream> {
     let test_fn_name = &test_function.sig.ident;
+    let test_fn_name_str = format!("{}", test_fn_name);
 
     let mut tests = Vec::with_capacity(CONNECTOR_NAMES.len());
 
@@ -97,7 +103,7 @@ fn test_each_connector_wrapper_functions(
         let test = quote! {
             #[test]
             fn #connector_test_fn_name() {
-                let api = #connector_api_factory();
+                let api = #connector_api_factory(#test_fn_name_str);
 
                 #test_fn_call
             }
@@ -114,6 +120,7 @@ fn test_each_connector_async_wrapper_functions(
     test_function: &ItemFn,
 ) -> Vec<proc_macro2::TokenStream> {
     let test_fn_name = &test_function.sig.ident;
+    let test_fn_name_str = format!("{}", test_fn_name);
 
     let mut tests = Vec::with_capacity(CONNECTOR_NAMES.len());
 
@@ -147,9 +154,10 @@ fn test_each_connector_async_wrapper_functions(
             #[test]
             fn #connector_test_fn_name() {
                 let fut = async {
-                    let api = #connector_api_factory().await;
+                    let api = #connector_api_factory(#test_fn_name_str).await;
                     #test_fn_call
                 };
+
 
                 tokio::runtime::Builder::new()
                     .basic_scheduler()
@@ -175,6 +183,7 @@ pub fn test_one_connector(attr: TokenStream, input: TokenStream) -> TokenStream 
 
     let async_test: bool = test_function.sig.asyncness.is_some();
     let test_impl_name = &test_function.sig.ident;
+    let test_impl_name_str = format!("{}", test_impl_name);
     let test_fn_name = Ident::new(
         &format!("{}_on_{}", &test_function.sig.ident, args.connector),
         Span::call_site(),
@@ -208,7 +217,7 @@ pub fn test_one_connector(attr: TokenStream, input: TokenStream) -> TokenStream 
             #[test]
             fn #test_fn_name() {
                 let fut = async {
-                    let api = #api_factory().await;
+                    let api = #api_factory(#test_impl_name_str).await;
                     #test_fn_call
                 };
 
@@ -227,7 +236,7 @@ pub fn test_one_connector(attr: TokenStream, input: TokenStream) -> TokenStream 
         quote! {
             #[test]
             fn #test_fn_name() {
-                let api = #api_factory();
+                let api = #api_factory(#test_impl_name_str);
 
                 #test_impl_name(&api)
             }

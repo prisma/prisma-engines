@@ -14,7 +14,7 @@ use url::Url;
 
 #[tokio::test]
 async fn authentication_failure_must_return_a_known_error_on_postgres() {
-    let mut url: Url = postgres_url().parse().unwrap();
+    let mut url: Url = postgres_url("test-db").parse().unwrap();
 
     url.set_password(Some("obviously-not-right")).unwrap();
 
@@ -48,7 +48,7 @@ async fn authentication_failure_must_return_a_known_error_on_postgres() {
 
 #[tokio::test]
 async fn authentication_failure_must_return_a_known_error_on_mysql() {
-    let mut url: Url = mysql_url().parse().unwrap();
+    let mut url: Url = mysql_url("authentication_failure_must_return_a_known_error_on_mysql").parse().unwrap();
 
     url.set_password(Some("obviously-not-right")).unwrap();
 
@@ -82,7 +82,7 @@ async fn authentication_failure_must_return_a_known_error_on_mysql() {
 
 #[tokio::test]
 async fn unreachable_database_must_return_a_proper_error_on_mysql() {
-    let mut url: Url = mysql_url().parse().unwrap();
+    let mut url: Url = mysql_url("unreachable_database_must_return_a_proper_error_on_mysql").parse().unwrap();
 
     url.set_port(Some(8787)).unwrap();
 
@@ -116,7 +116,7 @@ async fn unreachable_database_must_return_a_proper_error_on_mysql() {
 
 #[tokio::test]
 async fn unreachable_database_must_return_a_proper_error_on_postgres() {
-    let mut url: Url = postgres_url().parse().unwrap();
+    let mut url: Url = postgres_url("unreachable_database_must_return_a_proper_error_on_postgres").parse().unwrap();
 
     url.set_port(Some(8787)).unwrap();
 
@@ -150,7 +150,7 @@ async fn unreachable_database_must_return_a_proper_error_on_postgres() {
 
 #[tokio::test]
 async fn database_does_not_exist_must_return_a_proper_error() {
-    let mut url: Url = mysql_url().parse().unwrap();
+    let mut url: Url = mysql_url("database_does_not_exist_must_return_a_proper_error").parse().unwrap();
     let database_name = "notmydatabase";
 
     url.set_path(database_name);
@@ -183,7 +183,12 @@ async fn database_does_not_exist_must_return_a_proper_error() {
 
 #[tokio::test]
 async fn database_already_exists_must_return_a_proper_error() {
-    let url = postgres_url();
+    let db_name = "database_already_exists_must_return_a_proper_error";
+    let url = postgres_url(db_name);
+
+    let conn = Quaint::new(&postgres_url("postgres")).await.unwrap();
+    conn.execute_raw("CREATE DATABASE \"database_already_exists_must_return_a_proper_error\"", &[]).await.ok();
+
     let error = get_cli_error(&["migration-engine", "cli", "--datasource", &url, "--create_database"]).await;
 
     let (host, port) = {
@@ -194,9 +199,9 @@ async fn database_already_exists_must_return_a_proper_error() {
     let json_error = serde_json::to_value(&error).unwrap();
 
     let expected = json!({
-        "message": format!("Database `test-db` already exists on the database server at `{host}:{port}`", host = host, port = port),
+        "message": format!("Database `database_already_exists_must_return_a_proper_error` already exists on the database server at `{host}:{port}`", host = host, port = port),
         "meta": {
-            "database_name": "test-db",
+            "database_name": "database_already_exists_must_return_a_proper_error",
             "database_host": host,
             "database_port": port,
         },
@@ -208,14 +213,16 @@ async fn database_already_exists_must_return_a_proper_error() {
 
 #[tokio::test]
 async fn database_access_denied_must_return_a_proper_error_in_cli() {
-    let conn = Quaint::new(&mysql_url()).await.unwrap();
+    let db_name = "dbaccessdeniedincli";
+    let url: Url = mysql_url(db_name).parse().unwrap();
+    let conn = create_mysql_database(&url).await.unwrap();
 
     conn.execute_raw("DROP USER IF EXISTS jeanmichel", &[]).await.unwrap();
     conn.execute_raw("CREATE USER jeanmichel IDENTIFIED BY '1234'", &[])
         .await
         .unwrap();
 
-    let mut url: Url = mysql_url().parse().unwrap();
+    let mut url: Url = url.clone();
     url.set_username("jeanmichel").unwrap();
     url.set_password(Some("1234")).unwrap();
     url.set_path("access_denied_test");
@@ -244,15 +251,17 @@ async fn database_access_denied_must_return_a_proper_error_in_cli() {
 
 #[tokio::test]
 async fn database_access_denied_must_return_a_proper_error_in_rpc() {
-    let conn = Quaint::new(&mysql_url()).await.unwrap();
+    let db_name = "dbaccessdeniedinrpc"; 
+    let url: Url = mysql_url(db_name).parse().unwrap();
+    let conn = create_mysql_database(&url).await.unwrap();
 
-    conn.execute_raw("DROP USER IF EXISTS jeanmichel", &[]).await.unwrap();
-    conn.execute_raw("CREATE USER jeanmichel IDENTIFIED BY '1234'", &[])
+    conn.execute_raw("DROP USER IF EXISTS jeanyves", &[]).await.unwrap();
+    conn.execute_raw("CREATE USER jeanyves IDENTIFIED BY '1234'", &[])
         .await
         .unwrap();
 
-    let mut url: Url = mysql_url().parse().unwrap();
-    url.set_username("jeanmichel").unwrap();
+    let mut url: Url = url.clone();
+    url.set_username("jeanyves").unwrap();
     url.set_password(Some("1234")).unwrap();
     url.set_path("access_denied_test");
 
@@ -270,9 +279,9 @@ async fn database_access_denied_must_return_a_proper_error_in_rpc() {
     let json_error = serde_json::to_value(&render_error(error)).unwrap();
 
     let expected = json!({
-        "message": "User `jeanmichel` was denied access on the database `access_denied_test`",
+        "message": "User `jeanyves` was denied access on the database `access_denied_test`",
         "meta": {
-            "database_user": "jeanmichel",
+            "database_user": "jeanyves",
             "database_name": "access_denied_test",
         },
         "error_code": "P1010",
@@ -368,15 +377,8 @@ async fn unique_constraint_errors_in_migrations_must_return_a_known_error(api: &
 
 #[test_one_connector(connector = "postgres")]
 async fn tls_errors_must_be_mapped_in_the_cli(_api: &TestApi) {
-    let url = format!("{}&sslmode=require&sslaccept=strict", postgres_url());
-    let error = get_cli_error(&[
-        "migration-engine",
-        "cli",
-        "--datasource",
-        &url,
-        "--can_connect_to_database",
-    ])
-    .await;
+    let url = format!("{}&sslmode=require&sslaccept=strict", postgres_url("tls_errors_must_be_mapped_in_the_cli"));
+    let error = get_cli_error(&["migration-engine", "cli", "--datasource", &url, "--can_connect_to_database"]).await;
 
     let json_error = serde_json::to_value(&error).unwrap();
 
