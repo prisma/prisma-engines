@@ -17,11 +17,11 @@ dev-sqlite:
 	echo 'sqlite' > current_connector
 
 dev-postgres9:
-	docker-compose -f docker-compose.yml up -d --remove-orphans postgres
+	docker-compose -f docker-compose.yml up -d --remove-orphans postgres9
 	echo 'postgres9' > current_connector
 
 dev-postgres10:
-	docker-compose -f docker-compose.yml up -d --remove-orphans postgres
+	docker-compose -f docker-compose.yml up -d --remove-orphans postgres10
 	echo 'postgres10' > current_connector
 
 dev-postgres11:
@@ -41,7 +41,7 @@ dev-mysql8:
 	echo 'mysql8' > current_connector
 
 dev-mariadb:
-	docker-compose -f docker-compose.yml up -d --remove-orphans mysql-8-0
+	docker-compose -f docker-compose.yml up -d --remove-orphans mariadb-10-0
 	echo 'mariadb' > current_connector
 
 dev-down:
