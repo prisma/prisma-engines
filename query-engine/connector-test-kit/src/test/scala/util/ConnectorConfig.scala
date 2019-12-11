@@ -69,9 +69,9 @@ object ConnectorConfig {
 
   lazy val postgres_11_Port = {
     if (EnvVars.isBuildkite) {
-      5433
-    } else {
       5432
+    } else {
+      5433
     }
   }
 
@@ -85,9 +85,9 @@ object ConnectorConfig {
 
   lazy val postgres_12_Port = {
     if (EnvVars.isBuildkite) {
-      5434
-    } else {
       5432
+    } else {
+      5434
     }
   }
 
