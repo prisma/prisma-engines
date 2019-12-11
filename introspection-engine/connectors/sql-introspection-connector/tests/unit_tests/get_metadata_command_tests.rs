@@ -8,7 +8,7 @@ async fn metadata_for_mysql_should_work(api: &TestApi) {
     setup(&barrel, api.db_name()).await;
     let result = api.get_metadata().await;
     assert_eq!(result.table_count, 3);
-    assert_eq!(result.size_in_bytes, 0);
+    assert_eq!(result.size_in_bytes, 49152);
 }
 
 #[test_one_connector(connector = "postgres")]

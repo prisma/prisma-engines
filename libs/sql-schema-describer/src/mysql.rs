@@ -99,17 +99,17 @@ impl SqlSchemaDescriber {
       FROM information_schema.TABLES 
       WHERE table_schema = ?";
         let result = self.conn.query_raw(sql, &[schema.into()]).await.expect("get db size ");
-        let size: i64 = result
+        let size = result
             .first()
             .map(|row| {
                 row.get("size")
-                    .and_then(|x| x.as_i64())
-                    .unwrap_or(0)
+                    .and_then(|x| x.to_string())
+                    .unwrap_or("0".to_string())
             })
             .unwrap();
 
         debug!("Found db size: {:?}", size);
-        size.try_into().unwrap()
+        size.parse().unwrap()
     }
 
     async fn get_table(&self, schema: &str, name: &str) -> Table {
