@@ -50,7 +50,7 @@ impl<'a> SqlSchemaDiffer<'a> {
             create_tables: self.create_tables(),
             alter_tables: self.alter_tables(),
             create_indexes: self.create_indexes(&alter_indexes),
-            drop_indexes: self.drop_indexes(&alter_indexes),
+            drop_indexes: self.drop_indexes(&alter_indexes).collect(),
             alter_indexes,
         }
     }
@@ -187,40 +187,46 @@ impl<'a> SqlSchemaDiffer<'a> {
         result
     }
 
-    fn drop_indexes(&self, alter_indexes: &[AlterIndex]) -> Vec<DropIndex> {
-        let mut result = Vec::new();
-        for previous_table in &self.previous.tables {
-            for index in &previous_table.indices {
+    fn drop_indexes<'b>(&'b self, alter_indexes: &'b [AlterIndex]) -> impl Iterator<Item = DropIndex> + 'b {
+        self.previous.tables.iter().flat_map(move |previous_table| {
+            previous_table.indices.iter().filter_map(move |index| {
                 // TODO: must diff index settings
                 let next_index_opt = self
                     .next
                     .table(&previous_table.name)
                     .ok()
                     .and_then(|t| t.indices.iter().find(|i| i.name == index.name));
+
                 let index_was_altered = alter_indexes.iter().any(|altered| altered.index_name == index.name);
-                if next_index_opt.is_none() && !index_was_altered {
-                    // If index covers PK, ignore it
-                    let index_covers_pk = match &previous_table.primary_key {
-                        None => false,
-                        Some(pk) => pk.columns == index.columns,
-                    };
-                    if !index_covers_pk {
-                        debug!("Dropping index '{}' on table '{}'", index.name, previous_table.name);
-                        let drop = DropIndex {
-                            table: previous_table.name.clone(),
-                            name: index.name.clone(),
-                        };
-                        result.push(drop);
-                    } else {
-                        debug!(
-                            "Not dropping index '{}' on table '{}' since it covers PK",
-                            index.name, previous_table.name
-                        );
-                    }
+                let index_was_dropped = next_index_opt.is_none() && !index_was_altered;
+
+                if !index_was_dropped {
+                    return None;
                 }
-            }
-        }
-        result
+
+                // If index covers PK, ignore it
+                let index_covers_pk = match &previous_table.primary_key {
+                    None => false,
+                    Some(pk) => pk.columns == index.columns,
+                };
+
+                if index_covers_pk {
+                    debug!(
+                        "Not dropping index '{}' on table '{}' since it covers PK",
+                        index.name, previous_table.name
+                    );
+
+                    return None;
+                }
+
+                let drop = DropIndex {
+                    table: previous_table.name.clone(),
+                    name: index.name.clone(),
+                };
+
+                Some(drop)
+            })
+        })
     }
 
     /// An iterator over the tables that are present in both schemas.
