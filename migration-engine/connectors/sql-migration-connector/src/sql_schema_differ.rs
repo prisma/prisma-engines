@@ -223,21 +223,26 @@ impl<'a> SqlSchemaDiffer<'a> {
         result
     }
 
-    /// An iterator over the tables that are present in both schemas. The yielded tuples should be interpreted as `(previous_table, next_table)`.
-    fn table_pairs(&self) -> impl Iterator<Item = (&Table, &Table)> {
+    /// An iterator over the tables that are present in both schemas.
+    fn table_pairs<'b>(&'b self) -> impl Iterator<Item = TableDiffer<'b>> {
         self.previous.tables.iter().filter_map(move |previous_table| {
             self.next
                 .tables
                 .iter()
-                .find(|next_table| next_table.name == previous_table.name)
-                .map(|next_table| (previous_table, next_table))
+                .find(move |next_table| next_table.name == previous_table.name)
+                .map(move |next_table| TableDiffer {
+                    previous: previous_table,
+                    next: next_table,
+                })
         })
     }
 
     fn alter_indexes(&self) -> Vec<AlterIndex> {
         self.table_pairs()
-            .flat_map(|(previous_table, next_table)| {
-                previous_table
+            .flat_map(|differ| {
+                let next_table = differ.next;
+                differ
+                    .previous
                     .indices
                     .iter()
                     .filter_map(move |previous_index| {
@@ -253,7 +258,7 @@ impl<'a> SqlSchemaDiffer<'a> {
                     .map(move |(previous_index, renamed_index)| AlterIndex {
                         index_name: previous_index.name.clone(),
                         index_new_name: renamed_index.name.clone(),
-                        table: next_table.name.clone(),
+                        table: differ.next.name.clone(),
                     })
             })
             .collect()

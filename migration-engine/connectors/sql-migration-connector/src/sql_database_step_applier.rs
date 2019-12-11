@@ -39,8 +39,6 @@ impl DatabaseMigrationStepApplier<SqlMigration> for SqlDatabaseStepApplier {
 
 impl SqlDatabaseStepApplier {
     async fn apply_next_step(&self, steps: &[SqlMigrationStep], index: usize) -> SqlResult<bool> {
-        use failure::ResultExt; 
-
         let has_this_one = steps.get(index).is_some();
         if !has_this_one {
             return Ok(false);
@@ -52,11 +50,7 @@ impl SqlDatabaseStepApplier {
         let sql_string = render_raw_sql(&step, self.sql_family(), &self.schema_name);
         tracing::debug!(index, %sql_string);
 
-        let result = self.conn
-            .query_raw(&sql_string, &[])
-            .await
-            .with_context(|err| format!("{}\nWhile executing SQL migration step: {}", err, sql_string))
-            .map_err(|err| SqlError::QueryError(err.into()));
+        let result = self.conn.query_raw(&sql_string, &[]).await;
 
         // TODO: this does not evaluate the results of SQLites PRAGMA foreign_key_check
         result?;
