@@ -50,7 +50,7 @@ pub trait GenericApi: Send + Sync + 'static {
         &self,
         input: &InferMigrationStepsInput,
     ) -> crate::Result<MigrationStepsResultOutput>;
-    async fn list_migrations(&self, input: &serde_json::Value) -> crate::Result<Vec<ListMigrationStepsOutput>>;
+    async fn list_migrations(&self, input: &serde_json::Value) -> crate::Result<Vec<ListMigrationsOutput>>;
     async fn migration_progress(&self, input: &MigrationProgressInput) -> crate::Result<MigrationProgressOutput>;
     async fn reset(&self, input: &serde_json::Value) -> crate::Result<serde_json::Value>;
     async fn unapply_migration(&self, input: &UnapplyMigrationInput) -> crate::Result<UnapplyMigrationOutput>;
@@ -112,8 +112,8 @@ where
             .await
     }
 
-    async fn list_migrations(&self, input: &serde_json::Value) -> crate::Result<Vec<ListMigrationStepsOutput>> {
-        self.handle_command::<ListMigrationStepsCommand>(input)
+    async fn list_migrations(&self, input: &serde_json::Value) -> crate::Result<Vec<ListMigrationsOutput>> {
+        self.handle_command::<ListMigrationsCommand>(input)
             .instrument(tracing::info_span!("ListMigrations"))
             .await
     }
