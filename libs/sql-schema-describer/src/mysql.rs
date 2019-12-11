@@ -3,7 +3,6 @@ use log::debug;
 use quaint::prelude::Queryable;
 use std::collections::{BTreeMap, HashMap};
 use std::sync::Arc;
-use failure::_core::convert::TryInto;
 
 pub struct SqlSchemaDescriber {
     conn: Arc<dyn Queryable + Send + Sync + 'static>,
