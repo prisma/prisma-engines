@@ -77,22 +77,22 @@ pub async fn mysql_8_test_api(db_name: &'static str) -> TestApi {
 }
 
 pub async fn postgres_test_api(db_name: &'static str) -> TestApi {
-    test_api_helper_for_postgres(postgres_10_url(db_name))
+    test_api_helper_for_postgres(postgres_10_url(db_name),db_name).await
 }
 
 pub async fn postgres9_test_api(db_name: &'static str) -> TestApi {
-    test_api_helper_for_postgres(postgres_9_url(db_name))
+    test_api_helper_for_postgres(postgres_9_url(db_name),db_name).await
 }
 
 pub async fn postgres11_test_api(db_name: &'static str) -> TestApi {
-    test_api_helper_for_postgres(postgres_11_url(db_name))
+    test_api_helper_for_postgres(postgres_11_url(db_name),db_name).await
 }
 
 pub async fn postgres12_test_api(db_name: &'static str) -> TestApi {
-    test_api_helper_for_postgres(postgres_12_url(db_name))
+    test_api_helper_for_postgres(postgres_12_url(db_name),db_name).await
 }
 
-pub async fn test_api_helper_for_postgres(url: String) -> TestApi {
+pub async fn test_api_helper_for_postgres(url: String,db_name: &'static str) -> TestApi {
     let database = test_setup::create_postgres_database(&url.parse().unwrap()).await.unwrap();
     let drop_schema = dbg!(format!("DROP SCHEMA IF EXISTS \"{}\" CASCADE;", SCHEMA_NAME));
     database.query_raw(&drop_schema, &[]).await.ok();
@@ -107,7 +107,6 @@ pub async fn test_api_helper_for_postgres(url: String) -> TestApi {
         sql_family: SqlFamily::Postgres,
         introspection_connector,
     }
-
 }
 
 
