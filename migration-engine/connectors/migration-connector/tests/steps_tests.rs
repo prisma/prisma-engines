@@ -201,12 +201,12 @@ fn CreateDirective_must_work() {
     "#;
 
     let expected_step = MigrationStep::CreateDirective(CreateDirective {
-        location: ArgumentLocation {
-            argument_container: "map".to_owned(),
-            arguments: None,
-            argument_type: ArgumentType::ModelDirective {
+        location: DirectiveLocation {
+            directive_type: DirectiveType::Model {
                 model: "Blog".to_owned(),
             },
+            directive: "map".to_owned(),
+            arguments: None,
         },
     });
 
@@ -228,12 +228,12 @@ fn minimal_DeleteDirective_must_work() {
     "#;
 
     let expected_step = MigrationStep::DeleteDirective(DeleteDirective {
-        location: ArgumentLocation {
-            argument_container: "map".to_owned(),
-            argument_type: ArgumentType::FieldDirective {
+        location: DirectiveLocation {
+            directive_type: DirectiveType::Field {
                 model: "Blog".to_owned(),
                 field: "title".to_owned(),
             },
+            directive: "map".to_owned(),
             arguments: None,
         },
     });
@@ -261,11 +261,11 @@ fn full_DeleteDirective_must_work() {
     "#;
 
     let expected_step = MigrationStep::DeleteDirective(DeleteDirective {
-        location: ArgumentLocation {
-            argument_container: "unique".to_owned(),
-            argument_type: ArgumentType::ModelDirective {
+        location: DirectiveLocation {
+            directive_type: DirectiveType::Model {
                 model: "Blog".to_owned(),
             },
+            directive: "unique".to_owned(),
             arguments: Some(vec![Argument {
                 name: "".to_owned(),
                 value: MigrationExpression("[name, age]".to_owned()),
@@ -292,13 +292,13 @@ fn UpdateArgument_must_work() {
     "#;
 
     let expected_step = MigrationStep::UpdateArgument(UpdateArgument {
-        location: ArgumentLocation {
-            argument_container: "map".to_owned(),
-            argument_type: ArgumentType::EnumDirective {
-                r#enum: "CatMood".to_owned(),
+        location: ArgumentLocation::Directive(DirectiveLocation {
+            directive_type: DirectiveType::Model {
+                model: "CatMood".to_owned(),
             },
+            directive: "map".to_owned(),
             arguments: None,
-        },
+        }),
         argument: "name".to_owned(),
         new_value: MigrationExpression("cat_mood".to_owned()),
     });
@@ -312,9 +312,12 @@ fn CreateArgument_must_work() {
         {
             "stepType": "CreateArgument",
             "location": {
-                "argumentType": "EnumDirective",
-                "enum": "CatMood",
-                "argumentContainer": "map"
+                "type": "Directive",         
+                "directive": "map",
+                "directiveType": {
+                    "enum": "CatMood",
+                    "type": "Enum"
+                }
             },
             "argument": "name",
             "value": "cat_mood"
@@ -322,16 +325,18 @@ fn CreateArgument_must_work() {
     "#;
 
     let expected_step = MigrationStep::CreateArgument(CreateArgument {
-        location: ArgumentLocation {
-            arguments: None,
-            argument_container: "map".to_owned(),
-            argument_type: ArgumentType::EnumDirective {
+        location: ArgumentLocation::Directive(DirectiveLocation {
+            directive_type: DirectiveType::Enum {
                 r#enum: "CatMood".to_owned(),
             },
-        },
+            directive: "map".to_owned(),
+            arguments: None,
+        }),
         argument: "name".to_owned(),
         value: MigrationExpression("cat_mood".to_owned()),
     });
+
+    println!("{}", serde_json::to_value(&expected_step).unwrap());
 
     assert_symmetric_serde(json, expected_step);
 }
@@ -351,13 +356,13 @@ fn DeleteArgument_must_work() {
     "#;
 
     let expected_step = MigrationStep::DeleteArgument(DeleteArgument {
-        location: ArgumentLocation {
-            argument_container: "map".to_owned(),
-            arguments: None,
-            argument_type: ArgumentType::EnumDirective {
+        location: ArgumentLocation::Directive(DirectiveLocation {
+            directive_type: DirectiveType::Enum {
                 r#enum: "CatMood".to_owned(),
             },
-        },
+            directive: "mao".to_owned(),
+            arguments: None,
+        }),
         argument: "name".to_owned(),
     });
 

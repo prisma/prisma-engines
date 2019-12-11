@@ -135,13 +135,13 @@ pub struct DeleteEnum {
 #[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateDirective {
-    pub location: ArgumentLocation,
+    pub location: DirectiveLocation,
 }
 
 #[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteDirective {
-    pub location: ArgumentLocation,
+    pub location: DirectiveLocation,
 }
 
 #[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
@@ -177,21 +177,24 @@ impl Into<ast::Argument> for &Argument {
 }
 
 #[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct ArgumentLocation {
-    #[serde(flatten)]
-    pub argument_type: ArgumentType,
-    pub argument_container: String,
-    /// The arguments of the directive are required to match directives that can be repeated,
-    /// like `@@unique` on a model. This is `None` when matching can be done without comparing
-    /// the arguments, and `Some` when a directive should be matched exactly.
+#[serde(deny_unknown_fields, tag = "type")]
+pub enum ArgumentLocation {
+    Directive(DirectiveLocation),
+    Source(SourceLocation),
+}
+
+#[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct DirectiveLocation {
+    pub directive_type: DirectiveType,
+    pub directive: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub arguments: Option<Vec<Argument>>,
 }
 
-impl ArgumentLocation {
+impl DirectiveLocation {
     pub fn matches_ast_directive(&self, directive: &ast::Directive) -> bool {
-        if self.argument_container != directive.name.name {
+        if self.directive != directive.name.name {
             return false;
         }
 
@@ -211,17 +214,31 @@ impl ArgumentLocation {
             None => true,
         }
     }
+
+    pub fn into_argument_location(self) -> ArgumentLocation {
+        ArgumentLocation::Directive(self)
+    }
 }
 
 #[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
-#[serde(deny_unknown_fields, tag = "argumentType")]
-pub enum ArgumentType {
+#[serde(deny_unknown_fields)]
+pub struct SourceLocation {
+    pub source: String,
+}
+
+impl SourceLocation {
+    pub fn into_argument_location(self) -> ArgumentLocation {
+        ArgumentLocation::Source(self)
+    }
+}
+
+#[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
+#[serde(deny_unknown_fields, tag = "type")]
+pub enum DirectiveType {
+    Field { model: String, field: String },
+    Model { model: String },
+    Enum { r#enum: String },
     TypeAlias { type_alias: String },
-    FieldDirective { model: String, field: String },
-    ModelDirective { model: String },
-    EnumDirective { r#enum: String },
-    Datasource,
-    Generator,
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone, PartialEq)]
@@ -308,12 +325,12 @@ mod tests {
     #[test]
     fn directive_location_serialization_gives_expected_json_shape() {
         let create_directive = CreateDirective {
-            location: ArgumentLocation {
-                argument_type: ArgumentType::FieldDirective {
+            location: DirectiveLocation {
+                directive_type: DirectiveType::Field {
                     model: "Cat".to_owned(),
                     field: "owner".to_owned(),
                 },
-                argument_container: "status".to_owned(),
+                directive: "status".to_owned(),
                 arguments: None,
             },
         };
@@ -322,12 +339,16 @@ mod tests {
 
         let expected_json = json!({
             "location": {
-                "argumentType": "FieldDirective",
-                "model": "Cat",
-                "field": "owner",
-                "argumentContainer": "status",
+                "directive_type": {
+                    "type": "Field",
+                    "model": "Cat",
+                    "field": "owner",
+                },
+                "directive": "status"
             }
         });
+
+        println!("{}\n{}", serialized_step, expected_json);
 
         assert_eq!(serialized_step, expected_json);
 

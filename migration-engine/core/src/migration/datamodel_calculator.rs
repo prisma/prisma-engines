@@ -389,11 +389,11 @@ fn apply_create_directive(
     datamodel: &mut ast::SchemaAst,
     step: &steps::CreateDirective,
 ) -> Result<(), CalculatorError> {
-    let directives = find_directives_mut(datamodel, &step.location.argument_type)
+    let directives = find_directives_mut(datamodel, &step.location.directive_type)
         .ok_or_else(|| format_err!("CreateDirective on absent target: {:?}.", step))?;
 
     let new_directive = ast::Directive {
-        name: new_ident(step.location.argument_container.clone()),
+        name: new_ident(step.location.directive.clone()),
         arguments: step
             .location
             .arguments
@@ -412,7 +412,7 @@ fn apply_delete_directive(
     datamodel: &mut ast::SchemaAst,
     step: &steps::DeleteDirective,
 ) -> Result<(), CalculatorError> {
-    let directives = find_directives_mut(datamodel, &step.location.argument_type)
+    let directives = find_directives_mut(datamodel, &step.location.directive_type)
         .ok_or_else(|| format_err!("DeleteDirective on absent target: {:?}.", step))?;
 
     let new_directives = directives
@@ -536,36 +536,34 @@ fn find_argument_container<'schema>(
     datamodel: &'schema mut ast::SchemaAst,
     locator: &steps::ArgumentLocation,
 ) -> Option<ArgumentContainer<'schema>> {
-    match locator.argument_type {
-        steps::ArgumentType::Datasource | steps::ArgumentType::Generator => datamodel
-            .find_source_mut(&locator.argument_container)
+    match locator {
+        steps::ArgumentLocation::Source(source_location) => datamodel
+            .find_source_mut(&source_location.source)
             .map(|sc| ArgumentContainer::SourceConfig(sc)),
-        _ => find_directive_mut(datamodel, locator).map(|d| ArgumentContainer::Directive(d)),
+        steps::ArgumentLocation::Directive(directive_location) => {
+            find_directive_mut(datamodel, directive_location).map(|d| ArgumentContainer::Directive(d))
+        }
     }
 }
 
 fn find_directive_mut<'a>(
     datamodel: &'a mut ast::SchemaAst,
-    locator: &steps::ArgumentLocation,
+    locator: &steps::DirectiveLocation,
 ) -> Option<&'a mut ast::Directive> {
-    find_directives_mut(datamodel, &locator.argument_type)?
+    find_directives_mut(datamodel, &locator.directive_type)?
         .iter_mut()
-        .find(|directive| directive.name.name == locator.argument_container)
+        .find(|directive| directive.name.name == locator.directive)
 }
 
 fn find_directives_mut<'a>(
     datamodel: &'a mut ast::SchemaAst,
-    location: &steps::ArgumentType,
+    location: &steps::DirectiveType,
 ) -> Option<&'a mut Vec<ast::Directive>> {
     let directives = match location {
-        steps::ArgumentType::FieldDirective { model, field } => {
-            &mut datamodel.find_field_mut(&model, &field)?.directives
-        }
-        steps::ArgumentType::ModelDirective { model } => &mut datamodel.find_model_mut(&model)?.directives,
-        steps::ArgumentType::EnumDirective { r#enum } => &mut datamodel.find_enum_mut(&r#enum)?.directives,
-        steps::ArgumentType::TypeAlias { type_alias } => &mut datamodel.find_type_alias_mut(&type_alias)?.directives,
-        steps::ArgumentType::Datasource => unreachable!(),
-        steps::ArgumentType::Generator => unreachable!(),
+        steps::DirectiveType::Field { model, field } => &mut datamodel.find_field_mut(&model, &field)?.directives,
+        steps::DirectiveType::Model { model } => &mut datamodel.find_model_mut(&model)?.directives,
+        steps::DirectiveType::Enum { r#enum } => &mut datamodel.find_enum_mut(&r#enum)?.directives,
+        steps::DirectiveType::TypeAlias { type_alias } => &mut datamodel.find_type_alias_mut(&type_alias)?.directives,
     };
 
     Some(directives)
