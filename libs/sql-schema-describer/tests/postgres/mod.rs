@@ -7,7 +7,7 @@ use super::SCHEMA;
 
 pub async fn get_postgres_describer(sql: &str, db_name: &str) -> postgres::SqlSchemaDescriber {
     let host = match std::env::var("IS_BUILDKITE") {
-        Ok(_) => "test-db-postgres",
+        Ok(_) => "test-db-postgres-10",
         Err(_) => "127.0.0.1",
     };
 

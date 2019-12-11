@@ -14,7 +14,7 @@ use url::Url;
 
 #[tokio::test]
 async fn authentication_failure_must_return_a_known_error_on_postgres() {
-    let mut url: Url = postgres_url("test-db").parse().unwrap();
+    let mut url: Url = postgres_10_url("test-db").parse().unwrap();
 
     url.set_password(Some("obviously-not-right")).unwrap();
 
@@ -116,7 +116,7 @@ async fn unreachable_database_must_return_a_proper_error_on_mysql() {
 
 #[tokio::test]
 async fn unreachable_database_must_return_a_proper_error_on_postgres() {
-    let mut url: Url = postgres_url("unreachable_database_must_return_a_proper_error_on_postgres").parse().unwrap();
+    let mut url: Url = postgres_10_url("unreachable_database_must_return_a_proper_error_on_postgres").parse().unwrap();
 
     url.set_port(Some(8787)).unwrap();
 
@@ -184,9 +184,9 @@ async fn database_does_not_exist_must_return_a_proper_error() {
 #[tokio::test]
 async fn database_already_exists_must_return_a_proper_error() {
     let db_name = "database_already_exists_must_return_a_proper_error";
-    let url = postgres_url(db_name);
+    let url = postgres_10_url(db_name);
 
-    let conn = Quaint::new(&postgres_url("postgres")).await.unwrap();
+    let conn = Quaint::new(&postgres_10_url("postgres")).await.unwrap();
     conn.execute_raw("CREATE DATABASE \"database_already_exists_must_return_a_proper_error\"", &[]).await.ok();
 
     let error = get_cli_error(&["migration-engine", "cli", "--datasource", &url, "--create_database"]).await;
@@ -377,7 +377,7 @@ async fn unique_constraint_errors_in_migrations_must_return_a_known_error(api: &
 
 #[test_one_connector(connector = "postgres")]
 async fn tls_errors_must_be_mapped_in_the_cli(_api: &TestApi) {
-    let url = format!("{}&sslmode=require&sslaccept=strict", postgres_url("tls_errors_must_be_mapped_in_the_cli"));
+    let url = format!("{}&sslmode=require&sslaccept=strict", postgres_10_url("tls_errors_must_be_mapped_in_the_cli"));
     let error = get_cli_error(&["migration-engine", "cli", "--datasource", &url, "--can_connect_to_database"]).await;
 
     let json_error = serde_json::to_value(&error).unwrap();

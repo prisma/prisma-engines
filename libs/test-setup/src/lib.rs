@@ -17,10 +17,49 @@ pub fn sqlite_test_file(db_name: &str) -> String {
     file_path
 }
 
-pub fn postgres_url(db_name: &str) -> String {
+pub fn postgres_9_url(db_name: &str) -> String {
+    let (host, port) = db_host_and_port_postgres_9();
+
     format!(
-        "postgresql://postgres:prisma@{}:5432/{}?schema={}",
-        db_host_postgres(),
+        "postgresql://postgres:prisma@{}:{}/{}?schema={}",
+        host,
+        port,
+        db_name,
+        SCHEMA_NAME
+    )
+}
+
+pub fn postgres_10_url(db_name: &str) -> String {
+    let (host, port) = db_host_and_port_postgres_10();
+
+    format!(
+        "postgresql://postgres:prisma@{}:{}/{}?schema={}",
+        host,
+        port,
+        db_name,
+        SCHEMA_NAME
+    )
+}
+
+pub fn postgres_11_url(db_name: &str) -> String {
+    let (host, port) = db_host_and_port_postgres_11();
+
+    format!(
+        "postgresql://postgres:prisma@{}:{}/{}?schema={}",
+        host,
+        port,
+        db_name,
+        SCHEMA_NAME
+    )
+}
+
+pub fn postgres_12_url(db_name: &str) -> String {
+    let (host, port) = db_host_and_port_postgres_12();
+
+    format!(
+        "postgresql://postgres:prisma@{}:{}/{}?schema={}",
+        host,
+        port,
         db_name,
         SCHEMA_NAME
     )
@@ -50,10 +89,45 @@ pub fn mysql_8_url(db_name: &str) -> String {
     )
 }
 
-fn db_host_postgres() -> &'static str {
+pub fn mariadb_url(db_name: &str) -> String {
+    let (host, port) = db_host_and_port_mariadb();
+
+    // maximum length of identifiers on mysql
+    let db_name = mysql_safe_identifier(db_name);
+
+    format!(
+        "mysql://root:prisma@{host}:{port}/{db_name}",
+        host = host,
+        port = port,
+        db_name = db_name,
+    )
+}
+
+fn db_host_and_port_postgres_9() -> (&'static str, usize) {
     match std::env::var("IS_BUILDKITE") {
-        Ok(_) => "test-db-postgres",
-        Err(_) => "127.0.0.1",
+        Ok(_) => ("test-db-postgres-9", 5432),
+        Err(_) => ("127.0.0.1", 5431),
+    }
+}
+
+fn db_host_and_port_postgres_10() -> (&'static str, usize) {
+    match std::env::var("IS_BUILDKITE") {
+        Ok(_) => ("test-db-postgres-10", 5432),
+        Err(_) => ("127.0.0.1", 5432),
+    }
+}
+
+fn db_host_and_port_postgres_11() -> (&'static str, usize) {
+    match std::env::var("IS_BUILDKITE") {
+        Ok(_) => ("test-db-postgres-11", 5432),
+        Err(_) => ("127.0.0.1", 5433),
+    }
+}
+
+fn db_host_and_port_postgres_12() -> (&'static str, usize) {
+    match std::env::var("IS_BUILDKITE") {
+        Ok(_) => ("test-db-postgres-12", 5432),
+        Err(_) => ("127.0.0.1", 5434),
     }
 }
 
@@ -71,7 +145,14 @@ fn db_host_mysql_5_7() -> &'static str {
     }
 }
 
-pub fn postgres_test_config(db_name: &str) -> String {
+fn db_host_and_port_mariadb() -> (&'static str, usize) {
+    match std::env::var("IS_BUILDKITE") {
+        Ok(_) => ("test-db-mariadb", 3306),
+        Err(_) => ("127.0.0.1", 3308),
+    }
+}
+
+pub fn postgres_9_test_config(db_name: &str) -> String {
     format!(
         r#"
         datasource my_db {{
@@ -80,7 +161,46 @@ pub fn postgres_test_config(db_name: &str) -> String {
             default = true
         }}
     "#,
-        postgres_url(db_name)
+        postgres_9_url(db_name)
+    )
+}
+
+pub fn postgres_10_test_config(db_name: &str) -> String {
+    format!(
+        r#"
+        datasource my_db {{
+            provider = "postgresql"
+            url = "{}"
+            default = true
+        }}
+    "#,
+        postgres_10_url(db_name)
+    )
+}
+
+pub fn postgres_11_test_config(db_name: &str) -> String {
+    format!(
+        r#"
+        datasource my_db {{
+            provider = "postgresql"
+            url = "{}"
+            default = true
+        }}
+    "#,
+        postgres_11_url(db_name)
+    )
+}
+
+pub fn postgres_12_test_config(db_name: &str) -> String {
+    format!(
+        r#"
+        datasource my_db {{
+            provider = "postgresql"
+            url = "{}"
+            default = true
+        }}
+    "#,
+        postgres_12_url(db_name)
     )
 }
 

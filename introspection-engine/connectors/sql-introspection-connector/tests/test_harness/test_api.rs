@@ -77,7 +77,7 @@ pub async fn mysql_8_test_api(db_name: &'static str) -> TestApi {
 }
 
 pub async fn postgres_test_api(db_name: &'static str) -> TestApi {
-    let url = postgres_url(db_name);
+    let url = postgres_10_url(db_name);
     let database = test_setup::create_postgres_database(&url.parse().unwrap()).await.unwrap();
     let drop_schema = dbg!(format!("DROP SCHEMA IF EXISTS \"{}\" CASCADE;", SCHEMA_NAME));
     database.query_raw(&drop_schema, &[]).await.ok();
