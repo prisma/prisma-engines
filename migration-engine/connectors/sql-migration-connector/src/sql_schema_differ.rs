@@ -26,22 +26,13 @@ pub struct SqlSchemaDiff {
 
 impl SqlSchemaDiff {
     pub fn into_steps(self) -> Vec<SqlMigrationStep> {
-        let mut steps = Vec::new();
-        steps.append(&mut wrap_as_step(self.drop_indexes, |x| SqlMigrationStep::DropIndex(x)));
-        steps.append(&mut wrap_as_step(self.drop_tables, |x| SqlMigrationStep::DropTable(x)));
-        steps.append(&mut wrap_as_step(self.create_tables, |x| {
-            SqlMigrationStep::CreateTable(x)
-        }));
-        steps.append(&mut wrap_as_step(self.alter_tables, |x| {
-            SqlMigrationStep::AlterTable(x)
-        }));
-        steps.append(&mut wrap_as_step(self.create_indexes, |x| {
-            SqlMigrationStep::CreateIndex(x)
-        }));
-        steps.append(&mut wrap_as_step(self.alter_indexes, |x| {
-            SqlMigrationStep::AlterIndex(x)
-        }));
-        steps
+        wrap_as_step(self.drop_indexes, SqlMigrationStep::DropIndex)
+            .chain(wrap_as_step(self.drop_tables, SqlMigrationStep::DropTable))
+            .chain(wrap_as_step(self.create_tables, SqlMigrationStep::CreateTable))
+            .chain(wrap_as_step(self.alter_tables, SqlMigrationStep::AlterTable))
+            .chain(wrap_as_step(self.create_indexes, SqlMigrationStep::CreateIndex))
+            .chain(wrap_as_step(self.alter_indexes, SqlMigrationStep::AlterIndex))
+            .collect()
     }
 }
 
