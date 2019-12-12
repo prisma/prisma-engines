@@ -252,15 +252,15 @@ fn full_DeleteDirective_must_work() {
             "location": {
                 "path": {
                     "tag": "Model",
-                    "model": "Blog"                    
+                    "model": "Blog",                    
+                    "arguments": [
+                        {
+                            "name": "",
+                            "value": "[name, age]"
+                        }
+                    ]
                 },
-                "directive": "unique",
-                "arguments": [
-                    {
-                        "name": "",
-                        "value": "[name, age]"
-                    }
-                ]
+                "directive": "unique"
             }
         }
     "#;
