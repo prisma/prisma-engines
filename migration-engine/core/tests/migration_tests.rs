@@ -100,6 +100,20 @@ async fn adding_an_id_field_of_type_int_must_work(api: &TestApi) {
     let result = api.infer_and_apply(&dm2).await.sql_schema;
     let column = result.table_bang("Test").column_bang("myId");
 
+    assert_eq!(column.auto_increment, false);
+ }
+
+#[test_each_connector]
+async fn adding_an_id_field_of_type_int_with_autoincrement_must_work(api: &TestApi) {
+    let dm2 = r#"
+        model Test {
+            myId Int @id @default(autoincrement())
+        }
+    "#;
+
+    let result = api.infer_and_apply(&dm2).await.sql_schema;
+    let column = result.table_bang("Test").column_bang("myId");
+
     match api.sql_family() {
         SqlFamily::Postgres => {
             let sequence = result.get_sequence("Test_myId_seq").expect("sequence must exist");
@@ -110,6 +124,7 @@ async fn adding_an_id_field_of_type_int_must_work(api: &TestApi) {
         _ => assert_eq!(column.auto_increment, true),
     }
 }
+
 
 #[test_each_connector]
 async fn removing_a_scalar_field_must_work(api: &TestApi) {
