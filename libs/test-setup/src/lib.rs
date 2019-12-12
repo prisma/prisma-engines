@@ -1,6 +1,14 @@
 //! This crate contains constants and utilities that are useful for writing tests across the
 //! engines.
 
+/// Macro utils
+#[doc(hidden)]
+pub mod logging;
+
+/// Macro utils
+#[doc(hidden)]
+pub mod runtime;
+
 use url::Url;
 use quaint::{prelude::Queryable, single::Quaint};
 
