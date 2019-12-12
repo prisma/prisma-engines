@@ -316,7 +316,7 @@ async fn unique_constraint_errors_in_migrations_must_return_a_known_error(api: &
 
     let dm = r#"
         model Fruit {
-            id Int @id
+            id Int @id @default(autoincrement())
             name String
         }
     "#;
@@ -332,7 +332,7 @@ async fn unique_constraint_errors_in_migrations_must_return_a_known_error(api: &
 
     let dm2 = r#"
         model Fruit {
-            id Int @id
+            id Int @id @default(autoincrement())
             name String @unique
         }
     "#;
