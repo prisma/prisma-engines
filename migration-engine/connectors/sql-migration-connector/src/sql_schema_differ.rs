@@ -27,9 +27,13 @@ pub struct SqlSchemaDiff {
 impl SqlSchemaDiff {
     pub fn into_steps(self) -> Vec<SqlMigrationStep> {
         wrap_as_step(self.drop_indexes, SqlMigrationStep::DropIndex)
-            .chain(wrap_as_step(self.drop_tables, SqlMigrationStep::DropTable))
+            // Order matters: we must create tables before `alter_table`s because we could
+            // be adding foreign keys to the new tables there.
             .chain(wrap_as_step(self.create_tables, SqlMigrationStep::CreateTable))
+            // Order matters: we must run `alter table`s before `drop`s because we want to
+            // drop foreign keys before the tables they are pointing to.
             .chain(wrap_as_step(self.alter_tables, SqlMigrationStep::AlterTable))
+            .chain(wrap_as_step(self.drop_tables, SqlMigrationStep::DropTable))
             .chain(wrap_as_step(self.create_indexes, SqlMigrationStep::CreateIndex))
             .chain(wrap_as_step(self.alter_indexes, SqlMigrationStep::AlterIndex))
             .collect()
