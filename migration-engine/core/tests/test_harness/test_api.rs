@@ -197,7 +197,7 @@ pub async fn mysql_test_api(db_name: &str) -> TestApi {
     }
 }
 
-pub async fn mariadb_test_api(db_name: &str) -> TestApi {
+pub async fn mysql_mariadb_test_api(db_name: &str) -> TestApi {
     let url = mariadb_url(db_name);
     let connection_info = ConnectionInfo::from_url(&url).unwrap();
     let connector = mysql_migration_connector(&url).await;
