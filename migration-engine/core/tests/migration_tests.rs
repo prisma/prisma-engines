@@ -994,7 +994,7 @@ async fn removing_multi_field_unique_index_must_work(api: &TestApi) {
     assert!(index.is_none());
 }
 
-#[test_each_connector]
+#[test_each_connector(ignore = "mysql_mariadb")]
 async fn index_renaming_must_work(api: &TestApi) {
     let dm1 = r#"
             model A {
@@ -1044,7 +1044,7 @@ async fn index_renaming_must_work(api: &TestApi) {
     }
 }
 
-#[test_each_connector]
+#[test_each_connector(ignore = "mysql_mariadb")]
 async fn index_renaming_must_work_when_renaming_to_default(api: &TestApi) {
     let dm1 = r#"
             model A {
@@ -1095,7 +1095,7 @@ async fn index_renaming_must_work_when_renaming_to_default(api: &TestApi) {
     }
 }
 
-#[test_each_connector]
+#[test_each_connector(ignore = "mysql_mariadb")]
 async fn index_renaming_must_work_when_renaming_to_custom(api: &TestApi) {
     let dm1 = r#"
             model A {
@@ -1146,7 +1146,7 @@ async fn index_renaming_must_work_when_renaming_to_custom(api: &TestApi) {
     }
 }
 
-#[test_each_connector]
+#[test_each_connector(ignore = "mysql_mariadb")]
 async fn index_updates_with_rename_must_work(api: &TestApi) {
     let dm1 = r#"
             model A {
@@ -1552,7 +1552,7 @@ async fn calculate_database_steps_with_infer_after_an_apply_must_work(api: &Test
     assert_eq!(result.datamodel_steps, new_steps);
 }
 
-#[test_each_connector]
+#[test_each_connector(ignore = "mysql_mariadb")]
 async fn column_defaults_must_be_migrated(api: &TestApi) {
     let dm1 = r#"
         model Fruit {

@@ -22,7 +22,7 @@ const CONNECTOR_NAMES: &[&'static str] = &[
     "postgres",
     "postgres11",
     "postgres12",
-    //"mariadb", // SIGILL MFS
+    "mysql_mariadb", // SIGILL MFS
     "sqlite",
 ];
 
