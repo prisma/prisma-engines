@@ -1,5 +1,5 @@
 use crate::test_harness::*;
-use crate::{test_one_connector, BarrelMigrationExecutor, TestApi};
+use crate::{test_one_connector,BarrelMigrationExecutor, TestApi};
 use barrel::types;
 
 #[test_one_connector(connector = "mysql")]

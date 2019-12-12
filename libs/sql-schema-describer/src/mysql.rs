@@ -50,8 +50,8 @@ impl SqlSchemaDescriber {
     }
 
     async fn get_databases(&self) -> Vec<String> {
-        debug!("Getting table names");
-        let sql = "select schema_name from information_schema.schemata;";
+        debug!("Getting databases");
+        let sql = "select schema_name as schema_name from information_schema.schemata;";
         let rows = self.conn.query_raw(sql, &[]).await.expect("get schema names ");
         let names = rows
             .into_iter()
@@ -92,15 +92,19 @@ impl SqlSchemaDescriber {
     }
 
     async fn get_size(&self, schema: &str) -> usize {
-        debug!("Getting table names");
+        debug!("Getting db size");
         let sql = "SELECT 
       SUM(data_length + index_length) as size 
       FROM information_schema.TABLES 
       WHERE table_schema = ?";
         let result = self.conn.query_raw(sql, &[schema.into()]).await.expect("get db size ");
-        let size: String = result
+        let size = result
             .first()
-            .map(|row| row.get("size").and_then(|x| x.to_string()).expect("get db size"))
+            .map(|row| {
+                row.get("size")
+                    .and_then(|x| x.to_string())
+                    .unwrap_or("0".to_string())
+            })
             .unwrap();
 
         debug!("Found db size: {:?}", size);

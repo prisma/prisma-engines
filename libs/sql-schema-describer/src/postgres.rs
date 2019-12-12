@@ -55,7 +55,7 @@ impl SqlSchemaDescriber {
     }
 
     async fn get_databases(&self) -> Vec<String> {
-        debug!("Getting table names");
+        debug!("Getting databases");
         let sql = "select schema_name from information_schema.schemata;";
         let rows = self.conn.query_raw(sql, &[]).await.expect("get schema names ");
         let names = rows
@@ -108,7 +108,7 @@ impl SqlSchemaDescriber {
             .map(|row| {
                 row.get("size")
                     .and_then(|x| x.as_i64())
-                    .expect("convert db size result")
+                    .unwrap_or(0)
             })
             .unwrap();
 
