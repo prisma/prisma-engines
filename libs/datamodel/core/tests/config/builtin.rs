@@ -106,7 +106,7 @@ datasource chinook {
 "#;
 
 #[test]
-fn enable_disable_source_flag() {
+fn enable_disable_source_through_argument() {
     let config = datamodel::parse_configuration(ENABLED_DISABLED_SOURCE).unwrap();
 
     assert_eq!(config.datasources.len(), 1);
@@ -119,34 +119,66 @@ fn enable_disable_source_flag() {
 }
 
 const ENABLED_DISABLED_SOURCE_ENV: &str = r#"
-datasource chinook {
+// will be disabled by the env var resolving to false
+datasource one {
   provider = "sqlite"
-  url = "file:../db/production.db"
-  enabled = env("PRODUCTION")
+  url = "file:../db/one.db"
+  enabled = env("ONE")
 }
 
-datasource chinook {
+// will be enabled by the env var resolving to true
+datasource two {
   provider = "sqlite"
-  url = "file:../db/staging.db"
-  enabled = env("STAGING")
+  url = "file:../db/two.db"
+  enabled = env("TWO")
+}
+
+// will be enabled by sheer presence of the env var
+datasource three {
+    provider = "sqlite"
+    url = "file:../db/three.db"
+    enabled = env("THREE")
+}
+
+// will be disabled by sheer presence of the env var
+datasource four {
+    provider = "sqlite"
+    url = "file:../db/four.db"
+    enabled = env("FOUR")
+}
+
+// will be enabled because normal
+datasource five {
+    provider = "sqlite"
+    url = "file:../db/five.db"
 }
 
 "#;
 
 #[test]
-fn enable_disable_source_flag_from_env() {
-    std::env::set_var("PRODUCTION", "false");
-    std::env::set_var("STAGING", "true");
+fn enable_and_disable_source_through_boolean_env_var() {
+    std::env::set_var("ONE", "false");
+    std::env::set_var("TWO", "true");
+    std::env::set_var("THREE", "FOOBAR");
 
     let config = datamodel::parse_configuration(ENABLED_DISABLED_SOURCE_ENV).unwrap();
 
-    assert_eq!(config.datasources.len(), 1);
+    assert_eq!(config.datasources.len(), 3);
 
-    let source = &config.datasources[0];
+    let source1 = &config.datasources[0];
+    assert_eq!(source1.name(), "two");
+    assert_eq!(source1.connector_type(), "sqlite");
+    assert_eq!(source1.url().value, "file:../db/two.db");
 
-    assert_eq!(source.name(), "chinook");
-    assert_eq!(source.connector_type(), "sqlite");
-    assert_eq!(source.url().value, "file:../db/staging.db");
+    let source2 = &config.datasources[1];
+    assert_eq!(source2.name(), "three");
+    assert_eq!(source2.connector_type(), "sqlite");
+    assert_eq!(source2.url().value, "file:../db/three.db");
+
+    let source3 = &config.datasources[2];
+    assert_eq!(source3.name(), "five");
+    assert_eq!(source3.connector_type(), "sqlite");
+    assert_eq!(source3.url().value, "file:../db/five.db");
 }
 
 fn assert_eq_json(a: &str, b: &str) {
