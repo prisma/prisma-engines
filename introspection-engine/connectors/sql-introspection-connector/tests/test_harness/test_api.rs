@@ -76,6 +76,21 @@ pub async fn mysql_8_test_api(db_name: &'static str) -> TestApi {
     }
 }
 
+pub async fn mysql_mariadb_test_api(db_name: &'static str) -> TestApi {
+    let db_name = test_setup::mysql_safe_identifier(db_name);
+    let url = mariadb_url(db_name.as_ref());
+    let conn = create_mysql_database(&url.parse().unwrap()).await.unwrap();
+
+    let introspection_connector = SqlIntrospectionConnector::new(&url).await.unwrap();
+
+    TestApi {
+        db_name,
+        database: Arc::new(conn),
+        sql_family: SqlFamily::Mysql,
+        introspection_connector,
+    }
+}
+
 pub async fn postgres_test_api(db_name: &'static str) -> TestApi {
     test_api_helper_for_postgres(postgres_10_url(db_name),db_name).await
 }
