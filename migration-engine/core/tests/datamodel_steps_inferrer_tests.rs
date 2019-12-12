@@ -1302,7 +1302,7 @@ fn infer_CreateTypeAlias() {
 
     let steps = infer(&dm1, &dm2);
 
-    let directive_type = DirectivePath::TypeAlias {
+    let directive_path = DirectivePath::TypeAlias {
         type_alias: "CUID".to_owned(),
     };
 
@@ -1314,19 +1314,19 @@ fn infer_CreateTypeAlias() {
         }),
         MigrationStep::CreateDirective(CreateDirective {
             location: DirectiveLocation {
-                path: directive_type.clone(),
+                path: directive_path.clone(),
                 directive: "id".to_owned(),
             },
         }),
         MigrationStep::CreateDirective(CreateDirective {
             location: DirectiveLocation {
-                path: directive_type.clone(),
+                path: directive_path.clone(),
                 directive: "default".to_owned(),
             },
         }),
         MigrationStep::CreateArgument(CreateArgument {
             location: DirectiveLocation {
-                path: directive_type,
+                path: directive_path,
                 directive: "default".to_owned(),
             }
             .into_argument_location(),
