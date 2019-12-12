@@ -173,7 +173,7 @@ impl SqlSchemaDescriber {
                 }
 
 
-                //Todo this needs to be more sophisticated aka postgres
+                //Integer Id columns are always implemented with either row id or autoincrement
                 if pk_cols.len() == 1 {
                     let pk_col = &columns[0];
                     for col in cols.iter_mut() {
