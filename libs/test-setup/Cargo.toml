@@ -9,6 +9,8 @@ edition = "2018"
 [dependencies]
 url = "1.7.0"
 failure = "0.1.6"
+tracing-subscriber = "0.1.6"
+tokio = "0.2.4"
 
 [dependencies.quaint]
 git = "https://github.com/prisma/quaint.git"

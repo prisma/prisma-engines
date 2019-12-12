@@ -82,34 +82,11 @@ fn test_each_connector_wrapper_functions(
         let connector_test_fn_name = Ident::new(&format!("{}_on_{}", test_fn_name, connector), Span::call_site());
         let connector_api_factory = Ident::new(&format!("{}_test_api", connector), Span::call_site());
 
-        let test_fn_call = args
-            .log
-            .as_ref()
-            .map(|log_config| {
-                quote! {
-                    let filter = tracing_subscriber::EnvFilter::new(#log_config);
-                    let subscriber = tracing_subscriber::FmtSubscriber::builder()
-                        .with_env_filter(filter)
-                        .with_writer(print_writer)
-                        .finish();
-
-                    tracing::subscriber::with_default(subscriber, || {
-                        #test_fn_name(&api)
-                    })
-                }
-            })
-            .unwrap_or_else(|| {
-                quote! {
-                    #test_fn_name(&api)
-                }
-            });
-
         let test = quote! {
             #[test]
             fn #connector_test_fn_name() {
                 let api = #connector_api_factory(#test_fn_name_str);
-
-                #test_fn_call
+                #test_fn_name(&api)
             }
         };
 
@@ -128,27 +105,9 @@ fn test_each_connector_async_wrapper_functions(
 
     let mut tests = Vec::with_capacity(CONNECTOR_NAMES.len());
 
-    let test_fn_call = args
-        .log
-        .as_ref()
-        .map(|log_config| {
-            quote! {
-                use tracing_futures::WithSubscriber;
-
-                let filter = tracing_subscriber::EnvFilter::new(#log_config);
-                let subscriber = tracing_subscriber::FmtSubscriber::builder()
-                    .with_env_filter(filter)
-                    .with_writer(print_writer)
-                    .finish();
-
-                #test_fn_name(&api).with_subscriber(subscriber).await
-            }
-        })
-        .unwrap_or_else(|| {
-            quote! {
-                #test_fn_name(&api).await
-            }
-        });
+    let optional_logging = args.log.as_ref().map(|log_config| {
+        quote! { .with_subscriber(test_setup::logging::test_tracing_subscriber(#log_config)) }
+    });
 
     for connector in args.connectors_to_test() {
         let connector_test_fn_name = Ident::new(&format!("{}_on_{}", test_fn_name, connector), Span::call_site());
@@ -157,18 +116,14 @@ fn test_each_connector_async_wrapper_functions(
         let test = quote! {
             #[test]
             fn #connector_test_fn_name() {
+                use tracing_futures::WithSubscriber;
+
                 let fut = async {
                     let api = #connector_api_factory(#test_fn_name_str).await;
-                    #test_fn_call
+                    #test_fn_name(&api)#optional_logging.await
                 };
 
-
-                tokio::runtime::Builder::new()
-                    .basic_scheduler()
-                    .enable_all()
-                    .build()
-                    .unwrap()
-                    .block_on(fut)
+                test_setup::runtime::run_with_tokio(fut)
             }
         };
 
@@ -195,43 +150,21 @@ pub fn test_one_connector(attr: TokenStream, input: TokenStream) -> TokenStream 
     let api_factory = Ident::new(&format!("{}_test_api", args.connector), Span::call_site());
 
     let output = if async_test {
-        let test_fn_call = args
-            .log
-            .as_ref()
-            .map(|log_config| {
-                quote! {
-                    use tracing_futures::WithSubscriber;
-
-                    let filter = tracing_subscriber::EnvFilter::new(#log_config);
-                    let subscriber = tracing_subscriber::FmtSubscriber::builder()
-                        .with_env_filter(filter)
-                        .with_writer(print_writer)
-                        .finish();
-
-                    #test_impl_name(&api).with_subscriber(subscriber).await
-                }
-            })
-            .unwrap_or_else(|| {
-                quote! {
-                    #test_impl_name(&api).await
-                }
-            });
+        let optional_logging = args.log.as_ref().map(|log_config| {
+            quote! { .with_subscriber(test_setup::logging::test_tracing_subscriber(#log_config)) }
+        });
 
         quote! {
             #[test]
             fn #test_fn_name() {
+                use tracing_futures::WithSubscriber;
+
                 let fut = async {
                     let api = #api_factory(#test_impl_name_str).await;
-                    #test_fn_call
+                    #test_impl_name(&api)#optional_logging.await
                 };
 
-
-                tokio::runtime::Builder::new()
-                    .basic_scheduler()
-                    .enable_all()
-                    .build()
-                    .unwrap()
-                    .block_on(fut)
+                test_setup::runtime::run_with_tokio(fut)
             }
 
             #test_function

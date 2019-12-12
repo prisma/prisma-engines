@@ -20,15 +20,15 @@ async fn databases_for_mysql_8_should_work(api: &TestApi) {
 #[test_one_connector(connector = "postgres")]
 async fn databases_for_postgres_should_work(api: &TestApi) {
     let barrel = api.barrel();
-    setup(&barrel, SCHEMA_NAME);
+    setup(&barrel, api.schema_name());
     let result = dbg!(api.list_databases().await);
-    assert!(result.contains(&SCHEMA_NAME.to_string()));
+    assert!(result.contains(&api.schema_name().to_string()));
 }
 
 #[test_one_connector(connector = "sqlite")]
 async fn databases_for_sqlite_should_work(api: &TestApi) {
     let barrel = api.barrel();
-    setup(&barrel, SCHEMA_NAME);
+    setup(&barrel, api.schema_name());
     let result = dbg!(api.list_databases().await);
     assert!(result.contains(&format!("{}.db", "databases_for_sqlite_should_work")));
 }

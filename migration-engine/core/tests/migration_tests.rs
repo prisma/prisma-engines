@@ -1494,7 +1494,7 @@ async fn foreign_keys_of_inline_one_to_one_relations_have_a_unique_constraint(ap
     assert_eq!(box_table.indices, expected_indexes);
 }
 
-#[test_each_connector(log = "debug")]
+#[test_each_connector]
 async fn calculate_database_steps_with_infer_after_an_apply_must_work(api: &TestApi) {
     let dm1 = r#"
         type CUID = String @id @default(cuid())

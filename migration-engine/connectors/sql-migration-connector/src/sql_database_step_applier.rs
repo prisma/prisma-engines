@@ -38,15 +38,16 @@ impl DatabaseMigrationStepApplier<SqlMigration> for SqlDatabaseStepApplier {
 }
 
 impl SqlDatabaseStepApplier {
-    async fn apply_next_step(&self, steps: &Vec<SqlMigrationStep>, index: usize) -> SqlResult<bool> {
+    async fn apply_next_step(&self, steps: &[SqlMigrationStep], index: usize) -> SqlResult<bool> {
         let has_this_one = steps.get(index).is_some();
         if !has_this_one {
             return Ok(false);
         }
 
         let step = &steps[index];
-        let sql_string = render_raw_sql(&step, self.sql_family(), &self.schema_name);
+        tracing::debug!(?step);
 
+        let sql_string = render_raw_sql(&step, self.sql_family(), &self.schema_name);
         tracing::debug!(index, %sql_string);
 
         let result = self.conn.query_raw(&sql_string, &[]).await;

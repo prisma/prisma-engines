@@ -4,7 +4,7 @@ use crate::{test_each_connector,BarrelMigrationExecutor, TestApi};
 #[test_each_connector]
 async fn empty_metadata_should_work(api: &TestApi) {
     let barrel = api.barrel();
-    setup_empty(&barrel, api.db_name()).await;
+    setup_empty(&barrel, api.schema_name()).await;
     let result = dbg!(api.get_metadata().await);
     assert_eq!(result.table_count, 0);
     assert_eq!(result.size_in_bytes, 0);

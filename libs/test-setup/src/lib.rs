@@ -1,10 +1,18 @@
 //! This crate contains constants and utilities that are useful for writing tests across the
 //! engines.
 
+/// Macro utils
+#[doc(hidden)]
+pub mod logging;
+
+/// Macro utils
+#[doc(hidden)]
+pub mod runtime;
+
 use url::Url;
 use quaint::{prelude::Queryable, single::Quaint};
 
-pub const SCHEMA_NAME: &str = "prisma-tests";
+const SCHEMA_NAME: &str = "prisma-tests";
 
 pub fn sqlite_test_url(db_name: &str) -> String {
     format!("file:{}?db_name={}", sqlite_test_file(db_name), SCHEMA_NAME)

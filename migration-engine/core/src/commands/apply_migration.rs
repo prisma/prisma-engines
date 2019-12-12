@@ -132,7 +132,7 @@ impl<'a> ApplyMigrationCommand<'a> {
                 tracing::debug!("Migration applied");
             }
             // We have warnings, but no force flag was passed.
-            (true, false) => tracing::debug!("The force flag was not passed, the migration will not be applied."),
+            (true, false) => tracing::info!("The force flag was not passed, the migration will not be applied."),
         }
 
         let DestructiveChangeDiagnostics { warnings, errors } = diagnostics;
