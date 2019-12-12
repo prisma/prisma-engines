@@ -389,7 +389,7 @@ fn apply_create_directive(
     datamodel: &mut ast::SchemaAst,
     step: &steps::CreateDirective,
 ) -> Result<(), CalculatorError> {
-    let directives = find_directives_mut(datamodel, &step.location.directive_type)
+    let directives = find_directives_mut(datamodel, &step.location.path)
         .ok_or_else(|| format_err!("CreateDirective on absent target: {:?}.", step))?;
 
     let new_directive = ast::Directive {
@@ -412,7 +412,7 @@ fn apply_delete_directive(
     datamodel: &mut ast::SchemaAst,
     step: &steps::DeleteDirective,
 ) -> Result<(), CalculatorError> {
-    let directives = find_directives_mut(datamodel, &step.location.directive_type)
+    let directives = find_directives_mut(datamodel, &step.location.path)
         .ok_or_else(|| format_err!("DeleteDirective on absent target: {:?}.", step))?;
 
     let new_directives = directives
@@ -550,20 +550,20 @@ fn find_directive_mut<'a>(
     datamodel: &'a mut ast::SchemaAst,
     locator: &steps::DirectiveLocation,
 ) -> Option<&'a mut ast::Directive> {
-    find_directives_mut(datamodel, &locator.directive_type)?
+    find_directives_mut(datamodel, &locator.path)?
         .iter_mut()
         .find(|directive| directive.name.name == locator.directive)
 }
 
 fn find_directives_mut<'a>(
     datamodel: &'a mut ast::SchemaAst,
-    location: &steps::DirectiveType,
+    location: &steps::DirectivePath,
 ) -> Option<&'a mut Vec<ast::Directive>> {
     let directives = match location {
-        steps::DirectiveType::Field { model, field } => &mut datamodel.find_field_mut(&model, &field)?.directives,
-        steps::DirectiveType::Model { model } => &mut datamodel.find_model_mut(&model)?.directives,
-        steps::DirectiveType::Enum { r#enum } => &mut datamodel.find_enum_mut(&r#enum)?.directives,
-        steps::DirectiveType::TypeAlias { type_alias } => &mut datamodel.find_type_alias_mut(&type_alias)?.directives,
+        steps::DirectivePath::Field { model, field } => &mut datamodel.find_field_mut(&model, &field)?.directives,
+        steps::DirectivePath::Model { model } => &mut datamodel.find_model_mut(&model)?.directives,
+        steps::DirectivePath::Enum { r#enum } => &mut datamodel.find_enum_mut(&r#enum)?.directives,
+        steps::DirectivePath::TypeAlias { type_alias } => &mut datamodel.find_type_alias_mut(&type_alias)?.directives,
     };
 
     Some(directives)
