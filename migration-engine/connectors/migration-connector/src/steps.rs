@@ -188,8 +188,6 @@ pub enum ArgumentLocation {
 pub struct DirectiveLocation {
     pub path: DirectivePath,
     pub directive: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub arguments: Option<Vec<Argument>>,
 }
 
 impl DirectiveLocation {
@@ -197,9 +195,11 @@ impl DirectiveLocation {
         if self.directive != directive.name.name {
             return false;
         }
-
-        match &self.arguments {
-            Some(arguments) => {
+        match &self.path {
+            DirectivePath::Model {
+                model: _,
+                arguments: Some(arguments),
+            } => {
                 if directive.arguments.len() != arguments.len() {
                     return false;
                 }
@@ -211,7 +211,7 @@ impl DirectiveLocation {
                         .is_some()
                 })
             }
-            None => true,
+            _ => true,
         }
     }
 
@@ -241,6 +241,8 @@ pub enum DirectivePath {
     },
     Model {
         model: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        arguments: Option<Vec<Argument>>,
     },
     Enum {
         r#enum: String,
@@ -249,6 +251,25 @@ pub enum DirectivePath {
         #[serde(rename = "typeAlias")]
         type_alias: String,
     },
+}
+
+impl DirectivePath {
+    pub fn set_arguments(self, arguments: Vec<Argument>) -> Self {
+        match self {
+            Self::Model { model, arguments: _ } => Self::Model {
+                model,
+                arguments: Some(arguments),
+            },
+            _ => self,
+        }
+    }
+
+    pub fn arguments(&self) -> &Option<Vec<Argument>> {
+        match &self {
+            Self::Model { model: _, arguments } => &arguments,
+            _ => &None,
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -346,7 +367,6 @@ mod tests {
                     field: "owner".to_owned(),
                 },
                 directive: "status".to_owned(),
-                arguments: None,
             },
         };
 

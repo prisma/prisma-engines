@@ -396,7 +396,8 @@ fn apply_create_directive(
         name: new_ident(step.location.directive.clone()),
         arguments: step
             .location
-            .arguments
+            .path
+            .arguments()
             .as_ref()
             .map(|args| args.iter().map(|arg| arg.into()).collect())
             .unwrap_or_else(Vec::new),
@@ -561,7 +562,7 @@ fn find_directives_mut<'a>(
 ) -> Option<&'a mut Vec<ast::Directive>> {
     let directives = match location {
         steps::DirectivePath::Field { model, field } => &mut datamodel.find_field_mut(&model, &field)?.directives,
-        steps::DirectivePath::Model { model } => &mut datamodel.find_model_mut(&model)?.directives,
+        steps::DirectivePath::Model { model, arguments: _ } => &mut datamodel.find_model_mut(&model)?.directives,
         steps::DirectivePath::Enum { r#enum } => &mut datamodel.find_enum_mut(&r#enum)?.directives,
         steps::DirectivePath::TypeAlias { type_alias } => &mut datamodel.find_type_alias_mut(&type_alias)?.directives,
     };

@@ -206,9 +206,9 @@ fn CreateDirective_must_work() {
         location: DirectiveLocation {
             path: DirectivePath::Model {
                 model: "Blog".to_owned(),
+                arguments: None,
             },
             directive: "map".to_owned(),
-            arguments: None,
         },
     });
 
@@ -238,7 +238,6 @@ fn minimal_DeleteDirective_must_work() {
                 field: "title".to_owned(),
             },
             directive: "map".to_owned(),
-            arguments: None,
         },
     });
 
@@ -270,12 +269,12 @@ fn full_DeleteDirective_must_work() {
         location: DirectiveLocation {
             path: DirectivePath::Model {
                 model: "Blog".to_owned(),
+                arguments: Some(vec![Argument {
+                    name: "".to_owned(),
+                    value: MigrationExpression("[name, age]".to_owned()),
+                }]),
             },
             directive: "unique".to_owned(),
-            arguments: Some(vec![Argument {
-                name: "".to_owned(),
-                value: MigrationExpression("[name, age]".to_owned()),
-            }]),
         },
     });
 
@@ -304,9 +303,9 @@ fn UpdateArgument_must_work() {
         location: ArgumentLocation::Directive(DirectiveLocation {
             path: DirectivePath::Model {
                 model: "CatMood".to_owned(),
+                arguments: None,
             },
             directive: "map".to_owned(),
-            arguments: None,
         }),
         argument: "name".to_owned(),
         new_value: MigrationExpression("cat_mood".to_owned()),
@@ -339,7 +338,6 @@ fn CreateArgument_must_work() {
                 r#enum: "CatMood".to_owned(),
             },
             directive: "map".to_owned(),
-            arguments: None,
         }),
         argument: "name".to_owned(),
         value: MigrationExpression("cat_mood".to_owned()),
@@ -373,7 +371,6 @@ fn DeleteArgument_must_work() {
                 r#enum: "CatMood".to_owned(),
             },
             directive: "map".to_owned(),
-            arguments: None,
         }),
         argument: "name".to_owned(),
     });

@@ -219,6 +219,7 @@ fn push_created_models<'a>(steps: &mut Steps, models: impl Iterator<Item = &'a a
     for created_model in models {
         let directive_type = DirectivePath::Model {
             model: created_model.name.name.clone(),
+            arguments: None,
         };
 
         let create_model_step = steps::CreateModel {
@@ -262,6 +263,7 @@ fn push_updated_models<'a>(steps: &mut Steps, models: impl Iterator<Item = Model
 
         let directive_type = DirectivePath::Model {
             model: model_name.clone(),
+            arguments: None,
         };
 
         push_created_directives(steps, &directive_type, model.created_regular_directives());
@@ -359,11 +361,11 @@ fn push_created_directive_with_arguments(
     directive_type: steps::DirectivePath,
     directive: &ast::Directive,
 ) {
+    let updated_path = directive_type.set_arguments(directive.arguments.iter().map(steps::Argument::from).collect());
     let step = steps::CreateDirective {
         location: steps::DirectiveLocation {
-            path: directive_type,
+            path: updated_path,
             directive: directive.name.name.clone(),
-            arguments: Some(directive.arguments.iter().map(steps::Argument::from).collect()),
         },
     };
 
@@ -374,7 +376,6 @@ fn push_created_directive(steps: &mut Steps, directive_type: steps::DirectivePat
     let directive_location = steps::DirectiveLocation {
         path: directive_type,
         directive: directive.name.name.clone(),
-        arguments: None,
     };
     let argument_location = ArgumentLocation::Directive(directive_location.clone());
 
@@ -403,7 +404,6 @@ fn push_deleted_directive(steps: &mut Steps, directive_type: steps::DirectivePat
     let location = steps::DirectiveLocation {
         path: directive_type,
         directive: directive.name.name.clone(),
-        arguments: None,
     };
     let step = steps::DeleteDirective { location };
 
@@ -415,10 +415,10 @@ fn push_deleted_directive_with_arguments(
     directive_type: steps::DirectivePath,
     directive: &ast::Directive,
 ) {
+    let updated_path = directive_type.set_arguments(directive.arguments.iter().map(steps::Argument::from).collect());
     let location = steps::DirectiveLocation {
-        path: directive_type,
+        path: updated_path,
         directive: directive.name.name.clone(),
-        arguments: Some(directive.arguments.iter().map(steps::Argument::from).collect()),
     };
     let step = steps::DeleteDirective { location };
 
@@ -439,7 +439,6 @@ fn push_updated_directive(steps: &mut Steps, directive_type: steps::DirectivePat
     let location = steps::ArgumentLocation::Directive(DirectiveLocation {
         path: directive_type,
         directive: directive.previous.name.name.clone(),
-        arguments: None,
     });
 
     for argument in directive.created_arguments() {

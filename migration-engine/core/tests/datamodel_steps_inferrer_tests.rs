@@ -36,7 +36,6 @@ fn infer_CreateModel_if_it_does_not_exist_yet() {
                     field: "id".to_owned(),
                 },
                 directive: "id".to_owned(),
-                arguments: None,
             },
         }),
     ];
@@ -94,9 +93,9 @@ fn infer_UpdateModel() {
         location: DirectiveLocation {
             path: DirectivePath::Model {
                 model: "Post".to_owned(),
+                arguments: None,
             },
             directive: "embedded".to_owned(),
-            arguments: None,
         },
     })];
     assert_eq!(steps, expected);
@@ -164,7 +163,6 @@ fn infer_CreateField_with_default() {
                     field: "isReady".to_owned(),
                 },
                 directive: "default".to_owned(),
-                arguments: None,
             },
         }),
         MigrationStep::CreateArgument(CreateArgument {
@@ -174,7 +172,6 @@ fn infer_CreateField_with_default() {
                     field: "isReady".to_owned(),
                 },
                 directive: "default".to_owned(),
-                arguments: None,
             }),
             argument: "".to_owned(),
             value: MigrationExpression("false".to_owned()),
@@ -291,7 +288,6 @@ fn infer_UpdateField_simple() {
                     field: "field".to_owned(),
                 },
                 directive: "default".to_owned(),
-                arguments: None,
             },
         }),
         MigrationStep::CreateArgument(CreateArgument {
@@ -301,7 +297,6 @@ fn infer_UpdateField_simple() {
                     field: "field".to_owned(),
                 },
                 directive: "default".to_owned(),
-                arguments: None,
             }),
             argument: "".to_owned(),
             value: MigrationExpression("false".to_owned()),
@@ -313,7 +308,6 @@ fn infer_UpdateField_simple() {
                     field: "field".to_owned(),
                 },
                 directive: "unique".to_owned(),
-                arguments: None,
             },
         }),
     ];
@@ -454,7 +448,6 @@ fn infer_CreateDirective_on_field() {
             field: "name".to_owned(),
         },
         directive: "map".to_owned(),
-        arguments: None,
     };
     let argument_location = ArgumentLocation::Directive(directive_location.clone());
 
@@ -499,9 +492,9 @@ fn infer_CreateDirective_on_model() {
     let directive_location = DirectiveLocation {
         path: DirectivePath::Model {
             model: "User".to_owned(),
+            arguments: None,
         },
         directive: "map".to_owned(),
-        arguments: None,
     };
     let argument_location = ArgumentLocation::Directive(directive_location.clone());
 
@@ -546,12 +539,12 @@ fn infer_CreateDirective_on_model_repeated_directive() {
     let directive_location = DirectiveLocation {
         path: DirectivePath::Model {
             model: "User".to_owned(),
+            arguments: Some(vec![Argument {
+                name: "".to_owned(),
+                value: MigrationExpression("[name]".to_owned()),
+            }]),
         },
         directive: "unique".to_owned(),
-        arguments: Some(vec![Argument {
-            name: "".to_owned(),
-            value: MigrationExpression("[name]".to_owned()),
-        }]),
     };
 
     let expected = &[MigrationStep::CreateDirective(CreateDirective {
@@ -592,7 +585,6 @@ fn infer_CreateDirective_on_enum() {
             r#enum: "Color".to_owned(),
         },
         directive: "map".to_owned(),
-        arguments: None,
     };
     let argument_location = ArgumentLocation::Directive(directive_location.clone());
 
@@ -622,7 +614,6 @@ fn infer_CreateDirective_on_type_alias() {
             type_alias: "BlogPost".to_owned(),
         },
         directive: "customized".to_owned(),
-        arguments: None,
     };
 
     let expected = &[MigrationStep::CreateDirective(CreateDirective {
@@ -659,7 +650,6 @@ fn infer_DeleteDirective_on_field() {
             model: "User".to_owned(),
             field: "name".to_owned(),
         },
-        arguments: None,
         directive: "map".to_owned(),
     };
 
@@ -697,9 +687,9 @@ fn infer_DeleteDirective_on_model() {
     let directive_location = DirectiveLocation {
         path: DirectivePath::Model {
             model: "User".to_owned(),
+            arguments: None,
         },
         directive: "map".to_owned(),
-        arguments: None,
     };
 
     let expected = &[MigrationStep::DeleteDirective(DeleteDirective {
@@ -736,12 +726,12 @@ fn infer_DeleteDirective_on_model_repeated_directive() {
     let directive_location = DirectiveLocation {
         path: DirectivePath::Model {
             model: "User".to_owned(),
+            arguments: Some(vec![Argument {
+                name: "".to_owned(),
+                value: MigrationExpression("[name]".to_owned()),
+            }]),
         },
         directive: "unique".to_owned(),
-        arguments: Some(vec![Argument {
-            name: "".to_owned(),
-            value: MigrationExpression("[name]".to_owned()),
-        }]),
     };
 
     let expected = &[MigrationStep::DeleteDirective(DeleteDirective {
@@ -785,7 +775,6 @@ fn infer_DeleteDirective_on_enum() {
             r#enum: "Color".to_owned(),
         },
         directive: "map".to_owned(),
-        arguments: None,
     };
 
     let expected = &[MigrationStep::DeleteDirective(DeleteDirective {
@@ -807,7 +796,6 @@ fn infer_DeleteDirective_on_type_alias() {
             type_alias: "BlogPost".to_owned(),
         },
         directive: "default".to_owned(),
-        arguments: None,
     };
 
     let expected = &[MigrationStep::DeleteDirective(DeleteDirective {
@@ -845,7 +833,6 @@ fn infer_CreateArgument_on_field() {
             field: "name".to_owned(),
         },
         directive: "translate".to_owned(),
-        arguments: None,
     };
     let arguments_location = ArgumentLocation::Directive(directive_location);
 
@@ -894,9 +881,9 @@ fn infer_CreateArgument_on_model() {
     let directive_location = DirectiveLocation {
         path: DirectivePath::Model {
             model: "User".to_owned(),
+            arguments: None,
         },
         directive: "randomDirective".to_owned(),
-        arguments: None,
     };
     let argument_location = ArgumentLocation::Directive(directive_location);
 
@@ -944,7 +931,6 @@ fn infer_CreateArgument_on_enum() {
             r#enum: "EyeColor".to_owned(),
         },
         directive: "random".to_owned(),
-        arguments: None,
     };
     let argument_location = ArgumentLocation::Directive(directive_location);
 
@@ -969,7 +955,6 @@ fn infer_CreateArgument_on_type_alias() {
             type_alias: "BlogPost".to_owned(),
         },
         directive: "customDirective".to_owned(),
-        arguments: None,
     };
     let argument_location = ArgumentLocation::Directive(directive_location);
 
@@ -1010,7 +995,6 @@ fn infer_DeleteArgument_on_field() {
             field: "name".to_owned(),
         },
         directive: "translate".to_owned(),
-        arguments: None,
     };
     let argument_location = ArgumentLocation::Directive(directive_location);
 
@@ -1057,9 +1041,9 @@ fn infer_DeleteArgument_on_model() {
     let directive_location = DirectiveLocation {
         path: DirectivePath::Model {
             model: "User".to_owned(),
+            arguments: None,
         },
         directive: "randomDirective".to_owned(),
-        arguments: None,
     };
     let argument_location = ArgumentLocation::Directive(directive_location);
 
@@ -1106,7 +1090,6 @@ fn infer_DeleteArgument_on_enum() {
             r#enum: "EyeColor".to_owned(),
         },
         directive: "random".to_owned(),
-        arguments: None,
     };
     let argument_location = ArgumentLocation::Directive(directive_location);
 
@@ -1130,7 +1113,6 @@ fn infer_DeleteArgument_on_type_alias() {
             type_alias: "BlogPost".to_owned(),
         },
         directive: "customDirective".to_owned(),
-        arguments: None,
     };
     let argument_location = ArgumentLocation::Directive(directive_location);
 
@@ -1170,7 +1152,6 @@ fn infer_UpdateArgument_on_field() {
             field: "name".to_owned(),
         },
         directive: "translate".to_owned(),
-        arguments: None,
     };
     let argument_location = ArgumentLocation::Directive(directive_location);
 
@@ -1221,9 +1202,9 @@ fn infer_UpdateArgument_on_model() {
     let directive_location = DirectiveLocation {
         path: DirectivePath::Model {
             model: "User".to_owned(),
+            arguments: None,
         },
         directive: "map".to_owned(),
-        arguments: None,
     };
     let argument_location = ArgumentLocation::Directive(directive_location);
 
@@ -1271,7 +1252,6 @@ fn infer_UpdateArgument_on_enum() {
             r#enum: "EyeColor".to_owned(),
         },
         directive: "random".to_owned(),
-        arguments: None,
     };
 
     let expected = &[MigrationStep::UpdateArgument(UpdateArgument {
@@ -1295,7 +1275,6 @@ fn infer_UpdateArgument_on_type_alias() {
             type_alias: "Text".to_owned(),
         },
         directive: "default".to_owned(),
-        arguments: None,
     };
 
     let expected = &[MigrationStep::UpdateArgument(UpdateArgument {
@@ -1337,21 +1316,18 @@ fn infer_CreateTypeAlias() {
             location: DirectiveLocation {
                 path: directive_type.clone(),
                 directive: "id".to_owned(),
-                arguments: None,
             },
         }),
         MigrationStep::CreateDirective(CreateDirective {
             location: DirectiveLocation {
                 path: directive_type.clone(),
                 directive: "default".to_owned(),
-                arguments: None,
             },
         }),
         MigrationStep::CreateArgument(CreateArgument {
             location: DirectiveLocation {
                 path: directive_type,
                 directive: "default".to_owned(),
-                arguments: None,
             }
             .into_argument_location(),
             argument: "".to_owned(),
