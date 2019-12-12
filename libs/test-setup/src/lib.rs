@@ -12,7 +12,7 @@ pub mod runtime;
 use url::Url;
 use quaint::{prelude::Queryable, single::Quaint};
 
-pub const SCHEMA_NAME: &str = "prisma-tests";
+const SCHEMA_NAME: &str = "prisma-tests";
 
 pub fn sqlite_test_url(db_name: &str) -> String {
     format!("file:{}?db_name={}", sqlite_test_file(db_name), SCHEMA_NAME)
