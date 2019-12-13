@@ -1,6 +1,5 @@
 #![allow(non_snake_case)]
 
-use datamodel::ast::FieldArity;
 use migration_connector::steps::*;
 
 #[test]
@@ -49,7 +48,7 @@ fn minimal_CreateField_must_work() {
                 "model":"Blog",
                 "field":"title",
                 "type":"String",
-                "arity":"required"
+                "arity":"Required"
             }
         "#;
     let expected_struct = MigrationStep::CreateField(CreateField {
@@ -68,7 +67,7 @@ fn full_CreateField_must_work() {
             "model": "Blog",
             "field": "title",
             "type": "String",
-            "arity": "optional"
+            "arity": "Optional"
         }"#;
     let expected_struct = MigrationStep::CreateField(CreateField {
         model: "Blog".to_string(),
@@ -102,7 +101,7 @@ fn full_UpdateField_must_work() {
             "field": "title",
             "newName": "MyBlog",
             "type": "String",
-            "arity": "optional"
+            "arity": "Optional"
         }
     "#;
     let expected_struct = MigrationStep::UpdateField(UpdateField {

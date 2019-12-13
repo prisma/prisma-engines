@@ -2,7 +2,7 @@
 
 mod test_harness;
 
-use datamodel::ast::{parser, FieldArity, SchemaAst};
+use datamodel::ast::{parser, SchemaAst};
 use migration_connector::steps::*;
 use migration_core::migration::datamodel_migration_steps_inferrer::*;
 use pretty_assertions::assert_eq;
