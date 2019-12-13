@@ -47,23 +47,21 @@ impl<'a> SqlSchemaCalculator<'a> {
             .map(|model| {
                 let columns = model
                     .fields()
-                    .flat_map(|f| match (&f.field_type, &f.arity) {
-                        (FieldType::Base(_), arity) | (FieldType::Enum(_), arity) if arity != &FieldArity::List => {
-                            Some(sql::Column {
-                                name: f.db_name(),
-                                tpe: column_type(f),
-                                default: f.migration_value_new(&self.data_model),
-                                auto_increment: {
-                                    match f.id_info {
-                                        Some(IdInfo {
-                                            strategy: IdStrategy::Auto,
-                                            sequence: _,
-                                        }) if column_type(f).family == sql::ColumnTypeFamily::Int => true,
-                                        _ => false,
-                                    }
-                                },
-                            })
-                        }
+                    .flat_map(|f| match &f.field_type {
+                        FieldType::Base(_) | FieldType::Enum(_) => Some(sql::Column {
+                            name: f.db_name(),
+                            tpe: column_type(f),
+                            default: f.migration_value_new(&self.data_model),
+                            auto_increment: {
+                                match f.id_info {
+                                    Some(IdInfo {
+                                        strategy: IdStrategy::Auto,
+                                        sequence: _,
+                                    }) if column_type(f).family == sql::ColumnTypeFamily::Int => true,
+                                    _ => false,
+                                }
+                            },
+                        }),
                         _ => None,
                     })
                     .collect();
