@@ -40,6 +40,7 @@ pub trait CreateInputTypeBuilderExtension<'a>: InputTypeBuilderBase<'a> {
 
                         (Some(FieldBehaviour::Id { strategy: IdStrategy::None, .. }), TypeIdentifier::GraphQLID) => self.map_required_input_type(f),
                         (Some(FieldBehaviour::Id { strategy: IdStrategy::None, .. }), TypeIdentifier::UUID)      => self.map_required_input_type(f),
+                        (Some(FieldBehaviour::Id { strategy: IdStrategy::None, .. }), TypeIdentifier::String)    => self.map_required_input_type(f),
 
                         _ => unreachable!(),
                     }
@@ -78,7 +79,7 @@ pub trait CreateInputTypeBuilderExtension<'a>: InputTypeBuilderBase<'a> {
                 let related_model = rf.related_model();
                 let related_field = rf.related_field();
 
-                // Comput input object name
+                // Compute input object name
                 let arity_part = if rf.is_list { "Many" } else { "One" };
                 let without_part = if !related_field.is_hidden {
                     format!("Without{}", capitalize(rf.name.clone()))
@@ -137,28 +138,28 @@ pub trait CreateInputTypeBuilderExtension<'a>: InputTypeBuilderBase<'a> {
         input_field("create", input_object, None)
     }
 
-    /// Returns true if the field should be filtered for create input type building.
+    /// Returns true if the field should be kept for create input type building.
     #[rustfmt::skip]
     fn do_filter(field: &ScalarFieldRef) -> bool {
-        match (field.behaviour.as_ref(), field.type_identifier) {
+        match (field.behaviour.as_ref(), field.type_identifier) {         //add example syntax behind lines
             _ if !field.is_id()                                                                      => true,
 
-            (Some(FieldBehaviour::Id { strategy: IdStrategy::Auto, .. }), TypeIdentifier::Int)       => false,
-            (None, TypeIdentifier::Int)                                                              => false,
 
-            (Some(FieldBehaviour::Id { strategy: IdStrategy::Auto, .. }), TypeIdentifier::UUID)      => true,
-            (Some(FieldBehaviour::Id { strategy: IdStrategy::Auto, .. }), TypeIdentifier::GraphQLID) => true,
-            (None, TypeIdentifier::UUID)                                                             => true,
-            (None, TypeIdentifier::GraphQLID)                                                        => true,
+            (Some(FieldBehaviour::Id { strategy: IdStrategy::Auto, .. }), TypeIdentifier::UUID)      => true,  //id String    @id @default(uuid())
+            (Some(FieldBehaviour::Id { strategy: IdStrategy::Auto, .. }), TypeIdentifier::GraphQLID) => true,  //id String    @id @default(cuid())
 
-            (Some(FieldBehaviour::Id { strategy: IdStrategy::None, .. }), TypeIdentifier::Int)       => false,
+            (Some(FieldBehaviour::Id { strategy: IdStrategy::None, .. }), TypeIdentifier::String)    => true,  //id String    @id
+            (Some(FieldBehaviour::Id { strategy: IdStrategy::None, .. }), TypeIdentifier::UUID)      => true,  //
+            (Some(FieldBehaviour::Id { strategy: IdStrategy::None, .. }), TypeIdentifier::GraphQLID) => true,  // 
 
-            (Some(FieldBehaviour::Id { strategy: IdStrategy::None, .. }), TypeIdentifier::UUID)      => true,
-            (Some(FieldBehaviour::Id { strategy: IdStrategy::None, .. }), TypeIdentifier::GraphQLID) => true,
+            (Some(FieldBehaviour::Id { strategy: IdStrategy::Auto, .. }), TypeIdentifier::Int)       => false, //id Int       @id @default(autoincrement())
+            (Some(FieldBehaviour::Id { strategy: IdStrategy::None, .. }), TypeIdentifier::Int)       => false, //id Int       @id  
+            (Some(FieldBehaviour::Id { strategy: IdStrategy::Sequence, .. }), TypeIdentifier::Int)   => false, //id Int       @id @sequence...
 
-            (Some(FieldBehaviour::Id { strategy: IdStrategy::Sequence, .. }), TypeIdentifier::Int)   => false,
-
-            _ => panic!("Id Behaviour unhandled"),
+            (None, TypeIdentifier::GraphQLID)                                                        => true,  //can probably go away
+            (None, TypeIdentifier::UUID)                                                             => true,  //can probably go away
+            (None, TypeIdentifier::Int)                                                              => false, //can probably go away
+            x => panic!("Id Behaviour unhandled: {:?}", x),
         }
     }
 }

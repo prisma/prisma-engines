@@ -1,7 +1,7 @@
 use super::*;
 
 /// Represents arbitrary, even nested, expressions.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Expression {
     /// Any numeric value e.g. floats or ints.
     NumericValue(String, Span),

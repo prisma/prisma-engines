@@ -197,6 +197,24 @@ impl ValueValidator {
         }
     }
 
+    /// returns a (Some(a), _) if the value comes from an env var
+    /// returns a (_, Some(b)) if the value could be parsed into a bool
+    pub fn as_bool_from_env(&self) -> Result<(Option<String>, Option<bool>), DatamodelError> {
+        match &self.value {
+            MaybeExpression::Value(env_var, ast::Expression::BooleanValue(value, _)) => {
+                let parsed_result = self.wrap_error_from_result(value.parse::<bool>(), "boolean");
+                let the_bool = parsed_result.ok();
+                Ok((env_var.clone(), the_bool))
+            }
+            MaybeExpression::Value(env_var, ast::Expression::Any(value, _)) => {
+                let parsed_result = self.wrap_error_from_result(value.parse::<bool>(), "boolean");
+                let the_bool = parsed_result.ok();
+                Ok((env_var.clone(), the_bool))
+            }
+            _ => Err(self.construct_error("boolean")),
+        }
+    }
+
     // TODO: Ask which datetime type to use.
     /// Tries to convert the wrapped value to a Prisma DateTime.
     pub fn as_date_time(&self) -> Result<DateTime<Utc>, DatamodelError> {

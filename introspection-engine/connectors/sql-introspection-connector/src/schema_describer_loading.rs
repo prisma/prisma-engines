@@ -5,11 +5,21 @@ use quaint::{
 };
 use sql_schema_describer::SqlSchemaDescriberBackend;
 use std::sync::Arc;
+use std::time::Duration;
+
+const CONNECTION_TIMEOUT: Duration = Duration::from_secs(10);
 
 pub async fn load_describer(url: &str) -> Result<(Box<dyn SqlSchemaDescriberBackend>, ConnectionInfo), QuaintError> {
-    let wrapper = Quaint::new(&url).await?;
+    let wrapper_fut = async {
+        let connection = Quaint::new(&url).await?;
+        connection.query_raw("SELECT 1", &[]).await?;
+        Result::Ok::<_, QuaintError>(connection)
+    };
 
-    wrapper.query_raw("SELECT 1", &[]).await?;
+    let wrapper = match tokio::time::timeout(CONNECTION_TIMEOUT, wrapper_fut).await {
+        Ok(result) => result?,
+        Err(_elapsed) => return Err(QuaintError::ConnectTimeout),
+    };
 
     let connection_info = wrapper.connection_info().to_owned();
 

@@ -8,6 +8,7 @@ use introspection_connector::{ConnectorError, ConnectorResult, DatabaseMetadata,
 use quaint::prelude::ConnectionInfo;
 use sql_schema_describer::{SqlSchema, SqlSchemaDescriberBackend};
 use std::future::Future;
+use tracing_futures::Instrument;
 
 pub use error::*;
 
@@ -20,16 +21,19 @@ pub struct SqlIntrospectionConnector {
 
 impl SqlIntrospectionConnector {
     pub async fn new(url: &str) -> ConnectorResult<SqlIntrospectionConnector> {
-        let (describer, connection_info) =
-            schema_describer_loading::load_describer(&url)
-                .await
-                .map_err(|quaint_error| {
-                    ConnectionInfo::from_url(url)
-                        .map(|connection_info| {
-                            SqlIntrospectionError::Quaint(quaint_error).into_connector_error(&connection_info)
-                        })
-                        .unwrap_or_else(|err| ConnectorError::url_parse_error(err, url))
-                })?;
+        let (describer, connection_info) = schema_describer_loading::load_describer(&url)
+            .instrument(tracing::debug_span!("Loading describer"))
+            .await
+            .map_err(|quaint_error| {
+                ConnectionInfo::from_url(url)
+                    .map(|connection_info| {
+                        SqlIntrospectionError::Quaint(quaint_error).into_connector_error(&connection_info)
+                    })
+                    .unwrap_or_else(|err| ConnectorError::url_parse_error(err, url))
+            })?;
+
+        tracing::debug!("SqlIntrospectionConnector initialized.");
+
         Ok(SqlIntrospectionConnector {
             describer,
             connection_info,

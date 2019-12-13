@@ -53,7 +53,7 @@ impl SqlSchemaDescriber {
     }
 
     async fn get_databases(&self) -> Vec<String> {
-        debug!("Getting table names");
+        debug!("Getting databases");
         let sql = "PRAGMA database_list;";
         let rows = self.conn.query_raw(sql, &[]).await.expect("get schema names ");
         let names = rows
@@ -89,8 +89,12 @@ impl SqlSchemaDescriber {
         let result = self.conn.query_raw(&sql, &[]).await.expect("get db size ");
         let size: i64 = result
             .first()
-            .and_then(|row| row.get("size")?.as_i64())
-            .expect("convert db size result");
+            .map(|row| {
+                row.get("size")
+                    .and_then(|x| x.as_i64())
+                    .unwrap_or(0)
+            })
+            .unwrap();
 
         size.try_into().unwrap()
     }
@@ -124,6 +128,7 @@ impl SqlSchemaDescriber {
                     Some(p) => panic!(format!("expected a string value but got {:?}", p)),
                     None => panic!("couldn't get dflt_value column"),
                 };
+
                 let is_required = row.get("notnull").and_then(|x| x.as_bool()).expect("notnull");
                 let arity = if is_required {
                     ColumnArity::Required
@@ -360,7 +365,7 @@ fn get_column_type(tpe: &str, arity: ColumnArity) -> ColumnType {
         "float[]" => ColumnTypeFamily::Float,
         "integer[]" => ColumnTypeFamily::Int,
         "text[]" => ColumnTypeFamily::String,
-        _ => ColumnTypeFamily::Unknown, //        x => panic!(format!("type '{}' is not supported here yet", x)),
+        _ => ColumnTypeFamily::Unknown,
     };
     ColumnType {
         raw: tpe.to_string(),

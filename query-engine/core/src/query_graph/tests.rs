@@ -1,5 +1,7 @@
 use super::*;
 use crate::{Query, ReadQuery, RecordQuery};
+use prisma_models::SelectedFields;
+use std::sync::Arc;
 
 #[test]
 fn test_direct_children() {
@@ -119,5 +121,15 @@ fn test_invalid_self_connecting_edge() {
 }
 
 fn dummy_query() -> Query {
-    Query::Read(ReadQuery::RecordQuery(RecordQuery::default()))
+    let test_dm = connector::test_data_model();
+
+    Query::Read(ReadQuery::RecordQuery(RecordQuery {
+        alias: None,
+        name: "Test".to_owned(),
+        model: Arc::clone(test_dm.models().first().unwrap()),
+        filter: None,
+        selected_fields: SelectedFields::default(),
+        nested: vec![],
+        selection_order: vec![],
+    }))
 }

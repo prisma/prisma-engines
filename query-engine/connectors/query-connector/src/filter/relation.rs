@@ -3,14 +3,14 @@ use crate::filter::Filter;
 use prisma_models::RelationField;
 use std::sync::Arc;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct RelationFilter {
     pub field: Arc<RelationField>,
     pub nested_filter: Box<Filter>,
     pub condition: RelationCondition,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct OneRelationIsNullFilter {
     pub field: Arc<RelationField>,
 }
@@ -20,7 +20,7 @@ pub enum RelationCondition {
     EveryRelatedRecord,
     AtLeastOneRelatedRecord,
     NoRelatedRecord,
-    ToOneRelatedRecord, // TODO: This is needed for Mongo and should be discussed with Matthias
+    ToOneRelatedRecord,
 }
 
 impl RelationCondition {
@@ -40,8 +40,7 @@ impl RelationCompare for Arc<RelationField> {
     /// # use serde_json;
     /// # use std::{fs::File, sync::Arc};
     /// #
-    /// # let tmp: InternalDataModelTemplate = serde_json::from_reader(File::open("../sql-query-connector/test_schema.json").unwrap()).unwrap();
-    /// # let schema = tmp.build(String::from("test"));
+    /// # let schema = test_data_model();
     /// # let user = schema.find_model("User").unwrap();
     /// # let site = schema.find_model("Site").unwrap();
     /// #
@@ -90,8 +89,7 @@ impl RelationCompare for Arc<RelationField> {
     /// # use serde_json;
     /// # use std::{fs::File, sync::Arc};
     /// #
-    /// # let tmp: InternalDataModelTemplate = serde_json::from_reader(File::open("../sql-query-connector/test_schema.json").unwrap()).unwrap();
-    /// # let schema = tmp.build(String::from("test"));
+    /// # let schema = test_data_model();
     /// # let user = schema.find_model("User").unwrap();
     /// # let site = schema.find_model("Site").unwrap();
     /// #
@@ -140,8 +138,7 @@ impl RelationCompare for Arc<RelationField> {
     /// # use serde_json;
     /// # use std::{fs::File, sync::Arc};
     /// #
-    /// # let tmp: InternalDataModelTemplate = serde_json::from_reader(File::open("../sql-query-connector/test_schema.json").unwrap()).unwrap();
-    /// # let schema = tmp.build(String::from("test"));
+    /// # let schema = test_data_model();
     /// # let user = schema.find_model("User").unwrap();
     /// # let site = schema.find_model("Site").unwrap();
     /// #
@@ -190,8 +187,7 @@ impl RelationCompare for Arc<RelationField> {
     /// # use serde_json;
     /// # use std::{fs::File, sync::Arc};
     /// #
-    /// # let tmp: InternalDataModelTemplate = serde_json::from_reader(File::open("../sql-query-connector/test_schema.json").unwrap()).unwrap();
-    /// # let schema = tmp.build(String::from("test"));
+    /// # let schema = test_data_model();
     /// # let user = schema.find_model("User").unwrap();
     /// # let site = schema.find_model("Site").unwrap();
     /// #
@@ -240,8 +236,7 @@ impl RelationCompare for Arc<RelationField> {
     /// # use serde_json;
     /// # use std::{fs::File, sync::Arc};
     /// #
-    /// # let tmp: InternalDataModelTemplate = serde_json::from_reader(File::open("../sql-query-connector/test_schema.json").unwrap()).unwrap();
-    /// # let schema = tmp.build(String::from("test"));
+    /// # let schema = test_data_model();
     /// # let user = schema.find_model("User").unwrap();
     /// #
     /// let rel_field = user.fields().find_from_relation_fields("sites").unwrap();

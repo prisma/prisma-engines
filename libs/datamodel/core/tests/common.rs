@@ -45,6 +45,7 @@ pub trait DatamodelAsserts {
 pub trait ErrorAsserts {
     fn assert_is(&self, error: DatamodelError) -> &Self;
     fn assert_is_at(&self, index: usize, error: DatamodelError) -> &Self;
+    fn assert_length(&self, length: usize) -> &Self;
 }
 
 impl FieldAsserts for dml::Field {
@@ -264,6 +265,19 @@ impl ErrorAsserts for ErrorCollection {
     fn assert_is_at(&self, index: usize, error: DatamodelError) -> &Self {
         assert_eq!(self.errors[index], error);
         self
+    }
+
+    fn assert_length(&self, length: usize) -> &Self {
+        if self.errors.len() == length {
+            self
+        } else {
+            panic!(
+                "Expected exactly {} validation errors, but got {}. The errors were {:?}",
+                length,
+                self.errors.len(),
+                &self.errors,
+            );
+        }
     }
 }
 

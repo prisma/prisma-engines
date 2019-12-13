@@ -2,22 +2,21 @@ use barrel::{types, Migration};
 use pretty_assertions::assert_eq;
 use sql_schema_describer::*;
 
-mod common;
 mod mysql;
 
-use crate::common::*;
 use crate::mysql::*;
 
 #[tokio::test]
 async fn all_mysql_column_types_must_work() {
-    setup();
+    let db_name = "all_mysql_column_types_must_work";
 
-    let mut migration = Migration::new().schema(SCHEMA);
+    let mut migration = Migration::new().schema(db_name);
     migration.create_table("User", move |t| {
         t.add_column("primary_col", types::primary());
         t.add_column("int_col", types::custom("int"));
         t.add_column("smallint_col", types::custom("smallint"));
-        t.add_column("tinyint_col", types::custom("tinyint"));
+        t.add_column("tinyint4_col", types::custom("tinyint(4)"));
+        t.add_column("tinyint1_col", types::custom("tinyint(1)"));
         t.add_column("mediumint_col", types::custom("mediumint"));
         t.add_column("bigint_col", types::custom("bigint"));
         t.add_column("decimal_col", types::custom("decimal"));
@@ -55,8 +54,8 @@ async fn all_mysql_column_types_must_work() {
     });
 
     let full_sql = migration.make::<barrel::backend::MySql>();
-    let inspector = get_mysql_describer(&full_sql).await;
-    let result = inspector.describe(&SCHEMA.to_string()).await.expect("describing");
+    let inspector = get_mysql_describer_for_schema(&full_sql, db_name).await;
+    let result = inspector.describe(db_name).await.expect("describing");
     let mut table = result.get_table("User").expect("couldn't get User table").to_owned();
     // Ensure columns are sorted as expected when comparing
     table.columns.sort_unstable_by_key(|c| c.name.to_owned());
@@ -95,7 +94,17 @@ async fn all_mysql_column_types_must_work() {
             auto_increment: false,
         },
         Column {
-            name: "tinyint_col".to_string(),
+            name: "tinyint4_col".to_string(),
+            tpe: ColumnType {
+                raw: "tinyint".to_string(),
+                family: ColumnTypeFamily::Int,
+                arity: ColumnArity::Required,
+            },
+            default: None,
+            auto_increment: false,
+        },
+        Column {
+            name: "tinyint1_col".to_string(),
             tpe: ColumnType {
                 raw: "tinyint".to_string(),
                 family: ColumnTypeFamily::Boolean,
@@ -499,7 +508,7 @@ async fn all_mysql_column_types_must_work() {
 
 #[tokio::test]
 async fn mysql_foreign_key_on_delete_must_be_handled() {
-    setup();
+    let db_name = "mysql_foreign_key_on_delete_must_be_handled";
 
     // NB: We don't test the SET DEFAULT variety since it isn't supported on InnoDB and will
     // just cause an error
@@ -512,11 +521,11 @@ async fn mysql_foreign_key_on_delete_must_be_handled() {
             city_restrict INTEGER, FOREIGN KEY(city_restrict) REFERENCES City (id) ON DELETE RESTRICT,
             city_set_null INTEGER, FOREIGN KEY(city_set_null) REFERENCES City (id) ON DELETE SET NULL
         )",
-        SCHEMA
+        db_name
     );
-    let inspector = get_mysql_describer(&sql).await;
+    let inspector = get_mysql_describer_for_schema(&sql, db_name).await;
 
-    let schema = inspector.describe(SCHEMA).await.expect("describing");
+    let schema = inspector.describe(db_name).await.expect("describing");
     let mut table = schema.get_table("User").expect("get User table").to_owned();
     table.foreign_keys.sort_unstable_by_key(|fk| fk.columns.clone());
 
@@ -618,9 +627,9 @@ async fn mysql_foreign_key_on_delete_must_be_handled() {
 
 #[tokio::test]
 async fn mysql_multi_field_indexes_must_be_inferred() {
-    setup();
+    let db_name = "mysql_multi_field_indexes_must_be_inferred";
 
-    let mut migration = Migration::new().schema(SCHEMA);
+    let mut migration = Migration::new().schema(db_name);
     migration.create_table("Employee", move |t| {
         t.add_column("id", types::primary());
         t.add_column("age", types::integer());
@@ -629,8 +638,8 @@ async fn mysql_multi_field_indexes_must_be_inferred() {
     });
 
     let full_sql = migration.make::<barrel::backend::MySql>();
-    let inspector = get_mysql_describer(&full_sql).await;
-    let result = inspector.describe(&SCHEMA.to_string()).await.expect("describing");
+    let inspector = get_mysql_describer_for_schema(&full_sql, db_name).await;
+    let result = inspector.describe(db_name).await.expect("describing");
     let table = result.get_table("Employee").expect("couldn't get Employee table");
 
     assert_eq!(
@@ -645,9 +654,9 @@ async fn mysql_multi_field_indexes_must_be_inferred() {
 
 #[tokio::test]
 async fn mysql_join_table_unique_indexes_must_be_inferred() {
-    setup();
+    let db_name = "mysql_join_table_unique_indexes_must_be_inferred";
 
-    let mut migration = Migration::new().schema(SCHEMA);
+    let mut migration = Migration::new().schema(db_name);
 
     migration.create_table("Cat", move |t| {
         t.add_column("id", types::primary());
@@ -667,8 +676,8 @@ async fn mysql_join_table_unique_indexes_must_be_inferred() {
     });
 
     let full_sql = migration.make::<barrel::backend::MySql>();
-    let inspector = get_mysql_describer(&full_sql).await;
-    let result = inspector.describe(&SCHEMA.to_string()).await.expect("describing");
+    let inspector = get_mysql_describer_for_schema(&full_sql, db_name).await;
+    let result = inspector.describe(db_name).await.expect("describing");
     let table = result.get_table("CatToHuman").expect("couldn't get CatToHuman table");
 
     assert_eq!(
@@ -685,7 +694,7 @@ async fn mysql_join_table_unique_indexes_must_be_inferred() {
 // constraints, introspecting one database should not yield constraints from the other.
 #[tokio::test]
 async fn constraints_from_other_databases_should_not_be_introspected() {
-    setup();
+    let db_name = "constraints_from_other_databases_should_not_be_introspected";
 
     let mut other_migration = Migration::new().schema("other_schema");
 
@@ -721,7 +730,7 @@ async fn constraints_from_other_databases_should_not_be_introspected() {
 
     // Now the migration in the current database.
 
-    let mut migration = Migration::new().schema(SCHEMA);
+    let mut migration = Migration::new().schema(db_name);
 
     migration.create_table("User", |t| {
         t.add_column("id", types::primary());
@@ -733,8 +742,8 @@ async fn constraints_from_other_databases_should_not_be_introspected() {
     });
 
     let full_sql = migration.make::<barrel::backend::MySql>();
-    let inspector = get_mysql_describer_for_schema(&full_sql, SCHEMA).await;
-    let schema = inspector.describe(&SCHEMA.to_string()).await.expect("describing");
+    let inspector = get_mysql_describer_for_schema(&full_sql, db_name).await;
+    let schema = inspector.describe(db_name).await.expect("describing");
     let table = schema.table_bang("Post");
 
     let fks = &table.foreign_keys;

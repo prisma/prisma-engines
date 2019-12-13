@@ -162,7 +162,11 @@ impl<'a> SqlSchemaCalculator<'a> {
                             },
                         };
                         model_table.table.columns.push(column);
-                        model_table.table.foreign_keys.push(foreign_key)
+                        model_table.table.foreign_keys.push(foreign_key);
+
+                        if relation.is_one_to_one() {
+                            add_one_to_one_relation_unique_index(&mut model_table.table, column_name)
+                        }
                     }
                     _ => {}
                 }
@@ -389,4 +393,14 @@ fn column_type_for_scalar_type(scalar_type: &ScalarType, column_arity: ColumnAri
         ScalarType::DateTime => sql::ColumnType::pure(sql::ColumnTypeFamily::DateTime, column_arity),
         ScalarType::Decimal => unimplemented!(),
     }
+}
+
+fn add_one_to_one_relation_unique_index(table: &mut sql::Table, column_name: &str) {
+    let index = sql::Index {
+        name: format!("{}_{}", table.name, column_name),
+        columns: vec![column_name.to_string()],
+        tpe: sql::IndexType::Unique,
+    };
+
+    table.indices.push(index);
 }

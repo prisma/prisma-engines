@@ -96,9 +96,8 @@ model Author {
 }
 
 model Post {
-  id    Int      @id
+  id    Int    @id
   title String
-  tags  String[]
   blog  Blog
 }"#;
 

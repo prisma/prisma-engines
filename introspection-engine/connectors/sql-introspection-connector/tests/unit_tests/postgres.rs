@@ -23,7 +23,7 @@ async fn introspecting_a_simple_table_with_gql_types_must_work(api: &TestApi) {
                 bool    Boolean
                 date    DateTime
                 float   Float
-                id      Int @id(strategy: NONE) @sequence(name: "Blog_id_seq", allocationSize: 1, initialValue: 1)
+                id      Int @id @sequence(name: "Blog_id_seq", allocationSize: 1, initialValue: 1)
                 int     Int 
                 string  String
             }
@@ -66,7 +66,7 @@ async fn introspecting_a_table_with_unique_index_must_work(api: &TestApi) {
             });
             migration.inject_custom(format!(
                 "Create Unique Index \"test\" on \"{}\".\"Blog\"( \"authorId\")",
-                SCHEMA_NAME
+                api.schema_name()
             ));
         })
         .await;
@@ -74,7 +74,7 @@ async fn introspecting_a_table_with_unique_index_must_work(api: &TestApi) {
     let dm = r#"
             model Blog {
                 authorId String @unique
-                id      Int @id(strategy: NONE) @sequence(name: "Blog_id_seq", allocationSize: 1, initialValue: 1)
+                id      Int @id @sequence(name: "Blog_id_seq", allocationSize: 1, initialValue: 1)
             }
         "#;
     let result = dbg!(api.introspect().await);
@@ -93,14 +93,14 @@ async fn introspecting_a_table_with_multi_column_unique_index_must_work(api: &Te
             });
             migration.inject_custom(format!(
                 "Create Unique Index \"test\" on \"{}\".\"User\"( \"firstname\", \"lastname\")",
-                SCHEMA_NAME,
+                api.schema_name(),
             ));
         })
         .await;
     let dm = r#"
             model User {
                 firstname String
-                id      Int @id(strategy: NONE) @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
+                id      Int @id @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
                 lastname String
                 @@unique([firstname, lastname], name: "test")
             }
@@ -123,7 +123,7 @@ async fn introspecting_a_table_with_required_and_optional_columns_must_work(api:
         .await;
     let dm = r#"
             model User {
-                id      Int @id(strategy: NONE) @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
+                id      Int @id @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
                 optionalname String?
                 requiredname String
             }
@@ -145,7 +145,7 @@ async fn introspecting_a_table_with_required_and_optional_columns_must_work(api:
 //    }).await;
 //    let dm = r#"
 //            model User {
-//                id      Int @id(strategy: NONE) @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
+//                id      Int @id @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
 //                joined DateTime? @default(now())
 //                name String
 //            }
@@ -176,7 +176,7 @@ async fn introspecting_a_table_with_default_values_should_work(api: &TestApi) {
                 bool Boolean @default(false)
                 bool2 Boolean @default(false)
                 float Float @default(5.3)
-                id      Int @id(strategy: NONE) @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
+                id      Int @id @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
                 int Int @default(5)
                 string String @default("Test")
             }
@@ -194,14 +194,14 @@ async fn introspecting_a_table_with_a_non_unique_index_should_work(api: &TestApi
                 t.add_column("a", types::text());
                 t.add_column("id", types::primary());
             });
-            migration.inject_custom(format!("Create Index \"test\" on \"{}\".\"User\"(\"a\")", SCHEMA_NAME));
+            migration.inject_custom(format!("Create Index \"test\" on \"{}\".\"User\"(\"a\")", api.schema_name()));
         })
         .await;
 
     let dm = r#"
             model User {
                 a String
-                id      Int @id(strategy: NONE) @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
+                id      Int @id @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
                 @@index([a], name: "test")
             }
         "#;
@@ -221,7 +221,7 @@ async fn introspecting_a_table_with_a_multi_column_non_unique_index_should_work(
             });
             migration.inject_custom(format!(
                 "Create Index \"test\" on \"{}\".\"User\"(\"a\",\"b\")",
-                SCHEMA_NAME
+                api.schema_name()
             ));
         })
         .await;
@@ -230,7 +230,7 @@ async fn introspecting_a_table_with_a_multi_column_non_unique_index_should_work(
             model User {
                 a String
                 b String
-                id      Int @id(strategy: NONE) @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
+                id      Int @id @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
                 @@index([a,b], name: "test")
             }
         "#;
@@ -256,12 +256,12 @@ async fn introspecting_a_one_to_one_req_relation_should_work(api: &TestApi) {
 
     let dm = r#"
               model Post {
-               id      Int @id(strategy: NONE) @sequence(name: "Post_id_seq", allocationSize: 1, initialValue: 1)
+               id      Int @id @sequence(name: "Post_id_seq", allocationSize: 1, initialValue: 1)
                user_id User
             }
           
             model User {
-               id      Int @id(strategy: NONE) @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
+               id      Int @id @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
                post Post? 
             }
         "#;
@@ -280,18 +280,18 @@ async fn introspecting_two_one_to_one_relations_between_the_same_models_should_w
                 t.add_column("id", types::primary());
                 t.inject_custom("user_id INTEGER NOT NULL UNIQUE REFERENCES \"User\"(\"id\")")
             });
-            migration.inject_custom(format!("ALTER TABLE \"{}\".\"User\" ADD Column \"post_id\" INTEGER NOT NULL UNIQUE REFERENCES \"Post\"(\"id\")", SCHEMA_NAME))
+            migration.inject_custom(format!("ALTER TABLE \"{}\".\"User\" ADD Column \"post_id\" INTEGER NOT NULL UNIQUE REFERENCES \"Post\"(\"id\")", api.schema_name()))
         }).await;
 
     let dm = r#"
             model Post {
-               id      Int @id(strategy: NONE) @sequence(name: "Post_id_seq", allocationSize: 1, initialValue: 1)
+               id      Int @id @sequence(name: "Post_id_seq", allocationSize: 1, initialValue: 1)
                user_id User  @relation("Post_user_idToUser")
                user    User? @relation("PostToUser_post_id", references: [post_id])
             }
         
             model User {
-               id      Int @id(strategy: NONE) @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
+               id      Int @id @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
                post_id Post  @relation("PostToUser_post_id")
                post Post?    @relation("Post_user_idToUser")
             }
@@ -316,12 +316,12 @@ async fn introspecting_a_one_to_one_relation_should_work(api: &TestApi) {
         .await;
     let dm = r#"        
             model Post {
-               id      Int @id(strategy: NONE) @sequence(name: "Post_id_seq", allocationSize: 1, initialValue: 1)
+               id      Int @id @sequence(name: "Post_id_seq", allocationSize: 1, initialValue: 1)
                user_id User?
             }
             
             model User {
-               id      Int @id(strategy: NONE) @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
+               id      Int @id @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
                post Post? 
             }
         "#;
@@ -345,12 +345,12 @@ async fn introspecting_a_one_to_many_relation_should_work(api: &TestApi) {
         .await;
     let dm = r#"  
             model Post {
-               id      Int @id(strategy: NONE) @sequence(name: "Post_id_seq", allocationSize: 1, initialValue: 1)
+               id      Int @id @sequence(name: "Post_id_seq", allocationSize: 1, initialValue: 1)
                user_id User?
             }
             
             model User {
-               id      Int @id(strategy: NONE) @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
+               id      Int @id @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
                posts Post[] 
             }
         "#;
@@ -374,12 +374,12 @@ async fn introspecting_a_one_req_to_many_relation_should_work(api: &TestApi) {
         .await;
     let dm = r#"
             model Post {
-               id      Int @id(strategy: NONE) @sequence(name: "Post_id_seq", allocationSize: 1, initialValue: 1)
+               id      Int @id @sequence(name: "Post_id_seq", allocationSize: 1, initialValue: 1)
                user_id User
             }
             
             model User {
-               id      Int @id(strategy: NONE) @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
+               id      Int @id @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
                posts Post[] 
             }
        "#;
@@ -406,19 +406,19 @@ async fn introspecting_a_prisma_many_to_many_relation_should_work(api: &TestApi)
             });
             migration.inject_custom(format!(
                 "CREATE UNIQUE INDEX test ON \"{}\".\"_PostToUser\" (\"a\", \"b\");",
-                SCHEMA_NAME
+                api.schema_name()
             ))
         })
         .await;
 
     let dm = r#"
             model Post {
-               id      Int @id(strategy: NONE) @sequence(name: "Post_id_seq", allocationSize: 1, initialValue: 1)
+               id      Int @id @sequence(name: "Post_id_seq", allocationSize: 1, initialValue: 1)
                users User[] 
             }
             
             model User {
-               id      Int @id(strategy: NONE) @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
+               id      Int @id @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
                posts Post[] 
             }
         "#;
@@ -448,7 +448,7 @@ async fn introspecting_a_many_to_many_relation_should_work(api: &TestApi) {
 
     let dm = r#"
             model Post {
-               id      Int @id(strategy: NONE) @sequence(name: "Post_id_seq", allocationSize: 1, initialValue: 1)
+               id      Int @id @sequence(name: "Post_id_seq", allocationSize: 1, initialValue: 1)
                postsToUserses PostsToUsers[] @relation(references: [post_id], onDelete: CASCADE)
             }
 
@@ -458,7 +458,7 @@ async fn introspecting_a_many_to_many_relation_should_work(api: &TestApi) {
             }
             
             model User {
-               id      Int @id(strategy: NONE) @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
+               id      Int @id @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
                postsToUserses PostsToUsers[] @relation( onDelete: CASCADE)
             }
         "#;
@@ -489,7 +489,7 @@ async fn introspecting_a_many_to_many_relation_with_extra_fields_should_work(api
 
     let dm = r#"
             model Post {
-               id      Int @id(strategy: NONE) @sequence(name: "Post_id_seq", allocationSize: 1, initialValue: 1)
+               id      Int @id @sequence(name: "Post_id_seq", allocationSize: 1, initialValue: 1)
                postsToUserses PostsToUsers[] @relation(references: [post_id])
             }
             
@@ -500,7 +500,7 @@ async fn introspecting_a_many_to_many_relation_with_extra_fields_should_work(api
             }
             
             model User {
-               id      Int @id(strategy: NONE) @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
+               id      Int @id @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
                postsToUserses PostsToUsers[] 
             }
         "#;
@@ -524,7 +524,7 @@ async fn introspecting_a_self_relation_should_work(api: &TestApi) {
     let dm = r#"
             model User {
                 direct_report                  User?  @relation("UserToUser_direct_report")
-                id      Int @id(strategy: NONE) @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
+                id      Int @id @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
                 recruited_by                   User?  @relation("UserToUser_recruited_by")
                 users_UserToUser_direct_report User[] @relation("UserToUser_direct_report")
                 users_UserToUser_recruited_by  User[] @relation("UserToUser_recruited_by")
@@ -539,7 +539,7 @@ async fn introspecting_a_self_relation_should_work(api: &TestApi) {
 #[test_one_connector(connector = "postgres")]
 async fn introspecting_cascading_delete_behaviour_should_work(api: &TestApi) {
     let barrel = api.barrel();
-    let _setup_schema = barrel
+    barrel
         .execute(|migration| {
             migration.create_table("User", |t| {
                 t.add_column("id", types::primary());
@@ -553,12 +553,12 @@ async fn introspecting_cascading_delete_behaviour_should_work(api: &TestApi) {
 
     let dm = r#"  
             model Post {
-               id      Int @id(strategy: NONE) @sequence(name: "Post_id_seq", allocationSize: 1, initialValue: 1)
+               id      Int @id @sequence(name: "Post_id_seq", allocationSize: 1, initialValue: 1)
                user_id User?
             }
             
             model User {
-               id      Int @id(strategy: NONE) @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
+               id    Int @id @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
                posts Post[] @relation(onDelete: CASCADE)
             }
         "#;
@@ -580,9 +580,13 @@ async fn introspecting_native_arrays_should_work(api: &TestApi) {
         });
     }).await;
 
-    let dm = r#"  
+    let dm = r#"
+            datasource pg {
+              provider = "postgres"
+              url = "postgresql://localhost:5432"
+            }
             model Post {
-               id      Int @id(strategy: NONE) @sequence(name: "Post_id_seq", allocationSize: 1, initialValue: 1)
+               id      Int @id @sequence(name: "Post_id_seq", allocationSize: 1, initialValue: 1)
                ints Int []
             }
         "#;

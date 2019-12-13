@@ -72,7 +72,8 @@ pub fn parse_datamodel(datamodel_string: &str) -> Result<Datamodel, error::Error
 /// [Datamodel](/struct.Datamodel.html).
 pub fn lift_ast(ast: &ast::SchemaAst) -> Result<Datamodel, error::ErrorCollection> {
     let mut errors = error::ErrorCollection::new();
-    let validator = ValidationPipeline::with_sources(&[]);
+    let sources = load_sources(ast, vec![])?;
+    let validator = ValidationPipeline::with_sources(&sources);
 
     match validator.validate(&ast) {
         Ok(src) => Ok(src),
@@ -130,6 +131,10 @@ pub fn parse_datamodel_with_sources(
             Err(errors)
         }
     }
+}
+
+pub fn parse_schema_ast(datamodel_string: &str) -> Result<SchemaAst, error::ErrorCollection> {
+    ast::parser::parse(datamodel_string)
 }
 
 /// Loads all configuration blocks from a datamodel using the built-in source definitions.

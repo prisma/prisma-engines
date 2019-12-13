@@ -239,3 +239,46 @@ async fn altering_a_column_with_non_null_values_should_warn(api: &TestApi) {
         }]
     );
 }
+
+#[test_each_connector]
+async fn dropping_a_table_referenced_by_foreign_keys_must_work(api: &TestApi) {
+    use quaint::ast::*;
+
+    let dm1 = r#"
+        model Category {
+            id Int @id
+            name String
+        }
+
+        model Recipe {
+            id Int @id
+            category Category
+        }
+    "#;
+
+    let sql_schema = api.infer_and_apply(&dm1).await.sql_schema;
+    assert!(sql_schema.table("Category").is_ok());
+
+    let id = 1;
+
+    let insert = Insert::single_into(api.render_table_name("Category")).value("name", "desserts").value("id", id);
+    api.database().query(insert.into()).await.unwrap();
+
+    let insert = Insert::single_into(api.render_table_name("Recipe")).value("category", id);
+    api.database().query(insert.into()).await.unwrap();
+
+    let fk = sql_schema.table_bang("Recipe").foreign_keys.get(0).unwrap();
+    assert_eq!(fk.referenced_table, "Category");
+
+    let dm2 = r#"
+        model Recipe {
+            id Int @id
+        }
+    "#;
+
+    api.infer_and_apply_with_options(InferAndApplyBuilder::new(&dm2).force(Some(true)).build()).await.unwrap();
+    let sql_schema = api.introspect_database().await.unwrap();
+
+    assert!(sql_schema.table("Category").is_err());
+    assert!(sql_schema.table_bang("Recipe").foreign_keys.is_empty());
+}

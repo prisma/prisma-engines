@@ -3,6 +3,7 @@ use quaint::prelude::Queryable;
 use sql_renderer::SqlRenderer;
 use sql_schema_describer::*;
 use std::sync::Arc;
+use tracing_futures::Instrument;
 
 pub struct SqlDatabaseStepApplier {
     pub connection_info: ConnectionInfo,
@@ -13,12 +14,15 @@ pub struct SqlDatabaseStepApplier {
 #[async_trait::async_trait]
 impl DatabaseMigrationStepApplier<SqlMigration> for SqlDatabaseStepApplier {
     async fn apply_step(&self, database_migration: &SqlMigration, index: usize) -> ConnectorResult<bool> {
-        self.apply_next_step(&database_migration.corrected_steps, index).await
+        self.apply_next_step(&database_migration.corrected_steps, index)
+            .instrument(tracing::debug_span!("ApplySqlStep", index))
+            .await
             .map_err(|sql_error| sql_error.into_connector_error(&self.connection_info))
     }
 
     async fn unapply_step(&self, database_migration: &SqlMigration, index: usize) -> ConnectorResult<bool> {
         self.apply_next_step(&database_migration.rollback, index)
+            .instrument(tracing::debug_span!("UnapplySqlStep", index))
             .await
             .map_err(|sql_error| sql_error.into_connector_error(&self.connection_info))
     }
@@ -34,15 +38,17 @@ impl DatabaseMigrationStepApplier<SqlMigration> for SqlDatabaseStepApplier {
 }
 
 impl SqlDatabaseStepApplier {
-    async fn apply_next_step(&self, steps: &Vec<SqlMigrationStep>, index: usize) -> SqlResult<bool> {
+    async fn apply_next_step(&self, steps: &[SqlMigrationStep], index: usize) -> SqlResult<bool> {
         let has_this_one = steps.get(index).is_some();
         if !has_this_one {
             return Ok(false);
         }
 
         let step = &steps[index];
+        tracing::debug!(?step);
+
         let sql_string = render_raw_sql(&step, self.sql_family(), &self.schema_name);
-        debug!("{}", sql_string);
+        tracing::debug!(index, %sql_string);
 
         let result = self.conn.query_raw(&sql_string, &[]).await;
 

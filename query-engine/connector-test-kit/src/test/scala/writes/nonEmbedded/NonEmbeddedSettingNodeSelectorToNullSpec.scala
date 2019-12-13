@@ -31,7 +31,7 @@ class NonEmbeddedSettingNodeSelectorToNullSpec extends FlatSpec with Matchers wi
         |    b: "abc"
         |    key: "abc"
         |    c: {
-        |       create:{ c: "C"}
+        |       create:{ c: "C" }
         |    }
         |  }) {
         |    id
@@ -78,9 +78,9 @@ class NonEmbeddedSettingNodeSelectorToNullSpec extends FlatSpec with Matchers wi
     val result = server.query(
       """
         |{
-        | as {
+        | as  (orderBy: id_ASC){
         |   b
-        |   c {
+        |   c{
         |     c
         |   }
         | }

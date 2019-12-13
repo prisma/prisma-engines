@@ -1,5 +1,6 @@
 use super::*;
-use crate::{query_ast::*, query_graph::*, ParsedInputValue};
+use crate::{query_ast::*, query_graph::*, InputAssertions, ParsedInputValue};
+use connector::{Filter, ScalarCompare};
 use itertools::Itertools;
 use prisma_models::{GraphqlId, ModelRef, PrismaValue, RelationFieldRef};
 use std::{collections::HashSet, convert::TryInto, iter::FromIterator, sync::Arc};
@@ -18,19 +19,28 @@ pub fn connect_nested_set(
 ) -> QueryGraphBuilderResult<()> {
     let relation = parent_relation_field.relation();
 
-    // Build all finders upfront.
-    let finders: Vec<RecordFinder> = utils::coerce_vec(value)
+    // Build all filters upfront.
+    let filters: Vec<Filter> = utils::coerce_vec(value)
         .into_iter()
-        .map(|value: ParsedInputValue| extract_record_finder(value, &child_model))
-        .collect::<QueryGraphBuilderResult<Vec<RecordFinder>>>()?
+        .map(|value: ParsedInputValue| {
+            let value: ParsedInputMap = value.try_into()?;
+
+            value.assert_size(1)?;
+            value.assert_non_null()?;
+
+            extract_filter(value, &child_model, false)
+        })
+        .collect::<QueryGraphBuilderResult<Vec<Filter>>>()?
         .into_iter()
         .unique()
         .collect();
 
+    let filter = Filter::or(filters);
+
     if relation.is_many_to_many() {
-        handle_many_to_many(graph, parent_node, parent_relation_field, finders)
+        handle_many_to_many(graph, parent_node, parent_relation_field, filter)
     } else if relation.is_one_to_many() {
-        handle_one_to_many(graph, parent_node, parent_relation_field, finders)
+        handle_one_to_many(graph, parent_node, parent_relation_field, filter)
     } else {
         panic!("Set is not supported on one-to-one relations.");
     }
@@ -79,10 +89,11 @@ fn handle_many_to_many(
     graph: &mut QueryGraph,
     parent_node: &NodeRef,
     parent_relation_field: &RelationFieldRef,
-    finders: Vec<RecordFinder>,
+    filter: Filter,
 ) -> QueryGraphBuilderResult<()> {
     let child_model = parent_relation_field.related_model();
-    let read_old_node = utils::insert_find_children_by_parent_node(graph, parent_node, parent_relation_field, None)?;
+    let read_old_node =
+        utils::insert_find_children_by_parent_node(graph, parent_node, parent_relation_field, Filter::empty())?;
 
     let disconnect = WriteQuery::DisconnectRecords(DisconnectRecords {
         parent_id: None,
@@ -126,9 +137,9 @@ fn handle_many_to_many(
         })),
     )?;
 
-    if finders.len() > 0 {
-        let expected_connects = finders.len();
-        let read_new_query = utils::read_ids_infallible(&child_model, finders);
+    if filter.size() > 0 {
+        let expected_connects = filter.size();
+        let read_new_query = utils::read_ids_infallible(&child_model, filter);
         let read_new_node = graph.create_node(read_new_query);
 
         graph.create_edge(&disconnect_node, &read_new_node, QueryGraphDependency::ExecutionOrder)?;
@@ -194,11 +205,12 @@ fn handle_one_to_many(
     graph: &mut QueryGraph,
     parent_node: &NodeRef,
     parent_relation_field: &RelationFieldRef,
-    finders: Vec<RecordFinder>,
+    filter: Filter,
 ) -> QueryGraphBuilderResult<()> {
     let child_model = parent_relation_field.related_model();
-    let read_old_node = utils::insert_find_children_by_parent_node(graph, parent_node, parent_relation_field, None)?;
-    let read_new_query = utils::read_ids_infallible(&child_model, finders);
+    let read_old_node =
+        utils::insert_find_children_by_parent_node(graph, parent_node, parent_relation_field, Filter::empty())?;
+    let read_new_query = utils::read_ids_infallible(&child_model, filter);
     let read_new_node = graph.create_node(read_new_query);
     let diff_node = graph.create_node(Node::Computation(Computation::empty_diff()));
 
@@ -234,7 +246,7 @@ fn handle_one_to_many(
 
     // Update (connect) case: Check left diff IDs
     let connect_if_node = graph.create_node(Node::Flow(Flow::default_if()));
-    let update_connect_node = utils::update_records_node_placeholder(graph, None, Arc::clone(&child_model));
+    let update_connect_node = utils::update_records_node_placeholder(graph, Filter::empty(), Arc::clone(&child_model));
     let relation_field_name = parent_relation_field.related_field().name.clone();
 
     graph.create_edge(
@@ -281,15 +293,16 @@ fn handle_one_to_many(
             let diff_result = result.as_diff_result().unwrap();
 
             if let Node::Query(Query::Write(WriteQuery::UpdateManyRecords(ref mut ur))) = node {
-                ur.filter = diff_result
-                    .left
-                    .iter()
-                    .map(|id| RecordFinder {
-                        field: id_field.clone(),
-                        value: id.into(),
-                    })
-                    .collect::<Vec<RecordFinder>>()
-                    .into();
+                ur.filter = Filter::or(
+                    diff_result
+                        .left
+                        .iter()
+                        .map(|id| {
+                            let id: PrismaValue = id.into();
+                            id_field.clone().equals(id)
+                        })
+                        .collect::<Vec<Filter>>(),
+                );
             }
 
             Ok(node)
@@ -298,7 +311,8 @@ fn handle_one_to_many(
 
     // Update (disconnct) case: Check right diff IDs.
     let disconnect_if_node = graph.create_node(Node::Flow(Flow::default_if()));
-    let update_disconnect_node = utils::update_records_node_placeholder(graph, None, Arc::clone(&child_model));
+    let update_disconnect_node =
+        utils::update_records_node_placeholder(graph, Filter::empty(), Arc::clone(&child_model));
     let relation_field_name = parent_relation_field.related_field().name.clone();
     let child_side_required = parent_relation_field.related_field().is_required;
     let rf = Arc::clone(parent_relation_field);
@@ -332,15 +346,16 @@ fn handle_one_to_many(
             let diff_result = result.as_diff_result().unwrap();
 
             if let Node::Query(Query::Write(WriteQuery::UpdateManyRecords(ref mut ur))) = node {
-                ur.filter = diff_result
-                    .right
-                    .iter()
-                    .map(|id| RecordFinder {
-                        field: id_field.clone(),
-                        value: id.into(),
-                    })
-                    .collect::<Vec<RecordFinder>>()
-                    .into();
+                ur.filter = Filter::or(
+                    diff_result
+                        .right
+                        .iter()
+                        .map(|id| {
+                            let id: PrismaValue = id.into();
+                            id_field.clone().equals(id)
+                        })
+                        .collect::<Vec<Filter>>(),
+                );
             }
 
             if let Node::Query(Query::Write(ref mut wq)) = node {
@@ -353,67 +368,3 @@ fn handle_one_to_many(
 
     Ok(())
 }
-
-// let mut finders = Vec::new();
-// for value in utils::coerce_vec(value) {
-//     let record_finder = extract_record_finder(value, &child_model)?;
-//     finders.push(record_finder);
-// }
-
-// let child_read_query = utils::read_ids_infallible(&child_model, finders);
-// let child_node = graph.create_node(child_read_query);
-
-// graph.create_edge(&parent_node, &child_node, QueryGraphDependency::ExecutionOrder)?;
-// // connect::connect_records_node(graph, &parent_node, &child_node, &parent_relation_field, None, None)?;
-
-// let set = WriteQuery::SetRecords(SetRecords {
-//     parent: None,
-//     wheres: vec![],
-//     relation_field: Arc::clone(&parent_relation_field),
-// });
-
-// let set_node = graph.create_node(Query::Write(set));
-
-// // Edge from parent to set.
-// graph.create_edge(
-//     &parent_node,
-//     &set_node,
-//     QueryGraphDependency::ParentIds(Box::new(|mut child_node, mut parent_ids| {
-//         let len = parent_ids.len();
-//         if len == 0 {
-//             Err(QueryGraphBuilderError::AssertionError(format!(
-//                 "Required exactly one parent ID to be present for set query, found none."
-//             )))
-//         } else if len > 1 {
-//             Err(QueryGraphBuilderError::AssertionError(format!(
-//                 "Required exactly one parent ID to be present for set query, found {}.",
-//                 len
-//             )))
-//         } else {
-//             if let Node::Query(Query::Write(WriteQuery::SetRecords(ref mut x))) = child_node {
-//                 let parent_id = parent_ids.pop().unwrap();
-//                 x.parent = Some(parent_id.try_into()?);
-//             }
-
-//             Ok(child_node)
-//         }
-//     })),
-// )?;
-
-// // Edge from child to set.
-// graph.create_edge(
-//     &child_node,
-//     &set_node,
-//     QueryGraphDependency::ParentIds(Box::new(|mut child_node, parent_ids| {
-//         if let Node::Query(Query::Write(WriteQuery::SetRecords(ref mut x))) = child_node {
-//             x.wheres = parent_ids
-//                 .iter()
-//                 .map(|x| x.try_into().expect("Prisma Value was not a GraphqlId"))
-//                 .collect();
-//         }
-
-//         Ok(child_node)
-//     })),
-// )?;
-
-// Ok(())

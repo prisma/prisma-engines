@@ -31,8 +31,7 @@ async fn create_one<'a, 'b>(tx: &'a ConnectionLike<'a, 'b>, q: CreateRecord) -> 
 }
 
 async fn update_one<'a, 'b>(tx: &'a ConnectionLike<'a, 'b>, q: UpdateRecord) -> InterpretationResult<QueryResult> {
-    let mut res = tx
-        .update_records(
+    let mut res = tx.update_records(
             &q.model,
             Filter::from(q.where_),
             WriteArgs::new(q.args),

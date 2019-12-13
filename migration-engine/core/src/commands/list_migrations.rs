@@ -4,12 +4,12 @@ use migration_connector::steps::*;
 use migration_connector::*;
 use serde::Serialize;
 
-pub struct ListMigrationStepsCommand;
+pub struct ListMigrationsCommand;
 
 #[async_trait::async_trait]
-impl<'a> MigrationCommand for ListMigrationStepsCommand {
+impl<'a> MigrationCommand for ListMigrationsCommand {
     type Input = serde_json::Value;
-    type Output = Vec<ListMigrationStepsOutput>;
+    type Output = Vec<ListMigrationsOutput>;
 
     async fn execute<C, D>(_input: &Self::Input, engine: &MigrationEngine<C, D>) -> CommandResult<Self::Output>
     where
@@ -17,20 +17,31 @@ impl<'a> MigrationCommand for ListMigrationStepsCommand {
         D: DatabaseMigrationMarker + Send + Sync + 'static,
     {
         let migration_persistence = engine.connector().migration_persistence();
-        let mut result = Vec::new();
 
-        for migration in migration_persistence.load_all().await.into_iter() {
-            result.push(convert_migration_to_list_migration_steps_output(&engine, migration)?);
+        let result: CommandResult<Self::Output> = migration_persistence.load_all()
+            .await
+            .into_iter()
+            .map(|migration| {
+                convert_migration_to_list_migration_steps_output(&engine, migration)
+            })
+            .collect();
+
+        if let Ok(migrations) = result.as_ref() {
+            tracing::info!(
+                "Returning {migrations_count} migrations ({pending_count} pending).",
+                migrations_count = migrations.len(),
+                pending_count = migrations.iter().filter(|mig| mig.status.is_pending()).count(),
+            );
         }
 
-        Ok(result)
+        result
     }
 }
 
 pub fn convert_migration_to_list_migration_steps_output<C, D>(
     engine: &MigrationEngine<C, D>,
     migration: Migration,
-) -> CommandResult<ListMigrationStepsOutput>
+) -> CommandResult<ListMigrationsOutput>
 where
     C: MigrationConnector<DatabaseMigration = D>,
     D: DatabaseMigrationMarker + 'static,
@@ -41,18 +52,18 @@ where
         .database_migration_step_applier()
         .render_steps_pretty(&database_migration)?;
 
-    Ok(ListMigrationStepsOutput {
+    Ok(ListMigrationsOutput {
         id: migration.name,
         datamodel_steps: migration.datamodel_steps,
         database_steps: serde_json::Value::Array(database_steps_json),
         status: migration.status,
-        datamodel: engine.render_datamodel(&migration.datamodel),
+        datamodel: migration.datamodel_string,
     })
 }
 
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct ListMigrationStepsOutput {
+pub struct ListMigrationsOutput {
     pub id: String,
     pub datamodel_steps: Vec<MigrationStep>,
     pub database_steps: serde_json::Value,

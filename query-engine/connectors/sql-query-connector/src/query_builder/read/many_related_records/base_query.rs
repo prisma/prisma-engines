@@ -1,5 +1,5 @@
 use crate::{cursor_condition, filter_conversion::AliasedCondition};
-use connector_interface::{QueryArguments, SkipAndLimit};
+use connector_interface::{OrderDirections, QueryArguments, SkipAndLimit};
 use prisma_models::prelude::*;
 use quaint::ast::{Aliasable, Comparable, ConditionTree, Joinable, Select};
 
@@ -8,8 +8,7 @@ pub struct ManyRelatedRecordsBaseQuery<'a> {
     pub selected_fields: &'a SelectedFields,
     pub from_record_ids: &'a [GraphqlId],
     pub query: Select<'a>,
-    pub order_by: Option<OrderBy>,
-    pub is_reverse_order: bool,
+    pub order_directions: OrderDirections,
     pub condition: ConditionTree<'a>,
     pub cursor: ConditionTree<'a>,
     pub window_limits: (i64, i64),
@@ -27,6 +26,7 @@ impl<'a> ManyRelatedRecordsBaseQuery<'a> {
         let window_limits = query_arguments.window_limits();
         let skip_and_limit = query_arguments.skip_and_limit();
 
+        let order_directions = query_arguments.ordering_directions();
         let condition = query_arguments
             .filter
             .map(|f| f.aliased_cond(None))
@@ -52,16 +52,12 @@ impl<'a> ManyRelatedRecordsBaseQuery<'a> {
             .fold(select, |acc, col| acc.column(col.clone()))
             .inner_join(join);
 
-        let order_by = query_arguments.order_by;
-        let is_reverse_order = query_arguments.last.is_some();
-
         Self {
             from_field,
             selected_fields,
             from_record_ids,
             query,
-            order_by,
-            is_reverse_order,
+            order_directions,
             condition,
             cursor,
             window_limits,

@@ -1,6 +1,9 @@
 #![allow(non_snake_case)]
 
 mod test_harness;
+use migration_core::commands::{
+    CalculateDatabaseStepsCommand, CalculateDatabaseStepsInput, InferMigrationStepsCommand, InferMigrationStepsInput,
+};
 use pretty_assertions::assert_eq;
 use quaint::prelude::SqlFamily;
 use sql_migration_connector::{AlterIndex, CreateIndex, DropIndex, SqlMigrationStep};
@@ -991,7 +994,7 @@ async fn removing_multi_field_unique_index_must_work(api: &TestApi) {
     assert!(index.is_none());
 }
 
-#[test_each_connector]
+#[test_each_connector(ignore = "mysql_mariadb")]
 async fn index_renaming_must_work(api: &TestApi) {
     let dm1 = r#"
             model A {
@@ -1041,7 +1044,7 @@ async fn index_renaming_must_work(api: &TestApi) {
     }
 }
 
-#[test_each_connector]
+#[test_each_connector(ignore = "mysql_mariadb")]
 async fn index_renaming_must_work_when_renaming_to_default(api: &TestApi) {
     let dm1 = r#"
             model A {
@@ -1092,7 +1095,7 @@ async fn index_renaming_must_work_when_renaming_to_default(api: &TestApi) {
     }
 }
 
-#[test_each_connector]
+#[test_each_connector(ignore = "mysql_mariadb")]
 async fn index_renaming_must_work_when_renaming_to_custom(api: &TestApi) {
     let dm1 = r#"
             model A {
@@ -1143,7 +1146,7 @@ async fn index_renaming_must_work_when_renaming_to_custom(api: &TestApi) {
     }
 }
 
-#[test_each_connector]
+#[test_each_connector(ignore = "mysql_mariadb")]
 async fn index_updates_with_rename_must_work(api: &TestApi) {
     let dm1 = r#"
             model A {
@@ -1226,9 +1229,14 @@ async fn dropping_a_model_with_a_multi_field_unique_index_must_work(api: &TestAp
     api.infer_and_apply(&dm2).await;
 }
 
-#[test_one_connector(connector="postgres")]
+#[test_one_connector(connector = "postgres")]
 async fn adding_a_scalar_list_for_a_modelwith_id_type_int_must_work(api: &TestApi) {
     let dm1 = r#"
+            datasource pg {
+                      provider = "postgres"
+                      url = "postgres://localhost:5432"
+            }
+
             model A {
                 id Int @id
                 strings String[]
@@ -1241,7 +1249,6 @@ async fn adding_a_scalar_list_for_a_modelwith_id_type_int_must_work(api: &TestAp
             }
         "#;
     let result = api.infer_and_apply(&dm1).await.sql_schema;
-
 
     let table_for_A = result.table_bang("A");
     let string_column = table_for_A.column_bang("strings");
@@ -1435,4 +1442,124 @@ async fn model_with_multiple_indexes_works(api: &TestApi) {
     let expected_indexes_count = if api.is_mysql() { 1 } else { 4 }; // 3 explicit indexes + PK, or only PK on mysql
 
     assert_eq!(like_indexes_count, expected_indexes_count);
+}
+
+#[test_each_connector]
+async fn foreign_keys_of_inline_one_to_one_relations_have_a_unique_constraint(api: &TestApi) {
+    let dm = r#"
+        model Cat {
+            id Int @id
+            box Box
+        }
+
+        model Box {
+            id Int @id
+            cat Cat
+        }
+    "#;
+
+    let schema = api.infer_and_apply(dm).await.sql_schema;
+
+    let box_table = schema.table_bang("Box");
+
+    let expected_indexes = &[Index {
+        name: "Box_cat".into(),
+        columns: vec!["cat".into()],
+        tpe: IndexType::Unique,
+    }];
+
+    assert_eq!(box_table.indices, expected_indexes);
+}
+
+#[test_each_connector]
+async fn calculate_database_steps_with_infer_after_an_apply_must_work(api: &TestApi) {
+    let dm1 = r#"
+        type CUID = String @id @default(cuid())
+
+        model User {
+            id CUID
+        }
+    "#;
+
+    let infer_input = InferMigrationStepsInput {
+        assume_to_be_applied: Vec::new(),
+        datamodel: dm1.to_owned(),
+        migration_id: "mig02".to_owned(),
+    };
+
+    let output = api
+        .execute_command::<InferMigrationStepsCommand>(&infer_input)
+        .await
+        .unwrap();
+    let steps = output.datamodel_steps;
+
+    api.infer_and_apply(dm1).await;
+
+    let dm2 = r#"
+        type CUID = String @id @default(cuid())
+
+        model User {
+            id CUID
+            name String
+        }
+    "#;
+
+    let infer_input = InferMigrationStepsInput {
+        assume_to_be_applied: Vec::new(),
+        datamodel: dm2.to_owned(),
+        migration_id: "mig02".to_owned(),
+    };
+
+    let output = api
+        .execute_command::<InferMigrationStepsCommand>(&infer_input)
+        .await
+        .unwrap();
+    let new_steps = output.datamodel_steps.clone();
+
+    let calculate_input = CalculateDatabaseStepsInput {
+        assume_to_be_applied: steps,
+        steps_to_apply: new_steps.clone(),
+    };
+
+    let result = api
+        .execute_command::<CalculateDatabaseStepsCommand>(dbg!(&calculate_input))
+        .await
+        .unwrap();
+
+    assert_eq!(result.datamodel_steps, new_steps);
+}
+
+#[test_each_connector(ignore = "mysql_mariadb")]
+async fn column_defaults_must_be_migrated(api: &TestApi) {
+    let dm1 = r#"
+        model Fruit {
+            id Int @id
+            name String @default("banana")
+        }
+    "#;
+
+    let schema = api.infer_and_apply(dm1).await.sql_schema;
+
+    let table = schema.table_bang("Fruit");
+    let column = table.column_bang("name");
+    assert_eq!(
+        column.default.as_ref().map(String::as_str),
+        Some(if api.is_sqlite() { "'banana'" } else { "banana" })
+    );
+
+    let dm2 = r#"
+        model Fruit {
+            id Int @id
+            name String @default("mango")
+        }
+    "#;
+
+    let schema = api.infer_and_apply(dm2).await.sql_schema;
+
+    let table = schema.table_bang("Fruit");
+    let column = table.column_bang("name");
+    assert_eq!(
+        column.default.as_ref().map(String::as_str),
+        Some(if api.is_sqlite() { "'mango'" } else { "mango" })
+    );
 }

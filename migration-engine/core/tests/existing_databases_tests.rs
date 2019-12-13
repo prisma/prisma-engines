@@ -65,12 +65,21 @@ async fn removing_a_model_for_a_table_that_is_already_deleted_must_work(api: &Te
 
 #[test_each_connector]
 async fn creating_a_field_for_an_existing_column_with_a_compatible_type_must_work(api: &TestApi) {
+    let is_mysql = api.is_mysql();
     let initial_result = api
         .barrel()
-        .execute(|migration| {
-            migration.create_table("Blog", |t| {
+        .execute(move |migration| {
+            migration.create_table("Blog", move |t| {
                 t.add_column("id", types::primary());
-                t.add_column("title", types::text());
+                // We add a default because the migration engine always adds defaults to facilitate migration of required columns.
+                t.add_column(
+                    "title",
+                    if is_mysql {
+                        types::varchar(181).default("")
+                    } else {
+                        types::text().default("")
+                    },
+                );
             });
         })
         .await;
@@ -143,6 +152,11 @@ async fn creating_a_field_for_an_existing_column_and_simultaneously_making_it_op
 #[test_one_connector(connector = "postgres")]
 async fn creating_a_scalar_list_field_for_an_existing_table_must_work(api: &TestApi) {
     let dm1 = r#"
+            datasource pg {
+              provider = "postgres"
+              url = "postgres://localhost:5432"
+            }
+
             model Blog {
                 id Int @id
             }
@@ -158,6 +172,11 @@ async fn creating_a_scalar_list_field_for_an_existing_table_must_work(api: &Test
     }).await;
 
     let dm2 = r#"
+            datasource pg {
+              provider = "postgres"
+              url = "postgres://localhost:5432"
+            }
+
             model Blog {
                 id Int @id
                 tags String[]
@@ -199,11 +218,14 @@ async fn delete_a_field_for_a_non_existent_column_must_work(api: &TestApi) {
     assert_eq!(result, final_result);
 }
 
-
-#[test_one_connector(connector="postgres")]
-async fn deleting_a_scalar_list_field_must_work(api: &TestApi) {
-
+#[test_one_connector(connector = "postgres")]
+async fn deleting_a_scalar_list_field_for_a_non_existent_column_must_work(api: &TestApi) {
     let dm1 = r#"
+            datasource pg {
+              provider = "postgres"
+              url = "postgres://localhost:5432"
+            }
+
             model Blog {
                 id Int @id
                 tags String[]
@@ -221,6 +243,11 @@ async fn deleting_a_scalar_list_field_must_work(api: &TestApi) {
     }).await;
 
     let dm2 = r#"
+            datasource pg {
+              provider = "postgres"
+              url = "postgres://localhost:5432"
+            }
+
             model Blog {
                 id Int @id
             }

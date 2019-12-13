@@ -1,7 +1,10 @@
 use super::FieldManifestation;
 use crate::prelude::*;
 use datamodel::FieldArity;
-use std::sync::{Arc, Weak};
+use std::{
+    hash::{Hash, Hasher},
+    sync::{Arc, Weak},
+};
 
 static ID_FIELD: &str = "id";
 static EMBEDDED_ID_FIELD: &str = "_id";
@@ -11,8 +14,7 @@ static CREATED_AT_FIELD: &str = "createdAt";
 pub type ScalarFieldRef = Arc<ScalarField>;
 pub type ScalarFieldWeak = Weak<ScalarField>;
 
-#[derive(Debug, Deserialize, Serialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(Debug)]
 pub struct ScalarFieldTemplate {
     pub name: String,
     pub type_identifier: TypeIdentifier,
@@ -24,8 +26,6 @@ pub struct ScalarFieldTemplate {
     pub manifestation: Option<FieldManifestation>,
     pub behaviour: Option<FieldBehaviour>,
     pub default_value: Option<PrismaValue>,
-
-    #[serde(rename = "enum")]
     pub internal_enum: Option<InternalEnum>,
 }
 
@@ -40,15 +40,51 @@ pub struct ScalarField {
     pub manifestation: Option<FieldManifestation>,
     pub internal_enum: Option<InternalEnum>,
     pub behaviour: Option<FieldBehaviour>,
+    pub default_value: Option<PrismaValue>,
+
     #[debug_stub = "#ModelWeakRef#"]
     pub model: ModelWeakRef,
-    pub default_value: Option<PrismaValue>,
 
     pub(crate) is_unique: bool,
 }
 
-#[derive(Debug, Deserialize, Serialize, Clone, Eq, PartialEq)]
-#[serde(rename_all = "camelCase", tag = "type")]
+impl Eq for ScalarField {}
+
+impl Hash for ScalarField {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.name.hash(state);
+        self.type_identifier.hash(state);
+        self.is_required.hash(state);
+        self.is_list.hash(state);
+        self.is_hidden.hash(state);
+        self.is_auto_generated.hash(state);
+        self.manifestation.hash(state);
+        self.internal_enum.hash(state);
+        self.behaviour.hash(state);
+        self.default_value.hash(state);
+        self.is_unique.hash(state);
+        self.model().hash(state);
+    }
+}
+
+impl PartialEq for ScalarField {
+    fn eq(&self, other: &Self) -> bool {
+        self.name == other.name
+            && self.type_identifier == other.type_identifier
+            && self.is_required == other.is_required
+            && self.is_list == other.is_list
+            && self.is_hidden == other.is_hidden
+            && self.is_auto_generated == other.is_auto_generated
+            && self.manifestation == other.manifestation
+            && self.internal_enum == other.internal_enum
+            && self.behaviour == other.behaviour
+            && self.default_value == other.default_value
+            && self.is_unique == other.is_unique
+            && self.model() == other.model()
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum FieldBehaviour {
     CreatedAt,
     UpdatedAt,
@@ -61,21 +97,20 @@ pub enum FieldBehaviour {
     },
 }
 
-#[derive(Debug, Deserialize, Serialize, Clone, Copy, Eq, PartialEq)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
 pub enum IdStrategy {
     Auto,
     None,
     Sequence,
 }
 
-#[derive(Debug, Deserialize, Serialize, Clone, Copy, Eq, PartialEq)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
 pub enum ScalarListStrategy {
     Embedded,
     Relation,
 }
 
-#[derive(Debug, Deserialize, Serialize, Clone, Eq, PartialEq)]
-#[serde(rename_all = "camelCase")]
+#[derive(Debug, Clone, Eq, PartialEq, Hash)]
 pub struct Sequence {
     pub name: String,
     pub initial_value: i32,
@@ -128,7 +163,7 @@ impl ScalarField {
         }
     }
 
-    pub fn is_unique(&self) -> bool {
+    pub fn unique(&self) -> bool {
         self.is_unique || self.is_id()
     }
 

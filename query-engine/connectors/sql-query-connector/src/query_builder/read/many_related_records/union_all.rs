@@ -7,7 +7,7 @@ use quaint::ast::*;
 pub struct ManyRelatedRecordsWithUnionAll;
 
 impl ManyRelatedRecordsQueryBuilder for ManyRelatedRecordsWithUnionAll {
-    fn with_pagination<'a>(base: ManyRelatedRecordsBaseQuery<'a>) -> Query {
+    fn with_pagination(base: ManyRelatedRecordsBaseQuery) -> Query {
         let distinct_ids = {
             let mut ids = base.from_record_ids.to_vec();
             ids.dedup();
@@ -15,11 +15,7 @@ impl ManyRelatedRecordsQueryBuilder for ManyRelatedRecordsWithUnionAll {
             ids
         };
 
-        let order_columns = Ordering::internal(
-            SelectedFields::RELATED_MODEL_ALIAS,
-            base.order_by.as_ref(),
-            base.is_reverse_order,
-        );
+        let order_columns = Ordering::internal(SelectedFields::RELATED_MODEL_ALIAS, base.order_directions);
 
         let base_condition = base.condition.and(base.cursor);
         let from_field = base.from_field;
@@ -33,15 +29,25 @@ impl ManyRelatedRecordsQueryBuilder for ManyRelatedRecordsWithUnionAll {
         };
 
         let base_query = order_columns.into_iter().fold(base_query, |acc, ord| acc.order_by(ord));
+        let mut distinct_ids = distinct_ids.into_iter();
 
-        let union = distinct_ids.into_iter().fold(UnionAll::default(), |acc, id| {
+
+        let build_cond = |id| {
             let conditions = base_condition
                 .clone()
                 .and(from_field.relation_column().table(Relation::TABLE_ALIAS).equals(id));
 
-            acc.union_all(base_query.clone().so_that(conditions))
-        });
+            base_query.clone().so_that(conditions)
+        };
 
-        Query::from(union)
+        if let Some(id) = distinct_ids.nth(0) {
+            let union = distinct_ids.fold(Union::new(build_cond(id)), |acc, id| {
+                acc.all(build_cond(id))
+            });
+
+            Query::from(union)
+        } else {
+            Query::from(Union::default())
+        }
     }
 }

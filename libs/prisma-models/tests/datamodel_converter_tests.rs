@@ -45,6 +45,11 @@ fn converting_enums() {
 fn models_with_only_scalar_fields() {
     let datamodel = convert(
         r#"
+            datasource mydb {
+                provider = "postgres"
+                url = "postgresql://localhost:5432"
+            }
+            
             model Test {
                 id Int @id
                 int Int
@@ -416,7 +421,7 @@ fn ambiguous_relations() {
 }
 
 fn convert(datamodel: &str) -> Arc<InternalDataModel> {
-    let datamodel = dbg!(datamodel::parse_datamodel(datamodel).unwrap());
+    let datamodel = datamodel::parse_datamodel(datamodel).unwrap();
     let template = DatamodelConverter::convert(&datamodel);
     template.build("not_important".to_string())
 }
@@ -488,7 +493,7 @@ impl FieldAssertions for ScalarField {
     }
 
     fn assert_unique(&self) -> &Self {
-        assert!(self.is_unique());
+        assert!(self.unique());
         self
     }
 }

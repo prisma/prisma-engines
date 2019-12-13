@@ -50,8 +50,8 @@ impl SqlSchemaDescriber {
     }
 
     async fn get_databases(&self) -> Vec<String> {
-        debug!("Getting table names");
-        let sql = "select schema_name from information_schema.schemata;";
+        debug!("Getting databases");
+        let sql = "select schema_name as schema_name from information_schema.schemata;";
         let rows = self.conn.query_raw(sql, &[]).await.expect("get schema names ");
         let names = rows
             .into_iter()
@@ -92,15 +92,19 @@ impl SqlSchemaDescriber {
     }
 
     async fn get_size(&self, schema: &str) -> usize {
-        debug!("Getting table names");
+        debug!("Getting db size");
         let sql = "SELECT 
       SUM(data_length + index_length) as size 
       FROM information_schema.TABLES 
       WHERE table_schema = ?";
         let result = self.conn.query_raw(sql, &[schema.into()]).await.expect("get db size ");
-        let size: String = result
+        let size = result
             .first()
-            .map(|row| row.get("size").and_then(|x| x.to_string()).expect("get db size"))
+            .map(|row| {
+                row.get("size")
+                    .and_then(|x| x.to_string())
+                    .unwrap_or("0".to_string())
+            })
             .unwrap();
 
         debug!("Found db size: {:?}", size);
@@ -126,7 +130,7 @@ impl SqlSchemaDescriber {
         // information schema column names became upper-case in MySQL 8, causing the code fetching
         // the result values by column name below to fail.
         let sql = "
-            SELECT column_name column_name, data_type data_type, column_default column_default, is_nullable is_nullable, extra extra
+            SELECT column_name column_name, data_type data_type, column_type full_data_type, column_default column_default, is_nullable is_nullable, extra extra
             FROM information_schema.columns
             WHERE table_schema = ? AND table_name = ?
             ORDER BY column_name";
@@ -142,6 +146,10 @@ impl SqlSchemaDescriber {
                 debug!("Got column: {:?}", col);
 
                 let data_type = col.get("data_type").and_then(|x| x.to_string()).expect("get data_type");
+                let full_data_type = col
+                    .get("full_data_type")
+                    .and_then(|x| x.to_string())
+                    .expect("get full_data_type aka column_type");
                 let is_nullable = col
                     .get("is_nullable")
                     .and_then(|x| x.to_string())
@@ -157,7 +165,7 @@ impl SqlSchemaDescriber {
                 } else {
                     ColumnArity::Nullable
                 };
-                let tpe = get_column_type(data_type.as_ref(), arity);
+                let tpe = get_column_type(&data_type, &full_data_type, arity);
                 let extra = col
                     .get("extra")
                     .and_then(|x| x.to_string())
@@ -394,47 +402,48 @@ impl SqlSchemaDescriber {
     }
 }
 
-fn get_column_type(data_type: &str, arity: ColumnArity) -> ColumnType {
-    let family = match data_type {
-        "int" => ColumnTypeFamily::Int,
-        "smallint" => ColumnTypeFamily::Int,
-        "tinyint" => ColumnTypeFamily::Boolean,
-        "mediumint" => ColumnTypeFamily::Int,
-        "bigint" => ColumnTypeFamily::Int,
-        "decimal" => ColumnTypeFamily::Float,
-        "numeric" => ColumnTypeFamily::Float,
-        "float" => ColumnTypeFamily::Float,
-        "double" => ColumnTypeFamily::Float,
-        "date" => ColumnTypeFamily::DateTime,
-        "time" => ColumnTypeFamily::DateTime,
-        "datetime" => ColumnTypeFamily::DateTime,
-        "timestamp" => ColumnTypeFamily::DateTime,
-        "year" => ColumnTypeFamily::DateTime,
-        "char" => ColumnTypeFamily::String,
-        "varchar" => ColumnTypeFamily::String,
-        "text" => ColumnTypeFamily::String,
-        "tinytext" => ColumnTypeFamily::String,
-        "mediumtext" => ColumnTypeFamily::String,
-        "longtext" => ColumnTypeFamily::String,
+fn get_column_type(data_type: &str, full_data_type: &str, arity: ColumnArity) -> ColumnType {
+    let family = match (data_type, full_data_type) {
+        ("int", _) => ColumnTypeFamily::Int,
+        ("smallint", _) => ColumnTypeFamily::Int,
+        ("tinyint", "tinyint(1)") => ColumnTypeFamily::Boolean,
+        ("tinyint", _) => ColumnTypeFamily::Int,
+        ("mediumint", _) => ColumnTypeFamily::Int,
+        ("bigint", _) => ColumnTypeFamily::Int,
+        ("decimal", _) => ColumnTypeFamily::Float,
+        ("numeric", _) => ColumnTypeFamily::Float,
+        ("float", _) => ColumnTypeFamily::Float,
+        ("double", _) => ColumnTypeFamily::Float,
+        ("date", _) => ColumnTypeFamily::DateTime,
+        ("time", _) => ColumnTypeFamily::DateTime,
+        ("datetime", _) => ColumnTypeFamily::DateTime,
+        ("timestamp", _) => ColumnTypeFamily::DateTime,
+        ("year", _) => ColumnTypeFamily::DateTime,
+        ("char", _) => ColumnTypeFamily::String,
+        ("varchar", _) => ColumnTypeFamily::String,
+        ("text", _) => ColumnTypeFamily::String,
+        ("tinytext", _) => ColumnTypeFamily::String,
+        ("mediumtext", _) => ColumnTypeFamily::String,
+        ("longtext", _) => ColumnTypeFamily::String,
         // XXX: Is this correct?
-        "enum" => ColumnTypeFamily::String,
-        "set" => ColumnTypeFamily::String,
-        "binary" => ColumnTypeFamily::Binary,
-        "varbinary" => ColumnTypeFamily::Binary,
-        "blob" => ColumnTypeFamily::Binary,
-        "tinyblob" => ColumnTypeFamily::Binary,
-        "mediumblob" => ColumnTypeFamily::Binary,
-        "longblob" => ColumnTypeFamily::Binary,
-        "geometry" => ColumnTypeFamily::Geometric,
-        "point" => ColumnTypeFamily::Geometric,
-        "linestring" => ColumnTypeFamily::Geometric,
-        "polygon" => ColumnTypeFamily::Geometric,
-        "multipoint" => ColumnTypeFamily::Geometric,
-        "multilinestring" => ColumnTypeFamily::Geometric,
-        "multipolygon" => ColumnTypeFamily::Geometric,
-        "geometrycollection" => ColumnTypeFamily::Geometric,
-        "json" => ColumnTypeFamily::Json,
-        _ => ColumnTypeFamily::Unknown, // panic!(format!("type '{}' is not supported here yet.", x)),
+        ("enum", _) => ColumnTypeFamily::String,
+        ("set", _) => ColumnTypeFamily::String,
+        ("binary", _) => ColumnTypeFamily::Binary,
+        ("varbinary", _) => ColumnTypeFamily::Binary,
+        ("blob", _) => ColumnTypeFamily::Binary,
+        ("tinyblob", _) => ColumnTypeFamily::Binary,
+        ("mediumblob", _) => ColumnTypeFamily::Binary,
+        ("longblob", _) => ColumnTypeFamily::Binary,
+        ("geometry", _) => ColumnTypeFamily::Geometric,
+        ("point", _) => ColumnTypeFamily::Geometric,
+        ("linestring", _) => ColumnTypeFamily::Geometric,
+        ("polygon", _) => ColumnTypeFamily::Geometric,
+        ("multipoint", _) => ColumnTypeFamily::Geometric,
+        ("multilinestring", _) => ColumnTypeFamily::Geometric,
+        ("multipolygon", _) => ColumnTypeFamily::Geometric,
+        ("geometrycollection", _) => ColumnTypeFamily::Geometric,
+        ("json", _) => ColumnTypeFamily::Json,
+        _ => ColumnTypeFamily::Unknown,
     };
     ColumnType {
         raw: data_type.to_string(),

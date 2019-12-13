@@ -3,7 +3,7 @@ use super::*;
 use crate::{
     query_ast::*,
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
-    ParsedInputValue,
+    InputAssertions, ParsedInputValue,
 };
 use connector::{Filter, ScalarCompare};
 use prisma_models::{ModelRef, RelationFieldRef};
@@ -37,30 +37,35 @@ pub fn connect_nested_update(
     child_model: &ModelRef,
 ) -> QueryGraphBuilderResult<()> {
     for value in utils::coerce_vec(value) {
-        let (data, finder) = if parent_relation_field.is_list {
+        let (data, filter) = if parent_relation_field.is_list {
             // We have to have a record specified as a record finder in "where".
             // This finder is used to read the children first, to make sure they're actually connected.
             // The update itself operates on the ID found by the read check.
             let mut map: ParsedInputMap = value.try_into()?;
-            let where_arg = map.remove("where").unwrap();
-            let record_finder = extract_record_finder(where_arg, &child_model)?;
+            let where_arg: ParsedInputMap = map.remove("where").unwrap().try_into()?;
+
+            where_arg.assert_size(1)?;
+            where_arg.assert_non_null()?;
+
+            let filter = extract_filter(where_arg, &child_model, false)?;
             let data_value = map.remove("data").unwrap();
 
-            (data_value, Some(record_finder))
+            (data_value, filter)
         } else {
-            (value, None)
+            (value, Filter::empty())
         };
 
         let find_child_records_node =
-            utils::insert_find_children_by_parent_node(graph, parent, parent_relation_field, finder)?;
+            utils::insert_find_children_by_parent_node(graph, parent, parent_relation_field, filter)?;
 
-        let update_node = update::update_record_node(graph, None, Arc::clone(child_model), data.try_into()?)?;
+        let update_node =
+            update::update_record_node(graph, Filter::empty(), Arc::clone(child_model), data.try_into()?)?;
         let id_field = child_model.fields().id();
 
         graph.create_edge(
             &find_child_records_node,
             &update_node,
-            QueryGraphDependency::ParentIds(Box::new(|mut node, mut parent_ids| {
+            QueryGraphDependency::ParentIds(Box::new(move |mut node, mut parent_ids| {
                 let parent_id = match parent_ids.pop() {
                     Some(pid) => Ok(pid),
                     None => Err(QueryGraphBuilderError::AssertionError(format!(
@@ -69,10 +74,7 @@ pub fn connect_nested_update(
                 }?;
 
                 if let Node::Query(Query::Write(WriteQuery::UpdateRecord(ref mut ur))) = node {
-                    ur.where_ = Some(RecordFinder {
-                        field: id_field,
-                        value: parent_id,
-                    });
+                    ur.add_filter(id_field.equals(parent_id));
                 }
 
                 Ok(node)
@@ -97,7 +99,7 @@ pub fn connect_nested_update_many(
         let data_map: ParsedInputMap = data_value.try_into()?;
         let where_map: ParsedInputMap = where_arg.try_into()?;
 
-        let filter = extract_filter(where_map, child_model)?;
+        let filter = extract_filter(where_map, child_model, true)?;
         let update_args = WriteArguments::from(&child_model, data_map)?;
 
         let find_child_records_node =

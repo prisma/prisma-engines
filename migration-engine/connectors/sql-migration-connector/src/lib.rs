@@ -24,8 +24,9 @@ use sql_database_step_applier::*;
 use sql_destructive_changes_checker::*;
 use sql_migration_persistence::*;
 use sql_schema_describer::SqlSchemaDescriberBackend;
-use std::{fs, path::PathBuf, sync::Arc};
+use std::{fs, path::PathBuf, sync::Arc, time::Duration};
 
+const CONNECTION_TIMEOUT: Duration = Duration::from_secs(10);
 pub type Result<T> = std::result::Result<T, SqlError>;
 
 pub struct SqlMigrationConnector {
@@ -44,22 +45,28 @@ impl SqlMigrationConnector {
         let connection_info =
             ConnectionInfo::from_url(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
 
-        let connection = Quaint::new(database_str)
-            .await
-            .map_err(SqlError::from)
-            .map_err(|err| err.into_connector_error(&connection_info))?;
+        let connection_fut = async {
+            let connection = Quaint::new(database_str)
+                .await
+                .map_err(SqlError::from)
+                .map_err(|err| err.into_connector_error(&connection_info))?;
 
-        Self::create_connector(connection).await
-    }
+            // async connections can be lazy, so we issue a simple query to fail early if the database
+            // is not reachable.
+            connection
+                .query_raw("SELECT 1", &[])
+                .await
+                .map_err(SqlError::from)
+                .map_err(|err| err.into_connector_error(&connection.connection_info()))?;
 
-    async fn create_connector(connection: Quaint) -> std::result::Result<Self, ConnectorError> {
-        // async connections can be lazy, so we issue a simple query to fail early if the database
-        // is not reachable.
-        connection
-            .query_raw("SELECT 1", &[])
+            Ok(connection)
+        };
+
+        let connection = tokio::time::timeout(CONNECTION_TIMEOUT, connection_fut)
             .await
-            .map_err(SqlError::from)
-            .map_err(|err| err.into_connector_error(&connection.connection_info()))?;
+            .map_err(|_elapsed| {
+                SqlError::from(quaint::error::Error::ConnectTimeout).into_connector_error(&connection_info)
+            })??;
 
         let schema_name = connection.connection_info().schema_name().to_owned();
 

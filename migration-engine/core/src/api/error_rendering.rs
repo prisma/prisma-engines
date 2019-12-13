@@ -63,7 +63,7 @@ fn render_unknown_error_as_jsonrpc_error(unknown_error: UnknownError) -> JsonRpc
 
 /// Last-resort JSON-RPC error, when we can't even render the error.
 fn fallback_jsonrpc_error(err: impl std::error::Error) -> JsonRpcError {
-    log::warn!("Failed to render user facing error. Using fallback error.");
+    tracing::warn!("Failed to render user facing error. Using fallback error.");
 
     JsonRpcError {
         code: jsonrpc_core::types::error::ErrorCode::ServerError(4466),

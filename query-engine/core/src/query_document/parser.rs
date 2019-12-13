@@ -2,6 +2,7 @@ use super::*;
 use crate::schema::*;
 use chrono::prelude::*;
 use prisma_models::{GraphqlId, PrismaValue};
+use rust_decimal::{prelude::FromPrimitive, Decimal};
 use std::{
     collections::{BTreeMap, HashSet},
     sync::Arc,
@@ -174,11 +175,11 @@ impl QueryDocumentParser {
             (QueryValue::Null, _)                         => Ok(PrismaValue::Null),
             (QueryValue::String(s), ScalarType::String)   => Ok(PrismaValue::String(s)),
             (QueryValue::String(s), ScalarType::DateTime) => Self::parse_datetime(s.as_str()).map(PrismaValue::DateTime),
-            (QueryValue::String(s), ScalarType::Json)     => Self::parse_json(s.as_str()).map(PrismaValue::Json),
+            (QueryValue::String(_s), ScalarType::Json)     => unimplemented!(),
             (QueryValue::String(s), ScalarType::UUID)     => Self::parse_uuid(s.as_str()).map(PrismaValue::Uuid),
-            (QueryValue::Int(i), ScalarType::Float)       => Ok(PrismaValue::Float(i as f64)),
+            (QueryValue::Int(i), ScalarType::Float)       => Ok(PrismaValue::Float(Decimal::from_f64(i as f64).expect("f64 is not a Decimal."))),
             (QueryValue::Int(i), ScalarType::Int)         => Ok(PrismaValue::Int(i)),
-            (QueryValue::Float(f), ScalarType::Float)     => Ok(PrismaValue::Float(f)),
+            (QueryValue::Float(f), ScalarType::Float)     => Ok(PrismaValue::Float(Decimal::from_f64(f).expect("f64 is not a Decimal."))),
             (QueryValue::Float(f), ScalarType::Int)       => Ok(PrismaValue::Int(f as i64)),
             (QueryValue::Boolean(b), ScalarType::Boolean) => Ok(PrismaValue::Boolean(b)),
             (QueryValue::Enum(e), ScalarType::Enum(et))   => match et.value_for(e.as_str()) {

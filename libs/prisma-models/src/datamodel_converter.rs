@@ -1,6 +1,7 @@
 use crate::*;
 use datamodel::dml;
 use itertools::Itertools;
+use std::convert::TryInto;
 
 pub struct DatamodelConverter<'a> {
     datamodel: &'a dml::Datamodel,
@@ -51,6 +52,7 @@ impl<'a> DatamodelConverter<'a> {
                 is_embedded: model.is_embedded,
                 fields: self.convert_fields(model),
                 manifestation: model.database_name.clone(),
+                indexes: self.convert_indexes(model),
             })
             .collect()
     }
@@ -111,6 +113,21 @@ impl<'a> DatamodelConverter<'a> {
                 manifestation: Some(r.manifestation()),
                 model_a_name: r.model_a.name.clone(),
                 model_b_name: r.model_b.name.clone(),
+            })
+            .collect()
+    }
+
+    fn convert_indexes(&self, model: &dml::Model) -> Vec<IndexTemplate> {
+        model
+            .indexes
+            .iter()
+            .map(|i| IndexTemplate {
+                name: i.name.clone(),
+                fields: i.fields.clone(),
+                typ: match i.tpe {
+                    dml::IndexType::Unique => IndexType::Unique,
+                    dml::IndexType::Normal => IndexType::Normal,
+                },
             })
             .collect()
     }
@@ -270,6 +287,10 @@ impl TempRelationHolder {
         "B".to_string()
     }
 
+    pub fn is_one_to_one(&self) -> bool {
+        !self.field_a.is_list() && !self.field_b.is_list()
+    }
+
     fn is_many_to_many(&self) -> bool {
         self.field_a.is_list() && self.field_b.is_list()
     }
@@ -425,10 +446,10 @@ impl DatamodelFieldExtensions for dml::Field {
         self.default_value.as_ref().and_then(|v| match v {
             datamodel::common::ScalarValue::Boolean(x) => Some(PrismaValue::Boolean(*x)),
             datamodel::common::ScalarValue::Int(x) => Some(PrismaValue::Int(i64::from(*x))),
-            datamodel::common::ScalarValue::Float(x) => Some(PrismaValue::Float(f64::from(*x))),
+            datamodel::common::ScalarValue::Float(x) => (*x).try_into().ok(),
             datamodel::common::ScalarValue::String(x) => Some(PrismaValue::String(x.clone())),
             datamodel::common::ScalarValue::DateTime(x) => Some(PrismaValue::DateTime(*x)),
-            datamodel::common::ScalarValue::Decimal(x) => Some(PrismaValue::Float(f64::from(*x))), // TODO: not sure if this mapping is correct
+            datamodel::common::ScalarValue::Decimal(x) => (*x).try_into().ok(), // TODO: not sure if this mapping is correct
             datamodel::common::ScalarValue::ConstantLiteral(x) => {
                 Some(PrismaValue::Enum(EnumValue::string(x.clone(), x.clone())))
             }

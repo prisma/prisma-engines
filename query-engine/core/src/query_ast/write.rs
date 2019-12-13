@@ -1,6 +1,6 @@
 //! Write query AST
-use super::RecordFinderInjector;
-use connector::filter::{Filter, RecordFinder};
+use super::FilteredQuery;
+use connector::filter::Filter;
 use prisma_models::prelude::*;
 
 #[derive(Debug, Clone)]
@@ -35,12 +35,23 @@ impl WriteQuery {
     }
 }
 
-impl RecordFinderInjector for WriteQuery {
-    fn inject_record_finder(&mut self, rf: RecordFinder) {
+impl FilteredQuery for WriteQuery {
+    fn get_filter(&mut self) -> Option<&mut Filter> {
         match self {
-            Self::UpdateRecord(ref mut ur) => ur.where_ = Some(rf),
-            Self::DeleteRecord(ref mut dr) => dr.where_ = Some(rf),
-            Self::UpdateManyRecords(ref mut ur) => ur.filter = rf.into(),
+            Self::UpdateRecord(q) => q.get_filter(),
+            Self::DeleteManyRecords(q) => q.get_filter(),
+            Self::DeleteRecord(q) => q.get_filter(),
+            Self::UpdateManyRecords(q) => q.get_filter(),
+            _ => unimplemented!(),
+        }
+    }
+
+    fn set_filter(&mut self, filter: Filter) {
+        match self {
+            Self::UpdateRecord(q) => q.set_filter(filter),
+            Self::DeleteManyRecords(q) => q.set_filter(filter),
+            Self::DeleteRecord(q) => q.set_filter(filter),
+            Self::UpdateManyRecords(q) => q.set_filter(filter),
             _ => unimplemented!(),
         }
     }
@@ -53,25 +64,9 @@ impl std::fmt::Display for WriteQuery {
             Self::UpdateRecord(q) => write!(
                 f,
                 "UpdateRecord(model: {}, finder: {:?}, args: {:?})",
-                q.model.name,
-                q.where_.as_ref().map(|finder| format!(
-                    "{}, {} = {:?}",
-                    finder.field.model().name,
-                    finder.field.name,
-                    finder.value
-                ),),
-                q.args,
+                q.model.name, q.where_, q.args,
             ),
-            Self::DeleteRecord(q) => write!(
-                f,
-                "DeleteRecord: {:?}",
-                q.where_.as_ref().map(|finder| format!(
-                    "{}, {} = {:?}",
-                    finder.field.model().name,
-                    finder.field.name,
-                    finder.value
-                ))
-            ),
+            Self::DeleteRecord(q) => write!(f, "DeleteRecord: {}, {:?}", q.model.name, q.where_),
             Self::UpdateManyRecords(q) => write!(f, "UpdateManyRecords(model: {}, args: {:?})", q.model.name, q.args),
             Self::DeleteManyRecords(q) => write!(f, "DeleteManyRecords: {}", q.model.name),
             Self::ConnectRecords(_) => write!(f, "ConnectRecords"),
@@ -90,7 +85,7 @@ pub struct CreateRecord {
 #[derive(Debug, Clone)]
 pub struct UpdateRecord {
     pub model: ModelRef,
-    pub where_: Option<RecordFinder>,
+    pub where_: Filter,
     pub args: PrismaArgs,
 }
 
@@ -104,7 +99,7 @@ pub struct UpdateManyRecords {
 #[derive(Debug, Clone)]
 pub struct DeleteRecord {
     pub model: ModelRef,
-    pub where_: Option<RecordFinder>,
+    pub where_: Option<Filter>,
 }
 
 #[derive(Debug, Clone)]
@@ -130,4 +125,44 @@ pub struct DisconnectRecords {
 #[derive(Debug, Clone)]
 pub struct ResetData {
     pub internal_data_model: InternalDataModelRef,
+}
+
+impl FilteredQuery for UpdateRecord {
+    fn get_filter(&mut self) -> Option<&mut Filter> {
+        Some(&mut self.where_)
+    }
+
+    fn set_filter(&mut self, filter: Filter) {
+        self.where_ = filter
+    }
+}
+
+impl FilteredQuery for UpdateManyRecords {
+    fn get_filter(&mut self) -> Option<&mut Filter> {
+        Some(&mut self.filter)
+    }
+
+    fn set_filter(&mut self, filter: Filter) {
+        self.filter = filter
+    }
+}
+
+impl FilteredQuery for DeleteManyRecords {
+    fn get_filter(&mut self) -> Option<&mut Filter> {
+        Some(&mut self.filter)
+    }
+
+    fn set_filter(&mut self, filter: Filter) {
+        self.filter = filter
+    }
+}
+
+impl FilteredQuery for DeleteRecord {
+    fn get_filter(&mut self) -> Option<&mut Filter> {
+        self.where_.as_mut()
+    }
+
+    fn set_filter(&mut self, filter: Filter) {
+        self.where_ = Some(filter)
+    }
 }

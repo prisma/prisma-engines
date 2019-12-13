@@ -41,7 +41,7 @@ pub use traits::*;
 
 /// A prisma schema.
 /// Schema = Datamodel + Generators + Datasources
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct SchemaAst {
     /// All models, enums, datasources, generators or type aliases
     pub tops: Vec<Top>,
@@ -50,6 +50,17 @@ pub struct SchemaAst {
 impl SchemaAst {
     pub fn empty() -> Self {
         SchemaAst { tops: Vec::new() }
+    }
+
+    pub fn find_source(&self, source: &str) -> Option<&SourceConfig> {
+        self.sources().into_iter().find(|s| s.name.name == source)
+    }
+
+    pub fn find_source_mut(&mut self, source: &str) -> Option<&mut SourceConfig> {
+        self.tops.iter_mut().find_map(|top| match top {
+            Top::Source(source_config) if source_config.name.name == source => Some(source_config),
+            _ => None,
+        })
     }
 
     pub fn find_model(&self, model: &str) -> Option<&Model> {

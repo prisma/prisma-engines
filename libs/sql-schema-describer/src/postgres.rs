@@ -1,6 +1,7 @@
 //! Postgres description.
 use super::*;
 use log::debug;
+use once_cell::sync::Lazy;
 use quaint::prelude::Queryable;
 use regex::Regex;
 use std::collections::{HashMap, HashSet};
@@ -54,7 +55,7 @@ impl SqlSchemaDescriber {
     }
 
     async fn get_databases(&self) -> Vec<String> {
-        debug!("Getting table names");
+        debug!("Getting databases");
         let sql = "select schema_name from information_schema.schemata;";
         let rows = self.conn.query_raw(sql, &[]).await.expect("get schema names ");
         let names = rows
@@ -99,7 +100,7 @@ impl SqlSchemaDescriber {
         debug!("Getting db size");
         let sql =
             "SELECT SUM(pg_total_relation_size(quote_ident(schemaname) || '.' || quote_ident(tablename)))::BIGINT as size
-             FROM pg_tables 
+             FROM pg_tables
              WHERE schemaname = $1::text";
         let result = self.conn.query_raw(sql, &[schema.into()]).await.expect("get db size ");
         let size: i64 = result
@@ -107,7 +108,7 @@ impl SqlSchemaDescriber {
             .map(|row| {
                 row.get("size")
                     .and_then(|x| x.as_i64())
-                    .expect("convert db size result")
+                    .unwrap_or(0)
             })
             .unwrap();
 
@@ -130,7 +131,7 @@ impl SqlSchemaDescriber {
     }
 
     async fn get_columns(&self, schema: &str, table: &str) -> Vec<Column> {
-        let sql = "SELECT column_name, udt_name, column_default, is_nullable, is_identity, data_type
+        let sql = "SELECT column_name, data_type, udt_name as full_column_type, column_default, is_nullable, is_identity, data_type
             FROM information_schema.columns
             WHERE table_schema = $1 AND table_name = $2
             ORDER BY column_name";
@@ -147,7 +148,11 @@ impl SqlSchemaDescriber {
                     .get("column_name")
                     .and_then(|x| x.to_string())
                     .expect("get column name");
-                let udt = col.get("udt_name").and_then(|x| x.to_string()).expect("get udt_name");
+                let data_type = col.get("data_type").and_then(|x| x.to_string()).expect("get data_type");
+                let full_data_type = col
+                    .get("full_column_type")
+                    .and_then(|x| x.to_string())
+                    .expect("get full_column_type aka udt_name");
                 let is_identity_str = col
                     .get("is_identity")
                     .and_then(|x| x.to_string())
@@ -168,14 +173,15 @@ impl SqlSchemaDescriber {
                     "yes" => false,
                     x => panic!(format!("unrecognized is_nullable variant '{}'", x)),
                 };
-                let arity = if udt.starts_with("_") {
+
+                let arity = if full_data_type.starts_with("_") {
                     ColumnArity::List
                 } else if is_required {
                     ColumnArity::Required
                 } else {
                     ColumnArity::Nullable
                 };
-                let tpe = get_column_type(udt.as_ref(), arity);
+                let tpe = get_column_type(data_type.as_ref(), &full_data_type, arity);
 
                 let default = col.get("column_default").and_then(|param_value| {
                     param_value
@@ -184,9 +190,7 @@ impl SqlSchemaDescriber {
                 });
                 let is_auto_increment = is_identity
                     || match default {
-                        Some(ref val) => {
-                            val == &format!("nextval(\"{}\".\"{}_{}_seq\"::regclass)", schema, table, col_name,)
-                        }
+                        Some(ref val) => is_autoincrement(val, schema, table, &col_name),
                         _ => false,
                     };
                 Column {
@@ -205,17 +209,17 @@ impl SqlSchemaDescriber {
     async fn get_foreign_keys(&self, schema: &str, table: &str) -> Vec<ForeignKey> {
         let sql = "SELECT 
                 con.oid as \"con_id\",
-                att2.attname as \"child_column\", 
-                cl.relname as \"parent_table\", 
+                att2.attname as \"child_column\",
+                cl.relname as \"parent_table\",
                 att.attname as \"parent_column\",
                 con.confdeltype,
                 conname as constraint_name
             FROM
-            (SELECT 
-                    unnest(con1.conkey) as \"parent\", 
-                    unnest(con1.confkey) as \"child\", 
+            (SELECT
+                    unnest(con1.conkey) as \"parent\",
+                    unnest(con1.confkey) as \"child\",
                     con1.oid,
-                    con1.confrelid, 
+                    con1.confrelid,
                     con1.conrelid,
                     con1.conname,
                     con1.confdeltype
@@ -401,7 +405,6 @@ impl SqlSchemaDescriber {
                 "Querying for sequence seeding primary key column '{}': '{}'",
                 columns[0], sql
             );
-            let re_seq = Regex::new("^(?:.+\\.)?\"?([^.\"]+)\"?").expect("compile regex");
             let rows = self
                 .conn
                 .query_raw(&sql, &[])
@@ -412,7 +415,7 @@ impl SqlSchemaDescriber {
                 row.get("sequence")
                     .and_then(|x| x.to_string())
                     .and_then(|sequence_name| {
-                        let captures = re_seq.captures(&sequence_name).expect("get captures");
+                        let captures = RE_SEQ.captures(&sequence_name).expect("get captures");
                         let sequence_name = captures.get(1).expect("get capture").as_str();
                         debug!("Found sequence name corresponding to primary key: {}", sequence_name);
                         sequences.iter().find(|s| &s.name == sequence_name).map(|sequence| {
@@ -467,8 +470,8 @@ impl SqlSchemaDescriber {
     async fn get_enums(&self, schema: &str) -> SqlSchemaDescriberResult<Vec<Enum>> {
         debug!("Getting enums");
         let sql = "SELECT t.typname as name, e.enumlabel as value
-            FROM pg_type t 
-            JOIN pg_enum e ON t.oid = e.enumtypid  
+            FROM pg_type t
+            JOIN pg_enum e ON t.oid = e.enumtypid
             JOIN pg_catalog.pg_namespace n ON n.oid = t.typnamespace
             WHERE n.nspname = $1";
         let rows = self
@@ -497,8 +500,8 @@ impl SqlSchemaDescriber {
     }
 }
 
-fn get_column_type(udt: &str, arity: ColumnArity) -> ColumnType {
-    let family = match udt {
+fn get_column_type(_data_type: &str, full_data_type: &str, arity: ColumnArity) -> ColumnType {
+    let family = match full_data_type {
         "int2" => ColumnTypeFamily::Int,
         "int4" => ColumnTypeFamily::Int,
         "int8" => ColumnTypeFamily::Int,
@@ -540,11 +543,110 @@ fn get_column_type(udt: &str, arity: ColumnArity) -> ColumnType {
         "_int4" => ColumnTypeFamily::Int,
         "_text" => ColumnTypeFamily::String,
         "_varchar" => ColumnTypeFamily::String,
-        _ => ColumnTypeFamily::Unknown, // panic!(format!("type '{}' is not supported here yet.", x)),
+        _ => ColumnTypeFamily::Unknown,
     };
     ColumnType {
-        raw: udt.to_string(),
+        raw: full_data_type.to_string(),
         family: family,
         arity,
+    }
+}
+
+static RE_SEQ: Lazy<Regex> = Lazy::new(|| Regex::new("^(?:.+\\.)?\"?([^.\"]+)\"?").expect("compile regex"));
+
+static AUTOINCREMENT_REGEX: Lazy<Regex> = Lazy::new(|| {
+    Regex::new(r#"nextval\((?:"(?P<schema_name>.+)"\.)?"(?P<table_and_column_name>.+)_seq(?:[0-9]+)?"::regclass\)"#)
+        .unwrap()
+});
+
+/// Returns whether a particular sequence (`value`) matches the provided column info.
+fn is_autoincrement(value: &str, schema_name: &str, table_name: &str, column_name: &str) -> bool {
+    AUTOINCREMENT_REGEX
+        .captures(value)
+        .and_then(|captures| {
+            captures
+                .name("schema_name")
+                .map(|matched| matched.as_str())
+                .or(Some(schema_name))
+                .filter(|matched| *matched == schema_name)
+                .and_then(|_| {
+                    captures.name("table_and_column_name").filter(|matched| {
+                        let expected_len = table_name.len() + column_name.len() + 1;
+
+                        if matched.as_str().len() != expected_len {
+                            return false;
+                        }
+
+                        let table_name_segments = table_name.split('_');
+                        let column_name_segments = column_name.split('_');
+                        let matched_segments = matched.as_str().split('_');
+                        matched_segments
+                            .zip(table_name_segments.chain(column_name_segments))
+                            .all(|(found, expected)| found == expected)
+                    })
+                })
+                .map(|_| true)
+        })
+        .unwrap_or(false)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn postgres_is_autoincrement_works() {
+        let schema_name = "prisma";
+        let table_name = "Test";
+        let col_name = "id";
+
+        let non_autoincrement = "_seq";
+        assert!(!is_autoincrement(non_autoincrement, schema_name, table_name, col_name));
+
+        let autoincrement = format!(
+            r#"nextval("{}"."{}_{}_seq"::regclass)"#,
+            schema_name, table_name, col_name
+        );
+        assert!(is_autoincrement(&autoincrement, schema_name, table_name, col_name));
+
+        let autoincrement_with_number = format!(
+            r#"nextval("{}"."{}_{}_seq1"::regclass)"#,
+            schema_name, table_name, col_name
+        );
+        assert!(is_autoincrement(
+            &autoincrement_with_number,
+            schema_name,
+            table_name,
+            col_name
+        ));
+
+        let autoincrement_without_schema = format!(r#"nextval("{}_{}_seq1"::regclass)"#, table_name, col_name);
+        assert!(is_autoincrement(
+            &autoincrement_without_schema,
+            schema_name,
+            table_name,
+            col_name
+        ));
+
+        // The table and column names contain underscores, so it's impossible to say from the sequence where one starts and the other ends.
+        let autoincrement_with_ambiguous_table_and_column_names =
+            r#"nextval("compound_table_compound_column_name_seq"::regclass)"#;
+        assert!(is_autoincrement(
+            &autoincrement_with_ambiguous_table_and_column_names,
+            "<ignored>",
+            "compound_table",
+            "compound_column_name",
+        ));
+
+        // The table and column names contain underscores, so it's impossible to say from the sequence where one starts and the other ends.
+        // But this one has extra text between table and column names, so it should not match.
+        let autoincrement_with_ambiguous_table_and_column_names =
+            r#"nextval("compound_table_something_compound_column_name_seq"::regclass)"#;
+        assert!(!is_autoincrement(
+            &autoincrement_with_ambiguous_table_and_column_names,
+            "<ignored>",
+            "compound_table",
+            "compound_column_name",
+        ));
     }
 }
