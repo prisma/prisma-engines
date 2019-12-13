@@ -21,6 +21,7 @@ class ExtendedRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase
                                          |  Title   String
                                          |  Artist  Artist  @relation(references: [id])
                                          |  Tracks  Track[]
+                                         |  @@index([Artist])
                                          |}
                                          |
                                          |model Genre {
@@ -48,6 +49,9 @@ class ExtendedRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase
                                          |  Milliseconds Int
                                          |  Bytes        Int
                                          |  UnitPrice    Float
+                                         |  @@index([Album])
+                                         |  @@index([MediaType])
+                                         |  @@index([Genre])
                                          |}
                                          |""" }
 
