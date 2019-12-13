@@ -6,7 +6,10 @@ use super::{
 use migration_connector::{MigrationPersistence, MigrationStep};
 use migration_core::{
     api::{GenericApi, MigrationApi},
-    commands::{ApplyMigrationInput, InferMigrationStepsInput, UnapplyMigrationInput, UnapplyMigrationOutput, MigrationStepsResultOutput},
+    commands::{
+        ApplyMigrationInput, InferMigrationStepsInput, MigrationStepsResultOutput, UnapplyMigrationInput,
+        UnapplyMigrationOutput,
+    },
 };
 use quaint::prelude::{ConnectionInfo, Queryable, SqlFamily};
 use sql_schema_describer::*;
@@ -86,7 +89,10 @@ impl TestApi {
     }
 
     pub async fn infer_and_apply(&self, datamodel: &str) -> InferAndApplyOutput {
-        let migration_output = self.infer_and_apply_with_options(InferAndApplyBuilder::new(datamodel).build()).await.unwrap();
+        let migration_output = self
+            .infer_and_apply_with_options(InferAndApplyBuilder::new(datamodel).build())
+            .await
+            .unwrap();
 
         InferAndApplyOutput {
             migration_output,
@@ -94,7 +100,10 @@ impl TestApi {
         }
     }
 
-    pub async fn infer_and_apply_with_options(&self, options: InferAndApply) -> Result<MigrationStepsResultOutput, failure::Error> {
+    pub async fn infer_and_apply_with_options(
+        &self,
+        options: InferAndApply,
+    ) -> Result<MigrationStepsResultOutput, failure::Error> {
         let InferAndApply {
             migration_id,
             force,
@@ -121,7 +130,14 @@ impl TestApi {
     }
 
     pub async fn infer_and_apply_with_migration_id(&self, datamodel: &str, migration_id: &str) -> InferAndApplyOutput {
-        let migration_output = self.infer_and_apply_with_options(InferAndApplyBuilder::new(datamodel).migration_id(Some(migration_id.into())).build()).await.unwrap();
+        let migration_output = self
+            .infer_and_apply_with_options(
+                InferAndApplyBuilder::new(datamodel)
+                    .migration_id(Some(migration_id.into()))
+                    .build(),
+            )
+            .await
+            .unwrap();
 
         InferAndApplyOutput {
             migration_output,
@@ -367,17 +383,19 @@ impl InferAndApplyBuilder {
         self
     }
 
-    pub fn build(self) -> InferAndApply{
+    pub fn build(self) -> InferAndApply {
         let InferAndApplyBuilder {
             migration_id,
             force,
             datamodel,
         } = self;
 
-        let migration_id = migration_id.unwrap_or_else(||format!(
-            "migration-{}",
-            MIGRATION_ID_COUNTER.fetch_add(1, std::sync::atomic::Ordering::Relaxed)
-        ));
+        let migration_id = migration_id.unwrap_or_else(|| {
+            format!(
+                "migration-{}",
+                MIGRATION_ID_COUNTER.fetch_add(1, std::sync::atomic::Ordering::Relaxed)
+            )
+        });
 
         InferAndApply {
             migration_id,

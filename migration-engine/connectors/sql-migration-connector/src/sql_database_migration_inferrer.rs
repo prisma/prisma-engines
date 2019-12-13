@@ -21,21 +21,18 @@ impl DatabaseMigrationInferrer<SqlMigration> for SqlDatabaseMigrationInferrer {
         next: &Datamodel,
         _steps: &[MigrationStep],
     ) -> ConnectorResult<SqlMigration> {
-        let result: SqlResult<SqlMigration> = (|| {
-            async {
-                let current_database_schema: SqlSchema = self.introspect(&self.schema_name).await?;
-                let expected_database_schema = SqlSchemaCalculator::calculate(next)?;
-                infer(
-                    &current_database_schema,
-                    &expected_database_schema,
-                    &self.schema_name,
-                    self.sql_family(),
-                )
-            }
-        })()
-        .await;
+        let fut = async {
+            let current_database_schema: SqlSchema = self.introspect(&self.schema_name).await?;
+            let expected_database_schema = SqlSchemaCalculator::calculate(next)?;
+            infer(
+                &current_database_schema,
+                &expected_database_schema,
+                &self.schema_name,
+                self.sql_family(),
+            )
+        };
 
-        result.map_err(|sql_error| sql_error.into_connector_error(&self.connection_info))
+        catch(&self.connection_info, fut).await
     }
 
     async fn infer_from_datamodels(
@@ -351,7 +348,7 @@ fn fix(current: &Table, next: &Table, schema_name: &str) -> Vec<SqlMigrationStep
     result
 }
 
-pub fn wrap_as_step<T, F>(steps: Vec<T>, mut wrap_fn: F) -> impl Iterator<Item=SqlMigrationStep>
+pub fn wrap_as_step<T, F>(steps: Vec<T>, mut wrap_fn: F) -> impl Iterator<Item = SqlMigrationStep>
 where
     F: FnMut(T) -> SqlMigrationStep,
 {
