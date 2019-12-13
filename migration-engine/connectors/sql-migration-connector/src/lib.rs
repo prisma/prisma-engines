@@ -168,8 +168,6 @@ impl SqlMigrationConnector {
             }
         }
 
-        self.migration_persistence.init().await;
-
         Ok(())
     }
 }
@@ -187,11 +185,15 @@ impl MigrationConnector for SqlMigrationConnector {
     }
 
     async fn initialize(&self) -> ConnectorResult<()> {
-        catch(&self.connection_info, self.initialize_impl()).await
+        catch(&self.connection_info, self.initialize_impl()).await?;
+
+        self.migration_persistence().init().await?;
+
+        Ok(())
     }
 
     async fn reset(&self) -> ConnectorResult<()> {
-        self.migration_persistence.reset().await;
+        self.migration_persistence().reset().await?;
         Ok(())
     }
 

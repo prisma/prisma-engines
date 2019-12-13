@@ -25,7 +25,7 @@ impl<'a> MigrationCommand for ApplyMigrationCommand<'a> {
         let connector = engine.connector();
         let migration_persistence = connector.migration_persistence();
 
-        match migration_persistence.last().await {
+        match migration_persistence.last().await? {
             Some(ref last_migration) if last_migration.is_watch_migration() && !cmd.input.is_watch_migration() => {
                 cmd.handle_transition_out_of_watch_mode(&engine).await
             }
@@ -46,19 +46,20 @@ impl<'a> ApplyMigrationCommand<'a> {
         let connector = engine.connector();
         let migration_persistence = connector.migration_persistence();
 
-        let current_datamodel_ast = migration_persistence.current_datamodel_ast().await;
+        let current_datamodel_ast = migration_persistence.current_datamodel_ast().await?;
         let current_datamodel = datamodel::lift_ast(&current_datamodel_ast)?;
 
         let last_non_watch_datamodel = migration_persistence
             .last_non_watch_migration()
-            .await
+            .await?
             .map(|m| m.datamodel_ast())
             .unwrap_or_else(SchemaAst::empty);
         let next_datamodel_ast = engine
             .datamodel_calculator()
             .infer(&last_non_watch_datamodel, self.input.steps.as_slice())?;
 
-        self.handle_migration(&engine, current_datamodel, next_datamodel_ast).await
+        self.handle_migration(&engine, current_datamodel, next_datamodel_ast)
+            .await
     }
 
     async fn handle_normal_migration<C, D>(
@@ -71,14 +72,15 @@ impl<'a> ApplyMigrationCommand<'a> {
     {
         let connector = engine.connector();
         let migration_persistence = connector.migration_persistence();
-        let current_datamodel_ast = migration_persistence.current_datamodel_ast().await;
+        let current_datamodel_ast = migration_persistence.current_datamodel_ast().await?;
         let current_datamodel = datamodel::lift_ast(&current_datamodel_ast)?;
 
         let next_datamodel_ast = engine
             .datamodel_calculator()
             .infer(&current_datamodel_ast, self.input.steps.as_slice())?;
 
-        self.handle_migration(&engine, current_datamodel,  next_datamodel_ast).await
+        self.handle_migration(&engine, current_datamodel, next_datamodel_ast)
+            .await
     }
 
     async fn handle_migration<C, D>(
@@ -120,7 +122,7 @@ impl<'a> ApplyMigrationCommand<'a> {
             // We have no warnings, or the force flag is passed.
             (false, _) | (true, true) => {
                 tracing::debug!("Applying the migration");
-                let saved_migration = migration_persistence.create(migration).await;
+                let saved_migration = migration_persistence.create(migration).await?;
 
                 connector
                     .migration_applier()

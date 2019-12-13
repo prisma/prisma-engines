@@ -164,12 +164,15 @@ async fn creating_a_scalar_list_field_for_an_existing_table_must_work(api: &Test
     let initial_result = api.infer_and_apply(&dm1).await.sql_schema;
     assert!(!initial_result.has_table("Blog_tags"));
 
-    let result = api.barrel().execute(|migration| {
-        migration.change_table("Blog", |t| {
-            let inner = types::text();
-            t.add_column("tags", types::array(&inner));
-        });
-    }).await;
+    let result = api
+        .barrel()
+        .execute(|migration| {
+            migration.change_table("Blog", |t| {
+                let inner = types::text();
+                t.add_column("tags", types::array(&inner));
+            });
+        })
+        .await;
 
     let dm2 = r#"
             datasource pg {
@@ -234,13 +237,16 @@ async fn deleting_a_scalar_list_field_for_a_non_existent_column_must_work(api: &
 
     let _ = api.infer_and_apply(&dm1).await.sql_schema;
 
-    let result = api.barrel().execute(|migration| {
-        // sqlite does not support dropping columns. So we are emulating it..
-        migration.drop_table("Blog");
-        migration.create_table("Blog", |t| {
-            t.add_column("id", types::primary());
-        });
-    }).await;
+    let result = api
+        .barrel()
+        .execute(|migration| {
+            // sqlite does not support dropping columns. So we are emulating it..
+            migration.drop_table("Blog");
+            migration.create_table("Blog", |t| {
+                t.add_column("id", types::primary());
+            });
+        })
+        .await;
 
     let dm2 = r#"
             datasource pg {

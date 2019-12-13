@@ -16,7 +16,7 @@ async fn single_watch_migrations_must_work(api: &TestApi) {
     ];
 
     let db_schema_1 = api.apply_migration(steps.clone(), "watch-0001").await.sql_schema;
-    let migrations = migration_persistence.load_all().await;
+    let migrations = migration_persistence.load_all().await.unwrap();
 
     assert_eq!(migrations.len(), 1);
     assert_eq!(migrations.first().unwrap().name, "watch-0001");
@@ -26,7 +26,7 @@ async fn single_watch_migrations_must_work(api: &TestApi) {
 
     assert_eq!(db_schema_1, db_schema_2);
 
-    let migrations = migration_persistence.load_all().await;
+    let migrations = migration_persistence.load_all().await.unwrap();
 
     assert_eq!(migrations.len(), 2);
     assert_eq!(migrations[0].name, "watch-0001");
@@ -46,14 +46,14 @@ async fn multiple_watch_migrations_must_work(api: &TestApi) {
     ];
 
     api.apply_migration(steps1.clone(), "watch-0001").await;
-    let migrations = migration_persistence.load_all().await;
+    let migrations = migration_persistence.load_all().await.unwrap();
 
     assert_eq!(migrations.len(), 1);
     assert_eq!(migrations[0].name, "watch-0001");
 
     let steps2 = vec![create_field_step("Test", "field", "String")];
     let db_schema_2 = api.apply_migration(steps2.clone(), "watch-0002").await.sql_schema;
-    let migrations = migration_persistence.load_all().await;
+    let migrations = migration_persistence.load_all().await.unwrap();
 
     assert_eq!(migrations.len(), 2);
     assert_eq!(migrations[0].name, "watch-0001");
@@ -69,7 +69,7 @@ async fn multiple_watch_migrations_must_work(api: &TestApi) {
 
     assert_eq!(db_schema_2, final_db_schema);
 
-    let migrations = migration_persistence.load_all().await;
+    let migrations = migration_persistence.load_all().await.unwrap();
 
     assert_eq!(migrations.len(), 3);
     assert_eq!(migrations[0].name, "watch-0001");
@@ -104,7 +104,7 @@ async fn steps_equivalence_criteria_is_satisfied_when_leaving_watch_mode(api: &T
 
     let final_db_schema = api.apply_migration(final_steps, custom_migration_id).await.sql_schema;
     assert_eq!(db_schema1, final_db_schema);
-    let migrations = migration_persistence.load_all().await;
+    let migrations = migration_persistence.load_all().await.unwrap();
     assert_eq!(migrations[0].name, "watch-0001");
     assert_eq!(migrations[1].name, "watch-0002");
     assert_eq!(migrations[2].name, "watch-0003");
@@ -142,7 +142,7 @@ async fn must_handle_additional_steps_when_transitioning_out_of_watch_mode(api: 
     table.column_bang("field1");
     table.column_bang("field2");
 
-    let migrations = migration_persistence.load_all().await;
+    let migrations = migration_persistence.load_all().await.unwrap();
     assert_eq!(migrations[0].name, "watch-0001");
     assert_eq!(migrations[1].name, "watch-0002");
     assert_eq!(migrations[2].name, custom_migration_id);
