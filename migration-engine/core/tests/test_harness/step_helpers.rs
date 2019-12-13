@@ -1,4 +1,3 @@
-use datamodel::ast::FieldArity;
 use migration_connector::steps::*;
 
 pub fn create_field_step(model: &str, field: &str, type_name: &str) -> MigrationStep {

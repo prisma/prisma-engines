@@ -46,7 +46,7 @@ fn push_created_type_aliases<'a>(steps: &mut Steps, type_aliases: impl Iterator<
         let create_type_alias_step = steps::CreateTypeAlias {
             type_alias: created_type_alias.name.name.clone(),
             r#type: created_type_alias.field_type.name.clone(),
-            arity: created_type_alias.arity.clone(),
+            arity: created_type_alias.arity.into(),
         };
 
         steps.push(MigrationStep::CreateTypeAlias(create_type_alias_step));
@@ -283,7 +283,7 @@ fn push_updated_models<'a>(steps: &mut Steps, models: impl Iterator<Item = Model
 fn push_created_fields<'a>(steps: &mut Steps, model_name: &'a str, fields: impl Iterator<Item = &'a ast::Field>) {
     for field in fields {
         let create_field_step = steps::CreateField {
-            arity: field.arity.clone(),
+            arity: field.arity.into(),
             field: field.name.name.clone(),
             tpe: field.field_type.name.clone(),
             model: model_name.to_owned(),
@@ -314,7 +314,7 @@ fn push_deleted_fields<'a>(steps: &mut Steps, model_name: &'a str, fields: impl 
 fn push_updated_fields<'a>(steps: &mut Steps, model_name: &'a str, fields: impl Iterator<Item = FieldDiffer<'a>>) {
     for field in fields {
         let update_field_step = steps::UpdateField {
-            arity: diff_value(&field.previous.arity, &field.next.arity),
+            arity: diff_value(&field.previous.arity, &field.next.arity).map(Into::into),
             new_name: diff_value(&field.previous.name.name, &field.next.name.name),
             model: model_name.to_owned(),
             field: field.previous.name.name.clone(),

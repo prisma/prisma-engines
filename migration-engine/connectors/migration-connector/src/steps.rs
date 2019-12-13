@@ -65,7 +65,7 @@ pub struct CreateField {
     #[serde(rename = "type")]
     pub tpe: String,
 
-    pub arity: ast::FieldArity,
+    pub arity: FieldArity,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -82,7 +82,7 @@ pub struct UpdateField {
     pub tpe: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub arity: Option<ast::FieldArity>,
+    pub arity: Option<FieldArity>,
 }
 
 impl UpdateField {
@@ -276,7 +276,6 @@ impl DirectivePath {
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct CreateArgument {
     pub location: ArgumentLocation,
-    // TODO: figure out whether we want this, or an option, for default arguments
     pub argument: String,
     pub value: MigrationExpression,
 }
@@ -285,7 +284,6 @@ pub struct CreateArgument {
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct DeleteArgument {
     pub location: ArgumentLocation,
-    // TODO: figure out whether we want this, or an option, for default arguments
     pub argument: String,
 }
 
@@ -294,7 +292,6 @@ pub struct DeleteArgument {
 pub struct UpdateArgument {
     pub location: ArgumentLocation,
     pub argument: String,
-    // TODO: figure out whether we want this, or an option, for default arguments
     pub new_value: MigrationExpression,
 }
 
@@ -317,7 +314,7 @@ pub struct CreateTypeAlias {
     pub type_alias: String,
 
     pub r#type: String,
-    pub arity: ast::FieldArity,
+    pub arity: FieldArity,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -351,6 +348,46 @@ pub struct CreateSource {
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct DeleteSource {
     pub source: String,
+}
+
+#[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub enum FieldArity {
+    Required,
+    Optional,
+    List,
+}
+
+impl From<ast::FieldArity> for FieldArity {
+    fn from(ast_arity: ast::FieldArity) -> Self {
+        (&ast_arity).into()
+    }
+}
+
+impl From<&ast::FieldArity> for FieldArity {
+    fn from(ast_arity: &ast::FieldArity) -> Self {
+        match &ast_arity {
+            ast::FieldArity::Required => FieldArity::Required,
+            ast::FieldArity::Optional => FieldArity::Optional,
+            ast::FieldArity::List => FieldArity::List,
+        }
+    }
+}
+
+impl Into<ast::FieldArity> for FieldArity {
+    fn into(self) -> ast::FieldArity {
+        (&self).into()
+    }
+}
+
+impl Into<ast::FieldArity> for &FieldArity {
+    fn into(self) -> ast::FieldArity {
+        match &self {
+            FieldArity::Required => ast::FieldArity::Required,
+            FieldArity::Optional => ast::FieldArity::Optional,
+            FieldArity::List => ast::FieldArity::List,
+        }
+    }
 }
 
 #[cfg(test)]

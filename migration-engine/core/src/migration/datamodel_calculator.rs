@@ -163,7 +163,7 @@ fn apply_create_field(datamodel: &mut ast::SchemaAst, step: &steps::CreateField)
     } = step;
 
     let field = ast::Field {
-        arity: arity.clone(),
+        arity: arity.into(),
         name: new_ident(field.to_owned()),
         documentation: None,
         field_type: new_ident(tpe.clone()),
@@ -260,7 +260,7 @@ fn apply_update_field(datamodel: &mut ast::SchemaAst, step: &steps::UpdateField)
         )
     })?;
 
-    apply_field_update(field, &step.arity, update_field_arity);
+    apply_field_update(field, &step.arity.map(|x| x.into()), update_field_arity);
     apply_field_update(field, &step.tpe, update_field_type);
     apply_field_update(field, &step.new_name, update_field_name);
 
@@ -475,7 +475,7 @@ fn apply_create_type_alias(
         name: new_ident(step.type_alias.clone()),
         span: new_span(),
         default_value: None,
-        arity: step.arity.clone(),
+        arity: step.arity.into(),
         directives: vec![],
         field_type: new_ident(step.r#type.clone()),
     };
