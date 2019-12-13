@@ -1,9 +1,9 @@
 use crate::commands::CommandResult;
 use crate::migration::datamodel_calculator::*;
 use crate::migration::datamodel_migration_steps_inferrer::*;
+use datamodel::ast::SchemaAst;
 use migration_connector::*;
 use std::sync::Arc;
-use datamodel::ast::SchemaAst;
 
 pub struct MigrationEngine<C, D>
 where

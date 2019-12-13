@@ -9,8 +9,8 @@ pub mod logging;
 #[doc(hidden)]
 pub mod runtime;
 
-use url::Url;
 use quaint::{prelude::Queryable, single::Quaint};
+use url::Url;
 
 const SCHEMA_NAME: &str = "prisma-tests";
 
@@ -30,10 +30,7 @@ pub fn postgres_9_url(db_name: &str) -> String {
 
     format!(
         "postgresql://postgres:prisma@{}:{}/{}?schema={}",
-        host,
-        port,
-        db_name,
-        SCHEMA_NAME
+        host, port, db_name, SCHEMA_NAME
     )
 }
 
@@ -42,10 +39,7 @@ pub fn postgres_10_url(db_name: &str) -> String {
 
     format!(
         "postgresql://postgres:prisma@{}:{}/{}?schema={}",
-        host,
-        port,
-        db_name,
-        SCHEMA_NAME
+        host, port, db_name, SCHEMA_NAME
     )
 }
 
@@ -54,10 +48,7 @@ pub fn postgres_11_url(db_name: &str) -> String {
 
     format!(
         "postgresql://postgres:prisma@{}:{}/{}?schema={}",
-        host,
-        port,
-        db_name,
-        SCHEMA_NAME
+        host, port, db_name, SCHEMA_NAME
     )
 }
 
@@ -66,10 +57,7 @@ pub fn postgres_12_url(db_name: &str) -> String {
 
     format!(
         "postgresql://postgres:prisma@{}:{}/{}?schema={}",
-        host,
-        port,
-        db_name,
-        SCHEMA_NAME
+        host, port, db_name, SCHEMA_NAME
     )
 }
 
@@ -250,10 +238,10 @@ pub fn mysql_safe_identifier(identifier: &str) -> &str {
 }
 
 fn fetch_db_name<'a>(url: &'a Url, default: &'static str) -> &'a str {
-     match url.path_segments() {
+    match url.path_segments() {
         Some(mut segments) => segments.next().unwrap_or(default),
         None => default,
-     }
+    }
 }
 
 pub async fn create_mysql_database(original_url: &Url) -> Result<Quaint, failure::Error> {
@@ -262,7 +250,11 @@ pub async fn create_mysql_database(original_url: &Url) -> Result<Quaint, failure
 
     let db_name = fetch_db_name(&original_url, "mysql");
     debug_assert!(!db_name.is_empty());
-    debug_assert!(db_name.len() < 64, "db_name should be less than 64 characters, got {:?}", db_name.len());
+    debug_assert!(
+        db_name.len() < 64,
+        "db_name should be less than 64 characters, got {:?}",
+        db_name.len()
+    );
     let conn = Quaint::new(url.as_str()).await.unwrap();
 
     let drop_stmt = format!("DROP DATABASE IF EXISTS `{}`", db_name);

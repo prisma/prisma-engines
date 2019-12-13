@@ -71,10 +71,7 @@ async fn main() {
             }
         }
     } else {
-        tracing::info!(
-            git_hash = env!("GIT_HASH"),
-            "Starting migration engine RPC server",
-        );
+        tracing::info!(git_hash = env!("GIT_HASH"), "Starting migration engine RPC server",);
         let dml_loc = matches.value_of("datamodel_location").unwrap();
         let mut file = fs::File::open(&dml_loc).unwrap();
 
