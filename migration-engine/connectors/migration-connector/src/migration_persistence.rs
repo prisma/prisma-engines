@@ -69,7 +69,7 @@ pub trait MigrationPersistence: Send + Sync + 'static {
 }
 
 /// The representation of a migration as persisted through [MigrationPersistence](trait.MigrationPersistence.html).
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct Migration {
     pub name: String,
     pub revision: usize,
@@ -82,6 +82,16 @@ pub struct Migration {
     pub errors: Vec<String>,
     pub started_at: DateTime<Utc>,
     pub finished_at: Option<DateTime<Utc>>,
+}
+
+impl Migration {
+    pub fn parse_datamodel(&self) -> Datamodel {
+        datamodel::parse_datamodel(&self.datamodel_string).unwrap()
+    }
+
+    pub fn parse_schema_ast(&self) -> SchemaAst {
+        datamodel::parse_schema_ast(&self.datamodel_string).unwrap()
+    }
 }
 
 /// Updates to be made to a persisted [Migration](struct.Migration.html).

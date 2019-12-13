@@ -38,15 +38,6 @@ pub async fn create_record(conn: &dyn QueryExt, model: &ModelRef, args: WriteArg
         None => GraphqlId::from(last_id.unwrap()),
     };
 
-    for (field_name, list_value) in args.list_args() {
-        let field = model.fields().find_from_scalar(field_name.as_ref()).unwrap();
-        let table = field.scalar_list_table();
-
-        if let Some(insert) = write::create_scalar_list_value(table.table(), &list_value, &id) {
-            conn.insert(insert).await?;
-        }
-    }
-
     Ok(id)
 }
 
@@ -69,20 +60,6 @@ pub async fn update_records(
 
     for update in updates {
         conn.update(update).await?;
-    }
-
-    for (field_name, list_value) in args.list_args() {
-        let field = model.fields().find_from_scalar(field_name.as_ref()).unwrap();
-        let table = field.scalar_list_table();
-        let (deletes, inserts) = write::update_scalar_list_values(&table, &list_value, ids.to_vec());
-
-        for delete in deletes {
-            conn.delete(delete).await?;
-        }
-
-        for insert in inserts {
-            conn.insert(insert).await?;
-        }
     }
 
     Ok(ids)

@@ -1,7 +1,7 @@
 use crate::database::operations::*;
 use crate::{query_builder::read::ManyRelatedRecordsQueryBuilder, SqlError};
 use connector_interface::{
-    self as connector, filter::Filter, QueryArguments, ReadOperations, ScalarListValues, Transaction, WriteArgs,
+    self as connector, filter::Filter, QueryArguments, ReadOperations, Transaction, WriteArgs,
     WriteOperations, IO,
 };
 use prisma_models::prelude::*;
@@ -90,14 +90,6 @@ where
             )
             .await
         }))
-    }
-
-    fn get_scalar_list_values<'b>(
-        &'b self,
-        list_field: &'b ScalarFieldRef,
-        record_ids: Vec<GraphqlId>,
-    ) -> connector::IO<'b, Vec<ScalarListValues>> {
-        IO::new(self.catch(async move { read::get_scalar_list_values(&self.inner, list_field, record_ids).await }))
     }
 
     fn count_by_model<'b>(&'b self, model: &'b ModelRef, query_arguments: QueryArguments) -> connector::IO<'b, usize> {

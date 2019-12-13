@@ -1,4 +1,5 @@
 use super::{EnumDiffer, FieldDiffer, ModelDiffer};
+use crate::migration::datamodel_differ::source::SourceArgumentsDiffer;
 use datamodel::ast::{self, Top};
 
 /// Implements the logic to diff top-level items in a pair of [Datamodel ASTs](/datamodel/ast/struct.Datamodel.html).
@@ -34,6 +35,30 @@ impl<'a> TopDiffer<'a> {
         self.previous_models().filter(move |previous_model| {
             self.next_models()
                 .find(|next_model| models_match(previous_model, next_model))
+                .is_none()
+        })
+    }
+
+    pub(crate) fn updated_datasources(&self) -> impl Iterator<Item = SourceArgumentsDiffer<'_>> {
+        self.previous_sources().filter_map(move |previous| {
+            self.next_sources()
+                .find(|next| sources_match(previous, next))
+                .map(|next| SourceArgumentsDiffer { previous, next })
+        })
+    }
+
+    pub(crate) fn created_datasources(&self) -> impl Iterator<Item = &ast::SourceConfig> {
+        self.next_sources().filter(move |next| {
+            self.previous_sources()
+                .find(|previous| sources_match(previous, next))
+                .is_none()
+        })
+    }
+
+    pub(crate) fn deleted_datasources(&self) -> impl Iterator<Item = &ast::SourceConfig> {
+        self.previous_sources().filter(move |next| {
+            self.next_sources()
+                .find(|previous| sources_match(previous, next))
                 .is_none()
         })
     }
@@ -97,6 +122,14 @@ impl<'a> TopDiffer<'a> {
         })
     }
 
+    fn previous_sources(&self) -> impl Iterator<Item = &ast::SourceConfig> {
+        walk_sources(self.previous)
+    }
+
+    fn next_sources(&self) -> impl Iterator<Item = &ast::SourceConfig> {
+        walk_sources(self.next)
+    }
+
     /// Iterator over the models in `previous`.
     fn previous_models(&self) -> impl Iterator<Item = &ast::Model> {
         walk_models(self.previous)
@@ -126,6 +159,14 @@ impl<'a> TopDiffer<'a> {
     pub fn next_type_aliases(&self) -> impl Iterator<Item = &ast::Field> {
         walk_type_aliases(self.next)
     }
+}
+
+fn walk_sources(ast: &ast::SchemaAst) -> impl Iterator<Item = &ast::SourceConfig> {
+    ast.tops.iter().filter_map(Top::as_source)
+}
+
+fn sources_match(previous: &ast::SourceConfig, next: &ast::SourceConfig) -> bool {
+    previous.name.name == next.name.name
 }
 
 fn walk_enums(ast: &ast::SchemaAst) -> impl Iterator<Item = &ast::Enum> {

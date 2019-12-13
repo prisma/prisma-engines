@@ -1,4 +1,5 @@
 use crate::configuration::*;
+use datamodel_connector::{Connector, ExampleConnector};
 
 pub const SQLITE_SOURCE_NAME: &str = "sqlite";
 
@@ -29,5 +30,9 @@ impl Source for SqliteSource {
 
     fn documentation(&self) -> &Option<String> {
         &self.documentation
+    }
+
+    fn connector(&self) -> Box<dyn Connector> {
+        Box::new(ExampleConnector::empty())
     }
 }

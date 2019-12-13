@@ -16,13 +16,13 @@ pub struct SqlSchemaDescriber {
 impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
     async fn list_databases(&self) -> SqlSchemaDescriberResult<Vec<String>> {
         let databases = self.get_databases().await;
-        Result::Ok(databases)
+       Ok(databases)
     }
 
     async fn get_metadata(&self, schema: &str) -> SqlSchemaDescriberResult<SQLMetadata> {
         let count = self.get_table_names(&schema).await.len();
         let size = self.get_size(&schema).await;
-        Result::Ok(SQLMetadata {
+       Ok(SQLMetadata {
             table_count: count,
             size_in_bytes: size,
         })
@@ -173,14 +173,15 @@ impl SqlSchemaDescriber {
                     "yes" => false,
                     x => panic!(format!("unrecognized is_nullable variant '{}'", x)),
                 };
-                let tpe = get_column_type(data_type.as_ref(), full_data_type.as_ref());
-                let arity = if tpe.raw.starts_with("_") {
+
+                let arity = if full_data_type.starts_with("_") {
                     ColumnArity::List
                 } else if is_required {
                     ColumnArity::Required
                 } else {
                     ColumnArity::Nullable
                 };
+                let tpe = get_column_type(data_type.as_ref(), &full_data_type, arity);
 
                 let default = col.get("column_default").and_then(|param_value| {
                     param_value
@@ -195,7 +196,6 @@ impl SqlSchemaDescriber {
                 Column {
                     name: col_name,
                     tpe,
-                    arity,
                     default,
                     auto_increment: is_auto_increment,
                 }
@@ -500,7 +500,7 @@ impl SqlSchemaDescriber {
     }
 }
 
-fn get_column_type(_data_type: &str, full_data_type: &str) -> ColumnType {
+fn get_column_type(_data_type: &str, full_data_type: &str, arity: ColumnArity) -> ColumnType {
     let family = match full_data_type {
         "int2" => ColumnTypeFamily::Int,
         "int4" => ColumnTypeFamily::Int,
@@ -548,6 +548,7 @@ fn get_column_type(_data_type: &str, full_data_type: &str) -> ColumnType {
     ColumnType {
         raw: full_data_type.to_string(),
         family: family,
+        arity,
     }
 }
 

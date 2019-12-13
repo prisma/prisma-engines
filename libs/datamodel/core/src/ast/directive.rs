@@ -1,6 +1,6 @@
 use super::*;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct Directive {
     pub name: Identifier,
     pub arguments: Vec<Argument>,

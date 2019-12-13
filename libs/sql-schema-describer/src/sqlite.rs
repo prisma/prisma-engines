@@ -14,7 +14,7 @@ pub struct SqlSchemaDescriber {
 impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
     async fn list_databases(&self) -> SqlSchemaDescriberResult<Vec<String>> {
         let databases = self.get_databases().await;
-        Result::Ok(databases)
+ Ok(databases)
     }
 
     async fn get_metadata(&self, schema: &str) -> SqlSchemaDescriberResult<SQLMetadata> {
@@ -128,20 +128,18 @@ impl SqlSchemaDescriber {
                     Some(p) => panic!(format!("expected a string value but got {:?}", p)),
                     None => panic!("couldn't get dflt_value column"),
                 };
-                let data_type = get_column_type(&row.get("type").and_then(|x| x.to_string()).expect("type"));
-                let pk_col = row.get("pk").and_then(|x| x.as_i64()).expect("primary key");
+
                 let is_required = row.get("notnull").and_then(|x| x.as_bool()).expect("notnull");
-                let arity = if data_type.raw.ends_with("[]") {
-                    ColumnArity::List
-                } else if is_required {
+                let arity = if is_required {
                     ColumnArity::Required
                 } else {
                     ColumnArity::Nullable
                 };
+                let tpe = get_column_type(&row.get("type").and_then(|x| x.to_string()).expect("type"), arity);
+                let pk_col = row.get("pk").and_then(|x| x.as_i64()).expect("primary key");
                 let col = Column {
                     name: row.get("name").and_then(|x| x.to_string()).expect("name"),
-                    tpe: data_type,
-                    arity: arity.clone(),
+                    tpe,
                     default: default_value.clone(),
                     auto_increment: false,
                 };
@@ -150,11 +148,10 @@ impl SqlSchemaDescriber {
                 }
 
                 debug!(
-                    "Found column '{}', type: '{:?}', default: {:?}, arity: {:?}, primary key: {}",
+                    "Found column '{}', type: '{:?}', default: {:?}, primary key: {}",
                     col.name,
                     col.tpe,
                     col.default,
-                    arity,
                     pk_col > 0
                 );
 
@@ -343,8 +340,8 @@ impl SqlSchemaDescriber {
     }
 }
 
-fn get_column_type(data_type: &str) -> ColumnType {
-    let tpe_lower = data_type.to_lowercase();
+fn get_column_type(tpe: &str, arity: ColumnArity) -> ColumnType {
+    let tpe_lower = tpe.to_lowercase();
     let family = match tpe_lower.as_ref() {
         // SQLite only has a few native data types: https://www.sqlite.org/datatype3.html
         // It's tolerant though, and you can assign any data type you like to columns
@@ -371,8 +368,9 @@ fn get_column_type(data_type: &str) -> ColumnType {
         _ => ColumnTypeFamily::Unknown,
     };
     ColumnType {
-        raw: data_type.to_string(),
+        raw: tpe.to_string(),
         family: family,
+        arity,
     }
 }
 

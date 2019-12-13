@@ -1,4 +1,5 @@
 use crate::configuration::*;
+use datamodel_connector::{Connector, ExampleConnector};
 
 pub const MYSQL_SOURCE_NAME: &str = "mysql";
 
@@ -30,5 +31,9 @@ impl Source for MySqlSource {
 
     fn documentation(&self) -> &Option<String> {
         &self.documentation
+    }
+
+    fn connector(&self) -> Box<dyn Connector> {
+        Box::new(ExampleConnector::empty())
     }
 }

@@ -77,23 +77,6 @@ where
         .fold(query.into_select(model), |acc, col| acc.column(col))
 }
 
-pub fn get_scalar_list_values_by_record_ids(
-    list_field: &ScalarFieldRef,
-    record_ids: Vec<GraphqlId>,
-) -> Select<'static> {
-    let table = list_field.scalar_list_table().table();
-
-    // I vant to saak your blaad... - Vlad the Impaler
-    let vhere = "nodeId".in_selection(record_ids);
-
-    Select::from_table(table)
-        .column("nodeId")
-        .column("value")
-        .so_that(vhere)
-        .order_by("nodeId".ascend())
-        .order_by("position".ascend())
-}
-
 pub fn count_by_model(model: &ModelRef, query_arguments: QueryArguments) -> Select<'static> {
     let id_field = model.fields().id();
 

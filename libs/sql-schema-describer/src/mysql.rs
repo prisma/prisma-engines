@@ -160,14 +160,12 @@ impl SqlSchemaDescriber {
                     "yes" => false,
                     x => panic!(format!("unrecognized is_nullable variant '{}'", x)),
                 };
-                let tpe = get_column_type(data_type.as_ref(), full_data_type.as_ref());
-                let arity = if tpe.raw.starts_with("_") {
-                    ColumnArity::List
-                } else if is_required {
+                let arity = if is_required {
                     ColumnArity::Required
                 } else {
                     ColumnArity::Nullable
                 };
+                let tpe = get_column_type(&data_type, &full_data_type, arity);
                 let extra = col
                     .get("extra")
                     .and_then(|x| x.to_string())
@@ -183,7 +181,6 @@ impl SqlSchemaDescriber {
                         .and_then(|x| x.to_string())
                         .expect("get column name"),
                     tpe,
-                    arity,
                     default: col.get("column_default").and_then(|x| x.to_string()),
                     auto_increment: auto_increment,
                 }
@@ -405,7 +402,7 @@ impl SqlSchemaDescriber {
     }
 }
 
-fn get_column_type(data_type: &str, full_data_type: &str) -> ColumnType {
+fn get_column_type(data_type: &str, full_data_type: &str, arity: ColumnArity) -> ColumnType {
     let family = match (data_type, full_data_type) {
         ("int", _) => ColumnTypeFamily::Int,
         ("smallint", _) => ColumnTypeFamily::Int,
@@ -451,5 +448,6 @@ fn get_column_type(data_type: &str, full_data_type: &str) -> ColumnType {
     ColumnType {
         raw: data_type.to_string(),
         family: family,
+        arity,
     }
 }

@@ -24,15 +24,18 @@ pub async fn execute<'a, 'b>(
 
 async fn create_one<'a, 'b>(tx: &'a ConnectionLike<'a, 'b>, q: CreateRecord) -> InterpretationResult<QueryResult> {
     let res = tx
-        .create_record(&q.model, WriteArgs::new(q.non_list_args, q.list_args))
+        .create_record(&q.model, WriteArgs::new(q.args))
         .await?;
 
     Ok(QueryResult::Id(Some(res)))
 }
 
 async fn update_one<'a, 'b>(tx: &'a ConnectionLike<'a, 'b>, q: UpdateRecord) -> InterpretationResult<QueryResult> {
-    let mut res = tx
-        .update_records(&q.model, q.where_, WriteArgs::new(q.non_list_args, q.list_args))
+    let mut res = tx.update_records(
+            &q.model,
+            Filter::from(q.where_),
+            WriteArgs::new(q.args),
+        )
         .await?;
 
     Ok(QueryResult::Id(res.pop()))
@@ -57,7 +60,7 @@ async fn update_many<'a, 'b>(
     q: UpdateManyRecords,
 ) -> InterpretationResult<QueryResult> {
     let res = tx
-        .update_records(&q.model, q.filter, WriteArgs::new(q.non_list_args, q.list_args))
+        .update_records(&q.model, q.filter, WriteArgs::new(q.args))
         .await?;
 
     Ok(QueryResult::Count(res.len()))

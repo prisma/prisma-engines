@@ -28,8 +28,8 @@ async fn sqlite_column_types_must_work() {
             tpe: ColumnType {
                 raw: "INTEGER".to_string(),
                 family: ColumnTypeFamily::Int,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
         },
@@ -38,8 +38,8 @@ async fn sqlite_column_types_must_work() {
             tpe: ColumnType {
                 raw: "TEXT".to_string(),
                 family: ColumnTypeFamily::String,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
         },
@@ -48,8 +48,8 @@ async fn sqlite_column_types_must_work() {
             tpe: ColumnType {
                 raw: "REAL".to_string(),
                 family: ColumnTypeFamily::Float,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
         },
@@ -58,8 +58,8 @@ async fn sqlite_column_types_must_work() {
             tpe: ColumnType {
                 raw: "INTEGER".to_string(),
                 family: ColumnTypeFamily::Int,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
             default: None,
             auto_increment: true,
         },
@@ -111,8 +111,8 @@ async fn sqlite_foreign_key_on_delete_must_be_handled() {
                     tpe: ColumnType {
                         raw: "INTEGER".to_string(),
                         family: ColumnTypeFamily::Int,
+                        arity: ColumnArity::Nullable,
                     },
-                    arity: ColumnArity::Nullable,
                     default: None,
                     auto_increment: false,
                 },
@@ -121,8 +121,8 @@ async fn sqlite_foreign_key_on_delete_must_be_handled() {
                     tpe: ColumnType {
                         raw: "INTEGER".to_string(),
                         family: ColumnTypeFamily::Int,
+                        arity: ColumnArity::Nullable,
                     },
-                    arity: ColumnArity::Nullable,
                     default: None,
                     auto_increment: false,
                 },
@@ -131,8 +131,8 @@ async fn sqlite_foreign_key_on_delete_must_be_handled() {
                     tpe: ColumnType {
                         raw: "INTEGER".to_string(),
                         family: ColumnTypeFamily::Int,
+                        arity: ColumnArity::Nullable,
                     },
-                    arity: ColumnArity::Nullable,
                     default: None,
                     auto_increment: false,
                 },
@@ -141,8 +141,8 @@ async fn sqlite_foreign_key_on_delete_must_be_handled() {
                     tpe: ColumnType {
                         raw: "INTEGER".to_string(),
                         family: ColumnTypeFamily::Int,
+                        arity: ColumnArity::Nullable,
                     },
-                    arity: ColumnArity::Nullable,
                     default: None,
                     auto_increment: false,
                 },
@@ -151,8 +151,8 @@ async fn sqlite_foreign_key_on_delete_must_be_handled() {
                     tpe: ColumnType {
                         raw: "INTEGER".to_string(),
                         family: ColumnTypeFamily::Int,
+                        arity: ColumnArity::Nullable,
                     },
-                    arity: ColumnArity::Nullable,
                     default: None,
                     auto_increment: false,
                 },
@@ -161,8 +161,8 @@ async fn sqlite_foreign_key_on_delete_must_be_handled() {
                     tpe: ColumnType {
                         raw: "INTEGER".to_string(),
                         family: ColumnTypeFamily::Int,
+                        arity: ColumnArity::Required,
                     },
-                    arity: ColumnArity::Required,
                     default: None,
                     auto_increment: true,
                 },

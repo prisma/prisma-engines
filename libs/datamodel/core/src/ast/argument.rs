@@ -1,7 +1,7 @@
 use super::*;
 
 /// An argument, either for directives, or for keys in source blocks.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct Argument {
     /// Name of the argument.
     pub name: Identifier,

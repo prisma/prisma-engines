@@ -4,6 +4,7 @@ use super::{Connector, ScalarFieldType, ScalarType};
 pub struct DeclarativeConnector {
     pub type_aliases: Vec<TypeAlias>,
     pub field_type_constructors: Vec<FieldTypeConstructor>,
+    pub supports_scalar_lists: bool,
 }
 
 impl Connector for DeclarativeConnector {
@@ -20,6 +21,10 @@ impl Connector for DeclarativeConnector {
                 }
             }),
         }
+    }
+
+    fn supports_scalar_lists(&self) -> bool {
+        self.supports_scalar_lists
     }
 }
 

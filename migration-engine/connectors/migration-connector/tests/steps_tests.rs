@@ -5,7 +5,7 @@ use migration_connector::steps::*;
 
 #[test]
 fn full_CreateModel_must_work() {
-    let json = r#"{"stepType":"CreateModel","model":"Blog"}"#;
+    let json = r#"{"tag":"CreateModel","model":"Blog"}"#;
     let expected_struct = MigrationStep::CreateModel(CreateModel {
         model: "Blog".to_string(),
     });
@@ -14,7 +14,7 @@ fn full_CreateModel_must_work() {
 
 #[test]
 fn minimal_UpdateModel_must_work() {
-    let json = r#"{"stepType":"UpdateModel","model":"Blog"}"#;
+    let json = r#"{"tag":"UpdateModel","model":"Blog"}"#;
     let expected_struct = MigrationStep::UpdateModel(UpdateModel {
         model: "Blog".to_string(),
         new_name: None,
@@ -24,7 +24,7 @@ fn minimal_UpdateModel_must_work() {
 
 #[test]
 fn full_UpdateModel_must_work() {
-    let json = r#"{"stepType":"UpdateModel","model":"Blog","newName":"MyBlog"}"#;
+    let json = r#"{"tag":"UpdateModel","model":"Blog","newName":"MyBlog"}"#;
     let expected_struct = MigrationStep::UpdateModel(UpdateModel {
         model: "Blog".to_string(),
         new_name: Some("MyBlog".to_string()),
@@ -34,7 +34,7 @@ fn full_UpdateModel_must_work() {
 
 #[test]
 fn DeleteModel_must_work() {
-    let json = r#"{"stepType":"DeleteModel","model":"Blog"}"#;
+    let json = r#"{"tag":"DeleteModel","model":"Blog"}"#;
     let expected_struct = MigrationStep::DeleteModel(DeleteModel {
         model: "Blog".to_string(),
     });
@@ -45,7 +45,7 @@ fn DeleteModel_must_work() {
 fn minimal_CreateField_must_work() {
     let json = r#"
             {
-                "stepType":"CreateField",
+                "tag":"CreateField",
                 "model":"Blog",
                 "field":"title",
                 "type":"String",
@@ -64,7 +64,7 @@ fn minimal_CreateField_must_work() {
 #[test]
 fn full_CreateField_must_work() {
     let json = r#"{
-            "stepType":"CreateField",
+            "tag":"CreateField",
             "model": "Blog",
             "field": "title",
             "type": "String",
@@ -82,7 +82,7 @@ fn full_CreateField_must_work() {
 
 #[test]
 fn minimal_UpdateField_must_work() {
-    let json = r#"{"stepType":"UpdateField","model":"Blog","field":"title"}"#;
+    let json = r#"{"tag":"UpdateField","model":"Blog","field":"title"}"#;
     let expected_struct = MigrationStep::UpdateField(UpdateField {
         model: "Blog".to_string(),
         field: "title".to_string(),
@@ -97,7 +97,7 @@ fn minimal_UpdateField_must_work() {
 fn full_UpdateField_must_work() {
     let json = r#"
         {
-            "stepType": "UpdateField",
+            "tag": "UpdateField",
             "model": "Blog",
             "field": "title",
             "newName": "MyBlog",
@@ -117,7 +117,7 @@ fn full_UpdateField_must_work() {
 
 #[test]
 fn DeleteField_must_work() {
-    let json = r#"{"stepType":"DeleteField","model":"Blog","field":"title"}"#;
+    let json = r#"{"tag":"DeleteField","model":"Blog","field":"title"}"#;
     let expected_struct = MigrationStep::DeleteField(DeleteField {
         model: "Blog".to_string(),
         field: "title".to_string(),
@@ -129,7 +129,7 @@ fn DeleteField_must_work() {
 fn CreateEnum_must_work() {
     let json = r#"
         {
-            "stepType": "CreateEnum",
+            "tag": "CreateEnum",
             "enum": "BlogCategory",
             "values": ["Politics","Tech"]
         }
@@ -145,7 +145,7 @@ fn CreateEnum_must_work() {
 fn minimal_UpdateEnum_must_work() {
     let json = r#"
         {
-            "stepType": "UpdateEnum",
+            "tag": "UpdateEnum",
             "enum": "BlogCategory"
         }
     "#;
@@ -162,7 +162,7 @@ fn minimal_UpdateEnum_must_work() {
 fn full_Update_Enum_must_work() {
     let json = r#"
         {
-            "stepType": "UpdateEnum",
+            "tag": "UpdateEnum",
             "enum": "BlogCategory",
             "newName": "MyBlogCategory",
             "createdValues": ["Tech"],
@@ -180,7 +180,7 @@ fn full_Update_Enum_must_work() {
 
 #[test]
 fn DeleteEnum_must_work() {
-    let json = r#"{"stepType":"DeleteEnum","enum":"BlogCategory"}"#;
+    let json = r#"{"tag":"DeleteEnum","enum":"BlogCategory"}"#;
     let expected_struct = MigrationStep::DeleteEnum(DeleteEnum {
         r#enum: "BlogCategory".to_string(),
     });
@@ -191,19 +191,24 @@ fn DeleteEnum_must_work() {
 fn CreateDirective_must_work() {
     let json = r#"
         {
-            "stepType": "CreateDirective",
-            "model": "Blog",
-            "directive": "map"
+            "tag": "CreateDirective",
+            "location": {
+                "directive": "map",
+                "path": {
+                    "tag": "Model",
+                    "model": "Blog"           
+                }
+            }
         }
     "#;
 
     let expected_step = MigrationStep::CreateDirective(CreateDirective {
-        locator: DirectiveLocation {
-            directive: "map".to_owned(),
-            arguments: None,
-            location: DirectiveType::Model {
+        location: DirectiveLocation {
+            path: DirectivePath::Model {
                 model: "Blog".to_owned(),
+                arguments: None,
             },
+            directive: "map".to_owned(),
         },
     });
 
@@ -214,21 +219,25 @@ fn CreateDirective_must_work() {
 fn minimal_DeleteDirective_must_work() {
     let json = r#"
         {
-            "stepType": "DeleteDirective",
-            "model": "Blog",
-            "field": "title",
-            "directive": "map"
+            "tag": "DeleteDirective",
+            "location": {
+                "path": {
+                    "tag": "Field",
+                    "model": "Blog",
+                    "field": "title"
+                },
+                "directive": "map"
+            }
         }
     "#;
 
     let expected_step = MigrationStep::DeleteDirective(DeleteDirective {
-        locator: DirectiveLocation {
-            directive: "map".to_owned(),
-            location: DirectiveType::Field {
+        location: DirectiveLocation {
+            path: DirectivePath::Field {
                 model: "Blog".to_owned(),
                 field: "title".to_owned(),
             },
-            arguments: None,
+            directive: "map".to_owned(),
         },
     });
 
@@ -239,28 +248,33 @@ fn minimal_DeleteDirective_must_work() {
 fn full_DeleteDirective_must_work() {
     let json = r#"
         {
-            "stepType": "DeleteDirective",
-            "model": "Blog",
-            "directive": "unique",
-            "arguments": [
-                {
-                    "name": "",
-                    "value": "[name, age]"
-                }
-            ]
+            "tag": "DeleteDirective",
+            "location": {
+                "path": {
+                    "tag": "Model",
+                    "model": "Blog",                    
+                    "arguments": [
+                        {
+                            "name": "",
+                            "value": "[name, age]"
+                        }
+                    ]
+                },
+                "directive": "unique"
+            }
         }
     "#;
 
     let expected_step = MigrationStep::DeleteDirective(DeleteDirective {
-        locator: DirectiveLocation {
-            directive: "unique".to_owned(),
-            location: DirectiveType::Model {
+        location: DirectiveLocation {
+            path: DirectivePath::Model {
                 model: "Blog".to_owned(),
+                arguments: Some(vec![Argument {
+                    name: "".to_owned(),
+                    value: MigrationExpression("[name, age]".to_owned()),
+                }]),
             },
-            arguments: Some(vec![Argument {
-                name: "".to_owned(),
-                value: MigrationExpression("[name, age]".to_owned()),
-            }]),
+            directive: "unique".to_owned(),
         },
     });
 
@@ -268,25 +282,31 @@ fn full_DeleteDirective_must_work() {
 }
 
 #[test]
-fn UpdateDirectiveArgument_must_work() {
+fn UpdateArgument_must_work() {
     let json = r#"
         {
-            "stepType": "UpdateDirectiveArgument",
-            "enum": "CatMood",
-            "directive": "map",
+            "tag": "UpdateArgument",
+            "location": {
+                "tag": "Directive",
+                "path": {
+                    "tag": "Model",
+                    "model": "CatMood"
+                },
+                "directive": "map"
+            },            
             "argument": "name",
             "newValue": "cat_mood"
         }
     "#;
 
-    let expected_step = MigrationStep::UpdateDirectiveArgument(UpdateDirectiveArgument {
-        directive_location: DirectiveLocation {
-            directive: "map".to_owned(),
-            location: DirectiveType::Enum {
-                r#enum: "CatMood".to_owned(),
+    let expected_step = MigrationStep::UpdateArgument(UpdateArgument {
+        location: ArgumentLocation::Directive(DirectiveLocation {
+            path: DirectivePath::Model {
+                model: "CatMood".to_owned(),
+                arguments: None,
             },
-            arguments: None,
-        },
+            directive: "map".to_owned(),
+        }),
         argument: "name".to_owned(),
         new_value: MigrationExpression("cat_mood".to_owned()),
     });
@@ -295,51 +315,63 @@ fn UpdateDirectiveArgument_must_work() {
 }
 
 #[test]
-fn CreateDirectiveArgument_must_work() {
+fn CreateArgument_must_work() {
     let json = r#"
         {
-            "stepType": "CreateDirectiveArgument",
-            "enum": "CatMood",
-            "directive": "map",
+            "tag": "CreateArgument",
+            "location": {
+                "tag": "Directive",         
+                "directive": "map",
+                "path": {
+                    "enum": "CatMood",
+                    "tag": "Enum"
+                }
+            },
             "argument": "name",
             "value": "cat_mood"
         }
     "#;
 
-    let expected_step = MigrationStep::CreateDirectiveArgument(CreateDirectiveArgument {
-        directive_location: DirectiveLocation {
-            arguments: None,
-            directive: "map".to_owned(),
-            location: DirectiveType::Enum {
+    let expected_step = MigrationStep::CreateArgument(CreateArgument {
+        location: ArgumentLocation::Directive(DirectiveLocation {
+            path: DirectivePath::Enum {
                 r#enum: "CatMood".to_owned(),
             },
-        },
+            directive: "map".to_owned(),
+        }),
         argument: "name".to_owned(),
         value: MigrationExpression("cat_mood".to_owned()),
     });
+
+    println!("{}", serde_json::to_value(&expected_step).unwrap());
 
     assert_symmetric_serde(json, expected_step);
 }
 
 #[test]
-fn DeleteDirectiveArgument_must_work() {
+fn DeleteArgument_must_work() {
     let json = r#"
         {
-            "stepType": "DeleteDirectiveArgument",
-            "enum": "CatMood",
-            "directive": "map",
+            "tag": "DeleteArgument",
+            "location": {
+                "tag": "Directive",
+                "path": {
+                    "tag":"Enum",
+                    "enum": "CatMood"                    
+                },
+                "directive":"map"
+            },
             "argument": "name"
         }
     "#;
 
-    let expected_step = MigrationStep::DeleteDirectiveArgument(DeleteDirectiveArgument {
-        directive_location: DirectiveLocation {
-            directive: "map".to_owned(),
-            arguments: None,
-            location: DirectiveType::Enum {
+    let expected_step = MigrationStep::DeleteArgument(DeleteArgument {
+        location: ArgumentLocation::Directive(DirectiveLocation {
+            path: DirectivePath::Enum {
                 r#enum: "CatMood".to_owned(),
             },
-        },
+            directive: "map".to_owned(),
+        }),
         argument: "name".to_owned(),
     });
 
@@ -352,7 +384,7 @@ fn assert_symmetric_serde(json: &str, expected: MigrationStep) {
     let serialized_again = serde_json::to_value(&deserialized).expect("Serialization failed");
     assert_eq!(
         deserialized, expected,
-        "The provided json could not be serialized into the expected struct."
+        "The provided json could not be deserialized into the expected struct."
     );
     assert_eq!(
         serialized_again, serde_value,

@@ -45,7 +45,7 @@ pub(crate) fn directives_match(previous: &ast::Directive, next: &ast::Directive)
     previous.name.name == next.name.name
 }
 
-fn arguments_match(previous: &ast::Argument, next: &ast::Argument) -> bool {
+pub fn arguments_match(previous: &ast::Argument, next: &ast::Argument) -> bool {
     previous.name.name == next.name.name
 }
 

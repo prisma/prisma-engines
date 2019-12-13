@@ -1,4 +1,5 @@
 use crate::{ModelRef, RelationField, ScalarField, TypeIdentifier};
+use datamodel::FieldArity;
 use std::sync::Arc;
 
 pub trait IntoSelectedFields {
@@ -53,12 +54,7 @@ impl From<Vec<Arc<ScalarField>>> for SelectedFields {
 
 impl From<&ModelRef> for SelectedFields {
     fn from(model: &ModelRef) -> SelectedFields {
-        let fields = model
-            .fields()
-            .scalar_non_list()
-            .into_iter()
-            .map(SelectedField::from)
-            .collect();
+        let fields = model.fields().scalar().into_iter().map(SelectedField::from).collect();
 
         SelectedFields::new(fields, None)
     }
@@ -94,7 +90,7 @@ impl SelectedFields {
     }
 
     pub fn names(&self) -> Vec<String> {
-        let mut result: Vec<String> = self.scalar_non_list().iter().map(|f| f.name.clone()).collect();
+        let mut result: Vec<String> = self.scalar_fields().iter().map(|f| f.name.clone()).collect();
 
         for rf in self.relation_inlined().iter() {
             result.push(rf.name.clone());
@@ -108,18 +104,24 @@ impl SelectedFields {
         result
     }
 
-    pub fn type_identifiers(&self) -> Vec<TypeIdentifier> {
-        let mut result: Vec<TypeIdentifier> = self.scalar_non_list().iter().map(|sf| sf.type_identifier).collect();
+    pub fn types(&self) -> Vec<(TypeIdentifier, FieldArity)> {
+        let mut result: Vec<(TypeIdentifier, FieldArity)> = self
+            .scalar_fields()
+            .iter()
+            .map(|sf| sf.type_identifier_with_arity())
+            .collect();
 
         for rf in self.relation_inlined().iter() {
-            result.push(rf.type_identifier);
+            result.push(rf.type_identifier_with_arity());
         }
 
-        // Related and parent id.
-        if self.from_field.is_some() {
-            result.push(TypeIdentifier::GraphQLID);
-            result.push(TypeIdentifier::GraphQLID);
-        };
+        match &self.from_field {
+            Some(rf) => {
+                result.push(rf.type_identifier_with_arity());
+                result.push(rf.related_field().type_identifier_with_arity());
+            }
+            None => (),
+        }
 
         result
     }
@@ -154,19 +156,7 @@ impl SelectedFields {
             .collect()
     }
 
-    pub fn scalar_non_list(&self) -> Vec<Arc<ScalarField>> {
-        self.scalar
-            .iter()
-            .filter(|sf| !sf.field.is_list)
-            .map(|sf| sf.field.clone())
-            .collect()
-    }
-
-    pub fn scalar_lists(&self) -> Vec<Arc<ScalarField>> {
-        self.scalar
-            .iter()
-            .filter(|sf| sf.field.is_list)
-            .map(|sf| sf.field.clone())
-            .collect()
+    pub fn scalar_fields(&self) -> Vec<Arc<ScalarField>> {
+        self.scalar.iter().map(|sf| sf.field.clone()).collect()
     }
 }

@@ -7,10 +7,7 @@ sealed trait ConnectorCapability extends EnumEntry
 object ConnectorCapability extends Enumeratum[ConnectorCapability] {
   val values = findValues
 
-  sealed trait ScalarListsCapability     extends ConnectorCapability
-  object ScalarListsCapability           extends ScalarListsCapability
-  object EmbeddedScalarListsCapability   extends ScalarListsCapability
-  object NonEmbeddedScalarListCapability extends ScalarListsCapability
+  object ScalarListsCapability           extends ConnectorCapability
 
   object NodeQueryCapability extends ConnectorCapability
 
@@ -23,7 +20,6 @@ object ConnectorCapability extends Enumeratum[ConnectorCapability] {
   object RawAccessCapability                 extends ConnectorCapability
   object IntrospectionCapability             extends ConnectorCapability
   object JoinRelationLinksCapability         extends ConnectorCapability // the ability to join using relation links
-  object MongoJoinRelationLinksCapability    extends ConnectorCapability // does not allow NOT/OR and only _some on manyrelations
   object RelationLinkListCapability          extends ConnectorCapability // relation links can be stored inline in a node in a list
   object RelationLinkTableCapability         extends ConnectorCapability // relation links are stored in a table
 
@@ -36,17 +32,8 @@ object ConnectorCapability extends Enumeratum[ConnectorCapability] {
 }
 
 case class ConnectorCapabilities(capabilities: Set[ConnectorCapability]) {
-  import ConnectorCapability._
-
-  def has(capability: ConnectorCapability): Boolean = capability match {
-    case ScalarListsCapability => capabilities.contains(EmbeddedScalarListsCapability) || capabilities.contains(NonEmbeddedScalarListCapability)
-    case x                     => capabilities.contains(x)
-  }
+  def has(capability: ConnectorCapability): Boolean = capabilities.contains(capability)
   def hasNot(capability: ConnectorCapability): Boolean = !has(capability)
-
-  def supportsScalarLists = capabilities.exists(_.isInstanceOf[ScalarListsCapability])
-
-  def isMongo: Boolean = has(EmbeddedTypesCapability)
 }
 
 object ConnectorCapabilities {
@@ -56,7 +43,7 @@ object ConnectorCapabilities {
   def apply(capabilities: ConnectorCapability*): ConnectorCapabilities = ConnectorCapabilities(Set(capabilities: _*))
 
   lazy val sqlite: ConnectorCapabilities = ConnectorCapabilities(sqlShared)
-  lazy val postgres: ConnectorCapabilities = ConnectorCapabilities(sqlShared)
+  lazy val postgres: ConnectorCapabilities = ConnectorCapabilities(sqlShared + ScalarListsCapability)
   lazy val mysql: ConnectorCapabilities = ConnectorCapabilities(sqlShared)
 
   private lazy val sqlShared: Set[ConnectorCapability] = {
@@ -66,31 +53,13 @@ object ConnectorCapabilities {
       JoinRelationLinksCapability,
       RelationLinkTableCapability,
       MigrationsCapability,
-      NonEmbeddedScalarListCapability,
-//      NodeQueryCapability,
       IntrospectionCapability,
       SupportsExistingDatabasesCapability,
       IntIdCapability,
-      NonEmbeddedScalarListCapability,
       RawAccessCapability,
       IdSequenceCapability,
       Prisma2Capability,
       UuidIdCapability
     )
-  }
-
-  val mongo: ConnectorCapabilities = {
-    val common = Set(
-      NodeQueryCapability,
-      EmbeddedScalarListsCapability,
-      EmbeddedTypesCapability,
-      JoinRelationLinksCapability,
-      MongoJoinRelationLinksCapability,
-      RelationLinkListCapability,
-      EmbeddedTypesCapability,
-      SupportsExistingDatabasesCapability
-    )
-
-    ConnectorCapabilities(common)
   }
 }
