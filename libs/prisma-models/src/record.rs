@@ -1,6 +1,7 @@
 use crate::{DomainError as Error, DomainResult, Field, GraphqlId, PrismaValue};
 use std::convert::TryFrom;
 
+#[derive(Debug, Clone)]
 pub struct RecordIdentifier {
     pub pairs: Vec<(Field, PrismaValue)>,
 }
@@ -94,7 +95,7 @@ impl ManyRecords {
 #[derive(Debug, Default, Clone)]
 pub struct Record {
     pub values: Vec<PrismaValue>,
-    pub parent_id: Option<GraphqlId>,
+    pub parent_id: Option<RecordIdentifier>,
 }
 
 impl Record {
@@ -121,7 +122,7 @@ impl Record {
         Ok(&self.values[index])
     }
 
-    pub fn add_parent_id(&mut self, parent_id: GraphqlId) {
+    pub fn set_parent_id(&mut self, parent_id: RecordIdentifier) {
         self.parent_id = Some(parent_id);
     }
 }

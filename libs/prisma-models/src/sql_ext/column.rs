@@ -1,6 +1,16 @@
 use crate::{Field, RelationField, ScalarField};
 use quaint::ast::Column;
 
+pub trait AsColumns {
+    fn as_columns(&self) -> Vec<Column<'static>>;
+}
+
+impl AsColumns for Vec<Field> {
+    fn as_columns(&self) -> Vec<Column<'static>> {
+        self.iter().map(|f| f.as_column()).collect()
+    }
+}
+
 pub trait AsColumn {
     fn as_column(&self) -> Column<'static>;
 }

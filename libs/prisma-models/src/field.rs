@@ -14,7 +14,7 @@ pub enum FieldTemplate {
     Scalar(ScalarFieldTemplate),
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Field {
     Relation(RelationFieldRef),
     Scalar(ScalarFieldRef),

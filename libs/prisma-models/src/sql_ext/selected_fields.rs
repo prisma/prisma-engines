@@ -7,11 +7,7 @@ pub trait SelectedFieldsExt {
 
 impl SelectedFieldsExt for SelectedFields {
     fn columns(&self) -> Vec<Column<'static>> {
-        let mut result: Vec<Column<'static>> = self
-            .scalar_non_list()
-            .iter()
-            .map(|f| f.as_column())
-            .collect();
+        let mut result: Vec<Column<'static>> = self.scalar_non_list().iter().map(|f| f.as_column()).collect();
 
         for rf in self.relation_inlined().iter() {
             result.push(rf.as_column());
@@ -21,30 +17,42 @@ impl SelectedFieldsExt for SelectedFields {
             let relation = from_field.relation();
 
             if from_field.relation_is_inlined_in_child() {
-                result.push(
+                result.extend(
                     relation
-                        .column_for_relation_side(from_field.relation_side.opposite())
-                        .alias(SelectedFields::RELATED_MODEL_ALIAS)
+                        .columns_for_relation_side(from_field.relation_side.opposite())
+                        .into_iter()
+                        .map(|col| col.alias(SelectedFields::RELATED_MODEL_ALIAS))
+                        .collect::<Vec<Column<'static>>>(),
                 );
 
-                result.push(
+                result.extend(
                     relation
-                        .column_for_relation_side(from_field.relation_side)
-                        .alias(SelectedFields::PARENT_MODEL_ALIAS),
+                        .columns_for_relation_side(from_field.relation_side)
+                        .into_iter()
+                        .map(|col| col.alias(SelectedFields::PARENT_MODEL_ALIAS))
+                        .collect::<Vec<Column<'static>>>(),
                 );
             } else {
-                result.push(
+                result.extend(
                     relation
-                        .column_for_relation_side(from_field.relation_side.opposite())
-                        .alias(SelectedFields::RELATED_MODEL_ALIAS)
-                        .table(Relation::TABLE_ALIAS),
+                        .columns_for_relation_side(from_field.relation_side.opposite())
+                        .into_iter()
+                        .map(|col| {
+                            col.alias(SelectedFields::RELATED_MODEL_ALIAS)
+                                .table(Relation::TABLE_ALIAS)
+                        })
+                        .collect::<Vec<Column<'static>>>(),
                 );
 
-                result.push(
+                result.extend(
                     relation
-                        .column_for_relation_side(from_field.relation_side)
-                        .alias(SelectedFields::PARENT_MODEL_ALIAS)
-                        .table(Relation::TABLE_ALIAS),
+                        .columns_for_relation_side(from_field.relation_side)
+                        .into_iter()
+                        .map(|col| {
+                            col.alias(SelectedFields::PARENT_MODEL_ALIAS)
+                                .table(Relation::TABLE_ALIAS)
+                        })
+                        .collect::<Vec<Column<'static>>>(),
                 );
             }
         };

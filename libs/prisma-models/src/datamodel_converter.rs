@@ -52,7 +52,7 @@ impl<'a> DatamodelConverter<'a> {
                 is_embedded: model.is_embedded,
                 fields: self.convert_fields(model),
                 manifestation: model.database_name.clone(),
-                id_field_names: model.id_fields,
+                id_field_names: model.id_fields.clone(),
                 indexes: self.convert_indexes(model),
             })
             .collect()

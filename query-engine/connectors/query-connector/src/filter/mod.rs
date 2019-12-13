@@ -158,6 +158,7 @@ pub fn test_data_model() -> InternalDataModelRef {
             is_embedded: false,
             fields: user_field_templates,
             manifestation: None,
+            id_field_names: vec![],
             indexes: vec![],
         },
         ModelTemplate {
@@ -165,6 +166,7 @@ pub fn test_data_model() -> InternalDataModelRef {
             is_embedded: false,
             fields: site_field_templates,
             manifestation: None,
+            id_field_names: vec![],
             indexes: vec![],
         },
     ];

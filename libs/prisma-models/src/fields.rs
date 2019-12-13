@@ -38,6 +38,7 @@ impl Fields {
                     .map(|x| vec![x])
                     .or_else(|| self.find_multipart_id())
             })
+            .clone()
             .map(|fields| fields.into_iter().map(|x| x.upgrade().unwrap()).collect())
     }
 
@@ -200,13 +201,20 @@ impl Fields {
     fn find_multipart_id(&self) -> Option<Vec<ScalarFieldWeak>> {
         if self.id_field_names.len() > 0 {
             let scalars = self.scalar();
-            let fields = self.id_field_names.iter().map(|f| {
-                let id_field = scalars.iter().find(|sf| &sf.name == f).expect(&format!("Expected ID field {} to be present on the model", f));
-                Arc::downgrade(id_field)
-            }).collect();
+            let fields = self
+                .id_field_names
+                .iter()
+                .map(|f| {
+                    let id_field = scalars
+                        .iter()
+                        .find(|sf| &sf.name == f)
+                        .expect(&format!("Expected ID field {} to be present on the model", f));
+                    Arc::downgrade(id_field)
+                })
+                .collect();
 
             Some(fields)
-            // Some(self.scalar().filter_map(|sf| x).collect())
+        // Some(self.scalar().filter_map(|sf| x).collect())
         } else {
             None
         }

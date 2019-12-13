@@ -74,7 +74,7 @@ where
         let model = from_field.related_model();
 
         let select = read::get_records(&model, selected_fields, query_arguments)
-            .and_where(from_field.relation_column().in_selection(from_record_ids.to_owned()));
+            .and_where(from_field.relation_columns().pop().unwrap().in_selection(from_record_ids.to_owned()));
 
         Query::from(select)
     } else {
@@ -100,7 +100,7 @@ where
             let _ = row.values.pop();
 
             let mut record = Record::from(row);
-            record.add_parent_id(GraphqlId::try_from(parent_id)?);
+            record.set_parent_id(GraphqlId::try_from(parent_id)?);
 
             Ok(record)
         })
