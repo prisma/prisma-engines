@@ -1445,19 +1445,19 @@ async fn simple_type_aliases_in_migrations_must_work(api: &TestApi) {
 async fn model_with_multiple_indexes_works(api: &TestApi) {
     let dm = r#"
     model User {
-      id         Int       @id @unique
+      id         Int       @id
     }
 
     model Post {
-      id        Int       @id @unique
+      id        Int       @id
     }
 
     model Comment {
-      id        Int       @id @unique
+      id        Int       @id
     }
 
     model Like {
-      id        Int       @id @unique
+      id        Int       @id
       user      User
       post      Post
       comment   Comment
