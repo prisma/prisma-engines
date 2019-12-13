@@ -9,7 +9,6 @@ pub enum QueryParserError {
     ArgumentNotFoundError,
     AtLeastOneSelectionError,
     ValueParseError(String),
-    // InputFieldValidationError,
     ValueTypeMismatchError {
         have: QueryValue,
         want: InputType,
@@ -29,18 +28,33 @@ pub enum QueryParserError {
 }
 
 impl QueryParserError {
+    pub(crate) fn location(&self) -> String {
+        let mut node = self;
+
+        std::iter::from_fn(|| match node {
+            QueryParserError::FieldValidationError {
+                field_name: name,
+                inner,
+            }
+            | QueryParserError::ArgumentValidationError { argument: name, inner }
+            | QueryParserError::ObjectValidationError {
+                object_name: name,
+                inner,
+            } => {
+                node = inner.as_ref();
+                Some(name)
+            }
+            _ => None,
+        })
+        .fold(String::with_capacity(32), |mut path, elem| {
+            path.push_str(".");
+            path.push_str(elem);
+            path
+        })
+    }
+
     pub fn format(&self, ident: usize) -> String {
         match self {
-            QueryParserError::AssertionError(reason) => format!("General assertion error: {}.", reason),
-            QueryParserError::RequiredValueNotSetError => "A value is required but not set.".into(),
-            QueryParserError::FieldNotFoundError => "Field does not exist on enclosing type.".into(),
-            QueryParserError::ArgumentNotFoundError => "Argument does not exist on enclosing type.".into(),
-            QueryParserError::AtLeastOneSelectionError => "At least one selection is required.".into(),
-            QueryParserError::ValueParseError(reason) => format!("Error parsing value: {}.", reason),
-            QueryParserError::ValueTypeMismatchError { have, want } => {
-                format!("Value types mismatch. Have: {:?}, want: {:?}", have, want)
-            } // wip value/type formatting
-
             // Validation root
             QueryParserError::ObjectValidationError { object_name, inner } => format!(
                 "{} (object)\n{}",
@@ -48,6 +62,7 @@ impl QueryParserError {
                 Self::ident(inner.format(ident + 2), ident + 2)
             ),
 
+            // Validation intermediates
             QueryParserError::FieldValidationError { field_name, inner } => format!(
                 "{} (field)\n{}",
                 field_name,
@@ -58,6 +73,17 @@ impl QueryParserError {
                 argument,
                 Self::ident(inner.format(ident + 2), ident + 2)
             ),
+
+            // Validation leaves
+            QueryParserError::AssertionError(reason) => format!("Assertion error: {}.", reason),
+            QueryParserError::RequiredValueNotSetError => "A value is required but not set.".into(),
+            QueryParserError::FieldNotFoundError => "Field does not exist on enclosing type.".into(),
+            QueryParserError::ArgumentNotFoundError => "Argument does not exist on enclosing type.".into(),
+            QueryParserError::AtLeastOneSelectionError => "At least one selection is required.".into(),
+            QueryParserError::ValueParseError(reason) => format!("Error parsing value: {}.", reason),
+            QueryParserError::ValueTypeMismatchError { have, want } => {
+                format!("Value types mismatch. Have: {:?}, want: {:?}", have, want)
+            }
         }
     }
 

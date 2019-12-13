@@ -2,7 +2,7 @@ mod dispatch;
 
 pub use dispatch::*;
 
-use crate::{Filter, QueryArguments, RecordFinder, WriteArgs};
+use crate::{Filter, QueryArguments, WriteArgs};
 use prisma_models::*;
 
 pub trait Connector {
@@ -29,7 +29,8 @@ where
 pub trait ReadOperations {
     fn get_single_record<'a>(
         &'a self,
-        record_finder: &'a RecordFinder,
+        model: &'a ModelRef,
+        filter: &'a Filter,
         selected_fields: &'a SelectedFields,
     ) -> crate::IO<'a, Option<SingleRecord>>;
 

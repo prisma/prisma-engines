@@ -28,11 +28,10 @@ fn read_one<'conn, 'tx>(
     let fut = async move {
 
         let selected_fields = inject_required_fields(query.selected_fields.clone());
-        let scalars = tx
-            .get_single_record(query.record_finder.as_ref().unwrap(), &selected_fields)
-            .await?;
+        let model = query.model;
+        let filter = query.filter.expect("Expected filter to be set for ReadOne query.");
+        let scalars = tx.get_single_record(&model, &filter, &selected_fields).await?;
 
-        let model = query.record_finder.unwrap().field.model();
         let id_field = model.fields().id().name.clone();
 
         match scalars {

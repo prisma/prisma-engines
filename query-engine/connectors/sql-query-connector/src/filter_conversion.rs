@@ -129,6 +129,7 @@ impl AliasedCondition for Filter {
                     ConditionTree::NegativeCondition
                 }
             }
+            Filter::Empty => ConditionTree::NoCondition,
             _ => unimplemented!(),
         }
     }

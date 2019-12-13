@@ -1,8 +1,5 @@
 #!/bin/bash
-fileName=$1
-folder="../../database-schema-examples/sqlite/basic_tests/models/"
-
-echo "{\"id\":1,\"jsonrpc\":\"2.0\",\"method\":\"introspect\",\"params\":[{\"url\":\"file:${folder}${fileName}.db\"}]}" | ../target/debug/introspection-engine | jq -r '.result' > "${folder}$fileName".prisma
+echo "{\"id\":1,\"jsonrpc\":\"2.0\",\"method\":\"introspect\",\"params\":[{\"url\":\"file:../db/lift.db\"}]}" | ../target/debug/introspection-engine
 # debug
 # echo "{\"id\":1,\"jsonrpc\":\"2.0\",\"method\":\"introspect\",\"params\":[{\"url\":\"file:${folder}${fileName}.db\"}]}" | ../target/debug/introspection-engine 
 

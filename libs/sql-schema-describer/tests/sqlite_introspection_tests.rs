@@ -10,8 +10,6 @@ use sqlite::*;
 
 #[tokio::test]
 async fn sqlite_column_types_must_work() {
-    setup();
-
     let mut migration = Migration::new().schema(SCHEMA);
     migration.create_table("User", move |t| {
         t.add_column("int4_col", types::integer());
@@ -21,7 +19,7 @@ async fn sqlite_column_types_must_work() {
     });
 
     let full_sql = migration.make::<barrel::backend::Sqlite>();
-    let inspector = get_sqlite_describer(&full_sql).await;
+    let inspector = get_sqlite_describer(&full_sql, "sqlite_column_types_must_work").await;
     let result = inspector.describe(SCHEMA).await.expect("describing");
     let table = result.get_table("User").expect("couldn't get User table");
     let mut expected_columns = vec![
@@ -85,8 +83,6 @@ async fn sqlite_column_types_must_work() {
 
 #[tokio::test]
 async fn sqlite_foreign_key_on_delete_must_be_handled() {
-    setup();
-
     let sql = format!(
         "CREATE TABLE \"{0}\".City (id INTEGER NOT NULL PRIMARY KEY);
          CREATE TABLE \"{0}\".User (
@@ -99,7 +95,7 @@ async fn sqlite_foreign_key_on_delete_must_be_handled() {
         )",
         SCHEMA
     );
-    let inspector = get_sqlite_describer(&sql).await;
+    let inspector = get_sqlite_describer(&sql, "sqlite_foreign_key_on_delete_must_be_handled").await;
 
     let schema = inspector.describe(SCHEMA).await.expect("describing");
     let mut table = schema.get_table("User").expect("get User table").to_owned();
@@ -219,8 +215,6 @@ async fn sqlite_foreign_key_on_delete_must_be_handled() {
 
 #[tokio::test]
 async fn sqlite_text_primary_keys_must_be_inferred_on_table_and_not_as_separate_indexes() {
-    setup();
-
     let mut migration = Migration::new().schema(SCHEMA);
     migration.create_table("User", move |t| {
         t.add_column("int4_col", types::integer());
@@ -233,7 +227,7 @@ async fn sqlite_text_primary_keys_must_be_inferred_on_table_and_not_as_separate_
     });
     let full_sql = migration.make::<barrel::backend::Sqlite>();
 
-    let inspector = get_sqlite_describer(&full_sql).await;
+    let inspector = get_sqlite_describer(&full_sql, "sqlite_text_primary_keys_must_be_inferred_on_table_and_not_as_separate_indexes").await;
     let result = inspector.describe(SCHEMA).await.expect("describing");
 
     let table = result.get_table("User").expect("couldn't get User table");

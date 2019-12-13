@@ -2,7 +2,7 @@ use super::*;
 use crate::{
     query_ast::*,
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
-    ParsedInputValue,
+    InputAssertions, ParsedInputMap, ParsedInputValue,
 };
 use connector::{Filter, ScalarCompare};
 use prisma_models::{ModelRef, PrismaValue, RelationFieldRef};
@@ -31,7 +31,14 @@ pub fn connect_nested_delete(
     if parent_relation_field.is_list {
         let filters: Vec<Filter> = utils::coerce_vec(value)
             .into_iter()
-            .map(|value| Ok(extract_record_finder(value, &child_model)?.into()))
+            .map(|value: ParsedInputValue| {
+                let value: ParsedInputMap = value.try_into()?;
+
+                value.assert_size(1)?;
+                value.assert_non_null()?;
+
+                extract_filter(value, &child_model, false)
+            })
             .collect::<QueryGraphBuilderResult<Vec<Filter>>>()?;
 
         let filter_len = filters.len();
@@ -102,10 +109,7 @@ pub fn connect_nested_delete(
                     }?;
 
                     if let Node::Query(Query::Write(ref mut wq)) = node {
-                        wq.inject_record_finder(RecordFinder {
-                            field: id_field,
-                            value: parent_id,
-                        });
+                        wq.add_filter(id_field.equals(parent_id));
                     }
 
                     Ok(node)
@@ -126,7 +130,7 @@ pub fn connect_nested_delete_many(
 ) -> QueryGraphBuilderResult<()> {
     for value in utils::coerce_vec(value) {
         let as_map: ParsedInputMap = value.try_into()?;
-        let filter = extract_filter(as_map, child_model)?;
+        let filter = extract_filter(as_map, child_model, true)?;
 
         let find_child_records_node =
             utils::insert_find_children_by_parent_node(graph, parent, parent_relation_field, filter.clone())?;

@@ -72,7 +72,11 @@ impl<T: 'static> DirectiveListValidator<T> {
 
         errors.ok()?;
 
-        for directive in ast.directives() {
+        // We must validate @default before @id. @id needs access to the default value on the field.
+        let mut cloned_directives = ast.directives().clone();
+        cloned_directives.sort_by(|a, b| a.name.name.partial_cmp(&b.name.name).unwrap());
+
+        for directive in cloned_directives {
             match self.known_directives.get(&directive.name.name) {
                 Some(validator) => {
                     let mut arguments = super::Args::new(&directive.arguments, directive.span);

@@ -10,3 +10,4 @@ pub use misc_helpers::*;
 pub use step_helpers::*;
 pub use test_api::*;
 pub use test_macros::*;
+pub use test_setup::*;

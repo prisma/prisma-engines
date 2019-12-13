@@ -18,8 +18,10 @@ itertools = "0.8"
 log = "0.4"
 failure = "0.1"
 user-facing-errors = { path = "../../../libs/user-facing-errors" }
+tracing = "0.1.10"
+tracing-futures = "0.2.0"
+tokio = { version = "0.2", features = ["time"] }
 
 [dependencies.quaint]
 git = "https://github.com/prisma/quaint.git"
-default-features = false
-features = ["sqlite", "json-1", "postgresql", "uuid-0_7", "chrono-0_4", "mysql"]
+features = ["single"]

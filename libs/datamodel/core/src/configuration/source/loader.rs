@@ -64,11 +64,26 @@ impl SourceLoader {
             ));
         }
 
-        if let Ok(arg) = args.arg("enabled") {
-            if !(arg.as_bool()?) {
-                // This source was disabled.
-                return Ok(None);
+        let is_enabled = match args.arg("enabled") {
+            Ok(arg) => {
+                let (env_var, is_enabled) = arg.as_bool_from_env()?;
+                match (env_var, is_enabled) {
+                    // the `unwrap_or` is about the case where the value could not be parsed into a bool. It came from an env var.
+                    (Some(_), is_enabled) => is_enabled.unwrap_or(true),
+                    // the `unwrap_or` is about the case where the value could not be parsed into a bool. It did NOT come from an env var.
+                    (None, is_enabled) => is_enabled.unwrap_or(false),
+                }
             }
+            // if the enabled argument is not provided a datasource is enabled by default
+            Err(DatamodelError::ArgumentNotFound {
+                argument_name: _,
+                span: _,
+            }) => true,
+            _ => false,
+        };
+        if !is_enabled {
+            // This source was disabled.
+            return Ok(None);
         }
 
         for decl in &self.source_declarations {

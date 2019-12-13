@@ -65,12 +65,21 @@ async fn removing_a_model_for_a_table_that_is_already_deleted_must_work(api: &Te
 
 #[test_each_connector]
 async fn creating_a_field_for_an_existing_column_with_a_compatible_type_must_work(api: &TestApi) {
+    let is_mysql = api.is_mysql();
     let initial_result = api
         .barrel()
-        .execute(|migration| {
-            migration.create_table("Blog", |t| {
+        .execute(move |migration| {
+            migration.create_table("Blog", move |t| {
                 t.add_column("id", types::primary());
-                t.add_column("title", types::text());
+                // We add a default because the migration engine always adds defaults to facilitate migration of required columns.
+                t.add_column(
+                    "title",
+                    if is_mysql {
+                        types::varchar(181).default("")
+                    } else {
+                        types::text().default("")
+                    },
+                );
             });
         })
         .await;

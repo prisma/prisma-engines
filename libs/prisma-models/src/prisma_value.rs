@@ -1,7 +1,7 @@
 use crate::{DomainError, DomainResult, EnumValue};
 use chrono::prelude::*;
+use rust_decimal::{prelude::FromPrimitive, Decimal};
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
 use std::{convert::TryFrom, fmt, string::FromUtf8Error};
 use uuid::Uuid;
 
@@ -14,14 +14,14 @@ pub enum GraphqlId {
     UUID(Uuid),
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Clone, Eq, Hash)]
 #[serde(tag = "gcValueType", content = "value")]
 pub enum PrismaValue {
     #[serde(rename = "string")]
     String(String),
 
     #[serde(rename = "float")]
-    Float(f64),
+    Float(Decimal),
 
     #[serde(rename = "bool")]
     Boolean(bool),
@@ -31,9 +31,6 @@ pub enum PrismaValue {
 
     #[serde(rename = "enum")]
     Enum(EnumValue),
-
-    #[serde(rename = "json")]
-    Json(Value),
 
     #[serde(rename = "int")]
     Int(i64),
@@ -68,7 +65,6 @@ impl fmt::Display for PrismaValue {
             PrismaValue::Boolean(x) => x.fmt(f),
             PrismaValue::DateTime(x) => x.fmt(f),
             PrismaValue::Enum(x) => x.as_string().fmt(f),
-            PrismaValue::Json(x) => x.fmt(f),
             PrismaValue::Int(x) => x.fmt(f),
             PrismaValue::Null => "null".fmt(f),
             PrismaValue::Uuid(x) => x.fmt(f),
@@ -97,15 +93,23 @@ impl From<String> for PrismaValue {
     }
 }
 
-impl From<f64> for PrismaValue {
-    fn from(f: f64) -> Self {
-        PrismaValue::Float(f)
+impl TryFrom<f64> for PrismaValue {
+    type Error = DomainError;
+
+    fn try_from(f: f64) -> DomainResult<PrismaValue> {
+        Decimal::from_f64(f)
+            .map(|d| PrismaValue::Float(d))
+            .ok_or(DomainError::ConversionFailure("f32", "Decimal"))
     }
 }
 
-impl From<f32> for PrismaValue {
-    fn from(f: f32) -> Self {
-        PrismaValue::Float(f64::from(f))
+impl TryFrom<f32> for PrismaValue {
+    type Error = DomainError;
+
+    fn try_from(f: f32) -> DomainResult<PrismaValue> {
+        Decimal::from_f32(f)
+            .map(|d| PrismaValue::Float(d))
+            .ok_or(DomainError::ConversionFailure("f64", "Decimal"))
     }
 }
 

@@ -2,18 +2,19 @@ use crate::{
     query_builder::read::{self, ManyRelatedRecordsBaseQuery, ManyRelatedRecordsQueryBuilder},
     QueryExt, SqlError,
 };
-use connector_interface::{error::ConnectorError, *};
+
+use connector_interface::*;
 use prisma_models::*;
 use quaint::ast::*;
 use std::convert::TryFrom;
 
 pub async fn get_single_record(
     conn: &dyn QueryExt,
-    record_finder: &RecordFinder,
+    model: &ModelRef,
+    filter: &Filter,
     selected_fields: &SelectedFields,
-) -> connector_interface::Result<Option<SingleRecord>> {
-    let model = record_finder.field.model();
-    let query = read::get_records(&model, selected_fields, record_finder);
+) -> crate::Result<Option<SingleRecord>> {
+    let query = read::get_records(&model, selected_fields, filter);
     let field_names = selected_fields.names();
     let idents = selected_fields.types();
 
@@ -34,7 +35,7 @@ pub async fn get_many_records(
     model: &ModelRef,
     query_arguments: QueryArguments,
     selected_fields: &SelectedFields,
-) -> connector_interface::Result<ManyRecords> {
+) -> crate::Result<ManyRecords> {
     let field_names = selected_fields.names();
     let idents = selected_fields.types();
     let query = read::get_records(model, selected_fields, query_arguments);
@@ -55,7 +56,7 @@ pub async fn get_related_records<T>(
     from_record_ids: &[GraphqlId],
     query_arguments: QueryArguments,
     selected_fields: &SelectedFields,
-) -> connector_interface::Result<ManyRecords>
+) -> crate::Result<ManyRecords>
 where
     T: ManyRelatedRecordsQueryBuilder,
 {
@@ -82,12 +83,12 @@ where
         }
     };
 
-    let records: Result<Vec<Record>> = conn
+    let records: crate::Result<Vec<Record>> = conn
         .filter(query, idents.as_slice())
         .await?
         .into_iter()
         .map(|mut row| {
-            let parent_id = row.values.pop().ok_or(ConnectorError::ColumnDoesNotExist)?;
+            let parent_id = row.values.pop().ok_or(SqlError::ColumnDoesNotExist)?;
 
             // Relation id is always the second last value. We don't need it
             // here and we don't need it in the record.
@@ -110,7 +111,7 @@ pub async fn count_by_model(
     conn: &dyn QueryExt,
     model: &ModelRef,
     query_arguments: QueryArguments,
-) -> connector_interface::Result<usize> {
+) -> crate::Result<usize> {
     let query = read::count_by_model(model, query_arguments);
     let result = conn.find_int(query).await? as usize;
 

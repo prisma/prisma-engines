@@ -1179,7 +1179,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |   }
          |  ) {
          |    nameTop
-         |    middles {
+         |    middles (orderBy: id_ASC) {
          |      nameMiddle
          |      bottom {
          |        nameBottom

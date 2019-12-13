@@ -12,11 +12,6 @@ pub trait MigrationPersistence: Send + Sync + 'static {
     /// Drop all persisted state.
     async fn reset(&self);
 
-    /// Returns the currently active Datamodel.
-    async fn current_datamodel(&self) -> Datamodel {
-        self.last().await.map(|m| m.parse_datamodel()).unwrap_or_else(Datamodel::empty)
-    }
-
     async fn current_datamodel_ast(&self) -> SchemaAst {
         self.last()
             .await
@@ -36,13 +31,6 @@ pub trait MigrationPersistence: Send + Sync + 'static {
         let mut all_migrations = self.load_all().await;
         all_migrations.reverse();
         all_migrations.into_iter().find(|m| !m.is_watch_migration())
-    }
-
-    async fn last_non_watch_datamodel(&self) -> Datamodel {
-        self.last_non_watch_migration()
-            .await
-            .map(|m| m.parse_datamodel())
-            .unwrap_or_else(Datamodel::empty)
     }
 
     /// Returns the last successful Migration.
@@ -175,6 +163,12 @@ impl Migration {
             .ok()
             .unwrap_or_else(SchemaAst::empty)
     }
+
+    pub fn datamodel(&self) -> Datamodel {
+        datamodel::lift_ast(&self.datamodel_ast())
+            .ok()
+            .unwrap_or_else(Datamodel::empty)
+    }
 }
 
 impl IsWatchMigration for Migration {
@@ -217,6 +211,20 @@ impl MigrationStatus {
             "RollbackSuccess" => MigrationStatus::RollbackSuccess,
             "RollbackFailure" => MigrationStatus::RollbackFailure,
             _ => panic!("MigrationStatus {:?} is not known", s),
+        }
+    }
+
+    pub fn is_success(&self) -> bool {
+        match self {
+            MigrationStatus::MigrationSuccess => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_pending(&self) -> bool {
+        match self {
+            MigrationStatus::Pending => true,
+            _ => false,
         }
     }
 }

@@ -27,12 +27,36 @@ pub type List = Vec<Item>;
 /// Convenience type wrapper for Arc<Item>.
 pub type ItemRef = Arc<Item>;
 
+#[derive(Debug, serde::Serialize)]
+pub struct ResponseError {
+    error: String,
+    user_facing_error: user_facing_errors::Error,
+}
+
+impl From<user_facing_errors::Error> for ResponseError {
+    fn from(err: user_facing_errors::Error) -> ResponseError {
+        ResponseError {
+            error: err.message().to_owned(),
+            user_facing_error: err,
+        }
+    }
+}
+
+impl From<crate::error::CoreError> for ResponseError {
+    fn from(err: crate::error::CoreError) -> ResponseError {
+        ResponseError {
+            error: format!("{}", err),
+            user_facing_error: err.into(),
+        }
+    }
+}
+
 /// A response can either be some `key-value` data representation
 /// or an error that occured.
 #[derive(Debug)]
 pub enum Response {
     Data(String, Item),
-    Error(String),
+    Error(ResponseError),
 }
 
 // todo merge of responses
@@ -83,7 +107,7 @@ impl IrSerializer {
 
                         Response::Data(self.key.clone(), result)
                     }
-                    Err(err) => Response::Error(format!("{}", err)),
+                    Err(err) => Response::Error(err.into()),
                 }
             }
 

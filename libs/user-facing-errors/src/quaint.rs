@@ -106,6 +106,23 @@ pub fn render_quaint_error(quaint_error: &QuaintError, connection_info: &Connect
             .ok()
         }
 
+        (QuaintError::TlsError { message }, _) => KnownError::new(common::TlsConnectionError {
+            message: message.into(),
+        })
+        .ok(),
+
+        (QuaintError::ConnectTimeout, ConnectionInfo::Mysql(url)) => KnownError::new(common::DatabaseNotReachable {
+            database_host: url.host().to_owned(),
+            database_port: url.port(),
+        })
+        .ok(),
+
+        (QuaintError::ConnectTimeout, ConnectionInfo::Postgres(url)) => KnownError::new(common::DatabaseNotReachable {
+            database_host: url.host().to_owned(),
+            database_port: url.port(),
+        })
+        .ok(),
+
         _ => None,
     }
 }

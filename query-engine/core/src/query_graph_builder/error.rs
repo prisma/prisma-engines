@@ -1,4 +1,3 @@
-// use std::fmt;
 use crate::{QueryGraphError, QueryParserError};
 use prisma_models::{DomainError, RelationFieldRef};
 

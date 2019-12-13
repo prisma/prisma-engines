@@ -66,7 +66,7 @@ async fn introspecting_a_table_with_unique_index_must_work(api: &TestApi) {
             });
             migration.inject_custom(format!(
                 "Create Unique Index \"{}\".\"test\" on \"Blog\"( \"authorId\")",
-                SCHEMA_NAME
+                api.schema_name()
             ));
         })
         .await;
@@ -93,7 +93,7 @@ async fn introspecting_a_table_with_multi_column_unique_index_must_work(api: &Te
             });
             migration.inject_custom(format!(
                 "Create Unique Index \"{}\".\"test\" on \"User\"( \"firstname\", \"lastname\")",
-                SCHEMA_NAME
+                api.schema_name()
             ));
         })
         .await;
@@ -198,7 +198,7 @@ async fn introspecting_a_table_with_a_non_unique_index_should_work(api: &TestApi
                 t.add_column("a", types::text());
                 t.add_column("id", types::primary());
             });
-            migration.inject_custom(format!("Create Index \"{}\".\"test\" on \"User\"(\"a\")", SCHEMA_NAME));
+            migration.inject_custom(format!("Create Index \"{}\".\"test\" on \"User\"(\"a\")", api.schema_name()));
         })
         .await;
 
@@ -225,7 +225,7 @@ async fn introspecting_a_table_with_a_multi_column_non_unique_index_should_work(
             });
             migration.inject_custom(format!(
                 "Create Index \"{}\".\"test\" on \"User\"(\"a\",\"b\")",
-                SCHEMA_NAME
+                api.schema_name()
             ));
         })
         .await;
@@ -435,7 +435,7 @@ async fn introspecting_a_prisma_many_to_many_relation_should_work(api: &TestApi)
             });
             migration.inject_custom(format!(
                 "CREATE UNIQUE INDEX \"{}\".test ON \"_PostToUser\" (\"A\", \"B\");",
-                SCHEMA_NAME
+                api.schema_name()
             ))
         })
         .await;

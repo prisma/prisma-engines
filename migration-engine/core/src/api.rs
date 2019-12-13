@@ -7,6 +7,7 @@ pub use rpc::*;
 use crate::{commands::*, migration_engine::MigrationEngine};
 use migration_connector::*;
 use std::sync::Arc;
+use tracing_futures::Instrument;
 
 pub struct MigrationApi<C, D>
 where
@@ -49,7 +50,7 @@ pub trait GenericApi: Send + Sync + 'static {
         &self,
         input: &InferMigrationStepsInput,
     ) -> crate::Result<MigrationStepsResultOutput>;
-    async fn list_migrations(&self, input: &serde_json::Value) -> crate::Result<Vec<ListMigrationStepsOutput>>;
+    async fn list_migrations(&self, input: &serde_json::Value) -> crate::Result<Vec<ListMigrationsOutput>>;
     async fn migration_progress(&self, input: &MigrationProgressInput) -> crate::Result<MigrationProgressOutput>;
     async fn reset(&self, input: &serde_json::Value) -> crate::Result<serde_json::Value>;
     async fn unapply_migration(&self, input: &UnapplyMigrationInput) -> crate::Result<UnapplyMigrationOutput>;
@@ -76,41 +77,66 @@ where
     D: DatabaseMigrationMarker + Send + Sync + 'static,
 {
     async fn apply_migration(&self, input: &ApplyMigrationInput) -> crate::Result<MigrationStepsResultOutput> {
-        self.handle_command::<ApplyMigrationCommand>(input).await
+        self.handle_command::<ApplyMigrationCommand>(input)
+            .instrument(tracing::info_span!(
+                "ApplyMigration",
+                migration_id = input.migration_id.as_str()
+            ))
+            .await
     }
 
     async fn calculate_database_steps(
         &self,
         input: &CalculateDatabaseStepsInput,
     ) -> crate::Result<MigrationStepsResultOutput> {
-        self.handle_command::<CalculateDatabaseStepsCommand>(input).await
+        self.handle_command::<CalculateDatabaseStepsCommand>(input)
+            .instrument(tracing::info_span!("CalculateDatabaseSteps"))
+            .await
     }
 
     async fn calculate_datamodel(&self, input: &CalculateDatamodelInput) -> crate::Result<CalculateDatamodelOutput> {
-        self.handle_command::<CalculateDatamodelCommand>(input).await
+        self.handle_command::<CalculateDatamodelCommand>(input)
+            .instrument(tracing::info_span!("CalculateDatamodel"))
+            .await
     }
 
     async fn infer_migration_steps(
         &self,
         input: &InferMigrationStepsInput,
     ) -> crate::Result<MigrationStepsResultOutput> {
-        self.handle_command::<InferMigrationStepsCommand>(input).await
+        self.handle_command::<InferMigrationStepsCommand>(input)
+            .instrument(tracing::info_span!(
+                "InferMigrationSteps",
+                migration_id = input.migration_id.as_str()
+            ))
+            .await
     }
 
-    async fn list_migrations(&self, input: &serde_json::Value) -> crate::Result<Vec<ListMigrationStepsOutput>> {
-        self.handle_command::<ListMigrationStepsCommand>(input).await
+    async fn list_migrations(&self, input: &serde_json::Value) -> crate::Result<Vec<ListMigrationsOutput>> {
+        self.handle_command::<ListMigrationsCommand>(input)
+            .instrument(tracing::info_span!("ListMigrations"))
+            .await
     }
 
     async fn migration_progress(&self, input: &MigrationProgressInput) -> crate::Result<MigrationProgressOutput> {
-        self.handle_command::<MigrationProgressCommand>(input).await
+        self.handle_command::<MigrationProgressCommand>(input)
+            .instrument(tracing::info_span!(
+                "MigrationProgress",
+                migration_id = input.migration_id.as_str()
+            ))
+            .await
     }
 
     async fn reset(&self, input: &serde_json::Value) -> crate::Result<serde_json::Value> {
-        self.handle_command::<ResetCommand>(input).await
+        self.handle_command::<ResetCommand>(input)
+            .instrument(tracing::info_span!("Reset"))
+            .await
     }
 
     async fn unapply_migration(&self, input: &UnapplyMigrationInput) -> crate::Result<UnapplyMigrationOutput> {
-        self.handle_command::<UnapplyMigrationCommand>(input).await
+        self.handle_command::<UnapplyMigrationCommand>(input)
+            .instrument(tracing::info_span!("UnapplyMigration"))
+            .await
     }
 
     fn migration_persistence(&self) -> Arc<dyn MigrationPersistence> {

@@ -1,11 +1,12 @@
 use crate::connector_loader::load_connector;
-use crate::error::{CoreError};
+use crate::error::CoreError;
 use introspection_connector::DatabaseMetadata;
 use jsonrpc_core::*;
 use jsonrpc_derive::rpc;
-use tokio::runtime::Runtime;
-use std::future::Future as StdFuture;
 use serde_derive::*;
+use std::{future::Future as StdFuture, sync::Mutex};
+use tokio::runtime::Runtime;
+use tracing_futures::Instrument;
 
 #[rpc]
 pub trait Rpc {
@@ -20,7 +21,7 @@ pub trait Rpc {
 }
 
 pub(crate) struct RpcImpl {
-    runtime: Runtime,
+    runtime: Mutex<Runtime>,
 }
 
 impl Rpc for RpcImpl {
@@ -33,14 +34,14 @@ impl Rpc for RpcImpl {
     }
 
     fn introspect(&self, url: UrlInput) -> Result<String> {
-        self.block_on(Self::introspect_internal(&url.url))
+        self.block_on(Self::introspect_internal(&url.url).instrument(tracing::info_span!("Introspect", ?url)))
     }
 }
 
 impl RpcImpl {
     pub(crate) fn new() -> Self {
         RpcImpl {
-            runtime: Runtime::new().unwrap(),
+            runtime: Mutex::new(Runtime::new().unwrap()),
         }
     }
 
@@ -50,26 +51,27 @@ impl RpcImpl {
         Ok(datamodel::render_datamodel_to_string(&data_model).map_err(CoreError::from)?)
     }
 
-    pub(crate) async fn list_databases_internal(connection_string:  &str) -> Result<Vec<String>> {
+    pub(crate) async fn list_databases_internal(connection_string: &str) -> Result<Vec<String>> {
         let connector = load_connector(connection_string).await?;
         Ok(connector.list_databases().await.map_err(CoreError::from)?)
     }
 
-    pub(crate) async fn get_database_metadata_internal(connection_string:  &str) -> Result<DatabaseMetadata> {
+    pub(crate) async fn get_database_metadata_internal(connection_string: &str) -> Result<DatabaseMetadata> {
         let connector = load_connector(connection_string).await?;
         Ok(connector.get_metadata().await.map_err(CoreError::from)?)
     }
 
     /// Will also catch panics.
     fn block_on<O>(&self, fut: impl StdFuture<Output = Result<O>>) -> Result<O> {
-        match self.runtime.block_on(fut) {
+        let mut rt = self.runtime.lock().unwrap();
+        match rt.block_on(fut) {
             Ok(o) => Ok(o),
             Err(err) => Err(err),
         }
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct UrlInput {
     pub(crate) url: String,
 }

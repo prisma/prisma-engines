@@ -1,7 +1,4 @@
 use std::collections::HashSet;
-use std::sync::atomic::{AtomicBool, Ordering};
-
-use log::LevelFilter;
 use pretty_assertions::assert_eq;
 
 use datamodel::{
@@ -11,42 +8,8 @@ use datamodel::{
 use sql_introspection_connector::calculate_datamodel::calculate_model;
 use sql_schema_describer::*;
 
-static IS_SETUP: AtomicBool = AtomicBool::new(false);
-
-fn setup() {
-    let is_setup = IS_SETUP.load(Ordering::Relaxed);
-    if is_setup {
-        return;
-    }
-
-    let log_level = match std::env::var("TEST_LOG")
-        .unwrap_or("warn".to_string())
-        .to_lowercase()
-        .as_ref()
-    {
-        "trace" => LevelFilter::Trace,
-        "debug" => LevelFilter::Debug,
-        "info" => LevelFilter::Info,
-        "warn" => LevelFilter::Warn,
-        "error" => LevelFilter::Error,
-        _ => LevelFilter::Warn,
-    };
-    fern::Dispatch::new()
-        .format(|out, message, record| {
-            out.finish(format_args!("[{}][{}] {}", record.target(), record.level(), message))
-        })
-        .level(log_level)
-        .chain(std::io::stdout())
-        .apply()
-        .expect("fern configuration");
-
-    IS_SETUP.store(true, Ordering::Relaxed);
-}
-
 #[test]
 fn a_data_model_can_be_generated_from_a_schema() {
-    setup();
-
     let col_types = &[
         ColumnTypeFamily::Int,
         ColumnTypeFamily::Float,
@@ -135,8 +98,6 @@ fn a_data_model_can_be_generated_from_a_schema() {
 
 #[test]
 fn arity_is_preserved_when_generating_data_model_from_a_schema() {
-    setup();
-
     let ref_data_model = Datamodel {
         models: vec![Model {
             database_name: None,
@@ -240,8 +201,6 @@ fn arity_is_preserved_when_generating_data_model_from_a_schema() {
 
 #[test]
 fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
-    setup();
-
     let ref_data_model = Datamodel {
         models: vec![Model {
             database_name: None,
@@ -386,8 +345,6 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
 
 #[test]
 fn primary_key_is_preserved_when_generating_data_model_from_a_schema() {
-    setup();
-
     let ref_data_model = Datamodel {
         models: vec![
             // Model with auto-incrementing primary key
@@ -547,8 +504,6 @@ fn primary_key_is_preserved_when_generating_data_model_from_a_schema() {
 
 #[test]
 fn uniqueness_is_preserved_when_generating_data_model_from_a_schema() {
-    setup();
-
     let ref_data_model = Datamodel {
         models: vec![Model {
             database_name: None,
@@ -631,10 +586,7 @@ fn uniqueness_is_preserved_when_generating_data_model_from_a_schema() {
 
 #[test]
 #[ignore]
-
 fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
-    setup();
-
     let ref_data_model = Datamodel {
         models: vec![
             Model {
@@ -825,8 +777,6 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
 
 #[test]
 fn multi_field_uniques_are_preserved_when_generating_data_model_from_a_schema() {
-    setup();
-
     let ref_data_model = Datamodel {
         models: vec![Model {
             database_name: None,
@@ -941,7 +891,6 @@ fn multi_field_uniques_are_preserved_when_generating_data_model_from_a_schema() 
 
 #[test]
 fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
-    setup();
 
     let ref_data_model = Datamodel {
         models: vec![
@@ -1122,8 +1071,6 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
 
 #[test]
 fn enums_are_preserved_when_generating_data_model_from_a_schema() {
-    setup();
-
     let ref_data_model = Datamodel {
         models: vec![],
         enums: vec![dml::Enum {

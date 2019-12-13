@@ -2,13 +2,15 @@ use super::FieldManifestation;
 use crate::prelude::*;
 use datamodel::FieldArity;
 use once_cell::sync::OnceCell;
-use std::sync::{Arc, Weak};
+use std::{
+    hash::{Hash, Hasher},
+    sync::{Arc, Weak},
+};
 
 pub type RelationFieldRef = Arc<RelationField>;
 pub type RelationFieldWeak = Weak<RelationField>;
 
-#[derive(Debug, Deserialize, Serialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(Debug)]
 pub struct RelationFieldTemplate {
     pub name: String,
     pub type_identifier: TypeIdentifier,
@@ -32,14 +34,47 @@ pub struct RelationField {
     pub is_auto_generated: bool,
     pub relation_name: String,
     pub relation_side: RelationSide,
+    pub relation: OnceCell<RelationWeakRef>,
+
     #[debug_stub = "#ModelWeakRef#"]
     pub model: ModelWeakRef,
-    pub relation: OnceCell<RelationWeakRef>,
 
     pub(crate) is_unique: bool,
 }
 
-#[derive(Clone, Copy, Debug, Deserialize, Serialize, PartialEq)]
+impl Eq for RelationField {}
+
+impl Hash for RelationField {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.name.hash(state);
+        self.type_identifier.hash(state);
+        self.is_required.hash(state);
+        self.is_list.hash(state);
+        self.is_hidden.hash(state);
+        self.is_auto_generated.hash(state);
+        self.relation_name.hash(state);
+        self.relation_side.hash(state);
+        self.is_unique.hash(state);
+        self.model().hash(state);
+    }
+}
+
+impl PartialEq for RelationField {
+    fn eq(&self, other: &Self) -> bool {
+        self.name == other.name
+            && self.type_identifier == other.type_identifier
+            && self.is_required == other.is_required
+            && self.is_list == other.is_list
+            && self.is_hidden == other.is_hidden
+            && self.is_auto_generated == other.is_auto_generated
+            && self.relation_name == other.relation_name
+            && self.relation_side == other.relation_side
+            && self.is_unique == other.is_unique
+            && self.model() == other.model()
+    }
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum RelationSide {
     A,
     B,

@@ -351,9 +351,9 @@ fn fix(current: &Table, next: &Table, schema_name: &str) -> Vec<SqlMigrationStep
     result
 }
 
-pub fn wrap_as_step<T, F>(steps: Vec<T>, mut wrap_fn: F) -> Vec<SqlMigrationStep>
+pub fn wrap_as_step<T, F>(steps: Vec<T>, mut wrap_fn: F) -> impl Iterator<Item=SqlMigrationStep>
 where
     F: FnMut(T) -> SqlMigrationStep,
 {
-    steps.into_iter().map(|x| wrap_fn(x)).collect()
+    steps.into_iter().map(move |x| wrap_fn(x))
 }

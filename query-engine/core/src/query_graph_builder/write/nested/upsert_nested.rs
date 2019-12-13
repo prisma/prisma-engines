@@ -3,8 +3,9 @@ use crate::query_graph_builder::write::utils::coerce_vec;
 use crate::{
     query_ast::*,
     query_graph::{Flow, Node, NodeRef, QueryGraph, QueryGraphDependency},
-    ParsedInputValue,
+    InputAssertions, ParsedInputMap, ParsedInputValue,
 };
+use connector::{Filter, ScalarCompare};
 use prisma_models::RelationFieldRef;
 use std::{convert::TryInto, sync::Arc};
 
@@ -97,18 +98,27 @@ pub fn connect_nested_upsert(
         let update_input = as_map.remove("update").expect("update argument is missing");
 
         // Read child(ren) node
-        let finder: Option<RecordFinder> = if parent_relation_field.is_list {
-            let where_input = as_map.remove("where").expect("where argument is missing");
-            Some(extract_record_finder(where_input, &child_model)?)
+        let filter: Filter = if parent_relation_field.is_list {
+            let where_input: ParsedInputMap = as_map.remove("where").expect("where argument is missing").try_into()?;
+
+            where_input.assert_size(1)?;
+            where_input.assert_non_null()?;
+
+            extract_filter(where_input, &child_model, false)?
         } else {
-            None
+            Filter::empty()
         };
 
         let read_children_node =
-            utils::insert_find_children_by_parent_node(graph, &parent_node, parent_relation_field, finder)?;
+            utils::insert_find_children_by_parent_node(graph, &parent_node, parent_relation_field, filter)?;
 
         let create_node = create::create_record_node(graph, Arc::clone(&child_model), create_input.try_into()?)?;
-        let update_node = update::update_record_node(graph, None, Arc::clone(&child_model), update_input.try_into()?)?;
+        let update_node = update::update_record_node(
+            graph,
+            Filter::empty(),
+            Arc::clone(&child_model),
+            update_input.try_into()?,
+        )?;
         let if_node = graph.create_node(Flow::default_if());
 
         graph.create_edge(
@@ -128,7 +138,7 @@ pub fn connect_nested_upsert(
         graph.create_edge(
             &read_children_node,
             &update_node,
-            QueryGraphDependency::ParentIds(Box::new(|mut node, mut parent_ids| {
+            QueryGraphDependency::ParentIds(Box::new(move |mut node, mut parent_ids| {
                 if let Node::Query(Query::Write(WriteQuery::UpdateRecord(ref mut x))) = node {
                     let parent_id = match parent_ids.pop() {
                         Some(pid) => Ok(pid),
@@ -137,8 +147,7 @@ pub fn connect_nested_upsert(
                         ))),
                     }?;
 
-                    let finder = RecordFinder::new(id_field, parent_id);
-                    x.where_ = Some(finder);
+                    x.add_filter(id_field.equals(parent_id));
                 }
                 Ok(node)
             })),
@@ -157,14 +166,15 @@ pub fn connect_nested_upsert(
                 let related_field_name = parent_relation_field.name.clone();
 
                 // Update parent node
-                let update_node = utils::update_records_node_placeholder(graph, None, Arc::clone(&parent_model));
+                let update_node =
+                    utils::update_records_node_placeholder(graph, Filter::empty(), Arc::clone(&parent_model));
                 let id_field = parent_model.fields().id();
 
                 // Edge to retrieve the finder
                 graph.create_edge(
                     &parent_node,
                     &update_node,
-                    QueryGraphDependency::ParentIds(Box::new(|mut child_node, mut parent_ids| {
+                    QueryGraphDependency::ParentIds(Box::new(move |mut child_node, mut parent_ids| {
                         let parent_id = match parent_ids.pop() {
                             Some(pid) => Ok(pid),
                             None => Err(QueryGraphBuilderError::AssertionError(format!(
@@ -173,7 +183,7 @@ pub fn connect_nested_upsert(
                         }?;
 
                         if let Node::Query(Query::Write(ref mut wq)) = child_node {
-                            wq.inject_record_finder((id_field, parent_id).into());
+                            wq.add_filter(id_field.equals(parent_id));
                         }
 
                         Ok(child_node)

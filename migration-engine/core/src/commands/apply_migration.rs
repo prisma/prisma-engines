@@ -2,7 +2,6 @@ use super::MigrationStepsResultOutput;
 use crate::commands::command::*;
 use crate::migration_engine::MigrationEngine;
 use datamodel::{ast::SchemaAst, Datamodel};
-use log::*;
 use migration_connector::*;
 use serde::Deserialize;
 
@@ -21,7 +20,7 @@ impl<'a> MigrationCommand for ApplyMigrationCommand<'a> {
         D: DatabaseMigrationMarker + Send + Sync + 'static,
     {
         let cmd = ApplyMigrationCommand { input };
-        debug!("{:?}", cmd.input);
+        tracing::debug!("{:?}", cmd.input);
 
         let connector = engine.connector();
         let migration_persistence = connector.migration_persistence();
@@ -47,7 +46,9 @@ impl<'a> ApplyMigrationCommand<'a> {
         let connector = engine.connector();
         let migration_persistence = connector.migration_persistence();
 
-        let current_datamodel = migration_persistence.current_datamodel().await;
+        let current_datamodel_ast = migration_persistence.current_datamodel_ast().await;
+        let current_datamodel = datamodel::lift_ast(&current_datamodel_ast)?;
+
         let last_non_watch_datamodel = migration_persistence
             .last_non_watch_migration()
             .await
@@ -56,9 +57,8 @@ impl<'a> ApplyMigrationCommand<'a> {
         let next_datamodel_ast = engine
             .datamodel_calculator()
             .infer(&last_non_watch_datamodel, self.input.steps.as_slice())?;
-        let next_datamodel = datamodel::lift_ast(&next_datamodel_ast)?;
 
-        self.handle_migration(&engine, current_datamodel, next_datamodel, next_datamodel_ast).await
+        self.handle_migration(&engine, current_datamodel, next_datamodel_ast).await
     }
 
     async fn handle_normal_migration<C, D>(
@@ -71,22 +71,20 @@ impl<'a> ApplyMigrationCommand<'a> {
     {
         let connector = engine.connector();
         let migration_persistence = connector.migration_persistence();
-        let current_datamodel = migration_persistence.current_datamodel().await;
         let current_datamodel_ast = migration_persistence.current_datamodel_ast().await;
+        let current_datamodel = datamodel::lift_ast(&current_datamodel_ast)?;
 
         let next_datamodel_ast = engine
             .datamodel_calculator()
             .infer(&current_datamodel_ast, self.input.steps.as_slice())?;
-        let next_datamodel = datamodel::lift_ast(&next_datamodel_ast)?;
 
-        self.handle_migration(&engine, current_datamodel, next_datamodel, next_datamodel_ast).await
+        self.handle_migration(&engine, current_datamodel,  next_datamodel_ast).await
     }
 
     async fn handle_migration<C, D>(
         &self,
         engine: &MigrationEngine<C, D>,
         current_datamodel: Datamodel,
-        next_datamodel: Datamodel,
         next_schema_ast: SchemaAst,
     ) -> CommandResult<MigrationStepsResultOutput>
     where
@@ -94,6 +92,7 @@ impl<'a> ApplyMigrationCommand<'a> {
         D: DatabaseMigrationMarker + Send + Sync + 'static,
     {
         let connector = engine.connector();
+        let next_datamodel = datamodel::lift_ast(&next_schema_ast)?;
         let migration_persistence = connector.migration_persistence();
 
         let database_migration = connector
@@ -120,15 +119,18 @@ impl<'a> ApplyMigrationCommand<'a> {
         match (diagnostics.has_warnings(), self.input.force.unwrap_or(false)) {
             // We have no warnings, or the force flag is passed.
             (false, _) | (true, true) => {
+                tracing::debug!("Applying the migration");
                 let saved_migration = migration_persistence.create(migration).await;
 
                 connector
                     .migration_applier()
                     .apply(&saved_migration, &database_migration)
                     .await?;
+
+                tracing::debug!("Migration applied");
             }
             // We have warnings, but no force flag was passed.
-            (true, false) => (),
+            (true, false) => tracing::info!("The force flag was not passed, the migration will not be applied."),
         }
 
         let DestructiveChangeDiagnostics { warnings, errors } = diagnostics;

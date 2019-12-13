@@ -1,40 +1,36 @@
 use crate::{error::SqlError, query_builder::write, QueryExt};
-use connector_interface::{error::ConnectorError, *};
+use connector_interface::*;
 use prisma_models::*;
 use quaint::error::Error as QueryError;
 
-pub async fn create_record(
-    conn: &dyn QueryExt,
-    model: &ModelRef,
-    args: WriteArgs,
-) -> connector_interface::Result<GraphqlId> {
+pub async fn create_record(conn: &dyn QueryExt, model: &ModelRef, args: WriteArgs) -> crate::Result<GraphqlId> {
     let (insert, returned_id) = write::create_record(model, args.non_list_args().clone());
 
     let last_id = match conn.insert(insert).await {
         Ok(id) => id,
         Err(QueryError::UniqueConstraintViolation { field_name }) => {
             if field_name == "PRIMARY" {
-                return Err(ConnectorError::UniqueConstraintViolation {
+                return Err(SqlError::UniqueConstraintViolation {
                     field_name: format!("{}.{}", model.name, model.fields().id().name),
                 });
             } else {
-                return Err(ConnectorError::UniqueConstraintViolation {
+                return Err(SqlError::UniqueConstraintViolation {
                     field_name: format!("{}.{}", model.name, field_name),
                 });
             }
         }
         Err(QueryError::NullConstraintViolation { field_name }) => {
             if field_name == "PRIMARY" {
-                return Err(ConnectorError::NullConstraintViolation {
+                return Err(SqlError::NullConstraintViolation {
                     field_name: format!("{}.{}", model.name, model.fields().id().name),
                 });
             } else {
-                return Err(ConnectorError::NullConstraintViolation {
+                return Err(SqlError::NullConstraintViolation {
                     field_name: format!("{}.{}", model.name, field_name),
                 });
             }
         }
-        Err(e) => return Err(SqlError::from(e).into()),
+        Err(e) => return Err(SqlError::from(e)),
     };
 
     let id = match returned_id {
@@ -50,7 +46,7 @@ pub async fn update_records(
     model: &ModelRef,
     where_: Filter,
     args: WriteArgs,
-) -> connector_interface::Result<Vec<GraphqlId>> {
+) -> crate::Result<Vec<GraphqlId>> {
     let ids = conn.filter_ids(model, where_.clone()).await?;
 
     if ids.len() == 0 {
@@ -63,17 +59,13 @@ pub async fn update_records(
     };
 
     for update in updates {
-        conn.update(update).await.map_err(SqlError::from)?;
+        conn.update(update).await?;
     }
 
     Ok(ids)
 }
 
-pub async fn delete_records(
-    conn: &dyn QueryExt,
-    model: &ModelRef,
-    where_: Filter,
-) -> connector_interface::Result<usize> {
+pub async fn delete_records(conn: &dyn QueryExt, model: &ModelRef, where_: Filter) -> crate::Result<usize> {
     let ids = conn.filter_ids(model, where_.clone()).await?;
     let ids: Vec<&GraphqlId> = ids.iter().map(|id| &*id).collect();
     let count = ids.len();
@@ -83,7 +75,7 @@ pub async fn delete_records(
     }
 
     for delete in write::delete_many(model, ids.as_slice()) {
-        conn.delete(delete).await.map_err(SqlError::from)?;
+        conn.delete(delete).await?;
     }
 
     Ok(count)
@@ -94,10 +86,10 @@ pub async fn connect(
     field: &RelationFieldRef,
     parent_id: &GraphqlId,
     child_ids: &[GraphqlId],
-) -> connector_interface::Result<()> {
+) -> crate::Result<()> {
     let query = write::create_relation_table_records(field, parent_id, child_ids);
 
-    conn.execute(query).await.map_err(SqlError::from)?;
+    conn.execute(query).await?;
     Ok(())
 }
 
@@ -106,9 +98,9 @@ pub async fn disconnect(
     field: &RelationFieldRef,
     parent_id: &GraphqlId,
     child_ids: &[GraphqlId],
-) -> connector_interface::Result<()> {
+) -> crate::Result<()> {
     let query = write::delete_relation_table_records(field, parent_id, child_ids);
 
-    conn.execute(query).await.map_err(SqlError::from)?;
+    conn.execute(query).await?;
     Ok(())
 }

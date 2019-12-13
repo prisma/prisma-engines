@@ -217,10 +217,10 @@ class DeleteManySpec extends FlatSpec with Matchers with ApiSpecBase {
          |   where: { name: "Dad" }
          |   data: {  children: {deleteMany:[
          |      {
-         |          name_contains:"Daughter"
+         |          name_contains: "Daughter"
          |      },
          |      {
-         |          name_contains:"Son"
+         |          name_contains: "Son"
          |      }
          |   ]
          |  }}

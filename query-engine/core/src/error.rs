@@ -69,3 +69,28 @@ impl From<InterpreterError> for CoreError {
         CoreError::InterpreterError(e)
     }
 }
+
+impl From<CoreError> for user_facing_errors::Error {
+    fn from(err: CoreError) -> user_facing_errors::Error {
+        match err {
+            CoreError::ConnectorError(ConnectorError {
+                user_facing_error: Some(user_facing_error),
+                ..
+            })
+            | CoreError::InterpreterError(InterpreterError::ConnectorError(ConnectorError {
+                user_facing_error: Some(user_facing_error),
+                ..
+            })) => user_facing_error.into(),
+            CoreError::QueryParserError(query_parser_error)
+            | CoreError::QueryGraphBuilderError(QueryGraphBuilderError::QueryParserError(query_parser_error)) => {
+                user_facing_errors::KnownError::new(user_facing_errors::query_engine::QueryValidationFailed {
+                    query_validation_error: format!("{}", query_parser_error),
+                    query_position: format!("{}", query_parser_error.location()),
+                })
+                .unwrap()
+                .into()
+            }
+            _ => user_facing_errors::UnknownError::from_fail(err).into(),
+        }
+    }
+}

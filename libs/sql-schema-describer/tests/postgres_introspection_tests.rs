@@ -11,7 +11,6 @@ use crate::postgres::*;
 
 #[tokio::test]
 async fn all_postgres_column_types_must_work() {
-    setup();
 
     let mut migration = Migration::new().schema(SCHEMA);
     migration.create_table("User", move |t| {
@@ -63,7 +62,7 @@ async fn all_postgres_column_types_must_work() {
     });
 
     let full_sql = migration.make::<barrel::backend::Pg>();
-    let inspector = get_postgres_describer(&full_sql).await;
+    let inspector = get_postgres_describer(&full_sql, "all_postgres_column_types_must_work").await;
     let result = inspector.describe(SCHEMA).await.expect("describing");
     let mut table = result.get_table("User").expect("couldn't get User table").to_owned();
     // Ensure columns are sorted as expected when comparing
@@ -574,7 +573,6 @@ async fn all_postgres_column_types_must_work() {
 
 #[tokio::test]
 async fn postgres_foreign_key_on_delete_must_be_handled() {
-    setup();
 
     let sql = format!(
         "CREATE TABLE \"{0}\".\"City\" (id INT PRIMARY KEY);
@@ -589,7 +587,7 @@ async fn postgres_foreign_key_on_delete_must_be_handled() {
         ",
         SCHEMA
     );
-    let inspector = get_postgres_describer(&sql).await;
+    let inspector = get_postgres_describer(&sql, "postgres_foreign_key_on_delete_must_be_handled").await;
 
     let schema = inspector.describe(SCHEMA).await.expect("describing");
     let mut table = schema.get_table("User").expect("get User table").to_owned();
@@ -710,12 +708,11 @@ async fn postgres_foreign_key_on_delete_must_be_handled() {
 
 #[tokio::test]
 async fn postgres_enums_must_work() {
-    setup();
 
     let inspector = get_postgres_describer(&format!(
         "CREATE TYPE \"{}\".\"mood\" AS ENUM ('sad', 'ok', 'happy')",
         SCHEMA
-    ))
+    ), "postgres_enums_must_work")
     .await;
 
     let schema = inspector.describe(SCHEMA).await.expect("describing");
@@ -733,9 +730,8 @@ async fn postgres_enums_must_work() {
 
 #[tokio::test]
 async fn postgres_sequences_must_work() {
-    setup();
 
-    let inspector = get_postgres_describer(&format!("CREATE SEQUENCE \"{}\".\"test\"", SCHEMA)).await;
+    let inspector = get_postgres_describer(&format!("CREATE SEQUENCE \"{}\".\"test\"", SCHEMA), "postgres_sequences_must_work").await;
 
     let schema = inspector.describe(SCHEMA).await.expect("describing");
     let got_seq = schema.get_sequence("test").expect("get sequence");

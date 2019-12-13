@@ -113,8 +113,8 @@ impl MigrationPersistence for SqlMigrationPersistence {
         let errors_json = serde_json::to_string(&migration.errors).unwrap();
 
         let insert = Insert::single_into(self.table())
-            .value(NAME_COLUMN, migration.name)
             .value(DATAMODEL_COLUMN, migration.datamodel_string)
+            .value(NAME_COLUMN, migration.name)
             .value(STATUS_COLUMN, migration.status.code())
             .value(APPLIED_COLUMN, migration.applied)
             .value(ROLLED_BACK_COLUMN, migration.rolled_back)
@@ -250,7 +250,6 @@ fn parse_rows_new(result_set: ResultSet) -> Vec<Migration> {
 
             let datamodel_steps =
                 serde_json::from_str(&datamodel_steps_json).expect("Error parsing the migration steps");
-
 
             let database_migration_json =
                 serde_json::from_str(&database_migration_string).expect("Error parsing the database migration steps");
