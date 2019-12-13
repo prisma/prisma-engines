@@ -20,7 +20,7 @@ impl<'a> MigrationCommand for ListMigrationsCommand {
 
         let result: CommandResult<Self::Output> = migration_persistence
             .load_all()
-            .await
+            .await?
             .into_iter()
             .map(|migration| convert_migration_to_list_migration_steps_output(&engine, migration))
             .collect();

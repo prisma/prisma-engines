@@ -30,7 +30,7 @@ impl<'a> MigrationCommand for InferMigrationStepsCommand<'a> {
         let migration_persistence = connector.migration_persistence();
         let database_migration_inferrer = connector.database_migration_inferrer();
 
-        let current_datamodel_ast = migration_persistence.current_datamodel_ast().await;
+        let current_datamodel_ast = migration_persistence.current_datamodel_ast().await?;
         let assumed_datamodel_ast = engine
             .datamodel_calculator()
             .infer(&current_datamodel_ast, cmd.input.assume_to_be_applied.as_slice())?;
@@ -59,7 +59,7 @@ impl<'a> MigrationCommand for InferMigrationStepsCommand<'a> {
 
             (model_migration_steps, database_steps)
         } else {
-            let last_non_watch_applied_migration = migration_persistence.last_non_watch_applied_migration().await;
+            let last_non_watch_applied_migration = migration_persistence.last_non_watch_applied_migration().await?;
             let last_non_watch_datamodel_ast = last_non_watch_applied_migration
                 .as_ref()
                 .map(|m| m.datamodel_ast())
