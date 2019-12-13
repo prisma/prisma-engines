@@ -51,7 +51,7 @@ fn models_with_only_scalar_fields() {
             }
             
             model Test {
-                id Int @id
+                id Int @id @default(autoincrement())
                 int Int
                 float Float
                 boolean Boolean

@@ -26,13 +26,18 @@ const BUILTIN_UUID_FUNCTIONAL: builtin::ServerSideTrivialFunctional = builtin::S
     name: "uuid",
     return_type: ScalarType::String,
 };
+const BUILTIN_AUTOINCREMENT_FUNCTIONAL: builtin::ServerSideTrivialFunctional = builtin::ServerSideTrivialFunctional {
+    name: "autoincrement",
+    return_type: ScalarType::Int,
+};
 
 /// Array of all builtin functionals.
-const BUILTIN_FUNCTIONALS: [&dyn Functional; 4] = [
+const BUILTIN_FUNCTIONALS: [&dyn Functional; 5] = [
     &BUILTIN_ENV_FUNCTIONAL,
     &BUILTIN_NOW_FUNCTIONAL,
     &BUILTIN_CUID_FUNCTIONAL,
     &BUILTIN_UUID_FUNCTIONAL,
+    &BUILTIN_AUTOINCREMENT_FUNCTIONAL,
 ];
 
 /// Evaluator for arbitrary expressions.

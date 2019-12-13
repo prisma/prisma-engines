@@ -1,9 +1,6 @@
 use crate::common::*;
 use datamodel::{ast::Span, error::DatamodelError};
 
-// Ported from
-// https://github.com/prisma/prisma/blob/master/server/servers/deploy/src/test/scala/com/prisma/deploy/migration/validation/IdDirectiveSpec.scala
-
 #[test]
 fn id_should_error_if_the_field_is_not_required() {
     let dml = r#"
@@ -21,7 +18,40 @@ fn id_should_error_if_the_field_is_not_required() {
     ));
 }
 
-// DISABLED until we decide on this.
+#[test]
+fn id_should_error_if_the_field_is_optional() {
+    let dml = r#"
+    model Model {
+        id Int? @id
+    }
+    "#;
+
+    let errors = parse_error(dml);
+
+    errors.assert_is(DatamodelError::new_directive_validation_error(
+        "Fields that are marked as id must be required.",
+        "id",
+        Span::new(36, 38),
+    ));
+}
+
+#[test]
+fn id_should_error_if_unique_and_id_are_specified() {
+    let dml = r#"
+    model Model {
+        id Int @id @unique
+    }
+    "#;
+
+    let errors = parse_error(dml);
+
+    errors.assert_is(DatamodelError::new_directive_validation_error(
+        "Fields that are marked as id should not have an additional @unique.",
+        "unique",
+        Span::new(39, 45),
+    ));
+}
+
 #[test]
 fn id_should_error_on_model_without_id() {
     let dml = r#"
@@ -58,7 +88,7 @@ fn id_should_error_multiple_ids_are_provided() {
 }
 
 #[test]
-fn it_must_error_when_single_and_multi_field_id_is_used() {
+fn id_must_error_when_single_and_multi_field_id_is_used() {
     let dml = r#"
     model Model {
         id         Int      @id
@@ -78,7 +108,7 @@ fn it_must_error_when_single_and_multi_field_id_is_used() {
 }
 
 #[test]
-fn it_must_error_when_multi_field_is_referring_to_undefined_fields() {
+fn id_must_error_when_multi_field_is_referring_to_undefined_fields() {
     let dml = r#"
     model Model {
       a String
@@ -97,7 +127,7 @@ fn it_must_error_when_multi_field_is_referring_to_undefined_fields() {
 }
 
 const ID_TYPE_ERROR: &str =
-    "Invalid ID field. ID field must be one of: Int @id or Int @id @default(`Integer`) for Int fields or String @id or String @id @default(`cuid()`|`uuid()`|`String`) for String fields.";
+    "Invalid ID field. ID field must be one of: Int @id or Int @id @default(`Integer`|`autoincrement()`) for Int fields or String @id or String @id @default(`cuid()`|`uuid()`|`String`) for String fields.";
 
 #[test]
 fn id_should_error_if_the_id_field_is_not_of_valid_type() {

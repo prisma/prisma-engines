@@ -136,7 +136,17 @@ impl<'a> Validator<'a> {
                     dml::FieldType::Base(dml::ScalarType::Int),
                     dml::FieldArity::Required,
                 ) => true,
+                (
+                    Some(dml::ScalarValue::Expression(name, return_type, args)),
+                    dml::FieldType::Base(dml::ScalarType::Int),
+                    dml::FieldArity::Required,
+                ) => {
+                    let name_eq = name == "autoincrement";
+                    let type_eq = return_type == &dml::ScalarType::Int;
+                    let args_eq = args.is_empty();
 
+                    name_eq && type_eq && args_eq
+                }
                 (None, dml::FieldType::Base(dml::ScalarType::Int), dml::FieldArity::Required) => true,
                 (None, dml::FieldType::Base(dml::ScalarType::String), dml::FieldArity::Required) => true,
                 _ => false,
@@ -144,7 +154,7 @@ impl<'a> Validator<'a> {
 
             if !is_valid {
                 return Err(DatamodelError::new_model_validation_error(
-                    "Invalid ID field. ID field must be one of: Int @id or Int @id @default(`Integer`) for Int fields or String @id or String @id @default(`cuid()`|`uuid()`|`String`) for String fields.",
+                    "Invalid ID field. ID field must be one of: Int @id or Int @id @default(`Integer`|`autoincrement()`) for Int fields or String @id or String @id @default(`cuid()`|`uuid()`|`String`) for String fields.",
                     &model.name,
                     ast_schema.find_field(&model.name, &id_field.name).expect(STATE_ERROR).span));
             }

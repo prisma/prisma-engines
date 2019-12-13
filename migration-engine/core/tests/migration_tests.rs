@@ -89,11 +89,42 @@ async fn adding_an_id_field_with_a_special_name_must_work(api: &TestApi) {
     assert_eq!(column.is_some(), true);
 }
 
-#[test_each_connector]
+#[test_each_connector(ignore="sqlite")]
 async fn adding_an_id_field_of_type_int_must_work(api: &TestApi) {
     let dm2 = r#"
         model Test {
             myId Int @id
+            text String
+        }
+    "#;
+
+    let result = api.infer_and_apply(&dm2).await.sql_schema;
+    let column = result.table_bang("Test").column_bang("myId");
+
+    assert_eq!(column.auto_increment, false);
+ }
+
+#[test_one_connector(connector="sqlite")]
+async fn adding_an_id_field_of_type_int_must_work_for_sqlite(api: &TestApi) {
+    let dm2 = r#"
+        model Test {
+            myId Int @id
+            text String
+        }
+    "#;
+
+    let result = api.infer_and_apply(&dm2).await.sql_schema;
+    let column = result.table_bang("Test").column_bang("myId");
+
+    assert_eq!(column.auto_increment, true);
+}
+
+#[test_each_connector]
+async fn adding_an_id_field_of_type_int_with_autoincrement_must_work(api: &TestApi) {
+    let dm2 = r#"
+        model Test {
+            myId Int @id @default(autoincrement())
+            text String
         }
     "#;
 
@@ -110,6 +141,7 @@ async fn adding_an_id_field_of_type_int_must_work(api: &TestApi) {
         _ => assert_eq!(column.auto_increment, true),
     }
 }
+
 
 #[test_each_connector]
 async fn removing_a_scalar_field_must_work(api: &TestApi) {
@@ -1413,19 +1445,19 @@ async fn simple_type_aliases_in_migrations_must_work(api: &TestApi) {
 async fn model_with_multiple_indexes_works(api: &TestApi) {
     let dm = r#"
     model User {
-      id         Int       @id @unique
+      id         Int       @id
     }
 
     model Post {
-      id        Int       @id @unique
+      id        Int       @id
     }
 
     model Comment {
-      id        Int       @id @unique
+      id        Int       @id
     }
 
     model Like {
-      id        Int       @id @unique
+      id        Int       @id
       user      User
       post      Post
       comment   Comment
@@ -1439,7 +1471,7 @@ async fn model_with_multiple_indexes_works(api: &TestApi) {
     let sql_schema = api.infer_and_apply(dm).await.sql_schema;
 
     let like_indexes_count = sql_schema.table_bang("Like").indices.len();
-    let expected_indexes_count = if api.is_mysql() { 1 } else { 4 }; // 3 explicit indexes + PK, or only PK on mysql
+    let expected_indexes_count = if api.is_mysql() { 0 } else { 3 }; // 3 explicit indexes + PK, or only PK on mysql
 
     assert_eq!(like_indexes_count, expected_indexes_count);
 }

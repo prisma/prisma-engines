@@ -10,7 +10,14 @@ impl DirectiveValidator<dml::Field> for FieldLevelUniqueDirectiveValidator {
         &"unique"
     }
 
-    fn validate_and_apply(&self, _args: &mut Args, obj: &mut dml::Field) -> Result<(), DatamodelError> {
+    fn validate_and_apply(&self, args: &mut Args, obj: &mut dml::Field) -> Result<(), DatamodelError> {
+        if obj.id_info.is_some() {
+            return self.error(
+                "Fields that are marked as id should not have an additional @unique.",
+                args.span(),
+            );
+        }
+
         obj.is_unique = true;
 
         Ok(())

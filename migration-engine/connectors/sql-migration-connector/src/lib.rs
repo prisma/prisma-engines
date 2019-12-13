@@ -37,7 +37,7 @@ pub struct SqlMigrationConnector {
     pub database_migration_inferrer: Arc<dyn DatabaseMigrationInferrer<SqlMigration>>,
     pub database_migration_step_applier: Arc<dyn DatabaseMigrationStepApplier<SqlMigration>>,
     pub destructive_changes_checker: Arc<dyn DestructiveChangesChecker<SqlMigration>>,
-    pub database_introspector: Arc<dyn SqlSchemaDescriberBackend + Send + Sync + 'static>,
+    pub database_describer: Arc<dyn SqlSchemaDescriberBackend + Send + Sync + 'static>,
 }
 
 impl SqlMigrationConnector {
@@ -75,7 +75,7 @@ impl SqlMigrationConnector {
 
         let conn = Arc::new(connection) as Arc<dyn Queryable + Send + Sync>;
 
-        let inspector: Arc<dyn SqlSchemaDescriberBackend + Send + Sync + 'static> = match sql_family {
+        let describer: Arc<dyn SqlSchemaDescriberBackend + Send + Sync + 'static> = match sql_family {
             SqlFamily::Mysql => Arc::new(sql_schema_describer::mysql::SqlSchemaDescriber::new(Arc::clone(&conn))),
             SqlFamily::Postgres => Arc::new(sql_schema_describer::postgres::SqlSchemaDescriber::new(Arc::clone(
                 &conn,
@@ -91,7 +91,7 @@ impl SqlMigrationConnector {
 
         let database_migration_inferrer = Arc::new(SqlDatabaseMigrationInferrer {
             connection_info: connection_info.clone(),
-            introspector: Arc::clone(&inspector),
+            describer: Arc::clone(&describer),
             schema_name: schema_name.to_string(),
         });
 
@@ -115,7 +115,7 @@ impl SqlMigrationConnector {
             database_migration_inferrer,
             database_migration_step_applier,
             destructive_changes_checker,
-            database_introspector: Arc::clone(&inspector),
+            database_describer: Arc::clone(&describer),
         })
     }
 

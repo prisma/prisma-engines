@@ -53,10 +53,12 @@ impl<'a> SqlSchemaCalculator<'a> {
                             tpe: column_type(f),
                             default: f.migration_value_new(&self.data_model),
                             auto_increment: {
-                                if column_type(f).family == sql::ColumnTypeFamily::Int {
-                                    f.is_id()
-                                } else {
-                                    false
+                                match f.id_info {
+                                    Some(IdInfo {
+                                        strategy: IdStrategy::Auto,
+                                        sequence: _,
+                                    }) if column_type(f).family == sql::ColumnTypeFamily::Int => true,
+                                    _ => false,
                                 }
                             },
                         }),

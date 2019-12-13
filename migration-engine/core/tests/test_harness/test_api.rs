@@ -83,7 +83,7 @@ impl TestApi {
         );
 
         InferAndApplyOutput {
-            sql_schema: self.introspect_database().await.unwrap(),
+            sql_schema: self.describe_database().await.unwrap(),
             migration_output,
         }
     }
@@ -96,7 +96,7 @@ impl TestApi {
 
         InferAndApplyOutput {
             migration_output,
-            sql_schema: self.introspect_database().await.unwrap(),
+            sql_schema: self.describe_database().await.unwrap(),
         }
     }
 
@@ -141,7 +141,7 @@ impl TestApi {
 
         InferAndApplyOutput {
             migration_output,
-            sql_schema: self.introspect_database().await.unwrap(),
+            sql_schema: self.describe_database().await.unwrap(),
         }
     }
 
@@ -162,8 +162,7 @@ impl TestApi {
     pub async fn unapply_migration(&self) -> UnapplyOutput {
         let input = UnapplyMigrationInput {};
         let output = self.api.unapply_migration(&input).await.unwrap();
-
-        let sql_schema = self.introspect_database().await.unwrap();
+        let sql_schema = self.describe_database().await.unwrap();
 
         UnapplyOutput { sql_schema, output }
     }
@@ -171,7 +170,7 @@ impl TestApi {
     pub fn barrel(&self) -> BarrelMigrationExecutor {
         BarrelMigrationExecutor {
             schema_name: self.connection_info().unwrap().schema_name().to_owned(),
-            inspector: self.inspector(),
+            inspector: self.describer(),
             database: Arc::clone(&self.database),
             sql_variant: match self.sql_family {
                 SqlFamily::Mysql => barrel::SqlVariant::Mysql,
@@ -181,7 +180,7 @@ impl TestApi {
         }
     }
 
-    fn inspector(&self) -> Box<dyn SqlSchemaDescriberBackend> {
+    fn describer(&self) -> Box<dyn SqlSchemaDescriberBackend> {
         match self.api.connector_type() {
             "postgresql" => Box::new(sql_schema_describer::postgres::SqlSchemaDescriber::new(Arc::clone(
                 &self.database,
@@ -196,14 +195,15 @@ impl TestApi {
         }
     }
 
-    pub async fn introspect_database(&self) -> Result<SqlSchema, failure::Error> {
+    pub async fn describe_database(&self) -> Result<SqlSchema, failure::Error> {
         use failure::ResultExt;
 
         let mut result = self
-            .inspector()
+            .describer()
             .describe(self.connection_info().unwrap().schema_name())
             .await
-            .context("Introspection")?;
+            .context("Description failed")?;
+
 
         // the presence of the _Migration table makes assertions harder. Therefore remove it from the result.
         result.tables = result.tables.into_iter().filter(|t| t.name != "_Migration").collect();
@@ -337,7 +337,7 @@ impl BarrelMigrationExecutor {
             .inspector
             .describe(&self.schema_name)
             .await
-            .expect("Introspection failed");
+            .expect("Description failed");
 
         // The presence of the _Migration table makes assertions harder. Therefore remove it.
         result.tables = result.tables.into_iter().filter(|t| t.name != "_Migration").collect();

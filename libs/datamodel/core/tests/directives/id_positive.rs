@@ -1,14 +1,28 @@
 use crate::common::*;
 use datamodel::dml::*;
 
-// Ported from
-// https://github.com/prisma/prisma/blob/master/server/servers/deploy/src/test/scala/com/prisma/deploy/migration/validation/IdDirectiveSpec.scala
-
 #[test]
-fn int_id_should_have_strategy_auto() {
+fn int_id_without_default_should_have_strategy_none() {
     let dml = r#"
     model Model {
         id Int @id
+    }
+    "#;
+
+    let datamodel = parse(dml);
+    let user_model = datamodel.assert_has_model("Model");
+    user_model
+        .assert_has_field("id")
+        .assert_is_id(true)
+        .assert_id_sequence(None)
+        .assert_id_strategy(IdStrategy::None);
+}
+
+#[test]
+fn int_id_with_default_autoincrement_should_have_strategy_auto() {
+    let dml = r#"
+    model Model {
+        id Int @id @default(autoincrement())
     }
     "#;
 
@@ -37,7 +51,7 @@ fn id_should_also_work_on_embedded_types() {
         .assert_has_field("id")
         .assert_is_id(true)
         .assert_id_sequence(None)
-        .assert_id_strategy(IdStrategy::Auto);
+        .assert_id_strategy(IdStrategy::None);
 }
 
 #[test]
@@ -132,7 +146,7 @@ fn should_allow_int_ids_with_static_default() {
     user_model
         .assert_has_field("id")
         .assert_is_id(true)
-        .assert_id_strategy(IdStrategy::Auto)
+        .assert_id_strategy(IdStrategy::None)
         .assert_default_value(ScalarValue::Int(0))
         .assert_base_type(&ScalarType::Int);
 }

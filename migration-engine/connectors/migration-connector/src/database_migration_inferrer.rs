@@ -3,7 +3,7 @@ use datamodel::Datamodel;
 
 /// The component responsible for generating a [DatabaseMigration](trait.MigrationConnector.html#associatedtype.DatabaseMigration)
 /// migrating the database from one datamodel to another. In addition to the datamodel information provided by the core, a connector
-/// may gather additional information itself, e.g. through introspection of the underlying database.
+/// may gather additional information itself, e.g. through looking at the description of the underlying database.
 #[async_trait::async_trait]
 pub trait DatabaseMigrationInferrer<T>: Send + Sync + 'static {
     /// Infer the database migration steps. The previous datamodel is provided, but the implementor can ignore it.

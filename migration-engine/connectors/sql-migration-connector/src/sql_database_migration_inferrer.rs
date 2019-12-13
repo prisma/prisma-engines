@@ -9,7 +9,7 @@ use std::sync::Arc;
 
 pub struct SqlDatabaseMigrationInferrer {
     pub connection_info: ConnectionInfo,
-    pub introspector: Arc<dyn SqlSchemaDescriberBackend + Send + Sync + 'static>,
+    pub describer: Arc<dyn SqlSchemaDescriberBackend + Send + Sync + 'static>,
     pub schema_name: String,
 }
 
@@ -22,7 +22,7 @@ impl DatabaseMigrationInferrer<SqlMigration> for SqlDatabaseMigrationInferrer {
         _steps: &[MigrationStep],
     ) -> ConnectorResult<SqlMigration> {
         let fut = async {
-            let current_database_schema: SqlSchema = self.introspect(&self.schema_name).await?;
+            let current_database_schema: SqlSchema = self.describe(&self.schema_name).await?;
             let expected_database_schema = SqlSchemaCalculator::calculate(next)?;
             infer(
                 &current_database_schema,
@@ -57,8 +57,8 @@ impl DatabaseMigrationInferrer<SqlMigration> for SqlDatabaseMigrationInferrer {
 }
 
 impl SqlDatabaseMigrationInferrer {
-    async fn introspect(&self, schema: &str) -> SqlResult<SqlSchema> {
-        Ok(self.introspector.describe(&schema).await?)
+    async fn describe(&self, schema: &str) -> SqlResult<SqlSchema> {
+        Ok(self.describer.describe(&schema).await?)
     }
 
     fn sql_family(&self) -> SqlFamily {

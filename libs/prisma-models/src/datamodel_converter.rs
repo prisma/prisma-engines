@@ -344,7 +344,6 @@ trait DatamodelFieldExtensions {
 
 impl DatamodelFieldExtensions for dml::Field {
     fn type_identifier(&self) -> TypeIdentifier {
-        // todo: add support for CUID and UUID
         match self.field_type {
             dml::FieldType::Enum(_) => TypeIdentifier::Enum,
             dml::FieldType::Relation(_) => TypeIdentifier::Relation,
@@ -360,6 +359,9 @@ impl DatamodelFieldExtensions for dml::Field {
                     }
                     Some(datamodel::common::ScalarValue::Expression(ref expr, _, _)) if expr == "uuid" => {
                         TypeIdentifier::UUID
+                    }
+                    Some(datamodel::common::ScalarValue::Expression(ref expr, _, _)) if expr == "autoincrement" => {
+                        TypeIdentifier::Int
                     }
                     _ => TypeIdentifier::String,
                 },
