@@ -183,15 +183,11 @@ impl MigrationConnector for SqlMigrationConnector {
     }
 
     async fn create_database(&self, db_name: &str) -> ConnectorResult<()> {
-        self.create_database_impl(db_name)
-            .await
-            .map_err(|sql_error| sql_error.into_connector_error(&self.connection_info))
+        catch(&self.connection_info, self.create_database_impl(db_name)).await
     }
 
     async fn initialize(&self) -> ConnectorResult<()> {
-        self.initialize_impl()
-            .await
-            .map_err(|sql_error| sql_error.into_connector_error(&self.connection_info))
+        catch(&self.connection_info, self.initialize_impl()).await
     }
 
     async fn reset(&self) -> ConnectorResult<()> {
@@ -217,5 +213,15 @@ impl MigrationConnector for SqlMigrationConnector {
 
     fn deserialize_database_migration(&self, json: serde_json::Value) -> SqlMigration {
         serde_json::from_value(json).expect("Deserializing the database migration failed.")
+    }
+}
+
+pub(crate) async fn catch<O>(
+    connection_info: &ConnectionInfo,
+    fut: impl std::future::Future<Output = std::result::Result<O, SqlError>>,
+) -> std::result::Result<O, migration_connector::ConnectorError> {
+    match fut.await {
+        Ok(o) => Ok(o),
+        Err(sql_error) => Err(sql_error.into_connector_error(connection_info)),
     }
 }
