@@ -2,7 +2,6 @@ use barrel::Migration;
 use pretty_assertions::assert_eq;
 use quaint::{connector::Queryable};
 use std::sync::Arc;
-use test_setup::*;
 
 pub(crate) fn custom_assert(left: &str, right: &str) {
     let parsed_expected = datamodel::parse_datamodel(&right).unwrap();
@@ -25,6 +24,7 @@ async fn run_full_sql(database: &Arc<dyn Queryable + Send + Sync>, full_sql: &st
 pub struct BarrelMigrationExecutor {
     pub(super) database: Arc<dyn Queryable + Send + Sync>,
     pub(super) sql_variant: barrel::backend::SqlVariant,
+    pub(super) schema_name: String,
 }
 
 impl BarrelMigrationExecutor {
@@ -32,7 +32,7 @@ impl BarrelMigrationExecutor {
     where
         F: FnMut(&mut Migration) -> (),
     {
-        self.execute_with_schema(migration_fn, SCHEMA_NAME).await
+        self.execute_with_schema(migration_fn, &self.schema_name).await
     }
 
     pub async fn execute_with_schema<F>(&self, mut migration_fn: F, schema_name: &str)

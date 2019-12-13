@@ -12,7 +12,7 @@ impl<'a> ColumnDiffer<'a> {
             // TODO: compare the whole type
             // || self.previous.tpe != self.next.tpe
             || self.previous.tpe.family != self.next.tpe.family
-            || self.previous.arity != self.next.arity
-            || (!self.previous.auto_increment && (self.previous.default != self.next.default))
+            || self.previous.tpe.arity != self.next.tpe.arity
+                || (!self.previous.auto_increment && (self.previous.default != self.next.default))
     }
 }

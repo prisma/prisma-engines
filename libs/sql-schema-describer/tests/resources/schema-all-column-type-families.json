@@ -7,9 +7,9 @@
           "name": "column1",
           "tpe": {
             "raw": "raw type",
-            "family": "int"
+            "family": "int",
+          "arity": "nullable"
           },
-          "arity": "nullable",
           "default": null,
           "autoIncrement": false
         },
@@ -17,9 +17,9 @@
           "name": "column2",
           "tpe": {
             "raw": "raw type",
-            "family": "float"
+            "family": "float",
+          "arity": "nullable"
           },
-          "arity": "nullable",
           "default": null,
           "autoIncrement": false
         },
@@ -27,9 +27,9 @@
           "name": "column3",
           "tpe": {
             "raw": "raw type",
-            "family": "boolean"
+            "family": "boolean",
+          "arity": "nullable"
           },
-          "arity": "nullable",
           "default": null,
           "autoIncrement": false
         },
@@ -37,9 +37,9 @@
           "name": "column4",
           "tpe": {
             "raw": "raw type",
-            "family": "string"
+            "family": "string",
+          "arity": "nullable"
           },
-          "arity": "nullable",
           "default": null,
           "autoIncrement": false
         },
@@ -47,9 +47,9 @@
           "name": "column5",
           "tpe": {
             "raw": "raw type",
-            "family": "dateTime"
+            "family": "dateTime",
+          "arity": "nullable"
           },
-          "arity": "nullable",
           "default": null,
           "autoIncrement": false
         },
@@ -57,9 +57,9 @@
           "name": "column6",
           "tpe": {
             "raw": "raw type",
-            "family": "binary"
+            "family": "binary",
+          "arity": "nullable"
           },
-          "arity": "nullable",
           "default": null,
           "autoIncrement": false
         },
@@ -67,9 +67,9 @@
           "name": "column7",
           "tpe": {
             "raw": "raw type",
-            "family": "json"
+            "family": "json",
+          "arity": "nullable"
           },
-          "arity": "nullable",
           "default": null,
           "autoIncrement": false
         },
@@ -77,9 +77,9 @@
           "name": "column8",
           "tpe": {
             "raw": "raw type",
-            "family": "uuid"
+            "family": "uuid",
+          "arity": "nullable"
           },
-          "arity": "nullable",
           "default": null,
           "autoIncrement": false
         },
@@ -87,9 +87,9 @@
           "name": "column9",
           "tpe": {
             "raw": "raw type",
-            "family": "geometric"
+            "family": "geometric",
+          "arity": "nullable"
           },
-          "arity": "nullable",
           "default": null,
           "autoIncrement": false
         },
@@ -97,9 +97,9 @@
           "name": "column10",
           "tpe": {
             "raw": "raw type",
-            "family": "logSequenceNumber"
+            "family": "logSequenceNumber",
+          "arity": "nullable"
           },
-          "arity": "nullable",
           "default": null,
           "autoIncrement": false
         },
@@ -107,9 +107,9 @@
           "name": "column11",
           "tpe": {
             "raw": "raw type",
-            "family": "textSearch"
+            "family": "textSearch",
+          "arity": "nullable"
           },
-          "arity": "nullable",
           "default": null,
           "autoIncrement": false
         },
@@ -117,9 +117,9 @@
           "name": "column12",
           "tpe": {
             "raw": "raw type",
-            "family": "transactionId"
+            "family": "transactionId",
+          "arity": "nullable"
           },
-          "arity": "nullable",
           "default": null,
           "autoIncrement": false
         }

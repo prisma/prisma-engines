@@ -21,6 +21,7 @@ class OneRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
       |   popularity Int
       |   blog       Blog?    @relation(references: [id])
       |   comment    Comment?
+      |   @@index([blog])
       |}
       |
       |model Comment {
@@ -28,6 +29,7 @@ class OneRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
       |   text  String
       |   likes Int
       |   post  Post?   @relation(references: [id])
+      |   @@index([post])
       |}
     """
   }

@@ -1,8 +1,7 @@
 use crate::{interpreter::InterpretationResult, query_ast::*, result_ast::*};
-use connector::{self, ConnectionLike, QueryArguments, ReadOperations, ScalarListValues};
+use connector::{self, ConnectionLike, QueryArguments, ReadOperations};
 use futures::future::{BoxFuture, FutureExt};
-use prisma_models::{GraphqlId, ScalarField, SelectedFields};
-use std::sync::Arc;
+use prisma_models::{GraphqlId, SelectedFields};
 
 pub fn execute<'a, 'b>(
     tx: &'a ConnectionLike<'a, 'b>,
@@ -27,6 +26,7 @@ fn read_one<'conn, 'tx>(
     query: RecordQuery,
 ) -> BoxFuture<'conn, InterpretationResult<QueryResult>> {
     let fut = async move {
+
         let selected_fields = inject_required_fields(query.selected_fields.clone());
         let model = query.model;
         let filter = query.filter.expect("Expected filter to be set for ReadOne query.");
@@ -37,16 +37,13 @@ fn read_one<'conn, 'tx>(
         match scalars {
             Some(record) => {
                 let ids = vec![record.collect_id(&id_field)?];
-                let list_fields = selected_fields.scalar_lists();
-                let lists = resolve_scalar_list_fields(tx, ids.clone(), list_fields).await?;
-                let nested: Vec<QueryResult> = process_nested(tx, query.nested, &ids).await?;
+                 let nested: Vec<QueryResult> = process_nested(tx, query.nested, &ids).await?;
 
                 Ok(QueryResult::RecordSelection(RecordSelection {
                     name: query.name,
                     fields: query.selection_order,
                     scalars: record.into(),
                     nested,
-                    lists,
                     id_field,
                     ..Default::default()
                 }))
@@ -77,8 +74,6 @@ fn read_many<'a, 'b>(
 
         let id_field = query.model.fields().id().name.clone();
         let ids = scalars.collect_ids(&id_field)?;
-        let list_fields = selected_fields.scalar_lists();
-        let lists = resolve_scalar_list_fields(tx, ids.clone(), list_fields).await?;
         let nested: Vec<QueryResult> = process_nested(tx, query.nested, &ids).await?;
 
         Ok(QueryResult::RecordSelection(RecordSelection {
@@ -87,7 +82,6 @@ fn read_many<'a, 'b>(
             query_arguments: query.args,
             scalars,
             nested,
-            lists,
             id_field,
         }))
     };
@@ -115,9 +109,7 @@ fn read_related<'a, 'b>(
         let model = query.parent_field.related_model();
         let id_field = model.fields().id().name.clone();
         let ids = scalars.collect_ids(&id_field)?;
-        let list_fields = selected_fields.scalar_lists();
-        let lists = resolve_scalar_list_fields(tx, ids.clone(), list_fields).await?;
-        let nested: Vec<QueryResult> = process_nested(tx, query.nested, &ids).await?;
+         let nested: Vec<QueryResult> = process_nested(tx, query.nested, &ids).await?;
 
         Ok(QueryResult::RecordSelection(RecordSelection {
             name: query.name,
@@ -125,7 +117,6 @@ fn read_related<'a, 'b>(
             query_arguments: query.args,
             scalars,
             nested,
-            lists,
             id_field,
         }))
     };
@@ -139,28 +130,6 @@ async fn aggregate<'a, 'b>(
 ) -> InterpretationResult<QueryResult> {
     let result = tx.count_by_model(&query.model, QueryArguments::default()).await?;
     Ok(QueryResult::Count(result))
-}
-
-/// Resolves scalar lists for a list field for a set of parent IDs.
-async fn resolve_scalar_list_fields<'a, 'b>(
-    tx: &'a ConnectionLike<'a, 'b>,
-    record_ids: Vec<GraphqlId>,
-    list_fields: Vec<Arc<ScalarField>>,
-) -> connector::Result<Vec<(String, Vec<ScalarListValues>)>> {
-    if !list_fields.is_empty() {
-        let mut results = vec![];
-
-        for list_field in list_fields {
-            let name = list_field.name.clone();
-            let r = tx.get_scalar_list_values(&list_field, record_ids.clone()).await?;
-
-            results.push((name, r));
-        }
-
-        Ok(results)
-    } else {
-        Ok(vec![])
-    }
 }
 
 /// Injects fields required for querying, if they're not already in the selection set.

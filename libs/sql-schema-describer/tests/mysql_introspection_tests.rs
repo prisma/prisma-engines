@@ -65,8 +65,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "int".to_string(),
                 family: ColumnTypeFamily::Int,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: true,
         },
@@ -75,8 +76,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "int".to_string(),
                 family: ColumnTypeFamily::Int,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -85,8 +87,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "smallint".to_string(),
                 family: ColumnTypeFamily::Int,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -95,8 +98,8 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "tinyint".to_string(),
                 family: ColumnTypeFamily::Int,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
             default: None,
             auto_increment: false,
         },
@@ -105,8 +108,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "tinyint".to_string(),
                 family: ColumnTypeFamily::Boolean,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -115,8 +119,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "mediumint".to_string(),
                 family: ColumnTypeFamily::Int,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -125,8 +130,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "bigint".to_string(),
                 family: ColumnTypeFamily::Int,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -135,8 +141,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "decimal".to_string(),
                 family: ColumnTypeFamily::Float,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -145,8 +152,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "decimal".to_string(),
                 family: ColumnTypeFamily::Float,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -155,8 +163,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "float".to_string(),
                 family: ColumnTypeFamily::Float,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -165,8 +174,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "double".to_string(),
                 family: ColumnTypeFamily::Float,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -175,8 +185,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "date".to_string(),
                 family: ColumnTypeFamily::DateTime,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -185,8 +196,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "time".to_string(),
                 family: ColumnTypeFamily::DateTime,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -195,8 +207,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "datetime".to_string(),
                 family: ColumnTypeFamily::DateTime,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -205,8 +218,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "timestamp".to_string(),
                 family: ColumnTypeFamily::DateTime,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: Some("CURRENT_TIMESTAMP".to_string()),
             auto_increment: false,
         },
@@ -215,8 +229,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "year".to_string(),
                 family: ColumnTypeFamily::DateTime,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -225,8 +240,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "char".to_string(),
                 family: ColumnTypeFamily::String,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -235,8 +251,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "varchar".to_string(),
                 family: ColumnTypeFamily::String,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -245,8 +262,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "text".to_string(),
                 family: ColumnTypeFamily::String,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -255,8 +273,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "tinytext".to_string(),
                 family: ColumnTypeFamily::String,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -265,8 +284,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "mediumtext".to_string(),
                 family: ColumnTypeFamily::String,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -275,8 +295,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "longtext".to_string(),
                 family: ColumnTypeFamily::String,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -285,8 +306,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "enum".to_string(),
                 family: ColumnTypeFamily::String,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -295,8 +317,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "set".to_string(),
                 family: ColumnTypeFamily::String,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -305,8 +328,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "binary".to_string(),
                 family: ColumnTypeFamily::Binary,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -315,8 +339,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "varbinary".to_string(),
                 family: ColumnTypeFamily::Binary,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -325,8 +350,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "blob".to_string(),
                 family: ColumnTypeFamily::Binary,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -335,8 +361,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "tinyblob".to_string(),
                 family: ColumnTypeFamily::Binary,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -345,8 +372,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "mediumblob".to_string(),
                 family: ColumnTypeFamily::Binary,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -355,8 +383,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "longblob".to_string(),
                 family: ColumnTypeFamily::Binary,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -365,8 +394,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "geometry".to_string(),
                 family: ColumnTypeFamily::Geometric,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -375,8 +405,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "point".to_string(),
                 family: ColumnTypeFamily::Geometric,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -385,8 +416,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "linestring".to_string(),
                 family: ColumnTypeFamily::Geometric,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -395,8 +427,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "polygon".to_string(),
                 family: ColumnTypeFamily::Geometric,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -405,8 +438,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "multipoint".to_string(),
                 family: ColumnTypeFamily::Geometric,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -415,8 +449,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "multilinestring".to_string(),
                 family: ColumnTypeFamily::Geometric,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -425,8 +460,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "multipolygon".to_string(),
                 family: ColumnTypeFamily::Geometric,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -435,8 +471,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "geometrycollection".to_string(),
                 family: ColumnTypeFamily::Geometric,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -445,8 +482,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "json".to_string(),
                 family: ColumnTypeFamily::Json,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -501,8 +539,8 @@ async fn mysql_foreign_key_on_delete_must_be_handled() {
                     tpe: ColumnType {
                         raw: "int".to_string(),
                         family: ColumnTypeFamily::Int,
+                        arity: ColumnArity::Nullable,
                     },
-                    arity: ColumnArity::Nullable,
                     default: None,
                     auto_increment: false,
                 },
@@ -511,8 +549,8 @@ async fn mysql_foreign_key_on_delete_must_be_handled() {
                     tpe: ColumnType {
                         raw: "int".to_string(),
                         family: ColumnTypeFamily::Int,
+                        arity: ColumnArity::Nullable,
                     },
-                    arity: ColumnArity::Nullable,
                     default: None,
                     auto_increment: false,
                 },
@@ -521,8 +559,8 @@ async fn mysql_foreign_key_on_delete_must_be_handled() {
                     tpe: ColumnType {
                         raw: "int".to_string(),
                         family: ColumnTypeFamily::Int,
+                        arity: ColumnArity::Nullable,
                     },
-                    arity: ColumnArity::Nullable,
                     default: None,
                     auto_increment: false,
                 },
@@ -531,8 +569,8 @@ async fn mysql_foreign_key_on_delete_must_be_handled() {
                     tpe: ColumnType {
                         raw: "int".to_string(),
                         family: ColumnTypeFamily::Int,
+                        arity: ColumnArity::Nullable,
                     },
-                    arity: ColumnArity::Nullable,
                     default: None,
                     auto_increment: false,
                 },
@@ -541,8 +579,9 @@ async fn mysql_foreign_key_on_delete_must_be_handled() {
                     tpe: ColumnType {
                         raw: "int".to_string(),
                         family: ColumnTypeFamily::Int,
+                        arity: ColumnArity::Required,
                     },
-                    arity: ColumnArity::Required,
+
                     default: None,
                     auto_increment: true,
                 },

@@ -1,5 +1,6 @@
 use crate::error::DatamodelError;
 use crate::StringFromEnvVar;
+use datamodel_connector::Connector;
 
 // TODO: Probably rename everything. Terminology here is messy.
 
@@ -20,6 +21,8 @@ pub trait Source: Send + Sync {
 
     /// Documentation of this source.
     fn documentation(&self) -> &Option<String>;
+
+    fn connector(&self) -> Box<dyn Connector>;
 }
 
 /// Trait for source definitions.

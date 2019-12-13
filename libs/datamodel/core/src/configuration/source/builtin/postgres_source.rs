@@ -1,4 +1,5 @@
 use crate::configuration::*;
+use datamodel_connector::{Connector, ExampleConnector};
 
 pub const POSTGRES_SOURCE_NAME: &str = "postgresql";
 
@@ -28,5 +29,9 @@ impl Source for PostgresSource {
 
     fn documentation(&self) -> &Option<String> {
         &self.documentation
+    }
+
+    fn connector(&self) -> Box<dyn Connector> {
+        Box::new(ExampleConnector::postgres())
     }
 }

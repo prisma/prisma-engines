@@ -1,17 +1,11 @@
 package writes.nonEmbedded
 
 import org.scalatest.{FlatSpec, Matchers}
-import util.ConnectorCapability.{JoinRelationLinksCapability, NonEmbeddedScalarListCapability, ScalarListsCapability}
+import util.ConnectorCapability.{JoinRelationLinksCapability, ScalarListsCapability}
 import util._
 
 class NonEmbeddedDeleteScalarListsSpec extends FlatSpec with Matchers with ApiSpecBase {
   override def runOnlyForCapabilities = Set(ScalarListsCapability, JoinRelationLinksCapability)
-
-  val scalarListStrategy = if (capabilities.has(NonEmbeddedScalarListCapability)) {
-    "@scalarList(strategy: RELATION)"
-  } else {
-    ""
-  }
 
   "A nested delete  mutation" should "also delete ListTable entries" in {
 
@@ -25,7 +19,7 @@ class NonEmbeddedDeleteScalarListsSpec extends FlatSpec with Matchers with ApiSp
         |model Bottom {
         | id   String @id @default(cuid())
         | name String @unique
-        | list Int[]  $scalarListStrategy
+        | list Int[]
         |}"""
     }
 
@@ -61,7 +55,7 @@ class NonEmbeddedDeleteScalarListsSpec extends FlatSpec with Matchers with ApiSp
         |model Bottom {
         |  id   String @id @default(cuid())
         |  name String @unique
-        |  list Int[]  $scalarListStrategy
+        |  list Int[]
         |  top  Top    @relation(name: "Test")
         |}"""
     }

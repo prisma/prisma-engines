@@ -1,5 +1,6 @@
 use super::FieldManifestation;
 use crate::prelude::*;
+use datamodel::FieldArity;
 use once_cell::sync::OnceCell;
 use std::{
     hash::{Hash, Hasher},
@@ -188,5 +189,15 @@ impl RelationField {
 
     pub fn is_relation_with_name_and_side(&self, relation_name: &str, side: RelationSide) -> bool {
         self.relation().name == relation_name && self.relation_side == side
+    }
+
+    pub fn type_identifier_with_arity(&self) -> (TypeIdentifier, FieldArity) {
+        let arity = match (self.is_list, self.is_required) {
+            (true, _) => FieldArity::List,
+            (false, true) => FieldArity::Required,
+            (false, false) => FieldArity::Optional,
+        };
+
+        (self.type_identifier, arity)
     }
 }

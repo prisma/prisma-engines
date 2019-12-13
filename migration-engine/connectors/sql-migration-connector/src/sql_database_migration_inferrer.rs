@@ -261,7 +261,7 @@ fn needs_fix(alter_table: &AlterTable) -> bool {
             // sqlite does not allow adding not null columns without a default value even if the table is empty
             // hence we just use our normal migration process
             // https://laracasts.com/discuss/channels/general-discussion/migrations-sqlite-general-error-1-cannot-add-a-not-null-column-with-default-value-null
-            add_column.column.arity == ColumnArity::Required
+            add_column.column.tpe.arity == ColumnArity::Required
         }
         TableChange::DropColumn(_) => true,
         TableChange::AlterColumn(_) => true,
@@ -351,9 +351,9 @@ fn fix(current: &Table, next: &Table, schema_name: &str) -> Vec<SqlMigrationStep
     result
 }
 
-pub fn wrap_as_step<T, F>(steps: Vec<T>, mut wrap_fn: F) -> Vec<SqlMigrationStep>
+pub fn wrap_as_step<T, F>(steps: Vec<T>, mut wrap_fn: F) -> impl Iterator<Item=SqlMigrationStep>
 where
     F: FnMut(T) -> SqlMigrationStep,
 {
-    steps.into_iter().map(|x| wrap_fn(x)).collect()
+    steps.into_iter().map(move |x| wrap_fn(x))
 }

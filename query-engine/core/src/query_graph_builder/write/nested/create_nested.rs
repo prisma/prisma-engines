@@ -328,7 +328,7 @@ fn handle_one_to_one(
 
             // We ONLY inject creates here. Check doc comment for explanation.
             if let Node::Query(Query::Write(WriteQuery::CreateRecord(ref mut cr))) = child_node {
-                cr.non_list_args.insert(relation_field_name_pc, parent_id);
+                cr.args.insert(relation_field_name_pc, parent_id);
             }
 
             Ok(child_node)

@@ -195,8 +195,6 @@ pub struct Column {
     pub name: String,
     /// Column type.
     pub tpe: ColumnType,
-    /// Column arity.
-    pub arity: ColumnArity,
     /// Column default.
     // Does this field need to be richer? E.g. to easier detect the usages of sequences here
     pub default: Option<String>,
@@ -206,7 +204,7 @@ pub struct Column {
 
 impl Column {
     pub fn is_required(&self) -> bool {
-        self.arity == ColumnArity::Required
+        self.tpe.arity == ColumnArity::Required
     }
 }
 
@@ -218,13 +216,16 @@ pub struct ColumnType {
     pub raw: String,
     /// The family of the raw type.
     pub family: ColumnTypeFamily,
+    /// The arity of the column.
+    pub arity: ColumnArity,
 }
 
 impl ColumnType {
-    pub fn pure(family: ColumnTypeFamily) -> ColumnType {
+    pub fn pure(family: ColumnTypeFamily, arity: ColumnArity) -> ColumnType {
         ColumnType {
             raw: "".to_string(),
             family,
+            arity,
         }
     }
 }

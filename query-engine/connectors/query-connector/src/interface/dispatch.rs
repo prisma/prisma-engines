@@ -40,18 +40,6 @@ impl<'conn, 'tx> ReadOperations for ConnectionLike<'conn, 'tx> {
         }
     }
 
-    // This method is temporary
-    fn get_scalar_list_values<'a>(
-        &'a self,
-        list_field: &'a ScalarFieldRef,
-        record_ids: Vec<GraphqlId>,
-    ) -> crate::IO<'a, Vec<ScalarListValues>> {
-        match self {
-            Self::Connection(c) => c.get_scalar_list_values(list_field, record_ids),
-            Self::Transaction(tx) => tx.get_scalar_list_values(list_field, record_ids),
-        }
-    }
-
     // This will eventually become a more generic `aggregate`
     fn count_by_model<'a>(&'a self, model: &'a ModelRef, query_arguments: QueryArguments) -> crate::IO<'a, usize> {
         match self {

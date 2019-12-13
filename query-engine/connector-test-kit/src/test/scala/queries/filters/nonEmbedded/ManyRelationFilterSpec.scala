@@ -22,6 +22,7 @@ class ManyRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
       |   popularity Int
       |   blog       Blog   @relation(references: [id])
       |   comments   Comment[]
+      |   @@index([blog])
       |}
       |
       |model Comment {
@@ -29,6 +30,7 @@ class ManyRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
       |   text  String
       |   likes Int
       |   post  Post   @relation(references: [id])
+      |   @@index([post])
       |}
     """
   }

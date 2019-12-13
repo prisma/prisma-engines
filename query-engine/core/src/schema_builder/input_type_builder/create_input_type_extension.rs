@@ -21,7 +21,7 @@ pub trait CreateInputTypeBuilderExtension<'a>: InputTypeBuilderBase<'a> {
             .fields()
             .scalar()
             .into_iter()
-            .filter(|f| !f.is_hidden && Self::do_filter(&f))
+            .filter(|f| !f.is_hidden && Self::field_should_be_kept_for_create_input_type(&f))
             .collect();
 
         let mut fields = self.scalar_input_fields(

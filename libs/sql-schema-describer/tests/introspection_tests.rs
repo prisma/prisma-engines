@@ -48,6 +48,7 @@ fn is_required_must_work() {
                 t.add_column("column2", types::integer().nullable(true));
             });
         },
+
         |db_type, inspector, schema_name| {
             async move {
                 let result = inspector.describe(schema_name).await.expect("describing");
@@ -58,25 +59,26 @@ fn is_required_must_work() {
                         tpe: ColumnType {
                             raw: int_type(db_type),
                             family: ColumnTypeFamily::Int,
-                        },
                         arity: ColumnArity::Required,
-                        default: None,
-                        auto_increment: false,
-                    },
-                    Column {
-                        name: "column2".to_string(),
-                        tpe: ColumnType {
-                            raw: int_type(db_type),
-                            family: ColumnTypeFamily::Int,
                         },
+                    default: None,
+                    auto_increment: false,
+                },
+                Column {
+                    name: "column2".to_string(),
+                    tpe: ColumnType {
+                        raw: int_type(db_type),
+                        family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
-                        default: None,
-                        auto_increment: false,
                     },
-                ];
-                assert_eq!(user_table.columns, expected_columns);
-            }
-            .boxed()
+                    default: None,
+                    auto_increment: false,
+                },
+            ];
+
+            assert_eq!(user_table.columns, expected_columns);
+            }.boxed()
+
         },
     );
 }
@@ -111,11 +113,13 @@ fn foreign_keys_must_work() {
                     tpe: ColumnType {
                         raw: int_type(db_type),
                         family: ColumnTypeFamily::Int,
+                        arity: ColumnArity::Required,
                     },
-                    arity: ColumnArity::Required,
                     default: None,
                     auto_increment: false,
-                }];
+                },
+                ];
+
 
                 let on_delete_action = match db_type {
                     DbType::MySql => ForeignKeyAction::Restrict,
@@ -141,9 +145,9 @@ fn foreign_keys_must_work() {
                         }],
                     }
                 );
-            }
-            .boxed()
-        },
+            }.boxed()
+        }
+
     );
 }
 
@@ -188,22 +192,23 @@ fn multi_column_foreign_keys_must_work() {
                         tpe: ColumnType {
                             raw: int_type(db_type),
                             family: ColumnTypeFamily::Int,
-                        },
                         arity: ColumnArity::Required,
-                        default: None,
-                        auto_increment: false,
-                    },
-                    Column {
-                        name: "city_name".to_string(),
-                        tpe: ColumnType {
-                            raw: varchar_type(db_type, 255),
-                            family: ColumnTypeFamily::String,
                         },
+                    default: None,
+                    auto_increment: false,
+
+                },
+                Column {
+                    name: "city_name".to_string(),
+                    tpe: ColumnType {
+                        raw: varchar_type(db_type, 255),
+                        family: ColumnTypeFamily::String,
                         arity: ColumnArity::Required,
-                        default: None,
-                        auto_increment: false,
                     },
-                ];
+                    default: None,
+                    auto_increment: false,
+                },
+            ];
 
                 let on_delete_action = match db_type {
                     DbType::MySql => ForeignKeyAction::Restrict,
@@ -230,9 +235,9 @@ fn multi_column_foreign_keys_must_work() {
                         },],
                     }
                 );
+
+            }.boxed()
             }
-            .boxed()
-        },
     );
 }
 
@@ -257,8 +262,8 @@ fn names_with_hyphens_must_work() {
                     tpe: ColumnType {
                         raw: int_type(db_type),
                         family: ColumnTypeFamily::Int,
-                    },
                     arity: ColumnArity::Required,
+                    },
                     default: None,
                     auto_increment: false,
                 }];
@@ -311,23 +316,25 @@ fn composite_primary_keys_must_work() {
                         tpe: ColumnType {
                             raw: exp_int.to_string(),
                             family: ColumnTypeFamily::Int,
-                        },
                         arity: ColumnArity::Required,
-                        default: None,
-                        auto_increment: false,
-                    },
-                    Column {
-                        name: "name".to_string(),
-                        tpe: ColumnType {
-                            raw: exp_varchar.to_string(),
-                            family: ColumnTypeFamily::String,
                         },
+                    default: None,
+                    auto_increment: false,
+
+                },
+                Column {
+                    name: "name".to_string(),
+                    tpe: ColumnType {
+                        raw: exp_varchar.to_string(),
+                        family: ColumnTypeFamily::String,
                         arity: ColumnArity::Required,
-                        default: None,
-                        auto_increment: false,
                     },
-                ];
-                expected_columns.sort_unstable_by_key(|c| c.name.to_owned());
+                    default: None,
+                    auto_increment: false,
+                },
+            ];
+            expected_columns.sort_unstable_by_key(|c| c.name.to_owned());
+
 
                 assert_eq!(
                     table,
@@ -345,6 +352,7 @@ fn composite_primary_keys_must_work() {
             }
             .boxed()
         },
+
     );
 }
 
@@ -374,30 +382,32 @@ fn indices_must_work() {
                         tpe: ColumnType {
                             raw: int_type(db_type),
                             family: ColumnTypeFamily::Int,
-                        },
                         arity: ColumnArity::Required,
-                        default: None,
-                        auto_increment: false,
-                    },
-                    Column {
-                        name: "id".to_string(),
-                        tpe: ColumnType {
-                            raw: int_type(db_type),
-                            family: ColumnTypeFamily::Int,
                         },
+                    default: None,
+                    auto_increment: false,
+
+                },
+                Column {
+                    name: "id".to_string(),
+                    tpe: ColumnType {
+                        raw: int_type(db_type),
+                        family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Required,
-                        default,
-                        auto_increment: true,
                     },
-                ];
-                let pk_sequence = match db_type {
-                    DbType::Postgres => Some(Sequence {
-                        name: "User_id_seq".to_string(),
-                        allocation_size: 1,
-                        initial_value: 1,
-                    }),
-                    _ => None,
-                };
+
+                    default,
+                    auto_increment: true,
+                },
+            ];
+            let pk_sequence = match db_type {
+                DbType::Postgres => Some(Sequence {
+                    name: "User_id_seq".to_string(),
+                    allocation_size: 1,
+                    initial_value: 1,
+                }),
+                _ => None,
+            };
                 assert_eq!(
                     user_table,
                     &Table {
@@ -449,27 +459,29 @@ fn column_uniqueness_must_be_detected() {
                         tpe: ColumnType {
                             raw: int_type(db_type),
                             family: ColumnTypeFamily::Int,
-                        },
                         arity: ColumnArity::Required,
-                        default: None,
-                        auto_increment: false,
-                    },
-                    Column {
-                        name: "uniq2".to_string(),
-                        tpe: ColumnType {
-                            raw: int_type(db_type),
-                            family: ColumnTypeFamily::Int,
                         },
+                    default: None,
+                    auto_increment: false,
+
+                },
+                Column {
+                    name: "uniq2".to_string(),
+                    tpe: ColumnType {
+                        raw: int_type(db_type),
+                        family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Required,
-                        default: None,
-                        auto_increment: false,
                     },
-                ];
-                let mut expected_indices = vec![Index {
-                    name: "uniq".to_string(),
-                    columns: vec!["uniq2".to_string()],
-                    tpe: IndexType::Unique,
-                }];
+
+                    default: None,
+                    auto_increment: false,
+                },
+            ];
+            let mut expected_indices = vec![Index {
+                name: "uniq".to_string(),
+                columns: vec!["uniq2".to_string()],
+                tpe: IndexType::Unique,
+            }];
                 match db_type {
                     DbType::MySql => expected_indices.push(Index {
                         name: "uniq1".to_string(),
@@ -508,8 +520,8 @@ fn column_uniqueness_must_be_detected() {
                     user_table.is_column_unique(&user_table.columns[1].name),
                     "Column 2 should return true for is_unique"
                 );
-            }
-            .boxed()
+            }.boxed()
+
         },
     );
 }
@@ -538,8 +550,9 @@ fn defaults_must_work() {
                     tpe: ColumnType {
                         raw: int_type(db_type),
                         family: ColumnTypeFamily::Int,
+                        arity: ColumnArity::Nullable,
                     },
-                    arity: ColumnArity::Nullable,
+
                     default: Some(default),
                     auto_increment: false,
                 }];
@@ -553,13 +566,14 @@ fn defaults_must_work() {
                         foreign_keys: vec![],
                     }
                 );
-            }
-            .boxed()
-        },
+            }.boxed()
+        }
     );
 }
 
+
 fn test_each_backend<MigrationFn, TestFn>(db_name: &str, mut migration_fn: MigrationFn, test_fn: TestFn)
+
 where
     MigrationFn: FnMut(DbType, &mut Migration) -> (),
     TestFn: for<'a> Fn(

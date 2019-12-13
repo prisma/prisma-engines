@@ -66,22 +66,22 @@ fn must_add_to_fields_on_the_right_side_for_one_to_one_relations() {
     // the to fields are always added to model with the lower name in lexicographic order
     let dml = r#"
     model User1 {
-      id         String @default(cuid()) @id @unique
+      id         String @default(cuid()) @id
       referenceA User2
     }
 
     model User2 {
-      id         String @default(cuid()) @id @unique
+      id         String @default(cuid()) @id 
       referenceB User1
     }
 
     model User3 {
-      id         String @default(cuid()) @id @unique
+      id         String @default(cuid()) @id 
       referenceB User4
     }
 
     model User4 {
-      id         String @default(cuid()) @id @unique
+      id         String @default(cuid()) @id
       referenceA User3
     }
     "#;

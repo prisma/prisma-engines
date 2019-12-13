@@ -2,16 +2,11 @@ use crate::{
     query_builder::read::{self, ManyRelatedRecordsBaseQuery, ManyRelatedRecordsQueryBuilder},
     QueryExt, SqlError,
 };
+
 use connector_interface::*;
-use itertools::Itertools;
 use prisma_models::*;
 use quaint::ast::*;
 use std::convert::TryFrom;
-
-struct ScalarListElement {
-    record_id: GraphqlId,
-    value: PrismaValue,
-}
 
 pub async fn get_single_record(
     conn: &dyn QueryExt,
@@ -21,7 +16,7 @@ pub async fn get_single_record(
 ) -> crate::Result<Option<SingleRecord>> {
     let query = read::get_records(&model, selected_fields, filter);
     let field_names = selected_fields.names();
-    let idents = selected_fields.type_identifiers();
+    let idents = selected_fields.types();
 
     let record = (match conn.find(query, idents.as_slice()).await {
         Ok(result) => Ok(Some(result)),
@@ -42,7 +37,7 @@ pub async fn get_many_records(
     selected_fields: &SelectedFields,
 ) -> crate::Result<ManyRecords> {
     let field_names = selected_fields.names();
-    let idents = selected_fields.type_identifiers();
+    let idents = selected_fields.types();
     let query = read::get_records(model, selected_fields, query_arguments);
 
     let records = conn
@@ -65,7 +60,7 @@ pub async fn get_related_records<T>(
 where
     T: ManyRelatedRecordsQueryBuilder,
 {
-    let idents = selected_fields.type_identifiers();
+    let idents = selected_fields.types();
     let field_names = selected_fields.names();
 
     let can_skip_joins = from_field.relation_is_inlined_in_child() && !query_arguments.is_with_pagination();
@@ -110,45 +105,6 @@ where
         records: records?,
         field_names,
     })
-}
-
-pub async fn get_scalar_list_values(
-    conn: &dyn QueryExt,
-    list_field: &ScalarFieldRef,
-    record_ids: Vec<GraphqlId>,
-) -> crate::Result<Vec<ScalarListValues>> {
-    let type_identifier = list_field.type_identifier;
-    let query = read::get_scalar_list_values_by_record_ids(list_field, record_ids);
-    let rows = conn
-        .filter(query.into(), &[TypeIdentifier::GraphQLID, type_identifier])
-        .await?;
-
-    let results: Vec<ScalarListElement> = rows
-        .into_iter()
-        .map(|row| {
-            let mut iter = row.values.into_iter();
-
-            let record_id = iter.next().ok_or(SqlError::ColumnDoesNotExist)?;
-            let value = iter.next().ok_or(SqlError::ColumnDoesNotExist)?;
-
-            Ok(ScalarListElement {
-                record_id: GraphqlId::try_from(record_id)?,
-                value,
-            })
-        })
-        .collect::<crate::Result<Vec<ScalarListElement>>>()?;
-
-    let mut list_values = Vec::new();
-
-    for (record_id, elements) in &results.into_iter().group_by(|ele| ele.record_id.clone()) {
-        let values = ScalarListValues {
-            record_id,
-            values: elements.into_iter().map(|e| e.value).collect(),
-        };
-        list_values.push(values);
-    }
-
-    Ok(list_values)
 }
 
 pub async fn count_by_model(
