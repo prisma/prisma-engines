@@ -85,9 +85,9 @@ impl SelectedFields {
         }
     }
 
-    pub fn id(model: ModelRef) -> Self {
-        Self::from(model.fields().id())
-    }
+    // pub fn id(model: ModelRef) -> Self {
+    //     Self::from(model.fields().id())
+    // }
 
     pub fn add_scalar(&mut self, field: Arc<ScalarField>) {
         self.scalar.push(SelectedScalarField { field });
