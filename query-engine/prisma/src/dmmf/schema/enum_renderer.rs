@@ -34,6 +34,6 @@ impl<'a> DMMFEnumRenderer<'a> {
     }
 
     fn format_enum_value(&self, value: &EnumValue) -> String {
-        value.as_string()
+        value.as_string().into_owned()
     }
 }

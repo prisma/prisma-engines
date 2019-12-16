@@ -3,7 +3,7 @@ use serde::{
     de::{self, Visitor},
     Deserialize, Deserializer, Serialize, Serializer,
 };
-use std::sync::Arc;
+use std::{sync::Arc, borrow::Cow};
 
 #[derive(Debug, Clone)]
 pub struct EnumType {
@@ -28,10 +28,12 @@ pub struct EnumValue {
 
 impl EnumValue {
     /// Represents this enum value as string.
-    pub fn as_string(&self) -> String {
+    pub fn as_string(&self) -> Cow<str> {
         match &self.value {
-            EnumValueWrapper::String(s) => s.clone(),
-            EnumValueWrapper::OrderBy(ob) => format!("{}_{}", ob.field.name, ob.sort_order.abbreviated()),
+            EnumValueWrapper::String(s) =>
+                Cow::from(s),
+            EnumValueWrapper::OrderBy(ob) =>
+                Cow::from(format!("{}_{}", ob.field.name, ob.sort_order.abbreviated())),
         }
     }
 
@@ -67,7 +69,7 @@ impl Serialize for EnumValue {
     where
         S: Serializer,
     {
-        serializer.serialize_str(self.as_string().as_str())
+        serializer.serialize_str(&*self.as_string())
     }
 }
 
