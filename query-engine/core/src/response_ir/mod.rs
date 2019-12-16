@@ -155,7 +155,7 @@ impl IrSerializer {
                         let result = if result.is_empty() {
                             match self.output_type.borrow() {
                                 OutputType::Opt(_) => Item::Value(PrismaValue::Null),
-                                OutputType::List(_) => Item::List(vec![]),
+                                OutputType::List(_) => Item::List(Vec::new()),
                                 _ => unreachable!(),
                             }
                         } else {

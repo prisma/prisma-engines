@@ -43,7 +43,7 @@ pub fn serialize_internal(
 
         QueryResult::Count(c) => {
             // Todo needs a real implementation
-            let mut map: IndexMap<String, Item> = IndexMap::new();
+            let mut map: IndexMap<String, Item> = IndexMap::with_capacity(1);
             let mut result = CheckedItemsWithParents::new();
 
             map.insert("count".into(), Item::Value(PrismaValue::Int(c as i64)));
@@ -137,7 +137,7 @@ fn serialize_record_selection(
 fn serialize_objects(mut result: RecordSelection, typ: ObjectTypeStrongRef) -> CoreResult<UncheckedItemsWithParents> {
     // The way our query execution works, we only need to look at nested + lists if we hit an object.
     // Move nested out of result for separate processing.
-    let nested = std::mem::replace(&mut result.nested, vec![]);
+    let nested = std::mem::replace(&mut result.nested, Vec::new());
 
     // { <nested field name> -> { parent ID -> items } }
     let mut nested_mapping: HashMap<String, CheckedItemsWithParents> = process_nested_results(nested, &typ)?;
@@ -146,7 +146,7 @@ fn serialize_objects(mut result: RecordSelection, typ: ObjectTypeStrongRef) -> C
     // to prevent expensive copying during serialization).
 
     // Finally, serialize the objects based on the selected fields.
-    let mut object_mapping = UncheckedItemsWithParents::new();
+    let mut object_mapping = UncheckedItemsWithParents::with_capacity(result.scalars.records.len());
     let scalar_field_names = result.scalars.field_names;
 
     // Write all fields, nested and list fields unordered into a map, afterwards order all into the final order.
@@ -159,10 +159,10 @@ fn serialize_objects(mut result: RecordSelection, typ: ObjectTypeStrongRef) -> C
             object_mapping.insert(record.parent_id.clone(), vec![]);
         }
 
-        let mut object: HashMap<String, Item> = HashMap::new();
-
         // Write scalars, but skip objects and lists, which while they are in the selection, are handled separately.
         let values = record.values;
+        let mut object = HashMap::with_capacity(values.len());
+
         for (val, field_name) in values.into_iter().zip(scalar_field_names.iter()) {
             let field = typ.find_field(field_name).unwrap();
             if !field.field_type.is_object() {
@@ -173,10 +173,9 @@ fn serialize_objects(mut result: RecordSelection, typ: ObjectTypeStrongRef) -> C
         // Write nested results
         write_nested_items(&record_id, &mut nested_mapping, &mut object, &typ);
 
-        // Reorder into final shape.
-        let mut map = Map::new();
-        result.fields.iter().for_each(|field_name| {
-            map.insert(field_name.to_owned(), object.remove(field_name).unwrap());
+        let map = result.fields.iter().fold(Map::with_capacity(result.fields.len()), |mut acc, field_name| {
+            acc.insert(field_name.to_owned(), object.remove(field_name).unwrap());
+            acc
         });
 
         // TODO: Find out how to easily determine when a result is null.
@@ -213,10 +212,10 @@ fn write_nested_items(
             None => {
                 let field = enclosing_type.find_field(field_name).unwrap();
                 let default = match field.field_type.borrow() {
-                    OutputType::List(_) => Item::List(vec![]),
+                    OutputType::List(_) => Item::List(Vec::new()),
                     OutputType::Opt(inner) => {
                         if inner.is_list() {
-                            Item::List(vec![])
+                            Item::List(Vec::new())
                         } else {
                             Item::Value(PrismaValue::Null)
                         }
@@ -240,7 +239,7 @@ fn process_nested_results(
     enclosing_type: &ObjectTypeStrongRef,
 ) -> CoreResult<HashMap<String, CheckedItemsWithParents>> {
     // For each nested selected field we need to map the parents to their items.
-    let mut nested_mapping = HashMap::new();
+    let mut nested_mapping = HashMap::with_capacity(nested.len());
 
     // Parse and validate all nested objects with their respective output type.
     // Unwraps are safe due to query validation.
