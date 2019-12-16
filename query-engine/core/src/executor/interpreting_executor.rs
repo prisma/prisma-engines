@@ -1,6 +1,6 @@
 use super::{pipeline::QueryPipeline, QueryExecutor};
 use crate::{
-    CoreResult, IrSerializer, QueryDocument, QueryGraph, QueryGraphBuilder, QueryInterpreter, QuerySchemaRef, Response,
+    CoreResult, IrSerializer, QueryDocument, QueryGraph, QueryGraphBuilder, QueryInterpreter, QuerySchemaRef, Response, Responses,
 };
 use async_trait::async_trait;
 use connector::{ConnectionLike, Connector};
@@ -30,14 +30,14 @@ impl<C> QueryExecutor for InterpretingExecutor<C>
 where
     C: Connector + Send + Sync,
 {
-    async fn execute(&self, query_doc: QueryDocument, query_schema: QuerySchemaRef) -> CoreResult<Vec<Response>> {
+    async fn execute(&self, query_doc: QueryDocument, query_schema: QuerySchemaRef) -> CoreResult<Responses> {
         let conn = self.connector.get_connection().await?;
 
         // Parse, validate, and extract query graphs from query document.
         let queries: Vec<(QueryGraph, IrSerializer)> = QueryGraphBuilder::new(query_schema).build(query_doc)?;
 
         // Create pipelines for all separate queries
-        let mut results: Vec<Response> = vec![];
+        let mut responses = Responses::default();
 
         for (query_graph, info) in queries {
             let result = if query_graph.needs_transaction() {
@@ -58,10 +58,13 @@ where
                 QueryPipeline::new(query_graph, interpreter, info).execute().await?
             };
 
-            results.push(result);
+            match result {
+                Response::Data(key, item) => responses.insert_data(key, item),
+                Response::Error(error) => responses.insert_error(error),
+            }
         }
 
-        Ok(results)
+        Ok(responses)
     }
 
     fn primary_connector(&self) -> &'static str {

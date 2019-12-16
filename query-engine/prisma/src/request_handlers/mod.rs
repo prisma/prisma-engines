@@ -1,18 +1,17 @@
 pub mod graphql;
 
 pub use graphql::{GraphQlBody, GraphQlRequestHandler};
-pub use query_core::schema::QuerySchemaRenderer;
+pub use query_core::{schema::QuerySchemaRenderer, response_ir};
 
 use crate::context::PrismaContext;
 use async_trait::async_trait;
-use serde_json;
 use std::{collections::HashMap, fmt::Debug};
 
 #[async_trait]
 pub trait RequestHandler {
     type Body: Debug;
 
-    async fn handle<S>(&self, req: S, ctx: &PrismaContext) -> serde_json::Value
+    async fn handle<S>(&self, req: S, ctx: &PrismaContext) -> response_ir::Responses
     where
         S: Into<PrismaRequest<Self::Body>> + Send + Sync + 'static;
 }

@@ -54,14 +54,14 @@ impl From<ErrorCollection> for PrismaError {
 }
 
 /// Helps to handle gracefully handle errors as a response.
-impl Into<response_ir::Response> for PrismaError {
-    fn into(self) -> response_ir::Response {
+impl From<PrismaError> for response_ir::ResponseError {
+    fn from(other: PrismaError) -> Self {
         use user_facing_errors::UnknownError;
 
-        match self {
-            PrismaError::CoreError(core_error) => response_ir::Response::Error(core_error.into()),
+        match other {
+            PrismaError::CoreError(core_error) => response_ir::ResponseError::from(core_error),
             err => {
-                response_ir::Response::Error(user_facing_errors::Error::Unknown(UnknownError::from_fail(err)).into())
+                response_ir::ResponseError::from(user_facing_errors::Error::Unknown(UnknownError::from_fail(err)))
             }
         }
     }

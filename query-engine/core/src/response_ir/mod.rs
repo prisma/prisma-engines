@@ -15,6 +15,7 @@ use crate::{ExpressionResult, OutputType, OutputTypeRef};
 use indexmap::IndexMap;
 use internal::*;
 use prisma_models::PrismaValue;
+use serde::ser::{Serialize, Serializer, SerializeMap, SerializeSeq};
 use std::{borrow::Borrow, sync::Arc};
 use utils::*;
 
@@ -59,7 +60,23 @@ pub enum Response {
     Error(ResponseError),
 }
 
-// todo merge of responses
+#[derive(Debug, serde::Serialize, Default)]
+pub struct Responses {
+    #[serde(skip_serializing_if = "IndexMap::is_empty")]
+    data: Map,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    errors: Vec<ResponseError>,
+}
+
+impl Responses {
+    pub fn insert_data(&mut self, key: impl Into<String>, item: Item) {
+        self.data.insert(key.into(), item);
+    }
+
+    pub fn insert_error(&mut self, error: impl Into<ResponseError>) {
+        self.errors.push(error.into());
+    }
+}
 
 /// An IR item that either expands to a subtype or leaf-record.
 #[derive(Debug, Clone)]
@@ -72,6 +89,36 @@ pub enum Item {
     /// to claim the same item without copying data
     /// (serialization can then choose how to copy if necessary).
     Ref(ItemRef),
+}
+
+impl Serialize for Item {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        match self {
+            Self::Map(m) => {
+                let mut map = serializer.serialize_map(Some(m.len()))?;
+
+                for (k, v) in m {
+                    map.serialize_entry(k, v)?;
+                }
+
+                map.end()
+            }
+            Self::List(l) => {
+                let mut seq = serializer.serialize_seq(Some(l.len()))?;
+
+                for e in l {
+                    seq.serialize_element(e)?;
+                }
+
+                seq.end()
+            }
+            Self::Value(pv) => pv.serialize(serializer),
+            Self::Ref(item_ref) => item_ref.serialize(serializer),
+        }
+    }
 }
 
 #[derive(Debug)]
