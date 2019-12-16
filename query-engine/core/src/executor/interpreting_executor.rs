@@ -37,7 +37,7 @@ where
         let queries: Vec<(QueryGraph, IrSerializer)> = QueryGraphBuilder::new(query_schema).build(query_doc)?;
 
         // Create pipelines for all separate queries
-        let mut responses = Responses::default();
+        let mut responses = Responses::with_capacity(queries.len());
 
         for (query_graph, info) in queries {
             let result = if query_graph.needs_transaction() {

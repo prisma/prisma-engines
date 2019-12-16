@@ -69,6 +69,17 @@ pub struct Responses {
 }
 
 impl Responses {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn with_capacity(capacity: usize) -> Self {
+        Self {
+            data: IndexMap::with_capacity(capacity),
+            ..Default::default()
+        }
+    }
+
     pub fn insert_data(&mut self, key: impl Into<String>, item: Item) {
         self.data.insert(key.into(), item);
     }
