@@ -67,23 +67,20 @@ impl SelectDefinition for QueryArguments {
     }
 }
 
-pub fn get_records<T>(model: &ModelRef, selected_fields: &SelectedFields, query: T) -> Select<'static>
+pub fn get_records<T>(model: &ModelRef, columns: impl Iterator<Item=Column<'static>>, query: T) -> Select<'static>
 where
     T: SelectDefinition,
 {
-    selected_fields
-        .columns()
-        .into_iter()
+    columns
         .fold(query.into_select(model), |acc, col| acc.column(col))
 }
 
 pub fn count_by_model(model: &ModelRef, query_arguments: QueryArguments) -> Select<'static> {
     let id_field = model.fields().id();
 
-    let mut selected_fields = SelectedFields::default();
-    selected_fields.add_scalar(id_field.clone());
+    let selected_fields = vec![id_field.as_column()];
 
-    let base_query = get_records(model, &selected_fields, query_arguments);
+    let base_query = get_records(model, selected_fields.into_iter(), query_arguments);
     let table = Table::from(base_query).alias("sub");
     let column = Column::from(("sub", id_field.db_name().to_string()));
 

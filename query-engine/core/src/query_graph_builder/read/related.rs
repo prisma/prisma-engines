@@ -26,7 +26,7 @@ impl Builder<ReadQuery> for ReadRelatedRecordsBuilder {
         let alias = self.field.alias;
         let sub_selections = self.field.nested_fields.unwrap().fields;
         let selection_order: Vec<String> = collect_selection_order(&sub_selections);
-        let selected_fields = collect_selected_fields(&sub_selections, &self.model, Some(Arc::clone(&self.parent)));
+        let selected_fields = collect_selected_fields(&sub_selections, &self.model);
         let nested = collect_nested_queries(sub_selections, &self.model)?;
         let parent_field = self.parent;
 

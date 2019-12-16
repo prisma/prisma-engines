@@ -103,24 +103,37 @@ impl QuerySchema {
 
 #[derive(DebugStub)]
 pub struct ObjectType {
-    pub name: String,
+    name: String,
 
     #[debug_stub = "#Fields Cell#"]
-    pub fields: OnceCell<Vec<FieldRef>>,
+    fields: OnceCell<Vec<FieldRef>>,
 
     // Object types can directly map to models.
-    pub model: Option<ModelRef>,
+    model: Option<ModelRef>,
 }
 
 impl ObjectType {
+    pub fn new<T>(name: T, model: Option<ModelRef>) -> Self
+    where
+        T: Into<String>
+    {
+        Self {
+            name: name.into(),
+            fields: OnceCell::new(),
+            model,
+        }
+    }
+
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+
     pub fn get_fields(&self) -> &Vec<FieldRef> {
         self.fields.get().unwrap()
     }
 
     pub fn set_fields(&self, fields: Vec<Field>) {
-        self.fields
-            .set(fields.into_iter().map(|f| Arc::new(f)).collect())
-            .unwrap();
+        self.fields.set(fields.into_iter().map(Arc::new).collect()).unwrap();
     }
 
     pub fn find_field(&self, name: &str) -> Option<FieldRef> {

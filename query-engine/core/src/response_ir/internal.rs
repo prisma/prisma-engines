@@ -152,11 +152,11 @@ fn serialize_objects(mut result: RecordSelection, typ: ObjectTypeStrongRef) -> C
     // Write all fields, nested and list fields unordered into a map, afterwards order all into the final order.
     // If nothing is written to the object, write null instead.
 
-    for record in result.scalars.records {
+    for record in result.scalars.records.into_iter() {
         let record_id = Some(record.collect_id(&scalar_field_names, &result.id_field)?);
 
         if !object_mapping.contains_key(&record.parent_id) {
-            object_mapping.insert(record.parent_id.clone(), vec![]);
+            object_mapping.insert(record.parent_id.clone(), Vec::new());
         }
 
         // Write scalars, but skip objects and lists, which while they are in the selection, are handled separately.
@@ -165,6 +165,7 @@ fn serialize_objects(mut result: RecordSelection, typ: ObjectTypeStrongRef) -> C
 
         for (val, field_name) in values.into_iter().zip(scalar_field_names.iter()) {
             let field = typ.find_field(field_name).unwrap();
+
             if !field.field_type.is_object() {
                 object.insert(field_name.to_owned(), serialize_scalar(val, &field.field_type)?);
             }

@@ -1,11 +1,11 @@
 use crate::{cursor_condition, filter_conversion::AliasedCondition};
 use connector_interface::{OrderDirections, QueryArguments, SkipAndLimit};
 use prisma_models::prelude::*;
-use quaint::ast::{Aliasable, Comparable, ConditionTree, Joinable, Select};
+use quaint::ast::{Aliasable, Comparable, ConditionTree, Joinable, Select, Column};
 
 pub struct ManyRelatedRecordsBaseQuery<'a> {
     pub from_field: &'a RelationFieldRef,
-    pub selected_fields: &'a SelectedFields,
+    pub columns: Vec<Column<'static>>,
     pub from_record_ids: &'a [GraphqlId],
     pub query: Select<'a>,
     pub order_directions: OrderDirections,
@@ -20,7 +20,7 @@ impl<'a> ManyRelatedRecordsBaseQuery<'a> {
         from_field: &'a RelationFieldRef,
         from_record_ids: &'a [GraphqlId],
         query_arguments: QueryArguments,
-        selected_fields: &'a SelectedFields,
+        columns: Vec<Column<'static>>,
     ) -> ManyRelatedRecordsBaseQuery<'a> {
         let cursor = cursor_condition::build(&query_arguments, from_field.related_model());
         let window_limits = query_arguments.window_limits();
@@ -46,15 +46,14 @@ impl<'a> ManyRelatedRecordsBaseQuery<'a> {
                 .as_column()
                 .equals(opposite_column));
 
-        let query = selected_fields
-            .columns()
-            .into_iter()
+        let query = columns
+            .iter()
             .fold(select, |acc, col| acc.column(col.clone()))
             .inner_join(join);
 
         Self {
             from_field,
-            selected_fields,
+            columns,
             from_record_ids,
             query,
             order_directions,

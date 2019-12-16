@@ -14,9 +14,9 @@ pub async fn get_single_record(
     filter: &Filter,
     selected_fields: &SelectedFields,
 ) -> crate::Result<Option<SingleRecord>> {
-    let query = read::get_records(&model, selected_fields, filter);
-    let field_names = selected_fields.names();
-    let idents = selected_fields.types();
+    let query = read::get_records(&model, selected_fields.columns(), filter);
+    let field_names = selected_fields.names().map(String::from).collect();
+    let idents: Vec<_> = selected_fields.types().collect();
 
     let record = (match conn.find(query, idents.as_slice()).await {
         Ok(result) => Ok(Some(result)),
@@ -36,9 +36,9 @@ pub async fn get_many_records(
     query_arguments: QueryArguments,
     selected_fields: &SelectedFields,
 ) -> crate::Result<ManyRecords> {
-    let field_names = selected_fields.names();
-    let idents = selected_fields.types();
-    let query = read::get_records(model, selected_fields, query_arguments);
+    let field_names = selected_fields.names().map(String::from).collect();
+    let idents: Vec<_> = selected_fields.types().collect();
+    let query = read::get_records(model, selected_fields.columns(), query_arguments);
 
     let records = conn
         .filter(query.into(), idents.as_slice())
@@ -60,21 +60,57 @@ pub async fn get_related_records<T>(
 where
     T: ManyRelatedRecordsQueryBuilder,
 {
-    let idents = selected_fields.types();
-    let field_names = selected_fields.names();
+    let mut idents: Vec<_> = selected_fields.types().collect();
+    idents.push(from_field.related_field().type_identifier_with_arity());
+    idents.push(from_field.type_identifier_with_arity());
+
+    let mut field_names: Vec<String> = selected_fields.names().map(String::from).collect();
+    field_names.push(from_field.related_field().name.clone());
+    field_names.push(from_field.name.clone());
 
     let can_skip_joins = from_field.relation_is_inlined_in_child() && !query_arguments.is_with_pagination();
+    let relation = from_field.relation();
 
     let query = if can_skip_joins {
+        let mut columns: Vec<_> = selected_fields.columns().collect();
+
+        columns.push(
+            relation
+                .column_for_relation_side(from_field.relation_side.opposite())
+                .alias(SelectedFields::RELATED_MODEL_ALIAS),
+        );
+
+        columns.push(
+            relation
+                .column_for_relation_side(from_field.relation_side)
+                .alias(SelectedFields::PARENT_MODEL_ALIAS),
+        );
+
         let model = from_field.related_model();
 
-        let select = read::get_records(&model, selected_fields, query_arguments)
+        let select = read::get_records(&model, columns.into_iter(), query_arguments)
             .and_where(from_field.relation_column().in_selection(from_record_ids.to_owned()));
 
         Query::from(select)
     } else {
+        let mut columns: Vec<_> = selected_fields.columns().collect();
+
+        columns.push(
+            relation
+                .column_for_relation_side(from_field.relation_side.opposite())
+                .alias(SelectedFields::RELATED_MODEL_ALIAS)
+                .table(Relation::TABLE_ALIAS),
+        );
+
+        columns.push(
+            relation
+                .column_for_relation_side(from_field.relation_side)
+                .alias(SelectedFields::PARENT_MODEL_ALIAS)
+                .table(Relation::TABLE_ALIAS),
+        );
+
         let is_with_pagination = query_arguments.is_with_pagination();
-        let base = ManyRelatedRecordsBaseQuery::new(from_field, from_record_ids, query_arguments, selected_fields);
+        let base = ManyRelatedRecordsBaseQuery::new(from_field, from_record_ids, query_arguments, columns);
 
         if is_with_pagination {
             T::with_pagination(base)

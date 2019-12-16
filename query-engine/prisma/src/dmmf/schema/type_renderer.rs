@@ -94,7 +94,7 @@ impl<'a> DMMFTypeRenderer<'a> {
             OutputType::Object(ref obj) => {
                 let (_, subctx) = obj.into_renderer().render(ctx);
                 let type_info = DMMFTypeInfo {
-                    typ: obj.into_arc().name.clone(),
+                    typ: obj.into_arc().name().to_string(),
                     kind: TypeKind::Object,
                     is_required: true,
                     is_list: false,

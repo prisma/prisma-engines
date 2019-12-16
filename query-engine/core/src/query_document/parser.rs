@@ -27,7 +27,7 @@ impl QueryDocumentParser {
     ) -> QueryParserResult<ParsedObject> {
         if selections.is_empty() {
             return Err(QueryParserError::ObjectValidationError {
-                object_name: schema_object.name.clone(),
+                object_name: schema_object.name().to_string(),
                 inner: Box::new(QueryParserError::AtLeastOneSelectionError),
             });
         }
@@ -44,7 +44,7 @@ impl QueryDocumentParser {
                 };
 
                 parsed_field.map_err(|err| QueryParserError::ObjectValidationError {
-                    object_name: schema_object.name.clone(),
+                    object_name: schema_object.name().to_string(),
                     inner: Box::new(err),
                 })
             })
