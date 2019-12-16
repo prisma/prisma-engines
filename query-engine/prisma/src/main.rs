@@ -25,6 +25,9 @@ use tracing::subscriber;
 use tracing_log::LogTracer;
 use tracing_subscriber::{EnvFilter, FmtSubscriber};
 
+#[global_allocator]
+static ALLOC: jemallocator::Jemalloc = jemallocator::Jemalloc;
+
 #[derive(Debug, Clone, PartialEq, Copy)]
 pub enum LogFormat {
     Text,
