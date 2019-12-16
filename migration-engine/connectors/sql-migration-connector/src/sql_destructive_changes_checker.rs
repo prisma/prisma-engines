@@ -112,8 +112,6 @@ impl SqlDestructiveChangesChecker {
                                  values_count=values_count,
                              )
             })
-
-        // TODO: Here we have to check whether there was previously a default. So we should introspect and pass the introspected previous schema in here.
         } else if previous_table.is_part_of_foreign_key(&alter_column.column.name)
             && alter_column.column.default.is_none()
             && previous_column.default.is_some()

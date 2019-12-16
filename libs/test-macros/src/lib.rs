@@ -120,8 +120,8 @@ fn test_each_connector_async_wrapper_functions(
 
                 let fut = async {
                     let api = #connector_api_factory(#test_fn_name_str).await;
-                    #test_fn_name(&api)#optional_logging.await
-                };
+                    #test_fn_name(&api).await
+                }#optional_logging;
 
                 test_setup::runtime::run_with_tokio(fut)
             }
