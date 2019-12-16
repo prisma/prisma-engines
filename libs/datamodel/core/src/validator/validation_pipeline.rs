@@ -56,6 +56,11 @@ impl<'a> ValidationPipeline<'a> {
             all_errors.append(&mut err);
         }
 
+        // Early return so that the standardiser does not have to deal with invalid schemas
+        if all_errors.has_errors() {
+            return Err(all_errors);
+        }
+
         // TODO: Move consistency stuff into different module.
         // Phase 5: Consistency fixes. These don't fail.
         if let Err(mut err) = self.standardiser.standardise(ast_schema, &mut schema) {

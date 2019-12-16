@@ -24,6 +24,30 @@ fn should_fail_on_ambiguous_relations() {
 }
 
 #[test]
+fn should_fail_on_ambiguous_relations_2() {
+    // test case based on: https://github.com/prisma/prisma2/issues/976
+    let dml = r#"
+    model User {
+        id Int @id
+        posts Post[]
+    }
+
+    model Post {
+        post_id Int @id
+        author1 User
+        author2 User
+    }
+    "#;
+
+    let errors = parse_error(dml);
+
+    errors.assert_is_at(
+        0,
+        DatamodelError::new_model_validation_error("Ambiguous relation detected.", "Post", Span::new(114, 126)),
+    );
+}
+
+#[test]
 fn should_fail_on_ambiguous_named_relations() {
     let dml = r#"
     model User {
