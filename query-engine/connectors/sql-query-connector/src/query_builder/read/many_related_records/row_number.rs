@@ -20,7 +20,7 @@ impl ManyRelatedRecordsQueryBuilder for ManyRelatedRecordsWithRowNumber {
         if let Some(order_by) = &base.order_directions.primary_order_by {
             let column = order_by.field.as_column();
 
-            if !base.selected_fields.columns().contains(&column) {
+            if !base.columns.contains(&column) {
                 base_query = base_query.column(order_by.field.as_column());
             }
         }

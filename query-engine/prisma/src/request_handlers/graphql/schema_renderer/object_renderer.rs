@@ -49,11 +49,11 @@ impl GqlObjectRenderer {
     fn render_output_object(&self, output_object: &ObjectTypeRef, ctx: RenderContext) -> (String, RenderContext) {
         let output_object = output_object.into_arc();
 
-        if ctx.already_rendered(&output_object.name) {
+        if ctx.already_rendered(output_object.name()) {
             return ("".into(), ctx);
         } else {
             // This short circuits recursive processing for fields.
-            ctx.mark_as_rendered(output_object.name.clone())
+            ctx.mark_as_rendered(output_object.name().to_string())
         }
 
         let (rendered_fields, ctx): (Vec<String>, RenderContext) =
@@ -71,7 +71,7 @@ impl GqlObjectRenderer {
             .map(|f| format!("{}{}", ctx.indent(), f))
             .collect();
 
-        let rendered = format!("type {} {{\n{}\n}}", output_object.name, indented.join("\n"));
+        let rendered = format!("type {} {{\n{}\n}}", output_object.name(), indented.join("\n"));
 
         ctx.add_output(rendered.clone());
         (rendered, ctx)

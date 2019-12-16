@@ -11,7 +11,7 @@ pub use related::*;
 use super::*;
 use crate::{query_document::ParsedField, ReadQuery};
 use prisma_models::{
-    Field, ModelRef, RelationFieldRef, SelectedField, SelectedFields, SelectedRelationField, SelectedScalarField,
+    Field, ModelRef, SelectedField, SelectedFields, SelectedRelationField, SelectedScalarField,
 };
 use std::sync::Arc;
 
@@ -47,7 +47,6 @@ pub fn collect_selection_order(from: &[ParsedField]) -> Vec<String> {
 pub fn collect_selected_fields(
     from: &[ParsedField],
     model: &ModelRef,
-    parent: Option<RelationFieldRef>,
 ) -> SelectedFields {
     let selected_fields = from
         .iter()
@@ -57,13 +56,13 @@ pub fn collect_selected_fields(
                 Field::Scalar(ref sf) => SelectedField::Scalar(SelectedScalarField { field: Arc::clone(sf) }),
                 Field::Relation(ref rf) => SelectedField::Relation(SelectedRelationField {
                     field: Arc::clone(rf),
-                    selected_fields: SelectedFields::new(vec![], None), // todo None here correct?
+                    selected_fields: SelectedFields::new(Vec::new()), // todo None here correct?
                 }),
             }
         })
         .collect::<Vec<SelectedField>>();
 
-    SelectedFields::new(selected_fields, parent)
+    SelectedFields::new(selected_fields)
 }
 
 pub fn collect_nested_queries(from: Vec<ParsedField>, model: &ModelRef) -> QueryGraphBuilderResult<Vec<ReadQuery>> {

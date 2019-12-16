@@ -84,7 +84,6 @@ where
 {
     let selected_fields = SelectedFields::new(
         vec![parent_relation_field.related_model().fields().id().into()],
-        Some(Arc::clone(parent_relation_field)),
     );
 
     let read_parent_node = graph.create_node(Query::Read(ReadQuery::RelatedRecordsQuery(RelatedRecordsQuery {

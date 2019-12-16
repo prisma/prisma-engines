@@ -20,7 +20,7 @@ impl Builder<ReadQuery> for ReadManyRecordsBuilder {
         let alias = self.field.alias;
         let nested_fields = self.field.nested_fields.unwrap().fields;
         let selection_order: Vec<String> = collect_selection_order(&nested_fields);
-        let selected_fields = collect_selected_fields(&nested_fields, &self.model, None);
+        let selected_fields = collect_selected_fields(&nested_fields, &self.model);
         let nested = collect_nested_queries(nested_fields, &self.model)?;
         let model = self.model;
 
