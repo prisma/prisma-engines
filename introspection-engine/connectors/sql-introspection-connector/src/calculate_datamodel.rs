@@ -86,10 +86,13 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
                 ColumnArity::List => FieldArity::List,
             };
             let id_info = calc_id_info(&column, &table);
-            let default_value = column
-                .default
-                .as_ref()
-                .and_then(|default| calculate_default(default, &column.tpe.family));
+            let default_value = match field_type {
+                FieldType::Relation(_) => None,
+                _ => column
+                    .default
+                    .as_ref()
+                    .and_then(|default| calculate_default(default, &column.tpe.family)),
+            };
 
             let is_unique = match field_type {
                 datamodel::dml::FieldType::Relation(..) => false,
