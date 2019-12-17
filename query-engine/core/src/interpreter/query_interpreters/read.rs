@@ -37,7 +37,7 @@ fn read_one<'conn, 'tx>(
         match scalars {
             Some(record) => {
                 let ids = vec![record.collect_id(&id_field)?];
-                 let nested: Vec<QueryResult> = process_nested(tx, query.nested, &ids).await?;
+                let nested: Vec<QueryResult> = process_nested(tx, query.nested, &ids).await?;
 
                 Ok(QueryResult::RecordSelection(RecordSelection {
                     name: query.name,
@@ -156,7 +156,7 @@ fn process_nested<'a, 'b>(
     parent_ids: &'a [GraphqlId],
 ) -> BoxFuture<'a, InterpretationResult<Vec<QueryResult>>> {
     let fut = async move {
-        let mut results = vec![];
+        let mut results = Vec::with_capacity(nested.len());
 
         for query in nested {
             let result = execute(tx, query, &parent_ids).await?;

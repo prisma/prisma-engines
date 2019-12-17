@@ -1,50 +1,15 @@
-use crate::{AsColumn, Relation, RelationExt, SelectedFields};
+use crate::{AsColumn, SelectedFields};
 use quaint::ast::Column;
 
 pub trait SelectedFieldsExt {
-    fn columns(&self) -> Vec<Column<'static>>;
+    fn columns<'a>(&'a self) -> Box<dyn Iterator<Item = Column<'static>> + 'a>;
 }
 
 impl SelectedFieldsExt for SelectedFields {
-    fn columns(&self) -> Vec<Column<'static>> {
-        let mut result: Vec<Column<'static>> = self.scalar_fields().iter().map(|f| f.as_column()).collect();
+    fn columns<'a>(&'a self) -> Box<dyn Iterator<Item = Column<'static>> + 'a> {
+        let scalar = self.scalar_fields().map(|f| f.as_column());
+        let relation = self.relation_inlined().map(|rf| rf.as_column());
 
-        for rf in self.relation_inlined().iter() {
-            result.push(rf.as_column());
-        }
-
-        if let Some(ref from_field) = self.from_field {
-            let relation = from_field.relation();
-
-            if from_field.relation_is_inlined_in_child() {
-                result.push(
-                    relation
-                        .column_for_relation_side(from_field.relation_side.opposite())
-                        .alias(SelectedFields::RELATED_MODEL_ALIAS),
-                );
-
-                result.push(
-                    relation
-                        .column_for_relation_side(from_field.relation_side)
-                        .alias(SelectedFields::PARENT_MODEL_ALIAS),
-                );
-            } else {
-                result.push(
-                    relation
-                        .column_for_relation_side(from_field.relation_side.opposite())
-                        .alias(SelectedFields::RELATED_MODEL_ALIAS)
-                        .table(Relation::TABLE_ALIAS),
-                );
-
-                result.push(
-                    relation
-                        .column_for_relation_side(from_field.relation_side)
-                        .alias(SelectedFields::PARENT_MODEL_ALIAS)
-                        .table(Relation::TABLE_ALIAS),
-                );
-            }
-        };
-
-        result
+        Box::new(scalar.chain(relation))
     }
 }
