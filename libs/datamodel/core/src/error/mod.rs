@@ -95,7 +95,7 @@ pub enum DatamodelError {
     #[fail(display = "Expected a {} value, but received {} value \"{}\".", expected_type, received_type, raw)]
     TypeMismatchError { expected_type: String, received_type: String, raw: String, span: Span },
 
-    #[fail(display = "Expected a {} value, but failed while parsing \"{}\": {}", expected_type, raw, parser_error)]
+    #[fail(display = "Expected a {} value, but failed while parsing \"{}\": {}.", expected_type, raw, parser_error)]
     ValueParserError { expected_type: String, parser_error: String, raw: String, span: Span },
 
     #[fail(display = "Error validating model \"{}\": {}", model_name, message)]
