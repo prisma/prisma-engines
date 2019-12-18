@@ -51,7 +51,7 @@ impl<'a> ObjectTypeBuilder<'a> {
         self.internal_data_model.models().iter().for_each(|m| {
             self.cache(
                 m.name.clone(),
-                Arc::new(init_object_type(m.name.clone(), Some(Arc::clone(&m)))),
+                Arc::new(ObjectType::new(m.name.clone(), Some(Arc::clone(&m)))),
             )
         });
 
@@ -225,7 +225,7 @@ impl<'a> ObjectTypeBuilder<'a> {
         let name = format!("Aggregate{}", capitalize(&model.name));
         return_cached!(self.get_cache(), &name);
 
-        let object = ObjectTypeStrongRef::new(init_object_type(&name, Some(ModelRef::clone(model))));
+        let object = ObjectTypeStrongRef::new(ObjectType::new(&name, Some(ModelRef::clone(model))));
         let fields = vec![field("count", vec![], OutputType::int(), None)];
 
         object.set_fields(fields);

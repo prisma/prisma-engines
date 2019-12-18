@@ -51,11 +51,11 @@ impl DMMFObjectRenderer {
     // WIP dedup code
     fn render_output_object(&self, output_object: &ObjectTypeRef, ctx: RenderContext) -> ((), RenderContext) {
         let output_object = output_object.into_arc();
-        if ctx.already_rendered(&output_object.name) {
+        if ctx.already_rendered(output_object.name()) {
             return ((), ctx);
         } else {
             // This short circuits recursive processing for fields.
-            ctx.mark_as_rendered(output_object.name.clone())
+            ctx.mark_as_rendered(output_object.name().to_string())
         }
 
         let (rendered_fields, ctx): (Vec<DMMFField>, RenderContext) =
@@ -73,7 +73,7 @@ impl DMMFObjectRenderer {
                 });
 
         let output_type = DMMFOutputType {
-            name: output_object.name.clone(),
+            name: output_object.name().to_string(),
             fields: rendered_fields,
         };
 

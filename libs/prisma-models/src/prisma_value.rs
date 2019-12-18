@@ -1,51 +1,43 @@
 use crate::{DomainError, DomainResult, EnumValue};
 use chrono::prelude::*;
-use rust_decimal::{prelude::FromPrimitive, Decimal};
-use serde::{Deserialize, Serialize};
+use rust_decimal::{prelude::{FromPrimitive, ToPrimitive}, Decimal};
+use serde::{Serialize, ser::Serializer};
 use std::{convert::TryFrom, fmt, string::FromUtf8Error};
 use uuid::Uuid;
 
 pub type PrismaListValue = Option<Vec<PrismaValue>>;
 
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Hash, Clone)]
+#[derive(Serialize, Debug, PartialEq, Eq, Hash, Clone)]
+#[serde(untagged)]
 pub enum GraphqlId {
     String(String),
     Int(usize),
     UUID(Uuid),
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq, Clone, Eq, Hash)]
-#[serde(tag = "gcValueType", content = "value")]
+#[derive(Debug, PartialEq, Clone, Eq, Hash, Serialize)]
+#[serde(untagged)]
 pub enum PrismaValue {
-    #[serde(rename = "string")]
     String(String),
-
-    #[serde(rename = "float")]
+    #[serde(serialize_with = "serialize_decimal")]
     Float(Decimal),
-
-    #[serde(rename = "bool")]
     Boolean(bool),
-
-    #[serde(rename = "datetime")]
+    #[serde(serialize_with = "serialize_date")]
     DateTime(DateTime<Utc>),
-
-    #[serde(rename = "enum")]
     Enum(EnumValue),
-
-    #[serde(rename = "int")]
     Int(i64),
-
-    #[serde(rename = "null")]
     Null,
-
-    #[serde(rename = "uuid")]
     Uuid(Uuid),
-
-    #[serde(rename = "graphQlId")]
     GraphqlId(GraphqlId),
-
-    #[serde(rename = "list")]
     List(PrismaListValue),
+}
+
+fn serialize_date<S>(date: &DateTime<Utc>, serializer: S) -> Result<S::Ok, S::Error> where S: Serializer {
+    format!("{}", date.format("%Y-%m-%dT%H:%M:%S%.3fZ")).serialize(serializer)
+}
+
+fn serialize_decimal<S>(decimal: &Decimal, serializer: S) -> Result<S::Ok, S::Error> where S: Serializer {
+    decimal.to_f64().expect("Decimal is not a f64.").serialize(serializer)
 }
 
 impl PrismaValue {

@@ -1,7 +1,7 @@
 use super::*;
 
 /// A source block declaration.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct SourceConfig {
     /// Name of this source.
     pub name: Identifier,

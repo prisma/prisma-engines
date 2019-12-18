@@ -21,7 +21,7 @@ pub trait CreateInputTypeBuilderExtension<'a>: InputTypeBuilderBase<'a> {
             .fields()
             .scalar()
             .into_iter()
-            .filter(|f| !f.is_hidden && Self::do_filter(&f))
+            .filter(|f| !f.is_hidden && Self::field_should_be_kept_for_create_input_type(&f))
             .collect();
 
         let mut fields = self.scalar_input_fields(
@@ -41,6 +41,7 @@ pub trait CreateInputTypeBuilderExtension<'a>: InputTypeBuilderBase<'a> {
                         (Some(FieldBehaviour::Id { strategy: IdStrategy::None, .. }), TypeIdentifier::GraphQLID) => self.map_required_input_type(f),
                         (Some(FieldBehaviour::Id { strategy: IdStrategy::None, .. }), TypeIdentifier::UUID)      => self.map_required_input_type(f),
                         (Some(FieldBehaviour::Id { strategy: IdStrategy::None, .. }), TypeIdentifier::String)    => self.map_required_input_type(f),
+                        (Some(FieldBehaviour::Id { strategy: IdStrategy::None, .. }), TypeIdentifier::Int)    => self.map_required_input_type(f),
 
                         _ => unreachable!(),
                     }
@@ -138,9 +139,8 @@ pub trait CreateInputTypeBuilderExtension<'a>: InputTypeBuilderBase<'a> {
         input_field("create", input_object, None)
     }
 
-    /// Returns true if the field should be kept for create input type building.
     #[rustfmt::skip]
-    fn do_filter(field: &ScalarFieldRef) -> bool {
+    fn field_should_be_kept_for_create_input_type(field: &ScalarFieldRef) -> bool {
         match (field.behaviour.as_ref(), field.type_identifier) {         //add example syntax behind lines
             _ if !field.is_id()                                                                      => true,
 
@@ -153,7 +153,7 @@ pub trait CreateInputTypeBuilderExtension<'a>: InputTypeBuilderBase<'a> {
             (Some(FieldBehaviour::Id { strategy: IdStrategy::None, .. }), TypeIdentifier::GraphQLID) => true,  // 
 
             (Some(FieldBehaviour::Id { strategy: IdStrategy::Auto, .. }), TypeIdentifier::Int)       => false, //id Int       @id @default(autoincrement())
-            (Some(FieldBehaviour::Id { strategy: IdStrategy::None, .. }), TypeIdentifier::Int)       => false, //id Int       @id  
+            (Some(FieldBehaviour::Id { strategy: IdStrategy::None, .. }), TypeIdentifier::Int)       => true, //id Int        @id  
             (Some(FieldBehaviour::Id { strategy: IdStrategy::Sequence, .. }), TypeIdentifier::Int)   => false, //id Int       @id @sequence...
 
             (None, TypeIdentifier::GraphQLID)                                                        => true,  //can probably go away

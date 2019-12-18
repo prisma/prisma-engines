@@ -109,8 +109,7 @@ pub fn connect_nested_update_many(
         let update_many = WriteQuery::UpdateManyRecords(UpdateManyRecords {
             model: Arc::clone(&child_model),
             filter,
-            non_list_args: update_args.non_list,
-            list_args: update_args.list,
+            args: update_args.args,
         });
 
         let update_many_node = graph.create_node(Query::Write(update_many));

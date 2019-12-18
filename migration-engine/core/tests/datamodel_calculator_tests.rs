@@ -2,7 +2,7 @@
 
 mod test_harness;
 
-use datamodel::ast::{FieldArity, SchemaAst};
+use datamodel::ast::SchemaAst;
 use migration_connector::steps::*;
 use migration_core::migration::datamodel_calculator::*;
 use migration_core::migration::datamodel_migration_steps_inferrer::*;

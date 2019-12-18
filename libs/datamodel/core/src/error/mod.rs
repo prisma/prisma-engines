@@ -56,6 +56,9 @@ pub enum DatamodelError {
     #[fail(display = "Field \"{}\" is already defined on model \"{}\".", field_name, model_name)]
     DuplicateFieldError { model_name: String, field_name: String, span: Span },
 
+    #[fail(display = "Field \"{}\" in model \"{}\" can't be a list. The current connector does not support lists of primitive types.", field_name, model_name)]
+    ScalarListFieldsAreNotSupported { model_name: String, field_name: String, span: Span },
+
     #[fail(display = "Value \"{}\" is already defined on enum \"{}\".", value_name, enum_name)]
     DuplicateEnumValueError { enum_name: String, value_name: String, span: Span },
 
@@ -225,6 +228,14 @@ impl DatamodelError {
         }
     }
 
+    pub fn new_scalar_list_fields_are_not_supported (model_name: &str, field_name: &str, span: Span) -> DatamodelError {
+        DatamodelError::ScalarListFieldsAreNotSupported {
+            model_name: String::from(model_name),
+            field_name: String::from(field_name),
+            span,
+        }
+    }
+
 
     pub fn new_model_validation_error(message: &str, model_name: &str, span: Span) -> DatamodelError {
         DatamodelError::ModelValidationError {
@@ -322,7 +333,8 @@ impl DatamodelError {
             DatamodelError::DuplicateEnumValueError { span, .. } => *span,
             DatamodelError::DuplicateArgumentError { span, .. } => *span,
             DatamodelError::DuplicateDefaultArgumentError { span, .. } => *span,
-            DatamodelError::UnusedArgumentError { span, .. } => *span
+            DatamodelError::UnusedArgumentError { span, .. } => *span,
+            DatamodelError::ScalarListFieldsAreNotSupported {span, ..} => *span,
         }
     }
     pub fn description(&self) -> String {

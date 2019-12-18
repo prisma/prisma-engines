@@ -1,9 +1,9 @@
 use super::connection::SqlConnection;
 use crate::{query_builder::ManyRelatedRecordsWithRowNumber, FromSource, SqlError};
+use async_trait::async_trait;
 use connector_interface::{Connection, Connector, IO};
 use datamodel::Source;
 use quaint::pooled::Quaint;
-use async_trait::async_trait;
 
 pub struct PostgreSql {
     pool: Quaint,
@@ -15,10 +15,7 @@ impl FromSource for PostgreSql {
     async fn from_source(source: &dyn Source) -> crate::Result<Self> {
         let pool = Quaint::new(&source.url().value).await?;
         let connection_info = pool.connection_info().to_owned();
-        Ok(PostgreSql {
-            pool,
-            connection_info,
-        })
+        Ok(PostgreSql { pool, connection_info })
     }
 }
 

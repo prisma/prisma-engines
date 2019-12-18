@@ -1,10 +1,10 @@
 use super::connection::SqlConnection;
 use crate::{query_builder::ManyRelatedRecordsWithRowNumber, FromSource, SqlError};
+use async_trait::async_trait;
 use connector_interface::{Connection, Connector, IO};
 use datamodel::Source;
-use quaint::{connector::SqliteParams, prelude::ConnectionInfo, pooled::Quaint};
+use quaint::{connector::SqliteParams, pooled::Quaint, prelude::ConnectionInfo};
 use std::convert::TryFrom;
-use async_trait::async_trait;
 
 pub struct Sqlite {
     pool: Quaint,

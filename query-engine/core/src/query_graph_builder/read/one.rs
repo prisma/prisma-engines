@@ -35,7 +35,7 @@ impl Builder<ReadQuery> for ReadOneRecordBuilder {
         let model = self.model;
         let nested_fields = self.field.nested_fields.unwrap().fields;
         let selection_order: Vec<String> = collect_selection_order(&nested_fields);
-        let selected_fields = collect_selected_fields(&nested_fields, &model, None);
+        let selected_fields = collect_selected_fields(&nested_fields, &model);
         let nested = collect_nested_queries(nested_fields, &model)?;
 
         Ok(ReadQuery::RecordQuery(RecordQuery {

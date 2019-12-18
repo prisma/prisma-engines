@@ -13,6 +13,7 @@ url = "1.7.2"
 log = "0.4"
 regex = "1.2"
 async-trait = "0.1.17"
+once_cell = "1"
 
 [dependencies.quaint]
 git = "https://github.com/prisma/quaint.git"
@@ -20,7 +21,7 @@ features = ["single"]
 
 [dev-dependencies]
 barrel = { version = "0.6.3-alpha.0", features = ["sqlite3", "mysql", "pg"] }
-fern = "0.5"
 pretty_assertions = "0.6"
 tokio = { version = "0.2", features = ["rt-threaded", "macros"] }
 futures = "0.3"
+test-setup = { path = "../test-setup" }

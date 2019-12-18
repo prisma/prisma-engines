@@ -81,7 +81,7 @@ impl TryInto<Option<String>> for ParsedInputValue {
 
         match prisma_value {
             PrismaValue::String(s) => Ok(Some(s)),
-            PrismaValue::Enum(s) => Ok(Some(s.as_string())),
+            PrismaValue::Enum(s) => Ok(Some(s.as_string().into_owned())),
             PrismaValue::Null => Ok(None),
             v => Err(QueryParserError::AssertionError(format!(
                 "Attempted conversion of non-String Prisma value type ({:?}) into String failed.",

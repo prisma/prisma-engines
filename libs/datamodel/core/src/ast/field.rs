@@ -1,7 +1,6 @@
 use super::*;
-use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct Field {
     /// The field's type.
     pub field_type: Identifier,
@@ -43,8 +42,7 @@ impl WithDocumentation for Field {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
-#[serde(rename_all = "camelCase")]
+#[derive(Copy, Debug, Clone, PartialEq)]
 pub enum FieldArity {
     Required,
     Optional,

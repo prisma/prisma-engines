@@ -1,7 +1,7 @@
 package queries
 
 import org.scalatest.{FlatSpec, Matchers}
-import util.ConnectorCapability.{NonEmbeddedScalarListCapability, ScalarListsCapability}
+import util.ConnectorCapability.ScalarListsCapability
 import util._
 
 class ScalarListsQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
@@ -11,8 +11,8 @@ class ScalarListsQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     val project = SchemaDsl.fromStringV11() {
       s"""model Model{
         |   id      String   @id @default(cuid())
-        |   ints    Int[]    $scalarListDirective
-        |   strings String[] $scalarListDirective
+        |   ints    Int[]
+        |   strings String[]
         |}"""
     }
 
@@ -48,8 +48,8 @@ class ScalarListsQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     val project = SchemaDsl.fromStringV11() {
       s"""model Model{
         |   id String @id @default(cuid())
-        |   ints Int[] $scalarListDirective
-        |   strings String[] $scalarListDirective
+        |   ints Int[]
+        |   strings String[]
         |}"""
     }
 
@@ -86,8 +86,8 @@ class ScalarListsQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     val project = SchemaDsl.fromStringV11() {
       s"""model Model{
         |   id String @id @default(cuid())
-        |   ints Int[] $scalarListDirective
-        |   strings String[] $scalarListDirective
+        |   ints Int[]
+        |   strings String[]
         |}"""
     }
     database.setup(project)
@@ -137,7 +137,7 @@ class ScalarListsQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     val project = SchemaDsl.fromStringV11() {
       s"""model Model{
         |   id String @id @default(cuid())
-        |   $fieldName String[] $scalarListDirective
+        |   $fieldName String[]
         |}"""
     }
 
@@ -153,7 +153,7 @@ class ScalarListsQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     val project = SchemaDsl.fromStringV11() {
       s"""model Model{
          |   id String @id @default(cuid())
-         |   $fieldName Int[] $scalarListDirective
+         |   $fieldName Int[]
          |}"""
     }
 
@@ -169,7 +169,7 @@ class ScalarListsQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     val project = SchemaDsl.fromStringV11() {
       s"""model Model{
          |   id String @id @default(cuid())
-         |   $fieldName Float[] $scalarListDirective
+         |   $fieldName Float[]
          |}"""
     }
 
@@ -185,7 +185,7 @@ class ScalarListsQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     val project = SchemaDsl.fromStringV11() {
       s"""model Model{
          |   id String @id @default(cuid())
-         |   $fieldName Boolean[] $scalarListDirective
+         |   $fieldName Boolean[]
          |}"""
     }
 
@@ -201,7 +201,7 @@ class ScalarListsQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     val project = SchemaDsl.fromStringV11() {
       s"""model Model{
          |   id String @id @default(cuid())
-         |   $fieldName String[] $scalarListDirective
+         |   $fieldName String[]
          |}"""
     }
 
@@ -217,7 +217,7 @@ class ScalarListsQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     val project = SchemaDsl.fromStringV11() {
       s"""model Model{
          |   id String @id @default(cuid())
-         |   $fieldName DateTime[] $scalarListDirective
+         |   $fieldName DateTime[]
          |}"""
     }
 
@@ -233,7 +233,7 @@ class ScalarListsQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     val project = SchemaDsl.fromStringV11() {
       s"""model Model{
          |   id String @id @default(cuid())
-         |   $fieldName Ha[] $scalarListDirective
+         |   $fieldName Ha[]
          |}
          |
          |enum Ha{
@@ -250,8 +250,8 @@ class ScalarListsQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     val project = SchemaDsl.fromStringV11() {
       s"""model Model{
          |   id String @id @default(cuid())
-         |   ints Int[] $scalarListDirective
-         |   strings String[] $scalarListDirective
+         |   ints Int[]
+         |   strings String[]
          |}"""
     }
 
@@ -314,8 +314,8 @@ class ScalarListsQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     val project = SchemaDsl.fromStringV11() {
       s"""model Model{
         |   id String @id @default(cuid())
-        |   ints Int[] $scalarListDirective
-        |   strings String[] $scalarListDirective
+        |   ints Int[]
+        |   strings String[]
         |}"""
     }
 
@@ -373,13 +373,13 @@ class ScalarListsQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
 
   }
 
-  "Using Int ids" should "work with scalar lists" taggedAs (IgnoreMongo) in {
+  "Using Int ids" should "work with scalar lists" taggedAs IgnoreMongo in {
 
     val project = SchemaDsl.fromStringV11() {
       s"""model Model{
-         |   id Int @id
+         |   id Int @id @default(autoincrement())
          |   name String?
-         |   ints Int[] $scalarListDirective
+         |   ints Int[]
          |}"""
     }
 

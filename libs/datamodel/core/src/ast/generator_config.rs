@@ -1,7 +1,7 @@
 use super::*;
 
 /// A Generator block declaration.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct GeneratorConfig {
     /// Name of this generator.
     pub name: Identifier,

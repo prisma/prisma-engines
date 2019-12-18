@@ -11,7 +11,6 @@ mod dmmf;
 mod error;
 mod exec_loader;
 mod request_handlers;
-mod serializers;
 mod server;
 mod utilities;
 

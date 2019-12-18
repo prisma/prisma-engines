@@ -3,24 +3,12 @@ use once_cell::sync::OnceCell;
 use prisma_models::{EnumType, EnumValue, ModelRef, PrismaValue};
 use std::sync::Arc;
 
-/// Object type initializer for cases where only the name is known, and fields are computed later.
-pub fn init_object_type<T>(name: T, model: Option<ModelRef>) -> ObjectType
-where
-    T: Into<String>,
-{
-    ObjectType {
-        name: name.into(),
-        fields: OnceCell::new(),
-        model,
-    }
-}
-
 /// Object type convenience wrapper function.
 pub fn object_type<T>(name: T, fields: Vec<Field>, model: Option<ModelRef>) -> ObjectType
 where
     T: Into<String>,
 {
-    let object_type = init_object_type(name.into(), model);
+    let object_type = ObjectType::new(name, model);
 
     object_type.set_fields(fields);
     object_type

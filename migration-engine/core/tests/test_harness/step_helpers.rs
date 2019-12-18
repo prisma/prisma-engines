@@ -1,4 +1,3 @@
-use datamodel::ast::FieldArity;
 use migration_connector::steps::*;
 
 pub fn create_field_step(model: &str, field: &str, type_name: &str) -> MigrationStep {
@@ -19,13 +18,12 @@ pub fn delete_field_step(model: &str, field: &str) -> MigrationStep {
 
 pub fn create_id_directive_step(model: &str, field: &str) -> MigrationStep {
     MigrationStep::CreateDirective(CreateDirective {
-        locator: DirectiveLocation {
-            directive: "id".to_owned(),
-            location: DirectiveType::Field {
+        location: DirectiveLocation {
+            path: DirectivePath::Field {
                 model: model.to_owned(),
                 field: field.to_owned(),
             },
-            arguments: None,
+            directive: "id".to_owned(),
         },
     })
 }

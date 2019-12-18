@@ -1,13 +1,12 @@
 use crate::database::operations::*;
 use crate::{query_builder::read::ManyRelatedRecordsQueryBuilder, SqlError};
 use connector_interface::{
-    self as connector,
-    filter::Filter,
-    QueryArguments, ReadOperations, ScalarListValues, Transaction, WriteArgs, WriteOperations, IO,
+    self as connector, filter::Filter, QueryArguments, ReadOperations, Transaction, WriteArgs,
+    WriteOperations, IO,
 };
 use prisma_models::prelude::*;
-use std::marker::PhantomData;
 use quaint::prelude::ConnectionInfo;
+use std::marker::PhantomData;
 
 pub struct SqlConnectorTransaction<'a, T> {
     inner: quaint::connector::Transaction<'a>,
@@ -24,7 +23,10 @@ impl<'a, T> SqlConnectorTransaction<'a, T> {
         }
     }
 
-    async fn catch<O>(&self, fut: impl std::future::Future<Output = Result<O, SqlError>>) -> Result<O, connector_interface::error::ConnectorError> {
+    async fn catch<O>(
+        &self,
+        fut: impl std::future::Future<Output = Result<O, SqlError>>,
+    ) -> Result<O, connector_interface::error::ConnectorError> {
         match fut.await {
             Ok(o) => Ok(o),
             Err(err) => Err(err.into_connector_error(&self.connection_info)),
@@ -64,7 +66,11 @@ where
         query_arguments: QueryArguments,
         selected_fields: &'b SelectedFields,
     ) -> connector::IO<'b, ManyRecords> {
-        IO::new(self.catch(async move { read::get_many_records(&self.inner, model, query_arguments, selected_fields).await }))
+        IO::new(
+            self.catch(
+                async move { read::get_many_records(&self.inner, model, query_arguments, selected_fields).await },
+            ),
+        )
     }
 
     fn get_related_records<'b>(
@@ -84,14 +90,6 @@ where
             )
             .await
         }))
-    }
-
-    fn get_scalar_list_values<'b>(
-        &'b self,
-        list_field: &'b ScalarFieldRef,
-        record_ids: Vec<GraphqlId>,
-    ) -> connector::IO<'b, Vec<ScalarListValues>> {
-        IO::new(self.catch(async move { read::get_scalar_list_values(&self.inner, list_field, record_ids).await }))
     }
 
     fn count_by_model<'b>(&'b self, model: &'b ModelRef, query_arguments: QueryArguments) -> connector::IO<'b, usize> {

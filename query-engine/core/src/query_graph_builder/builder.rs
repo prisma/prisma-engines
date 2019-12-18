@@ -58,7 +58,7 @@ impl QueryGraphBuilder {
             Some(builder) => builder.build(parsed_field),
             None => Err(QueryGraphBuilderError::SchemaError(format!(
                 "Expected attached query builder on {} object, root level field '{}'.",
-                object.name, parsed_field.name
+                object.name(), parsed_field.name
             ))),
         }?;
 

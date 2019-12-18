@@ -1,53 +1,15 @@
 use std::collections::HashSet;
-use std::sync::atomic::{AtomicBool, Ordering};
-
-use log::LevelFilter;
 use pretty_assertions::assert_eq;
 
 use datamodel::{
     common::{ScalarType, ScalarValue},
     dml, Datamodel, Field, FieldArity, FieldType, IdInfo, IdStrategy, Model, OnDeleteStrategy, RelationInfo,
-    ScalarListStrategy,
 };
 use sql_introspection_connector::calculate_datamodel::calculate_model;
 use sql_schema_describer::*;
 
-static IS_SETUP: AtomicBool = AtomicBool::new(false);
-
-fn setup() {
-    let is_setup = IS_SETUP.load(Ordering::Relaxed);
-    if is_setup {
-        return;
-    }
-
-    let log_level = match std::env::var("TEST_LOG")
-        .unwrap_or("warn".to_string())
-        .to_lowercase()
-        .as_ref()
-    {
-        "trace" => LevelFilter::Trace,
-        "debug" => LevelFilter::Debug,
-        "info" => LevelFilter::Info,
-        "warn" => LevelFilter::Warn,
-        "error" => LevelFilter::Error,
-        _ => LevelFilter::Warn,
-    };
-    fern::Dispatch::new()
-        .format(|out, message, record| {
-            out.finish(format_args!("[{}][{}] {}", record.target(), record.level(), message))
-        })
-        .level(log_level)
-        .chain(std::io::stdout())
-        .apply()
-        .expect("fern configuration");
-
-    IS_SETUP.store(true, Ordering::Relaxed);
-}
-
 #[test]
 fn a_data_model_can_be_generated_from_a_schema() {
-    setup();
-
     let col_types = &[
         ColumnTypeFamily::Int,
         ColumnTypeFamily::Float,
@@ -93,7 +55,6 @@ fn a_data_model_can_be_generated_from_a_schema() {
                         default_value: None,
                         is_unique: false,
                         id_info: None,
-                        scalar_list_strategy: None,
                         documentation: None,
                         is_generated: false,
                         is_updated_at: false,
@@ -114,8 +75,8 @@ fn a_data_model_can_be_generated_from_a_schema() {
                     tpe: ColumnType {
                         raw: "raw".to_string(),
                         family: family.to_owned(),
+                        arity: ColumnArity::Nullable,
                     },
-                    arity: ColumnArity::Nullable,
                     default: None,
                     auto_increment: false,
                 })
@@ -137,8 +98,6 @@ fn a_data_model_can_be_generated_from_a_schema() {
 
 #[test]
 fn arity_is_preserved_when_generating_data_model_from_a_schema() {
-    setup();
-
     let ref_data_model = Datamodel {
         models: vec![Model {
             database_name: None,
@@ -154,7 +113,6 @@ fn arity_is_preserved_when_generating_data_model_from_a_schema() {
                     default_value: None,
                     is_unique: false,
                     id_info: None,
-                    scalar_list_strategy: None,
                     documentation: None,
                     is_generated: false,
                     is_updated_at: false,
@@ -167,7 +125,6 @@ fn arity_is_preserved_when_generating_data_model_from_a_schema() {
                     default_value: None,
                     is_unique: false,
                     id_info: None,
-                    scalar_list_strategy: None,
                     documentation: None,
                     is_generated: false,
                     is_updated_at: false,
@@ -180,7 +137,6 @@ fn arity_is_preserved_when_generating_data_model_from_a_schema() {
                     default_value: None,
                     is_unique: false,
                     id_info: None,
-                    scalar_list_strategy: Some(ScalarListStrategy::Embedded),
                     documentation: None,
                     is_generated: false,
                     is_updated_at: false,
@@ -202,8 +158,8 @@ fn arity_is_preserved_when_generating_data_model_from_a_schema() {
                     tpe: ColumnType {
                         raw: "raw".to_string(),
                         family: ColumnTypeFamily::Int,
+                        arity: ColumnArity::Nullable,
                     },
-                    arity: ColumnArity::Nullable,
                     default: None,
                     auto_increment: false,
                 },
@@ -212,8 +168,8 @@ fn arity_is_preserved_when_generating_data_model_from_a_schema() {
                     tpe: ColumnType {
                         raw: "raw".to_string(),
                         family: ColumnTypeFamily::Int,
+                        arity: ColumnArity::Required,
                     },
-                    arity: ColumnArity::Required,
                     default: None,
                     auto_increment: false,
                 },
@@ -222,8 +178,8 @@ fn arity_is_preserved_when_generating_data_model_from_a_schema() {
                     tpe: ColumnType {
                         raw: "raw".to_string(),
                         family: ColumnTypeFamily::Int,
+                        arity: ColumnArity::List,
                     },
-                    arity: ColumnArity::List,
                     default: None,
                     auto_increment: false,
                 },
@@ -245,8 +201,6 @@ fn arity_is_preserved_when_generating_data_model_from_a_schema() {
 
 #[test]
 fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
-    setup();
-
     let ref_data_model = Datamodel {
         models: vec![Model {
             database_name: None,
@@ -262,7 +216,6 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
                     default_value: None,
                     is_unique: false,
                     id_info: None,
-                    scalar_list_strategy: None,
                     documentation: None,
                     is_generated: false,
                     is_updated_at: false,
@@ -275,7 +228,6 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
                     default_value: Some(ScalarValue::Int(1)),
                     is_unique: false,
                     id_info: None,
-                    scalar_list_strategy: None,
                     documentation: None,
                     is_generated: false,
                     is_updated_at: false,
@@ -288,7 +240,6 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
                     default_value: Some(ScalarValue::Boolean(true)),
                     is_unique: false,
                     id_info: None,
-                    scalar_list_strategy: None,
                     documentation: None,
                     is_generated: false,
                     is_updated_at: false,
@@ -301,7 +252,6 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
                     default_value: Some(ScalarValue::Float(1.0)),
                     is_unique: false,
                     id_info: None,
-                    scalar_list_strategy: None,
                     documentation: None,
                     is_generated: false,
                     is_updated_at: false,
@@ -314,7 +264,6 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
                     default_value: Some(ScalarValue::String("default".to_string())),
                     is_unique: false,
                     id_info: None,
-                    scalar_list_strategy: None,
                     documentation: None,
                     is_generated: false,
                     is_updated_at: false,
@@ -336,8 +285,8 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
                     tpe: ColumnType {
                         raw: "raw".to_string(),
                         family: ColumnTypeFamily::Int,
+                        arity: ColumnArity::Nullable,
                     },
-                    arity: ColumnArity::Nullable,
                     default: None,
                     auto_increment: false,
                 },
@@ -346,8 +295,8 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
                     tpe: ColumnType {
                         raw: "raw".to_string(),
                         family: ColumnTypeFamily::Int,
+                        arity: ColumnArity::Nullable,
                     },
-                    arity: ColumnArity::Nullable,
                     default: Some("'1'".to_string()),
                     auto_increment: false,
                 },
@@ -356,8 +305,8 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
                     tpe: ColumnType {
                         raw: "raw".to_string(),
                         family: ColumnTypeFamily::Boolean,
+                        arity: ColumnArity::Nullable,
                     },
-                    arity: ColumnArity::Nullable,
                     default: Some("'1'".to_string()),
                     auto_increment: false,
                 },
@@ -366,8 +315,8 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
                     tpe: ColumnType {
                         raw: "raw".to_string(),
                         family: ColumnTypeFamily::Float,
+                        arity: ColumnArity::Nullable,
                     },
-                    arity: ColumnArity::Nullable,
                     default: Some("'1.0'".to_string()),
                     auto_increment: false,
                 },
@@ -376,8 +325,8 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
                     tpe: ColumnType {
                         raw: "raw".to_string(),
                         family: ColumnTypeFamily::String,
+                        arity: ColumnArity::Nullable,
                     },
-                    arity: ColumnArity::Nullable,
                     default: Some("default".to_string()),
                     auto_increment: false,
                 },
@@ -396,8 +345,6 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
 
 #[test]
 fn primary_key_is_preserved_when_generating_data_model_from_a_schema() {
-    setup();
-
     let ref_data_model = Datamodel {
         models: vec![
             // Model with auto-incrementing primary key
@@ -417,7 +364,6 @@ fn primary_key_is_preserved_when_generating_data_model_from_a_schema() {
                         strategy: IdStrategy::Auto,
                         sequence: None,
                     }),
-                    scalar_list_strategy: None,
                     documentation: None,
                     is_generated: false,
                     is_updated_at: false,
@@ -443,7 +389,6 @@ fn primary_key_is_preserved_when_generating_data_model_from_a_schema() {
                         strategy: IdStrategy::None,
                         sequence: None,
                     }),
-                    scalar_list_strategy: None,
                     documentation: None,
                     is_generated: false,
                     is_updated_at: false,
@@ -473,7 +418,6 @@ fn primary_key_is_preserved_when_generating_data_model_from_a_schema() {
                             allocation_size: 1,
                         }),
                     }),
-                    scalar_list_strategy: None,
                     documentation: None,
                     is_generated: false,
                     is_updated_at: false,
@@ -495,8 +439,8 @@ fn primary_key_is_preserved_when_generating_data_model_from_a_schema() {
                     tpe: ColumnType {
                         raw: "integer".to_string(),
                         family: ColumnTypeFamily::Int,
+                        arity: ColumnArity::Required,
                     },
-                    arity: ColumnArity::Required,
                     default: None,
                     auto_increment: true,
                 }],
@@ -514,8 +458,8 @@ fn primary_key_is_preserved_when_generating_data_model_from_a_schema() {
                     tpe: ColumnType {
                         raw: "integer".to_string(),
                         family: ColumnTypeFamily::Int,
+                        arity: ColumnArity::Required,
                     },
-                    arity: ColumnArity::Required,
                     default: None,
                     auto_increment: false,
                 }],
@@ -533,8 +477,8 @@ fn primary_key_is_preserved_when_generating_data_model_from_a_schema() {
                     tpe: ColumnType {
                         raw: "integer".to_string(),
                         family: ColumnTypeFamily::Int,
+                        arity: ColumnArity::Required,
                     },
-                    arity: ColumnArity::Required,
                     default: None,
                     auto_increment: true,
                 }],
@@ -560,8 +504,6 @@ fn primary_key_is_preserved_when_generating_data_model_from_a_schema() {
 
 #[test]
 fn uniqueness_is_preserved_when_generating_data_model_from_a_schema() {
-    setup();
-
     let ref_data_model = Datamodel {
         models: vec![Model {
             database_name: None,
@@ -577,7 +519,6 @@ fn uniqueness_is_preserved_when_generating_data_model_from_a_schema() {
                     default_value: None,
                     is_unique: false,
                     id_info: None,
-                    scalar_list_strategy: None,
                     documentation: None,
                     is_generated: false,
                     is_updated_at: false,
@@ -590,7 +531,6 @@ fn uniqueness_is_preserved_when_generating_data_model_from_a_schema() {
                     default_value: None,
                     is_unique: true,
                     id_info: None,
-                    scalar_list_strategy: None,
                     documentation: None,
                     is_generated: false,
                     is_updated_at: false,
@@ -612,8 +552,8 @@ fn uniqueness_is_preserved_when_generating_data_model_from_a_schema() {
                     tpe: ColumnType {
                         raw: "raw".to_string(),
                         family: ColumnTypeFamily::Int,
+                        arity: ColumnArity::Nullable,
                     },
-                    arity: ColumnArity::Nullable,
                     default: None,
                     auto_increment: false,
                 },
@@ -622,8 +562,8 @@ fn uniqueness_is_preserved_when_generating_data_model_from_a_schema() {
                     tpe: ColumnType {
                         raw: "raw".to_string(),
                         family: ColumnTypeFamily::Int,
+                        arity: ColumnArity::Required,
                     },
-                    arity: ColumnArity::Required,
                     default: None,
                     auto_increment: false,
                 },
@@ -646,10 +586,7 @@ fn uniqueness_is_preserved_when_generating_data_model_from_a_schema() {
 
 #[test]
 #[ignore]
-
 fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
-    setup();
-
     let ref_data_model = Datamodel {
         models: vec![
             Model {
@@ -669,7 +606,6 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
                             strategy: IdStrategy::Auto,
                             sequence: None,
                         }),
-                        scalar_list_strategy: None,
                         documentation: None,
                         is_generated: false,
                         is_updated_at: false,
@@ -682,7 +618,6 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
                         default_value: None,
                         is_unique: false,
                         id_info: None,
-                        scalar_list_strategy: None,
                         documentation: None,
                         is_generated: false,
                         is_updated_at: false,
@@ -706,7 +641,6 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
                         default_value: None,
                         is_unique: false,
                         id_info: None,
-                        scalar_list_strategy: None,
                         documentation: None,
                         is_generated: false,
                         is_updated_at: false,
@@ -724,7 +658,6 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
                         default_value: None,
                         is_unique: false,
                         id_info: None,
-                        scalar_list_strategy: None,
                         documentation: None,
                         is_generated: false,
                         is_updated_at: false,
@@ -742,7 +675,6 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
                         default_value: None,
                         is_unique: false,
                         id_info: None,
-                        scalar_list_strategy: None,
                         documentation: None,
                         is_generated: false,
                         is_updated_at: false,
@@ -766,8 +698,8 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
                         tpe: ColumnType {
                             raw: "integer".to_string(),
                             family: ColumnTypeFamily::Int,
+                            arity: ColumnArity::Required,
                         },
-                        arity: ColumnArity::Required,
                         default: None,
                         auto_increment: true,
                     },
@@ -776,8 +708,8 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
                         tpe: ColumnType {
                             raw: "text".to_string(),
                             family: ColumnTypeFamily::String,
+                            arity: ColumnArity::Required,
                         },
-                        arity: ColumnArity::Required,
                         default: None,
                         auto_increment: false,
                     },
@@ -797,8 +729,8 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
                         tpe: ColumnType {
                             raw: "integer".to_string(),
                             family: ColumnTypeFamily::Int,
+                            arity: ColumnArity::Required,
                         },
-                        arity: ColumnArity::Required,
                         default: None,
                         auto_increment: true,
                     },
@@ -807,8 +739,8 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
                         tpe: ColumnType {
                             raw: "integer".to_string(),
                             family: ColumnTypeFamily::Int,
+                            arity: ColumnArity::Required,
                         },
-                        arity: ColumnArity::Required,
                         default: None,
                         auto_increment: false,
                     },
@@ -817,8 +749,8 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
                         tpe: ColumnType {
                             raw: "text".to_string(),
                             family: ColumnTypeFamily::String,
+                            arity: ColumnArity::Required,
                         },
-                        arity: ColumnArity::Required,
                         default: None,
                         auto_increment: false,
                     },
@@ -845,8 +777,6 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
 
 #[test]
 fn multi_field_uniques_are_preserved_when_generating_data_model_from_a_schema() {
-    setup();
-
     let ref_data_model = Datamodel {
         models: vec![Model {
             database_name: None,
@@ -865,7 +795,6 @@ fn multi_field_uniques_are_preserved_when_generating_data_model_from_a_schema() 
                         strategy: IdStrategy::Auto,
                         sequence: None,
                     }),
-                    scalar_list_strategy: None,
                     documentation: None,
                     is_generated: false,
                     is_updated_at: false,
@@ -878,7 +807,6 @@ fn multi_field_uniques_are_preserved_when_generating_data_model_from_a_schema() 
                     default_value: None,
                     is_unique: false,
                     id_info: None,
-                    scalar_list_strategy: None,
                     documentation: None,
                     is_generated: false,
                     is_updated_at: false,
@@ -891,7 +819,6 @@ fn multi_field_uniques_are_preserved_when_generating_data_model_from_a_schema() 
                     default_value: None,
                     is_unique: false,
                     id_info: None,
-                    scalar_list_strategy: None,
                     documentation: None,
                     is_generated: false,
                     is_updated_at: false,
@@ -917,8 +844,8 @@ fn multi_field_uniques_are_preserved_when_generating_data_model_from_a_schema() 
                     tpe: ColumnType {
                         raw: "integer".to_string(),
                         family: ColumnTypeFamily::Int,
+                        arity: ColumnArity::Required,
                     },
-                    arity: ColumnArity::Required,
                     default: None,
                     auto_increment: true,
                 },
@@ -927,8 +854,8 @@ fn multi_field_uniques_are_preserved_when_generating_data_model_from_a_schema() 
                     tpe: ColumnType {
                         raw: "text".to_string(),
                         family: ColumnTypeFamily::String,
+                        arity: ColumnArity::Required,
                     },
-                    arity: ColumnArity::Required,
                     default: None,
                     auto_increment: false,
                 },
@@ -937,8 +864,8 @@ fn multi_field_uniques_are_preserved_when_generating_data_model_from_a_schema() 
                     tpe: ColumnType {
                         raw: "text".to_string(),
                         family: ColumnTypeFamily::String,
+                        arity: ColumnArity::Required,
                     },
-                    arity: ColumnArity::Required,
                     default: None,
                     auto_increment: false,
                 },
@@ -964,7 +891,6 @@ fn multi_field_uniques_are_preserved_when_generating_data_model_from_a_schema() 
 
 #[test]
 fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
-    setup();
 
     let ref_data_model = Datamodel {
         models: vec![
@@ -985,7 +911,6 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                             strategy: IdStrategy::Auto,
                             sequence: None,
                         }),
-                        scalar_list_strategy: None,
                         documentation: None,
                         is_generated: false,
                         is_updated_at: false,
@@ -998,7 +923,6 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                         default_value: None,
                         is_unique: false,
                         id_info: None,
-                        scalar_list_strategy: None,
                         documentation: None,
                         is_generated: false,
                         is_updated_at: false,
@@ -1016,7 +940,6 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                         default_value: None,
                         is_unique: false,
                         id_info: None,
-                        scalar_list_strategy: None,
                         documentation: None,
                         is_generated: false,
                         is_updated_at: false,
@@ -1040,7 +963,6 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                         default_value: None,
                         is_unique: false,
                         id_info: None,
-                        scalar_list_strategy: None,
                         documentation: None,
                         is_generated: false,
                         is_updated_at: false,
@@ -1058,7 +980,6 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                         default_value: None,
                         is_unique: false,
                         id_info: None,
-                        scalar_list_strategy: None,
                         documentation: None,
                         is_generated: false,
                         is_updated_at: false,
@@ -1082,8 +1003,8 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                         tpe: ColumnType {
                             raw: "integer".to_string(),
                             family: ColumnTypeFamily::Int,
+                            arity: ColumnArity::Required,
                         },
-                        arity: ColumnArity::Required,
                         default: None,
                         auto_increment: true,
                     },
@@ -1092,8 +1013,8 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                         tpe: ColumnType {
                             raw: "text".to_string(),
                             family: ColumnTypeFamily::String,
+                            arity: ColumnArity::Required,
                         },
-                        arity: ColumnArity::Required,
                         default: None,
                         auto_increment: false,
                     },
@@ -1113,8 +1034,8 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                         tpe: ColumnType {
                             raw: "integer".to_string(),
                             family: ColumnTypeFamily::Int,
+                            arity: ColumnArity::Required,
                         },
-                        arity: ColumnArity::Required,
                         default: None,
                         auto_increment: true,
                     },
@@ -1123,8 +1044,8 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                         tpe: ColumnType {
                             raw: "integer".to_string(),
                             family: ColumnTypeFamily::Int,
+                            arity: ColumnArity::Required,
                         },
-                        arity: ColumnArity::Required,
                         default: None,
                         auto_increment: false,
                     },
@@ -1150,8 +1071,6 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
 
 #[test]
 fn enums_are_preserved_when_generating_data_model_from_a_schema() {
-    setup();
-
     let ref_data_model = Datamodel {
         models: vec![],
         enums: vec![dml::Enum {

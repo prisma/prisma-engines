@@ -45,8 +45,13 @@ fn converting_enums() {
 fn models_with_only_scalar_fields() {
     let datamodel = convert(
         r#"
+            datasource mydb {
+                provider = "postgres"
+                url = "postgresql://localhost:5432"
+            }
+            
             model Test {
-                id Int @id
+                id Int @id @default(autoincrement())
                 int Int
                 float Float
                 boolean Boolean

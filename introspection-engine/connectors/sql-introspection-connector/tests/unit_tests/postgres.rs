@@ -66,7 +66,7 @@ async fn introspecting_a_table_with_unique_index_must_work(api: &TestApi) {
             });
             migration.inject_custom(format!(
                 "Create Unique Index \"test\" on \"{}\".\"Blog\"( \"authorId\")",
-                SCHEMA_NAME
+                api.schema_name()
             ));
         })
         .await;
@@ -93,7 +93,7 @@ async fn introspecting_a_table_with_multi_column_unique_index_must_work(api: &Te
             });
             migration.inject_custom(format!(
                 "Create Unique Index \"test\" on \"{}\".\"User\"( \"firstname\", \"lastname\")",
-                SCHEMA_NAME,
+                api.schema_name(),
             ));
         })
         .await;
@@ -194,7 +194,7 @@ async fn introspecting_a_table_with_a_non_unique_index_should_work(api: &TestApi
                 t.add_column("a", types::text());
                 t.add_column("id", types::primary());
             });
-            migration.inject_custom(format!("Create Index \"test\" on \"{}\".\"User\"(\"a\")", SCHEMA_NAME));
+            migration.inject_custom(format!("Create Index \"test\" on \"{}\".\"User\"(\"a\")", api.schema_name()));
         })
         .await;
 
@@ -221,7 +221,7 @@ async fn introspecting_a_table_with_a_multi_column_non_unique_index_should_work(
             });
             migration.inject_custom(format!(
                 "Create Index \"test\" on \"{}\".\"User\"(\"a\",\"b\")",
-                SCHEMA_NAME
+                api.schema_name()
             ));
         })
         .await;
@@ -280,7 +280,7 @@ async fn introspecting_two_one_to_one_relations_between_the_same_models_should_w
                 t.add_column("id", types::primary());
                 t.inject_custom("user_id INTEGER NOT NULL UNIQUE REFERENCES \"User\"(\"id\")")
             });
-            migration.inject_custom(format!("ALTER TABLE \"{}\".\"User\" ADD Column \"post_id\" INTEGER NOT NULL UNIQUE REFERENCES \"Post\"(\"id\")", SCHEMA_NAME))
+            migration.inject_custom(format!("ALTER TABLE \"{}\".\"User\" ADD Column \"post_id\" INTEGER NOT NULL UNIQUE REFERENCES \"Post\"(\"id\")", api.schema_name()))
         }).await;
 
     let dm = r#"
@@ -406,7 +406,7 @@ async fn introspecting_a_prisma_many_to_many_relation_should_work(api: &TestApi)
             });
             migration.inject_custom(format!(
                 "CREATE UNIQUE INDEX test ON \"{}\".\"_PostToUser\" (\"a\", \"b\");",
-                SCHEMA_NAME
+                api.schema_name()
             ))
         })
         .await;
@@ -539,7 +539,7 @@ async fn introspecting_a_self_relation_should_work(api: &TestApi) {
 #[test_one_connector(connector = "postgres")]
 async fn introspecting_cascading_delete_behaviour_should_work(api: &TestApi) {
     let barrel = api.barrel();
-    let _setup_schema = barrel
+    barrel
         .execute(|migration| {
             migration.create_table("User", |t| {
                 t.add_column("id", types::primary());
@@ -558,7 +558,7 @@ async fn introspecting_cascading_delete_behaviour_should_work(api: &TestApi) {
             }
             
             model User {
-               id      Int @id @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
+               id    Int @id @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
                posts Post[] @relation(onDelete: CASCADE)
             }
         "#;
@@ -569,3 +569,61 @@ async fn introspecting_cascading_delete_behaviour_should_work(api: &TestApi) {
 // enums
 
 // native arrays
+
+#[test_one_connector(connector = "postgres")]
+async fn introspecting_native_arrays_should_work(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel.execute(|migration| {
+        migration.create_table("Post", |t| {
+            t.add_column("id", types::primary());
+            t.inject_custom("ints INTEGER [12]");
+        });
+    }).await;
+
+    let dm = r#"
+            datasource pg {
+              provider = "postgres"
+              url = "postgresql://localhost:5432"
+            }
+            model Post {
+               id      Int @id @sequence(name: "Post_id_seq", allocationSize: 1, initialValue: 1)
+               ints Int []
+            }
+        "#;
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}
+
+#[test_one_connector(connector = "postgres")]
+async fn introspecting_default_values_on_relations_should_be_ignored(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+            });
+            migration.create_table("Post", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom("user_id INTEGER REFERENCES \"User\"(\"id\") Default 0");
+            });
+        })
+        .await;
+
+    let dm = r#"
+            datasource pg {
+              provider = "postgres"
+              url = "postgresql://localhost:5432"
+            }
+            model Post {
+               id      Int @id @sequence(name: "Post_id_seq", allocationSize: 1, initialValue: 1)
+               user_id User?
+            }
+
+            model User {
+               id      Int @id @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
+               posts Post[]
+            }
+        "#;
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}

@@ -1,5 +1,6 @@
 use super::FieldManifestation;
 use crate::prelude::*;
+use datamodel::FieldArity;
 use std::{
     hash::{Hash, Hasher},
     sync::{Arc, Weak},
@@ -182,13 +183,13 @@ impl ScalarField {
         }
     }
 
-    pub fn scalar_list_behaviour_clone(&self) -> Option<FieldBehaviour> {
-        match self.behaviour {
-            Some(ref b) => match b {
-                FieldBehaviour::ScalarList { strategy } => Some(FieldBehaviour::ScalarList { strategy: *strategy }),
-                _ => None,
-            },
-            _ => None,
-        }
+    pub fn type_identifier_with_arity(&self) -> (TypeIdentifier, FieldArity) {
+        let arity = match (self.is_list, self.is_required) {
+            (true, _) => FieldArity::List,
+            (false, true) => FieldArity::Required,
+            (false, false) => FieldArity::Optional,
+        };
+
+        (self.type_identifier, arity)
     }
 }

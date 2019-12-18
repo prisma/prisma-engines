@@ -24,7 +24,7 @@ failure = "0.1"
 jsonrpc-core = "13.0"
 jsonrpc-stdio-server = "13.0"
 
-futures = "0.3"
+futures = { version = "0.3", features = ["compat"] }
 tokio = { version = "0.2", features = ["rt-threaded", "macros"] }
 async-trait = "0.1.17"
 async-std = "1.0"

@@ -13,12 +13,12 @@ class CreateMutationListSpec extends FlatSpec with Matchers with ApiSpecBase {
     s"""
       |model ScalarModel {
       |  id           String @id @default(cuid())
-      |  optStrings   String[] $scalarListDirective
-      |  optInts      Int[] $scalarListDirective
-      |  optFloats    Float[] $scalarListDirective
-      |  optBooleans  Boolean[] $scalarListDirective
-      |  optEnums     MyEnum[] $scalarListDirective
-      |  optDateTimes DateTime[] $scalarListDirective
+      |  optStrings   String[]
+      |  optInts      Int[]
+      |  optFloats    Float[]
+      |  optBooleans  Boolean[]
+      |  optEnums     MyEnum[]
+      |  optDateTimes DateTime[]
       |}
       |
       |enum MyEnum {
@@ -94,7 +94,7 @@ class CreateMutationListSpec extends FlatSpec with Matchers with ApiSpecBase {
                      id     String @id @default(cuid())
                      unique Int    @unique
                      name   String
-                     ints   Int[]  $scalarListDirective
+                     ints   Int[]
                   }"""
 
       TestDataModels(mongo = dm1, sql = dm2)

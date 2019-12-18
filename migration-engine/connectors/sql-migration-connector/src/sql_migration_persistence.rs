@@ -14,108 +14,137 @@ pub struct SqlMigrationPersistence {
     pub schema_name: String,
 }
 
-#[async_trait::async_trait]
-impl MigrationPersistence for SqlMigrationPersistence {
-    async fn init(&self) {
-        let sql_str = match self.connection_info.sql_family() {
-            SqlFamily::Sqlite => {
-                let mut m = barrel::Migration::new().schema(self.schema_name.clone());
-                m.create_table_if_not_exists(TABLE_NAME, migration_table_setup_sqlite);
-                m.make_from(barrel::SqlVariant::Sqlite)
-            }
-            SqlFamily::Postgres => {
-                let mut m = barrel::Migration::new().schema(self.schema_name.clone());
-                m.create_table(TABLE_NAME, migration_table_setup_postgres);
-                m.make_from(barrel::SqlVariant::Pg)
-            }
-            SqlFamily::Mysql => {
-                // work around barrels missing quoting
-                let mut m = barrel::Migration::new().schema(format!("{}", self.schema_name.clone()));
-                m.create_table(format!("{}", TABLE_NAME), migration_table_setup_mysql);
-                m.make_from(barrel::SqlVariant::Mysql)
-            }
-        };
-
-        self.connection.query_raw(&sql_str, &[]).await.ok();
-    }
-
-    async fn reset(&self) {
-        let sql_str = format!(r#"DELETE FROM "{}"."_Migration";"#, self.schema_name); // TODO: this is not vendor agnostic yet
-        self.connection.query_raw(&sql_str, &[]).await.ok();
-
-        // TODO: this is the wrong place to do that
-        match &self.connection_info {
-            ConnectionInfo::Postgres(_) => {
-                let sql_str = format!(r#"DROP SCHEMA "{}" CASCADE;"#, self.schema_name);
-                debug!("{}", sql_str);
-
-                self.connection.query_raw(&sql_str, &[]).await.ok();
-            }
-            ConnectionInfo::Sqlite { file_path, .. } => {
-                self.connection
-                    .execute_raw(
-                        "DETACH DATABASE ?",
-                        &[ParameterizedValue::from(self.schema_name.as_str())],
-                    )
-                    .await
-                    .ok();
-                std::fs::remove_file(file_path).ok(); // ignore potential errors
-                self.connection
-                    .execute_raw(
-                        "ATTACH DATABASE ? AS ?",
-                        &[
-                            ParameterizedValue::from(file_path.as_str()),
-                            ParameterizedValue::from(self.schema_name.as_str()),
-                        ],
-                    )
-                    .await
-                    .unwrap();
-            }
-            ConnectionInfo::Mysql(_) => {
-                let sql_str = format!(r#"DROP SCHEMA `{}`;"#, self.schema_name);
-                debug!("{}", sql_str);
-                self.connection.query_raw(&sql_str, &[]).await.ok();
-            }
+impl SqlMigrationPersistence {
+    async fn catch<O>(
+        &self,
+        fut: impl std::future::Future<Output = Result<O, super::SqlError>>,
+    ) -> Result<O, ConnectorError> {
+        match fut.await {
+            Ok(o) => Ok(o),
+            Err(sql_error) => Err(sql_error.into_connector_error(&self.connection_info)),
         }
     }
+}
 
-    async fn last(&self) -> Option<Migration> {
-        let conditions = STATUS_COLUMN.equals(MigrationStatus::MigrationSuccess.code());
-        let query = Select::from_table(self.table())
-            .so_that(conditions)
-            .order_by(REVISION_COLUMN.descend());
+#[async_trait::async_trait]
+impl MigrationPersistence for SqlMigrationPersistence {
+    async fn init(&self) -> Result<(), ConnectorError> {
+        self.catch(async {
+            let sql_str = match self.connection_info.sql_family() {
+                SqlFamily::Sqlite => {
+                    let mut m = barrel::Migration::new().schema(self.schema_name.clone());
+                    m.create_table_if_not_exists(TABLE_NAME, migration_table_setup_sqlite);
+                    m.make_from(barrel::SqlVariant::Sqlite)
+                }
+                SqlFamily::Postgres => {
+                    let mut m = barrel::Migration::new().schema(self.schema_name.clone());
+                    m.create_table(TABLE_NAME, migration_table_setup_postgres);
+                    m.make_from(barrel::SqlVariant::Pg)
+                }
+                SqlFamily::Mysql => {
+                    // work around barrels missing quoting
+                    let mut m = barrel::Migration::new().schema(format!("{}", self.schema_name.clone()));
+                    m.create_table(format!("{}", TABLE_NAME), migration_table_setup_mysql);
+                    m.make_from(barrel::SqlVariant::Mysql)
+                }
+            };
 
-        let result_set = self.connection.query(query.into()).await.unwrap();
-        parse_rows_new(result_set).into_iter().next()
+            self.connection.query_raw(&sql_str, &[]).await.ok();
+
+            Ok(())
+        })
+        .await
     }
 
-    async fn load_all(&self) -> Vec<Migration> {
-        let query = Select::from_table(self.table()).order_by(REVISION_COLUMN.ascend());
+    async fn reset(&self) -> Result<(), ConnectorError> {
+        self.catch(async {
+            let sql_str = format!(r#"DELETE FROM "{}"."_Migration";"#, self.schema_name); // TODO: this is not vendor agnostic yet
+            self.connection.query_raw(&sql_str, &[]).await.ok();
 
-        let result_set = self.connection.query(query.into()).await.unwrap();
-        parse_rows_new(result_set)
+            // TODO: this is the wrong place to do that
+            match &self.connection_info {
+                ConnectionInfo::Postgres(_) => {
+                    let sql_str = format!(r#"DROP SCHEMA "{}" CASCADE;"#, self.schema_name);
+                    debug!("{}", sql_str);
+
+                    self.connection.query_raw(&sql_str, &[]).await.ok();
+                }
+                ConnectionInfo::Sqlite { file_path, .. } => {
+                    self.connection
+                        .execute_raw(
+                            "DETACH DATABASE ?",
+                            &[ParameterizedValue::from(self.schema_name.as_str())],
+                        )
+                        .await
+                        .ok();
+                    std::fs::remove_file(file_path).ok(); // ignore potential errors
+                    self.connection
+                        .execute_raw(
+                            "ATTACH DATABASE ? AS ?",
+                            &[
+                                ParameterizedValue::from(file_path.as_str()),
+                                ParameterizedValue::from(self.schema_name.as_str()),
+                            ],
+                        )
+                        .await?;
+                }
+                ConnectionInfo::Mysql(_) => {
+                    let sql_str = format!(r#"DROP SCHEMA `{}`;"#, self.schema_name);
+                    debug!("{}", sql_str);
+                    self.connection.query_raw(&sql_str, &[]).await?;
+                }
+            };
+
+            Ok(())
+        })
+        .await
     }
 
-    async fn by_name(&self, name: &str) -> Option<Migration> {
-        let conditions = NAME_COLUMN.equals(name);
-        let query = Select::from_table(self.table())
-            .so_that(conditions)
-            .order_by(REVISION_COLUMN.descend());
+    async fn last(&self) -> Result<Option<Migration>, ConnectorError> {
+        self.catch(async {
+            let conditions = STATUS_COLUMN.equals(MigrationStatus::MigrationSuccess.code());
+            let query = Select::from_table(self.table())
+                .so_that(conditions)
+                .order_by(REVISION_COLUMN.descend());
 
-        let result_set = self.connection.query(query.into()).await.unwrap();
-        parse_rows_new(result_set).into_iter().next()
+            let result_set = self.connection.query(query.into()).await?;
+            Ok(parse_rows_new(result_set).into_iter().next())
+        })
+        .await
     }
 
-    async fn create(&self, migration: Migration) -> Migration {
+    async fn load_all(&self) -> Result<Vec<Migration>, ConnectorError> {
+        self.catch(async {
+            let query = Select::from_table(self.table()).order_by(REVISION_COLUMN.ascend());
+
+            let result_set = self.connection.query(query.into()).await?;
+            Ok(parse_rows_new(result_set))
+        })
+        .await
+    }
+
+    async fn by_name(&self, name: &str) -> Result<Option<Migration>, ConnectorError> {
+        self.catch(async {
+            let conditions = NAME_COLUMN.equals(name);
+            let query = Select::from_table(self.table())
+                .so_that(conditions)
+                .order_by(REVISION_COLUMN.descend());
+
+            let result_set = self.connection.query(query.into()).await?;
+            Ok(parse_rows_new(result_set).into_iter().next())
+        })
+        .await
+    }
+
+    async fn create(&self, migration: Migration) -> Result<Migration, ConnectorError> {
         let mut cloned = migration.clone();
         let model_steps_json = serde_json::to_string(&migration.datamodel_steps).unwrap();
         let database_migration_json = serde_json::to_string(&migration.database_migration).unwrap();
         let errors_json = serde_json::to_string(&migration.errors).unwrap();
-        let serialized_datamodel = datamodel::render_datamodel_to_string(&migration.datamodel).unwrap();
 
         let insert = Insert::single_into(self.table())
+            .value(DATAMODEL_COLUMN, migration.datamodel_string)
             .value(NAME_COLUMN, migration.name)
-            .value(DATAMODEL_COLUMN, serialized_datamodel)
             .value(STATUS_COLUMN, migration.status.code())
             .value(APPLIED_COLUMN, migration.applied)
             .value(ROLLED_BACK_COLUMN, migration.rolled_back)
@@ -141,29 +170,35 @@ impl MigrationPersistence for SqlMigrationPersistence {
                 });
             }
         }
-        cloned
+
+        Ok(cloned)
     }
 
-    async fn update(&self, params: &MigrationUpdateParams) {
-        let finished_at_value = match params.finished_at {
-            Some(x) => self.convert_datetime(x),
-            None => ParameterizedValue::Null,
-        };
-        let errors_json = serde_json::to_string(&params.errors).unwrap();
-        let query = Update::table(self.table())
-            .set(NAME_COLUMN, params.new_name.clone())
-            .set(STATUS_COLUMN, params.status.code())
-            .set(APPLIED_COLUMN, params.applied)
-            .set(ROLLED_BACK_COLUMN, params.rolled_back)
-            .set(ERRORS_COLUMN, errors_json)
-            .set(FINISHED_AT_COLUMN, finished_at_value)
-            .so_that(
-                NAME_COLUMN
-                    .equals(params.name.clone())
-                    .and(REVISION_COLUMN.equals(params.revision)),
-            );
+    async fn update(&self, params: &MigrationUpdateParams) -> Result<(), ConnectorError> {
+        self.catch(async {
+            let finished_at_value = match params.finished_at {
+                Some(x) => self.convert_datetime(x),
+                None => ParameterizedValue::Null,
+            };
+            let errors_json = serde_json::to_string(&params.errors).unwrap();
+            let query = Update::table(self.table())
+                .set(NAME_COLUMN, params.new_name.clone())
+                .set(STATUS_COLUMN, params.status.code())
+                .set(APPLIED_COLUMN, params.applied)
+                .set(ROLLED_BACK_COLUMN, params.rolled_back)
+                .set(ERRORS_COLUMN, errors_json)
+                .set(FINISHED_AT_COLUMN, finished_at_value)
+                .so_that(
+                    NAME_COLUMN
+                        .equals(params.name.clone())
+                        .and(REVISION_COLUMN.equals(params.revision)),
+                );
 
-        self.connection.query(query.into()).await.unwrap();
+            self.connection.query(query.into()).await?;
+
+            Ok(())
+        })
+        .await
     }
 }
 
@@ -251,7 +286,6 @@ fn parse_rows_new(result_set: ResultSet) -> Vec<Migration> {
 
             let datamodel_steps =
                 serde_json::from_str(&datamodel_steps_json).expect("Error parsing the migration steps");
-            let datamodel = datamodel::parse_datamodel(&datamodel_string).unwrap();
 
             let database_migration_json =
                 serde_json::from_str(&database_migration_string).expect("Error parsing the database migration steps");
@@ -261,7 +295,6 @@ fn parse_rows_new(result_set: ResultSet) -> Vec<Migration> {
                 name: row[NAME_COLUMN].to_string().unwrap(),
                 revision: row[REVISION_COLUMN].as_i64().unwrap() as usize,
                 datamodel_string,
-                datamodel,
                 status: MigrationStatus::from_str(row[STATUS_COLUMN].to_string().unwrap()),
                 applied: row[APPLIED_COLUMN].as_i64().unwrap() as usize,
                 rolled_back: row[ROLLED_BACK_COLUMN].as_i64().unwrap() as usize,

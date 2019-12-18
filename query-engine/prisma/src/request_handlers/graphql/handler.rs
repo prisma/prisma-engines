@@ -1,5 +1,5 @@
 use super::protocol_adapter::GraphQLProtocolAdapter;
-use crate::{context::PrismaContext, serializers::json, PrismaRequest, PrismaResult, RequestHandler};
+use crate::{context::PrismaContext, PrismaRequest, PrismaResult, RequestHandler};
 use async_trait::async_trait;
 use graphql_parser as gql;
 use query_core::{response_ir, CoreError};
@@ -21,29 +21,40 @@ pub struct GraphQlRequestHandler;
 impl RequestHandler for GraphQlRequestHandler {
     type Body = GraphQlBody;
 
-    async fn handle<S>(&self, req: S, ctx: &PrismaContext) -> serde_json::Value
+    async fn handle<S>(&self, req: S, ctx: &PrismaContext) -> response_ir::Responses
     where
         S: Into<PrismaRequest<Self::Body>> + Send + Sync + 'static,
     {
-        use std::panic::AssertUnwindSafe;
         use futures::FutureExt;
-        use user_facing_errors::{UnknownError, Error};
+        use std::panic::AssertUnwindSafe;
+        use user_facing_errors::{Error, UnknownError};
 
-        let responses = match AssertUnwindSafe(handle_graphql_query(req.into(), ctx)).catch_unwind().await {
+        match AssertUnwindSafe(handle_graphql_query(req.into(), ctx))
+            .catch_unwind()
+            .await
+        {
             Ok(Ok(responses)) => responses,
-            Ok(Err(err)) => vec![err.into()],
+            Ok(Err(err)) => {
+                let mut responses = response_ir::Responses::default();
+                responses.insert_error(err);
+                responses
+            },
             // panicked
-            Err(err) => vec![response_ir::Response::Error(response_ir::ResponseError::from(Error::Unknown(UnknownError::from_panic_payload(&err))))],
-        };
+            Err(err) => {
+                let mut responses = response_ir::Responses::default();
+                let error = Error::Unknown(UnknownError::from_panic_payload(&err));
 
-        json::serialize(responses)
+                responses.insert_error(error);
+                responses
+            },
+        }
     }
 }
 
 async fn handle_graphql_query(
     req: PrismaRequest<GraphQlBody>,
     ctx: &PrismaContext,
-) -> PrismaResult<Vec<response_ir::Response>> {
+) -> PrismaResult<response_ir::Responses> {
     debug!("Incoming GQL query: {:?}", &req.body.query);
 
     let gql_doc = gql::parse_query(&req.body.query)?;

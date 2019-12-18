@@ -25,7 +25,7 @@ impl<'a> MigrationCommand for ApplyMigrationCommand<'a> {
         let connector = engine.connector();
         let migration_persistence = connector.migration_persistence();
 
-        match migration_persistence.last().await {
+        match migration_persistence.last().await? {
             Some(ref last_migration) if last_migration.is_watch_migration() && !cmd.input.is_watch_migration() => {
                 cmd.handle_transition_out_of_watch_mode(&engine).await
             }
@@ -46,18 +46,20 @@ impl<'a> ApplyMigrationCommand<'a> {
         let connector = engine.connector();
         let migration_persistence = connector.migration_persistence();
 
-        let current_datamodel = migration_persistence.current_datamodel().await;
+        let current_datamodel_ast = migration_persistence.current_datamodel_ast().await?;
+        let current_datamodel = datamodel::lift_ast(&current_datamodel_ast)?;
+
         let last_non_watch_datamodel = migration_persistence
             .last_non_watch_migration()
-            .await
+            .await?
             .map(|m| m.datamodel_ast())
             .unwrap_or_else(SchemaAst::empty);
         let next_datamodel_ast = engine
             .datamodel_calculator()
             .infer(&last_non_watch_datamodel, self.input.steps.as_slice())?;
-        let next_datamodel = datamodel::lift_ast(&next_datamodel_ast)?;
 
-        self.handle_migration(&engine, current_datamodel, next_datamodel).await
+        self.handle_migration(&engine, current_datamodel, next_datamodel_ast)
+            .await
     }
 
     async fn handle_normal_migration<C, D>(
@@ -70,28 +72,29 @@ impl<'a> ApplyMigrationCommand<'a> {
     {
         let connector = engine.connector();
         let migration_persistence = connector.migration_persistence();
-        let current_datamodel = migration_persistence.current_datamodel().await;
-        let current_datamodel_ast = migration_persistence.current_datamodel_ast().await;
+        let current_datamodel_ast = migration_persistence.current_datamodel_ast().await?;
+        let current_datamodel = datamodel::lift_ast(&current_datamodel_ast)?;
 
         let next_datamodel_ast = engine
             .datamodel_calculator()
             .infer(&current_datamodel_ast, self.input.steps.as_slice())?;
-        let next_datamodel = datamodel::lift_ast(&next_datamodel_ast)?;
 
-        self.handle_migration(&engine, current_datamodel, next_datamodel).await
+        self.handle_migration(&engine, current_datamodel, next_datamodel_ast)
+            .await
     }
 
     async fn handle_migration<C, D>(
         &self,
         engine: &MigrationEngine<C, D>,
         current_datamodel: Datamodel,
-        next_datamodel: Datamodel,
+        next_schema_ast: SchemaAst,
     ) -> CommandResult<MigrationStepsResultOutput>
     where
         C: MigrationConnector<DatabaseMigration = D>,
         D: DatabaseMigrationMarker + Send + Sync + 'static,
     {
         let connector = engine.connector();
+        let next_datamodel = datamodel::lift_ast(&next_schema_ast)?;
         let migration_persistence = connector.migration_persistence();
 
         let database_migration = connector
@@ -108,7 +111,7 @@ impl<'a> ApplyMigrationCommand<'a> {
         let mut migration = Migration::new(self.input.migration_id.clone());
         migration.datamodel_steps = self.input.steps.clone();
         migration.database_migration = database_migration_json;
-        migration.datamodel = next_datamodel.clone();
+        migration.datamodel_string = datamodel::render_schema_ast_to_string(&next_schema_ast)?;
 
         let diagnostics = connector
             .destructive_changes_checker()
@@ -119,7 +122,7 @@ impl<'a> ApplyMigrationCommand<'a> {
             // We have no warnings, or the force flag is passed.
             (false, _) | (true, true) => {
                 tracing::debug!("Applying the migration");
-                let saved_migration = migration_persistence.create(migration).await;
+                let saved_migration = migration_persistence.create(migration).await?;
 
                 connector
                     .migration_applier()
@@ -129,7 +132,7 @@ impl<'a> ApplyMigrationCommand<'a> {
                 tracing::debug!("Migration applied");
             }
             // We have warnings, but no force flag was passed.
-            (true, false) => tracing::debug!("The force flag was not passed, the migration will not be applied."),
+            (true, false) => tracing::info!("The force flag was not passed, the migration will not be applied."),
         }
 
         let DestructiveChangeDiagnostics { warnings, errors } = diagnostics;

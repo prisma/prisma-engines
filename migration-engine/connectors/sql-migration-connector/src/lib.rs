@@ -24,8 +24,9 @@ use sql_database_step_applier::*;
 use sql_destructive_changes_checker::*;
 use sql_migration_persistence::*;
 use sql_schema_describer::SqlSchemaDescriberBackend;
-use std::{fs, path::PathBuf, sync::Arc};
+use std::{fs, path::PathBuf, sync::Arc, time::Duration};
 
+const CONNECTION_TIMEOUT: Duration = Duration::from_secs(10);
 pub type Result<T> = std::result::Result<T, SqlError>;
 
 pub struct SqlMigrationConnector {
@@ -36,7 +37,7 @@ pub struct SqlMigrationConnector {
     pub database_migration_inferrer: Arc<dyn DatabaseMigrationInferrer<SqlMigration>>,
     pub database_migration_step_applier: Arc<dyn DatabaseMigrationStepApplier<SqlMigration>>,
     pub destructive_changes_checker: Arc<dyn DestructiveChangesChecker<SqlMigration>>,
-    pub database_introspector: Arc<dyn SqlSchemaDescriberBackend + Send + Sync + 'static>,
+    pub database_describer: Arc<dyn SqlSchemaDescriberBackend + Send + Sync + 'static>,
 }
 
 impl SqlMigrationConnector {
@@ -44,22 +45,28 @@ impl SqlMigrationConnector {
         let connection_info =
             ConnectionInfo::from_url(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
 
-        let connection = Quaint::new(database_str)
-            .await
-            .map_err(SqlError::from)
-            .map_err(|err| err.into_connector_error(&connection_info))?;
+        let connection_fut = async {
+            let connection = Quaint::new(database_str)
+                .await
+                .map_err(SqlError::from)
+                .map_err(|err| err.into_connector_error(&connection_info))?;
 
-        Self::create_connector(connection).await
-    }
+            // async connections can be lazy, so we issue a simple query to fail early if the database
+            // is not reachable.
+            connection
+                .query_raw("SELECT 1", &[])
+                .await
+                .map_err(SqlError::from)
+                .map_err(|err| err.into_connector_error(&connection.connection_info()))?;
 
-    async fn create_connector(connection: Quaint) -> std::result::Result<Self, ConnectorError> {
-        // async connections can be lazy, so we issue a simple query to fail early if the database
-        // is not reachable.
-        connection
-            .query_raw("SELECT 1", &[])
+            Ok(connection)
+        };
+
+        let connection = tokio::time::timeout(CONNECTION_TIMEOUT, connection_fut)
             .await
-            .map_err(SqlError::from)
-            .map_err(|err| err.into_connector_error(&connection.connection_info()))?;
+            .map_err(|_elapsed| {
+                SqlError::from(quaint::error::Error::ConnectTimeout).into_connector_error(&connection_info)
+            })??;
 
         let schema_name = connection.connection_info().schema_name().to_owned();
 
@@ -68,7 +75,7 @@ impl SqlMigrationConnector {
 
         let conn = Arc::new(connection) as Arc<dyn Queryable + Send + Sync>;
 
-        let inspector: Arc<dyn SqlSchemaDescriberBackend + Send + Sync + 'static> = match sql_family {
+        let describer: Arc<dyn SqlSchemaDescriberBackend + Send + Sync + 'static> = match sql_family {
             SqlFamily::Mysql => Arc::new(sql_schema_describer::mysql::SqlSchemaDescriber::new(Arc::clone(&conn))),
             SqlFamily::Postgres => Arc::new(sql_schema_describer::postgres::SqlSchemaDescriber::new(Arc::clone(
                 &conn,
@@ -84,7 +91,7 @@ impl SqlMigrationConnector {
 
         let database_migration_inferrer = Arc::new(SqlDatabaseMigrationInferrer {
             connection_info: connection_info.clone(),
-            introspector: Arc::clone(&inspector),
+            describer: Arc::clone(&describer),
             schema_name: schema_name.to_string(),
         });
 
@@ -108,7 +115,7 @@ impl SqlMigrationConnector {
             database_migration_inferrer,
             database_migration_step_applier,
             destructive_changes_checker,
-            database_introspector: Arc::clone(&inspector),
+            database_describer: Arc::clone(&describer),
         })
     }
 
@@ -161,8 +168,6 @@ impl SqlMigrationConnector {
             }
         }
 
-        self.migration_persistence.init().await;
-
         Ok(())
     }
 }
@@ -176,19 +181,19 @@ impl MigrationConnector for SqlMigrationConnector {
     }
 
     async fn create_database(&self, db_name: &str) -> ConnectorResult<()> {
-        self.create_database_impl(db_name)
-            .await
-            .map_err(|sql_error| sql_error.into_connector_error(&self.connection_info))
+        catch(&self.connection_info, self.create_database_impl(db_name)).await
     }
 
     async fn initialize(&self) -> ConnectorResult<()> {
-        self.initialize_impl()
-            .await
-            .map_err(|sql_error| sql_error.into_connector_error(&self.connection_info))
+        catch(&self.connection_info, self.initialize_impl()).await?;
+
+        self.migration_persistence().init().await?;
+
+        Ok(())
     }
 
     async fn reset(&self) -> ConnectorResult<()> {
-        self.migration_persistence.reset().await;
+        self.migration_persistence().reset().await?;
         Ok(())
     }
 
@@ -210,5 +215,15 @@ impl MigrationConnector for SqlMigrationConnector {
 
     fn deserialize_database_migration(&self, json: serde_json::Value) -> SqlMigration {
         serde_json::from_value(json).expect("Deserializing the database migration failed.")
+    }
+}
+
+pub(crate) async fn catch<O>(
+    connection_info: &ConnectionInfo,
+    fut: impl std::future::Future<Output = std::result::Result<O, SqlError>>,
+) -> std::result::Result<O, migration_connector::ConnectorError> {
+    match fut.await {
+        Ok(o) => Ok(o),
+        Err(sql_error) => Err(sql_error.into_connector_error(connection_info)),
     }
 }

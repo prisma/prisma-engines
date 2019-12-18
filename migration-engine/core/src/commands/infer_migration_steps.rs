@@ -1,11 +1,13 @@
+//! The InferMigrationSteps RPC method.
+
 use super::MigrationStepsResultOutput;
 use crate::commands::command::*;
 use crate::migration_engine::MigrationEngine;
 use crate::*;
 use datamodel::ast::{parser::parse, SchemaAst};
-use tracing::debug;
 use migration_connector::*;
 use serde::Deserialize;
+use tracing::debug;
 
 pub struct InferMigrationStepsCommand<'a> {
     input: &'a InferMigrationStepsInput,
@@ -22,13 +24,13 @@ impl<'a> MigrationCommand for InferMigrationStepsCommand<'a> {
         D: DatabaseMigrationMarker + Sync + Send + 'static,
     {
         let cmd = InferMigrationStepsCommand { input };
-        debug!("{:?}", cmd.input);
+        debug!(?cmd.input);
 
         let connector = engine.connector();
         let migration_persistence = connector.migration_persistence();
         let database_migration_inferrer = connector.database_migration_inferrer();
 
-        let current_datamodel_ast = migration_persistence.current_datamodel_ast().await;
+        let current_datamodel_ast = migration_persistence.current_datamodel_ast().await?;
         let assumed_datamodel_ast = engine
             .datamodel_calculator()
             .infer(&current_datamodel_ast, cmd.input.assume_to_be_applied.as_slice())?;
@@ -57,13 +59,13 @@ impl<'a> MigrationCommand for InferMigrationStepsCommand<'a> {
 
             (model_migration_steps, database_steps)
         } else {
-            let last_non_watch_applied_migration = migration_persistence.last_non_watch_applied_migration().await;
+            let last_non_watch_applied_migration = migration_persistence.last_non_watch_applied_migration().await?;
             let last_non_watch_datamodel_ast = last_non_watch_applied_migration
                 .as_ref()
                 .map(|m| m.datamodel_ast())
                 .unwrap_or_else(SchemaAst::empty);
             let last_non_watch_datamodel = last_non_watch_applied_migration
-                .map(|m| m.datamodel)
+                .map(|m| m.parse_datamodel())
                 .unwrap_or_else(Datamodel::empty);
             let datamodel_steps = engine
                 .datamodel_migration_steps_inferrer()
@@ -80,6 +82,8 @@ impl<'a> MigrationCommand for InferMigrationStepsCommand<'a> {
 
             (datamodel_steps, database_steps)
         };
+
+        debug!(?returned_datamodel_steps);
 
         Ok(MigrationStepsResultOutput {
             datamodel: datamodel::render_datamodel_to_string(&next_datamodel).unwrap(),

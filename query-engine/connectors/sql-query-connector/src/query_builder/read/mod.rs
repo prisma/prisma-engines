@@ -67,40 +67,20 @@ impl SelectDefinition for QueryArguments {
     }
 }
 
-pub fn get_records<T>(model: &ModelRef, selected_fields: &SelectedFields, query: T) -> Select<'static>
+pub fn get_records<T>(model: &ModelRef, columns: impl Iterator<Item=Column<'static>>, query: T) -> Select<'static>
 where
     T: SelectDefinition,
 {
-    selected_fields
-        .columns()
-        .into_iter()
+    columns
         .fold(query.into_select(model), |acc, col| acc.column(col))
-}
-
-pub fn get_scalar_list_values_by_record_ids(
-    list_field: &ScalarFieldRef,
-    record_ids: Vec<GraphqlId>,
-) -> Select<'static> {
-    let table = list_field.scalar_list_table().table();
-
-    // I vant to saak your blaad... - Vlad the Impaler
-    let vhere = "nodeId".in_selection(record_ids);
-
-    Select::from_table(table)
-        .column("nodeId")
-        .column("value")
-        .so_that(vhere)
-        .order_by("nodeId".ascend())
-        .order_by("position".ascend())
 }
 
 pub fn count_by_model(model: &ModelRef, query_arguments: QueryArguments) -> Select<'static> {
     let id_field = model.fields().id();
 
-    let mut selected_fields = SelectedFields::default();
-    selected_fields.add_scalar(id_field.clone());
+    let selected_fields = vec![id_field.as_column()];
 
-    let base_query = get_records(model, &selected_fields, query_arguments);
+    let base_query = get_records(model, selected_fields.into_iter(), query_arguments);
     let table = Table::from(base_query).alias("sub");
     let column = Column::from(("sub", id_field.db_name().to_string()));
 

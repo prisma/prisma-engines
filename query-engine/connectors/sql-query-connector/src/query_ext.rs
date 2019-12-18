@@ -1,8 +1,6 @@
 use crate::{error::*, AliasedCondition, RawQuery, SqlRow, ToSqlRow};
 use async_trait::async_trait;
-use connector_interface::{
-    filter::{Filter},
-};
+use connector_interface::filter::Filter;
 use prisma_models::*;
 use quaint::{
     ast::*,
@@ -10,6 +8,7 @@ use quaint::{
     pooled::PooledConnection,
 };
 use serde_json::{Map, Number, Value};
+use datamodel::FieldArity;
 use std::convert::TryFrom;
 
 impl<'t> QueryExt for connector::Transaction<'t> {}
@@ -19,7 +18,7 @@ impl QueryExt for PooledConnection {}
 /// Basically represents a connection wrapper?
 #[async_trait]
 pub trait QueryExt: Queryable + Send + Sync {
-    async fn filter(&self, q: Query<'_>, idents: &[TypeIdentifier]) -> crate::Result<Vec<SqlRow>> {
+    async fn filter(&self, q: Query<'_>, idents: &[(TypeIdentifier, FieldArity)]) -> crate::Result<Vec<SqlRow>> {
         let result_set = self.query(q).await?;
         let mut sql_rows = Vec::new();
 
@@ -55,7 +54,7 @@ pub trait QueryExt: Queryable + Send + Sync {
     }
 
     /// Select one row from the database.
-    async fn find(&self, q: Select<'_>, idents: &[TypeIdentifier]) -> crate::Result<SqlRow> {
+    async fn find(&self, q: Select<'_>, idents: &[(TypeIdentifier, FieldArity)]) -> crate::Result<SqlRow> {
         self.filter(q.limit(1).into(), idents)
             .await?
             .into_iter()
@@ -67,7 +66,7 @@ pub trait QueryExt: Queryable + Send + Sync {
     async fn find_int(&self, q: Select<'_>) -> crate::Result<i64> {
         // UNWRAP: A dataset will always have at least one column, even if it contains no data.
         let id = self
-            .find(q, &[TypeIdentifier::Int])
+            .find(q, &[(TypeIdentifier::Int, FieldArity::Required)])
             .await?
             .values
             .into_iter()
@@ -87,7 +86,7 @@ pub trait QueryExt: Queryable + Send + Sync {
     }
 
     async fn select_ids(&self, select: Select<'_>) -> crate::Result<Vec<GraphqlId>> {
-        let mut rows = self.filter(select.into(), &[TypeIdentifier::GraphQLID]).await?;
+        let mut rows = self.filter(select.into(), &[(TypeIdentifier::GraphQLID, FieldArity::Required)]).await?;
         let mut result = Vec::new();
 
         for mut row in rows.drain(0..) {

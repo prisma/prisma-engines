@@ -2,22 +2,21 @@ use barrel::{types, Migration};
 use pretty_assertions::assert_eq;
 use sql_schema_describer::*;
 
-mod common;
 mod mysql;
 
-use crate::common::*;
 use crate::mysql::*;
 
 #[tokio::test]
 async fn all_mysql_column_types_must_work() {
-    setup();
+    let db_name = "all_mysql_column_types_must_work";
 
-    let mut migration = Migration::new().schema(SCHEMA);
+    let mut migration = Migration::new().schema(db_name);
     migration.create_table("User", move |t| {
         t.add_column("primary_col", types::primary());
         t.add_column("int_col", types::custom("int"));
         t.add_column("smallint_col", types::custom("smallint"));
-        t.add_column("tinyint_col", types::custom("tinyint"));
+        t.add_column("tinyint4_col", types::custom("tinyint(4)"));
+        t.add_column("tinyint1_col", types::custom("tinyint(1)"));
         t.add_column("mediumint_col", types::custom("mediumint"));
         t.add_column("bigint_col", types::custom("bigint"));
         t.add_column("decimal_col", types::custom("decimal"));
@@ -55,8 +54,8 @@ async fn all_mysql_column_types_must_work() {
     });
 
     let full_sql = migration.make::<barrel::backend::MySql>();
-    let inspector = get_mysql_describer(&full_sql).await;
-    let result = inspector.describe(&SCHEMA.to_string()).await.expect("describing");
+    let inspector = get_mysql_describer_for_schema(&full_sql, db_name).await;
+    let result = inspector.describe(db_name).await.expect("describing");
     let mut table = result.get_table("User").expect("couldn't get User table").to_owned();
     // Ensure columns are sorted as expected when comparing
     table.columns.sort_unstable_by_key(|c| c.name.to_owned());
@@ -66,8 +65,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "int".to_string(),
                 family: ColumnTypeFamily::Int,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: true,
         },
@@ -76,8 +76,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "int".to_string(),
                 family: ColumnTypeFamily::Int,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -86,18 +87,30 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "smallint".to_string(),
                 family: ColumnTypeFamily::Int,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
         Column {
-            name: "tinyint_col".to_string(),
+            name: "tinyint4_col".to_string(),
+            tpe: ColumnType {
+                raw: "tinyint".to_string(),
+                family: ColumnTypeFamily::Int,
+                arity: ColumnArity::Required,
+            },
+            default: None,
+            auto_increment: false,
+        },
+        Column {
+            name: "tinyint1_col".to_string(),
             tpe: ColumnType {
                 raw: "tinyint".to_string(),
                 family: ColumnTypeFamily::Boolean,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -106,8 +119,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "mediumint".to_string(),
                 family: ColumnTypeFamily::Int,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -116,8 +130,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "bigint".to_string(),
                 family: ColumnTypeFamily::Int,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -126,8 +141,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "decimal".to_string(),
                 family: ColumnTypeFamily::Float,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -136,8 +152,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "decimal".to_string(),
                 family: ColumnTypeFamily::Float,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -146,8 +163,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "float".to_string(),
                 family: ColumnTypeFamily::Float,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -156,8 +174,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "double".to_string(),
                 family: ColumnTypeFamily::Float,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -166,8 +185,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "date".to_string(),
                 family: ColumnTypeFamily::DateTime,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -176,8 +196,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "time".to_string(),
                 family: ColumnTypeFamily::DateTime,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -186,8 +207,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "datetime".to_string(),
                 family: ColumnTypeFamily::DateTime,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -196,8 +218,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "timestamp".to_string(),
                 family: ColumnTypeFamily::DateTime,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: Some("CURRENT_TIMESTAMP".to_string()),
             auto_increment: false,
         },
@@ -206,8 +229,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "year".to_string(),
                 family: ColumnTypeFamily::DateTime,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -216,8 +240,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "char".to_string(),
                 family: ColumnTypeFamily::String,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -226,8 +251,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "varchar".to_string(),
                 family: ColumnTypeFamily::String,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -236,8 +262,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "text".to_string(),
                 family: ColumnTypeFamily::String,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -246,8 +273,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "tinytext".to_string(),
                 family: ColumnTypeFamily::String,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -256,8 +284,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "mediumtext".to_string(),
                 family: ColumnTypeFamily::String,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -266,8 +295,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "longtext".to_string(),
                 family: ColumnTypeFamily::String,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -276,8 +306,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "enum".to_string(),
                 family: ColumnTypeFamily::String,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -286,8 +317,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "set".to_string(),
                 family: ColumnTypeFamily::String,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -296,8 +328,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "binary".to_string(),
                 family: ColumnTypeFamily::Binary,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -306,8 +339,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "varbinary".to_string(),
                 family: ColumnTypeFamily::Binary,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -316,8 +350,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "blob".to_string(),
                 family: ColumnTypeFamily::Binary,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -326,8 +361,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "tinyblob".to_string(),
                 family: ColumnTypeFamily::Binary,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -336,8 +372,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "mediumblob".to_string(),
                 family: ColumnTypeFamily::Binary,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -346,8 +383,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "longblob".to_string(),
                 family: ColumnTypeFamily::Binary,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -356,8 +394,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "geometry".to_string(),
                 family: ColumnTypeFamily::Geometric,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -366,8 +405,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "point".to_string(),
                 family: ColumnTypeFamily::Geometric,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -376,8 +416,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "linestring".to_string(),
                 family: ColumnTypeFamily::Geometric,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -386,8 +427,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "polygon".to_string(),
                 family: ColumnTypeFamily::Geometric,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -396,8 +438,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "multipoint".to_string(),
                 family: ColumnTypeFamily::Geometric,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -406,8 +449,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "multilinestring".to_string(),
                 family: ColumnTypeFamily::Geometric,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -416,8 +460,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "multipolygon".to_string(),
                 family: ColumnTypeFamily::Geometric,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -426,8 +471,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "geometrycollection".to_string(),
                 family: ColumnTypeFamily::Geometric,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -436,8 +482,9 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 raw: "json".to_string(),
                 family: ColumnTypeFamily::Json,
+                arity: ColumnArity::Required,
             },
-            arity: ColumnArity::Required,
+
             default: None,
             auto_increment: false,
         },
@@ -461,7 +508,7 @@ async fn all_mysql_column_types_must_work() {
 
 #[tokio::test]
 async fn mysql_foreign_key_on_delete_must_be_handled() {
-    setup();
+    let db_name = "mysql_foreign_key_on_delete_must_be_handled";
 
     // NB: We don't test the SET DEFAULT variety since it isn't supported on InnoDB and will
     // just cause an error
@@ -474,11 +521,11 @@ async fn mysql_foreign_key_on_delete_must_be_handled() {
             city_restrict INTEGER, FOREIGN KEY(city_restrict) REFERENCES City (id) ON DELETE RESTRICT,
             city_set_null INTEGER, FOREIGN KEY(city_set_null) REFERENCES City (id) ON DELETE SET NULL
         )",
-        SCHEMA
+        db_name
     );
-    let inspector = get_mysql_describer(&sql).await;
+    let inspector = get_mysql_describer_for_schema(&sql, db_name).await;
 
-    let schema = inspector.describe(SCHEMA).await.expect("describing");
+    let schema = inspector.describe(db_name).await.expect("describing");
     let mut table = schema.get_table("User").expect("get User table").to_owned();
     table.foreign_keys.sort_unstable_by_key(|fk| fk.columns.clone());
 
@@ -492,8 +539,8 @@ async fn mysql_foreign_key_on_delete_must_be_handled() {
                     tpe: ColumnType {
                         raw: "int".to_string(),
                         family: ColumnTypeFamily::Int,
+                        arity: ColumnArity::Nullable,
                     },
-                    arity: ColumnArity::Nullable,
                     default: None,
                     auto_increment: false,
                 },
@@ -502,8 +549,8 @@ async fn mysql_foreign_key_on_delete_must_be_handled() {
                     tpe: ColumnType {
                         raw: "int".to_string(),
                         family: ColumnTypeFamily::Int,
+                        arity: ColumnArity::Nullable,
                     },
-                    arity: ColumnArity::Nullable,
                     default: None,
                     auto_increment: false,
                 },
@@ -512,8 +559,8 @@ async fn mysql_foreign_key_on_delete_must_be_handled() {
                     tpe: ColumnType {
                         raw: "int".to_string(),
                         family: ColumnTypeFamily::Int,
+                        arity: ColumnArity::Nullable,
                     },
-                    arity: ColumnArity::Nullable,
                     default: None,
                     auto_increment: false,
                 },
@@ -522,8 +569,8 @@ async fn mysql_foreign_key_on_delete_must_be_handled() {
                     tpe: ColumnType {
                         raw: "int".to_string(),
                         family: ColumnTypeFamily::Int,
+                        arity: ColumnArity::Nullable,
                     },
-                    arity: ColumnArity::Nullable,
                     default: None,
                     auto_increment: false,
                 },
@@ -532,8 +579,9 @@ async fn mysql_foreign_key_on_delete_must_be_handled() {
                     tpe: ColumnType {
                         raw: "int".to_string(),
                         family: ColumnTypeFamily::Int,
+                        arity: ColumnArity::Required,
                     },
-                    arity: ColumnArity::Required,
+
                     default: None,
                     auto_increment: true,
                 },
@@ -579,9 +627,9 @@ async fn mysql_foreign_key_on_delete_must_be_handled() {
 
 #[tokio::test]
 async fn mysql_multi_field_indexes_must_be_inferred() {
-    setup();
+    let db_name = "mysql_multi_field_indexes_must_be_inferred";
 
-    let mut migration = Migration::new().schema(SCHEMA);
+    let mut migration = Migration::new().schema(db_name);
     migration.create_table("Employee", move |t| {
         t.add_column("id", types::primary());
         t.add_column("age", types::integer());
@@ -590,8 +638,8 @@ async fn mysql_multi_field_indexes_must_be_inferred() {
     });
 
     let full_sql = migration.make::<barrel::backend::MySql>();
-    let inspector = get_mysql_describer(&full_sql).await;
-    let result = inspector.describe(&SCHEMA.to_string()).await.expect("describing");
+    let inspector = get_mysql_describer_for_schema(&full_sql, db_name).await;
+    let result = inspector.describe(db_name).await.expect("describing");
     let table = result.get_table("Employee").expect("couldn't get Employee table");
 
     assert_eq!(
@@ -606,9 +654,9 @@ async fn mysql_multi_field_indexes_must_be_inferred() {
 
 #[tokio::test]
 async fn mysql_join_table_unique_indexes_must_be_inferred() {
-    setup();
+    let db_name = "mysql_join_table_unique_indexes_must_be_inferred";
 
-    let mut migration = Migration::new().schema(SCHEMA);
+    let mut migration = Migration::new().schema(db_name);
 
     migration.create_table("Cat", move |t| {
         t.add_column("id", types::primary());
@@ -628,8 +676,8 @@ async fn mysql_join_table_unique_indexes_must_be_inferred() {
     });
 
     let full_sql = migration.make::<barrel::backend::MySql>();
-    let inspector = get_mysql_describer(&full_sql).await;
-    let result = inspector.describe(&SCHEMA.to_string()).await.expect("describing");
+    let inspector = get_mysql_describer_for_schema(&full_sql, db_name).await;
+    let result = inspector.describe(db_name).await.expect("describing");
     let table = result.get_table("CatToHuman").expect("couldn't get CatToHuman table");
 
     assert_eq!(
@@ -646,7 +694,7 @@ async fn mysql_join_table_unique_indexes_must_be_inferred() {
 // constraints, introspecting one database should not yield constraints from the other.
 #[tokio::test]
 async fn constraints_from_other_databases_should_not_be_introspected() {
-    setup();
+    let db_name = "constraints_from_other_databases_should_not_be_introspected";
 
     let mut other_migration = Migration::new().schema("other_schema");
 
@@ -682,7 +730,7 @@ async fn constraints_from_other_databases_should_not_be_introspected() {
 
     // Now the migration in the current database.
 
-    let mut migration = Migration::new().schema(SCHEMA);
+    let mut migration = Migration::new().schema(db_name);
 
     migration.create_table("User", |t| {
         t.add_column("id", types::primary());
@@ -694,8 +742,8 @@ async fn constraints_from_other_databases_should_not_be_introspected() {
     });
 
     let full_sql = migration.make::<barrel::backend::MySql>();
-    let inspector = get_mysql_describer_for_schema(&full_sql, SCHEMA).await;
-    let schema = inspector.describe(&SCHEMA.to_string()).await.expect("describing");
+    let inspector = get_mysql_describer_for_schema(&full_sql, db_name).await;
+    let schema = inspector.describe(db_name).await.expect("describing");
     let table = schema.table_bang("Post");
 
     let fks = &table.foreign_keys;

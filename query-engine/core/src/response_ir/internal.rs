@@ -3,13 +3,9 @@ use crate::{
     schema::{IntoArc, ObjectTypeStrongRef, OutputType, OutputTypeRef, ScalarType},
     CoreError, CoreResult, QueryResult, RecordSelection,
 };
-use connector::ScalarListValues;
 use indexmap::IndexMap;
-use prisma_models::{GraphqlId, PrismaValue};
-use rust_decimal::{
-    prelude::{FromPrimitive, ToPrimitive},
-    Decimal,
-};
+use prisma_models::{EnumType, EnumValue, GraphqlId, PrismaValue};
+use rust_decimal::prelude::ToPrimitive;
 use std::{borrow::Borrow, collections::HashMap, convert::TryFrom};
 
 /// A grouping of items to their parent record.
@@ -47,7 +43,7 @@ pub fn serialize_internal(
 
         QueryResult::Count(c) => {
             // Todo needs a real implementation
-            let mut map: IndexMap<String, Item> = IndexMap::new();
+            let mut map: IndexMap<String, Item> = IndexMap::with_capacity(1);
             let mut result = CheckedItemsWithParents::new();
 
             map.insert("count".into(), Item::Value(PrismaValue::Int(c as i64)));
@@ -140,9 +136,8 @@ fn serialize_record_selection(
 /// Returns a vector of serialized objects (as Item::Map), grouped into a map by parent, if present.
 fn serialize_objects(mut result: RecordSelection, typ: ObjectTypeStrongRef) -> CoreResult<UncheckedItemsWithParents> {
     // The way our query execution works, we only need to look at nested + lists if we hit an object.
-    // Move lists and nested out of result for separate processing.
-    let nested = std::mem::replace(&mut result.nested, vec![]);
-    let lists = std::mem::replace(&mut result.lists, vec![]);
+    // Move nested out of result for separate processing.
+    let nested = std::mem::replace(&mut result.nested, Vec::new());
 
     // { <nested field name> -> { parent ID -> items } }
     let mut nested_mapping: HashMap<String, CheckedItemsWithParents> = process_nested_results(nested, &typ)?;
@@ -150,41 +145,38 @@ fn serialize_objects(mut result: RecordSelection, typ: ObjectTypeStrongRef) -> C
     // We need the Arcs to solve the issue where we have multiple parents claiming the same data (we want to move the data out of the nested structure
     // to prevent expensive copying during serialization).
 
-    // { <list field name> -> { parent ID -> items } }
-    let mut list_mapping = process_scalar_lists(lists, &typ)?;
-
     // Finally, serialize the objects based on the selected fields.
-    let mut object_mapping = UncheckedItemsWithParents::new();
+    let mut object_mapping = UncheckedItemsWithParents::with_capacity(result.scalars.records.len());
     let scalar_field_names = result.scalars.field_names;
 
     // Write all fields, nested and list fields unordered into a map, afterwards order all into the final order.
     // If nothing is written to the object, write null instead.
-    for record in result.scalars.records {
+
+    for record in result.scalars.records.into_iter() {
         let record_id = Some(record.collect_id(&scalar_field_names, &result.id_field)?);
 
         if !object_mapping.contains_key(&record.parent_id) {
-            object_mapping.insert(record.parent_id.clone(), vec![]);
+            object_mapping.insert(record.parent_id.clone(), Vec::new());
         }
-
-        let mut object: HashMap<String, Item> = HashMap::new();
 
         // Write scalars, but skip objects and lists, which while they are in the selection, are handled separately.
         let values = record.values;
+        let mut object = HashMap::with_capacity(values.len());
+
         for (val, field_name) in values.into_iter().zip(scalar_field_names.iter()) {
             let field = typ.find_field(field_name).unwrap();
-            if !field.field_type.is_object() && !field.field_type.is_list() {
+
+            if !field.field_type.is_object() {
                 object.insert(field_name.to_owned(), serialize_scalar(val, &field.field_type)?);
             }
         }
 
-        // Write nested results & lists
+        // Write nested results
         write_nested_items(&record_id, &mut nested_mapping, &mut object, &typ);
-        write_nested_items(&record_id, &mut list_mapping, &mut object, &typ);
 
-        // Reorder into final shape.
-        let mut map = Map::new();
-        result.fields.iter().for_each(|field_name| {
-            map.insert(field_name.to_owned(), object.remove(field_name).unwrap());
+        let map = result.fields.iter().fold(Map::with_capacity(result.fields.len()), |mut acc, field_name| {
+            acc.insert(field_name.to_owned(), object.remove(field_name).unwrap());
+            acc
         });
 
         // TODO: Find out how to easily determine when a result is null.
@@ -221,10 +213,10 @@ fn write_nested_items(
             None => {
                 let field = enclosing_type.find_field(field_name).unwrap();
                 let default = match field.field_type.borrow() {
-                    OutputType::List(_) => Item::List(vec![]),
+                    OutputType::List(_) => Item::List(Vec::new()),
                     OutputType::Opt(inner) => {
                         if inner.is_list() {
-                            Item::List(vec![])
+                            Item::List(Vec::new())
                         } else {
                             Item::Value(PrismaValue::Null)
                         }
@@ -248,12 +240,12 @@ fn process_nested_results(
     enclosing_type: &ObjectTypeStrongRef,
 ) -> CoreResult<HashMap<String, CheckedItemsWithParents>> {
     // For each nested selected field we need to map the parents to their items.
-    let mut nested_mapping = HashMap::new();
+    let mut nested_mapping = HashMap::with_capacity(nested.len());
 
     // Parse and validate all nested objects with their respective output type.
     // Unwraps are safe due to query validation.
     for nested_result in nested {
-        // todo Workaroun, tb changed with flat reads.
+        // todo Workaround, tb changed with flat reads.
         if let QueryResult::RecordSelection(ref rs) = nested_result {
             let name = rs.name.clone();
             let field = enclosing_type.find_field(&name).unwrap();
@@ -266,49 +258,8 @@ fn process_nested_results(
     Ok(nested_mapping)
 }
 
-/// Processes scalar lists into a more ergonomic structure of { <list field name> -> { parent ID -> item (Item::Ref) } }
-fn process_scalar_lists(
-    lists: Vec<(String, Vec<ScalarListValues>)>,
-    enclosing_type: &ObjectTypeStrongRef,
-) -> CoreResult<HashMap<String, CheckedItemsWithParents>> {
-    // For each selected scalar list field we need to map the parents to their items.
-    let mut list_mapping: HashMap<String, CheckedItemsWithParents> = HashMap::new();
-    for list_result in lists {
-        let field = enclosing_type.find_field(&list_result.0).unwrap();
-
-        // Todo optional lists...?
-        let list_type = match field.field_type.borrow() {
-            OutputType::List(inner) => inner,
-            other => {
-                return Err(CoreError::SerializationError(format!(
-                    "Attempted to serialize scalar list '{}' with non-scalar-list compatible type '{:?}'",
-                    field.name.clone(),
-                    other
-                )))
-            }
-        };
-
-        list_mapping.insert(field.name.clone(), CheckedItemsWithParents::new());
-
-        for list_pair in list_result.1 {
-            let converted: Vec<Item> = list_pair
-                .values
-                .into_iter()
-                .map(|val| serialize_scalar(val, &list_type))
-                .collect::<CoreResult<Vec<_>>>()?;
-
-            list_mapping.get_mut(&field.name).unwrap().insert(
-                Some(list_pair.record_id),
-                Item::Ref(ItemRef::new(Item::List(converted))),
-            );
-        }
-    }
-
-    Ok(list_mapping)
-}
-
 fn serialize_scalar(value: PrismaValue, typ: &OutputTypeRef) -> CoreResult<Item> {
-    match (&value, typ.borrow()) {
+    match (&value, typ.as_ref()) {
         (PrismaValue::Null, OutputType::Opt(_)) => Ok(Item::Value(PrismaValue::Null)),
         (_, OutputType::Opt(inner)) => serialize_scalar(value, inner),
         (_, OutputType::Enum(et)) => match value {
@@ -320,66 +271,242 @@ fn serialize_scalar(value: PrismaValue, typ: &OutputTypeRef) -> CoreResult<Item>
                 ))),
             },
 
-            PrismaValue::Enum(ref ev) => match et.value_for(&ev.name) {
-                Some(_) => Ok(Item::Value(PrismaValue::Enum(ev.clone()))),
-                None => Err(CoreError::SerializationError(format!(
-                    "Enum value '{}' not found on enum '{}'",
-                    ev.as_string(),
-                    et.name
-                ))),
-            },
+            PrismaValue::Enum(ref ev) => convert_enum_to_item(&ev, et),
 
             val => Err(CoreError::SerializationError(format!(
                 "Attempted to serialize non-enum-compatible value '{}' with enum '{:?}'",
                 val, et
             ))),
         },
-        (_, OutputType::Scalar(st)) => {
-            let item_value = match (st, value) {
-                (ScalarType::String, PrismaValue::String(s)) => PrismaValue::String(s),
-
-                (ScalarType::ID, PrismaValue::GraphqlId(id)) => PrismaValue::GraphqlId(id),
-                (ScalarType::ID, val) => PrismaValue::GraphqlId(GraphqlId::try_from(val)?),
-
-                (ScalarType::Int, PrismaValue::Float(f)) => {
-                    PrismaValue::Int(f.to_i64().expect("Unable to convert Decimal to i64."))
-                }
-                (ScalarType::Int, PrismaValue::Int(i)) => PrismaValue::Int(i),
-
-                (ScalarType::Float, PrismaValue::Float(f)) => PrismaValue::Float(f),
-                (ScalarType::Float, PrismaValue::Int(i)) => {
-                    PrismaValue::Float(Decimal::from_i64(i).expect("Unable to convert i64 to Decimal."))
-                }
-
-                (ScalarType::Enum(ref et), PrismaValue::Enum(ref ev)) => match et.value_for(&ev.name) {
-                    Some(_) => PrismaValue::Enum(ev.clone()),
-                    None => {
-                        return Err(CoreError::SerializationError(format!(
-                            "Enum value '{}' not found on enum '{}'",
-                            ev.as_string(),
-                            et.name
-                        )))
-                    }
-                },
-
-                (ScalarType::Boolean, PrismaValue::Boolean(b)) => PrismaValue::Boolean(b),
-                (ScalarType::DateTime, PrismaValue::DateTime(dt)) => PrismaValue::DateTime(dt),
-                (ScalarType::Json, _) => unimplemented!(),
-                (ScalarType::UUID, PrismaValue::Uuid(u)) => PrismaValue::Uuid(u),
-
-                (st, pv) => {
-                    return Err(CoreError::SerializationError(format!(
-                        "Attempted to serialize scalar '{}' with incompatible type '{:?}'",
-                        pv, st
-                    )))
-                }
-            };
-
-            Ok(Item::Value(item_value))
-        }
+        (PrismaValue::List(_), OutputType::List(arc_type)) => match arc_type.as_ref() {
+            OutputType::Scalar(subtype) => {
+                let items = unwrap_prisma_value(value)
+                    .into_iter()
+                    .map(|v| convert_prisma_value(v, subtype))
+                    .map(|pv| pv.map(|x| Item::Value(x)))
+                    .collect::<Result<Vec<Item>, CoreError>>()?;
+                Ok(Item::List(items))
+            }
+            OutputType::Enum(subtype) => {
+                let items = unwrap_prisma_value(value)
+                    .into_iter()
+                    .map(|v| match v {
+                        PrismaValue::Enum(ref ev) => convert_enum_to_item(ev, subtype),
+                        val => Err(CoreError::SerializationError(format!(
+                            "Attempted to serialize non-enum-compatible value '{}' with enum '{:?}'",
+                            val, subtype
+                        ))),
+                    })
+                    .collect::<Result<Vec<Item>, CoreError>>()?;
+                Ok(Item::List(items))
+            }
+            _ => Err(CoreError::SerializationError(format!(
+                "Attempted to serialize scalar list which contained non-scalar items of type '{:?}'",
+                arc_type
+            ))),
+        },
+        (_, OutputType::Scalar(st)) => Ok(Item::Value(convert_prisma_value(value, st)?)),
         (pv, ot) => Err(CoreError::SerializationError(format!(
             "Attempted to serialize scalar '{}' with non-scalar compatible type '{:?}'",
             pv, ot
         ))),
     }
 }
+
+fn convert_prisma_value(value: PrismaValue, st: &ScalarType) -> Result<PrismaValue, CoreError> {
+    let item_value = match (st, value) {
+        (ScalarType::String, PrismaValue::String(s)) => PrismaValue::String(s),
+
+        (ScalarType::ID, PrismaValue::GraphqlId(id)) => PrismaValue::GraphqlId(id),
+        (ScalarType::ID, val) => PrismaValue::GraphqlId(GraphqlId::try_from(val)?),
+
+        (ScalarType::Int, PrismaValue::Float(f)) => PrismaValue::Int(f.to_i64().unwrap()),
+        (ScalarType::Int, PrismaValue::Int(i)) => PrismaValue::Int(i),
+
+        (ScalarType::Float, PrismaValue::Float(f)) => PrismaValue::Float(f),
+        (ScalarType::Float, PrismaValue::Int(i)) => {
+            PrismaValue::Int(i.to_i64().expect("Unable to convert Decimal to i64."))
+        }
+
+        (ScalarType::Enum(ref et), PrismaValue::Enum(ref ev)) => match et.value_for(&ev.name) {
+            Some(_) => PrismaValue::Enum(ev.clone()),
+            None => {
+                return Err(CoreError::SerializationError(format!(
+                    "Enum value '{}' not found on enum '{}'",
+                    ev.as_string(),
+                    et.name
+                )))
+            }
+        },
+
+        (ScalarType::Boolean, PrismaValue::Boolean(b)) => PrismaValue::Boolean(b),
+        (ScalarType::DateTime, PrismaValue::DateTime(dt)) => PrismaValue::DateTime(dt),
+        (ScalarType::UUID, PrismaValue::Uuid(u)) => PrismaValue::Uuid(u),
+
+        (st, pv) => {
+            return Err(CoreError::SerializationError(format!(
+                "Attempted to serialize scalar '{}' with incompatible type '{:?}'",
+                pv, st
+            )))
+        }
+    };
+    Ok(item_value)
+}
+
+//fn serialize_scalar(value: PrismaValue, typ: &OutputTypeRef) -> CoreResult<Item> {
+//    match (&value, typ.as_ref()) {
+//        (PrismaValue::Null, OutputType::Opt(_)) => Ok(Item::Value(PrismaValue::Null)),
+//        (_, OutputType::Opt(inner)) => serialize_scalar(value, inner),
+//        (_, OutputType::Enum(et)) => match value {
+//            PrismaValue::String(s) => match et.value_for(&s) {
+//                Some(ev) => Ok(Item::Value(PrismaValue::Enum(ev.clone()))),
+//                None => Err(CoreError::SerializationError(format!(
+//                    "Value '{}' not found in enum '{:?}'",
+//                    s, et
+//                ))),
+//            },
+//
+//            PrismaValue::Enum(ref ev) => convert_enum_to_item(&ev, et),
+//
+//            val => Err(CoreError::SerializationError(format!(
+//                "Attempted to serialize non-enum-compatible value '{}' with enum '{:?}'",
+//                val, et
+//            ))),
+//        },
+//<<<<<<< HEAD
+//        (PrismaValue::List(_), OutputType::List(arc_type)) => match arc_type.as_ref() {
+//            OutputType::Scalar(subtype) => {
+//                let items = unwrap_prisma_value(value)
+//                    .into_iter()
+//                    .map(|v| convert_prisma_value(v, subtype))
+//                    .map(|pv| pv.map(|x| Item::Value(x)))
+//                    .collect::<Result<Vec<Item>, CoreError>>()?;
+//                Ok(Item::List(items))
+//            }
+//            OutputType::Enum(subtype) => {
+//                let items = unwrap_prisma_value(value)
+//                    .into_iter()
+//                    .map(|v| match v {
+//                        PrismaValue::Enum(ref ev) => convert_enum_to_item(ev, subtype),
+//                        val => Err(CoreError::SerializationError(format!(
+//                            "Attempted to serialize non-enum-compatible value '{}' with enum '{:?}'",
+//                            val, subtype
+//                        ))),
+//                    })
+//                    .collect::<Result<Vec<Item>, CoreError>>()?;
+//                Ok(Item::List(items))
+//            }
+//            _ => Err(CoreError::SerializationError(format!(
+//                "Attempted to serialize scalar list which contained non-scalar items of type '{:?}'",
+//                arc_type
+//            ))),
+//        },
+//        (_, OutputType::Scalar(st)) => Ok(Item::Value(convert_prisma_value(value, st)?)),
+//=======
+//        (_, OutputType::Scalar(st)) => {
+//            let item_value = match (st, value) {
+//                (ScalarType::String, PrismaValue::String(s)) => PrismaValue::String(s),
+//
+//                (ScalarType::ID, PrismaValue::GraphqlId(id)) => PrismaValue::GraphqlId(id),
+//                (ScalarType::ID, val) => PrismaValue::GraphqlId(GraphqlId::try_from(val)?),
+//
+//                (ScalarType::Int, PrismaValue::Float(f)) => {
+//                    PrismaValue::Int(f.to_i64().expect("Unable to convert Decimal to i64."))
+//                }
+//                (ScalarType::Int, PrismaValue::Int(i)) => PrismaValue::Int(i),
+//
+//                (ScalarType::Float, PrismaValue::Float(f)) => PrismaValue::Float(f),
+//                (ScalarType::Float, PrismaValue::Int(i)) => {
+//                    PrismaValue::Float(Decimal::from_i64(i).expect("Unable to convert i64 to Decimal."))
+//                }
+//
+//                (ScalarType::Enum(ref et), PrismaValue::Enum(ref ev)) => match et.value_for(&ev.name) {
+//                    Some(_) => PrismaValue::Enum(ev.clone()),
+//                    None => {
+//                        return Err(CoreError::SerializationError(format!(
+//                            "Enum value '{}' not found on enum '{}'",
+//                            ev.as_string(),
+//                            et.name
+//                        )))
+//                    }
+//                },
+//
+//                (ScalarType::Boolean, PrismaValue::Boolean(b)) => PrismaValue::Boolean(b),
+//                (ScalarType::DateTime, PrismaValue::DateTime(dt)) => PrismaValue::DateTime(dt),
+//                (ScalarType::Json, _) => unimplemented!(),
+//                (ScalarType::UUID, PrismaValue::Uuid(u)) => PrismaValue::Uuid(u),
+//
+//                (st, pv) => {
+//                    return Err(CoreError::SerializationError(format!(
+//                        "Attempted to serialize scalar '{}' with incompatible type '{:?}'",
+//                        pv, st
+//                    )))
+//                }
+//            };
+//
+//            Ok(Item::Value(item_value))
+//        }
+//>>>>>>> master
+//        (pv, ot) => Err(CoreError::SerializationError(format!(
+//            "Attempted to serialize scalar '{}' with non-scalar compatible type '{:?}'",
+//            pv, ot
+//        ))),
+//    }
+//}
+
+fn convert_enum_to_item(ev: &EnumValue, et: &EnumType) -> Result<Item, CoreError> {
+    match et.value_for(&ev.name) {
+        Some(_) => Ok(Item::Value(PrismaValue::Enum(ev.clone()))),
+        None => Err(CoreError::SerializationError(format!(
+            "Enum value '{}' not found on enum '{}'",
+            ev.as_string(),
+            et.name
+        ))),
+    }
+}
+
+fn unwrap_prisma_value(pv: PrismaValue) -> Vec<PrismaValue> {
+    match pv {
+        PrismaValue::List(Some(l)) => l,
+        _ => panic!("We want Some lists!"),
+    }
+}
+
+//fn convert_prisma_value(value: PrismaValue, st: &ScalarType) -> Result<PrismaValue, CoreError> {
+//    let item_value = match (st, value) {
+//        (ScalarType::String, PrismaValue::String(s)) => PrismaValue::String(s),
+//
+//        (ScalarType::ID, PrismaValue::GraphqlId(id)) => PrismaValue::GraphqlId(id),
+//        (ScalarType::ID, val) => PrismaValue::GraphqlId(GraphqlId::try_from(val)?),
+//
+//        (ScalarType::Int, PrismaValue::Float(f)) => PrismaValue::Int(f as i64),
+//        (ScalarType::Int, PrismaValue::Int(i)) => PrismaValue::Int(i),
+//
+//        (ScalarType::Float, PrismaValue::Float(f)) => PrismaValue::Float(f),
+//        (ScalarType::Float, PrismaValue::Int(i)) => PrismaValue::Float(i as f64),
+//
+//        (ScalarType::Enum(ref et), PrismaValue::Enum(ref ev)) => match et.value_for(&ev.name) {
+//            Some(_) => PrismaValue::Enum(ev.clone()),
+//            None => {
+//                return Err(CoreError::SerializationError(format!(
+//                    "Enum value '{}' not found on enum '{}'",
+//                    ev.as_string(),
+//                    et.name
+//                )))
+//            }
+//        },
+//
+//        (ScalarType::Boolean, PrismaValue::Boolean(b)) => PrismaValue::Boolean(b),
+//        (ScalarType::DateTime, PrismaValue::DateTime(dt)) => PrismaValue::DateTime(dt),
+//        (ScalarType::Json, PrismaValue::Json(j)) => PrismaValue::Json(j),
+//        (ScalarType::UUID, PrismaValue::Uuid(u)) => PrismaValue::Uuid(u),
+//
+//        (st, pv) => {
+//            return Err(CoreError::SerializationError(format!(
+//                "Attempted to serialize scalar '{}' with incompatible type '{:?}'",
+//                pv, st
+//            )))
+//        }
+//    };
+//    Ok(item_value)
+//}

@@ -1,67 +1,154 @@
 //! This crate contains constants and utilities that are useful for writing tests across the
 //! engines.
 
-pub const SCHEMA_NAME: &str = "prisma-tests";
+/// Macro utils
+#[doc(hidden)]
+pub mod logging;
 
-pub fn sqlite_test_url() -> String {
-    format!("file:{}?db_name={}", sqlite_test_file(), SCHEMA_NAME)
+/// Macro utils
+#[doc(hidden)]
+pub mod runtime;
+
+use quaint::{prelude::Queryable, single::Quaint};
+use url::Url;
+
+const SCHEMA_NAME: &str = "prisma-tests";
+
+pub fn sqlite_test_url(db_name: &str) -> String {
+    format!("file:{}?db_name={}", sqlite_test_file(db_name), SCHEMA_NAME)
 }
 
-pub fn sqlite_test_file() -> String {
+pub fn sqlite_test_file(db_name: &str) -> String {
     let server_root = std::env::var("SERVER_ROOT").expect("Env var SERVER_ROOT required but not found.");
     let database_folder_path = format!("{}/db", server_root);
-    let file_path = format!("{}/{}.db", database_folder_path, SCHEMA_NAME);
+    let file_path = format!("{}/{}.db", database_folder_path, db_name);
     file_path
 }
 
-pub fn postgres_url() -> String {
-    dbg!(format!(
-        "postgresql://postgres:prisma@{}:5432/test-db?schema={}",
-        db_host_postgres(),
-        SCHEMA_NAME
-    ))
+pub fn postgres_9_url(db_name: &str) -> String {
+    let (host, port) = db_host_and_port_postgres_9();
+
+    format!(
+        "postgresql://postgres:prisma@{}:{}/{}?schema={}",
+        host, port, db_name, SCHEMA_NAME
+    )
 }
 
-pub fn mysql_url() -> String {
-    dbg!(format!(
-        "mysql://root:prisma@{host}:3306/{schema_name}",
+pub fn postgres_10_url(db_name: &str) -> String {
+    let (host, port) = db_host_and_port_postgres_10();
+
+    format!(
+        "postgresql://postgres:prisma@{}:{}/{}?schema={}",
+        host, port, db_name, SCHEMA_NAME
+    )
+}
+
+pub fn postgres_11_url(db_name: &str) -> String {
+    let (host, port) = db_host_and_port_postgres_11();
+
+    format!(
+        "postgresql://postgres:prisma@{}:{}/{}?schema={}",
+        host, port, db_name, SCHEMA_NAME
+    )
+}
+
+pub fn postgres_12_url(db_name: &str) -> String {
+    let (host, port) = db_host_and_port_postgres_12();
+
+    format!(
+        "postgresql://postgres:prisma@{}:{}/{}?schema={}",
+        host, port, db_name, SCHEMA_NAME
+    )
+}
+
+pub fn mysql_url(db_name: &str) -> String {
+    let db_name = mysql_safe_identifier(db_name);
+
+    format!(
+        "mysql://root:prisma@{host}:3306/{db_name}",
         host = db_host_mysql_5_7(),
-        schema_name = SCHEMA_NAME
-    ))
+        db_name = db_name,
+    )
 }
 
-pub fn mysql_8_url() -> String {
+pub fn mysql_8_url(db_name: &str) -> String {
     let (host, port) = db_host_and_port_mysql_8_0();
-    dbg!(format!(
-        "mysql://root:prisma@{host}:{port}/{schema_name}",
+
+    // maximum length of identifiers on mysql
+    let db_name = mysql_safe_identifier(db_name);
+
+    format!(
+        "mysql://root:prisma@{host}:{port}/{db_name}",
         host = host,
         port = port,
-        schema_name = SCHEMA_NAME
-    ))
+        db_name = db_name,
+    )
 }
 
-fn db_host_postgres() -> String {
+pub fn mariadb_url(db_name: &str) -> String {
+    let (host, port) = db_host_and_port_mariadb();
+
+    // maximum length of identifiers on mysql
+    let db_name = mysql_safe_identifier(db_name);
+
+    format!(
+        "mysql://root:prisma@{host}:{port}/{db_name}",
+        host = host,
+        port = port,
+        db_name = db_name,
+    )
+}
+
+fn db_host_and_port_postgres_9() -> (&'static str, usize) {
     match std::env::var("IS_BUILDKITE") {
-        Ok(_) => "test-db-postgres".to_string(),
-        Err(_) => "127.0.0.1".to_string(),
+        Ok(_) => ("test-db-postgres-9", 5432),
+        Err(_) => ("127.0.0.1", 5431),
     }
 }
 
-fn db_host_and_port_mysql_8_0() -> (String, usize) {
+fn db_host_and_port_postgres_10() -> (&'static str, usize) {
     match std::env::var("IS_BUILDKITE") {
-        Ok(_) => ("test-db-mysql-8-0".to_string(), 3306),
-        Err(_) => ("127.0.0.1".to_string(), 3307),
+        Ok(_) => ("test-db-postgres-10", 5432),
+        Err(_) => ("127.0.0.1", 5432),
     }
 }
 
-fn db_host_mysql_5_7() -> String {
+fn db_host_and_port_postgres_11() -> (&'static str, usize) {
     match std::env::var("IS_BUILDKITE") {
-        Ok(_) => "test-db-mysql-5-7".to_string(),
-        Err(_) => "127.0.0.1".to_string(),
+        Ok(_) => ("test-db-postgres-11", 5432),
+        Err(_) => ("127.0.0.1", 5433),
     }
 }
 
-pub fn postgres_test_config() -> String {
+fn db_host_and_port_postgres_12() -> (&'static str, usize) {
+    match std::env::var("IS_BUILDKITE") {
+        Ok(_) => ("test-db-postgres-12", 5432),
+        Err(_) => ("127.0.0.1", 5434),
+    }
+}
+
+fn db_host_and_port_mysql_8_0() -> (&'static str, usize) {
+    match std::env::var("IS_BUILDKITE") {
+        Ok(_) => ("test-db-mysql-8-0", 3306),
+        Err(_) => ("127.0.0.1", 3307),
+    }
+}
+
+fn db_host_mysql_5_7() -> &'static str {
+    match std::env::var("IS_BUILDKITE") {
+        Ok(_) => "test-db-mysql-5-7",
+        Err(_) => "127.0.0.1",
+    }
+}
+
+fn db_host_and_port_mariadb() -> (&'static str, usize) {
+    match std::env::var("IS_BUILDKITE") {
+        Ok(_) => ("test-db-mariadb", 3306),
+        Err(_) => ("127.0.0.1", 3308),
+    }
+}
+
+pub fn postgres_9_test_config(db_name: &str) -> String {
     format!(
         r#"
         datasource my_db {{
@@ -70,11 +157,50 @@ pub fn postgres_test_config() -> String {
             default = true
         }}
     "#,
-        postgres_url()
+        postgres_9_url(db_name)
     )
 }
 
-pub fn mysql_test_config() -> String {
+pub fn postgres_10_test_config(db_name: &str) -> String {
+    format!(
+        r#"
+        datasource my_db {{
+            provider = "postgresql"
+            url = "{}"
+            default = true
+        }}
+    "#,
+        postgres_10_url(db_name)
+    )
+}
+
+pub fn postgres_11_test_config(db_name: &str) -> String {
+    format!(
+        r#"
+        datasource my_db {{
+            provider = "postgresql"
+            url = "{}"
+            default = true
+        }}
+    "#,
+        postgres_11_url(db_name)
+    )
+}
+
+pub fn postgres_12_test_config(db_name: &str) -> String {
+    format!(
+        r#"
+        datasource my_db {{
+            provider = "postgresql"
+            url = "{}"
+            default = true
+        }}
+    "#,
+        postgres_12_url(db_name)
+    )
+}
+
+pub fn mysql_test_config(db_name: &str) -> String {
     format!(
         r#"
         datasource my_db {{
@@ -83,11 +209,11 @@ pub fn mysql_test_config() -> String {
             default = true
         }}
     "#,
-        mysql_url()
+        mysql_url(db_name)
     )
 }
 
-pub fn sqlite_test_config() -> String {
+pub fn sqlite_test_config(db_name: &str) -> String {
     format!(
         r#"
         datasource my_db {{
@@ -96,6 +222,59 @@ pub fn sqlite_test_config() -> String {
             default = true
         }}
     "#,
-        sqlite_test_file()
+        sqlite_test_file(db_name)
     )
+}
+
+/// The maximum length of identifiers on mysql is 64 bytes.
+///
+/// Source: https://dev.mysql.com/doc/mysql-reslimits-excerpt/5.5/en/identifier-length.html
+pub fn mysql_safe_identifier(identifier: &str) -> &str {
+    if identifier.len() < 64 {
+        identifier
+    } else {
+        identifier.get(0..63).expect("mysql identifier truncation")
+    }
+}
+
+fn fetch_db_name<'a>(url: &'a Url, default: &'static str) -> &'a str {
+    match url.path_segments() {
+        Some(mut segments) => segments.next().unwrap_or(default),
+        None => default,
+    }
+}
+
+pub async fn create_mysql_database(original_url: &Url) -> Result<Quaint, failure::Error> {
+    let mut url = original_url.clone();
+    url.set_path("");
+
+    let db_name = fetch_db_name(&original_url, "mysql");
+    debug_assert!(!db_name.is_empty());
+    debug_assert!(
+        db_name.len() < 64,
+        "db_name should be less than 64 characters, got {:?}",
+        db_name.len()
+    );
+    let conn = Quaint::new(url.as_str()).await.unwrap();
+
+    let drop_stmt = format!("DROP DATABASE IF EXISTS `{}`", db_name);
+    conn.execute_raw(&drop_stmt, &[]).await.unwrap();
+    let create_stmt = format!("CREATE DATABASE `{}`", db_name);
+    conn.execute_raw(&create_stmt, &[]).await.unwrap();
+
+    Ok(Quaint::new(original_url.as_str()).await?)
+}
+
+pub async fn create_postgres_database(original_url: &Url) -> Result<Quaint, failure::Error> {
+    let mut url = original_url.clone();
+    url.set_path("postgres");
+
+    let db_name = fetch_db_name(&original_url, "postgres");
+    let create_stmt = format!("CREATE DATABASE \"{}\"", db_name);
+
+    let conn = Quaint::new(url.as_str()).await.unwrap();
+
+    conn.execute_raw(&create_stmt, &[]).await.ok();
+
+    Ok(Quaint::new(original_url.as_str()).await?)
 }

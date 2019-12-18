@@ -23,15 +23,15 @@ impl<'a> MigrationCommand for MigrationProgressCommand<'a> {
 
         let migration = migration_persistence
             .by_name(&cmd.input.migration_id)
-            .await
+            .await?
             .ok_or_else(|| {
                 let error = format!(
                     "Could not load migration from database. Migration name was: {}",
                     &cmd.input.migration_id
                 );
 
-            CommandError::Input { error }
-        })?;
+                CommandError::Input { error }
+            })?;
 
         Ok(MigrationProgressOutput {
             status: migration.status,

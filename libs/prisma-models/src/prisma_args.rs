@@ -60,8 +60,8 @@ impl PrismaArgs {
         }
     }
 
-    pub fn update_datetimes(&mut self, model: ModelRef, list_causes_update: bool) {
-        if !self.args.is_empty() || list_causes_update {
+    pub fn update_datetimes(&mut self, model: ModelRef) {
+        if !self.args.is_empty() {
             if let Some(field) = model.fields().updated_at() {
                 if let None = self.args.get(&field.name) {
                     self.args.insert(field.name.clone(), PrismaValue::DateTime(Utc::now()));

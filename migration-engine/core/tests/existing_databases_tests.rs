@@ -1,9 +1,9 @@
-mod test_harness;
-
 use barrel::types;
 use pretty_assertions::assert_eq;
 use sql_schema_describer::*;
 use test_harness::*;
+
+mod test_harness;
 
 #[test_each_connector]
 async fn adding_a_model_for_an_existing_table_must_work(api: &TestApi) {
@@ -65,12 +65,21 @@ async fn removing_a_model_for_a_table_that_is_already_deleted_must_work(api: &Te
 
 #[test_each_connector]
 async fn creating_a_field_for_an_existing_column_with_a_compatible_type_must_work(api: &TestApi) {
+    let is_mysql = api.is_mysql();
     let initial_result = api
         .barrel()
-        .execute(|migration| {
-            migration.create_table("Blog", |t| {
+        .execute(move |migration| {
+            migration.create_table("Blog", move |t| {
                 t.add_column("id", types::primary());
-                t.add_column("title", types::text());
+                // We add a default because the migration engine always adds defaults to facilitate migration of required columns.
+                t.add_column(
+                    "title",
+                    if is_mysql {
+                        types::varchar(181).default("")
+                    } else {
+                        types::text().default("")
+                    },
+                );
             });
         })
         .await;
@@ -140,9 +149,14 @@ async fn creating_a_field_for_an_existing_column_and_simultaneously_making_it_op
     assert_eq!(column.is_required(), false);
 }
 
-#[test_each_connector(ignore = "mysql")]
+#[test_one_connector(connector = "postgres")]
 async fn creating_a_scalar_list_field_for_an_existing_table_must_work(api: &TestApi) {
     let dm1 = r#"
+            datasource pg {
+              provider = "postgres"
+              url = "postgres://localhost:5432"
+            }
+
             model Blog {
                 id Int @id
             }
@@ -150,49 +164,28 @@ async fn creating_a_scalar_list_field_for_an_existing_table_must_work(api: &Test
     let initial_result = api.infer_and_apply(&dm1).await.sql_schema;
     assert!(!initial_result.has_table("Blog_tags"));
 
-    let mut result = api
+    let result = api
         .barrel()
         .execute(|migration| {
-            migration.create_table("Blog_tags", |t| {
-                // TODO: barrel does not render this one correctly
-                t.add_column("nodeId", types::foreign("Blog", "id"));
-                t.add_column("position", types::integer());
-                t.add_column("value", types::text());
+            migration.change_table("Blog", |t| {
+                let inner = types::text();
+                t.add_column("tags", types::array(&inner));
             });
         })
         .await;
 
-    // hacks for things i can't set in barrel due to limitations
-    for table in &mut result.tables {
-        if table.name == "Blog_tags" {
-            for fk in &mut table.foreign_keys {
-                if fk.columns == &["nodeId"] {
-                    fk.on_delete_action = ForeignKeyAction::Cascade
-                }
-            }
-            //                table.primary_key = Some(PrimaryKey {
-            //                    columns: vec!["nodeId".to_string(), "position".to_string()],
-            //                    sequence: None,
-            //                });
-        }
-    }
-
-    assert!(result.has_table("Blog_tags"));
-
     let dm2 = r#"
+            datasource pg {
+              provider = "postgres"
+              url = "postgres://localhost:5432"
+            }
+
             model Blog {
                 id Int @id
                 tags String[]
             }
         "#;
-    let mut final_result = api.infer_and_apply(&dm2).await.sql_schema;
-    for table in &mut final_result.tables {
-        if table.name == "Blog_tags" {
-            // can't set that properly up again
-            table.indices = vec![];
-            table.primary_key = None;
-        }
-    }
+    let final_result = api.infer_and_apply(&dm2).await.sql_schema;
     assert_eq!(result, final_result);
 }
 
@@ -228,26 +221,39 @@ async fn delete_a_field_for_a_non_existent_column_must_work(api: &TestApi) {
     assert_eq!(result, final_result);
 }
 
-#[test_each_connector]
-async fn deleting_a_scalar_list_field_for_a_non_existent_list_table_must_work(api: &TestApi) {
+#[test_one_connector(connector = "postgres")]
+async fn deleting_a_scalar_list_field_for_a_non_existent_column_must_work(api: &TestApi) {
     let dm1 = r#"
+            datasource pg {
+              provider = "postgres"
+              url = "postgres://localhost:5432"
+            }
+
             model Blog {
                 id Int @id
                 tags String[]
             }
         "#;
-    let initial_result = api.infer_and_apply(&dm1).await.sql_schema;
-    assert!(initial_result.has_table("Blog_tags"));
+
+    let _ = api.infer_and_apply(&dm1).await.sql_schema;
 
     let result = api
         .barrel()
         .execute(|migration| {
-            migration.drop_table("Blog_tags");
+            // sqlite does not support dropping columns. So we are emulating it..
+            migration.drop_table("Blog");
+            migration.create_table("Blog", |t| {
+                t.add_column("id", types::primary());
+            });
         })
         .await;
-    assert!(!result.has_table("Blog_tags"));
 
     let dm2 = r#"
+            datasource pg {
+              provider = "postgres"
+              url = "postgres://localhost:5432"
+            }
+
             model Blog {
                 id Int @id
             }

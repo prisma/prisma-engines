@@ -1,8 +1,8 @@
 use crate::commands::command::*;
 use crate::migration_engine::MigrationEngine;
-use tracing::debug;
 use migration_connector::*;
 use serde::{Deserialize, Serialize};
+use tracing::debug;
 
 pub struct UnapplyMigrationCommand<'a> {
     input: &'a UnapplyMigrationInput,
@@ -22,7 +22,7 @@ impl<'a> MigrationCommand for UnapplyMigrationCommand<'a> {
         debug!("{:?}", cmd.input);
         let connector = engine.connector();
 
-        let result = match connector.migration_persistence().last().await {
+        let result = match connector.migration_persistence().last().await? {
             None => UnapplyMigrationOutput {
                 rolled_back: "not-applicable".to_string(),
                 active: None,
@@ -37,7 +37,7 @@ impl<'a> MigrationCommand for UnapplyMigrationCommand<'a> {
                     .unapply(&migration_to_rollback, &database_migration)
                     .await?;
 
-                let new_active_migration = connector.migration_persistence().last().await.map(|m| m.name);
+                let new_active_migration = connector.migration_persistence().last().await?.map(|m| m.name);
 
                 UnapplyMigrationOutput {
                     rolled_back: migration_to_rollback.name,
