@@ -627,3 +627,62 @@ async fn introspecting_default_values_on_relations_should_be_ignored(api: &TestA
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
+
+
+#[test_one_connector(connector = "postgres")]
+async fn fields_with_invalid_characters_should_be_mapped(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+                t.add_column("_a", types::text());
+                t.add_column("*b", types::text());
+                t.add_column("?c", types::text());
+                t.add_column("(d", types::text());
+                t.add_column(")e", types::text());
+                t.add_column("/r", types::text());
+                t.add_column(" g", types::text());
+
+            });
+        })
+        .await;
+
+    let dm = r#"
+            datasource pg {
+              provider = "postgres"
+              url = "postgresql://localhost:5432"
+            }
+
+            model User {
+               id      Int @id @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
+            }
+        "#;
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}
+
+#[test_one_connector(connector = "postgres")]
+async fn tables_with_invalid_characters_should_be_mapped(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("?User", |t| {
+                t.inject_custom("id text Not Null Primary Key");
+                });
+        })
+        .await;
+
+    let dm = r#"
+            datasource pg {
+              provider = "postgres"
+              url = "postgresql://localhost:5432"
+            }
+
+            model _User {
+               id      String @id
+            }
+        "#;
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}

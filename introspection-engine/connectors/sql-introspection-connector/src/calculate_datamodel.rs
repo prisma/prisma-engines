@@ -75,7 +75,8 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
         .filter(|table| !is_migration_table(&table))
         .filter(|table| !is_prisma_join_table(&table))
     {
-        let mut model = Model::new(&table.name);
+        let (name, database_name) = sanitize_name(table.name.clone());
+        let mut model = Model::new(name, database_name);
         //Todo: This needs to filter out composite Foreign Key columns, they are merged into one new field
         for column in table.columns.iter() {
             debug!("Handling column {:?}", column);
@@ -105,11 +106,13 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
                 }
             };
 
+            let (name, database_name) = sanitize_name(column.name.clone());
+
             let field = Field {
-                name: column.name.clone(),
+                name,
                 arity,
                 field_type,
-                database_name: None,
+                database_name,
                 default_value,
                 is_unique,
                 id_info,
@@ -447,5 +450,15 @@ fn calculate_field_type(schema: &SqlSchema, column: &Column, table: &Table) -> F
                 _ => FieldType::Base(ScalarType::String),
             }
         }
+    }
+}
+
+fn sanitize_name(name: String) -> (String, Option<String>) {
+    let re = Regex::new("[^a-zA-Z0-9_]").unwrap();
+    let needs_sanitation = re.is_match(name.as_str());
+    if needs_sanitation {
+        (re.replace_all(name.as_str(), "_").parse().unwrap(), Some(name))
+    } else {
+        (name, None)
     }
 }
