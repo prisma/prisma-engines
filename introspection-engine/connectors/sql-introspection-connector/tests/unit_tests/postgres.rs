@@ -627,3 +627,36 @@ async fn introspecting_default_values_on_relations_should_be_ignored(api: &TestA
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
+
+#[test_one_connector(connector = "postgres")]
+async fn introspecting_id_fields_with_foreign_key_should_ignore_the_relation(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+            });
+            migration.create_table("Post", |t| {
+                t.add_column("test", types::text());
+                t.inject_custom("user_id INTEGER REFERENCES \"User\"(\"id\") Primary Key");
+            });
+        })
+        .await;
+
+    let dm = r#"
+            datasource pg {
+              provider = "postgres"
+              url = "postgresql://localhost:5432"
+            }
+            model Post {
+               test    String
+               user_id Int @id
+            }
+
+            model User {
+               id      Int @id @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
+            }
+        "#;
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}

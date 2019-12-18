@@ -117,6 +117,7 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
                 is_generated: false,
                 is_updated_at: false,
             };
+
             model.add_field(field);
         }
 
@@ -418,7 +419,7 @@ fn calculate_field_type(schema: &SqlSchema, column: &Column, table: &Table) -> F
     debug!("Calculating field type for '{}'", column.name);
     // Look for a foreign key referencing this column
     match table.foreign_keys.iter().find(|fk| fk.columns.contains(&column.name)) {
-        Some(fk) => {
+        Some(fk) if calc_id_info(column, table).is_none() => {
             debug!("Found corresponding foreign key");
             let idx = fk
                 .columns
@@ -434,7 +435,7 @@ fn calculate_field_type(schema: &SqlSchema, column: &Column, table: &Table) -> F
                 on_delete: OnDeleteStrategy::None,
             })
         }
-        None => {
+        _ => {
             debug!("Found no corresponding foreign key");
             match column.tpe.family {
                 ColumnTypeFamily::Boolean => FieldType::Base(ScalarType::Boolean),
