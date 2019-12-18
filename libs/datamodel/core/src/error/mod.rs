@@ -353,14 +353,15 @@ fn pretty_print_error(f: &mut dyn std::io::Write, file_name: &str, text: &str, e
     let span = error_obj.span();
     let error = error_obj.description();
 
-    let line_number = text[..span.start].matches("\n").count();
+    let start_line_number = text[..span.start].matches("\n").count();
+    let end_line_number = text[..span.end].matches("\n").count();
     let file_lines = text.split("\n").collect::<Vec<&str>>();
 
-    let chars_in_line_before: usize = file_lines[..line_number].iter().map(|l| l.len()).sum();
+    let chars_in_line_before: usize = file_lines[..start_line_number].iter().map(|l| l.len()).sum();
     // Don't forget to count the all the line breaks.
-    let chars_in_line_before = chars_in_line_before + line_number;
+    let chars_in_line_before = chars_in_line_before + start_line_number;
 
-    let line = &file_lines[line_number];
+    let line = &file_lines[start_line_number];
 
     let start_in_line = span.start - chars_in_line_before;
     let end_in_line = std::cmp::min(start_in_line + (span.end - span.start), line.len());
@@ -370,18 +371,23 @@ fn pretty_print_error(f: &mut dyn std::io::Write, file_name: &str, text: &str, e
     let suffix = &line[end_in_line..];
 
     let arrow = "-->".bright_blue().bold();
-    let file_path = format!("{}:{}", file_name, line_number + 1).underline();
+    let file_path = format!("{}:{}", file_name, start_line_number + 1).underline();
 
     writeln!(f, "{}: {}", "error".bright_red().bold(), error.bold())?;
     writeln!(f, "  {}  {}", arrow, file_path)?;
     writeln!(f, "{}", format_line_number(0))?;
-    writeln!(f, "{}", format_line_number_with_line(line_number, &file_lines))?;
-    writeln!(f, "{}{}{}{}", format_line_number(line_number + 1), prefix, offending, suffix)?;
+    
+    writeln!(f, "{}", format_line_number_with_line(start_line_number, &file_lines))?;
+    writeln!(f, "{}{}{}{}", format_line_number(start_line_number + 1), prefix, offending, suffix)?;
     if offending.len() == 0 {
         let spacing = std::iter::repeat(" ").take(start_in_line).collect::<String>();
         writeln!(f, "{}{}{}", format_line_number(0), spacing, "^ Unexpected token.".bold().bright_red())?;
     }
-    writeln!(f, "{}", format_line_number_with_line(line_number + 2, &file_lines))?;
+    
+    for line_number in start_line_number + 2 .. end_line_number + 2 {
+        writeln!(f, "{}", format_line_number_with_line(line_number, &file_lines))?;
+    }
+    
     writeln!(f, "{}", format_line_number(0))
 }
 

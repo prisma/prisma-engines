@@ -62,6 +62,13 @@ fn id_should_error_on_model_without_id() {
 
     let errors = parse_error(dml);
 
+    errors
+        .errors
+        .first()
+        .unwrap()
+        .pretty_print(&mut std::io::stderr().lock(), "", dml)
+        .unwrap();
+
     errors.assert_is(DatamodelError::new_model_validation_error(
         "Each model must have exactly one id criteria. Either mark a single field with `@id` or add a multi field id criterion with `@@id([])` to the model.",
         "Model",
