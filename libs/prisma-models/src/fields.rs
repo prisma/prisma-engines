@@ -38,7 +38,7 @@ impl Fields {
                         Field::Scalar(sf) if sf.is_id() => Some(Arc::downgrade(sf)),
                         _ => acc,
                     })
-                    .expect("No id field defined!")
+                    .expect(format!("No id field defined! Model: {}", (self.model.upgrade().unwrap().name)).as_str())
             })
             .upgrade()
             .unwrap()
