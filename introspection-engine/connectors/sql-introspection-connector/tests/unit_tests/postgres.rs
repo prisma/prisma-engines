@@ -627,3 +627,31 @@ async fn introspecting_default_values_on_relations_should_be_ignored(api: &TestA
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
+
+#[test_one_connector(connector = "postgres")]
+async fn introspecting_default_values_on_lists_should_be_ignored(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom("ints Integer[] DEFAULT array[]::Integer[]");
+                t.inject_custom("ints2 Integer[] DEFAULT '{}'");
+            });
+        })
+        .await;
+
+    let dm = r#"
+            datasource pg {
+              provider = "postgres"
+              url = "postgresql://localhost:5432"
+            }
+            model User {
+               id      Int @id @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
+               ints    Int []
+               ints2   Int []
+            }
+        "#;
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}
