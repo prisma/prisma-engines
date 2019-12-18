@@ -82,27 +82,28 @@ impl Model {
             if id_fields.len() == 1 {
                 let id = id_fields.pop().unwrap();
                 let generated: PrismaValue = match id.type_identifier {
-                // This will panic when:
-                //
-                // - System time goes backwards
-                // - There is an error generating a fingerprint
-                // - Time cannot be converted to a string.
-                //
-                // Panic is a better choice than bubbling this up
-            TypeIdentifier::GraphQLID => GraphqlId::String(cuid::cuid().unwrap()),
-                TypeIdentifier::UUID => GraphqlId::UUID(Uuid::new_v4()),
-                TypeIdentifier::Int => panic!("Cannot generate integer ids."),
+                    // This will panic when:
+                    //
+                    // - System time goes backwards
+                    // - There is an error generating a fingerprint
+                    // - Time cannot be converted to a string.
+                    //
+                    // Panic is a better choice than bubbling this up
+                    TypeIdentifier::GraphQLID => GraphqlId::String(cuid::cuid().unwrap()),
+                    TypeIdentifier::UUID => GraphqlId::UUID(Uuid::new_v4()),
+                    TypeIdentifier::Int => panic!("Cannot generate integer ids."),
 
-                // All other ID types are rejected on data model construction.
-                _ => unreachable!(),
-            }.into();
+                    // All other ID types are rejected on data model construction.
+                    _ => unreachable!(),
+                }
+                .into();
 
-            (Field::Scalar(id), generated).into()
+                (Field::Scalar(id), generated).into()
             } else {
                 // Todo: Check what our plan is regarding this.
                 unimplemented!("Generated multi-part IDs are currently unsupported.")
             }
-    })
+        })
     }
 
     /// Returns the set of fields to be used as the primary identifier for a record of that model.
@@ -111,16 +112,29 @@ impl Model {
     /// 1. If an ID definition (single or multi-part doesn't matter) is present, take that one.
     /// 2. If no ID definition is found, take the first scalar unique found.
     /// 3. If no scalar unique is found, take the first compound unique found.
-    /// 4. If all of the above fails, we panic. Models with no unique / ID are not supported.
+    /// 4. If all of the above fails, we panic. Models with no unique / ID are not supported (yet).
     ///
     /// This relies entirely on the datamodel parsing and conversion to have a stable ordering of fields.
     pub fn primary_identifier(&self) -> Vec<Field> {
         self.fields()
             .id()
             .map(|fields| fields.into_iter().map(|f| Field::Scalar(f)).collect())
-            .or_else(|| self.fields().scalar().into_iter().find(|sf| sf.is_unique).map(|x| vec![Field::Scalar(x)]))
-            .or_else(|| self.unique_indexes().first().map(|index| index.fields().into_iter().map(|f| Field::Scalar(f)).collect()))
-            .expect(&format!("Unable to resolve a primary identifier for model {}.", self.name))
+            .or_else(|| {
+                self.fields()
+                    .scalar()
+                    .into_iter()
+                    .find(|sf| sf.is_unique)
+                    .map(|x| vec![Field::Scalar(x)])
+            })
+            .or_else(|| {
+                self.unique_indexes()
+                    .first()
+                    .map(|index| index.fields().into_iter().map(|f| Field::Scalar(f)).collect())
+            })
+            .expect(&format!(
+                "Unable to resolve a primary identifier for model {}.",
+                self.name
+            ))
     }
 
     pub fn fields(&self) -> &Fields {
