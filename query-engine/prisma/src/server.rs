@@ -7,8 +7,6 @@ use crate::{
     },
     PrismaResult,
 };
-use futures::stream::StreamExt;
-use http::header::CONTENT_LENGTH;
 use hyper::header;
 use hyper::service::{make_service_fn, service_fn};
 use hyper::{Body, Error, Method, Request, Response, Server, StatusCode};
@@ -56,22 +54,11 @@ impl HttpServer {
     async fn routes(ctx: Arc<RequestContext>, req: Request<Body>) -> std::result::Result<Response<Body>, Error> {
         let res = match (req.method(), req.uri().path()) {
             (&Method::POST, "/") => {
-                let (parts, mut chunks) = req.into_parts();
+                let (parts, body) = req.into_parts();
 
-                let content_length: usize = parts
-                    .headers
-                    .get(CONTENT_LENGTH)
-                    .and_then(|s| s.to_str().ok())
-                    .and_then(|s| s.parse().ok())
-                    .unwrap_or(0);
+                let bytes = hyper::body::to_bytes(body).await?;
 
-                let mut body_bytes: Vec<u8> = Vec::with_capacity(content_length);
-
-                while let Some(chunk) = chunks.next().await {
-                    body_bytes.extend_from_slice(&chunk?);
-                }
-
-                match serde_json::from_slice(body_bytes.as_ref()) {
+                match serde_json::from_slice(bytes.as_ref()) {
                     Ok(body) => {
                         let req = PrismaRequest {
                             body,
