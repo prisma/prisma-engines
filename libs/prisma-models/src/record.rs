@@ -1,6 +1,11 @@
-use crate::{DomainError as Error, DomainResult, Field, GraphqlId, PrismaValue};
-use std::convert::TryFrom;
+use crate::{DomainError as Error, DomainResult, Field, PrismaValue};
 
+// Collection of fields of which the primary identifier of a model is composed of.
+pub type PrimaryIdentifier = Vec<Field>;
+
+// Collection of field to value pairs corresponding to the
+// WIP: Holding an arc here is a terrible idea. After seeing what the final code
+//      looks like, we need to revise that decision.
 #[derive(Debug, Clone)]
 pub struct RecordIdentifier {
     pub pairs: Vec<(Field, PrismaValue)>,
@@ -48,8 +53,8 @@ impl SingleRecord {
         Self { record, field_names }
     }
 
-    pub fn collect_id(&self, id_field: &str) -> DomainResult<GraphqlId> {
-        self.record.collect_id(&self.field_names, id_field)
+    pub fn primary_id(&self, id: &PrimaryIdentifier) -> DomainResult<RecordIdentifier> {
+        self.record.primary_id(&self.field_names, id)
     }
 
     pub fn get_field_value(&self, field: &str) -> DomainResult<&PrismaValue> {
@@ -64,10 +69,10 @@ pub struct ManyRecords {
 }
 
 impl ManyRecords {
-    pub fn collect_ids(&self, id_field: &str) -> DomainResult<Vec<GraphqlId>> {
+    pub fn primary_ids(&self, id: PrimaryIdentifier) -> DomainResult<Vec<RecordIdentifier>> {
         self.records
             .iter()
-            .map(|record| record.collect_id(&self.field_names, id_field).map(|i| i.clone()))
+            .map(|record| record.primary_id(&self.field_names, &id).map(|i| i.clone()))
             .collect()
     }
 
@@ -106,9 +111,16 @@ impl Record {
         }
     }
 
-    pub fn collect_id(&self, field_names: &[String], id_field: &str) -> DomainResult<GraphqlId> {
-        self.get_field_value(field_names, id_field)
-            .and_then(GraphqlId::try_from)
+    pub fn primary_id(&self, field_names: &[String], id: &PrimaryIdentifier) -> DomainResult<RecordIdentifier> {
+        let pairs: Vec<(Field, PrismaValue)> = id
+            .into_iter()
+            .map(|id_field| {
+                self.get_field_value(field_names, id_field.name())
+                    .map(|val| (id_field.clone(), val.clone()))
+            })
+            .collect::<DomainResult<Vec<_>>>()?;
+
+        Ok(RecordIdentifier { pairs })
     }
 
     pub fn get_field_value(&self, field_names: &[String], field: &str) -> DomainResult<&PrismaValue> {

@@ -110,12 +110,12 @@ impl Model {
     /// The implementation guarantees that the returned set of fields is deterministic for the same underlying data model.
     /// The rules for finding a primary identifier are as follows:
     /// 1. If an ID definition (single or multi-part doesn't matter) is present, take that one.
-    /// 2. If no ID definition is found, take the first scalar unique found.
-    /// 3. If no scalar unique is found, take the first compound unique found.
+    /// 2. If no ID definition is found, take the first scalar unique found that is required.
+    /// 3. If no scalar unique is found, take the first compound unique found. All fields must be required.
     /// 4. If all of the above fails, we panic. Models with no unique / ID are not supported (yet).
     ///
     /// This relies entirely on the datamodel parsing and conversion to have a stable ordering of fields.
-    pub fn primary_identifier(&self) -> Vec<Field> {
+    pub fn primary_identifier(&self) -> PrimaryIdentifier {
         self.fields()
             .id()
             .map(|fields| fields.into_iter().map(|f| Field::Scalar(f)).collect())
@@ -123,12 +123,13 @@ impl Model {
                 self.fields()
                     .scalar()
                     .into_iter()
-                    .find(|sf| sf.is_unique)
+                    .find(|sf| sf.is_unique && sf.is_required)
                     .map(|x| vec![Field::Scalar(x)])
             })
             .or_else(|| {
                 self.unique_indexes()
-                    .first()
+                    .into_iter()
+                    .find(|index| index.fields().into_iter().all(|f| f.is_required))
                     .map(|index| index.fields().into_iter().map(|f| Field::Scalar(f)).collect())
             })
             .expect(&format!(
