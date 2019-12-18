@@ -28,7 +28,7 @@ pub enum DatamodelError {
     #[fail(display = "Argument \"{}\" is missing in generator block \"{}\".", argument_name, generator_name)]
     GeneratorArgumentNotFound { argument_name: String, generator_name: String, span: Span },
 
-    #[fail(display = "Error parsing attribute \"@{}\": {}.", directive_name, message)]
+    #[fail(display = "Error parsing attribute \"@{}\": {}", directive_name, message)]
     DirectiveValidationError { message: String, directive_name: String, span: Span },
 
     #[fail(display = "Attribute \"@{}\" is defined twice.", directive_name)]
@@ -80,7 +80,7 @@ pub enum DatamodelError {
     #[fail(display = "Type \"{}\" is not a built-in type.", type_name)]
     ScalarTypeNotFoundError { type_name: String, span: Span },
 
-    #[fail(display = "Unexpected token. Expected one of: {}.", expected_str)]
+    #[fail(display = "Unexpected token. Expected one of: {}", expected_str)]
     ParserError { expected: Vec<&'static str>, expected_str: String, span: Span },
 
     #[fail(display = "{}", message)]
@@ -95,13 +95,13 @@ pub enum DatamodelError {
     #[fail(display = "Expected a {} value, but received {} value \"{}\".", expected_type, received_type, raw)]
     TypeMismatchError { expected_type: String, received_type: String, raw: String, span: Span },
 
-    #[fail(display = "Expected a {} value, but failed while parsing \"{}\": {}.", expected_type, raw, parser_error)]
+    #[fail(display = "Expected a {} value, but failed while parsing \"{}\": {}", expected_type, raw, parser_error)]
     ValueParserError { expected_type: String, parser_error: String, raw: String, span: Span },
 
-    #[fail(display = "Error validating model \"{}\": {}.", model_name, message)]
+    #[fail(display = "Error validating model \"{}\": {}", model_name, message)]
     ModelValidationError { message: String, model_name: String, span: Span  },
 
-    #[fail(display = "Error validating: {}.", message)]
+    #[fail(display = "Error validating: {}", message)]
     ValidationError { message: String, span: Span  },
 }
 
