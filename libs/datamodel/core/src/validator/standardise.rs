@@ -332,7 +332,7 @@ impl Standardiser {
                 panic!("Tried to name a non-existing relation.");
             }
 
-            // Foreign site.
+            // Foreign side.
             let field = datamodel
                 .find_model_mut(&rel_info.to)
                 .expect(STATE_ERROR)
