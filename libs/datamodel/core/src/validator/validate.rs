@@ -211,20 +211,38 @@ impl<'a> Validator<'a> {
                                 // but pointing to the same foreign model,
                                 // and also no names set.
                                 if rel_a.to == rel_b.to && rel_a.name == rel_b.name {
-                                    return Err(DatamodelError::new_model_validation_error(
-                                        &format!(
-                                            "Ambiguous relation detected. The fields `{}` and `{}` in model `{}` both refer to `{}`. Provide different relation names for them by adding `@relation(<name>).",
-                                            &field_a.name,
-                                            &field_b.name,
+                                    if rel_a.name == "" {
+                                        // unnamed relation
+                                        return Err(DatamodelError::new_model_validation_error(
+                                            &format!(
+                                                "Ambiguous relation detected. The fields `{}` and `{}` in model `{}` both refer to `{}`. Please provide different relation names for them by adding `@relation(<name>).",
+                                                &field_a.name,
+                                                &field_b.name,
+                                                &model.name,
+                                                &rel_a.to
+                                            ),
                                             &model.name,
-                                            &rel_a.to
-                                        ),
-                                        &model.name,
-                                        ast_schema
-                                            .find_field(&model.name, &field_a.name)
-                                            .expect(STATE_ERROR)
-                                            .span,
-                                    ));
+                                            ast_schema
+                                                .find_field(&model.name, &field_a.name)
+                                                .expect(STATE_ERROR)
+                                                .span,
+                                        ));
+                                    } else {
+                                        // explicitly named relation
+                                        return Err(DatamodelError::new_model_validation_error(
+                                            &format!(
+                                                "Wrongly named relation detected. The fields `{}` and `{}` in model `{}` both use the same relation name. Please provide different relation names for them through `@relation(<name>).",
+                                                &field_a.name,
+                                                &field_b.name,
+                                                &model.name,
+                                            ),
+                                            &model.name,
+                                            ast_schema
+                                                .find_field(&model.name, &field_a.name)
+                                                .expect(STATE_ERROR)
+                                                .span,
+                                        ));
+                                    }
                                 }
                             } else if rel_a.to == model.name && rel_b.to == model.name {
                                 // This is a self-relation with at least two fields.
@@ -241,7 +259,7 @@ impl<'a> Validator<'a> {
                                                     // unnamed relation
                                                     return Err(DatamodelError::new_model_validation_error(
                                                         &format!(
-                                                            "Unnamed self relation detected. The fields `{}`, `{}` and `{}` in model `{}` have no relation name. Provide a relation name for one of them by adding `@relation(<name>).",
+                                                            "Unnamed self relation detected. The fields `{}`, `{}` and `{}` in model `{}` have no relation name. Please provide a relation name for one of them by adding `@relation(<name>).",
                                                             &field_a.name,
                                                             &field_b.name,
                                                             &field_c.name,
@@ -256,7 +274,7 @@ impl<'a> Validator<'a> {
                                                 } else {
                                                     return Err(DatamodelError::new_model_validation_error(
                                                         &format!(
-                                                        "Wrongly named self relation detected. The fields `{}`, `{}` and `{}` in model `{}` have the same relation name. At most two relation fields can belong to the same relation and therefore have the same name. Assign a different relation name to one of them.",
+                                                        "Wrongly named self relation detected. The fields `{}`, `{}` and `{}` in model `{}` have the same relation name. At most two relation fields can belong to the same relation and therefore have the same name. Please assign a different relation name to one of them.",
                                                             &field_a.name,
                                                             &field_b.name,
                                                             &field_c.name,
