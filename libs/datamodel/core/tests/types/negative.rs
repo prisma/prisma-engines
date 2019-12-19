@@ -47,7 +47,7 @@ fn shound_fail_on_directive_duplication_recursive() {
 }
 
 #[test]
-fn shound_fail_on_endless_recursive_type_def() {
+fn should_fail_on_endless_recursive_type_def() {
     let dml = r#"
     type MyString = ID
     type MyStringWithDefault = MyString
@@ -61,7 +61,7 @@ fn shound_fail_on_endless_recursive_type_def() {
     let error = parse_error(dml);
 
     error.assert_is(DatamodelError::new_validation_error(
-        "Recursive type definitions are not allowed. Recursive path was: ID -> MyStringWithDefault -> MyString -> ID",
+        "Recursive type definitions are not allowed. Recursive path was: ID -> MyStringWithDefault -> MyString -> ID.",
         ast::Span::new(21, 23),
     ));
 }
