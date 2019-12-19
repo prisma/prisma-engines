@@ -644,10 +644,6 @@ async fn introspecting_id_fields_with_foreign_key_should_ignore_the_relation(api
         .await;
 
     let dm = r#"
-            datasource pg {
-              provider = "postgres"
-              url = "postgresql://localhost:5432"
-            }
             model Post {
                test    String
                user_id Int @id

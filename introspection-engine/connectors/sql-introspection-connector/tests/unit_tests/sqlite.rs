@@ -606,3 +606,35 @@ async fn introspecting_cascading_delete_behaviour_should_work(api: &TestApi) {
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
+
+
+#[test_one_connector(connector = "sqlite")]
+async fn introspecting_id_fields_with_foreign_key_should_ignore_the_relation(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+            });
+            migration.create_table("Post", |t| {
+                t.add_column("test", types::text());
+                t.inject_custom("user_id INTEGER Not Null Primary Key");
+                t.inject_custom("FOREIGN KEY (`user_id`) REFERENCES `User`(`id`)");
+            });
+        })
+        .await;
+
+    let dm = r#"
+            model User {
+               id      Int @id
+            }
+
+            model Post {
+               test    String
+               user_id Int @id
+            }
+        "#;
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}
+
