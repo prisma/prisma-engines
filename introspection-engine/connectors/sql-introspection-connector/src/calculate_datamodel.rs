@@ -88,6 +88,7 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
             let id_info = calc_id_info(&column, &table);
             let default_value = match field_type {
                 FieldType::Relation(_) => None,
+                _ if arity == FieldArity::List => None,
                 _ => column
                     .default
                     .as_ref()
