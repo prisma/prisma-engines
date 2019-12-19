@@ -79,7 +79,7 @@ where
                 .columns_for_relation_side(from_field.relation_side.opposite())
                 .into_iter()
                 .map(|col| col.alias(SelectedFields::RELATED_MODEL_ALIAS))
-                .collect()
+                .collect::<Vec<_>>()
 
         );
 
@@ -88,7 +88,7 @@ where
                 .columns_for_relation_side(from_field.relation_side)
                 .into_iter()
                 .map(|col| col.alias(SelectedFields::PARENT_MODEL_ALIAS))
-                .collect()
+                .collect::<Vec<_>>()
         );
 
         let model = from_field.related_model();
@@ -106,7 +106,7 @@ where
                 .into_iter()
                 .map(|col| col.alias(SelectedFields::RELATED_MODEL_ALIAS)
                 .table(Relation::TABLE_ALIAS))
-                .collect()
+                .collect::<Vec<_>>()
         );
 
         columns.extend(
@@ -115,7 +115,7 @@ where
                 .into_iter()
                 .map(|col| col.alias(SelectedFields::PARENT_MODEL_ALIAS)
                 .table(Relation::TABLE_ALIAS))
-                .collect()
+                .collect::<Vec<_>>()
         );
 
         let is_with_pagination = query_arguments.is_with_pagination();
@@ -140,7 +140,7 @@ where
             let _ = row.values.pop();
 
             let mut record = Record::from(row);
-            record.set_parent_id(GraphqlId::try_from(parent_id)?);
+            // record.set_parent_id(GraphqlId::try_from(parent_id)?);
 
             Ok(record)
         })
