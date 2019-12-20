@@ -19,12 +19,10 @@ impl FieldArity {
 #[derive(Clone)]
 pub enum DefaultValue {
     Single(ScalarValue),
-    Expression(String, &'static dyn Fn() -> ScalarValue),
+    Expression(String, fn() -> ScalarValue),
 }
 
-fn something(v: &'static str) -> ScalarValue {
-    unimplemented!()
-}
+struct ExpressionContext {}
 
 impl DefaultValue {
     // Returns either a copy of the contained value or produces a new
@@ -37,9 +35,17 @@ impl DefaultValue {
     }
 }
 
+// fn something(v: &'static str) -> ScalarValue {
+//     unimplemented!()
+// }
+
 impl fmt::Debug for DefaultValue {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        // DefaultValue::Expression("".to_owned(), &something);
+        let x = "asdf";
+        DefaultValue::Expression("".to_owned(), move || {
+            println!("{}", x);
+            unimplemented!()
+        });
 
         match self {
             Self::Single(ref v) => write!(f, "DefaultValue::Single({:?})", v),
