@@ -686,3 +686,42 @@ async fn introspecting_id_fields_with_foreign_key_should_ignore_the_relation(api
             let result = dbg!(api.introspect().await);
             custom_assert(&result, dm);
 }
+
+#[test_one_connector(connector = "postgres")]
+async fn duplicate_back_relation_fields_should_be_renamed(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+                t.add_column("name", types::text());
+                t.inject_custom("CONSTRAINT user_unique UNIQUE(\"id\", \"name\")");
+            });
+            migration.create_table("Post", |t| {
+                t.add_column("id", types::primary());
+                t.add_column("user_id", types::integer());
+                t.add_column("user_name", types::text());
+                t.inject_custom("FOREIGN KEY (\"user_id\",\"user_name\") REFERENCES \"User\"(\"id\", \"name\")");
+             });
+        })
+        .await;
+
+    let dm = r#"
+            model Post {
+               id    Int @id  @id @sequence(name: "Post_id_seq", allocationSize: 1, initialValue: 1)
+               user_id   User
+               user_name User @relation(references: [name])
+            }
+
+            model User {
+               id      Int @id @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
+               name  String
+               posts_PostToUser Post[]
+               posts_PostToUser Post[]
+
+               @@unique([id, name] name: "user_unique")
+            }
+        "#;
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}
