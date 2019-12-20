@@ -19,10 +19,12 @@ impl FieldArity {
 #[derive(Clone)]
 pub enum DefaultValue {
     Single(ScalarValue),
-    Expression(String, fn() -> ScalarValue),
+    Expression(String, Box<dyn ValueGenerator>),
 }
 
-struct ExpressionContext {}
+pub trait ValueGenerator {
+    fn generate() -> ScalarValue;
+}
 
 impl DefaultValue {
     // Returns either a copy of the contained value or produces a new
@@ -34,10 +36,6 @@ impl DefaultValue {
         }
     }
 }
-
-// fn something(v: &'static str) -> ScalarValue {
-//     unimplemented!()
-// }
 
 impl fmt::Debug for DefaultValue {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
