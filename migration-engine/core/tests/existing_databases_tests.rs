@@ -2,6 +2,8 @@ use barrel::types;
 use pretty_assertions::assert_eq;
 use sql_schema_describer::*;
 use test_harness::*;
+use migration_core::commands::{InferMigrationStepsCommand, InferMigrationStepsInput, ApplyMigrationInput, ApplyMigrationCommand};
+use quaint::prelude::SqlFamily;
 
 mod test_harness;
 
@@ -284,7 +286,7 @@ async fn updating_a_field_for_a_non_existent_column(api: &TestApi) {
             });
         })
         .await;
-    assert_eq!(result.table_bang("Blog").column("title").is_some(), false);
+    assert!(result.table_bang("Blog").column("title").is_none());
 
     let dm2 = r#"
             model Blog {
@@ -327,7 +329,7 @@ async fn renaming_a_field_where_the_column_was_already_renamed_must_work(api: &T
             });
         })
         .await;
-    assert_eq!(result.table_bang("Blog").column("new_title").is_some(), true);
+    assert!(result.table_bang("Blog").column("new_title").is_some());
 
     let dm2 = r#"
             model Blog {
@@ -341,5 +343,62 @@ async fn renaming_a_field_where_the_column_was_already_renamed_must_work(api: &T
     let final_column = final_result.table_bang("Blog").column_bang("new_title");
 
     assert_eq!(final_column.tpe.family, ColumnTypeFamily::Float);
-    assert_eq!(final_result.table_bang("Blog").column("title").is_some(), false);
+    assert!(final_result.table_bang("Blog").column("title").is_none());
+}
+
+#[test_each_connector(log = "debug")]
+async fn removing_a_default_from_a_non_nullable_foreign_key_column_must_warn(api: &TestApi) {
+    let sql_family = api.sql_family();
+    let sql_schema = api
+        .barrel()
+        .execute(move |migration| {
+            migration.create_table("User", move |t| {
+                t.add_column("id", types::primary());
+            });
+
+            migration.create_table("Blog", move |t| {
+                t.add_column("id", types::primary());
+                // Barrel fails to create foreign key columns with defaults (bad SQL).
+                let fk = match sql_family {
+                    SqlFamily::Postgres => r#""user" INTEGER DEFAULT 1, FOREIGN KEY ("user") REFERENCES "User" ("id")"#,
+                    _ => "user INTEGER DEFAULT 1, FOREIGN KEY (user) REFERENCES User (id)",
+                };
+
+                t.inject_custom(fk);
+            });
+        })
+        .await;
+
+    assert!(sql_schema.table_bang("Blog").column("user").unwrap().default.is_some());
+
+    let dm = r#"
+        model User {
+            id Int @id
+        }
+
+        model Blog {
+            id Int @id
+            user User
+        }
+    "#;
+
+    let infer_input = InferMigrationStepsInput {
+        datamodel: dm.into(),
+        assume_to_be_applied: Vec::new(),
+        migration_id: "test-migration".into(),
+
+    };
+
+    let result = api.execute_command::<InferMigrationStepsCommand>(&infer_input).await.unwrap();
+
+    let apply_input = ApplyMigrationInput {
+        steps: result.datamodel_steps,
+        force: Some(false),
+        migration_id: "test-migration".into(),
+    };
+
+    let result = api.execute_command::<ApplyMigrationCommand>(&apply_input).await.unwrap();
+
+    let expected_warning = "The migration is about to remove a default value on the foreign key field `Blog.user`.";
+    assert_eq!(result.warnings, &[migration_connector::MigrationWarning { description: expected_warning.into() }]);
 }

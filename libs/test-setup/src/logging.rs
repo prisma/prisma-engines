@@ -1,14 +1,18 @@
 use tracing_subscriber::*;
 
-type Subscriber<T> =
-    FmtSubscriber<tracing_subscriber::fmt::format::NewRecorder, tracing_subscriber::fmt::format::Format, EnvFilter, T>;
+type Subscriber = FmtSubscriber<
+    tracing_subscriber::fmt::format::NewRecorder,
+    tracing_subscriber::fmt::format::Format,
+    EnvFilter,
+    PrintWriter,
+>;
 
-pub fn test_tracing_subscriber<T>(log_config: &'static str) -> Subscriber<impl Fn() -> PrintWriter> {
+pub fn test_tracing_subscriber(log_config: &'static str) -> Subscriber {
     let filter = EnvFilter::new(log_config);
 
     FmtSubscriber::builder()
         .with_env_filter(filter)
-        .with_writer(print_writer)
+        .with_writer(PrintWriter)
         .finish()
 }
 
@@ -18,12 +22,15 @@ pub fn test_tracing_subscriber<T>(log_config: &'static str) -> Subscriber<impl F
 /// specific test outputs for readability.
 ///
 /// It is used from test_macros.
-pub fn print_writer() -> PrintWriter {
-    PrintWriter
-}
-
-/// See `print_writer`.
 pub struct PrintWriter;
+
+impl tracing_subscriber::fmt::MakeWriter for PrintWriter {
+    type Writer = PrintWriter;
+
+    fn make_writer(&self) -> Self::Writer {
+        PrintWriter
+    }
+}
 
 impl std::io::Write for PrintWriter {
     fn write(&mut self, buf: &[u8]) -> Result<usize, std::io::Error> {
