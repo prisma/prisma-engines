@@ -89,7 +89,7 @@ async fn adding_an_id_field_with_a_special_name_must_work(api: &TestApi) {
     assert_eq!(column.is_some(), true);
 }
 
-#[test_each_connector(ignore="sqlite")]
+#[test_each_connector(ignore = "sqlite")]
 async fn adding_an_id_field_of_type_int_must_work(api: &TestApi) {
     let dm2 = r#"
         model Test {
@@ -102,9 +102,9 @@ async fn adding_an_id_field_of_type_int_must_work(api: &TestApi) {
     let column = result.table_bang("Test").column_bang("myId");
 
     assert_eq!(column.auto_increment, false);
- }
+}
 
-#[test_one_connector(connector="sqlite")]
+#[test_one_connector(connector = "sqlite")]
 async fn adding_an_id_field_of_type_int_must_work_for_sqlite(api: &TestApi) {
     let dm2 = r#"
         model Test {
@@ -141,7 +141,6 @@ async fn adding_an_id_field_of_type_int_with_autoincrement_must_work(api: &TestA
         _ => assert_eq!(column.auto_increment, true),
     }
 }
-
 
 #[test_each_connector]
 async fn removing_a_scalar_field_must_work(api: &TestApi) {
@@ -1594,4 +1593,34 @@ async fn column_defaults_must_be_migrated(api: &TestApi) {
         column.default.as_ref().map(String::as_str),
         Some(if api.is_sqlite() { "'mango'" } else { "mango" })
     );
+}
+
+#[test_each_connector]
+async fn created_at_does_not_get_arbitrarily_migrated(api: &TestApi) {
+    use quaint::ast::*;
+
+    let dm1 = r#"
+        model Fruit {
+            id Int @id @default(autoincrement())
+            name String
+            createdAt DateTime @default(now())
+        }
+    "#;
+
+    api.infer_and_apply(dm1).await;
+
+    let insert = Insert::single_into(api.render_table_name("Fruit")).value("name", "banana");
+    api.database().execute(insert.into()).await.unwrap();
+
+    let dm2 = r#"
+        model Fruit {
+            id Int @id @default(autoincrement())
+            name String
+            createdAt DateTime @default(now())
+        }
+    "#;
+
+    let output = api.infer_and_apply(dm2).await;
+
+    assert_eq!(output.migration_output.warnings, &[]);
 }
