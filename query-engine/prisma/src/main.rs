@@ -103,7 +103,7 @@ async fn main() -> Result<(), AnyError> {
             Some(cmd) => {
                 if let Err(err) = cmd.execute() {
                     info!("Encountered error during initialization:");
-                    err.pretty_print();
+                    err.render_as_json().expect("error rendering");
                     process::exit(1);
                 }
             }
@@ -125,9 +125,11 @@ async fn main() -> Result<(), AnyError> {
         let address = ([0, 0, 0, 0], port);
         let legacy = matches.is_present("legacy");
 
+        eprintln!("Printing to stderr for debugging");
+
         if let Err(err) = HttpServer::run(address, legacy).await {
             info!("Encountered error during initialization:");
-            err.pretty_print();
+            err.render_as_json().expect("error rendering");
             process::exit(1);
         };
     };

@@ -33,6 +33,7 @@ async fn authentication_failure_must_return_a_known_error_on_postgres() {
 
     let json_error = serde_json::to_value(&render_error(error)).unwrap();
     let expected = json!({
+        "is_panic": false,
         "message": format!("Authentication failed against database server at `{host}`, the provided database credentials for `postgres` are not valid.\n\nPlease make sure to provide valid database credentials for the database server at `{host}`.", host = host),
         "meta": {
             "database_user": user,
@@ -69,6 +70,7 @@ async fn authentication_failure_must_return_a_known_error_on_mysql() {
 
     let json_error = serde_json::to_value(&render_error(error)).unwrap();
     let expected = json!({
+        "is_panic": false,
         "message": format!("Authentication failed against database server at `{host}`, the provided database credentials for `{user}` are not valid.\n\nPlease make sure to provide valid database credentials for the database server at `{host}`.", host = host, user = user),
         "meta": {
             "database_user": user,
@@ -105,6 +107,7 @@ async fn unreachable_database_must_return_a_proper_error_on_mysql() {
 
     let json_error = serde_json::to_value(&render_error(error)).unwrap();
     let expected = json!({
+        "is_panic": false,
         "message": format!("Can't reach database server at `{host}`:`{port}`\n\nPlease make sure your database server is running at `{host}`:`{port}`.", host = host, port = port),
         "meta": {
             "database_host": host,
@@ -141,6 +144,7 @@ async fn unreachable_database_must_return_a_proper_error_on_postgres() {
 
     let json_error = serde_json::to_value(&render_error(error)).unwrap();
     let expected = json!({
+        "is_panic": false,
         "message": format!("Can't reach database server at `{host}`:`{port}`\n\nPlease make sure your database server is running at `{host}`:`{port}`.", host = host, port = port),
         "meta": {
             "database_host": host,
@@ -175,6 +179,7 @@ async fn database_does_not_exist_must_return_a_proper_error() {
 
     let json_error = serde_json::to_value(&render_error(error)).unwrap();
     let expected = json!({
+        "is_panic": false,
         "message": format!("Database `{database_name}` does not exist on the database server at `{database_host}:{database_port}`.", database_name = database_name, database_host = url.host().unwrap(), database_port = url.port().unwrap()),
         "meta": {
             "database_name": database_name,
@@ -210,6 +215,7 @@ async fn database_already_exists_must_return_a_proper_error() {
     let json_error = serde_json::to_value(&error).unwrap();
 
     let expected = json!({
+        "is_panic": false,
         "message": format!("Database `database_already_exists_must_return_a_proper_error` already exists on the database server at `{host}:{port}`", host = host, port = port),
         "meta": {
             "database_name": "database_already_exists_must_return_a_proper_error",
@@ -249,6 +255,7 @@ async fn database_access_denied_must_return_a_proper_error_in_cli() {
 
     let json_error = serde_json::to_value(&error).unwrap();
     let expected = json!({
+        "is_panic": false,
         "message": "User `jeanmichel` was denied access on the database `access_denied_test`",
         "meta": {
             "database_user": "jeanmichel",
@@ -290,6 +297,7 @@ async fn database_access_denied_must_return_a_proper_error_in_rpc() {
     let json_error = serde_json::to_value(&render_error(error)).unwrap();
 
     let expected = json!({
+        "is_panic": false,
         "message": "User `jeanyves` was denied access on the database `access_denied_test`",
         "meta": {
             "database_user": "jeanyves",
@@ -313,7 +321,7 @@ async fn command_errors_must_return_an_unknown_error(api: &TestApi) {
 
     let error = api.execute_command::<ApplyMigrationCommand>(&input).await.unwrap_err();
 
-    let expected_error = user_facing_errors::Error::Unknown(user_facing_errors::UnknownError {
+    let expected_error = user_facing_errors::Error::from(user_facing_errors::UnknownError {
         message: "Failure during a migration command: Generic error. (error: The model abcd does not exist in this Datamodel. It is not possible to delete it.)".to_owned(),
         backtrace: None,
     });
@@ -376,6 +384,7 @@ async fn unique_constraint_errors_in_migrations_must_return_a_known_error(api: &
     };
 
     let expected_json = json!({
+        "is_panic": false,
         "message": format!("Unique constraint failed on the field: `{}`", field_name),
         "meta": {
             "field_name": field_name,
@@ -404,6 +413,7 @@ async fn tls_errors_must_be_mapped_in_the_cli(_api: &TestApi) {
     let json_error = serde_json::to_value(&error).unwrap();
 
     let expected = json!({
+        "is_panic": false,
         "message": format!("Error opening a TLS connection: error performing TLS handshake: server does not support TLS"),
         "meta": {
             "message": "error performing TLS handshake: server does not support TLS",

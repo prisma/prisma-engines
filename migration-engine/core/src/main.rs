@@ -7,9 +7,9 @@ pub mod migration_engine;
 
 use crate::api::RpcApi;
 use commands::*;
-use datamodel::{self, error::ErrorCollection, Datamodel};
+use datamodel::{self, Datamodel};
 use futures::FutureExt;
-use std::{fs, io, io::Read};
+use std::{fs, io::Read};
 #[cfg(test)]
 mod tests;
 
@@ -23,21 +23,11 @@ pub(crate) fn parse_datamodel(datamodel: &str) -> CommandResult<Datamodel> {
     result.map_err(|e| CommandError::DataModelErrors { errors: vec![e] })
 }
 
-pub(crate) fn pretty_print_errors(errors: ErrorCollection, datamodel: &str) {
-    let file_name = "schema.prisma".to_string();
-
-    for error in errors.to_iter() {
-        println!();
-        error
-            .pretty_print(&mut io::stderr().lock(), &file_name, datamodel)
-            .expect("Failed to write errors to stderr");
-    }
-}
-
 #[tokio::main]
 async fn main() {
     user_facing_errors::set_panic_hook();
     init_logger();
+    let mut global_exit_code: i32 = 0;
 
     let matches = cli::clap_app().get_matches();
 
@@ -53,23 +43,23 @@ async fn main() {
         {
             Ok(Ok(msg)) => {
                 tracing::info!("{}", msg);
-                std::process::exit(0);
+                global_exit_code = 0;
             }
             Ok(Err(error)) => {
                 tracing::error!("{}", error);
                 let exit_code = error.exit_code();
                 serde_json::to_writer(std::io::stdout(), &cli::render_error(error)).expect("failed to write to stdout");
                 println!();
-                std::process::exit(exit_code);
+                global_exit_code = exit_code;
             }
             Err(panic) => {
                 serde_json::to_writer(
                     std::io::stdout(),
-                    &user_facing_errors::UnknownError::from_panic_payload(panic.as_ref()),
+                    &user_facing_errors::Error::from_panic_payload(panic.as_ref()),
                 )
                 .expect("failed to write to stdout");
                 println!();
-                std::process::exit(255);
+                global_exit_code = 255;
             }
         }
     } else {
@@ -88,18 +78,28 @@ async fn main() {
         } else {
             match RpcApi::new(&datamodel).await {
                 Ok(api) => api.start_server().await,
-                Err(Error::DatamodelError(errors)) => {
-                    pretty_print_errors(errors, &datamodel);
-                    std::process::exit(1);
-                }
-                Err(e) => {
-                    serde_json::to_writer(std::io::stdout(), &api::render_error(e)).expect("failed to write to stdout");
-                    println!();
-                    std::process::exit(255);
+                Err(err) => {
+                    let (error, exit_code) = match &err {
+                        Error::DatamodelError(errors) => {
+                            let error = user_facing_errors::UnknownError {
+                                message: api::pretty_print_datamodel_errors(errors, &datamodel)
+                                    .expect("rendering error"),
+                                backtrace: Some(format!("{:?}", user_facing_errors::new_backtrace())),
+                            };
+
+                            (user_facing_errors::Error::from(error), 1)
+                        }
+                        _ => (api::render_error(err), 255),
+                    };
+
+                    serde_json::to_writer(std::io::stdout().lock(), &error).expect("failed to write to stdout");
+                    global_exit_code = exit_code
                 }
             }
         }
     }
+
+    std::process::exit(global_exit_code);
 }
 
 fn init_logger() {
