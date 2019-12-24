@@ -1,10 +1,8 @@
 #![allow(non_snake_case)]
 
-mod test_harness;
-
+use crate::migration::datamodel_migration_steps_inferrer::*;
 use datamodel::ast::{parser, SchemaAst};
 use migration_connector::steps::*;
-use migration_core::migration::datamodel_migration_steps_inferrer::*;
 use pretty_assertions::assert_eq;
 
 #[test]

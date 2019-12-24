@@ -1,9 +1,7 @@
 #![allow(non_snake_case)]
 
-mod test_harness;
-
+use super::test_harness::*;
 use migration_connector::*;
-use test_harness::*;
 
 #[test_each_connector]
 async fn single_watch_migrations_must_work(api: &TestApi) {

@@ -1,14 +1,13 @@
 #![allow(non_snake_case)]
 
-mod test_harness;
-use migration_core::commands::{
+use super::test_harness::*;
+use crate::commands::{
     CalculateDatabaseStepsCommand, CalculateDatabaseStepsInput, InferMigrationStepsCommand, InferMigrationStepsInput,
 };
 use pretty_assertions::assert_eq;
 use quaint::prelude::SqlFamily;
 use sql_migration_connector::{AlterIndex, CreateIndex, DropIndex, SqlMigrationStep};
 use sql_schema_describer::*;
-use test_harness::*;
 
 #[test_each_connector]
 async fn adding_a_scalar_field_must_work(api: &TestApi) {

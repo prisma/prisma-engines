@@ -1,15 +1,13 @@
-mod test_harness;
-
-use migration_connector::steps::{DeleteModel, MigrationStep};
-use migration_core::{
+use super::test_harness::*;
+use crate::{
     api::{render_error, RpcApi},
     cli,
     commands::{ApplyMigrationCommand, ApplyMigrationInput, InferMigrationStepsCommand, InferMigrationStepsInput},
 };
+use migration_connector::steps::{DeleteModel, MigrationStep};
 use pretty_assertions::assert_eq;
 use quaint::{prelude::*, single::Quaint};
 use serde_json::json;
-use test_harness::*;
 use url::Url;
 
 #[tokio::test]

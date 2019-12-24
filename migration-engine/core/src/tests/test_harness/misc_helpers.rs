@@ -1,6 +1,6 @@
+use crate::{api::MigrationApi, commands::ResetCommand};
 use datamodel::ast::{parser, SchemaAst};
 use migration_connector::*;
-use migration_core::{api::MigrationApi, commands::ResetCommand};
 use sql_migration_connector::SqlMigrationConnector;
 use test_setup::*;
 

@@ -1,11 +1,11 @@
+use super::test_harness::*;
+use crate::commands::{
+    ApplyMigrationCommand, ApplyMigrationInput, InferMigrationStepsCommand, InferMigrationStepsInput,
+};
 use barrel::types;
 use pretty_assertions::assert_eq;
-use sql_schema_describer::*;
-use test_harness::*;
-use migration_core::commands::{InferMigrationStepsCommand, InferMigrationStepsInput, ApplyMigrationInput, ApplyMigrationCommand};
 use quaint::prelude::SqlFamily;
-
-mod test_harness;
+use sql_schema_describer::*;
 
 #[test_each_connector]
 async fn adding_a_model_for_an_existing_table_must_work(api: &TestApi) {
@@ -386,10 +386,12 @@ async fn removing_a_default_from_a_non_nullable_foreign_key_column_must_warn(api
         datamodel: dm.into(),
         assume_to_be_applied: Vec::new(),
         migration_id: "test-migration".into(),
-
     };
 
-    let result = api.execute_command::<InferMigrationStepsCommand>(&infer_input).await.unwrap();
+    let result = api
+        .execute_command::<InferMigrationStepsCommand>(&infer_input)
+        .await
+        .unwrap();
 
     let apply_input = ApplyMigrationInput {
         steps: result.datamodel_steps,
@@ -397,8 +399,16 @@ async fn removing_a_default_from_a_non_nullable_foreign_key_column_must_warn(api
         migration_id: "test-migration".into(),
     };
 
-    let result = api.execute_command::<ApplyMigrationCommand>(&apply_input).await.unwrap();
+    let result = api
+        .execute_command::<ApplyMigrationCommand>(&apply_input)
+        .await
+        .unwrap();
 
     let expected_warning = "The migration is about to remove a default value on the foreign key field `Blog.user`.";
-    assert_eq!(result.warnings, &[migration_connector::MigrationWarning { description: expected_warning.into() }]);
+    assert_eq!(
+        result.warnings,
+        &[migration_connector::MigrationWarning {
+            description: expected_warning.into()
+        }]
+    );
 }

@@ -1,11 +1,9 @@
 #![allow(non_snake_case)]
 
-mod test_harness;
-
+use super::test_harness::*;
 use migration_connector::{steps::CreateEnum, *};
 use pretty_assertions::assert_eq;
 use quaint::prelude::SqlFamily;
-use test_harness::*;
 
 #[test_each_connector]
 async fn last_should_return_none_if_there_is_no_migration(api: &TestApi) {

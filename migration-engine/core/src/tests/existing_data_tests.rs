@@ -1,9 +1,7 @@
-mod test_harness;
-
+use super::test_harness::*;
 use migration_connector::MigrationWarning;
 use pretty_assertions::assert_eq;
 use quaint::ast::*;
-use test_harness::*;
 
 #[test_each_connector]
 async fn adding_a_required_field_if_there_is_data(api: &TestApi) {
@@ -266,7 +264,9 @@ async fn dropping_a_table_referenced_by_foreign_keys_must_work(api: &TestApi) {
         .value("id", id);
     api.database().query(insert.into()).await.unwrap();
 
-    let insert = Insert::single_into(api.render_table_name("Recipe")).value("category", id).value("id", id);
+    let insert = Insert::single_into(api.render_table_name("Recipe"))
+        .value("category", id)
+        .value("id", id);
     api.database().query(insert.into()).await.unwrap();
 
     let fk = sql_schema.table_bang("Recipe").foreign_keys.get(0).unwrap();
@@ -277,7 +277,6 @@ async fn dropping_a_table_referenced_by_foreign_keys_must_work(api: &TestApi) {
             id Int @id
         }
     "#;
-
 
     api.infer_and_apply_with_options(InferAndApplyBuilder::new(&dm2).force(Some(true)).build())
         .await
