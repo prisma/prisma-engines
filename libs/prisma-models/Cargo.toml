@@ -18,8 +18,7 @@ parking_lot = "0.7"
 uuid = { version = "0.7", features = ["serde", "v4"] }
 cuid = { git = "https://github.com/prisma/cuid-rust" }
 chrono = { version = "0.4", features = ["serde"] }
-failure = "0.1"
-failure_derive = "0.1"
+failure = { version = "0.1", features = ["derive"] }
 rand = "0.6"
 datamodel = { path = "../datamodel/core" }
 itertools = "0.8"
