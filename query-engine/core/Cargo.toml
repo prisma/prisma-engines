@@ -8,8 +8,7 @@ edition = "2018"
 prisma-models = { path = "../../libs/prisma-models" }
 prisma-inflector = { path = "../../libs/prisma-inflector" }
 connector = { path = "../connectors/query-connector", package = "query-connector" }
-failure = "0.1"
-failure_derive = "0.1"
+failure = { version =  "0.1", features = ["derive"] }
 lazy_static = "1.4"
 uuid = "0.7"
 indexmap = "1.0"
