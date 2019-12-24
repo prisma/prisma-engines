@@ -3,14 +3,14 @@ use super::{
     misc_helpers::{mysql_migration_connector, postgres_migration_connector, sqlite_migration_connector, test_api},
     InferAndApplyOutput,
 };
-use migration_connector::{MigrationPersistence, MigrationStep};
-use migration_core::{
+use crate::{
     api::{GenericApi, MigrationApi},
     commands::{
         ApplyMigrationInput, InferMigrationStepsInput, MigrationStepsResultOutput, UnapplyMigrationInput,
         UnapplyMigrationOutput,
     },
 };
+use migration_connector::{MigrationPersistence, MigrationStep};
 use quaint::prelude::{ConnectionInfo, Queryable, SqlFamily};
 use sql_schema_describer::*;
 use std::sync::Arc;
@@ -147,7 +147,7 @@ impl TestApi {
 
     pub async fn execute_command<'a, C>(&self, input: &'a C::Input) -> Result<C::Output, user_facing_errors::Error>
     where
-        C: migration_core::commands::MigrationCommand,
+        C: crate::commands::MigrationCommand,
     {
         self.api
             .handle_command::<C>(input)
@@ -203,7 +203,6 @@ impl TestApi {
             .describe(self.connection_info().unwrap().schema_name())
             .await
             .context("Description failed")?;
-
 
         // the presence of the _Migration table makes assertions harder. Therefore remove it from the result.
         result.tables = result.tables.into_iter().filter(|t| t.name != "_Migration").collect();
