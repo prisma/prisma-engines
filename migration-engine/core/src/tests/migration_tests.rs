@@ -1623,3 +1623,40 @@ async fn created_at_does_not_get_arbitrarily_migrated(api: &TestApi) {
 
     assert_eq!(output.migration_output.warnings, &[]);
 }
+
+#[test_one_connector(connector = "sqlite", log = "debug")]
+async fn renaming_a_datasource_works(api: &TestApi) -> Result<(), anyhow::Error> {
+    let dm1 = r#"
+        datasource db1 {
+            provider = "sqlite"
+            url = "file:///tmp/prisma-test.db"    
+        }
+
+        model User {
+            id Int @id  
+        }
+    "#;
+
+    let infer_output = api.infer_migration(&InferBuilder::new(dm1.to_owned()).build()).await?;
+
+    let dm2 = r#"
+        datasource db2 {
+            provider = "sqlite"
+            url = "file:///tmp/prisma-test.db"    
+        }
+    
+        model User {
+            id Int @id
+        }
+    "#;
+
+    api.infer_migration(
+        &InferBuilder::new(dm2.to_owned())
+            .assume_to_be_applied(Some(infer_output.datamodel_steps))
+            .migration_id(Some("mig02".to_owned()))
+            .build(),
+    )
+    .await?;
+
+    Ok(())
+}
