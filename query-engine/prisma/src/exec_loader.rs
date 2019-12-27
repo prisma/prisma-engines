@@ -22,7 +22,10 @@ pub async fn load(
         MYSQL_SOURCE_NAME => mysql(source).await,
 
         #[cfg(feature = "sql")]
-        POSTGRES_SOURCE_NAME => postgres(source).await,
+        POSTGRES_SOURCE_NAME => {
+            panic!("started the migration engine with postgres connector");
+            postgres(source).await
+        }
 
         x => Err(PrismaError::ConfigurationError(format!(
             "Unsupported connector type: {}",
