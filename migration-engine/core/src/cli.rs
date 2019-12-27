@@ -1,29 +1,29 @@
 use clap::ArgMatches;
-use failure::Fail;
 use itertools::Itertools;
 use migration_connector::*;
 use quaint::prelude::SqlFamily;
 use sql_migration_connector::SqlMigrationConnector;
 use std::collections::HashMap;
+use thiserror::Error;
 use url::Url;
 
-#[derive(Debug, Fail)]
+#[derive(Debug, Error)]
 pub enum CliError {
-    #[fail(display = "Known error: {:?}", _0)]
+    #[error("Known error: {:?}", error)]
     Known {
         error: user_facing_errors::KnownError,
         exit_code: i32,
     },
-    #[fail(display = "{}", _0)]
+    #[error("{}", error)]
     Unknown {
         error: migration_connector::ErrorKind,
         exit_code: i32,
     },
 
-    #[fail(display = "No command defined")]
+    #[error("No command defined")]
     NoCommandDefined,
 
-    #[fail(display = "Unknown error occured: {}", _0)]
+    #[error("Unknown error occured: {0}")]
     Other(String),
 }
 
@@ -250,7 +250,7 @@ pub fn render_error(cli_error: CliError) -> user_facing_errors::Error {
         CliError::Known { error, .. } => error.into(),
         other => UnknownError {
             message: format!("{}", other),
-            backtrace: other.backtrace().map(|bt| format!("{}", bt)),
+            backtrace: None,
         }
         .into(),
     }
