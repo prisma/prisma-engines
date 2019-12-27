@@ -1588,13 +1588,8 @@ async fn column_defaults_must_be_migrated(api: &TestApi) {
     assert_eq!(column.default.as_ref().map(String::as_str), Some("mango"));
 }
 
-<<<<<<< HEAD
 #[test_each_connector(ignore = "mysql_mariadb")]
 async fn escaped_string_defaults_are_not_arbitrarily_migrated(api: &TestApi) -> Result<(), anyhow::Error> {
-=======
-#[test_each_connector]
-async fn escaped_string_defaults_are_not_migrated_spuriously(api: &TestApi) -> Result<(), anyhow::Error> {
->>>>>>> b56eb118... Move SQL migration connector to std::error::Error
     use quaint::ast::*;
 
     let dm1 = r#"
@@ -1668,7 +1663,7 @@ async fn escaped_string_defaults_are_not_migrated_spuriously(api: &TestApi) -> R
 }
 
 #[test_each_connector]
-async fn created_at_does_not_get_arbitrarily_migrated(api: &TestApi) {
+async fn created_at_does_not_get_arbitrarily_migrated(api: &TestApi) -> Result<(), anyhow::Error> {
     use quaint::ast::*;
 
     let dm1 = r#"
@@ -1679,10 +1674,21 @@ async fn created_at_does_not_get_arbitrarily_migrated(api: &TestApi) {
         }
     "#;
 
-    api.infer_and_apply(dm1).await;
+    let schema = api.infer_and_apply(dm1).await.sql_schema;
 
     let insert = Insert::single_into(api.render_table_name("Fruit")).value("name", "banana");
     api.database().execute(insert.into()).await.unwrap();
+
+    anyhow::ensure!(
+        schema
+            .table_bang("Fruit")
+            .column_bang("createdAt")
+            .default
+            .as_ref()
+            .unwrap()
+            .contains("1970"),
+        "createdAt default is set"
+    );
 
     let dm2 = r#"
         model Fruit {
@@ -1694,7 +1700,13 @@ async fn created_at_does_not_get_arbitrarily_migrated(api: &TestApi) {
 
     let output = api.infer_and_apply(dm2).await;
 
-    assert_eq!(output.migration_output.warnings, &[]);
+    anyhow::ensure!(output.migration_output.warnings.is_empty(), "No warnings");
+    anyhow::ensure!(
+        output.migration_output.datamodel_steps.is_empty(),
+        "Migration should be empty"
+    );
+
+    Ok(())
 }
 
 #[test_one_connector(connector = "sqlite")]
