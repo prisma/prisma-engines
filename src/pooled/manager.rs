@@ -8,7 +8,6 @@ use crate::{
     connector::{self, Queryable, TransactionCapable, DBIO},
     error::Error,
 };
-use failure::{Compat, Fail};
 use futures::{future::FutureExt};
 use mobc::{runtime::DefaultExecutor, AnyFuture, ConnectionManager, PooledConnection as MobcPooled};
 
@@ -57,7 +56,7 @@ pub enum QuaintManager {
 impl ConnectionManager for QuaintManager {
     type Connection = Box<dyn Queryable + Send + Sync>;
     type Executor = DefaultExecutor;
-    type Error = Compat<Error>;
+    type Error = Error;
 
     fn get_executor(&self) -> Self::Executor {
         DefaultExecutor::current()
@@ -72,9 +71,9 @@ impl ConnectionManager for QuaintManager {
                 match Sqlite::new(&file_path) {
                     Ok(mut conn) => match conn.attach_database(db_name) {
                         Ok(_) => futures::future::ok(Box::new(conn) as Self::Connection).boxed(),
-                        Err(e) => futures::future::err(e.compat()).boxed(),
+                        Err(e) => futures::future::err(e).boxed(),
                     },
-                    Err(e) => futures::future::err(e.compat()).boxed(),
+                    Err(e) => futures::future::err(e).boxed(),
                 }
             }
 
@@ -84,7 +83,7 @@ impl ConnectionManager for QuaintManager {
 
                 match Mysql::new(url.clone()) {
                     Ok(mysql) => futures::future::ok(Box::new(mysql) as Self::Connection).boxed(),
-                    Err(e) => futures::future::err(e.compat()).boxed(),
+                    Err(e) => futures::future::err(e).boxed(),
                 }
             }
 
@@ -95,7 +94,7 @@ impl ConnectionManager for QuaintManager {
                 let url: PostgresUrl = url.clone();
 
                 let fut = async move {
-                    let conn = PostgreSql::new(url).await.map_err(|e| e.compat())?;
+                    let conn = PostgreSql::new(url).await?;
                     Ok(Box::new(conn) as Self::Connection)
                 };
 
@@ -106,7 +105,7 @@ impl ConnectionManager for QuaintManager {
 
     fn is_valid(&self, conn: Self::Connection) -> AnyFuture<Self::Connection, Self::Error> {
         async move {
-            conn.query_raw("SELECT 1", &[]).await.map_err(|e| e.compat())?;
+            conn.query_raw("SELECT 1", &[]).await?;
             Ok(conn)
         }
             .boxed()

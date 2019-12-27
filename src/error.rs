@@ -1,74 +1,74 @@
-use failure::{Error as FError, Fail};
+use thiserror::Error;
 use std::io;
 
-#[derive(Debug, Fail)]
+#[derive(Debug, Error)]
 pub enum Error {
-    #[fail(display = "Error querying the database: {}", _0)]
-    QueryError(FError),
+    #[error("Error querying the database: {}", _0)]
+    QueryError(Box<dyn std::error::Error + Send + Sync + 'static>),
 
-    #[fail(display = "Database '{}' does not exist.", db_name)]
+    #[error("Database '{}' does not exist.", db_name)]
     DatabaseDoesNotExist { db_name: String },
 
-    #[fail(display = "Access denied to database '{}'", db_name)]
+    #[error("Access denied to database '{}'", db_name)]
     DatabaseAccessDenied { db_name: String },
 
-    #[fail(display = "Database '{}' already exists", db_name)]
+    #[error("Database '{}' already exists", db_name)]
     DatabaseAlreadyExists { db_name: String },
 
-    #[fail(display = "Authentication failed for user '{}'", user)]
+    #[error("Authentication failed for user '{}'", user)]
     AuthenticationFailed { user: String },
 
-    #[fail(display = "Query returned no data")]
+    #[error("Query returned no data")]
     NotFound,
 
-    #[fail(display = "Unique constraint failed: {}", field_name)]
+    #[error("Unique constraint failed: {}", field_name)]
     UniqueConstraintViolation { field_name: String },
 
-    #[fail(display = "Null constraint failed: {}", field_name)]
+    #[error("Null constraint failed: {}", field_name)]
     NullConstraintViolation { field_name: String },
 
-    #[fail(display = "Error creating a database connection.")]
-    ConnectionError(FError),
+    #[error("Error creating a database connection.")]
+    ConnectionError(Box<dyn std::error::Error + Send + Sync + 'static>),
 
-    #[fail(display = "Error reading the column value: {}", _0)]
-    ColumnReadFailure(FError),
+    #[error("Error reading the column value: {}", _0)]
+    ColumnReadFailure(Box<dyn std::error::Error + Send + Sync + 'static>),
 
-    #[fail(display = "Error accessing result set, index out of bounds: {}", _0)]
+    #[error("Error accessing result set, index out of bounds: {}", _0)]
     ResultIndexOutOfBounds(usize),
 
-    #[fail(display = "Error accessing result set, column not found: {}", _0)]
+    #[error("Error accessing result set, column not found: {}", _0)]
     ColumnNotFound(String),
 
-    #[fail(display = "Error accessing result set, type mismatch, expected: {}", _0)]
+    #[error("Error accessing result set, type mismatch, expected: {}", _0)]
     ResultTypeMismatch(&'static str),
 
-    #[fail(display = "The specified database url {} is invalid", _0)]
+    #[error("The specified database url {} is invalid", _0)]
     DatabaseUrlIsInvalid(String),
 
-    #[fail(display = "Conversion failed: {}", _0)]
+    #[error("Conversion failed: {}", _0)]
     ConversionError(&'static str),
 
-    #[fail(display = "The provided arguments are not supported")]
+    #[error("The provided arguments are not supported")]
     InvalidConnectionArguments,
 
-    #[fail(display = "Error in an I/O operation")]
-    IoError(FError),
+    #[error("Error in an I/O operation")]
+    IoError(io::Error),
 
-    #[fail(display = "Connect timed out")]
+    #[error("Connect timed out")]
     ConnectTimeout,
 
-    #[fail(display = "Operation timed out")]
+    #[error("Operation timed out")]
     Timeout,
 
-    #[fail(display = "Error opening a TLS connection. {}", message)]
+    #[error("Error opening a TLS connection. {}", message)]
     TlsError { message: String },
 }
 
 #[cfg(feature = "pooled")]
-impl From<mobc::Error<failure::Compat<Error>>> for Error {
-    fn from(e: mobc::Error<failure::Compat<Error>>) -> Self {
+impl From<mobc::Error<Error>> for Error {
+    fn from(e: mobc::Error<Error>) -> Self {
         match e {
-            mobc::Error::Inner(e) => e.into_inner(),
+            mobc::Error::Inner(e) => e,
             mobc::Error::Timeout => Self::Timeout,
         }
     }
@@ -82,12 +82,12 @@ impl From<url::ParseError> for Error {
 
 impl From<io::Error> for Error {
     fn from(e: io::Error) -> Error {
-        Error::IoError(e.into())
+        Error::IoError(e)
     }
 }
 
 impl From<std::string::FromUtf8Error> for Error {
-    fn from(e: std::string::FromUtf8Error) -> Error {
-        Error::QueryError(e.into())
+    fn from(_: std::string::FromUtf8Error) -> Error {
+        Error::ConversionError("Couldn't convert data to UTF-8")
     }
 }

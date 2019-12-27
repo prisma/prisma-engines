@@ -41,15 +41,14 @@ array = []
 
 [dependencies]
 url = "1.7"
-failure = "0.1"
 metrics = "0.11"
-failure_derive = "0.1"
 percent-encoding = "2"
 debug_stub_derive = "0.3"
 lazy_static = "1.3"
 num_cpus = "1.11"
 rust_decimal = "1.1"
 futures = "0.3"
+thiserror = "1.0"
 
 uuid = { version = "0.8", optional = true }
 chrono = { version = "0.4", optional = true }
