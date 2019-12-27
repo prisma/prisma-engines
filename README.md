@@ -7,10 +7,23 @@ Quaint is an abstraction over certain SQL databases. It provides:
 - Visitors for different databases to generate SQL strings.
 - Connectors to abstract over results and querying.
 - Pooling with [mobc](https://crates.io/crates/mobc)
+- Async/await and Futures 0.3
 
 ### Documentation
 
+- [Released](https://docs.rs/quaint)
 - [Master](https://prisma.github.io/quaint/quaint/index.html)
+
+### Feature flags
+
+- `full`: All connectors and a pooled `Quaint` manager
+- `full-postgresql`: Pooled support for PostgreSQL
+- `full-mysql`: Pooled support for MySQL
+- `full-sqlite`: Pooled support for SQLite
+- `single`: All connectors, but no pooling
+- `single-postgresql`: Single connection support for PostgreSQL
+- `single-mysql`: Single connection support for MySQL
+- `single-sqlite`: Single connection support for SQLite
 
 ### Goals:
 
