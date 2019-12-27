@@ -1588,8 +1588,13 @@ async fn column_defaults_must_be_migrated(api: &TestApi) {
     assert_eq!(column.default.as_ref().map(String::as_str), Some("mango"));
 }
 
+<<<<<<< HEAD
 #[test_each_connector(ignore = "mysql_mariadb")]
 async fn escaped_string_defaults_are_not_arbitrarily_migrated(api: &TestApi) -> Result<(), anyhow::Error> {
+=======
+#[test_each_connector]
+async fn escaped_string_defaults_are_not_migrated_spuriously(api: &TestApi) -> Result<(), anyhow::Error> {
+>>>>>>> b56eb118... Move SQL migration connector to std::error::Error
     use quaint::ast::*;
 
     let dm1 = r#"
@@ -1597,6 +1602,7 @@ async fn escaped_string_defaults_are_not_arbitrarily_migrated(api: &TestApi) -> 
             id String @id @default(cuid())
             name String @default("ba\0nana")
             seasonality String @default("\"summer\"")
+            contains String @default("'potassium'")
             sideNames String @default("top\ndown")
             size Float @default(12.3)
         }
@@ -1611,6 +1617,7 @@ async fn escaped_string_defaults_are_not_arbitrarily_migrated(api: &TestApi) -> 
         .value("id", "apple-id")
         .value("name", "apple")
         .value("sideNames", "stem and the other one")
+        .value("contains", "'vitamin C'")
         .value("seasonality", "september");
 
     api.database().execute(insert.into()).await.unwrap();
