@@ -22,19 +22,164 @@ impl<'a> ColumnDiffer<'a> {
     ///
     /// - Postgres autoincrement fields get inferred with a default, which we want to ignore.
     ///
-    /// - We want to consider string defaults with and without quotes the same, because they can be set without quotes and introspected back with quotes on sqlite and mariadb.
+    /// - We bail on a number of cases that are too complex to deal with right now or underspecified, like strings containing escaped characters.
     fn defaults_match(&self) -> bool {
         if self.previous.auto_increment {
             return true;
         }
 
-        if self.previous.tpe.family == ColumnTypeFamily::DateTime {
-            return true;
+        debug_assert_eq!(self.previous.tpe.family, self.next.tpe.family);
+
+        let previous_value: Option<&str> = self.previous.default.as_ref().map(String::as_str);
+        let next_value: Option<&str> = self.next.default.as_ref().map(String::as_str);
+
+        match self.previous.tpe.family {
+            ColumnTypeFamily::String => string_defaults_match(previous_value, next_value),
+            ColumnTypeFamily::Float => float_default(previous_value) == float_default(next_value),
+            ColumnTypeFamily::Int => int_default(previous_value) == int_default(next_value),
+            ColumnTypeFamily::Boolean => bool_default(previous_value) == bool_default(next_value),
+            _ => true,
         }
+    }
+}
 
-        let trimmed_previous = self.previous.default.as_ref().map(|s| s.trim_matches('\''));
-        let trimmed_next = self.next.default.as_ref().map(|s| s.trim_matches('\''));
+fn float_default(s: Option<&str>) -> Option<f64> {
+    s.and_then(|s| s.parse().ok())
+}
 
-        trimmed_previous == trimmed_next
+fn int_default(s: Option<&str>) -> Option<i128> {
+    s.and_then(|s| s.parse().ok())
+}
+
+fn bool_default(s: Option<&str>) -> Option<bool> {
+    s.and_then(|s| match s {
+        "true" | "TRUE" | "True" | "t" | "1" => Some(true),
+        "false" | "FALSE" | "False" | "f" | "0" => Some(false),
+        _ => None,
+    })
+}
+
+fn string_defaults_match(previous: Option<&str>, next: Option<&str>) -> bool {
+    match (previous, next) {
+        (Some(_), None) | (None, Some(_)) => false,
+        (None, None) => true,
+        (Some(previous), Some(next)) => {
+            if string_contains_tricky_character(previous) || string_contains_tricky_character(next) {
+                return true;
+            }
+
+            previous == next
+        }
+    }
+}
+
+fn string_contains_tricky_character(s: &str) -> bool {
+    s.contains('\\') || s.contains("'") || s.contains("\"")
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use sql_schema_describer::{ColumnArity, ColumnType, ColumnTypeFamily};
+
+    #[test]
+    fn quoted_string_defaults_match() {
+        let col_a = Column {
+            name: "A".to_owned(),
+            tpe: ColumnType::pure(ColumnTypeFamily::String, ColumnArity::Required),
+            default: Some("abc".to_owned()),
+            auto_increment: false,
+        };
+
+        let col_b = Column {
+            name: "A".to_owned(),
+            tpe: ColumnType::pure(ColumnTypeFamily::String, ColumnArity::Required),
+            default: Some(r##""abc""##.to_owned()),
+            auto_increment: false,
+        };
+
+        let col_c = Column {
+            name: "A".to_owned(),
+            tpe: ColumnType::pure(ColumnTypeFamily::String, ColumnArity::Required),
+            default: Some(r##"'abc'"##.to_owned()),
+            auto_increment: false,
+        };
+
+        assert!(ColumnDiffer {
+            previous: &col_a,
+            next: &col_b
+        }
+        .defaults_match());
+
+        assert!(ColumnDiffer {
+            previous: &col_a,
+            next: &col_c
+        }
+        .defaults_match());
+
+        assert!(ColumnDiffer {
+            previous: &col_c,
+            next: &col_b
+        }
+        .defaults_match());
+    }
+
+    #[test]
+    fn datetime_defaults_match() {
+        let col_a = Column {
+            name: "A".to_owned(),
+            tpe: ColumnType::pure(ColumnTypeFamily::DateTime, ColumnArity::Required),
+            default: Some("2019-09-01T08:00:00Z".to_owned()),
+            auto_increment: false,
+        };
+
+        let col_b = Column {
+            name: "A".to_owned(),
+            tpe: ColumnType::pure(ColumnTypeFamily::DateTime, ColumnArity::Required),
+            default: Some("2019-09-01 18:00:00 UTC".to_owned()),
+            auto_increment: false,
+        };
+
+        assert!(ColumnDiffer {
+            previous: &col_a,
+            next: &col_b,
+        }
+        .defaults_match());
+    }
+
+    #[test]
+    fn float_defaults_match() {
+        let col_a = Column {
+            name: "A".to_owned(),
+            tpe: ColumnType::pure(ColumnTypeFamily::Float, ColumnArity::Required),
+            default: Some("0.33".to_owned()),
+            auto_increment: false,
+        };
+
+        let col_b = Column {
+            name: "A".to_owned(),
+            tpe: ColumnType::pure(ColumnTypeFamily::Float, ColumnArity::Required),
+            default: Some("0.33000".to_owned()),
+            auto_increment: false,
+        };
+
+        assert!(ColumnDiffer {
+            previous: &col_a,
+            next: &col_b,
+        }
+        .defaults_match());
+
+        let col_c = Column {
+            name: "A".to_owned(),
+            tpe: ColumnType::pure(ColumnTypeFamily::Float, ColumnArity::Required),
+            default: Some("0.34".to_owned()),
+            auto_increment: false,
+        };
+
+        assert!(!ColumnDiffer {
+            previous: &col_a,
+            next: &col_c,
+        }
+        .defaults_match());
     }
 }
