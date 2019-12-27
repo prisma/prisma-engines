@@ -823,7 +823,7 @@ async fn multi_column_unique_in_conjunction_with_custom_column_name_must_work(ap
     assert_eq!(index.unwrap().tpe, IndexType::Unique);
 }
 
-#[test_each_connector]
+#[test_one_connector(connector = "sqlite")]
 async fn sqlite_must_recreate_indexes(api: &TestApi) {
     // SQLite must go through a complicated migration procedure which requires dropping and recreating indexes. This test checks that.
     // We run them still against each connector.
@@ -859,7 +859,7 @@ async fn sqlite_must_recreate_indexes(api: &TestApi) {
     assert_eq!(index.unwrap().tpe, IndexType::Unique);
 }
 
-#[test_each_connector]
+#[test_one_connector(connector = "sqlite")]
 async fn sqlite_must_recreate_multi_field_indexes(api: &TestApi) {
     // SQLite must go through a complicated migration procedure which requires dropping and recreating indexes. This test checks that.
     // We run them still against each connector.
@@ -1572,10 +1572,7 @@ async fn column_defaults_must_be_migrated(api: &TestApi) {
 
     let table = schema.table_bang("Fruit");
     let column = table.column_bang("name");
-    assert_eq!(
-        column.default.as_ref().map(String::as_str),
-        Some(if api.is_sqlite() { "'banana'" } else { "banana" })
-    );
+    assert_eq!(column.default.as_ref().map(String::as_str), Some("banana"));
 
     let dm2 = r#"
         model Fruit {
@@ -1588,10 +1585,79 @@ async fn column_defaults_must_be_migrated(api: &TestApi) {
 
     let table = schema.table_bang("Fruit");
     let column = table.column_bang("name");
+    assert_eq!(column.default.as_ref().map(String::as_str), Some("mango"));
+}
+
+#[test_each_connector(ignore = "mysql_mariadb")]
+async fn escaped_string_defaults_are_not_arbitrarily_migrated(api: &TestApi) -> Result<(), anyhow::Error> {
+    use quaint::ast::*;
+
+    let dm1 = r#"
+        model Fruit {
+            id String @id @default(cuid())
+            name String @default("ba\0nana")
+            seasonality String @default("\"summer\"")
+            sideNames String @default("top\ndown")
+            size Float @default(12.3)
+        }
+    "#;
+
+    let output = api.infer_and_apply(dm1).await;
+
+    anyhow::ensure!(!output.migration_output.datamodel_steps.is_empty(), "Yes migration");
+    anyhow::ensure!(output.migration_output.warnings.is_empty(), "No warnings");
+
+    let insert = Insert::single_into(api.render_table_name("Fruit"))
+        .value("id", "apple-id")
+        .value("name", "apple")
+        .value("sideNames", "stem and the other one")
+        .value("seasonality", "september");
+
+    api.database().execute(insert.into()).await.unwrap();
+
+    let output = api.infer_and_apply(dm1).await;
+
+    anyhow::ensure!(output.migration_output.datamodel_steps.is_empty(), "No migration");
+    anyhow::ensure!(output.migration_output.warnings.is_empty(), "No warnings");
+
+    let table = output.sql_schema.table_bang("Fruit");
+
     assert_eq!(
-        column.default.as_ref().map(String::as_str),
-        Some(if api.is_sqlite() { "'mango'" } else { "mango" })
+        table
+            .column("name")
+            .and_then(|c| c.default.as_ref())
+            .map(String::as_str),
+        Some(if api.is_mysql() { "ba\u{0}nana" } else { "ba\\0nana" })
     );
+    assert_eq!(
+        table
+            .column("sideNames")
+            .and_then(|c| c.default.as_ref())
+            .map(String::as_str),
+        Some(if api.is_mysql() { "top\ndown" } else { "top\\ndown" })
+    );
+    assert_eq!(
+        table
+            .column("contains")
+            .and_then(|c| c.default.as_ref())
+            .map(String::as_str),
+        Some("potassium")
+    );
+    assert_eq!(
+        table
+            .column("seasonality")
+            .and_then(|c| c.default.as_ref())
+            .map(String::as_str),
+        Some(if api.is_sqlite() {
+            r#"\summer\"#
+        } else if api.is_mysql() {
+            r#""summer""#
+        } else {
+            r#"\"summer\""#
+        })
+    );
+
+    Ok(())
 }
 
 #[test_each_connector]
@@ -1624,7 +1690,7 @@ async fn created_at_does_not_get_arbitrarily_migrated(api: &TestApi) {
     assert_eq!(output.migration_output.warnings, &[]);
 }
 
-#[test_one_connector(connector = "sqlite", log = "debug")]
+#[test_one_connector(connector = "sqlite")]
 async fn renaming_a_datasource_works(api: &TestApi) -> Result<(), anyhow::Error> {
     let dm1 = r#"
         datasource db1 {
