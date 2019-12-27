@@ -104,8 +104,6 @@ impl TestApi {
         &self,
         options: InferAndApply,
     ) -> Result<MigrationStepsResultOutput, anyhow::Error> {
-        use failure::ResultExt;
-
         let InferAndApply {
             migration_id,
             force,
@@ -126,7 +124,7 @@ impl TestApi {
             force,
         };
 
-        let migration_output = self.api.apply_migration(&input).await.compat()?;
+        let migration_output = self.api.apply_migration(&input).await?;
 
         Ok(migration_output)
     }
@@ -161,9 +159,7 @@ impl TestApi {
         &self,
         input: &InferMigrationStepsInput,
     ) -> Result<MigrationStepsResultOutput, anyhow::Error> {
-        use failure::ResultExt;
-
-        Ok(self.api.infer_migration_steps(&input).await.compat()?)
+        Ok(self.api.infer_migration_steps(&input).await?)
     }
 
     pub async fn run_infer_command(&self, input: InferMigrationStepsInput) -> InferOutput {
@@ -207,14 +203,11 @@ impl TestApi {
     }
 
     pub async fn describe_database(&self) -> Result<SqlSchema, anyhow::Error> {
-        use failure::ResultExt;
-
         let mut result = self
             .describer()
             .describe(self.connection_info().unwrap().schema_name())
             .await
-            .context("Description failed")
-            .compat()?;
+            .expect("Description failed");
 
         // the presence of the _Migration table makes assertions harder. Therefore remove it from the result.
         result.tables = result.tables.into_iter().filter(|t| t.name != "_Migration").collect();

@@ -1,5 +1,4 @@
 use crate::{commands::CommandError, error::Error as CrateError};
-use failure::Fail as _;
 use jsonrpc_core::types::Error as JsonRpcError;
 use migration_connector::ConnectorError;
 use user_facing_errors::{Error, UnknownError};
@@ -16,7 +15,7 @@ pub fn render_error(crate_error: CrateError) -> Error {
         })) => user_facing_error.into(),
         _ => UnknownError {
             message: format!("{}", crate_error),
-            backtrace: crate_error.backtrace().map(|bt| format!("{}", bt)),
+            backtrace: None,
         }
         .into(),
     }

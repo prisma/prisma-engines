@@ -1,17 +1,18 @@
+use anyhow::format_err;
 use datamodel::ast::{self, ArgumentContainer, SchemaAst};
-use failure::{format_err, Fail};
 use migration_connector::steps::{self, CreateSource, DeleteSource, MigrationStep};
+use thiserror::Error;
 
 pub trait DataModelCalculator: Send + Sync + 'static {
     fn infer(&self, current: &SchemaAst, steps: &[MigrationStep]) -> Result<SchemaAst, CalculatorError>;
 }
 
-#[derive(Debug, Fail)]
-#[fail(display = "{}", _0)]
-pub struct CalculatorError(#[fail(cause)] failure::Error);
+#[derive(Debug, Error)]
+#[error("{0}")]
+pub struct CalculatorError(#[source] anyhow::Error);
 
-impl From<failure::Error> for CalculatorError {
-    fn from(fe: failure::Error) -> Self {
+impl From<anyhow::Error> for CalculatorError {
+    fn from(fe: anyhow::Error) -> Self {
         CalculatorError(fe)
     }
 }

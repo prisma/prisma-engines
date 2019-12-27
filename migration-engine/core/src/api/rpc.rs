@@ -1,13 +1,13 @@
 use super::{GenericApi, MigrationApi};
 use crate::commands::*;
 use datamodel::configuration::{MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME};
-use failure::Fail;
 use futures::{FutureExt, TryFutureExt};
 use jsonrpc_core::types::error::Error as JsonRpcError;
 use jsonrpc_core::{IoHandler, Params};
 use jsonrpc_stdio_server::ServerBuilder;
 use sql_migration_connector::SqlMigrationConnector;
 use std::{io, sync::Arc};
+use thiserror::Error;
 
 pub struct RpcApi {
     io_handler: jsonrpc_core::IoHandler<()>,
@@ -171,11 +171,11 @@ fn render(result: impl serde::Serialize) -> std::result::Result<serde_json::Valu
     Ok(serde_json::to_value(result).expect("Rendering of RPC response failed"))
 }
 
-#[derive(Debug, Fail)]
+#[derive(Debug, Error)]
 enum RunCommandError {
-    #[fail(display = "{}", _0)]
+    #[error("{0}")]
     JsonRpcError(JsonRpcError),
-    #[fail(display = "{}", _0)]
+    #[error("{0}")]
     CrateError(crate::Error),
 }
 
