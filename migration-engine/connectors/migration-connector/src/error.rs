@@ -1,9 +1,10 @@
-use failure::{format_err, Error, Fail};
+use anyhow::format_err;
 use std::fmt::Display;
+use thiserror::Error;
 use user_facing_errors::KnownError;
 
-#[derive(Debug, Fail)]
-#[fail(display = "{}", kind)]
+#[derive(Debug, Error)]
+#[error("{}", kind)]
 pub struct ConnectorError {
     /// An optional error already rendered for users in case the migration core does not handle it.
     pub user_facing_error: Option<KnownError>,
@@ -31,48 +32,48 @@ impl ConnectorError {
     }
 }
 
-#[derive(Debug, Fail)]
+#[derive(Debug, Error)]
 pub enum ErrorKind {
-    #[fail(display = "{}", _0)]
-    Generic(Error),
+    #[error("{0}")]
+    Generic(anyhow::Error),
 
-    #[fail(display = "Error querying the database: {}", _0)]
-    QueryError(Error),
+    #[error("Error querying the database: {0}")]
+    QueryError(anyhow::Error),
 
-    #[fail(display = "Database '{}' does not exist", db_name)]
+    #[error("Database '{}' does not exist", db_name)]
     DatabaseDoesNotExist { db_name: String },
 
-    #[fail(display = "Access denied to database '{}'", database_name)]
+    #[error("Access denied to database '{}'", database_name)]
     DatabaseAccessDenied { database_name: String },
 
-    #[fail(display = "Database '{}' already exists", db_name)]
+    #[error("Database '{}' already exists", db_name)]
     DatabaseAlreadyExists { db_name: String },
 
-    #[fail(display = "Could not create the database. {}", explanation)]
+    #[error("Could not create the database. {}", explanation)]
     DatabaseCreationFailed { explanation: String },
 
-    #[fail(display = "Authentication failed for user '{}'", user)]
+    #[error("Authentication failed for user '{}'", user)]
     AuthenticationFailed { user: String },
 
-    #[fail(display = "The database URL is not valid")]
+    #[error("The database URL is not valid")]
     InvalidDatabaseUrl,
 
-    #[fail(display = "Failed to connect to the database at `{}`.", host)]
+    #[error("Failed to connect to the database at `{}`.", host)]
     ConnectionError {
         host: String,
-        #[fail(cause)]
-        cause: Error,
+        #[source]
+        cause: anyhow::Error,
     },
 
-    #[fail(display = "Connect timed out")]
+    #[error("Connect timed out")]
     ConnectTimeout,
 
-    #[fail(display = "Operation timed out")]
+    #[error("Operation timed out")]
     Timeout,
 
-    #[fail(display = "Error opening a TLS connection. {}", message)]
+    #[error("Error opening a TLS connection. {}", message)]
     TlsError { message: String },
 
-    #[fail(display = "Unique constraint violation.")]
+    #[error("Unique constraint violation.")]
     UniqueConstraintViolation { field_name: String },
 }

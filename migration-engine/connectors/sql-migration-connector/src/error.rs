@@ -95,21 +95,29 @@ impl SqlError {
                     message: format!("{}", cause),
                 },
             },
-            SqlError::ConnectionError { cause } => ConnectorError {
-                user_facing_error: render_quaint_error(&cause, connection_info),
-                kind: ErrorKind::ConnectionError {
-                    host: connection_info.host().to_owned(),
-                    cause: cause.into(),
-                },
-            },
-            SqlError::UniqueConstraintViolation { cause, .. } => ConnectorError {
-                user_facing_error: render_quaint_error(&cause, connection_info),
-                kind: ErrorKind::ConnectionError {
-                    host: connection_info.host().to_owned(),
-                    cause: cause.into(),
-                },
-            },
-            error => ConnectorError::from_kind(ErrorKind::QueryError(error.into())),
+            SqlError::ConnectionError { cause } => {
+                let user_facing_error = render_quaint_error(&cause, connection_info);
+                let compat_cause = cause.compat();
+                ConnectorError {
+                    user_facing_error,
+                    kind: ErrorKind::ConnectionError {
+                        host: connection_info.host().to_owned(),
+                        cause: compat_cause.into(),
+                    },
+                }
+            }
+            SqlError::UniqueConstraintViolation { cause, .. } => {
+                let user_facing_error = render_quaint_error(&cause, connection_info);
+                let compat_cause = cause.compat();
+                ConnectorError {
+                    user_facing_error,
+                    kind: ErrorKind::ConnectionError {
+                        host: connection_info.host().to_owned(),
+                        cause: compat_cause.into(),
+                    },
+                }
+            }
+            error => ConnectorError::from_kind(ErrorKind::QueryError(error.compat().into())),
         }
     }
 }

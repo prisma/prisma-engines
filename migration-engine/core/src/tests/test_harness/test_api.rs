@@ -162,6 +162,13 @@ impl TestApi {
         Ok(self.api.infer_migration_steps(&input).await?)
     }
 
+    pub async fn apply_migration_with(
+        &self,
+        input: &ApplyMigrationInput,
+    ) -> Result<MigrationStepsResultOutput, anyhow::Error> {
+        Ok(self.api.apply_migration(&input).await?)
+    }
+
     pub async fn run_infer_command(&self, input: InferMigrationStepsInput) -> InferOutput {
         run_infer_command(&self.api, input).await
     }
@@ -459,6 +466,55 @@ impl InferBuilder {
             assume_to_be_applied: assume_to_be_applied.unwrap_or_else(Vec::new),
             datamodel,
             migration_id,
+        }
+    }
+}
+
+#[derive(Debug, Default)]
+pub struct ApplyBuilder {
+    migration_id: Option<String>,
+    steps: Option<Vec<MigrationStep>>,
+    force: Option<bool>,
+}
+
+impl ApplyBuilder {
+    pub fn new() -> Self {
+        ApplyBuilder::default()
+    }
+
+    pub fn migration_id(mut self, migration_id: Option<String>) -> Self {
+        self.migration_id = migration_id;
+        self
+    }
+
+    pub fn steps(mut self, steps: Option<Vec<MigrationStep>>) -> Self {
+        self.steps = steps;
+        self
+    }
+
+    pub fn force(mut self, force: Option<bool>) -> Self {
+        self.force = force;
+        self
+    }
+
+    pub fn build(self) -> ApplyMigrationInput {
+        let ApplyBuilder {
+            migration_id,
+            steps,
+            force,
+        } = self;
+
+        let migration_id = migration_id.unwrap_or_else(|| {
+            format!(
+                "migration-{}",
+                MIGRATION_ID_COUNTER.fetch_add(1, std::sync::atomic::Ordering::Relaxed)
+            )
+        });
+
+        ApplyMigrationInput {
+            migration_id,
+            steps: steps.unwrap_or_else(Vec::new),
+            force,
         }
     }
 }

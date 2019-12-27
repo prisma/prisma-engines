@@ -102,6 +102,9 @@ pub struct InferMigrationStepsInput {
     pub migration_id: String,
     #[serde(alias = "dataModel")]
     pub datamodel: String,
+    /// Migration steps from migrations that have been inferred but not applied yet.
+    ///
+    /// These steps must be provided and correct for migration inferrence to work.
     pub assume_to_be_applied: Vec<MigrationStep>,
 }
 

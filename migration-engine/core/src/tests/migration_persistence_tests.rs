@@ -128,3 +128,24 @@ async fn update_must_work(api: &TestApi) {
     }
     assert_eq!(loaded.name, params.new_name);
 }
+
+#[test_each_connector]
+async fn migration_is_already_applied_must_work(api: &TestApi) -> Result<(), anyhow::Error> {
+    let persistence = api.migration_persistence();
+
+    let mut migration_1 = Migration::new("migration_1".to_string());
+    migration_1.status = MigrationStatus::MigrationSuccess;
+
+    persistence.create(migration_1).await?;
+
+    let mut migration_2 = Migration::new("migration_2".to_string());
+    migration_2.status = MigrationStatus::MigrationFailure;
+
+    persistence.create(migration_2).await?;
+
+    assert!(persistence.migration_is_already_applied("migration_1").await?);
+    assert!(!persistence.migration_is_already_applied("migration_2").await?);
+    assert!(!persistence.migration_is_already_applied("another_migration").await?);
+
+    Ok(())
+}
