@@ -1,6 +1,6 @@
 [package]
 name = "quaint"
-version = "0.1.1"
+version = "0.1.2"
 authors = [
     "Julius de Bruijn <bruijn@prisma.io>",
     "Dominic Petrick <petrick@prisma.io>",
@@ -15,6 +15,9 @@ repository  = "https://github.com/prisma/quaint/"
 homepage    = "https://github.com/prisma/quaint/"
 keywords    = ["mysql", "postgresql", "sqlite", "sql"]
 documentation = "https://docs.rs/quaint/"
+
+[package.metadata.docs.rs]
+features = [ "full" ]
 
 [features]
 default = []
