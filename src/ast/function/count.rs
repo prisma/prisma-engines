@@ -1,6 +1,7 @@
 use crate::ast::DatabaseValue;
 
 #[derive(Debug, Clone, PartialEq)]
+/// Returns the number of rows that matches a specified criteria.
 pub struct Count<'a> {
     pub(crate) exprs: Vec<DatabaseValue<'a>>,
 }

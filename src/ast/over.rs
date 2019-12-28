@@ -1,6 +1,8 @@
 use crate::ast::{Column, Ordering};
 
 #[derive(Debug, Default, Clone, PartialEq)]
+/// Determines the partitioning and ordering of a rowset before the associated
+/// window function is applied.
 pub struct Over<'a> {
     pub(crate) ordering: Ordering<'a>,
     pub(crate) partitioning: Vec<Column<'a>>,

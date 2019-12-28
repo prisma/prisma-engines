@@ -10,6 +10,7 @@ pub trait Aliasable<'a> {
 }
 
 #[derive(Clone, Debug, PartialEq)]
+/// Either an identifier or a nested query.
 pub enum TableType<'a> {
     Table(Cow<'a, str>),
     Query(Select<'a>),

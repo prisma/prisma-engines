@@ -53,7 +53,7 @@ where
 {
     #[inline]
     fn from(vals: (A, B)) -> Self {
-        Row::new().push(vals.0).push(vals.1)
+        Row::new().push(vals.0).push(1.vals)
     }
 }
 

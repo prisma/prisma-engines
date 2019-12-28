@@ -1,6 +1,8 @@
 use crate::ast::{Column, IntoOrderDefinition, Over};
 
 #[derive(Debug, Default, Clone, PartialEq)]
+/// A window function that assigns a sequential integer
+/// number to each row in the query’s result set.
 pub struct RowNumber<'a> {
     pub(crate) over: Over<'a>,
 }

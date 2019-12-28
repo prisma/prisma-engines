@@ -1,3 +1,4 @@
+//! Error module
 use thiserror::Error;
 use std::io;
 

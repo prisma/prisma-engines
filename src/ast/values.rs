@@ -425,6 +425,25 @@ impl<'a> TryFrom<ParameterizedValue<'a>> for DateTime<Utc> {
 }
 
 #[macro_export]
+/// Marks a given string as a value. Useful when using a value in calculations,
+/// e.g.
+///
+/// ``` rust
+/// # use quaint::{col, val, ast::*, visitor::{Visitor, Sqlite}};
+/// let join = "dogs".on(("dogs", "slave_id").equals(Column::from(("cats", "master_id"))));
+///
+/// let query = Select::from_table("cats")
+///     .value(Table::from("cats").asterisk())
+///     .value(col!("dogs", "age") - val!(4))
+///     .inner_join(join);
+///
+/// let (sql, params) = Sqlite::build(query);
+///
+/// assert_eq!(
+///     "SELECT `cats`.*, (`dogs`.`age` - ?) FROM `cats` INNER JOIN `dogs` ON `dogs`.`slave_id` = `cats`.`master_id`",
+///     sql
+/// );
+/// ```
 macro_rules! val {
     ($val:expr) => {
         DatabaseValue::from($val)

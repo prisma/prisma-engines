@@ -1,6 +1,8 @@
 use crate::ast::DatabaseValue;
 
 #[derive(Debug, Clone, PartialEq)]
+/// An aggregate function that concatenates strings from a group into a single
+/// string with various options.
 pub struct AggregateToString<'a> {
     pub(crate) value: Box<DatabaseValue<'a>>,
 }

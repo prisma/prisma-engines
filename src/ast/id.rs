@@ -2,6 +2,7 @@
 use uuid::Uuid;
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone)]
+/// A representation of a database ID value.
 pub enum Id {
     String(String),
     Int(usize),

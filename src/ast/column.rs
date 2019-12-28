@@ -10,6 +10,25 @@ pub struct Column<'a> {
 }
 
 #[macro_export]
+/// Marks a given string or a tuple as a column. Useful when using a column in
+/// calculations, e.g.
+///
+/// ``` rust
+/// # use quaint::{col, val, ast::*, visitor::{Visitor, Sqlite}};
+/// let join = "dogs".on(("dogs", "slave_id").equals(Column::from(("cats", "master_id"))));
+///
+/// let query = Select::from_table("cats")
+///     .value(Table::from("cats").asterisk())
+///     .value(col!("dogs", "age") - val!(4))
+///     .inner_join(join);
+///
+/// let (sql, params) = Sqlite::build(query);
+///
+/// assert_eq!(
+///     "SELECT `cats`.*, (`dogs`.`age` - ?) FROM `cats` INNER JOIN `dogs` ON `dogs`.`slave_id` = `cats`.`master_id`",
+///     sql
+/// );
+/// ```
 macro_rules! col {
     ($e1:expr) => {
         DatabaseValue::from(Column::from($e1))

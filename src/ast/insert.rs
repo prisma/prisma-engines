@@ -10,12 +10,14 @@ pub struct Insert<'a> {
     pub(crate) returning: Option<Vec<Column<'a>>>,
 }
 
+/// A builder for an `INSERT` statement for a single row.
 pub struct SingleRowInsert<'a> {
     pub(crate) table: Table<'a>,
     pub(crate) columns: Vec<Column<'a>>,
     pub(crate) values: Row<'a>,
 }
 
+/// A builder for an `INSERT` statement for multiple rows.
 pub struct MultiRowInsert<'a> {
     pub(crate) table: Table<'a>,
     pub(crate) columns: Vec<Column<'a>>,
