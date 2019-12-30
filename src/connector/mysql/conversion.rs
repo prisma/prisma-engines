@@ -92,7 +92,7 @@ impl<'a> From<ParameterizedValue<'a>> for MyValue {
             }
             #[cfg(feature = "array")]
             ParameterizedValue::Array(_) => unimplemented!("Arrays are not supported for mysql."),
-            #[cfg(feature = "uuid-0_7")]
+            #[cfg(feature = "uuid-0_8")]
             ParameterizedValue::Uuid(u) => MyValue::Bytes(u.to_hyphenated().to_string().into_bytes()),
             #[cfg(feature = "chrono-0_4")]
             ParameterizedValue::DateTime(dt) => MyValue::Date(

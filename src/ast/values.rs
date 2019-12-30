@@ -13,7 +13,7 @@ use std::{
 #[cfg(feature = "json-1")]
 use serde_json::{Number, Value};
 
-#[cfg(feature = "uuid-0_7")]
+#[cfg(feature = "uuid-0_8")]
 use uuid::Uuid;
 
 #[cfg(feature = "chrono-0_4")]
@@ -32,7 +32,7 @@ pub enum ParameterizedValue<'a> {
     Array(Vec<ParameterizedValue<'a>>),
     #[cfg(feature = "json-1")]
     Json(Value),
-    #[cfg(feature = "uuid-0_7")]
+    #[cfg(feature = "uuid-0_8")]
     Uuid(Uuid),
     #[cfg(feature = "chrono-0_4")]
     DateTime(DateTime<Utc>),
@@ -81,7 +81,7 @@ impl<'a> fmt::Display for ParameterizedValue<'a> {
             }
             #[cfg(feature = "json-1")]
             ParameterizedValue::Json(val) => write!(f, "{}", val),
-            #[cfg(feature = "uuid-0_7")]
+            #[cfg(feature = "uuid-0_8")]
             ParameterizedValue::Uuid(val) => write!(f, "{}", val),
             #[cfg(feature = "chrono-0_4")]
             ParameterizedValue::DateTime(val) => write!(f, "{}", val),
@@ -108,7 +108,7 @@ impl<'a> From<ParameterizedValue<'a>> for Value {
             ParameterizedValue::Json(v) => v,
             #[cfg(feature = "array")]
             ParameterizedValue::Array(v) => Value::Array(v.into_iter().map(Value::from).collect()),
-            #[cfg(feature = "uuid-0_7")]
+            #[cfg(feature = "uuid-0_8")]
             ParameterizedValue::Uuid(u) => Value::String(u.to_hyphenated().to_string()),
             #[cfg(feature = "chrono-0_4")]
             ParameterizedValue::DateTime(dt) => Value::String(dt.to_rfc3339()),
@@ -227,7 +227,7 @@ impl<'a> ParameterizedValue<'a> {
     }
 
     /// `true` if the `ParameterizedValue` is of UUID type.
-    #[cfg(feature = "uuid-0_7")]
+    #[cfg(feature = "uuid-0_8")]
     pub fn is_uuid(&self) -> bool {
         match self {
             ParameterizedValue::Uuid(_) => true,
@@ -236,7 +236,7 @@ impl<'a> ParameterizedValue<'a> {
     }
 
     /// Returns an UUID if the value is of UUID type, otherwise `None`.
-    #[cfg(feature = "uuid-0_7")]
+    #[cfg(feature = "uuid-0_8")]
     pub fn as_uuid(&self) -> Option<Uuid> {
         match self {
             ParameterizedValue::Uuid(u) => Some(*u),
@@ -467,7 +467,7 @@ parameterized_value!(Decimal, Real);
 #[cfg(feature = "json-1")]
 parameterized_value!(Value, Json);
 
-#[cfg(feature = "uuid-0_7")]
+#[cfg(feature = "uuid-0_8")]
 parameterized_value!(Uuid, Uuid);
 
 #[cfg(feature = "chrono-0_4")]

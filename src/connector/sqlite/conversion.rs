@@ -68,7 +68,7 @@ impl<'a> ToSql for ParameterizedValue<'a> {
                     serde_json::to_string(value).map_err(|err| RusqlError::ToSqlConversionFailure(Box::new(err)))?;
                 ToSqlOutput::from(stringified)
             }
-            #[cfg(feature = "uuid-0_7")]
+            #[cfg(feature = "uuid-0_8")]
             ParameterizedValue::Uuid(value) => ToSqlOutput::from(value.to_hyphenated().to_string()),
             #[cfg(feature = "chrono-0_4")]
             ParameterizedValue::DateTime(value) => ToSqlOutput::from(value.timestamp_millis()),

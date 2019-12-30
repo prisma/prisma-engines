@@ -12,14 +12,14 @@ use tokio_postgres::{
     Row as PostgresRow, Statement as PostgresStatement,
 };
 
-#[cfg(feature = "uuid-0_7")]
+#[cfg(feature = "uuid-0_8")]
 use uuid::Uuid;
 
 pub fn conv_params<'a>(params: &'a [ParameterizedValue<'a>]) -> Vec<&'a (dyn types::ToSql + Sync)> {
     params.iter().map(|x| x as &(dyn ToSql + Sync)).collect::<Vec<_>>()
 }
 
-#[cfg(feature = "uuid-0_7")]
+#[cfg(feature = "uuid-0_8")]
 fn accepts(ty: &PostgresType) -> bool {
     <Uuid as FromSql>::accepts(ty)
         || <&str as FromSql>::accepts(ty)
@@ -28,7 +28,7 @@ fn accepts(ty: &PostgresType) -> bool {
         || <i64 as FromSql>::accepts(ty)
 }
 
-#[cfg(not(feature = "uuid-0_7"))]
+#[cfg(not(feature = "uuid-0_8"))]
 fn accepts(ty: &PostgresType) -> bool {
     <&str as FromSql>::accepts(ty)
         || <i16 as FromSql>::accepts(ty)
@@ -42,7 +42,7 @@ impl<'a> FromSql<'a> for Id {
             PostgresType::INT2 => Id::Int(i16::from_sql(ty, raw)? as usize),
             PostgresType::INT4 => Id::Int(i32::from_sql(ty, raw)? as usize),
             PostgresType::INT8 => Id::Int(i64::from_sql(ty, raw)? as usize),
-            #[cfg(feature = "uuid-0_7")]
+            #[cfg(feature = "uuid-0_8")]
             PostgresType::UUID => Id::UUID(Uuid::from_sql(ty, raw)?),
             _ => Id::String(String::from_sql(ty, raw)?),
         };
@@ -114,7 +114,7 @@ impl GetRow for PostgresRow {
                     }
                     None => ParameterizedValue::Null,
                 },
-                #[cfg(feature = "uuid-0_7")]
+                #[cfg(feature = "uuid-0_8")]
                 PostgresType::UUID => match row.try_get(i)? {
                     Some(val) => {
                         let val: Uuid = val;
@@ -290,7 +290,7 @@ impl<'a> ToSql for ParameterizedValue<'a> {
             ParameterizedValue::Array(vec) => vec.to_sql(ty, out),
             #[cfg(feature = "json-1")]
             ParameterizedValue::Json(value) => value.to_sql(ty, out),
-            #[cfg(feature = "uuid-0_7")]
+            #[cfg(feature = "uuid-0_8")]
             ParameterizedValue::Uuid(value) => value.to_sql(ty, out),
             #[cfg(feature = "chrono-0_4")]
             ParameterizedValue::DateTime(value) => value.naive_utc().to_sql(ty, out),
@@ -328,7 +328,7 @@ impl<'a> ToSql for ParameterizedValue<'a> {
             ParameterizedValue::Array(vec) => vec.to_sql_checked(ty, out),
             #[cfg(feature = "json-1")]
             ParameterizedValue::Json(value) => value.to_sql_checked(ty, out),
-            #[cfg(feature = "uuid-0_7")]
+            #[cfg(feature = "uuid-0_8")]
             ParameterizedValue::Uuid(value) => value.to_sql_checked(ty, out),
             #[cfg(feature = "chrono-0_4")]
             ParameterizedValue::DateTime(value) => value.naive_utc().to_sql_checked(ty, out),
