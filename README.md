@@ -40,7 +40,7 @@ The Connector TestKit is a separate Scala project found at `./query-engine/conne
 
 ### Set up & run integration tests:
 **Prerequisites:**
-- Installed Rust roolchain.
+- Installed Rust toolchain.
 - Installed Docker and Docker-Compose.
 - Installed Java, Scala, SBT (Scala Build Tool).
 - Installed `direnv`, then `direnv allow` on the repository root.
