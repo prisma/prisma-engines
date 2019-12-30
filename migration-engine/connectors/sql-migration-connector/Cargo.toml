@@ -23,7 +23,4 @@ tracing-futures = "0.2.0"
 tokio = { version = "0.2", features = ["time"] }
 anyhow = "1.0.26"
 thiserror = "1.0.9"
-
-[dependencies.quaint]
-git = "https://github.com/prisma/quaint.git"
-features = ["single"]
+quaint = { version = "0.1", features = ["single"] }
