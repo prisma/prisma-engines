@@ -194,6 +194,13 @@ impl TestApi {
 
         Ok(SchemaAssertion(schema))
     }
+
+    pub async fn dump_table(&self, table_name: &str) -> Result<quaint::prelude::ResultSet, quaint::error::Error> {
+        let select_star =
+            quaint::ast::Select::from_table(self.render_table_name(table_name)).value(quaint::ast::asterisk());
+
+        self.database.query(select_star.into()).await
+    }
 }
 
 pub async fn mysql_8_test_api(db_name: &str) -> TestApi {

@@ -3,8 +3,11 @@ use crate::{
     SqlResult, TableChange,
 };
 use migration_connector::*;
-use quaint::{ast::*, prelude::Queryable};
-use sql_schema_describer::SqlSchemaDescriberBackend;
+use quaint::{
+    ast::*,
+    prelude::{Queryable, SqlFamily},
+};
+use sql_schema_describer::{ColumnArity, SqlSchemaDescriberBackend};
 use std::sync::Arc;
 
 pub struct SqlDestructiveChangesChecker {
@@ -15,6 +18,13 @@ pub struct SqlDestructiveChangesChecker {
 }
 
 impl SqlDestructiveChangesChecker {
+    fn is_on_sqlite(&self) -> bool {
+        match self.connection_info.sql_family() {
+            SqlFamily::Sqlite => true,
+            _ => false,
+        }
+    }
+
     async fn check_table_drop(
         &self,
         table_name: &str,
@@ -104,10 +114,15 @@ impl SqlDestructiveChangesChecker {
         previous_table: &sql_schema_describer::Table,
         diagnostics: &mut DestructiveChangeDiagnostics,
     ) -> SqlResult<()> {
-        let values_count = self.count_values_in_column(&alter_column.name, previous_table).await?;
         let previous_column = previous_table
             .column(&alter_column.name)
             .expect("unsupported column renaming");
+
+        if self.alter_column_is_safe(alter_column, previous_column) {
+            return Ok(());
+        }
+
+        let values_count = self.count_values_in_column(&alter_column.name, previous_table).await?;
 
         if values_count > 0 {
             diagnostics.add_warning(MigrationWarning {
@@ -131,6 +146,30 @@ impl SqlDestructiveChangesChecker {
         }
 
         Ok(())
+    }
+
+    /// Are considered safe at the moment:
+    ///
+    /// - renamings on SQLite
+    /// - default changes on SQLite
+    /// - Arity changes from required to optional on SQLite
+    fn alter_column_is_safe(&self, alter_column: &AlterColumn, previous_column: &sql_schema_describer::Column) -> bool {
+        if !self.is_on_sqlite() {
+            return false;
+        }
+
+        let arity_change_is_safe = match (&previous_column.tpe.arity, &alter_column.column.tpe.arity) {
+            // column became required
+            (ColumnArity::Nullable, ColumnArity::Required) => false,
+            // column became nullable
+            (ColumnArity::Required, ColumnArity::Nullable) => true,
+            // nothing changed
+            (ColumnArity::Required, ColumnArity::Required) | (ColumnArity::Nullable, ColumnArity::Nullable) => true,
+            // not supported on SQLite
+            (ColumnArity::List, _) | (_, ColumnArity::List) => unreachable!(),
+        };
+
+        alter_column.column.tpe.family == previous_column.tpe.family && arity_change_is_safe
     }
 
     async fn check_impl(&self, database_migration: &SqlMigration) -> SqlResult<DestructiveChangeDiagnostics> {
