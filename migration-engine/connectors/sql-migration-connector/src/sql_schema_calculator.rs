@@ -134,6 +134,7 @@ impl<'a> SqlSchemaCalculator<'a> {
                     TempManifestationHolder::Inline {
                         in_table_of_model,
                         column: column_name,
+                        referenced_fields,
                     } if in_table_of_model == &model_table.model.name => {
                         let (model, related_model) = if model_table.model == relation.model_a {
                             (&relation.model_a, &relation.model_b)
@@ -143,10 +144,23 @@ impl<'a> SqlSchemaCalculator<'a> {
 
                         let field = model.fields().find(|f| &f.db_name() == column_name).unwrap();
 
+                        let referenced_field = if referenced_fields.is_empty() {
+                            related_model.id_field()?
+                        } else {
+                            let field_name = referenced_fields.first().unwrap();
+                            let field = related_model
+                                .fields()
+                                .find(|field| field.name == field_name.as_str())
+                                .ok_or_else(|| {
+                                    format!("Reference to unknown field: {}.{}", related_model.name, field_name)
+                                })?;
+                            field
+                        };
+
                         let column = sql::Column {
                             name: column_name.to_string(),
                             tpe: column_type_for_scalar_type(
-                                scalar_type_for_field(related_model.id_field()?),
+                                scalar_type_for_field(referenced_field),
                                 column_arity(&field),
                             ),
                             default: None,
@@ -156,7 +170,7 @@ impl<'a> SqlSchemaCalculator<'a> {
                             constraint_name: None,
                             columns: vec![column_name.to_string()],
                             referenced_table: related_model.db_name(),
-                            referenced_columns: vec![related_model.id_field()?.db_name()],
+                            referenced_columns: vec![referenced_field.db_name()],
                             on_delete_action: if column.is_required() {
                                 sql::ForeignKeyAction::Restrict
                             } else {

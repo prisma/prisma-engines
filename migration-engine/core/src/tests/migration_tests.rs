@@ -1527,7 +1527,7 @@ async fn calculate_database_steps_with_infer_after_an_apply_must_work(api: &Test
     };
 
     let result = api
-        .execute_command::<CalculateDatabaseStepsCommand>(dbg!(&calculate_input))
+        .execute_command::<CalculateDatabaseStepsCommand>(&calculate_input)
         .await
         .unwrap();
 
@@ -1711,6 +1711,122 @@ async fn renaming_a_datasource_works(api: &TestApi) -> Result<(), anyhow::Error>
             .build(),
     )
     .await?;
+
+    Ok(())
+}
+
+#[test_each_connector]
+async fn relations_can_reference_arbitrary_unique_fields(api: &TestApi) -> Result<(), anyhow::Error> {
+    let dm = r#"
+        model User {
+            id Int @id
+            email String @unique
+        }
+        
+        model Account {
+            id Int @id
+            user User @relation(references: [email])
+        }    
+    "#;
+
+    api.infer_and_apply_with_options(InferAndApplyBuilder::new(dm).build())
+        .await?;
+    let schema = api.describe_database().await?;
+
+    let fks = &schema.table_bang("Account").foreign_keys;
+
+    assert_eq!(fks.len(), 1);
+
+    let fk = fks.iter().next().unwrap();
+
+    assert_eq!(fk.columns, &["user"]);
+    assert_eq!(fk.referenced_table, "User");
+    assert_eq!(fk.referenced_columns, &["email"]);
+
+    Ok(())
+}
+
+#[test_each_connector]
+async fn relations_can_reference_arbitrary_unique_fields_with_maps(api: &TestApi) -> Result<(), anyhow::Error> {
+    let dm = r#"
+        model User {
+            id Int @id
+            email String @unique @map("emergency-mail")
+            accounts Account[]
+
+            @@map("users")
+        }
+
+        model Account {
+            id Int @id
+            user User @relation(references: [email]) @map("user-id")
+        }
+    "#;
+
+    api.infer_and_apply_with_options(InferAndApplyBuilder::new(dm).build())
+        .await?;
+    let schema = api.describe_database().await?;
+
+    let fks = &schema.table_bang("Account").foreign_keys;
+
+    assert_eq!(fks.len(), 1);
+
+    let fk = fks.iter().next().unwrap();
+
+    assert_eq!(fk.columns, &["user-id"]);
+    assert_eq!(fk.referenced_table, "users");
+    assert_eq!(fk.referenced_columns, &["emergency-mail"]);
+
+    Ok(())
+}
+
+#[test_each_connector]
+async fn foreign_keys_are_added_on_existing_tables(api: &TestApi) -> Result<(), anyhow::Error> {
+    let dm1 = r#"
+        model User {
+            id Int @id
+            email String @unique
+        }
+
+        model Account {
+            id Int @id
+        }
+    "#;
+
+    api.infer_and_apply_with_options(InferAndApplyBuilder::new(dm1).build())
+        .await?;
+    let schema = api.describe_database().await?;
+
+    anyhow::ensure!(
+        schema.table("Account").ok().map(|table| table.foreign_keys.is_empty()) == Some(true),
+        "There should be no foreign key yet."
+    );
+
+    let dm2 = r#"
+        model User {
+            id Int @id
+            email String @unique
+        }
+
+        model Account {
+            id Int @id
+            user User @relation(references: [email])
+        }
+    "#;
+
+    api.infer_and_apply_with_options(InferAndApplyBuilder::new(dm2).build())
+        .await?;
+    let schema = api.describe_database().await?;
+
+    let table = schema.table("Account").map_err(|err| anyhow::anyhow!("{}", err))?;
+
+    assert_eq!(table.foreign_keys.len(), 1);
+
+    let fk = table.foreign_keys.iter().next().unwrap();
+
+    assert_eq!(fk.columns, &["user"]);
+    assert_eq!(fk.referenced_table, "User");
+    assert_eq!(fk.referenced_columns, &["email"]);
 
     Ok(())
 }

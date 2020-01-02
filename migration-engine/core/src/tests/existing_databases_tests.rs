@@ -120,9 +120,9 @@ async fn creating_a_field_for_an_existing_column_and_changing_its_type_must_work
     let table = result.table_bang("Blog");
     let column = table.column_bang("title");
     assert_eq!(column.tpe.family, ColumnTypeFamily::String);
-    assert_eq!(column.is_required(), true);
-    let index = table.indices.iter().find(|i| i.columns == vec!["title"]);
-    assert_eq!(index.is_some(), true);
+    assert!(column.is_required());
+    let index = table.indices.iter().find(|i| i.columns == &["title"]);
+    assert!(index.is_some());
     assert_eq!(index.unwrap().tpe, IndexType::Unique);
 }
 
@@ -346,7 +346,7 @@ async fn renaming_a_field_where_the_column_was_already_renamed_must_work(api: &T
     assert!(final_result.table_bang("Blog").column("title").is_none());
 }
 
-#[test_each_connector(log = "debug")]
+#[test_each_connector]
 async fn removing_a_default_from_a_non_nullable_foreign_key_column_must_warn(api: &TestApi) {
     let sql_family = api.sql_family();
     let sql_schema = api

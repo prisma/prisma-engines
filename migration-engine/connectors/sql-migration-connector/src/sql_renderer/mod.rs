@@ -21,15 +21,17 @@ pub trait SqlRenderer {
 
     fn render_column_type(&self, t: &ColumnType) -> String;
 
-    fn render_references(&self, schema_name: &str, foreign_key: Option<&ForeignKey>) -> String;
+    fn render_references(&self, schema_name: &str, foreign_key: &ForeignKey) -> String;
+
+    fn sql_family(&self) -> SqlFamily;
 }
 
 impl dyn SqlRenderer {
-    pub fn for_family(sql_family: &SqlFamily) -> &dyn SqlRenderer {
+    pub fn for_family<'a>(sql_family: &SqlFamily) -> Box<dyn SqlRenderer + Send + Sync + 'a> {
         match sql_family {
-            SqlFamily::Postgres => &PostgresRenderer {},
-            SqlFamily::Mysql => &MySqlRenderer {},
-            SqlFamily::Sqlite => &SqliteRenderer {},
+            SqlFamily::Postgres => Box::new(PostgresRenderer {}),
+            SqlFamily::Mysql => Box::new(MySqlRenderer {}),
+            SqlFamily::Sqlite => Box::new(SqliteRenderer {}),
         }
     }
 }
