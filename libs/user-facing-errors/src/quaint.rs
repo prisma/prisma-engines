@@ -1,5 +1,5 @@
 use crate::{common, query_engine, KnownError};
-use quaint::{connector::ConnectionInfo, error::Error as QuaintError};
+use quaint::{error::Error as QuaintError, prelude::ConnectionInfo};
 
 pub fn render_quaint_error(quaint_error: &QuaintError, connection_info: &ConnectionInfo) -> Option<KnownError> {
     match (quaint_error, connection_info) {

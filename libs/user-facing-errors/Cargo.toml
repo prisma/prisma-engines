@@ -13,6 +13,4 @@ serde = { version = "1.0.102", features = ["derive"] }
 backtrace = "0.3.40"
 failure = "*"
 log = "0.4.8"
-
-[dependencies.quaint]
-git = "https://github.com/prisma/quaint.git"
+quaint = { version = "0.1", features = ["mysql", "postgresql", "sqlite"] }

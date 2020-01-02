@@ -10,7 +10,7 @@ serde_json = "1.0"
 once_cell = "1.2"
 prisma-models = { path = "../../../libs/prisma-models" }
 failure = { version = "0.1", features = ["derive"] }
-uuid = "0.7"
+uuid = "0.8"
 itertools = "0.8"
 chrono = { version = "0.4", features = ["serde"] }
 futures = "0.3"
