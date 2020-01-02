@@ -1,7 +1,5 @@
-mod test_harness;
-
+use super::test_harness::*;
 use pretty_assertions::assert_eq;
-use test_harness::*;
 
 #[test_each_connector]
 async fn unapply_must_work(api: &TestApi) {

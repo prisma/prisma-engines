@@ -105,6 +105,7 @@ impl SqlMigrationConnector {
             connection_info: connection_info.clone(),
             schema_name: schema_name.clone(),
             database: Arc::clone(&conn),
+            database_describer: describer.clone(),
         });
 
         Ok(Self {

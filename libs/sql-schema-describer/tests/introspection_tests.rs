@@ -541,10 +541,7 @@ fn defaults_must_work() {
             async move {
                 let result = inspector.describe(schema_name).await.expect("describing");
                 let user_table = result.get_table("User").expect("getting User table");
-                let default = match db_type {
-                    DbType::Sqlite => "'1'".to_string(),
-                    _ => "1".to_string(),
-                };
+                let default = "1".to_owned();
                 let expected_columns = vec![Column {
                     name: "id".to_string(),
                     tpe: ColumnType {

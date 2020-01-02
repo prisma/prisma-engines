@@ -22,10 +22,10 @@ pub enum SqlError {
     ConnectionError(QuaintError),
 
     #[fail(display = "Error querying the database: {}", _0)]
-    QueryError(Error),
+    QueryError(Box<dyn std::error::Error + Send + Sync>),
 
     #[fail(display = "The column value was different from the model")]
-    ColumnReadFailure(Error),
+    ColumnReadFailure(Box<dyn std::error::Error + Send + Sync>),
 
     #[fail(display = "Field cannot be null: {}", field)]
     FieldCannotBeNull { field: String },
@@ -116,7 +116,7 @@ impl SqlError {
 impl From<quaint::error::Error> for SqlError {
     fn from(e: quaint::error::Error) -> Self {
         match e {
-            quaint::error::Error::QueryError(e) => Self::QueryError(e.into()),
+            quaint::error::Error::QueryError(e) => Self::QueryError(e),
             quaint::error::Error::IoError(_) => Self::ConnectionError(e),
             quaint::error::Error::NotFound => Self::RecordDoesNotExist,
             quaint::error::Error::UniqueConstraintViolation { field_name } => {
@@ -128,7 +128,7 @@ impl From<quaint::error::Error> for SqlError {
             }
 
             quaint::error::Error::ConnectionError(_) => Self::ConnectionError(e),
-            quaint::error::Error::ColumnReadFailure(e) => Self::ColumnReadFailure(e.into()),
+            quaint::error::Error::ColumnReadFailure(e) => Self::ColumnReadFailure(e),
             quaint::error::Error::ColumnNotFound(_) => Self::ColumnDoesNotExist,
 
             e @ quaint::error::Error::ConversionError(_) => SqlError::ConversionError(e.into()),
@@ -166,14 +166,8 @@ impl From<url::ParseError> for SqlError {
     }
 }
 
-impl From<uuid::parser::ParseError> for SqlError {
-    fn from(e: uuid::parser::ParseError) -> SqlError {
-        SqlError::ColumnReadFailure(e.into())
-    }
-}
-
-impl From<uuid::BytesError> for SqlError {
-    fn from(e: uuid::BytesError) -> SqlError {
+impl From<uuid::Error> for SqlError {
+    fn from(e: uuid::Error) -> SqlError {
         SqlError::ColumnReadFailure(e.into())
     }
 }

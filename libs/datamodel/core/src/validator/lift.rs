@@ -203,7 +203,7 @@ impl LiftAstToDml {
             // Recursive type.
             return Err(DatamodelError::new_validation_error(
                 &format!(
-                    "Recursive type definitions are not allowed. Recursive path was: {} -> {}",
+                    "Recursive type definitions are not allowed. Recursive path was: {} -> {}.",
                     checked_types.join(" -> "),
                     type_name
                 ),

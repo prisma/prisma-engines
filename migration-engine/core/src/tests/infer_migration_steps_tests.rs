@@ -1,11 +1,9 @@
 #![allow(non_snake_case)]
 
-mod test_harness;
-
-use migration_core::commands::*;
+use super::test_harness::*;
+use crate::commands::*;
 use pretty_assertions::assert_eq;
 use sql_migration_connector::PrettySqlMigrationStep;
-use test_harness::*;
 
 #[test_each_connector]
 async fn assume_to_be_applied_must_work(api: &TestApi) {

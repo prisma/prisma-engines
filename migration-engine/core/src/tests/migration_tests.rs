@@ -1,14 +1,13 @@
 #![allow(non_snake_case)]
 
-mod test_harness;
-use migration_core::commands::{
+use super::test_harness::*;
+use crate::commands::{
     CalculateDatabaseStepsCommand, CalculateDatabaseStepsInput, InferMigrationStepsCommand, InferMigrationStepsInput,
 };
 use pretty_assertions::assert_eq;
 use quaint::prelude::SqlFamily;
 use sql_migration_connector::{AlterIndex, CreateIndex, DropIndex, SqlMigrationStep};
 use sql_schema_describer::*;
-use test_harness::*;
 
 #[test_each_connector]
 async fn adding_a_scalar_field_must_work(api: &TestApi) {
@@ -89,7 +88,7 @@ async fn adding_an_id_field_with_a_special_name_must_work(api: &TestApi) {
     assert_eq!(column.is_some(), true);
 }
 
-#[test_each_connector(ignore="sqlite")]
+#[test_each_connector(ignore = "sqlite")]
 async fn adding_an_id_field_of_type_int_must_work(api: &TestApi) {
     let dm2 = r#"
         model Test {
@@ -102,9 +101,9 @@ async fn adding_an_id_field_of_type_int_must_work(api: &TestApi) {
     let column = result.table_bang("Test").column_bang("myId");
 
     assert_eq!(column.auto_increment, false);
- }
+}
 
-#[test_one_connector(connector="sqlite")]
+#[test_one_connector(connector = "sqlite")]
 async fn adding_an_id_field_of_type_int_must_work_for_sqlite(api: &TestApi) {
     let dm2 = r#"
         model Test {
@@ -141,7 +140,6 @@ async fn adding_an_id_field_of_type_int_with_autoincrement_must_work(api: &TestA
         _ => assert_eq!(column.auto_increment, true),
     }
 }
-
 
 #[test_each_connector]
 async fn removing_a_scalar_field_must_work(api: &TestApi) {
@@ -825,7 +823,7 @@ async fn multi_column_unique_in_conjunction_with_custom_column_name_must_work(ap
     assert_eq!(index.unwrap().tpe, IndexType::Unique);
 }
 
-#[test_each_connector]
+#[test_one_connector(connector = "sqlite")]
 async fn sqlite_must_recreate_indexes(api: &TestApi) {
     // SQLite must go through a complicated migration procedure which requires dropping and recreating indexes. This test checks that.
     // We run them still against each connector.
@@ -861,7 +859,7 @@ async fn sqlite_must_recreate_indexes(api: &TestApi) {
     assert_eq!(index.unwrap().tpe, IndexType::Unique);
 }
 
-#[test_each_connector]
+#[test_one_connector(connector = "sqlite")]
 async fn sqlite_must_recreate_multi_field_indexes(api: &TestApi) {
     // SQLite must go through a complicated migration procedure which requires dropping and recreating indexes. This test checks that.
     // We run them still against each connector.
@@ -1574,10 +1572,7 @@ async fn column_defaults_must_be_migrated(api: &TestApi) {
 
     let table = schema.table_bang("Fruit");
     let column = table.column_bang("name");
-    assert_eq!(
-        column.default.as_ref().map(String::as_str),
-        Some(if api.is_sqlite() { "'banana'" } else { "banana" })
-    );
+    assert_eq!(column.default.as_ref().map(String::as_str), Some("banana"));
 
     let dm2 = r#"
         model Fruit {
@@ -1590,8 +1585,163 @@ async fn column_defaults_must_be_migrated(api: &TestApi) {
 
     let table = schema.table_bang("Fruit");
     let column = table.column_bang("name");
+    assert_eq!(column.default.as_ref().map(String::as_str), Some("mango"));
+}
+
+#[test_each_connector(ignore = "mysql_mariadb")]
+async fn escaped_string_defaults_are_not_arbitrarily_migrated(api: &TestApi) -> Result<(), anyhow::Error> {
+    use quaint::ast::*;
+
+    let dm1 = r#"
+        model Fruit {
+            id String @id @default(cuid())
+            name String @default("ba\0nana")
+            seasonality String @default("\"summer\"")
+            contains String @default("'potassium'")
+            sideNames String @default("top\ndown")
+            size Float @default(12.3)
+        }
+    "#;
+
+    let output = api.infer_and_apply(dm1).await;
+
+    anyhow::ensure!(!output.migration_output.datamodel_steps.is_empty(), "Yes migration");
+    anyhow::ensure!(output.migration_output.warnings.is_empty(), "No warnings");
+
+    let insert = Insert::single_into(api.render_table_name("Fruit"))
+        .value("id", "apple-id")
+        .value("name", "apple")
+        .value("sideNames", "stem and the other one")
+        .value("contains", "'vitamin C'")
+        .value("seasonality", "september");
+
+    api.database().execute(insert.into()).await.unwrap();
+
+    let output = api.infer_and_apply(dm1).await;
+
+    anyhow::ensure!(output.migration_output.datamodel_steps.is_empty(), "No migration");
+    anyhow::ensure!(output.migration_output.warnings.is_empty(), "No warnings");
+
+    let table = output.sql_schema.table_bang("Fruit");
+
     assert_eq!(
-        column.default.as_ref().map(String::as_str),
-        Some(if api.is_sqlite() { "'mango'" } else { "mango" })
+        table
+            .column("name")
+            .and_then(|c| c.default.as_ref())
+            .map(String::as_str),
+        Some(if api.is_mysql() { "ba\u{0}nana" } else { "ba\\0nana" })
     );
+    assert_eq!(
+        table
+            .column("sideNames")
+            .and_then(|c| c.default.as_ref())
+            .map(String::as_str),
+        Some(if api.is_mysql() { "top\ndown" } else { "top\\ndown" })
+    );
+    assert_eq!(
+        table
+            .column("contains")
+            .and_then(|c| c.default.as_ref())
+            .map(String::as_str),
+        Some("potassium")
+    );
+    assert_eq!(
+        table
+            .column("seasonality")
+            .and_then(|c| c.default.as_ref())
+            .map(String::as_str),
+        Some(if api.is_sqlite() {
+            r#"\summer\"#
+        } else if api.is_mysql() {
+            r#""summer""#
+        } else {
+            r#"\"summer\""#
+        })
+    );
+
+    Ok(())
+}
+
+#[test_each_connector]
+async fn created_at_does_not_get_arbitrarily_migrated(api: &TestApi) -> Result<(), anyhow::Error> {
+    use quaint::ast::*;
+
+    let dm1 = r#"
+        model Fruit {
+            id Int @id @default(autoincrement())
+            name String
+            createdAt DateTime @default(now())
+        }
+    "#;
+
+    let schema = api.infer_and_apply(dm1).await.sql_schema;
+
+    let insert = Insert::single_into(api.render_table_name("Fruit")).value("name", "banana");
+    api.database().execute(insert.into()).await.unwrap();
+
+    anyhow::ensure!(
+        schema
+            .table_bang("Fruit")
+            .column_bang("createdAt")
+            .default
+            .as_ref()
+            .unwrap()
+            .contains("1970"),
+        "createdAt default is set"
+    );
+
+    let dm2 = r#"
+        model Fruit {
+            id Int @id @default(autoincrement())
+            name String
+            createdAt DateTime @default(now())
+        }
+    "#;
+
+    let output = api.infer_and_apply(dm2).await;
+
+    anyhow::ensure!(output.migration_output.warnings.is_empty(), "No warnings");
+    anyhow::ensure!(
+        output.migration_output.datamodel_steps.is_empty(),
+        "Migration should be empty"
+    );
+
+    Ok(())
+}
+
+#[test_one_connector(connector = "sqlite")]
+async fn renaming_a_datasource_works(api: &TestApi) -> Result<(), anyhow::Error> {
+    let dm1 = r#"
+        datasource db1 {
+            provider = "sqlite"
+            url = "file:///tmp/prisma-test.db"    
+        }
+
+        model User {
+            id Int @id  
+        }
+    "#;
+
+    let infer_output = api.infer_migration(&InferBuilder::new(dm1.to_owned()).build()).await?;
+
+    let dm2 = r#"
+        datasource db2 {
+            provider = "sqlite"
+            url = "file:///tmp/prisma-test.db"    
+        }
+    
+        model User {
+            id Int @id
+        }
+    "#;
+
+    api.infer_migration(
+        &InferBuilder::new(dm2.to_owned())
+            .assume_to_be_applied(Some(infer_output.datamodel_steps))
+            .migration_id(Some("mig02".to_owned()))
+            .build(),
+    )
+    .await?;
+
+    Ok(())
 }

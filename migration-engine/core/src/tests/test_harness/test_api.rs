@@ -3,14 +3,14 @@ use super::{
     misc_helpers::{mysql_migration_connector, postgres_migration_connector, sqlite_migration_connector, test_api},
     InferAndApplyOutput,
 };
-use migration_connector::{MigrationPersistence, MigrationStep};
-use migration_core::{
+use crate::{
     api::{GenericApi, MigrationApi},
     commands::{
         ApplyMigrationInput, InferMigrationStepsInput, MigrationStepsResultOutput, UnapplyMigrationInput,
         UnapplyMigrationOutput,
     },
 };
+use migration_connector::{MigrationPersistence, MigrationStep};
 use quaint::prelude::{ConnectionInfo, Queryable, SqlFamily};
 use sql_schema_describer::*;
 use std::sync::Arc;
@@ -103,7 +103,7 @@ impl TestApi {
     pub async fn infer_and_apply_with_options(
         &self,
         options: InferAndApply,
-    ) -> Result<MigrationStepsResultOutput, failure::Error> {
+    ) -> Result<MigrationStepsResultOutput, anyhow::Error> {
         let InferAndApply {
             migration_id,
             force,
@@ -147,12 +147,26 @@ impl TestApi {
 
     pub async fn execute_command<'a, C>(&self, input: &'a C::Input) -> Result<C::Output, user_facing_errors::Error>
     where
-        C: migration_core::commands::MigrationCommand,
+        C: crate::commands::MigrationCommand,
     {
         self.api
             .handle_command::<C>(input)
             .await
             .map_err(|err| self.api.render_error(err))
+    }
+
+    pub async fn infer_migration(
+        &self,
+        input: &InferMigrationStepsInput,
+    ) -> Result<MigrationStepsResultOutput, anyhow::Error> {
+        Ok(self.api.infer_migration_steps(&input).await?)
+    }
+
+    pub async fn apply_migration_with(
+        &self,
+        input: &ApplyMigrationInput,
+    ) -> Result<MigrationStepsResultOutput, anyhow::Error> {
+        Ok(self.api.apply_migration(&input).await?)
     }
 
     pub async fn run_infer_command(&self, input: InferMigrationStepsInput) -> InferOutput {
@@ -195,15 +209,12 @@ impl TestApi {
         }
     }
 
-    pub async fn describe_database(&self) -> Result<SqlSchema, failure::Error> {
-        use failure::ResultExt;
-
+    pub async fn describe_database(&self) -> Result<SqlSchema, anyhow::Error> {
         let mut result = self
             .describer()
             .describe(self.connection_info().unwrap().schema_name())
             .await
-            .context("Description failed")?;
-
+            .expect("Description failed");
 
         // the presence of the _Migration table makes assertions harder. Therefore remove it from the result.
         result.tables = result.tables.into_iter().filter(|t| t.name != "_Migration").collect();
@@ -410,4 +421,100 @@ pub struct InferAndApply {
     migration_id: String,
     force: Option<bool>,
     datamodel: String,
+}
+
+pub struct InferBuilder {
+    assume_to_be_applied: Option<Vec<MigrationStep>>,
+    datamodel: String,
+    migration_id: Option<String>,
+}
+
+impl InferBuilder {
+    pub fn new(datamodel: String) -> Self {
+        InferBuilder {
+            assume_to_be_applied: None,
+            datamodel,
+            migration_id: None,
+        }
+    }
+
+    pub fn migration_id(mut self, migration_id: Option<String>) -> Self {
+        self.migration_id = migration_id;
+        self
+    }
+
+    pub fn assume_to_be_applied(mut self, assume_to_be_applied: Option<Vec<MigrationStep>>) -> Self {
+        self.assume_to_be_applied = assume_to_be_applied;
+        self
+    }
+
+    pub fn build(self) -> InferMigrationStepsInput {
+        let InferBuilder {
+            assume_to_be_applied,
+            datamodel,
+            migration_id,
+        } = self;
+
+        let migration_id = migration_id.unwrap_or_else(|| {
+            format!(
+                "migration-{}",
+                MIGRATION_ID_COUNTER.fetch_add(1, std::sync::atomic::Ordering::Relaxed)
+            )
+        });
+
+        InferMigrationStepsInput {
+            assume_to_be_applied: assume_to_be_applied.unwrap_or_else(Vec::new),
+            datamodel,
+            migration_id,
+        }
+    }
+}
+
+#[derive(Debug, Default)]
+pub struct ApplyBuilder {
+    migration_id: Option<String>,
+    steps: Option<Vec<MigrationStep>>,
+    force: Option<bool>,
+}
+
+impl ApplyBuilder {
+    pub fn new() -> Self {
+        ApplyBuilder::default()
+    }
+
+    pub fn migration_id(mut self, migration_id: Option<String>) -> Self {
+        self.migration_id = migration_id;
+        self
+    }
+
+    pub fn steps(mut self, steps: Option<Vec<MigrationStep>>) -> Self {
+        self.steps = steps;
+        self
+    }
+
+    pub fn force(mut self, force: Option<bool>) -> Self {
+        self.force = force;
+        self
+    }
+
+    pub fn build(self) -> ApplyMigrationInput {
+        let ApplyBuilder {
+            migration_id,
+            steps,
+            force,
+        } = self;
+
+        let migration_id = migration_id.unwrap_or_else(|| {
+            format!(
+                "migration-{}",
+                MIGRATION_ID_COUNTER.fetch_add(1, std::sync::atomic::Ordering::Relaxed)
+            )
+        });
+
+        ApplyMigrationInput {
+            migration_id,
+            steps: steps.unwrap_or_else(Vec::new),
+            force,
+        }
+    }
 }

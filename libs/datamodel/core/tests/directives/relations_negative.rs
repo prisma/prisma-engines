@@ -2,7 +2,7 @@ use crate::common::*;
 use datamodel::{ast::Span, error::DatamodelError};
 
 #[test]
-fn should_fail_on_ambiguous_relations() {
+fn should_fail_on_ambiguous_relations_with_automatic_names_1() {
     let dml = r#"
     model User {
         id Int @id
@@ -17,14 +17,36 @@ fn should_fail_on_ambiguous_relations() {
 
     let errors = parse_error(dml);
 
-    errors.assert_is_at(
-        0,
-        DatamodelError::new_model_validation_error("Ambiguous relation detected.", "User", Span::new(45, 57)),
+    errors.assert_is(
+        DatamodelError::new_model_validation_error("Ambiguous relation detected. The fields `posts` and `more_posts` in model `User` both refer to `Post`. Please provide different relation names for them by adding `@relation(<name>).", "User", Span::new(45, 57)),
     );
 }
 
 #[test]
-fn should_fail_on_ambiguous_named_relations() {
+fn should_fail_on_ambiguous_relations_with_automatic_names_2() {
+    // test case based on: https://github.com/prisma/prisma2/issues/976
+    let dml = r#"
+    model User {
+        id Int @id
+        posts Post[]
+    }
+
+    model Post {
+        post_id Int @id
+        author1 User
+        author2 User
+    }
+    "#;
+
+    let errors = parse_error(dml);
+
+    errors.assert_is(
+        DatamodelError::new_model_validation_error("Ambiguous relation detected. The fields `author1` and `author2` in model `Post` both refer to `User`. Please provide different relation names for them by adding `@relation(<name>).", "Post", Span::new(114, 126)),
+    );
+}
+
+#[test]
+fn should_fail_on_ambiguous_relations_with_manual_names_1() {
     let dml = r#"
     model User {
         id Int @id
@@ -39,14 +61,17 @@ fn should_fail_on_ambiguous_named_relations() {
 
     let errors = parse_error(dml);
 
-    errors.assert_is_at(
-        0,
-        DatamodelError::new_model_validation_error("Ambiguous relation detected.", "User", Span::new(45, 81)),
+    errors.assert_is(
+        DatamodelError::new_model_validation_error(
+            "Wrongly named relation detected. The fields `posts` and `more_posts` in model `User` both use the same relation name. Please provide different relation names for them through `@relation(<name>).", 
+            "User", 
+            Span::new(45, 81)
+        ),
     );
 }
 
 #[test]
-fn should_fail_on_ambiguous_named_relations_2() {
+fn should_fail_on_ambiguous_relations_with_manual_names_2() {
     let dml = r#"
     model User {
         id Int @id
@@ -63,10 +88,11 @@ fn should_fail_on_ambiguous_named_relations_2() {
 
     let errors = parse_error(dml);
 
-    errors.assert_is_at(
-        0,
-        DatamodelError::new_model_validation_error("Ambiguous relation detected.", "User", Span::new(45, 78)),
-    );
+    errors.assert_is(DatamodelError::new_model_validation_error(
+        "Wrongly named relation detected. The fields `posts` and `even_more_posts` in model `User` both use the same relation name. Please provide different relation names for them through `@relation(<name>).",
+        "User",
+        Span::new(45, 78),
+    ));
 }
 
 #[test]
@@ -83,7 +109,7 @@ fn should_fail_on_ambiguous_self_relation() {
     let errors = parse_error(dml);
 
     errors.assert_is(DatamodelError::new_model_validation_error(
-        "Ambiguous self relation detected.",
+        "Unnamed self relation detected. The fields `father`, `son` and `mother` in model `User` have no relation name. Please provide a relation name for one of them by adding `@relation(<name>).",
         "User",
         Span::new(45, 56),
     ));
@@ -102,7 +128,7 @@ fn should_fail_on_ambiguous_self_relation_with_two_fields() {
     let errors = parse_error(dml);
 
     errors.assert_is(DatamodelError::new_model_validation_error(
-        "Ambiguous self relation detected.",
+        "Ambiguous self relation detected. The fields `child` and `mother` in model `User` both refer to `User`. If they are part of the same relation add the same relation name for them with `@relation(<name>)`.",
         "User",
         Span::new(57, 67),
     ));
@@ -122,7 +148,7 @@ fn should_fail_on_ambiguous_named_self_relation() {
     let errors = parse_error(dml);
 
     errors.assert_is(DatamodelError::new_model_validation_error(
-        "Ambiguous self relation detected.",
+        "Wrongly named self relation detected. The fields `father`, `son` and `mother` in model `User` have the same relation name. At most two relation fields can belong to the same relation and therefore have the same name. Please assign a different relation name to one of them.",
         "User",
         Span::new(45, 82),
     ));

@@ -72,6 +72,19 @@ impl<'a> ApplyMigrationCommand<'a> {
     {
         let connector = engine.connector();
         let migration_persistence = connector.migration_persistence();
+
+        if migration_persistence
+            .migration_is_already_applied(&self.input.migration_id)
+            .await?
+        {
+            return Err(CommandError::Input {
+                error: format!(
+                    "Invariant violation: the migration with id `{migration_id}` has already been applied.",
+                    migration_id = self.input.migration_id
+                ),
+            });
+        }
+
         let current_datamodel_ast = migration_persistence.current_datamodel_ast().await?;
         let current_datamodel = datamodel::lift_ast(&current_datamodel_ast)?;
 
