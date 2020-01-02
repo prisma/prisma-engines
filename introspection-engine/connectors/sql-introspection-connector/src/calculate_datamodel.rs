@@ -454,10 +454,13 @@ fn calculate_field_type(schema: &SqlSchema, column: &Column, table: &Table) -> F
 }
 
 fn sanitize_name(name: String) -> (String, Option<String>) {
+    let re_start = Regex::new("^[^a-zA-Z]+").unwrap();
     let re = Regex::new("[^a-zA-Z0-9_]").unwrap();
-    let needs_sanitation = re.is_match(name.as_str());
+    let needs_sanitation = re_start.is_match(name.as_str()) || re.is_match(name.as_str());
+
     if needs_sanitation {
-        (re.replace_all(name.as_str(), "_").parse().unwrap(), Some(name))
+        let start_cleaned: String = re_start.replace_all(name.as_str(), "").parse().unwrap();
+        (re.replace_all(start_cleaned.as_str(), "_").parse().unwrap(), Some(name))
     } else {
         (name, None)
     }
