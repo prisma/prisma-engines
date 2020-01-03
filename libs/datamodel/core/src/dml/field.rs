@@ -56,7 +56,7 @@ pub struct Field {
     /// The field's type.
     pub field_type: FieldType,
     /// The database internal name.
-    pub database_name: Option<String>,
+    pub database_name: Option<DatabaseName>,
     /// The default value.
     pub default_value: Option<ScalarValue>,
     /// Indicates if the field is unique.
@@ -85,10 +85,18 @@ impl WithName for Field {
 
 impl WithDatabaseName for Field {
     fn database_name(&self) -> &Option<String> {
+        match &self.database_name {
+            None => &None,
+            Some(DatabaseName::Single(name)) => &Some(name.to_string()),
+            Some(DatabaseName::Compound(_)) => panic!("Compound names are not implemented yet."),
+        }
+    }
+
+    fn database_names(&self) -> &Option<DatabaseName> {
         &self.database_name
     }
-    fn set_database_name(&mut self, database_name: &Option<String>) {
-        self.database_name = database_name.clone()
+    fn set_database_name(&mut self, database_name: Option<DatabaseName>) {
+        self.database_name = database_name
     }
 }
 

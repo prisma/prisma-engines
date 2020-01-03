@@ -162,7 +162,15 @@ impl WithDatabaseName for Model {
     fn database_name(&self) -> &Option<String> {
         &self.database_name
     }
-    fn set_database_name(&mut self, database_name: &Option<String>) {
-        self.database_name = database_name.clone()
+
+    fn database_names(&self) -> &Option<DatabaseName> {
+        panic!("This should not be called on Models")
+    }
+    fn set_database_name(&mut self, database_name: Option<DatabaseName>) {
+        self.database_name = match database_name {
+            None => None,
+            Some(DatabaseName::Single(name)) => Some(name.to_string()),
+            Some(DatabaseName::Compound(_)) => panic!("There are no compound names for models"),
+        }
     }
 }

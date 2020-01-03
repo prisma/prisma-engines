@@ -64,6 +64,13 @@ fn create_many_to_many_field(foreign_key: &ForeignKey, relation_name: String, is
     }
 }
 
+fn is_compound_foreign_key_column(table: &Table, column: &Column) -> bool {
+    match table.foreign_keys.iter().find(|fk| fk.columns.contains(&column.name)) {
+        Some(fk) if fk.columns.len() > 1 => true,
+        _ => false,
+    }
+}
+
 /// Calculate a data model from a database schema.
 pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> {
     debug!("Calculating data model");
@@ -76,8 +83,12 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
         .filter(|table| !is_prisma_join_table(&table))
     {
         let mut model = Model::new(&table.name);
-        //Todo: This needs to filter out composite Foreign Key columns, they are merged into one new field
-        for column in table.columns.iter() {
+
+        for column in table
+            .columns
+            .iter()
+            .filter(|column| !is_compound_foreign_key_column(&table, &column))
+        {
             debug!("Handling column {:?}", column);
             let field_type = calculate_field_type(&schema, &column, &table);
             let arity = match column.tpe.arity {
@@ -122,6 +133,56 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
             model.add_field(field);
         }
 
+        //Todo:
+        // Merge them into one new field and add it to model
+        // how to merge? start with first column, remove other columns
+        // continue with remaining columns, look for name clashes
+        // what if more than one fk references a field https://stackoverflow.com/questions/48807000/same-column-in-multiple-foreign-overlapping-foreign-keys-good-practise
+        // how to identify same fk
+        // name is opposing model / opposing model + relation name
+        // the backrelationfield could then automatically be added by the existing logic
+
+        for column in table
+            .columns
+            .iter()
+            .filter(|column| is_compound_foreign_key_column(&table, &column))
+        {
+            debug!("Handling column {:?}", column);
+            let field_type = calculate_field_type(&schema, &column, &table);
+
+            // todo arity is calculated differently
+            let arity = match column.tpe.arity {
+                ColumnArity::Required => FieldArity::Required,
+                ColumnArity::Nullable => FieldArity::Optional,
+                ColumnArity::List => FieldArity::List,
+            };
+
+            // this latter needs to be a compound value of the two columns defaults?
+            let default_value = None;
+
+            //todo
+            // fetch this from indexes
+            // what about separate uniques?
+            let is_unique = false;
+
+            let field = Field {
+                name: column.name.clone(),
+                arity,
+                field_type,
+                database_name: None,
+                default_value,
+                is_unique,
+                id_info: None,
+                documentation: None,
+                is_generated: false,
+                is_updated_at: false,
+            };
+
+            //todo
+            // only add one compound field per fk not one for each column in fk
+            model.add_field(field);
+        }
+
         for index in table.indices.iter() {
             if index.columns.len() > 1 {
                 let tpe = if index.tpe == IndexType::Unique {
@@ -150,6 +211,8 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
         if table.primary_key_columns().len() > 1 {
             model.id_fields = table.primary_key_columns();
         }
+
+        // todo add merged relation fields
 
         data_model.add_model(model);
     }

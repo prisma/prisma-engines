@@ -194,7 +194,10 @@ async fn introspecting_a_table_with_a_non_unique_index_should_work(api: &TestApi
                 t.add_column("a", types::text());
                 t.add_column("id", types::primary());
             });
-            migration.inject_custom(format!("Create Index \"test\" on \"{}\".\"User\"(\"a\")", api.schema_name()));
+            migration.inject_custom(format!(
+                "Create Index \"test\" on \"{}\".\"User\"(\"a\")",
+                api.schema_name()
+            ));
         })
         .await;
 
@@ -573,12 +576,14 @@ async fn introspecting_cascading_delete_behaviour_should_work(api: &TestApi) {
 #[test_one_connector(connector = "postgres")]
 async fn introspecting_native_arrays_should_work(api: &TestApi) {
     let barrel = api.barrel();
-    let _setup_schema = barrel.execute(|migration| {
-        migration.create_table("Post", |t| {
-            t.add_column("id", types::primary());
-            t.inject_custom("ints INTEGER [12]");
-        });
-    }).await;
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("Post", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom("ints INTEGER [12]");
+            });
+        })
+        .await;
 
     let dm = r#"
             datasource pg {
@@ -660,20 +665,20 @@ async fn introspecting_default_values_on_lists_should_be_ignored(api: &TestApi) 
 
 #[test_one_connector(connector = "postgres")]
 async fn introspecting_id_fields_with_foreign_key_should_ignore_the_relation(api: &TestApi) {
-            let barrel = api.barrel();
-            let _setup_schema = barrel
-                .execute(|migration| {
-                    migration.create_table("User", |t| {
-                        t.add_column("id", types::primary());
-                    });
-                    migration.create_table("Post", |t| {
-                        t.add_column("test", types::text());
-                        t.inject_custom("user_id INTEGER REFERENCES \"User\"(\"id\") Primary Key");
-                    });
-                })
-                .await;
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+            });
+            migration.create_table("Post", |t| {
+                t.add_column("test", types::text());
+                t.inject_custom("user_id INTEGER REFERENCES \"User\"(\"id\") Primary Key");
+            });
+        })
+        .await;
 
-            let dm = r#"
+    let dm = r#"
             model Post {
                test    String
                user_id Int @id
@@ -683,12 +688,12 @@ async fn introspecting_id_fields_with_foreign_key_should_ignore_the_relation(api
                id      Int @id @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
             }
         "#;
-            let result = dbg!(api.introspect().await);
-            custom_assert(&result, dm);
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
 }
 
 #[test_one_connector(connector = "postgres")]
-async fn duplicate_back_relation_fields_should_be_renamed(api: &TestApi) {
+async fn compound_foreign_keys_should_work_for_relations(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -702,24 +707,22 @@ async fn duplicate_back_relation_fields_should_be_renamed(api: &TestApi) {
                 t.add_column("user_id", types::integer());
                 t.add_column("user_name", types::text());
                 t.inject_custom("FOREIGN KEY (\"user_id\",\"user_name\") REFERENCES \"User\"(\"id\", \"name\")");
-             });
+            });
         })
         .await;
 
     let dm = r#"
             model Post {
-               id    Int @id  @id @sequence(name: "Post_id_seq", allocationSize: 1, initialValue: 1)
-               user_id   User
-               user_name User @relation(references: [name])
+                id      Int     @id @sequence(name: "Post_id_seq", allocationSize: 1, initialValue: 1)
+                user    User    @relation(references:[id, name]) @map(["user_id", "user_name"])
             }
 
             model User {
-               id      Int @id @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
-               name  String
-               posts_PostToUser Post[]
-               posts_PostToUser Post[]
-
-               @@unique([id, name] name: "user_unique")
+               id       Int     @id @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
+               name     String
+               post     Post[]
+               
+               @@unique([id, name], name: "user_unique")
             }
         "#;
     let result = dbg!(api.introspect().await);
