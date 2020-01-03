@@ -6,14 +6,16 @@ use crate::{
 };
 use futures::lock::Mutex;
 use url::Url;
+use std::sync::Arc;
 
 #[cfg(feature = "sqlite")]
 use std::convert::TryFrom;
 
 /// The main entry point and an abstraction over a database connection.
+#[derive(Clone)]
 pub struct Quaint {
-    inner: Mutex<Box<dyn Queryable + Send + Sync>>,
-    connection_info: ConnectionInfo,
+    inner: Arc<Mutex<Box<dyn Queryable + Send + Sync>>>,
+    connection_info: Arc<ConnectionInfo>,
 }
 
 impl TransactionCapable for Quaint {}
@@ -97,8 +99,10 @@ impl Quaint {
             _ => unimplemented!("Supported url schemes: file or sqlite, mysql, postgres or postgresql."),
         };
 
-        let connection_info = ConnectionInfo::from_url(url_str)?;
+        let connection_info = Arc::new(ConnectionInfo::from_url(url_str)?);
         Self::log_start(connection_info.sql_family(), 1);
+
+        let inner = Arc::new(inner);
 
         Ok(Self { inner, connection_info })
     }
