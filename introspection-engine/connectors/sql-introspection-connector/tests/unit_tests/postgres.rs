@@ -692,6 +692,12 @@ async fn introspecting_id_fields_with_foreign_key_should_ignore_the_relation(api
     custom_assert(&result, dm);
 }
 
+//todo compound foreign keys
+// more test cases:
+// to one relations, required relations, to many relations
+// separate uniques on compound fields
+// default values on compound fields
+
 #[test_one_connector(connector = "postgres")]
 async fn compound_foreign_keys_should_work_for_relations(api: &TestApi) {
     let barrel = api.barrel();

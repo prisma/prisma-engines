@@ -133,56 +133,6 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
             model.add_field(field);
         }
 
-        //Todo:
-        // Merge them into one new field and add it to model
-        // how to merge? start with first column, remove other columns
-        // continue with remaining columns, look for name clashes
-        // what if more than one fk references a field https://stackoverflow.com/questions/48807000/same-column-in-multiple-foreign-overlapping-foreign-keys-good-practise
-        // how to identify same fk
-        // name is opposing model / opposing model + relation name
-        // the backrelationfield could then automatically be added by the existing logic
-
-        for column in table
-            .columns
-            .iter()
-            .filter(|column| is_compound_foreign_key_column(&table, &column))
-        {
-            debug!("Handling column {:?}", column);
-            let field_type = calculate_field_type(&schema, &column, &table);
-
-            // todo arity is calculated differently
-            let arity = match column.tpe.arity {
-                ColumnArity::Required => FieldArity::Required,
-                ColumnArity::Nullable => FieldArity::Optional,
-                ColumnArity::List => FieldArity::List,
-            };
-
-            // this latter needs to be a compound value of the two columns defaults?
-            let default_value = None;
-
-            //todo
-            // fetch this from indexes
-            // what about separate uniques?
-            let is_unique = false;
-
-            let field = Field {
-                name: column.name.clone(),
-                arity,
-                field_type,
-                database_name: None,
-                default_value,
-                is_unique,
-                id_info: None,
-                documentation: None,
-                is_generated: false,
-                is_updated_at: false,
-            };
-
-            //todo
-            // only add one compound field per fk not one for each column in fk
-            model.add_field(field);
-        }
-
         for index in table.indices.iter() {
             if index.columns.len() > 1 {
                 let tpe = if index.tpe == IndexType::Unique {
@@ -208,11 +158,70 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
             }
         }
 
+        //Todo:
+        // Merge them into one new field and add it to model
+        // how to merge? start with first column, remove other columns
+        // continue with remaining columns, look for name clashes
+        // what if more than one fk references a field https://stackoverflow.com/questions/48807000/same-column-in-multiple-foreign-overlapping-foreign-keys-good-practise
+        // how to identify same fk
+        // name is opposing model / opposing model + relation name
+        // the backrelationfield could then automatically be added by the existing logic
+
+        for foreign_key in table.foreign_keys.iter().filter(|fk| fk.columns.len() > 1) {
+            debug!("Handling compound foreign key  {:?}", foreign_key);
+
+            let field_type = FieldType::Relation(RelationInfo {
+                name: calculate_relation_name(schema, fk, table),
+                to: foreign_key.referenced_table.clone(),
+                to_fields: foreign_key.referenced_columns.clone(),
+                on_delete: OnDeleteStrategy::None,
+            });
+
+            let columns = table
+                .columns
+                .iter()
+                .filter(|column| foreign_key.columns.contains(&column.name))
+                .collect();
+
+            // todo arity is calculated differently
+            let arity = match column.tpe.arity {
+                ColumnArity::Required => FieldArity::Required,
+                ColumnArity::Nullable => FieldArity::Optional,
+                ColumnArity::List => FieldArity::List,
+            };
+
+            // this latter needs to be a compound value of the two columns defaults?
+            let default_value = None;
+
+            //todo
+            // fetch this from indexes
+            // what about separate uniques? all @unique == @@unique ?? No! separate ones do not fully work since you can only connect to a subset of the @@unique case
+            // model.indexes contains a multi-field unique index that matches the colums exactly, then it is unique
+            // if there are separate uniques it probably should not become a relation
+            // what breaks by having an @@unique that refers to fields that do not have a representation on the model anymore due to the merged relation field
+            let is_unique = false;
+
+            let field = Field {
+                name: column.name.clone(),
+                arity,
+                field_type,
+                database_name: None,
+                default_value,
+                is_unique,
+                id_info: None,
+                documentation: None,
+                is_generated: false,
+                is_updated_at: false,
+            };
+
+            //todo
+            // only add one compound field per fk not one for each column in fk
+            model.add_field(field);
+        }
+
         if table.primary_key_columns().len() > 1 {
             model.id_fields = table.primary_key_columns();
         }
-
-        // todo add merged relation fields
 
         data_model.add_model(model);
     }
