@@ -1,5 +1,3 @@
-#![allow(non_snake_case)]
-
 use super::test_harness::*;
 use crate::commands::{
     CalculateDatabaseStepsCommand, CalculateDatabaseStepsInput, InferMigrationStepsCommand, InferMigrationStepsInput,
@@ -39,31 +37,7 @@ async fn adding_a_scalar_field_must_work(api: &TestApi) {
     assert_eq!(table.column_bang("enum").tpe.family, ColumnTypeFamily::String);
 }
 
-//#[test]
-//fn apply_schema() {
-//    test_each_connector(|api| {
-//        let dm2 = r#"
-//            model Test {
-//                id String @id @default(cuid())
-//                int Int
-//                float Float
-//                boolean Boolean
-//                string String
-//                dateTime DateTime
-//                enum MyEnum
-//            }
-//
-//            enum MyEnum {
-//                A
-//                B
-//            }
-//        "#;
-//
-//        infer_and_apply(test_setup, api, &dm2);
-//    });
-//}
-
-#[test_each_connector]
+#[test_each_connector(ignore = "mysql_mariadb")]
 async fn adding_an_optional_field_must_work(api: &TestApi) {
     let dm2 = r#"
         model Test {
@@ -74,6 +48,7 @@ async fn adding_an_optional_field_must_work(api: &TestApi) {
     let result = api.infer_and_apply(&dm2).await.sql_schema;
     let column = result.table_bang("Test").column_bang("field");
     assert_eq!(column.is_required(), false);
+    assert!(column.default.is_none());
 }
 
 #[test_each_connector]
@@ -427,10 +402,10 @@ async fn adding_a_many_to_many_relation_must_result_in_a_prisma_style_relation_t
     println!("{:?}", relation_table.foreign_keys);
     assert_eq!(relation_table.columns.len(), 2);
 
-    let aColumn = relation_table.column_bang("A");
-    assert_eq!(aColumn.tpe.family, ColumnTypeFamily::Int);
-    let bColumn = relation_table.column_bang("B");
-    assert_eq!(bColumn.tpe.family, ColumnTypeFamily::Int);
+    let a_column = relation_table.column_bang("A");
+    assert_eq!(a_column.tpe.family, ColumnTypeFamily::Int);
+    let b_column = relation_table.column_bang("B");
+    assert_eq!(b_column.tpe.family, ColumnTypeFamily::Int);
 
     assert_eq!(
         relation_table.foreign_keys,
@@ -441,7 +416,7 @@ async fn adding_a_many_to_many_relation_must_result_in_a_prisma_style_relation_t
                     SqlFamily::Mysql => Some("_AToB_ibfk_1".to_owned()),
                     SqlFamily::Sqlite => None,
                 },
-                columns: vec![aColumn.name.clone()],
+                columns: vec![a_column.name.clone()],
                 referenced_table: "A".to_string(),
                 referenced_columns: vec!["id".to_string()],
                 on_delete_action: ForeignKeyAction::Cascade,
@@ -452,7 +427,7 @@ async fn adding_a_many_to_many_relation_must_result_in_a_prisma_style_relation_t
                     SqlFamily::Mysql => Some("_AToB_ibfk_2".to_owned()),
                     SqlFamily::Sqlite => None,
                 },
-                columns: vec![bColumn.name.clone()],
+                columns: vec![b_column.name.clone()],
                 referenced_table: "B".to_string(),
                 referenced_columns: vec!["id".to_string()],
                 on_delete_action: ForeignKeyAction::Cascade,
@@ -478,10 +453,10 @@ async fn adding_a_many_to_many_relation_with_custom_name_must_work(api: &TestApi
     let relation_table = result.table_bang("_my_relation");
     assert_eq!(relation_table.columns.len(), 2);
 
-    let aColumn = relation_table.column_bang("A");
-    assert_eq!(aColumn.tpe.family, ColumnTypeFamily::Int);
-    let bColumn = relation_table.column_bang("B");
-    assert_eq!(bColumn.tpe.family, ColumnTypeFamily::Int);
+    let a_column = relation_table.column_bang("A");
+    assert_eq!(a_column.tpe.family, ColumnTypeFamily::Int);
+    let b_column = relation_table.column_bang("B");
+    assert_eq!(b_column.tpe.family, ColumnTypeFamily::Int);
 
     assert_eq!(
         relation_table.foreign_keys,
@@ -492,7 +467,7 @@ async fn adding_a_many_to_many_relation_with_custom_name_must_work(api: &TestApi
                     SqlFamily::Mysql => Some("_my_relation_ibfk_1".to_owned()),
                     SqlFamily::Sqlite => None,
                 },
-                columns: vec![aColumn.name.clone()],
+                columns: vec![a_column.name.clone()],
                 referenced_table: "A".to_string(),
                 referenced_columns: vec!["id".to_string()],
                 on_delete_action: ForeignKeyAction::Cascade,
@@ -503,7 +478,7 @@ async fn adding_a_many_to_many_relation_with_custom_name_must_work(api: &TestApi
                     SqlFamily::Mysql => Some("_my_relation_ibfk_2".to_owned()),
                     SqlFamily::Sqlite => None,
                 },
-                columns: vec![bColumn.name.clone()],
+                columns: vec![b_column.name.clone()],
                 referenced_table: "B".to_string(),
                 referenced_columns: vec!["id".to_string()],
                 on_delete_action: ForeignKeyAction::Cascade,
@@ -1280,12 +1255,12 @@ async fn adding_a_scalar_list_for_a_modelwith_id_type_int_must_work(api: &TestAp
         "#;
     let result = api.infer_and_apply(&dm1).await.sql_schema;
 
-    let table_for_A = result.table_bang("A");
-    let string_column = table_for_A.column_bang("strings");
+    let table_for_a = result.table_bang("A");
+    let string_column = table_for_a.column_bang("strings");
     assert_eq!(string_column.tpe.family, ColumnTypeFamily::String);
     assert_eq!(string_column.tpe.arity, ColumnArity::List);
 
-    let enum_column = table_for_A.column_bang("enums");
+    let enum_column = table_for_a.column_bang("enums");
     assert_eq!(enum_column.tpe.family, ColumnTypeFamily::String);
     assert_eq!(enum_column.tpe.arity, ColumnArity::List);
 }
@@ -1650,13 +1625,7 @@ async fn escaped_string_defaults_are_not_arbitrarily_migrated(api: &TestApi) -> 
             .column("seasonality")
             .and_then(|c| c.default.as_ref())
             .map(String::as_str),
-        Some(if api.is_sqlite() {
-            r#"\summer\"#
-        } else if api.is_mysql() {
-            r#""summer""#
-        } else {
-            r#"\"summer\""#
-        })
+        Some("summer")
     );
 
     Ok(())
