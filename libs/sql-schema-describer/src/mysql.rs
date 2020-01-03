@@ -212,6 +212,7 @@ impl SqlSchemaDescriber {
                 AND kcu.table_name = ?
                 AND rc.constraint_schema = ?
                 AND referenced_column_name IS NOT NULL
+            ORDER BY ordinal_position
         ";
 
         debug!("describing table foreign keys, SQL: '{}'", sql);
