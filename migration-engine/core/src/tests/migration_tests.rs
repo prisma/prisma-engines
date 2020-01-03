@@ -1683,11 +1683,11 @@ async fn renaming_a_datasource_works(api: &TestApi) -> TestResult {
     let dm1 = r#"
         datasource db1 {
             provider = "sqlite"
-            url = "file:///tmp/prisma-test.db"    
+            url = "file:///tmp/prisma-test.db"
         }
 
         model User {
-            id Int @id  
+            id Int @id
         }
     "#;
 
@@ -1696,9 +1696,9 @@ async fn renaming_a_datasource_works(api: &TestApi) -> TestResult {
     let dm2 = r#"
         datasource db2 {
             provider = "sqlite"
-            url = "file:///tmp/prisma-test.db"    
+            url = "file:///tmp/prisma-test.db"
         }
-    
+
         model User {
             id Int @id
         }
@@ -1722,11 +1722,11 @@ async fn relations_can_reference_arbitrary_unique_fields(api: &TestApi) -> TestR
             id Int @id
             email String @unique
         }
-        
+
         model Account {
             id Int @id
             user User @relation(references: [email])
-        }    
+        }
     "#;
 
     api.infer_apply(dm).send().await?;
@@ -1776,6 +1776,91 @@ async fn relations_can_reference_arbitrary_unique_fields_with_maps(api: &TestApi
     assert_eq!(fk.columns, &["user-id"]);
     assert_eq!(fk.referenced_table, "users");
     assert_eq!(fk.referenced_columns, &["emergency-mail"]);
+
+    Ok(())
+}
+
+#[test_each_connector]
+async fn relations_can_reference_multiple_fields(api: &TestApi) -> TestResult {
+    let dm = r#"
+        model User {
+            id Int @id
+            email  String
+            age    Int
+
+            @@unique([email, age])
+        }
+
+        model Account {
+            id   Int @id
+            user User @relation(references: [email, age])
+        }
+    "#;
+
+    api.infer_and_apply_with_options(InferAndApplyBuilder::new(dm).build())
+        .await?;
+    let schema = api.describe_database().await?;
+
+    let fks = &schema.table_bang("Account").foreign_keys;
+
+    // On SQLite we don't infer multi-field foreign keys correctly yet.
+    if api.is_sqlite() {
+        assert_eq!(fks.len(), 2);
+
+        assert!(fks.iter().all(|fk| fk.referenced_table == "User"));
+    } else {
+        assert_eq!(fks.len(), 1);
+
+        let fk = fks.iter().next().unwrap();
+
+        assert_eq!(fk.columns, &["user_email", "user_age"]);
+        assert_eq!(fk.referenced_table, "User");
+        assert_eq!(fk.referenced_columns, &["email", "age"]);
+    }
+
+    Ok(())
+}
+
+#[test_each_connector]
+async fn relations_can_reference_multiple_fields_with_mappings(api: &TestApi) -> TestResult {
+    let dm = r#"
+        model User {
+            id Int @id
+            email  String @map("emergency-mail")
+            age    Int    @map("birthdays-count")
+
+            @@unique([email, age])
+
+            @@map("users")
+        }
+
+        model Account {
+            id   Int @id
+            user User @relation(references: [email, age])
+            // @map(["emergency-mail-fk1", "age-fk2"])
+        }
+    "#;
+
+    api.infer_and_apply_with_options(InferAndApplyBuilder::new(dm).build())
+        .await?;
+    let schema = api.describe_database().await?;
+
+    let fks = &schema.table_bang("Account").foreign_keys;
+
+    // On SQLite we don't infer multi-field foreign keys correctly yet.
+    if api.is_sqlite() {
+        assert_eq!(fks.len(), 2);
+
+        assert!(fks.iter().all(|fk| fk.referenced_table == "users"));
+    } else {
+        assert_eq!(fks.len(), 1);
+
+        let fk = fks.iter().next().unwrap();
+
+        assert_eq!(fk.columns, &["user_emergency-mail", "user_birthdays-count"]);
+        assert_eq!(fk.referenced_table, "users");
+        assert_eq!(fk.referenced_columns, &["emergency-mail", "birthdays-count"]);
+    }
 
     Ok(())
 }
