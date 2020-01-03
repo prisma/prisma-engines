@@ -299,13 +299,15 @@ impl FieldExtensions for Field {
     }
 
     fn migration_value_new(&self, datamodel: &Datamodel) -> Option<String> {
-        let value = match &self.default_value {
-            Some(x) => match x {
-                ScalarValue::Expression(_, _, _) => default_migration_value(&self.field_type, datamodel),
-                x => x.clone(),
+        let value = match (&self.default_value, self.arity) {
+            (Some(x), _) => match x {
+                ScalarValue::Expression(_, _, _) => Some(default_migration_value(&self.field_type, datamodel)),
+                x => Some(x.clone()),
             },
-            None => default_migration_value(&self.field_type, datamodel),
-        };
+            // This is a temporary hack until we can report impossible unexecutable migrations.
+            (None, FieldArity::Required) => Some(default_migration_value(&self.field_type, datamodel)),
+            (None, _) => None,
+        }?;
         let result = match value {
             ScalarValue::Boolean(x) => {
                 if x {

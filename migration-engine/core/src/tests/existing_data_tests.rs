@@ -286,3 +286,63 @@ async fn dropping_a_table_referenced_by_foreign_keys_must_work(api: &TestApi) {
     assert!(sql_schema.table("Category").is_err());
     assert!(sql_schema.table_bang("Recipe").foreign_keys.is_empty());
 }
+
+#[test_each_connector(ignore = "mysql_mariadb")]
+async fn string_columns_do_not_get_arbitrarily_migrated(api: &TestApi) -> Result<(), anyhow::Error> {
+    use quaint::ast::*;
+
+    let dm1 = r#"
+        model User {
+            id           String  @default(cuid()) @id
+            name         String?
+            email        String  @unique
+            kindle_email String? @unique
+        }
+    "#;
+
+    api.infer_and_apply_with_options(InferAndApplyBuilder::new(dm1).build())
+        .await?;
+
+    let insert = Insert::single_into(api.render_table_name("User"))
+        .value("id", "the-id")
+        .value("name", "George")
+        .value("email", "george@prisma.io")
+        .value("kindle_email", "george+kindle@prisma.io");
+
+    api.database().execute(insert.into()).await?;
+
+    let dm2 = r#"
+        model User {
+            id           String  @default(cuid()) @id
+            name         String?
+            email        String  @unique
+            kindle_email String? @unique
+            count        Int     @default(0)
+        }
+    "#;
+
+    let output = api
+        .infer_and_apply_with_options(InferAndApplyBuilder::new(dm2).build())
+        .await?;
+
+    assert!(output.warnings.is_empty());
+
+    // Check that the string values are still there.
+    let select = Select::from_table(api.render_table_name("User"))
+        .column("name")
+        .column("kindle_email")
+        .column("email");
+
+    let counts = api.database().query(select.into()).await?;
+
+    let row = counts.get(0).unwrap();
+
+    assert_eq!(row.get("name").unwrap().as_str().unwrap(), "George");
+    assert_eq!(
+        row.get("kindle_email").unwrap().as_str().unwrap(),
+        "george+kindle@prisma.io"
+    );
+    assert_eq!(row.get("email").unwrap().as_str().unwrap(), "george@prisma.io");
+
+    Ok(())
+}

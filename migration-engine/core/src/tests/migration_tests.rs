@@ -1650,13 +1650,7 @@ async fn escaped_string_defaults_are_not_arbitrarily_migrated(api: &TestApi) -> 
             .column("seasonality")
             .and_then(|c| c.default.as_ref())
             .map(String::as_str),
-        Some(if api.is_sqlite() {
-            r#"\summer\"#
-        } else if api.is_mysql() {
-            r#""summer""#
-        } else {
-            r#"\"summer\""#
-        })
+        Some("summer")
     );
 
     Ok(())
