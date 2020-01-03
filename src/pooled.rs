@@ -6,14 +6,16 @@ pub use manager::{PooledConnection, QuaintManager};
 use crate::connector::{ConnectionInfo, SqlFamily};
 use mobc::Pool;
 use url::Url;
+use std::sync::Arc;
 
 #[cfg(feature = "sqlite")]
 use std::convert::TryFrom;
 
 /// The main entry point and an abstraction over database connections and
+#[derive(Clone)]
 pub struct Quaint {
     pub inner: Pool<QuaintManager>,
-    connection_info: ConnectionInfo,
+    connection_info: Arc<ConnectionInfo>,
 }
 
 impl Quaint {
@@ -106,7 +108,7 @@ impl Quaint {
             _ => unimplemented!("Supported url schemes: file or sqlite, mysql, postgres or postgresql."),
         };
 
-        let connection_info = ConnectionInfo::from_url(url_str)?;
+        let connection_info = Arc::new(ConnectionInfo::from_url(url_str)?);
         Self::log_start(connection_info.sql_family(), connection_limit);
 
         let inner = Pool::builder().max_size(connection_limit).build(manager).await?;
