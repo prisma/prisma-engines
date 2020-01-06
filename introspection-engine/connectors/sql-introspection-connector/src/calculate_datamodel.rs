@@ -192,11 +192,21 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
                 .collect();
 
             // todo arity is calculated differently
-            let arity = match column.tpe.arity {
-                ColumnArity::Required => FieldArity::Required,
-                ColumnArity::Nullable => FieldArity::Optional,
-                ColumnArity::List => FieldArity::List,
+            let arity = match table.indices
+                .iter()
+                .all(|i| !unique_index_covers_foreign_keys(i, foreign_key)){
+              true => ,
+                false => ,
+
+
             };
+
+
+//            match column.tpe.arity {
+//                ColumnArity::Required => FieldArity::Required,
+//                ColumnArity::Nullable => FieldArity::Optional,
+//                ColumnArity::List => FieldArity::List,
+//            };
 
             // todo this latter needs to be a compound value of the two columns defaults?
             let default_value = None;
