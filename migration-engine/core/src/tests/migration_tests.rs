@@ -1564,7 +1564,7 @@ async fn column_defaults_must_be_migrated(api: &TestApi) {
 }
 
 #[test_each_connector(ignore = "mysql_mariadb")]
-async fn escaped_string_defaults_are_not_arbitrarily_migrated(api: &TestApi) -> Result<(), anyhow::Error> {
+async fn escaped_string_defaults_are_not_arbitrarily_migrated(api: &TestApi) -> TestResult {
     use quaint::ast::*;
 
     let dm1 = r#"
@@ -1632,7 +1632,7 @@ async fn escaped_string_defaults_are_not_arbitrarily_migrated(api: &TestApi) -> 
 }
 
 #[test_each_connector]
-async fn created_at_does_not_get_arbitrarily_migrated(api: &TestApi) -> Result<(), anyhow::Error> {
+async fn created_at_does_not_get_arbitrarily_migrated(api: &TestApi) -> TestResult {
     use quaint::ast::*;
 
     let dm1 = r#"
@@ -1679,7 +1679,7 @@ async fn created_at_does_not_get_arbitrarily_migrated(api: &TestApi) -> Result<(
 }
 
 #[test_one_connector(connector = "sqlite")]
-async fn renaming_a_datasource_works(api: &TestApi) -> Result<(), anyhow::Error> {
+async fn renaming_a_datasource_works(api: &TestApi) -> TestResult {
     let dm1 = r#"
         datasource db1 {
             provider = "sqlite"
@@ -1716,7 +1716,7 @@ async fn renaming_a_datasource_works(api: &TestApi) -> Result<(), anyhow::Error>
 }
 
 #[test_each_connector]
-async fn relations_can_reference_arbitrary_unique_fields(api: &TestApi) -> Result<(), anyhow::Error> {
+async fn relations_can_reference_arbitrary_unique_fields(api: &TestApi) -> TestResult {
     let dm = r#"
         model User {
             id Int @id
@@ -1729,8 +1729,8 @@ async fn relations_can_reference_arbitrary_unique_fields(api: &TestApi) -> Resul
         }    
     "#;
 
-    api.infer_and_apply_with_options(InferAndApplyBuilder::new(dm).build())
-        .await?;
+    api.infer_apply(dm).send().await?;
+
     let schema = api.describe_database().await?;
 
     let fks = &schema.table_bang("Account").foreign_keys;
@@ -1747,7 +1747,7 @@ async fn relations_can_reference_arbitrary_unique_fields(api: &TestApi) -> Resul
 }
 
 #[test_each_connector]
-async fn relations_can_reference_arbitrary_unique_fields_with_maps(api: &TestApi) -> Result<(), anyhow::Error> {
+async fn relations_can_reference_arbitrary_unique_fields_with_maps(api: &TestApi) -> TestResult {
     let dm = r#"
         model User {
             id Int @id
@@ -1763,8 +1763,8 @@ async fn relations_can_reference_arbitrary_unique_fields_with_maps(api: &TestApi
         }
     "#;
 
-    api.infer_and_apply_with_options(InferAndApplyBuilder::new(dm).build())
-        .await?;
+    api.infer_apply(dm).send().await?;
+
     let schema = api.describe_database().await?;
 
     let fks = &schema.table_bang("Account").foreign_keys;
@@ -1781,7 +1781,7 @@ async fn relations_can_reference_arbitrary_unique_fields_with_maps(api: &TestApi
 }
 
 #[test_each_connector]
-async fn foreign_keys_are_added_on_existing_tables(api: &TestApi) -> Result<(), anyhow::Error> {
+async fn foreign_keys_are_added_on_existing_tables(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model User {
             id Int @id
@@ -1793,8 +1793,7 @@ async fn foreign_keys_are_added_on_existing_tables(api: &TestApi) -> Result<(), 
         }
     "#;
 
-    api.infer_and_apply_with_options(InferAndApplyBuilder::new(dm1).build())
-        .await?;
+    api.infer_apply(dm1).send().await?;
     let schema = api.describe_database().await?;
 
     anyhow::ensure!(
@@ -1814,8 +1813,7 @@ async fn foreign_keys_are_added_on_existing_tables(api: &TestApi) -> Result<(), 
         }
     "#;
 
-    api.infer_and_apply_with_options(InferAndApplyBuilder::new(dm2).build())
-        .await?;
+    api.infer_apply(dm2).send().await?;
     let schema = api.describe_database().await?;
 
     let table = schema.table("Account").map_err(|err| anyhow::anyhow!("{}", err))?;

@@ -239,7 +239,7 @@ async fn altering_a_column_with_non_null_values_should_warn(api: &TestApi) {
 }
 
 #[test_each_connector]
-async fn dropping_a_table_referenced_by_foreign_keys_must_work(api: &TestApi) {
+async fn dropping_a_table_referenced_by_foreign_keys_must_work(api: &TestApi) -> TestResult {
     use quaint::ast::*;
 
     let dm1 = r#"
@@ -278,17 +278,17 @@ async fn dropping_a_table_referenced_by_foreign_keys_must_work(api: &TestApi) {
         }
     "#;
 
-    api.infer_and_apply_with_options(InferAndApplyBuilder::new(&dm2).force(Some(true)).build())
-        .await
-        .unwrap();
+    api.infer_apply(dm2).force(Some(true)).send().await?;
     let sql_schema = api.describe_database().await.unwrap();
 
     assert!(sql_schema.table("Category").is_err());
     assert!(sql_schema.table_bang("Recipe").foreign_keys.is_empty());
+
+    Ok(())
 }
 
 #[test_each_connector(ignore = "mysql_mariadb")]
-async fn string_columns_do_not_get_arbitrarily_migrated(api: &TestApi) -> Result<(), anyhow::Error> {
+async fn string_columns_do_not_get_arbitrarily_migrated(api: &TestApi) -> TestResult {
     use quaint::ast::*;
 
     let dm1 = r#"
@@ -300,8 +300,7 @@ async fn string_columns_do_not_get_arbitrarily_migrated(api: &TestApi) -> Result
         }
     "#;
 
-    api.infer_and_apply_with_options(InferAndApplyBuilder::new(dm1).build())
-        .await?;
+    api.infer_apply(dm1).send().await?;
 
     let insert = Insert::single_into(api.render_table_name("User"))
         .value("id", "the-id")
@@ -321,9 +320,7 @@ async fn string_columns_do_not_get_arbitrarily_migrated(api: &TestApi) -> Result
         }
     "#;
 
-    let output = api
-        .infer_and_apply_with_options(InferAndApplyBuilder::new(dm2).build())
-        .await?;
+    let output = api.infer_apply(dm2).send().await?;
 
     assert!(output.warnings.is_empty());
 

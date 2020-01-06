@@ -130,7 +130,7 @@ async fn update_must_work(api: &TestApi) {
 }
 
 #[test_each_connector]
-async fn migration_is_already_applied_must_work(api: &TestApi) -> Result<(), anyhow::Error> {
+async fn migration_is_already_applied_must_work(api: &TestApi) -> TestResult {
     let persistence = api.migration_persistence();
 
     let mut migration_1 = Migration::new("migration_1".to_string());
