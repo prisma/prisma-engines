@@ -1536,7 +1536,7 @@ async fn calculate_database_steps_with_infer_after_an_apply_must_work(api: &Test
 }
 
 #[test_each_connector(ignore = "mysql_mariadb")]
-async fn column_defaults_must_be_migrated(api: &TestApi) {
+async fn column_defaults_must_be_migrated(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Fruit {
             id Int @id
@@ -1544,11 +1544,12 @@ async fn column_defaults_must_be_migrated(api: &TestApi) {
         }
     "#;
 
-    let schema = api.infer_and_apply(dm1).await.sql_schema;
+    api.infer_apply(dm1).send().await?;
+    let schema = api.describe_database().await?;
 
-    let table = schema.table_bang("Fruit");
-    let column = table.column_bang("name");
-    assert_eq!(column.default.as_ref().map(String::as_str), Some("banana"));
+    schema
+        .assert_table("Fruit")?
+        .assert_column("name", |col| col.assert_default(Some("banana")))?;
 
     let dm2 = r#"
         model Fruit {
@@ -1557,11 +1558,14 @@ async fn column_defaults_must_be_migrated(api: &TestApi) {
         }
     "#;
 
-    let schema = api.infer_and_apply(dm2).await.sql_schema;
+    api.infer_apply(dm2).send().await?;
+    let schema = api.describe_database().await?;
 
-    let table = schema.table_bang("Fruit");
-    let column = table.column_bang("name");
-    assert_eq!(column.default.as_ref().map(String::as_str), Some("mango"));
+    schema
+        .assert_table("Fruit")?
+        .assert_column("name", |col| col.assert_default(Some("mango")))?;
+
+    Ok(())
 }
 
 #[test_each_connector(ignore = "mysql_mariadb")]
@@ -1905,6 +1909,138 @@ async fn foreign_keys_are_added_on_existing_tables(api: &TestApi) -> TestResult 
     assert_eq!(fk.columns, &["user"]);
     assert_eq!(fk.referenced_table, "User");
     assert_eq!(fk.referenced_columns, &["email"]);
+
+    Ok(())
+}
+
+#[test_each_connector]
+async fn basic_composite_primary_keys_must_work(api: &TestApi) -> TestResult {
+    let dm = r#"
+        model User {
+            firstName String
+            lastName String
+
+            @@id([lastName, firstName])
+        }
+    "#;
+
+    api.infer_apply(dm).send().await?;
+
+    let sql_schema = api.describe_database().await?;
+
+    sql_schema
+        .assert_table("User")?
+        .assert_pk(|pk| pk.assert_columns(&["lastName", "firstName"]))?;
+
+    Ok(())
+}
+
+#[test_each_connector]
+async fn composite_primary_keys_on_mapped_columns_must_work(api: &TestApi) -> TestResult {
+    let dm = r#"
+        model User {
+            firstName String @map("first_name")
+            lastName String @map("family_name")
+
+            @@id([firstName, lastName])
+        }
+    "#;
+
+    api.infer_apply(dm).send().await?;
+
+    let sql_schema = api.describe_database().await?;
+
+    sql_schema
+        .assert_table("User")?
+        .assert_pk(|pk| pk.assert_columns(&["first_name", "family_name"]))?;
+
+    Ok(())
+}
+
+#[test_each_connector]
+async fn references_to_models_with_composite_primary_keys_must_work(api: &TestApi) -> TestResult {
+    let dm = r#"
+        model User {
+            firstName String
+            lastName String
+            pets Pet[]
+
+            @@id([firstName, lastName])
+        }
+
+        model Pet {
+            id String @id
+            human User
+        }
+    "#;
+
+    api.infer_apply(dm).send().await?;
+
+    let sql_schema = api.describe_database().await?;
+
+    if api.is_sqlite() {
+        sql_schema
+            .assert_table("Pet")?
+            .assert_has_column("id")?
+            .assert_has_column("human_firstName")?
+            .assert_has_column("human_lastName")?
+            // Compound foreign keys aren't inferred properly on sqlite yet.
+            .assert_foreign_keys_count(2)?;
+    } else {
+        sql_schema
+            .assert_table("Pet")?
+            .assert_has_column("id")?
+            .assert_has_column("human_firstName")?
+            .assert_has_column("human_lastName")?
+            // Compound foreign keys aren't inferred properly on sqlite yet.
+            .assert_foreign_keys_count(1)?
+            .assert_fk_on_columns(&["human_firstName", "human_lastName"], |fk| {
+                fk.assert_references("User", &["firstName", "lastName"])
+            })?;
+    }
+
+    Ok(())
+}
+
+#[test_each_connector]
+async fn join_tables_between_models_with_compound_primary_keys_must_work(api: &TestApi) -> TestResult {
+    let dm = r#"
+        model Human {
+            firstName String
+            lastName String
+            cats Cat[]
+
+            @@id([firstName, lastName])
+        }
+
+        model Cat {
+            id String @id
+            humans Human[]
+        }
+    "#;
+
+    api.infer_apply(dm).send().await?;
+
+    let sql_schema = api.describe_database().await?;
+
+    if api.is_sqlite() {
+        sql_schema
+            .assert_table("_CatToHuman")?
+            .assert_has_column("B_firstName")?
+            .assert_has_column("B_lastName")?
+            .assert_has_column("A")?
+            .assert_foreign_keys_count(3)?;
+    } else {
+        sql_schema
+            .assert_table("_CatToHuman")?
+            .assert_has_column("B_firstName")?
+            .assert_has_column("B_lastName")?
+            .assert_has_column("A")?
+            .assert_fk_on_columns(&["B_firstName", "B_lastName"], |fk| {
+                fk.assert_references("Human", &["firstName", "lastName"])
+            })?
+            .assert_fk_on_columns(&["A"], |fk| fk.assert_references("Cat", &["id"]))?;
+    }
 
     Ok(())
 }
