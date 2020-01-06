@@ -713,6 +713,7 @@ async fn compound_foreign_keys_should_work_for_relations(api: &TestApi) {
                 t.add_column("user_id", types::integer());
                 t.add_column("user_name", types::text());
                 t.inject_custom("FOREIGN KEY (\"user_id\",\"user_name\") REFERENCES \"User\"(\"id\", \"name\")");
+                t.inject_custom("CONSTRAINT post_user_unique UNIQUE(\"user_id\", \"user_name\")");
             });
         })
         .await;
@@ -726,7 +727,7 @@ async fn compound_foreign_keys_should_work_for_relations(api: &TestApi) {
             model User {
                id       Int     @id @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
                name     String
-               post     Post[]
+               post     Post
                
                @@unique([id, name], name: "user_unique")
             }

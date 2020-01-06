@@ -133,28 +133,36 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
             model.add_field(field);
         }
 
-        for index in table.indices.iter() {
-            if index.columns.len() > 1 {
-                let tpe = if index.tpe == IndexType::Unique {
-                    datamodel::dml::IndexType::Unique
-                } else {
-                    datamodel::dml::IndexType::Normal
-                };
-
-                let index_definition: IndexDefinition = IndexDefinition {
-                    name: Some(index.name.clone()),
-                    fields: index.columns.clone(),
-                    tpe,
-                };
-                model.add_index(index_definition)
+        fn unique_index_covers_foreign_keys(index: &Index, foreign_key: &ForeignKey) -> bool {
+            match index.tpe {
+                IndexType::Unique => foreign_key.referenced_columns == index.columns,
+                IndexType::Normal => false,
             }
-            if index.columns.len() == 1 && index.tpe != IndexType::Unique {
-                let index_definition: IndexDefinition = IndexDefinition {
-                    name: Some(index.name.clone()),
-                    fields: index.columns.clone(),
-                    tpe: datamodel::dml::IndexType::Normal,
-                };
-                model.add_index(index_definition)
+        }
+
+        //do not add compound indexes to schema when they cover a foreign key, instead make the relation 1:1
+        for index in table.indices.iter().filter(|i| {
+            table
+                .foreign_keys
+                .iter()
+                .all(|fk| !unique_index_covers_foreign_keys(i, fk))
+        }) {
+            let tpe = match index.tpe {
+                IndexType::Unique => datamodel::dml::IndexType::Unique,
+                IndexType::Normal => datamodel::dml::IndexType::Normal,
+            };
+
+            let index_definition: IndexDefinition = IndexDefinition {
+                name: Some(index.name.clone()),
+                fields: index.columns.clone(),
+                tpe,
+            };
+
+            match index.columns.len() {
+                //single column uniques go onto the field level not the model level
+                1 if index.tpe != IndexType::Unique => model.add_index(index_definition),
+                x if x > 1 => model.add_index(index_definition),
+                _ => (),
             }
         }
 
@@ -190,7 +198,7 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
                 ColumnArity::List => FieldArity::List,
             };
 
-            // this latter needs to be a compound value of the two columns defaults?
+            // todo this latter needs to be a compound value of the two columns defaults?
             let default_value = None;
 
             //todo
