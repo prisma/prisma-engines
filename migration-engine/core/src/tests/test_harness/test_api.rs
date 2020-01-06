@@ -106,20 +106,6 @@ impl TestApi {
         }
     }
 
-    pub async fn infer_and_apply_with_migration_id(&self, datamodel: &str, migration_id: &str) -> InferAndApplyOutput {
-        let migration_output = self
-            .infer_apply(datamodel)
-            .migration_id(Some(migration_id.to_owned()))
-            .send()
-            .await
-            .unwrap();
-
-        InferAndApplyOutput {
-            migration_output,
-            sql_schema: self.describe_database().await.unwrap(),
-        }
-    }
-
     pub async fn execute_command<'a, C>(&self, input: &'a C::Input) -> Result<C::Output, user_facing_errors::Error>
     where
         C: crate::commands::MigrationCommand,
@@ -341,61 +327,6 @@ async fn run_full_sql(database: &Arc<dyn Queryable + Send + Sync>, full_sql: &st
 pub struct UnapplyOutput {
     pub sql_schema: SqlSchema,
     pub output: UnapplyMigrationOutput,
-}
-
-#[derive(Debug)]
-pub struct InferAndApplyBuilder {
-    migration_id: Option<String>,
-    force: Option<bool>,
-    datamodel: String,
-}
-
-impl InferAndApplyBuilder {
-    pub fn new(datamodel: &str) -> Self {
-        InferAndApplyBuilder {
-            migration_id: None,
-            force: None,
-            datamodel: datamodel.to_owned(),
-        }
-    }
-
-    pub fn force(mut self, force: Option<bool>) -> Self {
-        self.force = force;
-        self
-    }
-
-    pub fn migration_id(mut self, migration_id: Option<String>) -> Self {
-        self.migration_id = migration_id;
-        self
-    }
-
-    pub fn build(self) -> InferAndApply {
-        let InferAndApplyBuilder {
-            migration_id,
-            force,
-            datamodel,
-        } = self;
-
-        let migration_id = migration_id.unwrap_or_else(|| {
-            format!(
-                "migration-{}",
-                MIGRATION_ID_COUNTER.fetch_add(1, std::sync::atomic::Ordering::Relaxed)
-            )
-        });
-
-        InferAndApply {
-            migration_id,
-            force,
-            datamodel,
-        }
-    }
-}
-
-#[derive(Debug)]
-pub struct InferAndApply {
-    migration_id: String,
-    force: Option<bool>,
-    datamodel: String,
 }
 
 pub struct InferBuilder {

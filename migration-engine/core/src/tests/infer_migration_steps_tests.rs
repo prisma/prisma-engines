@@ -13,7 +13,11 @@ async fn assume_to_be_applied_must_work(api: &TestApi) {
             }
         "#;
 
-    api.infer_and_apply_with_migration_id(&dm0, "mig0000").await;
+    api.infer_apply(&dm0)
+        .migration_id(Some("mig0000".into()))
+        .send()
+        .await
+        .unwrap();
 
     let dm1 = r#"
             model Blog {
@@ -52,14 +56,17 @@ async fn assume_to_be_applied_must_work(api: &TestApi) {
 }
 
 #[test_each_connector]
-async fn special_handling_of_watch_migrations(api: &TestApi) {
+async fn special_handling_of_watch_migrations(api: &TestApi) -> TestResult {
     let dm = r#"
             model Blog {
                 id Int @id
             }
         "#;
 
-    api.infer_and_apply_with_migration_id(&dm, "mig00").await;
+    api.infer_apply(&dm)
+        .migration_id(Some("mig00".to_owned()))
+        .send()
+        .await?;
 
     let dm = r#"
             model Blog {
@@ -68,7 +75,10 @@ async fn special_handling_of_watch_migrations(api: &TestApi) {
             }
         "#;
 
-    api.infer_and_apply_with_migration_id(&dm, "watch01").await;
+    api.infer_apply(&dm)
+        .migration_id(Some("watch01".to_owned()))
+        .send()
+        .await?;
 
     let dm = r#"
             model Blog {
@@ -78,7 +88,10 @@ async fn special_handling_of_watch_migrations(api: &TestApi) {
             }
         "#;
 
-    api.infer_and_apply_with_migration_id(&dm, "watch02").await;
+    api.infer_apply(&dm)
+        .migration_id(Some("watch02".to_owned()))
+        .send()
+        .await?;
 
     let dm = r#"
             model Blog {
@@ -105,6 +118,8 @@ async fn special_handling_of_watch_migrations(api: &TestApi) {
             create_field_step("Blog", "field3", "Int"),
         ]
     );
+
+    Ok(())
 }
 
 /// When we transition out of watch mode and `lift save` the migrations to commit the changes to
@@ -113,14 +128,17 @@ async fn special_handling_of_watch_migrations(api: &TestApi) {
 ///
 /// Relevant issue: https://github.com/prisma/lift/issues/167
 #[test_each_connector]
-async fn watch_migrations_must_be_returned_when_transitioning_out_of_watch_mode(api: &TestApi) {
+async fn watch_migrations_must_be_returned_when_transitioning_out_of_watch_mode(api: &TestApi) -> TestResult {
     let dm = r#"
             model Blog {
                 id Int @id
             }
         "#;
 
-    api.infer_and_apply_with_migration_id(&dm, "mig00").await;
+    api.infer_apply(&dm)
+        .migration_id(Some("mig00".to_owned()))
+        .send()
+        .await?;
 
     let dm = r#"
             model Blog {
@@ -132,9 +150,11 @@ async fn watch_migrations_must_be_returned_when_transitioning_out_of_watch_mode(
     let mut applied_database_steps: Vec<PrettySqlMigrationStep> = Vec::new();
 
     let output = api
-        .infer_and_apply_with_migration_id(&dm, "watch01")
-        .await
-        .migration_output;
+        .infer_apply(&dm)
+        .migration_id(Some("watch01".to_owned()))
+        .send()
+        .await?;
+
     applied_database_steps
         .extend(serde_json::from_value::<Vec<PrettySqlMigrationStep>>(output.database_steps).unwrap());
 
@@ -155,9 +175,11 @@ async fn watch_migrations_must_be_returned_when_transitioning_out_of_watch_mode(
         "#;
 
     let output = api
-        .infer_and_apply_with_migration_id(&dm, "watch02")
-        .await
-        .migration_output;
+        .infer_apply(&dm)
+        .migration_id(Some("watch02".to_owned()))
+        .send()
+        .await?;
+
     applied_database_steps
         .extend(serde_json::from_value::<Vec<PrettySqlMigrationStep>>(output.database_steps).unwrap());
 
@@ -176,12 +198,14 @@ async fn watch_migrations_must_be_returned_when_transitioning_out_of_watch_mode(
     let expected_steps_count = if api.is_sqlite() { 9 } else { 3 }; // one AlterTable, two CreateTables
 
     assert_eq!(returned_steps.len(), expected_steps_count);
+
+    Ok(())
 }
 
 #[test_each_connector]
 async fn watch_migrations_must_be_returned_in_addition_to_regular_inferred_steps_when_transitioning_out_of_watch_mode(
     api: &TestApi,
-) {
+) -> TestResult {
     let dm = r#"
             model Blog {
                 id Int @id
@@ -190,7 +214,10 @@ async fn watch_migrations_must_be_returned_in_addition_to_regular_inferred_steps
 
     let mut applied_database_steps: Vec<PrettySqlMigrationStep> = Vec::new();
 
-    api.infer_and_apply_with_migration_id(&dm, "mig00").await;
+    api.infer_apply(&dm)
+        .migration_id(Some("mig00".to_owned()))
+        .send()
+        .await?;
 
     let dm = r#"
             model Blog {
@@ -200,9 +227,11 @@ async fn watch_migrations_must_be_returned_in_addition_to_regular_inferred_steps
         "#;
 
     let output = api
-        .infer_and_apply_with_migration_id(&dm, "watch01")
-        .await
-        .migration_output;
+        .infer_apply(&dm)
+        .migration_id(Some("watch01".to_owned()))
+        .send()
+        .await?;
+
     applied_database_steps
         .extend(serde_json::from_value::<Vec<PrettySqlMigrationStep>>(output.database_steps).unwrap());
 
@@ -223,9 +252,10 @@ async fn watch_migrations_must_be_returned_in_addition_to_regular_inferred_steps
         "#;
 
     let output = api
-        .infer_and_apply_with_migration_id(&dm, "watch02")
-        .await
-        .migration_output;
+        .infer_apply(&dm)
+        .migration_id(Some("watch02".to_owned()))
+        .send()
+        .await?;
     applied_database_steps
         .extend(serde_json::from_value::<Vec<PrettySqlMigrationStep>>(output.database_steps).unwrap());
 
@@ -268,4 +298,6 @@ async fn watch_migrations_must_be_returned_in_addition_to_regular_inferred_steps
     };
 
     assert_eq!(returned_steps.len(), expected_steps_count);
+
+    Ok(())
 }
