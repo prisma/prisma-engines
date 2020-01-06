@@ -46,8 +46,8 @@ pub fn create_relation_table_records(
     child_ids: &[GraphqlId],
 ) -> Query<'static> {
     let relation = field.relation();
-    let parent_column = field.relation_column();
-    let child_column = field.opposite_column();
+    let parent_column = field.relation_column(false);
+    let child_column = field.opposite_column(false);
 
     let mut columns = vec![parent_column.name.to_string(), child_column.name.to_string()];
     if let Some(id_col) = relation.id_column() {
@@ -76,8 +76,8 @@ pub fn delete_relation_table_records(
     child_ids: &[GraphqlId],
 ) -> Query<'static> {
     let relation = field.relation();
-    let parent_column = field.relation_column();
-    let child_column = field.opposite_column();
+    let parent_column = field.relation_column(false);
+    let child_column = field.opposite_column(false);
 
     let parent_id_criteria = parent_column.equals(parent_id);
     let child_id_criteria = child_column.in_selection(child_ids.to_owned());

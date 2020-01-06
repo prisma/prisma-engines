@@ -67,12 +67,11 @@ impl SelectDefinition for QueryArguments {
     }
 }
 
-pub fn get_records<T>(model: &ModelRef, columns: impl Iterator<Item=Column<'static>>, query: T) -> Select<'static>
+pub fn get_records<T>(model: &ModelRef, columns: impl Iterator<Item = Column<'static>>, query: T) -> Select<'static>
 where
     T: SelectDefinition,
 {
-    columns
-        .fold(query.into_select(model), |acc, col| acc.column(col))
+    columns.fold(query.into_select(model), |acc, col| acc.column(col))
 }
 
 pub fn count_by_model(model: &ModelRef, query_arguments: QueryArguments) -> Select<'static> {

@@ -31,19 +31,16 @@ impl ManyRelatedRecordsQueryBuilder for ManyRelatedRecordsWithUnionAll {
         let base_query = order_columns.into_iter().fold(base_query, |acc, ord| acc.order_by(ord));
         let mut distinct_ids = distinct_ids.into_iter();
 
-
         let build_cond = |id| {
             let conditions = base_condition
                 .clone()
-                .and(from_field.relation_column().table(Relation::TABLE_ALIAS).equals(id));
+                .and(from_field.relation_column(true).equals(id));
 
             base_query.clone().so_that(conditions)
         };
 
         if let Some(id) = distinct_ids.nth(0) {
-            let union = distinct_ids.fold(Union::new(build_cond(id)), |acc, id| {
-                acc.all(build_cond(id))
-            });
+            let union = distinct_ids.fold(Union::new(build_cond(id)), |acc, id| acc.all(build_cond(id)));
 
             Query::from(union)
         } else {

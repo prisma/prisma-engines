@@ -14,8 +14,8 @@ pub trait RelationExt {
 }
 
 pub trait RelationFieldExt {
-    fn opposite_column(&self) -> Column<'static>;
-    fn relation_column(&self) -> Column<'static>;
+    fn opposite_column(&self, alias: bool) -> Column<'static>;
+    fn relation_column(&self, alias: bool) -> Column<'static>;
 }
 
 pub trait InlineRelationExt {
@@ -30,17 +30,29 @@ impl InlineRelationExt for InlineRelation {
 }
 
 impl RelationFieldExt for RelationField {
-    fn opposite_column(&self) -> Column<'static> {
-        match self.relation_side {
+    fn opposite_column(&self, alias: bool) -> Column<'static> {
+        let col = match self.relation_side {
             RelationSide::A => self.relation().model_b_column(),
             RelationSide::B => self.relation().model_a_column(),
+        };
+
+        if alias && !self.relation_is_inlined_in_child() {
+            col.table(Relation::TABLE_ALIAS)
+        } else {
+            col
         }
     }
 
-    fn relation_column(&self) -> Column<'static> {
-        match self.relation_side {
+    fn relation_column(&self, alias: bool) -> Column<'static> {
+        let col = match self.relation_side {
             RelationSide::A => self.relation().model_a_column(),
             RelationSide::B => self.relation().model_b_column(),
+        };
+
+        if alias && !self.relation_is_inlined_in_child() {
+            col.table(Relation::TABLE_ALIAS)
+        } else {
+            col
         }
     }
 }
