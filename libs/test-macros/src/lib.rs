@@ -51,7 +51,8 @@ pub fn test_each_connector(attr: TokenStream, input: TokenStream) -> TokenStream
     let attributes_meta: syn::AttributeArgs = parse_macro_input!(attr as AttributeArgs);
     let args = TestEachConnectorArgs::from_list(&attributes_meta);
 
-    let test_function = parse_macro_input!(input as ItemFn);
+    let mut test_function = parse_macro_input!(input as ItemFn);
+    strip_test_attribute(&mut test_function);
     let async_test: bool = test_function.sig.asyncness.is_some();
 
     let tests = match (args, async_test) {
@@ -144,7 +145,8 @@ pub fn test_one_connector(attr: TokenStream, input: TokenStream) -> TokenStream 
     let attributes_meta: syn::AttributeArgs = parse_macro_input!(attr as AttributeArgs);
     let args = TestOneConnectorArgs::from_list(&attributes_meta).unwrap();
 
-    let test_function = parse_macro_input!(input as ItemFn);
+    let mut test_function = parse_macro_input!(input as ItemFn);
+    strip_test_attribute(&mut test_function);
 
     let async_test: bool = test_function.sig.asyncness.is_some();
     let test_impl_name = &test_function.sig.ident;
@@ -202,4 +204,15 @@ fn function_returns_result(func: &ItemFn) -> bool {
         // just assume it's a result
         syn::ReturnType::Type(_, _) => true,
     }
+}
+
+/// We do this because Intellij only recognizes functions annotated with #[test] *before* macro expansion as tests. This way we can add it manually, and the test macro will strip it.
+fn strip_test_attribute(function: &mut ItemFn) {
+    let new_attrs = function
+        .attrs
+        .drain(..)
+        .filter(|attr| attr.path.segments.iter().last().unwrap().ident != "test")
+        .collect();
+
+    function.attrs = new_attrs;
 }
