@@ -165,26 +165,29 @@ impl<'a> DatamodelConverter<'a> {
                                 "Related model for model {} and field {} not found",
                                 model.name, field.name
                             )
-                        })
-                        .clone();
+                        });
 
-                    let related_field_info = match &related_field.field_type {
+                    let related_field_info: &dml::RelationInfo = match &related_field.field_type {
                         dml::FieldType::Relation(info) => info,
                         _ => panic!("this was not a relation field"),
                     };
 
-                    let (model_a, model_b, field_a, field_b) = match () {
+                    let (model_a, model_b, field_a, field_b, referenced_fields_a, referenced_fields_b) = match () {
                         _ if model.name < related_model.name => (
                             model.clone(),
                             related_model.clone(),
                             field.clone(),
                             related_field.clone(),
+                            to_fields,
+                            &related_field_info.to_fields,
                         ),
                         _ if related_model.name < model.name => (
                             related_model.clone(),
                             model.clone(),
                             related_field.clone(),
                             field.clone(),
+                            &related_field_info.to_fields,
+                            to_fields,
                         ),
                         // SELF RELATION CASE
                         _ => {
@@ -193,24 +196,35 @@ impl<'a> DatamodelConverter<'a> {
                             } else {
                                 (related_field.clone(), field.clone())
                             };
-                            (model.clone(), related_model.clone(), field_a, field_b)
+                            (
+                                model.clone(),
+                                related_model.clone(),
+                                field_a,
+                                field_b,
+                                to_fields,
+                                &related_field_info.to_fields,
+                            )
                         }
                     };
                     let inline_on_model_a = TempManifestationHolder::Inline {
                         in_table_of_model: model_a.name.clone(),
                         column: field_a.final_db_name(),
+                        referenced_fields: referenced_fields_a.clone(),
                     };
                     let inline_on_model_b = TempManifestationHolder::Inline {
                         in_table_of_model: model_b.name.clone(),
                         column: field_b.final_db_name(),
+                        referenced_fields: referenced_fields_b.clone(),
                     };
                     let inline_on_this_model = TempManifestationHolder::Inline {
                         in_table_of_model: model.name.clone(),
                         column: field.final_db_name(),
+                        referenced_fields: to_fields.clone(),
                     };
                     let inline_on_related_model = TempManifestationHolder::Inline {
                         in_table_of_model: related_model.name.clone(),
                         column: related_field.final_db_name(),
+                        referenced_fields: related_field_info.to_fields.clone(),
                     };
 
                     let manifestation = match (field_a.is_list(), field_b.is_list()) {
@@ -261,7 +275,13 @@ pub struct TempRelationHolder {
 
 #[derive(PartialEq, Debug, Clone)]
 pub enum TempManifestationHolder {
-    Inline { in_table_of_model: String, column: String },
+    Inline {
+        in_table_of_model: String,
+        /// The name of the foreign key columns.
+        column: String,
+        /// The name of the (dml) fields referenced by the relation.
+        referenced_fields: Vec<String>,
+    },
     Table,
 }
 
@@ -321,6 +341,7 @@ impl TempRelationHolder {
             TempManifestationHolder::Inline {
                 in_table_of_model,
                 column,
+                ..
             } => RelationLinkManifestation::Inline(InlineRelation {
                 in_table_of_model_name: in_table_of_model.to_string(),
                 referencing_column: column.to_string(),

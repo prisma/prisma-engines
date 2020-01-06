@@ -137,27 +137,24 @@ impl SqlDestructiveChangesChecker {
                     // check against the current state of the table.
                     let before_table = database_migration
                         .before
-                        .get_table(&alter_table.table.name)
-                        .ok_or_else(|| {
-                            SqlError::Generic(format!(
-                                "Internal Error: altering previously-unknown table {}",
-                                &alter_table.table.name
-                            ))
-                        })?;
+                        .get_table(&alter_table.table.name);
 
-                    for change in &alter_table.changes {
-                        match *change {
-                            TableChange::DropColumn(ref drop_column) => {
-                                self.check_column_drop(drop_column, before_table, &mut diagnostics)
-                                    .await?
+                    if let Some(before_table) = before_table {
+                        for change in &alter_table.changes {
+                            match *change {
+                                TableChange::DropColumn(ref drop_column) => {
+                                    self.check_column_drop(drop_column, before_table, &mut diagnostics)
+                                        .await?
+                                }
+                                TableChange::AlterColumn(ref alter_column) => {
+                                    self.check_alter_column(alter_column, before_table, &mut diagnostics)
+                                        .await?
+                                }
+                                _ => (),
                             }
-                            TableChange::AlterColumn(ref alter_column) => {
-                                self.check_alter_column(alter_column, before_table, &mut diagnostics)
-                                    .await?
-                            }
-                            _ => (),
                         }
                     }
+
                 }
                 // Here, check for each table we are going to delete if it is empty. If
                 // not, return a warning.

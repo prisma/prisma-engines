@@ -1,8 +1,14 @@
 use super::common::*;
+use crate::SqlFamily;
 use sql_schema_describer::*;
 
 pub struct SqliteRenderer {}
+
 impl super::SqlRenderer for SqliteRenderer {
+    fn sql_family(&self) -> SqlFamily {
+        SqlFamily::Sqlite
+    }
+
     fn quote(&self, name: &str) -> String {
         format!("\"{}\"", name)
     }
@@ -13,7 +19,11 @@ impl super::SqlRenderer for SqliteRenderer {
         let nullability_str = render_nullability(&column);
         let default_str = render_default(&column);
         let foreign_key = table.foreign_key_for_column(&column.name);
-        let references_str = self.render_references(&schema_name, foreign_key);
+        let references_str: String = if let Some(foreign_key) = foreign_key {
+            self.render_references(&schema_name, foreign_key)
+        } else {
+            String::new()
+        };
         let auto_increment_str = if column.auto_increment {
             "PRIMARY KEY AUTOINCREMENT"
         } else {
@@ -37,15 +47,12 @@ impl super::SqlRenderer for SqliteRenderer {
         }
     }
 
-    fn render_references(&self, _schema_name: &str, foreign_key: Option<&ForeignKey>) -> String {
-        match foreign_key {
-            Some(fk) => format!(
-                "REFERENCES \"{}\"({}) {}",
-                fk.referenced_table,
-                fk.referenced_columns.first().unwrap(),
-                render_on_delete(&fk.on_delete_action)
-            ),
-            None => "".to_string(),
-        }
+    fn render_references(&self, _schema_name: &str, foreign_key: &ForeignKey) -> String {
+        format!(
+            "REFERENCES \"{}\"(\"{}\") {}",
+            foreign_key.referenced_table,
+            foreign_key.referenced_columns.first().unwrap(),
+            render_on_delete(&foreign_key.on_delete_action)
+        )
     }
 }
