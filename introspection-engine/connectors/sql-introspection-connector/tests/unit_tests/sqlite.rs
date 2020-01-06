@@ -3,6 +3,7 @@ use barrel::types;
 use test_harness::*;
 
 #[test_one_connector(connector = "sqlite")]
+#[test]
 async fn introspecting_a_simple_table_with_gql_types_must_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
