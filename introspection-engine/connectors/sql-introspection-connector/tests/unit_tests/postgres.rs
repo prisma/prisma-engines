@@ -333,6 +333,37 @@ async fn introspecting_a_one_to_one_relation_should_work(api: &TestApi) {
 }
 
 #[test_one_connector(connector = "postgres")]
+async fn introspecting_a_one_to_one_relation_referencing_non_id_should_work(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom("email TEXT UNIQUE");
+            });
+            migration.create_table("Post", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom("user_email TEXT UNIQUE REFERENCES \"User\"(\"email\")");
+            });
+        })
+        .await;
+    let dm = r#"        
+            model Post {
+               id           Int     @id  @sequence(name: "Post_id_seq", allocationSize: 1, initialValue: 1)
+               user_email   User?   @relation(references: [email])
+            }
+            
+            model User {
+               email        String? @unique 
+               id           Int     @id  @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
+               post         Post? 
+            }
+        "#;
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}
+
+#[test_one_connector(connector = "postgres")]
 async fn introspecting_a_one_to_many_relation_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
