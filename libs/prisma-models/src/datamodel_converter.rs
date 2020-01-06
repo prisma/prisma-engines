@@ -1,5 +1,5 @@
 use crate::*;
-use datamodel::dml;
+use datamodel::{dml, DatabaseName, WithDatabaseName};
 use itertools::Itertools;
 use std::convert::TryInto;
 
@@ -51,7 +51,7 @@ impl<'a> DatamodelConverter<'a> {
                 name: model.name.clone(),
                 is_embedded: model.is_embedded,
                 fields: self.convert_fields(model),
-                manifestation: model.database_name.clone(),
+                manifestation: model.single_database_name().map(|s| s.to_owned()),
                 indexes: self.convert_indexes(model),
             })
             .collect()
@@ -392,7 +392,11 @@ impl DatamodelFieldExtensions for dml::Field {
     }
 
     fn manifestation(&self) -> Option<FieldManifestation> {
-        self.database_name.clone().map(|n| FieldManifestation { db_name: n })
+        match &self.database_name {
+            None => None,
+            Some(DatabaseName::Single(name)) => Some(FieldManifestation { db_name: name.clone() }),
+            Some(DatabaseName::Compound(_)) => unimplemented!(),
+        }
     }
 
     fn behaviour(&self) -> Option<FieldBehaviour> {
@@ -426,7 +430,11 @@ impl DatamodelFieldExtensions for dml::Field {
     }
 
     fn final_db_name(&self) -> String {
-        self.database_name.clone().unwrap_or_else(|| self.name.clone())
+        match &self.database_name {
+            None => self.name.clone(),
+            Some(DatabaseName::Single(name)) => name.clone(),
+            Some(DatabaseName::Compound(_)) => unimplemented!(),
+        }
     }
 
     fn internal_enum(&self, datamodel: &dml::Datamodel) -> Option<InternalEnum> {

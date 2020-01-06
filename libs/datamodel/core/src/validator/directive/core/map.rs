@@ -13,8 +13,8 @@ impl<T: dml::WithDatabaseName> DirectiveValidator<T> for MapDirectiveValidator {
         match args.default_arg("name")?.as_array() {
             Ok(value) => match value.len() {
                 0 => panic!("needs to be at least 1"),
-                1 => obj.set_database_name(Some(DatabaseName::Single(value[0].as_str()?))),
-                _ => obj.set_database_name(Some(DatabaseName::Compound(
+                1 => obj.set_database_names(Some(DatabaseName::Single(value[0].as_str()?))),
+                _ => obj.set_database_names(Some(DatabaseName::Compound(
                     value
                         .into_iter()
                         .map(|v| v.as_str())
@@ -34,12 +34,31 @@ impl<T: dml::WithDatabaseName> DirectiveValidator<T> for MapDirectiveValidator {
         Ok(())
     }
 
-    fn serialize(&self, obj: &T, _atamodel: &dml::Datamodel) -> Result<Vec<ast::Directive>, DatamodelError> {
-        if let Some(db_name) = obj.database_name() {
-            return Ok(vec![ast::Directive::new(
-                DirectiveValidator::<T>::directive_name(self),
-                vec![ast::Argument::new_string("", db_name)],
-            )]);
+    fn serialize(&self, obj: &T, _datamodel: &dml::Datamodel) -> Result<Vec<ast::Directive>, DatamodelError> {
+        if let Some(db_name) = obj.database_names() {
+            //todo can be single or compound
+            match db_name {
+                DatabaseName::Single(name) => {
+                    return Ok(vec![ast::Directive::new(
+                        DirectiveValidator::<T>::directive_name(self),
+                        vec![ast::Argument::new_string("", name)],
+                    )])
+                }
+                DatabaseName::Compound(names) => {
+                    let mut related_fields: Vec<ast::Expression> = Vec::new();
+                    for related_field in names {
+                        related_fields.push(ast::Expression::ConstantValue(
+                            related_field.clone(),
+                            ast::Span::empty(),
+                        ));
+                    }
+
+                    return Ok(vec![ast::Directive::new(
+                        DirectiveValidator::<T>::directive_name(self),
+                        vec![ast::Argument::new_array("", related_fields)],
+                    )]);
+                }
+            }
         }
 
         Ok(vec![])

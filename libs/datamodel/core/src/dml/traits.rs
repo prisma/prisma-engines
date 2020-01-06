@@ -17,12 +17,12 @@ pub enum DatabaseName {
 
 /// Trait for all datamodel objects which have an internal database name.
 pub trait WithDatabaseName {
-    /// Gets the internal database name.
-    fn database_name(&self) -> &Option<String>;
+    /// Get the database name as str option, should not be used on fields
+    fn single_database_name(&self) -> Option<&str>;
     /// Gets the proper database name enum. unused for now
     fn database_names(&self) -> &Option<DatabaseName>;
     /// Sets the internal database name.
-    fn set_database_name(&mut self, database_name: Option<DatabaseName>);
+    fn set_database_names(&mut self, database_name: Option<DatabaseName>);
 }
 
 pub trait Parsable: Sized {

@@ -27,10 +27,11 @@ pub fn schema_from_dmmf(schema: &Datamodel) -> dml::Datamodel {
     datamodel
 }
 
+//todo
 fn model_from_dmmf(model: &Model) -> dml::Model {
     dml::Model {
         name: model.name.clone(),
-        database_name: model.db_name.clone(),
+        database_name: None,
         is_embedded: model.is_embedded,
         fields: model.fields.iter().map(&field_from_dmmf).collect(),
         indexes: vec![],
@@ -52,10 +53,11 @@ fn field_from_dmmf(field: &Field) -> dml::Field {
         false => None,
     };
 
+    //Todo
     dml::Field {
         name: field.name.clone(),
         arity: get_field_arity(field.is_required, field.is_list),
-        database_name: field.db_name.clone(),
+        database_name: None,
         field_type,
         default_value,
         id_info,
@@ -153,11 +155,12 @@ fn get_field_arity(is_required: bool, is_list: bool) -> dml::FieldArity {
     }
 }
 
+//todo
 fn enum_from_dmmf(en: &Enum) -> dml::Enum {
     dml::Enum {
         name: en.name.clone(),
         values: en.values.clone(),
-        database_name: en.db_name.clone(),
+        database_name: None,
         documentation: en.documentation.clone(),
     }
 }

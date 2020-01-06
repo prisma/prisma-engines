@@ -10,7 +10,7 @@ pub struct Model {
     /// Comments associated with this model.
     pub documentation: Option<String>,
     /// The database internal name of this model.
-    pub database_name: Option<String>,
+    pub database_name: Option<DatabaseName>,
     /// Indicates if this model is embedded or not.
     pub is_embedded: bool,
     /// Describes Composite Indexes
@@ -159,18 +159,19 @@ impl WithName for Model {
 }
 
 impl WithDatabaseName for Model {
-    fn database_name(&self) -> &Option<String> {
-        &self.database_name
+    fn single_database_name(&self) -> Option<&str> {
+        match &self.database_name {
+            None => None,
+            Some(DatabaseName::Single(name)) => Some(name.as_ref()),
+            Some(DatabaseName::Compound(_)) => panic!("Models should not have compound databasenames."),
+        }
     }
 
     fn database_names(&self) -> &Option<DatabaseName> {
-        panic!("This should not be called on Models")
+        &self.database_name
     }
-    fn set_database_name(&mut self, database_name: Option<DatabaseName>) {
-        self.database_name = match database_name {
-            None => None,
-            Some(DatabaseName::Single(name)) => Some(name.to_string()),
-            Some(DatabaseName::Compound(_)) => panic!("There are no compound names for models"),
-        }
+
+    fn set_database_names(&mut self, database_name: Option<DatabaseName>) {
+        self.database_name = database_name
     }
 }

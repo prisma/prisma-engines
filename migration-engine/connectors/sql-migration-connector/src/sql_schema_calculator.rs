@@ -257,7 +257,10 @@ impl ModelExtensions for Model {
     }
 
     fn db_name(&self) -> String {
-        self.database_name.clone().unwrap_or_else(|| self.name.clone())
+        self.single_database_name()
+            .map(|s| s.to_owned())
+            .clone()
+            .unwrap_or_else(|| self.name.clone())
     }
 }
 
@@ -289,7 +292,11 @@ impl FieldExtensions for Field {
     }
 
     fn db_name(&self) -> String {
-        self.database_name.clone().unwrap_or_else(|| self.name.clone())
+        match &self.database_name {
+            None => self.name.clone(),
+            Some(DatabaseName::Single(name)) => name.clone(),
+            Some(DatabaseName::Compound(_)) => unimplemented!(),
+        }
     }
 
     fn migration_value(&self, datamodel: &Datamodel) -> ScalarValue {

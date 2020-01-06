@@ -30,19 +30,21 @@ fn schema_to_dmmf(schema: &dml::Datamodel) -> Datamodel {
     datamodel
 }
 
+//todo
 fn enum_to_dmmf(en: &dml::Enum) -> Enum {
     Enum {
         name: en.name.clone(),
         values: en.values.clone(),
-        db_name: en.database_name.clone(),
+        db_name: None,
         documentation: en.documentation.clone(),
     }
 }
 
+//todo
 fn model_to_dmmf(model: &dml::Model) -> Model {
     Model {
         name: model.name.clone(),
-        db_name: model.database_name.clone(),
+        db_name: None,
         is_embedded: model.is_embedded,
         fields: model.fields().map(&field_to_dmmf).collect(),
         is_generated: Some(model.is_generated),
@@ -51,11 +53,12 @@ fn model_to_dmmf(model: &dml::Model) -> Model {
     }
 }
 
+//Todo
 fn field_to_dmmf(field: &dml::Field) -> Field {
     Field {
         name: field.name.clone(),
         kind: get_field_kind(field),
-        db_name: field.database_name.clone(),
+        db_name: None,
         is_required: field.arity == dml::FieldArity::Required,
         is_list: field.arity == dml::FieldArity::List,
         is_id: field.id_info.is_some(),

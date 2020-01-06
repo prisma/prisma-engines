@@ -1,6 +1,6 @@
 extern crate datamodel;
 
-use self::datamodel::IndexDefinition;
+use self::datamodel::{DatabaseName, IndexDefinition};
 use datamodel::{common::ScalarType, configuration::SourceDefinition, dml, error::*};
 use datamodel_connector::ScalarFieldType;
 
@@ -126,7 +126,7 @@ impl FieldAsserts for dml::Field {
     }
 
     fn assert_with_db_name(&self, t: &str) -> &Self {
-        assert_eq!(self.database_name, Some(String::from(t)));
+        assert_eq!(self.database_name, Some(DatabaseName::Single(String::from(t))));
 
         self
     }

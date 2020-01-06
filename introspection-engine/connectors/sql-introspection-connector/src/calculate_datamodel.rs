@@ -133,7 +133,7 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
             model.add_field(field);
         }
 
-        fn unique_index_covers_foreign_keys(index: &Index, foreign_key: &ForeignKey) -> bool {
+        fn unique_index_covers_foreign_key(index: &Index, foreign_key: &ForeignKey) -> bool {
             match index.tpe {
                 IndexType::Unique => foreign_key.referenced_columns == index.columns,
                 IndexType::Normal => false,
@@ -145,7 +145,7 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
             table
                 .foreign_keys
                 .iter()
-                .all(|fk| !unique_index_covers_foreign_keys(i, fk))
+                .all(|fk| !unique_index_covers_foreign_key(i, fk))
         }) {
             let tpe = match index.tpe {
                 IndexType::Unique => datamodel::dml::IndexType::Unique,
@@ -166,61 +166,37 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
             }
         }
 
-        //Todo:
-        // Merge them into one new field and add it to model
-        // how to merge? start with first column, remove other columns
-        // continue with remaining columns, look for name clashes
-        // what if more than one fk references a field https://stackoverflow.com/questions/48807000/same-column-in-multiple-foreign-overlapping-foreign-keys-good-practise
-        // how to identify same fk
-        // name is opposing model / opposing model + relation name
-        // the backrelationfield could then automatically be added by the existing logic
-
         for foreign_key in table.foreign_keys.iter().filter(|fk| fk.columns.len() > 1) {
             debug!("Handling compound foreign key  {:?}", foreign_key);
 
             let field_type = FieldType::Relation(RelationInfo {
-                name: calculate_relation_name(schema, fk, table),
+                name: calculate_relation_name(schema, foreign_key, table),
                 to: foreign_key.referenced_table.clone(),
                 to_fields: foreign_key.referenced_columns.clone(),
                 on_delete: OnDeleteStrategy::None,
             });
 
-            let columns = table
+            let columns: Vec<&Column> = table
                 .columns
                 .iter()
                 .filter(|column| foreign_key.columns.contains(&column.name))
                 .collect();
 
-            // todo arity is calculated differently
-            let arity = match table.indices
-                .iter()
-                .all(|i| !unique_index_covers_foreign_keys(i, foreign_key)){
-              true => ,
-                false => ,
-
-
+            let arity = match columns.iter().find(|c| c.is_required()).is_none() {
+                true => FieldArity::Optional,
+                false => FieldArity::Required,
             };
-
-
-//            match column.tpe.arity {
-//                ColumnArity::Required => FieldArity::Required,
-//                ColumnArity::Nullable => FieldArity::Optional,
-//                ColumnArity::List => FieldArity::List,
-//            };
 
             // todo this latter needs to be a compound value of the two columns defaults?
             let default_value = None;
 
-            //todo
-            // fetch this from indexes
-            // what about separate uniques? all @unique == @@unique ?? No! separate ones do not fully work since you can only connect to a subset of the @@unique case
-            // model.indexes contains a multi-field unique index that matches the colums exactly, then it is unique
-            // if there are separate uniques it probably should not become a relation
-            // what breaks by having an @@unique that refers to fields that do not have a representation on the model anymore due to the merged relation field
             let is_unique = false;
 
+            //todo name of the opposing model  -> still needs to be sanitized
+            let name = foreign_key.referenced_table.clone();
+
             let field = Field {
-                name: column.name.clone(),
+                name,
                 arity,
                 field_type,
                 database_name: None,
@@ -232,8 +208,6 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
                 is_updated_at: false,
             };
 
-            //todo
-            // only add one compound field per fk not one for each column in fk
             model.add_field(field);
         }
 
@@ -290,10 +264,19 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
                             on_delete,
                         });
 
+                        //todo
+                        // fetch this from indexes
+                        // what about separate uniques? all @unique == @@unique ?? No! separate ones do not fully work since you can only connect to a subset of the @@unique case
+                        // model.indexes contains a multi-field unique index that matches the colums exactly, then it is unique
+                        // if there are separate uniques it probably should not become a relation
+                        // what breaks by having an @@unique that refers to fields that do not have a representation on the model anymore due to the merged relation field
+
                         let arity = match relation_field.arity {
                             FieldArity::Required | FieldArity::Optional
                                 if schema.table_bang(&model.name).is_column_unique(
-                                    &relation_field.database_name().as_ref().unwrap_or(&relation_field.name),
+                                    &relation_field
+                                        .single_database_name()
+                                        .unwrap_or(relation_field.name.as_str()),
                                 ) =>
                             {
                                 FieldArity::Optional

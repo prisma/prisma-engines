@@ -143,9 +143,11 @@ impl Table {
         }
     }
 
-    pub fn is_column_unique(&self, column_name: &String) -> bool {
+    pub fn is_column_unique(&self, column_name: &str) -> bool {
         self.indices.iter().any(|index| {
-            index.tpe == IndexType::Unique && index.columns.len() == 1 && index.columns.contains(column_name)
+            index.tpe == IndexType::Unique
+                && index.columns.len() == 1
+                && index.columns.contains(&column_name.to_owned())
         })
     }
 }

@@ -10,7 +10,7 @@ pub struct Enum {
     /// Comments for this enum.
     pub documentation: Option<String>,
     /// Database internal name of this enum.
-    pub database_name: Option<String>,
+    pub database_name: Option<DatabaseName>,
 }
 
 impl Enum {
@@ -35,17 +35,19 @@ impl WithName for Enum {
 }
 
 impl WithDatabaseName for Enum {
-    fn database_name(&self) -> &Option<String> {
+    fn single_database_name(&self) -> Option<&str> {
+        match &self.database_name {
+            None => None,
+            Some(DatabaseName::Single(name)) => Some(name.as_ref()),
+            Some(DatabaseName::Compound(_)) => panic!("Enums should not have compound databasenames."),
+        }
+    }
+
+    fn database_names(&self) -> &Option<DatabaseName> {
         &self.database_name
     }
-    fn database_names(&self) -> &Option<DatabaseName> {
-        panic!("This should not be called on Enums")
-    }
-    fn set_database_name(&mut self, database_name: Option<DatabaseName>) {
-        self.database_name = match database_name {
-            None => None,
-            Some(DatabaseName::Single(name)) => Some(name.to_string()),
-            Some(DatabaseName::Compound(_)) => panic!("There are no compound names for enum models"),
-        }
+
+    fn set_database_names(&mut self, database_name: Option<DatabaseName>) {
+        self.database_name = database_name
     }
 }
