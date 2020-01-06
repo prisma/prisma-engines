@@ -7,10 +7,12 @@ const PARAMETER_LIMIT: usize = 10000;
 
 pub fn create_record(model: &ModelRef, mut args: PrismaArgs) -> (Insert<'static>, Option<GraphqlId>) {
     let id_field = model.fields().id();
+    dbg!(&id_field);
 
     let return_id = match args.get_field_value(&id_field.name) {
         _ if id_field.is_auto_generated => None,
         Some(PrismaValue::Null) | None => {
+            dbg!("Generating");
             let id = model.generate_id();
             args.insert(id_field.name.as_str(), id.clone());
             Some(id)

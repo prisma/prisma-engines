@@ -235,6 +235,8 @@ impl QueryDocumentParser {
             .collect();
 
         let right: HashSet<&str> = object.keys().map(|k| k.as_str()).collect();
+        dbg!(&left);
+        dbg!(&right);
         let diff = Diff::new(&left, &right);
 
         // First, check that all fields not provided in the query (left diff) are optional,
@@ -244,10 +246,14 @@ impl QueryDocumentParser {
             .into_iter()
             .filter_map(|unset_field_name| {
                 let field = schema_object.find_field(*unset_field_name).unwrap();
+                let default_pair = field.default_value.clone().map(|def| (&field.name, def));
 
-                match field.default_value.clone().map(|def| (&field.name, def)) {
+                dbg!(&unset_field_name);
+                dbg!(&default_pair);
+
+                match default_pair {
                     // If the input field has a default, add the default to the result.
-                    Some((k, v)) => Some(Ok((k.clone(), ParsedInputValue::Single(v)))),
+                    Some((k, dv)) => Some(Ok((k.clone(), ParsedInputValue::Single(dv.get().into())))),
 
                     // Finally, if nothing is found, parse the input value with Null but disregard the result,
                     // except errors, which are propagated.

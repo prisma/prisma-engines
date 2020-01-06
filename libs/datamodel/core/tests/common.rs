@@ -138,7 +138,7 @@ impl FieldAsserts for dml::Field {
     }
 
     fn assert_default_value(&self, t: dml::ScalarValue) -> &Self {
-        assert_eq!(self.default_value, Some(t));
+        assert_eq!(self.default_value.as_ref().and_then(|df| df.get()), Some(t));
 
         self
     }

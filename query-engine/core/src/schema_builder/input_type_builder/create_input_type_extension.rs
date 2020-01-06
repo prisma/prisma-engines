@@ -141,25 +141,30 @@ pub trait CreateInputTypeBuilderExtension<'a>: InputTypeBuilderBase<'a> {
 
     #[rustfmt::skip]
     fn field_should_be_kept_for_create_input_type(field: &ScalarFieldRef) -> bool {
-        match (field.behaviour.as_ref(), field.type_identifier) {         //add example syntax behind lines
-            _ if !field.is_id()                                                                      => true,
-
-
-            (Some(FieldBehaviour::Id { strategy: IdStrategy::Auto, .. }), TypeIdentifier::UUID)      => true,  //id String    @id @default(uuid())
-            (Some(FieldBehaviour::Id { strategy: IdStrategy::Auto, .. }), TypeIdentifier::GraphQLID) => true,  //id String    @id @default(cuid())
-
-            (Some(FieldBehaviour::Id { strategy: IdStrategy::None, .. }), TypeIdentifier::String)    => true,  //id String    @id
-            (Some(FieldBehaviour::Id { strategy: IdStrategy::None, .. }), TypeIdentifier::UUID)      => true,  //
-            (Some(FieldBehaviour::Id { strategy: IdStrategy::None, .. }), TypeIdentifier::GraphQLID) => true,  // 
-
-            (Some(FieldBehaviour::Id { strategy: IdStrategy::Auto, .. }), TypeIdentifier::Int)       => false, //id Int       @id @default(autoincrement())
-            (Some(FieldBehaviour::Id { strategy: IdStrategy::None, .. }), TypeIdentifier::Int)       => true, //id Int        @id  
-            (Some(FieldBehaviour::Id { strategy: IdStrategy::Sequence, .. }), TypeIdentifier::Int)   => false, //id Int       @id @sequence...
-
-            (None, TypeIdentifier::GraphQLID)                                                        => true,  //can probably go away
-            (None, TypeIdentifier::UUID)                                                             => true,  //can probably go away
-            (None, TypeIdentifier::Int)                                                              => false, //can probably go away
-            x => panic!("Id Behaviour unhandled: {:?}", x),
+        if field.default_value.is_some() && field.type_identifier == TypeIdentifier::Int && field.is_id() {
+            false
+        } else {
+            true
         }
+        // match (field.behaviour.as_ref(), field.type_identifier) {         //add example syntax behind lines
+        //     _ if !field.is_id()                                                                      => true,
+
+
+        //     (Some(FieldBehaviour::Id { strategy: IdStrategy::Auto, .. }), TypeIdentifier::UUID)      => true,  //id String    @id @default(uuid())
+        //     (Some(FieldBehaviour::Id { strategy: IdStrategy::Auto, .. }), TypeIdentifier::GraphQLID) => true,  //id String    @id @default(cuid())
+
+        //     (Some(FieldBehaviour::Id { strategy: IdStrategy::None, .. }), TypeIdentifier::String)    => true,  //id String    @id
+        //     (Some(FieldBehaviour::Id { strategy: IdStrategy::None, .. }), TypeIdentifier::UUID)      => true,  //
+        //     (Some(FieldBehaviour::Id { strategy: IdStrategy::None, .. }), TypeIdentifier::GraphQLID) => true,  //
+
+        //     (Some(FieldBehaviour::Id { strategy: IdStrategy::Auto, .. }), TypeIdentifier::Int)       => false, //id Int       @id @default(autoincrement())
+        //     (Some(FieldBehaviour::Id { strategy: IdStrategy::None, .. }), TypeIdentifier::Int)       => true, //id Int        @id
+        //     (Some(FieldBehaviour::Id { strategy: IdStrategy::Sequence, .. }), TypeIdentifier::Int)   => false, //id Int       @id @sequence...
+
+        //     (None, TypeIdentifier::GraphQLID)                                                        => true,  //can probably go away
+        //     (None, TypeIdentifier::UUID)                                                             => true,  //can probably go away
+        //     (None, TypeIdentifier::Int)                                                              => false, //can probably go away
+        //     x => panic!("Id Behaviour unhandled: {:?}", x),
+        // }
     }
 }

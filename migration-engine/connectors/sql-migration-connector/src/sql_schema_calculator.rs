@@ -295,17 +295,19 @@ impl FieldExtensions for Field {
     fn migration_value(&self, datamodel: &Datamodel) -> ScalarValue {
         self.default_value
             .clone()
+            .and_then(|df| df.get())
             .unwrap_or_else(|| default_migration_value(&self.field_type, datamodel))
     }
 
     fn migration_value_new(&self, datamodel: &Datamodel) -> Option<String> {
         let value = match &self.default_value {
-            Some(x) => match x {
-                ScalarValue::Expression(_, _, _) => default_migration_value(&self.field_type, datamodel),
-                x => x.clone(),
+            Some(df) => match df {
+                dml::DefaultValue::Single(s) => s.clone(),
+                dml::DefaultValue::Expression(_) => default_migration_value(&self.field_type, datamodel),
             },
             None => default_migration_value(&self.field_type, datamodel),
         };
+
         let result = match value {
             ScalarValue::Boolean(x) => {
                 if x {

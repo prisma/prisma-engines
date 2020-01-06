@@ -1,7 +1,7 @@
 use super::*;
 use crate::{ParsedField, QueryGraph, QueryGraphBuilderResult};
 use once_cell::sync::OnceCell;
-use prisma_models::{EnumType, InternalDataModelRef, ModelRef, PrismaValue};
+use prisma_models::{dml, EnumType, InternalDataModelRef, ModelRef};
 use std::{
     borrow::Borrow,
     boxed::Box,
@@ -115,7 +115,7 @@ pub struct ObjectType {
 impl ObjectType {
     pub fn new<T>(name: T, model: Option<ModelRef>) -> Self
     where
-        T: Into<String>
+        T: Into<String>,
     {
         Self {
             name: name.into(),
@@ -244,7 +244,7 @@ pub struct GenericQueryBuilder {
 pub struct Argument {
     pub name: String,
     pub argument_type: InputType,
-    pub default_value: Option<PrismaValue>,
+    pub default_value: Option<dml::DefaultValue>,
 }
 
 #[derive(DebugStub)]
@@ -284,7 +284,7 @@ impl InputObjectType {
 pub struct InputField {
     pub name: String,
     pub field_type: InputType,
-    pub default_value: Option<PrismaValue>,
+    pub default_value: Option<dml::DefaultValue>,
 }
 
 #[derive(Debug, Clone)]

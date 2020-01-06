@@ -1,7 +1,6 @@
 use crate::*;
 use datamodel::dml;
 use itertools::Itertools;
-use std::convert::TryInto;
 
 pub struct DatamodelConverter<'a> {
     datamodel: &'a dml::Datamodel,
@@ -353,19 +352,20 @@ impl DatamodelFieldExtensions for dml::Field {
                 dml::ScalarType::Decimal => TypeIdentifier::Float,
                 dml::ScalarType::Float => TypeIdentifier::Float,
                 dml::ScalarType::Int => TypeIdentifier::Int,
-                dml::ScalarType::String => match self.default_value {
-                    Some(datamodel::common::ScalarValue::Expression(ref expr, _, _)) if expr == "cuid" => {
-                        TypeIdentifier::GraphQLID
-                    }
-                    Some(datamodel::common::ScalarValue::Expression(ref expr, _, _)) if expr == "uuid" => {
-                        TypeIdentifier::UUID
-                    }
-                    Some(datamodel::common::ScalarValue::Expression(ref expr, _, _)) if expr == "autoincrement" => {
-                        TypeIdentifier::Int
-                    }
-                    _ => TypeIdentifier::String,
-                },
+                dml::ScalarType::String => TypeIdentifier::String,
+                // match self.default_value {
+                //     Some(datamodel::common::ScalarValue::Expression(ref expr, _, _)) if expr == "cuid" => {
+                //         TypeIdentifier::GraphQLID
+                //     }
+                //     Some(datamodel::common::ScalarValue::Expression(ref expr, _, _)) if expr == "uuid" => {
+                //         TypeIdentifier::UUID
+                //     }
+                //     Some(datamodel::common::ScalarValue::Expression(ref expr, _, _)) if expr == "autoincrement" => {
+                //         TypeIdentifier::Int
+                //     }
+                // _ => TypeIdentifier::String,
             },
+            // },
             dml::FieldType::ConnectorSpecific { .. } => {
                 unimplemented!("Connector Specific types are not supported here yet")
             }
@@ -375,19 +375,24 @@ impl DatamodelFieldExtensions for dml::Field {
     fn is_required(&self) -> bool {
         self.arity == dml::FieldArity::Required
     }
+
     fn is_list(&self) -> bool {
         self.arity == dml::FieldArity::List
     }
+
     fn is_unique(&self) -> bool {
         self.is_unique
     }
+
     fn is_auto_generated(&self) -> bool {
         let has_auto_generating_behaviour = self
             .id_info
             .as_ref()
             .filter(|id| id.strategy == dml::IdStrategy::Auto)
             .is_some();
+
         let is_an_int = self.type_identifier() == TypeIdentifier::Int;
+
         has_auto_generating_behaviour && is_an_int
     }
 
@@ -410,12 +415,14 @@ impl DatamodelFieldExtensions for dml::Field {
                 }
             })
             // case: @default(now())
-            .or_else(|| match self.default_value {
-                Some(datamodel::common::ScalarValue::Expression(ref expr, _, _)) if expr == "now" => {
-                    Some(FieldBehaviour::CreatedAt)
-                }
-                _ => None,
-            })
+            .or_else(
+                || //match self.default_value {
+                // Some(datamodel::common::ScalarValue::Expression(ref expr, _, _)) if expr == "now" => {
+                //     Some(FieldBehaviour::CreatedAt)
+                // }
+                // _ => None,
+                None, //}
+            )
             .or_else(|| {
                 if self.is_updated_at {
                     Some(FieldBehaviour::UpdatedAt)
@@ -444,18 +451,7 @@ impl DatamodelFieldExtensions for dml::Field {
         }
     }
 
-    fn default_value(&self) -> Option<PrismaValue> {
-        self.default_value.as_ref().and_then(|v| match v {
-            datamodel::common::ScalarValue::Boolean(x) => Some(PrismaValue::Boolean(*x)),
-            datamodel::common::ScalarValue::Int(x) => Some(PrismaValue::Int(i64::from(*x))),
-            datamodel::common::ScalarValue::Float(x) => (*x).try_into().ok(),
-            datamodel::common::ScalarValue::String(x) => Some(PrismaValue::String(x.clone())),
-            datamodel::common::ScalarValue::DateTime(x) => Some(PrismaValue::DateTime(*x)),
-            datamodel::common::ScalarValue::Decimal(x) => (*x).try_into().ok(), // TODO: not sure if this mapping is correct
-            datamodel::common::ScalarValue::ConstantLiteral(x) => {
-                Some(PrismaValue::Enum(EnumValue::string(x.clone(), x.clone())))
-            }
-            datamodel::common::ScalarValue::Expression(_, _, _) => None, // expressions are handled in the behaviour function right now
-        })
+    fn default_value(&self) -> Option<dml::DefaultValue> {
+        self.default_value.clone()
     }
 }

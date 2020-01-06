@@ -1,5 +1,5 @@
-use std::collections::HashSet;
 use pretty_assertions::assert_eq;
+use std::collections::HashSet;
 
 use datamodel::{
     common::{ScalarType, ScalarValue},
@@ -225,7 +225,7 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
                     arity: FieldArity::Optional,
                     field_type: FieldType::Base(ScalarType::Int),
                     database_name: None,
-                    default_value: Some(ScalarValue::Int(1)),
+                    default_value: Some(dml::DefaultValue::Single(ScalarValue::Int(1))),
                     is_unique: false,
                     id_info: None,
                     documentation: None,
@@ -237,7 +237,7 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
                     arity: FieldArity::Optional,
                     field_type: FieldType::Base(ScalarType::Boolean),
                     database_name: None,
-                    default_value: Some(ScalarValue::Boolean(true)),
+                    default_value: Some(dml::DefaultValue::Single(ScalarValue::Boolean(true))),
                     is_unique: false,
                     id_info: None,
                     documentation: None,
@@ -249,7 +249,7 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
                     arity: FieldArity::Optional,
                     field_type: FieldType::Base(ScalarType::Float),
                     database_name: None,
-                    default_value: Some(ScalarValue::Float(1.0)),
+                    default_value: Some(dml::DefaultValue::Single(ScalarValue::Float(1.0))),
                     is_unique: false,
                     id_info: None,
                     documentation: None,
@@ -261,7 +261,7 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
                     arity: FieldArity::Optional,
                     field_type: FieldType::Base(ScalarType::String),
                     database_name: None,
-                    default_value: Some(ScalarValue::String("default".to_string())),
+                    default_value: Some(dml::DefaultValue::Single(ScalarValue::String("default".to_string()))),
                     is_unique: false,
                     id_info: None,
                     documentation: None,
@@ -891,7 +891,6 @@ fn multi_field_uniques_are_preserved_when_generating_data_model_from_a_schema() 
 
 #[test]
 fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
-
     let ref_data_model = Datamodel {
         models: vec![
             Model {
