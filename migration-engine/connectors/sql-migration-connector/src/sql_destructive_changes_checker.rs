@@ -135,9 +135,7 @@ impl SqlDestructiveChangesChecker {
                 SqlMigrationStep::AlterTable(alter_table) => {
                     // The table in alter_table is the updated table, but we want to
                     // check against the current state of the table.
-                    let before_table = database_migration
-                        .before
-                        .get_table(&alter_table.table.name);
+                    let before_table = database_migration.before.get_table(&alter_table.table.name);
 
                     if let Some(before_table) = before_table {
                         for change in &alter_table.changes {
@@ -154,7 +152,6 @@ impl SqlDestructiveChangesChecker {
                             }
                         }
                     }
-
                 }
                 // Here, check for each table we are going to delete if it is empty. If
                 // not, return a warning.
