@@ -15,6 +15,8 @@ async fn setup_invalid_fields(api: &TestApi) {
                 t.add_column(")e", types::text());
                 t.add_column("/f", types::text());
                 t.add_column("g a", types::text());
+                t.add_column("h-a", types::text());
+                t.add_column("h1", types::text());
             });
         })
         .await;
@@ -32,14 +34,15 @@ async fn fields_with_invalid_characters_should_be_mapped_for_postgres(api: &Test
                d      String @map("(d")
                e      String @map(")e")
                f      String @map("/f")
-               g_a      String @map("g a")
+               g_a    String @map("g a")
+               h1     String
+               h_a    String @map("h-a")
                id     Int @id @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
             }
         "#;
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
-
 
 #[test_one_connector(connector = "mysql")]
 async fn fields_with_invalid_characters_should_be_mapped_for_mysql(api: &TestApi) {
@@ -53,6 +56,8 @@ async fn fields_with_invalid_characters_should_be_mapped_for_mysql(api: &TestApi
                f      String @map("/f")
                c      String @map("?c")
                g_a    String @map("g a")
+               h_a    String @map("h-a")
+               h1     String
                id     Int @id
                a      String @map("_a")
             }
@@ -74,6 +79,8 @@ async fn fields_with_invalid_characters_should_be_mapped_for_sqlite(api: &TestAp
                c      String @map("?c")
                a      String @map("_a")
                g_a    String @map("g a")
+               h_a    String @map("h-a")
+               h1     String
                id     Int @id
             }
         "#;
@@ -116,7 +123,6 @@ async fn tables_with_invalid_characters_should_be_mapped_for_postgres(api: &Test
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
-
 
 #[test_one_connector(connector = "mysql")]
 async fn tables_with_invalid_characters_should_be_mapped_for_mysql(api: &TestApi) {
