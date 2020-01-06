@@ -42,7 +42,7 @@ fn model_from_dmmf(model: &Model) -> dml::Model {
 
 fn field_from_dmmf(field: &Field) -> dml::Field {
     let field_type = get_field_type(field);
-    let default_value = default_value_from_serde(&field.default, &field_type);
+
     // TODO: Id details?
     let id_info = match &field.is_id {
         true => Some(dml::IdInfo {
@@ -57,7 +57,7 @@ fn field_from_dmmf(field: &Field) -> dml::Field {
         arity: get_field_arity(field.is_required, field.is_list),
         database_name: field.db_name.clone(),
         field_type,
-        default_value,
+        default_value: None,
         id_info,
         is_unique: field.is_unique,
         is_generated: field.is_generated.unwrap_or(false),

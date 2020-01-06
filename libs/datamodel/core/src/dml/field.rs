@@ -1,6 +1,5 @@
 use super::*;
 use datamodel_connector::ScalarFieldType;
-use std::fmt;
 
 /// Datamodel field arity.
 #[derive(Debug, PartialEq, Copy, Clone)]
@@ -13,56 +12,6 @@ pub enum FieldArity {
 impl FieldArity {
     pub fn is_singular(&self) -> bool {
         self == &FieldArity::Required || self == &FieldArity::Optional
-    }
-}
-
-#[derive(Clone)]
-pub enum DefaultValue {
-    Single(ScalarValue),
-    Expression(String, Box<dyn ValueGenerator>),
-}
-
-pub trait ValueGenerator {
-    fn generate() -> ScalarValue;
-}
-
-impl DefaultValue {
-    // Returns either a copy of the contained value or produces a new
-    // value as defined by the expression.
-    pub fn get(&self) -> ScalarValue {
-        match self {
-            Self::Single(v) => v.clone(),
-            Self::Expression(_, f) => f(),
-        }
-    }
-}
-
-impl fmt::Debug for DefaultValue {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let x = "asdf";
-        DefaultValue::Expression("".to_owned(), move || {
-            println!("{}", x);
-            unimplemented!()
-        });
-
-        match self {
-            Self::Single(ref v) => write!(f, "DefaultValue::Single({:?})", v),
-            Self::Expression(name, f) => {
-                f();
-
-                write!(f, "DefaultValue::Expression({})", name)
-            }
-        }
-    }
-}
-
-impl PartialEq for DefaultValue {
-    fn eq(&self, other: &Self) -> bool {
-        match (self, other) {
-            (Self::Single(ref v), Self::Single(ref ov)) => v == ov,
-            (Self::Expression(ref name, _), Self::Expression(ref other_name, _)) => name == other_name,
-            _ => false,
-        }
     }
 }
 

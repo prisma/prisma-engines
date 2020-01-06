@@ -1,6 +1,6 @@
 use super::FieldManifestation;
 use crate::prelude::*;
-use datamodel::FieldArity;
+use datamodel::{DefaultValue, FieldArity};
 use std::{
     hash::{Hash, Hasher},
     sync::{Arc, Weak},
@@ -25,7 +25,7 @@ pub struct ScalarFieldTemplate {
     pub is_auto_generated: bool,
     pub manifestation: Option<FieldManifestation>,
     pub behaviour: Option<FieldBehaviour>,
-    pub default_value: Option<PrismaValue>,
+    pub default_value: Option<DefaultValue>,
     pub internal_enum: Option<InternalEnum>,
 }
 
@@ -40,7 +40,7 @@ pub struct ScalarField {
     pub manifestation: Option<FieldManifestation>,
     pub internal_enum: Option<InternalEnum>,
     pub behaviour: Option<FieldBehaviour>,
-    pub default_value: Option<PrismaValue>,
+    pub default_value: Option<DefaultValue>,
 
     #[debug_stub = "#ModelWeakRef#"]
     pub model: ModelWeakRef,
@@ -61,7 +61,7 @@ impl Hash for ScalarField {
         self.manifestation.hash(state);
         self.internal_enum.hash(state);
         self.behaviour.hash(state);
-        self.default_value.hash(state);
+        // self.default_value.hash(state); // Todo: default values can't be hashed at the moment, floating point issues in dml crate.
         self.is_unique.hash(state);
         self.model().hash(state);
     }

@@ -339,7 +339,7 @@ trait DatamodelFieldExtensions {
     fn behaviour(&self) -> Option<FieldBehaviour>;
     fn final_db_name(&self) -> String;
     fn internal_enum(&self, datamodel: &dml::Datamodel) -> Option<InternalEnum>;
-    fn default_value(&self) -> Option<PrismaValue>;
+    fn default_value(&self) -> Option<dml::DefaultValue>;
 }
 
 impl DatamodelFieldExtensions for dml::Field {

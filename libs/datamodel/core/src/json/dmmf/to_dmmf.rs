@@ -59,7 +59,7 @@ fn field_to_dmmf(field: &dml::Field) -> Field {
         is_required: field.arity == dml::FieldArity::Required,
         is_list: field.arity == dml::FieldArity::List,
         is_id: field.id_info.is_some(),
-        default: default_value_to_serde(&field.default_value),
+        default: None,
         is_unique: field.is_unique,
         relation_name: get_relation_name(field),
         relation_to_fields: get_relation_to_fields(field),

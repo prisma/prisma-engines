@@ -1,7 +1,6 @@
 use crate::error::DatamodelError;
 use crate::validator::directive::{Args, DirectiveValidator};
 use crate::{ast, dml};
-use datamodel_connector::scalars::ScalarValue;
 
 /// Prismas builtin `@primary` directive.
 pub struct IdDirectiveValidator {}
@@ -11,12 +10,13 @@ impl DirectiveValidator<dml::Field> for IdDirectiveValidator {
         &"id"
     }
 
+    // TODO In which form is this still required or needs to change? Default values are handling the id strategy now.
     fn validate_and_apply(&self, args: &mut Args, obj: &mut dml::Field) -> Result<(), DatamodelError> {
         let strategy = match (&obj.field_type, &obj.default_value) {
-            (dml::FieldType::Base(dml::ScalarType::Int), Some(ScalarValue::Expression(_, _, _))) => {
+            (dml::FieldType::Base(dml::ScalarType::Int), Some(dml::DefaultValue::Expression(_))) => {
                 dml::IdStrategy::Auto
             }
-            (dml::FieldType::Base(dml::ScalarType::String), Some(ScalarValue::Expression(_, _, _))) => {
+            (dml::FieldType::Base(dml::ScalarType::String), Some(dml::DefaultValue::Expression(_))) => {
                 dml::IdStrategy::Auto
             }
             _ => dml::IdStrategy::None,
