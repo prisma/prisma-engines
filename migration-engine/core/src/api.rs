@@ -1,6 +1,7 @@
 mod error_rendering;
 mod rpc;
 
+pub(crate) use error_rendering::pretty_print_datamodel_errors;
 pub use error_rendering::render_error;
 pub use rpc::*;
 
@@ -63,10 +64,6 @@ pub trait GenericApi: Send + Sync + 'static {
 
     fn render_jsonrpc_error(&self, error: crate::error::Error) -> jsonrpc_core::error::Error {
         error_rendering::render_jsonrpc_error(error)
-    }
-
-    fn render_panic(&self, panic: Box<dyn std::any::Any + Send + 'static>) -> jsonrpc_core::error::Error {
-        error_rendering::render_panic(panic)
     }
 }
 

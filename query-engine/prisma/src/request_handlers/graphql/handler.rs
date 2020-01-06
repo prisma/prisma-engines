@@ -27,7 +27,7 @@ impl RequestHandler for GraphQlRequestHandler {
     {
         use futures::FutureExt;
         use std::panic::AssertUnwindSafe;
-        use user_facing_errors::{Error, UnknownError};
+        use user_facing_errors::Error;
 
         match AssertUnwindSafe(handle_graphql_query(req.into(), ctx))
             .catch_unwind()
@@ -38,15 +38,15 @@ impl RequestHandler for GraphQlRequestHandler {
                 let mut responses = response_ir::Responses::default();
                 responses.insert_error(err);
                 responses
-            },
+            }
             // panicked
             Err(err) => {
                 let mut responses = response_ir::Responses::default();
-                let error = Error::Unknown(UnknownError::from_panic_payload(&err));
+                let error = Error::from_panic_payload(&err);
 
                 responses.insert_error(error);
                 responses
-            },
+            }
         }
     }
 }
