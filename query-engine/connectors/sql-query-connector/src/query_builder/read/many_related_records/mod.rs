@@ -20,13 +20,12 @@ pub trait ManyRelatedRecordsQueryBuilder {
     fn without_pagination<'a>(base: ManyRelatedRecordsBaseQuery<'a>) -> Query {
         let conditions = base
             .from_field
-            .relation_column()
-            .table(Relation::TABLE_ALIAS)
+            .relation_column(true)
             .in_selection(base.from_record_ids.to_owned())
             .and(base.condition)
             .and(base.cursor);
 
-        let opposite_column = base.from_field.opposite_column().table(Relation::TABLE_ALIAS);
+        let opposite_column = base.from_field.opposite_column(true);
         let order_columns = Ordering::internal(opposite_column, base.order_directions);
 
         order_columns

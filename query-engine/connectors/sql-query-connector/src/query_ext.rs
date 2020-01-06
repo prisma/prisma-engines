@@ -1,6 +1,7 @@
 use crate::{error::*, AliasedCondition, RawQuery, SqlRow, ToSqlRow};
 use async_trait::async_trait;
 use connector_interface::filter::Filter;
+use datamodel::FieldArity;
 use prisma_models::*;
 use quaint::{
     ast::*,
@@ -8,7 +9,6 @@ use quaint::{
     pooled::PooledConnection,
 };
 use serde_json::{Map, Number, Value};
-use datamodel::FieldArity;
 use std::convert::TryFrom;
 
 impl<'t> QueryExt for connector::Transaction<'t> {}
@@ -86,7 +86,9 @@ pub trait QueryExt: Queryable + Send + Sync {
     }
 
     async fn select_ids(&self, select: Select<'_>) -> crate::Result<Vec<GraphqlId>> {
-        let mut rows = self.filter(select.into(), &[(TypeIdentifier::GraphQLID, FieldArity::Required)]).await?;
+        let mut rows = self
+            .filter(select.into(), &[(TypeIdentifier::GraphQLID, FieldArity::Required)])
+            .await?;
         let mut result = Vec::new();
 
         for mut row in rows.drain(0..) {
