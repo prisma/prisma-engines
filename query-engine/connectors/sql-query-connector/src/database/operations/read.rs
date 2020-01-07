@@ -69,55 +69,39 @@ where
     field_names.push(from_field.name.clone());
 
     let can_skip_joins = from_field.relation_is_inlined_in_child() && !query_arguments.is_with_pagination();
-    let relation = from_field.relation();
+
+    let mut columns: Vec<_> = selected_fields.columns().collect();
+
+    columns.extend(
+        from_field
+            .opposite_columns(true)
+            .into_iter()
+            .map(|col| col.alias(SelectedFields::RELATED_MODEL_ALIAS))
+            .collect::<Vec<_>>(),
+    );
+
+    columns.extend(
+        from_field
+            .relation_columns(true)
+            .into_iter()
+            .map(|col| col.alias(SelectedFields::PARENT_MODEL_ALIAS))
+            .collect::<Vec<_>>(),
+    );
 
     let query = if can_skip_joins {
-        let mut columns: Vec<_> = selected_fields.columns().collect();
-
-        columns.extend(
-            relation
-                .columns_for_relation_side(from_field.relation_side.opposite())
-                .into_iter()
-                .map(|col| col.alias(SelectedFields::RELATED_MODEL_ALIAS))
-                .collect::<Vec<_>>()
-
-        );
-
-        columns.extend(
-            relation
-                .columns_for_relation_side(from_field.relation_side)
-                .into_iter()
-                .map(|col| col.alias(SelectedFields::PARENT_MODEL_ALIAS))
-                .collect::<Vec<_>>()
-        );
-
         let model = from_field.related_model();
 
-        let select = read::get_records(&model, columns.into_iter(), query_arguments)
-            .and_where(from_field.relation_columns().pop().unwrap().in_selection(from_record_ids.to_owned()));
+        // Todo: Needs to be adapted for multiple columns.
+        let select = read::get_records(&model, columns.into_iter(), query_arguments).and_where(
+            from_field
+                .relation_columns(true)
+                .pop()
+                .unwrap()
+                .in_selection(from_record_ids.to_owned()),
+        );
 
         Query::from(select)
     } else {
-        let mut columns: Vec<_> = selected_fields.columns().collect();
-
-        columns.extend(
-            relation
-                .columns_for_relation_side(from_field.relation_side.opposite())
-                .into_iter()
-                .map(|col| col.alias(SelectedFields::RELATED_MODEL_ALIAS)
-                .table(Relation::TABLE_ALIAS))
-                .collect::<Vec<_>>()
-        );
-
-        columns.extend(
-            relation
-                .columns_for_relation_side(from_field.relation_side)
-                .into_iter()
-                .map(|col| col.alias(SelectedFields::PARENT_MODEL_ALIAS)
-                .table(Relation::TABLE_ALIAS))
-                .collect::<Vec<_>>()
-        );
-
         let is_with_pagination = query_arguments.is_with_pagination();
         let base = ManyRelatedRecordsBaseQuery::new(from_field, from_record_ids, query_arguments, columns);
 

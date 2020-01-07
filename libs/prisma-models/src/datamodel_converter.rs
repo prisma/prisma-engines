@@ -1,7 +1,6 @@
 use crate::*;
 use datamodel::dml;
 use itertools::Itertools;
-use std::convert::TryInto;
 
 pub struct DatamodelConverter<'a> {
     datamodel: &'a dml::Datamodel,
@@ -81,7 +80,7 @@ impl<'a> DatamodelConverter<'a> {
                         is_list: field.is_list(),
                         is_unique: field.is_unique(),
                         is_hidden: false,
-                        is_auto_generated: field.is_auto_generated(),
+                        is_auto_generated_int_id: field.is_auto_generated_int_id(),
                         manifestation: field.manifestation(),
                         relation_name: relation.name(),
                         relation_side: relation.relation_side(field),
@@ -94,7 +93,7 @@ impl<'a> DatamodelConverter<'a> {
                     is_list: field.is_list(),
                     is_unique: field.is_unique(),
                     is_hidden: false,
-                    is_auto_generated: field.is_auto_generated(),
+                    is_auto_generated_int_id: field.is_auto_generated_int_id(),
                     manifestation: field.manifestation(),
                     behaviour: field.behaviour(),
                     default_value: field.default_value(),
@@ -166,26 +165,29 @@ impl<'a> DatamodelConverter<'a> {
                                 "Related model for model {} and field {} not found",
                                 model.name, field.name
                             )
-                        })
-                        .clone();
+                        });
 
-                    let related_field_info = match &related_field.field_type {
+                    let related_field_info: &dml::RelationInfo = match &related_field.field_type {
                         dml::FieldType::Relation(info) => info,
                         _ => panic!("this was not a relation field"),
                     };
 
-                    let (model_a, model_b, field_a, field_b) = match () {
+                    let (model_a, model_b, field_a, field_b, referenced_fields_a, referenced_fields_b) = match () {
                         _ if model.name < related_model.name => (
                             model.clone(),
                             related_model.clone(),
                             field.clone(),
                             related_field.clone(),
+                            to_fields,
+                            &related_field_info.to_fields,
                         ),
                         _ if related_model.name < model.name => (
                             related_model.clone(),
                             model.clone(),
                             related_field.clone(),
                             field.clone(),
+                            &related_field_info.to_fields,
+                            to_fields,
                         ),
                         // SELF RELATION CASE
                         _ => {
@@ -194,24 +196,35 @@ impl<'a> DatamodelConverter<'a> {
                             } else {
                                 (related_field.clone(), field.clone())
                             };
-                            (model.clone(), related_model.clone(), field_a, field_b)
+                            (
+                                model.clone(),
+                                related_model.clone(),
+                                field_a,
+                                field_b,
+                                to_fields,
+                                &related_field_info.to_fields,
+                            )
                         }
                     };
                     let inline_on_model_a = TempManifestationHolder::Inline {
                         in_table_of_model: model_a.name.clone(),
                         column: field_a.final_db_name(),
+                        referenced_fields: referenced_fields_a.clone(),
                     };
                     let inline_on_model_b = TempManifestationHolder::Inline {
                         in_table_of_model: model_b.name.clone(),
                         column: field_b.final_db_name(),
+                        referenced_fields: referenced_fields_b.clone(),
                     };
                     let inline_on_this_model = TempManifestationHolder::Inline {
                         in_table_of_model: model.name.clone(),
                         column: field.final_db_name(),
+                        referenced_fields: to_fields.clone(),
                     };
                     let inline_on_related_model = TempManifestationHolder::Inline {
                         in_table_of_model: related_model.name.clone(),
                         column: related_field.final_db_name(),
+                        referenced_fields: related_field_info.to_fields.clone(),
                     };
 
                     let manifestation = match (field_a.is_list(), field_b.is_list()) {
@@ -262,7 +275,13 @@ pub struct TempRelationHolder {
 
 #[derive(PartialEq, Debug, Clone)]
 pub enum TempManifestationHolder {
-    Inline { in_table_of_model: String, column: String },
+    Inline {
+        in_table_of_model: String,
+        /// The name of the foreign key columns.
+        column: String,
+        /// The name of the (dml) fields referenced by the relation.
+        referenced_fields: Vec<String>,
+    },
     Table,
 }
 
@@ -322,6 +341,7 @@ impl TempRelationHolder {
             TempManifestationHolder::Inline {
                 in_table_of_model,
                 column,
+                ..
             } => RelationLinkManifestation::Inline(InlineRelation {
                 in_table_of_model_name: in_table_of_model.to_string(),
                 referencing_column: column.to_string(),
@@ -335,12 +355,12 @@ trait DatamodelFieldExtensions {
     fn is_required(&self) -> bool;
     fn is_list(&self) -> bool;
     fn is_unique(&self) -> bool;
-    fn is_auto_generated(&self) -> bool;
+    fn is_auto_generated_int_id(&self) -> bool;
     fn manifestation(&self) -> Option<FieldManifestation>;
     fn behaviour(&self) -> Option<FieldBehaviour>;
     fn final_db_name(&self) -> String;
     fn internal_enum(&self, datamodel: &dml::Datamodel) -> Option<InternalEnum>;
-    fn default_value(&self) -> Option<PrismaValue>;
+    fn default_value(&self) -> Option<dml::DefaultValue>;
 }
 
 impl DatamodelFieldExtensions for dml::Field {
@@ -354,18 +374,7 @@ impl DatamodelFieldExtensions for dml::Field {
                 dml::ScalarType::Decimal => TypeIdentifier::Float,
                 dml::ScalarType::Float => TypeIdentifier::Float,
                 dml::ScalarType::Int => TypeIdentifier::Int,
-                dml::ScalarType::String => match self.default_value {
-                    Some(datamodel::common::ScalarValue::Expression(ref expr, _, _)) if expr == "cuid" => {
-                        TypeIdentifier::GraphQLID
-                    }
-                    Some(datamodel::common::ScalarValue::Expression(ref expr, _, _)) if expr == "uuid" => {
-                        TypeIdentifier::UUID
-                    }
-                    Some(datamodel::common::ScalarValue::Expression(ref expr, _, _)) if expr == "autoincrement" => {
-                        TypeIdentifier::Int
-                    }
-                    _ => TypeIdentifier::String,
-                },
+                dml::ScalarType::String => TypeIdentifier::String,
             },
             dml::FieldType::ConnectorSpecific { .. } => {
                 unimplemented!("Connector Specific types are not supported here yet")
@@ -376,19 +385,24 @@ impl DatamodelFieldExtensions for dml::Field {
     fn is_required(&self) -> bool {
         self.arity == dml::FieldArity::Required
     }
+
     fn is_list(&self) -> bool {
         self.arity == dml::FieldArity::List
     }
+
     fn is_unique(&self) -> bool {
         self.is_unique
     }
-    fn is_auto_generated(&self) -> bool {
+
+    fn is_auto_generated_int_id(&self) -> bool {
         let has_auto_generating_behaviour = self
             .id_info
             .as_ref()
             .filter(|id| id.strategy == dml::IdStrategy::Auto)
             .is_some();
+
         let is_an_int = self.type_identifier() == TypeIdentifier::Int;
+
         has_auto_generating_behaviour && is_an_int
     }
 
@@ -409,13 +423,6 @@ impl DatamodelFieldExtensions for dml::Field {
                     strategy,
                     sequence: None, // the sequence was just used by the migration engine. Now those models are only used by the query engine. Hence we don't need it anyway.
                 }
-            })
-            // case: @default(now())
-            .or_else(|| match self.default_value {
-                Some(datamodel::common::ScalarValue::Expression(ref expr, _, _)) if expr == "now" => {
-                    Some(FieldBehaviour::CreatedAt)
-                }
-                _ => None,
             })
             .or_else(|| {
                 if self.is_updated_at {
@@ -445,18 +452,7 @@ impl DatamodelFieldExtensions for dml::Field {
         }
     }
 
-    fn default_value(&self) -> Option<PrismaValue> {
-        self.default_value.as_ref().and_then(|v| match v {
-            datamodel::common::ScalarValue::Boolean(x) => Some(PrismaValue::Boolean(*x)),
-            datamodel::common::ScalarValue::Int(x) => Some(PrismaValue::Int(i64::from(*x))),
-            datamodel::common::ScalarValue::Float(x) => (*x).try_into().ok(),
-            datamodel::common::ScalarValue::String(x) => Some(PrismaValue::String(x.clone())),
-            datamodel::common::ScalarValue::DateTime(x) => Some(PrismaValue::DateTime(*x)),
-            datamodel::common::ScalarValue::Decimal(x) => (*x).try_into().ok(), // TODO: not sure if this mapping is correct
-            datamodel::common::ScalarValue::ConstantLiteral(x) => {
-                Some(PrismaValue::Enum(EnumValue::string(x.clone(), x.clone())))
-            }
-            datamodel::common::ScalarValue::Expression(_, _, _) => None, // expressions are handled in the behaviour function right now
-        })
+    fn default_value(&self) -> Option<dml::DefaultValue> {
+        self.default_value.clone()
     }
 }

@@ -2,6 +2,7 @@ use super::*;
 use crate::common::ScalarType;
 use crate::dml;
 use serde_json;
+use std::convert::TryInto;
 
 pub fn render_to_dmmf(schema: &dml::Datamodel) -> String {
     let dmmf = schema_to_dmmf(schema);
@@ -93,9 +94,9 @@ fn type_to_string(scalar: &ScalarType) -> String {
     scalar.to_string()
 }
 
-fn default_value_to_serde(container: &Option<dml::ScalarValue>) -> Option<serde_json::Value> {
+fn default_value_to_serde(container: &Option<dml::DefaultValue>) -> Option<serde_json::Value> {
     match container {
-        Some(value) => Some(value_to_serde(value)),
+        Some(value) => Some(value_to_serde(&value.clone().try_into().unwrap())),
         None => None,
     }
 }

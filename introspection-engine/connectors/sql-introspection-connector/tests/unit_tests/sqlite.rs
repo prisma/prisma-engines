@@ -3,6 +3,7 @@ use barrel::types;
 use test_harness::*;
 
 #[test_one_connector(connector = "sqlite")]
+#[test]
 async fn introspecting_a_simple_table_with_gql_types_must_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
@@ -198,7 +199,10 @@ async fn introspecting_a_table_with_a_non_unique_index_should_work(api: &TestApi
                 t.add_column("a", types::text());
                 t.add_column("id", types::primary());
             });
-            migration.inject_custom(format!("Create Index \"{}\".\"test\" on \"User\"(\"a\")", api.schema_name()));
+            migration.inject_custom(format!(
+                "Create Index \"{}\".\"test\" on \"User\"(\"a\")",
+                api.schema_name()
+            ));
         })
         .await;
 
@@ -342,6 +346,40 @@ async fn introspecting_a_one_to_one_relation_should_work(api: &TestApi) {
             model Post {
                id Int @id
                user_id User?
+            }
+        "#;
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}
+
+#[test_one_connector(connector = "sqlite")]
+async fn introspecting_a_one_to_one_relation_referencing_non_id_should_work(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom("email varchar(10) UNIQUE");
+            });
+            migration.create_table("Post", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom(
+                    "user_email varchar(10) UNIQUE,
+                FOREIGN KEY (user_email) REFERENCES User(email)",
+                );
+            });
+        })
+        .await;
+    let dm = r#"
+            model User {
+               email        String? @unique 
+               id           Int     @id 
+               post         Post? 
+            }
+            
+            model Post {
+               id           Int     @id  
+               user_email   User?   @relation(references: [email])
             }
         "#;
     let result = dbg!(api.introspect().await);
@@ -601,6 +639,36 @@ async fn introspecting_cascading_delete_behaviour_should_work(api: &TestApi) {
             model Post {
                id      Int @id
                user_id User?
+            }
+        "#;
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}
+
+#[test_one_connector(connector = "sqlite")]
+async fn introspecting_id_fields_with_foreign_key_should_ignore_the_relation(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+            });
+            migration.create_table("Post", |t| {
+                t.add_column("test", types::text());
+                t.inject_custom("user_id INTEGER Not Null Primary Key");
+                t.inject_custom("FOREIGN KEY (`user_id`) REFERENCES `User`(`id`)");
+            });
+        })
+        .await;
+
+    let dm = r#"
+            model User {
+               id      Int @id
+            }
+
+            model Post {
+               test    String
+               user_id Int @id
             }
         "#;
     let result = dbg!(api.introspect().await);

@@ -27,6 +27,7 @@ pub mod sql_ext;
 
 pub mod prelude;
 
+pub use datamodel::dml;
 pub use datamodel_converter::*;
 pub use enum_type::*;
 pub use error::*;

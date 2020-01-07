@@ -14,22 +14,24 @@ pub struct SqlDatabaseStepApplier {
 #[async_trait::async_trait]
 impl DatabaseMigrationStepApplier<SqlMigration> for SqlDatabaseStepApplier {
     async fn apply_step(&self, database_migration: &SqlMigration, index: usize) -> ConnectorResult<bool> {
-        self.apply_next_step(&database_migration.corrected_steps, index)
-            .instrument(tracing::debug_span!("ApplySqlStep", index))
-            .await
-            .map_err(|sql_error| sql_error.into_connector_error(&self.connection_info))
+        self.catch(
+            self.apply_next_step(&database_migration.corrected_steps, index, self.renderer().as_ref())
+                .instrument(tracing::debug_span!("ApplySqlStep", index)),
+        )
+        .await
     }
 
     async fn unapply_step(&self, database_migration: &SqlMigration, index: usize) -> ConnectorResult<bool> {
-        self.apply_next_step(&database_migration.rollback, index)
-            .instrument(tracing::debug_span!("UnapplySqlStep", index))
-            .await
-            .map_err(|sql_error| sql_error.into_connector_error(&self.connection_info))
+        self.catch(
+            self.apply_next_step(&database_migration.rollback, index, self.renderer().as_ref())
+                .instrument(tracing::debug_span!("UnapplySqlStep", index)),
+        )
+        .await
     }
 
     fn render_steps_pretty(&self, database_migration: &SqlMigration) -> ConnectorResult<Vec<serde_json::Value>> {
         Ok(
-            render_steps_pretty(&database_migration, self.sql_family(), &self.schema_name)?
+            render_steps_pretty(&database_migration, self.renderer().as_ref(), &self.schema_name)?
                 .into_iter()
                 .map(|pretty_step| serde_json::to_value(&pretty_step).unwrap())
                 .collect(),
@@ -38,7 +40,19 @@ impl DatabaseMigrationStepApplier<SqlMigration> for SqlDatabaseStepApplier {
 }
 
 impl SqlDatabaseStepApplier {
-    async fn apply_next_step(&self, steps: &[SqlMigrationStep], index: usize) -> SqlResult<bool> {
+    async fn catch<O>(&self, fut: impl std::future::Future<Output = SqlResult<O>>) -> ConnectorResult<O> {
+        match fut.await {
+            Ok(o) => Ok(o),
+            Err(sql_error) => Err(sql_error.into_connector_error(&self.connection_info)),
+        }
+    }
+
+    async fn apply_next_step(
+        &self,
+        steps: &[SqlMigrationStep],
+        index: usize,
+        renderer: &(dyn SqlRenderer + Send + Sync),
+    ) -> SqlResult<bool> {
         let has_this_one = steps.get(index).is_some();
         if !has_this_one {
             return Ok(false);
@@ -47,13 +61,18 @@ impl SqlDatabaseStepApplier {
         let step = &steps[index];
         tracing::debug!(?step);
 
-        let sql_string = render_raw_sql(&step, self.sql_family(), &self.schema_name);
-        tracing::debug!(index, %sql_string);
+        if let Some(sql_string) = render_raw_sql(&step, renderer, &self.schema_name)
+            .map_err(|err: std::fmt::Error| SqlError::Generic(format!("IO error: {}", err)))?
+        {
+            tracing::debug!(index, %sql_string);
 
-        let result = self.conn.query_raw(&sql_string, &[]).await;
+            let result = self.conn.query_raw(&sql_string, &[]).await;
 
-        // TODO: this does not evaluate the results of SQLites PRAGMA foreign_key_check
-        result?;
+            // TODO: this does not evaluate the results of SQLites PRAGMA foreign_key_check
+            result?;
+        } else {
+            tracing::debug!("Step rendered no SQL.");
+        }
 
         let has_more = steps.get(index + 1).is_some();
         Ok(has_more)
@@ -62,27 +81,42 @@ impl SqlDatabaseStepApplier {
     fn sql_family(&self) -> SqlFamily {
         self.connection_info.sql_family()
     }
+
+    fn renderer<'a>(&'a self) -> Box<dyn SqlRenderer + Send + Sync + 'a> {
+        SqlRenderer::for_family(&self.sql_family())
+    }
 }
 
 fn render_steps_pretty(
     database_migration: &SqlMigration,
-    sql_family: SqlFamily,
+    renderer: &(dyn SqlRenderer + Send + Sync),
     schema_name: &str,
 ) -> ConnectorResult<Vec<PrettySqlMigrationStep>> {
-    let steps = database_migration
-        .corrected_steps
-        .iter()
-        .map(|step| PrettySqlMigrationStep {
-            step: step.clone(),
-            raw: render_raw_sql(&step, sql_family, schema_name),
-        })
-        .collect();
+    let mut steps = Vec::with_capacity(database_migration.corrected_steps.len());
+
+    for step in &database_migration.corrected_steps {
+        if let Some(sql) = render_raw_sql(&step, renderer, schema_name)
+            .map_err(|err: std::fmt::Error| ConnectorError::from_kind(ErrorKind::Generic(err.into())))?
+        {
+            steps.push(PrettySqlMigrationStep {
+                step: step.clone(),
+                raw: sql,
+            });
+        }
+    }
+
     Ok(steps)
 }
 
-fn render_raw_sql(step: &SqlMigrationStep, sql_family: SqlFamily, schema_name: &str) -> String {
+fn render_raw_sql(
+    step: &SqlMigrationStep,
+    renderer: &(dyn SqlRenderer + Send + Sync),
+    schema_name: &str,
+) -> std::result::Result<Option<String>, std::fmt::Error> {
+    use std::fmt::Write as _;
+
+    let sql_family = renderer.sql_family();
     let schema_name = schema_name.to_string();
-    let renderer = SqlRenderer::for_family(&sql_family);
 
     match step {
         SqlMigrationStep::CreateTable(CreateTable { table }) => {
@@ -103,34 +137,67 @@ fn render_raw_sql(step: &SqlMigrationStep, sql_family: SqlFamily, schema_name: &
                     .collect();
                 lines.push(format!("  PRIMARY KEY ({})", column_names.join(",")))
             }
-            format!(
+            Ok(Some(format!(
                 "CREATE TABLE {} (\n{}\n){};",
                 renderer.quote_with_schema(&schema_name, &table.name),
                 lines.join(",\n"),
                 create_table_suffix(sql_family),
-            )
+            )))
         }
-        SqlMigrationStep::DropTable(DropTable { name }) => {
-            format!("DROP TABLE {};", renderer.quote_with_schema(&schema_name, &name))
-        }
+        SqlMigrationStep::DropTable(DropTable { name }) => Ok(Some(format!(
+            "DROP TABLE {};",
+            renderer.quote_with_schema(&schema_name, &name)
+        ))),
         SqlMigrationStep::DropTables(DropTables { names }) => {
             let fully_qualified_names: Vec<String> = names
                 .iter()
                 .map(|name| renderer.quote_with_schema(&schema_name, &name))
                 .collect();
-            format!("DROP TABLE {};", fully_qualified_names.join(","))
+            Ok(Some(format!("DROP TABLE {};", fully_qualified_names.join(","))))
         }
         SqlMigrationStep::RenameTable { name, new_name } => {
             let new_name = match sql_family {
                 SqlFamily::Sqlite => renderer.quote(new_name),
                 _ => renderer.quote_with_schema(&schema_name, &new_name),
             };
-            format!(
+            Ok(Some(format!(
                 "ALTER TABLE {} RENAME TO {};",
                 renderer.quote_with_schema(&schema_name, &name),
                 new_name
-            )
+            )))
         }
+        SqlMigrationStep::AddForeignKey(AddForeignKey { table, foreign_key }) => match sql_family {
+            SqlFamily::Sqlite => Ok(None),
+            _ => {
+                let mut add_constraint = String::with_capacity(120);
+
+                write!(
+                    add_constraint,
+                    "ALTER TABLE {table} ADD ",
+                    table = renderer.quote_with_schema(&schema_name, table)
+                )?;
+
+                if let Some(constraint_name) = foreign_key.constraint_name.as_ref() {
+                    write!(add_constraint, "CONSTRAINT {} ", renderer.quote(constraint_name))?;
+                }
+
+                write!(add_constraint, "FOREIGN KEY (")?;
+
+                for (idx, column) in foreign_key.columns.iter().enumerate() {
+                    write!(add_constraint, "{}", renderer.quote(column))?;
+
+                    if idx < foreign_key.columns.len() - 1 {
+                        write!(add_constraint, ", ")?;
+                    }
+                }
+
+                write!(add_constraint, ") ")?;
+
+                add_constraint.push_str(&renderer.render_references(&schema_name, &foreign_key));
+
+                Ok(Some(add_constraint))
+            }
+        },
         SqlMigrationStep::AlterTable(AlterTable { table, changes }) => {
             let mut lines = Vec::new();
             for change in changes.clone() {
@@ -140,7 +207,6 @@ fn render_raw_sql(step: &SqlMigrationStep, sql_family: SqlFamily, schema_name: &
                         lines.push(format!("ADD COLUMN {}", col_sql));
                     }
                     TableChange::DropColumn(DropColumn { name }) => {
-                        // TODO: this does not work on MySQL for columns with foreign keys. Here the FK must be dropped first by name.
                         let name = renderer.quote(&name);
                         lines.push(format!("DROP COLUMN {}", name));
                     }
@@ -157,13 +223,13 @@ fn render_raw_sql(step: &SqlMigrationStep, sql_family: SqlFamily, schema_name: &
                         }
                         _ => (),
                     },
-                }
+                };
             }
-            format!(
+            Ok(Some(format!(
                 "ALTER TABLE {} {};",
                 renderer.quote_with_schema(&schema_name, &table.name),
                 lines.join(",\n")
-            )
+            )))
         }
         SqlMigrationStep::CreateIndex(CreateIndex { table, index }) => {
             let Index { name, columns, tpe } = index;
@@ -180,43 +246,44 @@ fn render_raw_sql(step: &SqlMigrationStep, sql_family: SqlFamily, schema_name: &
                 _ => renderer.quote_with_schema(&schema_name, &table),
             };
             let columns: Vec<String> = columns.iter().map(|c| renderer.quote(c)).collect();
-            format!(
+            Ok(Some(format!(
                 "CREATE {} INDEX {} ON {}({})",
                 index_type,
                 index_name,
                 table_reference,
                 columns.join(",")
-            )
+            )))
         }
         SqlMigrationStep::DropIndex(DropIndex { table, name }) => match sql_family {
-            SqlFamily::Mysql => format!(
+            SqlFamily::Mysql => Ok(Some(format!(
                 "DROP INDEX {} ON {}",
                 renderer.quote(&name),
                 renderer.quote_with_schema(&schema_name, &table),
-            ),
-            SqlFamily::Postgres | SqlFamily::Sqlite => {
-                format!("DROP INDEX {}", renderer.quote_with_schema(&schema_name, &name),)
-            }
+            ))),
+            SqlFamily::Postgres | SqlFamily::Sqlite => Ok(Some(format!(
+                "DROP INDEX {}",
+                renderer.quote_with_schema(&schema_name, &name)
+            ))),
         },
         SqlMigrationStep::AlterIndex(AlterIndex {
             table,
             index_name,
             index_new_name,
         }) => match sql_family {
-            SqlFamily::Mysql => format!(
+            SqlFamily::Mysql => Ok(Some(format!(
                 "ALTER TABLE {table_name} RENAME INDEX {index_name} TO {index_new_name}",
                 table_name = renderer.quote_with_schema(&schema_name, &table),
                 index_name = renderer.quote(index_name),
                 index_new_name = renderer.quote(index_new_name)
-            ),
-            SqlFamily::Postgres => format!(
+            ))),
+            SqlFamily::Postgres => Ok(Some(format!(
                 "ALTER INDEX {} RENAME TO {}",
                 renderer.quote_with_schema(&schema_name, index_name),
                 renderer.quote(index_new_name)
-            ),
+            ))),
             SqlFamily::Sqlite => unimplemented!("Index renaming on SQLite."),
         },
-        SqlMigrationStep::RawSql { raw } => raw.to_string(),
+        SqlMigrationStep::RawSql { raw } => Ok(Some(raw.to_owned())),
     }
 }
 

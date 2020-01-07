@@ -1,5 +1,5 @@
 use crate::common::*;
-use datamodel::common::{ScalarType, ScalarValue};
+use datamodel::{common::ScalarType, DefaultValue, ValueGenerator};
 
 #[test]
 fn correctly_handle_server_side_now_function() {
@@ -18,10 +18,8 @@ fn correctly_handle_server_side_now_function() {
     user_model
         .assert_has_field("signupDate")
         .assert_base_type(&ScalarType::DateTime)
-        .assert_default_value(ScalarValue::Expression(
-            String::from("now"),
-            ScalarType::DateTime,
-            vec![],
+        .assert_default_value(DefaultValue::Expression(
+            ValueGenerator::new("now".to_owned(), Vec::new()).unwrap(),
         ));
 }
 
@@ -42,10 +40,8 @@ fn correctly_handle_server_side_cuid_function() {
     user_model
         .assert_has_field("someId")
         .assert_base_type(&ScalarType::String)
-        .assert_default_value(ScalarValue::Expression(
-            String::from("cuid"),
-            ScalarType::String,
-            vec![],
+        .assert_default_value(DefaultValue::Expression(
+            ValueGenerator::new("cuid".to_owned(), Vec::new()).unwrap(),
         ));
 }
 
@@ -66,9 +62,7 @@ fn correctly_handle_server_side_uuid_function() {
     user_model
         .assert_has_field("someId")
         .assert_base_type(&ScalarType::String)
-        .assert_default_value(ScalarValue::Expression(
-            String::from("uuid"),
-            ScalarType::String,
-            vec![],
+        .assert_default_value(DefaultValue::Expression(
+            ValueGenerator::new("uuid".to_owned(), Vec::new()).unwrap(),
         ));
 }

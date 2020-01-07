@@ -207,8 +207,8 @@ impl AliasedSelect for RelationFilter {
         let condition = self.condition.clone();
         let relation = self.field.relation();
 
-        let this_column = self.field.relation_column().table(alias.to_string(None));
-        let other_column = self.field.opposite_column().table(alias.to_string(None));
+        let this_column = self.field.relation_column(false).table(alias.to_string(None));
+        let other_column = self.field.opposite_column(false).table(alias.to_string(None));
 
         // Normalize filter tree
         let compacted = match *self.nested_filter {

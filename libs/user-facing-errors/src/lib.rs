@@ -42,11 +42,45 @@ pub struct UnknownError {
     pub backtrace: Option<String>,
 }
 
-impl UnknownError {
+#[derive(Serialize, PartialEq, Debug)]
+pub struct Error {
+    is_panic: bool,
+    #[serde(flatten)]
+    inner: ErrorType,
+}
+
+#[derive(Serialize, PartialEq, Debug)]
+#[serde(untagged)]
+enum ErrorType {
+    Known(KnownError),
+    Unknown(UnknownError),
+}
+
+impl Error {
+    pub fn message(&self) -> &str {
+        match &self.inner {
+            ErrorType::Known(err) => &err.message,
+            ErrorType::Unknown(err) => &err.message,
+        }
+    }
+
+    pub fn new_non_panic_with_current_backtrace(message: String) -> Self {
+        Error {
+            inner: ErrorType::Unknown(UnknownError {
+                message,
+                backtrace: Some(format!("{:?}", backtrace::Backtrace::new())),
+            }),
+            is_panic: false,
+        }
+    }
+
     pub fn from_fail(err: impl Fail) -> Self {
-        UnknownError {
-            message: format!("{}", err),
-            backtrace: err.backtrace().map(|bt| bt.to_string()),
+        Error {
+            inner: ErrorType::Unknown(UnknownError {
+                message: format!("{}", err),
+                backtrace: err.backtrace().map(|bt| bt.to_string()),
+            }),
+            is_panic: false,
         }
     }
 
@@ -60,18 +94,24 @@ impl UnknownError {
             .map(|loc| format!("{}", loc))
             .unwrap_or_else(|| "<unknown location>".to_owned());
 
-        UnknownError {
-            message: format!("[{}] {}", location, message),
-            backtrace,
+        Error {
+            inner: ErrorType::Unknown(UnknownError {
+                message: format!("[{}] {}", location, message),
+                backtrace,
+            }),
+            is_panic: true,
         }
     }
 
     pub fn from_panic_payload(panic_payload: &(dyn std::any::Any + Send + 'static)) -> Self {
         let message = Self::extract_panic_message(panic_payload).unwrap_or_else(|| "<unknown panic>".to_owned());
 
-        UnknownError {
-            message,
-            backtrace: None,
+        Error {
+            inner: ErrorType::Unknown(UnknownError {
+                message,
+                backtrace: None,
+            }),
+            is_panic: true,
         }
     }
 
@@ -83,30 +123,24 @@ impl UnknownError {
     }
 }
 
-#[derive(Serialize, PartialEq, Debug)]
-#[serde(untagged)]
-pub enum Error {
-    Known(KnownError),
-    Unknown(UnknownError),
-}
-
-impl Error {
-    pub fn message(&self) -> &str {
-        match self {
-            Error::Known(err) => &err.message,
-            Error::Unknown(err) => &err.message,
-        }
-    }
+pub fn new_backtrace() -> backtrace::Backtrace {
+    backtrace::Backtrace::new()
 }
 
 impl From<UnknownError> for Error {
     fn from(unknown_error: UnknownError) -> Self {
-        Error::Unknown(unknown_error)
+        Error {
+            inner: ErrorType::Unknown(unknown_error),
+            is_panic: false,
+        }
     }
 }
 
 impl From<KnownError> for Error {
     fn from(known_error: KnownError) -> Self {
-        Error::Known(known_error)
+        Error {
+            is_panic: false,
+            inner: ErrorType::Known(known_error),
+        }
     }
 }

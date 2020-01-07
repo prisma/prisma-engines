@@ -5,27 +5,32 @@ use std::convert::TryFrom;
 
 const PARAMETER_LIMIT: usize = 10000;
 
-pub fn create_record(model: &ModelRef, mut args: PrismaArgs) -> (Insert<'static>, Option<RecordIdentifier>) {
-    let mut id_fields = model.primary_identifier();
-    // let id_field = if id_fields.len() == 1 {
-    //     id_fields.pop().unwrap()
-    // } else {
-    //     panic!("Multi-field IDs are not (yet) supported.")
+pub fn create_record(model: &ModelRef, mut args: PrismaArgs) -> (Insert<'static>, Option<GraphqlId>) {
+    let id_field = model.fields().id();
+    let return_id = args
+        .get_field_value(&id_field.name)
+        .map(|id| GraphqlId::try_from(id).expect("Could not convert prisma value to graphqlid"));
+
+    // let mut id_fields = model.primary_identifier();
+    // // let id_field = if id_fields.len() == 1 {
+    // //     id_fields.pop().unwrap()
+    // // } else {
+    // //     panic!("Multi-field IDs are not (yet) supported.")
+    // // };
+
+    // let return_id = match args.get_field_value(&id_field.name) {
+    //     _ if id_field.is_auto_generated => None,
+
+    //     Some(PrismaValue::Null) | None => {
+    //         let id = model.generate_id();
+    //         args.insert(id_field.name.as_str(), id.clone());
+    //         Some(id)
+    //     }
+
+    //     Some(prisma_value) => {
+    //         Some(GraphqlId::try_from(prisma_value).expect("Could not convert prisma value to graphqlid"))
+    //     }
     // };
-
-    let return_id = match args.get_field_value(&id_field.name) {
-        _ if id_field.is_auto_generated => None,
-
-        Some(PrismaValue::Null) | None => {
-            let id = model.generate_id();
-            args.insert(id_field.name.as_str(), id.clone());
-            Some(id)
-        }
-
-        Some(prisma_value) => {
-            Some(GraphqlId::try_from(prisma_value).expect("Could not convert prisma value to graphqlid"))
-        }
-    };
 
     let fields: Vec<&Field> = model
         .fields()
@@ -53,8 +58,8 @@ pub fn create_relation_table_records(
     child_ids: &[GraphqlId],
 ) -> Query<'static> {
     let relation = field.relation();
-    let parent_column = field.relation_column();
-    let child_column = field.opposite_column();
+    let parent_column = field.relation_column(false);
+    let child_column = field.opposite_column(false);
 
     let mut columns = vec![parent_column.name.to_string(), child_column.name.to_string()];
     if let Some(id_col) = relation.id_column() {
@@ -83,8 +88,8 @@ pub fn delete_relation_table_records(
     child_ids: &[GraphqlId],
 ) -> Query<'static> {
     let relation = field.relation();
-    let parent_column = field.relation_column();
-    let child_column = field.opposite_column();
+    let parent_column = field.relation_column(false);
+    let child_column = field.opposite_column(false);
 
     let parent_id_criteria = parent_column.equals(parent_id);
     let child_id_criteria = child_column.in_selection(child_ids.to_owned());

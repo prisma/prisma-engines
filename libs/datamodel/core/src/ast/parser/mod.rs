@@ -44,7 +44,7 @@ pub fn parse_expression(token: &pest::iterators::Pair<'_, Rule>) -> Expression {
         Rule::constant_literal => Expression::ConstantValue(current.as_str().to_string(), Span::from_pest(current.as_span())),
         Rule::function => parse_function(&current),
         Rule::array_expression => parse_array(&current),
-        _ => unreachable!("Encounterd impossible literal during parsing: {:?}", current.tokens())
+        _ => unreachable!("Encountered impossible literal during parsing: {:?}", current.tokens())
     };
 }
 
@@ -55,12 +55,12 @@ fn parse_function(token: &pest::iterators::Pair<'_, Rule>) -> Expression {
     match_children! { token, current,
         Rule::identifier => name = Some(current.as_str().to_string()),
         Rule::argument_value => arguments.push(parse_arg_value(&current)),
-        _ => unreachable!("Encounterd impossible function during parsing: {:?}", current.tokens())
+        _ => unreachable!("Encountered impossible function during parsing: {:?}", current.tokens())
     };
 
     match name {
         Some(name) => Expression::Function(name, arguments, Span::from_pest(token.as_span())),
-        _ => unreachable!("Encounterd impossible function during parsing: {:?}", token.as_str()),
+        _ => unreachable!("Encountered impossible function during parsing: {:?}", token.as_str()),
     }
 }
 
@@ -69,7 +69,7 @@ fn parse_array(token: &pest::iterators::Pair<'_, Rule>) -> Expression {
 
     match_children! { token, current,
         Rule::expression => elements.push(parse_expression(&current)),
-        _ => unreachable!("Encounterd impossible array during parsing: {:?}", current.tokens())
+        _ => unreachable!("Encountered impossible array during parsing: {:?}", current.tokens())
     };
 
     Expression::Array(elements, Span::from_pest(token.as_span()))
@@ -78,7 +78,7 @@ fn parse_array(token: &pest::iterators::Pair<'_, Rule>) -> Expression {
 fn parse_arg_value(token: &pest::iterators::Pair<'_, Rule>) -> Expression {
     match_first! { token, current,
         Rule::expression => parse_expression(&current),
-        _ => unreachable!("Encounterd impossible value during parsing: {:?}", current.tokens())
+        _ => unreachable!("Encountered impossible value during parsing: {:?}", current.tokens())
     }
 }
 
@@ -115,7 +115,7 @@ fn parse_directive_arg(token: &pest::iterators::Pair<'_, Rule>) -> Argument {
     match_children! { token, current,
         Rule::argument_name => name = Some(current.to_id()),
         Rule::argument_value => argument = Some(parse_arg_value(&current)),
-        _ => unreachable!("Encounterd impossible directive argument during parsing: {:?}", current.tokens())
+        _ => unreachable!("Encountered impossible directive argument during parsing: {:?}", current.tokens())
     };
 
     match (name, argument) {
@@ -125,7 +125,7 @@ fn parse_directive_arg(token: &pest::iterators::Pair<'_, Rule>) -> Argument {
             span: Span::from_pest(token.as_span()),
         },
         _ => panic!(
-            "Encounterd impossible directive arg during parsing: {:?}",
+            "Encountered impossible directive arg during parsing: {:?}",
             token.as_str()
         ),
     }
@@ -141,7 +141,7 @@ fn parse_directive_args(token: &pest::iterators::Pair<'_, Rule>, arguments: &mut
             value: parse_arg_value(&current),
             span: Span::from_pest(current.as_span())
         }),
-        _ => unreachable!("Encounterd impossible directive argument during parsing: {:?}", current.tokens())
+        _ => unreachable!("Encountered impossible directive argument during parsing: {:?}", current.tokens())
     }
 }
 
@@ -152,7 +152,7 @@ fn parse_directive(token: &pest::iterators::Pair<'_, Rule>) -> Directive {
     match_children! { token, current,
         Rule::directive_name => name = Some(current.to_id()),
         Rule::directive_arguments => parse_directive_args(&current, &mut arguments),
-        _ => unreachable!("Encounterd impossible directive during parsing: {:?}", current.tokens())
+        _ => unreachable!("Encountered impossible directive during parsing: {:?}", current.tokens())
     };
 
     match name {
@@ -161,7 +161,7 @@ fn parse_directive(token: &pest::iterators::Pair<'_, Rule>) -> Directive {
             arguments,
             span: Span::from_pest(token.as_span()),
         },
-        _ => panic!("Encounterd impossible type during parsing: {:?}", token.as_str()),
+        _ => panic!("Encountered impossible type during parsing: {:?}", token.as_str()),
     }
 }
 
@@ -169,7 +169,7 @@ fn parse_directive(token: &pest::iterators::Pair<'_, Rule>) -> Directive {
 fn parse_base_type(token: &pest::iterators::Pair<'_, Rule>) -> String {
     match_first! { token, current,
         Rule::identifier => current.as_str().to_string(),
-        _ => unreachable!("Encounterd impossible type during parsing: {:?}", current.tokens())
+        _ => unreachable!("Encountered impossible type during parsing: {:?}", current.tokens())
     }
 }
 
@@ -186,7 +186,7 @@ fn parse_field_type(token: &pest::iterators::Pair<'_, Rule>) -> Result<(FieldAri
             "To specify a list, please use `Type[]` instead of `[Type]`.",
             Span::from_pest(current.as_span())
         )),
-        _ => unreachable!("Encounterd impossible field during parsing: {:?}", current.tokens())
+        _ => unreachable!("Encountered impossible field during parsing: {:?}", current.tokens())
     }
 }
 
@@ -209,7 +209,7 @@ fn parse_field(token: &pest::iterators::Pair<'_, Rule>) -> Result<Field, Datamod
             Span::from_pest(current.as_span()))),
         Rule::directive => directives.push(parse_directive(&current)),
         Rule::doc_comment => comments.push(parse_doc_comment(&current)),
-        _ => unreachable!("Encounterd impossible field declaration during parsing: {:?}", current.tokens())
+        _ => unreachable!("Encountered impossible field declaration during parsing: {:?}", current.tokens())
     }
 
     match (name, field_type) {
@@ -226,7 +226,7 @@ fn parse_field(token: &pest::iterators::Pair<'_, Rule>) -> Result<Field, Datamod
             span: Span::from_pest(token.as_span()),
         }),
         _ => panic!(
-            "Encounterd impossible field declaration during parsing: {:?}",
+            "Encountered impossible field declaration during parsing: {:?}",
             token.as_str()
         ),
     }
@@ -255,7 +255,7 @@ fn parse_model(token: &pest::iterators::Pair<'_, Rule>) -> Result<Model, ErrorCo
             }
         },
         Rule::doc_comment => comments.push(parse_doc_comment(&current)),
-        _ => unreachable!("Encounterd impossible model declaration during parsing: {:?}", current.tokens())
+        _ => unreachable!("Encountered impossible model declaration during parsing: {:?}", current.tokens())
     }
 
     errors.ok()?;
@@ -269,7 +269,7 @@ fn parse_model(token: &pest::iterators::Pair<'_, Rule>) -> Result<Model, ErrorCo
             span: Span::from_pest(token.as_span()),
         }),
         _ => panic!(
-            "Encounterd impossible model declaration during parsing: {:?}",
+            "Encountered impossible model declaration during parsing: {:?}",
             token.as_str()
         ),
     }
@@ -288,7 +288,7 @@ fn parse_enum(token: &pest::iterators::Pair<'_, Rule>) -> Enum {
         Rule::directive => directives.push(parse_directive(&current)),
         Rule::enum_field_declaration => values.push(EnumValue { name: current.as_str().to_string(), span: Span::from_pest(current.as_span()) }),
         Rule::doc_comment => comments.push(parse_doc_comment(&current)),
-        _ => unreachable!("Encounterd impossible enum declaration during parsing: {:?}", current.tokens())
+        _ => unreachable!("Encountered impossible enum declaration during parsing: {:?}", current.tokens())
     }
 
     match name {
@@ -300,7 +300,7 @@ fn parse_enum(token: &pest::iterators::Pair<'_, Rule>) -> Enum {
             span: Span::from_pest(token.as_span()),
         },
         _ => panic!(
-            "Encounterd impossible enum declaration during parsing, name is missing: {:?}",
+            "Encountered impossible enum declaration during parsing, name is missing: {:?}",
             token.as_str()
         ),
     }
@@ -313,7 +313,7 @@ fn parse_key_value(token: &pest::iterators::Pair<'_, Rule>) -> Argument {
     match_children! { token, current,
         Rule::identifier => name = Some(current.to_id()),
         Rule::expression => value = Some(parse_expression(&current)),
-        _ => unreachable!("Encounterd impossible source property declaration during parsing: {:?}", current.tokens())
+        _ => unreachable!("Encountered impossible source property declaration during parsing: {:?}", current.tokens())
     }
 
     match (name, value) {
@@ -323,7 +323,7 @@ fn parse_key_value(token: &pest::iterators::Pair<'_, Rule>) -> Argument {
             span: Span::from_pest(token.as_span()),
         },
         _ => panic!(
-            "Encounterd impossible source property declaration during parsing: {:?}",
+            "Encountered impossible source property declaration during parsing: {:?}",
             token.as_str()
         ),
     }
@@ -340,7 +340,7 @@ fn parse_source(token: &pest::iterators::Pair<'_, Rule>) -> SourceConfig {
         Rule::identifier => name = Some(current.to_id()),
         Rule::key_value => properties.push(parse_key_value(&current)),
         Rule::doc_comment => comments.push(parse_doc_comment(&current)),
-        _ => unreachable!("Encounterd impossible source declaration during parsing: {:?}", current.tokens())
+        _ => unreachable!("Encountered impossible source declaration during parsing: {:?}", current.tokens())
     };
 
     match name {
@@ -351,7 +351,7 @@ fn parse_source(token: &pest::iterators::Pair<'_, Rule>) -> SourceConfig {
             span: Span::from_pest(token.as_span()),
         },
         _ => panic!(
-            "Encounterd impossible source declaration during parsing, name is missing: {:?}",
+            "Encountered impossible source declaration during parsing, name is missing: {:?}",
             token.as_str()
         ),
     }
@@ -368,7 +368,7 @@ fn parse_generator(token: &pest::iterators::Pair<'_, Rule>) -> GeneratorConfig {
         Rule::identifier => name = Some(current.to_id()),
         Rule::key_value => properties.push(parse_key_value(&current)),
         Rule::doc_comment => comments.push(parse_doc_comment(&current)),
-        _ => unreachable!("Encounterd impossible generator declaration during parsing: {:?}", current.tokens())
+        _ => unreachable!("Encountered impossible generator declaration during parsing: {:?}", current.tokens())
     };
 
     match name {
@@ -379,7 +379,7 @@ fn parse_generator(token: &pest::iterators::Pair<'_, Rule>) -> GeneratorConfig {
             span: Span::from_pest(token.as_span()),
         },
         _ => panic!(
-            "Encounterd impossible generator declaration during parsing, name is missing: {:?}",
+            "Encountered impossible generator declaration during parsing, name is missing: {:?}",
             token.as_str()
         ),
     }
@@ -400,7 +400,7 @@ fn parse_type(token: &pest::iterators::Pair<'_, Rule>) -> Field {
         },
         Rule::directive => directives.push(parse_directive(&current)),
         Rule::doc_comment => comments.push(parse_doc_comment(&current)),
-        _ => unreachable!("Encounterd impossible custom type during parsing: {:?}", current.tokens())
+        _ => unreachable!("Encountered impossible custom type during parsing: {:?}", current.tokens())
     }
 
     match (name, base_type) {
@@ -417,7 +417,7 @@ fn parse_type(token: &pest::iterators::Pair<'_, Rule>) -> Field {
             span: Span::from_pest(token.as_span()),
         },
         _ => panic!(
-            "Encounterd impossible custom type declaration during parsing: {:?}",
+            "Encountered impossible custom type declaration during parsing: {:?}",
             token.as_str()
         ),
     }
@@ -445,7 +445,7 @@ pub fn parse(datamodel_string: &str) -> Result<SchemaAst, ErrorCollection> {
                 Rule::generator_block => models.push(Top::Generator(parse_generator(&current))),
                 Rule::type_declaration => models.push(Top::Type(parse_type(&current))),
                 Rule::EOI => {},
-                _ => panic!("Encounterd impossible datamodel declaration during parsing: {:?}", current.tokens())
+                _ => panic!("Encountered impossible datamodel declaration during parsing: {:?}", current.tokens())
             }
 
             errors.ok()?;

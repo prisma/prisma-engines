@@ -39,13 +39,13 @@ pub enum ErrorKind {
     ConnectionError(Error),
 
     #[fail(display = "Error querying the database: {}", _0)]
-    QueryError(Error),
+    QueryError(Box<dyn std::error::Error + Send + Sync>),
 
     #[fail(display = "The provided arguments are not supported.")]
     InvalidConnectionArguments,
 
     #[fail(display = "The column value was different from the model")]
-    ColumnReadFailure(Error),
+    ColumnReadFailure(Box<dyn std::error::Error + Send + Sync>),
 
     #[fail(display = "Field cannot be null: {}", field)]
     FieldCannotBeNull { field: String },

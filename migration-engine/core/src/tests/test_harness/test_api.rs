@@ -3,18 +3,26 @@ use super::{
     misc_helpers::{mysql_migration_connector, postgres_migration_connector, sqlite_migration_connector, test_api},
     InferAndApplyOutput,
 };
-use migration_connector::{MigrationPersistence, MigrationStep};
-use migration_core::{
+use crate::{
     api::{GenericApi, MigrationApi},
     commands::{
         ApplyMigrationInput, InferMigrationStepsInput, MigrationStepsResultOutput, UnapplyMigrationInput,
         UnapplyMigrationOutput,
     },
 };
+use migration_connector::{MigrationPersistence, MigrationStep};
 use quaint::prelude::{ConnectionInfo, Queryable, SqlFamily};
 use sql_schema_describer::*;
 use std::sync::Arc;
 use test_setup::*;
+
+mod apply;
+mod infer;
+mod infer_apply;
+
+pub use apply::Apply;
+pub use infer::Infer;
+pub use infer_apply::InferApply;
 
 /// An atomic counter to generate unique migration IDs in tests.
 static MIGRATION_ID_COUNTER: std::sync::atomic::AtomicUsize = std::sync::atomic::AtomicUsize::new(0);
@@ -88,56 +96,17 @@ impl TestApi {
         }
     }
 
-    pub async fn infer_and_apply(&self, datamodel: &str) -> InferAndApplyOutput {
-        let migration_output = self
-            .infer_and_apply_with_options(InferAndApplyBuilder::new(datamodel).build())
-            .await
-            .unwrap();
-
-        InferAndApplyOutput {
-            migration_output,
-            sql_schema: self.describe_database().await.unwrap(),
+    pub fn infer_apply<'a>(&'a self, schema: &'a str) -> InferApply<'a> {
+        InferApply {
+            api: self,
+            force: None,
+            migration_id: None,
+            schema,
         }
     }
 
-    pub async fn infer_and_apply_with_options(
-        &self,
-        options: InferAndApply,
-    ) -> Result<MigrationStepsResultOutput, failure::Error> {
-        let InferAndApply {
-            migration_id,
-            force,
-            datamodel,
-        } = options;
-
-        let input = InferMigrationStepsInput {
-            migration_id: migration_id.clone(),
-            datamodel,
-            assume_to_be_applied: Vec::new(),
-        };
-
-        let steps = self.run_infer_command(input).await.0.datamodel_steps;
-
-        let input = ApplyMigrationInput {
-            migration_id,
-            steps,
-            force,
-        };
-
-        let migration_output = self.api.apply_migration(&input).await?;
-
-        Ok(migration_output)
-    }
-
-    pub async fn infer_and_apply_with_migration_id(&self, datamodel: &str, migration_id: &str) -> InferAndApplyOutput {
-        let migration_output = self
-            .infer_and_apply_with_options(
-                InferAndApplyBuilder::new(datamodel)
-                    .migration_id(Some(migration_id.into()))
-                    .build(),
-            )
-            .await
-            .unwrap();
+    pub async fn infer_and_apply(&self, schema: &str) -> InferAndApplyOutput {
+        let migration_output = self.infer_apply(schema).send().await.unwrap();
 
         InferAndApplyOutput {
             migration_output,
@@ -147,12 +116,37 @@ impl TestApi {
 
     pub async fn execute_command<'a, C>(&self, input: &'a C::Input) -> Result<C::Output, user_facing_errors::Error>
     where
-        C: migration_core::commands::MigrationCommand,
+        C: crate::commands::MigrationCommand,
     {
         self.api
             .handle_command::<C>(input)
             .await
             .map_err(|err| self.api.render_error(err))
+    }
+
+    pub fn infer<'a>(&'a self, dm: String) -> Infer<'a> {
+        Infer {
+            datamodel: dm,
+            api: self,
+            assume_to_be_applied: None,
+            migration_id: None,
+        }
+    }
+
+    pub fn apply<'a>(&'a self) -> Apply<'a> {
+        Apply {
+            api: self,
+            migration_id: None,
+            steps: None,
+            force: None,
+        }
+    }
+
+    pub async fn apply_migration_with(
+        &self,
+        input: &ApplyMigrationInput,
+    ) -> Result<MigrationStepsResultOutput, anyhow::Error> {
+        Ok(self.api.apply_migration(&input).await?)
     }
 
     pub async fn run_infer_command(&self, input: InferMigrationStepsInput) -> InferOutput {
@@ -195,15 +189,12 @@ impl TestApi {
         }
     }
 
-    pub async fn describe_database(&self) -> Result<SqlSchema, failure::Error> {
-        use failure::ResultExt;
-
+    pub async fn describe_database(&self) -> Result<SqlSchema, anyhow::Error> {
         let mut result = self
             .describer()
             .describe(self.connection_info().unwrap().schema_name())
             .await
-            .context("Description failed")?;
-
+            .expect("Description failed");
 
         // the presence of the _Migration table makes assertions harder. Therefore remove it from the result.
         result.tables = result.tables.into_iter().filter(|t| t.name != "_Migration").collect();
@@ -355,59 +346,4 @@ async fn run_full_sql(database: &Arc<dyn Queryable + Send + Sync>, full_sql: &st
 pub struct UnapplyOutput {
     pub sql_schema: SqlSchema,
     pub output: UnapplyMigrationOutput,
-}
-
-#[derive(Debug)]
-pub struct InferAndApplyBuilder {
-    migration_id: Option<String>,
-    force: Option<bool>,
-    datamodel: String,
-}
-
-impl InferAndApplyBuilder {
-    pub fn new(datamodel: &str) -> Self {
-        InferAndApplyBuilder {
-            migration_id: None,
-            force: None,
-            datamodel: datamodel.to_owned(),
-        }
-    }
-
-    pub fn force(mut self, force: Option<bool>) -> Self {
-        self.force = force;
-        self
-    }
-
-    pub fn migration_id(mut self, migration_id: Option<String>) -> Self {
-        self.migration_id = migration_id;
-        self
-    }
-
-    pub fn build(self) -> InferAndApply {
-        let InferAndApplyBuilder {
-            migration_id,
-            force,
-            datamodel,
-        } = self;
-
-        let migration_id = migration_id.unwrap_or_else(|| {
-            format!(
-                "migration-{}",
-                MIGRATION_ID_COUNTER.fetch_add(1, std::sync::atomic::Ordering::Relaxed)
-            )
-        });
-
-        InferAndApply {
-            migration_id,
-            force,
-            datamodel,
-        }
-    }
-}
-
-#[derive(Debug)]
-pub struct InferAndApply {
-    migration_id: String,
-    force: Option<bool>,
-    datamodel: String,
 }

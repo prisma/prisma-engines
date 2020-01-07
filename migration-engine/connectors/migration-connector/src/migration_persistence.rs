@@ -72,6 +72,19 @@ pub trait MigrationPersistence: Send + Sync + 'static {
     /// Used by the MigrationApplier to write the progress of a [Migration](struct.Migration.html)
     /// into the database.
     async fn update(&self, params: &MigrationUpdateParams) -> Result<(), ConnectorError>;
+
+    /// Returns whether the migration with the provided migration id has already been successfully applied.
+    ///
+    /// The default impl will load all migrations and scan for the provided migration id. Implementors are encouraged to implement this more efficiently.
+    async fn migration_is_already_applied(&self, migration_id: &str) -> Result<bool, ConnectorError> {
+        let migrations = self.load_all().await?;
+
+        let already_applied = migrations
+            .iter()
+            .any(|migration| migration.status == MigrationStatus::MigrationSuccess && migration.name == migration_id);
+
+        Ok(already_applied)
+    }
 }
 
 /// The representation of a migration as persisted through [MigrationPersistence](trait.MigrationPersistence.html).

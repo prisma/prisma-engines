@@ -134,6 +134,7 @@ impl<'a> SqlSchemaCalculator<'a> {
                     TempManifestationHolder::Inline {
                         in_table_of_model,
                         column: column_name,
+                        referenced_fields,
                     } if in_table_of_model == &model_table.model.name => {
                         let (model, related_model) = if model_table.model == relation.model_a {
                             (&relation.model_a, &relation.model_b)
@@ -143,27 +144,71 @@ impl<'a> SqlSchemaCalculator<'a> {
 
                         let field = model.fields().find(|f| &f.db_name() == column_name).unwrap();
 
-                        let column = sql::Column {
-                            name: column_name.to_string(),
-                            tpe: column_type_for_scalar_type(
-                                scalar_type_for_field(related_model.id_field()?),
-                                column_arity(&field),
-                            ),
-                            default: None,
-                            auto_increment: false,
+                        let referenced_fields: Vec<&Field> = if referenced_fields.is_empty() {
+                            vec![related_model.id_field()?]
+                        } else {
+                            let fields: Vec<_> = related_model
+                                .fields()
+                                .filter(|field| {
+                                    referenced_fields
+                                        .iter()
+                                        .any(|referenced| referenced.as_str() == field.name)
+                                })
+                                .collect();
+
+                            if fields.len() != referenced_fields.len() {
+                                return Err(crate::SqlError::Generic(format!(
+                                    "References to unknown fields {referenced_fields:?} on `{model_name}`",
+                                    model_name = related_model.name,
+                                    referenced_fields = referenced_fields,
+                                )));
+                            }
+
+                            fields
                         };
+
+                        let columns: Vec<sql::Column> = if referenced_fields.len() == 1 {
+                            let referenced_field = referenced_fields.iter().next().unwrap();
+
+                            vec![sql::Column {
+                                name: column_name.clone(),
+                                tpe: column_type_for_scalar_type(
+                                    scalar_type_for_field(referenced_field),
+                                    column_arity(&field),
+                                ),
+                                default: None,
+                                auto_increment: false,
+                            }]
+                        } else {
+                            referenced_fields
+                                .iter()
+                                .map(|referenced_field| sql::Column {
+                                    name: format!("{}_{}", column_name, referenced_field.db_name()),
+                                    tpe: column_type_for_scalar_type(
+                                        scalar_type_for_field(referenced_field),
+                                        column_arity(&field),
+                                    ),
+                                    default: None,
+                                    auto_increment: false,
+                                })
+                                .collect()
+                        };
+
                         let foreign_key = sql::ForeignKey {
                             constraint_name: None,
-                            columns: vec![column_name.to_string()],
+                            columns: columns.iter().map(|col| col.name.to_owned()).collect(),
                             referenced_table: related_model.db_name(),
-                            referenced_columns: vec![related_model.id_field()?.db_name()],
-                            on_delete_action: if column.is_required() {
-                                sql::ForeignKeyAction::Restrict
-                            } else {
-                                sql::ForeignKeyAction::SetNull
+                            referenced_columns: referenced_fields
+                                .iter()
+                                .map(|referenced_field| referenced_field.db_name())
+                                .collect(),
+                            on_delete_action: match column_arity(&field) {
+                                ColumnArity::Required => sql::ForeignKeyAction::Restrict,
+                                _ => sql::ForeignKeyAction::SetNull,
                             },
                         };
-                        model_table.table.columns.push(column);
+
+                        model_table.table.columns.extend(columns);
                         model_table.table.foreign_keys.push(foreign_key);
 
                         if relation.is_one_to_one() {
@@ -295,17 +340,21 @@ impl FieldExtensions for Field {
     fn migration_value(&self, datamodel: &Datamodel) -> ScalarValue {
         self.default_value
             .clone()
+            .and_then(|df| df.get())
             .unwrap_or_else(|| default_migration_value(&self.field_type, datamodel))
     }
 
     fn migration_value_new(&self, datamodel: &Datamodel) -> Option<String> {
-        let value = match &self.default_value {
-            Some(x) => match x {
-                ScalarValue::Expression(_, _, _) => default_migration_value(&self.field_type, datamodel),
-                x => x.clone(),
+        let value = match (&self.default_value, self.arity) {
+            (Some(df), _) => match df {
+                dml::DefaultValue::Single(s) => s.clone(),
+                dml::DefaultValue::Expression(_) => default_migration_value(&self.field_type, datamodel),
             },
-            None => default_migration_value(&self.field_type, datamodel),
+            // This is a temporary hack until we can report impossible unexecutable migrations.
+            (None, FieldArity::Required) => default_migration_value(&self.field_type, datamodel),
+            (None, _) => return None,
         };
+
         let result = match value {
             ScalarValue::Boolean(x) => {
                 if x {
@@ -329,6 +378,7 @@ impl FieldExtensions for Field {
                 unreachable!("expressions must have been filtered out in the preceding pattern match")
             }
         };
+
         if self.is_id() {
             None
         } else {

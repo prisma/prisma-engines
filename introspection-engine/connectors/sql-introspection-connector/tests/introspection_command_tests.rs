@@ -1,5 +1,5 @@
-use std::collections::HashSet;
 use pretty_assertions::assert_eq;
+use std::collections::HashSet;
 
 use datamodel::{
     common::{ScalarType, ScalarValue},
@@ -209,7 +209,7 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
             is_embedded: false,
             fields: vec![
                 Field {
-                    name: "no-default".to_string(),
+                    name: "no_default".to_string(),
                     arity: FieldArity::Optional,
                     field_type: FieldType::Base(ScalarType::Int),
                     database_name: None,
@@ -221,11 +221,11 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
                     is_updated_at: false,
                 },
                 Field {
-                    name: "int-default".to_string(),
+                    name: "int_default".to_string(),
                     arity: FieldArity::Optional,
                     field_type: FieldType::Base(ScalarType::Int),
                     database_name: None,
-                    default_value: Some(ScalarValue::Int(1)),
+                    default_value: Some(dml::DefaultValue::Single(ScalarValue::Int(1))),
                     is_unique: false,
                     id_info: None,
                     documentation: None,
@@ -233,11 +233,11 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
                     is_updated_at: false,
                 },
                 Field {
-                    name: "bool-default".to_string(),
+                    name: "bool_default".to_string(),
                     arity: FieldArity::Optional,
                     field_type: FieldType::Base(ScalarType::Boolean),
                     database_name: None,
-                    default_value: Some(ScalarValue::Boolean(true)),
+                    default_value: Some(dml::DefaultValue::Single(ScalarValue::Boolean(true))),
                     is_unique: false,
                     id_info: None,
                     documentation: None,
@@ -245,11 +245,11 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
                     is_updated_at: false,
                 },
                 Field {
-                    name: "float-default".to_string(),
+                    name: "float_default".to_string(),
                     arity: FieldArity::Optional,
                     field_type: FieldType::Base(ScalarType::Float),
                     database_name: None,
-                    default_value: Some(ScalarValue::Float(1.0)),
+                    default_value: Some(dml::DefaultValue::Single(ScalarValue::Float(1.0))),
                     is_unique: false,
                     id_info: None,
                     documentation: None,
@@ -257,11 +257,11 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
                     is_updated_at: false,
                 },
                 Field {
-                    name: "string-default".to_string(),
+                    name: "string_default".to_string(),
                     arity: FieldArity::Optional,
                     field_type: FieldType::Base(ScalarType::String),
                     database_name: None,
-                    default_value: Some(ScalarValue::String("default".to_string())),
+                    default_value: Some(dml::DefaultValue::Single(ScalarValue::String("default".to_string()))),
                     is_unique: false,
                     id_info: None,
                     documentation: None,
@@ -281,7 +281,7 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
             name: "Table1".to_string(),
             columns: vec![
                 Column {
-                    name: "no-default".to_string(),
+                    name: "no_default".to_string(),
                     tpe: ColumnType {
                         raw: "raw".to_string(),
                         family: ColumnTypeFamily::Int,
@@ -291,7 +291,7 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
                     auto_increment: false,
                 },
                 Column {
-                    name: "int-default".to_string(),
+                    name: "int_default".to_string(),
                     tpe: ColumnType {
                         raw: "raw".to_string(),
                         family: ColumnTypeFamily::Int,
@@ -301,7 +301,7 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
                     auto_increment: false,
                 },
                 Column {
-                    name: "bool-default".to_string(),
+                    name: "bool_default".to_string(),
                     tpe: ColumnType {
                         raw: "raw".to_string(),
                         family: ColumnTypeFamily::Boolean,
@@ -311,7 +311,7 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
                     auto_increment: false,
                 },
                 Column {
-                    name: "float-default".to_string(),
+                    name: "float_default".to_string(),
                     tpe: ColumnType {
                         raw: "raw".to_string(),
                         family: ColumnTypeFamily::Float,
@@ -321,7 +321,7 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
                     auto_increment: false,
                 },
                 Column {
-                    name: "string-default".to_string(),
+                    name: "string_default".to_string(),
                     tpe: ColumnType {
                         raw: "raw".to_string(),
                         family: ColumnTypeFamily::String,
@@ -512,7 +512,7 @@ fn uniqueness_is_preserved_when_generating_data_model_from_a_schema() {
             is_embedded: false,
             fields: vec![
                 Field {
-                    name: "non-unique".to_string(),
+                    name: "non_unique".to_string(),
                     arity: FieldArity::Optional,
                     field_type: FieldType::Base(ScalarType::Int),
                     database_name: None,
@@ -548,7 +548,7 @@ fn uniqueness_is_preserved_when_generating_data_model_from_a_schema() {
             name: "Table1".to_string(),
             columns: vec![
                 Column {
-                    name: "non-unique".to_string(),
+                    name: "non_unique".to_string(),
                     tpe: ColumnType {
                         raw: "raw".to_string(),
                         family: ColumnTypeFamily::Int,
@@ -891,7 +891,6 @@ fn multi_field_uniques_are_preserved_when_generating_data_model_from_a_schema() 
 
 #[test]
 fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
-
     let ref_data_model = Datamodel {
         models: vec![
             Model {
@@ -932,7 +931,7 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                         arity: FieldArity::List,
                         field_type: FieldType::Relation(RelationInfo {
                             to: "User".to_string(),
-                            to_fields: vec!["city-id".to_string()],
+                            to_fields: vec!["city_id".to_string()],
                             name: "CityToUser".to_string(),
                             on_delete: OnDeleteStrategy::None,
                         }),
@@ -968,7 +967,7 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                         is_updated_at: false,
                     },
                     Field {
-                        name: "city-id".to_string(),
+                        name: "city_id".to_string(),
                         arity: FieldArity::Required,
                         field_type: FieldType::Relation(RelationInfo {
                             name: "CityToUser".to_string(),
@@ -1040,7 +1039,7 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                         auto_increment: true,
                     },
                     Column {
-                        name: "city-id".to_string(),
+                        name: "city_id".to_string(),
                         tpe: ColumnType {
                             raw: "integer".to_string(),
                             family: ColumnTypeFamily::Int,
@@ -1054,7 +1053,7 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                 primary_key: None,
                 foreign_keys: vec![ForeignKey {
                     constraint_name: None,
-                    columns: vec!["city-id".to_string()],
+                    columns: vec!["city_id".to_string()],
                     referenced_table: "City".to_string(),
                     on_delete_action: ForeignKeyAction::NoAction,
                     referenced_columns: vec!["id".to_string()],

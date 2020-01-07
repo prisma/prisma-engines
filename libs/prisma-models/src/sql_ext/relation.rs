@@ -13,8 +13,8 @@ pub trait RelationExt {
 }
 
 pub trait RelationFieldExt {
-    fn opposite_columns(&self) -> Vec<Column<'static>>;
-    fn relation_columns(&self) -> Vec<Column<'static>>;
+    fn opposite_columns(&self, alias: bool) -> Vec<Column<'static>>;
+    fn relation_columns(&self, alias: bool) -> Vec<Column<'static>>;
 }
 
 pub trait InlineRelationExt {
@@ -29,17 +29,29 @@ impl InlineRelationExt for InlineRelation {
 }
 
 impl RelationFieldExt for RelationField {
-    fn opposite_columns(&self) -> Vec<Column<'static>> {
-        match self.relation_side {
+    fn opposite_columns(&self, alias: bool) -> Vec<Column<'static>> {
+        let cols = match self.relation_side {
             RelationSide::A => self.relation().model_b_columns(),
             RelationSide::B => self.relation().model_a_columns(),
+        };
+
+        if alias && !self.relation_is_inlined_in_child() {
+            cols.into_iter().map(|col| col.table(Relation::TABLE_ALIAS)).collect()
+        } else {
+            cols
         }
     }
 
-    fn relation_columns(&self) -> Vec<Column<'static>> {
-        match self.relation_side {
+    fn relation_columns(&self, alias: bool) -> Vec<Column<'static>> {
+        let cols = match self.relation_side {
             RelationSide::A => self.relation().model_a_columns(),
             RelationSide::B => self.relation().model_b_columns(),
+        };
+
+        if alias && !self.relation_is_inlined_in_child() {
+            cols.into_iter().map(|col| col.table(Relation::TABLE_ALIAS)).collect()
+        } else {
+            cols
         }
     }
 }

@@ -75,7 +75,8 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
         .filter(|table| !is_migration_table(&table))
         .filter(|table| !is_prisma_join_table(&table))
     {
-        let mut model = Model::new(&table.name);
+        let (name, database_name) = sanitize_name(table.name.clone());
+        let mut model = Model::new(name, database_name);
         //Todo: This needs to filter out composite Foreign Key columns, they are merged into one new field
         for column in table.columns.iter() {
             debug!("Handling column {:?}", column);
@@ -88,6 +89,7 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
             let id_info = calc_id_info(&column, &table);
             let default_value = match field_type {
                 FieldType::Relation(_) => None,
+                _ if arity == FieldArity::List => None,
                 _ => column
                     .default
                     .as_ref()
@@ -105,11 +107,13 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
                 }
             };
 
+            let (name, database_name) = sanitize_name(column.name.clone());
+
             let field = Field {
-                name: column.name.clone(),
+                name,
                 arity,
                 field_type,
-                database_name: None,
+                database_name,
                 default_value,
                 is_unique,
                 id_info,
@@ -117,6 +121,7 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
                 is_generated: false,
                 is_updated_at: false,
             };
+
             model.add_field(field);
         }
 
@@ -344,8 +349,8 @@ fn parse_float(value: &str) -> Option<f32> {
     }
 }
 
-fn calculate_default(default: &str, tpe: &ColumnTypeFamily) -> Option<ScalarValue> {
-    match tpe {
+fn calculate_default(default: &str, tpe: &ColumnTypeFamily) -> Option<dml::DefaultValue> {
+    let scalar = match tpe {
         ColumnTypeFamily::Boolean => match parse_int(default) {
             Some(x) => Some(ScalarValue::Boolean(x != 0)),
             None => parse_bool(default).map(|b| ScalarValue::Boolean(b)),
@@ -354,7 +359,9 @@ fn calculate_default(default: &str, tpe: &ColumnTypeFamily) -> Option<ScalarValu
         ColumnTypeFamily::Float => parse_float(default).map(|x| ScalarValue::Float(x)),
         ColumnTypeFamily::String => Some(ScalarValue::String(default.to_string())),
         _ => None,
-    }
+    };
+
+    scalar.map(|s| dml::DefaultValue::Single(s))
 }
 
 fn calc_id_info(column: &Column, table: &Table) -> Option<IdInfo> {
@@ -418,7 +425,7 @@ fn calculate_field_type(schema: &SqlSchema, column: &Column, table: &Table) -> F
     debug!("Calculating field type for '{}'", column.name);
     // Look for a foreign key referencing this column
     match table.foreign_keys.iter().find(|fk| fk.columns.contains(&column.name)) {
-        Some(fk) => {
+        Some(fk) if calc_id_info(column, table).is_none() => {
             debug!("Found corresponding foreign key");
             let idx = fk
                 .columns
@@ -434,7 +441,7 @@ fn calculate_field_type(schema: &SqlSchema, column: &Column, table: &Table) -> F
                 on_delete: OnDeleteStrategy::None,
             })
         }
-        None => {
+        _ => {
             debug!("Found no corresponding foreign key");
             match column.tpe.family {
                 ColumnTypeFamily::Boolean => FieldType::Base(ScalarType::Boolean),
@@ -447,5 +454,18 @@ fn calculate_field_type(schema: &SqlSchema, column: &Column, table: &Table) -> F
                 _ => FieldType::Base(ScalarType::String),
             }
         }
+    }
+}
+
+fn sanitize_name(name: String) -> (String, Option<String>) {
+    let re_start = Regex::new("^[^a-zA-Z]+").unwrap();
+    let re = Regex::new("[^_a-zA-Z0-9]").unwrap();
+    let needs_sanitation = re_start.is_match(name.as_str()) || re.is_match(name.as_str());
+
+    if needs_sanitation {
+        let start_cleaned: String = re_start.replace_all(name.as_str(), "").parse().unwrap();
+        (re.replace_all(start_cleaned.as_str(), "_").parse().unwrap(), Some(name))
+    } else {
+        (name, None)
     }
 }

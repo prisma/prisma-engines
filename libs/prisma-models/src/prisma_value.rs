@@ -1,8 +1,15 @@
-use crate::{DomainError, DomainResult, EnumValue};
+use crate::{dml, DomainError, DomainResult, EnumValue};
 use chrono::prelude::*;
-use rust_decimal::{prelude::{FromPrimitive, ToPrimitive}, Decimal};
-use serde::{Serialize, ser::Serializer};
-use std::{convert::TryFrom, fmt, string::FromUtf8Error};
+use rust_decimal::{
+    prelude::{FromPrimitive, ToPrimitive},
+    Decimal,
+};
+use serde::{ser::Serializer, Serialize};
+use std::{
+    convert::{TryFrom, TryInto},
+    fmt,
+    string::FromUtf8Error,
+};
 use uuid::Uuid;
 
 pub type PrismaListValue = Option<Vec<PrismaValue>>;
@@ -32,11 +39,17 @@ pub enum PrismaValue {
     List(PrismaListValue),
 }
 
-fn serialize_date<S>(date: &DateTime<Utc>, serializer: S) -> Result<S::Ok, S::Error> where S: Serializer {
+fn serialize_date<S>(date: &DateTime<Utc>, serializer: S) -> Result<S::Ok, S::Error>
+where
+    S: Serializer,
+{
     format!("{}", date.format("%Y-%m-%dT%H:%M:%S%.3fZ")).serialize(serializer)
 }
 
-fn serialize_decimal<S>(decimal: &Decimal, serializer: S) -> Result<S::Ok, S::Error> where S: Serializer {
+fn serialize_decimal<S>(decimal: &Decimal, serializer: S) -> Result<S::Ok, S::Error>
+where
+    S: Serializer,
+{
     decimal.to_f64().expect("Decimal is not a f64.").serialize(serializer)
 }
 
@@ -245,5 +258,21 @@ impl From<u64> for GraphqlId {
 impl From<Uuid> for GraphqlId {
     fn from(uuid: Uuid) -> Self {
         GraphqlId::UUID(uuid)
+    }
+}
+
+impl From<Option<dml::ScalarValue>> for PrismaValue {
+    fn from(sv: Option<dml::ScalarValue>) -> Self {
+        sv.map(|sv| match sv {
+            dml::ScalarValue::Boolean(x) => PrismaValue::Boolean(x),
+            dml::ScalarValue::Int(x) => PrismaValue::Int(i64::from(x)),
+            dml::ScalarValue::Float(x) => x.try_into().expect("Can't convert float to decimal"),
+            dml::ScalarValue::String(x) => PrismaValue::String(x.clone()),
+            dml::ScalarValue::DateTime(x) => PrismaValue::DateTime(x),
+            dml::ScalarValue::Decimal(x) => x.try_into().expect("Can't convert float to decimal"),
+            dml::ScalarValue::ConstantLiteral(x) => PrismaValue::Enum(EnumValue::string(x.clone(), x.clone())),
+            dml::ScalarValue::Expression(_, _, _) => unreachable!(),
+        })
+        .unwrap_or_else(|| PrismaValue::Null)
     }
 }

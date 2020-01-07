@@ -7,6 +7,7 @@ use crate::{
     error::{DatamodelError, ErrorCollection},
 };
 use datamodel_connector::{Connector, ExampleConnector};
+use std::convert::TryInto;
 
 /// Helper for lifting a datamodel.
 ///
@@ -60,7 +61,7 @@ impl LiftAstToDml {
 
     /// Internal: Validates a model AST node and lifts it to a DML model.
     fn lift_model(&self, ast_model: &ast::Model, ast_schema: &ast::SchemaAst) -> Result<dml::Model, ErrorCollection> {
-        let mut model = dml::Model::new(&ast_model.name.name);
+        let mut model = dml::Model::new(ast_model.name.name.clone(), None);
         model.documentation = ast_model.documentation.clone().map(|comment| comment.text);
 
         let mut errors = ErrorCollection::new();
@@ -119,7 +120,7 @@ impl LiftAstToDml {
 
             if let dml::FieldType::Base(base_type) = &field_type {
                 match validator.as_type(*base_type) {
-                    Ok(val) => field.default_value = Some(val),
+                    Ok(val) => field.default_value = Some(val.try_into()?),
                     Err(err) => errors.push(err),
                 };
             } else {
@@ -203,7 +204,7 @@ impl LiftAstToDml {
             // Recursive type.
             return Err(DatamodelError::new_validation_error(
                 &format!(
-                    "Recursive type definitions are not allowed. Recursive path was: {} -> {}",
+                    "Recursive type definitions are not allowed. Recursive path was: {} -> {}.",
                     checked_types.join(" -> "),
                     type_name
                 ),

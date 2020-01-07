@@ -1,4 +1,4 @@
-pub fn run_with_tokio<T, F: std::future::Future<Output = T>>(fut: F) -> T {
+pub fn run_with_tokio<O, F: std::future::Future<Output = O>>(fut: F) -> O {
     tokio::runtime::Builder::new()
         .basic_scheduler()
         .enable_all()

@@ -1,8 +1,7 @@
 use crate::database::operations::*;
 use crate::{query_builder::read::ManyRelatedRecordsQueryBuilder, SqlError};
 use connector_interface::{
-    self as connector, filter::Filter, QueryArguments, ReadOperations, Transaction, WriteArgs,
-    WriteOperations, IO,
+    self as connector, filter::Filter, QueryArguments, ReadOperations, Transaction, WriteArgs, WriteOperations, IO,
 };
 use prisma_models::prelude::*;
 use quaint::prelude::ConnectionInfo;

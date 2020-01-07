@@ -103,6 +103,6 @@ fn fail_if_ambigous_relation_fields_do_not_specify_a_name() {
 
     errors.assert_is_at(
         0,
-        DatamodelError::new_model_validation_error("Ambiguous relation detected.", "Todo", Span::new(41, 59)),
+        DatamodelError::new_model_validation_error("Ambiguous relation detected. The fields `comments` and `comments2` in model `Todo` both refer to `Comment`. Please provide different relation names for them by adding `@relation(<name>).", "Todo", Span::new(41, 59)),
     );
 }

@@ -69,10 +69,8 @@ fn should_allow_string_ids_with_cuid() {
         .assert_is_id(true)
         .assert_base_type(&ScalarType::String)
         .assert_id_strategy(IdStrategy::Auto)
-        .assert_default_value(ScalarValue::Expression(
-            String::from("cuid"),
-            ScalarType::String,
-            Vec::new(),
+        .assert_default_value(DefaultValue::Expression(
+            ValueGenerator::new("cuid".to_owned(), Vec::new()).unwrap(),
         ));
 }
 
@@ -91,10 +89,8 @@ fn should_allow_string_ids_with_uuid() {
         .assert_is_id(true)
         .assert_id_strategy(IdStrategy::Auto)
         .assert_base_type(&ScalarType::String)
-        .assert_default_value(ScalarValue::Expression(
-            String::from("uuid"),
-            ScalarType::String,
-            Vec::new(),
+        .assert_default_value(DefaultValue::Expression(
+            ValueGenerator::new("uuid".to_owned(), Vec::new()).unwrap(),
         ));
 }
 
@@ -129,7 +125,7 @@ fn should_allow_string_ids_with_static_default() {
         .assert_has_field("id")
         .assert_is_id(true)
         .assert_id_strategy(IdStrategy::None)
-        .assert_default_value(ScalarValue::String(String::from("")))
+        .assert_default_value(DefaultValue::Single(ScalarValue::String(String::from(""))))
         .assert_base_type(&ScalarType::String);
 }
 
@@ -147,7 +143,7 @@ fn should_allow_int_ids_with_static_default() {
         .assert_has_field("id")
         .assert_is_id(true)
         .assert_id_strategy(IdStrategy::None)
-        .assert_default_value(ScalarValue::Int(0))
+        .assert_default_value(DefaultValue::Single(ScalarValue::Int(0)))
         .assert_base_type(&ScalarType::Int);
 }
 
