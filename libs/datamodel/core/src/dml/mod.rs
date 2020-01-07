@@ -1,5 +1,6 @@
 mod comment;
 mod datamodel;
+mod default_value;
 mod enummodel;
 mod field;
 mod id;
@@ -8,6 +9,7 @@ mod relation_info;
 mod traits;
 
 pub use self::datamodel::*;
+pub use default_value::*;
 pub use enummodel::*;
 pub use field::*;
 pub use id::*;

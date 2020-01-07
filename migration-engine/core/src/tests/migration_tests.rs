@@ -1519,6 +1519,7 @@ async fn calculate_database_steps_with_infer_after_an_apply_must_work(api: &Test
         .execute_command::<InferMigrationStepsCommand>(&infer_input)
         .await
         .unwrap();
+
     let new_steps = output.datamodel_steps.clone();
 
     let calculate_input = CalculateDatabaseStepsInput {

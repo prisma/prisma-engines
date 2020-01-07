@@ -49,7 +49,7 @@ fn models_with_only_scalar_fields() {
                 provider = "postgres"
                 url = "postgresql://localhost:5432"
             }
-            
+
             model Test {
                 id Int @id @default(autoincrement())
                 int Int
@@ -70,7 +70,7 @@ fn models_with_only_scalar_fields() {
             strategy: IdStrategy::Auto,
             sequence: None,
         })
-        .assert_is_auto_generated_by_db();
+        .assert_is_auto_generated_int_id_by_db();
     model
         .assert_scalar_field("int")
         .assert_type_identifier(TypeIdentifier::Int)
@@ -171,7 +171,7 @@ fn uuid_fields_must_work() {
     let model = datamodel.assert_model("Test");
     model
         .assert_scalar_field("id")
-        .assert_type_identifier(TypeIdentifier::UUID);
+        .assert_type_identifier(TypeIdentifier::String);
 }
 
 #[test]
@@ -187,7 +187,7 @@ fn cuid_fields_must_work() {
     let model = datamodel.assert_model("Test");
     model
         .assert_scalar_field("id")
-        .assert_type_identifier(TypeIdentifier::GraphQLID);
+        .assert_type_identifier(TypeIdentifier::String);
 }
 
 #[test]
@@ -204,8 +204,7 @@ fn createdAt_works() {
     let model = datamodel.assert_model("Test");
     model
         .assert_scalar_field("createdAt")
-        .assert_type_identifier(TypeIdentifier::DateTime)
-        .assert_created_at();
+        .assert_type_identifier(TypeIdentifier::DateTime);
 }
 
 #[test]
@@ -402,7 +401,7 @@ fn ambiguous_relations() {
                 post1 Post @relation(name: "Relation1")
                 post2 Post @relation(name: "Relation2")
             }
-            
+
             model Post {
                 id    Int  @id
                 blog1 Blog @relation(name: "Relation1")
@@ -465,10 +464,9 @@ trait FieldAssertions {
 
 trait ScalarFieldAssertions {
     fn assert_updated_at(&self) -> &Self;
-    fn assert_created_at(&self) -> &Self;
     fn assert_behaviour(&self, behaviour: FieldBehaviour) -> &Self;
     fn assert_no_behaviour(&self) -> &Self;
-    fn assert_is_auto_generated_by_db(&self) -> &Self;
+    fn assert_is_auto_generated_int_id_by_db(&self) -> &Self;
 }
 
 trait RelationFieldAssertions {
@@ -499,11 +497,6 @@ impl FieldAssertions for ScalarField {
 }
 
 impl ScalarFieldAssertions for ScalarField {
-    fn assert_created_at(&self) -> &Self {
-        self.assert_behaviour(FieldBehaviour::CreatedAt);
-        self
-    }
-
     fn assert_updated_at(&self) -> &Self {
         self.assert_behaviour(FieldBehaviour::UpdatedAt);
         self
@@ -519,8 +512,8 @@ impl ScalarFieldAssertions for ScalarField {
         self
     }
 
-    fn assert_is_auto_generated_by_db(&self) -> &Self {
-        assert!(self.is_auto_generated);
+    fn assert_is_auto_generated_int_id_by_db(&self) -> &Self {
+        assert!(self.is_auto_generated_int_id);
         self
     }
 }

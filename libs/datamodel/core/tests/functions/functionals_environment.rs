@@ -1,5 +1,8 @@
 use crate::common::*;
-use datamodel::common::{ScalarType, ScalarValue};
+use datamodel::{
+    common::{ScalarType, ScalarValue},
+    DefaultValue,
+};
 
 #[test]
 fn interpolate_environment_variables() {
@@ -19,7 +22,7 @@ fn interpolate_environment_variables() {
     user_model
         .assert_has_field("firstName")
         .assert_base_type(&ScalarType::String)
-        .assert_default_value(ScalarValue::String(String::from("prisma-user")));
+        .assert_default_value(DefaultValue::Single(ScalarValue::String(String::from("prisma-user"))));
 }
 
 // This is very useless, except being a good test case.
@@ -42,7 +45,7 @@ fn interpolate_nested_environment_variables() {
     user_model
         .assert_has_field("firstName")
         .assert_base_type(&ScalarType::String)
-        .assert_default_value(ScalarValue::String(String::from("prisma-user")));
+        .assert_default_value(DefaultValue::Single(ScalarValue::String(String::from("prisma-user"))));
 }
 
 #[test]
@@ -63,5 +66,5 @@ fn ducktype_environment_variables() {
     user_model
         .assert_has_field("age")
         .assert_base_type(&ScalarType::Int)
-        .assert_default_value(ScalarValue::Int(18));
+        .assert_default_value(DefaultValue::Single(ScalarValue::Int(18)));
 }

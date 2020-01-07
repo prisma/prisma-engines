@@ -340,19 +340,21 @@ impl FieldExtensions for Field {
     fn migration_value(&self, datamodel: &Datamodel) -> ScalarValue {
         self.default_value
             .clone()
+            .and_then(|df| df.get())
             .unwrap_or_else(|| default_migration_value(&self.field_type, datamodel))
     }
 
     fn migration_value_new(&self, datamodel: &Datamodel) -> Option<String> {
         let value = match (&self.default_value, self.arity) {
-            (Some(x), _) => match x {
-                ScalarValue::Expression(_, _, _) => Some(default_migration_value(&self.field_type, datamodel)),
-                x => Some(x.clone()),
+            (Some(df), _) => match df {
+                dml::DefaultValue::Single(s) => s.clone(),
+                dml::DefaultValue::Expression(_) => default_migration_value(&self.field_type, datamodel),
             },
             // This is a temporary hack until we can report impossible unexecutable migrations.
-            (None, FieldArity::Required) => Some(default_migration_value(&self.field_type, datamodel)),
-            (None, _) => None,
-        }?;
+            (None, FieldArity::Required) => default_migration_value(&self.field_type, datamodel),
+            (None, _) => return None,
+        };
+
         let result = match value {
             ScalarValue::Boolean(x) => {
                 if x {
@@ -376,6 +378,7 @@ impl FieldExtensions for Field {
                 unreachable!("expressions must have been filtered out in the preceding pattern match")
             }
         };
+
         if self.is_id() {
             None
         } else {

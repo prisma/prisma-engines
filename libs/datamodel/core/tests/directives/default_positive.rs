@@ -1,6 +1,9 @@
 use crate::common::*;
 use chrono::{DateTime, Utc};
-use datamodel::common::{ScalarType, ScalarValue};
+use datamodel::{
+    common::{ScalarType, ScalarValue},
+    DefaultValue,
+};
 
 #[test]
 fn should_set_default_for_all_scalar_types() {
@@ -21,29 +24,29 @@ fn should_set_default_for_all_scalar_types() {
     user_model
         .assert_has_field("int")
         .assert_base_type(&ScalarType::Int)
-        .assert_default_value(ScalarValue::Int(3));
+        .assert_default_value(DefaultValue::Single(ScalarValue::Int(3)));
     user_model
         .assert_has_field("float")
         .assert_base_type(&ScalarType::Float)
-        .assert_default_value(ScalarValue::Float(3.14));
+        .assert_default_value(DefaultValue::Single(ScalarValue::Float(3.14)));
     user_model
         .assert_has_field("decimal")
         .assert_base_type(&ScalarType::Decimal)
-        .assert_default_value(ScalarValue::Decimal(3.15));
+        .assert_default_value(DefaultValue::Single(ScalarValue::Decimal(3.15)));
     user_model
         .assert_has_field("string")
         .assert_base_type(&ScalarType::String)
-        .assert_default_value(ScalarValue::String(String::from("String")));
+        .assert_default_value(DefaultValue::Single(ScalarValue::String(String::from("String"))));
     user_model
         .assert_has_field("boolean")
         .assert_base_type(&ScalarType::Boolean)
-        .assert_default_value(ScalarValue::Boolean(false));
+        .assert_default_value(DefaultValue::Single(ScalarValue::Boolean(false)));
     user_model
         .assert_has_field("dateTime")
         .assert_base_type(&ScalarType::DateTime)
-        .assert_default_value(ScalarValue::DateTime(
+        .assert_default_value(DefaultValue::Single(ScalarValue::DateTime(
             "2019-06-17T14:20:57Z".parse::<DateTime<Utc>>().unwrap(),
-        ));
+        )));
 }
 
 #[test]
@@ -66,5 +69,7 @@ fn should_set_default_an_enum_type() {
     user_model
         .assert_has_field("role")
         .assert_enum_type("Role")
-        .assert_default_value(ScalarValue::ConstantLiteral(String::from("A_VARIANT_WITH_UNDERSCORES")));
+        .assert_default_value(DefaultValue::Single(ScalarValue::ConstantLiteral(String::from(
+            "A_VARIANT_WITH_UNDERSCORES",
+        ))));
 }

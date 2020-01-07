@@ -4,6 +4,7 @@ use crate::common::FromStrAndSpan;
 use crate::common::ScalarType;
 use crate::dml;
 use chrono::{DateTime, Utc};
+use std::convert::TryInto;
 
 pub fn parse_from_dmmf(dmmf: &str) -> dml::Datamodel {
     let parsed_dmmf = serde_json::from_str::<Datamodel>(&dmmf).expect("Failed to parse JSON");
@@ -43,6 +44,7 @@ fn model_from_dmmf(model: &Model) -> dml::Model {
 fn field_from_dmmf(field: &Field) -> dml::Field {
     let field_type = get_field_type(field);
     let default_value = default_value_from_serde(&field.default, &field_type);
+
     // TODO: Id details?
     let id_info = match &field.is_id {
         true => Some(dml::IdInfo {
@@ -69,8 +71,8 @@ fn field_from_dmmf(field: &Field) -> dml::Field {
 fn default_value_from_serde(
     container: &Option<serde_json::Value>,
     field_type: &dml::FieldType,
-) -> Option<dml::ScalarValue> {
-    match (container, field_type) {
+) -> Option<dml::DefaultValue> {
+    let def_opt = match (container, field_type) {
         // Scalar.
         (Some(value), dml::FieldType::Base(scalar_type)) => Some(match (value, scalar_type) {
             (serde_json::Value::Bool(val), ScalarType::Boolean) => dml::ScalarValue::Boolean(*val),
@@ -100,7 +102,9 @@ fn default_value_from_serde(
         }
         (Some(_), _) => panic!("Fields with non-scalar type cannot have default value"),
         _ => None,
-    }
+    };
+
+    def_opt.map(|dv| dv.try_into().unwrap())
 }
 
 fn type_from_string(scalar: &str) -> ScalarType {

@@ -349,8 +349,8 @@ fn parse_float(value: &str) -> Option<f32> {
     }
 }
 
-fn calculate_default(default: &str, tpe: &ColumnTypeFamily) -> Option<ScalarValue> {
-    match tpe {
+fn calculate_default(default: &str, tpe: &ColumnTypeFamily) -> Option<dml::DefaultValue> {
+    let scalar = match tpe {
         ColumnTypeFamily::Boolean => match parse_int(default) {
             Some(x) => Some(ScalarValue::Boolean(x != 0)),
             None => parse_bool(default).map(|b| ScalarValue::Boolean(b)),
@@ -359,7 +359,9 @@ fn calculate_default(default: &str, tpe: &ColumnTypeFamily) -> Option<ScalarValu
         ColumnTypeFamily::Float => parse_float(default).map(|x| ScalarValue::Float(x)),
         ColumnTypeFamily::String => Some(ScalarValue::String(default.to_string())),
         _ => None,
-    }
+    };
+
+    scalar.map(|s| dml::DefaultValue::Single(s))
 }
 
 fn calc_id_info(column: &Column, table: &Table) -> Option<IdInfo> {

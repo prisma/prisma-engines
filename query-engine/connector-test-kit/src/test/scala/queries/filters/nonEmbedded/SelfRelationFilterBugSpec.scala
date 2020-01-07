@@ -36,7 +36,7 @@ class SelfRelationFilterBugSpec extends FlatSpec with Matchers with ApiSpecBase 
   "Getting all categories" should "succeed" in {
     val allCategories =
       s"""{
-         |  allCategories: categories {
+         |  allCategories: categories(orderBy: id_ASC) {
          |    name
          |    parent {
          |      name
@@ -45,7 +45,7 @@ class SelfRelationFilterBugSpec extends FlatSpec with Matchers with ApiSpecBase 
          |}"""
 
     val res1 = server.query(allCategories, project).toString
-    res1 should be("""{"data":{"allCategories":[{"name":"Root","parent":null},{"name":"Sub","parent":{"name":"Root"}}]}}""")
+    res1 should be("""{"data":{"allCategories":[{"name":"Sub","parent":{"name":"Root"}},{"name":"Root","parent":null}]}}""")
   }
 
   "Getting root categories categories" should "succeed" in {
