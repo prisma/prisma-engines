@@ -140,9 +140,10 @@ impl<'a> Select<'a> {
     ///
     /// assert_eq!("SELECT `foo`, `bar` FROM `users`", sql);
     /// ```
-    pub fn columns<T>(mut self, columns: Vec<T>) -> Self
+    pub fn columns<T, C>(mut self, columns: T) -> Self
     where
-        T: Into<Column<'a>>,
+        T: IntoIterator<Item = C>,
+        C: Into<Column<'a>>,
     {
         self.columns = columns.into_iter().map(|c| c.into().into()).collect();
         self

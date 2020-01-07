@@ -116,10 +116,11 @@ impl<'a> Insert<'a> {
 
     /// Creates a new multi row `INSERT` statement for the given table.
     #[inline]
-    pub fn multi_into<T, K>(table: T, columns: Vec<K>) -> MultiRowInsert<'a>
+    pub fn multi_into<T, K, I>(table: T, columns: I) -> MultiRowInsert<'a>
     where
         T: Into<Table<'a>>,
         K: Into<Column<'a>>,
+        I: IntoIterator<Item = K>,
     {
         MultiRowInsert {
             table: table.into(),
@@ -146,9 +147,10 @@ impl<'a> Insert<'a> {
     /// assert_eq!("INSERT INTO \"users\" DEFAULT VALUES RETURNING \"id\"", sql);
     /// ```
     #[cfg(feature = "postgresql")]
-    pub fn returning<K>(mut self, columns: Vec<K>) -> Self
+    pub fn returning<K, I>(mut self, columns: I) -> Self
     where
         K: Into<Column<'a>>,
+        I: IntoIterator<Item = K>,
     {
         self.returning = Some(columns.into_iter().map(|k| k.into()).collect());
         self
