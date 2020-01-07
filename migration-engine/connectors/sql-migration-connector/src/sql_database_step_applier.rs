@@ -113,6 +113,7 @@ fn render_raw_sql(
     renderer: &(dyn SqlRenderer + Send + Sync),
     schema_name: &str,
 ) -> std::result::Result<Option<String>, std::fmt::Error> {
+    use itertools::Itertools;
     use std::fmt::Write as _;
 
     let sql_family = renderer.sql_family();
@@ -137,10 +138,29 @@ fn render_raw_sql(
                     .collect();
                 lines.push(format!("  PRIMARY KEY ({})", column_names.join(",")))
             }
+
+            let fk_lines = if sql_family == SqlFamily::Sqlite {
+                table
+                    .foreign_keys
+                    .iter()
+                    .map(|fk| {
+                        format!(
+                            "FOREIGN KEY ({constrained_columns}) {references}",
+                            constrained_columns = fk.columns.iter().map(|col| format!(r#""{}""#, col)).join(","),
+                            references = renderer.render_references(&schema_name, fk)
+                        )
+                    })
+                    .join(",\n")
+            } else {
+                String::new()
+            };
+
             Ok(Some(format!(
-                "CREATE TABLE {} (\n{}\n){};",
+                "CREATE TABLE {} (\n{}\n{}{}\n){};",
                 renderer.quote_with_schema(&schema_name, &table.name),
                 lines.join(",\n"),
+                if fk_lines.is_empty() { "" } else { "," },
+                fk_lines,
                 create_table_suffix(sql_family),
             )))
         }

@@ -1801,22 +1801,12 @@ async fn relations_can_reference_multiple_fields(api: &TestApi) -> TestResult {
     api.infer_apply(dm).send().await?;
     let schema = api.describe_database().await?;
 
-    let fks = &schema.table_bang("Account").foreign_keys;
-
-    // On SQLite we don't infer multi-field foreign keys correctly yet.
-    if api.is_sqlite() {
-        assert_eq!(fks.len(), 2);
-
-        assert!(fks.iter().all(|fk| fk.referenced_table == "User"));
-    } else {
-        assert_eq!(fks.len(), 1);
-
-        let fk = fks.iter().next().unwrap();
-
-        assert_eq!(fk.columns, &["user_email", "user_age"]);
-        assert_eq!(fk.referenced_table, "User");
-        assert_eq!(fk.referenced_columns, &["email", "age"]);
-    }
+    schema
+        .assert_table("Account")?
+        .assert_foreign_keys_count(1)?
+        .assert_fk_on_columns(&["user_email", "user_age"], |fk| {
+            fk.assert_references("User", &["email", "age"])
+        })?;
 
     Ok(())
 }
@@ -1844,22 +1834,12 @@ async fn relations_can_reference_multiple_fields_with_mappings(api: &TestApi) ->
     api.infer_apply(dm).send().await?;
     let schema = api.describe_database().await?;
 
-    let fks = &schema.table_bang("Account").foreign_keys;
-
-    // On SQLite we don't infer multi-field foreign keys correctly yet.
-    if api.is_sqlite() {
-        assert_eq!(fks.len(), 2);
-
-        assert!(fks.iter().all(|fk| fk.referenced_table == "users"));
-    } else {
-        assert_eq!(fks.len(), 1);
-
-        let fk = fks.iter().next().unwrap();
-
-        assert_eq!(fk.columns, &["user_emergency-mail", "user_birthdays-count"]);
-        assert_eq!(fk.referenced_table, "users");
-        assert_eq!(fk.referenced_columns, &["emergency-mail", "birthdays-count"]);
-    }
+    schema
+        .assert_table("Account")?
+        .assert_foreign_keys_count(1)?
+        .assert_fk_on_columns(&["user_emergency-mail", "user_birthdays-count"], |fk| {
+            fk.assert_references("users", &["emergency-mail", "birthdays-count"])
+        })?;
 
     Ok(())
 }
@@ -1914,7 +1894,7 @@ async fn foreign_keys_are_added_on_existing_tables(api: &TestApi) -> TestResult 
 }
 
 #[test_each_connector]
-async fn basic_composite_primary_keys_must_work(api: &TestApi) -> TestResult {
+async fn basic_compound_primary_keys_must_work(api: &TestApi) -> TestResult {
     let dm = r#"
         model User {
             firstName String
@@ -1936,7 +1916,7 @@ async fn basic_composite_primary_keys_must_work(api: &TestApi) -> TestResult {
 }
 
 #[test_each_connector]
-async fn composite_primary_keys_on_mapped_columns_must_work(api: &TestApi) -> TestResult {
+async fn compound_primary_keys_on_mapped_columns_must_work(api: &TestApi) -> TestResult {
     let dm = r#"
         model User {
             firstName String @map("first_name")
@@ -1958,7 +1938,7 @@ async fn composite_primary_keys_on_mapped_columns_must_work(api: &TestApi) -> Te
 }
 
 #[test_each_connector]
-async fn references_to_models_with_composite_primary_keys_must_work(api: &TestApi) -> TestResult {
+async fn references_to_models_with_compound_primary_keys_must_work(api: &TestApi) -> TestResult {
     let dm = r#"
         model User {
             firstName String
@@ -1978,26 +1958,15 @@ async fn references_to_models_with_composite_primary_keys_must_work(api: &TestAp
 
     let sql_schema = api.describe_database().await?;
 
-    if api.is_sqlite() {
-        sql_schema
-            .assert_table("Pet")?
-            .assert_has_column("id")?
-            .assert_has_column("human_firstName")?
-            .assert_has_column("human_lastName")?
-            // Compound foreign keys aren't inferred properly on sqlite yet.
-            .assert_foreign_keys_count(2)?;
-    } else {
-        sql_schema
-            .assert_table("Pet")?
-            .assert_has_column("id")?
-            .assert_has_column("human_firstName")?
-            .assert_has_column("human_lastName")?
-            // Compound foreign keys aren't inferred properly on sqlite yet.
-            .assert_foreign_keys_count(1)?
-            .assert_fk_on_columns(&["human_firstName", "human_lastName"], |fk| {
-                fk.assert_references("User", &["firstName", "lastName"])
-            })?;
-    }
+    sql_schema
+        .assert_table("Pet")?
+        .assert_has_column("id")?
+        .assert_has_column("human_firstName")?
+        .assert_has_column("human_lastName")?
+        .assert_foreign_keys_count(1)?
+        .assert_fk_on_columns(&["human_firstName", "human_lastName"], |fk| {
+            fk.assert_references("User", &["firstName", "lastName"])
+        })?;
 
     Ok(())
 }
@@ -2023,24 +1992,15 @@ async fn join_tables_between_models_with_compound_primary_keys_must_work(api: &T
 
     let sql_schema = api.describe_database().await?;
 
-    if api.is_sqlite() {
-        sql_schema
-            .assert_table("_CatToHuman")?
-            .assert_has_column("B_firstName")?
-            .assert_has_column("B_lastName")?
-            .assert_has_column("A")?
-            .assert_foreign_keys_count(3)?;
-    } else {
-        sql_schema
-            .assert_table("_CatToHuman")?
-            .assert_has_column("B_firstName")?
-            .assert_has_column("B_lastName")?
-            .assert_has_column("A")?
-            .assert_fk_on_columns(&["B_firstName", "B_lastName"], |fk| {
-                fk.assert_references("Human", &["firstName", "lastName"])
-            })?
-            .assert_fk_on_columns(&["A"], |fk| fk.assert_references("Cat", &["id"]))?;
-    }
+    sql_schema
+        .assert_table("_CatToHuman")?
+        .assert_has_column("B_firstName")?
+        .assert_has_column("B_lastName")?
+        .assert_has_column("A")?
+        .assert_fk_on_columns(&["B_firstName", "B_lastName"], |fk| {
+            fk.assert_references("Human", &["firstName", "lastName"])
+        })?
+        .assert_fk_on_columns(&["A"], |fk| fk.assert_references("Cat", &["id"]))?;
 
     Ok(())
 }
