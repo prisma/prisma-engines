@@ -23,8 +23,6 @@ pub struct Field {
     pub is_id: bool,
     #[serde(rename = "type")]
     pub field_type: String,
-
-    // Todo: Can this be removed?
     #[serde(skip_serializing_if = "Option::is_none")]
     pub default: Option<serde_json::Value>,
     #[serde(skip_serializing_if = "Option::is_none")]

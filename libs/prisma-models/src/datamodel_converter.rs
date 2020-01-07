@@ -79,7 +79,7 @@ impl<'a> DatamodelConverter<'a> {
                         is_list: field.is_list(),
                         is_unique: field.is_unique(),
                         is_hidden: false,
-                        is_auto_generated: field.is_auto_generated(),
+                        is_auto_generated_int_id: field.is_auto_generated_int_id(),
                         manifestation: field.manifestation(),
                         relation_name: relation.name(),
                         relation_side: relation.relation_side(field),
@@ -92,7 +92,7 @@ impl<'a> DatamodelConverter<'a> {
                     is_list: field.is_list(),
                     is_unique: field.is_unique(),
                     is_hidden: false,
-                    is_auto_generated: field.is_auto_generated(),
+                    is_auto_generated_int_id: field.is_auto_generated_int_id(),
                     manifestation: field.manifestation(),
                     behaviour: field.behaviour(),
                     default_value: field.default_value(),
@@ -333,7 +333,7 @@ trait DatamodelFieldExtensions {
     fn is_required(&self) -> bool;
     fn is_list(&self) -> bool;
     fn is_unique(&self) -> bool;
-    fn is_auto_generated(&self) -> bool;
+    fn is_auto_generated_int_id(&self) -> bool;
     fn manifestation(&self) -> Option<FieldManifestation>;
     fn behaviour(&self) -> Option<FieldBehaviour>;
     fn final_db_name(&self) -> String;
@@ -353,19 +353,7 @@ impl DatamodelFieldExtensions for dml::Field {
                 dml::ScalarType::Float => TypeIdentifier::Float,
                 dml::ScalarType::Int => TypeIdentifier::Int,
                 dml::ScalarType::String => TypeIdentifier::String,
-                // match self.default_value {
-                //     Some(datamodel::common::ScalarValue::Expression(ref expr, _, _)) if expr == "cuid" => {
-                //         TypeIdentifier::GraphQLID
-                //     }
-                //     Some(datamodel::common::ScalarValue::Expression(ref expr, _, _)) if expr == "uuid" => {
-                //         TypeIdentifier::UUID
-                //     }
-                //     Some(datamodel::common::ScalarValue::Expression(ref expr, _, _)) if expr == "autoincrement" => {
-                //         TypeIdentifier::Int
-                //     }
-                // _ => TypeIdentifier::String,
             },
-            // },
             dml::FieldType::ConnectorSpecific { .. } => {
                 unimplemented!("Connector Specific types are not supported here yet")
             }
@@ -384,7 +372,7 @@ impl DatamodelFieldExtensions for dml::Field {
         self.is_unique
     }
 
-    fn is_auto_generated(&self) -> bool {
+    fn is_auto_generated_int_id(&self) -> bool {
         let has_auto_generating_behaviour = self
             .id_info
             .as_ref()
@@ -414,15 +402,6 @@ impl DatamodelFieldExtensions for dml::Field {
                     sequence: None, // the sequence was just used by the migration engine. Now those models are only used by the query engine. Hence we don't need it anyway.
                 }
             })
-            // case: @default(now())
-            .or_else(
-                || //match self.default_value {
-                // Some(datamodel::common::ScalarValue::Expression(ref expr, _, _)) if expr == "now" => {
-                //     Some(FieldBehaviour::CreatedAt)
-                // }
-                // _ => None,
-                None, //}
-            )
             .or_else(|| {
                 if self.is_updated_at {
                     Some(FieldBehaviour::UpdatedAt)

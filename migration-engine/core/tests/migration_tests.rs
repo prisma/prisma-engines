@@ -89,7 +89,7 @@ async fn adding_an_id_field_with_a_special_name_must_work(api: &TestApi) {
     assert_eq!(column.is_some(), true);
 }
 
-#[test_each_connector(ignore="sqlite")]
+#[test_each_connector(ignore = "sqlite")]
 async fn adding_an_id_field_of_type_int_must_work(api: &TestApi) {
     let dm2 = r#"
         model Test {
@@ -102,9 +102,9 @@ async fn adding_an_id_field_of_type_int_must_work(api: &TestApi) {
     let column = result.table_bang("Test").column_bang("myId");
 
     assert_eq!(column.auto_increment, false);
- }
+}
 
-#[test_one_connector(connector="sqlite")]
+#[test_one_connector(connector = "sqlite")]
 async fn adding_an_id_field_of_type_int_must_work_for_sqlite(api: &TestApi) {
     let dm2 = r#"
         model Test {
@@ -141,7 +141,6 @@ async fn adding_an_id_field_of_type_int_with_autoincrement_must_work(api: &TestA
         _ => assert_eq!(column.auto_increment, true),
     }
 }
-
 
 #[test_each_connector]
 async fn removing_a_scalar_field_must_work(api: &TestApi) {
@@ -1546,6 +1545,7 @@ async fn calculate_database_steps_with_infer_after_an_apply_must_work(api: &Test
         .execute_command::<InferMigrationStepsCommand>(&infer_input)
         .await
         .unwrap();
+
     let new_steps = output.datamodel_steps.clone();
 
     let calculate_input = CalculateDatabaseStepsInput {

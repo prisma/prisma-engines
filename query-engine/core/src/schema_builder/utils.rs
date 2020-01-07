@@ -1,6 +1,6 @@
 use super::*;
 use once_cell::sync::OnceCell;
-use prisma_models::{dml, EnumType, EnumValue, ModelRef, PrismaValue};
+use prisma_models::{dml, EnumType, EnumValue, ModelRef};
 use std::sync::Arc;
 
 /// Object type convenience wrapper function.

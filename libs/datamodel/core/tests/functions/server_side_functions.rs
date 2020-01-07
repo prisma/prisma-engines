@@ -1,8 +1,5 @@
 use crate::common::*;
-use datamodel::{
-    common::{ScalarType, ScalarValue},
-    DefaultValue, ValueGenerator,
-};
+use datamodel::{common::ScalarType, DefaultValue, ValueGenerator};
 
 #[test]
 fn correctly_handle_server_side_now_function() {

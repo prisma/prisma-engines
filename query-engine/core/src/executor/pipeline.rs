@@ -23,7 +23,6 @@ impl<'conn, 'tx> QueryPipeline<'conn, 'tx> {
         let serializer = self.serializer;
         let expr = Expressionista::translate(self.graph)?;
         let result = self.interpreter.interpret(expr, Env::default(), 0).await;
-        dbg!(&result);
 
         trace!("{}", self.interpreter.log_output());
         Ok(serializer.serialize(result?))

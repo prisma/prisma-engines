@@ -20,8 +20,6 @@ pub fn connect_nested_create(
 ) -> QueryGraphBuilderResult<()> {
     let relation = parent_relation_field.relation();
 
-    dbg!(&value);
-
     // Build all create nodes upfront.
     let creates: Vec<NodeRef> = utils::coerce_vec(value)
         .into_iter()

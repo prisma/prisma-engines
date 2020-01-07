@@ -29,9 +29,6 @@ impl<'a> Validator<'a> {
             {
                 errors.push(err);
             }
-            if let Err(err) = self.validate_id_fields_valid(ast_schema, model) {
-                errors.push(err);
-            }
             if let Err(err) = self.validate_relations_not_ambiguous(ast_schema, model) {
                 errors.push(err);
             }
@@ -110,14 +107,6 @@ impl<'a> Validator<'a> {
             (1, true) | (0, false) => Ok(()),
             (_, _) => unreachable!(), // the compiler does not check the first if guard
         }
-    }
-
-    fn validate_id_fields_valid(
-        &self,
-        _ast_schema: &ast::SchemaAst,
-        _model: &dml::Model,
-    ) -> Result<(), DatamodelError> {
-        Ok(())
     }
 
     /// Ensures that embedded types do not have back relations

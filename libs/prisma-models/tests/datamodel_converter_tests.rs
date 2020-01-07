@@ -70,7 +70,7 @@ fn models_with_only_scalar_fields() {
             strategy: IdStrategy::Auto,
             sequence: None,
         })
-        .assert_is_auto_generated_by_db();
+        .assert_is_auto_generated_int_id_by_db();
     model
         .assert_scalar_field("int")
         .assert_type_identifier(TypeIdentifier::Int)
@@ -466,7 +466,7 @@ trait ScalarFieldAssertions {
     fn assert_updated_at(&self) -> &Self;
     fn assert_behaviour(&self, behaviour: FieldBehaviour) -> &Self;
     fn assert_no_behaviour(&self) -> &Self;
-    fn assert_is_auto_generated_by_db(&self) -> &Self;
+    fn assert_is_auto_generated_int_id_by_db(&self) -> &Self;
 }
 
 trait RelationFieldAssertions {
@@ -512,8 +512,8 @@ impl ScalarFieldAssertions for ScalarField {
         self
     }
 
-    fn assert_is_auto_generated_by_db(&self) -> &Self {
-        assert!(self.is_auto_generated);
+    fn assert_is_auto_generated_int_id_by_db(&self) -> &Self {
+        assert!(self.is_auto_generated_int_id);
         self
     }
 }

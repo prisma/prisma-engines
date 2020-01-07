@@ -22,7 +22,7 @@ pub struct ScalarFieldTemplate {
     pub is_list: bool,
     pub is_unique: bool,
     pub is_hidden: bool,
-    pub is_auto_generated: bool,
+    pub is_auto_generated_int_id: bool,
     pub manifestation: Option<FieldManifestation>,
     pub behaviour: Option<FieldBehaviour>,
     pub default_value: Option<DefaultValue>,
@@ -36,7 +36,7 @@ pub struct ScalarField {
     pub is_required: bool,
     pub is_list: bool,
     pub is_hidden: bool,
-    pub is_auto_generated: bool,
+    pub is_auto_generated_int_id: bool,
     pub manifestation: Option<FieldManifestation>,
     pub internal_enum: Option<InternalEnum>,
     pub behaviour: Option<FieldBehaviour>,
@@ -57,11 +57,10 @@ impl Hash for ScalarField {
         self.is_required.hash(state);
         self.is_list.hash(state);
         self.is_hidden.hash(state);
-        self.is_auto_generated.hash(state);
+        self.is_auto_generated_int_id.hash(state);
         self.manifestation.hash(state);
         self.internal_enum.hash(state);
         self.behaviour.hash(state);
-        // self.default_value.hash(state); // Todo: default values can't be hashed at the moment, floating point issues in dml crate.
         self.is_unique.hash(state);
         self.model().hash(state);
     }
@@ -74,7 +73,7 @@ impl PartialEq for ScalarField {
             && self.is_required == other.is_required
             && self.is_list == other.is_list
             && self.is_hidden == other.is_hidden
-            && self.is_auto_generated == other.is_auto_generated
+            && self.is_auto_generated_int_id == other.is_auto_generated_int_id
             && self.manifestation == other.manifestation
             && self.internal_enum == other.internal_enum
             && self.behaviour == other.behaviour

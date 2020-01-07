@@ -228,8 +228,6 @@ impl QueryDocumentParser {
         object: BTreeMap<String, QueryValue>,
         schema_object: InputObjectTypeStrongRef,
     ) -> QueryParserResult<ParsedInputMap> {
-        dbg!(&object);
-
         let left: HashSet<&str> = schema_object
             .get_fields()
             .iter()
@@ -247,9 +245,6 @@ impl QueryDocumentParser {
             .filter_map(|unset_field_name| {
                 let field = schema_object.find_field(*unset_field_name).unwrap();
                 let default_pair = field.default_value.clone().map(|def| (&field.name, def));
-
-                dbg!(&unset_field_name);
-                dbg!(&default_pair);
 
                 match default_pair {
                     // If the input field has a default, add the default to the result.
