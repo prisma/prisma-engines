@@ -2,6 +2,7 @@ use super::*;
 use crate::common::ScalarType;
 use crate::dml;
 use serde_json;
+use std::convert::TryInto;
 
 pub fn render_to_dmmf(schema: &dml::Datamodel) -> String {
     let dmmf = schema_to_dmmf(schema);
@@ -59,7 +60,7 @@ fn field_to_dmmf(field: &dml::Field) -> Field {
         is_required: field.arity == dml::FieldArity::Required,
         is_list: field.arity == dml::FieldArity::List,
         is_id: field.id_info.is_some(),
-        default: None,
+        default: default_value_to_serde(&field.default_value),
         is_unique: field.is_unique,
         relation_name: get_relation_name(field),
         relation_to_fields: get_relation_to_fields(field),
@@ -93,9 +94,9 @@ fn type_to_string(scalar: &ScalarType) -> String {
     scalar.to_string()
 }
 
-fn default_value_to_serde(container: &Option<dml::ScalarValue>) -> Option<serde_json::Value> {
+fn default_value_to_serde(container: &Option<dml::DefaultValue>) -> Option<serde_json::Value> {
     match container {
-        Some(value) => Some(value_to_serde(value)),
+        Some(value) => Some(value_to_serde(&value.clone().try_into().unwrap())),
         None => None,
     }
 }

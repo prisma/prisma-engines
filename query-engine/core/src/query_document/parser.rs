@@ -228,6 +228,8 @@ impl QueryDocumentParser {
         object: BTreeMap<String, QueryValue>,
         schema_object: InputObjectTypeStrongRef,
     ) -> QueryParserResult<ParsedInputMap> {
+        dbg!(&object);
+
         let left: HashSet<&str> = schema_object
             .get_fields()
             .iter()
@@ -235,8 +237,6 @@ impl QueryDocumentParser {
             .collect();
 
         let right: HashSet<&str> = object.keys().map(|k| k.as_str()).collect();
-        dbg!(&left);
-        dbg!(&right);
         let diff = Diff::new(&left, &right);
 
         // First, check that all fields not provided in the query (left diff) are optional,

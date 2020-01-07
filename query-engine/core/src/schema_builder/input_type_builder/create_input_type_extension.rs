@@ -141,14 +141,14 @@ pub trait CreateInputTypeBuilderExtension<'a>: InputTypeBuilderBase<'a> {
 
     #[rustfmt::skip]
     fn field_should_be_kept_for_create_input_type(field: &ScalarFieldRef) -> bool {
-        if field.default_value.is_some() && field.type_identifier == TypeIdentifier::Int && field.is_id() {
+        if field.is_auto_generated {
             false
         } else {
             true
         }
+
         // match (field.behaviour.as_ref(), field.type_identifier) {         //add example syntax behind lines
         //     _ if !field.is_id()                                                                      => true,
-
 
         //     (Some(FieldBehaviour::Id { strategy: IdStrategy::Auto, .. }), TypeIdentifier::UUID)      => true,  //id String    @id @default(uuid())
         //     (Some(FieldBehaviour::Id { strategy: IdStrategy::Auto, .. }), TypeIdentifier::GraphQLID) => true,  //id String    @id @default(cuid())

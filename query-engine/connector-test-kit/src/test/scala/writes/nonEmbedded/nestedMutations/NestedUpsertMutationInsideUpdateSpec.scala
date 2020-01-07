@@ -1181,6 +1181,7 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
                                              |  nameBottom String @unique
                                              |  middle     Middle?
                                              |}""".stripMargin }
+
     database.setup(project)
 
     val createMutation =
@@ -1223,7 +1224,7 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |   }
          |  ) {
          |    nameTop
-         |    middles (orderBy: id_ASC){
+         |    middles (orderBy: id_ASC) {
          |      nameMiddle
          |      bottom {
          |        nameBottom
@@ -1236,7 +1237,7 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
     val result = server.query(updateMutation, project)
 
     result should be(
-      """{"data":{"updateTop":{"nameTop":"updated top","middles":[{"nameMiddle":"the second middle","bottom":{"nameBottom":"the second bottom"}},{"nameMiddle":"updated middle","bottom":{"nameBottom":"created bottom"}}]}}}""".parseJson)
+      """{"data":{"updateTop":{"nameTop":"updated top","middles":[{"nameMiddle":"updated middle","bottom":{"nameBottom":"created bottom"}},{"nameMiddle":"the second middle","bottom":{"nameBottom":"the second bottom"}}]}}}""".parseJson)
 
     server.query("query{bottoms(orderBy: id_ASC){nameBottom}}", project) should be(
       """{"data":{"bottoms":[{"nameBottom":"the second bottom"},{"nameBottom":"created bottom"}]}}""".parseJson)
@@ -1331,7 +1332,8 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
     result.toString should be(
       """{"data":{"updateTop":{"nameTop":"updated top","middle":{"nameMiddle":"updated middle","bottom":{"nameBottom":"updated bottom","below":[{"nameBelow":"updated below"},{"nameBelow":"second below"}]}}}}}""")
 
-    server.query("query{belows(orderBy: id_ASC){nameBelow}}", project).toString should be("""{"data":{"belows":[{"nameBelow":"updated below"},{"nameBelow":"second below"}]}}""")
+    server.query("query{belows(orderBy: id_ASC){nameBelow}}", project).toString should be(
+      """{"data":{"belows":[{"nameBelow":"updated below"},{"nameBelow":"second below"}]}}""")
   }
 
   "a deeply nested mutation" should "execute all levels of the mutation if there are model and node edges on the path  and back relations are missing and node edges follow model edges for create" in {

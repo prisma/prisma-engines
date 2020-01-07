@@ -22,7 +22,9 @@ fn interpolate_expressions_in_strings() {
     user_model
         .assert_has_field("firstName")
         .assert_base_type(&ScalarType::String)
-        .assert_default_value(dml::ScalarValue::String(String::from("user_3")));
+        .assert_default_value(dml::DefaultValue::Single(dml::ScalarValue::String(String::from(
+            "user_3",
+        ))));
 }
 
 #[test]
@@ -41,7 +43,9 @@ fn dont_interpolate_escaped_expressions_in_strings() {
     user_model
         .assert_has_field("firstName")
         .assert_base_type(&ScalarType::String)
-        .assert_default_value(dml::ScalarValue::String(String::from("user_${3}")));
+        .assert_default_value(dml::DefaultValue::Single(dml::ScalarValue::String(String::from(
+            "user_${3}",
+        ))));
 }
 
 #[test]
@@ -62,7 +66,9 @@ fn interpolate_functionals_in_strings() {
     user_model
         .assert_has_field("firstName")
         .assert_base_type(&ScalarType::String)
-        .assert_default_value(dml::ScalarValue::String(String::from("user_prisma-user")));
+        .assert_default_value(dml::DefaultValue::Single(dml::ScalarValue::String(String::from(
+            "user_prisma-user",
+        ))));
 }
 
 #[test]
@@ -83,7 +89,9 @@ fn interpolate_nested_mess() {
     user_model
         .assert_has_field("firstName")
         .assert_base_type(&ScalarType::String)
-        .assert_default_value(dml::ScalarValue::String(String::from("user_number_really?_3")));
+        .assert_default_value(dml::DefaultValue::Single(dml::ScalarValue::String(String::from(
+            "user_number_really?_3",
+        ))));
 }
 
 #[test]
@@ -101,7 +109,9 @@ fn should_not_remove_whitespace() {
     user_model
         .assert_has_field("firstName")
         .assert_base_type(&ScalarType::String)
-        .assert_default_value(ScalarValue::String(String::from("This is a string with whitespace")));
+        .assert_default_value(dml::DefaultValue::Single(ScalarValue::String(String::from(
+            "This is a string with whitespace",
+        ))));
 }
 
 #[test]
@@ -119,7 +129,9 @@ fn should_not_try_to_interpret_comments_in_strings() {
     user_model
         .assert_has_field("firstName")
         .assert_base_type(&ScalarType::String)
-        .assert_default_value(ScalarValue::String(String::from("This is a string with a // Comment")));
+        .assert_default_value(dml::DefaultValue::Single(ScalarValue::String(String::from(
+            "This is a string with a // Comment",
+        ))));
 }
 
 #[test]

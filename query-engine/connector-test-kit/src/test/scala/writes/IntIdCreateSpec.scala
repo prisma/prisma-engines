@@ -5,7 +5,6 @@ import util._
 
 class IntIdCreateSpec extends FlatSpec with Matchers with ApiSpecBase {
 
-
   "Creating an item with an id field of type Int without default" should "work" in {
     val project = ProjectDsl.fromString {
       s"""
@@ -53,7 +52,8 @@ class IntIdCreateSpec extends FlatSpec with Matchers with ApiSpecBase {
         |  }
         |}
       """.stripMargin,
-      project,0
+      project,
+      0
     )
   }
 
@@ -66,6 +66,7 @@ class IntIdCreateSpec extends FlatSpec with Matchers with ApiSpecBase {
          |}
        """.stripMargin
     }
+
     database.setup(project)
 
     val result = server.query(
