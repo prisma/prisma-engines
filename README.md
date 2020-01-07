@@ -2,7 +2,7 @@
 [![crates.io](https://meritbadge.herokuapp.com/quaint)](https://crates.io/crates/quaint)
 [![docs.rs](https://docs.rs/quaint/badge.svg)](https://docs.rs/quaint)
 [![Build status](https://badge.buildkite.com/c30bc2b4dccc155aec44608ad5f366feabdab121295ceb6b6b.svg)](https://buildkite.com/prisma/quaint)
-![Discord](https://img.shields.io/discord/664092374359605268)
+[![Discord](https://img.shields.io/discord/664092374359605268)](https://discord.gg/r4CPY4B)
 
 Quaint is an abstraction over certain SQL databases. It provides:
 
