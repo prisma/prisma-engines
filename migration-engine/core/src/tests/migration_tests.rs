@@ -1578,10 +1578,10 @@ async fn escaped_string_defaults_are_not_arbitrarily_migrated(api: &TestApi) -> 
         }
     "#;
 
-    let output = api.infer_and_apply(dm1).await;
+    let output = api.infer_apply(dm1).send().await?;
 
-    anyhow::ensure!(!output.migration_output.datamodel_steps.is_empty(), "Yes migration");
-    anyhow::ensure!(output.migration_output.warnings.is_empty(), "No warnings");
+    anyhow::ensure!(!output.datamodel_steps.is_empty(), "Yes migration");
+    anyhow::ensure!(output.warnings.is_empty(), "No warnings");
 
     let insert = Insert::single_into(api.render_table_name("Fruit"))
         .value("id", "apple-id")
@@ -1590,14 +1590,15 @@ async fn escaped_string_defaults_are_not_arbitrarily_migrated(api: &TestApi) -> 
         .value("contains", "'vitamin C'")
         .value("seasonality", "september");
 
-    api.database().execute(insert.into()).await.unwrap();
+    api.database().execute(insert.into()).await?;
 
-    let output = api.infer_and_apply(dm1).await;
+    let output = api.infer_apply(dm1).send().await?;
 
-    anyhow::ensure!(output.migration_output.datamodel_steps.is_empty(), "No migration");
-    anyhow::ensure!(output.migration_output.warnings.is_empty(), "No warnings");
+    anyhow::ensure!(output.datamodel_steps.is_empty(), "No migration");
+    anyhow::ensure!(output.warnings.is_empty(), "No warnings");
 
-    let table = output.sql_schema.table_bang("Fruit");
+    let sql_schema = api.describe_database().await?;
+    let table = sql_schema.table_bang("Fruit");
 
     assert_eq!(
         table
@@ -1667,13 +1668,10 @@ async fn created_at_does_not_get_arbitrarily_migrated(api: &TestApi) -> TestResu
         }
     "#;
 
-    let output = api.infer_and_apply(dm2).await;
+    let output = api.infer_apply(dm2).send().await?;
 
-    anyhow::ensure!(output.migration_output.warnings.is_empty(), "No warnings");
-    anyhow::ensure!(
-        output.migration_output.datamodel_steps.is_empty(),
-        "Migration should be empty"
-    );
+    anyhow::ensure!(output.warnings.is_empty(), "No warnings");
+    anyhow::ensure!(output.datamodel_steps.is_empty(), "Migration should be empty");
 
     Ok(())
 }
@@ -1797,8 +1795,7 @@ async fn relations_can_reference_multiple_fields(api: &TestApi) -> TestResult {
         }
     "#;
 
-    api.infer_and_apply_with_options(InferAndApplyBuilder::new(dm).build())
-        .await?;
+    api.infer_apply(dm).send().await?;
     let schema = api.describe_database().await?;
 
     let fks = &schema.table_bang("Account").foreign_keys;
@@ -1841,8 +1838,7 @@ async fn relations_can_reference_multiple_fields_with_mappings(api: &TestApi) ->
         }
     "#;
 
-    api.infer_and_apply_with_options(InferAndApplyBuilder::new(dm).build())
-        .await?;
+    api.infer_apply(dm).send().await?;
     let schema = api.describe_database().await?;
 
     let fks = &schema.table_bang("Account").foreign_keys;
