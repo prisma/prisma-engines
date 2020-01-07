@@ -120,13 +120,13 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
                 }
             };
 
-            let (name, sanitized_name) = sanitize_name(column.name.clone());
+            let (name, db_name) = sanitize_name(column.name.clone());
 
             let field = Field {
                 name,
                 arity,
                 field_type,
-                database_name: sanitized_name.map(|sn| Single(sn)),
+                database_name: db_name.map(|dn| Single(dn)),
                 default_value,
                 is_unique,
                 id_info,
@@ -236,6 +236,8 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
             documentation: None,
         });
     }
+
+    // upwards comes from the db
 
     let mut fields_to_be_added = Vec::new();
 
@@ -379,6 +381,14 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
         let model = data_model.find_model_mut(&model).unwrap();
         model.add_field(field);
     }
+
+    // todo do all the name sanitizing here
+    // model names
+    // field names
+    // enum names
+    // relation names
+    // relationinfo to
+    // relationinfo to_fields
 
     Ok(data_model)
 }
