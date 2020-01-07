@@ -727,7 +727,7 @@ async fn compound_foreign_keys_should_work_for_relations(api: &TestApi) {
             model User {
                id       Int     @id @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
                name     String
-               post     Post
+               post     Post?
                
                @@unique([id, name], name: "user_unique")
             }

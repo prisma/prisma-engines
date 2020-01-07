@@ -1,8 +1,8 @@
 use crate::SqlIntrospectionResult;
 use datamodel::{
     common::{names::NameNormalizer, ScalarType, ScalarValue},
-    dml, Datamodel, Field, FieldArity, FieldType, IdInfo, IdStrategy, IndexDefinition, Model, OnDeleteStrategy,
-    RelationInfo, WithDatabaseName,
+    dml, DatabaseName, Datamodel, Field, FieldArity, FieldType, IdInfo, IdStrategy, IndexDefinition, Model,
+    OnDeleteStrategy, RelationInfo, WithDatabaseName,
 };
 use log::debug;
 use prisma_inflector;
@@ -135,7 +135,7 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
 
         fn unique_index_covers_foreign_key(index: &Index, foreign_key: &ForeignKey) -> bool {
             match index.tpe {
-                IndexType::Unique => foreign_key.referenced_columns == index.columns,
+                IndexType::Unique => foreign_key.columns == index.columns,
                 IndexType::Normal => false,
             }
         }
@@ -147,6 +147,7 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
                 .iter()
                 .all(|fk| !unique_index_covers_foreign_key(i, fk))
         }) {
+            debug!("Handling index  {:?}", index);
             let tpe = match index.tpe {
                 IndexType::Unique => datamodel::dml::IndexType::Unique,
                 IndexType::Normal => datamodel::dml::IndexType::Normal,
@@ -192,14 +193,16 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
 
             let is_unique = false;
 
-            //todo name of the opposing model  -> still needs to be sanitized
+            //todo name of the opposing model  -> still needs to be sanitized and lowercased
             let name = foreign_key.referenced_table.clone();
+
+            let database_name = Some(DatabaseName::Compound(columns.iter().map(|c| c.name.clone()).collect()));
 
             let field = Field {
                 name,
                 arity,
                 field_type,
-                database_name: None,
+                database_name,
                 default_value,
                 is_unique,
                 id_info: None,
@@ -271,16 +274,20 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
                         // if there are separate uniques it probably should not become a relation
                         // what breaks by having an @@unique that refers to fields that do not have a representation on the model anymore due to the merged relation field
 
-                        let arity = match relation_field.arity {
-                            FieldArity::Required | FieldArity::Optional
-                                if schema.table_bang(&model.name).is_column_unique(
-                                    &relation_field
-                                        .single_database_name()
-                                        .unwrap_or(relation_field.name.as_str()),
-                                ) =>
-                            {
-                                FieldArity::Optional
+                        let other_is_unique = || {
+                            let table = schema.table_bang(&model.name);
+
+                            match &relation_field.database_name {
+                                None => table.is_column_unique(relation_field.name.as_str()),
+                                Some(DatabaseName::Single(name)) => table.is_column_unique(name),
+                                Some(DatabaseName::Compound(names)) => {
+                                    table.indices.iter().any(|i| i.columns == *names)
+                                }
                             }
+                        };
+
+                        let arity = match relation_field.arity {
+                            FieldArity::Required | FieldArity::Optional if other_is_unique() => FieldArity::Optional,
                             FieldArity::Required | FieldArity::Optional => FieldArity::List,
                             FieldArity::List => FieldArity::Optional,
                         };
