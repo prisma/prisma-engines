@@ -728,13 +728,15 @@ async fn introspecting_id_fields_with_foreign_key_should_ignore_the_relation(api
 // to one relations, required relations, to many relations
 // separate uniques on compound fields
 // default values on compound fields
+// field / model names that need sanitizing
 
 #[test_one_connector(connector = "postgres")]
+#[test]
 async fn compound_foreign_keys_should_work_for_relations(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
-            migration.create_table("User", |t| {
+            migration.create_table("User with Space", |t| {
                 t.add_column("id", types::primary());
                 t.add_column("name", types::text());
                 t.inject_custom("CONSTRAINT user_unique UNIQUE(\"id\", \"name\")");
@@ -743,7 +745,9 @@ async fn compound_foreign_keys_should_work_for_relations(api: &TestApi) {
                 t.add_column("id", types::primary());
                 t.add_column("user_id", types::integer());
                 t.add_column("user_name", types::text());
-                t.inject_custom("FOREIGN KEY (\"user_id\",\"user_name\") REFERENCES \"User\"(\"id\", \"name\")");
+                t.inject_custom(
+                    "FOREIGN KEY (\"user_id\",\"user_name\") REFERENCES \"User with Space\"(\"id\", \"name\")",
+                );
                 t.inject_custom("CONSTRAINT post_user_unique UNIQUE(\"user_id\", \"user_name\")");
             });
         })
@@ -751,15 +755,16 @@ async fn compound_foreign_keys_should_work_for_relations(api: &TestApi) {
 
     let dm = r#"
             model Post {
-                id      Int     @id @sequence(name: "Post_id_seq", allocationSize: 1, initialValue: 1)
-                user    User    @map(["user_id", "user_name"]) @relation(references:[id, name]) 
+                id      Int                 @id @sequence(name: "Post_id_seq", allocationSize: 1, initialValue: 1)
+                user    User_with_Space     @map(["user_id", "user_name"]) @relation(references:[id, name]) 
             }
 
-            model User {
-               id       Int     @id @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
+            model User_with_Space {
+               id       Int                 @id @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
                name     String
                post     Post?
                
+               @@map("User with Space")
                @@unique([id, name], name: "user_unique")
             }
         "#;

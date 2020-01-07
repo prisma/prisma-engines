@@ -25,23 +25,6 @@ impl RelationInfo {
             on_delete: OnDeleteStrategy::None,
         }
     }
-    pub fn new_with_field(to: &str, to_field: &str) -> RelationInfo {
-        RelationInfo {
-            to: String::from(to),
-            to_fields: vec![String::from(to_field)],
-            name: String::new(),
-            on_delete: OnDeleteStrategy::None,
-        }
-    }
-
-    pub fn new_with_fields(to: &str, to_fields: Vec<String>) -> RelationInfo {
-        RelationInfo {
-            to: String::from(to),
-            to_fields,
-            name: String::new(),
-            on_delete: OnDeleteStrategy::None,
-        }
-    }
 }
 
 /// Describes what happens when related nodes

@@ -4,7 +4,7 @@ use datamodel::{
     dml,
     DatabaseName::{Compound, Single},
     Datamodel, Field, FieldArity, FieldType, IdInfo, IdStrategy, IndexDefinition, Model, OnDeleteStrategy,
-    RelationInfo,
+    RelationInfo, WithDatabaseName,
 };
 use log::debug;
 use prisma_inflector;
@@ -122,13 +122,11 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
 
             let (name, sanitized_name) = sanitize_name(column.name.clone());
 
-            let database_name = sanitized_name.map(|sn| Single(sn));
-
             let field = Field {
                 name,
                 arity,
                 field_type,
-                database_name,
+                database_name: sanitized_name.map(|sn| Single(sn)),
                 default_value,
                 is_unique,
                 id_info,
@@ -200,8 +198,8 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
 
             let is_unique = false;
 
-            //todo name of the opposing model  -> still needs to be sanitized and lowercased
-            let name = foreign_key.referenced_table.clone();
+            //todo name of the opposing model  -> still needs to be sanitized
+            let name = foreign_key.referenced_table.clone().to_lowercase();
 
             let database_name = Some(Compound(columns.iter().map(|c| c.name.clone()).collect()));
 
@@ -255,7 +253,7 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
                         )
                         .is_none()
                     {
-                        let other_model = data_model.find_model(&relation_info.to).unwrap();
+                        let other_model = data_model.find_model(relation_info.to.as_str()).unwrap();
 
                         let table = schema.table_bang(model.name.as_str());
                         let fk = table.foreign_key_for_column(relation_field.name.as_str());
@@ -348,8 +346,8 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
         }
     }
 
+    //todo find duplicated field indexes
     let mut duplicated_relation_fields = Vec::new();
-
     fields_to_be_added
         .iter()
         .enumerate()
@@ -365,6 +363,7 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
             }
         });
 
+    //todo disambiguate names
     duplicated_relation_fields.iter().for_each(|index| {
         let (_, ref mut field) = fields_to_be_added.get_mut(*index).unwrap();
         let suffix = match &field.field_type {

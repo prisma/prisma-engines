@@ -1,4 +1,5 @@
 use super::*;
+use crate::DatabaseName::{Compound, Single};
 
 /// Represents a prisma-datamodel.
 #[derive(Debug, PartialEq, Clone)]
@@ -78,7 +79,11 @@ impl Datamodel {
 
     /// Finds a model by name.
     pub fn find_model(&self, name: &str) -> Option<&Model> {
-        self.models().find(|m| m.name == *name)
+        self.models.iter().find(|model| match &model.database_name {
+            None => model.name == name,
+            Some(Single(single_name)) => single_name == name,
+            Some(Compound(_)) => panic!("Should not happen."),
+        })
     }
 
     /// Finds a model for a field reference by using reference comparison.

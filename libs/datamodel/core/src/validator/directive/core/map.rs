@@ -1,3 +1,4 @@
+use crate::ast::Span;
 use crate::error::DatamodelError;
 use crate::validator::directive::{Args, DirectiveValidator};
 use crate::{ast, dml, DatabaseName};
@@ -36,7 +37,6 @@ impl<T: dml::WithDatabaseName> DirectiveValidator<T> for MapDirectiveValidator {
 
     fn serialize(&self, obj: &T, _datamodel: &dml::Datamodel) -> Result<Vec<ast::Directive>, DatamodelError> {
         if let Some(db_name) = obj.database_names() {
-            //todo can be single or compound
             match db_name {
                 DatabaseName::Single(name) => {
                     return Ok(vec![ast::Directive::new(
@@ -45,17 +45,15 @@ impl<T: dml::WithDatabaseName> DirectiveValidator<T> for MapDirectiveValidator {
                     )])
                 }
                 DatabaseName::Compound(names) => {
-                    let mut related_fields: Vec<ast::Expression> = Vec::new();
-                    for related_field in names {
-                        related_fields.push(ast::Expression::ConstantValue(
-                            related_field.clone(),
-                            ast::Span::empty(),
-                        ));
-                    }
-
                     return Ok(vec![ast::Directive::new(
                         DirectiveValidator::<T>::directive_name(self),
-                        vec![ast::Argument::new_array("", related_fields)],
+                        vec![ast::Argument::new_array(
+                            "",
+                            names
+                                .iter()
+                                .map(|name| ast::Expression::StringValue(String::from(name), Span::empty()))
+                                .collect(),
+                        )],
                     )]);
                 }
             }
