@@ -1,6 +1,6 @@
 # Changelog
 
-## v0.1.6 (not released)
+## v0.1.6
 
 - Loosen up certain vector-taking functions to use `IntoIter`
 - Fix the `columns` method to actually use `Column` instead of a plain `DatabaseValue`
