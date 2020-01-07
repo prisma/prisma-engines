@@ -187,7 +187,7 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
                 false => FieldArity::Required,
             };
 
-            // todo this latter needs to be a compound value of the two columns defaults?
+            // todo this later needs to be a compound value of the two columns defaults?
             let default_value = None;
 
             let is_unique = false;

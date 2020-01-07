@@ -85,7 +85,11 @@ impl WithName for Field {
 
 impl WithDatabaseName for Field {
     fn single_database_name(&self) -> Option<&str> {
-        panic!("Should not be called on fields since these can now be compound.")
+        match &self.database_name {
+            None => None,
+            Some(DatabaseName::Single(name)) => Some(name.as_ref()),
+            Some(DatabaseName::Compound(_)) => panic!("This is not implemented yet for fields."),
+        }
     }
 
     fn database_names(&self) -> &Option<DatabaseName> {

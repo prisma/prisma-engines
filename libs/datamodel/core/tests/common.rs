@@ -212,7 +212,7 @@ impl ModelAsserts for dml::Model {
     }
 
     fn assert_with_db_name(&self, t: &str) -> &Self {
-        assert_eq!(self.database_name, Some(String::from(t)));
+        assert_eq!(self.database_name, Some(DatabaseName::Single(String::from(t))));
 
         self
     }

@@ -721,7 +721,7 @@ async fn compound_foreign_keys_should_work_for_relations(api: &TestApi) {
     let dm = r#"
             model Post {
                 id      Int     @id @sequence(name: "Post_id_seq", allocationSize: 1, initialValue: 1)
-                user    User    @relation(references:[id, name]) @map(["user_id", "user_name"])
+                user    User    @map(["user_id", "user_name"]) @relation(references:[id, name]) 
             }
 
             model User {
