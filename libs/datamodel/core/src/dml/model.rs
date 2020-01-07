@@ -36,14 +36,14 @@ pub enum IndexType {
 
 impl Model {
     /// Creates a new model with the given name.
-    pub fn new(name: &str) -> Model {
+    pub fn new(name: String, database_name: Option<String>) -> Model {
         Model {
-            name: String::from(name),
+            name,
             fields: vec![],
             indexes: vec![],
             id_fields: vec![],
             documentation: None,
-            database_name: None,
+            database_name,
             is_embedded: false,
             is_generated: false,
         }

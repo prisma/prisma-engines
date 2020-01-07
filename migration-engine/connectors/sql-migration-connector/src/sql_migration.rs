@@ -34,6 +34,7 @@ impl DatabaseMigrationMarker for SqlMigration {
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub enum SqlMigrationStep {
+    AddForeignKey(AddForeignKey),
     CreateTable(CreateTable),
     AlterTable(AlterTable),
     DropTable(DropTable),
@@ -99,6 +100,12 @@ pub struct DropColumn {
 pub struct AlterColumn {
     pub name: String,
     pub column: Column,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
+pub struct AddForeignKey {
+    pub table: String,
+    pub foreign_key: ForeignKey,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]

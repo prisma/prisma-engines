@@ -1,4 +1,4 @@
-use migration_core::{api::GenericApi, commands::*};
+use crate::{api::GenericApi, commands::*};
 use sql_migration_connector::{PrettySqlMigrationStep, SqlMigrationStep};
 use sql_schema_describer::*;
 

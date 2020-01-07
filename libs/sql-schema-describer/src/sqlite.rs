@@ -14,7 +14,7 @@ pub struct SqlSchemaDescriber {
 impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
     async fn list_databases(&self) -> SqlSchemaDescriberResult<Vec<String>> {
         let databases = self.get_databases().await;
- Ok(databases)
+        Ok(databases)
     }
 
     async fn get_metadata(&self, schema: &str) -> SqlSchemaDescriberResult<SQLMetadata> {
@@ -89,11 +89,7 @@ impl SqlSchemaDescriber {
         let result = self.conn.query_raw(&sql, &[]).await.expect("get db size ");
         let size: i64 = result
             .first()
-            .map(|row| {
-                row.get("size")
-                    .and_then(|x| x.as_i64())
-                    .unwrap_or(0)
-            })
+            .map(|row| row.get("size").and_then(|x| x.as_i64()).unwrap_or(0))
             .unwrap();
 
         size.try_into().unwrap()
@@ -123,9 +119,9 @@ impl SqlSchemaDescriber {
             .map(|row| {
                 debug!("Got column row {:?}", row);
                 let default_value = match row.get("dflt_value") {
-                    Some(ParameterizedValue::Text(v)) => Some(v.to_string().replace("\"", "")),
+                    Some(ParameterizedValue::Text(v)) => Some(v.to_string().replace("\"", "").replace("'", "")),
                     Some(ParameterizedValue::Null) => None,
-                    Some(p) => panic!(format!("expected a string value but got {:?}", p)),
+                    Some(p) => panic!("expected a string value but got {:?}", p),
                     None => panic!("couldn't get dflt_value column"),
                 };
 
@@ -172,7 +168,6 @@ impl SqlSchemaDescriber {
                 for i in col_idxs {
                     columns.push(pk_cols[i].clone());
                 }
-
 
                 //Integer Id columns are always implemented with either row id or autoincrement
                 if pk_cols.len() == 1 {

@@ -11,7 +11,6 @@ use rpc::{Rpc, RpcImpl};
 
 fn main() {
     let matches = cli::clap_app().get_matches();
-    std::env::set_var("RUST_LOG", "debug");
     init_logger();
 
     if matches.is_present("version") {

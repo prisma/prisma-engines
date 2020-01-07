@@ -1,7 +1,7 @@
 use crate::{cursor_condition, filter_conversion::AliasedCondition};
 use connector_interface::{OrderDirections, QueryArguments, SkipAndLimit};
 use prisma_models::prelude::*;
-use quaint::ast::{Aliasable, Comparable, ConditionTree, Joinable, Select, Column};
+use quaint::ast::{Aliasable, Column, Comparable, ConditionTree, Joinable, Select};
 
 pub struct ManyRelatedRecordsBaseQuery<'a> {
     pub from_field: &'a RelationFieldRef,
@@ -32,24 +32,27 @@ impl<'a> ManyRelatedRecordsBaseQuery<'a> {
             .map(|f| f.aliased_cond(None))
             .unwrap_or(ConditionTree::NoCondition);
 
-        let opposite_column = from_field.opposite_column().table(Relation::TABLE_ALIAS);
         let select = Select::from_table(from_field.related_model().as_table());
 
-        let join = from_field
-            .relation()
-            .as_table()
-            .alias(Relation::TABLE_ALIAS)
-            .on(from_field
-                .related_model()
-                .fields()
-                .id()
-                .as_column()
-                .equals(opposite_column));
+        let query = if from_field.relation_is_inlined_in_child() {
+            columns.iter().fold(select, |acc, col| acc.column(col.clone()))
+        } else {
+            let join = from_field
+                .relation()
+                .as_table()
+                .alias(Relation::TABLE_ALIAS)
+                .on(from_field
+                    .related_model()
+                    .fields()
+                    .id()
+                    .as_column()
+                    .equals(from_field.opposite_column(true)));
 
-        let query = columns
-            .iter()
-            .fold(select, |acc, col| acc.column(col.clone()))
-            .inner_join(join);
+            columns
+                .iter()
+                .fold(select, |acc, col| acc.column(col.clone()))
+                .inner_join(join)
+        };
 
         Self {
             from_field,

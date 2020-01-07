@@ -60,7 +60,7 @@ impl LiftAstToDml {
 
     /// Internal: Validates a model AST node and lifts it to a DML model.
     fn lift_model(&self, ast_model: &ast::Model, ast_schema: &ast::SchemaAst) -> Result<dml::Model, ErrorCollection> {
-        let mut model = dml::Model::new(&ast_model.name.name);
+        let mut model = dml::Model::new(ast_model.name.name.clone(), None);
         model.documentation = ast_model.documentation.clone().map(|comment| comment.text);
 
         let mut errors = ErrorCollection::new();

@@ -16,13 +16,13 @@ pub struct SqlSchemaDescriber {
 impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
     async fn list_databases(&self) -> SqlSchemaDescriberResult<Vec<String>> {
         let databases = self.get_databases().await;
-       Ok(databases)
+        Ok(databases)
     }
 
     async fn get_metadata(&self, schema: &str) -> SqlSchemaDescriberResult<SQLMetadata> {
         let count = self.get_table_names(&schema).await.len();
         let size = self.get_size(&schema).await;
-       Ok(SQLMetadata {
+        Ok(SQLMetadata {
             table_count: count,
             size_in_bytes: size,
         })
@@ -105,11 +105,7 @@ impl SqlSchemaDescriber {
         let result = self.conn.query_raw(sql, &[schema.into()]).await.expect("get db size ");
         let size: i64 = result
             .first()
-            .map(|row| {
-                row.get("size")
-                    .and_then(|x| x.as_i64())
-                    .unwrap_or(0)
-            })
+            .map(|row| row.get("size").and_then(|x| x.as_i64()).unwrap_or(0))
             .unwrap();
 
         debug!("Found db size: {:?}", size);
@@ -207,17 +203,22 @@ impl SqlSchemaDescriber {
     }
 
     async fn get_foreign_keys(&self, schema: &str, table: &str) -> Vec<ForeignKey> {
-        let sql = "SELECT 
-                con.oid as \"con_id\",
-                att2.attname as \"child_column\",
-                cl.relname as \"parent_table\",
-                att.attname as \"parent_column\",
+        // The `generate_subscripts` in the inner select is needed because the optimizer is free to reorganize the unnested rows if not explicitly ordered.
+        let sql = r#"
+            SELECT
+                con.oid as "con_id",
+                att2.attname as "child_column",
+                cl.relname as "parent_table",
+                att.attname as "parent_column",
                 con.confdeltype,
-                conname as constraint_name
+                conname as constraint_name,
+                child,
+                parent
             FROM
             (SELECT
-                    unnest(con1.conkey) as \"parent\",
-                    unnest(con1.confkey) as \"child\",
+                    unnest(con1.conkey) as "parent",
+                    unnest(con1.confkey) as "child",
+                    generate_subscripts(con1.conkey, 1) AS colidx,
                     con1.oid,
                     con1.confrelid,
                     con1.conrelid,
@@ -231,6 +232,7 @@ impl SqlSchemaDescriber {
                     cl.relname = $1
                     and ns.nspname = $2
                     and con1.contype = 'f'
+                    ORDER BY colidx
             ) con
             JOIN pg_attribute att on
                 att.attrelid = con.confrelid and att.attnum = con.child
@@ -238,7 +240,7 @@ impl SqlSchemaDescriber {
                 cl.oid = con.confrelid
             JOIN pg_attribute att2 on
                 att2.attrelid = con.conrelid and att2.attnum = con.parent
-            ORDER BY con_id";
+            ORDER BY con_id, con.colidx"#;
         debug!("describing table foreign keys, SQL: '{}'", sql);
 
         // One foreign key with multiple columns will be represented here as several

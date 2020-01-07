@@ -9,8 +9,7 @@ impl ManyRelatedRecordsQueryBuilder for ManyRelatedRecordsWithRowNumber {
     fn with_pagination(base: ManyRelatedRecordsBaseQuery) -> Query {
         let conditions = base
             .from_field
-            .relation_column()
-            .table(Relation::TABLE_ALIAS)
+            .relation_column(true)
             .in_selection(base.from_record_ids.to_owned())
             .and(base.condition)
             .and(base.cursor);

@@ -10,25 +10,18 @@ pub fn render_nullability(column: &Column) -> &'static str {
 
 pub fn render_default(column: &Column) -> String {
     match &column.default {
-        Some(value) => {
-            let default = match column.tpe.family {
-                ColumnTypeFamily::String | ColumnTypeFamily::DateTime => {
-                    // TODO: find a better solution for this amazing hack. the default value must not be a String
-                    if value.starts_with("'") {
-                        format!("DEFAULT {}", value)
-                    } else {
-                        format!("DEFAULT '{}'", value)
-                    }
-                }
-                _ => format!("DEFAULT {}", value),
-            };
-            // we use the default value right now only to smoothen migrations. So we only use it when absolutely needed.
-            if column.is_required() {
-                default
-            } else {
-                "".to_string()
-            }
-        }
+        Some(value) => match column.tpe.family {
+            ColumnTypeFamily::String | ColumnTypeFamily::DateTime => format!(
+                "DEFAULT '{}'",
+                // TODO: remove once sql-schema-describer does unescaping, and perform escaping again here.
+                value
+                    .trim_matches('\\')
+                    .trim_matches('"')
+                    .trim_matches('\'')
+                    .trim_matches('\\')
+            ),
+            _ => format!("DEFAULT {}", value),
+        },
         None => "".to_string(),
     }
 }

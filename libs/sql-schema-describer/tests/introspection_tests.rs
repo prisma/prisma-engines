@@ -48,7 +48,6 @@ fn is_required_must_work() {
                 t.add_column("column2", types::integer().nullable(true));
             });
         },
-
         |db_type, inspector, schema_name| {
             async move {
                 let result = inspector.describe(schema_name).await.expect("describing");
@@ -162,21 +161,21 @@ fn multi_column_foreign_keys_must_work() {
                 t.add_column("id", types::primary());
                 t.add_column("name", types::varchar(255));
                 if db_type != DbType::Sqlite {
-                    t.inject_custom("constraint uniq unique (id, name)");
+                    t.inject_custom("constraint uniq unique (name, id)");
                 }
             });
             migration.create_table("User", move |t| {
                 t.add_column("city", types::integer());
                 t.add_column("city_name", types::varchar(255));
                 if db_type == DbType::MySql {
-                    t.inject_custom("FOREIGN KEY(city, city_name) REFERENCES City(id, name)");
+                    t.inject_custom("FOREIGN KEY(city_name, city) REFERENCES City(name, id)");
                 } else {
                     let relation_prefix = match db_type {
                         DbType::Postgres => format!("\"{}\".", SCHEMA),
                         _ => "".to_string(),
                     };
                     t.inject_custom(format!(
-                        "FOREIGN KEY(city, city_name) REFERENCES {}\"City\"(id, name)",
+                        "FOREIGN KEY(city_name, city) REFERENCES {}\"City\"(name, id)",
                         relation_prefix
                     ));
                 }
@@ -192,23 +191,22 @@ fn multi_column_foreign_keys_must_work() {
                         tpe: ColumnType {
                             raw: int_type(db_type),
                             family: ColumnTypeFamily::Int,
-                        arity: ColumnArity::Required,
+                            arity: ColumnArity::Required,
                         },
-                    default: None,
-                    auto_increment: false,
-
-                },
-                Column {
-                    name: "city_name".to_string(),
-                    tpe: ColumnType {
-                        raw: varchar_type(db_type, 255),
-                        family: ColumnTypeFamily::String,
-                        arity: ColumnArity::Required,
+                        default: None,
+                        auto_increment: false,
                     },
-                    default: None,
-                    auto_increment: false,
-                },
-            ];
+                    Column {
+                        name: "city_name".to_string(),
+                        tpe: ColumnType {
+                            raw: varchar_type(db_type, 255),
+                            family: ColumnTypeFamily::String,
+                            arity: ColumnArity::Required,
+                        },
+                        default: None,
+                        auto_increment: false,
+                    },
+                ];
 
                 let on_delete_action = match db_type {
                     DbType::MySql => ForeignKeyAction::Restrict,
@@ -224,26 +222,25 @@ fn multi_column_foreign_keys_must_work() {
                         primary_key: None,
                         foreign_keys: vec![ForeignKey {
                             constraint_name: match db_type {
-                                DbType::Postgres => Some("User_city_fkey".to_owned()),
+                                DbType::Postgres => Some("User_city_name_fkey".to_owned()),
                                 DbType::MySql => Some("User_ibfk_1".to_owned()),
                                 DbType::Sqlite => None,
                             },
-                            columns: vec!["city".to_string(), "city_name".to_string()],
-                            referenced_columns: vec!["id".to_string(), "name".to_string()],
+                            columns: vec!["city_name".to_string(), "city".to_string()],
+                            referenced_columns: vec!["name".to_string(), "id".to_string(),],
                             referenced_table: "City".to_string(),
                             on_delete_action,
                         },],
                     }
                 );
-
-            }.boxed()
             }
+            .boxed()
+        },
     );
 }
 
 #[test]
 fn names_with_hyphens_must_work() {
-
     let db_name = "names_with_hyphens_must_work";
 
     test_each_backend(
@@ -541,10 +538,7 @@ fn defaults_must_work() {
             async move {
                 let result = inspector.describe(schema_name).await.expect("describing");
                 let user_table = result.get_table("User").expect("getting User table");
-                let default = match db_type {
-                    DbType::Sqlite => "'1'".to_string(),
-                    _ => "1".to_string(),
-                };
+                let default = "1".to_owned();
                 let expected_columns = vec![Column {
                     name: "id".to_string(),
                     tpe: ColumnType {

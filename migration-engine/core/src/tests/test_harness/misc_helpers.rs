@@ -1,8 +1,10 @@
+use crate::{api::MigrationApi, commands::ResetCommand};
 use datamodel::ast::{parser, SchemaAst};
 use migration_connector::*;
-use migration_core::{api::MigrationApi, commands::ResetCommand};
 use sql_migration_connector::SqlMigrationConnector;
 use test_setup::*;
+
+pub type TestResult = Result<(), anyhow::Error>;
 
 pub fn parse(datamodel_string: &str) -> SchemaAst {
     parser::parse(datamodel_string).unwrap()

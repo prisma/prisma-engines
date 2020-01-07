@@ -1,10 +1,9 @@
 use crate::migration::datamodel_calculator::CalculatorError;
 use crate::migration_engine::MigrationEngine;
-use failure::Fail;
 use migration_connector::*;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
-use std::convert::From;
+use thiserror::Error;
 
 #[async_trait::async_trait]
 pub trait MigrationCommand {
@@ -19,21 +18,21 @@ pub trait MigrationCommand {
 
 pub type CommandResult<T> = Result<T, CommandError>;
 
-#[derive(Debug, Fail)]
+#[derive(Debug, Error)]
 pub enum CommandError {
-    #[fail(display = "Errors in datamodel. (errors: {:?})", errors)]
+    #[error("Errors in datamodel. (errors: {:?})", errors)]
     DataModelErrors { errors: Vec<String> },
 
-    #[fail(display = "Initialization error. (error: {})", error)]
+    #[error("Initialization error. (error: {})", error)]
     InitializationError { error: String },
 
-    #[fail(display = "Connector error. (error: {})", _0)]
+    #[error("Connector error. (error: {0})")]
     ConnectorError(ConnectorError),
 
-    #[fail(display = "Generic error. (error: {})", error)]
+    #[error("Generic error. (error: {})", error)]
     Generic { error: String },
 
-    #[fail(display = "Error in command input. (error: {})", error)]
+    #[error("Error in command input. (error: {})", error)]
     Input { error: String },
 }
 

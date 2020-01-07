@@ -138,7 +138,7 @@ datamodel = { SOI ~ (model_declaration | enum_declaration | source_block | gener
 // Greedy match escaped interpolation or any char. Do not match interpolation.
 string_any = @{ ANY }
 string_escaped_interpolation = @{ "\\"  ~ INTERPOLATION_START }
-// String is marked as compount atomic. We do not allow whitespace or similar.
+// String is marked as compound atomic. We do not allow whitespace or similar.
 string_interpolated = ${ SOI ~ (
                             // This is basically everything except an expression, using the escape trick from above.
                             (!(INTERPOLATION_START) ~ ( string_escaped_interpolation | string_any))+ |
