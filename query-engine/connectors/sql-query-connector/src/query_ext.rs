@@ -76,19 +76,22 @@ pub trait QueryExt: Queryable + Send + Sync {
         Ok(i64::try_from(id)?)
     }
 
-    /// Read the all columns as an `GraphqlId`
-    async fn filter_ids(&self, model: &ModelRef, filter: Filter) -> crate::Result<Vec<GraphqlId>> {
+    /// Read the all columns as a (primary) identifier.
+    async fn filter_ids(&self, model: &ModelRef, filter: Filter) -> crate::Result<Vec<RecordIdentifier>> {
+        let id_cols = model.primary_identifier().as_columns();
+
         let select = Select::from_table(model.as_table())
-            .column(model.fields().id().as_column())
+            .columns(id_cols)
             .so_that(filter.aliased_cond(None));
 
         self.select_ids(select).await
     }
 
-    async fn select_ids(&self, select: Select<'_>) -> crate::Result<Vec<GraphqlId>> {
+    async fn select_ids(&self, select: Select<'_>) -> crate::Result<Vec<RecordIdentifier>> {
         let mut rows = self
             .filter(select.into(), &[(TypeIdentifier::GraphQLID, FieldArity::Required)])
             .await?;
+
         let mut result = Vec::new();
 
         for mut row in rows.drain(0..) {

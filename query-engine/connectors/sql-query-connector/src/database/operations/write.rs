@@ -6,39 +6,41 @@ use quaint::error::Error as QueryError;
 pub async fn create_record(conn: &dyn QueryExt, model: &ModelRef, args: WriteArgs) -> crate::Result<GraphqlId> {
     let (insert, returned_id) = write::create_record(model, args.non_list_args().clone());
 
-    let last_id = match conn.insert(insert).await {
-        Ok(id) => id,
-        Err(QueryError::UniqueConstraintViolation { field_name }) => {
-            if field_name == "PRIMARY" {
-                return Err(SqlError::UniqueConstraintViolation {
-                    field_name: format!("{}.{}", model.name, model.fields().id().name),
-                });
-            } else {
-                return Err(SqlError::UniqueConstraintViolation {
-                    field_name: format!("{}.{}", model.name, field_name),
-                });
-            }
-        }
-        Err(QueryError::NullConstraintViolation { field_name }) => {
-            if field_name == "PRIMARY" {
-                return Err(SqlError::NullConstraintViolation {
-                    field_name: format!("{}.{}", model.name, model.fields().id().name),
-                });
-            } else {
-                return Err(SqlError::NullConstraintViolation {
-                    field_name: format!("{}.{}", model.name, field_name),
-                });
-            }
-        }
-        Err(e) => return Err(SqlError::from(e)),
-    };
+    // let last_id = match conn.insert(insert).await {
+    //     Ok(id) => id,
+    //     Err(QueryError::UniqueConstraintViolation { field_name }) => {
+    //         if field_name == "PRIMARY" {
+    //             return Err(SqlError::UniqueConstraintViolation {
+    //                 field_name: format!("{}.{}", model.name, model.fields().id().name),
+    //             });
+    //         } else {
+    //             return Err(SqlError::UniqueConstraintViolation {
+    //                 field_name: format!("{}.{}", model.name, field_name),
+    //             });
+    //         }
+    //     }
+    //     Err(QueryError::NullConstraintViolation { field_name }) => {
+    //         if field_name == "PRIMARY" {
+    //             return Err(SqlError::NullConstraintViolation {
+    //                 field_name: format!("{}.{}", model.name, model.fields().id().name),
+    //             });
+    //         } else {
+    //             return Err(SqlError::NullConstraintViolation {
+    //                 field_name: format!("{}.{}", model.name, field_name),
+    //             });
+    //         }
+    //     }
+    //     Err(e) => return Err(SqlError::from(e)),
+    // };
 
-    let id = match returned_id {
-        Some(id) => id,
-        None => GraphqlId::from(last_id.unwrap()),
-    };
+    // let id = match returned_id {
+    //     Some(id) => id,
+    //     None => GraphqlId::from(last_id.unwrap()),
+    // };
 
-    Ok(id)
+    // Ok(id)
+
+    todo!()
 }
 
 pub async fn update_records(

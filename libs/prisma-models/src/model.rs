@@ -4,7 +4,6 @@ use std::{
     hash::{Hash, Hasher},
     sync::{Arc, Weak},
 };
-use uuid::Uuid;
 
 pub type ModelRef = Arc<Model>;
 pub type ModelWeakRef = Weak<Model>;
@@ -77,35 +76,6 @@ impl PartialEq for Model {
 }
 
 impl Model {
-    pub fn generate_id(&self) -> Option<RecordIdentifier> {
-        self.fields().id().map(|mut id_fields| {
-            if id_fields.len() == 1 {
-                let id = id_fields.pop().unwrap();
-                let generated: PrismaValue = match id.type_identifier {
-                    // This will panic when:
-                    //
-                    // - System time goes backwards
-                    // - There is an error generating a fingerprint
-                    // - Time cannot be converted to a string.
-                    //
-                    // Panic is a better choice than bubbling this up
-                    TypeIdentifier::GraphQLID => GraphqlId::String(cuid::cuid().unwrap()),
-                    TypeIdentifier::UUID => GraphqlId::UUID(Uuid::new_v4()),
-                    TypeIdentifier::Int => panic!("Cannot generate integer ids."),
-
-                    // All other ID types are rejected on data model construction.
-                    _ => unreachable!(),
-                }
-                .into();
-
-                (Field::Scalar(id), generated).into()
-            } else {
-                // Todo: Check what our plan is regarding this.
-                unimplemented!("Generated multi-part IDs are currently unsupported.")
-            }
-        })
-    }
-
     /// Returns the set of fields to be used as the primary identifier for a record of that model.
     /// The implementation guarantees that the returned set of fields is deterministic for the same underlying data model.
     /// The rules for finding a primary identifier are as follows:

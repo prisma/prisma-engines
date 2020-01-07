@@ -6,50 +6,53 @@ use std::convert::TryFrom;
 const PARAMETER_LIMIT: usize = 10000;
 
 pub fn create_record(model: &ModelRef, mut args: PrismaArgs) -> (Insert<'static>, Option<GraphqlId>) {
-    let id_field = model.fields().id();
-    let return_id = args
-        .get_field_value(&id_field.name)
-        .map(|id| GraphqlId::try_from(id).expect("Could not convert prisma value to graphqlid"));
-
     // let mut id_fields = model.primary_identifier();
+    // let return_id = args
+    //     .get_field_value(&id_field.name)
+    //     .map(|id| GraphqlId::try_from(id).expect("Could not convert prisma value to graphqlid"));
+
+    // // --------------------- Snippets
     // // let id_field = if id_fields.len() == 1 {
     // //     id_fields.pop().unwrap()
     // // } else {
     // //     panic!("Multi-field IDs are not (yet) supported.")
     // // };
 
-    // let return_id = match args.get_field_value(&id_field.name) {
-    //     _ if id_field.is_auto_generated => None,
+    // // let return_id = match args.get_field_value(&id_field.name) {
+    // //     _ if id_field.is_auto_generated => None,
 
-    //     Some(PrismaValue::Null) | None => {
-    //         let id = model.generate_id();
-    //         args.insert(id_field.name.as_str(), id.clone());
-    //         Some(id)
-    //     }
+    // //     Some(PrismaValue::Null) | None => {
+    // //         let id = model.generate_id();
+    // //         args.insert(id_field.name.as_str(), id.clone());
+    // //         Some(id)
+    // //     }
 
-    //     Some(prisma_value) => {
-    //         Some(GraphqlId::try_from(prisma_value).expect("Could not convert prisma value to graphqlid"))
-    //     }
-    // };
+    // //     Some(prisma_value) => {
+    // //         Some(GraphqlId::try_from(prisma_value).expect("Could not convert prisma value to graphqlid"))
+    // //     }
+    // // };
+    // // ---------------------
 
-    let fields: Vec<&Field> = model
-        .fields()
-        .all
-        .iter()
-        .filter(|field| args.has_arg_for(&field.name()))
-        .collect();
+    // let fields: Vec<&Field> = model
+    //     .fields()
+    //     .all
+    //     .iter()
+    //     .filter(|field| args.has_arg_for(&field.name()))
+    //     .collect();
 
-    let fields = fields
-        .iter()
-        .map(|field| (field.db_name(), args.take_field_value(field.name()).unwrap()));
+    // let fields = fields
+    //     .iter()
+    //     .map(|field| (field.db_name(), args.take_field_value(field.name()).unwrap()));
 
-    let base = Insert::single_into(model.as_table());
+    // let base = Insert::single_into(model.as_table());
 
-    let insert = fields
-        .into_iter()
-        .fold(base, |acc, (name, value)| acc.value(name.into_owned(), value));
+    // let insert = fields
+    //     .into_iter()
+    //     .fold(base, |acc, (name, value)| acc.value(name.into_owned(), value));
 
-    (Insert::from(insert).returning(vec![id_field.as_column()]), return_id)
+    // (Insert::from(insert).returning(vec![id_field.as_column()]), return_id)
+
+    todo!()
 }
 
 pub fn create_relation_table_records(
