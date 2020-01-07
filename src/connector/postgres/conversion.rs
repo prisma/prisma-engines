@@ -160,7 +160,7 @@ impl GetRow for PostgresRow {
                 PostgresType::FLOAT4_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<f32> = val;
-                        ParameterizedValue::Array(val.into_iter().map(|x| ParameterizedValue::from(x)).collect())
+                        ParameterizedValue::Array(val.into_iter().map(ParameterizedValue::from).collect())
                     }
                     None => ParameterizedValue::Null,
                 },
@@ -168,7 +168,7 @@ impl GetRow for PostgresRow {
                 PostgresType::FLOAT8_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<f64> = val;
-                        ParameterizedValue::Array(val.into_iter().map(|x| ParameterizedValue::from(x)).collect())
+                        ParameterizedValue::Array(val.into_iter().map(ParameterizedValue::from).collect())
                     }
                     None => ParameterizedValue::Null,
                 },

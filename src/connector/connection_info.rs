@@ -114,7 +114,7 @@ impl ConnectionInfo {
     }
 
     /// The provided database user name. This will be `None` on SQLite.
-    pub fn username<'a>(&'a self) -> Option<Cow<'a, str>> {
+    pub fn username(&self) -> Option<Cow<str>> {
         match self {
             #[cfg(feature = "postgresql")]
             ConnectionInfo::Postgres(url) => Some(url.username()),
@@ -188,7 +188,7 @@ pub enum SqlFamily {
 
 impl SqlFamily {
     /// Get a string representation of the family.
-    pub fn as_str(&self) -> &'static str {
+    pub fn as_str(self) -> &'static str {
         match self {
             #[cfg(feature = "postgresql")]
             SqlFamily::Postgres => "postgresql",

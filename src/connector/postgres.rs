@@ -123,7 +123,7 @@ impl PostgresUrl {
     }
 
     /// The percent-decoded database username.
-    pub fn username<'a>(&'a self) -> Cow<'a, str> {
+    pub fn username(&self) -> Cow<str> {
         match percent_decode(self.url.username().as_bytes()).decode_utf8() {
             Ok(username) => username,
             Err(_) => {

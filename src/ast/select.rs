@@ -17,14 +17,14 @@ pub struct Select<'a> {
 impl<'a> From<Select<'a>> for DatabaseValue<'a> {
     #[inline]
     fn from(sel: Select<'a>) -> DatabaseValue<'a> {
-        DatabaseValue::Select(sel)
+        DatabaseValue::Select(Box::new(sel))
     }
 }
 
 impl<'a> From<Select<'a>> for Query<'a> {
     #[inline]
     fn from(sel: Select<'a>) -> Query<'a> {
-        Query::Select(sel)
+        Query::Select(Box::new(sel))
     }
 }
 

@@ -79,31 +79,28 @@
 //! The visitor returns the query as a string and its parameters as a vector.
 //!
 //! ```
-//! use quaint::{prelude::*, visitor::{Sqlite, Visitor}};
+//! # use quaint::{prelude::*, visitor::{Sqlite, Visitor}};
+//! let conditions = "word"
+//!     .equals("meow")
+//!     .and("age".less_than(10))
+//!     .and("paw".equals("warm"));
 //!
-//! fn main() {
-//!     let conditions = "word"
-//!         .equals("meow")
-//!         .and("age".less_than(10))
-//!         .and("paw".equals("warm"));
+//! let query = Select::from_table("naukio").so_that(conditions);
+//! let (sql_str, params) = Sqlite::build(query);
 //!
-//!     let query = Select::from_table("naukio").so_that(conditions);
-//!     let (sql_str, params) = Sqlite::build(query);
+//! assert_eq!(
+//!     "SELECT `naukio`.* FROM `naukio` WHERE ((`word` = ? AND `age` < ?) AND `paw` = ?)",
+//!     sql_str,
+//! );
 //!
-//!     assert_eq!(
-//!         "SELECT `naukio`.* FROM `naukio` WHERE ((`word` = ? AND `age` < ?) AND `paw` = ?)",
-//!         sql_str,
-//!     );
-//!
-//!     assert_eq!(
-//!         vec![
-//!             ParameterizedValue::from("meow"),
-//!             ParameterizedValue::from(10),
-//!             ParameterizedValue::from("warm"),
-//!         ],
-//!         params
-//!     );
-//! }
+//! assert_eq!(
+//!     vec![
+//!         ParameterizedValue::from("meow"),
+//!         ParameterizedValue::from(10),
+//!         ParameterizedValue::from("warm"),
+//!     ],
+//!     params
+//! );
 //! ```
 #[cfg(all(
     not(feature = "tracing-log"),

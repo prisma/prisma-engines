@@ -319,7 +319,7 @@ pub enum DatabaseValue<'a> {
     /// Data in a row form, e.g. (1, 2, 3)
     Row(Row<'a>),
     /// A nested `SELECT` statement
-    Select(Select<'a>),
+    Select(Box<Select<'a>>),
     /// A database function call
     Function(Function<'a>),
     /// A qualified asterisk to a table

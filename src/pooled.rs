@@ -93,7 +93,7 @@ impl Quaint {
             "mysql" => {
                 let url = crate::connector::MysqlUrl::new(url)?;
                 let connection_limit = url.connection_limit();
-                let manager = QuaintManager::Mysql(url.clone());
+                let manager = QuaintManager::Mysql(url);
 
                 (manager, connection_limit as u32)
             }

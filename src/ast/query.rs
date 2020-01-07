@@ -5,7 +5,7 @@ use std::borrow::Cow;
 #[derive(Debug, Clone, PartialEq)]
 pub enum Query<'a> {
     /// Query for fetching data. E.g. the `SELECT` query.
-    Select(Select<'a>),
+    Select(Box<Select<'a>>),
     Insert(Box<Insert<'a>>),
     Update(Box<Update<'a>>),
     Delete(Box<Delete<'a>>),

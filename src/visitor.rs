@@ -32,18 +32,15 @@ pub trait Visitor<'a> {
     /// The point of entry for visiting query ASTs.
     ///
     /// ```
-    /// use quaint::{ast::*, visitor::*};
+    /// # use quaint::{ast::*, visitor::*};
+    /// let query = Select::from_table("cats");
+    /// let (sqlite, _) = Sqlite::build(query.clone());
+    /// let (psql, _) = Postgres::build(query.clone());
+    /// let (mysql, _) = Mysql::build(query.clone());
     ///
-    /// fn main() {
-    ///     let query = Select::from_table("cats");
-    ///     let (sqlite, _) = Sqlite::build(query.clone());
-    ///     let (psql, _) = Postgres::build(query.clone());
-    ///     let (mysql, _) = Mysql::build(query.clone());
-    ///
-    ///     assert_eq!("SELECT `cats`.* FROM `cats`", sqlite);
-    ///     assert_eq!("SELECT \"cats\".* FROM \"cats\"", psql);
-    ///     assert_eq!("SELECT `cats`.* FROM `cats`", mysql);
-    /// }
+    /// assert_eq!("SELECT `cats`.* FROM `cats`", sqlite);
+    /// assert_eq!("SELECT \"cats\".* FROM \"cats\"", psql);
+    /// assert_eq!("SELECT `cats`.* FROM `cats`", mysql);
     /// ```
     fn build<Q>(query: Q) -> (String, Vec<ParameterizedValue<'a>>)
     where
@@ -243,7 +240,7 @@ pub trait Visitor<'a> {
     /// A walk through a complete `Query` statement
     fn visit_query(&mut self, query: Query<'a>) {
         match query {
-            Query::Select(select) => self.visit_select(select).unwrap(),
+            Query::Select(select) => self.visit_select(*select).unwrap(),
             Query::Insert(insert) => self.visit_insert(*insert).unwrap(),
             Query::Update(update) => self.visit_update(*update).unwrap(),
             Query::Delete(delete) => self.visit_delete(*delete).unwrap(),
@@ -323,7 +320,7 @@ pub trait Visitor<'a> {
             DatabaseValue::Parameterized(val) => self.visit_parameterized(val),
             DatabaseValue::Column(column) => self.visit_column(*column),
             DatabaseValue::Row(row) => self.visit_row(row),
-            DatabaseValue::Select(select) => self.surround_with("(", ")", |ref mut s| s.visit_select(select)),
+            DatabaseValue::Select(select) => self.surround_with("(", ")", |ref mut s| s.visit_select(*select)),
             DatabaseValue::Function(function) => self.visit_function(function),
             DatabaseValue::Op(op) => self.visit_operation(*op),
             DatabaseValue::Asterisk(table) => match table {
