@@ -136,20 +136,15 @@ impl<'a> Select<'a> {
     /// ```rust
     /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
     /// let query = Select::from_table("users").columns(vec!["foo", "bar"]);
-    /// let (sql, params) = Sqlite::build(query);
+    /// let (sql, _) = Sqlite::build(query);
     ///
-    /// assert_eq!("SELECT ?, ? FROM `users`", sql);
-    ///
-    /// assert_eq!(vec![
-    ///    ParameterizedValue::from("foo"),
-    ///    ParameterizedValue::from("bar"),
-    /// ], params);
+    /// assert_eq!("SELECT `foo`, `bar` FROM `users`", sql);
     /// ```
     pub fn columns<T>(mut self, columns: Vec<T>) -> Self
     where
-        T: Into<DatabaseValue<'a>>,
+        T: Into<Column<'a>>,
     {
-        self.columns = columns.into_iter().map(|c| c.into()).collect();
+        self.columns = columns.into_iter().map(|c| c.into().into()).collect();
         self
     }
 
