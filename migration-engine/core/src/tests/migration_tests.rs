@@ -1578,10 +1578,10 @@ async fn escaped_string_defaults_are_not_arbitrarily_migrated(api: &TestApi) -> 
         }
     "#;
 
-    let output = api.infer_and_apply(dm1).await;
+    let output = api.infer_apply(dm1).send().await?;
 
-    anyhow::ensure!(!output.migration_output.datamodel_steps.is_empty(), "Yes migration");
-    anyhow::ensure!(output.migration_output.warnings.is_empty(), "No warnings");
+    anyhow::ensure!(!output.datamodel_steps.is_empty(), "Yes migration");
+    anyhow::ensure!(output.warnings.is_empty(), "No warnings");
 
     let insert = Insert::single_into(api.render_table_name("Fruit"))
         .value("id", "apple-id")
@@ -1590,14 +1590,15 @@ async fn escaped_string_defaults_are_not_arbitrarily_migrated(api: &TestApi) -> 
         .value("contains", "'vitamin C'")
         .value("seasonality", "september");
 
-    api.database().execute(insert.into()).await.unwrap();
+    api.database().execute(insert.into()).await?;
 
-    let output = api.infer_and_apply(dm1).await;
+    let output = api.infer_apply(dm1).send().await?;
 
-    anyhow::ensure!(output.migration_output.datamodel_steps.is_empty(), "No migration");
-    anyhow::ensure!(output.migration_output.warnings.is_empty(), "No warnings");
+    anyhow::ensure!(output.datamodel_steps.is_empty(), "No migration");
+    anyhow::ensure!(output.warnings.is_empty(), "No warnings");
 
-    let table = output.sql_schema.table_bang("Fruit");
+    let sql_schema = api.describe_database().await?;
+    let table = sql_schema.table_bang("Fruit");
 
     assert_eq!(
         table
@@ -1667,13 +1668,10 @@ async fn created_at_does_not_get_arbitrarily_migrated(api: &TestApi) -> TestResu
         }
     "#;
 
-    let output = api.infer_and_apply(dm2).await;
+    let output = api.infer_apply(dm2).send().await?;
 
-    anyhow::ensure!(output.migration_output.warnings.is_empty(), "No warnings");
-    anyhow::ensure!(
-        output.migration_output.datamodel_steps.is_empty(),
-        "Migration should be empty"
-    );
+    anyhow::ensure!(output.warnings.is_empty(), "No warnings");
+    anyhow::ensure!(output.datamodel_steps.is_empty(), "Migration should be empty");
 
     Ok(())
 }
@@ -1683,34 +1681,32 @@ async fn renaming_a_datasource_works(api: &TestApi) -> TestResult {
     let dm1 = r#"
         datasource db1 {
             provider = "sqlite"
-            url = "file:///tmp/prisma-test.db"    
+            url = "file:///tmp/prisma-test.db"
         }
 
-        model User {
-            id Int @id  
-        }
-    "#;
-
-    let infer_output = api.infer_migration(&InferBuilder::new(dm1.to_owned()).build()).await?;
-
-    let dm2 = r#"
-        datasource db2 {
-            provider = "sqlite"
-            url = "file:///tmp/prisma-test.db"    
-        }
-    
         model User {
             id Int @id
         }
     "#;
 
-    api.infer_migration(
-        &InferBuilder::new(dm2.to_owned())
-            .assume_to_be_applied(Some(infer_output.datamodel_steps))
-            .migration_id(Some("mig02".to_owned()))
-            .build(),
-    )
-    .await?;
+    let infer_output = api.infer(dm1.to_owned()).send().await?;
+
+    let dm2 = r#"
+        datasource db2 {
+            provider = "sqlite"
+            url = "file:///tmp/prisma-test.db"
+        }
+
+        model User {
+            id Int @id
+        }
+    "#;
+
+    api.infer(dm2.to_owned())
+        .assume_to_be_applied(Some(infer_output.datamodel_steps))
+        .migration_id(Some("mig02".to_owned()))
+        .send()
+        .await?;
 
     Ok(())
 }
@@ -1722,11 +1718,11 @@ async fn relations_can_reference_arbitrary_unique_fields(api: &TestApi) -> TestR
             id Int @id
             email String @unique
         }
-        
+
         model Account {
             id Int @id
             user User @relation(references: [email])
-        }    
+        }
     "#;
 
     api.infer_apply(dm).send().await?;
@@ -1776,6 +1772,89 @@ async fn relations_can_reference_arbitrary_unique_fields_with_maps(api: &TestApi
     assert_eq!(fk.columns, &["user-id"]);
     assert_eq!(fk.referenced_table, "users");
     assert_eq!(fk.referenced_columns, &["emergency-mail"]);
+
+    Ok(())
+}
+
+#[test_each_connector]
+async fn relations_can_reference_multiple_fields(api: &TestApi) -> TestResult {
+    let dm = r#"
+        model User {
+            id Int @id
+            email  String
+            age    Int
+
+            @@unique([email, age])
+        }
+
+        model Account {
+            id   Int @id
+            user User @relation(references: [email, age])
+        }
+    "#;
+
+    api.infer_apply(dm).send().await?;
+    let schema = api.describe_database().await?;
+
+    let fks = &schema.table_bang("Account").foreign_keys;
+
+    // On SQLite we don't infer multi-field foreign keys correctly yet.
+    if api.is_sqlite() {
+        assert_eq!(fks.len(), 2);
+
+        assert!(fks.iter().all(|fk| fk.referenced_table == "User"));
+    } else {
+        assert_eq!(fks.len(), 1);
+
+        let fk = fks.iter().next().unwrap();
+
+        assert_eq!(fk.columns, &["user_email", "user_age"]);
+        assert_eq!(fk.referenced_table, "User");
+        assert_eq!(fk.referenced_columns, &["email", "age"]);
+    }
+
+    Ok(())
+}
+
+#[test_each_connector]
+async fn relations_can_reference_multiple_fields_with_mappings(api: &TestApi) -> TestResult {
+    let dm = r#"
+        model User {
+            id Int @id
+            email  String @map("emergency-mail")
+            age    Int    @map("birthdays-count")
+
+            @@unique([email, age])
+
+            @@map("users")
+        }
+
+        model Account {
+            id   Int @id
+            user User @relation(references: [email, age])
+            // @map(["emergency-mail-fk1", "age-fk2"])
+        }
+    "#;
+
+    api.infer_apply(dm).send().await?;
+    let schema = api.describe_database().await?;
+
+    let fks = &schema.table_bang("Account").foreign_keys;
+
+    // On SQLite we don't infer multi-field foreign keys correctly yet.
+    if api.is_sqlite() {
+        assert_eq!(fks.len(), 2);
+
+        assert!(fks.iter().all(|fk| fk.referenced_table == "users"));
+    } else {
+        assert_eq!(fks.len(), 1);
+
+        let fk = fks.iter().next().unwrap();
+
+        assert_eq!(fk.columns, &["user_emergency-mail", "user_birthdays-count"]);
+        assert_eq!(fk.referenced_table, "users");
+        assert_eq!(fk.referenced_columns, &["emergency-mail", "birthdays-count"]);
+    }
 
     Ok(())
 }

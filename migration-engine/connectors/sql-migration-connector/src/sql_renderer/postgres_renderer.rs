@@ -44,11 +44,19 @@ impl super::SqlRenderer for PostgresRenderer {
     }
 
     fn render_references(&self, schema_name: &str, foreign_key: &ForeignKey) -> String {
+        use itertools::Itertools;
+
+        let referenced_columns = foreign_key
+            .referenced_columns
+            .iter()
+            .map(|col| self.quote(col))
+            .join(",");
+
         format!(
-            "REFERENCES \"{}\".\"{}\"(\"{}\") {}",
+            "REFERENCES \"{}\".\"{}\"({}) {}",
             schema_name,
             foreign_key.referenced_table,
-            foreign_key.referenced_columns.first().unwrap(),
+            referenced_columns,
             render_on_delete(&foreign_key.on_delete_action)
         )
     }

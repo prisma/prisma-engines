@@ -156,16 +156,16 @@ async fn applying_an_already_applied_migration_must_return_an_error(api: &TestAp
 
     let migration_id = "duplicate-migration";
 
-    let input = ApplyBuilder::new()
+    let cmd = api
+        .apply()
         .migration_id(Some(migration_id.to_owned()))
         .steps(Some(steps))
-        .force(Some(true))
-        .build();
+        .force(Some(true));
 
-    api.apply_migration_with(&input).await?;
+    cmd.clone().send().await?;
 
     assert_eq!(
-        api.apply_migration_with(&input)
+        cmd.send()
             .await
             .map_err(|err| err.to_string())
             .unwrap_err(),

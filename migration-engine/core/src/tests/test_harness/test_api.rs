@@ -16,6 +16,14 @@ use sql_schema_describer::*;
 use std::sync::Arc;
 use test_setup::*;
 
+mod apply;
+mod infer;
+mod infer_apply;
+
+pub use apply::Apply;
+pub use infer::Infer;
+pub use infer_apply::InferApply;
+
 /// An atomic counter to generate unique migration IDs in tests.
 static MIGRATION_ID_COUNTER: std::sync::atomic::AtomicUsize = std::sync::atomic::AtomicUsize::new(0);
 
@@ -116,11 +124,22 @@ impl TestApi {
             .map_err(|err| self.api.render_error(err))
     }
 
-    pub async fn infer_migration(
-        &self,
-        input: &InferMigrationStepsInput,
-    ) -> Result<MigrationStepsResultOutput, anyhow::Error> {
-        Ok(self.api.infer_migration_steps(&input).await?)
+    pub fn infer<'a>(&'a self, dm: String) -> Infer<'a> {
+        Infer {
+            datamodel: dm,
+            api: self,
+            assume_to_be_applied: None,
+            migration_id: None,
+        }
+    }
+
+    pub fn apply<'a>(&'a self) -> Apply<'a> {
+        Apply {
+            api: self,
+            migration_id: None,
+            steps: None,
+            force: None,
+        }
     }
 
     pub async fn apply_migration_with(
@@ -327,146 +346,4 @@ async fn run_full_sql(database: &Arc<dyn Queryable + Send + Sync>, full_sql: &st
 pub struct UnapplyOutput {
     pub sql_schema: SqlSchema,
     pub output: UnapplyMigrationOutput,
-}
-
-pub struct InferBuilder {
-    assume_to_be_applied: Option<Vec<MigrationStep>>,
-    datamodel: String,
-    migration_id: Option<String>,
-}
-
-impl InferBuilder {
-    pub fn new(datamodel: String) -> Self {
-        InferBuilder {
-            assume_to_be_applied: None,
-            datamodel,
-            migration_id: None,
-        }
-    }
-
-    pub fn migration_id(mut self, migration_id: Option<String>) -> Self {
-        self.migration_id = migration_id;
-        self
-    }
-
-    pub fn assume_to_be_applied(mut self, assume_to_be_applied: Option<Vec<MigrationStep>>) -> Self {
-        self.assume_to_be_applied = assume_to_be_applied;
-        self
-    }
-
-    pub fn build(self) -> InferMigrationStepsInput {
-        let InferBuilder {
-            assume_to_be_applied,
-            datamodel,
-            migration_id,
-        } = self;
-
-        let migration_id = migration_id.unwrap_or_else(|| {
-            format!(
-                "migration-{}",
-                MIGRATION_ID_COUNTER.fetch_add(1, std::sync::atomic::Ordering::Relaxed)
-            )
-        });
-
-        InferMigrationStepsInput {
-            assume_to_be_applied: assume_to_be_applied.unwrap_or_else(Vec::new),
-            datamodel,
-            migration_id,
-        }
-    }
-}
-
-#[derive(Debug, Default)]
-pub struct ApplyBuilder {
-    migration_id: Option<String>,
-    steps: Option<Vec<MigrationStep>>,
-    force: Option<bool>,
-}
-
-impl ApplyBuilder {
-    pub fn new() -> Self {
-        ApplyBuilder::default()
-    }
-
-    pub fn migration_id(mut self, migration_id: Option<String>) -> Self {
-        self.migration_id = migration_id;
-        self
-    }
-
-    pub fn steps(mut self, steps: Option<Vec<MigrationStep>>) -> Self {
-        self.steps = steps;
-        self
-    }
-
-    pub fn force(mut self, force: Option<bool>) -> Self {
-        self.force = force;
-        self
-    }
-
-    pub fn build(self) -> ApplyMigrationInput {
-        let ApplyBuilder {
-            migration_id,
-            steps,
-            force,
-        } = self;
-
-        let migration_id = migration_id.unwrap_or_else(|| {
-            format!(
-                "migration-{}",
-                MIGRATION_ID_COUNTER.fetch_add(1, std::sync::atomic::Ordering::Relaxed)
-            )
-        });
-
-        ApplyMigrationInput {
-            migration_id,
-            steps: steps.unwrap_or_else(Vec::new),
-            force,
-        }
-    }
-}
-
-pub struct InferApply<'a> {
-    api: &'a TestApi,
-    schema: &'a str,
-    migration_id: Option<String>,
-    force: Option<bool>,
-}
-
-impl<'a> InferApply<'a> {
-    pub fn force(mut self, force: Option<bool>) -> Self {
-        self.force = force;
-        self
-    }
-
-    pub fn migration_id(mut self, migration_id: Option<String>) -> Self {
-        self.migration_id = migration_id;
-        self
-    }
-
-    pub async fn send(self) -> Result<MigrationStepsResultOutput, anyhow::Error> {
-        let migration_id = self.migration_id.map(String::from).unwrap_or_else(|| {
-            format!(
-                "migration-{}",
-                MIGRATION_ID_COUNTER.fetch_add(1, std::sync::atomic::Ordering::Relaxed)
-            )
-        });
-
-        let input = InferMigrationStepsInput {
-            migration_id: migration_id.clone(),
-            datamodel: self.schema.to_owned(),
-            assume_to_be_applied: Vec::new(),
-        };
-
-        let steps = self.api.run_infer_command(input).await.0.datamodel_steps;
-
-        let input = ApplyMigrationInput {
-            migration_id,
-            steps,
-            force: self.force,
-        };
-
-        let migration_output = self.api.api.apply_migration(&input).await?;
-
-        Ok(migration_output)
-    }
 }
