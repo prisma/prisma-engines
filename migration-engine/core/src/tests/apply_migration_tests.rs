@@ -147,7 +147,7 @@ async fn must_handle_additional_steps_when_transitioning_out_of_watch_mode(api: 
 }
 
 #[test_each_connector]
-async fn applying_an_already_applied_migration_must_return_an_error(api: &TestApi) -> Result<(), anyhow::Error> {
+async fn applying_an_already_applied_migration_must_return_an_error(api: &TestApi) -> TestResult {
     let steps = vec![
         create_model_step("Test"),
         create_field_step("Test", "id", "Int"),

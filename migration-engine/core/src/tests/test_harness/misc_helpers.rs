@@ -4,6 +4,8 @@ use migration_connector::*;
 use sql_migration_connector::SqlMigrationConnector;
 use test_setup::*;
 
+pub type TestResult = Result<(), anyhow::Error>;
+
 pub fn parse(datamodel_string: &str) -> SchemaAst {
     parser::parse(datamodel_string).unwrap()
 }
