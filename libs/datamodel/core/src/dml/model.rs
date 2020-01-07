@@ -36,7 +36,7 @@ pub enum IndexType {
 
 impl Model {
     /// Creates a new model with the given name.
-    pub fn new(name: String, database_name: Option<String>) -> Model {
+    pub fn new(name: String, database_name: Option<DatabaseName>) -> Model {
         Model {
             name,
             fields: vec![],

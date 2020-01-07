@@ -84,8 +84,8 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
         .filter(|table| !is_migration_table(&table))
         .filter(|table| !is_prisma_join_table(&table))
     {
-        let (name, database_name) = sanitize_name(table.name.clone());
-        let mut model = Model::new(name, database_name);
+        let (name, sanitized_name) = sanitize_name(table.name.clone());
+        let mut model = Model::new(name, sanitized_name.map(|sn| Single(sn)));
 
         for column in table
             .columns
