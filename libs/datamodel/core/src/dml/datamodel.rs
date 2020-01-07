@@ -1,5 +1,4 @@
 use super::*;
-use crate::DatabaseName::{Compound, Single};
 
 /// Represents a prisma-datamodel.
 #[derive(Debug, PartialEq, Clone)]

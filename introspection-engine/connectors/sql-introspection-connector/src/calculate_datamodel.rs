@@ -1,77 +1,15 @@
+use crate::misc_helpers::*;
+use crate::sanitize_datamodel_names::sanitize_datamodel_names;
 use crate::SqlIntrospectionResult;
 use datamodel::{
-    common::{names::NameNormalizer, ScalarType, ScalarValue},
+    common::names::NameNormalizer,
     dml,
     DatabaseName::{Compound, Single},
-    Datamodel, Field, FieldArity, FieldType, IdInfo, IdStrategy, IndexDefinition, Model, OnDeleteStrategy,
-    RelationInfo, WithDatabaseName,
+    Datamodel, Field, FieldArity, FieldType, IndexDefinition, Model, OnDeleteStrategy, RelationInfo,
 };
 use log::debug;
 use prisma_inflector;
-use regex::Regex;
 use sql_schema_describer::*;
-
-fn is_migration_table(table: &Table) -> bool {
-    table.name == "_Migration"
-}
-
-fn is_prisma_join_table(table: &Table) -> bool {
-    table.columns.len() == 2
-        && table.foreign_keys.len() == 2
-        && table.foreign_keys[0].referenced_table < table.foreign_keys[1].referenced_table
-        && table.name.starts_with("_")
-        && table
-            .columns
-            .iter()
-            .find(|column| column.name.to_lowercase() == "a")
-            .is_some()
-        && table
-            .columns
-            .iter()
-            .find(|column| column.name.to_lowercase() == "b")
-            .is_some()
-        && table.indices.len() == 1
-        && table.indices[0].columns.len() == 2
-        && table.indices[0].tpe == IndexType::Unique
-}
-
-fn create_many_to_many_field(foreign_key: &ForeignKey, relation_name: String, is_self_relation: bool) -> Field {
-    let inflector = prisma_inflector::default();
-
-    let field_type = FieldType::Relation(RelationInfo {
-        name: relation_name,
-        to: foreign_key.referenced_table.clone(),
-        to_fields: foreign_key.referenced_columns.clone(),
-        on_delete: OnDeleteStrategy::None,
-    });
-
-    let basename = inflector.pluralize(&foreign_key.referenced_table).camel_case();
-
-    let name = match is_self_relation {
-        true => format!("{}_{}", basename, foreign_key.columns[0]),
-        false => basename,
-    };
-
-    Field {
-        name,
-        arity: FieldArity::List,
-        field_type,
-        database_name: None,
-        default_value: None,
-        is_unique: false,
-        id_info: None,
-        documentation: None,
-        is_generated: false,
-        is_updated_at: false,
-    }
-}
-
-fn is_compound_foreign_key_column(table: &Table, column: &Column) -> bool {
-    match table.foreign_keys.iter().find(|fk| fk.columns.contains(&column.name)) {
-        Some(fk) if fk.columns.len() > 1 => true,
-        _ => false,
-    }
-}
 
 /// Calculate a data model from a database schema.
 pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> {
@@ -84,8 +22,7 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
         .filter(|table| !is_migration_table(&table))
         .filter(|table| !is_prisma_join_table(&table))
     {
-        let (name, sanitized_name) = sanitize_name(table.name.clone());
-        let mut model = Model::new(name, sanitized_name.map(|sn| Single(sn)));
+        let mut model = Model::new(table.name.clone(), None);
 
         for column in table
             .columns
@@ -99,7 +36,7 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
                 ColumnArity::Nullable => FieldArity::Optional,
                 ColumnArity::List => FieldArity::List,
             };
-            let id_info = calc_id_info(&column, &table);
+            let id_info = calculate_id_info(&column, &table);
             let default_value = match field_type {
                 FieldType::Relation(_) => None,
                 _ if arity == FieldArity::List => None,
@@ -111,22 +48,15 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
 
             let is_unique = match field_type {
                 datamodel::dml::FieldType::Relation(..) => false,
-                _ => {
-                    if id_info.is_some() {
-                        false
-                    } else {
-                        table.is_column_unique(&column.name)
-                    }
-                }
+                _ if id_info.is_some() => false,
+                _ => table.is_column_unique(&column.name),
             };
 
-            let (name, db_name) = sanitize_name(column.name.clone());
-
             let field = Field {
-                name,
+                name: column.name.clone(),
                 arity,
                 field_type,
-                database_name: db_name.map(|dn| Single(dn)),
+                database_name: None,
                 default_value,
                 is_unique,
                 id_info,
@@ -138,19 +68,12 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
             model.add_field(field);
         }
 
-        fn unique_index_covers_foreign_key(index: &Index, foreign_key: &ForeignKey) -> bool {
-            match index.tpe {
-                IndexType::Unique => foreign_key.columns == index.columns,
-                IndexType::Normal => false,
-            }
-        }
-
         //do not add compound indexes to schema when they cover a foreign key, instead make the relation 1:1
         for index in table.indices.iter().filter(|i| {
             table
                 .foreign_keys
                 .iter()
-                .all(|fk| !unique_index_covers_foreign_key(i, fk))
+                .all(|fk| !is_foreign_key_covered_by_unique_index(i, fk))
         }) {
             debug!("Handling index  {:?}", index);
             let tpe = match index.tpe {
@@ -199,7 +122,7 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
             let is_unique = false;
 
             //todo name of the opposing model  -> still needs to be sanitized
-            let name = foreign_key.referenced_table.clone().to_lowercase();
+            let name = foreign_key.referenced_table.clone().camel_case();
 
             let database_name = Some(Compound(columns.iter().map(|c| c.name.clone()).collect()));
 
@@ -236,8 +159,6 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
             documentation: None,
         });
     }
-
-    // upwards comes from the db
 
     let mut fields_to_be_added = Vec::new();
 
@@ -348,7 +269,7 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
         }
     }
 
-    //todo find duplicated field indexes
+    //todo make separate method: find duplicated field indexes
     let mut duplicated_relation_fields = Vec::new();
     fields_to_be_added
         .iter()
@@ -365,7 +286,7 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
             }
         });
 
-    //todo disambiguate names
+    //todo make separate method: disambiguate names
     duplicated_relation_fields.iter().for_each(|index| {
         let (_, ref mut field) = fields_to_be_added.get_mut(*index).unwrap();
         let suffix = match &field.field_type {
@@ -382,179 +303,5 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
         model.add_field(field);
     }
 
-    // todo do all the name sanitizing here
-    // model names
-    // field names
-    // enum names
-    // relation names
-    // relationinfo to
-    // relationinfo to_fields
-
-    Ok(data_model)
-}
-
-fn parse_int(value: &str) -> Option<i32> {
-    debug!("Parsing int '{}'", value);
-    let re_num = Regex::new(r"^'?(\d+)'?$").expect("compile regex");
-    let rslt = re_num.captures(value);
-    if rslt.is_none() {
-        debug!("Couldn't parse int");
-        return None;
-    }
-
-    let captures = rslt.expect("get captures");
-    let num_str = captures.get(1).expect("get capture").as_str();
-    let num_rslt = num_str.parse::<i32>();
-    match num_rslt {
-        Ok(num) => Some(num),
-        Err(_) => {
-            debug!("Couldn't parse int '{}'", num_str);
-            None
-        }
-    }
-}
-
-fn parse_bool(value: &str) -> Option<bool> {
-    debug!("Parsing bool '{}'", value);
-    value.to_lowercase().parse().ok()
-}
-
-fn parse_float(value: &str) -> Option<f32> {
-    debug!("Parsing float '{}'", value);
-    let re_num = Regex::new(r"^'?([^']+)'?$").expect("compile regex");
-    let rslt = re_num.captures(value);
-    if rslt.is_none() {
-        debug!("Couldn't parse float");
-        return None;
-    }
-
-    let captures = rslt.expect("get captures");
-    let num_str = captures.get(1).expect("get capture").as_str();
-    let num_rslt = num_str.parse::<f32>();
-    match num_rslt {
-        Ok(num) => Some(num),
-        Err(_) => {
-            debug!("Couldn't parse float '{}'", num_str);
-            None
-        }
-    }
-}
-
-fn calculate_default(default: &str, tpe: &ColumnTypeFamily) -> Option<ScalarValue> {
-    match tpe {
-        ColumnTypeFamily::Boolean => match parse_int(default) {
-            Some(x) => Some(ScalarValue::Boolean(x != 0)),
-            None => parse_bool(default).map(|b| ScalarValue::Boolean(b)),
-        },
-        ColumnTypeFamily::Int => parse_int(default).map(|x| ScalarValue::Int(x)),
-        ColumnTypeFamily::Float => parse_float(default).map(|x| ScalarValue::Float(x)),
-        ColumnTypeFamily::String => Some(ScalarValue::String(default.to_string())),
-        _ => None,
-    }
-}
-
-fn calc_id_info(column: &Column, table: &Table) -> Option<IdInfo> {
-    table.primary_key.as_ref().and_then(|pk| {
-        if pk.is_single_primary_key(&column.name) {
-            let strategy = match column.auto_increment {
-                true => IdStrategy::Auto,
-                false => IdStrategy::None,
-            };
-            Some(IdInfo {
-                strategy,
-                sequence: pk.sequence.as_ref().map(|sequence| dml::Sequence {
-                    name: sequence.name.clone(),
-                    allocation_size: sequence.allocation_size as i32,
-                    initial_value: sequence.initial_value as i32,
-                }),
-            })
-        } else {
-            None
-        }
-    })
-}
-
-fn calculate_relation_name(schema: &SqlSchema, fk: &ForeignKey, table: &Table) -> String {
-    //this is not called for prisma many to many relations. for them the name is just the name of the join table.
-    let referenced_model = &fk.referenced_table;
-    let model_with_fk = &table.name;
-    let fk_column_name = fk.columns.get(0).unwrap();
-
-    let fk_to_same_model: Vec<&ForeignKey> = table
-        .foreign_keys
-        .iter()
-        .filter(|fk| fk.referenced_table == referenced_model.clone())
-        .collect();
-
-    let fk_from_other_model_to_this: Vec<&ForeignKey> = schema
-        .table_bang(referenced_model)
-        .foreign_keys
-        .iter()
-        .filter(|fk| fk.referenced_table == model_with_fk.clone())
-        .collect();
-
-    //unambiguous
-    if fk_to_same_model.len() < 2 && fk_from_other_model_to_this.len() == 0 {
-        if model_with_fk < referenced_model {
-            format!("{}To{}", model_with_fk, referenced_model)
-        } else {
-            format!("{}To{}", referenced_model, model_with_fk)
-        }
-    } else {
-        //ambiguous
-        if model_with_fk < referenced_model {
-            format!("{}_{}To{}", model_with_fk, fk_column_name, referenced_model)
-        } else {
-            format!("{}To{}_{}", referenced_model, model_with_fk, fk_column_name)
-        }
-    }
-}
-
-fn calculate_field_type(schema: &SqlSchema, column: &Column, table: &Table) -> FieldType {
-    debug!("Calculating field type for '{}'", column.name);
-    // Look for a foreign key referencing this column
-    match table.foreign_keys.iter().find(|fk| fk.columns.contains(&column.name)) {
-        Some(fk) if calc_id_info(column, table).is_none() => {
-            debug!("Found corresponding foreign key");
-            let idx = fk
-                .columns
-                .iter()
-                .position(|n| n == &column.name)
-                .expect("get column FK position");
-            let referenced_col = &fk.referenced_columns[idx];
-
-            FieldType::Relation(RelationInfo {
-                name: calculate_relation_name(schema, fk, table),
-                to: fk.referenced_table.clone(),
-                to_fields: vec![referenced_col.clone()],
-                on_delete: OnDeleteStrategy::None,
-            })
-        }
-        _ => {
-            debug!("Found no corresponding foreign key");
-            match column.tpe.family {
-                ColumnTypeFamily::Boolean => FieldType::Base(ScalarType::Boolean),
-                ColumnTypeFamily::DateTime => FieldType::Base(ScalarType::DateTime),
-                ColumnTypeFamily::Float => FieldType::Base(ScalarType::Float),
-                ColumnTypeFamily::Int => FieldType::Base(ScalarType::Int),
-                ColumnTypeFamily::String => FieldType::Base(ScalarType::String),
-                // XXX: We made a conscious decision to punt on mapping of ColumnTypeFamily
-                // variants that don't yet have corresponding PrismaType variants
-                _ => FieldType::Base(ScalarType::String),
-            }
-        }
-    }
-}
-
-fn sanitize_name(name: String) -> (String, Option<String>) {
-    let re_start = Regex::new("^[^a-zA-Z]+").unwrap();
-    let re = Regex::new("[^_a-zA-Z0-9]").unwrap();
-    let needs_sanitation = re_start.is_match(name.as_str()) || re.is_match(name.as_str());
-
-    if needs_sanitation {
-        let start_cleaned: String = re_start.replace_all(name.as_str(), "").parse().unwrap();
-        (re.replace_all(start_cleaned.as_str(), "_").parse().unwrap(), Some(name))
-    } else {
-        (name, None)
-    }
+    Ok(sanitize_datamodel_names(data_model))
 }

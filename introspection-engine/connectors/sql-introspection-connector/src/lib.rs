@@ -1,6 +1,7 @@
 pub mod calculate_datamodel; // only exported to be able to unit test it
-
 mod error;
+mod misc_helpers;
+mod sanitize_datamodel_names; // only exported to be able to unit test it
 mod schema_describer_loading;
 
 use datamodel::Datamodel;

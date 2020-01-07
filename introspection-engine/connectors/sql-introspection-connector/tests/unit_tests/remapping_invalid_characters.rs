@@ -23,7 +23,7 @@ async fn setup_invalid_fields(api: &TestApi) {
 }
 
 #[test_one_connector(connector = "postgres")]
-async fn fields_with_invalid_characters_should_be_mapped_for_postgres(api: &TestApi) {
+async fn remapping_fields_with_invalid_characters_should_work_for_postgres(api: &TestApi) {
     setup_invalid_fields(api).await;
 
     let dm = r#"
@@ -45,7 +45,7 @@ async fn fields_with_invalid_characters_should_be_mapped_for_postgres(api: &Test
 }
 
 #[test_one_connector(connector = "mysql")]
-async fn fields_with_invalid_characters_should_be_mapped_for_mysql(api: &TestApi) {
+async fn remapping_fields_with_invalid_characters_should_work_for_mysql(api: &TestApi) {
     setup_invalid_fields(api).await;
 
     let dm = r#"
@@ -67,7 +67,7 @@ async fn fields_with_invalid_characters_should_be_mapped_for_mysql(api: &TestApi
 }
 
 #[test_one_connector(connector = "sqlite")]
-async fn fields_with_invalid_characters_should_be_mapped_for_sqlite(api: &TestApi) {
+async fn remapping_fields_with_invalid_characters_should_work_for_sqlite(api: &TestApi) {
     setup_invalid_fields(api).await;
 
     let dm = r#"
@@ -104,7 +104,7 @@ async fn setup_invalid_models(api: &TestApi) {
 }
 
 #[test_one_connector(connector = "postgres")]
-async fn tables_with_invalid_characters_should_be_mapped_for_postgres(api: &TestApi) {
+async fn remapping_tables_with_invalid_characters_should_work_for_postgres(api: &TestApi) {
     setup_invalid_models(api).await;
 
     let dm = r#"
@@ -125,7 +125,7 @@ async fn tables_with_invalid_characters_should_be_mapped_for_postgres(api: &Test
 }
 
 #[test_one_connector(connector = "mysql")]
-async fn tables_with_invalid_characters_should_be_mapped_for_mysql(api: &TestApi) {
+async fn remapping_tables_with_invalid_characters_should_work_for_mysql(api: &TestApi) {
     setup_invalid_models(api).await;
 
     let dm = r#"
@@ -146,7 +146,7 @@ async fn tables_with_invalid_characters_should_be_mapped_for_mysql(api: &TestApi
 }
 
 #[test_one_connector(connector = "sqlite")]
-async fn tables_with_invalid_characters_should_be_mapped_for_sqlite(api: &TestApi) {
+async fn remapping_tables_with_invalid_characters_should_work_for_sqlite(api: &TestApi) {
     setup_invalid_models(api).await;
 
     let dm = r#"
@@ -178,7 +178,7 @@ async fn remapping_models_in_relations_should_work(api: &TestApi) {
             migration.create_table("Post", |t| {
                 t.add_column("id", types::primary());
                 t.add_column("user_id", types::integer());
-                t.inject_custom("FOREIGN KEY (\"user_id\") REFERENCES \"User\"(\"id\")");
+                t.inject_custom("FOREIGN KEY (\"user_id\") REFERENCES \"User with Space\"(\"id\")");
                 t.inject_custom("CONSTRAINT post_user_unique UNIQUE(\"user_id\")");
             });
         })
@@ -187,15 +187,57 @@ async fn remapping_models_in_relations_should_work(api: &TestApi) {
     let dm = r#"
             model Post {
                 id                  Int                 @id @sequence(name: "Post_id_seq", allocationSize: 1, initialValue: 1)
-                user_with_Space     User_with_Space
+                user_id     User_with_Space
             }
 
             model User_with_Space {
-               id       Int                             @id @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
+               id       Int                             @id @sequence(name: "User with Space_id_seq", allocationSize: 1, initialValue: 1)
                name     String
                post     Post?
                
                @@map("User with Space")
+            }
+        "#;
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}
+
+#[test_one_connector(connector = "postgres")]
+#[test]
+async fn remapping_models_in_compound_relations_should_work(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("User with Space", |t| {
+                t.add_column("id", types::primary());
+                t.add_column("name", types::text());
+                t.inject_custom("CONSTRAINT user_unique UNIQUE(\"id\", \"name\")");
+            });
+            migration.create_table("Post", |t| {
+                t.add_column("id", types::primary());
+                t.add_column("user_id", types::integer());
+                t.add_column("user_name", types::text());
+                t.inject_custom(
+                    "FOREIGN KEY (\"user_id\",\"user_name\") REFERENCES \"User with Space\"(\"id\", \"name\")",
+                );
+                t.inject_custom("CONSTRAINT post_user_unique UNIQUE(\"user_id\", \"user_name\")");
+            });
+        })
+        .await;
+
+    let dm = r#"
+            model Post {
+                id      Int                             @id @sequence(name: "Post_id_seq", allocationSize: 1, initialValue: 1)
+                user_with_Space    User_with_Space      @map(["user_id", "user_name"]) @relation(references:[id, name]) 
+            }
+
+            model User_with_Space {
+               id       Int                             @id @sequence(name: "User with Space_id_seq", allocationSize: 1, initialValue: 1)
+               name     String
+               post     Post?
+               
+               @@map("User with Space")
+               @@unique([id, name], name: "user_unique")
             }
         "#;
     let result = dbg!(api.introspect().await);
