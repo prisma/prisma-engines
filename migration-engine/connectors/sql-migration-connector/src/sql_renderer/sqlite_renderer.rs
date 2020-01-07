@@ -1,6 +1,7 @@
 use super::common::*;
 use crate::SqlFamily;
 use sql_schema_describer::*;
+use std::fmt::Write as _;
 
 pub struct SqliteRenderer {}
 
@@ -11,6 +12,10 @@ impl super::SqlRenderer for SqliteRenderer {
 
     fn quote(&self, name: &str) -> String {
         format!("\"{}\"", name)
+    }
+
+    fn write_quoted(&self, buf: &mut String, name: &str) -> std::fmt::Result {
+        write!(buf, r#""{}""#, name)
     }
 
     fn render_column(&self, _schema_name: &str, _table: &Table, column: &Column, _add_fk_prefix: bool) -> String {

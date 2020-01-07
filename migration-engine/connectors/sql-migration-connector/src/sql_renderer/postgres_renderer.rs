@@ -1,11 +1,16 @@
 use super::common::*;
 use crate::SqlFamily;
 use sql_schema_describer::*;
+use std::fmt::Write as _;
 
 pub struct PostgresRenderer {}
 impl super::SqlRenderer for PostgresRenderer {
     fn sql_family(&self) -> SqlFamily {
         SqlFamily::Postgres
+    }
+
+    fn write_quoted(&self, buf: &mut String, name: &str) -> std::fmt::Result {
+        write!(buf, r#""{}""#, name)
     }
 
     fn quote(&self, name: &str) -> String {

@@ -10,7 +10,19 @@ use mysql_renderer::MySqlRenderer;
 use postgres_renderer::PostgresRenderer;
 use sqlite_renderer::SqliteRenderer;
 
+use std::fmt::Write as _;
+
 pub trait SqlRenderer {
+    fn write_quoted_with_schema(&self, buf: &mut String, schema: &str, name: &str) -> std::fmt::Result {
+        self.write_quoted(buf, schema)?;
+        write!(buf, ".")?;
+        self.write_quoted(buf, name)?;
+
+        Ok(())
+    }
+
+    fn write_quoted(&self, buf: &mut String, identifier: &str) -> std::fmt::Result;
+
     fn quote_with_schema(&self, schema: &str, name: &str) -> String {
         format!("{}.{}", self.quote(&schema), self.quote(&name),)
     }
