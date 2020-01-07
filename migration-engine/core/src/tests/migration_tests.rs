@@ -1689,7 +1689,7 @@ async fn renaming_a_datasource_works(api: &TestApi) -> TestResult {
         }
     "#;
 
-    let infer_output = api.infer_migration(&InferBuilder::new(dm1.to_owned()).build()).await?;
+    let infer_output = api.infer(dm1.to_owned()).send().await?;
 
     let dm2 = r#"
         datasource db2 {
@@ -1702,13 +1702,11 @@ async fn renaming_a_datasource_works(api: &TestApi) -> TestResult {
         }
     "#;
 
-    api.infer_migration(
-        &InferBuilder::new(dm2.to_owned())
-            .assume_to_be_applied(Some(infer_output.datamodel_steps))
-            .migration_id(Some("mig02".to_owned()))
-            .build(),
-    )
-    .await?;
+    api.infer(dm2.to_owned())
+        .assume_to_be_applied(Some(infer_output.datamodel_steps))
+        .migration_id(Some("mig02".to_owned()))
+        .send()
+        .await?;
 
     Ok(())
 }
