@@ -1,21 +1,21 @@
 use crate::commands::CommandError;
 use datamodel::error::ErrorCollection;
-use failure::{Error as Schwerror, Fail};
 use migration_connector::ConnectorError;
+use thiserror::Error;
 
-#[derive(Debug, Fail)]
+#[derive(Debug, Error)]
 pub enum Error {
-    #[fail(display = "Error in connector: {}", _0)]
+    #[error("Error in connector: {0}")]
     ConnectorError(ConnectorError),
 
-    #[fail(display = "Failure during a migration command: {}", _0)]
+    #[error("Failure during a migration command: {0}")]
     CommandError(CommandError),
 
-    #[fail(display = "Error in datamodel: {:?}", _0)]
+    #[error("Error in datamodel: {:?}", .0)]
     DatamodelError(ErrorCollection),
 
-    #[fail(display = "Error performing IO: {:?}", _0)]
-    IOError(Schwerror),
+    #[error("Error performing IO: {:?}", .0)]
+    IOError(anyhow::Error),
 }
 
 impl From<ConnectorError> for Error {

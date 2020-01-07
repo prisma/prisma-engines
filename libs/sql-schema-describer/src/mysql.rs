@@ -100,11 +100,7 @@ impl SqlSchemaDescriber {
         let result = self.conn.query_raw(sql, &[schema.into()]).await.expect("get db size ");
         let size = result
             .first()
-            .map(|row| {
-                row.get("size")
-                    .and_then(|x| x.to_string())
-                    .unwrap_or("0".to_string())
-            })
+            .map(|row| row.get("size").and_then(|x| x.to_string()).unwrap_or("0".to_string()))
             .unwrap();
 
         debug!("Found db size: {:?}", size);
@@ -216,6 +212,7 @@ impl SqlSchemaDescriber {
                 AND kcu.table_name = ?
                 AND rc.constraint_schema = ?
                 AND referenced_column_name IS NOT NULL
+            ORDER BY ordinal_position
         ";
 
         debug!("describing table foreign keys, SQL: '{}'", sql);

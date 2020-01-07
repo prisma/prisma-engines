@@ -15,16 +15,12 @@ serde_json = "1.0"
 serde = "1.0"
 debug_stub_derive = "0.3"
 parking_lot = "0.7"
-uuid = { version = "0.7", features = ["serde", "v4"] }
+uuid = { version = "0.8", features = ["serde", "v4"] }
 cuid = { git = "https://github.com/prisma/cuid-rust" }
 chrono = { version = "0.4", features = ["serde"] }
-failure = "0.1"
-failure_derive = "0.1"
+failure = { version = "0.1", features = ["derive"] }
 rand = "0.6"
 datamodel = { path = "../datamodel/core" }
 itertools = "0.8"
-rust_decimal = { git = "https://github.com/pimeys/rust-decimal.git", branch = "async-await-psql" }
-
-[dependencies.quaint]
-git = "https://github.com/prisma/quaint.git"
-optional = true
+rust_decimal = "1.1"
+quaint = { version = "0.1", optional = true, features = ["uuid-0_8"] }

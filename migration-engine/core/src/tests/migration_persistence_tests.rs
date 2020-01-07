@@ -1,11 +1,9 @@
 #![allow(non_snake_case)]
 
-mod test_harness;
-
+use super::test_harness::*;
 use migration_connector::{steps::CreateEnum, *};
 use pretty_assertions::assert_eq;
 use quaint::prelude::SqlFamily;
-use test_harness::*;
 
 #[test_each_connector]
 async fn last_should_return_none_if_there_is_no_migration(api: &TestApi) {
@@ -129,4 +127,25 @@ async fn update_must_work(api: &TestApi) {
         assert_eq!(loaded.finished_at, params.finished_at);
     }
     assert_eq!(loaded.name, params.new_name);
+}
+
+#[test_each_connector]
+async fn migration_is_already_applied_must_work(api: &TestApi) -> TestResult {
+    let persistence = api.migration_persistence();
+
+    let mut migration_1 = Migration::new("migration_1".to_string());
+    migration_1.status = MigrationStatus::MigrationSuccess;
+
+    persistence.create(migration_1).await?;
+
+    let mut migration_2 = Migration::new("migration_2".to_string());
+    migration_2.status = MigrationStatus::MigrationFailure;
+
+    persistence.create(migration_2).await?;
+
+    assert!(persistence.migration_is_already_applied("migration_1").await?);
+    assert!(!persistence.migration_is_already_applied("migration_2").await?);
+    assert!(!persistence.migration_is_already_applied("another_migration").await?);
+
+    Ok(())
 }

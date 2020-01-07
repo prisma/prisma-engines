@@ -17,6 +17,7 @@ async fn unreachable_database_must_return_a_proper_error_on_mysql() {
 
     let json_error = serde_json::to_value(error.data.unwrap()).unwrap();
     let expected = json!({
+        "is_panic": false,
         "message": format!("Can't reach database server at `{host}`:`{port}`\n\nPlease make sure your database server is running at `{host}`:`{port}`.", host = host, port = port),
         "meta": {
             "database_host": host,

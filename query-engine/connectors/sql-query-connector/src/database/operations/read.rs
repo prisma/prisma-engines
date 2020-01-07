@@ -69,46 +69,18 @@ where
     field_names.push(from_field.name.clone());
 
     let can_skip_joins = from_field.relation_is_inlined_in_child() && !query_arguments.is_with_pagination();
-    let relation = from_field.relation();
+
+    let mut columns: Vec<_> = selected_fields.columns().collect();
+    columns.push(from_field.opposite_column(true).alias(SelectedFields::RELATED_MODEL_ALIAS));
+    columns.push(from_field.relation_column(true).alias(SelectedFields::PARENT_MODEL_ALIAS));
 
     let query = if can_skip_joins {
-        let mut columns: Vec<_> = selected_fields.columns().collect();
-
-        columns.push(
-            relation
-                .column_for_relation_side(from_field.relation_side.opposite())
-                .alias(SelectedFields::RELATED_MODEL_ALIAS),
-        );
-
-        columns.push(
-            relation
-                .column_for_relation_side(from_field.relation_side)
-                .alias(SelectedFields::PARENT_MODEL_ALIAS),
-        );
-
         let model = from_field.related_model();
-
         let select = read::get_records(&model, columns.into_iter(), query_arguments)
-            .and_where(from_field.relation_column().in_selection(from_record_ids.to_owned()));
+            .and_where(from_field.relation_column(true).in_selection(from_record_ids.to_owned()));
 
         Query::from(select)
     } else {
-        let mut columns: Vec<_> = selected_fields.columns().collect();
-
-        columns.push(
-            relation
-                .column_for_relation_side(from_field.relation_side.opposite())
-                .alias(SelectedFields::RELATED_MODEL_ALIAS)
-                .table(Relation::TABLE_ALIAS),
-        );
-
-        columns.push(
-            relation
-                .column_for_relation_side(from_field.relation_side)
-                .alias(SelectedFields::PARENT_MODEL_ALIAS)
-                .table(Relation::TABLE_ALIAS),
-        );
-
         let is_with_pagination = query_arguments.is_with_pagination();
         let base = ManyRelatedRecordsBaseQuery::new(from_field, from_record_ids, query_arguments, columns);
 

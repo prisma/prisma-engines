@@ -1,8 +1,8 @@
 use super::transaction::SqlConnectorTransaction;
 use crate::{database::operations::*, query_builder::read::ManyRelatedRecordsQueryBuilder, QueryExt, SqlError};
 use connector_interface::{
-    self as connector, filter::Filter, Connection, QueryArguments, ReadOperations, Transaction,
-    WriteArgs, WriteOperations, IO,
+    self as connector, filter::Filter, Connection, QueryArguments, ReadOperations, Transaction, WriteArgs,
+    WriteOperations, IO,
 };
 use prisma_models::prelude::*;
 use quaint::{connector::TransactionCapable, prelude::ConnectionInfo};

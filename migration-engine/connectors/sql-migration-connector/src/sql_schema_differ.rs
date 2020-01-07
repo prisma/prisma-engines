@@ -16,6 +16,7 @@ pub struct SqlSchemaDiffer<'a> {
 
 #[derive(Debug, Clone)]
 pub struct SqlSchemaDiff {
+    pub add_foreign_keys: Vec<AddForeignKey>,
     pub drop_tables: Vec<DropTable>,
     pub create_tables: Vec<CreateTable>,
     pub alter_tables: Vec<AlterTable>,
@@ -33,8 +34,13 @@ impl SqlSchemaDiff {
             // Order matters: we must run `alter table`s before `drop`s because we want to
             // drop foreign keys before the tables they are pointing to.
             .chain(wrap_as_step(self.alter_tables, SqlMigrationStep::AlterTable))
-            .chain(wrap_as_step(self.drop_tables, SqlMigrationStep::DropTable))
+            // Order matters: we must create indexes after ALTER TABLEs because the indexes can be on fields that
+            // are dropped/created there.
             .chain(wrap_as_step(self.create_indexes, SqlMigrationStep::CreateIndex))
+            // Order matters: this needs to come after create_indexes, because the foreign keys can depend on unique
+            // indexes created there.
+            .chain(wrap_as_step(self.add_foreign_keys, SqlMigrationStep::AddForeignKey))
+            .chain(wrap_as_step(self.drop_tables, SqlMigrationStep::DropTable))
             .chain(wrap_as_step(self.alter_indexes, SqlMigrationStep::AlterIndex))
             .collect()
     }
@@ -50,6 +56,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
         let alter_indexes: Vec<_> = self.alter_indexes();
 
         SqlSchemaDiff {
+            add_foreign_keys: self.add_foreign_keys(),
             drop_tables: self.drop_tables(),
             create_tables: self.create_tables(),
             alter_tables: self.alter_tables(),
@@ -60,16 +67,11 @@ impl<'schema> SqlSchemaDiffer<'schema> {
     }
 
     fn create_tables(&self) -> Vec<CreateTable> {
-        let mut result = Vec::new();
-        for next_table in &self.next.tables {
-            if !self.previous.has_table(&next_table.name) && next_table.name != MIGRATION_TABLE_NAME {
-                let create = CreateTable {
-                    table: next_table.clone(),
-                };
-                result.push(create);
-            }
-        }
-        result
+        self.created_tables()
+            .map(|created_table| CreateTable {
+                table: created_table.clone(),
+            })
+            .collect()
     }
 
     fn drop_tables(&self) -> Vec<DropTable> {
@@ -83,6 +85,15 @@ impl<'schema> SqlSchemaDiffer<'schema> {
             }
         }
         result
+    }
+
+    fn add_foreign_keys(&self) -> Vec<AddForeignKey> {
+        let mut add_foreign_keys = Vec::new();
+
+        push_foreign_keys_from_created_tables(&mut add_foreign_keys, self.created_tables());
+        push_created_foreign_keys(&mut add_foreign_keys, self.table_pairs());
+
+        add_foreign_keys
     }
 
     fn alter_tables(&self) -> Vec<AlterTable> {
@@ -110,6 +121,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
                 }
             }
         }
+
         result
     }
 
@@ -124,7 +136,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
     }
 
     fn add_columns<'a>(differ: &'a TableDiffer<'schema>) -> impl Iterator<Item = TableChange> + 'a {
-        differ.added_columns().map(|column| {
+        differ.added_columns().map(move |column| {
             let change = AddColumn { column: column.clone() };
 
             TableChange::AddColumn(change)
@@ -260,6 +272,36 @@ impl<'schema> SqlSchemaDiffer<'schema> {
         });
 
         alter_indexes
+    }
+
+    fn created_tables<'a>(&'a self) -> impl Iterator<Item = &'a Table> + 'a {
+        self.next.tables.iter().filter(move |next_table| {
+            !self.previous.has_table(&next_table.name) && next_table.name != MIGRATION_TABLE_NAME
+        })
+    }
+}
+
+fn push_created_foreign_keys<'a, 'schema>(
+    added_foreign_keys: &mut Vec<AddForeignKey>,
+    table_pairs: impl Iterator<Item = TableDiffer<'schema>>,
+) {
+    table_pairs.for_each(|differ| {
+        added_foreign_keys.extend(differ.created_foreign_keys().map(|created_fk| AddForeignKey {
+            table: differ.next.name.clone(),
+            foreign_key: created_fk.clone(),
+        }))
+    })
+}
+
+fn push_foreign_keys_from_created_tables<'a>(
+    steps: &mut Vec<AddForeignKey>,
+    created_tables: impl Iterator<Item = &'a Table>,
+) {
+    for table in created_tables {
+        steps.extend(table.foreign_keys.iter().map(|fk| AddForeignKey {
+            table: table.name.clone(),
+            foreign_key: fk.clone(),
+        }));
     }
 }
 

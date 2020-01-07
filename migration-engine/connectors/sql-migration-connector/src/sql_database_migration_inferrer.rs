@@ -105,8 +105,7 @@ fn infer_database_migration_steps_and_fix(
     let corrected_steps = if is_sqlite {
         fix_stupid_sqlite(diff, &from, &to, &schema_name)?
     } else {
-        let steps = delay_foreign_key_creation(diff);
-        fix_id_column_type_change(&from, &to, schema_name, steps)?
+        fix_id_column_type_change(&from, &to, schema_name, diff.into_steps())?
     };
 
     Ok((SqlSchemaDiffer::diff(&from, &to).into_steps(), corrected_steps))
@@ -158,60 +157,13 @@ fn fix_id_column_type_change(
             .collect();
         radical_steps.push(SqlMigrationStep::DropTables(DropTables { names: tables_to_drop }));
         let diff_from_empty: SqlSchemaDiff = SqlSchemaDiffer::diff(&SqlSchema::empty(), &to);
-        let mut steps_from_empty = delay_foreign_key_creation(diff_from_empty);
+        let mut steps_from_empty = diff_from_empty.into_steps();
         radical_steps.append(&mut steps_from_empty);
 
         Ok(radical_steps)
     } else {
         Ok(steps)
     }
-}
-
-// this function caters for the case that a table gets created that has a foreign key to a table that still needs to be created
-// Example: Table A has a reference to Table B and Table B has a reference to Table A.
-// We therefore split the creation of foreign key columns into separate steps when the referenced tables are not existing yet.
-// FIXME: This does not work with SQLite. A required column might get delayed. SQLite then fails with: "Cannot add a NOT NULL column with default value NULL"
-fn delay_foreign_key_creation(mut diff: SqlSchemaDiff) -> Vec<SqlMigrationStep> {
-    let names_of_tables_that_get_created: Vec<String> =
-        diff.create_tables.iter().map(|t| t.table.name.clone()).collect();
-    let mut extra_alter_tables = Vec::new();
-
-    // This mutates the CreateTables in place to remove the foreign key creation. Instead the foreign key creation is moved into separate AlterTable statements.
-    for create_table in diff.create_tables.iter_mut() {
-        let mut column_that_need_to_be_done_later_for_this_table = Vec::new();
-        for column in &create_table.table.columns {
-            if let Some(ref foreign_key) = create_table.table.foreign_key_for_column(&column.name) {
-                let references_non_existent_table =
-                    names_of_tables_that_get_created.contains(&foreign_key.referenced_table);
-                let is_part_of_primary_key = create_table.table.is_part_of_primary_key(&column.name);
-                let is_relation_table = create_table.table.name.starts_with("_"); // todo: this is a very weak check. find a better one
-
-                if references_non_existent_table && !is_part_of_primary_key && !is_relation_table {
-                    let change = column.clone();
-                    column_that_need_to_be_done_later_for_this_table.push(change);
-                }
-            }
-        }
-        // remove columns from the create that will be instead added later
-        create_table
-            .table
-            .columns
-            .retain(|c| !column_that_need_to_be_done_later_for_this_table.contains(&c));
-        let changes = column_that_need_to_be_done_later_for_this_table
-            .into_iter()
-            .map(|c| TableChange::AddColumn(AddColumn { column: c.clone() }))
-            .collect();
-
-        let alter_table = AlterTable {
-            table: create_table.table.clone(),
-            changes,
-        };
-        if !alter_table.changes.is_empty() {
-            extra_alter_tables.push(alter_table);
-        }
-    }
-    diff.alter_tables.append(&mut extra_alter_tables);
-    diff.into_steps()
 }
 
 fn fix_stupid_sqlite(
@@ -225,7 +177,9 @@ fn fix_stupid_sqlite(
     let mut fixed_tables = Vec::new();
     for step in steps {
         match step {
-            SqlMigrationStep::AlterTable(ref alter_table) if needs_fix(&alter_table) => {
+            SqlMigrationStep::AlterTable(ref alter_table)
+                if needs_fix(&alter_table) && current_database_schema.has_table(&alter_table.table.name) =>
+            {
                 result.extend(sqlite_fix_table(
                     current_database_schema,
                     next_database_schema,
@@ -234,8 +188,11 @@ fn fix_stupid_sqlite(
                 )?);
                 fixed_tables.push(alter_table.table.name.clone());
             }
+            SqlMigrationStep::AddForeignKey(add_foreign_key) if fixed_tables.contains(&add_foreign_key.table) => {
+                // The fixed alter table step will already create the foreign key.
+            }
             SqlMigrationStep::CreateIndex(ref create_index) if fixed_tables.contains(&create_index.table) => {
-                // The fixed alter table step will already create the index
+                // The fixed alter table step will already create the index.
             }
             SqlMigrationStep::AlterIndex(AlterIndex { table, .. }) => {
                 result.extend(sqlite_fix_table(

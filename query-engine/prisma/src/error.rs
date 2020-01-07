@@ -41,6 +41,42 @@ pub enum PrismaError {
     QueryConversionError(String),
 }
 
+impl PrismaError {
+    pub(crate) fn render_as_json(&self) -> Result<(), failure::Error> {
+        use std::io::Write as _;
+
+        // Datamodel errors need raw byte IO instead of String IO.
+        let mut message: Vec<u8> = Vec::with_capacity(60);
+
+        match self {
+            PrismaError::ConversionError(errors, dml_string) => {
+                let file_name = "schema.prisma";
+
+                for error in errors.to_iter() {
+                    writeln!(&mut message)?;
+
+                    error.pretty_print(&mut message, file_name, dml_string)?
+                }
+            }
+            other => write!(message, "{}", other)?,
+        };
+
+        let error = user_facing_errors::Error::new_non_panic_with_current_backtrace(
+            String::from_utf8_lossy(&message).into_owned(),
+        );
+
+        // Because of how the node frontend works (stdout.on('data', ...)), we want to emit one clean JSON message on a single line at once.
+        let stdout = std::io::stdout();
+        let _lock = stdout.lock();
+        let mut writer = std::io::LineWriter::new(std::io::stdout());
+        serde_json::to_writer(&mut writer, &error)?;
+        writeln!(&mut writer)?;
+        writer.flush()?;
+
+        Ok(())
+    }
+}
+
 impl From<CoreError> for PrismaError {
     fn from(e: CoreError) -> Self {
         PrismaError::CoreError(e)
@@ -56,37 +92,10 @@ impl From<ErrorCollection> for PrismaError {
 /// Helps to handle gracefully handle errors as a response.
 impl From<PrismaError> for response_ir::ResponseError {
     fn from(other: PrismaError) -> Self {
-        use user_facing_errors::UnknownError;
-
         match other {
             PrismaError::CoreError(core_error) => response_ir::ResponseError::from(core_error),
-            err => {
-                response_ir::ResponseError::from(user_facing_errors::Error::Unknown(UnknownError::from_fail(err)))
-            }
+            err => response_ir::ResponseError::from(user_facing_errors::Error::from_fail(err)),
         }
-    }
-}
-
-/// Pretty print helper errors.
-pub trait PrettyPrint {
-    fn pretty_print(&self);
-}
-
-impl PrettyPrint for PrismaError {
-    fn pretty_print(&self) {
-        match self {
-            PrismaError::ConversionError(errors, dml_string) => {
-                let file_name = "schema.prisma".to_string();
-
-                for error in errors.to_iter() {
-                    println!();
-                    error
-                        .pretty_print(&mut std::io::stderr().lock(), &file_name, &dml_string)
-                        .expect("Failed to write errors to stderr");
-                }
-            }
-            x => println!("{}", x),
-        };
     }
 }
 
