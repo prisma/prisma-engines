@@ -3,6 +3,7 @@ use regex::Regex;
 
 pub fn sanitize_datamodel_names(mut datamodel: Datamodel) -> Datamodel {
     // todo enum names
+    // fix name clashes we introduce
 
     for model in &mut datamodel.models {
         let (sanitized_name, db_name) = sanitize_name(model.name.clone());

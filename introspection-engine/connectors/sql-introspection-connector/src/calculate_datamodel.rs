@@ -87,11 +87,9 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
                 tpe,
             };
 
-            match index.columns.len() {
-                //single column uniques go onto the field level not the model level
-                1 if index.tpe != IndexType::Unique => model.add_index(index_definition),
-                x if x > 1 => model.add_index(index_definition),
-                _ => (),
+            match (index.columns.len(), &index.tpe) {
+                (1, IndexType::Unique) => (), // they go on the field not the model in the datamodel
+                _ => model.add_index(index_definition),
             }
         }
 
@@ -181,11 +179,8 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
                         let table = schema.table_bang(model.name.as_str());
                         let fk = table.foreign_key_for_column(relation_field.name.as_str());
                         let on_delete = match fk {
-                            None => OnDeleteStrategy::None,
-                            Some(fk) => match fk.on_delete_action {
-                                ForeignKeyAction::Cascade => OnDeleteStrategy::Cascade,
-                                _ => OnDeleteStrategy::None,
-                            },
+                            Some(fk) if fk.on_delete_action == ForeignKeyAction::Cascade => OnDeleteStrategy::Cascade,
+                            _ => OnDeleteStrategy::None,
                         };
 
                         let field_type = FieldType::Relation(RelationInfo {
