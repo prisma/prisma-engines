@@ -1,8 +1,10 @@
 use crate::SqlIntrospectionResult;
 use datamodel::{
     common::{names::NameNormalizer, ScalarType, ScalarValue},
-    dml, DatabaseName, Datamodel, Field, FieldArity, FieldType, IdInfo, IdStrategy, IndexDefinition, Model,
-    OnDeleteStrategy, RelationInfo, WithDatabaseName,
+    dml,
+    DatabaseName::{Compound, Single},
+    Datamodel, Field, FieldArity, FieldType, IdInfo, IdStrategy, IndexDefinition, Model, OnDeleteStrategy,
+    RelationInfo,
 };
 use log::debug;
 use prisma_inflector;
@@ -196,7 +198,7 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
             //todo name of the opposing model  -> still needs to be sanitized and lowercased
             let name = foreign_key.referenced_table.clone();
 
-            let database_name = Some(DatabaseName::Compound(columns.iter().map(|c| c.name.clone()).collect()));
+            let database_name = Some(Compound(columns.iter().map(|c| c.name.clone()).collect()));
 
             let field = Field {
                 name,
@@ -272,17 +274,15 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
                         // what about separate uniques? all @unique == @@unique ?? No! separate ones do not fully work since you can only connect to a subset of the @@unique case
                         // model.indexes contains a multi-field unique index that matches the colums exactly, then it is unique
                         // if there are separate uniques it probably should not become a relation
-                        // what breaks by having an @@unique that refers to fields that do not have a representation on the model anymore due to the merged relation field
+                        // what breaks by having an @@unique that refers to fields that do not have a representation on the model anymore due to the merged relation field?
 
                         let other_is_unique = || {
                             let table = schema.table_bang(&model.name);
 
                             match &relation_field.database_name {
                                 None => table.is_column_unique(relation_field.name.as_str()),
-                                Some(DatabaseName::Single(name)) => table.is_column_unique(name),
-                                Some(DatabaseName::Compound(names)) => {
-                                    table.indices.iter().any(|i| i.columns == *names)
-                                }
+                                Some(Single(name)) => table.is_column_unique(name),
+                                Some(Compound(names)) => table.indices.iter().any(|i| i.columns == *names),
                             }
                         };
 
