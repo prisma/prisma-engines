@@ -19,6 +19,28 @@ impl SqlSchemaExt for SqlSchema {
     }
 }
 
+pub struct SchemaAssertion(pub SqlSchema);
+
+impl SchemaAssertion {
+    pub fn assert_table<F>(self, table_name: &str, table_assertions: F) -> AssertionResult<Self>
+    where
+        F: for<'a> FnOnce(TableAssertion<'a>) -> AssertionResult<TableAssertion<'a>>,
+    {
+        let table_result = self.0.table(table_name);
+        let table = table_result.map(TableAssertion).map_err(|_| {
+            anyhow::anyhow!(
+                "assert_table failed. Table {} not found. Tables in database: {:?}",
+                table_name,
+                self.0.tables.iter().map(|table| &table.name).collect::<Vec<_>>()
+            )
+        })?;
+
+        table_assertions(table)?;
+
+        Ok(self)
+    }
+}
+
 pub struct TableAssertion<'a>(&'a Table);
 
 impl<'a> TableAssertion<'a> {
