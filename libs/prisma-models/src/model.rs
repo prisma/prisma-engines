@@ -85,8 +85,9 @@ impl Model {
     /// 4. If all of the above fails, we panic. Models with no unique / ID are not supported (yet).
     ///
     /// This relies entirely on the datamodel parsing and conversion to have a stable ordering of fields.
-    pub fn primary_identifier(&self) -> PrimaryIdentifier {
-        self.fields()
+    pub fn identifier(&self) -> ModelIdentifier {
+        let fields: Vec<Field> = self
+            .fields()
             .id()
             .map(|fields| fields.into_iter().map(|f| Field::Scalar(f)).collect())
             .or_else(|| {
@@ -105,7 +106,9 @@ impl Model {
             .expect(&format!(
                 "Unable to resolve a primary identifier for model {}.",
                 self.name
-            ))
+            ));
+
+        ModelIdentifier::new(fields)
     }
 
     pub fn fields(&self) -> &Fields {

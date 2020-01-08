@@ -1,4 +1,4 @@
-use crate::{ModelRef, RelationFieldRef, ScalarFieldRef, TypeIdentifier};
+use crate::{Field, ModelRef, RelationFieldRef, ScalarFieldRef, TypeIdentifier};
 use datamodel::FieldArity;
 
 pub trait IntoSelectedFields {
@@ -71,6 +71,13 @@ impl SelectedFields {
         });
 
         SelectedFields { scalar, relation }
+    }
+
+    pub fn add(&mut self, field: Field) {
+        match field {
+            Field::Scalar(sf) => self.add_scalar(sf),
+            Field::Relation(rf) => self.add_relation(rf),
+        }
     }
 
     pub fn add_scalar(&mut self, field: ScalarFieldRef) {

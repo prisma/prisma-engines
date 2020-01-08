@@ -5,9 +5,9 @@ pub trait AsColumns {
     fn as_columns(&self) -> Vec<Column<'static>>;
 }
 
-impl AsColumns for Vec<Field> {
+impl AsColumns for &[Field] {
     fn as_columns(&self) -> Vec<Column<'static>> {
-        self.iter().map(|f| f.as_column()).collect()
+        self.into_iter().map(|f| f.as_column()).collect()
     }
 }
 

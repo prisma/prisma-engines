@@ -14,10 +14,16 @@ pub enum FieldTemplate {
     Scalar(ScalarFieldTemplate),
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Field {
     Relation(RelationFieldRef),
     Scalar(ScalarFieldRef),
+}
+
+#[derive(Debug, Clone)]
+pub enum FieldWeak {
+    Relation(RelationFieldWeak),
+    Scalar(ScalarFieldWeak),
 }
 
 #[derive(Debug, PartialEq, Eq, Hash)]

@@ -79,33 +79,30 @@ pub trait QueryExt: Queryable + Send + Sync {
 
     /// Read the all columns as a (primary) identifier.
     async fn filter_ids(&self, model: &ModelRef, filter: Filter) -> crate::Result<Vec<RecordIdentifier>> {
-        let primary_id = model.primary_identifier();
-        let id_cols = primary_id.as_columns();
+        let model_id = model.identifier();
+        let id_cols = model_id.fields().as_columns();
 
         let select = Select::from_table(model.as_table())
             .columns(id_cols)
             .so_that(filter.aliased_cond(None));
 
-        self.select_ids(select, primary_id).await
+        self.select_ids(select, model_id).await
     }
 
-    async fn select_ids(
-        &self,
-        select: Select<'_>,
-        primary_id: PrimaryIdentifier,
-    ) -> crate::Result<Vec<RecordIdentifier>> {
+    async fn select_ids(&self, select: Select<'_>, model_id: ModelIdentifier) -> crate::Result<Vec<RecordIdentifier>> {
         // Todo: We assume that all fields have to be required.
-        let idents: Vec<_> = primary_id
-            .iter()
+        let idents: Vec<_> = model_id
+            .fields()
+            .into_iter()
             .map(|f| (f.type_identifier(), FieldArity::Required))
             .collect();
 
         let mut rows = self.filter(select.into(), &idents).await?;
         let mut result = Vec::new();
 
-        for mut row in rows.drain(0..) {
+        for row in rows.drain(0..) {
             // todo Cloning the arcs all the time is a bad idea.
-            let record_id: RecordIdentifier = primary_id
+            let record_id: RecordIdentifier = model_id
                 .clone()
                 .into_iter()
                 .zip(row.values.into_iter())

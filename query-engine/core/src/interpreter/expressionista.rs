@@ -2,7 +2,7 @@ use super::{
     expression::*, ComputationResult, DiffResult, Env, ExpressionResult, InterpretationResult, InterpreterError,
 };
 use crate::{query_graph::*, Query};
-use prisma_models::GraphqlId;
+use prisma_models::RecordIdentifier;
 use std::convert::TryInto;
 
 pub struct Expressionista;
@@ -142,8 +142,8 @@ impl Expressionista {
             Ok(Expression::Func {
                 func: Box::new(move |_| match node {
                     Node::Computation(Computation::Diff(DiffNode { left, right })) => {
-                        let left_diff: Vec<&GraphqlId> = left.difference(&right).collect();
-                        let right_diff: Vec<&GraphqlId> = right.difference(&left).collect();
+                        let left_diff: Vec<&RecordIdentifier> = left.difference(&right).collect();
+                        let right_diff: Vec<&RecordIdentifier> = right.difference(&left).collect();
 
                         Ok(Expression::Return {
                             result: ExpressionResult::Computation(ComputationResult::Diff(DiffResult {

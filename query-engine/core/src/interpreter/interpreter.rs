@@ -27,16 +27,16 @@ pub enum ComputationResult {
 /// `right` contains all elements that are in B but not in A.
 #[derive(Debug, Clone)]
 pub struct DiffResult {
-    pub left: Vec<GraphqlId>,
-    pub right: Vec<GraphqlId>,
+    pub left: Vec<RecordIdentifier>,
+    pub right: Vec<RecordIdentifier>,
 }
 
 impl ExpressionResult {
-    /// Attempts to transform the result into a vector of IDs (as PrismaValue).
-    pub fn as_ids(&self) -> InterpretationResult<Vec<PrismaValue>> {
+    /// Attempts to transform the result into a vector of record identifiers.
+    pub fn as_ids(&self) -> InterpretationResult<Vec<RecordIdentifier>> {
         let converted = match self {
             Self::Query(ref result) => match result {
-                QueryResult::Id(id) => Some(id.clone().map(|id| vec![id.into()]).unwrap_or_else(|| vec![])),
+                QueryResult::Id(id) => Some(id.clone().map(|id| vec![id]).unwrap_or_else(|| vec![])),
 
                 // We always select IDs, the unwraps are safe.
                 QueryResult::RecordSelection(rs) => Some(

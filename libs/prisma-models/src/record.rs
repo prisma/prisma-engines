@@ -1,12 +1,45 @@
 use crate::{DomainError as Error, DomainResult, Field, PrismaValue};
 
 // Collection of fields of which the primary identifier of a model is composed of.
-pub type PrimaryIdentifier = Vec<Field>;
+// Todo: Currently, this uses arcs, which is not ideal, but also not terrible compared
+// Arcs in the RecordIdentifier.
+#[derive(Clone, Default)]
+pub struct ModelIdentifier {
+    fields: Vec<Field>,
+}
 
-// Collection of field to value pairs corresponding to the
-// WIP: Holding an arc here is a terrible idea. After seeing what the final code
-//      looks like, we need to revise that decision.
-#[derive(Debug, Clone)]
+impl ModelIdentifier {
+    pub fn new(fields: Vec<Field>) -> Self {
+        Self { fields }
+    }
+
+    pub fn names(&self) -> Vec<&str> {
+        self.fields.iter().map(|field| field.name()).collect()
+    }
+
+    pub fn names_owned(&self) -> Vec<String> {
+        self.fields.iter().map(|field| field.name().to_owned()).collect()
+    }
+
+    pub fn fields(&self) -> &[Field] {
+        &self.fields
+    }
+}
+
+impl IntoIterator for ModelIdentifier {
+    type Item = Field;
+    type IntoIter = std::vec::IntoIter<Self::Item>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.fields.into_iter()
+    }
+}
+
+// Collection of field to value pairs corresponding to the ModelIdentifier the record belongs to.
+// Todo: Storing Arcs is not a great idea, as practically every single record produced by a query
+// essentially clones the arcs of the model identifier. After the main work on multi/any-id-fields
+// is done. Maybe references are acceptable to use here.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct RecordIdentifier {
     pub pairs: Vec<(Field, PrismaValue)>,
 }
@@ -53,8 +86,8 @@ impl SingleRecord {
         Self { record, field_names }
     }
 
-    pub fn primary_id(&self, id: &PrimaryIdentifier) -> DomainResult<RecordIdentifier> {
-        self.record.primary_id(&self.field_names, id)
+    pub fn identifier(&self, id: &ModelIdentifier) -> DomainResult<RecordIdentifier> {
+        self.record.identifier(&self.field_names, id)
     }
 
     pub fn get_field_value(&self, field: &str) -> DomainResult<&PrismaValue> {
@@ -69,10 +102,10 @@ pub struct ManyRecords {
 }
 
 impl ManyRecords {
-    pub fn primary_ids(&self, id: PrimaryIdentifier) -> DomainResult<Vec<RecordIdentifier>> {
+    pub fn identifiers(&self, model_id: &ModelIdentifier) -> DomainResult<Vec<RecordIdentifier>> {
         self.records
             .iter()
-            .map(|record| record.primary_id(&self.field_names, &id).map(|i| i.clone()))
+            .map(|record| record.identifier(&self.field_names, model_id).map(|i| i.clone()))
             .collect()
     }
 
@@ -111,8 +144,9 @@ impl Record {
         }
     }
 
-    pub fn primary_id(&self, field_names: &[String], id: &PrimaryIdentifier) -> DomainResult<RecordIdentifier> {
+    pub fn identifier(&self, field_names: &[String], id: &ModelIdentifier) -> DomainResult<RecordIdentifier> {
         let pairs: Vec<(Field, PrismaValue)> = id
+            .fields()
             .into_iter()
             .map(|id_field| {
                 self.get_field_value(field_names, id_field.name())

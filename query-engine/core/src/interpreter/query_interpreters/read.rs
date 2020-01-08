@@ -1,12 +1,12 @@
 use crate::{interpreter::InterpretationResult, query_ast::*, result_ast::*};
 use connector::{self, ConnectionLike, QueryArguments, ReadOperations};
 use futures::future::{BoxFuture, FutureExt};
-use prisma_models::{GraphqlId, SelectedFields};
+use prisma_models::{Field, RecordIdentifier, SelectedFields};
 
 pub fn execute<'a, 'b>(
     tx: &'a ConnectionLike<'a, 'b>,
     query: ReadQuery,
-    parent_ids: &'a [GraphqlId],
+    parent_ids: &'a [RecordIdentifier],
 ) -> BoxFuture<'a, InterpretationResult<QueryResult>> {
     let fut = async move {
         match query {
@@ -26,17 +26,15 @@ fn read_one<'conn, 'tx>(
     query: RecordQuery,
 ) -> BoxFuture<'conn, InterpretationResult<QueryResult>> {
     let fut = async move {
-
         let selected_fields = inject_required_fields(query.selected_fields.clone());
         let model = query.model;
         let filter = query.filter.expect("Expected filter to be set for ReadOne query.");
         let scalars = tx.get_single_record(&model, &filter, &selected_fields).await?;
-
-        let id_field = model.fields().id().name.clone();
+        let model_id = model.identifier();
 
         match scalars {
             Some(record) => {
-                let ids = vec![record.collect_id(&id_field)?];
+                let ids = vec![record.identifier(&model_id)?];
                 let nested: Vec<QueryResult> = process_nested(tx, query.nested, &ids).await?;
 
                 Ok(QueryResult::RecordSelection(RecordSelection {
@@ -44,7 +42,7 @@ fn read_one<'conn, 'tx>(
                     fields: query.selection_order,
                     scalars: record.into(),
                     nested,
-                    id_field,
+                    id_fields: model_id.names_owned(),
                     ..Default::default()
                 }))
             }
@@ -52,7 +50,7 @@ fn read_one<'conn, 'tx>(
             None => Ok(QueryResult::RecordSelection(RecordSelection {
                 name: query.name,
                 fields: query.selection_order,
-                id_field,
+                id_fields: model_id.names_owned(),
                 ..Default::default()
             })),
         }
@@ -72,17 +70,17 @@ fn read_many<'a, 'b>(
             .get_many_records(&query.model, query.args.clone(), &selected_fields)
             .await?;
 
-        let id_field = query.model.fields().id().name.clone();
-        let ids = scalars.collect_ids(&id_field)?;
+        let model_id = query.model.identifier();
+        let ids = scalars.identifiers(&model_id)?;
         let nested: Vec<QueryResult> = process_nested(tx, query.nested, &ids).await?;
 
         Ok(QueryResult::RecordSelection(RecordSelection {
             name: query.name,
             fields: query.selection_order,
             query_arguments: query.args,
+            id_fields: model_id.names_owned(),
             scalars,
             nested,
-            id_field,
         }))
     };
 
@@ -93,7 +91,7 @@ fn read_many<'a, 'b>(
 fn read_related<'a, 'b>(
     tx: &'a ConnectionLike<'a, 'b>,
     query: RelatedRecordsQuery,
-    parent_ids: &'a [GraphqlId],
+    parent_ids: &'a [RecordIdentifier],
 ) -> BoxFuture<'a, InterpretationResult<QueryResult>> {
     let fut = async move {
         let selected_fields = inject_required_fields(query.selected_fields.clone());
@@ -107,17 +105,17 @@ fn read_related<'a, 'b>(
             .await?;
 
         let model = query.parent_field.related_model();
-        let id_field = model.fields().id().name.clone();
-        let ids = scalars.collect_ids(&id_field)?;
-         let nested: Vec<QueryResult> = process_nested(tx, query.nested, &ids).await?;
+        let model_id = model.identifier();
+        let ids = scalars.identifiers(&model_id)?;
+        let nested: Vec<QueryResult> = process_nested(tx, query.nested, &ids).await?;
 
         Ok(QueryResult::RecordSelection(RecordSelection {
             name: query.name,
             fields: query.selection_order,
             query_arguments: query.args,
+            id_fields: model_id.names_owned(),
             scalars,
             nested,
-            id_field,
         }))
     };
 
@@ -132,19 +130,19 @@ async fn aggregate<'a, 'b>(
     Ok(QueryResult::Count(result))
 }
 
-/// Injects fields required for querying, if they're not already in the selection set.
-/// Currently, required fields for every query are:
-/// - ID field
+/// Injects fields required for querying data, if they're not already in the selection set.
+/// Currently, required fields for every query are the fields of the model identifier.
 fn inject_required_fields(mut selected_fields: SelectedFields) -> SelectedFields {
-    let id_field = selected_fields.model().fields().id();
+    let model_id = selected_fields.model().identifier();
+    let selected_names = selected_fields.names();
 
-    if selected_fields
-        .scalar
-        .iter()
-        .find(|f| f.field.name == id_field.name)
-        .is_none()
-    {
-        selected_fields.add_scalar(id_field);
+    let missing_fields: Vec<Field> = model_id
+        .into_iter()
+        .filter(|field| selected_names.find(|name| name == &field.name()).is_none())
+        .collect();
+
+    for field in missing_fields {
+        selected_fields.add(field)
     }
 
     selected_fields
@@ -153,7 +151,7 @@ fn inject_required_fields(mut selected_fields: SelectedFields) -> SelectedFields
 fn process_nested<'a, 'b>(
     tx: &'a ConnectionLike<'a, 'b>,
     nested: Vec<ReadQuery>,
-    parent_ids: &'a [GraphqlId],
+    parent_ids: &'a [RecordIdentifier],
 ) -> BoxFuture<'a, InterpretationResult<Vec<QueryResult>>> {
     let fut = async move {
         let mut results = Vec::with_capacity(nested.len());

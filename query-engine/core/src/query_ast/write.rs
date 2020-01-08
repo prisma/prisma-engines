@@ -110,15 +110,15 @@ pub struct DeleteManyRecords {
 
 #[derive(Debug, Clone)]
 pub struct ConnectRecords {
-    pub parent_id: Option<GraphqlId>,
-    pub child_ids: Vec<GraphqlId>,
+    pub parent_id: Option<RecordIdentifier>,
+    pub child_ids: Vec<RecordIdentifier>,
     pub relation_field: RelationFieldRef,
 }
 
 #[derive(Debug, Clone)]
 pub struct DisconnectRecords {
-    pub parent_id: Option<GraphqlId>,
-    pub child_ids: Vec<GraphqlId>,
+    pub parent_id: Option<RecordIdentifier>,
+    pub child_ids: Vec<RecordIdentifier>,
     pub relation_field: RelationFieldRef,
 }
 

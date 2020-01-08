@@ -1,9 +1,9 @@
 use connector::QueryArguments;
-use prisma_models::{GraphqlId, ManyRecords};
+use prisma_models::{ManyRecords, RecordIdentifier};
 
 #[derive(Debug, Clone)]
 pub enum QueryResult {
-    Id(Option<GraphqlId>),
+    Id(Option<RecordIdentifier>),
     Count(usize),
     RecordSelection(RecordSelection),
     Unit,
@@ -28,6 +28,6 @@ pub struct RecordSelection {
     /// Required for result processing
     pub query_arguments: QueryArguments,
 
-    /// Name of the id field of the contained records.
-    pub id_field: String,
+    /// Names of the identifier fields of the contained records.
+    pub id_fields: Vec<String>,
 }

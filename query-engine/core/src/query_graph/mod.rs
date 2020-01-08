@@ -19,7 +19,7 @@ use crate::{interpreter::ExpressionResult, Query, QueryGraphBuilderResult};
 use guard::*;
 use invariance_rules::*;
 use petgraph::{graph::*, visit::EdgeRef as PEdgeRef, *};
-use prisma_models::{GraphqlId, PrismaValue};
+use prisma_models::RecordIdentifier;
 use std::{borrow::Borrow, collections::HashSet};
 
 pub type QueryGraphResult<T> = std::result::Result<T, QueryGraphError>;
@@ -79,8 +79,8 @@ impl Computation {
 }
 
 pub struct DiffNode {
-    pub left: HashSet<GraphqlId>,
-    pub right: HashSet<GraphqlId>,
+    pub left: HashSet<RecordIdentifier>,
+    pub right: HashSet<RecordIdentifier>,
 }
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
@@ -107,7 +107,9 @@ impl EdgeRef {
     }
 }
 
-pub type ParentIdsFn = Box<dyn FnOnce(Node, Vec<PrismaValue>) -> QueryGraphBuilderResult<Node> + Send + Sync + 'static>;
+pub type ParentIdsFn =
+    Box<dyn FnOnce(Node, Vec<RecordIdentifier>) -> QueryGraphBuilderResult<Node> + Send + Sync + 'static>;
+
 pub type ParentResultFn =
     Box<dyn FnOnce(Node, &ExpressionResult) -> QueryGraphBuilderResult<Node> + Send + Sync + 'static>;
 
