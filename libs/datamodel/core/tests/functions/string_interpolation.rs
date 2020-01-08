@@ -6,6 +6,7 @@ use datamodel::{
     error::DatamodelError,
 };
 
+#[ignore]
 #[test]
 fn interpolate_expressions_in_strings() {
     let dml = r#"
@@ -27,6 +28,7 @@ fn interpolate_expressions_in_strings() {
         ))));
 }
 
+#[ignore]
 #[test]
 fn dont_interpolate_escaped_expressions_in_strings() {
     let dml = r#"
@@ -48,6 +50,7 @@ fn dont_interpolate_escaped_expressions_in_strings() {
         ))));
 }
 
+#[ignore]
 #[test]
 fn interpolate_functionals_in_strings() {
     let dml = r#"
@@ -71,6 +74,7 @@ fn interpolate_functionals_in_strings() {
         ))));
 }
 
+#[ignore]
 #[test]
 fn interpolate_nested_mess() {
     let dml = r#"
@@ -134,6 +138,7 @@ fn should_not_try_to_interpret_comments_in_strings() {
         ))));
 }
 
+#[ignore]
 #[test]
 fn resolve_argument_errors_correctly() {
     let dml = r#"
@@ -152,6 +157,7 @@ fn resolve_argument_errors_correctly() {
     );
 }
 
+#[ignore]
 #[test]
 fn resolve_array_interpolation_errors_correctly() {
     let dml = r#"

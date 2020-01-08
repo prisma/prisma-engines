@@ -4,6 +4,7 @@ use datamodel::{
     DefaultValue,
 };
 
+#[ignore]
 #[test]
 fn interpolate_environment_variables() {
     let dml = r#"
@@ -26,6 +27,7 @@ fn interpolate_environment_variables() {
 }
 
 // This is very useless, except being a good test case.
+#[ignore]
 #[test]
 fn interpolate_nested_environment_variables() {
     let dml = r#"
@@ -48,6 +50,7 @@ fn interpolate_nested_environment_variables() {
         .assert_default_value(DefaultValue::Single(ScalarValue::String(String::from("prisma-user"))));
 }
 
+#[ignore]
 #[test]
 fn ducktype_environment_variables() {
     let dml = r#"
