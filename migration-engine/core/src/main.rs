@@ -16,7 +16,7 @@ mod tests;
 pub use error::Error;
 pub use migration_engine::*;
 
-pub type Result<T> = std::result::Result<T, Error>;
+pub type CoreResult<T> = Result<T, Error>;
 
 pub(crate) fn parse_datamodel(datamodel: &str) -> CommandResult<Datamodel> {
     let result = datamodel::parse_datamodel_or_pretty_error(&datamodel, "datamodel file, line");

@@ -1,3 +1,4 @@
+use crate::CoreResult;
 use clap::ArgMatches;
 use itertools::Itertools;
 use migration_connector::*;
@@ -89,7 +90,7 @@ impl From<crate::Error> for CliError {
     }
 }
 
-pub async fn run(matches: &ArgMatches<'_>, datasource: &str) -> std::result::Result<String, CliError> {
+pub async fn run(matches: &ArgMatches<'_>, datasource: &str) -> Result<String, CliError> {
     if matches.is_present("can_connect_to_database") {
         create_conn(datasource, false).await?;
         Ok("Connection successful".into())
@@ -111,7 +112,7 @@ fn fetch_db_name(url: &Url, default: &str) -> String {
     String::from(result)
 }
 
-async fn create_conn(datasource: &str, admin_mode: bool) -> crate::Result<(String, Box<SqlMigrationConnector>)> {
+async fn create_conn(datasource: &str, admin_mode: bool) -> CoreResult<(String, Box<SqlMigrationConnector>)> {
     let mut url = Url::parse(datasource).expect("Invalid url in the datasource");
     let sql_family = SqlFamily::from_scheme(url.scheme());
 
@@ -148,7 +149,7 @@ async fn create_conn(datasource: &str, admin_mode: bool) -> crate::Result<(Strin
 
 /// Try to connect as an admin to a postgres database. We try to pick a default database from which
 /// we can create another database.
-async fn create_postgres_admin_conn(mut url: Url) -> crate::Result<SqlMigrationConnector> {
+async fn create_postgres_admin_conn(mut url: Url) -> CoreResult<SqlMigrationConnector> {
     let candidate_default_databases = &["postgres", "template1"];
 
     let mut params: HashMap<String, String> = url.query_pairs().into_owned().collect();

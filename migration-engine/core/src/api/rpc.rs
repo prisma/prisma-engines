@@ -1,5 +1,5 @@
 use super::{GenericApi, MigrationApi};
-use crate::commands::*;
+use crate::{commands::*, CoreResult};
 use datamodel::configuration::{MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME};
 use futures::{FutureExt, TryFutureExt};
 use jsonrpc_core::types::error::Error as JsonRpcError;
@@ -53,7 +53,7 @@ static AVAILABLE_COMMANDS: &[RpcCommand] = &[
 ];
 
 impl RpcApi {
-    pub async fn new(datamodel: &str) -> crate::Result<Self> {
+    pub async fn new(datamodel: &str) -> CoreResult<Self> {
         let config = datamodel::parse_configuration(datamodel)?;
 
         let source = config.datasources.first().ok_or(CommandError::DataModelErrors {
@@ -85,7 +85,7 @@ impl RpcApi {
     }
 
     /// Handle one request
-    pub fn handle(&self) -> crate::Result<String> {
+    pub fn handle(&self) -> CoreResult<String> {
         let mut json_is_complete = false;
         let mut input = String::new();
 
@@ -118,7 +118,7 @@ impl RpcApi {
         executor: &Arc<dyn GenericApi>,
         cmd: RpcCommand,
         params: &Params,
-    ) -> std::result::Result<serde_json::Value, JsonRpcError> {
+    ) -> Result<serde_json::Value, JsonRpcError> {
         let result: Result<serde_json::Value, RunCommandError> = Self::run_command(&executor, cmd, params).await;
 
         match result {
@@ -132,7 +132,7 @@ impl RpcApi {
         executor: &Arc<dyn GenericApi>,
         cmd: RpcCommand,
         params: &Params,
-    ) -> std::result::Result<serde_json::Value, RunCommandError> {
+    ) -> Result<serde_json::Value, RunCommandError> {
         tracing::debug!(?cmd, "running the command");
         match cmd {
             RpcCommand::InferMigrationSteps => {
@@ -167,7 +167,7 @@ impl RpcApi {
     }
 }
 
-fn render(result: impl serde::Serialize) -> std::result::Result<serde_json::Value, RunCommandError> {
+fn render(result: impl serde::Serialize) -> Result<serde_json::Value, RunCommandError> {
     Ok(serde_json::to_value(result).expect("Rendering of RPC response failed"))
 }
 
