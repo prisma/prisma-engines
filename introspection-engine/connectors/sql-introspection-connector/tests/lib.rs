@@ -1,6 +1,8 @@
 #![allow(dead_code)]
 
+mod common_unit_tests;
+mod db_specific_introspection;
+mod rpc_calls;
 mod test_harness;
-mod unit_tests;
+
 pub use test_harness::*;
-pub use unit_tests::*;

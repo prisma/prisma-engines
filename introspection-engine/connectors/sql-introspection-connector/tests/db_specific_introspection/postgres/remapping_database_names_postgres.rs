@@ -2,7 +2,8 @@ use crate::*;
 use barrel::types;
 use test_harness::*;
 
-async fn setup_invalid_fields(api: &TestApi) {
+#[test_one_connector(connector = "postgres")]
+async fn remapping_fields_with_invalid_characters_should_work_for_postgres(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -20,11 +21,6 @@ async fn setup_invalid_fields(api: &TestApi) {
             });
         })
         .await;
-}
-
-#[test_one_connector(connector = "postgres")]
-async fn remapping_fields_with_invalid_characters_should_work_for_postgres(api: &TestApi) {
-    setup_invalid_fields(api).await;
 
     let dm = r#"
             model User {
@@ -44,51 +40,8 @@ async fn remapping_fields_with_invalid_characters_should_work_for_postgres(api: 
     custom_assert(&result, dm);
 }
 
-#[test_one_connector(connector = "mysql")]
-async fn remapping_fields_with_invalid_characters_should_work_for_mysql(api: &TestApi) {
-    setup_invalid_fields(api).await;
-
-    let dm = r#"
-            model User {
-               d      String @map("(d")
-               e      String @map(")e")
-               b      String @map("*b")
-               f      String @map("/f")
-               c      String @map("?c")
-               g_a    String @map("g a")
-               h_a    String @map("h-a")
-               h1     String
-               id     Int @id
-               a      String @map("_a")
-            }
-        "#;
-    let result = dbg!(api.introspect().await);
-    custom_assert(&result, dm);
-}
-
-#[test_one_connector(connector = "sqlite")]
-async fn remapping_fields_with_invalid_characters_should_work_for_sqlite(api: &TestApi) {
-    setup_invalid_fields(api).await;
-
-    let dm = r#"
-            model User {
-               d      String @map("(d")
-               e      String @map(")e")
-               b      String @map("*b")
-               f      String @map("/f")
-               c      String @map("?c")
-               a      String @map("_a")
-               g_a    String @map("g a")
-               h_a    String @map("h-a")
-               h1     String
-               id     Int @id
-            }
-        "#;
-    let result = dbg!(api.introspect().await);
-    custom_assert(&result, dm);
-}
-
-async fn setup_invalid_models(api: &TestApi) {
+#[test_one_connector(connector = "postgres")]
+async fn remapping_tables_with_invalid_characters_should_work_for_postgres(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -101,12 +54,6 @@ async fn setup_invalid_models(api: &TestApi) {
             });
         })
         .await;
-}
-
-#[test_one_connector(connector = "postgres")]
-async fn remapping_tables_with_invalid_characters_should_work_for_postgres(api: &TestApi) {
-    setup_invalid_models(api).await;
-
     let dm = r#"
             model User {
                id Int @id @sequence(name: "?User_id_seq", allocationSize: 1, initialValue: 1)
@@ -116,48 +63,6 @@ async fn remapping_tables_with_invalid_characters_should_work_for_postgres(api: 
 
             model User_with_Space {
                id Int @id @sequence(name: "User with Space_id_seq", allocationSize: 1, initialValue: 1)
-
-               @@map("User with Space")
-            }
-        "#;
-    let result = dbg!(api.introspect().await);
-    custom_assert(&result, dm);
-}
-
-#[test_one_connector(connector = "mysql")]
-async fn remapping_tables_with_invalid_characters_should_work_for_mysql(api: &TestApi) {
-    setup_invalid_models(api).await;
-
-    let dm = r#"
-            model User {
-               id      Int @id
-
-               @@map("?User")
-            }
-
-            model User_with_Space {
-               id      Int @id
-
-               @@map("User with Space")
-            }
-        "#;
-    let result = dbg!(api.introspect().await);
-    custom_assert(&result, dm);
-}
-
-#[test_one_connector(connector = "sqlite")]
-async fn remapping_tables_with_invalid_characters_should_work_for_sqlite(api: &TestApi) {
-    setup_invalid_models(api).await;
-
-    let dm = r#"
-            model User {
-               id      Int @id
-
-               @@map("?User")
-            }
-
-            model User_with_Space {
-               id      Int @id
 
                @@map("User with Space")
             }

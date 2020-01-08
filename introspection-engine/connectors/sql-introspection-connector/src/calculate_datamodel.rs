@@ -29,6 +29,7 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
             .iter()
             .filter(|column| !is_compound_foreign_key_column(&table, &column))
         {
+            //todo add non-compound fields
             debug!("Handling column {:?}", column);
             let field_type = calculate_field_type(&schema, &column, &table);
             let arity = match column.tpe.arity {
@@ -94,6 +95,8 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
         }
 
         for foreign_key in table.foreign_keys.iter().filter(|fk| fk.columns.len() > 1) {
+            //todo add compound fields
+
             debug!("Handling compound foreign key  {:?}", foreign_key);
 
             let field_type = FieldType::Relation(RelationInfo {

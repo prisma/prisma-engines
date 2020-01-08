@@ -1,0 +1,13 @@
+//introspection test structure
+//test harness
+//rpc commands
+//common unit tests
+//db specific
+//  postgres
+//      introspecting_foreign_keys
+//      introspecting_compound_foreign_keys
+//  mysql
+//  sqlite
+
+
+start all tests in a file with the same word / phrase that lets you test the whole file
