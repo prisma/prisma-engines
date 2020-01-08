@@ -109,7 +109,6 @@ fn value_to_serde(value: &dml::ScalarValue) -> serde_json::Value {
         dml::ScalarValue::Int(val) => serde_json::Value::Number(serde_json::Number::from_f64(*val as f64).unwrap()),
         dml::ScalarValue::Decimal(val) => serde_json::Value::Number(serde_json::Number::from_f64(*val as f64).unwrap()),
         dml::ScalarValue::DateTime(val) => serde_json::Value::String(val.to_rfc3339()),
-        //        dml::ScalarValue::Expression(name, return_type, args) => function_to_serde(&name, *return_type, &args),
     }
 }
 
