@@ -45,9 +45,17 @@ choice.
 
 - See `.envrc` for connection params. Override variables if different. MySQL and
   PostgreSQL needs to be running for tests to succeed.
-  
+
 Then:
   
 ``` sh
 > cargo test
 ```
+
+### Query debug
+
+The queries can be logged by setting the `LOG_QUERIES` environment variable to any
+value. They'll be logged at the `INFO` level and are visible when having a
+logger in scope. If using [Tracing](https://github.com/tokio-rs/tracing),
+compiling Quaint with the `tracing-log` feature flag will parameterize the
+logged queries into a more suitable format for Tracing.
