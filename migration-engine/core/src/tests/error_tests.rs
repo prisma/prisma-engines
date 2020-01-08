@@ -309,6 +309,32 @@ async fn database_access_denied_must_return_a_proper_error_in_rpc() {
     assert_eq!(json_error, expected);
 }
 
+#[tokio::test]
+async fn bad_datasource_url_and_provider_combinations_must_return_a_proper_error() {
+    let db_name = "bad_datasource_url_and_provider_combinations_must_return_a_proper_error";
+    let dm = format!(
+        r#"
+            datasource db {{
+                provider = "sqlite"
+                url = "{}"
+            }}
+        "#,
+        postgres_10_url(db_name),
+    );
+
+    let error = RpcApi::new(&dm).await.map(drop).unwrap_err();
+
+    let json_error = serde_json::to_value(&render_error(error)).unwrap();
+
+    let expected = json!({
+        "is_panic": false,
+        "message": "Error in connector: The database URL is not valid",
+        "backtrace": null,
+    });
+
+    assert_eq!(json_error, expected);
+}
+
 #[test_one_connector(connector = "postgres")]
 async fn command_errors_must_return_an_unknown_error(api: &TestApi) {
     let input = ApplyMigrationInput {

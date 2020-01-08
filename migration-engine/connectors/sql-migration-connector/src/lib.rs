@@ -27,7 +27,6 @@ use sql_schema_describer::SqlSchemaDescriberBackend;
 use std::{fs, path::PathBuf, sync::Arc, time::Duration};
 
 const CONNECTION_TIMEOUT: Duration = Duration::from_secs(10);
-pub type Result<T> = std::result::Result<T, SqlError>;
 
 pub struct SqlMigrationConnector {
     pub connection_info: ConnectionInfo,
@@ -41,7 +40,9 @@ pub struct SqlMigrationConnector {
 }
 
 impl SqlMigrationConnector {
-    pub async fn new(database_str: &str) -> std::result::Result<Self, ConnectorError> {
+    pub async fn new(database_str: &str, provider: &str) -> ConnectorResult<Self> {
+        validate_database_str(database_str, provider)?;
+
         let connection_info =
             ConnectionInfo::from_url(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
 
@@ -226,5 +227,24 @@ pub(crate) async fn catch<O>(
     match fut.await {
         Ok(o) => Ok(o),
         Err(sql_error) => Err(sql_error.into_connector_error(connection_info)),
+    }
+}
+
+fn validate_database_str(database_str: &str, provider: &str) -> ConnectorResult<()> {
+    let scheme = database_str.split(":").next();
+
+    match (provider, scheme) {
+        ("mysql", Some("mysql")) => Ok(()),
+        ("postgresql", Some(scheme)) if scheme.starts_with("postgres") => Ok(()),
+        ("postgres", Some(scheme)) if scheme.starts_with("postgres") => Ok(()),
+        ("sqlite", Some("file")) | ("sqlite", Some("sqlite")) => Ok(()),
+        _ => {
+            let error = ConnectorError {
+                kind: migration_connector::ErrorKind::InvalidDatabaseUrl,
+                user_facing_error: None,
+            };
+
+            Err(error)
+        }
     }
 }
