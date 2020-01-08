@@ -49,38 +49,42 @@ pub async fn update_records(
     where_: Filter,
     args: WriteArgs,
 ) -> crate::Result<Vec<GraphqlId>> {
-    let ids = conn.filter_ids(model, where_.clone()).await?;
+    // let ids = conn.filter_ids(model, where_.clone()).await?;
 
-    if ids.len() == 0 {
-        return Ok(vec![]);
-    }
+    // if ids.len() == 0 {
+    //     return Ok(vec![]);
+    // }
 
-    let updates = {
-        let ids: Vec<&GraphqlId> = ids.iter().map(|id| &*id).collect();
-        write::update_many(model, ids.as_slice(), args.non_list_args())?
-    };
+    // let updates = {
+    //     let ids: Vec<&GraphqlId> = ids.iter().map(|id| &*id).collect();
+    //     write::update_many(model, ids.as_slice(), args.non_list_args())?
+    // };
 
-    for update in updates {
-        conn.update(update).await?;
-    }
+    // for update in updates {
+    //     conn.update(update).await?;
+    // }
 
-    Ok(ids)
+    // Ok(ids)
+
+    todo!()
 }
 
 pub async fn delete_records(conn: &dyn QueryExt, model: &ModelRef, where_: Filter) -> crate::Result<usize> {
-    let ids = conn.filter_ids(model, where_.clone()).await?;
-    let ids: Vec<&GraphqlId> = ids.iter().map(|id| &*id).collect();
-    let count = ids.len();
+    // let ids = conn.filter_ids(model, where_.clone()).await?;
+    // let ids: Vec<&GraphqlId> = ids.iter().map(|id| &*id).collect();
+    // let count = ids.len();
 
-    if count == 0 {
-        return Ok(count);
-    }
+    // if count == 0 {
+    //     return Ok(count);
+    // }
 
-    for delete in write::delete_many(model, ids.as_slice()) {
-        conn.delete(delete).await?;
-    }
+    // for delete in write::delete_many(model, ids.as_slice()) {
+    //     conn.delete(delete).await?;
+    // }
 
-    Ok(count)
+    // Ok(count)
+
+    todo!()
 }
 
 pub async fn connect(

@@ -1,3 +1,4 @@
+use super::row::row_value_to_prisma_value;
 use crate::{error::*, AliasedCondition, RawQuery, SqlRow, ToSqlRow};
 use async_trait::async_trait;
 use connector_interface::filter::Filter;
@@ -78,26 +79,38 @@ pub trait QueryExt: Queryable + Send + Sync {
 
     /// Read the all columns as a (primary) identifier.
     async fn filter_ids(&self, model: &ModelRef, filter: Filter) -> crate::Result<Vec<RecordIdentifier>> {
-        let id_cols = model.primary_identifier().as_columns();
+        let primary_id = model.primary_identifier();
+        let id_cols = primary_id.as_columns();
+
+        // Todo: We assume that all fields have to be required. Is this a valid assumption?
+        let idents: Vec<_> = primary_id
+            .iter()
+            .map(|f| (f.type_identifier(), FieldArity::Required))
+            .collect();
 
         let select = Select::from_table(model.as_table())
             .columns(id_cols)
             .so_that(filter.aliased_cond(None));
 
-        self.select_ids(select).await
+        self.select_ids(select, &idents).await
     }
 
-    async fn select_ids(&self, select: Select<'_>) -> crate::Result<Vec<RecordIdentifier>> {
-        let mut rows = self
-            .filter(select.into(), &[(TypeIdentifier::GraphQLID, FieldArity::Required)])
-            .await?;
-
+    async fn select_ids(
+        &self,
+        select: Select<'_>,
+        id_idents: &[(TypeIdentifier, FieldArity)],
+    ) -> crate::Result<Vec<RecordIdentifier>> {
+        let mut rows = self.filter(select.into(), id_idents).await?;
         let mut result = Vec::new();
 
         for mut row in rows.drain(0..) {
-            for value in row.values.drain(0..) {
-                result.push(GraphqlId::try_from(value)?)
+            let record_id = Vec::with_capacity(id_idents.len());
+
+            for (i, value) in row.values.drain(0..).enumerate() {
+                record_id.push(row_value_to_prisma_value(value, id_idents[i].0)?)
             }
+
+            result.push(record_id);
         }
 
         Ok(result)

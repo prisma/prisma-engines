@@ -60,7 +60,7 @@ impl ToSqlRow for ResultRow {
     }
 }
 
-fn row_value_to_prisma_value(
+pub fn row_value_to_prisma_value(
     p_value: ParameterizedValue,
     type_identifier: TypeIdentifier,
 ) -> Result<PrismaValue, SqlError> {
