@@ -266,11 +266,6 @@ impl Into<ast::Expression> for &dml::ScalarValue {
             dml::ScalarValue::Decimal(value) => ast::Expression::NumericValue(value.to_string(), ast::Span::empty()),
             dml::ScalarValue::Float(value) => ast::Expression::NumericValue(value.to_string(), ast::Span::empty()),
             dml::ScalarValue::Int(value) => ast::Expression::NumericValue(value.to_string(), ast::Span::empty()),
-            dml::ScalarValue::Expression(name, _, args) => ast::Expression::Function(
-                name.clone(),
-                args.iter().map(|a| a.into()).collect(),
-                ast::Span::empty(),
-            ),
         }
     }
 }

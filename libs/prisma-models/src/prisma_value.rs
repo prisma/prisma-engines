@@ -271,7 +271,6 @@ impl From<Option<dml::ScalarValue>> for PrismaValue {
             dml::ScalarValue::DateTime(x) => PrismaValue::DateTime(x),
             dml::ScalarValue::Decimal(x) => x.try_into().expect("Can't convert float to decimal"),
             dml::ScalarValue::ConstantLiteral(x) => PrismaValue::Enum(EnumValue::string(x.clone(), x.clone())),
-            dml::ScalarValue::Expression(_, _, _) => unreachable!(),
         })
         .unwrap_or_else(|| PrismaValue::Null)
     }

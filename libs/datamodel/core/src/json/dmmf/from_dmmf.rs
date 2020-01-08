@@ -2,9 +2,9 @@ use super::*;
 use crate::ast::Span;
 use crate::common::FromStrAndSpan;
 use crate::common::ScalarType;
-use crate::dml;
+use crate::{dml, ValueGenerator};
 use chrono::{DateTime, Utc};
-use std::convert::TryInto;
+use datamodel_connector::scalars::ScalarValue;
 
 pub fn parse_from_dmmf(dmmf: &str) -> dml::Datamodel {
     let parsed_dmmf = serde_json::from_str::<Datamodel>(&dmmf).expect("Failed to parse JSON");
@@ -72,46 +72,53 @@ fn default_value_from_serde(
     container: &Option<serde_json::Value>,
     field_type: &dml::FieldType,
 ) -> Option<dml::DefaultValue> {
-    let def_opt = match (container, field_type) {
+    match (container, field_type) {
         // Scalar.
-        (Some(value), dml::FieldType::Base(scalar_type)) => Some(match (value, scalar_type) {
-            (serde_json::Value::Bool(val), ScalarType::Boolean) => dml::ScalarValue::Boolean(*val),
-            (serde_json::Value::String(val), ScalarType::String) => {
-                dml::ScalarValue::String(String::from(val.as_str()))
-            }
-            (serde_json::Value::Number(val), ScalarType::Float) => {
-                dml::ScalarValue::Float(val.as_f64().unwrap() as f32)
-            }
-            (serde_json::Value::Number(val), ScalarType::Int) => dml::ScalarValue::Int(val.as_i64().unwrap() as i32),
-            (serde_json::Value::Number(val), ScalarType::Decimal) => {
-                dml::ScalarValue::Decimal(val.as_f64().unwrap() as f32)
-            }
-            (serde_json::Value::String(val), ScalarType::DateTime) => {
-                dml::ScalarValue::DateTime(String::from(val.as_str()).parse::<DateTime<Utc>>().unwrap())
-            }
+        (Some(value), dml::FieldType::Base(scalar_type)) => match (value, scalar_type) {
             // Function.
             (serde_json::Value::Object(_), _) => {
                 let func = serde_json::from_value::<Function>(value.clone()).expect("Failed to parse function JSON");
-                function_from_dmmf(&func, *scalar_type)
+                let vg = function_from_dmmf(&func, *scalar_type);
+                Some(dml::DefaultValue::Expression(vg))
             }
-            _ => panic!("Invalid type/value combination for default value."),
-        }),
+            (json, scalar_type) => {
+                let sv = parse_as_scalar_value(&json, &scalar_type);
+                Some(dml::DefaultValue::Single(sv))
+            }
+        },
         // Enum.
-        (Some(value), dml::FieldType::Enum(_)) => {
-            Some(dml::ScalarValue::ConstantLiteral(String::from(value.as_str().unwrap())))
-        }
+        (Some(value), dml::FieldType::Enum(_)) => Some(dml::DefaultValue::Single(dml::ScalarValue::ConstantLiteral(
+            String::from(value.as_str().unwrap()),
+        ))),
         (Some(_), _) => panic!("Fields with non-scalar type cannot have default value"),
         _ => None,
-    };
+    }
+}
 
-    def_opt.map(|dv| dv.try_into().unwrap())
+fn parse_as_scalar_value(json: &serde_json::Value, scalar_type: &ScalarType) -> ScalarValue {
+    match (json, scalar_type) {
+        (serde_json::Value::Bool(val), ScalarType::Boolean) => dml::ScalarValue::Boolean(*val),
+        (serde_json::Value::String(val), ScalarType::String) => dml::ScalarValue::String(String::from(val.as_str())),
+        (serde_json::Value::Number(val), ScalarType::Float) => dml::ScalarValue::Float(val.as_f64().unwrap() as f32),
+        (serde_json::Value::Number(val), ScalarType::Int) => dml::ScalarValue::Int(val.as_i64().unwrap() as i32),
+        (serde_json::Value::Number(val), ScalarType::Decimal) => {
+            dml::ScalarValue::Decimal(val.as_f64().unwrap() as f32)
+        }
+        (serde_json::Value::String(val), ScalarType::DateTime) => {
+            dml::ScalarValue::DateTime(String::from(val.as_str()).parse::<DateTime<Utc>>().unwrap())
+        }
+        _ => panic!(
+            "Invalid type/value combination for scalar value. Type: {:?}, Value: {}",
+            &scalar_type, &json
+        ),
+    }
 }
 
 fn type_from_string(scalar: &str) -> ScalarType {
     ScalarType::from_str(scalar).unwrap()
 }
 
-fn function_from_dmmf(func: &Function, expected_type: ScalarType) -> dml::ScalarValue {
+fn function_from_dmmf(func: &Function, expected_type: ScalarType) -> dml::ValueGenerator {
     if !func.args.is_empty() {
         panic!("Function argument deserialization is not supported with DMMF. There are no type annotations yet, so it's not clear which is meant.");
     }
@@ -124,7 +131,8 @@ fn function_from_dmmf(func: &Function, expected_type: ScalarType) -> dml::Scalar
         );
     }
 
-    dml::ScalarValue::Expression(func.name.clone(), expected_type, vec![])
+    let vg = ValueGenerator::new(func.name.clone(), vec![]).unwrap();
+    vg
 }
 
 fn get_on_delete_strategy(strategy: &Option<String>) -> dml::OnDeleteStrategy {

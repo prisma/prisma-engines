@@ -2,7 +2,6 @@ use super::*;
 use crate::common::ScalarType;
 use crate::dml;
 use serde_json;
-use std::convert::TryInto;
 
 pub fn render_to_dmmf(schema: &dml::Datamodel) -> String {
     let dmmf = schema_to_dmmf(schema);
@@ -94,11 +93,11 @@ fn type_to_string(scalar: &ScalarType) -> String {
     scalar.to_string()
 }
 
-fn default_value_to_serde(container: &Option<dml::DefaultValue>) -> Option<serde_json::Value> {
-    match container {
-        Some(value) => Some(value_to_serde(&value.clone().try_into().unwrap())),
-        None => None,
-    }
+fn default_value_to_serde(dv_opt: &Option<dml::DefaultValue>) -> Option<serde_json::Value> {
+    dv_opt.as_ref().map(|dv| match dv {
+        dml::DefaultValue::Single(value) => value_to_serde(&value.clone()),
+        dml::DefaultValue::Expression(vg) => function_to_serde(&vg.name, vg.return_type(), &vg.args),
+    })
 }
 
 fn value_to_serde(value: &dml::ScalarValue) -> serde_json::Value {
@@ -110,7 +109,7 @@ fn value_to_serde(value: &dml::ScalarValue) -> serde_json::Value {
         dml::ScalarValue::Int(val) => serde_json::Value::Number(serde_json::Number::from_f64(*val as f64).unwrap()),
         dml::ScalarValue::Decimal(val) => serde_json::Value::Number(serde_json::Number::from_f64(*val as f64).unwrap()),
         dml::ScalarValue::DateTime(val) => serde_json::Value::String(val.to_rfc3339()),
-        dml::ScalarValue::Expression(name, return_type, args) => function_to_serde(&name, *return_type, &args),
+        //        dml::ScalarValue::Expression(name, return_type, args) => function_to_serde(&name, *return_type, &args),
     }
 }
 

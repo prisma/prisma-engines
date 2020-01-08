@@ -7,7 +7,6 @@ use crate::{
     error::{DatamodelError, ErrorCollection},
 };
 use datamodel_connector::{Connector, ExampleConnector};
-use std::convert::TryInto;
 
 /// Helper for lifting a datamodel.
 ///
@@ -119,8 +118,8 @@ impl LiftAstToDml {
             let validator = ValueValidator::new(value)?;
 
             if let dml::FieldType::Base(base_type) = &field_type {
-                match validator.as_type(*base_type) {
-                    Ok(val) => field.default_value = Some(val.try_into()?),
+                match validator.as_default_value(*base_type) {
+                    Ok(dv) => field.default_value = Some(dv),
                     Err(err) => errors.push(err),
                 };
             } else {

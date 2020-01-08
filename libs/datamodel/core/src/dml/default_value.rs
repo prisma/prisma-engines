@@ -1,10 +1,7 @@
 use super::*;
 use crate::{ast, error::DatamodelError};
 use chrono::Utc;
-use std::{
-    convert::{TryFrom, TryInto},
-    fmt,
-};
+use std::{convert::TryFrom, fmt};
 use uuid::Uuid;
 
 #[derive(Clone, PartialEq)]
@@ -135,30 +132,30 @@ impl fmt::Debug for DefaultValue {
     }
 }
 
-impl TryFrom<ScalarValue> for DefaultValue {
-    type Error = DatamodelError;
-
-    fn try_from(sv: ScalarValue) -> std::result::Result<Self, DatamodelError> {
-        Ok(match sv {
-            ScalarValue::Expression(name, _, args) => Self::Expression(ValueGenerator::new(name, args)?),
-            other => Self::Single(other),
-        })
-    }
-}
-
-impl TryInto<ScalarValue> for DefaultValue {
-    type Error = DatamodelError;
-
-    fn try_into(self) -> std::result::Result<ScalarValue, DatamodelError> {
-        Ok(match self {
-            Self::Expression(vg) => {
-                let rt = vg.return_type();
-                ScalarValue::Expression(vg.name, rt, vg.args)
-            }
-            Self::Single(sv) => sv,
-        })
-    }
-}
+//impl TryFrom<ScalarValue> for DefaultValue {
+//    type Error = DatamodelError;
+//
+//    fn try_from(sv: ScalarValue) -> std::result::Result<Self, DatamodelError> {
+//        Ok(match sv {
+//            ScalarValue::Expression(name, _, args) => Self::Expression(ValueGenerator::new(name, args)?),
+//            other => Self::Single(other),
+//        })
+//    }
+//}
+//
+//impl TryInto<ScalarValue> for DefaultValue {
+//    type Error = DatamodelError;
+//
+//    fn try_into(self) -> std::result::Result<ScalarValue, DatamodelError> {
+//        Ok(match self {
+//            Self::Expression(vg) => {
+//                let rt = vg.return_type();
+//                ScalarValue::Expression(vg.name, rt, vg.args)
+//            }
+//            Self::Single(sv) => sv,
+//        })
+//    }
+//}
 
 impl Into<ast::Expression> for DefaultValue {
     fn into(self) -> ast::Expression {
