@@ -1,5 +1,6 @@
 use crate::error::DatamodelError;
 use crate::validator::directive::{Args, DirectiveValidator};
+use crate::validator::LowerDmlToAst;
 use crate::{ast, dml};
 
 /// Prismas builtin `@sequence` directive.
@@ -59,11 +60,11 @@ impl DirectiveValidator<dml::Field> for SequenceDirectiveValidator {
                 args.push(ast::Argument::new_string("name", &seq_info.name));
                 args.push(ast::Argument::new(
                     "allocationSize",
-                    dml::ScalarValue::Int(seq_info.allocation_size).into(),
+                    LowerDmlToAst::lower_scalar_value(&dml::ScalarValue::Int(seq_info.allocation_size)),
                 ));
                 args.push(ast::Argument::new(
                     "initialValue",
-                    dml::ScalarValue::Int(seq_info.initial_value).into(),
+                    LowerDmlToAst::lower_scalar_value(&dml::ScalarValue::Int(seq_info.initial_value)),
                 ));
 
                 return Ok(vec![ast::Directive::new(self.directive_name(), args)]);

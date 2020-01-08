@@ -244,28 +244,3 @@ impl ValueListValidator for Vec<ValueValidator> {
         Ok(res)
     }
 }
-
-impl Into<ast::Expression> for dml::ScalarValue {
-    fn into(self) -> ast::Expression {
-        (&self).into()
-    }
-}
-
-impl Into<ast::Expression> for &dml::ScalarValue {
-    fn into(self) -> ast::Expression {
-        match self {
-            dml::ScalarValue::Boolean(true) => ast::Expression::BooleanValue(String::from("true"), ast::Span::empty()),
-            dml::ScalarValue::Boolean(false) => {
-                ast::Expression::BooleanValue(String::from("false"), ast::Span::empty())
-            }
-            dml::ScalarValue::String(value) => ast::Expression::StringValue(value.clone(), ast::Span::empty()),
-            dml::ScalarValue::ConstantLiteral(value) => {
-                ast::Expression::ConstantValue(value.clone(), ast::Span::empty())
-            }
-            dml::ScalarValue::DateTime(value) => ast::Expression::ConstantValue(value.to_rfc3339(), ast::Span::empty()),
-            dml::ScalarValue::Decimal(value) => ast::Expression::NumericValue(value.to_string(), ast::Span::empty()),
-            dml::ScalarValue::Float(value) => ast::Expression::NumericValue(value.to_string(), ast::Span::empty()),
-            dml::ScalarValue::Int(value) => ast::Expression::NumericValue(value.to_string(), ast::Span::empty()),
-        }
-    }
-}

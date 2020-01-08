@@ -101,7 +101,7 @@ impl LowerDmlToAst {
         Ok(ast::Field {
             name: ast::Identifier::new(&field.name),
             arity: self.lower_field_arity(field.arity),
-            default_value: field.default_value.clone().map(|dv| self.lower_default_value(dv)),
+            default_value: field.default_value.clone().map(|dv| Self::lower_default_value(dv)),
             directives: self.directives.field.serialize(field, datamodel)?,
             field_type: self.lower_type(&field.field_type, field, model, &datamodel),
             documentation: field.documentation.clone().map(|text| ast::Comment { text }),
@@ -118,13 +118,30 @@ impl LowerDmlToAst {
         }
     }
 
-    pub fn lower_default_value(&self, dv: dml::DefaultValue) -> ast::Expression {
+    pub fn lower_default_value(dv: dml::DefaultValue) -> ast::Expression {
         match dv {
-            dml::DefaultValue::Single(v) => v.into(),
+            dml::DefaultValue::Single(v) => Self::lower_scalar_value(&v),
             dml::DefaultValue::Expression(e) => {
-                let exprs = e.args.into_iter().map(Into::into).collect();
+                let exprs = e.args.iter().map(Self::lower_scalar_value).collect();
                 ast::Expression::Function(e.name, exprs, ast::Span::empty())
             }
+        }
+    }
+
+    pub fn lower_scalar_value(sv: &dml::ScalarValue) -> ast::Expression {
+        match sv {
+            dml::ScalarValue::Boolean(true) => ast::Expression::BooleanValue(String::from("true"), ast::Span::empty()),
+            dml::ScalarValue::Boolean(false) => {
+                ast::Expression::BooleanValue(String::from("false"), ast::Span::empty())
+            }
+            dml::ScalarValue::String(value) => ast::Expression::StringValue(value.clone(), ast::Span::empty()),
+            dml::ScalarValue::ConstantLiteral(value) => {
+                ast::Expression::ConstantValue(value.clone(), ast::Span::empty())
+            }
+            dml::ScalarValue::DateTime(value) => ast::Expression::ConstantValue(value.to_rfc3339(), ast::Span::empty()),
+            dml::ScalarValue::Decimal(value) => ast::Expression::NumericValue(value.to_string(), ast::Span::empty()),
+            dml::ScalarValue::Float(value) => ast::Expression::NumericValue(value.to_string(), ast::Span::empty()),
+            dml::ScalarValue::Int(value) => ast::Expression::NumericValue(value.to_string(), ast::Span::empty()),
         }
     }
 

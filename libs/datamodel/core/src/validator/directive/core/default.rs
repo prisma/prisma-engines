@@ -44,13 +44,12 @@ impl DirectiveValidator<dml::Field> for DefaultDirectiveValidator {
         field: &dml::Field,
         _datamodel: &dml::Datamodel,
     ) -> Result<Vec<ast::Directive>, DatamodelError> {
-        let lowerer = LowerDmlToAst::new();
         if let Some(default_value) = &field.default_value {
             return Ok(vec![ast::Directive::new(
                 self.directive_name(),
                 vec![ast::Argument::new(
                     "",
-                    lowerer.lower_default_value(default_value.clone()),
+                    LowerDmlToAst::lower_default_value(default_value.clone()),
                 )],
             )]);
         }
