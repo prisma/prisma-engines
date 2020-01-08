@@ -323,34 +323,48 @@ impl SqlSchemaDescriber {
         table_name: &str,
         sequences: &Vec<Sequence>,
     ) -> (Vec<Index>, Option<PrimaryKey>) {
-        let sql = "SELECT indexInfos.relname as name,
+        let sql = r#"
+        SELECT
+            indexInfos.relname as name,
             array_agg(columnInfos.attname) as column_names,
             rawIndex.indisunique as is_unique, rawIndex.indisprimary as is_primary_key
-            FROM
+        FROM
             -- pg_class stores infos about tables, indices etc: https://www.postgresql.org/docs/current/catalog-pg-class.html
-            pg_class tableInfos, pg_class indexInfos,
+            pg_class tableInfos,
+            pg_class indexInfos,
             -- pg_index stores indices: https://www.postgresql.org/docs/current/catalog-pg-index.html
-            pg_index rawIndex,
+            (
+                SELECT
+                    indrelid,
+                    indexrelid,
+                    indisunique,
+                    indisprimary,
+                    unnest(array_agg(pg_index.indkey)) AS indkey,
+                    generate_subscripts(array_agg(pg_index.indkey), 1) AS indkeyidx
+                FROM pg_index
+                GROUP BY indrelid, indexrelid, indisunique, indisprimary
+                ORDER BY indkeyidx
+            ) rawIndex,
             -- pg_attribute stores infos about columns: https://www.postgresql.org/docs/current/catalog-pg-attribute.html
             pg_attribute columnInfos,
             -- pg_namespace stores info about the schema
             pg_namespace schemaInfo
-            WHERE
+        WHERE
             -- find table info for index
             tableInfos.oid = rawIndex.indrelid
             -- find index info
             AND indexInfos.oid = rawIndex.indexrelid
             -- find table columns
             AND columnInfos.attrelid = tableInfos.oid
-            AND columnInfos.attnum = ANY(rawIndex.indkey)
+            AND columnInfos.attnum = rawIndex.indkey
             -- we only consider ordinary tables
             AND tableInfos.relkind = 'r'
             -- we only consider stuff out of one specific schema
             AND tableInfos.relnamespace = schemaInfo.oid
             AND schemaInfo.nspname = $1
             AND tableInfos.relname = $2
-            GROUP BY tableInfos.relname, indexInfos.relname, rawIndex.indisunique,
-            rawIndex.indisprimary";
+        GROUP BY tableInfos.relname, indexInfos.relname, rawIndex.indisunique, rawIndex.indisprimary
+        "#;
         debug!("Getting indices: {}", sql);
         let rows = self
             .conn

@@ -113,6 +113,7 @@ fn render_raw_sql(
     renderer: &(dyn SqlRenderer + Send + Sync),
     schema_name: &str,
 ) -> std::result::Result<Option<String>, std::fmt::Error> {
+    use itertools::Itertools;
     use std::fmt::Write as _;
 
     let sql_family = renderer.sql_family();
@@ -120,29 +121,55 @@ fn render_raw_sql(
 
     match step {
         SqlMigrationStep::CreateTable(CreateTable { table }) => {
-            let cloned_columns = table.columns.clone();
-            let primary_columns = table.primary_key_columns();
-            let mut lines = Vec::new();
-            for column in cloned_columns.clone() {
-                let col_sql = renderer.render_column(&schema_name, &table, &column, false);
-                lines.push(format!("  {}", col_sql));
-            }
-            let primary_key_was_already_set_in_column_line = lines.join(",").contains(&"PRIMARY KEY");
+            let mut create_table = String::with_capacity(100);
 
-            if primary_columns.len() > 0 && !primary_key_was_already_set_in_column_line {
+            write!(create_table, "CREATE TABLE ")?;
+            renderer.write_quoted_with_schema(&mut create_table, &schema_name, &table.name)?;
+            writeln!(create_table, " (")?;
+
+            let mut columns = table.columns.iter().peekable();
+            while let Some(column) = columns.next() {
+                let col_sql = renderer.render_column(&schema_name, &table, &column, false);
+
+                write!(
+                    create_table,
+                    "    {}{}",
+                    col_sql,
+                    if columns.peek().is_some() { ",\n" } else { "" }
+                )?;
+            }
+
+            let primary_key_is_already_set = create_table.contains("PRIMARY KEY");
+            let primary_columns = table.primary_key_columns();
+
+            if primary_columns.len() > 0 && !primary_key_is_already_set {
                 let column_names: Vec<String> = primary_columns
                     .clone()
                     .into_iter()
                     .map(|col| renderer.quote(&col))
                     .collect();
-                lines.push(format!("  PRIMARY KEY ({})", column_names.join(",")))
+                write!(create_table, ",\n    PRIMARY KEY ({})", column_names.join(","))?;
             }
-            Ok(Some(format!(
-                "CREATE TABLE {} (\n{}\n){};",
-                renderer.quote_with_schema(&schema_name, &table.name),
-                lines.join(",\n"),
-                create_table_suffix(sql_family),
-            )))
+
+            if sql_family == SqlFamily::Sqlite && !table.foreign_keys.is_empty() {
+                write!(create_table, ",")?;
+
+                let mut fks = table.foreign_keys.iter().peekable();
+
+                while let Some(fk) = fks.next() {
+                    write!(
+                        create_table,
+                        "FOREIGN KEY ({constrained_columns}) {references}{comma}",
+                        constrained_columns = fk.columns.iter().map(|col| format!(r#""{}""#, col)).join(","),
+                        references = renderer.render_references(&schema_name, fk),
+                        comma = if fks.peek().is_some() { ",\n" } else { "" },
+                    )?;
+                }
+            }
+
+            write!(create_table, "\n) {}", create_table_suffix(sql_family))?;
+
+            Ok(Some(create_table))
         }
         SqlMigrationStep::DropTable(DropTable { name }) => Ok(Some(format!(
             "DROP TABLE {};",

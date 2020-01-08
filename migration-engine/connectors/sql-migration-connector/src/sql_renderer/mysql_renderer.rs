@@ -1,6 +1,7 @@
 use super::common::*;
 use crate::SqlFamily;
 use sql_schema_describer::*;
+use std::fmt::Write as _;
 
 const VARCHAR_LENGTH_PREFIX: &str = "(191)";
 
@@ -9,6 +10,10 @@ pub struct MySqlRenderer {}
 impl super::SqlRenderer for MySqlRenderer {
     fn sql_family(&self) -> SqlFamily {
         SqlFamily::Mysql
+    }
+
+    fn write_quoted(&self, buf: &mut String, name: &str) -> std::fmt::Result {
+        write!(buf, "`{}`", name)
     }
 
     fn quote(&self, name: &str) -> String {
