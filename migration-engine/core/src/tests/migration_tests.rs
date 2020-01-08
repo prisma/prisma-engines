@@ -7,6 +7,8 @@ use quaint::prelude::SqlFamily;
 use sql_migration_connector::{AlterIndex, CreateIndex, DropIndex, SqlMigrationStep};
 use sql_schema_describer::*;
 
+mod mariadb;
+
 #[test_each_connector]
 async fn adding_a_scalar_field_must_work(api: &TestApi) {
     let dm2 = r#"
@@ -999,7 +1001,7 @@ async fn removing_multi_field_unique_index_must_work(api: &TestApi) {
     assert!(index.is_none());
 }
 
-#[test_each_connector(ignore = "mysql_mariadb")]
+#[test_each_connector]
 async fn index_renaming_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
             model A {
@@ -1049,7 +1051,7 @@ async fn index_renaming_must_work(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(ignore = "mysql_mariadb")]
+#[test_each_connector]
 async fn index_renaming_must_work_when_renaming_to_default(api: &TestApi) {
     let dm1 = r#"
             model A {
@@ -1100,8 +1102,8 @@ async fn index_renaming_must_work_when_renaming_to_default(api: &TestApi) {
     }
 }
 
-#[test_each_connector(ignore = "mysql_mariadb")]
-async fn index_renaming_must_work_when_renaming_to_custom(api: &TestApi) {
+#[test_each_connector(log = "debug")]
+async fn index_renaming_must_work_when_renaming_to_custom(api: &TestApi) -> TestResult {
     let dm1 = r#"
             model A {
                 id Int @id
@@ -1111,15 +1113,13 @@ async fn index_renaming_must_work_when_renaming_to_custom(api: &TestApi) {
                 @@unique([field, secondField])
             }
         "#;
-    let result = api.infer_and_apply(&dm1).await;
-    let index = result
-        .sql_schema
-        .table_bang("A")
-        .indices
-        .iter()
-        .find(|i| i.columns == &["field", "secondField"]);
-    assert!(index.is_some());
-    assert_eq!(index.unwrap().tpe, IndexType::Unique);
+
+    api.infer_apply(&dm1).send().await?;
+    api.assert_schema().await?.assert_table("A", |table| {
+        table
+            .assert_indexes_count(1)?
+            .assert_index_on_columns(&["field", "secondField"], |idx| idx.assert_is_unique())
+    })?;
 
     let dm2 = r#"
             model A {
@@ -1130,18 +1130,19 @@ async fn index_renaming_must_work_when_renaming_to_custom(api: &TestApi) {
                 @@unique([field, secondField], name: "somethingCustom")
             }
         "#;
-    let result = api.infer_and_apply(&dm2).await;
-    let indexes = result
-        .sql_schema
-        .table_bang("A")
-        .indices
-        .iter()
-        .filter(|i| i.columns == &["field", "secondField"] && i.name == "somethingCustom");
-    assert_eq!(indexes.count(), 1);
+
+    let result = api.infer_apply(&dm2).send().await?;
+    api.assert_schema().await?.assert_table("A", |table| {
+        table
+            .assert_indexes_count(1)?
+            .assert_index_on_columns(&["field", "secondField"], |idx| {
+                idx.assert_name("somethingCustom")?.assert_is_unique()
+            })
+    })?;
 
     // Test that we are not dropping and recreating the index. Except in SQLite, because there we are.
     if !api.is_sqlite() {
-        let expected_steps = vec![SqlMigrationStep::AlterIndex(AlterIndex {
+        let expected_steps = &[SqlMigrationStep::AlterIndex(AlterIndex {
             table: "A".into(),
             index_name: "A.field_secondField".into(),
             index_new_name: "somethingCustom".into(),
@@ -1149,6 +1150,8 @@ async fn index_renaming_must_work_when_renaming_to_custom(api: &TestApi) {
         let actual_steps = result.sql_migration();
         assert_eq!(actual_steps, expected_steps);
     }
+
+    Ok(())
 }
 
 #[test_each_connector]
