@@ -40,7 +40,7 @@ impl SqlIntrospectionError {
             SqlIntrospectionError::Quaint(quaint_error) => {
                 user_facing_errors::quaint::render_quaint_error(quaint_error, connection_info)
             }
-            err => KnownError::new(user_facing_errors::introspection::IntrospectionFailed {
+            err => KnownError::new(user_facing_errors::introspection_engine::IntrospectionFailed {
                 introspection_error: format!("{}", err),
             })
             .ok(),
