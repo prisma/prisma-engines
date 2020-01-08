@@ -28,7 +28,7 @@ impl DirectiveValidator<dml::Field> for IdDirectiveValidator {
         };
 
         if obj.arity != dml::FieldArity::Required {
-            return self.error("Fields that are marked as id must be required.", args.span());
+            return self.new_directive_validation_error("Fields that are marked as id must be required.", args.span());
         }
 
         obj.id_info = Some(id_info);
@@ -62,7 +62,7 @@ impl DirectiveValidator<dml::Model> for ModelLevelIdDirectiveValidator {
                 let fields = fields.iter().map(|f| f.as_constant_literal().unwrap()).collect();
                 obj.id_fields = fields;
             }
-            Err(err) => return Err(self.parser_error(&err)),
+            Err(err) => return Err(self.wrap_in_directive_validation_error(&err)),
         };
 
         let undefined_fields: Vec<String> = obj

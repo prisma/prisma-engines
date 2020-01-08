@@ -1,6 +1,6 @@
-use crate::ast;
-use crate::dml;
 use crate::error::DatamodelError;
+use crate::{ast, DefaultValue, EnvFunction};
+use crate::{dml, ValueGenerator};
 
 use super::interpolation::StringInterpolator;
 use super::FromStrAndSpan;
@@ -87,34 +87,18 @@ impl ValueValidator {
     pub fn as_str_from_env(&self) -> Result<(Option<String>, String), DatamodelError> {
         match &self.value {
             ast::Expression::Function(name, args, _) if name == "env" => {
-                let (env_var, value) = self.evaluate_env_functional()?;
-                Ok((Some(env_var), value.as_str()?))
+                let env_function = self.as_env_function()?;
+                let var_name = Some(env_function.var_name().to_string());
+                let value = env_function.evaluate().and_then(|x| x.as_str())?;
+                Ok((var_name, value))
             }
             ast::Expression::StringValue(value, _) => Ok((None, value.to_string())),
             _ => Err(self.construct_type_mismatch_error("String")),
         }
     }
 
-    fn evaluate_env_functional(&self) -> Result<(String, ValueValidator), DatamodelError> {
-        assert!(self.is_from_env());
-        let args = match &self.value {
-            ast::Expression::Function(name, args, _) if name == "env" => args,
-            _ => unreachable!(),
-        };
-        assert_eq!(args.len(), 1);
-        // TODO: convert asserts to proper errors
-
-        let var_wrapped = &args[0];
-        let var_name = ValueValidator::new(var_wrapped)?.as_str()?;
-        if let Ok(var) = std::env::var(&var_name) {
-            let value = ValueValidator::new(&ast::Expression::StringValue(var, self.value.span()))?;
-            Ok((var_name, value))
-        } else {
-            Err(DatamodelError::new_environment_functional_evaluation_error(
-                &var_name,
-                var_wrapped.span(),
-            ))
-        }
+    pub fn as_env_function(&self) -> Result<EnvFunction, DatamodelError> {
+        EnvFunction::from_ast(&self.value)
     }
 
     /// returns true if this argument is derived from an env() function
@@ -155,6 +139,7 @@ impl ValueValidator {
         match &self.value {
             ast::Expression::BooleanValue(value, _) => self.wrap_error_from_result(value.parse::<bool>(), "boolean"),
             ast::Expression::Any(value, _) => self.wrap_error_from_result(value.parse::<bool>(), "boolean"),
+            // this case is just here because `as_bool_from_env` passes a StringValue
             ast::Expression::StringValue(value, _) => self.wrap_error_from_result(value.parse::<bool>(), "boolean"),
             _ => Err(self.construct_type_mismatch_error("boolean")),
         }
@@ -165,8 +150,15 @@ impl ValueValidator {
     pub fn as_bool_from_env(&self) -> Result<(Option<String>, Option<bool>), DatamodelError> {
         match &self.value {
             ast::Expression::Function(name, args, _) if name == "env" => {
-                let (env_var, value) = self.evaluate_env_functional()?;
-                Ok((Some(env_var), value.as_bool().ok()))
+                let env_function = self.as_env_function()?;
+                let var_name = if env_function.is_var_defined() {
+                    Some(env_function.var_name().to_string())
+                } else {
+                    None
+                };
+
+                let value = env_function.evaluate().and_then(|x| x.as_bool()).ok();
+                Ok((var_name, value))
             }
             ast::Expression::BooleanValue(value, _) => Ok((
                 None,
@@ -176,7 +168,6 @@ impl ValueValidator {
         }
     }
 
-    // TODO: Ask which datetime type to use.
     /// Tries to convert the wrapped value to a Prisma DateTime.
     pub fn as_date_time(&self) -> Result<DateTime<Utc>, DatamodelError> {
         match &self.value {
@@ -212,6 +203,18 @@ impl ValueValidator {
             _ => Ok(vec![ValueValidator {
                 value: self.value.clone(),
             }]),
+        }
+    }
+
+    pub fn as_default_value(&self, scalar_type: ScalarType) -> Result<DefaultValue, DatamodelError> {
+        match &self.value {
+            ast::Expression::Function(name, _, _) => {
+                Ok(DefaultValue::Expression(ValueGenerator::new(name.to_string(), vec![])?))
+            }
+            _ => {
+                let x = ValueValidator::new(&self.value)?.as_type(scalar_type)?;
+                Ok(DefaultValue::Single(x))
+            }
         }
     }
 }

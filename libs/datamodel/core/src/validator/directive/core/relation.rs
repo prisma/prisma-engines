@@ -17,7 +17,8 @@ impl DirectiveValidator<dml::Field> for RelationDirectiveValidator {
                 let name = name_arg.as_str()?;
 
                 if name.is_empty() {
-                    return self.error("A relation cannot have an empty name.", name_arg.span());
+                    return self
+                        .new_directive_validation_error("A relation cannot have an empty name.", name_arg.span());
                 }
 
                 relation_info.name = name;
@@ -33,7 +34,7 @@ impl DirectiveValidator<dml::Field> for RelationDirectiveValidator {
 
             Ok(())
         } else {
-            self.error("Invalid field type, not a relation.", args.span())
+            self.new_directive_validation_error("Invalid field type, not a relation.", args.span())
         }
     }
 

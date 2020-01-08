@@ -15,41 +15,24 @@ impl DirectiveValidator<dml::Field> for DefaultDirectiveValidator {
     fn validate_and_apply(&self, args: &mut Args, field: &mut dml::Field) -> Result<(), DatamodelError> {
         // If we allow list default values, we need to adjust the types below properly for that case.
         if field.arity == dml::FieldArity::List {
-            return self.error("Cannot set a default value on list field.", args.span());
+            return self.new_directive_validation_error("Cannot set a default value on list field.", args.span());
         }
 
         if let dml::FieldType::Base(scalar_type) = field.field_type {
-            let arg = args.default_arg_new("value")?;
-            let dv = match &arg.value {
-                ast::Expression::Function(name, _, _) => {
-                    DefaultValue::Expression(ValueGenerator::new(name.to_string(), vec![])?)
-                }
-                _ => {
-                    let x = ValueValidator::new(&arg.value)?.as_type(scalar_type);
-                    let x = x.map_err(|e| self.parser_error(&e))?;
-                    DefaultValue::Single(x)
-                }
-            };
+            let dv = args
+                .default_arg("value")?
+                .as_default_value(scalar_type)
+                .map_err(|e| self.wrap_in_directive_validation_error(&e))?;
 
-            if dv.get_type() != scalar_type {
-                return self.error(
-                    &format!(
-                        "Default value type {:?} doesn't match expected type {:?}.",
-                        dv.get_type(),
-                        scalar_type
-                    ),
-                    args.span(),
-                );
-            }
             field.default_value = Some(dv);
         } else if let dml::FieldType::Enum(_) = &field.field_type {
             match args.default_arg("value")?.as_constant_literal() {
                 // TODO: We should also check if this value is a valid enum value.
                 Ok(value) => field.default_value = Some(dml::ScalarValue::ConstantLiteral(value).try_into()?),
-                Err(err) => return Err(self.parser_error(&err)),
+                Err(err) => return Err(self.wrap_in_directive_validation_error(&err)),
             }
         } else {
-            return self.error("Cannot set a default value on a relation field.", args.span());
+            return self.new_directive_validation_error("Cannot set a default value on a relation field.", args.span());
         }
 
         Ok(())

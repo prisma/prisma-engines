@@ -12,7 +12,7 @@ impl DirectiveValidator<dml::Field> for FieldLevelUniqueDirectiveValidator {
 
     fn validate_and_apply(&self, args: &mut Args, obj: &mut dml::Field) -> Result<(), DatamodelError> {
         if obj.id_info.is_some() {
-            return self.error(
+            return self.new_directive_validation_error(
                 "Fields that are marked as id should not have an additional @unique.",
                 args.span(),
             );
@@ -118,7 +118,7 @@ trait IndexDirectiveBase<T>: DirectiveValidator<T> {
                 let fields = fields.iter().map(|f| f.as_constant_literal().unwrap()).collect();
                 index_def.fields = fields;
             }
-            Err(err) => return Err(self.parser_error(&err)),
+            Err(err) => return Err(self.wrap_in_directive_validation_error(&err)),
         }
 
         let undefined_fields: Vec<String> = index_def

@@ -72,7 +72,7 @@ impl<'a> Arguments<'a> {
     }
 
     /// Gets the full argument span for an argument, used to generate errors.
-    pub fn arg_internal(&mut self, name: &str) -> Option<&'a ast::Argument> {
+    fn arg_internal(&mut self, name: &str) -> Option<&'a ast::Argument> {
         for arg in self.arguments {
             if arg.name.name == name {
                 self.used_arguments.insert(&arg.name.name as &str);
@@ -90,15 +90,6 @@ impl<'a> Arguments<'a> {
         match (self.arg_internal(name), self.arg_internal("")) {
             (Some(arg), None) => value::ValueValidator::new(&arg.value),
             (None, Some(arg)) => value::ValueValidator::new(&arg.value),
-            (Some(arg), Some(_)) => Err(DatamodelError::new_duplicate_default_argument_error(&name, arg.span)),
-            (None, None) => Err(DatamodelError::new_argument_not_found_error(name, self.span)),
-        }
-    }
-
-    pub fn default_arg_new(&mut self, name: &str) -> Result<&'a ast::Argument, DatamodelError> {
-        match (self.arg_internal(name), self.arg_internal("")) {
-            (Some(arg), None) => Ok(&arg),
-            (None, Some(arg)) => Ok(&arg),
             (Some(arg), Some(_)) => Err(DatamodelError::new_duplicate_default_argument_error(&name, arg.span)),
             (None, None) => Err(DatamodelError::new_argument_not_found_error(name, self.span)),
         }
