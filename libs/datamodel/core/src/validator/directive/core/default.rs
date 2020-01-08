@@ -1,6 +1,7 @@
+use crate::common::value::ValueValidator;
 use crate::error::DatamodelError;
 use crate::validator::directive::{Args, DirectiveValidator};
-use crate::{ast, dml};
+use crate::{ast, dml, DefaultValue, ValueGenerator};
 use std::convert::TryInto;
 
 /// Prismas builtin `@default` directive.
@@ -18,26 +19,29 @@ impl DirectiveValidator<dml::Field> for DefaultDirectiveValidator {
         }
 
         if let dml::FieldType::Base(scalar_type) = field.field_type {
-            match args.default_arg("value")?.as_type(scalar_type) {
-                // TODO: Here, a default value directive can override the default value syntax sugar.
-                Ok(value) => {
-                    let dv: dml::DefaultValue = value.try_into()?;
-
-                    if dv.get_type() != scalar_type {
-                        return self.error(
-                            &format!(
-                                "Default value type {:?} doesn't match expected type {:?}.",
-                                dv.get_type(),
-                                scalar_type
-                            ),
-                            args.span(),
-                        );
-                    }
-
-                    field.default_value = Some(dv)
+            let arg = args.default_arg_new("value")?;
+            let dv = match &arg.value {
+                ast::Expression::Function(name, _, _) => {
+                    DefaultValue::Expression(ValueGenerator::new(name.to_string(), vec![])?)
                 }
-                Err(err) => return Err(self.parser_error(&err)),
+                _ => {
+                    let x = ValueValidator::new(&arg.value)?.as_type(scalar_type);
+                    let x = x.map_err(|e| self.parser_error(&e))?;
+                    DefaultValue::Single(x)
+                }
+            };
+
+            if dv.get_type() != scalar_type {
+                return self.error(
+                    &format!(
+                        "Default value type {:?} doesn't match expected type {:?}.",
+                        dv.get_type(),
+                        scalar_type
+                    ),
+                    args.span(),
+                );
             }
+            field.default_value = Some(dv);
         } else if let dml::FieldType::Enum(_) = &field.field_type {
             match args.default_arg("value")?.as_constant_literal() {
                 // TODO: We should also check if this value is a valid enum value.

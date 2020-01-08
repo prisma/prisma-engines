@@ -44,6 +44,25 @@ impl Expression {
     pub fn render_to_string(&self) -> String {
         crate::ast::renderer::Renderer::render_value_to_string(self)
     }
+
+    pub fn span(&self) -> Span {
+        match &self {
+            Self::NumericValue(_, span) => *span,
+            Self::BooleanValue(_, span) => *span,
+            Self::StringValue(_, span) => *span,
+            Self::Any(_, span) => *span,
+            Self::ConstantValue(_, span) => *span,
+            Self::Function(_, _, span) => *span,
+            Self::Array(_, span) => *span,
+        }
+    }
+
+    pub fn is_env_expression(&self) -> bool {
+        match &self {
+            Self::Function(name, _, _) => name == "env",
+            _ => false,
+        }
+    }
 }
 
 impl ToString for Expression {

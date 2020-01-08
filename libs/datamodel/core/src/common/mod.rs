@@ -1,5 +1,4 @@
 pub mod argument;
-pub mod functions;
 mod interpolation;
 pub mod names;
 pub mod value;

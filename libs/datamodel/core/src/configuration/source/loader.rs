@@ -66,7 +66,11 @@ impl SourceLoader {
 
         let is_enabled = match args.arg("enabled") {
             Ok(arg) => {
-                let (env_var, is_enabled) = arg.as_bool_from_env()?;
+                let (env_var, is_enabled) = match arg.as_bool_from_env() {
+                    Ok((env_var, is_enabled)) => (env_var, is_enabled),
+                    Err(DatamodelError::EnvironmentFunctionalEvaluationError { var_name: _, span: _ }) => (None, None),
+                    _ => unreachable!(),
+                };
                 match (env_var, is_enabled) {
                     // the `unwrap_or` is about the case where the value could not be parsed into a bool. It came from an env var.
                     (Some(_), is_enabled) => is_enabled.unwrap_or(true),

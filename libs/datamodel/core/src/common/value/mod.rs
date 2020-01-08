@@ -2,25 +2,17 @@ use crate::ast;
 use crate::dml;
 use crate::error::DatamodelError;
 
-use super::functions::FunctionalEvaluator;
 use super::interpolation::StringInterpolator;
 use super::FromStrAndSpan;
 use super::{ScalarType, ScalarValue};
 use chrono::{DateTime, Utc};
 use std::error;
 
-#[derive(Debug, Clone)]
-pub enum MaybeExpression {
-    // The Option is Some if the value came from an env var. The String is then the name of the env var.
-    Value(Option<String>, ast::Expression),
-    Expression(ScalarValue, ast::Span),
-}
-
 /// Wraps a value and provides convenience methods for
 /// parsing it.
 #[derive(Debug)]
 pub struct ValueValidator {
-    value: MaybeExpression,
+    value: ast::Expression,
 }
 
 impl ValueValidator {
@@ -29,24 +21,13 @@ impl ValueValidator {
     /// If the value is a function expression, it is evaluated
     /// recursively.
     pub fn new(value: &ast::Expression) -> Result<ValueValidator, DatamodelError> {
-        match value {
-            ast::Expression::StringValue(string, span) => Ok(ValueValidator {
-                value: MaybeExpression::Value(None, StringInterpolator::interpolate(string, *span)?),
-            }),
-            _ => Ok(ValueValidator {
-                value: FunctionalEvaluator::new(value).evaluate()?,
-            }),
-        }
+        Ok(ValueValidator { value: value.clone() })
     }
 
     /// Creates a new type mismatch error for the
     /// value wrapped by this instance.
-    fn construct_error(&self, expected_type: &str) -> DatamodelError {
-        let description = match &self.value {
-            MaybeExpression::Value(_, val) => String::from(ast::describe_value_type(&val)),
-            MaybeExpression::Expression(val, _) => val.get_type().to_string(),
-        };
-
+    fn construct_type_mismatch_error(&self, expected_type: &str) -> DatamodelError {
+        let description = String::from(ast::describe_value_type(&self.value));
         DatamodelError::new_type_mismatch_error(expected_type, &description, &self.raw(), self.span())
     }
 
@@ -71,22 +52,13 @@ impl ValueValidator {
     /// Attempts to parse the wrapped value
     /// to a given prisma type.
     pub fn as_type(&self, scalar_type: ScalarType) -> Result<dml::ScalarValue, DatamodelError> {
-        match &self.value {
-            MaybeExpression::Value(_, _) => match scalar_type {
-                ScalarType::Int => self.as_int().map(dml::ScalarValue::Int),
-                ScalarType::Float => self.as_float().map(dml::ScalarValue::Float),
-                ScalarType::Decimal => self.as_decimal().map(dml::ScalarValue::Decimal),
-                ScalarType::Boolean => self.as_bool().map(dml::ScalarValue::Boolean),
-                ScalarType::DateTime => self.as_date_time().map(dml::ScalarValue::DateTime),
-                ScalarType::String => self.as_str().map(dml::ScalarValue::String),
-            },
-            MaybeExpression::Expression(expr, _) => {
-                if expr.get_type() == scalar_type {
-                    Ok(expr.clone())
-                } else {
-                    Err(self.construct_error(&scalar_type.to_string()))
-                }
-            }
+        match scalar_type {
+            ScalarType::Int => self.as_int().map(dml::ScalarValue::Int),
+            ScalarType::Float => self.as_float().map(dml::ScalarValue::Float),
+            ScalarType::Decimal => self.as_decimal().map(dml::ScalarValue::Decimal),
+            ScalarType::Boolean => self.as_bool().map(dml::ScalarValue::Boolean),
+            ScalarType::DateTime => self.as_date_time().map(dml::ScalarValue::DateTime),
+            ScalarType::String => self.as_str().map(dml::ScalarValue::String),
         }
     }
 
@@ -98,26 +70,12 @@ impl ValueValidator {
     /// Accesses the raw string representation
     /// of the wrapped value.
     pub fn raw(&self) -> String {
-        match &self.value {
-            MaybeExpression::Value(_, val) => val.to_string(),
-            MaybeExpression::Expression(val, _) => val.to_string(),
-        }
+        self.value.to_string()
     }
 
     /// Accesses the span of the wrapped value.
     pub fn span(&self) -> ast::Span {
-        match &self.value {
-            MaybeExpression::Value(_, val) => match val {
-                ast::Expression::StringValue(_, s) => *s,
-                ast::Expression::NumericValue(_, s) => *s,
-                ast::Expression::BooleanValue(_, s) => *s,
-                ast::Expression::ConstantValue(_, s) => *s,
-                ast::Expression::Function(_, _, s) => *s,
-                ast::Expression::Array(_, s) => *s,
-                ast::Expression::Any(_, s) => *s,
-            },
-            MaybeExpression::Expression(_, s) => *s,
-        }
+        self.value.span()
     }
 
     /// Tries to convert the wrapped value to a Prisma String.
@@ -128,45 +86,57 @@ impl ValueValidator {
     /// returns a (Some(a), b) if the string was deducted from an env var
     pub fn as_str_from_env(&self) -> Result<(Option<String>, String), DatamodelError> {
         match &self.value {
-            MaybeExpression::Value(env_var, ast::Expression::StringValue(value, _)) => {
-                Ok((env_var.clone(), value.to_string()))
+            ast::Expression::Function(name, args, _) if name == "env" => {
+                let (env_var, value) = self.evaluate_env_functional()?;
+                Ok((Some(env_var), value.as_str()?))
             }
-            MaybeExpression::Value(env_var, ast::Expression::Any(value, _)) => Ok((env_var.clone(), value.to_string())),
-            _ => Err(self.construct_error("String")),
+            ast::Expression::StringValue(value, _) => Ok((None, value.to_string())),
+            _ => Err(self.construct_type_mismatch_error("String")),
+        }
+    }
+
+    fn evaluate_env_functional(&self) -> Result<(String, ValueValidator), DatamodelError> {
+        assert!(self.is_from_env());
+        let args = match &self.value {
+            ast::Expression::Function(name, args, _) if name == "env" => args,
+            _ => unreachable!(),
+        };
+        assert_eq!(args.len(), 1);
+        // TODO: convert asserts to proper errors
+
+        let var_wrapped = &args[0];
+        let var_name = ValueValidator::new(var_wrapped)?.as_str()?;
+        if let Ok(var) = std::env::var(&var_name) {
+            let value = ValueValidator::new(&ast::Expression::StringValue(var, self.value.span()))?;
+            Ok((var_name, value))
+        } else {
+            Err(DatamodelError::new_environment_functional_evaluation_error(
+                &var_name,
+                var_wrapped.span(),
+            ))
         }
     }
 
     /// returns true if this argument is derived from an env() function
     pub fn is_from_env(&self) -> bool {
-        match &self.value {
-            MaybeExpression::Value(Some(_), _) => true,
-            _ => false,
-        }
+        self.value.is_env_expression()
     }
 
     /// Tries to convert the wrapped value to a Prisma Integer.
     pub fn as_int(&self) -> Result<i32, DatamodelError> {
         match &self.value {
-            MaybeExpression::Value(_, ast::Expression::NumericValue(value, _)) => {
-                self.wrap_error_from_result(value.parse::<i32>(), "numeric")
-            }
-            MaybeExpression::Value(_, ast::Expression::Any(value, _)) => {
-                self.wrap_error_from_result(value.parse::<i32>(), "numeric")
-            }
-            _ => Err(self.construct_error("numeric")),
+            ast::Expression::NumericValue(value, _) => self.wrap_error_from_result(value.parse::<i32>(), "numeric"),
+            ast::Expression::Any(value, _) => self.wrap_error_from_result(value.parse::<i32>(), "numeric"),
+            _ => Err(self.construct_type_mismatch_error("numeric")),
         }
     }
 
     /// Tries to convert the wrapped value to a Prisma Float.
     pub fn as_float(&self) -> Result<f32, DatamodelError> {
         match &self.value {
-            MaybeExpression::Value(_, ast::Expression::NumericValue(value, _)) => {
-                self.wrap_error_from_result(value.parse::<f32>(), "numeric")
-            }
-            MaybeExpression::Value(_, ast::Expression::Any(value, _)) => {
-                self.wrap_error_from_result(value.parse::<f32>(), "numeric")
-            }
-            _ => Err(self.construct_error("numeric")),
+            ast::Expression::NumericValue(value, _) => self.wrap_error_from_result(value.parse::<f32>(), "numeric"),
+            ast::Expression::Any(value, _) => self.wrap_error_from_result(value.parse::<f32>(), "numeric"),
+            _ => Err(self.construct_type_mismatch_error("numeric")),
         }
     }
 
@@ -174,26 +144,19 @@ impl ValueValidator {
     /// Tries to convert the wrapped value to a Prisma Decimal.
     pub fn as_decimal(&self) -> Result<f32, DatamodelError> {
         match &self.value {
-            MaybeExpression::Value(_, ast::Expression::NumericValue(value, _)) => {
-                self.wrap_error_from_result(value.parse::<f32>(), "numeric")
-            }
-            MaybeExpression::Value(_, ast::Expression::Any(value, _)) => {
-                self.wrap_error_from_result(value.parse::<f32>(), "numeric")
-            }
-            _ => Err(self.construct_error("numeric")),
+            ast::Expression::NumericValue(value, _) => self.wrap_error_from_result(value.parse::<f32>(), "numeric"),
+            ast::Expression::Any(value, _) => self.wrap_error_from_result(value.parse::<f32>(), "numeric"),
+            _ => Err(self.construct_type_mismatch_error("numeric")),
         }
     }
 
     /// Tries to convert the wrapped value to a Prisma Boolean.
     pub fn as_bool(&self) -> Result<bool, DatamodelError> {
         match &self.value {
-            MaybeExpression::Value(_, ast::Expression::BooleanValue(value, _)) => {
-                self.wrap_error_from_result(value.parse::<bool>(), "boolean")
-            }
-            MaybeExpression::Value(_, ast::Expression::Any(value, _)) => {
-                self.wrap_error_from_result(value.parse::<bool>(), "boolean")
-            }
-            _ => Err(self.construct_error("boolean")),
+            ast::Expression::BooleanValue(value, _) => self.wrap_error_from_result(value.parse::<bool>(), "boolean"),
+            ast::Expression::Any(value, _) => self.wrap_error_from_result(value.parse::<bool>(), "boolean"),
+            ast::Expression::StringValue(value, _) => self.wrap_error_from_result(value.parse::<bool>(), "boolean"),
+            _ => Err(self.construct_type_mismatch_error("boolean")),
         }
     }
 
@@ -201,17 +164,15 @@ impl ValueValidator {
     /// returns a (_, Some(b)) if the value could be parsed into a bool
     pub fn as_bool_from_env(&self) -> Result<(Option<String>, Option<bool>), DatamodelError> {
         match &self.value {
-            MaybeExpression::Value(env_var, ast::Expression::BooleanValue(value, _)) => {
-                let parsed_result = self.wrap_error_from_result(value.parse::<bool>(), "boolean");
-                let the_bool = parsed_result.ok();
-                Ok((env_var.clone(), the_bool))
+            ast::Expression::Function(name, args, _) if name == "env" => {
+                let (env_var, value) = self.evaluate_env_functional()?;
+                Ok((Some(env_var), value.as_bool().ok()))
             }
-            MaybeExpression::Value(env_var, ast::Expression::Any(value, _)) => {
-                let parsed_result = self.wrap_error_from_result(value.parse::<bool>(), "boolean");
-                let the_bool = parsed_result.ok();
-                Ok((env_var.clone(), the_bool))
-            }
-            _ => Err(self.construct_error("boolean")),
+            ast::Expression::BooleanValue(value, _) => Ok((
+                None,
+                Some(self.wrap_error_from_result(value.parse::<bool>(), "boolean")?),
+            )),
+            _ => Err(self.construct_type_mismatch_error("String")),
         }
     }
 
@@ -219,29 +180,27 @@ impl ValueValidator {
     /// Tries to convert the wrapped value to a Prisma DateTime.
     pub fn as_date_time(&self) -> Result<DateTime<Utc>, DatamodelError> {
         match &self.value {
-            MaybeExpression::Value(_, ast::Expression::StringValue(value, _)) => {
+            ast::Expression::StringValue(value, _) => {
                 self.wrap_error_from_result(value.parse::<DateTime<Utc>>(), "datetime")
             }
-            MaybeExpression::Value(_, ast::Expression::Any(value, _)) => {
-                self.wrap_error_from_result(value.parse::<DateTime<Utc>>(), "datetime")
-            }
-            _ => Err(self.construct_error("dateTime")),
+            ast::Expression::Any(value, _) => self.wrap_error_from_result(value.parse::<DateTime<Utc>>(), "datetime"),
+            _ => Err(self.construct_type_mismatch_error("dateTime")),
         }
     }
 
     /// Unwraps the wrapped value as a constant literal..
     pub fn as_constant_literal(&self) -> Result<String, DatamodelError> {
         match &self.value {
-            MaybeExpression::Value(_, ast::Expression::ConstantValue(value, _)) => Ok(value.to_string()),
-            MaybeExpression::Value(_, ast::Expression::Any(value, _)) => Ok(value.to_string()),
-            _ => Err(self.construct_error("constant literal")),
+            ast::Expression::ConstantValue(value, _) => Ok(value.to_string()),
+            ast::Expression::Any(value, _) => Ok(value.to_string()),
+            _ => Err(self.construct_type_mismatch_error("constant literal")),
         }
     }
 
     /// Unwraps the wrapped value as a constant literal..
     pub fn as_array(&self) -> Result<Vec<ValueValidator>, DatamodelError> {
         match &self.value {
-            MaybeExpression::Value(_, ast::Expression::Array(values, _)) => {
+            ast::Expression::Array(values, _) => {
                 let mut validators: Vec<ValueValidator> = Vec::new();
 
                 for value in values {
