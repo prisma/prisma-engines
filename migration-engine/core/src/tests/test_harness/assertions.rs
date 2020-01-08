@@ -91,6 +91,16 @@ impl<'a> TableAssertion<'a> {
         Ok(this)
     }
 
+    pub fn assert_no_pk(self) -> AssertionResult<Self> {
+        anyhow::ensure!(
+            self.0.primary_key.is_none(),
+            "assertion failed. Expected no primary key on {}, found one.",
+            self.0.name
+        );
+
+        Ok(self)
+    }
+
     pub fn assert_pk<F>(self, pk_assertions: F) -> AssertionResult<Self>
     where
         F: FnOnce(PrimaryKeyAssertion<'a>) -> AssertionResult<PrimaryKeyAssertion<'a>>,

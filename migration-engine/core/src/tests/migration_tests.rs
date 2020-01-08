@@ -2038,3 +2038,25 @@ async fn join_tables_between_models_with_mapped_compound_primary_keys_must_work(
 
     Ok(())
 }
+
+#[test_each_connector]
+async fn tables_without_primary_key_can_be_created(api: &TestApi) -> TestResult {
+    let dm = r#"
+        model Fruit {
+            name String
+            size Int
+        }
+    "#;
+
+    api.infer_apply(dm).send().await?;
+
+    api.assert_schema()
+        .await?
+        .assert_table("Fruit", |table| {
+            table
+                .assert_no_pk()?
+                .assert_has_column("name")?
+                .assert_has_column("size")
+        })
+        .map(drop)
+}
