@@ -65,10 +65,10 @@ impl PrismaError {
             String::from_utf8_lossy(&message).into_owned(),
         );
 
-        // Because of how the node frontend works (stdout.on('data', ...)), we want to emit one clean JSON message on a single line at once.
-        let stdout = std::io::stdout();
-        let _lock = stdout.lock();
-        let mut writer = std::io::LineWriter::new(std::io::stdout());
+        // Because of how the node frontend works (stderr.on('data', ...)), we want to emit one clean JSON message on a single line at once.
+        let stderr = std::io::stderr();
+        let locked_stderr = stderr.lock();
+        let mut writer = std::io::LineWriter::new(locked_stderr);
         serde_json::to_writer(&mut writer, &error)?;
         writeln!(&mut writer)?;
         writer.flush()?;
