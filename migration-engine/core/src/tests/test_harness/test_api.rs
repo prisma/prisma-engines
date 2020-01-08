@@ -1,3 +1,4 @@
+use super::assertions::SchemaAssertion;
 use super::{
     command_helpers::{run_infer_command, InferOutput},
     misc_helpers::{mysql_migration_connector, postgres_migration_connector, sqlite_migration_connector, test_api},
@@ -200,6 +201,12 @@ impl TestApi {
         result.tables = result.tables.into_iter().filter(|t| t.name != "_Migration").collect();
 
         Ok(result)
+    }
+
+    pub async fn assert_schema(&self) -> Result<SchemaAssertion, anyhow::Error> {
+        let schema = self.describe_database().await?;
+
+        Ok(SchemaAssertion(schema))
     }
 }
 
