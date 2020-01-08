@@ -101,7 +101,7 @@ impl LowerDmlToAst {
         Ok(ast::Field {
             name: ast::Identifier::new(&field.name),
             arity: self.lower_field_arity(field.arity),
-            default_value: field.default_value.clone().map(|v| v.into()),
+            default_value: field.default_value.clone().map(|dv| self.lower_default_value(dv)),
             directives: self.directives.field.serialize(field, datamodel)?,
             field_type: self.lower_type(&field.field_type, field, model, &datamodel),
             documentation: field.documentation.clone().map(|text| ast::Comment { text }),
@@ -115,6 +115,16 @@ impl LowerDmlToAst {
             dml::FieldArity::Required => ast::FieldArity::Required,
             dml::FieldArity::Optional => ast::FieldArity::Optional,
             dml::FieldArity::List => ast::FieldArity::List,
+        }
+    }
+
+    pub fn lower_default_value(&self, dv: dml::DefaultValue) -> ast::Expression {
+        match dv {
+            dml::DefaultValue::Single(v) => v.into(),
+            dml::DefaultValue::Expression(e) => {
+                let exprs = e.args.into_iter().map(Into::into).collect();
+                ast::Expression::Function(e.name, exprs, ast::Span::empty())
+            }
         }
     }
 
