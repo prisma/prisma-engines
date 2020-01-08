@@ -2004,3 +2004,37 @@ async fn join_tables_between_models_with_compound_primary_keys_must_work(api: &T
 
     Ok(())
 }
+
+#[test_each_connector]
+async fn join_tables_between_models_with_mapped_compound_primary_keys_must_work(api: &TestApi) -> TestResult {
+    let dm = r#"
+        model Human {
+            firstName String @map("the_first_name")
+            lastName String @map("the_last_name")
+            cats Cat[]
+
+            @@id([firstName, lastName])
+        }
+
+        model Cat {
+            id String @id
+            humans Human[]
+        }
+    "#;
+
+    api.infer_apply(dm).send().await?;
+
+    let sql_schema = api.describe_database().await?;
+
+    sql_schema
+        .assert_table("_CatToHuman")?
+        .assert_has_column("B_the_first_name")?
+        .assert_has_column("B_the_last_name")?
+        .assert_has_column("A")?
+        .assert_fk_on_columns(&["B_the_first_name", "B_the_last_name"], |fk| {
+            fk.assert_references("Human", &["the_first_name", "the_last_name"])
+        })?
+        .assert_fk_on_columns(&["A"], |fk| fk.assert_references("Cat", &["id"]))?;
+
+    Ok(())
+}

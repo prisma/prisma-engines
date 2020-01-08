@@ -46,9 +46,13 @@ impl<'a> TableAssertion<'a> {
     }
 
     pub fn assert_has_column(self, column_name: &str) -> AssertionResult<Self> {
-        self.0
-            .column(column_name)
-            .ok_or_else(|| anyhow::anyhow!("Column {} not found.", column_name))?;
+        self.0.column(column_name).ok_or_else(|| {
+            anyhow::anyhow!(
+                "Assertion failed: column {} not found. Existing columns: {:?}",
+                column_name,
+                self.0.columns.iter().map(|col| &col.name).collect::<Vec<_>>()
+            )
+        })?;
 
         Ok(self)
     }
@@ -57,14 +61,12 @@ impl<'a> TableAssertion<'a> {
     where
         F: FnOnce(ColumnAssertion<'a>) -> AssertionResult<ColumnAssertion<'a>>,
     {
-        let column = self
-            .0
-            .column(column_name)
-            .ok_or_else(|| anyhow::anyhow!("Column {} not found", column_name))?;
+        let this = self.assert_has_column(column_name)?;
+        let column = this.0.column(column_name).unwrap();
 
         column_assertions(ColumnAssertion(column))?;
 
-        Ok(self)
+        Ok(this)
     }
 
     pub fn assert_pk<F>(self, pk_assertions: F) -> AssertionResult<Self>
@@ -109,7 +111,11 @@ impl<'a> ForeignKeyAssertion<'a> {
     pub fn assert_references(self, table: &str, columns: &[&str]) -> AssertionResult<Self> {
         anyhow::ensure!(
             self.0.referenced_table == table && self.0.referenced_columns == columns,
-            "assert_references failed"
+            r#"Assertion failed. Expected reference to "{}" ({:?}). Found "{}" ({:?}) "#,
+            table,
+            columns,
+            self.0.referenced_table,
+            self.0.referenced_columns,
         );
 
         Ok(self)
