@@ -287,7 +287,7 @@ async fn dropping_a_table_referenced_by_foreign_keys_must_work(api: &TestApi) ->
     Ok(())
 }
 
-#[test_each_connector(ignore = "mysql_mariadb")]
+#[test_each_connector]
 async fn string_columns_do_not_get_arbitrarily_migrated(api: &TestApi) -> TestResult {
     use quaint::ast::*;
 

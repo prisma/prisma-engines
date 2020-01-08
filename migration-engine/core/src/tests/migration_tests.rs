@@ -37,7 +37,7 @@ async fn adding_a_scalar_field_must_work(api: &TestApi) {
     assert_eq!(table.column_bang("enum").tpe.family, ColumnTypeFamily::String);
 }
 
-#[test_each_connector(ignore = "mysql_mariadb")]
+#[test_each_connector]
 async fn adding_an_optional_field_must_work(api: &TestApi) {
     let dm2 = r#"
         model Test {
@@ -1000,7 +1000,7 @@ async fn removing_multi_field_unique_index_must_work(api: &TestApi) {
 }
 
 #[test_each_connector(ignore = "mysql_mariadb")]
-async fn index_renaming_must_work(api: &TestApi) {
+async fn index_renaming_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
             model A {
                 id Int @id
@@ -1010,14 +1010,13 @@ async fn index_renaming_must_work(api: &TestApi) {
                 @@unique([field, secondField], name: "customName")
             }
         "#;
-    let result = api.infer_and_apply(&dm1).await.sql_schema;
-    let index = result
-        .table_bang("A")
-        .indices
-        .iter()
-        .find(|i| i.name == "customName" && i.columns == &["field", "secondField"]);
-    assert!(index.is_some());
-    assert_eq!(index.unwrap().tpe, IndexType::Unique);
+    api.infer_apply(&dm1).send().await?;
+
+    api.assert_schema().await?.assert_table("A", |table| {
+        table.assert_index_on_columns(&["field", "secondField"], |idx| {
+            idx.assert_name("customName")?.assert_is_unique()
+        })
+    })?;
 
     let dm2 = r#"
             model A {
@@ -1028,14 +1027,13 @@ async fn index_renaming_must_work(api: &TestApi) {
                 @@unique([field, secondField], name: "customNameA")
             }
         "#;
-    let result = api.infer_and_apply(&dm2).await;
-    let indexes = result
-        .sql_schema
-        .table_bang("A")
-        .indices
-        .iter()
-        .filter(|i| i.columns == &["field", "secondField"] && i.name == "customNameA");
-    assert_eq!(indexes.count(), 1);
+
+    let result = api.infer_apply(&dm2).send().await?;
+    api.assert_schema().await?.assert_table("A", |table| {
+        table
+            .assert_indexes_count(1)?
+            .assert_index_on_columns(&["field", "secondField"], |idx| idx.assert_name("customNameA"))
+    })?;
 
     // Test that we are not dropping and recreating the index. Except in SQLite, because there we are.
     if !api.is_sqlite() {
@@ -1047,6 +1045,8 @@ async fn index_renaming_must_work(api: &TestApi) {
         let actual_steps = result.sql_migration();
         assert_eq!(actual_steps, expected_steps);
     }
+
+    Ok(())
 }
 
 #[test_each_connector(ignore = "mysql_mariadb")]
@@ -1151,7 +1151,7 @@ async fn index_renaming_must_work_when_renaming_to_custom(api: &TestApi) {
     }
 }
 
-#[test_each_connector(ignore = "mysql_mariadb")]
+#[test_each_connector]
 async fn index_updates_with_rename_must_work(api: &TestApi) {
     let dm1 = r#"
             model A {
@@ -1535,7 +1535,7 @@ async fn calculate_database_steps_with_infer_after_an_apply_must_work(api: &Test
     assert_eq!(result.datamodel_steps, new_steps);
 }
 
-#[test_each_connector(ignore = "mysql_mariadb")]
+#[test_each_connector]
 async fn column_defaults_must_be_migrated(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Fruit {
@@ -1568,7 +1568,7 @@ async fn column_defaults_must_be_migrated(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(ignore = "mysql_mariadb")]
+#[test_each_connector]
 async fn escaped_string_defaults_are_not_arbitrarily_migrated(api: &TestApi) -> TestResult {
     use quaint::ast::*;
 
@@ -1610,14 +1610,22 @@ async fn escaped_string_defaults_are_not_arbitrarily_migrated(api: &TestApi) -> 
             .column("name")
             .and_then(|c| c.default.as_ref())
             .map(String::as_str),
-        Some(if api.is_mysql() { "ba\u{0}nana" } else { "ba\\0nana" })
+        Some(if api.is_mysql() && !api.connector_name().contains("mariadb") {
+            "ba\u{0}nana"
+        } else {
+            "ba\\0nana"
+        })
     );
     assert_eq!(
         table
             .column("sideNames")
             .and_then(|c| c.default.as_ref())
             .map(String::as_str),
-        Some(if api.is_mysql() { "top\ndown" } else { "top\\ndown" })
+        Some(if api.is_mysql() && !api.connector_name().contains("mariadb") {
+            "top\ndown"
+        } else {
+            "top\\ndown"
+        })
     );
     assert_eq!(
         table
