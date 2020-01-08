@@ -2,9 +2,8 @@ use crate::error::DatamodelError;
 use crate::{ast, DefaultValue, EnvFunction};
 use crate::{dml, ValueGenerator};
 
-use super::interpolation::StringInterpolator;
 use super::FromStrAndSpan;
-use super::{ScalarType, ScalarValue};
+use super::ScalarType;
 use chrono::{DateTime, Utc};
 use std::error;
 
@@ -86,7 +85,7 @@ impl ValueValidator {
     /// returns a (Some(a), b) if the string was deducted from an env var
     pub fn as_str_from_env(&self) -> Result<(Option<String>, String), DatamodelError> {
         match &self.value {
-            ast::Expression::Function(name, args, _) if name == "env" => {
+            ast::Expression::Function(name, _, _) if name == "env" => {
                 let env_function = self.as_env_function()?;
                 let var_name = Some(env_function.var_name().to_string());
                 let value = env_function.evaluate().and_then(|x| x.as_str())?;
@@ -149,7 +148,7 @@ impl ValueValidator {
     /// returns a (_, Some(b)) if the value could be parsed into a bool
     pub fn as_bool_from_env(&self) -> Result<(Option<String>, Option<bool>), DatamodelError> {
         match &self.value {
-            ast::Expression::Function(name, args, _) if name == "env" => {
+            ast::Expression::Function(name, _, _) if name == "env" => {
                 let env_function = self.as_env_function()?;
                 let var_name = if env_function.is_var_defined() {
                     Some(env_function.var_name().to_string())

@@ -22,6 +22,7 @@ fn parse_expr_and_lift_span(
 }
 
 /// Struct which helps with interpolating strings.
+#[allow(unused)]
 impl StringInterpolator {
     /// Interpolates expressions inside strings.alloc
     ///

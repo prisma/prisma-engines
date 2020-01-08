@@ -1,8 +1,8 @@
-use crate::common::value::ValueValidator;
+use std::convert::TryInto;
+
 use crate::error::DatamodelError;
 use crate::validator::directive::{Args, DirectiveValidator};
-use crate::{ast, dml, DefaultValue, ValueGenerator};
-use std::convert::TryInto;
+use crate::{ast, dml};
 
 /// Prismas builtin `@default` directive.
 pub struct DefaultDirectiveValidator {}
