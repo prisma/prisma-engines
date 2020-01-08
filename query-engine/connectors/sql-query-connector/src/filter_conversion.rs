@@ -179,133 +179,139 @@ impl AliasedCondition for ScalarFilter {
 impl AliasedCondition for RelationFilter {
     /// Conversion from a `RelationFilter` to a query condition tree. Aliased when in a nested `SELECT`.
     fn aliased_cond(self, alias: Option<Alias>) -> ConditionTree<'static> {
-        let id = self.field.model().fields().id().as_column();
+        // Not sure yet how it's supposed to work with multi-field primary ids
+        todo!()
+        // let id = self.field.model().fields().id().as_column();
 
-        let column = match alias {
-            Some(ref alias) => id.table(alias.dec().to_string(None)),
-            None => id,
-        };
+        // let column = match alias {
+        //     Some(ref alias) => id.table(alias.dec().to_string(None)),
+        //     None => id,
+        // };
 
-        let condition = self.condition.clone();
-        let sub_select = self.aliased_sel(alias.map(|a| a.inc(AliasMode::Table)));
+        // let condition = self.condition.clone();
+        // let sub_select = self.aliased_sel(alias.map(|a| a.inc(AliasMode::Table)));
 
-        let comparison = match condition {
-            RelationCondition::EveryRelatedRecord => column.not_in_selection(sub_select),
-            RelationCondition::NoRelatedRecord => column.not_in_selection(sub_select),
-            RelationCondition::AtLeastOneRelatedRecord => column.in_selection(sub_select),
-            RelationCondition::ToOneRelatedRecord => column.in_selection(sub_select),
-        };
+        // let comparison = match condition {
+        //     RelationCondition::EveryRelatedRecord => column.not_in_selection(sub_select),
+        //     RelationCondition::NoRelatedRecord => column.not_in_selection(sub_select),
+        //     RelationCondition::AtLeastOneRelatedRecord => column.in_selection(sub_select),
+        //     RelationCondition::ToOneRelatedRecord => column.in_selection(sub_select),
+        // };
 
-        comparison.into()
+        // comparison.into()
     }
 }
 
 impl AliasedSelect for RelationFilter {
     /// The subselect part of the `RelationFilter` `ConditionTree`.
     fn aliased_sel(self, alias: Option<Alias>) -> Select<'static> {
-        let alias = alias.unwrap_or(Alias::default());
-        let condition = self.condition.clone();
-        let relation = self.field.relation();
+        // let alias = alias.unwrap_or(Alias::default());
+        // let condition = self.condition.clone();
+        // let relation = self.field.relation();
 
-        let this_column = self.field.relation_column(false).table(alias.to_string(None));
-        let other_column = self.field.opposite_column(false).table(alias.to_string(None));
+        // let this_column = self.field.relation_column(false).table(alias.to_string(None));
+        // let other_column = self.field.opposite_column(false).table(alias.to_string(None));
 
-        // Normalize filter tree
-        let compacted = match *self.nested_filter {
-            Filter::And(mut filters) => {
-                if filters.len() == 1 {
-                    filters.pop().unwrap()
-                } else {
-                    Filter::And(filters)
-                }
-            }
-            Filter::Or(mut filters) => {
-                if filters.len() == 1 {
-                    filters.pop().unwrap()
-                } else {
-                    Filter::Or(filters)
-                }
-            }
-            f => f,
-        };
+        // // Normalize filter tree
+        // let compacted = match *self.nested_filter {
+        //     Filter::And(mut filters) => {
+        //         if filters.len() == 1 {
+        //             filters.pop().unwrap()
+        //         } else {
+        //             Filter::And(filters)
+        //         }
+        //     }
+        //     Filter::Or(mut filters) => {
+        //         if filters.len() == 1 {
+        //             filters.pop().unwrap()
+        //         } else {
+        //             Filter::Or(filters)
+        //         }
+        //     }
+        //     f => f,
+        // };
 
-        match compacted {
-            Filter::Relation(filter) => {
-                let sub_condition = filter.condition.clone();
-                let sub_select = filter.aliased_sel(Some(alias.inc(AliasMode::Table)));
+        // match compacted {
+        //     Filter::Relation(filter) => {
+        //         let sub_condition = filter.condition.clone();
+        //         let sub_select = filter.aliased_sel(Some(alias.inc(AliasMode::Table)));
 
-                let tree: ConditionTree<'static> = match sub_condition {
-                    RelationCondition::EveryRelatedRecord => other_column.not_in_selection(sub_select),
-                    RelationCondition::NoRelatedRecord => other_column.not_in_selection(sub_select),
-                    RelationCondition::AtLeastOneRelatedRecord => other_column.in_selection(sub_select),
-                    RelationCondition::ToOneRelatedRecord => other_column.in_selection(sub_select),
-                }
-                .into();
+        //         let tree: ConditionTree<'static> = match sub_condition {
+        //             RelationCondition::EveryRelatedRecord => other_column.not_in_selection(sub_select),
+        //             RelationCondition::NoRelatedRecord => other_column.not_in_selection(sub_select),
+        //             RelationCondition::AtLeastOneRelatedRecord => other_column.in_selection(sub_select),
+        //             RelationCondition::ToOneRelatedRecord => other_column.in_selection(sub_select),
+        //         }
+        //         .into();
 
-                let conditions = tree.invert_if(condition.invert_of_subselect());
+        //         let conditions = tree.invert_if(condition.invert_of_subselect());
 
-                Select::from_table(relation.as_table().alias(alias.to_string(None)))
-                    .column(this_column)
-                    .so_that(conditions)
-            }
-            nested_filter => {
-                let tree = nested_filter.aliased_cond(Some(alias.flip(AliasMode::Join)));
+        //         Select::from_table(relation.as_table().alias(alias.to_string(None)))
+        //             .column(this_column)
+        //             .so_that(conditions)
+        //     }
+        //     nested_filter => {
+        //         let tree = nested_filter.aliased_cond(Some(alias.flip(AliasMode::Join)));
 
-                let id_column = self
-                    .field
-                    .related_model()
-                    .fields()
-                    .id()
-                    .as_column()
-                    .table(alias.to_string(Some(AliasMode::Join)));
+        //         let id_column = self
+        //             .field
+        //             .related_model()
+        //             .fields()
+        //             .id()
+        //             .as_column()
+        //             .table(alias.to_string(Some(AliasMode::Join)));
 
-                let join = self
-                    .field
-                    .related_model()
-                    .as_table()
-                    .alias(alias.to_string(Some(AliasMode::Join)))
-                    .on(id_column.equals(other_column));
+        //         let join = self
+        //             .field
+        //             .related_model()
+        //             .as_table()
+        //             .alias(alias.to_string(Some(AliasMode::Join)))
+        //             .on(id_column.equals(other_column));
 
-                let table = relation.as_table().alias(alias.to_string(Some(AliasMode::Table)));
+        //         let table = relation.as_table().alias(alias.to_string(Some(AliasMode::Table)));
 
-                Select::from_table(table)
-                    .column(this_column)
-                    .inner_join(join)
-                    .so_that(tree.invert_if(condition.invert_of_subselect()))
-            }
-        }
+        //         Select::from_table(table)
+        //             .column(this_column)
+        //             .inner_join(join)
+        //             .so_that(tree.invert_if(condition.invert_of_subselect()))
+        //     }
+        // }
+
+        todo!()
     }
 }
 
 impl AliasedCondition for OneRelationIsNullFilter {
     /// Conversion from a `OneRelationIsNullFilter` to a query condition tree. Aliased when in a nested `SELECT`.
     fn aliased_cond(self, alias: Option<Alias>) -> ConditionTree<'static> {
-        let alias = alias.map(|a| a.to_string(None));
+        // let alias = alias.map(|a| a.to_string(None));
 
-        let condition = if self.field.relation_is_inlined_in_parent() {
-            self.field.as_column().opt_table(alias.clone()).is_null()
-        } else {
-            let relation = self.field.relation();
+        // let condition = if self.field.relation_is_inlined_in_parent() {
+        //     self.field.as_column().opt_table(alias.clone()).is_null()
+        // } else {
+        //     let relation = self.field.relation();
 
-            let column = relation
-                .column_for_relation_side(self.field.relation_side)
-                .opt_table(alias.clone());
+        //     let column = relation
+        //         .column_for_relation_side(self.field.relation_side)
+        //         .opt_table(alias.clone());
 
-            let table = Table::from(relation.as_table());
-            let relation_table = match alias {
-                Some(ref alias) => table.alias(alias.to_string()),
-                None => table,
-            };
+        //     let table = Table::from(relation.as_table());
+        //     let relation_table = match alias {
+        //         Some(ref alias) => table.alias(alias.to_string()),
+        //         None => table,
+        //     };
 
-            let select = Select::from_table(relation_table)
-                .column(column.clone())
-                .so_that(column.is_not_null());
+        //     let select = Select::from_table(relation_table)
+        //         .column(column.clone())
+        //         .so_that(column.is_not_null());
 
-            let id_column = self.field.model().fields().id().as_column().opt_table(alias.clone());
+        //     let id_column = self.field.model().fields().id().as_column().opt_table(alias.clone());
 
-            id_column.not_in_selection(select)
-        };
+        //     id_column.not_in_selection(select)
+        // };
 
-        ConditionTree::single(condition)
+        // ConditionTree::single(condition)
+
+        todo!()
     }
 }

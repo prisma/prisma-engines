@@ -82,33 +82,36 @@ pub trait QueryExt: Queryable + Send + Sync {
         let primary_id = model.primary_identifier();
         let id_cols = primary_id.as_columns();
 
-        // Todo: We assume that all fields have to be required. Is this a valid assumption?
-        let idents: Vec<_> = primary_id
-            .iter()
-            .map(|f| (f.type_identifier(), FieldArity::Required))
-            .collect();
-
         let select = Select::from_table(model.as_table())
             .columns(id_cols)
             .so_that(filter.aliased_cond(None));
 
-        self.select_ids(select, &idents).await
+        self.select_ids(select, primary_id).await
     }
 
     async fn select_ids(
         &self,
         select: Select<'_>,
-        id_idents: &[(TypeIdentifier, FieldArity)],
+        primary_id: PrimaryIdentifier,
     ) -> crate::Result<Vec<RecordIdentifier>> {
-        let mut rows = self.filter(select.into(), id_idents).await?;
+        // Todo: We assume that all fields have to be required.
+        let idents: Vec<_> = primary_id
+            .iter()
+            .map(|f| (f.type_identifier(), FieldArity::Required))
+            .collect();
+
+        let mut rows = self.filter(select.into(), &idents).await?;
         let mut result = Vec::new();
 
         for mut row in rows.drain(0..) {
-            let record_id = Vec::with_capacity(id_idents.len());
-
-            for (i, value) in row.values.drain(0..).enumerate() {
-                record_id.push(row_value_to_prisma_value(value, id_idents[i].0)?)
-            }
+            // todo Cloning the arcs all the time is a bad idea.
+            let record_id: RecordIdentifier = primary_id
+                .clone()
+                .into_iter()
+                .zip(row.values.into_iter())
+                .map(|pair| pair.into())
+                .collect::<Vec<_>>()
+                .into();
 
             result.push(record_id);
         }

@@ -75,13 +75,14 @@ where
 }
 
 pub fn count_by_model(model: &ModelRef, query_arguments: QueryArguments) -> Select<'static> {
-    let id_field = model.fields().id();
+    // let id_field = model.fields().id();
 
-    let selected_fields = vec![id_field.as_column()];
+    // let selected_fields = vec![id_field.as_column()];
 
-    let base_query = get_records(model, selected_fields.into_iter(), query_arguments);
-    let table = Table::from(base_query).alias("sub");
-    let column = Column::from(("sub", id_field.db_name().to_string()));
+    // let base_query = get_records(model, selected_fields.into_iter(), query_arguments);
+    // let table = Table::from(base_query).alias("sub");
+    // let column = Column::from(("sub", id_field.db_name().to_string()));
 
-    Select::from_table(table).value(count(column))
+    // Select::from_table(table).value(count(column))
+    todo!()
 }

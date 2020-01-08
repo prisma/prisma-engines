@@ -84,7 +84,7 @@ where
     fn get_related_records<'b>(
         &'b self,
         from_field: &'b RelationFieldRef,
-        from_record_ids: &'b [GraphqlId],
+        from_record_ids: &'b [RecordIdentifier],
         query_arguments: QueryArguments,
         selected_fields: &'b SelectedFields,
     ) -> connector::IO<'b, ManyRecords> {
@@ -110,7 +110,7 @@ where
     C: QueryExt + Send + Sync + 'static,
     T: ManyRelatedRecordsQueryBuilder + Send + Sync + 'static,
 {
-    fn create_record<'a>(&'a self, model: &'a ModelRef, args: WriteArgs) -> connector::IO<GraphqlId> {
+    fn create_record<'a>(&'a self, model: &'a ModelRef, args: WriteArgs) -> connector::IO<RecordIdentifier> {
         IO::new(self.catch(async move { write::create_record(&self.inner, model, args).await }))
     }
 
@@ -119,7 +119,7 @@ where
         model: &'a ModelRef,
         where_: Filter,
         args: WriteArgs,
-    ) -> connector::IO<Vec<GraphqlId>> {
+    ) -> connector::IO<Vec<RecordIdentifier>> {
         IO::new(self.catch(async move { write::update_records(&self.inner, model, where_, args).await }))
     }
 
@@ -130,8 +130,8 @@ where
     fn connect<'a>(
         &'a self,
         field: &'a RelationFieldRef,
-        parent_id: &'a GraphqlId,
-        child_ids: &'a [GraphqlId],
+        parent_id: &'a RecordIdentifier,
+        child_ids: &'a [RecordIdentifier],
     ) -> connector::IO<()> {
         IO::new(self.catch(async move { write::connect(&self.inner, field, parent_id, child_ids).await }))
     }
@@ -139,8 +139,8 @@ where
     fn disconnect<'a>(
         &'a self,
         field: &'a RelationFieldRef,
-        parent_id: &'a GraphqlId,
-        child_ids: &'a [GraphqlId],
+        parent_id: &'a RecordIdentifier,
+        child_ids: &'a [RecordIdentifier],
     ) -> connector::IO<()> {
         IO::new(self.catch(async move { write::disconnect(&self.inner, field, parent_id, child_ids).await }))
     }

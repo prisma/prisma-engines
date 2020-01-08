@@ -28,7 +28,7 @@ impl<'conn, 'tx> ReadOperations for ConnectionLike<'conn, 'tx> {
     fn get_related_records<'a>(
         &'a self,
         from_field: &'a RelationFieldRef,
-        from_record_ids: &'a [GraphqlId],
+        from_record_ids: &'a [RecordIdentifier],
         query_arguments: QueryArguments,
         selected_fields: &'a SelectedFields,
     ) -> crate::IO<'a, ManyRecords> {
@@ -50,14 +50,19 @@ impl<'conn, 'tx> ReadOperations for ConnectionLike<'conn, 'tx> {
 }
 
 impl<'conn, 'tx> WriteOperations for ConnectionLike<'conn, 'tx> {
-    fn create_record<'a>(&'a self, model: &'a ModelRef, args: WriteArgs) -> crate::IO<GraphqlId> {
+    fn create_record<'a>(&'a self, model: &'a ModelRef, args: WriteArgs) -> crate::IO<RecordIdentifier> {
         match self {
             Self::Connection(c) => c.create_record(model, args),
             Self::Transaction(tx) => tx.create_record(model, args),
         }
     }
 
-    fn update_records<'a>(&'a self, model: &'a ModelRef, where_: Filter, args: WriteArgs) -> crate::IO<Vec<GraphqlId>> {
+    fn update_records<'a>(
+        &'a self,
+        model: &'a ModelRef,
+        where_: Filter,
+        args: WriteArgs,
+    ) -> crate::IO<Vec<RecordIdentifier>> {
         match self {
             Self::Connection(c) => c.update_records(model, where_, args),
             Self::Transaction(tx) => tx.update_records(model, where_, args),
@@ -74,8 +79,8 @@ impl<'conn, 'tx> WriteOperations for ConnectionLike<'conn, 'tx> {
     fn connect<'a>(
         &'a self,
         field: &'a RelationFieldRef,
-        parent_id: &'a GraphqlId,
-        child_ids: &'a [GraphqlId],
+        parent_id: &'a RecordIdentifier,
+        child_ids: &'a [RecordIdentifier],
     ) -> crate::IO<()> {
         match self {
             Self::Connection(c) => c.connect(field, parent_id, child_ids),
@@ -86,8 +91,8 @@ impl<'conn, 'tx> WriteOperations for ConnectionLike<'conn, 'tx> {
     fn disconnect<'a>(
         &'a self,
         field: &'a RelationFieldRef,
-        parent_id: &'a GraphqlId,
-        child_ids: &'a [GraphqlId],
+        parent_id: &'a RecordIdentifier,
+        child_ids: &'a [RecordIdentifier],
     ) -> crate::IO<()> {
         match self {
             Self::Connection(c) => c.disconnect(field, parent_id, child_ids),

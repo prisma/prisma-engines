@@ -53,7 +53,7 @@ pub async fn get_many_records(
 pub async fn get_related_records<T>(
     conn: &dyn QueryExt,
     from_field: &RelationFieldRef,
-    from_record_ids: &[GraphqlId],
+    from_record_ids: &[RecordIdentifier],
     query_arguments: QueryArguments,
     selected_fields: &SelectedFields,
 ) -> crate::Result<ManyRecords>
@@ -69,7 +69,6 @@ where
     field_names.push(from_field.name.clone());
 
     let can_skip_joins = from_field.relation_is_inlined_in_child() && !query_arguments.is_with_pagination();
-
     let mut columns: Vec<_> = selected_fields.columns().collect();
 
     columns.extend(
@@ -88,52 +87,54 @@ where
             .collect::<Vec<_>>(),
     );
 
-    let query = if can_skip_joins {
-        let model = from_field.related_model();
+    // let query = if can_skip_joins {
+    //     let model = from_field.related_model();
 
-        // Todo: Needs to be adapted for multiple columns.
-        let select = read::get_records(&model, columns.into_iter(), query_arguments).and_where(
-            from_field
-                .relation_columns(true)
-                .pop()
-                .unwrap()
-                .in_selection(from_record_ids.to_owned()),
-        );
+    //     // Todo: Needs to be adapted for multiple columns.
+    //     let select = read::get_records(&model, columns.into_iter(), query_arguments).and_where(
+    //         from_field
+    //             .relation_columns(true)
+    //             .pop()
+    //             .unwrap()
+    //             .in_selection(from_record_ids.to_owned()),
+    //     );
 
-        Query::from(select)
-    } else {
-        let is_with_pagination = query_arguments.is_with_pagination();
-        let base = ManyRelatedRecordsBaseQuery::new(from_field, from_record_ids, query_arguments, columns);
+    //     Query::from(select)
+    // } else {
+    //     let is_with_pagination = query_arguments.is_with_pagination();
+    //     let base = ManyRelatedRecordsBaseQuery::new(from_field, from_record_ids, query_arguments, columns);
 
-        if is_with_pagination {
-            T::with_pagination(base)
-        } else {
-            T::without_pagination(base)
-        }
-    };
+    //     if is_with_pagination {
+    //         T::with_pagination(base)
+    //     } else {
+    //         T::without_pagination(base)
+    //     }
+    // };
 
-    let records: crate::Result<Vec<Record>> = conn
-        .filter(query, idents.as_slice())
-        .await?
-        .into_iter()
-        .map(|mut row| {
-            let parent_id = row.values.pop().ok_or(SqlError::ColumnDoesNotExist)?;
+    // let records: crate::Result<Vec<Record>> = conn
+    //     .filter(query, idents.as_slice())
+    //     .await?
+    //     .into_iter()
+    //     .map(|mut row| {
+    //         let parent_id = row.values.pop().ok_or(SqlError::ColumnDoesNotExist)?;
 
-            // Relation id is always the second last value. We don't need it
-            // here and we don't need it in the record.
-            let _ = row.values.pop();
+    //         // Relation id is always the second last value. We don't need it
+    //         // here and we don't need it in the record.
+    //         let _ = row.values.pop();
 
-            let mut record = Record::from(row);
-            // record.set_parent_id(GraphqlId::try_from(parent_id)?);
+    //         let mut record = Record::from(row);
+    //         // record.set_parent_id(RecordIdentifier::try_from(parent_id)?);
 
-            Ok(record)
-        })
-        .collect();
+    //         Ok(record)
+    //     })
+    //     .collect();
 
-    Ok(ManyRecords {
-        records: records?,
-        field_names,
-    })
+    // Ok(ManyRecords {
+    //     records: records?,
+    //     field_names,
+    // })
+
+    todo!()
 }
 
 pub async fn count_by_model(

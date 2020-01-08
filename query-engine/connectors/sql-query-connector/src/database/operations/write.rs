@@ -3,7 +3,7 @@ use connector_interface::*;
 use prisma_models::*;
 use quaint::error::Error as QueryError;
 
-pub async fn create_record(conn: &dyn QueryExt, model: &ModelRef, args: WriteArgs) -> crate::Result<GraphqlId> {
+pub async fn create_record(conn: &dyn QueryExt, model: &ModelRef, args: WriteArgs) -> crate::Result<RecordIdentifier> {
     let (insert, returned_id) = write::create_record(model, args.non_list_args().clone());
 
     // let last_id = match conn.insert(insert).await {
@@ -35,7 +35,7 @@ pub async fn create_record(conn: &dyn QueryExt, model: &ModelRef, args: WriteArg
 
     // let id = match returned_id {
     //     Some(id) => id,
-    //     None => GraphqlId::from(last_id.unwrap()),
+    //     None => RecordIdentifier::from(last_id.unwrap()),
     // };
 
     // Ok(id)
@@ -48,7 +48,7 @@ pub async fn update_records(
     model: &ModelRef,
     where_: Filter,
     args: WriteArgs,
-) -> crate::Result<Vec<GraphqlId>> {
+) -> crate::Result<Vec<RecordIdentifier>> {
     // let ids = conn.filter_ids(model, where_.clone()).await?;
 
     // if ids.len() == 0 {
@@ -56,7 +56,7 @@ pub async fn update_records(
     // }
 
     // let updates = {
-    //     let ids: Vec<&GraphqlId> = ids.iter().map(|id| &*id).collect();
+    //     let ids: Vec<&RecordIdentifier> = ids.iter().map(|id| &*id).collect();
     //     write::update_many(model, ids.as_slice(), args.non_list_args())?
     // };
 
@@ -71,7 +71,7 @@ pub async fn update_records(
 
 pub async fn delete_records(conn: &dyn QueryExt, model: &ModelRef, where_: Filter) -> crate::Result<usize> {
     // let ids = conn.filter_ids(model, where_.clone()).await?;
-    // let ids: Vec<&GraphqlId> = ids.iter().map(|id| &*id).collect();
+    // let ids: Vec<&RecordIdentifier> = ids.iter().map(|id| &*id).collect();
     // let count = ids.len();
 
     // if count == 0 {
@@ -90,23 +90,27 @@ pub async fn delete_records(conn: &dyn QueryExt, model: &ModelRef, where_: Filte
 pub async fn connect(
     conn: &dyn QueryExt,
     field: &RelationFieldRef,
-    parent_id: &GraphqlId,
-    child_ids: &[GraphqlId],
+    parent_id: &RecordIdentifier,
+    child_ids: &[RecordIdentifier],
 ) -> crate::Result<()> {
-    let query = write::create_relation_table_records(field, parent_id, child_ids);
+    // let query = write::create_relation_table_records(field, parent_id, child_ids);
 
-    conn.execute(query).await?;
-    Ok(())
+    // conn.execute(query).await?;
+    // Ok(())
+
+    todo!()
 }
 
 pub async fn disconnect(
     conn: &dyn QueryExt,
     field: &RelationFieldRef,
-    parent_id: &GraphqlId,
-    child_ids: &[GraphqlId],
+    parent_id: &RecordIdentifier,
+    child_ids: &[RecordIdentifier],
 ) -> crate::Result<()> {
-    let query = write::delete_relation_table_records(field, parent_id, child_ids);
+    // let query = write::delete_relation_table_records(field, parent_id, child_ids);
 
-    conn.execute(query).await?;
-    Ok(())
+    // conn.execute(query).await?;
+    // Ok(())
+
+    todo!()
 }

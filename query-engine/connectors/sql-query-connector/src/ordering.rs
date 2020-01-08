@@ -9,14 +9,16 @@ pub struct Ordering;
 /// Tooling for generating orderings for different query types.
 impl Ordering {
     pub fn for_model(model: ModelRef, order_directive: OrderDirections) -> OrderVec<'static> {
-        Self::by_fields(
-            order_directive
-                .primary_order_by
-                .as_ref()
-                .map(|oby| oby.field.as_column()),
-            model.fields().id().as_column(),
-            order_directive,
-        )
+        // Self::by_fields(
+        //     order_directive
+        //         .primary_order_by
+        //         .as_ref()
+        //         .map(|oby| oby.field.as_column()),
+        //     model.fields().id().as_column(),
+        //     order_directive,
+        // )
+
+        todo!()
     }
 
     pub fn internal<C>(second_field: C, order_directive: OrderDirections) -> OrderVec<'static>
