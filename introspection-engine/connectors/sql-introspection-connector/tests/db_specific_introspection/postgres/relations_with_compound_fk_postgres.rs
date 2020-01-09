@@ -110,15 +110,48 @@ async fn compound_foreign_keys_should_work_for_one_to_many_relations(api: &TestA
     let dm = r#"
             model Post {
                 id      Int                 @id @sequence(name: "Post_id_seq", allocationSize: 1, initialValue: 1)
-                user    User                @map(["user_id", "user_name"]) @relation(references:[id, name]) 
+                user    User?                @map(["user_id", "user_name"]) @relation(references:[id, name]) 
             }
 
             model User {
                id       Int                 @id @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
                name     String
-               posts     Post[]
+               posts    Post[]
                
                @@unique([id, name], name: "user_unique")
+            }
+        "#;
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}
+
+#[test_one_connector(connector = "postgres")]
+#[test]
+async fn compound_foreign_keys_should_work_for_self_relations(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("Person", |t| {
+                t.add_column("id", types::primary());
+                t.add_column("name", types::text());
+                t.add_column("partner_id", types::integer());
+                t.add_column("partner_name", types::text());
+                t.inject_custom(
+                    "FOREIGN KEY (\"partner_id\",\"partner_name\") REFERENCES \"Person\"(\"id\", \"name\")",
+                );
+                t.inject_custom("CONSTRAINT \"person_unique\" UNIQUE (\"id\", \"name\")");
+            });
+        })
+        .await;
+
+    let dm = r#"
+            model Person {
+               id       Int         @id @sequence(name: "Person_id_seq", allocationSize: 1, initialValue: 1)
+               name     String
+               person   Person      @map(["partner_id", "partner_name"]) @relation("PersonToPerson_partner_id_partner_name")
+               persons  Person[]    @relation("PersonToPerson_partner_id_partner_name")
+               
+               @@unique([id, name], name: "person_unique")
             }
         "#;
     let result = dbg!(api.introspect().await);

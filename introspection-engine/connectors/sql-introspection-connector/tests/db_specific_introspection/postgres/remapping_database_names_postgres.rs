@@ -149,5 +149,43 @@ async fn remapping_models_in_compound_relations_should_work(api: &TestApi) {
     custom_assert(&result, dm);
 }
 
-//todo
-// fields in relations
+#[test_one_connector(connector = "postgres")]
+#[test]
+async fn remapping_fields_in_compound_relations_should_work(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+                t.add_column("name-that-is-invalid", types::text());
+                t.inject_custom("CONSTRAINT user_unique UNIQUE(\"id\", \"name-that-is-invalid\")");
+            });
+            migration.create_table("Post", |t| {
+                t.add_column("id", types::primary());
+                t.add_column("user_id", types::integer());
+                t.add_column("user_name", types::text());
+                t.inject_custom(
+                    "FOREIGN KEY (\"user_id\",\"user_name\") REFERENCES \"User\"(\"id\", \"name-that-is-invalid\")",
+                );
+                t.inject_custom("CONSTRAINT post_user_unique UNIQUE(\"user_id\", \"user_name\")");
+            });
+        })
+        .await;
+
+    let dm = r#"
+            model Post {
+                id                      Int     @id @sequence(name: "Post_id_seq", allocationSize: 1, initialValue: 1)
+                user                    User    @map(["user_id", "user_name"]) @relation(references:[id, name_that_is_invalid]) 
+            }
+
+            model User {
+               id                       Int     @id @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
+               name_that_is_invalid     String  @map("name-that-is-invalid")
+               post                     Post?
+               
+               @@unique([id, name_that_is_invalid], name: "user_unique")
+            }
+        "#;
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}

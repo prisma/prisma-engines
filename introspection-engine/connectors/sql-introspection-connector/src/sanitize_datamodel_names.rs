@@ -26,6 +26,10 @@ pub fn sanitize_datamodel_names(mut datamodel: Datamodel) -> Datamodel {
                 info.to_fields = info.to_fields.iter().map(|f| sanitize_name(f.clone()).0).collect();
             }
         }
+
+        for index in &mut model.indexes {
+            index.fields = index.fields.iter().map(|f| sanitize_name(f.clone()).0).collect();
+        }
     }
 
     datamodel

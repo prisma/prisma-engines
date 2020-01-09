@@ -117,7 +117,7 @@ pub(crate) fn calculate_relation_name(schema: &SqlSchema, fk: &ForeignKey, table
     //this is not called for prisma many to many relations. for them the name is just the name of the join table.
     let referenced_model = &fk.referenced_table;
     let model_with_fk = &table.name;
-    let fk_column_name = fk.columns.get(0).unwrap();
+    let fk_column_name = fk.columns.join("_");
 
     let fk_to_same_model: Vec<&ForeignKey> = table
         .foreign_keys
