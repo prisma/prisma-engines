@@ -3,7 +3,7 @@ use barrel::types;
 use test_harness::*;
 
 #[test_one_connector(connector = "postgres")]
-async fn remapping_fields_with_invalid_characters_should_work_for_postgres(api: &TestApi) {
+async fn remapping_fields_with_invalid_characters_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -41,7 +41,7 @@ async fn remapping_fields_with_invalid_characters_should_work_for_postgres(api: 
 }
 
 #[test_one_connector(connector = "postgres")]
-async fn remapping_tables_with_invalid_characters_should_work_for_postgres(api: &TestApi) {
+async fn remapping_tables_with_invalid_characters_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {

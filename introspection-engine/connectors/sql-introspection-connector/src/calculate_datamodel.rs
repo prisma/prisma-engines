@@ -94,9 +94,8 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
             }
         }
 
+        //add compound fields
         for foreign_key in table.foreign_keys.iter().filter(|fk| fk.columns.len() > 1) {
-            //todo add compound fields
-
             debug!("Handling compound foreign key  {:?}", foreign_key);
 
             let field_type = FieldType::Relation(RelationInfo {
@@ -106,10 +105,10 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
                 on_delete: OnDeleteStrategy::None,
             });
 
-            let columns: Vec<&Column> = table
+            let columns: Vec<&Column> = foreign_key
                 .columns
                 .iter()
-                .filter(|column| foreign_key.columns.contains(&column.name))
+                .map(|c| table.columns.iter().find(|tc| tc.name == *c).unwrap())
                 .collect();
 
             let arity = match columns.iter().find(|c| c.is_required()).is_none() {
