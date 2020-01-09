@@ -58,9 +58,18 @@ fn main() {
                 .required(false)
                 .help("Specifies wich tab width to use when formaitting. Default is 2."),
         )
+        .arg(
+            Arg::with_name("version")
+                .long("version")
+                .help("Prints the version")
+                .takes_value(false)
+                .required(false),
+        )
         .get_matches();
 
-    if matches.is_present("lint") {
+    if matches.is_present("version") {
+        println!(env!("GIT_HASH"));
+    } else if matches.is_present("lint") {
         // Linter
         let skip_env_errors = matches.is_present("no_env_errors");
         let mut datamodel_string = String::new();
