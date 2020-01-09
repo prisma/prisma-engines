@@ -2,11 +2,6 @@ use crate::{AsColumn, AsTable, InlineRelation, Relation, RelationField, Relation
 use quaint::ast::{Column, Table};
 
 pub trait RelationExt {
-    /// A helper function to decide actions based on the `Relation` type. Inline
-    /// relation will return a column for updates, a relation table gives back
-    /// `None`.
-    fn inline_relation_column(&self) -> Option<Column<'static>>;
-
     fn id_column(&self) -> Option<Column<'static>>;
     fn column_for_relation_side(&self, side: RelationSide) -> Column<'static>;
     fn model_a_column(&self) -> Column<'static>;
@@ -103,14 +98,6 @@ impl RelationExt for Relation {
         match side {
             RelationSide::A => self.model_a_column(),
             RelationSide::B => self.model_b_column(),
-        }
-    }
-
-    fn inline_relation_column(&self) -> Option<Column<'static>> {
-        if let Some(mani) = self.inline_manifestation() {
-            Some(Column::from(mani.referencing_column.clone()).table(self.as_table()))
-        } else {
-            None
         }
     }
 
