@@ -2,7 +2,6 @@ use crate::{AsColumn, AsTable, InlineRelation, Relation, RelationField, Relation
 use quaint::ast::{Column, Table};
 
 pub trait RelationExt {
-    fn id_column(&self) -> Option<Column<'static>>;
     fn column_for_relation_side(&self, side: RelationSide) -> Column<'static>;
 }
 
@@ -76,17 +75,6 @@ impl AsTable for Relation {
 }
 
 impl RelationExt for Relation {
-    fn id_column(&self) -> Option<Column<'static>> {
-        match self.manifestation {
-            None => Some("id".into()),
-            Some(RelationLinkManifestation::RelationTable(ref m)) => m.id_column.as_ref().map(|s| {
-                let st: String = s.clone();
-                st.into()
-            }),
-            _ => None,
-        }
-    }
-
     fn column_for_relation_side(&self, side: RelationSide) -> Column<'static> {
         match side {
             RelationSide::A => self.model_a_column(),

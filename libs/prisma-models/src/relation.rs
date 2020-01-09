@@ -38,7 +38,6 @@ pub struct RelationTable {
     pub table: String,
     pub model_a_column: String,
     pub model_b_column: String,
-    pub id_column: Option<String>,
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -194,16 +193,6 @@ impl Relation {
 
     pub fn is_one_to_many(&self) -> bool {
         !self.is_many_to_many() && !self.is_one_to_one()
-    }
-
-    pub fn relation_table_has_3_columns(&self) -> bool {
-        use RelationLinkManifestation::*;
-
-        match self.manifestation {
-            None => true,
-            Some(RelationTable(ref m)) => m.id_column.as_ref().map(|_| true).unwrap_or(false),
-            _ => false,
-        }
     }
 
     pub fn contains_the_model(&self, model: ModelRef) -> bool {

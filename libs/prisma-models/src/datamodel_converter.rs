@@ -335,7 +335,6 @@ impl TempRelationHolder {
                 table: self.table_name(),
                 model_a_column: self.model_a_column(),
                 model_b_column: self.model_b_column(),
-                id_column: None,
             }),
             TempManifestationHolder::Inline {
                 in_table_of_model,
