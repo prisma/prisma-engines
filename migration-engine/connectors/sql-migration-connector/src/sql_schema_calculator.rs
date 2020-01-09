@@ -157,7 +157,7 @@ impl<'a> SqlSchemaCalculator<'a> {
                                 .collect();
 
                             if fields.len() != referenced_fields.len() {
-                                return Err(crate::SqlError::Generic(format!(
+                                return Err(crate::SqlError::Generic(anyhow::anyhow!(
                                     "References to unknown fields {referenced_fields:?} on `{model_name}`",
                                     model_name = related_model.name,
                                     referenced_fields = referenced_fields,

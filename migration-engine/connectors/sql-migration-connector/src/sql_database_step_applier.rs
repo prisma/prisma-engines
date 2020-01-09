@@ -74,7 +74,7 @@ impl SqlDatabaseStepApplier {
         tracing::debug!(?step);
 
         for sql_string in render_raw_sql(&step, renderer, &self.database_info, current_schema)
-            .map_err(|err: anyhow::Error| SqlError::Generic(format!("{}", err)))?
+            .map_err(|err: anyhow::Error| SqlError::Generic(err))?
         {
             tracing::debug!(index, %sql_string);
 

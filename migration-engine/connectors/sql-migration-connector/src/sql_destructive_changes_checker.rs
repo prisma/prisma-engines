@@ -23,10 +23,14 @@ impl SqlDestructiveChangesChecker {
         let query = Select::from_table((self.schema_name.as_str(), table_name)).value(count(asterisk()));
         let result_set = self.database.query(query.into()).await?;
         let first_row = result_set.first().ok_or_else(|| {
-            SqlError::Generic("No row was returned when checking for existing rows in dropped table.".to_owned())
+            SqlError::Generic(anyhow::anyhow!(
+                "No row was returned when checking for existing rows in dropped table."
+            ))
         })?;
         let rows_count: i64 = first_row.at(0).and_then(|value| value.as_i64()).ok_or_else(|| {
-            SqlError::Generic("No count was returned when checking for existing rows in dropped table.".to_owned())
+            SqlError::Generic(anyhow::anyhow!(
+                "No count was returned when checking for existing rows in dropped table."
+            ))
         })?;
 
         if rows_count > 0 {
@@ -59,7 +63,9 @@ impl SqlDestructiveChangesChecker {
                     .and_then(|row| row.at(0))
                     .and_then(|count| count.as_i64())
                     .ok_or_else(|| {
-                        SqlError::Generic("Unexpected result set shape when checking dropped columns.".to_owned())
+                        SqlError::Generic(anyhow::anyhow!(
+                            "Unexpected result set shape when checking dropped columns."
+                        ))
                     })
             })?;
 
