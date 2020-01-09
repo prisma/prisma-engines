@@ -5,8 +5,27 @@ use crate::{
 };
 use connector::{Filter, QueryArguments, ScalarCompare};
 use itertools::Itertools;
-use prisma_models::{ModelRef, PrismaArgs, PrismaValue, RelationFieldRef, SelectedFields};
+use prisma_models::{Field, ModelRef, PrismaArgs, PrismaValue, RecordIdentifier, RelationFieldRef, SelectedFields};
 use std::{convert::TryInto, sync::Arc};
+
+pub trait IdFilter {
+    fn filter(self) -> Filter;
+}
+
+impl IdFilter for RecordIdentifier {
+    fn filter(self) -> Filter {
+        let filters: Vec<Filter> = self
+            .pairs
+            .into_iter()
+            .map(|(field, value)| match field {
+                Field::Scalar(sf) => sf.equals(value),
+                Field::Relation(_) => panic!("Relation fields in IDs are not supported"),
+            })
+            .collect();
+
+        Filter::and(filters)
+    }
+}
 
 /// Coerces single values (`ParsedInputValue::Single` and `ParsedInputValue::Map`) into a vector.
 /// Simply unpacks `ParsedInputValue::List`.
@@ -82,9 +101,7 @@ pub fn insert_find_children_by_parent_node<T>(
 where
     T: Into<QueryArguments>,
 {
-    let selected_fields = SelectedFields::new(
-        vec![parent_relation_field.related_model().fields().id().into()],
-    );
+    let selected_fields = SelectedFields::new(vec![parent_relation_field.related_model().fields().id().into()]);
 
     let read_parent_node = graph.create_node(Query::Read(ReadQuery::RelatedRecordsQuery(RelatedRecordsQuery {
         name: "find_children_by_parent".to_owned(),

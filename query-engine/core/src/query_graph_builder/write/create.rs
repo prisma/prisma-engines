@@ -11,7 +11,7 @@ use write_arguments::*;
 
 /// Creates a create record query and adds it to the query graph, together with it's nested queries and companion read query.
 pub fn create_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedField) -> QueryGraphBuilderResult<()> {
-    let id_field = model.fields().id();
+    let id_field = model.identifier();
     let data_argument = field.arguments.lookup("data").unwrap();
     let data_map: ParsedInputMap = data_argument.value.try_into()?;
     let create_node = create::create_record_node(graph, Arc::clone(&model), data_map)?;

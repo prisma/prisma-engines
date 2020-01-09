@@ -1,4 +1,4 @@
-use crate::{Field, ModelRef, RelationFieldRef, ScalarFieldRef, TypeIdentifier};
+use crate::{Field, ModelIdentifier, ModelRef, RelationFieldRef, ScalarFieldRef, TypeIdentifier};
 use datamodel::FieldArity;
 
 pub trait IntoSelectedFields {
@@ -43,6 +43,20 @@ impl From<ScalarFieldRef> for SelectedFields {
 impl From<Vec<ScalarFieldRef>> for SelectedFields {
     fn from(sfs: Vec<ScalarFieldRef>) -> SelectedFields {
         let fields = sfs.into_iter().map(SelectedField::from).collect();
+
+        SelectedFields::new(fields)
+    }
+}
+
+impl From<ModelIdentifier> for SelectedFields {
+    fn from(id: ModelIdentifier) -> SelectedFields {
+        let fields = id
+            .into_iter()
+            .map(|field| match field {
+                Field::Scalar(sf) => sf.into(),
+                Field::Relation(_) => panic!("Relation fields in IDs is unsupported"),
+            })
+            .collect();
 
         SelectedFields::new(fields)
     }
