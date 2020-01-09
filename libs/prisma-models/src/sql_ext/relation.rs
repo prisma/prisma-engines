@@ -4,6 +4,9 @@ use quaint::ast::{Column, Table};
 pub trait RelationExt {
     fn id_column(&self) -> Option<Column<'static>>;
     fn column_for_relation_side(&self, side: RelationSide) -> Column<'static>;
+}
+
+trait RelationExtPrivate {
     fn model_a_column(&self) -> Column<'static>;
     fn model_b_column(&self) -> Column<'static>;
 }
@@ -13,11 +16,11 @@ pub trait RelationFieldExt {
     fn relation_column(&self, alias: bool) -> Column<'static>;
 }
 
-pub trait InlineRelationExt {
+trait InlineRelationExtPrivate {
     fn referencing_column(&self, table: Table<'static>) -> Column<'static>;
 }
 
-impl InlineRelationExt for InlineRelation {
+impl InlineRelationExtPrivate for InlineRelation {
     fn referencing_column(&self, table: Table<'static>) -> Column<'static> {
         let column = Column::from(self.referencing_column.clone());
         column.table(table)
@@ -26,10 +29,7 @@ impl InlineRelationExt for InlineRelation {
 
 impl RelationFieldExt for RelationField {
     fn opposite_column(&self, alias: bool) -> Column<'static> {
-        let col = match self.relation_side {
-            RelationSide::A => self.relation().model_b_column(),
-            RelationSide::B => self.relation().model_a_column(),
-        };
+        let col = self.relation().column_for_relation_side(self.relation_side.opposite());
 
         if alias && !self.relation_is_inlined_in_child() {
             col.table(Relation::TABLE_ALIAS)
@@ -39,10 +39,7 @@ impl RelationFieldExt for RelationField {
     }
 
     fn relation_column(&self, alias: bool) -> Column<'static> {
-        let col = match self.relation_side {
-            RelationSide::A => self.relation().model_a_column(),
-            RelationSide::B => self.relation().model_b_column(),
-        };
+        let col = self.relation().column_for_relation_side(self.relation_side);
 
         if alias && !self.relation_is_inlined_in_child() {
             col.table(Relation::TABLE_ALIAS)
@@ -96,7 +93,9 @@ impl RelationExt for Relation {
             RelationSide::B => self.model_b_column(),
         }
     }
+}
 
+impl RelationExtPrivate for Relation {
     #[allow(clippy::if_same_then_else)]
     fn model_a_column(&self) -> Column<'static> {
         match self.manifestation {
