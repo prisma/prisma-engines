@@ -160,7 +160,7 @@ async fn create_postgres_admin_conn(mut url: Url) -> CoreResult<SqlMigrationConn
     let mut connector = None;
 
     for database_name in candidate_default_databases {
-        url.set_path(database_name);
+        url.set_path(&format!("/{}", database_name));
         match SqlMigrationConnector::new(url.as_str(), "postgresql").await {
             // If the database does not exist, try the next one.
             Err(err) => match &err.kind {

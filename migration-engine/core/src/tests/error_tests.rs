@@ -163,7 +163,7 @@ async fn database_does_not_exist_must_return_a_proper_error() {
         .unwrap();
     let database_name = "notmydatabase";
 
-    url.set_path(database_name);
+    url.set_path(&format!("/{}", database_name));
 
     let dm = format!(
         r#"
@@ -242,7 +242,7 @@ async fn database_access_denied_must_return_a_proper_error_in_cli() {
     let mut url: Url = url.clone();
     url.set_username("jeanmichel").unwrap();
     url.set_password(Some("1234")).unwrap();
-    url.set_path("access_denied_test");
+    url.set_path("/access_denied_test");
 
     let error = get_cli_error(&[
         "migration-engine",
@@ -281,7 +281,7 @@ async fn database_access_denied_must_return_a_proper_error_in_rpc() {
     let mut url: Url = url.clone();
     url.set_username("jeanyves").unwrap();
     url.set_password(Some("1234")).unwrap();
-    url.set_path("access_denied_test");
+    url.set_path("/access_denied_test");
 
     let dm = format!(
         r#"
