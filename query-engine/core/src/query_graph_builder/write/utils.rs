@@ -49,7 +49,7 @@ pub fn read_ids_infallible<T>(model: &ModelRef, filter: T) -> Query
 where
     T: Into<Filter>,
 {
-    let selected_fields: SelectedFields = model.fields().id().into();
+    let selected_fields: SelectedFields = model.identifier().into();
     let filter: Filter = filter.into();
 
     let read_query = ReadQuery::ManyRecordsQuery(ManyRecordsQuery {
@@ -101,7 +101,7 @@ pub fn insert_find_children_by_parent_node<T>(
 where
     T: Into<QueryArguments>,
 {
-    let selected_fields = SelectedFields::new(vec![parent_relation_field.related_model().fields().id().into()]);
+    let selected_fields: SelectedFields = parent_relation_field.related_model().identifier().into();
 
     let read_parent_node = graph.create_node(Query::Read(ReadQuery::RelatedRecordsQuery(RelatedRecordsQuery {
         name: "find_children_by_parent".to_owned(),
@@ -191,7 +191,7 @@ pub fn insert_existing_1to1_related_model_checks(
     parent_relation_field: &RelationFieldRef,
 ) -> QueryGraphBuilderResult<()> {
     let child_model = parent_relation_field.related_model();
-    let child_model_id_field = child_model.fields().id();
+    let child_model_id_field = child_model.identifier();
     let child_side_required = parent_relation_field.related_field().is_required;
     let relation_inlined_parent = parent_relation_field.relation_is_inlined_in_parent();
     let rf = Arc::clone(&parent_relation_field);
@@ -233,7 +233,7 @@ pub fn insert_existing_1to1_related_model_checks(
             }?;
 
             if let Node::Query(Query::Write(ref mut wq)) = child_node {
-                wq.add_filter(child_model_id_field.equals(child_id));
+                wq.add_filter(child_id.filter());
                 wq.inject_non_list_arg(relation_field_name, PrismaValue::Null);
             }
 
