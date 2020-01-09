@@ -1,3 +1,6 @@
+mod indexes;
+mod mariadb;
+
 use super::test_harness::*;
 use crate::commands::{
     CalculateDatabaseStepsCommand, CalculateDatabaseStepsInput, InferMigrationStepsCommand, InferMigrationStepsInput,
@@ -6,8 +9,6 @@ use pretty_assertions::assert_eq;
 use quaint::prelude::SqlFamily;
 use sql_migration_connector::{AlterIndex, CreateIndex, DropIndex, SqlMigrationStep};
 use sql_schema_describer::*;
-
-mod mariadb;
 
 #[test_each_connector]
 async fn adding_a_scalar_field_must_work(api: &TestApi) {
@@ -1102,7 +1103,7 @@ async fn index_renaming_must_work_when_renaming_to_default(api: &TestApi) {
     }
 }
 
-#[test_each_connector(log = "debug")]
+#[test_each_connector]
 async fn index_renaming_must_work_when_renaming_to_custom(api: &TestApi) -> TestResult {
     let dm1 = r#"
             model A {
