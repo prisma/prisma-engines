@@ -4,7 +4,7 @@ use std::process::Command;
 fn check_rust_version() {
     let rust_version = version().expect("Could not get rustc version");
     let expected_major_version = 1;
-    let expected_minor_version = 39;
+    let expected_minor_version = 40;
 
     assert_eq!(rust_version.major, expected_major_version);
 
