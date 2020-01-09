@@ -2,8 +2,7 @@ use datamodel::{DatabaseName::Single, Datamodel, FieldType};
 use regex::Regex;
 
 pub fn sanitize_datamodel_names(mut datamodel: Datamodel) -> Datamodel {
-    // todo enum names
-    // fix name clashes we introduce
+    // todo fix name clashes we introduce
 
     for model in &mut datamodel.models {
         let (sanitized_name, db_name) = sanitize_name(model.name.clone());
@@ -31,6 +30,15 @@ pub fn sanitize_datamodel_names(mut datamodel: Datamodel) -> Datamodel {
             index.fields = index.fields.iter().map(|f| sanitize_name(f.clone()).0).collect();
         }
     }
+
+    //    todo enums are a bit more complicated and not fully specced, lets do this separately.
+    //    We also need to map the actual valid values before printing them
+    //    for enm in &mut datamodel.enums {
+    //        let (sanitized_name, db_name) = sanitize_name(enm.name.clone());
+    //
+    //        enm.name = sanitized_name;
+    //        enm.database_name = db_name.map(|db| Single(db));
+    //    }
 
     datamodel
 }
