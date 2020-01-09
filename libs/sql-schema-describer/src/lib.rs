@@ -173,6 +173,12 @@ pub struct Index {
     pub tpe: IndexType,
 }
 
+impl Index {
+    pub fn is_unique(&self) -> bool {
+        self.tpe == IndexType::Unique
+    }
+}
+
 /// The primary key of a table.
 #[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]

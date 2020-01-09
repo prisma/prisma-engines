@@ -14,7 +14,7 @@ pub struct Model {
     /// Indicates if this model is embedded or not.
     pub is_embedded: bool,
     /// Describes Composite Indexes
-    pub indexes: Vec<IndexDefinition>,
+    pub indices: Vec<IndexDefinition>,
     /// Describes Composite Primary Keys
     pub id_fields: Vec<String>,
     /// Indicates if this model is generated.
@@ -40,7 +40,7 @@ impl Model {
         Model {
             name,
             fields: vec![],
-            indexes: vec![],
+            indices: vec![],
             id_fields: vec![],
             documentation: None,
             database_name,
@@ -141,11 +141,11 @@ impl Model {
     }
 
     pub fn add_index(&mut self, index: IndexDefinition) {
-        self.indexes.push(index)
+        self.indices.push(index)
     }
 
     pub fn has_index(&self, index: &IndexDefinition) -> bool {
-        self.indexes.iter().any(|own_index| own_index == index)
+        self.indices.iter().any(|own_index| own_index == index)
     }
 }
 

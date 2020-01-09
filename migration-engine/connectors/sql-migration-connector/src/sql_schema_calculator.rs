@@ -83,7 +83,7 @@ impl<'a> SqlSchemaCalculator<'a> {
                     }
                 });
 
-                let multiple_field_indexes = model.indexes.iter().map(|index_definition: &IndexDefinition| {
+                let multiple_field_indexes = model.indices.iter().map(|index_definition: &IndexDefinition| {
                     let referenced_fields: Vec<&Field> = index_definition
                         .fields
                         .iter()

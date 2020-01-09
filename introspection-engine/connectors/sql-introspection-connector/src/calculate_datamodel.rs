@@ -27,23 +27,27 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
             model.add_field(field);
         }
 
-        //do not add compound indexes to schema when they cover a foreign key, instead make the relation 1:1
-        for index in table.indices.iter().filter(|i| {
-            table
-                .foreign_keys
-                .iter()
-                .all(|fk| !is_foreign_key_covered_by_unique_index(i, fk))
-        }) {
-            match (index.columns.len(), &index.tpe) {
-                (1, IndexType::Unique) => (), // they go on the field not the model in the datamodel
-                _ => model.add_index(calculate_index(index)),
-            }
-        }
-
         //add compound fields
         for foreign_key in table.foreign_keys.iter().filter(|fk| fk.columns.len() > 1) {
             let field = calculate_compound_field(schema, table, foreign_key);
             model.add_field(field);
+        }
+
+        //do not add compound unique indexes to schema when they cover a foreign key, instead make the relation 1:1
+        for index in table.indices.iter().filter(|i| {
+            table
+                .foreign_keys
+                .iter()
+                .all(|fk| !((fk.columns == i.columns) && i.is_unique()))
+        }) {
+            //todo
+            //covers a compound field
+            //doesnt
+
+            match index.columns.len() {
+                1 if index.is_unique() => (), // they go on the field not the model in the datamodel
+                _ => model.add_index(calculate_index(index)),
+            }
         }
 
         if table.primary_key_columns().len() > 1 {

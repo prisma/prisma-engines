@@ -12,13 +12,6 @@ use sql_schema_describer::{
 
 //checks
 
-pub fn is_foreign_key_covered_by_unique_index(index: &Index, foreign_key: &ForeignKey) -> bool {
-    match index.tpe {
-        IndexType::Unique => foreign_key.columns == index.columns,
-        IndexType::Normal => false,
-    }
-}
-
 pub fn is_migration_table(table: &Table) -> bool {
     table.name == "_Migration"
 }
@@ -108,7 +101,10 @@ pub(crate) fn calculate_backrelation_field(
         match &relation_field.database_name {
             None => table.is_column_unique(relation_field.name.as_str()),
             Some(Single(name)) => table.is_column_unique(name),
-            Some(Compound(names)) => table.indices.iter().any(|i| i.columns == *names),
+            Some(Compound(names)) => table
+                .indices
+                .iter()
+                .any(|i| i.columns == *names && i.tpe == IndexType::Unique),
         }
     };
     let arity = match relation_field.arity {
@@ -150,10 +146,12 @@ pub(crate) fn calculate_compound_field(schema: &SqlSchema, table: &Table, foreig
         .iter()
         .map(|c| table.columns.iter().find(|tc| tc.name == *c).unwrap())
         .collect();
+
     let arity = match columns.iter().find(|c| c.is_required()).is_none() {
         true => FieldArity::Optional,
         false => FieldArity::Required,
     };
+
     // todo this at some point needs to be a compound value of the two columns defaults?
     let default_value = None;
     let is_unique = false;

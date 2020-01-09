@@ -119,7 +119,7 @@ impl<'a> DatamodelConverter<'a> {
 
     fn convert_indexes(&self, model: &dml::Model) -> Vec<IndexTemplate> {
         model
-            .indexes
+            .indices
             .iter()
             .map(|i| IndexTemplate {
                 name: i.name.clone(),

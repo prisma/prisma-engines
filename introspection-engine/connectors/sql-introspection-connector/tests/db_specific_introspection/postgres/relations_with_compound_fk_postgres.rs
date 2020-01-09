@@ -4,7 +4,7 @@ use test_harness::*;
 
 #[test_one_connector(connector = "postgres")]
 #[test]
-async fn compound_foreign_keys_should_work_for_one_to_one_relations(api: &TestApi) {
+async fn compound_foreign_keys_should_work_for_required_one_to_one_relations(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -43,7 +43,7 @@ async fn compound_foreign_keys_should_work_for_one_to_one_relations(api: &TestAp
 
 #[test_one_connector(connector = "postgres")]
 #[test]
-async fn compound_foreign_keys_should_work_for_required_one_to_one_relations(api: &TestApi) {
+async fn compound_foreign_keys_should_work_for_one_to_one_relations(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -54,8 +54,8 @@ async fn compound_foreign_keys_should_work_for_required_one_to_one_relations(api
             });
             migration.create_table("Post", |t| {
                 t.add_column("id", types::primary());
-                t.add_column("user_id", types::integer().nullable(false));
-                t.add_column("user_name", types::text().nullable(false));
+                t.add_column("user_id", types::integer().nullable(true));
+                t.add_column("user_name", types::text().nullable(true));
                 t.inject_custom("FOREIGN KEY (\"user_id\",\"user_name\") REFERENCES \"User\"(\"id\", \"name\")");
                 t.inject_custom("CONSTRAINT post_user_unique UNIQUE(\"user_id\", \"user_name\")");
             });
@@ -65,13 +65,13 @@ async fn compound_foreign_keys_should_work_for_required_one_to_one_relations(api
     let dm = r#"
             model Post {
                 id      Int                 @id @sequence(name: "Post_id_seq", allocationSize: 1, initialValue: 1)
-                user    User                @map(["user_id", "user_name"]) @relation(references:[id, name]) 
+                user    User?                @map(["user_id", "user_name"]) @relation(references:[id, name]) 
             }
 
             model User {
                id       Int                 @id @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
                name     String
-               post     Post
+               post     Post?
                
                @@unique([id, name], name: "user_unique")
             }
@@ -93,6 +93,44 @@ async fn compound_foreign_keys_should_work_for_one_to_many_relations(api: &TestA
             });
             migration.create_table("Post", |t| {
                 t.add_column("id", types::primary());
+                t.add_column("user_id", types::integer().nullable(true));
+                t.add_column("user_name", types::text().nullable(true));
+                t.inject_custom("FOREIGN KEY (\"user_id\",\"user_name\") REFERENCES \"User\"(\"id\", \"name\")");
+            });
+        })
+        .await;
+
+    let dm = r#"
+            model Post {
+                id      Int                 @id @sequence(name: "Post_id_seq", allocationSize: 1, initialValue: 1)
+                user    User?                @map(["user_id", "user_name"]) @relation(references:[id, name]) 
+            }
+
+            model User {
+               id       Int                 @id @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
+               name     String
+               posts    Post[]
+               
+               @@unique([id, name], name: "user_unique")
+            }
+        "#;
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}
+
+#[test_one_connector(connector = "postgres")]
+#[test]
+async fn compound_foreign_keys_should_work_for_required_one_to_many_relations(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+                t.add_column("name", types::text());
+                t.inject_custom("CONSTRAINT user_unique UNIQUE(\"id\", \"name\")");
+            });
+            migration.create_table("Post", |t| {
+                t.add_column("id", types::primary());
                 t.add_column("user_id", types::integer());
                 t.add_column("user_name", types::text());
                 t.inject_custom("FOREIGN KEY (\"user_id\",\"user_name\") REFERENCES \"User\"(\"id\", \"name\")");
@@ -103,7 +141,7 @@ async fn compound_foreign_keys_should_work_for_one_to_many_relations(api: &TestA
     let dm = r#"
             model Post {
                 id      Int                 @id @sequence(name: "Post_id_seq", allocationSize: 1, initialValue: 1)
-                user    User?                @map(["user_id", "user_name"]) @relation(references:[id, name]) 
+                user    User                @map(["user_id", "user_name"]) @relation(references:[id, name]) 
             }
 
             model User {
@@ -223,6 +261,48 @@ async fn compound_foreign_keys_should_work_for_one_to_one_relations_with_separat
                post     Post?
                
                @@unique([id, name], name: "user_unique")
+            }
+        "#;
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}
+
+#[test_one_connector(connector = "postgres")]
+#[test]
+async fn compound_foreign_keys_should_work_for_one_to_many_relations_with_non_unique_index(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+                t.add_column("age", types::integer());
+                t.inject_custom("CONSTRAINT user_unique UNIQUE(\"id\", \"age\")");
+            });
+            migration.create_table("Post", |t| {
+                t.add_column("id", types::primary());
+                t.add_column("user_id", types::integer());
+                t.add_column("user_age", types::integer());
+                t.inject_custom("FOREIGN KEY (\"user_id\",\"user_age\") REFERENCES \"User\"(\"id\", \"age\")");
+            });
+
+            migration.inject_custom("CREATE INDEX test ON \"Post\"(\"user_id\",\"user_age\");");
+        })
+        .await;
+
+    let dm = r#"
+            model Post {
+                id      Int                 @id
+                user    User               @map(["user_id", "user_age"]) @relation(references:[id, age])
+                
+                @@index(user)
+            }
+
+            model User {
+               age      Int
+               id       Int                 @id
+               posts    Post[]
+               
+               @@unique([id, age], name: "user_unique")
             }
         "#;
     let result = dbg!(api.introspect().await);
