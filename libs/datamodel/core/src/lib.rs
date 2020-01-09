@@ -65,29 +65,17 @@ use validator::ValidationPipeline;
 
 /// Parses and validates a datamodel string, using core attributes only.
 pub fn parse_datamodel(datamodel_string: &str) -> Result<Datamodel, error::ErrorCollection> {
-    parse_datamodel_with_sources(datamodel_string, vec![])
+    parse_datamodel_internal(datamodel_string, false)
 }
 
-/// Validates a [Schema AST](/ast/struct.SchemaAst.html) and returns its
-/// [Datamodel](/struct.Datamodel.html).
-pub fn lift_ast(ast: &ast::SchemaAst) -> Result<Datamodel, error::ErrorCollection> {
-    let mut errors = error::ErrorCollection::new();
-    let sources = load_sources(ast, vec![])?;
-    let validator = ValidationPipeline::with_sources(&sources);
-
-    match validator.validate(&ast) {
-        Ok(src) => Ok(src),
-        Err(mut err) => {
-            errors.append(&mut err);
-            Err(errors)
-        }
-    }
+pub fn parse_datamodel_and_ignore_env_errors(datamodel_string: &str) -> Result<Datamodel, error::ErrorCollection> {
+    parse_datamodel_internal(datamodel_string, true)
 }
 
 /// Parses and validates a datamodel string, using core attributes only.
 /// In case of an error, a pretty, colorful string is returned.
 pub fn parse_datamodel_or_pretty_error(datamodel_string: &str, file_name: &str) -> Result<Datamodel, String> {
-    match parse_datamodel_with_sources(datamodel_string, vec![]) {
+    match parse_datamodel_internal(datamodel_string, false) {
         Ok(dml) => Ok(dml),
         Err(errs) => {
             let mut buffer = std::io::Cursor::new(Vec::<u8>::new());
@@ -104,17 +92,15 @@ pub fn parse_datamodel_or_pretty_error(datamodel_string: &str, file_name: &str) 
     }
 }
 
-/// Parses and validates a datamodel string, using core attributes and the given sources.
-/// If source loading failes, validation continues, but an error is returned.
-pub fn parse_datamodel_with_sources(
+fn parse_datamodel_internal(
     datamodel_string: &str,
-    source_definitions: Vec<Box<dyn configuration::SourceDefinition>>,
+    ignore_env_var_errors: bool,
 ) -> Result<Datamodel, error::ErrorCollection> {
     let ast = ast::parser::parse(datamodel_string)?;
 
     let mut errors = error::ErrorCollection::new();
 
-    let sources = match load_sources(&ast, source_definitions) {
+    let sources = match load_sources(&ast, ignore_env_var_errors) {
         Ok(src) => src,
         Err(mut err) => {
             errors.append(&mut err);
@@ -133,22 +119,30 @@ pub fn parse_datamodel_with_sources(
     }
 }
 
+/// Validates a [Schema AST](/ast/struct.SchemaAst.html) and returns its
+/// [Datamodel](/struct.Datamodel.html).
+pub fn lift_ast(ast: &ast::SchemaAst) -> Result<Datamodel, error::ErrorCollection> {
+    let mut errors = error::ErrorCollection::new();
+    let sources = load_sources(ast, false)?;
+    let validator = ValidationPipeline::with_sources(&sources);
+
+    match validator.validate(&ast) {
+        Ok(src) => Ok(src),
+        Err(mut err) => {
+            errors.append(&mut err);
+            Err(errors)
+        }
+    }
+}
+
 pub fn parse_schema_ast(datamodel_string: &str) -> Result<SchemaAst, error::ErrorCollection> {
     ast::parser::parse(datamodel_string)
 }
 
 /// Loads all configuration blocks from a datamodel using the built-in source definitions.
 pub fn parse_configuration(datamodel_string: &str) -> Result<Configuration, error::ErrorCollection> {
-    parse_configuration_with_sources(datamodel_string, vec![])
-}
-
-/// Loads all configuration blocks from a datamodel using the built-in source definitions and extra given ones.
-pub fn parse_configuration_with_sources(
-    datamodel_string: &str,
-    source_definitions: Vec<Box<dyn configuration::SourceDefinition>>,
-) -> Result<Configuration, error::ErrorCollection> {
     let ast = ast::parser::parse(datamodel_string)?;
-    let datasources = load_sources(&ast, source_definitions)?;
+    let datasources = load_sources(&ast, false)?;
     let generators = GeneratorLoader::load_generators_from_ast(&ast)?;
 
     Ok(Configuration {
@@ -159,19 +153,10 @@ pub fn parse_configuration_with_sources(
 
 fn load_sources(
     schema_ast: &SchemaAst,
-    source_definitions: Vec<Box<dyn configuration::SourceDefinition>>,
+    ignore_env_var_errors: bool,
 ) -> Result<Vec<Box<dyn Source + Send + Sync>>, error::ErrorCollection> {
-    let mut source_loader = SourceLoader::new();
-
-    for source in get_builtin_sources() {
-        source_loader.add_source_definition(source);
-    }
-
-    for source in source_definitions {
-        source_loader.add_source_definition(source);
-    }
-
-    source_loader.load(&schema_ast)
+    let source_loader = SourceLoader::new();
+    source_loader.load_sources(&schema_ast, ignore_env_var_errors)
 }
 
 //
@@ -232,13 +217,4 @@ pub fn render_datamodel_and_config_to(
 fn render_schema_ast_to(stream: &mut dyn std::io::Write, schema: &ast::SchemaAst, ident_width: usize) {
     let mut renderer = ast::renderer::Renderer::new(stream, ident_width);
     renderer.render(schema);
-}
-
-// Convenience Helpers
-pub fn get_builtin_sources() -> Vec<Box<dyn SourceDefinition>> {
-    vec![
-        Box::new(configuration::builtin::MySqlSourceDefinition::new()),
-        Box::new(configuration::builtin::PostgresSourceDefinition::new()),
-        Box::new(configuration::builtin::SqliteSourceDefinition::new()),
-    ]
 }

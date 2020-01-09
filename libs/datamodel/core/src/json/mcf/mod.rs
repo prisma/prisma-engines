@@ -4,7 +4,7 @@ mod source;
 pub use generator::*;
 pub use source::*;
 
-use crate::{Configuration, SourceDefinition};
+use crate::Configuration;
 use serde::{Deserialize, Serialize};
 
 pub fn config_to_mcf_json_value(mcf: &Configuration) -> serde_json::Value {
@@ -20,7 +20,7 @@ pub fn config_from_mcf_json(json: &str) -> Configuration {
 
     Configuration {
         generators: generator::generators_from_json_value(mcf.generators),
-        datasources: source::sources_from_json_value_with_plugins(mcf.datasources, vec![]),
+        datasources: source::sources_from_json_value(mcf.datasources),
     }
 }
 
@@ -28,19 +28,6 @@ pub fn config_from_mcf_json_value(json: serde_json::Value) -> Configuration {
     let mcf: SerializeableMcf = serde_json::from_value(json).expect("Failed to parse JSON.");
 
     Configuration::from(mcf)
-}
-
-#[allow(unused)]
-fn config_from_mcf_json_value_with_plugins(
-    json: serde_json::Value,
-    plugins: Vec<Box<dyn SourceDefinition>>,
-) -> Configuration {
-    let mcf: SerializeableMcf = serde_json::from_value(json).expect("Failed to parse JSON.");
-
-    Configuration {
-        generators: generator::generators_from_json_value(mcf.generators),
-        datasources: source::sources_from_json_value_with_plugins(mcf.datasources, plugins),
-    }
 }
 
 #[serde(rename_all = "camelCase")]
@@ -61,7 +48,7 @@ impl From<SerializeableMcf> for Configuration {
     fn from(mcf: SerializeableMcf) -> Self {
         Self {
             generators: generator::generators_from_json_value(mcf.generators),
-            datasources: source::sources_from_json_value_with_plugins(mcf.datasources, vec![]),
+            datasources: source::sources_from_json_value(mcf.datasources),
         }
     }
 }

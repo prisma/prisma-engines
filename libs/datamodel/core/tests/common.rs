@@ -1,7 +1,7 @@
 extern crate datamodel;
 
 use self::datamodel::IndexDefinition;
-use datamodel::{common::ScalarType, configuration::SourceDefinition, dml, error::*};
+use datamodel::{common::ScalarType, dml, error::*};
 use datamodel_connector::ScalarFieldType;
 
 pub trait FieldAsserts {
@@ -283,14 +283,7 @@ impl ErrorAsserts for ErrorCollection {
 
 #[allow(dead_code)] // Not sure why the compiler thinks this is never used.
 pub fn parse(datamodel_string: &str) -> datamodel::Datamodel {
-    parse_with_plugins(datamodel_string, vec![])
-}
-
-pub fn parse_with_plugins(
-    datamodel_string: &str,
-    source_definitions: Vec<Box<dyn SourceDefinition>>,
-) -> datamodel::Datamodel {
-    match datamodel::parse_datamodel_with_sources(datamodel_string, source_definitions) {
+    match datamodel::parse_datamodel(datamodel_string) {
         Ok(s) => s,
         Err(errs) => {
             for err in errs.to_iter() {
@@ -304,14 +297,7 @@ pub fn parse_with_plugins(
 
 #[allow(dead_code)] // Not sure why the compiler thinks this is never used.
 pub fn parse_error(datamodel_string: &str) -> ErrorCollection {
-    parse_with_plugins_error(datamodel_string, vec![])
-}
-
-pub fn parse_with_plugins_error(
-    datamodel_string: &str,
-    source_definitions: Vec<Box<dyn SourceDefinition>>,
-) -> ErrorCollection {
-    match datamodel::parse_datamodel_with_sources(datamodel_string, source_definitions) {
+    match datamodel::parse_datamodel(datamodel_string) {
         Ok(_) => panic!("Expected an error when parsing schema."),
         Err(errs) => errs,
     }
