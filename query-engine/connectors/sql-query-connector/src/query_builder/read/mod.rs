@@ -21,8 +21,7 @@ impl SelectDefinition for Filter {
 
 impl SelectDefinition for &Filter {
     fn into_select(self, model: &ModelRef) -> Select<'static> {
-        let args = QueryArguments::from(self.clone());
-        args.into_select(model)
+        self.clone().into_select(model)
     }
 }
 

@@ -1,5 +1,9 @@
-use crate::{Field, RelationField, ScalarField};
-use quaint::ast::Column;
+use crate::{Field, RelationField, ScalarField, ModelIdentifier};
+use quaint::ast::{Column, Row};
+
+pub trait AsRow {
+    fn as_row(&self) -> Row<'static>;
+}
 
 pub trait AsColumns {
     fn as_columns(&self) -> Vec<Column<'static>>;
@@ -8,6 +12,18 @@ pub trait AsColumns {
 impl AsColumns for &[Field] {
     fn as_columns(&self) -> Vec<Column<'static>> {
         self.into_iter().map(|f| f.as_column()).collect()
+    }
+}
+
+impl AsColumns for ModelIdentifier {
+    fn as_columns(&self) -> Vec<Column<'static>> {
+        self.fields().as_columns()
+    }
+}
+
+impl AsRow for ModelIdentifier {
+    fn as_row(&self) -> Row<'static> {
+        Row::from(self.as_columns())
     }
 }
 

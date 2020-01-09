@@ -10,9 +10,9 @@ pub struct SkipAndLimit {
 #[derive(Debug, Default, Clone)]
 pub struct QueryArguments {
     pub skip: Option<i64>,
-    pub after: Option<GraphqlId>,
+    pub after: Option<RecordIdentifier>,
     pub first: Option<i64>,
-    pub before: Option<GraphqlId>,
+    pub before: Option<RecordIdentifier>,
     pub last: Option<i64>,
     pub filter: Option<Filter>,
     pub order_by: Option<OrderBy>,

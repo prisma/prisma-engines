@@ -1,4 +1,4 @@
-use crate::{DomainError as Error, DomainResult, Field, PrismaValue};
+use crate::{ScalarFieldRef, DomainError as Error, DomainResult, Field, PrismaValue};
 
 // Collection of fields of which the primary identifier of a model is composed of.
 // Todo: Currently, this uses arcs, which is not ideal, but also not terrible compared
@@ -6,6 +6,20 @@ use crate::{DomainError as Error, DomainResult, Field, PrismaValue};
 #[derive(Debug, Clone, Default)]
 pub struct ModelIdentifier {
     fields: Vec<Field>,
+}
+
+impl From<Field> for ModelIdentifier {
+    fn from(f: Field) -> Self {
+        Self {
+            fields: vec![f]
+        }
+    }
+}
+
+impl From<ScalarFieldRef> for ModelIdentifier {
+    fn from(f: ScalarFieldRef) -> Self {
+        Self::from(Field::Scalar(f))
+    }
 }
 
 impl ModelIdentifier {
@@ -23,6 +37,10 @@ impl ModelIdentifier {
 
     pub fn len(&self) -> usize {
         self.fields.len()
+    }
+
+    pub fn is_singular_field(&self) -> bool {
+        self.len() == 1
     }
 }
 
@@ -52,6 +70,10 @@ impl RecordIdentifier {
     pub fn add(&mut self, pair: (Field, PrismaValue)) {
         self.pairs.push(pair);
     }
+
+    pub fn values(&self) -> impl Iterator<Item = PrismaValue> + '_ {
+        self.pairs.iter().map(|p| p.1.clone())
+    }
 }
 
 impl IntoIterator for RecordIdentifier {
@@ -63,15 +85,15 @@ impl IntoIterator for RecordIdentifier {
     }
 }
 
-impl Into<RecordIdentifier> for (Field, PrismaValue) {
-    fn into(self) -> RecordIdentifier {
-        RecordIdentifier::new(vec![self])
+impl From<(Field, PrismaValue)> for RecordIdentifier {
+    fn from(tup: (Field, PrismaValue)) -> Self {
+        Self::new(vec![tup])
     }
 }
 
-impl Into<RecordIdentifier> for Vec<(Field, PrismaValue)> {
-    fn into(self) -> RecordIdentifier {
-        RecordIdentifier::new(self)
+impl From<Vec<(Field, PrismaValue)>> for RecordIdentifier {
+    fn from(tup: Vec<(Field, PrismaValue)>) -> Self {
+        Self::new(tup)
     }
 }
 
