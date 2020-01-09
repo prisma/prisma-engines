@@ -5,53 +5,12 @@ use std::sync::{Arc, Weak};
 pub type RelationRef = Arc<Relation>;
 pub type RelationWeakRef = Weak<Relation>;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum OnDelete {
-    SetNull,
-    Cascade,
-}
-
-impl OnDelete {
-    pub fn is_cascade(self) -> bool {
-        match self {
-            OnDelete::Cascade => true,
-            OnDelete::SetNull => false,
-        }
-    }
-
-    pub fn is_set_null(self) -> bool {
-        match self {
-            OnDelete::Cascade => false,
-            OnDelete::SetNull => true,
-        }
-    }
-}
-
-#[derive(Debug, Clone, PartialEq)]
-pub struct InlineRelation {
-    pub in_table_of_model_name: String,
-    pub referencing_column: String,
-}
-
-#[derive(Debug, Clone, PartialEq)]
-pub struct RelationTable {
-    pub table: String,
-    pub model_a_column: String,
-    pub model_b_column: String,
-}
-
-#[derive(Debug, Clone, PartialEq)]
-pub enum RelationLinkManifestation {
-    Inline(InlineRelation),
-    RelationTable(RelationTable),
-}
-
 #[derive(Debug)]
 pub struct RelationTemplate {
     pub name: String,
     pub model_a_on_delete: OnDelete,
     pub model_b_on_delete: OnDelete,
-    pub manifestation: Option<RelationLinkManifestation>, // TODO: remove the option after the switch to v2 is completed
+    pub manifestation: RelationLinkManifestation,
     pub model_a_name: String,
     pub model_b_name: String,
 }
@@ -74,10 +33,51 @@ pub struct Relation {
     field_a: OnceCell<Weak<RelationField>>,
     field_b: OnceCell<Weak<RelationField>>,
 
-    pub manifestation: Option<RelationLinkManifestation>,
+    pub manifestation: RelationLinkManifestation,
 
     #[debug_stub = "#InternalDataModelWeakRef#"]
     pub internal_data_model: InternalDataModelWeakRef,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum RelationLinkManifestation {
+    Inline(InlineRelation),
+    RelationTable(RelationTable),
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct InlineRelation {
+    pub in_table_of_model_name: String,
+    pub referencing_column: String,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct RelationTable {
+    pub table: String,
+    pub model_a_column: String,
+    pub model_b_column: String,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum OnDelete {
+    SetNull,
+    Cascade,
+}
+
+impl OnDelete {
+    pub fn is_cascade(self) -> bool {
+        match self {
+            OnDelete::Cascade => true,
+            OnDelete::SetNull => false,
+        }
+    }
+
+    pub fn is_set_null(self) -> bool {
+        match self {
+            OnDelete::Cascade => false,
+            OnDelete::SetNull => true,
+        }
+    }
 }
 
 impl RelationTemplate {
@@ -108,13 +108,10 @@ impl Relation {
     /// Returns `true` only if the `Relation` is just a link between two
     /// `RelationField`s.
     pub fn is_inline_relation(&self) -> bool {
-        self.manifestation
-            .as_ref()
-            .map(|manifestation| match manifestation {
-                RelationLinkManifestation::Inline(_) => true,
-                _ => false,
-            })
-            .unwrap_or(false)
+        match self.manifestation {
+            RelationLinkManifestation::Inline(_) => true,
+            _ => false,
+        }
     }
 
     /// Returns `true` if the `Relation` is a table linking two models.
@@ -216,7 +213,7 @@ impl Relation {
         use RelationLinkManifestation::*;
 
         match self.manifestation {
-            Some(Inline(ref m)) => Some(m),
+            Inline(ref m) => Some(m),
             _ => None,
         }
     }

@@ -57,19 +57,15 @@ impl AsTable for Relation {
     ///   data model syntax.
     fn as_table(&self) -> Table<'static> {
         match self.manifestation {
-            Some(RelationLinkManifestation::RelationTable(ref m)) => {
+            RelationLinkManifestation::RelationTable(ref m) => {
                 let db = self.model_a().internal_data_model().db_name.clone();
                 (db, m.table.clone()).into()
             }
-            Some(RelationLinkManifestation::Inline(ref m)) => self
+            RelationLinkManifestation::Inline(ref m) => self
                 .internal_data_model()
                 .find_model(&m.in_table_of_model_name)
                 .unwrap()
                 .as_table(),
-            None => {
-                let db = self.model_a().internal_data_model().db_name.clone();
-                (db, format!("_{}", self.name)).into()
-            }
         }
     }
 }
@@ -87,8 +83,8 @@ impl RelationExtPrivate for Relation {
     #[allow(clippy::if_same_then_else)]
     fn model_a_column(&self) -> Column<'static> {
         match self.manifestation {
-            Some(RelationLinkManifestation::RelationTable(ref m)) => m.model_a_column.clone().into(),
-            Some(RelationLinkManifestation::Inline(ref m)) => {
+            RelationLinkManifestation::RelationTable(ref m) => m.model_a_column.clone().into(),
+            RelationLinkManifestation::Inline(ref m) => {
                 let model_a = self.model_a();
                 let model_b = self.model_b();
 
@@ -104,15 +100,14 @@ impl RelationExtPrivate for Relation {
                     m.referencing_column(self.as_table())
                 }
             }
-            None => Relation::MODEL_A_DEFAULT_COLUMN.into(),
         }
     }
 
     #[allow(clippy::if_same_then_else)]
     fn model_b_column(&self) -> Column<'static> {
         match self.manifestation {
-            Some(RelationLinkManifestation::RelationTable(ref m)) => m.model_b_column.clone().into(),
-            Some(RelationLinkManifestation::Inline(ref m)) => {
+            RelationLinkManifestation::RelationTable(ref m) => m.model_b_column.clone().into(),
+            RelationLinkManifestation::Inline(ref m) => {
                 let model_b = self.model_b();
 
                 if self.is_self_relation() && (self.field_a().is_hidden || self.field_b().is_hidden) {
@@ -125,7 +120,6 @@ impl RelationExtPrivate for Relation {
                     m.referencing_column(self.as_table())
                 }
             }
-            None => Relation::MODEL_B_DEFAULT_COLUMN.into(),
         }
     }
 }

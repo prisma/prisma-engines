@@ -109,7 +109,7 @@ impl<'a> DatamodelConverter<'a> {
                 name: r.name(),
                 model_a_on_delete: OnDelete::SetNull,
                 model_b_on_delete: OnDelete::SetNull,
-                manifestation: Some(r.manifestation()),
+                manifestation: r.manifestation(),
                 model_a_name: r.model_a.name.clone(),
                 model_b_name: r.model_b.name.clone(),
             })
