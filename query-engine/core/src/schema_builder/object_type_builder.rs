@@ -110,7 +110,7 @@ impl<'a> ObjectTypeBuilder<'a> {
                 TypeIdentifier::Enum => Self::map_enum_field(sf).into(),
                 TypeIdentifier::Json => OutputType::json(),
                 TypeIdentifier::DateTime => OutputType::date_time(),
-                TypeIdentifier::GraphQLID => OutputType::id(),
+                TypeIdentifier::GraphQLID => OutputType::string(),
                 TypeIdentifier::UUID => OutputType::uuid(),
                 TypeIdentifier::Int => OutputType::int(),
                 TypeIdentifier::Relation => unreachable!(), // Scalar fields can't have a Relation type identifier.
@@ -142,8 +142,20 @@ impl<'a> ObjectTypeBuilder<'a> {
 
     /// Builds "many records where" arguments solely based on the given model.
     pub fn many_records_arguments(&self, model: &ModelRef) -> Vec<Argument> {
-        let id_field = model.fields().id();
-        let id_input_type = self.map_optional_input_type(id_field);
+        let model_id = model.identifier();
+
+        // Todo: The following code will change as soon as we support multi-field IDs in some form. For now we assume single field ids.
+        let field = if model_id.len() != 1 {
+            panic!("Multi-field ids are not yet supported.")
+        } else {
+            match model_id.into_iter().last() {
+                Some(prisma_models::Field::Scalar(sf)) => sf,
+                _ => panic!("Relation fields in IDs are not supported."),
+            }
+        };
+
+        let id_input_type = self.map_optional_input_type(field);
+
         vec![
             self.where_argument(&model),
             self.order_by_argument(&model),

@@ -1,5 +1,5 @@
 use connector::QueryArguments;
-use prisma_models::{ManyRecords, RecordIdentifier};
+use prisma_models::{ManyRecords, ModelIdentifier, RecordIdentifier};
 
 #[derive(Debug, Clone)]
 pub enum QueryResult {
@@ -28,6 +28,6 @@ pub struct RecordSelection {
     /// Required for result processing
     pub query_arguments: QueryArguments,
 
-    /// Names of the identifier fields of the contained records.
-    pub id_fields: Vec<String>,
+    /// Model ID that can be used to retrieve the IDs of the contained records.
+    pub model_id: ModelIdentifier,
 }

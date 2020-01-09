@@ -12,7 +12,7 @@ pub trait InputBuilderExtensions {
             TypeIdentifier::Int => InputType::int(),
             TypeIdentifier::Float => InputType::float(),
             TypeIdentifier::Boolean => InputType::boolean(),
-            TypeIdentifier::GraphQLID => InputType::id(),
+            TypeIdentifier::GraphQLID => InputType::string(),
             TypeIdentifier::UUID => InputType::uuid(),
             TypeIdentifier::DateTime => InputType::date_time(),
             TypeIdentifier::Json => InputType::json(),

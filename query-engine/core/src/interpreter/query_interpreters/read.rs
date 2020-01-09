@@ -42,7 +42,7 @@ fn read_one<'conn, 'tx>(
                     fields: query.selection_order,
                     scalars: record.into(),
                     nested,
-                    id_fields: model_id.names_owned(),
+                    model_id,
                     ..Default::default()
                 }))
             }
@@ -50,7 +50,7 @@ fn read_one<'conn, 'tx>(
             None => Ok(QueryResult::RecordSelection(RecordSelection {
                 name: query.name,
                 fields: query.selection_order,
-                id_fields: model_id.names_owned(),
+                model_id,
                 ..Default::default()
             })),
         }
@@ -78,7 +78,7 @@ fn read_many<'a, 'b>(
             name: query.name,
             fields: query.selection_order,
             query_arguments: query.args,
-            id_fields: model_id.names_owned(),
+            model_id,
             scalars,
             nested,
         }))
@@ -113,7 +113,7 @@ fn read_related<'a, 'b>(
             name: query.name,
             fields: query.selection_order,
             query_arguments: query.args,
-            id_fields: model_id.names_owned(),
+            model_id,
             scalars,
             nested,
         }))

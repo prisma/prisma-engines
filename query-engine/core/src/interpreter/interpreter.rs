@@ -41,7 +41,7 @@ impl ExpressionResult {
                 // We always select IDs, the unwraps are safe.
                 QueryResult::RecordSelection(rs) => Some(
                     rs.scalars
-                        .collect_ids(rs.id_field.as_str())
+                        .identifiers(&rs.model_id)
                         .unwrap()
                         .into_iter()
                         .map(|val| val.into())

@@ -4,20 +4,20 @@ use crate::{
     CoreError, CoreResult, QueryResult, RecordSelection,
 };
 use indexmap::IndexMap;
-use prisma_models::{EnumType, EnumValue, GraphqlId, PrismaValue};
+use prisma_models::{EnumType, EnumValue, PrismaValue, RecordIdentifier};
 use rust_decimal::prelude::ToPrimitive;
-use std::{borrow::Borrow, collections::HashMap, convert::TryFrom};
+use std::{borrow::Borrow, collections::HashMap};
 
 /// A grouping of items to their parent record.
 /// The item implicitly holds the information of the type of item contained.
 /// E.g., if the output type of a field designates a single object, the item will be
 /// Item::Map(map), if it's a list, Item::List(list), etc. (hence "checked")
-type CheckedItemsWithParents = IndexMap<Option<GraphqlId>, Item>;
+type CheckedItemsWithParents = IndexMap<Option<RecordIdentifier>, Item>;
 
 /// A grouping of items to their parent record.
 /// As opposed to the checked mapping, this map isn't holding final information about
 /// the contained items, i.e. the Items are all unchecked.
-type UncheckedItemsWithParents = IndexMap<Option<GraphqlId>, Vec<Item>>;
+type UncheckedItemsWithParents = IndexMap<Option<RecordIdentifier>, Vec<Item>>;
 
 /// The query validation makes sure that the output selection already has the correct shape.
 /// This means that we can make the following assumptions:
@@ -151,9 +151,8 @@ fn serialize_objects(mut result: RecordSelection, typ: ObjectTypeStrongRef) -> C
 
     // Write all fields, nested and list fields unordered into a map, afterwards order all into the final order.
     // If nothing is written to the object, write null instead.
-
     for record in result.scalars.records.into_iter() {
-        let record_id = Some(record.collect_id(&scalar_field_names, &result.id_field)?);
+        let record_id = Some(record.identifier(&scalar_field_names, &result.model_id)?);
 
         if !object_mapping.contains_key(&record.parent_id) {
             object_mapping.insert(record.parent_id.clone(), Vec::new());
@@ -174,10 +173,13 @@ fn serialize_objects(mut result: RecordSelection, typ: ObjectTypeStrongRef) -> C
         // Write nested results
         write_nested_items(&record_id, &mut nested_mapping, &mut object, &typ);
 
-        let map = result.fields.iter().fold(Map::with_capacity(result.fields.len()), |mut acc, field_name| {
-            acc.insert(field_name.to_owned(), object.remove(field_name).unwrap());
-            acc
-        });
+        let map = result
+            .fields
+            .iter()
+            .fold(Map::with_capacity(result.fields.len()), |mut acc, field_name| {
+                acc.insert(field_name.to_owned(), object.remove(field_name).unwrap());
+                acc
+            });
 
         // TODO: Find out how to easily determine when a result is null.
         // If the object is null or completely empty, coerce into null instead.
@@ -196,7 +198,7 @@ fn serialize_objects(mut result: RecordSelection, typ: ObjectTypeStrongRef) -> C
 
 /// Unwraps are safe due to query validation.
 fn write_nested_items(
-    record_id: &Option<GraphqlId>,
+    record_id: &Option<RecordIdentifier>,
     items_with_parent: &mut HashMap<String, CheckedItemsWithParents>,
     into: &mut HashMap<String, Item>,
     enclosing_type: &ObjectTypeStrongRef,
@@ -316,9 +318,6 @@ fn serialize_scalar(value: PrismaValue, typ: &OutputTypeRef) -> CoreResult<Item>
 fn convert_prisma_value(value: PrismaValue, st: &ScalarType) -> Result<PrismaValue, CoreError> {
     let item_value = match (st, value) {
         (ScalarType::String, PrismaValue::String(s)) => PrismaValue::String(s),
-
-        (ScalarType::ID, PrismaValue::GraphqlId(id)) => PrismaValue::GraphqlId(id),
-        (ScalarType::ID, val) => PrismaValue::GraphqlId(GraphqlId::try_from(val)?),
 
         (ScalarType::Int, PrismaValue::Float(f)) => PrismaValue::Int(f.to_i64().unwrap()),
         (ScalarType::Int, PrismaValue::Int(i)) => PrismaValue::Int(i),

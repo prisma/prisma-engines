@@ -1,7 +1,7 @@
 use super::*;
 use crate::schema::*;
 use chrono::prelude::*;
-use prisma_models::{GraphqlId, PrismaValue};
+use prisma_models::PrismaValue;
 use rust_decimal::{prelude::FromPrimitive, Decimal};
 use std::{
     collections::{BTreeMap, HashSet},
@@ -187,11 +187,7 @@ impl QueryDocumentParser {
                                                                 None => Err(QueryParserError::ValueParseError(format!("Enum value '{}' is invalid for enum type {}", e, et.name)))
                                                              },
 
-            // Possible ID combinations TODO UUID ids are not encoded in any useful way in the schema.
-            (QueryValue::String(s), ScalarType::ID)       => Self::parse_uuid(s.as_str()).map(PrismaValue::Uuid).or_else(|_| Ok(PrismaValue::String(s))),
-            (QueryValue::Int(i), ScalarType::ID)          => Ok(PrismaValue::GraphqlId(GraphqlId::Int(i as usize))),
-
-            // Remainder of combinations is invalid
+            // All other combinations are invalid.
             (qv, _)                                       => Err(QueryParserError::ValueTypeMismatchError { have: qv, want: InputType::Scalar(scalar_type.clone()) }),
         }
     }

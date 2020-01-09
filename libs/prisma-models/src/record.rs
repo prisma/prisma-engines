@@ -3,7 +3,7 @@ use crate::{DomainError as Error, DomainResult, Field, PrismaValue};
 // Collection of fields of which the primary identifier of a model is composed of.
 // Todo: Currently, this uses arcs, which is not ideal, but also not terrible compared
 // Arcs in the RecordIdentifier.
-#[derive(Clone, Default)]
+#[derive(Debug, Clone, Default)]
 pub struct ModelIdentifier {
     fields: Vec<Field>,
 }
@@ -17,12 +17,12 @@ impl ModelIdentifier {
         self.fields.iter().map(|field| field.name()).collect()
     }
 
-    pub fn names_owned(&self) -> Vec<String> {
-        self.fields.iter().map(|field| field.name().to_owned()).collect()
-    }
-
     pub fn fields(&self) -> &[Field] {
         &self.fields
+    }
+
+    pub fn len(&self) -> usize {
+        self.fields.len()
     }
 }
 
