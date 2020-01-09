@@ -1,4 +1,4 @@
-use crate::{AsColumn, AsTable, InlineRelation, Relation, RelationField, RelationSide};
+use crate::{AsColumn, AsTable, InlineRelation, Relation, RelationField, RelationLinkManifestation, RelationSide};
 use quaint::ast::{Column, Table};
 
 pub trait RelationExt {
@@ -60,14 +60,12 @@ impl AsTable for Relation {
     /// - A separate relation table for all relations, if using the deprecated
     ///   data model syntax.
     fn as_table(&self) -> Table<'static> {
-        use crate::RelationLinkManifestation::*;
-
         match self.manifestation {
-            Some(RelationTable(ref m)) => {
+            Some(RelationLinkManifestation::RelationTable(ref m)) => {
                 let db = self.model_a().internal_data_model().db_name.clone();
                 (db, m.table.clone()).into()
             }
-            Some(Inline(ref m)) => self
+            Some(RelationLinkManifestation::Inline(ref m)) => self
                 .internal_data_model()
                 .find_model(&m.in_table_of_model_name)
                 .unwrap()
@@ -82,11 +80,9 @@ impl AsTable for Relation {
 
 impl RelationExt for Relation {
     fn id_column(&self) -> Option<Column<'static>> {
-        use crate::RelationLinkManifestation::*;
-
         match self.manifestation {
             None => Some("id".into()),
-            Some(RelationTable(ref m)) => m.id_column.as_ref().map(|s| {
+            Some(RelationLinkManifestation::RelationTable(ref m)) => m.id_column.as_ref().map(|s| {
                 let st: String = s.clone();
                 st.into()
             }),
@@ -103,11 +99,9 @@ impl RelationExt for Relation {
 
     #[allow(clippy::if_same_then_else)]
     fn model_a_column(&self) -> Column<'static> {
-        use crate::RelationLinkManifestation::*;
-
         match self.manifestation {
-            Some(RelationTable(ref m)) => m.model_a_column.clone().into(),
-            Some(Inline(ref m)) => {
+            Some(RelationLinkManifestation::RelationTable(ref m)) => m.model_a_column.clone().into(),
+            Some(RelationLinkManifestation::Inline(ref m)) => {
                 let model_a = self.model_a();
                 let model_b = self.model_b();
 
@@ -129,11 +123,9 @@ impl RelationExt for Relation {
 
     #[allow(clippy::if_same_then_else)]
     fn model_b_column(&self) -> Column<'static> {
-        use crate::RelationLinkManifestation::*;
-
         match self.manifestation {
-            Some(RelationTable(ref m)) => m.model_b_column.clone().into(),
-            Some(Inline(ref m)) => {
+            Some(RelationLinkManifestation::RelationTable(ref m)) => m.model_b_column.clone().into(),
+            Some(RelationLinkManifestation::Inline(ref m)) => {
                 let model_b = self.model_b();
 
                 if self.is_self_relation() && (self.field_a().is_hidden || self.field_b().is_hidden) {
