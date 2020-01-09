@@ -2,9 +2,9 @@ mod column;
 mod table;
 
 use crate::*;
-use log::debug;
 use sql_schema_describer::*;
 use table::TableDiffer;
+use tracing::debug;
 
 const MIGRATION_TABLE_NAME: &str = "_Migration";
 

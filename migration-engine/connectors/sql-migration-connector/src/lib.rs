@@ -1,6 +1,3 @@
-#[macro_use]
-extern crate log;
-
 mod error;
 mod sql_database_migration_inferrer;
 mod sql_database_step_applier;
@@ -25,6 +22,7 @@ use sql_destructive_changes_checker::*;
 use sql_migration_persistence::*;
 use sql_schema_describer::SqlSchemaDescriberBackend;
 use std::{fs, path::PathBuf, sync::Arc, time::Duration};
+use tracing::debug;
 
 const CONNECTION_TIMEOUT: Duration = Duration::from_secs(10);
 
