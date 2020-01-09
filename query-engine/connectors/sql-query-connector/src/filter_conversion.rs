@@ -36,16 +36,6 @@ impl Alias {
         }
     }
 
-    /// Decrement the alias as a new copy keeping the same `AliasMode`.
-    pub fn dec(&self) -> Self {
-        let counter = if self.counter == 0 { 0 } else { self.counter - 1 };
-
-        Self {
-            counter,
-            mode: self.mode,
-        }
-    }
-
     /// Flip the alias to a different mode keeping the same nesting count.
     pub fn flip(&self, mode: AliasMode) -> Self {
         Self {
@@ -182,7 +172,7 @@ impl AliasedCondition for RelationFilter {
         let id = self.field.model().fields().id().as_column();
 
         let column = match alias {
-            Some(ref alias) => id.table(alias.dec().to_string(None)),
+            Some(ref alias) => id.table(alias.to_string(None)),
             None => id,
         };
 

@@ -461,6 +461,27 @@ class ExtendedRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase
     result.pathAsJsValue("data") shouldBe """{"genres":[{"GenreId":1}]}""".parseJson
   }
 
+  "3 level filters with a relation filter and a scalar filter" should "work" in {
+    val result = server.query(
+      """{
+        |  artists(where: {
+        |      Albums_some: {
+        |        Tracks_some: {
+        |          Genre: { Name: "Genre1" }
+        |          TrackId: 1
+        |        }
+        |      }
+        |  }){
+        |    ArtistId
+        |  }
+        |}
+        |
+      """.stripMargin,
+      project
+    )
+    result.pathAsJsValue("data") shouldBe """{"artists":[{"ArtistId":1}]}""".parseJson
+  }
+
   "an empty _none filter" should "return all nodes that do have an empty relation" taggedAs (IgnoreMongo) in {
     server.query(query = """{genres(where:{Tracks_none:{}}){Name}}""", project = project).toString should be(
       """{"data":{"genres":[{"Name":"GenreThatIsNotUsed"}]}}""")
