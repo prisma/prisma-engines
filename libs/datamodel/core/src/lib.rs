@@ -97,26 +97,10 @@ fn parse_datamodel_internal(
     ignore_env_var_errors: bool,
 ) -> Result<Datamodel, error::ErrorCollection> {
     let ast = ast::parser::parse(datamodel_string)?;
-
-    let mut errors = error::ErrorCollection::new();
-
-    let sources = match load_sources(&ast, ignore_env_var_errors) {
-        Ok(src) => src,
-        Err(mut err) => {
-            errors.append(&mut err);
-            Vec::new()
-        }
-    };
-
+    let sources = load_sources(&ast, ignore_env_var_errors)?;
     let validator = ValidationPipeline::with_sources(&sources);
 
-    match validator.validate(&ast) {
-        Ok(src) => Ok(src),
-        Err(mut err) => {
-            errors.append(&mut err);
-            Err(errors)
-        }
-    }
+    validator.validate(&ast)
 }
 
 /// Validates a [Schema AST](/ast/struct.SchemaAst.html) and returns its

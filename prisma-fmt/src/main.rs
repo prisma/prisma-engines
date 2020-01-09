@@ -68,24 +68,27 @@ fn main() {
             .read_to_string(&mut datamodel_string)
             .expect("Unable to read from stdin.");
 
-        if let Err(err) = datamodel::parse_datamodel(&datamodel_string) {
-            let errs: Vec<MiniError> = err
-                .errors
-                .iter()
-                .filter(|err: &&DatamodelError| match err {
-                    DatamodelError::EnvironmentFunctionalEvaluationError { var_name: _, span: _ } => !skip_env_errors,
-                    _ => true,
-                })
-                .map(|err: &DatamodelError| MiniError {
-                    start: err.span().start,
-                    end: err.span().end,
-                    text: format!("{}", err),
-                })
-                .collect();
-            let json = serde_json::to_string(&errs).expect("Failed to render JSON");
-            print!("{}", json)
+        let datamodel_result = if skip_env_errors {
+            datamodel::parse_datamodel_and_ignore_env_errors(&datamodel_string)
         } else {
-            print!("[]");
+            datamodel::parse_datamodel(&datamodel_string)
+        };
+
+        match datamodel_result {
+            Err(err) => {
+                let as_mini_errors: Vec<MiniError> = err
+                    .errors
+                    .iter()
+                    .map(|err: &DatamodelError| MiniError {
+                        start: err.span().start,
+                        end: err.span().end,
+                        text: format!("{}", err),
+                    })
+                    .collect();
+                let json = serde_json::to_string(&as_mini_errors).expect("Failed to render JSON");
+                print!("{}", json)
+            }
+            _ => print!("[]"),
         }
 
         std::process::exit(0);
