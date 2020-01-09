@@ -1,10 +1,9 @@
-use crate::{error::SqlError, query_builder::write, QueryExt};
+use crate::{query_builder::write, QueryExt};
 use connector_interface::*;
 use prisma_models::*;
-use quaint::error::Error as QueryError;
 
-pub async fn create_record(conn: &dyn QueryExt, model: &ModelRef, args: WriteArgs) -> crate::Result<RecordIdentifier> {
-    // let (insert, returned_id) = write::create_record(model, args.non_list_args().clone());
+pub async fn create_record(_conn: &dyn QueryExt, model: &ModelRef, args: WriteArgs) -> crate::Result<RecordIdentifier> {
+    let (_insert, _returned_id) = write::create_record(model, args);
 
     // let last_id = match conn.insert(insert).await {
     //     Ok(id) => id,
@@ -44,10 +43,10 @@ pub async fn create_record(conn: &dyn QueryExt, model: &ModelRef, args: WriteArg
 }
 
 pub async fn update_records(
-    conn: &dyn QueryExt,
-    model: &ModelRef,
-    where_: Filter,
-    args: WriteArgs,
+    _conn: &dyn QueryExt,
+    _model: &ModelRef,
+    _where_: Filter,
+    _args: WriteArgs,
 ) -> crate::Result<Vec<RecordIdentifier>> {
     // let ids = conn.filter_ids(model, where_.clone()).await?;
 
@@ -69,7 +68,7 @@ pub async fn update_records(
     todo!()
 }
 
-pub async fn delete_records(conn: &dyn QueryExt, model: &ModelRef, where_: Filter) -> crate::Result<usize> {
+pub async fn delete_records(_conn: &dyn QueryExt, _model: &ModelRef, _where_: Filter) -> crate::Result<usize> {
     // let ids = conn.filter_ids(model, where_.clone()).await?;
     // let ids: Vec<&RecordIdentifier> = ids.iter().map(|id| &*id).collect();
     // let count = ids.len();
@@ -88,10 +87,10 @@ pub async fn delete_records(conn: &dyn QueryExt, model: &ModelRef, where_: Filte
 }
 
 pub async fn connect(
-    conn: &dyn QueryExt,
-    field: &RelationFieldRef,
-    parent_id: &RecordIdentifier,
-    child_ids: &[RecordIdentifier],
+    _conn: &dyn QueryExt,
+    _field: &RelationFieldRef,
+    _parent_id: &RecordIdentifier,
+    _child_ids: &[RecordIdentifier],
 ) -> crate::Result<()> {
     // let query = write::create_relation_table_records(field, parent_id, child_ids);
 
@@ -102,10 +101,10 @@ pub async fn connect(
 }
 
 pub async fn disconnect(
-    conn: &dyn QueryExt,
-    field: &RelationFieldRef,
-    parent_id: &RecordIdentifier,
-    child_ids: &[RecordIdentifier],
+    _conn: &dyn QueryExt,
+    _field: &RelationFieldRef,
+    _parent_id: &RecordIdentifier,
+    _child_ids: &[RecordIdentifier],
 ) -> crate::Result<()> {
     // let query = write::delete_relation_table_records(field, parent_id, child_ids);
 

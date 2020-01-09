@@ -1,4 +1,3 @@
-use super::row::row_value_to_prisma_value;
 use crate::{error::*, AliasedCondition, RawQuery, SqlRow, ToSqlRow};
 use async_trait::async_trait;
 use connector_interface::filter::Filter;

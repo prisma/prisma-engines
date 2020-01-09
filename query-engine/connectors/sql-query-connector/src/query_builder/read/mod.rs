@@ -74,7 +74,7 @@ where
     columns.fold(query.into_select(model), |acc, col| acc.column(col))
 }
 
-pub fn count_by_model(model: &ModelRef, query_arguments: QueryArguments) -> Select<'static> {
+pub fn count_by_model(_model: &ModelRef, _query_arguments: QueryArguments) -> Select<'static> {
     // let id_field = model.fields().id();
 
     // let selected_fields = vec![id_field.as_column()];

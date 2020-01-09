@@ -6,9 +6,7 @@ pub use base_query::*;
 pub use row_number::*;
 pub use union_all::*;
 
-use crate::ordering::Ordering;
-use prisma_models::*;
-use quaint::ast::{Comparable, Conjuctive, Query};
+use quaint::ast::Query;
 
 pub trait ManyRelatedRecordsQueryBuilder {
     const BASE_TABLE_ALIAS: &'static str = "prismaBaseTableAlias";
@@ -17,7 +15,7 @@ pub trait ManyRelatedRecordsQueryBuilder {
 
     fn with_pagination<'a>(base: ManyRelatedRecordsBaseQuery<'a>) -> Query;
 
-    fn without_pagination<'a>(base: ManyRelatedRecordsBaseQuery<'a>) -> Query {
+    fn without_pagination<'a>(_base: ManyRelatedRecordsBaseQuery<'a>) -> Query {
         // let conditions = base
         //     .from_field
         //     .relation_column(true)

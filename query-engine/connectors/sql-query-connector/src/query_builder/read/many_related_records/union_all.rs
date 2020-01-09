@@ -1,13 +1,10 @@
 use super::*;
-use crate::ordering::Ordering;
-use connector_interface::SkipAndLimit;
-use prisma_models::prelude::*;
 use quaint::ast::*;
 
 pub struct ManyRelatedRecordsWithUnionAll;
 
 impl ManyRelatedRecordsQueryBuilder for ManyRelatedRecordsWithUnionAll {
-    fn with_pagination(base: ManyRelatedRecordsBaseQuery) -> Query {
+    fn with_pagination(_base: ManyRelatedRecordsBaseQuery) -> Query {
         // let distinct_ids = {
         //     let mut ids = base.from_record_ids.to_vec();
         //     ids.dedup();

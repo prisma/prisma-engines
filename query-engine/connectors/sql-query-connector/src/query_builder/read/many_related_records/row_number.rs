@@ -1,12 +1,9 @@
 use super::*;
-use crate::ordering::Ordering;
-use prisma_models::prelude::*;
-use quaint::ast::{row_number, Aliasable, Comparable, Conjuctive, Function, Select, Table};
 
 pub struct ManyRelatedRecordsWithRowNumber;
 
 impl ManyRelatedRecordsQueryBuilder for ManyRelatedRecordsWithRowNumber {
-    fn with_pagination(base: ManyRelatedRecordsBaseQuery) -> Query {
+    fn with_pagination(_base: ManyRelatedRecordsBaseQuery) -> Query {
         // let conditions = base
         //     .from_field
         //     .relation_column(true)

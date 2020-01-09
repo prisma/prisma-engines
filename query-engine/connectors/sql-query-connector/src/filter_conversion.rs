@@ -7,7 +7,7 @@ use quaint::ast::*;
 /// in the statement.
 pub enum AliasMode {
     Table,
-    Join,
+    //Join,
 }
 
 impl Default for AliasMode {
@@ -25,6 +25,7 @@ pub struct Alias {
 }
 
 impl Alias {
+/*
     /// Increment the alias as a new copy.
     ///
     /// Use when nesting one level down to a new subquery. `AliasMode` is
@@ -54,12 +55,13 @@ impl Alias {
         }
     }
 
+*/
     /// A string representation of the current alias. The current mode can be
     /// overridden by defining the `mode_override`.
     pub fn to_string(&self, mode_override: Option<AliasMode>) -> String {
         match mode_override.unwrap_or(self.mode) {
             AliasMode::Table => format!("t{}", self.counter),
-            AliasMode::Join => format!("j{}", self.counter),
+            //AliasMode::Join => format!("j{}", self.counter),
         }
     }
 }
@@ -178,7 +180,7 @@ impl AliasedCondition for ScalarFilter {
 
 impl AliasedCondition for RelationFilter {
     /// Conversion from a `RelationFilter` to a query condition tree. Aliased when in a nested `SELECT`.
-    fn aliased_cond(self, alias: Option<Alias>) -> ConditionTree<'static> {
+    fn aliased_cond(self, _alias: Option<Alias>) -> ConditionTree<'static> {
         // Not sure yet how it's supposed to work with multi-field primary ids
         todo!()
         // let id = self.field.model().fields().id().as_column();
@@ -204,7 +206,7 @@ impl AliasedCondition for RelationFilter {
 
 impl AliasedSelect for RelationFilter {
     /// The subselect part of the `RelationFilter` `ConditionTree`.
-    fn aliased_sel(self, alias: Option<Alias>) -> Select<'static> {
+    fn aliased_sel(self, _alias: Option<Alias>) -> Select<'static> {
         // let alias = alias.unwrap_or(Alias::default());
         // let condition = self.condition.clone();
         // let relation = self.field.relation();
@@ -283,7 +285,7 @@ impl AliasedSelect for RelationFilter {
 
 impl AliasedCondition for OneRelationIsNullFilter {
     /// Conversion from a `OneRelationIsNullFilter` to a query condition tree. Aliased when in a nested `SELECT`.
-    fn aliased_cond(self, alias: Option<Alias>) -> ConditionTree<'static> {
+    fn aliased_cond(self, _alias: Option<Alias>) -> ConditionTree<'static> {
         // let alias = alias.map(|a| a.to_string(None));
 
         // let condition = if self.field.relation_is_inlined_in_parent() {

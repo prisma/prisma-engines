@@ -8,7 +8,7 @@ pub struct Ordering;
 
 /// Tooling for generating orderings for different query types.
 impl Ordering {
-    pub fn for_model(model: ModelRef, order_directive: OrderDirections) -> OrderVec<'static> {
+    pub fn for_model(_model: ModelRef, _order_directive: OrderDirections) -> OrderVec<'static> {
         // Self::by_fields(
         //     order_directive
         //         .primary_order_by
@@ -21,6 +21,7 @@ impl Ordering {
         todo!()
     }
 
+    /*
     pub fn internal<C>(second_field: C, order_directive: OrderDirections) -> OrderVec<'static>
     where
         C: Into<Column<'static>>,
@@ -84,4 +85,5 @@ impl Ordering {
             None => vec![],
         }
     }
+    */
 }

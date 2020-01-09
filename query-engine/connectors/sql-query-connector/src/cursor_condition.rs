@@ -1,15 +1,16 @@
 use connector_interface::QueryArguments;
 use prisma_models::*;
 use quaint::ast::*;
-use std::sync::Arc;
 
+/*
 #[derive(Clone, Copy)]
 enum CursorType {
     Before,
     After,
 }
+*/
 
-pub fn build(query_arguments: &QueryArguments, model: ModelRef) -> ConditionTree<'static> {
+pub fn build(_query_arguments: &QueryArguments, _model: ModelRef) -> ConditionTree<'static> {
     // match (
     //     query_arguments.before.as_ref(),
     //     query_arguments.after.as_ref(),

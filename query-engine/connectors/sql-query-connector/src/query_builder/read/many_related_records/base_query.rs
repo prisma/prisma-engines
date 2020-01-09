@@ -1,7 +1,6 @@
-use crate::{cursor_condition, filter_conversion::AliasedCondition};
-use connector_interface::{OrderDirections, QueryArguments, SkipAndLimit};
+use connector_interface::{OrderDirections, SkipAndLimit};
 use prisma_models::prelude::*;
-use quaint::ast::{Aliasable, Column, Comparable, ConditionTree, Joinable, Select};
+use quaint::ast::{Column, ConditionTree, Select};
 
 pub struct ManyRelatedRecordsBaseQuery<'a> {
     pub from_field: &'a RelationFieldRef,
@@ -15,12 +14,13 @@ pub struct ManyRelatedRecordsBaseQuery<'a> {
     pub skip_and_limit: SkipAndLimit,
 }
 
+/*
 impl<'a> ManyRelatedRecordsBaseQuery<'a> {
     pub fn new(
-        from_field: &'a RelationFieldRef,
-        from_record_ids: &'a [GraphqlId],
-        query_arguments: QueryArguments,
-        columns: Vec<Column<'static>>,
+        _from_field: &'a RelationFieldRef,
+        _from_record_ids: &'a [GraphqlId],
+        _query_arguments: QueryArguments,
+        _columns: Vec<Column<'static>>,
     ) -> ManyRelatedRecordsBaseQuery<'a> {
         // let cursor = cursor_condition::build(&query_arguments, from_field.related_model());
         // let window_limits = query_arguments.window_limits();
@@ -69,3 +69,4 @@ impl<'a> ManyRelatedRecordsBaseQuery<'a> {
         todo!()
     }
 }
+*/

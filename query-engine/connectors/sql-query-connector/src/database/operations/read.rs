@@ -1,12 +1,10 @@
 use crate::{
-    query_builder::read::{self, ManyRelatedRecordsBaseQuery, ManyRelatedRecordsQueryBuilder},
+    query_builder::read::{self, ManyRelatedRecordsQueryBuilder},
     QueryExt, SqlError,
 };
 
 use connector_interface::*;
 use prisma_models::*;
-use quaint::ast::*;
-use std::convert::TryFrom;
 
 pub async fn get_single_record(
     conn: &dyn QueryExt,
@@ -51,9 +49,9 @@ pub async fn get_many_records(
 }
 
 pub async fn get_related_records<T>(
-    conn: &dyn QueryExt,
+    _conn: &dyn QueryExt,
     from_field: &RelationFieldRef,
-    from_record_ids: &[RecordIdentifier],
+    _from_record_ids: &[RecordIdentifier],
     query_arguments: QueryArguments,
     selected_fields: &SelectedFields,
 ) -> crate::Result<ManyRecords>
@@ -68,7 +66,7 @@ where
     field_names.push(from_field.related_field().name.clone());
     field_names.push(from_field.name.clone());
 
-    let can_skip_joins = from_field.relation_is_inlined_in_child() && !query_arguments.is_with_pagination();
+    let _can_skip_joins = from_field.relation_is_inlined_in_child() && !query_arguments.is_with_pagination();
     let mut columns: Vec<_> = selected_fields.columns().collect();
 
     columns.extend(
