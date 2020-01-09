@@ -239,8 +239,6 @@ impl AliasedSelect for RelationFilter {
                     .so_that(conditions)
             }
             nested_filter => {
-                let tree = nested_filter.aliased_cond(Some(alias.flip(AliasMode::Join)));
-
                 let id_column = self
                     .field
                     .related_model()
@@ -249,19 +247,33 @@ impl AliasedSelect for RelationFilter {
                     .as_column()
                     .table(alias.to_string(Some(AliasMode::Join)));
 
-                let join = self
-                    .field
-                    .related_model()
-                    .as_table()
-                    .alias(alias.to_string(Some(AliasMode::Join)))
-                    .on(id_column.equals(other_column));
+                let related_table = self.field.related_model().as_table();
 
                 let table = relation.as_table().alias(alias.to_string(Some(AliasMode::Table)));
 
-                Select::from_table(table)
-                    .column(this_column)
-                    .inner_join(join)
-                    .so_that(tree.invert_if(condition.invert_of_subselect()))
+                let would_peform_needless_join = related_table.typ == table.typ && id_column.name == other_column.name;
+
+                if would_peform_needless_join {
+                    // NO JOIN NEEDED
+                    // relation is inlined in this table. No extra join needed.
+                    // this does not work for self relations so we are not performing the optimization for them
+                    let tree = nested_filter.aliased_cond(Some(alias));
+                    let conditions = tree.invert_if(condition.invert_of_subselect());
+                    Select::from_table(relation.as_table().alias(alias.to_string(None)))
+                        .column(this_column)
+                        .so_that(conditions)
+                } else {
+                    // JOIN NEEDED
+                    let join = related_table
+                        .clone()
+                        .alias(alias.to_string(Some(AliasMode::Join)))
+                        .on(id_column.equals(other_column));
+                    let tree = nested_filter.aliased_cond(Some(alias.flip(AliasMode::Join)));
+                    Select::from_table(table)
+                        .column(this_column)
+                        .inner_join(join)
+                        .so_that(tree.clone().invert_if(condition.invert_of_subselect()))
+                }
             }
         }
     }
