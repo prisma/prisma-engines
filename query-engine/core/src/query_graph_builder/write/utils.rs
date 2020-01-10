@@ -3,9 +3,9 @@ use crate::{
     query_graph::{Flow, Node, NodeRef, QueryGraph, QueryGraphDependency},
     ParsedInputValue, QueryGraphBuilderError, QueryGraphBuilderResult,
 };
-use connector::{Filter, QueryArguments, ScalarCompare};
+use connector::{Filter, QueryArguments, ScalarCompare, WriteArgs};
 use itertools::Itertools;
-use prisma_models::{Field, ModelRef, PrismaArgs, PrismaValue, RecordIdentifier, RelationFieldRef, SelectedFields};
+use prisma_models::{Field, ModelRef, RecordIdentifier, RelationFieldRef, SelectedFields};
 use std::{convert::TryInto, sync::Arc};
 
 pub trait IdFilter {
@@ -139,8 +139,7 @@ pub fn update_records_node_placeholder<T>(graph: &mut QueryGraph, filter: T, mod
 where
     T: Into<Filter>,
 {
-    let mut args = PrismaArgs::new();
-
+    let mut args = WriteArgs::new();
     args.update_datetimes(Arc::clone(&model));
 
     let ur = UpdateManyRecords {
@@ -234,7 +233,7 @@ pub fn insert_existing_1to1_related_model_checks(
 
             if let Node::Query(Query::Write(ref mut wq)) = child_node {
                 wq.add_filter(child_id.filter());
-                wq.inject_non_list_arg(relation_field.into(), PrismaValue::Null);
+                wq.inject_field_arg(relation_field.into(), vec![]);
             }
 
             Ok(child_node)

@@ -1,5 +1,5 @@
 use super::*;
-use crate::query_graph_builder::write::write_arguments::WriteArguments;
+use crate::query_graph_builder::write::write_args_parser::*;
 use crate::{
     query_ast::*,
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
@@ -67,7 +67,7 @@ pub fn update_many_records(
 
     let data_argument = field.arguments.lookup("data").unwrap();
     let data_map: ParsedInputMap = data_argument.value.try_into()?;
-    let update_args = WriteArguments::from(&model, data_map)?;
+    let update_args = WriteArgsParser::from(&model, data_map)?;
 
     let mut args = update_args.args;
     args.update_datetimes(Arc::clone(&model));
@@ -88,7 +88,7 @@ pub fn update_record_node<T>(
 where
     T: Into<Filter>,
 {
-    let update_args = WriteArguments::from(&model, data_map)?;
+    let update_args = WriteArgsParser::from(&model, data_map)?;
     let mut args = update_args.args;
 
     args.update_datetimes(Arc::clone(&model));

@@ -7,7 +7,7 @@ use crate::{
 use prisma_models::ModelRef;
 use std::{convert::TryInto, sync::Arc};
 use utils::IdFilter;
-use write_arguments::*;
+use write_args_parser::*;
 
 /// Creates a create record query and adds it to the query graph, together with it's nested queries and companion read query.
 pub fn create_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedField) -> QueryGraphBuilderResult<()> {
@@ -48,13 +48,12 @@ pub fn create_record_node(
     model: ModelRef,
     data_map: ParsedInputMap,
 ) -> QueryGraphBuilderResult<NodeRef> {
-    let create_args = WriteArguments::from(&model, data_map)?;
+    let create_args = WriteArgsParser::from(&model, data_map)?;
     let mut args = create_args.args;
 
     args.add_datetimes(Arc::clone(&model));
 
     let cr = CreateRecord { model, args };
-
     let create_node = graph.create_node(Query::Write(WriteQuery::CreateRecord(cr)));
 
     for (relation_field, data_map) in create_args.nested {

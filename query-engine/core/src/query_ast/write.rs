@@ -1,6 +1,6 @@
 //! Write query AST
 use super::FilteredQuery;
-use connector::filter::Filter;
+use connector::{filter::Filter, WriteArgs};
 use prisma_models::prelude::*;
 
 #[derive(Debug, Clone)]
@@ -16,29 +16,32 @@ pub enum WriteQuery {
 }
 
 impl WriteQuery {
-    pub fn inject_inlined_identifier(&mut self, id: RecordIdentifier) {
-        id.into_iter()
-            .for_each(|(field, value)| self.inject_args(field, vec![value]));
+    pub fn inject_all(&mut self, pairs: Vec<(Field, Vec<PrismaValue>)>) {
+        pairs
+            .into_iter()
+            .for_each(|(field, values)| self.inject_field_arg(field, values));
     }
 
     // Injects PrismaValues into the write arguments based the passed field.
-    // If the underlying representation of the field takes multiple values,
-    pub fn inject_args(&mut self, field: Field, values: Vec<PrismaValue>) {
-        match self {
-            Self::CreateRecord(x) => {
-                x.args.insert(key, value);
-            }
+    // If the underlying representation of the field takes multiple values, a compound field is injected.
+    // If values are missing (e.g. empty vec passed), `PrismaValue::Null`(s) are written instead.
+    pub fn inject_field_arg(&mut self, field: Field, mut values: Vec<PrismaValue>) {
+        let args = match self {
+            Self::CreateRecord(ref mut x) => &mut x.args,
+            Self::UpdateRecord(x) => &mut x.args,
+            Self::UpdateManyRecords(x) => &mut x.args,
 
-            Self::UpdateRecord(x) => {
-                x.args.insert(key, value);
-            }
-
-            Self::UpdateManyRecords(x) => {
-                x.args.insert(key, value);
-            }
-
-            _ => (),
+            _ => return,
         };
+
+        // Todo: The correct behaviour depends on code inflight on master.
+        // (Fields need to be backed by DataSourceFields or similar.)
+        // This allows us to reason over single or multi-value containers.
+        // For now we can only assume singular injects.
+        args.insert(
+            field.name().to_owned(),
+            values.pop().unwrap_or_else(|| PrismaValue::Null),
+        );
     }
 }
 
@@ -86,21 +89,21 @@ impl std::fmt::Display for WriteQuery {
 #[derive(Debug, Clone)]
 pub struct CreateRecord {
     pub model: ModelRef,
-    pub args: PrismaArgs,
+    pub args: WriteArgs,
 }
 
 #[derive(Debug, Clone)]
 pub struct UpdateRecord {
     pub model: ModelRef,
     pub where_: Filter,
-    pub args: PrismaArgs,
+    pub args: WriteArgs,
 }
 
 #[derive(Debug, Clone)]
 pub struct UpdateManyRecords {
     pub model: ModelRef,
     pub filter: Filter,
-    pub args: PrismaArgs,
+    pub args: WriteArgs,
 }
 
 #[derive(Debug, Clone)]
