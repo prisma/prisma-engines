@@ -31,7 +31,7 @@ async fn introspecting_a_one_to_one_req_relation_should_work(api: &TestApi) {
           
             model User {
                id      Int @id
-               post Post? 
+               post Post?
             }
         "#;
     let result = dbg!(api.introspect().await);
@@ -114,6 +114,7 @@ async fn introspecting_a_one_to_one_relation_should_work(api: &TestApi) {
             model User {
                id      Int @id
                post Post? 
+              
             }
         "#;
     let result = dbg!(api.introspect().await);
@@ -179,6 +180,8 @@ async fn introspecting_a_one_to_many_relation_should_work(api: &TestApi) {
             model Post {
                id      Int @id
                user_id User?
+               
+               @@index([user_id], name: "user_id")
             }
             
             model User {
@@ -215,6 +218,8 @@ async fn introspecting_a_one_req_to_many_relation_should_work(api: &TestApi) {
             model Post {
                id      Int @id
                user_id User
+               
+               @@index([user_id], name: "user_id")
             }
             
             model User {
@@ -304,6 +309,9 @@ async fn introspecting_a_many_to_many_relation_should_work(api: &TestApi) {
             model PostsToUsers {
               post_id Post 
               user_id User
+              
+              @@index([post_id], name: "post_id")  
+              @@index([user_id], name: "user_id")
             }
             
             model User {
@@ -351,6 +359,9 @@ async fn introspecting_a_many_to_many_relation_with_extra_fields_should_work(api
               date    DateTime?
               post_id Post 
               user_id User
+              
+              @@index([post_id], name: "post_id")  
+              @@index([user_id], name: "user_id")
             }
             
             model User {
@@ -383,11 +394,14 @@ async fn introspecting_a_self_relation_should_work(api: &TestApi) {
 
     let dm = r#"
             model User {
+                id                             Int @id
                 direct_report                  User?  @relation("UserToUser_direct_report")
-                id      Int @id
                 recruited_by                   User?  @relation("UserToUser_recruited_by")
                 users_UserToUser_direct_report User[] @relation("UserToUser_direct_report")
                 users_UserToUser_recruited_by  User[] @relation("UserToUser_recruited_by")
+                
+                @@index([direct_report], name: "direct_report")  
+                @@index([recruited_by], name: "recruited_by")
             }
         "#;
     let result = dbg!(api.introspect().await);
@@ -420,6 +434,8 @@ async fn introspecting_cascading_delete_behaviour_should_work(api: &TestApi) {
             model Post {
                id      Int @id
                user_id User?
+                 
+               @@index([user_id], name: "user_id")
             }
             
             model User {

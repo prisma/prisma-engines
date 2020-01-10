@@ -36,11 +36,12 @@ pub(crate) fn is_prisma_join_table(table: &Table) -> bool {
         && table.indices[0].tpe == IndexType::Unique
 }
 
-pub(crate) fn is_compound_foreign_key_column(table: &Table, column: &Column) -> bool {
-    match table.foreign_keys.iter().find(|fk| fk.columns.contains(&column.name)) {
-        Some(fk) if fk.columns.len() > 1 => true,
-        _ => false,
-    }
+pub(crate) fn is_foreign_key_column(table: &Table, column: &Column) -> bool {
+    table
+        .foreign_keys
+        .iter()
+        .find(|fk| fk.columns.contains(&column.name))
+        .is_some()
 }
 
 //calculators
@@ -74,6 +75,109 @@ pub fn calculate_many_to_many_field(foreign_key: &ForeignKey, relation_name: Str
         is_generated: false,
         is_updated_at: false,
     }
+}
+
+pub(crate) fn calculate_index(index: &Index) -> IndexDefinition {
+    debug!("Handling index  {:?}", index);
+    let tpe = match index.tpe {
+        IndexType::Unique => datamodel::dml::IndexType::Unique,
+        IndexType::Normal => datamodel::dml::IndexType::Normal,
+    };
+    let index_definition: IndexDefinition = IndexDefinition {
+        name: Some(index.name.clone()),
+        fields: index.columns.clone(),
+        tpe,
+    };
+    index_definition
+}
+
+pub(crate) fn calculate_compound_index(index: &Index, name: String) -> IndexDefinition {
+    debug!("Handling compound index  {:?}", name);
+    IndexDefinition {
+        name: Some(index.name.clone()),
+        fields: vec![name],
+        tpe: datamodel::dml::IndexType::Normal,
+    }
+}
+
+pub(crate) fn calculate_scalar_field(schema: &&SqlSchema, table: &&Table, column: &&Column) -> Field {
+    debug!("Handling column {:?}", column);
+    let field_type = calculate_field_type(&schema, &column, &table);
+    let arity = match column.tpe.arity {
+        ColumnArity::Required => FieldArity::Required,
+        ColumnArity::Nullable => FieldArity::Optional,
+        ColumnArity::List => FieldArity::List,
+    };
+
+    let id_info = calculate_id_info(&column, &table);
+    let default_value = match arity {
+        FieldArity::List => None,
+        _ => column
+            .default
+            .as_ref()
+            .and_then(|default| calculate_default(default, &column.tpe.family)),
+    };
+
+    let is_unique = match id_info {
+        Some(_) => false,
+        None => table.is_column_unique(&column.name),
+    };
+
+    Field {
+        name: column.name.clone(),
+        arity,
+        field_type,
+        database_name: None,
+        default_value,
+        is_unique,
+        id_info,
+        documentation: None,
+        is_generated: false,
+        is_updated_at: false,
+    }
+}
+
+pub(crate) fn calculate_relation_field(schema: &SqlSchema, table: &Table, foreign_key: &ForeignKey) -> Field {
+    debug!("Handling compound foreign key  {:?}", foreign_key);
+    let field_type = FieldType::Relation(RelationInfo {
+        name: calculate_relation_name(schema, foreign_key, table),
+        to: foreign_key.referenced_table.clone(),
+        to_fields: foreign_key.referenced_columns.clone(),
+        on_delete: OnDeleteStrategy::None,
+    });
+
+    let columns: Vec<&Column> = foreign_key
+        .columns
+        .iter()
+        .map(|c| table.columns.iter().find(|tc| tc.name == *c).unwrap())
+        .collect();
+
+    let arity = match columns.iter().find(|c| c.is_required()).is_none() {
+        true => FieldArity::Optional,
+        false => FieldArity::Required,
+    };
+
+    let (name, database_name) = match columns.len() {
+        1 => (columns[0].name.clone(), None),
+        _ => (
+            foreign_key.referenced_table.clone().camel_case(),
+            Some(Compound(columns.iter().map(|c| c.name.clone()).collect())),
+        ),
+    };
+
+    let field = Field {
+        name,
+        arity,
+        field_type,
+        database_name,
+        default_value: None,
+        is_unique: false,
+        id_info: None,
+        documentation: None,
+        is_generated: false,
+        is_updated_at: false,
+    };
+    field
 }
 
 pub(crate) fn calculate_backrelation_field(
@@ -126,105 +230,6 @@ pub(crate) fn calculate_backrelation_field(
         default_value: None,
         is_unique: false,
         id_info: None,
-        documentation: None,
-        is_generated: false,
-        is_updated_at: false,
-    };
-    field
-}
-
-pub(crate) fn calculate_compound_field(schema: &SqlSchema, table: &Table, foreign_key: &ForeignKey) -> Field {
-    debug!("Handling compound foreign key  {:?}", foreign_key);
-    let field_type = FieldType::Relation(RelationInfo {
-        name: calculate_relation_name(schema, foreign_key, table),
-        to: foreign_key.referenced_table.clone(),
-        to_fields: foreign_key.referenced_columns.clone(),
-        on_delete: OnDeleteStrategy::None,
-    });
-    let columns: Vec<&Column> = foreign_key
-        .columns
-        .iter()
-        .map(|c| table.columns.iter().find(|tc| tc.name == *c).unwrap())
-        .collect();
-
-    let arity = match columns.iter().find(|c| c.is_required()).is_none() {
-        true => FieldArity::Optional,
-        false => FieldArity::Required,
-    };
-
-    // todo this at some point needs to be a compound value of the two columns defaults?
-    let default_value = None;
-    let is_unique = false;
-    let name = foreign_key.referenced_table.clone().camel_case();
-    let database_name = Some(Compound(columns.iter().map(|c| c.name.clone()).collect()));
-    let field = Field {
-        name,
-        arity,
-        field_type,
-        database_name,
-        default_value,
-        is_unique,
-        id_info: None,
-        documentation: None,
-        is_generated: false,
-        is_updated_at: false,
-    };
-    field
-}
-
-pub(crate) fn calculate_index(index: &Index) -> IndexDefinition {
-    debug!("Handling index  {:?}", index);
-    let tpe = match index.tpe {
-        IndexType::Unique => datamodel::dml::IndexType::Unique,
-        IndexType::Normal => datamodel::dml::IndexType::Normal,
-    };
-    let index_definition: IndexDefinition = IndexDefinition {
-        name: Some(index.name.clone()),
-        fields: index.columns.clone(),
-        tpe,
-    };
-    index_definition
-}
-
-pub(crate) fn calculate_compound_index(index: &Index, name: String) -> IndexDefinition {
-    debug!("Handling compound index  {:?}", name);
-    IndexDefinition {
-        name: Some(index.name.clone()),
-        fields: vec![name],
-        tpe: datamodel::dml::IndexType::Normal,
-    }
-}
-
-pub(crate) fn calculate_non_compound_field(schema: &&SqlSchema, table: &&Table, column: &&Column) -> Field {
-    debug!("Handling column {:?}", column);
-    let field_type = calculate_field_type(&schema, &column, &table);
-    let arity = match column.tpe.arity {
-        ColumnArity::Required => FieldArity::Required,
-        ColumnArity::Nullable => FieldArity::Optional,
-        ColumnArity::List => FieldArity::List,
-    };
-    let id_info = calculate_id_info(&column, &table);
-    let default_value = match field_type {
-        FieldType::Relation(_) => None,
-        _ if arity == FieldArity::List => None,
-        _ => column
-            .default
-            .as_ref()
-            .and_then(|default| calculate_default(default, &column.tpe.family)),
-    };
-    let is_unique = match field_type {
-        datamodel::dml::FieldType::Relation(..) => false,
-        _ if id_info.is_some() => false,
-        _ => table.is_column_unique(&column.name),
-    };
-    let field = Field {
-        name: column.name.clone(),
-        arity,
-        field_type,
-        database_name: None,
-        default_value,
-        is_unique,
-        id_info,
         documentation: None,
         is_generated: false,
         is_updated_at: false,

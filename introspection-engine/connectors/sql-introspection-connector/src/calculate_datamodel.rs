@@ -22,15 +22,14 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
         for column in table
             .columns
             .iter()
-            .filter(|column| !is_compound_foreign_key_column(&table, &column))
+            .filter(|column| !is_foreign_key_column(&table, &column))
         {
-            let field = calculate_non_compound_field(&schema, &table, &column);
+            let field = calculate_scalar_field(&schema, &table, &column);
             model.add_field(field);
         }
 
-        //add compound fields
-        for foreign_key in table.foreign_keys.iter().filter(|fk| fk.columns.len() > 1) {
-            let field = calculate_compound_field(schema, table, foreign_key);
+        for foreign_key in &table.foreign_keys {
+            let field = calculate_relation_field(schema, table, foreign_key);
             model.add_field(field);
         }
 
@@ -48,10 +47,11 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
 
             let index_to_add = match (fk_on_index, index.columns.len(), index.is_unique()) {
                 (Some(_), _, true) => None, // just make the relation 1:1 and dont print the unique index
-                (None, _, true) => Some(calculate_index(index)),
-                (None, _, false) => Some(calculate_index(index)),
                 (Some(_), 1, false) => Some(calculate_index(index)),
                 (Some(_), _, false) => Some(calculate_compound_index(index, compound_field_name())),
+                (None, 1, true) => None, // this is expressed by the @unique already
+                (None, _, true) => Some(calculate_index(index)),
+                (None, _, false) => Some(calculate_index(index)),
             };
 
             index_to_add.map(|i| model.add_index(i));
