@@ -1,29 +1,60 @@
 use crate::{Field, RelationField, ScalarField, ModelIdentifier};
 use quaint::ast::{Column, Row};
 
+pub struct ColumnIterator {
+    inner: Box<dyn Iterator<Item = Column<'static>> + 'static>,
+}
+
+impl ColumnIterator {
+    pub fn new(inner: impl Iterator<Item = Column<'static>> + 'static) -> Self {
+        Self {
+            inner: Box::new(inner),
+        }
+    }
+}
+
+impl Iterator for ColumnIterator {
+    type Item = Column<'static>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.inner.next()
+    }
+}
+
+impl From<Vec<Column<'static>>> for ColumnIterator {
+    fn from(v: Vec<Column<'static>>) -> Self {
+        Self {
+            inner: Box::new(v.into_iter()),
+        }
+    }
+}
+
 pub trait AsRow {
     fn as_row(&self) -> Row<'static>;
 }
 
 pub trait AsColumns {
-    fn as_columns(&self) -> Vec<Column<'static>>;
+    fn as_columns(&self) -> ColumnIterator;
 }
 
 impl AsColumns for &[Field] {
-    fn as_columns(&self) -> Vec<Column<'static>> {
-        self.into_iter().map(|f| f.as_column()).collect()
+    fn as_columns(&self) -> ColumnIterator {
+        let cols: Vec<Column<'static>> = self.into_iter().map(AsColumn::as_column).collect();
+        ColumnIterator::from(cols)
     }
 }
 
 impl AsColumns for ModelIdentifier {
-    fn as_columns(&self) -> Vec<Column<'static>> {
-        self.fields().as_columns()
+    fn as_columns(&self) -> ColumnIterator {
+        let cols: Vec<Column<'static>> = self.fields().map(AsColumn::as_column).collect();
+        ColumnIterator::from(cols)
     }
 }
 
 impl AsRow for ModelIdentifier {
     fn as_row(&self) -> Row<'static> {
-        Row::from(self.as_columns())
+        let cols: Vec<Column<'static>> = self.as_columns().collect();
+        Row::from(cols)
     }
 }
 
@@ -45,6 +76,7 @@ impl AsColumn for RelationField {
         let model = self.model();
         let internal_data_model = model.internal_data_model();
         let db_name = self.db_name();
+
         let parts = (
             (internal_data_model.db_name.clone(), model.db_name().to_string()),
             db_name.clone(),

@@ -79,7 +79,7 @@ pub trait QueryExt: Queryable + Send + Sync {
     /// Read the all columns as a (primary) identifier.
     async fn filter_ids(&self, model: &ModelRef, filter: Filter) -> crate::Result<Vec<RecordIdentifier>> {
         let model_id = model.identifier();
-        let id_cols = model_id.fields().as_columns();
+        let id_cols: Vec<Column<'static>> = model_id.as_columns().collect();
 
         let select = Select::from_table(model.as_table())
             .columns(id_cols)

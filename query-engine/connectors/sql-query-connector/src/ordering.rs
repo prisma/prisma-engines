@@ -14,7 +14,7 @@ impl Ordering {
                 .primary_order_by
                 .as_ref()
                 .map(|oby| oby.field.as_column()),
-            model.identifier().as_columns(),
+            model.identifier().as_columns().collect(),
             order_directive,
         )
     }

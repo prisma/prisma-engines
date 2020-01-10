@@ -23,4 +23,4 @@ rand = "0.6"
 datamodel = { path = "../datamodel/core" }
 itertools = "0.8"
 rust_decimal = "1.1"
-quaint = { version = "0.1", optional = true, features = ["uuid-0_8"] }
+quaint = { version = "0.1", optional = true, features = ["full"] }

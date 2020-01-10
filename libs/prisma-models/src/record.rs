@@ -27,12 +27,12 @@ impl ModelIdentifier {
         Self { fields }
     }
 
-    pub fn names(&self) -> Vec<&str> {
-        self.fields.iter().map(|field| field.name()).collect()
+    pub fn names<'a>(&'a self) -> impl Iterator<Item = &'a str> + 'a {
+        self.fields.iter().map(|field| field.name())
     }
 
-    pub fn fields(&self) -> &[Field] {
-        &self.fields
+    pub fn fields<'a>(&'a self) -> impl Iterator<Item = &'a Field> + 'a {
+        self.fields.iter()
     }
 
     pub fn len(&self) -> usize {
