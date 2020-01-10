@@ -200,69 +200,46 @@ impl AliasedSelect for RelationFilter {
         let this_column = self.field.relation_column(false).table(alias.to_string(None));
         let other_column = self.field.opposite_column(false).table(alias.to_string(None));
 
-        // Normalize filter tree
-        let compacted = match *self.nested_filter {
-            Filter::And(mut filters) => {
-                if filters.len() == 1 {
-                    filters.pop().unwrap()
-                } else {
-                    Filter::And(filters)
-                }
-            }
-            Filter::Or(mut filters) => {
-                if filters.len() == 1 {
-                    filters.pop().unwrap()
-                } else {
-                    Filter::Or(filters)
-                }
-            }
-            f => f,
-        };
+        let id_column = self
+            .field
+            .related_model()
+            .fields()
+            .id()
+            .as_column()
+            .table(alias.to_string(Some(AliasMode::Join)));
 
-        match compacted {
-            Filter::Relation(filter) => {
-                let sub_condition = filter.condition.clone();
-                let sub_select = filter.aliased_sel(Some(alias.inc(AliasMode::Table)));
+        let related_table = self.field.related_model().as_table();
+        let table = relation.as_table().alias(alias.to_string(Some(AliasMode::Table)));
 
-                let tree: ConditionTree<'static> = match sub_condition {
-                    RelationCondition::EveryRelatedRecord => other_column.not_in_selection(sub_select),
-                    RelationCondition::NoRelatedRecord => other_column.not_in_selection(sub_select),
-                    RelationCondition::AtLeastOneRelatedRecord => other_column.in_selection(sub_select),
-                    RelationCondition::ToOneRelatedRecord => other_column.in_selection(sub_select),
-                }
-                .into();
+        // check whether the join would join the same table and same column
+        // example: `Track` AS `t1` INNER JOIN `Track` AS `j1` ON `j1`.`id` = `t1`.`id`
+        let would_peform_needless_join = table.typ == related_table.typ && id_column.name == other_column.name;
 
-                let conditions = tree.invert_if(condition.invert_of_subselect());
+        if would_peform_needless_join {
+            // Don't do the useless join
+            let conditions = self
+                .nested_filter
+                .aliased_cond(Some(alias))
+                .invert_if(condition.invert_of_subselect());
 
-                Select::from_table(relation.as_table().alias(alias.to_string(None)))
-                    .column(this_column)
-                    .so_that(conditions)
-            }
-            nested_filter => {
-                let tree = nested_filter.aliased_cond(Some(alias.flip(AliasMode::Join)));
+            Select::from_table(relation.as_table().alias(alias.to_string(None)))
+                .column(this_column)
+                .so_that(conditions)
+        } else {
+            let conditions = self
+                .nested_filter
+                .aliased_cond(Some(alias.flip(AliasMode::Join)))
+                .invert_if(condition.invert_of_subselect());
 
-                let id_column = self
-                    .field
-                    .related_model()
-                    .fields()
-                    .id()
-                    .as_column()
-                    .table(alias.to_string(Some(AliasMode::Join)));
+            let join = related_table
+                .clone()
+                .alias(alias.to_string(Some(AliasMode::Join)))
+                .on(id_column.equals(other_column));
 
-                let join = self
-                    .field
-                    .related_model()
-                    .as_table()
-                    .alias(alias.to_string(Some(AliasMode::Join)))
-                    .on(id_column.equals(other_column));
-
-                let table = relation.as_table().alias(alias.to_string(Some(AliasMode::Table)));
-
-                Select::from_table(table)
-                    .column(this_column)
-                    .inner_join(join)
-                    .so_that(tree.invert_if(condition.invert_of_subselect()))
-            }
+            Select::from_table(table)
+                .column(this_column)
+                .inner_join(join)
+                .so_that(conditions)
         }
     }
 }
