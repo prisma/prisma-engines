@@ -200,7 +200,7 @@ pub fn insert_existing_1to1_related_model_checks(
         insert_find_children_by_parent_node(graph, &parent_node, &parent_relation_field, Filter::empty())?;
 
     let update_existing_child = update_records_node_placeholder(graph, Filter::empty(), child_model);
-    let relation_field_name = parent_relation_field.related_field().name.clone();
+    let relation_field = Arc::clone(parent_relation_field);
     let if_node = graph.create_node(Flow::default_if());
 
     graph.create_edge(
@@ -234,7 +234,7 @@ pub fn insert_existing_1to1_related_model_checks(
 
             if let Node::Query(Query::Write(ref mut wq)) = child_node {
                 wq.add_filter(child_id.filter());
-                wq.inject_non_list_arg(relation_field_name, PrismaValue::Null);
+                wq.inject_non_list_arg(relation_field.into(), PrismaValue::Null);
             }
 
             Ok(child_node)

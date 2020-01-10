@@ -4,7 +4,7 @@ use prisma_models::*;
 use quaint::error::Error as QueryError;
 
 pub async fn create_record(conn: &dyn QueryExt, model: &ModelRef, args: WriteArgs) -> crate::Result<RecordIdentifier> {
-    let (insert, returned_id) = write::create_record(model, args.non_list_args().clone());
+    // let (insert, returned_id) = write::create_record(model, args.non_list_args().clone());
 
     // let last_id = match conn.insert(insert).await {
     //     Ok(id) => id,

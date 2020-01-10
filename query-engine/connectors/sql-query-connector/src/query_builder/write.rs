@@ -1,11 +1,12 @@
 use crate::error::SqlError;
+use connector_interface::WriteArgs;
 use prisma_models::*;
 use quaint::ast::*;
 use std::convert::TryFrom;
 
 const PARAMETER_LIMIT: usize = 10000;
 
-pub fn create_record(model: &ModelRef, mut args: PrismaArgs) -> (Insert<'static>, Option<GraphqlId>) {
+pub fn create_record(model: &ModelRef, mut args: WriteArgs) -> (Insert<'static>, Option<GraphqlId>) {
     // let mut id_fields = model.primary_identifier();
     // let return_id = args
     //     .get_field_value(&id_field.name)
@@ -106,7 +107,7 @@ pub fn delete_relation_table_records(
     todo!()
 }
 
-pub fn update_many(model: &ModelRef, ids: &[&GraphqlId], args: &PrismaArgs) -> crate::Result<Vec<Update<'static>>> {
+pub fn update_many(model: &ModelRef, ids: &[&GraphqlId], args: &WriteArgs) -> crate::Result<Vec<Update<'static>>> {
     // if args.args.is_empty() || ids.is_empty() {
     //     return Ok(Vec::new());
     // }

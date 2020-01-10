@@ -16,7 +16,14 @@ pub enum WriteQuery {
 }
 
 impl WriteQuery {
-    pub fn inject_non_list_arg(&mut self, key: String, value: PrismaValue) {
+    pub fn inject_inlined_identifier(&mut self, id: RecordIdentifier) {
+        id.into_iter()
+            .for_each(|(field, value)| self.inject_args(field, vec![value]));
+    }
+
+    // Injects PrismaValues into the write arguments based the passed field.
+    // If the underlying representation of the field takes multiple values,
+    pub fn inject_args(&mut self, field: Field, values: Vec<PrismaValue>) {
         match self {
             Self::CreateRecord(x) => {
                 x.args.insert(key, value);

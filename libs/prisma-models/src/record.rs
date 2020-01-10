@@ -54,6 +54,15 @@ impl RecordIdentifier {
     }
 }
 
+impl IntoIterator for RecordIdentifier {
+    type Item = (Field, PrismaValue);
+    type IntoIter = std::vec::IntoIter<Self::Item>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.pairs.into_iter()
+    }
+}
+
 impl Into<RecordIdentifier> for (Field, PrismaValue) {
     fn into(self) -> RecordIdentifier {
         RecordIdentifier::new(vec![self])
