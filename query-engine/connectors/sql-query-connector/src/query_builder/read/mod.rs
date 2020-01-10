@@ -35,7 +35,7 @@ impl SelectDefinition for QueryArguments {
     fn into_select(self, model: &ModelRef) -> Select<'static> {
         let cursor: ConditionTree = cursor_condition::build(&self, Arc::clone(&model));
         let ordering_directions = self.ordering_directions();
-        let ordering = Ordering::for_model(Arc::clone(&model), ordering_directions);
+        let ordering = Ordering::for_model(&model, ordering_directions);
 
         let filter: ConditionTree = self
             .filter

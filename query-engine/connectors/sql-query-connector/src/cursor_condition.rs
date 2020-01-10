@@ -25,7 +25,11 @@ pub fn build(query_arguments: &QueryArguments, model: ModelRef) -> ConditionTree
             let sort_order: SortOrder = order_by.map(|order| order.sort_order).unwrap_or(SortOrder::Ascending);
 
             let cursor_for = |cursor_type: CursorType, id: &RecordIdentifier| {
-                let id_values = Row::from(id.values().collect::<Vec<PrismaValue>>());
+                let id_values: Row = {
+                    let id_values: Vec<PrismaValue> = id.values().collect();
+                    id_values.into()
+                };
+
                 let model_id = model.identifier();
                 let where_condition = model_id.as_row().equals(id_values.clone());
 
