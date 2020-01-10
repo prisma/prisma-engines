@@ -141,7 +141,10 @@ impl TestApi {
     }
 
     pub(crate) fn unapply_migration<'a>(&'a self) -> UnapplyMigration<'a> {
-        UnapplyMigration { api: &self.api }
+        UnapplyMigration {
+            api: &self.api,
+            force: None,
+        }
     }
 
     pub fn barrel(&self) -> BarrelMigrationExecutor {
