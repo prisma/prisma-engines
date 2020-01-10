@@ -1,7 +1,7 @@
 use super::DirectiveBox;
 use crate::{
     ast,
-    common::value::ValueValidator,
+    common::value_validator::ValueValidator,
     common::ScalarType,
     configuration, dml,
     error::{DatamodelError, ErrorCollection},

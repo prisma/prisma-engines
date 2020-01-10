@@ -1,6 +1,6 @@
 use super::traits::{Source, SourceDefinition};
 use crate::ast;
-use crate::common::argument::Arguments;
+use crate::common::arguments::Arguments;
 use crate::error::{DatamodelError, ErrorCollection};
 use crate::StringFromEnvVar;
 

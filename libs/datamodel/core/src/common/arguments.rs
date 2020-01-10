@@ -1,5 +1,5 @@
 use crate::ast;
-use crate::common::value;
+use crate::common::value_validator;
 use crate::error::{DatamodelError, ErrorCollection};
 use std::collections::HashSet;
 
@@ -57,17 +57,17 @@ impl<'a> Arguments<'a> {
     }
 
     /// Gets the arg with the given name.
-    pub fn arg(&mut self, name: &str) -> Result<value::ValueValidator, DatamodelError> {
+    pub fn arg(&mut self, name: &str) -> Result<value_validator::ValueValidator, DatamodelError> {
         match self.arg_internal(name) {
             None => Err(DatamodelError::new_argument_not_found_error(name, self.span)),
-            Some(arg) => Ok(value::ValueValidator::new(&arg.value)),
+            Some(arg) => Ok(value_validator::ValueValidator::new(&arg.value)),
         }
     }
 
-    pub fn optional_arg(&mut self, name: &str) -> Option<value::ValueValidator> {
+    pub fn optional_arg(&mut self, name: &str) -> Option<value_validator::ValueValidator> {
         match self.arg_internal(name) {
             None => None,
-            Some(arg) => Some(value::ValueValidator::new(&arg.value)),
+            Some(arg) => Some(value_validator::ValueValidator::new(&arg.value)),
         }
     }
 
@@ -86,10 +86,10 @@ impl<'a> Arguments<'a> {
     /// Gets the arg with the given name, or if it is not found, the first unnamed argument.
     ///
     /// Use this to implement unnamed argument behavior.
-    pub fn default_arg(&mut self, name: &str) -> Result<value::ValueValidator, DatamodelError> {
+    pub fn default_arg(&mut self, name: &str) -> Result<value_validator::ValueValidator, DatamodelError> {
         match (self.arg_internal(name), self.arg_internal("")) {
-            (Some(arg), None) => Ok(value::ValueValidator::new(&arg.value)),
-            (None, Some(arg)) => Ok(value::ValueValidator::new(&arg.value)),
+            (Some(arg), None) => Ok(value_validator::ValueValidator::new(&arg.value)),
+            (None, Some(arg)) => Ok(value_validator::ValueValidator::new(&arg.value)),
             (Some(arg), Some(_)) => Err(DatamodelError::new_duplicate_default_argument_error(&name, arg.span)),
             (None, None) => Err(DatamodelError::new_argument_not_found_error(name, self.span)),
         }

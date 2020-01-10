@@ -1,6 +1,6 @@
 use crate::{
     ast,
-    common::{argument::Arguments, value::ValueListValidator},
+    common::{arguments::Arguments, value_validator::ValueListValidator},
     configuration::Generator,
     error::*,
 };

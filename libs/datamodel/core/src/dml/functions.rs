@@ -1,5 +1,5 @@
 use crate::ast;
-use crate::common::value::ValueValidator;
+use crate::common::value_validator::ValueValidator;
 use crate::error::DatamodelError;
 
 //pub trait Function {
