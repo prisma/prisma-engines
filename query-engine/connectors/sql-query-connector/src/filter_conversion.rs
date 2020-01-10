@@ -148,16 +148,8 @@ impl AliasedCondition for ScalarFilter {
             ScalarCondition::LessThanOrEquals(value) => column.less_than_or_equals(value),
             ScalarCondition::GreaterThan(value) => column.greater_than(value),
             ScalarCondition::GreaterThanOrEquals(value) => column.greater_than_or_equals(value),
-            // We need to preserve the split first semantic for protobuf
-            ScalarCondition::In(values) => match values.split_first() {
-                Some((PrismaValue::Null, tail)) if tail.is_empty() => column.is_null(),
-                _ => column.in_selection(values),
-            },
-            // We need to preserve the split first semantic for protobuf
-            ScalarCondition::NotIn(values) => match values.split_first() {
-                Some((PrismaValue::Null, tail)) if tail.is_empty() => column.is_not_null(),
-                _ => column.not_in_selection(values),
-            },
+            ScalarCondition::In(values) => column.in_selection(values),
+            ScalarCondition::NotIn(values) => column.not_in_selection(values),
         };
 
         ConditionTree::single(condition)
