@@ -1,15 +1,11 @@
 use super::assertions::SchemaAssertion;
 use super::{
-    command_helpers::{run_infer_command, InferOutput},
     misc_helpers::{mysql_migration_connector, postgres_migration_connector, sqlite_migration_connector, test_api},
     InferAndApplyOutput,
 };
 use crate::{
     api::{GenericApi, MigrationApi},
-    commands::{
-        ApplyMigrationInput, InferMigrationStepsInput, MigrationStepsResultOutput, UnapplyMigrationInput,
-        UnapplyMigrationOutput,
-    },
+    commands::{ApplyMigrationInput, MigrationStepsResultOutput, UnapplyMigrationInput, UnapplyMigrationOutput},
 };
 use migration_connector::{MigrationPersistence, MigrationStep};
 use quaint::prelude::{ConnectionInfo, Queryable, SqlFamily};
@@ -24,9 +20,6 @@ mod infer_apply;
 pub use apply::Apply;
 pub use infer::Infer;
 pub use infer_apply::InferApply;
-
-/// An atomic counter to generate unique migration IDs in tests.
-static MIGRATION_ID_COUNTER: std::sync::atomic::AtomicUsize = std::sync::atomic::AtomicUsize::new(0);
 
 /// A handle to all the context needed for end-to-end testing of the migration engine across
 /// connectors.
@@ -105,7 +98,7 @@ impl TestApi {
 
     pub fn infer_apply<'a>(&'a self, schema: &'a str) -> InferApply<'a> {
         InferApply {
-            api: self,
+            api: &self.api,
             force: None,
             migration_id: None,
             schema,
@@ -131,10 +124,10 @@ impl TestApi {
             .map_err(|err| self.api.render_error(err))
     }
 
-    pub fn infer<'a>(&'a self, dm: String) -> Infer<'a> {
+    pub fn infer<'a>(&'a self, dm: impl Into<String>) -> Infer<'a> {
         Infer {
-            datamodel: dm,
-            api: self,
+            datamodel: dm.into(),
+            api: &self.api,
             assume_to_be_applied: None,
             migration_id: None,
         }
@@ -142,7 +135,7 @@ impl TestApi {
 
     pub fn apply<'a>(&'a self) -> Apply<'a> {
         Apply {
-            api: self,
+            api: &self.api,
             migration_id: None,
             steps: None,
             force: None,
@@ -154,10 +147,6 @@ impl TestApi {
         input: &ApplyMigrationInput,
     ) -> Result<MigrationStepsResultOutput, anyhow::Error> {
         Ok(self.api.apply_migration(&input).await?)
-    }
-
-    pub async fn run_infer_command(&self, input: InferMigrationStepsInput) -> InferOutput {
-        run_infer_command(&self.api, input).await
     }
 
     pub async fn unapply_migration(&self) -> UnapplyOutput {
