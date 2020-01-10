@@ -7,7 +7,7 @@ use std::marker::PhantomData;
 /// The type parameter is the connector's [DatabaseMigration](trait.MigrationConnector.html#associatedtype.DatabaseMigration)
 /// type.
 #[async_trait::async_trait]
-pub trait DestructiveChangesChecker<T>: Send + Sync + 'static
+pub trait DestructiveChangesChecker<T>: Send + Sync
 where
     T: Send + Sync + 'static,
 {

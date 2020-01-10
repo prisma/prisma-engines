@@ -1,27 +1,26 @@
 use crate::*;
-use std::sync::Arc;
 
 /// Apply and unapply migrations on the connector's database.
 #[async_trait::async_trait]
 pub trait MigrationApplier<T>
 where
-    T: Send + Sync + 'static,
+    T: Send + Sync,
 {
     async fn apply(&self, migration: &Migration, database_migration: &T) -> ConnectorResult<()>;
 
     async fn unapply(&self, migration: &Migration, database_migration: &T) -> ConnectorResult<()>;
 }
 
-pub struct MigrationApplierImpl<T>
+pub struct MigrationApplierImpl<'a, T>
 where
     T: Send + Sync + 'static,
 {
-    pub migration_persistence: Arc<dyn MigrationPersistence>,
-    pub step_applier: Arc<dyn DatabaseMigrationStepApplier<T>>,
+    pub migration_persistence: Box<dyn MigrationPersistence + 'a>,
+    pub step_applier: Box<dyn DatabaseMigrationStepApplier<T> + 'a>,
 }
 
 #[async_trait::async_trait]
-impl<T> MigrationApplier<T> for MigrationApplierImpl<T>
+impl<'a, T> MigrationApplier<T> for MigrationApplierImpl<'a, T>
 where
     T: Send + Sync + 'static,
 {
@@ -72,9 +71,9 @@ where
     }
 }
 
-impl<T> MigrationApplierImpl<T>
+impl<'a, T> MigrationApplierImpl<'a, T>
 where
-    T: Send + Sync + 'static,
+    T: Send + Sync,
 {
     async fn go_forward(
         &self,

@@ -7,7 +7,6 @@ pub use rpc::*;
 
 use crate::{commands::*, migration_engine::MigrationEngine, CoreResult};
 use migration_connector::*;
-use std::sync::Arc;
 use tracing_futures::Instrument;
 
 pub struct MigrationApi<C, D>
@@ -52,7 +51,7 @@ pub trait GenericApi: Send + Sync + 'static {
     async fn migration_progress(&self, input: &MigrationProgressInput) -> CoreResult<MigrationProgressOutput>;
     async fn reset(&self, input: &serde_json::Value) -> CoreResult<serde_json::Value>;
     async fn unapply_migration(&self, input: &UnapplyMigrationInput) -> CoreResult<UnapplyMigrationOutput>;
-    fn migration_persistence(&self) -> Arc<dyn MigrationPersistence>;
+    fn migration_persistence<'a>(&'a self) -> Box<dyn MigrationPersistence + 'a>;
     fn connector_type(&self) -> &'static str;
 
     fn render_error(&self, error: crate::error::Error) -> user_facing_errors::Error {
@@ -130,7 +129,7 @@ where
             .await
     }
 
-    fn migration_persistence(&self) -> Arc<dyn MigrationPersistence> {
+    fn migration_persistence<'a>(&'a self) -> Box<dyn MigrationPersistence + 'a> {
         self.engine.connector().migration_persistence()
     }
 

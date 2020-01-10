@@ -1,25 +1,24 @@
 use crate::{
-    AlterColumn, ConnectionInfo, DropColumn, DropTable, DropTables, SqlError, SqlMigration, SqlMigrationStep,
-    SqlResult, TableChange,
+    AlterColumn, Component, DropColumn, DropTable, DropTables, SqlError, SqlMigration, SqlMigrationStep, SqlResult,
+    TableChange,
 };
 use migration_connector::*;
-use quaint::{
-    ast::*,
-    prelude::{Queryable, SqlFamily},
-};
-use sql_schema_describer::{ColumnArity, SqlSchemaDescriberBackend};
-use std::sync::Arc;
+use quaint::{ast::*, prelude::SqlFamily};
+use sql_schema_describer::ColumnArity;
 
-pub struct SqlDestructiveChangesChecker {
-    pub connection_info: ConnectionInfo,
-    pub schema_name: String,
-    pub database: Arc<dyn Queryable + Send + Sync>,
-    pub database_describer: Arc<dyn SqlSchemaDescriberBackend + Send + Sync + 'static>,
+pub struct SqlDestructiveChangesChecker<'a> {
+    pub connector: &'a crate::SqlMigrationConnector,
 }
 
-impl SqlDestructiveChangesChecker {
+impl Component for SqlDestructiveChangesChecker<'_> {
+    fn connector(&self) -> &crate::SqlMigrationConnector {
+        self.connector
+    }
+}
+
+impl SqlDestructiveChangesChecker<'_> {
     fn is_on_sqlite(&self) -> bool {
-        match self.connection_info.sql_family() {
+        match self.sql_family() {
             SqlFamily::Sqlite => true,
             _ => false,
         }
@@ -30,8 +29,8 @@ impl SqlDestructiveChangesChecker {
         table_name: &str,
         diagnostics: &mut DestructiveChangeDiagnostics,
     ) -> SqlResult<()> {
-        let query = Select::from_table((self.schema_name.as_str(), table_name)).value(count(asterisk()));
-        let result_set = self.database.query(query.into()).await?;
+        let query = Select::from_table((self.schema_name(), table_name)).value(count(asterisk()));
+        let result_set = self.conn().query(query.into()).await?;
         let first_row = result_set.first().ok_or_else(|| {
             SqlError::Generic(anyhow::anyhow!(
                 "No row was returned when checking for existing rows in dropped table."
@@ -57,27 +56,27 @@ impl SqlDestructiveChangesChecker {
     }
 
     async fn count_values_in_column(&self, column_name: &str, table: &sql_schema_describer::Table) -> SqlResult<i64> {
-        let query = Select::from_table((self.schema_name.as_str(), table.name.as_str()))
+        let query = Select::from_table((self.schema_name(), table.name.as_str()))
             .value(count(quaint::ast::Column::new(column_name)))
             .so_that(column_name.is_not_null());
 
-        let values_count: i64 = self
-            .database
-            .query(query.into())
-            .await
-            .map_err(SqlError::from)
-            .and_then(|result_set| {
-                result_set
-                    .first()
-                    .as_ref()
-                    .and_then(|row| row.at(0))
-                    .and_then(|count| count.as_i64())
-                    .ok_or_else(|| {
-                        SqlError::Generic(anyhow::anyhow!(
-                            "Unexpected result set shape when checking dropped columns."
-                        ))
-                    })
-            })?;
+        let values_count: i64 =
+            self.conn()
+                .query(query.into())
+                .await
+                .map_err(SqlError::from)
+                .and_then(|result_set| {
+                    result_set
+                        .first()
+                        .as_ref()
+                        .and_then(|row| row.at(0))
+                        .and_then(|count| count.as_i64())
+                        .ok_or_else(|| {
+                            SqlError::Generic(anyhow::anyhow!(
+                                "Unexpected result set shape when checking dropped columns."
+                            ))
+                        })
+                })?;
 
         Ok(values_count)
     }
@@ -218,10 +217,10 @@ impl SqlDestructiveChangesChecker {
 }
 
 #[async_trait::async_trait]
-impl DestructiveChangesChecker<SqlMigration> for SqlDestructiveChangesChecker {
+impl DestructiveChangesChecker<SqlMigration> for SqlDestructiveChangesChecker<'_> {
     async fn check(&self, database_migration: &SqlMigration) -> ConnectorResult<DestructiveChangeDiagnostics> {
         self.check_impl(database_migration)
             .await
-            .map_err(|sql_error| sql_error.into_connector_error(&self.connection_info))
+            .map_err(|sql_error| sql_error.into_connector_error(&self.connection_info()))
     }
 }
