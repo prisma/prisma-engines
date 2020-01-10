@@ -1,4 +1,4 @@
-use super::MIGRATION_ID_COUNTER;
+use super::super::unique_migration_id;
 use crate::{
     api::GenericApi,
     commands::{ApplyMigrationInput, MigrationStepsResultOutput},
@@ -30,12 +30,7 @@ impl Apply<'_> {
     }
 
     pub async fn send(self) -> Result<MigrationStepsResultOutput, anyhow::Error> {
-        let migration_id = self.migration_id.unwrap_or_else(|| {
-            format!(
-                "migration-{}",
-                MIGRATION_ID_COUNTER.fetch_add(1, std::sync::atomic::Ordering::Relaxed)
-            )
-        });
+        let migration_id = self.migration_id.unwrap_or_else(unique_migration_id);
 
         let input = ApplyMigrationInput {
             migration_id,

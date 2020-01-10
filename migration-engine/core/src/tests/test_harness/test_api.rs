@@ -21,9 +21,6 @@ pub use apply::Apply;
 pub use infer::Infer;
 pub use infer_apply::InferApply;
 
-/// An atomic counter to generate unique migration IDs in tests.
-static MIGRATION_ID_COUNTER: std::sync::atomic::AtomicUsize = std::sync::atomic::AtomicUsize::new(0);
-
 /// A handle to all the context needed for end-to-end testing of the migration engine across
 /// connectors.
 pub struct TestApi {

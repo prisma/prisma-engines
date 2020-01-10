@@ -49,3 +49,13 @@ where
 
     api
 }
+
+pub(crate) fn unique_migration_id() -> String {
+    /// An atomic counter to generate unique migration IDs in tests.
+    static MIGRATION_ID_COUNTER: std::sync::atomic::AtomicUsize = std::sync::atomic::AtomicUsize::new(0);
+
+    format!(
+        "migration-{}",
+        MIGRATION_ID_COUNTER.fetch_add(1, std::sync::atomic::Ordering::Relaxed)
+    )
+}
