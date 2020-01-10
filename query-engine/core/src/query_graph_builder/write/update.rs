@@ -5,9 +5,10 @@ use crate::{
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
     ArgumentListLookup, InputAssertions, ParsedField, ParsedInputMap, ReadOneRecordBuilder,
 };
-use connector::{filter::Filter, ScalarCompare};
+use connector::filter::Filter;
 use prisma_models::ModelRef;
 use std::{convert::TryInto, sync::Arc};
+use utils::IdFilter;
 
 /// Creates an update record query and adds it to the query graph, together with it's nested queries and companion read query.
 pub fn update_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedField) -> QueryGraphBuilderResult<()> {
@@ -43,7 +44,7 @@ pub fn update_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedF
             }?;
 
             if let Node::Query(Query::Read(ReadQuery::RecordQuery(ref mut rq))) = node {
-                rq.add_filter(id_field.equals(parent_id));
+                rq.add_filter(parent_id.filter());
             };
 
             Ok(node)
@@ -69,11 +70,9 @@ pub fn update_many_records(
     let update_args = WriteArguments::from(&model, data_map)?;
 
     let mut args = update_args.args;
-
     args.update_datetimes(Arc::clone(&model));
 
     let update_many = WriteQuery::UpdateManyRecords(UpdateManyRecords { model, filter, args });
-
     graph.create_node(Query::Write(update_many));
 
     Ok(())

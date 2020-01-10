@@ -4,7 +4,7 @@ use crate::{
     QueryGraphBuilderError, QueryGraphBuilderResult,
 };
 use prisma_models::RelationFieldRef;
-use std::{convert::TryInto, sync::Arc};
+use std::sync::Arc;
 
 /// Only for many to many relations.
 ///
@@ -63,7 +63,7 @@ pub fn disconnect_records_node(
             }?;
 
             if let Node::Query(Query::Write(WriteQuery::DisconnectRecords(ref mut c))) = child_node {
-                c.parent_id = Some(parent_id.try_into()?);
+                c.parent_id = Some(parent_id);
             }
 
             Ok(child_node)
@@ -90,8 +90,7 @@ pub fn disconnect_records_node(
             }
 
             if let Node::Query(Query::Write(WriteQuery::DisconnectRecords(ref mut c))) = child_node {
-                let child_ids = parent_ids.into_iter().map(|id| id.try_into().unwrap()).collect();
-                c.child_ids = child_ids;
+                c.child_ids = parent_ids;
             }
 
             Ok(child_node)

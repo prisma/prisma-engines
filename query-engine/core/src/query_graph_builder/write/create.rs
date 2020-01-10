@@ -4,9 +4,9 @@ use crate::{
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
     ArgumentListLookup, ParsedField, ParsedInputMap, ReadOneRecordBuilder,
 };
-use connector::ScalarCompare;
 use prisma_models::ModelRef;
 use std::{convert::TryInto, sync::Arc};
+use utils::IdFilter;
 use write_arguments::*;
 
 /// Creates a create record query and adds it to the query graph, together with it's nested queries and companion read query.
@@ -33,7 +33,7 @@ pub fn create_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedF
             }?;
 
             if let Node::Query(Query::Read(ReadQuery::RecordQuery(ref mut rq))) = node {
-                rq.add_filter(id_field.equals(parent_id));
+                rq.add_filter(parent_id.filter());
             };
 
             Ok(node)

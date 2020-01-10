@@ -4,7 +4,7 @@ use crate::{
     QueryGraphBuilderError, QueryGraphBuilderResult,
 };
 use prisma_models::RelationFieldRef;
-use std::{convert::TryInto, sync::Arc};
+use std::sync::Arc;
 
 /// Only for many to many relations.
 ///
@@ -66,7 +66,7 @@ pub fn connect_records_node(
 
             if let Node::Query(Query::Write(WriteQuery::ConnectRecords(ref mut c))) = child_node {
                 let parent_id = parent_ids.pop().unwrap();
-                c.parent_id = Some(parent_id.try_into()?);
+                c.parent_id = Some(parent_id);
             }
 
             Ok(child_node)
@@ -82,13 +82,13 @@ pub fn connect_records_node(
 
             if len != expected_connects {
                 return Err(QueryGraphBuilderError::RecordNotFound(format!(
-                    "Expected {} records to be connected, found {}.",
+                    "Expected {} records to be connected, found only {}.",
                     expected_connects, len,
                 )));
             }
 
             if let Node::Query(Query::Write(WriteQuery::ConnectRecords(ref mut c))) = child_node {
-                c.child_ids = parent_ids.into_iter().map(|id| id.try_into().unwrap()).collect();
+                c.child_ids = parent_ids;
             }
 
             Ok(child_node)

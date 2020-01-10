@@ -4,9 +4,9 @@ use crate::{
     query_graph::{Flow, Node, QueryGraph, QueryGraphDependency},
     ArgumentListLookup, InputAssertions, ParsedField, ParsedInputMap, ReadOneRecordBuilder,
 };
-use connector::ScalarCompare;
 use prisma_models::ModelRef;
 use std::{convert::TryInto, sync::Arc};
+use utils::IdFilter;
 
 pub fn upsert_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedField) -> QueryGraphBuilderResult<()> {
     let where_arg: ParsedInputMap = field.arguments.lookup("where").unwrap().value.try_into()?;
@@ -63,7 +63,7 @@ pub fn upsert_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedF
             }?;
 
             if let Node::Query(Query::Read(ReadQuery::RecordQuery(ref mut rq))) = node {
-                rq.add_filter(id_field.equals(parent_id));
+                rq.add_filter(parent_id.filter());
             };
 
             Ok(node)
@@ -84,7 +84,7 @@ pub fn upsert_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedF
             }?;
 
             if let Node::Query(Query::Read(ReadQuery::RecordQuery(ref mut rq))) = node {
-                rq.add_filter(id_field.equals(parent_id));
+                rq.add_filter(parent_id.filter());
             };
 
             Ok(node)
