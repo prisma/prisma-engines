@@ -174,10 +174,13 @@ fn serialize_objects(mut result: RecordSelection, typ: ObjectTypeStrongRef) -> C
         // Write nested results
         write_nested_items(&record_id, &mut nested_mapping, &mut object, &typ);
 
-        let map = result.fields.iter().fold(Map::with_capacity(result.fields.len()), |mut acc, field_name| {
-            acc.insert(field_name.to_owned(), object.remove(field_name).unwrap());
-            acc
-        });
+        let map = result
+            .fields
+            .iter()
+            .fold(Map::with_capacity(result.fields.len()), |mut acc, field_name| {
+                acc.insert(field_name.to_owned(), object.remove(field_name).unwrap());
+                acc
+            });
 
         // TODO: Find out how to easily determine when a result is null.
         // If the object is null or completely empty, coerce into null instead.
@@ -467,8 +470,8 @@ fn convert_enum_to_item(ev: &EnumValue, et: &EnumType) -> Result<Item, CoreError
 
 fn unwrap_prisma_value(pv: PrismaValue) -> Vec<PrismaValue> {
     match pv {
-        PrismaValue::List(Some(l)) => l,
-        _ => panic!("We want Some lists!"),
+        PrismaValue::List(l) => l,
+        _ => panic!("We want lists!"),
     }
 }
 

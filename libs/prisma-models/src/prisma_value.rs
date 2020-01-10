@@ -12,7 +12,7 @@ use std::{
 };
 use uuid::Uuid;
 
-pub type PrismaListValue = Option<Vec<PrismaValue>>;
+pub type PrismaListValue = Vec<PrismaValue>;
 
 #[derive(Serialize, Debug, PartialEq, Eq, Hash, Clone)]
 #[serde(untagged)]
@@ -163,18 +163,6 @@ impl From<GraphqlId> for PrismaValue {
 impl From<&GraphqlId> for PrismaValue {
     fn from(id: &GraphqlId) -> PrismaValue {
         PrismaValue::GraphqlId(id.clone())
-    }
-}
-
-impl TryFrom<PrismaValue> for PrismaListValue {
-    type Error = DomainError;
-
-    fn try_from(s: PrismaValue) -> DomainResult<PrismaListValue> {
-        match s {
-            PrismaValue::List(l) => Ok(l),
-            PrismaValue::Null => Ok(None),
-            _ => Err(DomainError::ConversionFailure("PrismaValue", "PrismaListValue")),
-        }
     }
 }
 
