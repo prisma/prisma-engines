@@ -103,7 +103,8 @@ case class TestServer() extends PlayJsonExtensions {
 
     val process = pb.start
 
-    Thread.sleep(100) // Offsets process startup latency
+    waitUntilServerIsUp(port)
+
     (port, process)
   }
 
@@ -135,6 +136,33 @@ case class TestServer() extends PlayJsonExtensions {
       QueryEngineResponse(status, buffer.toString)
     } catch {
       case e: Throwable => QueryEngineResponse(999, s"""{"errors": [{"message": "Connection error: $e"}]}""")
+    } finally {
+      con.disconnect()
+    }
+  }
+
+  private def waitUntilServerIsUp(port: Int): Unit = {
+    val sleepTime = 5 // 5ms
+    val maxWaitTime = 2000 // 2s
+    var tryCount = 0
+    while(!isServerUp(port)) {
+      Thread.sleep(sleepTime)
+      if(tryCount * sleepTime > maxWaitTime) {
+        sys.error("TestServer did not start within maximum wait time")
+      }
+      tryCount += 1
+    }
+  }
+
+  private def isServerUp(port: Int): Boolean = {
+    val url = new URL(s"http://127.0.0.1:$port/status")
+    val con = url.openConnection().asInstanceOf[HttpURLConnection]
+    con.setRequestMethod("GET")
+    try {
+      val status = con.getResponseCode
+      status == 200
+    } catch {
+      case e: Throwable => false
     } finally {
       con.disconnect()
     }
