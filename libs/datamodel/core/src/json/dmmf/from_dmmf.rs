@@ -41,6 +41,16 @@ fn model_from_dmmf(model: &Model) -> dml::Model {
     }
 }
 
+//todo
+fn enum_from_dmmf(en: &Enum) -> dml::Enum {
+    dml::Enum {
+        name: en.name.clone(),
+        values: en.values.clone(),
+        database_name: None,
+        documentation: en.documentation.clone(),
+    }
+}
+
 fn field_from_dmmf(field: &Field) -> dml::Field {
     let field_type = get_field_type(field);
     let default_value = default_value_from_serde(&field.default, &field_type);
@@ -152,15 +162,5 @@ fn get_field_arity(is_required: bool, is_list: bool) -> dml::FieldArity {
         (false, true) => dml::FieldArity::List,
         (true, false) => dml::FieldArity::Required,
         (false, false) => dml::FieldArity::Optional,
-    }
-}
-
-//todo
-fn enum_from_dmmf(en: &Enum) -> dml::Enum {
-    dml::Enum {
-        name: en.name.clone(),
-        values: en.values.clone(),
-        database_name: None,
-        documentation: en.documentation.clone(),
     }
 }

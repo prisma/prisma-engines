@@ -294,7 +294,6 @@ async fn compound_foreign_keys_should_work_for_one_to_one_relations_with_separat
     custom_assert(&result, dm);
 }
 
-// the fk indexes are created implicitly on mysql
 #[test_one_connector(connector = "mysql")]
 #[test]
 async fn compound_foreign_keys_should_work_for_one_to_many_relations_with_non_unique_index(api: &TestApi) {
