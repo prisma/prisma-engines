@@ -22,6 +22,16 @@ impl SqlSchemaExt for SqlSchema {
 pub struct SchemaAssertion(pub SqlSchema);
 
 impl SchemaAssertion {
+    pub fn into_schema(self) -> SqlSchema {
+        self.0
+    }
+
+    pub fn assert_equals(self, other: &SqlSchema) -> AssertionResult<Self> {
+        assert_eq!(&self.0, other);
+
+        Ok(self)
+    }
+
     pub fn assert_table<F>(self, table_name: &str, table_assertions: F) -> AssertionResult<Self>
     where
         F: for<'a> FnOnce(TableAssertion<'a>) -> AssertionResult<TableAssertion<'a>>,
@@ -62,6 +72,14 @@ impl<'a> TableAssertion<'a> {
             fk_assertions(ForeignKeyAssertion(fk))?;
         } else {
             anyhow::bail!("Could not find foreign key on {}.{:?}", self.0.name, columns);
+        }
+
+        Ok(self)
+    }
+
+    pub fn assert_does_not_have_column(self, column_name: &str) -> AssertionResult<Self> {
+        if self.0.column(column_name).is_some() {
+            anyhow::bail!("Assertion failed: found column `{}` on `{}`.", column_name, self.0.name);
         }
 
         Ok(self)
@@ -178,6 +196,12 @@ impl<'a> IndexAssertion<'a> {
 
     pub fn assert_is_unique(self) -> AssertionResult<Self> {
         assert_eq!(self.0.tpe, IndexType::Unique);
+
+        Ok(self)
+    }
+
+    pub fn assert_is_not_unique(self) -> AssertionResult<Self> {
+        assert_eq!(self.0.tpe, IndexType::Normal);
 
         Ok(self)
     }

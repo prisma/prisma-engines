@@ -1,3 +1,13 @@
+mod apply;
+mod infer;
+mod infer_apply;
+mod unapply_migration;
+
+pub(crate) use apply::Apply;
+pub(crate) use infer::Infer;
+pub(crate) use infer_apply::InferApply;
+pub(crate) use unapply_migration::UnapplyMigration;
+
 use super::assertions::SchemaAssertion;
 use super::{
     misc_helpers::{mysql_migration_connector, postgres_migration_connector, sqlite_migration_connector, test_api},
@@ -5,21 +15,13 @@ use super::{
 };
 use crate::{
     api::{GenericApi, MigrationApi},
-    commands::{ApplyMigrationInput, MigrationStepsResultOutput, UnapplyMigrationInput, UnapplyMigrationOutput},
+    commands::ApplyMigrationInput,
 };
 use migration_connector::{MigrationPersistence, MigrationStep};
 use quaint::prelude::{ConnectionInfo, Queryable, SqlFamily};
 use sql_schema_describer::*;
 use std::sync::Arc;
 use test_setup::*;
-
-mod apply;
-mod infer;
-mod infer_apply;
-
-pub use apply::Apply;
-pub use infer::Infer;
-pub use infer_apply::InferApply;
 
 /// A handle to all the context needed for end-to-end testing of the migration engine across
 /// connectors.
@@ -133,7 +135,7 @@ impl TestApi {
         }
     }
 
-    pub fn apply<'a>(&'a self) -> Apply<'a> {
+    pub(crate) fn apply<'a>(&'a self) -> Apply<'a> {
         Apply {
             api: &self.api,
             migration_id: None,
@@ -142,19 +144,8 @@ impl TestApi {
         }
     }
 
-    pub async fn apply_migration_with(
-        &self,
-        input: &ApplyMigrationInput,
-    ) -> Result<MigrationStepsResultOutput, anyhow::Error> {
-        Ok(self.api.apply_migration(&input).await?)
-    }
-
-    pub async fn unapply_migration(&self) -> UnapplyOutput {
-        let input = UnapplyMigrationInput {};
-        let output = self.api.unapply_migration(&input).await.unwrap();
-        let sql_schema = self.describe_database().await.unwrap();
-
-        UnapplyOutput { sql_schema, output }
+    pub(crate) fn unapply_migration<'a>(&'a self) -> UnapplyMigration<'a> {
+        UnapplyMigration { api: &self.api }
     }
 
     pub fn barrel(&self) -> BarrelMigrationExecutor {
@@ -350,10 +341,4 @@ async fn run_full_sql(database: &Arc<dyn Queryable + Send + Sync>, full_sql: &st
     for sql in full_sql.split(";").filter(|sql| !sql.is_empty()) {
         database.query_raw(&sql, &[]).await.unwrap();
     }
-}
-
-#[derive(Debug)]
-pub struct UnapplyOutput {
-    pub sql_schema: SqlSchema,
-    pub output: UnapplyMigrationOutput,
 }
