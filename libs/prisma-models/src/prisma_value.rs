@@ -166,18 +166,6 @@ impl From<&GraphqlId> for PrismaValue {
     }
 }
 
-impl TryFrom<PrismaValue> for Option<PrismaListValue> {
-    type Error = DomainError;
-
-    fn try_from(s: PrismaValue) -> DomainResult<Option<PrismaListValue>> {
-        match s {
-            PrismaValue::List(l) => Ok(Some(l)),
-            PrismaValue::Null => Ok(None),
-            _ => Err(DomainError::ConversionFailure("PrismaValue", "PrismaListValue")),
-        }
-    }
-}
-
 impl TryFrom<PrismaValue> for GraphqlId {
     type Error = DomainError;
 

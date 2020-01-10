@@ -4,8 +4,8 @@ use crate::{
     QueryGraphBuilderError, QueryGraphBuilderResult,
 };
 use connector::{filter::Filter, RelationCompare, ScalarCompare};
-use prisma_models::{Field, ModelRef, PrismaListValue, PrismaValue, RelationFieldRef, ScalarFieldRef};
-use std::{collections::BTreeMap, convert::TryFrom, convert::TryInto};
+use prisma_models::{Field, ModelRef, PrismaValue, RelationFieldRef, ScalarFieldRef};
+use std::{collections::BTreeMap, convert::TryInto};
 
 lazy_static! {
     /// Filter operations in descending order of how they should be checked.
@@ -161,22 +161,24 @@ fn handle_scalar_field(
     op: &FilterOp,
 ) -> QueryGraphBuilderResult<Filter> {
     let value: PrismaValue = value.try_into()?;
-    Ok(match op {
-        FilterOp::In => field.is_in(Option::<PrismaListValue>::try_from(value)?),
-        FilterOp::NotIn => field.not_in(Option::<PrismaListValue>::try_from(value)?),
-        FilterOp::Not => field.not_equals(value),
-        FilterOp::Lt => field.less_than(value),
-        FilterOp::Lte => field.less_than_or_equals(value),
-        FilterOp::Gt => field.greater_than(value),
-        FilterOp::Gte => field.greater_than_or_equals(value),
-        FilterOp::Contains => field.contains(value),
-        FilterOp::NotContains => field.not_contains(value),
-        FilterOp::StartsWith => field.starts_with(value),
-        FilterOp::NotStartsWith => field.not_starts_with(value),
-        FilterOp::EndsWith => field.ends_with(value),
-        FilterOp::NotEndsWith => field.not_ends_with(value),
-        FilterOp::Field => field.equals(value),
-        _ => unreachable!(),
+    Ok(match (op, value) {
+        (FilterOp::In, PrismaValue::Null) => field.equals(PrismaValue::Null),
+        (FilterOp::In, PrismaValue::List(values)) => field.is_in(values),
+        (FilterOp::NotIn, PrismaValue::Null) => field.not_equals(PrismaValue::Null),
+        (FilterOp::NotIn, PrismaValue::List(values)) => field.not_in(values),
+        (FilterOp::Not, value) => field.not_equals(value),
+        (FilterOp::Lt, value) => field.less_than(value),
+        (FilterOp::Lte, value) => field.less_than_or_equals(value),
+        (FilterOp::Gt, value) => field.greater_than(value),
+        (FilterOp::Gte, value) => field.greater_than_or_equals(value),
+        (FilterOp::Contains, value) => field.contains(value),
+        (FilterOp::NotContains, value) => field.not_contains(value),
+        (FilterOp::StartsWith, value) => field.starts_with(value),
+        (FilterOp::NotStartsWith, value) => field.not_starts_with(value),
+        (FilterOp::EndsWith, value) => field.ends_with(value),
+        (FilterOp::NotEndsWith, value) => field.not_ends_with(value),
+        (FilterOp::Field, value) => field.equals(value),
+        (_, _) => unreachable!(),
     })
 }
 

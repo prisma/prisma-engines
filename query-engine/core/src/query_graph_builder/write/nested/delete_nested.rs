@@ -72,7 +72,7 @@ pub fn connect_nested_delete(
                 }
 
                 if let Node::Query(Query::Write(WriteQuery::DeleteManyRecords(ref mut ur))) = node {
-                    let ids_filter = id_field.is_in(Some(parent_ids));
+                    let ids_filter = id_field.is_in(parent_ids);
                     let new_filter = Filter::and(vec![ur.filter.clone(), ids_filter]);
 
                     ur.filter = new_filter;
@@ -150,7 +150,7 @@ pub fn connect_nested_delete_many(
             &delete_many_node,
             QueryGraphDependency::ParentIds(Box::new(move |mut node, parent_ids| {
                 if let Node::Query(Query::Write(WriteQuery::DeleteManyRecords(ref mut ur))) = node {
-                    let ids_filter = id_field.is_in(Some(parent_ids));
+                    let ids_filter = id_field.is_in(parent_ids);
                     let new_filter = Filter::and(vec![ur.filter.clone(), ids_filter]);
 
                     ur.filter = new_filter;
