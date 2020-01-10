@@ -15,7 +15,7 @@ use super::{
 };
 use crate::{
     api::{GenericApi, MigrationApi},
-    commands::{ApplyMigrationInput, MigrationStepsResultOutput},
+    commands::ApplyMigrationInput,
 };
 use migration_connector::{MigrationPersistence, MigrationStep};
 use quaint::prelude::{ConnectionInfo, Queryable, SqlFamily};
@@ -142,13 +142,6 @@ impl TestApi {
             steps: None,
             force: None,
         }
-    }
-
-    pub async fn apply_migration_with(
-        &self,
-        input: &ApplyMigrationInput,
-    ) -> Result<MigrationStepsResultOutput, anyhow::Error> {
-        Ok(self.api.apply_migration(&input).await?)
     }
 
     pub(crate) fn unapply_migration<'a>(&'a self) -> UnapplyMigration<'a> {
