@@ -1,3 +1,4 @@
+mod component;
 mod error;
 mod sql_database_migration_inferrer;
 mod sql_database_step_applier;
@@ -11,6 +12,7 @@ mod sql_schema_differ;
 pub use error::*;
 pub use sql_migration::*;
 
+use component::Component;
 use migration_connector::*;
 use quaint::{
     prelude::{ConnectionInfo, Queryable, SqlFamily},
@@ -47,10 +49,6 @@ pub struct SqlMigrationConnector {
     pub schema_name: String,
     pub database: Arc<dyn Queryable + Send + Sync + 'static>,
     pub database_info: DatabaseInfo,
-    pub migration_persistence: Arc<dyn MigrationPersistence>,
-    pub database_migration_inferrer: Arc<dyn DatabaseMigrationInferrer<SqlMigration>>,
-    pub database_migration_step_applier: Arc<dyn DatabaseMigrationStepApplier<SqlMigration>>,
-    pub destructive_changes_checker: Arc<dyn DestructiveChangesChecker<SqlMigration>>,
     pub database_describer: Arc<dyn SqlSchemaDescriberBackend + Send + Sync + 'static>,
 }
 
@@ -108,38 +106,10 @@ impl SqlMigrationConnector {
             SqlFamily::Sqlite => Arc::new(sql_schema_describer::sqlite::SqlSchemaDescriber::new(Arc::clone(&conn))),
         };
 
-        let migration_persistence = Arc::new(SqlMigrationPersistence {
-            connection_info: connection_info.clone(),
-            connection: Arc::clone(&conn),
-            schema_name: schema_name.clone(),
-        });
-
-        let database_migration_inferrer = Arc::new(SqlDatabaseMigrationInferrer {
-            connection_info: connection_info.clone(),
-            describer: Arc::clone(&describer),
-            schema_name: schema_name.to_string(),
-        });
-
-        let database_migration_step_applier = Arc::new(SqlDatabaseStepApplier {
-            database_info: database_info.clone(),
-            conn: Arc::clone(&conn),
-        });
-
-        let destructive_changes_checker = Arc::new(SqlDestructiveChangesChecker {
-            connection_info: connection_info.clone(),
-            schema_name: schema_name.clone(),
-            database: Arc::clone(&conn),
-            database_describer: describer.clone(),
-        });
-
         Ok(Self {
             database_info,
             schema_name,
-            database: Arc::clone(&conn),
-            migration_persistence,
-            database_migration_inferrer,
-            database_migration_step_applier,
-            destructive_changes_checker,
+            database: conn,
             database_describer: Arc::clone(&describer),
         })
     }
@@ -226,20 +196,20 @@ impl MigrationConnector for SqlMigrationConnector {
         Ok(())
     }
 
-    fn migration_persistence(&self) -> Arc<dyn MigrationPersistence> {
-        Arc::clone(&self.migration_persistence)
+    fn migration_persistence<'a>(&'a self) -> Box<dyn MigrationPersistence + 'a> {
+        Box::new(SqlMigrationPersistence { connector: self })
     }
 
-    fn database_migration_inferrer(&self) -> Arc<dyn DatabaseMigrationInferrer<SqlMigration>> {
-        Arc::clone(&self.database_migration_inferrer)
+    fn database_migration_inferrer<'a>(&'a self) -> Box<dyn DatabaseMigrationInferrer<SqlMigration> + 'a> {
+        Box::new(SqlDatabaseMigrationInferrer { connector: self })
     }
 
-    fn database_migration_step_applier(&self) -> Arc<dyn DatabaseMigrationStepApplier<SqlMigration>> {
-        Arc::clone(&self.database_migration_step_applier)
+    fn database_migration_step_applier<'a>(&'a self) -> Box<dyn DatabaseMigrationStepApplier<SqlMigration> + 'a> {
+        Box::new(SqlDatabaseStepApplier { connector: self })
     }
 
-    fn destructive_changes_checker(&self) -> Arc<dyn DestructiveChangesChecker<SqlMigration>> {
-        Arc::clone(&self.destructive_changes_checker)
+    fn destructive_changes_checker<'a>(&'a self) -> Box<dyn DestructiveChangesChecker<SqlMigration> + 'a> {
+        Box::new(SqlDestructiveChangesChecker { connector: self })
     }
 
     fn deserialize_database_migration(&self, json: serde_json::Value) -> SqlMigration {
