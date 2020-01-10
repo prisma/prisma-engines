@@ -60,11 +60,11 @@ impl<'a> Arguments<'a> {
     pub fn arg(&mut self, name: &str) -> Result<value::ValueValidator, DatamodelError> {
         match self.arg_internal(name) {
             None => Err(DatamodelError::new_argument_not_found_error(name, self.span)),
-            Some(arg) => value::ValueValidator::new(&arg.value),
+            Some(arg) => Ok(value::ValueValidator::new(&arg.value)),
         }
     }
 
-    pub fn optional_arg(&mut self, name: &str) -> Option<Result<value::ValueValidator, DatamodelError>> {
+    pub fn optional_arg(&mut self, name: &str) -> Option<value::ValueValidator> {
         match self.arg_internal(name) {
             None => None,
             Some(arg) => Some(value::ValueValidator::new(&arg.value)),
@@ -88,8 +88,8 @@ impl<'a> Arguments<'a> {
     /// Use this to implement unnamed argument behavior.
     pub fn default_arg(&mut self, name: &str) -> Result<value::ValueValidator, DatamodelError> {
         match (self.arg_internal(name), self.arg_internal("")) {
-            (Some(arg), None) => value::ValueValidator::new(&arg.value),
-            (None, Some(arg)) => value::ValueValidator::new(&arg.value),
+            (Some(arg), None) => Ok(value::ValueValidator::new(&arg.value)),
+            (None, Some(arg)) => Ok(value::ValueValidator::new(&arg.value)),
             (Some(arg), Some(_)) => Err(DatamodelError::new_duplicate_default_argument_error(&name, arg.span)),
             (None, None) => Err(DatamodelError::new_argument_not_found_error(name, self.span)),
         }

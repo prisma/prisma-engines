@@ -108,7 +108,7 @@ trait IndexDirectiveBase<T>: DirectiveValidator<T> {
             tpe: index_type,
         };
         let name = match args.optional_arg("name") {
-            Some(name_arg) => Some(name_arg?.as_str()?),
+            Some(name_arg) => Some(name_arg.as_str()?),
             None => None,
         };
         index_def.name = name;

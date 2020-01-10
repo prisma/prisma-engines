@@ -19,8 +19,8 @@ impl ValueValidator {
     ///
     /// If the value is a function expression, it is evaluated
     /// recursively.
-    pub fn new(value: &ast::Expression) -> Result<ValueValidator, DatamodelError> {
-        Ok(ValueValidator { value: value.clone() })
+    pub fn new(value: &ast::Expression) -> ValueValidator {
+        ValueValidator { value: value.clone() }
     }
 
     /// Creates a new type mismatch error for the
@@ -194,7 +194,7 @@ impl ValueValidator {
                 let mut validators: Vec<ValueValidator> = Vec::new();
 
                 for value in values {
-                    validators.push(ValueValidator::new(value)?);
+                    validators.push(ValueValidator::new(value));
                 }
 
                 Ok(validators)
@@ -211,7 +211,7 @@ impl ValueValidator {
                 Ok(DefaultValue::Expression(ValueGenerator::new(name.to_string(), vec![])?))
             }
             _ => {
-                let x = ValueValidator::new(&self.value)?.as_type(scalar_type)?;
+                let x = ValueValidator::new(&self.value).as_type(scalar_type)?;
                 Ok(DefaultValue::Single(x))
             }
         }

@@ -39,7 +39,7 @@ impl EnvFunction {
         }
 
         let var_wrapped = &args[0];
-        let var_name = ValueValidator::new(var_wrapped)?.as_str()?;
+        let var_name = ValueValidator::new(var_wrapped).as_str()?;
         Ok(Self {
             var_name,
             span: expr.span(),
@@ -56,7 +56,7 @@ impl EnvFunction {
 
     pub fn evaluate(&self) -> Result<ValueValidator, DatamodelError> {
         if let Ok(var) = std::env::var(&self.var_name) {
-            let value_validator = ValueValidator::new(&ast::Expression::StringValue(var, self.span))?;
+            let value_validator = ValueValidator::new(&ast::Expression::StringValue(var, self.span));
             Ok(value_validator)
         } else {
             Err(DatamodelError::new_environment_functional_evaluation_error(

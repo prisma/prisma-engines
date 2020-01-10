@@ -115,7 +115,7 @@ impl LiftAstToDml {
         field.arity = self.lift_field_arity(&ast_field.arity);
 
         if let Some(value) = &ast_field.default_value {
-            let validator = ValueValidator::new(value)?;
+            let validator = ValueValidator::new(value);
 
             if let dml::FieldType::Base(base_type) = &field_type {
                 match validator.as_default_value(*base_type) {
