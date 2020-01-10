@@ -1,4 +1,4 @@
-use super::{TestApi, MIGRATION_ID_COUNTER};
+use super::MIGRATION_ID_COUNTER;
 use crate::{
     api::GenericApi,
     commands::{InferMigrationStepsInput, MigrationStepsResultOutput},
@@ -6,7 +6,7 @@ use crate::{
 use migration_connector::MigrationStep;
 
 pub struct Infer<'a> {
-    pub(super) api: &'a TestApi,
+    pub(super) api: &'a dyn GenericApi,
     pub(super) assume_to_be_applied: Option<Vec<MigrationStep>>,
     pub(super) datamodel: String,
     pub(super) migration_id: Option<String>,
@@ -37,6 +37,6 @@ impl Infer<'_> {
             migration_id,
         };
 
-        Ok(self.api.api.infer_migration_steps(&input).await?)
+        Ok(self.api.infer_migration_steps(&input).await?)
     }
 }

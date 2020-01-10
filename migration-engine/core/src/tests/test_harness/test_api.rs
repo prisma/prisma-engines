@@ -105,7 +105,7 @@ impl TestApi {
 
     pub fn infer_apply<'a>(&'a self, schema: &'a str) -> InferApply<'a> {
         InferApply {
-            api: self,
+            api: &self.api,
             force: None,
             migration_id: None,
             schema,
@@ -134,7 +134,7 @@ impl TestApi {
     pub fn infer<'a>(&'a self, dm: String) -> Infer<'a> {
         Infer {
             datamodel: dm,
-            api: self,
+            api: &self.api,
             assume_to_be_applied: None,
             migration_id: None,
         }
@@ -142,7 +142,7 @@ impl TestApi {
 
     pub fn apply<'a>(&'a self) -> Apply<'a> {
         Apply {
-            api: self,
+            api: &self.api,
             migration_id: None,
             steps: None,
             force: None,

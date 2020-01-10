@@ -1,11 +1,11 @@
-use super::{TestApi, MIGRATION_ID_COUNTER};
+use super::MIGRATION_ID_COUNTER;
 use crate::{
     api::GenericApi,
     commands::{ApplyMigrationInput, InferMigrationStepsInput, MigrationStepsResultOutput},
 };
 
 pub struct InferApply<'a> {
-    pub(super) api: &'a TestApi,
+    pub(super) api: &'a dyn GenericApi,
     pub(super) schema: &'a str,
     pub(super) migration_id: Option<String>,
     pub(super) force: Option<bool>,
@@ -36,7 +36,7 @@ impl<'a> InferApply<'a> {
             assume_to_be_applied: Vec::new(),
         };
 
-        let steps = self.api.run_infer_command(input).await.0.datamodel_steps;
+        let steps = self.api.infer_migration_steps(&input).await?.datamodel_steps;
 
         let input = ApplyMigrationInput {
             migration_id,
@@ -44,7 +44,7 @@ impl<'a> InferApply<'a> {
             force: self.force,
         };
 
-        let migration_output = self.api.api.apply_migration(&input).await?;
+        let migration_output = self.api.apply_migration(&input).await?;
 
         Ok(migration_output)
     }
