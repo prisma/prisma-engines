@@ -1,4 +1,4 @@
-use crate::{ast, configuration, get_builtin_sources, StringFromEnvVar};
+use crate::{ast, configuration, StringFromEnvVar};
 use serde_json;
 
 #[serde(rename_all = "camelCase")]
@@ -40,27 +40,14 @@ fn source_to_json_struct(source: &dyn configuration::Source) -> SourceConfig {
     }
 }
 
-pub fn sources_from_json_value_with_plugins(
-    json: serde_json::Value,
-    source_definitions: Vec<Box<dyn configuration::SourceDefinition>>,
-) -> Vec<Box<dyn configuration::Source + Send + Sync>> {
+pub fn sources_from_json_value(json: serde_json::Value) -> Vec<Box<dyn configuration::Source + Send + Sync>> {
     let json_sources = serde_json::from_value::<Vec<SourceConfig>>(json).expect("Failed to parse JSON");
-    sources_from_vec(json_sources, source_definitions)
+    sources_from_vec(json_sources)
 }
 
-fn sources_from_vec(
-    sources: Vec<SourceConfig>,
-    source_definitions: Vec<Box<dyn configuration::SourceDefinition>>,
-) -> Vec<Box<dyn configuration::Source + Send + Sync>> {
+fn sources_from_vec(sources: Vec<SourceConfig>) -> Vec<Box<dyn configuration::Source + Send + Sync>> {
     let mut res = Vec::new();
-    let mut source_loader = configuration::SourceLoader::new();
-    for source in get_builtin_sources() {
-        source_loader.add_source_definition(source);
-    }
-    for source in source_definitions {
-        source_loader.add_source_definition(source);
-    }
-
+    let source_loader = configuration::SourceLoader::new();
     for source in sources {
         res.push(source_from_json(&source, &source_loader))
     }
@@ -96,7 +83,7 @@ fn source_from_json(
     };
 
     loader
-        .load_source(&ast_source)
+        .load_source(&ast_source, false)
         .expect("Source loading failed.") // Result
         .expect("Source was disabled. That should not be possible.") // Option
 }

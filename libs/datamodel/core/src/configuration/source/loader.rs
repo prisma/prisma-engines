@@ -1,4 +1,7 @@
-use super::traits::{Source, SourceDefinition};
+use super::{
+    builtin::{MySqlSourceDefinition, PostgresSourceDefinition, SqliteSourceDefinition},
+    traits::{Source, SourceDefinition},
+};
 use crate::ast;
 use crate::common::arguments::Arguments;
 use crate::error::{DatamodelError, ErrorCollection};
@@ -13,23 +16,22 @@ impl SourceLoader {
     /// Creates a new, empty source loader.
     pub fn new() -> Self {
         Self {
-            source_declarations: Vec::new(),
+            source_declarations: get_builtin_sources(),
         }
-    }
-
-    /// Adds a source definition to this loader.
-    pub fn add_source_definition(&mut self, source_definition: Box<dyn SourceDefinition>) {
-        self.source_declarations.push(source_definition);
     }
 
     /// Loads all source config blocks form the given AST,
     /// and returns a Source instance for each.
-    pub fn load(&self, ast_schema: &ast::SchemaAst) -> Result<Vec<Box<dyn Source + Send + Sync>>, ErrorCollection> {
+    pub fn load_sources(
+        &self,
+        ast_schema: &ast::SchemaAst,
+        ignore_env_var_errors: bool,
+    ) -> Result<Vec<Box<dyn Source + Send + Sync>>, ErrorCollection> {
         let mut sources: Vec<Box<dyn Source + Send + Sync>> = vec![];
         let mut errors = ErrorCollection::new();
 
         for src in &ast_schema.sources() {
-            match self.load_source(&src) {
+            match self.load_source(&src, ignore_env_var_errors) {
                 Ok(Some(loaded_src)) => sources.push(loaded_src),
                 Ok(None) => { /* Source was disabled. */ }
                 // Lift error to source.
@@ -51,9 +53,14 @@ impl SourceLoader {
     pub fn load_source(
         &self,
         ast_source: &ast::SourceConfig,
+        ignore_env_var_errors: bool,
     ) -> Result<Option<Box<dyn Source + Send + Sync>>, DatamodelError> {
         let mut args = Arguments::new(&ast_source.properties, ast_source.span);
-        let (env_var_for_url, url) = args.arg("url")?.as_str_from_env()?;
+        let (env_var_for_url, url) = match args.arg("url")?.as_str_from_env() {
+            Ok((env_var, url)) => (env_var, url),
+            Err(_) if ignore_env_var_errors => (None, "dummy://url".to_owned()), // the flag is only used by the vs code plugin
+            Err(err) => return Err(err),
+        };
         let provider_arg = args.arg("provider")?;
         let provider = provider_arg.as_str()?;
 
@@ -108,4 +115,12 @@ impl SourceLoader {
             provider_arg.span(),
         ))
     }
+}
+
+fn get_builtin_sources() -> Vec<Box<dyn SourceDefinition>> {
+    vec![
+        Box::new(MySqlSourceDefinition::new()),
+        Box::new(PostgresSourceDefinition::new()),
+        Box::new(SqliteSourceDefinition::new()),
+    ]
 }
