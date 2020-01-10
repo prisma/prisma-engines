@@ -16,6 +16,17 @@ impl InferAndApplyOutput {
     }
 }
 
+pub trait MigrationStepsResultOutputExt {
+    fn sql_migration(&self) -> Vec<SqlMigrationStep>;
+}
+
+impl MigrationStepsResultOutputExt for MigrationStepsResultOutput {
+    fn sql_migration(&self) -> Vec<SqlMigrationStep> {
+        let steps: Vec<PrettySqlMigrationStep> = serde_json::from_value(self.database_steps.clone()).unwrap();
+        steps.into_iter().map(|pretty_step| pretty_step.step).collect()
+    }
+}
+
 #[derive(Debug)]
 pub struct InferOutput(pub MigrationStepsResultOutput);
 

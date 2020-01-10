@@ -1,5 +1,5 @@
 use pretty_assertions::assert_eq;
-use sql_schema_describer::{Column, ForeignKey, PrimaryKey, SqlSchema, Table};
+use sql_schema_describer::{Column, ForeignKey, Index, IndexType, PrimaryKey, SqlSchema, Table};
 
 type AssertionResult<T> = Result<T, anyhow::Error>;
 
@@ -16,6 +16,28 @@ impl SqlSchemaExt for SqlSchema {
                 self.tables.iter().map(|table| &table.name).collect::<Vec<_>>()
             )
         })
+    }
+}
+
+pub struct SchemaAssertion(pub SqlSchema);
+
+impl SchemaAssertion {
+    pub fn assert_table<F>(self, table_name: &str, table_assertions: F) -> AssertionResult<Self>
+    where
+        F: for<'a> FnOnce(TableAssertion<'a>) -> AssertionResult<TableAssertion<'a>>,
+    {
+        let table_result = self.0.table(table_name);
+        let table = table_result.map(TableAssertion).map_err(|_| {
+            anyhow::anyhow!(
+                "assert_table failed. Table {} not found. Tables in database: {:?}",
+                table_name,
+                self.0.tables.iter().map(|table| &table.name).collect::<Vec<_>>()
+            )
+        })?;
+
+        table_assertions(table)?;
+
+        Ok(self)
     }
 }
 
@@ -83,6 +105,29 @@ impl<'a> TableAssertion<'a> {
 
         Ok(self)
     }
+
+    pub fn assert_indexes_count(self, n: usize) -> AssertionResult<Self> {
+        let idx_count = self.0.indices.len();
+        anyhow::ensure!(
+            idx_count == n,
+            anyhow::anyhow!("Expected {} indexes, found {}.", n, idx_count)
+        );
+
+        Ok(self)
+    }
+
+    pub fn assert_index_on_columns<F>(self, columns: &[&str], index_assertions: F) -> AssertionResult<Self>
+    where
+        F: FnOnce(IndexAssertion<'a>) -> AssertionResult<IndexAssertion<'a>>,
+    {
+        if let Some(idx) = self.0.indices.iter().find(|idx| idx.columns == columns) {
+            index_assertions(IndexAssertion(idx))?;
+        } else {
+            anyhow::bail!("Could not find index on {}.{:?}", self.0.name, columns);
+        }
+
+        Ok(self)
+    }
 }
 
 pub struct ColumnAssertion<'a>(&'a Column);
@@ -117,6 +162,22 @@ impl<'a> ForeignKeyAssertion<'a> {
             self.0.referenced_table,
             self.0.referenced_columns,
         );
+
+        Ok(self)
+    }
+}
+
+pub struct IndexAssertion<'a>(&'a Index);
+
+impl<'a> IndexAssertion<'a> {
+    pub fn assert_name(self, name: &str) -> AssertionResult<Self> {
+        assert_eq!(self.0.name, name);
+
+        Ok(self)
+    }
+
+    pub fn assert_is_unique(self) -> AssertionResult<Self> {
+        assert_eq!(self.0.tpe, IndexType::Unique);
 
         Ok(self)
     }

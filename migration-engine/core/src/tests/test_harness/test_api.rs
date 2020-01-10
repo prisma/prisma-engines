@@ -1,3 +1,4 @@
+use super::assertions::SchemaAssertion;
 use super::{
     command_helpers::{run_infer_command, InferOutput},
     misc_helpers::{mysql_migration_connector, postgres_migration_connector, sqlite_migration_connector, test_api},
@@ -30,6 +31,8 @@ static MIGRATION_ID_COUNTER: std::sync::atomic::AtomicUsize = std::sync::atomic:
 /// A handle to all the context needed for end-to-end testing of the migration engine across
 /// connectors.
 pub struct TestApi {
+    /// More precise than SqlFamily.
+    connector_name: &'static str,
     sql_family: SqlFamily,
     database: Arc<dyn Queryable + Send + Sync + 'static>,
     api: MigrationApi<sql_migration_connector::SqlMigrationConnector, sql_migration_connector::SqlMigration>,
@@ -37,6 +40,10 @@ pub struct TestApi {
 }
 
 impl TestApi {
+    pub fn connector_name(&self) -> &str {
+        self.connector_name
+    }
+
     pub fn schema_name(&self) -> &str {
         self.connection_info.as_ref().unwrap().schema_name()
     }
@@ -201,6 +208,12 @@ impl TestApi {
 
         Ok(result)
     }
+
+    pub async fn assert_schema(&self) -> Result<SchemaAssertion, anyhow::Error> {
+        let schema = self.describe_database().await?;
+
+        Ok(SchemaAssertion(schema))
+    }
 }
 
 pub async fn mysql_8_test_api(db_name: &str) -> TestApi {
@@ -209,6 +222,7 @@ pub async fn mysql_8_test_api(db_name: &str) -> TestApi {
     let connector = mysql_migration_connector(&url).await;
 
     TestApi {
+        connector_name: "mysql_8",
         connection_info: Some(connection_info),
         sql_family: SqlFamily::Mysql,
         database: Arc::clone(&connector.database),
@@ -222,6 +236,7 @@ pub async fn mysql_test_api(db_name: &str) -> TestApi {
     let connector = mysql_migration_connector(&url).await;
 
     TestApi {
+        connector_name: "mysql",
         connection_info: Some(connection_info),
         sql_family: SqlFamily::Mysql,
         database: Arc::clone(&connector.database),
@@ -235,6 +250,7 @@ pub async fn mysql_mariadb_test_api(db_name: &str) -> TestApi {
     let connector = mysql_migration_connector(&url).await;
 
     TestApi {
+        connector_name: "mysql_mariadb",
         connection_info: Some(connection_info),
         sql_family: SqlFamily::Mysql,
         database: Arc::clone(&connector.database),
@@ -248,6 +264,7 @@ pub async fn postgres9_test_api(db_name: &str) -> TestApi {
     let connector = postgres_migration_connector(&url).await;
 
     TestApi {
+        connector_name: "postgres9",
         connection_info: Some(connection_info),
         sql_family: SqlFamily::Postgres,
         database: Arc::clone(&connector.database),
@@ -261,6 +278,7 @@ pub async fn postgres_test_api(db_name: &str) -> TestApi {
     let connector = postgres_migration_connector(&url).await;
 
     TestApi {
+        connector_name: "postgres",
         connection_info: Some(connection_info),
         sql_family: SqlFamily::Postgres,
         database: Arc::clone(&connector.database),
@@ -274,6 +292,7 @@ pub async fn postgres11_test_api(db_name: &str) -> TestApi {
     let connector = postgres_migration_connector(&url).await;
 
     TestApi {
+        connector_name: "postgres11",
         connection_info: Some(connection_info),
         sql_family: SqlFamily::Postgres,
         database: Arc::clone(&connector.database),
@@ -287,6 +306,7 @@ pub async fn postgres12_test_api(db_name: &str) -> TestApi {
     let connector = postgres_migration_connector(&url).await;
 
     TestApi {
+        connector_name: "postgres12",
         connection_info: Some(connection_info),
         sql_family: SqlFamily::Postgres,
         database: Arc::clone(&connector.database),
@@ -299,6 +319,7 @@ pub async fn sqlite_test_api(db_name: &str) -> TestApi {
     let connector = sqlite_migration_connector(db_name).await;
 
     TestApi {
+        connector_name: "sqlite",
         connection_info: Some(connection_info),
         sql_family: SqlFamily::Sqlite,
         database: Arc::clone(&connector.database),

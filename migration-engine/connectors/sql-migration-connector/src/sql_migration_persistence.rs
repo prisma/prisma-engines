@@ -7,6 +7,7 @@ use quaint::{
     prelude::{ConnectionInfo, SqlFamily},
 };
 use std::sync::Arc;
+use tracing::debug;
 
 pub struct SqlMigrationPersistence {
     pub connection_info: ConnectionInfo,

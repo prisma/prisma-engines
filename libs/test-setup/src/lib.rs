@@ -12,6 +12,8 @@ pub mod runtime;
 use quaint::{prelude::Queryable, single::Quaint};
 use url::Url;
 
+type AnyError = Box<dyn std::error::Error + Send + Sync>;
+
 const SCHEMA_NAME: &str = "prisma-tests";
 
 pub fn sqlite_test_url(db_name: &str) -> String {
@@ -244,7 +246,7 @@ fn fetch_db_name<'a>(url: &'a Url, default: &'static str) -> &'a str {
     }
 }
 
-pub async fn create_mysql_database(original_url: &Url) -> Result<Quaint, failure::Error> {
+pub async fn create_mysql_database(original_url: &Url) -> Result<Quaint, AnyError> {
     let mut url = original_url.clone();
     url.set_path("");
 
@@ -265,11 +267,12 @@ pub async fn create_mysql_database(original_url: &Url) -> Result<Quaint, failure
     Ok(Quaint::new(original_url.as_str()).await?)
 }
 
-pub async fn create_postgres_database(original_url: &Url) -> Result<Quaint, failure::Error> {
+pub async fn create_postgres_database(original_url: &Url) -> Result<Quaint, AnyError> {
     let mut url = original_url.clone();
-    url.set_path("postgres");
+    url.set_path("/postgres");
 
     let db_name = fetch_db_name(&original_url, "postgres");
+
     let create_stmt = format!("CREATE DATABASE \"{}\"", db_name);
 
     let conn = Quaint::new(url.as_str()).await.unwrap();
