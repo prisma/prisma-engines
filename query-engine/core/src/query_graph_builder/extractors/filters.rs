@@ -162,8 +162,8 @@ fn handle_scalar_field(
 ) -> QueryGraphBuilderResult<Filter> {
     let value: PrismaValue = value.try_into()?;
     Ok(match op {
-        FilterOp::In => field.is_in(PrismaListValue::try_from(value)?),
-        FilterOp::NotIn => field.not_in(PrismaListValue::try_from(value)?),
+        FilterOp::In => field.is_in(Option::<PrismaListValue>::try_from(value)?),
+        FilterOp::NotIn => field.not_in(Option::<PrismaListValue>::try_from(value)?),
         FilterOp::Not => field.not_equals(value),
         FilterOp::Lt => field.less_than(value),
         FilterOp::Lte => field.less_than_or_equals(value),

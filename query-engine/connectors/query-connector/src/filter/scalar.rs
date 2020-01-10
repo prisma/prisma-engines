@@ -1,6 +1,6 @@
 use super::Filter;
 use crate::compare::ScalarCompare;
-use prisma_models::{PrismaValue, ScalarField};
+use prisma_models::{PrismaListValue, PrismaValue, ScalarField};
 use std::sync::Arc;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -23,8 +23,8 @@ pub enum ScalarCondition {
     LessThanOrEquals(PrismaValue),
     GreaterThan(PrismaValue),
     GreaterThanOrEquals(PrismaValue),
-    In(Option<Vec<PrismaValue>>),
-    NotIn(Option<Vec<PrismaValue>>),
+    In(Option<PrismaListValue>),
+    NotIn(Option<PrismaListValue>),
 }
 
 impl ScalarCompare for Arc<ScalarField> {
