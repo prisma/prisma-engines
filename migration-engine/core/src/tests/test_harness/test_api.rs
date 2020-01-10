@@ -1,15 +1,11 @@
 use super::assertions::SchemaAssertion;
 use super::{
-    command_helpers::{run_infer_command, InferOutput},
     misc_helpers::{mysql_migration_connector, postgres_migration_connector, sqlite_migration_connector, test_api},
     InferAndApplyOutput,
 };
 use crate::{
     api::{GenericApi, MigrationApi},
-    commands::{
-        ApplyMigrationInput, InferMigrationStepsInput, MigrationStepsResultOutput, UnapplyMigrationInput,
-        UnapplyMigrationOutput,
-    },
+    commands::{ApplyMigrationInput, MigrationStepsResultOutput, UnapplyMigrationInput, UnapplyMigrationOutput},
 };
 use migration_connector::{MigrationPersistence, MigrationStep};
 use quaint::prelude::{ConnectionInfo, Queryable, SqlFamily};
@@ -131,9 +127,9 @@ impl TestApi {
             .map_err(|err| self.api.render_error(err))
     }
 
-    pub fn infer<'a>(&'a self, dm: String) -> Infer<'a> {
+    pub fn infer<'a>(&'a self, dm: impl Into<String>) -> Infer<'a> {
         Infer {
-            datamodel: dm,
+            datamodel: dm.into(),
             api: &self.api,
             assume_to_be_applied: None,
             migration_id: None,
@@ -154,10 +150,6 @@ impl TestApi {
         input: &ApplyMigrationInput,
     ) -> Result<MigrationStepsResultOutput, anyhow::Error> {
         Ok(self.api.apply_migration(&input).await?)
-    }
-
-    pub async fn run_infer_command(&self, input: InferMigrationStepsInput) -> InferOutput {
-        run_infer_command(&self.api, input).await
     }
 
     pub async fn unapply_migration(&self) -> UnapplyOutput {

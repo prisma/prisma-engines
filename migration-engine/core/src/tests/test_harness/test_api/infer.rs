@@ -13,8 +13,8 @@ pub struct Infer<'a> {
 }
 
 impl Infer<'_> {
-    pub fn migration_id(mut self, migration_id: Option<String>) -> Self {
-        self.migration_id = migration_id;
+    pub fn migration_id(mut self, migration_id: Option<impl Into<String>>) -> Self {
+        self.migration_id = migration_id.map(Into::into);
         self
     }
 
@@ -37,6 +37,13 @@ impl Infer<'_> {
             migration_id,
         };
 
-        Ok(self.api.infer_migration_steps(&input).await?)
+        let output = self.api.infer_migration_steps(&input).await?;
+
+        assert!(
+            output.general_errors.is_empty(),
+            format!("InferMigration returned unexpected errors: {:?}", output.general_errors)
+        );
+
+        Ok(output)
     }
 }

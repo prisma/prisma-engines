@@ -17,13 +17,13 @@ impl<'a> InferApply<'a> {
         self
     }
 
-    pub fn migration_id(mut self, migration_id: Option<String>) -> Self {
-        self.migration_id = migration_id;
+    pub fn migration_id(mut self, migration_id: Option<impl Into<String>>) -> Self {
+        self.migration_id = migration_id.map(Into::into);
         self
     }
 
     pub async fn send(self) -> Result<MigrationStepsResultOutput, anyhow::Error> {
-        let migration_id = self.migration_id.map(String::from).unwrap_or_else(|| {
+        let migration_id = self.migration_id.map(Into::into).unwrap_or_else(|| {
             format!(
                 "migration-{}",
                 MIGRATION_ID_COUNTER.fetch_add(1, std::sync::atomic::Ordering::Relaxed)
