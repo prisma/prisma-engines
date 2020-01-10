@@ -17,6 +17,7 @@ pub fn is_migration_table(table: &Table) -> bool {
 }
 
 pub(crate) fn is_prisma_join_table(table: &Table) -> bool {
+    println!("{:?}", table);
     table.columns.len() == 2
         && table.foreign_keys.len() == 2
         && table.foreign_keys[0].referenced_table < table.foreign_keys[1].referenced_table
@@ -31,9 +32,9 @@ pub(crate) fn is_prisma_join_table(table: &Table) -> bool {
             .iter()
             .find(|column| column.name.to_lowercase() == "b")
             .is_some()
-        && table.indices.len() == 1
-        && table.indices[0].columns.len() == 2
-        && table.indices[0].tpe == IndexType::Unique
+        && table.indices.len() >= 1
+        && table.indices.last().unwrap().columns.len() == 2
+        && table.indices.last().unwrap().tpe == IndexType::Unique
 }
 
 pub(crate) fn is_foreign_key_column(table: &Table, column: &Column) -> bool {
@@ -139,45 +140,57 @@ pub(crate) fn calculate_scalar_field(schema: &&SqlSchema, table: &&Table, column
 
 pub(crate) fn calculate_relation_field(schema: &SqlSchema, table: &Table, foreign_key: &ForeignKey) -> Field {
     debug!("Handling compound foreign key  {:?}", foreign_key);
-    let field_type = FieldType::Relation(RelationInfo {
-        name: calculate_relation_name(schema, foreign_key, table),
-        to: foreign_key.referenced_table.clone(),
-        to_fields: foreign_key.referenced_columns.clone(),
-        on_delete: OnDeleteStrategy::None,
-    });
 
-    let columns: Vec<&Column> = foreign_key
-        .columns
-        .iter()
-        .map(|c| table.columns.iter().find(|tc| tc.name == *c).unwrap())
-        .collect();
+    //todo this ignores relations on id fields of length 1, the problem persists for compound id fields
+    if table.primary_key.is_some()
+        && table.primary_key.as_ref().unwrap().columns == foreign_key.columns
+        && foreign_key.columns.len() == 1
+    {
+        calculate_scalar_field(
+            &schema,
+            &table,
+            &table.columns.iter().find(|c| c.name == foreign_key.columns[0]).unwrap(),
+        )
+    } else {
+        let field_type = FieldType::Relation(RelationInfo {
+            name: calculate_relation_name(schema, foreign_key, table),
+            to: foreign_key.referenced_table.clone(),
+            to_fields: foreign_key.referenced_columns.clone(),
+            on_delete: OnDeleteStrategy::None,
+        });
 
-    let arity = match columns.iter().find(|c| c.is_required()).is_none() {
-        true => FieldArity::Optional,
-        false => FieldArity::Required,
-    };
+        let columns: Vec<&Column> = foreign_key
+            .columns
+            .iter()
+            .map(|c| table.columns.iter().find(|tc| tc.name == *c).unwrap())
+            .collect();
 
-    let (name, database_name) = match columns.len() {
-        1 => (columns[0].name.clone(), None),
-        _ => (
-            foreign_key.referenced_table.clone().camel_case(),
-            Some(Compound(columns.iter().map(|c| c.name.clone()).collect())),
-        ),
-    };
+        let arity = match columns.iter().find(|c| c.is_required()).is_none() {
+            true => FieldArity::Optional,
+            false => FieldArity::Required,
+        };
 
-    let field = Field {
-        name,
-        arity,
-        field_type,
-        database_name,
-        default_value: None,
-        is_unique: false,
-        id_info: None,
-        documentation: None,
-        is_generated: false,
-        is_updated_at: false,
-    };
-    field
+        let (name, database_name) = match columns.len() {
+            1 => (columns[0].name.clone(), None),
+            _ => (
+                foreign_key.referenced_table.clone().camel_case(),
+                Some(Compound(columns.iter().map(|c| c.name.clone()).collect())),
+            ),
+        };
+
+        Field {
+            name,
+            arity,
+            field_type,
+            database_name,
+            default_value: None,
+            is_unique: false,
+            id_info: None,
+            documentation: None,
+            is_generated: false,
+            is_updated_at: false,
+        }
+    }
 }
 
 pub(crate) fn calculate_backrelation_field(

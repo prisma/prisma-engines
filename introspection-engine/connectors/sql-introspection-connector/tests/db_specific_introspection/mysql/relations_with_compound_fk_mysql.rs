@@ -104,6 +104,8 @@ async fn compound_foreign_keys_should_work_for_one_to_many_relations(api: &TestA
             model Post {
                 id      Int                 @id
                 user    User?               @map(["user_id", "user_age"]) @relation(references:[id, age]) 
+                
+                @@index([user], name: "user_id")
             }
 
             model User {
@@ -142,6 +144,8 @@ async fn compound_foreign_keys_should_work_for_required_one_to_many_relations(ap
             model Post {
                 id      Int                 @id
                 user    User               @map(["user_id", "user_age"]) @relation(references:[id, age]) 
+                
+                @@index([user], name: "user_id")
             }
 
             model User {
@@ -181,6 +185,7 @@ async fn compound_foreign_keys_should_work_for_required_self_relations(api: &Tes
                persons  Person[]    @relation("PersonToPerson_partner_id_partner_age")
                
                @@unique([id, age], name: "person_unique")
+               @@index([person], name: "partner_id")
             }
         "#;
     let result = dbg!(api.introspect().await);
@@ -212,6 +217,7 @@ async fn compound_foreign_keys_should_work_for_self_relations(api: &TestApi) {
                persons  Person[]    @relation("PersonToPerson_partner_id_partner_age")
                
                @@unique([id, age], name: "person_unique")
+               @@index([person], name: "partner_id")
             }
         "#;
     let result = dbg!(api.introspect().await);
@@ -243,6 +249,7 @@ async fn compound_foreign_keys_should_work_with_defaults(api: &TestApi) {
                persons  Person[]    @relation("PersonToPerson_partner_id_partner_age")
                
                @@unique([id, age], name: "person_unique")
+               @@index([person], name: "partner_id")
             }
         "#;
     let result = dbg!(api.introspect().await);

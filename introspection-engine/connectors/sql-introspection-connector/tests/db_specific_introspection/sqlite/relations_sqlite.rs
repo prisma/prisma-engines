@@ -354,8 +354,8 @@ async fn introspecting_a_self_relation_should_work(api: &TestApi) {
 
     let dm = r#"
             model User {
-                direct_report                  User?  @relation("UserToUser_direct_report")
                 id                             Int    @id
+                direct_report                  User?  @relation("UserToUser_direct_report")
                 recruited_by                   User?  @relation("UserToUser_recruited_by")
                 users_UserToUser_direct_report User[] @relation("UserToUser_direct_report")
                 users_UserToUser_recruited_by  User[] @relation("UserToUser_recruited_by")
