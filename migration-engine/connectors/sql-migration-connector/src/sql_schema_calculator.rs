@@ -381,9 +381,6 @@ impl FieldExtensions for Field {
                 format!("{}", raw)
             }
             ScalarValue::ConstantLiteral(x) => format!("{}", x), // this represents enum values
-            ScalarValue::Expression(_, _, _) => {
-                unreachable!("expressions must have been filtered out in the preceding pattern match")
-            }
         };
 
         if self.is_id() {
