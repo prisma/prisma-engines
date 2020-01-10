@@ -32,6 +32,12 @@ impl SchemaAssertion {
         Ok(self)
     }
 
+    pub fn assert_ne(self, other: &SqlSchema) -> AssertionResult<Self> {
+        assert_ne!(&self.0, other);
+
+        Ok(self)
+    }
+
     pub fn assert_table<F>(self, table_name: &str, table_assertions: F) -> AssertionResult<Self>
     where
         F: for<'a> FnOnce(TableAssertion<'a>) -> AssertionResult<TableAssertion<'a>>,
