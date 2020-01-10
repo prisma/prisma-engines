@@ -1,5 +1,6 @@
 mod indexes;
 mod mariadb;
+mod sqlite;
 
 use super::test_harness::*;
 use crate::commands::{
@@ -797,84 +798,6 @@ async fn multi_column_unique_in_conjunction_with_custom_column_name_must_work(ap
         .indices
         .iter()
         .find(|i| i.columns == &["custom_field_name", "second_custom_field_name"]);
-    assert!(index.is_some());
-    assert_eq!(index.unwrap().tpe, IndexType::Unique);
-}
-
-#[test_one_connector(connector = "sqlite")]
-async fn sqlite_must_recreate_indexes(api: &TestApi) {
-    // SQLite must go through a complicated migration procedure which requires dropping and recreating indexes. This test checks that.
-    // We run them still against each connector.
-    let dm1 = r#"
-            model A {
-                id Int @id
-                field String @unique
-            }
-        "#;
-    let result = api.infer_and_apply(&dm1).await.sql_schema;
-    let index = result
-        .table_bang("A")
-        .indices
-        .iter()
-        .find(|i| i.columns == vec!["field"]);
-    assert!(index.is_some());
-    assert_eq!(index.unwrap().tpe, IndexType::Unique);
-
-    let dm2 = r#"
-            model A {
-                id    Int    @id
-                field String @unique
-                other String
-            }
-        "#;
-    let result = api.infer_and_apply(&dm2).await.sql_schema;
-    let index = result
-        .table_bang("A")
-        .indices
-        .iter()
-        .find(|i| i.columns == vec!["field"]);
-    assert!(index.is_some());
-    assert_eq!(index.unwrap().tpe, IndexType::Unique);
-}
-
-#[test_one_connector(connector = "sqlite")]
-async fn sqlite_must_recreate_multi_field_indexes(api: &TestApi) {
-    // SQLite must go through a complicated migration procedure which requires dropping and recreating indexes. This test checks that.
-    // We run them still against each connector.
-    let dm1 = r#"
-            model A {
-                id Int @id
-                field String
-                secondField Int
-
-                @@unique([field, secondField])
-            }
-        "#;
-    let result = api.infer_and_apply(&dm1).await.sql_schema;
-    let index = result
-        .table_bang("A")
-        .indices
-        .iter()
-        .find(|i| i.columns == &["field", "secondField"]);
-    assert!(index.is_some());
-    assert_eq!(index.unwrap().tpe, IndexType::Unique);
-
-    let dm2 = r#"
-            model A {
-                id    Int    @id
-                field String
-                secondField Int
-                other String
-
-                @@unique([field, secondField])
-            }
-        "#;
-    let result = api.infer_and_apply(&dm2).await.sql_schema;
-    let index = result
-        .table_bang("A")
-        .indices
-        .iter()
-        .find(|i| i.columns == &["field", "secondField"]);
     assert!(index.is_some());
     assert_eq!(index.unwrap().tpe, IndexType::Unique);
 }
