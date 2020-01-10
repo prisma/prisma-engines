@@ -308,7 +308,6 @@ fn many_to_many_relations() {
             table: format!("_{}", relation_name),
             model_a_column: "A".to_string(),
             model_b_column: "B".to_string(),
-            id_column: None,
         }));
 }
 
@@ -573,7 +572,7 @@ impl RelationAssertions for Relation {
         self
     }
     fn assert_manifestation(&self, manifestation: RelationLinkManifestation) -> &Self {
-        assert_eq!(self.manifestation, Some(manifestation));
+        assert_eq!(self.manifestation, manifestation);
         self
     }
 }
