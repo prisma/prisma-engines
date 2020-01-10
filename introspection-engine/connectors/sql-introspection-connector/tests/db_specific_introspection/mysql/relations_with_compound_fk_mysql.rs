@@ -317,15 +317,15 @@ async fn compound_foreign_keys_should_work_for_one_to_many_relations_with_non_un
 
     let dm = r#"
             model Post {
-                id      Int                 @id @sequence(name: "Post_id_seq", allocationSize: 1, initialValue: 1)
+                id      Int                 @id 
                 user    User               @map(["user_id", "user_age"]) @relation(references:[id, age])
                 
-                @@index(user)
+                @@index([user], name: "user_id")
             }
 
             model User {
                age      Int
-               id       Int                 @id @sequence(name: "Post_id_seq", allocationSize: 1, initialValue: 1)
+               id       Int                 @id
                posts    Post[]
                
                @@unique([id, age], name: "user_unique")

@@ -186,6 +186,15 @@ pub(crate) fn calculate_index(index: &Index) -> IndexDefinition {
     index_definition
 }
 
+pub(crate) fn calculate_compound_index(index: &Index, name: String) -> IndexDefinition {
+    debug!("Handling compound index  {:?}", name);
+    IndexDefinition {
+        name: Some(index.name.clone()),
+        fields: vec![name],
+        tpe: datamodel::dml::IndexType::Normal,
+    }
+}
+
 pub(crate) fn calculate_non_compound_field(schema: &&SqlSchema, table: &&Table, column: &&Column) -> Field {
     debug!("Handling column {:?}", column);
     let field_type = calculate_field_type(&schema, &column, &table);

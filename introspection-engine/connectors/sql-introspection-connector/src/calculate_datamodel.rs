@@ -1,6 +1,7 @@
 use crate::misc_helpers::*;
 use crate::sanitize_datamodel_names::sanitize_datamodel_names;
 use crate::SqlIntrospectionResult;
+use datamodel::DatabaseName::Compound;
 use datamodel::{dml, Datamodel, FieldType, Model};
 use log::debug;
 use sql_schema_describer::*;
@@ -33,21 +34,27 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
             model.add_field(field);
         }
 
-        //do not add compound unique indexes to schema when they cover a foreign key, instead make the relation 1:1
-        for index in table.indices.iter().filter(|i| {
-            table
-                .foreign_keys
-                .iter()
-                .all(|fk| !((fk.columns == i.columns) && i.is_unique()))
-        }) {
-            //todo
-            //covers a compound field
-            //doesnt
+        for index in &table.indices {
+            let fk_on_index = table.foreign_keys.iter().find(|fk| fk.columns == index.columns);
+            let compound_field_name = || {
+                model
+                    .fields
+                    .iter()
+                    .find(|f| f.database_name == Some(Compound(index.columns.clone())))
+                    .unwrap()
+                    .name
+                    .clone()
+            };
 
-            match index.columns.len() {
-                1 if index.is_unique() => (), // they go on the field not the model in the datamodel
-                _ => model.add_index(calculate_index(index)),
-            }
+            let index_to_add = match (fk_on_index, index.columns.len(), index.is_unique()) {
+                (Some(_), _, true) => None, // just make the relation 1:1 and dont print the unique index
+                (None, _, true) => Some(calculate_index(index)),
+                (None, _, false) => Some(calculate_index(index)),
+                (Some(_), 1, false) => Some(calculate_index(index)),
+                (Some(_), _, false) => Some(calculate_compound_index(index, compound_field_name())),
+            };
+
+            index_to_add.map(|i| model.add_index(i));
         }
 
         if table.primary_key_columns().len() > 1 {
