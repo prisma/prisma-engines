@@ -116,6 +116,10 @@ where
                 parent_ids.push((field.clone(), val))
             }
 
+            // ModelIdentifier fields are in the end, we pop them in reverse
+            // order so we should flip them before returning.
+            parent_ids.reverse();
+
             // Relation id is always the second last value. We don't need it
             // here and we don't need it in the record.
             let _ = row.values.pop();
