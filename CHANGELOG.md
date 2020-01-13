@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.1.7
+- Fixing clippy warnings, 2020 edition
+- Add is_* methods to SqlFamily
+- Add item type to the tracing query log
+
 ## v0.1.6
 
 - Loosen up certain vector-taking functions to use `IntoIter`
