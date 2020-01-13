@@ -60,8 +60,8 @@ impl<'schema> SqlSchemaDiffer<'schema> {
             drop_tables: self.drop_tables(),
             create_tables: self.create_tables(),
             alter_tables: self.alter_tables(),
-            create_indexes: self.create_indexes(&alter_indexes),
-            drop_indexes: self.drop_indexes(&alter_indexes).collect(),
+            create_indexes: self.create_indexes(),
+            drop_indexes: self.drop_indexes(),
             alter_indexes,
         }
     }
@@ -175,73 +175,54 @@ impl<'schema> SqlSchemaDiffer<'schema> {
             })
     }
 
-    fn create_indexes(&self, alter_indexes: &[AlterIndex]) -> Vec<CreateIndex> {
-        let mut result = Vec::new();
-        for next_table in &self.next.tables {
-            for index in &next_table.indices {
-                // TODO: must diff index settings
-                let previous_index_opt = self
-                    .previous
-                    .table(&next_table.name)
-                    .ok()
-                    .and_then(|t| t.indices.iter().find(|i| i.name == index.name));
-                let index_was_altered = alter_indexes.iter().any(|altered| altered.index_new_name == index.name);
-                if previous_index_opt.is_none() && !index_was_altered {
-                    let create = CreateIndex {
-                        table: next_table.name.clone(),
-                        index: index.clone(),
-                    };
-                    result.push(create);
-                }
+    fn create_indexes(&self) -> Vec<CreateIndex> {
+        let mut steps = Vec::new();
+
+        for table in self.created_tables() {
+            for index in &table.indices {
+                let create = CreateIndex {
+                    table: table.name.clone(),
+                    index: index.clone(),
+                };
+
+                steps.push(create)
             }
         }
-        result
+
+        for tables in self.table_pairs() {
+            for index in tables.created_indexes() {
+                let create = CreateIndex {
+                    table: tables.next.name.clone(),
+                    index: index.clone(),
+                };
+
+                steps.push(create)
+            }
+        }
+
+        steps
     }
 
-    fn drop_indexes<'a>(&'a self, alter_indexes: &'a [AlterIndex]) -> impl Iterator<Item = DropIndex> + 'a {
-        self.previous.tables.iter().flat_map(move |previous_table| {
-            previous_table.indices.iter().filter_map(move |index| {
-                // TODO: must diff index settings
-                let next_index_opt = self
-                    .next
-                    .table(&previous_table.name)
-                    .ok()
-                    .and_then(|t| t.indices.iter().find(|i| i.name == index.name));
+    fn drop_indexes<'a>(&'a self) -> Vec<DropIndex> {
+        let mut drop_indexes = Vec::new();
 
-                let index_was_altered = alter_indexes.iter().any(|altered| altered.index_name == index.name);
-                let index_was_dropped = next_index_opt.is_none() && !index_was_altered;
-
-                if !index_was_dropped {
-                    return None;
-                }
-
-                // If index covers PK, ignore it
-                let index_covers_pk = match &previous_table.primary_key {
-                    None => false,
-                    Some(pk) => pk.columns == index.columns,
-                };
-
-                if index_covers_pk {
-                    debug!(
-                        "Not dropping index '{}' on table '{}' since it covers PK",
-                        index.name, previous_table.name
-                    );
-
-                    return None;
-                }
-
-                let drop = DropIndex {
-                    table: previous_table.name.clone(),
+        for tables in self.table_pairs() {
+            for index in tables.dropped_indexes() {
+                drop_indexes.push(DropIndex {
+                    table: tables.previous.name.clone(),
                     name: index.name.clone(),
-                };
+                })
+            }
+        }
 
-                Some(drop)
-            })
-        })
+        drop_indexes
     }
 
     /// An iterator over the tables that are present in both schemas.
-    fn table_pairs<'a>(&'a self) -> impl Iterator<Item = TableDiffer<'schema>> + 'a {
+    fn table_pairs<'a>(&'a self) -> impl Iterator<Item = TableDiffer<'schema>> + 'a
+    where
+        'schema: 'a,
+    {
         self.previous.tables.iter().filter_map(move |previous_table| {
             self.next
                 .tables
