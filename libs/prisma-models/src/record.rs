@@ -1,4 +1,4 @@
-use crate::{ScalarFieldRef, DomainError as Error, DomainResult, Field, PrismaValue};
+use crate::{DomainError as Error, DomainResult, Field, PrismaValue, ScalarFieldRef};
 
 // Collection of fields of which the primary identifier of a model is composed of.
 // Todo: Currently, this uses arcs, which is not ideal, but also not terrible compared
@@ -10,9 +10,7 @@ pub struct ModelIdentifier {
 
 impl From<Field> for ModelIdentifier {
     fn from(f: Field) -> Self {
-        Self {
-            fields: vec![f]
-        }
+        Self { fields: vec![f] }
     }
 }
 
