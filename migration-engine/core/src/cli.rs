@@ -425,7 +425,19 @@ mod tests {
 
     #[tokio::test]
     async fn test_create_psql_database() {
-        let url = postgres_url(Some("this_should_exist"));
+        let db_name = "this_should_exist";
+
+        let _drop_database: () = {
+            let url = postgres_url(None);
+
+            let conn = Quaint::new(&url).await.unwrap();
+
+            conn.execute_raw("DROP DATABASE IF EXISTS \"this_should_exist\"", &[])
+                .await
+                .unwrap();
+        };
+
+        let url = postgres_url(Some(db_name));
 
         let res = run(&["--create_database"], &url).await;
 
@@ -434,21 +446,10 @@ mod tests {
             res.as_ref().unwrap()
         );
 
-        if let Ok(_) = res {
-            let res = run(&["--can_connect_to_database"], &url).await;
-            assert_eq!("Connection successful", res.as_ref().unwrap());
+        let res = run(&["--can_connect_to_database"], &url).await;
+        assert_eq!("Connection successful", res.as_ref().unwrap());
 
-            {
-                let uri = postgres_url(None);
-                let conn = Quaint::new(&uri).await.unwrap();
-
-                conn.execute_raw("DROP DATABASE \"this_should_exist\"", &[])
-                    .await
-                    .unwrap();
-            }
-
-            res.unwrap();
-        }
+        res.unwrap();
     }
 
     #[test]
