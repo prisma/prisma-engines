@@ -75,16 +75,11 @@ impl<'schema> SqlSchemaDiffer<'schema> {
     }
 
     fn drop_tables(&self) -> Vec<DropTable> {
-        let mut result = Vec::new();
-        for previous_table in &self.previous.tables {
-            if !self.next.has_table(&previous_table.name) && previous_table.name != MIGRATION_TABLE_NAME {
-                let drop = DropTable {
-                    name: previous_table.name.clone(),
-                };
-                result.push(drop);
-            }
-        }
-        result
+        self.dropped_tables()
+            .map(|dropped_table| DropTable {
+                name: dropped_table.name.clone(),
+            })
+            .collect()
     }
 
     fn add_foreign_keys(&self) -> Vec<AddForeignKey> {
@@ -251,7 +246,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
             self.next
                 .tables
                 .iter()
-                .find(move |next_table| next_table.name == previous_table.name)
+                .find(move |next_table| tables_match(previous_table, next_table))
                 .map(move |next_table| TableDiffer {
                     previous: previous_table,
                     next: next_table,
@@ -275,9 +270,30 @@ impl<'schema> SqlSchemaDiffer<'schema> {
     }
 
     fn created_tables<'a>(&'a self) -> impl Iterator<Item = &'a Table> + 'a {
-        self.next.tables.iter().filter(move |next_table| {
-            !self.previous.has_table(&next_table.name) && next_table.name != MIGRATION_TABLE_NAME
+        self.next_tables()
+            .filter(move |next_table| !self.previous.has_table(&next_table.name))
+    }
+
+    fn dropped_tables(&self) -> impl Iterator<Item = &Table> {
+        self.previous_tables().filter(move |previous_table| {
+            !self
+                .next_tables()
+                .any(|next_table| tables_match(previous_table, next_table))
         })
+    }
+
+    fn previous_tables(&self) -> impl Iterator<Item = &Table> {
+        self.previous
+            .tables
+            .iter()
+            .filter(|table| table.name != MIGRATION_TABLE_NAME)
+    }
+
+    fn next_tables(&self) -> impl Iterator<Item = &Table> {
+        self.next
+            .tables
+            .iter()
+            .filter(|table| table.name != MIGRATION_TABLE_NAME)
     }
 }
 
@@ -322,4 +338,8 @@ fn foreign_keys_match(previous: &ForeignKey, next: &ForeignKey) -> bool {
         && previous.referenced_columns == next.referenced_columns
         && previous.columns == next.columns
         && previous.on_delete_action == next.on_delete_action
+}
+
+fn tables_match(previous: &Table, next: &Table) -> bool {
+    previous.name == next.name
 }
