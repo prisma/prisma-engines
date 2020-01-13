@@ -19,7 +19,7 @@ rust_decimal = "1.1"
 
 [dependencies.quaint]
 version = "0.1"
-features = ["full"]
+features = ["full", "tracing-log"]
 
 [dependencies.connector-interface]
 path = "../query-connector"
