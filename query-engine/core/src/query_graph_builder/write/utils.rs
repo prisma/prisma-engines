@@ -190,7 +190,6 @@ pub fn insert_existing_1to1_related_model_checks(
     parent_relation_field: &RelationFieldRef,
 ) -> QueryGraphBuilderResult<()> {
     let child_model = parent_relation_field.related_model();
-    let child_model_id_field = child_model.identifier();
     let child_side_required = parent_relation_field.related_field().is_required;
     let relation_inlined_parent = parent_relation_field.relation_is_inlined_in_parent();
     let rf = Arc::clone(&parent_relation_field);
