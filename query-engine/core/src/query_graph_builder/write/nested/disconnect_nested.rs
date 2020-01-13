@@ -165,113 +165,115 @@ fn handle_one_to_x(
     parent_relation_field: &RelationFieldRef,
     filter: Filter,
 ) -> QueryGraphBuilderResult<()> {
-    let filter_size = filter.size();
+    // let filter_size = filter.size();
 
-    // Fetches children to be disconnected.
-    let find_child_records_node =
-        utils::insert_find_children_by_parent_node(graph, &parent_node, parent_relation_field, filter)?;
+    // // Fetches children to be disconnected.
+    // let find_child_records_node =
+    //     utils::insert_find_children_by_parent_node(graph, &parent_node, parent_relation_field, filter)?;
 
-    let child_relation_field = parent_relation_field.related_field();
+    // let child_relation_field = parent_relation_field.related_field();
 
-    // If we're in a 1:m scenario and either relation side is required, a disconnect is impossible, as some
-    // relation requirement would be violated with the disconnect.
-    if parent_relation_field.is_required || child_relation_field.is_required {
-        return Err(QueryGraphBuilderError::RelationViolation(parent_relation_field.into()));
-    }
+    // // If we're in a 1:m scenario and either relation side is required, a disconnect is impossible, as some
+    // // relation requirement would be violated with the disconnect.
+    // if parent_relation_field.is_required || child_relation_field.is_required {
+    //     return Err(QueryGraphBuilderError::RelationViolation(parent_relation_field.into()));
+    // }
 
-    // Depending on where the relation is inlined, we update the parent or the child and check the other one for ID presence.
-    let (node_to_attach, node_to_check, model_to_update, relation_field_name, id_field, expected_disconnects) =
-        if parent_relation_field.relation_is_inlined_in_parent() {
-            let parent_model = parent_relation_field.model();
-            let relation_field_name = parent_relation_field.name.clone();
-            let parent_model_id = parent_model.fields().id();
+    // // Depending on where the relation is inlined, we update the parent or the child and check the other one for ID presence.
+    // let (node_to_attach, node_to_check, model_to_update, relation_field_name, id_field, expected_disconnects) =
+    //     if parent_relation_field.relation_is_inlined_in_parent() {
+    //         let parent_model = parent_relation_field.model();
+    //         let relation_field_name = parent_relation_field.name.clone();
+    //         let parent_model_id = parent_model.fields().id();
 
-            (
-                parent_node,
-                &find_child_records_node,
-                parent_model,
-                relation_field_name,
-                parent_model_id,
-                std::cmp::max(filter_size, 1),
-            )
-        } else {
-            let child_model = child_relation_field.model();
-            let relation_field_name = child_relation_field.name.clone();
-            let child_model_id = child_model.fields().id();
+    //         (
+    //             parent_node,
+    //             &find_child_records_node,
+    //             parent_model,
+    //             relation_field_name,
+    //             parent_model_id,
+    //             std::cmp::max(filter_size, 1),
+    //         )
+    //     } else {
+    //         let child_model = child_relation_field.model();
+    //         let relation_field_name = child_relation_field.name.clone();
+    //         let child_model_id = child_model.fields().id();
 
-            (
-                &find_child_records_node,
-                parent_node,
-                child_model,
-                relation_field_name,
-                child_model_id,
-                1,
-            )
-        };
+    //         (
+    //             &find_child_records_node,
+    //             parent_node,
+    //             child_model,
+    //             relation_field_name,
+    //             child_model_id,
+    //             1,
+    //         )
+    //     };
 
-    let update_node = utils::update_records_node_placeholder(graph, Filter::empty(), model_to_update);
-    let relation_name = parent_relation_field.relation().name.clone();
-    let parent_name = parent_relation_field.model().name.clone();
-    let child_name = parent_relation_field.related_model().name.clone();
+    // let update_node = utils::update_records_node_placeholder(graph, Filter::empty(), model_to_update);
+    // let relation_name = parent_relation_field.relation().name.clone();
+    // let parent_name = parent_relation_field.model().name.clone();
+    // let child_name = parent_relation_field.related_model().name.clone();
 
-    // Edge to inject the correct data into the update (either from the parent or child).
-    graph.create_edge(
-        node_to_attach,
-        &update_node,
-        QueryGraphDependency::ParentIds(Box::new(move |mut child_node, mut parent_ids| {
-            if parent_ids.len() == 0 {
-                return Err(QueryGraphBuilderError::RecordsNotConnected {
-                    relation_name,
-                    parent_name,
-                    child_name,
-                });
-            }
+    // // Edge to inject the correct data into the update (either from the parent or child).
+    // graph.create_edge(
+    //     node_to_attach,
+    //     &update_node,
+    //     QueryGraphDependency::ParentIds(Box::new(move |mut child_node, mut parent_ids| {
+    //         if parent_ids.len() == 0 {
+    //             return Err(QueryGraphBuilderError::RecordsNotConnected {
+    //                 relation_name,
+    //                 parent_name,
+    //                 child_name,
+    //             });
+    //         }
 
-            // Handle finder / filter injection
-            match child_node {
-                Node::Query(Query::Write(WriteQuery::UpdateManyRecords(ref mut ur))) => {
-                    ur.filter = Filter::or(
-                        parent_ids
-                            .into_iter()
-                            .map(|id| id_field.clone().equals(id))
-                            .collect::<Vec<Filter>>(),
-                    )
-                }
+    //         // Handle finder / filter injection
+    //         match child_node {
+    //             Node::Query(Query::Write(WriteQuery::UpdateManyRecords(ref mut ur))) => {
+    //                 ur.filter = Filter::or(
+    //                     parent_ids
+    //                         .into_iter()
+    //                         .map(|id| id_field.clone().equals(id))
+    //                         .collect::<Vec<Filter>>(),
+    //                 )
+    //             }
 
-                Node::Query(Query::Write(ref mut wq)) => wq.add_filter(id_field.equals(parent_ids.pop().unwrap())),
+    //             Node::Query(Query::Write(ref mut wq)) => wq.add_filter(id_field.equals(parent_ids.pop().unwrap())),
 
-                _ => unimplemented!(),
-            };
+    //             _ => unimplemented!(),
+    //         };
 
-            // Handle arg injection
-            if let Node::Query(Query::Write(ref mut wq)) = child_node {
-                wq.inject_non_list_arg(relation_field_name, PrismaValue::Null);
-            }
+    //         // Handle arg injection
+    //         if let Node::Query(Query::Write(ref mut wq)) = child_node {
+    //             wq.inject_non_list_arg(relation_field_name, PrismaValue::Null);
+    //         }
 
-            Ok(child_node)
-        })),
-    )?;
+    //         Ok(child_node)
+    //     })),
+    // )?;
 
-    let relation_name = parent_relation_field.relation().name.clone();
-    let parent_name = parent_relation_field.model().name.clone();
-    let child_name = parent_relation_field.related_model().name.clone();
+    // let relation_name = parent_relation_field.relation().name.clone();
+    // let parent_name = parent_relation_field.model().name.clone();
+    // let child_name = parent_relation_field.related_model().name.clone();
 
-    // Edge to check that IDs have been returned.
-    graph.create_edge(
-        node_to_check,
-        &update_node,
-        QueryGraphDependency::ParentIds(Box::new(move |child_node, parent_ids| {
-            if parent_ids.len() != expected_disconnects {
-                return Err(QueryGraphBuilderError::RecordsNotConnected {
-                    relation_name,
-                    parent_name,
-                    child_name,
-                });
-            }
+    // // Edge to check that IDs have been returned.
+    // graph.create_edge(
+    //     node_to_check,
+    //     &update_node,
+    //     QueryGraphDependency::ParentIds(Box::new(move |child_node, parent_ids| {
+    //         if parent_ids.len() != expected_disconnects {
+    //             return Err(QueryGraphBuilderError::RecordsNotConnected {
+    //                 relation_name,
+    //                 parent_name,
+    //                 child_name,
+    //             });
+    //         }
 
-            Ok(child_node)
-        })),
-    )?;
+    //         Ok(child_node)
+    //     })),
+    // )?;
 
-    Ok(())
+    // Ok(())
+
+    todo!()
 }

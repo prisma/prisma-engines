@@ -148,4 +148,8 @@ impl SelectedFields {
     pub(super) fn scalar_fields(&self) -> impl Iterator<Item = &ScalarFieldRef> {
         self.scalar.iter().map(|sf| &sf.field)
     }
+
+    pub fn contains(&self, name: &str) -> bool {
+        self.names().find(|fname| fname == &name).is_some()
+    }
 }

@@ -134,11 +134,10 @@ async fn aggregate<'a, 'b>(
 /// Currently, required fields for every query are the fields of the model identifier.
 fn inject_required_fields(mut selected_fields: SelectedFields) -> SelectedFields {
     let model_id = selected_fields.model().identifier();
-    let selected_names = selected_fields.names();
 
     let missing_fields: Vec<Field> = model_id
         .into_iter()
-        .filter(|field| selected_names.find(|name| name == &field.name()).is_none())
+        .filter(|field| !selected_fields.contains(field.name()))
         .collect();
 
     for field in missing_fields {
