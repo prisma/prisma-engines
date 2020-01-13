@@ -216,6 +216,30 @@ impl SqlFamily {
     pub fn scheme_is_supported(url_scheme: &str) -> bool {
         Self::from_scheme(url_scheme).is_some()
     }
+
+    #[cfg(feature = "postgresql")]
+    pub fn is_postgres(&self) -> bool {
+        match self {
+            SqlFamily::Postgres => true,
+            _ => false,
+        }
+    }
+
+    #[cfg(feature = "mysql")]
+    pub fn is_mysql(&self) -> bool {
+        match self {
+            SqlFamily::Mysql => true,
+            _ => false,
+        }
+    }
+
+    #[cfg(feature = "sqlite")]
+    pub fn is_sqlite(&self) -> bool {
+        match self {
+            SqlFamily::Sqlite => true,
+            _ => false,
+        }
+    }
 }
 
 impl fmt::Display for SqlFamily {
