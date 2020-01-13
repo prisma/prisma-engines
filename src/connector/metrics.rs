@@ -33,6 +33,7 @@ where
             {
                 tracing::info!(
                     query,
+                    item_type = "query",
                     params = %Params(params),
                     duration_ms = start.elapsed().as_millis() as u64,
                 )
