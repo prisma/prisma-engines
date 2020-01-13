@@ -158,7 +158,14 @@ pub struct ColumnAssertion<'a>(&'a Column);
 
 impl<'a> ColumnAssertion<'a> {
     pub fn assert_default(self, expected: Option<&str>) -> AssertionResult<Self> {
-        assert_eq!(self.0.default.as_ref().map(String::as_str), expected);
+        let found = self.0.default.as_ref().map(String::as_str);
+
+        anyhow::ensure!(
+            found == expected,
+            "Assertion failed. Expected default: {:?}, but found {:?}",
+            expected,
+            found
+        );
 
         Ok(self)
     }

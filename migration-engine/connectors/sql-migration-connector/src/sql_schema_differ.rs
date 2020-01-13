@@ -1,3 +1,5 @@
+pub(crate) use column::{ColumnChange, ColumnDiffer};
+
 mod column;
 mod index;
 mod table;

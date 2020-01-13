@@ -256,10 +256,23 @@ fn render_raw_sql(
                         lines.push(format!("DROP COLUMN {}", name));
                     }
                     TableChange::AlterColumn(AlterColumn { name, column }) => {
-                        let name = renderer.quote(&name);
-                        lines.push(format!("DROP COLUMN {}", name));
-                        let col_sql = renderer.render_column(&schema_name, &table, &column, true);
-                        lines.push(format!("ADD COLUMN {}", col_sql));
+                        match safe_alter_column(
+                            renderer,
+                            current_schema.get_table(&table.name).unwrap().column(&name).unwrap(),
+                            &column,
+                        ) {
+                            Some(safe_sql) => {
+                                for line in safe_sql {
+                                    lines.push(line)
+                                }
+                            }
+                            None => {
+                                let name = renderer.quote(&name);
+                                lines.push(format!("DROP COLUMN {}", name));
+                                let col_sql = renderer.render_column(&schema_name, &table, &column, true);
+                                lines.push(format!("ADD COLUMN {}", col_sql));
+                            }
+                        }
                     }
                     TableChange::DropForeignKey(DropForeignKey { constraint_name }) => match sql_family {
                         SqlFamily::Mysql => {
@@ -396,4 +409,45 @@ fn create_table_suffix(sql_family: SqlFamily) -> &'static str {
         SqlFamily::Postgres => "",
         SqlFamily::Mysql => "\nDEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci",
     }
+}
+
+fn safe_alter_column(
+    renderer: &dyn SqlRenderer,
+    previous_column: &Column,
+    next_column: &Column,
+) -> Option<Vec<String>> {
+    use crate::sql_migration::expanded_alter_column::*;
+
+    let expanded = crate::sql_migration::expanded_alter_column::expand_alter_column(
+        previous_column,
+        next_column,
+        &renderer.sql_family(),
+    )?;
+
+    let alter_column_prefix = format!("ALTER COLUMN {}", renderer.quote(&previous_column.name));
+
+    let steps = match expanded {
+        ExpandedAlterColumn::Postgres(steps) => steps
+            .into_iter()
+            .map(|step| match step {
+                PostgresAlterColumn::DropDefault => format!("{} DROP DEFAULT", &alter_column_prefix),
+                PostgresAlterColumn::SetDefault(new_default) => {
+                    format!("{} SET DEFAULT '{}'", &alter_column_prefix, new_default)
+                }
+                PostgresAlterColumn::DropNotNull => format!("{} DROP NOT NULL", &alter_column_prefix),
+            })
+            .collect(),
+        ExpandedAlterColumn::Mysql(steps) => steps
+            .into_iter()
+            .map(|step| match step {
+                MysqlAlterColumn::DropDefault => format!("{} DROP DEFAULT", &alter_column_prefix),
+                MysqlAlterColumn::SetDefault(new_default) => {
+                    format!("{} SET DEFAULT '{}'", &alter_column_prefix, new_default)
+                }
+            })
+            .collect(),
+        ExpandedAlterColumn::Sqlite(_steps) => vec![],
+    };
+
+    Some(steps)
 }

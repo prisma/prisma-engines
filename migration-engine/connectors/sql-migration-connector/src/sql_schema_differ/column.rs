@@ -8,12 +8,37 @@ pub(crate) struct ColumnDiffer<'a> {
 
 impl<'a> ColumnDiffer<'a> {
     pub(crate) fn differs_in_something(&self) -> bool {
-        self.previous.name != self.next.name
-            // TODO: compare the whole type
-            // || self.previous.tpe != self.next.tpe
-            || self.previous.tpe.family != self.next.tpe.family
-            || self.previous.tpe.arity != self.next.tpe.arity
-            || !self.defaults_match()
+        self.all_changes().iter().count() > 0
+    }
+
+    pub(crate) fn all_changes(&self) -> ColumnChanges {
+        let renaming = if self.previous.name != self.next.name {
+            Some(ColumnChange::Renaming)
+        } else {
+            None
+        };
+
+        let arity = if self.previous.tpe.arity != self.next.tpe.arity {
+            Some(ColumnChange::Arity)
+        } else {
+            None
+        };
+
+        let r#type = if self.previous.tpe.family != self.next.tpe.family {
+            Some(ColumnChange::Type)
+        } else {
+            None
+        };
+
+        let default = if !self.defaults_match() {
+            Some(ColumnChange::Default)
+        } else {
+            None
+        };
+
+        ColumnChanges {
+            changes: [renaming, r#type, arity, default],
+        }
     }
 
     /// There are workarounds to cope with current migration and introspection limitations.
@@ -27,8 +52,6 @@ impl<'a> ColumnDiffer<'a> {
         if self.previous.auto_increment {
             return true;
         }
-
-        debug_assert_eq!(self.previous.tpe.family, self.next.tpe.family);
 
         let previous_value: Option<&str> = self.previous.default.as_ref().map(String::as_str);
         let next_value: Option<&str> = self.next.default.as_ref().map(String::as_str);
@@ -75,6 +98,29 @@ fn string_defaults_match(previous: Option<&str>, next: Option<&str>) -> bool {
 
 fn string_contains_tricky_character(s: &str) -> bool {
     s.contains('\\') || s.contains("'") || s.contains("\"")
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub(crate) enum ColumnChange {
+    Renaming,
+    Arity,
+    Default,
+    Type,
+}
+
+#[derive(Debug, Clone)]
+pub(crate) struct ColumnChanges {
+    changes: [Option<ColumnChange>; 4],
+}
+
+impl ColumnChanges {
+    pub(crate) fn iter<'a>(&'a self) -> impl Iterator<Item = ColumnChange> + 'a {
+        self.changes.iter().filter_map(|c| c.as_ref().map(|c| c.clone()))
+    }
+
+    pub(crate) fn type_changed(&self) -> bool {
+        self.changes.iter().any(|c| c.as_ref() == Some(&ColumnChange::Type))
+    }
 }
 
 #[cfg(test)]
