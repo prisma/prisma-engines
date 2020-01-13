@@ -4,7 +4,7 @@ use crate::{
 };
 use migration_connector::*;
 use quaint::{ast::*, prelude::SqlFamily};
-use sql_schema_describer::ColumnArity;
+use sql_schema_describer::{ColumnArity, SqlSchema};
 
 pub struct SqlDestructiveChangesChecker<'a> {
     pub connector: &'a crate::SqlMigrationConnector,
@@ -171,15 +171,19 @@ impl SqlDestructiveChangesChecker<'_> {
         alter_column.column.tpe.family == previous_column.tpe.family && arity_change_is_safe
     }
 
-    async fn check_impl(&self, database_migration: &SqlMigration) -> SqlResult<DestructiveChangeDiagnostics> {
+    async fn check_impl(
+        &self,
+        steps: &[SqlMigrationStep],
+        before: &SqlSchema,
+    ) -> SqlResult<DestructiveChangeDiagnostics> {
         let mut diagnostics = DestructiveChangeDiagnostics::new();
 
-        for step in &database_migration.original_steps {
+        for step in steps {
             match step {
                 SqlMigrationStep::AlterTable(alter_table) => {
                     // The table in alter_table is the updated table, but we want to
                     // check against the current state of the table.
-                    let before_table = database_migration.before.get_table(&alter_table.table.name);
+                    let before_table = before.get_table(&alter_table.table.name);
 
                     if let Some(before_table) = before_table {
                         for change in &alter_table.changes {
@@ -219,7 +223,13 @@ impl SqlDestructiveChangesChecker<'_> {
 #[async_trait::async_trait]
 impl DestructiveChangesChecker<SqlMigration> for SqlDestructiveChangesChecker<'_> {
     async fn check(&self, database_migration: &SqlMigration) -> ConnectorResult<DestructiveChangeDiagnostics> {
-        self.check_impl(database_migration)
+        self.check_impl(&database_migration.original_steps, &database_migration.before)
+            .await
+            .map_err(|sql_error| sql_error.into_connector_error(&self.connection_info()))
+    }
+
+    async fn check_unapply(&self, database_migration: &SqlMigration) -> ConnectorResult<DestructiveChangeDiagnostics> {
+        self.check_impl(&database_migration.rollback, &database_migration.after)
             .await
             .map_err(|sql_error| sql_error.into_connector_error(&self.connection_info()))
     }

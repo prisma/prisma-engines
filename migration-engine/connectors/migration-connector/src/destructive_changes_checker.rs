@@ -11,7 +11,11 @@ pub trait DestructiveChangesChecker<T>: Send + Sync
 where
     T: Send + Sync + 'static,
 {
+    /// Check destructive changes resulting of applying the provided migration.
     async fn check(&self, database_migration: &T) -> ConnectorResult<DestructiveChangeDiagnostics>;
+
+    /// Check destructive changes resulting of reverting the provided migration.
+    async fn check_unapply(&self, database_migration: &T) -> ConnectorResult<DestructiveChangeDiagnostics>;
 }
 
 /// The errors and warnings emitted by the [DestructiveChangesChecker](trait.DestructiveChangesChecker.html).
@@ -75,6 +79,10 @@ where
     T: Send + Sync + 'static,
 {
     async fn check(&self, _database_migration: &T) -> ConnectorResult<DestructiveChangeDiagnostics> {
+        Ok(DestructiveChangeDiagnostics::new())
+    }
+
+    async fn check_unapply(&self, _database_migration: &T) -> ConnectorResult<DestructiveChangeDiagnostics> {
         Ok(DestructiveChangeDiagnostics::new())
     }
 }
