@@ -36,8 +36,10 @@ impl RelationFieldExt for RelationField {
         };
 
         if alias && !self.relation_is_inlined_in_child() {
+            let count = cols.len();
             let inner = cols.into_iter().map(|col| col.table(Relation::TABLE_ALIAS));
-            ColumnIterator::new(inner)
+
+            ColumnIterator::new(inner, count)
         } else {
             cols
         }
@@ -50,8 +52,10 @@ impl RelationFieldExt for RelationField {
         };
 
         if alias && !self.relation_is_inlined_in_child() {
+            let count = cols.len();
             let inner = cols.into_iter().map(|col| col.table(Relation::TABLE_ALIAS));
-            ColumnIterator::new(inner)
+
+            ColumnIterator::new(inner, count)
         } else {
             cols
         }
@@ -129,13 +133,22 @@ impl RelationExt for Relation {
                 let model_b = self.model_b();
 
                 if self.is_self_relation() && self.field_a().is_hidden {
-                    ColumnIterator::new(model_a.identifier().as_columns())
+                    let identifier = model_a.identifier();
+                    let count = identifier.len();
+
+                    ColumnIterator::new(identifier.as_columns(), count)
                 } else if self.is_self_relation() && self.field_b().is_hidden {
-                    ColumnIterator::new(model_b.identifier().as_columns())
+                    let identifier = model_b.identifier();
+                    let count = identifier.len();
+
+                    ColumnIterator::new(identifier.as_columns(), count)
                 } else if self.is_self_relation() {
                     m.referencing_columns(self.as_table())
                 } else if m.in_table_of_model_name == model_a.name && !self.is_self_relation() {
-                    ColumnIterator::new(model_a.identifier().as_columns())
+                    let identifier = model_a.identifier();
+                    let count = identifier.len();
+
+                    ColumnIterator::new(identifier.as_columns(), count)
                 } else {
                     m.referencing_columns(self.as_table())
                 }
@@ -157,9 +170,15 @@ impl RelationExt for Relation {
                 if self.is_self_relation() && (self.field_a().is_hidden || self.field_b().is_hidden) {
                     m.referencing_columns(self.as_table())
                 } else if self.is_self_relation() {
-                    ColumnIterator::new(model_b.identifier().as_columns())
+                    let identifier = model_b.identifier();
+                    let count = identifier.len();
+
+                    ColumnIterator::new(identifier.as_columns(), count)
                 } else if m.in_table_of_model_name == model_b.name && !self.is_self_relation() {
-                    ColumnIterator::new(model_b.identifier().as_columns())
+                    let identifier = model_b.identifier();
+                    let count = identifier.len();
+
+                    ColumnIterator::new(identifier.as_columns(), count)
                 } else {
                     m.referencing_columns(self.as_table())
                 }
