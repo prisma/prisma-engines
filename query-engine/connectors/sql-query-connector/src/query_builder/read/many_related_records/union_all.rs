@@ -1,49 +1,54 @@
 use super::*;
 use quaint::ast::*;
+use crate::ordering::Ordering;
+use prisma_models::{sql_ext::AsColumn, SelectedFields, RecordIdentifier};
+use connector_interface::SkipAndLimit;
 
 pub struct ManyRelatedRecordsWithUnionAll;
 
 impl ManyRelatedRecordsQueryBuilder for ManyRelatedRecordsWithUnionAll {
-    fn with_pagination(_base: ManyRelatedRecordsBaseQuery) -> Query {
-        // let distinct_ids = {
-        //     let mut ids = base.from_record_ids.to_vec();
-        //     ids.dedup();
+    fn with_pagination(base: ManyRelatedRecordsBaseQuery) -> Query {
+        let distinct_ids = {
+            let mut ids = base.from_record_ids.to_vec();
+            ids.dedup();
 
-        //     ids
-        // };
+            ids
+        };
 
-        // let order_columns = Ordering::internal(SelectedFields::RELATED_MODEL_ALIAS, base.order_directions);
+        let order_columns = Ordering::internal(vec![SelectedFields::RELATED_MODEL_ALIAS], base.order_directions);
 
-        // let base_condition = base.condition.and(base.cursor);
-        // let from_field = base.from_field;
+        let base_condition = base.condition.and(base.cursor);
 
-        // let base_query = match base.skip_and_limit {
-        //     SkipAndLimit {
-        //         skip,
-        //         limit: Some(limit),
-        //     } => base.query.limit(limit).offset(skip),
-        //     SkipAndLimit { skip, limit: None } => base.query.offset(skip),
-        // };
+        let base_query = match base.skip_and_limit {
+            SkipAndLimit {
+                skip,
+                limit: Some(limit),
+            } => base.query.limit(limit).offset(skip),
+            SkipAndLimit { skip, limit: None } => base.query.offset(skip),
+        };
 
-        // let base_query = order_columns.into_iter().fold(base_query, |acc, ord| acc.order_by(ord));
-        // let mut distinct_ids = distinct_ids.into_iter();
+        let base_query = order_columns.into_iter().fold(base_query, |acc, ord| acc.order_by(ord));
+        let mut distinct_ids = distinct_ids.into_iter();
 
-        // let build_cond = |id| {
-        //     let conditions = base_condition
-        //         .clone()
-        //         .and(from_field.relation_column(true).equals(id));
+        let build_cond = |ids: RecordIdentifier| {
+            let id_cond = ids.into_iter().fold(ConditionTree::NoCondition, |acc, (field, val)| {
+                match acc {
+                    ConditionTree::NoCondition => field.as_column().equals(val).into(),
+                    cond => cond.and(field.as_column().equals(val)),
+                }
+            });
 
-        //     base_query.clone().so_that(conditions)
-        // };
+            let conditions = base_condition.clone().and(id_cond);
 
-        // if let Some(id) = distinct_ids.nth(0) {
-        //     let union = distinct_ids.fold(Union::new(build_cond(id)), |acc, id| acc.all(build_cond(id)));
+            base_query.clone().so_that(conditions)
+        };
 
-        //     Query::from(union)
-        // } else {
-        //     Query::from(Union::default())
-        // }
+        if let Some(id) = distinct_ids.nth(0) {
+            let union = distinct_ids.fold(Union::new(build_cond(id)), |acc, id| acc.all(build_cond(id)));
 
-        todo!()
+            Query::from(union)
+        } else {
+            Query::from(Union::default())
+        }
     }
 }
