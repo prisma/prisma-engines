@@ -19,17 +19,17 @@ impl Ordering {
         )
     }
 
-    /*
-    pub fn internal<C>(second_field: C, order_directive: OrderDirections) -> OrderVec<'static>
+    pub fn internal<I, C>(second_field: I, order_directive: OrderDirections) -> OrderVec<'static>
     where
         C: Into<Column<'static>>,
+        I: IntoIterator<Item = C>,
     {
         Self::by_fields(
             order_directive
                 .primary_order_by
                 .as_ref()
                 .map(|oby| oby.field.as_column()),
-            vec![second_field.into()],
+            second_field.into_iter().map(Into::into).collect(),
             order_directive,
         )
     }
@@ -49,7 +49,6 @@ impl Ordering {
             order_directive,
         )
     }
-    */
 
     fn by_fields(
         first_column: Option<Column<'static>>,

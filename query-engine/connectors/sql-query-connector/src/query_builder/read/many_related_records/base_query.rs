@@ -1,11 +1,12 @@
-use connector_interface::{OrderDirections, SkipAndLimit};
+use connector_interface::{OrderDirections, SkipAndLimit, QueryArguments};
 use prisma_models::prelude::*;
-use quaint::ast::{Column, ConditionTree, Select};
+use quaint::ast::{Column, Row, ConditionTree, Select, Aliasable, Joinable, Comparable};
+use crate::{cursor_condition, filter_conversion::AliasedCondition};
 
 pub struct ManyRelatedRecordsBaseQuery<'a> {
     pub from_field: &'a RelationFieldRef,
     pub columns: Vec<Column<'static>>,
-    pub from_record_ids: &'a [GraphqlId],
+    pub from_record_ids: &'a [RecordIdentifier],
     pub query: Select<'a>,
     pub order_directions: OrderDirections,
     pub condition: ConditionTree<'a>,
@@ -14,59 +15,60 @@ pub struct ManyRelatedRecordsBaseQuery<'a> {
     pub skip_and_limit: SkipAndLimit,
 }
 
-/*
 impl<'a> ManyRelatedRecordsBaseQuery<'a> {
     pub fn new(
-        _from_field: &'a RelationFieldRef,
-        _from_record_ids: &'a [GraphqlId],
-        _query_arguments: QueryArguments,
-        _columns: Vec<Column<'static>>,
+        from_field: &'a RelationFieldRef,
+        from_record_ids: &'a [RecordIdentifier],
+        query_arguments: QueryArguments,
+        columns: Vec<Column<'static>>,
     ) -> ManyRelatedRecordsBaseQuery<'a> {
-        // let cursor = cursor_condition::build(&query_arguments, from_field.related_model());
-        // let window_limits = query_arguments.window_limits();
-        // let skip_and_limit = query_arguments.skip_and_limit();
+        let cursor = cursor_condition::build(&query_arguments, from_field.related_model());
+        let window_limits = query_arguments.window_limits();
+        let skip_and_limit = query_arguments.skip_and_limit();
 
-        // let order_directions = query_arguments.ordering_directions();
-        // let condition = query_arguments
-        //     .filter
-        //     .map(|f| f.aliased_cond(None))
-        //     .unwrap_or(ConditionTree::NoCondition);
+        let order_directions = query_arguments.ordering_directions();
+        let condition = query_arguments
+            .filter
+            .map(|f| f.aliased_cond(None))
+            .unwrap_or(ConditionTree::NoCondition);
 
-        // let select = Select::from_table(from_field.related_model().as_table());
+        let select = Select::from_table(from_field.related_model().as_table());
 
-        // let query = if from_field.relation_is_inlined_in_child() {
-        //     columns.iter().fold(select, |acc, col| acc.column(col.clone()))
-        // } else {
-        //     let join = from_field
-        //         .relation()
-        //         .as_table()
-        //         .alias(Relation::TABLE_ALIAS)
-        //         .on(from_field
-        //             .related_model()
-        //             .fields()
-        //             .id()
-        //             .as_column()
-        //             .equals(from_field.opposite_column(true)));
+        let query = if from_field.relation_is_inlined_in_child() {
+            columns.iter().fold(select, |acc, col| acc.column(col.clone()))
+        } else {
+            let id_columns: Vec<Column<'static>> = from_field
+                .related_model()
+                .identifier()
+                .as_columns()
+                .collect();
 
-        //     columns
-        //         .iter()
-        //         .fold(select, |acc, col| acc.column(col.clone()))
-        //         .inner_join(join)
-        // };
+            let opposite_columns: Vec<Column<'static>> = from_field
+                .opposite_columns(true)
+                .collect();
 
-        // Self {
-        //     from_field,
-        //     columns,
-        //     from_record_ids,
-        //     query,
-        //     order_directions,
-        //     condition,
-        //     cursor,
-        //     window_limits,
-        //     skip_and_limit,
-        // }
+            let join = from_field
+                .relation()
+                .as_table()
+                .alias(Relation::TABLE_ALIAS)
+                .on(Row::from(id_columns).equals(Row::from(opposite_columns)));
 
-        todo!()
+            columns
+                .iter()
+                .fold(select, |acc, col| acc.column(col.clone()))
+                .inner_join(join)
+        };
+
+        Self {
+            from_field,
+            columns,
+            from_record_ids,
+            query,
+            order_directions,
+            condition,
+            cursor,
+            window_limits,
+            skip_and_limit,
+        }
     }
 }
-*/

@@ -85,3 +85,27 @@ pub fn count_by_model(_model: &ModelRef, _query_arguments: QueryArguments) -> Se
     // Select::from_table(table).value(count(column))
     todo!()
 }
+
+pub fn relation_in_selection<'a, I>(from_field: &RelationFieldRef, identifiers: I) -> ConditionTree<'static>
+where
+    I: IntoIterator<Item = &'a RecordIdentifier>,
+{
+    identifiers
+        .into_iter()
+        .map(|ids| {
+            let cols_with_vals = from_field.relation_columns(true).into_iter().zip(ids.values());
+
+            cols_with_vals.fold(ConditionTree::NoCondition, |acc, (col, val)| {
+                match acc {
+                    ConditionTree::NoCondition => col.equals(val).into(),
+                    cond => cond.and(col.equals(val))
+                }
+            })
+        })
+        .fold(ConditionTree::NoCondition, |acc, cond| {
+            match acc {
+                ConditionTree::NoCondition => cond,
+                acc => acc.or(cond),
+            }
+        })
+}
