@@ -1444,7 +1444,7 @@ async fn model_with_multiple_indexes_works(api: &TestApi) {
     let sql_schema = api.infer_and_apply(dm).await.sql_schema;
 
     let like_indexes_count = sql_schema.table_bang("Like").indices.len();
-    let expected_indexes_count = if api.is_mysql() { 0 } else { 3 }; // 3 explicit indexes + PK, or only PK on mysql
+    let expected_indexes_count = 3;
 
     assert_eq!(like_indexes_count, expected_indexes_count);
 }
