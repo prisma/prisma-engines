@@ -93,9 +93,8 @@ fn infer_database_migration_steps_and_fix(
     sql_family: SqlFamily,
 ) -> SqlResult<(Vec<SqlMigrationStep>, Vec<SqlMigrationStep>)> {
     let diff: SqlSchemaDiff = SqlSchemaDiffer::diff(&from, &to);
-    let is_sqlite = sql_family == SqlFamily::Sqlite;
 
-    let corrected_steps = if is_sqlite {
+    let corrected_steps = if sql_family.is_sqlite() {
         fix_stupid_sqlite(diff, &from, &to, &schema_name)?
     } else {
         fix_id_column_type_change(&from, &to, schema_name, diff.into_steps())?
