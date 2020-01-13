@@ -2,33 +2,53 @@ package util
 
 trait SchemaBaseV11 {
 
-  //NON EMBEDDED A
+  //region NON EMBEDDED WITH @id
 
   val schemaP1reqToC1req = {
     val s1 = """
     model Parent {
-        id       String @id @default(cuid())
-        p        String @unique
-        childReq Child  @relation(references: [id])
+        id            String    @id @default(cuid())
+        p             String    @unique
+        p_1           String?
+        p_2           String?
+        childReq      Child     @relation(references: [id])
+        non_unique    String?
+
+        @@unique([p_1, p_2])
     }
 
     model Child {
-        id        String @id @default(cuid())
-        c         String @unique
-        parentReq Parent
+        id            String    @id @default(cuid())
+        c             String    @unique
+        c_1           String?
+        c_2           String?
+        parentReq     Parent
+        non_unique    String?
+
+        @@unique([c_1, c_2])
     }"""
 
     val s2 = """
     model Parent {
-        id       String @id @default(cuid())
-        p        String @unique
-        childReq Child
+        id            String    @id @default(cuid())
+        p             String    @unique
+        p_1           String?
+        p_2           String?
+        childReq      Child
+        non_unique    String?
+
+        @@unique([p_1, p_2])
     }
 
     model Child {
-        id        String @id @default(cuid())
-        c         String @unique
-        parentReq Parent @relation(references: [id])
+        id            String    @id @default(cuid())
+        c             String    @unique
+        c_1           String?
+        c_2           String?
+        parentReq     Parent    @relation(references: [id])
+        non_unique    String?
+
+        @@unique([c_1, c_2])
     }"""
 
     TestDataModels(mongo = Vector(s1, s2), sql = Vector(s1, s2))
@@ -89,8 +109,7 @@ trait SchemaBaseV11 {
           id        String  @id @default(cuid())
           c         String  @unique
           parentOpt Parent? @relation(references: [id])
-      }
-          """
+      }"""
 
     TestDataModels(mongo = Vector(s1, s2), sql = Vector(s1, s2))
   }
@@ -107,7 +126,7 @@ trait SchemaBaseV11 {
           id        String  @id @default(cuid())
           c         String  @unique
           parentOpt Parent?
-      }"""
+        }"""
 
     val s2 = """
       model Parent {
@@ -240,7 +259,7 @@ trait SchemaBaseV11 {
 
     model Child {
         id         String   @id @default(cuid())
-        c          String   @unique
+        c          String  @unique
         parentsOpt Parent[] @relation(references: [id])
     }"""
 
@@ -270,7 +289,7 @@ trait SchemaBaseV11 {
 
     model Child {
         id         String   @id @default(cuid())
-        c          String   @unique
+        c          String  @unique
         parentsOpt Parent[]
     }"""
 
@@ -283,7 +302,7 @@ trait SchemaBaseV11 {
 
     model Child {
         id         String   @id @default(cuid())
-        c          String   @unique
+        c          String  @unique
         parentsOpt Parent[] @relation(references: [id])
     }"""
 
@@ -296,7 +315,7 @@ trait SchemaBaseV11 {
 
     model Child {
         id         String   @id @default(cuid())
-        c          String   @unique
+        c          String  @unique
         parentsOpt Parent[]
     }"""
 
@@ -327,7 +346,7 @@ trait SchemaBaseV11 {
 
     model Child {
         id         String   @id @default(cuid())
-        c          String   @unique
+        c          String  @unique
         parentsOpt Parent[] @relation(references: [id])
         test       String?
     }"""
@@ -341,7 +360,7 @@ trait SchemaBaseV11 {
 
     model Child {
         id         String   @id @default(cuid())
-        c          String   @unique
+        c          String  @unique
         parentsOpt Parent[]
         test       String?
     }"""
@@ -349,7 +368,9 @@ trait SchemaBaseV11 {
     TestDataModels(mongo = Vector(s1, s2), sql = Vector(s3))
   }
 
-  //EMBEDDED
+  //endregion
+
+  //region EMBEDDED
 
   val embeddedP1req = """model Parent {
                             id       String  @id @default(cuid())
@@ -383,7 +404,9 @@ trait SchemaBaseV11 {
                             test String?
                         }"""
 
-  //EMBEDDED TO NON-EMBEDDED
+  //endregion
+
+  //region EMBEDDED TO NON-EMBEDDED
   val embedddedToJoinFriendReq = """
                             |model Parent {
                             |    id       String  @id @default(cuid())
@@ -439,4 +462,6 @@ trait SchemaBaseV11 {
                         |    test String?
                         |}"""
 
+  //endregion
 }
+
