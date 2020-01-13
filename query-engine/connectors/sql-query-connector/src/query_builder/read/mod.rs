@@ -73,17 +73,21 @@ where
     columns.fold(query.into_select(model), |acc, col| acc.column(col))
 }
 
-pub fn count_by_model(_model: &ModelRef, _query_arguments: QueryArguments) -> Select<'static> {
-    // let id_field = model.fields().id();
+pub fn count_by_model(model: &ModelRef, query_arguments: QueryArguments) -> Select<'static> {
+    let id = model.identifier();
+    let selected_columns = id.as_columns();
 
-    // let selected_fields = vec![id_field.as_column()];
+    let base_query = get_records(model, selected_columns, query_arguments);
+    let table = Table::from(base_query).alias("sub");
 
-    // let base_query = get_records(model, selected_fields.into_iter(), query_arguments);
-    // let table = Table::from(base_query).alias("sub");
-    // let column = Column::from(("sub", id_field.db_name().to_string()));
+    let columns: Vec<Column<'static>> = id
+        .fields()
+        .map(|id_field| {
+            Column::from(("sub", id_field.db_name().to_string()))
+        })
+        .collect();
 
-    // Select::from_table(table).value(count(column))
-    todo!()
+    Select::from_table(table).value(count(Row::from(columns)))
 }
 
 pub fn relation_in_selection<'a, I>(from_field: &RelationFieldRef, identifiers: I) -> ConditionTree<'static>
