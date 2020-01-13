@@ -11,6 +11,8 @@ use std::convert::TryInto;
 /// e.g. that the query schema guarantees that required fields are present.
 /// Errors occur if conversions fail unexpectedly.
 pub fn extract_query_args(arguments: Vec<ParsedArgument>, model: &ModelRef) -> QueryGraphBuilderResult<QueryArguments> {
+    let model_id = model.identifier();
+
     arguments
         .into_iter()
         .fold(Ok(QueryArguments::default()), |result, arg| {
@@ -32,12 +34,12 @@ pub fn extract_query_args(arguments: Vec<ParsedArgument>, model: &ModelRef) -> Q
                     }),
 
                     "after" => Ok(QueryArguments {
-                        after: arg.value.try_into()?,
+                        after: extract_identifier(arg.value, &model_id)?,
                         ..res
                     }),
 
                     "before" => Ok(QueryArguments {
-                        before: arg.value.try_into()?,
+                        before: extract_identifier(arg.value, &model_id)?,
                         ..res
                     }),
 

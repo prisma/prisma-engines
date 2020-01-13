@@ -5,7 +5,7 @@ use crate::{
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
     ParsedInputMap, ParsedInputValue, QueryResult,
 };
-use connector::{Filter, ScalarCompare};
+use connector::Filter;
 use itertools::Itertools;
 use prisma_models::{ModelRef, RelationFieldRef};
 use std::convert::TryInto;
@@ -177,7 +177,7 @@ fn handle_one_to_many(
                     }?;
 
                     if let Node::Query(Query::Write(ref mut wq)) = child_node {
-                        wq.inject_non_list_arg(relation_field_name, parent_id);
+                        wq.inject_inlined_identifier(relation_field_name, parent_id);
                     }
 
                     Ok(child_node)

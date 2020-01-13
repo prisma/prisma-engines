@@ -49,8 +49,6 @@ pub fn upsert_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedF
 
     graph.create_edge(&if_node, &update_node, QueryGraphDependency::Then)?;
     graph.create_edge(&if_node, &create_node, QueryGraphDependency::Else)?;
-
-    let id_field = model.fields().id();
     graph.create_edge(
         &update_node,
         &read_node_update,
@@ -69,8 +67,6 @@ pub fn upsert_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedF
             Ok(node)
         })),
     )?;
-
-    let id_field = model.fields().id();
 
     graph.create_edge(
         &create_node,

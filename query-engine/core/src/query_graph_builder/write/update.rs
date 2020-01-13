@@ -12,8 +12,6 @@ use utils::IdFilter;
 
 /// Creates an update record query and adds it to the query graph, together with it's nested queries and companion read query.
 pub fn update_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedField) -> QueryGraphBuilderResult<()> {
-    let id_field = model.fields().id();
-
     // "where"
     let where_arg: ParsedInputMap = field.arguments.lookup("where").unwrap().value.try_into()?;
 

@@ -132,7 +132,6 @@ fn handle_one_to_many(
 
         // We need to swap the create node and the parent because the inlining is done in the parent.
         graph.mark_nodes(&parent_node, &create_node);
-        // let (parent_node, child_node) = utils::swap_nodes(graph, parent_node, create_node)?;
 
         graph.create_edge(
             &parent_node,
