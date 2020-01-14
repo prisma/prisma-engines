@@ -18,3 +18,6 @@ members = [
   "libs/user-facing-errors",
   "libs/prisma-models",
 ]
+
+[patch.crates-io]
+barrel = { git = "https://github.com/tomhoule/barrel.git" }

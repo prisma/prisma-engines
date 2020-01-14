@@ -26,7 +26,7 @@ version = "0.1"
 features = ["single"]
 
 [dev-dependencies]
-barrel = { version = "0.6.4", features = ["sqlite3", "mysql", "pg"] }
+barrel = { version = "0.6.5-alpha.0", features = ["sqlite3", "mysql", "pg"] }
 test-macros = { path = "../../../libs/test-macros" }
 test-setup = { path = "../../../libs/test-setup" }
 once_cell = "1.2.0"

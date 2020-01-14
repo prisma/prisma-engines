@@ -34,7 +34,7 @@ tracing-futures = "0.2.0"
 quaint = { version = "0.1" }
 
 [dev-dependencies]
-barrel = { version = "0.6.4", features = ["sqlite3", "mysql", "pg"] }
+barrel = { version = "0.6.5-alpha.0", features = ["sqlite3", "mysql", "pg"] }
 pretty_assertions = "0.6"
 sql-schema-describer = { path = "../../libs/sql-schema-describer" }
 test-macros = { path = "../../libs/test-macros" }
