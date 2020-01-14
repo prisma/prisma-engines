@@ -68,22 +68,20 @@ pub async fn update_records(
     todo!()
 }
 
-pub async fn delete_records(_conn: &dyn QueryExt, _model: &ModelRef, _where_: Filter) -> crate::Result<usize> {
-    // let ids = conn.filter_ids(model, where_.clone()).await?;
-    // let ids: Vec<&RecordIdentifier> = ids.iter().map(|id| &*id).collect();
-    // let count = ids.len();
+pub async fn delete_records(conn: &dyn QueryExt, model: &ModelRef, where_: Filter) -> crate::Result<usize> {
+    let ids = conn.filter_ids(model, where_.clone()).await?;
+    let ids: Vec<&RecordIdentifier> = ids.iter().map(|id| &*id).collect();
+    let count = ids.len();
 
-    // if count == 0 {
-    //     return Ok(count);
-    // }
+    if count == 0 {
+        return Ok(count);
+    }
 
-    // for delete in write::delete_many(model, ids.as_slice()) {
-    //     conn.delete(delete).await?;
-    // }
+    for delete in write::delete_many(model, ids.as_slice()) {
+        conn.delete(delete).await?;
+    }
 
-    // Ok(count)
-
-    todo!()
+    Ok(count)
 }
 
 pub async fn connect(

@@ -2,7 +2,7 @@ use prisma_models::*;
 use quaint::ast::*;
 use connector_interface::WriteArgs;
 
-// const PARAMETER_LIMIT: usize = 10000;
+const PARAMETER_LIMIT: usize = 10000;
 
 pub fn create_record(_model: &ModelRef, _args: WriteArgs) -> (Insert<'static>, Option<GraphqlId>) {
     // let mut id_fields = model.primary_identifier();
@@ -89,6 +89,28 @@ pub fn delete_relation_table_records(
         .into()
 }
 
+pub fn delete_many(model: &ModelRef, ids: &[&RecordIdentifier]) -> Vec<Delete<'static>> {
+    ids.chunks(PARAMETER_LIMIT).map(|chunk| {
+        let condition = chunk.into_iter().map(|ids| {
+            let cols_with_vals = model.identifier().as_columns().zip(ids.values());
+
+            cols_with_vals.fold(ConditionTree::NoCondition, |acc, (col, val)| {
+                match acc {
+                    ConditionTree::NoCondition => col.equals(val).into(),
+                    cond => cond.and(col.equals(val)),
+                }
+            })
+        }).fold(ConditionTree::NoCondition, |acc, cond| {
+            match acc {
+                ConditionTree::NoCondition => cond,
+                acc => acc.or(cond),
+            }
+        });
+
+        Delete::from_table(model.as_table()).so_that(condition)
+    }).collect()
+}
+
 /*
 pub fn create_relation_table_records(
     _field: &RelationFieldRef,
@@ -153,19 +175,6 @@ pub fn update_many(_model: &ModelRef, _ids: &[&GraphqlId], _args: &WriteArgs) ->
     //     .collect();
 
     // Ok(result)
-
-    todo!()
-}
-
-pub fn delete_many(_model: &ModelRef, _ids: &[&GraphqlId]) -> Vec<Delete<'static>> {
-    // let mut deletes = Vec::new();
-
-    // for chunk in ids.chunks(PARAMETER_LIMIT).into_iter() {
-    //     let condition = model.fields().id().as_column().in_selection(chunk.to_vec());
-    //     deletes.push(Delete::from_table(model.as_table()).so_that(condition));
-    // }
-
-    // deletes
 
     todo!()
 }
