@@ -32,20 +32,12 @@ impl<'a> Transaction<'a> {
 }
 
 impl<'a> Queryable for Transaction<'a> {
-    fn execute<'b>(&'b self, q: Query<'b>) -> DBIO<'b, Option<Id>> {
-        self.inner.execute(q)
-    }
-
     fn query<'b>(&'b self, q: Query<'b>) -> DBIO<'b, ResultSet> {
         self.inner.query(q)
     }
 
     fn query_raw<'b>(&'b self, sql: &'b str, params: &'b [ParameterizedValue]) -> DBIO<'b, ResultSet> {
         self.inner.query_raw(sql, params)
-    }
-
-    fn execute_raw<'b>(&'b self, sql: &'b str, params: &'b [ParameterizedValue]) -> DBIO<'b, u64> {
-        self.inner.execute_raw(sql, params)
     }
 
     fn raw_cmd<'b>(&'b self, cmd: &'b str) -> DBIO<'b, ()> {

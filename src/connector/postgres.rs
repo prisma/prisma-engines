@@ -2,7 +2,7 @@ mod conversion;
 mod error;
 
 use crate::{
-    ast::{Id, ParameterizedValue, Query},
+    ast::{ParameterizedValue, Query},
     connector::{metrics, queryable::*, ResultSet, DBIO},
     error::Error,
     visitor::{self, Visitor},
@@ -344,35 +344,11 @@ impl PostgreSql {
             client: Mutex::new(client),
         })
     }
-
-    fn execute_and_get_id<'a>(&'a self, sql: &'a str, params: &'a [ParameterizedValue]) -> DBIO<'a, Option<Id>> {
-        metrics::query("postgres.execute", sql, params, move || {
-            async move {
-                let client = self.client.lock().await;
-                let stmt = client.prepare(sql).await?;
-                let rows = client.query(&stmt, conversion::conv_params(params).as_slice()).await?;
-
-                let id: Option<Id> = rows.into_iter().rev().next().map(|row| {
-                    let id: Id = row.get(0);
-                    id
-                });
-
-                Ok(id)
-            }
-        })
-    }
 }
 
 impl TransactionCapable for PostgreSql {}
 
 impl Queryable for PostgreSql {
-    fn execute<'a>(&'a self, q: Query<'a>) -> DBIO<'a, Option<Id>> {
-        DBIO::new(async move {
-            let (sql, params) = visitor::Postgres::build(q);
-            self.execute_and_get_id(&sql, &params).await
-        })
-    }
-
     fn query<'a>(&'a self, q: Query<'a>) -> DBIO<'a, ResultSet> {
         let (sql, params) = visitor::Postgres::build(q);
 
@@ -393,20 +369,6 @@ impl Queryable for PostgreSql {
                 }
 
                 Ok(result)
-            }
-        })
-    }
-
-    fn execute_raw<'a>(&'a self, sql: &'a str, params: &'a [ParameterizedValue]) -> DBIO<'a, u64> {
-        metrics::query("postgres.execute_raw", sql, params, move || {
-            async move {
-                let client = self.client.lock().await;
-                let stmt = client.prepare(sql).await?;
-                let changes = client
-                    .execute(&stmt, conversion::conv_params(params).as_slice())
-                    .await?;
-
-                Ok(changes)
             }
         })
     }

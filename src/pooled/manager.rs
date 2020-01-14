@@ -20,20 +20,12 @@ pub struct PooledConnection {
 impl TransactionCapable for PooledConnection {}
 
 impl Queryable for PooledConnection {
-    fn execute<'a>(&'a self, q: ast::Query<'a>) -> DBIO<'a, Option<ast::Id>> {
-        self.inner.execute(q)
-    }
-
     fn query<'a>(&'a self, q: ast::Query<'a>) -> DBIO<'a, connector::ResultSet> {
         self.inner.query(q)
     }
 
     fn query_raw<'a>(&'a self, sql: &'a str, params: &'a [ast::ParameterizedValue]) -> DBIO<'a, connector::ResultSet> {
         self.inner.query_raw(sql, params)
-    }
-
-    fn execute_raw<'a>(&'a self, sql: &'a str, params: &'a [ast::ParameterizedValue]) -> DBIO<'a, u64> {
-        self.inner.execute_raw(sql, params)
     }
 
     fn raw_cmd<'a>(&'a self, cmd: &'a str) -> DBIO<'a, ()> {

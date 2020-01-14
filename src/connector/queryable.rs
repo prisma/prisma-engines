@@ -18,19 +18,12 @@ pub trait Queryable
 where
     Self: Sync,
 {
-    /// Executes the given query and returns the ID of the last inserted row.
-    fn execute<'a>(&'a self, q: Query<'a>) -> DBIO<'a, Option<Id>>;
-
     /// Executes the given query and returns the result set.
     fn query<'a>(&'a self, q: Query<'a>) -> DBIO<'a, ResultSet>;
 
     /// Executes a query given as SQL, interpolating the given parameters and
     /// returning a set of results.
     fn query_raw<'a>(&'a self, sql: &'a str, params: &'a [ParameterizedValue<'a>]) -> DBIO<'a, ResultSet>;
-
-    /// Executes a query given as SQL, interpolating the given parameters and
-    /// returning the number of affected rows.
-    fn execute_raw<'a>(&'a self, sql: &'a str, params: &'a [ParameterizedValue<'a>]) -> DBIO<'a, u64>;
 
     /// Runs a command in the database, for queries that can't be run using
     /// prepared statements.
@@ -42,14 +35,14 @@ where
     }
 
     /// For inserting data. Returns the ID of the last inserted row.
-    fn insert<'a>(&'a self, q: Insert<'a>) -> DBIO<'a, Option<Id>> {
-        self.execute(q.into())
+    fn insert<'a>(&'a self, q: Insert<'a>) -> DBIO<'a, ResultSet> {
+        self.query(q.into())
     }
 
     /// For updating data.
     fn update<'a>(&'a self, q: Update<'a>) -> DBIO<'a, ()> {
         DBIO::new(async move {
-            self.execute(q.into()).await?;
+            self.query(q.into()).await?;
             Ok(())
         })
     }
@@ -57,7 +50,7 @@ where
     /// For deleting data.
     fn delete<'a>(&'a self, q: Delete<'a>) -> DBIO<'a, ()> {
         DBIO::new(async move {
-            self.execute(q.into()).await?;
+            self.query(q.into()).await?;
             Ok(())
         })
     }

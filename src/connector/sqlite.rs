@@ -2,7 +2,7 @@ mod conversion;
 mod error;
 
 use crate::{
-    ast::{Id, ParameterizedValue, Query},
+    ast::{ParameterizedValue, Query},
     connector::{metrics, queryable::*, ResultSet, DBIO},
     error::Error,
     visitor::{self, Visitor},
@@ -137,19 +137,6 @@ impl Sqlite {
 impl TransactionCapable for Sqlite {}
 
 impl Queryable for Sqlite {
-    fn execute<'a>(&'a self, q: Query<'a>) -> DBIO<'a, Option<Id>> {
-        DBIO::new(async move {
-            let (sql, params) = visitor::Sqlite::build(q);
-
-            self.execute_raw(&sql, &params).await?;
-
-            let client = self.client.lock().unwrap();
-            let res = Some(Id::Int(client.last_insert_rowid() as usize));
-
-            Ok(res)
-        })
-    }
-
     fn query<'a>(&'a self, q: Query<'a>) -> DBIO<'a, ResultSet> {
         let (sql, params) = visitor::Sqlite::build(q);
 
@@ -169,25 +156,9 @@ impl Queryable for Sqlite {
                     result.rows.push(row.get_result_row()?);
                 }
 
+                result.set_last_insert_id(u64::try_from(client.last_insert_rowid()).unwrap_or(0));
+
                 Ok(result)
-            };
-
-            match res() {
-                Ok(res) => future::ok(res),
-                Err(e) => future::err(e),
-            }
-        })
-    }
-
-    fn execute_raw<'a>(&'a self, sql: &'a str, params: &'a [ParameterizedValue]) -> DBIO<'a, u64> {
-        metrics::query("sqlite.execute_raw", sql, params, move || {
-            let res = move || {
-                let client = self.client.lock().unwrap();
-
-                let mut stmt = client.prepare_cached(sql)?;
-                let changes = stmt.execute(params)?;
-
-                Ok(u64::try_from(changes).unwrap())
             };
 
             match res() {

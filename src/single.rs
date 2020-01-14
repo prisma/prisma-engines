@@ -125,20 +125,12 @@ impl Quaint {
 }
 
 impl Queryable for Quaint {
-    fn execute<'a>(&'a self, q: ast::Query<'a>) -> DBIO<'a, Option<ast::Id>> {
-        DBIO::new(async move { self.inner.lock().await.execute(q).await })
-    }
-
     fn query<'a>(&'a self, q: ast::Query<'a>) -> DBIO<'a, connector::ResultSet> {
         DBIO::new(async move { self.inner.lock().await.query(q).await })
     }
 
     fn query_raw<'a>(&'a self, sql: &'a str, params: &'a [ast::ParameterizedValue]) -> DBIO<'a, connector::ResultSet> {
         DBIO::new(async move { self.inner.lock().await.query_raw(sql, params).await })
-    }
-
-    fn execute_raw<'a>(&'a self, sql: &'a str, params: &'a [ast::ParameterizedValue]) -> DBIO<'a, u64> {
-        DBIO::new(async move { self.inner.lock().await.execute_raw(sql, params).await })
     }
 
     fn raw_cmd<'a>(&'a self, cmd: &'a str) -> DBIO<'a, ()> {

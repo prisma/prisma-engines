@@ -58,8 +58,8 @@ uuid = { version = "0.8", optional = true }
 chrono = { version = "0.4", optional = true }
 serde_json = { version = "1.0", optional = true }
 
-rusqlite = { version = "0.20", features = ["chrono", "bundled"], optional = true }
-libsqlite3-sys = { version = "0.16", default-features = false, features = ["bundled"], optional = true }
+rusqlite = { version = "0.21", features = ["chrono", "bundled"], optional = true }
+libsqlite3-sys = { version = "0.17", default-features = false, features = ["bundled"], optional = true }
 
 tokio-postgres = { version = "0.5", features = ["with-uuid-0_8", "with-chrono-0_4", "with-serde_json-1"], optional = true }
 postgres-native-tls = { version = "0.3", optional = true }

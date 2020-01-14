@@ -14,19 +14,35 @@ use std::{
 use serde_json::{Map, Value};
 
 /// Encapsulates a set of results and their respective column names.
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct ResultSet {
     pub(crate) rows: Vec<Vec<ParameterizedValue<'static>>>,
     pub(crate) name_to_index: Arc<BTreeMap<String, usize>>,
+    pub(crate) last_insert_id: Option<u64>,
 }
 
 impl ResultSet {
     /// Creates a new instance, bound to the given column names and result rows.
-    pub fn new(names: Vec<String>, rows: Vec<Vec<ParameterizedValue<'static>>>) -> ResultSet {
-        ResultSet {
+    pub fn new(
+        names: Vec<String>,
+        rows: Vec<Vec<ParameterizedValue<'static>>>,
+    ) -> Self
+    {
+        Self {
             name_to_index: Arc::new(Self::build_name_map(names)),
             rows,
+            last_insert_id: None,
         }
+    }
+
+    pub(crate) fn set_last_insert_id(&mut self, id: u64) {
+        self.last_insert_id = Some(id);
+    }
+
+    /// The last id inserted, if available. Only works on certain databases and
+    /// if using an auto-increment ids.
+    pub fn last_insert_id(&self) -> Option<u64> {
+        self.last_insert_id
     }
 
     /// An iterator of column names.

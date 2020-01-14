@@ -1,5 +1,5 @@
 use crate::{
-    ast::{Id, ParameterizedValue},
+    ast::ParameterizedValue,
     connector::queryable::{GetRow, ToColumnNames},
 };
 use bytes::BytesMut;
@@ -8,7 +8,7 @@ use chrono::{DateTime, NaiveDateTime, Utc};
 use rust_decimal::{prelude::FromPrimitive, Decimal};
 use std::{error::Error, str::FromStr};
 use tokio_postgres::{
-    types::{self, FromSql, IsNull, ToSql, Type as PostgresType},
+    types::{self, IsNull, ToSql, Type as PostgresType},
     Row as PostgresRow, Statement as PostgresStatement,
 };
 
@@ -17,42 +17,6 @@ use uuid::Uuid;
 
 pub fn conv_params<'a>(params: &'a [ParameterizedValue<'a>]) -> Vec<&'a (dyn types::ToSql + Sync)> {
     params.iter().map(|x| x as &(dyn ToSql + Sync)).collect::<Vec<_>>()
-}
-
-#[cfg(feature = "uuid-0_8")]
-fn accepts(ty: &PostgresType) -> bool {
-    <Uuid as FromSql>::accepts(ty)
-        || <&str as FromSql>::accepts(ty)
-        || <i16 as FromSql>::accepts(ty)
-        || <i32 as FromSql>::accepts(ty)
-        || <i64 as FromSql>::accepts(ty)
-}
-
-#[cfg(not(feature = "uuid-0_8"))]
-fn accepts(ty: &PostgresType) -> bool {
-    <&str as FromSql>::accepts(ty)
-        || <i16 as FromSql>::accepts(ty)
-        || <i32 as FromSql>::accepts(ty)
-        || <i64 as FromSql>::accepts(ty)
-}
-
-impl<'a> FromSql<'a> for Id {
-    fn from_sql(ty: &PostgresType, raw: &'a [u8]) -> Result<Id, Box<dyn std::error::Error + Sync + Send>> {
-        let res = match *ty {
-            PostgresType::INT2 => Id::Int(i16::from_sql(ty, raw)? as usize),
-            PostgresType::INT4 => Id::Int(i32::from_sql(ty, raw)? as usize),
-            PostgresType::INT8 => Id::Int(i64::from_sql(ty, raw)? as usize),
-            #[cfg(feature = "uuid-0_8")]
-            PostgresType::UUID => Id::UUID(Uuid::from_sql(ty, raw)?),
-            _ => Id::String(String::from_sql(ty, raw)?),
-        };
-
-        Ok(res)
-    }
-
-    fn accepts(ty: &PostgresType) -> bool {
-        accepts(ty)
-    }
 }
 
 impl GetRow for PostgresRow {

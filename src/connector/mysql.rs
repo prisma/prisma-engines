@@ -7,7 +7,7 @@ use std::{borrow::Cow, path::Path, time::Duration};
 use url::Url;
 
 use crate::{
-    ast::{Id, ParameterizedValue, Query},
+    ast::{ParameterizedValue, Query},
     connector::{metrics, queryable::*, ResultSet, DBIO},
     error::Error,
     visitor::{self, Visitor},
@@ -209,29 +209,11 @@ impl Mysql {
             pool: my::Pool::new(opts),
         })
     }
-
-    fn execute_and_get_id<'a>(&'a self, sql: &'a str, params: &'a [ParameterizedValue]) -> DBIO<'a, Option<Id>> {
-        metrics::query("mysql.execute", sql, params, move || {
-            async move {
-                let conn = self.pool.get_conn().await?;
-                let results = conn.prep_exec(sql, params.to_vec()).await?;
-
-                Ok(results.last_insert_id().map(Id::from))
-            }
-        })
-    }
 }
 
 impl TransactionCapable for Mysql {}
 
 impl Queryable for Mysql {
-    fn execute<'a>(&'a self, q: Query<'a>) -> DBIO<'a, Option<Id>> {
-        DBIO::new(async move {
-            let (sql, params) = visitor::Mysql::build(q);
-            self.execute_and_get_id(&sql, &params).await
-        })
-    }
-
     fn query<'a>(&'a self, q: Query<'a>) -> DBIO<'a, ResultSet> {
         DBIO::new(async move {
             let (sql, params) = visitor::Mysql::build(q);
@@ -250,25 +232,20 @@ impl Queryable for Mysql {
                     .map(|s| s.name_str().into_owned())
                     .collect();
 
+                let last_id = results.last_insert_id();
                 let mut result_set = ResultSet::new(columns, Vec::new());
+
                 let (_, rows) = results.map_and_drop(|mut row| row.take_result_row()).await?;
 
                 for row in rows.into_iter() {
                     result_set.rows.push(row?);
                 }
 
+                if let Some(id) = last_id {
+                    result_set.set_last_insert_id(id);
+                };
+
                 Ok(result_set)
-            }
-        })
-    }
-
-    fn execute_raw<'a>(&'a self, sql: &'a str, params: &'a [ParameterizedValue]) -> DBIO<'a, u64> {
-        metrics::query("mysql.execute_raw", sql, params, move || {
-            async move {
-                let conn = self.pool.get_conn().await?;
-                let result = conn.prep_exec(sql, conversion::conv_params(params)).await?;
-
-                Ok(result.affected_rows())
             }
         })
     }
