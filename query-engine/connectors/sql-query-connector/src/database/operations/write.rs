@@ -101,15 +101,13 @@ pub async fn connect(
 }
 
 pub async fn disconnect(
-    _conn: &dyn QueryExt,
-    _field: &RelationFieldRef,
-    _parent_id: &RecordIdentifier,
-    _child_ids: &[RecordIdentifier],
+    conn: &dyn QueryExt,
+    field: &RelationFieldRef,
+    parent_id: &RecordIdentifier,
+    child_ids: &[RecordIdentifier],
 ) -> crate::Result<()> {
-    // let query = write::delete_relation_table_records(field, parent_id, child_ids);
+    let query = write::delete_relation_table_records(field, parent_id, child_ids);
+    conn.execute(query).await?;
 
-    // conn.execute(query).await?;
-    // Ok(())
-
-    todo!()
+    Ok(())
 }

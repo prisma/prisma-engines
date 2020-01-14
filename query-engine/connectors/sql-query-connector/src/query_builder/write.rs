@@ -54,6 +54,41 @@ pub fn create_record(_model: &ModelRef, _args: WriteArgs) -> (Insert<'static>, O
     todo!()
 }
 
+pub fn delete_relation_table_records(
+    field: &RelationFieldRef,
+    parent_ids: &RecordIdentifier,
+    child_ids: &[RecordIdentifier],
+) -> Query<'static> {
+    let relation = field.relation();
+    let parent_columns: Vec<Column<'static>> = field.relation_columns(false).collect();
+
+    let parent_ids: Vec<PrismaValue> = parent_ids.values().collect();
+    let parent_id_criteria = Row::from(parent_columns).equals(parent_ids);
+
+    let child_id_criteria = child_ids
+        .into_iter()
+        .map(|ids| {
+            let cols_with_vals = field.opposite_columns(false).zip(ids.values());
+
+            cols_with_vals.fold(ConditionTree::NoCondition, |acc, (col, val)| {
+                match acc {
+                    ConditionTree::NoCondition => col.equals(val).into(),
+                    cond => cond.and(col.equals(val))
+                }
+            })
+        }).fold(ConditionTree::NoCondition, |acc, cond| {
+            match acc {
+                ConditionTree::NoCondition => cond,
+                acc => acc.or(cond),
+            }
+        });
+
+
+    Delete::from_table(relation.as_table())
+        .so_that(parent_id_criteria.and(child_id_criteria))
+        .into()
+}
+
 /*
 pub fn create_relation_table_records(
     _field: &RelationFieldRef,
@@ -83,25 +118,6 @@ pub fn create_relation_table_records(
     //     .into();
 
     // insert.build().on_conflict(OnConflict::DoNothing).into()
-
-    todo!()
-}
-
-pub fn delete_relation_table_records(
-    _field: &RelationFieldRef,
-    _parent_id: &GraphqlId,
-    _child_ids: &[GraphqlId],
-) -> Query<'static> {
-    // let relation = field.relation();
-    // let parent_column = field.relation_column(false);
-    // let child_column = field.opposite_column(false);
-
-    // let parent_id_criteria = parent_column.equals(parent_id);
-    // let child_id_criteria = child_column.in_selection(child_ids.to_owned());
-
-    // Delete::from_table(relation.as_table())
-    //     .so_that(parent_id_criteria.and(child_id_criteria))
-    //     .into()
 
     todo!()
 }
