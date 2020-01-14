@@ -1,6 +1,12 @@
 use crate::{ModelRef, ScalarField};
 use std::sync::Arc;
 
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+pub struct OrderBy {
+    pub field: Arc<ScalarField>,
+    pub sort_order: SortOrder,
+}
+
 pub trait IntoOrderBy {
     fn into_order_by(self, model: ModelRef) -> OrderBy;
 }
@@ -19,10 +25,4 @@ impl SortOrder {
             SortOrder::Descending => "DESC",
         }
     }
-}
-
-#[derive(Clone, Debug, PartialEq, Eq, Hash)]
-pub struct OrderBy {
-    pub field: Arc<ScalarField>,
-    pub sort_order: SortOrder,
 }

@@ -1,4 +1,4 @@
-use crate::{dml, DomainError, DomainResult, EnumValue};
+use crate::{dml, DomainError, DomainResult};
 use chrono::prelude::*;
 use rust_decimal::{
     prelude::{FromPrimitive, ToPrimitive},
@@ -31,7 +31,7 @@ pub enum PrismaValue {
     Boolean(bool),
     #[serde(serialize_with = "serialize_date")]
     DateTime(DateTime<Utc>),
-    Enum(EnumValue),
+    Enum(String),
     Int(i64),
     Null,
     Uuid(Uuid),
@@ -69,7 +69,7 @@ impl fmt::Display for PrismaValue {
             PrismaValue::Float(x) => x.fmt(f),
             PrismaValue::Boolean(x) => x.fmt(f),
             PrismaValue::DateTime(x) => x.fmt(f),
-            PrismaValue::Enum(x) => x.as_string().fmt(f),
+            PrismaValue::Enum(x) => x.fmt(f),
             PrismaValue::Int(x) => x.fmt(f),
             PrismaValue::Null => "null".fmt(f),
             PrismaValue::Uuid(x) => x.fmt(f),
@@ -258,7 +258,7 @@ impl From<Option<dml::ScalarValue>> for PrismaValue {
             dml::ScalarValue::String(x) => PrismaValue::String(x.clone()),
             dml::ScalarValue::DateTime(x) => PrismaValue::DateTime(x),
             dml::ScalarValue::Decimal(x) => x.try_into().expect("Can't convert float to decimal"),
-            dml::ScalarValue::ConstantLiteral(x) => PrismaValue::Enum(EnumValue::string(x.clone(), x.clone())),
+            dml::ScalarValue::ConstantLiteral(x) => PrismaValue::Enum(x.clone()),
         })
         .unwrap_or_else(|| PrismaValue::Null)
     }
