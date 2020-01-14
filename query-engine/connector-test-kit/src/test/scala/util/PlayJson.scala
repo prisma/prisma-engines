@@ -82,6 +82,14 @@ trait PlayJsonExtensions extends JsonUtils {
     def getFirstErrorCode = jsValue.pathAsSeq("errors").head.pathAsLong("code")
 
     def getFirstFunctionErrorMessage = jsValue.pathAsSeq("errors").head.pathAsString("functionError")
+
+    def identifierAtPath(path: String, subPath: String = "") : String = {
+        subPath match {
+          case "" => pathAsJsObject(path).toString()
+          case x  => pathAsString(path + x)
+        }
+
+    }
   }
 
   implicit class PlayJsonAssertionsExtension(json: JsValue) {

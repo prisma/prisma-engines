@@ -2,9 +2,99 @@ package util
 
 trait SchemaBaseV11 {
 
-  //region NON EMBEDDED WITH @id
+  //todo make this super generic over the datamodel
 
   val schemaP1reqToC1req = {
+
+    // todo allow to pass in flags to enable/disable certain combinations ??
+
+//    vectors of strings
+//    for comprehension over the vectors
+//    generate datamodel,
+//    then loop further over the options for the query params
+//    return case class containing all
+//    pass that one to the tests
+
+
+
+
+
+    val parent_id =  "id            String    @id @default(cuid())"
+
+    //val parent_id =    """id_1          String    @id @default(cuid())
+    //                      id_2          String    @id @default(cuid())
+    //                      @@unique([id_1, id_2])"""
+
+    //val parent_id = ""
+
+    val child_id =    "id            String    @id @default(cuid())"
+
+    //val child_id =    """id_1          String    @id @default(cuid())
+    //                     id_2          String    @id @default(cuid())
+    //                     @@unique([id_1, id_2])"""
+
+    //val child_id =    ""
+
+
+
+     val (relation_parent, relation_child) =      ("@relation(references: [id])", "")
+    // val (relation_parent, relation_child) =     ("", "@relation(references: [id])")
+
+    // val (relation_parent, relation_child) =     ("@relation(references: [id_1, id_2]) @map(["child_id_1", "child_id_2"])", "")
+    // val (relation_parent, relation_child) =     ("", "@relation(references: [id_1, id_2]) @map(["parent_id_1", "parent_id_2"])")
+
+    // val (relation_parent, relation_child) =     ("@relation(references: [c])", "")
+    // val (relation_parent, relation_child) =     ("", "@relation(references: [p])")
+
+    // val (relation_parent, relation_child) =     ("@relation(references: [c_1, c_2]) @map(["child_c_1", "child_c_2"])", "")
+    // val (relation_parent, relation_child) =     ("", "@relation(references: [p_1, p_2]) @map(["parent_p_1", "parent_p_2"])")
+
+
+    val s1 = s"""
+    model Parent {
+        p             String    @unique
+        p_1           String?
+        p_2           String?
+        childReq      Child     $relation_parent
+        non_unique    String?
+        $parent_id
+
+        @@unique([p_1, p_2])
+    }
+
+    model Child {
+        c             String    @unique
+        c_1           String?
+        c_2           String?
+        parentReq     Parent    $relation_child
+        non_unique    String?
+        $child_id
+
+        @@unique([c_1, c_2])
+    }"""
+
+
+//    Test Case Class
+//    Datamodel
+//    parentIdentifierName
+//    parentReturnValue
+//    parentReturnValueParse
+//    childIdentifierName
+//    childReturnValue
+//    childReturnValueParse
+
+//    println(s1)
+    //todo generate different data models here,
+    //pass back the necessary placeholders for the operation together with the datamodel
+
+    TestDataModels(mongo = Vector(s1), sql = Vector(s1))
+  }
+
+
+
+  //region NON EMBEDDED WITH @id
+
+  val schemaP1reqToC1reqWithId = {
     val s1 = """
     model Parent {
         id            String    @id @default(cuid())
@@ -53,6 +143,113 @@ trait SchemaBaseV11 {
 
     TestDataModels(mongo = Vector(s1, s2), sql = Vector(s1, s2))
   }
+
+  val schemaP1reqToC1reqWithCompoundId = {
+    val s1 = """
+    model Parent {
+        id_1          String    @default(cuid())
+        id_2          String    @default(cuid())
+        p             String    @unique
+        p_1           String?
+        p_2           String?
+        childReq      Child     @relation(references: [id_2, id_2]) @map("child_id_1", "child_id_2")
+        non_unique    String?
+
+        @@id([id_1, id_2])
+        @@unique([p_1, p_2])
+    }
+
+    model Child {
+        id_1          String    @default(cuid())
+        id_2          String    @default(cuid())
+        c             String    @unique
+        c_1           String?
+        c_2           String?
+        parentReq     Parent
+        non_unique    String?
+
+        @@id([id_1, id_2])
+        @@unique([c_1, c_2])
+    }"""
+
+    val s2 = """
+     model Parent {
+        id_1          String    @default(cuid())
+        id_2          String    @default(cuid())
+        p             String    @unique
+        p_1           String?
+        p_2           String?
+        childReq      Child
+        non_unique    String?
+
+        @@id([id_1, id_2])
+        @@unique([p_1, p_2])
+    }
+
+    model Child {
+        id_1          String    @default(cuid())
+        id_2          String    @default(cuid())
+        c             String    @unique
+        c_1           String?
+        c_2           String?
+        parentReq     Parent    @relation(references: [id_2, id_2]) @map("parent_id_1", "parent_id_2")
+        non_unique    String?
+
+        @@id([id_1, id_2])
+        @@unique([c_1, c_2])
+    }"""
+
+    TestDataModels(mongo = Vector(s1, s2), sql = Vector(s1, s2))
+  }
+
+  val schemaP1reqToC1reqWithoutId = {
+    val s1 = """
+    model Parent {
+        p             String    @unique
+        p_1           String?
+        p_2           String?
+        childReq      Child     @relation(references: [c])
+        non_unique    String?
+
+        @@unique([p_1, p_2])
+    }
+
+    model Child {
+        c             String    @unique
+        c_1           String?
+        c_2           String?
+        parentReq     Parent
+        non_unique    String?
+
+        @@unique([c_1, c_2])
+    }"""
+
+    val s2 = """
+    model Parent {
+        p             String    @unique
+        p_1           String?
+        p_2           String?
+        childReq      Child
+        non_unique    String?
+
+        @@unique([p_1, p_2])
+    }
+
+    model Child {
+        c             String    @unique
+        c_1           String?
+        c_2           String?
+        parentReq     Parent    @relation(references: [p_1, p_2]) @map(["parent_p_1", "parent_p_2"])
+        non_unique    String?
+
+        @@unique([c_1, c_2])
+    }"""
+
+    TestDataModels(mongo = Vector(s1, s2), sql = Vector(s1, s2))
+  }
+
+
+  // todo
 
   val schemaP1optToC1req = {
     val s1 = """
