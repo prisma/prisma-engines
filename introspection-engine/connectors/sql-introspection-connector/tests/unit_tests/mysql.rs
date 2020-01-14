@@ -71,14 +71,18 @@ async fn introspecting_a_table_with_unique_index_must_work(api: &TestApi) {
                     t.add_column("id", types::primary());
                     t.add_column("authorId", types::varchar(10));
                 });
-                migration.inject_custom(format!(
-                    "Create Unique Index `test` on `{}`.`Blog`( `authorId`)",
-                    api.db_name()
-                ));
             },
             api.db_name(),
         )
         .await;
+
+    api.database()
+        .execute_raw(
+            &format!("Create Unique Index `test` on `{}`.`Blog`( `authorId`)", api.db_name()),
+            &[],
+        )
+        .await
+        .unwrap();
 
     let dm = r#"
             model Blog {
@@ -101,14 +105,21 @@ async fn introspecting_a_table_with_multi_column_unique_index_must_work(api: &Te
                     t.add_column("firstname", types::varchar(10));
                     t.add_column("lastname", types::varchar(10));
                 });
-                migration.inject_custom(format!(
-                    "Create Unique Index `test` on `{}`.`User`( `firstname`, `lastname`)",
-                    api.db_name()
-                ));
             },
             api.db_name(),
         )
         .await;
+
+    api.database()
+        .execute_raw(
+            &format!(
+                "Create Unique Index `test` on `{}`.`User`( `firstname`, `lastname`)",
+                api.db_name()
+            ),
+            &[],
+        )
+        .await
+        .unwrap();
 
     let dm = r#"
             model User {
@@ -217,11 +228,15 @@ async fn introspecting_a_table_with_a_non_unique_index_should_work(api: &TestApi
                     t.add_column("a", types::varchar(10));
                     t.add_column("id", types::primary());
                 });
-                migration.inject_custom(format!("Create Index `test` on `{}`.`User`(`a`)", api.db_name()));
             },
             api.db_name(),
         )
         .await;
+
+    api.database()
+        .execute_raw(&format!("Create Index `test` on `{}`.`User`(`a`)", api.db_name()), &[])
+        .await
+        .unwrap();
 
     let dm = r#"
             model User {
@@ -245,11 +260,18 @@ async fn introspecting_a_table_with_a_multi_column_non_unique_index_should_work(
                     t.add_column("b", types::varchar(10));
                     t.add_column("id", types::primary());
                 });
-                migration.inject_custom(format!("Create Index `test` on `{}`.`User`(`a`,`b`)", api.db_name()));
             },
             api.db_name(),
         )
         .await;
+
+    api.database()
+        .execute_raw(
+            &format!("Create Index `test` on `{}`.`User`(`a`,`b`)", api.db_name()),
+            &[],
+        )
+        .await
+        .unwrap();
 
     let dm = r#"
             model User {
@@ -313,21 +335,35 @@ async fn introspecting_two_one_to_one_relations_between_the_same_models_should_w
                     t.add_column("id", types::primary());
                     t.inject_custom(
                         "user_id INTEGER NOT NULL UNIQUE,\
-                     FOREIGN KEY(`user_id`) REFERENCES `User`(`id`)",
+                         FOREIGN KEY(`user_id`) REFERENCES `User`(`id`)",
                     )
                 });
-                migration.inject_custom(format!(
-                    "ALTER TABLE `{}`.`User` ADD Column `post_id` INTEGER NOT NULL UNIQUE ",
-                    api.db_name(),
-                ));
-                migration.inject_custom(format!(
-                    "ALTER TABLE `{}`.`User` ADD CONSTRAINT `post_fk` FOREIGN KEY(`post_id`) REFERENCES `Post`(`id`)",
-                    api.db_name(),
-                ));
             },
             api.db_name(),
         )
         .await;
+
+    api.database()
+        .execute_raw(
+            &format!(
+                "ALTER TABLE `{}`.`User` ADD Column `post_id` INTEGER NOT NULL UNIQUE ",
+                api.db_name(),
+            ),
+            &[],
+        )
+        .await
+        .unwrap();
+
+    api.database()
+        .execute_raw(
+            &format!(
+                "ALTER TABLE `{}`.`User` ADD CONSTRAINT `post_fk` FOREIGN KEY(`post_id`) REFERENCES `Post`(`id`)",
+                api.db_name(),
+            ),
+            &[],
+        )
+        .await
+        .unwrap();
 
     let dm = r#"
             model Post {
@@ -359,7 +395,7 @@ async fn introspecting_a_one_to_one_relation_should_work(api: &TestApi) {
                     t.add_column("id", types::primary());
                     t.inject_custom(
                         "user_id INTEGER UNIQUE,\
-                     FOREIGN KEY (`user_id`) REFERENCES `User`(`id`)",
+                         FOREIGN KEY (`user_id`) REFERENCES `User`(`id`)",
                     );
                 });
             },
@@ -429,7 +465,7 @@ async fn introspecting_a_one_to_many_relation_should_work(api: &TestApi) {
                     t.add_column("id", types::primary());
                     t.inject_custom(
                         "user_id INTEGER,\
-                     FOREIGN KEY (`user_id`) REFERENCES `User`(`id`)",
+                         FOREIGN KEY (`user_id`) REFERENCES `User`(`id`)",
                     );
                 });
             },
@@ -465,7 +501,7 @@ async fn introspecting_a_one_req_to_many_relation_should_work(api: &TestApi) {
                     t.add_column("id", types::primary());
                     t.inject_custom(
                         "user_id INTEGER NOT NULL,\
-                     FOREIGN KEY (`user_id`) REFERENCES `User`(`id`)",
+                         FOREIGN KEY (`user_id`) REFERENCES `User`(`id`)",
                     );
                 });
             },
@@ -508,14 +544,21 @@ async fn introspecting_a_prisma_many_to_many_relation_should_work(api: &TestApi)
                      FOREIGN KEY (`B`) REFERENCES  `User`(`id`) ON DELETE CASCADE",
                     )
                 });
-                migration.inject_custom(format!(
-                    "CREATE UNIQUE INDEX test ON `{schema_name}`.`_PostToUser` (`A`, `B`);",
-                    schema_name = api.db_name()
-                ))
             },
             api.db_name(),
         )
         .await;
+
+    api.database()
+        .execute_raw(
+            &format!(
+                "CREATE UNIQUE INDEX test ON `{schema_name}`.`_PostToUser` (`A`, `B`);",
+                schema_name = api.db_name()
+            ),
+            &[],
+        )
+        .await
+        .unwrap();
 
     let dm = r#"
             model Post {

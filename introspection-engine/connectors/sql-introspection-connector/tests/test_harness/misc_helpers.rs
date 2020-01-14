@@ -1,6 +1,6 @@
 use barrel::Migration;
 use pretty_assertions::assert_eq;
-use quaint::{connector::Queryable};
+use quaint::connector::Queryable;
 use std::sync::Arc;
 
 pub(crate) fn custom_assert(left: &str, right: &str) {
@@ -32,6 +32,7 @@ impl BarrelMigrationExecutor {
     where
         F: FnMut(&mut Migration) -> (),
     {
+        dbg!(&self.sql_variant);
         self.execute_with_schema(migration_fn, &self.schema_name).await
     }
 
