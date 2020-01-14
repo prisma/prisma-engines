@@ -1,7 +1,8 @@
 mod error;
+#[cfg(feature = "sql-ext")]
+pub mod sql_ext;
 
 use chrono::prelude::*;
-use error::ConversionFailure;
 use rust_decimal::{
     prelude::{FromPrimitive, ToPrimitive},
     Decimal,
@@ -10,6 +11,7 @@ use serde::{ser::Serializer, Serialize};
 use std::{convert::TryFrom, fmt, string::FromUtf8Error};
 use uuid::Uuid;
 
+pub use error::ConversionFailure;
 pub type PrismaValueResult<T> = std::result::Result<T, ConversionFailure>;
 pub type PrismaListValue = Vec<PrismaValue>;
 
