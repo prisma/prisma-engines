@@ -13,7 +13,7 @@ prisma-models = { path = "../../../libs/prisma-models" }
 chrono = { version = "0.4" }
 serde_json = "1.0"
 serde = "1.0"
-barrel = { version = "0.6.3-alpha.0", features = ["sqlite3", "mysql", "pg"] }
+barrel = { version = "0.6.4", features = ["sqlite3", "mysql", "pg"] }
 itertools = "0.8"
 user-facing-errors = { path = "../../../libs/user-facing-errors" }
 tracing = "0.1.10"
