@@ -72,6 +72,14 @@ impl RecordIdentifier {
     pub fn values(&self) -> impl Iterator<Item = PrismaValue> + '_ {
         self.pairs.iter().map(|p| p.1.clone())
     }
+
+    pub fn len(&self) -> usize {
+        self.pairs.len()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
 }
 
 impl IntoIterator for RecordIdentifier {

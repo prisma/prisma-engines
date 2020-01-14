@@ -85,17 +85,15 @@ pub async fn delete_records(conn: &dyn QueryExt, model: &ModelRef, where_: Filte
 }
 
 pub async fn connect(
-    _conn: &dyn QueryExt,
-    _field: &RelationFieldRef,
-    _parent_id: &RecordIdentifier,
-    _child_ids: &[RecordIdentifier],
+    conn: &dyn QueryExt,
+    field: &RelationFieldRef,
+    parent_id: &RecordIdentifier,
+    child_ids: &[RecordIdentifier],
 ) -> crate::Result<()> {
-    // let query = write::create_relation_table_records(field, parent_id, child_ids);
+    let query = write::create_relation_table_records(field, parent_id, child_ids);
 
-    // conn.execute(query).await?;
-    // Ok(())
-
-    todo!()
+    conn.execute(query).await?;
+    Ok(())
 }
 
 pub async fn disconnect(

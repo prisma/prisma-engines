@@ -111,38 +111,49 @@ pub fn delete_many(model: &ModelRef, ids: &[&RecordIdentifier]) -> Vec<Delete<'s
     }).collect()
 }
 
-/*
 pub fn create_relation_table_records(
-    _field: &RelationFieldRef,
-    _parent_id: &GraphqlId,
-    _child_ids: &[GraphqlId],
+    field: &RelationFieldRef,
+    parent_id: &RecordIdentifier,
+    child_ids: &[RecordIdentifier],
 ) -> Query<'static> {
-    // let relation = field.relation();
-    // let parent_column = field.relation_column(false);
-    // let child_column = field.opposite_column(false);
+    let relation = field.relation();
+    let parent_columns = field.relation_columns(false).map(|c| c.name.to_string());
+    let child_columns = field.opposite_columns(false).map(|c| c.name.to_string());
 
-    // let mut columns = vec![parent_column.name.to_string(), child_column.name.to_string()];
-    // if let Some(id_col) = relation.id_column() {
-    //     columns.push(id_col.name.to_string());
-    // };
+    let mut columns: Vec<String> = parent_columns.chain(child_columns).collect();
 
-    // let generate_ids = relation.id_column().is_some();
-    // let insert = Insert::multi_into(relation.as_table(), columns);
-    // let insert: MultiRowInsert = child_ids
-    //     .into_iter()
-    //     .fold(insert, |insert, child_id| {
-    //         if generate_ids {
-    //             insert.values((parent_id.clone(), child_id.clone(), cuid::cuid().unwrap()))
-    //         } else {
-    //             insert.values((parent_id.clone(), child_id.clone()))
-    //         }
-    //     })
-    //     .into();
+    let id_columns = relation.id_columns();
 
-    // insert.build().on_conflict(OnConflict::DoNothing).into()
+    if let Some(mut id_cols) = relation.id_columns() {
+        assert!(id_cols.len() == 1);
+        columns.push(id_cols.next().unwrap().name.to_string())
+    }
 
-    todo!()
+    let generate_ids = id_columns.is_some();
+
+    let insert = Insert::multi_into(relation.as_table(), columns);
+
+    let insert: MultiRowInsert = child_ids
+        .into_iter()
+        .fold(insert, |insert, child_id| {
+            assert!(child_id.len() == 1);
+            assert!(parent_id.len() == 1);
+
+            let child_id = child_id.values().next().unwrap();
+            let parent_id = parent_id.values().next().unwrap();
+
+            if generate_ids {
+                insert.values((parent_id.clone(), child_id.clone(), cuid::cuid().unwrap()))
+            } else {
+                insert.values((parent_id.clone(), child_id.clone()))
+            }
+        })
+        .into();
+
+    insert.build().on_conflict(OnConflict::DoNothing).into()
 }
+
+/*
 
 pub fn update_many(_model: &ModelRef, _ids: &[&GraphqlId], _args: &WriteArgs) -> crate::Result<Vec<Update<'static>>> {
     // if args.args.is_empty() || ids.is_empty() {
