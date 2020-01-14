@@ -437,7 +437,7 @@ class NestedSetMutationInsideUpdateSpec extends FlatSpec with Matchers with ApiS
       s"""model Child {
         | id      String   @id @default(cuid())
         | c       String   @unique
-        | parents Parent[] $listInlineDirective
+        | parents Parent[] $relationInlineDirective
         |}
         |
         |model Parent {
@@ -526,7 +526,7 @@ class NestedSetMutationInsideUpdateSpec extends FlatSpec with Matchers with ApiS
       s"""
         |model Post {
         |  id      String  @id @default(cuid())
-        |  authors AUser[] $listInlineDirective
+        |  authors AUser[] $relationInlineDirective
         |  title   String  @unique
         |}
         |
@@ -549,5 +549,5 @@ class NestedSetMutationInsideUpdateSpec extends FlatSpec with Matchers with ApiS
     server.query("""query{aUsers{name, posts{title}}}""", project).toString should be("""{"data":{"aUsers":[{"name":"Author","posts":[{"title":"Title"}]}]}}""")
   }
 
-  println(listInlineDirective)
+  println(relationInlineDirective)
 }

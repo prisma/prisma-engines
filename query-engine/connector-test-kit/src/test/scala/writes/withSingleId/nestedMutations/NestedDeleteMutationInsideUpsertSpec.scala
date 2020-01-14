@@ -520,7 +520,7 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
     val schema = s"""model Parent{
                             id          String  @id @default(cuid())
                             p           String  @unique
-                            childrenOpt Child[] $listInlineDirective
+                            childrenOpt Child[] $relationInlineDirective
                         }
 
                         model Child{
@@ -601,7 +601,7 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
     val schema = s"""model Parent{
                             id          String  @id @default(cuid())
                             p           String  @unique
-                            childrenOpt Child[] $listInlineDirective
+                            childrenOpt Child[] $relationInlineDirective
                         }
 
                         model Child{
@@ -689,7 +689,7 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
                         model Todo{
                             id       String    @id @default(cuid())
                             text     String?
-                            comments Comment[] $listInlineDirective
+                            comments Comment[] $relationInlineDirective
                         }"""
 
     val project = SchemaDsl.fromStringV11() { schema }
@@ -756,7 +756,7 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
                         model Todo{
                             id       String    @id @default(cuid())
                             text     String?
-                            comments Comment[] $listInlineDirective
+                            comments Comment[] $relationInlineDirective
                         }"""
 
     val project = SchemaDsl.fromStringV11() { schema }
@@ -818,7 +818,7 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
                         model Todo{
                             id       String    @id @default(cuid())
                             text     String?
-                            comments Comment[] $listInlineDirective
+                            comments Comment[] $relationInlineDirective
                         }"""
 
     val project = SchemaDsl.fromStringV11() { schema }
@@ -1063,14 +1063,14 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
     val project = SchemaDsl.fromStringV11() { s"""model Top {
                                              |  id      String   @id @default(cuid())
                                              |  nameTop String   @unique
-                                             |  middles Middle[] $listInlineDirective
+                                             |  middles Middle[] $relationInlineDirective
                                              |}
                                              |
                                              |model Middle {
                                              |  id         String @id @default(cuid())
                                              |  nameMiddle String @unique
                                              |  tops       Top[]
-                                             |  bottoms    Bottom[] $listInlineDirective
+                                             |  bottoms    Bottom[] $relationInlineDirective
                                              |}
                                              |
                                              |model Bottom {
@@ -1144,13 +1144,13 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
     val project = SchemaDsl.fromStringV11() { s"""model Top {
                                              |  id      String   @id @default(cuid())
                                              |  nameTop String   @unique
-                                             |  middles Middle[] $listInlineDirective
+                                             |  middles Middle[] $relationInlineDirective
                                              |}
                                              |
                                              |model Middle {
                                              |  id         String   @id @default(cuid())
                                              |  nameMiddle String   @unique
-                                             |  bottoms    Bottom[] $listInlineDirective
+                                             |  bottoms    Bottom[] $relationInlineDirective
                                              |}
                                              |
                                              |model Bottom {
@@ -1223,7 +1223,7 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
     val project = SchemaDsl.fromStringV11() { s"""model Top {
                                              |  id      String @id @default(cuid())
                                              |  nameTop String @unique
-                                             |  middles Middle[] $listInlineDirective
+                                             |  middles Middle[] $relationInlineDirective
                                              |}
                                              |
                                              |model Middle {
@@ -1312,7 +1312,7 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
                                              |model Bottom {
                                              |  id          String  @id @default(cuid())
                                              |  nameBottom  String  @unique
-                                             |  below       Below[] $listInlineDirective
+                                             |  below       Below[] $relationInlineDirective
                                              |}
                                              |
                                              |model Below {

@@ -34,7 +34,7 @@ trait ApiSpecBase extends ConnectorAwareTest with BeforeAndAfterEach with Before
     ""
   }
 
-  val listInlineDirective = if (capabilities.has(RelationLinkListCapability)) {
+  val relationInlineDirective = if (capabilities.has(RelationLinkListCapability)) {
     s"@relation($listInlineArgument)"
   } else {
     ""

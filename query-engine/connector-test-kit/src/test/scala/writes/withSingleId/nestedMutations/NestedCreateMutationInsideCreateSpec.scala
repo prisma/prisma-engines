@@ -282,7 +282,7 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
     val project = SchemaDsl.fromStringV11() {
       s"""model Todo{
         |   id        String    @id @default(cuid())
-        |   comments  Comment[] $listInlineDirective
+        |   comments  Comment[] $relationInlineDirective
         |}
         |
         |model Comment{
@@ -357,7 +357,7 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
       s"""model Todo{
         |   id     String @id @default(cuid())
         |   title  String
-        |   tags   Tag[] $listInlineDirective
+        |   tags   Tag[] $relationInlineDirective
         |}
         |
         |model Tag{
@@ -529,7 +529,7 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
       s"""model List{
         |   id    String @id @default(cuid())
         |   name  String
-        |   todos Todo[] $listInlineDirective
+        |   todos Todo[] $relationInlineDirective
         |}
         |
         |model Todo{
