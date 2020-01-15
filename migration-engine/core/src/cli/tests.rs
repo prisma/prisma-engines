@@ -174,6 +174,25 @@ async fn test_create_psql_database() {
     res.unwrap();
 }
 
+#[tokio::test]
+async fn test_create_sqlite_database() {
+    let base_dir = tempfile::tempdir().unwrap();
+
+    let sqlite_path = base_dir
+        .path()
+        .join("doesntexist/either")
+        .join("test_create_sqlite_database.db");
+
+    assert!(!sqlite_path.exists());
+
+    let url = format!("file:{}", sqlite_path.to_string_lossy());
+
+    let res = run(&["--create_database"], &url).await;
+    assert_eq!("", res.as_ref().unwrap());
+
+    assert!(sqlite_path.exists());
+}
+
 #[test]
 fn test_fetch_db_name() {
     let url: url::Url = "postgresql://postgres:prisma@127.0.0.1:5432/pgres?schema=test_schema"
