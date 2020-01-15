@@ -1272,6 +1272,7 @@ dependencies = [
  "serde_json 1.0.44 (registry+https://github.com/rust-lang/crates.io-index)",
  "sql-migration-connector 0.1.0",
  "sql-schema-describer 0.1.0",
+ "tempfile 3.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "test-macros 0.1.0",
  "test-setup 0.1.0",
  "thiserror 1.0.9 (registry+https://github.com/rust-lang/crates.io-index)",
