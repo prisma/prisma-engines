@@ -57,29 +57,21 @@ impl<'a> MigrationCommand for InferMigrationStepsCommand<'a> {
             .check(&database_migration)
             .await?;
 
-        let (returned_datamodel_steps, returned_database_migration) = if cmd.input.is_watch_migration() {
-            let database_steps = connector
-                .database_migration_step_applier()
-                .render_steps_pretty(&database_migration)?;
-
-            (model_migration_steps, database_steps)
-        } else {
-            let last_non_watch_applied_migration = migration_persistence.last_non_watch_applied_migration().await?;
-            let last_non_watch_datamodel_ast = last_non_watch_applied_migration
+        let (returned_datamodel_steps, returned_database_migration) = {
+            let last_applied_migration = migration_persistence.last_applied_migration().await?;
+            let last_datamodel_ast = last_applied_migration
                 .as_ref()
                 .map(|m| m.datamodel_ast())
                 .unwrap_or_else(SchemaAst::empty);
-            let last_non_watch_datamodel = last_non_watch_applied_migration
+            let last_datamodel = last_applied_migration
                 .map(|m| m.parse_datamodel())
                 .unwrap_or_else(Datamodel::empty);
             let datamodel_steps = engine
                 .datamodel_migration_steps_inferrer()
-                .infer(&last_non_watch_datamodel_ast, &next_datamodel_ast);
+                .infer(&last_datamodel_ast, &next_datamodel_ast);
 
-            // The database migration since the last non-watch migration, so we can render all the steps applied
-            // in watch mode to the migrations folder.
             let full_database_migration = database_migration_inferrer
-                .infer_from_datamodels(&last_non_watch_datamodel, &next_datamodel, &datamodel_steps)
+                .infer_from_datamodels(&last_datamodel, &next_datamodel, &datamodel_steps)
                 .await?;
             let database_steps = connector
                 .database_migration_step_applier()
@@ -160,10 +152,4 @@ pub struct InferMigrationStepsInput {
 pub struct AppliedMigration {
     pub migration_id: String,
     pub datamodel_steps: Vec<MigrationStep>,
-}
-
-impl IsWatchMigration for InferMigrationStepsInput {
-    fn is_watch_migration(&self) -> bool {
-        self.migration_id.starts_with("watch")
-    }
 }

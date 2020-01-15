@@ -22,46 +22,11 @@ impl<'a> MigrationCommand for ApplyMigrationCommand<'a> {
         let cmd = ApplyMigrationCommand { input };
         tracing::debug!("{:?}", cmd.input);
 
-        let connector = engine.connector();
-        let migration_persistence = connector.migration_persistence();
-
-        match migration_persistence.last().await? {
-            Some(ref last_migration) if last_migration.is_watch_migration() && !cmd.input.is_watch_migration() => {
-                cmd.handle_transition_out_of_watch_mode(&engine).await
-            }
-            _ => cmd.handle_normal_migration(&engine).await,
-        }
+        cmd.handle_normal_migration(&engine).await
     }
 }
 
 impl<'a> ApplyMigrationCommand<'a> {
-    async fn handle_transition_out_of_watch_mode<C, D>(
-        &self,
-        engine: &MigrationEngine<C, D>,
-    ) -> CommandResult<MigrationStepsResultOutput>
-    where
-        C: MigrationConnector<DatabaseMigration = D>,
-        D: DatabaseMigrationMarker + Send + Sync + 'static,
-    {
-        let connector = engine.connector();
-        let migration_persistence = connector.migration_persistence();
-
-        let current_datamodel_ast = migration_persistence.current_datamodel_ast().await?;
-        let current_datamodel = datamodel::lift_ast(&current_datamodel_ast)?;
-
-        let last_non_watch_datamodel = migration_persistence
-            .last_non_watch_migration()
-            .await?
-            .map(|m| m.datamodel_ast())
-            .unwrap_or_else(SchemaAst::empty);
-        let next_datamodel_ast = engine
-            .datamodel_calculator()
-            .infer(&last_non_watch_datamodel, self.input.steps.as_slice())?;
-
-        self.handle_migration(&engine, current_datamodel, next_datamodel_ast)
-            .await
-    }
-
     async fn handle_normal_migration<C, D>(
         &self,
         engine: &MigrationEngine<C, D>,
@@ -167,10 +132,4 @@ pub struct ApplyMigrationInput {
     pub migration_id: String,
     pub steps: Vec<MigrationStep>,
     pub force: Option<bool>,
-}
-
-impl IsWatchMigration for ApplyMigrationInput {
-    fn is_watch_migration(&self) -> bool {
-        self.migration_id.starts_with("watch")
-    }
 }

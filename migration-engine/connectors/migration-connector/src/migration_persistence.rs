@@ -22,21 +22,18 @@ pub trait MigrationPersistence: Send + Sync {
         Ok(ast)
     }
 
-    async fn last_non_watch_applied_migration(&self) -> Result<Option<Migration>, ConnectorError> {
-        let migration =
-            self.load_all().await?.into_iter().rev().find(|migration| {
-                !migration.is_watch_migration() && migration.status == MigrationStatus::MigrationSuccess
-            });
-
-        Ok(migration)
+    async fn last_applied_migration(&self) -> Result<Option<Migration>, ConnectorError> {
+        Ok(self
+            .load_all()
+            .await?
+            .into_iter()
+            .rev()
+            .filter(|mig| mig.status == MigrationStatus::MigrationSuccess)
+            .next())
     }
 
-    async fn last_non_watch_migration(&self) -> Result<Option<Migration>, ConnectorError> {
-        let mut all_migrations = self.load_all().await?;
-        all_migrations.reverse();
-        let migration = all_migrations.into_iter().find(|m| !m.is_watch_migration());
-
-        Ok(migration)
+    async fn last_migration(&self) -> Result<Option<Migration>, ConnectorError> {
+        Ok(self.load_all().await?.into_iter().rev().next())
     }
 
     /// Returns the last successful Migration.
@@ -47,24 +44,6 @@ pub trait MigrationPersistence: Send + Sync {
 
     /// This powers the listMigrations command.
     async fn load_all(&self) -> Result<Vec<Migration>, ConnectorError>;
-
-    /// Load all current trailing watch migrations from Migration Event Log.
-    async fn load_current_watch_migrations(&self) -> Result<Vec<Migration>, ConnectorError> {
-        let mut all_migrations = self.load_all().await?;
-        let mut result = Vec::new();
-        // start to take all migrations from the back until we hit a migration that is not watch
-        all_migrations.reverse();
-        for migration in all_migrations {
-            if migration.is_watch_migration() {
-                result.push(migration);
-            } else {
-                break;
-            }
-        }
-        // reverse the result so the migrations are in the right order again
-        result.reverse();
-        Ok(result)
-    }
 
     /// Write the migration to the Migration table.
     async fn create(&self, migration: Migration) -> Result<Migration, ConnectorError>;
@@ -133,10 +112,6 @@ impl MigrationUpdateParams {
     }
 }
 
-pub trait IsWatchMigration {
-    fn is_watch_migration(&self) -> bool;
-}
-
 impl Migration {
     pub fn new(name: String) -> Migration {
         Migration {
@@ -187,12 +162,6 @@ impl Migration {
         datamodel::lift_ast(&self.datamodel_ast())
             .ok()
             .unwrap_or_else(Datamodel::empty)
-    }
-}
-
-impl IsWatchMigration for Migration {
-    fn is_watch_migration(&self) -> bool {
-        self.name.starts_with("watch")
     }
 }
 
