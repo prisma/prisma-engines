@@ -1,57 +1,31 @@
 use prisma_models::*;
 use quaint::ast::*;
-use connector_interface::WriteArgs;
+use connector_interface::{WriteArgs, FieldValueContainer};
 
 const PARAMETER_LIMIT: usize = 10000;
 
-pub fn create_record(_model: &ModelRef, _args: WriteArgs) -> (Insert<'static>, Option<GraphqlId>) {
-    // let mut id_fields = model.primary_identifier();
-    // let return_id = args
-    //     .get_field_value(&id_field.name)
-    //     .map(|id| GraphqlId::try_from(id).expect("Could not convert prisma value to graphqlid"));
+pub fn create_record(model: &ModelRef, mut args: WriteArgs) -> (Insert<'static>, Option<RecordIdentifier>) {
+    let return_id = args.as_record_identifier(model.identifier());
 
-    // // --------------------- Snippets
-    // // let id_field = if id_fields.len() == 1 {
-    // //     id_fields.pop().unwrap()
-    // // } else {
-    // //     panic!("Multi-field IDs are not (yet) supported.")
-    // // };
+    let fields: Vec<_> = model
+        .fields()
+        .all
+        .iter()
+        .filter(|field| args.has_arg_for(&field.name()))
+        .collect();
 
-    // // let return_id = match args.get_field_value(&id_field.name) {
-    // //     _ if id_field.is_auto_generated => None,
+    let insert = fields
+        .into_iter()
+        .map(|field| (field.db_name(), args.take_field_value(field.name()).unwrap()))
+        .fold(Insert::single_into(model.as_table()), |insert, (name, value)| match value {
+            FieldValueContainer::Single(val) => insert.value(name.into_owned(), val),
+            FieldValueContainer::Compound(_) => todo!("Compound schwompound"),
+        });
 
-    // //     Some(PrismaValue::Null) | None => {
-    // //         let id = model.generate_id();
-    // //         args.insert(id_field.name.as_str(), id.clone());
-    // //         Some(id)
-    // //     }
-
-    // //     Some(prisma_value) => {
-    // //         Some(GraphqlId::try_from(prisma_value).expect("Could not convert prisma value to graphqlid"))
-    // //     }
-    // // };
-    // // ---------------------
-
-    // let fields: Vec<&Field> = model
-    //     .fields()
-    //     .all
-    //     .iter()
-    //     .filter(|field| args.has_arg_for(&field.name()))
-    //     .collect();
-
-    // let fields = fields
-    //     .iter()
-    //     .map(|field| (field.db_name(), args.take_field_value(field.name()).unwrap()));
-
-    // let base = Insert::single_into(model.as_table());
-
-    // let insert = fields
-    //     .into_iter()
-    //     .fold(base, |acc, (name, value)| acc.value(name.into_owned(), value));
-
-    // (Insert::from(insert).returning(vec![id_field.as_column()]), return_id)
-
-    todo!()
+    (
+        Insert::from(insert).returning(model.identifier().as_columns()),
+        return_id,
+    )
 }
 
 pub fn delete_relation_table_records(
@@ -122,31 +96,13 @@ pub fn create_relation_table_records(
 
     let mut columns: Vec<String> = parent_columns.chain(child_columns).collect();
 
-    let id_columns = relation.id_columns();
-
-    if let Some(mut id_cols) = relation.id_columns() {
-        assert!(id_cols.len() == 1);
-        columns.push(id_cols.next().unwrap().name.to_string())
-    }
-
-    let generate_ids = id_columns.is_some();
-
     let insert = Insert::multi_into(relation.as_table(), columns);
 
     let insert: MultiRowInsert = child_ids
         .into_iter()
         .fold(insert, |insert, child_id| {
-            assert!(child_id.len() == 1);
-            assert!(parent_id.len() == 1);
-
-            let child_id = child_id.values().next().unwrap();
-            let parent_id = parent_id.values().next().unwrap();
-
-            if generate_ids {
-                insert.values((parent_id.clone(), child_id.clone(), cuid::cuid().unwrap()))
-            } else {
-                insert.values((parent_id.clone(), child_id.clone()))
-            }
+            let values: Vec<_> = parent_id.values().chain(child_id.values()).collect();
+            insert.values(values)
         })
         .into();
 

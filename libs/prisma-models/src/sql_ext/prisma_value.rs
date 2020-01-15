@@ -1,15 +1,5 @@
 use crate::{GraphqlId, PrismaValue};
-use quaint::ast::{DatabaseValue, Id, ParameterizedValue};
-
-impl From<Id> for GraphqlId {
-    fn from(id: Id) -> Self {
-        match id {
-            Id::String(s) => GraphqlId::String(s),
-            Id::Int(i) => GraphqlId::Int(i),
-            Id::UUID(u) => GraphqlId::UUID(u),
-        }
-    }
-}
+use quaint::ast::{DatabaseValue, ParameterizedValue};
 
 impl<'a> From<GraphqlId> for ParameterizedValue<'a> {
     fn from(id: GraphqlId) -> Self {

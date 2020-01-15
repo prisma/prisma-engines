@@ -20,4 +20,5 @@ members = [
 ]
 
 [patch.crates-io]
+quaint = { git = "https://github.com/prisma/quaint.git", branch = "master", features = ["full", "tracing-log"] }
 barrel = { git = "https://github.com/tomhoule/barrel.git" }

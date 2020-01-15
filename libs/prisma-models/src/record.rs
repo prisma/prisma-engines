@@ -55,7 +55,7 @@ impl IntoIterator for ModelIdentifier {
 // Todo: Storing Arcs is not a great idea, as practically every single record produced by a query
 // essentially clones the arcs of the model identifier. After the main work on multi/any-id-fields
 // is done. Maybe references are acceptable to use here.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Default, Debug, Clone, PartialEq, Eq, Hash)]
 pub struct RecordIdentifier {
     pub pairs: Vec<(Field, PrismaValue)>,
 }
