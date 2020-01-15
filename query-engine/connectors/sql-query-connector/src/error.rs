@@ -124,7 +124,7 @@ impl From<quaint::error::Error> for SqlError {
                     quaint::error::DatabaseConstraint::Fields(field_names) => {
                         Self::UniqueConstraintViolation { field_names }
                     },
-                    quaint::error::DatabaseConstraint::Index(index) => {
+                    quaint::error::DatabaseConstraint::Index(_) => {
                         Self::UniqueConstraintViolation { field_names: vec![] }
                     }
                 }

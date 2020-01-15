@@ -1,6 +1,7 @@
 use prisma_models::*;
 use quaint::ast::*;
 use connector_interface::{WriteArgs, FieldValueContainer};
+use crate::error::SqlError;
 
 const PARAMETER_LIMIT: usize = 10000;
 
@@ -94,8 +95,7 @@ pub fn create_relation_table_records(
     let parent_columns = field.relation_columns(false).map(|c| c.name.to_string());
     let child_columns = field.opposite_columns(false).map(|c| c.name.to_string());
 
-    let mut columns: Vec<String> = parent_columns.chain(child_columns).collect();
-
+    let columns: Vec<String> = parent_columns.chain(child_columns).collect();
     let insert = Insert::multi_into(relation.as_table(), columns);
 
     let insert: MultiRowInsert = child_ids
@@ -109,41 +109,56 @@ pub fn create_relation_table_records(
     insert.build().on_conflict(OnConflict::DoNothing).into()
 }
 
-/*
+pub fn update_many(model: &ModelRef, ids: &[&RecordIdentifier], args: &WriteArgs) -> crate::Result<Vec<Update<'static>>> {
+    if args.args.is_empty() || ids.is_empty() {
+        return Ok(Vec::new());
+    }
 
-pub fn update_many(_model: &ModelRef, _ids: &[&GraphqlId], _args: &WriteArgs) -> crate::Result<Vec<Update<'static>>> {
-    // if args.args.is_empty() || ids.is_empty() {
-    //     return Ok(Vec::new());
-    // }
+    let fields = model.fields();
+    let mut query = Update::table(model.as_table());
 
-    // let fields = model.fields();
-    // let mut query = Update::table(model.as_table());
+    for (name, value) in args.args.iter() {
+        let field = fields.find_from_all(&name).unwrap();
 
-    // for (name, value) in args.args.iter() {
-    //     let field = fields.find_from_all(&name).unwrap();
+        match value {
+            FieldValueContainer::Single(value) => {
+                if field.is_required() && value.is_null() {
+                    return Err(SqlError::FieldCannotBeNull {
+                        field: field.name().to_owned(),
+                    });
+                }
 
-    //     if field.is_required() && value.is_null() {
-    //         return Err(SqlError::FieldCannotBeNull {
-    //             field: field.name().to_owned(),
-    //         });
-    //     }
+                query = query.set(field.db_name().to_string(), value.clone());
+            }
+            FieldValueContainer::Compound(_) => todo!("Not yet")
+        }
+    }
 
-    //     query = query.set(field.db_name().to_string(), value.clone());
-    // }
+    let result: Vec<Update> = ids
+        .chunks(PARAMETER_LIMIT)
+        .into_iter()
+        .map(|chunk| {
+            let condition = chunk.into_iter().map(|ids| {
+                let cols_with_vals = model.identifier().as_columns().zip(ids.values());
 
-    // let result: Vec<Update> = ids
-    //     .chunks(PARAMETER_LIMIT)
-    //     .into_iter()
-    //     .map(|ids| {
-    //         query
-    //             .clone()
-    //             .so_that(fields.id().as_column().in_selection(ids.to_vec()))
-    //     })
-    //     .collect();
+                cols_with_vals.fold(ConditionTree::NoCondition, |acc, (col, val)| {
+                    match acc {
+                        ConditionTree::NoCondition => col.equals(val).into(),
+                        cond => cond.and(col.equals(val)),
+                    }
+                })
+            }).fold(ConditionTree::NoCondition, |acc, cond| {
+                match acc {
+                    ConditionTree::NoCondition => cond,
+                    acc => acc.or(cond),
+                }
+            });
 
-    // Ok(result)
+            query
+                .clone()
+                .so_that(condition)
+        })
+        .collect();
 
-    todo!()
+    Ok(result)
 }
-
-*/

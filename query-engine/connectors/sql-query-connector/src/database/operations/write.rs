@@ -5,9 +5,9 @@ use quaint::error::{Error as QueryError, DatabaseConstraint};
 use itertools::Itertools;
 
 pub async fn create_record(conn: &dyn QueryExt, model: &ModelRef, args: WriteArgs) -> crate::Result<RecordIdentifier> {
-    let (insert, returned_id) = write::create_record(model, args);
+    let (insert, _returned_id) = write::create_record(model, args);
 
-    let last_id = match conn.insert(insert).await {
+    let _last_id = match conn.insert(insert).await {
         Ok(id) => id,
         Err(QueryError::UniqueConstraintViolation { constraint }) => {
             match constraint {
@@ -57,29 +57,27 @@ pub async fn create_record(conn: &dyn QueryExt, model: &ModelRef, args: WriteArg
 }
 
 pub async fn update_records(
-    _conn: &dyn QueryExt,
-    _model: &ModelRef,
-    _where_: Filter,
-    _args: WriteArgs,
+    conn: &dyn QueryExt,
+    model: &ModelRef,
+    where_: Filter,
+    args: WriteArgs,
 ) -> crate::Result<Vec<RecordIdentifier>> {
-    // let ids = conn.filter_ids(model, where_.clone()).await?;
+    let ids = conn.filter_ids(model, where_.clone()).await?;
 
-    // if ids.len() == 0 {
-    //     return Ok(vec![]);
-    // }
+    if ids.len() == 0 {
+        return Ok(vec![]);
+    }
 
-    // let updates = {
-    //     let ids: Vec<&RecordIdentifier> = ids.iter().map(|id| &*id).collect();
-    //     write::update_many(model, ids.as_slice(), args.non_list_args())?
-    // };
+    let updates = {
+        let ids: Vec<&RecordIdentifier> = ids.iter().map(|id| &*id).collect();
+        write::update_many(model, ids.as_slice(), &args)?
+    };
 
-    // for update in updates {
-    //     conn.update(update).await?;
-    // }
+    for update in updates {
+        conn.update(update).await?;
+    }
 
-    // Ok(ids)
-
-    todo!()
+    Ok(ids)
 }
 
 pub async fn delete_records(conn: &dyn QueryExt, model: &ModelRef, where_: Filter) -> crate::Result<usize> {
