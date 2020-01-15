@@ -65,6 +65,7 @@ fn field_from_dmmf(field: &Field) -> dml::Field {
         is_generated: field.is_generated.unwrap_or(false),
         is_updated_at: field.is_updated_at.unwrap_or(false),
         documentation: field.documentation.clone(),
+        data_source_fields: vec![],
     }
 }
 

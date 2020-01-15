@@ -29,7 +29,7 @@ pub trait CreateInputTypeBuilderExtension<'a>: InputTypeBuilderBase<'a> {
             "Create",
             scalar_fields,
             |f: ScalarFieldRef| {
-                let required_and_none = f.is_required && f.default_value.is_none();
+                let required_and_none = f.is_required && f.default_value().is_none();
 
                 if required_and_none && f.is_id() {
                     match (f.behaviour.as_ref(), f.type_identifier) {

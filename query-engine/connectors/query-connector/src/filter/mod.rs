@@ -9,6 +9,7 @@ mod relation;
 mod scalar;
 
 use prisma_models::prelude::*;
+use prisma_models::DataSourceField;
 use std::fmt;
 
 pub use list::*;
@@ -106,10 +107,12 @@ pub fn test_data_model() -> InternalDataModelRef {
             is_unique: false,
             is_hidden: false,
             is_auto_generated_int_id: false,
-            manifestation: None,
             behaviour: None,
-            default_value: None,
             internal_enum: None,
+            data_source_field: DataSourceField {
+                name: Some("id".to_owned()),
+                default_value: None,
+            },
         }),
         FieldTemplate::Scalar(ScalarFieldTemplate {
             name: "name".to_owned(),
@@ -119,10 +122,12 @@ pub fn test_data_model() -> InternalDataModelRef {
             is_unique: false,
             is_hidden: false,
             is_auto_generated_int_id: false,
-            manifestation: None,
             behaviour: None,
-            default_value: None,
             internal_enum: None,
+            data_source_field: DataSourceField {
+                name: Some("name".to_owned()),
+                default_value: None,
+            },
         }),
         FieldTemplate::Relation(RelationFieldTemplate {
             name: "sites".to_owned(),
@@ -132,9 +137,12 @@ pub fn test_data_model() -> InternalDataModelRef {
             is_unique: false,
             is_hidden: false,
             is_auto_generated_int_id: false,
-            manifestation: None,
             relation_name: "bar".to_owned(),
             relation_side: RelationSide::A,
+            data_source_fields: vec![DataSourceField {
+                name: Some("sites".to_owned()),
+                default_value: None,
+            }],
         }),
     ];
 
@@ -146,10 +154,12 @@ pub fn test_data_model() -> InternalDataModelRef {
         is_unique: false,
         is_hidden: false,
         is_auto_generated_int_id: false,
-        manifestation: None,
         behaviour: None,
-        default_value: None,
         internal_enum: None,
+        data_source_field: DataSourceField {
+            name: Some("name".to_owned()),
+            default_value: None,
+        },
     })];
 
     let model_templates = vec![

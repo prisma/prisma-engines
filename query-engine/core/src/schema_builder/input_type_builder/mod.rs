@@ -28,7 +28,11 @@ pub trait InputTypeBuilderBase<'a>: CachedBuilder<InputObjectType> + InputBuilde
             .iter()
             .filter(|f| !f.is_list)
             .map(|f| {
-                let default = if with_defaults { f.default_value.clone() } else { None };
+                let default = if with_defaults {
+                    f.default_value().cloned()
+                } else {
+                    None
+                };
                 input_field(f.name.clone(), field_mapper(Arc::clone(f)), default)
             })
             .collect();

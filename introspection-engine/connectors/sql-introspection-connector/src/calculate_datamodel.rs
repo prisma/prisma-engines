@@ -61,6 +61,7 @@ fn create_many_to_many_field(foreign_key: &ForeignKey, relation_name: String, is
         documentation: None,
         is_generated: false,
         is_updated_at: false,
+        data_source_fields: vec![],
     }
 }
 
@@ -113,13 +114,18 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
                 name,
                 arity,
                 field_type,
-                database_name,
-                default_value,
+                database_name: database_name.clone(),
+                default_value: default_value.clone(),
                 is_unique,
                 id_info,
                 documentation: None,
                 is_generated: false,
                 is_updated_at: false,
+                // Todo: Do actual multi-field stuff here
+                data_source_fields: vec![dml::DataSourceField {
+                    name: database_name,
+                    default_value,
+                }],
             };
 
             model.add_field(field);
@@ -234,6 +240,7 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
                             documentation: None,
                             is_generated: false,
                             is_updated_at: false,
+                            data_source_fields: vec![],
                         };
 
                         fields_to_be_added.push((other_model.name.clone(), field));

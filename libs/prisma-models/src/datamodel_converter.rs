@@ -68,7 +68,7 @@ impl<'a> DatamodelConverter<'a> {
                         .find(|r| r.is_for_model_and_field(model, field))
                         .unwrap_or_else(|| {
                             panic!(
-                                "Did not find a relation for those for model {} and field {}",
+                                "Did not find a relation for model {} and field {}",
                                 model.name, field.name
                             )
                         });
@@ -81,7 +81,7 @@ impl<'a> DatamodelConverter<'a> {
                         is_unique: field.is_unique(),
                         is_hidden: false,
                         is_auto_generated_int_id: field.is_auto_generated_int_id(),
-                        manifestation: field.manifestation(),
+                        data_source_fields: field.data_source_fields.clone(),
                         relation_name: relation.name(),
                         relation_side: relation.relation_side(field),
                     })
@@ -94,9 +94,12 @@ impl<'a> DatamodelConverter<'a> {
                     is_unique: field.is_unique(),
                     is_hidden: false,
                     is_auto_generated_int_id: field.is_auto_generated_int_id(),
-                    manifestation: field.manifestation(),
+                    data_source_field: field
+                        .data_source_fields
+                        .clone()
+                        .pop()
+                        .expect("Expected exactly one data source field for ScalarField"),
                     behaviour: field.behaviour(),
-                    default_value: field.default_value(),
                     internal_enum: field.internal_enum(self.datamodel),
                 }),
             })
@@ -356,11 +359,10 @@ trait DatamodelFieldExtensions {
     fn is_list(&self) -> bool;
     fn is_unique(&self) -> bool;
     fn is_auto_generated_int_id(&self) -> bool;
-    fn manifestation(&self) -> Option<FieldManifestation>;
     fn behaviour(&self) -> Option<FieldBehaviour>;
     fn final_db_name(&self) -> String;
     fn internal_enum(&self, datamodel: &dml::Datamodel) -> Option<InternalEnum>;
-    fn default_value(&self) -> Option<dml::DefaultValue>;
+    // fn default_value(&self) -> Option<dml::DefaultValue>; todo this is not applicable anymore
 }
 
 impl DatamodelFieldExtensions for dml::Field {
@@ -406,9 +408,9 @@ impl DatamodelFieldExtensions for dml::Field {
         has_auto_generating_behaviour && is_an_int
     }
 
-    fn manifestation(&self) -> Option<FieldManifestation> {
-        self.database_name.clone().map(|n| FieldManifestation { db_name: n })
-    }
+    // fn manifestation(&self) -> Option<FieldManifestation> {
+    //     self.database_name.clone().map(|n| FieldManifestation { db_name: n })
+    // }
 
     fn behaviour(&self) -> Option<FieldBehaviour> {
         // TODO: implement this properly once this is specced for the datamodel
@@ -452,7 +454,7 @@ impl DatamodelFieldExtensions for dml::Field {
         }
     }
 
-    fn default_value(&self) -> Option<dml::DefaultValue> {
-        self.default_value.clone()
-    }
+    // fn default_value(&self) -> Option<dml::DefaultValue> {
+    //     self.default_value.clone()
+    // }
 }

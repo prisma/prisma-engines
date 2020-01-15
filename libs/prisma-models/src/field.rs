@@ -5,7 +5,6 @@ pub use relation::*;
 pub use scalar::*;
 
 use crate::prelude::*;
-use dml::DefaultValue;
 use once_cell::sync::OnceCell;
 use std::{borrow::Cow, sync::Arc};
 
@@ -25,11 +24,6 @@ pub enum Field {
 pub enum FieldWeak {
     Relation(RelationFieldWeak),
     Scalar(ScalarFieldWeak),
-}
-
-#[derive(Debug, PartialEq, Eq, Hash)]
-pub struct FieldManifestation {
-    pub db_name: String,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
@@ -118,11 +112,10 @@ impl FieldTemplate {
                     is_hidden: st.is_hidden,
                     is_auto_generated_int_id: st.is_auto_generated_int_id,
                     is_unique: st.is_unique,
-                    manifestation: st.manifestation,
                     internal_enum: st.internal_enum,
                     behaviour: st.behaviour,
                     model,
-                    default_value: st.default_value,
+                    data_source_field: st.data_source_field,
                 };
 
                 Field::Scalar(Arc::new(scalar))
@@ -140,6 +133,7 @@ impl FieldTemplate {
                     relation_side: rt.relation_side,
                     model,
                     relation: OnceCell::new(),
+                    data_source_fields: rt.data_source_fields,
                 };
 
                 Field::Relation(Arc::new(relation))

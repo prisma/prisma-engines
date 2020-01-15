@@ -1,6 +1,5 @@
-use super::FieldManifestation;
 use crate::prelude::*;
-use datamodel::FieldArity;
+use datamodel::{DataSourceField, FieldArity};
 use once_cell::sync::OnceCell;
 use std::{
     hash::{Hash, Hasher},
@@ -19,9 +18,9 @@ pub struct RelationFieldTemplate {
     pub is_unique: bool,
     pub is_hidden: bool,
     pub is_auto_generated_int_id: bool,
-    pub data_source_mapping: DataSourceMapping,
     pub relation_name: String,
     pub relation_side: RelationSide,
+    pub data_source_fields: Vec<DataSourceField>,
 }
 
 #[derive(DebugStub)]
@@ -35,7 +34,7 @@ pub struct RelationField {
     pub relation_name: String,
     pub relation_side: RelationSide,
     pub relation: OnceCell<RelationWeakRef>,
-    pub data_source_mapping: DataSourceMapping,
+    pub data_source_fields: Vec<DataSourceField>,
 
     #[debug_stub = "#ModelWeakRef#"]
     pub model: ModelWeakRef,

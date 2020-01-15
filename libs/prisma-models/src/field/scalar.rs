@@ -1,6 +1,5 @@
-use super::FieldManifestation;
 use crate::prelude::*;
-use datamodel::{DefaultValue, FieldArity};
+use datamodel::{DataSourceField, DefaultValue, FieldArity};
 use std::{
     hash::{Hash, Hasher},
     sync::{Arc, Weak},
@@ -23,10 +22,9 @@ pub struct ScalarFieldTemplate {
     pub is_unique: bool,
     pub is_hidden: bool,
     pub is_auto_generated_int_id: bool,
-    pub manifestation: Option<FieldManifestation>,
-    pub data_source_mapping: DataSourceMapping,
     pub behaviour: Option<FieldBehaviour>,
     pub internal_enum: Option<InternalEnum>,
+    pub data_source_field: DataSourceField,
 }
 
 #[derive(DebugStub)]
@@ -37,10 +35,9 @@ pub struct ScalarField {
     pub is_list: bool,
     pub is_hidden: bool,
     pub is_auto_generated_int_id: bool,
-    pub manifestation: Option<FieldManifestation>,
-    pub data_source_mapping: DataSourceMapping,
     pub internal_enum: Option<InternalEnum>,
     pub behaviour: Option<FieldBehaviour>,
+    pub data_source_field: DataSourceField,
 
     #[debug_stub = "#ModelWeakRef#"]
     pub model: ModelWeakRef,
@@ -58,7 +55,6 @@ impl Hash for ScalarField {
         self.is_list.hash(state);
         self.is_hidden.hash(state);
         self.is_auto_generated_int_id.hash(state);
-        self.manifestation.hash(state);
         self.internal_enum.hash(state);
         self.behaviour.hash(state);
         self.is_unique.hash(state);
@@ -74,7 +70,7 @@ impl PartialEq for ScalarField {
             && self.is_list == other.is_list
             && self.is_hidden == other.is_hidden
             && self.is_auto_generated_int_id == other.is_auto_generated_int_id
-            && self.manifestation == other.manifestation
+            && self.data_source_field == other.data_source_field
             && self.internal_enum == other.internal_enum
             && self.behaviour == other.behaviour
             && self.default_value() == other.default_value()
@@ -171,7 +167,7 @@ impl ScalarField {
     }
 
     pub fn db_name_opt(&self) -> Option<&str> {
-        self.manifestation.as_ref().map(|mf| mf.db_name.as_ref())
+        self.data_source_field.name.as_ref().map(|s| s.as_ref())
     }
 
     pub fn id_behaviour_clone(&self) -> Option<FieldBehaviour> {
@@ -193,6 +189,6 @@ impl ScalarField {
     }
 
     pub fn default_value(&self) -> Option<&DefaultValue> {
-        self.data_source_mapping.default_value.as_ref()
+        self.data_source_field.default_value.as_ref()
     }
 }
