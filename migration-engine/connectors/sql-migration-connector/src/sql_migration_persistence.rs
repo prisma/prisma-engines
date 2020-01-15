@@ -1,97 +1,88 @@
+use crate::Component;
 use barrel::types;
 use chrono::*;
 use migration_connector::*;
 use quaint::ast::*;
 use quaint::{
-    connector::{Queryable, ResultSet},
+    connector::ResultSet,
     prelude::{ConnectionInfo, SqlFamily},
 };
-use std::sync::Arc;
+use tracing::debug;
 
-pub struct SqlMigrationPersistence {
-    pub connection_info: ConnectionInfo,
-    pub connection: Arc<dyn Queryable + Send + Sync + 'static>,
-    pub schema_name: String,
+pub struct SqlMigrationPersistence<'a> {
+    pub connector: &'a crate::SqlMigrationConnector,
 }
 
-impl SqlMigrationPersistence {
-    async fn catch<O>(
-        &self,
-        fut: impl std::future::Future<Output = Result<O, super::SqlError>>,
-    ) -> Result<O, ConnectorError> {
-        match fut.await {
-            Ok(o) => Ok(o),
-            Err(sql_error) => Err(sql_error.into_connector_error(&self.connection_info)),
-        }
+impl Component for SqlMigrationPersistence<'_> {
+    fn connector(&self) -> &crate::SqlMigrationConnector {
+        self.connector
     }
 }
 
 #[async_trait::async_trait]
-impl MigrationPersistence for SqlMigrationPersistence {
+impl MigrationPersistence for SqlMigrationPersistence<'_> {
     async fn init(&self) -> Result<(), ConnectorError> {
-        self.catch(async {
-            let sql_str = match self.connection_info.sql_family() {
+        let fut = async {
+            let sql_str = match self.sql_family() {
                 SqlFamily::Sqlite => {
-                    let mut m = barrel::Migration::new().schema(self.schema_name.clone());
+                    let mut m = barrel::Migration::new().schema(self.schema_name());
                     m.create_table_if_not_exists(TABLE_NAME, migration_table_setup_sqlite);
                     m.make_from(barrel::SqlVariant::Sqlite)
                 }
                 SqlFamily::Postgres => {
-                    let mut m = barrel::Migration::new().schema(self.schema_name.clone());
+                    let mut m = barrel::Migration::new().schema(self.schema_name());
                     m.create_table(TABLE_NAME, migration_table_setup_postgres);
                     m.make_from(barrel::SqlVariant::Pg)
                 }
                 SqlFamily::Mysql => {
                     // work around barrels missing quoting
-                    let mut m = barrel::Migration::new().schema(format!("{}", self.schema_name.clone()));
+                    let mut m = barrel::Migration::new().schema(self.schema_name());
                     m.create_table(format!("{}", TABLE_NAME), migration_table_setup_mysql);
                     m.make_from(barrel::SqlVariant::Mysql)
                 }
             };
 
-            self.connection.query_raw(&sql_str, &[]).await.ok();
+            self.conn().query_raw(&sql_str, &[]).await.ok();
 
             Ok(())
-        })
-        .await
+        };
+
+        crate::catch(self.connection_info(), fut).await
     }
 
     async fn reset(&self) -> Result<(), ConnectorError> {
-        self.catch(async {
-            let sql_str = format!(r#"DELETE FROM "{}"."_Migration";"#, self.schema_name); // TODO: this is not vendor agnostic yet
-            self.connection.query_raw(&sql_str, &[]).await.ok();
+        crate::catch(self.connection_info(), async {
+            let sql_str = format!(r#"DELETE FROM "{}"."_Migration";"#, self.schema_name()); // TODO: this is not vendor agnostic yet
+            self.conn().query_raw(&sql_str, &[]).await.ok();
 
             // TODO: this is the wrong place to do that
-            match &self.connection_info {
+            match &self.connection_info() {
                 ConnectionInfo::Postgres(_) => {
-                    let sql_str = format!(r#"DROP SCHEMA "{}" CASCADE;"#, self.schema_name);
+                    let sql_str = format!(r#"DROP SCHEMA "{}" CASCADE;"#, self.schema_name());
                     debug!("{}", sql_str);
 
-                    self.connection.query_raw(&sql_str, &[]).await.ok();
+                    self.conn().query_raw(&sql_str, &[]).await.ok();
                 }
                 ConnectionInfo::Sqlite { file_path, .. } => {
-                    self.connection
-                        .execute_raw(
-                            "DETACH DATABASE ?",
-                            &[ParameterizedValue::from(self.schema_name.as_str())],
-                        )
+                    self.conn()
+                        .execute_raw("DETACH DATABASE ?", &[ParameterizedValue::from(self.schema_name())])
                         .await
                         .ok();
                     std::fs::remove_file(file_path).ok(); // ignore potential errors
-                    self.connection
+                    self.conn()
                         .execute_raw(
                             "ATTACH DATABASE ? AS ?",
                             &[
                                 ParameterizedValue::from(file_path.as_str()),
-                                ParameterizedValue::from(self.schema_name.as_str()),
+                                ParameterizedValue::from(self.schema_name()),
                             ],
                         )
                         .await?;
                 }
                 ConnectionInfo::Mysql(_) => {
-                    let sql_str = format!(r#"DROP SCHEMA `{}`;"#, self.schema_name);
+                    let sql_str = format!(r#"DROP SCHEMA `{}`;"#, self.schema_name());
                     debug!("{}", sql_str);
-                    self.connection.query_raw(&sql_str, &[]).await?;
+                    self.conn().query_raw(&sql_str, &[]).await?;
                 }
             };
 
@@ -101,36 +92,36 @@ impl MigrationPersistence for SqlMigrationPersistence {
     }
 
     async fn last(&self) -> Result<Option<Migration>, ConnectorError> {
-        self.catch(async {
+        crate::catch(self.connection_info(), async {
             let conditions = STATUS_COLUMN.equals(MigrationStatus::MigrationSuccess.code());
             let query = Select::from_table(self.table())
                 .so_that(conditions)
                 .order_by(REVISION_COLUMN.descend());
 
-            let result_set = self.connection.query(query.into()).await?;
+            let result_set = self.conn().query(query.into()).await?;
             Ok(parse_rows_new(result_set).into_iter().next())
         })
         .await
     }
 
     async fn load_all(&self) -> Result<Vec<Migration>, ConnectorError> {
-        self.catch(async {
+        crate::catch(self.connection_info(), async {
             let query = Select::from_table(self.table()).order_by(REVISION_COLUMN.ascend());
 
-            let result_set = self.connection.query(query.into()).await?;
+            let result_set = self.conn().query(query.into()).await?;
             Ok(parse_rows_new(result_set))
         })
         .await
     }
 
     async fn by_name(&self, name: &str) -> Result<Option<Migration>, ConnectorError> {
-        self.catch(async {
+        crate::catch(self.connection_info(), async {
             let conditions = NAME_COLUMN.equals(name);
             let query = Select::from_table(self.table())
                 .so_that(conditions)
                 .order_by(REVISION_COLUMN.descend());
 
-            let result_set = self.connection.query(query.into()).await?;
+            let result_set = self.conn().query(query.into()).await?;
             Ok(parse_rows_new(result_set).into_iter().next())
         })
         .await
@@ -154,9 +145,9 @@ impl MigrationPersistence for SqlMigrationPersistence {
             .value(STARTED_AT_COLUMN, self.convert_datetime(migration.started_at))
             .value(FINISHED_AT_COLUMN, ParameterizedValue::Null);
 
-        match self.connection_info.sql_family() {
+        match self.sql_family() {
             SqlFamily::Sqlite | SqlFamily::Mysql => {
-                let id = self.connection.execute(insert.into()).await.unwrap();
+                let id = self.conn().execute(insert.into()).await.unwrap();
                 match id {
                     Some(quaint::ast::Id::Int(id)) => cloned.revision = id,
                     _ => panic!("This insert must return an int"),
@@ -164,7 +155,7 @@ impl MigrationPersistence for SqlMigrationPersistence {
             }
             SqlFamily::Postgres => {
                 let returning_insert = Insert::from(insert).returning(vec!["revision"]);
-                let result_set = self.connection.query(returning_insert.into()).await.unwrap();
+                let result_set = self.conn().query(returning_insert.into()).await.unwrap();
                 result_set.into_iter().next().map(|row| {
                     cloned.revision = row["revision"].as_i64().unwrap() as usize;
                 });
@@ -175,7 +166,7 @@ impl MigrationPersistence for SqlMigrationPersistence {
     }
 
     async fn update(&self, params: &MigrationUpdateParams) -> Result<(), ConnectorError> {
-        self.catch(async {
+        crate::catch(self.connection_info(), async {
             let finished_at_value = match params.finished_at {
                 Some(x) => self.convert_datetime(x),
                 None => ParameterizedValue::Null,
@@ -194,7 +185,7 @@ impl MigrationPersistence for SqlMigrationPersistence {
                         .and(REVISION_COLUMN.equals(params.revision)),
                 );
 
-            self.connection.query(query.into()).await?;
+            self.conn().query(query.into()).await?;
 
             Ok(())
         })
@@ -232,19 +223,19 @@ fn migration_table_setup(
     t.add_column(FINISHED_AT_COLUMN, datetime_type.clone().nullable(true));
 }
 
-impl SqlMigrationPersistence {
+impl<'a> SqlMigrationPersistence<'a> {
     fn table(&self) -> Table {
-        match self.connection_info.sql_family() {
+        match self.sql_family() {
             SqlFamily::Sqlite => {
                 // sqlite case. Otherwise quaint produces invalid SQL
                 TABLE_NAME.to_string().into()
             }
-            _ => (self.schema_name.to_string(), TABLE_NAME.to_string()).into(),
+            _ => (self.schema_name().to_string(), TABLE_NAME.to_string()).into(),
         }
     }
 
     fn convert_datetime(&self, datetime: DateTime<Utc>) -> ParameterizedValue {
-        match self.connection_info.sql_family() {
+        match self.sql_family() {
             SqlFamily::Sqlite => ParameterizedValue::Integer(datetime.timestamp_millis()),
             SqlFamily::Postgres => ParameterizedValue::DateTime(datetime),
             SqlFamily::Mysql => ParameterizedValue::DateTime(datetime),

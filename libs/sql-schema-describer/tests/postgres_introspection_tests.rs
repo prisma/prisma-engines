@@ -11,7 +11,6 @@ use crate::postgres::*;
 
 #[tokio::test]
 async fn all_postgres_column_types_must_work() {
-
     let mut migration = Migration::new().schema(SCHEMA);
     migration.create_table("User", move |t| {
         t.add_column("array_bin_col", types::array(&types::binary()));
@@ -573,7 +572,6 @@ async fn all_postgres_column_types_must_work() {
 
 #[tokio::test]
 async fn postgres_foreign_key_on_delete_must_be_handled() {
-
     let sql = format!(
         "CREATE TABLE \"{0}\".\"City\" (id INT PRIMARY KEY);
          CREATE TABLE \"{0}\".\"User\" (
@@ -708,11 +706,10 @@ async fn postgres_foreign_key_on_delete_must_be_handled() {
 
 #[tokio::test]
 async fn postgres_enums_must_work() {
-
-    let inspector = get_postgres_describer(&format!(
-        "CREATE TYPE \"{}\".\"mood\" AS ENUM ('sad', 'ok', 'happy')",
-        SCHEMA
-    ), "postgres_enums_must_work")
+    let inspector = get_postgres_describer(
+        &format!("CREATE TYPE \"{}\".\"mood\" AS ENUM ('sad', 'ok', 'happy')", SCHEMA),
+        "postgres_enums_must_work",
+    )
     .await;
 
     let schema = inspector.describe(SCHEMA).await.expect("describing");
@@ -730,8 +727,11 @@ async fn postgres_enums_must_work() {
 
 #[tokio::test]
 async fn postgres_sequences_must_work() {
-
-    let inspector = get_postgres_describer(&format!("CREATE SEQUENCE \"{}\".\"test\"", SCHEMA), "postgres_sequences_must_work").await;
+    let inspector = get_postgres_describer(
+        &format!("CREATE SEQUENCE \"{}\".\"test\"", SCHEMA),
+        "postgres_sequences_must_work",
+    )
+    .await;
 
     let schema = inspector.describe(SCHEMA).await.expect("describing");
     let got_seq = schema.get_sequence("test").expect("get sequence");

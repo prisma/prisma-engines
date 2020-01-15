@@ -128,7 +128,7 @@ impl RelationField {
         let relation = self.relation();
 
         match relation.manifestation {
-            Some(RelationLinkManifestation::Inline(ref m)) => {
+            RelationLinkManifestation::Inline(ref m) => {
                 let is_self_rel = relation.is_self_relation();
 
                 if is_self_rel && self.is_hidden {
@@ -152,7 +152,7 @@ impl RelationField {
         let relation = self.relation();
 
         match relation.manifestation {
-            Some(RelationLinkManifestation::Inline(ref m)) => {
+            RelationLinkManifestation::Inline(ref m) => {
                 let is_self_rel = relation.is_self_relation();
 
                 if is_self_rel && self.is_hidden {

@@ -12,14 +12,17 @@ impl DirectiveValidator<dml::Field> for UpdatedAtDirectiveValidator {
 
     fn validate_and_apply(&self, args: &mut Args, obj: &mut dml::Field) -> Result<(), DatamodelError> {
         if obj.field_type != dml::FieldType::Base(dml::ScalarType::DateTime) {
-            return self.error(
+            return self.new_directive_validation_error(
                 "Fields that are marked with @updatedAt must be of type DateTime.",
                 args.span(),
             );
         }
 
         if obj.arity == dml::FieldArity::List {
-            return self.error("Fields that are marked with @updatedAt can not be lists.", args.span());
+            return self.new_directive_validation_error(
+                "Fields that are marked with @updatedAt can not be lists.",
+                args.span(),
+            );
         }
 
         obj.is_updated_at = true;

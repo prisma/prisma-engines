@@ -1,9 +1,6 @@
 #![deny(warnings)]
 
 #[macro_use]
-extern crate serde_derive;
-
-#[macro_use]
 extern crate debug_stub_derive;
 
 mod datamodel_converter;
@@ -16,7 +13,6 @@ mod internal_data_model;
 mod model;
 mod order_by;
 mod prisma_value;
-mod project;
 mod record;
 mod relation;
 mod selected_fields;
@@ -38,7 +34,6 @@ pub use internal_data_model::*;
 pub use model::*;
 pub use order_by::*;
 pub use prisma_value::*;
-pub use project::*;
 pub use record::*;
 pub use relation::*;
 pub use selected_fields::*;

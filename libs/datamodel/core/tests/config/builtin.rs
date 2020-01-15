@@ -140,7 +140,7 @@ datasource three {
     enabled = env("THREE")
 }
 
-// will be disabled by sheer presence of the env var
+// will be disabled by sheer absence of the env var
 datasource four {
     provider = "sqlite"
     url = "file:../db/four.db"

@@ -122,4 +122,13 @@ class CreateMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
     server.query(mutation, project)
     server.queryThatMustFail(mutation, project, errorCode = 3010)
   }
+
+  "A Create Mutation" should "create and return an item with enums passed as strings" in {
+    val res = server.query(s"""mutation {createScalarModel(data: {optEnum: "A"}){ optEnum }}""", project)
+    res should be("""{"data":{"createScalarModel":{"optEnum":"A"}}}""".parseJson)
+  }
+
+  "A Create Mutation" should "fail if an item with enums passed as strings doesn't match and enum value" in {
+    server.queryThatMustFail(s"""mutation {createScalarModel(data: {optEnum: "NOPE"}){ optEnum }}""", project, errorCode = 3010)
+  }
 }

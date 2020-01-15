@@ -163,7 +163,7 @@ async fn database_does_not_exist_must_return_a_proper_error() {
         .unwrap();
     let database_name = "notmydatabase";
 
-    url.set_path(database_name);
+    url.set_path(&format!("/{}", database_name));
 
     let dm = format!(
         r#"
@@ -242,7 +242,7 @@ async fn database_access_denied_must_return_a_proper_error_in_cli() {
     let mut url: Url = url.clone();
     url.set_username("jeanmichel").unwrap();
     url.set_password(Some("1234")).unwrap();
-    url.set_path("access_denied_test");
+    url.set_path("/access_denied_test");
 
     let error = get_cli_error(&[
         "migration-engine",
@@ -281,7 +281,7 @@ async fn database_access_denied_must_return_a_proper_error_in_rpc() {
     let mut url: Url = url.clone();
     url.set_username("jeanyves").unwrap();
     url.set_password(Some("1234")).unwrap();
-    url.set_path("access_denied_test");
+    url.set_path("/access_denied_test");
 
     let dm = format!(
         r#"
@@ -304,6 +304,32 @@ async fn database_access_denied_must_return_a_proper_error_in_rpc() {
             "database_name": "access_denied_test",
         },
         "error_code": "P1010",
+    });
+
+    assert_eq!(json_error, expected);
+}
+
+#[tokio::test]
+async fn bad_datasource_url_and_provider_combinations_must_return_a_proper_error() {
+    let db_name = "bad_datasource_url_and_provider_combinations_must_return_a_proper_error";
+    let dm = format!(
+        r#"
+            datasource db {{
+                provider = "sqlite"
+                url = "{}"
+            }}
+        "#,
+        postgres_10_url(db_name),
+    );
+
+    let error = RpcApi::new(&dm).await.map(drop).unwrap_err();
+
+    let json_error = serde_json::to_value(&render_error(error)).unwrap();
+
+    let expected = json!({
+        "is_panic": false,
+        "message": "Error in connector: The database URL is not valid",
+        "backtrace": null,
     });
 
     assert_eq!(json_error, expected);
@@ -378,8 +404,9 @@ async fn unique_constraint_errors_in_migrations_must_return_a_known_error(api: &
 
     let json_error = serde_json::to_value(&error).unwrap();
 
-    let field_name = match api.sql_family() {
-        SqlFamily::Mysql => "Fruit.name",
+    let field_name = match (api.sql_family(), api.connector_name()) {
+        (SqlFamily::Mysql, "mysql_8") => "Fruit.Fruit.name",
+        (SqlFamily::Mysql, _) => "Fruit.name",
         _ => "name",
     };
 

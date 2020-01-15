@@ -27,15 +27,25 @@ impl<'a> MigrationCommand for UnapplyMigrationCommand<'a> {
                 rolled_back: "not-applicable".to_string(),
                 active: None,
                 errors: vec!["There is no last migration that can be rolled back.".to_string()],
+                warnings: Vec::new(),
             },
             Some(migration_to_rollback) => {
                 let database_migration =
                     connector.deserialize_database_migration(migration_to_rollback.database_migration.clone());
 
-                connector
-                    .migration_applier()
-                    .unapply(&migration_to_rollback, &database_migration)
-                    .await?;
+                let destructive_changes_checker = connector.destructive_changes_checker();
+
+                let warnings = destructive_changes_checker.check_unapply(&database_migration).await?;
+
+                match (warnings.has_warnings(), input.force) {
+                    (false, _) | (true, None) | (true, Some(true)) => {
+                        connector
+                            .migration_applier()
+                            .unapply(&migration_to_rollback, &database_migration)
+                            .await?;
+                    }
+                    (true, Some(false)) => (),
+                }
 
                 let new_active_migration = connector.migration_persistence().last().await?.map(|m| m.name);
 
@@ -43,6 +53,7 @@ impl<'a> MigrationCommand for UnapplyMigrationCommand<'a> {
                     rolled_back: migration_to_rollback.name,
                     active: new_active_migration,
                     errors: Vec::new(),
+                    warnings: warnings.warnings,
                 }
             }
         };
@@ -53,7 +64,9 @@ impl<'a> MigrationCommand for UnapplyMigrationCommand<'a> {
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct UnapplyMigrationInput {}
+pub struct UnapplyMigrationInput {
+    pub force: Option<bool>,
+}
 
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -61,4 +74,5 @@ pub struct UnapplyMigrationOutput {
     pub rolled_back: String,
     pub active: Option<String>,
     pub errors: Vec<String>,
+    pub warnings: Vec<MigrationWarning>,
 }

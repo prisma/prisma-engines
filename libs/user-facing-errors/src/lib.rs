@@ -1,7 +1,7 @@
 #![deny(warnings, rust_2018_idioms)]
 
 pub mod common;
-pub mod introspection;
+pub mod introspection_engine;
 pub mod migration_engine;
 pub mod quaint;
 pub mod query_engine;

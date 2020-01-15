@@ -12,7 +12,7 @@ use std::{
 };
 use uuid::Uuid;
 
-pub type PrismaListValue = Option<Vec<PrismaValue>>;
+pub type PrismaListValue = Vec<PrismaValue>;
 
 #[derive(Serialize, Debug, PartialEq, Eq, Hash, Clone)]
 #[serde(untagged)]
@@ -166,18 +166,6 @@ impl From<&GraphqlId> for PrismaValue {
     }
 }
 
-impl TryFrom<PrismaValue> for PrismaListValue {
-    type Error = DomainError;
-
-    fn try_from(s: PrismaValue) -> DomainResult<PrismaListValue> {
-        match s {
-            PrismaValue::List(l) => Ok(l),
-            PrismaValue::Null => Ok(None),
-            _ => Err(DomainError::ConversionFailure("PrismaValue", "PrismaListValue")),
-        }
-    }
-}
-
 impl TryFrom<PrismaValue> for GraphqlId {
     type Error = DomainError;
 
@@ -271,7 +259,6 @@ impl From<Option<dml::ScalarValue>> for PrismaValue {
             dml::ScalarValue::DateTime(x) => PrismaValue::DateTime(x),
             dml::ScalarValue::Decimal(x) => x.try_into().expect("Can't convert float to decimal"),
             dml::ScalarValue::ConstantLiteral(x) => PrismaValue::Enum(EnumValue::string(x.clone(), x.clone())),
-            dml::ScalarValue::Expression(_, _, _) => unreachable!(),
         })
         .unwrap_or_else(|| PrismaValue::Null)
     }

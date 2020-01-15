@@ -9,6 +9,7 @@ Authentication failed against database server at `${database_host}`, the provide
 
 Please make sure to provide valid database credentials for the database server at `${database_host}`."
 )]
+// **Notes**: Might vary for different data source, For example, SQLite has no concept of user accounts, and instead relies on the file system for all database permissions. This makes enforcing storage quotas difficult and enforcing user permissions impossible.
 pub struct IncorrectDatabaseCredentials {
     /// Database host URI
     pub database_user: String,

@@ -5,7 +5,7 @@ use datamodel::Datamodel;
 /// migrating the database from one datamodel to another. In addition to the datamodel information provided by the core, a connector
 /// may gather additional information itself, e.g. through looking at the description of the underlying database.
 #[async_trait::async_trait]
-pub trait DatabaseMigrationInferrer<T>: Send + Sync + 'static {
+pub trait DatabaseMigrationInferrer<T>: Send + Sync {
     /// Infer the database migration steps. The previous datamodel is provided, but the implementor can ignore it.
     async fn infer(&self, previous: &Datamodel, next: &Datamodel, steps: &[MigrationStep]) -> ConnectorResult<T>;
 

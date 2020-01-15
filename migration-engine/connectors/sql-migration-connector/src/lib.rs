@@ -1,6 +1,4 @@
-#[macro_use]
-extern crate log;
-
+mod component;
 mod error;
 mod sql_database_migration_inferrer;
 mod sql_database_step_applier;
@@ -14,6 +12,7 @@ mod sql_schema_differ;
 pub use error::*;
 pub use sql_migration::*;
 
+use component::Component;
 use migration_connector::*;
 use quaint::{
     prelude::{ConnectionInfo, Queryable, SqlFamily},
@@ -25,23 +24,38 @@ use sql_destructive_changes_checker::*;
 use sql_migration_persistence::*;
 use sql_schema_describer::SqlSchemaDescriberBackend;
 use std::{fs, path::PathBuf, sync::Arc, time::Duration};
+use tracing::debug;
 
 const CONNECTION_TIMEOUT: Duration = Duration::from_secs(10);
-pub type Result<T> = std::result::Result<T, SqlError>;
+
+#[derive(Debug, Clone)]
+pub struct DatabaseInfo {
+    connection_info: ConnectionInfo,
+    database_version: Option<String>,
+}
+
+impl DatabaseInfo {
+    pub(crate) fn is_mariadb(&self) -> bool {
+        self.connection_info.sql_family() == SqlFamily::Mysql
+            && self
+                .database_version
+                .as_ref()
+                .map(|version| version.contains("MariaDB"))
+                .unwrap_or(false)
+    }
+}
 
 pub struct SqlMigrationConnector {
-    pub connection_info: ConnectionInfo,
     pub schema_name: String,
     pub database: Arc<dyn Queryable + Send + Sync + 'static>,
-    pub migration_persistence: Arc<dyn MigrationPersistence>,
-    pub database_migration_inferrer: Arc<dyn DatabaseMigrationInferrer<SqlMigration>>,
-    pub database_migration_step_applier: Arc<dyn DatabaseMigrationStepApplier<SqlMigration>>,
-    pub destructive_changes_checker: Arc<dyn DestructiveChangesChecker<SqlMigration>>,
+    pub database_info: DatabaseInfo,
     pub database_describer: Arc<dyn SqlSchemaDescriberBackend + Send + Sync + 'static>,
 }
 
 impl SqlMigrationConnector {
-    pub async fn new(database_str: &str) -> std::result::Result<Self, ConnectorError> {
+    pub async fn new(database_str: &str, provider: &str) -> ConnectorResult<Self> {
+        validate_database_str(database_str, provider)?;
+
         let connection_info =
             ConnectionInfo::from_url(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
 
@@ -68,12 +82,21 @@ impl SqlMigrationConnector {
                 SqlError::from(quaint::error::Error::ConnectTimeout).into_connector_error(&connection_info)
             })??;
 
+        let database_version = get_database_version(&connection, &connection_info)
+            .await
+            .map_err(|sql_error| sql_error.into_connector_error(&connection_info))?;
+
         let schema_name = connection.connection_info().schema_name().to_owned();
 
         let sql_family = connection.connection_info().sql_family();
         let connection_info = connection.connection_info().clone();
 
         let conn = Arc::new(connection) as Arc<dyn Queryable + Send + Sync>;
+
+        let database_info = DatabaseInfo {
+            connection_info: connection_info.clone(),
+            database_version,
+        };
 
         let describer: Arc<dyn SqlSchemaDescriberBackend + Send + Sync + 'static> = match sql_family {
             SqlFamily::Mysql => Arc::new(sql_schema_describer::mysql::SqlSchemaDescriber::new(Arc::clone(&conn))),
@@ -83,45 +106,16 @@ impl SqlMigrationConnector {
             SqlFamily::Sqlite => Arc::new(sql_schema_describer::sqlite::SqlSchemaDescriber::new(Arc::clone(&conn))),
         };
 
-        let migration_persistence = Arc::new(SqlMigrationPersistence {
-            connection_info: connection_info.clone(),
-            connection: Arc::clone(&conn),
-            schema_name: schema_name.clone(),
-        });
-
-        let database_migration_inferrer = Arc::new(SqlDatabaseMigrationInferrer {
-            connection_info: connection_info.clone(),
-            describer: Arc::clone(&describer),
-            schema_name: schema_name.to_string(),
-        });
-
-        let database_migration_step_applier = Arc::new(SqlDatabaseStepApplier {
-            connection_info: connection_info.clone(),
-            schema_name: schema_name.clone(),
-            conn: Arc::clone(&conn),
-        });
-
-        let destructive_changes_checker = Arc::new(SqlDestructiveChangesChecker {
-            connection_info: connection_info.clone(),
-            schema_name: schema_name.clone(),
-            database: Arc::clone(&conn),
-            database_describer: describer.clone(),
-        });
-
         Ok(Self {
-            connection_info,
+            database_info,
             schema_name,
-            database: Arc::clone(&conn),
-            migration_persistence,
-            database_migration_inferrer,
-            database_migration_step_applier,
-            destructive_changes_checker,
+            database: conn,
             database_describer: Arc::clone(&describer),
         })
     }
 
     async fn create_database_impl(&self, db_name: &str) -> SqlResult<()> {
-        match self.connection_info.sql_family() {
+        match self.database_info.connection_info.sql_family() {
             SqlFamily::Postgres => {
                 let query = format!("CREATE DATABASE \"{}\"", db_name);
                 self.database.query_raw(&query, &[]).await?;
@@ -140,7 +134,7 @@ impl SqlMigrationConnector {
 
     async fn initialize_impl(&self) -> SqlResult<()> {
         // TODO: this code probably does not ever do anything. The schema/db creation happens already in the helper functions above.
-        match &self.connection_info {
+        match &self.database_info.connection_info {
             ConnectionInfo::Sqlite { file_path, .. } => {
                 let path_buf = PathBuf::from(&file_path);
                 match path_buf.parent() {
@@ -171,6 +165,10 @@ impl SqlMigrationConnector {
 
         Ok(())
     }
+
+    fn connection_info(&self) -> &ConnectionInfo {
+        &self.database_info.connection_info
+    }
 }
 
 #[async_trait::async_trait]
@@ -178,15 +176,15 @@ impl MigrationConnector for SqlMigrationConnector {
     type DatabaseMigration = SqlMigration;
 
     fn connector_type(&self) -> &'static str {
-        self.connection_info.sql_family().as_str()
+        self.connection_info().sql_family().as_str()
     }
 
     async fn create_database(&self, db_name: &str) -> ConnectorResult<()> {
-        catch(&self.connection_info, self.create_database_impl(db_name)).await
+        catch(self.connection_info(), self.create_database_impl(db_name)).await
     }
 
     async fn initialize(&self) -> ConnectorResult<()> {
-        catch(&self.connection_info, self.initialize_impl()).await?;
+        catch(self.connection_info(), self.initialize_impl()).await?;
 
         self.migration_persistence().init().await?;
 
@@ -198,20 +196,20 @@ impl MigrationConnector for SqlMigrationConnector {
         Ok(())
     }
 
-    fn migration_persistence(&self) -> Arc<dyn MigrationPersistence> {
-        Arc::clone(&self.migration_persistence)
+    fn migration_persistence<'a>(&'a self) -> Box<dyn MigrationPersistence + 'a> {
+        Box::new(SqlMigrationPersistence { connector: self })
     }
 
-    fn database_migration_inferrer(&self) -> Arc<dyn DatabaseMigrationInferrer<SqlMigration>> {
-        Arc::clone(&self.database_migration_inferrer)
+    fn database_migration_inferrer<'a>(&'a self) -> Box<dyn DatabaseMigrationInferrer<SqlMigration> + 'a> {
+        Box::new(SqlDatabaseMigrationInferrer { connector: self })
     }
 
-    fn database_migration_step_applier(&self) -> Arc<dyn DatabaseMigrationStepApplier<SqlMigration>> {
-        Arc::clone(&self.database_migration_step_applier)
+    fn database_migration_step_applier<'a>(&'a self) -> Box<dyn DatabaseMigrationStepApplier<SqlMigration> + 'a> {
+        Box::new(SqlDatabaseStepApplier { connector: self })
     }
 
-    fn destructive_changes_checker(&self) -> Arc<dyn DestructiveChangesChecker<SqlMigration>> {
-        Arc::clone(&self.destructive_changes_checker)
+    fn destructive_changes_checker<'a>(&'a self) -> Box<dyn DestructiveChangesChecker<SqlMigration> + 'a> {
+        Box::new(SqlDestructiveChangesChecker { connector: self })
     }
 
     fn deserialize_database_migration(&self, json: serde_json::Value) -> SqlMigration {
@@ -226,5 +224,41 @@ pub(crate) async fn catch<O>(
     match fut.await {
         Ok(o) => Ok(o),
         Err(sql_error) => Err(sql_error.into_connector_error(connection_info)),
+    }
+}
+
+fn validate_database_str(database_str: &str, provider: &str) -> ConnectorResult<()> {
+    let scheme = database_str.split(":").next();
+
+    match (provider, scheme) {
+        ("mysql", Some("mysql")) => Ok(()),
+        ("postgresql", Some(scheme)) if scheme.starts_with("postgres") => Ok(()),
+        ("postgres", Some(scheme)) if scheme.starts_with("postgres") => Ok(()),
+        ("sqlite", Some("file")) | ("sqlite", Some("sqlite")) => Ok(()),
+        _ => {
+            let error = ConnectorError {
+                kind: migration_connector::ErrorKind::InvalidDatabaseUrl,
+                user_facing_error: None,
+            };
+
+            Err(error)
+        }
+    }
+}
+
+async fn get_database_version(connection: &Quaint, connection_info: &ConnectionInfo) -> SqlResult<Option<String>> {
+    match connection_info.sql_family() {
+        SqlFamily::Mysql => {
+            let query = r#"SELECT @@GLOBAL.version version"#;
+
+            let rows = connection.query_raw(query, &[]).await?;
+
+            let version_string = rows
+                .get(0)
+                .and_then(|row| row.get("version").and_then(|version| version.to_string()));
+
+            Ok(version_string)
+        }
+        _ => Ok(None),
     }
 }

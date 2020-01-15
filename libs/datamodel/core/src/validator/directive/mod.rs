@@ -10,4 +10,4 @@ pub use directive_scope::DirectiveScope;
 pub use directive_validator::DirectiveValidator;
 
 /// The argument type for directive validators.
-type Args<'a> = crate::common::argument::Arguments<'a>;
+type Args<'a> = crate::common::arguments::Arguments<'a>;

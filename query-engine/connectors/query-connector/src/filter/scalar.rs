@@ -1,6 +1,6 @@
 use super::Filter;
 use crate::compare::ScalarCompare;
-use prisma_models::{PrismaValue, ScalarField};
+use prisma_models::{PrismaListValue, PrismaValue, ScalarField};
 use std::sync::Arc;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -23,30 +23,30 @@ pub enum ScalarCondition {
     LessThanOrEquals(PrismaValue),
     GreaterThan(PrismaValue),
     GreaterThanOrEquals(PrismaValue),
-    In(Option<Vec<PrismaValue>>),
-    NotIn(Option<Vec<PrismaValue>>),
+    In(PrismaListValue),
+    NotIn(PrismaListValue),
 }
 
 impl ScalarCompare for Arc<ScalarField> {
     /// Field is in a given value
-    fn is_in<T>(&self, val: Option<Vec<T>>) -> Filter
+    fn is_in<T>(&self, values: Vec<T>) -> Filter
     where
         T: Into<PrismaValue>,
     {
         Filter::from(ScalarFilter {
             field: Arc::clone(self),
-            condition: ScalarCondition::In(val.map(|v| v.into_iter().map(|i| i.into()).collect())),
+            condition: ScalarCondition::In(values.into_iter().map(|i| i.into()).collect()),
         })
     }
 
     /// Field is not in a given value
-    fn not_in<T>(&self, val: Option<Vec<T>>) -> Filter
+    fn not_in<T>(&self, values: Vec<T>) -> Filter
     where
         T: Into<PrismaValue>,
     {
         Filter::from(ScalarFilter {
             field: Arc::clone(self),
-            condition: ScalarCondition::NotIn(val.map(|v| v.into_iter().map(|i| i.into()).collect())),
+            condition: ScalarCondition::NotIn(values.into_iter().map(|i| i.into()).collect()),
         })
     }
 

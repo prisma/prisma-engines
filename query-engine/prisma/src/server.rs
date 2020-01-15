@@ -52,7 +52,9 @@ impl HttpServer {
     }
 
     async fn routes(ctx: Arc<RequestContext>, req: Request<Body>) -> std::result::Result<Response<Body>, Error> {
-        let res = match (req.method(), req.uri().path()) {
+        let start = Instant::now();
+
+        let mut res = match (req.method(), req.uri().path()) {
             (&Method::POST, "/") => {
                 let (parts, body) = req.into_parts();
 
@@ -93,6 +95,9 @@ impl HttpServer {
                 not_found
             }
         };
+
+        let elapsed = Instant::now().duration_since(start).as_micros() as u64;
+        res.headers_mut().insert("x-elapsed", elapsed.into());
 
         Ok(res)
     }

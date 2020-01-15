@@ -1,12 +1,11 @@
 #![allow(non_snake_case)]
 
 use super::test_harness::*;
-use crate::commands::*;
 use pretty_assertions::assert_eq;
 use sql_migration_connector::PrettySqlMigrationStep;
 
 #[test_each_connector]
-async fn assume_to_be_applied_must_work(api: &TestApi) {
+async fn assume_to_be_applied_must_work(api: &TestApi) -> TestResult {
     let dm0 = r#"
             model Blog {
                 id Int @id
@@ -14,7 +13,7 @@ async fn assume_to_be_applied_must_work(api: &TestApi) {
         "#;
 
     api.infer_apply(&dm0)
-        .migration_id(Some("mig0000".into()))
+        .migration_id(Some("mig0000"))
         .send()
         .await
         .unwrap();
@@ -25,12 +24,13 @@ async fn assume_to_be_applied_must_work(api: &TestApi) {
                 field1 String
             }
         "#;
-    let input1 = InferMigrationStepsInput {
-        migration_id: "mig0001".to_string(),
-        assume_to_be_applied: Vec::new(),
-        datamodel: dm1.to_string(),
-    };
-    let steps1 = api.run_infer_command(input1).await.0.datamodel_steps;
+
+    let steps1 = api
+        .infer(dm1)
+        .migration_id(Some("mig0001"))
+        .send()
+        .await?
+        .datamodel_steps;
     let expected_steps_1 = create_field_step("Blog", "field1", "String");
     assert_eq!(steps1, &[expected_steps_1.clone()]);
 
@@ -41,18 +41,22 @@ async fn assume_to_be_applied_must_work(api: &TestApi) {
                 field2 String
             }
         "#;
-    let input2 = InferMigrationStepsInput {
-        migration_id: "mig0002".to_string(),
-        assume_to_be_applied: steps1,
-        datamodel: dm2.to_string(),
-    };
-    let steps2 = api.run_infer_command(input2).await.0.datamodel_steps;
+
+    let steps2 = api
+        .infer(dm2)
+        .migration_id(Some("mig0002"))
+        .assume_to_be_applied(Some(steps1))
+        .send()
+        .await?
+        .datamodel_steps;
 
     // We are exiting watch mode, so the returned steps go back to the last non-watch migration.
     assert_eq!(
         steps2,
         &[expected_steps_1, create_field_step("Blog", "field2", "String")]
     );
+
+    Ok(())
 }
 
 #[test_each_connector]
@@ -102,13 +106,7 @@ async fn special_handling_of_watch_migrations(api: &TestApi) -> TestResult {
             }
         "#;
 
-    let input = InferMigrationStepsInput {
-        migration_id: "mig02".to_string(),
-        assume_to_be_applied: Vec::new(),
-        datamodel: dm.to_string(),
-    };
-
-    let steps = api.run_infer_command(input).await.0.datamodel_steps;
+    let steps = api.infer(dm).migration_id(Some("mig02")).send().await?.datamodel_steps;
 
     assert_eq!(
         steps,
@@ -135,10 +133,7 @@ async fn watch_migrations_must_be_returned_when_transitioning_out_of_watch_mode(
             }
         "#;
 
-    api.infer_apply(&dm)
-        .migration_id(Some("mig00".to_owned()))
-        .send()
-        .await?;
+    api.infer_apply(&dm).migration_id(Some("mig00")).send().await?;
 
     let dm = r#"
             model Blog {
@@ -174,11 +169,7 @@ async fn watch_migrations_must_be_returned_when_transitioning_out_of_watch_mode(
             }
         "#;
 
-    let output = api
-        .infer_apply(&dm)
-        .migration_id(Some("watch02".to_owned()))
-        .send()
-        .await?;
+    let output = api.infer_apply(&dm).migration_id(Some("watch02")).send().await?;
 
     applied_database_steps
         .extend(serde_json::from_value::<Vec<PrettySqlMigrationStep>>(output.database_steps).unwrap());
@@ -186,14 +177,8 @@ async fn watch_migrations_must_be_returned_when_transitioning_out_of_watch_mode(
     // We added one field/column twice, and two models, so we should have four database steps.
     assert_eq!(applied_database_steps.len(), if api.is_sqlite() { 16 } else { 4 });
 
-    let input = InferMigrationStepsInput {
-        migration_id: "mig02".to_string(),
-        assume_to_be_applied: vec![],
-        datamodel: dm.to_string(),
-    };
-
-    let output = api.run_infer_command(input).await;
-    let returned_steps: Vec<PrettySqlMigrationStep> = serde_json::from_value(output.0.database_steps).unwrap();
+    let output = api.infer(dm).migration_id(Some("mig02")).send().await?;
+    let returned_steps: Vec<PrettySqlMigrationStep> = serde_json::from_value(output.database_steps).unwrap();
 
     let expected_steps_count = if api.is_sqlite() { 9 } else { 3 }; // one AlterTable, two CreateTables
 
@@ -214,10 +199,7 @@ async fn watch_migrations_must_be_returned_in_addition_to_regular_inferred_steps
 
     let mut applied_database_steps: Vec<PrettySqlMigrationStep> = Vec::new();
 
-    api.infer_apply(&dm)
-        .migration_id(Some("mig00".to_owned()))
-        .send()
-        .await?;
+    api.infer_apply(&dm).migration_id(Some("mig00")).send().await?;
 
     let dm = r#"
             model Blog {
@@ -226,11 +208,7 @@ async fn watch_migrations_must_be_returned_in_addition_to_regular_inferred_steps
             }
         "#;
 
-    let output = api
-        .infer_apply(&dm)
-        .migration_id(Some("watch01".to_owned()))
-        .send()
-        .await?;
+    let output = api.infer_apply(&dm).migration_id(Some("watch01")).send().await?;
 
     applied_database_steps
         .extend(serde_json::from_value::<Vec<PrettySqlMigrationStep>>(output.database_steps).unwrap());
@@ -251,11 +229,7 @@ async fn watch_migrations_must_be_returned_in_addition_to_regular_inferred_steps
             }
         "#;
 
-    let output = api
-        .infer_apply(&dm)
-        .migration_id(Some("watch02".to_owned()))
-        .send()
-        .await?;
+    let output = api.infer_apply(&dm).migration_id(Some("watch02")).send().await?;
     applied_database_steps
         .extend(serde_json::from_value::<Vec<PrettySqlMigrationStep>>(output.database_steps).unwrap());
 
@@ -282,14 +256,8 @@ async fn watch_migrations_must_be_returned_in_addition_to_regular_inferred_steps
             }
         "#;
 
-    let input = InferMigrationStepsInput {
-        migration_id: "mig02".to_string(),
-        assume_to_be_applied: vec![],
-        datamodel: dm.to_string(),
-    };
-
-    let output = api.run_infer_command(input).await;
-    let returned_steps: Vec<PrettySqlMigrationStep> = serde_json::from_value(output.0.database_steps).unwrap();
+    let output = api.infer(dm).migration_id(Some("mig02")).send().await?;
+    let returned_steps: Vec<PrettySqlMigrationStep> = serde_json::from_value(output.database_steps).unwrap();
 
     let expected_steps_count = if api.is_sqlite() {
         10

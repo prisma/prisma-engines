@@ -1,4 +1,4 @@
-use super::{TestApi, MIGRATION_ID_COUNTER};
+use super::super::unique_migration_id;
 use crate::{
     api::GenericApi,
     commands::{ApplyMigrationInput, MigrationStepsResultOutput},
@@ -7,7 +7,7 @@ use migration_connector::MigrationStep;
 
 #[derive(Clone)]
 pub struct Apply<'a> {
-    pub(super) api: &'a TestApi,
+    pub(super) api: &'a dyn GenericApi,
     pub(super) migration_id: Option<String>,
     pub(super) steps: Option<Vec<MigrationStep>>,
     pub(super) force: Option<bool>,
@@ -30,12 +30,7 @@ impl Apply<'_> {
     }
 
     pub async fn send(self) -> Result<MigrationStepsResultOutput, anyhow::Error> {
-        let migration_id = self.migration_id.unwrap_or_else(|| {
-            format!(
-                "migration-{}",
-                MIGRATION_ID_COUNTER.fetch_add(1, std::sync::atomic::Ordering::Relaxed)
-            )
-        });
+        let migration_id = self.migration_id.unwrap_or_else(unique_migration_id);
 
         let input = ApplyMigrationInput {
             migration_id,
@@ -43,6 +38,6 @@ impl Apply<'_> {
             steps: self.steps.unwrap_or_else(Vec::new),
         };
 
-        Ok(self.api.api.apply_migration(&input).await?)
+        Ok(self.api.apply_migration(&input).await?)
     }
 }

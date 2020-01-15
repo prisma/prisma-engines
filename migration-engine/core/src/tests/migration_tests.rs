@@ -7,6 +7,8 @@ use quaint::prelude::SqlFamily;
 use sql_migration_connector::{AlterIndex, CreateIndex, DropIndex, SqlMigrationStep};
 use sql_schema_describer::*;
 
+mod mariadb;
+
 #[test_each_connector]
 async fn adding_a_scalar_field_must_work(api: &TestApi) {
     let dm2 = r#"
@@ -37,7 +39,7 @@ async fn adding_a_scalar_field_must_work(api: &TestApi) {
     assert_eq!(table.column_bang("enum").tpe.family, ColumnTypeFamily::String);
 }
 
-#[test_each_connector(ignore = "mysql_mariadb")]
+#[test_each_connector]
 async fn adding_an_optional_field_must_work(api: &TestApi) {
     let dm2 = r#"
         model Test {
@@ -999,8 +1001,8 @@ async fn removing_multi_field_unique_index_must_work(api: &TestApi) {
     assert!(index.is_none());
 }
 
-#[test_each_connector(ignore = "mysql_mariadb")]
-async fn index_renaming_must_work(api: &TestApi) {
+#[test_each_connector]
+async fn index_renaming_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
             model A {
                 id Int @id
@@ -1010,14 +1012,13 @@ async fn index_renaming_must_work(api: &TestApi) {
                 @@unique([field, secondField], name: "customName")
             }
         "#;
-    let result = api.infer_and_apply(&dm1).await.sql_schema;
-    let index = result
-        .table_bang("A")
-        .indices
-        .iter()
-        .find(|i| i.name == "customName" && i.columns == &["field", "secondField"]);
-    assert!(index.is_some());
-    assert_eq!(index.unwrap().tpe, IndexType::Unique);
+    api.infer_apply(&dm1).send().await?;
+
+    api.assert_schema().await?.assert_table("A", |table| {
+        table.assert_index_on_columns(&["field", "secondField"], |idx| {
+            idx.assert_name("customName")?.assert_is_unique()
+        })
+    })?;
 
     let dm2 = r#"
             model A {
@@ -1028,14 +1029,13 @@ async fn index_renaming_must_work(api: &TestApi) {
                 @@unique([field, secondField], name: "customNameA")
             }
         "#;
-    let result = api.infer_and_apply(&dm2).await;
-    let indexes = result
-        .sql_schema
-        .table_bang("A")
-        .indices
-        .iter()
-        .filter(|i| i.columns == &["field", "secondField"] && i.name == "customNameA");
-    assert_eq!(indexes.count(), 1);
+
+    let result = api.infer_apply(&dm2).send().await?;
+    api.assert_schema().await?.assert_table("A", |table| {
+        table
+            .assert_indexes_count(1)?
+            .assert_index_on_columns(&["field", "secondField"], |idx| idx.assert_name("customNameA"))
+    })?;
 
     // Test that we are not dropping and recreating the index. Except in SQLite, because there we are.
     if !api.is_sqlite() {
@@ -1047,9 +1047,11 @@ async fn index_renaming_must_work(api: &TestApi) {
         let actual_steps = result.sql_migration();
         assert_eq!(actual_steps, expected_steps);
     }
+
+    Ok(())
 }
 
-#[test_each_connector(ignore = "mysql_mariadb")]
+#[test_each_connector]
 async fn index_renaming_must_work_when_renaming_to_default(api: &TestApi) {
     let dm1 = r#"
             model A {
@@ -1100,8 +1102,8 @@ async fn index_renaming_must_work_when_renaming_to_default(api: &TestApi) {
     }
 }
 
-#[test_each_connector(ignore = "mysql_mariadb")]
-async fn index_renaming_must_work_when_renaming_to_custom(api: &TestApi) {
+#[test_each_connector(log = "debug")]
+async fn index_renaming_must_work_when_renaming_to_custom(api: &TestApi) -> TestResult {
     let dm1 = r#"
             model A {
                 id Int @id
@@ -1111,15 +1113,13 @@ async fn index_renaming_must_work_when_renaming_to_custom(api: &TestApi) {
                 @@unique([field, secondField])
             }
         "#;
-    let result = api.infer_and_apply(&dm1).await;
-    let index = result
-        .sql_schema
-        .table_bang("A")
-        .indices
-        .iter()
-        .find(|i| i.columns == &["field", "secondField"]);
-    assert!(index.is_some());
-    assert_eq!(index.unwrap().tpe, IndexType::Unique);
+
+    api.infer_apply(&dm1).send().await?;
+    api.assert_schema().await?.assert_table("A", |table| {
+        table
+            .assert_indexes_count(1)?
+            .assert_index_on_columns(&["field", "secondField"], |idx| idx.assert_is_unique())
+    })?;
 
     let dm2 = r#"
             model A {
@@ -1130,18 +1130,19 @@ async fn index_renaming_must_work_when_renaming_to_custom(api: &TestApi) {
                 @@unique([field, secondField], name: "somethingCustom")
             }
         "#;
-    let result = api.infer_and_apply(&dm2).await;
-    let indexes = result
-        .sql_schema
-        .table_bang("A")
-        .indices
-        .iter()
-        .filter(|i| i.columns == &["field", "secondField"] && i.name == "somethingCustom");
-    assert_eq!(indexes.count(), 1);
+
+    let result = api.infer_apply(&dm2).send().await?;
+    api.assert_schema().await?.assert_table("A", |table| {
+        table
+            .assert_indexes_count(1)?
+            .assert_index_on_columns(&["field", "secondField"], |idx| {
+                idx.assert_name("somethingCustom")?.assert_is_unique()
+            })
+    })?;
 
     // Test that we are not dropping and recreating the index. Except in SQLite, because there we are.
     if !api.is_sqlite() {
-        let expected_steps = vec![SqlMigrationStep::AlterIndex(AlterIndex {
+        let expected_steps = &[SqlMigrationStep::AlterIndex(AlterIndex {
             table: "A".into(),
             index_name: "A.field_secondField".into(),
             index_new_name: "somethingCustom".into(),
@@ -1149,9 +1150,11 @@ async fn index_renaming_must_work_when_renaming_to_custom(api: &TestApi) {
         let actual_steps = result.sql_migration();
         assert_eq!(actual_steps, expected_steps);
     }
+
+    Ok(())
 }
 
-#[test_each_connector(ignore = "mysql_mariadb")]
+#[test_each_connector]
 async fn index_updates_with_rename_must_work(api: &TestApi) {
     let dm1 = r#"
             model A {
@@ -1535,8 +1538,8 @@ async fn calculate_database_steps_with_infer_after_an_apply_must_work(api: &Test
     assert_eq!(result.datamodel_steps, new_steps);
 }
 
-#[test_each_connector(ignore = "mysql_mariadb")]
-async fn column_defaults_must_be_migrated(api: &TestApi) {
+#[test_each_connector]
+async fn column_defaults_must_be_migrated(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Fruit {
             id Int @id
@@ -1544,11 +1547,12 @@ async fn column_defaults_must_be_migrated(api: &TestApi) {
         }
     "#;
 
-    let schema = api.infer_and_apply(dm1).await.sql_schema;
+    api.infer_apply(dm1).send().await?;
+    let schema = api.describe_database().await?;
 
-    let table = schema.table_bang("Fruit");
-    let column = table.column_bang("name");
-    assert_eq!(column.default.as_ref().map(String::as_str), Some("banana"));
+    schema
+        .assert_table("Fruit")?
+        .assert_column("name", |col| col.assert_default(Some("banana")))?;
 
     let dm2 = r#"
         model Fruit {
@@ -1557,14 +1561,17 @@ async fn column_defaults_must_be_migrated(api: &TestApi) {
         }
     "#;
 
-    let schema = api.infer_and_apply(dm2).await.sql_schema;
+    api.infer_apply(dm2).send().await?;
+    let schema = api.describe_database().await?;
 
-    let table = schema.table_bang("Fruit");
-    let column = table.column_bang("name");
-    assert_eq!(column.default.as_ref().map(String::as_str), Some("mango"));
+    schema
+        .assert_table("Fruit")?
+        .assert_column("name", |col| col.assert_default(Some("mango")))?;
+
+    Ok(())
 }
 
-#[test_each_connector(ignore = "mysql_mariadb")]
+#[test_each_connector]
 async fn escaped_string_defaults_are_not_arbitrarily_migrated(api: &TestApi) -> TestResult {
     use quaint::ast::*;
 
@@ -1606,14 +1613,22 @@ async fn escaped_string_defaults_are_not_arbitrarily_migrated(api: &TestApi) -> 
             .column("name")
             .and_then(|c| c.default.as_ref())
             .map(String::as_str),
-        Some(if api.is_mysql() { "ba\u{0}nana" } else { "ba\\0nana" })
+        Some(if api.is_mysql() && !api.connector_name().contains("mariadb") {
+            "ba\u{0}nana"
+        } else {
+            "ba\\0nana"
+        })
     );
     assert_eq!(
         table
             .column("sideNames")
             .and_then(|c| c.default.as_ref())
             .map(String::as_str),
-        Some(if api.is_mysql() { "top\ndown" } else { "top\\ndown" })
+        Some(if api.is_mysql() && !api.connector_name().contains("mariadb") {
+            "top\ndown"
+        } else {
+            "top\\ndown"
+        })
     );
     assert_eq!(
         table
@@ -1797,22 +1812,12 @@ async fn relations_can_reference_multiple_fields(api: &TestApi) -> TestResult {
     api.infer_apply(dm).send().await?;
     let schema = api.describe_database().await?;
 
-    let fks = &schema.table_bang("Account").foreign_keys;
-
-    // On SQLite we don't infer multi-field foreign keys correctly yet.
-    if api.is_sqlite() {
-        assert_eq!(fks.len(), 2);
-
-        assert!(fks.iter().all(|fk| fk.referenced_table == "User"));
-    } else {
-        assert_eq!(fks.len(), 1);
-
-        let fk = fks.iter().next().unwrap();
-
-        assert_eq!(fk.columns, &["user_email", "user_age"]);
-        assert_eq!(fk.referenced_table, "User");
-        assert_eq!(fk.referenced_columns, &["email", "age"]);
-    }
+    schema
+        .assert_table("Account")?
+        .assert_foreign_keys_count(1)?
+        .assert_fk_on_columns(&["user_email", "user_age"], |fk| {
+            fk.assert_references("User", &["email", "age"])
+        })?;
 
     Ok(())
 }
@@ -1840,22 +1845,12 @@ async fn relations_can_reference_multiple_fields_with_mappings(api: &TestApi) ->
     api.infer_apply(dm).send().await?;
     let schema = api.describe_database().await?;
 
-    let fks = &schema.table_bang("Account").foreign_keys;
-
-    // On SQLite we don't infer multi-field foreign keys correctly yet.
-    if api.is_sqlite() {
-        assert_eq!(fks.len(), 2);
-
-        assert!(fks.iter().all(|fk| fk.referenced_table == "users"));
-    } else {
-        assert_eq!(fks.len(), 1);
-
-        let fk = fks.iter().next().unwrap();
-
-        assert_eq!(fk.columns, &["user_emergency-mail", "user_birthdays-count"]);
-        assert_eq!(fk.referenced_table, "users");
-        assert_eq!(fk.referenced_columns, &["emergency-mail", "birthdays-count"]);
-    }
+    schema
+        .assert_table("Account")?
+        .assert_foreign_keys_count(1)?
+        .assert_fk_on_columns(&["user_emergency-mail", "user_birthdays-count"], |fk| {
+            fk.assert_references("users", &["emergency-mail", "birthdays-count"])
+        })?;
 
     Ok(())
 }
@@ -1905,6 +1900,152 @@ async fn foreign_keys_are_added_on_existing_tables(api: &TestApi) -> TestResult 
     assert_eq!(fk.columns, &["user"]);
     assert_eq!(fk.referenced_table, "User");
     assert_eq!(fk.referenced_columns, &["email"]);
+
+    Ok(())
+}
+
+#[test_each_connector]
+async fn basic_compound_primary_keys_must_work(api: &TestApi) -> TestResult {
+    let dm = r#"
+        model User {
+            firstName String
+            lastName String
+
+            @@id([lastName, firstName])
+        }
+    "#;
+
+    api.infer_apply(dm).send().await?;
+
+    let sql_schema = api.describe_database().await?;
+
+    sql_schema
+        .assert_table("User")?
+        .assert_pk(|pk| pk.assert_columns(&["lastName", "firstName"]))?;
+
+    Ok(())
+}
+
+#[test_each_connector]
+async fn compound_primary_keys_on_mapped_columns_must_work(api: &TestApi) -> TestResult {
+    let dm = r#"
+        model User {
+            firstName String @map("first_name")
+            lastName String @map("family_name")
+
+            @@id([firstName, lastName])
+        }
+    "#;
+
+    api.infer_apply(dm).send().await?;
+
+    let sql_schema = api.describe_database().await?;
+
+    sql_schema
+        .assert_table("User")?
+        .assert_pk(|pk| pk.assert_columns(&["first_name", "family_name"]))?;
+
+    Ok(())
+}
+
+#[test_each_connector]
+async fn references_to_models_with_compound_primary_keys_must_work(api: &TestApi) -> TestResult {
+    let dm = r#"
+        model User {
+            firstName String
+            lastName String
+            pets Pet[]
+
+            @@id([firstName, lastName])
+        }
+
+        model Pet {
+            id String @id
+            human User
+        }
+    "#;
+
+    api.infer_apply(dm).send().await?;
+
+    let sql_schema = api.describe_database().await?;
+
+    sql_schema
+        .assert_table("Pet")?
+        .assert_has_column("id")?
+        .assert_has_column("human_firstName")?
+        .assert_has_column("human_lastName")?
+        .assert_foreign_keys_count(1)?
+        .assert_fk_on_columns(&["human_firstName", "human_lastName"], |fk| {
+            fk.assert_references("User", &["firstName", "lastName"])
+        })?;
+
+    Ok(())
+}
+
+#[test_each_connector]
+async fn join_tables_between_models_with_compound_primary_keys_must_work(api: &TestApi) -> TestResult {
+    let dm = r#"
+        model Human {
+            firstName String
+            lastName String
+            cats Cat[]
+
+            @@id([firstName, lastName])
+        }
+
+        model Cat {
+            id String @id
+            humans Human[]
+        }
+    "#;
+
+    api.infer_apply(dm).send().await?;
+
+    let sql_schema = api.describe_database().await?;
+
+    sql_schema
+        .assert_table("_CatToHuman")?
+        .assert_has_column("B_firstName")?
+        .assert_has_column("B_lastName")?
+        .assert_has_column("A")?
+        .assert_fk_on_columns(&["B_firstName", "B_lastName"], |fk| {
+            fk.assert_references("Human", &["firstName", "lastName"])
+        })?
+        .assert_fk_on_columns(&["A"], |fk| fk.assert_references("Cat", &["id"]))?;
+
+    Ok(())
+}
+
+#[test_each_connector]
+async fn join_tables_between_models_with_mapped_compound_primary_keys_must_work(api: &TestApi) -> TestResult {
+    let dm = r#"
+        model Human {
+            firstName String @map("the_first_name")
+            lastName String @map("the_last_name")
+            cats Cat[]
+
+            @@id([firstName, lastName])
+        }
+
+        model Cat {
+            id String @id
+            humans Human[]
+        }
+    "#;
+
+    api.infer_apply(dm).send().await?;
+
+    let sql_schema = api.describe_database().await?;
+
+    sql_schema
+        .assert_table("_CatToHuman")?
+        .assert_has_column("B_the_first_name")?
+        .assert_has_column("B_the_last_name")?
+        .assert_has_column("A")?
+        .assert_fk_on_columns(&["B_the_first_name", "B_the_last_name"], |fk| {
+            fk.assert_references("Human", &["the_first_name", "the_last_name"])
+        })?
+        .assert_fk_on_columns(&["A"], |fk| fk.assert_references("Cat", &["id"]))?;
 
     Ok(())
 }

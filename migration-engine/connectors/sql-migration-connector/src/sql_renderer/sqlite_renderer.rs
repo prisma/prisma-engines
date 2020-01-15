@@ -1,6 +1,7 @@
 use super::common::*;
 use crate::SqlFamily;
 use sql_schema_describer::*;
+use std::fmt::Write as _;
 
 pub struct SqliteRenderer {}
 
@@ -13,17 +14,15 @@ impl super::SqlRenderer for SqliteRenderer {
         format!("\"{}\"", name)
     }
 
-    fn render_column(&self, schema_name: &str, table: &Table, column: &Column, _add_fk_prefix: bool) -> String {
+    fn write_quoted(&self, buf: &mut String, name: &str) -> std::fmt::Result {
+        write!(buf, r#""{}""#, name)
+    }
+
+    fn render_column(&self, _schema_name: &str, _table: &Table, column: &Column, _add_fk_prefix: bool) -> String {
         let column_name = self.quote(&column.name);
         let tpe_str = self.render_column_type(&column.tpe);
         let nullability_str = render_nullability(&column);
         let default_str = render_default(&column);
-        let foreign_key = table.foreign_key_for_column(&column.name);
-        let references_str: String = if let Some(foreign_key) = foreign_key {
-            self.render_references(&schema_name, foreign_key)
-        } else {
-            String::new()
-        };
         let auto_increment_str = if column.auto_increment {
             "PRIMARY KEY AUTOINCREMENT"
         } else {
@@ -31,8 +30,8 @@ impl super::SqlRenderer for SqliteRenderer {
         };
 
         format!(
-            "{} {} {} {} {} {}",
-            column_name, tpe_str, nullability_str, default_str, auto_increment_str, references_str
+            "{} {} {} {} {}",
+            column_name, tpe_str, nullability_str, default_str, auto_increment_str
         )
     }
 
@@ -48,10 +47,18 @@ impl super::SqlRenderer for SqliteRenderer {
     }
 
     fn render_references(&self, _schema_name: &str, foreign_key: &ForeignKey) -> String {
+        use itertools::Itertools;
+
+        let referenced_fields = foreign_key
+            .referenced_columns
+            .iter()
+            .map(|col| format!(r#""{}""#, col))
+            .join(",");
+
         format!(
-            "REFERENCES \"{}\"(\"{}\") {}",
+            "REFERENCES \"{}\"({}) {}",
             foreign_key.referenced_table,
-            foreign_key.referenced_columns.first().unwrap(),
+            referenced_fields,
             render_on_delete(&foreign_key.on_delete_action)
         )
     }

@@ -5,6 +5,35 @@ use datamodel::{
 };
 
 #[test]
+fn skipping_of_env_vars() {
+    let dml = r#"
+    datasource db {
+        provider = "postgresql"
+        url      = env("POSTGRES_URL")
+    }
+    
+    model User {
+        id   Int      @id
+        tags String[]
+    }
+    "#;
+
+    // must fail without env var
+    parse_error(dml);
+
+    // must not fail with flag
+    // ...
+    if let Err(err) = datamodel::parse_datamodel_and_ignore_env_errors(dml) {
+        panic!("Skipping env var errors did not work. Error was {:?}", err)
+    }
+
+    // must not fail with env var set
+    std::env::set_var("POSTGRES_URL", "postgresql://localhost:5432");
+    parse(dml);
+}
+
+#[ignore]
+#[test]
 fn interpolate_environment_variables() {
     let dml = r#"
     model User {
@@ -26,6 +55,7 @@ fn interpolate_environment_variables() {
 }
 
 // This is very useless, except being a good test case.
+#[ignore]
 #[test]
 fn interpolate_nested_environment_variables() {
     let dml = r#"
@@ -48,6 +78,7 @@ fn interpolate_nested_environment_variables() {
         .assert_default_value(DefaultValue::Single(ScalarValue::String(String::from("prisma-user"))));
 }
 
+#[ignore]
 #[test]
 fn ducktype_environment_variables() {
     let dml = r#"

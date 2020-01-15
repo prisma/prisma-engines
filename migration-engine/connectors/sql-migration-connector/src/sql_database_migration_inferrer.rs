@@ -5,16 +5,19 @@ use datamodel::*;
 use migration_connector::steps::MigrationStep;
 use migration_connector::*;
 use sql_schema_describer::*;
-use std::sync::Arc;
 
-pub struct SqlDatabaseMigrationInferrer {
-    pub connection_info: ConnectionInfo,
-    pub describer: Arc<dyn SqlSchemaDescriberBackend + Send + Sync + 'static>,
-    pub schema_name: String,
+pub struct SqlDatabaseMigrationInferrer<'a> {
+    pub connector: &'a crate::SqlMigrationConnector,
+}
+
+impl Component for SqlDatabaseMigrationInferrer<'_> {
+    fn connector(&self) -> &crate::SqlMigrationConnector {
+        self.connector
+    }
 }
 
 #[async_trait::async_trait]
-impl DatabaseMigrationInferrer<SqlMigration> for SqlDatabaseMigrationInferrer {
+impl DatabaseMigrationInferrer<SqlMigration> for SqlDatabaseMigrationInferrer<'_> {
     async fn infer(
         &self,
         _previous: &Datamodel,
@@ -22,17 +25,17 @@ impl DatabaseMigrationInferrer<SqlMigration> for SqlDatabaseMigrationInferrer {
         _steps: &[MigrationStep],
     ) -> ConnectorResult<SqlMigration> {
         let fut = async {
-            let current_database_schema: SqlSchema = self.describe(&self.schema_name).await?;
+            let current_database_schema: SqlSchema = self.describe().await?;
             let expected_database_schema = SqlSchemaCalculator::calculate(next)?;
             infer(
                 &current_database_schema,
                 &expected_database_schema,
-                &self.schema_name,
+                self.schema_name(),
                 self.sql_family(),
             )
         };
 
-        catch(&self.connection_info, fut).await
+        catch(&self.connection_info(), fut).await
     }
 
     async fn infer_from_datamodels(
@@ -47,22 +50,12 @@ impl DatabaseMigrationInferrer<SqlMigration> for SqlDatabaseMigrationInferrer {
             infer(
                 &current_database_schema,
                 &expected_database_schema,
-                &self.schema_name,
+                self.schema_name(),
                 self.sql_family(),
             )
         })();
 
-        result.map_err(|sql_error| sql_error.into_connector_error(&self.connection_info))
-    }
-}
-
-impl SqlDatabaseMigrationInferrer {
-    async fn describe(&self, schema: &str) -> SqlResult<SqlSchema> {
-        Ok(self.describer.describe(&schema).await?)
-    }
-
-    fn sql_family(&self) -> SqlFamily {
-        self.connection_info.sql_family()
+        result.map_err(|sql_error| sql_error.into_connector_error(self.connection_info()))
     }
 }
 
@@ -100,9 +93,8 @@ fn infer_database_migration_steps_and_fix(
     sql_family: SqlFamily,
 ) -> SqlResult<(Vec<SqlMigrationStep>, Vec<SqlMigrationStep>)> {
     let diff: SqlSchemaDiff = SqlSchemaDiffer::diff(&from, &to);
-    let is_sqlite = sql_family == SqlFamily::Sqlite;
 
-    let corrected_steps = if is_sqlite {
+    let corrected_steps = if sql_family.is_sqlite() {
         fix_stupid_sqlite(diff, &from, &to, &schema_name)?
     } else {
         fix_id_column_type_change(&from, &to, schema_name, diff.into_steps())?

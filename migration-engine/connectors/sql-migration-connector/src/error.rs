@@ -7,8 +7,8 @@ pub type SqlResult<T> = Result<T, SqlError>;
 
 #[derive(Debug, Error)]
 pub enum SqlError {
-    #[error("{}", _0)]
-    Generic(String),
+    #[error("{0}")]
+    Generic(#[source] anyhow::Error),
 
     #[error("Error connecting to the database {cause}")]
     ConnectionError {
@@ -17,7 +17,7 @@ pub enum SqlError {
     },
 
     #[error("Error querying the database: {}", _0)]
-    QueryError(anyhow::Error),
+    QueryError(#[source] anyhow::Error),
 
     #[error("Database '{}' does not exist", db_name)]
     DatabaseDoesNotExist {
@@ -170,6 +170,6 @@ impl From<sql_schema_describer::SqlSchemaDescriberError> for SqlError {
 
 impl From<String> for SqlError {
     fn from(error: String) -> Self {
-        SqlError::Generic(error)
+        SqlError::Generic(anyhow::anyhow!(error))
     }
 }

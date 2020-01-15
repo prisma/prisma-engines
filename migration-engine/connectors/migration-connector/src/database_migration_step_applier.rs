@@ -3,7 +3,7 @@ use crate::*;
 /// Apply a single migration step to the connector's database. At this level, we are working with database migrations,
 /// i.e. the [associated type on MigrationConnector](trait.MigrationConnector.html#associatedtype.DatabaseMigration).
 #[async_trait::async_trait]
-pub trait DatabaseMigrationStepApplier<T>: Send + Sync + 'static {
+pub trait DatabaseMigrationStepApplier<T>: Send + Sync {
     /// Applies the step to the database
     /// Returns true to signal to the caller that there are more steps to apply.
     async fn apply_step(&self, database_migration: &T, step: usize) -> ConnectorResult<bool>;

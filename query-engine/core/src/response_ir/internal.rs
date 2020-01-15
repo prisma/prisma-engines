@@ -466,8 +466,8 @@ fn convert_enum_to_item(ev: &EnumValue, et: &EnumType) -> Result<Item, CoreError
 
 fn unwrap_prisma_value(pv: PrismaValue) -> Vec<PrismaValue> {
     match pv {
-        PrismaValue::List(Some(l)) => l,
-        _ => panic!("We want Some lists!"),
+        PrismaValue::List(l) => l,
+        _ => panic!("We want lists!"),
     }
 }
 

@@ -1,15 +1,15 @@
-use crate::{commands::CommandError, error::Error as CrateError};
+use crate::{commands::CommandError, error::Error as CoreError};
 use jsonrpc_core::types::Error as JsonRpcError;
 use migration_connector::ConnectorError;
 use user_facing_errors::Error;
 
-pub fn render_error(crate_error: CrateError) -> Error {
+pub fn render_error(crate_error: CoreError) -> Error {
     match crate_error {
-        CrateError::ConnectorError(ConnectorError {
+        CoreError::ConnectorError(ConnectorError {
             user_facing_error: Some(user_facing_error),
             ..
         }) => user_facing_error.into(),
-        CrateError::CommandError(CommandError::ConnectorError(ConnectorError {
+        CoreError::CommandError(CommandError::ConnectorError(ConnectorError {
             user_facing_error: Some(user_facing_error),
             ..
         })) => user_facing_error.into(),
@@ -17,7 +17,7 @@ pub fn render_error(crate_error: CrateError) -> Error {
     }
 }
 
-pub(super) fn render_jsonrpc_error(crate_error: CrateError) -> JsonRpcError {
+pub(super) fn render_jsonrpc_error(crate_error: CoreError) -> JsonRpcError {
     let prisma_error = render_error(crate_error);
 
     let error_rendering_result: Result<_, _> = serde_json::to_value(&prisma_error).map(|data| JsonRpcError {

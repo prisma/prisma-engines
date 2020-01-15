@@ -158,7 +158,8 @@ impl QueryDocumentParser {
 
             // Scalar and enum handling.
             (_, InputType::Scalar(scalar))                  => Self::parse_scalar(value, &scalar).map(ParsedInputValue::Single),
-            (QueryValue::Enum(_), InputType::Enum(et))      => Self::parse_scalar(value, &ScalarType::Enum(Arc::clone(et))).map(ParsedInputValue::Single), // todo
+            (QueryValue::Enum(_), InputType::Enum(et))      => Self::parse_scalar(value, &ScalarType::Enum(Arc::clone(et))).map(ParsedInputValue::Single),
+            (QueryValue::String(_), InputType::Enum(et))      => Self::parse_scalar(value, &ScalarType::Enum(Arc::clone(et))).map(ParsedInputValue::Single),
 
             // List and object handling.
             (QueryValue::List(values), InputType::List(l))  => Self::parse_list(values.clone(), &l).map(ParsedInputValue::List),
@@ -177,15 +178,13 @@ impl QueryDocumentParser {
             (QueryValue::String(s), ScalarType::DateTime) => Self::parse_datetime(s.as_str()).map(PrismaValue::DateTime),
             (QueryValue::String(_s), ScalarType::Json)     => unimplemented!(),
             (QueryValue::String(s), ScalarType::UUID)     => Self::parse_uuid(s.as_str()).map(PrismaValue::Uuid),
+            (QueryValue::String(e), ScalarType::Enum(et)) => Self::parse_enum(e, &et),
             (QueryValue::Int(i), ScalarType::Float)       => Ok(PrismaValue::Float(Decimal::from_f64(i as f64).expect("f64 is not a Decimal."))),
             (QueryValue::Int(i), ScalarType::Int)         => Ok(PrismaValue::Int(i)),
             (QueryValue::Float(f), ScalarType::Float)     => Ok(PrismaValue::Float(Decimal::from_f64(f).expect("f64 is not a Decimal."))),
             (QueryValue::Float(f), ScalarType::Int)       => Ok(PrismaValue::Int(f as i64)),
             (QueryValue::Boolean(b), ScalarType::Boolean) => Ok(PrismaValue::Boolean(b)),
-            (QueryValue::Enum(e), ScalarType::Enum(et))   => match et.value_for(e.as_str()) {
-                                                                Some(val) => Ok(PrismaValue::Enum(val.clone())),
-                                                                None => Err(QueryParserError::ValueParseError(format!("Enum value '{}' is invalid for enum type {}", e, et.name)))
-                                                             },
+            (QueryValue::Enum(e), ScalarType::Enum(et))   => Self::parse_enum(e, &et),
 
             // All other combinations are invalid.
             (qv, _)                                       => Err(QueryParserError::ValueTypeMismatchError { have: qv, want: InputType::Scalar(scalar_type.clone()) }),
@@ -217,6 +216,16 @@ impl QueryDocumentParser {
             .into_iter()
             .map(|val| Self::parse_input_value(val, value_type))
             .collect::<QueryParserResult<Vec<ParsedInputValue>>>()
+    }
+
+    pub fn parse_enum(raw: String, typ: &EnumTypeRef) -> QueryParserResult<PrismaValue> {
+        match typ.value_for(raw.as_str()) {
+            Some(val) => Ok(PrismaValue::Enum(val.clone())),
+            None => Err(QueryParserError::ValueParseError(format!(
+                "Enum value '{}' is invalid for enum type {}",
+                raw, typ.name
+            ))),
+        }
     }
 
     /// Parses and validates an input object recursively.

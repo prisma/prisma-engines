@@ -35,7 +35,7 @@ impl<'a> From<ParameterizedValue<'a>> for PrismaValue {
             ParameterizedValue::Real(d) => PrismaValue::Float(d),
             ParameterizedValue::Text(s) => PrismaValue::String(s.into_owned()),
             ParameterizedValue::Boolean(b) => PrismaValue::Boolean(b),
-            ParameterizedValue::Array(v) => PrismaValue::List(Some(v.into_iter().map(PrismaValue::from).collect())),
+            ParameterizedValue::Array(v) => PrismaValue::List(v.into_iter().map(PrismaValue::from).collect()),
             ParameterizedValue::Json(val) => PrismaValue::String(val.to_string()),
             ParameterizedValue::Uuid(uuid) => PrismaValue::Uuid(uuid),
             ParameterizedValue::DateTime(dt) => PrismaValue::DateTime(dt),
@@ -56,8 +56,7 @@ impl<'a> From<PrismaValue> for ParameterizedValue<'a> {
             PrismaValue::Null => ParameterizedValue::Null,
             PrismaValue::Uuid(u) => u.to_string().into(),
             PrismaValue::GraphqlId(id) => id.into(),
-            PrismaValue::List(Some(l)) => ParameterizedValue::Array(l.into_iter().map(|x| x.into()).collect()),
-            PrismaValue::List(None) => unreachable!(),
+            PrismaValue::List(l) => ParameterizedValue::Array(l.into_iter().map(|x| x.into()).collect()),
         }
     }
 }
