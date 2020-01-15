@@ -264,7 +264,7 @@ impl Queryable for Mysql {
 #[cfg(test)]
 mod tests {
     use super::MysqlUrl;
-    use crate::{connector::Queryable, error::Error, single::Quaint};
+    use crate::{connector::Queryable, error::*, single::Quaint};
     use lazy_static::lazy_static;
     use std::env;
     use url::Url;
@@ -344,6 +344,58 @@ VALUES (1, 'Joe', 27, 20000.00 );
         match res.unwrap_err() {
             Error::DatabaseDoesNotExist { db_name } => assert_eq!("this_does_not_exist", db_name.as_str()),
             e => panic!("Expected `DatabaseDoesNotExist`, got {:?}", e),
+        }
+    }
+
+    #[tokio::test]
+    async fn test_uniq_constraint_violation() {
+        let conn = Quaint::new(&CONN_STR).await.unwrap();
+
+        let _ = conn.raw_cmd("DROP TABLE test_uniq_constraint_violation").await;
+        let _ = conn.raw_cmd("DROP INDEX idx_uniq_constraint_violation").await;
+
+        conn.raw_cmd("CREATE TABLE test_uniq_constraint_violation (id1 int, id2 int)").await.unwrap();
+        conn.raw_cmd("CREATE UNIQUE INDEX idx_uniq_constraint_violation ON test_uniq_constraint_violation (id1, id2) USING btree").await.unwrap();
+
+        conn.execute_raw(
+            "INSERT INTO test_uniq_constraint_violation (id1, id2) VALUES (1, 2)",
+            &[]
+        ).await.unwrap();
+
+        let res = conn.execute_raw(
+            "INSERT INTO test_uniq_constraint_violation (id1, id2) VALUES (1, 2)",
+            &[]
+        ).await;
+
+        match res.unwrap_err() {
+            Error::UniqueConstraintViolation { constraint } => {
+                assert_eq!(
+                    DatabaseConstraint::Index(String::from("idx_uniq_constraint_violation")),
+                    constraint,
+                )
+            },
+            e => panic!(e)
+        }
+    }
+
+    #[tokio::test]
+    async fn test_null_constraint_violation() {
+        let conn = Quaint::new(&CONN_STR).await.unwrap();
+
+        let _ = conn.raw_cmd("DROP TABLE test_null_constraint_violation").await;
+
+        conn.raw_cmd("CREATE TABLE test_null_constraint_violation (id1 int not null, id2 int not null)").await.unwrap();
+
+        let res = conn.execute_raw(
+            "INSERT INTO test_null_constraint_violation () VALUES ()",
+            &[]
+        ).await;
+
+        match res.unwrap_err() {
+            Error::NullConstraintViolation { constraint } => {
+                assert_eq!(DatabaseConstraint::Fields(vec![String::from("id1")]), constraint)
+            },
+            e => panic!(e)
         }
     }
 }

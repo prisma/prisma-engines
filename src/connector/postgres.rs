@@ -388,7 +388,7 @@ impl Queryable for PostgreSql {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{connector::Queryable, single::Quaint};
+    use crate::{connector::Queryable, single::Quaint, error::*};
     use lazy_static::lazy_static;
     use std::env;
     use url::Url;
@@ -467,6 +467,60 @@ mod tests {
         assert_eq!(row["age"].as_i64(), Some(27));
 
         assert_eq!(row["salary"].as_f64(), Some(20000.0));
+    }
+
+    #[tokio::test]
+    async fn test_uniq_constraint_violation() {
+        let conn = Quaint::new(&CONN_STR).await.unwrap();
+
+        let _ = conn.raw_cmd("DROP TABLE test_uniq_constraint_violation").await;
+        let _ = conn.raw_cmd("DROP INDEX idx_uniq_constraint_violation").await;
+
+        conn.raw_cmd("CREATE TABLE test_uniq_constraint_violation (id1 int, id2 int)").await.unwrap();
+        conn.raw_cmd("CREATE UNIQUE INDEX idx_uniq_constraint_violation ON test_uniq_constraint_violation (id1, id2)").await.unwrap();
+
+        conn.execute_raw(
+            "INSERT INTO test_uniq_constraint_violation (id1, id2) VALUES (1, 2)",
+            &[]
+        ).await.unwrap();
+
+        let res = conn.execute_raw(
+            "INSERT INTO test_uniq_constraint_violation (id1, id2) VALUES (1, 2)",
+            &[]
+        ).await;
+
+        match res.unwrap_err() {
+            Error::UniqueConstraintViolation { constraint } => {
+                assert_eq!(
+                    DatabaseConstraint::Fields(
+                        vec![String::from("id1"), String::from("id2")]
+                    ),
+                    constraint,
+                )
+            },
+            e => panic!(e)
+        }
+    }
+
+    #[tokio::test]
+    async fn test_null_constraint_violation() {
+        let conn = Quaint::new(&CONN_STR).await.unwrap();
+
+        let _ = conn.raw_cmd("DROP TABLE test_null_constraint_violation").await;
+
+        conn.raw_cmd("CREATE TABLE test_null_constraint_violation (id1 int not null, id2 int not null)").await.unwrap();
+
+        let res = conn.execute_raw(
+            "INSERT INTO test_null_constraint_violation DEFAULT VALUES",
+            &[]
+        ).await;
+
+        match res.unwrap_err() {
+            Error::NullConstraintViolation { constraint } => {
+                assert_eq!(DatabaseConstraint::Fields(vec![String::from("id1")]), constraint)
+            },
+            e => panic!(e)
+        }
     }
 
     #[tokio::test]

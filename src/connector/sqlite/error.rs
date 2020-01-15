@@ -1,4 +1,4 @@
-use crate::error::Error;
+use crate::error::*;
 use libsqlite3_sys as ffi;
 use rusqlite::types::FromSqlError;
 
@@ -15,10 +15,14 @@ impl From<rusqlite::Error> for Error {
                 Some(description),
             ) => {
                 let splitted: Vec<&str> = description.split(": ").collect();
-                let splitted: Vec<&str> = splitted[1].split('.').collect();
+
+                let field_names: Vec<String> = splitted[1]
+                    .split(", ")
+                    .map(|s| s.split(".").last().unwrap())
+                    .map(|s| s.to_string()).collect();
 
                 Error::UniqueConstraintViolation {
-                    field_name: splitted[1].into(),
+                    constraint: DatabaseConstraint::Fields(field_names)
                 }
             }
 
@@ -30,10 +34,14 @@ impl From<rusqlite::Error> for Error {
                 Some(description),
             ) => {
                 let splitted: Vec<&str> = description.split(": ").collect();
-                let splitted: Vec<&str> = splitted[1].split('.').collect();
+
+                let field_names: Vec<String> = splitted[1]
+                    .split(", ")
+                    .map(|s| s.split(".").last().unwrap())
+                    .map(|s| s.to_string()).collect();
 
                 Error::UniqueConstraintViolation {
-                    field_name: splitted[1].into(),
+                    constraint: DatabaseConstraint::Fields(field_names)
                 }
             }
 
@@ -45,10 +53,14 @@ impl From<rusqlite::Error> for Error {
                 Some(description),
             ) => {
                 let splitted: Vec<&str> = description.split(": ").collect();
-                let splitted: Vec<&str> = splitted[1].split('.').collect();
+
+                let field_names: Vec<String> = splitted[1]
+                    .split(", ")
+                    .map(|s| s.split(".").last().unwrap())
+                    .map(|s| s.to_string()).collect();
 
                 Error::NullConstraintViolation {
-                    field_name: splitted[1].into(),
+                    constraint: DatabaseConstraint::Fields(field_names)
                 }
             }
 

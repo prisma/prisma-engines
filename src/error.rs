@@ -1,6 +1,21 @@
 //! Error module
 use thiserror::Error;
-use std::io;
+use std::{io, fmt};
+
+#[derive(Debug, PartialEq, Eq)]
+pub enum DatabaseConstraint {
+    Fields(Vec<String>),
+    Index(String),
+}
+
+impl fmt::Display for DatabaseConstraint {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Fields(fields) => write!(f, "({})", fields.join(",")),
+            Self::Index(index) => index.fmt(f)
+        }
+    }
+}
 
 #[derive(Debug, Error)]
 pub enum Error {
@@ -22,11 +37,11 @@ pub enum Error {
     #[error("Query returned no data")]
     NotFound,
 
-    #[error("Unique constraint failed: {}", field_name)]
-    UniqueConstraintViolation { field_name: String },
+    #[error("Unique constraint failed: {}", constraint)]
+    UniqueConstraintViolation { constraint: DatabaseConstraint },
 
-    #[error("Null constraint failed: {}", field_name)]
-    NullConstraintViolation { field_name: String },
+    #[error("Null constraint failed: {}", constraint)]
+    NullConstraintViolation { constraint: DatabaseConstraint },
 
     #[error("Error creating a database connection.")]
     ConnectionError(Box<dyn std::error::Error + Send + Sync + 'static>),

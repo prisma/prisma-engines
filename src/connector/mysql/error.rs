@@ -1,4 +1,4 @@
-use crate::error::Error;
+use crate::error::{Error, DatabaseConstraint};
 use mysql_async as my;
 use std::io::ErrorKind as IoErrorKind;
 
@@ -15,20 +15,28 @@ impl From<my::error::Error> for Error {
             my::error::Error::Server(ServerError { ref message, code, .. }) if code == 1062 => {
                 let splitted: Vec<&str> = message.split_whitespace().collect();
                 let splitted: Vec<&str> = splitted.last().map(|s| s.split('\'').collect()).unwrap();
-                let splitted: Vec<&str> = splitted[1].split('_').collect();
 
-                let field_name: String = splitted[0].into();
+                let index = splitted[1].split(".").last().unwrap().to_string();
 
-                Error::UniqueConstraintViolation { field_name }
+                Error::UniqueConstraintViolation {
+                    constraint: DatabaseConstraint::Index(index),
+                }
             }
             my::error::Error::Server(ServerError { ref message, code, .. }) if code == 1263 => {
                 let splitted: Vec<&str> = message.split_whitespace().collect();
                 let splitted: Vec<&str> = splitted.last().map(|s| s.split('\'').collect()).unwrap();
-                let splitted: Vec<&str> = splitted[1].split('_').collect();
 
-                let field_name: String = splitted[0].into();
+                Error::NullConstraintViolation {
+                    constraint: DatabaseConstraint::Index(splitted[1].to_string()),
+                }
+            }
+            my::error::Error::Server(ServerError { ref message, code, .. }) if code == 1364 => {
+                let splitted: Vec<&str> = message.split_whitespace().collect();
+                let splitted: Vec<&str> = splitted.get(1).map(|s| s.split('\'').collect()).unwrap();
 
-                Error::NullConstraintViolation { field_name }
+                Error::NullConstraintViolation {
+                    constraint: DatabaseConstraint::Fields(vec![splitted[1].to_string()]),
+                }
             }
             my::error::Error::Server(ServerError { ref message, code, .. }) if code == 1049 => {
                 let splitted: Vec<&str> = message.split_whitespace().collect();

@@ -183,7 +183,7 @@ impl Queryable for Sqlite {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{ast::*, connector::{Queryable, TransactionCapable}, val};
+    use crate::{ast::*, connector::{Queryable, TransactionCapable}, val, error::DatabaseConstraint};
 
     #[test]
     fn sqlite_params_from_str_should_resolve_path_correctly_with_file_scheme() {
@@ -353,5 +353,58 @@ mod tests {
         let row = rows.get(0).unwrap();
 
         assert_eq!(row[0].as_i64(), Some(2));
+    }
+
+    #[tokio::test]
+    async fn test_uniq_constraint_violation() {
+        let conn = Sqlite::try_from("file:db/test.db").unwrap();
+
+        let _ = conn.raw_cmd("DROP TABLE test_uniq_constraint_violation").await;
+
+        conn.raw_cmd("CREATE TABLE test_uniq_constraint_violation (id1 int, id2 int)").await.unwrap();
+        conn.raw_cmd("CREATE UNIQUE INDEX musti ON test_uniq_constraint_violation (id1, id2)").await.unwrap();
+
+        conn.execute_raw(
+            "INSERT INTO test_uniq_constraint_violation (id1, id2) VALUES (1, 2)",
+            &[]
+        ).await.unwrap();
+
+        let res = conn.execute_raw(
+            "INSERT INTO test_uniq_constraint_violation (id1, id2) VALUES (1, 2)",
+            &[]
+        ).await;
+
+        match res.unwrap_err() {
+            Error::UniqueConstraintViolation { constraint } => {
+                assert_eq!(
+                    DatabaseConstraint::Fields(
+                        vec![String::from("id1"), String::from("id2")]
+                    ),
+                    constraint,
+                )
+            },
+            e => panic!(e)
+        }
+    }
+
+    #[tokio::test]
+    async fn test_null_constraint_violation() {
+        let conn = Sqlite::try_from("file:db/test.db").unwrap();
+
+        let _ = conn.raw_cmd("DROP TABLE test_null_constraint_violation").await;
+
+        conn.raw_cmd("CREATE TABLE test_null_constraint_violation (id1 int not null, id2 int not null)").await.unwrap();
+
+        let res = conn.execute_raw(
+            "INSERT INTO test_null_constraint_violation DEFAULT VALUES",
+            &[]
+        ).await;
+
+        match res.unwrap_err() {
+            Error::NullConstraintViolation { constraint } => {
+                assert_eq!(DatabaseConstraint::Fields(vec![String::from("id1")]), constraint)
+            },
+            e => panic!(e)
+        }
     }
 }

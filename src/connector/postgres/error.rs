@@ -1,4 +1,4 @@
-use crate::error::Error;
+use crate::error::{Error, DatabaseConstraint};
 
 impl From<tokio_postgres::error::Error> for Error {
     fn from(e: tokio_postgres::error::Error) -> Error {
@@ -13,21 +13,26 @@ impl From<tokio_postgres::error::Error> for Error {
 
                 let splitted: Vec<&str> = detail.split(")=(").collect();
                 let splitted: Vec<&str> = splitted[0].split(" (").collect();
-                let field_name = splitted[1].replace("\"", "");
 
-                Error::UniqueConstraintViolation { field_name }
+                let field_names = splitted[1].replace("\"", "");
+                let field_names: Vec<String> = field_names.split(", ").map(|s| s.to_string()).collect();
+
+                Error::UniqueConstraintViolation {
+                    constraint: DatabaseConstraint::Fields(field_names)
+                }
             }
             // Even lipstick will not save this...
             Some("23502") => {
                 let error = e.into_source().unwrap(); // boom
                 let db_error = error.downcast_ref::<DbError>().unwrap(); // BOOM
-                let detail = db_error.detail().unwrap(); // KA-BOOM
+                let detail = db_error.message(); // KA-BOOM
 
-                let splitted: Vec<&str> = detail.split(")=(").collect();
-                let splitted: Vec<&str> = splitted[0].split(" (").collect();
-                let field_name = splitted[1].replace("\"", "");
+                let splitted: Vec<&str> = detail.split(' ').collect();
+                let field_name = splitted[4].replace("\"", "");
 
-                Error::NullConstraintViolation { field_name }
+                Error::NullConstraintViolation {
+                    constraint: DatabaseConstraint::Fields(vec![field_name])
+                }
             }
             Some("3D000") => {
                 let error = e.into_source().unwrap(); // boom
