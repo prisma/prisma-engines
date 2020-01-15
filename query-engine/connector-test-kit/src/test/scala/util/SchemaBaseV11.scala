@@ -1,27 +1,17 @@
 package util
 
 trait SchemaBaseV11 {
-  //todo make this super generic over the datamodel
-
   val schemaP1reqToC1req = {
 
     // todo allow to pass in flags to enable/disable certain combinations ??
 
-    case class TestAbstraction(datamodel: String,
-                               parentReturnValue:String,
-                               childReturnValue:String,
-                               parentReturnValueParse:String,
-                               childReturnValueParse:String,
-                               parentIdentifierName:String,
-                               childIdentifierName:String
-                              )
 
-    val simpleId = "id            String    @id @default(cuid())"
-    val compoundId = """id_1          String    @id @default(cuid())
-                            id_2          String    @id @default(cuid())
-                            @@unique([id_1, id_2])"""
-    val noId = ""
 
+    val simpleId =     "id          String    @id @default(cuid())"
+    val compoundId = """id_1        String        @default(cuid())
+                        id_2        String        @default(cuid())
+                        @@id([id_1, id_2])"""
+    val noId =       ""
 
     val idOptions =  Vector(simpleId, compoundId,noId)
 
@@ -36,23 +26,53 @@ trait SchemaBaseV11 {
     val compoundCReference = "@relation(references: [c_1, c_2]) @map([\"child_c_1\", \"child_c_2\"])"
 
 
-     val commonRelationAttributes = Vector((cReference, noRef),
+    val commonRelationAttributes = Vector((cReference, noRef),
                                           (noRef, pReference),
                                           (compoundCReference, noRef),
                                           (noRef, compoundPReference))
 
+    val commonChildRelationAttributes = Vector(pReference, compoundPReference, noRef)
+    val commonParentRelationAttributes = Vector(cReference, compoundCReference)
+
+
+    val idParams = QueryParams("id","id",".id")
+    val compoundIdParams = QueryParams ("id_1_id_2", "id_1 , id_2","")
+
+    val parentUniqueParams = QueryParams ("p", "p",".p")
+    val parentCompoundUniqueParams = QueryParams ("p_1_p_2", "p_1, p_2", "")
+
+    val childUniqueParams = QueryParams ("c", "c",".c")
+    val childCompoundUniqueParams = QueryParams ("c_1_c_2", "c_1, c_2", "")
+
+
+
+    // fit correct params to the generated datamodel,
+    // is another loop in the for comprehension,
+    // => 4-9 more variations per datamodel?
+
+
     val datamodelsUsingIds = for (parentId <- idOptions;
                           childId <- idOptions;
-                           childRelationAttribute <- if (parentId == simpleId) Vector(idReference, noRef) else if (parentId == compoundId) {Vector(compoundParentIdReference, noRef)}else {Vector.empty};
-                           parentRelationAttribute = (parentId, childRelationAttribute) match {
-                             case (`simpleId`, `noRef`) => idReference
-                             case (`simpleId`, `idReference`) => noRef
-                             case (`compoundId`, `noRef`) => compoundChildIdReference
-                             case (`compoundId`, `compoundParentIdReference`) => noRef
-                             case _ => ???
-                           }
+                          childRelationAttribute <- parentId match {
+                              case `simpleId` => commonChildRelationAttributes :+ idReference
+                              case `compoundId` => commonChildRelationAttributes :+ compoundParentIdReference
+                              case _ => commonChildRelationAttributes
+                          };
+                          parentRelationAttribute <- (parentId, childRelationAttribute) match {
+                              case (`simpleId`, `noRef`) => commonParentRelationAttributes :+idReference
+                              case (`simpleId`, _ ) => Vector(noRef)
+                              case (`compoundId`, `noRef`) => commonParentRelationAttributes :+ compoundChildIdReference
+                              case (`compoundId`, _) => Vector(noRef)
+                              case (`noId`, `noRef`) => commonParentRelationAttributes
+                              case (`noId`, _) => Vector(noRef)
+                              case (_,_) => Vector.empty
+                          }
     )
-      yield (s"""
+      yield {
+
+
+        val datamodel =
+          s"""
     model Parent {
         p             String    @unique
         p_1           String?
@@ -73,87 +93,17 @@ trait SchemaBaseV11 {
         $childId
 
         @@unique([c_1, c_2])
-    }""")
+    }"""
 
-    val datamodelUsingUniques = for (parentId <- idOptions;
-                          childId <- idOptions;
-                          relationAttribute <- commonRelationAttributes
-                          )
-      yield (s"""
-    model Parent {
-        p             String    @unique
-        p_1           String?
-        p_2           String?
-        childReq      Child     ${relationAttribute._1}
-        non_unique    String?
-        $parentId
+        TestAbstraction(datamodel, idParams, idParams)
+      }
 
-        @@unique([p_1, p_2])
-    }
+    val allDatamodels = datamodelsUsingIds
 
-    model Child {
-        c             String    @unique
-        c_1           String?
-        c_2           String?
-        parentReq     Parent    ${relationAttribute._1}
-        non_unique    String?
-        $childId
+    println(allDatamodels.length)
+    println(allDatamodels)
 
-        @@unique([c_1, c_2])
-    }""")
-
-
-    val parentReturnValue = "id"
-    // val parentReturnValue = "id_1 , id_2"
-    // val parentReturnValue = "p"
-    // val parentReturnValue = "p_1, p_2"
-
-    //       val childReturnValue = "id"
-    //       val childReturnValue = "id_1 , id_2"
-    // val childReturnValue = "c"
-    val childReturnValue = "c_1, c_2"
-
-    //       val childReturnValueParse = ".id"
-    //       val returnValueParseC = ".c"
-    val childReturnValueParse = ""
-
-    val parentReturnValueParse = ".id"
-    //         val parentReturnValueParse = ".p"
-    //         val parentReturnValueParse = ""
-
-
-    val parentIdentifierName = "id"
-    // val parentIdentifierName = "id_1_id_2"
-    // val parentIdentifierName = "p"
-    // parentIdentifierName = "p_1, p_2"
-
-    //       val childIdentifierName = "id"
-    // val childIdentifierName = "id_1_id_2"
-    // val childIdentifierName = "c"
-    val childIdentifierName = "c_1, c_2"
-
-
-
-
-//    TestAbstraction(s1, parentReturnValue, childReturnValue, parentReturnValueParse, childReturnValueParse, parentIdentifierName, childIdentifierName )
-
-
-    //    vectors of strings
-    //    for comprehension over the vectors
-    //    generate datamodel,
-    //    then loop further over the options for the query params
-    //    return case class containing all
-    //    pass that one to the tests
-
-
-    //    println(s1)
-    //todo generate different data models here,
-    //pass back the necessary placeholders for the operation together with the datamodel
-
-    println(datamodelUsingUniques.length + datamodelsUsingIds.length)
-
-    TestDataModels(mongo = datamodelUsingUniques, sql = datamodelUsingUniques)
-
+    AbstractTestDataModels(mongo = allDatamodels, sql = allDatamodels)
   }
 
 

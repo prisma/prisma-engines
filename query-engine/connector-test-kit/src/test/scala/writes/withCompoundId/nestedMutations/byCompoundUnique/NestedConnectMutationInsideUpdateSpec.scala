@@ -8,42 +8,15 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
   override def runOnlyForCapabilities: Set[ConnectorCapability] = Set(JoinRelationLinksCapability)
 
   " TEST a P1! to C1! relation with the child already in a relation" should "error when connecting since old required parent relation would be broken" in {
-    schemaP1reqToC1req.test { dataModel =>
+    schemaP1reqToC1req.test { t =>
+      println(t)
+
       val project = SchemaDsl.fromStringV11() {
-        dataModel
+        t.datamodel
       }
       database.setup(project)
 
-      //todo make this super generic based on snippets returned together with the datamodel
 
-       val parentReturnValue = "id"
-      // val parentReturnValue = "id_1 , id_2"
-      // val parentReturnValue = "p"
-      // val parentReturnValue = "p_1, p_2"
-
-//       val childReturnValue = "id"
-//       val childReturnValue = "id_1 , id_2"
-      // val childReturnValue = "c"
-         val childReturnValue = "c_1, c_2"
-
-//       val childReturnValueParse = ".id"
-//       val returnValueParseC = ".c"
-         val childReturnValueParse = ""
-
-         val parentReturnValueParse = ".id"
-//         val parentReturnValueParse = ".p"
-//         val parentReturnValueParse = ""
-
-
-      val parentIdentifierName = "id"
-      // val parentIdentifierName = "id_1_id_2"
-      // val parentIdentifierName = "p"
-      // parentIdentifierName = "p_1, p_2"
-
-//       val childIdentifierName = "id"
-      // val childIdentifierName = "id_1_id_2"
-      // val childIdentifierName = "c"
-       val childIdentifierName = "c_1, c_2"
 
       val childIdentifier = server
         .query(
@@ -57,13 +30,13 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
             |    }
             |  }){
             |    childReq{
-            |       $childReturnValue
+            |       ${t.child.returnValue}
             |    }
             |  }
             |}""",
           project
         )
-        .identifierAtPath(s"data.createParent.childReq",  childReturnValueParse)
+        .identifierAtPath(s"data.createParent.childReq",  t.child.parseValue)
 
       val parentIdentifier = server
         .query(
@@ -76,25 +49,25 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
             |      create: {c: "c2", c_1: "c", c_2: "2"}
             |    }
             |  }){
-            |  $parentReturnValue
+            |  ${t.parent.returnValue}
             |  }
             |}""",
           project
         )
-        .identifierAtPath(s"data.createParent", parentReturnValueParse)
+        .identifierAtPath(s"data.createParent", t.parent.parseValue)
 
       // ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(2) }
 
       server.queryThatMustFail(
         s"""mutation {
            |  updateParent(
-           |  where: {$parentIdentifierName: $parentIdentifier}
+           |  where: {${t.parent.identifierName}: $parentIdentifier}
            |  data:{
            |    p: "p2"
-           |    childReq: {connect: { $childIdentifierName: $childIdentifier}}
+           |    childReq: {connect: { ${t.child.identifierName}: $childIdentifier}}
            |  }){
            |    childReq {
-           |      $childReturnValue
+           |      ${t.child.returnValue}
            |    }
            |  }
            |}
