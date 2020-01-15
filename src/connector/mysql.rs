@@ -357,12 +357,12 @@ VALUES (1, 'Joe', 27, 20000.00 );
         conn.raw_cmd("CREATE TABLE test_uniq_constraint_violation (id1 int, id2 int)").await.unwrap();
         conn.raw_cmd("CREATE UNIQUE INDEX idx_uniq_constraint_violation ON test_uniq_constraint_violation (id1, id2) USING btree").await.unwrap();
 
-        conn.execute_raw(
+        conn.query_raw(
             "INSERT INTO test_uniq_constraint_violation (id1, id2) VALUES (1, 2)",
             &[]
         ).await.unwrap();
 
-        let res = conn.execute_raw(
+        let res = conn.query_raw(
             "INSERT INTO test_uniq_constraint_violation (id1, id2) VALUES (1, 2)",
             &[]
         ).await;
@@ -386,7 +386,7 @@ VALUES (1, 'Joe', 27, 20000.00 );
 
         conn.raw_cmd("CREATE TABLE test_null_constraint_violation (id1 int not null, id2 int not null)").await.unwrap();
 
-        let res = conn.execute_raw(
+        let res = conn.query_raw(
             "INSERT INTO test_null_constraint_violation () VALUES ()",
             &[]
         ).await;
