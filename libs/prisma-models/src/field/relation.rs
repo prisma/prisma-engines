@@ -19,7 +19,7 @@ pub struct RelationFieldTemplate {
     pub is_unique: bool,
     pub is_hidden: bool,
     pub is_auto_generated_int_id: bool,
-    pub manifestation: Option<FieldManifestation>,
+    pub data_source_mapping: DataSourceMapping,
     pub relation_name: String,
     pub relation_side: RelationSide,
 }
@@ -35,6 +35,7 @@ pub struct RelationField {
     pub relation_name: String,
     pub relation_side: RelationSide,
     pub relation: OnceCell<RelationWeakRef>,
+    pub data_source_mapping: DataSourceMapping,
 
     #[debug_stub = "#ModelWeakRef#"]
     pub model: ModelWeakRef,

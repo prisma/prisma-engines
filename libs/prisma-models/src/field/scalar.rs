@@ -24,8 +24,8 @@ pub struct ScalarFieldTemplate {
     pub is_hidden: bool,
     pub is_auto_generated_int_id: bool,
     pub manifestation: Option<FieldManifestation>,
+    pub data_source_mapping: DataSourceMapping,
     pub behaviour: Option<FieldBehaviour>,
-    pub default_value: Option<DefaultValue>,
     pub internal_enum: Option<InternalEnum>,
 }
 
@@ -38,9 +38,9 @@ pub struct ScalarField {
     pub is_hidden: bool,
     pub is_auto_generated_int_id: bool,
     pub manifestation: Option<FieldManifestation>,
+    pub data_source_mapping: DataSourceMapping,
     pub internal_enum: Option<InternalEnum>,
     pub behaviour: Option<FieldBehaviour>,
-    pub default_value: Option<DefaultValue>,
 
     #[debug_stub = "#ModelWeakRef#"]
     pub model: ModelWeakRef,
@@ -77,7 +77,7 @@ impl PartialEq for ScalarField {
             && self.manifestation == other.manifestation
             && self.internal_enum == other.internal_enum
             && self.behaviour == other.behaviour
-            && self.default_value == other.default_value
+            && self.default_value() == other.default_value()
             && self.is_unique == other.is_unique
             && self.model() == other.model()
     }
@@ -190,5 +190,9 @@ impl ScalarField {
         };
 
         (self.type_identifier, arity)
+    }
+
+    pub fn default_value(&self) -> Option<&DefaultValue> {
+        self.data_source_mapping.default_value.as_ref()
     }
 }

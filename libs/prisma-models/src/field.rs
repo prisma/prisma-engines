@@ -5,6 +5,7 @@ pub use relation::*;
 pub use scalar::*;
 
 use crate::prelude::*;
+use dml::DefaultValue;
 use once_cell::sync::OnceCell;
 use std::{borrow::Cow, sync::Arc};
 

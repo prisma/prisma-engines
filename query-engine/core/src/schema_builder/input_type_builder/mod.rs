@@ -93,6 +93,7 @@ pub trait InputTypeBuilderBase<'a>: CachedBuilder<InputObjectType> + InputBuilde
         let input_object = Arc::new(init_input_object_type(name.clone()));
         self.cache(name, Arc::clone(&input_object));
 
+        // Simple, single unique fields
         let unique_fields: Vec<ScalarFieldRef> = model
             .fields()
             .scalar()
@@ -106,7 +107,8 @@ pub trait InputTypeBuilderBase<'a>: CachedBuilder<InputObjectType> + InputBuilde
             .map(|f| input_field(f.name.clone(), self.map_optional_input_type(f), None))
             .collect();
 
-        let compound_fields: Vec<InputField> = model
+        // @@unique compound fields
+        let compound_unique_fields: Vec<InputField> = model
             .unique_indexes()
             .into_iter()
             .map(|index| {
@@ -117,7 +119,10 @@ pub trait InputTypeBuilderBase<'a>: CachedBuilder<InputObjectType> + InputBuilde
             })
             .collect();
 
-        fields.extend(compound_fields);
+        fields.extend(compound_unique_fields);
+
+        // Todo: @@id compounds here
+
         input_object.set_fields(fields);
 
         Arc::downgrade(&input_object)
