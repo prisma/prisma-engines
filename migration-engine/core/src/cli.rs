@@ -2,6 +2,7 @@
 mod tests;
 
 use crate::CoreResult;
+use anyhow::Context;
 use clap::ArgMatches;
 use itertools::Itertools;
 use migration_connector::*;
@@ -28,7 +29,7 @@ pub enum CliError {
     NoCommandDefined,
 
     #[error("Unknown error occured: {0}")]
-    Other(String),
+    Other(anyhow::Error),
 }
 
 impl CliError {
@@ -88,7 +89,7 @@ impl From<crate::Error> for CliError {
     fn from(e: crate::Error) -> Self {
         match e {
             crate::Error::ConnectorError(e) => e.into(),
-            e => Self::Other(format!("{}", e)),
+            e => Self::Other(e.into()),
         }
     }
 }
@@ -98,9 +99,7 @@ pub async fn run(matches: &ArgMatches<'_>, datasource: &str) -> Result<String, C
         create_conn(datasource, false).await?;
         Ok("Connection successful".into())
     } else if matches.is_present("create_database") {
-        let (db_name, conn) = create_conn(datasource, true).await?;
-        conn.create_database(&db_name).await?;
-        Ok(format!("Database '{}' created successfully.", db_name))
+        create_database(datasource).await
     } else {
         Err(CliError::NoCommandDefined)
     }
@@ -115,15 +114,49 @@ fn fetch_db_name(url: &Url, default: &str) -> String {
     String::from(result)
 }
 
+async fn create_database(datasource: &str) -> Result<String, CliError> {
+    let url = split_database_string(datasource)
+        .and_then(|(prefix, rest)| SqlFamily::from_scheme(prefix).map(|family| (family, rest)));
+
+    match url {
+        Some((SqlFamily::Sqlite, path)) => {
+            let path = std::path::Path::new(path);
+            if path.exists() {
+                return Ok(String::new());
+            }
+
+            let dir = path.parent();
+
+            if let Some((dir, false)) = dir.map(|dir| (dir, dir.exists())) {
+                std::fs::create_dir_all(dir)
+                    .context("Creating SQLite database parent directory.")
+                    .map_err(|io_err| CliError::Other(io_err.into()))?;
+            }
+
+            create_conn(datasource, true).await?;
+
+            Ok(String::new())
+        }
+        Some(_) => {
+            let (db_name, conn) = create_conn(datasource, true).await?;
+            conn.create_database(&db_name).await?;
+            Ok(format!("Database '{}' created successfully.", db_name))
+        }
+        None => Err(CliError::Other(anyhow::anyhow!(
+            "Invalid URL or unsupported connector in the datasource ({:?})",
+            url
+        ))),
+    }
+}
+
 async fn create_conn(datasource: &str, admin_mode: bool) -> CoreResult<(String, Box<SqlMigrationConnector>)> {
     let mut url = Url::parse(datasource).expect("Invalid url in the datasource");
     let sql_family = SqlFamily::from_scheme(url.scheme());
 
     match sql_family {
         Some(SqlFamily::Sqlite) => {
-            let inner = SqlMigrationConnector::new(datasource, "sqlite").await?;
-
-            Ok((String::new(), Box::new(inner)))
+            let connector = SqlMigrationConnector::new(datasource, "sqlite").await?;
+            Ok((datasource.to_owned(), Box::new(connector)))
         }
         Some(SqlFamily::Postgres) => {
             let db_name = fetch_db_name(&url, "postgres");
@@ -258,4 +291,10 @@ pub fn render_error(cli_error: CliError) -> user_facing_errors::Error {
         }
         .into(),
     }
+}
+
+fn split_database_string(database_string: &str) -> Option<(&str, &str)> {
+    let mut split = database_string.splitn(2, ':');
+
+    split.next().and_then(|prefix| split.next().map(|rest| (prefix, rest)))
 }
