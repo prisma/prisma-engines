@@ -1,4 +1,6 @@
+use super::input_type_builder::InputTypeBuilderBase;
 use super::*;
+use std::borrow::Borrow;
 
 #[derive(Debug)]
 pub struct ObjectTypeBuilder<'a> {
@@ -142,26 +144,18 @@ impl<'a> ObjectTypeBuilder<'a> {
 
     /// Builds "many records where" arguments solely based on the given model.
     pub fn many_records_arguments(&self, model: &ModelRef) -> Vec<Argument> {
-        let model_id = model.identifier();
-
-        // Todo: The following code will change as soon as we support multi-field IDs in some form. For now we assume single field ids.
-        let field = if model_id.len() != 1 {
-            panic!("Multi-field ids are not yet supported.")
-        } else {
-            match model_id.into_iter().last() {
-                Some(prisma_models::Field::Scalar(sf)) => sf,
-                _ => panic!("Relation fields in IDs are not supported."),
-            }
-        };
-
-        let id_input_type = self.map_optional_input_type(field);
+        let unique_input_type = self
+            .filter_object_type_builder
+            .into_arc()
+            .borrow()
+            .where_unique_object_type(model);
 
         vec![
             self.where_argument(&model),
             self.order_by_argument(&model),
             argument("skip", InputType::opt(InputType::int()), None),
-            argument("after", id_input_type.clone(), None),
-            argument("before", id_input_type, None),
+            argument("after", unique_input_type.clone(), None),
+            argument("before", unique_input_type, None),
             argument("first", InputType::opt(InputType::int()), None),
             argument("last", InputType::opt(InputType::int()), None),
         ]

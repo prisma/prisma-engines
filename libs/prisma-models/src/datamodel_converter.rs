@@ -81,7 +81,11 @@ impl<'a> DatamodelConverter<'a> {
                         is_unique: field.is_unique(),
                         is_hidden: false,
                         is_auto_generated_int_id: field.is_auto_generated_int_id(),
-                        data_source_fields: field.data_source_fields.clone(),
+                        // todo the data source fields are not yet build correctly in the datamodel
+                        data_source_fields: vec![DataSourceField {
+                            name: field.database_name.clone(),
+                            default_value: field.default_value.clone(),
+                        }],
                         relation_name: relation.name(),
                         relation_side: relation.relation_side(field),
                     })
@@ -94,11 +98,11 @@ impl<'a> DatamodelConverter<'a> {
                     is_unique: field.is_unique(),
                     is_hidden: false,
                     is_auto_generated_int_id: field.is_auto_generated_int_id(),
-                    data_source_field: field
-                        .data_source_fields
-                        .clone()
-                        .pop()
-                        .expect("Expected exactly one data source field for ScalarField"),
+                    // todo the data source field is not yet build correctly in the datamodel
+                    data_source_field: DataSourceField {
+                        name: field.database_name.clone(),
+                        default_value: field.default_value.clone(),
+                    },
                     behaviour: field.behaviour(),
                     internal_enum: field.internal_enum(self.datamodel),
                 }),
