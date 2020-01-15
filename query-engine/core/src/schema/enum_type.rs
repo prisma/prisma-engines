@@ -1,8 +1,5 @@
 use prisma_models::{InternalEnum, OrderBy};
-use serde::{
-    de::{self, Visitor},
-    Deserialize, Deserializer, Serialize, Serializer,
-};
+// use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
 #[derive(Debug)]
 pub enum EnumType {
