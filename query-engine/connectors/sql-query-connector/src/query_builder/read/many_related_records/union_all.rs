@@ -16,7 +16,6 @@ impl ManyRelatedRecordsQueryBuilder for ManyRelatedRecordsWithUnionAll {
         };
 
         let order_columns = Ordering::internal(vec![SelectedFields::RELATED_MODEL_ALIAS], base.order_directions);
-
         let base_condition = base.condition.and(base.cursor);
 
         let base_query = match base.skip_and_limit {

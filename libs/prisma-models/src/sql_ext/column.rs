@@ -52,14 +52,14 @@ pub trait AsColumns {
 
 impl AsColumns for &[Field] {
     fn as_columns(&self) -> ColumnIterator {
-        let cols: Vec<Column<'static>> = self.into_iter().map(AsColumn::as_column).collect();
+        let cols: Vec<Column<'static>> = self.into_iter().flat_map(AsColumns::as_columns).collect();
         ColumnIterator::from(cols)
     }
 }
 
 impl AsColumns for ModelIdentifier {
     fn as_columns(&self) -> ColumnIterator {
-        let cols: Vec<Column<'static>> = self.fields().map(AsColumn::as_column).collect();
+        let cols: Vec<Column<'static>> = self.fields().map(|f| f.as_column()).collect();
         ColumnIterator::from(cols)
     }
 }
@@ -75,27 +75,30 @@ pub trait AsColumn {
     fn as_column(&self) -> Column<'static>;
 }
 
-impl AsColumn for Field {
-    fn as_column(&self) -> Column<'static> {
+impl AsColumns for Field {
+    fn as_columns(&self) -> ColumnIterator {
         match self {
-            Field::Scalar(ref sf) => sf.as_column(),
-            Field::Relation(ref rf) => rf.as_column(),
+            Field::Scalar(ref sf) => ColumnIterator::from(vec![sf.as_column()]),
+            Field::Relation(ref rf) => rf.as_columns(),
         }
     }
 }
 
-impl AsColumn for RelationField {
-    fn as_column(&self) -> Column<'static> {
+impl AsColumns for RelationField {
+    fn as_columns(&self) -> ColumnIterator {
         let model = self.model();
         let internal_data_model = model.internal_data_model();
-        let db_name = self.db_name();
 
-        let parts = (
-            (internal_data_model.db_name.clone(), model.db_name().to_string()),
-            db_name.clone(),
-        );
+        let inner: Vec<_> = self.data_source_fields.iter().map(|dsf| {
+            let parts = (
+                (internal_data_model.db_name.clone(), model.db_name().to_string()),
+                dsf.name.clone(),
+            );
 
-        parts.into()
+            Column::from(parts)
+        }).collect();
+
+        ColumnIterator::from(inner)
     }
 }
 

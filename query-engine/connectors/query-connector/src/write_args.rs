@@ -1,6 +1,7 @@
 use chrono::Utc;
 use prisma_models::{ModelRef, PrismaValue};
 use std::collections::{btree_map::Keys, BTreeMap};
+use prisma_models::{RecordIdentifier, ModelIdentifier};
 
 /// A FieldValueContainer encapulates one or more values depending on
 /// the field it belongs to, as fields may have more than one underlying
@@ -87,5 +88,23 @@ impl WriteArgs {
                 }
             }
         }
+    }
+
+    pub fn as_record_identifier(&self, id: ModelIdentifier) -> Option<RecordIdentifier> {
+        let mut rec_id = RecordIdentifier::default();
+
+        for field in id.into_iter() {
+            match self.get_field_value(&field.name) {
+                Some(FieldValueContainer::Single(val)) => {
+                    rec_id.add((field.clone(), val.clone()))
+                },
+                Some(FieldValueContainer::Compound(_)) => {
+                    unreachable!("Relation fields are not supported in record identifiers")
+                }
+                None => return None,
+            }
+        }
+
+        Some(rec_id)
     }
 }

@@ -53,7 +53,7 @@ pub struct IdInfo {
 #[derive(Debug, PartialEq, Clone)]
 pub struct DataSourceField {
     /// Name of the backing DB field (e.g. column name or document key).
-    pub name: Option<String>, // todo why is this an option?
+    pub name: String,
 
     /// Default value of the backing field, if any.
     pub default_value: Option<DefaultValue>,

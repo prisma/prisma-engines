@@ -124,29 +124,6 @@ impl RelationField {
             .unwrap()
     }
 
-    pub fn db_name(&self) -> String {
-        let relation = self.relation();
-
-        match relation.manifestation {
-            RelationLinkManifestation::Inline(ref m) => {
-                let is_self_rel = relation.is_self_relation();
-
-                if is_self_rel && self.is_hidden {
-                    self.name.clone()
-                } else if is_self_rel && (self.relation_side == RelationSide::B || self.related_field().is_hidden) {
-                    m.referencing_column.clone()
-                } else if is_self_rel && self.relation_side == RelationSide::A {
-                    self.name.clone()
-                } else if m.in_table_of_model_name == self.model().name {
-                    m.referencing_column.clone()
-                } else {
-                    self.name.clone()
-                }
-            }
-            _ => self.name.clone(),
-        }
-    }
-
     /// Inlined in self / model of self
     pub fn relation_is_inlined_in_parent(&self) -> bool {
         let relation = self.relation();

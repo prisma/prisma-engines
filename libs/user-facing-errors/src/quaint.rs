@@ -1,5 +1,14 @@
 use crate::{common, query_engine, KnownError};
-use quaint::{error::Error as QuaintError, prelude::ConnectionInfo};
+use quaint::{error::{Error as QuaintError}, prelude::ConnectionInfo};
+
+impl From<&quaint::error::DatabaseConstraint> for crate::query_engine::DatabaseConstraint {
+    fn from(other: &quaint::error::DatabaseConstraint) -> Self {
+        match other {
+            quaint::error::DatabaseConstraint::Fields(fields) => Self::Fields(fields.to_vec()),
+            quaint::error::DatabaseConstraint::Index(index) => Self::Index(index.to_string()),
+        }
+    }
+}
 
 pub fn render_quaint_error(quaint_error: &QuaintError, connection_info: &ConnectionInfo) -> Option<KnownError> {
     match (quaint_error, connection_info) {
@@ -99,9 +108,9 @@ pub fn render_quaint_error(quaint_error: &QuaintError, connection_info: &Connect
             .ok()
         }
 
-        (QuaintError::UniqueConstraintViolation { field_name }, _) => {
+        (QuaintError::UniqueConstraintViolation { constraint }, _) => {
             KnownError::new(query_engine::UniqueKeyViolation {
-                field_name: field_name.into(),
+                constraint: constraint.into(),
             })
             .ok()
         }

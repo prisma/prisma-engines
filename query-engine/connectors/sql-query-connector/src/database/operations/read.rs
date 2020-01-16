@@ -1,5 +1,5 @@
 use crate::{
-    query_builder::read::{self, ManyRelatedRecordsQueryBuilder, ManyRelatedRecordsBaseQuery},
+    query_builder::{read::{self, ManyRelatedRecordsQueryBuilder, ManyRelatedRecordsBaseQuery}, self},
     QueryExt, SqlError,
 };
 use connector_interface::*;
@@ -88,8 +88,10 @@ where
     let query = if can_skip_joins {
         let model = from_field.related_model();
 
+        let relation_columns: Vec<_> = from_field.relation_columns(true).collect();
+
         let select = read::get_records(&model, columns.into_iter(), query_arguments)
-            .and_where(read::relation_in_selection(from_field, from_record_ids));
+            .and_where(query_builder::conditions(&relation_columns, from_record_ids));
 
         Query::from(select)
     } else {
@@ -109,7 +111,7 @@ where
         .into_iter()
         .map(|mut row| {
             let relation_cols = from_field.relation_columns(true);
-            let mut parent_ids: Vec<(Field, PrismaValue)> = Vec::with_capacity(relation_cols.len());
+            let mut parent_ids: Vec<(ScalarFieldRef, PrismaValue)> = Vec::with_capacity(relation_cols.len());
 
             for field in from_field.related_model().identifier().fields() {
                 let val = row.values.pop().ok_or(SqlError::ColumnDoesNotExist)?;

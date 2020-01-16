@@ -6,8 +6,8 @@ use std::string::FromUtf8Error;
 
 #[derive(Debug, Fail)]
 pub enum SqlError {
-    #[fail(display = "Unique constraint failed: {}", field_name)]
-    UniqueConstraintViolation { field_name: String },
+    #[fail(display = "Unique constraint failed: {:?}", field_names)]
+    UniqueConstraintViolation { field_names: Vec<String> },
 
     #[fail(display = "Null constraint failed: {}", field_name)]
     NullConstraintViolation { field_name: String },
@@ -65,14 +65,14 @@ pub enum SqlError {
 impl SqlError {
     pub(crate) fn into_connector_error(self, connection_info: &quaint::prelude::ConnectionInfo) -> ConnectorError {
         match self {
-            SqlError::UniqueConstraintViolation { field_name } => ConnectorError {
+            SqlError::UniqueConstraintViolation { field_names } => ConnectorError {
                 user_facing_error: user_facing_errors::KnownError::new(
                     user_facing_errors::query_engine::UniqueKeyViolation {
-                        field_name: field_name.clone(),
+                        constraint: user_facing_errors::query_engine::DatabaseConstraint::Fields(field_names.clone())
                     },
                 )
                 .ok(),
-                kind: ErrorKind::UniqueConstraintViolation { field_name },
+                kind: ErrorKind::UniqueConstraintViolation { field_name: field_names.join(", ") },
             },
             SqlError::NullConstraintViolation { field_name } => {
                 ConnectorError::from_kind(ErrorKind::NullConstraintViolation { field_name })
@@ -119,12 +119,26 @@ impl From<quaint::error::Error> for SqlError {
             quaint::error::Error::QueryError(e) => Self::QueryError(e),
             quaint::error::Error::IoError(_) => Self::ConnectionError(e),
             quaint::error::Error::NotFound => Self::RecordDoesNotExist,
-            quaint::error::Error::UniqueConstraintViolation { field_name } => {
-                Self::UniqueConstraintViolation { field_name }
+            quaint::error::Error::UniqueConstraintViolation { constraint } => {
+                match constraint {
+                    quaint::error::DatabaseConstraint::Fields(field_names) => {
+                        Self::UniqueConstraintViolation { field_names }
+                    },
+                    quaint::error::DatabaseConstraint::Index(_) => {
+                        Self::UniqueConstraintViolation { field_names: vec![] }
+                    }
+                }
             }
 
-            quaint::error::Error::NullConstraintViolation { field_name } => {
-                Self::NullConstraintViolation { field_name }
+            quaint::error::Error::NullConstraintViolation { constraint } => {
+                match constraint {
+                    quaint::error::DatabaseConstraint::Fields(field_names) => {
+                        Self::NullConstraintViolation { field_name: field_names.join(", ") }
+                    },
+                    quaint::error::DatabaseConstraint::Index(index) => {
+                        Self::NullConstraintViolation { field_name: index }
+                    }
+                }
             }
 
             quaint::error::Error::ConnectionError(_) => Self::ConnectionError(e),

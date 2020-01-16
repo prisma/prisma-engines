@@ -1,5 +1,22 @@
 use serde::Serialize;
 use user_facing_error_macros::*;
+use std::fmt;
+
+#[derive(Debug, PartialEq, Eq, Serialize)]
+#[serde(untagged)]
+pub enum DatabaseConstraint {
+    Fields(Vec<String>),
+    Index(String),
+}
+
+impl fmt::Display for DatabaseConstraint {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Fields(fields) => write!(f, "fields: ({})", fields.join(",")),
+            Self::Index(index) => write!(f, "constraint: {}", index),
+        }
+    }
+}
 
 #[derive(Debug, UserFacingError, Serialize)]
 #[user_facing(
@@ -33,10 +50,10 @@ pub struct RecordNotFound {
 }
 
 #[derive(Debug, UserFacingError, Serialize)]
-#[user_facing(code = "P2002", message = "Unique constraint failed on the field: `${field_name}`")]
+#[user_facing(code = "P2002", message = "Unique constraint failed on `${constraint}`")]
 pub struct UniqueKeyViolation {
     /// Field name from one model from Prisma schema
-    pub field_name: String,
+    pub constraint: DatabaseConstraint,
 }
 
 #[derive(Debug, UserFacingError, Serialize)]

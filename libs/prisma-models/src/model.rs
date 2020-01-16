@@ -86,22 +86,22 @@ impl Model {
     ///
     /// This relies entirely on the datamodel parsing and conversion to have a stable ordering of fields.
     pub fn identifier(&self) -> ModelIdentifier {
-        let fields: Vec<Field> = self
+        let fields: Vec<_> = self
             .fields()
             .id()
-            .map(|fields| fields.into_iter().map(|f| Field::Scalar(f)).collect())
+            .map(|fields| fields.into_iter().collect())
             .or_else(|| {
                 self.fields()
                     .scalar()
                     .into_iter()
                     .find(|sf| sf.is_unique && sf.is_required)
-                    .map(|x| vec![Field::Scalar(x)])
+                    .map(|x| vec![x])
             })
             .or_else(|| {
                 self.unique_indexes()
                     .into_iter()
                     .find(|index| index.fields().into_iter().all(|f| f.is_required))
-                    .map(|index| index.fields().into_iter().map(|f| Field::Scalar(f)).collect())
+                    .map(|index| index.fields().into_iter().collect())
             })
             .expect(&format!(
                 "Unable to resolve a primary identifier for model {}.",

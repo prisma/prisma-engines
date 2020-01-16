@@ -1,35 +1,29 @@
-use crate::{DomainError as Error, DomainResult, Field, PrismaValue, ScalarFieldRef};
+use crate::{DomainError as Error, DomainResult, PrismaValue, ScalarFieldRef};
 
 // Collection of fields of which the primary identifier of a model is composed of.
 // Todo: Currently, this uses arcs, which is not ideal, but also not terrible compared
 // Arcs in the RecordIdentifier.
 #[derive(Debug, Clone, Default)]
 pub struct ModelIdentifier {
-    fields: Vec<Field>,
-}
-
-impl From<Field> for ModelIdentifier {
-    fn from(f: Field) -> Self {
-        Self { fields: vec![f] }
-    }
+    fields: Vec<ScalarFieldRef>,
 }
 
 impl From<ScalarFieldRef> for ModelIdentifier {
     fn from(f: ScalarFieldRef) -> Self {
-        Self::from(Field::Scalar(f))
+        Self { fields: vec![f] }
     }
 }
 
 impl ModelIdentifier {
-    pub fn new(fields: Vec<Field>) -> Self {
+    pub fn new(fields: Vec<ScalarFieldRef>) -> Self {
         Self { fields }
     }
 
     pub fn names<'a>(&'a self) -> impl Iterator<Item = &'a str> + 'a {
-        self.fields.iter().map(|field| field.name())
+        self.fields.iter().map(|field| field.name.as_str())
     }
 
-    pub fn fields<'a>(&'a self) -> impl Iterator<Item = &'a Field> + 'a {
+    pub fn fields<'a>(&'a self) -> impl Iterator<Item = &'a ScalarFieldRef> + 'a {
         self.fields.iter()
     }
 
@@ -43,7 +37,7 @@ impl ModelIdentifier {
 }
 
 impl IntoIterator for ModelIdentifier {
-    type Item = Field;
+    type Item = ScalarFieldRef;
     type IntoIter = std::vec::IntoIter<Self::Item>;
 
     fn into_iter(self) -> Self::IntoIter {
@@ -55,27 +49,35 @@ impl IntoIterator for ModelIdentifier {
 // Todo: Storing Arcs is not a great idea, as practically every single record produced by a query
 // essentially clones the arcs of the model identifier. After the main work on multi/any-id-fields
 // is done. Maybe references are acceptable to use here.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Default, Debug, Clone, PartialEq, Eq, Hash)]
 pub struct RecordIdentifier {
-    pub pairs: Vec<(Field, PrismaValue)>,
+    pub pairs: Vec<(ScalarFieldRef, PrismaValue)>,
 }
 
 impl RecordIdentifier {
-    pub fn new(pairs: Vec<(Field, PrismaValue)>) -> Self {
+    pub fn new(pairs: Vec<(ScalarFieldRef, PrismaValue)>) -> Self {
         Self { pairs }
     }
 
-    pub fn add(&mut self, pair: (Field, PrismaValue)) {
+    pub fn add(&mut self, pair: (ScalarFieldRef, PrismaValue)) {
         self.pairs.push(pair);
     }
 
     pub fn values(&self) -> impl Iterator<Item = PrismaValue> + '_ {
         self.pairs.iter().map(|p| p.1.clone())
     }
+
+    pub fn len(&self) -> usize {
+        self.pairs.len()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
 }
 
 impl IntoIterator for RecordIdentifier {
-    type Item = (Field, PrismaValue);
+    type Item = (ScalarFieldRef, PrismaValue);
     type IntoIter = std::vec::IntoIter<Self::Item>;
 
     fn into_iter(self) -> Self::IntoIter {
@@ -83,14 +85,14 @@ impl IntoIterator for RecordIdentifier {
     }
 }
 
-impl From<(Field, PrismaValue)> for RecordIdentifier {
-    fn from(tup: (Field, PrismaValue)) -> Self {
+impl From<(ScalarFieldRef, PrismaValue)> for RecordIdentifier {
+    fn from(tup: (ScalarFieldRef, PrismaValue)) -> Self {
         Self::new(vec![tup])
     }
 }
 
-impl From<Vec<(Field, PrismaValue)>> for RecordIdentifier {
-    fn from(tup: Vec<(Field, PrismaValue)>) -> Self {
+impl From<Vec<(ScalarFieldRef, PrismaValue)>> for RecordIdentifier {
+    fn from(tup: Vec<(ScalarFieldRef, PrismaValue)>) -> Self {
         Self::new(tup)
     }
 }
@@ -174,11 +176,11 @@ impl Record {
     }
 
     pub fn identifier(&self, field_names: &[String], id: &ModelIdentifier) -> DomainResult<RecordIdentifier> {
-        let pairs: Vec<(Field, PrismaValue)> = id
+        let pairs: Vec<(ScalarFieldRef, PrismaValue)> = id
             .fields()
             .into_iter()
             .map(|id_field| {
-                self.get_field_value(field_names, id_field.name())
+                self.get_field_value(field_names, &id_field.name)
                     .map(|val| (id_field.clone(), val.clone()))
             })
             .collect::<DomainResult<Vec<_>>>()?;

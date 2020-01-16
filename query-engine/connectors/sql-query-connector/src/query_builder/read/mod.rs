@@ -74,42 +74,9 @@ where
 }
 
 pub fn count_by_model(model: &ModelRef, query_arguments: QueryArguments) -> Select<'static> {
-    let id = model.identifier();
-    let selected_columns = id.as_columns();
-
+    let selected_columns = model.identifier().as_columns();
     let base_query = get_records(model, selected_columns, query_arguments);
     let table = Table::from(base_query).alias("sub");
 
-    let columns: Vec<Column<'static>> = id
-        .fields()
-        .map(|id_field| {
-            Column::from(("sub", id_field.db_name().to_string()))
-        })
-        .collect();
-
-    Select::from_table(table).value(count(Row::from(columns)))
-}
-
-pub fn relation_in_selection<'a, I>(from_field: &RelationFieldRef, identifiers: I) -> ConditionTree<'static>
-where
-    I: IntoIterator<Item = &'a RecordIdentifier>,
-{
-    identifiers
-        .into_iter()
-        .map(|ids| {
-            let cols_with_vals = from_field.relation_columns(true).into_iter().zip(ids.values());
-
-            cols_with_vals.fold(ConditionTree::NoCondition, |acc, (col, val)| {
-                match acc {
-                    ConditionTree::NoCondition => col.equals(val).into(),
-                    cond => cond.and(col.equals(val))
-                }
-            })
-        })
-        .fold(ConditionTree::NoCondition, |acc, cond| {
-            match acc {
-                ConditionTree::NoCondition => cond,
-                acc => acc.or(cond),
-            }
-        })
+    Select::from_table(table).value(count(asterisk()))
 }

@@ -6,7 +6,7 @@ pub use scalar::*;
 
 use crate::prelude::*;
 use once_cell::sync::OnceCell;
-use std::{borrow::Cow, sync::Arc};
+use std::sync::Arc;
 
 #[derive(Debug)]
 pub enum FieldTemplate {
@@ -50,13 +50,6 @@ impl TypeIdentifier {
 }
 
 impl Field {
-    pub fn db_name(&self) -> Cow<str> {
-        match self {
-            Field::Scalar(ref sf) => Cow::from(sf.db_name()),
-            Field::Relation(ref rf) => Cow::from(rf.db_name()),
-        }
-    }
-
     pub fn name(&self) -> &str {
         match self {
             Field::Scalar(ref sf) => &sf.name,

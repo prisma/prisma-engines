@@ -8,7 +8,7 @@ use quaint::{
     connector::{self, Queryable},
     pooled::PooledConnection,
 };
-use serde_json::{Map, Number, Value};
+use serde_json::{Map, Value};
 use std::convert::TryFrom;
 
 impl<'t> QueryExt for connector::Transaction<'t> {}
@@ -48,8 +48,8 @@ pub trait QueryExt: Queryable + Send + Sync {
 
             Ok(Value::Array(result))
         } else {
-            let changes = self.execute_raw(q.0.as_str(), &[]).await?;
-            Ok(Value::Number(Number::from(changes)))
+            self.query_raw(q.0.as_str(), &[]).await?;
+            Ok(Value::Null)
         }
     }
 
@@ -93,7 +93,7 @@ pub trait QueryExt: Queryable + Send + Sync {
         let idents: Vec<_> = model_id
             .fields()
             .into_iter()
-            .map(|f| (f.type_identifier(), FieldArity::Required))
+            .map(|f| (f.type_identifier, FieldArity::Required))
             .collect();
 
         let mut rows = self.filter(select.into(), &idents).await?;
