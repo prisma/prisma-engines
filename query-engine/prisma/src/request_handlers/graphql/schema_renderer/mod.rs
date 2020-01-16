@@ -6,7 +6,6 @@ mod type_renderer;
 use enum_renderer::*;
 use field_renderer::*;
 use object_renderer::*;
-use prisma_models::EnumType;
 use query_core::schema::*;
 use std::{
     cell::RefCell,
