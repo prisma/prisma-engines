@@ -279,6 +279,10 @@ fn render_raw_sql(
                             let constraint_name = renderer.quote(&constraint_name);
                             lines.push(format!("DROP FOREIGN KEY {}", constraint_name));
                         }
+                        SqlFamily::Postgres => {
+                            let constraint_name = renderer.quote(&constraint_name);
+                            lines.push(format!("DROP CONSTRAINT IF EXiSTS {}", constraint_name));
+                        }
                         _ => (),
                     },
                 };
@@ -435,6 +439,11 @@ fn safe_alter_column(
                     format!("{} SET DEFAULT '{}'", &alter_column_prefix, new_default)
                 }
                 PostgresAlterColumn::DropNotNull => format!("{} DROP NOT NULL", &alter_column_prefix),
+                PostgresAlterColumn::SetType(ty) => format!(
+                    "{} SET DATA TYPE {}",
+                    &alter_column_prefix,
+                    renderer.render_column_type(&ty)
+                ),
             })
             .collect(),
         ExpandedAlterColumn::Mysql(steps) => steps

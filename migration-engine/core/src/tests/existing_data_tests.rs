@@ -684,3 +684,73 @@ async fn altering_the_type_of_a_column_in_a_non_empty_table_always_warns(api: &T
         })
         .map(drop)
 }
+
+#[test_each_connector(ignore = "mysql")]
+async fn migrating_a_required_column_from_int_to_string_should_warn_and_cast(api: &TestApi) -> TestResult {
+    let dm1 = r#"
+        model Test {
+            id String @id
+            serialNumber Int
+        }
+    "#;
+
+    api.infer_apply(dm1).send().await?;
+
+    api.database()
+        .query(
+            api.insert("Test")
+                .value("id", "abcd")
+                .value("serialNumber", 47i64)
+                .into(),
+        )
+        .await?;
+
+    let test = api.dump_table("Test").await?;
+    let first_row = test.get(0).unwrap();
+    assert_eq!(
+        format!("{:?} {:?}", first_row.get("id"), first_row.get("serialNumber")),
+        r#"Some(Text("abcd")) Some(Integer(47))"#
+    );
+
+    let original_schema = api.assert_schema().await?.into_schema();
+
+    let dm2 = r#"
+        model Test {
+            id String @id
+            serialNumber String
+        }
+    "#;
+
+    let expected_warning = MigrationWarning {
+        description: "You are about to alter the column `serialNumber` on the `Test` table, which still contains 1 non-null values. The data in that column will be lost.".to_owned(),
+    };
+
+    // Apply once without forcing
+    {
+        let result = api.infer_apply(dm2).send().await?;
+
+        assert_eq!(result.warnings, &[expected_warning.clone()]);
+
+        api.assert_schema().await?.assert_equals(&original_schema)?;
+    }
+
+    // Force apply
+    {
+        let result = api.infer_apply(dm2).force(Some(true)).send().await?;
+
+        assert_eq!(result.warnings, &[expected_warning]);
+
+        api.assert_schema().await?.assert_table("Test", |table| {
+            table.assert_column("serialNumber", |col| col.assert_type_is_string())
+        })?;
+
+        let test = api.dump_table("Test").await?;
+        let first_row = test.get(0).unwrap();
+        assert_eq!(
+            format!("{:?} {:?}", first_row.get("id"), first_row.get("serialNumber")),
+            r#"Some(Text("abcd")) Some(Text("47"))"#
+        );
+    }
+
+    Ok(())
+}

@@ -175,13 +175,14 @@ impl SqlDestructiveChangesChecker<'_> {
 
                 // We keep the match here to keep the exhaustiveness checking for when we add variants.
                 if let Some(steps) = expanded {
-                    let is_safe = true;
+                    let mut is_safe = true;
 
                     for step in steps {
                         match step {
                             PostgresAlterColumn::SetDefault(_)
                             | PostgresAlterColumn::DropDefault
                             | PostgresAlterColumn::DropNotNull => (),
+                            PostgresAlterColumn::SetType(_) => is_safe = false,
                         }
                     }
 

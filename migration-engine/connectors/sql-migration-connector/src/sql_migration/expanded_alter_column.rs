@@ -1,6 +1,6 @@
 use crate::sql_schema_differ::{ColumnChange, ColumnDiffer};
 use quaint::prelude::SqlFamily;
-use sql_schema_describer::{Column, ColumnArity};
+use sql_schema_describer::{Column, ColumnArity, ColumnType, ColumnTypeFamily};
 
 pub(crate) fn expand_alter_column(
     previous_column: &Column,
@@ -52,7 +52,14 @@ pub(crate) fn expand_postgres_alter_column(columns: ColumnDiffer) -> Option<Vec<
                 (ColumnArity::Required, ColumnArity::Nullable) => changes.push(PostgresAlterColumn::DropNotNull),
                 _ => return None,
             },
-            _ => return None,
+            ColumnChange::Type => match (&columns.previous.tpe.family, &columns.next.tpe.family) {
+                // Ints can be cast to text.
+                (ColumnTypeFamily::Int, ColumnTypeFamily::String) => {
+                    changes.push(PostgresAlterColumn::SetType(columns.next.tpe.clone()))
+                }
+                _ => return None,
+            },
+            ColumnChange::Renaming => unreachable!("column renaming"),
         }
     }
 
@@ -72,10 +79,10 @@ pub(crate) enum PostgresAlterColumn {
     SetDefault(String),
     DropDefault,
     DropNotNull,
+    SetType(ColumnType),
     // Not used yet:
     // SetNotNull,
     // Rename { previous_name: String, next_name: String },
-    // SetType(String),
 }
 
 /// https://dev.mysql.com/doc/refman/8.0/en/alter-table.html

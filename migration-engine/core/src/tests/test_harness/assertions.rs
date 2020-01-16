@@ -70,6 +70,14 @@ impl<'a> TableAssertion<'a> {
         Ok(self)
     }
 
+    pub fn assert_has_fk(self, fk: &ForeignKey) -> AssertionResult<Self> {
+        let matching_fk = self.0.foreign_keys.iter().any(|found| found == fk);
+
+        anyhow::ensure!(matching_fk, "Assertion failed. Could not find fk.");
+
+        Ok(self)
+    }
+
     pub fn assert_fk_on_columns<F>(self, columns: &[&str], fk_assertions: F) -> AssertionResult<Self>
     where
         F: FnOnce(ForeignKeyAssertion<'a>) -> AssertionResult<ForeignKeyAssertion<'a>>,
