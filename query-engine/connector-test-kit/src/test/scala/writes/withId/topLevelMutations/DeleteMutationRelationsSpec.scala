@@ -8,7 +8,7 @@ class DeleteMutationRelationsSpec extends FlatSpec with Matchers with ApiSpecBas
   override def runOnlyForCapabilities: Set[ConnectorCapability] = Set(JoinRelationLinksCapability)
 
   "a P1! to C1! relation " should "error when deleting the parent" in {
-    schemaP1reqToC1reqWithId.test { dataModel =>
+    schemaP1reqToC1req.test { dataModel =>
       val project = SchemaDsl.fromStringV11() { dataModel }
       database.setup(project)
       server
@@ -50,7 +50,7 @@ class DeleteMutationRelationsSpec extends FlatSpec with Matchers with ApiSpecBas
   }
 
   "a P1! to C1! relation " should "error when deleting the parent2" in {
-    schemaP1reqToC1reqWithId.test { dataModel =>
+    schemaP1reqToC1req.test { dataModel =>
       val project = SchemaDsl.fromStringV11() { dataModel }
       database.setup(project)
 

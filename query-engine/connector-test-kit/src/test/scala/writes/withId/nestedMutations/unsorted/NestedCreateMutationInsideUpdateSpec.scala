@@ -11,7 +11,7 @@ class NestedCreateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
   //todo which tests to keep and which ones to delete???? Some do not really test the compound unique functionality
 
   "a P1! to C1! relation" should "error since old required parent relation would be broken" in {
-    schemaP1reqToC1reqWithId.test { dataModel =>
+    schemaP1reqToC1req.test { dataModel =>
       val project = SchemaDsl.fromStringV11() { dataModel }
       database.setup(project)
 

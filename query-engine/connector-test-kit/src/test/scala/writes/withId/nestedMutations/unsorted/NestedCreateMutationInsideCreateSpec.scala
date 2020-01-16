@@ -10,7 +10,7 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
   override def runOnlyForCapabilities = Set(JoinRelationLinksCapability)
 
   "a P1! to C1! relation should be possible" in {
-    schemaP1reqToC1reqWithId.test { dataModel =>
+    schemaP1reqToC1req.test { dataModel =>
       val project = SchemaDsl.fromStringV11() { dataModel }
       database.setup(project)
 

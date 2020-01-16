@@ -8,7 +8,7 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
   override def runOnlyForCapabilities: Set[ConnectorCapability] = Set(JoinRelationLinksCapability)
 
   " TEST a P1! to C1! relation with the child already in a relation" should "error when connecting since old required parent relation would be broken" in {
-    schemaP1reqToC1req.test { t =>
+    schemaWithRelation(onParent = ChildReq, onChild = ParentReq).test { t =>
       println(t)
 
       val project = SchemaDsl.fromStringV11() {
@@ -84,7 +84,7 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
 
 
   "a P1! to C1! relation with the child already in a relation" should "error when connecting since old required parent relation would be broken" in {
-    schemaP1reqToC1reqWithId.test { dataModel =>
+    schemaP1reqToC1req.test { dataModel =>
       val project = SchemaDsl.fromStringV11() {
         dataModel
       }

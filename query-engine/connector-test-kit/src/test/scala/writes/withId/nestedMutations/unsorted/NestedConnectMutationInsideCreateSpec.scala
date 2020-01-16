@@ -8,7 +8,7 @@ class NestedConnectMutationInsideCreateSpec extends FlatSpec with Matchers with 
   override def runOnlyForCapabilities: Set[ConnectorCapability] = Set(JoinRelationLinksCapability)
 
   "a P1! to C1! relation with the child already in a relation" should "error when connecting by id since old required parent relation would be broken" in {
-    schemaP1reqToC1reqWithId.test { dataModel =>
+    schemaP1reqToC1req.test { dataModel =>
       val project = SchemaDsl.fromStringV11() { dataModel }
       database.setup(project)
 

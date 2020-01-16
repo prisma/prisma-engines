@@ -1,65 +1,92 @@
 package util
 
 trait SchemaBaseV11 {
-  val schemaP1reqToC1req = {
 
-    // todo allow to pass in flags to enable/disable certain combinations ??
-
-    //Datamodel
-    val simpleId =     "id            String    @id @default(cuid())"
-    val compoundId = """id_1          String        @default(cuid())
+  //Datamodel
+  val simpleId   = "id            String    @id @default(cuid())"
+  val compoundId = """id_1          String        @default(cuid())
                         id_2          String        @default(cuid())
                         @@id([id_1, id_2])"""
-    val noId =       ""
+  val noId       = ""
 
-    val idOptions =  Vector(simpleId, compoundId,noId)
+  val idOptions = Vector(simpleId, compoundId, noId)
 
-    val idReference = "@relation(references: [id])"
-    val noRef = ""
-    val compoundParentIdReference = "@relation(references: [id_1, id_2]) @map([\"parent_id_1\", \"parent_id_2\"])"
-    val compoundChildIdReference = "@relation(references: [id_1, id_2]) @map([\"child_id_1\", \"child_id_2\"])"
+  val idReference               = "@relation(references: [id])"
+  val noRef                     = ""
+  val compoundParentIdReference = "@relation(references: [id_1, id_2]) @map([\"parent_id_1\", \"parent_id_2\"])"
+  val compoundChildIdReference  = "@relation(references: [id_1, id_2]) @map([\"child_id_1\", \"child_id_2\"])"
 
-    val pReference = "@relation(references: [p])"
-    val compoundPReference = "@relation(references: [p_1, p_2]) @map([\"parent_p_1\", \"parent_p_2\"])"
-    val cReference = "@relation(references: [c])"
-    val compoundCReference = "@relation(references: [c_1, c_2]) @map([\"child_c_1\", \"child_c_2\"])"
+  val pReference         = "@relation(references: [p])"
+  val compoundPReference = "@relation(references: [p_1, p_2]) @map([\"parent_p_1\", \"parent_p_2\"])"
+  val cReference         = "@relation(references: [c])"
+  val compoundCReference = "@relation(references: [c_1, c_2]) @map([\"child_c_1\", \"child_c_2\"])"
 
-    val commonChildRelationAttributes = Vector(pReference, compoundPReference, noRef)
-    val commonParentRelationAttributes = Vector(cReference, compoundCReference)
+  val commonParentReferences = Vector(pReference, compoundPReference, noRef)
+  val commonChildReferences  = Vector(cReference, compoundCReference)
 
-    //Query Params
-    val idParams = QueryParams("id","id",".id")
-    val compoundIdParams = QueryParams ("id_1_id_2", "id_1 , id_2","")
-    val parentUniqueParams = Vector(QueryParams ("p", "p",".p"),QueryParams ("p_1_p_2", "p_1, p_2", ""))
-    val childUniqueParams = Vector(QueryParams ("c", "c",".c"),QueryParams ("c_1_c_2", "c_1, c_2", ""))
+  //Query Params
+  val idParams           = QueryParams("id", "id", ".id")
+  val compoundIdParams   = QueryParams("id_1_id_2", "id_1 , id_2", "")
+  val parentUniqueParams = Vector(QueryParams("p", "p", ".p"), QueryParams("p_1_p_2", "p_1, p_2", ""))
+  val childUniqueParams  = Vector(QueryParams("c", "c", ".c"), QueryParams("c_1_c_2", "c_1, c_2", ""))
+
+  sealed trait RelationField {
+    def field: String
+  }
+  sealed trait ListRelationField extends RelationField
+  final case object ParentList extends ListRelationField {
+    override def field: String = "parentsOpt   Parent[]"
+  }
+  final case object ChildList extends ListRelationField {
+    override def field: String = "childrenOpt  Child[]"
+  }
+
+  sealed trait NonListRelationField extends RelationField
+  final case object ParentOpt extends NonListRelationField {
+    override def field: String = "parentOpt     Parent?"
+  }
+  final case object ParentReq extends NonListRelationField {
+    override def field: String = "parentReq     Parent"
+  }
+  final case object ChildOpt extends NonListRelationField {
+    override def field: String = "childOpt      Child?"
+  }
+  final case object ChildReq extends NonListRelationField {
+    override def field: String = "childReq      Child"
+  }
+
+  def schemaWithRelation(onParent: RelationField, onChild: RelationField) = {
 
     val datamodelsWithParams = for (parentId <- idOptions;
-                              childId <- idOptions;
-                              childRelationAttribute <- parentId match {
-                                  case `simpleId` =>  idReference +: commonChildRelationAttributes
-                                  case `compoundId` => compoundParentIdReference +: commonChildRelationAttributes
-                                  case _ => commonChildRelationAttributes
-                              };
-                              parentRelationAttribute <- (parentId, childRelationAttribute) match {
-                                  case (`simpleId`, `noRef`) => idReference +: commonParentRelationAttributes
-                                  case (`simpleId`, _ ) => Vector(noRef)
-                                  case (`compoundId`, `noRef`) => compoundChildIdReference +: commonParentRelationAttributes
-                                  case (`compoundId`, _) => Vector(noRef)
-                                  case (`noId`, `noRef`) => commonParentRelationAttributes
-                                  case (`noId`, _) => Vector(noRef)
-                                  case (_,_) => Vector.empty
-                              };
-                              parentParams <- parentId match {
-                                case `simpleId` => parentUniqueParams :+ idParams
-                                case `compoundId` => parentUniqueParams :+ compoundIdParams
-                                case `noId` => parentUniqueParams
-                              };
-                              childParams <- childId match {
-                                case `simpleId` => childUniqueParams :+ idParams
-                                case `compoundId` => childUniqueParams :+ compoundIdParams
-                                case `noId` => parentUniqueParams
-                              }
-                          )
+                                    childId <- idOptions;
+                                    //based on Id and relation
+                                    childReferences <- (parentId, onChild) match {
+                                                        case (_, _: ListRelationField) => Vector(`noRef`)
+                                                        case (`simpleId`, _)           => idReference +: commonParentReferences
+                                                        case (`compoundId`, _)         => compoundParentIdReference +: commonParentReferences
+                                                        case (_, _)                    => commonParentReferences
+                                                      };
+                                    parentReferences <- (childId, childReferences, onParent, onChild) match { // todo fix this
+                                                         case (_, _, _, _: ListRelationField) => Vector(`noRef`)
+                                                         case (`simpleId`, `noRef`, _, _)     => idReference +: commonChildReferences
+                                                         case (`simpleId`, _, _, _)           => Vector(noRef)
+                                                         case (`compoundId`, `noRef`, _, _)   => compoundChildIdReference +: commonChildReferences
+                                                         case (`compoundId`, _, _, _)         => Vector(noRef)
+                                                         case (`noId`, `noRef`, _, _)         => commonChildReferences
+                                                         case (`noId`, _, _, _)               => Vector(noRef)
+                                                         case (_, _, _, _)                    => Vector.empty
+                                                       };
+                                    //only based on id
+                                    parentParams <- parentId match {
+                                                     case `simpleId`   => parentUniqueParams :+ idParams
+                                                     case `compoundId` => parentUniqueParams :+ compoundIdParams
+                                                     case `noId`       => parentUniqueParams
+                                                   };
+                                    childParams <- childId match {
+                                                    case `simpleId`   => childUniqueParams :+ idParams
+                                                    case `compoundId` => childUniqueParams :+ compoundIdParams
+                                                    case `noId`       => parentUniqueParams
+                                                  })
       yield {
         val datamodel =
           s"""
@@ -67,7 +94,7 @@ trait SchemaBaseV11 {
                     p             String    @unique
                     p_1           String?
                     p_2           String?
-                    childReq      Child     $parentRelationAttribute
+                    ${onParent.field}         $parentReferences
                     non_unique    String?
                     $parentId
 
@@ -78,7 +105,7 @@ trait SchemaBaseV11 {
                     c             String    @unique
                     c_1           String?
                     c_2           String?
-                    parentReq     Parent    $childRelationAttribute
+                    ${onChild.field}          $childReferences
                     non_unique    String?
                     $childId
 
@@ -89,169 +116,69 @@ trait SchemaBaseV11 {
         TestAbstraction(datamodel, parentParams, childParams)
       }
 
+    println(datamodelsWithParams.length)
+
     AbstractTestDataModels(mongo = datamodelsWithParams, sql = datamodelsWithParams)
   }
 
-
-
   //region NON EMBEDDED WITH @id
 
-  val schemaP1reqToC1reqWithId = {
+//  val schemaP1reqToC1reqWithId = {
+//    val s1 = """
+//    model Parent {
+//        id            String    @id @default(cuid())
+//        p             String    @unique
+//        p_1           String?
+//        p_2           String?
+//        childReq      Child     @relation(references: [id])
+//        non_unique    String?
+//
+//        @@unique([p_1, p_2])
+//    }
+//
+//    model Child {
+//        id            String    @id @default(cuid())
+//        c             String    @unique
+//        c_1           String?
+//        c_2           String?
+//        parentReq     Parent
+//        non_unique    String?
+//
+//        @@unique([c_1, c_2])
+//    }"""
+//
+//    val s2 = """
+//    model Parent {
+//        id            String    @id @default(cuid())
+//        p             String    @unique
+//        p_1           String?
+//        p_2           String?
+//        childReq      Child
+//        non_unique    String?
+//
+//        @@unique([p_1, p_2])
+//    }
+//
+//    model Child {
+//        id            String    @id @default(cuid())
+//        c             String    @unique
+//        c_1           String?
+//        c_2           String?
+//        parentReq     Parent    @relation(references: [id])
+//        non_unique    String?
+//
+//        @@unique([c_1, c_2])
+//    }"""
+//
+//    TestDataModels(mongo = Vector(s1, s2), sql = Vector(s1, s2))
+//  }
+
+  val schemaP1reqToC1req = {
     val s1 = """
-    model Parent {
-        id            String    @id @default(cuid())
-        p             String    @unique
-        p_1           String?
-        p_2           String?
-        childReq      Child     @relation(references: [id])
-        non_unique    String?
+    """
 
-        @@unique([p_1, p_2])
-    }
-
-    model Child {
-        id            String    @id @default(cuid())
-        c             String    @unique
-        c_1           String?
-        c_2           String?
-        parentReq     Parent
-        non_unique    String?
-
-        @@unique([c_1, c_2])
-    }"""
-
-    val s2 = """
-    model Parent {
-        id            String    @id @default(cuid())
-        p             String    @unique
-        p_1           String?
-        p_2           String?
-        childReq      Child
-        non_unique    String?
-
-        @@unique([p_1, p_2])
-    }
-
-    model Child {
-        id            String    @id @default(cuid())
-        c             String    @unique
-        c_1           String?
-        c_2           String?
-        parentReq     Parent    @relation(references: [id])
-        non_unique    String?
-
-        @@unique([c_1, c_2])
-    }"""
-
-    TestDataModels(mongo = Vector(s1, s2), sql = Vector(s1, s2))
+    TestDataModels(mongo = Vector(s1), sql = Vector(s1))
   }
-
-  val schemaP1reqToC1reqWithCompoundId = {
-    val s1 = """
-    model Parent {
-        id_1          String    @default(cuid())
-        id_2          String    @default(cuid())
-        p             String    @unique
-        p_1           String?
-        p_2           String?
-        childReq      Child     @relation(references: [id_2, id_2]) @map("child_id_1", "child_id_2")
-        non_unique    String?
-
-        @@id([id_1, id_2])
-        @@unique([p_1, p_2])
-    }
-
-    model Child {
-        id_1          String    @default(cuid())
-        id_2          String    @default(cuid())
-        c             String    @unique
-        c_1           String?
-        c_2           String?
-        parentReq     Parent
-        non_unique    String?
-
-        @@id([id_1, id_2])
-        @@unique([c_1, c_2])
-    }"""
-
-    val s2 = """
-     model Parent {
-        id_1          String    @default(cuid())
-        id_2          String    @default(cuid())
-        p             String    @unique
-        p_1           String?
-        p_2           String?
-        childReq      Child
-        non_unique    String?
-
-        @@id([id_1, id_2])
-        @@unique([p_1, p_2])
-    }
-
-    model Child {
-        id_1          String    @default(cuid())
-        id_2          String    @default(cuid())
-        c             String    @unique
-        c_1           String?
-        c_2           String?
-        parentReq     Parent    @relation(references: [id_2, id_2]) @map("parent_id_1", "parent_id_2")
-        non_unique    String?
-
-        @@id([id_1, id_2])
-        @@unique([c_1, c_2])
-    }"""
-
-    TestDataModels(mongo = Vector(s1, s2), sql = Vector(s1, s2))
-  }
-
-  val schemaP1reqToC1reqWithoutId = {
-    val s1 = """
-    model Parent {
-        p             String    @unique
-        p_1           String?
-        p_2           String?
-        childReq      Child     @relation(references: [c])
-        non_unique    String?
-
-        @@unique([p_1, p_2])
-    }
-
-    model Child {
-        c             String    @unique
-        c_1           String?
-        c_2           String?
-        parentReq     Parent
-        non_unique    String?
-
-        @@unique([c_1, c_2])
-    }"""
-
-    val s2 = """
-    model Parent {
-        p             String    @unique
-        p_1           String?
-        p_2           String?
-        childReq      Child
-        non_unique    String?
-
-        @@unique([p_1, p_2])
-    }
-
-    model Child {
-        c             String    @unique
-        c_1           String?
-        c_2           String?
-        parentReq     Parent    @relation(references: [p_1, p_2]) @map(["parent_p_1", "parent_p_2"])
-        non_unique    String?
-
-        @@unique([c_1, c_2])
-    }"""
-
-    TestDataModels(mongo = Vector(s1, s2), sql = Vector(s1, s2))
-  }
-
-
-  // todo
 
   val schemaP1optToC1req = {
     val s1 = """
@@ -663,4 +590,3 @@ trait SchemaBaseV11 {
 
   //endregion
 }
-
