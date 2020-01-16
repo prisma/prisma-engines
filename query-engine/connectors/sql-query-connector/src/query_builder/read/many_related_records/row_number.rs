@@ -2,15 +2,17 @@ use super::*;
 
 pub struct ManyRelatedRecordsWithRowNumber;
 
-use crate::{query_builder::read, ordering::Ordering};
+use crate::{query_builder, ordering::Ordering};
 use prisma_models::{SelectedFields, sql_ext::AsColumn};
 use quaint::ast::*;
 
 impl ManyRelatedRecordsQueryBuilder for ManyRelatedRecordsWithRowNumber {
     fn with_pagination(base: ManyRelatedRecordsBaseQuery) -> Query {
-        let conditions = read::relation_in_selection(base.from_field, base.from_record_ids)
-                .and(base.condition)
-                .and(base.cursor);
+        let columns: Vec<_> = base.from_field.relation_columns(true).collect();
+
+        let conditions = query_builder::conditions(&columns, base.from_record_ids)
+            .and(base.condition)
+            .and(base.cursor);
 
         let mut base_query = base.query.so_that(conditions);
 

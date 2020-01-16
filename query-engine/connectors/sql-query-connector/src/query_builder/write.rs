@@ -3,8 +3,6 @@ use quaint::ast::*;
 use connector_interface::{WriteArgs, FieldValueContainer};
 use crate::error::SqlError;
 
-const PARAMETER_LIMIT: usize = 10000;
-
 pub fn create_record(model: &ModelRef, mut args: WriteArgs) -> (Insert<'static>, Option<RecordIdentifier>) {
     let return_id = args.as_record_identifier(model.identifier());
 
@@ -33,57 +31,27 @@ pub fn delete_relation_table_records(
     field: &RelationFieldRef,
     parent_ids: &RecordIdentifier,
     child_ids: &[RecordIdentifier],
-) -> Query<'static> {
+) -> Delete<'static> {
+    let columns: Vec<_> = field.opposite_columns(false).collect();
+
     let relation = field.relation();
     let parent_columns: Vec<Column<'static>> = field.relation_columns(false).collect();
 
     let parent_ids: Vec<PrismaValue> = parent_ids.values().collect();
     let parent_id_criteria = Row::from(parent_columns).equals(parent_ids);
 
-    let child_id_criteria = child_ids
-        .into_iter()
-        .map(|ids| {
-            let cols_with_vals = field.opposite_columns(false).zip(ids.values());
-
-            cols_with_vals.fold(ConditionTree::NoCondition, |acc, (col, val)| {
-                match acc {
-                    ConditionTree::NoCondition => col.equals(val).into(),
-                    cond => cond.and(col.equals(val))
-                }
-            })
-        }).fold(ConditionTree::NoCondition, |acc, cond| {
-            match acc {
-                ConditionTree::NoCondition => cond,
-                acc => acc.or(cond),
-            }
-        });
-
+    let child_id_criteria = super::conditions(&columns, child_ids);
 
     Delete::from_table(relation.as_table())
         .so_that(parent_id_criteria.and(child_id_criteria))
-        .into()
 }
 
-pub fn delete_many(model: &ModelRef, ids: &[&RecordIdentifier]) -> Vec<Delete<'static>> {
-    ids.chunks(PARAMETER_LIMIT).map(|chunk| {
-        let condition = chunk.into_iter().map(|ids| {
-            let cols_with_vals = model.identifier().as_columns().zip(ids.values());
+pub fn delete_many(model: &ModelRef, ids: &[&RecordIdentifier]) -> Vec<Query<'static>> {
+    let columns: Vec<_> = model.identifier().as_columns().collect();
 
-            cols_with_vals.fold(ConditionTree::NoCondition, |acc, (col, val)| {
-                match acc {
-                    ConditionTree::NoCondition => col.equals(val).into(),
-                    cond => cond.and(col.equals(val)),
-                }
-            })
-        }).fold(ConditionTree::NoCondition, |acc, cond| {
-            match acc {
-                ConditionTree::NoCondition => cond,
-                acc => acc.or(cond),
-            }
-        });
-
-        Delete::from_table(model.as_table()).so_that(condition)
-    }).collect()
+    super::chunked_conditions(&columns, ids, |conditions| {
+        Delete::from_table(model.as_table()).so_that(conditions)
+    })
 }
 
 pub fn create_relation_table_records(
@@ -109,7 +77,7 @@ pub fn create_relation_table_records(
     insert.build().on_conflict(OnConflict::DoNothing).into()
 }
 
-pub fn update_many(model: &ModelRef, ids: &[&RecordIdentifier], args: &WriteArgs) -> crate::Result<Vec<Update<'static>>> {
+pub fn update_many(model: &ModelRef, ids: &[&RecordIdentifier], args: &WriteArgs) -> crate::Result<Vec<Query<'static>>> {
     if args.args.is_empty() || ids.is_empty() {
         return Ok(Vec::new());
     }
@@ -134,31 +102,10 @@ pub fn update_many(model: &ModelRef, ids: &[&RecordIdentifier], args: &WriteArgs
         }
     }
 
-    let result: Vec<Update> = ids
-        .chunks(PARAMETER_LIMIT)
-        .into_iter()
-        .map(|chunk| {
-            let condition = chunk.into_iter().map(|ids| {
-                let cols_with_vals = model.identifier().as_columns().zip(ids.values());
-
-                cols_with_vals.fold(ConditionTree::NoCondition, |acc, (col, val)| {
-                    match acc {
-                        ConditionTree::NoCondition => col.equals(val).into(),
-                        cond => cond.and(col.equals(val)),
-                    }
-                })
-            }).fold(ConditionTree::NoCondition, |acc, cond| {
-                match acc {
-                    ConditionTree::NoCondition => cond,
-                    acc => acc.or(cond),
-                }
-            });
-
-            query
-                .clone()
-                .so_that(condition)
-        })
-        .collect();
+    let columns: Vec<_> = model.identifier().as_columns().collect();
+    let result: Vec<Query> = super::chunked_conditions(&columns, ids, |conditions| {
+        query.clone().so_that(conditions)
+    });
 
     Ok(result)
 }

@@ -74,7 +74,7 @@ pub async fn update_records(
     };
 
     for update in updates {
-        conn.update(update).await?;
+        conn.query(update).await?;
     }
 
     Ok(ids)
@@ -90,7 +90,7 @@ pub async fn delete_records(conn: &dyn QueryExt, model: &ModelRef, where_: Filte
     }
 
     for delete in write::delete_many(model, ids.as_slice()) {
-        conn.delete(delete).await?;
+        conn.query(delete).await?;
     }
 
     Ok(count)
@@ -115,7 +115,7 @@ pub async fn disconnect(
     child_ids: &[RecordIdentifier],
 ) -> crate::Result<()> {
     let query = write::delete_relation_table_records(field, parent_id, child_ids);
-    conn.query(query).await?;
+    conn.delete(query).await?;
 
     Ok(())
 }

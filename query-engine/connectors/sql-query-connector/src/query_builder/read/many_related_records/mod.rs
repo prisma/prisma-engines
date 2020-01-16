@@ -7,7 +7,7 @@ pub use row_number::*;
 pub use union_all::*;
 
 use quaint::ast::{Query, Conjuctive};
-use crate::{query_builder::read, ordering::Ordering};
+use crate::{query_builder, ordering::Ordering};
 use prisma_models::sql_ext::RelationFieldExt;
 
 pub trait ManyRelatedRecordsQueryBuilder {
@@ -18,7 +18,9 @@ pub trait ManyRelatedRecordsQueryBuilder {
     fn with_pagination<'a>(base: ManyRelatedRecordsBaseQuery<'a>) -> Query;
 
     fn without_pagination<'a>(base: ManyRelatedRecordsBaseQuery<'a>) -> Query {
-        let conditions = read::relation_in_selection(base.from_field, base.from_record_ids)
+        let columns: Vec<_> = base.from_field.relation_columns(true).collect();
+
+        let conditions = query_builder::conditions(&columns, base.from_record_ids)
             .and(base.condition)
             .and(base.cursor);
 
