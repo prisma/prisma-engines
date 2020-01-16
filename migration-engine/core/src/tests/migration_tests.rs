@@ -1490,7 +1490,8 @@ async fn calculate_database_steps_with_infer_after_an_apply_must_work(api: &Test
     "#;
 
     let infer_input = InferMigrationStepsInput {
-        assume_to_be_applied: Vec::new(),
+        assume_to_be_applied: Some(Vec::new()),
+        assume_applied_migrations: None,
         datamodel: dm1.to_owned(),
         migration_id: "mig02".to_owned(),
     };
@@ -1513,7 +1514,8 @@ async fn calculate_database_steps_with_infer_after_an_apply_must_work(api: &Test
     "#;
 
     let infer_input = InferMigrationStepsInput {
-        assume_to_be_applied: Vec::new(),
+        assume_to_be_applied: Some(Vec::new()),
+        assume_applied_migrations: None,
         datamodel: dm2.to_owned(),
         migration_id: "mig02".to_owned(),
     };

@@ -123,12 +123,7 @@ impl TestApi {
     }
 
     pub fn infer<'a>(&'a self, dm: impl Into<String>) -> Infer<'a> {
-        Infer {
-            datamodel: dm.into(),
-            api: &self.api,
-            assume_to_be_applied: None,
-            migration_id: None,
-        }
+        Infer::new(&self.api, dm)
     }
 
     pub(crate) fn apply<'a>(&'a self) -> Apply<'a> {
