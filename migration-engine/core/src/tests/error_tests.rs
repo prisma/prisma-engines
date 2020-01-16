@@ -383,7 +383,8 @@ async fn unique_constraint_errors_in_migrations_must_return_a_known_error(api: &
     "#;
 
     let infer_migration_steps_input = InferMigrationStepsInput {
-        assume_to_be_applied: vec![],
+        assume_to_be_applied: Some(vec![]),
+        assume_applied_migrations: None,
         datamodel: dm2.to_owned(),
         migration_id: "the-migration".to_owned(),
     };

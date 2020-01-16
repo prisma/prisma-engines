@@ -1490,7 +1490,8 @@ async fn calculate_database_steps_with_infer_after_an_apply_must_work(api: &Test
     "#;
 
     let infer_input = InferMigrationStepsInput {
-        assume_to_be_applied: Vec::new(),
+        assume_to_be_applied: Some(Vec::new()),
+        assume_applied_migrations: None,
         datamodel: dm1.to_owned(),
         migration_id: "mig02".to_owned(),
     };
@@ -1513,7 +1514,8 @@ async fn calculate_database_steps_with_infer_after_an_apply_must_work(api: &Test
     "#;
 
     let infer_input = InferMigrationStepsInput {
-        assume_to_be_applied: Vec::new(),
+        assume_to_be_applied: Some(Vec::new()),
+        assume_applied_migrations: None,
         datamodel: dm2.to_owned(),
         migration_id: "mig02".to_owned(),
     };
@@ -2046,6 +2048,42 @@ async fn join_tables_between_models_with_mapped_compound_primary_keys_must_work(
             fk.assert_references("Human", &["the_first_name", "the_last_name"])
         })?
         .assert_fk_on_columns(&["A"], |fk| fk.assert_references("Cat", &["id"]))?;
+
+    Ok(())
+}
+
+#[test_each_connector]
+async fn switching_databases_must_work(api: &TestApi) -> TestResult {
+    let dm1 = r#"
+        datasource db {
+            provider = "sqlite"
+            url = "file:dev.db"
+        }
+
+        model Test {
+            id String @id
+            name String
+        }
+    "#;
+
+    api.infer_apply(dm1).send().await?;
+
+    // Drop the existing migrations.
+    api.migration_persistence().reset().await?;
+
+    let dm2 = r#"
+        datasource db {
+            provider = "sqlite"
+            url = "file:hiya.db"
+        }
+
+        model Test {
+            id String @id
+            name String
+        }
+    "#;
+
+    api.infer_apply(dm2).send().await?;
 
     Ok(())
 }
