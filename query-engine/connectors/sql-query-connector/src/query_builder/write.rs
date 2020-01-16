@@ -1,11 +1,11 @@
 use prisma_models::*;
 use quaint::ast::*;
 use connector_interface::{WriteArgs, FieldValueContainer};
-use crate::error::SqlError;
 
 pub fn create_record(model: &ModelRef, mut args: WriteArgs) -> (Insert<'static>, Option<RecordIdentifier>) {
-    todo!()
-    /*
+    use FieldValueContainer::*;
+    use Field::*;
+
     let return_id = args.as_record_identifier(model.identifier());
 
     let fields: Vec<_> = model
@@ -17,35 +17,36 @@ pub fn create_record(model: &ModelRef, mut args: WriteArgs) -> (Insert<'static>,
 
     let insert = fields
         .into_iter()
-        .fold(Insert::single_into(model.as_table()), |insert, field| match (field, args.take_field_value(field.name())) {
-            (Single(value), Scalar(sf)) => {
-                insert.value(sf.db_name().to_string(), value.clone())
-            }
-            (Single(value), Relation(rf)) if rf.data_source_fields.len() == 1 => {
-                insert.value(rf.db_name().to_string(), value.clone())
-            }
-            (Compound(values), Relation(rf)) if values.len() == rf.data_source_fields.len() => {
-                for (field, value) in rf.data_source_fields.iter().zip(values) {
-                    query = query.set(field.name.clone(), value.clone());
+        .fold(Insert::single_into(model.as_table()), |mut insert, field| {
+            match (args.take_field_value(field.name()), field) {
+                (Some(Single(ref value)), Scalar(sf)) => {
+                    insert.value(sf.db_name().to_string(), value.clone())
                 }
+                (Some(Single(ref value)), Relation(rf)) if rf.data_source_fields.len() == 1 => {
+                    let name = rf.data_source_fields.first().unwrap().name.clone();
+                    insert.value(name, value.clone())
+                }
+                (Some(Compound(ref values)), Relation(rf)) if values.len() == rf.data_source_fields.len() => {
+                    for (field, value) in rf.data_source_fields.iter().zip(values) {
+                        insert = insert.value(field.name.clone(), value.clone())
+                    }
+
+                    insert
+                }
+                (_, Relation(_)) => {
+                    panic!("Mismatch between the length of columns and values.")
+                }
+                (Some(Compound(_)), Scalar(_)) => {
+                    panic!("Cannot use a compound value container for a scalar field.")
+                }
+                _ => insert
             }
-            (_, Relation(rf)) => {
-                panic!("Mismatch between the length of columns and values.")
-            }
-            (Compound(_), Scalar(sf)) => {
-                panic!("Cannot use a compound value container for a scalar field.")
-            }
-        })
-        .fold(Insert::single_into(model.as_table()), |insert, (name, value)| match value {
-            FieldValueContainer::Single(val) => insert.value(name.into_owned(), val),
-            FieldValueContainer::Compound(_) => todo!("Compound schwompound"),
         });
 
     (
         Insert::from(insert).returning(model.identifier().as_columns()),
         return_id,
     )
-    */
 }
 
 pub fn delete_relation_table_records(
@@ -125,10 +126,10 @@ pub fn update_many(model: &ModelRef, ids: &[&RecordIdentifier], args: &WriteArgs
                     query = query.set(field.name.clone(), value.clone());
                 }
             }
-            (_, Relation(rf)) => {
+            (_, Relation(_)) => {
                 panic!("Mismatch between the length of columns and values.")
             }
-            (Compound(_), Scalar(sf)) => {
+            (Compound(_), Scalar(_)) => {
                 panic!("Cannot use a compound value container for a scalar field.")
             }
         }
