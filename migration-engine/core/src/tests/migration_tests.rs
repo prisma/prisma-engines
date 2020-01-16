@@ -2049,3 +2049,39 @@ async fn join_tables_between_models_with_mapped_compound_primary_keys_must_work(
 
     Ok(())
 }
+
+#[test_each_connector]
+async fn switching_databases_must_work(api: &TestApi) -> TestResult {
+    let dm1 = r#"
+        datasource db {
+            provider = "sqlite"
+            url = "file:dev.db"
+        }
+
+        model Test {
+            id String @id
+            name String
+        }
+    "#;
+
+    api.infer_apply(dm1).send().await?;
+
+    // Drop the existing migrations.
+    api.migration_persistence().reset().await?;
+
+    let dm2 = r#"
+        datasource db {
+            provider = "sqlite"
+            url = "file:hiya.db"
+        }
+
+        model Test {
+            id String @id
+            name String
+        }
+    "#;
+
+    api.infer_apply(dm2).send().await?;
+
+    Ok(())
+}

@@ -33,3 +33,10 @@ pub(crate) trait Component {
         self.connection_info().sql_family()
     }
 }
+
+#[async_trait::async_trait]
+impl Component for SqlMigrationConnector {
+    fn connector(&self) -> &SqlMigrationConnector {
+        self
+    }
+}

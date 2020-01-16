@@ -169,6 +169,47 @@ impl SqlMigrationConnector {
     fn connection_info(&self) -> &ConnectionInfo {
         &self.database_info.connection_info
     }
+
+    async fn drop_database(&self) -> ConnectorResult<()> {
+        use quaint::ast::ParameterizedValue;
+
+        catch(self.connection_info(), async {
+            match &self.connection_info() {
+                ConnectionInfo::Postgres(_) => {
+                    let sql_str = format!(r#"DROP SCHEMA "{}" CASCADE;"#, self.schema_name());
+                    debug!("{}", sql_str);
+
+                    self.conn().query_raw(&sql_str, &[]).await.ok();
+                }
+                ConnectionInfo::Sqlite { file_path, .. } => {
+                    self.conn()
+                        .execute_raw("DETACH DATABASE ?", &[ParameterizedValue::from(self.schema_name())])
+                        .await
+                        .ok();
+                    std::fs::remove_file(file_path).ok(); // ignore potential errors
+                    self.conn()
+                        .execute_raw(
+                            "ATTACH DATABASE ? AS ?",
+                            &[
+                                ParameterizedValue::from(file_path.as_str()),
+                                ParameterizedValue::from(self.schema_name()),
+                            ],
+                        )
+                        .await?;
+                }
+                ConnectionInfo::Mysql(_) => {
+                    let sql_str = format!(r#"DROP SCHEMA `{}`;"#, self.schema_name());
+                    debug!("{}", sql_str);
+                    self.conn().query_raw(&sql_str, &[]).await?;
+                }
+            };
+
+            Ok(())
+        })
+        .await?;
+
+        Ok(())
+    }
 }
 
 #[async_trait::async_trait]
@@ -193,6 +234,8 @@ impl MigrationConnector for SqlMigrationConnector {
 
     async fn reset(&self) -> ConnectorResult<()> {
         self.migration_persistence().reset().await?;
+        self.drop_database().await?;
+
         Ok(())
     }
 
