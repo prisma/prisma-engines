@@ -169,6 +169,29 @@ impl<'a> ColumnAssertion<'a> {
 
         Ok(self)
     }
+
+    pub fn assert_type_is_string(self) -> AssertionResult<Self> {
+        let found = &self.0.tpe.family;
+
+        anyhow::ensure!(
+            found == &sql_schema_describer::ColumnTypeFamily::String,
+            "Assertion failed. Expected a string column, got {:?}.",
+            found
+        );
+
+        Ok(self)
+    }
+
+    pub fn assert_is_required(self) -> AssertionResult<Self> {
+        anyhow::ensure!(
+            self.0.tpe.arity.is_required(),
+            "Assertion failed. Expected column `{}` to be NOT NULL, got {:?}",
+            self.0.name,
+            self.0.tpe.arity,
+        );
+
+        Ok(self)
+    }
 }
 
 pub struct PrimaryKeyAssertion<'a>(&'a PrimaryKey);

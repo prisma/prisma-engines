@@ -570,3 +570,35 @@ async fn string_columns_do_not_get_arbitrarily_migrated(api: &TestApi) -> TestRe
 
     Ok(())
 }
+
+#[test_each_connector]
+async fn altering_the_type_of_a_column_in_an_empty_table_should_not_warn(api: &TestApi) -> TestResult {
+    let dm1 = r#"
+        model User {
+            id String @id @default(cuid())
+            name String
+            dogs Int?
+        }
+    "#;
+
+    api.infer_apply(dm1).send().await?;
+
+    let dm2 = r#"
+        model User {
+            id String @id @default(cuid())
+            name String
+            dogs String
+        }
+    "#;
+
+    let response = api.infer_apply(dm2).send().await?;
+
+    assert!(response.warnings.is_empty());
+
+    api.assert_schema()
+        .await?
+        .assert_table("User", |table| {
+            table.assert_column("dogs", |col| col.assert_type_is_string()?.assert_is_required())
+        })
+        .map(drop)
+}
