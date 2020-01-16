@@ -1,35 +1,37 @@
 use super::super::test_harness::*;
 
-#[test_each_connector(log = "debug")]
-async fn index_on_compound_relation_fields_must_work(api: &TestApi) -> TestResult {
-    let dm = r#"
-        model User {
-            id String @id
-            email String
-            name String
+// Blocked on https://github.com/prisma/prisma-engine/pull/341
+//
+// #[test_each_connector]
+// async fn index_on_compound_relation_fields_must_work(api: &TestApi) -> TestResult {
+//     let dm = r#"
+//         model User {
+//             id String @id
+//             email String
+//             name String
 
-            @@unique([email, name])
-        }
+//             @@unique([email, name])
+//         }
 
-        model Post {
-            id String @id
-            author User @relation(references: [email, name])
+//         model Post {
+//             id String @id
+//             author User @relation(references: [email, name])
 
-            @@index([author])
-        }
-    "#;
+//             @@index([author])
+//         }
+//     "#;
 
-    api.infer_apply(dm).send().await?;
+//     api.infer_apply(dm).send().await?;
 
-    api.assert_schema()
-        .await?
-        .assert_table("Post", |table| {
-            table
-                .assert_has_column("username")?
-                .assert_index_on_columns(&["a", "b"], |idx| Ok(idx))
-        })
-        .map(drop)
-}
+//     api.assert_schema()
+//         .await?
+//         .assert_table("Post", |table| {
+//             table
+//                 .assert_has_column("username")?
+//                 .assert_index_on_columns(&["a", "b"], |idx| Ok(idx))
+//         })
+//         .map(drop)
+// }
 
 #[test_each_connector]
 async fn index_settings_must_be_migrated(api: &TestApi) -> TestResult {
