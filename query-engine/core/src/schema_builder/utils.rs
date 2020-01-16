@@ -133,11 +133,17 @@ pub fn append_opt<T>(vec: &mut Vec<T>, opt: Option<T>) {
 }
 
 /// Computes a compound field name based on an index.
-pub fn compound_field_name(index: &Index) -> String {
+pub fn compound_index_field_name(index: &Index) -> String {
     index.name.clone().unwrap_or_else(|| {
         let index_fields = index.fields();
         let field_names: Vec<&str> = index_fields.iter().map(|sf| sf.name.as_ref()).collect();
 
         field_names.join("_")
     })
+}
+
+/// Computes a compound field name based on a multi-field id.
+pub fn compound_id_field_name(field_names: &[&str]) -> String {
+    // Extremely sophisticated.
+    field_names.join("_")
 }

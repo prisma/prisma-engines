@@ -1,6 +1,6 @@
+use super::utils;
 use crate::{
     query_document::{ParsedInputMap, ParsedInputValue},
-    schema_builder::compound_field_name,
     QueryGraphBuilderError, QueryGraphBuilderResult,
 };
 use connector::{filter::Filter, RelationCompare, ScalarCompare};
@@ -138,7 +138,7 @@ pub fn extract_filter(
                             Field::Scalar(field) => handle_scalar_field(field, value, &op),
                             Field::Relation(field) => handle_relation_field(field, value, &op, match_suffix),
                         },
-                        Err(_) => find_index_fields(&field_name, &model)
+                        Err(_) => utils::find_index_fields(&field_name, &model)
                             .and_then(|fields| handle_compound_field(fields, value))
                             .map_err(|_| {
                                 QueryGraphBuilderError::AssertionError(format!(
@@ -218,17 +218,4 @@ fn handle_compound_field(fields: Vec<ScalarFieldRef>, value: ParsedInputValue) -
         .collect::<QueryGraphBuilderResult<Vec<_>>>()?;
 
     Ok(Filter::And(filters))
-}
-
-/// Attempts to match a given name to the (schema) name of a compound indexes on the model and returns the first match.
-fn find_index_fields(name: &str, model: &ModelRef) -> QueryGraphBuilderResult<Vec<ScalarFieldRef>> {
-    model
-        .unique_indexes()
-        .into_iter()
-        .find(|index| &compound_field_name(index) == name)
-        .map(|index| index.fields())
-        .ok_or(QueryGraphBuilderError::AssertionError(format!(
-            "Unable to resolve {} to an index on model {}",
-            name, model.name
-        )))
 }

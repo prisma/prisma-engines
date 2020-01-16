@@ -4,15 +4,13 @@ use crate::{
     QueryGraphBuilderResult,
 };
 use connector::QueryArguments;
-use prisma_models::ModelRef;
+use prisma_models::{ModelRef, PrismaValue, ScalarFieldRef};
 use std::convert::TryInto;
 
 /// Expects the caller to know that it is structurally guaranteed that query arguments can be extracted,
 /// e.g. that the query schema guarantees that required fields are present.
 /// Errors occur if conversions fail unexpectedly.
 pub fn extract_query_args(arguments: Vec<ParsedArgument>, model: &ModelRef) -> QueryGraphBuilderResult<QueryArguments> {
-    let model_id = model.identifier();
-
     arguments
         .into_iter()
         .fold(Ok(QueryArguments::default()), |result, arg| {
@@ -34,12 +32,12 @@ pub fn extract_query_args(arguments: Vec<ParsedArgument>, model: &ModelRef) -> Q
                     }),
 
                     "after" => Ok(QueryArguments {
-                        after: todo!(),
+                        after: extract_cursor(arg.value, model)?,
                         ..res
                     }),
 
                     "before" => Ok(QueryArguments {
-                        before: todo!(),
+                        before: extract_cursor(arg.value, model)?,
                         ..res
                     }),
 
@@ -65,4 +63,18 @@ pub fn extract_query_args(arguments: Vec<ParsedArgument>, model: &ModelRef) -> Q
                 result
             }
         })
+}
+
+fn extract_cursor(
+    value: ParsedInputValue,
+    model: &ModelRef,
+) -> QueryGraphBuilderResult<Option<Vec<(ScalarFieldRef, PrismaValue)>>> {
+    let map: ParsedInputMap = value.try_into()?;
+
+    map.assert_size(1)?;
+    // let (field_name,) = map.into_iter().nth(0).unwrap();
+
+    // model.fields().find_from_all(&field_name)
+
+    todo!()
 }
