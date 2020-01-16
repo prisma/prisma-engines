@@ -135,7 +135,7 @@ fn render_raw_sql(
     use itertools::Itertools;
 
     let sql_family = renderer.sql_family();
-    let schema_name = database_info.connection_info.schema_name().to_string();
+    let schema_name = database_info.connection_info().schema_name().to_string();
 
     match step {
         SqlMigrationStep::CreateTable(CreateTable { table }) => {
@@ -355,14 +355,14 @@ fn render_create_index(
         IndexType::Unique => "UNIQUE",
         IndexType::Normal => "",
     };
-    let sql_family = database_info.connection_info.sql_family();
+    let sql_family = database_info.sql_family();
     let index_name = match sql_family {
-        SqlFamily::Sqlite => renderer.quote_with_schema(database_info.connection_info.schema_name(), &name),
+        SqlFamily::Sqlite => renderer.quote_with_schema(database_info.connection_info().schema_name(), &name),
         _ => renderer.quote(&name),
     };
     let table_reference = match sql_family {
         SqlFamily::Sqlite => renderer.quote(table_name),
-        _ => renderer.quote_with_schema(database_info.connection_info.schema_name(), table_name),
+        _ => renderer.quote_with_schema(database_info.connection_info().schema_name(), table_name),
     };
     let columns: Vec<String> = columns.iter().map(|c| renderer.quote(c)).collect();
 
