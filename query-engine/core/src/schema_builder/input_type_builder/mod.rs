@@ -75,7 +75,7 @@ pub trait InputTypeBuilderBase<'a>: CachedBuilder<InputObjectType> + InputBuilde
     where
         T: Into<String>,
     {
-        let input_type = self.where_unique_object_type(field.related_model());
+        let input_type = self.where_unique_object_type(&field.related_model());
         let input_type = Self::wrap_list_input_object_type(input_type, field.is_list);
 
         input_field(name.into(), input_type, None)
@@ -90,7 +90,7 @@ pub trait InputTypeBuilderBase<'a>: CachedBuilder<InputObjectType> + InputBuilde
         }
     }
 
-    fn where_unique_object_type(&self, model: ModelRef) -> InputObjectTypeRef {
+    fn where_unique_object_type(&self, model: &ModelRef) -> InputObjectTypeRef {
         let name = format!("{}WhereUniqueInput", model.name);
         return_cached!(self.get_cache(), &name);
 

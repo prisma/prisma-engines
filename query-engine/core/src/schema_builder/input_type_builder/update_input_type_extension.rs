@@ -145,7 +145,7 @@ pub trait UpdateInputTypeBuilderExtension<'a>: InputTypeBuilderBase<'a> + Create
         update_object: InputObjectTypeRef,
     ) -> Option<InputObjectTypeRef> {
         let related_model = parent_field.related_model();
-        let where_object = self.where_unique_object_type(Arc::clone(&related_model));
+        let where_object = self.where_unique_object_type(&related_model);
         let create_object = self.create_input_type(Arc::clone(&related_model), Some(Arc::clone(&parent_field)));
 
         if where_object.into_arc().is_empty() || create_object.into_arc().is_empty() {
@@ -313,7 +313,7 @@ pub trait UpdateInputTypeBuilderExtension<'a>: InputTypeBuilderBase<'a> + Create
         let nested_input_object = self.nested_update_data(Arc::clone(&parent_field));
 
         if parent_field.is_list {
-            let where_input_object = self.where_unique_object_type(Arc::clone(&related_model));
+            let where_input_object = self.where_unique_object_type(&related_model);
             let type_name = if parent_field.related_field().is_hidden {
                 format!("{}UpdateWithWhereUniqueNestedInput", related_model.name.clone())
             } else {
