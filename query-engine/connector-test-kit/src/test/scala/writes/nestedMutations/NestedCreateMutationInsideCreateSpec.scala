@@ -10,8 +10,10 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
   override def runOnlyForCapabilities = Set(JoinRelationLinksCapability)
 
   "a P1! to C1! relation should be possible" in {
-    schemaP1reqToC1req.test { dataModel =>
-      val project = SchemaDsl.fromStringV11() { dataModel }
+    schemaWithRelation(onParent = ChildReq, onChild = ParentReq).test { t =>
+      val project = SchemaDsl.fromStringV11() {
+        t.datamodel
+      }
       database.setup(project)
 
       val res = server
@@ -39,8 +41,10 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
   }
 
   "a P1! to C1 relation should work" in {
-    schemaP1reqToC1opt.test { dataModel =>
-      val project = SchemaDsl.fromStringV11() { dataModel }
+    schemaWithRelation(onParent = ChildReq, onChild = ParentOpt).test { t =>
+      val project = SchemaDsl.fromStringV11() {
+        t.datamodel
+      }
       database.setup(project)
 
       val child1Id = server
@@ -66,8 +70,10 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
   }
 
   "a P1 to C1 relation should work" in {
-    schemaP1optToC1opt.test { dataModel =>
-      val project = SchemaDsl.fromStringV11() { dataModel }
+    schemaWithRelation(onParent = ChildOpt, onChild = ParentOpt).test { t =>
+      val project = SchemaDsl.fromStringV11() {
+        t.datamodel
+      }
       database.setup(project)
 
       val res = server
@@ -94,8 +100,10 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
   }
 
   "a PM to C1! should work" in {
-    schemaPMToC1req.test { dataModel =>
-      val project = SchemaDsl.fromStringV11() { dataModel }
+    schemaWithRelation(onParent = ChildList, onChild = ParentReq).test { t =>
+      val project = SchemaDsl.fromStringV11() {
+        t.datamodel
+      }
       database.setup(project)
 
       val res = server
@@ -122,8 +130,10 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
   }
 
   "a P1 to C1! relation  should work" in {
-    schemaP1optToC1req.test { dataModel =>
-      val project = SchemaDsl.fromStringV11() { dataModel }
+    schemaWithRelation(onParent = ChildOpt, onChild = ParentReq).test { t =>
+      val project = SchemaDsl.fromStringV11() {
+        t.datamodel
+      }
       database.setup(project)
 
       val res = server
@@ -150,8 +160,10 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
   }
 
   "a PM to C1 relation should work" in {
-    schemaPMToC1opt.test { dataModel =>
-      val project = SchemaDsl.fromStringV11() { dataModel }
+    schemaWithRelation(onParent = ChildList, onChild = ParentOpt).test { t =>
+      val project = SchemaDsl.fromStringV11() {
+        t.datamodel
+      }
       database.setup(project)
 
       val res = server
@@ -178,8 +190,10 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
   }
 
   "a P1! to CM  relation  should work" in {
-    schemaP1reqToCM.test { dataModel =>
-      val project = SchemaDsl.fromStringV11() { dataModel }
+    schemaWithRelation(onParent = ChildReq, onChild = ParentList).test { t =>
+      val project = SchemaDsl.fromStringV11() {
+        t.datamodel
+      }
       database.setup(project)
 
       val res = server
@@ -206,8 +220,10 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
   }
 
   "a P1 to CM relation should work" in {
-    schemaP1optToCM.test { dataModel =>
-      val project = SchemaDsl.fromStringV11() { dataModel }
+    schemaWithRelation(onParent = ChildOpt, onChild = ParentList).test { t =>
+      val project = SchemaDsl.fromStringV11() {
+        t.datamodel
+      }
       database.setup(project)
 
       val res = server
@@ -251,8 +267,10 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
   }
 
   "a PM to CM  relation  should work" in {
-    schemaPMToCM.test { dataModel =>
-      val project = SchemaDsl.fromStringV11() { dataModel }
+    schemaWithRelation(onParent = ChildList, onChild = ParentList).test { t =>
+      val project = SchemaDsl.fromStringV11() {
+        t.datamodel
+      }
       database.setup(project)
 
       val res = server
@@ -277,6 +295,8 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
     // ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(2) }
     }
   }
+
+  // todo other test
 
   "a one to many relation should be creatable through a nested mutation" in {
     val project = SchemaDsl.fromStringV11() {

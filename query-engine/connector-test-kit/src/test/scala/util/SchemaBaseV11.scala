@@ -42,7 +42,6 @@ trait SchemaBaseV11 {
     override def field: String = "childrenOpt  Child[]"
     override def isList: Boolean = true
   }
-
   final case object ParentOpt extends RelationField {
     override def field: String = "parentOpt     Parent?"
   }
@@ -58,10 +57,14 @@ trait SchemaBaseV11 {
 
   def schemaWithRelation(onParent: RelationField, onChild: RelationField) = {
 
-    val datamodelsWithParams = for (parentId <- idOptions;
-                                    childId <- idOptions;
-                                    //based on Id and relation
-                                    childReferences <- parentId match {
+    //todo for testing enable generating simple case, all single ids
+    val simple = true
+
+    val datamodelsWithParams = for (
+                                    parentId <- if (simple) Vector(simpleId) else idOptions;
+                                    childId <- if (simple) Vector(simpleId) else idOptions;
+                                    //based on Id and relation fields
+                                    childReferences <- if (simple) Vector(idReference) else parentId match {
                                                         case _ if onChild.isList && !onParent.isList => Vector(`noRef`)
                                                         case `simpleId`           => idReference +: commonParentReferences
                                                         case `compoundId`         => compoundParentIdReference +: commonParentReferences
@@ -81,12 +84,12 @@ trait SchemaBaseV11 {
                                                          case (_, _)                    => Vector.empty
                                                        };
                                     //only based on id
-                                    parentParams <- parentId match {
+                                    parentParams <- if(simple) Vector(idParams) else parentId match {
                                                      case `simpleId`   => parentUniqueParams :+ idParams
                                                      case `compoundId` => parentUniqueParams :+ compoundIdParams
                                                      case `noId`       => parentUniqueParams
                                                    };
-                                    childParams <- childId match {
+                                    childParams <- if(simple) Vector(idParams) else childId match {
                                                     case `simpleId`   => childUniqueParams :+ idParams
                                                     case `compoundId` => childUniqueParams :+ compoundIdParams
                                                     case `noId`       => parentUniqueParams
@@ -119,63 +122,13 @@ trait SchemaBaseV11 {
 
         TestAbstraction(datamodel, parentParams, childParams)
       }
-
     println(datamodelsWithParams.length)
+
 
     AbstractTestDataModels(mongo = datamodelsWithParams, sql = datamodelsWithParams)
   }
 
   //region NON EMBEDDED WITH @id
-
-//  val schemaP1reqToC1reqWithId = {
-//    val s1 = """
-//    model Parent {
-//        id            String    @id @default(cuid())
-//        p             String    @unique
-//        p_1           String?
-//        p_2           String?
-//        childReq      Child     @relation(references: [id])
-//        non_unique    String?
-//
-//        @@unique([p_1, p_2])
-//    }
-//
-//    model Child {
-//        id            String    @id @default(cuid())
-//        c             String    @unique
-//        c_1           String?
-//        c_2           String?
-//        parentReq     Parent
-//        non_unique    String?
-//
-//        @@unique([c_1, c_2])
-//    }"""
-//
-//    val s2 = """
-//    model Parent {
-//        id            String    @id @default(cuid())
-//        p             String    @unique
-//        p_1           String?
-//        p_2           String?
-//        childReq      Child
-//        non_unique    String?
-//
-//        @@unique([p_1, p_2])
-//    }
-//
-//    model Child {
-//        id            String    @id @default(cuid())
-//        c             String    @unique
-//        c_1           String?
-//        c_2           String?
-//        parentReq     Parent    @relation(references: [id])
-//        non_unique    String?
-//
-//        @@unique([c_1, c_2])
-//    }"""
-//
-//    TestDataModels(mongo = Vector(s1, s2), sql = Vector(s1, s2))
-//  }
 
   val schemaP1reqToC1req = {
     val s1 = """
