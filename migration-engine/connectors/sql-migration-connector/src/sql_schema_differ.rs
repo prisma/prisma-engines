@@ -60,13 +60,6 @@ impl<'schema> SqlSchemaDiffer<'schema> {
         differ.diff_internal()
     }
 
-    fn is_mysql(&self) -> bool {
-        match self.sql_family {
-            SqlFamily::Mysql => true,
-            _ => false,
-        }
-    }
-
     fn diff_internal(&self) -> SqlSchemaDiff {
         let alter_indexes: Vec<_> = self.alter_indexes();
 
@@ -225,12 +218,13 @@ impl<'schema> SqlSchemaDiffer<'schema> {
             for index in tables.dropped_indexes() {
                 // On MySQL, foreign keys automatically create indexes. These foreign-key-created
                 // indexes should only be dropped as part of the foreign key.
-                if !self.is_mysql() || !index::index_covers_fk(&tables.previous, index) {
-                    drop_indexes.push(DropIndex {
-                        table: tables.previous.name.clone(),
-                        name: index.name.clone(),
-                    })
+                if self.sql_family.is_mysql() && index::index_covers_fk(&tables.previous, index) {
+                    continue
                 }
+                drop_indexes.push(DropIndex {
+                    table: tables.previous.name.clone(),
+                    name: index.name.clone(),
+                })
             }
         }
 

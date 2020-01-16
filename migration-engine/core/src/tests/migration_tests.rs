@@ -649,8 +649,8 @@ async fn adding_an_inline_relation_to_a_model_with_an_exotic_id_type(api: &TestA
     );
 }
 
-#[test_each_connector(ignore = "mysql")]
-async fn removing_an_inline_relation_must_work(api: &TestApi) {
+#[test_each_connector]
+async fn removing_an_inline_relation_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
             model A {
                 id Int @id
@@ -674,13 +674,22 @@ async fn removing_an_inline_relation_must_work(api: &TestApi) {
                 id Int @id
             }
         "#;
-    let result = api.infer_and_apply(&dm2).await.sql_schema;
-    let column = result.table_bang("A").column("b");
-    assert_eq!(column.is_some(), false);
+
+    api.infer_apply(dm2).send().await?;
+
+    api.assert_schema()
+        .await?
+        .assert_table("A", |table| {
+            table
+                .assert_foreign_keys_count(0)?
+                .assert_indexes_count(0)?
+                .assert_does_not_have_column("b")
+        })
+        .map(drop)
 }
 
-#[test_each_connector(ignore = "mysql")]
-async fn moving_an_inline_relation_to_the_other_side_must_work(api: &TestApi) {
+#[test_each_connector]
+async fn moving_an_inline_relation_to_the_other_side_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
             model A {
                 id Int @id
@@ -699,7 +708,7 @@ async fn moving_an_inline_relation_to_the_other_side_must_work(api: &TestApi) {
             constraint_name: match api.sql_family() {
                 SqlFamily::Postgres => Some("A_b_fkey".to_owned()),
                 SqlFamily::Sqlite => None,
-                SqlFamily::Mysql => unreachable!(),
+                SqlFamily::Mysql => Some("A_ibfk_1".to_owned()),
             },
             columns: vec!["b".to_string()],
             referenced_table: "B".to_string(),
@@ -726,7 +735,7 @@ async fn moving_an_inline_relation_to_the_other_side_must_work(api: &TestApi) {
             constraint_name: match api.sql_family() {
                 SqlFamily::Postgres => Some("B_a_fkey".to_owned()),
                 SqlFamily::Sqlite => None,
-                SqlFamily::Mysql => unreachable!(),
+                SqlFamily::Mysql => Some("B_ibfk_1".to_owned()),
             },
             columns: vec!["a".to_string()],
             referenced_table: "A".to_string(),
@@ -734,6 +743,12 @@ async fn moving_an_inline_relation_to_the_other_side_must_work(api: &TestApi) {
             on_delete_action: ForeignKeyAction::Restrict,
         }]
     );
+
+    api.assert_schema()
+        .await?
+        .assert_table("B", |table| table.assert_foreign_keys_count(1))?
+        .assert_table("A", |table| table.assert_foreign_keys_count(0)?.assert_indexes_count(0))
+        .map(drop)
 }
 
 #[test_each_connector]
