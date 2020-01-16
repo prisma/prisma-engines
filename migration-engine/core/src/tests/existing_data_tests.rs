@@ -577,7 +577,7 @@ async fn altering_the_type_of_a_column_in_an_empty_table_should_not_warn(api: &T
         model User {
             id String @id @default(cuid())
             name String
-            dogs Int?
+            dogs Int
         }
     "#;
 
@@ -599,6 +599,88 @@ async fn altering_the_type_of_a_column_in_an_empty_table_should_not_warn(api: &T
         .await?
         .assert_table("User", |table| {
             table.assert_column("dogs", |col| col.assert_type_is_string()?.assert_is_required())
+        })
+        .map(drop)
+}
+
+#[test_each_connector]
+async fn making_a_column_required_in_an_empty_table_should_not_warn(api: &TestApi) -> TestResult {
+    let dm1 = r#"
+        model User {
+            id String @id @default(cuid())
+            name String
+            dogs Int?
+        }
+    "#;
+
+    api.infer_apply(dm1).send().await?;
+
+    let dm2 = r#"
+        model User {
+            id String @id @default(cuid())
+            name String
+            dogs Int
+        }
+    "#;
+
+    let response = api.infer_apply(dm2).send().await?;
+
+    assert!(response.warnings.is_empty());
+
+    api.assert_schema()
+        .await?
+        .assert_table("User", |table| {
+            table.assert_column("dogs", |col| col.assert_type_is_int()?.assert_is_required())
+        })
+        .map(drop)
+}
+
+#[test_each_connector]
+async fn altering_the_type_of_a_column_in_a_non_empty_table_always_warns(api: &TestApi) -> TestResult {
+    let dm1 = r#"
+        model User {
+            id String @id @default(cuid())
+            name String
+            dogs Int
+        }
+    "#;
+
+    api.infer_apply(dm1).send().await?;
+
+    let insert = quaint::ast::Insert::single_into(api.render_table_name("User"))
+        .value("id", "abc")
+        .value("name", "Shinzo")
+        .value("dogs", 7);
+
+    api.database().query(insert.into()).await?;
+
+    let dm2 = r#"
+        model User {
+            id String @id @default(cuid())
+            name String
+            dogs String
+        }
+    "#;
+
+    let response = api.infer_apply(dm2).send().await?;
+
+    assert_eq!(
+        response.warnings,
+        &[MigrationWarning {
+            // TODO: the message should say that altering the type of a column is not guaranteed to preserve the data, but the database is going to do its best.
+            // Also think about timeouts.
+            description: "You are about to alter the column `dogs` on the `User` table, which still contains 1 non-null values. The data in that column will be lost.".to_owned()
+        }]
+    );
+
+    let data = api.dump_table("User").await?;
+    assert_eq!(data.len(), 1);
+    assert_eq!(data.get(0).unwrap().get("dogs").unwrap().as_i64().unwrap(), 7);
+
+    api.assert_schema()
+        .await?
+        .assert_table("User", |table| {
+            table.assert_column("dogs", |col| col.assert_type_is_int()?.assert_is_required())
         })
         .map(drop)
 }
