@@ -1598,7 +1598,7 @@ async fn escaped_string_defaults_are_not_arbitrarily_migrated(api: &TestApi) -> 
         .value("contains", "'vitamin C'")
         .value("seasonality", "september");
 
-    api.database().execute(insert.into()).await?;
+    api.database().query(insert.into()).await?;
 
     let output = api.infer_apply(dm1).send().await?;
 
@@ -1663,7 +1663,7 @@ async fn created_at_does_not_get_arbitrarily_migrated(api: &TestApi) -> TestResu
     let schema = api.infer_and_apply(dm1).await.sql_schema;
 
     let insert = Insert::single_into(api.render_table_name("Fruit")).value("name", "banana");
-    api.database().execute(insert.into()).await.unwrap();
+    api.database().query(insert.into()).await.unwrap();
 
     anyhow::ensure!(
         schema

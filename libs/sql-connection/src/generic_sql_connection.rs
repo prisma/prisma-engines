@@ -95,14 +95,14 @@ impl SqlConnection for GenericSqlConnection {
     }
 
     async fn execute_raw<'a>(&self, sql: &str, params: &[ParameterizedValue<'a>]) -> Result<u64, QuaintError> {
-        self.pool.execute_raw(sql, params).await
+        self.pool.query_raw(sql, params).await
     }
 }
 
 impl SyncSqlConnection for GenericSqlConnection {
     fn execute(&self, q: Query<'_>) -> Result<Option<Id>, QuaintError> {
         let conn = self.runtime.block_on(self.pool.check_out())?;
-        self.runtime.block_on(conn.execute(q))
+        self.runtime.block_on(conn.query(q))
     }
 
     fn query(&self, q: Query<'_>) -> Result<ResultSet, QuaintError> {
@@ -117,6 +117,6 @@ impl SyncSqlConnection for GenericSqlConnection {
 
     fn execute_raw(&self, sql: &str, params: &[ParameterizedValue<'_>]) -> Result<u64, QuaintError> {
         let conn = self.runtime.block_on(self.pool.check_out())?;
-        self.runtime.block_on(conn.execute_raw(sql, params))
+        self.runtime.block_on(conn.query_raw(sql, params))
     }
 }

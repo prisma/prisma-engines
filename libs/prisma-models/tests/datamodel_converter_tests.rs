@@ -116,7 +116,7 @@ fn db_names_work() {
     assert_eq!(
         field.data_source_field,
         DataSourceField {
-            name: Some("my_column".to_string()),
+            name: "my_column".to_string(),
             default_value: None,
         }
     )

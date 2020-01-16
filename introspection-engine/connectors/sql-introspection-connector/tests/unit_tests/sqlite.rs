@@ -24,7 +24,7 @@ async fn introspecting_a_simple_table_with_gql_types_must_work(api: &TestApi) {
                 date    DateTime
                 float   Float
                 id      Int @id
-                int     Int 
+                int     Int
                 string  String
             }
         "#;
@@ -69,7 +69,7 @@ async fn introspecting_a_table_with_unique_index_must_work(api: &TestApi) {
         .await;
 
     api.database()
-        .execute_raw(
+        .query_raw(
             &format!(
                 "Create Unique Index \"{}\".\"test\" on \"Blog\"( \"authorId\")",
                 api.schema_name()
@@ -103,7 +103,7 @@ async fn introspecting_a_table_with_multi_column_unique_index_must_work(api: &Te
         .await;
 
     api.database()
-        .execute_raw(
+        .query_raw(
             &format!(
                 "Create Unique Index \"{}\".\"test\" on \"User\"( \"firstname\", \"lastname\")",
                 api.schema_name()
@@ -217,7 +217,7 @@ async fn introspecting_a_table_with_a_non_unique_index_should_work(api: &TestApi
         .await;
 
     api.database()
-        .execute_raw(
+        .query_raw(
             &format!("Create Index \"{}\".\"test\" on \"User\"(\"a\")", api.schema_name()),
             &[],
         )
@@ -249,7 +249,7 @@ async fn introspecting_a_table_with_a_multi_column_non_unique_index_should_work(
         .await;
 
     api.database()
-        .execute_raw(
+        .query_raw(
             &format!(
                 "Create Index \"{}\".\"test\" on \"User\"(\"a\",\"b\")",
                 api.schema_name()
@@ -293,9 +293,9 @@ async fn introspecting_a_one_to_one_req_relation_should_work(api: &TestApi) {
     let dm = r#"
             model User {
                id Int @id
-               post Post? 
+               post Post?
             }
-            
+
             model Post {
                id Int @id
                user_id User
@@ -333,7 +333,7 @@ async fn introspecting_two_one_to_one_relations_between_the_same_models_should_w
                post_id Post  @relation("PostToUser_post_id")
                post Post?    @relation("Post_user_idToUser")
             }
-            
+
             model Post {
                id Int @id
                user_id User  @relation("Post_user_idToUser")
@@ -365,9 +365,9 @@ async fn introspecting_a_one_to_one_relation_should_work(api: &TestApi) {
     let dm = r#"
             model User {
                id Int @id
-               post Post? 
+               post Post?
             }
-            
+
             model Post {
                id Int @id
                user_id User?
@@ -397,13 +397,13 @@ async fn introspecting_a_one_to_one_relation_referencing_non_id_should_work(api:
         .await;
     let dm = r#"
             model User {
-               email        String? @unique 
-               id           Int     @id 
-               post         Post? 
+               email        String? @unique
+               id           Int     @id
+               post         Post?
             }
-            
+
             model Post {
-               id           Int     @id  
+               id           Int     @id
                user_email   User?   @relation(references: [email])
             }
         "#;
@@ -432,9 +432,9 @@ async fn introspecting_a_one_to_many_relation_should_work(api: &TestApi) {
     let dm = r#"
             model User {
                id Int @id
-               posts Post[] 
+               posts Post[]
             }
-            
+
             model Post {
                id Int @id
                user_id User?
@@ -465,9 +465,9 @@ async fn introspecting_a_one_req_to_many_relation_should_work(api: &TestApi) {
     let dm = r#"
             model User {
                id Int @id
-               posts Post[] 
+               posts Post[]
             }
-            
+
             model Post {
                id Int @id
                user_id User
@@ -500,7 +500,7 @@ async fn introspecting_a_prisma_many_to_many_relation_should_work(api: &TestApi)
         .await;
 
     api.database()
-        .execute_raw(
+        .query_raw(
             &format!(
                 "CREATE UNIQUE INDEX \"{}\".test ON \"_PostToUser\" (\"A\", \"B\");",
                 api.schema_name(),
@@ -513,12 +513,12 @@ async fn introspecting_a_prisma_many_to_many_relation_should_work(api: &TestApi)
     let dm = r#"
             model User {
                id Int @id
-               posts Post[] 
+               posts Post[]
             }
-            
+
             model Post {
                id Int @id
-               users User[] 
+               users User[]
             }
         "#;
     let result = dbg!(api.introspect().await);
@@ -553,14 +553,14 @@ async fn introspecting_a_many_to_many_relation_should_work(api: &TestApi) {
                id Int @id
                postsToUserses PostsToUsers[] @relation(onDelete: CASCADE)
             }
-            
+
             model Post {
                id Int @id
                postsToUserses PostsToUsers[] @relation(references: [post_id], onDelete: CASCADE)
             }
-            
+
             model PostsToUsers {
-              post_id Post 
+              post_id Post
               user_id User
             }
         "#;
@@ -594,17 +594,17 @@ async fn introspecting_a_many_to_many_relation_with_extra_fields_should_work(api
     let dm = r#"
             model User {
                id Int @id
-               postsToUserses PostsToUsers[] 
+               postsToUserses PostsToUsers[]
             }
-            
+
             model Post {
                id Int @id
                postsToUserses PostsToUsers[] @relation(references: [post_id])
             }
-            
+
             model PostsToUsers {
               date    DateTime?
-              post_id Post 
+              post_id Post
               user_id User
             }
         "#;
@@ -667,7 +667,7 @@ async fn introspecting_cascading_delete_behaviour_should_work(api: &TestApi) {
                id      Int @id
                posts Post[] @relation(onDelete: CASCADE)
             }
-            
+
             model Post {
                id      Int @id
                user_id User?

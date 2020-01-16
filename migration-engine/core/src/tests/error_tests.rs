@@ -198,7 +198,7 @@ async fn database_already_exists_must_return_a_proper_error() {
     let url = postgres_10_url(db_name);
 
     let conn = Quaint::new(&postgres_10_url("postgres")).await.unwrap();
-    conn.execute_raw(
+    conn.query_raw(
         "CREATE DATABASE \"database_already_exists_must_return_a_proper_error\"",
         &[],
     )
@@ -234,8 +234,8 @@ async fn database_access_denied_must_return_a_proper_error_in_cli() {
     let url: Url = mysql_url(db_name).parse().unwrap();
     let conn = create_mysql_database(&url).await.unwrap();
 
-    conn.execute_raw("DROP USER IF EXISTS jeanmichel", &[]).await.unwrap();
-    conn.execute_raw("CREATE USER jeanmichel IDENTIFIED BY '1234'", &[])
+    conn.query_raw("DROP USER IF EXISTS jeanmichel", &[]).await.unwrap();
+    conn.query_raw("CREATE USER jeanmichel IDENTIFIED BY '1234'", &[])
         .await
         .unwrap();
 
@@ -273,8 +273,8 @@ async fn database_access_denied_must_return_a_proper_error_in_rpc() {
     let url: Url = mysql_url(db_name).parse().unwrap();
     let conn = create_mysql_database(&url).await.unwrap();
 
-    conn.execute_raw("DROP USER IF EXISTS jeanyves", &[]).await.unwrap();
-    conn.execute_raw("CREATE USER jeanyves IDENTIFIED BY '1234'", &[])
+    conn.query_raw("DROP USER IF EXISTS jeanyves", &[]).await.unwrap();
+    conn.query_raw("CREATE USER jeanyves IDENTIFIED BY '1234'", &[])
         .await
         .unwrap();
 
@@ -373,7 +373,7 @@ async fn unique_constraint_errors_in_migrations_must_return_a_known_error(api: &
         .values(("apple",))
         .values(("banana",));
 
-    api.database().execute(insert.into()).await.unwrap();
+    api.database().query(insert.into()).await.unwrap();
 
     let dm2 = r#"
         model Fruit {

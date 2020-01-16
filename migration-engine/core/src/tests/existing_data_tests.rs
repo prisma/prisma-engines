@@ -18,7 +18,7 @@ async fn adding_a_required_field_if_there_is_data(api: &TestApi) {
     api.infer_and_apply(&dm).await.sql_schema;
 
     let insert = Insert::single_into((api.schema_name(), "Test")).value("id", "test");
-    api.database().execute(insert.into()).await.unwrap();
+    api.database().query(insert.into()).await.unwrap();
 
     let dm = r#"
             model Test {
@@ -56,7 +56,7 @@ async fn adding_a_required_field_must_use_the_default_value_for_migrations(api: 
     let conn = api.database();
     let insert = Insert::single_into((api.schema_name(), "Test")).value("id", "test");
 
-    conn.execute(insert.into()).await.unwrap();
+    conn.query(insert.into()).await.unwrap();
 
     let dm = r#"
             model Test {
@@ -103,7 +103,7 @@ async fn dropping_a_table_with_rows_should_warn(api: &TestApi) {
     let conn = api.database();
     let insert = Insert::single_into((api.schema_name(), "Test")).value("id", "test");
 
-    conn.execute(insert.into()).await.unwrap();
+    conn.query(insert.into()).await.unwrap();
 
     let dm = "";
 
@@ -139,7 +139,7 @@ async fn dropping_a_column_with_non_null_values_should_warn(api: &TestApi) {
         .values(("a", 7))
         .values(("b", 8));
 
-    api.database().execute(insert.into()).await.unwrap();
+    api.database().query(insert.into()).await.unwrap();
 
     // Drop the `favouriteAnimal` column.
     let dm = r#"
@@ -180,7 +180,7 @@ async fn altering_a_column_without_non_null_values_should_not_warn(api: &TestApi
         .values(vec!["a"])
         .values(vec!["b"]);
 
-    api.database().execute(insert.into()).await.unwrap();
+    api.database().query(insert.into()).await.unwrap();
 
     let dm2 = r#"
         model Test {
@@ -212,7 +212,7 @@ async fn altering_a_column_with_non_null_values_should_warn(api: &TestApi) -> Te
         .values(("a", 12))
         .values(("b", 22));
 
-    api.database().execute(insert.into()).await.unwrap();
+    api.database().query(insert.into()).await.unwrap();
 
     let dm2 = r#"
         model Test {
@@ -258,7 +258,7 @@ async fn changing_a_column_default_should_warn(api: &TestApi) -> TestResult {
         .values(("a", 12))
         .values(("b", 22));
 
-    api.database().execute(insert.into()).await.unwrap();
+    api.database().query(insert.into()).await.unwrap();
 
     let dm2 = r#"
         model Test {
@@ -312,7 +312,7 @@ async fn changing_a_column_from_required_to_optional_should_warn(api: &TestApi) 
         .values(("a", 12))
         .values(("b", 22));
 
-    api.database().execute(insert.into()).await.unwrap();
+    api.database().query(insert.into()).await.unwrap();
 
     let dm2 = r#"
         model Test {
@@ -420,7 +420,7 @@ async fn string_columns_do_not_get_arbitrarily_migrated(api: &TestApi) -> TestRe
         .value("email", "george@prisma.io")
         .value("kindle_email", "george+kindle@prisma.io");
 
-    api.database().execute(insert.into()).await?;
+    api.database().query(insert.into()).await?;
 
     let dm2 = r#"
         model User {

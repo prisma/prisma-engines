@@ -83,7 +83,7 @@ impl<'a> DatamodelConverter<'a> {
                         is_auto_generated_int_id: field.is_auto_generated_int_id(),
                         // todo the data source fields are not yet build correctly in the datamodel
                         data_source_fields: vec![DataSourceField {
-                            name: field.database_name.clone(),
+                            name: field.database_name.clone().unwrap_or_else(|| field.name.clone()),
                             default_value: field.default_value.clone(),
                         }],
                         relation_name: relation.name(),
@@ -100,7 +100,7 @@ impl<'a> DatamodelConverter<'a> {
                     is_auto_generated_int_id: field.is_auto_generated_int_id(),
                     // todo the data source field is not yet build correctly in the datamodel
                     data_source_field: DataSourceField {
-                        name: field.database_name.clone(),
+                        name: field.database_name.clone().unwrap_or_else(|| field.name.clone()),
                         default_value: field.default_value.clone(),
                     },
                     behaviour: field.behaviour(),

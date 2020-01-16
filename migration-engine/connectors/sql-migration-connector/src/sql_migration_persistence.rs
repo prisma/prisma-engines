@@ -65,12 +65,12 @@ impl MigrationPersistence for SqlMigrationPersistence<'_> {
                 }
                 ConnectionInfo::Sqlite { file_path, .. } => {
                     self.conn()
-                        .execute_raw("DETACH DATABASE ?", &[ParameterizedValue::from(self.schema_name())])
+                        .query_raw("DETACH DATABASE ?", &[ParameterizedValue::from(self.schema_name())])
                         .await
                         .ok();
                     std::fs::remove_file(file_path).ok(); // ignore potential errors
                     self.conn()
-                        .execute_raw(
+                        .query_raw(
                             "ATTACH DATABASE ? AS ?",
                             &[
                                 ParameterizedValue::from(file_path.as_str()),
@@ -147,9 +147,9 @@ impl MigrationPersistence for SqlMigrationPersistence<'_> {
 
         match self.sql_family() {
             SqlFamily::Sqlite | SqlFamily::Mysql => {
-                let id = self.conn().execute(insert.into()).await.unwrap();
-                match id {
-                    Some(quaint::ast::Id::Int(id)) => cloned.revision = id,
+                let result_set = self.conn().query(insert.into()).await.unwrap();
+                match result_set.last_insert_id() {
+                    Some(id) => cloned.revision = id as usize,
                     _ => panic!("This insert must return an int"),
                 };
             }

@@ -1,5 +1,5 @@
 use migration_connector::{ConnectorError, ErrorKind};
-use quaint::error::Error as QuaintError;
+use quaint::error::{Error as QuaintError, DatabaseConstraint};
 use thiserror::Error;
 use user_facing_errors::quaint::render_quaint_error;
 
@@ -153,9 +153,15 @@ impl From<quaint::error::Error> for SqlError {
             quaint::error::Error::ConnectionError { .. } => Self::ConnectionError { cause: error },
             quaint::error::Error::Timeout => Self::Timeout,
             quaint::error::Error::TlsError { .. } => Self::TlsError { cause: error },
-            quaint::error::Error::UniqueConstraintViolation { field_name } => Self::UniqueConstraintViolation {
-                field_name: field_name.into(),
-                cause: error,
+            quaint::error::Error::UniqueConstraintViolation { constraint } => match constraint {
+                DatabaseConstraint::Fields(fields) => Self::UniqueConstraintViolation {
+                    field_name: fields.join(","),
+                    cause: error,
+                },
+                DatabaseConstraint::Index(index) => Self::UniqueConstraintViolation {
+                    field_name: index.into(),
+                    cause: error,
+                }
             },
             _ => SqlError::QueryError(error.into()),
         }

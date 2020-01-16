@@ -259,7 +259,7 @@ async fn composite_primary_keys_must_work(api: &TestApi) {
         ),
     };
 
-    api.database().execute_raw(&sql, &[]).await.unwrap();
+    api.database().query_raw(&sql, &[]).await.unwrap();
 
     let schema = api.describe().await.expect("describe failed");
     let table = schema.get_table("User").expect("couldn't get User table");
@@ -395,7 +395,7 @@ async fn column_uniqueness_must_be_detected(api: &TestApi) {
             api.schema_name()
         ),
     };
-    api.database().execute_raw(&index_sql, &[]).await.unwrap();
+    api.database().query_raw(&index_sql, &[]).await.unwrap();
 
     let result = api.describe().await.expect("describing");
     let user_table = result.get_table("User").expect("getting User table");

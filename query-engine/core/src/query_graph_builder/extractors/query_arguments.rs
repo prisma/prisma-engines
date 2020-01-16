@@ -34,12 +34,12 @@ pub fn extract_query_args(arguments: Vec<ParsedArgument>, model: &ModelRef) -> Q
                     }),
 
                     "after" => Ok(QueryArguments {
-                        after: extract_identifier(arg.value, &model_id)?,
+                        after: todo!(),
                         ..res
                     }),
 
                     "before" => Ok(QueryArguments {
-                        before: extract_identifier(arg.value, &model_id)?,
+                        before: todo!(),
                         ..res
                     }),
 

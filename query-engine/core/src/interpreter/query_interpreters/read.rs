@@ -135,13 +135,13 @@ async fn aggregate<'a, 'b>(
 fn inject_required_fields(mut selected_fields: SelectedFields) -> SelectedFields {
     let model_id = selected_fields.model().identifier();
 
-    let missing_fields: Vec<Field> = model_id
+    let missing_fields: Vec<_> = model_id
         .into_iter()
-        .filter(|field| !selected_fields.contains(field.name()))
+        .filter(|field| !selected_fields.contains(&field.name))
         .collect();
 
     for field in missing_fields {
-        selected_fields.add(field)
+        selected_fields.add_scalar(field)
     }
 
     selected_fields

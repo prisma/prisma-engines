@@ -17,10 +17,7 @@ impl IdFilter for RecordIdentifier {
         let filters: Vec<Filter> = self
             .pairs
             .into_iter()
-            .map(|(field, value)| match field {
-                Field::Scalar(sf) => sf.equals(value),
-                Field::Relation(_) => panic!("Relation fields in IDs are not supported"),
-            })
+            .map(|(field, value)| field.equals(value))
             .collect();
 
         Filter::and(filters)

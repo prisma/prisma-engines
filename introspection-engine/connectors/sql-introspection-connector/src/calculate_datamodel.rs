@@ -111,7 +111,7 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
             let (name, database_name) = sanitize_name(column.name.clone());
 
             let field = Field {
-                name,
+                name: name.clone(),
                 arity,
                 field_type,
                 database_name: database_name.clone(),
@@ -123,7 +123,7 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
                 is_updated_at: false,
                 // Todo: Do actual multi-field stuff here
                 data_source_fields: vec![dml::DataSourceField {
-                    name: database_name,
+                    name: database_name.unwrap_or_else(|| name),
                     default_value,
                 }],
             };
