@@ -42,6 +42,7 @@ chrono-0_4 = ["chrono"]
 mysql = ["mysql_async"]
 tracing-log = ["tracing", "tracing-core"]
 array = []
+serde-support = ["serde", "chrono/serde"]
 
 [dependencies]
 url = "1.7"
@@ -74,6 +75,8 @@ tracing-core = { version = "0.1", optional = true }
 mobc = { version = "0.3", optional = true }
 bytes = { version = "0.5", optional = true }
 tokio = { version = "0.2", features = ["rt-threaded", "macros"], optional = true}
+serde = { version = "1.0.104", optional = true }
 
 [dev-dependencies]
 tokio = { version = "0.2", features = ["rt-threaded", "macros"]}
+serde = { version = "1.0.104", features = ["derive"] }
