@@ -163,11 +163,7 @@ impl ScalarField {
     }
 
     pub fn db_name(&self) -> &str {
-        self.db_name_opt().unwrap_or_else(|| self.name.as_ref())
-    }
-
-    pub fn db_name_opt(&self) -> Option<&str> {
-        self.data_source_field.name.as_ref().map(|s| s.as_ref())
+        &self.data_source_field.name
     }
 
     pub fn id_behaviour_clone(&self) -> Option<FieldBehaviour> {

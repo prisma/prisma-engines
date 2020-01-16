@@ -12,11 +12,11 @@ pub async fn create_record(conn: &dyn QueryExt, model: &ModelRef, args: WriteArg
         Err(QueryError::UniqueConstraintViolation { constraint }) => {
             match constraint {
                 DatabaseConstraint::Index(_) => {
-                    let fields = model.identifier().into_iter().map(|id| format!("{}.{}", model.name, id.name()));
+                    let fields = model.identifier().into_iter().map(|id| format!("{}.{}", model.name, id.name));
                     return Err(SqlError::UniqueConstraintViolation { field_names: fields.collect() });
                 },
                 DatabaseConstraint::Fields(fields) if fields.first().map(|s| s.as_str()) == Some("PRIMARY") => {
-                    let fields = model.identifier().into_iter().map(|id| format!("{}.{}", model.name, id.name()));
+                    let fields = model.identifier().into_iter().map(|id| format!("{}.{}", model.name, id.name));
                     return Err(SqlError::UniqueConstraintViolation { field_names: fields.collect() });
                 },
                 DatabaseConstraint::Fields(fields) => {
@@ -28,11 +28,11 @@ pub async fn create_record(conn: &dyn QueryExt, model: &ModelRef, args: WriteArg
         Err(QueryError::NullConstraintViolation { constraint }) => {
             match constraint {
                 DatabaseConstraint::Index(_) => {
-                    let mut fields = model.identifier().into_iter().map(|id| format!("{}.{}", model.name, id.name()));
+                    let mut fields = model.identifier().into_iter().map(|id| format!("{}.{}", model.name, id.name));
                     return Err(SqlError::NullConstraintViolation { field_name: fields.join(",") });
                 },
                 DatabaseConstraint::Fields(fields) if fields.first().map(|s| s.as_str()) == Some("PRIMARY") => {
-                    let mut fields = model.identifier().into_iter().map(|id| format!("{}.{}", model.name, id.name()));
+                    let mut fields = model.identifier().into_iter().map(|id| format!("{}.{}", model.name, id.name));
                     return Err(SqlError::NullConstraintViolation { field_name: fields.join(",") });
                 },
                 DatabaseConstraint::Fields(fields) => {

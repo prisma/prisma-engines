@@ -110,7 +110,7 @@ pub fn test_data_model() -> InternalDataModelRef {
             behaviour: None,
             internal_enum: None,
             data_source_field: DataSourceField {
-                name: Some("id".to_owned()),
+                name: "id".to_owned(),
                 default_value: None,
             },
         }),
@@ -125,7 +125,7 @@ pub fn test_data_model() -> InternalDataModelRef {
             behaviour: None,
             internal_enum: None,
             data_source_field: DataSourceField {
-                name: Some("name".to_owned()),
+                name: "name".to_owned(),
                 default_value: None,
             },
         }),
@@ -140,7 +140,7 @@ pub fn test_data_model() -> InternalDataModelRef {
             relation_name: "bar".to_owned(),
             relation_side: RelationSide::A,
             data_source_fields: vec![DataSourceField {
-                name: Some("sites".to_owned()),
+                name: "sites".to_owned(),
                 default_value: None,
             }],
         }),
@@ -157,7 +157,7 @@ pub fn test_data_model() -> InternalDataModelRef {
         behaviour: None,
         internal_enum: None,
         data_source_field: DataSourceField {
-            name: Some("name".to_owned()),
+            name: "name".to_owned(),
             default_value: None,
         },
     })];

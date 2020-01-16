@@ -74,18 +74,9 @@ where
 }
 
 pub fn count_by_model(model: &ModelRef, query_arguments: QueryArguments) -> Select<'static> {
-    let id = model.identifier();
-    let selected_columns = id.as_columns();
-
+    let selected_columns = model.identifier().as_columns();
     let base_query = get_records(model, selected_columns, query_arguments);
     let table = Table::from(base_query).alias("sub");
 
-    let columns: Vec<Column<'static>> = id
-        .fields()
-        .map(|id_field| {
-            Column::from(("sub", id_field.db_name().to_string()))
-        })
-        .collect();
-
-    Select::from_table(table).value(count(Row::from(columns)))
+    Select::from_table(table).value(count(asterisk()))
 }

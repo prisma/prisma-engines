@@ -93,7 +93,7 @@ pub trait QueryExt: Queryable + Send + Sync {
         let idents: Vec<_> = model_id
             .fields()
             .into_iter()
-            .map(|f| (f.type_identifier(), FieldArity::Required))
+            .map(|f| (f.type_identifier, FieldArity::Required))
             .collect();
 
         let mut rows = self.filter(select.into(), &idents).await?;

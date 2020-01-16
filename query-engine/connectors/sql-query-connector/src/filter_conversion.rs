@@ -258,7 +258,14 @@ impl AliasedCondition for OneRelationIsNullFilter {
         let alias = alias.map(|a| a.to_string(None));
 
         let condition = if self.field.relation_is_inlined_in_parent() {
-            self.field.as_column().opt_table(alias.clone()).is_null()
+            self.field.as_columns().fold(ConditionTree::NoCondition, |acc, column| {
+                let column_is_null = column.opt_table(alias.clone()).is_null();
+
+                match acc {
+                    ConditionTree::NoCondition => column_is_null.into(),
+                    cond => cond.and(column_is_null)
+                }
+            })
         } else {
             let relation = self.field.relation();
 
@@ -284,7 +291,7 @@ impl AliasedCondition for OneRelationIsNullFilter {
                 .map(|c| c.opt_table(alias.clone()))
                 .collect();
 
-            Row::from(id_columns).not_in_selection(select)
+            Row::from(id_columns).not_in_selection(select).into()
         };
 
         ConditionTree::single(condition)

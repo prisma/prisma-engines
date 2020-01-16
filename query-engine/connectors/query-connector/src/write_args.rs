@@ -94,7 +94,7 @@ impl WriteArgs {
         let mut rec_id = RecordIdentifier::default();
 
         for field in id.into_iter() {
-            match self.get_field_value(field.name()) {
+            match self.get_field_value(&field.name) {
                 Some(FieldValueContainer::Single(val)) => {
                     rec_id.add((field.clone(), val.clone()))
                 },

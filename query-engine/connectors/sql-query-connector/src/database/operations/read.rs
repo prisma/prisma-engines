@@ -111,7 +111,7 @@ where
         .into_iter()
         .map(|mut row| {
             let relation_cols = from_field.relation_columns(true);
-            let mut parent_ids: Vec<(Field, PrismaValue)> = Vec::with_capacity(relation_cols.len());
+            let mut parent_ids: Vec<(ScalarFieldRef, PrismaValue)> = Vec::with_capacity(relation_cols.len());
 
             for field in from_field.related_model().identifier().fields() {
                 let val = row.values.pop().ok_or(SqlError::ColumnDoesNotExist)?;

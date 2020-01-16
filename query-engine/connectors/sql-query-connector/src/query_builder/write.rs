@@ -4,6 +4,8 @@ use connector_interface::{WriteArgs, FieldValueContainer};
 use crate::error::SqlError;
 
 pub fn create_record(model: &ModelRef, mut args: WriteArgs) -> (Insert<'static>, Option<RecordIdentifier>) {
+    todo!()
+    /*
     let return_id = args.as_record_identifier(model.identifier());
 
     let fields: Vec<_> = model
@@ -15,7 +17,25 @@ pub fn create_record(model: &ModelRef, mut args: WriteArgs) -> (Insert<'static>,
 
     let insert = fields
         .into_iter()
-        .map(|field| (field.db_name(), args.take_field_value(field.name()).unwrap()))
+        .fold(Insert::single_into(model.as_table()), |insert, field| match (field, args.take_field_value(field.name())) {
+            (Single(value), Scalar(sf)) => {
+                insert.value(sf.db_name().to_string(), value.clone())
+            }
+            (Single(value), Relation(rf)) if rf.data_source_fields.len() == 1 => {
+                insert.value(rf.db_name().to_string(), value.clone())
+            }
+            (Compound(values), Relation(rf)) if values.len() == rf.data_source_fields.len() => {
+                for (field, value) in rf.data_source_fields.iter().zip(values) {
+                    query = query.set(field.name.clone(), value.clone());
+                }
+            }
+            (_, Relation(rf)) => {
+                panic!("Mismatch between the length of columns and values.")
+            }
+            (Compound(_), Scalar(sf)) => {
+                panic!("Cannot use a compound value container for a scalar field.")
+            }
+        })
         .fold(Insert::single_into(model.as_table()), |insert, (name, value)| match value {
             FieldValueContainer::Single(val) => insert.value(name.into_owned(), val),
             FieldValueContainer::Compound(_) => todo!("Compound schwompound"),
@@ -25,6 +45,7 @@ pub fn create_record(model: &ModelRef, mut args: WriteArgs) -> (Insert<'static>,
         Insert::from(insert).returning(model.identifier().as_columns()),
         return_id,
     )
+    */
 }
 
 pub fn delete_relation_table_records(
@@ -78,6 +99,9 @@ pub fn create_relation_table_records(
 }
 
 pub fn update_many(model: &ModelRef, ids: &[&RecordIdentifier], args: &WriteArgs) -> crate::Result<Vec<Query<'static>>> {
+    use FieldValueContainer::*;
+    use Field::*;
+
     if args.args.is_empty() || ids.is_empty() {
         return Ok(Vec::new());
     }
@@ -88,21 +112,30 @@ pub fn update_many(model: &ModelRef, ids: &[&RecordIdentifier], args: &WriteArgs
     for (name, value) in args.args.iter() {
         let field = fields.find_from_all(&name).unwrap();
 
-        match value {
-            FieldValueContainer::Single(value) => {
-                if field.is_required() && value.is_null() {
-                    return Err(SqlError::FieldCannotBeNull {
-                        field: field.name().to_owned(),
-                    });
-                }
-
-                query = query.set(field.db_name().to_string(), value.clone());
+        match (value, field) {
+            (Single(value), Scalar(sf)) => {
+                query = query.set(sf.db_name().to_string(), value.clone());
             }
-            FieldValueContainer::Compound(_) => todo!("Not yet")
+            (Single(value), Relation(rf)) if rf.data_source_fields.len() == 1 => {
+                let name = rf.data_source_fields.first().unwrap().name.clone();
+                query = query.set(name, value.clone());
+            }
+            (Compound(values), Relation(rf)) if values.len() == rf.data_source_fields.len() => {
+                for (field, value) in rf.data_source_fields.iter().zip(values) {
+                    query = query.set(field.name.clone(), value.clone());
+                }
+            }
+            (_, Relation(rf)) => {
+                panic!("Mismatch between the length of columns and values.")
+            }
+            (Compound(_), Scalar(sf)) => {
+                panic!("Cannot use a compound value container for a scalar field.")
+            }
         }
     }
 
     let columns: Vec<_> = model.identifier().as_columns().collect();
+
     let result: Vec<Query> = super::chunked_conditions(&columns, ids, |conditions| {
         query.clone().so_that(conditions)
     });

@@ -50,14 +50,7 @@ impl From<Vec<ScalarFieldRef>> for SelectedFields {
 
 impl From<ModelIdentifier> for SelectedFields {
     fn from(id: ModelIdentifier) -> SelectedFields {
-        let fields = id
-            .into_iter()
-            .map(|field| match field {
-                Field::Scalar(sf) => sf.into(),
-                Field::Relation(_) => panic!("Relation fields in IDs is unsupported"),
-            })
-            .collect();
-
+        let fields = id.into_iter().map(SelectedField::from).collect();
         SelectedFields::new(fields)
     }
 }
