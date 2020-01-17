@@ -10,10 +10,14 @@ import play.api.libs.json._
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Awaitable, Future}
-import scala.util.Try
+import scala.util.{Success, Try}
 
 case class QueryEngineResponse(status: Int, body: String) {
   lazy val jsonBody: Try[JsValue] = Try(Json.parse(body))
+}
+
+object TestServer {
+  val nextPort = new AtomicInteger(4000)
 }
 
 case class TestServer() extends PlayJsonExtensions {
@@ -48,7 +52,7 @@ case class TestServer() extends PlayJsonExtensions {
   ): JsValue = {
     val result = awaitInfinitely {
       querySchemaAsync(
-        query = query,
+        query = query.stripMargin,
         project = project,
       )
     }
@@ -64,22 +68,39 @@ case class TestServer() extends PlayJsonExtensions {
   ): Future[JsValue] = {
     val (port, queryEngineProcess) = startQueryEngine(project)
 
-    println(s"query engine started on port $port")
+    println(s"query engine started on port $port, pid: ${getPidOfProcess(queryEngineProcess)}")
     println(s"Query: $query")
 
     Future {
       queryPrismaProcess(query, port)
-    }.map(r => r.jsonBody.get)
-      .transform { r =>
-        println(s"Query result: $r")
+    }.transform { r =>
         queryEngineProcess.destroyForcibly().waitFor()
+        println(s"pid stopped: ${getPidOfProcess(queryEngineProcess)}")
         r
+      }
+      .map { r =>
+        println(s"Query result: $r")
+        r.jsonBody.get
       }
   }
 
-  val nextPort = new AtomicInteger(4000)
+  import java.lang.reflect.Field
 
-  private def startQueryEngine(project: Project): (Int, java.lang.Process) = {
+  def getPidOfProcess(p: Process): Long = {
+    var pid: Long = -1
+    try if (p.getClass.getName == "java.lang.UNIXProcess") {
+      val f = p.getClass.getDeclaredField("pid")
+      f.setAccessible(true)
+      pid = f.getLong(p)
+      f.setAccessible(false)
+    } catch {
+      case e: Exception =>
+        pid = -1
+    }
+    pid
+  }
+
+  private def startQueryEngine(project: Project) = {
     import java.lang.ProcessBuilder.Redirect
 
     // TODO: discuss with Dom whether we want to keep the legacy mode
@@ -90,11 +111,12 @@ case class TestServer() extends PlayJsonExtensions {
     // Important: Rust requires UTF-8 encoding (encodeToString uses Latin-1)
     val encoded = Base64.getEncoder.encode(fullDataModel.getBytes(StandardCharsets.UTF_8))
     val envVar  = new String(encoded, StandardCharsets.UTF_8)
-    val port    = nextPort.incrementAndGet()
+    val port    = TestServer.nextPort.incrementAndGet()
 
+    println("RUST_LOG :" + sys.env.getOrElse("RUST_LOG", "info"))
     pb.environment.put("PRISMA_DML", envVar)
     pb.environment.put("PORT", port.toString)
-    pb.environment.put("PRISMA_LOG_QUERIES", sys.env.getOrElse("PRISMA_LOG_QUERIES", "n"))
+    pb.environment.put("LOG_QUERIES", "y")
     pb.environment.put("RUST_LOG", sys.env.getOrElse("RUST_LOG", "info"))
 
     pb.directory(workingDir)
@@ -104,6 +126,7 @@ case class TestServer() extends PlayJsonExtensions {
     val process = pb.start
 
     waitUntilServerIsUp(port)
+//    Thread.sleep(1000)
 
     (port, process)
   }
@@ -142,12 +165,12 @@ case class TestServer() extends PlayJsonExtensions {
   }
 
   private def waitUntilServerIsUp(port: Int): Unit = {
-    val sleepTime = 5 // 5ms
+    val sleepTime   = 5 // 5ms
     val maxWaitTime = 2000 // 2s
-    var tryCount = 0
-    while(!isServerUp(port)) {
+    var tryCount    = 0
+    while (!isServerUp(port)) {
       Thread.sleep(sleepTime)
-      if(tryCount * sleepTime > maxWaitTime) {
+      if (tryCount * sleepTime > maxWaitTime) {
         sys.error("TestServer did not start within maximum wait time")
       }
       tryCount += 1

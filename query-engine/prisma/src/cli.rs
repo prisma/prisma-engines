@@ -1,15 +1,22 @@
-use crate::{
-    data_model_loader::{load_configuration, load_data_model_components},
-    dmmf, PrismaResult,
-};
+//use std::collections::HashMap;
+use std::{fs::File, io::Read, sync::Arc};
+
 use clap::ArgMatches;
+use graphql_parser as gql;
+use serde::Deserialize;
+
 use datamodel::json::dmmf::Datamodel;
 use query_core::{
     schema::{QuerySchemaRef, SupportedCapabilities},
     BuildMode, QuerySchemaBuilder,
 };
-use serde::Deserialize;
-use std::{fs::File, io::Read, sync::Arc};
+
+use crate::context::PrismaContext;
+use crate::request_handlers::graphql::*;
+use crate::{
+    data_model_loader::{load_configuration, load_data_model_components},
+    dmmf, PrismaResult,
+};
 
 #[derive(Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
@@ -22,6 +29,7 @@ pub enum CliCommand {
     Dmmf(BuildMode),
     DmmfToDml(DmmfToDmlInput),
     GetConfig(String),
+    ExecuteRequest(String),
 }
 
 impl CliCommand {
@@ -47,6 +55,10 @@ impl CliCommand {
             file.read_to_string(&mut datamodel).expect("Couldn't read file");
 
             Some(Self::GetConfig(datamodel))
+        } else if matches.is_present("execute_request") {
+            let request = matches.value_of("execute_request").unwrap();
+            println!("Got Here");
+            Some(Self::ExecuteRequest(request.to_string()))
         } else {
             None
         }
@@ -57,6 +69,7 @@ impl CliCommand {
             CliCommand::Dmmf(build_mode) => Self::dmmf(build_mode),
             CliCommand::DmmfToDml(input) => Self::dmmf_to_dml(input),
             CliCommand::GetConfig(input) => Self::get_config(input),
+            CliCommand::ExecuteRequest(input) => Self::execute_request(input),
         }
     }
 
@@ -94,6 +107,17 @@ impl CliCommand {
         let serialized = serde_json::to_string(&json)?;
 
         println!("{}", serialized);
+
+        Ok(())
+    }
+
+    fn execute_request(input: String) -> PrismaResult<()> {
+        use futures::executor::block_on;
+        let ctx = block_on(PrismaContext::new(false))?;
+        let gql_doc = gql::parse_query(&input)?;
+        let query_doc = GraphQLProtocolAdapter::convert(gql_doc, None)?;
+        let response = block_on(ctx.executor.execute(query_doc, Arc::clone(ctx.query_schema())))?;
+        println!("{:?}", response);
 
         Ok(())
     }

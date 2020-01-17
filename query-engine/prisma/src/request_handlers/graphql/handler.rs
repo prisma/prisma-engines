@@ -9,9 +9,9 @@ use std::{collections::HashMap, sync::Arc};
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct GraphQlBody {
-    query: String,
-    operation_name: Option<String>,
-    variables: HashMap<String, String>,
+    pub query: String,
+    pub operation_name: Option<String>,
+    pub variables: HashMap<String, String>,
 }
 
 pub struct GraphQlRequestHandler;
@@ -51,7 +51,7 @@ impl RequestHandler for GraphQlRequestHandler {
     }
 }
 
-async fn handle_graphql_query(
+pub(crate) async fn handle_graphql_query(
     req: PrismaRequest<GraphQlBody>,
     ctx: &PrismaContext,
 ) -> PrismaResult<response_ir::Responses> {
