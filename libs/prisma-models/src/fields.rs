@@ -123,7 +123,7 @@ impl Fields {
             .collect()
     }
 
-    pub fn find_from_all(&self, name: &str) -> DomainResult<&Field> {
+    pub fn find_from_all(&self, name: &str) -> crate::Result<&Field> {
         self.all
             .iter()
             .find(|field| field.name() == name)
@@ -133,7 +133,7 @@ impl Fields {
             })
     }
 
-    pub fn find_from_scalar(&self, name: &str) -> DomainResult<ScalarFieldRef> {
+    pub fn find_from_scalar(&self, name: &str) -> crate::Result<ScalarFieldRef> {
         self.scalar_weak()
             .iter()
             .map(|field| field.upgrade().unwrap())
@@ -148,7 +148,7 @@ impl Fields {
         self.model.upgrade().unwrap()
     }
 
-    pub fn find_from_relation_fields(&self, name: &str) -> DomainResult<Arc<RelationField>> {
+    pub fn find_from_relation_fields(&self, name: &str) -> crate::Result<Arc<RelationField>> {
         self.relation_weak()
             .iter()
             .map(|field| field.upgrade().unwrap())
@@ -159,7 +159,7 @@ impl Fields {
             })
     }
 
-    pub fn find_from_relation(&self, name: &str, side: RelationSide) -> DomainResult<Arc<RelationField>> {
+    pub fn find_from_relation(&self, name: &str, side: RelationSide) -> crate::Result<Arc<RelationField>> {
         self.relation_weak()
             .iter()
             .map(|field| field.upgrade().unwrap())

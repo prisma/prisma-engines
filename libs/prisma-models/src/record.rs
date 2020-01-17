@@ -1,4 +1,4 @@
-use crate::{DomainError as Error, DomainResult, PrismaValue, ScalarFieldRef};
+use crate::{DomainError as Error, PrismaValue, ScalarFieldRef};
 
 // Collection of fields of which the primary identifier of a model is composed of.
 // Todo: Currently, this uses arcs, which is not ideal, but also not terrible compared
@@ -33,6 +33,10 @@ impl ModelIdentifier {
 
     pub fn is_singular_field(&self) -> bool {
         self.len() == 1
+    }
+
+    pub fn get(&self, name: &str) -> Option<&ScalarFieldRef> {
+        self.fields().find(|field| field.name == name)
     }
 }
 
@@ -73,6 +77,24 @@ impl RecordIdentifier {
 
     pub fn is_empty(&self) -> bool {
         self.len() == 0
+    }
+
+    pub fn misses_autogen_value(&self) -> bool {
+        self.pairs.iter().any(|p| p.1.is_null())
+    }
+
+    pub fn add_autogen_value<V>(&mut self, value: V) -> bool
+    where
+        V: Into<PrismaValue>
+    {
+        for pair in self.pairs.iter_mut() {
+            if pair.1.is_null() {
+                pair.1 = value.into();
+                return true
+            }
+        }
+
+        return false
     }
 }
 
@@ -117,11 +139,11 @@ impl SingleRecord {
         Self { record, field_names }
     }
 
-    pub fn identifier(&self, id: &ModelIdentifier) -> DomainResult<RecordIdentifier> {
+    pub fn identifier(&self, id: &ModelIdentifier) -> crate::Result<RecordIdentifier> {
         self.record.identifier(&self.field_names, id)
     }
 
-    pub fn get_field_value(&self, field: &str) -> DomainResult<&PrismaValue> {
+    pub fn get_field_value(&self, field: &str) -> crate::Result<&PrismaValue> {
         self.record.get_field_value(&self.field_names, field)
     }
 }
@@ -133,7 +155,7 @@ pub struct ManyRecords {
 }
 
 impl ManyRecords {
-    pub fn identifiers(&self, model_id: &ModelIdentifier) -> DomainResult<Vec<RecordIdentifier>> {
+    pub fn identifiers(&self, model_id: &ModelIdentifier) -> crate::Result<Vec<RecordIdentifier>> {
         self.records
             .iter()
             .map(|record| record.identifier(&self.field_names, model_id).map(|i| i.clone()))
@@ -175,7 +197,7 @@ impl Record {
         }
     }
 
-    pub fn identifier(&self, field_names: &[String], id: &ModelIdentifier) -> DomainResult<RecordIdentifier> {
+    pub fn identifier(&self, field_names: &[String], id: &ModelIdentifier) -> crate::Result<RecordIdentifier> {
         let pairs: Vec<(ScalarFieldRef, PrismaValue)> = id
             .fields()
             .into_iter()
@@ -183,12 +205,12 @@ impl Record {
                 self.get_field_value(field_names, &id_field.name)
                     .map(|val| (id_field.clone(), val.clone()))
             })
-            .collect::<DomainResult<Vec<_>>>()?;
+            .collect::<crate::Result<Vec<_>>>()?;
 
         Ok(RecordIdentifier { pairs })
     }
 
-    pub fn get_field_value(&self, field_names: &[String], field: &str) -> DomainResult<&PrismaValue> {
+    pub fn get_field_value(&self, field_names: &[String], field: &str) -> crate::Result<&PrismaValue> {
         let index = field_names.iter().position(|r| r == field).map(Ok).unwrap_or_else(|| {
             Err(Error::FieldNotFound {
                 name: field.to_string(),

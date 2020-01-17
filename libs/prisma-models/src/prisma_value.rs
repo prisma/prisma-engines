@@ -1,4 +1,4 @@
-use crate::{dml, DomainError, DomainResult, EnumValue};
+use crate::{dml, DomainError, EnumValue};
 use chrono::prelude::*;
 use rust_decimal::{
     prelude::{FromPrimitive, ToPrimitive},
@@ -101,7 +101,7 @@ impl From<String> for PrismaValue {
 impl TryFrom<f64> for PrismaValue {
     type Error = DomainError;
 
-    fn try_from(f: f64) -> DomainResult<PrismaValue> {
+    fn try_from(f: f64) -> crate::Result<PrismaValue> {
         Decimal::from_f64(f)
             .map(|d| PrismaValue::Float(d))
             .ok_or(DomainError::ConversionFailure("f32", "Decimal"))
@@ -111,7 +111,7 @@ impl TryFrom<f64> for PrismaValue {
 impl TryFrom<f32> for PrismaValue {
     type Error = DomainError;
 
-    fn try_from(f: f32) -> DomainResult<PrismaValue> {
+    fn try_from(f: f32) -> crate::Result<PrismaValue> {
         Decimal::from_f32(f)
             .map(|d| PrismaValue::Float(d))
             .ok_or(DomainError::ConversionFailure("f64", "Decimal"))
@@ -169,7 +169,7 @@ impl From<&GraphqlId> for PrismaValue {
 impl TryFrom<PrismaValue> for GraphqlId {
     type Error = DomainError;
 
-    fn try_from(value: PrismaValue) -> DomainResult<GraphqlId> {
+    fn try_from(value: PrismaValue) -> crate::Result<GraphqlId> {
         match value {
             PrismaValue::GraphqlId(id) => Ok(id),
             PrismaValue::Int(i) => Ok(GraphqlId::from(i)),
@@ -183,7 +183,7 @@ impl TryFrom<PrismaValue> for GraphqlId {
 impl TryFrom<&PrismaValue> for GraphqlId {
     type Error = DomainError;
 
-    fn try_from(value: &PrismaValue) -> DomainResult<GraphqlId> {
+    fn try_from(value: &PrismaValue) -> crate::Result<GraphqlId> {
         match value {
             PrismaValue::GraphqlId(id) => Ok(id.clone()),
             PrismaValue::Int(i) => Ok(GraphqlId::from(*i)),
@@ -197,7 +197,7 @@ impl TryFrom<&PrismaValue> for GraphqlId {
 impl TryFrom<PrismaValue> for i64 {
     type Error = DomainError;
 
-    fn try_from(value: PrismaValue) -> DomainResult<i64> {
+    fn try_from(value: PrismaValue) -> crate::Result<i64> {
         match value {
             PrismaValue::Int(i) => Ok(i),
             _ => Err(DomainError::ConversionFailure("PrismaValue", "i64")),

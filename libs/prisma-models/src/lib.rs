@@ -41,4 +41,4 @@ pub use selected_fields::*;
 #[cfg(feature = "sql-ext")]
 pub use sql_ext::*;
 
-pub type DomainResult<T> = Result<T, DomainError>;
+pub type Result<T> = std::result::Result<T, DomainError>;
