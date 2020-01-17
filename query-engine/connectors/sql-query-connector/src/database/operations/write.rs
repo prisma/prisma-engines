@@ -3,12 +3,13 @@ use connector_interface::*;
 use prisma_models::*;
 use quaint::error::{Error as QueryError, DatabaseConstraint};
 use itertools::Itertools;
+use std::convert::TryFrom;
 
 pub async fn create_record(conn: &dyn QueryExt, model: &ModelRef, args: WriteArgs) -> crate::Result<RecordIdentifier> {
-    let (insert, _returned_id) = write::create_record(model, args);
+    let (insert, returned_id) = write::create_record(model, args);
 
-    let _last_id = match conn.insert(insert).await {
-        Ok(id) => id,
+    let result_set = match conn.insert(insert).await {
+        Ok(result_set) => result_set,
         Err(QueryError::UniqueConstraintViolation { constraint }) => {
             match constraint {
                 DatabaseConstraint::Index(_) => {
@@ -44,16 +45,21 @@ pub async fn create_record(conn: &dyn QueryExt, model: &ModelRef, args: WriteArg
         Err(e) => return Err(SqlError::from(e)),
     };
 
-    todo!()
-    /*
-    let id = match (returned_id, last_id) {
-        (Some(id), _) => id,
-        (_, Some(id)) =>
-        None => RecordIdentifier::from(last_id.unwrap()),
-    };
+    match (returned_id, result_set.len(), result_set.last_insert_id()) {
+        // All values provided in the write arrghs
+        (Some(identifier), _, _) if !identifier.misses_autogen_value() => Ok(identifier),
 
-    Ok(id)
-    */
+        // PostgreSQL with a working RETURNING statement
+        (_, n, _) if n > 0 => Ok(RecordIdentifier::try_from((&model.identifier(), result_set))?),
+
+        // We have an auto-incremented id that we got from MySQL or SQLite
+        (Some(mut identifier), _, Some(num)) if identifier.misses_autogen_value() => {
+            identifier.add_autogen_value(num as i64);
+            Ok(identifier)
+        },
+
+        (_, _, _) => panic!("Could not figure out an ID in create")
+    }
 }
 
 pub async fn update_records(

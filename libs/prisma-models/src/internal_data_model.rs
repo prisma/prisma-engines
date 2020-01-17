@@ -75,7 +75,7 @@ impl InternalDataModel {
         self.relations.get().unwrap().as_slice()
     }
 
-    pub fn find_model(&self, name: &str) -> DomainResult<ModelRef> {
+    pub fn find_model(&self, name: &str) -> crate::Result<ModelRef> {
         self.models
             .get()
             .and_then(|models| models.iter().find(|model| model.name == name))
@@ -83,7 +83,7 @@ impl InternalDataModel {
             .ok_or_else(|| DomainError::ModelNotFound { name: name.to_string() })
     }
 
-    pub fn find_relation(&self, name: &str) -> DomainResult<RelationWeakRef> {
+    pub fn find_relation(&self, name: &str) -> crate::Result<RelationWeakRef> {
         self.relations
             .get()
             .and_then(|relations| relations.iter().find(|relation| relation.name == name))

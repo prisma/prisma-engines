@@ -101,6 +101,9 @@ impl WriteArgs {
                 Some(FieldValueContainer::Compound(_)) => {
                     unreachable!("Relation fields are not supported in record identifiers")
                 }
+                None if field.is_auto_generated_int_id => {
+                    rec_id.add((field.clone(), PrismaValue::Null))
+                },
                 None => return None,
             }
         }

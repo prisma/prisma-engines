@@ -196,7 +196,7 @@ impl Relation {
         self.model_a().name == model.name || self.model_b().name == model.name
     }
 
-    pub fn get_field_on_model(&self, model_id: &str) -> DomainResult<Arc<RelationField>> {
+    pub fn get_field_on_model(&self, model_id: &str) -> crate::Result<Arc<RelationField>> {
         if model_id == self.model_a().name {
             Ok(self.field_a())
         } else if model_id == self.model_b().name {
