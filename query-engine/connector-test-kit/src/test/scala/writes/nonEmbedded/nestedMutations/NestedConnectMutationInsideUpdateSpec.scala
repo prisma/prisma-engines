@@ -7,13 +7,52 @@ import util._
 class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with ApiSpecBase with SchemaBaseV11 {
   override def runOnlyForCapabilities: Set[ConnectorCapability] = Set(JoinRelationLinksCapability)
 
+  "Bypassing http" should "work" in {
+    schemaP1reqToC1req.test { dataModel =>
+      val project = SchemaDsl.fromStringV11() {
+        """model Comment {
+          |        id       String  @id @default(cuid())
+          |        text     String
+          |        todo Todo @relation(references: [id])
+          |    }
+          |
+          |    model Todo {
+          |        id         String   @id @default(cuid())
+          |        comments Comment[]
+          |    }""".stripMargin
+      }
+      database.setup(project)
+
+      val res = server
+        .queryBinaryCLI(
+          """mutation {
+            |  createParent(data: {
+            |    p: "p1"
+            |    childReq: {
+            |      create: {c: "c1"}
+            |    }
+            |  }){
+            |    childReq{
+            |       id
+            |    }
+            |  }
+            |}""",
+          project
+        )
+
+      println(res)
+    }
+  }
+
   "a P1! to C1! relation with the child already in a relation" should "error when connecting by id since old required parent relation would be broken" in {
     schemaP1reqToC1req.test { dataModel =>
       val project = SchemaDsl.fromStringV11() { dataModel }
       database.setup(project)
 
+      val start = System.currentTimeMillis
+
       val child1Id = server
-        .query(
+        .queryBinaryCLI(
           """mutation {
           |  createParent(data: {
           |    p: "p1"
@@ -30,8 +69,12 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
         )
         .pathAsString("data.createParent.childReq.id")
 
+      val end = System.currentTimeMillis
+
+      println("Execution time: ", end - start)
+
       val parentId2 = server
-        .query(
+        .queryBinaryCLI(
           """mutation {
           |  createParent(data: {
           |    p: "p2"

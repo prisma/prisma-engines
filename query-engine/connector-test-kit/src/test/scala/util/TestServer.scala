@@ -1,6 +1,7 @@
 package util
 
 import java.io.{BufferedReader, InputStreamReader}
+import java.lang.ProcessBuilder.Redirect
 import java.net.{HttpURLConnection, URL}
 import java.nio.charset.StandardCharsets
 import java.util.Base64
@@ -129,6 +130,20 @@ case class TestServer() extends PlayJsonExtensions {
 //    Thread.sleep(1000)
 
     (port, process)
+  }
+
+  def queryBinaryCLI(query: String, project: Project) = {
+    import scala.language.postfixOps
+    val fullDataModel = project.dataModelWithDataSourceConfig
+    // Important: Rust requires UTF-8 encoding (encodeToString uses Latin-1)
+    val encoded = Base64.getEncoder.encode(fullDataModel.getBytes(StandardCharsets.UTF_8))
+    val envVar  = new String(encoded, StandardCharsets.UTF_8)
+
+    val formattedQuery = query.stripMargin.replace("\n", "")
+    import sys.process._
+    val res =
+      Process(Seq("/Users/matthias/repos/work/prisma-engine/target/debug/prisma", "cli", "--execute_request", formattedQuery), None, "PRISMA_DML" -> envVar).!!
+    Json.parse(res)
   }
 
   private def queryPrismaProcess(query: String, port: Int): QueryEngineResponse = {

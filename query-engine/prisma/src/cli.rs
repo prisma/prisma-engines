@@ -57,7 +57,6 @@ impl CliCommand {
             Some(Self::GetConfig(datamodel))
         } else if matches.is_present("execute_request") {
             let request = matches.value_of("execute_request").unwrap();
-            println!("Got Here");
             Some(Self::ExecuteRequest(request.to_string()))
         } else {
             None
@@ -113,11 +112,14 @@ impl CliCommand {
 
     fn execute_request(input: String) -> PrismaResult<()> {
         use futures::executor::block_on;
-        let ctx = block_on(PrismaContext::new(false))?;
+        let ctx = block_on(PrismaContext::new(true))?;
         let gql_doc = gql::parse_query(&input)?;
         let query_doc = GraphQLProtocolAdapter::convert(gql_doc, None)?;
         let response = block_on(ctx.executor.execute(query_doc, Arc::clone(ctx.query_schema())))?;
-        println!("{:?}", response);
+
+        let res = serde_json::to_string(&response).unwrap();
+
+        println!("{}", res);
 
         Ok(())
     }
