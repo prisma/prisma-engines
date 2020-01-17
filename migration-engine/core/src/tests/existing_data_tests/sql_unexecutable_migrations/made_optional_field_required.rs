@@ -1,13 +1,12 @@
 use crate::tests::test_harness::sql::*;
 
 #[test_each_connector]
-async fn adding_a_required_field_to_an_existing_table_with_data_without_a_default_is_unexecutable(
-    api: &TestApi,
-) -> TestResult {
+async fn making_an_optional_field_required_with_data_without_a_default_is_unexecutable(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Test {
             id String @id
             name String
+            age Int?
         }
     "#;
 
@@ -30,6 +29,10 @@ async fn adding_a_required_field_to_an_existing_table_with_data_without_a_defaul
     // TODO: flip this
     api.infer_apply(&dm2).send_assert().await?.assert_green()?;
 
+    api.assert_schema()
+        .await?
+        .assert_table("Test", |table| table.assert_does_not_have_column("Int"))?;
+
     let rows = api.select("Test").column("id").column("name").send_debug().await?;
     assert_eq!(rows, &[&[r#"Text("abc")"#, r#"Text("george")"#]]);
 
@@ -37,11 +40,12 @@ async fn adding_a_required_field_to_an_existing_table_with_data_without_a_defaul
 }
 
 #[test_each_connector]
-async fn adding_a_required_field_with_a_default_to_an_existing_table_works(api: &TestApi) -> TestResult {
+async fn making_an_optional_field_required_with_data_with_a_default_works(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Test {
             id String @id
             name String
+            age Int?
         }
     "#;
 
@@ -57,11 +61,16 @@ async fn adding_a_required_field_with_a_default_to_an_existing_table_works(api: 
         model Test {
             id String @id
             name String
-            age Int @default(45)
+            age Int @default(84)
         }
     "#;
 
+    // TODO: flip this
     api.infer_apply(&dm2).send_assert().await?.assert_green()?;
+
+    api.assert_schema()
+        .await?
+        .assert_table("Test", |table| table.assert_does_not_have_column("Int"))?;
 
     let rows = api
         .select("Test")
@@ -70,17 +79,18 @@ async fn adding_a_required_field_with_a_default_to_an_existing_table_works(api: 
         .column("age")
         .send_debug()
         .await?;
-    assert_eq!(rows, &[&[r#"Text("abc")"#, r#"Text("george")"#, r#"Integer(45)"#]]);
+    assert_eq!(rows, &[&[r#"Text("abc")"#, r#"Text("george")"#, "Integer(84)"]]);
 
     Ok(())
 }
 
 #[test_each_connector]
-async fn adding_a_required_field_without_default_to_an_existing_table_without_data_works(api: &TestApi) -> TestResult {
+async fn making_an_optional_field_required_on_an_empty_table_works(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Test {
             id String @id
             name String
+            age Int?
         }
     "#;
 
@@ -90,15 +100,26 @@ async fn adding_a_required_field_without_default_to_an_existing_table_without_da
         model Test {
             id String @id
             name String
-            age Int   
+            age Int
         }
     "#;
 
+    // TODO: flip this
     api.infer_apply(&dm2).send_assert().await?.assert_green()?;
 
     api.assert_schema()
         .await?
-        .assert_table("Test", |table| table.assert_has_column("age"))?;
+        .assert_table("Test", |table| table.assert_does_not_have_column("Int"))?;
+
+    let rows = api
+        .select("Test")
+        .column("id")
+        .column("name")
+        .column("age")
+        .send_debug()
+        .await?;
+
+    assert!(rows.is_empty());
 
     Ok(())
 }

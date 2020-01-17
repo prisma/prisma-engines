@@ -1,7 +1,7 @@
 use pretty_assertions::assert_eq;
 use sql_schema_describer::{Column, ForeignKey, Index, IndexType, PrimaryKey, SqlSchema, Table};
 
-type AssertionResult<T> = Result<T, anyhow::Error>;
+pub(crate) type AssertionResult<T> = Result<T, anyhow::Error>;
 
 pub trait SqlSchemaExt {
     fn assert_table<'a>(&'a self, table_name: &str) -> AssertionResult<TableAssertion<'a>>;

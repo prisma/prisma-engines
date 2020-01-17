@@ -13,17 +13,17 @@ pub(crate) fn expand_alter_column(
     };
 
     match sql_family {
-        SqlFamily::Sqlite => expand_sqlite_alter_column(column_differ).map(ExpandedAlterColumn::Sqlite),
-        SqlFamily::Mysql => expand_mysql_alter_column(column_differ).map(ExpandedAlterColumn::Mysql),
-        SqlFamily::Postgres => expand_postgres_alter_column(column_differ).map(ExpandedAlterColumn::Postgres),
+        SqlFamily::Sqlite => expand_sqlite_alter_column(&column_differ).map(ExpandedAlterColumn::Sqlite),
+        SqlFamily::Mysql => expand_mysql_alter_column(&column_differ).map(ExpandedAlterColumn::Mysql),
+        SqlFamily::Postgres => expand_postgres_alter_column(&column_differ).map(ExpandedAlterColumn::Postgres),
     }
 }
 
-pub(crate) fn expand_sqlite_alter_column(_columns: ColumnDiffer) -> Option<Vec<SqliteAlterColumn>> {
+pub(crate) fn expand_sqlite_alter_column(_columns: &ColumnDiffer) -> Option<Vec<SqliteAlterColumn>> {
     None
 }
 
-pub(crate) fn expand_mysql_alter_column(columns: ColumnDiffer) -> Option<Vec<MysqlAlterColumn>> {
+pub(crate) fn expand_mysql_alter_column(columns: &ColumnDiffer) -> Option<Vec<MysqlAlterColumn>> {
     let mut changes: Vec<MysqlAlterColumn> = Vec::new();
 
     for change in columns.all_changes().iter() {
@@ -39,7 +39,7 @@ pub(crate) fn expand_mysql_alter_column(columns: ColumnDiffer) -> Option<Vec<Mys
     Some(changes)
 }
 
-pub(crate) fn expand_postgres_alter_column(columns: ColumnDiffer) -> Option<Vec<PostgresAlterColumn>> {
+pub(crate) fn expand_postgres_alter_column(columns: &ColumnDiffer) -> Option<Vec<PostgresAlterColumn>> {
     let mut changes = Vec::new();
 
     for change in columns.all_changes().iter() {

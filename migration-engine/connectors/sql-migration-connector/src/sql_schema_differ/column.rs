@@ -127,6 +127,10 @@ impl ColumnChanges {
     pub(crate) fn type_changed(&self) -> bool {
         self.changes.iter().any(|c| c.as_ref() == Some(&ColumnChange::Type))
     }
+
+    pub(crate) fn arity_changed(&self) -> bool {
+        self.changes.iter().any(|c| c.as_ref() == Some(&ColumnChange::Arity))
+    }
 }
 
 #[cfg(test)]

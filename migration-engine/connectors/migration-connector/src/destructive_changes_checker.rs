@@ -23,6 +23,7 @@ where
 pub struct DestructiveChangeDiagnostics {
     pub errors: Vec<MigrationError>,
     pub warnings: Vec<MigrationWarning>,
+    pub unexecutable_migrations: Vec<UnexecutableMigration>,
 }
 
 impl DestructiveChangeDiagnostics {
@@ -30,6 +31,7 @@ impl DestructiveChangeDiagnostics {
         DestructiveChangeDiagnostics {
             errors: Vec::new(),
             warnings: Vec::new(),
+            unexecutable_migrations: Vec::new(),
         }
     }
 
@@ -58,6 +60,11 @@ pub struct MigrationError {
     pub tpe: String,
     pub description: String,
     pub field: Option<String>,
+}
+
+#[derive(Debug, Serialize, PartialEq)]
+pub struct UnexecutableMigration {
+    pub description: String,
 }
 
 /// An implementor of [DestructiveChangesChecker](trait.DestructiveChangesChecker.html) that performs no check.
