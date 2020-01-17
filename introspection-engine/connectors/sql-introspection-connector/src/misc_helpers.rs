@@ -1,5 +1,4 @@
 use datamodel::common::names::NameNormalizer;
-use datamodel::DatabaseName::{Compound, Single};
 use datamodel::{
     dml, Field, FieldArity, FieldType, IdInfo, IdStrategy, IndexDefinition, Model, OnDeleteStrategy, RelationInfo,
     ScalarType, ScalarValue,
@@ -68,7 +67,7 @@ pub fn calculate_many_to_many_field(foreign_key: &ForeignKey, relation_name: Str
         name,
         arity: FieldArity::List,
         field_type,
-        database_name: None,
+        database_names: Vec::new(),
         default_value: None,
         is_unique: false,
         id_info: None,
@@ -128,7 +127,7 @@ pub(crate) fn calculate_scalar_field(schema: &&SqlSchema, table: &&Table, column
         name: column.name.clone(),
         arity,
         field_type,
-        database_name: None,
+        database_names: Vec::new(),
         default_value,
         is_unique,
         id_info,
@@ -171,10 +170,10 @@ pub(crate) fn calculate_relation_field(schema: &SqlSchema, table: &Table, foreig
         };
 
         let (name, database_name) = match columns.len() {
-            1 => (columns[0].name.clone(), None),
+            1 => (columns[0].name.clone(), Vec::new()),
             _ => (
                 foreign_key.referenced_table.clone().camel_case(),
-                Some(Compound(columns.iter().map(|c| c.name.clone()).collect())),
+                vec![columns.iter().map(|c| c.name.clone()).collect()],
             ),
         };
 
@@ -182,7 +181,7 @@ pub(crate) fn calculate_relation_field(schema: &SqlSchema, table: &Table, foreig
             name,
             arity,
             field_type,
-            database_name,
+            database_names: database_name,
             default_value: None,
             is_unique: false,
             id_info: None,
@@ -215,13 +214,16 @@ pub(crate) fn calculate_backrelation_field(
     let other_is_unique = || {
         let table = schema.table_bang(&model.name);
 
-        match &relation_field.database_name {
-            None => table.is_column_unique(relation_field.name.as_str()),
-            Some(Single(name)) => table.is_column_unique(name),
-            Some(Compound(names)) => table
+        match &relation_field.database_names.len() {
+            0 => table.is_column_unique(relation_field.name.as_str()),
+            1 => {
+                let column_name = relation_field.database_names.first().unwrap();
+                table.is_column_unique(column_name)
+            }
+            _ => table
                 .indices
                 .iter()
-                .any(|i| i.columns == *names && i.tpe == IndexType::Unique),
+                .any(|i| i.columns == relation_field.database_names && i.tpe == IndexType::Unique),
         }
     };
     let arity = match relation_field.arity {
@@ -239,7 +241,7 @@ pub(crate) fn calculate_backrelation_field(
         name,
         arity,
         field_type,
-        database_name: None,
+        database_names: Vec::new(),
         default_value: None,
         is_unique: false,
         id_info: None,

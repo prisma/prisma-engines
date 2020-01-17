@@ -10,7 +10,7 @@ pub struct Model {
     /// Comments associated with this model.
     pub documentation: Option<String>,
     /// The database internal name of this model.
-    pub database_name: Option<DatabaseName>,
+    pub database_name: Option<String>,
     /// Indicates if this model is embedded or not.
     pub is_embedded: bool,
     /// Describes Composite Indexes
@@ -36,7 +36,7 @@ pub enum IndexType {
 
 impl Model {
     /// Creates a new model with the given name.
-    pub fn new(name: String, database_name: Option<DatabaseName>) -> Model {
+    pub fn new(name: String, database_name: Option<String>) -> Model {
         Model {
             name,
             fields: vec![],
@@ -159,19 +159,16 @@ impl WithName for Model {
 }
 
 impl WithDatabaseName for Model {
-    fn single_database_name(&self) -> Option<&str> {
+    fn database_names(&self) -> Vec<&str> {
         match &self.database_name {
-            None => None,
-            Some(DatabaseName::Single(name)) => Some(name.as_ref()),
-            Some(DatabaseName::Compound(_)) => panic!("Models should not have compound databasenames."),
+            None => vec![],
+            Some(db_name) => vec![db_name],
         }
     }
 
-    fn database_names(&self) -> &Option<DatabaseName> {
-        &self.database_name
-    }
-
-    fn set_database_names(&mut self, database_name: Option<DatabaseName>) {
-        self.database_name = database_name
+    fn set_database_names(&mut self, database_names: Vec<String>) {
+        // TODO: return error if there's more than 1 name
+        let first = database_names.into_iter().next();
+        self.database_name = first
     }
 }

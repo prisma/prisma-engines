@@ -1,4 +1,4 @@
-use datamodel::{DatabaseName::Single, Datamodel, FieldType};
+use datamodel::{Datamodel, FieldType};
 use regex::Regex;
 
 pub fn sanitize_datamodel_names(mut datamodel: Datamodel) -> Datamodel {
@@ -8,15 +8,15 @@ pub fn sanitize_datamodel_names(mut datamodel: Datamodel) -> Datamodel {
         let (sanitized_name, db_name) = sanitize_name(model.name.clone());
 
         model.name = sanitized_name;
-        model.database_name = db_name.map(|db| Single(db));
+        model.database_name = db_name;
 
         for field in &mut model.fields {
             let (sanitized_name, db_name) = sanitize_name(field.name.clone());
 
             field.name = sanitized_name;
 
-            if field.database_name.is_none() {
-                field.database_name = db_name.map(|db| Single(db));
+            if field.database_names.is_empty() {
+                field.database_names = db_name.map(|db| vec![db]).unwrap_or(vec![]);
             }
 
             if let FieldType::Relation(info) = &mut field.field_type {

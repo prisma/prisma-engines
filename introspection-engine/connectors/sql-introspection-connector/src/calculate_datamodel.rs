@@ -1,7 +1,6 @@
 use crate::misc_helpers::*;
 use crate::sanitize_datamodel_names::sanitize_datamodel_names;
 use crate::SqlIntrospectionResult;
-use datamodel::DatabaseName::Compound;
 use datamodel::{dml, Datamodel, FieldType, Model};
 use log::debug;
 use sql_schema_describer::*;
@@ -39,7 +38,7 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
                 model
                     .fields
                     .iter()
-                    .find(|f| f.database_name == Some(Compound(index.columns.clone())))
+                    .find(|f| f.database_names == index.columns.clone())
                     .unwrap()
                     .name
                     .clone()

@@ -337,11 +337,7 @@ impl FieldExtensions for Field {
     }
 
     fn db_name(&self) -> String {
-        match &self.database_name {
-            None => self.name.clone(),
-            Some(DatabaseName::Single(name)) => name.clone(),
-            Some(DatabaseName::Compound(_)) => unimplemented!(),
-        }
+        self.single_database_name().unwrap_or(&self.name).to_string()
     }
 
     fn migration_value(&self, datamodel: &Datamodel) -> ScalarValue {

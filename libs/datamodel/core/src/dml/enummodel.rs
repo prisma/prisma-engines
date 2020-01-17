@@ -10,7 +10,7 @@ pub struct Enum {
     /// Comments for this enum.
     pub documentation: Option<String>,
     /// Database internal name of this enum.
-    pub database_name: Option<DatabaseName>,
+    pub database_name: Option<String>,
 }
 
 impl Enum {
@@ -35,19 +35,16 @@ impl WithName for Enum {
 }
 
 impl WithDatabaseName for Enum {
-    fn single_database_name(&self) -> Option<&str> {
+    fn database_names(&self) -> Vec<&str> {
         match &self.database_name {
-            None => None,
-            Some(DatabaseName::Single(name)) => Some(name.as_ref()),
-            Some(DatabaseName::Compound(_)) => panic!("Enums should not have compound databasenames."),
+            None => vec![],
+            Some(db_name) => vec![db_name],
         }
     }
 
-    fn database_names(&self) -> &Option<DatabaseName> {
-        &self.database_name
-    }
-
-    fn set_database_names(&mut self, database_name: Option<DatabaseName>) {
-        self.database_name = database_name
+    fn set_database_names(&mut self, database_names: Vec<String>) {
+        // TODO: return error if there's more than 1 name
+        let first = database_names.into_iter().next();
+        self.database_name = first
     }
 }

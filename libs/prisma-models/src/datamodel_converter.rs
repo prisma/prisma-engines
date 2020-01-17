@@ -1,5 +1,5 @@
 use crate::*;
-use datamodel::{dml, DatabaseName, WithDatabaseName};
+use datamodel::{dml, WithDatabaseName};
 use itertools::Itertools;
 use std::convert::TryInto;
 
@@ -413,11 +413,9 @@ impl DatamodelFieldExtensions for dml::Field {
     }
 
     fn manifestation(&self) -> Option<FieldManifestation> {
-        match &self.database_name {
-            None => None,
-            Some(DatabaseName::Single(name)) => Some(FieldManifestation { db_name: name.clone() }),
-            Some(DatabaseName::Compound(_)) => unimplemented!(),
-        }
+        self.single_database_name().map(|db_name| FieldManifestation {
+            db_name: db_name.to_owned(),
+        })
     }
 
     fn behaviour(&self) -> Option<FieldBehaviour> {
@@ -451,10 +449,9 @@ impl DatamodelFieldExtensions for dml::Field {
     }
 
     fn final_db_name(&self) -> String {
-        match &self.database_name {
+        match self.database_names.first() {
             None => self.name.clone(),
-            Some(DatabaseName::Single(name)) => name.clone(),
-            Some(DatabaseName::Compound(_)) => unimplemented!(),
+            Some(x) => x.clone(),
         }
     }
 

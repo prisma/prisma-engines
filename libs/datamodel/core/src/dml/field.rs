@@ -56,7 +56,7 @@ pub struct Field {
     /// The field's type.
     pub field_type: FieldType,
     /// The database internal name.
-    pub database_name: Option<DatabaseName>,
+    pub database_names: Vec<String>,
     /// The default value.
     pub default_value: Option<ScalarValue>,
     /// Indicates if the field is unique.
@@ -84,20 +84,12 @@ impl WithName for Field {
 }
 
 impl WithDatabaseName for Field {
-    fn single_database_name(&self) -> Option<&str> {
-        match &self.database_name {
-            None => None,
-            Some(DatabaseName::Single(name)) => Some(name.as_ref()),
-            Some(DatabaseName::Compound(_)) => panic!("This is not implemented yet for fields."),
-        }
+    fn database_names(&self) -> Vec<&str> {
+        self.database_names.iter().map(|s| s.as_str()).collect()
     }
 
-    fn database_names(&self) -> &Option<DatabaseName> {
-        &self.database_name
-    }
-
-    fn set_database_names(&mut self, database_name: Option<DatabaseName>) {
-        self.database_name = database_name
+    fn set_database_names(&mut self, database_names: Vec<String>) {
+        self.database_names = database_names
     }
 }
 
@@ -108,7 +100,7 @@ impl Field {
             name: String::from(name),
             arity: FieldArity::Required,
             field_type,
-            database_name: None,
+            database_names: Vec::new(),
             default_value: None,
             is_unique: false,
             id_info: None,
@@ -123,7 +115,7 @@ impl Field {
             name: String::from(name),
             arity: FieldArity::Optional,
             field_type,
-            database_name: None,
+            database_names: Vec::new(),
             default_value: None,
             is_unique: false,
             id_info: None,

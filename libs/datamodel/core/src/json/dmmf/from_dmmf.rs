@@ -31,7 +31,7 @@ pub fn schema_from_dmmf(schema: &Datamodel) -> dml::Datamodel {
 fn model_from_dmmf(model: &Model) -> dml::Model {
     dml::Model {
         name: model.name.clone(),
-        database_name: None,
+        database_name: model.db_name.clone(),
         is_embedded: model.is_embedded,
         fields: model.fields.iter().map(&field_from_dmmf).collect(),
         indices: vec![],
@@ -46,7 +46,7 @@ fn enum_from_dmmf(en: &Enum) -> dml::Enum {
     dml::Enum {
         name: en.name.clone(),
         values: en.values.clone(),
-        database_name: None,
+        database_name: en.db_name.clone(),
         documentation: en.documentation.clone(),
     }
 }
@@ -67,7 +67,7 @@ fn field_from_dmmf(field: &Field) -> dml::Field {
     dml::Field {
         name: field.name.clone(),
         arity: get_field_arity(field.is_required, field.is_list),
-        database_name: None,
+        database_names: field.db_names.clone(),
         field_type,
         default_value,
         id_info,
