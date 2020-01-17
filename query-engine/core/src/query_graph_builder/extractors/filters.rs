@@ -138,14 +138,12 @@ pub fn extract_filter(
                             Field::Scalar(field) => handle_scalar_field(field, value, &op),
                             Field::Relation(field) => handle_relation_field(field, value, &op, match_suffix),
                         },
-                        Err(_) => utils::find_index_fields(&field_name, &model)
-                            .and_then(|fields| handle_compound_field(fields, value))
-                            .map_err(|_| {
-                                QueryGraphBuilderError::AssertionError(format!(
-                                    "Unable to resolve field {} to a field or index on model {}",
-                                    field_name, model.name
-                                ))
-                            }),
+                        Err(_) => utils::resolve_compound_field(&field_name, &model)
+                            .ok_or(QueryGraphBuilderError::AssertionError(format!(
+                                "Unable to resolve field {} to a field or set of fields on model {}",
+                                field_name, model.name
+                            )))
+                            .and_then(|fields| handle_compound_field(fields, value)),
                     }
                 }
             }

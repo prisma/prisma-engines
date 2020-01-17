@@ -1,4 +1,5 @@
 use super::*;
+use itertools::Itertools;
 use once_cell::sync::OnceCell;
 use prisma_models::{dml, EnumType, EnumValue, ModelRef};
 use std::sync::Arc;
@@ -143,7 +144,10 @@ pub fn compound_index_field_name(index: &Index) -> String {
 }
 
 /// Computes a compound field name based on a multi-field id.
-pub fn compound_id_field_name(field_names: &[&str]) -> String {
+pub fn compound_id_field_name<T>(field_names: &[T]) -> String
+where
+    T: AsRef<str>,
+{
     // Extremely sophisticated.
-    field_names.join("_")
+    field_names.into_iter().map(AsRef::as_ref).join("_")
 }

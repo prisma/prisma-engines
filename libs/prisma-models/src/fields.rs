@@ -31,7 +31,7 @@ impl Fields {
         }
     }
 
-    pub(crate) fn id(&self) -> Option<Vec<ScalarFieldRef>> {
+    pub fn id(&self) -> Option<Vec<ScalarFieldRef>> {
         self.id
             .get_or_init(|| {
                 self.find_singular_id()

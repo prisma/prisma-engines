@@ -116,39 +116,42 @@ pub trait InputTypeBuilderBase<'a>: CachedBuilder<InputObjectType> + InputBuilde
             .unique_indexes()
             .into_iter()
             .map(|index| {
-                let typ = self.compound_field_unique_object_type(index);
-                let name = compound_field_name(index);
+                let typ = self.compound_field_unique_object_type(index.name.as_ref(), index.fields());
+                let name = compound_index_field_name(index);
 
                 input_field(name, InputType::object(typ), None)
             })
             .collect();
 
-        fields.extend(compound_unique_fields);
+        // @@id compound field (there can be only one per model)
+        let compound_id_field: Option<InputField> = model.fields().id().map(|fields| {
+            let name = compound_id_field_name(&fields.iter().map(|f| f.name.as_ref()).collect::<Vec<&str>>());
+            let typ = self.compound_field_unique_object_type(None, fields);
 
-        // Todo: @@id compounds here
+            input_field(name, InputType::object(typ), None)
+        });
+
+        fields.extend(compound_unique_fields);
+        fields.extend(compound_id_field);
 
         input_object.set_fields(fields);
 
         Arc::downgrade(&input_object)
     }
 
-    /// Generates and caches an object type for a unique index.
-    fn compound_field_unique_object_type(&self, index: &Index) -> InputObjectTypeRef {
-        let name = index.name.as_ref().map(|n| capitalize(n)).unwrap_or_else(|| {
-            let index_fields = index.fields();
-            let field_names: Vec<String> = index_fields.iter().map(|sf| capitalize(&sf.name)).collect();
-
-            field_names.join("")
-        });
-
-        let name = format!("{}CompoundUniqueInput", name);
+    /// Generates and caches an input object type for a compound field.
+    fn compound_field_unique_object_type(
+        &self,
+        alias: Option<&String>,
+        from_fields: Vec<ScalarFieldRef>,
+    ) -> InputObjectTypeRef {
+        let name = format!("{}CompoundUniqueInput", Self::compound_name(alias, &from_fields));
         return_cached!(self.get_cache(), &name);
 
         let input_object = Arc::new(init_input_object_type(name.clone()));
         self.cache(name, Arc::clone(&input_object));
 
-        let index_fields = index.fields();
-        let object_fields = index_fields
+        let object_fields = from_fields
             .into_iter()
             .map(|field| {
                 let name = field.name.clone();
@@ -160,6 +163,13 @@ pub trait InputTypeBuilderBase<'a>: CachedBuilder<InputObjectType> + InputBuilde
 
         input_object.set_fields(object_fields);
         Arc::downgrade(&input_object)
+    }
+
+    fn compound_name(alias: Option<&String>, from_fields: &[ScalarFieldRef]) -> String {
+        alias.map(|n| capitalize(n)).unwrap_or_else(|| {
+            let field_names: Vec<String> = from_fields.iter().map(|sf| capitalize(&sf.name)).collect();
+            field_names.join("")
+        })
     }
 
     fn get_filter_object_builder(&self) -> Arc<FilterObjectTypeBuilder<'a>>;

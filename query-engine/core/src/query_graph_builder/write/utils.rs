@@ -5,7 +5,7 @@ use crate::{
 };
 use connector::{Filter, QueryArguments, ScalarCompare, WriteArgs};
 use itertools::Itertools;
-use prisma_models::{Field, ModelRef, RecordIdentifier, RelationFieldRef, SelectedFields};
+use prisma_models::{ModelRef, RecordIdentifier, RelationFieldRef, SelectedFields};
 use std::{convert::TryInto, sync::Arc};
 
 pub trait IdFilter {
