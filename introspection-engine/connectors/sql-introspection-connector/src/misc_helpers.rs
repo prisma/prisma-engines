@@ -173,7 +173,7 @@ pub(crate) fn calculate_relation_field(schema: &SqlSchema, table: &Table, foreig
             1 => (columns[0].name.clone(), Vec::new()),
             _ => (
                 foreign_key.referenced_table.clone().camel_case(),
-                vec![columns.iter().map(|c| c.name.clone()).collect()],
+                columns.iter().map(|c| c.name.clone()).collect(),
             ),
         };
 

@@ -38,7 +38,7 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
                 model
                     .fields
                     .iter()
-                    .find(|f| f.database_names == index.columns.clone())
+                    .find(|f| !f.database_names.is_empty() && f.database_names == index.columns.clone())
                     .unwrap()
                     .name
                     .clone()
