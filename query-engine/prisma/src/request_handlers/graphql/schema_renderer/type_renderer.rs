@@ -31,7 +31,7 @@ impl<'a> GqlTypeRenderer<'a> {
             InputType::Enum(et) => {
                 // Not sure how this fits together with the enum handling below.
                 let (_, subctx) = et.into_renderer().render(ctx);
-                (format!("{}!", et.name), subctx)
+                (format!("{}!", et.name()), subctx)
             }
             InputType::List(ref l) => {
                 let (substring, subctx) = self.render_input_type(l, ctx);
@@ -43,7 +43,7 @@ impl<'a> GqlTypeRenderer<'a> {
             }
             InputType::Scalar(ScalarType::Enum(et)) => {
                 let (_, subctx) = et.into_renderer().render(ctx);
-                (format!("{}!", et.name), subctx)
+                (format!("{}!", et.name()), subctx)
             }
             InputType::Scalar(ref scalar) => {
                 let stringified = match scalar {
@@ -72,7 +72,7 @@ impl<'a> GqlTypeRenderer<'a> {
             OutputType::Enum(et) => {
                 // Not sure how this fits together with the enum handling below.
                 let (_, subctx) = et.into_renderer().render(ctx);
-                (format!("{}!", et.name), subctx)
+                (format!("{}!", et.name()), subctx)
             }
             OutputType::List(l) => {
                 let (substring, subctx) = self.render_output_type(l, ctx);
@@ -84,7 +84,7 @@ impl<'a> GqlTypeRenderer<'a> {
             }
             OutputType::Scalar(ScalarType::Enum(et)) => {
                 let (_, subctx) = et.into_renderer().render(ctx);
-                (format!("{}!", et.name), subctx)
+                (format!("{}!", et.name()), subctx)
             }
             OutputType::Scalar(ref scalar) => {
                 let stringified = match scalar {

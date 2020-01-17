@@ -30,10 +30,15 @@ impl<'a> MigrationCommand for InferMigrationStepsCommand<'a> {
         let migration_persistence = connector.migration_persistence();
         let database_migration_inferrer = connector.database_migration_inferrer();
 
+        let assume_to_be_applied = cmd.assume_to_be_applied();
+
+        cmd.validate_assumed_migrations_are_not_applied(migration_persistence.as_ref())
+            .await?;
+
         let current_datamodel_ast = migration_persistence.current_datamodel_ast().await?;
         let assumed_datamodel_ast = engine
             .datamodel_calculator()
-            .infer(&current_datamodel_ast, cmd.input.assume_to_be_applied.as_slice())?;
+            .infer(&current_datamodel_ast, assume_to_be_applied.as_slice())?;
         let assumed_datamodel = datamodel::lift_ast(&assumed_datamodel_ast)?;
 
         let next_datamodel = parse_datamodel(&cmd.input.datamodel)?;
@@ -96,6 +101,47 @@ impl<'a> MigrationCommand for InferMigrationStepsCommand<'a> {
     }
 }
 
+impl InferMigrationStepsCommand<'_> {
+    fn assume_to_be_applied(&self) -> Vec<MigrationStep> {
+        self.input
+            .assume_to_be_applied
+            .clone()
+            .or_else(|| {
+                self.input.assume_applied_migrations.as_ref().map(|migrations| {
+                    migrations
+                        .into_iter()
+                        .flat_map(|migration| migration.datamodel_steps.clone().into_iter())
+                        .collect()
+                })
+            })
+            .unwrap_or_else(Vec::new)
+    }
+
+    async fn validate_assumed_migrations_are_not_applied(
+        &self,
+        migration_persistence: &dyn MigrationPersistence,
+    ) -> CommandResult<()> {
+        if let Some(migrations) = self.input.assume_applied_migrations.as_ref() {
+            for migration in migrations {
+                if migration_persistence
+                    .migration_is_already_applied(&migration.migration_id)
+                    .await?
+                {
+                    return Err(CommandError::ConnectorError(ConnectorError {
+                        user_facing_error: None,
+                        kind: ErrorKind::Generic(anyhow::anyhow!(
+                            "Input is invalid. Migration {} is already applied.",
+                            migration.migration_id
+                        )),
+                    }));
+                }
+            }
+        }
+
+        Ok(())
+    }
+}
+
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct InferMigrationStepsInput {
@@ -105,7 +151,15 @@ pub struct InferMigrationStepsInput {
     /// Migration steps from migrations that have been inferred but not applied yet.
     ///
     /// These steps must be provided and correct for migration inferrence to work.
-    pub assume_to_be_applied: Vec<MigrationStep>,
+    pub assume_to_be_applied: Option<Vec<MigrationStep>>,
+    pub assume_applied_migrations: Option<Vec<AppliedMigration>>,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct AppliedMigration {
+    pub migration_id: String,
+    pub datamodel_steps: Vec<MigrationStep>,
 }
 
 impl IsWatchMigration for InferMigrationStepsInput {

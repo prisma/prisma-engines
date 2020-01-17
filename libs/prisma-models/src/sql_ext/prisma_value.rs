@@ -51,7 +51,7 @@ impl<'a> From<PrismaValue> for ParameterizedValue<'a> {
             PrismaValue::Float(f) => f.into(),
             PrismaValue::Boolean(b) => b.into(),
             PrismaValue::DateTime(d) => d.into(),
-            PrismaValue::Enum(e) => e.as_string().into_owned().into(),
+            PrismaValue::Enum(e) => e.into(),
             PrismaValue::Int(i) => (i as i64).into(),
             PrismaValue::Null => ParameterizedValue::Null,
             PrismaValue::Uuid(u) => u.to_string().into(),

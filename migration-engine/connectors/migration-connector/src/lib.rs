@@ -18,7 +18,6 @@ pub use migration_persistence::*;
 pub use steps::MigrationStep;
 
 use std::fmt::Debug;
-use std::sync::Arc;
 
 /// The top-level trait for connectors. This is the abstraction the migration engine core relies on to
 /// interface with different database backends.
@@ -44,23 +43,25 @@ pub trait MigrationConnector: Send + Sync + 'static {
     async fn reset(&self) -> ConnectorResult<()>;
 
     /// See [MigrationPersistence](trait.MigrationPersistence.html).
-    fn migration_persistence(&self) -> Arc<dyn MigrationPersistence>;
+    fn migration_persistence<'a>(&'a self) -> Box<dyn MigrationPersistence + 'a>;
 
     /// See [DatabaseMigrationInferrer](trait.DatabaseMigrationInferrer.html).
-    fn database_migration_inferrer(&self) -> Arc<dyn DatabaseMigrationInferrer<Self::DatabaseMigration>>;
+    fn database_migration_inferrer<'a>(&'a self) -> Box<dyn DatabaseMigrationInferrer<Self::DatabaseMigration> + 'a>;
 
     /// See [DatabaseMigrationStepApplier](trait.DatabaseMigrationStepApplier.html).
-    fn database_migration_step_applier(&self) -> Arc<dyn DatabaseMigrationStepApplier<Self::DatabaseMigration>>;
+    fn database_migration_step_applier<'a>(
+        &'a self,
+    ) -> Box<dyn DatabaseMigrationStepApplier<Self::DatabaseMigration> + 'a>;
 
     /// See [DestructiveChangesChecker](trait.DestructiveChangesChecker.html).
-    fn destructive_changes_checker(&self) -> Arc<dyn DestructiveChangesChecker<Self::DatabaseMigration>>;
+    fn destructive_changes_checker<'a>(&'a self) -> Box<dyn DestructiveChangesChecker<Self::DatabaseMigration> + 'a>;
 
     // TODO: figure out if this is the best way to do this or move to a better place/interface
     // this is placed here so i can use the associated type
     fn deserialize_database_migration(&self, json: serde_json::Value) -> Self::DatabaseMigration;
 
     /// See [MigrationStepApplier](trait.MigrationStepApplier.html).
-    fn migration_applier(&self) -> Box<dyn MigrationApplier<Self::DatabaseMigration> + Send + Sync> {
+    fn migration_applier<'a>(&'a self) -> Box<dyn MigrationApplier<Self::DatabaseMigration> + Send + Sync + 'a> {
         let applier = MigrationApplierImpl {
             migration_persistence: self.migration_persistence(),
             step_applier: self.database_migration_step_applier(),

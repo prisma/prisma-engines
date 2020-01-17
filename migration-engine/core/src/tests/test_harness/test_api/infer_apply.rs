@@ -28,7 +28,8 @@ impl<'a> InferApply<'a> {
         let input = InferMigrationStepsInput {
             migration_id: migration_id.clone(),
             datamodel: self.schema.to_owned(),
-            assume_to_be_applied: Vec::new(),
+            assume_to_be_applied: Some(Vec::new()),
+            assume_applied_migrations: None,
         };
 
         let steps = self.api.infer_migration_steps(&input).await?.datamodel_steps;

@@ -28,10 +28,9 @@ use test_setup::*;
 pub struct TestApi {
     /// More precise than SqlFamily.
     connector_name: &'static str,
-    sql_family: SqlFamily,
     database: Arc<dyn Queryable + Send + Sync + 'static>,
     api: MigrationApi<sql_migration_connector::SqlMigrationConnector, sql_migration_connector::SqlMigration>,
-    connection_info: Option<ConnectionInfo>,
+    connection_info: ConnectionInfo,
 }
 
 impl TestApi {
@@ -40,7 +39,7 @@ impl TestApi {
     }
 
     pub fn schema_name(&self) -> &str {
-        self.connection_info.as_ref().unwrap().schema_name()
+        self.connection_info.schema_name()
     }
 
     pub fn database(&self) -> &Arc<dyn Queryable + Send + Sync + 'static> {
@@ -48,31 +47,28 @@ impl TestApi {
     }
 
     pub fn is_sqlite(&self) -> bool {
-        self.sql_family == SqlFamily::Sqlite
+        self.sql_family() == SqlFamily::Sqlite
     }
 
     pub fn is_mysql(&self) -> bool {
-        self.sql_family == SqlFamily::Mysql
+        self.sql_family() == SqlFamily::Mysql
     }
 
-    pub fn migration_persistence(&self) -> Arc<dyn MigrationPersistence> {
+    pub fn migration_persistence<'a>(&'a self) -> Box<dyn MigrationPersistence + 'a> {
         self.api.migration_persistence()
     }
 
-    pub fn connection_info(&self) -> Option<&ConnectionInfo> {
-        self.connection_info.as_ref()
+    pub fn connection_info(&self) -> &ConnectionInfo {
+        &self.connection_info
     }
 
     pub fn sql_family(&self) -> SqlFamily {
-        self.sql_family
+        self.connection_info().sql_family()
     }
 
     /// Render a table name with the required prefixing for use with quaint query building.
     pub fn render_table_name(&self, table_name: &str) -> quaint::ast::Table {
-        match self.connection_info.as_ref().map(|ci| ci.schema_name()) {
-            Some(schema_name) => (schema_name.to_owned(), table_name.to_owned()).into(),
-            None => table_name.to_owned().into(),
-        }
+        (self.schema_name().to_owned(), table_name.to_owned()).into()
     }
 
     pub async fn apply_migration(&self, steps: Vec<MigrationStep>, migration_id: &str) -> InferAndApplyOutput {
@@ -127,12 +123,7 @@ impl TestApi {
     }
 
     pub fn infer<'a>(&'a self, dm: impl Into<String>) -> Infer<'a> {
-        Infer {
-            datamodel: dm.into(),
-            api: &self.api,
-            assume_to_be_applied: None,
-            migration_id: None,
-        }
+        Infer::new(&self.api, dm)
     }
 
     pub(crate) fn apply<'a>(&'a self) -> Apply<'a> {
@@ -145,15 +136,18 @@ impl TestApi {
     }
 
     pub(crate) fn unapply_migration<'a>(&'a self) -> UnapplyMigration<'a> {
-        UnapplyMigration { api: &self.api }
+        UnapplyMigration {
+            api: &self.api,
+            force: None,
+        }
     }
 
     pub fn barrel(&self) -> BarrelMigrationExecutor {
         BarrelMigrationExecutor {
-            schema_name: self.connection_info().unwrap().schema_name().to_owned(),
+            schema_name: self.schema_name().to_owned(),
             inspector: self.describer(),
             database: Arc::clone(&self.database),
-            sql_variant: match self.sql_family {
+            sql_variant: match self.sql_family() {
                 SqlFamily::Mysql => barrel::SqlVariant::Mysql,
                 SqlFamily::Postgres => barrel::SqlVariant::Pg,
                 SqlFamily::Sqlite => barrel::SqlVariant::Sqlite,
@@ -162,16 +156,11 @@ impl TestApi {
     }
 
     fn describer(&self) -> Box<dyn SqlSchemaDescriberBackend> {
+        let db = Arc::clone(&self.database);
         match self.api.connector_type() {
-            "postgresql" => Box::new(sql_schema_describer::postgres::SqlSchemaDescriber::new(Arc::clone(
-                &self.database,
-            ))),
-            "sqlite" => Box::new(sql_schema_describer::sqlite::SqlSchemaDescriber::new(Arc::clone(
-                &self.database,
-            ))),
-            "mysql" => Box::new(sql_schema_describer::mysql::SqlSchemaDescriber::new(Arc::clone(
-                &self.database,
-            ))),
+            "postgresql" => Box::new(sql_schema_describer::postgres::SqlSchemaDescriber::new(db)),
+            "sqlite" => Box::new(sql_schema_describer::sqlite::SqlSchemaDescriber::new(db)),
+            "mysql" => Box::new(sql_schema_describer::mysql::SqlSchemaDescriber::new(db)),
             _ => unimplemented!(),
         }
     }
@@ -179,7 +168,7 @@ impl TestApi {
     pub async fn describe_database(&self) -> Result<SqlSchema, anyhow::Error> {
         let mut result = self
             .describer()
-            .describe(self.connection_info().unwrap().schema_name())
+            .describe(self.schema_name())
             .await
             .expect("Description failed");
 
@@ -210,8 +199,7 @@ pub async fn mysql_8_test_api(db_name: &str) -> TestApi {
 
     TestApi {
         connector_name: "mysql_8",
-        connection_info: Some(connection_info),
-        sql_family: SqlFamily::Mysql,
+        connection_info,
         database: Arc::clone(&connector.database),
         api: test_api(connector).await,
     }
@@ -224,8 +212,7 @@ pub async fn mysql_test_api(db_name: &str) -> TestApi {
 
     TestApi {
         connector_name: "mysql",
-        connection_info: Some(connection_info),
-        sql_family: SqlFamily::Mysql,
+        connection_info,
         database: Arc::clone(&connector.database),
         api: test_api(connector).await,
     }
@@ -238,8 +225,7 @@ pub async fn mysql_mariadb_test_api(db_name: &str) -> TestApi {
 
     TestApi {
         connector_name: "mysql_mariadb",
-        connection_info: Some(connection_info),
-        sql_family: SqlFamily::Mysql,
+        connection_info,
         database: Arc::clone(&connector.database),
         api: test_api(connector).await,
     }
@@ -252,8 +238,7 @@ pub async fn postgres9_test_api(db_name: &str) -> TestApi {
 
     TestApi {
         connector_name: "postgres9",
-        connection_info: Some(connection_info),
-        sql_family: SqlFamily::Postgres,
+        connection_info,
         database: Arc::clone(&connector.database),
         api: test_api(connector).await,
     }
@@ -266,8 +251,7 @@ pub async fn postgres_test_api(db_name: &str) -> TestApi {
 
     TestApi {
         connector_name: "postgres",
-        connection_info: Some(connection_info),
-        sql_family: SqlFamily::Postgres,
+        connection_info,
         database: Arc::clone(&connector.database),
         api: test_api(connector).await,
     }
@@ -280,8 +264,7 @@ pub async fn postgres11_test_api(db_name: &str) -> TestApi {
 
     TestApi {
         connector_name: "postgres11",
-        connection_info: Some(connection_info),
-        sql_family: SqlFamily::Postgres,
+        connection_info,
         database: Arc::clone(&connector.database),
         api: test_api(connector).await,
     }
@@ -294,8 +277,7 @@ pub async fn postgres12_test_api(db_name: &str) -> TestApi {
 
     TestApi {
         connector_name: "postgres12",
-        connection_info: Some(connection_info),
-        sql_family: SqlFamily::Postgres,
+        connection_info,
         database: Arc::clone(&connector.database),
         api: test_api(connector).await,
     }
@@ -307,8 +289,7 @@ pub async fn sqlite_test_api(db_name: &str) -> TestApi {
 
     TestApi {
         connector_name: "sqlite",
-        connection_info: Some(connection_info),
-        sql_family: SqlFamily::Sqlite,
+        connection_info,
         database: Arc::clone(&connector.database),
         api: test_api(connector).await,
     }

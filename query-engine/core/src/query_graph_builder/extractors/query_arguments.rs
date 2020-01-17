@@ -42,7 +42,7 @@ pub fn extract_query_args(arguments: Vec<ParsedArgument>, model: &ModelRef) -> Q
                     }),
 
                     "orderBy" => Ok(QueryArguments {
-                        order_by: arg.value.try_into()?,
+                        order_by: Some(arg.value.try_into()?),
                         ..res
                     }),
 

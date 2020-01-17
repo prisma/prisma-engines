@@ -1,5 +1,5 @@
 use crate::test_harness::*;
-use crate::{test_one_connector,BarrelMigrationExecutor, TestApi};
+use crate::{test_one_connector, BarrelMigrationExecutor, TestApi};
 use barrel::types;
 
 #[test_one_connector(connector = "mysql")]
@@ -31,28 +31,31 @@ async fn metadata_for_sqlite_should_work(api: &TestApi) {
 
 async fn setup(barrel: &BarrelMigrationExecutor, db_name: &str) {
     let _setup_schema = barrel
-        .execute_with_schema(|migration| {
-            migration.create_table("Blog", |t| {
-                t.add_column("bool", types::boolean());
-                t.add_column("float", types::float());
-                t.add_column("date", types::date());
-                t.add_column("id", types::primary());
-                t.add_column("int", types::integer());
-                t.add_column("string", types::text());
-            });
+        .execute_with_schema(
+            |migration| {
+                migration.create_table("Blog", |t| {
+                    t.add_column("bool", types::boolean());
+                    t.add_column("float", types::float());
+                    t.add_column("date", types::date());
+                    t.add_column("id", types::primary());
+                    t.add_column("int", types::integer());
+                    t.add_column("string", types::text());
+                });
 
-            migration.create_table("Blog2", |t| {
-                t.add_column("id", types::primary());
-                t.add_column("int", types::integer());
-                t.add_column("string", types::text());
-            });
+                migration.create_table("Blog2", |t| {
+                    t.add_column("id", types::primary());
+                    t.add_column("int", types::integer());
+                    t.add_column("string", types::text());
+                });
 
-            migration.create_table("Blog3", |t| {
-                t.add_column("bool", types::boolean());
-                t.add_column("float", types::float());
-                t.add_column("date", types::date());
-                t.add_column("id", types::primary());
-            });
-        }, db_name)
+                migration.create_table("Blog3", |t| {
+                    t.add_column("bool", types::boolean());
+                    t.add_column("float", types::float());
+                    t.add_column("date", types::date());
+                    t.add_column("id", types::primary());
+                });
+            },
+            db_name,
+        )
         .await;
 }

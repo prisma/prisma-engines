@@ -30,10 +30,16 @@ pub struct InternalDataModel {
     relation_fields: OnceCell<Vec<RelationFieldRef>>,
 }
 
-#[derive(Debug, PartialEq, Eq, Hash)]
+#[derive(Debug, PartialEq, Eq, Hash, Clone)]
 pub struct InternalEnum {
     pub name: String,
     pub values: Vec<String>,
+}
+
+impl InternalEnum {
+    pub fn contains(&self, val: &String) -> bool {
+        self.values.contains(val)
+    }
 }
 
 impl InternalDataModelTemplate {

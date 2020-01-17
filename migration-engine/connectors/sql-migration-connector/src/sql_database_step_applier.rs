@@ -1,17 +1,21 @@
 use crate::*;
-use quaint::prelude::Queryable;
 use sql_renderer::SqlRenderer;
 use sql_schema_describer::*;
-use std::{fmt::Write as _, sync::Arc};
+use std::fmt::Write as _;
 use tracing_futures::Instrument;
 
-pub struct SqlDatabaseStepApplier {
-    pub database_info: DatabaseInfo,
-    pub conn: Arc<dyn Queryable + Send + Sync + 'static>,
+pub struct SqlDatabaseStepApplier<'a> {
+    pub connector: &'a crate::SqlMigrationConnector,
+}
+
+impl crate::component::Component for SqlDatabaseStepApplier<'_> {
+    fn connector(&self) -> &crate::SqlMigrationConnector {
+        self.connector
+    }
 }
 
 #[async_trait::async_trait]
-impl DatabaseMigrationStepApplier<SqlMigration> for SqlDatabaseStepApplier {
+impl DatabaseMigrationStepApplier<SqlMigration> for SqlDatabaseStepApplier<'_> {
     async fn apply_step(&self, database_migration: &SqlMigration, index: usize) -> ConnectorResult<bool> {
         let renderer = self.renderer();
         let fut = self
@@ -41,23 +45,22 @@ impl DatabaseMigrationStepApplier<SqlMigration> for SqlDatabaseStepApplier {
     }
 
     fn render_steps_pretty(&self, database_migration: &SqlMigration) -> ConnectorResult<Vec<serde_json::Value>> {
-        Ok(render_steps_pretty(
+        render_steps_pretty(
             &database_migration,
             self.renderer().as_ref(),
-            &self.database_info,
+            self.database_info(),
             &database_migration.before,
         )?
         .into_iter()
-        .map(|pretty_step| serde_json::to_value(&pretty_step).unwrap())
-        .collect())
+        .map(|pretty_step| {
+            serde_json::to_value(&pretty_step)
+                .map_err(|err| ConnectorError::from_kind(migration_connector::ErrorKind::Generic(err.into())))
+        })
+        .collect()
     }
 }
 
-impl SqlDatabaseStepApplier {
-    fn connection_info(&self) -> &ConnectionInfo {
-        &self.database_info.connection_info
-    }
-
+impl SqlDatabaseStepApplier<'_> {
     async fn apply_next_step(
         &self,
         steps: &[SqlMigrationStep],
@@ -73,12 +76,12 @@ impl SqlDatabaseStepApplier {
         let step = &steps[index];
         tracing::debug!(?step);
 
-        for sql_string in render_raw_sql(&step, renderer, &self.database_info, current_schema)
+        for sql_string in render_raw_sql(&step, renderer, self.database_info(), current_schema)
             .map_err(|err: anyhow::Error| SqlError::Generic(err))?
         {
             tracing::debug!(index, %sql_string);
 
-            let result = self.conn.query_raw(&sql_string, &[]).await;
+            let result = self.conn().query_raw(&sql_string, &[]).await;
 
             // TODO: this does not evaluate the results of SQLites PRAGMA foreign_key_check
             result?;
@@ -86,10 +89,6 @@ impl SqlDatabaseStepApplier {
 
         let has_more = steps.get(index + 1).is_some();
         Ok(has_more)
-    }
-
-    fn sql_family(&self) -> SqlFamily {
-        self.connection_info().sql_family()
     }
 
     fn renderer<'a>(&'a self) -> Box<dyn SqlRenderer + Send + Sync + 'a> {
@@ -136,7 +135,7 @@ fn render_raw_sql(
     use itertools::Itertools;
 
     let sql_family = renderer.sql_family();
-    let schema_name = database_info.connection_info.schema_name().to_string();
+    let schema_name = database_info.connection_info().schema_name().to_string();
 
     match step {
         SqlMigrationStep::CreateTable(CreateTable { table }) => {
@@ -356,14 +355,14 @@ fn render_create_index(
         IndexType::Unique => "UNIQUE",
         IndexType::Normal => "",
     };
-    let sql_family = database_info.connection_info.sql_family();
+    let sql_family = database_info.sql_family();
     let index_name = match sql_family {
-        SqlFamily::Sqlite => renderer.quote_with_schema(database_info.connection_info.schema_name(), &name),
+        SqlFamily::Sqlite => renderer.quote_with_schema(database_info.connection_info().schema_name(), &name),
         _ => renderer.quote(&name),
     };
     let table_reference = match sql_family {
         SqlFamily::Sqlite => renderer.quote(table_name),
-        _ => renderer.quote_with_schema(database_info.connection_info.schema_name(), table_name),
+        _ => renderer.quote_with_schema(database_info.connection_info().schema_name(), table_name),
     };
     let columns: Vec<String> = columns.iter().map(|c| renderer.quote(c)).collect();
 

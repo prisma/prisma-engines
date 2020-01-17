@@ -31,6 +31,10 @@ struct TestEachConnectorArgs {
     /// Comma-separated list of connectors to exclude.
     #[darling(default)]
     ignore: Option<String>,
+
+    #[darling(default)]
+    starts_with: Option<String>,
+
     #[darling(default)]
     log: Option<String>,
 }
@@ -38,11 +42,18 @@ struct TestEachConnectorArgs {
 impl TestEachConnectorArgs {
     fn connectors_to_test(&self) -> impl Iterator<Item = &&str> {
         let ignore = self.ignore.as_ref().map(String::as_str);
+        let starts_with = self.starts_with.as_ref().map(String::as_str);
 
-        CONNECTOR_NAMES.iter().filter(move |connector_name| match ignore {
-            Some(ignore) => !connector_name.starts_with(&ignore),
-            None => true,
-        })
+        CONNECTOR_NAMES
+            .iter()
+            .filter(move |connector_name| match ignore {
+                Some(ignore) => !connector_name.starts_with(&ignore),
+                None => true,
+            })
+            .filter(move |connector_name| match starts_with {
+                Some(pat) => connector_name.starts_with(pat),
+                None => true,
+            })
     }
 }
 
@@ -106,6 +117,7 @@ fn test_each_connector_async_wrapper_functions(
 
     let mut tests = Vec::with_capacity(CONNECTOR_NAMES.len());
 
+    let optional_logging_import = args.log.as_ref().map(|_| quote!(use tracing_futures::WithSubscriber;));
     let optional_logging = args.log.as_ref().map(|log_config| {
         quote! { .with_subscriber(test_setup::logging::test_tracing_subscriber(#log_config)) }
     });
@@ -123,7 +135,7 @@ fn test_each_connector_async_wrapper_functions(
         let test = quote! {
             #[test]
             fn #connector_test_fn_name() {
-                use tracing_futures::WithSubscriber;
+                #optional_logging_import
 
                 let fut = async {
                     let api = #connector_api_factory(#test_fn_name_str).await;
@@ -163,6 +175,7 @@ pub fn test_one_connector(attr: TokenStream, input: TokenStream) -> TokenStream 
     };
 
     let output = if async_test {
+        let optional_logging_import = args.log.as_ref().map(|_| quote!(use tracing_futures::WithSubscriber;));
         let optional_logging = args.log.as_ref().map(|log_config| {
             quote! { .with_subscriber(test_setup::logging::test_tracing_subscriber(#log_config)) }
         });
@@ -170,7 +183,7 @@ pub fn test_one_connector(attr: TokenStream, input: TokenStream) -> TokenStream 
         quote! {
             #[test]
             fn #test_fn_name() {
-                use tracing_futures::WithSubscriber;
+                #optional_logging_import
 
                 let fut = async {
                     let api = #api_factory(#test_impl_name_str).await;

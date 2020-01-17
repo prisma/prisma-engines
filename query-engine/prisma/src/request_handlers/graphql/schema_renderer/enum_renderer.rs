@@ -1,5 +1,4 @@
 use super::*;
-use prisma_models::{EnumType, EnumValue};
 
 pub struct GqlEnumRenderer<'a> {
     enum_type: &'a EnumType,
@@ -7,20 +6,14 @@ pub struct GqlEnumRenderer<'a> {
 
 impl<'a> Renderer for GqlEnumRenderer<'a> {
     fn render(&self, ctx: RenderContext) -> (String, RenderContext) {
-        if ctx.already_rendered(&self.enum_type.name) {
-            return ("".into(), ctx);
+        if ctx.already_rendered(self.enum_type.name()) {
+            return ("".to_owned(), ctx);
         }
 
-        let values: Vec<String> = self
-            .enum_type
-            .values
-            .iter()
-            .map(|v| format!("{}{}", ctx.indent(), self.format_enum_value(v)))
-            .collect();
+        let values = self.format_enum_values();
+        let rendered = format!("enum {} {{\n{}\n}}", self.enum_type.name(), values.join("\n"));
 
-        let rendered = format!("enum {} {{\n{}\n}}", self.enum_type.name, values.join("\n"));
-
-        ctx.add(self.enum_type.name.clone(), rendered.clone());
+        ctx.add(self.enum_type.name().to_owned(), rendered.clone());
         (rendered, ctx)
     }
 }
@@ -30,7 +23,10 @@ impl<'a> GqlEnumRenderer<'a> {
         GqlEnumRenderer { enum_type }
     }
 
-    fn format_enum_value(&self, value: &EnumValue) -> String {
-        value.as_string().into_owned()
+    fn format_enum_values(&self) -> Vec<String> {
+        match self.enum_type {
+            EnumType::Internal(i) => i.values.clone(),
+            EnumType::OrderBy(ord) => ord.values.iter().map(|(name, _)| name.to_owned()).collect(),
+        }
     }
 }
