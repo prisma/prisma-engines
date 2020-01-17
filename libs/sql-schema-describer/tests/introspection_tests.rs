@@ -124,12 +124,26 @@ fn foreign_keys_must_work() {
                     DbType::MySql => ForeignKeyAction::Restrict,
                     _ => ForeignKeyAction::NoAction,
                 };
+                let expected_indexes = if db_type == DbType::MySql {
+                    vec![
+                        Index {
+                            name: "city".to_owned(),
+                            columns: vec![
+                                "city".to_owned(),
+                            ],
+                            tpe: IndexType::Normal
+                        }
+                    ]
+                }  else {
+                    vec![]
+                };
+
                 assert_eq!(
                     user_table,
                     &Table {
                         name: "User".to_string(),
                         columns: expected_columns,
-                        indices: vec![],
+                        indices: expected_indexes,
                         primary_key: None,
                         foreign_keys: vec![ForeignKey {
                             constraint_name: match db_type {
@@ -213,12 +227,28 @@ fn multi_column_foreign_keys_must_work() {
                     _ => ForeignKeyAction::NoAction,
                 };
 
+                let expected_indexes = if db_type == DbType::MySql {
+                    vec![
+                        Index {
+                            name: "city_name".to_owned(),
+                            columns: vec![
+                                "city_name".to_owned(),
+                                "city".to_owned(),
+                            ],
+                            tpe: IndexType::Normal
+                        }
+                    ]
+                }  else {
+                    vec![]
+                };
+
+
                 assert_eq!(
                     user_table,
                     &Table {
-                        name: "User".to_string(),
+                        name: "User".to_owned(),
                         columns: expected_columns,
-                        indices: vec![],
+                        indices: expected_indexes,
                         primary_key: None,
                         foreign_keys: vec![ForeignKey {
                             constraint_name: match db_type {
@@ -234,7 +264,7 @@ fn multi_column_foreign_keys_must_work() {
                     }
                 );
             }
-            .boxed()
+                .boxed()
         },
     );
 }
