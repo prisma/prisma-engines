@@ -86,6 +86,14 @@ impl GetRow for PostgresRow {
                     }
                     None => ParameterizedValue::Null,
                 },
+                #[cfg(feature = "json-1")]
+                PostgresType::JSON => match row.try_get(i)? {
+                    Some(val) => {
+                        let val: serde_json::Value = val;
+                        ParameterizedValue::Json(val)
+                    }
+                    None => ParameterizedValue::Null,
+                }
                 #[cfg(feature = "array")]
                 PostgresType::INT2_ARRAY => match row.try_get(i)? {
                     Some(val) => {
