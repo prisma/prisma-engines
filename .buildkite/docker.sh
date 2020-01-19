@@ -17,7 +17,7 @@ docker run --name test-mysql --network test-net \
 docker run -w /build --network test-net -v $BUILDKITE_BUILD_CHECKOUT_PATH:/build \
     -e TEST_MYSQL=mysql://prisma:prisma@test-mysql:3306/prisma \
     -e TEST_PSQL=postgres://prisma:prisma@test-postgres:5432/prisma \
-    prismagraphql/build:test cargo test --features "full serde"
+    prismagraphql/build:test cargo test --features full,json-1,uuid-0_8,chrono-0_4,tracing-log,serde-support
 
 exit_code=$?
 
