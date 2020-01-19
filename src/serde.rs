@@ -206,6 +206,7 @@ mod tests {
         let result_set = ResultSet {
             name_to_index: std::sync::Arc::clone(&first_row.name_to_index),
             rows: vec![first_row.values, second_row.values],
+            last_insert_id: None,
         };
 
         let users: Vec<User> = from_rows(result_set).unwrap();
