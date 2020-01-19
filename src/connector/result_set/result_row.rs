@@ -1,11 +1,11 @@
 use crate::ast::ParameterizedValue;
-use std::{collections::BTreeMap, sync::Arc};
+use std::sync::Arc;
 
 /// An owned version of a `Row` in a `ResultSet`. See
 /// [ResultRowRef](struct.ResultRowRef.html) for documentation on data access.
 #[derive(Debug)]
 pub struct ResultRow {
-    pub(crate) name_to_index: Arc<BTreeMap<String, usize>>,
+    pub(crate) columns: Arc<Vec<String>>,
     pub(crate) values: Vec<ParameterizedValue<'static>>,
 }
 
@@ -34,7 +34,7 @@ impl IntoIterator for ResultRow {
 /// ```
 #[derive(Debug)]
 pub struct ResultRowRef<'a> {
-    pub(crate) name_to_index: Arc<BTreeMap<String, usize>>,
+    pub(crate) columns: Arc<Vec<String>>,
     pub(crate) values: &'a Vec<ParameterizedValue<'static>>,
 }
 
@@ -53,8 +53,8 @@ impl ResultRow {
     /// Take a value with the given column name from the row. Usage
     /// documentation in [ResultRowRef](struct.ResultRowRef.html).
     pub fn get(&self, name: &str) -> Option<&ParameterizedValue<'static>> {
-        if let Some(idx) = self.name_to_index.get(name) {
-            Some(&self.values[*idx])
+        if let Some(idx) = self.columns.iter().position(|c| c == name) {
+            Some(&self.values[idx])
         } else {
             None
         }
@@ -63,7 +63,7 @@ impl ResultRow {
     /// Make a referring [ResultRowRef](struct.ResultRowRef.html).
     pub fn as_ref(&self) -> ResultRowRef {
         ResultRowRef {
-            name_to_index: Arc::clone(&self.name_to_index),
+            columns: Arc::clone(&self.columns),
             values: &self.values,
         }
     }
@@ -100,8 +100,8 @@ impl<'a> ResultRowRef<'a> {
     /// assert_eq!(Some(&row["id"]), row.get("id"));
     /// ```
     pub fn get(&self, name: &str) -> Option<&ParameterizedValue<'static>> {
-        if let Some(idx) = self.name_to_index.get(name) {
-            Some(&self.values[*idx])
+        if let Some(idx) = self.columns.iter().position(|c| c == name) {
+            Some(&self.values[idx])
         } else {
             None
         }
