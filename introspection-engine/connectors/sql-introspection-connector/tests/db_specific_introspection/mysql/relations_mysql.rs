@@ -324,7 +324,7 @@ async fn introspecting_a_many_to_many_relation_should_work(api: &TestApi) {
     let dm = r#"
             model Post {
                id      Int @id
-               postsToUserses PostsToUsers[] @relation(references: [post_id], onDelete: CASCADE)
+               postsToUserses PostsToUsers[] @relation(references: [post_id])
             }
 
             model PostsToUsers {
@@ -337,7 +337,7 @@ async fn introspecting_a_many_to_many_relation_should_work(api: &TestApi) {
             
             model User {
                id      Int @id
-               postsToUserses PostsToUsers[] @relation(onDelete: CASCADE)
+               postsToUserses PostsToUsers[]
             }
         "#;
     let result = dbg!(api.introspect().await);
@@ -431,7 +431,8 @@ async fn introspecting_a_self_relation_should_work(api: &TestApi) {
 
 // on delete cascade
 
-#[test_one_connector(connector = "mysql")]
+// TODO: bring `onDelete` back once `prisma migrate` is a thing
+//#[test_one_connector(connector = "mysql")]
 async fn introspecting_cascading_delete_behaviour_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel

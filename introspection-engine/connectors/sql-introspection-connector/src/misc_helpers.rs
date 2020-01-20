@@ -202,7 +202,8 @@ pub(crate) fn calculate_backrelation_field(
     let table = schema.table_bang(model.name.as_str());
     let fk = table.foreign_key_for_column(relation_field.name.as_str());
     let on_delete = match fk {
-        Some(fk) if fk.on_delete_action == ForeignKeyAction::Cascade => OnDeleteStrategy::Cascade,
+        // TODO: bring `onDelete` back once `prisma migrate` is a thing
+        //        Some(fk) if fk.on_delete_action == ForeignKeyAction::Cascade => OnDeleteStrategy::Cascade,
         _ => OnDeleteStrategy::None,
     };
     let field_type = FieldType::Relation(RelationInfo {

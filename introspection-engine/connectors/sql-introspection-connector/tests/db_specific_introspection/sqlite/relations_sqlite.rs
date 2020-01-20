@@ -281,12 +281,12 @@ async fn introspecting_a_many_to_many_relation_should_work(api: &TestApi) {
     let dm = r#"
             model User {
                id Int @id
-               postsToUserses PostsToUsers[] @relation(onDelete: CASCADE)
+               postsToUserses PostsToUsers[]
             }
             
             model Post {
                id Int @id
-               postsToUserses PostsToUsers[] @relation(references: [post_id], onDelete: CASCADE)
+               postsToUserses PostsToUsers[] @relation(references: [post_id])
             }
             
             model PostsToUsers {
@@ -374,7 +374,8 @@ async fn introspecting_a_self_relation_should_work(api: &TestApi) {
 
 // on delete cascade
 
-#[test_one_connector(connector = "sqlite")]
+// TODO: bring `onDelete` back once `prisma migrate` is a thing
+//#[test_one_connector(connector = "sqlite")]
 async fn introspecting_cascading_delete_behaviour_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
