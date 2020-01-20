@@ -10,8 +10,9 @@ const DIRECTIVE_NAME: &'static str = "map";
 
 impl<T: dml::WithDatabaseName> DirectiveValidator<T> for MapDirectiveValidator {
     fn directive_name(&self) -> &'static str {
-        &"map"
+        DIRECTIVE_NAME
     }
+
     fn validate_and_apply(&self, args: &mut Args, obj: &mut T) -> Result<(), DatamodelError> {
         match args.default_arg("name")?.as_array() {
             Ok(value) => {
@@ -27,7 +28,9 @@ impl<T: dml::WithDatabaseName> DirectiveValidator<T> for MapDirectiveValidator {
                         args.span(),
                     ));
                 } else {
-                    obj.set_database_names(db_names)
+                    obj.set_database_names(db_names).map_err(|err_msg| {
+                        DatamodelError::new_directive_validation_error(&err_msg, DIRECTIVE_NAME, args.span())
+                    })?
                 }
             }
             // self.parser_error would be better here, but we cannot call it due to rust limitations.
@@ -55,15 +58,12 @@ impl<T: dml::WithDatabaseName> DirectiveValidator<T> for MapDirectiveValidator {
             1 => {
                 let db_name = db_names.into_iter().next().unwrap();
                 Ok(vec![ast::Directive::new(
-                    DirectiveValidator::<T>::directive_name(self),
+                    DIRECTIVE_NAME,
                     vec![ast::Argument::new("", db_name)],
                 )])
             }
             _ => {
-                let directive = ast::Directive::new(
-                    DirectiveValidator::<T>::directive_name(self),
-                    vec![ast::Argument::new_array("", db_names)],
-                );
+                let directive = ast::Directive::new(DIRECTIVE_NAME, vec![ast::Argument::new_array("", db_names)]);
                 Ok(vec![directive])
             }
         }

@@ -166,9 +166,13 @@ impl WithDatabaseName for Model {
         }
     }
 
-    fn set_database_names(&mut self, database_names: Vec<String>) {
-        // TODO: return error if there's more than 1 name
-        let first = database_names.into_iter().next();
-        self.database_name = first
+    fn set_database_names(&mut self, database_names: Vec<String>) -> Result<(), String> {
+        if database_names.len() > 1 {
+            Err("A Model must not specify multiple mapped names.".to_string())
+        } else {
+            let first = database_names.into_iter().next();
+            self.database_name = first;
+            Ok(())
+        }
     }
 }

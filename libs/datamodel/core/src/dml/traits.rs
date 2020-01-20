@@ -1,5 +1,4 @@
-// Setters are a bit untypical for rust,
-// but we want to have "composeable" struct creation.
+use std::result::Result;
 
 pub trait WithName {
     fn name(&self) -> &String;
@@ -19,7 +18,7 @@ pub trait WithDatabaseName {
 
     fn database_names(&self) -> Vec<&str>;
 
-    fn set_database_names(&mut self, database_name: Vec<String>);
+    fn set_database_names(&mut self, database_name: Vec<String>) -> Result<(), String>;
 }
 
 pub trait Parsable: Sized {
