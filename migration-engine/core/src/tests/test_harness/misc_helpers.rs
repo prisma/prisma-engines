@@ -11,27 +11,29 @@ pub fn parse(datamodel_string: &str) -> SchemaAst {
 }
 
 pub(super) async fn mysql_migration_connector(url_str: &str) -> SqlMigrationConnector {
-    match SqlMigrationConnector::new(url_str).await {
+    match SqlMigrationConnector::new(url_str, "mysql").await {
         Ok(c) => c,
         Err(_) => {
             create_mysql_database(&url_str.parse().unwrap()).await.unwrap();
-            SqlMigrationConnector::new(url_str).await.unwrap()
+            SqlMigrationConnector::new(url_str, "mysql").await.unwrap()
         }
     }
 }
 
 pub(super) async fn postgres_migration_connector(url_str: &str) -> SqlMigrationConnector {
-    match SqlMigrationConnector::new(url_str).await {
+    match SqlMigrationConnector::new(url_str, "postgresql").await {
         Ok(c) => c,
         Err(_) => {
             create_postgres_database(&url_str.parse().unwrap()).await.unwrap();
-            SqlMigrationConnector::new(url_str).await.unwrap()
+            SqlMigrationConnector::new(url_str, "postgresql").await.unwrap()
         }
     }
 }
 
 pub(super) async fn sqlite_migration_connector(db_name: &str) -> SqlMigrationConnector {
-    SqlMigrationConnector::new(&sqlite_test_url(db_name)).await.unwrap()
+    SqlMigrationConnector::new(&sqlite_test_url(db_name), "sqlite")
+        .await
+        .unwrap()
 }
 
 pub async fn test_api<C, D>(connector: C) -> MigrationApi<C, D>
@@ -46,4 +48,14 @@ where
         .expect("Engine reset failed");
 
     api
+}
+
+pub(crate) fn unique_migration_id() -> String {
+    /// An atomic counter to generate unique migration IDs in tests.
+    static MIGRATION_ID_COUNTER: std::sync::atomic::AtomicUsize = std::sync::atomic::AtomicUsize::new(0);
+
+    format!(
+        "migration-{}",
+        MIGRATION_ID_COUNTER.fetch_add(1, std::sync::atomic::Ordering::Relaxed)
+    )
 }

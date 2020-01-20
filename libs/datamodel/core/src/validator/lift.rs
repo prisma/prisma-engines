@@ -1,7 +1,7 @@
 use super::DirectiveBox;
 use crate::{
     ast,
-    common::value::ValueValidator,
+    common::value_validator::ValueValidator,
     common::ScalarType,
     configuration, dml,
     error::{DatamodelError, ErrorCollection},
@@ -115,11 +115,11 @@ impl LiftAstToDml {
         field.arity = self.lift_field_arity(&ast_field.arity);
 
         if let Some(value) = &ast_field.default_value {
-            let validator = ValueValidator::new(value)?;
+            let validator = ValueValidator::new(value);
 
             if let dml::FieldType::Base(base_type) = &field_type {
-                match validator.as_type(*base_type) {
-                    Ok(val) => field.default_value = Some(val),
+                match validator.as_default_value(*base_type) {
+                    Ok(dv) => field.default_value = Some(dv),
                     Err(err) => errors.push(err),
                 };
             } else {

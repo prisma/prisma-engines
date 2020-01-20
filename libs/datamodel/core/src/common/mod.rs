@@ -1,8 +1,6 @@
-pub mod argument;
-pub mod functions;
-mod interpolation;
+pub mod arguments;
 pub mod names;
-pub mod value;
+pub mod value_validator;
 
 mod fromstr;
 mod string_helper;

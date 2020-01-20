@@ -1,6 +1,7 @@
 use super::*;
+use crate::EnumType;
 use once_cell::sync::OnceCell;
-use prisma_models::{EnumType, EnumValue, ModelRef, PrismaValue};
+use prisma_models::{dml, ModelRef, OrderBy};
 use std::sync::Arc;
 
 /// Object type convenience wrapper function.
@@ -37,18 +38,18 @@ where
 }
 
 /// Enum type convenience wrapper function.
-pub fn enum_type<T>(name: T, values: Vec<EnumValue>) -> EnumType
+pub fn order_by_enum_type<T>(name: T, values: Vec<(String, OrderBy)>) -> EnumType
 where
     T: Into<String>,
 {
-    EnumType {
+    EnumType::OrderBy(OrderByEnumType {
         name: name.into(),
         values,
-    }
+    })
 }
 
 /// Argument convenience wrapper function.
-pub fn argument<T>(name: T, arg_type: InputType, default_value: Option<PrismaValue>) -> Argument
+pub fn argument<T>(name: T, arg_type: InputType, default_value: Option<dml::DefaultValue>) -> Argument
 where
     T: Into<String>,
 {
@@ -78,7 +79,7 @@ where
 }
 
 /// Field convenience wrapper function.
-pub fn input_field<T>(name: T, field_type: InputType, default_value: Option<PrismaValue>) -> InputField
+pub fn input_field<T>(name: T, field_type: InputType, default_value: Option<dml::DefaultValue>) -> InputField
 where
     T: Into<String>,
 {

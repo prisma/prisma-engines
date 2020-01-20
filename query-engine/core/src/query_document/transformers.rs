@@ -6,7 +6,7 @@
 //! assume the data has to be because of the structural guarantees of the query schema validation.
 use super::*;
 use chrono::prelude::*;
-use prisma_models::{EnumValue, EnumValueWrapper, GraphqlId, OrderBy, PrismaValue};
+use prisma_models::{GraphqlId, OrderBy, PrismaValue};
 use rust_decimal::prelude::ToPrimitive;
 use std::convert::TryInto;
 
@@ -20,7 +20,7 @@ impl TryInto<PrismaValue> for ParsedInputValue {
                 .into_iter()
                 .map(|val| val.try_into())
                 .collect::<QueryParserResult<Vec<PrismaValue>>>()
-                .map(|vec| PrismaValue::List(Some(vec))),
+                .map(|vec| PrismaValue::List(vec)),
 
             v => Err(QueryParserError::AssertionError(format!(
                 "Attempted conversion of ParsedInputValue ({:?}) into PrismaValue failed.",
@@ -81,7 +81,7 @@ impl TryInto<Option<String>> for ParsedInputValue {
 
         match prisma_value {
             PrismaValue::String(s) => Ok(Some(s)),
-            PrismaValue::Enum(s) => Ok(Some(s.as_string().into_owned())),
+            PrismaValue::Enum(s) => Ok(Some(s)),
             PrismaValue::Null => Ok(None),
             v => Err(QueryParserError::AssertionError(format!(
                 "Attempted conversion of non-String Prisma value type ({:?}) into String failed.",
@@ -91,37 +91,14 @@ impl TryInto<Option<String>> for ParsedInputValue {
     }
 }
 
-impl TryInto<Option<EnumValue>> for ParsedInputValue {
+impl TryInto<OrderBy> for ParsedInputValue {
     type Error = QueryParserError;
 
-    fn try_into(self) -> QueryParserResult<Option<EnumValue>> {
-        let prisma_value: PrismaValue = self.try_into()?;
-
-        match prisma_value {
-            PrismaValue::Enum(s) => Ok(Some(s)),
-            PrismaValue::Null => Ok(None),
+    fn try_into(self) -> QueryParserResult<OrderBy> {
+        match self {
+            Self::OrderBy(ord) => Ok(ord),
             v => Err(QueryParserError::AssertionError(format!(
-                "Attempted conversion of non-Enum Prisma value type ({:?}) into enum value failed.",
-                v
-            ))),
-        }
-    }
-}
-
-impl TryInto<Option<OrderBy>> for ParsedInputValue {
-    type Error = QueryParserError;
-
-    fn try_into(self) -> QueryParserResult<Option<OrderBy>> {
-        let enum_val: Option<EnumValue> = self.try_into()?;
-
-        match enum_val {
-            Some(EnumValue {
-                value: EnumValueWrapper::OrderBy(ob),
-                ..
-            }) => Ok(Some(ob)),
-            None => Ok(None),
-            v => Err(QueryParserError::AssertionError(format!(
-                "Attempted conversion of non-order-by enum Prisma value type ({:?}) into order by enum value failed.",
+                "Attempted conversion of non-order-by enum ({:?}) into order by enum value failed.",
                 v
             ))),
         }

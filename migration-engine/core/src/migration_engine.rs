@@ -1,6 +1,6 @@
-use crate::commands::CommandResult;
 use crate::migration::datamodel_calculator::*;
 use crate::migration::datamodel_migration_steps_inferrer::*;
+use crate::{commands::CommandResult, CoreResult};
 use datamodel::ast::SchemaAst;
 use migration_connector::*;
 use std::sync::Arc;
@@ -20,7 +20,7 @@ where
     C: MigrationConnector<DatabaseMigration = D>,
     D: DatabaseMigrationMarker + Send + Sync + 'static,
 {
-    pub async fn new(connector: C) -> crate::Result<Self> {
+    pub async fn new(connector: C) -> CoreResult<Self> {
         let engine = MigrationEngine {
             datamodel_migration_steps_inferrer: Arc::new(DataModelMigrationStepsInferrerImplWrapper {}),
             datamodel_calculator: Arc::new(DataModelCalculatorImpl),

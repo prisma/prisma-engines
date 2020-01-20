@@ -226,12 +226,19 @@ async fn introspecting_a_prisma_many_to_many_relation_should_work(api: &TestApi)
                           FOREIGN KEY (B) REFERENCES  User(id) ON DELETE CASCADE",
                 )
             });
-            migration.inject_custom(format!(
-                "CREATE UNIQUE INDEX \"{}\".test ON \"_PostToUser\" (\"A\", \"B\");",
-                api.schema_name()
-            ))
         })
         .await;
+
+    api.database()
+        .execute_raw(
+            &format!(
+                "CREATE UNIQUE INDEX \"{}\".test ON \"_PostToUser\" (\"A\", \"B\");",
+                api.schema_name(),
+            ),
+            &[],
+        )
+        .await
+        .unwrap();
 
     let dm = r#"
             model User {

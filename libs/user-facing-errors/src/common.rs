@@ -9,6 +9,7 @@ Authentication failed against database server at `${database_host}`, the provide
 
 Please make sure to provide valid database credentials for the database server at `${database_host}`."
 )]
+// **Notes**: Might vary for different data source, For example, SQLite has no concept of user accounts, and instead relies on the file system for all database permissions. This makes enforcing storage quotas difficult and enforcing user permissions impossible.
 pub struct IncorrectDatabaseCredentials {
     /// Database host URI
     pub database_user: String,
@@ -56,9 +57,7 @@ pub struct DatabaseTimeout {
 #[serde(untagged)]
 #[user_facing(code = "P1003")]
 pub enum DatabaseDoesNotExist {
-    #[user_facing(
-        message = "Database ${database_file_name} does not exist on the database server at ${database_file_path}"
-    )]
+    #[user_facing(message = "Database ${database_file_name} does not exist at ${database_file_path}")]
     Sqlite {
         database_file_name: String,
         database_file_path: String,
@@ -112,7 +111,7 @@ pub struct UnableToStartTheQueryEngine {
 #[user_facing(
     code = "P1006",
     message = "\
-Photon binary for current platform `${platform}` could not be found. Make sure to adjust the generator configuration in the schema.prisma file.
+Query engine binary for current platform `${platform}` could not be found. Make sure to adjust the generator configuration in the Prisma schema file.
 
 ${generator_config}
 
@@ -190,10 +189,7 @@ mod tests {
             database_file_name: "dev.db".into(),
         };
 
-        assert_eq!(
-            sqlite_err.message(),
-            "Database dev.db does not exist on the database server at /tmp/dev.db"
-        );
+        assert_eq!(sqlite_err.message(), "Database dev.db does not exist at /tmp/dev.db");
 
         let mysql_err = DatabaseDoesNotExist::Mysql {
             database_name: "root".into(),

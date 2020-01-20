@@ -197,7 +197,7 @@ async fn altering_a_column_without_non_null_values_should_not_warn(api: &TestApi
 }
 
 #[test_each_connector]
-async fn altering_a_column_with_non_null_values_should_warn(api: &TestApi) {
+async fn altering_a_column_with_non_null_values_should_warn(api: &TestApi) -> TestResult {
     let dm = r#"
         model Test {
             id String @id @default(cuid())
@@ -205,7 +205,8 @@ async fn altering_a_column_with_non_null_values_should_warn(api: &TestApi) {
         }
     "#;
 
-    let original_database_schema = api.infer_and_apply(&dm).await.sql_schema;
+    api.infer_apply(&dm).send().await?;
+    let original_database_schema = api.describe_database().await?;
 
     let insert = Insert::multi_into((api.schema_name(), "Test"), vec!["id", "age"])
         .values(("a", 12))
@@ -220,15 +221,13 @@ async fn altering_a_column_with_non_null_values_should_warn(api: &TestApi) {
         }
     "#;
 
-    let result = api.infer_and_apply(&dm2).await;
-    let final_database_schema = result.sql_schema;
-
+    let migration_output = api.infer_apply(&dm2).send().await?;
     // The schema should not change because the migration should not run if there are warnings
     // and the force flag isn't passed.
-    assert_eq!(original_database_schema, final_database_schema);
+    api.assert_schema().await?.assert_equals(&original_database_schema)?;
 
     assert_eq!(
-        result.migration_output.warnings,
+        migration_output.warnings,
         &[MigrationWarning {
             description:
                 "You are about to alter the column `age` on the `Test` table, which still contains 2 non-null values. \
@@ -236,6 +235,119 @@ async fn altering_a_column_with_non_null_values_should_warn(api: &TestApi) {
                     .to_owned()
         }]
     );
+
+    let data = api.dump_table("Test").await?;
+    assert_eq!(data.len(), 2);
+
+    Ok(())
+}
+
+#[test_each_connector]
+async fn changing_a_column_default_should_warn(api: &TestApi) -> TestResult {
+    let dm = r#"
+        model Test {
+            id String @id @default(cuid())
+            age Int? @default(30)
+        }
+    "#;
+
+    api.infer_apply(&dm).send().await?;
+    let original_database_schema = api.describe_database().await?;
+
+    let insert = Insert::multi_into((api.schema_name(), "Test"), vec!["id", "age"])
+        .values(("a", 12))
+        .values(("b", 22));
+
+    api.database().execute(insert.into()).await.unwrap();
+
+    let dm2 = r#"
+        model Test {
+            id String @id @default(cuid())
+            age Int? @default(40)
+        }
+    "#;
+
+    let migration_output = api.infer_apply(&dm2).send().await?;
+
+    if api.is_sqlite() {
+        // On SQLite, we can safely migrate column defaults.
+        api.assert_schema().await?.assert_ne(&original_database_schema)?;
+
+        assert!(migration_output.warnings.is_empty());
+    } else {
+        // The schema should not change because the migration should not run if there are warnings
+        // and the force flag isn't passed.
+        api.assert_schema().await?.assert_equals(&original_database_schema)?;
+
+        assert_eq!(
+            migration_output.warnings,
+            &[MigrationWarning {
+                description:
+                    "You are about to alter the column `age` on the `Test` table, which still contains 2 non-null values. \
+                     The data in that column will be lost."
+                        .to_owned()
+            }]
+        );
+    }
+
+    let data = api.dump_table("Test").await?;
+    assert_eq!(data.len(), 2);
+
+    Ok(())
+}
+
+#[test_each_connector]
+async fn changing_a_column_from_required_to_optional_should_warn(api: &TestApi) -> TestResult {
+    let dm = r#"
+        model Test {
+            id String @id @default(cuid())
+            age Int @default(30)
+        }
+    "#;
+
+    api.infer_apply(&dm).send().await?;
+    let original_database_schema = api.describe_database().await?;
+
+    let insert = Insert::multi_into((api.schema_name(), "Test"), vec!["id", "age"])
+        .values(("a", 12))
+        .values(("b", 22));
+
+    api.database().execute(insert.into()).await.unwrap();
+
+    let dm2 = r#"
+        model Test {
+            id String @id @default(cuid())
+            age Int? @default(30)
+        }
+    "#;
+
+    let migration_output = api.infer_apply(&dm2).send().await?;
+
+    if api.is_sqlite() {
+        // On SQLite, we can safely migrate column defaults.
+        api.assert_schema().await?.assert_ne(&original_database_schema)?;
+
+        assert!(migration_output.warnings.is_empty());
+    } else {
+        // The schema should not change because the migration should not run if there are warnings
+        // and the force flag isn't passed.
+        api.assert_schema().await?.assert_equals(&original_database_schema)?;
+
+        assert_eq!(
+            migration_output.warnings,
+            &[MigrationWarning {
+                description:
+                    "You are about to alter the column `age` on the `Test` table, which still contains 2 non-null values. \
+                     The data in that column will be lost."
+                        .to_owned()
+            }]
+        );
+    }
+
+    let data = api.dump_table("Test").await?;
+    assert_eq!(data.len(), 2);
+
+    Ok(())
 }
 
 #[test_each_connector]
@@ -287,7 +399,7 @@ async fn dropping_a_table_referenced_by_foreign_keys_must_work(api: &TestApi) ->
     Ok(())
 }
 
-#[test_each_connector(ignore = "mysql_mariadb")]
+#[test_each_connector]
 async fn string_columns_do_not_get_arbitrarily_migrated(api: &TestApi) -> TestResult {
     use quaint::ast::*;
 

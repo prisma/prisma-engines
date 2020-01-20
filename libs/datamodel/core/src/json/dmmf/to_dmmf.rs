@@ -96,11 +96,11 @@ fn type_to_string(scalar: &ScalarType) -> String {
     scalar.to_string()
 }
 
-fn default_value_to_serde(container: &Option<dml::ScalarValue>) -> Option<serde_json::Value> {
-    match container {
-        Some(value) => Some(value_to_serde(value)),
-        None => None,
-    }
+fn default_value_to_serde(dv_opt: &Option<dml::DefaultValue>) -> Option<serde_json::Value> {
+    dv_opt.as_ref().map(|dv| match dv {
+        dml::DefaultValue::Single(value) => value_to_serde(&value.clone()),
+        dml::DefaultValue::Expression(vg) => function_to_serde(&vg.name, vg.return_type(), &vg.args),
+    })
 }
 
 fn value_to_serde(value: &dml::ScalarValue) -> serde_json::Value {
@@ -112,7 +112,6 @@ fn value_to_serde(value: &dml::ScalarValue) -> serde_json::Value {
         dml::ScalarValue::Int(val) => serde_json::Value::Number(serde_json::Number::from_f64(*val as f64).unwrap()),
         dml::ScalarValue::Decimal(val) => serde_json::Value::Number(serde_json::Number::from_f64(*val as f64).unwrap()),
         dml::ScalarValue::DateTime(val) => serde_json::Value::String(val.to_rfc3339()),
-        dml::ScalarValue::Expression(name, return_type, args) => function_to_serde(&name, *return_type, &args),
     }
 }
 

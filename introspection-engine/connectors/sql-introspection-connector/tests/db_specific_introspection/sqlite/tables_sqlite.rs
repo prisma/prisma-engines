@@ -65,12 +65,19 @@ async fn introspecting_a_table_with_unique_index_must_work(api: &TestApi) {
                 t.add_column("id", types::primary());
                 t.add_column("authorId", types::text());
             });
-            migration.inject_custom(format!(
-                "Create Unique Index \"{}\".\"test\" on \"Blog\"( \"authorId\")",
-                api.schema_name()
-            ));
         })
         .await;
+
+    api.database()
+        .execute_raw(
+            &format!(
+                "Create Unique Index \"{}\".\"test\" on \"Blog\"( \"authorId\")",
+                api.schema_name()
+            ),
+            &[],
+        )
+        .await
+        .unwrap();
 
     let dm = r#"
             model Blog {
@@ -92,12 +99,19 @@ async fn introspecting_a_table_with_multi_column_unique_index_must_work(api: &Te
                 t.add_column("firstname", types::text());
                 t.add_column("lastname", types::text());
             });
-            migration.inject_custom(format!(
-                "Create Unique Index \"{}\".\"test\" on \"User\"( \"firstname\", \"lastname\")",
-                api.schema_name()
-            ));
         })
         .await;
+
+    api.database()
+        .execute_raw(
+            &format!(
+                "Create Unique Index \"{}\".\"test\" on \"User\"( \"firstname\", \"lastname\")",
+                api.schema_name()
+            ),
+            &[],
+        )
+        .await
+        .unwrap();
 
     let dm = r#"
             model User {
@@ -199,12 +213,16 @@ async fn introspecting_a_table_with_a_non_unique_index_should_work(api: &TestApi
                 t.add_column("a", types::text());
                 t.add_column("id", types::primary());
             });
-            migration.inject_custom(format!(
-                "Create Index \"{}\".\"test\" on \"User\"(\"a\")",
-                api.schema_name()
-            ));
         })
         .await;
+
+    api.database()
+        .execute_raw(
+            &format!("Create Index \"{}\".\"test\" on \"User\"(\"a\")", api.schema_name()),
+            &[],
+        )
+        .await
+        .unwrap();
 
     let dm = r#"
             model User {
@@ -227,12 +245,19 @@ async fn introspecting_a_table_with_a_multi_column_non_unique_index_should_work(
                 t.add_column("b", types::text());
                 t.add_column("id", types::primary());
             });
-            migration.inject_custom(format!(
-                "Create Index \"{}\".\"test\" on \"User\"(\"a\",\"b\")",
-                api.schema_name()
-            ));
         })
         .await;
+
+    api.database()
+        .execute_raw(
+            &format!(
+                "Create Index \"{}\".\"test\" on \"User\"(\"a\",\"b\")",
+                api.schema_name()
+            ),
+            &[],
+        )
+        .await
+        .unwrap();
 
     let dm = r#"
             model User {

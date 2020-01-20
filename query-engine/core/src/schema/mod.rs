@@ -1,10 +1,12 @@
 #![warn(warnings)]
 
 mod capability;
+mod enum_type;
 mod query_schema;
 mod renderer;
 
 pub use capability::*;
+pub use enum_type::*;
 pub use query_schema::*;
 pub use renderer::*;
 

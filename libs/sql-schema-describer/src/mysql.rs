@@ -1,5 +1,6 @@
 use super::*;
 use log::debug;
+use once_cell::sync::Lazy;
 use quaint::prelude::Queryable;
 use std::collections::{BTreeMap, HashMap};
 use std::sync::Arc;
@@ -177,7 +178,11 @@ impl SqlSchemaDescriber {
                         .and_then(|x| x.to_string())
                         .expect("get column name"),
                     tpe,
-                    default: col.get("column_default").and_then(|x| x.to_string()),
+                    default: col
+                        .get("column_default")
+                        .and_then(|x| x.as_str())
+                        .and_then(sanitize_default_value)
+                        .map(String::from),
                     auto_increment: auto_increment,
                 }
             })
@@ -434,5 +439,38 @@ fn get_column_type(data_type: &str, full_data_type: &str, arity: ColumnArity) ->
         raw: data_type.to_string(),
         family: family,
         arity,
+    }
+}
+
+fn sanitize_default_value(value: &str) -> Option<&str> {
+    match value {
+        "NULL" => None,
+        default if default.starts_with("'") => Some(unquote_mariadb_string_defaults(default)),
+        other => Some(other),
+    }
+}
+
+fn unquote_mariadb_string_defaults(default: &str) -> &str {
+    /// Regex for matching the quotes on the introspected string values on MariaDB.
+    static MARIADB_STRING_DEFAULT_RE: Lazy<regex::Regex> = Lazy::new(|| regex::Regex::new(r#"^'(.*)'$"#).unwrap());
+
+    MARIADB_STRING_DEFAULT_RE
+        .captures(default)
+        .and_then(|captures| captures.get(1))
+        .map(|capt| capt.as_str())
+        .unwrap_or(default)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn mariadb_string_default_regex_works() {
+        let quoted_str = "'abc $$ def'";
+
+        assert_eq!(unquote_mariadb_string_defaults(quoted_str), "abc $$ def");
+
+        assert_eq!(unquote_mariadb_string_defaults("heh "), "heh ");
     }
 }

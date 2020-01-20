@@ -1,7 +1,7 @@
 use datamodel::common::names::NameNormalizer;
 use datamodel::{
-    dml, Field, FieldArity, FieldType, IdInfo, IdStrategy, IndexDefinition, Model, OnDeleteStrategy, RelationInfo,
-    ScalarType, ScalarValue,
+    dml, DefaultValue, Field, FieldArity, FieldType, IdInfo, IdStrategy, IndexDefinition, Model, OnDeleteStrategy,
+    RelationInfo, ScalarType, ScalarValue,
 };
 use log::debug;
 use regex::Regex;
@@ -115,7 +115,8 @@ pub(crate) fn calculate_scalar_field(schema: &&SqlSchema, table: &&Table, column
         _ => column
             .default
             .as_ref()
-            .and_then(|default| calculate_default(default, &column.tpe.family)),
+            .and_then(|default| calculate_default(default, &column.tpe.family))
+            .map(|sv| DefaultValue::Single(sv)),
     };
 
     let is_unique = match id_info {

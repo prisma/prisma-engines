@@ -1,4 +1,5 @@
 use super::*;
+use prisma_models::OrderBy;
 
 #[derive(Debug)]
 pub struct ObjectTypeBuilder<'a> {
@@ -167,21 +168,25 @@ impl<'a> ObjectTypeBuilder<'a> {
 
     // Builds "orderBy" argument.
     pub fn order_by_argument(&self, model: &ModelRef) -> Argument {
-        let enum_values: Vec<EnumValue> = model
+        let enum_values: Vec<_> = model
             .fields()
             .scalar_non_list()
             .iter()
-            .map(|f| {
+            .map(|field| {
                 vec![
-                    EnumValue::order_by(
-                        format!("{}_{}", f.name, SortOrder::Ascending.abbreviated()),
-                        Arc::clone(f),
-                        SortOrder::Ascending,
+                    (
+                        format!("{}_{}", field.name, SortOrder::Ascending.abbreviated()),
+                        OrderBy {
+                            field: field.clone(),
+                            sort_order: SortOrder::Ascending,
+                        },
                     ),
-                    EnumValue::order_by(
-                        format!("{}_{}", f.name, SortOrder::Descending.abbreviated()),
-                        Arc::clone(f),
-                        SortOrder::Descending,
+                    (
+                        format!("{}_{}", field.name, SortOrder::Descending.abbreviated()),
+                        OrderBy {
+                            field: field.clone(),
+                            sort_order: SortOrder::Descending,
+                        },
                     ),
                 ]
             })
@@ -189,7 +194,7 @@ impl<'a> ObjectTypeBuilder<'a> {
             .collect();
 
         let enum_name = format!("{}OrderByInput", model.name);
-        let enum_type = enum_type(enum_name, enum_values);
+        let enum_type = order_by_enum_type(enum_name, enum_values);
 
         argument("orderBy", InputType::opt(enum_type.into()), None)
     }
@@ -201,7 +206,7 @@ impl<'a> ObjectTypeBuilder<'a> {
                     "Invariant violation: Enum fields are expected to have an internal_enum associated with them.",
                 );
 
-                internal_enum.into()
+                internal_enum.clone().into()
             }
             _ => panic!("Invariant violation: map_enum_field can only be called on scalar enum fields."),
         }

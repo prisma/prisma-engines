@@ -58,7 +58,7 @@ pub struct Field {
     /// The database internal name.
     pub database_names: Vec<String>,
     /// The default value.
-    pub default_value: Option<ScalarValue>,
+    pub default_value: Option<DefaultValue>,
     /// Indicates if the field is unique.
     pub is_unique: bool,
     /// If set, signals that this field is an id field, or

@@ -5,7 +5,7 @@ use serde::Serialize;
 
 /// This trait is implemented by each connector. It provides a generic API to store and retrieve [Migration](struct.Migration.html) records.
 #[async_trait::async_trait]
-pub trait MigrationPersistence: Send + Sync + 'static {
+pub trait MigrationPersistence: Send + Sync {
     /// Initialize migration persistence state. E.g. create the migrations table in an SQL database.
     async fn init(&self) -> Result<(), ConnectorError>;
 

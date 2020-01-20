@@ -4,6 +4,7 @@ use chrono::prelude::*;
 use prisma_models::{GraphqlId, PrismaValue};
 use rust_decimal::{prelude::FromPrimitive, Decimal};
 use std::{
+    borrow::Borrow,
     collections::{BTreeMap, HashSet},
     sync::Arc,
 };
@@ -158,7 +159,8 @@ impl QueryDocumentParser {
 
             // Scalar and enum handling.
             (_, InputType::Scalar(scalar))                  => Self::parse_scalar(value, &scalar).map(ParsedInputValue::Single),
-            (QueryValue::Enum(_), InputType::Enum(et))      => Self::parse_scalar(value, &ScalarType::Enum(Arc::clone(et))).map(ParsedInputValue::Single), // todo
+            (QueryValue::Enum(_), InputType::Enum(et))      => Self::parse_enum(value, et),
+            (QueryValue::String(_), InputType::Enum(et))      => Self::parse_enum(value, et),
 
             // List and object handling.
             (QueryValue::List(values), InputType::List(l))  => Self::parse_list(values.clone(), &l).map(ParsedInputValue::List),
@@ -182,10 +184,6 @@ impl QueryDocumentParser {
             (QueryValue::Float(f), ScalarType::Float)     => Ok(PrismaValue::Float(Decimal::from_f64(f).expect("f64 is not a Decimal."))),
             (QueryValue::Float(f), ScalarType::Int)       => Ok(PrismaValue::Int(f as i64)),
             (QueryValue::Boolean(b), ScalarType::Boolean) => Ok(PrismaValue::Boolean(b)),
-            (QueryValue::Enum(e), ScalarType::Enum(et))   => match et.value_for(e.as_str()) {
-                                                                Some(val) => Ok(PrismaValue::Enum(val.clone())),
-                                                                None => Err(QueryParserError::ValueParseError(format!("Enum value '{}' is invalid for enum type {}", e, et.name)))
-                                                             },
 
             // Possible ID combinations TODO UUID ids are not encoded in any useful way in the schema.
             (QueryValue::String(s), ScalarType::ID)       => Self::parse_uuid(s.as_str()).map(PrismaValue::Uuid).or_else(|_| Ok(PrismaValue::String(s))),
@@ -223,6 +221,40 @@ impl QueryDocumentParser {
             .collect::<QueryParserResult<Vec<ParsedInputValue>>>()
     }
 
+    pub fn parse_enum(val: QueryValue, typ: &EnumTypeRef) -> QueryParserResult<ParsedInputValue> {
+        let raw = match val {
+            QueryValue::Enum(s) => s,
+            QueryValue::String(s) => s,
+            _ => {
+                return Err(QueryParserError::ValueParseError(format!(
+                    "Unexpected Enum value type {:?} for enum {}",
+                    val,
+                    typ.name()
+                )))
+            }
+        };
+
+        match typ.borrow() {
+            EnumType::Internal(i) => {
+                if i.contains(&raw) {
+                    Ok(ParsedInputValue::Single(PrismaValue::Enum(raw)))
+                } else {
+                    Err(QueryParserError::ValueParseError(format!(
+                        "Enum value '{}' is invalid for enum type {}",
+                        raw, i.name
+                    )))
+                }
+            }
+            EnumType::OrderBy(ord) => match ord.value_for(raw.as_str()) {
+                Some(val) => Ok(ParsedInputValue::OrderBy(val.clone())),
+                None => Err(QueryParserError::ValueParseError(format!(
+                    "Enum value '{}' is invalid for enum type {}",
+                    raw, ord.name
+                ))),
+            },
+        }
+    }
+
     /// Parses and validates an input object recursively.
     pub fn parse_input_object(
         object: BTreeMap<String, QueryValue>,
@@ -244,10 +276,11 @@ impl QueryDocumentParser {
             .into_iter()
             .filter_map(|unset_field_name| {
                 let field = schema_object.find_field(*unset_field_name).unwrap();
+                let default_pair = field.default_value.clone().map(|def| (&field.name, def));
 
-                match field.default_value.clone().map(|def| (&field.name, def)) {
+                match default_pair {
                     // If the input field has a default, add the default to the result.
-                    Some((k, v)) => Some(Ok((k.clone(), ParsedInputValue::Single(v)))),
+                    Some((k, dv)) => Some(Ok((k.clone(), ParsedInputValue::Single(dv.get().into())))),
 
                     // Finally, if nothing is found, parse the input value with Null but disregard the result,
                     // except errors, which are propagated.

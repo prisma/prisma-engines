@@ -54,18 +54,32 @@ async fn introspecting_two_one_to_one_relations_between_the_same_models_should_w
                          FOREIGN KEY(`user_id`) REFERENCES `User`(`id`)",
                     )
                 });
-                migration.inject_custom(format!(
-                    "ALTER TABLE `{}`.`User` ADD Column `post_id` INTEGER NOT NULL UNIQUE ",
-                    api.db_name(),
-                ));
-                migration.inject_custom(format!(
-                    "ALTER TABLE `{}`.`User` ADD CONSTRAINT `post_fk` FOREIGN KEY(`post_id`) REFERENCES `Post`(`id`)",
-                    api.db_name(),
-                ));
             },
             api.db_name(),
         )
         .await;
+
+    api.database()
+        .execute_raw(
+            &format!(
+                "ALTER TABLE `{}`.`User` ADD Column `post_id` INTEGER NOT NULL UNIQUE ",
+                api.db_name(),
+            ),
+            &[],
+        )
+        .await
+        .unwrap();
+
+    api.database()
+        .execute_raw(
+            &format!(
+                "ALTER TABLE `{}`.`User` ADD CONSTRAINT `post_fk` FOREIGN KEY(`post_id`) REFERENCES `Post`(`id`)",
+                api.db_name(),
+            ),
+            &[],
+        )
+        .await
+        .unwrap();
 
     let dm = r#"
             model Post {
@@ -251,14 +265,21 @@ async fn introspecting_a_prisma_many_to_many_relation_should_work(api: &TestApi)
                      FOREIGN KEY (`B`) REFERENCES  `User`(`id`) ON DELETE CASCADE",
                     )
                 });
-                migration.inject_custom(format!(
-                    "CREATE UNIQUE INDEX test ON `{schema_name}`.`_PostToUser` (`A`, `B`);",
-                    schema_name = api.db_name()
-                ))
             },
             api.db_name(),
         )
         .await;
+
+    api.database()
+        .execute_raw(
+            &format!(
+                "CREATE UNIQUE INDEX test ON `{schema_name}`.`_PostToUser` (`A`, `B`);",
+                schema_name = api.db_name()
+            ),
+            &[],
+        )
+        .await
+        .unwrap();
 
     let dm = r#"
             model Post {

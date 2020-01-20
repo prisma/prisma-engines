@@ -35,7 +35,8 @@ async fn introspecting_a_one_to_one_req_relation_should_work(api: &TestApi) {
 #[test_one_connector(connector = "postgres")]
 async fn introspecting_two_one_to_one_relations_between_the_same_models_should_work(api: &TestApi) {
     let barrel = api.barrel();
-    let _setup_schema = barrel.execute(|migration| {
+    let _setup_schema = barrel
+        .execute(|migration| {
             migration.create_table("User", |t| {
                 t.add_column("id", types::primary());
             });
@@ -43,8 +44,10 @@ async fn introspecting_two_one_to_one_relations_between_the_same_models_should_w
                 t.add_column("id", types::primary());
                 t.inject_custom("user_id INTEGER NOT NULL UNIQUE REFERENCES \"User\"(\"id\")")
             });
-            migration.inject_custom(format!("ALTER TABLE \"{}\".\"User\" ADD Column \"post_id\" INTEGER NOT NULL UNIQUE REFERENCES \"Post\"(\"id\")", api.schema_name()))
-        }).await;
+        })
+        .await;
+
+    api.database().execute_raw(&format!("ALTER TABLE \"{}\".\"User\" ADD Column \"post_id\" INTEGER NOT NULL UNIQUE REFERENCES \"Post\"(\"id\")", api.schema_name()), &[]).await.unwrap();
 
     let dm = r#"
             model Post {
@@ -198,12 +201,19 @@ async fn introspecting_a_prisma_many_to_many_relation_should_work(api: &TestApi)
                     B INTEGER NOT NULL REFERENCES  \"User\"(\"id\") ON DELETE CASCADE",
                 )
             });
-            migration.inject_custom(format!(
-                "CREATE UNIQUE INDEX test ON \"{}\".\"_PostToUser\" (\"a\", \"b\");",
-                api.schema_name()
-            ))
         })
         .await;
+
+    api.database()
+        .execute_raw(
+            &format!(
+                "CREATE UNIQUE INDEX test ON \"{}\".\"_PostToUser\" (\"a\", \"b\");",
+                api.schema_name()
+            ),
+            &[],
+        )
+        .await
+        .unwrap();
 
     let dm = r#"
             model Post {

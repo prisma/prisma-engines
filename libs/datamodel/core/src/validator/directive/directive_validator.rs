@@ -22,7 +22,7 @@ pub trait DirectiveValidator<T> {
     fn serialize(&self, obj: &T, datamodel: &dml::Datamodel) -> Result<Vec<ast::Directive>, DatamodelError>;
 
     /// Shorthand to construct an directive validation error.
-    fn error(&self, msg: &str, span: ast::Span) -> Result<(), DatamodelError> {
+    fn new_directive_validation_error(&self, msg: &str, span: ast::Span) -> Result<(), DatamodelError> {
         Err(DatamodelError::new_directive_validation_error(
             msg,
             self.directive_name(),
@@ -31,7 +31,7 @@ pub trait DirectiveValidator<T> {
     }
 
     /// Shorthand to lift a generic parser error to an directive validation error.
-    fn parser_error(&self, err: &DatamodelError) -> DatamodelError {
+    fn wrap_in_directive_validation_error(&self, err: &DatamodelError) -> DatamodelError {
         DatamodelError::new_directive_validation_error(&format!("{}", err), self.directive_name(), err.span())
     }
 }

@@ -18,7 +18,7 @@ pub struct RelationFieldTemplate {
     pub is_list: bool,
     pub is_unique: bool,
     pub is_hidden: bool,
-    pub is_auto_generated: bool,
+    pub is_auto_generated_int_id: bool,
     pub manifestation: Option<FieldManifestation>,
     pub relation_name: String,
     pub relation_side: RelationSide,
@@ -31,7 +31,7 @@ pub struct RelationField {
     pub is_required: bool,
     pub is_list: bool,
     pub is_hidden: bool,
-    pub is_auto_generated: bool,
+    pub is_auto_generated_int_id: bool,
     pub relation_name: String,
     pub relation_side: RelationSide,
     pub relation: OnceCell<RelationWeakRef>,
@@ -51,7 +51,7 @@ impl Hash for RelationField {
         self.is_required.hash(state);
         self.is_list.hash(state);
         self.is_hidden.hash(state);
-        self.is_auto_generated.hash(state);
+        self.is_auto_generated_int_id.hash(state);
         self.relation_name.hash(state);
         self.relation_side.hash(state);
         self.is_unique.hash(state);
@@ -66,7 +66,7 @@ impl PartialEq for RelationField {
             && self.is_required == other.is_required
             && self.is_list == other.is_list
             && self.is_hidden == other.is_hidden
-            && self.is_auto_generated == other.is_auto_generated
+            && self.is_auto_generated_int_id == other.is_auto_generated_int_id
             && self.relation_name == other.relation_name
             && self.relation_side == other.relation_side
             && self.is_unique == other.is_unique
@@ -128,7 +128,7 @@ impl RelationField {
         let relation = self.relation();
 
         match relation.manifestation {
-            Some(RelationLinkManifestation::Inline(ref m)) => {
+            RelationLinkManifestation::Inline(ref m) => {
                 let is_self_rel = relation.is_self_relation();
 
                 if is_self_rel && self.is_hidden {
@@ -152,7 +152,7 @@ impl RelationField {
         let relation = self.relation();
 
         match relation.manifestation {
-            Some(RelationLinkManifestation::Inline(ref m)) => {
+            RelationLinkManifestation::Inline(ref m) => {
                 let is_self_rel = relation.is_self_relation();
 
                 if is_self_rel && self.is_hidden {

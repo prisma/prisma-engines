@@ -1,5 +1,6 @@
 use crate::error::DatamodelError;
 use crate::validator::directive::{Args, DirectiveValidator};
+use crate::validator::LowerDmlToAst;
 use crate::{ast, dml};
 
 /// Prismas builtin `@sequence` directive.
@@ -21,23 +22,23 @@ impl DirectiveValidator<dml::Field> for SequenceDirectiveValidator {
 
         match args.arg("name")?.as_str() {
             Ok(name) => seq.name = name,
-            Err(err) => return Err(self.parser_error(&err)),
+            Err(err) => return Err(self.wrap_in_directive_validation_error(&err)),
         }
 
         match args.arg("allocationSize")?.as_int() {
             Ok(allocation_size) => seq.allocation_size = allocation_size,
-            Err(err) => return Err(self.parser_error(&err)),
+            Err(err) => return Err(self.wrap_in_directive_validation_error(&err)),
         }
 
         match args.arg("initialValue")?.as_int() {
             Ok(initial_value) => seq.initial_value = initial_value,
-            Err(err) => return Err(self.parser_error(&err)),
+            Err(err) => return Err(self.wrap_in_directive_validation_error(&err)),
         }
 
         match &mut obj.id_info {
             Some(info) => info.sequence = Some(seq),
             None => {
-                return self.error(
+                return self.new_directive_validation_error(
                     "An @sequence directive can only exist on a primary id field.",
                     args.span(),
                 )
@@ -59,11 +60,11 @@ impl DirectiveValidator<dml::Field> for SequenceDirectiveValidator {
                 args.push(ast::Argument::new_string("name", &seq_info.name));
                 args.push(ast::Argument::new(
                     "allocationSize",
-                    dml::ScalarValue::Int(seq_info.allocation_size).into(),
+                    LowerDmlToAst::lower_scalar_value(&dml::ScalarValue::Int(seq_info.allocation_size)),
                 ));
                 args.push(ast::Argument::new(
                     "initialValue",
-                    dml::ScalarValue::Int(seq_info.initial_value).into(),
+                    LowerDmlToAst::lower_scalar_value(&dml::ScalarValue::Int(seq_info.initial_value)),
                 ));
 
                 return Ok(vec![ast::Directive::new(self.directive_name(), args)]);

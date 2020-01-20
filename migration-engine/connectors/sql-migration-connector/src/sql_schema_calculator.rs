@@ -67,7 +67,7 @@ impl<'a> SqlSchemaCalculator<'a> {
                     .collect();
 
                 let primary_key = sql::PrimaryKey {
-                    columns: vec![model.id_field()?.db_name()],
+                    columns: id_fields(model).map(|field| field.db_name()).collect(),
                     sequence: None,
                 };
 
@@ -110,7 +110,7 @@ impl<'a> SqlSchemaCalculator<'a> {
                 });
 
                 let table = sql::Table {
-                    name: model.db_name(),
+                    name: model.db_name().to_owned(),
                     columns,
                     indices: single_field_indexes.chain(multiple_field_indexes).collect(),
                     primary_key: Some(primary_key),
@@ -145,7 +145,7 @@ impl<'a> SqlSchemaCalculator<'a> {
                         let field = model.fields().find(|f| &f.db_name() == column_name).unwrap();
 
                         let referenced_fields: Vec<&Field> = if referenced_fields.is_empty() {
-                            vec![related_model.id_field()?]
+                            id_fields(related_model).collect()
                         } else {
                             let fields: Vec<_> = related_model
                                 .fields()
@@ -157,7 +157,7 @@ impl<'a> SqlSchemaCalculator<'a> {
                                 .collect();
 
                             if fields.len() != referenced_fields.len() {
-                                return Err(crate::SqlError::Generic(format!(
+                                return Err(crate::SqlError::Generic(anyhow::anyhow!(
                                     "References to unknown fields {referenced_fields:?} on `{model_name}`",
                                     model_name = related_model.name,
                                     referenced_fields = referenced_fields,
@@ -197,7 +197,7 @@ impl<'a> SqlSchemaCalculator<'a> {
                         let foreign_key = sql::ForeignKey {
                             constraint_name: None,
                             columns: columns.iter().map(|col| col.name.to_owned()).collect(),
-                            referenced_table: related_model.db_name(),
+                            referenced_table: related_model.db_name().to_owned(),
                             referenced_columns: referenced_fields
                                 .iter()
                                 .map(|referenced_field| referenced_field.db_name())
@@ -228,43 +228,40 @@ impl<'a> SqlSchemaCalculator<'a> {
         for relation in self.calculate_relations().iter() {
             match &relation.manifestation {
                 TempManifestationHolder::Table => {
+                    let a_columns = relation_table_columns(&relation.model_a, relation.model_a_column());
+                    let mut b_columns = relation_table_columns(&relation.model_b, relation.model_b_column());
+
                     let foreign_keys = vec![
                         sql::ForeignKey {
                             constraint_name: None,
-                            columns: vec![relation.model_a_column()],
-                            referenced_table: relation.model_a.db_name(),
-                            referenced_columns: vec![relation.model_a.id_field()?.db_name()],
+                            columns: a_columns.iter().map(|col| col.name.clone()).collect(),
+                            referenced_table: relation.model_a.db_name().to_owned(),
+                            referenced_columns: id_fields(&relation.model_a).map(|field| field.db_name()).collect(),
                             on_delete_action: sql::ForeignKeyAction::Cascade,
                         },
                         sql::ForeignKey {
                             constraint_name: None,
-                            columns: vec![relation.model_b_column()],
-                            referenced_table: relation.model_b.db_name(),
-                            referenced_columns: vec![relation.model_b.id_field()?.db_name()],
+                            columns: b_columns.iter().map(|col| col.name.clone()).collect(),
+                            referenced_table: relation.model_b.db_name().to_owned(),
+                            referenced_columns: id_fields(&relation.model_b).map(|field| field.db_name()).collect(),
                             on_delete_action: sql::ForeignKeyAction::Cascade,
                         },
                     ];
+
+                    let mut columns = a_columns;
+                    columns.append(&mut b_columns);
+
+                    let index = sql::Index {
+                        // TODO: rename
+                        name: format!("{}_AB_unique", relation.table_name()),
+                        columns: columns.iter().map(|col| col.name.clone()).collect(),
+                        tpe: sql::IndexType::Unique,
+                    };
+
                     let table = sql::Table {
                         name: relation.table_name(),
-                        columns: vec![
-                            sql::Column {
-                                name: relation.model_a_column(),
-                                tpe: column_type(relation.model_a.id_field()?),
-                                default: None,
-                                auto_increment: false,
-                            },
-                            sql::Column {
-                                name: relation.model_b_column(),
-                                tpe: column_type(relation.model_b.id_field()?),
-                                default: None,
-                                auto_increment: false,
-                            },
-                        ],
-                        indices: vec![sql::Index {
-                            name: format!("{}_AB_unique", relation.table_name()),
-                            columns: vec![relation.model_a_column(), relation.model_b_column()],
-                            tpe: sql::IndexType::Unique,
-                        }],
+                        columns,
+                        indices: vec![index],
                         primary_key: None,
                         foreign_keys,
                     };
@@ -281,6 +278,31 @@ impl<'a> SqlSchemaCalculator<'a> {
     }
 }
 
+fn relation_table_columns(referenced_model: &Model, reference_field_name: String) -> Vec<sql::Column> {
+    if referenced_model.id_fields.is_empty() {
+        let id_field = referenced_model.fields().find(|field| field.is_id()).unwrap();
+        vec![sql::Column {
+            name: reference_field_name,
+            tpe: column_type(id_field),
+            default: None,
+            auto_increment: false,
+        }]
+    } else {
+        id_fields(referenced_model)
+            .map(|referenced_field| sql::Column {
+                name: format!(
+                    "{reference_field_name}_{referenced_column_name}",
+                    reference_field_name = reference_field_name,
+                    referenced_column_name = referenced_field.db_name()
+                ),
+                tpe: column_type(referenced_field),
+                default: None,
+                auto_increment: false,
+            })
+            .collect()
+    }
+}
+
 #[derive(PartialEq, Debug)]
 struct ModelTable {
     table: sql::Table,
@@ -288,24 +310,12 @@ struct ModelTable {
 }
 
 pub trait ModelExtensions {
-    fn id_field(&self) -> Result<&Field, String>;
-
-    fn db_name(&self) -> String;
+    fn db_name(&self) -> &str;
 }
 
 impl ModelExtensions for Model {
-    fn id_field(&self) -> Result<&Field, String> {
-        match self.fields().find(|f| f.is_id()) {
-            Some(f) => Ok(f),
-            None => Err(format!("Model {} does not have an id field", self.name)),
-        }
-    }
-
-    fn db_name(&self) -> String {
-        self.single_database_name()
-            .map(|s| s.to_owned())
-            .clone()
-            .unwrap_or_else(|| self.name.clone())
+    fn db_name(&self) -> &str {
+        self.single_database_name().unwrap_or_else(|| &self.name)
     }
 }
 
@@ -313,8 +323,6 @@ pub trait FieldExtensions {
     fn is_id(&self) -> bool;
 
     fn is_list(&self) -> bool;
-
-    fn is_required(&self) -> bool;
 
     fn db_name(&self) -> String;
 
@@ -332,10 +340,6 @@ impl FieldExtensions for Field {
         self.arity == FieldArity::List
     }
 
-    fn is_required(&self) -> bool {
-        self.arity == FieldArity::Required
-    }
-
     fn db_name(&self) -> String {
         self.single_database_name().unwrap_or(&self.name).to_string()
     }
@@ -343,19 +347,21 @@ impl FieldExtensions for Field {
     fn migration_value(&self, datamodel: &Datamodel) -> ScalarValue {
         self.default_value
             .clone()
+            .and_then(|df| df.get())
             .unwrap_or_else(|| default_migration_value(&self.field_type, datamodel))
     }
 
     fn migration_value_new(&self, datamodel: &Datamodel) -> Option<String> {
         let value = match (&self.default_value, self.arity) {
-            (Some(x), _) => match x {
-                ScalarValue::Expression(_, _, _) => Some(default_migration_value(&self.field_type, datamodel)),
-                x => Some(x.clone()),
+            (Some(df), _) => match df {
+                dml::DefaultValue::Single(s) => s.clone(),
+                dml::DefaultValue::Expression(_) => default_migration_value(&self.field_type, datamodel),
             },
             // This is a temporary hack until we can report impossible unexecutable migrations.
-            (None, FieldArity::Required) => Some(default_migration_value(&self.field_type, datamodel)),
-            (None, _) => None,
-        }?;
+            (None, FieldArity::Required) => default_migration_value(&self.field_type, datamodel),
+            (None, _) => return None,
+        };
+
         let result = match value {
             ScalarValue::Boolean(x) => {
                 if x {
@@ -375,10 +381,8 @@ impl FieldExtensions for Field {
                 format!("{}", raw)
             }
             ScalarValue::ConstantLiteral(x) => format!("{}", x), // this represents enum values
-            ScalarValue::Expression(_, _, _) => {
-                unreachable!("expressions must have been filtered out in the preceding pattern match")
-            }
         };
+
         if self.is_id() {
             None
         } else {
@@ -455,4 +459,18 @@ fn add_one_to_one_relation_unique_index(table: &mut sql::Table, column_name: &st
     };
 
     table.indices.push(index);
+}
+
+fn id_fields(model: &Model) -> impl Iterator<Item = &Field> {
+    // Single-id models
+    model
+        .fields()
+        .filter(|field| field.is_id())
+        // Compound id models
+        .chain(
+            model
+                .id_fields
+                .iter()
+                .filter_map(move |field_name| model.fields().find(|field| field.name.as_str() == field_name)),
+        )
 }

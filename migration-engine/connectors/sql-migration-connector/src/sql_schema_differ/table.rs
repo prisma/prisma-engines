@@ -49,14 +49,26 @@ impl<'schema> TableDiffer<'schema> {
         })
     }
 
+    pub(crate) fn created_indexes<'a>(&'a self) -> impl Iterator<Item = &'schema Index> + 'a {
+        self.next_indexes().filter(move |next_index| {
+            !self
+                .previous_indexes()
+                .any(move |previous_index| indexes_match(previous_index, next_index))
+        })
+    }
+
+    pub(crate) fn dropped_indexes<'a>(&'a self) -> impl Iterator<Item = &'schema Index> + 'a {
+        self.previous_indexes().filter(move |previous_index| {
+            !self
+                .next_indexes()
+                .any(|next_index| indexes_match(previous_index, next_index))
+        })
+    }
+
     pub(crate) fn index_pairs<'a>(&'a self) -> impl Iterator<Item = (&'schema Index, &'schema Index)> + 'a {
-        self.previous.indices.iter().filter_map(move |previous_index| {
-            self.next
-                .indices
-                .iter()
-                .find(|next_index| {
-                    indexes_are_equivalent(previous_index, next_index) && previous_index.name != next_index.name
-                })
+        self.previous_indexes().filter_map(move |previous_index| {
+            self.next_indexes()
+                .find(|next_index| indexes_match(previous_index, next_index) && previous_index.name != next_index.name)
                 .map(|renamed_index| (previous_index, renamed_index))
         })
     }
@@ -76,13 +88,21 @@ impl<'schema> TableDiffer<'schema> {
     fn next_foreign_keys(&self) -> impl Iterator<Item = &ForeignKey> {
         self.next.foreign_keys.iter()
     }
+
+    fn previous_indexes<'a>(&'a self) -> impl Iterator<Item = &'schema Index> + 'a {
+        self.previous.indices.iter()
+    }
+
+    fn next_indexes<'a>(&'a self) -> impl Iterator<Item = &'schema Index> + 'a {
+        self.next.indices.iter()
+    }
 }
 
 fn columns_match(a: &Column, b: &Column) -> bool {
     a.name == b.name
 }
 
-/// Compare two SQL indexes and return whether they only differ by name or type.
-fn indexes_are_equivalent(first: &Index, second: &Index) -> bool {
+/// Compare two SQL indexes and return whether they only differ by name.
+fn indexes_match(first: &Index, second: &Index) -> bool {
     first.columns == second.columns && first.tpe == second.tpe
 }

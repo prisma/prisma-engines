@@ -1,29 +1,11 @@
+#![allow(unused)]
+
 use log::debug;
 
 use quaint::prelude::*;
 use sql_schema_describer::*;
 use std::sync::Arc;
-
-fn mysql_url(schema: &str) -> String {
-    let host = match std::env::var("IS_BUILDKITE") {
-        Ok(_) => "test-db-mysql-5-7",
-        Err(_) => "127.0.0.1",
-    };
-    let port = 3306;
-    let user = "root";
-    let password = "prisma";
-
-    debug!("Connecting to MySQL server at {}, port {}, user '{}'", host, port, user);
-
-    format!(
-        "mysql://{user}:{password}@{host}:{port}/{schema}",
-        user = user,
-        password = password,
-        host = host,
-        port = port,
-        schema = schema
-    )
-}
+use test_setup::mysql_url;
 
 pub async fn get_mysql_describer_for_schema(sql: &str, schema: &str) -> mysql::SqlSchemaDescriber {
     // Ensure the presence of an empty database.

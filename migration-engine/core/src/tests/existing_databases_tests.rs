@@ -384,7 +384,8 @@ async fn removing_a_default_from_a_non_nullable_foreign_key_column_must_warn(api
 
     let infer_input = InferMigrationStepsInput {
         datamodel: dm.into(),
-        assume_to_be_applied: Vec::new(),
+        assume_to_be_applied: Some(Vec::new()),
+        assume_applied_migrations: None,
         migration_id: "test-migration".into(),
     };
 

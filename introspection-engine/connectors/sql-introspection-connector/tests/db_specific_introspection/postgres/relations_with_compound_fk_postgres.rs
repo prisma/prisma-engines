@@ -284,10 +284,18 @@ async fn compound_foreign_keys_should_work_for_one_to_many_relations_with_non_un
                 t.add_column("user_age", types::integer());
                 t.inject_custom("FOREIGN KEY (\"user_id\",\"user_age\") REFERENCES \"User\"(\"id\", \"age\")");
             });
-
-            migration.inject_custom("CREATE INDEX test ON \"Post\"(\"user_id\",\"user_age\");");
         })
         .await;
+
+    api.database()
+        .execute_raw(
+            &format!(
+                "CREATE INDEX test ON \"Post\"(\"user_id\",\"user_age\");",
+            ),
+            &[],
+        )
+        .await
+        .unwrap();
 
     let dm = r#"
             model Post {

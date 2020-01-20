@@ -3,11 +3,11 @@ use prisma_models::PrismaValue;
 
 /// Comparing methods for scalar fields.
 pub trait ScalarCompare {
-    fn is_in<T>(&self, val: Option<Vec<T>>) -> Filter
+    fn is_in<T>(&self, val: Vec<T>) -> Filter
     where
         T: Into<PrismaValue>;
 
-    fn not_in<T>(&self, val: Option<Vec<T>>) -> Filter
+    fn not_in<T>(&self, val: Vec<T>) -> Filter
     where
         T: Into<PrismaValue>;
 

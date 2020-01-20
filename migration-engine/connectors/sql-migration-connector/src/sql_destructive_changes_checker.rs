@@ -1,32 +1,38 @@
 use crate::{
-    AlterColumn, ConnectionInfo, DropColumn, DropTable, DropTables, SqlError, SqlMigration, SqlMigrationStep,
-    SqlResult, TableChange,
+    AlterColumn, Component, DropColumn, DropTable, DropTables, SqlError, SqlMigration, SqlMigrationStep, SqlResult,
+    TableChange,
 };
 use migration_connector::*;
-use quaint::{ast::*, prelude::Queryable};
-use sql_schema_describer::SqlSchemaDescriberBackend;
-use std::sync::Arc;
+use quaint::ast::*;
+use sql_schema_describer::{ColumnArity, SqlSchema};
 
-pub struct SqlDestructiveChangesChecker {
-    pub connection_info: ConnectionInfo,
-    pub schema_name: String,
-    pub database: Arc<dyn Queryable + Send + Sync>,
-    pub database_describer: Arc<dyn SqlSchemaDescriberBackend + Send + Sync + 'static>,
+pub struct SqlDestructiveChangesChecker<'a> {
+    pub connector: &'a crate::SqlMigrationConnector,
 }
 
-impl SqlDestructiveChangesChecker {
+impl Component for SqlDestructiveChangesChecker<'_> {
+    fn connector(&self) -> &crate::SqlMigrationConnector {
+        self.connector
+    }
+}
+
+impl SqlDestructiveChangesChecker<'_> {
     async fn check_table_drop(
         &self,
         table_name: &str,
         diagnostics: &mut DestructiveChangeDiagnostics,
     ) -> SqlResult<()> {
-        let query = Select::from_table((self.schema_name.as_str(), table_name)).value(count(asterisk()));
-        let result_set = self.database.query(query.into()).await?;
+        let query = Select::from_table((self.schema_name(), table_name)).value(count(asterisk()));
+        let result_set = self.conn().query(query.into()).await?;
         let first_row = result_set.first().ok_or_else(|| {
-            SqlError::Generic("No row was returned when checking for existing rows in dropped table.".to_owned())
+            SqlError::Generic(anyhow::anyhow!(
+                "No row was returned when checking for existing rows in dropped table."
+            ))
         })?;
         let rows_count: i64 = first_row.at(0).and_then(|value| value.as_i64()).ok_or_else(|| {
-            SqlError::Generic("No count was returned when checking for existing rows in dropped table.".to_owned())
+            SqlError::Generic(anyhow::anyhow!(
+                "No count was returned when checking for existing rows in dropped table."
+            ))
         })?;
 
         if rows_count > 0 {
@@ -43,25 +49,27 @@ impl SqlDestructiveChangesChecker {
     }
 
     async fn count_values_in_column(&self, column_name: &str, table: &sql_schema_describer::Table) -> SqlResult<i64> {
-        let query = Select::from_table((self.schema_name.as_str(), table.name.as_str()))
+        let query = Select::from_table((self.schema_name(), table.name.as_str()))
             .value(count(quaint::ast::Column::new(column_name)))
             .so_that(column_name.is_not_null());
 
-        let values_count: i64 = self
-            .database
-            .query(query.into())
-            .await
-            .map_err(SqlError::from)
-            .and_then(|result_set| {
-                result_set
-                    .first()
-                    .as_ref()
-                    .and_then(|row| row.at(0))
-                    .and_then(|count| count.as_i64())
-                    .ok_or_else(|| {
-                        SqlError::Generic("Unexpected result set shape when checking dropped columns.".to_owned())
-                    })
-            })?;
+        let values_count: i64 =
+            self.conn()
+                .query(query.into())
+                .await
+                .map_err(SqlError::from)
+                .and_then(|result_set| {
+                    result_set
+                        .first()
+                        .as_ref()
+                        .and_then(|row| row.at(0))
+                        .and_then(|count| count.as_i64())
+                        .ok_or_else(|| {
+                            SqlError::Generic(anyhow::anyhow!(
+                                "Unexpected result set shape when checking dropped columns."
+                            ))
+                        })
+                })?;
 
         Ok(values_count)
     }
@@ -98,10 +106,15 @@ impl SqlDestructiveChangesChecker {
         previous_table: &sql_schema_describer::Table,
         diagnostics: &mut DestructiveChangeDiagnostics,
     ) -> SqlResult<()> {
-        let values_count = self.count_values_in_column(&alter_column.name, previous_table).await?;
         let previous_column = previous_table
             .column(&alter_column.name)
             .expect("unsupported column renaming");
+
+        if self.alter_column_is_safe(alter_column, previous_column) {
+            return Ok(());
+        }
+
+        let values_count = self.count_values_in_column(&alter_column.name, previous_table).await?;
 
         if values_count > 0 {
             diagnostics.add_warning(MigrationWarning {
@@ -127,15 +140,43 @@ impl SqlDestructiveChangesChecker {
         Ok(())
     }
 
-    async fn check_impl(&self, database_migration: &SqlMigration) -> SqlResult<DestructiveChangeDiagnostics> {
+    /// Are considered safe at the moment:
+    ///
+    /// - renamings on SQLite
+    /// - default changes on SQLite
+    /// - Arity changes from required to optional on SQLite
+    fn alter_column_is_safe(&self, alter_column: &AlterColumn, previous_column: &sql_schema_describer::Column) -> bool {
+        if !self.sql_family().is_sqlite() {
+            return false;
+        }
+
+        let arity_change_is_safe = match (&previous_column.tpe.arity, &alter_column.column.tpe.arity) {
+            // column became required
+            (ColumnArity::Nullable, ColumnArity::Required) => false,
+            // column became nullable
+            (ColumnArity::Required, ColumnArity::Nullable) => true,
+            // nothing changed
+            (ColumnArity::Required, ColumnArity::Required) | (ColumnArity::Nullable, ColumnArity::Nullable) => true,
+            // not supported on SQLite
+            (ColumnArity::List, _) | (_, ColumnArity::List) => unreachable!(),
+        };
+
+        alter_column.column.tpe.family == previous_column.tpe.family && arity_change_is_safe
+    }
+
+    async fn check_impl(
+        &self,
+        steps: &[SqlMigrationStep],
+        before: &SqlSchema,
+    ) -> SqlResult<DestructiveChangeDiagnostics> {
         let mut diagnostics = DestructiveChangeDiagnostics::new();
 
-        for step in &database_migration.original_steps {
+        for step in steps {
             match step {
                 SqlMigrationStep::AlterTable(alter_table) => {
                     // The table in alter_table is the updated table, but we want to
                     // check against the current state of the table.
-                    let before_table = database_migration.before.get_table(&alter_table.table.name);
+                    let before_table = before.get_table(&alter_table.table.name);
 
                     if let Some(before_table) = before_table {
                         for change in &alter_table.changes {
@@ -173,10 +214,16 @@ impl SqlDestructiveChangesChecker {
 }
 
 #[async_trait::async_trait]
-impl DestructiveChangesChecker<SqlMigration> for SqlDestructiveChangesChecker {
+impl DestructiveChangesChecker<SqlMigration> for SqlDestructiveChangesChecker<'_> {
     async fn check(&self, database_migration: &SqlMigration) -> ConnectorResult<DestructiveChangeDiagnostics> {
-        self.check_impl(database_migration)
+        self.check_impl(&database_migration.original_steps, &database_migration.before)
             .await
-            .map_err(|sql_error| sql_error.into_connector_error(&self.connection_info))
+            .map_err(|sql_error| sql_error.into_connector_error(&self.connection_info()))
+    }
+
+    async fn check_unapply(&self, database_migration: &SqlMigration) -> ConnectorResult<DestructiveChangeDiagnostics> {
+        self.check_impl(&database_migration.rollback, &database_migration.after)
+            .await
+            .map_err(|sql_error| sql_error.into_connector_error(&self.connection_info()))
     }
 }

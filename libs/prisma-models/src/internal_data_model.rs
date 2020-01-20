@@ -30,10 +30,16 @@ pub struct InternalDataModel {
     relation_fields: OnceCell<Vec<RelationFieldRef>>,
 }
 
-#[derive(Debug, PartialEq, Eq, Hash)]
+#[derive(Debug, PartialEq, Eq, Hash, Clone)]
 pub struct InternalEnum {
     pub name: String,
     pub values: Vec<String>,
+}
+
+impl InternalEnum {
+    pub fn contains(&self, val: &String) -> bool {
+        self.values.contains(val)
+    }
 }
 
 impl InternalDataModelTemplate {
@@ -113,17 +119,5 @@ impl InternalDataModel {
                     .collect()
             })
             .as_slice()
-    }
-}
-
-impl From<&InternalDataModelRef> for Project {
-    fn from(data_model: &InternalDataModelRef) -> Self {
-        let internal_data_model = OnceCell::new();
-        internal_data_model.set(Arc::clone(data_model)).unwrap();
-
-        Self {
-            id: data_model.db_name.clone(),
-            internal_data_model,
-        }
     }
 }

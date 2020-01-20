@@ -1,13 +1,9 @@
 #![deny(warnings)]
 
 #[macro_use]
-extern crate serde_derive;
-
-#[macro_use]
 extern crate debug_stub_derive;
 
 mod datamodel_converter;
-mod enum_type;
 mod error;
 mod field;
 mod fields;
@@ -17,7 +13,6 @@ mod model;
 mod order_by;
 mod prisma_args;
 mod prisma_value;
-mod project;
 mod record;
 mod relation;
 mod selected_fields;
@@ -27,8 +22,8 @@ pub mod sql_ext;
 
 pub mod prelude;
 
+pub use datamodel::dml;
 pub use datamodel_converter::*;
-pub use enum_type::*;
 pub use error::*;
 pub use field::*;
 pub use fields::*;
@@ -39,7 +34,6 @@ pub use order_by::*;
 pub use prisma_args::*;
 pub use prisma_args::*;
 pub use prisma_value::*;
-pub use project::*;
 pub use record::*;
 pub use relation::*;
 pub use selected_fields::*;

@@ -26,6 +26,7 @@ impl BarrelMigrationExecutor {
     where
         F: FnMut(&mut Migration) -> (),
     {
+        dbg!(&self.sql_variant);
         self.execute_with_schema(migration_fn, &self.schema_name).await
     }
 
