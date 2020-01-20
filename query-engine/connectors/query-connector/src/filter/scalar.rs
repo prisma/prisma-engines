@@ -51,25 +51,6 @@ impl ScalarCompare for Arc<ScalarField> {
     }
 
     /// Field equals the given value.
-    /// ```rust
-    /// # use query_connector::{*, filter::*};
-    /// # use prisma_models::*;
-    /// # use std::{fs::File, sync::Arc};
-    /// #
-    /// # let schema = test_data_model();
-    /// # let model = schema.find_model("User").unwrap();
-    /// #
-    /// let field = model.fields().find_from_scalar("name").unwrap();
-    /// let filter = field.equals("foo");
-    ///
-    /// match filter {
-    ///     Filter::Scalar(ScalarFilter { field: field, condition: ScalarCondition::Equals(val) }) => {
-    ///         assert_eq!(PrismaValue::from("foo"), val);
-    ///         assert_eq!(String::from("name"), field.name);
-    ///     }
-    ///     _ => unreachable!()
-    /// }
-    /// ```
     fn equals<T>(&self, val: T) -> Filter
     where
         T: Into<PrismaValue>,
@@ -81,25 +62,6 @@ impl ScalarCompare for Arc<ScalarField> {
     }
 
     /// Field does not equal the given value.
-    /// ```rust
-    /// # use query_connector::{*, filter::*};
-    /// # use prisma_models::*;
-    /// # use std::{fs::File, sync::Arc};
-    /// #
-    /// # let schema = test_data_model();
-    /// # let model = schema.find_model("User").unwrap();
-    /// #
-    /// let field = model.fields().find_from_scalar("name").unwrap();
-    /// let filter = field.not_equals(false);
-    ///
-    /// match filter {
-    ///     Filter::Scalar(ScalarFilter { field: field, condition: ScalarCondition::NotEquals(val) }) => {
-    ///         assert_eq!(PrismaValue::from(false), val);
-    ///         assert_eq!(String::from("name"), field.name);
-    ///     }
-    ///     _ => unreachable!()
-    /// }
-    /// ```
     fn not_equals<T>(&self, val: T) -> Filter
     where
         T: Into<PrismaValue>,
@@ -111,25 +73,6 @@ impl ScalarCompare for Arc<ScalarField> {
     }
 
     /// Field contains the given value.
-    /// ```rust
-    /// # use query_connector::{*, filter::*};
-    /// # use prisma_models::*;
-    /// # use std::{fs::File, sync::Arc};
-    /// #
-    /// # let schema = test_data_model();
-    /// # let model = schema.find_model("User").unwrap();
-    /// #
-    /// let field = model.fields().find_from_scalar("name").unwrap();
-    /// let filter = field.contains("asdf");
-    ///
-    /// match filter {
-    ///     Filter::Scalar(ScalarFilter { field: field, condition: ScalarCondition::Contains(val) }) => {
-    ///         assert_eq!(PrismaValue::from("asdf"), val);
-    ///         assert_eq!(String::from("name"), field.name);
-    ///     }
-    ///     _ => unreachable!()
-    /// }
-    /// ```
     fn contains<T>(&self, val: T) -> Filter
     where
         T: Into<PrismaValue>,
@@ -141,25 +84,6 @@ impl ScalarCompare for Arc<ScalarField> {
     }
 
     /// Field does not contain the given value.
-    /// ```rust
-    /// # use query_connector::{*, filter::*};
-    /// # use prisma_models::*;
-    /// # use std::{fs::File, sync::Arc};
-    /// #
-    /// # let schema = test_data_model();
-    /// # let model = schema.find_model("User").unwrap();
-    /// #
-    /// let field = model.fields().find_from_scalar("name").unwrap();
-    /// let filter = field.not_contains("asdf");
-    ///
-    /// match filter {
-    ///     Filter::Scalar(ScalarFilter { field: field, condition: ScalarCondition::NotContains(val) }) => {
-    ///         assert_eq!(PrismaValue::from("asdf"), val);
-    ///         assert_eq!(String::from("name"), field.name);
-    ///     }
-    ///     _ => unreachable!()
-    /// }
-    /// ```
     fn not_contains<T>(&self, val: T) -> Filter
     where
         T: Into<PrismaValue>,
@@ -171,25 +95,6 @@ impl ScalarCompare for Arc<ScalarField> {
     }
 
     /// Field starts with the given value.
-    /// ```rust
-    /// # use query_connector::{*, filter::*};
-    /// # use prisma_models::*;
-    /// # use std::{fs::File, sync::Arc};
-    /// #
-    /// # let schema = test_data_model();
-    /// # let model = schema.find_model("User").unwrap();
-    /// #
-    /// let field = model.fields().find_from_scalar("name").unwrap();
-    /// let filter = field.starts_with("qwert");
-    ///
-    /// match filter {
-    ///     Filter::Scalar(ScalarFilter { field: field, condition: ScalarCondition::StartsWith(val) }) => {
-    ///         assert_eq!(PrismaValue::from("qwert"), val);
-    ///         assert_eq!(String::from("name"), field.name);
-    ///     }
-    ///     _ => unreachable!()
-    /// }
-    /// ```
     fn starts_with<T>(&self, val: T) -> Filter
     where
         T: Into<PrismaValue>,
@@ -201,25 +106,6 @@ impl ScalarCompare for Arc<ScalarField> {
     }
 
     /// Field does not start with the given value.
-    /// ```rust
-    /// # use query_connector::{*, filter::*};
-    /// # use prisma_models::*;
-    /// # use std::{fs::File, sync::Arc};
-    /// #
-    /// # let schema = test_data_model();
-    /// # let model = schema.find_model("User").unwrap();
-    /// #
-    /// let field = model.fields().find_from_scalar("name").unwrap();
-    /// let filter = field.not_starts_with("qwert");
-    ///
-    /// match filter {
-    ///     Filter::Scalar(ScalarFilter { field: field, condition: ScalarCondition::NotStartsWith(val) }) => {
-    ///         assert_eq!(PrismaValue::from("qwert"), val);
-    ///         assert_eq!(String::from("name"), field.name);
-    ///     }
-    ///     _ => unreachable!()
-    /// }
-    /// ```
     fn not_starts_with<T>(&self, val: T) -> Filter
     where
         T: Into<PrismaValue>,
@@ -231,25 +117,6 @@ impl ScalarCompare for Arc<ScalarField> {
     }
 
     /// Field ends with the given value.
-    /// ```rust
-    /// # use query_connector::{*, filter::*};
-    /// # use prisma_models::*;
-    /// # use std::{fs::File, sync::Arc};
-    /// #
-    /// # let schema = test_data_model();
-    /// # let model = schema.find_model("User").unwrap();
-    /// #
-    /// let field = model.fields().find_from_scalar("name").unwrap();
-    /// let filter = field.ends_with("musti");
-    ///
-    /// match filter {
-    ///     Filter::Scalar(ScalarFilter { field: field, condition: ScalarCondition::EndsWith(val) }) => {
-    ///         assert_eq!(PrismaValue::from("musti"), val);
-    ///         assert_eq!(String::from("name"), field.name);
-    ///     }
-    ///     _ => unreachable!()
-    /// }
-    /// ```
     fn ends_with<T>(&self, val: T) -> Filter
     where
         T: Into<PrismaValue>,
@@ -261,25 +128,6 @@ impl ScalarCompare for Arc<ScalarField> {
     }
 
     /// Field does not end with the given value.
-    /// ```rust
-    /// # use query_connector::{*, filter::*};
-    /// # use prisma_models::*;
-    /// # use std::{fs::File, sync::Arc};
-    /// #
-    /// # let schema = test_data_model();
-    /// # let model = schema.find_model("User").unwrap();
-    /// #
-    /// let field = model.fields().find_from_scalar("name").unwrap();
-    /// let filter = field.not_ends_with("naukio");
-    ///
-    /// match filter {
-    ///     Filter::Scalar(ScalarFilter { field: field, condition: ScalarCondition::NotEndsWith(val) }) => {
-    ///         assert_eq!(PrismaValue::from("naukio"), val);
-    ///         assert_eq!(String::from("name"), field.name);
-    ///     }
-    ///     _ => unreachable!()
-    /// }
-    /// ```
     fn not_ends_with<T>(&self, val: T) -> Filter
     where
         T: Into<PrismaValue>,
@@ -291,25 +139,6 @@ impl ScalarCompare for Arc<ScalarField> {
     }
 
     /// Field is less than the given value.
-    /// ```rust
-    /// # use query_connector::{*, filter::*};
-    /// # use prisma_models::*;
-    /// # use std::{fs::File, sync::Arc};
-    /// #
-    /// # let schema = test_data_model();
-    /// # let model = schema.find_model("User").unwrap();
-    /// #
-    /// let field = model.fields().find_from_scalar("id").unwrap();
-    /// let filter = field.less_than(10);
-    ///
-    /// match filter {
-    ///     Filter::Scalar(ScalarFilter { field: field, condition: ScalarCondition::LessThan(val) }) => {
-    ///         assert_eq!(PrismaValue::from(10), val);
-    ///         assert_eq!(String::from("id"), field.name);
-    ///     }
-    ///     _ => unreachable!()
-    /// }
-    /// ```
     fn less_than<T>(&self, val: T) -> Filter
     where
         T: Into<PrismaValue>,
@@ -321,25 +150,6 @@ impl ScalarCompare for Arc<ScalarField> {
     }
 
     /// Field is less than or equals the given value.
-    /// ```rust
-    /// # use query_connector::{*, filter::*};
-    /// # use prisma_models::*;
-    /// # use std::{fs::File, sync::Arc};
-    /// #
-    /// # let schema = test_data_model();
-    /// # let model = schema.find_model("User").unwrap();
-    /// #
-    /// let field = model.fields().find_from_scalar("id").unwrap();
-    /// let filter = field.less_than_or_equals(10);
-    ///
-    /// match filter {
-    ///     Filter::Scalar(ScalarFilter { field: field, condition: ScalarCondition::LessThanOrEquals(val) }) => {
-    ///         assert_eq!(PrismaValue::from(10), val);
-    ///         assert_eq!(String::from("id"), field.name);
-    ///     }
-    ///     _ => unreachable!()
-    /// }
-    /// ```
     fn less_than_or_equals<T>(&self, val: T) -> Filter
     where
         T: Into<PrismaValue>,
@@ -351,25 +161,6 @@ impl ScalarCompare for Arc<ScalarField> {
     }
 
     /// Field is greater than the given value.
-    /// ```rust
-    /// # use query_connector::{*, filter::*};
-    /// # use prisma_models::*;
-    /// # use std::{fs::File, sync::Arc};
-    /// #
-    /// # let schema = test_data_model();
-    /// # let model = schema.find_model("User").unwrap();
-    /// #
-    /// let field = model.fields().find_from_scalar("id").unwrap();
-    /// let filter = field.greater_than(10);
-    ///
-    /// match filter {
-    ///     Filter::Scalar(ScalarFilter { field: field, condition: ScalarCondition::GreaterThan(val) }) => {
-    ///         assert_eq!(PrismaValue::from(10), val);
-    ///         assert_eq!(String::from("id"), field.name);
-    ///     }
-    ///     _ => unreachable!()
-    /// }
-    /// ```
     fn greater_than<T>(&self, val: T) -> Filter
     where
         T: Into<PrismaValue>,
@@ -381,25 +172,6 @@ impl ScalarCompare for Arc<ScalarField> {
     }
 
     /// Field is greater than or equals the given value.
-    /// ```rust
-    /// # use query_connector::{*, filter::*};
-    /// # use prisma_models::*;
-    /// # use std::{fs::File, sync::Arc};
-    /// #
-    /// # let schema = test_data_model();
-    /// # let model = schema.find_model("User").unwrap();
-    /// #
-    /// let field = model.fields().find_from_scalar("id").unwrap();
-    /// let filter = field.greater_than_or_equals(10);
-    ///
-    /// match filter {
-    ///     Filter::Scalar(ScalarFilter { field: field, condition: ScalarCondition::GreaterThanOrEquals(val) }) => {
-    ///         assert_eq!(PrismaValue::from(10), val);
-    ///         assert_eq!(String::from("id"), field.name);
-    ///     }
-    ///     _ => unreachable!()
-    /// }
-    /// ```
     fn greater_than_or_equals<T>(&self, val: T) -> Filter
     where
         T: Into<PrismaValue>,
@@ -408,5 +180,215 @@ impl ScalarCompare for Arc<ScalarField> {
             field: Arc::clone(self),
             condition: ScalarCondition::GreaterThanOrEquals(val.into()),
         })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::{*, filter::*};
+
+    #[test]
+    fn equals() {
+        let schema = test_data_model();
+        let model = schema.find_model("User").unwrap();
+
+        let field = model.fields().find_from_scalar("name").unwrap();
+        let filter = field.equals("qwert");
+
+        match filter {
+            Filter::Scalar(ScalarFilter { field, condition: ScalarCondition::Equals(val) }) => {
+                assert_eq!(PrismaValue::from("qwert"), val);
+                assert_eq!(String::from("name"), field.name);
+            }
+            _ => unreachable!()
+        }
+    }
+
+    #[test]
+    fn not_equals() {
+        let schema = test_data_model();
+        let model = schema.find_model("User").unwrap();
+
+        let field = model.fields().find_from_scalar("name").unwrap();
+        let filter = field.not_equals("qwert");
+
+        match filter {
+            Filter::Scalar(ScalarFilter { field, condition: ScalarCondition::NotEquals(val) }) => {
+                assert_eq!(PrismaValue::from("qwert"), val);
+                assert_eq!(String::from("name"), field.name);
+            }
+            _ => unreachable!()
+        }
+    }
+
+    #[test]
+    fn contains() {
+        let schema = test_data_model();
+        let model = schema.find_model("User").unwrap();
+
+        let field = model.fields().find_from_scalar("name").unwrap();
+        let filter = field.contains("qwert");
+
+        match filter {
+            Filter::Scalar(ScalarFilter { field, condition: ScalarCondition::Contains(val) }) => {
+                assert_eq!(PrismaValue::from("qwert"), val);
+                assert_eq!(String::from("name"), field.name);
+            }
+            _ => unreachable!()
+        }
+    }
+
+    #[test]
+    fn not_contains() {
+        let schema = test_data_model();
+        let model = schema.find_model("User").unwrap();
+
+        let field = model.fields().find_from_scalar("name").unwrap();
+        let filter = field.not_contains("qwert");
+
+        match filter {
+            Filter::Scalar(ScalarFilter { field, condition: ScalarCondition::NotContains(val) }) => {
+                assert_eq!(PrismaValue::from("qwert"), val);
+                assert_eq!(String::from("name"), field.name);
+            }
+            _ => unreachable!()
+        }
+    }
+
+    #[test]
+    fn starts_with() {
+        let schema = test_data_model();
+        let model = schema.find_model("User").unwrap();
+
+        let field = model.fields().find_from_scalar("name").unwrap();
+        let filter = field.starts_with("qwert");
+
+        match filter {
+            Filter::Scalar(ScalarFilter { field, condition: ScalarCondition::StartsWith(val) }) => {
+                assert_eq!(PrismaValue::from("qwert"), val);
+                assert_eq!(String::from("name"), field.name);
+            }
+            _ => unreachable!()
+        }
+    }
+
+    #[test]
+    fn not_starts_with() {
+        let schema = test_data_model();
+        let model = schema.find_model("User").unwrap();
+
+        let field = model.fields().find_from_scalar("name").unwrap();
+        let filter = field.not_starts_with("qwert");
+
+        match filter {
+            Filter::Scalar(ScalarFilter { field, condition: ScalarCondition::NotStartsWith(val) }) => {
+                assert_eq!(PrismaValue::from("qwert"), val);
+                assert_eq!(String::from("name"), field.name);
+            }
+            _ => unreachable!()
+        }
+    }
+
+    #[test]
+    fn ends_with() {
+        let schema = test_data_model();
+        let model = schema.find_model("User").unwrap();
+
+        let field = model.fields().find_from_scalar("name").unwrap();
+        let filter = field.ends_with("musti");
+
+        match filter {
+            Filter::Scalar(ScalarFilter { field, condition: ScalarCondition::EndsWith(val) }) => {
+                assert_eq!(PrismaValue::from("musti"), val);
+                assert_eq!(String::from("name"), field.name);
+            }
+            _ => unreachable!()
+        }
+    }
+
+    #[test]
+    fn not_ends_with() {
+        let schema = test_data_model();
+        let model = schema.find_model("User").unwrap();
+
+        let field = model.fields().find_from_scalar("name").unwrap();
+        let filter = field.not_ends_with("naukio");
+
+        match filter {
+            Filter::Scalar(ScalarFilter { field, condition: ScalarCondition::NotEndsWith(val) }) => {
+                assert_eq!(PrismaValue::from("naukio"), val);
+                assert_eq!(String::from("name"), field.name);
+            }
+            _ => unreachable!()
+        }
+    }
+
+    #[test]
+    fn less_than() {
+        let schema = test_data_model();
+        let model = schema.find_model("User").unwrap();
+
+        let field = model.fields().find_from_scalar("id").unwrap();
+        let filter = field.less_than(10);
+
+        match filter {
+            Filter::Scalar(ScalarFilter { field, condition: ScalarCondition::LessThan(val) }) => {
+                assert_eq!(PrismaValue::from(10), val);
+                assert_eq!(String::from("id"), field.name);
+            }
+            _ => unreachable!()
+        }
+    }
+
+    #[test]
+    fn less_than_or_equals() {
+        let schema = test_data_model();
+        let model = schema.find_model("User").unwrap();
+
+        let field = model.fields().find_from_scalar("id").unwrap();
+        let filter = field.less_than_or_equals(10);
+
+        match filter {
+            Filter::Scalar(ScalarFilter { field, condition: ScalarCondition::LessThanOrEquals(val) }) => {
+                assert_eq!(PrismaValue::from(10), val);
+                assert_eq!(String::from("id"), field.name);
+            }
+            _ => unreachable!()
+        }
+    }
+
+    #[test]
+    fn greater_than() {
+        let schema = test_data_model();
+        let model = schema.find_model("User").unwrap();
+
+        let field = model.fields().find_from_scalar("id").unwrap();
+        let filter = field.greater_than(10);
+
+        match filter {
+            Filter::Scalar(ScalarFilter { field, condition: ScalarCondition::GreaterThan(val) }) => {
+                assert_eq!(PrismaValue::from(10), val);
+                assert_eq!(String::from("id"), field.name);
+            }
+            _ => unreachable!()
+        }
+
+    }
+
+    #[test]
+    fn greater_then_or_equals() {
+        let schema = test_data_model();
+        let model = schema.find_model("User").unwrap();
+
+        let field = model.fields().find_from_scalar("id").unwrap();
+        let filter = field.greater_than_or_equals(10);
+
+        match filter {
+            Filter::Scalar(ScalarFilter { field, condition: ScalarCondition::GreaterThanOrEquals(val) }) => {
+                assert_eq!(PrismaValue::from(10), val);
+                assert_eq!(String::from("id"), field.name);
+            }
+            _ => unreachable!()
+        }
     }
 }

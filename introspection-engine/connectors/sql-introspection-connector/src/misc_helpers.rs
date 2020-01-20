@@ -6,7 +6,7 @@ use datamodel::{
 use log::debug;
 use regex::Regex;
 use sql_schema_describer::{
-    Column, ColumnArity, ColumnTypeFamily, ForeignKey, ForeignKeyAction, Index, IndexType, SqlSchema, Table,
+    Column, ColumnArity, ColumnTypeFamily, ForeignKey, Index, IndexType, SqlSchema, Table,
 };
 
 //checks
