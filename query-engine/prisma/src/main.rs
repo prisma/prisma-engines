@@ -3,7 +3,7 @@ extern crate log;
 #[macro_use]
 extern crate rust_embed;
 
-use std::{env, error::Error, process};
+use std::{env, error::Error, process, net::{SocketAddr, IpAddr}, str::FromStr};
 
 use clap::{App as ClapApp, Arg, SubCommand};
 use tracing::subscriber;
@@ -48,6 +48,13 @@ type AnyError = Box<dyn Error + Send + Sync + 'static>;
 async fn main() -> Result<(), AnyError> {
     let matches = ClapApp::new("Prisma Query Engine")
         .version(env!("CARGO_PKG_VERSION"))
+        .arg(
+            Arg::with_name("host")
+                .long("host")
+                .value_name("host")
+                .help("The hostname or IP the query engine should bind to.")
+                .takes_value(true),
+        )
         .arg(
             Arg::with_name("port")
                 .short("p")
@@ -123,17 +130,29 @@ async fn main() -> Result<(), AnyError> {
     } else {
         init_logger()?;
 
+        let default_host = [127, 0, 0, 1];
+        let default_port = 4466;
+
         let port = matches
             .value_of("port")
             .map(|p| p.to_owned())
             .or_else(|| env::var("PORT").ok())
             .and_then(|p| p.parse::<u16>().ok())
-            .unwrap_or_else(|| 4466);
+            .unwrap_or_else(|| default_port);
 
-        let address = ([0, 0, 0, 0], port);
+        let host = matches
+            .value_of("host")
+            .map(|p| p.to_owned())
+            .or_else(|| env::var("HOST").ok())
+            .and_then(|p| Some(IpAddr::from_str(&p).expect("Invalid Host provided")))
+            .unwrap_or_else(|| IpAddr::from(default_host));
+
+        let address = SocketAddr::new(host, port);
+
         let legacy = matches.is_present("legacy");
 
         eprintln!("Printing to stderr for debugging");
+        eprintln!("Listening on {}:{}", host, port);
 
         if let Err(err) = HttpServer::run(address, legacy).await {
             info!("Encountered error during initialization:");
