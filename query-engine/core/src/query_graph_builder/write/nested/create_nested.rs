@@ -18,24 +18,23 @@ pub fn connect_nested_create(
     value: ParsedInputValue,
     child_model: &ModelRef,
 ) -> QueryGraphBuilderResult<()> {
-    // let relation = parent_relation_field.relation();
+    let relation = parent_relation_field.relation();
 
-    // // Build all create nodes upfront.
-    // let creates: Vec<NodeRef> = utils::coerce_vec(value)
-    //     .into_iter()
-    //     .map(|value| create::create_record_node(graph, Arc::clone(child_model), value.try_into()?))
-    //     .collect::<QueryGraphBuilderResult<Vec<NodeRef>>>()?;
+    // Build all create nodes upfront.
+    let creates: Vec<NodeRef> = utils::coerce_vec(value)
+        .into_iter()
+        .map(|value| create::create_record_node(graph, Arc::clone(child_model), value.try_into()?))
+        .collect::<QueryGraphBuilderResult<Vec<NodeRef>>>()?;
 
-    // if relation.is_many_to_many() {
-    //     handle_many_to_many(graph, parent_node, parent_relation_field, creates)?;
-    // } else if relation.is_one_to_many() {
-    //     handle_one_to_many(graph, parent_node, parent_relation_field, creates)?;
-    // } else {
-    //     handle_one_to_one(graph, parent_node, parent_relation_field, creates)?;
-    // }
+    if relation.is_many_to_many() {
+        handle_many_to_many(graph, parent_node, parent_relation_field, creates)?;
+    } else if relation.is_one_to_many() {
+        handle_one_to_many(graph, parent_node, parent_relation_field, creates)?;
+    } else {
+        handle_one_to_one(graph, parent_node, parent_relation_field, creates)?;
+    }
 
-    // Ok(())
-    todo!()
+    Ok(())
 }
 
 /// Handles a many-to-many nested create.

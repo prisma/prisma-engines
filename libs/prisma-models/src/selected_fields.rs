@@ -1,11 +1,12 @@
 use crate::{Field, ModelIdentifier, ModelRef, RelationFieldRef, ScalarFieldRef, TypeIdentifier};
 use datamodel::FieldArity;
+use itertools::Itertools;
 
 pub trait IntoSelectedFields {
     fn into_selected_fields(self, model: ModelRef) -> SelectedFields;
 }
 
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Default, Clone, PartialEq, Hash, Eq)]
 pub struct SelectedFields {
     pub scalar: Vec<SelectedScalarField>,
     pub relation: Vec<SelectedRelationField>,
@@ -17,12 +18,12 @@ pub enum SelectedField {
     Relation(SelectedRelationField),
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Hash, Eq)]
 pub struct SelectedScalarField {
     pub field: ScalarFieldRef,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Hash, Eq)]
 pub struct SelectedRelationField {
     pub field: RelationFieldRef,
     pub selected_fields: SelectedFields,
@@ -144,5 +145,11 @@ impl SelectedFields {
 
     pub fn contains(&self, name: &str) -> bool {
         self.names().find(|fname| fname == &name).is_some()
+    }
+
+    pub fn deduplicate(mut self) -> Self {
+        self.scalar = self.scalar.into_iter().unique().collect();
+        self.relation = self.relation.into_iter().unique().collect();
+        self
     }
 }

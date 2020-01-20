@@ -1,5 +1,8 @@
 use crate::{
-    query_builder::{read::{self, ManyRelatedRecordsQueryBuilder, ManyRelatedRecordsBaseQuery}, self},
+    query_builder::{
+        self,
+        read::{self, ManyRelatedRecordsBaseQuery, ManyRelatedRecordsQueryBuilder},
+    },
     QueryExt, SqlError,
 };
 use connector_interface::*;
@@ -58,6 +61,8 @@ pub async fn get_related_records<T>(
 where
     T: ManyRelatedRecordsQueryBuilder,
 {
+    // Todo: Does this work with relation fields that are backed by multiple fields?
+    // Q: What is the TypeIdentifier::Relation actually doing?
     let mut idents: Vec<_> = selected_fields.types().collect();
     idents.push(from_field.related_field().type_identifier_with_arity());
     idents.push(from_field.type_identifier_with_arity());

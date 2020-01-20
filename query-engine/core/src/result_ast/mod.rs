@@ -21,7 +21,7 @@ pub struct RecordSelection {
     /// Scalar field results
     pub scalars: ManyRecords,
 
-    /// Nested queries results
+    /// Nested query results
     // Todo this is only here because reads are still resolved in one go
     pub nested: Vec<QueryResult>,
 

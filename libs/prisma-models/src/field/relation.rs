@@ -124,6 +124,11 @@ impl RelationField {
             .unwrap()
     }
 
+    /// Alias for more clarity.
+    pub fn is_inlined_in_enclosing_model(&self) -> bool {
+        self.relation_is_inlined_in_parent()
+    }
+
     /// Inlined in self / model of self
     pub fn relation_is_inlined_in_parent(&self) -> bool {
         let relation = self.relation();

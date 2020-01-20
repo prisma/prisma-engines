@@ -1,8 +1,7 @@
 use crate::{DomainError as Error, PrismaValue, ScalarFieldRef};
 
-// Collection of fields of which the primary identifier of a model is composed of.
-// Todo: Currently, this uses arcs, which is not ideal, but also not terrible compared
-// Arcs in the RecordIdentifier.
+// Collection of fields that uniquely identify a record of a model.
+// There can be different sets of fields at the same time identifying a model.
 #[derive(Debug, Clone, Default)]
 pub struct ModelIdentifier {
     fields: Vec<ScalarFieldRef>,
@@ -49,10 +48,7 @@ impl IntoIterator for ModelIdentifier {
     }
 }
 
-// Collection of field to value pairs corresponding to the ModelIdentifier the record belongs to.
-// Todo: Storing Arcs is not a great idea, as practically every single record produced by a query
-// essentially clones the arcs of the model identifier. After the main work on multi/any-id-fields
-// is done. Maybe references are acceptable to use here.
+// Collection of field to value pairs corresponding to a ModelIdentifier the record belongs to.
 #[derive(Default, Debug, Clone, PartialEq, Eq, Hash)]
 pub struct RecordIdentifier {
     pub pairs: Vec<(ScalarFieldRef, PrismaValue)>,
@@ -85,16 +81,16 @@ impl RecordIdentifier {
 
     pub fn add_autogen_value<V>(&mut self, value: V) -> bool
     where
-        V: Into<PrismaValue>
+        V: Into<PrismaValue>,
     {
         for pair in self.pairs.iter_mut() {
             if pair.1.is_null() {
                 pair.1 = value.into();
-                return true
+                return true;
             }
         }
 
-        return false
+        return false;
     }
 }
 

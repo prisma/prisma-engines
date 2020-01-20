@@ -104,7 +104,7 @@ where
         name: "find_children_by_parent".to_owned(),
         alias: None,
         parent_field: Arc::clone(parent_relation_field),
-        parent_ids: None,
+        relation_ids: None,
         args: filter.into(),
         selected_fields,
         nested: vec![],
@@ -117,7 +117,7 @@ where
         QueryGraphDependency::ParentIds(Box::new(|mut node, parent_ids| {
             if let Node::Query(Query::Read(ReadQuery::RelatedRecordsQuery(ref mut rq))) = node {
                 // We know that all PrismaValues in `parent_ids` are transformable into GraphqlIds.
-                rq.parent_ids = Some(parent_ids.into_iter().map(|id| id.try_into().unwrap()).collect());
+                rq.relation_ids = Some(parent_ids.into_iter().map(|id| id.try_into().unwrap()).collect());
             };
 
             Ok(node)

@@ -83,7 +83,7 @@ pub struct RelatedRecordsQuery {
     pub name: String,
     pub alias: Option<String>,
     pub parent_field: RelationFieldRef,
-    pub parent_ids: Option<Vec<RecordIdentifier>>,
+    pub relation_ids: Option<Vec<RecordIdentifier>>,
     pub args: QueryArguments,
     pub selected_fields: SelectedFields,
     pub nested: Vec<ReadQuery>,

@@ -34,14 +34,23 @@ impl WriteQuery {
             _ => return,
         };
 
-        // Todo: The correct behaviour depends on code inflight on master.
-        // (Fields need to be backed by DataSourceFields or similar.)
-        // This allows us to reason over single or multi-value containers.
-        // For now we can only assume singular injects.
-        args.insert(
-            field.name().to_owned(),
-            values.pop().unwrap_or_else(|| PrismaValue::Null),
-        );
+        let key = field.name().to_owned();
+
+        match field {
+            Field::Scalar(_) => args.insert(key, values.pop().unwrap_or_else(|| PrismaValue::Null)),
+            Field::Relation(rf) => {
+                // Equalize the values and backing field lengths.
+                if values.len() != rf.data_source_fields.len() {
+                    values.truncate(rf.data_source_fields.len());
+
+                    for i in 0..(values.len() - rf.data_source_fields.len()) {
+                        values.push(PrismaValue::Null);
+                    }
+                }
+
+                args.insert_compound(key, values)
+            }
+        };
     }
 }
 

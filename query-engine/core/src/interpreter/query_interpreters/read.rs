@@ -1,7 +1,7 @@
 use crate::{interpreter::InterpretationResult, query_ast::*, result_ast::*};
 use connector::{self, ConnectionLike, QueryArguments, ReadOperations};
 use futures::future::{BoxFuture, FutureExt};
-use prisma_models::{Field, RecordIdentifier, SelectedFields};
+use prisma_models::RecordIdentifier;
 
 pub fn execute<'a, 'b>(
     tx: &'a ConnectionLike<'a, 'b>,
@@ -26,10 +26,9 @@ fn read_one<'conn, 'tx>(
     query: RecordQuery,
 ) -> BoxFuture<'conn, InterpretationResult<QueryResult>> {
     let fut = async move {
-        let selected_fields = inject_required_fields(query.selected_fields.clone());
         let model = query.model;
         let filter = query.filter.expect("Expected filter to be set for ReadOne query.");
-        let scalars = tx.get_single_record(&model, &filter, &selected_fields).await?;
+        let scalars = tx.get_single_record(&model, &filter, &query.selected_fields).await?;
         let model_id = model.identifier();
 
         match scalars {
@@ -65,9 +64,8 @@ fn read_many<'a, 'b>(
     query: ManyRecordsQuery,
 ) -> BoxFuture<'a, InterpretationResult<QueryResult>> {
     let fut = async move {
-        let selected_fields = inject_required_fields(query.selected_fields.clone());
         let scalars = tx
-            .get_many_records(&query.model, query.args.clone(), &selected_fields)
+            .get_many_records(&query.model, query.args.clone(), &query.selected_fields)
             .await?;
 
         let model_id = query.model.identifier();
@@ -91,17 +89,21 @@ fn read_many<'a, 'b>(
 fn read_related<'a, 'b>(
     tx: &'a ConnectionLike<'a, 'b>,
     query: RelatedRecordsQuery,
-    parent_ids: &'a [RecordIdentifier],
+    relation_ids: &'a [RecordIdentifier],
 ) -> BoxFuture<'a, InterpretationResult<QueryResult>> {
     let fut = async move {
-        let selected_fields = inject_required_fields(query.selected_fields.clone());
         let parent_ids = match query.parent_ids {
             Some(ref ids) => ids,
             None => parent_ids,
         };
 
         let scalars = tx
-            .get_related_records(&query.parent_field, parent_ids, query.args.clone(), &selected_fields)
+            .get_related_records(
+                &query.parent_field,
+                parent_ids,
+                query.args.clone(),
+                &query.selected_fields,
+            )
             .await?;
 
         let model = query.parent_field.related_model();
@@ -128,23 +130,6 @@ async fn aggregate<'a, 'b>(
 ) -> InterpretationResult<QueryResult> {
     let result = tx.count_by_model(&query.model, QueryArguments::default()).await?;
     Ok(QueryResult::Count(result))
-}
-
-/// Injects fields required for querying data, if they're not already in the selection set.
-/// Currently, required fields for every query are the fields of the model identifier.
-fn inject_required_fields(mut selected_fields: SelectedFields) -> SelectedFields {
-    let model_id = selected_fields.model().identifier();
-
-    let missing_fields: Vec<_> = model_id
-        .into_iter()
-        .filter(|field| !selected_fields.contains(&field.name))
-        .collect();
-
-    for field in missing_fields {
-        selected_fields.add_scalar(field)
-    }
-
-    selected_fields
 }
 
 fn process_nested<'a, 'b>(
