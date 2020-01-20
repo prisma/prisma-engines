@@ -3,6 +3,7 @@
 mod assertions;
 mod command_helpers;
 mod misc_helpers;
+pub(super) mod sql;
 mod step_helpers;
 mod test_api;
 
