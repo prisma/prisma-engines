@@ -38,7 +38,7 @@ case class TestServer() extends PlayJsonExtensions {
     import sys.process._
 
     val res =
-      Process(Seq(s"${EnvVars.serverRoot}/target/release/prisma", "cli", "--execute_request", formattedQuery), None, "PRISMA_DML" -> project.envVar).!!
+      Process(Seq(EnvVars.prismaBinaryPath, "cli", "--execute_request", formattedQuery), None, "PRISMA_DML" -> project.envVar).!!
     Json.parse(res)
   }
 }
