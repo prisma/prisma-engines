@@ -118,7 +118,11 @@ impl CliCommand {
         use std::panic::AssertUnwindSafe;
         use user_facing_errors::Error;
 
-        let response = match block_on(AssertUnwindSafe(CliCommand::handle_gql_request(input)).catch_unwind()) {
+        let decoded = base64::decode(&input)?;
+        let decoded_request = String::from_utf8(decoded)?;
+
+        let response = match block_on(AssertUnwindSafe(CliCommand::handle_gql_request(decoded_request)).catch_unwind())
+        {
             Ok(Ok(responses)) => responses,
             Ok(Err(err)) => {
                 let mut responses = response_ir::Responses::default();
@@ -135,9 +139,10 @@ impl CliCommand {
             }
         };
 
-        let res = serde_json::to_string(&response).unwrap();
+        let response = serde_json::to_string(&response).unwrap();
 
-        println!("{}", res);
+        let encoded_response = base64::encode(&response);
+        print!("{}", encoded_response);
 
         Ok(())
     }

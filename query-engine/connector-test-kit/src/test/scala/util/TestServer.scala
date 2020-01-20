@@ -1,5 +1,8 @@
 package util
 
+import java.nio.charset.StandardCharsets
+import java.util.Base64
+
 import play.api.libs.json._
 case class TestServer() extends PlayJsonExtensions {
   def query(
@@ -34,11 +37,17 @@ case class TestServer() extends PlayJsonExtensions {
   }
 
   def queryBinaryCLI(query: String, project: Project) = {
-    val formattedQuery = query.stripMargin.replace("\n", "")
     import sys.process._
 
-    val res =
-      Process(Seq(EnvVars.prismaBinaryPath, "cli", "--execute_request", formattedQuery), None, "PRISMA_DML" -> project.envVar).!!
-    Json.parse(res)
+    val formattedQuery = query.stripMargin.replace("\n", "")
+    val encoded        = Base64.getEncoder.encode(formattedQuery.getBytes(StandardCharsets.UTF_8))
+    val encoded_query  = new String(encoded, StandardCharsets.UTF_8)
+    val response =
+      Process(Seq(EnvVars.prismaBinaryPath, "cli", "--execute_request", encoded_query), None, "PRISMA_DML" -> project.envVar).!!
+
+    val decoded          = Base64.getDecoder.decode(response.trim.getBytes(StandardCharsets.UTF_8))
+    val decoded_response = new String(decoded, StandardCharsets.UTF_8)
+
+    Json.parse(decoded_response)
   }
 }
