@@ -45,11 +45,10 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
   }
 
   "a P1! to C1! relation with the child already in a relation" should "error when connecting by id since old required parent relation would be broken" in {
+    val start = System.currentTimeMillis
     schemaP1reqToC1req.test { dataModel =>
       val project = SchemaDsl.fromStringV11() { dataModel }
       database.setup(project)
-
-      val start = System.currentTimeMillis
 
       val child1Id = server
         .queryBinaryCLI(
@@ -69,12 +68,8 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
         )
         .pathAsString("data.createParent.childReq.id")
 
-      val end = System.currentTimeMillis
-
-      println("Execution time: ", end - start)
-
       val parentId2 = server
-        .queryBinaryCLI(
+        .query(
           """mutation {
           |  createParent(data: {
           |    p: "p2"
@@ -113,6 +108,9 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
     // ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(2) }
 
     }
+    val end = System.currentTimeMillis
+
+    println("Execution time: ", end - start)
   }
 
   "a P1! to C1 relation with the child already in a relation" should "should fail on existing old parent" in {

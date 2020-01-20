@@ -7,16 +7,19 @@ use serde::Deserialize;
 
 use datamodel::json::dmmf::Datamodel;
 use query_core::{
+    response_ir,
     schema::{QuerySchemaRef, SupportedCapabilities},
-    BuildMode, QuerySchemaBuilder,
+    BuildMode, CoreError, QuerySchemaBuilder, Responses,
 };
 
 use crate::context::PrismaContext;
+use crate::error::PrismaError;
 use crate::request_handlers::graphql::*;
 use crate::{
     data_model_loader::{load_configuration, load_data_model_components},
     dmmf, PrismaResult,
 };
+use user_facing_errors::Error;
 
 #[derive(Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
@@ -112,15 +115,45 @@ impl CliCommand {
 
     fn execute_request(input: String) -> PrismaResult<()> {
         use futures::executor::block_on;
-        let ctx = block_on(PrismaContext::new(true))?;
-        let gql_doc = gql::parse_query(&input)?;
-        let query_doc = GraphQLProtocolAdapter::convert(gql_doc, None)?;
-        let response = block_on(ctx.executor.execute(query_doc, Arc::clone(ctx.query_schema())))?;
+        use futures::FutureExt;
+        use std::panic::AssertUnwindSafe;
+        use user_facing_errors::Error;
+
+        let response = match block_on(AssertUnwindSafe(CliCommand::handle_gql_request(&input)).catch_unwind()) {
+            Ok(Ok(responses)) => responses,
+            Ok(Err(err)) => {
+                let mut responses = response_ir::Responses::default();
+                responses.insert_error(err);
+                responses
+            }
+            // panicked
+            Err(err) => {
+                let mut responses = response_ir::Responses::default();
+                let error = Error::from_panic_payload(&err);
+
+                responses.insert_error(error);
+                responses
+            }
+        };
 
         let res = serde_json::to_string(&response).unwrap();
 
         println!("{}", res);
 
         Ok(())
+    }
+
+    async fn handle_gql_request(input: &String) -> Result<Responses, PrismaError> {
+        let ctx = PrismaContext::new(true).await?;
+        let gql_doc = gql::parse_query(&input)?;
+        let query_doc = GraphQLProtocolAdapter::convert(gql_doc, None)?;
+        ctx.executor
+            .execute(query_doc, Arc::clone(ctx.query_schema()))
+            .await
+            .map_err(|err| {
+                debug!("{}", err);
+                let ce: CoreError = err.into();
+                ce.into()
+            })
     }
 }

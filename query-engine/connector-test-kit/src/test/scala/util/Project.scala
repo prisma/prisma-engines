@@ -1,6 +1,8 @@
 package util
 
 import java.io.{File, PrintWriter}
+import java.nio.charset.StandardCharsets
+import java.util.Base64
 
 import org.scalatest.Suite
 
@@ -9,9 +11,7 @@ case class Project(
     dataModel: String,
 ) {
   val dataSourceUrl: String = {
-    ConnectorConfig
-      .instance
-      .url
+    ConnectorConfig.instance.url
       .replaceAllLiterally("$DB_FILE", s"${EnvVars.serverRoot}/db/$id.db")
       .replaceAllLiterally("$DB", id)
   }
@@ -31,10 +31,14 @@ case class Project(
     dataSourceConfig + "\n" + dataModel
   }
 
+  // Important: Rust requires UTF-8 encoding (encodeToString uses Latin-1)
+  val encoded = Base64.getEncoder.encode(dataModelWithDataSourceConfig.getBytes(StandardCharsets.UTF_8))
+  val envVar  = new String(encoded, StandardCharsets.UTF_8)
+
   val dataModelPath: String = {
     val pathName = s"${EnvVars.serverRoot}/db/$id.prisma"
-    val file = new File(pathName)
-    val writer = new PrintWriter(file)
+    val file     = new File(pathName)
+    val writer   = new PrintWriter(file)
 
     try {
       dataModelWithDataSourceConfig.foreach(writer.print)

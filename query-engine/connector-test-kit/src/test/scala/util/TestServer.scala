@@ -29,19 +29,18 @@ case class TestServer() extends PlayJsonExtensions {
       project: Project,
       dataContains: String = ""
   ): JsValue = {
-    awaitInfinitely { queryAsync(query, project, dataContains) }
+    queryAsync(query, project, dataContains)
   }
 
-  def queryAsync(query: String, project: Project, dataContains: String = ""): Future[JsValue] = {
-    val result = querySchemaAsync(
+  def queryAsync(query: String, project: Project, dataContains: String = ""): JsValue = {
+    val result = queryBinaryCLI(
       query = query.stripMargin,
       project = project,
     )
 
-    result.map { r =>
-      r.assertSuccessfulResponse(dataContains)
-      r
-    }
+    println("Query :" + result)
+    result.assertSuccessfulResponse(dataContains)
+    result
   }
 
   def queryThatMustFail(
@@ -51,13 +50,20 @@ case class TestServer() extends PlayJsonExtensions {
       errorCount: Int = 1,
       errorContains: String = ""
   ): JsValue = {
-    val result = awaitInfinitely {
-      querySchemaAsync(
+//    val result = awaitInfinitely {
+//      querySchemaAsync(
+//        query = query.stripMargin,
+//        project = project,
+//      )
+//    }
+
+    val result =
+      queryBinaryCLI(
         query = query.stripMargin,
         project = project,
       )
-    }
 
+    println("Failing Query " + result)
     // Ignore error codes for external tests (0) and containment checks ("")
     result.assertFailingResponse(0, errorCount, "")
     result
@@ -114,7 +120,6 @@ case class TestServer() extends PlayJsonExtensions {
     val envVar  = new String(encoded, StandardCharsets.UTF_8)
     val port    = TestServer.nextPort.incrementAndGet()
 
-    println("RUST_LOG :" + sys.env.getOrElse("RUST_LOG", "info"))
     pb.environment.put("PRISMA_DML", envVar)
     pb.environment.put("PORT", port.toString)
     pb.environment.put("LOG_QUERIES", "y")
@@ -133,17 +138,15 @@ case class TestServer() extends PlayJsonExtensions {
   }
 
   def queryBinaryCLI(query: String, project: Project) = {
-    import scala.language.postfixOps
-    val fullDataModel = project.dataModelWithDataSourceConfig
-    // Important: Rust requires UTF-8 encoding (encodeToString uses Latin-1)
-    val encoded = Base64.getEncoder.encode(fullDataModel.getBytes(StandardCharsets.UTF_8))
-    val envVar  = new String(encoded, StandardCharsets.UTF_8)
-
     val formattedQuery = query.stripMargin.replace("\n", "")
     import sys.process._
     val res =
-      Process(Seq("/Users/matthias/repos/work/prisma-engine/target/debug/prisma", "cli", "--execute_request", formattedQuery), None, "PRISMA_DML" -> envVar).!!
-    Json.parse(res)
+      Process(Seq("/Users/matthias/repos/work/prisma-engine/target/debug/prisma", "cli", "--execute_request", formattedQuery),
+              None,
+              "PRISMA_DML" -> project.envVar).!!
+    val res2 = Json.parse(res)
+    println(res2)
+    res2
   }
 
   private def queryPrismaProcess(query: String, port: Int): QueryEngineResponse = {
