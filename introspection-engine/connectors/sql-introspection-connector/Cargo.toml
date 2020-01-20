@@ -16,7 +16,7 @@ failure = "0.1"
 log = "0.4"
 regex = "1.2"
 url = "1.7"
-user-facing-errors = { path = "../../../libs/user-facing-errors" }
+user-facing-errors = { path = "../../../libs/user-facing-errors", features = ["sql"] }
 tracing = "0.1.10"
 tracing-futures = "0.2.0"
 tokio = { version = "0.2", features = ["rt-threaded", "time"] }
