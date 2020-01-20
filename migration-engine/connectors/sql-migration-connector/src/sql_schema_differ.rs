@@ -1,4 +1,5 @@
 mod column;
+mod index;
 mod table;
 
 use crate::*;
@@ -12,6 +13,7 @@ const MIGRATION_TABLE_NAME: &str = "_Migration";
 pub struct SqlSchemaDiffer<'a> {
     previous: &'a SqlSchema,
     next: &'a SqlSchema,
+    sql_family: SqlFamily,
 }
 
 #[derive(Debug, Clone)]
@@ -47,9 +49,20 @@ impl SqlSchemaDiff {
 }
 
 impl<'schema> SqlSchemaDiffer<'schema> {
-    pub fn diff(previous: &SqlSchema, next: &SqlSchema) -> SqlSchemaDiff {
-        let differ = SqlSchemaDiffer { previous, next };
+    pub fn diff(previous: &SqlSchema, next: &SqlSchema, sql_family: SqlFamily) -> SqlSchemaDiff {
+        let differ = SqlSchemaDiffer {
+            previous,
+            next,
+            sql_family,
+        };
         differ.diff_internal()
+    }
+
+    fn is_mysql(&self) -> bool {
+        match self.sql_family {
+            SqlFamily::Mysql => true,
+            _ => false,
+        }
     }
 
     fn diff_internal(&self) -> SqlSchemaDiff {
@@ -208,10 +221,14 @@ impl<'schema> SqlSchemaDiffer<'schema> {
 
         for tables in self.table_pairs() {
             for index in tables.dropped_indexes() {
-                drop_indexes.push(DropIndex {
-                    table: tables.previous.name.clone(),
-                    name: index.name.clone(),
-                })
+                // On MySQL, foreign keys automatically create indexes. These foreign-key-created
+                // indexes should only be dropped as part of the foreign key.
+                if !self.is_mysql() || !index::index_covers_fk(&tables.previous, index) {
+                    drop_indexes.push(DropIndex {
+                        table: tables.previous.name.clone(),
+                        name: index.name.clone(),
+                    })
+                }
             }
         }
 

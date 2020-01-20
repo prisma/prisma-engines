@@ -83,7 +83,7 @@ impl<'a> SqlSchemaCalculator<'a> {
                     }
                 });
 
-                let multiple_field_indexes = model.indexes.iter().map(|index_definition: &IndexDefinition| {
+                let multiple_field_indexes = model.indices.iter().map(|index_definition: &IndexDefinition| {
                     let referenced_fields: Vec<&Field> = index_definition
                         .fields
                         .iter()
@@ -315,7 +315,7 @@ pub trait ModelExtensions {
 
 impl ModelExtensions for Model {
     fn db_name(&self) -> &str {
-        self.database_name.as_ref().unwrap_or_else(|| &self.name)
+        self.single_database_name().unwrap_or_else(|| &self.name)
     }
 }
 
@@ -341,7 +341,7 @@ impl FieldExtensions for Field {
     }
 
     fn db_name(&self) -> String {
-        self.database_name.clone().unwrap_or_else(|| self.name.clone())
+        self.single_database_name().unwrap_or(&self.name).to_string()
     }
 
     fn migration_value(&self, datamodel: &Datamodel) -> ScalarValue {

@@ -174,7 +174,7 @@ const DMFF_WITHOUT_RELATION_NAME: &str = r#"
         {
           "name": "id",
           "kind": "scalar",
-          "dbName": null,
+          "dbNames": [],
           "isList": false,
           "isRequired": true,
           "isUnique": false,
@@ -186,7 +186,7 @@ const DMFF_WITHOUT_RELATION_NAME: &str = r#"
         {
           "name": "posts",
           "kind": "object",
-          "dbName": null,
+          "dbNames": [],
           "isList": true,
           "isRequired": false,
           "isUnique": false,
@@ -209,7 +209,7 @@ const DMFF_WITHOUT_RELATION_NAME: &str = r#"
         {
           "name": "id",
           "kind": "scalar",
-          "dbName": null,
+          "dbNames": [],
           "isList": false,
           "isRequired": true,
           "isUnique": false,
@@ -221,7 +221,7 @@ const DMFF_WITHOUT_RELATION_NAME: &str = r#"
         {
           "name": "user",
           "kind": "object",
-          "dbName": null,
+          "dbNames": [],
           "isList": false,
           "isRequired": true,
           "isUnique": false,

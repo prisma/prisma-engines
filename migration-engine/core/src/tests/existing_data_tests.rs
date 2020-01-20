@@ -374,12 +374,12 @@ async fn dropping_a_table_referenced_by_foreign_keys_must_work(api: &TestApi) ->
     let insert = Insert::single_into(api.render_table_name("Category"))
         .value("name", "desserts")
         .value("id", id);
-    api.database().query(insert.into()).await.unwrap();
+    api.database().query(insert.into()).await?;
 
     let insert = Insert::single_into(api.render_table_name("Recipe"))
         .value("category", id)
         .value("id", id);
-    api.database().query(insert.into()).await.unwrap();
+    api.database().query(insert.into()).await?;
 
     let fk = sql_schema.table_bang("Recipe").foreign_keys.get(0).unwrap();
     assert_eq!(fk.referenced_table, "Category");

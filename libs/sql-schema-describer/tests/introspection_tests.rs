@@ -107,12 +107,26 @@ async fn foreign_keys_must_work(api: &TestApi) {
         SqlFamily::Mysql => ForeignKeyAction::Restrict,
         _ => ForeignKeyAction::NoAction,
     };
+    let expected_indexes = if sql_family.is_mysql() {
+        vec![
+            Index {
+                name: "city".to_owned(),
+                columns: vec![
+                    "city".to_owned(),
+                ],
+                tpe: IndexType::Normal
+            }
+        ]
+    }  else {
+        vec![]
+    };
+
     assert_eq!(
         user_table,
         &Table {
             name: "User".to_string(),
             columns: expected_columns,
-            indices: vec![],
+            indices: expected_indexes,
             primary_key: None,
             foreign_keys: vec![ForeignKey {
                 constraint_name: match api.sql_family() {
@@ -186,6 +200,21 @@ async fn multi_column_foreign_keys_must_work(api: &TestApi) {
         },
     ];
 
+    let expected_indexes = if sql_family.is_mysql() {
+        vec![
+            Index {
+                name: "city_name".to_owned(),
+                columns: vec![
+                    "city_name".to_owned(),
+                    "city".to_owned(),
+                ],
+                tpe: IndexType::Normal
+            }
+        ]
+    }  else {
+        vec![]
+    };
+
     let on_delete_action = match api.sql_family() {
         SqlFamily::Mysql => ForeignKeyAction::Restrict,
         _ => ForeignKeyAction::NoAction,
@@ -196,7 +225,7 @@ async fn multi_column_foreign_keys_must_work(api: &TestApi) {
         &Table {
             name: "User".to_string(),
             columns: expected_columns,
-            indices: vec![],
+            indices: expected_indexes,
             primary_key: None,
             foreign_keys: vec![ForeignKey {
                 constraint_name: match (api.sql_family(), api.connector_name()) {

@@ -146,7 +146,7 @@ impl Standardiser {
             database_name: None,
             is_embedded: false,
             fields: vec![a_related_field, b_related_field],
-            indexes: vec![],
+            indices: vec![],
             id_fields: vec![],
             is_generated: true,
         }

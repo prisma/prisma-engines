@@ -112,7 +112,7 @@ impl SqlSchemaDescriber {
         debug!("Getting table '{}'", name);
         let columns = self.get_columns(schema, name).await;
         let foreign_keys = self.get_foreign_keys(schema, name).await;
-        let (indices, primary_key) = self.get_indices(schema, name, &foreign_keys).await;
+        let (indices, primary_key) = self.get_indices(schema, name).await;
         Table {
             name: name.to_string(),
             columns,
@@ -308,12 +308,7 @@ impl SqlSchemaDescriber {
         fks
     }
 
-    async fn get_indices(
-        &self,
-        schema: &str,
-        table_name: &str,
-        foreign_keys: &[ForeignKey],
-    ) -> (Vec<Index>, Option<PrimaryKey>) {
+    async fn get_indices(&self, schema: &str, table_name: &str) -> (Vec<Index>, Option<PrimaryKey>) {
         // We alias all the columns because MySQL column names are case-insensitive in queries, but the
         // information schema column names became upper-case in MySQL 8, causing the code fetching
         // the result values by column name below to fail.
@@ -390,14 +385,7 @@ impl SqlSchemaDescriber {
             }
         }
 
-        let indices = indexes_map
-            .into_iter()
-            .map(|(_k, v)| v)
-            // Remove foreign keys, because they are introspected separately. But if there is a unique constraint on that column we need it to identify 1:1 relations
-            .filter(|index| {
-                foreign_keys.iter().find(|fk| fk.columns == index.columns).is_none() || index.tpe == IndexType::Unique
-            })
-            .collect();
+        let indices = indexes_map.into_iter().map(|(_k, v)| v).collect();
 
         debug!("Found table indices: {:?}, primary key: {:?}", indices, primary_key);
         (indices, primary_key)

@@ -13,7 +13,7 @@ lazy_static! {
     static ref CLASSICAL: Inflector = Inflector::new(Mode::Classical);
 }
 
-/// Default inflector, anglecized mode.
+/// Default inflector, anglicized mode.
 pub fn default() -> &'static Inflector {
     &DEFAULT
 }
