@@ -4,6 +4,7 @@ pub mod default_positive;
 pub mod id_negative;
 pub mod id_positive;
 pub mod index;
+pub mod map;
 pub mod relations_basic;
 pub mod relations_consistency;
 pub mod relations_legacy;

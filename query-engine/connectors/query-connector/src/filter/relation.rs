@@ -34,43 +34,6 @@ impl RelationCondition {
 
 impl RelationCompare for Arc<RelationField> {
     /// Every related record matches the filter.
-    /// ```rust
-    /// # use query_connector::{*, filter::*};
-    /// # use prisma_models::*;
-    /// # use serde_json;
-    /// # use std::{fs::File, sync::Arc};
-    /// #
-    /// # let schema = test_data_model();
-    /// # let user = schema.find_model("User").unwrap();
-    /// # let site = schema.find_model("Site").unwrap();
-    /// #
-    /// let rel_field = user.fields().find_from_relation_fields("sites").unwrap();
-    /// let site_name = site.fields().find_from_scalar("name").unwrap();
-    /// let filter = rel_field.every_related(site_name.equals("Blog"));
-    ///
-    /// match filter {
-    ///     Filter::Relation(RelationFilter {
-    ///         field: relation_field,
-    ///         nested_filter: nested,
-    ///         condition: condition,
-    ///     }) => {
-    ///         assert_eq!(String::from("sites"), relation_field.name);
-    ///         assert_eq!(RelationCondition::EveryRelatedRecord, condition);
-    ///
-    ///         match *nested {
-    ///             Filter::Scalar(ScalarFilter {
-    ///                 field: scalar_field,
-    ///                 condition: ScalarCondition::Equals(scalar_val),
-    ///             }) => {
-    ///                 assert_eq!(String::from("name"), scalar_field.name);
-    ///                 assert_eq!(PrismaValue::from("Blog"), scalar_val);
-    ///             }
-    ///             _ => unreachable!()
-    ///         }
-    ///     }
-    ///     _ => unreachable!()
-    /// }
-    /// ```
     fn every_related<T>(&self, filter: T) -> Filter
     where
         T: Into<Filter>,
@@ -83,43 +46,6 @@ impl RelationCompare for Arc<RelationField> {
     }
 
     /// At least one related record matches the filter.
-    /// ```rust
-    /// # use query_connector::{*, filter::*};
-    /// # use prisma_models::*;
-    /// # use serde_json;
-    /// # use std::{fs::File, sync::Arc};
-    /// #
-    /// # let schema = test_data_model();
-    /// # let user = schema.find_model("User").unwrap();
-    /// # let site = schema.find_model("Site").unwrap();
-    /// #
-    /// let rel_field = user.fields().find_from_relation_fields("sites").unwrap();
-    /// let site_name = site.fields().find_from_scalar("name").unwrap();
-    /// let filter = rel_field.at_least_one_related(site_name.equals("Blog"));
-    ///
-    /// match filter {
-    ///     Filter::Relation(RelationFilter {
-    ///         field: relation_field,
-    ///         nested_filter: nested,
-    ///         condition: condition,
-    ///     }) => {
-    ///         assert_eq!(String::from("sites"), relation_field.name);
-    ///         assert_eq!(RelationCondition::AtLeastOneRelatedRecord, condition);
-    ///
-    ///         match *nested {
-    ///             Filter::Scalar(ScalarFilter {
-    ///                 field: scalar_field,
-    ///                 condition: ScalarCondition::Equals(scalar_val),
-    ///             }) => {
-    ///                 assert_eq!(String::from("name"), scalar_field.name);
-    ///                 assert_eq!(PrismaValue::from("Blog"), scalar_val);
-    ///             }
-    ///             _ => unreachable!()
-    ///         }
-    ///     }
-    ///     _ => unreachable!()
-    /// }
-    /// ```
     fn at_least_one_related<T>(&self, filter: T) -> Filter
     where
         T: Into<Filter>,
@@ -132,43 +58,6 @@ impl RelationCompare for Arc<RelationField> {
     }
 
     /// To one related record. FIXME
-    /// ```rust
-    /// # use query_connector::{*, filter::*};
-    /// # use prisma_models::*;
-    /// # use serde_json;
-    /// # use std::{fs::File, sync::Arc};
-    /// #
-    /// # let schema = test_data_model();
-    /// # let user = schema.find_model("User").unwrap();
-    /// # let site = schema.find_model("Site").unwrap();
-    /// #
-    /// let rel_field = user.fields().find_from_relation_fields("sites").unwrap();
-    /// let site_name = site.fields().find_from_scalar("name").unwrap();
-    /// let filter = rel_field.to_one_related(site_name.equals("Blog"));
-    ///
-    /// match filter {
-    ///     Filter::Relation(RelationFilter {
-    ///         field: relation_field,
-    ///         nested_filter: nested,
-    ///         condition: condition,
-    ///     }) => {
-    ///         assert_eq!(String::from("sites"), relation_field.name);
-    ///         assert_eq!(RelationCondition::ToOneRelatedRecord, condition);
-    ///
-    ///         match *nested {
-    ///             Filter::Scalar(ScalarFilter {
-    ///                 field: scalar_field,
-    ///                 condition: ScalarCondition::Equals(scalar_val),
-    ///             }) => {
-    ///                 assert_eq!(String::from("name"), scalar_field.name);
-    ///                 assert_eq!(PrismaValue::from("Blog"), scalar_val);
-    ///             }
-    ///             _ => unreachable!()
-    ///         }
-    ///     }
-    ///     _ => unreachable!()
-    /// }
-    /// ```
     fn to_one_related<T>(&self, filter: T) -> Filter
     where
         T: Into<Filter>,
@@ -181,43 +70,6 @@ impl RelationCompare for Arc<RelationField> {
     }
 
     /// None of the related records matches the filter.
-    /// ```rust
-    /// # use query_connector::{*, filter::*};
-    /// # use prisma_models::*;
-    /// # use serde_json;
-    /// # use std::{fs::File, sync::Arc};
-    /// #
-    /// # let schema = test_data_model();
-    /// # let user = schema.find_model("User").unwrap();
-    /// # let site = schema.find_model("Site").unwrap();
-    /// #
-    /// let rel_field = user.fields().find_from_relation_fields("sites").unwrap();
-    /// let site_name = site.fields().find_from_scalar("name").unwrap();
-    /// let filter = rel_field.no_related(site_name.equals("Blog"));
-    ///
-    /// match filter {
-    ///     Filter::Relation(RelationFilter {
-    ///         field: relation_field,
-    ///         nested_filter: nested,
-    ///         condition: condition,
-    ///     }) => {
-    ///         assert_eq!(String::from("sites"), relation_field.name);
-    ///         assert_eq!(RelationCondition::NoRelatedRecord, condition);
-    ///
-    ///         match *nested {
-    ///             Filter::Scalar(ScalarFilter {
-    ///                 field: scalar_field,
-    ///                 condition: ScalarCondition::Equals(scalar_val),
-    ///             }) => {
-    ///                 assert_eq!(String::from("name"), scalar_field.name);
-    ///                 assert_eq!(PrismaValue::from("Blog"), scalar_val);
-    ///             }
-    ///             _ => unreachable!()
-    ///         }
-    ///     }
-    ///     _ => unreachable!()
-    /// }
-    /// ```
     fn no_related<T>(&self, filter: T) -> Filter
     where
         T: Into<Filter>,
@@ -230,27 +82,164 @@ impl RelationCompare for Arc<RelationField> {
     }
 
     /// One of the relations is `Null`.
-    /// ```rust
-    /// # use query_connector::{*, filter::*};
-    /// # use prisma_models::*;
-    /// # use serde_json;
-    /// # use std::{fs::File, sync::Arc};
-    /// #
-    /// # let schema = test_data_model();
-    /// # let user = schema.find_model("User").unwrap();
-    /// #
-    /// let rel_field = user.fields().find_from_relation_fields("sites").unwrap();
-    /// let filter = rel_field.one_relation_is_null();
-    ///
-    /// match filter {
-    ///     Filter::OneRelationIsNull(OneRelationIsNullFilter { field }) =>
-    ///         assert_eq!(String::from("sites"), field.name),
-    ///     _ => unreachable!()
-    /// };
-    /// ```
     fn one_relation_is_null(&self) -> Filter {
         Filter::from(OneRelationIsNullFilter {
             field: Arc::clone(self),
         })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::{*, filter::*};
+
+    #[test]
+    fn one_relation_is_null() {
+        let schema = test_data_model();
+        let user = schema.find_model("User").unwrap();
+        let rel_field = user.fields().find_from_relation_fields("sites").unwrap();
+        let filter = rel_field.one_relation_is_null();
+
+        match filter {
+            Filter::OneRelationIsNull(OneRelationIsNullFilter { field }) =>
+                assert_eq!(String::from("sites"), field.name),
+            _ => unreachable!()
+        };
+    }
+
+    #[test]
+    fn no_related() {
+        let schema = test_data_model();
+        let user = schema.find_model("User").unwrap();
+        let site = schema.find_model("Site").unwrap();
+
+        let rel_field = user.fields().find_from_relation_fields("sites").unwrap();
+        let site_name = site.fields().find_from_scalar("name").unwrap();
+        let filter = rel_field.no_related(site_name.equals("Blog"));
+
+        match filter {
+            Filter::Relation(RelationFilter {
+                field: relation_field,
+                nested_filter: nested,
+                condition,
+            }) => {
+                assert_eq!(String::from("sites"), relation_field.name);
+                assert_eq!(RelationCondition::NoRelatedRecord, condition);
+
+                match *nested {
+                    Filter::Scalar(ScalarFilter {
+                        field: scalar_field,
+                        condition: ScalarCondition::Equals(scalar_val),
+                    }) => {
+                        assert_eq!(String::from("name"), scalar_field.name);
+                        assert_eq!(PrismaValue::from("Blog"), scalar_val);
+                    }
+                    _ => unreachable!()
+                }
+            }
+            _ => unreachable!()
+        }
+    }
+
+    #[test]
+    fn to_one_related() {
+        let schema = test_data_model();
+        let user = schema.find_model("User").unwrap();
+        let site = schema.find_model("Site").unwrap();
+
+        let rel_field = user.fields().find_from_relation_fields("sites").unwrap();
+        let site_name = site.fields().find_from_scalar("name").unwrap();
+        let filter = rel_field.to_one_related(site_name.equals("Blog"));
+
+        match filter {
+            Filter::Relation(RelationFilter {
+                field: relation_field,
+                nested_filter: nested,
+                condition,
+            }) => {
+                assert_eq!(String::from("sites"), relation_field.name);
+                assert_eq!(RelationCondition::ToOneRelatedRecord, condition);
+
+                match *nested {
+                    Filter::Scalar(ScalarFilter {
+                        field: scalar_field,
+                        condition: ScalarCondition::Equals(scalar_val),
+                    }) => {
+                        assert_eq!(String::from("name"), scalar_field.name);
+                        assert_eq!(PrismaValue::from("Blog"), scalar_val);
+                    }
+                    _ => unreachable!()
+                }
+            }
+            _ => unreachable!()
+        }
+    }
+
+    #[test]
+    fn at_least_one_related() {
+        let schema = test_data_model();
+        let user = schema.find_model("User").unwrap();
+        let site = schema.find_model("Site").unwrap();
+
+        let rel_field = user.fields().find_from_relation_fields("sites").unwrap();
+        let site_name = site.fields().find_from_scalar("name").unwrap();
+        let filter = rel_field.at_least_one_related(site_name.equals("Blog"));
+
+        match filter {
+            Filter::Relation(RelationFilter {
+                field: relation_field,
+                nested_filter: nested,
+                condition,
+            }) => {
+                assert_eq!(String::from("sites"), relation_field.name);
+                assert_eq!(RelationCondition::AtLeastOneRelatedRecord, condition);
+
+                match *nested {
+                    Filter::Scalar(ScalarFilter {
+                        field: scalar_field,
+                        condition: ScalarCondition::Equals(scalar_val),
+                    }) => {
+                        assert_eq!(String::from("name"), scalar_field.name);
+                        assert_eq!(PrismaValue::from("Blog"), scalar_val);
+                    }
+                    _ => unreachable!()
+                }
+            }
+            _ => unreachable!()
+        }
+    }
+
+    #[test]
+    fn every_related() {
+        let schema = test_data_model();
+        let user = schema.find_model("User").unwrap();
+        let site = schema.find_model("Site").unwrap();
+
+        let rel_field = user.fields().find_from_relation_fields("sites").unwrap();
+        let site_name = site.fields().find_from_scalar("name").unwrap();
+        let filter = rel_field.every_related(site_name.equals("Blog"));
+
+        match filter {
+            Filter::Relation(RelationFilter {
+                field: relation_field,
+                nested_filter: nested,
+                condition,
+            }) => {
+                assert_eq!(String::from("sites"), relation_field.name);
+                assert_eq!(RelationCondition::EveryRelatedRecord, condition);
+
+                match *nested {
+                    Filter::Scalar(ScalarFilter {
+                        field: scalar_field,
+                        condition: ScalarCondition::Equals(scalar_val),
+                    }) => {
+                        assert_eq!(String::from("name"), scalar_field.name);
+                        assert_eq!(PrismaValue::from("Blog"), scalar_val);
+                    }
+                    _ => unreachable!()
+                }
+            }
+            _ => unreachable!()
+        }
     }
 }

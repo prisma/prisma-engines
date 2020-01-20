@@ -1,12 +1,13 @@
 extern crate datamodel;
 use pretty_assertions::assert_eq;
 
+// TODO: test `onDelete` back once `prisma migrate` is a thing
 const DATAMODEL_STRING: &str = r#"model User {
   id        Int      @id
   createdAt DateTime
   email     String   @unique
   name      String?
-  posts     Post[]   @relation("author", onDelete: CASCADE)
+  posts     Post[]   @relation("author")
   profile   Profile?
 
   @@map("user")
@@ -174,7 +175,7 @@ const DMFF_WITHOUT_RELATION_NAME: &str = r#"
         {
           "name": "id",
           "kind": "scalar",
-          "dbName": null,
+          "dbNames": [],
           "isList": false,
           "isRequired": true,
           "isUnique": false,
@@ -186,7 +187,7 @@ const DMFF_WITHOUT_RELATION_NAME: &str = r#"
         {
           "name": "posts",
           "kind": "object",
-          "dbName": null,
+          "dbNames": [],
           "isList": true,
           "isRequired": false,
           "isUnique": false,
@@ -209,7 +210,7 @@ const DMFF_WITHOUT_RELATION_NAME: &str = r#"
         {
           "name": "id",
           "kind": "scalar",
-          "dbName": null,
+          "dbNames": [],
           "isList": false,
           "isRequired": true,
           "isUnique": false,
@@ -221,7 +222,7 @@ const DMFF_WITHOUT_RELATION_NAME: &str = r#"
         {
           "name": "user",
           "kind": "object",
-          "dbName": null,
+          "dbNames": [],
           "isList": false,
           "isRequired": true,
           "isUnique": false,

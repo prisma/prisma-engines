@@ -586,7 +586,36 @@ async fn mysql_foreign_key_on_delete_must_be_handled() {
                     auto_increment: true,
                 },
             ],
-            indices: vec![],
+            indices: vec![
+                Index {
+                    name: "city".to_owned(),
+                    columns: vec![
+                        "city".to_owned(),
+                    ],
+                    tpe: IndexType::Normal
+                },
+                Index {
+                    name: "city_cascade".to_owned(),
+                    columns: vec![
+                        "city_cascade".to_owned(),
+                    ],
+                    tpe: IndexType::Normal
+                },
+                Index {
+                    name: "city_restrict".to_owned(),
+                    columns: vec![
+                        "city_restrict".to_owned(),
+                    ],
+                    tpe: IndexType::Normal
+                },
+                Index {
+                    name: "city_set_null".to_owned(),
+                    columns: vec![
+                        "city_set_null".to_owned(),
+                    ],
+                    tpe: IndexType::Normal
+                }
+            ],
             primary_key: Some(PrimaryKey {
                 columns: vec!["id".to_string()],
                 sequence: None,

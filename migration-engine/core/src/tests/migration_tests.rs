@@ -1,5 +1,6 @@
 mod indexes;
 mod mariadb;
+mod mysql;
 mod sqlite;
 
 use super::test_harness::*;
@@ -1371,7 +1372,7 @@ async fn model_with_multiple_indexes_works(api: &TestApi) {
     let sql_schema = api.infer_and_apply(dm).await.sql_schema;
 
     let like_indexes_count = sql_schema.table_bang("Like").indices.len();
-    let expected_indexes_count = if api.is_mysql() { 0 } else { 3 }; // 3 explicit indexes + PK, or only PK on mysql
+    let expected_indexes_count = 3;
 
     assert_eq!(like_indexes_count, expected_indexes_count);
 }
@@ -1769,14 +1770,14 @@ async fn relations_can_reference_multiple_fields_with_mappings(api: &TestApi) ->
     "#;
 
     api.infer_apply(dm).send().await?;
-    let schema = api.describe_database().await?;
 
-    schema
-        .assert_table("Account")?
-        .assert_foreign_keys_count(1)?
-        .assert_fk_on_columns(&["user_emergency-mail", "user_birthdays-count"], |fk| {
-            fk.assert_references("users", &["emergency-mail", "birthdays-count"])
-        })?;
+    api.assert_schema().await?.assert_table("Account", |table| {
+        table
+            .assert_foreign_keys_count(1)?
+            .assert_fk_on_columns(&["user_emergency-mail", "user_birthdays-count"], |fk| {
+                fk.assert_references("users", &["emergency-mail", "birthdays-count"])
+            })
+    })?;
 
     Ok(())
 }
@@ -1795,12 +1796,10 @@ async fn foreign_keys_are_added_on_existing_tables(api: &TestApi) -> TestResult 
     "#;
 
     api.infer_apply(dm1).send().await?;
-    let schema = api.describe_database().await?;
-
-    anyhow::ensure!(
-        schema.table("Account").ok().map(|table| table.foreign_keys.is_empty()) == Some(true),
-        "There should be no foreign key yet."
-    );
+    api.assert_schema()
+        .await?
+        // There should be no foreign keys yet.
+        .assert_table("Account", |table| table.assert_foreign_keys_count(0))?;
 
     let dm2 = r#"
         model User {
@@ -1815,17 +1814,11 @@ async fn foreign_keys_are_added_on_existing_tables(api: &TestApi) -> TestResult 
     "#;
 
     api.infer_apply(dm2).send().await?;
-    let schema = api.describe_database().await?;
-
-    let table = schema.table("Account").map_err(|err| anyhow::anyhow!("{}", err))?;
-
-    assert_eq!(table.foreign_keys.len(), 1);
-
-    let fk = table.foreign_keys.iter().next().unwrap();
-
-    assert_eq!(fk.columns, &["user"]);
-    assert_eq!(fk.referenced_table, "User");
-    assert_eq!(fk.referenced_columns, &["email"]);
+    api.assert_schema().await?.assert_table("Account", |table| {
+        table
+            .assert_foreign_keys_count(1)?
+            .assert_fk_on_columns(&["user"], |fk| fk.assert_references("User", &["email"]))
+    })?;
 
     Ok(())
 }
