@@ -28,9 +28,10 @@ impl DirectiveValidator<dml::Field> for RelationDirectiveValidator {
                 relation_info.to_fields = related_fields.as_array()?.to_literal_vec()?;
             }
 
-            if let Ok(on_delete) = args.arg("onDelete") {
-                relation_info.on_delete = on_delete.parse_literal::<dml::OnDeleteStrategy>()?;
-            }
+            // TODO: bring `onDelete` back once `prisma migrate` is a thing
+            //            if let Ok(on_delete) = args.arg("onDelete") {
+            //                relation_info.on_delete = on_delete.parse_literal::<dml::OnDeleteStrategy>()?;
+            //            }
 
             Ok(())
         } else {
