@@ -1,4 +1,3 @@
-//use std::collections::HashMap;
 use std::{fs::File, io::Read, sync::Arc};
 
 use clap::ArgMatches;
