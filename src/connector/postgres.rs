@@ -17,6 +17,7 @@ use std::{
     fs,
 };
 use tokio_postgres::{config::SslMode, Client, Config};
+use tokio::time::timeout;
 use url::Url;
 
 pub(crate) const DEFAULT_SCHEMA: &str = "public";
@@ -26,6 +27,7 @@ pub(crate) const DEFAULT_SCHEMA: &str = "public";
 pub struct PostgreSql {
     #[debug_stub = "postgres::Client"]
     client: Mutex<Client>,
+    socket_timeout: Duration,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -194,6 +196,8 @@ impl PostgresUrl {
         let mut ssl_accept_mode = SslAcceptMode::AcceptInvalidCerts;
         let mut ssl_mode = SslMode::Prefer;
         let mut host = None;
+        let mut socket_timeout = Duration::from_secs(5);
+        let mut connect_timeout = Duration::from_secs(5);
 
         for (k, v) in url.query_pairs() {
             match k.as_ref() {
@@ -250,6 +254,14 @@ impl PostgresUrl {
                 "host" => {
                     host = Some(v.to_string());
                 }
+                "socket_timeout" => {
+                    let as_int = v.parse().map_err(|_| Error::InvalidConnectionArguments)?;
+                    socket_timeout = Duration::from_secs(as_int);
+                }
+                "connect_timeout" => {
+                    let as_int = v.parse().map_err(|_| Error::InvalidConnectionArguments)?;
+                    connect_timeout = Duration::from_secs(as_int);
+                }
                 _ => {
                     #[cfg(not(feature = "tracing-log"))]
                     trace!("Discarding connection string param: {}", k);
@@ -270,6 +282,8 @@ impl PostgresUrl {
             schema,
             ssl_mode,
             host,
+            connect_timeout,
+            socket_timeout,
         })
     }
 
@@ -290,7 +304,7 @@ impl PostgresUrl {
         config.host(self.host());
         config.port(self.port());
         config.dbname(self.dbname());
-        config.connect_timeout(Duration::from_millis(5000));
+        config.connect_timeout(self.query_params.connect_timeout);
 
         config.ssl_mode(self.query_params.ssl_mode);
 
@@ -305,15 +319,13 @@ pub(crate) struct PostgresUrlQueryParams {
     schema: String,
     ssl_mode: SslMode,
     host: Option<String>,
+    socket_timeout: Duration,
+    connect_timeout: Duration,
 }
 
 impl PostgreSql {
     /// Create a new connection to the database.
-    pub async fn new(
-        url: PostgresUrl,
-        // schema: Option<String>,
-        // ssl_params: Option<SslParams>,
-    ) -> crate::Result<Self> {
+    pub async fn new(url: PostgresUrl) -> crate::Result<Self> {
         let config = url.to_config();
         let mut tls_builder = TlsConnector::builder();
 
@@ -338,10 +350,15 @@ impl PostgreSql {
 
         let schema = url.schema();
         let path = format!("SET search_path = \"{}\"", schema);
-        client.execute(path.as_str(), &[]).await?;
+
+        timeout(
+            url.query_params.socket_timeout,
+            client.execute(path.as_str(), &[])
+        ).await??;
 
         Ok(Self {
             client: Mutex::new(client),
+            socket_timeout: url.query_params.socket_timeout,
         })
     }
 
@@ -349,8 +366,12 @@ impl PostgreSql {
         metrics::query("postgres.execute", sql, params, move || {
             async move {
                 let client = self.client.lock().await;
-                let stmt = client.prepare(sql).await?;
-                let rows = client.query(&stmt, conversion::conv_params(params).as_slice()).await?;
+                let stmt = timeout(self.socket_timeout, client.prepare(sql)).await??;
+
+                let rows = timeout(
+                    self.socket_timeout,
+                    client.query(&stmt, conversion::conv_params(params).as_slice())
+                ).await??;
 
                 let id: Option<Id> = rows.into_iter().rev().next().map(|row| {
                     let id: Id = row.get(0);
@@ -383,8 +404,12 @@ impl Queryable for PostgreSql {
         metrics::query("postgres.query_raw", sql, params, move || {
             async move {
                 let client = self.client.lock().await;
-                let stmt = client.prepare(sql).await?;
-                let rows = client.query(&stmt, conversion::conv_params(params).as_slice()).await?;
+                let stmt = timeout(self.socket_timeout, client.prepare(sql)).await??;
+
+                let rows = timeout(
+                    self.socket_timeout,
+                    client.query(&stmt, conversion::conv_params(params).as_slice())
+                ).await??;
 
                 let mut result = ResultSet::new(stmt.to_column_names(), Vec::new());
 
@@ -401,10 +426,12 @@ impl Queryable for PostgreSql {
         metrics::query("postgres.execute_raw", sql, params, move || {
             async move {
                 let client = self.client.lock().await;
-                let stmt = client.prepare(sql).await?;
-                let changes = client
-                    .execute(&stmt, conversion::conv_params(params).as_slice())
-                    .await?;
+                let stmt = timeout(self.socket_timeout, client.prepare(sql)).await??;
+
+                let changes = timeout(
+                    self.socket_timeout,
+                    client.execute(&stmt, conversion::conv_params(params).as_slice()),
+                ).await??;
 
                 Ok(changes)
             }
@@ -415,7 +442,7 @@ impl Queryable for PostgreSql {
         metrics::query("postgres.raw_cmd", cmd, &[], move || {
             async move {
                 let client = self.client.lock().await;
-                client.simple_query(cmd).await?;
+                timeout(self.socket_timeout, client.simple_query(cmd)).await??;
 
                 Ok(())
             }

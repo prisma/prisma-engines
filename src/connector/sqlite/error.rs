@@ -52,6 +52,16 @@ impl From<rusqlite::Error> for Error {
                 }
             }
 
+            rusqlite::Error::SqliteFailure(
+                ffi::Error {
+                    code: ffi::ErrorCode::DatabaseBusy,
+                    ..
+                },
+                _
+            ) => {
+                Error::Timeout
+            }
+
             e => Error::QueryError(e.into()),
         }
     }

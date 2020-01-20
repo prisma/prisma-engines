@@ -75,6 +75,13 @@ impl From<mobc::Error<Error>> for Error {
     }
 }
 
+#[cfg(any(feature = "postgresql", feature = "mysql"))]
+impl From<tokio::time::Elapsed> for Error {
+    fn from(_: tokio::time::Elapsed) -> Self {
+        Self::Timeout
+    }
+}
+
 impl From<url::ParseError> for Error {
     fn from(_: url::ParseError) -> Error {
         Error::DatabaseUrlIsInvalid("Error parsing database connection string.".to_string())

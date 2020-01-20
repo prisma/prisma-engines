@@ -39,7 +39,7 @@ json-1 = ["serde_json"]
 postgresql = ["rust_decimal/postgres", "native-tls", "tokio-postgres", "postgres-native-tls", "array", "bytes", "tokio"]
 uuid-0_8 = ["uuid"]
 chrono-0_4 = ["chrono"]
-mysql = ["mysql_async"]
+mysql = ["mysql_async", "tokio"]
 tracing-log = ["tracing", "tracing-core"]
 array = []
 

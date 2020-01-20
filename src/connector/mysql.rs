@@ -5,6 +5,7 @@ use mysql_async::{self as my, prelude::Queryable as _};
 use percent_encoding::percent_decode;
 use std::{borrow::Cow, path::Path, time::Duration};
 use url::Url;
+use tokio::time::timeout;
 
 use crate::{
     ast::{Id, ParameterizedValue, Query},
@@ -18,6 +19,8 @@ use crate::{
 pub struct Mysql {
     pub(crate) pool: my::Pool,
     pub(crate) url: MysqlUrl,
+    socket_timeout: Duration,
+    connect_timeout: Duration,
 }
 
 /// Wraps a connection url and exposes the parsing logic used by quaint, including default values.
@@ -100,6 +103,8 @@ impl MysqlUrl {
         let mut ssl_opts = my::SslOpts::default();
         let mut use_ssl = false;
         let mut socket = None;
+        let mut socket_timeout = Duration::from_secs(5);
+        let mut connect_timeout = Duration::from_secs(5);
 
         for (k, v) in url.query_pairs() {
             match k.as_ref() {
@@ -121,6 +126,14 @@ impl MysqlUrl {
                 }
                 "socket" => {
                     socket = Some(v.replace("(", "").replace(")", ""));
+                }
+                "socket_timeout" => {
+                    let as_int = v.parse().map_err(|_| Error::InvalidConnectionArguments)?;
+                    socket_timeout = Duration::from_secs(as_int);
+                }
+                "connect_timeout" => {
+                    let as_int = v.parse().map_err(|_| Error::InvalidConnectionArguments)?;
+                    connect_timeout = Duration::from_secs(as_int);
                 }
                 "sslaccept" => {
                     match v.as_ref() {
@@ -153,6 +166,8 @@ impl MysqlUrl {
             connection_limit,
             use_ssl,
             socket,
+            connect_timeout,
+            socket_timeout,
         })
     }
 
@@ -195,6 +210,8 @@ pub(crate) struct MysqlUrlQueryParams {
     connection_limit: usize,
     use_ssl: bool,
     socket: Option<String>,
+    socket_timeout: Duration,
+    connect_timeout: Duration,
 }
 
 impl Mysql {
@@ -205,16 +222,18 @@ impl Mysql {
         opts.pool_options(pool_opts);
 
         Ok(Self {
-            url,
+            socket_timeout: url.query_params.socket_timeout,
+            connect_timeout: url.query_params.connect_timeout,
             pool: my::Pool::new(opts),
+            url,
         })
     }
 
     fn execute_and_get_id<'a>(&'a self, sql: &'a str, params: &'a [ParameterizedValue]) -> DBIO<'a, Option<Id>> {
         metrics::query("mysql.execute", sql, params, move || {
             async move {
-                let conn = self.pool.get_conn().await?;
-                let results = conn.prep_exec(sql, params.to_vec()).await?;
+                let conn = timeout(self.connect_timeout, self.pool.get_conn()).await??;
+                let results = timeout(self.socket_timeout, conn.prep_exec(sql, params.to_vec())).await??;
 
                 Ok(results.last_insert_id().map(Id::from))
             }
@@ -242,8 +261,13 @@ impl Queryable for Mysql {
     fn query_raw<'a>(&'a self, sql: &'a str, params: &'a [ParameterizedValue]) -> DBIO<'a, ResultSet> {
         metrics::query("mysql.query_raw", sql, params, move || {
             async move {
-                let conn = self.pool.get_conn().await?;
-                let results = conn.prep_exec(sql, conversion::conv_params(params)).await?;
+                let conn = timeout(self.connect_timeout, self.pool.get_conn()).await??;
+
+                let results = timeout(
+                    self.socket_timeout,
+                    conn.prep_exec(sql, conversion::conv_params(params)),
+                ).await??;
+
                 let columns = results
                     .columns_ref()
                     .iter()
@@ -251,7 +275,11 @@ impl Queryable for Mysql {
                     .collect();
 
                 let mut result_set = ResultSet::new(columns, Vec::new());
-                let (_, rows) = results.map_and_drop(|mut row| row.take_result_row()).await?;
+
+                let (_, rows) = timeout(
+                    self.socket_timeout,
+                    results.map_and_drop(|mut row| row.take_result_row()),
+                ).await??;
 
                 for row in rows.into_iter() {
                     result_set.rows.push(row?);
@@ -265,8 +293,12 @@ impl Queryable for Mysql {
     fn execute_raw<'a>(&'a self, sql: &'a str, params: &'a [ParameterizedValue]) -> DBIO<'a, u64> {
         metrics::query("mysql.execute_raw", sql, params, move || {
             async move {
-                let conn = self.pool.get_conn().await?;
-                let result = conn.prep_exec(sql, conversion::conv_params(params)).await?;
+                let conn = timeout(self.connect_timeout, self.pool.get_conn()).await??;
+
+                let result = timeout(
+                    self.socket_timeout,
+                    conn.prep_exec(sql, conversion::conv_params(params)),
+                ).await??;
 
                 Ok(result.affected_rows())
             }
@@ -276,8 +308,8 @@ impl Queryable for Mysql {
     fn raw_cmd<'a>(&'a self, cmd: &'a str) -> DBIO<'a, ()> {
         metrics::query("mysql.raw_cmd", cmd, &[], move || {
             async move {
-                let conn = self.pool.get_conn().await?;
-                conn.query(cmd).await?;
+                let conn = timeout(self.connect_timeout, self.pool.get_conn()).await??;
+                timeout(self.socket_timeout, conn.query(cmd)).await??;
                 Ok(())
             }
         })

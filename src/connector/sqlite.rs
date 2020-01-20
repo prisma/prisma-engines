@@ -9,7 +9,7 @@ use crate::{
 };
 use futures::future;
 use rusqlite::NO_PARAMS;
-use std::{collections::HashSet, convert::TryFrom, path::Path, sync::Mutex};
+use std::{collections::HashSet, convert::TryFrom, path::Path, sync::Mutex, time::Duration};
 
 const DEFAULT_SCHEMA_NAME: &str = "quaint";
 
@@ -27,6 +27,7 @@ pub struct SqliteParams {
     /// only be done with UTF-8 paths.
     pub file_path: String,
     pub db_name: String,
+    pub socket_timeout: Duration,
 }
 
 type ConnectionParams = (Vec<(String, String)>, Vec<(String, String)>);
@@ -51,6 +52,7 @@ impl TryFrom<&str> for SqliteParams {
             let official = vec![];
             let mut connection_limit = num_cpus::get_physical() * 2 + 1;
             let mut db_name = None;
+            let mut socket_timeout = Duration::from_secs(5);
 
             if path_parts.len() > 1 {
                 let (_, unsupported): ConnectionParams = path_parts
@@ -75,6 +77,10 @@ impl TryFrom<&str> for SqliteParams {
                         "db_name" => {
                             db_name = Some(v.to_string());
                         }
+                        "socket_timeout" => {
+                            let as_int = v.parse().map_err(|_| Error::InvalidConnectionArguments)?;
+                            socket_timeout = Duration::from_secs(as_int);
+                        }
                         _ => {
                             #[cfg(not(feature = "tracing-log"))]
                             trace!("Discarding connection string param: {}", k);
@@ -89,6 +95,7 @@ impl TryFrom<&str> for SqliteParams {
                 connection_limit: u32::try_from(connection_limit).unwrap(),
                 file_path: path_str.to_owned(),
                 db_name: db_name.unwrap_or_else(|| DEFAULT_SCHEMA_NAME.to_owned()),
+                socket_timeout,
             })
         }
     }
@@ -99,10 +106,14 @@ impl TryFrom<&str> for Sqlite {
 
     fn try_from(path: &str) -> crate::Result<Self> {
         let params = SqliteParams::try_from(path)?;
-        let client = Mutex::new(rusqlite::Connection::open_in_memory()?);
+
+        let conn = rusqlite::Connection::open_in_memory()?;
+        conn.busy_timeout(params.socket_timeout)?;
+
+        let client = Mutex::new(conn);
         let file_path = params.file_path;
 
-        Ok(Sqlite { client, file_path })
+        Ok(Sqlite { client, file_path, })
     }
 }
 
@@ -161,8 +172,8 @@ impl Queryable for Sqlite {
             let res = move || {
                 let client = self.client.lock().unwrap();
                 let mut stmt = client.prepare_cached(sql)?;
-                let mut rows = stmt.query(params)?;
 
+                let mut rows = stmt.query(params)?;
                 let mut result = ResultSet::new(rows.to_column_names(), Vec::new());
 
                 while let Some(row) = rows.next()? {
