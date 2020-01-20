@@ -1,6 +1,11 @@
 # Changelog
 
+## v0.1.8
+
+- Adding timeout configuration (https://github.com/prisma/quaint/pull/66)
+
 ## v0.1.7
+
 - Fixing clippy warnings, 2020 edition
 - Add is_* methods to SqlFamily
 - Add item type to the tracing query log
