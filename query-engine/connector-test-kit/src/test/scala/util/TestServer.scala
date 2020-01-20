@@ -36,11 +36,9 @@ case class TestServer() extends PlayJsonExtensions {
   def queryBinaryCLI(query: String, project: Project) = {
     val formattedQuery = query.stripMargin.replace("\n", "")
     import sys.process._
+
     val res =
-      Process(Seq("/Users/matthias/repos/work/prisma-engine/target/release/prisma", "cli", "--execute_request", formattedQuery),
-              None,
-              "PRISMA_DML" -> project.envVar).!!
-    println(res)
+      Process(Seq(s"${EnvVars.serverRoot}/target/release/prisma", "cli", "--execute_request", formattedQuery), None, "PRISMA_DML" -> project.envVar).!!
     Json.parse(res)
   }
 }
