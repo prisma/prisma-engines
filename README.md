@@ -13,7 +13,7 @@ The engines and their respective binary crates are:
 **Prerequisites:**
 - Installed the stable Rust toolchain, at least version 1.39.0. You can get the toolchain at [rustup](https://rustup.rs/) or the package manager of your choice.
 - Linux only: OpenSSL is required to be installed.
-- Installed `direnv`, then `direnv allow` on the repository root.
+- Installed [direnv](https://github.com/direnv/direnv), then `direnv allow` on the repository root.
     - Alternatively: Load the defined environment in `./.envrc` manually in your shell.
 
 **How to build:**
