@@ -137,14 +137,17 @@ fn map_must_work_on_right_number_of_args_for_relation_fields() {
     let dml = r#"
     model User {
         id Int @id
-        firstRelation Foo @map(["name1"]) @relation(name: "One")
-        secondRelation Foo @map(["name1", "name2"]) @relation(name: "Two", references:[a,b])
+        firstRelation Foo @map(["name1"]) @relation("One", references: id)
+        secondRelation Foo @map(["name1", "name2"]) @relation("Two", references:[a,b])
     }
     
     model Foo {
         id Int @id
         a String
         b String
+        
+        userOne User @relation("One")
+        userTwo User @relation("Two")
         
         @@unique([a,b])
     }
