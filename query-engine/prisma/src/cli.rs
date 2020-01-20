@@ -19,7 +19,6 @@ use crate::{
     data_model_loader::{load_configuration, load_data_model_components},
     dmmf, PrismaResult,
 };
-use user_facing_errors::Error;
 
 #[derive(Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
@@ -119,7 +118,7 @@ impl CliCommand {
         use std::panic::AssertUnwindSafe;
         use user_facing_errors::Error;
 
-        let response = match block_on(AssertUnwindSafe(CliCommand::handle_gql_request(&input)).catch_unwind()) {
+        let response = match block_on(AssertUnwindSafe(CliCommand::handle_gql_request(input)).catch_unwind()) {
             Ok(Ok(responses)) => responses,
             Ok(Err(err)) => {
                 let mut responses = response_ir::Responses::default();
@@ -143,7 +142,7 @@ impl CliCommand {
         Ok(())
     }
 
-    async fn handle_gql_request(input: &String) -> Result<Responses, PrismaError> {
+    async fn handle_gql_request(input: String) -> Result<Responses, PrismaError> {
         let ctx = PrismaContext::new(true).await?;
         let gql_doc = gql::parse_query(&input)?;
         let query_doc = GraphQLProtocolAdapter::convert(gql_doc, None)?;
