@@ -7,7 +7,7 @@ use sql_schema_describer::*;
 
 /// Calculate a data model from a database schema.
 pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> {
-    debug!("Calculating data model");
+    debug!("Calculating data model.");
 
     let mut data_model = Datamodel::new();
     for table in schema
@@ -16,6 +16,7 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
         .filter(|table| !is_migration_table(&table))
         .filter(|table| !is_prisma_join_table(&table))
     {
+        debug!("Calculating model: {}", table.name);
         let mut model = Model::new(table.name.clone(), None);
 
         for column in table
@@ -121,5 +122,8 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
         model.add_field(field);
     }
 
-    Ok(sanitize_datamodel_names(data_model))
+    let final_datamodel = sanitize_datamodel_names(data_model);
+    debug!("Done calculating data model {:?}", final_datamodel);
+
+    Ok(final_datamodel)
 }
