@@ -1,18 +1,22 @@
-use crate::{dml, DomainError, DomainResult};
+mod error;
+#[cfg(feature = "sql-ext")]
+pub mod sql_ext;
+
 use chrono::prelude::*;
 use rust_decimal::{
     prelude::{FromPrimitive, ToPrimitive},
     Decimal,
 };
 use serde::{ser::Serializer, Serialize};
-use std::{
-    convert::{TryFrom, TryInto},
-    fmt,
-    string::FromUtf8Error,
-};
+use std::{convert::TryFrom, fmt, string::FromUtf8Error};
 use uuid::Uuid;
 
+pub use error::ConversionFailure;
+pub type PrismaValueResult<T> = std::result::Result<T, ConversionFailure>;
 pub type PrismaListValue = Vec<PrismaValue>;
+
+#[cfg(feature = "sql-ext")]
+pub use sql_ext::*;
 
 #[derive(Serialize, Debug, PartialEq, Eq, Hash, Clone)]
 #[serde(untagged)]
@@ -99,22 +103,22 @@ impl From<String> for PrismaValue {
 }
 
 impl TryFrom<f64> for PrismaValue {
-    type Error = DomainError;
+    type Error = ConversionFailure;
 
-    fn try_from(f: f64) -> DomainResult<PrismaValue> {
+    fn try_from(f: f64) -> PrismaValueResult<PrismaValue> {
         Decimal::from_f64(f)
             .map(|d| PrismaValue::Float(d))
-            .ok_or(DomainError::ConversionFailure("f32", "Decimal"))
+            .ok_or(ConversionFailure::new("f32", "Decimal"))
     }
 }
 
 impl TryFrom<f32> for PrismaValue {
-    type Error = DomainError;
+    type Error = ConversionFailure;
 
-    fn try_from(f: f32) -> DomainResult<PrismaValue> {
+    fn try_from(f: f32) -> PrismaValueResult<PrismaValue> {
         Decimal::from_f32(f)
             .map(|d| PrismaValue::Float(d))
-            .ok_or(DomainError::ConversionFailure("f64", "Decimal"))
+            .ok_or(ConversionFailure::new("f64", "Decimal"))
     }
 }
 
@@ -167,40 +171,40 @@ impl From<&GraphqlId> for PrismaValue {
 }
 
 impl TryFrom<PrismaValue> for GraphqlId {
-    type Error = DomainError;
+    type Error = ConversionFailure;
 
-    fn try_from(value: PrismaValue) -> DomainResult<GraphqlId> {
+    fn try_from(value: PrismaValue) -> PrismaValueResult<GraphqlId> {
         match value {
             PrismaValue::GraphqlId(id) => Ok(id),
             PrismaValue::Int(i) => Ok(GraphqlId::from(i)),
             PrismaValue::String(s) => Ok(GraphqlId::from(s)),
             PrismaValue::Uuid(u) => Ok(GraphqlId::from(u)),
-            _ => Err(DomainError::ConversionFailure("PrismaValue", "GraphqlId")),
+            _ => Err(ConversionFailure::new("PrismaValue", "GraphqlId")),
         }
     }
 }
 
 impl TryFrom<&PrismaValue> for GraphqlId {
-    type Error = DomainError;
+    type Error = ConversionFailure;
 
-    fn try_from(value: &PrismaValue) -> DomainResult<GraphqlId> {
+    fn try_from(value: &PrismaValue) -> PrismaValueResult<GraphqlId> {
         match value {
             PrismaValue::GraphqlId(id) => Ok(id.clone()),
             PrismaValue::Int(i) => Ok(GraphqlId::from(*i)),
             PrismaValue::String(s) => Ok(GraphqlId::from(s.clone())),
             PrismaValue::Uuid(u) => Ok(GraphqlId::from(*u)),
-            _ => Err(DomainError::ConversionFailure("PrismaValue", "GraphqlId")),
+            _ => Err(ConversionFailure::new("PrismaValue", "GraphqlId")),
         }
     }
 }
 
 impl TryFrom<PrismaValue> for i64 {
-    type Error = DomainError;
+    type Error = ConversionFailure;
 
-    fn try_from(value: PrismaValue) -> DomainResult<i64> {
+    fn try_from(value: PrismaValue) -> PrismaValueResult<i64> {
         match value {
             PrismaValue::Int(i) => Ok(i),
-            _ => Err(DomainError::ConversionFailure("PrismaValue", "i64")),
+            _ => Err(ConversionFailure::new("PrismaValue", "i64")),
         }
     }
 }
@@ -246,20 +250,5 @@ impl From<u64> for GraphqlId {
 impl From<Uuid> for GraphqlId {
     fn from(uuid: Uuid) -> Self {
         GraphqlId::UUID(uuid)
-    }
-}
-
-impl From<Option<dml::ScalarValue>> for PrismaValue {
-    fn from(sv: Option<dml::ScalarValue>) -> Self {
-        sv.map(|sv| match sv {
-            dml::ScalarValue::Boolean(x) => PrismaValue::Boolean(x),
-            dml::ScalarValue::Int(x) => PrismaValue::Int(i64::from(x)),
-            dml::ScalarValue::Float(x) => x.try_into().expect("Can't convert float to decimal"),
-            dml::ScalarValue::String(x) => PrismaValue::String(x.clone()),
-            dml::ScalarValue::DateTime(x) => PrismaValue::DateTime(x),
-            dml::ScalarValue::Decimal(x) => x.try_into().expect("Can't convert float to decimal"),
-            dml::ScalarValue::ConstantLiteral(x) => PrismaValue::Enum(x.clone()),
-        })
-        .unwrap_or_else(|| PrismaValue::Null)
     }
 }

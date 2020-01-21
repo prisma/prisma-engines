@@ -1,4 +1,5 @@
 use failure::Fail;
+use prisma_value::ConversionFailure;
 
 #[derive(Debug, Fail)]
 pub enum DomainError {
@@ -25,4 +26,10 @@ pub enum DomainError {
 
     #[fail(display = "Conversion from `{}` to `{}` failed.", _0, _1)]
     ConversionFailure(&'static str, &'static str),
+}
+
+impl From<super::ConversionFailure> for DomainError {
+    fn from(err: ConversionFailure) -> Self {
+        Self::ConversionFailure(err.from, err.to)
+    }
 }
