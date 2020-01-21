@@ -35,11 +35,11 @@ trait SchemaBaseV11 {
     def isList: Boolean = false
   }
   final case object ParentList extends RelationField {
-    override def field: String = "parentsOpt   Parent[]"
+    override def field: String   = "parentsOpt   Parent[]"
     override def isList: Boolean = true
   }
   final case object ChildList extends RelationField {
-    override def field: String = "childrenOpt  Child[]"
+    override def field: String   = "childrenOpt  Child[]"
     override def isList: Boolean = true
   }
   final case object ParentOpt extends RelationField {
@@ -60,40 +60,47 @@ trait SchemaBaseV11 {
     //todo for testing enable generating simple case, all single ids
     val simple = true
 
-    val datamodelsWithParams = for (
-                                    parentId <- if (simple) Vector(simpleId) else idOptions;
+    val datamodelsWithParams = for (parentId <- if (simple) Vector(simpleId) else idOptions;
                                     childId <- if (simple) Vector(simpleId) else idOptions;
                                     //based on Id and relation fields
-                                    childReferences <- if (simple) Vector(idReference) else parentId match {
-                                                        case _ if onChild.isList && !onParent.isList => Vector(`noRef`)
-                                                        case `simpleId`           => idReference +: commonParentReferences
-                                                        case `compoundId`         => compoundParentIdReference +: commonParentReferences
-                                                        case _                   => commonParentReferences
-                                                      };
-                                    parentReferences <- (childId, childReferences)  match {
+                                    childReferences <- if (simple) Vector(idReference)
+                                                      else
+                                                        parentId match {
+                                                          case _ if onChild.isList && !onParent.isList => Vector(`noRef`)
+                                                          case `simpleId`                              => idReference +: commonParentReferences
+                                                          case `compoundId`                            => compoundParentIdReference +: commonParentReferences
+                                                          case _                                       => commonParentReferences
+                                                        };
+                                    parentReferences <- (childId, childReferences) match {
                                                          case (_, _) if onParent.isList && !onChild.isList => Vector(`noRef`)
-                                                         case (`simpleId`, `noRef`)     => idReference +: commonChildReferences
-                                                         case (`simpleId`, _) if onParent.isList && onChild.isList => idReference +: commonChildReferences :+ noRef
-                                                         case (`simpleId`, _)           => Vector(noRef)
-                                                         case (`compoundId`, `noRef`)   => compoundChildIdReference +: commonChildReferences
-                                                         case (`compoundId`, _) if onParent.isList && onChild.isList => compoundChildIdReference +: commonChildReferences :+ noRef
-                                                         case (`compoundId`, _)         => Vector(noRef)
-                                                         case (`noId`, `noRef`)         => commonChildReferences
+                                                         case (`simpleId`, `noRef`)                        => idReference +: commonChildReferences
+                                                         case (`simpleId`, _) if onParent.isList && onChild.isList =>
+                                                           idReference +: commonChildReferences :+ noRef
+                                                         case (`simpleId`, _)         => Vector(noRef)
+                                                         case (`compoundId`, `noRef`) => compoundChildIdReference +: commonChildReferences
+                                                         case (`compoundId`, _) if onParent.isList && onChild.isList =>
+                                                           compoundChildIdReference +: commonChildReferences :+ noRef
+                                                         case (`compoundId`, _)                                => Vector(noRef)
+                                                         case (`noId`, `noRef`)                                => commonChildReferences
                                                          case (`noId`, _) if onParent.isList && onChild.isList => commonChildReferences :+ noRef
-                                                         case (`noId`, _)               => Vector(noRef)
-                                                         case (_, _)                    => Vector.empty
+                                                         case (`noId`, _)                                      => Vector(noRef)
+                                                         case (_, _)                                           => Vector.empty
                                                        };
                                     //only based on id
-                                    parentParams <- if(simple) Vector(idParams) else parentId match {
-                                                     case `simpleId`   => parentUniqueParams :+ idParams
-                                                     case `compoundId` => parentUniqueParams :+ compoundIdParams
-                                                     case `noId`       => parentUniqueParams
-                                                   };
-                                    childParams <- if(simple) Vector(idParams) else childId match {
-                                                    case `simpleId`   => childUniqueParams :+ idParams
-                                                    case `compoundId` => childUniqueParams :+ compoundIdParams
-                                                    case `noId`       => parentUniqueParams
-                                                  })
+                                    parentParams <- if (simple) Vector(idParams)
+                                                   else
+                                                     parentId match {
+                                                       case `simpleId`   => parentUniqueParams :+ idParams
+                                                       case `compoundId` => parentUniqueParams :+ compoundIdParams
+                                                       case `noId`       => parentUniqueParams
+                                                     };
+                                    childParams <- if (simple) Vector(idParams)
+                                                  else
+                                                    childId match {
+                                                      case `simpleId`   => childUniqueParams :+ idParams
+                                                      case `compoundId` => childUniqueParams :+ compoundIdParams
+                                                      case `noId`       => parentUniqueParams
+                                                    })
       yield {
         val datamodel =
           s"""
@@ -122,8 +129,9 @@ trait SchemaBaseV11 {
 
         TestAbstraction(datamodel, parentParams, childParams)
       }
-    println(datamodelsWithParams.length)
 
+    println(datamodelsWithParams.length)
+    println(datamodelsWithParams)
 
     AbstractTestDataModels(mongo = datamodelsWithParams, sql = datamodelsWithParams)
   }
