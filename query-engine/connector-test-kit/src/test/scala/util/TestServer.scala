@@ -1,8 +1,5 @@
 package util
 
-import java.nio.charset.StandardCharsets
-import java.util.Base64
-
 import play.api.libs.json._
 case class TestServer() extends PlayJsonExtensions {
   def query(
@@ -40,7 +37,7 @@ case class TestServer() extends PlayJsonExtensions {
     import sys.process._
 
     val formattedQuery = query.stripMargin.replace("\n", "")
-    val encoded_query  = UTF8Base64.encode(formattedQuery)
+    val encoded_query = UTF8Base64.encode(formattedQuery)
     val response =
       Process(Seq(EnvVars.prismaBinaryPath, "cli", "--execute_request", encoded_query), None, "PRISMA_DML" -> project.envVar).!!
     val decoded_response = UTF8Base64.decode(response)
