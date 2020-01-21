@@ -5,9 +5,7 @@ use datamodel::{
 };
 use log::debug;
 use regex::Regex;
-use sql_schema_describer::{
-    Column, ColumnArity, ColumnTypeFamily, ForeignKey, Index, IndexType, SqlSchema, Table,
-};
+use sql_schema_describer::{Column, ColumnArity, ColumnTypeFamily, ForeignKey, Index, IndexType, SqlSchema, Table};
 
 //checks
 
@@ -16,7 +14,6 @@ pub fn is_migration_table(table: &Table) -> bool {
 }
 
 pub(crate) fn is_prisma_join_table(table: &Table) -> bool {
-    println!("{:?}", table);
     table.columns.len() == 2
         && table.foreign_keys.len() == 2
         && table.foreign_keys[0].referenced_table < table.foreign_keys[1].referenced_table
