@@ -81,6 +81,24 @@ class CreateMutationListSpec extends FlatSpec with Matchers with ApiSpecBase {
       s"""{"data":{"createScalarModel":{"optEnums":[],"optBooleans":[],"optDateTimes":[],"optStrings":[],"optInts":[], "optFloats":[]}}}""".parseJson)
   }
 
+  "A Create Mutation with an empty scalar list update input object" should "return a detailed error" in {
+
+    val res = server.queryThatMustFail(
+      s"""mutation {
+         |  createScalarModel(data: {
+         |    optStrings: {},
+         |  }){optStrings, optInts, optFloats, optBooleans, optEnums, optDateTimes }
+         |}""",
+      project = project,
+      errorCode = 1
+    )
+
+
+    res.pathAsString("errors.[0].error") should be(
+      s"""Error in query graph construction: InputError(\"The `set` argument was not provided for field `optStrings` on `ScalarModel`")"""
+    )
+  }
+
   "ListValues" should "work" in {
     val testDataModels = {
       val dm1 = s"""model Top {

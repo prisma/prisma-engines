@@ -20,8 +20,19 @@ impl WriteArguments {
                 match field {
                     Field::Scalar(sf) if sf.is_list => {
                         let vals: ParsedInputMap = v.try_into()?;
-                        let set_value: PrismaValue =
-                            vals.into_iter().find(|(k, _)| k == "set").unwrap().1.try_into()?;
+
+                        let set_value = vals.into_iter().find(|(k, _)| k == "set");
+
+                        let set_value: PrismaValue = match set_value {
+                            Some(value) => value.1.try_into()?,
+                            None => {
+                                return Err(QueryGraphBuilderError::InputError(format!(
+                                    "The `set` argument was not provided for field `{field_name}` on `{model_name}`",
+                                    field_name = &sf.name,
+                                    model_name = &model.name,
+                                )))
+                            }
+                        };
 
                         args.args.insert(sf.name.clone(), set_value)
                     }
