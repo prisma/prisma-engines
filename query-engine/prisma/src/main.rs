@@ -79,6 +79,13 @@ async fn main() -> Result<(), AnyError> {
                 .required(false),
         )
         .arg(
+            Arg::with_name("always_force_transactions")
+                .long("always_force_transactions")
+                .help("Runs all queries in a transaction, including all the reads.")
+                .takes_value(false)
+                .required(false),
+        )
+        .arg(
             Arg::with_name("version")
                 .long("version")
                 .help("Prints the server commit ID")
@@ -158,11 +165,16 @@ async fn main() -> Result<(), AnyError> {
         let address = SocketAddr::new(host, port);
 
         let legacy = matches.is_present("legacy");
+        let force_tx = matches.is_present("always_force_transactions");
 
         eprintln!("Printing to stderr for debugging");
         eprintln!("Listening on {}:{}", host, port);
 
-        if let Err(err) = HttpServer::run(address, legacy).await {
+        let builder = HttpServer::builder()
+            .legacy(legacy)
+            .force_transactions(force_tx);
+
+        if let Err(err) = builder.build_and_run(address).await {
             info!("Encountered error during initialization:");
             err.render_as_json().expect("error rendering");
             process::exit(1);

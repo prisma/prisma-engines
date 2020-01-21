@@ -24,14 +24,48 @@ pub(crate) struct RequestContext {
     graphql_request_handler: GraphQlRequestHandler,
 }
 
+pub struct HttpServerBuilder {
+    legacy_mode: bool,
+    force_transactions: bool,
+}
+
+impl HttpServerBuilder {
+    pub fn legacy(mut self, val: bool) -> Self {
+        self.legacy_mode = val;
+        self
+    }
+
+    pub fn force_transactions(mut self, val: bool) -> Self {
+        self.force_transactions = val;
+        self
+    }
+
+    pub async fn build_and_run(self, address: SocketAddr) -> PrismaResult<()> {
+        let ctx = PrismaContext::builder()
+            .legacy(self.legacy_mode)
+            .force_transactions(self.force_transactions)
+            .build()
+            .await?;
+
+        HttpServer::run(address, ctx).await
+    }
+}
+
 pub struct HttpServer;
 
 impl HttpServer {
-    pub async fn run(address: SocketAddr, legacy_mode: bool) -> PrismaResult<()> {
+    pub fn builder() -> HttpServerBuilder {
+        HttpServerBuilder {
+            legacy_mode: false,
+            force_transactions: false,
+        }
+    }
+
+    async fn run(address: SocketAddr, context: PrismaContext) -> PrismaResult<()> {
         let now = Instant::now();
 
         let ctx = Arc::new(RequestContext {
-            context: PrismaContext::new(legacy_mode).await?,
+            context,
             graphql_request_handler: GraphQlRequestHandler,
         });
 

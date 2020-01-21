@@ -1,5 +1,22 @@
 version: "3"
 services:
+  pgbouncer:
+    image: brainsam/pgbouncer:latest
+    restart: always
+    environment:
+      DB_HOST: "postgres11"
+      DB_PORT: "5432"
+      DB_USER: "postgres"
+      DB_PASSWORD: "prisma"
+      POOL_MODE: "transaction"
+      MAX_CLIENT_CONN: "1000"
+      SERVER_RESET_QUERY_ALWAYS: "1"
+      SERVER_RESET_QUERY: "DEALLOCATE ALL"
+    networks:
+      - databases
+    ports:
+      - "6432:6432"
+
   postgres9:
     image: postgres:9
     restart: always
