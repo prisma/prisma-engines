@@ -40,13 +40,10 @@ case class TestServer() extends PlayJsonExtensions {
     import sys.process._
 
     val formattedQuery = query.stripMargin.replace("\n", "")
-    val encoded        = Base64.getEncoder.encode(formattedQuery.getBytes(StandardCharsets.UTF_8))
-    val encoded_query  = new String(encoded, StandardCharsets.UTF_8)
+    val encoded_query  = UTF8Base64.encode(formattedQuery)
     val response =
       Process(Seq(EnvVars.prismaBinaryPath, "cli", "--execute_request", encoded_query), None, "PRISMA_DML" -> project.envVar).!!
-
-    val decoded          = Base64.getDecoder.decode(response.trim.getBytes(StandardCharsets.UTF_8))
-    val decoded_response = new String(decoded, StandardCharsets.UTF_8)
+    val decoded_response = UTF8Base64.decode(response)
 
     Json.parse(decoded_response)
   }

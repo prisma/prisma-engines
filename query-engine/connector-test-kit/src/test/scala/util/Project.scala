@@ -31,9 +31,7 @@ case class Project(
     dataSourceConfig + "\n" + dataModel
   }
 
-  // Important: Rust requires UTF-8 encoding (encodeToString uses Latin-1)
-  val encoded = Base64.getEncoder.encode(dataModelWithDataSourceConfig.getBytes(StandardCharsets.UTF_8))
-  val envVar  = new String(encoded, StandardCharsets.UTF_8)
+  val envVar = UTF8Base64.encode(dataModelWithDataSourceConfig)
 
   val dataModelPath: String = {
     val pathName = s"${EnvVars.serverRoot}/db/$id.prisma"
