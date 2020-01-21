@@ -113,7 +113,7 @@ pub trait InputTypeBuilderBase<'a>: CachedBuilder<InputObjectType> + InputBuilde
                 let typ = self.compound_field_unique_object_type(index);
                 let name = compound_field_name(index);
 
-                input_field(name, InputType::object(typ), None)
+                input_field(name, InputType::opt(InputType::object(typ)), None)
             })
             .collect();
 

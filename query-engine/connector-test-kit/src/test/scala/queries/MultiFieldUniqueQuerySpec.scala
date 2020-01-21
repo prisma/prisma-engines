@@ -305,4 +305,23 @@ class MultiFieldUniqueQuerySpec extends FlatSpec with Matchers with ApiSpecBase 
 
     result.pathAsString("data.user.id") should equal(id)
   }
+
+  "Not using the compound unique as the UniqueInput" should "be allowed" in {
+    val project = SchemaDsl.fromStringV11() {
+      """                model Parent {
+        |                    p_1           String?
+        |                    p_2           String?
+        |                    id            String    @id @default(cuid())
+        |
+        |                    @@unique([p_1, p_2])
+        |                }
+        |
+        |           """.stripMargin
+    }
+
+    database.setup(project)
+
+    server.query("""query{parent(where:{id: "1"}){id}}""", project)
+
+  }
 }
