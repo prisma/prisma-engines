@@ -51,7 +51,7 @@ impl DirectiveValidator<dml::Model> for ModelLevelUniqueDirectiveValidator {
 
     fn validate_and_apply(&self, args: &mut Args, obj: &mut dml::Model) -> Result<(), DatamodelError> {
         let index_def = self.validate_index(args, obj, IndexType::Unique)?;
-        obj.indexes.push(index_def);
+        obj.indices.push(index_def);
 
         Ok(())
     }
@@ -80,7 +80,7 @@ impl DirectiveValidator<dml::Model> for ModelLevelIndexDirectiveValidator {
 
     fn validate_and_apply(&self, args: &mut Args, obj: &mut dml::Model) -> Result<(), DatamodelError> {
         let index_def = self.validate_index(args, obj, IndexType::Normal)?;
-        obj.indexes.push(index_def);
+        obj.indices.push(index_def);
 
         Ok(())
     }
@@ -154,7 +154,7 @@ trait IndexDirectiveBase<T>: DirectiveValidator<T> {
         index_type: IndexType,
     ) -> Result<Vec<ast::Directive>, DatamodelError> {
         let directives: Vec<ast::Directive> = model
-            .indexes
+            .indices
             .iter()
             .filter(|index| index.tpe == index_type)
             .map(|index_def| {

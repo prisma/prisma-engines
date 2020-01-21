@@ -30,6 +30,7 @@ fn schema_to_dmmf(schema: &dml::Datamodel) -> Datamodel {
     datamodel
 }
 
+//todo
 fn enum_to_dmmf(en: &dml::Enum) -> Enum {
     Enum {
         name: en.name.clone(),
@@ -39,6 +40,7 @@ fn enum_to_dmmf(en: &dml::Enum) -> Enum {
     }
 }
 
+//todo
 fn model_to_dmmf(model: &dml::Model) -> Model {
     Model {
         name: model.name.clone(),
@@ -51,11 +53,12 @@ fn model_to_dmmf(model: &dml::Model) -> Model {
     }
 }
 
+//Todo
 fn field_to_dmmf(field: &dml::Field) -> Field {
     Field {
         name: field.name.clone(),
         kind: get_field_kind(field),
-        db_name: field.database_name.clone(),
+        db_names: field.database_names.clone(),
         is_required: field.arity == dml::FieldArity::Required,
         is_list: field.arity == dml::FieldArity::List,
         is_id: field.id_info.is_some(),

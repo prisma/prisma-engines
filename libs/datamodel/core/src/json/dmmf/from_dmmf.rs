@@ -28,16 +28,27 @@ pub fn schema_from_dmmf(schema: &Datamodel) -> dml::Datamodel {
     datamodel
 }
 
+//todo
 fn model_from_dmmf(model: &Model) -> dml::Model {
     dml::Model {
         name: model.name.clone(),
         database_name: model.db_name.clone(),
         is_embedded: model.is_embedded,
         fields: model.fields.iter().map(&field_from_dmmf).collect(),
-        indexes: vec![],
+        indices: vec![],
         id_fields: model.id_fields.clone(),
         documentation: model.documentation.clone(),
         is_generated: model.is_generated.unwrap_or(false),
+    }
+}
+
+//todo
+fn enum_from_dmmf(en: &Enum) -> dml::Enum {
+    dml::Enum {
+        name: en.name.clone(),
+        values: en.values.clone(),
+        database_name: en.db_name.clone(),
+        documentation: en.documentation.clone(),
     }
 }
 
@@ -54,10 +65,11 @@ fn field_from_dmmf(field: &Field) -> dml::Field {
         false => None,
     };
 
+    //Todo
     dml::Field {
         name: field.name.clone(),
         arity: get_field_arity(field.is_required, field.is_list),
-        database_name: field.db_name.clone(),
+        database_names: field.db_names.clone(),
         field_type,
         default_value,
         id_info,
@@ -162,14 +174,5 @@ fn get_field_arity(is_required: bool, is_list: bool) -> dml::FieldArity {
         (false, true) => dml::FieldArity::List,
         (true, false) => dml::FieldArity::Required,
         (false, false) => dml::FieldArity::Optional,
-    }
-}
-
-fn enum_from_dmmf(en: &Enum) -> dml::Enum {
-    dml::Enum {
-        name: en.name.clone(),
-        values: en.values.clone(),
-        database_name: en.db_name.clone(),
-        documentation: en.documentation.clone(),
     }
 }

@@ -78,7 +78,7 @@ impl Datamodel {
 
     /// Finds a model by name.
     pub fn find_model(&self, name: &str) -> Option<&Model> {
-        self.models().find(|m| m.name == *name)
+        self.models.iter().find(|model| model.name == name)
     }
 
     /// Finds a model for a field reference by using reference comparison.

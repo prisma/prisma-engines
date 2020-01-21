@@ -92,15 +92,18 @@ fn infer_database_migration_steps_and_fix(
     schema_name: &str,
     sql_family: SqlFamily,
 ) -> SqlResult<(Vec<SqlMigrationStep>, Vec<SqlMigrationStep>)> {
-    let diff: SqlSchemaDiff = SqlSchemaDiffer::diff(&from, &to);
+    let diff: SqlSchemaDiff = SqlSchemaDiffer::diff(&from, &to, sql_family);
 
     let corrected_steps = if sql_family.is_sqlite() {
         fix_stupid_sqlite(diff, &from, &to, &schema_name)?
     } else {
-        fix_id_column_type_change(&from, &to, schema_name, diff.into_steps())?
+        fix_id_column_type_change(&from, &to, schema_name, diff.into_steps(), sql_family)?
     };
 
-    Ok((SqlSchemaDiffer::diff(&from, &to).into_steps(), corrected_steps))
+    Ok((
+        SqlSchemaDiffer::diff(&from, &to, sql_family).into_steps(),
+        corrected_steps,
+    ))
 }
 
 fn fix_id_column_type_change(
@@ -108,6 +111,7 @@ fn fix_id_column_type_change(
     to: &SqlSchema,
     _schema_name: &str,
     steps: Vec<SqlMigrationStep>,
+    sql_family: SqlFamily,
 ) -> SqlResult<Vec<SqlMigrationStep>> {
     let has_id_type_change = steps
         .iter()
@@ -148,7 +152,7 @@ fn fix_id_column_type_change(
             .map(|t| t.name.clone())
             .collect();
         radical_steps.push(SqlMigrationStep::DropTables(DropTables { names: tables_to_drop }));
-        let diff_from_empty: SqlSchemaDiff = SqlSchemaDiffer::diff(&SqlSchema::empty(), &to);
+        let diff_from_empty: SqlSchemaDiff = SqlSchemaDiffer::diff(&SqlSchema::empty(), &to, sql_family);
         let mut steps_from_empty = diff_from_empty.into_steps();
         radical_steps.append(&mut steps_from_empty);
 
