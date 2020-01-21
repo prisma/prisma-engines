@@ -65,10 +65,7 @@ trait Dsl {
   }
 
   private def projectId(suite: Suite): String = {
-    // GetFieldFromSQLUniqueException blows up if we generate longer names, since we then exceed the postgres limits for constraint names
-    // todo: actually fix GetFieldFromSQLUniqueException instead
-    val nameThatMightBeTooLong = suite.getClass.getSimpleName
-    nameThatMightBeTooLong.substring(0, Math.min(32, nameThatMightBeTooLong.length))
+    suite.getClass.getSimpleName
   }
 }
 

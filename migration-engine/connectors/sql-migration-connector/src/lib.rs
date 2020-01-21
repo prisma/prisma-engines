@@ -110,7 +110,6 @@ impl SqlMigrationConnector {
     }
 
     async fn initialize_impl(&self) -> SqlResult<()> {
-        // TODO: this code probably does not ever do anything. The schema/db creation happens already in the helper functions above.
         match self.database_info.connection_info() {
             ConnectionInfo::Sqlite { file_path, .. } => {
                 let path_buf = PathBuf::from(&file_path);

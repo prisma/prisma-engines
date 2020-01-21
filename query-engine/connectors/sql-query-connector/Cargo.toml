@@ -45,3 +45,4 @@ git = "https://github.com/prisma/cuid-rust"
 
 [dependencies.user-facing-errors]
 path = "../../../libs/user-facing-errors"
+features = ["sql"]

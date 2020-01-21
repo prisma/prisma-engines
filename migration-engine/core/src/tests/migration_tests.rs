@@ -293,52 +293,59 @@ async fn updating_db_name_of_a_scalar_field_must_work(api: &TestApi) {
     assert_eq!(result.table_bang("A").column("name2").is_some(), true);
 }
 
-// this relies on link: INLINE which we don't support yet
-#[test_each_connector(ignore = "mysql")]
-async fn changing_a_relation_field_to_a_scalar_field_must_work(api: &TestApi) {
+#[test_each_connector(log = "debug")]
+async fn changing_a_relation_field_to_a_scalar_field_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
-            model A {
-                id Int @id
-                b B @relation(references: [id])
-            }
-            model B {
-                id Int @id
-                a A // remove this once the implicit back relation field is implemented
-            }
-        "#;
-    let result = api.infer_and_apply(&dm1).await.sql_schema;
-    let table = result.table_bang("A");
-    let column = table.column_bang("b");
-    assert_eq!(column.tpe.family, ColumnTypeFamily::Int);
-    assert_eq!(
-        table.foreign_keys,
-        &[ForeignKey {
-            constraint_name: match api.sql_family() {
-                SqlFamily::Postgres => Some("A_b_fkey".to_owned()),
-                SqlFamily::Mysql => Some("A_ibfk_1".to_owned()),
-                SqlFamily::Sqlite => None,
-            },
-            columns: vec![column.name.clone()],
-            referenced_table: "B".to_string(),
-            referenced_columns: vec!["id".to_string()],
-            on_delete_action: ForeignKeyAction::Restrict,
-        }]
-    );
+        model A {
+            id Int @id
+            b B @relation(references: [id])
+        }
+        model B {
+            id Int @id
+            a A // remove this once the implicit back relation field is implemented
+        }
+    "#;
+
+    api.infer_apply(dm1).send().await?;
+    api.assert_schema().await?.assert_table("A", |table| {
+        table
+            .assert_column("b", |col| col.assert_type_is_int())?
+            .assert_foreign_keys_count(1)?
+            .assert_has_fk(&ForeignKey {
+                constraint_name: match api.sql_family() {
+                    SqlFamily::Postgres => Some("A_b_fkey".to_owned()),
+                    SqlFamily::Mysql => Some("A_ibfk_1".to_owned()),
+                    SqlFamily::Sqlite => None,
+                },
+                columns: vec!["b".to_owned()],
+                referenced_table: "B".to_string(),
+                referenced_columns: vec!["id".to_string()],
+                on_delete_action: ForeignKeyAction::Restrict,
+            })
+    })?;
 
     let dm2 = r#"
-            model A {
-                id Int @id
-                b String
-            }
-            model B {
-                id Int @id
-            }
-        "#;
-    let result = api.infer_and_apply(&dm2).await.sql_schema;
-    let table = result.table_bang("A");
+        model A {
+            id Int @id
+            b String
+        }
+        model B {
+            id Int @id
+        }
+    "#;
+
+    let result = api.infer_apply(dm2).send().await?;
+
+    anyhow::ensure!(result.warnings.is_empty(), "Warnings should be empty");
+
+    let schema = api.assert_schema().await?.into_schema();
+
+    let table = schema.table_bang("A");
     let column = table.column_bang("b");
     assert_eq!(column.tpe.family, ColumnTypeFamily::String);
     assert_eq!(table.foreign_keys, vec![]);
+
+    Ok(())
 }
 
 #[test_each_connector]
@@ -642,8 +649,8 @@ async fn adding_an_inline_relation_to_a_model_with_an_exotic_id_type(api: &TestA
     );
 }
 
-#[test_each_connector(ignore = "mysql")]
-async fn removing_an_inline_relation_must_work(api: &TestApi) {
+#[test_each_connector]
+async fn removing_an_inline_relation_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
             model A {
                 id Int @id
@@ -667,13 +674,22 @@ async fn removing_an_inline_relation_must_work(api: &TestApi) {
                 id Int @id
             }
         "#;
-    let result = api.infer_and_apply(&dm2).await.sql_schema;
-    let column = result.table_bang("A").column("b");
-    assert_eq!(column.is_some(), false);
+
+    api.infer_apply(dm2).send().await?;
+
+    api.assert_schema()
+        .await?
+        .assert_table("A", |table| {
+            table
+                .assert_foreign_keys_count(0)?
+                .assert_indexes_count(0)?
+                .assert_does_not_have_column("b")
+        })
+        .map(drop)
 }
 
-#[test_each_connector(ignore = "mysql")]
-async fn moving_an_inline_relation_to_the_other_side_must_work(api: &TestApi) {
+#[test_each_connector]
+async fn moving_an_inline_relation_to_the_other_side_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
             model A {
                 id Int @id
@@ -692,7 +708,7 @@ async fn moving_an_inline_relation_to_the_other_side_must_work(api: &TestApi) {
             constraint_name: match api.sql_family() {
                 SqlFamily::Postgres => Some("A_b_fkey".to_owned()),
                 SqlFamily::Sqlite => None,
-                SqlFamily::Mysql => unreachable!(),
+                SqlFamily::Mysql => Some("A_ibfk_1".to_owned()),
             },
             columns: vec!["b".to_string()],
             referenced_table: "B".to_string(),
@@ -719,7 +735,7 @@ async fn moving_an_inline_relation_to_the_other_side_must_work(api: &TestApi) {
             constraint_name: match api.sql_family() {
                 SqlFamily::Postgres => Some("B_a_fkey".to_owned()),
                 SqlFamily::Sqlite => None,
-                SqlFamily::Mysql => unreachable!(),
+                SqlFamily::Mysql => Some("B_ibfk_1".to_owned()),
             },
             columns: vec!["a".to_string()],
             referenced_table: "A".to_string(),
@@ -727,6 +743,12 @@ async fn moving_an_inline_relation_to_the_other_side_must_work(api: &TestApi) {
             on_delete_action: ForeignKeyAction::Restrict,
         }]
     );
+
+    api.assert_schema()
+        .await?
+        .assert_table("B", |table| table.assert_foreign_keys_count(1))?
+        .assert_table("A", |table| table.assert_foreign_keys_count(0)?.assert_indexes_count(0))
+        .map(drop)
 }
 
 #[test_each_connector]
