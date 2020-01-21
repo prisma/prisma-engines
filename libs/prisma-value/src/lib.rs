@@ -252,18 +252,3 @@ impl From<Uuid> for GraphqlId {
         GraphqlId::UUID(uuid)
     }
 }
-
-//impl From<Option<dml::ScalarValue>> for PrismaValue {
-//    fn from(sv: Option<dml::ScalarValue>) -> Self {
-//        sv.map(|sv| match sv {
-//            dml::ScalarValue::Boolean(x) => PrismaValue::Boolean(x),
-//            dml::ScalarValue::Int(x) => PrismaValue::Int(i64::from(x)),
-//            dml::ScalarValue::Float(x) => x.try_into().expect("Can't convert float to decimal"),
-//            dml::ScalarValue::String(x) => PrismaValue::String(x.clone()),
-//            dml::ScalarValue::DateTime(x) => PrismaValue::DateTime(x),
-//            dml::ScalarValue::Decimal(x) => x.try_into().expect("Can't convert float to decimal"),
-//            dml::ScalarValue::ConstantLiteral(x) => PrismaValue::Enum(EnumValue::string(x.clone(), x.clone())),
-//        })
-//        .unwrap_or_else(|| PrismaValue::Null)
-//    }
-//}
