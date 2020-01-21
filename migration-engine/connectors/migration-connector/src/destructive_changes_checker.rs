@@ -46,7 +46,7 @@ impl DestructiveChangeDiagnostics {
 
 /// A warning emitted by [DestructiveChangesChecker](trait.DestructiveChangesChecker.html). Warnings will
 /// prevent a migration from being applied, unless the `force` flag is passed.
-#[derive(Debug, Serialize, PartialEq)]
+#[derive(Debug, Serialize, PartialEq, Clone)]
 pub struct MigrationWarning {
     pub description: String,
 }

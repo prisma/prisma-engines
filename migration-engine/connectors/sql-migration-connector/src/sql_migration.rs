@@ -1,6 +1,8 @@
+pub(crate) mod expanded_alter_column;
+
 use migration_connector::DatabaseMigrationMarker;
 use serde::{Deserialize, Serialize};
-use sql_schema_describer::*;
+use sql_schema_describer::{Column, ForeignKey, Index, SqlSchema, Table};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SqlMigration {

@@ -304,6 +304,15 @@ pub enum ColumnArity {
     List,
 }
 
+impl ColumnArity {
+    pub fn is_required(&self) -> bool {
+        match self {
+            ColumnArity::Required => true,
+            _ => false,
+        }
+    }
+}
+
 /// Foreign key action types (for ON DELETE|ON UPDATE).
 #[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]

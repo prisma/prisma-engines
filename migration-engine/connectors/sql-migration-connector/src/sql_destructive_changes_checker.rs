@@ -3,7 +3,7 @@ use crate::{
     TableChange,
 };
 use migration_connector::*;
-use quaint::ast::*;
+use quaint::{ast::*, prelude::SqlFamily};
 use sql_schema_describer::{ColumnArity, SqlSchema};
 
 pub struct SqlDestructiveChangesChecker<'a> {
@@ -146,22 +146,70 @@ impl SqlDestructiveChangesChecker<'_> {
     /// - default changes on SQLite
     /// - Arity changes from required to optional on SQLite
     fn alter_column_is_safe(&self, alter_column: &AlterColumn, previous_column: &sql_schema_describer::Column) -> bool {
-        if !self.sql_family().is_sqlite() {
-            return false;
-        }
+        use crate::sql_migration::expanded_alter_column::*;
 
-        let arity_change_is_safe = match (&previous_column.tpe.arity, &alter_column.column.tpe.arity) {
-            // column became required
-            (ColumnArity::Nullable, ColumnArity::Required) => false,
-            // column became nullable
-            (ColumnArity::Required, ColumnArity::Nullable) => true,
-            // nothing changed
-            (ColumnArity::Required, ColumnArity::Required) | (ColumnArity::Nullable, ColumnArity::Nullable) => true,
-            // not supported on SQLite
-            (ColumnArity::List, _) | (_, ColumnArity::List) => unreachable!(),
+        let differ = crate::sql_schema_differ::ColumnDiffer {
+            previous: previous_column,
+            next: &alter_column.column,
         };
 
-        alter_column.column.tpe.family == previous_column.tpe.family && arity_change_is_safe
+        match self.sql_family() {
+            SqlFamily::Sqlite => {
+                let arity_change_is_safe = match (&previous_column.tpe.arity, &alter_column.column.tpe.arity) {
+                    // column became required
+                    (ColumnArity::Nullable, ColumnArity::Required) => false,
+                    // column became nullable
+                    (ColumnArity::Required, ColumnArity::Nullable) => true,
+                    // nothing changed
+                    (ColumnArity::Required, ColumnArity::Required) | (ColumnArity::Nullable, ColumnArity::Nullable) => {
+                        true
+                    }
+                    // not supported on SQLite
+                    (ColumnArity::List, _) | (_, ColumnArity::List) => unreachable!(),
+                };
+
+                !differ.all_changes().type_changed() && arity_change_is_safe
+            }
+            SqlFamily::Postgres => {
+                let expanded = expand_postgres_alter_column(differ);
+
+                // We keep the match here to keep the exhaustiveness checking for when we add variants.
+                if let Some(steps) = expanded {
+                    let mut is_safe = true;
+
+                    for step in steps {
+                        match step {
+                            PostgresAlterColumn::SetDefault(_)
+                            | PostgresAlterColumn::DropDefault
+                            | PostgresAlterColumn::DropNotNull => (),
+                            PostgresAlterColumn::SetType(_) => is_safe = false,
+                        }
+                    }
+
+                    is_safe
+                } else {
+                    false
+                }
+            }
+            SqlFamily::Mysql => {
+                let expanded = expand_mysql_alter_column(differ);
+
+                // We keep the match here to keep the exhaustiveness checking for when we add variants.
+                if let Some(steps) = expanded {
+                    let is_safe = true;
+
+                    for step in steps {
+                        match step {
+                            MysqlAlterColumn::SetDefault(_) | MysqlAlterColumn::DropDefault => (),
+                        }
+                    }
+
+                    is_safe
+                } else {
+                    false
+                }
+            }
+        }
     }
 
     async fn check_impl(
