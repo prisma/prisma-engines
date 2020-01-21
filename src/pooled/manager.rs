@@ -105,7 +105,7 @@ impl ConnectionManager for QuaintManager {
 
     fn is_valid(&self, conn: Self::Connection) -> AnyFuture<Self::Connection, Self::Error> {
         async move {
-            conn.query_raw("SELECT 1", &[]).await?;
+            conn.raw_cmd("SELECT 1").await?;
             Ok(conn)
         }
             .boxed()

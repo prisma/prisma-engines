@@ -353,7 +353,7 @@ impl PostgreSql {
 
         timeout(
             url.query_params.socket_timeout,
-            client.execute(path.as_str(), &[])
+            client.simple_query(path.as_str())
         ).await??;
 
         Ok(Self {
