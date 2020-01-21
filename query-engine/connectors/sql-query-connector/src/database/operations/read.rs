@@ -6,7 +6,6 @@ use crate::{
 use connector_interface::*;
 use prisma_models::*;
 use quaint::ast::*;
-use std::convert::TryFrom;
 
 pub async fn get_single_record(
     conn: &dyn QueryExt,
@@ -103,7 +102,7 @@ where
             let _ = row.values.pop();
 
             let mut record = Record::from(row);
-            record.add_parent_id(GraphqlId::try_from(parent_id)?);
+            record.add_parent_id(parent_id.into_graphql_id()?);
 
             Ok(record)
         })

@@ -1,5 +1,4 @@
-use crate::{DomainError as Error, DomainResult, GraphqlId, PrismaValue};
-use std::convert::TryFrom;
+use crate::{DomainError, DomainResult, GraphqlId, PrismaValue, PrismaValueExtensions};
 
 #[derive(Debug, Clone)]
 pub struct SingleRecord {
@@ -81,12 +80,12 @@ impl Record {
 
     pub fn collect_id(&self, field_names: &[String], id_field: &str) -> DomainResult<GraphqlId> {
         self.get_field_value(field_names, id_field)
-            .and_then(GraphqlId::try_from)
+            .and_then(|v| v.clone().into_graphql_id())
     }
 
     pub fn get_field_value(&self, field_names: &[String], field: &str) -> DomainResult<&PrismaValue> {
         let index = field_names.iter().position(|r| r == field).map(Ok).unwrap_or_else(|| {
-            Err(Error::FieldNotFound {
+            Err(DomainError::FieldNotFound {
                 name: field.to_string(),
                 model: String::new(),
             })

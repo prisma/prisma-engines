@@ -15,6 +15,9 @@ pub use error::ConversionFailure;
 pub type PrismaValueResult<T> = std::result::Result<T, ConversionFailure>;
 pub type PrismaListValue = Vec<PrismaValue>;
 
+#[cfg(feature = "sql-ext")]
+pub use sql_ext::*;
+
 #[derive(Serialize, Debug, PartialEq, Eq, Hash, Clone)]
 #[serde(untagged)]
 pub enum GraphqlId {

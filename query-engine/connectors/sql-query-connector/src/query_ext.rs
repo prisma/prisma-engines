@@ -73,7 +73,10 @@ pub trait QueryExt: Queryable + Send + Sync {
             .next()
             .unwrap();
 
-        Ok(i64::try_from(id)?)
+        Ok(i64::try_from(id).map_err(|err|{
+            let domain_error: DomainError = err.into();
+            domain_error
+        })?)
     }
 
     /// Read the all columns as an `GraphqlId`
@@ -93,7 +96,7 @@ pub trait QueryExt: Queryable + Send + Sync {
 
         for mut row in rows.drain(0..) {
             for value in row.values.drain(0..) {
-                result.push(GraphqlId::try_from(value)?)
+                result.push(value.into_graphql_id()?)
             }
         }
 

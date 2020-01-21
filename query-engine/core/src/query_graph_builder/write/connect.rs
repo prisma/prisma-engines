@@ -3,7 +3,7 @@ use crate::{
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
     QueryGraphBuilderError, QueryGraphBuilderResult,
 };
-use prisma_models::RelationFieldRef;
+use prisma_models::{PrismaValueExtensions, RelationFieldRef};
 use std::{convert::TryInto, sync::Arc};
 
 /// Only for many to many relations.
@@ -66,7 +66,7 @@ pub fn connect_records_node(
 
             if let Node::Query(Query::Write(WriteQuery::ConnectRecords(ref mut c))) = child_node {
                 let parent_id = parent_ids.pop().unwrap();
-                c.parent_id = Some(parent_id.try_into()?);
+                c.parent_id = Some(parent_id.into_graphql_id()?);
             }
 
             Ok(child_node)

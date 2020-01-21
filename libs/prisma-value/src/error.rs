@@ -1,3 +1,4 @@
+#[derive(Debug)]
 pub struct ConversionFailure {
     pub from: &'static str,
     pub to: &'static str,
