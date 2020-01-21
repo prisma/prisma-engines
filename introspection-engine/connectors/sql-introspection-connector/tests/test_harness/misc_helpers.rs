@@ -1,7 +1,9 @@
 use barrel::Migration;
 use pretty_assertions::assert_eq;
-use quaint::{connector::Queryable};
+use quaint::connector::Queryable;
 use std::sync::Arc;
+
+//todo split into barrel and assert???
 
 pub(crate) fn custom_assert(left: &str, right: &str) {
     let parsed_expected = datamodel::parse_datamodel(&right).unwrap();
@@ -9,14 +11,6 @@ pub(crate) fn custom_assert(left: &str, right: &str) {
         datamodel::render_datamodel_to_string(&parsed_expected).expect("Datamodel rendering failed");
 
     assert_eq!(left, reformatted_expected);
-}
-
-async fn run_full_sql(database: &Arc<dyn Queryable + Send + Sync>, full_sql: &str) {
-    for sql in full_sql.split(";") {
-        if sql != "" {
-            database.query_raw(&sql, &[]).await.unwrap();
-        }
-    }
 }
 
 // barrel
@@ -32,6 +26,7 @@ impl BarrelMigrationExecutor {
     where
         F: FnMut(&mut Migration) -> (),
     {
+        dbg!(&self.sql_variant);
         self.execute_with_schema(migration_fn, &self.schema_name).await
     }
 
@@ -43,5 +38,13 @@ impl BarrelMigrationExecutor {
         migration_fn(&mut migration);
         let full_sql = migration.make_from(self.sql_variant);
         run_full_sql(&self.database, &full_sql).await;
+    }
+}
+
+async fn run_full_sql(database: &Arc<dyn Queryable + Send + Sync>, full_sql: &str) {
+    for sql in full_sql.split(";") {
+        if sql != "" {
+            database.query_raw(&sql, &[]).await.unwrap();
+        }
     }
 }

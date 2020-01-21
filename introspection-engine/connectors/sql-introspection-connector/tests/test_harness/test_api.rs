@@ -1,6 +1,9 @@
 use super::misc_helpers::*;
 use introspection_connector::{DatabaseMetadata, IntrospectionConnector};
-use quaint::{single::Quaint, prelude::{Queryable, SqlFamily}};
+use quaint::{
+    prelude::{Queryable, SqlFamily},
+    single::Quaint,
+};
 use sql_introspection_connector::SqlIntrospectionConnector;
 use std::sync::Arc;
 use test_setup::*;
@@ -16,6 +19,10 @@ pub struct TestApi {
 impl TestApi {
     pub async fn list_databases(&self) -> Vec<String> {
         self.introspection_connector.list_databases().await.unwrap()
+    }
+
+    pub fn database(&self) -> &Arc<dyn Queryable + Send + Sync + 'static> {
+        &self.database
     }
 
     pub async fn introspect(&self) -> String {
@@ -101,28 +108,36 @@ pub async fn mysql_mariadb_test_api(db_name: &'static str) -> TestApi {
 }
 
 pub async fn postgres_test_api(db_name: &'static str) -> TestApi {
-    test_api_helper_for_postgres(postgres_10_url(db_name),db_name).await
+    test_api_helper_for_postgres(postgres_10_url(db_name), db_name).await
 }
 
 pub async fn postgres9_test_api(db_name: &'static str) -> TestApi {
-    test_api_helper_for_postgres(postgres_9_url(db_name),db_name).await
+    test_api_helper_for_postgres(postgres_9_url(db_name), db_name).await
 }
 
 pub async fn postgres11_test_api(db_name: &'static str) -> TestApi {
-    test_api_helper_for_postgres(postgres_11_url(db_name),db_name).await
+    test_api_helper_for_postgres(postgres_11_url(db_name), db_name).await
 }
 
 pub async fn postgres12_test_api(db_name: &'static str) -> TestApi {
-    test_api_helper_for_postgres(postgres_12_url(db_name),db_name).await
+    test_api_helper_for_postgres(postgres_12_url(db_name), db_name).await
 }
 
-pub async fn test_api_helper_for_postgres(url: String,db_name: &'static str) -> TestApi {
-    let database = test_setup::create_postgres_database(&url.parse().unwrap()).await.unwrap();
+pub async fn test_api_helper_for_postgres(url: String, db_name: &'static str) -> TestApi {
+    let database = test_setup::create_postgres_database(&url.parse().unwrap())
+        .await
+        .unwrap();
     let connection_info = database.connection_info().to_owned();
-    let drop_schema = dbg!(format!("DROP SCHEMA IF EXISTS \"{}\" CASCADE;", connection_info.schema_name()));
+    let drop_schema = dbg!(format!(
+        "DROP SCHEMA IF EXISTS \"{}\" CASCADE;",
+        connection_info.schema_name()
+    ));
     database.query_raw(&drop_schema, &[]).await.ok();
 
-    let create_schema = dbg!(format!("CREATE SCHEMA IF NOT EXISTS \"{}\";", connection_info.schema_name()));
+    let create_schema = dbg!(format!(
+        "CREATE SCHEMA IF NOT EXISTS \"{}\";",
+        connection_info.schema_name()
+    ));
     database.query_raw(&create_schema, &[]).await.ok();
     let introspection_connector = SqlIntrospectionConnector::new(&url).await.unwrap();
 
@@ -134,8 +149,6 @@ pub async fn test_api_helper_for_postgres(url: String,db_name: &'static str) -> 
         introspection_connector,
     }
 }
-
-
 
 pub async fn sqlite_test_api(db_name: &'static str) -> TestApi {
     let database_file_path = sqlite_test_file(db_name);

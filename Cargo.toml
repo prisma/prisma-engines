@@ -20,4 +20,4 @@ members = [
 ]
 
 [patch.crates-io]
-barrel = { git = "https://github.com/aknuds1/barrel.git", branch = "master" }
+barrel = { git = "https://github.com/tomhoule/barrel.git" }

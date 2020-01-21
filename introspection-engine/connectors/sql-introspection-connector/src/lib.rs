@@ -1,6 +1,7 @@
 pub mod calculate_datamodel; // only exported to be able to unit test it
-
 mod error;
+mod misc_helpers;
+mod sanitize_datamodel_names; // only exported to be able to unit test it
 mod schema_describer_loading;
 
 use datamodel::Datamodel;
@@ -75,6 +76,7 @@ impl IntrospectionConnector for SqlIntrospectionConnector {
 
     async fn introspect(&self) -> ConnectorResult<Datamodel> {
         let sql_schema = self.catch(self.describe()).await?;
+        tracing::debug!("SQL Schema Describer is done: {:?}", sql_schema);
         let data_model = calculate_datamodel::calculate_model(&sql_schema).unwrap();
         Ok(data_model)
     }

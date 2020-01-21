@@ -14,8 +14,8 @@ pub struct Apply<'a> {
 }
 
 impl Apply<'_> {
-    pub fn migration_id(mut self, migration_id: Option<String>) -> Self {
-        self.migration_id = migration_id;
+    pub fn migration_id(mut self, migration_id: Option<impl Into<String>>) -> Self {
+        self.migration_id = migration_id.map(Into::into);
         self
     }
 

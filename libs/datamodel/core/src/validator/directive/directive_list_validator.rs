@@ -5,6 +5,7 @@ use crate::error::{DatamodelError, ErrorCollection};
 
 // BTreeMap has a strictly defined order.
 // That's important since rendering depends on that order.
+use failure::_core::cmp::Ordering;
 use std::collections::{BTreeMap, HashMap};
 
 /// Struct which holds a list of directive validators and automatically
@@ -72,9 +73,17 @@ impl<T: 'static> DirectiveListValidator<T> {
 
         errors.ok()?;
 
-        // We must validate @default before @id. @id needs access to the default value on the field.
+        // validation orders:
+        // @default before @id -> @id needs access to the default value on the field.
+        // @relation before @map -> @map needs access to the relation info
         let mut cloned_directives = ast.directives().clone();
-        cloned_directives.sort_by(|a, b| a.name.name.partial_cmp(&b.name.name).unwrap());
+        cloned_directives.sort_by(|a, b| match (a.name.name.as_ref(), b.name.name.as_ref()) {
+            ("default", "id") => Ordering::Less,
+            ("id", "default") => Ordering::Greater,
+            ("relation", "map") => Ordering::Less,
+            ("map", "relation") => Ordering::Greater,
+            _ => a.name.name.partial_cmp(&b.name.name).unwrap(),
+        });
 
         for directive in cloned_directives {
             match self.known_directives.get(&directive.name.name) {

@@ -1,3 +1,8 @@
+mod indexes;
+mod mariadb;
+mod mysql;
+mod sqlite;
+
 use super::test_harness::*;
 use crate::commands::{
     CalculateDatabaseStepsCommand, CalculateDatabaseStepsInput, InferMigrationStepsCommand, InferMigrationStepsInput,
@@ -6,8 +11,6 @@ use pretty_assertions::assert_eq;
 use quaint::prelude::SqlFamily;
 use sql_migration_connector::{AlterIndex, CreateIndex, DropIndex, SqlMigrationStep};
 use sql_schema_describer::*;
-
-mod mariadb;
 
 #[test_each_connector]
 async fn adding_a_scalar_field_must_work(api: &TestApi) {
@@ -800,84 +803,6 @@ async fn multi_column_unique_in_conjunction_with_custom_column_name_must_work(ap
     assert_eq!(index.unwrap().tpe, IndexType::Unique);
 }
 
-#[test_one_connector(connector = "sqlite")]
-async fn sqlite_must_recreate_indexes(api: &TestApi) {
-    // SQLite must go through a complicated migration procedure which requires dropping and recreating indexes. This test checks that.
-    // We run them still against each connector.
-    let dm1 = r#"
-            model A {
-                id Int @id
-                field String @unique
-            }
-        "#;
-    let result = api.infer_and_apply(&dm1).await.sql_schema;
-    let index = result
-        .table_bang("A")
-        .indices
-        .iter()
-        .find(|i| i.columns == vec!["field"]);
-    assert!(index.is_some());
-    assert_eq!(index.unwrap().tpe, IndexType::Unique);
-
-    let dm2 = r#"
-            model A {
-                id    Int    @id
-                field String @unique
-                other String
-            }
-        "#;
-    let result = api.infer_and_apply(&dm2).await.sql_schema;
-    let index = result
-        .table_bang("A")
-        .indices
-        .iter()
-        .find(|i| i.columns == vec!["field"]);
-    assert!(index.is_some());
-    assert_eq!(index.unwrap().tpe, IndexType::Unique);
-}
-
-#[test_one_connector(connector = "sqlite")]
-async fn sqlite_must_recreate_multi_field_indexes(api: &TestApi) {
-    // SQLite must go through a complicated migration procedure which requires dropping and recreating indexes. This test checks that.
-    // We run them still against each connector.
-    let dm1 = r#"
-            model A {
-                id Int @id
-                field String
-                secondField Int
-
-                @@unique([field, secondField])
-            }
-        "#;
-    let result = api.infer_and_apply(&dm1).await.sql_schema;
-    let index = result
-        .table_bang("A")
-        .indices
-        .iter()
-        .find(|i| i.columns == &["field", "secondField"]);
-    assert!(index.is_some());
-    assert_eq!(index.unwrap().tpe, IndexType::Unique);
-
-    let dm2 = r#"
-            model A {
-                id    Int    @id
-                field String
-                secondField Int
-                other String
-
-                @@unique([field, secondField])
-            }
-        "#;
-    let result = api.infer_and_apply(&dm2).await.sql_schema;
-    let index = result
-        .table_bang("A")
-        .indices
-        .iter()
-        .find(|i| i.columns == &["field", "secondField"]);
-    assert!(index.is_some());
-    assert_eq!(index.unwrap().tpe, IndexType::Unique);
-}
-
 #[test_each_connector]
 async fn removing_an_existing_unique_field_must_work(api: &TestApi) {
     let dm1 = r#"
@@ -1102,7 +1027,7 @@ async fn index_renaming_must_work_when_renaming_to_default(api: &TestApi) {
     }
 }
 
-#[test_each_connector(log = "debug")]
+#[test_each_connector]
 async fn index_renaming_must_work_when_renaming_to_custom(api: &TestApi) -> TestResult {
     let dm1 = r#"
             model A {
@@ -1447,7 +1372,7 @@ async fn model_with_multiple_indexes_works(api: &TestApi) {
     let sql_schema = api.infer_and_apply(dm).await.sql_schema;
 
     let like_indexes_count = sql_schema.table_bang("Like").indices.len();
-    let expected_indexes_count = if api.is_mysql() { 0 } else { 3 }; // 3 explicit indexes + PK, or only PK on mysql
+    let expected_indexes_count = 3;
 
     assert_eq!(like_indexes_count, expected_indexes_count);
 }
@@ -1490,7 +1415,8 @@ async fn calculate_database_steps_with_infer_after_an_apply_must_work(api: &Test
     "#;
 
     let infer_input = InferMigrationStepsInput {
-        assume_to_be_applied: Vec::new(),
+        assume_to_be_applied: Some(Vec::new()),
+        assume_applied_migrations: None,
         datamodel: dm1.to_owned(),
         migration_id: "mig02".to_owned(),
     };
@@ -1513,7 +1439,8 @@ async fn calculate_database_steps_with_infer_after_an_apply_must_work(api: &Test
     "#;
 
     let infer_input = InferMigrationStepsInput {
-        assume_to_be_applied: Vec::new(),
+        assume_to_be_applied: Some(Vec::new()),
+        assume_applied_migrations: None,
         datamodel: dm2.to_owned(),
         migration_id: "mig02".to_owned(),
     };
@@ -1843,14 +1770,14 @@ async fn relations_can_reference_multiple_fields_with_mappings(api: &TestApi) ->
     "#;
 
     api.infer_apply(dm).send().await?;
-    let schema = api.describe_database().await?;
 
-    schema
-        .assert_table("Account")?
-        .assert_foreign_keys_count(1)?
-        .assert_fk_on_columns(&["user_emergency-mail", "user_birthdays-count"], |fk| {
-            fk.assert_references("users", &["emergency-mail", "birthdays-count"])
-        })?;
+    api.assert_schema().await?.assert_table("Account", |table| {
+        table
+            .assert_foreign_keys_count(1)?
+            .assert_fk_on_columns(&["user_emergency-mail", "user_birthdays-count"], |fk| {
+                fk.assert_references("users", &["emergency-mail", "birthdays-count"])
+            })
+    })?;
 
     Ok(())
 }
@@ -1869,12 +1796,10 @@ async fn foreign_keys_are_added_on_existing_tables(api: &TestApi) -> TestResult 
     "#;
 
     api.infer_apply(dm1).send().await?;
-    let schema = api.describe_database().await?;
-
-    anyhow::ensure!(
-        schema.table("Account").ok().map(|table| table.foreign_keys.is_empty()) == Some(true),
-        "There should be no foreign key yet."
-    );
+    api.assert_schema()
+        .await?
+        // There should be no foreign keys yet.
+        .assert_table("Account", |table| table.assert_foreign_keys_count(0))?;
 
     let dm2 = r#"
         model User {
@@ -1889,17 +1814,11 @@ async fn foreign_keys_are_added_on_existing_tables(api: &TestApi) -> TestResult 
     "#;
 
     api.infer_apply(dm2).send().await?;
-    let schema = api.describe_database().await?;
-
-    let table = schema.table("Account").map_err(|err| anyhow::anyhow!("{}", err))?;
-
-    assert_eq!(table.foreign_keys.len(), 1);
-
-    let fk = table.foreign_keys.iter().next().unwrap();
-
-    assert_eq!(fk.columns, &["user"]);
-    assert_eq!(fk.referenced_table, "User");
-    assert_eq!(fk.referenced_columns, &["email"]);
+    api.assert_schema().await?.assert_table("Account", |table| {
+        table
+            .assert_foreign_keys_count(1)?
+            .assert_fk_on_columns(&["user"], |fk| fk.assert_references("User", &["email"]))
+    })?;
 
     Ok(())
 }
@@ -2046,6 +1965,42 @@ async fn join_tables_between_models_with_mapped_compound_primary_keys_must_work(
             fk.assert_references("Human", &["the_first_name", "the_last_name"])
         })?
         .assert_fk_on_columns(&["A"], |fk| fk.assert_references("Cat", &["id"]))?;
+
+    Ok(())
+}
+
+#[test_each_connector]
+async fn switching_databases_must_work(api: &TestApi) -> TestResult {
+    let dm1 = r#"
+        datasource db {
+            provider = "sqlite"
+            url = "file:dev.db"
+        }
+
+        model Test {
+            id String @id
+            name String
+        }
+    "#;
+
+    api.infer_apply(dm1).send().await?;
+
+    // Drop the existing migrations.
+    api.migration_persistence().reset().await?;
+
+    let dm2 = r#"
+        datasource db {
+            provider = "sqlite"
+            url = "file:hiya.db"
+        }
+
+        model Test {
+            id String @id
+            name String
+        }
+    "#;
+
+    api.infer_apply(dm2).send().await?;
 
     Ok(())
 }

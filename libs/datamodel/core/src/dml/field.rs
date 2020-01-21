@@ -56,7 +56,7 @@ pub struct Field {
     /// The field's type.
     pub field_type: FieldType,
     /// The database internal name.
-    pub database_name: Option<String>,
+    pub database_names: Vec<String>,
     /// The default value.
     pub default_value: Option<DefaultValue>,
     /// Indicates if the field is unique.
@@ -84,11 +84,36 @@ impl WithName for Field {
 }
 
 impl WithDatabaseName for Field {
-    fn database_name(&self) -> &Option<String> {
-        &self.database_name
+    fn database_names(&self) -> Vec<&str> {
+        self.database_names.iter().map(|s| s.as_str()).collect()
     }
-    fn set_database_name(&mut self, database_name: &Option<String>) {
-        self.database_name = database_name.clone()
+
+    fn set_database_names(&mut self, database_names: Vec<String>) -> Result<(), String> {
+        match &self.field_type {
+            FieldType::Relation(rel_info) => {
+                let num_of_to_fields = rel_info.to_fields.len();
+                // in case of auto populated to fields the validation is very hard. We want to move to explicit references anyway.
+                // TODO: revisist this once explicit `@relation(references:)` is implemented
+                let should_validate = num_of_to_fields > 0;
+                if should_validate && rel_info.to_fields.len() != database_names.len() {
+                    Err(format!(
+                        "This Relation Field must specify exactly {} mapped names.",
+                        rel_info.to_fields.len()
+                    ))
+                } else {
+                    self.database_names = database_names;
+                    Ok(())
+                }
+            }
+            _ => {
+                if database_names.len() > 1 {
+                    Err("A scalar Field must not specify multiple mapped names.".to_string())
+                } else {
+                    self.database_names = database_names;
+                    Ok(())
+                }
+            }
+        }
     }
 }
 
@@ -99,7 +124,7 @@ impl Field {
             name: String::from(name),
             arity: FieldArity::Required,
             field_type,
-            database_name: None,
+            database_names: Vec::new(),
             default_value: None,
             is_unique: false,
             id_info: None,
@@ -114,7 +139,7 @@ impl Field {
             name: String::from(name),
             arity: FieldArity::Optional,
             field_type,
-            database_name: None,
+            database_names: Vec::new(),
             default_value: None,
             is_unique: false,
             id_info: None,

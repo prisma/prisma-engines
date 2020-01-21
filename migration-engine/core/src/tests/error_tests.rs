@@ -383,7 +383,8 @@ async fn unique_constraint_errors_in_migrations_must_return_a_known_error(api: &
     "#;
 
     let infer_migration_steps_input = InferMigrationStepsInput {
-        assume_to_be_applied: vec![],
+        assume_to_be_applied: Some(vec![]),
+        assume_applied_migrations: None,
         datamodel: dm2.to_owned(),
         migration_id: "the-migration".to_owned(),
     };
@@ -404,8 +405,9 @@ async fn unique_constraint_errors_in_migrations_must_return_a_known_error(api: &
 
     let json_error = serde_json::to_value(&error).unwrap();
 
-    let field_name = match api.sql_family() {
-        SqlFamily::Mysql => "Fruit.name",
+    let field_name = match (api.sql_family(), api.connector_name()) {
+        (SqlFamily::Mysql, "mysql_8") => "Fruit.Fruit.name",
+        (SqlFamily::Mysql, _) => "Fruit.name",
         _ => "name",
     };
 

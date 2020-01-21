@@ -35,10 +35,20 @@ impl WithName for Enum {
 }
 
 impl WithDatabaseName for Enum {
-    fn database_name(&self) -> &Option<String> {
-        &self.database_name
+    fn database_names(&self) -> Vec<&str> {
+        match &self.database_name {
+            None => vec![],
+            Some(db_name) => vec![db_name],
+        }
     }
-    fn set_database_name(&mut self, database_name: &Option<String>) {
-        self.database_name = database_name.clone()
+
+    fn set_database_names(&mut self, database_names: Vec<String>) -> Result<(), String> {
+        if database_names.len() > 1 {
+            Err("An Enum must not specify multiple mapped names.".to_string())
+        } else {
+            let first = database_names.into_iter().next();
+            self.database_name = first;
+            Ok(())
+        }
     }
 }

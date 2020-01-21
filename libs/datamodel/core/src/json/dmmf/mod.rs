@@ -16,7 +16,7 @@ pub use to_dmmf::render_to_dmmf_value;
 pub struct Field {
     pub name: String,
     pub kind: String,
-    pub db_name: Option<String>,
+    pub db_names: Vec<String>,
     pub is_list: bool,
     pub is_required: bool,
     pub is_unique: bool,

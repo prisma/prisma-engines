@@ -1,5 +1,5 @@
 use crate::*;
-use datamodel::dml;
+use datamodel::{dml, WithDatabaseName};
 use itertools::Itertools;
 
 pub struct DatamodelConverter<'a> {
@@ -50,7 +50,7 @@ impl<'a> DatamodelConverter<'a> {
                 name: model.name.clone(),
                 is_embedded: model.is_embedded,
                 fields: self.convert_fields(model),
-                manifestation: model.database_name.clone(),
+                manifestation: model.single_database_name().map(|s| s.to_owned()),
                 indexes: self.convert_indexes(model),
             })
             .collect()
@@ -118,7 +118,7 @@ impl<'a> DatamodelConverter<'a> {
 
     fn convert_indexes(&self, model: &dml::Model) -> Vec<IndexTemplate> {
         model
-            .indexes
+            .indices
             .iter()
             .map(|i| IndexTemplate {
                 name: i.name.clone(),
@@ -405,7 +405,9 @@ impl DatamodelFieldExtensions for dml::Field {
     }
 
     fn manifestation(&self) -> Option<FieldManifestation> {
-        self.database_name.clone().map(|n| FieldManifestation { db_name: n })
+        self.single_database_name().map(|db_name| FieldManifestation {
+            db_name: db_name.to_owned(),
+        })
     }
 
     fn behaviour(&self) -> Option<FieldBehaviour> {
@@ -432,7 +434,10 @@ impl DatamodelFieldExtensions for dml::Field {
     }
 
     fn final_db_name(&self) -> String {
-        self.database_name.clone().unwrap_or_else(|| self.name.clone())
+        match self.database_names.first() {
+            None => self.name.clone(),
+            Some(x) => x.clone(),
+        }
     }
 
     fn internal_enum(&self, datamodel: &dml::Datamodel) -> Option<InternalEnum> {

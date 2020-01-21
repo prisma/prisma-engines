@@ -3,7 +3,7 @@ use crate::{
     TableChange,
 };
 use migration_connector::*;
-use quaint::{ast::*, prelude::SqlFamily};
+use quaint::ast::*;
 use sql_schema_describer::{ColumnArity, SqlSchema};
 
 pub struct SqlDestructiveChangesChecker<'a> {
@@ -17,13 +17,6 @@ impl Component for SqlDestructiveChangesChecker<'_> {
 }
 
 impl SqlDestructiveChangesChecker<'_> {
-    fn is_on_sqlite(&self) -> bool {
-        match self.sql_family() {
-            SqlFamily::Sqlite => true,
-            _ => false,
-        }
-    }
-
     async fn check_table_drop(
         &self,
         table_name: &str,
@@ -153,7 +146,7 @@ impl SqlDestructiveChangesChecker<'_> {
     /// - default changes on SQLite
     /// - Arity changes from required to optional on SQLite
     fn alter_column_is_safe(&self, alter_column: &AlterColumn, previous_column: &sql_schema_describer::Column) -> bool {
-        if !self.is_on_sqlite() {
+        if !self.sql_family().is_sqlite() {
             return false;
         }
 

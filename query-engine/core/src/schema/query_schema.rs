@@ -1,7 +1,7 @@
 use super::*;
 use crate::{ParsedField, QueryGraph, QueryGraphBuilderResult};
 use once_cell::sync::OnceCell;
-use prisma_models::{dml, EnumType, InternalDataModelRef, ModelRef};
+use prisma_models::{dml, InternalDataModelRef, ModelRef};
 use std::{
     borrow::Borrow,
     boxed::Box,

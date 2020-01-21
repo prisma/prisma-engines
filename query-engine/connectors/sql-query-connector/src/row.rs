@@ -1,7 +1,7 @@
 use crate::error::SqlError;
 use chrono::{DateTime, Utc};
 use datamodel::FieldArity;
-use prisma_models::{EnumValue, GraphqlId, PrismaValue, Record, TypeIdentifier};
+use prisma_models::{GraphqlId, PrismaValue, Record, TypeIdentifier};
 use quaint::{
     ast::{DatabaseValue, ParameterizedValue},
     connector::ResultRow,
@@ -93,7 +93,7 @@ fn row_value_to_prisma_value(
         },
         TypeIdentifier::Enum => match p_value {
             ParameterizedValue::Null => PrismaValue::Null,
-            ParameterizedValue::Text(cow) => PrismaValue::Enum(EnumValue::from(cow.into_owned())),
+            ParameterizedValue::Text(cow) => PrismaValue::Enum(cow.into_owned()),
             _ => {
                 let error = io::Error::new(io::ErrorKind::InvalidData, "Enum value not stored as text");
                 return Err(SqlError::ConversionError(error.into()));

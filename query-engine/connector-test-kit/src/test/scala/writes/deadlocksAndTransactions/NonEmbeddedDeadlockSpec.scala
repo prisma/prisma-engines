@@ -5,8 +5,6 @@ import org.scalatest.{FlatSpec, Matchers, Retries}
 import util.ConnectorCapability.{JoinRelationLinksCapability, ScalarListsCapability}
 import util._
 
-import scala.concurrent.Future
-
 class NonEmbeddedDeadlockSpec extends FlatSpec with Matchers with Retries with ApiSpecBase with AwaitUtils {
 
   override def runOnlyForCapabilities = Set(JoinRelationLinksCapability, ScalarListsCapability)
@@ -18,6 +16,8 @@ class NonEmbeddedDeadlockSpec extends FlatSpec with Matchers with Retries with A
       super.withFixture(test)
     }
   }
+
+  val fifty = Vector.range(0, 50)
 
   "updating single item many times" should "not cause deadlocks" in {
     testDataModels.testV11 { project =>
@@ -40,7 +40,7 @@ class NonEmbeddedDeadlockSpec extends FlatSpec with Matchers with Retries with A
       val todoId = createResult.pathAsString("data.createTodo.id")
 
       def exec(i: Int) =
-        server.queryAsync(
+        server.query(
           s"""mutation {
            |  updateTodo(
            |    where: { id: "$todoId" }
@@ -55,11 +55,7 @@ class NonEmbeddedDeadlockSpec extends FlatSpec with Matchers with Retries with A
           project
         )
 
-      Future
-        .traverse(0 to 50) { i =>
-          exec(i)
-        }
-        .await(seconds = 30)
+      fifty.par.foreach(i => exec(i))
     }
   }
 
@@ -89,7 +85,7 @@ class NonEmbeddedDeadlockSpec extends FlatSpec with Matchers with Retries with A
     val todoId = createResult.pathAsString("data.createTodo.id")
 
     def exec(i: Int) =
-      server.queryAsync(
+      server.query(
         s"""mutation {
            |  updateTodo(
            |    where: { id: "$todoId" }
@@ -107,11 +103,8 @@ class NonEmbeddedDeadlockSpec extends FlatSpec with Matchers with Retries with A
         project
       )
 
-    Future
-      .traverse(0 to 150) { i =>
-        exec(i)
-      }
-      .await(seconds = 30)
+    fifty.par.foreach(i => exec(i))
+
   }
 
   "updating single item and relations many times" should "not cause deadlocks" in {
@@ -137,7 +130,7 @@ class NonEmbeddedDeadlockSpec extends FlatSpec with Matchers with Retries with A
       val comment2Id = createResult.pathAsString("data.createTodo.comments.[1].id")
 
       def exec(i: Int) =
-        server.queryAsync(
+        server.query(
           s"""mutation {
            |  updateTodo(
            |    where: { id: "$todoId" }
@@ -155,18 +148,15 @@ class NonEmbeddedDeadlockSpec extends FlatSpec with Matchers with Retries with A
           project
         )
 
-      Future
-        .traverse(0 to 100) { i =>
-          exec(i)
-        }
-        .await(seconds = 30)
+      fifty.par.foreach(i => exec(i))
+
     }
   }
 
   "creating many items with relations" should "not cause deadlocks" in {
     testDataModels.testV11 { project =>
       def exec(i: Int) =
-        server.queryAsync(
+        server.query(
           s"""mutation {
              |  createTodo(
              |    data:{
@@ -185,14 +175,15 @@ class NonEmbeddedDeadlockSpec extends FlatSpec with Matchers with Retries with A
           project
         )
 
-      Future.traverse(0 to 50)(i => exec(i)).await(seconds = 30)
+      fifty.par.foreach(i => exec(i))
+
     }
   }
 
   "deleting many items" should "not cause deadlocks" in {
     testDataModels.testV11 { project =>
       def create() =
-        server.queryAsync(
+        server.query(
           """mutation {
           |  createTodo(
           |    data: {
@@ -209,10 +200,10 @@ class NonEmbeddedDeadlockSpec extends FlatSpec with Matchers with Retries with A
           project
         )
 
-      val todoIds = Future.traverse(0 to 50)(i => create()).await(seconds = 30).map(_.pathAsString("data.createTodo.id"))
+      val todoIds = fifty.par.map(i => create().pathAsString("data.createTodo.id"))
 
       def exec(id: String) =
-        server.queryAsync(
+        server.query(
           s"""mutation {
            |  deleteTodo(
            |    where: { id: "$id" }
@@ -224,7 +215,7 @@ class NonEmbeddedDeadlockSpec extends FlatSpec with Matchers with Retries with A
           project
         )
 
-      Future.traverse(todoIds)(i => exec(i)).await(seconds = 30)
+      todoIds.par.foreach(id => exec(id))
     }
   }
 

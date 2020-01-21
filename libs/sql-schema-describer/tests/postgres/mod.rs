@@ -1,5 +1,7 @@
+#![allow(unused)]
+
 use log::debug;
-use quaint::{prelude::*};
+use quaint::prelude::*;
 use sql_schema_describer::*;
 use std::sync::Arc;
 
@@ -12,7 +14,9 @@ pub async fn get_postgres_describer(sql: &str, db_name: &str) -> postgres::SqlSc
     };
 
     let url = format!("postgres://postgres:prisma@{}:5432/{}", host, db_name);
-    let client = test_setup::create_postgres_database(&url.parse().unwrap()).await.unwrap();
+    let client = test_setup::create_postgres_database(&url.parse().unwrap())
+        .await
+        .unwrap();
 
     let drop_schema = format!("DROP SCHEMA IF EXISTS \"{}\" CASCADE;", SCHEMA);
     client

@@ -91,7 +91,7 @@ impl FieldAsserts for dml::Field {
 
     fn assert_relation_name(&self, t: &str) -> &Self {
         if let dml::FieldType::Relation(info) = &self.field_type {
-            assert_eq!(info.name, String::from(t));
+            assert_eq!(info.name, t.to_owned());
         } else {
             panic!("Relation expected, but found {:?}", self.field_type);
         }
@@ -126,13 +126,13 @@ impl FieldAsserts for dml::Field {
     }
 
     fn assert_with_db_name(&self, t: &str) -> &Self {
-        assert_eq!(self.database_name, Some(String::from(t)));
+        assert_eq!(self.database_names, vec![t.to_owned()]);
 
         self
     }
 
     fn assert_with_documentation(&self, t: &str) -> &Self {
-        assert_eq!(self.documentation, Some(String::from(t)));
+        assert_eq!(self.documentation, Some(t.to_owned()));
 
         self
     }
@@ -190,18 +190,18 @@ impl FieldAsserts for dml::Field {
 
 impl DatamodelAsserts for dml::Datamodel {
     fn assert_has_model(&self, t: &str) -> &dml::Model {
-        self.find_model(&String::from(t))
+        self.find_model(&t.to_owned())
             .expect(format!("Model {} not found", t).as_str())
     }
     fn assert_has_enum(&self, t: &str) -> &dml::Enum {
-        self.find_enum(&String::from(t))
+        self.find_enum(&t.to_owned())
             .expect(format!("Enum {} not found", t).as_str())
     }
 }
 
 impl ModelAsserts for dml::Model {
     fn assert_has_field(&self, t: &str) -> &dml::Field {
-        self.find_field(&String::from(t))
+        self.find_field(&t.to_owned())
             .expect(format!("Field {} not found", t).as_str())
     }
 
@@ -212,23 +212,23 @@ impl ModelAsserts for dml::Model {
     }
 
     fn assert_with_db_name(&self, t: &str) -> &Self {
-        assert_eq!(self.database_name, Some(String::from(t)));
+        assert_eq!(self.database_name, Some(t.to_owned()));
 
         self
     }
 
     fn assert_with_documentation(&self, t: &str) -> &Self {
-        assert_eq!(self.documentation, Some(String::from(t)));
+        assert_eq!(self.documentation, Some(t.to_owned()));
 
         self
     }
 
     fn assert_has_index(&self, def: IndexDefinition) -> &Self {
         assert!(
-            self.indexes.contains(&def),
+            self.indices.contains(&def),
             "could not find index {:?} in the indexes of this model \n {:?}",
             def,
-            self.indexes
+            self.indices
         );
         self
     }
@@ -241,7 +241,7 @@ impl ModelAsserts for dml::Model {
 
 impl EnumAsserts for dml::Enum {
     fn assert_has_value(&self, t: &str) -> &Self {
-        let pred = String::from(t);
+        let pred = t.to_owned();
         self.values
             .iter()
             .find(|x| **x == pred)

@@ -1,7 +1,7 @@
 pub mod graphql;
 
-pub use graphql::{GraphQlBody, GraphQlRequestHandler};
-pub use query_core::{schema::QuerySchemaRenderer, response_ir};
+pub use graphql::*;
+pub use query_core::{response_ir, schema::QuerySchemaRenderer};
 
 use crate::context::PrismaContext;
 use async_trait::async_trait;

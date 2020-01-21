@@ -3,11 +3,7 @@ use barrel::types;
 use chrono::*;
 use migration_connector::*;
 use quaint::ast::*;
-use quaint::{
-    connector::ResultSet,
-    prelude::{ConnectionInfo, SqlFamily},
-};
-use tracing::debug;
+use quaint::{connector::ResultSet, prelude::SqlFamily};
 
 pub struct SqlMigrationPersistence<'a> {
     pub connector: &'a crate::SqlMigrationConnector,
@@ -54,37 +50,6 @@ impl MigrationPersistence for SqlMigrationPersistence<'_> {
         crate::catch(self.connection_info(), async {
             let sql_str = format!(r#"DELETE FROM "{}"."_Migration";"#, self.schema_name()); // TODO: this is not vendor agnostic yet
             self.conn().query_raw(&sql_str, &[]).await.ok();
-
-            // TODO: this is the wrong place to do that
-            match &self.connection_info() {
-                ConnectionInfo::Postgres(_) => {
-                    let sql_str = format!(r#"DROP SCHEMA "{}" CASCADE;"#, self.schema_name());
-                    debug!("{}", sql_str);
-
-                    self.conn().query_raw(&sql_str, &[]).await.ok();
-                }
-                ConnectionInfo::Sqlite { file_path, .. } => {
-                    self.conn()
-                        .execute_raw("DETACH DATABASE ?", &[ParameterizedValue::from(self.schema_name())])
-                        .await
-                        .ok();
-                    std::fs::remove_file(file_path).ok(); // ignore potential errors
-                    self.conn()
-                        .execute_raw(
-                            "ATTACH DATABASE ? AS ?",
-                            &[
-                                ParameterizedValue::from(file_path.as_str()),
-                                ParameterizedValue::from(self.schema_name()),
-                            ],
-                        )
-                        .await?;
-                }
-                ConnectionInfo::Mysql(_) => {
-                    let sql_str = format!(r#"DROP SCHEMA `{}`;"#, self.schema_name());
-                    debug!("{}", sql_str);
-                    self.conn().query_raw(&sql_str, &[]).await?;
-                }
-            };
 
             Ok(())
         })
