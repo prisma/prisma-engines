@@ -12,7 +12,7 @@ mod internal_data_model;
 mod model;
 mod order_by;
 mod prisma_args;
-mod prisma_value;
+mod prisma_value_ext;
 mod record;
 mod relation;
 mod selected_fields;
@@ -33,10 +33,13 @@ pub use model::*;
 pub use order_by::*;
 pub use prisma_args::*;
 pub use prisma_args::*;
-pub use prisma_value::*;
+pub use prisma_value_ext::*;
 pub use record::*;
 pub use relation::*;
 pub use selected_fields::*;
+
+// reexport
+pub use prisma_value::*;
 
 #[cfg(feature = "sql-ext")]
 pub use sql_ext::*;

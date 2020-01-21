@@ -1,7 +1,8 @@
 use super::*;
 use crate::{ast::Span, error::DatamodelError};
 use chrono::Utc;
-use std::{convert::TryFrom, fmt};
+use prisma_value::PrismaValue;
+use std::{convert::TryFrom, convert::TryInto, fmt};
 use uuid::Uuid;
 
 #[derive(Clone, PartialEq)]
@@ -18,6 +19,20 @@ impl DefaultValue {
             Self::Single(v) => Some(v.clone()),
             Self::Expression(g) => g.generate(),
         }
+    }
+
+    pub fn get_as_prisma_value(&self) -> PrismaValue {
+        self.get()
+            .map(|sv| match sv {
+                ScalarValue::Boolean(x) => PrismaValue::Boolean(x),
+                ScalarValue::Int(x) => PrismaValue::Int(i64::from(x)),
+                ScalarValue::Float(x) => x.try_into().expect("Can't convert float to decimal"),
+                ScalarValue::String(x) => PrismaValue::String(x.clone()),
+                ScalarValue::DateTime(x) => PrismaValue::DateTime(x),
+                ScalarValue::Decimal(x) => x.try_into().expect("Can't convert float to decimal"),
+                ScalarValue::ConstantLiteral(x) => PrismaValue::Enum(x.clone()),
+            })
+            .unwrap_or_else(|| PrismaValue::Null)
     }
 
     pub fn get_type(&self) -> ScalarType {

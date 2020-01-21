@@ -99,7 +99,7 @@ async fn main() -> Result<(), AnyError> {
                         .long("execute_request")
                         .help("Executes one request and then terminates.")
                         .takes_value(true)
-                        .required(true),
+                        .required(false),
                 ),
         )
         .get_matches();

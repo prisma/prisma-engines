@@ -280,7 +280,7 @@ impl QueryDocumentParser {
 
                 match default_pair {
                     // If the input field has a default, add the default to the result.
-                    Some((k, dv)) => Some(Ok((k.clone(), ParsedInputValue::Single(dv.get().into())))),
+                    Some((k, dv)) => Some(Ok((k.clone(), ParsedInputValue::Single(dv.get_as_prisma_value())))),
 
                     // Finally, if nothing is found, parse the input value with Null but disregard the result,
                     // except errors, which are propagated.

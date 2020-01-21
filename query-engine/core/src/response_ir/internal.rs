@@ -4,9 +4,9 @@ use crate::{
     CoreError, CoreResult, EnumType, QueryResult, RecordSelection,
 };
 use indexmap::IndexMap;
-use prisma_models::{GraphqlId, InternalEnum, PrismaValue};
+use prisma_models::{GraphqlId, InternalEnum, PrismaValue, PrismaValueExtensions};
 use rust_decimal::prelude::ToPrimitive;
-use std::{borrow::Borrow, collections::HashMap, convert::TryFrom};
+use std::{borrow::Borrow, collections::HashMap};
 
 /// A grouping of items to their parent record.
 /// The item implicitly holds the information of the type of item contained.
@@ -306,7 +306,7 @@ fn convert_prisma_value(value: PrismaValue, st: &ScalarType) -> Result<PrismaVal
         (ScalarType::String, PrismaValue::String(s)) => PrismaValue::String(s),
 
         (ScalarType::ID, PrismaValue::GraphqlId(id)) => PrismaValue::GraphqlId(id),
-        (ScalarType::ID, val) => PrismaValue::GraphqlId(GraphqlId::try_from(val)?),
+        (ScalarType::ID, val) => PrismaValue::GraphqlId(val.into_graphql_id()?),
 
         (ScalarType::Int, PrismaValue::Float(f)) => PrismaValue::Int(f.to_i64().unwrap()),
         (ScalarType::Int, PrismaValue::Int(i)) => PrismaValue::Int(i),
