@@ -1,6 +1,7 @@
 package util
 
 import org.scalatest.{Suite, WordSpecLike}
+import play.api.libs.json.JsValue
 import util.ConnectorTag.{MongoConnectorTag, RelationalConnectorTag}
 
 case class TestDataModels(
@@ -62,33 +63,32 @@ case class TestDataModelsWrapper(
 
 }
 
-case class QueryParams ( identifierName: String, returnValue: String, parseValue: String)
+case class QueryParams(identifierName: String, returnValue: String, parse: (JsValue, String) => String, parseFirst: (JsValue, String) => String)
 
-case class TestAbstraction(datamodel: String, parent: QueryParams, child:QueryParams)
+case class TestAbstraction(datamodel: String, parent: QueryParams, child: QueryParams)
 
 case class AbstractTestDataModels(
-                                   mongo: Vector[TestAbstraction],
-                                   sql: Vector[TestAbstraction]
-                         )
+    mongo: Vector[TestAbstraction],
+    sql: Vector[TestAbstraction]
+)
 object AbstractTestDataModels {
   def apply(mongo: TestAbstraction, sql: TestAbstraction): AbstractTestDataModels = {
     AbstractTestDataModels(mongo = Vector(mongo), sql = Vector(sql))
   }
 }
 
-
 case class AbstractTestDataModelsWrapper(
-                                  dataModel: AbstractTestDataModels,
-                                  connectorTag: ConnectorTag,
-                                  connectorName: String,
-                                  database: TestDatabase
-                                )(implicit suite: Suite)
-  extends WordSpecLike {
+    dataModel: AbstractTestDataModels,
+    connectorTag: ConnectorTag,
+    connectorName: String,
+    database: TestDatabase
+)(implicit suite: Suite)
+    extends WordSpecLike {
 
-  def test[T](indexToTest: Int)(fn: TestAbstraction => T)     = internal(Some(indexToTest))(fn)
-  def test[T](fn: TestAbstraction => T)                       = internal(None)(fn)
-  def testV11[T](indexToTest: Int)(fn: Project => T) = internalV11(Some(indexToTest))(fn)
-  def testV11[T](fn: Project => T)                   = internalV11(None)(fn)
+  def test[T](indexToTest: Int)(fn: TestAbstraction => T) = internal(Some(indexToTest))(fn)
+  def test[T](fn: TestAbstraction => T)                   = internal(None)(fn)
+  def testV11[T](indexToTest: Int)(fn: Project => T)      = internalV11(Some(indexToTest))(fn)
+  def testV11[T](fn: Project => T)                        = internalV11(None)(fn)
 
   private def internalV11[T](indexToTest: Option[Int])(fn: Project => T) = {
     internal(indexToTest) { dm =>
@@ -125,4 +125,3 @@ case class AbstractTestDataModelsWrapper(
   }
 
 }
-

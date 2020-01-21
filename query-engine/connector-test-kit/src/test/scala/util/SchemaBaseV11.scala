@@ -1,6 +1,8 @@
 package util
 
-trait SchemaBaseV11 {
+import play.api.libs.json.JsValue
+
+trait SchemaBaseV11 extends PlayJsonExtensions {
 
   //Datamodel
   val simpleId   = "id            String    @id @default(cuid())"
@@ -24,11 +26,20 @@ trait SchemaBaseV11 {
   val commonParentReferences = Vector(pReference, compoundPReference, noRef)
   val commonChildReferences  = Vector(cReference, compoundCReference)
 
-  //Query Params
-  val idParams           = QueryParams("id", "id", ".id")
-  val compoundIdParams   = QueryParams("id_1_id_2", "id_1 , id_2", "")
-  val parentUniqueParams = Vector(QueryParams("p", "p", ".p"), QueryParams("p_1_p_2", "p_1, p_2", ""))
-  val childUniqueParams  = Vector(QueryParams("c", "c", ".c"), QueryParams("c_1_c_2", "c_1, c_2", ""))
+  // parse functions
+
+  def parse(subpath: String): ((JsValue, String) => String) = {
+    def test(input: JsValue, path: String): String = {
+      input.identifierAtPath(path, subpath, list = false)
+    }
+    test
+  }
+  def parseFirst(subpath: String): ((JsValue, String) => String) = {
+    def test(input: JsValue, path: String): String = {
+      input.identifierAtPath(path, subpath, list = true)
+    }
+    test
+  }
 
   sealed trait RelationField {
     def field: String
@@ -56,6 +67,14 @@ trait SchemaBaseV11 {
   }
 
   def schemaWithRelation(onParent: RelationField, onChild: RelationField) = {
+
+    //Query Params
+    val idParams         = QueryParams("id", "id", parse(".id"), parseFirst("id"))
+    val compoundIdParams = QueryParams("id_1_id_2", "id_1 , id_2", parse(""), parseFirst(""))
+    val parentUniqueParams =
+      Vector(QueryParams("p", "p", parse(".p"), parseFirst("p")), QueryParams("p_1_p_2", "p_1, p_2", parse(""), parseFirst("")))
+    val childUniqueParams =
+      Vector(QueryParams("c", "c", parse(".c"), parseFirst("c")), QueryParams("c_1_c_2", "c_1, c_2", parse(""), parseFirst("")))
 
     //todo for testing enable generating simple case, all single ids
     val simple = true
