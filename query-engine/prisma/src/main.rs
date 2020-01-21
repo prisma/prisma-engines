@@ -1,8 +1,20 @@
 #[macro_use]
 extern crate log;
-
 #[macro_use]
 extern crate rust_embed;
+
+use std::{env, error::Error, process};
+
+use clap::{App as ClapApp, Arg, SubCommand};
+use tracing::subscriber;
+use tracing_log::LogTracer;
+use tracing_subscriber::{EnvFilter, FmtSubscriber};
+
+use cli::*;
+use error::*;
+use lazy_static::lazy_static;
+use request_handlers::{PrismaRequest, RequestHandler};
+use server::HttpServer;
 
 mod cli;
 mod context;
@@ -13,17 +25,6 @@ mod exec_loader;
 mod request_handlers;
 mod server;
 mod utilities;
-
-use clap::{App as ClapApp, Arg, SubCommand};
-use cli::*;
-use error::*;
-use lazy_static::lazy_static;
-use request_handlers::{PrismaRequest, RequestHandler};
-use server::HttpServer;
-use std::{env, error::Error, process};
-use tracing::subscriber;
-use tracing_log::LogTracer;
-use tracing_subscriber::{EnvFilter, FmtSubscriber};
 
 #[derive(Debug, Clone, PartialEq, Copy)]
 pub enum LogFormat {
@@ -82,16 +83,23 @@ async fn main() -> Result<(), AnyError> {
                 .arg(
                     Arg::with_name("dmmf_to_dml")
                         .long("dmmf_to_dml")
-                        .help("Convert the given DMMF JSON file to a data model")
+                        .help("Convert the given DMMF JSON file to a data model.")
                         .takes_value(true)
                         .required(false),
                 )
                 .arg(
                     Arg::with_name("get_config")
                         .long("get_config")
-                        .help("Get the configuration from the given data model")
+                        .help("Get the configuration from the given data model.")
                         .takes_value(true)
                         .required(false),
+                )
+                .arg(
+                    Arg::with_name("execute_request")
+                        .long("execute_request")
+                        .help("Executes one request and then terminates.")
+                        .takes_value(true)
+                        .required(true),
                 ),
         )
         .get_matches();
