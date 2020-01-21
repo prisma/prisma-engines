@@ -16,6 +16,7 @@ members = [
   "libs/json-rpc-stdio",
   "libs/prisma-inflector",
   "libs/sql-schema-describer",
+  "libs/test-cli",
   "libs/user-facing-errors",
   "libs/prisma-models",
   "libs/prisma-value",
