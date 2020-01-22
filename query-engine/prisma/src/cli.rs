@@ -30,11 +30,14 @@ pub enum CliCommand {
     Dmmf(BuildMode),
     DmmfToDml(DmmfToDmlInput),
     GetConfig(String),
-    ExecuteRequest(String),
+    ExecuteRequest {
+        query: String,
+        force_transactions: bool,
+    },
 }
 
 impl CliCommand {
-    pub fn new(matches: &ArgMatches) -> Option<Self> {
+    pub fn new(matches: &ArgMatches, force_transactions: bool) -> Option<Self> {
         if matches.is_present("dmmf") {
             let build_mode = if matches.is_present("legacy") {
                 BuildMode::Legacy
@@ -42,12 +45,12 @@ impl CliCommand {
                 BuildMode::Modern
             };
 
-            Some(Self::Dmmf(build_mode))
+            Some(CliCommand::Dmmf(build_mode))
         } else if matches.is_present("dmmf_to_dml") {
             let path = matches.value_of("dmmf_to_dml").unwrap();
             let file = File::open(path).expect("File should open read only");
             let input: DmmfToDmlInput = serde_json::from_reader(file).expect("File should be proper JSON");
-            Some(Self::DmmfToDml(input))
+            Some(CliCommand::DmmfToDml(input))
         } else if matches.is_present("get_config") {
             let path = matches.value_of("get_config").unwrap();
             let mut file = File::open(path).expect("File should open read only");
@@ -55,10 +58,14 @@ impl CliCommand {
             let mut datamodel = String::new();
             file.read_to_string(&mut datamodel).expect("Couldn't read file");
 
-            Some(Self::GetConfig(datamodel))
+            Some(CliCommand::GetConfig(datamodel))
         } else if matches.is_present("execute_request") {
             let request = matches.value_of("execute_request").unwrap();
-            Some(Self::ExecuteRequest(request.to_string()))
+
+            Some(CliCommand::ExecuteRequest {
+                query: request.to_string(),
+                force_transactions,
+            })
         } else {
             None
         }
@@ -69,7 +76,8 @@ impl CliCommand {
             CliCommand::Dmmf(build_mode) => Self::dmmf(build_mode),
             CliCommand::DmmfToDml(input) => Self::dmmf_to_dml(input),
             CliCommand::GetConfig(input) => Self::get_config(input),
-            CliCommand::ExecuteRequest(input) => Self::execute_request(input),
+            CliCommand::ExecuteRequest { query, force_transactions } =>
+                Self::execute_request(query, force_transactions),
         }
     }
 
@@ -111,7 +119,7 @@ impl CliCommand {
         Ok(())
     }
 
-    fn execute_request(input: String) -> PrismaResult<()> {
+    fn execute_request(input: String, force_transactions: bool) -> PrismaResult<()> {
         use futures::executor::block_on;
         use futures::FutureExt;
         use std::panic::AssertUnwindSafe;
@@ -119,8 +127,9 @@ impl CliCommand {
 
         let decoded = base64::decode(&input)?;
         let decoded_request = String::from_utf8(decoded)?;
+        let cmd = CliCommand::handle_gql_request(decoded_request, force_transactions);
 
-        let response = match block_on(AssertUnwindSafe(CliCommand::handle_gql_request(decoded_request)).catch_unwind())
+        let response = match block_on(AssertUnwindSafe(cmd).catch_unwind())
         {
             Ok(Ok(responses)) => responses,
             Ok(Err(err)) => {
@@ -146,10 +155,15 @@ impl CliCommand {
         Ok(())
     }
 
-    async fn handle_gql_request(input: String) -> Result<Responses, PrismaError> {
-        let ctx = PrismaContext::new(true).await?;
+    async fn handle_gql_request(input: String, force_transactions: bool) -> Result<Responses, PrismaError> {
+        let ctx = PrismaContext::builder()
+            .legacy(true)
+            .force_transactions(force_transactions)
+            .build().await?;
+
         let gql_doc = gql::parse_query(&input)?;
         let query_doc = GraphQLProtocolAdapter::convert(gql_doc, None)?;
+
         ctx.executor
             .execute(query_doc, Arc::clone(ctx.query_schema()))
             .await

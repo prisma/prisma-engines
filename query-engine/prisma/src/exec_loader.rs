@@ -13,6 +13,7 @@ use sql_connector::*;
 
 pub async fn load(
     source: &(dyn Source + Send + Sync),
+    force_transactions: bool,
 ) -> PrismaResult<(String, Box<dyn QueryExecutor + Send + Sync + 'static>)> {
     match source.connector_type() {
         #[cfg(feature = "sql")]
@@ -22,7 +23,7 @@ pub async fn load(
         MYSQL_SOURCE_NAME => mysql(source).await,
 
         #[cfg(feature = "sql")]
-        POSTGRES_SOURCE_NAME => postgres(source).await,
+        POSTGRES_SOURCE_NAME => postgres(source, force_transactions).await,
 
         x => Err(PrismaError::ConfigurationError(format!(
             "Unsupported connector type: {}",
@@ -42,12 +43,13 @@ async fn sqlite(
     let db_name = path.file_stem().unwrap().to_str().unwrap().to_owned(); // Safe due to previous validations.
 
     trace!("Loaded SQLite connector.");
-    Ok((db_name, sql_executor("sqlite", sqlite)))
+    Ok((db_name, sql_executor("sqlite", sqlite, false)))
 }
 
 #[cfg(feature = "sql")]
 async fn postgres(
     source: &(dyn Source + Send + Sync),
+    force_transactions: bool,
 ) -> PrismaResult<(String, Box<dyn QueryExecutor + Send + Sync + 'static>)> {
     trace!("Loading Postgres connector...");
 
@@ -62,7 +64,7 @@ async fn postgres(
     let psql = PostgreSql::from_source(source).await?;
 
     trace!("Loaded Postgres connector.");
-    Ok((db_name, sql_executor("postgres", psql)))
+    Ok((db_name, sql_executor("postgres", psql, force_transactions)))
 }
 
 #[cfg(feature = "sql")]
@@ -82,13 +84,17 @@ async fn mysql(
     let db_name = db_name.next().expect(err_str).to_owned();
 
     trace!("Loaded MySQL connector.");
-    Ok((db_name, sql_executor("mysql", mysql)))
+    Ok((db_name, sql_executor("mysql", mysql, false)))
 }
 
 #[cfg(feature = "sql")]
-fn sql_executor<T>(primary_connector: &'static str, connector: T) -> Box<dyn QueryExecutor + Send + Sync + 'static>
+fn sql_executor<T>(
+    primary_connector: &'static str,
+    connector: T,
+    force_transactions: bool,
+) -> Box<dyn QueryExecutor + Send + Sync + 'static>
 where
     T: Connector + Send + Sync + 'static,
 {
-    Box::new(InterpretingExecutor::new(connector, primary_connector))
+    Box::new(InterpretingExecutor::new(connector, primary_connector, force_transactions))
 }
