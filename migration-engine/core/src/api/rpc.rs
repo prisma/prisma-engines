@@ -1,7 +1,7 @@
 use super::{GenericApi, MigrationApi};
 use crate::{commands::*, CoreResult};
 use datamodel::configuration::{MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME};
-use futures::{FutureExt, TryFutureExt};
+use futures::{compat::*, FutureExt, TryFutureExt};
 use jsonrpc_core::types::error::Error as JsonRpcError;
 use jsonrpc_core::{IoHandler, Params};
 use jsonrpc_stdio_server::ServerBuilder;
@@ -81,7 +81,11 @@ impl RpcApi {
 
     /// Block the thread and handle IO in async until EOF.
     pub async fn start_server(self) {
-        ServerBuilder::new(self.io_handler).build()
+        ServerBuilder::new(self.io_handler)
+            .build_future()
+            .compat()
+            .await
+            .unwrap()
     }
 
     /// Handle one request

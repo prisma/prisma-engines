@@ -22,7 +22,7 @@ anyhow = "1.0.26"
 thiserror = "1.0.9"
 
 jsonrpc-core = "14.0"
-jsonrpc-stdio-server = { git = "https://github.com/tomhoule/jsonrpc.git", branch = "stdio-tokio-compat" }
+jsonrpc-stdio-server = { git = "https://github.com/tomhoule/jsonrpc.git", branch = "alternate-branch" }
 
 futures = { version = "0.3", features = ["compat"] }
 tokio = { version = "0.2", features = ["rt-threaded", "macros"] }
