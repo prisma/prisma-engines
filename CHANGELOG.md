@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.1.9
+
+- Internal fix for faster result row generation (#65)
+- Make Postgres initialization to not use prepared statements, making it
+  possible to use it in pgbouncer transactional mode (#67)
+
 ## v0.1.8
 
 - Adding timeout configuration (https://github.com/prisma/quaint/pull/66)
