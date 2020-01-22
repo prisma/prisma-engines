@@ -5,7 +5,7 @@ pub trait CreateInputTypeBuilderExtension<'a>: InputTypeBuilderBase<'a> {
     #[rustfmt::skip]
     fn create_input_type(&self, model: ModelRef, parent_field: Option<RelationFieldRef>) -> InputObjectTypeRef {
         let name = match parent_field.as_ref().map(|pf| pf.related_field()) {
-            Some(ref f) if !f.is_hidden => format!("{}CreateWithout{}Input", model.name, capitalize(f.name.as_str())),
+            Some(ref f) => format!("{}CreateWithout{}Input", model.name, capitalize(f.name.as_str())),
             _ => format!("{}CreateInput", model.name),
         };
 
@@ -21,7 +21,7 @@ pub trait CreateInputTypeBuilderExtension<'a>: InputTypeBuilderBase<'a> {
             .fields()
             .scalar()
             .into_iter()
-            .filter(|f| !f.is_hidden && Self::field_should_be_kept_for_create_input_type(&f))
+            .filter(|f|  Self::field_should_be_kept_for_create_input_type(&f))
             .collect();
 
         let mut fields = self.scalar_input_fields(
@@ -75,7 +75,6 @@ pub trait CreateInputTypeBuilderExtension<'a>: InputTypeBuilderBase<'a> {
             .fields()
             .relation()
             .into_iter()
-            .filter(|rf| !rf.is_hidden)
             .filter_map(|rf| {
                 let related_model = rf.related_model();
                 let related_field = rf.related_field();

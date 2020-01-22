@@ -70,10 +70,7 @@ impl SelectedFields {
             acc
         });
 
-        SelectedFields {
-            scalar,
-            relation,
-        }
+        SelectedFields { scalar, relation }
     }
 
     pub fn id(model: ModelRef) -> Self {
@@ -107,24 +104,18 @@ impl SelectedFields {
     }
 
     pub(super) fn relation_inlined(&self) -> impl Iterator<Item = &RelationFieldRef> {
-        self.relation
-            .iter()
-            .map(|rf| &rf.field)
-            .filter(|rf| {
-                let relation = rf.relation();
-                let related = rf.related_field();
-                let is_inline = relation.is_inline_relation();
-                let is_self = relation.is_self_relation();
+        self.relation.iter().map(|rf| &rf.field).filter(|rf| {
+            let relation = rf.relation();
+            let is_inline = relation.is_inline_relation();
+            let is_self = relation.is_self_relation();
 
-                let is_intable = relation
-                    .inline_manifestation()
-                    .map(|mf| mf.in_table_of_model_name == rf.model().name)
-                    .unwrap_or(false);
+            let is_intable = relation
+                .inline_manifestation()
+                .map(|mf| mf.in_table_of_model_name == rf.model().name)
+                .unwrap_or(false);
 
-                (!rf.is_hidden && is_inline && is_self && rf.relation_side.is_b())
-                    || (related.is_hidden && is_inline && is_self && rf.relation_side.is_a())
-                    || (is_inline && !is_self && is_intable)
-            })
+            (is_inline && is_self && rf.relation_side.is_b()) || (is_inline && !is_self && is_intable)
+        })
     }
 
     pub(super) fn scalar_fields(&self) -> impl Iterator<Item = &ScalarFieldRef> {
