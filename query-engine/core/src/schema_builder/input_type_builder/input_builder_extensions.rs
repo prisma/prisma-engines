@@ -33,7 +33,7 @@ pub trait InputBuilderExtensions {
             .as_ref()
             .expect("A field with TypeIdentifier Enum must always have an enum.");
 
-        let et: EnumType = internal_enum.into();
+        let et: EnumType = internal_enum.clone().into();
         et.into()
     }
 }

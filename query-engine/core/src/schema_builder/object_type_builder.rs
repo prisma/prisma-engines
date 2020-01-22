@@ -1,4 +1,5 @@
 use super::*;
+use prisma_models::OrderBy;
 
 #[derive(Debug)]
 pub struct ObjectTypeBuilder<'a> {
@@ -75,12 +76,9 @@ impl<'a> ObjectTypeBuilder<'a> {
             .fields()
             .all
             .iter()
-            .filter(|f| {
-                f.is_visible()
-                    && match f {
-                        ModelField::Scalar(_) => true,
-                        ModelField::Relation(_) => self.with_relations,
-                    }
+            .filter(|f| match f {
+                ModelField::Scalar(_) => true,
+                ModelField::Relation(_) => self.with_relations,
             })
             .map(|f| self.map_field(f))
             .collect()
@@ -132,7 +130,6 @@ impl<'a> ObjectTypeBuilder<'a> {
     /// Builds "many records where" arguments based on the given model and field.
     pub fn many_records_field_arguments(&self, field: &ModelField) -> Vec<Argument> {
         match field {
-            f if !f.is_visible() => vec![],
             ModelField::Scalar(_) => vec![],
             ModelField::Relation(rf) if rf.is_list && !rf.related_model().is_embedded => {
                 self.many_records_arguments(&rf.related_model())
@@ -170,21 +167,25 @@ impl<'a> ObjectTypeBuilder<'a> {
 
     // Builds "orderBy" argument.
     pub fn order_by_argument(&self, model: &ModelRef) -> Argument {
-        let enum_values: Vec<EnumValue> = model
+        let enum_values: Vec<_> = model
             .fields()
             .scalar_non_list()
             .iter()
-            .map(|f| {
+            .map(|field| {
                 vec![
-                    EnumValue::order_by(
-                        format!("{}_{}", f.name, SortOrder::Ascending.abbreviated()),
-                        Arc::clone(f),
-                        SortOrder::Ascending,
+                    (
+                        format!("{}_{}", field.name, SortOrder::Ascending.abbreviated()),
+                        OrderBy {
+                            field: field.clone(),
+                            sort_order: SortOrder::Ascending,
+                        },
                     ),
-                    EnumValue::order_by(
-                        format!("{}_{}", f.name, SortOrder::Descending.abbreviated()),
-                        Arc::clone(f),
-                        SortOrder::Descending,
+                    (
+                        format!("{}_{}", field.name, SortOrder::Descending.abbreviated()),
+                        OrderBy {
+                            field: field.clone(),
+                            sort_order: SortOrder::Descending,
+                        },
                     ),
                 ]
             })
@@ -192,7 +193,7 @@ impl<'a> ObjectTypeBuilder<'a> {
             .collect();
 
         let enum_name = format!("{}OrderByInput", model.name);
-        let enum_type = enum_type(enum_name, enum_values);
+        let enum_type = order_by_enum_type(enum_name, enum_values);
 
         argument("orderBy", InputType::opt(enum_type.into()), None)
     }
@@ -204,7 +205,7 @@ impl<'a> ObjectTypeBuilder<'a> {
                     "Invariant violation: Enum fields are expected to have an internal_enum associated with them.",
                 );
 
-                internal_enum.into()
+                internal_enum.clone().into()
             }
             _ => panic!("Invariant violation: map_enum_field can only be called on scalar enum fields."),
         }

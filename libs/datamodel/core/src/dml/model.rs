@@ -14,7 +14,7 @@ pub struct Model {
     /// Indicates if this model is embedded or not.
     pub is_embedded: bool,
     /// Describes Composite Indexes
-    pub indexes: Vec<IndexDefinition>,
+    pub indices: Vec<IndexDefinition>,
     /// Describes Composite Primary Keys
     pub id_fields: Vec<String>,
     /// Indicates if this model is generated.
@@ -40,7 +40,7 @@ impl Model {
         Model {
             name,
             fields: vec![],
-            indexes: vec![],
+            indices: vec![],
             id_fields: vec![],
             documentation: None,
             database_name,
@@ -141,11 +141,11 @@ impl Model {
     }
 
     pub fn add_index(&mut self, index: IndexDefinition) {
-        self.indexes.push(index)
+        self.indices.push(index)
     }
 
     pub fn has_index(&self, index: &IndexDefinition) -> bool {
-        self.indexes.iter().any(|own_index| own_index == index)
+        self.indices.iter().any(|own_index| own_index == index)
     }
 }
 
@@ -159,10 +159,20 @@ impl WithName for Model {
 }
 
 impl WithDatabaseName for Model {
-    fn database_name(&self) -> &Option<String> {
-        &self.database_name
+    fn database_names(&self) -> Vec<&str> {
+        match &self.database_name {
+            None => vec![],
+            Some(db_name) => vec![db_name],
+        }
     }
-    fn set_database_name(&mut self, database_name: &Option<String>) {
-        self.database_name = database_name.clone()
+
+    fn set_database_names(&mut self, database_names: Vec<String>) -> Result<(), String> {
+        if database_names.len() > 1 {
+            Err("A Model must not specify multiple mapped names.".to_string())
+        } else {
+            let first = database_names.into_iter().next();
+            self.database_name = first;
+            Ok(())
+        }
     }
 }

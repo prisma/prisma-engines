@@ -23,7 +23,7 @@ prisma-models = { path = "../../libs/prisma-models" }
 query-core = { path = "../core" }
 connector = { path = "../connectors/query-connector", package = "query-connector" }
 sql-connector = { path = "../connectors/sql-query-connector", optional = true, package = "sql-query-connector" }
-graphql-parser = { version = "0.2.2", optional = true }
+graphql-parser = { git = "https://github.com/prisma/graphql-parser", optional = true }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = { version = "1.0", features = [ "preserve_order" ] }
 base64 = "0.10"

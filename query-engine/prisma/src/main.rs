@@ -1,8 +1,26 @@
 #[macro_use]
 extern crate log;
-
 #[macro_use]
 extern crate rust_embed;
+
+use std::{
+    env,
+    error::Error,
+    net::{IpAddr, SocketAddr},
+    process,
+    str::FromStr,
+};
+
+use clap::{App as ClapApp, Arg, SubCommand};
+use tracing::subscriber;
+use tracing_log::LogTracer;
+use tracing_subscriber::{EnvFilter, FmtSubscriber};
+
+use cli::*;
+use error::*;
+use lazy_static::lazy_static;
+use request_handlers::{PrismaRequest, RequestHandler};
+use server::HttpServer;
 
 mod cli;
 mod context;
@@ -12,18 +30,9 @@ mod error;
 mod exec_loader;
 mod request_handlers;
 mod server;
+#[cfg(test)]
+mod tests;
 mod utilities;
-
-use clap::{App as ClapApp, Arg, SubCommand};
-use cli::*;
-use error::*;
-use lazy_static::lazy_static;
-use request_handlers::{PrismaRequest, RequestHandler};
-use server::HttpServer;
-use std::{env, error::Error, process};
-use tracing::subscriber;
-use tracing_log::LogTracer;
-use tracing_subscriber::{EnvFilter, FmtSubscriber};
 
 #[derive(Debug, Clone, PartialEq, Copy)]
 pub enum LogFormat {
@@ -47,6 +56,13 @@ type AnyError = Box<dyn Error + Send + Sync + 'static>;
 async fn main() -> Result<(), AnyError> {
     let matches = ClapApp::new("Prisma Query Engine")
         .version(env!("CARGO_PKG_VERSION"))
+        .arg(
+            Arg::with_name("host")
+                .long("host")
+                .value_name("host")
+                .help("The hostname or IP the query engine should bind to.")
+                .takes_value(true),
+        )
         .arg(
             Arg::with_name("port")
                 .short("p")
@@ -82,14 +98,21 @@ async fn main() -> Result<(), AnyError> {
                 .arg(
                     Arg::with_name("dmmf_to_dml")
                         .long("dmmf_to_dml")
-                        .help("Convert the given DMMF JSON file to a data model")
+                        .help("Convert the given DMMF JSON file to a data model.")
                         .takes_value(true)
                         .required(false),
                 )
                 .arg(
                     Arg::with_name("get_config")
                         .long("get_config")
-                        .help("Get the configuration from the given data model")
+                        .help("Get the configuration from the given data model.")
+                        .takes_value(true)
+                        .required(false),
+                )
+                .arg(
+                    Arg::with_name("execute_request")
+                        .long("execute_request")
+                        .help("Executes one request and then terminates.")
                         .takes_value(true)
                         .required(false),
                 ),
@@ -115,17 +138,29 @@ async fn main() -> Result<(), AnyError> {
     } else {
         init_logger()?;
 
+        let default_host = [127, 0, 0, 1];
+        let default_port = 4466;
+
         let port = matches
             .value_of("port")
             .map(|p| p.to_owned())
             .or_else(|| env::var("PORT").ok())
             .and_then(|p| p.parse::<u16>().ok())
-            .unwrap_or_else(|| 4466);
+            .unwrap_or_else(|| default_port);
 
-        let address = ([0, 0, 0, 0], port);
+        let host = matches
+            .value_of("host")
+            .map(|p| p.to_owned())
+            .or_else(|| env::var("HOST").ok())
+            .and_then(|p| Some(IpAddr::from_str(&p).expect("Invalid Host provided")))
+            .unwrap_or_else(|| IpAddr::from(default_host));
+
+        let address = SocketAddr::new(host, port);
+
         let legacy = matches.is_present("legacy");
 
         eprintln!("Printing to stderr for debugging");
+        eprintln!("Listening on {}:{}", host, port);
 
         if let Err(err) = HttpServer::run(address, legacy).await {
             info!("Encountered error during initialization:");

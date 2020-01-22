@@ -73,7 +73,10 @@ pub trait QueryExt: Queryable + Send + Sync {
             .next()
             .unwrap();
 
-        Ok(i64::try_from(id)?)
+        Ok(i64::try_from(id).map_err(|err| {
+            let domain_error: DomainError = err.into();
+            domain_error
+        })?)
     }
 
     /// Read the all columns as a (primary) identifier.

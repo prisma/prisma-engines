@@ -69,7 +69,9 @@ fn settings_must_be_deteced() {
     model Todo {
       id Int @id
       child_todos Todo[] @relation("MyRelation")
-      parent_todo Todo? @relation("MyRelation", onDelete: CASCADE, references: id)
+      // TODO: bring `onDelete` back once `prisma migrate` is a thing
+      // parent_todo Todo? @relation("MyRelation", onDelete: CASCADE, references: id)
+      parent_todo Todo? @relation("MyRelation", references: id)
     }
     "#;
 
@@ -80,8 +82,9 @@ fn settings_must_be_deteced() {
         .assert_has_field("parent_todo")
         .assert_relation_to("Todo")
         .assert_relation_to_fields(&["id"])
-        .assert_arity(&dml::FieldArity::Optional)
-        .assert_relation_delete_strategy(dml::OnDeleteStrategy::Cascade);
+        .assert_arity(&dml::FieldArity::Optional);
+    // TODO: bring `onDelete` back once `prisma migrate` is a thing
+    //        .assert_relation_delete_strategy(dml::OnDeleteStrategy::Cascade);
 }
 
 #[test]

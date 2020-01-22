@@ -107,7 +107,9 @@ impl SelectedFields {
 
     pub fn types<'a>(&'a self) -> impl Iterator<Item = (TypeIdentifier, FieldArity)> + 'a {
         let scalar = self.scalar_fields().map(|sf| sf.type_identifier_with_arity());
-        let relation = self.relation_inlined().flat_map(|rf| rf.type_identifiers_with_arities());
+        let relation = self
+            .relation_inlined()
+            .flat_map(|rf| rf.type_identifiers_with_arities());
 
         scalar.chain(relation)
     }
@@ -123,7 +125,6 @@ impl SelectedFields {
     pub(super) fn relation_inlined(&self) -> impl Iterator<Item = &RelationFieldRef> {
         self.relation.iter().map(|rf| &rf.field).filter(|rf| {
             let relation = rf.relation();
-            let related = rf.related_field();
             let is_inline = relation.is_inline_relation();
             let is_self = relation.is_self_relation();
 
@@ -132,9 +133,7 @@ impl SelectedFields {
                 .map(|mf| mf.in_table_of_model_name == rf.model().name)
                 .unwrap_or(false);
 
-            (!rf.is_hidden && is_inline && is_self && rf.relation_side.is_b())
-                || (related.is_hidden && is_inline && is_self && rf.relation_side.is_a())
-                || (is_inline && !is_self && is_intable)
+            (is_inline && is_self && rf.relation_side.is_b()) || (is_inline && !is_self && is_intable)
         })
     }
 

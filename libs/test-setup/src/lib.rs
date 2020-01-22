@@ -67,7 +67,7 @@ pub fn mysql_url(db_name: &str) -> String {
     let db_name = mysql_safe_identifier(db_name);
 
     format!(
-        "mysql://root:prisma@{host}:3306/{db_name}",
+        "mysql://root:prisma@{host}:3306/{db_name}?connect_timeout=20&socket_timeout=20",
         host = db_host_mysql_5_7(),
         db_name = db_name,
     )
@@ -80,7 +80,7 @@ pub fn mysql_8_url(db_name: &str) -> String {
     let db_name = mysql_safe_identifier(db_name);
 
     format!(
-        "mysql://root:prisma@{host}:{port}/{db_name}",
+        "mysql://root:prisma@{host}:{port}/{db_name}?connect_timeout=20&socket_timeout=20",
         host = host,
         port = port,
         db_name = db_name,
@@ -94,7 +94,7 @@ pub fn mariadb_url(db_name: &str) -> String {
     let db_name = mysql_safe_identifier(db_name);
 
     format!(
-        "mysql://root:prisma@{host}:{port}/{db_name}",
+        "mysql://root:prisma@{host}:{port}/{db_name}?connect_timeout=20&socket_timeout=20",
         host = host,
         port = port,
         db_name = db_name,

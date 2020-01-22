@@ -21,13 +21,12 @@ serde_json = "1.0"
 anyhow = "1.0.26"
 thiserror = "1.0.9"
 
-jsonrpc-core = "13.0"
-jsonrpc-stdio-server = "13.0"
+jsonrpc-core = "14.0"
+jsonrpc-stdio-server = { git = "https://github.com/tomhoule/jsonrpc.git", branch = "stdio-tokio-compat" }
 
 futures = { version = "0.3", features = ["compat"] }
 tokio = { version = "0.2", features = ["rt-threaded", "macros"] }
 async-trait = "0.1.17"
-async-std = "1.0"
 tracing = "0.1.10"
 tracing-subscriber = { version = "0.1.6", features = ["tracing-log"] }
 tracing-futures = "0.2.0"

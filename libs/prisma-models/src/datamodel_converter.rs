@@ -1,5 +1,5 @@
 use crate::*;
-use datamodel::dml;
+use datamodel::{dml, WithDatabaseName};
 use itertools::Itertools;
 
 pub struct DatamodelConverter<'a> {
@@ -14,7 +14,7 @@ impl<'a> DatamodelConverter<'a> {
     }
 
     pub fn convert(datamodel: &dml::Datamodel) -> InternalDataModelTemplate {
-        DatamodelConverter::new(datamodel).convert_internal()
+        dbg!(DatamodelConverter::new(datamodel).convert_internal())
     }
 
     fn new(datamodel: &dml::Datamodel) -> DatamodelConverter {
@@ -50,7 +50,7 @@ impl<'a> DatamodelConverter<'a> {
                 name: model.name.clone(),
                 is_embedded: model.is_embedded,
                 fields: self.convert_fields(model),
-                manifestation: model.database_name.clone(),
+                manifestation: model.single_database_name().map(|s| s.to_owned()),
                 id_field_names: model.id_fields.clone(),
                 indexes: self.convert_indexes(model),
             })
@@ -78,7 +78,6 @@ impl<'a> DatamodelConverter<'a> {
                         is_required: field.is_required(),
                         is_list: field.is_list(),
                         is_unique: field.is_unique(),
-                        is_hidden: false,
                         is_auto_generated_int_id: field.is_auto_generated_int_id(),
                         // todo the data source fields are not yet build correctly in the datamodel
                         data_source_fields: vec![DataSourceField {
@@ -95,7 +94,6 @@ impl<'a> DatamodelConverter<'a> {
                     is_required: field.is_required(),
                     is_list: field.is_list(),
                     is_unique: field.is_unique(),
-                    is_hidden: false,
                     is_auto_generated_int_id: field.is_auto_generated_int_id(),
                     // todo the data source field is not yet build correctly in the datamodel
                     data_source_field: DataSourceField {
@@ -125,7 +123,7 @@ impl<'a> DatamodelConverter<'a> {
 
     fn convert_indexes(&self, model: &dml::Model) -> Vec<IndexTemplate> {
         model
-            .indexes
+            .indices
             .iter()
             .map(|i| IndexTemplate {
                 name: i.name.clone(),
@@ -410,10 +408,6 @@ impl DatamodelFieldExtensions for dml::Field {
         has_auto_generating_behaviour && is_an_int
     }
 
-    // fn manifestation(&self) -> Option<FieldManifestation> {
-    //     self.database_name.clone().map(|n| FieldManifestation { db_name: n })
-    // }
-
     fn behaviour(&self) -> Option<FieldBehaviour> {
         // TODO: implement this properly once this is specced for the datamodel
         self.id_info
@@ -438,7 +432,10 @@ impl DatamodelFieldExtensions for dml::Field {
     }
 
     fn final_db_name(&self) -> String {
-        self.database_name.clone().unwrap_or_else(|| self.name.clone())
+        match self.database_names.first() {
+            None => self.name.clone(),
+            Some(x) => x.clone(),
+        }
     }
 
     fn internal_enum(&self, datamodel: &dml::Datamodel) -> Option<InternalEnum> {

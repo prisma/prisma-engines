@@ -18,7 +18,7 @@ pub trait DirectiveValidator<T> {
     /// to the given object.
     fn validate_and_apply(&self, args: &mut Args, obj: &mut T) -> Result<(), DatamodelError>;
 
-    /// Serilizes the given directive's arguments for rendering.
+    /// Serializes the given directive's arguments for rendering.
     fn serialize(&self, obj: &T, datamodel: &dml::Datamodel) -> Result<Vec<ast::Directive>, DatamodelError>;
 
     /// Shorthand to construct an directive validation error.

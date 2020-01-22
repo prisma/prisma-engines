@@ -68,7 +68,8 @@ class DeeplyNestedSelfRelationSpec extends FlatSpec with Matchers with ApiSpecBa
 
   }
 
-  "Regression #249" should "not fail" in {
+  // TODO: bring `onDelete` back once `prisma migrate` is a thing
+  "Regression #249" should "not fail" ignore {
     val project = SchemaDsl.fromStringV11() { """
                                                 |model User {
                                                 |  id       String @default(cuid()) @id

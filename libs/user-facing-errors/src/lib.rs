@@ -3,6 +3,7 @@
 pub mod common;
 pub mod introspection_engine;
 pub mod migration_engine;
+#[cfg(feature = "sql")]
 pub mod quaint;
 pub mod query_engine;
 

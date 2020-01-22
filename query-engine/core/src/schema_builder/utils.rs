@@ -1,7 +1,8 @@
 use super::*;
+use crate::EnumType;
 use itertools::Itertools;
 use once_cell::sync::OnceCell;
-use prisma_models::{dml, EnumType, EnumValue, ModelRef};
+use prisma_models::{dml, ModelRef, OrderBy};
 use std::sync::Arc;
 
 /// Object type convenience wrapper function.
@@ -38,14 +39,14 @@ where
 }
 
 /// Enum type convenience wrapper function.
-pub fn enum_type<T>(name: T, values: Vec<EnumValue>) -> EnumType
+pub fn order_by_enum_type<T>(name: T, values: Vec<(String, OrderBy)>) -> EnumType
 where
     T: Into<String>,
 {
-    EnumType {
+    EnumType::OrderBy(OrderByEnumType {
         name: name.into(),
         values,
-    }
+    })
 }
 
 /// Argument convenience wrapper function.

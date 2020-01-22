@@ -32,7 +32,7 @@ impl<'a> DMMFTypeRenderer<'a> {
             InputType::Enum(et) => {
                 let (_, subctx) = et.into_renderer().render(ctx);
                 let type_info = DMMFTypeInfo {
-                    typ: et.name.clone(),
+                    typ: et.name().to_owned(),
                     kind: TypeKind::Enum,
                     is_required: true,
                     is_list: false,
@@ -55,7 +55,7 @@ impl<'a> DMMFTypeRenderer<'a> {
             InputType::Scalar(ScalarType::Enum(et)) => {
                 let (_, subctx) = et.into_renderer().render(ctx);
                 let type_info = DMMFTypeInfo {
-                    typ: et.name.clone(),
+                    typ: et.name().to_owned(),
                     kind: TypeKind::Scalar,
                     is_required: true,
                     is_list: false,
@@ -104,7 +104,7 @@ impl<'a> DMMFTypeRenderer<'a> {
             OutputType::Enum(et) => {
                 let (_, subctx) = et.into_renderer().render(ctx);
                 let type_info = DMMFTypeInfo {
-                    typ: et.name.clone(),
+                    typ: et.name().to_owned(),
                     kind: TypeKind::Enum,
                     is_required: true,
                     is_list: false,
@@ -127,7 +127,7 @@ impl<'a> DMMFTypeRenderer<'a> {
             OutputType::Scalar(ScalarType::Enum(et)) => {
                 let (_, subctx) = et.into_renderer().render(ctx);
                 let type_info = DMMFTypeInfo {
-                    typ: et.name.clone(),
+                    typ: et.name().to_owned(),
                     kind: TypeKind::Scalar,
                     is_required: true,
                     is_list: false,

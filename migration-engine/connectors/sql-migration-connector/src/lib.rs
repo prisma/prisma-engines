@@ -1,4 +1,5 @@
 mod component;
+mod database_info;
 mod error;
 mod sql_database_migration_inferrer;
 mod sql_database_step_applier;
@@ -13,6 +14,7 @@ pub use error::*;
 pub use sql_migration::*;
 
 use component::Component;
+use database_info::DatabaseInfo;
 use migration_connector::*;
 use quaint::{
     prelude::{ConnectionInfo, Queryable, SqlFamily},
@@ -27,23 +29,6 @@ use std::{fs, path::PathBuf, sync::Arc, time::Duration};
 use tracing::debug;
 
 const CONNECTION_TIMEOUT: Duration = Duration::from_secs(10);
-
-#[derive(Debug, Clone)]
-pub struct DatabaseInfo {
-    connection_info: ConnectionInfo,
-    database_version: Option<String>,
-}
-
-impl DatabaseInfo {
-    pub(crate) fn is_mariadb(&self) -> bool {
-        self.connection_info.sql_family() == SqlFamily::Mysql
-            && self
-                .database_version
-                .as_ref()
-                .map(|version| version.contains("MariaDB"))
-                .unwrap_or(false)
-    }
-}
 
 pub struct SqlMigrationConnector {
     pub schema_name: String,
@@ -82,23 +67,15 @@ impl SqlMigrationConnector {
                 SqlError::from(quaint::error::Error::ConnectTimeout).into_connector_error(&connection_info)
             })??;
 
-        let database_version = get_database_version(&connection, &connection_info)
+        let database_info = DatabaseInfo::new(&connection, connection.connection_info().clone())
             .await
             .map_err(|sql_error| sql_error.into_connector_error(&connection_info))?;
 
         let schema_name = connection.connection_info().schema_name().to_owned();
 
-        let sql_family = connection.connection_info().sql_family();
-        let connection_info = connection.connection_info().clone();
-
         let conn = Arc::new(connection) as Arc<dyn Queryable + Send + Sync>;
 
-        let database_info = DatabaseInfo {
-            connection_info: connection_info.clone(),
-            database_version,
-        };
-
-        let describer: Arc<dyn SqlSchemaDescriberBackend + Send + Sync + 'static> = match sql_family {
+        let describer: Arc<dyn SqlSchemaDescriberBackend + Send + Sync + 'static> = match database_info.sql_family() {
             SqlFamily::Mysql => Arc::new(sql_schema_describer::mysql::SqlSchemaDescriber::new(Arc::clone(&conn))),
             SqlFamily::Postgres => Arc::new(sql_schema_describer::postgres::SqlSchemaDescriber::new(Arc::clone(
                 &conn,
@@ -115,7 +92,7 @@ impl SqlMigrationConnector {
     }
 
     async fn create_database_impl(&self, db_name: &str) -> SqlResult<()> {
-        match self.database_info.connection_info.sql_family() {
+        match self.database_info.sql_family() {
             SqlFamily::Postgres => {
                 let query = format!("CREATE DATABASE \"{}\"", db_name);
                 self.database.query_raw(&query, &[]).await?;
@@ -133,8 +110,7 @@ impl SqlMigrationConnector {
     }
 
     async fn initialize_impl(&self) -> SqlResult<()> {
-        // TODO: this code probably does not ever do anything. The schema/db creation happens already in the helper functions above.
-        match &self.database_info.connection_info {
+        match self.database_info.connection_info() {
             ConnectionInfo::Sqlite { file_path, .. } => {
                 let path_buf = PathBuf::from(&file_path);
                 match path_buf.parent() {
@@ -167,7 +143,48 @@ impl SqlMigrationConnector {
     }
 
     fn connection_info(&self) -> &ConnectionInfo {
-        &self.database_info.connection_info
+        self.database_info.connection_info()
+    }
+
+    async fn drop_database(&self) -> ConnectorResult<()> {
+        use quaint::ast::ParameterizedValue;
+
+        catch(self.connection_info(), async {
+            match &self.connection_info() {
+                ConnectionInfo::Postgres(_) => {
+                    let sql_str = format!(r#"DROP SCHEMA "{}" CASCADE;"#, self.schema_name());
+                    debug!("{}", sql_str);
+
+                    self.conn().query_raw(&sql_str, &[]).await.ok();
+                }
+                ConnectionInfo::Sqlite { file_path, .. } => {
+                    self.conn()
+                        .execute_raw("DETACH DATABASE ?", &[ParameterizedValue::from(self.schema_name())])
+                        .await
+                        .ok();
+                    std::fs::remove_file(file_path).ok(); // ignore potential errors
+                    self.conn()
+                        .execute_raw(
+                            "ATTACH DATABASE ? AS ?",
+                            &[
+                                ParameterizedValue::from(file_path.as_str()),
+                                ParameterizedValue::from(self.schema_name()),
+                            ],
+                        )
+                        .await?;
+                }
+                ConnectionInfo::Mysql(_) => {
+                    let sql_str = format!(r#"DROP SCHEMA `{}`;"#, self.schema_name());
+                    debug!("{}", sql_str);
+                    self.conn().query_raw(&sql_str, &[]).await?;
+                }
+            };
+
+            Ok(())
+        })
+        .await?;
+
+        Ok(())
     }
 }
 
@@ -193,6 +210,8 @@ impl MigrationConnector for SqlMigrationConnector {
 
     async fn reset(&self) -> ConnectorResult<()> {
         self.migration_persistence().reset().await?;
+        self.drop_database().await?;
+
         Ok(())
     }
 
@@ -219,8 +238,8 @@ impl MigrationConnector for SqlMigrationConnector {
 
 pub(crate) async fn catch<O>(
     connection_info: &ConnectionInfo,
-    fut: impl std::future::Future<Output = std::result::Result<O, SqlError>>,
-) -> std::result::Result<O, migration_connector::ConnectorError> {
+    fut: impl std::future::Future<Output = Result<O, SqlError>>,
+) -> Result<O, ConnectorError> {
     match fut.await {
         Ok(o) => Ok(o),
         Err(sql_error) => Err(sql_error.into_connector_error(connection_info)),
@@ -243,22 +262,5 @@ fn validate_database_str(database_str: &str, provider: &str) -> ConnectorResult<
 
             Err(error)
         }
-    }
-}
-
-async fn get_database_version(connection: &Quaint, connection_info: &ConnectionInfo) -> SqlResult<Option<String>> {
-    match connection_info.sql_family() {
-        SqlFamily::Mysql => {
-            let query = r#"SELECT @@GLOBAL.version version"#;
-
-            let rows = connection.query_raw(query, &[]).await?;
-
-            let version_string = rows
-                .get(0)
-                .and_then(|row| row.get("version").and_then(|version| version.to_string()));
-
-            Ok(version_string)
-        }
-        _ => Ok(None),
     }
 }

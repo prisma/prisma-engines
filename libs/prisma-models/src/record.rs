@@ -1,4 +1,4 @@
-use crate::{DomainError as Error, PrismaValue, ScalarFieldRef};
+use crate::{DomainError, PrismaValue, ScalarFieldRef};
 
 // Collection of fields that uniquely identify a record of a model.
 // There can be different sets of fields at the same time identifying a model.
@@ -208,7 +208,7 @@ impl Record {
 
     pub fn get_field_value(&self, field_names: &[String], field: &str) -> crate::Result<&PrismaValue> {
         let index = field_names.iter().position(|r| r == field).map(Ok).unwrap_or_else(|| {
-            Err(Error::FieldNotFound {
+            Err(DomainError::FieldNotFound {
                 name: field.to_string(),
                 model: String::new(),
             })

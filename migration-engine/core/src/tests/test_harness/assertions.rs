@@ -70,6 +70,14 @@ impl<'a> TableAssertion<'a> {
         Ok(self)
     }
 
+    pub fn assert_has_fk(self, fk: &ForeignKey) -> AssertionResult<Self> {
+        let matching_fk = self.0.foreign_keys.iter().any(|found| found == fk);
+
+        anyhow::ensure!(matching_fk, "Assertion failed. Could not find fk.");
+
+        Ok(self)
+    }
+
     pub fn assert_fk_on_columns<F>(self, columns: &[&str], fk_assertions: F) -> AssertionResult<Self>
     where
         F: FnOnce(ForeignKeyAssertion<'a>) -> AssertionResult<ForeignKeyAssertion<'a>>,
@@ -158,7 +166,49 @@ pub struct ColumnAssertion<'a>(&'a Column);
 
 impl<'a> ColumnAssertion<'a> {
     pub fn assert_default(self, expected: Option<&str>) -> AssertionResult<Self> {
-        assert_eq!(self.0.default.as_ref().map(String::as_str), expected);
+        let found = self.0.default.as_ref().map(String::as_str);
+
+        anyhow::ensure!(
+            found == expected,
+            "Assertion failed. Expected default: {:?}, but found {:?}",
+            expected,
+            found
+        );
+
+        Ok(self)
+    }
+
+    pub fn assert_type_is_string(self) -> AssertionResult<Self> {
+        let found = &self.0.tpe.family;
+
+        anyhow::ensure!(
+            found == &sql_schema_describer::ColumnTypeFamily::String,
+            "Assertion failed. Expected a string column, got {:?}.",
+            found
+        );
+
+        Ok(self)
+    }
+
+    pub fn assert_type_is_int(self) -> AssertionResult<Self> {
+        let found = &self.0.tpe.family;
+
+        anyhow::ensure!(
+            found == &sql_schema_describer::ColumnTypeFamily::Int,
+            "Assertion failed. Expected an integer column, got {:?}.",
+            found
+        );
+
+        Ok(self)
+    }
+
+    pub fn assert_is_required(self) -> AssertionResult<Self> {
+        anyhow::ensure!(
+            self.0.tpe.arity.is_required(),
+            "Assertion failed. Expected column `{}` to be NOT NULL, got {:?}",
+            self.0.name,
+            self.0.tpe.arity,
+        );
 
         Ok(self)
     }

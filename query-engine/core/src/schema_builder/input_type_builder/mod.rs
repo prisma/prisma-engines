@@ -102,7 +102,7 @@ pub trait InputTypeBuilderBase<'a>: CachedBuilder<InputObjectType> + InputBuilde
             .fields()
             .scalar()
             .iter()
-            .filter(|f| (f.unique() && !f.is_hidden) || f.is_id())
+            .filter(|f| f.unique() || f.is_id())
             .map(|f| Arc::clone(f))
             .collect();
 
@@ -119,7 +119,7 @@ pub trait InputTypeBuilderBase<'a>: CachedBuilder<InputObjectType> + InputBuilde
                 let typ = self.compound_field_unique_object_type(index.name.as_ref(), index.fields());
                 let name = compound_index_field_name(index);
 
-                input_field(name, InputType::object(typ), None)
+                input_field(name, InputType::opt(InputType::object(typ)), None)
             })
             .collect();
 

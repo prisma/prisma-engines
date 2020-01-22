@@ -57,9 +57,7 @@ pub struct DatabaseTimeout {
 #[serde(untagged)]
 #[user_facing(code = "P1003")]
 pub enum DatabaseDoesNotExist {
-    #[user_facing(
-        message = "Database ${database_file_name} does not exist on the database server at ${database_file_path}"
-    )]
+    #[user_facing(message = "Database ${database_file_name} does not exist at ${database_file_path}")]
     Sqlite {
         database_file_name: String,
         database_file_path: String,
@@ -113,7 +111,7 @@ pub struct UnableToStartTheQueryEngine {
 #[user_facing(
     code = "P1006",
     message = "\
-Photon binary for current platform `${platform}` could not be found. Make sure to adjust the generator configuration in the schema.prisma file.
+Query engine binary for current platform `${platform}` could not be found. Make sure to adjust the generator configuration in the Prisma schema file.
 
 ${generator_config}
 
@@ -191,10 +189,7 @@ mod tests {
             database_file_name: "dev.db".into(),
         };
 
-        assert_eq!(
-            sqlite_err.message(),
-            "Database dev.db does not exist on the database server at /tmp/dev.db"
-        );
+        assert_eq!(sqlite_err.message(), "Database dev.db does not exist at /tmp/dev.db");
 
         let mysql_err = DatabaseDoesNotExist::Mysql {
             database_name: "root".into(),

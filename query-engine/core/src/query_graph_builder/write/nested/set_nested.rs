@@ -2,7 +2,7 @@ use super::*;
 use crate::{query_ast::*, query_graph::*, InputAssertions, ParsedInputValue};
 use connector::{Filter, ScalarCompare};
 use itertools::Itertools;
-use prisma_models::{GraphqlId, ModelRef, PrismaValue, RelationFieldRef};
+use prisma_models::{GraphqlId, ModelRef, PrismaValue, PrismaValueExtensions, RelationFieldRef};
 use std::{collections::HashSet, convert::TryInto, iter::FromIterator, sync::Arc};
 
 /// Only for x-to-many relations.
@@ -116,7 +116,7 @@ fn handle_many_to_many(
     //         }?;
 
     //         if let Node::Query(Query::Write(WriteQuery::DisconnectRecords(ref mut c))) = child_node {
-    //             c.parent_id = Some(parent_id.try_into()?);
+    //             c.parent_id = Some(parent_id.into_graphql_id()?);
     //         }
 
     //         Ok(child_node)
@@ -154,7 +154,6 @@ fn handle_many_to_many(
     // }
 
     // Ok(())
-
     todo!()
 }
 

@@ -5,20 +5,20 @@ authors = ["Marcus Böhm <boehm@prisma.io>"]
 edition = "2018"
 
 [dependencies]
+anyhow = "1.0.26"
 async-trait = "0.1.17"
-migration-connector = { path = "../migration-connector" }
-sql-schema-describer = { path = "../../../libs/sql-schema-describer" }
-datamodel = { path = "../../../libs/datamodel/core" }
-prisma-models = { path = "../../../libs/prisma-models" }
-chrono = { version = "0.4" }
-serde_json = "1.0"
-serde = "1.0"
 barrel = { version = "0.6.5-alpha.0", features = ["sqlite3", "mysql", "pg"] }
+chrono = { version = "0.4" }
+datamodel = { path = "../../../libs/datamodel/core" }
 itertools = "0.8"
-user-facing-errors = { path = "../../../libs/user-facing-errors" }
+migration-connector = { path = "../migration-connector" }
+prisma-models = { path = "../../../libs/prisma-models" }
+quaint = { version = "0.1", features = ["single"] }
+serde = "1.0"
+serde_json = "1.0"
+sql-schema-describer = { path = "../../../libs/sql-schema-describer" }
+thiserror = "1.0.9"
+tokio = { version = "0.2", features = ["time"] }
 tracing = "0.1.10"
 tracing-futures = "0.2.0"
-tokio = { version = "0.2", features = ["time"] }
-anyhow = "1.0.26"
-thiserror = "1.0.9"
-quaint = { version = "0.1", features = ["single"] }
+user-facing-errors = { path = "../../../libs/user-facing-errors", features = ["sql"] }

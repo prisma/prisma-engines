@@ -13,6 +13,7 @@ use hyper::{Body, Error, Method, Request, Response, Server, StatusCode};
 use query_core::schema::QuerySchemaRenderer;
 use serde_json::json;
 use std::{sync::Arc, time::Instant};
+use std::net::{SocketAddr};
 
 #[derive(RustEmbed)]
 #[folder = "query-engine/prisma/static_files"]
@@ -26,7 +27,7 @@ pub(crate) struct RequestContext {
 pub struct HttpServer;
 
 impl HttpServer {
-    pub async fn run(address: ([u8; 4], u16), legacy_mode: bool) -> PrismaResult<()> {
+    pub async fn run(address: SocketAddr, legacy_mode: bool) -> PrismaResult<()> {
         let now = Instant::now();
 
         let ctx = Arc::new(RequestContext {
@@ -40,7 +41,6 @@ impl HttpServer {
             async { Ok::<_, Error>(service_fn(move |req| Self::routes(ctx.clone(), req))) }
         });
 
-        let address = address.into();
         let server = Server::bind(&address).serve(service);
 
         trace!("Initialized in {}ms", now.elapsed().as_millis());

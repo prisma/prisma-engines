@@ -1,4 +1,7 @@
+pub(crate) use column::{ColumnChange, ColumnDiffer};
+
 mod column;
+mod index;
 mod table;
 
 use crate::*;
@@ -12,6 +15,7 @@ const MIGRATION_TABLE_NAME: &str = "_Migration";
 pub struct SqlSchemaDiffer<'a> {
     previous: &'a SqlSchema,
     next: &'a SqlSchema,
+    sql_family: SqlFamily,
 }
 
 #[derive(Debug, Clone)]
@@ -47,8 +51,12 @@ impl SqlSchemaDiff {
 }
 
 impl<'schema> SqlSchemaDiffer<'schema> {
-    pub fn diff(previous: &SqlSchema, next: &SqlSchema) -> SqlSchemaDiff {
-        let differ = SqlSchemaDiffer { previous, next };
+    pub fn diff(previous: &SqlSchema, next: &SqlSchema, sql_family: SqlFamily) -> SqlSchemaDiff {
+        let differ = SqlSchemaDiffer {
+            previous,
+            next,
+            sql_family,
+        };
         differ.diff_internal()
     }
 
@@ -60,8 +68,8 @@ impl<'schema> SqlSchemaDiffer<'schema> {
             drop_tables: self.drop_tables(),
             create_tables: self.create_tables(),
             alter_tables: self.alter_tables(),
-            create_indexes: self.create_indexes(&alter_indexes),
-            drop_indexes: self.drop_indexes(&alter_indexes).collect(),
+            create_indexes: self.create_indexes(),
+            drop_indexes: self.drop_indexes(),
             alter_indexes,
         }
     }
@@ -75,16 +83,11 @@ impl<'schema> SqlSchemaDiffer<'schema> {
     }
 
     fn drop_tables(&self) -> Vec<DropTable> {
-        let mut result = Vec::new();
-        for previous_table in &self.previous.tables {
-            if !self.next.has_table(&previous_table.name) && previous_table.name != MIGRATION_TABLE_NAME {
-                let drop = DropTable {
-                    name: previous_table.name.clone(),
-                };
-                result.push(drop);
-            }
-        }
-        result
+        self.dropped_tables()
+            .map(|dropped_table| DropTable {
+                name: dropped_table.name.clone(),
+            })
+            .collect()
     }
 
     fn add_foreign_keys(&self) -> Vec<AddForeignKey> {
@@ -180,78 +183,64 @@ impl<'schema> SqlSchemaDiffer<'schema> {
             })
     }
 
-    fn create_indexes(&self, alter_indexes: &[AlterIndex]) -> Vec<CreateIndex> {
-        let mut result = Vec::new();
-        for next_table in &self.next.tables {
-            for index in &next_table.indices {
-                // TODO: must diff index settings
-                let previous_index_opt = self
-                    .previous
-                    .table(&next_table.name)
-                    .ok()
-                    .and_then(|t| t.indices.iter().find(|i| i.name == index.name));
-                let index_was_altered = alter_indexes.iter().any(|altered| altered.index_new_name == index.name);
-                if previous_index_opt.is_none() && !index_was_altered {
-                    let create = CreateIndex {
-                        table: next_table.name.clone(),
-                        index: index.clone(),
-                    };
-                    result.push(create);
-                }
+    fn create_indexes(&self) -> Vec<CreateIndex> {
+        let mut steps = Vec::new();
+
+        for table in self.created_tables() {
+            for index in &table.indices {
+                let create = CreateIndex {
+                    table: table.name.clone(),
+                    index: index.clone(),
+                };
+
+                steps.push(create)
             }
         }
-        result
+
+        for tables in self.table_pairs() {
+            for index in tables.created_indexes() {
+                let create = CreateIndex {
+                    table: tables.next.name.clone(),
+                    index: index.clone(),
+                };
+
+                steps.push(create)
+            }
+        }
+
+        steps
     }
 
-    fn drop_indexes<'a>(&'a self, alter_indexes: &'a [AlterIndex]) -> impl Iterator<Item = DropIndex> + 'a {
-        self.previous.tables.iter().flat_map(move |previous_table| {
-            previous_table.indices.iter().filter_map(move |index| {
-                // TODO: must diff index settings
-                let next_index_opt = self
-                    .next
-                    .table(&previous_table.name)
-                    .ok()
-                    .and_then(|t| t.indices.iter().find(|i| i.name == index.name));
+    fn drop_indexes<'a>(&'a self) -> Vec<DropIndex> {
+        let mut drop_indexes = Vec::new();
 
-                let index_was_altered = alter_indexes.iter().any(|altered| altered.index_name == index.name);
-                let index_was_dropped = next_index_opt.is_none() && !index_was_altered;
-
-                if !index_was_dropped {
-                    return None;
+        for tables in self.table_pairs() {
+            for index in tables.dropped_indexes() {
+                // On MySQL, foreign keys automatically create indexes. These foreign-key-created
+                // indexes should only be dropped as part of the foreign key.
+                if self.sql_family.is_mysql() && index::index_covers_fk(&tables.previous, index) {
+                    continue
                 }
-
-                // If index covers PK, ignore it
-                let index_covers_pk = match &previous_table.primary_key {
-                    None => false,
-                    Some(pk) => pk.columns == index.columns,
-                };
-
-                if index_covers_pk {
-                    debug!(
-                        "Not dropping index '{}' on table '{}' since it covers PK",
-                        index.name, previous_table.name
-                    );
-
-                    return None;
-                }
-
-                let drop = DropIndex {
-                    table: previous_table.name.clone(),
+                drop_indexes.push(DropIndex {
+                    table: tables.previous.name.clone(),
                     name: index.name.clone(),
-                };
+                })
+            }
+        }
 
-                Some(drop)
-            })
-        })
+        drop_indexes
     }
 
     /// An iterator over the tables that are present in both schemas.
-    fn table_pairs<'a>(&'a self) -> impl Iterator<Item = TableDiffer<'schema>> + 'a {
+    fn table_pairs<'a>(&'a self) -> impl Iterator<Item = TableDiffer<'schema>> + 'a
+    where
+        'schema: 'a,
+    {
         self.previous.tables.iter().filter_map(move |previous_table| {
             self.next
                 .tables
                 .iter()
-                .find(move |next_table| next_table.name == previous_table.name)
+                .find(move |next_table| tables_match(previous_table, next_table))
                 .map(move |next_table| TableDiffer {
                     previous: previous_table,
                     next: next_table,
@@ -275,9 +264,30 @@ impl<'schema> SqlSchemaDiffer<'schema> {
     }
 
     fn created_tables<'a>(&'a self) -> impl Iterator<Item = &'a Table> + 'a {
-        self.next.tables.iter().filter(move |next_table| {
-            !self.previous.has_table(&next_table.name) && next_table.name != MIGRATION_TABLE_NAME
+        self.next_tables()
+            .filter(move |next_table| !self.previous.has_table(&next_table.name))
+    }
+
+    fn dropped_tables(&self) -> impl Iterator<Item = &Table> {
+        self.previous_tables().filter(move |previous_table| {
+            !self
+                .next_tables()
+                .any(|next_table| tables_match(previous_table, next_table))
         })
+    }
+
+    fn previous_tables(&self) -> impl Iterator<Item = &Table> {
+        self.previous
+            .tables
+            .iter()
+            .filter(|table| table.name != MIGRATION_TABLE_NAME)
+    }
+
+    fn next_tables(&self) -> impl Iterator<Item = &Table> {
+        self.next
+            .tables
+            .iter()
+            .filter(|table| table.name != MIGRATION_TABLE_NAME)
     }
 }
 
@@ -322,4 +332,8 @@ fn foreign_keys_match(previous: &ForeignKey, next: &ForeignKey) -> bool {
         && previous.referenced_columns == next.referenced_columns
         && previous.columns == next.columns
         && previous.on_delete_action == next.on_delete_action
+}
+
+fn tables_match(previous: &Table, next: &Table) -> bool {
+    previous.name == next.name
 }

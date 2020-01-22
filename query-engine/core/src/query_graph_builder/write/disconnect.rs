@@ -3,8 +3,8 @@ use crate::{
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
     QueryGraphBuilderError, QueryGraphBuilderResult,
 };
-use prisma_models::RelationFieldRef;
-use std::sync::Arc;
+use prisma_models::{PrismaValueExtensions, RelationFieldRef};
+use std::{convert::TryInto, sync::Arc};
 
 /// Only for many to many relations.
 ///

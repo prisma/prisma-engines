@@ -135,7 +135,7 @@ fn render_raw_sql(
     use itertools::Itertools;
 
     let sql_family = renderer.sql_family();
-    let schema_name = database_info.connection_info.schema_name().to_string();
+    let schema_name = database_info.connection_info().schema_name().to_string();
 
     match step {
         SqlMigrationStep::CreateTable(CreateTable { table }) => {
@@ -256,15 +256,32 @@ fn render_raw_sql(
                         lines.push(format!("DROP COLUMN {}", name));
                     }
                     TableChange::AlterColumn(AlterColumn { name, column }) => {
-                        let name = renderer.quote(&name);
-                        lines.push(format!("DROP COLUMN {}", name));
-                        let col_sql = renderer.render_column(&schema_name, &table, &column, true);
-                        lines.push(format!("ADD COLUMN {}", col_sql));
+                        match safe_alter_column(
+                            renderer,
+                            current_schema.get_table(&table.name).unwrap().column(&name).unwrap(),
+                            &column,
+                        ) {
+                            Some(safe_sql) => {
+                                for line in safe_sql {
+                                    lines.push(line)
+                                }
+                            }
+                            None => {
+                                let name = renderer.quote(&name);
+                                lines.push(format!("DROP COLUMN {}", name));
+                                let col_sql = renderer.render_column(&schema_name, &table, &column, true);
+                                lines.push(format!("ADD COLUMN {}", col_sql));
+                            }
+                        }
                     }
                     TableChange::DropForeignKey(DropForeignKey { constraint_name }) => match sql_family {
                         SqlFamily::Mysql => {
                             let constraint_name = renderer.quote(&constraint_name);
                             lines.push(format!("DROP FOREIGN KEY {}", constraint_name));
+                        }
+                        SqlFamily::Postgres => {
+                            let constraint_name = renderer.quote(&constraint_name);
+                            lines.push(format!("DROP CONSTRAINT IF EXiSTS {}", constraint_name));
                         }
                         _ => (),
                     },
@@ -355,14 +372,14 @@ fn render_create_index(
         IndexType::Unique => "UNIQUE",
         IndexType::Normal => "",
     };
-    let sql_family = database_info.connection_info.sql_family();
+    let sql_family = database_info.sql_family();
     let index_name = match sql_family {
-        SqlFamily::Sqlite => renderer.quote_with_schema(database_info.connection_info.schema_name(), &name),
+        SqlFamily::Sqlite => renderer.quote_with_schema(database_info.connection_info().schema_name(), &name),
         _ => renderer.quote(&name),
     };
     let table_reference = match sql_family {
         SqlFamily::Sqlite => renderer.quote(table_name),
-        _ => renderer.quote_with_schema(database_info.connection_info.schema_name(), table_name),
+        _ => renderer.quote_with_schema(database_info.connection_info().schema_name(), table_name),
     };
     let columns: Vec<String> = columns.iter().map(|c| renderer.quote(c)).collect();
 
@@ -396,4 +413,50 @@ fn create_table_suffix(sql_family: SqlFamily) -> &'static str {
         SqlFamily::Postgres => "",
         SqlFamily::Mysql => "\nDEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci",
     }
+}
+
+fn safe_alter_column(
+    renderer: &dyn SqlRenderer,
+    previous_column: &Column,
+    next_column: &Column,
+) -> Option<Vec<String>> {
+    use crate::sql_migration::expanded_alter_column::*;
+
+    let expanded = crate::sql_migration::expanded_alter_column::expand_alter_column(
+        previous_column,
+        next_column,
+        &renderer.sql_family(),
+    )?;
+
+    let alter_column_prefix = format!("ALTER COLUMN {}", renderer.quote(&previous_column.name));
+
+    let steps = match expanded {
+        ExpandedAlterColumn::Postgres(steps) => steps
+            .into_iter()
+            .map(|step| match step {
+                PostgresAlterColumn::DropDefault => format!("{} DROP DEFAULT", &alter_column_prefix),
+                PostgresAlterColumn::SetDefault(new_default) => {
+                    format!("{} SET DEFAULT '{}'", &alter_column_prefix, new_default)
+                }
+                PostgresAlterColumn::DropNotNull => format!("{} DROP NOT NULL", &alter_column_prefix),
+                PostgresAlterColumn::SetType(ty) => format!(
+                    "{} SET DATA TYPE {}",
+                    &alter_column_prefix,
+                    renderer.render_column_type(&ty)
+                ),
+            })
+            .collect(),
+        ExpandedAlterColumn::Mysql(steps) => steps
+            .into_iter()
+            .map(|step| match step {
+                MysqlAlterColumn::DropDefault => format!("{} DROP DEFAULT", &alter_column_prefix),
+                MysqlAlterColumn::SetDefault(new_default) => {
+                    format!("{} SET DEFAULT '{}'", &alter_column_prefix, new_default)
+                }
+            })
+            .collect(),
+        ExpandedAlterColumn::Sqlite(_steps) => vec![],
+    };
+
+    Some(steps)
 }

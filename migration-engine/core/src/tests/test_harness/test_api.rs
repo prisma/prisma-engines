@@ -67,7 +67,7 @@ impl TestApi {
     }
 
     /// Render a table name with the required prefixing for use with quaint query building.
-    pub fn render_table_name(&self, table_name: &str) -> quaint::ast::Table {
+    pub fn render_table_name<'a>(&self, table_name: &'a str) -> quaint::ast::Table<'a> {
         (self.schema_name().to_owned(), table_name.to_owned()).into()
     }
 
@@ -123,12 +123,7 @@ impl TestApi {
     }
 
     pub fn infer<'a>(&'a self, dm: impl Into<String>) -> Infer<'a> {
-        Infer {
-            datamodel: dm.into(),
-            api: &self.api,
-            assume_to_be_applied: None,
-            migration_id: None,
-        }
+        Infer::new(&self.api, dm)
     }
 
     pub(crate) fn apply<'a>(&'a self) -> Apply<'a> {
@@ -194,6 +189,10 @@ impl TestApi {
             quaint::ast::Select::from_table(self.render_table_name(table_name)).value(quaint::ast::asterisk());
 
         self.database.query(select_star.into()).await
+    }
+
+    pub fn insert<'a>(&self, table_name: &'a str) -> quaint::ast::SingleRowInsert<'a> {
+        quaint::ast::Insert::single_into(self.render_table_name(table_name))
     }
 }
 
