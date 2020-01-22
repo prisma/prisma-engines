@@ -28,18 +28,31 @@ trait SchemaBaseV11 extends PlayJsonExtensions {
 
   // parse functions
 
-  def parse(subpath: String): ((JsValue, String) => String) = {
+  def parse(subpath: String): (JsValue, String) => String = {
     def test(input: JsValue, path: String): String = {
       input.identifierAtPath(path, subpath, list = false)
     }
     test
   }
-  def parseFirst(subpath: String): ((JsValue, String) => String) = {
+
+  def parseFirst(subpath: String): (JsValue, String) => String = {
     def test(input: JsValue, path: String): String = {
       input.identifierAtPath(path, subpath, list = true)
     }
     test
   }
+
+  def parseAll(): (JsValue, String) => String = {
+    def test(input: JsValue, path: String): String = {
+      input.pathAsJsArray(path).toString()
+        .replace("{\"c\":","{c:")
+        .replace("{\"p\":","{p:")
+        .replace("{\"id\":","{id:")
+        }
+    test
+  }
+
+
 
   sealed trait RelationField {
     def field: String
@@ -69,12 +82,12 @@ trait SchemaBaseV11 extends PlayJsonExtensions {
   def schemaWithRelation(onParent: RelationField, onChild: RelationField) = {
 
     //Query Params
-    val idParams         = QueryParams("id", "id", parse(".id"), parseFirst("id"))
-    val compoundIdParams = QueryParams("id_1_id_2", "id_1 , id_2", parse(""), parseFirst(""))
+    val idParams         = QueryParams("id", "id", parse(".id"), parseFirst("id"), parseAll())
+    val compoundIdParams = QueryParams("id_1_id_2", "id_1 , id_2", parse(""), parseFirst(""), parseAll())
     val parentUniqueParams =
-      Vector(QueryParams("p", "p", parse(".p"), parseFirst("p")), QueryParams("p_1_p_2", "p_1, p_2", parse(""), parseFirst("")))
+      Vector(QueryParams("p", "p", parse(".p"), parseFirst("p"), parseAll()), QueryParams("p_1_p_2", "p_1, p_2", parse(""), parseFirst(""), parseAll()))
     val childUniqueParams =
-      Vector(QueryParams("c", "c", parse(".c"), parseFirst("c")), QueryParams("c_1_c_2", "c_1, c_2", parse(""), parseFirst("")))
+      Vector(QueryParams("c", "c", parse(".c"), parseFirst("c"), parseAll()), QueryParams("c_1_c_2", "c_1, c_2", parse(""), parseFirst(""), parseAll()))
 
     //todo for testing enable generating simple case, all single ids
     val simple = true

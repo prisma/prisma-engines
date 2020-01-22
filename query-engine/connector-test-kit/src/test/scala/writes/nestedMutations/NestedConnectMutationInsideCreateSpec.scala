@@ -25,7 +25,7 @@ class NestedConnectMutationInsideCreateSpec extends FlatSpec with Matchers with 
             |    }
             |  }){
             |    childReq{
-            |       ${t.child.returnValue}
+            |       ${t.child.selection}
             |    }
             |  }
             |}""".stripMargin,
@@ -41,7 +41,7 @@ class NestedConnectMutationInsideCreateSpec extends FlatSpec with Matchers with 
            |mutation {
            |  createParent(data:{
            |    p: "p2"
-           |    childReq: {connect: {${t.child.identifierName}: "$child1Id"}}
+           |    childReq: {connect: {${t.child.identifier}: "$child1Id"}}
            |  }){
            |    childReq {
            |      c
@@ -77,7 +77,7 @@ class NestedConnectMutationInsideCreateSpec extends FlatSpec with Matchers with 
             |    }
             |  }){
             |    childReq{
-            |       ${t.child.returnValue}
+            |       ${t.child.selection}
             |    }
             |  }
             |}""".stripMargin,
@@ -93,7 +93,7 @@ class NestedConnectMutationInsideCreateSpec extends FlatSpec with Matchers with 
            |mutation {
            |  createParent(data:{
            |    p: "p2"
-           |    childReq: {connect: {${t.child.identifierName}: "$child1Id"}}
+           |    childReq: {connect: {${t.child.identifier}: "$child1Id"}}
            |  }){
            |    childReq {
            |      c
@@ -123,7 +123,7 @@ class NestedConnectMutationInsideCreateSpec extends FlatSpec with Matchers with 
             s"""mutation {
           |  createChild(data: {c: "looseChild"})
           |  {
-          |    ${t.child.returnValue}
+          |    ${t.child.selection}
           |  }
           |}""".stripMargin,
             project
@@ -140,7 +140,7 @@ class NestedConnectMutationInsideCreateSpec extends FlatSpec with Matchers with 
            |    p: "otherParent"
            |    childReq: {create: {c: "otherChild"}}
            |  }){
-           |     ${t.parent.returnValue}
+           |     ${t.parent.selection}
            |  }
            |}
       """.stripMargin,
@@ -155,7 +155,7 @@ class NestedConnectMutationInsideCreateSpec extends FlatSpec with Matchers with 
             s"""mutation {
           |  createChild(data: {c: "c1"})
           |  {
-          |     ${t.child.returnValue}
+          |     ${t.child.selection}
           |  }
           |}""".stripMargin,
             project
@@ -170,7 +170,7 @@ class NestedConnectMutationInsideCreateSpec extends FlatSpec with Matchers with 
          |mutation {
          |  createParent(data:{
          |    p: "p2"
-         |    childReq: {connect: {${t.child.identifierName}: "$child1Id"}}
+         |    childReq: {connect: {${t.child.identifier}: "$child1Id"}}
          |  }){
          |    childReq {
          |      c
@@ -190,7 +190,7 @@ class NestedConnectMutationInsideCreateSpec extends FlatSpec with Matchers with 
         .query(
           s"""
            |{
-           |  parent(where: {${t.parent.identifierName}: "$otherParentWithChildId"}){
+           |  parent(where: {${t.parent.identifier}: "$otherParentWithChildId"}){
            |    childReq {
            |      c
            |    }
@@ -205,7 +205,7 @@ class NestedConnectMutationInsideCreateSpec extends FlatSpec with Matchers with 
         .query(
           s"""
            |{
-           |  child(where: {${t.child.identifierName}: "$looseChildId"}){
+           |  child(where: {${t.child.identifier}: "$looseChildId"}){
            |    c
            |  }
            |}
@@ -234,7 +234,7 @@ class NestedConnectMutationInsideCreateSpec extends FlatSpec with Matchers with 
             |    }
             |  }){
             |    childOpt{
-            |        ${t.child.returnValue}
+            |        ${t.child.selection}
             |    }
             |  }
             |}""".stripMargin,
@@ -250,7 +250,7 @@ class NestedConnectMutationInsideCreateSpec extends FlatSpec with Matchers with 
            |mutation {
            |  createParent(data:{
            |    p: "p2"
-           |    childOpt: {connect: {${t.child.identifierName}: "$child1Id"}}
+           |    childOpt: {connect: {${t.child.identifier}: "$child1Id"}}
            |  }){
            |    childOpt {
            |      c
@@ -280,7 +280,7 @@ class NestedConnectMutationInsideCreateSpec extends FlatSpec with Matchers with 
             s"""mutation {
             |  createChild(data: {c: "c1"})
             |  {
-            |     ${t.child.returnValue}
+            |     ${t.child.selection}
             |  }
             |}""".stripMargin,
             project
@@ -295,7 +295,7 @@ class NestedConnectMutationInsideCreateSpec extends FlatSpec with Matchers with 
            |mutation {
            |  createParent(data:{
            |    p: "p2"
-           |    childOpt: {connect: {${t.child.identifierName}: "$child1Id"}}
+           |    childOpt: {connect: {${t.child.identifier}: "$child1Id"}}
            |  }){
            |    childOpt {
            |      c
@@ -331,7 +331,7 @@ class NestedConnectMutationInsideCreateSpec extends FlatSpec with Matchers with 
           |    }
           |  }){
           |    childrenOpt{
-          |        ${t.child.returnValue}
+          |        ${t.child.selection}
           |    }
           |  }
           |}""".stripMargin,
@@ -347,7 +347,7 @@ class NestedConnectMutationInsideCreateSpec extends FlatSpec with Matchers with 
            |mutation {
            |  createParent(data:{
            |    p: "p2"
-           |    childrenOpt: {connect: {${t.child.identifierName}: "$child"}}
+           |    childrenOpt: {connect: {${t.child.identifier}: "$child"}}
            |  }){
            |    childrenOpt {
            |      c
@@ -382,7 +382,7 @@ class NestedConnectMutationInsideCreateSpec extends FlatSpec with Matchers with 
           |    }
           |  }){
           |    childOpt{
-          |        ${t.child.returnValue}
+          |        ${t.child.selection}
           |    }
           |  }
           |}""".stripMargin,
@@ -398,7 +398,7 @@ class NestedConnectMutationInsideCreateSpec extends FlatSpec with Matchers with 
            |mutation {
            |  createParent(data:{
            |    p: "p2"
-           |    childOpt: {connect: {${t.child.identifierName}: "$child"}}
+           |    childOpt: {connect: {${t.child.identifier}: "$child"}}
            |  }){
            |    childOpt {
            |      c

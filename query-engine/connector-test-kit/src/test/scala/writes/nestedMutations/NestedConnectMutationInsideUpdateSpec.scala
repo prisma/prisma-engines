@@ -25,7 +25,7 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
              |    }
              |  }){
              |    childReq{
-             |       ${t.child.returnValue}
+             |       ${t.child.selection}
              |    }
              |  }
              |}""",
@@ -44,7 +44,7 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
              |      create: {c: "c2", c_1: "c", c_2: "2"}
              |    }
              |  }){
-             |  ${t.parent.returnValue}
+             |  ${t.parent.selection}
              |  }
              |}""",
             project
@@ -57,9 +57,9 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
       server.queryThatMustFail(
         s"""mutation {
            |  updateParent(
-           |  where: {${t.parent.identifierName}: "$parentIdentifier"}
+           |  where: {${t.parent.identifier}: "$parentIdentifier"}
            |  data:{
-           |    childReq: {connect: { ${t.child.identifierName}: "$childIdentifier"}}
+           |    childReq: {connect: { ${t.child.identifier}: "$childIdentifier"}}
            |  }){
            |    childReq {
            |      c
@@ -94,7 +94,7 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
             |    }
             |  }){
             |    childReq{
-            |       ${t.child.returnValue}
+            |       ${t.child.selection}
             |    }
             |  }
             |}""",
@@ -113,7 +113,7 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
             |      create: {c: "c2"}
             |    }
             |  }){
-            |    ${t.parent.returnValue}
+            |    ${t.parent.selection}
             |  }
             |}""",
             project
@@ -126,9 +126,9 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
       server.queryThatMustFail(
         s"""mutation {
            |  updateParent(
-           |  where: {${t.parent.identifierName}: "$parentId2"}
+           |  where: {${t.parent.identifier}: "$parentId2"}
            |  data:{
-           |    childReq: {connect: {${t.child.identifierName}: "$child1Id"}}
+           |    childReq: {connect: {${t.child.identifier}: "$child1Id"}}
            |  }){
            |    childReq {
            |      c
@@ -159,7 +159,7 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
             s"""mutation {
             |  createChild(data: {c: "looseChild"})
             |  {
-            |    ${t.child.returnValue}
+            |    ${t.child.selection}
             |  }
             |}""".stripMargin,
             project
@@ -176,7 +176,7 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
              |    p: "otherParent"
              |    childReq: {create: {c: "otherChild"}}
              |  }){
-             |    ${t.parent.returnValue}
+             |    ${t.parent.selection}
              |  }
              |}
       """.stripMargin,
@@ -191,7 +191,7 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
             s"""mutation {
             |  createChild(data: {c: "c1"})
             |  {
-            |    ${t.child.returnValue}
+            |    ${t.child.selection}
             |  }
             |}""",
             project
@@ -209,7 +209,7 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
             |      create: {c: "c2"}
             |    }
             |  }){
-            |     ${t.parent.returnValue}
+            |     ${t.parent.selection}
             |  }
             |}""",
             project
@@ -223,10 +223,10 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
         s"""
            |mutation {
            |  updateParent(
-           |  where: {${t.parent.identifierName}: "$parentId"}
+           |  where: {${t.parent.identifier}: "$parentId"}
            |  data:{
            |    p: "p2"
-           |    childReq: {connect: {${t.child.identifierName}: "$child1Id"}}
+           |    childReq: {connect: {${t.child.identifier}: "$child1Id"}}
            |  }){
            |    childReq {
            |      c
@@ -246,7 +246,7 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
         .query(
           s"""
              |{
-             |  parent(where: {${t.parent.identifierName}: "${otherParentWithChildId}"}){
+             |  parent(where: {${t.parent.identifier}: "${otherParentWithChildId}"}){
              |    childReq {
              |      c
              |    }
@@ -261,7 +261,7 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
         .query(
           s"""
              |{
-             |  child(where: {${t.child.identifierName}: "${looseChildId}"}){
+             |  child(where: {${t.child.identifier}: "${looseChildId}"}){
              |    c
              |  }
              |}
@@ -285,7 +285,7 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
             s"""mutation {
             |  createChild(data: {c: "looseChild"})
             |  {
-            |    ${t.child.returnValue}
+            |    ${t.child.selection}
             |  }
             |}""".stripMargin,
             project
@@ -302,7 +302,7 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
              |    p: "otherParent"
              |    childOpt: {create: {c: "otherChild"}}
              |  }){
-             |    ${t.parent.returnValue}
+             |    ${t.parent.selection}
              |  }
              |}
       """.stripMargin,
@@ -322,7 +322,7 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
             |    }
             |  }){
             |    childOpt{
-            |       ${t.child.returnValue}
+            |       ${t.child.selection}
             |    }
             |  }
             |}""",
@@ -341,7 +341,7 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
             |      create: {c: "c2"}
             |    }
             |  }){
-            |    ${t.parent.returnValue}
+            |    ${t.parent.selection}
             |  }
             |}""",
             project
@@ -355,10 +355,10 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
         s"""
            |mutation {
            |  updateParent(
-           |  where:{${t.parent.identifierName}: "$parentId2"}
+           |  where:{${t.parent.identifier}: "$parentId2"}
            |  data:{
            |    p: "p2"
-           |    childOpt: {connect: {${t.child.identifierName}: "$child1Id"}}
+           |    childOpt: {connect: {${t.child.identifier}: "$child1Id"}}
            |  }){
            |    childOpt {
            |      c
@@ -379,7 +379,7 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
         .query(
           s"""
              |{
-             |  parent(where: {${t.parent.identifierName}: "${otherParentWithChildId}"}){
+             |  parent(where: {${t.parent.identifier}: "${otherParentWithChildId}"}){
              |    childOpt {
              |      c
              |    }
@@ -394,7 +394,7 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
         .query(
           s"""
              |{
-             |  child(where: {${t.child.identifierName}: "${looseChildId}"}){
+             |  child(where: {${t.child.identifier}: "${looseChildId}"}){
              |    c
              |  }
              |}
@@ -418,7 +418,7 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
             s"""mutation {
             |  createChild(data: {c: "c1"})
             |  {
-            |    ${t.child.returnValue}
+            |    ${t.child.selection}
             |  }
             |}""",
             project
@@ -479,7 +479,7 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
             s"""mutation {
             |  createChild(data: {c: "c1"})
             |  {
-            |    ${t.child.returnValue}
+            |    ${t.child.selection}
             |  }
             |}""",
             project
@@ -700,7 +700,7 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
              |    p: "otherParent"
              |    childrenOpt: {create: {c: "otherChild"}}
              |  }){
-             |     ${t.parent.returnValue}
+             |     ${t.parent.selection}
              |  }
              |}
       """.stripMargin,
@@ -720,7 +720,7 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
           |    }
           |  }){
           |    childrenOpt{
-          |        ${t.child.returnValue}
+          |        ${t.child.selection}
           |    }
           |  }
           |}""",
@@ -738,7 +738,7 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
           |    }
           |  }){
           |    childrenOpt{
-          |        ${t.child.returnValue}
+          |        ${t.child.selection}
           |    }
           |  }
           |}""",
@@ -753,7 +753,7 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
            |  updateParent(
            |    where: {p: "p2"}
            |    data:{
-           |    childrenOpt: {connect: {${t.child.identifierName}: "$childId"}}
+           |    childrenOpt: {connect: {${t.child.identifier}: "$childId"}}
            |  }){
            |    childrenOpt(first:10) {
            |      c
@@ -774,7 +774,7 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
         .query(
           s"""
              |{
-             |  parent(where: { ${t.parent.identifierName}: "${otherParentWithChildId}"}){
+             |  parent(where: { ${t.parent.identifier}: "$otherParentWithChildId"}){
              |    childrenOpt {
              |      c
              |    }
@@ -849,8 +849,6 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
     // ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(2) }
     }
   }
-  //todo unique tests
-// these need to explicitly fetch the return values
 
   "a P1 to C1! relation with the child already in a relation" should "should not error when switching to a different parent" in {
     schemaWithRelation(onParent = ChildOpt, onChild = ParentReq).test { t =>
@@ -861,7 +859,7 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
 
       val child = t.child.parse(
         server.query(
-          """mutation {
+          s"""mutation {
           |  createParent(data: {
           |    p: "p1"
           |    childOpt: {
@@ -869,7 +867,7 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
           |    }
           |  }){
           |    childOpt{
-          |       c
+          |       ${t.child.selection}
           |    }
           |  }
           |}""",
@@ -880,11 +878,11 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
 
       val parent = t.parent.parse(
         server.query(
-          """mutation {
+          s"""mutation {
           |  createParent(data: {
           |    p: "p2"
           |  }){
-          |  p
+          |  ${t.parent.selection}
           |  }
           |}""",
           project
@@ -898,9 +896,9 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
         s"""
            |mutation {
            |  updateParent(
-           |  where: {p: "p2"}
+           |  where: {${t.parent.identifier}: "$parent"}
            |  data:{
-           |    childOpt: {connect: {${t.child.identifierName}: "$child"}}
+           |    childOpt: {connect: {${t.child.identifier}: "$child"}}
            |  }){
            |    childOpt {
            |      c
@@ -916,6 +914,7 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
     // ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(1) }
     }
   }
+
 
   "a PM to C1  relation with the child already in a relation" should "be connectable through a nested mutation" in {
     schemaWithRelation(onParent = ChildList, onChild = ParentOpt).test { t =>
@@ -941,15 +940,15 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
           project
         )
 
-      server
+      val parent = t.parent.parse(server
         .query(
-          """mutation {
+          s"""mutation {
             |  createParent(data: {p: "p2"}){
-            |    p
+            |    ${t.parent.selection}
             |  }
             |}""",
           project
-        )
+        ), "data.createParent")
 
       // ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(2) }
 
@@ -959,7 +958,7 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
         s"""
            |mutation {
            |  updateParent(
-           |  where: { p: "p2"}
+           |  where: { ${t.parent.identifier}: "$parent"}
            |  data:{
            |    childrenOpt: {connect: [{c: "c1"},{c: "c2"},{c: "c2"}]}
            |  }){
@@ -987,7 +986,7 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
       }
       database.setup(project)
 
-      server
+      val child = t.child.parse(server
         .query(
           """mutation {
             |  createChild(data: {c: "c1"})
@@ -996,9 +995,9 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
             |  }
             |}""",
           project
-        )
+        ),"data.createChild")
 
-      server
+      val parent = t.parent.parse(server
         .query(
           """mutation {
             |  createParent(data: {p: "p1"})
@@ -1007,7 +1006,7 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
             |  }
             |}""",
           project
-        )
+        ), "data.createParent")
 
       // ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(0) }
 
@@ -1015,9 +1014,9 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
         s"""
            |mutation {
            |  updateParent(
-           |  where: {p:"p1"}
+           |  where: {${t.parent.identifier}:"$parent"}
            |  data:{
-           |    childrenOpt: {connect: {c: "c1"}}
+           |    childrenOpt: {connect: {${t.child.identifier}: "$child"}}
            |  }){
            |    childrenOpt {
            |      c
@@ -1041,8 +1040,8 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
       }
       database.setup(project)
 
-      server.query(
-        """mutation {
+      val child = t.child.parse(server.query(
+        s"""mutation {
           |  createParent(data: {
           |    p: "p1"
           |    childReq: {
@@ -1050,28 +1049,26 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
           |    }
           |  }){
           |    childReq{
-          |       c
+          |       ${t.child.selection}
           |    }
           |  }
           |}""",
         project
-      )
+      ),"data.createParent.childReq")
 
-      server.query(
-        """mutation {
+      val parent = t.parent.parse(server.query(
+        s"""mutation {
           |  createParent(data: {
           |    p: "p2"
           |    childReq: {
           |      create: {c: "c2"}
           |    }
           |  }){
-          |    childReq{
-          |       c
-          |    }
+          |    ${t.parent.selection}
           |  }
           |}""",
         project
-      )
+      ), "data.createParent")
 
       // ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(2) }
 
@@ -1079,9 +1076,9 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
         s"""
            |mutation {
            |  updateParent(
-           |  where: {p: "p2"}
+           |  where: {${t.parent.identifier}: "$parent"}
            |  data:{
-           |    childReq: {connect: {c: "c1"}}
+           |    childReq: {connect: {${t.child.identifier}: "$child"}}
            |  }){
            |    childReq {
            |      c
@@ -1101,6 +1098,7 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
     }
   }
 
+
   "a P1! to CM  relation with the child not already in a relation" should "be connectable through a nested mutation" in {
     schemaWithRelation(onParent = ChildReq, onChild = ParentList).test { t =>
       val project = SchemaDsl.fromStringV11() {
@@ -1108,30 +1106,29 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
       }
       database.setup(project)
 
-      server.query(
-        """mutation {
+      val child = t.child.parse(server.query(
+        s"""mutation {
           |  createChild(data: {c: "c1"}){
-          |       c
+          |       ${t.child.selection}
           |  }
           |}""",
         project
-      )
+      ), "data.createChild")
 
-      server.query(
-        """mutation {
+
+      val parent = t.parent.parse(server.query(
+        s"""mutation {
           |  createParent(data: {
           |    p: "p2"
           |    childReq: {
           |      create: {c: "c2"}
           |    }
           |  }){
-          |    childReq{
-          |       c
-          |    }
+          |    ${t.parent.selection}
           |  }
           |}""",
         project
-      )
+      ), "data.createParent")
 
       // ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(1) }
 
@@ -1139,9 +1136,9 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
         s"""
            |mutation {
            |  updateParent(
-           |  where: {p: "p2"}
+           |  where: {${t.parent.identifier}: "$parent"}
            |  data:{
-           |    childReq: {connect: {c: "c1"}}
+           |    childReq: {connect: {${t.child.identifier}: "$child"}}
            |  }){
            |    childReq {
            |      c
@@ -1168,8 +1165,8 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
       }
       database.setup(project)
 
-      server.query(
-        """mutation {
+      val child = t.child.parse(server.query(
+        s"""mutation {
           |  createParent(data: {
           |    p: "p1"
           |    childOpt: {
@@ -1177,21 +1174,21 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
           |    }
           |  }){
           |    childOpt{
-          |       c
+          |       ${t.child.selection}
           |    }
           |  }
           |}""",
         project
-      )
+      ),"data.createParent.childOpt")
 
-      server.query(
-        """mutation {
+      val parent = t.parent.parse(server.query(
+        s"""mutation {
           |  createParent(data: {p: "p2"}){
-          |    p
+          |    ${t.parent.selection}
           |  }
           |}""",
         project
-      )
+      ),"data.createParent")
 
       // ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(1) }
 
@@ -1199,9 +1196,9 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
         s"""
            |mutation {
            |  updateParent(
-           |    where: {p: "p2"}
+           |    where: {${t.parent.identifier}: "$parent"}
            |    data:{
-           |    childOpt: {connect: {c: "c1"}}
+           |    childOpt: {connect: {${t.child.identifier}: "$child"}}
            |  }){
            |    childOpt{
            |      c
@@ -1228,23 +1225,23 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
       }
       database.setup(project)
 
-      server.query(
-        """mutation {
+      val child = t.child.parse(server.query(
+        s"""mutation {
           |  createChild(data: {c: "c1"}){
-          |       c
+          |       ${t.child.selection}
           |  }
           |}""",
         project
-      )
+      ),"data.createChild")
 
-      server.query(
-        """mutation {
+      val parent = t.parent.parse(server.query(
+        s"""mutation {
           |  createParent(data: {p: "p1"}){
-          |       p
+          |       ${t.parent.selection}
           |  }
           |}""",
         project
-      )
+      ),"data.createParent")
 
       // ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(0) }
 
@@ -1252,9 +1249,9 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
         s"""
            |mutation {
            |  updateParent(
-           |  where: {p: "p1"}
+           |  where: {${t.parent.identifier}: "$parent"}
            |  data:{
-           |    childOpt: {connect: {c: "c1"}}
+           |    childOpt: {connect: {${t.child.identifier}: "$child"}}
            |  }){
            |    childOpt {
            |      c
@@ -1280,7 +1277,7 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
       }
       database.setup(project)
 
-      server.query(
+      val children = t.child.parseAll(server.query(
         """mutation {
           |  createParent(data: {
           |    p: "p1"
@@ -1294,23 +1291,21 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
           |  }
           |}""",
         project
-      )
+      ),"data.createParent.childrenOpt")
 
-      server.query(
-        """mutation {
+      val parent = t.parent.parse(server.query(
+        s"""mutation {
           |  createParent(data: {
           |    p: "p2"
           |    childrenOpt: {
           |      create: [{c: "c3"},{c: "c4"}]
           |    }
           |  }){
-          |    childrenOpt{
-          |       c
-          |    }
+          |    ${t.parent.selection}
           |  }
           |}""",
         project
-      )
+      ),"data.createParent")
 
       // ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(4) }
 
@@ -1318,9 +1313,9 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
         s"""
            |mutation {
            |  updateParent(
-           |  where: {    p: "p2"}
+           |  where: {${t.parent.identifier}: "$parent"}
            |  data:{
-           |    childrenOpt: {connect: [{c: "c1"}, {c: "c2"}]}
+           |    childrenOpt: {connect: $children}
            |  }){
            |    childrenOpt(orderBy: id_ASC){
            |      c
@@ -1347,23 +1342,23 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
       }
       database.setup(project)
 
-      server.query(
-        """mutation {
+      val child = t.child.parse(server.query(
+        s"""mutation {
           |  createChild(data: {c: "c1"}){
-          |       c
+          |       ${t.child.selection}
           |  }
           |}""",
         project
-      )
+      ),"data.createChild")
 
-      server.query(
-        """mutation {
+      val parent = t.parent.parse(server.query(
+        s"""mutation {
           |  createParent(data: {p: "p1"}){
-          |       p
+          |       ${t.parent.selection}
           |  }
           |}""",
         project
-      )
+      ),"data.createParent")
 
       // ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(0) }
 
@@ -1371,9 +1366,9 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
         s"""
            |mutation {
            |  updateParent(
-           |  where: {p: "p1"}
+           |  where: {${t.parent.identifier}: "$parent"}
            |  data:{
-           |    childrenOpt: {connect: {c: "c1"}}
+           |    childrenOpt: {connect: {${t.child.identifier}: "$child"}}
            |  }){
            |    childrenOpt {
            |      c
