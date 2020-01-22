@@ -3,7 +3,13 @@ extern crate log;
 #[macro_use]
 extern crate rust_embed;
 
-use std::{env, error::Error, process, net::{SocketAddr, IpAddr}, str::FromStr};
+use std::{
+    env,
+    error::Error,
+    net::{IpAddr, SocketAddr},
+    process,
+    str::FromStr,
+};
 
 use clap::{App as ClapApp, Arg, SubCommand};
 use tracing::subscriber;
@@ -24,6 +30,8 @@ mod error;
 mod exec_loader;
 mod request_handlers;
 mod server;
+#[cfg(test)]
+mod tests;
 mod utilities;
 
 #[derive(Debug, Clone, PartialEq, Copy)]
@@ -71,6 +79,13 @@ async fn main() -> Result<(), AnyError> {
                 .required(false),
         )
         .arg(
+            Arg::with_name("always_force_transactions")
+                .long("always_force_transactions")
+                .help("Runs all queries in a transaction, including all the reads.")
+                .takes_value(false)
+                .required(false),
+        )
+        .arg(
             Arg::with_name("version")
                 .long("version")
                 .help("Prints the server commit ID")
@@ -111,10 +126,12 @@ async fn main() -> Result<(), AnyError> {
         )
         .get_matches();
 
+    let force_transactions = matches.is_present("always_force_transactions");
+
     if matches.is_present("version") {
         println!(env!("GIT_HASH"));
     } else if let Some(matches) = matches.subcommand_matches("cli") {
-        match CliCommand::new(matches) {
+        match CliCommand::new(matches, force_transactions) {
             Some(cmd) => {
                 if let Err(err) = cmd.execute() {
                     info!("Encountered error during initialization:");
@@ -154,7 +171,11 @@ async fn main() -> Result<(), AnyError> {
         eprintln!("Printing to stderr for debugging");
         eprintln!("Listening on {}:{}", host, port);
 
-        if let Err(err) = HttpServer::run(address, legacy).await {
+        let builder = HttpServer::builder()
+            .legacy(legacy)
+            .force_transactions(force_transactions);
+
+        if let Err(err) = builder.build_and_run(address).await {
             info!("Encountered error during initialization:");
             err.render_as_json().expect("error rendering");
             process::exit(1);

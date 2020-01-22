@@ -32,7 +32,7 @@ pub trait QueryExt: Queryable + Send + Sync {
     async fn raw_json(&self, q: RawQuery) -> crate::Result<Value> {
         if q.is_select() {
             let result_set = self.query_raw(q.0.as_str(), &[]).await?;
-            let columns: Vec<String> = result_set.columns().map(ToString::to_string).collect();
+            let columns: Vec<String> = result_set.columns().into_iter().map(ToString::to_string).collect();
             let mut result = Vec::new();
 
             for row in result_set.into_iter() {

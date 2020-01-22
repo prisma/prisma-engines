@@ -32,6 +32,10 @@ dev-postgres12:
 	docker-compose -f docker-compose.yml up -d --remove-orphans postgres12
 	echo 'postgres12' > current_connector
 
+dev-pgbouncer:
+	docker-compose -f docker-compose.yml up -d --remove-orphans pgbouncer postgres11
+	echo 'pgbouncer' > current_connector
+
 dev-mysql:
 	docker-compose -f docker-compose.yml up -d --remove-orphans mysql-5-7
 	echo 'mysql' > current_connector

@@ -28,10 +28,13 @@ class SelfRelationFilterBugSpec extends FlatSpec with Matchers with ApiSpecBase 
     }
   }
 
-  database.setup(project)
-  val id = server
-    .query("""mutation{createCategory(data:{name: "Sub", parent: {create:{ name: "Root"}} }){parent{id}}}""", project)
-    .pathAsString("data.createCategory.parent.id")
+  override protected def beforeEach(): Unit = {
+    super.beforeEach()
+    database.setup(project)
+    val id = server
+      .query("""mutation{createCategory(data:{name: "Sub", parent: {create:{ name: "Root"}} }){parent{id}}}""", project)
+      .pathAsString("data.createCategory.parent.id")
+  }
 
   "Getting all categories" should "succeed" in {
     val allCategories =

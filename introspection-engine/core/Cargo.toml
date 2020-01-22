@@ -8,16 +8,17 @@ edition = "2018"
 [dependencies]
 clap = "2.33"
 serde = "1.0"
-futures = "0.3"
+futures = { version = "0.3", features = ["compat"] }
+futures01 = { package = "futures", version = "0.1" }
 failure = "0.1"
 
 serde_json = "1.0"
 serde_derive = "1.0"
-jsonrpc-core = "13.0"
 async-trait = "0.1.17"
-jsonrpc-derive = "13.0"
-jsonrpc-core-client = "13.0"
-jsonrpc-stdio-server = "13.0"
+jsonrpc-core = "14.0"
+jsonrpc-derive = "14.0"
+jsonrpc-core-client = "14.0"
+jsonrpc-stdio-server = { git = "https://github.com/tomhoule/jsonrpc.git", branch = "alternate-branch" }
 
 datamodel = { path = "../../libs/datamodel/core" }
 user-facing-errors = { path = "../../libs/user-facing-errors" }
@@ -27,14 +28,15 @@ tracing = "0.1.10"
 tracing-subscriber = "0.1.6"
 tracing-futures = "0.2.0"
 
-[dependencies.tokio]
-version = "0.2"
-features = ["macros", "rt-threaded"]
-
 [dev-dependencies]
 pretty_assertions = "0.6.1"
 test-setup = { path = "../../libs/test-setup" }
 url = "2.1.0"
+
+[dev-dependencies.tokio]
+version = "0.2"
+features = ["macros"]
+
 
 [[bin]]
 name = "introspection-engine"

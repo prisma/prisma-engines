@@ -19,6 +19,3 @@ members = [
   "libs/prisma-models",
   "libs/prisma-value",
 ]
-
-[patch.crates-io]
-barrel = { git = "https://github.com/tomhoule/barrel.git" }

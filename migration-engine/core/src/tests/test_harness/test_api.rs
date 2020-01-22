@@ -11,6 +11,7 @@ pub(crate) use unapply_migration::UnapplyMigration;
 use super::assertions::SchemaAssertion;
 use super::{
     misc_helpers::{mysql_migration_connector, postgres_migration_connector, sqlite_migration_connector, test_api},
+    sql::barrel_migration_executor::BarrelMigrationExecutor,
     InferAndApplyOutput,
 };
 use crate::{
@@ -142,11 +143,9 @@ impl TestApi {
         }
     }
 
-    pub fn barrel(&self) -> BarrelMigrationExecutor {
+    pub(crate) fn barrel(&self) -> BarrelMigrationExecutor {
         BarrelMigrationExecutor {
-            schema_name: self.schema_name().to_owned(),
-            inspector: self.describer(),
-            database: Arc::clone(&self.database),
+            api: self,
             sql_variant: match self.sql_family() {
                 SqlFamily::Mysql => barrel::SqlVariant::Mysql,
                 SqlFamily::Postgres => barrel::SqlVariant::Pg,
@@ -296,41 +295,5 @@ pub async fn sqlite_test_api(db_name: &str) -> TestApi {
         connection_info,
         database: Arc::clone(&connector.database),
         api: test_api(connector).await,
-    }
-}
-
-pub struct BarrelMigrationExecutor {
-    inspector: Box<dyn SqlSchemaDescriberBackend>,
-    database: Arc<dyn Queryable + Send + Sync>,
-    sql_variant: barrel::backend::SqlVariant,
-    schema_name: String,
-}
-
-impl BarrelMigrationExecutor {
-    pub async fn execute<F>(&self, mut migration_fn: F) -> SqlSchema
-    where
-        F: FnMut(&mut barrel::Migration) -> (),
-    {
-        use barrel::Migration;
-
-        let mut migration = Migration::new().schema(&self.schema_name);
-        migration_fn(&mut migration);
-        let full_sql = migration.make_from(self.sql_variant);
-        run_full_sql(&self.database, &full_sql).await;
-        let mut result = self
-            .inspector
-            .describe(&self.schema_name)
-            .await
-            .expect("Description failed");
-
-        // The presence of the _Migration table makes assertions harder. Therefore remove it.
-        result.tables = result.tables.into_iter().filter(|t| t.name != "_Migration").collect();
-        result
-    }
-}
-
-async fn run_full_sql(database: &Arc<dyn Queryable + Send + Sync>, full_sql: &str) {
-    for sql in full_sql.split(";").filter(|sql| !sql.is_empty()) {
-        database.query_raw(&sql, &[]).await.unwrap();
     }
 }
