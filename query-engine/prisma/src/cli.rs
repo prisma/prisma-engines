@@ -37,7 +37,7 @@ pub enum CliCommand {
 }
 
 impl CliCommand {
-    pub fn new(matches: &ArgMatches) -> Option<Self> {
+    pub fn new(matches: &ArgMatches, force_transactions: bool) -> Option<Self> {
         if matches.is_present("dmmf") {
             let build_mode = if matches.is_present("legacy") {
                 BuildMode::Legacy
@@ -61,9 +61,10 @@ impl CliCommand {
             Some(CliCommand::GetConfig(datamodel))
         } else if matches.is_present("execute_request") {
             let request = matches.value_of("execute_request").unwrap();
+
             Some(CliCommand::ExecuteRequest {
                 query: request.to_string(),
-                force_transactions: matches.is_present("always_force_transactions"),
+                force_transactions,
             })
         } else {
             None

@@ -126,10 +126,12 @@ async fn main() -> Result<(), AnyError> {
         )
         .get_matches();
 
+    let force_transactions = matches.is_present("always_force_transactions");
+
     if matches.is_present("version") {
         println!(env!("GIT_HASH"));
     } else if let Some(matches) = matches.subcommand_matches("cli") {
-        match CliCommand::new(matches) {
+        match CliCommand::new(matches, force_transactions) {
             Some(cmd) => {
                 if let Err(err) = cmd.execute() {
                     info!("Encountered error during initialization:");
@@ -165,14 +167,13 @@ async fn main() -> Result<(), AnyError> {
         let address = SocketAddr::new(host, port);
 
         let legacy = matches.is_present("legacy");
-        let force_tx = matches.is_present("always_force_transactions");
 
         eprintln!("Printing to stderr for debugging");
         eprintln!("Listening on {}:{}", host, port);
 
         let builder = HttpServer::builder()
             .legacy(legacy)
-            .force_transactions(force_tx);
+            .force_transactions(force_transactions);
 
         if let Err(err) = builder.build_and_run(address).await {
             info!("Encountered error during initialization:");
