@@ -1,5 +1,5 @@
+use crate::{error::DomainError, ModelIdentifier, RecordIdentifier};
 use quaint::connector::ResultSet;
-use crate::{RecordIdentifier, ModelIdentifier, error::DomainError};
 use std::{convert::TryFrom, sync::Arc};
 
 impl TryFrom<(&ModelIdentifier, ResultSet)> for RecordIdentifier {
@@ -8,7 +8,7 @@ impl TryFrom<(&ModelIdentifier, ResultSet)> for RecordIdentifier {
     fn try_from(pair: (&ModelIdentifier, ResultSet)) -> crate::Result<Self> {
         let (id, result_set) = pair;
 
-        let columns: Vec<String> = result_set.columns().map(|c| c.to_string()).collect();
+        let columns: Vec<String> = result_set.columns().iter().map(|c| c.to_string()).collect();
         let mut record_id = RecordIdentifier::default();
 
         for row in result_set.into_iter() {
@@ -16,11 +16,13 @@ impl TryFrom<(&ModelIdentifier, ResultSet)> for RecordIdentifier {
                 match id.get(columns[i].as_str()) {
                     Some(ref field) => {
                         record_id.add((Arc::clone(field), val.into()));
-                    },
-                    None => return Err(DomainError::ScalarFieldNotFound {
-                        name: columns[i].clone(),
-                        model: String::from("unspecified"),
-                    })
+                    }
+                    None => {
+                        return Err(DomainError::ScalarFieldNotFound {
+                            name: columns[i].clone(),
+                            model: String::from("unspecified"),
+                        })
+                    }
                 }
             }
 
