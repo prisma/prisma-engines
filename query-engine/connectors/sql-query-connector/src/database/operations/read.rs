@@ -63,6 +63,9 @@ where
 {
     // Todo: Does this work with relation fields that are backed by multiple fields?
     // Q: What is the TypeIdentifier::Relation actually doing?
+    // Q: The following code simply queries both field sides, is this correct?
+    //    Columns that don't exist are ignored? Iterator is empty?
+    // Q: Additionally: field names contains always both, isn't that breaking the above assumption?
     let mut idents: Vec<_> = selected_fields.types().collect();
     idents.push(from_field.related_field().type_identifier_with_arity());
     idents.push(from_field.type_identifier_with_arity());
@@ -92,9 +95,7 @@ where
 
     let query = if can_skip_joins {
         let model = from_field.related_model();
-
         let relation_columns: Vec<_> = from_field.relation_columns(true).collect();
-
         let select = read::get_records(&model, columns.into_iter(), query_arguments)
             .and_where(query_builder::conditions(&relation_columns, from_record_ids));
 

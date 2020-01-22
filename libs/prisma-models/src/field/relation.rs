@@ -98,6 +98,12 @@ impl RelationSide {
 }
 
 impl RelationField {
+    /// Returns the `ModelIdentifier` used for this relation and model.
+    ///
+    pub fn identifier() -> ModelIdentifier {
+        todo!()
+    }
+
     pub fn is_optional(&self) -> bool {
         !self.is_required
     }

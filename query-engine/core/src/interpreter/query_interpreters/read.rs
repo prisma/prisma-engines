@@ -1,18 +1,18 @@
 use crate::{interpreter::InterpretationResult, query_ast::*, result_ast::*};
 use connector::{self, ConnectionLike, QueryArguments, ReadOperations};
 use futures::future::{BoxFuture, FutureExt};
-use prisma_models::RecordIdentifier;
+use prisma_models::{ManyRecords, RecordIdentifier};
 
 pub fn execute<'a, 'b>(
     tx: &'a ConnectionLike<'a, 'b>,
     query: ReadQuery,
-    parent_ids: &'a [RecordIdentifier],
+    parent_result: Option<&'a ManyRecords>,
 ) -> BoxFuture<'a, InterpretationResult<QueryResult>> {
     let fut = async move {
         match query {
             ReadQuery::RecordQuery(q) => read_one(tx, q).await,
             ReadQuery::ManyRecordsQuery(q) => read_many(tx, q).await,
-            ReadQuery::RelatedRecordsQuery(q) => read_related(tx, q, parent_ids).await,
+            ReadQuery::RelatedRecordsQuery(q) => read_related(tx, q, parent_result).await,
             ReadQuery::AggregateRecordsQuery(q) => aggregate(tx, q).await,
         }
     };
@@ -33,13 +33,13 @@ fn read_one<'conn, 'tx>(
 
         match scalars {
             Some(record) => {
-                let ids = vec![record.identifier(&model_id)?];
-                let nested: Vec<QueryResult> = process_nested(tx, query.nested, &ids).await?;
+                let records: ManyRecords = record.into();
+                let nested: Vec<QueryResult> = process_nested(tx, query.nested, Some(&records)).await?;
 
                 Ok(QueryResult::RecordSelection(RecordSelection {
                     name: query.name,
                     fields: query.selection_order,
-                    scalars: record.into(),
+                    scalars: records,
                     nested,
                     model_id,
                     ..Default::default()
@@ -69,8 +69,8 @@ fn read_many<'a, 'b>(
             .await?;
 
         let model_id = query.model.identifier();
-        let ids = scalars.identifiers(&model_id)?;
-        let nested: Vec<QueryResult> = process_nested(tx, query.nested, &ids).await?;
+        // let ids = scalars.identifiers(&model_id)?;
+        let nested: Vec<QueryResult> = process_nested(tx, query.nested, Some(&scalars)).await?;
 
         Ok(QueryResult::RecordSelection(RecordSelection {
             name: query.name,
@@ -89,18 +89,26 @@ fn read_many<'a, 'b>(
 fn read_related<'a, 'b>(
     tx: &'a ConnectionLike<'a, 'b>,
     query: RelatedRecordsQuery,
-    relation_ids: &'a [RecordIdentifier],
+    parent_result: Option<&'a ManyRecords>,
 ) -> BoxFuture<'a, InterpretationResult<QueryResult>> {
     let fut = async move {
-        let parent_ids = match query.parent_ids {
+        // The query construction must guarantee that the parent result
+        // contains the selected fields necessary to satisfy the relation query.
+        // There are 2 options:
+        // - The query already has IDs set - use those.
+        // - The IDs need to be extracted from the parent result.
+        let relation_parent_ids = match query.relation_parent_ids {
             Some(ref ids) => ids,
-            None => parent_ids,
+            None => {
+                let relation_id = query.parent_field.identifier();
+                parent_result.identifiers(relation_id)?
+            },
         };
 
         let scalars = tx
             .get_related_records(
                 &query.parent_field,
-                parent_ids,
+                relation_parent_ids,
                 query.args.clone(),
                 &query.selected_fields,
             )
@@ -108,8 +116,7 @@ fn read_related<'a, 'b>(
 
         let model = query.parent_field.related_model();
         let model_id = model.identifier();
-        let ids = scalars.identifiers(&model_id)?;
-        let nested: Vec<QueryResult> = process_nested(tx, query.nested, &ids).await?;
+        let nested: Vec<QueryResult> = process_nested(tx, query.nested, Some(&scalars)).await?;
 
         Ok(QueryResult::RecordSelection(RecordSelection {
             name: query.name,
@@ -135,13 +142,13 @@ async fn aggregate<'a, 'b>(
 fn process_nested<'a, 'b>(
     tx: &'a ConnectionLike<'a, 'b>,
     nested: Vec<ReadQuery>,
-    parent_ids: &'a [RecordIdentifier],
+    parent_result: Option<&'a ManyRecords>,
 ) -> BoxFuture<'a, InterpretationResult<Vec<QueryResult>>> {
     let fut = async move {
         let mut results = Vec::with_capacity(nested.len());
 
         for query in nested {
-            let result = execute(tx, query, &parent_ids).await?;
+            let result = execute(tx, query, parent_result).await?;
             results.push(result);
         }
 
