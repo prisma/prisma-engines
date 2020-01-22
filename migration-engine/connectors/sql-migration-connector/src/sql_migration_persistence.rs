@@ -31,9 +31,8 @@ impl MigrationPersistence for SqlMigrationPersistence<'_> {
                     m.make_from(barrel::SqlVariant::Pg)
                 }
                 SqlFamily::Mysql => {
-                    // work around barrels missing quoting
                     let mut m = barrel::Migration::new().schema(self.schema_name());
-                    m.create_table(format!("{}", TABLE_NAME), migration_table_setup_mysql);
+                    m.create_table(TABLE_NAME, migration_table_setup_mysql);
                     m.make_from(barrel::SqlVariant::Mysql)
                 }
             };
@@ -47,9 +46,13 @@ impl MigrationPersistence for SqlMigrationPersistence<'_> {
     }
 
     async fn reset(&self) -> Result<(), ConnectorError> {
+        use quaint::ast::Delete;
+
         crate::catch(self.connection_info(), async {
-            let sql_str = format!(r#"DELETE FROM "{}"."_Migration";"#, self.schema_name()); // TODO: this is not vendor agnostic yet
-            self.conn().query_raw(&sql_str, &[]).await.ok();
+            self.conn()
+                .query(Delete::from_table((self.schema_name(), TABLE_NAME)).into())
+                .await
+                .ok();
 
             Ok(())
         })
