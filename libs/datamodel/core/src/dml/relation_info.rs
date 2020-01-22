@@ -25,6 +25,7 @@ impl RelationInfo {
             on_delete: OnDeleteStrategy::None,
         }
     }
+
     pub fn new_with_field(to: &str, to_field: &str) -> RelationInfo {
         RelationInfo {
             to: String::from(to),

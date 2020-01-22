@@ -11,7 +11,6 @@ pub struct SelectedFields {
     pub scalar: Vec<SelectedScalarField>,
     pub relation: Vec<SelectedRelationField>,
 }
-
 #[derive(Debug, Clone)]
 pub enum SelectedField {
     Scalar(SelectedScalarField),
@@ -108,7 +107,7 @@ impl SelectedFields {
 
     pub fn types<'a>(&'a self) -> impl Iterator<Item = (TypeIdentifier, FieldArity)> + 'a {
         let scalar = self.scalar_fields().map(|sf| sf.type_identifier_with_arity());
-        let relation = self.relation_inlined().map(|rf| rf.type_identifier_with_arity());
+        let relation = self.relation_inlined().flat_map(|rf| rf.type_identifiers_with_arities());
 
         scalar.chain(relation)
     }

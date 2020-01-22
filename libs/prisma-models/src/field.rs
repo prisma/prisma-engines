@@ -5,6 +5,7 @@ pub use relation::*;
 pub use scalar::*;
 
 use crate::prelude::*;
+use datamodel::ScalarType;
 use once_cell::sync::OnceCell;
 use std::sync::Arc;
 
@@ -38,15 +39,6 @@ pub enum TypeIdentifier {
     UUID,
     Int,
     Relation,
-}
-
-impl TypeIdentifier {
-    pub fn user_friendly_type_name(self) -> String {
-        match self {
-            TypeIdentifier::GraphQLID => "ID".to_string(),
-            _ => format!("{:?}", self),
-        }
-    }
 }
 
 impl Field {
@@ -84,13 +76,6 @@ impl Field {
             Field::Relation(ref rf) => rf.is_required,
         }
     }
-
-    pub fn type_identifier(&self) -> TypeIdentifier {
-        match self {
-            Field::Scalar(ref sf) => sf.type_identifier,
-            Field::Relation(ref rf) => rf.type_identifier,
-        }
-    }
 }
 
 impl FieldTemplate {
@@ -116,7 +101,6 @@ impl FieldTemplate {
             FieldTemplate::Relation(rt) => {
                 let relation = RelationField {
                     name: rt.name,
-                    type_identifier: rt.type_identifier,
                     is_required: rt.is_required,
                     is_list: rt.is_list,
                     is_hidden: rt.is_hidden,
@@ -144,5 +128,18 @@ impl From<ScalarFieldRef> for Field {
 impl From<RelationFieldRef> for Field {
     fn from(rf: RelationFieldRef) -> Self {
         Field::Relation(rf)
+    }
+}
+
+impl From<ScalarType> for TypeIdentifier {
+    fn from(st: ScalarType) -> Self {
+        match st {
+            ScalarType::String => Self::String,
+            ScalarType::Int => Self::Int,
+            ScalarType::Float => Self::Float,
+            ScalarType::Boolean => Self::Boolean,
+            ScalarType::Decimal => Self::Float,
+            ScalarType::DateTime => Self::DateTime,
+        }
     }
 }

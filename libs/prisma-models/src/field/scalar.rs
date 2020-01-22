@@ -175,13 +175,7 @@ impl ScalarField {
     }
 
     pub fn type_identifier_with_arity(&self) -> (TypeIdentifier, FieldArity) {
-        let arity = match (self.is_list, self.is_required) {
-            (true, _) => FieldArity::List,
-            (false, true) => FieldArity::Required,
-            (false, false) => FieldArity::Optional,
-        };
-
-        (self.type_identifier, arity)
+        (self.data_source_field.field_type.into(), self.data_source_field.arity)
     }
 
     pub fn default_value(&self) -> Option<&DefaultValue> {

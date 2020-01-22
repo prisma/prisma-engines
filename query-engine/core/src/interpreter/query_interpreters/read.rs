@@ -102,8 +102,9 @@ fn read_related<'a, 'b>(
             None => {
                 let relation_id = query.parent_field.identifier();
                 parent_result.identifiers(relation_id)?
-            },
+            }
         };
+        -
 
         let scalars = tx
             .get_related_records(

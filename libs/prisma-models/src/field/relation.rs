@@ -12,7 +12,6 @@ pub type RelationFieldWeak = Weak<RelationField>;
 #[derive(Debug)]
 pub struct RelationFieldTemplate {
     pub name: String,
-    pub type_identifier: TypeIdentifier,
     pub is_required: bool,
     pub is_list: bool,
     pub is_unique: bool,
@@ -26,7 +25,6 @@ pub struct RelationFieldTemplate {
 #[derive(DebugStub)]
 pub struct RelationField {
     pub name: String,
-    pub type_identifier: TypeIdentifier,
     pub is_required: bool,
     pub is_list: bool,
     pub is_hidden: bool,
@@ -47,7 +45,6 @@ impl Eq for RelationField {}
 impl Hash for RelationField {
     fn hash<H: Hasher>(&self, state: &mut H) {
         self.name.hash(state);
-        self.type_identifier.hash(state);
         self.is_required.hash(state);
         self.is_list.hash(state);
         self.is_hidden.hash(state);
@@ -62,7 +59,6 @@ impl Hash for RelationField {
 impl PartialEq for RelationField {
     fn eq(&self, other: &Self) -> bool {
         self.name == other.name
-            && self.type_identifier == other.type_identifier
             && self.is_required == other.is_required
             && self.is_list == other.is_list
             && self.is_hidden == other.is_hidden
@@ -179,13 +175,10 @@ impl RelationField {
         self.relation().name == relation_name && self.relation_side == side
     }
 
-    pub fn type_identifier_with_arity(&self) -> (TypeIdentifier, FieldArity) {
-        let arity = match (self.is_list, self.is_required) {
-            (true, _) => FieldArity::List,
-            (false, true) => FieldArity::Required,
-            (false, false) => FieldArity::Optional,
-        };
-
-        (self.type_identifier, arity)
+    pub fn type_identifiers_with_arities(&self) -> Vec<(TypeIdentifier, FieldArity)> {
+        self.data_source_fields
+            .iter()
+            .map(|dsf| (dsf.field_type.into(), dsf.arity))
+            .collect()
     }
 }

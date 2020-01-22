@@ -122,10 +122,7 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
                 is_generated: false,
                 is_updated_at: false,
                 // Todo: Do actual multi-field stuff here
-                data_source_fields: vec![dml::DataSourceField {
-                    name: database_name.unwrap_or_else(|| name),
-                    default_value,
-                }],
+                data_source_fields: todo!(),
             };
 
             model.add_field(field);

@@ -52,10 +52,10 @@ pub struct IdInfo {
 /// data source fields.
 #[derive(Debug, PartialEq, Clone)]
 pub struct DataSourceField {
-    /// Name of the backing DB field (e.g. column name or document key).
+    /// Name of the backing data source field (e.g. SQL column name or document key).
     pub name: String,
-
-    /// Default value of the backing field, if any.
+    pub field_type: ScalarType,
+    pub arity: FieldArity,
     pub default_value: Option<DefaultValue>,
 }
 
@@ -65,13 +65,13 @@ pub struct Field {
     /// Name of the field.
     pub name: String,
 
-    /// The field's arity.
-    pub arity: FieldArity,
-
     /// The field's type.
     pub field_type: FieldType,
 
     // -------- todo this is duplicated from DataSourceField --------
+    /// The field's arity.
+    pub arity: FieldArity,
+
     /// The database internal name.
     pub database_name: Option<String>,
 
