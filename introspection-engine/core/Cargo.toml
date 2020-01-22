@@ -13,11 +13,11 @@ failure = "0.1"
 
 serde_json = "1.0"
 serde_derive = "1.0"
-jsonrpc-core = "13.0"
 async-trait = "0.1.17"
-jsonrpc-derive = "13.0"
-jsonrpc-core-client = "13.0"
-jsonrpc-stdio-server = "13.0"
+jsonrpc-core = "14.0"
+jsonrpc-derive = "14.0"
+jsonrpc-core-client = "14.0"
+jsonrpc-stdio-server = { git = "https://github.com/tomhoule/jsonrpc.git", branch = "stdio-tokio-compat" }
 
 datamodel = { path = "../../libs/datamodel/core" }
 user-facing-errors = { path = "../../libs/user-facing-errors" }

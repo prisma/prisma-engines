@@ -3,7 +3,13 @@ extern crate log;
 #[macro_use]
 extern crate rust_embed;
 
-use std::{env, error::Error, process, net::{SocketAddr, IpAddr}, str::FromStr};
+use std::{
+    env,
+    error::Error,
+    net::{IpAddr, SocketAddr},
+    process,
+    str::FromStr,
+};
 
 use clap::{App as ClapApp, Arg, SubCommand};
 use tracing::subscriber;
@@ -24,6 +30,8 @@ mod error;
 mod exec_loader;
 mod request_handlers;
 mod server;
+#[cfg(test)]
+mod tests;
 mod utilities;
 
 #[derive(Debug, Clone, PartialEq, Copy)]

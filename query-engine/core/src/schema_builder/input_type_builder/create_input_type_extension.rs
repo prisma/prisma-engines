@@ -77,11 +77,11 @@ pub trait CreateInputTypeBuilderExtension<'a>: InputTypeBuilderBase<'a> {
             .into_iter()
             .filter_map(|rf| {
                 let related_model = rf.related_model();
+                let related_field = rf.related_field();
 
                 // Compute input object name
                 let arity_part = if rf.is_list { "Many" } else { "One" };
-                let without_part = format!("Without{}", capitalize(rf.name.clone()));
-
+                let without_part = format!("Without{}", capitalize(&related_field.name));
                 let input_name = format!("{}Create{}{}Input", related_model.name, arity_part, without_part);
                 let field_is_opposite_relation_field = parent_field
                     .as_ref()
