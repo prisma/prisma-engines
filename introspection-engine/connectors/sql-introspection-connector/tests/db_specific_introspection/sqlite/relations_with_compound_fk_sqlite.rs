@@ -314,20 +314,10 @@ async fn compound_foreign_keys_should_work_for_one_to_many_relations_with_non_un
                 t.add_column("user_id", types::integer());
                 t.add_column("user_age", types::integer());
                 t.inject_custom("FOREIGN KEY (`user_id`,`user_age`) REFERENCES `User`(`id`, `age`)");
+                t.add_index("test", types::index(vec!["user_id", "user_age"]));
             });
         })
         .await;
-
-    api.database()
-        .execute_raw(
-            &format!(
-                "Create Index `{}`.`test` on `Post`(`user_id`, `user_age`)",
-                api.schema_name()
-            ),
-            &[],
-        )
-        .await
-        .unwrap();
 
     let dm = r#"
             model User {

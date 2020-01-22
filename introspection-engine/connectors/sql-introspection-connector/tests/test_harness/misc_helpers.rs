@@ -24,15 +24,14 @@ pub struct BarrelMigrationExecutor {
 impl BarrelMigrationExecutor {
     pub async fn execute<F>(&self, migration_fn: F)
     where
-        F: FnMut(&mut Migration) -> (),
+        F: FnOnce(&mut Migration) -> (),
     {
-        dbg!(&self.sql_variant);
         self.execute_with_schema(migration_fn, &self.schema_name).await
     }
 
-    pub async fn execute_with_schema<F>(&self, mut migration_fn: F, schema_name: &str)
+    pub async fn execute_with_schema<F>(&self, migration_fn: F, schema_name: &str)
     where
-        F: FnMut(&mut Migration) -> (),
+        F: FnOnce(&mut Migration) -> (),
     {
         let mut migration = Migration::new().schema(schema_name);
         migration_fn(&mut migration);
