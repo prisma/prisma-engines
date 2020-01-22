@@ -35,7 +35,7 @@ pub struct ScalarField {
     pub is_auto_generated_int_id: bool,
     pub internal_enum: Option<InternalEnum>,
     pub behaviour: Option<FieldBehaviour>,
-    pub data_source_field: DataSourceField,
+    pub data_source_field: DataSourceFieldRef,
 
     #[debug_stub = "#ModelWeakRef#"]
     pub model: ModelWeakRef,

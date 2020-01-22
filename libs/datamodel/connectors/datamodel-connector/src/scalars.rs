@@ -2,7 +2,7 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
 /// Prisma's builtin scalar types.
-#[derive(Debug, Copy, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Debug, Copy, PartialEq, Clone, Serialize, Deserialize, Eq, Hash)]
 pub enum ScalarType {
     Int,
     Float,

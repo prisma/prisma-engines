@@ -1,8 +1,9 @@
 use super::*;
 use datamodel_connector::ScalarFieldType;
+use std::hash::{Hash, Hasher};
 
 /// Datamodel field arity.
-#[derive(Debug, PartialEq, Copy, Clone)]
+#[derive(Debug, PartialEq, Copy, Clone, Eq, Hash)]
 pub enum FieldArity {
     Required,
     Optional,
@@ -58,6 +59,16 @@ pub struct DataSourceField {
     pub arity: FieldArity,
     pub default_value: Option<DefaultValue>,
 }
+
+impl Hash for DataSourceField {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.name.hash(state);
+        self.field_type.hash(state);
+        self.arity.hash(state);
+    }
+}
+
+impl Eq for DataSourceField {}
 
 /// Represents a field in a model.
 #[derive(Debug, PartialEq, Clone)]

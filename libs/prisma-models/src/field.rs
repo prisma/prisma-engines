@@ -9,6 +9,8 @@ use datamodel::ScalarType;
 use once_cell::sync::OnceCell;
 use std::sync::Arc;
 
+pub type DataSourceFieldRef = Arc<DataSourceField>;
+
 #[derive(Debug)]
 pub enum FieldTemplate {
     Relation(RelationFieldTemplate),
@@ -85,7 +87,7 @@ impl FieldTemplate {
                     internal_enum: st.internal_enum,
                     behaviour: st.behaviour,
                     model,
-                    data_source_field: st.data_source_field,
+                    data_source_field: Arc::new(st.data_source_field),
                 };
 
                 Field::Scalar(Arc::new(scalar))
@@ -101,7 +103,7 @@ impl FieldTemplate {
                     relation_side: rt.relation_side,
                     model,
                     relation: OnceCell::new(),
-                    data_source_fields: rt.data_source_fields,
+                    data_source_fields: rt.data_source_fields.into_iter().map(Arc::new).collect(),
                 };
 
                 Field::Relation(Arc::new(relation))

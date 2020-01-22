@@ -1,28 +1,28 @@
-use crate::{DomainError, PrismaValue, ScalarFieldRef};
+use crate::{DataSourceFieldRef, DomainError, Field, PrismaValue};
 
 // Collection of fields that uniquely identify a record of a model.
 // There can be different sets of fields at the same time identifying a model.
 #[derive(Debug, Clone, Default)]
 pub struct ModelIdentifier {
-    fields: Vec<ScalarFieldRef>,
+    fields: Vec<Field>,
 }
 
-impl From<ScalarFieldRef> for ModelIdentifier {
-    fn from(f: ScalarFieldRef) -> Self {
+impl From<Field> for ModelIdentifier {
+    fn from(f: Field) -> Self {
         Self { fields: vec![f] }
     }
 }
 
 impl ModelIdentifier {
-    pub fn new(fields: Vec<ScalarFieldRef>) -> Self {
+    pub fn new(fields: Vec<Field>) -> Self {
         Self { fields }
     }
 
     pub fn names<'a>(&'a self) -> impl Iterator<Item = &'a str> + 'a {
-        self.fields.iter().map(|field| field.name.as_str())
+        self.fields.iter().map(|field| field.name())
     }
 
-    pub fn fields<'a>(&'a self) -> impl Iterator<Item = &'a ScalarFieldRef> + 'a {
+    pub fn fields<'a>(&'a self) -> impl Iterator<Item = &'a Field> + 'a {
         self.fields.iter()
     }
 
@@ -34,13 +34,13 @@ impl ModelIdentifier {
         self.len() == 1
     }
 
-    pub fn get(&self, name: &str) -> Option<&ScalarFieldRef> {
-        self.fields().find(|field| field.name == name)
+    pub fn get(&self, name: &str) -> Option<&Field> {
+        self.fields().find(|field| field.name() == name)
     }
 }
 
 impl IntoIterator for ModelIdentifier {
-    type Item = ScalarFieldRef;
+    type Item = Field;
     type IntoIter = std::vec::IntoIter<Self::Item>;
 
     fn into_iter(self) -> Self::IntoIter {
@@ -51,15 +51,15 @@ impl IntoIterator for ModelIdentifier {
 // Collection of field to value pairs corresponding to a ModelIdentifier the record belongs to.
 #[derive(Default, Debug, Clone, PartialEq, Eq, Hash)]
 pub struct RecordIdentifier {
-    pub pairs: Vec<(ScalarFieldRef, PrismaValue)>,
+    pub pairs: Vec<(DataSourceFieldRef, PrismaValue)>,
 }
 
 impl RecordIdentifier {
-    pub fn new(pairs: Vec<(ScalarFieldRef, PrismaValue)>) -> Self {
+    pub fn new(pairs: Vec<(DataSourceFieldRef, PrismaValue)>) -> Self {
         Self { pairs }
     }
 
-    pub fn add(&mut self, pair: (ScalarFieldRef, PrismaValue)) {
+    pub fn add(&mut self, pair: (DataSourceFieldRef, PrismaValue)) {
         self.pairs.push(pair);
     }
 
@@ -95,7 +95,7 @@ impl RecordIdentifier {
 }
 
 impl IntoIterator for RecordIdentifier {
-    type Item = (ScalarFieldRef, PrismaValue);
+    type Item = (DataSourceFieldRef, PrismaValue);
     type IntoIter = std::vec::IntoIter<Self::Item>;
 
     fn into_iter(self) -> Self::IntoIter {
@@ -103,14 +103,14 @@ impl IntoIterator for RecordIdentifier {
     }
 }
 
-impl From<(ScalarFieldRef, PrismaValue)> for RecordIdentifier {
-    fn from(tup: (ScalarFieldRef, PrismaValue)) -> Self {
+impl From<(DataSourceFieldRef, PrismaValue)> for RecordIdentifier {
+    fn from(tup: (DataSourceFieldRef, PrismaValue)) -> Self {
         Self::new(vec![tup])
     }
 }
 
-impl From<Vec<(ScalarFieldRef, PrismaValue)>> for RecordIdentifier {
-    fn from(tup: Vec<(ScalarFieldRef, PrismaValue)>) -> Self {
+impl From<Vec<(DataSourceFieldRef, PrismaValue)>> for RecordIdentifier {
+    fn from(tup: Vec<(DataSourceFieldRef, PrismaValue)>) -> Self {
         Self::new(tup)
     }
 }
@@ -193,13 +193,21 @@ impl Record {
         }
     }
 
+    // Todo - Q: Are the `field_names` basically the column names of the underlying DB?
     pub fn identifier(&self, field_names: &[String], id: &ModelIdentifier) -> crate::Result<RecordIdentifier> {
-        let pairs: Vec<(ScalarFieldRef, PrismaValue)> = id
+        let pairs: Vec<(DataSourceFieldRef, PrismaValue)> = id
             .fields()
             .into_iter()
-            .map(|id_field| {
-                self.get_field_value(field_names, &id_field.name)
-                    .map(|val| (id_field.clone(), val.clone()))
+            .flat_map(|id_field| {
+                let source_fields = match id_field {
+                    Field::Scalar(sf) => vec![sf.data_source_field.clone()],
+                    Field::Relation(rf) => rf.data_source_fields.clone(),
+                };
+
+                source_fields.into_iter().map(|source_field| {
+                    self.get_field_value(field_names, &source_field.name)
+                        .map(|val| (source_field, val.clone()))
+                })
             })
             .collect::<crate::Result<Vec<_>>>()?;
 

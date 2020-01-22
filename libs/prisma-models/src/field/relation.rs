@@ -30,7 +30,7 @@ pub struct RelationField {
     pub relation_name: String,
     pub relation_side: RelationSide,
     pub relation: OnceCell<RelationWeakRef>,
-    pub data_source_fields: Vec<DataSourceField>,
+    pub data_source_fields: Vec<DataSourceFieldRef>,
 
     #[debug_stub = "#ModelWeakRef#"]
     pub model: ModelWeakRef,

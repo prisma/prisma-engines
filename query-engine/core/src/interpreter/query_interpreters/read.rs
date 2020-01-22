@@ -104,7 +104,6 @@ fn read_related<'a, 'b>(
                 parent_result.identifiers(relation_id)?
             }
         };
-        -
 
         let scalars = tx
             .get_related_records(

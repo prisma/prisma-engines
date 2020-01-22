@@ -25,12 +25,28 @@ pub struct SelectedScalarField {
 #[derive(Debug, Clone, PartialEq, Hash, Eq)]
 pub struct SelectedRelationField {
     pub field: RelationFieldRef,
-    pub selected_fields: SelectedFields,
+    // Todo - Q: Is this still used?
+    // pub selected_fields: SelectedFields,
+}
+
+impl From<Field> for SelectedField {
+    fn from(field: Field) -> SelectedField {
+        match field {
+            Field::Scalar(sf) => sf.into(),
+            Field::Relation(rf) => rf.into(),
+        }
+    }
+}
+
+impl From<RelationFieldRef> for SelectedField {
+    fn from(field: RelationFieldRef) -> SelectedField {
+        SelectedField::Relation(SelectedRelationField { field })
+    }
 }
 
 impl From<ScalarFieldRef> for SelectedField {
-    fn from(sf: ScalarFieldRef) -> SelectedField {
-        SelectedField::Scalar(SelectedScalarField { field: sf })
+    fn from(field: ScalarFieldRef) -> SelectedField {
+        SelectedField::Scalar(SelectedScalarField { field })
     }
 }
 
@@ -43,6 +59,20 @@ impl From<ScalarFieldRef> for SelectedFields {
 impl From<Vec<ScalarFieldRef>> for SelectedFields {
     fn from(sfs: Vec<ScalarFieldRef>) -> SelectedFields {
         let fields = sfs.into_iter().map(SelectedField::from).collect();
+
+        SelectedFields::new(fields)
+    }
+}
+
+impl From<Vec<Field>> for SelectedFields {
+    fn from(fields: Vec<Field>) -> SelectedFields {
+        let fields = fields
+            .into_iter()
+            .map(|f| match f {
+                Field::Scalar(sf) => SelectedField::from(sf),
+                Field::Relation(rf) => SelectedField::from(rf),
+            })
+            .collect();
 
         SelectedFields::new(fields)
     }
@@ -94,7 +124,7 @@ impl SelectedFields {
     pub fn add_relation(&mut self, field: RelationFieldRef) {
         self.relation.push(SelectedRelationField {
             field,
-            selected_fields: SelectedFields::default(),
+            // selected_fields: SelectedFields::default(),
         });
     }
 
