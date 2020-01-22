@@ -21,7 +21,6 @@ pub struct ScalarFieldTemplate {
     pub is_required: bool,
     pub is_list: bool,
     pub is_unique: bool,
-    pub is_hidden: bool,
     pub is_auto_generated_int_id: bool,
     pub manifestation: Option<FieldManifestation>,
     pub behaviour: Option<FieldBehaviour>,
@@ -35,7 +34,6 @@ pub struct ScalarField {
     pub type_identifier: TypeIdentifier,
     pub is_required: bool,
     pub is_list: bool,
-    pub is_hidden: bool,
     pub is_auto_generated_int_id: bool,
     pub manifestation: Option<FieldManifestation>,
     pub internal_enum: Option<InternalEnum>,
@@ -56,7 +54,6 @@ impl Hash for ScalarField {
         self.type_identifier.hash(state);
         self.is_required.hash(state);
         self.is_list.hash(state);
-        self.is_hidden.hash(state);
         self.is_auto_generated_int_id.hash(state);
         self.manifestation.hash(state);
         self.internal_enum.hash(state);
@@ -72,7 +69,6 @@ impl PartialEq for ScalarField {
             && self.type_identifier == other.type_identifier
             && self.is_required == other.is_required
             && self.is_list == other.is_list
-            && self.is_hidden == other.is_hidden
             && self.is_auto_generated_int_id == other.is_auto_generated_int_id
             && self.manifestation == other.manifestation
             && self.internal_enum == other.internal_enum

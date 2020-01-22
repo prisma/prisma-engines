@@ -64,10 +64,8 @@ impl Field {
     }
 
     pub fn is_visible(&self) -> bool {
-        match self {
-            Field::Scalar(ref sf) => !sf.is_hidden,
-            Field::Relation(ref rf) => !rf.is_hidden,
-        }
+        // TODO: remove
+        true
     }
 
     pub fn is_scalar(&self) -> bool {
@@ -108,7 +106,6 @@ impl FieldTemplate {
                     type_identifier: st.type_identifier,
                     is_required: st.is_required,
                     is_list: st.is_list,
-                    is_hidden: st.is_hidden,
                     is_auto_generated_int_id: st.is_auto_generated_int_id,
                     is_unique: st.is_unique,
                     manifestation: st.manifestation,

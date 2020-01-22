@@ -53,7 +53,7 @@ impl<'a> FilterObjectTypeBuilder<'a> {
             ),
         ];
 
-        let fields: Vec<ScalarFieldRef> = model.fields().scalar().into_iter().filter(|f| !f.is_hidden).collect();
+        let fields: Vec<ScalarFieldRef> = model.fields().scalar();
         let mut fields: Vec<InputField> = fields.into_iter().flat_map(|f| self.map_input_field(f)).collect();
 
         input_fields.append(&mut fields);
@@ -100,7 +100,6 @@ impl<'a> FilterObjectTypeBuilder<'a> {
             .fields()
             .scalar()
             .into_iter()
-            .filter(|sf| !sf.is_hidden)
             .map(|sf| self.map_input_field(sf))
             .flatten()
             .collect();

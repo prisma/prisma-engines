@@ -91,7 +91,6 @@ impl<'a> DatamodelConverter<'a> {
                     is_required: field.is_required(),
                     is_list: field.is_list(),
                     is_unique: field.is_unique(),
-                    is_hidden: false,
                     is_auto_generated_int_id: field.is_auto_generated_int_id(),
                     manifestation: field.manifestation(),
                     behaviour: field.behaviour(),
