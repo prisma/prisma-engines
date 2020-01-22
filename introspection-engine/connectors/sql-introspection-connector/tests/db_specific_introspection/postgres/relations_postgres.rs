@@ -12,7 +12,7 @@ async fn introspecting_a_one_to_one_req_relation_should_work(api: &TestApi) {
             });
             migration.create_table("Post", |t| {
                 t.add_column("id", types::primary());
-                t.inject_custom("user_id INTEGER NOT NULL UNIQUE REFERENCES \"User\"(\"id\")")
+                t.add_column("user_id", types::foreign("User", "id").nullable(false).unique(true));
             });
         })
         .await;
@@ -35,19 +35,20 @@ async fn introspecting_a_one_to_one_req_relation_should_work(api: &TestApi) {
 #[test_one_connector(connector = "postgres")]
 async fn introspecting_two_one_to_one_relations_between_the_same_models_should_work(api: &TestApi) {
     let barrel = api.barrel();
-    let _setup_schema = barrel
+    barrel
         .execute(|migration| {
             migration.create_table("User", |t| {
                 t.add_column("id", types::primary());
             });
             migration.create_table("Post", |t| {
                 t.add_column("id", types::primary());
-                t.inject_custom("user_id INTEGER NOT NULL UNIQUE REFERENCES \"User\"(\"id\")")
+                t.add_column("user_id", types::foreign("User", "id").unique(true).nullable(false));
+            });
+            migration.change_table("User", |t| {
+                t.add_column("post_id", types::foreign("Post", "id").unique(true).nullable(false));
             });
         })
         .await;
-
-    api.database().execute_raw(&format!("ALTER TABLE \"{}\".\"User\" ADD Column \"post_id\" INTEGER NOT NULL UNIQUE REFERENCES \"Post\"(\"id\")", api.schema_name()), &[]).await.unwrap();
 
     let dm = r#"
             model Post {
@@ -76,7 +77,7 @@ async fn introspecting_a_one_to_one_relation_should_work(api: &TestApi) {
             });
             migration.create_table("Post", |t| {
                 t.add_column("id", types::primary());
-                t.inject_custom("user_id INTEGER UNIQUE REFERENCES \"User\"(\"id\")");
+                t.add_column("user_id", types::foreign("User", "id").unique(true).nullable(true));
             });
         })
         .await;

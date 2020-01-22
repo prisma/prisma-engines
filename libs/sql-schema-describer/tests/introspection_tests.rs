@@ -108,16 +108,12 @@ async fn foreign_keys_must_work(api: &TestApi) {
         _ => ForeignKeyAction::NoAction,
     };
     let expected_indexes = if sql_family.is_mysql() {
-        vec![
-            Index {
-                name: "city".to_owned(),
-                columns: vec![
-                    "city".to_owned(),
-                ],
-                tpe: IndexType::Normal
-            }
-        ]
-    }  else {
+        vec![Index {
+            name: "city".to_owned(),
+            columns: vec!["city".to_owned()],
+            tpe: IndexType::Normal,
+        }]
+    } else {
         vec![]
     };
 
@@ -201,17 +197,12 @@ async fn multi_column_foreign_keys_must_work(api: &TestApi) {
     ];
 
     let expected_indexes = if sql_family.is_mysql() {
-        vec![
-            Index {
-                name: "city_name".to_owned(),
-                columns: vec![
-                    "city_name".to_owned(),
-                    "city".to_owned(),
-                ],
-                tpe: IndexType::Normal
-            }
-        ]
-    }  else {
+        vec![Index {
+            name: "city_name".to_owned(),
+            columns: vec!["city_name".to_owned(), "city".to_owned()],
+            tpe: IndexType::Normal,
+        }]
+    } else {
         vec![]
     };
 
@@ -410,21 +401,10 @@ async fn column_uniqueness_must_be_detected(api: &TestApi) {
             migration.create_table("User", move |t| {
                 t.add_column("uniq1", types::integer().unique(true));
                 t.add_column("uniq2", types::integer());
+                t.add_index("uniq", types::index(vec!["uniq2"]).unique(true));
             });
         })
         .await;
-    let index_sql = match api.sql_family() {
-        SqlFamily::Mysql => format!("CREATE UNIQUE INDEX `uniq` ON `{}`.`User` (uniq2)", api.db_name()),
-        SqlFamily::Sqlite => format!(
-            "CREATE UNIQUE INDEX \"{}\".\"uniq\" ON \"User\" (uniq2)",
-            api.schema_name()
-        ),
-        SqlFamily::Postgres => format!(
-            "CREATE UNIQUE INDEX \"uniq\" ON \"{}\".\"User\" (uniq2)",
-            api.schema_name()
-        ),
-    };
-    api.database().execute_raw(&index_sql, &[]).await.unwrap();
 
     let result = api.describe().await.expect("describing");
     let user_table = result.get_table("User").expect("getting User table");
@@ -531,52 +511,3 @@ async fn defaults_must_work(api: &TestApi) {
         }
     );
 }
-
-// fn test_each_backend<MigrationFn, TestFn>(db_name: &str, mut migration_fn: MigrationFn, test_fn: TestFn)
-// where
-//     MigrationFn: FnMut(SqlFamily, &mut Migration) -> (),
-//     TestFn: for<'a> Fn(
-//         SqlFamily,
-//         &'a mut dyn SqlSchemaDescriberBackend,
-//         &'a str,
-//     ) -> Pin<Box<dyn std::future::Future<Output = ()> + 'a>>,
-// {
-//     let mut runtime = tokio_runtime();
-//     // SQLite
-//     {
-//         eprintln!("Testing on SQLite");
-//         let mut migration = Migration::new().schema(SCHEMA);
-//         migration_fn(SqlFamily::Sqlite, &mut migration);
-//         let full_sql = migration.make::<barrel::backend::Sqlite>();
-//         let mut describer = runtime.block_on(get_sqlite_describer(&full_sql, db_name));
-
-//         let fut = test_fn(SqlFamily::Sqlite, &mut describer, SCHEMA);
-//         runtime.block_on(fut);
-//     }
-//     // Postgres
-//     {
-//         eprintln!("Testing on Postgres");
-//         let mut migration = Migration::new().schema(SCHEMA);
-//         migration_fn(SqlFamily::Postgres, &mut migration);
-//         let full_sql = migration.make::<barrel::backend::Pg>();
-//         let mut describer = runtime.block_on(get_postgres_describer(&full_sql, db_name));
-
-//         runtime.block_on(test_fn(SqlFamily::Postgres, &mut describer, SCHEMA));
-//     }
-//     // MySQL
-//     {
-//         eprintln!("Testing on MySQL");
-//         let mut migration = Migration::new().schema(db_name);
-//         migration_fn(SqlFamily::Mysql, &mut migration);
-//         let full_sql = migration.make::<barrel::backend::MySql>();
-
-//         runtime.block_on(async {
-//             let mut describer = get_mysql_describer_for_schema(&full_sql, db_name).await;
-//             test_fn(SqlFamily::Mysql, &mut describer, db_name).await
-//         });
-//     }
-// }
-
-// fn tokio_runtime() -> tokio::runtime::Runtime {
-//     tokio::runtime::Runtime::new().unwrap()
-// }

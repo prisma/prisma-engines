@@ -220,10 +220,12 @@ async fn introspecting_a_prisma_many_to_many_relation_should_work(api: &TestApi)
             });
             migration.create_table("_PostToUser", |t| {
                 t.inject_custom(
-                    "A TEXT NOT NULL,
-                          B TEXT NOT NULL,
-                          FOREIGN KEY (A) REFERENCES  Post(id) ON DELETE CASCADE,
-                          FOREIGN KEY (B) REFERENCES  User(id) ON DELETE CASCADE",
+                    "
+                        A TEXT NOT NULL,
+                        B TEXT NOT NULL,
+                        FOREIGN KEY (A) REFERENCES  Post(id) ON DELETE CASCADE,
+                        FOREIGN KEY (B) REFERENCES  User(id) ON DELETE CASCADE
+                    ",
                 )
             });
         })
