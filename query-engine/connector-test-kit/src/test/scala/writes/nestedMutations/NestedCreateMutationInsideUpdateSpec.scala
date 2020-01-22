@@ -21,7 +21,7 @@ class NestedCreateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
           |  createParent(data: {
           |    p: "p1"
           |    childReq: {
-          |      create: {c: "c1", c_1: "c", c_2: "1"}
+          |      create: {c: "c1"}
           |    }
           |  }){
           |    id

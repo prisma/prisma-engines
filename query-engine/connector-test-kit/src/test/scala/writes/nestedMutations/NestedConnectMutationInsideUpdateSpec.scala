@@ -602,13 +602,13 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
       }
       database.setup(project)
 
-      val parentId = t.child.parse(
+      val parent = t.parent.parse(
         server
           .query(
-            """mutation {
+            s"""mutation {
             |  createParent(data: {p: "p1"})
             |  {
-            |    id
+            |    ${t.parent.selection}
             |  }
             |}""",
             project
@@ -616,17 +616,19 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
         "data.createParent"
       )
 
-      val childId = t.child.parse(
+      val child = t.child.parseFirst(
         server
           .query(
-            """mutation {
+            s"""mutation {
             |  createParent(data: {
-            |    p: "p2"
+            |    p: "p2",
             |    childrenOpt: {
             |      create: {c: "c1"}
             |    }
             |  }){
-            |    childrenOpt{id}
+            |    childrenOpt{
+            |       ${t.child.selection}
+            |    }
             |  }
             |}""",
             project
@@ -640,9 +642,9 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
         s"""
            |mutation {
            |  updateParent(
-           |  where:{id: "$parentId"}
+           |  where:{id: "$parent"}
            |  data:{
-           |    childrenOpt: {connect: {id: "$childId"}}
+           |    childrenOpt: {connect: {${t.child.identifier}: "$child"}}
            |  }){
            |    childrenOpt {
            |      c
@@ -661,9 +663,9 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
         s"""
            |mutation {
            |  updateParent(
-           |  where:{id: "$parentId"}
+           |  where:{${t.parent.identifier}: "$parent"}
            |  data:{
-           |    childrenOpt: {connect: {id: "$childId"}}
+           |    childrenOpt: {connect: {${t.child.identifier}: "$child"}}
            |  }){
            |    childrenOpt {
            |      c

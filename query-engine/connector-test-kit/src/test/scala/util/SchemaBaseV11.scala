@@ -52,8 +52,6 @@ trait SchemaBaseV11 extends PlayJsonExtensions {
     test
   }
 
-
-
   sealed trait RelationField {
     def field: String
     def isList: Boolean = false
@@ -89,7 +87,6 @@ trait SchemaBaseV11 extends PlayJsonExtensions {
     val childUniqueParams =
       Vector(QueryParams("c", "c", parse(".c"), parseFirst("c"), parseAll()), QueryParams("c_1_c_2", "c_1, c_2", parse(""), parseFirst(""), parseAll()))
 
-    //todo for testing enable generating simple case, all single ids
     val simple = true
 
     val datamodelsWithParams = for (parentId <- if (simple) Vector(simpleId) else idOptions;
@@ -103,7 +100,9 @@ trait SchemaBaseV11 extends PlayJsonExtensions {
                                                           case `compoundId`                            => compoundParentIdReference +: commonParentReferences
                                                           case _                                       => commonParentReferences
                                                         };
-                                    parentReferences <- (childId, childReferences) match {
+                                    parentReferences <- if (simple) Vector(noRef)
+                                                        else
+                                                        (childId, childReferences) match {
                                                          case (_, _) if onParent.isList && !onChild.isList => Vector(`noRef`)
                                                          case (`simpleId`, `noRef`)                        => idReference +: commonChildReferences
                                                          case (`simpleId`, _) if onParent.isList && onChild.isList =>
@@ -162,20 +161,43 @@ trait SchemaBaseV11 extends PlayJsonExtensions {
         TestAbstraction(datamodel, parentParams, childParams)
       }
 
-    println(datamodelsWithParams.length)
-    println(datamodelsWithParams)
-
     AbstractTestDataModels(mongo = datamodelsWithParams, sql = datamodelsWithParams)
   }
 
   //region NON EMBEDDED WITH @id
 
-  val schemaP1reqToC1req = {
-    val s1 = """
-    """
+    val schemaP1reqToC1req = {
+      val s1 =
+        """
+    model Parent {
+        id       String @id @default(cuid())
+        p        String @unique
+        childReq Child  @relation(references: [id])
+    }
 
-    TestDataModels(mongo = Vector(s1), sql = Vector(s1))
-  }
+    model Child {
+        id        String @id @default(cuid())
+        c         String @unique
+        parentReq Parent
+    }"""
+
+      val s2 =
+        """
+    model Parent {
+        id       String @id @default(cuid())
+        p        String @unique
+        childReq Child
+    }
+
+    model Child {
+        id        String @id @default(cuid())
+        c         String @unique
+        parentReq Parent @relation(references: [id])
+    }"""
+
+      TestDataModels(mongo = Vector(s1, s2), sql = Vector(s1, s2))
+    }
+
 
   val schemaP1optToC1req = {
     val s1 = """
