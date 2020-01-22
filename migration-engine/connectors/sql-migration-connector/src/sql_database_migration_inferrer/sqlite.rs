@@ -1,5 +1,6 @@
 use crate::{
     sql_migration::*,
+    sql_renderer::sqlite_renderer::quoted,
     sql_schema_differ::{ColumnDiffer, SqlSchemaDiff, TableDiffer},
     SqlResult,
 };
@@ -80,7 +81,7 @@ fn sqlite_fix_table(
 
 fn fix_table(current: &Table, next: &Table, schema_name: &str) -> Vec<SqlMigrationStep> {
     // based on 'Making Other Kinds Of Table Schema Changes' from https://www.sqlite.org/lang_altertable.html
-    let name_of_temporary_table = format!("new_{}", next.name.clone());
+    let name_of_temporary_table = format!("new_{}", &next.name);
     let mut temporary_table = next.clone();
     temporary_table.name = name_of_temporary_table.clone();
 
@@ -122,7 +123,7 @@ fn fix_table(current: &Table, next: &Table, schema_name: &str) -> Vec<SqlMigrati
     }));
 
     result.push(SqlMigrationStep::RawSql {
-        raw: format!(r#"PRAGMA "{}".foreign_key_check;"#, schema_name),
+        raw: format!("PRAGMA {}.foreign_key_check;", quoted(schema_name)),
     });
 
     result.push(SqlMigrationStep::RawSql {
@@ -151,32 +152,37 @@ fn copy_current_table_into_new_table(
                 && columns.next.default.is_some()
         })
         .collect();
-    let intersection_columns: Vec<String> = differ
+    let intersection_columns: Vec<&str> = differ
         .column_pairs()
         .filter(|columns| {
             !columns_that_became_required_with_a_default
                 .iter()
                 .any(|excluded| excluded.name() == columns.name())
         })
-        .map(|columns| format!(r#""{}""#, columns.name()))
+        .map(|columns| columns.name())
         .collect();
 
     let mut query = String::with_capacity(40);
 
-    write!(query, r#"INSERT INTO "{}"."{}" ("#, schema_name, &differ.next.name)?;
+    write!(
+        query,
+        "INSERT INTO {}.{} (",
+        quoted(schema_name),
+        quoted(&differ.next.name)
+    )?;
 
     let mut destination_columns = intersection_columns
         .iter()
-        .map(|s| s.clone())
+        .map(|s| *s)
         .chain(
             columns_that_became_required_with_a_default
                 .iter()
-                .map(|columns| format!(r#""{}""#, columns.name())),
+                .map(|columns| columns.name()),
         )
         .peekable();
 
     while let Some(destination_column) = destination_columns.next() {
-        write!(query, "{}", destination_column)?;
+        write!(query, "{}", quoted(destination_column))?;
 
         if destination_columns.peek().is_some() {
             write!(query, ", ")?;
@@ -187,11 +193,11 @@ fn copy_current_table_into_new_table(
 
     let mut source_columns = intersection_columns
         .iter()
-        .map(|s| s.clone())
+        .map(|s| format!("{}", quoted(s)))
         .chain(columns_that_became_required_with_a_default.iter().map(|columns| {
             format!(
-                r#"coalesce("{column_name}", {default_value}) AS "{column_name}""#,
-                column_name = columns.name(),
+                "coalesce({column_name}, {default_value}) AS {column_name}",
+                column_name = quoted(columns.name()),
                 default_value = render_default(&columns.next)
             )
         }))
@@ -205,7 +211,7 @@ fn copy_current_table_into_new_table(
         }
     }
 
-    write!(query, r#" FROM "{}""#, &differ.previous.name)?;
+    write!(query, " FROM {}.{}", quoted(schema_name), quoted(&differ.previous.name))?;
 
     steps.push(SqlMigrationStep::RawSql { raw: query });
 

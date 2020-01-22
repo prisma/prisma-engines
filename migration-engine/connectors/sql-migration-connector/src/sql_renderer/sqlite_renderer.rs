@@ -3,7 +3,7 @@ use crate::SqlFamily;
 use sql_schema_describer::*;
 use std::fmt::Write as _;
 
-pub struct SqliteRenderer {}
+pub struct SqliteRenderer;
 
 impl super::SqlRenderer for SqliteRenderer {
     fn sql_family(&self) -> SqlFamily {
@@ -11,11 +11,11 @@ impl super::SqlRenderer for SqliteRenderer {
     }
 
     fn quote(&self, name: &str) -> String {
-        format!("\"{}\"", name)
+        format!("{}", quoted(name))
     }
 
     fn write_quoted(&self, buf: &mut String, name: &str) -> std::fmt::Result {
-        write!(buf, r#""{}""#, name)
+        write!(buf, "{}", quoted(name))
     }
 
     fn render_column(&self, _schema_name: &str, _table: &Table, column: &Column, _add_fk_prefix: bool) -> String {
@@ -49,17 +49,32 @@ impl super::SqlRenderer for SqliteRenderer {
     fn render_references(&self, _schema_name: &str, foreign_key: &ForeignKey) -> String {
         use itertools::Itertools;
 
-        let referenced_fields = foreign_key
-            .referenced_columns
-            .iter()
-            .map(|col| format!(r#""{}""#, col))
-            .join(",");
+        let referenced_fields = foreign_key.referenced_columns.iter().map(SqliteQuoted).join(",");
 
         format!(
-            "REFERENCES \"{}\"({}) {}",
-            foreign_key.referenced_table,
-            referenced_fields,
-            render_on_delete(&foreign_key.on_delete_action)
+            "REFERENCES {referenced_table}({referenced_fields}) {on_delete_action}",
+            referenced_table = quoted(&foreign_key.referenced_table),
+            referenced_fields = referenced_fields,
+            on_delete_action = render_on_delete(&foreign_key.on_delete_action)
         )
+    }
+}
+
+pub(crate) fn quoted<T>(t: T) -> SqliteQuoted<T>
+where
+    T: std::fmt::Display,
+{
+    SqliteQuoted(t)
+}
+
+#[derive(Debug)]
+pub(crate) struct SqliteQuoted<T>(T);
+
+impl<T> std::fmt::Display for SqliteQuoted<T>
+where
+    T: std::fmt::Display,
+{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, r#""{}""#, self.0)
     }
 }

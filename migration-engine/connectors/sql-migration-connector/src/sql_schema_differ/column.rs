@@ -7,7 +7,7 @@ pub(crate) struct ColumnDiffer<'a> {
 }
 
 impl<'a> ColumnDiffer<'a> {
-    pub(crate) fn name(&self) -> &str {
+    pub(crate) fn name(&self) -> &'a str {
         debug_assert_eq!(self.previous.name, self.next.name);
 
         self.previous.name.as_str()
