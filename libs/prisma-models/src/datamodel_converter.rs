@@ -14,7 +14,7 @@ impl<'a> DatamodelConverter<'a> {
     }
 
     pub fn convert(datamodel: &dml::Datamodel) -> InternalDataModelTemplate {
-        DatamodelConverter::new(datamodel).convert_internal()
+        dbg!(DatamodelConverter::new(datamodel).convert_internal())
     }
 
     fn new(datamodel: &dml::Datamodel) -> DatamodelConverter {
@@ -78,7 +78,6 @@ impl<'a> DatamodelConverter<'a> {
                         is_required: field.is_required(),
                         is_list: field.is_list(),
                         is_unique: field.is_unique(),
-                        is_hidden: false,
                         is_auto_generated_int_id: field.is_auto_generated_int_id(),
                         manifestation: field.manifestation(),
                         relation_name: relation.name(),

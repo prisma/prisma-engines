@@ -17,7 +17,6 @@ pub struct RelationFieldTemplate {
     pub is_required: bool,
     pub is_list: bool,
     pub is_unique: bool,
-    pub is_hidden: bool,
     pub is_auto_generated_int_id: bool,
     pub manifestation: Option<FieldManifestation>,
     pub relation_name: String,
@@ -30,7 +29,6 @@ pub struct RelationField {
     pub type_identifier: TypeIdentifier,
     pub is_required: bool,
     pub is_list: bool,
-    pub is_hidden: bool,
     pub is_auto_generated_int_id: bool,
     pub relation_name: String,
     pub relation_side: RelationSide,
@@ -50,7 +48,6 @@ impl Hash for RelationField {
         self.type_identifier.hash(state);
         self.is_required.hash(state);
         self.is_list.hash(state);
-        self.is_hidden.hash(state);
         self.is_auto_generated_int_id.hash(state);
         self.relation_name.hash(state);
         self.relation_side.hash(state);
@@ -65,7 +62,6 @@ impl PartialEq for RelationField {
             && self.type_identifier == other.type_identifier
             && self.is_required == other.is_required
             && self.is_list == other.is_list
-            && self.is_hidden == other.is_hidden
             && self.is_auto_generated_int_id == other.is_auto_generated_int_id
             && self.relation_name == other.relation_name
             && self.relation_side == other.relation_side
@@ -131,9 +127,7 @@ impl RelationField {
             RelationLinkManifestation::Inline(ref m) => {
                 let is_self_rel = relation.is_self_relation();
 
-                if is_self_rel && self.is_hidden {
-                    self.name.clone()
-                } else if is_self_rel && (self.relation_side == RelationSide::B || self.related_field().is_hidden) {
+                if is_self_rel && self.relation_side == RelationSide::B {
                     m.referencing_column.clone()
                 } else if is_self_rel && self.relation_side == RelationSide::A {
                     self.name.clone()
@@ -155,9 +149,7 @@ impl RelationField {
             RelationLinkManifestation::Inline(ref m) => {
                 let is_self_rel = relation.is_self_relation();
 
-                if is_self_rel && self.is_hidden {
-                    false
-                } else if is_self_rel && (self.relation_side == RelationSide::B || self.related_field().is_hidden) {
+                if is_self_rel && self.relation_side == RelationSide::B {
                     true
                 } else if is_self_rel && self.relation_side == RelationSide::A {
                     false

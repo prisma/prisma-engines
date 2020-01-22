@@ -73,12 +73,9 @@ impl<'a> ObjectTypeBuilder<'a> {
             .fields()
             .all
             .iter()
-            .filter(|f| {
-                f.is_visible()
-                    && match f {
-                        ModelField::Scalar(_) => true,
-                        ModelField::Relation(_) => self.with_relations,
-                    }
+            .filter(|f| match f {
+                ModelField::Scalar(_) => true,
+                ModelField::Relation(_) => self.with_relations,
             })
             .map(|f| self.map_field(f))
             .collect()
@@ -130,7 +127,6 @@ impl<'a> ObjectTypeBuilder<'a> {
     /// Builds "many records where" arguments based on the given model and field.
     pub fn many_records_field_arguments(&self, field: &ModelField) -> Vec<Argument> {
         match field {
-            f if !f.is_visible() => vec![],
             ModelField::Scalar(_) => vec![],
             ModelField::Relation(rf) if rf.is_list && !rf.related_model().is_embedded => {
                 self.many_records_arguments(&rf.related_model())

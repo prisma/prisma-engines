@@ -144,14 +144,13 @@ impl<'a> FilterObjectTypeBuilder<'a> {
         let related_model = field.related_model();
         let related_input_type = self.filter_object_type(related_model);
 
-        match (field.is_hidden, field.is_list) {
-            (true, _) => vec![],
-            (_, false) => vec![input_field(
+        match field.is_list {
+            false => vec![input_field(
                 field.name.clone(),
                 InputType::opt(InputType::object(Weak::clone(&related_input_type))),
                 None,
             )],
-            (_, true) => get_field_filters(&ModelField::Relation(Arc::clone(&field)))
+            true => get_field_filters(&ModelField::Relation(Arc::clone(&field)))
                 .into_iter()
                 .map(|arg| {
                     let field_name = format!("{}{}", field.name, arg.suffix);

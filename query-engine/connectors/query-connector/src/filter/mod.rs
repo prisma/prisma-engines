@@ -128,7 +128,6 @@ pub fn test_data_model() -> InternalDataModelRef {
             is_required: false,
             is_list: false,
             is_unique: false,
-            is_hidden: false,
             is_auto_generated_int_id: false,
             manifestation: None,
             relation_name: "bar".to_owned(),

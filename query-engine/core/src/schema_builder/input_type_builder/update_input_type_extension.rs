@@ -54,7 +54,6 @@ pub trait UpdateInputTypeBuilderExtension<'a>: InputTypeBuilderBase<'a> + Create
             .fields()
             .relation()
             .into_iter()
-            .filter(|rf| !rf.is_hidden)
             .filter_map(|rf| {
                 let related_model = rf.related_model();
                 let related_field = rf.related_field();
@@ -66,11 +65,7 @@ pub trait UpdateInputTypeBuilderExtension<'a>: InputTypeBuilderBase<'a> + Create
                     (false, false) => "One",
                 };
 
-                let without_part = if related_field.is_hidden {
-                    "".into()
-                } else {
-                    format!("Without{}", capitalize(related_field.name.clone()))
-                };
+                let without_part = format!("Without{}", capitalize(related_field.name.clone()));
 
                 let input_name = format!("{}Update{}{}Input", related_model.name, arity_part, without_part);
                 let field_is_opposite_relation_field = parent_field
@@ -152,15 +147,11 @@ pub trait UpdateInputTypeBuilderExtension<'a>: InputTypeBuilderBase<'a> + Create
             return None;
         }
 
-        let type_name = if parent_field.related_field().is_hidden {
-            format!("{}UpsertWithWhereUniqueNestedInput", related_model.name.clone())
-        } else {
-            format!(
-                "{}UpsertWithWhereUniqueWithout{}Input",
-                related_model.name.clone(),
-                capitalize(parent_field.related_field().name.clone())
-            )
-        };
+        let type_name = format!(
+            "{}UpsertWithWhereUniqueWithout{}Input",
+            related_model.name.clone(),
+            capitalize(parent_field.related_field().name.clone())
+        );
 
         match self.get_cache().get(&type_name) {
             None => {
@@ -193,15 +184,11 @@ pub trait UpdateInputTypeBuilderExtension<'a>: InputTypeBuilderBase<'a> + Create
             return None;
         }
 
-        let type_name = if parent_field.related_field().is_hidden {
-            format!("{}UpsertNestedInput", related_model.name.clone())
-        } else {
-            format!(
-                "{}UpsertWithout{}Input",
-                related_model.name.clone(),
-                capitalize(parent_field.related_field().name.clone())
-            )
-        };
+        let type_name = format!(
+            "{}UpsertWithout{}Input",
+            related_model.name.clone(),
+            capitalize(parent_field.related_field().name.clone())
+        );
 
         match self.get_cache().get(&type_name) {
             None => {
@@ -314,15 +301,11 @@ pub trait UpdateInputTypeBuilderExtension<'a>: InputTypeBuilderBase<'a> + Create
 
         if parent_field.is_list {
             let where_input_object = self.where_unique_object_type(Arc::clone(&related_model));
-            let type_name = if parent_field.related_field().is_hidden {
-                format!("{}UpdateWithWhereUniqueNestedInput", related_model.name.clone())
-            } else {
-                format!(
-                    "{}UpdateWithWhereUniqueWithout{}Input",
-                    related_model.name.clone(),
-                    capitalize(parent_field.related_field().name.clone())
-                )
-            };
+            let type_name = format!(
+                "{}UpdateWithWhereUniqueWithout{}Input",
+                related_model.name.clone(),
+                capitalize(parent_field.related_field().name.clone())
+            );
 
             return_cached!(self.get_cache(), &type_name);
             let input_object = Arc::new(init_input_object_type(type_name.clone()));
@@ -343,15 +326,11 @@ pub trait UpdateInputTypeBuilderExtension<'a>: InputTypeBuilderBase<'a> + Create
     /// Builds "<x>UpdateDataInput" / "<x>UpdateWithout<y>DataInput" ubout input object types.
     fn nested_update_data(&self, parent_field: RelationFieldRef) -> InputObjectTypeRef {
         let related_model = parent_field.related_model();
-        let type_name = if parent_field.related_field().is_hidden {
-            format!("{}UpdateDataInput", related_model.name.clone())
-        } else {
-            format!(
-                "{}UpdateWithout{}DataInput",
-                related_model.name.clone(),
-                capitalize(parent_field.related_field().name.clone())
-            )
-        };
+        let type_name = format!(
+            "{}UpdateWithout{}DataInput",
+            related_model.name.clone(),
+            capitalize(parent_field.related_field().name.clone())
+        );
 
         return_cached!(self.get_cache(), &type_name);
 

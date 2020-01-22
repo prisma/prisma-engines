@@ -86,15 +86,10 @@ impl RelationExtPrivate for Relation {
             RelationLinkManifestation::RelationTable(ref m) => m.model_a_column.clone().into(),
             RelationLinkManifestation::Inline(ref m) => {
                 let model_a = self.model_a();
-                let model_b = self.model_b();
 
-                if self.is_self_relation() && self.field_a().is_hidden {
-                    model_a.fields().id().as_column()
-                } else if self.is_self_relation() && self.field_b().is_hidden {
-                    model_b.fields().id().as_column()
-                } else if self.is_self_relation() {
+                if self.is_self_relation() {
                     m.referencing_column(self.as_table())
-                } else if m.in_table_of_model_name == model_a.name && !self.is_self_relation() {
+                } else if m.in_table_of_model_name == model_a.name {
                     model_a.fields().id().as_column()
                 } else {
                     m.referencing_column(self.as_table())
@@ -110,11 +105,9 @@ impl RelationExtPrivate for Relation {
             RelationLinkManifestation::Inline(ref m) => {
                 let model_b = self.model_b();
 
-                if self.is_self_relation() && (self.field_a().is_hidden || self.field_b().is_hidden) {
-                    m.referencing_column(self.as_table())
-                } else if self.is_self_relation() {
+                if self.is_self_relation() {
                     model_b.fields().id().as_column()
-                } else if m.in_table_of_model_name == model_b.name && !self.is_self_relation() {
+                } else if m.in_table_of_model_name == model_b.name {
                     model_b.fields().id().as_column()
                 } else {
                     m.referencing_column(self.as_table())

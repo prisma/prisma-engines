@@ -63,11 +63,6 @@ impl Field {
         }
     }
 
-    pub fn is_visible(&self) -> bool {
-        // TODO: remove
-        true
-    }
-
     pub fn is_scalar(&self) -> bool {
         match self {
             Field::Scalar(_) => true,
@@ -123,7 +118,6 @@ impl FieldTemplate {
                     type_identifier: rt.type_identifier,
                     is_required: rt.is_required,
                     is_list: rt.is_list,
-                    is_hidden: rt.is_hidden,
                     is_auto_generated_int_id: rt.is_auto_generated_int_id,
                     is_unique: rt.is_unique,
                     relation_name: rt.relation_name,

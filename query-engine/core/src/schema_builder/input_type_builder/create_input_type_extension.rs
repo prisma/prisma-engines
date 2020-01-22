@@ -5,7 +5,7 @@ pub trait CreateInputTypeBuilderExtension<'a>: InputTypeBuilderBase<'a> {
     #[rustfmt::skip]
     fn create_input_type(&self, model: ModelRef, parent_field: Option<RelationFieldRef>) -> InputObjectTypeRef {
         let name = match parent_field.as_ref().map(|pf| pf.related_field()) {
-            Some(ref f) if !f.is_hidden => format!("{}CreateWithout{}Input", model.name, capitalize(f.name.as_str())),
+            Some(ref f) => format!("{}CreateWithout{}Input", model.name, capitalize(f.name.as_str())),
             _ => format!("{}CreateInput", model.name),
         };
 
@@ -75,18 +75,12 @@ pub trait CreateInputTypeBuilderExtension<'a>: InputTypeBuilderBase<'a> {
             .fields()
             .relation()
             .into_iter()
-            .filter(|rf| !rf.is_hidden)
             .filter_map(|rf| {
                 let related_model = rf.related_model();
-                let related_field = rf.related_field();
 
                 // Compute input object name
                 let arity_part = if rf.is_list { "Many" } else { "One" };
-                let without_part = if !related_field.is_hidden {
-                    format!("Without{}", capitalize(rf.name.clone()))
-                } else {
-                    "".into()
-                };
+                let without_part = format!("Without{}", capitalize(rf.name.clone()));
 
                 let input_name = format!("{}Create{}{}Input", related_model.name, arity_part, without_part);
                 let field_is_opposite_relation_field = parent_field
