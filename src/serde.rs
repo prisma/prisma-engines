@@ -66,13 +66,13 @@ impl<'de> Deserializer<'de> for RowDeserializer {
 
     fn deserialize_any<V: Visitor<'de>>(self, visitor: V) -> Result<V::Value, Self::Error> {
         let ResultRow {
-            name_to_index,
+            columns,
             mut values,
         } = self.0;
 
-        let kvs = name_to_index.iter().map(move |(k, v)| {
-            // The unwrap is safe if `name_to_index` is correct.
-            let value = values.get_mut(*v).unwrap();
+        let kvs = columns.iter().enumerate().map(move |(v, k)| {
+            // The unwrap is safe if `columns` is correct.
+            let value = values.get_mut(v).unwrap();
             let taken_value = std::mem::replace(value, ParameterizedValue::Null);
             (k.as_str(), taken_value)
         });
@@ -143,19 +143,17 @@ impl<'de> Deserializer<'de> for ParameterizedValueDeserializer<'de> {
 
 #[doc(hidden)]
 pub fn make_row(cols: Vec<(&'static str, ParameterizedValue<'static>)>) -> ResultRow {
-    use std::collections::BTreeMap;
-
-    let mut name_to_index = BTreeMap::new();
+    let mut columns = Vec::with_capacity(cols.len());
     let mut values = Vec::with_capacity(cols.len());
 
-    for (idx, (name, value)) in cols.into_iter().enumerate() {
-        name_to_index.insert(name.to_owned(), idx);
+    for (name, value) in cols.into_iter() {
+        columns.push(name.to_owned());
         values.push(value);
     }
 
     ResultRow {
         values,
-        name_to_index: std::sync::Arc::new(name_to_index),
+        columns: std::sync::Arc::new(columns),
     }
 }
 
@@ -204,7 +202,7 @@ mod tests {
         let second_row = make_row(vec![("id", 33.into()), ("name", "Philbert".into())]);
 
         let result_set = ResultSet {
-            name_to_index: std::sync::Arc::clone(&first_row.name_to_index),
+            columns: std::sync::Arc::clone(&first_row.columns),
             rows: vec![first_row.values, second_row.values],
             last_insert_id: None,
         };
