@@ -7,6 +7,12 @@ pub(crate) struct ColumnDiffer<'a> {
 }
 
 impl<'a> ColumnDiffer<'a> {
+    pub(crate) fn name(&self) -> &str {
+        debug_assert_eq!(self.previous.name, self.next.name);
+
+        self.previous.name.as_str()
+    }
+
     pub(crate) fn differs_in_something(&self) -> bool {
         self.all_changes().iter().count() > 0
     }
