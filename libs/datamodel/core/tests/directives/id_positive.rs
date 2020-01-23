@@ -161,3 +161,40 @@ fn multi_field_ids_must_work() {
     let user_model = datamodel.assert_has_model("Model");
     user_model.assert_has_id_fields(&["a", "b"]);
 }
+
+#[test]
+fn relation_field_as_id_must_work() {
+    let dml = r#"
+    model User {
+        identification Identification @relation(references:[id]) @id
+    }
+    
+    model Identification {
+        id Int @id
+    }
+    "#;
+
+    let schema = parse(dml);
+    let user_model = schema.assert_has_model("User");
+    user_model.assert_has_field("identification").assert_is_id(true);
+}
+
+#[test]
+fn relation_fields_as_part_of_compound_id_must_work() {
+    let dml = r#"
+    model User {
+        name           String            
+        identification Identification @relation(references:[id])
+
+        @@id([name, identification])
+    }
+    
+    model Identification {
+        id Int @id
+    }
+    "#;
+
+    let schema = parse(dml);
+    let user_model = schema.assert_has_model("User");
+    user_model.assert_has_id_fields(&["name", "identification"]);
+}
