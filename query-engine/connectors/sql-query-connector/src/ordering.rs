@@ -14,7 +14,7 @@ impl Ordering {
                 .primary_order_by
                 .as_ref()
                 .map(|oby| oby.field.as_column()),
-            model.identifier().as_columns().collect(),
+            model.primary_identifier().as_columns().collect(),
             order_directive,
         )
     }
@@ -60,36 +60,23 @@ impl Ordering {
                 let first = first_column.unwrap();
                 let size_hint = identifier.len() + 1;
 
-                if !identifier.contains(&first) && order_directive.needs_implicit_id_ordering && !order_by.field.unique() {
+                if !identifier.contains(&first)
+                    && order_directive.needs_implicit_id_ordering
+                    && !order_by.field.unique()
+                {
                     match (order_by.sort_order, order_directive.needs_to_be_reverse_order) {
                         (SortOrder::Ascending, true) => {
-                            Self::merge_columns(
-                                first.descend(),
-                                identifier.into_iter().map(|c| c.descend()),
-                                size_hint,
-                            )
+                            Self::merge_columns(first.descend(), identifier.into_iter().map(|c| c.descend()), size_hint)
                         }
                         (SortOrder::Descending, true) => {
-                            Self::merge_columns(
-                                first.ascend(),
-                                identifier.into_iter().map(|c| c.descend()),
-                                size_hint,
-                            )
+                            Self::merge_columns(first.ascend(), identifier.into_iter().map(|c| c.descend()), size_hint)
                         }
                         (SortOrder::Ascending, false) => {
-                            Self::merge_columns(
-                                first.ascend(),
-                                identifier.into_iter().map(|c| c.ascend()),
-                                size_hint,
-                            )
+                            Self::merge_columns(first.ascend(), identifier.into_iter().map(|c| c.ascend()), size_hint)
                         }
                         (SortOrder::Descending, false) => {
-                            Self::merge_columns(
-                                first.descend(),
-                                identifier.into_iter().map(|c| c.ascend()),
-                                size_hint,
-                            )
-                        },
+                            Self::merge_columns(first.descend(), identifier.into_iter().map(|c| c.ascend()), size_hint)
+                        }
                     }
                 } else {
                     match (order_by.sort_order, order_directive.needs_to_be_reverse_order) {
@@ -113,7 +100,7 @@ impl Ordering {
     fn merge_columns(
         first: OrderDefinition<'static>,
         rest: impl IntoIterator<Item = OrderDefinition<'static>>,
-        size_hint: usize
+        size_hint: usize,
     ) -> OrderVec<'static> {
         let mut order_vec = Vec::with_capacity(size_hint);
         order_vec.push(first);

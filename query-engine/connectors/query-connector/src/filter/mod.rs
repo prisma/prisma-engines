@@ -9,7 +9,7 @@ mod relation;
 mod scalar;
 
 use prisma_models::prelude::*;
-use prisma_models::DataSourceField;
+use prisma_models::{dml, DataSourceField};
 use std::fmt;
 
 pub use list::*;
@@ -110,6 +110,8 @@ pub fn test_data_model() -> InternalDataModelRef {
             internal_enum: None,
             data_source_field: DataSourceField {
                 name: "id".to_owned(),
+                arity: dml::FieldArity::Optional,
+                field_type: dml::ScalarType::String,
                 default_value: None,
             },
         }),
@@ -124,22 +126,20 @@ pub fn test_data_model() -> InternalDataModelRef {
             internal_enum: None,
             data_source_field: DataSourceField {
                 name: "name".to_owned(),
+                arity: dml::FieldArity::Optional,
+                field_type: dml::ScalarType::String,
                 default_value: None,
             },
         }),
         FieldTemplate::Relation(RelationFieldTemplate {
             name: "sites".to_owned(),
-            type_identifier: TypeIdentifier::String,
             is_required: false,
             is_list: false,
             is_unique: false,
             is_auto_generated_int_id: false,
             relation_name: "bar".to_owned(),
             relation_side: RelationSide::A,
-            data_source_fields: vec![DataSourceField {
-                name: "sites".to_owned(),
-                default_value: None,
-            }],
+            data_source_fields: vec![],
         }),
     ];
 
@@ -154,6 +154,8 @@ pub fn test_data_model() -> InternalDataModelRef {
         internal_enum: None,
         data_source_field: DataSourceField {
             name: "name".to_owned(),
+            arity: dml::FieldArity::Optional,
+            field_type: dml::ScalarType::String,
             default_value: None,
         },
     })];

@@ -159,7 +159,7 @@ impl AliasedCondition for ScalarFilter {
 impl AliasedCondition for RelationFilter {
     /// Conversion from a `RelationFilter` to a query condition tree. Aliased when in a nested `SELECT`.
     fn aliased_cond(self, alias: Option<Alias>) -> ConditionTree<'static> {
-        let identifier = self.field.model().identifier();
+        let identifier = self.field.model().primary_identifier();
         let ids = identifier.as_columns();
 
         let columns: Vec<Column<'static>> = match alias {
@@ -197,7 +197,7 @@ impl AliasedSelect for RelationFilter {
         let other_columns_len = other_columns.len();
         let other_columns = other_columns.map(|c| c.table(alias.to_string(None)));
 
-        let id_columns = self.field.related_model().identifier().as_columns();
+        let id_columns = self.field.related_model().primary_identifier().as_columns();
         let id_columns_len = id_columns.len();
         let id_columns = id_columns.map(|col| col.table(alias.to_string(Some(AliasMode::Join))));
 
@@ -230,7 +230,7 @@ impl AliasedSelect for RelationFilter {
             let identifiers: Vec<_> = self
                 .field
                 .related_model()
-                .identifier()
+                .primary_identifier()
                 .as_columns()
                 .map(|col| col.table(alias.to_string(Some(AliasMode::Join))))
                 .collect();
@@ -263,7 +263,7 @@ impl AliasedCondition for OneRelationIsNullFilter {
 
                 match acc {
                     ConditionTree::NoCondition => column_is_null.into(),
-                    cond => cond.and(column_is_null)
+                    cond => cond.and(column_is_null),
                 }
             })
         } else {
@@ -286,7 +286,7 @@ impl AliasedCondition for OneRelationIsNullFilter {
             let id_columns: Vec<Column<'static>> = self
                 .field
                 .model()
-                .identifier()
+                .primary_identifier()
                 .as_columns()
                 .map(|c| c.opt_table(alias.clone()))
                 .collect();

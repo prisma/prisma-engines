@@ -112,16 +112,17 @@ impl RelationExt for Relation {
             RelationTable(ref m) => ColumnIterator::from(vec![m.model_a_column.clone().into()]),
             Inline(ref m) => {
                 let model_a = self.model_a();
+                let model_b = self.model_b();
 
                 if self.is_self_relation() {
-                    m.referencing_columns(self.as_table())
+                    (&model_b, self.field_b().data_source_fields.as_slice()).as_columns()
                 } else if m.in_table_of_model_name == model_a.name && !self.is_self_relation() {
-                    let identifier = model_a.identifier();
+                    let identifier = model_a.primary_identifier();
                     let count = identifier.len();
 
                     ColumnIterator::new(identifier.as_columns(), count)
                 } else {
-                    m.referencing_columns(self.as_table())
+                    (&model_b, self.field_b().data_source_fields.as_slice()).as_columns()
                 }
             }
         }
@@ -134,20 +135,21 @@ impl RelationExt for Relation {
         match self.manifestation {
             RelationTable(ref m) => ColumnIterator::from(vec![m.model_b_column.clone().into()]),
             Inline(ref m) => {
+                let model_a = self.model_a();
                 let model_b = self.model_b();
 
                 if self.is_self_relation() {
-                    let identifier = model_b.identifier();
+                    let identifier = model_b.primary_identifier();
                     let count = identifier.len();
 
                     ColumnIterator::new(identifier.as_columns(), count)
                 } else if m.in_table_of_model_name == model_b.name {
-                    let identifier = model_b.identifier();
+                    let identifier = model_b.primary_identifier();
                     let count = identifier.len();
 
                     ColumnIterator::new(identifier.as_columns(), count)
                 } else {
-                    m.referencing_columns(self.as_table())
+                    (&model_a, self.field_a().data_source_fields.as_slice()).as_columns()
                 }
             }
         }

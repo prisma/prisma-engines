@@ -1,4 +1,5 @@
 use crate::{DataSourceFieldRef, DomainError, Field, PrismaValue};
+use std::sync::Arc;
 
 // Collection of fields that uniquely identify a record of a model.
 // There can be different sets of fields at the same time identifying a model.
@@ -36,6 +37,24 @@ impl ModelIdentifier {
 
     pub fn get(&self, name: &str) -> Option<&Field> {
         self.fields().find(|field| field.name() == name)
+    }
+
+    pub fn data_source_fields<'a>(&'a self) -> impl Iterator<Item = DataSourceFieldRef> + 'a {
+        self.fields
+            .iter()
+            .flat_map(|field| match field {
+                Field::Scalar(sf) => vec![sf.data_source_field.clone()],
+                Field::Relation(rf) => rf.data_source_fields.iter().map(Arc::clone).collect(),
+            })
+            .into_iter()
+    }
+
+    pub fn map_db_name(&self, name: &str) -> Option<&DataSourceFieldRef> {
+        self.fields().find_map(|field| match field {
+            Field::Scalar(sf) if sf.data_source_field.name == name => Some(&sf.data_source_field),
+            Field::Relation(rf) => rf.data_source_fields.iter().find(|dsf| dsf.name == name),
+            _ => None,
+        })
     }
 }
 

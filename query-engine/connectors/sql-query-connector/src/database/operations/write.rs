@@ -1,8 +1,8 @@
-use crate::{query_builder::write, QueryExt, error::SqlError};
+use crate::{error::SqlError, query_builder::write, QueryExt};
 use connector_interface::*;
-use prisma_models::*;
-use quaint::error::{Error as QueryError, DatabaseConstraint};
 use itertools::Itertools;
+use prisma_models::*;
+use quaint::error::{DatabaseConstraint, Error as QueryError};
 use std::convert::TryFrom;
 
 pub async fn create_record(conn: &dyn QueryExt, model: &ModelRef, args: WriteArgs) -> crate::Result<RecordIdentifier> {
@@ -10,38 +10,60 @@ pub async fn create_record(conn: &dyn QueryExt, model: &ModelRef, args: WriteArg
 
     let result_set = match conn.insert(insert).await {
         Ok(result_set) => result_set,
-        Err(QueryError::UniqueConstraintViolation { constraint }) => {
-            match constraint {
-                DatabaseConstraint::Index(_) => {
-                    let fields = model.identifier().into_iter().map(|id| format!("{}.{}", model.name, id.name));
-                    return Err(SqlError::UniqueConstraintViolation { field_names: fields.collect() });
-                },
-                DatabaseConstraint::Fields(fields) if fields.first().map(|s| s.as_str()) == Some("PRIMARY") => {
-                    let fields = model.identifier().into_iter().map(|id| format!("{}.{}", model.name, id.name));
-                    return Err(SqlError::UniqueConstraintViolation { field_names: fields.collect() });
-                },
-                DatabaseConstraint::Fields(fields) => {
-                    let field_names = fields.into_iter().map(|field_name| format!("{}.{}", model.name, field_name)).collect();
-                    return Err(SqlError::UniqueConstraintViolation { field_names })
-                }
+        Err(QueryError::UniqueConstraintViolation { constraint }) => match constraint {
+            DatabaseConstraint::Index(_) => {
+                let fields = model
+                    .primary_identifier()
+                    .into_iter()
+                    .map(|id_field| format!("{}.{}", model.name, id_field.name()));
+                return Err(SqlError::UniqueConstraintViolation {
+                    field_names: fields.collect(),
+                });
             }
-        }
-        Err(QueryError::NullConstraintViolation { constraint }) => {
-            match constraint {
-                DatabaseConstraint::Index(_) => {
-                    let mut fields = model.identifier().into_iter().map(|id| format!("{}.{}", model.name, id.name));
-                    return Err(SqlError::NullConstraintViolation { field_name: fields.join(",") });
-                },
-                DatabaseConstraint::Fields(fields) if fields.first().map(|s| s.as_str()) == Some("PRIMARY") => {
-                    let mut fields = model.identifier().into_iter().map(|id| format!("{}.{}", model.name, id.name));
-                    return Err(SqlError::NullConstraintViolation { field_name: fields.join(",") });
-                },
-                DatabaseConstraint::Fields(fields) => {
-                    let field_name = fields.into_iter().map(|field_name| format!("{}.{}", model.name, field_name)).collect();
-                    return Err(SqlError::NullConstraintViolation { field_name })
-                }
+            DatabaseConstraint::Fields(fields) if fields.first().map(|s| s.as_str()) == Some("PRIMARY") => {
+                let fields = model
+                    .primary_identifier()
+                    .into_iter()
+                    .map(|id_field| format!("{}.{}", model.name, id_field.name()));
+                return Err(SqlError::UniqueConstraintViolation {
+                    field_names: fields.collect(),
+                });
             }
-        }
+            DatabaseConstraint::Fields(fields) => {
+                let field_names = fields
+                    .into_iter()
+                    .map(|field_name| format!("{}.{}", model.name, field_name))
+                    .collect();
+                return Err(SqlError::UniqueConstraintViolation { field_names });
+            }
+        },
+        Err(QueryError::NullConstraintViolation { constraint }) => match constraint {
+            DatabaseConstraint::Index(_) => {
+                let mut fields = model
+                    .primary_identifier()
+                    .into_iter()
+                    .map(|id_field| format!("{}.{}", model.name, id_field.name()));
+                return Err(SqlError::NullConstraintViolation {
+                    field_name: fields.join(","),
+                });
+            }
+            DatabaseConstraint::Fields(fields) if fields.first().map(|s| s.as_str()) == Some("PRIMARY") => {
+                let mut fields = model
+                    .primary_identifier()
+                    .into_iter()
+                    .map(|id_field| format!("{}.{}", model.name, id_field.name()));
+                return Err(SqlError::NullConstraintViolation {
+                    field_name: fields.join(","),
+                });
+            }
+            DatabaseConstraint::Fields(fields) => {
+                let field_name = fields
+                    .into_iter()
+                    .map(|field_name| format!("{}.{}", model.name, field_name))
+                    .collect();
+                return Err(SqlError::NullConstraintViolation { field_name });
+            }
+        },
         Err(e) => return Err(SqlError::from(e)),
     };
 
@@ -50,15 +72,15 @@ pub async fn create_record(conn: &dyn QueryExt, model: &ModelRef, args: WriteArg
         (Some(identifier), _, _) if !identifier.misses_autogen_value() => Ok(identifier),
 
         // PostgreSQL with a working RETURNING statement
-        (_, n, _) if n > 0 => Ok(RecordIdentifier::try_from((&model.identifier(), result_set))?),
+        (_, n, _) if n > 0 => Ok(RecordIdentifier::try_from((&model.primary_identifier(), result_set))?),
 
         // We have an auto-incremented id that we got from MySQL or SQLite
         (Some(mut identifier), _, Some(num)) if identifier.misses_autogen_value() => {
             identifier.add_autogen_value(num as i64);
             Ok(identifier)
-        },
+        }
 
-        (_, _, _) => panic!("Could not figure out an ID in create")
+        (_, _, _) => panic!("Could not figure out an ID in create"),
     }
 }
 

@@ -67,8 +67,8 @@ where
     //    Columns that don't exist are ignored? Iterator is empty?
     // Q: Additionally: field names contains always both, isn't that breaking the above assumption?
     let mut idents: Vec<_> = selected_fields.types().collect();
-    idents.push(from_field.related_field().type_identifier_with_arity());
-    idents.push(from_field.type_identifier_with_arity());
+    idents.extend(from_field.related_field().type_identifiers_with_arities());
+    idents.extend(from_field.type_identifiers_with_arities());
 
     let mut field_names: Vec<String> = selected_fields.names().map(String::from).collect();
     field_names.push(from_field.related_field().name.clone());
@@ -117,11 +117,22 @@ where
         .into_iter()
         .map(|mut row| {
             let relation_cols = from_field.relation_columns(true);
-            let mut parent_ids: Vec<(ScalarFieldRef, PrismaValue)> = Vec::with_capacity(relation_cols.len());
+            let mut parent_ids: Vec<(DataSourceFieldRef, PrismaValue)> = Vec::with_capacity(relation_cols.len());
 
-            for field in from_field.related_model().identifier().fields() {
-                let val = row.values.pop().ok_or(SqlError::ColumnDoesNotExist)?;
-                parent_ids.push((field.clone(), val))
+            // Todo: This doesn't work with @relation(references ...), it assumes primary ids.
+            for field in from_field.related_model().primary_identifier().fields() {
+                match field {
+                    Field::Scalar(sf) => {
+                        let val = row.values.pop().ok_or(SqlError::ColumnDoesNotExist)?;
+                        parent_ids.push((sf.data_source_field.clone(), val))
+                    }
+                    Field::Relation(rf) => {
+                        for field in rf.data_source_fields.iter() {
+                            let val = row.values.pop().ok_or(SqlError::ColumnDoesNotExist)?;
+                            parent_ids.push((field.clone(), val))
+                        }
+                    }
+                }
             }
 
             // ModelIdentifier fields are in the end, we pop them in reverse

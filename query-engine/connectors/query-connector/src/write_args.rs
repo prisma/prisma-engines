@@ -1,7 +1,6 @@
 use chrono::Utc;
-use prisma_models::{ModelRef, PrismaValue};
+use prisma_models::{Field, ModelIdentifier, ModelRef, PrismaValue, RecordIdentifier};
 use std::collections::{btree_map::Keys, BTreeMap};
-use prisma_models::{RecordIdentifier, ModelIdentifier};
 
 /// A FieldValueContainer encapulates one or more values depending on
 /// the field it belongs to, as fields may have more than one underlying
@@ -94,17 +93,28 @@ impl WriteArgs {
         let mut rec_id = RecordIdentifier::default();
 
         for field in id.into_iter() {
-            match self.get_field_value(&field.name) {
-                Some(FieldValueContainer::Single(val)) => {
-                    rec_id.add((field.clone(), val.clone()))
-                },
-                Some(FieldValueContainer::Compound(_)) => {
-                    unreachable!("Relation fields are not supported in record identifiers")
+            match (&field, self.get_field_value(field.name())) {
+                (Field::Scalar(sf), Some(FieldValueContainer::Single(val))) => {
+                    rec_id.add((sf.data_source_field.clone(), val.clone()))
                 }
-                None if field.is_auto_generated_int_id => {
-                    rec_id.add((field.clone(), PrismaValue::Null))
-                },
-                None => return None,
+                (Field::Scalar(sf), None) if sf.is_auto_generated_int_id => {
+                    rec_id.add((sf.data_source_field.clone(), PrismaValue::Null))
+                }
+                (Field::Relation(rf), Some(FieldValueContainer::Single(val))) => {
+                    assert_eq!(rf.data_source_fields.len(), 1);
+                    rec_id.add((rf.data_source_fields.first().unwrap().clone(), val.clone()))
+                }
+                (Field::Relation(rf), Some(FieldValueContainer::Compound(vals))) => {
+                    assert_eq!(rf.data_source_fields.len(), vals.len());
+                    rf.data_source_fields
+                        .iter()
+                        .zip(vals)
+                        .for_each(|(dsf, val)| rec_id.add((dsf.clone(), val.clone())))
+                }
+                (Field::Scalar(_), Some(FieldValueContainer::Compound(_))) => {
+                    panic!("Can't combine scalar fields and compound values.");
+                }
+                (_, None) => return None,
             }
         }
 

@@ -280,13 +280,13 @@ async fn column_defaults_can_safely_be_changed(api: &TestApi) -> TestResult {
         {
             let query = Insert::single_into(api.render_table_name(model_name)).value("id", "abc");
 
-            api.database().execute(query.into()).await?;
+            api.database().query(query.into()).await?;
 
             let query = Insert::single_into(api.render_table_name(model_name))
                 .value("id", "def")
                 .value("name", "Waterworld");
 
-            api.database().execute(query.into()).await?;
+            api.database().query(query.into()).await?;
 
             let data = api.dump_table(model_name).await?;
             let names: Vec<String> = data

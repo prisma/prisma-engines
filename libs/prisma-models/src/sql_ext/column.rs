@@ -1,4 +1,4 @@
-use crate::{Field, RelationField, ScalarField, ModelIdentifier};
+use crate::{DataSourceFieldRef, Field, ModelIdentifier, ModelRef, RelationField, ScalarField};
 use quaint::ast::{Column, Row};
 
 pub struct ColumnIterator {
@@ -59,7 +59,7 @@ impl AsColumns for &[Field] {
 
 impl AsColumns for ModelIdentifier {
     fn as_columns(&self) -> ColumnIterator {
-        let cols: Vec<Column<'static>> = self.fields().map(|f| f.as_column()).collect();
+        let cols: Vec<Column<'static>> = self.fields().flat_map(|f| f.as_columns()).collect();
         ColumnIterator::from(cols)
     }
 }
@@ -89,14 +89,39 @@ impl AsColumns for RelationField {
         let model = self.model();
         let internal_data_model = model.internal_data_model();
 
-        let inner: Vec<_> = self.data_source_fields.iter().map(|dsf| {
-            let parts = (
-                (internal_data_model.db_name.clone(), model.db_name().to_string()),
-                dsf.name.clone(),
-            );
+        let inner: Vec<_> = self
+            .data_source_fields
+            .iter()
+            .map(|dsf| {
+                let parts = (
+                    (internal_data_model.db_name.clone(), model.db_name().to_string()),
+                    dsf.name.clone(),
+                );
 
-            Column::from(parts)
-        }).collect();
+                Column::from(parts)
+            })
+            .collect();
+
+        ColumnIterator::from(inner)
+    }
+}
+
+impl AsColumns for (&ModelRef, &[DataSourceFieldRef]) {
+    fn as_columns(&self) -> ColumnIterator {
+        let internal_data_model = self.0.internal_data_model();
+
+        let inner: Vec<_> = self
+            .1
+            .iter()
+            .map(|dsf| {
+                let parts = (
+                    (internal_data_model.db_name.clone(), self.0.db_name().to_string()),
+                    dsf.name.clone(),
+                );
+
+                Column::from(parts)
+            })
+            .collect();
 
         ColumnIterator::from(inner)
     }
@@ -107,6 +132,16 @@ impl AsColumn for ScalarField {
         let db = self.internal_data_model().db_name.clone();
         let table = self.model().db_name().to_string();
         let col = self.db_name().to_string();
+
+        Column::from(((db, table), col))
+    }
+}
+
+impl AsColumn for (&ModelRef, &DataSourceFieldRef) {
+    fn as_column(&self) -> Column<'static> {
+        let db = self.0.internal_data_model().db_name.clone();
+        let table = self.0.db_name().to_string();
+        let col = self.1.name.to_string();
 
         Column::from(((db, table), col))
     }

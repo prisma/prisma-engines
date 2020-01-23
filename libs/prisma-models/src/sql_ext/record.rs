@@ -13,8 +13,8 @@ impl TryFrom<(&ModelIdentifier, ResultSet)> for RecordIdentifier {
 
         for row in result_set.into_iter() {
             for (i, val) in row.into_iter().enumerate() {
-                match id.get(columns[i].as_str()) {
-                    Some(ref field) => {
+                match id.map_db_name(columns[i].as_str()) {
+                    Some(field) => {
                         record_id.add((Arc::clone(field), val.into()));
                     }
                     None => {

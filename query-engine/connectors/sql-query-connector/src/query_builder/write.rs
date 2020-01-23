@@ -1,12 +1,12 @@
+use connector_interface::{FieldValueContainer, WriteArgs};
 use prisma_models::*;
 use quaint::ast::*;
-use connector_interface::{WriteArgs, FieldValueContainer};
 
 pub fn create_record(model: &ModelRef, mut args: WriteArgs) -> (Insert<'static>, Option<RecordIdentifier>) {
-    use FieldValueContainer::*;
     use Field::*;
+    use FieldValueContainer::*;
 
-    let return_id = args.as_record_identifier(model.identifier());
+    let return_id = args.as_record_identifier(model.primary_identifier());
 
     let fields: Vec<_> = model
         .fields()
@@ -19,9 +19,7 @@ pub fn create_record(model: &ModelRef, mut args: WriteArgs) -> (Insert<'static>,
         .into_iter()
         .fold(Insert::single_into(model.as_table()), |mut insert, field| {
             match (args.take_field_value(field.name()), field) {
-                (Some(Single(ref value)), Scalar(sf)) => {
-                    insert.value(sf.db_name().to_string(), value.clone())
-                }
+                (Some(Single(ref value)), Scalar(sf)) => insert.value(sf.db_name().to_string(), value.clone()),
                 (Some(Single(ref value)), Relation(rf)) if rf.data_source_fields.len() == 1 => {
                     let name = rf.data_source_fields.first().unwrap().name.clone();
                     insert.value(name, value.clone())
@@ -33,18 +31,14 @@ pub fn create_record(model: &ModelRef, mut args: WriteArgs) -> (Insert<'static>,
 
                     insert
                 }
-                (_, Relation(_)) => {
-                    panic!("Mismatch between the length of columns and values.")
-                }
-                (Some(Compound(_)), Scalar(_)) => {
-                    panic!("Cannot use a compound value container for a scalar field.")
-                }
-                _ => insert
+                (_, Relation(_)) => panic!("Mismatch between the length of columns and values."),
+                (Some(Compound(_)), Scalar(_)) => panic!("Cannot use a compound value container for a scalar field."),
+                _ => insert,
             }
         });
 
     (
-        Insert::from(insert).returning(model.identifier().as_columns()),
+        Insert::from(insert).returning(model.primary_identifier().as_columns()),
         return_id,
     )
 }
@@ -64,12 +58,11 @@ pub fn delete_relation_table_records(
 
     let child_id_criteria = super::conditions(&columns, child_ids);
 
-    Delete::from_table(relation.as_table())
-        .so_that(parent_id_criteria.and(child_id_criteria))
+    Delete::from_table(relation.as_table()).so_that(parent_id_criteria.and(child_id_criteria))
 }
 
 pub fn delete_many(model: &ModelRef, ids: &[&RecordIdentifier]) -> Vec<Query<'static>> {
-    let columns: Vec<_> = model.identifier().as_columns().collect();
+    let columns: Vec<_> = model.primary_identifier().as_columns().collect();
 
     super::chunked_conditions(&columns, ids, |conditions| {
         Delete::from_table(model.as_table()).so_that(conditions)
@@ -99,9 +92,13 @@ pub fn create_relation_table_records(
     insert.build().on_conflict(OnConflict::DoNothing).into()
 }
 
-pub fn update_many(model: &ModelRef, ids: &[&RecordIdentifier], args: &WriteArgs) -> crate::Result<Vec<Query<'static>>> {
-    use FieldValueContainer::*;
+pub fn update_many(
+    model: &ModelRef,
+    ids: &[&RecordIdentifier],
+    args: &WriteArgs,
+) -> crate::Result<Vec<Query<'static>>> {
     use Field::*;
+    use FieldValueContainer::*;
 
     if args.args.is_empty() || ids.is_empty() {
         return Ok(Vec::new());
@@ -126,20 +123,14 @@ pub fn update_many(model: &ModelRef, ids: &[&RecordIdentifier], args: &WriteArgs
                     query = query.set(field.name.clone(), value.clone());
                 }
             }
-            (_, Relation(_)) => {
-                panic!("Mismatch between the length of columns and values.")
-            }
-            (Compound(_), Scalar(_)) => {
-                panic!("Cannot use a compound value container for a scalar field.")
-            }
+            (_, Relation(_)) => panic!("Mismatch between the length of columns and values."),
+            (Compound(_), Scalar(_)) => panic!("Cannot use a compound value container for a scalar field."),
         }
     }
 
-    let columns: Vec<_> = model.identifier().as_columns().collect();
+    let columns: Vec<_> = model.primary_identifier().as_columns().collect();
 
-    let result: Vec<Query> = super::chunked_conditions(&columns, ids, |conditions| {
-        query.clone().so_that(conditions)
-    });
+    let result: Vec<Query> = super::chunked_conditions(&columns, ids, |conditions| query.clone().so_that(conditions));
 
     Ok(result)
 }

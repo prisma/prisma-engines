@@ -32,7 +32,7 @@ pub trait QueryExt: Queryable + Send + Sync {
     async fn raw_json(&self, q: RawQuery) -> crate::Result<Value> {
         if q.is_select() {
             let result_set = self.query_raw(q.0.as_str(), &[]).await?;
-            let columns: Vec<String> = result_set.columns().map(ToString::to_string).collect();
+            let columns: Vec<String> = result_set.columns().iter().map(ToString::to_string).collect();
             let mut result = Vec::new();
 
             for row in result_set.into_iter() {
@@ -81,7 +81,7 @@ pub trait QueryExt: Queryable + Send + Sync {
 
     /// Read the all columns as a (primary) identifier.
     async fn filter_ids(&self, model: &ModelRef, filter: Filter) -> crate::Result<Vec<RecordIdentifier>> {
-        let model_id = model.identifier();
+        let model_id = model.primary_identifier();
         let id_cols: Vec<Column<'static>> = model_id.as_columns().collect();
 
         let select = Select::from_table(model.as_table())
@@ -92,25 +92,21 @@ pub trait QueryExt: Queryable + Send + Sync {
     }
 
     async fn select_ids(&self, select: Select<'_>, model_id: ModelIdentifier) -> crate::Result<Vec<RecordIdentifier>> {
-        // Todo: We assume that all fields have to be required.
         let idents: Vec<_> = model_id
             .fields()
             .into_iter()
-            .map(|f| (f.type_identifier, FieldArity::Required))
+            .flat_map(|f| match f {
+                Field::Scalar(sf) => vec![sf.type_identifier_with_arity()],
+                Field::Relation(rf) => rf.type_identifiers_with_arities(),
+            })
             .collect();
 
         let mut rows = self.filter(select.into(), &idents).await?;
         let mut result = Vec::new();
 
         for row in rows.drain(0..) {
-            // todo Cloning the arcs all the time is a bad idea.
-            let record_id: RecordIdentifier = model_id
-                .clone()
-                .into_iter()
-                .zip(row.values.into_iter())
-                .map(|pair| pair.into())
-                .collect::<Vec<_>>()
-                .into();
+            let tuples: Vec<_> = model_id.data_source_fields().zip(row.values.into_iter()).collect();
+            let record_id: RecordIdentifier = RecordIdentifier::new(tuples);
 
             result.push(record_id);
         }

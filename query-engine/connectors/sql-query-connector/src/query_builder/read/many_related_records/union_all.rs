@@ -1,8 +1,8 @@
 use super::*;
-use quaint::ast::*;
 use crate::ordering::Ordering;
-use prisma_models::{sql_ext::AsColumn, SelectedFields, RecordIdentifier};
 use connector_interface::SkipAndLimit;
+use prisma_models::{sql_ext::AsColumn, RecordIdentifier, SelectedFields};
+use quaint::ast::*;
 
 pub struct ManyRelatedRecordsWithUnionAll;
 
@@ -29,11 +29,15 @@ impl ManyRelatedRecordsQueryBuilder for ManyRelatedRecordsWithUnionAll {
         let base_query = order_columns.into_iter().fold(base_query, |acc, ord| acc.order_by(ord));
         let mut distinct_ids = distinct_ids.into_iter();
 
+        // Todo: Unclear if this is the correct model.
+        let model = base.from_field.model();
+
         let build_cond = |ids: RecordIdentifier| {
-            let id_cond = ids.into_iter().fold(ConditionTree::NoCondition, |acc, (field, val)| {
+            let id_cond = ids.into_iter().fold(ConditionTree::NoCondition, |acc, (dsf, val)| {
+                let col = (&model, &dsf).as_column();
                 match acc {
-                    ConditionTree::NoCondition => field.as_column().equals(val).into(),
-                    cond => cond.and(field.as_column().equals(val)),
+                    ConditionTree::NoCondition => col.equals(val).into(),
+                    cond => cond.and(col.equals(val)),
                 }
             });
 

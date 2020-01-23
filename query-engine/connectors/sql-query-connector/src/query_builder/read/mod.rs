@@ -74,7 +74,7 @@ where
 }
 
 pub fn count_by_model(model: &ModelRef, query_arguments: QueryArguments) -> Select<'static> {
-    let selected_columns = model.identifier().as_columns();
+    let selected_columns = model.primary_identifier().as_columns();
     let base_query = get_records(model, selected_columns, query_arguments);
     let table = Table::from(base_query).alias("sub");
 

@@ -1,7 +1,7 @@
-use connector_interface::{OrderDirections, SkipAndLimit, QueryArguments};
-use prisma_models::prelude::*;
-use quaint::ast::{Column, Row, ConditionTree, Select, Aliasable, Joinable, Comparable};
 use crate::{cursor_condition, filter_conversion::AliasedCondition};
+use connector_interface::{OrderDirections, QueryArguments, SkipAndLimit};
+use prisma_models::prelude::*;
+use quaint::ast::{Aliasable, Column, Comparable, ConditionTree, Joinable, Row, Select};
 
 pub struct ManyRelatedRecordsBaseQuery<'a> {
     pub from_field: &'a RelationFieldRef,
@@ -37,15 +37,10 @@ impl<'a> ManyRelatedRecordsBaseQuery<'a> {
         let query = if from_field.relation_is_inlined_in_child() {
             columns.iter().fold(select, |acc, col| acc.column(col.clone()))
         } else {
-            let id_columns: Vec<Column<'static>> = from_field
-                .related_model()
-                .identifier()
-                .as_columns()
-                .collect();
+            let id_columns: Vec<Column<'static>> =
+                from_field.related_model().primary_identifier().as_columns().collect();
 
-            let opposite_columns: Vec<Column<'static>> = from_field
-                .opposite_columns(true)
-                .collect();
+            let opposite_columns: Vec<Column<'static>> = from_field.opposite_columns(true).collect();
 
             let join = from_field
                 .relation()
