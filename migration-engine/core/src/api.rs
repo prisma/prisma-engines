@@ -33,6 +33,10 @@ where
     {
         Ok(E::execute(input, &self.engine).await?)
     }
+
+    pub fn connector(&self) -> &C {
+        self.engine.connector()
+    }
 }
 
 // This is here only to get rid of the generic type parameters due to neon not
