@@ -1,12 +1,12 @@
-pub(crate) use column::{ColumnChange, ColumnDiffer};
-
 mod column;
 mod index;
 mod table;
 
+pub(crate) use column::{ColumnChange, ColumnDiffer};
+pub(crate) use table::TableDiffer;
+
 use crate::*;
 use sql_schema_describer::*;
-use table::TableDiffer;
 use tracing::debug;
 
 const MIGRATION_TABLE_NAME: &str = "_Migration";
@@ -219,7 +219,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
                 // On MySQL, foreign keys automatically create indexes. These foreign-key-created
                 // indexes should only be dropped as part of the foreign key.
                 if self.sql_family.is_mysql() && index::index_covers_fk(&tables.previous, index) {
-                    continue
+                    continue;
                 }
                 drop_indexes.push(DropIndex {
                     table: tables.previous.name.clone(),

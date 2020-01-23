@@ -52,7 +52,11 @@ impl<'a> MigrationCommand for InferMigrationStepsCommand<'a> {
             .infer(&assumed_datamodel, &next_datamodel, &model_migration_steps)
             .await?;
 
-        let DestructiveChangeDiagnostics { warnings, errors: _ } = connector
+        let DestructiveChangeDiagnostics {
+            warnings,
+            errors: _,
+            unexecutable_migrations,
+        } = connector
             .destructive_changes_checker()
             .check(&database_migration)
             .await?;
@@ -97,6 +101,7 @@ impl<'a> MigrationCommand for InferMigrationStepsCommand<'a> {
             errors: vec![],
             warnings,
             general_errors: vec![],
+            unexecutable_migrations,
         })
     }
 }
