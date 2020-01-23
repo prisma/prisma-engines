@@ -46,6 +46,9 @@ impl Quaint {
     /// - `host` should point to the database file.
     /// - `db_name` parameter should give a name to the database attached for
     ///   query namespacing.
+    /// - `socket_timeout` defined in seconds. Acts as the busy timeout in
+    ///   SQLite. When set, queries that are waiting for a lock to be released
+    ///   will return the `Timeout` error after the defined value.
     ///
     /// PostgreSQL:
     ///
@@ -62,6 +65,11 @@ impl Quaint {
     ///   cases when connectiong to the database through a unix socket to
     ///   separate the database name from the database path, such as
     ///   `postgresql:///dbname?host=/var/run/postgresql`.
+    /// - `socket_timeout` defined in seconds. If set, a query will return a
+    ///   `Timeout` error if it fails to resolve before given time.
+    /// - `connect_timeout` defined in seconds (default: 5). Connecting to a
+    ///   database will return a `ConnectTimeout` error if taking more than the
+    ///   defined value.
     ///
     /// MySQL:
     ///
@@ -74,6 +82,11 @@ impl Quaint {
     ///   lead to weakened security. Defaults to `strict`.
     /// - `socket` needed when connecting to MySQL database through a unix
     ///   socket. When set, the host parameter is dismissed.
+    /// - `socket_timeout` defined in seconds. If set, a query will return a
+    ///   `Timeout` error if it fails to resolve before given time.
+    /// - `connect_timeout` defined in seconds (default: 5). Connecting to a
+    ///   database will return a `ConnectTimeout` error if taking more than the
+    ///   defined value.
     pub async fn new(url_str: &str) -> crate::Result<Self> {
         let url = Url::parse(url_str)?;
 

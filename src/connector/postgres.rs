@@ -14,6 +14,7 @@ use postgres_native_tls::MakeTlsConnector;
 use std::{
     borrow::{Borrow, Cow},
     time::Duration,
+    future::Future,
     fs,
 };
 use tokio_postgres::{config::SslMode, Client, Config};
@@ -27,7 +28,7 @@ pub(crate) const DEFAULT_SCHEMA: &str = "public";
 pub struct PostgreSql {
     #[debug_stub = "postgres::Client"]
     client: Mutex<Client>,
-    socket_timeout: Duration,
+    socket_timeout: Option<Duration>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -196,7 +197,7 @@ impl PostgresUrl {
         let mut ssl_accept_mode = SslAcceptMode::AcceptInvalidCerts;
         let mut ssl_mode = SslMode::Prefer;
         let mut host = None;
-        let mut socket_timeout = Duration::from_secs(5);
+        let mut socket_timeout = None;
         let mut connect_timeout = Duration::from_secs(5);
 
         for (k, v) in url.query_pairs() {
@@ -256,7 +257,7 @@ impl PostgresUrl {
                 }
                 "socket_timeout" => {
                     let as_int = v.parse().map_err(|_| Error::InvalidConnectionArguments)?;
-                    socket_timeout = Duration::from_secs(as_int);
+                    socket_timeout = Some(Duration::from_secs(as_int));
                 }
                 "connect_timeout" => {
                     let as_int = v.parse().map_err(|_| Error::InvalidConnectionArguments)?;
@@ -319,7 +320,7 @@ pub(crate) struct PostgresUrlQueryParams {
     schema: String,
     ssl_mode: SslMode,
     host: Option<String>,
-    socket_timeout: Duration,
+    socket_timeout: Option<Duration>,
     connect_timeout: Duration,
 }
 
@@ -351,15 +352,30 @@ impl PostgreSql {
         let schema = url.schema();
         let path = format!("SET search_path = \"{}\"", schema);
 
-        timeout(
-            url.query_params.socket_timeout,
-            client.simple_query(path.as_str())
-        ).await??;
+        client.simple_query(path.as_str()).await?;
 
         Ok(Self {
             client: Mutex::new(client),
             socket_timeout: url.query_params.socket_timeout,
         })
+    }
+
+    async fn timeout<T, F, E>(&self, f: F) -> crate::Result<T>
+    where
+        F: Future<Output = std::result::Result<T, E>>,
+        E: Into<Error>
+    {
+        match self.socket_timeout {
+            Some(duration) => match timeout(duration, f).await {
+                Ok(Ok(result)) => Ok(result),
+                Ok(Err(err)) => Err(err.into()),
+                Err(to) => Err(to.into()),
+            }
+            None => match f.await {
+                Ok(result) => Ok(result),
+                Err(err) => Err(err.into()),
+            }
+        }
     }
 }
 
@@ -376,13 +392,9 @@ impl Queryable for PostgreSql {
         metrics::query("postgres.query_raw", sql, params, move || {
             async move {
                 let client = self.client.lock().await;
-                let stmt = timeout(self.socket_timeout, client.prepare(sql)).await??;
+                let stmt = self.timeout(client.prepare(sql)).await?;
 
-                let rows = timeout(
-                    self.socket_timeout,
-                    client.query(&stmt, conversion::conv_params(params).as_slice())
-                ).await??;
-
+                let rows = self.timeout(client.query(&stmt, conversion::conv_params(params).as_slice())).await?;
                 let mut result = ResultSet::new(stmt.to_column_names(), Vec::new());
 
                 for row in rows {
@@ -398,7 +410,7 @@ impl Queryable for PostgreSql {
         metrics::query("postgres.raw_cmd", cmd, &[], move || {
             async move {
                 let client = self.client.lock().await;
-                timeout(self.socket_timeout, client.simple_query(cmd)).await??;
+                self.timeout(client.simple_query(cmd)).await?;
 
                 Ok(())
             }

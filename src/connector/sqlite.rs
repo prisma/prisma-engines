@@ -27,7 +27,7 @@ pub struct SqliteParams {
     /// only be done with UTF-8 paths.
     pub file_path: String,
     pub db_name: String,
-    pub socket_timeout: Duration,
+    pub socket_timeout: Option<Duration>,
 }
 
 type ConnectionParams = (Vec<(String, String)>, Vec<(String, String)>);
@@ -52,7 +52,7 @@ impl TryFrom<&str> for SqliteParams {
             let official = vec![];
             let mut connection_limit = num_cpus::get_physical() * 2 + 1;
             let mut db_name = None;
-            let mut socket_timeout = Duration::from_secs(5);
+            let mut socket_timeout = None;
 
             if path_parts.len() > 1 {
                 let (_, unsupported): ConnectionParams = path_parts
@@ -79,7 +79,7 @@ impl TryFrom<&str> for SqliteParams {
                         }
                         "socket_timeout" => {
                             let as_int = v.parse().map_err(|_| Error::InvalidConnectionArguments)?;
-                            socket_timeout = Duration::from_secs(as_int);
+                            socket_timeout = Some(Duration::from_secs(as_int));
                         }
                         _ => {
                             #[cfg(not(feature = "tracing-log"))]
@@ -108,7 +108,10 @@ impl TryFrom<&str> for Sqlite {
         let params = SqliteParams::try_from(path)?;
 
         let conn = rusqlite::Connection::open_in_memory()?;
-        conn.busy_timeout(params.socket_timeout)?;
+
+        if let Some(timeout) = params.socket_timeout {
+            conn.busy_timeout(timeout)?;
+        };
 
         let client = Mutex::new(conn);
         let file_path = params.file_path;

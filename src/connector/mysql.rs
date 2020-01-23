@@ -3,7 +3,7 @@ mod error;
 
 use mysql_async::{self as my, prelude::Queryable as _};
 use percent_encoding::percent_decode;
-use std::{borrow::Cow, path::Path, time::Duration};
+use std::{borrow::Cow, path::Path, time::Duration, future::Future};
 use url::Url;
 use tokio::time::timeout;
 
@@ -19,7 +19,7 @@ use crate::{
 pub struct Mysql {
     pub(crate) pool: my::Pool,
     pub(crate) url: MysqlUrl,
-    socket_timeout: Duration,
+    socket_timeout: Option<Duration>,
     connect_timeout: Duration,
 }
 
@@ -103,7 +103,7 @@ impl MysqlUrl {
         let mut ssl_opts = my::SslOpts::default();
         let mut use_ssl = false;
         let mut socket = None;
-        let mut socket_timeout = Duration::from_secs(5);
+        let mut socket_timeout = None;
         let mut connect_timeout = Duration::from_secs(5);
 
         for (k, v) in url.query_pairs() {
@@ -129,7 +129,7 @@ impl MysqlUrl {
                 }
                 "socket_timeout" => {
                     let as_int = v.parse().map_err(|_| Error::InvalidConnectionArguments)?;
-                    socket_timeout = Duration::from_secs(as_int);
+                    socket_timeout = Some(Duration::from_secs(as_int));
                 }
                 "connect_timeout" => {
                     let as_int = v.parse().map_err(|_| Error::InvalidConnectionArguments)?;
@@ -210,7 +210,7 @@ pub(crate) struct MysqlUrlQueryParams {
     connection_limit: usize,
     use_ssl: bool,
     socket: Option<String>,
-    socket_timeout: Duration,
+    socket_timeout: Option<Duration>,
     connect_timeout: Duration,
 }
 
@@ -228,6 +228,24 @@ impl Mysql {
             url,
         })
     }
+
+    async fn timeout<T, F, E>(&self, f: F) -> crate::Result<T>
+    where
+        F: Future<Output = std::result::Result<T, E>>,
+        E: Into<Error>
+    {
+        match self.socket_timeout {
+            Some(duration) => match timeout(duration, f).await {
+                Ok(Ok(result)) => Ok(result),
+                Ok(Err(err)) => Err(err.into()),
+                Err(to) => Err(to.into()),
+            }
+            None => match f.await {
+                Ok(result) => Ok(result),
+                Err(err) => Err(err.into()),
+            }
+        }
+    }
 }
 
 impl TransactionCapable for Mysql {}
@@ -244,11 +262,7 @@ impl Queryable for Mysql {
         metrics::query("mysql.query_raw", sql, params, move || {
             async move {
                 let conn = timeout(self.connect_timeout, self.pool.get_conn()).await??;
-
-                let results = timeout(
-                    self.socket_timeout,
-                    conn.prep_exec(sql, conversion::conv_params(params)),
-                ).await??;
+                let results = self.timeout(conn.prep_exec(sql, conversion::conv_params(params))).await?;
 
                 let columns = results
                     .columns_ref()
@@ -259,10 +273,7 @@ impl Queryable for Mysql {
                 let last_id = results.last_insert_id();
                 let mut result_set = ResultSet::new(columns, Vec::new());
 
-                let (_, rows) = timeout(
-                    self.socket_timeout,
-                    results.map_and_drop(|mut row| row.take_result_row()),
-                ).await??;
+                let (_, rows) = self.timeout(results.map_and_drop(|mut row| row.take_result_row())).await?;
 
                 for row in rows.into_iter() {
                     result_set.rows.push(row?);
@@ -281,7 +292,8 @@ impl Queryable for Mysql {
         metrics::query("mysql.raw_cmd", cmd, &[], move || {
             async move {
                 let conn = timeout(self.connect_timeout, self.pool.get_conn()).await??;
-                timeout(self.socket_timeout, conn.query(cmd)).await??;
+                self.timeout(conn.query(cmd)).await?;
+
                 Ok(())
             }
         })
