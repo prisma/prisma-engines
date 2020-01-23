@@ -1,6 +1,5 @@
-use std::{fs::File, io::Read, sync::Arc};
+use std::{fs::File, io::Read, sync::Arc, convert::TryFrom};
 
-use clap::ArgMatches;
 use graphql_parser as gql;
 use serde::Deserialize;
 
@@ -11,6 +10,7 @@ use query_core::{
     BuildMode, CoreError, QuerySchemaBuilder, Responses,
 };
 
+use crate::{CliOpt, PrismaOpt, Subcommand};
 use crate::context::PrismaContext;
 use crate::error::PrismaError;
 use crate::request_handlers::graphql::*;
@@ -36,44 +36,48 @@ pub enum CliCommand {
     },
 }
 
-impl CliCommand {
-    pub fn new(matches: &ArgMatches, force_transactions: bool) -> Option<Self> {
-        if matches.is_present("dmmf") {
-            let build_mode = if matches.is_present("legacy") {
-                BuildMode::Legacy
-            } else {
-                BuildMode::Modern
-            };
+impl TryFrom<&PrismaOpt> for CliCommand {
+    type Error = PrismaError;
 
-            Some(CliCommand::Dmmf(build_mode))
-        } else if matches.is_present("dmmf_to_dml") {
-            let path = matches.value_of("dmmf_to_dml").unwrap();
-            let file = File::open(path).expect("File should open read only");
-            let input: DmmfToDmlInput = serde_json::from_reader(file).expect("File should be proper JSON");
-            Some(CliCommand::DmmfToDml(input))
-        } else if matches.is_present("get_config") {
-            let path = matches.value_of("get_config").unwrap();
-            let mut file = File::open(path).expect("File should open read only");
+    fn try_from(opts: &PrismaOpt) -> crate::PrismaResult<CliCommand> {
+        match opts.subcommand {
+            None => Err(PrismaError::InvocationError(String::from("cli subcommand not present"))),
+            Some(Subcommand::Cli(ref cliopts)) => match cliopts {
+                CliOpt::Dmmf => {
+                    let cmd = if opts.legacy {
+                        CliCommand::Dmmf(BuildMode::Legacy)
+                    } else {
+                        CliCommand::Dmmf(BuildMode::Modern)
+                    };
 
-            let mut datamodel = String::new();
-            file.read_to_string(&mut datamodel).expect("Couldn't read file");
+                    Ok(cmd)
+                }
+                CliOpt::DmmfToDml(input) => {
+                    let file = File::open(&input.path).expect("File should open read only");
+                    let input = serde_json::from_reader(file).expect("File should be proper JSON");
 
-            Some(CliCommand::GetConfig(datamodel))
-        } else if matches.is_present("execute_request") {
-            let request = matches.value_of("execute_request").unwrap();
+                    Ok(CliCommand::DmmfToDml(input))
+                }
+                CliOpt::GetConfig(input) => {
+                    let mut file = File::open(&input.path).expect("File should open read only");
+                    let mut datamodel = String::new();
 
-            Some(CliCommand::ExecuteRequest {
-                query: request.to_string(),
-                force_transactions,
-            })
-        } else {
-            None
+                    file.read_to_string(&mut datamodel).expect("Couldn't read file");
+                    Ok(CliCommand::GetConfig(datamodel))
+                }
+                CliOpt::ExecuteRequest(input) => Ok(CliCommand::ExecuteRequest {
+                    query: input.query.clone(),
+                    force_transactions: opts.always_force_transactions,
+                })
+            }
         }
     }
+}
 
+impl CliCommand {
     pub fn execute(self) -> PrismaResult<()> {
         match self {
-            CliCommand::Dmmf(build_mode) => Self::dmmf(build_mode),
+            CliCommand::Dmmf(mode) => Self::dmmf(mode),
             CliCommand::DmmfToDml(input) => Self::dmmf_to_dml(input),
             CliCommand::GetConfig(input) => Self::get_config(input),
             CliCommand::ExecuteRequest { query, force_transactions } =>
@@ -81,14 +85,14 @@ impl CliCommand {
         }
     }
 
-    fn dmmf(build_mode: BuildMode) -> PrismaResult<()> {
+    fn dmmf(mode: BuildMode) -> PrismaResult<()> {
         let (v2components, template) = load_data_model_components()?;
 
         // temporary code duplication
         let internal_data_model = template.build("".into());
         let capabilities = SupportedCapabilities::empty();
 
-        let schema_builder = QuerySchemaBuilder::new(&internal_data_model, &capabilities, build_mode);
+        let schema_builder = QuerySchemaBuilder::new(&internal_data_model, &capabilities, mode);
         let query_schema: QuerySchemaRef = Arc::new(schema_builder.build());
 
         let dmmf = dmmf::render_dmmf(&v2components.datamodel, query_schema);

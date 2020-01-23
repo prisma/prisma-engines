@@ -4,14 +4,13 @@ extern crate log;
 extern crate rust_embed;
 
 use std::{
-    env,
     error::Error,
-    net::{IpAddr, SocketAddr},
+    net::SocketAddr,
     process,
-    str::FromStr,
+    convert::TryFrom,
 };
 
-use clap::{App as ClapApp, Arg, SubCommand};
+use structopt::StructOpt;
 use tracing::subscriber;
 use tracing_log::LogTracer;
 use tracing_subscriber::{EnvFilter, FmtSubscriber};
@@ -52,135 +51,95 @@ lazy_static! {
 pub type PrismaResult<T> = Result<T, PrismaError>;
 type AnyError = Box<dyn Error + Send + Sync + 'static>;
 
+#[derive(Debug, StructOpt, Clone)]
+pub enum Subcommand {
+    /// Doesn't start a server, but allows running specific commands against Prisma.
+    Cli(CliOpt),
+}
+
+#[derive(Debug, Clone, StructOpt)]
+pub struct DmmfToDmlInput {
+    #[structopt(name = "path")]
+    pub path: String,
+}
+
+#[derive(Debug, Clone, StructOpt)]
+pub struct GetConfigInput {
+    pub path: String,
+}
+
+#[derive(Debug, Clone, StructOpt)]
+pub struct ExecuteRequestInput {
+    pub query: String,
+}
+
+#[derive(Debug, StructOpt, Clone)]
+pub enum CliOpt {
+    /// Output the DMMF from the loaded data model.
+    #[structopt(name = "--dmmf")]
+    Dmmf,
+    /// Convert the given DMMF JSON file to a data model.
+    #[structopt(name = "--dmmf_to_dml")]
+    DmmfToDml(DmmfToDmlInput),
+    /// Get the configuration from the given data model.
+    #[structopt(name = "--get_config")]
+    GetConfig(GetConfigInput),
+    /// Executes one request and then terminates.
+    #[structopt(name = "--execute_request")]
+    ExecuteRequest(ExecuteRequestInput),
+}
+
+#[derive(Debug, StructOpt, Clone)]
+pub struct PrismaOpt {
+    /// The hostname or IP the query engine should bind to.
+    #[structopt(long, default_value = "127.0.0.1")]
+    host: String,
+    /// The port the query engine should bind to.
+    #[structopt(long, short, default_value = "4466")]
+    port: u16,
+    /// Switches query schema generation to Prisma 1 compatible mode.
+    #[structopt(long)]
+    legacy: bool,
+    /// Runs all queries in a transaction, including all the reads.
+    #[structopt(long = "always_force_transactions")]
+    always_force_transactions: bool,
+    /// Prints the server commit ID.
+    #[structopt(long)]
+    version: bool,
+    #[structopt(subcommand)]
+    subcommand: Option<Subcommand>,
+}
+
 #[tokio::main]
 async fn main() -> Result<(), AnyError> {
-    let matches = ClapApp::new("Prisma Query Engine")
-        .version(env!("CARGO_PKG_VERSION"))
-        .arg(
-            Arg::with_name("host")
-                .long("host")
-                .value_name("host")
-                .help("The hostname or IP the query engine should bind to.")
-                .takes_value(true),
-        )
-        .arg(
-            Arg::with_name("port")
-                .short("p")
-                .long("port")
-                .value_name("port")
-                .help("The port the query engine should bind to.")
-                .takes_value(true),
-        )
-        .arg(
-            Arg::with_name("legacy")
-                .long("legacy")
-                .help("Switches query schema generation to Prisma 1 compatible mode.")
-                .takes_value(false)
-                .required(false),
-        )
-        .arg(
-            Arg::with_name("always_force_transactions")
-                .long("always_force_transactions")
-                .help("Runs all queries in a transaction, including all the reads.")
-                .takes_value(false)
-                .required(false),
-        )
-        .arg(
-            Arg::with_name("version")
-                .long("version")
-                .help("Prints the server commit ID")
-                .takes_value(false)
-                .required(false),
-        )
-        .subcommand(
-            SubCommand::with_name("cli")
-                .about("Doesn't start a server, but allows running specific commands against Prisma.")
-                .arg(
-                    Arg::with_name("dmmf")
-                        .long("dmmf")
-                        .help("Output the DMMF from the loaded data model.")
-                        .takes_value(false)
-                        .required(false),
-                )
-                .arg(
-                    Arg::with_name("dmmf_to_dml")
-                        .long("dmmf_to_dml")
-                        .help("Convert the given DMMF JSON file to a data model.")
-                        .takes_value(true)
-                        .required(false),
-                )
-                .arg(
-                    Arg::with_name("get_config")
-                        .long("get_config")
-                        .help("Get the configuration from the given data model.")
-                        .takes_value(true)
-                        .required(false),
-                )
-                .arg(
-                    Arg::with_name("execute_request")
-                        .long("execute_request")
-                        .help("Executes one request and then terminates.")
-                        .takes_value(true)
-                        .required(false),
-                ),
-        )
-        .get_matches();
+    let opts = PrismaOpt::from_args();
 
-    let force_transactions = matches.is_present("always_force_transactions");
-
-    if matches.is_present("version") {
-        println!(env!("GIT_HASH"));
-    } else if let Some(matches) = matches.subcommand_matches("cli") {
-        match CliCommand::new(matches, force_transactions) {
-            Some(cmd) => {
-                if let Err(err) = cmd.execute() {
-                    info!("Encountered error during initialization:");
-                    err.render_as_json().expect("error rendering");
-                    process::exit(1);
-                }
-            }
-            None => {
-                error!("No command provided");
-                process::exit(1);
-            }
-        }
-    } else {
-        init_logger()?;
-
-        let default_host = [127, 0, 0, 1];
-        let default_port = 4466;
-
-        let port = matches
-            .value_of("port")
-            .map(|p| p.to_owned())
-            .or_else(|| env::var("PORT").ok())
-            .and_then(|p| p.parse::<u16>().ok())
-            .unwrap_or_else(|| default_port);
-
-        let host = matches
-            .value_of("host")
-            .map(|p| p.to_owned())
-            .or_else(|| env::var("HOST").ok())
-            .and_then(|p| Some(IpAddr::from_str(&p).expect("Invalid Host provided")))
-            .unwrap_or_else(|| IpAddr::from(default_host));
-
-        let address = SocketAddr::new(host, port);
-
-        let legacy = matches.is_present("legacy");
-
-        eprintln!("Printing to stderr for debugging");
-        eprintln!("Listening on {}:{}", host, port);
-
-        let builder = HttpServer::builder()
-            .legacy(legacy)
-            .force_transactions(force_transactions);
-
-        if let Err(err) = builder.build_and_run(address).await {
+    match CliCommand::try_from(&opts) {
+        Ok(cmd) => if let Err(err) = cmd.execute() {
             info!("Encountered error during initialization:");
             err.render_as_json().expect("error rendering");
             process::exit(1);
-        };
-    };
+        }
+        Err(_) => {
+            init_logger()?;
+
+            let ip = opts.host.parse().expect("Host was not a valid IP address");
+            let address = SocketAddr::new(ip, opts.port);
+
+            eprintln!("Printing to stderr for debugging");
+            eprintln!("Listening on {}:{}", opts.host, opts.port);
+
+            let builder = HttpServer::builder()
+                .legacy(opts.legacy)
+                .force_transactions(opts.always_force_transactions);
+
+            if let Err(err) = builder.build_and_run(address).await {
+                info!("Encountered error during initialization:");
+                err.render_as_json().expect("error rendering");
+                process::exit(1);
+            };
+        }
+    }
 
     Ok(())
 }
