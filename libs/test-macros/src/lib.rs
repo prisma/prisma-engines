@@ -64,12 +64,10 @@ pub fn test_each_connector(attr: TokenStream, input: TokenStream) -> TokenStream
 
     let mut test_function = parse_macro_input!(input as ItemFn);
     strip_test_attribute(&mut test_function);
-    let async_test: bool = test_function.sig.asyncness.is_some();
 
-    let tests = match (args, async_test) {
-        (Ok(args), false) => test_each_connector_wrapper_functions(&args, &test_function),
-        (Ok(args), true) => test_each_connector_async_wrapper_functions(&args, &test_function),
-        (Err(err), _) => panic!("{}", err),
+    let tests = match args {
+        Ok(args) => test_each_connector_async_wrapper_functions(&args, &test_function),
+        Err(err) => panic!("{}", err),
     };
 
     let output = quote! {
@@ -79,33 +77,6 @@ pub fn test_each_connector(attr: TokenStream, input: TokenStream) -> TokenStream
     };
 
     output.into()
-}
-
-fn test_each_connector_wrapper_functions(
-    args: &TestEachConnectorArgs,
-    test_function: &ItemFn,
-) -> Vec<proc_macro2::TokenStream> {
-    let test_fn_name = &test_function.sig.ident;
-    let test_fn_name_str = format!("{}", test_fn_name);
-
-    let mut tests = Vec::with_capacity(CONNECTOR_NAMES.len());
-
-    for connector in args.connectors_to_test() {
-        let connector_test_fn_name = Ident::new(&format!("{}_on_{}", test_fn_name, connector), Span::call_site());
-        let connector_api_factory = Ident::new(&format!("{}_test_api", connector), Span::call_site());
-
-        let test = quote! {
-            #[test]
-            fn #connector_test_fn_name() {
-                let api = #connector_api_factory(#test_fn_name_str);
-                #test_fn_name(&api)
-            }
-        };
-
-        tests.push(test);
-    }
-
-    tests
 }
 
 fn test_each_connector_async_wrapper_functions(
