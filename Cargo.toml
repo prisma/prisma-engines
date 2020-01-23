@@ -1,6 +1,6 @@
 [package]
 name = "quaint"
-version = "0.1.9"
+version = "0.1.10"
 authors = [
     "Julius de Bruijn <bruijn@prisma.io>",
     "Dominic Petrick <petrick@prisma.io>",

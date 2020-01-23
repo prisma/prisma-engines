@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.1.10
+
+- Make socket timeouts optional
+
 ## v0.1.9
 
 - Internal fix for faster result row generation (#65)
