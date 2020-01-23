@@ -5,11 +5,12 @@ import play.api.libs.json.JsValue
 trait SchemaBaseV11 extends PlayJsonExtensions {
 
   //Datamodel
-  val simpleId   = "id            String    @id @default(cuid())"
-  val compoundId = """id_1          String        @default(cuid())
+  val simpleId = "id            String    @id @default(cuid())"
+  val compoundId =
+    """id_1          String        @default(cuid())
                         id_2          String        @default(cuid())
                         @@id([id_1, id_2])"""
-  val noId       = ""
+  val noId = ""
 
   val idOptions = Vector(simpleId, compoundId, noId)
 
@@ -28,27 +29,37 @@ trait SchemaBaseV11 extends PlayJsonExtensions {
 
   // parse functions
 
-  def parse(subpath: String): (JsValue, String) => String = {
-    def test(input: JsValue, path: String): String = {
-      input.identifierAtPath(path, subpath, list = false)
-    }
+  def unescapeFields(input: String): String = {
+    input
+      .replace("{\"c\":", "{c:")
+      .replace("{\"p\":", "{p:")
+      .replace("{\"id\":", "{id:")
+      .replace("{\"c_1\":", "{c_1:")
+      .replace("\"c_2\":", "c_2:")
+      .replace("{\"p_1\":", "{p_1:")
+      .replace("\"p_2\":", "p_2:")
+      .replace("\"{", "{")
+      .replace("}\"", "}")
+
+  }
+
+  def parse(subpath: String = "", where: String): (JsValue, String) => String = {
+    def test(input: JsValue, path: String): String = s"""{$where : ${unescapeFields(input.identifierAtPath(path, subpath, list = false))}}"""
     test
   }
 
-  def parseFirst(subpath: String): (JsValue, String) => String = {
-    def test(input: JsValue, path: String): String = {
-      input.identifierAtPath(path, subpath, list = true)
-    }
+  def parseFirst(subpath: String = "", where: String): (JsValue, String) => String = {
+    def test(input: JsValue, path: String): String = s"""{$where : ${unescapeFields(input.identifierAtPath(path, subpath, list = true))}}"""
     test
   }
 
-  def parseAll(): (JsValue, String) => String = {
+  def parseAll(where: String, compound: Boolean = false): (JsValue, String) => String = {
     def test(input: JsValue, path: String): String = {
-      input.pathAsJsArray(path).toString()
-        .replace("{\"c\":","{c:")
-        .replace("{\"p\":","{p:")
-        .replace("{\"id\":","{id:")
-        }
+      compound match {
+        case false => s"""${unescapeFields(input.pathAsJsArray(path).toString())}"""
+        case true  => "[" + input.pathAsSeq(path).map(x => "{" + where + ":" + unescapeFields(x.toString()) + "}").mkString(",") + "]"
+      }
+    }
     test
   }
 
@@ -80,12 +91,18 @@ trait SchemaBaseV11 extends PlayJsonExtensions {
   def schemaWithRelation(onParent: RelationField, onChild: RelationField) = {
 
     //Query Params
-    val idParams         = QueryParams("id", "id", parse(".id"), parseFirst("id"), parseAll())
-    val compoundIdParams = QueryParams("id_1_id_2", "id_1 , id_2", parse(""), parseFirst(""), parseAll())
+    val idParams         = QueryParams("id", parse(".id", "id"), parseFirst("id", "id"), parseAll("id"))
+    val compoundIdParams = QueryParams("id_1 , id_2", parse("", "id_1_id_2"), parseFirst("", "id_1_id_2"), parseAll("id_1_id_2", true))
     val parentUniqueParams =
-      Vector(QueryParams("p", "p", parse(".p"), parseFirst("p"), parseAll()), QueryParams("p_1_p_2", "p_1, p_2", parse(""), parseFirst(""), parseAll()))
+      Vector(
+        QueryParams("p", parse(".p", "p"), parseFirst("p", "p"), parseAll("p")),
+        QueryParams("p_1, p_2", parse("", "p_1_p_2"), parseFirst("", "p_1_p_2"), parseAll("p_1_p_2", true))
+      )
     val childUniqueParams =
-      Vector(QueryParams("c", "c", parse(".c"), parseFirst("c"), parseAll()), QueryParams("c_1_c_2", "c_1, c_2", parse(""), parseFirst(""), parseAll()))
+      Vector(
+        QueryParams("c", parse(".c", "c"), parseFirst("c", "c"), parseAll("c")),
+        QueryParams("c_1, c_2", parse("", "c_1_c_2"), parseFirst("", "c_1_c_2"), parseAll("c_1_c_2", true))
+      )
 
     val simple = true
 
@@ -101,31 +118,31 @@ trait SchemaBaseV11 extends PlayJsonExtensions {
                                                           case _                                       => commonParentReferences
                                                         };
                                     parentReferences <- if (simple) Vector(noRef)
-                                                        else
-                                                        (childId, childReferences) match {
-                                                         case (_, _) if onParent.isList && !onChild.isList => Vector(`noRef`)
-                                                         case (`simpleId`, `noRef`)                        => idReference +: commonChildReferences
-                                                         case (`simpleId`, _) if onParent.isList && onChild.isList =>
-                                                           idReference +: commonChildReferences :+ noRef
-                                                         case (`simpleId`, _)         => Vector(noRef)
-                                                         case (`compoundId`, `noRef`) => compoundChildIdReference +: commonChildReferences
-                                                         case (`compoundId`, _) if onParent.isList && onChild.isList =>
-                                                           compoundChildIdReference +: commonChildReferences :+ noRef
-                                                         case (`compoundId`, _)                                => Vector(noRef)
-                                                         case (`noId`, `noRef`)                                => commonChildReferences
-                                                         case (`noId`, _) if onParent.isList && onChild.isList => commonChildReferences :+ noRef
-                                                         case (`noId`, _)                                      => Vector(noRef)
-                                                         case (_, _)                                           => Vector.empty
-                                                       };
+                                                       else
+                                                         (childId, childReferences) match {
+                                                           case (_, _) if onParent.isList && !onChild.isList => Vector(`noRef`)
+                                                           case (`simpleId`, `noRef`)                        => idReference +: commonChildReferences
+                                                           case (`simpleId`, _) if onParent.isList && onChild.isList =>
+                                                             idReference +: commonChildReferences :+ noRef
+                                                           case (`simpleId`, _)         => Vector(noRef)
+                                                           case (`compoundId`, `noRef`) => compoundChildIdReference +: commonChildReferences
+                                                           case (`compoundId`, _) if onParent.isList && onChild.isList =>
+                                                             compoundChildIdReference +: commonChildReferences :+ noRef
+                                                           case (`compoundId`, _)                                => Vector(noRef)
+                                                           case (`noId`, `noRef`)                                => commonChildReferences
+                                                           case (`noId`, _) if onParent.isList && onChild.isList => commonChildReferences :+ noRef
+                                                           case (`noId`, _)                                      => Vector(noRef)
+                                                           case (_, _)                                           => Vector.empty
+                                                         };
                                     //only based on id
-                                    parentParams <- if (simple) Vector(idParams)
+                                    parentParams <- if (simple) parentUniqueParams :+ idParams
                                                    else
                                                      parentId match {
                                                        case `simpleId`   => parentUniqueParams :+ idParams
                                                        case `compoundId` => parentUniqueParams :+ compoundIdParams
                                                        case `noId`       => parentUniqueParams
                                                      };
-                                    childParams <- if (simple) Vector(idParams)
+                                    childParams <- if (simple) childUniqueParams :+ idParams
                                                   else
                                                     childId match {
                                                       case `simpleId`   => childUniqueParams :+ idParams
@@ -166,9 +183,9 @@ trait SchemaBaseV11 extends PlayJsonExtensions {
 
   //region NON EMBEDDED WITH @id
 
-    val schemaP1reqToC1req = {
-      val s1 =
-        """
+  val schemaP1reqToC1req = {
+    val s1 =
+      """
     model Parent {
         id       String @id @default(cuid())
         p        String @unique
@@ -181,8 +198,8 @@ trait SchemaBaseV11 extends PlayJsonExtensions {
         parentReq Parent
     }"""
 
-      val s2 =
-        """
+    val s2 =
+      """
     model Parent {
         id       String @id @default(cuid())
         p        String @unique
@@ -195,9 +212,8 @@ trait SchemaBaseV11 extends PlayJsonExtensions {
         parentReq Parent @relation(references: [id])
     }"""
 
-      TestDataModels(mongo = Vector(s1, s2), sql = Vector(s1, s2))
-    }
-
+    TestDataModels(mongo = Vector(s1, s2), sql = Vector(s1, s2))
+  }
 
   val schemaP1optToC1req = {
     val s1 = """

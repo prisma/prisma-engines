@@ -63,7 +63,7 @@ case class TestDataModelsWrapper(
 
 }
 
-case class QueryParams(identifier: String, selection: String, parse: (JsValue, String) => String, parseFirst: (JsValue, String) => String, parseAll: (JsValue, String) => String )
+case class QueryParams(selection: String, where: (JsValue, String) => String, parseFirst: (JsValue, String) => String, parseAll: (JsValue, String) => String)
 
 case class TestAbstraction(datamodel: String, parent: QueryParams, child: QueryParams)
 
