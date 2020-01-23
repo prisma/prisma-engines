@@ -1,5 +1,7 @@
 use super::common::*;
-use crate::{ast, common::names::*, dml, error::ErrorCollection, DataSourceField, OnDeleteStrategy};
+use crate::{
+    ast, common::names::*, dml, dml::WithDatabaseName, error::ErrorCollection, DataSourceField, OnDeleteStrategy,
+};
 use prisma_inflector;
 
 /// Helper for standardsing a datamodel.
@@ -380,89 +382,105 @@ impl Standardiser {
     }
 
     fn populate_datasource_fields(&self, datamodel: &mut dml::Datamodel) {
-        // FIX borrowing issues with double iteration
-        // 1. build Vec<(String,String, DataSourceField)>
-        // 2. then go over mutable model and add them
-        let mut datasource_fields_collector: Vec<(String, String, DataSourceField)> = Vec::new();
+        let mut datasource_fields_to_push: Vec<AddDatasourceField> = Vec::new();
         for model in datamodel.models() {
             for field in model.fields() {
                 let datasource_fields = match &field.field_type {
                     dml::FieldType::Base(scalar_type) => {
-                        let db_name = field.database_names.first().unwrap_or(&field.name);
-                        let datasource_field = dml::DataSourceField {
-                            name: db_name.clone(), // TODO: this is wrong
-                            field_type: scalar_type.clone(),
-                            arity: field.arity,
-                            default_value: field.default_value.clone(),
-                        };
-                        vec![datasource_field]
+                        self.get_datasource_fields_for_scalar_field(&field, &scalar_type)
                     }
                     dml::FieldType::Enum(_) => {
                         // TODO: why i do not need the enum name here? Seems fishy to ignore that.
-                        let db_name = field.database_names.first().unwrap_or(&field.name);
-                        let datasource_field = dml::DataSourceField {
-                            name: db_name.clone(),
-                            field_type: dml::ScalarType::String, // TODO: is this right?
-                            arity: field.arity,
-                            default_value: field.default_value.clone(),
-                        };
-                        vec![datasource_field]
+                        self.get_datasource_fields_for_enum_field(&field)
                     }
                     dml::FieldType::Relation(rel_info) => {
-                        if field.database_names.len() > 0 {
-                            // TODO: explain this invariant
-                            assert_eq!(rel_info.to_fields.len(), field.database_names.len());
-                        }
-
-                        let final_db_names = self.final_db_names(&field, &rel_info);
-                        let to_fields_and_db_names = rel_info.to_fields.iter().zip(final_db_names.iter());
-
-                        let datasource_fields: Vec<dml::DataSourceField> = to_fields_and_db_names
-                            .map(|(to_field, db_name)| {
-                                let related_model = datamodel.find_model(&rel_info.to).unwrap();
-                                let referenced_field = related_model.find_field(&to_field).unwrap();
-                                let scalar_type = match &referenced_field.field_type {
-                                    dml::FieldType::Base(scalar_type) => scalar_type,
-                                    x => unimplemented!("This must be a scalar type: {:?}", x),
-                                };
-                                dml::DataSourceField {
-                                    name: db_name.clone(),
-                                    field_type: *scalar_type, // TODO: is this right? Must get `to_field` from Model `to`.
-                                    arity: field.arity,
-                                    default_value: None, // TODO: we don't allow default values for now on relation fields
-                                }
-                            })
-                            .collect();
-                        datasource_fields
+                        self.get_datasource_fields_for_relation_field(&field, &rel_info, &datamodel)
                     }
                     dml::FieldType::ConnectorSpecific(_) => {
-                        unimplemented!("ConnectorSpecific should be gone at some point")
+                        unimplemented!("ConnectorSpecific is not supported here as it will be removed soon.")
                     }
                 };
                 datasource_fields.into_iter().for_each(|ds_field| {
-                    datasource_fields_collector.push((model.name.clone(), field.name.clone(), ds_field));
+                    datasource_fields_to_push.push(AddDatasourceField {
+                        model: model.name.clone(),
+                        field: field.name.clone(),
+                        datasource_field: ds_field,
+                    })
                 });
             }
         }
 
-        datasource_fields_collector
-            .into_iter()
-            .for_each(|(model, field, ds_field)| {
-                let field = datamodel
-                    .find_model_mut(&model)
-                    .unwrap()
-                    .find_field_mut(&field)
-                    .unwrap();
-                field.data_source_fields.push(ds_field);
-            });
+        datasource_fields_to_push.into_iter().for_each(|add_ds_field| {
+            let AddDatasourceField {
+                model,
+                field,
+                datasource_field,
+            } = add_ds_field;
+            let field = datamodel
+                .find_model_mut(&model)
+                .unwrap()
+                .find_field_mut(&field)
+                .unwrap();
+            field.data_source_fields.push(datasource_field);
+        });
     }
 
-    fn final_db_names(&self, field: &dml::Field, relation_info: &dml::RelationInfo) -> Vec<String> {
+    fn get_datasource_fields_for_scalar_field(
+        &self,
+        field: &dml::Field,
+        scalar_type: &dml::ScalarType,
+    ) -> Vec<DataSourceField> {
+        let datasource_field = dml::DataSourceField {
+            name: field.final_single_database_name().to_owned(),
+            field_type: scalar_type.clone(),
+            arity: field.arity,
+            default_value: field.default_value.clone(),
+        };
+        vec![datasource_field]
+    }
+
+    fn get_datasource_fields_for_enum_field(&self, field: &dml::Field) -> Vec<DataSourceField> {
+        let datasource_field = dml::DataSourceField {
+            name: field.final_single_database_name().to_owned(),
+            field_type: dml::ScalarType::String,
+            arity: field.arity,
+            default_value: field.default_value.clone(),
+        };
+        vec![datasource_field]
+    }
+
+    fn get_datasource_fields_for_relation_field(
+        &self,
+        field: &dml::Field,
+        rel_info: &dml::RelationInfo,
+        datamodel: &dml::Datamodel,
+    ) -> Vec<DataSourceField> {
+        let final_db_names = self.final_db_names_for_relation_field(&field, &rel_info);
+        let to_fields_and_db_names = rel_info.to_fields.iter().zip(final_db_names.iter());
+
+        to_fields_and_db_names
+            .map(|(to_field, db_name)| {
+                let related_model = datamodel.find_model(&rel_info.to).expect(STATE_ERROR);
+                let referenced_field = related_model.find_field(&to_field).expect(STATE_ERROR);
+                let scalar_type = match &referenced_field.field_type {
+                    dml::FieldType::Base(scalar_type) => scalar_type,
+                    x => unimplemented!("This must be a scalar type: {:?}", x),
+                };
+                dml::DataSourceField {
+                    name: db_name.clone(),
+                    field_type: *scalar_type,
+                    arity: field.arity,
+                    default_value: None,
+                }
+            })
+            .collect()
+    }
+
+    fn final_db_names_for_relation_field(&self, field: &dml::Field, relation_info: &dml::RelationInfo) -> Vec<String> {
         if field.database_names.len() == 0 {
             // TODO: this rule must be incorporated into psl-sql-conversion.md
             if relation_info.to_fields.len() == 1 {
-                let db_name = field.database_names.first().unwrap_or(&field.name);
-                vec![db_name.to_owned()]
+                vec![field.name.to_owned()]
             } else {
                 relation_info
                     .to_fields
@@ -471,6 +489,9 @@ impl Standardiser {
                     .collect()
             }
         } else {
+            // This assertion verifies that the same number of names was used in @relation(references: [..]) and @map([..])
+            // This must already verified by the parser. Just making sure this is the case.
+            assert_eq!(relation_info.to_fields.len(), field.database_names.len());
             field.database_names.clone()
         }
     }
@@ -484,4 +505,11 @@ struct AddMissingBackRelationField {
     relation_info: dml::RelationInfo,
     related_model: String,
     related_field: String,
+}
+
+#[derive(Debug)]
+struct AddDatasourceField {
+    model: String,
+    field: String,
+    datasource_field: DataSourceField,
 }
