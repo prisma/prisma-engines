@@ -155,3 +155,110 @@ fn must_respect_custom_db_names() {
         ]
     );
 }
+
+#[test]
+fn must_handle_crazy_compound_stuff() {
+    let dml = r#"
+    model Blog {
+        id Int @id 
+        author User
+    }
+    model User {
+        firstName      String
+        lastName       Int
+        identification Identification
+        @@id([firstName, lastName, identification])
+    }
+    
+    model Identification {
+        id Float @id
+    }
+    "#;
+
+    let datamodel = parse(dml);
+
+    assert_eq!(
+        datamodel
+            .assert_has_model("Blog")
+            .assert_has_field("author")
+            .assert_has_multiple_datasource_fields(),
+        vec![
+            &DataSourceField {
+                name: "author_firstName".to_owned(),
+                arity: FieldArity::Required,
+                field_type: ScalarType::String,
+                default_value: None
+            },
+            &DataSourceField {
+                name: "author_lastName".to_owned(),
+                arity: FieldArity::Required,
+                field_type: ScalarType::Int,
+                default_value: None
+            },
+            &DataSourceField {
+                name: "author_identification".to_owned(),
+                arity: FieldArity::Required,
+                field_type: ScalarType::Float,
+                default_value: None
+            },
+        ]
+    );
+}
+
+#[test]
+#[ignore] // TODO: revisit this crazy test case
+fn must_handle_even_more_crazy_compound_stuff() {
+    let dml = r#"
+    model Blog {
+        id Int @id 
+        author User
+    }
+    model User {
+        firstName      String
+        lastName       Int
+        identification Identification
+        @@id([firstName, lastName, identification])
+    }
+    
+    model Identification {
+        foo Float
+        bar DateTime
+        @@id([foo,bar]) 
+    }
+    "#;
+
+    let datamodel = parse(dml);
+
+    assert_eq!(
+        datamodel
+            .assert_has_model("Blog")
+            .assert_has_field("author")
+            .assert_has_multiple_datasource_fields(),
+        vec![
+            &DataSourceField {
+                name: "author_firstName".to_owned(),
+                arity: FieldArity::Required,
+                field_type: ScalarType::String,
+                default_value: None
+            },
+            &DataSourceField {
+                name: "author_lastName".to_owned(),
+                arity: FieldArity::Required,
+                field_type: ScalarType::Int,
+                default_value: None
+            },
+            &DataSourceField {
+                name: "author_identification_foo".to_owned(),
+                arity: FieldArity::Required,
+                field_type: ScalarType::Float,
+                default_value: None
+            },
+            &DataSourceField {
+                name: "author_identification_bar".to_owned(),
+                arity: FieldArity::Required,
+                field_type: ScalarType::DateTime,
+                default_value: None
+            },
+        ]
+    );
+}

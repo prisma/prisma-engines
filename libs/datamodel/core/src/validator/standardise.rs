@@ -456,23 +456,33 @@ impl Standardiser {
         datamodel: &dml::Datamodel,
     ) -> Vec<DataSourceField> {
         let final_db_names = self.final_db_names_for_relation_field(&field, &rel_info);
+        //        dbg!(&final_db_names);
         let to_fields_and_db_names = rel_info.to_fields.iter().zip(final_db_names.iter());
 
         to_fields_and_db_names
             .map(|(to_field, db_name)| {
                 let related_model = datamodel.find_model(&rel_info.to).expect(STATE_ERROR);
                 let referenced_field = related_model.find_field(&to_field).expect(STATE_ERROR);
-                let scalar_type = match &referenced_field.field_type {
-                    dml::FieldType::Base(scalar_type) => scalar_type,
+                match &referenced_field.field_type {
+                    dml::FieldType::Base(scalar_type) => {
+                        let ds_field = dml::DataSourceField {
+                            name: db_name.clone(),
+                            field_type: *scalar_type,
+                            arity: field.arity,
+                            default_value: None,
+                        };
+                        vec![ds_field]
+                    }
+                    dml::FieldType::Relation(rel_info) => {
+                        let mut x =
+                            self.get_datasource_fields_for_relation_field(&referenced_field, &rel_info, &datamodel);
+                        x.iter_mut().for_each(|ds_field| ds_field.name = db_name.to_owned());
+                        x
+                    }
                     x => unimplemented!("This must be a scalar type: {:?}", x),
-                };
-                dml::DataSourceField {
-                    name: db_name.clone(),
-                    field_type: *scalar_type,
-                    arity: field.arity,
-                    default_value: None,
                 }
             })
+            .flatten()
             .collect()
     }
 
