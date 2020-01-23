@@ -29,7 +29,7 @@ fn read_one<'conn, 'tx>(
         let model = query.model;
         let filter = query.filter.expect("Expected filter to be set for ReadOne query.");
         let scalars = tx.get_single_record(&model, &filter, &query.selected_fields).await?;
-        let model_id = model.identifier();
+        let model_id = model.primary_identifier();
 
         match scalars {
             Some(record) => {
@@ -68,7 +68,7 @@ fn read_many<'a, 'b>(
             .get_many_records(&query.model, query.args.clone(), &query.selected_fields)
             .await?;
 
-        let model_id = query.model.identifier();
+        let model_id = query.model.primary_identifier();
         // let ids = scalars.identifiers(&model_id)?;
         let nested: Vec<QueryResult> = process_nested(tx, query.nested, Some(&scalars)).await?;
 
@@ -92,40 +92,42 @@ fn read_related<'a, 'b>(
     parent_result: Option<&'a ManyRecords>,
 ) -> BoxFuture<'a, InterpretationResult<QueryResult>> {
     let fut = async move {
-        // The query construction must guarantee that the parent result
-        // contains the selected fields necessary to satisfy the relation query.
-        // There are 2 options:
-        // - The query already has IDs set - use those.
-        // - The IDs need to be extracted from the parent result.
-        let relation_parent_ids = match query.relation_parent_ids {
-            Some(ref ids) => ids,
-            None => {
-                let relation_id = query.parent_field.identifier();
-                parent_result.identifiers(relation_id)?
-            }
-        };
+        // // The query construction must guarantee that the parent result
+        // // contains the selected fields necessary to satisfy the relation query.
+        // // There are 2 options:
+        // // - The query already has IDs set - use those.
+        // // - The IDs need to be extracted from the parent result.
+        // let relation_parent_ids = match query.relation_parent_ids {
+        //     Some(ref ids) => ids,
+        //     None => {
+        //         let relation_id = query.parent_field.identifier();
+        //         parent_result.identifiers(relation_id)?
+        //     }
+        // };
 
-        let scalars = tx
-            .get_related_records(
-                &query.parent_field,
-                relation_parent_ids,
-                query.args.clone(),
-                &query.selected_fields,
-            )
-            .await?;
+        // let scalars = tx
+        //     .get_related_records(
+        //         &query.parent_field,
+        //         relation_parent_ids,
+        //         query.args.clone(),
+        //         &query.selected_fields,
+        //     )
+        //     .await?;
 
-        let model = query.parent_field.related_model();
-        let model_id = model.identifier();
-        let nested: Vec<QueryResult> = process_nested(tx, query.nested, Some(&scalars)).await?;
+        // let model = query.parent_field.related_model();
+        // let model_id = model.identifier();
+        // let nested: Vec<QueryResult> = process_nested(tx, query.nested, Some(&scalars)).await?;
 
-        Ok(QueryResult::RecordSelection(RecordSelection {
-            name: query.name,
-            fields: query.selection_order,
-            query_arguments: query.args,
-            model_id,
-            scalars,
-            nested,
-        }))
+        // Ok(QueryResult::RecordSelection(RecordSelection {
+        //     name: query.name,
+        //     fields: query.selection_order,
+        //     query_arguments: query.args,
+        //     model_id,
+        //     scalars,
+        //     nested,
+        // }))
+
+        todo!()
     };
 
     fut.boxed()

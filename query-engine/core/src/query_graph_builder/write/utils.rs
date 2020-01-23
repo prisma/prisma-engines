@@ -46,7 +46,7 @@ pub fn read_ids_infallible<T>(model: &ModelRef, filter: T) -> Query
 where
     T: Into<Filter>,
 {
-    let selected_fields: SelectedFields = model.identifier().into();
+    let selected_fields: SelectedFields = model.primary_identifier().into();
     let filter: Filter = filter.into();
 
     let read_query = ReadQuery::ManyRecordsQuery(ManyRecordsQuery {
@@ -98,13 +98,13 @@ pub fn insert_find_children_by_parent_node<T>(
 where
     T: Into<QueryArguments>,
 {
-    let selected_fields: SelectedFields = parent_relation_field.related_model().identifier().into();
+    let selected_fields: SelectedFields = parent_relation_field.related_model().primary_identifier().into();
 
     let read_parent_node = graph.create_node(Query::Read(ReadQuery::RelatedRecordsQuery(RelatedRecordsQuery {
         name: "find_children_by_parent".to_owned(),
         alias: None,
         parent_field: Arc::clone(parent_relation_field),
-        relation_ids: None,
+        relation_parent_ids: None,
         args: filter.into(),
         selected_fields,
         nested: vec![],
@@ -117,7 +117,7 @@ where
         QueryGraphDependency::ParentIds(Box::new(|mut node, parent_ids| {
             if let Node::Query(Query::Read(ReadQuery::RelatedRecordsQuery(ref mut rq))) = node {
                 // We know that all PrismaValues in `parent_ids` are transformable into GraphqlIds.
-                rq.relation_ids = Some(parent_ids.into_iter().map(|id| id.try_into().unwrap()).collect());
+                rq.relation_parent_ids = Some(parent_ids.into_iter().map(|id| id.try_into().unwrap()).collect());
             };
 
             Ok(node)

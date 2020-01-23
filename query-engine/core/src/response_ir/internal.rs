@@ -4,7 +4,7 @@ use crate::{
     CoreError, CoreResult, EnumType, QueryResult, RecordSelection,
 };
 use indexmap::IndexMap;
-use prisma_models::{InternalEnum, PrismaValue, PrismaValueExtensions};
+use prisma_models::{InternalEnum, PrismaValue, RecordIdentifier};
 use rust_decimal::prelude::ToPrimitive;
 use std::{borrow::Borrow, collections::HashMap};
 

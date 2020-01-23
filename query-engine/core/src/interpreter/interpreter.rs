@@ -192,7 +192,7 @@ where
                         Query::Read(read) => {
                             self.log_line(level, || format!("READ {}", read));
 
-                            Ok(read::execute(&self.conn, read, &[])
+                            Ok(read::execute(&self.conn, read, None)
                                 .await
                                 .map(|res| ExpressionResult::Query(res))?)
                         }

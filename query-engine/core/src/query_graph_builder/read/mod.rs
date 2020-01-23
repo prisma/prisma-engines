@@ -53,19 +53,16 @@ pub fn collect_selected_fields(from: &[ParsedField], model: &ModelRef) -> Select
             let model_field = model.fields().find_from_all(&selected_field.name).unwrap();
             match model_field {
                 Field::Scalar(ref sf) => SelectedField::Scalar(SelectedScalarField { field: Arc::clone(sf) }),
-                Field::Relation(ref rf) => SelectedField::Relation(SelectedRelationField {
-                    field: Arc::clone(rf),
-                    selected_fields: SelectedFields::new(Vec::new()), // todo None here correct?
-                }),
+                Field::Relation(ref rf) => SelectedField::Relation(SelectedRelationField { field: Arc::clone(rf) }),
             }
         })
         .collect::<Vec<SelectedField>>();
 
     let mut selected_fields = SelectedFields::new(selected_fields);
 
-    let model_id = model.identifier();
+    let model_id = model.primary_identifier();
     for field in model_id {
-        selected_fields.add_scalar(field);
+        selected_fields.add(field);
     }
 
     selected_fields

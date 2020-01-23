@@ -79,8 +79,7 @@ impl<'a> DatamodelConverter<'a> {
                         is_list: field.is_list(),
                         is_unique: field.is_unique(),
                         is_auto_generated_int_id: field.is_auto_generated_int_id(),
-                        // todo the data source fields are not yet build correctly in the datamodel
-                        data_source_fields: vec![],
+                        data_source_fields: field.data_source_fields.clone(),
                         relation_name: relation.name(),
                         relation_side: relation.relation_side(field),
                     })
@@ -92,13 +91,11 @@ impl<'a> DatamodelConverter<'a> {
                     is_list: field.is_list(),
                     is_unique: field.is_unique(),
                     is_auto_generated_int_id: field.is_auto_generated_int_id(),
-                    // todo the data source field is not yet build correctly in the datamodel
-                    data_source_field: DataSourceField {
-                        name: "".to_owned(),                 // dummy
-                        arity: dml::FieldArity::Optional,    // dummy
-                        field_type: dml::ScalarType::String, // dummy
-                        default_value: field.default_value.clone(),
-                    },
+                    data_source_field: field
+                        .data_source_fields
+                        .clone()
+                        .pop()
+                        .expect("Expected exactly one data source field for ScalarFieldTemplate."),
                     behaviour: field.behaviour(),
                     internal_enum: field.internal_enum(self.datamodel),
                 }),
