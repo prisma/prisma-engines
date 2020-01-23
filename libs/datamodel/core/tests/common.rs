@@ -22,6 +22,9 @@ pub trait FieldAsserts {
     fn assert_is_updated_at(&self, b: bool) -> &Self;
     fn assert_id_strategy(&self, strategy: dml::IdStrategy) -> &Self;
     fn assert_id_sequence(&self, strategy: Option<dml::Sequence>) -> &Self;
+    fn assert_has_no_datasource_fields(&self) -> &Self;
+    fn assert_has_one_datasource_field(&self) -> &dml::DataSourceField;
+    fn assert_has_multiple_datasource_fields(&self) -> Vec<&dml::DataSourceField>;
 }
 
 pub trait ModelAsserts {
@@ -185,6 +188,41 @@ impl FieldAsserts for dml::Field {
         }
 
         self
+    }
+
+    fn assert_has_no_datasource_fields(&self) -> &Self {
+        assert_eq!(
+            self.data_source_fields.len(),
+            0,
+            "Expected field {} to have exactly one datasource field but found {}",
+            &self.name,
+            self.data_source_fields.len()
+        );
+        &self
+    }
+
+    fn assert_has_one_datasource_field(&self) -> &dml::DataSourceField {
+        if self.data_source_fields.len() == 1 {
+            self.data_source_fields.first().unwrap()
+        } else {
+            panic!(
+                "Expected field {} to have exactly one datasource field but found {}",
+                &self.name,
+                self.data_source_fields.len()
+            );
+        }
+    }
+
+    fn assert_has_multiple_datasource_fields(&self) -> Vec<&dml::DataSourceField> {
+        if self.data_source_fields.len() > 1 {
+            self.data_source_fields.iter().collect()
+        } else {
+            panic!(
+                "Expected field {} to have multiple datasource fields but found {}",
+                &self.name,
+                self.data_source_fields.len()
+            );
+        }
     }
 }
 
