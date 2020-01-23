@@ -13,7 +13,7 @@ fn int_id_without_default_should_have_strategy_none() {
     let user_model = datamodel.assert_has_model("Model");
     user_model
         .assert_has_field("id")
-        .assert_is_id(true)
+        .assert_is_id()
         .assert_id_sequence(None)
         .assert_id_strategy(IdStrategy::None);
 }
@@ -30,7 +30,7 @@ fn int_id_with_default_autoincrement_should_have_strategy_auto() {
     let user_model = datamodel.assert_has_model("Model");
     user_model
         .assert_has_field("id")
-        .assert_is_id(true)
+        .assert_is_id()
         .assert_id_sequence(None)
         .assert_id_strategy(IdStrategy::Auto);
 }
@@ -49,7 +49,7 @@ fn id_should_also_work_on_embedded_types() {
     let user_model = datamodel.assert_has_model("Model");
     user_model
         .assert_has_field("id")
-        .assert_is_id(true)
+        .assert_is_id()
         .assert_id_sequence(None)
         .assert_id_strategy(IdStrategy::None);
 }
@@ -66,7 +66,7 @@ fn should_allow_string_ids_with_cuid() {
     let user_model = datamodel.assert_has_model("Model");
     user_model
         .assert_has_field("id")
-        .assert_is_id(true)
+        .assert_is_id()
         .assert_base_type(&ScalarType::String)
         .assert_id_strategy(IdStrategy::Auto)
         .assert_default_value(DefaultValue::Expression(
@@ -86,7 +86,7 @@ fn should_allow_string_ids_with_uuid() {
     let user_model = datamodel.assert_has_model("Model");
     user_model
         .assert_has_field("id")
-        .assert_is_id(true)
+        .assert_is_id()
         .assert_id_strategy(IdStrategy::Auto)
         .assert_base_type(&ScalarType::String)
         .assert_default_value(DefaultValue::Expression(
@@ -106,7 +106,7 @@ fn should_allow_string_ids_without_default() {
     let user_model = datamodel.assert_has_model("Model");
     user_model
         .assert_has_field("id")
-        .assert_is_id(true)
+        .assert_is_id()
         .assert_id_strategy(IdStrategy::None)
         .assert_base_type(&ScalarType::String);
 }
@@ -123,7 +123,7 @@ fn should_allow_string_ids_with_static_default() {
     let user_model = datamodel.assert_has_model("Model");
     user_model
         .assert_has_field("id")
-        .assert_is_id(true)
+        .assert_is_id()
         .assert_id_strategy(IdStrategy::None)
         .assert_default_value(DefaultValue::Single(ScalarValue::String(String::from(""))))
         .assert_base_type(&ScalarType::String);
@@ -141,7 +141,7 @@ fn should_allow_int_ids_with_static_default() {
     let user_model = datamodel.assert_has_model("Model");
     user_model
         .assert_has_field("id")
-        .assert_is_id(true)
+        .assert_is_id()
         .assert_id_strategy(IdStrategy::None)
         .assert_default_value(DefaultValue::Single(ScalarValue::Int(0)))
         .assert_base_type(&ScalarType::Int);
@@ -176,7 +176,7 @@ fn relation_field_as_id_must_work() {
 
     let schema = parse(dml);
     let user_model = schema.assert_has_model("User");
-    user_model.assert_has_field("identification").assert_is_id(true);
+    user_model.assert_has_field("identification").assert_is_id();
 }
 
 #[test]

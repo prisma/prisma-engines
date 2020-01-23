@@ -17,7 +17,7 @@ pub trait FieldAsserts {
     fn assert_with_documentation(&self, t: &str) -> &Self;
     fn assert_default_value(&self, t: dml::DefaultValue) -> &Self;
     fn assert_is_generated(&self, b: bool) -> &Self;
-    fn assert_is_id(&self, b: bool) -> &Self;
+    fn assert_is_id(&self) -> &Self;
     fn assert_is_unique(&self, b: bool) -> &Self;
     fn assert_is_updated_at(&self, b: bool) -> &Self;
     fn assert_id_strategy(&self, strategy: dml::IdStrategy) -> &Self;
@@ -143,8 +143,8 @@ impl FieldAsserts for dml::Field {
         self
     }
 
-    fn assert_is_id(&self, b: bool) -> &Self {
-        assert_eq!(self.id_info.is_some(), b);
+    fn assert_is_id(&self) -> &Self {
+        assert!(self.id_info.is_some());
 
         self
     }
