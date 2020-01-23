@@ -16,13 +16,16 @@ type AnyError = Box<dyn std::error::Error + Send + Sync>;
 
 const SCHEMA_NAME: &str = "prisma-tests";
 
+pub fn server_root() -> String {
+    std::env::var("SERVER_ROOT").expect("Env var SERVER_ROOT required but not found.")
+}
+
 pub fn sqlite_test_url(db_name: &str) -> String {
     format!("file:{}?db_name={}", sqlite_test_file(db_name), SCHEMA_NAME)
 }
 
 pub fn sqlite_test_file(db_name: &str) -> String {
-    let server_root = std::env::var("SERVER_ROOT").expect("Env var SERVER_ROOT required but not found.");
-    let database_folder_path = format!("{}/db", server_root);
+    let database_folder_path = format!("{}/db", server_root());
     let file_path = format!("{}/{}.db", database_folder_path, db_name);
     file_path
 }

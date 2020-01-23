@@ -4,7 +4,7 @@ use sql_schema_describer::*;
 mod common;
 mod mysql_renderer;
 mod postgres_renderer;
-mod sqlite_renderer;
+pub(crate) mod sqlite_renderer;
 
 use mysql_renderer::MySqlRenderer;
 use postgres_renderer::PostgresRenderer;

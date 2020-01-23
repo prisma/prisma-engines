@@ -22,9 +22,9 @@ anyhow = "1.0.26"
 thiserror = "1.0.9"
 
 jsonrpc-core = "14.0"
-jsonrpc-stdio-server = { git = "https://github.com/tomhoule/jsonrpc.git", branch = "alternate-branch" }
+json-rpc-stdio = { path = "../../libs/json-rpc-stdio" }
 
-futures = { version = "0.3", features = ["compat"] }
+futures = { version = "0.3", features = [] }
 tokio = { version = "0.2", features = ["rt-threaded", "macros"] }
 async-trait = "0.1.17"
 tracing = "0.1.10"

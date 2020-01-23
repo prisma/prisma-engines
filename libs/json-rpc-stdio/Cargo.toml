@@ -1,0 +1,13 @@
+[package]
+name = "json-rpc-stdio"
+version = "0.1.0"
+authors = ["Tom Houlé <tom@tomhoule.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+futures = { version = "0.3.1", features = ["compat"] }
+jsonrpc-core = "14.0.5"
+tokio = { version = "0.2.10", features = ["io-std", "io-util"] }
+tracing = "0.1.12"

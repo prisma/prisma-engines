@@ -42,7 +42,11 @@ impl<'a> MigrationCommand for CalculateDatabaseStepsCommand<'a> {
             .infer(&assumed_datamodel, &next_datamodel, &cmd.input.steps_to_apply)
             .await?;
 
-        let DestructiveChangeDiagnostics { warnings, errors: _ } = connector
+        let DestructiveChangeDiagnostics {
+            warnings,
+            errors: _,
+            unexecutable_migrations,
+        } = connector
             .destructive_changes_checker()
             .check(&database_migration)
             .await?;
@@ -58,6 +62,7 @@ impl<'a> MigrationCommand for CalculateDatabaseStepsCommand<'a> {
             errors: Vec::new(),
             warnings,
             general_errors: Vec::new(),
+            unexecutable_migrations,
         })
     }
 }

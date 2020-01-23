@@ -35,7 +35,7 @@ async fn main() {
         println!(env!("GIT_HASH"));
     } else if let Some(matches) = matches.subcommand_matches("cli") {
         tracing::info!(git_hash = env!("GIT_HASH"), "Starting migration engine CLI");
-        let datasource = matches.value_of("datasource").unwrap();
+        let datasource = matches.value_of("datasource").expect("missing datasource");
 
         match std::panic::AssertUnwindSafe(cli::run(&matches, &datasource))
             .catch_unwind()
@@ -64,8 +64,10 @@ async fn main() {
         }
     } else {
         tracing::info!(git_hash = env!("GIT_HASH"), "Starting migration engine RPC server",);
-        let dml_loc = matches.value_of("datamodel_location").unwrap();
-        let mut file = fs::File::open(&dml_loc).unwrap();
+        let dml_loc = matches
+            .value_of("datamodel_location")
+            .expect("missing datamodel_location");
+        let mut file = fs::File::open(&dml_loc).expect("error opening dml_loc");
 
         let mut datamodel = String::new();
         file.read_to_string(&mut datamodel).unwrap();
@@ -77,7 +79,7 @@ async fn main() {
             println!("{}", response);
         } else {
             match RpcApi::new(&datamodel).await {
-                Ok(api) => api.start_server().await,
+                Ok(api) => api.start_server().await.unwrap(),
                 Err(err) => {
                     let (error, exit_code) = match &err {
                         Error::DatamodelError(errors) => {

@@ -1,3 +1,5 @@
+mod sql_unexecutable_migrations;
+
 use super::test_harness::*;
 use migration_connector::MigrationWarning;
 use pretty_assertions::assert_eq;
@@ -673,9 +675,8 @@ async fn altering_the_type_of_a_column_in_a_non_empty_table_always_warns(api: &T
         }]
     );
 
-    let data = api.dump_table("User").await?;
-    assert_eq!(data.len(), 1);
-    assert_eq!(data.get(0).unwrap().get("dogs").unwrap().as_i64().unwrap(), 7);
+    let rows = api.select("User").column("dogs").send_debug().await?;
+    assert_eq!(rows, &[["Integer(7)"]]);
 
     api.assert_schema()
         .await?
@@ -696,13 +697,10 @@ async fn migrating_a_required_column_from_int_to_string_should_warn_and_cast(api
 
     api.infer_apply(dm1).send().await?;
 
-    api.database()
-        .query(
-            api.insert("Test")
-                .value("id", "abcd")
-                .value("serialNumber", 47i64)
-                .into(),
-        )
+    api.insert("Test")
+        .value("id", "abcd")
+        .value("serialNumber", 47i64)
+        .result_raw()
         .await?;
 
     let test = api.dump_table("Test").await?;

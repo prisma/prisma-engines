@@ -148,7 +148,11 @@ impl<'a> ApplyMigrationCommand<'a> {
             (true, false) => tracing::info!("The force flag was not passed, the migration will not be applied."),
         }
 
-        let DestructiveChangeDiagnostics { warnings, errors } = diagnostics;
+        let DestructiveChangeDiagnostics {
+            warnings,
+            errors,
+            unexecutable_migrations,
+        } = diagnostics;
 
         Ok(MigrationStepsResultOutput {
             datamodel: datamodel::render_datamodel_to_string(&next_datamodel).unwrap(),
@@ -157,6 +161,7 @@ impl<'a> ApplyMigrationCommand<'a> {
             errors,
             warnings,
             general_errors: Vec::new(),
+            unexecutable_migrations,
         })
     }
 }
