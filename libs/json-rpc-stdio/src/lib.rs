@@ -21,12 +21,13 @@ impl ServerBuilder {
     pub async fn run(self) -> std::io::Result<()> {
         let stdin = tokio::io::BufReader::new(tokio::io::stdin());
         let mut stdin_lines = stdin.lines();
-        let mut stdout = tokio::io::stdout();
+        let mut stdout = tokio::io::BufWriter::new(tokio::io::stdout());
 
         while let Some(line) = stdin_lines.next_line().await? {
             let response = handle_request(&self.handler, &line).await;
-            stdout.write(response.as_bytes()).await?;
-            stdout.write(b"\n").await?;
+            stdout.write_all(response.as_bytes()).await?;
+            stdout.write_all(b"\n").await?;
+            stdout.flush().await?;
         }
 
         Ok(())
