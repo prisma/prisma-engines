@@ -14,34 +14,32 @@ class NestedConnectMutationInsideCreateSpec extends FlatSpec with Matchers with 
       }
       database.setup(project)
 
-      val child1Id = t.child.parse(
+      val child1 = t.child.where(
         server
           .query(
             s"""mutation {
             |  createParent(data: {
-            |    p: "p1"
+            |    p: "p1", p_1:"p", p_2: "1",
             |    childReq: {
-            |      create: {c: "c1"}
+            |      create: {c: "c1", c_1:"c", c_2: "1"}
             |    }
             |  }){
             |    childReq{
             |       ${t.child.selection}
             |    }
             |  }
-            |}""".stripMargin,
+            |}""",
             project
           ),
         "data.createParent.childReq"
       )
-
-//      ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(1) }
 
       server.queryThatMustFail(
         s"""
            |mutation {
            |  createParent(data:{
            |    p: "p2"
-           |    childReq: {connect: {${t.child.identifier}: "$child1Id"}}
+           |    childReq: {connect: $child1}
            |  }){
            |    childReq {
            |      c
@@ -53,8 +51,6 @@ class NestedConnectMutationInsideCreateSpec extends FlatSpec with Matchers with 
         errorCode = 3042,
         errorContains = "The change you are trying to make would violate the required relation 'ChildToParent' between Child and Parent"
       )
-
-    //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(1) }
 
     }
   }
@@ -66,34 +62,32 @@ class NestedConnectMutationInsideCreateSpec extends FlatSpec with Matchers with 
       }
       database.setup(project)
 
-      val child1Id = t.child.parse(
+      val child1 = t.child.where(
         server
           .query(
             s"""mutation {
             |  createParent(data: {
-            |    p: "p1"
+            |    p: "p1", p_1:"p", p_2: "1",
             |    childReq: {
-            |      create: {c: "c1"}
+            |      create: {c: "c1", c_1:"c", c_2: "1"}
             |    }
             |  }){
             |    childReq{
             |       ${t.child.selection}
             |    }
             |  }
-            |}""".stripMargin,
+            |}""",
             project
           ),
         "data.createParent.childReq"
       )
-
-      //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(1) }
 
       server.queryThatMustFail(
         s"""
            |mutation {
            |  createParent(data:{
            |    p: "p2"
-           |    childReq: {connect: {${t.child.identifier}: "$child1Id"}}
+           |    childReq: {connect: $child1}
            |  }){
            |    childReq {
            |      c
@@ -105,9 +99,6 @@ class NestedConnectMutationInsideCreateSpec extends FlatSpec with Matchers with 
         errorCode = 3042,
         errorContains = "The change you are trying to make would violate the required relation 'ChildToParent' between Child and Parent"
       )
-
-    // ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(1) }
-
     }
   }
 
@@ -117,60 +108,58 @@ class NestedConnectMutationInsideCreateSpec extends FlatSpec with Matchers with 
         t.datamodel
       }
       database.setup(project)
-      val looseChildId = t.child.parse(
+      val looseChild = t.child.where(
         server
           .query(
             s"""mutation {
-          |  createChild(data: {c: "looseChild"})
+          |  createChild(data: {c: "looseChild", c_1:"c", c_2: "1"})
           |  {
           |    ${t.child.selection}
           |  }
-          |}""".stripMargin,
+          |}""",
             project
           ),
         "data.createChild"
       )
 
-      val otherParentWithChildId = t.parent.parse(
+      val otherParentWithChildId = t.parent.where(
         server
           .query(
             s"""
            |mutation {
            |  createParent(data:{
-           |    p: "otherParent"
-           |    childReq: {create: {c: "otherChild"}}
+           |    p: "otherParent", p_1:"p", p_2: "1",
+           |    childReq: {create: {c: "otherChild", c_1:"c", c_2: "2"}}
            |  }){
            |     ${t.parent.selection}
            |  }
            |}
-      """.stripMargin,
+      """,
             project
           ),
         "data.createParent"
       )
 
-      val child1Id = t.child.parse(
+      val child3Id = t.child.where(
         server
           .query(
             s"""mutation {
-          |  createChild(data: {c: "c1"})
+          |  createChild(data: {c: "c3", c_1:"c", c_2: "3"})
           |  {
           |     ${t.child.selection}
           |  }
-          |}""".stripMargin,
+          |}""",
             project
           ),
         "data.createChild"
       )
 
-      //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(1) }
-
       val res = server.query(
         s"""
          |mutation {
          |  createParent(data:{
-         |    p: "p2"
-         |    childReq: {connect: {${t.child.identifier}: "$child1Id"}}
+         |    p: "p2", p_1:"p", p_2: "2",
+         |    childReq: {connect: $child3Id}
          |  }){
          |    childReq {
          |      c
@@ -181,8 +170,7 @@ class NestedConnectMutationInsideCreateSpec extends FlatSpec with Matchers with 
         project
       )
 
-      res.toString should be("""{"data":{"createParent":{"childReq":{"c":"c1"}}}}""")
-      //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(2) }
+      res.toString should be("""{"data":{"createParent":{"childReq":{"c":"c3"}}}}""")
 
       // verify preexisting data
 
@@ -190,7 +178,7 @@ class NestedConnectMutationInsideCreateSpec extends FlatSpec with Matchers with 
         .query(
           s"""
            |{
-           |  parent(where: {${t.parent.identifier}: "$otherParentWithChildId"}){
+           |  parent(where: $otherParentWithChildId){
            |    childReq {
            |      c
            |    }
@@ -205,7 +193,7 @@ class NestedConnectMutationInsideCreateSpec extends FlatSpec with Matchers with 
         .query(
           s"""
            |{
-           |  child(where: {${t.child.identifier}: "$looseChildId"}){
+           |  child(where: $looseChild){
            |    c
            |  }
            |}
@@ -223,47 +211,44 @@ class NestedConnectMutationInsideCreateSpec extends FlatSpec with Matchers with 
       }
       database.setup(project)
 
-      val child1Id = t.child.parse(
+      val child1 = t.child.where(
         server
           .query(
             s"""mutation {
             |  createParent(data: {
-            |    p: "p1"
+            |    p: "p1", p_1:"p", p_2: "1",
             |    childOpt: {
-            |      create: {c: "c1"}
+            |      create: {c: "c1", c_1:"c", c_2: "1"}
             |    }
             |  }){
             |    childOpt{
             |        ${t.child.selection}
             |    }
             |  }
-            |}""".stripMargin,
+            |}""",
             project
           ),
         "data.createParent.childOpt"
       )
 
-      //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(1) }
-
       val res = server.query(
         s"""
            |mutation {
            |  createParent(data:{
-           |    p: "p2"
-           |    childOpt: {connect: {${t.child.identifier}: "$child1Id"}}
+           |    p: "p2", p_1:"p", p_2: "2",
+           |    childOpt: {connect: $child1}
            |  }){
            |    childOpt {
            |      c
            |    }
            |  }
            |}
-        """.stripMargin,
+        """,
         project
       )
 
       res.toString should be("""{"data":{"createParent":{"childOpt":{"c":"c1"}}}}""")
 
-    //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(1) }
     }
   }
 
@@ -274,41 +259,37 @@ class NestedConnectMutationInsideCreateSpec extends FlatSpec with Matchers with 
       }
       database.setup(project)
 
-      val child1Id = t.child.parse(
+      val child1 = t.child.where(
         server
           .query(
             s"""mutation {
-            |  createChild(data: {c: "c1"})
+            |  createChild(data: {c: "c1", c_1:"c", c_2: "1"})
             |  {
             |     ${t.child.selection}
             |  }
-            |}""".stripMargin,
+            |}""",
             project
           ),
         "data.createChild"
       )
 
-      //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(0) }
-
       val res = server.query(
         s"""
            |mutation {
            |  createParent(data:{
-           |    p: "p2"
-           |    childOpt: {connect: {${t.child.identifier}: "$child1Id"}}
+           |    p: "p1", p_1:"p", p_2: "1",
+           |    childOpt: {connect: $child1}
            |  }){
            |    childOpt {
            |      c
            |    }
            |  }
            |}
-        """.stripMargin,
+        """,
         project
       )
 
       res.toString should be("""{"data":{"createParent":{"childOpt":{"c":"c1"}}}}""")
-
-    //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(1) }
 
     }
   }
@@ -325,29 +306,27 @@ class NestedConnectMutationInsideCreateSpec extends FlatSpec with Matchers with 
           .query(
             s"""mutation {
           |  createParent(data: {
-          |    p: "p1"
+          |    p: "p1", p_1:"p", p_2: "1",
           |    childrenOpt: {
-          |      create: {c: "c1"}
+          |      create: {c: "c1", c_1:"c", c_2: "1"}
           |    }
           |  }){
           |    childrenOpt{
           |        ${t.child.selection}
           |    }
           |  }
-          |}""".stripMargin,
+          |}""",
             project
           ),
         "data.createParent.childrenOpt"
       )
 
-      //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(1) }
-
       val res = server.query(
         s"""
            |mutation {
            |  createParent(data:{
-           |    p: "p2"
-           |    childrenOpt: {connect: {${t.child.identifier}: "$child"}}
+           |    p: "p2", p_1:"p", p_2: "2",
+           |    childrenOpt: {connect: $child}
            |  }){
            |    childrenOpt {
            |      c
@@ -359,8 +338,6 @@ class NestedConnectMutationInsideCreateSpec extends FlatSpec with Matchers with 
       )
 
       res.toString should be("""{"data":{"createParent":{"childrenOpt":[{"c":"c1"}]}}}""")
-
-    //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(1) }
     }
   }
 
@@ -371,47 +348,43 @@ class NestedConnectMutationInsideCreateSpec extends FlatSpec with Matchers with 
       }
       database.setup(project)
 
-      val child = t.child.parse(
+      val child = t.child.where(
         server
           .query(
             s"""mutation {
           |  createParent(data: {
-          |    p: "p1"
+          |    p: "p1", p_1:"p", p_2: "1",
           |    childOpt: {
-          |      create: {c: "c1"}
+          |      create: {c: "c1", c_1:"c", c_2: "1"}
           |    }
           |  }){
           |    childOpt{
           |        ${t.child.selection}
           |    }
           |  }
-          |}""".stripMargin,
+          |}""",
             project
           ),
         "data.createParent.childOpt"
       )
 
-      //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(1) }
-
       val res = server.query(
         s"""
            |mutation {
            |  createParent(data:{
-           |    p: "p2"
-           |    childOpt: {connect: {${t.child.identifier}: "$child"}}
+           |    p: "p2", p_1:"p", p_2: "2",
+           |    childOpt: {connect: $child}
            |  }){
            |    childOpt {
            |      c
            |    }
            |  }
            |}
-        """.stripMargin,
+        """,
         project
       )
 
       res.toString should be("""{"data":{"createParent":{"childOpt":{"c":"c1"}}}}""")
-
-    //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(1) }
     }
   }
 

@@ -85,10 +85,10 @@ trait PlayJsonExtensions extends JsonUtils {
 
     def identifierAtPath(path: String, subPath: String = "", list: Boolean): String = {
       (subPath, list) match {
-        case ("", false) => pathAsJsObject(path).toString()
-        case (x, false)  => pathAsString(path + x)
-        case ("", true)  => pathAsSeq(path).head.pathAsString("")
-        case (x, true)   => pathAsSeq(path).head.pathAsString(x)
+        case ("", false) => s"""${pathAsJsObject(path)}"""
+        case (x, false)  => s""""${pathAsString(path + x)}""""
+        case ("", true)  => s"""${pathAsSeq(path).head.toString()}"""
+        case (x, true)   => s""""${pathAsSeq(path).head.pathAsString(x)}""""
       }
     }
   }
