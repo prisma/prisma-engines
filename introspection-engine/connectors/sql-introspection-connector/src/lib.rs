@@ -74,10 +74,17 @@ impl IntrospectionConnector for SqlIntrospectionConnector {
         Ok(self.catch(self.get_metadata_internal()).await?)
     }
 
+    async fn get_sql_schema(&self) -> ConnectorResult<SqlSchema> {
+        let sql_schema = self.catch(self.describe()).await?;
+        tracing::debug!("SQL Schema Describer is done: {:?}", sql_schema);
+        Ok(sql_schema)
+    }
+
     async fn introspect(&self) -> ConnectorResult<Datamodel> {
         let sql_schema = self.catch(self.describe()).await?;
         tracing::debug!("SQL Schema Describer is done: {:?}", sql_schema);
         let data_model = calculate_datamodel::calculate_model(&sql_schema).unwrap();
+        tracing::debug!("Calculating datamodel is done: {:?}", sql_schema);
         Ok(data_model)
     }
 }
