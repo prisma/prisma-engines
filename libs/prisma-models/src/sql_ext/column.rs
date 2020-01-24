@@ -1,4 +1,4 @@
-use crate::{DataSourceFieldRef, Field, ModelIdentifier, ModelRef, RelationField, ScalarField};
+use crate::{Field, ModelIdentifier, RelationField, ScalarField};
 use quaint::ast::{Column, Row};
 
 pub struct ColumnIterator {
@@ -106,23 +106,9 @@ impl AsColumns for RelationField {
     }
 }
 
-impl AsColumns for (&ModelRef, &[DataSourceFieldRef]) {
+impl AsColumns for &[crate::field::DataSourceFieldRef] {
     fn as_columns(&self) -> ColumnIterator {
-        let internal_data_model = self.0.internal_data_model();
-
-        let inner: Vec<_> = self
-            .1
-            .iter()
-            .map(|dsf| {
-                let parts = (
-                    (internal_data_model.db_name.clone(), self.0.db_name().to_string()),
-                    dsf.name.clone(),
-                );
-
-                Column::from(parts)
-            })
-            .collect();
-
+        let inner: Vec<_> = self.iter().map(|dsf| dsf.as_column()).collect();
         ColumnIterator::from(inner)
     }
 }
@@ -137,11 +123,12 @@ impl AsColumn for ScalarField {
     }
 }
 
-impl AsColumn for (&ModelRef, &DataSourceFieldRef) {
+impl AsColumn for crate::field::DataSourceField {
     fn as_column(&self) -> Column<'static> {
-        let db = self.0.internal_data_model().db_name.clone();
-        let table = self.0.db_name().to_string();
-        let col = self.1.name.to_string();
+        let model = self.model_field().model();
+        let db = model.internal_data_model().db_name.clone();
+        let table = model.db_name().to_string();
+        let col = self.name.to_string();
 
         Column::from(((db, table), col))
     }

@@ -29,12 +29,9 @@ impl ManyRelatedRecordsQueryBuilder for ManyRelatedRecordsWithUnionAll {
         let base_query = order_columns.into_iter().fold(base_query, |acc, ord| acc.order_by(ord));
         let mut distinct_ids = distinct_ids.into_iter();
 
-        // Todo: Unclear if this is the correct model.
-        let model = base.from_field.model();
-
         let build_cond = |ids: RecordIdentifier| {
             let id_cond = ids.into_iter().fold(ConditionTree::NoCondition, |acc, (dsf, val)| {
-                let col = (&model, &dsf).as_column();
+                let col = dsf.as_column();
                 match acc {
                     ConditionTree::NoCondition => col.equals(val).into(),
                     cond => cond.and(col.equals(val)),

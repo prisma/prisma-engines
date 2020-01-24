@@ -146,6 +146,13 @@ impl Field {
             Field::Relation(ref rf) => rf.is_required,
         }
     }
+
+    pub fn model(&self) -> ModelRef {
+        match self {
+            Self::Scalar(sf) => sf.model(),
+            Self::Relation(rf) => rf.model(),
+        }
+    }
 }
 
 impl FieldTemplate {
