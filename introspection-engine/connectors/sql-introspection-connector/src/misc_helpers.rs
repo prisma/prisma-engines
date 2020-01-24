@@ -106,7 +106,7 @@ pub(crate) fn calculate_scalar_field(schema: &&SqlSchema, table: &&Table, column
         ColumnArity::List => FieldArity::List,
     };
 
-    let is_id = calculate_id_info(&column, &table);
+    let is_id = is_id(&column, &table);
     let default_value = calculate_default(&column, &arity);
     let is_unique = table.is_column_unique(&column.name) && !is_id;
 
@@ -261,7 +261,7 @@ pub(crate) fn calculate_default(column: &Column, arity: &FieldArity) -> Option<D
     }
 }
 
-pub(crate) fn calculate_id_info(column: &Column, table: &Table) -> bool {
+pub(crate) fn is_id(column: &Column, table: &Table) -> bool {
     table
         .primary_key
         .as_ref()
@@ -309,7 +309,7 @@ pub(crate) fn calculate_field_type(schema: &SqlSchema, column: &Column, table: &
     debug!("Calculating field type for '{}'", column.name);
     // Look for a foreign key referencing this column
     match table.foreign_keys.iter().find(|fk| fk.columns.contains(&column.name)) {
-        Some(fk) if !calculate_id_info(column, table) => {
+        Some(fk) if !is_id(column, table) => {
             debug!("Found corresponding foreign key");
             let idx = fk
                 .columns
