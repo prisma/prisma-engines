@@ -44,7 +44,7 @@ impl PrismaContext {
         let (db_name, executor) = exec_loader::load(&**data_source).await?;
 
         // Build internal data model
-        let internal_data_model = template.build(db_name);
+        let internal_data_model = dbg!(template.build(db_name));
 
         // Construct query schema
         let build_mode = if legacy { BuildMode::Legacy } else { BuildMode::Modern };

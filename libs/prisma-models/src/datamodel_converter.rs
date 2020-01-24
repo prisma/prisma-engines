@@ -14,7 +14,7 @@ impl<'a> DatamodelConverter<'a> {
     }
 
     pub fn convert(datamodel: &dml::Datamodel) -> InternalDataModelTemplate {
-        dbg!(DatamodelConverter::new(datamodel).convert_internal())
+        DatamodelConverter::new(datamodel).convert_internal()
     }
 
     fn new(datamodel: &dml::Datamodel) -> DatamodelConverter {

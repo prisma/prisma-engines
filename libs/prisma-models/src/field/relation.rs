@@ -118,9 +118,9 @@ impl RelationFieldTemplate {
 }
 
 impl RelationField {
-    /// Returns the `ModelIdentifier` used for this relation and model.
+    /// Returns the `ModelIdentifier` used for this relation fields model.
     ///
-    pub fn identifier() -> ModelIdentifier {
+    pub fn identifier(&self) -> ModelIdentifier {
         todo!()
     }
 
