@@ -5,9 +5,12 @@ pub use relation::*;
 pub use scalar::*;
 
 use crate::prelude::*;
+use core::ops::Deref;
 use datamodel::ScalarType;
-use once_cell::sync::OnceCell;
-use std::sync::Arc;
+use std::{
+    hash::{Hash, Hasher},
+    sync::Arc,
+};
 
 pub type DataSourceFieldRef = Arc<DataSourceField>;
 
@@ -27,6 +30,78 @@ pub enum Field {
 pub enum FieldWeak {
     Relation(RelationFieldWeak),
     Scalar(ScalarFieldWeak),
+}
+
+impl FieldWeak {
+    pub fn upgrade(&self) -> Field {
+        match self {
+            Self::Relation(rf) => rf.upgrade().unwrap().into(),
+            Self::Scalar(sf) => sf.upgrade().unwrap().into(),
+        }
+    }
+}
+
+#[derive(Clone, Debug)]
+pub struct DataSourceField {
+    backing_field: dml::DataSourceField,
+    model_field: FieldWeak,
+}
+
+impl DataSourceField {
+    pub fn new(backing_field: dml::DataSourceField, model_field: FieldWeak) -> Self {
+        Self {
+            backing_field,
+            model_field,
+        }
+    }
+
+    pub fn model_field(&self) -> Field {
+        self.model_field.upgrade()
+    }
+}
+
+impl Deref for DataSourceField {
+    type Target = dml::DataSourceField;
+
+    fn deref(&self) -> &dml::DataSourceField {
+        &self.backing_field
+    }
+}
+
+impl Hash for DataSourceField {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.backing_field.hash(state);
+        self.model_field().hash(state);
+    }
+}
+
+impl Eq for DataSourceField {}
+
+impl PartialEq for DataSourceField {
+    fn eq(&self, other: &DataSourceField) -> bool {
+        self.name == other.name
+    }
+}
+
+impl From<&Field> for FieldWeak {
+    fn from(f: &Field) -> Self {
+        match f {
+            Field::Scalar(sf) => sf.into(),
+            Field::Relation(rf) => rf.into(),
+        }
+    }
+}
+
+impl From<&ScalarFieldRef> for FieldWeak {
+    fn from(f: &ScalarFieldRef) -> Self {
+        FieldWeak::Scalar(Arc::downgrade(f))
+    }
+}
+
+impl From<&RelationFieldRef> for FieldWeak {
+    fn from(f: &RelationFieldRef) -> Self {
+        FieldWeak::Relation(Arc::downgrade(f))
+    }
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
@@ -76,38 +151,8 @@ impl Field {
 impl FieldTemplate {
     pub fn build(self, model: ModelWeakRef) -> Field {
         match self {
-            FieldTemplate::Scalar(st) => {
-                let scalar = ScalarField {
-                    name: st.name,
-                    type_identifier: st.type_identifier,
-                    is_required: st.is_required,
-                    is_list: st.is_list,
-                    is_auto_generated_int_id: st.is_auto_generated_int_id,
-                    is_unique: st.is_unique,
-                    internal_enum: st.internal_enum,
-                    behaviour: st.behaviour,
-                    model,
-                    data_source_field: Arc::new(st.data_source_field),
-                };
-
-                Field::Scalar(Arc::new(scalar))
-            }
-            FieldTemplate::Relation(rt) => {
-                let relation = RelationField {
-                    name: rt.name,
-                    is_required: rt.is_required,
-                    is_list: rt.is_list,
-                    is_auto_generated_int_id: rt.is_auto_generated_int_id,
-                    is_unique: rt.is_unique,
-                    relation_name: rt.relation_name,
-                    relation_side: rt.relation_side,
-                    model,
-                    relation: OnceCell::new(),
-                    data_source_fields: rt.data_source_fields.into_iter().map(Arc::new).collect(),
-                };
-
-                Field::Relation(Arc::new(relation))
-            }
+            FieldTemplate::Scalar(st) => Field::Scalar(st.build(model)),
+            FieldTemplate::Relation(rt) => Field::Relation(rt.build(model)),
         }
     }
 }

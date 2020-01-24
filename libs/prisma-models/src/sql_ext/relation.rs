@@ -115,14 +115,14 @@ impl RelationExt for Relation {
                 let model_b = self.model_b();
 
                 if self.is_self_relation() {
-                    (&model_b, self.field_b().data_source_fields.as_slice()).as_columns()
+                    (&model_b, self.field_b().data_source_fields()).as_columns()
                 } else if m.in_table_of_model_name == model_a.name && !self.is_self_relation() {
                     let identifier = model_a.primary_identifier();
                     let count = identifier.len();
 
                     ColumnIterator::new(identifier.as_columns(), count)
                 } else {
-                    (&model_b, self.field_b().data_source_fields.as_slice()).as_columns()
+                    (&model_b, self.field_b().data_source_fields()).as_columns()
                 }
             }
         }
@@ -149,7 +149,7 @@ impl RelationExt for Relation {
 
                     ColumnIterator::new(identifier.as_columns(), count)
                 } else {
-                    (&model_a, self.field_a().data_source_fields.as_slice()).as_columns()
+                    (&model_a, self.field_a().data_source_fields()).as_columns()
                 }
             }
         }

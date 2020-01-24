@@ -90,7 +90,7 @@ impl AsColumns for RelationField {
         let internal_data_model = model.internal_data_model();
 
         let inner: Vec<_> = self
-            .data_source_fields
+            .data_source_fields()
             .iter()
             .map(|dsf| {
                 let parts = (

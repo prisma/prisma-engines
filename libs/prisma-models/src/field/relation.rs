@@ -1,5 +1,6 @@
+use super::DataSourceField;
 use crate::prelude::*;
-use datamodel::{DataSourceField, FieldArity};
+use datamodel::FieldArity;
 use once_cell::sync::OnceCell;
 use std::{
     hash::{Hash, Hasher},
@@ -18,7 +19,7 @@ pub struct RelationFieldTemplate {
     pub is_auto_generated_int_id: bool,
     pub relation_name: String,
     pub relation_side: RelationSide,
-    pub data_source_fields: Vec<DataSourceField>,
+    pub data_source_fields: Vec<dml::DataSourceField>,
 }
 
 #[derive(DebugStub)]
@@ -30,7 +31,7 @@ pub struct RelationField {
     pub relation_name: String,
     pub relation_side: RelationSide,
     pub relation: OnceCell<RelationWeakRef>,
-    pub data_source_fields: Vec<DataSourceFieldRef>,
+    pub data_source_fields: OnceCell<Vec<DataSourceFieldRef>>,
 
     #[debug_stub = "#ModelWeakRef#"]
     pub model: ModelWeakRef,
@@ -86,6 +87,33 @@ impl RelationSide {
 
     pub fn is_b(self) -> bool {
         self == RelationSide::B
+    }
+}
+
+impl RelationFieldTemplate {
+    pub fn build(self, model: ModelWeakRef) -> RelationFieldRef {
+        let relation = RelationField {
+            name: self.name,
+            is_required: self.is_required,
+            is_list: self.is_list,
+            is_auto_generated_int_id: self.is_auto_generated_int_id,
+            is_unique: self.is_unique,
+            relation_name: self.relation_name,
+            relation_side: self.relation_side,
+            model,
+            relation: OnceCell::new(),
+            data_source_fields: OnceCell::new(),
+        };
+
+        let arc = Arc::new(relation);
+        let fields: Vec<_> = self
+            .data_source_fields
+            .into_iter()
+            .map(|dsf| Arc::new(DataSourceField::new(dsf, FieldWeak::from(&arc))))
+            .collect();
+
+        arc.data_source_fields.set(fields).unwrap();
+        arc
     }
 }
 
@@ -169,8 +197,15 @@ impl RelationField {
         self.relation().name == relation_name && self.relation_side == side
     }
 
-    pub fn type_identifiers_with_arities(&self) -> Vec<(TypeIdentifier, FieldArity)> {
+    pub fn data_source_fields(&self) -> &[DataSourceFieldRef] {
         self.data_source_fields
+            .get()
+            .ok_or_else(|| String::from("Data source fields must be set!"))
+            .unwrap()
+    }
+
+    pub fn type_identifiers_with_arities(&self) -> Vec<(TypeIdentifier, FieldArity)> {
+        self.data_source_fields()
             .iter()
             .map(|dsf| (dsf.field_type.into(), dsf.arity))
             .collect()

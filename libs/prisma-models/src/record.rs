@@ -1,5 +1,4 @@
 use crate::{DataSourceFieldRef, DomainError, Field, PrismaValue};
-use std::sync::Arc;
 
 // Collection of fields that uniquely identify a record of a model.
 // There can be different sets of fields at the same time identifying a model.
@@ -43,16 +42,16 @@ impl ModelIdentifier {
         self.fields
             .iter()
             .flat_map(|field| match field {
-                Field::Scalar(sf) => vec![sf.data_source_field.clone()],
-                Field::Relation(rf) => rf.data_source_fields.iter().map(Arc::clone).collect(),
+                Field::Scalar(sf) => vec![sf.data_source_field().clone()],
+                Field::Relation(rf) => rf.data_source_fields().to_vec(),
             })
             .into_iter()
     }
 
     pub fn map_db_name(&self, name: &str) -> Option<&DataSourceFieldRef> {
         self.fields().find_map(|field| match field {
-            Field::Scalar(sf) if sf.data_source_field.name == name => Some(&sf.data_source_field),
-            Field::Relation(rf) => rf.data_source_fields.iter().find(|dsf| dsf.name == name),
+            Field::Scalar(sf) if sf.data_source_field().name == name => Some(sf.data_source_field()),
+            Field::Relation(rf) => rf.data_source_fields().iter().find(|dsf| dsf.name == name),
             _ => None,
         })
     }
@@ -212,15 +211,14 @@ impl Record {
         }
     }
 
-    // Todo - Q: Are the `field_names` basically the column names of the underlying DB?
     pub fn identifier(&self, field_names: &[String], id: &ModelIdentifier) -> crate::Result<RecordIdentifier> {
         let pairs: Vec<(DataSourceFieldRef, PrismaValue)> = id
             .fields()
             .into_iter()
             .flat_map(|id_field| {
                 let source_fields = match id_field {
-                    Field::Scalar(sf) => vec![sf.data_source_field.clone()],
-                    Field::Relation(rf) => rf.data_source_fields.clone(),
+                    Field::Scalar(sf) => vec![sf.data_source_field().clone()],
+                    Field::Relation(rf) => rf.data_source_fields().to_vec(),
                 };
 
                 source_fields.into_iter().map(|source_field| {
