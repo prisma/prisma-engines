@@ -34,9 +34,12 @@ fn comment(target: &mut dyn LineWriteable, comment_text: &str) {
 
 impl Reformatter {
     pub fn reformat_to(input: &str, output: &mut dyn std::io::Write, ident_width: usize) {
-        let mut ast = PrismaDatamodelParser::parse(Rule::datamodel, input).unwrap(); // TODO: Handle error.
-        let mut top_formatter = RefCell::new(Renderer::new(output, ident_width));
-        Self::reformat_top(&mut top_formatter, &ast.next().unwrap());
+        let dml = crate::parse_datamodel(&input).unwrap();
+        //        dbg!(&dml);
+        //        let mut ast = PrismaDatamodelParser::parse(Rule::datamodel, input).unwrap(); // TODO: Handle error.
+        //        let mut top_formatter = RefCell::new(Renderer::new(output, ident_width));
+        //        Self::reformat_top(&mut top_formatter, &ast.next().unwrap());
+        crate::render_datamodel_to(output, &dml).unwrap();
     }
 
     fn reformat_top(target: &mut RefCell<Renderer>, token: &Token) {
