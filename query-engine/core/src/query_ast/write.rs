@@ -40,10 +40,10 @@ impl WriteQuery {
             Field::Scalar(_) => args.insert(key, values.pop().unwrap_or_else(|| PrismaValue::Null)),
             Field::Relation(rf) => {
                 // Equalize the values and backing field lengths.
-                if values.len() != rf.data_source_fields.len() {
-                    values.truncate(rf.data_source_fields.len());
+                if values.len() != rf.data_source_fields().len() {
+                    values.truncate(rf.data_source_fields().len());
 
-                    for i in 0..(values.len() - rf.data_source_fields.len()) {
+                    for i in 0..(values.len() - rf.data_source_fields().len()) {
                         values.push(PrismaValue::Null);
                     }
                 }

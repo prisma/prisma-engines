@@ -20,12 +20,12 @@ pub fn create_record(model: &ModelRef, mut args: WriteArgs) -> (Insert<'static>,
         .fold(Insert::single_into(model.as_table()), |mut insert, field| {
             match (args.take_field_value(field.name()), field) {
                 (Some(Single(ref value)), Scalar(sf)) => insert.value(sf.db_name().to_string(), value.clone()),
-                (Some(Single(ref value)), Relation(rf)) if rf.data_source_fields.len() == 1 => {
-                    let name = rf.data_source_fields.first().unwrap().name.clone();
+                (Some(Single(ref value)), Relation(rf)) if rf.data_source_fields().len() == 1 => {
+                    let name = rf.data_source_fields().first().unwrap().name.clone();
                     insert.value(name, value.clone())
                 }
-                (Some(Compound(ref values)), Relation(rf)) if values.len() == rf.data_source_fields.len() => {
-                    for (field, value) in rf.data_source_fields.iter().zip(values) {
+                (Some(Compound(ref values)), Relation(rf)) if values.len() == rf.data_source_fields().len() => {
+                    for (field, value) in rf.data_source_fields().iter().zip(values) {
                         insert = insert.value(field.name.clone(), value.clone())
                     }
 
@@ -114,12 +114,12 @@ pub fn update_many(
             (Single(value), Scalar(sf)) => {
                 query = query.set(sf.db_name().to_string(), value.clone());
             }
-            (Single(value), Relation(rf)) if rf.data_source_fields.len() == 1 => {
-                let name = rf.data_source_fields.first().unwrap().name.clone();
+            (Single(value), Relation(rf)) if rf.data_source_fields().len() == 1 => {
+                let name = rf.data_source_fields().first().unwrap().name.clone();
                 query = query.set(name, value.clone());
             }
-            (Compound(values), Relation(rf)) if values.len() == rf.data_source_fields.len() => {
-                for (field, value) in rf.data_source_fields.iter().zip(values) {
+            (Compound(values), Relation(rf)) if values.len() == rf.data_source_fields().len() => {
+                for (field, value) in rf.data_source_fields().iter().zip(values) {
                     query = query.set(field.name.clone(), value.clone());
                 }
             }

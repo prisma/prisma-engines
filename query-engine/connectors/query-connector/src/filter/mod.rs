@@ -10,7 +10,6 @@ mod scalar;
 
 use prisma_models::prelude::*;
 use prisma_models::{dml, DataSourceField};
-use std::fmt;
 
 pub use list::*;
 pub use relation::*;
@@ -56,13 +55,6 @@ impl Filter {
             Self::Empty => 0,
             _ => 1,
         }
-    }
-}
-
-// WIP
-impl fmt::Display for Filter {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{:?}", self)
     }
 }
 

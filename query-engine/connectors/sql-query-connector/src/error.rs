@@ -33,7 +33,7 @@ pub enum SqlError {
     #[fail(display = "{}", _0)]
     DomainError(DomainError),
 
-    #[fail(display = "Record not found: {}", _0)]
+    #[fail(display = "Record not found: {:?}", _0)]
     RecordNotFoundForWhere(Filter),
 
     #[fail(
@@ -68,11 +68,13 @@ impl SqlError {
             SqlError::UniqueConstraintViolation { field_names } => ConnectorError {
                 user_facing_error: user_facing_errors::KnownError::new(
                     user_facing_errors::query_engine::UniqueKeyViolation {
-                        constraint: user_facing_errors::query_engine::DatabaseConstraint::Fields(field_names.clone())
+                        constraint: user_facing_errors::query_engine::DatabaseConstraint::Fields(field_names.clone()),
                     },
                 )
                 .ok(),
-                kind: ErrorKind::UniqueConstraintViolation { field_name: field_names.join(", ") },
+                kind: ErrorKind::UniqueConstraintViolation {
+                    field_name: field_names.join(", "),
+                },
             },
             SqlError::NullConstraintViolation { field_name } => {
                 ConnectorError::from_kind(ErrorKind::NullConstraintViolation { field_name })
@@ -119,27 +121,19 @@ impl From<quaint::error::Error> for SqlError {
             quaint::error::Error::QueryError(e) => Self::QueryError(e),
             quaint::error::Error::IoError(_) => Self::ConnectionError(e),
             quaint::error::Error::NotFound => Self::RecordDoesNotExist,
-            quaint::error::Error::UniqueConstraintViolation { constraint } => {
-                match constraint {
-                    quaint::error::DatabaseConstraint::Fields(field_names) => {
-                        Self::UniqueConstraintViolation { field_names }
-                    },
-                    quaint::error::DatabaseConstraint::Index(_) => {
-                        Self::UniqueConstraintViolation { field_names: vec![] }
-                    }
+            quaint::error::Error::UniqueConstraintViolation { constraint } => match constraint {
+                quaint::error::DatabaseConstraint::Fields(field_names) => {
+                    Self::UniqueConstraintViolation { field_names }
                 }
-            }
+                quaint::error::DatabaseConstraint::Index(_) => Self::UniqueConstraintViolation { field_names: vec![] },
+            },
 
-            quaint::error::Error::NullConstraintViolation { constraint } => {
-                match constraint {
-                    quaint::error::DatabaseConstraint::Fields(field_names) => {
-                        Self::NullConstraintViolation { field_name: field_names.join(", ") }
-                    },
-                    quaint::error::DatabaseConstraint::Index(index) => {
-                        Self::NullConstraintViolation { field_name: index }
-                    }
-                }
-            }
+            quaint::error::Error::NullConstraintViolation { constraint } => match constraint {
+                quaint::error::DatabaseConstraint::Fields(field_names) => Self::NullConstraintViolation {
+                    field_name: field_names.join(", "),
+                },
+                quaint::error::DatabaseConstraint::Index(index) => Self::NullConstraintViolation { field_name: index },
+            },
 
             quaint::error::Error::ConnectionError(_) => Self::ConnectionError(e),
             quaint::error::Error::ColumnReadFailure(e) => Self::ColumnReadFailure(e),

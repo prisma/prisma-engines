@@ -95,18 +95,18 @@ impl WriteArgs {
         for field in id.into_iter() {
             match (&field, self.get_field_value(field.name())) {
                 (Field::Scalar(sf), Some(FieldValueContainer::Single(val))) => {
-                    rec_id.add((sf.data_source_field.clone(), val.clone()))
+                    rec_id.add((sf.data_source_field().clone(), val.clone()))
                 }
                 (Field::Scalar(sf), None) if sf.is_auto_generated_int_id => {
-                    rec_id.add((sf.data_source_field.clone(), PrismaValue::Null))
+                    rec_id.add((sf.data_source_field().clone(), PrismaValue::Null))
                 }
                 (Field::Relation(rf), Some(FieldValueContainer::Single(val))) => {
-                    assert_eq!(rf.data_source_fields.len(), 1);
-                    rec_id.add((rf.data_source_fields.first().unwrap().clone(), val.clone()))
+                    assert_eq!(rf.data_source_fields().len(), 1);
+                    rec_id.add((rf.data_source_fields().first().unwrap().clone(), val.clone()))
                 }
                 (Field::Relation(rf), Some(FieldValueContainer::Compound(vals))) => {
-                    assert_eq!(rf.data_source_fields.len(), vals.len());
-                    rf.data_source_fields
+                    assert_eq!(rf.data_source_fields().len(), vals.len());
+                    rf.data_source_fields()
                         .iter()
                         .zip(vals)
                         .for_each(|(dsf, val)| rec_id.add((dsf.clone(), val.clone())))

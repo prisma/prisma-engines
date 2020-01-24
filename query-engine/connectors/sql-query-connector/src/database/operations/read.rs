@@ -124,10 +124,10 @@ where
                 match field {
                     Field::Scalar(sf) => {
                         let val = row.values.pop().ok_or(SqlError::ColumnDoesNotExist)?;
-                        parent_ids.push((sf.data_source_field.clone(), val))
+                        parent_ids.push((sf.data_source_field().clone(), val))
                     }
                     Field::Relation(rf) => {
-                        for field in rf.data_source_fields.iter() {
+                        for field in rf.data_source_fields().iter() {
                             let val = row.values.pop().ok_or(SqlError::ColumnDoesNotExist)?;
                             parent_ids.push((field.clone(), val))
                         }
