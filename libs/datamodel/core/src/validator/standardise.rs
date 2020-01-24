@@ -248,7 +248,7 @@ impl Standardiser {
                     .find_model_mut(&missing_back_relation_field.model)
                     .expect(STATE_ERROR);
 
-                let mut back_relation_field = dml::Field::new_generated(
+                let mut back_relation_field = dml::Field::new(
                     &field_name,
                     dml::FieldType::Relation(missing_back_relation_field.relation_info),
                 );
