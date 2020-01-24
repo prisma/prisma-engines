@@ -1,9 +1,11 @@
 mod apply;
+mod calculate_database_steps;
 mod infer;
 mod infer_apply;
 mod unapply_migration;
 
 pub(crate) use apply::Apply;
+pub(crate) use calculate_database_steps::CalculateDatabaseSteps;
 pub(crate) use infer::Infer;
 pub(crate) use infer_apply::InferApply;
 pub(crate) use unapply_migration::UnapplyMigration;
@@ -197,6 +199,10 @@ impl TestApi {
             select: quaint::ast::Select::from_table(self.render_table_name(table_name)),
             api: self,
         }
+    }
+
+    pub(crate) fn calculate_database_steps<'a>(&'a self) -> CalculateDatabaseSteps<'a> {
+        CalculateDatabaseSteps::new(&self.api)
     }
 }
 
