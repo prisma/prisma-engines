@@ -8,7 +8,6 @@ macro_rules! match_children (
         for $current in $token.clone().into_inner() {
             match $current.as_rule() {
                 Rule::WHITESPACE => { },
-                Rule::COMMENT => { },
                 Rule::BLOCK_OPEN => { },
                 Rule::BLOCK_CLOSE => { },
                 $(
@@ -30,8 +29,8 @@ macro_rules! match_first (
                 .filter(|rule|
                     rule.as_rule() != Rule::BLOCK_CLOSE &&
                     rule.as_rule() != Rule::BLOCK_OPEN &&
-                    rule.as_rule() != Rule::WHITESPACE &&
-                    rule.as_rule() != Rule::COMMENT)
+                    rule.as_rule() != Rule::WHITESPACE
+                )
                 .next().unwrap();
             match $current.as_rule() {
                 $(

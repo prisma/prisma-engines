@@ -12,8 +12,6 @@
 
 // Treat every whitespace the same for now.
 WHITESPACE = @{ SPACE_SEPARATOR | "\t" | NEWLINE }
-// Comment ignores everything until end of line.
-COMMENT = @{ (!"///") ~ "//" ~ (!NEWLINE ~ ANY)* ~ NEWLINE? }
 BLOCK_OPEN = @{ "{" }
 BLOCK_CLOSE = @{ "}" }
 MODEL_KEYWORD = @{ "model" }
@@ -28,7 +26,7 @@ INTERPOLATION_END = { "}" }
 LEGACY_COLON = { ":" }
 
 doc_content = @{ (!NEWLINE ~ ANY)* ~ NEWLINE }
-doc_comment = { "///" ~ doc_content }
+doc_comment = { "//" ~ doc_content }
 
 // ######################################
 // Base building blocks

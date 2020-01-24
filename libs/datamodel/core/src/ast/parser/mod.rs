@@ -540,6 +540,5 @@ fn rule_to_string(rule: Rule) -> &'static str {
         Rule::boolean_true => "boolean true",
         Rule::boolean_false => "boolean false",
         Rule::doc_content => "documentation comment content",
-        Rule::COMMENT => "",
     }
 }
