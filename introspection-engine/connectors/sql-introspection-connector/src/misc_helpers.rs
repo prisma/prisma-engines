@@ -241,26 +241,23 @@ pub(crate) fn calculate_backrelation_field(
 }
 
 pub(crate) fn calculate_default(column: &Column, arity: &FieldArity) -> Option<DefaultValue> {
-    match (arity, &column.default) {
-        (FieldArity::List, _) => None,
-        (_, Some(default)) => {
-            match column.tpe.family {
-                ColumnTypeFamily::Boolean => match parse_int(default) {
-                    Some(x) => Some(DefaultValue::Single(ScalarValue::Boolean(x != 0))),
-                    None => parse_bool(default).map(|b| DefaultValue::Single(ScalarValue::Boolean(b))),
-                },
-                ColumnTypeFamily::Int => match column.auto_increment {
-                    true => Some(DefaultValue::Expression(ValueGenerator::new_autoincrement_bang())),
-                    false => parse_int(default).map(|x| DefaultValue::Single(ScalarValue::Int(x))),
-                },
-                ColumnTypeFamily::Float => parse_float(default).map(|x| DefaultValue::Single(ScalarValue::Float(x))),
-                ColumnTypeFamily::String => Some(DefaultValue::Single(ScalarValue::String(default.to_string()))),
-                ColumnTypeFamily::DateTime => None, //todo
-                _ => None,
-            }
+    match (arity, &column.default, column.tpe.family) {
+        (FieldArity::List, _, _) => None,
+        (_, Some(d), ColumnTypeFamily::Boolean) => match parse_int(d) {
+            Some(x) => Some(DefaultValue::Single(ScalarValue::Boolean(x != 0))),
+            None => parse_bool(d).map(|b| DefaultValue::Single(ScalarValue::Boolean(b))),
+        },
+        (_, Some(d), ColumnTypeFamily::Int) => match column.auto_increment {
+            true => Some(DefaultValue::Expression(ValueGenerator::new_autoincrement_bang())),
+            false => parse_int(d).map(|x| DefaultValue::Single(ScalarValue::Int(x))),
+        },
+        (_, Some(d), ColumnTypeFamily::Float) => parse_float(d).map(|x| DefaultValue::Single(ScalarValue::Float(x))),
+        (_, Some(d), ColumnTypeFamily::String) => Some(DefaultValue::Single(ScalarValue::String(d.to_string()))),
+        (_, Some(d), ColumnTypeFamily::DateTime) => None, //todo
+        (_, None, _) if column.auto_increment => {
+            Some(DefaultValue::Expression(ValueGenerator::new_autoincrement_bang()))
         }
-        (_, None) if column.auto_increment => Some(DefaultValue::Expression(ValueGenerator::new_autoincrement_bang())),
-        (_, None) => None,
+        (_, _, _) => None,
     }
 }
 
