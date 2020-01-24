@@ -1,4 +1,5 @@
 mod apply_migration_tests;
+mod calculate_database_steps_tests;
 mod datamodel_calculator_tests;
 mod datamodel_steps_inferrer_tests;
 mod error_tests;
