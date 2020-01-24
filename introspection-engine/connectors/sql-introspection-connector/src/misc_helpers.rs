@@ -244,26 +244,34 @@ pub(crate) fn calculate_default(column: &Column, arity: &FieldArity) -> Option<D
     match arity {
         FieldArity::List => None,
         _ => {
-            column.default.as_ref().and_then(|default| {
-                match column.tpe.family {
-                    ColumnTypeFamily::Boolean => match parse_int(default) {
-                        Some(x) => Some(DefaultValue::Single(ScalarValue::Boolean(x != 0))),
-                        None => parse_bool(default).map(|b| DefaultValue::Single(ScalarValue::Boolean(b))),
-                    },
-                    ColumnTypeFamily::Int => match column.auto_increment {
-                        true => Some(DefaultValue::Expression(
-                            ValueGenerator::new("autoincrement".to_string(), vec![]).unwrap(),
-                        )),
-                        false => parse_int(default).map(|x| DefaultValue::Single(ScalarValue::Int(x))),
-                    },
-                    ColumnTypeFamily::Float => {
-                        parse_float(default).map(|x| DefaultValue::Single(ScalarValue::Float(x)))
+            match &column.default {
+                Some(default) => {
+                    match column.tpe.family {
+                        ColumnTypeFamily::Boolean => match parse_int(default) {
+                            Some(x) => Some(DefaultValue::Single(ScalarValue::Boolean(x != 0))),
+                            None => parse_bool(default).map(|b| DefaultValue::Single(ScalarValue::Boolean(b))),
+                        },
+                        ColumnTypeFamily::Int => match column.auto_increment {
+                            true => Some(DefaultValue::Expression(
+                                ValueGenerator::new("autoincrement".to_string(), vec![]).unwrap(),
+                            )),
+                            false => parse_int(default).map(|x| DefaultValue::Single(ScalarValue::Int(x))),
+                        },
+                        ColumnTypeFamily::Float => {
+                            parse_float(default).map(|x| DefaultValue::Single(ScalarValue::Float(x)))
+                        }
+                        ColumnTypeFamily::String => {
+                            Some(DefaultValue::Single(ScalarValue::String(default.to_string())))
+                        }
+                        ColumnTypeFamily::DateTime => None, //todo
+                        _ => None,
                     }
-                    ColumnTypeFamily::String => Some(DefaultValue::Single(ScalarValue::String(default.to_string()))),
-                    ColumnTypeFamily::DateTime => None, //todo
-                    _ => None,
                 }
-            })
+                None if column.auto_increment => Some(DefaultValue::Expression(
+                    ValueGenerator::new("autoincrement".to_string(), vec![]).unwrap(),
+                )),
+                _ => None,
+            }
         }
     }
 }
