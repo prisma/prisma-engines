@@ -33,7 +33,7 @@ async fn remapping_fields_with_invalid_characters_should_work(api: &TestApi) {
                g_a    String @map("g a")
                h1     String
                h_a    String @map("h-a")
-               id     Int @id @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
+               id     Int @id @default(autoincrement())
             }
         "#;
     let result = dbg!(api.introspect().await);
@@ -56,13 +56,13 @@ async fn remapping_tables_with_invalid_characters_should_work(api: &TestApi) {
         .await;
     let dm = r#"
             model User {
-               id Int @id @sequence(name: "?User_id_seq", allocationSize: 1, initialValue: 1)
+               id Int @id @default(autoincrement())
 
                @@map("?User")
             }
 
             model User_with_Space {
-               id Int @id @sequence(name: "User with Space_id_seq", allocationSize: 1, initialValue: 1)
+               id Int @id @default(autoincrement())
 
                @@map("User with Space")
             }
@@ -91,12 +91,12 @@ async fn remapping_models_in_relations_should_work(api: &TestApi) {
 
     let dm = r#"
             model Post {
-                id                  Int                 @id @sequence(name: "Post_id_seq", allocationSize: 1, initialValue: 1)
+                id                  Int                 @id @default(autoincrement())
                 user_id     User_with_Space
             }
 
             model User_with_Space {
-               id       Int                             @id @sequence(name: "User with Space_id_seq", allocationSize: 1, initialValue: 1)
+               id       Int                             @id @default(autoincrement())
                name     String
                post     Post?
                
@@ -132,12 +132,12 @@ async fn remapping_models_in_compound_relations_should_work(api: &TestApi) {
 
     let dm = r#"
             model Post {
-                id      Int                             @id @sequence(name: "Post_id_seq", allocationSize: 1, initialValue: 1)
+                id      Int                             @id @default(autoincrement())
                 user_with_Space    User_with_Space      @map(["user_id", "user_name"]) @relation(references:[id, name]) 
             }
 
             model User_with_Space {
-               id       Int                             @id @sequence(name: "User with Space_id_seq", allocationSize: 1, initialValue: 1)
+               id       Int                             @id @default(autoincrement())
                name     String
                post     Post?
                
@@ -174,12 +174,12 @@ async fn remapping_fields_in_compound_relations_should_work(api: &TestApi) {
 
     let dm = r#"
             model Post {
-                id                      Int     @id @sequence(name: "Post_id_seq", allocationSize: 1, initialValue: 1)
+                id                      Int     @id @default(autoincrement())
                 user                    User    @map(["user_id", "user_name"]) @relation(references:[id, name_that_is_invalid]) 
             }
 
             model User {
-               id                       Int     @id @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
+               id                       Int     @id @default(autoincrement())
                name_that_is_invalid     String  @map("name-that-is-invalid")
                post                     Post?
                

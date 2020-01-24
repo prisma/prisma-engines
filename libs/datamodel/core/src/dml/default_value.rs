@@ -48,7 +48,7 @@ pub struct ValueGenerator {
     pub name: String,
     pub args: Vec<ScalarValue>,
 
-    generator: ValueGeneratorFn,
+    pub generator: ValueGeneratorFn,
 }
 
 impl ValueGenerator {
@@ -56,6 +56,10 @@ impl ValueGenerator {
         let generator = ValueGeneratorFn::try_from(name.as_ref())?;
 
         Ok(ValueGenerator { name, args, generator })
+    }
+
+    pub fn new_autoincrement() -> Self {
+        ValueGenerator::new("autoincrement".to_owned(), vec![]).unwrap()
     }
 
     pub fn return_type(&self) -> ScalarType {
@@ -75,7 +79,7 @@ impl ValueGenerator {
     }
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq)]
 pub enum ValueGeneratorFn {
     UUID,
     CUID,
