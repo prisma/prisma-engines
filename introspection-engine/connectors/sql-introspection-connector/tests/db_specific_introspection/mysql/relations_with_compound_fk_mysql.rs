@@ -25,13 +25,13 @@ async fn compound_foreign_keys_should_work_for_one_to_one_relations(api: &TestAp
 
     let dm = r#"
             model Post {
-                id      Int                 @id
+                id      Int                 @id  @default(autoincrement())
                 user    User?               @map(["user_id", "user_age"]) @relation(references:[id, age]) 
             }
 
             model User {
                age      Int
-               id       Int                 @id
+               id       Int                 @id  @default(autoincrement())
                post     Post?
                
                @@unique([id, age], name: "user_unique")
@@ -64,13 +64,13 @@ async fn compound_foreign_keys_should_work_for_required_one_to_one_relations(api
 
     let dm = r#"
             model Post {
-                id      Int                 @id 
+                id      Int                 @id   @default(autoincrement())
                 user    User                @map(["user_id", "user_age"]) @relation(references:[id, age]) 
             }
 
             model User {
                age     Int
-               id       Int                 @id 
+               id       Int                 @id   @default(autoincrement())
                post     Post?
                
                @@unique([id, age], name: "user_unique")
@@ -102,7 +102,7 @@ async fn compound_foreign_keys_should_work_for_one_to_many_relations(api: &TestA
 
     let dm = r#"
             model Post {
-                id      Int                 @id
+                id      Int                 @id  @default(autoincrement())
                 user    User?               @map(["user_id", "user_age"]) @relation(references:[id, age]) 
                 
                 @@index([user], name: "user_id")
@@ -110,7 +110,7 @@ async fn compound_foreign_keys_should_work_for_one_to_many_relations(api: &TestA
 
             model User {
                age      Int
-               id       Int                 @id
+               id       Int                 @id  @default(autoincrement())
                posts    Post[]
                
                @@unique([id, age], name: "user_unique")
@@ -142,7 +142,7 @@ async fn compound_foreign_keys_should_work_for_required_one_to_many_relations(ap
 
     let dm = r#"
             model Post {
-                id      Int                 @id
+                id      Int                 @id  @default(autoincrement())
                 user    User               @map(["user_id", "user_age"]) @relation(references:[id, age]) 
                 
                 @@index([user], name: "user_id")
@@ -150,7 +150,7 @@ async fn compound_foreign_keys_should_work_for_required_one_to_many_relations(ap
 
             model User {
                age      Int
-               id       Int                 @id
+               id       Int                 @id  @default(autoincrement())
                posts    Post[]
                
                @@unique([id, age], name: "user_unique")

@@ -468,7 +468,7 @@ async fn introspecting_id_fields_with_foreign_key_should_ignore_the_relation(api
     let dm = r#"
             model Post {
                test    String
-               user_id Int @id @default(autoincrement())
+               user_id Int @id
             }
 
             model User {

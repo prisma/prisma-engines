@@ -937,9 +937,9 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                         arity: FieldArity::Required,
                         field_type: FieldType::Base(ScalarType::Int),
                         database_names: Vec::new(),
-                        default_value: None,
+                        default_value: Some(DefaultValue::Expression(ValueGenerator::new_autoincrement_bang())),
                         is_unique: false,
-                        is_id: false,
+                        is_id: true,
                         documentation: None,
                         is_generated: false,
                         is_updated_at: false,
@@ -1028,7 +1028,10 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                     },
                 ],
                 indices: vec![],
-                primary_key: None,
+                primary_key: Some(PrimaryKey {
+                    columns: vec!["id".to_string()],
+                    sequence: None,
+                }),
                 foreign_keys: vec![ForeignKey {
                     constraint_name: None,
                     columns: vec!["city_id".to_string()],
