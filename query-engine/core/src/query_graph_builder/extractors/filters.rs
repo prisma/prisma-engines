@@ -159,23 +159,25 @@ fn handle_scalar_field(
     op: &FilterOp,
 ) -> QueryGraphBuilderResult<Filter> {
     let value: PrismaValue = value.try_into()?;
+    let dsf = field.data_source_field();
+
     Ok(match (op, value) {
-        (FilterOp::In, PrismaValue::Null) => field.equals(PrismaValue::Null),
-        (FilterOp::In, PrismaValue::List(values)) => field.is_in(values),
-        (FilterOp::NotIn, PrismaValue::Null) => field.not_equals(PrismaValue::Null),
-        (FilterOp::NotIn, PrismaValue::List(values)) => field.not_in(values),
-        (FilterOp::Not, val) => field.not_equals(val),
-        (FilterOp::Lt, val) => field.less_than(val),
-        (FilterOp::Lte, val) => field.less_than_or_equals(val),
-        (FilterOp::Gt, val) => field.greater_than(val),
-        (FilterOp::Gte, val) => field.greater_than_or_equals(val),
-        (FilterOp::Contains, val) => field.contains(val),
-        (FilterOp::NotContains, val) => field.not_contains(val),
-        (FilterOp::StartsWith, val) => field.starts_with(val),
-        (FilterOp::NotStartsWith, val) => field.not_starts_with(val),
-        (FilterOp::EndsWith, val) => field.ends_with(val),
-        (FilterOp::NotEndsWith, val) => field.not_ends_with(val),
-        (FilterOp::Field, val) => field.equals(val),
+        (FilterOp::In, PrismaValue::Null) => dsf.equals(PrismaValue::Null),
+        (FilterOp::In, PrismaValue::List(values)) => dsf.is_in(values),
+        (FilterOp::NotIn, PrismaValue::Null) => dsf.not_equals(PrismaValue::Null),
+        (FilterOp::NotIn, PrismaValue::List(values)) => dsf.not_in(values),
+        (FilterOp::Not, val) => dsf.not_equals(val),
+        (FilterOp::Lt, val) => dsf.less_than(val),
+        (FilterOp::Lte, val) => dsf.less_than_or_equals(val),
+        (FilterOp::Gt, val) => dsf.greater_than(val),
+        (FilterOp::Gte, val) => dsf.greater_than_or_equals(val),
+        (FilterOp::Contains, val) => dsf.contains(val),
+        (FilterOp::NotContains, val) => dsf.not_contains(val),
+        (FilterOp::StartsWith, val) => dsf.starts_with(val),
+        (FilterOp::NotStartsWith, val) => dsf.not_starts_with(val),
+        (FilterOp::EndsWith, val) => dsf.ends_with(val),
+        (FilterOp::NotEndsWith, val) => dsf.not_ends_with(val),
+        (FilterOp::Field, val) => dsf.equals(val),
         (_, _) => unreachable!(),
     })
 }
@@ -211,7 +213,7 @@ fn handle_compound_field(fields: Vec<ScalarFieldRef>, value: ParsedInputValue) -
         .into_iter()
         .map(|field| {
             let value: PrismaValue = value.remove(&field.name).unwrap().try_into()?;
-            Ok(field.equals(value))
+            Ok(field.data_source_field().equals(value))
         })
         .collect::<QueryGraphBuilderResult<Vec<_>>>()?;
 

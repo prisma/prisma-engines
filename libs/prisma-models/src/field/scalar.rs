@@ -37,11 +37,11 @@ pub struct ScalarField {
     pub is_auto_generated_int_id: bool,
     pub internal_enum: Option<InternalEnum>,
     pub behaviour: Option<FieldBehaviour>,
-    pub data_source_field: OnceCell<DataSourceFieldRef>,
 
     #[debug_stub = "#ModelWeakRef#"]
     pub model: ModelWeakRef,
     pub(crate) is_unique: bool,
+    pub(crate) data_source_field: OnceCell<DataSourceFieldRef>,
 }
 
 impl Eq for ScalarField {}
