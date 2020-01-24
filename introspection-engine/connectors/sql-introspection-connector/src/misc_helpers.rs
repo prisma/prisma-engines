@@ -241,7 +241,7 @@ pub(crate) fn calculate_backrelation_field(
 }
 
 pub(crate) fn calculate_default(column: &Column, arity: &FieldArity) -> Option<DefaultValue> {
-    match (arity, &column.default, column.tpe.family) {
+    match (arity, &column.default, &column.tpe.family) {
         (FieldArity::List, _, _) => None,
         (_, Some(d), ColumnTypeFamily::Boolean) => match parse_int(d) {
             Some(x) => Some(DefaultValue::Single(ScalarValue::Boolean(x != 0))),
@@ -253,7 +253,7 @@ pub(crate) fn calculate_default(column: &Column, arity: &FieldArity) -> Option<D
         },
         (_, Some(d), ColumnTypeFamily::Float) => parse_float(d).map(|x| DefaultValue::Single(ScalarValue::Float(x))),
         (_, Some(d), ColumnTypeFamily::String) => Some(DefaultValue::Single(ScalarValue::String(d.to_string()))),
-        (_, Some(d), ColumnTypeFamily::DateTime) => None, //todo
+        (_, Some(_), ColumnTypeFamily::DateTime) => None, //todo
         (_, None, _) if column.auto_increment => {
             Some(DefaultValue::Expression(ValueGenerator::new_autoincrement_bang()))
         }
