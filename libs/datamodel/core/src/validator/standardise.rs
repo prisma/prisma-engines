@@ -31,7 +31,6 @@ impl Standardiser {
     /// For any relations which are missing to_fields, sets them to the @id fields
     /// of the foreign model.
     fn set_relation_to_field_to_id_if_missing(&self, schema: &mut dml::Datamodel) {
-        // TODO: This is such a bad solution. :(
         let schema_copy = schema.clone();
 
         // Iterate and mutate models.
