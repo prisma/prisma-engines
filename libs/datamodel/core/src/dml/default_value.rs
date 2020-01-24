@@ -58,7 +58,7 @@ impl ValueGenerator {
         Ok(ValueGenerator { name, args, generator })
     }
 
-    pub fn new_autoincrement_bang() -> Self {
+    pub fn new_autoincrement() -> Self {
         ValueGenerator::new("autoincrement".to_owned(), vec![]).unwrap()
     }
 

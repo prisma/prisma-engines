@@ -248,15 +248,13 @@ pub(crate) fn calculate_default(column: &Column, arity: &FieldArity) -> Option<D
             None => parse_bool(d).map(|b| DefaultValue::Single(ScalarValue::Boolean(b))),
         },
         (_, Some(d), ColumnTypeFamily::Int) => match column.auto_increment {
-            true => Some(DefaultValue::Expression(ValueGenerator::new_autoincrement_bang())),
+            true => Some(DefaultValue::Expression(ValueGenerator::new_autoincrement())),
             false => parse_int(d).map(|x| DefaultValue::Single(ScalarValue::Int(x))),
         },
         (_, Some(d), ColumnTypeFamily::Float) => parse_float(d).map(|x| DefaultValue::Single(ScalarValue::Float(x))),
         (_, Some(d), ColumnTypeFamily::String) => Some(DefaultValue::Single(ScalarValue::String(d.to_string()))),
         (_, Some(_), ColumnTypeFamily::DateTime) => None, //todo
-        (_, None, _) if column.auto_increment => {
-            Some(DefaultValue::Expression(ValueGenerator::new_autoincrement_bang()))
-        }
+        (_, None, _) if column.auto_increment => Some(DefaultValue::Expression(ValueGenerator::new_autoincrement())),
         (_, _, _) => None,
     }
 }
