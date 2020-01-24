@@ -37,15 +37,6 @@ impl FieldType {
     }
 }
 
-///// Holds information about an id, or priamry key.
-//#[derive(Debug, PartialEq, Clone)]
-//pub struct IdInfo {
-//    /// The strategy which is used to generate the id field.
-//    pub strategy: IdStrategy,
-//    /// A sequence used to generate the id.
-//    pub sequence: Option<Sequence>,
-//}
-
 /// Represents a field in a model.
 #[derive(Debug, PartialEq, Clone)]
 pub struct Field {
