@@ -147,12 +147,24 @@ fn serialize_objects(mut result: RecordSelection, typ: ObjectTypeStrongRef) -> C
 
     // Finally, serialize the objects based on the selected fields.
     let mut object_mapping = UncheckedItemsWithParents::with_capacity(result.scalars.records.len());
-    let scalar_field_names = result.scalars.field_names;
+    let scalar_db_field_names = result.scalars.field_names;
+
+    let model = result.model_id.model();
+    let field_names: Vec<_> = scalar_db_field_names
+        .iter()
+        .map(|f| {
+            model
+                .map_scalar_db_field_name(f)
+                .expect(&format!("Can't resolve db name {} on model {}", f, model.name))
+                .name
+                .clone()
+        })
+        .collect();
 
     // Write all fields, nested and list fields unordered into a map, afterwards order all into the final order.
     // If nothing is written to the object, write null instead.
     for record in result.scalars.records.into_iter() {
-        let record_id = Some(record.identifier(&scalar_field_names, &result.model_id)?);
+        let record_id = Some(record.identifier(&scalar_db_field_names, &result.model_id)?);
 
         if !object_mapping.contains_key(&record.parent_id) {
             object_mapping.insert(record.parent_id.clone(), Vec::new());
@@ -162,11 +174,11 @@ fn serialize_objects(mut result: RecordSelection, typ: ObjectTypeStrongRef) -> C
         let values = record.values;
         let mut object = HashMap::with_capacity(values.len());
 
-        for (val, field_name) in values.into_iter().zip(scalar_field_names.iter()) {
-            let field = typ.find_field(field_name).unwrap();
+        for (val, scalar_field_name) in values.into_iter().zip(field_names.iter()) {
+            let field = typ.find_field(scalar_field_name).unwrap();
 
             if !field.field_type.is_object() {
-                object.insert(field_name.to_owned(), serialize_scalar(val, &field.field_type)?);
+                object.insert(scalar_field_name.to_owned(), serialize_scalar(val, &field.field_type)?);
             }
         }
 

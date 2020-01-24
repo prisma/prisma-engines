@@ -142,7 +142,9 @@ impl<'a> ObjectTypeBuilder<'a> {
 
     /// Builds "many records where" arguments solely based on the given model.
     pub fn many_records_arguments(&self, model: &ModelRef) -> Vec<Argument> {
-        let unique_input_type = InputType::object(self.input_type_builder.into_arc().where_unique_object_type(model));
+        let unique_input_type = InputType::opt(InputType::object(
+            self.input_type_builder.into_arc().where_unique_object_type(model),
+        ));
 
         vec![
             self.where_argument(&model),

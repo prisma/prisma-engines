@@ -1,4 +1,4 @@
-use crate::{DataSourceFieldRef, DomainError, Field, PrismaValue};
+use crate::{DataSourceFieldRef, DomainError, Field, ModelRef, PrismaValue};
 
 // Collection of fields that uniquely identify a record of a model.
 // There can be different sets of fields at the same time identifying a model.
@@ -14,6 +14,10 @@ impl From<Field> for ModelIdentifier {
 }
 
 impl ModelIdentifier {
+    pub fn model(&self) -> ModelRef {
+        self.fields[0].model()
+    }
+
     pub fn new(fields: Vec<Field>) -> Self {
         Self { fields }
     }
@@ -216,10 +220,7 @@ impl Record {
             .fields()
             .into_iter()
             .flat_map(|id_field| {
-                let source_fields = match id_field {
-                    Field::Scalar(sf) => vec![sf.data_source_field().clone()],
-                    Field::Relation(rf) => rf.data_source_fields().to_vec(),
-                };
+                let source_fields = id_field.data_source_fields();
 
                 source_fields.into_iter().map(|source_field| {
                     self.get_field_value(field_names, &source_field.name)

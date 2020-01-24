@@ -210,4 +210,8 @@ impl RelationField {
             .map(|dsf| (dsf.field_type.into(), dsf.arity))
             .collect()
     }
+
+    pub fn db_names(&self) -> impl Iterator<Item = &str> {
+        self.data_source_fields().into_iter().map(|dsf| dsf.name.as_str())
+    }
 }

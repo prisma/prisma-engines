@@ -15,11 +15,19 @@
 //!    - it can have a number of nested selections (selection set in GQL).
 //! - Arguments contain concrete values and complex subtypes that are parsed and validated by the query builders, and then used for querying data (input types in GQL).
 //!
+use itertools::Itertools;
 use std::collections::BTreeMap;
 
 #[derive(Debug)]
 pub struct QueryDocument {
     pub operations: Vec<Operation>,
+}
+
+impl QueryDocument {
+    pub fn dedup_operations(mut self) -> Self {
+        self.operations = self.operations.into_iter().map(|op| op.dedup_selections()).collect();
+        self
+    }
 }
 
 #[derive(Debug)]
@@ -29,12 +37,33 @@ pub enum Operation {
     // "Batch" for grouping operations into one transaction?
 }
 
+impl Operation {
+    pub fn dedup_selections(self) -> Self {
+        match self {
+            Self::Read(s) => Self::Read(s.dedup()),
+            Self::Write(s) => Self::Write(s.dedup()),
+        }
+    }
+}
+
 #[derive(Debug)]
 pub struct Selection {
     pub name: String,
     pub alias: Option<String>,
     pub arguments: Vec<(String, QueryValue)>,
     pub nested_selections: Vec<Selection>,
+}
+
+impl Selection {
+    pub fn dedup(mut self) -> Self {
+        self.nested_selections = self
+            .nested_selections
+            .into_iter()
+            .unique_by(|s| s.name.clone())
+            .collect();
+
+        self
+    }
 }
 
 #[derive(Debug, Clone, PartialEq)]

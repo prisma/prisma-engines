@@ -16,7 +16,7 @@ pub async fn get_single_record(
     selected_fields: &SelectedFields,
 ) -> crate::Result<Option<SingleRecord>> {
     let query = read::get_records(&model, selected_fields.columns(), filter);
-    let field_names = selected_fields.names().map(String::from).collect();
+    let field_names = selected_fields.db_names().map(String::from).collect();
     let idents: Vec<_> = selected_fields.types().collect();
 
     let record = (match conn.find(query, idents.as_slice()).await {
@@ -37,7 +37,7 @@ pub async fn get_many_records(
     query_arguments: QueryArguments,
     selected_fields: &SelectedFields,
 ) -> crate::Result<ManyRecords> {
-    let field_names = selected_fields.names().map(String::from).collect();
+    let field_names = selected_fields.db_names().map(String::from).collect();
     let idents: Vec<_> = selected_fields.types().collect();
     let query = read::get_records(model, selected_fields.columns(), query_arguments);
 
@@ -70,8 +70,12 @@ where
     idents.extend(from_field.related_field().type_identifiers_with_arities());
     idents.extend(from_field.type_identifiers_with_arities());
 
-    let mut field_names: Vec<String> = selected_fields.names().map(String::from).collect();
-    field_names.push(from_field.related_field().name.clone());
+    let mut field_names: Vec<String> = selected_fields
+        .db_names()
+        .chain(from_field.related_field().db_names())
+        .map(String::from)
+        .collect();
+
     field_names.push(from_field.name.clone());
 
     let can_skip_joins = from_field.relation_is_inlined_in_child() && !query_arguments.is_with_pagination();

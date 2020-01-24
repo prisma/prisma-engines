@@ -153,6 +153,13 @@ impl Field {
             Self::Relation(rf) => rf.model(),
         }
     }
+
+    pub fn data_source_fields(&self) -> Vec<DataSourceFieldRef> {
+        match self {
+            Self::Scalar(sf) => vec![sf.data_source_field().clone()],
+            Self::Relation(rf) => rf.data_source_fields().to_vec(),
+        }
+    }
 }
 
 impl FieldTemplate {

@@ -25,8 +25,6 @@ pub struct SelectedScalarField {
 #[derive(Debug, Clone, PartialEq, Hash, Eq)]
 pub struct SelectedRelationField {
     pub field: RelationFieldRef,
-    // Todo - Q: Is this still used?
-    // pub selected_fields: SelectedFields,
 }
 
 impl From<Field> for SelectedField {
@@ -122,15 +120,21 @@ impl SelectedFields {
     }
 
     pub fn add_relation(&mut self, field: RelationFieldRef) {
-        self.relation.push(SelectedRelationField {
-            field,
-            // selected_fields: SelectedFields::default(),
-        });
+        self.relation.push(SelectedRelationField { field });
     }
 
     pub fn names(&self) -> impl Iterator<Item = &str> {
         let scalar = self.scalar_fields().map(|f| f.name.as_str());
         let relation = self.relation_inlined().map(|f| f.name.as_str());
+
+        scalar.chain(relation)
+    }
+
+    pub fn db_names(&self) -> impl Iterator<Item = &str> {
+        let scalar = self.scalar_fields().map(|f| f.data_source_field().name.as_str());
+        let relation = self
+            .relation_inlined()
+            .flat_map(|f| f.data_source_fields().into_iter().map(|dsf| dsf.name.as_str()));
 
         scalar.chain(relation)
     }
