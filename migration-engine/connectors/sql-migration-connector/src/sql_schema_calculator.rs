@@ -53,11 +53,12 @@ impl<'a> SqlSchemaCalculator<'a> {
                             tpe: column_type(f),
                             default: f.migration_value_new(&self.data_model),
                             auto_increment: {
-                                match f.id_info {
-                                    Some(IdInfo {
-                                        strategy: IdStrategy::Auto,
-                                        sequence: _,
-                                    }) if column_type(f).family == sql::ColumnTypeFamily::Int => true,
+                                match &f.default_value {
+                                    Some(DefaultValue::Expression(ValueGenerator {
+                                        name: _,
+                                        args: _,
+                                        generator: ValueGeneratorFn::Autoincrement,
+                                    })) => true,
                                     _ => false,
                                 }
                             },
@@ -333,7 +334,7 @@ pub trait FieldExtensions {
 
 impl FieldExtensions for Field {
     fn is_id(&self) -> bool {
-        self.id_info.is_some()
+        self.is_id
     }
 
     fn is_list(&self) -> bool {

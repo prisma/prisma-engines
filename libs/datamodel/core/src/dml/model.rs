@@ -90,7 +90,7 @@ impl Model {
 
     /// Finds the name of all id fields
     pub fn singular_id_fields(&self) -> impl std::iter::Iterator<Item = &Field> {
-        self.fields().filter(|x| x.id_info.is_some())
+        self.fields().filter(|x| x.is_id)
     }
 
     /// Finds a field with a certain relation guarantee.

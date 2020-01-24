@@ -21,7 +21,6 @@ fn should_apply_a_custom_type() {
         .assert_has_field("id")
         .assert_is_id()
         .assert_base_type(&ScalarType::String)
-        .assert_id_sequence(None)
         .assert_default_value(DefaultValue::Expression(
             ValueGenerator::new("cuid".to_owned(), Vec::new()).unwrap(),
         ));
@@ -45,7 +44,6 @@ fn should_recursively_apply_a_custom_type() {
         .assert_has_field("id")
         .assert_is_id()
         .assert_base_type(&ScalarType::String)
-        .assert_id_sequence(None)
         .assert_default_value(DefaultValue::Expression(
             ValueGenerator::new("cuid".to_owned(), Vec::new()).unwrap(),
         ));
@@ -71,7 +69,6 @@ fn should_be_able_to_handle_multiple_types() {
         .assert_has_field("id")
         .assert_is_id()
         .assert_base_type(&ScalarType::String)
-        .assert_id_sequence(None)
         .assert_default_value(DefaultValue::Expression(
             ValueGenerator::new("cuid".to_owned(), Vec::new()).unwrap(),
         ));

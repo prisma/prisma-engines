@@ -48,7 +48,7 @@ pub struct ValueGenerator {
     pub name: String,
     pub args: Vec<ScalarValue>,
 
-    generator: ValueGeneratorFn,
+    pub generator: ValueGeneratorFn,
 }
 
 impl ValueGenerator {
@@ -75,7 +75,7 @@ impl ValueGenerator {
     }
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq)]
 pub enum ValueGeneratorFn {
     UUID,
     CUID,

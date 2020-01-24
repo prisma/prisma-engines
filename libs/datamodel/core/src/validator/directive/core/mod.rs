@@ -17,7 +17,7 @@ pub fn new_builtin_field_directives() -> DirectiveListValidator<dml::Field> {
 
     validator.add(Box::new(map::MapDirectiveValidator {}));
     validator.add(Box::new(id::IdDirectiveValidator {}));
-    validator.add(Box::new(sequence::SequenceDirectiveValidator {}));
+    //    validator.add(Box::new(sequence::SequenceDirectiveValidator {}));
     validator.add(Box::new(unique_and_index::FieldLevelUniqueDirectiveValidator {}));
     validator.add(Box::new(default::DefaultDirectiveValidator {}));
     validator.add(Box::new(relation::RelationDirectiveValidator {}));
