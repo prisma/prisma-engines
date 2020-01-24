@@ -17,7 +17,7 @@ const DATAMODEL_STRING: &str = r#"model User {
 
 model Profile {
   id   Int    @id
-  user User
+  user User   @relation(references: [id])
   bio  String
 
   @@map("profile")
@@ -29,7 +29,7 @@ model Post {
   updatedAt  DateTime
   title      String           @default("Default-Title")
   wasLiked   Boolean          @default(false)
-  author     User             @relation("author")
+  author     User             @relation("author", references: [id])
   published  Boolean          @default(false)
   categories PostToCategory[]
 
@@ -48,15 +48,15 @@ model Category {
 
 model PostToCategory {
   id       Int      @id
-  post     Post
-  category Category
+  post     Post     @relation(references: [title, createdAt])
+  category Category @relation(references: [id])
 
   @@map("post_to_category")
 }
 
 model A {
   id Int @id
-  b  B
+  b  B   @relation(references: [id])
 }
 
 model B {
@@ -80,26 +80,24 @@ fn test_parser_renderer_via_dml() {
     assert_eq!(DATAMODEL_STRING, rendered);
 }
 
-// TODO: Test that N:M relation names are correctly handled as soon as we
-// get relation table support.
 const MANY_TO_MANY_DATAMODEL: &str = r#"model Blog {
   id        Int      @id
   name      String
   viewCount Int
   posts     Post[]
-  authors   Author[] @relation("AuthorToBlogs")
+  authors   Author[] @relation("AuthorToBlogs", references: [id])
 }
 
 model Author {
   id      Int     @id
   name    String?
-  authors Blog[]  @relation("AuthorToBlogs")
+  authors Blog[]  @relation("AuthorToBlogs", references: [id])
 }
 
 model Post {
   id    Int    @id
   title String
-  blog  Blog
+  blog  Blog   @relation(references: [id])
 }"#;
 
 #[test]
@@ -112,14 +110,14 @@ fn test_parser_renderer_many_to_many_via_dml() {
     assert_eq!(rendered, MANY_TO_MANY_DATAMODEL);
 }
 
-const DATAMODEL_STRING_WITH_COMMENTS: &str = r#"/// Cool user model
+const DATAMODEL_STRING_WITH_COMMENTS: &str = r#"// Cool user model
 model User {
   id        Int      @id
-  /// Created at field
+  // Created at field
   createdAt DateTime
   email     String   @unique
-  /// Name field.
-  /// Multi line comment.
+  // Name field.
+  // Multi line comment.
   name      String?
 
   @@map("user")

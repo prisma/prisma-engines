@@ -5,11 +5,12 @@ use std::str;
 #[test]
 fn test_reformat_model() {
     let input = r#"
-        model User { id Int @id }
+        model User { 
+            id               Int                   @id 
+        }
     "#;
 
-    let expected = r#"
-model User {
+    let expected = r#"model User {
   id Int @id
 }"#;
 
@@ -22,12 +23,16 @@ model User {
 #[test]
 fn test_reformat_config() {
     let input = r#"
-        datasource pg { provider = "postgres" }
+        datasource pg { 
+            provider = "postgres"
+            url = "postgres://"
+        }
     "#;
 
     let expected = r#"
 datasource pg {
   provider = "postgres"
+  url = "postgres://"
 }"#;
 
     let mut buf = Vec::new();
@@ -39,12 +44,16 @@ datasource pg {
 #[test]
 fn test_reformat_tabs() {
     let input = r#"
-        datasource pg {\tprovider\t=\t"postgres"\t}
+        datasource pg {
+            provider\t=\t"postgres"
+            url = "postgres://"
+        }
     "#;
 
     let expected = r#"
 datasource pg {
   provider = "postgres"
+  url = "postgres://"
 }"#;
 
     let mut buf = Vec::new();

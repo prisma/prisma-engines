@@ -255,6 +255,7 @@ fn parse_model(token: &pest::iterators::Pair<'_, Rule>) -> Result<Model, ErrorCo
             }
         },
         Rule::doc_comment => comments.push(parse_doc_comment(&current)),
+        Rule::UNTIL_END_OF_LINE => {},
         _ => unreachable!("Encountered impossible model declaration during parsing: {:?}", current.tokens())
     }
 
@@ -444,6 +445,7 @@ pub fn parse(datamodel_string: &str) -> Result<SchemaAst, ErrorCollection> {
                 Rule::source_block => models.push(Top::Source(parse_source(&current))),
                 Rule::generator_block => models.push(Top::Generator(parse_generator(&current))),
                 Rule::type_declaration => models.push(Top::Type(parse_type(&current))),
+                Rule::doc_comment => {},
                 Rule::EOI => {},
                 _ => panic!("Encountered impossible datamodel declaration during parsing: {:?}", current.tokens())
             }
@@ -520,6 +522,7 @@ fn rule_to_string(rule: Rule) -> &'static str {
         Rule::DATASOURCE_KEYWORD => "\"datasource\" keyword",
         Rule::INTERPOLATION_START => "string interpolation start",
         Rule::INTERPOLATION_END => "string interpolation end",
+        Rule::UNTIL_END_OF_LINE => "until end of line",
 
         // Those are top level things and will never surface.
         Rule::datamodel => "datamodel declaration",

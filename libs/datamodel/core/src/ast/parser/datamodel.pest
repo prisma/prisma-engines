@@ -11,8 +11,9 @@
 // ######################################
 
 // Treat every whitespace the same for now.
-WHITESPACE = @{ SPACE_SEPARATOR | "\t" | NEWLINE }
-BLOCK_OPEN = @{ "{" }
+WHITESPACE = @{ SPACE_SEPARATOR | "\t" }
+UNTIL_END_OF_LINE = @{ WHITESPACE* ~ NEWLINE }
+BLOCK_OPEN = @{ "{" ~ UNTIL_END_OF_LINE }
 BLOCK_CLOSE = @{ "}" }
 MODEL_KEYWORD = @{ "model" }
 TYPE_KEYWORD = @{ "type" }
@@ -91,7 +92,7 @@ field_type = { list_type | optional_type | legacy_required_type | legacy_list_ty
 // TODO: We want to force a line break after a field declaration.
 // For this, we have to rely on pests new '-' operator.
 // Progress tracked here: https://github.com/pest-parser/pest/issues/271
-field_declaration = { doc_comment* ~ identifier ~ LEGACY_COLON? ~ (field_type ~ ( "@" ~ directive )+ | field_type) }
+field_declaration = { doc_comment* ~ identifier ~ LEGACY_COLON? ~ (field_type ~ ( "@" ~ directive )+ | field_type) ~ doc_comment? }
 
 // ######################################
 // Custom type declarations
@@ -101,18 +102,18 @@ type_declaration = { doc_comment* ~ TYPE_KEYWORD ~ identifier ~ "=" ~ (base_type
 // ######################################
 // Model declarations
 // ######################################
-model_declaration = { doc_comment* ~ (MODEL_KEYWORD | TYPE_KEYWORD) ~ identifier ~ BLOCK_OPEN ~ ( field_declaration | ( "@@" ~ directive )  )* ~ BLOCK_CLOSE }
+model_declaration = { (UNTIL_END_OF_LINE | doc_comment)* ~ (MODEL_KEYWORD | TYPE_KEYWORD) ~ identifier ~ BLOCK_OPEN ~ ( field_declaration | ( "@@" ~ directive ) | NEWLINE )* ~ BLOCK_CLOSE }
 
 // ######################################
 // Enum declarations
 // ######################################
 enum_field_declaration = @{ identifier }
-enum_declaration = { doc_comment* ~ ENUM_KEYWORD ~ identifier ~ BLOCK_OPEN ~ (enum_field_declaration | ( "@@" ~ directive )  )* ~ BLOCK_CLOSE }
+enum_declaration = { doc_comment* ~ ENUM_KEYWORD ~ identifier ~ BLOCK_OPEN ~ ((enum_field_declaration | ( "@@" ~ directive )) ~ NEWLINE)* ~ BLOCK_CLOSE }
 
 // ######################################
 // Source block
 // ######################################
-key_value = { identifier ~ "=" ~ expression }
+key_value = { identifier ~ "=" ~ expression ~ NEWLINE }
 source_block = { doc_comment* ~ DATASOURCE_KEYWORD ~ identifier ~ BLOCK_OPEN ~ key_value* ~ BLOCK_CLOSE }
 
 // ######################################
@@ -123,7 +124,7 @@ generator_block = { doc_comment* ~ GENERATOR_KEYWORD ~ identifier ~ BLOCK_OPEN ~
 // ######################################
 // Datamodel
 // ######################################
-datamodel = { SOI ~ (model_declaration | enum_declaration | source_block | generator_block | type_declaration )* ~ EOI }
+datamodel = { SOI ~ NEWLINE* ~ ((model_declaration | enum_declaration | source_block | generator_block | type_declaration) ~ NEWLINE*)* ~ EOI }
 
 // ######################################
 // String Interpolation

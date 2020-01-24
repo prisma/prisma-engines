@@ -15,7 +15,7 @@ const DATAMODEL_STRING: &str = r#"model User {
 
 model Profile {
   id   Int    @id
-  user User
+  user User   @relation(references: [id])
   bio  String
 
   @@map("profile")
@@ -27,7 +27,7 @@ model Post {
   updatedAt  DateTime
   title      String           @default("Default-Title")
   wasLiked   Boolean          @default(false)
-  author     User             @relation("author")
+  author     User             @relation("author", references: [id])
   published  Boolean          @default(false)
   categories PostToCategory[]
 
@@ -46,15 +46,15 @@ model Category {
 
 model PostToCategory {
   id       Int      @id
-  post     Post
-  category Category
+  post     Post     @relation(references: [title, createdAt])
+  category Category @relation(references: [id])
 
   @@map("post_to_category")
 }
 
 model A {
   id Int @id
-  b  B
+  b  B   @relation(references: [id])
 }
 
 model B {
@@ -117,16 +117,16 @@ fn test_dmmf_roundtrip_with_sources() {
     assert_eq!(DATAMODEL_WITH_SOURCE, rendered);
 }
 
-const DATAMODEL_WITH_SOURCE_AND_COMMENTS: &str = r#"/// Super cool postgres source.
+const DATAMODEL_WITH_SOURCE_AND_COMMENTS: &str = r#"// Super cool postgres source.
 datasource pg1 {
   provider = "postgresql"
   url      = "https://localhost/postgres1"
 }
 
-/// My author model.
+// My author model.
 model Author {
   id        Int      @id
-  /// Name of the author.
+  // Name of the author.
   name      String?
   createdAt DateTime @default(now())
 }"#;
@@ -249,7 +249,7 @@ const DML_WITHOUT_RELATION_NAME: &str = r#"model User {
 
 model Post {
   id   Int  @id
-  user User
+  user User @relation(references: [id])
 }"#;
 
 #[test]

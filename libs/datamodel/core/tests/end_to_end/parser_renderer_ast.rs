@@ -172,30 +172,30 @@ fn test_parser_renderer_sources_and_comments_via_ast() {
     assert_eq!(rendered, DATAMODEL_WITH_SOURCE_AND_COMMENTS);
 }
 
-const DATAMODEL_WITH_TABS: &str = r#"/// Super cool postgres source.
+const DATAMODEL_WITH_TABS: &str = r#"// Super cool postgres source.
 datasource\tpg1\t{
 \tprovider\t=\t\t"postgres"
 \turl\t=\t"https://localhost/postgres1"
 }
 \t
-///\tMy author\tmodel.
+//\tMy author\tmodel.
 model\tAuthor\t{
 \tid\tInt\t@id
-\t/// Name of the author.
+\t// Name of the author.
 \t\tname\tString?
 \tcreatedAt\tDateTime\t@default(now())
 }"#;
 
-const DATAMODEL_WITH_SPACES: &str = r#"/// Super cool postgres source.
+const DATAMODEL_WITH_SPACES: &str = r#"// Super cool postgres source.
 datasource pg1 {
   provider = "postgres"
   url      = "https://localhost/postgres1"
 }
 
-/// My author\tmodel.
+// My author\tmodel.
 model Author {
   id        Int      @id
-  /// Name of the author.
+  // Name of the author.
   name      String?
   createdAt DateTime @default(now())
 }"#;
