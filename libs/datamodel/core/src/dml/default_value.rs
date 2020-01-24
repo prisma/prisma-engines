@@ -58,6 +58,10 @@ impl ValueGenerator {
         Ok(ValueGenerator { name, args, generator })
     }
 
+    pub fn new_autoincrement_bang() -> Self {
+        ValueGenerator::new("autoincrement".to_owned(), vec![]).unwrap()
+    }
+
     pub fn return_type(&self) -> ScalarType {
         self.generator.return_type()
     }
