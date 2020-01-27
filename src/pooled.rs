@@ -124,14 +124,17 @@ impl Quaint {
         let connection_info = Arc::new(ConnectionInfo::from_url(url_str)?);
         Self::log_start(connection_info.sql_family(), connection_limit);
 
-        let inner = Pool::builder().max_size(connection_limit).build(manager).await?;
+        let inner = Pool::builder()
+            .max_open(connection_limit.into())
+            .test_on_check_out(false)
+            .build(manager);
 
         Ok(Self { inner, connection_info })
     }
 
     /// The number of connections in the pool.
     pub async fn capacity(&self) -> u32 {
-        self.inner.state().await.connections
+        self.inner.state().await.max_open as u32
     }
 
     /// Reserve a connection from the pool.

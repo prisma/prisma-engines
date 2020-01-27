@@ -90,6 +90,7 @@ impl From<mobc::Error<Error>> for Error {
         match e {
             mobc::Error::Inner(e) => e,
             mobc::Error::Timeout => Self::Timeout,
+            e @ mobc::Error::BadConn => Self::ConnectionError(Box::new(e)),
         }
     }
 }
