@@ -17,8 +17,8 @@ pub trait Rpc {
     #[rpc(name = "getDatabaseMetadata")]
     fn get_database_metadata(&self, url: UrlInput) -> RpcFutureResult<DatabaseMetadata>;
 
-    #[rpc(name = "getSQLSchema")]
-    fn get_sql_schema(&self, url: UrlInput) -> RpcFutureResult<String>;
+    #[rpc(name = "getDatabaseDescription")]
+    fn get_database_description(&self, url: UrlInput) -> RpcFutureResult<String>;
 
     #[rpc(name = "introspect")]
     fn introspect(&self, url: UrlInput) -> RpcFutureResult<String>;
@@ -35,8 +35,8 @@ impl Rpc for RpcImpl {
         Box::new(Self::get_database_metadata_internal(url.url).boxed().compat())
     }
 
-    fn get_sql_schema(&self, url: UrlInput) -> RpcFutureResult<String> {
-        Box::new(Self::get_sql_schema(url.url).boxed().compat())
+    fn get_database_description(&self, url: UrlInput) -> RpcFutureResult<String> {
+        Box::new(Self::get_database_description(url.url).boxed().compat())
     }
 
     fn introspect(&self, url: UrlInput) -> RpcFutureResult<String> {
@@ -60,9 +60,9 @@ impl RpcImpl {
         Ok(connector.list_databases().await.map_err(CoreError::from)?)
     }
 
-    pub(crate) async fn get_sql_schema(connection_string: String) -> RpcResult<SqlSchema> {
+    pub(crate) async fn get_database_description(connection_string: String) -> RpcResult<String> {
         let connector = load_connector(&connection_string).await?;
-        Ok(connector.get_sql_schema().await.map_err(CoreError::from)?)
+        Ok(connector.get_database_description().await.map_err(CoreError::from)?)
     }
 
     pub(crate) async fn get_database_metadata_internal(connection_string: String) -> RpcResult<DatabaseMetadata> {

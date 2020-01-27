@@ -3,7 +3,6 @@ mod error;
 use datamodel::Datamodel;
 pub use error::{ConnectorError, ErrorKind};
 use serde::*;
-use sql_schema_describer::SqlSchema;
 
 pub type ConnectorResult<T> = Result<T, ConnectorError>;
 
@@ -13,7 +12,7 @@ pub trait IntrospectionConnector: Send + Sync + 'static {
 
     async fn get_metadata(&self) -> ConnectorResult<DatabaseMetadata>;
 
-    async fn get_sql_schema(&self) -> ConnectorResult<SqlSchema>;
+    async fn get_database_description(&self) -> ConnectorResult<String>;
 
     async fn introspect(&self) -> ConnectorResult<Datamodel>;
 }
