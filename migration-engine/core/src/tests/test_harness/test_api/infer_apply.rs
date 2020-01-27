@@ -63,8 +63,8 @@ impl<'a> InferApply<'a> {
 }
 
 pub(crate) struct InferApplyAssertion<'a> {
-    result: MigrationStepsResultOutput,
-    api: &'a dyn GenericApi,
+    pub(super) result: MigrationStepsResultOutput,
+    pub(super) api: &'a dyn GenericApi,
 }
 
 impl<'a> InferApplyAssertion<'a> {
