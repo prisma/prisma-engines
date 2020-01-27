@@ -69,6 +69,14 @@ impl ResultSet {
             values: row,
         })
     }
+
+    /// Takes the first row if existing, otherwise returns error.
+    pub fn into_single(self) -> crate::Result<ResultRow> {
+        match self.into_iter().next() {
+            Some(row) => Ok(row),
+            None => Err(crate::error::Error::NotFound),
+        }
+    }
 }
 
 impl IntoIterator for ResultSet {

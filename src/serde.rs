@@ -5,12 +5,18 @@ use crate::{
     connector::{ResultRow, ResultSet},
 };
 use serde::{de::Error as SerdeError, de::*};
-use thiserror::Error;
+
+impl ResultSet {
+    /// Takes the first row and deserializes it.
+    pub fn from_first<T: DeserializeOwned>(self) -> crate::Result<T> {
+        Ok(from_row(self.into_single()?)?)
+    }
+}
 
 /// Deserialize each row of a [`ResultSet`](../connector/struct.ResultSet.html).
 ///
 /// For an example, see the docs for [`from_row`](fn.from_row.html).
-pub fn from_rows<T: DeserializeOwned>(result_set: ResultSet) -> Result<Vec<T>, FromRowError> {
+pub fn from_rows<T: DeserializeOwned>(result_set: ResultSet) -> crate::Result<Vec<T>> {
     let mut deserialized_rows = Vec::with_capacity(result_set.len());
 
     for row in result_set {
@@ -46,15 +52,11 @@ pub fn from_rows<T: DeserializeOwned>(result_set: ResultSet) -> Result<Vec<T>, F
 /// # Ok(())
 /// # }
 /// ```
-pub fn from_row<T: DeserializeOwned>(row: ResultRow) -> Result<T, FromRowError> {
+pub fn from_row<T: DeserializeOwned>(row: ResultRow) -> crate::Result<T> {
     let deserializer = RowDeserializer(row);
 
-    T::deserialize(deserializer).map_err(FromRowError)
+    T::deserialize(deserializer).map_err(crate::error::Error::FromRowError)
 }
-
-#[derive(Debug, Error)]
-#[error("{0}")]
-pub struct FromRowError(DeserializeError);
 
 type DeserializeError = serde::de::value::Error;
 

@@ -78,6 +78,10 @@ pub enum Error {
 
     #[error("Error opening a TLS connection. {}", message)]
     TlsError { message: String },
+
+    #[cfg(feature = "serde-support")]
+    #[error("Deserializing a ResultRow {:?}", _0)]
+    FromRowError(serde::de::value::Error),
 }
 
 #[cfg(feature = "pooled")]
