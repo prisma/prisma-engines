@@ -12,6 +12,7 @@ introspection-connector = { path = "../introspection-connector" }
 sql-schema-describer = { path = "../../../libs/sql-schema-describer" }
 prisma-inflector = { path = "../../../libs/prisma-inflector" }
 datamodel = { path = "../../../libs/datamodel/core" }
+serde_json = "1.0"
 failure = "0.1"
 log = "0.4"
 regex = "1.2"
