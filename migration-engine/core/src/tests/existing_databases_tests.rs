@@ -1,7 +1,4 @@
 use super::test_harness::sql::*;
-use crate::commands::{
-    ApplyMigrationCommand, ApplyMigrationInput, InferMigrationStepsCommand, InferMigrationStepsInput,
-};
 use barrel::types;
 use pretty_assertions::assert_eq;
 use quaint::prelude::SqlFamily;
@@ -404,28 +401,19 @@ async fn removing_a_default_from_a_non_nullable_foreign_key_column_must_warn(api
         }
     "#;
 
-    let infer_input = InferMigrationStepsInput {
-        datamodel: dm.into(),
-        assume_to_be_applied: Some(Vec::new()),
-        assume_applied_migrations: None,
-        migration_id: "test-migration".into(),
-    };
-
     let result = api
-        .execute_command::<InferMigrationStepsCommand>(&infer_input)
-        .await
-        .unwrap();
+        .infer(dm)
+        .assume_to_be_applied(Some(Vec::new()))
+        .migration_id(Some("test_migration"))
+        .send()
+        .await?;
 
-    let apply_input = ApplyMigrationInput {
-        steps: result.datamodel_steps,
-        force: Some(false),
-        migration_id: "test-migration".into(),
-    };
-
-    let result = api
-        .execute_command::<ApplyMigrationCommand>(&apply_input)
-        .await
-        .unwrap();
+    api.apply()
+        .force(Some(false))
+        .steps(Some(result.datamodel_steps))
+        .migration_id(Some("test-migration"))
+        .send()
+        .await?;
 
     let expected_warning = "The migration is about to remove a default value on the foreign key field `Blog.user`.";
     assert_eq!(
