@@ -13,6 +13,7 @@ members = [
   "prisma-fmt",
   "libs/datamodel/core",
   "libs/datamodel/connectors/datamodel-connector",
+  "libs/json-rpc-stdio",
   "libs/prisma-inflector",
   "libs/sql-schema-describer",
   "libs/user-facing-errors",

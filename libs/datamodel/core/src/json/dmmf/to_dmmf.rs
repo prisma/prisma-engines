@@ -30,7 +30,6 @@ fn schema_to_dmmf(schema: &dml::Datamodel) -> Datamodel {
     datamodel
 }
 
-//todo
 fn enum_to_dmmf(en: &dml::Enum) -> Enum {
     Enum {
         name: en.name.clone(),
@@ -40,7 +39,6 @@ fn enum_to_dmmf(en: &dml::Enum) -> Enum {
     }
 }
 
-//todo
 fn model_to_dmmf(model: &dml::Model) -> Model {
     Model {
         name: model.name.clone(),
@@ -53,7 +51,6 @@ fn model_to_dmmf(model: &dml::Model) -> Model {
     }
 }
 
-//Todo
 fn field_to_dmmf(field: &dml::Field) -> Field {
     Field {
         name: field.name.clone(),
@@ -61,7 +58,7 @@ fn field_to_dmmf(field: &dml::Field) -> Field {
         db_names: field.database_names.clone(),
         is_required: field.arity == dml::FieldArity::Required,
         is_list: field.arity == dml::FieldArity::List,
-        is_id: field.id_info.is_some(),
+        is_id: field.is_id,
         default: default_value_to_serde(&field.default_value),
         is_unique: field.is_unique,
         relation_name: get_relation_name(field),

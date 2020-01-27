@@ -1,4 +1,4 @@
-use super::test_harness::*;
+use super::test_harness::sql::*;
 use crate::commands::{
     ApplyMigrationCommand, ApplyMigrationInput, InferMigrationStepsCommand, InferMigrationStepsInput,
 };
@@ -8,7 +8,7 @@ use quaint::prelude::SqlFamily;
 use sql_schema_describer::*;
 
 #[test_each_connector]
-async fn adding_a_model_for_an_existing_table_must_work(api: &TestApi) {
+async fn adding_a_model_for_an_existing_table_must_work(api: &TestApi) -> TestResult {
     let initial_result = api
         .barrel()
         .execute(|migration| {
@@ -16,7 +16,7 @@ async fn adding_a_model_for_an_existing_table_must_work(api: &TestApi) {
                 t.add_column("id", types::primary());
             });
         })
-        .await;
+        .await?;
 
     let dm = r#"
             model Blog {
@@ -26,6 +26,8 @@ async fn adding_a_model_for_an_existing_table_must_work(api: &TestApi) {
     let result = api.infer_and_apply(&dm).await.sql_schema;
 
     assert_eq!(initial_result, result);
+
+    Ok(())
 }
 
 #[test]
@@ -34,7 +36,7 @@ fn bigint_columns_must_work() {
 }
 
 #[test_each_connector]
-async fn removing_a_model_for_a_table_that_is_already_deleted_must_work(api: &TestApi) {
+async fn removing_a_model_for_a_table_that_is_already_deleted_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
             model Blog {
                 id Int @id
@@ -52,7 +54,7 @@ async fn removing_a_model_for_a_table_that_is_already_deleted_must_work(api: &Te
         .execute(|migration| {
             migration.drop_table("Post");
         })
-        .await;
+        .await?;
 
     assert!(!result.has_table("Post"));
 
@@ -63,10 +65,12 @@ async fn removing_a_model_for_a_table_that_is_already_deleted_must_work(api: &Te
         "#;
     let final_result = api.infer_and_apply(&dm2).await.sql_schema;
     assert_eq!(result, final_result);
+
+    Ok(())
 }
 
 #[test_each_connector]
-async fn creating_a_field_for_an_existing_column_with_a_compatible_type_must_work(api: &TestApi) {
+async fn creating_a_field_for_an_existing_column_with_a_compatible_type_must_work(api: &TestApi) -> TestResult {
     let is_mysql = api.is_mysql();
     let initial_result = api
         .barrel()
@@ -84,19 +88,23 @@ async fn creating_a_field_for_an_existing_column_with_a_compatible_type_must_wor
                 );
             });
         })
-        .await;
+        .await?;
+
     let dm = r#"
-            model Blog {
-                id Int @id
-                title String
-            }
-        "#;
+        model Blog {
+            id Int @id
+            title String
+        }
+    "#;
+
     let result = api.infer_and_apply(&dm).await.sql_schema;
     assert_eq!(initial_result, result);
+
+    Ok(())
 }
 
 #[test_each_connector]
-async fn creating_a_field_for_an_existing_column_and_changing_its_type_must_work(api: &TestApi) {
+async fn creating_a_field_for_an_existing_column_and_changing_its_type_must_work(api: &TestApi) -> TestResult {
     let initial_result = api
         .barrel()
         .execute(|migration| {
@@ -105,7 +113,7 @@ async fn creating_a_field_for_an_existing_column_and_changing_its_type_must_work
                 t.add_column("title", types::integer().nullable(true));
             });
         })
-        .await;
+        .await?;
     let initial_column = initial_result.table_bang("Blog").column_bang("title");
     assert_eq!(initial_column.tpe.family, ColumnTypeFamily::Int);
     assert_eq!(initial_column.is_required(), false);
@@ -124,10 +132,12 @@ async fn creating_a_field_for_an_existing_column_and_changing_its_type_must_work
     let index = table.indices.iter().find(|i| i.columns == &["title"]);
     assert!(index.is_some());
     assert_eq!(index.unwrap().tpe, IndexType::Unique);
+
+    Ok(())
 }
 
 #[test_each_connector]
-async fn creating_a_field_for_an_existing_column_and_simultaneously_making_it_optional(api: &TestApi) {
+async fn creating_a_field_for_an_existing_column_and_simultaneously_making_it_optional(api: &TestApi) -> TestResult {
     let initial_result = api
         .barrel()
         .execute(|migration| {
@@ -136,7 +146,7 @@ async fn creating_a_field_for_an_existing_column_and_simultaneously_making_it_op
                 t.add_column("title", types::text());
             });
         })
-        .await;
+        .await?;
     let initial_column = initial_result.table_bang("Blog").column_bang("title");
     assert_eq!(initial_column.is_required(), true);
 
@@ -149,10 +159,12 @@ async fn creating_a_field_for_an_existing_column_and_simultaneously_making_it_op
     let result = api.infer_and_apply(&dm).await.sql_schema;
     let column = result.table_bang("Blog").column_bang("title");
     assert_eq!(column.is_required(), false);
+
+    Ok(())
 }
 
 #[test_one_connector(connector = "postgres")]
-async fn creating_a_scalar_list_field_for_an_existing_table_must_work(api: &TestApi) {
+async fn creating_a_scalar_list_field_for_an_existing_table_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
             datasource pg {
               provider = "postgres"
@@ -174,7 +186,7 @@ async fn creating_a_scalar_list_field_for_an_existing_table_must_work(api: &Test
                 t.add_column("tags", types::array(&inner));
             });
         })
-        .await;
+        .await?;
 
     let dm2 = r#"
             datasource pg {
@@ -189,10 +201,12 @@ async fn creating_a_scalar_list_field_for_an_existing_table_must_work(api: &Test
         "#;
     let final_result = api.infer_and_apply(&dm2).await.sql_schema;
     assert_eq!(result, final_result);
+
+    Ok(())
 }
 
 #[test_each_connector]
-async fn delete_a_field_for_a_non_existent_column_must_work(api: &TestApi) {
+async fn delete_a_field_for_a_non_existent_column_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
             model Blog {
                 id Int @id
@@ -211,7 +225,7 @@ async fn delete_a_field_for_a_non_existent_column_must_work(api: &TestApi) {
                 t.add_column("id", types::primary());
             });
         })
-        .await;
+        .await?;
     assert_eq!(result.table_bang("Blog").column("title").is_some(), false);
 
     let dm2 = r#"
@@ -221,10 +235,12 @@ async fn delete_a_field_for_a_non_existent_column_must_work(api: &TestApi) {
         "#;
     let final_result = api.infer_and_apply(&dm2).await.sql_schema;
     assert_eq!(result, final_result);
+
+    Ok(())
 }
 
 #[test_one_connector(connector = "postgres")]
-async fn deleting_a_scalar_list_field_for_a_non_existent_column_must_work(api: &TestApi) {
+async fn deleting_a_scalar_list_field_for_a_non_existent_column_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
             datasource pg {
               provider = "postgres"
@@ -248,7 +264,7 @@ async fn deleting_a_scalar_list_field_for_a_non_existent_column_must_work(api: &
                 t.add_column("id", types::primary());
             });
         })
-        .await;
+        .await?;
 
     let dm2 = r#"
             datasource pg {
@@ -262,10 +278,12 @@ async fn deleting_a_scalar_list_field_for_a_non_existent_column_must_work(api: &
         "#;
     let final_result = api.infer_and_apply(&dm2).await.sql_schema;
     assert_eq!(result, final_result);
+
+    Ok(())
 }
 
 #[test_each_connector]
-async fn updating_a_field_for_a_non_existent_column(api: &TestApi) {
+async fn updating_a_field_for_a_non_existent_column(api: &TestApi) -> TestResult {
     let dm1 = r#"
             model Blog {
                 id Int @id
@@ -285,7 +303,7 @@ async fn updating_a_field_for_a_non_existent_column(api: &TestApi) {
                 t.add_column("id", types::primary());
             });
         })
-        .await;
+        .await?;
     assert!(result.table_bang("Blog").column("title").is_none());
 
     let dm2 = r#"
@@ -304,10 +322,12 @@ async fn updating_a_field_for_a_non_existent_column(api: &TestApi) {
         .find(|i| i.columns == vec!["title"]);
     assert_eq!(index.is_some(), true);
     assert_eq!(index.unwrap().tpe, IndexType::Unique);
+
+    Ok(())
 }
 
 #[test_each_connector]
-async fn renaming_a_field_where_the_column_was_already_renamed_must_work(api: &TestApi) {
+async fn renaming_a_field_where_the_column_was_already_renamed_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
             model Blog {
                 id Int @id
@@ -328,7 +348,7 @@ async fn renaming_a_field_where_the_column_was_already_renamed_must_work(api: &T
                 t.add_column("new_title", types::text());
             });
         })
-        .await;
+        .await?;
     assert!(result.table_bang("Blog").column("new_title").is_some());
 
     let dm2 = r#"
@@ -344,10 +364,12 @@ async fn renaming_a_field_where_the_column_was_already_renamed_must_work(api: &T
 
     assert_eq!(final_column.tpe.family, ColumnTypeFamily::Float);
     assert!(final_result.table_bang("Blog").column("title").is_none());
+
+    Ok(())
 }
 
 #[test_each_connector]
-async fn removing_a_default_from_a_non_nullable_foreign_key_column_must_warn(api: &TestApi) {
+async fn removing_a_default_from_a_non_nullable_foreign_key_column_must_warn(api: &TestApi) -> TestResult {
     let sql_family = api.sql_family();
     let sql_schema = api
         .barrel()
@@ -367,7 +389,7 @@ async fn removing_a_default_from_a_non_nullable_foreign_key_column_must_warn(api
                 t.inject_custom(fk);
             });
         })
-        .await;
+        .await?;
 
     assert!(sql_schema.table_bang("Blog").column("user").unwrap().default.is_some());
 
@@ -412,4 +434,6 @@ async fn removing_a_default_from_a_non_nullable_foreign_key_column_must_warn(api
             description: expected_warning.into()
         }]
     );
+
+    Ok(())
 }

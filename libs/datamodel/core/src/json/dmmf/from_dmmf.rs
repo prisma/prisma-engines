@@ -28,7 +28,6 @@ pub fn schema_from_dmmf(schema: &Datamodel) -> dml::Datamodel {
     datamodel
 }
 
-//todo
 fn model_from_dmmf(model: &Model) -> dml::Model {
     dml::Model {
         name: model.name.clone(),
@@ -42,7 +41,6 @@ fn model_from_dmmf(model: &Model) -> dml::Model {
     }
 }
 
-//todo
 fn enum_from_dmmf(en: &Enum) -> dml::Enum {
     dml::Enum {
         name: en.name.clone(),
@@ -56,23 +54,13 @@ fn field_from_dmmf(field: &Field) -> dml::Field {
     let field_type = get_field_type(field);
     let default_value = default_value_from_serde(&field.default, &field_type);
 
-    // TODO: Id details?
-    let id_info = match &field.is_id {
-        true => Some(dml::IdInfo {
-            strategy: dml::IdStrategy::Auto,
-            sequence: None,
-        }),
-        false => None,
-    };
-
-    //Todo
     dml::Field {
         name: field.name.clone(),
         arity: get_field_arity(field.is_required, field.is_list),
         database_names: field.db_names.clone(),
         field_type,
         default_value,
-        id_info,
+        is_id: field.is_id,
         is_unique: field.is_unique,
         is_generated: field.is_generated.unwrap_or(false),
         is_updated_at: field.is_updated_at.unwrap_or(false),

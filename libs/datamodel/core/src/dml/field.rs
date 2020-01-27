@@ -38,15 +38,6 @@ impl FieldType {
     }
 }
 
-/// Holds information about an id, or priamry key.
-#[derive(Debug, PartialEq, Clone)]
-pub struct IdInfo {
-    /// The strategy which is used to generate the id field.
-    pub strategy: IdStrategy,
-    /// A sequence used to generate the id.
-    pub sequence: Option<Sequence>,
-}
-
 /// Describes a singular field on a data source.
 /// This doesn't necessarily map 1:1 to fields in the datamodel, as some
 /// datamodel fields, notably relation fields, can be backed by multiple
@@ -94,7 +85,7 @@ pub struct Field {
 
     /// If set, signals that this field is an id field, or
     /// primary key.
-    pub id_info: Option<IdInfo>,
+    pub is_id: bool,
 
     /// Comments associated with this field.
     pub documentation: Option<String>,
@@ -164,7 +155,7 @@ impl Field {
             database_names: Vec::new(),
             default_value: None,
             is_unique: false,
-            id_info: None,
+            is_id: false,
             documentation: None,
             is_generated: false,
             is_updated_at: false,
@@ -180,7 +171,7 @@ impl Field {
             database_names: Vec::new(),
             default_value: None,
             is_unique: false,
-            id_info: None,
+            is_id: false,
             documentation: None,
             is_generated: true,
             is_updated_at: false,

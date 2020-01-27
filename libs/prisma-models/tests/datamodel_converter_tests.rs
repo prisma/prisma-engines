@@ -66,10 +66,6 @@ fn models_with_only_scalar_fields() {
     model
         .assert_scalar_field("id")
         .assert_type_identifier(TypeIdentifier::Int)
-        .assert_behaviour(FieldBehaviour::Id {
-            strategy: IdStrategy::Auto,
-            sequence: None,
-        })
         .assert_is_auto_generated_int_id_by_db();
     model
         .assert_scalar_field("int")

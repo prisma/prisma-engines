@@ -17,7 +17,7 @@ fn unique_directive() {
         .assert_has_field("id")
         .assert_base_type(&ScalarType::Int)
         .assert_is_unique(false)
-        .assert_is_id(true);
+        .assert_is_id();
     test_model
         .assert_has_field("unique")
         .assert_base_type(&ScalarType::String)

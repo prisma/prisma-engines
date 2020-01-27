@@ -23,7 +23,7 @@ async fn introspecting_a_simple_table_with_gql_types_must_work(api: &TestApi) {
                 bool    Boolean
                 date    DateTime
                 float   Float
-                id      Int @id
+                id      Int @id @default(autoincrement())
                 int     Int
                 string  String
             }
@@ -64,25 +64,15 @@ async fn introspecting_a_table_with_unique_index_must_work(api: &TestApi) {
             migration.create_table("Blog", |t| {
                 t.add_column("id", types::primary());
                 t.add_column("authorId", types::text());
+                t.add_index("test", types::index(vec!["authorId"]).unique(true));
             });
         })
         .await;
 
-    api.database()
-        .query_raw(
-            &format!(
-                "Create Unique Index \"{}\".\"test\" on \"Blog\"( \"authorId\")",
-                api.schema_name()
-            ),
-            &[],
-        )
-        .await
-        .unwrap();
-
     let dm = r#"
             model Blog {
                 authorId String @unique
-                id Int @id
+                id Int @id @default(autoincrement())
             }
         "#;
     let result = dbg!(api.introspect().await);
@@ -92,31 +82,21 @@ async fn introspecting_a_table_with_unique_index_must_work(api: &TestApi) {
 #[test_one_connector(connector = "sqlite")]
 async fn introspecting_a_table_with_multi_column_unique_index_must_work(api: &TestApi) {
     let barrel = api.barrel();
-    let _setup_schema = barrel
+    barrel
         .execute(|migration| {
             migration.create_table("User", |t| {
                 t.add_column("id", types::primary());
                 t.add_column("firstname", types::text());
                 t.add_column("lastname", types::text());
+                t.add_index("test", types::index(vec!["firstname", "lastname"]).unique(true));
             });
         })
         .await;
 
-    api.database()
-        .query_raw(
-            &format!(
-                "Create Unique Index \"{}\".\"test\" on \"User\"( \"firstname\", \"lastname\")",
-                api.schema_name()
-            ),
-            &[],
-        )
-        .await
-        .unwrap();
-
     let dm = r#"
             model User {
                 firstname String
-                id Int @id
+                id Int @id @default(autoincrement())
                 lastname String
                 @@unique([firstname, lastname], name: "test")
             }
@@ -128,7 +108,7 @@ async fn introspecting_a_table_with_multi_column_unique_index_must_work(api: &Te
 #[test_one_connector(connector = "sqlite")]
 async fn introspecting_a_table_with_required_and_optional_columns_must_work(api: &TestApi) {
     let barrel = api.barrel();
-    let _setup_schema = barrel
+    barrel
         .execute(|migration| {
             migration.create_table("User", |t| {
                 t.add_column("id", types::primary());
@@ -140,7 +120,7 @@ async fn introspecting_a_table_with_required_and_optional_columns_must_work(api:
 
     let dm = r#"
             model User {
-                id Int @id
+                id Int @id @default(autoincrement())
                 optionalname String?
                 requiredname String
             }
@@ -195,7 +175,7 @@ async fn introspecting_a_table_with_default_values_should_work(api: &TestApi) {
                 bool Boolean @default(false)
                 bool2 Boolean @default(false)
                 float Float @default(5.3)
-                id Int @id
+                id Int @id @default(autoincrement())
                 int Int @default(5)
                 string String @default("Test")
             }
@@ -212,22 +192,15 @@ async fn introspecting_a_table_with_a_non_unique_index_should_work(api: &TestApi
             migration.create_table("User", |t| {
                 t.add_column("a", types::text());
                 t.add_column("id", types::primary());
+                t.add_index("test", types::index(vec!["a"]));
             });
         })
         .await;
 
-    api.database()
-        .query_raw(
-            &format!("Create Index \"{}\".\"test\" on \"User\"(\"a\")", api.schema_name()),
-            &[],
-        )
-        .await
-        .unwrap();
-
     let dm = r#"
             model User {
                 a String
-                id Int @id
+                id Int @id @default(autoincrement())
                 @@index([a], name: "test")
             }
         "#;
@@ -244,26 +217,16 @@ async fn introspecting_a_table_with_a_multi_column_non_unique_index_should_work(
                 t.add_column("a", types::text());
                 t.add_column("b", types::text());
                 t.add_column("id", types::primary());
+                t.add_index("test", types::index(vec!["a", "b"]));
             });
         })
         .await;
-
-    api.database()
-        .query_raw(
-            &format!(
-                "Create Index \"{}\".\"test\" on \"User\"(\"a\",\"b\")",
-                api.schema_name()
-            ),
-            &[],
-        )
-        .await
-        .unwrap();
 
     let dm = r#"
             model User {
                 a String
                 b String
-                id Int @id
+                id Int @id @default(autoincrement())
                 @@index([a,b], name: "test")
             }
         "#;

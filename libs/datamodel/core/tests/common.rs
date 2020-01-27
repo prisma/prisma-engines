@@ -17,11 +17,9 @@ pub trait FieldAsserts {
     fn assert_with_documentation(&self, t: &str) -> &Self;
     fn assert_default_value(&self, t: dml::DefaultValue) -> &Self;
     fn assert_is_generated(&self, b: bool) -> &Self;
-    fn assert_is_id(&self, b: bool) -> &Self;
+    fn assert_is_id(&self) -> &Self;
     fn assert_is_unique(&self, b: bool) -> &Self;
     fn assert_is_updated_at(&self, b: bool) -> &Self;
-    fn assert_id_strategy(&self, strategy: dml::IdStrategy) -> &Self;
-    fn assert_id_sequence(&self, strategy: Option<dml::Sequence>) -> &Self;
     fn assert_has_no_datasource_fields(&self) -> &Self;
     fn assert_has_one_datasource_field(&self) -> &dml::DataSourceField;
     fn assert_has_multiple_datasource_fields(&self) -> Vec<&dml::DataSourceField>;
@@ -146,8 +144,8 @@ impl FieldAsserts for dml::Field {
         self
     }
 
-    fn assert_is_id(&self, b: bool) -> &Self {
-        assert_eq!(self.id_info.is_some(), b);
+    fn assert_is_id(&self) -> &Self {
+        assert!(self.is_id);
 
         self
     }
@@ -166,26 +164,6 @@ impl FieldAsserts for dml::Field {
 
     fn assert_is_updated_at(&self, b: bool) -> &Self {
         assert_eq!(self.is_updated_at, b);
-
-        self
-    }
-
-    fn assert_id_strategy(&self, strategy: dml::IdStrategy) -> &Self {
-        if let Some(id_info) = &self.id_info {
-            assert_eq!(id_info.strategy, strategy)
-        } else {
-            panic!("Id field expected, but no id info given");
-        }
-
-        self
-    }
-
-    fn assert_id_sequence(&self, sequence: Option<dml::Sequence>) -> &Self {
-        if let Some(id_info) = &self.id_info {
-            assert_eq!(id_info.sequence, sequence)
-        } else {
-            panic!("Id field expected, but no id info given");
-        }
 
         self
     }

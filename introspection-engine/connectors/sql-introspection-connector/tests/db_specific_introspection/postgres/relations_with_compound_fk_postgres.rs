@@ -25,12 +25,12 @@ async fn compound_foreign_keys_should_work_for_required_one_to_one_relations(api
 
     let dm = r#"
             model Post {
-                id      Int                 @id @sequence(name: "Post_id_seq", allocationSize: 1, initialValue: 1)
+                id      Int                 @id @default(autoincrement())
                 user    User                @map(["user_id", "user_name"]) @relation(references:[id, name])
             }
 
             model User {
-               id       Int                 @id @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
+               id       Int                 @id @default(autoincrement())
                name     String
                post     Post?
 
@@ -64,12 +64,12 @@ async fn compound_foreign_keys_should_work_for_one_to_one_relations(api: &TestAp
 
     let dm = r#"
             model Post {
-                id      Int                 @id @sequence(name: "Post_id_seq", allocationSize: 1, initialValue: 1)
+                id      Int                 @id @default(autoincrement())
                 user    User?                @map(["user_id", "user_name"]) @relation(references:[id, name])
             }
 
             model User {
-               id       Int                 @id @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
+               id       Int                 @id @default(autoincrement())
                name     String
                post     Post?
 
@@ -102,12 +102,12 @@ async fn compound_foreign_keys_should_work_for_one_to_many_relations(api: &TestA
 
     let dm = r#"
             model Post {
-                id      Int                 @id @sequence(name: "Post_id_seq", allocationSize: 1, initialValue: 1)
+                id      Int                 @id @default(autoincrement())
                 user    User?                @map(["user_id", "user_name"]) @relation(references:[id, name])
             }
 
             model User {
-               id       Int                 @id @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
+               id       Int                 @id @default(autoincrement())
                name     String
                posts    Post[]
 
@@ -140,12 +140,12 @@ async fn compound_foreign_keys_should_work_for_required_one_to_many_relations(ap
 
     let dm = r#"
             model Post {
-                id      Int                 @id @sequence(name: "Post_id_seq", allocationSize: 1, initialValue: 1)
+                id      Int                 @id @default(autoincrement())
                 user    User                @map(["user_id", "user_name"]) @relation(references:[id, name])
             }
 
             model User {
-               id       Int                 @id @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
+               id       Int                 @id @default(autoincrement())
                name     String
                posts    Post[]
 
@@ -177,7 +177,7 @@ async fn compound_foreign_keys_should_work_for_self_relations(api: &TestApi) {
 
     let dm = r#"
             model Person {
-               id       Int         @id @sequence(name: "Person_id_seq", allocationSize: 1, initialValue: 1)
+               id       Int         @id @default(autoincrement())
                name     String
                person   Person      @map(["partner_id", "partner_name"]) @relation("PersonToPerson_partner_id_partner_name")
                persons  Person[]    @relation("PersonToPerson_partner_id_partner_name")
@@ -210,7 +210,7 @@ async fn compound_foreign_keys_should_work_with_defaults(api: &TestApi) {
 
     let dm = r#"
             model Person {
-               id       Int         @id @sequence(name: "Person_id_seq", allocationSize: 1, initialValue: 1)
+               id       Int         @id @default(autoincrement())
                name     String
                person   Person      @map(["partner_id", "partner_name"]) @relation("PersonToPerson_partner_id_partner_name")
                persons  Person[]    @relation("PersonToPerson_partner_id_partner_name")
@@ -283,23 +283,14 @@ async fn compound_foreign_keys_should_work_for_one_to_many_relations_with_non_un
                 t.add_column("user_id", types::integer());
                 t.add_column("user_age", types::integer());
                 t.inject_custom("FOREIGN KEY (\"user_id\",\"user_age\") REFERENCES \"User\"(\"id\", \"age\")");
+                t.add_index("test", types::index(vec!["user_id", "user_age"]));
             });
         })
         .await;
 
-    api.database()
-        .query_raw(
-            &format!(
-                "CREATE INDEX test ON \"Post\"(\"user_id\",\"user_age\");",
-            ),
-            &[],
-        )
-        .await
-        .unwrap();
-
     let dm = r#"
             model Post {
-                id      Int                @id @sequence(name: "Post_id_seq", allocationSize: 1, initialValue: 1)
+                id      Int                @id @default(autoincrement())
                 user    User               @map(["user_id", "user_age"]) @relation(references:[id, age])
 
                 @@index(user, name: "test")
@@ -307,7 +298,7 @@ async fn compound_foreign_keys_should_work_for_one_to_many_relations_with_non_un
 
             model User {
                age      Int
-               id       Int                @id @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
+               id       Int                @id @default(autoincrement())
                posts    Post[]
 
                @@unique([id, age], name: "user_unique")

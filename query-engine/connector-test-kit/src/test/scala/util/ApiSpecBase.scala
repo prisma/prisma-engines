@@ -28,13 +28,17 @@ trait ApiSpecBase extends ConnectorAwareTest with BeforeAndAfterEach with Before
     TestDataModelsWrapper(testDataModel, connectorTag, connector, database)
   }
 
+  implicit def abstractTestDataModelsWrapper(testDataModel: AbstractTestDataModels): AbstractTestDataModelsWrapper = {
+    AbstractTestDataModelsWrapper(testDataModel, connectorTag, connector, database)
+  }
+
   val listInlineArgument = if (capabilities.has(RelationLinkListCapability)) {
     "references: [id]"
   } else {
     ""
   }
 
-  val listInlineDirective = if (capabilities.has(RelationLinkListCapability)) {
+  val relationInlineDirective = if (capabilities.has(RelationLinkListCapability)) {
     s"@relation($listInlineArgument)"
   } else {
     ""

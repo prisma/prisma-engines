@@ -1,28 +1,37 @@
-use super::super::unique_migration_id;
+use super::super::{assertions::AssertionResult, unique_migration_id};
 use crate::{
     api::GenericApi,
     commands::{ApplyMigrationInput, InferMigrationStepsInput, MigrationStepsResultOutput},
 };
 
 pub struct InferApply<'a> {
-    pub(super) api: &'a dyn GenericApi,
-    pub(super) schema: &'a str,
-    pub(super) migration_id: Option<String>,
-    pub(super) force: Option<bool>,
+    api: &'a dyn GenericApi,
+    schema: &'a str,
+    migration_id: Option<String>,
+    force: Option<bool>,
 }
 
 impl<'a> InferApply<'a> {
-    pub fn force(mut self, force: Option<bool>) -> Self {
+    pub(crate) fn new(api: &'a dyn GenericApi, schema: &'a str) -> Self {
+        InferApply {
+            api,
+            schema,
+            migration_id: None,
+            force: None,
+        }
+    }
+
+    pub(crate) fn force(mut self, force: Option<bool>) -> Self {
         self.force = force;
         self
     }
 
-    pub fn migration_id(mut self, migration_id: Option<impl Into<String>>) -> Self {
+    pub(crate) fn migration_id(mut self, migration_id: Option<impl Into<String>>) -> Self {
         self.migration_id = migration_id.map(Into::into);
         self
     }
 
-    pub async fn send(self) -> Result<MigrationStepsResultOutput, anyhow::Error> {
+    pub(crate) async fn send(self) -> Result<MigrationStepsResultOutput, anyhow::Error> {
         let migration_id = self.migration_id.map(Into::into).unwrap_or_else(unique_migration_id);
 
         let input = InferMigrationStepsInput {
@@ -43,5 +52,64 @@ impl<'a> InferApply<'a> {
         let migration_output = self.api.apply_migration(&input).await?;
 
         Ok(migration_output)
+    }
+
+    pub(crate) async fn send_assert(self) -> Result<InferApplyAssertion<'a>, anyhow::Error> {
+        let api = self.api;
+        let result = self.send().await?;
+
+        Ok(InferApplyAssertion { result, api })
+    }
+}
+
+pub(crate) struct InferApplyAssertion<'a> {
+    result: MigrationStepsResultOutput,
+    api: &'a dyn GenericApi,
+}
+
+impl<'a> InferApplyAssertion<'a> {
+    pub(crate) fn assert_green(self) -> AssertionResult<Self> {
+        assert!(self.result.warnings.is_empty());
+        assert!(self.result.general_errors.is_empty());
+        assert!(self.result.unexecutable_migrations.is_empty());
+
+        Ok(self)
+    }
+
+    pub(crate) fn assert_no_warning(self) -> AssertionResult<Self> {
+        assert!(self.result.warnings.is_empty());
+
+        Ok(self)
+    }
+
+    pub(crate) fn assert_no_error(self) -> AssertionResult<Self> {
+        assert!(self.result.general_errors.is_empty());
+
+        Ok(self)
+    }
+
+    pub(crate) fn assert_executable(self) -> AssertionResult<Self> {
+        assert!(self.result.unexecutable_migrations.is_empty());
+
+        Ok(self)
+    }
+
+    pub(crate) fn assert_unexecutable(self, expected_messages: &[String]) -> AssertionResult<Self> {
+        assert_eq!(self.result.unexecutable_migrations.len(), expected_messages.len());
+
+        for (expected, actual) in expected_messages.iter().zip(
+            self.result
+                .unexecutable_migrations
+                .iter()
+                .map(|w| w.description.as_str()),
+        ) {
+            assert_eq!(actual, expected);
+        }
+
+        Ok(self)
+    }
+
+    pub(crate) fn into_inner(self) -> MigrationStepsResultOutput {
+        self.result
     }
 }

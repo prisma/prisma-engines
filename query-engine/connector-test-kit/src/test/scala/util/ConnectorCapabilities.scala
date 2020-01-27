@@ -8,9 +8,6 @@ object ConnectorCapability extends Enumeratum[ConnectorCapability] {
   val values = findValues
 
   object ScalarListsCapability           extends ConnectorCapability
-
-  object NodeQueryCapability extends ConnectorCapability
-
   object EmbeddedTypesCapability          extends ConnectorCapability
   object JoinRelationsFilterCapability    extends ConnectorCapability
   object TransactionalExecutionCapability extends ConnectorCapability

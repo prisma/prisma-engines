@@ -7,6 +7,12 @@ pub(crate) struct ColumnDiffer<'a> {
 }
 
 impl<'a> ColumnDiffer<'a> {
+    pub(crate) fn name(&self) -> &'a str {
+        debug_assert_eq!(self.previous.name, self.next.name);
+
+        self.previous.name.as_str()
+    }
+
     pub(crate) fn differs_in_something(&self) -> bool {
         self.all_changes().iter().count() > 0
     }
@@ -120,6 +126,10 @@ impl ColumnChanges {
 
     pub(crate) fn type_changed(&self) -> bool {
         self.changes.iter().any(|c| c.as_ref() == Some(&ColumnChange::Type))
+    }
+
+    pub(crate) fn arity_changed(&self) -> bool {
+        self.changes.iter().any(|c| c.as_ref() == Some(&ColumnChange::Arity))
     }
 }
 

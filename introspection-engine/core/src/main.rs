@@ -5,11 +5,12 @@ mod rpc;
 
 #[cfg(test)]
 mod tests;
+use json_rpc_stdio::ServerBuilder;
 use jsonrpc_core::*;
-use jsonrpc_stdio_server::ServerBuilder;
 use rpc::{Rpc, RpcImpl};
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let matches = cli::clap_app().get_matches();
     init_logger();
 
@@ -25,7 +26,7 @@ fn main() {
         io_handler.extend_with(RpcImpl::new().to_delegate());
 
         let server = ServerBuilder::new(io_handler);
-        server.build();
+        server.run().await.unwrap();
     }
 }
 

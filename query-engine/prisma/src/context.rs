@@ -21,13 +21,34 @@ pub struct PrismaContext {
     pub executor: Box<dyn QueryExecutor + Send + Sync + 'static>,
 }
 
+pub struct ContextBuilder {
+    legacy: bool,
+    force_transactions: bool,
+}
+
+impl ContextBuilder {
+    pub fn legacy(mut self, val: bool) -> Self {
+        self.legacy = val;
+        self
+    }
+
+    pub fn force_transactions(mut self, val: bool) -> Self {
+        self.force_transactions = val;
+        self
+    }
+
+    pub async fn build(self) -> PrismaResult<PrismaContext> {
+        PrismaContext::new(self.legacy, self.force_transactions).await
+    }
+}
+
 impl PrismaContext {
     /// Initializes a new Prisma context.
     /// Loads all immutable state for the query engine:
     /// 1. The data model. This has different options on how to initialize. See data_model_loader module. The Prisma configuration (prisma.yml) is used as fallback.
     /// 2. The data model is converted to the internal data model.
     /// 3. The api query schema is constructed from the internal data model.
-    pub async fn new(legacy: bool) -> PrismaResult<Self> {
+    async fn new(legacy: bool, force_transactions: bool) -> PrismaResult<Self> {
         // Load data model in order of precedence.
         let (v2components, template) = load_data_model_components()?;
 
@@ -41,7 +62,7 @@ impl PrismaContext {
         };
 
         // Load executor
-        let (db_name, executor) = exec_loader::load(&**data_source).await?;
+        let (db_name, executor) = exec_loader::load(&**data_source, force_transactions).await?;
 
         // Build internal data model
         let internal_data_model = dbg!(template.build(db_name));
@@ -58,6 +79,13 @@ impl PrismaContext {
             dm,
             executor,
         })
+    }
+
+    pub fn builder() -> ContextBuilder {
+        ContextBuilder {
+            legacy: false,
+            force_transactions: false,
+        }
     }
 
     pub fn query_schema(&self) -> &QuerySchemaRef {

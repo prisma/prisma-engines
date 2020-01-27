@@ -9,6 +9,7 @@ use connector::{ConnectionLike, Connector};
 pub struct InterpretingExecutor<C> {
     connector: C,
     primary_connector: &'static str,
+    force_transactions: bool,
 }
 
 // Todo:
@@ -17,10 +18,16 @@ impl<C> InterpretingExecutor<C>
 where
     C: Connector + Send + Sync,
 {
-    pub fn new(connector: C, primary_connector: &'static str) -> Self {
+    pub fn new(
+        connector: C,
+        primary_connector: &'static str,
+        force_transactions: bool,
+    ) -> Self
+    {
         InterpretingExecutor {
             connector,
             primary_connector,
+            force_transactions,
         }
     }
 }
@@ -40,7 +47,9 @@ where
         let mut responses = Responses::with_capacity(queries.len());
 
         for (query_graph, info) in queries {
-            let result = if query_graph.needs_transaction() {
+            let needs_transaction = self.force_transactions || query_graph.needs_transaction();
+
+            let result = if needs_transaction {
                 let tx = conn.start_transaction().await?;
 
                 let interpreter = QueryInterpreter::new(ConnectionLike::Transaction(tx.as_ref()));

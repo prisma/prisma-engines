@@ -22,6 +22,7 @@ pub struct ScalarFieldTemplate {
     pub is_required: bool,
     pub is_list: bool,
     pub is_unique: bool,
+    pub is_id: bool,
     pub is_auto_generated_int_id: bool,
     pub behaviour: Option<FieldBehaviour>,
     pub internal_enum: Option<InternalEnum>,
@@ -34,6 +35,7 @@ pub struct ScalarField {
     pub type_identifier: TypeIdentifier,
     pub is_required: bool,
     pub is_list: bool,
+    pub is_id: bool,
     pub is_auto_generated_int_id: bool,
     pub internal_enum: Option<InternalEnum>,
     pub behaviour: Option<FieldBehaviour>,
@@ -52,6 +54,7 @@ impl Hash for ScalarField {
         self.type_identifier.hash(state);
         self.is_required.hash(state);
         self.is_list.hash(state);
+        self.is_id.hash(state);
         self.is_auto_generated_int_id.hash(state);
         self.internal_enum.hash(state);
         self.behaviour.hash(state);
@@ -66,6 +69,7 @@ impl PartialEq for ScalarField {
             && self.type_identifier == other.type_identifier
             && self.is_required == other.is_required
             && self.is_list == other.is_list
+            && self.is_id == other.is_id
             && self.is_auto_generated_int_id == other.is_auto_generated_int_id
             && self.internal_enum == other.internal_enum
             && self.behaviour == other.behaviour
@@ -79,20 +83,7 @@ impl PartialEq for ScalarField {
 pub enum FieldBehaviour {
     CreatedAt,
     UpdatedAt,
-    Id {
-        strategy: IdStrategy,
-        sequence: Option<Sequence>, // TODO: this can be removed when we have switched fully to datamodel v2. This is not of interested for the query engine.
-    },
-    ScalarList {
-        strategy: ScalarListStrategy,
-    },
-}
-
-#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
-pub enum IdStrategy {
-    Auto,
-    None,
-    Sequence,
+    ScalarList { strategy: ScalarListStrategy },
 }
 
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
@@ -101,18 +92,12 @@ pub enum ScalarListStrategy {
     Relation,
 }
 
-#[derive(Debug, Clone, Eq, PartialEq, Hash)]
-pub struct Sequence {
-    pub name: String,
-    pub initial_value: i32,
-    pub allocation_size: i32,
-}
-
 impl ScalarFieldTemplate {
     pub fn build(self, model: ModelWeakRef) -> ScalarFieldRef {
         let scalar = ScalarField {
             name: self.name,
             type_identifier: self.type_identifier,
+            is_id: self.is_id,
             is_required: self.is_required,
             is_list: self.is_list,
             is_auto_generated_int_id: self.is_auto_generated_int_id,
@@ -152,10 +137,7 @@ impl ScalarField {
         if self.model().is_legacy() {
             self.name == ID_FIELD || self.name == EMBEDDED_ID_FIELD
         } else {
-            match self.behaviour {
-                Some(FieldBehaviour::Id { .. }) => true,
-                _ => false,
-            }
+            self.is_id
         }
     }
 
@@ -187,14 +169,6 @@ impl ScalarField {
 
     pub fn db_name(&self) -> &str {
         &self.data_source_field().name
-    }
-
-    pub fn id_behaviour_clone(&self) -> Option<FieldBehaviour> {
-        if self.is_id() {
-            self.behaviour.clone()
-        } else {
-            None
-        }
     }
 
     pub fn type_identifier_with_arity(&self) -> (TypeIdentifier, FieldArity) {

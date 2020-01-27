@@ -97,35 +97,35 @@ fn read_related<'a, 'b>(
         // There are 2 options:
         // - The query already has IDs set - use those.
         // - The IDs need to be extracted from the parent result.
-        let relation_parent_ids = match query.relation_parent_ids {
-            Some(ref ids) => ids,
-            None => {
-                let relation_id = query.parent_field.identifier();
-                parent_result.identifiers(relation_id)?
-            }
-        };
+        // let relation_parent_ids = match query.relation_parent_ids {
+        //     Some(ref ids) => ids,
+        //     None => {
+        //         let relation_id = query.parent_field.identifier();
+        //         parent_result.identifiers(relation_id)?
+        //     }
+        // };
 
-        let scalars = tx
-            .get_related_records(
-                &query.parent_field,
-                relation_parent_ids,
-                query.args.clone(),
-                &query.selected_fields,
-            )
-            .await?;
+        // let scalars = tx
+        //     .get_related_records(
+        //         &query.parent_field,
+        //         relation_parent_ids,
+        //         query.args.clone(),
+        //         &query.selected_fields,
+        //     )
+        //     .await?;
 
-        let model = query.parent_field.related_model();
-        let model_id = model.identifier();
-        let nested: Vec<QueryResult> = process_nested(tx, query.nested, Some(&scalars)).await?;
+        // let model = query.parent_field.related_model();
+        // let model_id = model.identifier();
+        // let nested: Vec<QueryResult> = process_nested(tx, query.nested, Some(&scalars)).await?;
 
-        Ok(QueryResult::RecordSelection(RecordSelection {
-            name: query.name,
-            fields: query.selection_order,
-            query_arguments: query.args,
-            model_id,
-            scalars,
-            nested,
-        }))
+        // Ok(QueryResult::RecordSelection(RecordSelection {
+        //     name: query.name,
+        //     fields: query.selection_order,
+        //     query_arguments: query.args,
+        //     model_id,
+        //     scalars,
+        //     nested,
+        // }))
 
         todo!()
     };
