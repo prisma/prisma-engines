@@ -42,7 +42,7 @@ async fn adding_a_required_field_if_there_is_data(api: &TestApi) {
 }
 
 #[test_each_connector]
-async fn adding_a_required_field_must_use_the_default_value_for_migrations(api: &TestApi) {
+async fn adding_a_required_field_must_use_the_default_value_for_migrations(api: &TestApi) -> TestResult {
     let dm = r#"
             model Test {
                 id String @id @default(cuid())
@@ -53,7 +53,8 @@ async fn adding_a_required_field_must_use_the_default_value_for_migrations(api: 
                 A
             }
         "#;
-    api.infer_and_apply(&dm).await;
+
+    api.infer_apply(&dm).send().await?;
 
     let conn = api.database();
     let insert = Insert::single_into((api.schema_name(), "Test")).value("id", "test");
@@ -68,9 +69,7 @@ async fn adding_a_required_field_must_use_the_default_value_for_migrations(api: 
                 boolean Boolean @default(true)
                 string String @default("test_string")
                 dateTime DateTime
-                // TODO: Currently failing because of ambiguity concerning expressions. Pending on
-                // spec work.
-                // enum MyEnum @default(C)
+                enum MyEnum @default(C)
             }
 
             enum MyEnum {
@@ -81,16 +80,16 @@ async fn adding_a_required_field_must_use_the_default_value_for_migrations(api: 
         "#;
     api.infer_and_apply(&dm).await;
 
-    // TODO: those assertions somehow fail with column not found on SQLite. I could observe the correct data in the db file though.
-    if !api.is_sqlite() {
-        let conditions = "id".equals("test");
-        let table_for_select: Table = (api.schema_name(), "Test").into();
-        let query = Select::from_table(table_for_select).so_that(conditions);
-        let result_set = conn.query(query.into()).await.unwrap();
-        let row = result_set.into_iter().next().expect("query returned no results");
-        assert_eq!(row["myint"].as_i64().unwrap(), 1);
-        assert_eq!(row["string"].as_str().unwrap(), "test_string");
-    }
+    let query = Select::from_table(api.render_table_name("Test"))
+        .column("myint")
+        .column("string")
+        .so_that("id".equals("test"));
+    let result_set = conn.query(query.into()).await.unwrap();
+    let row = result_set.into_iter().next().expect("query returned no results");
+    assert_eq!(row["myint"].as_i64().unwrap(), 1);
+    assert_eq!(row["string"].as_str().unwrap(), "test_string");
+
+    Ok(())
 }
 
 #[test_each_connector]
