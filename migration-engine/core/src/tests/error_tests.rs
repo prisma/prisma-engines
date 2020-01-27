@@ -2,7 +2,6 @@ use super::test_harness::*;
 use crate::{
     api::{render_error, RpcApi},
     cli,
-    commands::{ApplyMigrationCommand, ApplyMigrationInput, InferMigrationStepsCommand, InferMigrationStepsInput},
 };
 use migration_connector::steps::{DeleteModel, MigrationStep};
 use pretty_assertions::assert_eq;
@@ -337,15 +336,18 @@ async fn bad_datasource_url_and_provider_combinations_must_return_a_proper_error
 
 #[test_one_connector(connector = "postgres")]
 async fn command_errors_must_return_an_unknown_error(api: &TestApi) {
-    let input = ApplyMigrationInput {
-        migration_id: "the-migration".to_owned(),
-        steps: vec![MigrationStep::DeleteModel(DeleteModel {
-            model: "abcd".to_owned(),
-        })],
-        force: Some(true),
-    };
+    let steps = vec![MigrationStep::DeleteModel(DeleteModel {
+        model: "abcd".to_owned(),
+    })];
 
-    let error = api.execute_command::<ApplyMigrationCommand>(&input).await.unwrap_err();
+    let error = api
+        .apply()
+        .migration_id(Some("the-migration"))
+        .steps(Some(steps))
+        .force(Some(true))
+        .send_user_facing()
+        .await
+        .unwrap_err();
 
     let expected_error = user_facing_errors::Error::from(user_facing_errors::UnknownError {
         message: "Failure during a migration command: Generic error. (error: The model abcd does not exist in this Datamodel. It is not possible to delete it.)".to_owned(),
@@ -356,7 +358,7 @@ async fn command_errors_must_return_an_unknown_error(api: &TestApi) {
 }
 
 #[test_each_connector]
-async fn unique_constraint_errors_in_migrations_must_return_a_known_error(api: &TestApi) {
+async fn unique_constraint_errors_in_migrations_must_return_a_known_error(api: &TestApi) -> TestResult {
     use quaint::ast::*;
 
     let dm = r#"
@@ -382,26 +384,21 @@ async fn unique_constraint_errors_in_migrations_must_return_a_known_error(api: &
         }
     "#;
 
-    let infer_migration_steps_input = InferMigrationStepsInput {
-        assume_to_be_applied: Some(vec![]),
-        assume_applied_migrations: None,
-        datamodel: dm2.to_owned(),
-        migration_id: "the-migration".to_owned(),
-    };
-
     let steps = api
-        .execute_command::<InferMigrationStepsCommand>(&infer_migration_steps_input)
-        .await
-        .unwrap()
+        .infer(dm2)
+        .migration_id(Some("the-migration"))
+        .send()
+        .await?
         .datamodel_steps;
 
-    let input = ApplyMigrationInput {
-        migration_id: "the-migration".to_owned(),
-        steps: steps,
-        force: Some(true),
-    };
-
-    let error = api.execute_command::<ApplyMigrationCommand>(&input).await.unwrap_err();
+    let error = api
+        .apply()
+        .steps(Some(steps))
+        .force(Some(true))
+        .migration_id(Some("the-migration"))
+        .send_user_facing()
+        .await
+        .unwrap_err();
 
     let json_error = serde_json::to_value(&error).unwrap();
 
@@ -421,6 +418,8 @@ async fn unique_constraint_errors_in_migrations_must_return_a_known_error(api: &
     });
 
     assert_eq!(json_error, expected_json);
+
+    Ok(())
 }
 
 #[test_one_connector(connector = "postgres")]

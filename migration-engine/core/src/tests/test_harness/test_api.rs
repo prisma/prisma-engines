@@ -110,27 +110,12 @@ impl TestApi {
         }
     }
 
-    pub async fn execute_command<'a, C>(&self, input: &'a C::Input) -> Result<C::Output, user_facing_errors::Error>
-    where
-        C: crate::commands::MigrationCommand,
-    {
-        self.api
-            .handle_command::<C>(input)
-            .await
-            .map_err(|err| self.api.render_error(err))
-    }
-
     pub fn infer<'a>(&'a self, dm: impl Into<String>) -> Infer<'a> {
         Infer::new(&self.api, dm)
     }
 
     pub(crate) fn apply<'a>(&'a self) -> Apply<'a> {
-        Apply {
-            api: &self.api,
-            migration_id: None,
-            steps: None,
-            force: None,
-        }
+        Apply::new(&self.api)
     }
 
     pub(crate) fn unapply_migration<'a>(&'a self) -> UnapplyMigration<'a> {
