@@ -152,13 +152,7 @@ fn serialize_objects(mut result: RecordSelection, typ: ObjectTypeStrongRef) -> C
     let model = result.model_id.model();
     let field_names: Vec<_> = scalar_db_field_names
         .iter()
-        .map(|f| {
-            model
-                .map_scalar_db_field_name(f)
-                .expect(&format!("Can't resolve db name {} on model {}", f, model.name))
-                .name
-                .clone()
-        })
+        .filter_map(|f| model.map_scalar_db_field_name(f).map(|x| x.name.clone()))
         .collect();
 
     // Write all fields, nested and list fields unordered into a map, afterwards order all into the final order.
@@ -216,7 +210,7 @@ fn write_nested_items(
     enclosing_type: &ObjectTypeStrongRef,
 ) {
     items_with_parent.iter_mut().for_each(|(field_name, inner)| {
-        let val = inner.get(record_id);
+        let val = inner.get(dbg!(record_id));
 
         // The value must be a reference (or None - handle default), everything else is an error in the serialization logic.
         match val {

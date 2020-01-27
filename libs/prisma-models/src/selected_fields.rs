@@ -125,7 +125,7 @@ impl SelectedFields {
 
     pub fn names(&self) -> impl Iterator<Item = &str> {
         let scalar = self.scalar_fields().map(|f| f.name.as_str());
-        let relation = self.relation_inlined().map(|f| f.name.as_str());
+        let relation = self.relation_fields().map(|f| f.name.as_str());
 
         scalar.chain(relation)
     }
@@ -133,7 +133,7 @@ impl SelectedFields {
     pub fn db_names(&self) -> impl Iterator<Item = &str> {
         let scalar = self.scalar_fields().map(|f| f.data_source_field().name.as_str());
         let relation = self
-            .relation_inlined()
+            .relation_fields()
             .flat_map(|f| f.data_source_fields().into_iter().map(|dsf| dsf.name.as_str()));
 
         scalar.chain(relation)
@@ -141,9 +141,7 @@ impl SelectedFields {
 
     pub fn types<'a>(&'a self) -> impl Iterator<Item = (TypeIdentifier, FieldArity)> + 'a {
         let scalar = self.scalar_fields().map(|sf| sf.type_identifier_with_arity());
-        let relation = self
-            .relation_inlined()
-            .flat_map(|rf| rf.type_identifiers_with_arities());
+        let relation = self.relation_fields().flat_map(|rf| rf.type_identifiers_with_arities());
 
         scalar.chain(relation)
     }
@@ -156,23 +154,12 @@ impl SelectedFields {
             .expect("Expected at least one field to be present.")
     }
 
-    pub(super) fn relation_inlined(&self) -> impl Iterator<Item = &RelationFieldRef> {
-        self.relation.iter().map(|rf| &rf.field).filter(|rf| {
-            let relation = rf.relation();
-            let is_inline = relation.is_inline_relation();
-            let is_self = relation.is_self_relation();
-
-            let is_intable = relation
-                .inline_manifestation()
-                .map(|mf| mf.in_table_of_model_name == rf.model().name)
-                .unwrap_or(false);
-
-            (is_inline && is_self && rf.relation_side.is_b()) || (is_inline && !is_self && is_intable)
-        })
-    }
-
     pub(super) fn scalar_fields(&self) -> impl Iterator<Item = &ScalarFieldRef> {
         self.scalar.iter().map(|sf| &sf.field)
+    }
+
+    pub(super) fn relation_fields(&self) -> impl Iterator<Item = &RelationFieldRef> {
+        self.relation.iter().map(|rf| &rf.field)
     }
 
     pub fn contains(&self, name: &str) -> bool {

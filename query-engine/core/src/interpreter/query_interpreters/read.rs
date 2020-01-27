@@ -1,5 +1,5 @@
 use crate::{interpreter::InterpretationResult, query_ast::*, result_ast::*};
-use connector::{self, ConnectionLike, QueryArguments, ReadOperations};
+use connector::{self, filter::Filter, ConnectionLike, QueryArguments, ReadOperations, ScalarCompare};
 use futures::future::{BoxFuture, FutureExt};
 use prisma_models::{ManyRecords, RecordIdentifier};
 
@@ -93,41 +93,94 @@ fn read_related<'a, 'b>(
 ) -> BoxFuture<'a, InterpretationResult<QueryResult>> {
     let fut = async move {
         // The query construction must guarantee that the parent result
-        // contains the selected fields necessary to satisfy the relation query.
+        // contains the selected fields necessary to satisfy the relation query ("relation IDs").
         // There are 2 options:
         // - The query already has IDs set - use those.
         // - The IDs need to be extracted from the parent result.
-        // let relation_parent_ids = match query.relation_parent_ids {
-        //     Some(ref ids) => ids,
-        //     None => {
-        //         let relation_id = query.parent_field.identifier();
-        //         parent_result.identifiers(relation_id)?
-        //     }
-        // };
+        let relation_parent_ids = match query.relation_parent_ids {
+            Some(ids) => ids,
+            None => {
+                let relation_id = query.parent_field.linking_fields();
+                parent_result
+                    .expect("No parent results present in the query graph for reading related records.")
+                    .identifiers(&relation_id)?
+            }
+        };
+
+        let other_fields: Vec<_> = query
+            .parent_field
+            .related_field()
+            .linking_fields()
+            .fields()
+            .flat_map(|f| f.data_source_fields())
+            .collect();
+
+        let filters: Vec<Filter> = relation_parent_ids
+            .into_iter()
+            .map(|id| {
+                let filters = id
+                    .pairs
+                    .into_iter()
+                    .zip(other_fields.iter())
+                    .map(|((_, value), other_field)| other_field.equals(value))
+                    .collect();
+                Filter::and(filters)
+            })
+            .collect();
+
+        let filter = Filter::or(filters);
+        let mut args = query.args.clone();
+
+        args.filter = match args.filter {
+            Some(existing_filter) => Some(Filter::and(vec![existing_filter, filter])),
+            None => Some(filter),
+        };
 
         // let scalars = tx
         //     .get_related_records(
         //         &query.parent_field,
-        //         relation_parent_ids,
+        //         &relation_parent_ids,
         //         query.args.clone(),
         //         &query.selected_fields,
         //     )
         //     .await?;
 
-        // let model = query.parent_field.related_model();
-        // let model_id = model.identifier();
-        // let nested: Vec<QueryResult> = process_nested(tx, query.nested, Some(&scalars)).await?;
+        let mut scalars = tx
+            .get_many_records(&query.parent_field.related_model(), args, &query.selected_fields)
+            .await?;
 
-        // Ok(QueryResult::RecordSelection(RecordSelection {
-        //     name: query.name,
-        //     fields: query.selection_order,
-        //     query_arguments: query.args,
-        //     model_id,
-        //     scalars,
-        //     nested,
-        // }))
+        dbg!(&scalars);
 
-        todo!()
+        let parent_identifier = query.parent_field.model().primary_identifier();
+        let field_names = scalars.field_names.clone();
+        let child_link_fields = query.parent_field.related_field().linking_fields();
+
+        for record in scalars.records.iter_mut() {
+            let parent_id: RecordIdentifier = record.identifier(&field_names, &child_link_fields)?;
+            let parent_id = parent_id
+                .into_iter()
+                .zip(parent_identifier.data_source_fields())
+                .map(|((_, value), field)| (field, value))
+                .collect::<Vec<_>>()
+                .into();
+
+            record.parent_id = Some(parent_id);
+        }
+
+        dbg!(&scalars);
+
+        let model = query.parent_field.related_model();
+        let model_id = model.primary_identifier();
+        let nested: Vec<QueryResult> = process_nested(tx, query.nested, Some(&scalars)).await?;
+
+        Ok(QueryResult::RecordSelection(RecordSelection {
+            name: query.name,
+            fields: query.selection_order,
+            query_arguments: query.args,
+            model_id,
+            scalars,
+            nested,
+        }))
     };
 
     fut.boxed()

@@ -8,7 +8,7 @@ pub trait SelectedFieldsExt {
 impl SelectedFieldsExt for SelectedFields {
     fn columns<'a>(&'a self) -> Box<dyn Iterator<Item = Column<'static>> + 'a> {
         let scalar = self.scalar_fields().map(|f| f.as_column());
-        let relation = self.relation_inlined().flat_map(|rf| rf.as_columns());
+        let relation = self.relation_fields().flat_map(|rf| rf.as_columns());
 
         Box::new(scalar.chain(relation))
     }

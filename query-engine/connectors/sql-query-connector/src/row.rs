@@ -41,6 +41,7 @@ impl ToSqlRow for ResultRow {
                         .map(|p_value| row_value_to_prisma_value(p_value, type_identifier))
                         .collect::<crate::Result<Vec<_>>>()
                         .map(|vec| PrismaValue::List(vec)),
+
                     ParameterizedValue::Null => Ok(PrismaValue::List(Vec::new())),
                     _ => {
                         let error = io::Error::new(

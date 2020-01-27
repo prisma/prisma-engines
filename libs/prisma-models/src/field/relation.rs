@@ -1,6 +1,6 @@
 use super::DataSourceField;
 use crate::prelude::*;
-use datamodel::FieldArity;
+use datamodel::{FieldArity, RelationInfo};
 use once_cell::sync::OnceCell;
 use std::{
     hash::{Hash, Hasher},
@@ -20,9 +20,10 @@ pub struct RelationFieldTemplate {
     pub relation_name: String,
     pub relation_side: RelationSide,
     pub data_source_fields: Vec<dml::DataSourceField>,
+    pub relation_info: RelationInfo,
 }
 
-#[derive(DebugStub)]
+#[derive(DebugStub, Clone)]
 pub struct RelationField {
     pub name: String,
     pub is_required: bool,
@@ -32,6 +33,7 @@ pub struct RelationField {
     pub relation_side: RelationSide,
     pub relation: OnceCell<RelationWeakRef>,
     pub data_source_fields: OnceCell<Vec<DataSourceFieldRef>>,
+    pub relation_info: RelationInfo,
 
     #[debug_stub = "#ModelWeakRef#"]
     pub model: ModelWeakRef,
@@ -103,6 +105,7 @@ impl RelationFieldTemplate {
             model,
             relation: OnceCell::new(),
             data_source_fields: OnceCell::new(),
+            relation_info: self.relation_info,
         };
 
         let arc = Arc::new(relation);
@@ -120,8 +123,34 @@ impl RelationFieldTemplate {
 impl RelationField {
     /// Returns the `ModelIdentifier` used for this relation fields model.
     ///
-    pub fn identifier(&self) -> ModelIdentifier {
-        todo!()
+    /// ## What is the model identifier of a relation field?
+    /// The set of fields required by the relation (on the model of the relation field) to be able to link the related records.
+    /// Tbd examples
+    pub fn linking_fields(&self) -> ModelIdentifier {
+        if self.relation_info.to_fields.is_empty() {
+            let related_field = self.related_field();
+            let model = self.model();
+            let fields = model.fields();
+
+            let to_fields: Vec<_> = related_field
+                .relation_info
+                .to_fields
+                .iter()
+                .map(|field_name| {
+                    fields
+                        .find_from_all(field_name)
+                        .expect(&format!(
+                            "Invalid data model: To field {} can't be resolved on model {}",
+                            field_name, model.name
+                        ))
+                        .clone()
+                })
+                .collect();
+
+            ModelIdentifier::new(to_fields)
+        } else {
+            ModelIdentifier::new(vec![Arc::new(self.clone()).into()])
+        }
     }
 
     pub fn is_optional(&self) -> bool {

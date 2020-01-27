@@ -60,8 +60,8 @@ impl<'a> DatamodelConverter<'a> {
     fn convert_fields(&self, model: &dml::Model) -> Vec<FieldTemplate> {
         model
             .fields()
-            .map(|field| match field.type_identifier() {
-                TypeIdentifier::Relation => {
+            .map(|field| match field.field_type {
+                dml::FieldType::Relation(ref ri) => {
                     let relation = self
                         .relations
                         .iter()
@@ -82,6 +82,7 @@ impl<'a> DatamodelConverter<'a> {
                         data_source_fields: field.data_source_fields.clone(),
                         relation_name: relation.name(),
                         relation_side: relation.relation_side(field),
+                        relation_info: ri.clone(),
                     })
                 }
                 _ => FieldTemplate::Scalar(ScalarFieldTemplate {

@@ -117,9 +117,8 @@ pub fn merge_inlined_relation_fields(
 
     for nested in nested_queries {
         if let ReadQuery::RelatedRecordsQuery(ref rq) = nested {
-            let field = rq.parent_field.related_field();
-            if field.is_inlined_in_enclosing_model() {
-                selected_fields.add_relation(field);
+            if rq.parent_field.is_inlined_in_enclosing_model() {
+                selected_fields.add_relation(rq.parent_field.clone());
             }
         }
     }

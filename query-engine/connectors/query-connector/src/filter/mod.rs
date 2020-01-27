@@ -134,6 +134,7 @@ pub fn test_data_model() -> InternalDataModelRef {
             relation_name: "bar".to_owned(),
             relation_side: RelationSide::A,
             data_source_fields: vec![],
+            relation_info: dml::RelationInfo::new(""),
         }),
     ];
 

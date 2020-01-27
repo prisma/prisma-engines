@@ -68,7 +68,7 @@ where
     // Q: Additionally: field names contains always both, isn't that breaking the above assumption?
     let mut idents: Vec<_> = selected_fields.types().collect();
     idents.extend(from_field.related_field().type_identifiers_with_arities());
-    idents.extend(from_field.type_identifiers_with_arities());
+    idents.extend(from_field.linking_fields().type_identifiers_with_arities());
 
     let mut field_names: Vec<String> = selected_fields
         .db_names()
@@ -120,11 +120,12 @@ where
         .await?
         .into_iter()
         .map(|mut row| {
+            dbg!(&row);
             let relation_cols = from_field.relation_columns(true);
             let mut parent_ids: Vec<(DataSourceFieldRef, PrismaValue)> = Vec::with_capacity(relation_cols.len());
 
             // Todo: This doesn't work with @relation(references ...), it assumes primary ids.
-            for field in from_field.related_model().primary_identifier().fields() {
+            for field in from_field.linking_fields().fields() {
                 match field {
                     Field::Scalar(sf) => {
                         let val = row.values.pop().ok_or(SqlError::ColumnDoesNotExist)?;

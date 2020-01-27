@@ -1,4 +1,4 @@
-use crate::{DataSourceFieldRef, DomainError, Field, ModelRef, PrismaValue};
+use crate::{DataSourceFieldRef, DomainError, Field, ModelRef, PrismaValue, TypeIdentifier, dml::FieldArity};
 
 // Collection of fields that uniquely identify a record of a model.
 // There can be different sets of fields at the same time identifying a model.
@@ -58,6 +58,12 @@ impl ModelIdentifier {
             Field::Relation(rf) => rf.data_source_fields().iter().find(|dsf| dsf.name == name),
             _ => None,
         })
+    }
+
+    pub fn type_identifiers_with_arities(&self) -> Vec<(TypeIdentifier, FieldArity)> {
+        self.data_source_fields()
+            .map(|dsf| (dsf.field_type.into(), dsf.arity))
+            .collect()
     }
 }
 
