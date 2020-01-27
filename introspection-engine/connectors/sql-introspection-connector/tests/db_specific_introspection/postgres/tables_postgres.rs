@@ -229,3 +229,34 @@ async fn introspecting_a_table_with_a_multi_column_non_unique_index_should_work(
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
+
+#[test_one_connector(connector = "postgres")]
+async fn introspecting_a_table_enums_should_work(api: &TestApi) {
+    let sql = format!("CREATE Type Color as ENUM ( 'black', 'white')");
+
+    api.database().execute_raw(&sql, &[]).await.unwrap();
+
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("Book", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom("color  Color Not Null")
+            });
+        })
+        .await;
+
+    let dm = r#"
+        model Book {
+            color   Color
+            id      Int     @default(autoincrement()) @id 
+        }
+        
+        enum Color{
+            black
+            white
+        }
+    "#;
+
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}
