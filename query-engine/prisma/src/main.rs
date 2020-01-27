@@ -95,7 +95,7 @@ pub struct PrismaOpt {
     #[structopt(long, default_value = "127.0.0.1")]
     host: String,
     /// The port the query engine should bind to.
-    #[structopt(long, short, default_value = "4466")]
+    #[structopt(long, short, env = "PORT", default_value = "4466")]
     port: u16,
     /// Switches query schema generation to Prisma 1 compatible mode.
     #[structopt(long)]
