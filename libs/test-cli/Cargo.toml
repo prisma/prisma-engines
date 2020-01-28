@@ -1,0 +1,15 @@
+[package]
+name = "test-cli"
+version = "0.1.0"
+authors = ["Tom Houlé <tom@tomhoule.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+anyhow = "1.0.26"
+colored = "1.9.2"
+structopt = "0.3.8"
+migration-core = { path = "../../migration-engine/core" }
+tokio = "0.2.9"
+serde_json = "1.0.44"
