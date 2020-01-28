@@ -35,9 +35,7 @@ features = ["macros"]
 [dev-dependencies]
 pretty_assertions = "0.6.1"
 test-setup = { path = "../../libs/test-setup" }
-url = "2.1.0"
-
-
+url = "2.1"
 
 [[bin]]
 name = "introspection-engine"

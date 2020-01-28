@@ -25,5 +25,5 @@ futures = "0.3"
 async-std = { version = "0.99", features = ["unstable"] }
 async-trait = "0.1"
 crossbeam-queue = "0.2"
-rust_decimal = "1.1"
+rust_decimal = "1.2"
 user-facing-errors = { path = "../../libs/user-facing-errors" }
