@@ -67,7 +67,7 @@ async fn calculate_database_steps_with_steps_to_apply_in_assume_to_be_applied_wo
     let output = {
         let dm1 = r#"
             type CUID = String @id @default(cuid())
-    
+
             model User {
                 id CUID
             }
@@ -85,7 +85,7 @@ async fn calculate_database_steps_with_steps_to_apply_in_assume_to_be_applied_wo
     let output_2 = {
         let dm1 = r#"
             type CUID = String @id @default(cuid())
-    
+
             model User {
                 id CUID
             }
@@ -107,12 +107,12 @@ async fn calculate_database_steps_with_steps_to_apply_in_assume_to_be_applied_wo
     {
         let dm2 = r#"
                 type CUID = String @id @default(cuid())
-    
+
                 model User {
                     id CUID
                     name String @default("maggie smith")
                 }
-    
+
                 model Cat {
                     id CUID
                     age Int
@@ -134,6 +134,28 @@ async fn calculate_database_steps_with_steps_to_apply_in_assume_to_be_applied_wo
             .await?
             .assert_green()?;
     }
+
+    Ok(())
+}
+
+#[test_each_connector]
+async fn calculate_database_steps_without_assume_to_be_applied_works(api: &TestApi) -> TestResult {
+    let dm = r#"
+        type CUID = String @id @default(cuid())
+
+        model User {
+            id CUID
+        }
+    "#;
+
+    let inferred_steps = api.infer(dm).send().await?;
+
+    api.calculate_database_steps()
+        .assume_to_be_applied(Some(Vec::new()))
+        .steps_to_apply(Some(inferred_steps.datamodel_steps))
+        .send_assert()
+        .await?
+        .assert_green()?;
 
     Ok(())
 }

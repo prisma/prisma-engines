@@ -83,7 +83,7 @@ impl CalculateDatabaseStepsCommand<'_> {
                 let steps_to_apply = &self.input.steps_to_apply;
 
                 if steps_to_apply.len() >= all_steps.len() {
-                    return steps_to_apply;
+                    return all_steps;
                 }
 
                 let start_idx = all_steps.len() - (steps_to_apply.len());
