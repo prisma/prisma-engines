@@ -1,13 +1,11 @@
-//! This library API is meant for the `test-cli` binary only.
+//! This library API is meant for the `test-cli` binary and migration-engine-tests only.
 
-#![allow(unused)]
-
-mod api;
-mod cli;
-mod commands;
-mod error;
-mod migration;
-mod migration_engine;
+pub mod api;
+pub mod cli;
+pub mod commands;
+pub mod error;
+pub mod migration;
+pub mod migration_engine;
 
 pub use api::GenericApi;
 pub use commands::{ApplyMigrationInput, InferMigrationStepsInput, MigrationStepsResultOutput};

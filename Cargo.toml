@@ -6,6 +6,7 @@ members = [
   "migration-engine/connectors/migration-connector",
   "migration-engine/connectors/sql-migration-connector",
   "migration-engine/core",
+  "migration-engine/migration-engine-tests",
   "query-engine/connectors/query-connector",
   "query-engine/connectors/sql-query-connector",
   "query-engine/core",
