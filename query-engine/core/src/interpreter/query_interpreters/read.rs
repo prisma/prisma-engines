@@ -116,6 +116,7 @@ fn read_related<'a, 'b>(
             .collect();
 
         let filters: Vec<Filter> = relation_parent_ids
+            .clone()
             .into_iter()
             .map(|id| {
                 let filters = id
@@ -136,35 +137,69 @@ fn read_related<'a, 'b>(
             None => Some(filter),
         };
 
-        // let scalars = tx
-        //     .get_related_records(
-        //         &query.parent_field,
-        //         &relation_parent_ids,
-        //         query.args.clone(),
-        //         &query.selected_fields,
-        //     )
-        //     .await?;
-
         let mut scalars = tx
             .get_many_records(&query.parent_field.related_model(), args, &query.selected_fields)
             .await?;
 
         dbg!(&scalars);
 
-        let parent_identifier = query.parent_field.model().primary_identifier();
-        let field_names = scalars.field_names.clone();
-        let child_link_fields = query.parent_field.related_field().linking_fields();
+        // Write parent IDs into the retrieved records
+        if parent_result.is_some() && query.parent_field.is_inlined_in_enclosing_model() {
+            let parent_identifier = query.parent_field.model().primary_identifier();
+            let field_names = scalars.field_names.clone();
 
-        for record in scalars.records.iter_mut() {
-            let parent_id: RecordIdentifier = record.identifier(&field_names, &child_link_fields)?;
-            let parent_id = parent_id
-                .into_iter()
-                .zip(parent_identifier.data_source_fields())
-                .map(|((_, value), field)| (field, value))
-                .collect::<Vec<_>>()
-                .into();
+            let parent_link_fields = query.parent_field.linking_fields();
+            let child_link_fields = query.parent_field.related_field().linking_fields();
 
-            record.parent_id = Some(parent_id);
+            let parent_result =
+                parent_result.expect("No parent results present in the query graph for reading related records.");
+
+            let parent_fields = &parent_result.field_names;
+            let mut additional_records = vec![];
+
+            for mut record in scalars.records.iter_mut() {
+                let child_link: RecordIdentifier = record.identifier(&field_names, &child_link_fields)?;
+
+                let mut parent_records = parent_result.records.iter().filter(|record| {
+                    let parent_link = record.identifier(parent_fields, &parent_link_fields).unwrap();
+
+                    child_link.values().eq(parent_link.values())
+                });
+
+                let parent_id = parent_records
+                    .next()
+                    .unwrap()
+                    .identifier(parent_fields, &parent_identifier)
+                    .unwrap();
+
+                record.parent_id = Some(parent_id);
+
+                for p_record in parent_records {
+                    let parent_id = p_record.identifier(parent_fields, &parent_identifier).unwrap();
+                    let mut record = record.clone();
+
+                    record.parent_id = Some(parent_id);
+                    additional_records.push(record);
+                }
+            }
+
+            scalars.records.extend(additional_records);
+        } else if parent_result.is_some() && query.parent_field.related_field().is_inlined_in_enclosing_model() {
+            let parent_identifier = query.parent_field.model().primary_identifier();
+            let field_names = scalars.field_names.clone();
+            let child_link_fields = query.parent_field.related_field().linking_fields();
+
+            for record in scalars.records.iter_mut() {
+                let parent_id: RecordIdentifier = record.identifier(&field_names, &child_link_fields)?;
+                let parent_id = parent_id
+                    .into_iter()
+                    .zip(parent_identifier.data_source_fields())
+                    .map(|((_, value), field)| (field, value))
+                    .collect::<Vec<_>>()
+                    .into();
+
+                record.parent_id = Some(parent_id);
+            }
         }
 
         dbg!(&scalars);
