@@ -120,7 +120,6 @@ where
         .await?
         .into_iter()
         .map(|mut row| {
-            dbg!(&row);
             let relation_cols = from_field.relation_columns(true);
             let mut parent_ids: Vec<(DataSourceFieldRef, PrismaValue)> = Vec::with_capacity(relation_cols.len());
 

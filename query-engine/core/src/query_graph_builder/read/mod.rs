@@ -110,14 +110,14 @@ pub fn merge_inlined_relation_fields(
     parent_relation.map(|rf| {
         let field = rf.related_field();
 
-        if field.is_inlined_in_enclosing_model() {
+        if field.is_inlined_on_enclosing_model() {
             selected_fields.add_relation(field);
         }
     });
 
     for nested in nested_queries {
         if let ReadQuery::RelatedRecordsQuery(ref rq) = nested {
-            if rq.parent_field.is_inlined_in_enclosing_model() {
+            if rq.parent_field.is_inlined_on_enclosing_model() {
                 selected_fields.add_relation(rq.parent_field.clone());
             }
         }

@@ -327,3 +327,13 @@ pub fn insert_deletion_checks(
 
     Ok(())
 }
+
+pub fn insert_node_reload(
+    graph: &mut QueryGraph,
+    parent_relation_field: &RelationFieldRef,
+    parent_node: NodeRef,
+) -> QueryGraphBuilderResult<NodeRef> {
+    // Check if the parent node returns the set of fields required to satisfy the relation
+
+    todo!()
+}

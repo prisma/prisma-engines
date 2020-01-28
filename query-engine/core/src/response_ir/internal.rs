@@ -210,7 +210,7 @@ fn write_nested_items(
     enclosing_type: &ObjectTypeStrongRef,
 ) {
     items_with_parent.iter_mut().for_each(|(field_name, inner)| {
-        let val = inner.get(dbg!(record_id));
+        let val = inner.get(record_id);
 
         // The value must be a reference (or None - handle default), everything else is an error in the serialization logic.
         match val {

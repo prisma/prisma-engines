@@ -141,10 +141,8 @@ fn read_related<'a, 'b>(
             .get_many_records(&query.parent_field.related_model(), args, &query.selected_fields)
             .await?;
 
-        dbg!(&scalars);
-
         // Write parent IDs into the retrieved records
-        if parent_result.is_some() && query.parent_field.is_inlined_in_enclosing_model() {
+        if parent_result.is_some() && query.parent_field.is_inlined_on_enclosing_model() {
             let parent_identifier = query.parent_field.model().primary_identifier();
             let field_names = scalars.field_names.clone();
 
@@ -184,7 +182,7 @@ fn read_related<'a, 'b>(
             }
 
             scalars.records.extend(additional_records);
-        } else if parent_result.is_some() && query.parent_field.related_field().is_inlined_in_enclosing_model() {
+        } else if parent_result.is_some() && query.parent_field.related_field().is_inlined_on_enclosing_model() {
             let parent_identifier = query.parent_field.model().primary_identifier();
             let field_names = scalars.field_names.clone();
             let child_link_fields = query.parent_field.related_field().linking_fields();
@@ -201,8 +199,6 @@ fn read_related<'a, 'b>(
                 record.parent_id = Some(parent_id);
             }
         }
-
-        dbg!(&scalars);
 
         let model = query.parent_field.related_model();
         let model_id = model.primary_identifier();

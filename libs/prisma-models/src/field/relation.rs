@@ -180,7 +180,7 @@ impl RelationField {
     }
 
     /// Alias for more clarity.
-    pub fn is_inlined_in_enclosing_model(&self) -> bool {
+    pub fn is_inlined_on_enclosing_model(&self) -> bool {
         self.relation_is_inlined_in_parent()
     }
 
