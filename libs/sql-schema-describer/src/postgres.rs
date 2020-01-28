@@ -489,7 +489,8 @@ impl SqlSchemaDescriber {
             FROM pg_type t
             JOIN pg_enum e ON t.oid = e.enumtypid
             JOIN pg_catalog.pg_namespace n ON n.oid = t.typnamespace
-            WHERE n.nspname = $1";
+            WHERE n.nspname = $1
+            ORDER BY name, value";
         let rows = self
             .conn
             .query_raw(&sql, &[schema.into()])
