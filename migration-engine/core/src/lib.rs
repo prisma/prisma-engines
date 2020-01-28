@@ -1,7 +1,6 @@
 //! This library API is meant for the `test-cli` binary and migration-engine-tests only.
 
 pub mod api;
-pub mod cli;
 pub mod commands;
 pub mod error;
 pub mod migration;
@@ -25,6 +24,7 @@ pub async fn migration_api(datamodel: &str) -> CoreResult<Box<dyn api::GenericAp
     })?;
 
     let connector = match source.connector_type() {
+        #[cfg(feature = "sql")]
         provider if [MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME].contains(&provider) => {
             sql_migration_connector::SqlMigrationConnector::new(&source.url().value, provider).await?
         }
