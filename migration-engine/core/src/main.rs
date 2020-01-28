@@ -10,8 +10,6 @@ use commands::*;
 use datamodel::{self, Datamodel};
 use futures::FutureExt;
 use std::{fs, io::Read};
-#[cfg(test)]
-mod tests;
 
 pub use error::Error;
 pub use migration_engine::*;
