@@ -372,7 +372,7 @@ VALUES (1, 'Joe', 27, 20000.00 );
     async fn should_map_nonexisting_database_error() {
         let mut url = Url::parse(&CONN_STR).unwrap();
         url.set_username("root").unwrap();
-        url.set_path("this_does_not_exist");
+        url.set_path("/this_does_not_exist");
 
         let url = url.as_str().to_string();
         let conn = Quaint::new(&url).await.unwrap();

@@ -572,7 +572,7 @@ mod tests {
     #[tokio::test]
     async fn should_map_nonexisting_database_error() {
         let mut url = Url::parse(&CONN_STR).unwrap();
-        url.set_path("this_does_not_exist");
+        url.set_path("/this_does_not_exist");
 
         let res = Quaint::new(url.as_str()).await;
 
