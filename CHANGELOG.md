@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.1.11
+
+- Update mobc to 0.5, do not check connection status on check-out
+
 ## v0.1.10
 
 - Make socket timeouts optional
