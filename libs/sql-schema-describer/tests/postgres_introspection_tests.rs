@@ -714,7 +714,7 @@ async fn postgres_enums_must_work() {
     let schema = inspector.describe(SCHEMA).await.expect("describing");
     let got_enum = schema.get_enum("mood").expect("get enum");
 
-    let values: Vec<String> = ["happy".into(), "ok".into(), "sad".into()].iter().cloned().collect();
+    let values: Vec<String> = vec!["happy".into(), "ok".into(), "sad".into()];
     assert_eq!(
         got_enum,
         &Enum {

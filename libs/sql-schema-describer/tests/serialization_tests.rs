@@ -17,9 +17,7 @@ const SCHEMA: &str = "DatabaseInspectorTest";
 
 #[test]
 fn database_schema_is_serializable() {
-    let mut enum_values = vec![];
-    enum_values.push("option1".to_string());
-    enum_values.push("option2".to_string());
+    let mut enum_values = vec!["option1".to_string(), "option2".to_string()];
     let schema = SqlSchema {
         tables: vec![
             Table {

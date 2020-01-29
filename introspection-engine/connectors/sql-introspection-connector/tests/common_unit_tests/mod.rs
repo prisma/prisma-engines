@@ -1059,9 +1059,7 @@ fn enums_are_preserved_when_generating_data_model_from_a_schema() {
         }],
     };
 
-    let mut enum_values = vec![];
-    enum_values.push("a".to_string());
-    enum_values.push("b".to_string());
+    let enum_values = vec!["a".to_string(), "b".to_string()];
     let schema = SqlSchema {
         tables: vec![],
         enums: vec![Enum {
