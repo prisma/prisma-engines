@@ -3,6 +3,7 @@ members = [
   "introspection-engine/core",
   "introspection-engine/connectors/introspection-connector",
   "introspection-engine/connectors/sql-introspection-connector",
+  "migration-engine/cli",
   "migration-engine/connectors/migration-connector",
   "migration-engine/connectors/sql-migration-connector",
   "migration-engine/core",

@@ -5,7 +5,6 @@ mod rpc;
 
 #[cfg(test)]
 mod tests;
-use json_rpc_stdio::ServerBuilder;
 use jsonrpc_core::*;
 use rpc::{Rpc, RpcImpl};
 
@@ -22,8 +21,7 @@ async fn main() {
         let mut io_handler = IoHandler::new();
         io_handler.extend_with(RpcImpl::new().to_delegate());
 
-        let server = ServerBuilder::new(io_handler);
-        server.run().await.unwrap();
+        json_rpc_stdio::run(io_handler).await.unwrap();
     }
 }
 

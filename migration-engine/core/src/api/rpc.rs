@@ -2,7 +2,6 @@ use super::{GenericApi, MigrationApi};
 use crate::{commands::*, CoreResult};
 use datamodel::configuration::{MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME};
 use futures::{FutureExt, TryFutureExt};
-use json_rpc_stdio::ServerBuilder;
 use jsonrpc_core::types::error::Error as JsonRpcError;
 use jsonrpc_core::{IoHandler, Params};
 use sql_migration_connector::SqlMigrationConnector;
@@ -81,7 +80,7 @@ impl RpcApi {
 
     /// Block the thread and handle IO in async until EOF.
     pub async fn start_server(self) -> std::io::Result<()> {
-        ServerBuilder::new(self.io_handler).run().await
+        json_rpc_stdio::run(self.io_handler).await
     }
 
     /// Handle one request
