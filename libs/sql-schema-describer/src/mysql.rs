@@ -32,13 +32,16 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
 
         let mut tables = Vec::with_capacity(table_names.len());
 
+        let mut enums = vec![];
         for table_name in &table_names {
-            tables.push(self.get_table(schema, table_name).await);
+            let (table, enms) = self.get_table(schema, table_name).await;
+            tables.push(table);
+            enums.extend(enms.iter().cloned());
         }
 
         Ok(SqlSchema {
             tables,
-            enums: vec![],
+            enums,
             sequences: vec![],
         })
     }
@@ -108,21 +111,25 @@ impl SqlSchemaDescriber {
         size.parse().unwrap()
     }
 
-    async fn get_table(&self, schema: &str, name: &str) -> Table {
+    async fn get_table(&self, schema: &str, name: &str) -> (Table, Vec<Enum>) {
         debug!("Getting table '{}'", name);
-        let columns = self.get_columns(schema, name).await;
+        let (columns, enums) = self.get_columns(schema, name).await;
+
         let foreign_keys = self.get_foreign_keys(schema, name).await;
         let (indices, primary_key) = self.get_indices(schema, name).await;
-        Table {
-            name: name.to_string(),
-            columns,
-            foreign_keys,
-            indices,
-            primary_key,
-        }
+        (
+            Table {
+                name: name.to_string(),
+                columns,
+                foreign_keys,
+                indices,
+                primary_key,
+            },
+            enums,
+        )
     }
 
-    async fn get_columns(&self, schema: &str, table: &str) -> Vec<Column> {
+    async fn get_columns(&self, schema: &str, table: &str) -> (Vec<Column>, Vec<Enum>) {
         // We alias all the columns because MySQL column names are case-insensitive in queries, but the
         // information schema column names became upper-case in MySQL 8, causing the code fetching
         // the result values by column name below to fail.
@@ -137,11 +144,17 @@ impl SqlSchemaDescriber {
             .query_raw(sql, &[schema.into(), table.into()])
             .await
             .expect("querying for columns");
+
+        let mut enums = vec![];
         let cols = rows
             .into_iter()
             .map(|col| {
                 debug!("Got column: {:?}", col);
 
+                let name = col
+                    .get("column_name")
+                    .and_then(|x| x.to_string())
+                    .expect("get column name");
                 let data_type = col.get("data_type").and_then(|x| x.to_string()).expect("get data_type");
                 let full_data_type = col
                     .get("full_data_type")
@@ -162,7 +175,8 @@ impl SqlSchemaDescriber {
                 } else {
                     ColumnArity::Nullable
                 };
-                let tpe = get_column_type(&data_type, &full_data_type, arity);
+                let (tpe, enum_option) =
+                    get_column_type_and_enum(&table, name.clone(), &data_type, &full_data_type, arity);
                 let extra = col
                     .get("extra")
                     .and_then(|x| x.to_string())
@@ -172,24 +186,27 @@ impl SqlSchemaDescriber {
                     "auto_increment" => true,
                     _ => false,
                 };
+
+                if let Some(enm) = enum_option {
+                    enums.push(enm);
+                }
+
                 Column {
-                    name: col
-                        .get("column_name")
-                        .and_then(|x| x.to_string())
-                        .expect("get column name"),
+                    name,
                     tpe,
                     default: col
                         .get("column_default")
                         .and_then(|x| x.as_str())
                         .and_then(sanitize_default_value)
                         .map(String::from),
-                    auto_increment: auto_increment,
+                    auto_increment,
                 }
             })
             .collect();
 
         debug!("Found table columns: {:?}", cols);
-        cols
+        debug!("Found table enums: {:?}", enums);
+        (cols, enums)
     }
 
     async fn get_foreign_keys(&self, schema: &str, table: &str) -> Vec<ForeignKey> {
@@ -392,7 +409,13 @@ impl SqlSchemaDescriber {
     }
 }
 
-fn get_column_type(data_type: &str, full_data_type: &str, arity: ColumnArity) -> ColumnType {
+fn get_column_type_and_enum(
+    table: &str,
+    column_name: String,
+    data_type: &str,
+    full_data_type: &str,
+    arity: ColumnArity,
+) -> (ColumnType, Option<Enum>) {
     let family = match (data_type, full_data_type) {
         ("int", _) => ColumnTypeFamily::Int,
         ("smallint", _) => ColumnTypeFamily::Int,
@@ -416,7 +439,7 @@ fn get_column_type(data_type: &str, full_data_type: &str, arity: ColumnArity) ->
         ("mediumtext", _) => ColumnTypeFamily::String,
         ("longtext", _) => ColumnTypeFamily::String,
         // XXX: Is this correct?
-        ("enum", _) => ColumnTypeFamily::String,
+        ("enum", _) => ColumnTypeFamily::Enum(format!("{}_{}", table, column_name)),
         ("set", _) => ColumnTypeFamily::String,
         ("binary", _) => ColumnTypeFamily::Binary,
         ("varbinary", _) => ColumnTypeFamily::Binary,
@@ -435,10 +458,25 @@ fn get_column_type(data_type: &str, full_data_type: &str, arity: ColumnArity) ->
         ("json", _) => ColumnTypeFamily::Json,
         _ => ColumnTypeFamily::Unknown,
     };
-    ColumnType {
+    println!("{}", data_type);
+    println!("{}", full_data_type);
+
+    let tpe = ColumnType {
         raw: data_type.to_string(),
-        family: family,
+        family: family.clone(),
         arity,
+    };
+
+    //todo values
+    match &family {
+        ColumnTypeFamily::Enum(name) => (
+            tpe,
+            Some(Enum {
+                name: name.clone(),
+                values: vec![],
+            }),
+        ),
+        _ => (tpe, None),
     }
 }
 
