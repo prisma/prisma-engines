@@ -101,6 +101,7 @@ impl FieldTemplate {
                     type_identifier: st.type_identifier,
                     is_required: st.is_required,
                     is_list: st.is_list,
+                    is_id: st.is_id,
                     is_auto_generated_int_id: st.is_auto_generated_int_id,
                     is_unique: st.is_unique,
                     manifestation: st.manifestation,

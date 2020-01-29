@@ -38,15 +38,6 @@ impl FieldType {
     }
 }
 
-/// Holds information about an id, or priamry key.
-#[derive(Debug, PartialEq, Clone)]
-pub struct IdInfo {
-    /// The strategy which is used to generate the id field.
-    pub strategy: IdStrategy,
-    /// A sequence used to generate the id.
-    pub sequence: Option<Sequence>,
-}
-
 /// Represents a field in a model.
 #[derive(Debug, PartialEq, Clone)]
 pub struct Field {
@@ -64,7 +55,7 @@ pub struct Field {
     pub is_unique: bool,
     /// If set, signals that this field is an id field, or
     /// primary key.
-    pub id_info: Option<IdInfo>,
+    pub is_id: bool,
     /// Comments associated with this field.
     pub documentation: Option<String>,
     /// If set, signals that this field was internally generated
@@ -128,7 +119,7 @@ impl Field {
             database_names: Vec::new(),
             default_value: None,
             is_unique: false,
-            id_info: None,
+            is_id: false,
             documentation: None,
             is_generated: false,
             is_updated_at: false,
@@ -143,7 +134,7 @@ impl Field {
             database_names: Vec::new(),
             default_value: None,
             is_unique: false,
-            id_info: None,
+            is_id: false,
             documentation: None,
             is_generated: true,
             is_updated_at: false,

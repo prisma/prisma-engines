@@ -12,26 +12,11 @@ impl DirectiveValidator<dml::Field> for IdDirectiveValidator {
 
     // TODO In which form is this still required or needs to change? Default values are handling the id strategy now.
     fn validate_and_apply(&self, args: &mut Args, obj: &mut dml::Field) -> Result<(), DatamodelError> {
-        let strategy = match (&obj.field_type, &obj.default_value) {
-            (dml::FieldType::Base(dml::ScalarType::Int, _), Some(dml::DefaultValue::Expression(_))) => {
-                dml::IdStrategy::Auto
-            }
-            (dml::FieldType::Base(dml::ScalarType::String, _), Some(dml::DefaultValue::Expression(_))) => {
-                dml::IdStrategy::Auto
-            }
-            _ => dml::IdStrategy::None,
-        };
-
-        let id_info = dml::IdInfo {
-            strategy,
-            sequence: None,
-        };
-
         if obj.arity != dml::FieldArity::Required {
             return self.new_directive_validation_error("Fields that are marked as id must be required.", args.span());
         }
 
-        obj.id_info = Some(id_info);
+        obj.is_id = true;
 
         Ok(())
     }
@@ -41,7 +26,7 @@ impl DirectiveValidator<dml::Field> for IdDirectiveValidator {
         field: &dml::Field,
         _datamodel: &dml::Datamodel,
     ) -> Result<Vec<ast::Directive>, DatamodelError> {
-        if let Some(_) = &field.id_info {
+        if field.is_id {
             return Ok(vec![ast::Directive::new(self.directive_name(), Vec::new())]);
         }
 

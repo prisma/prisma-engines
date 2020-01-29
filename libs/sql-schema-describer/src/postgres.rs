@@ -4,7 +4,7 @@ use log::debug;
 use once_cell::sync::Lazy;
 use quaint::prelude::Queryable;
 use regex::Regex;
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 use std::convert::TryInto;
 use std::sync::Arc;
 
@@ -495,22 +495,23 @@ impl SqlSchemaDescriber {
             .query_raw(&sql, &[schema.into()])
             .await
             .expect("querying for enums");
-        let mut enum_values: HashMap<String, HashSet<String>> = HashMap::new();
+        let mut enum_values: HashMap<String, Vec<String>> = HashMap::new();
         for row in rows.into_iter() {
             debug!("Got enum row: {:?}", row);
             let name = row.get("name").and_then(|x| x.to_string()).expect("get name");
             let value = row.get("value").and_then(|x| x.to_string()).expect("get value");
-            if !enum_values.contains_key(&name) {
-                enum_values.insert(name.clone(), HashSet::new());
-            }
-            let vals = enum_values.get_mut(&name).expect("get enum values");
-            vals.insert(value);
+
+            let values = enum_values.entry(name).or_insert(vec![]);
+            values.push(value);
         }
 
-        let enums: Vec<Enum> = enum_values
+        let mut enums: Vec<Enum> = enum_values
             .into_iter()
             .map(|(k, v)| Enum { name: k, values: v })
             .collect();
+
+        enums.sort_by(|a, b| Ord::cmp(&a.name, &b.name));
+
         debug!("Found enums: {:?}", enums);
         Ok(enums)
     }

@@ -21,7 +21,7 @@ async fn introspecting_native_arrays_should_work(api: &TestApi) {
             }
             
             model Post {
-               id      Int @id @sequence(name: "Post_id_seq", allocationSize: 1, initialValue: 1)
+               id      Int @id @default(autoincrement())
                ints Int []
             }
         "#;

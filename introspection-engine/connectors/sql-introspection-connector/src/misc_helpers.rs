@@ -1,7 +1,7 @@
 use datamodel::common::names::NameNormalizer;
 use datamodel::{
-    dml, DefaultValue, Field, FieldArity, FieldType, IdInfo, IdStrategy, IndexDefinition, Model, OnDeleteStrategy,
-    RelationInfo, ScalarType, ScalarValue,
+    DefaultValue, Field, FieldArity, FieldType, IndexDefinition, Model, OnDeleteStrategy, RelationInfo, ScalarType,
+    ScalarValue, ValueGenerator,
 };
 use log::debug;
 use regex::Regex;
@@ -67,7 +67,7 @@ pub fn calculate_many_to_many_field(foreign_key: &ForeignKey, relation_name: Str
         database_names: Vec::new(),
         default_value: None,
         is_unique: false,
-        id_info: None,
+        is_id: false,
         documentation: None,
         is_generated: false,
         is_updated_at: false,
@@ -106,20 +106,9 @@ pub(crate) fn calculate_scalar_field(schema: &&SqlSchema, table: &&Table, column
         ColumnArity::List => FieldArity::List,
     };
 
-    let id_info = calculate_id_info(&column, &table);
-    let default_value = match arity {
-        FieldArity::List => None,
-        _ => column
-            .default
-            .as_ref()
-            .and_then(|default| calculate_default(default, &column.tpe.family))
-            .map(|sv| DefaultValue::Single(sv)),
-    };
-
-    let is_unique = match id_info {
-        Some(_) => false,
-        None => table.is_column_unique(&column.name),
-    };
+    let is_id = is_id(&column, &table);
+    let default_value = calculate_default(&column, &arity);
+    let is_unique = table.is_column_unique(&column.name) && !is_id;
 
     Field {
         name: column.name.clone(),
@@ -128,7 +117,7 @@ pub(crate) fn calculate_scalar_field(schema: &&SqlSchema, table: &&Table, column
         database_names: Vec::new(),
         default_value,
         is_unique,
-        id_info,
+        is_id,
         documentation: None,
         is_generated: false,
         is_updated_at: false,
@@ -182,7 +171,7 @@ pub(crate) fn calculate_relation_field(schema: &SqlSchema, table: &Table, foreig
             database_names: database_name,
             default_value: None,
             is_unique: false,
-            id_info: None,
+            is_id: false,
             documentation: None,
             is_generated: false,
             is_updated_at: false,
@@ -243,7 +232,7 @@ pub(crate) fn calculate_backrelation_field(
         database_names: Vec::new(),
         default_value: None,
         is_unique: false,
-        id_info: None,
+        is_id: false,
         documentation: None,
         is_generated: false,
         is_updated_at: false,
@@ -251,38 +240,31 @@ pub(crate) fn calculate_backrelation_field(
     field
 }
 
-pub(crate) fn calculate_default(default: &str, tpe: &ColumnTypeFamily) -> Option<ScalarValue> {
-    match tpe {
-        ColumnTypeFamily::Boolean => match parse_int(default) {
-            Some(x) => Some(ScalarValue::Boolean(x != 0)),
-            None => parse_bool(default).map(|b| ScalarValue::Boolean(b)),
+pub(crate) fn calculate_default(column: &Column, arity: &FieldArity) -> Option<DefaultValue> {
+    match (arity, &column.default, &column.tpe.family) {
+        (FieldArity::List, _, _) => None,
+        (_, Some(d), ColumnTypeFamily::Boolean) => match parse_int(d) {
+            Some(x) => Some(DefaultValue::Single(ScalarValue::Boolean(x != 0))),
+            None => parse_bool(d).map(|b| DefaultValue::Single(ScalarValue::Boolean(b))),
         },
-        ColumnTypeFamily::Int => parse_int(default).map(|x| ScalarValue::Int(x)),
-        ColumnTypeFamily::Float => parse_float(default).map(|x| ScalarValue::Float(x)),
-        ColumnTypeFamily::String => Some(ScalarValue::String(default.to_string())),
-        _ => None,
+        (_, Some(d), ColumnTypeFamily::Int) => match column.auto_increment {
+            true => Some(DefaultValue::Expression(ValueGenerator::new_autoincrement())),
+            false => parse_int(d).map(|x| DefaultValue::Single(ScalarValue::Int(x))),
+        },
+        (_, Some(d), ColumnTypeFamily::Float) => parse_float(d).map(|x| DefaultValue::Single(ScalarValue::Float(x))),
+        (_, Some(d), ColumnTypeFamily::String) => Some(DefaultValue::Single(ScalarValue::String(d.to_string()))),
+        (_, Some(_), ColumnTypeFamily::DateTime) => None, //todo
+        (_, None, _) if column.auto_increment => Some(DefaultValue::Expression(ValueGenerator::new_autoincrement())),
+        (_, _, _) => None,
     }
 }
 
-pub(crate) fn calculate_id_info(column: &Column, table: &Table) -> Option<IdInfo> {
-    table.primary_key.as_ref().and_then(|pk| {
-        if pk.is_single_primary_key(&column.name) {
-            let strategy = match column.auto_increment {
-                true => IdStrategy::Auto,
-                false => IdStrategy::None,
-            };
-            Some(IdInfo {
-                strategy,
-                sequence: pk.sequence.as_ref().map(|sequence| dml::Sequence {
-                    name: sequence.name.clone(),
-                    allocation_size: sequence.allocation_size as i32,
-                    initial_value: sequence.initial_value as i32,
-                }),
-            })
-        } else {
-            None
-        }
-    })
+pub(crate) fn is_id(column: &Column, table: &Table) -> bool {
+    table
+        .primary_key
+        .as_ref()
+        .map(|pk| pk.is_single_primary_key(&column.name))
+        .unwrap_or(false)
 }
 
 pub(crate) fn calculate_relation_name(schema: &SqlSchema, fk: &ForeignKey, table: &Table) -> String {
@@ -325,7 +307,7 @@ pub(crate) fn calculate_field_type(schema: &SqlSchema, column: &Column, table: &
     debug!("Calculating field type for '{}'", column.name);
     // Look for a foreign key referencing this column
     match table.foreign_keys.iter().find(|fk| fk.columns.contains(&column.name)) {
-        Some(fk) if calculate_id_info(column, table).is_none() => {
+        Some(fk) if !is_id(column, table) => {
             debug!("Found corresponding foreign key");
             let idx = fk
                 .columns

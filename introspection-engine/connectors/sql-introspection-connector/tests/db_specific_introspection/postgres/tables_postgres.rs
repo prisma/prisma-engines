@@ -23,7 +23,7 @@ async fn introspecting_a_simple_table_with_gql_types_must_work(api: &TestApi) {
                 bool    Boolean
                 date    DateTime
                 float   Float
-                id      Int @id @sequence(name: "Blog_id_seq", allocationSize: 1, initialValue: 1)
+                id      Int @id @default(autoincrement())
                 int     Int
                 string  String
             }
@@ -71,7 +71,7 @@ async fn introspecting_a_table_with_unique_index_must_work(api: &TestApi) {
     let dm = r#"
             model Blog {
                 authorId String @unique
-                id      Int @id @sequence(name: "Blog_id_seq", allocationSize: 1, initialValue: 1)
+                id      Int @id @default(autoincrement())
             }
         "#;
     let result = dbg!(api.introspect().await);
@@ -95,7 +95,7 @@ async fn introspecting_a_table_with_multi_column_unique_index_must_work(api: &Te
     let dm = r#"
             model User {
                 firstname String
-                id      Int @id @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
+                id      Int @id @default(autoincrement())
                 lastname String
                 @@unique([firstname, lastname], name: "test")
             }
@@ -118,7 +118,7 @@ async fn introspecting_a_table_with_required_and_optional_columns_must_work(api:
         .await;
     let dm = r#"
             model User {
-                id      Int @id @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
+                id      Int @id @default(autoincrement())
                 optionalname String?
                 requiredname String
             }
@@ -171,7 +171,7 @@ async fn introspecting_a_table_with_default_values_should_work(api: &TestApi) {
                 bool Boolean @default(false)
                 bool2 Boolean @default(false)
                 float Float @default(5.3)
-                id      Int @id @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
+                id      Int @id @default(autoincrement())
                 int Int @default(5)
                 string String @default("Test")
             }
@@ -196,7 +196,7 @@ async fn introspecting_a_table_with_a_non_unique_index_should_work(api: &TestApi
     let dm = r#"
             model User {
                 a String
-                id      Int @id @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
+                id      Int @id @default(autoincrement())
                 @@index([a], name: "test")
             }
         "#;
@@ -222,10 +222,106 @@ async fn introspecting_a_table_with_a_multi_column_non_unique_index_should_work(
         model User {
             a String
             b String
-            id      Int @id @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
+            id      Int @id @default(autoincrement())
             @@index([a,b], name: "test")
         }
     "#;
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
+}
+
+#[test_one_connector(connector = "postgres")]
+async fn introspecting_a_table_enums_should_work(api: &TestApi) {
+    let sql = format!("CREATE Type Color as ENUM ( 'black', 'white')");
+    let sql2 = format!("CREATE Type Color2 as ENUM ( 'black2', 'white2')");
+
+    api.database().execute_raw(&sql, &[]).await.unwrap();
+    api.database().execute_raw(&sql2, &[]).await.unwrap();
+
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("Book", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom("color  Color Not Null");
+                t.inject_custom("color2  Color2 Not Null");
+            });
+        })
+        .await;
+
+    let dm = r#"
+        model Book {
+            color   String
+            color2  String
+            id      Int     @default(autoincrement()) @id 
+        }
+        
+        enum color{
+            black
+            white
+        }
+        
+        enum color2{
+            black2
+            white2
+        }
+    "#;
+
+    let result = dbg!(api.introspect().await);
+    let result1 = dbg!(api.introspect().await);
+    let result2 = dbg!(api.introspect().await);
+    let result3 = dbg!(api.introspect().await);
+    let result4 = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+    custom_assert(&result1, dm);
+    custom_assert(&result2, dm);
+    custom_assert(&result3, dm);
+    custom_assert(&result4, dm);
+}
+
+#[test_one_connector(connector = "postgres")]
+async fn introspecting_a_table_enums_should_return_alphabetically_even_when_in_different_order(api: &TestApi) {
+    let sql1 = format!("CREATE Type Color as ENUM ( 'black', 'white')");
+    let sql2 = format!("CREATE Type Color2 as ENUM ( 'black2', 'white2')");
+
+    api.database().execute_raw(&sql2, &[]).await.unwrap();
+    api.database().execute_raw(&sql1, &[]).await.unwrap();
+
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("Book", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom("color2  Color2 Not Null");
+                t.inject_custom("color  Color Not Null");
+            });
+        })
+        .await;
+
+    let dm = r#"
+        model Book {
+            color   String
+            color2  String
+            id      Int     @default(autoincrement()) @id 
+        }
+        
+        enum color{
+            black
+            white
+        }
+        
+        enum color2{
+            black2
+            white2
+        }
+    "#;
+
+    let result = dbg!(api.introspect().await);
+    let result1 = dbg!(api.introspect().await);
+    let result2 = dbg!(api.introspect().await);
+    let result3 = dbg!(api.introspect().await);
+    let result4 = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+    custom_assert(&result1, dm);
+    custom_assert(&result2, dm);
+    custom_assert(&result3, dm);
+    custom_assert(&result4, dm);
 }

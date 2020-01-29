@@ -29,25 +29,9 @@ pub trait CreateInputTypeBuilderExtension<'a>: InputTypeBuilderBase<'a> {
             "Create",
             scalar_fields,
             |f: ScalarFieldRef| {
-                let required_and_none = f.is_required && f.default_value.is_none();
-
-                if required_and_none && f.is_id() {
-                    match (f.behaviour.as_ref(), f.type_identifier) {
-                        (Some(FieldBehaviour::Id { strategy: IdStrategy::Auto, .. }), TypeIdentifier::UUID)      => self.map_optional_input_type(f),
-                        (Some(FieldBehaviour::Id { strategy: IdStrategy::Auto, .. }), TypeIdentifier::GraphQLID) => self.map_optional_input_type(f),
-                        (None, TypeIdentifier::UUID)                                                             => self.map_optional_input_type(f),
-                        (None, TypeIdentifier::GraphQLID)                                                        => self.map_optional_input_type(f),
-
-                        (Some(FieldBehaviour::Id { strategy: IdStrategy::None, .. }), TypeIdentifier::GraphQLID) => self.map_required_input_type(f),
-                        (Some(FieldBehaviour::Id { strategy: IdStrategy::None, .. }), TypeIdentifier::UUID)      => self.map_required_input_type(f),
-                        (Some(FieldBehaviour::Id { strategy: IdStrategy::None, .. }), TypeIdentifier::String)    => self.map_required_input_type(f),
-                        (Some(FieldBehaviour::Id { strategy: IdStrategy::None, .. }), TypeIdentifier::Int)    => self.map_required_input_type(f),
-
-                        _ => unreachable!(),
-                    }
-                } else if required_and_none && (f.is_created_at() || f.is_updated_at()) {
+                if f.is_required && f.default_value.is_none() && (f.is_created_at() || f.is_updated_at()) { //todo shouldnt these also be Default Value expressions at some point?
                     self.map_optional_input_type(f)
-                } else if required_and_none {
+                } else if f.is_required && f.default_value.is_none(){
                     self.map_required_input_type(f)
                 } else {
                     self.map_optional_input_type(f)
