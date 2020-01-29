@@ -52,6 +52,23 @@ impl WriteQuery {
             }
         };
     }
+
+    pub fn returns(&self, ident: &ModelIdentifier) -> bool {
+        let db_names = ident.db_names().map(|n| n.as_str());
+
+        // x.selected_fields.contains_all_db_names(db_names)
+
+        match self {
+            Self::CreateRecord(q) => todo!(),
+            Self::UpdateRecord(q) => todo!(),
+            Self::DeleteRecord(q) => todo!(),
+            Self::UpdateManyRecords(q) => todo!(),
+            Self::DeleteManyRecords(q) => todo!(),
+            Self::ConnectRecords(q) => false,
+            Self::DisconnectRecords(q) => false,
+            Self::ResetData(q) => false,
+        }
+    }
 }
 
 impl FilteredQuery for WriteQuery {

@@ -21,6 +21,17 @@ impl ReadQuery {
             ReadQuery::AggregateRecordsQuery(x) => &x.name,
         }
     }
+
+    pub fn returns(&self, ident: &ModelIdentifier) -> bool {
+        let db_names = ident.db_names().map(|n| n.as_str());
+
+        match self {
+            ReadQuery::RecordQuery(x) => x.selected_fields.contains_all_db_names(db_names),
+            ReadQuery::ManyRecordsQuery(x) => x.selected_fields.contains_all_db_names(db_names),
+            ReadQuery::RelatedRecordsQuery(x) => x.selected_fields.contains_all_db_names(db_names),
+            ReadQuery::AggregateRecordsQuery(x) => false,
+        }
+    }
 }
 
 impl FilteredQuery for ReadQuery {
@@ -104,5 +115,15 @@ impl FilteredQuery for RecordQuery {
 
     fn set_filter(&mut self, filter: Filter) {
         self.filter = Some(filter)
+    }
+}
+
+impl FilteredQuery for ManyRecordsQuery {
+    fn get_filter(&mut self) -> Option<&mut Filter> {
+        self.args.filter.as_mut()
+    }
+
+    fn set_filter(&mut self, filter: Filter) {
+        self.args.filter = Some(filter)
     }
 }

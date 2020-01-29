@@ -5,11 +5,37 @@ pub use read::*;
 pub use write::*;
 
 use connector::filter::Filter;
+use prisma_models::ModelIdentifier;
 
 #[derive(Debug, Clone)]
 pub enum Query {
     Read(ReadQuery),
     Write(WriteQuery),
+}
+
+impl Query {
+    pub fn returns(&self, ident: &ModelIdentifier) -> bool {
+        match self {
+            Self::Read(rq) => rq.returns(ident),
+            Self::Write(wq) => wq.returns(ident),
+        }
+    }
+}
+
+impl FilteredQuery for Query {
+    fn get_filter(&mut self) -> Option<&mut Filter> {
+        match self {
+            Self::Read(rq) => rq.get_filter(),
+            Self::Write(wq) => wq.get_filter(),
+        }
+    }
+
+    fn set_filter(&mut self, filter: Filter) {
+        match self {
+            Self::Read(rq) => rq.set_filter(filter),
+            Self::Write(wq) => wq.set_filter(filter),
+        }
+    }
 }
 
 pub trait FilteredQuery {

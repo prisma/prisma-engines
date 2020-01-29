@@ -94,7 +94,7 @@ impl Display for QueryGraphDependency {
         match self {
             Self::ExecutionOrder => write!(f, "ExecutionOrder"),
             Self::ParentResult(_) => write!(f, "ParentResult"),
-            Self::ParentIds(_) => write!(f, "ParentIds"),
+            Self::ParentIds(id, _) => write!(f, "ParentIds ({:?})", id.names().collect::<Vec<_>>()),
             Self::Then => write!(f, "Then"),
             Self::Else => write!(f, "Else"),
         }

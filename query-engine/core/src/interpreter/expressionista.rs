@@ -255,8 +255,8 @@ impl Expressionista {
                                     }?;
 
                                     let res = match dependency {
-                                        QueryGraphDependency::ParentIds(f) => {
-                                            binding.as_ids().and_then(|parent_ids| Ok(f(node, parent_ids)?))
+                                        QueryGraphDependency::ParentIds(id, f) => {
+                                            binding.as_ids(&id).and_then(|parent_ids| Ok(f(node, parent_ids)?))
                                         }
 
                                         QueryGraphDependency::ParentResult(f) => Ok(f(node, &binding)?),
@@ -291,7 +291,7 @@ impl Expressionista {
                     let parent_binding_name = graph.edge_source(&edge).id();
                     Some((parent_binding_name, x))
                 }
-                x @ QueryGraphDependency::ParentIds(_) => {
+                x @ QueryGraphDependency::ParentIds(_, _) => {
                     let parent_binding_name = graph.edge_source(&edge).id();
                     Some((parent_binding_name, x))
                 }

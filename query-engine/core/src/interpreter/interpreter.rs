@@ -33,15 +33,19 @@ pub struct DiffResult {
 
 impl ExpressionResult {
     /// Attempts to transform the result into a vector of record identifiers.
-    pub fn as_ids(&self) -> InterpretationResult<Vec<RecordIdentifier>> {
+    pub fn as_ids(&self, model_id: &ModelIdentifier) -> InterpretationResult<Vec<RecordIdentifier>> {
         let converted = match self {
             Self::Query(ref result) => match result {
-                QueryResult::Id(id) => Some(id.clone().map(|id| vec![id]).unwrap_or_else(|| vec![])),
+                QueryResult::Id(id) => match id {
+                    Some(id) if model_id.matches(id) => Some(vec![id.clone()]),
+                    None => Some(vec![]),
+                    _ => None,
+                },
 
                 // We always select IDs, the unwraps are safe.
                 QueryResult::RecordSelection(rs) => Some(
                     rs.scalars
-                        .identifiers(&rs.model_id)
+                        .identifiers(model_id)
                         .unwrap()
                         .into_iter()
                         .map(|val| val.into())

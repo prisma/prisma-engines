@@ -166,6 +166,20 @@ impl SelectedFields {
         self.names().find(|fname| fname == &name).is_some()
     }
 
+    pub fn contains_all_db_names<'a>(&self, names: impl Iterator<Item = &'a str>) -> bool {
+        let mut db_names: Vec<_> = self.db_names().collect();
+        let mut names: Vec<_> = names.collect();
+
+        if names.len() > db_names.len() {
+            false
+        } else {
+            db_names.sort();
+            names.sort();
+
+            db_names.into_iter().zip(names).all(|(a, b)| a == b)
+        }
+    }
+
     pub fn deduplicate(mut self) -> Self {
         self.scalar = self.scalar.into_iter().unique().collect();
         self.relation = self.relation.into_iter().unique().collect();

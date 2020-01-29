@@ -19,7 +19,7 @@ use crate::{interpreter::ExpressionResult, Query, QueryGraphBuilderResult};
 use guard::*;
 use invariance_rules::*;
 use petgraph::{graph::*, visit::EdgeRef as PEdgeRef, *};
-use prisma_models::RecordIdentifier;
+use prisma_models::{ModelIdentifier, RecordIdentifier};
 use std::{borrow::Borrow, collections::HashSet};
 
 pub type QueryGraphResult<T> = std::result::Result<T, QueryGraphError>;
@@ -124,9 +124,9 @@ pub enum QueryGraphDependency {
     ParentResult(ParentResultFn),
 
     /// More specialized version of `ParentResult`
-    /// Performs a transformation on the child node based on the IDs of the parent result (as PrismaValues).
-    /// Assumes that the parent result can be converted into IDs, else a runtime error will occur.
-    ParentIds(ParentIdsFn),
+    /// Performs a transformation on the child node based on the requested IDs of the parent result (passed as RecordIdentifiers).
+    /// Assumes that the parent result can be converted into the requested record identifiers, else a runtime error will occur.
+    ParentIds(ModelIdentifier, ParentIdsFn),
 
     /// Only valid in the context of a `If` control flow node.
     Then,

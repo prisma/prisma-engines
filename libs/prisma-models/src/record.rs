@@ -1,4 +1,4 @@
-use crate::{DataSourceFieldRef, DomainError, Field, ModelRef, PrismaValue, TypeIdentifier, dml::FieldArity};
+use crate::{dml::FieldArity, DataSourceFieldRef, DomainError, Field, ModelRef, PrismaValue, TypeIdentifier};
 
 // Collection of fields that uniquely identify a record of a model.
 // There can be different sets of fields at the same time identifying a model.
@@ -24,6 +24,10 @@ impl ModelIdentifier {
 
     pub fn names<'a>(&'a self) -> impl Iterator<Item = &'a str> + 'a {
         self.fields.iter().map(|field| field.name())
+    }
+
+    pub fn db_names<'a>(&'a self) -> impl Iterator<Item = String> + 'a {
+        self.data_source_fields().map(|dsf| dsf.name.clone())
     }
 
     pub fn fields<'a>(&'a self) -> impl Iterator<Item = &'a Field> + 'a {
@@ -65,6 +69,32 @@ impl ModelIdentifier {
             .map(|dsf| (dsf.field_type.into(), dsf.arity))
             .collect()
     }
+
+    /// Checks if a given `RecordIdentifier` belongs to this `ModelIdentifier`.
+    pub fn matches(&self, id: &RecordIdentifier) -> bool {
+        self.data_source_fields().eq(id.fields())
+    }
+
+    /// Inserts this model identifiers data source fields into the given record identifier.
+    /// Assumes caller knows that the exchange can be done. Errors if lengths mismatch.
+    pub fn assimilate(&self, id: RecordIdentifier) -> crate::Result<RecordIdentifier> {
+        if self.len() != id.len() {
+            Err(DomainError::ConversionFailure(
+                "record identifier",
+                "assimilated record identifier",
+            ))
+        } else {
+            let fields = self.data_source_fields();
+
+            Ok(id
+                .pairs
+                .into_iter()
+                .zip(fields)
+                .map(|((_, value), other_field)| (other_field, value))
+                .collect::<Vec<_>>()
+                .into())
+        }
+    }
 }
 
 impl IntoIterator for ModelIdentifier {
@@ -89,6 +119,10 @@ impl RecordIdentifier {
 
     pub fn add(&mut self, pair: (DataSourceFieldRef, PrismaValue)) {
         self.pairs.push(pair);
+    }
+
+    pub fn fields(&self) -> impl Iterator<Item = DataSourceFieldRef> + '_ {
+        self.pairs.iter().map(|p| p.0.clone())
     }
 
     pub fn values(&self) -> impl Iterator<Item = PrismaValue> + '_ {
