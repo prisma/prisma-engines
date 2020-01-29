@@ -93,6 +93,9 @@ pub enum ErrorKind {
 
     #[fail(display = "Authentication failed for user '{}'", user)]
     AuthenticationFailed { user: String },
+
+    #[fail(display = "Database error. error code: {}, error message: {}", code, message)]
+    RawError { code: String, message: String },
 }
 
 impl From<DomainError> for ConnectorError {

@@ -333,6 +333,10 @@ impl InputType {
         InputType::Scalar(ScalarType::Json)
     }
 
+    pub fn json_list() -> InputType {
+        InputType::Scalar(ScalarType::JsonList)
+    }
+
     pub fn uuid() -> InputType {
         InputType::Scalar(ScalarType::UUID)
     }
@@ -434,6 +438,7 @@ pub enum ScalarType {
     Enum(EnumTypeRef),
     DateTime,
     Json,
+    JsonList,
     UUID,
     ID,
 }

@@ -1,5 +1,6 @@
 use super::{Env, ExpressionResult, InterpretationResult};
-use crate::Query;
+use crate::{Query, WriteQuery};
+use prisma_value::PrismaValue;
 
 pub enum Expression {
     Sequence {
@@ -36,6 +37,13 @@ pub enum Expression {
     Return {
         result: ExpressionResult,
     },
+}
+
+impl Expression {
+    pub fn raw(query: String, parameters: Vec<PrismaValue>) -> Self {
+        let query = Query::Write(WriteQuery::Raw { query, parameters });
+        Self::Query { query }
+    }
 }
 
 pub struct Binding {

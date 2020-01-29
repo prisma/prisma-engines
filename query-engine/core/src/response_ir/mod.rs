@@ -11,7 +11,7 @@
 mod internal;
 mod utils;
 
-use crate::{ExpressionResult, OutputType, OutputTypeRef};
+use crate::{ExpressionResult, QueryResult, OutputType, OutputTypeRef};
 use indexmap::IndexMap;
 use internal::*;
 use prisma_models::PrismaValue;
@@ -95,6 +95,7 @@ pub enum Item {
     Map(Map),
     List(List),
     Value(PrismaValue),
+    Json(serde_json::Value),
 
     /// Wrapper type to allow multiple parent records
     /// to claim the same item without copying data
@@ -127,6 +128,7 @@ impl Serialize for Item {
                 seq.end()
             }
             Self::Value(pv) => pv.serialize(serializer),
+            Self::Json(value) => value.serialize(serializer),
             Self::Ref(item_ref) => item_ref.serialize(serializer),
         }
     }
@@ -145,6 +147,9 @@ pub struct IrSerializer {
 impl IrSerializer {
     pub fn serialize(&self, result: ExpressionResult) -> Response {
         match result {
+            ExpressionResult::Query(QueryResult::Json(json)) => {
+                Response::Data(self.key.clone(), Item::Json(json))
+            }
             ExpressionResult::Query(r) => {
                 match serialize_internal(r, &self.output_type, false, false) {
                     Ok(result) => {

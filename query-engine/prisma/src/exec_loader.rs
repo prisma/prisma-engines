@@ -96,5 +96,9 @@ fn sql_executor<T>(
 where
     T: Connector + Send + Sync + 'static,
 {
-    Box::new(InterpretingExecutor::new(connector, primary_connector, force_transactions))
+    Box::new(InterpretingExecutor::new(
+        connector,
+        primary_connector,
+        force_transactions,
+    ))
 }

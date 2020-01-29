@@ -52,6 +52,8 @@ pub fn serialize_internal(
             Ok(result)
         }
 
+        QueryResult::Json(_) => unimplemented!(),
+
         QueryResult::Id(_) => unimplemented!(),
         QueryResult::Unit => unimplemented!(),
     }

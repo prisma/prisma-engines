@@ -1,4 +1,5 @@
 use super::*;
+use prisma_value::PrismaValue;
 
 impl<'conn, 'tx> ReadOperations for ConnectionLike<'conn, 'tx> {
     fn get_single_record<'a>(
@@ -92,6 +93,13 @@ impl<'conn, 'tx> WriteOperations for ConnectionLike<'conn, 'tx> {
         match self {
             Self::Connection(c) => c.disconnect(field, parent_id, child_ids),
             Self::Transaction(tx) => tx.disconnect(field, parent_id, child_ids),
+        }
+    }
+
+    fn execute_raw<'a>(&'a self, query: String, parameters: Vec<PrismaValue>) -> crate::IO<serde_json::Value> {
+        match self {
+            Self::Connection(c) => c.execute_raw(query, parameters),
+            Self::Transaction(tx) => tx.execute_raw(query, parameters),
         }
     }
 }
