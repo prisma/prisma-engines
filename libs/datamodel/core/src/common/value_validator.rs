@@ -41,7 +41,7 @@ impl ValueValidator {
             Ok(val) => Ok(val),
             Err(err) => Err(DatamodelError::new_value_parser_error(
                 expected_type,
-                err.description(),
+                format!("{}", err).as_ref(),
                 &self.raw(),
                 self.span(),
             )),

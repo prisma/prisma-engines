@@ -1,7 +1,6 @@
 use failure::{Error, Fail};
 use introspection_connector::{ConnectorError, ErrorKind};
 use quaint::{error::Error as QuaintError, prelude::ConnectionInfo};
-use std::error::Error as StdError; // just bringing the trait functions into scope
 use user_facing_errors::KnownError;
 
 #[derive(Debug, Fail)]
@@ -17,7 +16,7 @@ pub enum SqlIntrospectionError {
 impl From<url::ParseError> for SqlIntrospectionError {
     fn from(e: url::ParseError) -> Self {
         SqlIntrospectionError::InvalidUrl {
-            message: format!("Couldn't parse the connection string because of: {}", e.description()),
+            message: format!("Couldn't parse the connection string because of: {}", e),
         }
     }
 }

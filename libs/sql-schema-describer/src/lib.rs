@@ -2,7 +2,6 @@
 
 use failure::Fail;
 use serde::{Deserialize, Serialize};
-use std::collections::HashSet;
 use std::fmt;
 
 pub mod mysql;
@@ -358,7 +357,7 @@ pub struct Enum {
     /// Enum name.
     pub name: String,
     /// Possible enum values.
-    pub values: HashSet<String>,
+    pub values: Vec<String>,
 }
 
 /// A SQL sequence.
