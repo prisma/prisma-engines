@@ -25,7 +25,8 @@ pub enum FieldType {
     /// Connector specific field type.
     ConnectorSpecific(ScalarFieldType),
     /// Base (built-in scalar) type.
-    Base(ScalarType),
+    /// The option is Some(x) if the scalar type is based upon a type alias.
+    Base(ScalarType, Option<String>),
 }
 
 impl FieldType {

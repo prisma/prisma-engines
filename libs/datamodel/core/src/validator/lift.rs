@@ -108,7 +108,7 @@ impl LiftAstToDml {
     fn lift_field(&self, ast_field: &ast::Field, ast_schema: &ast::SchemaAst) -> Result<dml::Field, ErrorCollection> {
         let mut errors = ErrorCollection::new();
         // If we cannot parse the field type, we exit right away.
-        let (field_type, extra_attributes) = self.lift_field_type(&ast_field, ast_schema, &mut Vec::new())?;
+        let (field_type, extra_attributes) = self.lift_field_type(&ast_field, None, ast_schema, &mut Vec::new())?;
 
         let mut field = dml::Field::new(&ast_field.name.name, field_type.clone());
         field.documentation = ast_field.documentation.clone().map(|comment| comment.text);
@@ -117,7 +117,7 @@ impl LiftAstToDml {
         if let Some(value) = &ast_field.default_value {
             let validator = ValueValidator::new(value);
 
-            if let dml::FieldType::Base(base_type) = &field_type {
+            if let dml::FieldType::Base(base_type, _) = &field_type {
                 match validator.as_default_value(*base_type) {
                     Ok(dv) => field.default_value = Some(dv),
                     Err(err) => errors.push(err),
@@ -158,6 +158,7 @@ impl LiftAstToDml {
     fn lift_field_type(
         &self,
         ast_field: &ast::Field,
+        custom_type_name: Option<String>,
         ast_schema: &ast::SchemaAst,
         checked_types: &mut Vec<String>,
     ) -> Result<(dml::FieldType, Vec<ast::Directive>), DatamodelError> {
@@ -177,10 +178,10 @@ impl LiftAstToDml {
                     let field_type = dml::FieldType::ConnectorSpecific(x);
                     Ok((field_type, vec![]))
                 } else {
-                    Ok((dml::FieldType::Base(scalar_type), vec![]))
+                    Ok((dml::FieldType::Base(scalar_type, custom_type_name), vec![]))
                 }
             } else {
-                Ok((dml::FieldType::Base(scalar_type), vec![]))
+                Ok((dml::FieldType::Base(scalar_type, custom_type_name), vec![]))
             }
         } else if ast_schema.find_model(type_name).is_some() {
             Ok((dml::FieldType::Relation(dml::RelationInfo::new(type_name)), vec![]))
@@ -213,7 +214,8 @@ impl LiftAstToDml {
 
         if let Some(custom_type) = ast_schema.find_type_alias(&type_name) {
             checked_types.push(custom_type.name.name.clone());
-            let (field_type, mut attrs) = self.lift_field_type(custom_type, ast_schema, checked_types)?;
+            let (field_type, mut attrs) =
+                self.lift_field_type(custom_type, Some(type_name.to_owned()), ast_schema, checked_types)?;
 
             if let dml::FieldType::Relation(_) = field_type {
                 return Err(DatamodelError::new_validation_error(

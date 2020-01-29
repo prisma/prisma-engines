@@ -13,10 +13,10 @@ impl DirectiveValidator<dml::Field> for IdDirectiveValidator {
     // TODO In which form is this still required or needs to change? Default values are handling the id strategy now.
     fn validate_and_apply(&self, args: &mut Args, obj: &mut dml::Field) -> Result<(), DatamodelError> {
         let strategy = match (&obj.field_type, &obj.default_value) {
-            (dml::FieldType::Base(dml::ScalarType::Int), Some(dml::DefaultValue::Expression(_))) => {
+            (dml::FieldType::Base(dml::ScalarType::Int, _), Some(dml::DefaultValue::Expression(_))) => {
                 dml::IdStrategy::Auto
             }
-            (dml::FieldType::Base(dml::ScalarType::String), Some(dml::DefaultValue::Expression(_))) => {
+            (dml::FieldType::Base(dml::ScalarType::String, _), Some(dml::DefaultValue::Expression(_))) => {
                 dml::IdStrategy::Auto
             }
             _ => dml::IdStrategy::None,

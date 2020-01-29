@@ -86,7 +86,7 @@ fn default_value_from_serde(
 ) -> Option<dml::DefaultValue> {
     match (container, field_type) {
         // Scalar.
-        (Some(value), dml::FieldType::Base(scalar_type)) => match (value, scalar_type) {
+        (Some(value), dml::FieldType::Base(scalar_type, _)) => match (value, scalar_type) {
             // Function.
             (serde_json::Value::Object(_), _) => {
                 let func = serde_json::from_value::<Function>(value.clone()).expect("Failed to parse function JSON");
@@ -163,7 +163,7 @@ fn get_field_type(field: &Field) -> dml::FieldType {
             on_delete: get_on_delete_strategy(&field.relation_on_delete),
         }),
         "enum" => dml::FieldType::Enum(field.field_type.clone()),
-        "scalar" => dml::FieldType::Base(type_from_string(&field.field_type)),
+        "scalar" => dml::FieldType::Base(type_from_string(&field.field_type), None),
         _ => panic!(format!("Unknown field kind {}.", &field.kind)),
     }
 }

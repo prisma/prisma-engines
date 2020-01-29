@@ -154,7 +154,9 @@ impl LowerDmlToAst {
         datamodel: &dml::Datamodel,
     ) -> ast::Identifier {
         match field_type {
-            dml::FieldType::Base(tpe) => ast::Identifier::new(&tpe.to_string()),
+            dml::FieldType::Base(tpe, custom_type_name) => {
+                ast::Identifier::new(&custom_type_name.as_ref().unwrap_or(&tpe.to_string()))
+            }
             dml::FieldType::Enum(tpe) => ast::Identifier::new(&tpe.to_string()),
             dml::FieldType::Relation(rel) => {
                 let related_model = datamodel.find_model(&rel.to).expect(STATE_ERROR);
