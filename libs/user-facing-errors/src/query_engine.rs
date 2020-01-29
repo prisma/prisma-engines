@@ -141,3 +141,13 @@ pub struct QueryValidationFailed {
     /// Location of the incorrect parsing, validation in a query. Represented by tuple or object with (line, character)
     pub query_position: String,
 }
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = "P2010",
+    message = "Raw query failed. Code: `${code}`. Message: `${message}`"
+)]
+pub struct RawQueryFailed {
+    pub code: String,
+    pub message: String,
+}

@@ -13,6 +13,10 @@ pub enum WriteQuery {
     ConnectRecords(ConnectRecords),
     DisconnectRecords(DisconnectRecords),
     ResetData(ResetData),
+    Raw {
+        query: String,
+        parameters: Vec<PrismaValue>,
+    },
 }
 
 impl WriteQuery {
@@ -72,6 +76,7 @@ impl std::fmt::Display for WriteQuery {
             Self::ConnectRecords(_) => write!(f, "ConnectRecords"),
             Self::DisconnectRecords(_) => write!(f, "DisconnectRecords"),
             Self::ResetData(_) => write!(f, "ResetData"),
+            Self::Raw { query, parameters } => write!(f, "Raw: {} ({:?})", query, parameters),
         }
     }
 }

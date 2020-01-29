@@ -43,6 +43,33 @@ pub enum PrismaValue {
     List(PrismaListValue),
 }
 
+impl TryFrom<serde_json::Value> for PrismaValue {
+    type Error = crate::error::ConversionFailure;
+
+    fn try_from(v: serde_json::Value) -> PrismaValueResult<Self> {
+        match v {
+            serde_json::Value::String(s) => Ok(PrismaValue::String(s)),
+            serde_json::Value::Array(v) => {
+                let vals: PrismaValueResult<Vec<PrismaValue>> = v.into_iter().map(PrismaValue::try_from).collect();
+                Ok(PrismaValue::List(vals?))
+            }
+            serde_json::Value::Null => Ok(PrismaValue::Null),
+            serde_json::Value::Bool(b) => Ok(PrismaValue::Boolean(b)),
+            serde_json::Value::Number(num) => {
+                if num.is_i64() {
+                    Ok(PrismaValue::Int(num.as_i64().unwrap()))
+                } else {
+                    let fl = num.as_f64().unwrap();
+                    let dec = Decimal::from_f64(fl).unwrap();
+
+                    Ok(PrismaValue::Float(dec))
+                }
+            }
+            serde_json::Value::Object(_) => Err(ConversionFailure::new("nested JSON object", "PrismaValue")),
+        }
+    }
+}
+
 fn serialize_date<S>(date: &DateTime<Utc>, serializer: S) -> Result<S::Ok, S::Error>
 where
     S: Serializer,
@@ -62,6 +89,20 @@ impl PrismaValue {
         match self {
             PrismaValue::Null => true,
             _ => false,
+        }
+    }
+
+    pub fn into_string(self) -> Option<String> {
+        match self {
+            PrismaValue::String(s) => Some(s),
+            _ => None,
+        }
+    }
+
+    pub fn into_list(self) -> Option<PrismaListValue> {
+        match self {
+            PrismaValue::List(l) => Some(l),
+            _ => None,
         }
     }
 }

@@ -7,6 +7,7 @@ pub enum QueryResult {
     Count(usize),
     RecordSelection(RecordSelection),
     Unit,
+    Json(serde_json::Value),
 }
 
 // Todo: In theory, much of this info can go into the serializer as soon as the read results are resolved in a flat tree.

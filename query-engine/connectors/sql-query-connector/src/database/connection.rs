@@ -5,6 +5,7 @@ use connector_interface::{
     WriteOperations, IO,
 };
 use prisma_models::prelude::*;
+use prisma_value::PrismaValue;
 use quaint::{connector::TransactionCapable, prelude::ConnectionInfo};
 use std::marker::PhantomData;
 
@@ -143,5 +144,9 @@ where
         child_ids: &'a [GraphqlId],
     ) -> connector::IO<()> {
         IO::new(self.catch(async move { write::disconnect(&self.inner, field, parent_id, child_ids).await }))
+    }
+
+    fn execute_raw<'a>(&'a self, query: String, parameters: Vec<PrismaValue>) -> connector::IO<serde_json::Value> {
+        IO::new(self.catch(async move { write::execute_raw(&self.inner, query, parameters).await }))
     }
 }

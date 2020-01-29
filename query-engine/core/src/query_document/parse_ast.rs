@@ -23,6 +23,12 @@ pub struct ParsedField {
     pub schema_field: FieldRef,
 }
 
+impl ParsedField {
+    pub fn is_raw_query(&self) -> bool {
+        self.name == "executeRaw"
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct ParsedArgument {
     pub name: String,
@@ -35,6 +41,15 @@ pub enum ParsedInputValue {
     OrderBy(OrderBy),
     List(Vec<ParsedInputValue>),
     Map(ParsedInputMap),
+}
+
+impl ParsedArgument {
+    pub fn into_value(self) -> Option<PrismaValue> {
+        match self.value {
+            ParsedInputValue::Single(val) => Some(val),
+            _ => None,
+        }
+    }
 }
 
 pub trait ArgumentListLookup {

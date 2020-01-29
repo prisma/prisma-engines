@@ -73,6 +73,7 @@ impl<'a> DMMFTypeRenderer<'a> {
                     ScalarType::Json => "DateTime",
                     ScalarType::ID => "ID",
                     ScalarType::UUID => "UUID",
+                    ScalarType::JsonList => "JsonList",
                     ScalarType::Enum(_) => unreachable!(), // Handled separately above.
                 };
 
@@ -146,6 +147,7 @@ impl<'a> DMMFTypeRenderer<'a> {
                     ScalarType::Json => "DateTime",
                     ScalarType::ID => "ID",
                     ScalarType::UUID => "UUID",
+                    ScalarType::JsonList => "JsonList",
                     ScalarType::Enum(_) => unreachable!(), // Handled separately above.
                 };
 

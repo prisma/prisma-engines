@@ -5,7 +5,7 @@ case class TestServer() extends PlayJsonExtensions {
   def query(
       query: String,
       project: Project,
-      dataContains: String = ""
+      dataContains: String = "",
   ): JsValue = {
     val result = queryBinaryCLI(
       query = query,
@@ -20,7 +20,7 @@ case class TestServer() extends PlayJsonExtensions {
       project: Project,
       errorCode: Int,
       errorCount: Int = 1,
-      errorContains: String = ""
+      errorContains: String = "",
   ): JsValue = {
     val result =
       queryBinaryCLI(
@@ -41,10 +41,13 @@ case class TestServer() extends PlayJsonExtensions {
     val encoded_query = UTF8Base64.encode(formattedQuery)
     val response = project.isPgBouncer match {
       case true =>
-        Process(Seq(EnvVars.prismaBinaryPath, "--always_force_transactions", "cli", "--execute_request", encoded_query),
+        Process(Seq(EnvVars.prismaBinaryPath, "--enable_raw_queries", "--always_force_transactions", "cli", "--execute_request", encoded_query),
                 None,
                 "PRISMA_DML" -> project.pgBouncerEnvVar).!!
-      case false => Process(Seq(EnvVars.prismaBinaryPath, "cli", "--execute_request", encoded_query), None, "PRISMA_DML" -> project.envVar).!!
+
+      case false => {
+        Process(Seq(EnvVars.prismaBinaryPath, "--enable_raw_queries", "cli", "--execute_request", encoded_query), None, "PRISMA_DML" -> project.envVar).!!
+      }
     }
     val decoded_response = UTF8Base64.decode(response)
     println(decoded_response)

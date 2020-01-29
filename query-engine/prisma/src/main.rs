@@ -3,12 +3,7 @@ extern crate log;
 #[macro_use]
 extern crate rust_embed;
 
-use std::{
-    error::Error,
-    net::SocketAddr,
-    process,
-    convert::TryFrom,
-};
+use std::{convert::TryFrom, error::Error, net::SocketAddr, process};
 
 use structopt::StructOpt;
 use tracing::subscriber;
@@ -104,6 +99,9 @@ pub struct PrismaOpt {
     /// Runs all queries in a transaction, including all the reads.
     #[structopt(long = "always_force_transactions")]
     always_force_transactions: bool,
+    /// Enables raw SQL queries with executeRaw mutation
+    #[structopt(long = "enable_raw_queries")]
+    enable_raw_queries: bool,
     #[structopt(subcommand)]
     subcommand: Option<Subcommand>,
 }
@@ -113,10 +111,12 @@ async fn main() -> Result<(), AnyError> {
     let opts = PrismaOpt::from_args();
 
     match CliCommand::try_from(&opts) {
-        Ok(cmd) => if let Err(err) = cmd.execute() {
-            info!("Encountered error during initialization:");
-            err.render_as_json().expect("error rendering");
-            process::exit(1);
+        Ok(cmd) => {
+            if let Err(err) = cmd.execute() {
+                info!("Encountered error during initialization:");
+                err.render_as_json().expect("error rendering");
+                process::exit(1);
+            }
         }
         Err(_) => {
             init_logger()?;
@@ -129,6 +129,7 @@ async fn main() -> Result<(), AnyError> {
 
             let builder = HttpServer::builder()
                 .legacy(opts.legacy)
+                .enable_raw_queries(opts.enable_raw_queries)
                 .force_transactions(opts.always_force_transactions);
 
             if let Err(err) = builder.build_and_run(address).await {

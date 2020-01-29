@@ -29,6 +29,10 @@ package = "query-connector"
 path = "../../../libs/prisma-models"
 features = ["sql-ext"]
 
+[dependencies.prisma-value]
+path = "../../../libs/prisma-value"
+features = ["sql-ext"]
+
 [dependencies.chrono]
 version = "0.4"
 features = ["serde"]

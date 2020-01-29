@@ -1,6 +1,7 @@
-use crate::{error::SqlError, query_builder::write, QueryExt};
+use crate::{error::SqlError, query_builder::write, QueryExt, RawQuery};
 use connector_interface::*;
 use prisma_models::*;
+use prisma_value::PrismaValue;
 use quaint::error::{DatabaseConstraint, ErrorKind};
 use std::convert::TryFrom;
 
@@ -147,4 +148,13 @@ pub async fn disconnect(
     conn.query(query).await?;
 
     Ok(())
+}
+
+pub async fn execute_raw(
+    conn: &dyn QueryExt,
+    query: String,
+    parameters: Vec<PrismaValue>,
+) -> crate::Result<serde_json::Value> {
+    let value = conn.raw_json(RawQuery::new(query, parameters)).await?;
+    Ok(value)
 }

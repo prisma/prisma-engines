@@ -2,6 +2,7 @@ use crate::{error::*, AliasedCondition, RawQuery, SqlRow, ToSqlRow};
 use async_trait::async_trait;
 use connector_interface::filter::Filter;
 use datamodel::FieldArity;
+use futures::future::FutureExt;
 use prisma_models::*;
 use quaint::{
     ast::*,
@@ -9,7 +10,7 @@ use quaint::{
     pooled::PooledConnection,
 };
 use serde_json::{Map, Number, Value};
-use std::convert::TryFrom;
+use std::{convert::TryFrom, panic::AssertUnwindSafe};
 
 impl<'t> QueryExt for connector::Transaction<'t> {}
 impl QueryExt for PooledConnection {}
@@ -29,9 +30,12 @@ pub trait QueryExt: Queryable + Send + Sync {
         Ok(sql_rows)
     }
 
-    async fn raw_json(&self, q: RawQuery) -> crate::Result<Value> {
+    async fn raw_json<'a>(&'a self, q: RawQuery<'a>) -> Result<Value, crate::error::RawError> {
         if q.is_select() {
-            let result_set = self.query_raw(q.0.as_str(), &[]).await?;
+            let result_set = AssertUnwindSafe(self.query_raw(q.query(), q.parameters()))
+                .catch_unwind()
+                .await??;
+
             let columns: Vec<String> = result_set.columns().into_iter().map(ToString::to_string).collect();
             let mut result = Vec::new();
 
@@ -48,7 +52,10 @@ pub trait QueryExt: Queryable + Send + Sync {
 
             Ok(Value::Array(result))
         } else {
-            let changes = self.execute_raw(q.0.as_str(), &[]).await?;
+            let changes = AssertUnwindSafe(self.execute_raw(q.query(), q.parameters()))
+                .catch_unwind()
+                .await??;
+
             Ok(Value::Number(Number::from(changes)))
         }
     }

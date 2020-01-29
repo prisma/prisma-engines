@@ -37,6 +37,19 @@ pub struct InternalEnum {
 }
 
 impl InternalEnum {
+    pub fn new<N, I, V>(name: N, values: I) -> Self
+    where
+        N: Into<String>,
+        V: Into<String>,
+        I: IntoIterator<Item = V>,
+
+    {
+        Self {
+            name: name.into(),
+            values: values.into_iter().map(|v| v.into()).collect(),
+        }
+    }
+
     pub fn contains(&self, val: &String) -> bool {
         self.values.contains(val)
     }

@@ -2,8 +2,41 @@ use connector_interface::{error::*, Filter};
 use failure::{Error, Fail};
 use prisma_models::prelude::DomainError;
 use quaint::error::ErrorKind as QuaintKind;
-use std::string::FromUtf8Error;
+use std::{any::Any, string::FromUtf8Error};
 use user_facing_errors::query_engine::DatabaseConstraint;
+
+pub struct RawError {
+    code: Option<String>,
+    message: Option<String>,
+}
+
+impl From<RawError> for SqlError {
+    fn from(re: RawError) -> SqlError {
+        Self::RawError {
+            code: re.code.unwrap_or_else(|| String::from("N/A")),
+            message: re.message.unwrap_or_else(|| String::from("N/A")),
+        }
+    }
+}
+
+impl From<quaint::error::Error> for RawError {
+    fn from(e: quaint::error::Error) -> Self {
+        Self {
+            code: e.original_code().map(ToString::to_string),
+            message: e.original_message().map(ToString::to_string),
+        }
+    }
+}
+
+// Catching the panics from the database driver for better error messages.
+impl From<Box<dyn Any + Send>> for RawError {
+    fn from(e: Box<dyn Any + Send>) -> Self {
+        Self {
+            code: None,
+            message: Some(*e.downcast::<String>().unwrap()),
+        }
+    }
+}
 
 #[derive(Debug, Fail)]
 pub enum SqlError {
@@ -61,6 +94,9 @@ pub enum SqlError {
 
     #[fail(display = "Conversion error: {}", _0)]
     ConversionError(Error),
+
+    #[fail(display = "Database error. error code: {}, error message: {}", code, message)]
+    RawError { code: String, message: String },
 }
 
 impl SqlError {
@@ -110,6 +146,16 @@ impl SqlError {
             }),
             SqlError::ConversionError(e) => ConnectorError::from_kind(ErrorKind::ConversionError(e)),
             SqlError::QueryError(e) => ConnectorError::from_kind(ErrorKind::QueryError(e)),
+            SqlError::RawError { code, message } => ConnectorError {
+                user_facing_error: user_facing_errors::KnownError::new(
+                    user_facing_errors::query_engine::RawQueryFailed {
+                        code: code.clone(),
+                        message: message.clone(),
+                    },
+                )
+                .ok(),
+                kind: ErrorKind::RawError { code, message },
+            },
         }
     }
 }

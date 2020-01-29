@@ -6,6 +6,7 @@ edition = "2018"
 
 [dependencies]
 prisma-models = { path = "../../libs/prisma-models" }
+prisma-value = { path = "../../libs/prisma-value" }
 prisma-inflector = { path = "../../libs/prisma-inflector" }
 connector = { path = "../connectors/query-connector", package = "query-connector" }
 failure = { version =  "0.1", features = ["derive"] }
