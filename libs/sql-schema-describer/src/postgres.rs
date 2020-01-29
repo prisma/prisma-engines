@@ -510,7 +510,7 @@ impl SqlSchemaDescriber {
             .map(|(k, v)| Enum { name: k, values: v })
             .collect();
 
-        enums.sort_by(|a, b| Ord::cmp(&b.name, &a.name));
+        enums.sort_by(|a, b| Ord::cmp(&a.name, &b.name));
 
         debug!("Found enums: {:?}", enums);
         Ok(enums)

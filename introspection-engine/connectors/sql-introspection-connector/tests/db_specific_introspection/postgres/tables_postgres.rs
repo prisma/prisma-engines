@@ -267,5 +267,13 @@ async fn introspecting_a_table_enums_should_work(api: &TestApi) {
     "#;
 
     let result = dbg!(api.introspect().await);
+    let result1 = dbg!(api.introspect().await);
+    let result2 = dbg!(api.introspect().await);
+    let result3 = dbg!(api.introspect().await);
+    let result4 = dbg!(api.introspect().await);
     custom_assert(&result, dm);
+    custom_assert(&result1, dm);
+    custom_assert(&result2, dm);
+    custom_assert(&result3, dm);
+    custom_assert(&result4, dm);
 }
