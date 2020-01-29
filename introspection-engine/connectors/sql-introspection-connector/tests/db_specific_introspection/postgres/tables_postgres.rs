@@ -232,8 +232,8 @@ async fn introspecting_a_table_with_a_multi_column_non_unique_index_should_work(
 
 #[test_one_connector(connector = "postgres")]
 async fn introspecting_a_table_enums_should_work(api: &TestApi) {
-    let sql = format!("CREATE Type Color as ENUM ( 'black', 'white')");
-    let sql2 = format!("CREATE Type Color2 as ENUM ( 'black2', 'white2')");
+    let sql = format!("CREATE Type color as ENUM ( 'black', 'white')");
+    let sql2 = format!("CREATE Type color2 as ENUM ( 'black2', 'white2')");
 
     api.database().execute_raw(&sql, &[]).await.unwrap();
     api.database().execute_raw(&sql2, &[]).await.unwrap();
@@ -242,16 +242,16 @@ async fn introspecting_a_table_enums_should_work(api: &TestApi) {
         .execute(|migration| {
             migration.create_table("Book", |t| {
                 t.add_column("id", types::primary());
-                t.inject_custom("color  Color Not Null");
-                t.inject_custom("color2  Color2 Not Null");
+                t.inject_custom("color  color Not Null");
+                t.inject_custom("color2  color2 Not Null");
             });
         })
         .await;
 
     let dm = r#"
         model Book {
-            color   String
-            color2  String
+            color   color
+            color2  color2
             id      Int     @default(autoincrement()) @id 
         }
         
@@ -280,8 +280,8 @@ async fn introspecting_a_table_enums_should_work(api: &TestApi) {
 
 #[test_one_connector(connector = "postgres")]
 async fn introspecting_a_table_enums_should_return_alphabetically_even_when_in_different_order(api: &TestApi) {
-    let sql1 = format!("CREATE Type Color as ENUM ( 'black', 'white')");
-    let sql2 = format!("CREATE Type Color2 as ENUM ( 'black2', 'white2')");
+    let sql1 = format!("CREATE Type color as ENUM ( 'black', 'white')");
+    let sql2 = format!("CREATE Type color2 as ENUM ( 'black2', 'white2')");
 
     api.database().execute_raw(&sql2, &[]).await.unwrap();
     api.database().execute_raw(&sql1, &[]).await.unwrap();
@@ -298,8 +298,8 @@ async fn introspecting_a_table_enums_should_return_alphabetically_even_when_in_d
 
     let dm = r#"
         model Book {
-            color   String
-            color2  String
+            color   color
+            color2  color2
             id      Int     @default(autoincrement()) @id 
         }
         

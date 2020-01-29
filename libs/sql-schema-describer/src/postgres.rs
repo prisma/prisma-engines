@@ -31,15 +31,14 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
     async fn describe(&self, schema: &str) -> SqlSchemaDescriberResult<SqlSchema> {
         debug!("describing schema '{}'", schema);
         let sequences = self.get_sequences(schema).await?;
+        let enums = self.get_enums(schema).await?;
+
         let table_names = self.get_table_names(schema).await;
-
         let mut tables = Vec::with_capacity(table_names.len());
-
         for table_name in &table_names {
-            tables.push(self.get_table(schema, &table_name, &sequences).await);
+            tables.push(self.get_table(schema, &table_name, &sequences, &enums).await);
         }
 
-        let enums = self.get_enums(schema).await?;
         Ok(SqlSchema {
             enums,
             sequences,
@@ -112,9 +111,9 @@ impl SqlSchemaDescriber {
         size.try_into().unwrap()
     }
 
-    async fn get_table(&self, schema: &str, name: &str, sequences: &Vec<Sequence>) -> Table {
+    async fn get_table(&self, schema: &str, name: &str, sequences: &Vec<Sequence>, enums: &Vec<Enum>) -> Table {
         debug!("Getting table '{}'", name);
-        let columns = self.get_columns(schema, name).await;
+        let columns = self.get_columns(schema, name, enums).await;
         let (indices, primary_key) = self.get_indices(schema, name, sequences).await;
         let foreign_keys = self.get_foreign_keys(schema, name).await;
         Table {
@@ -126,7 +125,7 @@ impl SqlSchemaDescriber {
         }
     }
 
-    async fn get_columns(&self, schema: &str, table: &str) -> Vec<Column> {
+    async fn get_columns(&self, schema: &str, table: &str, enums: &Vec<Enum>) -> Vec<Column> {
         let sql = "SELECT column_name, data_type, udt_name as full_column_type, column_default, is_nullable, is_identity, data_type
             FROM information_schema.columns
             WHERE table_schema = $1 AND table_name = $2
@@ -177,7 +176,7 @@ impl SqlSchemaDescriber {
                 } else {
                     ColumnArity::Nullable
                 };
-                let tpe = get_column_type(data_type.as_ref(), &full_data_type, arity);
+                let tpe = get_column_type(data_type.as_ref(), &full_data_type, arity, enums);
 
                 let default = col.get("column_default").and_then(|param_value| {
                     param_value
@@ -517,8 +516,11 @@ impl SqlSchemaDescriber {
     }
 }
 
-fn get_column_type(_data_type: &str, full_data_type: &str, arity: ColumnArity) -> ColumnType {
+fn get_column_type(data_type: &str, full_data_type: &str, arity: ColumnArity, enums: &Vec<Enum>) -> ColumnType {
     let family = match full_data_type {
+        x if data_type == "USER-DEFINED" && enums.iter().find(|e| e.name == x).is_some() => {
+            ColumnTypeFamily::Enum(x.to_string())
+        }
         "int2" => ColumnTypeFamily::Int,
         "int4" => ColumnTypeFamily::Int,
         "int8" => ColumnTypeFamily::Int,
@@ -564,7 +566,7 @@ fn get_column_type(_data_type: &str, full_data_type: &str, arity: ColumnArity) -
     };
     ColumnType {
         raw: full_data_type.to_string(),
-        family: family,
+        family,
         arity,
     }
 }
