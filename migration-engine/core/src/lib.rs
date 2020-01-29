@@ -8,6 +8,7 @@ pub mod migration_engine;
 
 pub use api::GenericApi;
 pub use commands::{ApplyMigrationInput, InferMigrationStepsInput, MigrationStepsResultOutput};
+pub use error::CoreResult;
 
 use commands::{CommandError, CommandResult};
 use datamodel::{
@@ -15,8 +16,9 @@ use datamodel::{
     dml::Datamodel,
 };
 use error::Error;
+use std::sync::Arc;
 
-pub async fn migration_api(datamodel: &str) -> CoreResult<Box<dyn api::GenericApi>> {
+pub async fn migration_api(datamodel: &str) -> CoreResult<Arc<dyn api::GenericApi>> {
     let config = datamodel::parse_configuration(datamodel)?;
 
     let source = config.datasources.first().ok_or(CommandError::DataModelErrors {
@@ -33,10 +35,8 @@ pub async fn migration_api(datamodel: &str) -> CoreResult<Box<dyn api::GenericAp
 
     let api = api::MigrationApi::new(connector).await?;
 
-    Ok(Box::new(api))
+    Ok(Arc::new(api))
 }
-
-pub type CoreResult<T> = Result<T, Error>;
 
 pub(crate) fn parse_datamodel(datamodel: &str) -> CommandResult<Datamodel> {
     let result = datamodel::parse_datamodel_or_pretty_error(&datamodel, "datamodel file, line");
