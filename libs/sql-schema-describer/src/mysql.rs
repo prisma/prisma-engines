@@ -458,8 +458,6 @@ fn get_column_type_and_enum(
         ("json", _) => ColumnTypeFamily::Json,
         _ => ColumnTypeFamily::Unknown,
     };
-    println!("{}", data_type);
-    println!("{}", full_data_type);
 
     let tpe = ColumnType {
         raw: data_type.to_string(),
@@ -467,36 +465,43 @@ fn get_column_type_and_enum(
         arity,
     };
 
-    //todo values
     match &family {
         ColumnTypeFamily::Enum(name) => (
             tpe,
             Some(Enum {
                 name: name.clone(),
-                values: vec![],
+                values: extract_enum_values(&full_data_type),
             }),
         ),
         _ => (tpe, None),
     }
 }
 
+fn extract_enum_values(full_data_type: &&str) -> Vec<String> {
+    let len = &full_data_type.len() - 1;
+    let vals = &full_data_type[5..len];
+    vals.split(",")
+        .map(|v| unquote_mariadb_strings(v).to_string())
+        .collect()
+}
+
 fn sanitize_default_value(value: &str) -> Option<&str> {
     match value {
         "NULL" => None,
-        default if default.starts_with("'") => Some(unquote_mariadb_string_defaults(default)),
+        default if default.starts_with("'") => Some(unquote_mariadb_strings(default)),
         other => Some(other),
     }
 }
 
-fn unquote_mariadb_string_defaults(default: &str) -> &str {
+fn unquote_mariadb_strings(input: &str) -> &str {
     /// Regex for matching the quotes on the introspected string values on MariaDB.
     static MARIADB_STRING_DEFAULT_RE: Lazy<regex::Regex> = Lazy::new(|| regex::Regex::new(r#"^'(.*)'$"#).unwrap());
 
     MARIADB_STRING_DEFAULT_RE
-        .captures(default)
+        .captures(input)
         .and_then(|captures| captures.get(1))
         .map(|capt| capt.as_str())
-        .unwrap_or(default)
+        .unwrap_or(input)
 }
 
 #[cfg(test)]
@@ -507,8 +512,8 @@ mod tests {
     fn mariadb_string_default_regex_works() {
         let quoted_str = "'abc $$ def'";
 
-        assert_eq!(unquote_mariadb_string_defaults(quoted_str), "abc $$ def");
+        assert_eq!(unquote_mariadb_strings(quoted_str), "abc $$ def");
 
-        assert_eq!(unquote_mariadb_string_defaults("heh "), "heh ");
+        assert_eq!(unquote_mariadb_strings("heh "), "heh ");
     }
 }
