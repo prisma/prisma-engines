@@ -1,6 +1,6 @@
 //! Error module
+use std::{fmt, io};
 use thiserror::Error;
-use std::{io, fmt};
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum DatabaseConstraint {
@@ -12,7 +12,7 @@ impl fmt::Display for DatabaseConstraint {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::Fields(fields) => write!(f, "({})", fields.join(",")),
-            Self::Index(index) => index.fmt(f)
+            Self::Index(index) => index.fmt(f),
         }
     }
 }
@@ -70,11 +70,11 @@ pub enum Error {
     #[error("Error in an I/O operation")]
     IoError(io::Error),
 
-    #[error("Connect timed out")]
-    ConnectTimeout,
+    #[error("Connect timed out ({0})")]
+    ConnectTimeout(String),
 
-    #[error("Operation timed out")]
-    Timeout,
+    #[error("Operation timed out ({0})")]
+    Timeout(String),
 
     #[error("Error opening a TLS connection. {}", message)]
     TlsError { message: String },
@@ -89,7 +89,7 @@ impl From<mobc::Error<Error>> for Error {
     fn from(e: mobc::Error<Error>) -> Self {
         match e {
             mobc::Error::Inner(e) => e,
-            mobc::Error::Timeout => Self::Timeout,
+            mobc::Error::Timeout => Self::Timeout("mobc timeout".into()),
             e @ mobc::Error::BadConn => Self::ConnectionError(Box::new(e)),
         }
     }
@@ -98,7 +98,7 @@ impl From<mobc::Error<Error>> for Error {
 #[cfg(any(feature = "postgresql", feature = "mysql"))]
 impl From<tokio::time::Elapsed> for Error {
     fn from(_: tokio::time::Elapsed) -> Self {
-        Self::Timeout
+        Self::Timeout("tokio timeout".into())
     }
 }
 

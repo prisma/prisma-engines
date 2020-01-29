@@ -1,4 +1,4 @@
-use crate::error::{Error, DatabaseConstraint};
+use crate::error::{DatabaseConstraint, Error};
 
 impl From<tokio_postgres::error::Error> for Error {
     fn from(e: tokio_postgres::error::Error) -> Error {
@@ -18,7 +18,7 @@ impl From<tokio_postgres::error::Error> for Error {
                 let field_names: Vec<String> = field_names.split(", ").map(|s| s.to_string()).collect();
 
                 Error::UniqueConstraintViolation {
-                    constraint: DatabaseConstraint::Fields(field_names)
+                    constraint: DatabaseConstraint::Fields(field_names),
                 }
             }
             // Even lipstick will not save this...
@@ -31,7 +31,7 @@ impl From<tokio_postgres::error::Error> for Error {
                 let field_name = splitted[4].replace("\"", "");
 
                 Error::NullConstraintViolation {
-                    constraint: DatabaseConstraint::Fields(vec![field_name])
+                    constraint: DatabaseConstraint::Fields(vec![field_name]),
                 }
             }
             Some("3D000") => {
@@ -82,7 +82,9 @@ impl From<tokio_postgres::error::Error> for Error {
                 let reason = format!("{}", e);
 
                 match reason.as_str() {
-                    "error connecting to server: timed out" => Error::ConnectTimeout, // sigh...
+                    "error connecting to server: timed out" => {
+                        Error::ConnectTimeout("tokio-postgres timeout connecting to server".into())
+                    } // sigh...
                     // https://github.com/sfackler/rust-postgres/blob/0c84ed9f8201f4e5b4803199a24afa2c9f3723b2/tokio-postgres/src/connect_tls.rs#L37
                     "error performing TLS handshake: server does not support TLS" => {
                         Error::TlsError { message: reason }
@@ -107,10 +109,7 @@ fn try_extracting_io_error(err: &tokio_postgres::error::Error) -> Option<Error> 
 
     err.source()
         .and_then(|err| err.downcast_ref::<std::io::Error>())
-        .map(|err| Error::ConnectionError(Box::new(std::io::Error::new(
-            err.kind(),
-            format!("{}", err),
-        ))))
+        .map(|err| Error::ConnectionError(Box::new(std::io::Error::new(err.kind(), format!("{}", err)))))
 }
 
 impl From<native_tls::Error> for Error {

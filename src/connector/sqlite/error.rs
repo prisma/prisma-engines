@@ -19,10 +19,11 @@ impl From<rusqlite::Error> for Error {
                 let field_names: Vec<String> = splitted[1]
                     .split(", ")
                     .map(|s| s.split(".").last().unwrap())
-                    .map(|s| s.to_string()).collect();
+                    .map(|s| s.to_string())
+                    .collect();
 
                 Error::UniqueConstraintViolation {
-                    constraint: DatabaseConstraint::Fields(field_names)
+                    constraint: DatabaseConstraint::Fields(field_names),
                 }
             }
 
@@ -38,10 +39,11 @@ impl From<rusqlite::Error> for Error {
                 let field_names: Vec<String> = splitted[1]
                     .split(", ")
                     .map(|s| s.split(".").last().unwrap())
-                    .map(|s| s.to_string()).collect();
+                    .map(|s| s.to_string())
+                    .collect();
 
                 Error::UniqueConstraintViolation {
-                    constraint: DatabaseConstraint::Fields(field_names)
+                    constraint: DatabaseConstraint::Fields(field_names),
                 }
             }
 
@@ -57,10 +59,11 @@ impl From<rusqlite::Error> for Error {
                 let field_names: Vec<String> = splitted[1]
                     .split(", ")
                     .map(|s| s.split(".").last().unwrap())
-                    .map(|s| s.to_string()).collect();
+                    .map(|s| s.to_string())
+                    .collect();
 
                 Error::NullConstraintViolation {
-                    constraint: DatabaseConstraint::Fields(field_names)
+                    constraint: DatabaseConstraint::Fields(field_names),
                 }
             }
 
@@ -69,10 +72,8 @@ impl From<rusqlite::Error> for Error {
                     code: ffi::ErrorCode::DatabaseBusy,
                     ..
                 },
-                _
-            ) => {
-                Error::Timeout
-            }
+                _,
+            ) => Error::Timeout("SQLite database is busy".into()),
 
             e => Error::QueryError(e.into()),
         }
