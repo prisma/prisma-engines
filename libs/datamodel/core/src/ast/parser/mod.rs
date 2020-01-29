@@ -287,7 +287,11 @@ fn parse_enum(token: &pest::iterators::Pair<'_, Rule>) -> Enum {
         Rule::ENUM_KEYWORD => { },
         Rule::identifier => name = Some(current.to_id()),
         Rule::directive => directives.push(parse_directive(&current)),
-        Rule::enum_field_declaration => values.push(EnumValue { name: current.as_str().to_string(), span: Span::from_pest(current.as_span()) }),
+        Rule::enum_field_declaration => {
+            let name_token = current.into_inner().next().unwrap();
+            let enum_value_name = name_token.as_str().to_string();
+            values.push(EnumValue { name: enum_value_name.as_str().to_string(), span: Span::from_pest(name_token.as_span()) })
+        },
         Rule::doc_comment => comments.push(parse_doc_comment(&current)),
         _ => unreachable!("Encountered impossible enum declaration during parsing: {:?}", current.tokens())
     }
@@ -486,6 +490,7 @@ fn rule_to_string(rule: Rule) -> &'static str {
         Rule::source_block => "source definition",
         Rule::generator_block => "generator definition",
         Rule::enum_field_declaration => "enum field declaration",
+        Rule::block_level_directive => "block level directive",
         Rule::EOI => "end of input",
         Rule::identifier => "alphanumeric identifier",
         Rule::numeric_literal => "numeric literal",
