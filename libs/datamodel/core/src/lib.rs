@@ -197,7 +197,7 @@ pub fn render_datamodel_and_config_to(
 }
 
 /// Renders as a string into the stream.
-fn render_schema_ast_to(stream: &mut dyn std::io::Write, schema: &ast::SchemaAst, ident_width: usize) {
+pub(crate) fn render_schema_ast_to(stream: &mut dyn std::io::Write, schema: &ast::SchemaAst, ident_width: usize) {
     let mut renderer = ast::renderer::Renderer::new(stream, ident_width);
     renderer.render(schema);
 }

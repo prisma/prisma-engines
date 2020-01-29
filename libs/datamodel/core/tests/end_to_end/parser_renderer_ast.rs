@@ -148,16 +148,16 @@ fn test_parser_renderer_sources_via_ast() {
     assert_eq!(rendered, DATAMODEL_WITH_SOURCE);
 }
 
-const DATAMODEL_WITH_SOURCE_AND_COMMENTS: &str = r#"/// Super cool postgres source.
+const DATAMODEL_WITH_SOURCE_AND_COMMENTS: &str = r#"// Super cool postgres source.
 datasource pg1 {
   provider = "postgres"
   url      = "https://localhost/postgres1"
 }
 
-/// My author model.
+// My author model.
 model Author {
   id        Int      @id
-  /// Name of the author.
+  // Name of the author.
   name      String?
   createdAt DateTime @default(now())
 }"#;

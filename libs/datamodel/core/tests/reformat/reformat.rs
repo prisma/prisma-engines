@@ -29,10 +29,9 @@ fn test_reformat_config() {
         }
     "#;
 
-    let expected = r#"
-datasource pg {
+    let expected = r#"datasource pg {
   provider = "postgres"
-  url = "postgres://"
+  url      = "postgres://"
 }"#;
 
     let mut buf = Vec::new();
@@ -50,10 +49,9 @@ fn test_reformat_tabs() {
         }
     "#;
 
-    let expected = r#"
-datasource pg {
+    let expected = r#"datasource pg {
   provider = "postgres"
-  url = "postgres://"
+  url      = "postgres://"
 }"#;
 
     let mut buf = Vec::new();

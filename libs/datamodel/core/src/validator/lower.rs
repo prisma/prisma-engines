@@ -49,7 +49,7 @@ impl LowerDmlToAst {
         Ok(ast::SchemaAst { tops: tops })
     }
 
-    fn lower_model(&self, model: &dml::Model, datamodel: &dml::Datamodel) -> Result<ast::Model, ErrorCollection> {
+    pub fn lower_model(&self, model: &dml::Model, datamodel: &dml::Datamodel) -> Result<ast::Model, ErrorCollection> {
         let mut errors = ErrorCollection::new();
         let mut fields: Vec<ast::Field> = Vec::new();
 
