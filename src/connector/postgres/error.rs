@@ -25,13 +25,14 @@ impl From<tokio_postgres::error::Error> for Error {
             Some("23502") => {
                 let error = e.into_source().unwrap(); // boom
                 let db_error = error.downcast_ref::<DbError>().unwrap(); // BOOM
-                let detail = db_error.message(); // KA-BOOM
 
-                let splitted: Vec<&str> = detail.split(' ').collect();
-                let field_name = splitted[4].replace("\"", "");
+                let column_name = db_error
+                    .column()
+                    .expect("column on null constraint violation error")
+                    .to_owned();
 
                 Error::NullConstraintViolation {
-                    constraint: DatabaseConstraint::Fields(vec![field_name]),
+                    constraint: DatabaseConstraint::Fields(vec![column_name]),
                 }
             }
             Some("3D000") => {

@@ -13,12 +13,12 @@ use percent_encoding::percent_decode;
 use postgres_native_tls::MakeTlsConnector;
 use std::{
     borrow::{Borrow, Cow},
-    time::Duration,
-    future::Future,
     fs,
+    future::Future,
+    time::Duration,
 };
-use tokio_postgres::{config::SslMode, Client, Config};
 use tokio::time::timeout;
+use tokio_postgres::{config::SslMode, Client, Config};
 use url::Url;
 
 pub(crate) const DEFAULT_SCHEMA: &str = "public";
@@ -363,18 +363,18 @@ impl PostgreSql {
     async fn timeout<T, F, E>(&self, f: F) -> crate::Result<T>
     where
         F: Future<Output = std::result::Result<T, E>>,
-        E: Into<Error>
+        E: Into<Error>,
     {
         match self.socket_timeout {
             Some(duration) => match timeout(duration, f).await {
                 Ok(Ok(result)) => Ok(result),
                 Ok(Err(err)) => Err(err.into()),
                 Err(to) => Err(to.into()),
-            }
+            },
             None => match f.await {
                 Ok(result) => Ok(result),
                 Err(err) => Err(err.into()),
-            }
+            },
         }
     }
 }
@@ -394,7 +394,9 @@ impl Queryable for PostgreSql {
                 let client = self.client.lock().await;
                 let stmt = self.timeout(client.prepare(sql)).await?;
 
-                let rows = self.timeout(client.query(&stmt, conversion::conv_params(params).as_slice())).await?;
+                let rows = self
+                    .timeout(client.query(&stmt, conversion::conv_params(params).as_slice()))
+                    .await?;
                 let mut result = ResultSet::new(stmt.to_column_names(), Vec::new());
 
                 for row in rows {
@@ -421,7 +423,7 @@ impl Queryable for PostgreSql {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{connector::Queryable, single::Quaint, error::*};
+    use crate::{connector::Queryable, error::*, single::Quaint};
     use lazy_static::lazy_static;
     use std::env;
     use url::Url;
@@ -509,29 +511,33 @@ mod tests {
         let _ = conn.raw_cmd("DROP TABLE test_uniq_constraint_violation").await;
         let _ = conn.raw_cmd("DROP INDEX idx_uniq_constraint_violation").await;
 
-        conn.raw_cmd("CREATE TABLE test_uniq_constraint_violation (id1 int, id2 int)").await.unwrap();
-        conn.raw_cmd("CREATE UNIQUE INDEX idx_uniq_constraint_violation ON test_uniq_constraint_violation (id1, id2)").await.unwrap();
+        conn.raw_cmd("CREATE TABLE test_uniq_constraint_violation (id1 int, id2 int)")
+            .await
+            .unwrap();
+        conn.raw_cmd("CREATE UNIQUE INDEX idx_uniq_constraint_violation ON test_uniq_constraint_violation (id1, id2)")
+            .await
+            .unwrap();
 
         conn.query_raw(
             "INSERT INTO test_uniq_constraint_violation (id1, id2) VALUES (1, 2)",
-            &[]
-        ).await.unwrap();
+            &[],
+        )
+        .await
+        .unwrap();
 
-        let res = conn.query_raw(
-            "INSERT INTO test_uniq_constraint_violation (id1, id2) VALUES (1, 2)",
-            &[]
-        ).await;
+        let res = conn
+            .query_raw(
+                "INSERT INTO test_uniq_constraint_violation (id1, id2) VALUES (1, 2)",
+                &[],
+            )
+            .await;
 
         match res.unwrap_err() {
-            Error::UniqueConstraintViolation { constraint } => {
-                assert_eq!(
-                    DatabaseConstraint::Fields(
-                        vec![String::from("id1"), String::from("id2")]
-                    ),
-                    constraint,
-                )
-            },
-            e => panic!(e)
+            Error::UniqueConstraintViolation { constraint } => assert_eq!(
+                DatabaseConstraint::Fields(vec![String::from("id1"), String::from("id2")]),
+                constraint,
+            ),
+            e => panic!(e),
         }
     }
 
@@ -541,18 +547,19 @@ mod tests {
 
         let _ = conn.raw_cmd("DROP TABLE test_null_constraint_violation").await;
 
-        conn.raw_cmd("CREATE TABLE test_null_constraint_violation (id1 int not null, id2 int not null)").await.unwrap();
+        conn.raw_cmd("CREATE TABLE test_null_constraint_violation (id1 int not null, id2 int not null)")
+            .await
+            .unwrap();
 
-        let res = conn.query_raw(
-            "INSERT INTO test_null_constraint_violation DEFAULT VALUES",
-            &[]
-        ).await;
+        let res = conn
+            .query_raw("INSERT INTO test_null_constraint_violation DEFAULT VALUES", &[])
+            .await;
 
         match res.unwrap_err() {
             Error::NullConstraintViolation { constraint } => {
                 assert_eq!(DatabaseConstraint::Fields(vec![String::from("id1")]), constraint)
-            },
-            e => panic!(e)
+            }
+            e => panic!(e),
         }
     }
 
@@ -598,6 +605,65 @@ mod tests {
             Ok(_) => unreachable!(),
             Err(Error::TlsError { .. }) => (),
             Err(other) => panic!("{:#?}", other),
+        }
+    }
+
+    #[tokio::test]
+    async fn should_map_null_constraint_errors() {
+        use crate::ast::*;
+
+        let conn = Quaint::new(&CONN_STR).await.unwrap();
+
+        conn.query_raw("DROP TABLE IF EXISTS should_map_null_constraint_errors_test", &[])
+            .await
+            .unwrap();
+
+        conn.query_raw(
+            "CREATE TABLE should_map_null_constraint_errors_test (id TEXT PRIMARY KEY, optional TEXT)",
+            &[],
+        )
+        .await
+        .unwrap();
+
+        let err = conn
+            .query(
+                Insert::single_into("should_map_null_constraint_errors_test")
+                    .value("id", ParameterizedValue::Null)
+                    .into(),
+            )
+            .await
+            .unwrap_err();
+
+        match err {
+            Error::NullConstraintViolation { constraint } => {
+                assert_eq!(constraint, DatabaseConstraint::Fields(vec!["id".into()]))
+            }
+            other => panic!("{:?}", other),
+        }
+
+        // Schema change null constraint violations now
+
+        conn.query(
+            Insert::single_into("should_map_null_constraint_errors_test")
+                .value("id", "theid")
+                .into(),
+        )
+        .await
+        .unwrap();
+
+        let err = conn
+            .query_raw(
+                "ALTER TABLE should_map_null_constraint_errors_test ALTER COLUMN optional SET NOT NULL",
+                &[],
+            )
+            .await
+            .unwrap_err();
+
+        match err {
+            Error::NullConstraintViolation { constraint } => {
+                assert_eq!(constraint, DatabaseConstraint::Fields(vec!["optional".into()]))
+            }
+            other => panic!("{:?}", other),
         }
     }
 }
