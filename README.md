@@ -1,6 +1,6 @@
 # Prisma Engines
 
-This repository contains a collection of engines that power the core stack for the [Prisma Framework](https://github.com/prisma/prisma2), most prominently [Photon](https://github.com/prisma/photonjs/) and [Lift](https://github.com/prisma/lift/).
+This repository contains a collection of engines that power the core stack for [Prisma](https://github.com/prisma/prisma2), most prominently [Prisma Client](https://github.com/prisma/prisma-client-js) and [Prisma Migrate](https://github.com/prisma/migrate).
 
 The engines and their respective binary crates are:
 - Query engine: `prisma`
@@ -23,7 +23,7 @@ If you want to build the optimized binaries in release mode, the command is `car
 
 Depending on how you invoked `cargo` in the previous step, you can find the compiled binaries inside the repository root in the `target/debug` (without `--release`) or `target/release` directories (with `--release`):
 
-| Prisma Framework Component | Path to Binary                                            |
+| Prisma Component           | Path to Binary                                            |
 | -------------------------- | --------------------------------------------------------- |
 | Query Engine               | `./target/[debug\|release]/prisma`                         |
 | Migration Engine           | `./target/[debug\|release]/migration-engine`               |
