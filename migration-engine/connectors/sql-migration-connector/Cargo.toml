@@ -7,7 +7,7 @@ edition = "2018"
 [dependencies]
 anyhow = "1.0.26"
 async-trait = "0.1.17"
-barrel = { version = "0.6.5-alpha.0", features = ["sqlite3", "mysql", "pg"] }
+barrel = { version = "0.6.5", features = ["sqlite3", "mysql", "pg"] }
 chrono = { version = "0.4" }
 datamodel = { path = "../../../libs/datamodel/core" }
 itertools = "0.8"
