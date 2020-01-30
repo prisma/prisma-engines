@@ -1,3 +1,5 @@
+pub mod multi_user;
+
 pub use super::assertions::*;
 pub use super::command_helpers::*;
 pub use super::misc_helpers::*;
