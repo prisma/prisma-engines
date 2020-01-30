@@ -98,7 +98,7 @@ pub async fn update_records(
 
     let updates = {
         let ids: Vec<&RecordIdentifier> = ids.iter().map(|id| &*id).collect();
-        write::update_many(model, ids.as_slice(), &args)?
+        write::update_many(model, ids.as_slice(), args)?
     };
 
     for update in updates {

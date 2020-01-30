@@ -219,4 +219,10 @@ impl Fields {
             None
         }
     }
+
+    pub fn db_names<'a>(&'a self) -> impl Iterator<Item = String> + 'a {
+        self.all
+            .iter()
+            .flat_map(|field| field.data_source_fields().into_iter().map(|dsf| dsf.name.clone()))
+    }
 }
