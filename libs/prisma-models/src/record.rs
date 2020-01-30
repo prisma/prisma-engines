@@ -2,7 +2,7 @@ use crate::{dml::FieldArity, DataSourceFieldRef, DomainError, Field, ModelRef, P
 
 // Collection of fields that uniquely identify a record of a model.
 // There can be different sets of fields at the same time identifying a model.
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, PartialEq)]
 pub struct ModelIdentifier {
     fields: Vec<Field>,
 }

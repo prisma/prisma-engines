@@ -2,6 +2,7 @@
 use super::FilteredQuery;
 use connector::{filter::Filter, WriteArgs};
 use prisma_models::prelude::*;
+use std::sync::Arc;
 
 #[derive(Debug, Clone)]
 pub enum WriteQuery {
@@ -12,7 +13,6 @@ pub enum WriteQuery {
     DeleteManyRecords(DeleteManyRecords),
     ConnectRecords(ConnectRecords),
     DisconnectRecords(DisconnectRecords),
-    ResetData(ResetData),
 }
 
 impl WriteQuery {
@@ -54,19 +54,31 @@ impl WriteQuery {
     }
 
     pub fn returns(&self, ident: &ModelIdentifier) -> bool {
-        let db_names = ident.db_names().map(|n| n.as_str());
+        let returns_id = &self.model().primary_identifier() == ident;
 
-        // x.selected_fields.contains_all_db_names(db_names)
-
+        // Write operations only return IDs at the moment, so anything different
+        // from the primary ID is automatically not returned.
+        // DeleteMany, Connect and Disconnect do not return anything.
         match self {
-            Self::CreateRecord(q) => todo!(),
-            Self::UpdateRecord(q) => todo!(),
-            Self::DeleteRecord(q) => todo!(),
-            Self::UpdateManyRecords(q) => todo!(),
-            Self::DeleteManyRecords(q) => todo!(),
+            Self::CreateRecord(q) => returns_id,
+            Self::UpdateRecord(q) => returns_id,
+            Self::DeleteRecord(q) => returns_id,
+            Self::UpdateManyRecords(q) => returns_id,
+            Self::DeleteManyRecords(q) => false,
             Self::ConnectRecords(q) => false,
             Self::DisconnectRecords(q) => false,
-            Self::ResetData(q) => false,
+        }
+    }
+
+    fn model(&self) -> ModelRef {
+        match self {
+            Self::CreateRecord(q) => Arc::clone(&q.model),
+            Self::UpdateRecord(q) => Arc::clone(&q.model),
+            Self::DeleteRecord(q) => Arc::clone(&q.model),
+            Self::UpdateManyRecords(q) => Arc::clone(&q.model),
+            Self::DeleteManyRecords(q) => Arc::clone(&q.model),
+            Self::ConnectRecords(q) => q.relation_field.model(),
+            Self::DisconnectRecords(q) => q.relation_field.model(),
         }
     }
 }
@@ -107,7 +119,6 @@ impl std::fmt::Display for WriteQuery {
             Self::DeleteManyRecords(q) => write!(f, "DeleteManyRecords: {}", q.model.name),
             Self::ConnectRecords(_) => write!(f, "ConnectRecords"),
             Self::DisconnectRecords(_) => write!(f, "DisconnectRecords"),
-            Self::ResetData(_) => write!(f, "ResetData"),
         }
     }
 }
@@ -156,11 +167,6 @@ pub struct DisconnectRecords {
     pub parent_id: Option<RecordIdentifier>,
     pub child_ids: Vec<RecordIdentifier>,
     pub relation_field: RelationFieldRef,
-}
-
-#[derive(Debug, Clone)]
-pub struct ResetData {
-    pub internal_data_model: InternalDataModelRef,
 }
 
 impl FilteredQuery for UpdateRecord {

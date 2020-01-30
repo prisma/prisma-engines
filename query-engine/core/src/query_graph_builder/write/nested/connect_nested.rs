@@ -82,7 +82,7 @@ fn handle_many_to_many(
     child_model: &ModelRef,
 ) -> QueryGraphBuilderResult<()> {
     let expected_connects = filter.size();
-    let child_read_query = utils::read_ids_infallible(&child_model, filter);
+    let child_read_query = utils::read_ids_infallible(child_model.clone(), child_model.primary_identifier(), filter);
     let child_node = graph.create_node(child_read_query);
 
     graph.create_edge(&parent_node, &child_node, QueryGraphDependency::ExecutionOrder)?;

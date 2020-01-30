@@ -77,7 +77,7 @@ fn handle_many_to_many(
 ///
 /// Concerning `create_nodes` parameter:
 /// - If the relation side is inlined on the parent, `create_nodes` can only be of length 1,
-///   because there can only be one possible child being created in that direction.
+///   because there can only be one possible child being created in that direction in the API.
 ///
 /// - If the relation side is inlined on the child, `create_nodes` can be of any size greater 1.
 ///   Opposite to the above reasoning, an indefinite amount of children can be created.
@@ -88,25 +88,26 @@ fn handle_many_to_many(
 /// In case the relation link used to satisfy the relation is NOT the same as the primary ID of the
 /// parent model (i.e. `Create Child` here) and it can be determined that the parent operation does
 /// not return the necessary set of fields, we need to reload (`Reload Child`) the created record to
-/// be able to write the correct inlined data into `Parent`.
+/// be able to write the correct inlined data into `Parent`. NOTE: Currently we always insert the reload!
 ///
+/// Example finalized (with swaps already performed) graph:
 /// ```text
 /// ┌────────────────┐             ┌────────────────┐
-/// │  Child Create  │             │  Child Create  │
-/// └────────────────┘             └────────────────┘
-///          │                              │
-///          │                              │
-///          │                              │
-///          ▼                              ▼
-/// ┌ ─ ─ ─ ─ ─ ─ ─ ─              ┌────────────────┐
-///       Parent     │             │  Reload Child  │
-/// └ ─ ─ ─ ─ ─ ─ ─ ─              └────────────────┘
-///          │                              │
-///          │                              │
-///          │                              │
-///          ▼                              ▼
-/// ┌ ─ ─ ─ ─ ─ ─ ─ ─              ┌ ─ ─ ─ ─ ─ ─ ─ ─
-///       Result     │                   Parent     │
+/// │  Child Create  │          ┌──│  Child Create  │
+/// └────────────────┘          │  └────────────────┘
+///          │                  │           │
+///          │                  │           │
+///          │                  │           │
+///          ▼                  │           ▼
+/// ┌ ─ ─ ─ ─ ─ ─ ─ ─           │  ┌────────────────┐
+///       Parent     │          │  │  Reload Child  │
+/// └ ─ ─ ─ ─ ─ ─ ─ ─           │  └────────────────┘
+///          │                  │           │
+///          │                  │           │
+///          │                  │           │
+///          ▼                  │           ▼
+/// ┌ ─ ─ ─ ─ ─ ─ ─ ─           │  ┌ ─ ─ ─ ─ ─ ─ ─ ─
+///       Result     │          └─▶      Parent     │
 /// └ ─ ─ ─ ─ ─ ─ ─ ─              └ ─ ─ ─ ─ ─ ─ ─ ─
 ///                                         │
 ///                                         │
@@ -117,7 +118,8 @@ fn handle_many_to_many(
 ///                                └ ─ ─ ─ ─ ─ ─ ─ ─
 /// ```
 ///
-/// In case of the child, we can have the parent first, then do the child create(s) and
+/// ## Inlined on the child
+/// We can have the parent operation first, then do the child create(s) and
 /// insert the parent ID into the inline relation field.
 ///
 /// Example for 2 children:
@@ -142,15 +144,41 @@ fn handle_one_to_many(
             .pop()
             .expect("[Query Graph] Expected one nested create node on a 1:m relation with inline IDs on the parent.");
 
-        // For the injection, we need the name of the field on the inlined side, in this case the parent.
-        let relation_field_name = parent_relation_field.name.clone();
+        // Because we're swapping the parent and child model, we need to look at the related field instead of the parent relation field.
+        let reload_node =
+            utils::insert_node_reload(graph, &parent_relation_field.related_field(), create_node.clone())?;
 
-        // We need to swap the create node and the parent because the inlining is done in the parent.
+        // We need to swap the create node (with reload) and the parent because the inlining is done in the parent.
         graph.mark_nodes(&parent_node, &create_node);
+        graph.mark_nodes(&parent_node, &reload_node);
+
+        // We extract the child linking fields in the edge, because after the swap, the child is the new parent.
+        let child_model_id = parent_relation_field.related_field().linking_fields();
+
+        graph.create_edge(&parent_node, &create_node, QueryGraphDependency::ExecutionOrder);
+
+        graph.create_edge(
+            &create_node,
+            &reload_node,
+            QueryGraphDependency::ParentIds(child_model_id, Box::new(|mut child_node, mut parent_ids| {
+                let parent_id = match parent_ids.pop() {
+                    Some(pid) => Ok(pid),
+                    None => Err(QueryGraphBuilderError::AssertionError(format!(
+                        "[Query Graph] Expected a valid parent ID to be present for a nested create on a one-to-many relation."
+                    ))),
+                }?;
+
+                if let Node::Query(Query::Write(ref mut wq)) = child_node {
+                    wq.inject_all(relation_field_name, parent_id);
+                }
+
+                Ok(child_node)
+            })),
+        )?;
 
         graph.create_edge(
             &parent_node,
-            &create_node,
+            &reload_node,
             QueryGraphDependency::ParentIds(Box::new(|mut child_node, mut parent_ids| {
                 let parent_id = match parent_ids.pop() {
                     Some(pid) => Ok(pid),

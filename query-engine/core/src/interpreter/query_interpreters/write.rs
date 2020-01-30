@@ -17,7 +17,6 @@ pub async fn execute<'a, 'b>(
         WriteQuery::DeleteManyRecords(q) => delete_many(tx, q).await,
         WriteQuery::ConnectRecords(q) => connect(tx, q).await,
         WriteQuery::DisconnectRecords(q) => disconnect(tx, q).await,
-        WriteQuery::ResetData(q) => reset(tx, q).await,
     }
 }
 
@@ -85,8 +84,4 @@ async fn disconnect<'a, 'b>(tx: &'a ConnectionLike<'a, 'b>, q: DisconnectRecords
     .await?;
 
     Ok(QueryResult::Unit)
-}
-
-async fn reset<'a, 'b>(_tx: &'a ConnectionLike<'a, 'b>, _q: ResetData) -> InterpretationResult<QueryResult> {
-    unimplemented!()
 }

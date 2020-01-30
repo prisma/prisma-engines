@@ -23,20 +23,23 @@ pub fn create_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedF
     graph.create_edge(
         &create_node,
         &read_node,
-        QueryGraphDependency::ParentIds(Box::new(move |mut node, mut parent_ids| {
-            let parent_id = match parent_ids.pop() {
-                Some(pid) => Ok(pid),
-                None => Err(QueryGraphBuilderError::AssertionError(format!(
-                    "Expected a valid parent ID to be present for create follow-up read query."
-                ))),
-            }?;
+        QueryGraphDependency::ParentIds(
+            model.primary_identifier(),
+            Box::new(move |mut node, mut parent_ids| {
+                let parent_id = match parent_ids.pop() {
+                    Some(pid) => Ok(pid),
+                    None => Err(QueryGraphBuilderError::AssertionError(format!(
+                        "Expected a valid parent ID to be present for create follow-up read query."
+                    ))),
+                }?;
 
-            if let Node::Query(Query::Read(ReadQuery::RecordQuery(ref mut rq))) = node {
-                rq.add_filter(parent_id.filter());
-            };
+                if let Node::Query(Query::Read(ReadQuery::RecordQuery(ref mut rq))) = node {
+                    rq.add_filter(parent_id.filter());
+                };
 
-            Ok(node)
-        })),
+                Ok(node)
+            }),
+        ),
     )?;
 
     Ok(())
