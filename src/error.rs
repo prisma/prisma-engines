@@ -18,7 +18,73 @@ impl fmt::Display for DatabaseConstraint {
 }
 
 #[derive(Debug, Error)]
-pub enum Error {
+/// The error types for database I/O, connection and query parameter
+/// construction.
+pub struct Error {
+    kind: ErrorKind,
+    original_code: Option<String>,
+    original_message: Option<String>,
+}
+
+pub(crate) struct ErrorBuilder {
+    kind: ErrorKind,
+    original_code: Option<String>,
+    original_message: Option<String>,
+}
+
+impl ErrorBuilder {
+    pub(crate) fn set_original_code(&mut self, code: impl Into<String>) -> &mut Self {
+        self.original_code = Some(code.into());
+        self
+    }
+
+    pub(crate) fn set_original_message(&mut self, message: impl Into<String>) -> &mut Self {
+        self.original_message = Some(message.into());
+        self
+    }
+
+    pub(crate) fn build(self) -> Error {
+        Error {
+            kind: self.kind,
+            original_code: self.original_code,
+            original_message: self.original_message,
+        }
+    }
+}
+
+impl Error {
+    pub(crate) fn builder(kind: ErrorKind) -> ErrorBuilder {
+        ErrorBuilder {
+            kind,
+            original_code: None,
+            original_message: None,
+        }
+    }
+
+    /// The error code sent by the database, if available.
+    pub fn original_code(&self) -> Option<&str> {
+        self.original_code.as_ref().map(|s| s.as_str())
+    }
+
+    /// The original error message sent by the database, if available.
+    pub fn original_message(&self) -> Option<&str> {
+        self.original_message.as_ref().map(|s| s.as_str())
+    }
+
+    /// A more specific error type for matching.
+    pub fn kind(&self) -> &ErrorKind {
+        &self.kind
+    }
+}
+
+impl fmt::Display for Error {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        self.kind.fmt(f)
+    }
+}
+
+#[derive(Debug, Error)]
+pub enum ErrorKind {
     #[error("Error querying the database: {}", _0)]
     QueryError(Box<dyn std::error::Error + Send + Sync + 'static>),
 
@@ -89,8 +155,8 @@ impl From<mobc::Error<Error>> for Error {
     fn from(e: mobc::Error<Error>) -> Self {
         match e {
             mobc::Error::Inner(e) => e,
-            mobc::Error::Timeout => Self::Timeout("mobc timeout".into()),
-            e @ mobc::Error::BadConn => Self::ConnectionError(Box::new(e)),
+            mobc::Error::Timeout => Error::builder(ErrorKind::Timeout("mobc timeout".into())).build(),
+            e @ mobc::Error::BadConn => Error::builder(ErrorKind::ConnectionError(Box::new(e))).build(),
         }
     }
 }
@@ -98,24 +164,25 @@ impl From<mobc::Error<Error>> for Error {
 #[cfg(any(feature = "postgresql", feature = "mysql"))]
 impl From<tokio::time::Elapsed> for Error {
     fn from(_: tokio::time::Elapsed) -> Self {
-        Self::Timeout("tokio timeout".into())
+        Error::builder(ErrorKind::Timeout("tokio timeout".into())).build()
     }
 }
 
 impl From<url::ParseError> for Error {
     fn from(_: url::ParseError) -> Error {
-        Error::DatabaseUrlIsInvalid("Error parsing database connection string.".to_string())
+        let kind = ErrorKind::DatabaseUrlIsInvalid("Error parsing database connection string.".to_string());
+        Error::builder(kind).build()
     }
 }
 
 impl From<io::Error> for Error {
     fn from(e: io::Error) -> Error {
-        Error::IoError(e)
+        Error::builder(ErrorKind::IoError(e)).build()
     }
 }
 
 impl From<std::string::FromUtf8Error> for Error {
     fn from(_: std::string::FromUtf8Error) -> Error {
-        Error::ConversionError("Couldn't convert data to UTF-8")
+        Error::builder(ErrorKind::ConversionError("Couldn't convert data to UTF-8")).build()
     }
 }

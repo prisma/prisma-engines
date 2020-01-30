@@ -1,5 +1,5 @@
 use crate::ast::*;
-use crate::error::Error;
+use crate::error::{Error, ErrorKind};
 use rust_decimal::{
     prelude::{FromPrimitive, ToPrimitive},
     Decimal,
@@ -376,7 +376,9 @@ impl<'a> TryFrom<ParameterizedValue<'a>> for i64 {
     type Error = Error;
 
     fn try_from(value: ParameterizedValue<'a>) -> Result<i64, Self::Error> {
-        value.as_i64().ok_or(Error::ConversionError("Not an i64"))
+        value.as_i64().ok_or_else(|| {
+            Error::builder(ErrorKind::ConversionError("Not an i64")).build()
+        })
     }
 }
 
@@ -384,7 +386,9 @@ impl<'a> TryFrom<ParameterizedValue<'a>> for Decimal {
     type Error = Error;
 
     fn try_from(value: ParameterizedValue<'a>) -> Result<Decimal, Self::Error> {
-        value.as_decimal().ok_or(Error::ConversionError("Not a decimal"))
+        value.as_decimal().ok_or_else(|| {
+            Error::builder(ErrorKind::ConversionError("Not a decimal")).build()
+        })
     }
 }
 
@@ -395,7 +399,9 @@ impl<'a> TryFrom<ParameterizedValue<'a>> for f64 {
         value
             .as_decimal()
             .and_then(|d| d.to_f64())
-            .ok_or(Error::ConversionError("Not a f64"))
+            .ok_or_else(|| {
+                Error::builder(ErrorKind::ConversionError("Not a f64")).build()
+            })
     }
 }
 
@@ -403,7 +409,9 @@ impl<'a> TryFrom<ParameterizedValue<'a>> for String {
     type Error = Error;
 
     fn try_from(value: ParameterizedValue<'a>) -> Result<String, Self::Error> {
-        value.into_string().ok_or(Error::ConversionError("Not a string"))
+        value.into_string().ok_or_else(|| {
+            Error::builder(ErrorKind::ConversionError("Not a string")).build()
+        })
     }
 }
 
@@ -411,7 +419,9 @@ impl<'a> TryFrom<ParameterizedValue<'a>> for bool {
     type Error = Error;
 
     fn try_from(value: ParameterizedValue<'a>) -> Result<bool, Self::Error> {
-        value.as_bool().ok_or(Error::ConversionError("Not a bool"))
+        value.as_bool().ok_or_else(|| {
+            Error::builder(ErrorKind::ConversionError("Not a bool")).build()
+        })
     }
 }
 
@@ -420,7 +430,9 @@ impl<'a> TryFrom<ParameterizedValue<'a>> for DateTime<Utc> {
     type Error = Error;
 
     fn try_from(value: ParameterizedValue<'a>) -> Result<DateTime<Utc>, Self::Error> {
-        value.as_datetime().ok_or(Error::ConversionError("Not a datetime"))
+        value.as_datetime().ok_or_else(|| {
+            Error::builder(ErrorKind::ConversionError("Not a datetime")).build()
+        })
     }
 }
 

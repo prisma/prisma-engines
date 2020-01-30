@@ -4,7 +4,7 @@ mod result_row;
 pub use index::*;
 pub use result_row::*;
 
-use crate::ast::ParameterizedValue;
+use crate::{ast::ParameterizedValue, error::*};
 use std::sync::Arc;
 
 #[cfg(feature = "json-1")]
@@ -74,7 +74,7 @@ impl ResultSet {
     pub fn into_single(self) -> crate::Result<ResultRow> {
         match self.into_iter().next() {
             Some(row) => Ok(row),
-            None => Err(crate::error::Error::NotFound),
+            None => Err(Error::builder(ErrorKind::NotFound).build()),
         }
     }
 }

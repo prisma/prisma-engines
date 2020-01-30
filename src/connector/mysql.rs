@@ -3,14 +3,14 @@ mod error;
 
 use mysql_async::{self as my, prelude::Queryable as _};
 use percent_encoding::percent_decode;
-use std::{borrow::Cow, path::Path, time::Duration, future::Future};
-use url::Url;
+use std::{borrow::Cow, future::Future, path::Path, time::Duration};
 use tokio::time::timeout;
+use url::Url;
 
 use crate::{
     ast::{ParameterizedValue, Query},
     connector::{metrics, queryable::*, ResultSet, DBIO},
-    error::Error,
+    error::{Error, ErrorKind},
     visitor::{self, Visitor},
 };
 
@@ -109,7 +109,10 @@ impl MysqlUrl {
         for (k, v) in url.query_pairs() {
             match k.as_ref() {
                 "connection_limit" => {
-                    let as_int: usize = v.parse().map_err(|_| Error::InvalidConnectionArguments)?;
+                    let as_int: usize = v
+                        .parse()
+                        .map_err(|_| Error::builder(ErrorKind::InvalidConnectionArguments).build())?;
+
                     connection_limit = as_int;
                 }
                 "sslcert" => {
@@ -128,11 +131,15 @@ impl MysqlUrl {
                     socket = Some(v.replace("(", "").replace(")", ""));
                 }
                 "socket_timeout" => {
-                    let as_int = v.parse().map_err(|_| Error::InvalidConnectionArguments)?;
+                    let as_int = v
+                        .parse()
+                        .map_err(|_| Error::builder(ErrorKind::InvalidConnectionArguments).build())?;
                     socket_timeout = Some(Duration::from_secs(as_int));
                 }
                 "connect_timeout" => {
-                    let as_int = v.parse().map_err(|_| Error::InvalidConnectionArguments)?;
+                    let as_int = v
+                        .parse()
+                        .map_err(|_| Error::builder(ErrorKind::InvalidConnectionArguments).build())?;
                     connect_timeout = Duration::from_secs(as_int);
                 }
                 "sslaccept" => {
@@ -232,18 +239,18 @@ impl Mysql {
     async fn timeout<T, F, E>(&self, f: F) -> crate::Result<T>
     where
         F: Future<Output = std::result::Result<T, E>>,
-        E: Into<Error>
+        E: Into<Error>,
     {
         match self.socket_timeout {
             Some(duration) => match timeout(duration, f).await {
                 Ok(Ok(result)) => Ok(result),
                 Ok(Err(err)) => Err(err.into()),
                 Err(to) => Err(to.into()),
-            }
+            },
             None => match f.await {
                 Ok(result) => Ok(result),
                 Err(err) => Err(err.into()),
-            }
+            },
         }
     }
 }
@@ -262,7 +269,9 @@ impl Queryable for Mysql {
         metrics::query("mysql.query_raw", sql, params, move || {
             async move {
                 let conn = timeout(self.connect_timeout, self.pool.get_conn()).await??;
-                let results = self.timeout(conn.prep_exec(sql, conversion::conv_params(params))).await?;
+                let results = self
+                    .timeout(conn.prep_exec(sql, conversion::conv_params(params)))
+                    .await?;
 
                 let columns = results
                     .columns_ref()
@@ -273,7 +282,9 @@ impl Queryable for Mysql {
                 let last_id = results.last_insert_id();
                 let mut result_set = ResultSet::new(columns, Vec::new());
 
-                let (_, rows) = self.timeout(results.map_and_drop(|mut row| row.take_result_row())).await?;
+                let (_, rows) = self
+                    .timeout(results.map_and_drop(|mut row| row.take_result_row()))
+                    .await?;
 
                 for row in rows.into_iter() {
                     result_set.rows.push(row?);
@@ -380,8 +391,14 @@ VALUES (1, 'Joe', 27, 20000.00 );
 
         assert!(&res.is_err());
 
-        match res.unwrap_err() {
-            Error::DatabaseDoesNotExist { db_name } => assert_eq!("this_does_not_exist", db_name.as_str()),
+        let err = res.unwrap_err();
+
+        match err.kind() {
+            ErrorKind::DatabaseDoesNotExist { db_name } => {
+                assert_eq!(Some("1049"), err.original_code());
+                assert_eq!(Some("Unknown database \'this_does_not_exist\'"), err.original_message());
+                assert_eq!("this_does_not_exist", db_name.as_str())
+            }
             e => panic!("Expected `DatabaseDoesNotExist`, got {:?}", e),
         }
     }
@@ -393,27 +410,36 @@ VALUES (1, 'Joe', 27, 20000.00 );
         let _ = conn.raw_cmd("DROP TABLE test_uniq_constraint_violation").await;
         let _ = conn.raw_cmd("DROP INDEX idx_uniq_constraint_violation").await;
 
-        conn.raw_cmd("CREATE TABLE test_uniq_constraint_violation (id1 int, id2 int)").await.unwrap();
+        conn.raw_cmd("CREATE TABLE test_uniq_constraint_violation (id1 int, id2 int)")
+            .await
+            .unwrap();
         conn.raw_cmd("CREATE UNIQUE INDEX idx_uniq_constraint_violation ON test_uniq_constraint_violation (id1, id2) USING btree").await.unwrap();
 
         conn.query_raw(
             "INSERT INTO test_uniq_constraint_violation (id1, id2) VALUES (1, 2)",
-            &[]
-        ).await.unwrap();
+            &[],
+        )
+        .await
+        .unwrap();
 
-        let res = conn.query_raw(
-            "INSERT INTO test_uniq_constraint_violation (id1, id2) VALUES (1, 2)",
-            &[]
-        ).await;
+        let res = conn
+            .query_raw(
+                "INSERT INTO test_uniq_constraint_violation (id1, id2) VALUES (1, 2)",
+                &[],
+            )
+            .await;
 
-        match res.unwrap_err() {
-            Error::UniqueConstraintViolation { constraint } => {
+        let err = res.unwrap_err();
+
+        match err.kind() {
+            ErrorKind::UniqueConstraintViolation { constraint } => {
+                assert_eq!(Some("1062"), err.original_code());
                 assert_eq!(
-                    DatabaseConstraint::Index(String::from("idx_uniq_constraint_violation")),
+                    &DatabaseConstraint::Index(String::from("idx_uniq_constraint_violation")),
                     constraint,
                 )
-            },
-            e => panic!(e)
+            }
+            _ => panic!(err),
         }
     }
 
@@ -423,18 +449,26 @@ VALUES (1, 'Joe', 27, 20000.00 );
 
         let _ = conn.raw_cmd("DROP TABLE test_null_constraint_violation").await;
 
-        conn.raw_cmd("CREATE TABLE test_null_constraint_violation (id1 int not null, id2 int not null)").await.unwrap();
+        conn.raw_cmd("CREATE TABLE test_null_constraint_violation (id1 int not null, id2 int not null)")
+            .await
+            .unwrap();
 
-        let res = conn.query_raw(
-            "INSERT INTO test_null_constraint_violation () VALUES ()",
-            &[]
-        ).await;
+        let res = conn
+            .query_raw("INSERT INTO test_null_constraint_violation () VALUES ()", &[])
+            .await;
 
-        match res.unwrap_err() {
-            Error::NullConstraintViolation { constraint } => {
-                assert_eq!(DatabaseConstraint::Fields(vec![String::from("id1")]), constraint)
-            },
-            e => panic!(e)
+        let err = res.unwrap_err();
+
+        match err.kind() {
+            ErrorKind::NullConstraintViolation { constraint } => {
+                assert_eq!(Some("1364"), err.original_code());
+                assert_eq!(
+                    Some("Field \'id1\' doesn\'t have a default value"),
+                    err.original_message()
+                );
+                assert_eq!(&DatabaseConstraint::Fields(vec![String::from("id1")]), constraint)
+            }
+            _ => panic!(err),
         }
     }
 }

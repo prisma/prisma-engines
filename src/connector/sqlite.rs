@@ -4,7 +4,7 @@ mod error;
 use crate::{
     ast::{ParameterizedValue, Query},
     connector::{metrics, queryable::*, ResultSet, DBIO},
-    error::Error,
+    error::{Error, ErrorKind},
     visitor::{self, Visitor},
 };
 use futures::future;
@@ -47,7 +47,7 @@ impl TryFrom<&str> for SqliteParams {
         let path = Path::new(path_str);
 
         if path.is_dir() {
-            Err(Error::DatabaseUrlIsInvalid(path.to_str().unwrap().to_string()))
+            Err(Error::builder(ErrorKind::DatabaseUrlIsInvalid(path.to_str().unwrap().to_string())).build())
         } else {
             let official = vec![];
             let mut connection_limit = num_cpus::get_physical() * 2 + 1;
@@ -70,7 +70,9 @@ impl TryFrom<&str> for SqliteParams {
                 for (k, v) in unsupported.into_iter() {
                     match k.as_ref() {
                         "connection_limit" => {
-                            let as_int: usize = v.parse().map_err(|_| Error::InvalidConnectionArguments)?;
+                            let as_int: usize = v
+                                .parse()
+                                .map_err(|_| Error::builder(ErrorKind::InvalidConnectionArguments).build())?;
 
                             connection_limit = as_int;
                         }
@@ -78,7 +80,10 @@ impl TryFrom<&str> for SqliteParams {
                             db_name = Some(v.to_string());
                         }
                         "socket_timeout" => {
-                            let as_int = v.parse().map_err(|_| Error::InvalidConnectionArguments)?;
+                            let as_int = v
+                                .parse()
+                                .map_err(|_| Error::builder(ErrorKind::InvalidConnectionArguments).build())?;
+
                             socket_timeout = Some(Duration::from_secs(as_int));
                         }
                         _ => {
@@ -197,7 +202,7 @@ impl Queryable for Sqlite {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{ast::*, connector::{Queryable, TransactionCapable}, val, error::DatabaseConstraint};
+    use crate::{ast::*, connector::{Queryable, TransactionCapable}, val, error::{DatabaseConstraint, ErrorKind}};
 
     #[test]
     fn sqlite_params_from_str_should_resolve_path_correctly_with_file_scheme() {
@@ -388,16 +393,21 @@ mod tests {
             &[]
         ).await;
 
-        match res.unwrap_err() {
-            Error::UniqueConstraintViolation { constraint } => {
+        let err = res.unwrap_err();
+
+        match err.kind() {
+            ErrorKind::UniqueConstraintViolation { constraint } => {
+                assert_eq!(Some("2067"), err.original_code());
+                assert_eq!(Some("UNIQUE constraint failed: test_uniq_constraint_violation.id1, test_uniq_constraint_violation.id2"), err.original_message());
+
                 assert_eq!(
-                    DatabaseConstraint::Fields(
+                    &DatabaseConstraint::Fields(
                         vec![String::from("id1"), String::from("id2")]
                     ),
                     constraint,
                 )
             },
-            e => panic!(e)
+            _ => panic!(err)
         }
     }
 
@@ -414,11 +424,15 @@ mod tests {
             &[]
         ).await;
 
-        match res.unwrap_err() {
-            Error::NullConstraintViolation { constraint } => {
-                assert_eq!(DatabaseConstraint::Fields(vec![String::from("id1")]), constraint)
+        let err = res.unwrap_err();
+
+        match err.kind() {
+            ErrorKind::NullConstraintViolation { constraint } => {
+                assert_eq!(Some("1299"), err.original_code());
+                assert_eq!(Some("NOT NULL constraint failed: test_null_constraint_violation.id1"), err.original_message());
+                assert_eq!(&DatabaseConstraint::Fields(vec![String::from("id1")]), constraint)
             },
-            e => panic!(e)
+            _ => panic!(err)
         }
     }
 }

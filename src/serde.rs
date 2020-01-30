@@ -3,6 +3,7 @@
 use crate::{
     ast::ParameterizedValue,
     connector::{ResultRow, ResultSet},
+    error::{Error, ErrorKind},
 };
 use serde::{de::Error as SerdeError, de::*};
 
@@ -55,7 +56,9 @@ pub fn from_rows<T: DeserializeOwned>(result_set: ResultSet) -> crate::Result<Ve
 pub fn from_row<T: DeserializeOwned>(row: ResultRow) -> crate::Result<T> {
     let deserializer = RowDeserializer(row);
 
-    T::deserialize(deserializer).map_err(crate::error::Error::FromRowError)
+    T::deserialize(deserializer).map_err(|e| {
+        Error::builder(ErrorKind::FromRowError(e)).build()
+    })
 }
 
 type DeserializeError = serde::de::value::Error;

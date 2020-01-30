@@ -4,7 +4,7 @@ mod error;
 use crate::{
     ast::{ParameterizedValue, Query},
     connector::{metrics, queryable::*, ResultSet, DBIO},
-    error::Error,
+    error::{Error, ErrorKind},
     visitor::{self, Visitor},
 };
 use futures::{future::FutureExt, lock::Mutex};
@@ -249,18 +249,18 @@ impl PostgresUrl {
                     schema = v.to_string();
                 }
                 "connection_limit" => {
-                    let as_int: usize = v.parse().map_err(|_| Error::InvalidConnectionArguments)?;
+                    let as_int: usize = v.parse().map_err(|_| Error::builder(ErrorKind::InvalidConnectionArguments).build())?;
                     connection_limit = as_int;
                 }
                 "host" => {
                     host = Some(v.to_string());
                 }
                 "socket_timeout" => {
-                    let as_int = v.parse().map_err(|_| Error::InvalidConnectionArguments)?;
+                    let as_int = v.parse().map_err(|_| Error::builder(ErrorKind::InvalidConnectionArguments).build())?;
                     socket_timeout = Some(Duration::from_secs(as_int));
                 }
                 "connect_timeout" => {
-                    let as_int = v.parse().map_err(|_| Error::InvalidConnectionArguments)?;
+                    let as_int = v.parse().map_err(|_| Error::builder(ErrorKind::InvalidConnectionArguments).build())?;
                     connect_timeout = Duration::from_secs(as_int);
                 }
                 _ => {
@@ -532,12 +532,19 @@ mod tests {
             )
             .await;
 
-        match res.unwrap_err() {
-            Error::UniqueConstraintViolation { constraint } => assert_eq!(
-                DatabaseConstraint::Fields(vec![String::from("id1"), String::from("id2")]),
-                constraint,
-            ),
-            e => panic!(e),
+        let err = res.unwrap_err();
+
+        match err.kind() {
+            ErrorKind::UniqueConstraintViolation { constraint } => {
+                assert_eq!(Some("23505"), err.original_code());
+                assert_eq!(Some("Key (id1, id2)=(1, 2) already exists."), err.original_message());
+
+                assert_eq!(
+                    &DatabaseConstraint::Fields(vec![String::from("id1"), String::from("id2")]),
+                    constraint,
+                )
+            },
+            _ => panic!(err)
         }
     }
 
@@ -555,11 +562,15 @@ mod tests {
             .query_raw("INSERT INTO test_null_constraint_violation DEFAULT VALUES", &[])
             .await;
 
-        match res.unwrap_err() {
-            Error::NullConstraintViolation { constraint } => {
-                assert_eq!(DatabaseConstraint::Fields(vec![String::from("id1")]), constraint)
-            }
-            e => panic!(e),
+        let err = res.unwrap_err();
+
+        match err.kind() {
+            ErrorKind::NullConstraintViolation { constraint } => {
+                assert_eq!(Some("23502"), err.original_code());
+                assert_eq!(Some("null value in column \"id1\" violates not-null constraint"), err.original_message());
+                assert_eq!(&DatabaseConstraint::Fields(vec![String::from("id1")]), constraint)
+            },
+            _ => panic!(err)
         }
     }
 
@@ -587,8 +598,14 @@ mod tests {
 
         match res {
             Ok(_) => unreachable!(),
-            Err(Error::DatabaseDoesNotExist { db_name }) => assert_eq!("this_does_not_exist", db_name.as_str()),
-            Err(e) => panic!("Expected `DatabaseDoesNotExist`, got {:?}", e),
+            Err(e) => match e.kind() {
+                ErrorKind::DatabaseDoesNotExist { db_name } => {
+                    assert_eq!(Some("3D000"), e.original_code());
+                    assert_eq!(Some("database \"this_does_not_exist\" does not exist"), e.original_message());
+                    assert_eq!("this_does_not_exist", db_name.as_str())
+                },
+                kind => panic!("Expected `DatabaseDoesNotExist`, got {:?}", kind),
+            }
         }
     }
 
@@ -603,8 +620,10 @@ mod tests {
 
         match res {
             Ok(_) => unreachable!(),
-            Err(Error::TlsError { .. }) => (),
-            Err(other) => panic!("{:#?}", other),
+            Err(e) => match e.kind() {
+                ErrorKind::TlsError { .. } => (),
+                other => panic!("{:#?}", other),
+            }
         }
     }
 
@@ -634,9 +653,11 @@ mod tests {
             .await
             .unwrap_err();
 
-        match err {
-            Error::NullConstraintViolation { constraint } => {
-                assert_eq!(constraint, DatabaseConstraint::Fields(vec!["id".into()]))
+        match err.kind() {
+            ErrorKind::NullConstraintViolation { constraint } => {
+                assert_eq!(Some("23502"), err.original_code());
+                assert_eq!(Some("null value in column \"id\" violates not-null constraint"), err.original_message());
+                assert_eq!(constraint, &DatabaseConstraint::Fields(vec!["id".into()]))
             }
             other => panic!("{:?}", other),
         }
@@ -659,9 +680,11 @@ mod tests {
             .await
             .unwrap_err();
 
-        match err {
-            Error::NullConstraintViolation { constraint } => {
-                assert_eq!(constraint, DatabaseConstraint::Fields(vec!["optional".into()]))
+        match err.kind() {
+            ErrorKind::NullConstraintViolation { constraint } => {
+                assert_eq!(Some("23502"), err.original_code());
+                assert_eq!(Some("column \"optional\" contains null values"), err.original_message());
+                assert_eq!(constraint, &DatabaseConstraint::Fields(vec!["optional".into()]))
             }
             other => panic!("{:?}", other),
         }

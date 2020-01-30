@@ -1,4 +1,4 @@
-use crate::error::{DatabaseConstraint, Error};
+use crate::error::{DatabaseConstraint, Error, ErrorKind};
 
 impl From<tokio_postgres::error::Error> for Error {
     fn from(e: tokio_postgres::error::Error) -> Error {
@@ -6,7 +6,8 @@ impl From<tokio_postgres::error::Error> for Error {
 
         match e.code().map(|c| c.code()) {
             // Don't look at me, I'm hideous ;((
-            Some("23505") => {
+            Some(code) if code == "23505" => {
+                let code = code.to_string();
                 let error = e.into_source().unwrap(); // boom
                 let db_error = error.downcast_ref::<DbError>().unwrap(); // BOOM
                 let detail = db_error.detail().unwrap(); // KA-BOOM
@@ -17,12 +18,18 @@ impl From<tokio_postgres::error::Error> for Error {
                 let field_names = splitted[1].replace("\"", "");
                 let field_names: Vec<String> = field_names.split(", ").map(|s| s.to_string()).collect();
 
-                Error::UniqueConstraintViolation {
+                let mut builder = Error::builder(ErrorKind::UniqueConstraintViolation {
                     constraint: DatabaseConstraint::Fields(field_names),
-                }
+                });
+
+                builder.set_original_code(code);
+                builder.set_original_message(detail);
+
+                builder.build()
             }
             // Even lipstick will not save this...
-            Some("23502") => {
+            Some(code) if code == "23502" => {
+                let code = code.to_string();
                 let error = e.into_source().unwrap(); // boom
                 let db_error = error.downcast_ref::<DbError>().unwrap(); // BOOM
 
@@ -31,11 +38,17 @@ impl From<tokio_postgres::error::Error> for Error {
                     .expect("column on null constraint violation error")
                     .to_owned();
 
-                Error::NullConstraintViolation {
+                let mut builder = Error::builder(ErrorKind::NullConstraintViolation {
                     constraint: DatabaseConstraint::Fields(vec![column_name]),
-                }
+                });
+
+                builder.set_original_code(code);
+                builder.set_original_message(db_error.message());
+
+                builder.build()
             }
-            Some("3D000") => {
+            Some(code) if code == "3D000" => {
+                let code = code.to_string();
                 let error = e.into_source().unwrap(); // boom
                 let db_error = error.downcast_ref::<DbError>().unwrap(); // BOOM
                 let message = db_error.message();
@@ -44,9 +57,15 @@ impl From<tokio_postgres::error::Error> for Error {
                 let splitted: Vec<&str> = splitted[1].split('"').collect();
                 let db_name = splitted[1].into();
 
-                Error::DatabaseDoesNotExist { db_name }
+                let mut builder = Error::builder(ErrorKind::DatabaseDoesNotExist { db_name });
+
+                builder.set_original_code(code);
+                builder.set_original_message(message);
+
+                builder.build()
             }
-            Some("28P01") => {
+            Some(code) if code == "28P01" => {
+                let code = code.to_string();
                 let error = e.into_source().unwrap(); // boom
                 let db_error = error.downcast_ref::<DbError>().unwrap(); // BOOM
                 let message = db_error.message();
@@ -55,9 +74,15 @@ impl From<tokio_postgres::error::Error> for Error {
                 let splitted: Vec<&str> = splitted.last().unwrap().split('"').collect();
                 let user = splitted[1].into();
 
-                Error::AuthenticationFailed { user }
+                let mut builder = Error::builder(ErrorKind::AuthenticationFailed { user });
+
+                builder.set_original_code(code);
+                builder.set_original_message(message);
+
+                builder.build()
             }
-            Some("42P04") => {
+            Some(code) if code == "42P04" => {
+                let code = code.to_string();
                 let error = e.into_source().unwrap(); // boom
                 let db_error = error.downcast_ref::<DbError>().unwrap(); // BOOM
                 let message = db_error.message();
@@ -66,9 +91,14 @@ impl From<tokio_postgres::error::Error> for Error {
                 let splitted: Vec<&str> = splitted[1].split('"').collect();
                 let db_name = splitted[1].into();
 
-                Error::DatabaseAlreadyExists { db_name }
+                let mut builder = Error::builder(ErrorKind::DatabaseAlreadyExists { db_name });
+
+                builder.set_original_code(code);
+                builder.set_original_message(message);
+
+                builder.build()
             }
-            _ => {
+            code => {
                 // This is necessary, on top of the other conversions, for the cases where a
                 // native_tls error comes wrapped in a tokio_postgres error.
                 if let Some(tls_error) = try_extracting_tls_error(&e) {
@@ -84,13 +114,41 @@ impl From<tokio_postgres::error::Error> for Error {
 
                 match reason.as_str() {
                     "error connecting to server: timed out" => {
-                        Error::ConnectTimeout("tokio-postgres timeout connecting to server".into())
+                        let mut builder = Error::builder(ErrorKind::ConnectTimeout(
+                            "tokio-postgres timeout connecting to server".into(),
+                        ));
+
+                        if let Some(code) = code {
+                            builder.set_original_code(code);
+                        };
+
+                        builder.set_original_message(reason);
+                        builder.build()
                     } // sigh...
                     // https://github.com/sfackler/rust-postgres/blob/0c84ed9f8201f4e5b4803199a24afa2c9f3723b2/tokio-postgres/src/connect_tls.rs#L37
                     "error performing TLS handshake: server does not support TLS" => {
-                        Error::TlsError { message: reason }
+                        let mut builder = Error::builder(ErrorKind::TlsError {
+                            message: reason.clone(),
+                        });
+
+                        if let Some(code) = code {
+                            builder.set_original_code(code);
+                        };
+
+                        builder.set_original_message(reason);
+                        builder.build()
                     } // double sigh
-                    _ => Error::QueryError(e.into()),
+                    _ => {
+                        let code = code.map(|c| c.to_string());
+                        let mut builder = Error::builder(ErrorKind::QueryError(e.into()));
+
+                        if let Some(code) = code {
+                            builder.set_original_code(code);
+                        };
+
+                        builder.set_original_message(reason);
+                        builder.build()
+                    }
                 }
             }
         }
@@ -110,7 +168,8 @@ fn try_extracting_io_error(err: &tokio_postgres::error::Error) -> Option<Error> 
 
     err.source()
         .and_then(|err| err.downcast_ref::<std::io::Error>())
-        .map(|err| Error::ConnectionError(Box::new(std::io::Error::new(err.kind(), format!("{}", err)))))
+        .map(|err| ErrorKind::ConnectionError(Box::new(std::io::Error::new(err.kind(), format!("{}", err)))))
+        .map(|kind| Error::builder(kind).build())
 }
 
 impl From<native_tls::Error> for Error {
@@ -121,8 +180,10 @@ impl From<native_tls::Error> for Error {
 
 impl From<&native_tls::Error> for Error {
     fn from(e: &native_tls::Error) -> Error {
-        Error::TlsError {
+        let kind = ErrorKind::TlsError {
             message: format!("{}", e),
-        }
+        };
+
+        Error::builder(kind).build()
     }
 }
