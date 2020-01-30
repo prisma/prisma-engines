@@ -3,12 +3,7 @@ extern crate log;
 #[macro_use]
 extern crate rust_embed;
 
-use std::{
-    error::Error,
-    net::SocketAddr,
-    process,
-    convert::TryFrom,
-};
+use std::{convert::TryFrom, error::Error, net::SocketAddr, process};
 
 use structopt::StructOpt;
 use tracing::subscriber;
@@ -115,10 +110,12 @@ async fn main() -> Result<(), AnyError> {
     let opts = PrismaOpt::from_args();
 
     match CliCommand::try_from(&opts) {
-        Ok(cmd) => if let Err(err) = cmd.execute() {
-            info!("Encountered error during initialization:");
-            err.render_as_json().expect("error rendering");
-            process::exit(1);
+        Ok(cmd) => {
+            if let Err(err) = cmd.execute() {
+                info!("Encountered error during initialization:");
+                err.render_as_json().expect("error rendering");
+                process::exit(1);
+            }
         }
         Err(_) => {
             init_logger()?;
