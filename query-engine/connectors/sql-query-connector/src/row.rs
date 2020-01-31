@@ -94,11 +94,13 @@ fn row_value_to_prisma_value(
         TypeIdentifier::Enum => match p_value {
             ParameterizedValue::Null => PrismaValue::Null,
             ParameterizedValue::Enum(cow) => PrismaValue::Enum(cow.into_owned()),
+            ParameterizedValue::Text(cow) => PrismaValue::Enum(cow.into_owned()),
             _ => {
                 let error = io::Error::new(io::ErrorKind::InvalidData, "Enum value not stored as enum");
                 return Err(SqlError::ConversionError(error.into()));
             }
         },
+
         TypeIdentifier::Json => match p_value {
             ParameterizedValue::Null => PrismaValue::Null,
             ParameterizedValue::Text(json) => PrismaValue::String(json.into()),
