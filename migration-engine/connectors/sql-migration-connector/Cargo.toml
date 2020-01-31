@@ -13,7 +13,7 @@ datamodel = { path = "../../../libs/datamodel/core" }
 itertools = "0.8"
 migration-connector = { path = "../migration-connector" }
 prisma-models = { path = "../../../libs/prisma-models" }
-quaint = { version = "0.2.0-alpha.1", features = ["single"] }
+quaint = { git = "https://github.com/prisma/quaint", features = ["single"] }
 serde = "1.0"
 serde_json = "1.0"
 sql-schema-describer = { path = "../../../libs/sql-schema-describer" }
