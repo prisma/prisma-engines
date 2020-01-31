@@ -26,7 +26,7 @@ barrel = { version = "0.6.5", features = ["sqlite3", "mysql", "pg"], optional = 
 futures = "0.3.1"
 git2 = { version = "0.11.0", default-features = false }
 pretty_assertions = "0.6"
-quaint = { version = "0.1", optional = true }
+quaint = { version = "0.2.0-alpha.1", optional = true }
 serde_json = "1.0.45"
 tempfile = "3.1.0"
 tokio = { version = "0.2.11", features = ["macros"] }

@@ -106,8 +106,10 @@ fn render_steps_pretty(
 
     for step in &database_migration.corrected_steps {
         let mut sql = String::with_capacity(200);
-        let statements = render_raw_sql(&step, renderer, database_info, current_schema)
-            .map_err(|err: anyhow::Error| ConnectorError::from_kind(ErrorKind::Generic(err.into())))?;
+        let statements =
+            render_raw_sql(&step, renderer, database_info, current_schema).map_err(|err: anyhow::Error| {
+                ConnectorError::from_kind(migration_connector::ErrorKind::Generic(err.into()))
+            })?;
 
         let mut statements = statements.into_iter().peekable();
 

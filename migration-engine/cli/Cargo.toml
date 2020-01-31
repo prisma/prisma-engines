@@ -13,7 +13,7 @@ sql-migration-connector = { path = "../connectors/sql-migration-connector", opti
 user-facing-errors = { path = "../../libs/user-facing-errors" }
 
 anyhow = "1.0.26"
-quaint = { version = "0.1.10", optional = true }
+quaint = { version = "0.2.0-alpha.1", optional = true }
 structopt = "0.3.8"
 thiserror = "1.0.9"
 tokio = { version = "0.2", features = ["macros"] }

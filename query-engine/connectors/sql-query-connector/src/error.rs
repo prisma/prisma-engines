@@ -1,16 +1,17 @@
 use connector_interface::{error::*, Filter};
 use failure::{Error, Fail};
 use prisma_models::prelude::DomainError;
-use quaint::error::Error as QuaintError;
+use quaint::error::ErrorKind as QuaintKind;
 use std::string::FromUtf8Error;
+use user_facing_errors::query_engine::DatabaseConstraint;
 
 #[derive(Debug, Fail)]
 pub enum SqlError {
-    #[fail(display = "Unique constraint failed: {}", field_name)]
-    UniqueConstraintViolation { field_name: String },
+    #[fail(display = "Unique constraint failed: {:?}", constraint)]
+    UniqueConstraintViolation { constraint: DatabaseConstraint },
 
-    #[fail(display = "Null constraint failed: {}", field_name)]
-    NullConstraintViolation { field_name: String },
+    #[fail(display = "Null constraint failed: {:?}", constraint)]
+    NullConstraintViolation { constraint: DatabaseConstraint },
 
     #[fail(display = "Record does not exist.")]
     RecordDoesNotExist,
@@ -19,7 +20,7 @@ pub enum SqlError {
     ColumnDoesNotExist,
 
     #[fail(display = "Error creating a database connection.")]
-    ConnectionError(QuaintError),
+    ConnectionError(QuaintKind),
 
     #[fail(display = "Error querying the database: {}", _0)]
     QueryError(Box<dyn std::error::Error + Send + Sync>),
@@ -65,17 +66,17 @@ pub enum SqlError {
 impl SqlError {
     pub(crate) fn into_connector_error(self, connection_info: &quaint::prelude::ConnectionInfo) -> ConnectorError {
         match self {
-            SqlError::UniqueConstraintViolation { field_name } => ConnectorError {
+            SqlError::UniqueConstraintViolation { constraint } => ConnectorError {
                 user_facing_error: user_facing_errors::KnownError::new(
                     user_facing_errors::query_engine::UniqueKeyViolation {
-                        field_name: field_name.clone(),
+                        constraint: constraint.clone(),
                     },
                 )
                 .ok(),
-                kind: ErrorKind::UniqueConstraintViolation { field_name },
+                kind: ErrorKind::UniqueConstraintViolation { constraint },
             },
-            SqlError::NullConstraintViolation { field_name } => {
-                ConnectorError::from_kind(ErrorKind::NullConstraintViolation { field_name })
+            SqlError::NullConstraintViolation { constraint } => {
+                ConnectorError::from_kind(ErrorKind::NullConstraintViolation { constraint })
             }
             SqlError::RecordDoesNotExist => ConnectorError::from_kind(ErrorKind::RecordDoesNotExist),
             SqlError::ColumnDoesNotExist => ConnectorError::from_kind(ErrorKind::ColumnDoesNotExist),
@@ -115,34 +116,33 @@ impl SqlError {
 
 impl From<quaint::error::Error> for SqlError {
     fn from(e: quaint::error::Error) -> Self {
-        match e {
-            quaint::error::Error::QueryError(e) => Self::QueryError(e),
-            quaint::error::Error::IoError(_) => Self::ConnectionError(e),
-            quaint::error::Error::NotFound => Self::RecordDoesNotExist,
-            quaint::error::Error::UniqueConstraintViolation { field_name } => {
-                Self::UniqueConstraintViolation { field_name }
-            }
+        match QuaintKind::from(e) {
+            QuaintKind::QueryError(qe) => Self::QueryError(qe),
+            e @ QuaintKind::IoError(_) => Self::ConnectionError(e),
+            QuaintKind::NotFound => Self::RecordDoesNotExist,
+            QuaintKind::UniqueConstraintViolation { constraint } => Self::UniqueConstraintViolation {
+                constraint: constraint.into(),
+            },
 
-            quaint::error::Error::NullConstraintViolation { field_name } => {
-                Self::NullConstraintViolation { field_name }
-            }
+            QuaintKind::NullConstraintViolation { constraint } => Self::NullConstraintViolation {
+                constraint: constraint.into(),
+            },
 
-            quaint::error::Error::ConnectionError(_) => Self::ConnectionError(e),
-            quaint::error::Error::ColumnReadFailure(e) => Self::ColumnReadFailure(e),
-            quaint::error::Error::ColumnNotFound(_) => Self::ColumnDoesNotExist,
-
-            e @ quaint::error::Error::ConversionError(_) => SqlError::ConversionError(e.into()),
-            e @ quaint::error::Error::ResultIndexOutOfBounds { .. } => SqlError::QueryError(e.into()),
-            e @ quaint::error::Error::ResultTypeMismatch { .. } => SqlError::QueryError(e.into()),
-            e @ quaint::error::Error::DatabaseUrlIsInvalid { .. } => SqlError::ConnectionError(e),
-            e @ quaint::error::Error::DatabaseDoesNotExist { .. } => SqlError::ConnectionError(e),
-            e @ quaint::error::Error::AuthenticationFailed { .. } => SqlError::ConnectionError(e),
-            e @ quaint::error::Error::DatabaseAccessDenied { .. } => SqlError::ConnectionError(e),
-            e @ quaint::error::Error::DatabaseAlreadyExists { .. } => SqlError::ConnectionError(e),
-            e @ quaint::error::Error::InvalidConnectionArguments => SqlError::ConnectionError(e),
-            e @ quaint::error::Error::ConnectTimeout { .. } => SqlError::ConnectionError(e.into()),
-            e @ quaint::error::Error::Timeout => SqlError::ConnectionError(e.into()),
-            e @ quaint::error::Error::TlsError { .. } => Self::ConnectionError(e.into()),
+            e @ QuaintKind::ConnectionError(_) => Self::ConnectionError(e),
+            QuaintKind::ColumnReadFailure(e) => Self::ColumnReadFailure(e),
+            QuaintKind::ColumnNotFound(_) => Self::ColumnDoesNotExist,
+            e @ QuaintKind::ConversionError(_) => SqlError::ConversionError(e.into()),
+            e @ QuaintKind::ResultIndexOutOfBounds { .. } => SqlError::QueryError(e.into()),
+            e @ QuaintKind::ResultTypeMismatch { .. } => SqlError::QueryError(e.into()),
+            e @ QuaintKind::DatabaseUrlIsInvalid { .. } => SqlError::ConnectionError(e),
+            e @ QuaintKind::DatabaseDoesNotExist { .. } => SqlError::ConnectionError(e),
+            e @ QuaintKind::AuthenticationFailed { .. } => SqlError::ConnectionError(e),
+            e @ QuaintKind::DatabaseAccessDenied { .. } => SqlError::ConnectionError(e),
+            e @ QuaintKind::DatabaseAlreadyExists { .. } => SqlError::ConnectionError(e),
+            e @ QuaintKind::InvalidConnectionArguments => SqlError::ConnectionError(e),
+            e @ QuaintKind::ConnectTimeout { .. } => SqlError::ConnectionError(e.into()),
+            e @ QuaintKind::Timeout(..) => SqlError::ConnectionError(e.into()),
+            e @ QuaintKind::TlsError { .. } => Self::ConnectionError(e.into()),
         }
     }
 }
@@ -156,13 +156,6 @@ impl From<DomainError> for SqlError {
 impl From<serde_json::error::Error> for SqlError {
     fn from(e: serde_json::error::Error) -> SqlError {
         SqlError::ConversionError(e.into())
-    }
-}
-
-impl From<url::ParseError> for SqlError {
-    fn from(err: url::ParseError) -> SqlError {
-        let quaint_error = QuaintError::from(err);
-        SqlError::from(quaint_error)
     }
 }
 

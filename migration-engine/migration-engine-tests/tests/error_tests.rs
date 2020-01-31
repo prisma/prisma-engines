@@ -324,17 +324,11 @@ async fn unique_constraint_errors_in_migrations_must_return_a_known_error(api: &
 
     let json_error = serde_json::to_value(&error).unwrap();
 
-    let field_name = match (api.sql_family(), api.connector_name()) {
-        (SqlFamily::Mysql, "mysql_8") => "Fruit.Fruit.name",
-        (SqlFamily::Mysql, _) => "Fruit.name",
-        _ => "name",
-    };
-
     let expected_json = json!({
         "is_panic": false,
-        "message": format!("Unique constraint failed on the field: `{}`", field_name),
+        "message": "Unique constraint failed on the field: `name`",
         "meta": {
-            "field_name": field_name,
+            "field_name": "name",
         },
         "error_code": "P2002",
     });

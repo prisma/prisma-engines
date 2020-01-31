@@ -1,12 +1,16 @@
-use crate::{GraphqlId, PrismaValue};
-use quaint::ast::{DatabaseValue, Id, ParameterizedValue};
+use crate::{ConversionFailure, GraphqlId, PrismaValue};
+use quaint::ast::{DatabaseValue, ParameterizedValue};
+use std::convert::TryFrom;
 
-impl From<Id> for GraphqlId {
-    fn from(id: Id) -> Self {
-        match id {
-            Id::String(s) => GraphqlId::String(s),
-            Id::Int(i) => GraphqlId::Int(i),
-            Id::UUID(u) => GraphqlId::UUID(u),
+impl<'a> TryFrom<ParameterizedValue<'a>> for GraphqlId {
+    type Error = ConversionFailure;
+
+    fn try_from(pv: ParameterizedValue<'a>) -> Result<Self, Self::Error> {
+        match pv {
+            ParameterizedValue::Integer(i) => Ok(GraphqlId::Int(i as usize)),
+            ParameterizedValue::Text(s) => Ok(GraphqlId::String(s.into_owned())),
+            ParameterizedValue::Uuid(uuid) => Ok(GraphqlId::UUID(uuid)),
+            _ => Err(ConversionFailure::new("ParameterizedValue", "GraphqlId")),
         }
     }
 }
@@ -40,6 +44,7 @@ impl<'a> From<ParameterizedValue<'a>> for PrismaValue {
             ParameterizedValue::Uuid(uuid) => PrismaValue::Uuid(uuid),
             ParameterizedValue::DateTime(dt) => PrismaValue::DateTime(dt),
             ParameterizedValue::Char(c) => PrismaValue::String(c.to_string()),
+            ParameterizedValue::Enum(e) => PrismaValue::Enum(e.into_owned()),
         }
     }
 }
