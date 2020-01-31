@@ -259,10 +259,13 @@ impl TransactionCapable for Mysql {}
 
 impl Queryable for Mysql {
     fn query<'a>(&'a self, q: Query<'a>) -> DBIO<'a, ResultSet> {
-        DBIO::new(async move {
-            let (sql, params) = visitor::Mysql::build(q);
-            self.query_raw(&sql, &params).await
-        })
+        let (sql, params) = visitor::Mysql::build(q);
+        DBIO::new(async move { self.query_raw(&sql, &params).await })
+    }
+
+    fn execute<'a>(&'a self, q: Query<'a>) -> DBIO<'a, u64> {
+        let (sql, params) = visitor::Mysql::build(q);
+        DBIO::new(async move { self.execute_raw(&sql, &params).await })
     }
 
     fn query_raw<'a>(&'a self, sql: &'a str, params: &'a [ParameterizedValue]) -> DBIO<'a, ResultSet> {
@@ -295,6 +298,18 @@ impl Queryable for Mysql {
                 };
 
                 Ok(result_set)
+            }
+        })
+    }
+
+    fn execute_raw<'a>(&'a self, sql: &'a str, params: &'a [ParameterizedValue<'a>]) -> DBIO<'a, u64> {
+        metrics::query("mysql.execute_raw", sql, params, move || {
+            async move {
+                let conn = timeout(self.connect_timeout, self.pool.get_conn()).await??;
+                let results = self
+                    .timeout(conn.prep_exec(sql, conversion::conv_params(params)))
+                    .await?;
+                Ok(results.affected_rows())
             }
         })
     }
@@ -367,7 +382,9 @@ VALUES (1, 'Joe', 27, 20000.00 );
 
         connection.query_raw(DROP_TABLE, &[]).await.unwrap();
         connection.query_raw(TABLE_DEF, &[]).await.unwrap();
-        connection.query_raw(CREATE_USER, &[]).await.unwrap();
+
+        let ch_ch_ch_ch_changees = connection.execute_raw(CREATE_USER, &[]).await.unwrap();
+        assert_eq!(1, ch_ch_ch_ch_changees);
 
         let rows = connection.query_raw("SELECT * FROM `user`", &[]).await.unwrap();
         assert_eq!(rows.len(), 1);

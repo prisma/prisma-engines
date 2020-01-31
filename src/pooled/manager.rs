@@ -10,7 +10,7 @@ use crate::{
     connector::{self, Queryable, TransactionCapable, DBIO},
     error::Error,
 };
-use mobc::{Manager, Connection as MobcPooled};
+use mobc::{Connection as MobcPooled, Manager};
 
 /// A connection from the pool. Implements
 /// [Queryable](connector/trait.Queryable.html).
@@ -25,8 +25,16 @@ impl Queryable for PooledConnection {
         self.inner.query(q)
     }
 
+    fn execute<'a>(&'a self, q: ast::Query<'a>) -> DBIO<'a, u64> {
+        self.inner.execute(q)
+    }
+
     fn query_raw<'a>(&'a self, sql: &'a str, params: &'a [ast::ParameterizedValue]) -> DBIO<'a, connector::ResultSet> {
         self.inner.query_raw(sql, params)
+    }
+
+    fn execute_raw<'a>(&'a self, sql: &'a str, params: &'a [ast::ParameterizedValue]) -> DBIO<'a, u64> {
+        self.inner.execute_raw(sql, params)
     }
 
     fn raw_cmd<'a>(&'a self, cmd: &'a str) -> DBIO<'a, ()> {

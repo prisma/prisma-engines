@@ -97,15 +97,9 @@ impl From<rusqlite::Error> for Error {
                 }
 
                 builder.build()
-            },
+            }
 
-            rusqlite::Error::SqliteFailure(
-                ffi::Error {
-                    extended_code,
-                    ..
-                },
-                ref description,
-            ) => {
+            rusqlite::Error::SqliteFailure(ffi::Error { extended_code, .. }, ref description) => {
                 let description = description.as_ref().map(|d| d.to_string());
                 let mut builder = Error::builder(ErrorKind::QueryError(e.into()));
                 builder.set_original_code(format!("{}", extended_code));
@@ -115,7 +109,7 @@ impl From<rusqlite::Error> for Error {
                 }
 
                 builder.build()
-            },
+            }
             e => Error::builder(ErrorKind::QueryError(e.into())).build(),
         }
     }

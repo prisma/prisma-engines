@@ -249,18 +249,24 @@ impl PostgresUrl {
                     schema = v.to_string();
                 }
                 "connection_limit" => {
-                    let as_int: usize = v.parse().map_err(|_| Error::builder(ErrorKind::InvalidConnectionArguments).build())?;
+                    let as_int: usize = v
+                        .parse()
+                        .map_err(|_| Error::builder(ErrorKind::InvalidConnectionArguments).build())?;
                     connection_limit = as_int;
                 }
                 "host" => {
                     host = Some(v.to_string());
                 }
                 "socket_timeout" => {
-                    let as_int = v.parse().map_err(|_| Error::builder(ErrorKind::InvalidConnectionArguments).build())?;
+                    let as_int = v
+                        .parse()
+                        .map_err(|_| Error::builder(ErrorKind::InvalidConnectionArguments).build())?;
                     socket_timeout = Some(Duration::from_secs(as_int));
                 }
                 "connect_timeout" => {
-                    let as_int = v.parse().map_err(|_| Error::builder(ErrorKind::InvalidConnectionArguments).build())?;
+                    let as_int = v
+                        .parse()
+                        .map_err(|_| Error::builder(ErrorKind::InvalidConnectionArguments).build())?;
                     connect_timeout = Duration::from_secs(as_int);
                 }
                 _ => {
@@ -384,11 +390,15 @@ impl TransactionCapable for PostgreSql {}
 impl Queryable for PostgreSql {
     fn query<'a>(&'a self, q: Query<'a>) -> DBIO<'a, ResultSet> {
         let (sql, params) = visitor::Postgres::build(q);
-
         DBIO::new(async move { self.query_raw(sql.as_str(), &params[..]).await })
     }
 
-    fn query_raw<'a>(&'a self, sql: &'a str, params: &'a [ParameterizedValue]) -> DBIO<'a, ResultSet> {
+    fn execute<'a>(&'a self, q: Query<'a>) -> DBIO<'a, u64> {
+        let (sql, params) = visitor::Postgres::build(q);
+        DBIO::new(async move { self.execute_raw(sql.as_str(), &params[..]).await })
+    }
+
+    fn query_raw<'a>(&'a self, sql: &'a str, params: &'a [ParameterizedValue<'a>]) -> DBIO<'a, ResultSet> {
         metrics::query("postgres.query_raw", sql, params, move || {
             async move {
                 let client = self.client.lock().await;
@@ -404,6 +414,21 @@ impl Queryable for PostgreSql {
                 }
 
                 Ok(result)
+            }
+        })
+    }
+
+    fn execute_raw<'a>(&'a self, sql: &'a str, params: &'a [ParameterizedValue<'a>]) -> DBIO<'a, u64> {
+        metrics::query("postgres.execute_raw", sql, params, move || {
+            async move {
+                let client = self.client.lock().await;
+                let stmt = self.timeout(client.prepare(sql)).await?;
+
+                let changes = self
+                    .timeout(client.execute(&stmt, conversion::conv_params(params).as_slice()))
+                    .await?;
+
+                Ok(changes)
             }
         })
     }
@@ -491,7 +516,9 @@ mod tests {
 
         connection.query_raw(DROP_TABLE, &[]).await.unwrap();
         connection.query_raw(TABLE_DEF, &[]).await.unwrap();
-        connection.query_raw(CREATE_USER, &[]).await.unwrap();
+
+        let changes = connection.execute_raw(CREATE_USER, &[]).await.unwrap();
+        assert_eq!(1, changes);
 
         let rows = connection.query_raw("SELECT * FROM \"user\"", &[]).await.unwrap();
         assert_eq!(rows.len(), 1);
@@ -543,8 +570,8 @@ mod tests {
                     &DatabaseConstraint::Fields(vec![String::from("id1"), String::from("id2")]),
                     constraint,
                 )
-            },
-            _ => panic!(err)
+            }
+            _ => panic!(err),
         }
     }
 
@@ -567,10 +594,13 @@ mod tests {
         match err.kind() {
             ErrorKind::NullConstraintViolation { constraint } => {
                 assert_eq!(Some("23502"), err.original_code());
-                assert_eq!(Some("null value in column \"id1\" violates not-null constraint"), err.original_message());
+                assert_eq!(
+                    Some("null value in column \"id1\" violates not-null constraint"),
+                    err.original_message()
+                );
                 assert_eq!(&DatabaseConstraint::Fields(vec![String::from("id1")]), constraint)
-            },
-            _ => panic!(err)
+            }
+            _ => panic!(err),
         }
     }
 
@@ -601,11 +631,14 @@ mod tests {
             Err(e) => match e.kind() {
                 ErrorKind::DatabaseDoesNotExist { db_name } => {
                     assert_eq!(Some("3D000"), e.original_code());
-                    assert_eq!(Some("database \"this_does_not_exist\" does not exist"), e.original_message());
+                    assert_eq!(
+                        Some("database \"this_does_not_exist\" does not exist"),
+                        e.original_message()
+                    );
                     assert_eq!("this_does_not_exist", db_name.as_str())
-                },
+                }
                 kind => panic!("Expected `DatabaseDoesNotExist`, got {:?}", kind),
-            }
+            },
         }
     }
 
@@ -623,7 +656,7 @@ mod tests {
             Err(e) => match e.kind() {
                 ErrorKind::TlsError { .. } => (),
                 other => panic!("{:#?}", other),
-            }
+            },
         }
     }
 
@@ -656,7 +689,10 @@ mod tests {
         match err.kind() {
             ErrorKind::NullConstraintViolation { constraint } => {
                 assert_eq!(Some("23502"), err.original_code());
-                assert_eq!(Some("null value in column \"id\" violates not-null constraint"), err.original_message());
+                assert_eq!(
+                    Some("null value in column \"id\" violates not-null constraint"),
+                    err.original_message()
+                );
                 assert_eq!(constraint, &DatabaseConstraint::Fields(vec!["id".into()]))
             }
             other => panic!("{:?}", other),

@@ -121,7 +121,7 @@ impl TryFrom<&str> for Sqlite {
         let client = Mutex::new(conn);
         let file_path = params.file_path;
 
-        Ok(Sqlite { client, file_path, })
+        Ok(Sqlite { client, file_path })
     }
 }
 
@@ -158,8 +158,12 @@ impl TransactionCapable for Sqlite {}
 impl Queryable for Sqlite {
     fn query<'a>(&'a self, q: Query<'a>) -> DBIO<'a, ResultSet> {
         let (sql, params) = visitor::Sqlite::build(q);
-
         DBIO::new(async move { self.query_raw(&sql, &params).await })
+    }
+
+    fn execute<'a>(&'a self, q: Query<'a>) -> DBIO<'a, u64> {
+        let (sql, params) = visitor::Sqlite::build(q);
+        DBIO::new(async move { self.execute_raw(&sql, &params).await })
     }
 
     fn query_raw<'a>(&'a self, sql: &'a str, params: &'a [ParameterizedValue]) -> DBIO<'a, ResultSet> {
@@ -187,6 +191,23 @@ impl Queryable for Sqlite {
         })
     }
 
+    fn execute_raw<'a>(&'a self, sql: &'a str, params: &'a [ParameterizedValue<'a>]) -> DBIO<'a, u64> {
+        metrics::query("sqlite.query_raw", sql, params, move || {
+            let res = move || {
+                let client = self.client.lock().unwrap();
+                let mut stmt = client.prepare_cached(sql)?;
+                let res = u64::try_from(stmt.execute(params)?)?;
+
+                Ok(res)
+            };
+
+            match res() {
+                Ok(res) => future::ok(res),
+                Err(e) => future::err(e),
+            }
+        })
+    }
+
     fn raw_cmd<'a>(&'a self, cmd: &'a str) -> DBIO<'a, ()> {
         metrics::query("sqlite.raw_cmd", cmd, &[], move || {
             let client = self.client.lock().unwrap();
@@ -202,7 +223,12 @@ impl Queryable for Sqlite {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{ast::*, connector::{Queryable, TransactionCapable}, val, error::{DatabaseConstraint, ErrorKind}};
+    use crate::{
+        ast::*,
+        connector::{Queryable, TransactionCapable},
+        error::{DatabaseConstraint, ErrorKind},
+        val,
+    };
 
     #[test]
     fn sqlite_params_from_str_should_resolve_path_correctly_with_file_scheme() {
@@ -263,7 +289,9 @@ mod tests {
         let connection = Sqlite::try_from("file:db/test.db").unwrap();
 
         connection.query_raw(TABLE_DEF, &[]).await.unwrap();
-        connection.query_raw(CREATE_USER, &[]).await.unwrap();
+
+        let changes = connection.execute_raw(CREATE_USER, &[]).await.unwrap();
+        assert_eq!(1, changes);
 
         let rows = connection.query_raw("SELECT * FROM USER", &[]).await.unwrap();
         assert_eq!(rows.len(), 1);
@@ -380,18 +408,26 @@ mod tests {
 
         let _ = conn.raw_cmd("DROP TABLE test_uniq_constraint_violation").await;
 
-        conn.raw_cmd("CREATE TABLE test_uniq_constraint_violation (id1 int, id2 int)").await.unwrap();
-        conn.raw_cmd("CREATE UNIQUE INDEX musti ON test_uniq_constraint_violation (id1, id2)").await.unwrap();
+        conn.raw_cmd("CREATE TABLE test_uniq_constraint_violation (id1 int, id2 int)")
+            .await
+            .unwrap();
+        conn.raw_cmd("CREATE UNIQUE INDEX musti ON test_uniq_constraint_violation (id1, id2)")
+            .await
+            .unwrap();
 
         conn.query_raw(
             "INSERT INTO test_uniq_constraint_violation (id1, id2) VALUES (1, 2)",
-            &[]
-        ).await.unwrap();
+            &[],
+        )
+        .await
+        .unwrap();
 
-        let res = conn.query_raw(
-            "INSERT INTO test_uniq_constraint_violation (id1, id2) VALUES (1, 2)",
-            &[]
-        ).await;
+        let res = conn
+            .query_raw(
+                "INSERT INTO test_uniq_constraint_violation (id1, id2) VALUES (1, 2)",
+                &[],
+            )
+            .await;
 
         let err = res.unwrap_err();
 
@@ -401,13 +437,11 @@ mod tests {
                 assert_eq!(Some("UNIQUE constraint failed: test_uniq_constraint_violation.id1, test_uniq_constraint_violation.id2"), err.original_message());
 
                 assert_eq!(
-                    &DatabaseConstraint::Fields(
-                        vec![String::from("id1"), String::from("id2")]
-                    ),
+                    &DatabaseConstraint::Fields(vec![String::from("id1"), String::from("id2")]),
                     constraint,
                 )
-            },
-            _ => panic!(err)
+            }
+            _ => panic!(err),
         }
     }
 
@@ -417,22 +451,26 @@ mod tests {
 
         let _ = conn.raw_cmd("DROP TABLE test_null_constraint_violation").await;
 
-        conn.raw_cmd("CREATE TABLE test_null_constraint_violation (id1 int not null, id2 int not null)").await.unwrap();
+        conn.raw_cmd("CREATE TABLE test_null_constraint_violation (id1 int not null, id2 int not null)")
+            .await
+            .unwrap();
 
-        let res = conn.query_raw(
-            "INSERT INTO test_null_constraint_violation DEFAULT VALUES",
-            &[]
-        ).await;
+        let res = conn
+            .query_raw("INSERT INTO test_null_constraint_violation DEFAULT VALUES", &[])
+            .await;
 
         let err = res.unwrap_err();
 
         match err.kind() {
             ErrorKind::NullConstraintViolation { constraint } => {
                 assert_eq!(Some("1299"), err.original_code());
-                assert_eq!(Some("NOT NULL constraint failed: test_null_constraint_violation.id1"), err.original_message());
+                assert_eq!(
+                    Some("NOT NULL constraint failed: test_null_constraint_violation.id1"),
+                    err.original_message()
+                );
                 assert_eq!(&DatabaseConstraint::Fields(vec![String::from("id1")]), constraint)
-            },
-            _ => panic!(err)
+            }
+            _ => panic!(err),
         }
     }
 }

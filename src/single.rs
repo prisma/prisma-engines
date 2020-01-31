@@ -5,8 +5,8 @@ use crate::{
     connector::{self, ConnectionInfo, Queryable, SqlFamily, TransactionCapable, DBIO},
 };
 use futures::lock::Mutex;
+use std::{fmt, sync::Arc};
 use url::Url;
-use std::sync::Arc;
 
 #[cfg(feature = "sqlite")]
 use std::convert::TryFrom;
@@ -16,6 +16,12 @@ use std::convert::TryFrom;
 pub struct Quaint {
     inner: Arc<Mutex<Box<dyn Queryable + Send + Sync>>>,
     connection_info: Arc<ConnectionInfo>,
+}
+
+impl fmt::Debug for Quaint {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{:?}", self.connection_info)
+    }
 }
 
 impl TransactionCapable for Quaint {}
@@ -142,8 +148,16 @@ impl Queryable for Quaint {
         DBIO::new(async move { self.inner.lock().await.query(q).await })
     }
 
+    fn execute<'a>(&'a self, q: ast::Query<'a>) -> DBIO<'a, u64> {
+        DBIO::new(async move { self.inner.lock().await.execute(q).await })
+    }
+
     fn query_raw<'a>(&'a self, sql: &'a str, params: &'a [ast::ParameterizedValue]) -> DBIO<'a, connector::ResultSet> {
         DBIO::new(async move { self.inner.lock().await.query_raw(sql, params).await })
+    }
+
+    fn execute_raw<'a>(&'a self, sql: &'a str, params: &'a [ast::ParameterizedValue]) -> DBIO<'a, u64> {
+        DBIO::new(async move { self.inner.lock().await.execute_raw(sql, params).await })
     }
 
     fn raw_cmd<'a>(&'a self, cmd: &'a str) -> DBIO<'a, ()> {

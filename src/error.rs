@@ -1,5 +1,5 @@
 //! Error module
-use std::{fmt, io};
+use std::{fmt, io, num};
 use thiserror::Error;
 
 #[derive(Debug, PartialEq, Eq)]
@@ -148,6 +148,21 @@ pub enum ErrorKind {
     #[cfg(feature = "serde-support")]
     #[error("Deserializing a ResultRow {:?}", _0)]
     FromRowError(serde::de::value::Error),
+}
+
+impl From<Error> for ErrorKind {
+    fn from(e: Error) -> Self {
+        e.kind
+    }
+}
+
+impl From<num::TryFromIntError> for Error {
+    fn from(_: num::TryFromIntError) -> Self {
+        Self::builder(ErrorKind::ConversionError(
+            "Couldn't convert an integer (possible overflow).",
+        ))
+        .build()
+    }
 }
 
 #[cfg(feature = "pooled")]

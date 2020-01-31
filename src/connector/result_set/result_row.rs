@@ -1,4 +1,7 @@
-use crate::ast::ParameterizedValue;
+use crate::{
+    ast::ParameterizedValue,
+    error::{Error, ErrorKind},
+};
 use std::sync::Arc;
 
 /// An owned version of a `Row` in a `ResultSet`. See
@@ -65,6 +68,13 @@ impl ResultRow {
         ResultRowRef {
             columns: Arc::clone(&self.columns),
             values: &self.values,
+        }
+    }
+
+    pub fn into_single(self) -> crate::Result<ParameterizedValue<'static>> {
+        match self.into_iter().next() {
+            Some(val) => Ok(val),
+            None => Err(Error::builder(ErrorKind::NotFound).build()),
         }
     }
 }

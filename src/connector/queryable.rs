@@ -18,36 +18,39 @@ pub trait Queryable
 where
     Self: Sync,
 {
-    /// Executes the given query and returns the result set.
+    /// Execute the given query.
     fn query<'a>(&'a self, q: Query<'a>) -> DBIO<'a, ResultSet>;
 
-    /// Executes a query given as SQL, interpolating the given parameters and
-    /// returning a set of results.
+    /// Execute a query given as SQL, interpolating the given parameters.
     fn query_raw<'a>(&'a self, sql: &'a str, params: &'a [ParameterizedValue<'a>]) -> DBIO<'a, ResultSet>;
 
-    /// Runs a command in the database, for queries that can't be run using
+    /// Execute the given query, returning the number of affected rows.
+    fn execute<'a>(&'a self, q: Query<'a>) -> DBIO<'a, u64>;
+
+    /// Execute a query given as SQL, interpolating the given parameters and
+    /// returning the number of affected rows.
+    fn execute_raw<'a>(&'a self, sql: &'a str, params: &'a [ParameterizedValue<'a>]) -> DBIO<'a, u64>;
+
+    /// Run a command in the database, for queries that can't be run using
     /// prepared statements.
     fn raw_cmd<'a>(&'a self, cmd: &'a str) -> DBIO<'a, ()>;
 
-    // For selecting data returning the results.
+    /// Execute a `SELECT` query.
     fn select<'a>(&'a self, q: Select<'a>) -> DBIO<'a, ResultSet> {
         self.query(q.into())
     }
 
-    /// For inserting data. Returns the ID of the last inserted row.
+    /// Execute an `INSERT` query.
     fn insert<'a>(&'a self, q: Insert<'a>) -> DBIO<'a, ResultSet> {
         self.query(q.into())
     }
 
-    /// For updating data.
-    fn update<'a>(&'a self, q: Update<'a>) -> DBIO<'a, ()> {
-        DBIO::new(async move {
-            self.query(q.into()).await?;
-            Ok(())
-        })
+    /// Execute an `UPDATE` query, returning the number of affected rows.
+    fn update<'a>(&'a self, q: Update<'a>) -> DBIO<'a, u64> {
+        self.execute(q.into())
     }
 
-    /// For deleting data.
+    /// Execute a `DELETE` query, returning the number of affected rows.
     fn delete<'a>(&'a self, q: Delete<'a>) -> DBIO<'a, ()> {
         DBIO::new(async move {
             self.query(q.into()).await?;
