@@ -17,7 +17,7 @@ futures = { version = "0.3", features = ["compat"] }
 itertools = "0.8"
 json-rpc-stdio = { path = "../../libs/json-rpc-stdio" }
 jsonrpc-core = "14.0"
-quaint = { version = "0.2.0-alpha.1", optional = true }
+quaint = { git = "https://github.com/prisma/quaint", optional = true }
 serde = { version = "1.0" }
 serde_json = "1.0"
 thiserror = "1.0.9"
