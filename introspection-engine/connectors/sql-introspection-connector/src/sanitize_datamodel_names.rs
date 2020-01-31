@@ -24,6 +24,10 @@ pub fn sanitize_datamodel_names(mut datamodel: Datamodel) -> Datamodel {
                 info.to = sanitize_name(info.to.clone()).0;
                 info.to_fields = info.to_fields.iter().map(|f| sanitize_name(f.clone()).0).collect();
             }
+
+            if let FieldType::Enum(info) = &mut field.field_type {
+                *info = sanitize_name(info.clone()).0;
+            }
         }
 
         for index in &mut model.indices {
@@ -31,14 +35,16 @@ pub fn sanitize_datamodel_names(mut datamodel: Datamodel) -> Datamodel {
         }
     }
 
-    //    todo enums are a bit more complicated and not fully specced, lets do this separately.
-    //    We also need to map the actual valid values before printing them
-    //    for enm in &mut datamodel.enums {
-    //        let (sanitized_name, db_name) = sanitize_name(enm.name.clone());
-    //
-    //        enm.name = sanitized_name;
-    //        enm.database_name = db_name.map(|db| Single(db));
-    //    }
+    //   todo Mysql is more complicated
+
+    //allow @map on enum names, currently that errors
+    //introduce an @map concept for enum values, that does not exist yet
+    //start printing this
+    for enm in &mut datamodel.enums {
+        let (sanitized_name, db_name) = sanitize_name(enm.name.clone());
+        enm.name = sanitized_name;
+        enm.database_name = db_name;
+    }
 
     datamodel
 }

@@ -189,3 +189,32 @@ async fn remapping_fields_in_compound_relations_should_work(api: &TestApi) {
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
+
+#[test_one_connector(connector = "postgres")]
+async fn remapping_enum_names_should_work(api: &TestApi) {
+    let sql1 = format!("CREATE Type _color as ENUM ('black')");
+    api.database().execute_raw(&sql1, &[]).await.unwrap();
+
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("Book", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom("color  _color Not Null");
+            });
+        })
+        .await;
+
+    let dm = r#"
+        model Book {
+            color   color
+            id      Int     @default(autoincrement()) @id 
+        }
+        
+        enum color {
+            black
+        }
+    "#;
+
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}

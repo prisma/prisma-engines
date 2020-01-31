@@ -169,6 +169,7 @@ impl SqlSchemaDescriber {
                     x => panic!(format!("unrecognized is_nullable variant '{}'", x)),
                 };
 
+                //todo this infers custom types that start with _ as lists -.-
                 let arity = if full_data_type.starts_with("_") {
                     ColumnArity::List
                 } else if is_required {
