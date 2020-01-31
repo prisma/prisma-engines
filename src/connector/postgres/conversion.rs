@@ -8,7 +8,7 @@ use chrono::{DateTime, NaiveDateTime, Utc};
 use rust_decimal::{prelude::FromPrimitive, Decimal};
 use std::{error::Error, str::FromStr};
 use tokio_postgres::{
-    types::{self, IsNull, Kind, ToSql, Type as PostgresType},
+    types::{self, FromSql, IsNull, Kind, ToSql, Type as PostgresType},
     Row as PostgresRow, Statement as PostgresStatement,
 };
 
