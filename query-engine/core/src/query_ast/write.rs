@@ -16,16 +16,23 @@ pub enum WriteQuery {
 }
 
 impl WriteQuery {
-    pub fn inject_all(&mut self, pairs: Vec<(Field, Vec<PrismaValue>)>) {
-        pairs
-            .into_iter()
-            .for_each(|(field, values)| self.inject_field_arg(field, values));
+    pub fn inject_id(&mut self, record_id: RecordIdentifier) {
+        let keys = record_id.fields().map(|dsf| dsf.name.clone()).collect();
+        let values = record_id.values().map(|v| v.clone()).collect();
+
+        self.inject_all(keys, values);
+    }
+
+    pub fn inject_all(&mut self, keys: Vec<String>, values: Vec<PrismaValue>) {
+        keys.into_iter()
+            .zip(values)
+            .for_each(|(key, value)| self.inject_field_arg(key, value));
     }
 
     // Injects PrismaValues into the write arguments based the passed field.
     // If the underlying representation of the field takes multiple values, a compound field is injected.
     // If values are missing (e.g. empty vec passed), `PrismaValue::Null`(s) are written instead.
-    pub fn inject_field_arg(&mut self, field: Field, mut values: Vec<PrismaValue>) {
+    pub fn inject_field_arg(&mut self, key: String, mut value: PrismaValue) {
         let args = match self {
             Self::CreateRecord(ref mut x) => &mut x.args,
             Self::UpdateRecord(x) => &mut x.args,
@@ -34,23 +41,7 @@ impl WriteQuery {
             _ => return,
         };
 
-        let key = field.name().to_owned();
-
-        match field {
-            Field::Scalar(_) => args.insert(key, values.pop().unwrap_or_else(|| PrismaValue::Null)),
-            Field::Relation(rf) => {
-                // Equalize the values and backing field lengths.
-                if values.len() != rf.data_source_fields().len() {
-                    values.truncate(rf.data_source_fields().len());
-
-                    for i in 0..(values.len() - rf.data_source_fields().len()) {
-                        values.push(PrismaValue::Null);
-                    }
-                }
-
-                args.insert_compound(key, values)
-            }
-        };
+        args.insert(key, value)
     }
 
     pub fn returns(&self, ident: &ModelIdentifier) -> bool {

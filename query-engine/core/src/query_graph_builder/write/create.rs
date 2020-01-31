@@ -16,7 +16,7 @@ pub fn create_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedF
     let create_node = create::create_record_node(graph, Arc::clone(&model), data_map)?;
 
     // Follow-up read query on the write
-    let read_query = ReadOneRecordBuilder::new(field, model).build()?;
+    let read_query = ReadOneRecordBuilder::new(field, model.clone()).build()?;
     let read_node = graph.create_node(Query::Read(read_query));
 
     graph.add_result_node(&read_node);

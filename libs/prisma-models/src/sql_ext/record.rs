@@ -32,7 +32,10 @@ impl TryFrom<(&ModelIdentifier, ResultSet)> for RecordIdentifier {
         if id.len() == record_id.len() {
             Ok(record_id)
         } else {
-            Err(DomainError::ConversionFailure("ResultSet", "RecordIdentifier"))
+            Err(DomainError::ConversionFailure(
+                "ResultSet".to_owned(),
+                "RecordIdentifier".to_owned(),
+            ))
         }
     }
 }

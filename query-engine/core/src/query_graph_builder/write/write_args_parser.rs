@@ -21,7 +21,6 @@ impl WriteArgsParser {
                 match field {
                     Field::Scalar(sf) if sf.is_list => {
                         let vals: ParsedInputMap = v.try_into()?;
-
                         let set_value = vals.into_iter().find(|(k, _)| k == "set");
 
                         let set_value: PrismaValue = match set_value {
@@ -35,12 +34,12 @@ impl WriteArgsParser {
                             }
                         };
 
-                        args.args.insert(sf.name.clone(), set_value)
+                        args.args.insert(sf.db_name().clone(), set_value)
                     }
 
                     Field::Scalar(sf) => {
                         let value: PrismaValue = v.try_into()?;
-                        args.args.insert(sf.name.clone(), value)
+                        args.args.insert(sf.db_name().clone(), value)
                     }
 
                     Field::Relation(ref rf) => {

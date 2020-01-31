@@ -1,4 +1,7 @@
-use crate::{dml::FieldArity, DataSourceFieldRef, DomainError, Field, ModelRef, PrismaValue, TypeIdentifier};
+use crate::{
+    dml::FieldArity, DataSourceFieldRef, DomainError, Field, ModelRef, PrismaValue, PrismaValueExtensions,
+    TypeIdentifier,
+};
 
 // Collection of fields that uniquely identify a record of a model.
 // There can be different sets of fields at the same time identifying a model.
@@ -77,11 +80,13 @@ impl ModelIdentifier {
 
     /// Inserts this model identifiers data source fields into the given record identifier.
     /// Assumes caller knows that the exchange can be done. Errors if lengths mismatch.
+    /// Additionally performs a type coercion based on the source and destination field types.
+    /// (Resistance is futile.)
     pub fn assimilate(&self, id: RecordIdentifier) -> crate::Result<RecordIdentifier> {
         if self.len() != id.len() {
             Err(DomainError::ConversionFailure(
-                "record identifier",
-                "assimilated record identifier",
+                "record identifier".to_owned(),
+                "assimilated record identifier".to_owned(),
             ))
         } else {
             let fields = self.data_source_fields();
@@ -90,8 +95,15 @@ impl ModelIdentifier {
                 .pairs
                 .into_iter()
                 .zip(fields)
-                .map(|((_, value), other_field)| (other_field, value))
-                .collect::<Vec<_>>()
+                .map(|((og_field, value), other_field)| {
+                    if og_field.field_type != other_field.field_type {
+                        let coerce_to: TypeIdentifier = other_field.field_type.into();
+                        Ok((other_field, value.coerce(coerce_to)?))
+                    } else {
+                        Ok((other_field, value))
+                    }
+                })
+                .collect::<crate::Result<Vec<_>>>()?
                 .into())
         }
     }

@@ -59,9 +59,10 @@ pub fn delete_many_records(
         None => Filter::empty(),
     };
 
-    let read_query = utils::read_ids_infallible(model, model.primary_identifier(), filter.clone());
+    let model_id = model.primary_identifier();
+    let read_query = utils::read_ids_infallible(model.clone(), model_id, filter.clone());
     let delete_many = WriteQuery::DeleteManyRecords(DeleteManyRecords {
-        model: Arc::clone(&model),
+        model: model.clone(),
         filter,
     });
 

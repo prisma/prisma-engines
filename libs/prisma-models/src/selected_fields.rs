@@ -166,7 +166,7 @@ impl SelectedFields {
         self.names().find(|fname| fname == &name).is_some()
     }
 
-    pub fn contains_all_db_names<'a>(&self, names: impl Iterator<Item = &'a str>) -> bool {
+    pub fn contains_all_db_names<'a>(&self, names: impl Iterator<Item = String>) -> bool {
         let mut db_names: Vec<_> = self.db_names().collect();
         let mut names: Vec<_> = names.collect();
 

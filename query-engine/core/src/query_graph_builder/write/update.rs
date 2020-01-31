@@ -26,7 +26,7 @@ pub fn update_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedF
 
     let update_node = update_record_node(graph, filter, Arc::clone(&model), data_map)?;
 
-    let read_query = ReadOneRecordBuilder::new(field, model).build()?;
+    let read_query = ReadOneRecordBuilder::new(field, model.clone()).build()?;
     let read_node = graph.create_node(Query::Read(read_query));
 
     graph.add_result_node(&read_node);

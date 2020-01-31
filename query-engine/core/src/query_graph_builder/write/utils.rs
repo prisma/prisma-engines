@@ -57,7 +57,7 @@ pub fn read_ids_infallible<T>(model: ModelRef, id: ModelIdentifier, filter: T) -
 where
     T: Into<Filter>,
 {
-    let selected_fields: SelectedFields = model.primary_identifier().into();
+    let selected_fields: SelectedFields = id.into();
     let filter: Filter = filter.into();
 
     let read_query = ReadQuery::ManyRecordsQuery(ManyRecordsQuery {
@@ -369,7 +369,7 @@ pub fn insert_node_reload(
     parent_relation_field: &RelationFieldRef,
     parent_node: NodeRef,
 ) -> QueryGraphBuilderResult<NodeRef> {
-    if let Some(Node::Query(q)) = graph.node_content(&parent_node) {
+    if let Some(Node::Query(_q)) = graph.node_content(&parent_node) {
         let required_fields = parent_relation_field.linking_fields();
 
         // Todo: Simplification: We currently always reload the node regardless of whether or not the parent actually
@@ -382,8 +382,8 @@ pub fn insert_node_reload(
             &reload_node,
             QueryGraphDependency::ParentIds(
                 required_fields,
-                Box::new(move |node, parent_ids| {
-                    if let Node::Query(mut q) = node {
+                Box::new(move |mut node, parent_ids| {
+                    if let Node::Query(ref mut q) = node {
                         q.add_filter(parent_ids.filter());
                     }
 
