@@ -279,7 +279,7 @@ async fn composite_primary_keys_must_work(api: &TestApi) {
         ),
     };
 
-    api.database().execute_raw(&sql, &[]).await.unwrap();
+    api.database().query_raw(&sql, &[]).await.unwrap();
 
     let schema = api.describe().await.expect("describe failed");
     let table = schema.get_table("User").expect("couldn't get User table");

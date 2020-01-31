@@ -73,7 +73,7 @@ pub trait QueryExt: Queryable + Send + Sync {
             .next()
             .unwrap();
 
-        Ok(i64::try_from(id).map_err(|err|{
+        Ok(i64::try_from(id).map_err(|err| {
             let domain_error: DomainError = err.into();
             domain_error
         })?)

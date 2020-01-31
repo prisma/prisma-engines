@@ -23,7 +23,7 @@ tracing-futures = "0.2.0"
 tokio = { version = "0.2", features = ["rt-threaded", "time"] }
 
 [dependencies.quaint]
-version = "0.1"
+version = "0.2.0-alpha.1"
 features = ["single"]
 
 [dev-dependencies]

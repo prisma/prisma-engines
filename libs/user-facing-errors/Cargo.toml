@@ -13,7 +13,7 @@ serde = { version = "1.0.102", features = ["derive"] }
 backtrace = "0.3.40"
 failure = "*"
 log = "0.4.8"
-quaint = { version = "0.1", features = ["mysql", "postgresql", "sqlite"], optional = true }
+quaint = { version = "0.2.0-alpha.1", features = ["mysql", "postgresql", "sqlite"], optional = true }
 
 [features]
 default = []
