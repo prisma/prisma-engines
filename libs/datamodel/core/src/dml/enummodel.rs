@@ -6,6 +6,8 @@ pub struct Enum {
     /// Name of the enum.
     pub name: String,
     /// Values of the enum.
+    //todo this needs to be able to hold database names for enum values -> tuple? or struct?
+    //struct could implement WithDatabaseName and using existing traits
     pub values: Vec<String>,
     /// Comments for this enum.
     pub documentation: Option<String>,
