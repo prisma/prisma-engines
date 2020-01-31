@@ -26,6 +26,7 @@ pub enum ParameterizedValue<'a> {
     Integer(i64),
     Real(Decimal),
     Text(Cow<'a, str>),
+    Enum(Cow<'a, str>),
     Boolean(bool),
     Char(char),
     #[cfg(all(feature = "array", feature = "postgresql"))]
@@ -63,6 +64,7 @@ impl<'a> fmt::Display for ParameterizedValue<'a> {
             ParameterizedValue::Integer(val) => write!(f, "{}", val),
             ParameterizedValue::Real(val) => write!(f, "{}", val),
             ParameterizedValue::Text(val) => write!(f, "\"{}\"", val),
+            ParameterizedValue::Enum(val) => write!(f, "\"{}\"", val),
             ParameterizedValue::Boolean(val) => write!(f, "{}", val),
             ParameterizedValue::Char(val) => write!(f, "'{}'", val),
             #[cfg(feature = "array")]
@@ -97,6 +99,7 @@ impl<'a> From<ParameterizedValue<'a>> for Value {
             ParameterizedValue::Integer(i) => Value::Number(Number::from(i)),
             ParameterizedValue::Real(d) => serde_json::to_value(d).unwrap(),
             ParameterizedValue::Text(cow) => Value::String(cow.into_owned()),
+            ParameterizedValue::Enum(cow) => Value::String(cow.into_owned()),
             ParameterizedValue::Boolean(b) => Value::Bool(b),
             ParameterizedValue::Char(c) => {
                 let bytes = [c as u8];
@@ -376,9 +379,9 @@ impl<'a> TryFrom<ParameterizedValue<'a>> for i64 {
     type Error = Error;
 
     fn try_from(value: ParameterizedValue<'a>) -> Result<i64, Self::Error> {
-        value.as_i64().ok_or_else(|| {
-            Error::builder(ErrorKind::ConversionError("Not an i64")).build()
-        })
+        value
+            .as_i64()
+            .ok_or_else(|| Error::builder(ErrorKind::ConversionError("Not an i64")).build())
     }
 }
 
@@ -386,9 +389,9 @@ impl<'a> TryFrom<ParameterizedValue<'a>> for Decimal {
     type Error = Error;
 
     fn try_from(value: ParameterizedValue<'a>) -> Result<Decimal, Self::Error> {
-        value.as_decimal().ok_or_else(|| {
-            Error::builder(ErrorKind::ConversionError("Not a decimal")).build()
-        })
+        value
+            .as_decimal()
+            .ok_or_else(|| Error::builder(ErrorKind::ConversionError("Not a decimal")).build())
     }
 }
 
@@ -399,9 +402,7 @@ impl<'a> TryFrom<ParameterizedValue<'a>> for f64 {
         value
             .as_decimal()
             .and_then(|d| d.to_f64())
-            .ok_or_else(|| {
-                Error::builder(ErrorKind::ConversionError("Not a f64")).build()
-            })
+            .ok_or_else(|| Error::builder(ErrorKind::ConversionError("Not a f64")).build())
     }
 }
 
@@ -409,9 +410,9 @@ impl<'a> TryFrom<ParameterizedValue<'a>> for String {
     type Error = Error;
 
     fn try_from(value: ParameterizedValue<'a>) -> Result<String, Self::Error> {
-        value.into_string().ok_or_else(|| {
-            Error::builder(ErrorKind::ConversionError("Not a string")).build()
-        })
+        value
+            .into_string()
+            .ok_or_else(|| Error::builder(ErrorKind::ConversionError("Not a string")).build())
     }
 }
 
@@ -419,9 +420,9 @@ impl<'a> TryFrom<ParameterizedValue<'a>> for bool {
     type Error = Error;
 
     fn try_from(value: ParameterizedValue<'a>) -> Result<bool, Self::Error> {
-        value.as_bool().ok_or_else(|| {
-            Error::builder(ErrorKind::ConversionError("Not a bool")).build()
-        })
+        value
+            .as_bool()
+            .ok_or_else(|| Error::builder(ErrorKind::ConversionError("Not a bool")).build())
     }
 }
 
@@ -430,9 +431,9 @@ impl<'a> TryFrom<ParameterizedValue<'a>> for DateTime<Utc> {
     type Error = Error;
 
     fn try_from(value: ParameterizedValue<'a>) -> Result<DateTime<Utc>, Self::Error> {
-        value.as_datetime().ok_or_else(|| {
-            Error::builder(ErrorKind::ConversionError("Not a datetime")).build()
-        })
+        value
+            .as_datetime()
+            .ok_or_else(|| Error::builder(ErrorKind::ConversionError("Not a datetime")).build())
     }
 }
 
