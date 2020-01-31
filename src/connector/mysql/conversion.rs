@@ -65,7 +65,7 @@ impl TakeRow for my::Row {
             Ok(res)
         }
 
-        let mut row = Vec::new();
+        let mut row = Vec::with_capacity(self.len());
 
         for i in 0..self.len() {
             row.push(convert(self, i)?);
@@ -82,6 +82,7 @@ impl<'a> From<ParameterizedValue<'a>> for MyValue {
             ParameterizedValue::Integer(i) => MyValue::Int(i),
             ParameterizedValue::Real(f) => MyValue::Float(f.to_f64().expect("Decimal is not a f64.")),
             ParameterizedValue::Text(s) => MyValue::Bytes((&*s).as_bytes().to_vec()),
+            ParameterizedValue::Enum(s) => MyValue::Bytes((&*s).as_bytes().to_vec()),
             ParameterizedValue::Boolean(b) => MyValue::Int(b as i64),
             ParameterizedValue::Char(c) => MyValue::Bytes(vec![c as u8]),
             #[cfg(feature = "json-1")]

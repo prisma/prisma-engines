@@ -10,7 +10,7 @@ use rust_decimal::prelude::ToPrimitive;
 
 impl<'a> GetRow for SqliteRow<'a> {
     fn get_result_row<'b>(&'b self) -> crate::Result<Vec<ParameterizedValue<'static>>> {
-        let mut row = Vec::new();
+        let mut row = Vec::with_capacity(self.columns().len());
 
         for (i, column) in self.columns().iter().enumerate() {
             let pv = match self.get_raw(i) {
@@ -27,7 +27,7 @@ impl<'a> GetRow for SqliteRow<'a> {
                 },
                 ValueRef::Real(f) => ParameterizedValue::from(f),
                 ValueRef::Text(bytes) => ParameterizedValue::Text(String::from_utf8(bytes.to_vec())?.into()),
-                ValueRef::Blob(_) => panic!("Blobs not supprted, yet"),
+                ValueRef::Blob(_) => panic!("Blobs not supported, yet"),
             };
 
             row.push(pv);
@@ -39,15 +39,10 @@ impl<'a> GetRow for SqliteRow<'a> {
 
 impl<'a> ToColumnNames for SqliteRows<'a> {
     fn to_column_names(&self) -> Vec<String> {
-        let mut names = Vec::new();
-
-        if let Some(columns) = self.column_names() {
-            for column in columns {
-                names.push(String::from(column));
-            }
+        match self.column_names() {
+            Some(columns) => columns.into_iter().map(|c| c.into()).collect(),
+            None => vec![],
         }
-
-        names
     }
 }
 
@@ -58,6 +53,7 @@ impl<'a> ToSql for ParameterizedValue<'a> {
             ParameterizedValue::Integer(integer) => ToSqlOutput::from(*integer),
             ParameterizedValue::Real(d) => ToSqlOutput::from((*d).to_f64().expect("Decimal is not a f64.")),
             ParameterizedValue::Text(cow) => ToSqlOutput::from(&**cow),
+            ParameterizedValue::Enum(cow) => ToSqlOutput::from(&**cow),
             ParameterizedValue::Boolean(boo) => ToSqlOutput::from(*boo),
             ParameterizedValue::Char(c) => ToSqlOutput::from(*c as u8),
             #[cfg(feature = "array")]
