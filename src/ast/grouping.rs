@@ -42,14 +42,14 @@ impl<'a> IntoGroupByDefinition<'a> for &'a str {
     #[inline]
     fn into_group_by_definition(self) -> GroupByDefinition<'a> {
         let column: Column = self.into();
-        (column.into())
+        column.into()
     }
 }
 
 impl<'a> IntoGroupByDefinition<'a> for Column<'a> {
     #[inline]
     fn into_group_by_definition(self) -> GroupByDefinition<'a> {
-        (self.into())
+        self.into()
     }
 }
 
@@ -63,7 +63,7 @@ impl<'a> IntoGroupByDefinition<'a> for GroupByDefinition<'a> {
 impl<'a> Groupable<'a> for Column<'a> {
     #[inline]
     fn group(self) -> GroupByDefinition<'a> {
-        (self.into())
+        self.into()
     }
 }
 

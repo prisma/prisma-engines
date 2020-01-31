@@ -56,9 +56,7 @@ pub fn from_rows<T: DeserializeOwned>(result_set: ResultSet) -> crate::Result<Ve
 pub fn from_row<T: DeserializeOwned>(row: ResultRow) -> crate::Result<T> {
     let deserializer = RowDeserializer(row);
 
-    T::deserialize(deserializer).map_err(|e| {
-        Error::builder(ErrorKind::FromRowError(e)).build()
-    })
+    T::deserialize(deserializer).map_err(|e| Error::builder(ErrorKind::FromRowError(e)).build())
 }
 
 type DeserializeError = serde::de::value::Error;
@@ -70,10 +68,7 @@ impl<'de> Deserializer<'de> for RowDeserializer {
     type Error = DeserializeError;
 
     fn deserialize_any<V: Visitor<'de>>(self, visitor: V) -> Result<V::Value, Self::Error> {
-        let ResultRow {
-            columns,
-            mut values,
-        } = self.0;
+        let ResultRow { columns, mut values } = self.0;
 
         let kvs = columns.iter().enumerate().map(move |(v, k)| {
             // The unwrap is safe if `columns` is correct.
@@ -113,6 +108,7 @@ impl<'de> Deserializer<'de> for ParameterizedValueDeserializer<'de> {
 
         match self.0 {
             ParameterizedValue::Text(s) => visitor.visit_string(s.into_owned()),
+            ParameterizedValue::Enum(s) => visitor.visit_string(s.into_owned()),
             ParameterizedValue::Integer(i) => visitor.visit_i64(i),
             ParameterizedValue::Boolean(b) => visitor.visit_bool(b),
             ParameterizedValue::Char(c) => visitor.visit_char(c),
