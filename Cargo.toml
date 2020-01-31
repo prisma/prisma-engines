@@ -1,12 +1,13 @@
 [package]
 name = "quaint"
-version = "0.1.11"
+version = "0.1.12"
 authors = [
     "Julius de Bruijn <bruijn@prisma.io>",
-    "Dominic Petrick <petrick@prisma.io>",
     "Katharina Fey <kookie@spacekookie.de>",
+    "Tom Houlé <tom@tomhoule.com>",
     "Emanuel Jöbstl <emanuel.joebstl@gmail.com>",
-    "Tom Houlé <tom@tomhoule.com>"
+    "Matthias Oertel <oertel@prisma.io>",
+    "Dominic Petrick <petrick@prisma.io>",
 ]
 edition = "2018"
 readme  = "README.md"
