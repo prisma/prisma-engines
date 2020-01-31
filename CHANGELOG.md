@@ -1,9 +1,17 @@
 # Changelog
 
+## v0.2.0-alpha.1
+
+Breaking changes ahead
+
+- Errors redesign. (https://github.com/prisma/quaint/pull/72)
+- Queryable redesign. (https://github.com/prisma/quaint/pull/61) and (https://github.com/prisma/quaint/pull/74)
+- Unique/null constr error should be multi-column (https://github.com/prisma/quaint/pull/62)
+- Add optional serde support (https://github.com/prisma/quaint/pull/63)
+
 ## v0.1.12
 
 - Add a ParameterizedValue::Enum in order to support writing to native enum columns in Postgres
-
 
 ## v0.1.11
 
