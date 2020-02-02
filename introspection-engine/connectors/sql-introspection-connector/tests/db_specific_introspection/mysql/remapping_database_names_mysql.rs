@@ -208,6 +208,7 @@ async fn remapping_enum_names_should_work(api: &TestApi) {
         
         enum MySQLBook_color {
             black
+            @@map("123MySQLBook_1color")
         }
     "#;
 

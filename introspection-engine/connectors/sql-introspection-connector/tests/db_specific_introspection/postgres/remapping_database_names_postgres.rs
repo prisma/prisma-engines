@@ -212,6 +212,7 @@ async fn remapping_enum_names_should_work(api: &TestApi) {
         
         enum color {
             black
+            @@map("_color")
         }
     "#;
 
