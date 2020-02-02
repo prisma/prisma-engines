@@ -325,3 +325,39 @@ async fn introspecting_a_table_enums_should_return_alphabetically_even_when_in_d
     custom_assert(&result3, dm);
     custom_assert(&result4, dm);
 }
+
+#[test_one_connector(connector = "postgres")]
+async fn introspecting_a_table_enums_array_should_work(api: &TestApi) {
+    let sql = format!("CREATE Type color as ENUM ( 'black', 'white')");
+
+    api.database().execute_raw(&sql, &[]).await.unwrap();
+
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("Book", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom("color  color []");
+            });
+        })
+        .await;
+
+    let dm = r#"
+        datasource pg {
+              provider = "postgres"
+              url = "postgresql://localhost:5432"
+        }
+    
+        model Book {
+            color   color[]
+            id      Int     @default(autoincrement()) @id 
+        }
+        
+        enum color{
+            black
+            white
+        }
+    "#;
+
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}

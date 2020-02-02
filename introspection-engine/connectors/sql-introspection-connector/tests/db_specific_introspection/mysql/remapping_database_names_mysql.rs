@@ -185,9 +185,6 @@ async fn remapping_fields_in_compound_relations_should_work(api: &TestApi) {
     custom_assert(&result, dm);
 }
 
-//todo invalid field + model name both remapped, enum should be valid still leading chars dropped in field
-// does @@map make sense for Mysql enums? They dont have a proper name to be renamed anyways
-
 #[test_one_connector(connector = "mysql")]
 async fn remapping_enum_names_should_work(api: &TestApi) {
     api.barrel()
