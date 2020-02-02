@@ -170,6 +170,7 @@ impl SqlSchemaDescriber {
                 };
 
                 //todo this infers custom types that start with _ as lists -.-
+
                 let arity = if full_data_type.starts_with("_") {
                     ColumnArity::List
                 } else if is_required {
@@ -520,6 +521,7 @@ impl SqlSchemaDescriber {
 
 fn get_column_type(data_type: &str, full_data_type: &str, arity: ColumnArity, enums: &Vec<Enum>) -> ColumnType {
     let family = match full_data_type {
+        //todo this does not recognize enum arrays
         x if data_type == "USER-DEFINED" && enums.iter().find(|e| e.name == x).is_some() => {
             ColumnTypeFamily::Enum(x.to_string())
         }

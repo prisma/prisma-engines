@@ -14,7 +14,11 @@ pub fn sanitize_datamodel_names(mut datamodel: Datamodel) -> Datamodel {
             if let FieldType::Relation(info) = &mut field.field_type {
                 info.name = sanitize_name(info.name.clone()).0;
                 info.to = sanitize_name(info.to.clone()).0;
-                info.to_fields = info.to_fields.iter().map(|f| sanitize_name(f.clone()).0).collect();
+                info.to_fields = info
+                    .to_fields
+                    .iter()
+                    .map(|f: &std::string::String| sanitize_name(f.clone()).0)
+                    .collect();
             }
 
             if let FieldType::Enum(enum_name) = &mut field.field_type {
@@ -25,7 +29,7 @@ pub fn sanitize_datamodel_names(mut datamodel: Datamodel) -> Datamodel {
                     } else {
                         (
                             format!("{}_{}", sanitized_model_name, sanitized_field_name),
-                            Some(enum_name.clone()), //todo should this be none as well? There is no dbName for MySql Enums
+                            Some(enum_name.clone()),
                         )
                     }
                 } else {
@@ -33,9 +37,7 @@ pub fn sanitize_datamodel_names(mut datamodel: Datamodel) -> Datamodel {
                 };
 
                 if let Some(old_name) = enum_db_name {
-                    enum_renames.insert(old_name.clone(), (sanitized_enum_name.clone(), Some(old_name.clone())))
-                } else {
-                    enum_renames.insert(sanitized_enum_name.clone(), (sanitized_enum_name.clone(), None))
+                    enum_renames.insert(old_name.clone(), (sanitized_enum_name.clone(), Some(old_name.clone())));
                 };
 
                 *enum_name = sanitized_enum_name;
@@ -56,13 +58,22 @@ pub fn sanitize_datamodel_names(mut datamodel: Datamodel) -> Datamodel {
         model.database_name = model_db_name;
     }
 
-    //allow @map on enum names, currently that errors
-    //introduce an @map concept for enum values, that does not exist yet
-    //start printing this
     for enm in &mut datamodel.enums {
-        let names = enum_renames.get(&enm.name).unwrap();
-        enm.name = (*names.0).to_string();
-        enm.database_name = names.1.clone();
+        println!("{:?}", enm);
+        println!("{:?}", enum_renames);
+
+        //        let names = enum_renames.get(&enm.name).unwrap();
+        //        enm.name = (*names.0).to_string();
+        //        enm.database_name = names.1.clone();
+
+        if let Some((sanitized_enum_name, enum_db_name)) = enum_renames.get(&enm.name) {
+            enm.name = sanitized_enum_name.to_owned();
+            enm.database_name = enum_db_name.to_owned();
+        } else {
+            let (sanitized_enum_name, enum_db_name) = sanitize_name(enm.name.clone());
+            enm.name = sanitized_enum_name.to_owned();
+            enm.database_name = enum_db_name.to_owned();
+        }
     }
 
     // todo: do a pass over all modified names and deduplicate them
