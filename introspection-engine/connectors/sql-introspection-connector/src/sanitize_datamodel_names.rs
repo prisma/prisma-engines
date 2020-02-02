@@ -1,23 +1,15 @@
 use datamodel::{Datamodel, FieldType};
 use regex::Regex;
+use std::collections::HashMap;
 
 pub fn sanitize_datamodel_names(mut datamodel: Datamodel) -> Datamodel {
-    // todo fix name clashes we introduce
+    let mut enum_renames = HashMap::new();
 
     for model in &mut datamodel.models {
-        let (sanitized_name, db_name) = sanitize_name(model.name.clone());
-
-        model.name = sanitized_name;
-        model.database_name = db_name;
+        let (sanitized_model_name, model_db_name) = sanitize_name(model.name.clone());
 
         for field in &mut model.fields {
-            let (sanitized_name, db_name) = sanitize_name(field.name.clone());
-
-            field.name = sanitized_name;
-
-            if field.database_names.is_empty() {
-                field.database_names = db_name.map(|db| vec![db]).unwrap_or(vec![]);
-            }
+            let (sanitized_field_name, field_db_name) = sanitize_name(field.name.clone());
 
             if let FieldType::Relation(info) = &mut field.field_type {
                 info.name = sanitize_name(info.name.clone()).0;
@@ -25,26 +17,55 @@ pub fn sanitize_datamodel_names(mut datamodel: Datamodel) -> Datamodel {
                 info.to_fields = info.to_fields.iter().map(|f| sanitize_name(f.clone()).0).collect();
             }
 
-            if let FieldType::Enum(info) = &mut field.field_type {
-                *info = sanitize_name(info.clone()).0;
+            if let FieldType::Enum(enum_name) = &mut field.field_type {
+                let (sanitized_enum_name, enum_db_name) = if *enum_name == format!("{}_{}", model.name, field.name) {
+                    //MySql
+                    if model_db_name.is_none() && field_db_name.is_none() {
+                        (enum_name.clone(), None)
+                    } else {
+                        (
+                            format!("{}_{}", sanitized_model_name, sanitized_field_name),
+                            Some(enum_name.clone()), //todo should this be none as well? There is no dbName for MySql Enums
+                        )
+                    }
+                } else {
+                    sanitize_name(enum_name.clone())
+                };
+
+                if let Some(old_name) = enum_db_name {
+                    enum_renames.insert(old_name.clone(), (sanitized_enum_name.clone(), Some(old_name.clone())))
+                } else {
+                    enum_renames.insert(sanitized_enum_name.clone(), (sanitized_enum_name.clone(), None))
+                };
+
+                *enum_name = sanitized_enum_name;
+            }
+
+            field.name = sanitized_field_name;
+
+            if field.database_names.is_empty() {
+                field.database_names = field_db_name.map(|db| vec![db]).unwrap_or(vec![]);
             }
         }
 
         for index in &mut model.indices {
             index.fields = index.fields.iter().map(|f| sanitize_name(f.clone()).0).collect();
         }
-    }
 
-    //   todo Mysql is more complicated
+        model.name = sanitized_model_name;
+        model.database_name = model_db_name;
+    }
 
     //allow @map on enum names, currently that errors
     //introduce an @map concept for enum values, that does not exist yet
     //start printing this
     for enm in &mut datamodel.enums {
-        let (sanitized_name, db_name) = sanitize_name(enm.name.clone());
-        enm.name = sanitized_name;
-        enm.database_name = db_name;
+        let names = enum_renames.get(&enm.name).unwrap();
+        enm.name = (*names.0).to_string();
+        enm.database_name = names.1.clone();
     }
+
+    // todo: do a pass over all modified names and deduplicate them
 
     datamodel
 }
