@@ -493,16 +493,12 @@ impl SqlSchemaDescriber {
             JOIN pg_catalog.pg_namespace n ON n.oid = t.typnamespace
             WHERE n.nspname = $1
             ORDER BY name, value";
-        let rows = self
-            .conn
-            .query_raw(&sql, &[schema.into()])
-            .await
-            .expect("querying for enums");
+        let rows = self.conn.query_raw(&sql, &[schema.into()]).await.unwrap();
         let mut enum_values: HashMap<String, Vec<String>> = HashMap::new();
         for row in rows.into_iter() {
             debug!("Got enum row: {:?}", row);
-            let name = row.get("name").and_then(|x| x.to_string()).expect("get name");
-            let value = row.get("value").and_then(|x| x.to_string()).expect("get value");
+            let name = row.get("name").and_then(|x| x.to_string()).unwrap();
+            let value = row.get("value").and_then(|x| x.to_string()).unwrap();
 
             let values = enum_values.entry(name).or_insert(vec![]);
             values.push(value);
