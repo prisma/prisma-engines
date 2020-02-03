@@ -126,7 +126,7 @@ impl SqlSchemaDescriber {
     }
 
     async fn get_columns(&self, schema: &str, table: &str, enums: &Vec<Enum>) -> Vec<Column> {
-        let sql = "SELECT column_name, data_type, udt_name as full_column_type, column_default, is_nullable, is_identity, data_type
+        let sql = "SELECT column_name, data_type, udt_name as full_data_type, column_default, is_nullable, is_identity, data_type
             FROM information_schema.columns
             WHERE table_schema = $1 AND table_name = $2
             ORDER BY column_name";
@@ -138,6 +138,7 @@ impl SqlSchemaDescriber {
         let cols = rows
             .into_iter()
             .map(|col| {
+                println!("{:?}", col);
                 debug!("Got column: {:?}", col);
                 let col_name = col
                     .get("column_name")
@@ -145,9 +146,9 @@ impl SqlSchemaDescriber {
                     .expect("get column name");
                 let data_type = col.get("data_type").and_then(|x| x.to_string()).expect("get data_type");
                 let full_data_type = col
-                    .get("full_column_type")
+                    .get("full_data_type")
                     .and_then(|x| x.to_string())
-                    .expect("get full_column_type aka udt_name");
+                    .expect("get full_data_type aka udt_name");
                 let is_identity_str = col
                     .get("is_identity")
                     .and_then(|x| x.to_string())
@@ -171,7 +172,7 @@ impl SqlSchemaDescriber {
 
                 //todo this infers custom types that start with _ as lists -.-
 
-                let arity = if full_data_type.starts_with("_") {
+                let arity = if data_type == "ARRAY" {
                     ColumnArity::List
                 } else if is_required {
                     ColumnArity::Required
@@ -521,51 +522,44 @@ impl SqlSchemaDescriber {
 
 fn get_column_type(data_type: &str, full_data_type: &str, arity: ColumnArity, enums: &Vec<Enum>) -> ColumnType {
     let family = match full_data_type {
-        //todo this does not recognize enum arrays
         x if data_type == "USER-DEFINED" && enums.iter().find(|e| e.name == x).is_some() => {
             ColumnTypeFamily::Enum(x.to_string())
         }
-        "int2" => ColumnTypeFamily::Int,
-        "int4" => ColumnTypeFamily::Int,
-        "int8" => ColumnTypeFamily::Int,
-        "float4" => ColumnTypeFamily::Float,
-        "float8" => ColumnTypeFamily::Float,
-        "bool" => ColumnTypeFamily::Boolean,
-        "text" => ColumnTypeFamily::String,
-        "varchar" => ColumnTypeFamily::String,
-        "date" => ColumnTypeFamily::DateTime,
-        "bytea" => ColumnTypeFamily::Binary,
-        "json" => ColumnTypeFamily::Json,
-        "jsonb" => ColumnTypeFamily::Json,
-        "uuid" => ColumnTypeFamily::Uuid,
-        "bit" => ColumnTypeFamily::Binary,
-        "varbit" => ColumnTypeFamily::Binary,
-        "box" => ColumnTypeFamily::Geometric,
-        "circle" => ColumnTypeFamily::Geometric,
-        "line" => ColumnTypeFamily::Geometric,
-        "lseg" => ColumnTypeFamily::Geometric,
-        "path" => ColumnTypeFamily::Geometric,
-        "polygon" => ColumnTypeFamily::Geometric,
-        "bpchar" => ColumnTypeFamily::String,
-        "interval" => ColumnTypeFamily::DateTime,
-        "numeric" => ColumnTypeFamily::Float,
-        "pg_lsn" => ColumnTypeFamily::LogSequenceNumber,
-        "time" => ColumnTypeFamily::DateTime,
-        "timetz" => ColumnTypeFamily::DateTime,
-        "timestamp" => ColumnTypeFamily::DateTime,
-        "timestamptz" => ColumnTypeFamily::DateTime,
-        "tsquery" => ColumnTypeFamily::TextSearch,
-        "tsvector" => ColumnTypeFamily::TextSearch,
-        "txid_snapshot" => ColumnTypeFamily::TransactionId,
-        // Array types
-        "_bytea" => ColumnTypeFamily::Binary,
-        "_bool" => ColumnTypeFamily::Boolean,
-        "_date" => ColumnTypeFamily::DateTime,
-        "_float8" => ColumnTypeFamily::Float,
-        "_float4" => ColumnTypeFamily::Float,
-        "_int4" => ColumnTypeFamily::Int,
-        "_text" => ColumnTypeFamily::String,
-        "_varchar" => ColumnTypeFamily::String,
+        x if data_type == "ARRAY" && enums.iter().find(|e| format!("_{}", e.name) == x).is_some() => {
+            ColumnTypeFamily::Enum(x.to_string())
+        }
+        "int2" | "_int2" => ColumnTypeFamily::Int,
+        "int4" | "_int4" => ColumnTypeFamily::Int,
+        "int8" | "_int8" => ColumnTypeFamily::Int,
+        "float4" | "_float4" => ColumnTypeFamily::Float,
+        "float8" | "_float8" => ColumnTypeFamily::Float,
+        "bool" | "_bool" => ColumnTypeFamily::Boolean,
+        "text" | "_text" => ColumnTypeFamily::String,
+        "varchar" | "_varchar" => ColumnTypeFamily::String,
+        "date" | "_date" => ColumnTypeFamily::DateTime,
+        "bytea" | "_bytea" => ColumnTypeFamily::Binary,
+        "json" | "_json" => ColumnTypeFamily::Json,
+        "jsonb" | "_jsonb" => ColumnTypeFamily::Json,
+        "uuid" | "_uuid" => ColumnTypeFamily::Uuid,
+        "bit" | "_bit" => ColumnTypeFamily::Binary,
+        "varbit" | "_varbit" => ColumnTypeFamily::Binary,
+        "box" | "_box" => ColumnTypeFamily::Geometric,
+        "circle" | "_circle" => ColumnTypeFamily::Geometric,
+        "line" | "_line" => ColumnTypeFamily::Geometric,
+        "lseg" | "_lseg" => ColumnTypeFamily::Geometric,
+        "path" | "_path" => ColumnTypeFamily::Geometric,
+        "polygon" | "_polygon" => ColumnTypeFamily::Geometric,
+        "bpchar" | "_bpchar" => ColumnTypeFamily::String,
+        "interval" | "_interval" => ColumnTypeFamily::DateTime,
+        "numeric" | "_numeric" => ColumnTypeFamily::Float,
+        "pg_lsn" | "_pg_lsn" => ColumnTypeFamily::LogSequenceNumber,
+        "time" | "_time" => ColumnTypeFamily::DateTime,
+        "timetz" | "_timetz" => ColumnTypeFamily::DateTime,
+        "timestamp" | "_timestamp" => ColumnTypeFamily::DateTime,
+        "timestamptz" | "_timestamptz" => ColumnTypeFamily::DateTime,
+        "tsquery" | "_tsquery" => ColumnTypeFamily::TextSearch,
+        "tsvector" | "_tsvector" => ColumnTypeFamily::TextSearch,
+        "txid_snapshot" | "_txid_snapshot" => ColumnTypeFamily::TransactionId,
         _ => ColumnTypeFamily::Unknown,
     };
     ColumnType {
