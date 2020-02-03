@@ -85,6 +85,7 @@ pub enum CliOpt {
 }
 
 #[derive(Debug, StructOpt, Clone)]
+#[structopt(version = env!("GIT_HASH"))]
 pub struct PrismaOpt {
     /// The hostname or IP the query engine should bind to.
     #[structopt(long, default_value = "127.0.0.1")]
@@ -98,9 +99,6 @@ pub struct PrismaOpt {
     /// Runs all queries in a transaction, including all the reads.
     #[structopt(long = "always_force_transactions")]
     always_force_transactions: bool,
-    /// Prints the server commit ID.
-    #[structopt(long)]
-    version: bool,
     #[structopt(subcommand)]
     subcommand: Option<Subcommand>,
 }

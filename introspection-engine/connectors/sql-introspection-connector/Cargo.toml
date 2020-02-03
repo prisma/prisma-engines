@@ -23,7 +23,7 @@ tracing-futures = "0.2.0"
 tokio = { version = "0.2", features = ["rt-threaded", "time"] }
 
 [dependencies.quaint]
-version = "0.1"
+git = "https://github.com/prisma/quaint"
 features = ["single"]
 
 [dev-dependencies]

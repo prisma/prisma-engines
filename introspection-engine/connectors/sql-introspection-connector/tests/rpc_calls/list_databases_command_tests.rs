@@ -34,9 +34,12 @@ async fn databases_for_sqlite_should_work(api: &TestApi) {
 }
 
 fn setup(barrel: &BarrelMigrationExecutor, db_name: &str) {
-    let _setup_schema = barrel.execute_with_schema(|migration| {
-        migration.create_table("Blog", |t| {
-            t.add_column("id", types::primary());
-        });
-    }, db_name);
+    let _setup_schema = barrel.execute_with_schema(
+        |migration| {
+            migration.create_table("Blog", |t| {
+                t.add_column("id", types::primary());
+            });
+        },
+        db_name,
+    );
 }

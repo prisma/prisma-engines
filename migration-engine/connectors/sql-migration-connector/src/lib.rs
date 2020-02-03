@@ -17,6 +17,7 @@ use component::Component;
 use database_info::DatabaseInfo;
 use migration_connector::*;
 use quaint::{
+    error::ErrorKind,
     prelude::{ConnectionInfo, Queryable, SqlFamily},
     single::Quaint,
 };
@@ -48,7 +49,7 @@ impl SqlMigrationConnector {
             let connection = Quaint::new(database_str)
                 .await
                 .map_err(SqlError::from)
-                .map_err(|err| err.into_connector_error(&connection_info))?;
+                .map_err(|err: SqlError| err.into_connector_error(&connection_info))?;
 
             // async connections can be lazy, so we issue a simple query to fail early if the database
             // is not reachable.
@@ -64,7 +65,8 @@ impl SqlMigrationConnector {
         let connection = tokio::time::timeout(CONNECTION_TIMEOUT, connection_fut)
             .await
             .map_err(|_elapsed| {
-                SqlError::from(quaint::error::Error::ConnectTimeout).into_connector_error(&connection_info)
+                // TODO: why...
+                SqlError::from(ErrorKind::ConnectTimeout("Tokio timer".into())).into_connector_error(&connection_info)
             })??;
 
         let database_info = DatabaseInfo::new(&connection, connection.connection_info().clone())
@@ -72,7 +74,6 @@ impl SqlMigrationConnector {
             .map_err(|sql_error| sql_error.into_connector_error(&connection_info))?;
 
         let schema_name = connection.connection_info().schema_name().to_owned();
-
         let conn = Arc::new(connection) as Arc<dyn Queryable + Send + Sync>;
 
         let describer: Arc<dyn SqlSchemaDescriberBackend + Send + Sync + 'static> = match database_info.sql_family() {

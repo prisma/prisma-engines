@@ -1,5 +1,5 @@
 use crate::ConnectorResult;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use std::marker::PhantomData;
 
 /// Implementors of this trait are responsible for checking whether a migration could lead to data loss.
@@ -48,14 +48,14 @@ impl DestructiveChangeDiagnostics {
 
 /// A warning emitted by [DestructiveChangesChecker](trait.DestructiveChangesChecker.html). Warnings will
 /// prevent a migration from being applied, unless the `force` flag is passed.
-#[derive(Debug, Serialize, PartialEq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Clone)]
 pub struct MigrationWarning {
     pub description: String,
 }
 
 /// An error emitted by the [DestructiveChangesChecker](trait.DestructiveChangesChecker.html). Errors will
 /// always prevent a migration from being applied.
-#[derive(Debug, Serialize, PartialEq)]
+#[derive(Debug, Serialize, PartialEq, Deserialize)]
 pub struct MigrationError {
     pub tpe: String,
     pub description: String,

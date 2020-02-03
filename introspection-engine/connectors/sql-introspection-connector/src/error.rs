@@ -11,6 +11,8 @@ pub enum SqlIntrospectionError {
     Generic(Error),
     #[fail(display = "{}", _0)]
     Quaint(QuaintError),
+    #[fail(display = "Connection timed out.")]
+    ConnectTimeout,
 }
 
 impl From<url::ParseError> for SqlIntrospectionError {
@@ -23,7 +25,7 @@ impl From<url::ParseError> for SqlIntrospectionError {
 
 impl From<quaint::error::Error> for SqlIntrospectionError {
     fn from(e: quaint::error::Error) -> Self {
-        SqlIntrospectionError::Generic(e.into())
+        SqlIntrospectionError::Quaint(e.into())
     }
 }
 
@@ -37,7 +39,7 @@ impl SqlIntrospectionError {
     pub(crate) fn into_connector_error(self, connection_info: &ConnectionInfo) -> ConnectorError {
         let user_facing = match &self {
             SqlIntrospectionError::Quaint(quaint_error) => {
-                user_facing_errors::quaint::render_quaint_error(quaint_error, connection_info)
+                user_facing_errors::quaint::render_quaint_error(quaint_error.kind(), connection_info)
             }
             err => KnownError::new(user_facing_errors::introspection_engine::IntrospectionFailed {
                 introspection_error: format!("{}", err),

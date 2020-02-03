@@ -25,11 +25,9 @@ impl SqlIntrospectionConnector {
         let (describer, connection_info) = schema_describer_loading::load_describer(&url)
             .instrument(tracing::debug_span!("Loading describer"))
             .await
-            .map_err(|quaint_error| {
+            .map_err(|error| {
                 ConnectionInfo::from_url(url)
-                    .map(|connection_info| {
-                        SqlIntrospectionError::Quaint(quaint_error).into_connector_error(&connection_info)
-                    })
+                    .map(|connection_info| error.into_connector_error(&connection_info))
                     .unwrap_or_else(|err| ConnectorError::url_parse_error(err, url))
             })?;
 

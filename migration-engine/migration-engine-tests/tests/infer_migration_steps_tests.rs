@@ -8,10 +8,10 @@ use sql_migration_connector::PrettySqlMigrationStep;
 #[test_each_connector]
 async fn assume_to_be_applied_must_work(api: &TestApi) -> TestResult {
     let dm0 = r#"
-            model Blog {
-                id Int @id
-            }
-        "#;
+        model Blog {
+            id Int @id
+        }
+    "#;
 
     api.infer_apply(&dm0)
         .migration_id(Some("mig0000"))
@@ -20,11 +20,11 @@ async fn assume_to_be_applied_must_work(api: &TestApi) -> TestResult {
         .unwrap();
 
     let dm1 = r#"
-            model Blog {
-                id Int @id
-                field1 String
-            }
-        "#;
+        model Blog {
+            id Int @id
+            field1 String
+        }
+    "#;
 
     let steps1 = api
         .infer(dm1)
@@ -36,26 +36,28 @@ async fn assume_to_be_applied_must_work(api: &TestApi) -> TestResult {
     assert_eq!(steps1, &[expected_steps_1.clone()]);
 
     let dm2 = r#"
-            model Blog {
-                id Int @id
-                field1 String
-                field2 String
-            }
-        "#;
+        model Blog {
+            id Int @id
+            field1 String
+            field2 String
+        }
+    "#;
 
     let steps2 = api
         .infer(dm2)
         .migration_id(Some("mig0002"))
-        .assume_to_be_applied(Some(steps1))
+        .assume_to_be_applied(Some(steps1.clone()))
         .send()
         .await?
         .datamodel_steps;
 
-    // We are exiting watch mode, so the returned steps go back to the last non-watch migration.
-    assert_eq!(
-        steps2,
-        &[expected_steps_1, create_field_step("Blog", "field2", "String")]
-    );
+    assert_eq!(steps2, &[create_field_step("Blog", "field2", "String")]);
+
+    api.infer(dm2)
+        .migration_id(Some("mig0003"))
+        .assume_to_be_applied(Some(steps1.into_iter().chain(steps2.into_iter()).collect()))
+        .send()
+        .await?;
 
     Ok(())
 }

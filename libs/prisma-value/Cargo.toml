@@ -15,5 +15,5 @@ serde = "1.0"
 uuid = { version = "0.8", features = ["serde", "v4"] }
 cuid = { git = "https://github.com/prisma/cuid-rust" }
 chrono = { version = "0.4", features = ["serde"] }
-rust_decimal = "1.1"
-quaint = { version = "0.1", optional = true, features = ["uuid-0_8"] }
+rust_decimal = "=1.1.0"
+quaint = { git = "https://github.com/prisma/quaint", optional = true, features = ["uuid-0_8"] }

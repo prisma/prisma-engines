@@ -1,0 +1,36 @@
+[package]
+name = "migration-engine-cli"
+version = "0.1.0"
+authors = ["Tom Houlé <tom@tomhoule.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+migration-connector = { path = "../connectors/migration-connector" }
+migration-core = { path = "../core" }
+sql-migration-connector = { path = "../connectors/sql-migration-connector", optional = true }
+user-facing-errors = { path = "../../libs/user-facing-errors" }
+
+anyhow = "1.0.26"
+quaint = { git = "https://github.com/prisma/quaint", optional = true }
+structopt = "0.3.8"
+thiserror = "1.0.9"
+tokio = { version = "0.2", features = ["macros"] }
+tracing = "0.1.12"
+tracing-subscriber = "0.1.6"
+serde_json = "1.0"
+futures = "0.3"
+url = "2.1.1"
+
+[dev-dependencies]
+tempfile = "3.1.0"
+test-setup = { path = "../../libs/test-setup" }
+
+[features]
+default = ["sql"]
+sql = ["quaint", "sql-migration-connector", "migration-core/sql"]
+
+[[bin]]
+name = "migration-engine"
+path = "src/main.rs"

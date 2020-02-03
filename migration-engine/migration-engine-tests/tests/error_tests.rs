@@ -1,11 +1,8 @@
 use migration_connector::steps::{DeleteModel, MigrationStep};
-use migration_core::{
-    api::{render_error, RpcApi},
-    cli,
-};
+use migration_core::api::{render_error, RpcApi};
 use migration_engine_tests::sql::*;
 use pretty_assertions::assert_eq;
-use quaint::{prelude::*, single::Quaint};
+use quaint::prelude::*;
 use serde_json::json;
 use url::Url;
 
@@ -192,81 +189,6 @@ async fn database_does_not_exist_must_return_a_proper_error() {
 }
 
 #[tokio::test]
-async fn database_already_exists_must_return_a_proper_error() {
-    let db_name = "database_already_exists_must_return_a_proper_error";
-    let url = postgres_10_url(db_name);
-
-    let conn = Quaint::new(&postgres_10_url("postgres")).await.unwrap();
-    conn.execute_raw(
-        "CREATE DATABASE \"database_already_exists_must_return_a_proper_error\"",
-        &[],
-    )
-    .await
-    .ok();
-
-    let error = get_cli_error(&["migration-engine", "cli", "--datasource", &url, "--create_database"]).await;
-
-    let (host, port) = {
-        let url = Url::parse(&url).unwrap();
-        (url.host().unwrap().to_string(), url.port().unwrap())
-    };
-
-    let json_error = serde_json::to_value(&error).unwrap();
-
-    let expected = json!({
-        "is_panic": false,
-        "message": format!("Database `database_already_exists_must_return_a_proper_error` already exists on the database server at `{host}:{port}`", host = host, port = port),
-        "meta": {
-            "database_name": "database_already_exists_must_return_a_proper_error",
-            "database_host": host,
-            "database_port": port,
-        },
-        "error_code": "P1009"
-    });
-
-    assert_eq!(json_error, expected);
-}
-
-#[tokio::test]
-async fn database_access_denied_must_return_a_proper_error_in_cli() {
-    let db_name = "dbaccessdeniedincli";
-    let url: Url = mysql_url(db_name).parse().unwrap();
-    let conn = create_mysql_database(&url).await.unwrap();
-
-    conn.execute_raw("DROP USER IF EXISTS jeanmichel", &[]).await.unwrap();
-    conn.execute_raw("CREATE USER jeanmichel IDENTIFIED BY '1234'", &[])
-        .await
-        .unwrap();
-
-    let mut url: Url = url.clone();
-    url.set_username("jeanmichel").unwrap();
-    url.set_password(Some("1234")).unwrap();
-    url.set_path("/access_denied_test");
-
-    let error = get_cli_error(&[
-        "migration-engine",
-        "cli",
-        "--datasource",
-        url.as_str(),
-        "--can_connect_to_database",
-    ])
-    .await;
-
-    let json_error = serde_json::to_value(&error).unwrap();
-    let expected = json!({
-        "is_panic": false,
-        "message": "User `jeanmichel` was denied access on the database `access_denied_test`",
-        "meta": {
-            "database_user": "jeanmichel",
-            "database_name": "access_denied_test",
-        },
-        "error_code": "P1010",
-    });
-
-    assert_eq!(json_error, expected);
-}
-
-#[tokio::test]
 async fn database_access_denied_must_return_a_proper_error_in_rpc() {
     let db_name = "dbaccessdeniedinrpc";
     let url: Url = mysql_url(db_name).parse().unwrap();
@@ -402,17 +324,11 @@ async fn unique_constraint_errors_in_migrations_must_return_a_known_error(api: &
 
     let json_error = serde_json::to_value(&error).unwrap();
 
-    let field_name = match (api.sql_family(), api.connector_name()) {
-        (SqlFamily::Mysql, "mysql_8") => "Fruit.Fruit.name",
-        (SqlFamily::Mysql, _) => "Fruit.name",
-        _ => "name",
-    };
-
     let expected_json = json!({
         "is_panic": false,
-        "message": format!("Unique constraint failed on the field: `{}`", field_name),
+        "message": "Unique constraint failed on the field: `name`",
         "meta": {
-            "field_name": field_name,
+            "field_name": "name",
         },
         "error_code": "P2002",
     });
@@ -420,44 +336,4 @@ async fn unique_constraint_errors_in_migrations_must_return_a_known_error(api: &
     assert_eq!(json_error, expected_json);
 
     Ok(())
-}
-
-#[test_one_connector(connector = "postgres")]
-async fn tls_errors_must_be_mapped_in_the_cli(_api: &TestApi) {
-    let url = format!(
-        "{}&sslmode=require&sslaccept=strict",
-        postgres_10_url("tls_errors_must_be_mapped_in_the_cli")
-    );
-    let error = get_cli_error(&[
-        "migration-engine",
-        "cli",
-        "--datasource",
-        &url,
-        "--can_connect_to_database",
-    ])
-    .await;
-
-    let json_error = serde_json::to_value(&error).unwrap();
-
-    let expected = json!({
-        "is_panic": false,
-        "message": format!("Error opening a TLS connection: error performing TLS handshake: server does not support TLS"),
-        "meta": {
-            "message": "error performing TLS handshake: server does not support TLS",
-        },
-        "error_code": "P1011"
-    });
-
-    assert_eq!(json_error, expected);
-}
-
-async fn get_cli_error(cli_args: &[&str]) -> user_facing_errors::Error {
-    let app = cli::clap_app();
-    let matches = app.get_matches_from(cli_args);
-    let cli_matches = matches.subcommand_matches("cli").expect("cli subcommand is passed");
-    let database_url = cli_matches.value_of("datasource").expect("datasource is provided");
-    cli::run(&cli_matches, database_url)
-        .await
-        .map_err(|err| cli::render_error(err))
-        .unwrap_err()
 }
