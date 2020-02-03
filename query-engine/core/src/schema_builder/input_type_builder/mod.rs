@@ -126,7 +126,7 @@ pub trait InputTypeBuilderBase<'a>: CachedBuilder<InputObjectType> + InputBuilde
     /// Generates and caches an object type for a unique index.
     fn compound_field_unique_object_type(&self, index: &Index) -> InputObjectTypeRef {
         let name = index.name.as_ref().map(|n| capitalize(n)).unwrap_or_else(|| {
-            let index_fields = index.fields();
+            let index_fields = index.scalar_fields();
             let field_names: Vec<String> = index_fields.iter().map(|sf| capitalize(&sf.name)).collect();
 
             field_names.join("")
@@ -138,7 +138,7 @@ pub trait InputTypeBuilderBase<'a>: CachedBuilder<InputObjectType> + InputBuilde
         let input_object = Arc::new(init_input_object_type(name.clone()));
         self.cache(name, Arc::clone(&input_object));
 
-        let index_fields = index.fields();
+        let index_fields = index.scalar_fields();
         let object_fields = index_fields
             .into_iter()
             .map(|field| {

@@ -20,6 +20,30 @@ pub enum Field {
     Scalar(ScalarFieldRef),
 }
 
+impl Field {
+    pub fn downgrade(&self) -> FieldWeak {
+        match self {
+            Field::Relation(field) => FieldWeak::Relation(Arc::downgrade(field)),
+            Field::Scalar(field) => FieldWeak::Scalar(Arc::downgrade(field)),
+        }
+    }
+}
+
+#[derive(Debug)]
+pub enum FieldWeak {
+    Relation(RelationFieldWeak),
+    Scalar(ScalarFieldWeak),
+}
+
+impl FieldWeak {
+    pub fn upgrade(&self) -> Field {
+        match self {
+            FieldWeak::Relation(field) => Field::Relation(field.upgrade().unwrap()),
+            FieldWeak::Scalar(field) => Field::Scalar(field.upgrade().unwrap()),
+        }
+    }
+}
+
 #[derive(Debug, PartialEq, Eq, Hash)]
 pub struct FieldManifestation {
     pub db_name: String,

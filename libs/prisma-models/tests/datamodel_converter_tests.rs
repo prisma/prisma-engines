@@ -415,6 +415,40 @@ fn ambiguous_relations() {
     post.assert_relation_field("blog2").assert_relation_name("Relation2");
 }
 
+#[test]
+fn multi_field_unique_can_cover_relation_fields() {
+    let datamodel = convert(
+        r#"
+            model Blog {
+                id Int @id
+                name String
+                posts Post[]
+            }
+
+            model Post {
+                id Int @id
+                blog Blog
+                title String
+
+                @@unique([blog, title])
+            }
+        "#,
+    );
+
+    let post = datamodel.assert_model("Post");
+    let indexes = post.indexes();
+
+    assert_eq!(indexes.len(), 1);
+
+    let index = &indexes[0];
+    let fields = index.fields();
+
+    assert_eq!(
+        fields.iter().map(|field| field.name()).collect::<Vec<_>>(),
+        &["blog", "title"]
+    );
+}
+
 fn convert(datamodel: &str) -> Arc<InternalDataModel> {
     let datamodel = datamodel::parse_datamodel(datamodel).unwrap();
     let template = DatamodelConverter::convert(&datamodel);

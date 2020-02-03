@@ -50,7 +50,7 @@ impl ModelTemplate {
             Arc::downgrade(&model),
         );
 
-        let indexes = self.indexes.into_iter().map(|i| i.build(&fields.scalar())).collect();
+        let indexes = self.indexes.into_iter().map(|i| i.build(&fields)).collect();
 
         // The model is created here and fields WILL BE UNSET before now!
         model.fields.set(fields).unwrap();

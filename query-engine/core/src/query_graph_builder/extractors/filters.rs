@@ -226,7 +226,7 @@ fn find_index_fields(name: &str, model: &ModelRef) -> QueryGraphBuilderResult<Ve
         .unique_indexes()
         .into_iter()
         .find(|index| &compound_field_name(index) == name)
-        .map(|index| index.fields())
+        .map(|index| index.scalar_fields())
         .ok_or(QueryGraphBuilderError::AssertionError(format!(
             "Unable to resolve {} to an index on model {}",
             name, model.name

@@ -136,7 +136,7 @@ pub fn append_opt<T>(vec: &mut Vec<T>, opt: Option<T>) {
 /// Computes a compound field name based on an index.
 pub fn compound_field_name(index: &Index) -> String {
     index.name.clone().unwrap_or_else(|| {
-        let index_fields = index.fields();
+        let index_fields = index.scalar_fields();
         let field_names: Vec<&str> = index_fields.iter().map(|sf| sf.name.as_ref()).collect();
 
         field_names.join("_")
