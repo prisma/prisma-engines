@@ -221,10 +221,13 @@ impl GetRow for PostgresRow {
                     None => ParameterizedValue::Null,
                 },
                 ref x => match x.kind() {
-                    Kind::Enum(_) => {
-                        let val: EnumString = row.try_get(i)?;
-                        ParameterizedValue::Enum(val.value.into())
-                    }
+                    Kind::Enum(_) => match row.try_get(i)? {
+                        Some(val) => {
+                            let val: EnumString = val;
+                            ParameterizedValue::Enum(val.value.into())
+                        }
+                        None => ParameterizedValue::Null,
+                    },
                     _ => match row.try_get(i)? {
                         Some(val) => {
                             let val: String = val;
