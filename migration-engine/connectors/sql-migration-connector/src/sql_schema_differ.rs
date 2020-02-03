@@ -34,7 +34,6 @@ pub struct SqlSchemaDiff {
 impl SqlSchemaDiff {
     pub fn into_steps(self) -> Vec<SqlMigrationStep> {
         wrap_as_step(self.create_enums, SqlMigrationStep::CreateEnum)
-            .chain(wrap_as_step(self.drop_enums, SqlMigrationStep::DropEnum))
             .chain(wrap_as_step(self.drop_indexes, SqlMigrationStep::DropIndex))
             // Order matters: we must create tables before `alter_table`s because we could
             // be adding foreign keys to the new tables there.
@@ -49,6 +48,7 @@ impl SqlSchemaDiff {
             // indexes created there.
             .chain(wrap_as_step(self.add_foreign_keys, SqlMigrationStep::AddForeignKey))
             .chain(wrap_as_step(self.drop_tables, SqlMigrationStep::DropTable))
+            .chain(wrap_as_step(self.drop_enums, SqlMigrationStep::DropEnum))
             .chain(wrap_as_step(self.alter_indexes, SqlMigrationStep::AlterIndex))
             .collect()
     }

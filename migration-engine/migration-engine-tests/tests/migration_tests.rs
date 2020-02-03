@@ -1189,37 +1189,6 @@ async fn dropping_a_model_with_a_multi_field_unique_index_must_work(api: &TestAp
     api.infer_and_apply(&dm2).await;
 }
 
-#[test_one_connector(connector = "postgres")]
-async fn adding_a_scalar_list_for_a_modelwith_id_type_int_must_work(api: &TestApi) {
-    let dm1 = r#"
-        datasource pg {
-            provider = "postgres"
-            url = "postgres://localhost:5432"
-        }
-
-        model A {
-            id Int @id
-            strings String[]
-            enums Status[]
-        }
-
-        enum Status {
-            OK
-            ERROR
-        }
-    "#;
-    let result = api.infer_and_apply(&dm1).await.sql_schema;
-
-    let table_for_a = result.table_bang("A");
-    let string_column = table_for_a.column_bang("strings");
-    assert_eq!(string_column.tpe.family, ColumnTypeFamily::String);
-    assert_eq!(string_column.tpe.arity, ColumnArity::List);
-
-    let enum_column = table_for_a.column_bang("enums");
-    assert_eq!(enum_column.tpe.family, ColumnTypeFamily::Enum("Status".to_owned()));
-    assert_eq!(enum_column.tpe.arity, ColumnArity::List);
-}
-
 #[test_each_connector]
 async fn reserved_sql_key_words_must_work(api: &TestApi) {
     // Group is a reserved keyword

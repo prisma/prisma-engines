@@ -1,5 +1,5 @@
 use pretty_assertions::assert_eq;
-use sql_schema_describer::{Column, ForeignKey, Index, IndexType, PrimaryKey, SqlSchema, Table};
+use sql_schema_describer::{Column, Enum, ForeignKey, Index, IndexType, PrimaryKey, SqlSchema, Table};
 
 pub(crate) type AssertionResult<T> = Result<T, anyhow::Error>;
 
@@ -52,6 +52,37 @@ impl SchemaAssertion {
         })?;
 
         table_assertions(table)?;
+
+        Ok(self)
+    }
+
+    pub fn assert_has_no_enum(self, enum_name: &str) -> AssertionResult<Self> {
+        assert!(self.0.get_enum(enum_name).is_none());
+
+        Ok(self)
+    }
+
+    pub fn assert_enum<F>(self, enum_name: &str, enum_assertions: F) -> AssertionResult<Self>
+    where
+        F: for<'a> FnOnce(EnumAssertion<'a>) -> AssertionResult<EnumAssertion<'a>>,
+    {
+        let r#enum = self
+            .0
+            .get_enum(enum_name)
+            .ok_or_else(|| anyhow::anyhow!("Assertion failed. Enum `{}` not found", enum_name))?;
+
+        enum_assertions(EnumAssertion(&r#enum))?;
+
+        Ok(self)
+    }
+}
+
+pub struct EnumAssertion<'a>(&'a Enum);
+
+impl<'a> EnumAssertion<'a> {
+    pub fn assert_values(self, expected_values: &[&'static str]) -> AssertionResult<Self> {
+        dbg!(&self.0);
+        assert_eq!(self.0.values, expected_values);
 
         Ok(self)
     }
