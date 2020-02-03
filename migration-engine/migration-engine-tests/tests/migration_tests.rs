@@ -1046,16 +1046,16 @@ async fn index_renaming_must_work_when_renaming_to_default(api: &TestApi) {
 #[test_each_connector]
 async fn index_renaming_must_work_when_renaming_to_custom(api: &TestApi) -> TestResult {
     let dm1 = r#"
-            model A {
-                id Int @id
-                field String
-                secondField Int
+        model A {
+            id Int @id
+            field String
+            secondField Int
 
-                @@unique([field, secondField])
-            }
-        "#;
+            @@unique([field, secondField])
+        }
+    "#;
 
-    api.infer_apply(&dm1).send().await?;
+    api.infer_apply(&dm1).send_assert().await?.assert_green()?;
     api.assert_schema().await?.assert_table("A", |table| {
         table
             .assert_indexes_count(1)?
@@ -1063,16 +1063,16 @@ async fn index_renaming_must_work_when_renaming_to_custom(api: &TestApi) -> Test
     })?;
 
     let dm2 = r#"
-            model A {
-                id Int @id
-                field String
-                secondField Int
+        model A {
+            id Int @id
+            field String
+            secondField Int
 
-                @@unique([field, secondField], name: "somethingCustom")
-            }
-        "#;
+            @@unique([field, secondField], name: "somethingCustom")
+        }
+    "#;
 
-    let result = api.infer_apply(&dm2).send().await?;
+    let result = api.infer_apply(&dm2).send_assert().await?.assert_green()?.into_inner();
     api.assert_schema().await?.assert_table("A", |table| {
         table
             .assert_indexes_count(1)?
@@ -1155,7 +1155,7 @@ async fn index_updates_with_rename_must_work(api: &TestApi) {
 }
 
 #[test_each_connector]
-async fn dropping_a_model_with_a_multi_field_unique_index_must_work(api: &TestApi) {
+async fn dropping_a_model_with_a_multi_field_unique_index_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
             model A {
                 id Int @id
@@ -1175,7 +1175,9 @@ async fn dropping_a_model_with_a_multi_field_unique_index_must_work(api: &TestAp
     assert_eq!(index.unwrap().tpe, IndexType::Unique);
 
     let dm2 = "";
-    api.infer_and_apply(&dm2).await;
+    api.infer_apply(&dm2).send_assert().await?.assert_green()?;
+
+    Ok(())
 }
 
 #[test_one_connector(connector = "postgres")]
@@ -1345,7 +1347,7 @@ async fn removing_a_relation_field_must_work(api: &TestApi) {
 }
 
 #[test_each_connector]
-async fn simple_type_aliases_in_migrations_must_work(api: &TestApi) {
+async fn simple_type_aliases_in_migrations_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
         type CUID = String @id @default(cuid())
 
@@ -1355,11 +1357,13 @@ async fn simple_type_aliases_in_migrations_must_work(api: &TestApi) {
         }
     "#;
 
-    api.infer_and_apply(dm1).await;
+    api.infer_apply(dm1).send_assert().await?.assert_green()?;
+
+    Ok(())
 }
 
 #[test_each_connector]
-async fn model_with_multiple_indexes_works(api: &TestApi) {
+async fn model_with_multiple_indexes_works(api: &TestApi) -> TestResult {
     let dm = r#"
     model User {
       id         Int       @id
@@ -1385,12 +1389,12 @@ async fn model_with_multiple_indexes_works(api: &TestApi) {
     }
     "#;
 
-    let sql_schema = api.infer_and_apply(dm).await.sql_schema;
+    api.infer_apply(dm).send_assert().await?.assert_green()?;
+    api.assert_schema()
+        .await?
+        .assert_table("Like", |table| table.assert_indexes_count(3))?;
 
-    let like_indexes_count = sql_schema.table_bang("Like").indices.len();
-    let expected_indexes_count = 3;
-
-    assert_eq!(like_indexes_count, expected_indexes_count);
+    Ok(())
 }
 
 #[test_each_connector]
@@ -1430,11 +1434,10 @@ async fn column_defaults_must_be_migrated(api: &TestApi) -> TestResult {
     "#;
 
     api.infer_apply(dm1).send().await?;
-    let schema = api.describe_database().await?;
 
-    schema
-        .assert_table("Fruit")?
-        .assert_column("name", |col| col.assert_default(Some("banana")))?;
+    api.assert_schema().await?.assert_table("Fruit", |table| {
+        table.assert_column("name", |col| col.assert_default(Some("banana")))
+    })?;
 
     let dm2 = r#"
         model Fruit {
@@ -1443,12 +1446,11 @@ async fn column_defaults_must_be_migrated(api: &TestApi) -> TestResult {
         }
     "#;
 
-    api.infer_apply(dm2).send().await?;
-    let schema = api.describe_database().await?;
+    api.infer_apply(dm2).send_assert().await?.assert_green()?;
 
-    schema
-        .assert_table("Fruit")?
-        .assert_column("name", |col| col.assert_default(Some("mango")))?;
+    api.assert_schema().await?.assert_table("Fruit", |table| {
+        table.assert_column("name", |col| col.assert_default(Some("mango")))
+    })?;
 
     Ok(())
 }
@@ -1574,7 +1576,7 @@ async fn created_at_does_not_get_arbitrarily_migrated(api: &TestApi) -> TestResu
     Ok(())
 }
 
-#[test_one_connector(connector = "sqlite")]
+#[test_each_connector(starts_with = "sqlite")]
 async fn renaming_a_datasource_works(api: &TestApi) -> TestResult {
     let dm1 = r#"
         datasource db1 {
@@ -1657,19 +1659,13 @@ async fn relations_can_reference_arbitrary_unique_fields_with_maps(api: &TestApi
         }
     "#;
 
-    api.infer_apply(dm).send().await?;
+    api.infer_apply(dm).send_assert().await?.assert_green()?;
 
-    let schema = api.describe_database().await?;
-
-    let fks = &schema.table_bang("Account").foreign_keys;
-
-    assert_eq!(fks.len(), 1);
-
-    let fk = fks.iter().next().unwrap();
-
-    assert_eq!(fk.columns, &["user-id"]);
-    assert_eq!(fk.referenced_table, "users");
-    assert_eq!(fk.referenced_columns, &["emergency-mail"]);
+    api.assert_schema().await?.assert_table("Account", |table| {
+        table
+            .assert_foreign_keys_count(1)?
+            .assert_fk_on_columns(&["user-id"], |fk| fk.assert_references("users", &["emergency-mail"]))
+    })?;
 
     Ok(())
 }
@@ -1724,7 +1720,7 @@ async fn relations_can_reference_multiple_fields_with_mappings(api: &TestApi) ->
         }
     "#;
 
-    api.infer_apply(dm).send().await?;
+    api.infer_apply(dm).send_assert().await?.assert_green()?;
 
     api.assert_schema().await?.assert_table("Account", |table| {
         table
@@ -1938,7 +1934,7 @@ async fn switching_databases_must_work(api: &TestApi) -> TestResult {
         }
     "#;
 
-    api.infer_apply(dm1).send().await?;
+    api.infer_apply(dm1).send_assert().await?.assert_green()?;
 
     // Drop the existing migrations.
     api.migration_persistence().reset().await?;
@@ -1955,7 +1951,7 @@ async fn switching_databases_must_work(api: &TestApi) -> TestResult {
         }
     "#;
 
-    api.infer_apply(dm2).send().await?;
+    api.infer_apply(dm2).send_assert().await?.assert_green()?;
 
     Ok(())
 }
