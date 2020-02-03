@@ -144,6 +144,7 @@ fn render_raw_sql(
 
     match step {
         SqlMigrationStep::CreateEnum(create_enum) => render_create_enum(renderer, create_enum),
+        SqlMigrationStep::DropEnum(drop_enum) => render_drop_enum(renderer, drop_enum),
         SqlMigrationStep::CreateTable(CreateTable { table }) => {
             let mut create_table = String::with_capacity(100);
 
@@ -482,6 +483,23 @@ fn render_create_enum(
                     .map(sql_renderer::postgres_quoted_string)
                     .join(", "),
             );
+            Ok(vec![sql])
+        }
+        _ => Ok(Vec::new()),
+    }
+}
+
+fn render_drop_enum(
+    renderer: &(dyn SqlRenderer + Send + Sync),
+    drop_enum: &DropEnum,
+) -> Result<Vec<String>, anyhow::Error> {
+    match renderer.sql_family() {
+        SqlFamily::Postgres => {
+            let sql = format!(
+                "DROP TYPE {enum_name}",
+                enum_name = sql_renderer::postgres_quoted(&drop_enum.name)
+            );
+
             Ok(vec![sql])
         }
         _ => Ok(Vec::new()),
