@@ -18,7 +18,14 @@ impl super::SqlRenderer for SqliteRenderer {
         write!(buf, "{}", quoted(name))
     }
 
-    fn render_column(&self, _schema_name: &str, _table: &Table, column: &Column, _add_fk_prefix: bool) -> String {
+    fn render_column(
+        &self,
+        _schema_name: &str,
+        _table: &Table,
+        column: &Column,
+        _add_fk_prefix: bool,
+        _next_schema: &SqlSchema,
+    ) -> String {
         let column_name = quoted(&column.name);
         let tpe_str = self.render_column_type(&column.tpe);
         let nullability_str = render_nullability(&column);
@@ -35,17 +42,6 @@ impl super::SqlRenderer for SqliteRenderer {
         )
     }
 
-    fn render_column_type(&self, t: &ColumnType) -> String {
-        match &t.family {
-            ColumnTypeFamily::Boolean => format!("BOOLEAN"),
-            ColumnTypeFamily::DateTime => format!("DATE"),
-            ColumnTypeFamily::Float => format!("REAL"),
-            ColumnTypeFamily::Int => format!("INTEGER"),
-            ColumnTypeFamily::String => format!("TEXT"),
-            x => unimplemented!("{:?} not handled yet", x),
-        }
-    }
-
     fn render_references(&self, _schema_name: &str, foreign_key: &ForeignKey) -> String {
         let referenced_fields = foreign_key.referenced_columns.iter().map(SqliteQuoted).join(",");
 
@@ -55,6 +51,19 @@ impl super::SqlRenderer for SqliteRenderer {
             referenced_fields = referenced_fields,
             on_delete_action = render_on_delete(&foreign_key.on_delete_action)
         )
+    }
+}
+
+impl SqliteRenderer {
+    fn render_column_type(&self, t: &ColumnType) -> String {
+        match &t.family {
+            ColumnTypeFamily::Boolean => format!("BOOLEAN"),
+            ColumnTypeFamily::DateTime => format!("DATE"),
+            ColumnTypeFamily::Float => format!("REAL"),
+            ColumnTypeFamily::Int => format!("INTEGER"),
+            ColumnTypeFamily::String => format!("TEXT"),
+            x => unimplemented!("{:?} not handled yet", x),
+        }
     }
 }
 

@@ -1,5 +1,5 @@
 use crate::*;
-use sql_renderer::{IteratorJoin, SqlRenderer};
+use sql_renderer::{postgres_render_column_type, IteratorJoin, SqlRenderer};
 use sql_schema_describer::*;
 use std::fmt::Write as _;
 use tracing_futures::Instrument;
@@ -24,6 +24,7 @@ impl DatabaseMigrationStepApplier<SqlMigration> for SqlDatabaseStepApplier<'_> {
                 index,
                 renderer.as_ref(),
                 &database_migration.before,
+                &database_migration.after,
             )
             .instrument(tracing::debug_span!("ApplySqlStep", index));
 
@@ -38,6 +39,7 @@ impl DatabaseMigrationStepApplier<SqlMigration> for SqlDatabaseStepApplier<'_> {
                 index,
                 renderer.as_ref(),
                 &database_migration.after,
+                &database_migration.before,
             )
             .instrument(tracing::debug_span!("UnapplySqlStep", index));
 
@@ -50,6 +52,7 @@ impl DatabaseMigrationStepApplier<SqlMigration> for SqlDatabaseStepApplier<'_> {
             self.renderer().as_ref(),
             self.database_info(),
             &database_migration.before,
+            &database_migration.after,
         )?
         .into_iter()
         .map(|pretty_step| {
@@ -67,6 +70,7 @@ impl SqlDatabaseStepApplier<'_> {
         index: usize,
         renderer: &(dyn SqlRenderer + Send + Sync),
         current_schema: &SqlSchema,
+        next_schema: &SqlSchema,
     ) -> SqlResult<bool> {
         let has_this_one = steps.get(index).is_some();
         if !has_this_one {
@@ -76,11 +80,10 @@ impl SqlDatabaseStepApplier<'_> {
         let step = &steps[index];
         tracing::debug!(?step);
 
-        for sql_string in render_raw_sql(&step, renderer, self.database_info(), current_schema)
+        for sql_string in render_raw_sql(&step, renderer, self.database_info(), current_schema, next_schema)
             .map_err(|err: anyhow::Error| SqlError::Generic(err))?
         {
             tracing::debug!(index, %sql_string);
-            dbg!(&sql_string);
 
             let result = self.conn().query_raw(&sql_string, &[]).await;
 
@@ -102,15 +105,15 @@ fn render_steps_pretty(
     renderer: &(dyn SqlRenderer + Send + Sync),
     database_info: &DatabaseInfo,
     current_schema: &SqlSchema,
+    next_schema: &SqlSchema,
 ) -> ConnectorResult<Vec<PrettySqlMigrationStep>> {
     let mut steps = Vec::with_capacity(database_migration.corrected_steps.len());
 
     for step in &database_migration.corrected_steps {
         let mut sql = String::with_capacity(200);
-        let statements =
-            render_raw_sql(&step, renderer, database_info, current_schema).map_err(|err: anyhow::Error| {
-                ConnectorError::from_kind(migration_connector::ErrorKind::Generic(err.into()))
-            })?;
+        let statements = render_raw_sql(&step, renderer, database_info, current_schema, next_schema).map_err(
+            |err: anyhow::Error| ConnectorError::from_kind(migration_connector::ErrorKind::Generic(err.into())),
+        )?;
 
         let mut statements = statements.into_iter().peekable();
 
@@ -134,6 +137,7 @@ fn render_raw_sql(
     renderer: &(dyn SqlRenderer + Send + Sync),
     database_info: &DatabaseInfo,
     current_schema: &SqlSchema,
+    next_schema: &SqlSchema,
 ) -> Result<Vec<String>, anyhow::Error> {
     let sql_family = renderer.sql_family();
     let schema_name = database_info.connection_info().schema_name().to_string();
@@ -149,7 +153,7 @@ fn render_raw_sql(
 
             let mut columns = table.columns.iter().peekable();
             while let Some(column) = columns.next() {
-                let col_sql = renderer.render_column(&schema_name, &table, &column, false);
+                let col_sql = renderer.render_column(&schema_name, &table, &column, false, next_schema);
 
                 write!(
                     create_table,
@@ -250,7 +254,7 @@ fn render_raw_sql(
             for change in changes.clone() {
                 match change {
                     TableChange::AddColumn(AddColumn { column }) => {
-                        let col_sql = renderer.render_column(&schema_name, &table, &column, true);
+                        let col_sql = renderer.render_column(&schema_name, &table, &column, true, next_schema);
                         lines.push(format!("ADD COLUMN {}", col_sql));
                     }
                     TableChange::DropColumn(DropColumn { name }) => {
@@ -271,7 +275,7 @@ fn render_raw_sql(
                             None => {
                                 let name = renderer.quote(&name);
                                 lines.push(format!("DROP COLUMN {}", name));
-                                let col_sql = renderer.render_column(&schema_name, &table, &column, true);
+                                let col_sql = renderer.render_column(&schema_name, &table, &column, true, next_schema);
                                 lines.push(format!("ADD COLUMN {}", col_sql));
                             }
                         }
@@ -444,7 +448,7 @@ fn safe_alter_column(
                 PostgresAlterColumn::SetType(ty) => format!(
                     "{} SET DATA TYPE {}",
                     &alter_column_prefix,
-                    renderer.render_column_type(&ty)
+                    postgres_render_column_type(&ty)
                 ),
             })
             .collect(),

@@ -34,13 +34,16 @@ async fn adding_a_scalar_field_must_work(api: &TestApi) {
     assert_eq!(table.column_bang("string").tpe.family, ColumnTypeFamily::String);
     assert_eq!(table.column_bang("dateTime").tpe.family, ColumnTypeFamily::DateTime);
 
-    if api.sql_family().is_postgres() {
-        assert_eq!(
+    match api.sql_family() {
+        SqlFamily::Postgres => assert_eq!(
             table.column_bang("enum").tpe.family,
             ColumnTypeFamily::Enum("MyEnum".to_owned())
-        );
-    } else {
-        assert_eq!(table.column_bang("enum").tpe.family, ColumnTypeFamily::String);
+        ),
+        SqlFamily::Mysql => assert_eq!(
+            table.column_bang("enum").tpe.family,
+            ColumnTypeFamily::Enum("Test_enum".to_owned())
+        ),
+        _ => assert_eq!(table.column_bang("enum").tpe.family, ColumnTypeFamily::String),
     }
 }
 

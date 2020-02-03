@@ -50,7 +50,10 @@ impl<'a> SqlSchemaCalculator<'a> {
         self.data_model
             .enums()
             .map(|r#enum| sql::Enum {
-                name: r#enum.name.clone(),
+                name: r#enum
+                    .single_database_name()
+                    .map(|s| s.to_owned())
+                    .unwrap_or_else(|| r#enum.name.clone()),
                 values: r#enum.values.clone(),
             })
             .collect()
@@ -450,7 +453,9 @@ fn default_migration_value(field_type: &FieldType, datamodel: &Datamodel) -> Sca
 fn enum_column_type(field: &Field, database_info: &DatabaseInfo, db_name: &str) -> sql::ColumnType {
     let arity = column_arity(field);
     match database_info.sql_family() {
-        SqlFamily::Postgres => sql::ColumnType::pure(sql::ColumnTypeFamily::Enum(db_name.to_owned()), arity),
+        SqlFamily::Postgres | SqlFamily::Mysql => {
+            sql::ColumnType::pure(sql::ColumnTypeFamily::Enum(db_name.to_owned()), arity)
+        }
         _ => column_type(field),
     }
 }

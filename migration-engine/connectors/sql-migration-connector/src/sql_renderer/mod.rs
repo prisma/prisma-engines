@@ -7,7 +7,10 @@ mod postgres_renderer;
 mod sqlite_renderer;
 
 pub(crate) use common::IteratorJoin;
-pub(crate) use postgres_renderer::{quoted as postgres_quoted, quoted_string as postgres_quoted_string};
+pub(crate) use postgres_renderer::{
+    quoted as postgres_quoted, quoted_string as postgres_quoted_string,
+    render_column_type as postgres_render_column_type,
+};
 pub(crate) use sqlite_renderer::quoted as sqlite_quoted;
 
 use mysql_renderer::MySqlRenderer;
@@ -33,9 +36,14 @@ pub trait SqlRenderer {
 
     fn quote(&self, name: &str) -> String;
 
-    fn render_column(&self, schema_name: &str, table: &Table, column: &Column, add_fk_prefix: bool) -> String;
-
-    fn render_column_type(&self, t: &ColumnType) -> String;
+    fn render_column(
+        &self,
+        schema_name: &str,
+        table: &Table,
+        column: &Column,
+        add_fk_prefix: bool,
+        next_schema: &SqlSchema,
+    ) -> String;
 
     fn render_references(&self, schema_name: &str, foreign_key: &ForeignKey) -> String;
 
