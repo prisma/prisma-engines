@@ -59,13 +59,6 @@ pub fn sanitize_datamodel_names(mut datamodel: Datamodel) -> Datamodel {
     }
 
     for enm in &mut datamodel.enums {
-        println!("{:?}", enm);
-        println!("{:?}", enum_renames);
-
-        //        let names = enum_renames.get(&enm.name).unwrap();
-        //        enm.name = (*names.0).to_string();
-        //        enm.database_name = names.1.clone();
-
         if let Some((sanitized_enum_name, enum_db_name)) = enum_renames.get(&enm.name) {
             enm.name = sanitized_enum_name.to_owned();
             enm.database_name = enum_db_name.to_owned();

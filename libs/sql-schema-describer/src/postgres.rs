@@ -138,7 +138,6 @@ impl SqlSchemaDescriber {
         let cols = rows
             .into_iter()
             .map(|col| {
-                println!("{:?}", col);
                 debug!("Got column: {:?}", col);
                 let col_name = col
                     .get("column_name")
@@ -169,8 +168,6 @@ impl SqlSchemaDescriber {
                     "yes" => false,
                     x => panic!(format!("unrecognized is_nullable variant '{}'", x)),
                 };
-
-                //todo this infers custom types that start with _ as lists -.-
 
                 let arity = if data_type == "ARRAY" {
                     ColumnArity::List

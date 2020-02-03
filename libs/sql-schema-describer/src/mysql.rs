@@ -438,8 +438,8 @@ fn get_column_type_and_enum(
         ("tinytext", _) => ColumnTypeFamily::String,
         ("mediumtext", _) => ColumnTypeFamily::String,
         ("longtext", _) => ColumnTypeFamily::String,
-        // XXX: Is this correct?
         ("enum", _) => ColumnTypeFamily::Enum(format!("{}_{}", table, column_name)),
+        // XXX: Is this correct?
         ("set", _) => ColumnTypeFamily::String,
         ("binary", _) => ColumnTypeFamily::Binary,
         ("varbinary", _) => ColumnTypeFamily::Binary,
