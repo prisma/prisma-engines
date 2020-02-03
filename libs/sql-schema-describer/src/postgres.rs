@@ -513,50 +513,50 @@ impl SqlSchemaDescriber {
     }
 }
 
-fn get_column_type(data_type: &str, full_data_type: &str, arity: ColumnArity, enums: &Vec<Enum>) -> ColumnType {
-    let family = match full_data_type {
-        x if data_type == "USER-DEFINED" && enums.iter().find(|e| e.name == x).is_some() => {
-            ColumnTypeFamily::Enum(x.to_string())
-        }
-        x if data_type == "ARRAY" && enums.iter().find(|e| format!("_{}", e.name) == x).is_some() => {
-            ColumnTypeFamily::Enum(x.to_string())
-        }
-        "int2" | "_int2" => ColumnTypeFamily::Int,
-        "int4" | "_int4" => ColumnTypeFamily::Int,
-        "int8" | "_int8" => ColumnTypeFamily::Int,
-        "float4" | "_float4" => ColumnTypeFamily::Float,
-        "float8" | "_float8" => ColumnTypeFamily::Float,
-        "bool" | "_bool" => ColumnTypeFamily::Boolean,
-        "text" | "_text" => ColumnTypeFamily::String,
-        "varchar" | "_varchar" => ColumnTypeFamily::String,
-        "date" | "_date" => ColumnTypeFamily::DateTime,
-        "bytea" | "_bytea" => ColumnTypeFamily::Binary,
-        "json" | "_json" => ColumnTypeFamily::Json,
-        "jsonb" | "_jsonb" => ColumnTypeFamily::Json,
-        "uuid" | "_uuid" => ColumnTypeFamily::Uuid,
-        "bit" | "_bit" => ColumnTypeFamily::Binary,
-        "varbit" | "_varbit" => ColumnTypeFamily::Binary,
-        "box" | "_box" => ColumnTypeFamily::Geometric,
-        "circle" | "_circle" => ColumnTypeFamily::Geometric,
-        "line" | "_line" => ColumnTypeFamily::Geometric,
-        "lseg" | "_lseg" => ColumnTypeFamily::Geometric,
-        "path" | "_path" => ColumnTypeFamily::Geometric,
-        "polygon" | "_polygon" => ColumnTypeFamily::Geometric,
-        "bpchar" | "_bpchar" => ColumnTypeFamily::String,
-        "interval" | "_interval" => ColumnTypeFamily::DateTime,
-        "numeric" | "_numeric" => ColumnTypeFamily::Float,
-        "pg_lsn" | "_pg_lsn" => ColumnTypeFamily::LogSequenceNumber,
-        "time" | "_time" => ColumnTypeFamily::DateTime,
-        "timetz" | "_timetz" => ColumnTypeFamily::DateTime,
-        "timestamp" | "_timestamp" => ColumnTypeFamily::DateTime,
-        "timestamptz" | "_timestamptz" => ColumnTypeFamily::DateTime,
-        "tsquery" | "_tsquery" => ColumnTypeFamily::TextSearch,
-        "tsvector" | "_tsvector" => ColumnTypeFamily::TextSearch,
-        "txid_snapshot" | "_txid_snapshot" => ColumnTypeFamily::TransactionId,
-        _ => ColumnTypeFamily::Unknown,
+fn get_column_type<'a>(data_type: &str, full_data_type: &'a str, arity: ColumnArity, enums: &Vec<Enum>) -> ColumnType {
+    use ColumnTypeFamily::*;
+    let trim = |name: &'a str| name.trim_start_matches("_");
+    let enum_exists = |name: &'a str| enums.iter().any(|e| e.name == name);
+
+    let family: ColumnTypeFamily = match full_data_type {
+        x if data_type == "USER-DEFINED" && enum_exists(x) => Enum(x.to_owned()),
+        x if data_type == "ARRAY" && x.starts_with("_") && enum_exists(trim(x)) => Enum(trim(x).to_owned()),
+        "int2" | "_int2" => Int,
+        "int4" | "_int4" => Int,
+        "int8" | "_int8" => Int,
+        "float4" | "_float4" => Float,
+        "float8" | "_float8" => Float,
+        "bool" | "_bool" => Boolean,
+        "text" | "_text" => String,
+        "varchar" | "_varchar" => String,
+        "date" | "_date" => DateTime,
+        "bytea" | "_bytea" => Binary,
+        "json" | "_json" => Json,
+        "jsonb" | "_jsonb" => Json,
+        "uuid" | "_uuid" => Uuid,
+        "bit" | "_bit" => Binary,
+        "varbit" | "_varbit" => Binary,
+        "box" | "_box" => Geometric,
+        "circle" | "_circle" => Geometric,
+        "line" | "_line" => Geometric,
+        "lseg" | "_lseg" => Geometric,
+        "path" | "_path" => Geometric,
+        "polygon" | "_polygon" => Geometric,
+        "bpchar" | "_bpchar" => String,
+        "interval" | "_interval" => DateTime,
+        "numeric" | "_numeric" => Float,
+        "pg_lsn" | "_pg_lsn" => LogSequenceNumber,
+        "time" | "_time" => DateTime,
+        "timetz" | "_timetz" => DateTime,
+        "timestamp" | "_timestamp" => DateTime,
+        "timestamptz" | "_timestamptz" => DateTime,
+        "tsquery" | "_tsquery" => TextSearch,
+        "tsvector" | "_tsvector" => TextSearch,
+        "txid_snapshot" | "_txid_snapshot" => TransactionId,
+        _ => Unknown,
     };
     ColumnType {
-        raw: full_data_type.to_string(),
+        raw: full_data_type.to_owned(),
         family,
         arity,
     }
