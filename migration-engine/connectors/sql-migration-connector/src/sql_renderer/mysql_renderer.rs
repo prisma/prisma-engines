@@ -51,8 +51,6 @@ impl super::SqlRenderer for MySqlRenderer {
     }
 
     fn render_references(&self, schema_name: &str, foreign_key: &ForeignKey) -> String {
-        use itertools::Itertools;
-
         let referenced_columns = foreign_key
             .referenced_columns
             .iter()

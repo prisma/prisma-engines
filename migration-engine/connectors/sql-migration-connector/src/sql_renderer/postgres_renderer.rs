@@ -44,25 +44,52 @@ impl super::SqlRenderer for PostgresRenderer {
             ColumnTypeFamily::Float => format!("Decimal(65,30) {}", array),
             ColumnTypeFamily::Int => format!("integer {}", array),
             ColumnTypeFamily::String => format!("text {}", array),
+            ColumnTypeFamily::Enum(name) => format!("{}{}", quoted(name), array),
             x => unimplemented!("{:?} not handled yet", x),
         }
     }
 
     fn render_references(&self, schema_name: &str, foreign_key: &ForeignKey) -> String {
-        use itertools::Itertools;
-
-        let referenced_columns = foreign_key
-            .referenced_columns
-            .iter()
-            .map(|col| self.quote(col))
-            .join(",");
+        let referenced_columns = foreign_key.referenced_columns.iter().map(quoted).join(",");
 
         format!(
-            "REFERENCES \"{}\".\"{}\"({}) {}",
-            schema_name,
-            foreign_key.referenced_table,
+            "REFERENCES {}.{}({}) {}",
+            quoted(schema_name),
+            quoted(&foreign_key.referenced_table),
             referenced_columns,
             render_on_delete(&foreign_key.on_delete_action)
         )
+    }
+}
+
+pub(crate) fn quoted_string<T>(t: T) -> PostgresQuotedString<T> {
+    PostgresQuotedString(t)
+}
+
+#[derive(Debug)]
+pub(crate) struct PostgresQuotedString<T>(T);
+
+impl<T> std::fmt::Display for PostgresQuotedString<T>
+where
+    T: std::fmt::Display,
+{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "'{}'", self.0)
+    }
+}
+
+pub(crate) fn quoted<T>(t: T) -> PostgresQuoted<T> {
+    PostgresQuoted(t)
+}
+
+#[derive(Debug)]
+pub(crate) struct PostgresQuoted<T>(T);
+
+impl<T> std::fmt::Display for PostgresQuoted<T>
+where
+    T: std::fmt::Display,
+{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, r#""{}""#, self.0)
     }
 }

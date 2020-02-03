@@ -4,7 +4,11 @@ use sql_schema_describer::*;
 mod common;
 mod mysql_renderer;
 mod postgres_renderer;
-pub(crate) mod sqlite_renderer;
+mod sqlite_renderer;
+
+pub(crate) use common::IteratorJoin;
+pub(crate) use postgres_renderer::{quoted as postgres_quoted, quoted_string as postgres_quoted_string};
+pub(crate) use sqlite_renderer::quoted as sqlite_quoted;
 
 use mysql_renderer::MySqlRenderer;
 use postgres_renderer::PostgresRenderer;

@@ -1,5 +1,5 @@
 use crate::*;
-use sql_renderer::SqlRenderer;
+use sql_renderer::{IteratorJoin, SqlRenderer};
 use sql_schema_describer::*;
 use std::fmt::Write as _;
 use tracing_futures::Instrument;
@@ -80,6 +80,7 @@ impl SqlDatabaseStepApplier<'_> {
             .map_err(|err: anyhow::Error| SqlError::Generic(err))?
         {
             tracing::debug!(index, %sql_string);
+            dbg!(&sql_string);
 
             let result = self.conn().query_raw(&sql_string, &[]).await;
 
@@ -134,12 +135,11 @@ fn render_raw_sql(
     database_info: &DatabaseInfo,
     current_schema: &SqlSchema,
 ) -> Result<Vec<String>, anyhow::Error> {
-    use itertools::Itertools;
-
     let sql_family = renderer.sql_family();
     let schema_name = database_info.connection_info().schema_name().to_string();
 
     match step {
+        SqlMigrationStep::CreateEnum(create_enum) => render_create_enum(renderer, create_enum),
         SqlMigrationStep::CreateTable(CreateTable { table }) => {
             let mut create_table = String::with_capacity(100);
 
@@ -461,4 +461,25 @@ fn safe_alter_column(
     };
 
     Some(steps)
+}
+
+fn render_create_enum(
+    renderer: &(dyn SqlRenderer + Send + Sync),
+    create_enum: &CreateEnum,
+) -> Result<Vec<String>, anyhow::Error> {
+    match renderer.sql_family() {
+        SqlFamily::Postgres => {
+            let sql = format!(
+                r#"CREATE TYPE {enum_name} AS ENUM ({variants});"#,
+                enum_name = sql_renderer::postgres_quoted(&create_enum.name),
+                variants = create_enum
+                    .variants
+                    .iter()
+                    .map(sql_renderer::postgres_quoted_string)
+                    .join(", "),
+            );
+            Ok(vec![sql])
+        }
+        _ => Ok(Vec::new()),
+    }
 }

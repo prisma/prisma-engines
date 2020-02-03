@@ -33,7 +33,15 @@ async fn adding_a_scalar_field_must_work(api: &TestApi) {
     assert_eq!(table.column_bang("boolean").tpe.family, ColumnTypeFamily::Boolean);
     assert_eq!(table.column_bang("string").tpe.family, ColumnTypeFamily::String);
     assert_eq!(table.column_bang("dateTime").tpe.family, ColumnTypeFamily::DateTime);
-    assert_eq!(table.column_bang("enum").tpe.family, ColumnTypeFamily::String);
+
+    if api.sql_family().is_postgres() {
+        assert_eq!(
+            table.column_bang("enum").tpe.family,
+            ColumnTypeFamily::Enum("MyEnum".to_owned())
+        );
+    } else {
+        assert_eq!(table.column_bang("enum").tpe.family, ColumnTypeFamily::String);
+    }
 }
 
 #[test_each_connector]
@@ -1181,22 +1189,22 @@ async fn dropping_a_model_with_a_multi_field_unique_index_must_work(api: &TestAp
 #[test_one_connector(connector = "postgres")]
 async fn adding_a_scalar_list_for_a_modelwith_id_type_int_must_work(api: &TestApi) {
     let dm1 = r#"
-            datasource pg {
-                      provider = "postgres"
-                      url = "postgres://localhost:5432"
-            }
+        datasource pg {
+            provider = "postgres"
+            url = "postgres://localhost:5432"
+        }
 
-            model A {
-                id Int @id
-                strings String[]
-                enums Status[]
-            }
+        model A {
+            id Int @id
+            strings String[]
+            enums Status[]
+        }
 
-            enum Status {
-              OK
-              ERROR
-            }
-        "#;
+        enum Status {
+            OK
+            ERROR
+        }
+    "#;
     let result = api.infer_and_apply(&dm1).await.sql_schema;
 
     let table_for_a = result.table_bang("A");
@@ -1205,7 +1213,7 @@ async fn adding_a_scalar_list_for_a_modelwith_id_type_int_must_work(api: &TestAp
     assert_eq!(string_column.tpe.arity, ColumnArity::List);
 
     let enum_column = table_for_a.column_bang("enums");
-    assert_eq!(enum_column.tpe.family, ColumnTypeFamily::String);
+    assert_eq!(enum_column.tpe.family, ColumnTypeFamily::Enum("Status".to_owned()));
     assert_eq!(enum_column.tpe.arity, ColumnArity::List);
 }
 

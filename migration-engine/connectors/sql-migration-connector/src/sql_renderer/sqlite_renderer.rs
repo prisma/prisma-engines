@@ -19,7 +19,7 @@ impl super::SqlRenderer for SqliteRenderer {
     }
 
     fn render_column(&self, _schema_name: &str, _table: &Table, column: &Column, _add_fk_prefix: bool) -> String {
-        let column_name = self.quote(&column.name);
+        let column_name = quoted(&column.name);
         let tpe_str = self.render_column_type(&column.tpe);
         let nullability_str = render_nullability(&column);
         let default_str = render_default(&column);
@@ -47,8 +47,6 @@ impl super::SqlRenderer for SqliteRenderer {
     }
 
     fn render_references(&self, _schema_name: &str, foreign_key: &ForeignKey) -> String {
-        use itertools::Itertools;
-
         let referenced_fields = foreign_key.referenced_columns.iter().map(SqliteQuoted).join(",");
 
         format!(
