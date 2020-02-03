@@ -46,7 +46,11 @@ case class TestServer() extends PlayJsonExtensions {
                 "PRISMA_DML" -> project.pgBouncerEnvVar).!!
       case false => Process(Seq(EnvVars.prismaBinaryPath, "cli", "--execute_request", encoded_query), None, "PRISMA_DML" -> project.envVar).!!
     }
-    val decoded_response = UTF8Base64.decode(response.linesIterator.toVector.last)
+    val lines           = response.linesIterator.toVector
+    val normalLogOutput = lines.init
+    val lastLine        = lines.last
+    println(normalLogOutput.mkString("\n"))
+    val decoded_response = UTF8Base64.decode(lastLine)
     println(decoded_response)
     Json.parse(decoded_response)
   }
