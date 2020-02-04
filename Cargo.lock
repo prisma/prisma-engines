@@ -3048,12 +3048,14 @@ dependencies = [
  "proc-macro2 1.0.8",
  "quote 1.0.2",
  "syn 1.0.14",
+ "test-setup",
 ]
 
 [[package]]
 name = "test-setup"
 version = "0.1.0"
 dependencies = [
+ "once_cell",
  "quaint",
  "tokio",
  "tracing-subscriber 0.1.6",
