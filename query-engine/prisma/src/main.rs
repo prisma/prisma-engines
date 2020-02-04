@@ -131,6 +131,8 @@ async fn main() -> Result<(), AnyError> {
     if matches.is_present("version") {
         println!(env!("GIT_HASH"));
     } else if let Some(matches) = matches.subcommand_matches("cli") {
+        init_logger()?;
+
         match CliCommand::new(matches, force_transactions) {
             Some(cmd) => {
                 if let Err(err) = cmd.execute() {
