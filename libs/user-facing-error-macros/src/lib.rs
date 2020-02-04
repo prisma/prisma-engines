@@ -16,18 +16,17 @@ pub fn derive_user_facing_error(input: TokenStream) -> TokenStream {
     match &input.data {
         syn::Data::Struct(_data) => user_error_derive_on_struct(&input),
         syn::Data::Enum(data) => user_error_derive_on_enum(&input, data),
-        _ => panic!("derive works only on structs and enums"),
+        _ => syn::Error::new_spanned(input, "derive works only on structs and enums")
+            .to_compile_error()
+            .into(),
     }
 }
 
 fn user_error_derive_on_struct(input: &DeriveInput) -> TokenStream {
-    let input = UserErrorDeriveInput::from_derive_input(&input);
-
-    if let Err(err) = input.as_ref() {
-        panic!("{}", err);
-    }
-
-    let input = input.unwrap();
+    let input = match UserErrorDeriveInput::from_derive_input(&input) {
+        Ok(input) => input,
+        Err(err) => return err.write_errors().into(),
+    };
 
     let ident = &input.ident;
     let error_code = input.code.as_str();
@@ -59,13 +58,11 @@ fn user_error_derive_on_struct(input: &DeriveInput) -> TokenStream {
 }
 
 fn user_error_derive_on_enum(input: &DeriveInput, data: &syn::DataEnum) -> TokenStream {
-    let attributes = UserErrorEnumDeriveInput::from_derive_input(&input);
+    let attributes = match UserErrorEnumDeriveInput::from_derive_input(&input) {
+        Ok(attributes) => attributes,
+        Err(err) => return err.write_errors().into(),
+    };
 
-    if let Err(err) = attributes.as_ref() {
-        panic!("{}", err);
-    }
-
-    let attributes = attributes.unwrap();
     let ident = &attributes.ident;
     let error_code = &attributes.code;
 
@@ -90,13 +87,25 @@ fn user_error_derive_on_enum(input: &DeriveInput, data: &syn::DataEnum) -> Token
 }
 
 fn enum_variant_match_branch(enum_ident: &syn::Ident, variant: &syn::Variant) -> impl quote::ToTokens {
-    let parsed_variant = UserErrorEnumVariantAttributes::from_variant(variant).unwrap();
+    let parsed_variant = match UserErrorEnumVariantAttributes::from_variant(variant) {
+        Ok(parsed_variant) => parsed_variant,
+        Err(err) => return err.write_errors().into(),
+    };
+
     let variant_ident = &parsed_variant.ident;
     let message_template = parsed_variant.message.value().replace("${", "{");
 
     let variant_field_names: Vec<&syn::Ident> = match &variant.fields {
-        syn::Fields::Named(fields) => fields.named.iter().map(|f| f.ident.as_ref().unwrap()).collect(),
-        _ => panic!("Enum variant fields of user facing errors must be named."),
+        syn::Fields::Named(fields) => fields
+            .named
+            .iter()
+            .map(|f| f.ident.as_ref().expect("expect identifier"))
+            .collect(),
+        tokens => {
+            return syn::Error::new_spanned(tokens, "Enum variant fields of user facing errors must be named.")
+                .to_compile_error()
+                .into()
+        }
     };
 
     quote! {

@@ -9,6 +9,9 @@ pub mod logging;
 #[doc(hidden)]
 pub mod runtime;
 
+/// The built-in connectors database.
+pub mod connectors;
+
 use quaint::{prelude::Queryable, single::Quaint};
 use url::Url;
 
