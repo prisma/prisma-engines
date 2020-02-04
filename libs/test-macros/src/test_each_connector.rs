@@ -45,7 +45,7 @@ pub fn test_each_connector_impl(attr: TokenStream, input: TokenStream) -> TokenS
 
     let tests = match args {
         Ok(args) => test_each_connector_async_wrapper_functions(&args, &test_function),
-        Err(err) => panic!("{}", err),
+        Err(err) => return err.write_errors().into(),
     };
 
     let output = quote! {
