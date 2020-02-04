@@ -219,3 +219,28 @@ async fn remapping_enum_names_should_work(api: &TestApi) {
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
+
+#[test_one_connector(connector = "postgres")]
+async fn remapping_compound_primary_keys_should_work(api: &TestApi) {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("first_name", types::text());
+                t.add_column("last@name", types::text());
+                t.inject_custom("Primary Key (\"first_name\", \"last@name\")");
+            });
+        })
+        .await;
+
+    let dm = r#"
+        model User {
+            first_name   String
+            last_name   String @map("last@name")
+        
+            @@id([first_name, last_name])
+        }
+    "#;
+
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}
