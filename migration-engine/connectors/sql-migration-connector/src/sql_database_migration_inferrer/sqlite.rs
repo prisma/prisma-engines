@@ -1,6 +1,6 @@
 use crate::{
     sql_migration::*,
-    sql_renderer::sqlite_renderer::quoted,
+    sql_renderer::sqlite_quoted,
     sql_schema_differ::{ColumnDiffer, SqlSchemaDiff, TableDiffer},
     SqlResult,
 };
@@ -123,7 +123,7 @@ fn fix_table(current: &Table, next: &Table, schema_name: &str) -> Vec<SqlMigrati
     }));
 
     result.push(SqlMigrationStep::RawSql {
-        raw: format!("PRAGMA {}.foreign_key_check;", quoted(schema_name)),
+        raw: format!("PRAGMA {}.foreign_key_check;", sqlite_quoted(schema_name)),
     });
 
     result.push(SqlMigrationStep::RawSql {
@@ -167,8 +167,8 @@ fn copy_current_table_into_new_table(
     write!(
         query,
         "INSERT INTO {}.{} (",
-        quoted(schema_name),
-        quoted(&differ.next.name)
+        sqlite_quoted(schema_name),
+        sqlite_quoted(&differ.next.name)
     )?;
 
     let mut destination_columns = intersection_columns
@@ -182,7 +182,7 @@ fn copy_current_table_into_new_table(
         .peekable();
 
     while let Some(destination_column) = destination_columns.next() {
-        write!(query, "{}", quoted(destination_column))?;
+        write!(query, "{}", sqlite_quoted(destination_column))?;
 
         if destination_columns.peek().is_some() {
             write!(query, ", ")?;
@@ -193,11 +193,11 @@ fn copy_current_table_into_new_table(
 
     let mut source_columns = intersection_columns
         .iter()
-        .map(|s| format!("{}", quoted(s)))
+        .map(|s| format!("{}", sqlite_quoted(s)))
         .chain(columns_that_became_required_with_a_default.iter().map(|columns| {
             format!(
                 "coalesce({column_name}, {default_value}) AS {column_name}",
-                column_name = quoted(columns.name()),
+                column_name = sqlite_quoted(columns.name()),
                 default_value = render_default(&columns.next)
             )
         }))
@@ -211,7 +211,12 @@ fn copy_current_table_into_new_table(
         }
     }
 
-    write!(query, " FROM {}.{}", quoted(schema_name), quoted(&differ.previous.name))?;
+    write!(
+        query,
+        " FROM {}.{}",
+        sqlite_quoted(schema_name),
+        sqlite_quoted(&differ.previous.name)
+    )?;
 
     steps.push(SqlMigrationStep::RawSql { raw: query });
 

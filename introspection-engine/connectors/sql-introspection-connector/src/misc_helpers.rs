@@ -325,12 +325,13 @@ pub(crate) fn calculate_field_type(schema: &SqlSchema, column: &Column, table: &
         }
         _ => {
             debug!("Found no corresponding foreign key");
-            match column.tpe.family {
+            match &column.tpe.family {
                 ColumnTypeFamily::Boolean => FieldType::Base(ScalarType::Boolean),
                 ColumnTypeFamily::DateTime => FieldType::Base(ScalarType::DateTime),
                 ColumnTypeFamily::Float => FieldType::Base(ScalarType::Float),
                 ColumnTypeFamily::Int => FieldType::Base(ScalarType::Int),
                 ColumnTypeFamily::String => FieldType::Base(ScalarType::String),
+                ColumnTypeFamily::Enum(name) => FieldType::Enum(name.clone()),
                 // XXX: We made a conscious decision to punt on mapping of ColumnTypeFamily
                 // variants that don't yet have corresponding PrismaType variants
                 _ => FieldType::Base(ScalarType::String),

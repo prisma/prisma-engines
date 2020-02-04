@@ -10,6 +10,9 @@ async fn introspecting_native_arrays_should_work(api: &TestApi) {
             migration.create_table("Post", |t| {
                 t.add_column("id", types::primary());
                 t.inject_custom("ints INTEGER [12]");
+                t.inject_custom("bools BOOLEAN [12]");
+                t.inject_custom("strings TEXT [12]");
+                t.inject_custom("floats FLOAT [12]");
             });
         })
         .await;
@@ -21,9 +24,12 @@ async fn introspecting_native_arrays_should_work(api: &TestApi) {
             }
             
             model Post {
+               bools    Boolean []
+               floats   Float []
                id      Int @id @default(autoincrement())
-               ints Int []
-            }
+               ints     Int []
+               strings  String []
+               }
         "#;
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);

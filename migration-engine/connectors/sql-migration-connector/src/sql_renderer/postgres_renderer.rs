@@ -10,16 +10,23 @@ impl super::SqlRenderer for PostgresRenderer {
     }
 
     fn write_quoted(&self, buf: &mut String, name: &str) -> std::fmt::Result {
-        write!(buf, r#""{}""#, name)
+        write!(buf, "{}", quoted(name))
     }
 
     fn quote(&self, name: &str) -> String {
-        format!("\"{}\"", name)
+        quoted(name).to_string()
     }
 
-    fn render_column(&self, _schema_name: &str, _table: &Table, column: &Column, _add_fk_prefix: bool) -> String {
+    fn render_column(
+        &self,
+        _schema_name: &str,
+        _table: &Table,
+        column: &Column,
+        _add_fk_prefix: bool,
+        _next_schema: &SqlSchema,
+    ) -> String {
         let column_name = self.quote(&column.name);
-        let tpe_str = self.render_column_type(&column.tpe);
+        let tpe_str = render_column_type(&column.tpe);
         let nullability_str = render_nullability(&column);
         let default_str = render_default(&column);
         let is_serial = column.auto_increment;
@@ -31,38 +38,64 @@ impl super::SqlRenderer for PostgresRenderer {
         }
     }
 
-    //Render the Arity here
-    fn render_column_type(&self, t: &ColumnType) -> String {
-        let array = match t.arity {
-            ColumnArity::List => "[]",
-            _ => "",
-        };
-
-        match &t.family {
-            ColumnTypeFamily::Boolean => format!("boolean {}", array),
-            ColumnTypeFamily::DateTime => format!("timestamp(3) {}", array),
-            ColumnTypeFamily::Float => format!("Decimal(65,30) {}", array),
-            ColumnTypeFamily::Int => format!("integer {}", array),
-            ColumnTypeFamily::String => format!("text {}", array),
-            x => unimplemented!("{:?} not handled yet", x),
-        }
-    }
-
     fn render_references(&self, schema_name: &str, foreign_key: &ForeignKey) -> String {
-        use itertools::Itertools;
-
-        let referenced_columns = foreign_key
-            .referenced_columns
-            .iter()
-            .map(|col| self.quote(col))
-            .join(",");
+        let referenced_columns = foreign_key.referenced_columns.iter().map(quoted).join(",");
 
         format!(
-            "REFERENCES \"{}\".\"{}\"({}) {}",
-            schema_name,
-            foreign_key.referenced_table,
+            "REFERENCES {}.{}({}) {}",
+            quoted(schema_name),
+            quoted(&foreign_key.referenced_table),
             referenced_columns,
             render_on_delete(&foreign_key.on_delete_action)
         )
+    }
+}
+
+pub(crate) fn render_column_type(t: &ColumnType) -> String {
+    let array = match t.arity {
+        ColumnArity::List => "[]",
+        _ => "",
+    };
+
+    match &t.family {
+        ColumnTypeFamily::Boolean => format!("boolean {}", array),
+        ColumnTypeFamily::DateTime => format!("timestamp(3) {}", array),
+        ColumnTypeFamily::Float => format!("Decimal(65,30) {}", array),
+        ColumnTypeFamily::Int => format!("integer {}", array),
+        ColumnTypeFamily::String => format!("text {}", array),
+        ColumnTypeFamily::Enum(name) => format!("{}{}", quoted(name), array),
+        x => unimplemented!("{:?} not handled yet", x),
+    }
+}
+
+pub(crate) fn quoted_string<T>(t: T) -> PostgresQuotedString<T> {
+    PostgresQuotedString(t)
+}
+
+#[derive(Debug)]
+pub(crate) struct PostgresQuotedString<T>(T);
+
+impl<T> std::fmt::Display for PostgresQuotedString<T>
+where
+    T: std::fmt::Display,
+{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "'{}'", self.0)
+    }
+}
+
+pub(crate) fn quoted<T>(t: T) -> PostgresQuoted<T> {
+    PostgresQuoted(t)
+}
+
+#[derive(Debug)]
+pub(crate) struct PostgresQuoted<T>(T);
+
+impl<T> std::fmt::Display for PostgresQuoted<T>
+where
+    T: std::fmt::Display,
+{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, r#""{}""#, self.0)
     }
 }

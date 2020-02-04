@@ -266,6 +266,8 @@ pub enum ColumnTypeFamily {
     TextSearch,
     /// Transaction ID types.
     TransactionId,
+    ///Enum
+    Enum(String),
     /// Unknown
     Unknown,
 }
@@ -273,19 +275,20 @@ pub enum ColumnTypeFamily {
 impl fmt::Display for ColumnTypeFamily {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let str = match self {
-            Self::Int => "int",
-            Self::Float => "float",
-            Self::Boolean => "boolean",
-            Self::String => "string",
-            Self::DateTime => "dateTime",
-            Self::Binary => "binary",
-            Self::Json => "json",
-            Self::Uuid => "uuid",
-            Self::Geometric => "geometric",
-            Self::LogSequenceNumber => "logSequenceNumber",
-            Self::TextSearch => "textSearch",
-            Self::TransactionId => "transactionId",
-            Self::Unknown => "unknown",
+            Self::Int => "int".to_string(),
+            Self::Float => "float".to_string(),
+            Self::Boolean => "boolean".to_string(),
+            Self::String => "string".to_string(),
+            Self::DateTime => "dateTime".to_string(),
+            Self::Binary => "binary".to_string(),
+            Self::Json => "json".to_string(),
+            Self::Uuid => "uuid".to_string(),
+            Self::Geometric => "geometric".to_string(),
+            Self::LogSequenceNumber => "logSequenceNumber".to_string(),
+            Self::TextSearch => "textSearch".to_string(),
+            Self::TransactionId => "transactionId".to_string(),
+            Self::Enum(x) => format!("Enum({})", &x),
+            Self::Unknown => "unknown".to_string(),
         };
         write!(f, "{}", str)
     }

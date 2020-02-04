@@ -184,3 +184,31 @@ async fn remapping_fields_in_compound_relations_should_work(api: &TestApi) {
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
+
+#[test_one_connector(connector = "mysql")]
+async fn remapping_enum_names_should_work(api: &TestApi) {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("123MySQLBook", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom("1color  Enum('black')");
+            });
+        })
+        .await;
+
+    let dm = r#"
+        model MySQLBook {
+            color   MySQLBook_color? @map("1color")
+            id      Int     @default(autoincrement()) @id 
+            @@map("123MySQLBook")
+        }
+        
+        enum MySQLBook_color {
+            black
+            @@map("123MySQLBook_1color")
+        }
+    "#;
+
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}
