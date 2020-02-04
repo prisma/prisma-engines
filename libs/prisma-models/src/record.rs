@@ -166,6 +166,11 @@ impl RecordIdentifier {
 
         return false;
     }
+
+    pub fn single_value(&self) -> PrismaValue {
+        assert_eq!(self.pairs.len(), 1);
+        self.pairs.iter().next().unwrap().1.clone()
+    }
 }
 
 impl IntoIterator for RecordIdentifier {

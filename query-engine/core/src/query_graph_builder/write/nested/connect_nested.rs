@@ -396,7 +396,6 @@ fn handle_one_to_one(
     if !relation_inlined_parent {
         let update_node = utils::update_records_node_placeholder(graph, Filter::empty(), Arc::clone(child_model));
         let relation_field_name = child_relation_field.name.clone();
-        let child_model_id = child_model.fields().id();
 
         graph.create_edge(
              &read_new_child_node,
@@ -418,14 +417,14 @@ fn handle_one_to_one(
         graph.create_edge(
              &parent_node,
              &update_node,
-             QueryGraphDependency::ParentIds(child_model_identifier.clone(), Box::new(|mut child_node, mut parent_ids| {
+             QueryGraphDependency::ParentIds(parent_model_identifier.clone(), Box::new(|mut child_node, mut parent_ids| {
                  let parent_id = match parent_ids.pop() {
                      Some(pid) => Ok(pid),
                      None => Err(QueryGraphBuilderError::AssertionError(format!("[Query Graph] Expected a valid parent ID to be present for a nested connect on a one-to-one relation, updating inlined on child."))),
                  }?;
 
                  if let Node::Query(Query::Write(ref mut wq)) = child_node {
-                     wq.inject_id(parent_id);
+                     wq.inject_field_arg(relation_field_name, parent_id.single_value());
                  }
 
                  Ok(child_node)
