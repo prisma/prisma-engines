@@ -369,38 +369,40 @@ pub fn insert_node_reload(
     parent_relation_field: &RelationFieldRef,
     parent_node: NodeRef,
 ) -> QueryGraphBuilderResult<NodeRef> {
-    if let Some(Node::Query(_q)) = graph.node_content(&parent_node) {
-        let required_fields = parent_relation_field.linking_fields();
-
-        // Todo: Simplification: We currently always reload the node regardless of whether or not the parent actually
-        // returns the required fields.
-        // if !q.returns(&required_fields) {
-        let reload_node = reload_node(graph, parent_relation_field.model(), required_fields.clone());
-
-        graph.create_edge(
-            &parent_node,
-            &reload_node,
-            QueryGraphDependency::ParentIds(
-                required_fields,
-                Box::new(move |mut node, parent_ids| {
-                    if let Node::Query(ref mut q) = node {
-                        q.add_filter(parent_ids.filter());
-                    }
-
-                    Ok(node)
-                }),
-            ),
-        )?;
-
-        Ok(reload_node)
-    // } else {
-    //     Ok(parent_node)
-    // }
-    } else {
-        Err(QueryGraphBuilderError::AssertionError(
-            "Query graph construction error: Attempted to attach a node reload to a non-query node.".to_owned(),
-        ))
-    }
+    // FIXME: AUMFIDARR
+    //    if let Some(Node::Query(_q)) = graph.node_content(&parent_node) {
+    //        let required_fields = parent_relation_field.linking_fields();
+    //
+    //        // Todo: Simplification: We currently always reload the node regardless of whether or not the parent actually
+    //        // returns the required fields.
+    //        // if !q.returns(&required_fields) {
+    //        let reload_node = reload_node(graph, parent_relation_field.model(), required_fields.clone());
+    //
+    //        graph.create_edge(
+    //            &parent_node,
+    //            &reload_node,
+    //            QueryGraphDependency::ParentIds(
+    //                required_fields,
+    //                Box::new(move |mut node, parent_ids| {
+    //                    if let Node::Query(ref mut q) = node {
+    //                        q.add_filter(parent_ids.filter());
+    //                    }
+    //
+    //                    Ok(node)
+    //                }),
+    //            ),
+    //        )?;
+    //
+    //        Ok(reload_node)
+    //    // } else {
+    //    //     Ok(parent_node)
+    //    // }
+    //    } else {
+    //        Err(QueryGraphBuilderError::AssertionError(
+    //            "Query graph construction error: Attempted to attach a node reload to a non-query node.".to_owned(),
+    //        ))
+    //    }
+    Ok(parent_node)
 }
 
 fn reload_node(graph: &mut QueryGraph, model: ModelRef, identifier: ModelIdentifier) -> NodeRef {

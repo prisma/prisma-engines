@@ -161,12 +161,14 @@ fn handle_one_to_many(
 
         // We need to swap the create node (with reload) and the parent because the inlining is done in the parent.
         graph.mark_nodes(&parent_node, &child_node);
-        graph.mark_nodes(&parent_node, &reload_child_node);
+        // FIXME: AUMFIDARR
+        //        graph.mark_nodes(&parent_node, &reload_child_node);
 
         let child_model_id = parent_relation_field.related_field().linking_fields();
         let parent_model_id = parent_relation_field.linking_fields();
 
-        graph.create_edge(&parent_node, &child_node, QueryGraphDependency::ExecutionOrder)?;
+        // FIXME: AUMFIDARR
+        //        graph.create_edge(&parent_node, &child_node, QueryGraphDependency::ExecutionOrder)?;
 
         // We extract the child linking fields in the edge, because after the swap, the child is the new parent.
         graph.create_edge(

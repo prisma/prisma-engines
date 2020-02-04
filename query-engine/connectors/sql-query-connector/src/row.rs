@@ -46,7 +46,7 @@ impl ToSqlRow for ResultRow {
                     _ => {
                         let error = io::Error::new(
                             io::ErrorKind::InvalidData,
-                            "List field did not return an Array from database.",
+                            format!("List field did not return an Array from database. Type identifier was {:?}. Value was {:?}.", &type_identifier, &p_value),
                         );
                         return Err(SqlError::ConversionError(error.into()));
                     }

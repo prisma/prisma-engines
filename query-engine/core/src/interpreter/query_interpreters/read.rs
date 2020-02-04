@@ -107,39 +107,50 @@ fn read_related<'a, 'b>(
             }
         };
 
-        let other_fields: Vec<_> = query
-            .parent_field
-            .related_field()
-            .linking_fields()
-            .fields()
-            .flat_map(|f| f.data_source_fields())
-            .collect();
 
-        let filters: Vec<Filter> = relation_parent_ids
-            .clone()
-            .into_iter()
-            .map(|id| {
-                let filters = id
-                    .pairs
-                    .into_iter()
-                    .zip(other_fields.iter())
-                    .map(|((_, value), other_field)| other_field.equals(value))
-                    .collect();
-                Filter::and(filters)
-            })
-            .collect();
 
-        let filter = Filter::or(filters);
-        let mut args = query.args.clone();
+        dbg!("RELATION: {}", &query.parent_field.relation().manifestation);
 
-        args.filter = match args.filter {
-            Some(existing_filter) => Some(Filter::and(vec![existing_filter, filter])),
-            None => Some(filter),
-        };
+        let mut scalars = if query.parent_field.relation().is_many_to_many() {
+            tx
+                .get_related_records(&query.parent_field, &relation_parent_ids, query.args.clone(), &query.selected_fields)
+                .await?
+        } else {
+            // PRISMA LEVEL JOIN
+            let other_fields: Vec<_> = query
+                .parent_field
+                .related_field()
+                .linking_fields()
+                .fields()
+                .flat_map(|f| f.data_source_fields())
+                .collect();
 
-        let mut scalars = tx
+            let filters: Vec<Filter> = relation_parent_ids
+                .clone()
+                .into_iter()
+                .map(|id| {
+                    let filters = id
+                        .pairs
+                        .into_iter()
+                        .zip(other_fields.iter())
+                        .map(|((_, value), other_field)| other_field.equals(value))
+                        .collect();
+                    Filter::and(filters)
+                })
+                .collect();
+
+            let filter = Filter::or(filters);
+            let mut args = query.args.clone();
+
+            args.filter = match args.filter {
+                Some(existing_filter) => Some(Filter::and(vec![existing_filter, filter])),
+                None => Some(filter),
+            };
+
+            tx
             .get_many_records(&query.parent_field.related_model(), args, &query.selected_fields)
-            .await?;
+            .await?
+        };
 
         // Write parent IDs into the retrieved records
         if parent_result.is_some() && query.parent_field.is_inlined_on_enclosing_model() {
@@ -198,6 +209,8 @@ fn read_related<'a, 'b>(
 
                 record.parent_id = Some(parent_id);
             }
+        } else {
+            // nothing to do for many to many. parent ids are already present
         }
 
         let model = query.parent_field.related_model();

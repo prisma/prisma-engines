@@ -1,6 +1,7 @@
 use super::common::*;
 use crate::{
-    ast, common::names::*, dml, dml::WithDatabaseName, error::ErrorCollection, DataSourceField, OnDeleteStrategy,
+    ast, common::names::*, dml, dml::WithDatabaseName, error::ErrorCollection, DataSourceField, FieldArity,
+    OnDeleteStrategy,
 };
 use prisma_inflector;
 
@@ -468,7 +469,11 @@ impl Standardiser {
                         let ds_field = dml::DataSourceField {
                             name: db_name.clone(),
                             field_type: *scalar_type,
-                            arity: field.arity,
+                            arity: match field.arity {
+                                // FIXME: superior hack. Talk to Marcus. This is a workaround for the behavior in row.rs for trait `ToSqlRow`
+                                FieldArity::List => FieldArity::Optional,
+                                x => x,
+                            },
                             default_value: None,
                         };
                         vec![ds_field]

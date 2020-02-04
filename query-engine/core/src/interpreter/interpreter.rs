@@ -34,14 +34,19 @@ pub struct DiffResult {
 impl ExpressionResult {
     /// Attempts to transform the result into a vector of record identifiers.
     pub fn as_ids(&self, model_id: &ModelIdentifier) -> InterpretationResult<Vec<RecordIdentifier>> {
+        println!("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         dbg!(self);
         dbg!(model_id);
+        println!("{:?}", self);
+        println!("{:?}", model_id);
         let converted = match self {
             Self::Query(ref result) => match result {
                 QueryResult::Id(id) => match id {
-                    Some(id) if model_id.matches(id) => Some(vec![id.clone()]),
+                    Some(id)=> Some(vec![id.clone()]),
+                    // FIXME: AUMFIDARR
+//                    Some(id) if model_id.matches(id) => Some(vec![id.clone()]),
+//                    Some(_) => None,
                     None => Some(vec![]),
-                    _ => None,
                 },
 
                 // We always select IDs, the unwraps are safe.

@@ -17,8 +17,11 @@ impl<'conn, 'tx> QueryPipeline<'conn, 'tx> {
 
     pub async fn execute(mut self) -> CoreResult<Response> {
         // Run final validations and transformations.
+        println!("BEFORE: {}", self.graph);
         self.graph.finalize()?;
         trace!("{}", self.graph);
+        eprintln!("TEST TEST TEST0");
+        println!("AFTER: {}", self.graph);
 
         let serializer = self.serializer;
         let expr = Expressionista::translate(self.graph)?;

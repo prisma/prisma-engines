@@ -513,19 +513,25 @@ impl QueryGraph {
                             child_node.id()
                         );
 
-                        // ONLY if there is no edge already existing!
-                        let existing_edge = self
-                            .graph
-                            .find_edge(parent_of_parent_node.node_ix, child_node.node_ix)
-                            .map(|edge_ix| EdgeRef { edge_ix });
-
-                        if let None = existing_edge {
-                            self.create_edge(
-                                &parent_of_parent_node,
-                                &child_node,
-                                QueryGraphDependency::ExecutionOrder,
-                            )?;
-                        }
+                        self.create_edge(
+                            &parent_of_parent_node,
+                            &child_node,
+                            QueryGraphDependency::ExecutionOrder,
+                        )?;
+                        // FIXME: AUMFIDARR
+                        //                        // ONLY if there is no edge already existing!
+                        //                        let existing_edge = self
+                        //                            .graph
+                        //                            .find_edge(parent_of_parent_node.node_ix, child_node.node_ix)
+                        //                            .map(|edge_ix| EdgeRef { edge_ix });
+                        //
+                        //                        if let None = existing_edge {
+                        //                            self.create_edge(
+                        //                                &parent_of_parent_node,
+                        //                                &child_node,
+                        //                                QueryGraphDependency::ExecutionOrder,
+                        //                            )?;
+                        //                        }
                     }
                 }
             }
