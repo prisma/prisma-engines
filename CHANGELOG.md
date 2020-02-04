@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.2.0-alpha.2
+
+- Implement support for Arrays of Enums
+
 ## v0.2.0-alpha.1
 
 Breaking changes ahead
