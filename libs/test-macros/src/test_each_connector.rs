@@ -141,7 +141,13 @@ fn test_each_connector_async_wrapper_functions(
         tests.push(test);
     }
 
-    // TODO: panic if tests.len() == 0.
+    if tests.is_empty() {
+        return vec![
+            syn::Error::new_spanned(test_function, "All connectors were filtered out for this test.")
+                .to_compile_error()
+                .into(),
+        ];
+    }
 
     tests
 }
