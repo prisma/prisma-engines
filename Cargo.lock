@@ -3058,6 +3058,7 @@ dependencies = [
 name = "test-setup"
 version = "0.1.0"
 dependencies = [
+ "bitflags",
  "once_cell",
  "quaint",
  "tokio",
