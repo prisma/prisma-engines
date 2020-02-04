@@ -145,6 +145,7 @@ fn render_raw_sql(
     match step {
         SqlMigrationStep::CreateEnum(create_enum) => render_create_enum(renderer, create_enum),
         SqlMigrationStep::DropEnum(drop_enum) => render_drop_enum(renderer, drop_enum),
+        SqlMigrationStep::AlterEnum(_alter_enum) => todo!("alter enum support"),
         SqlMigrationStep::CreateTable(CreateTable { table }) => {
             let mut create_table = String::with_capacity(100);
 
