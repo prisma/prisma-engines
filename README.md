@@ -54,9 +54,9 @@ Notable environment flags:
   datamodel for the server.
 - `RUST_BACKTRACE=(0|1)` if set to 1, the error backtraces will be printed to
   the STDERR.
-- `LOG_QUERIES=(anything)` if set, the SQL queries will be written to the `INFO`
+- `LOG_QUERIES=[anything]` if set, the SQL queries will be written to the `INFO`
   log. Needs the right log level enabled to be seen from the terminal.
-- `RUST_LOG=(filter)` sets the filter for the logger. Can be either `trace`,
+- `RUST_LOG=[filter]` sets the filter for the logger. Can be either `trace`,
   `debug`, `info`, `warning` or `error`, that will output ALL logs from every
   crate from that level. The `.envrc` in this repo shows how to log different
   parts of the system in a more granular way.
