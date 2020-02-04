@@ -228,6 +228,28 @@ impl GetRow for PostgresRow {
                         }
                         None => ParameterizedValue::Null,
                     },
+                    Kind::Array(inner) => match inner.kind() {
+                        Kind::Enum(_) => match row.try_get(i)? {
+                            Some(val) => {
+                                let val: Vec<EnumString> = val;
+                                ParameterizedValue::Array(
+                                    val.into_iter()
+                                        .map(|x| ParameterizedValue::Enum(x.value.into()))
+                                        .collect(),
+                                )
+                            }
+                            None => ParameterizedValue::Null,
+                        },
+                        _ => match row.try_get(i)? {
+                            Some(val) => {
+                                let val: Vec<String> = val;
+                                ParameterizedValue::Array(
+                                    val.into_iter().map(|x| ParameterizedValue::Text(x.into())).collect(),
+                                )
+                            }
+                            None => ParameterizedValue::Null,
+                        },
+                    },
                     _ => match row.try_get(i)? {
                         Some(val) => {
                             let val: String = val;

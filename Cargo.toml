@@ -1,6 +1,6 @@
 [package]
 name = "quaint"
-version = "0.2.0-alpha.1"
+version = "0.2.0-alpha.2"
 authors = [
     "Julius de Bruijn <bruijn@prisma.io>",
     "Katharina Fey <kookie@spacekookie.de>",
