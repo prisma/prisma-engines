@@ -88,7 +88,7 @@ async fn adding_an_id_field_of_type_int_must_work(api: &TestApi) {
     assert_eq!(column.auto_increment, false);
 }
 
-#[test_one_connector(connector = "sqlite")]
+#[test_each_connector(starts_with = "sqlite")]
 async fn adding_an_id_field_of_type_int_must_work_for_sqlite(api: &TestApi) {
     let dm2 = r#"
         model Test {

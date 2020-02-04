@@ -2,8 +2,9 @@ use darling::FromMeta;
 use proc_macro::TokenStream;
 use proc_macro2::Span;
 use quote::quote;
-use syn::{parse_macro_input, AttributeArgs, Ident, ItemFn};
-use test_setup::connectors::{Connector, CONNECTORS};
+use std::str::FromStr;
+use syn::{parse_macro_input, spanned::Spanned, AttributeArgs, Ident, ItemFn};
+use test_setup::connectors::{Capabilities, Connector, CONNECTORS};
 
 #[derive(Debug, FromMeta)]
 struct TestEachConnectorArgs {
@@ -15,6 +16,43 @@ struct TestEachConnectorArgs {
 
     #[darling(default)]
     log: Option<String>,
+
+    #[darling(default)]
+    capabilities: CapabilitiesWrapper,
+}
+
+#[derive(Debug)]
+struct CapabilitiesWrapper(Capabilities);
+
+impl Default for CapabilitiesWrapper {
+    fn default() -> Self {
+        CapabilitiesWrapper(Capabilities::empty())
+    }
+}
+
+impl darling::FromMeta for CapabilitiesWrapper {
+    fn from_list(items: &[syn::NestedMeta]) -> Result<Self, darling::Error> {
+        let mut capabilities = Capabilities::empty();
+
+        for item in items {
+            match item {
+                syn::NestedMeta::Lit(syn::Lit::Str(s)) => {
+                    let s = s.value();
+                    let capability = Capabilities::from_str(&s)
+                        .map_err(|err| darling::Error::unknown_value(&err.to_string()).with_span(&item.span()))?;
+                    capabilities.insert(capability);
+                }
+                syn::NestedMeta::Lit(other) => {
+                    return Err(darling::Error::unexpected_lit_type(other).with_span(&other.span()))
+                }
+                syn::NestedMeta::Meta(meta) => {
+                    return Err(darling::Error::unsupported_shape("Expected string literal").with_span(&meta.span()))
+                }
+            }
+        }
+
+        Ok(CapabilitiesWrapper(capabilities))
+    }
 }
 
 impl TestEachConnectorArgs {
@@ -32,6 +70,7 @@ impl TestEachConnectorArgs {
                 Some(pat) => connector.name().starts_with(pat),
                 None => true,
             })
+            .filter(move |connector| connector.capabilities.contains(self.capabilities.0))
     }
 }
 
@@ -100,6 +139,14 @@ fn test_each_connector_async_wrapper_functions(
         };
 
         tests.push(test);
+    }
+
+    if tests.is_empty() {
+        return vec![
+            syn::Error::new_spanned(test_function, "All connectors were filtered out for this test.")
+                .to_compile_error()
+                .into(),
+        ];
     }
 
     tests

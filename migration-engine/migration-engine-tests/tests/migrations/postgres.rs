@@ -35,7 +35,7 @@ async fn enums_can_be_dropped_on_postgres(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(starts_with = "postgres")]
+#[test_each_connector(capabilities("scalar_lists"))]
 async fn adding_a_scalar_list_for_a_model_with_id_type_int_must_work(api: &TestApi) {
     let dm1 = r#"
         datasource pg {

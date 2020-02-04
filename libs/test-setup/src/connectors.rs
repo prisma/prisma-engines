@@ -1,3 +1,7 @@
+mod capabilities;
+
+pub use capabilities::*;
+
 use once_cell::sync::Lazy;
 
 const CONNECTOR_NAMES: &[&'static str] = &[
@@ -11,14 +15,34 @@ const CONNECTOR_NAMES: &[&'static str] = &[
     "sqlite",
 ];
 
+fn postgres_capabilities() -> Capabilities {
+    Capabilities::SCALAR_LISTS | Capabilities::ENUMS
+}
+
+fn mysql_capabilities() -> Capabilities {
+    Capabilities::ENUMS
+}
+
 pub static CONNECTORS: Lazy<Connectors> = Lazy::new(|| {
-    let connectors = CONNECTOR_NAMES
+    let mut connectors: Vec<Connector> = CONNECTOR_NAMES
         .iter()
         .map(|name| Connector {
             name: (*name).to_owned(),
             test_api_factory_name: format!("{}_test_api", name),
+            capabilities: Capabilities::empty(),
         })
         .collect();
+
+    connectors
+        .iter_mut()
+        .filter(|connector| connector.name.starts_with("postgres"))
+        .for_each(|connector| connector.capabilities.insert(postgres_capabilities()));
+
+    connectors
+        .iter_mut()
+        .filter(|connector| connector.name.starts_with("mysql"))
+        .for_each(|connector| connector.capabilities.insert(mysql_capabilities()));
+
     Connectors::new(connectors)
 });
 
@@ -44,6 +68,7 @@ impl Connectors {
 pub struct Connector {
     name: String,
     test_api_factory_name: String,
+    pub capabilities: Capabilities,
 }
 
 impl Connector {
