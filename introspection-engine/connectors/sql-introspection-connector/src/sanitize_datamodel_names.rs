@@ -43,7 +43,9 @@ pub fn sanitize_datamodel_names(mut datamodel: Datamodel) -> Datamodel {
                 *enum_name = sanitized_enum_name;
             }
 
-            field.name = sanitized_field_name;
+            let id_field_option = model.id_fields.iter_mut().find(|name| **name == field.name);
+            field.name = sanitized_field_name.clone();
+            id_field_option.map(|id_field| *id_field = sanitized_field_name);
 
             if field.database_names.is_empty() {
                 field.database_names = field_db_name.map(|db| vec![db]).unwrap_or(vec![]);
