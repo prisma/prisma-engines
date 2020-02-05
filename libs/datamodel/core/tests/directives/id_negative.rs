@@ -19,23 +19,6 @@ fn id_should_error_if_the_field_is_not_required() {
 }
 
 #[test]
-fn id_should_error_if_the_field_is_optional() {
-    let dml = r#"
-    model Model {
-        id Int? @id
-    }
-    "#;
-
-    let errors = parse_error(dml);
-
-    errors.assert_is(DatamodelError::new_directive_validation_error(
-        "Fields that are marked as id must be required.",
-        "id",
-        Span::new(36, 38),
-    ));
-}
-
-#[test]
 fn id_should_error_if_unique_and_id_are_specified() {
     let dml = r#"
     model Model {
