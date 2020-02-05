@@ -2,7 +2,7 @@ use crate::*;
 use barrel::types;
 use test_harness::*;
 
-#[test_one_connector(connector = "sqlite")]
+#[test_each_connector(tags("sqlite"))]
 #[test]
 async fn compound_foreign_keys_should_work_for_one_to_one_relations(api: &TestApi) {
     let barrel = api.barrel();
@@ -25,16 +25,16 @@ async fn compound_foreign_keys_should_work_for_one_to_one_relations(api: &TestAp
 
     let dm = r#"
             model User {
-               age      Int 
+               age      Int
                id       Int                 @id @default(autoincrement())
                post     Post?
-               
+
                @@unique([id, age], name: "sqlite_autoindex_User_1")
             }
-            
+
             model Post {
                 id      Int                 @id @default(autoincrement())
-                user    User?               @map(["user_id", "user_age"]) @relation(references:[id, age]) 
+                user    User?               @map(["user_id", "user_age"]) @relation(references:[id, age])
             }
 
         "#;
@@ -42,7 +42,7 @@ async fn compound_foreign_keys_should_work_for_one_to_one_relations(api: &TestAp
     custom_assert(&result, dm);
 }
 
-#[test_one_connector(connector = "sqlite")]
+#[test_each_connector(tags("sqlite"))]
 #[test]
 async fn compound_foreign_keys_should_work_for_required_one_to_one_relations(api: &TestApi) {
     let barrel = api.barrel();
@@ -68,13 +68,13 @@ async fn compound_foreign_keys_should_work_for_required_one_to_one_relations(api
                age     Int
                id       Int                 @id @default(autoincrement())
                post     Post?
-               
+
                @@unique([id, age], name: "sqlite_autoindex_User_1")
             }
-            
+
             model Post {
                 id      Int                 @id  @default(autoincrement())
-                user    User                @map(["user_id", "user_age"]) @relation(references:[id, age]) 
+                user    User                @map(["user_id", "user_age"]) @relation(references:[id, age])
             }
 
         "#;
@@ -82,7 +82,7 @@ async fn compound_foreign_keys_should_work_for_required_one_to_one_relations(api
     custom_assert(&result, dm);
 }
 
-#[test_one_connector(connector = "sqlite")]
+#[test_each_connector(tags("sqlite"))]
 #[test]
 async fn compound_foreign_keys_should_work_for_one_to_many_relations(api: &TestApi) {
     let barrel = api.barrel();
@@ -107,13 +107,13 @@ async fn compound_foreign_keys_should_work_for_one_to_many_relations(api: &TestA
                age      Int
                id       Int                 @id @default(autoincrement())
                posts    Post[]
-               
+
                @@unique([id, age], name: "sqlite_autoindex_User_1")
             }
-            
+
             model Post {
                 id      Int                 @id @default(autoincrement())
-                user    User?               @map(["user_id", "user_age"]) @relation(references:[id, age]) 
+                user    User?               @map(["user_id", "user_age"]) @relation(references:[id, age])
             }
 
         "#;
@@ -121,7 +121,7 @@ async fn compound_foreign_keys_should_work_for_one_to_many_relations(api: &TestA
     custom_assert(&result, dm);
 }
 
-#[test_one_connector(connector = "sqlite")]
+#[test_each_connector(tags("sqlite"))]
 #[test]
 async fn compound_foreign_keys_should_work_for_required_one_to_many_relations(api: &TestApi) {
     let barrel = api.barrel();
@@ -146,20 +146,20 @@ async fn compound_foreign_keys_should_work_for_required_one_to_many_relations(ap
                age      Int
                id       Int                 @id @default(autoincrement())
                posts    Post[]
-               
+
                @@unique([id, age], name: "sqlite_autoindex_User_1")
             }
-            
+
             model Post {
                 id      Int                 @id @default(autoincrement())
-                user    User               @map(["user_id", "user_age"]) @relation(references:[id, age]) 
+                user    User               @map(["user_id", "user_age"]) @relation(references:[id, age])
             }
         "#;
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
 
-#[test_one_connector(connector = "sqlite")]
+#[test_each_connector(tags("sqlite"))]
 #[test]
 async fn compound_foreign_keys_should_work_for_required_self_relations(api: &TestApi) {
     let barrel = api.barrel();
@@ -182,7 +182,7 @@ async fn compound_foreign_keys_should_work_for_required_self_relations(api: &Tes
                id       Int         @id  @default(autoincrement())
                person   Person      @map(["partner_id", "partner_age"]) @relation("PersonToPerson_partner_id_partner_age")
                persons  Person[]    @relation("PersonToPerson_partner_id_partner_age")
-               
+
                @@unique([id, age], name: "sqlite_autoindex_Person_1")
             }
         "#;
@@ -190,7 +190,7 @@ async fn compound_foreign_keys_should_work_for_required_self_relations(api: &Tes
     custom_assert(&result, dm);
 }
 
-#[test_one_connector(connector = "sqlite")]
+#[test_each_connector(tags("sqlite"))]
 #[test]
 async fn compound_foreign_keys_should_work_for_self_relations(api: &TestApi) {
     let barrel = api.barrel();
@@ -213,7 +213,7 @@ async fn compound_foreign_keys_should_work_for_self_relations(api: &TestApi) {
                id       Int         @id  @default(autoincrement())
                person   Person?     @map(["partner_id", "partner_age"]) @relation("PersonToPerson_partner_id_partner_age")
                persons  Person[]    @relation("PersonToPerson_partner_id_partner_age")
-               
+
                @@unique([id, age], name: "sqlite_autoindex_Person_1")
             }
         "#;
@@ -221,7 +221,7 @@ async fn compound_foreign_keys_should_work_for_self_relations(api: &TestApi) {
     custom_assert(&result, dm);
 }
 
-#[test_one_connector(connector = "sqlite")]
+#[test_each_connector(tags("sqlite"))]
 #[test]
 async fn compound_foreign_keys_should_work_with_defaults(api: &TestApi) {
     let barrel = api.barrel();
@@ -244,7 +244,7 @@ async fn compound_foreign_keys_should_work_with_defaults(api: &TestApi) {
                id       Int         @id  @default(autoincrement())
                person   Person      @map(["partner_id", "partner_age"]) @relation("PersonToPerson_partner_id_partner_age")
                persons  Person[]    @relation("PersonToPerson_partner_id_partner_age")
-               
+
                @@unique([id, age], name: "sqlite_autoindex_Person_1")
             }
         "#;
@@ -259,7 +259,7 @@ async fn compound_foreign_keys_should_work_with_defaults(api: &TestApi) {
 // model.indexes contains a multi-field unique index that matches the colums exactly, then it is unique
 // if there are separate uniques it probably should not become a relation
 // what breaks by having an @@unique that refers to fields that do not have a representation on the model anymore due to the merged relation field?
-//#[test_one_connector(connector = "sqlite")]
+//#[test_each_connector(tags("sqlite"))]
 //#[test]
 //async fn compound_foreign_keys_should_work_for_one_to_one_relations_with_separate_uniques(api: &TestApi) {
 //    let barrel = api.barrel();
@@ -298,7 +298,7 @@ async fn compound_foreign_keys_should_work_with_defaults(api: &TestApi) {
 //}
 
 // the fk indexes are created implicitly on mysql
-#[test_one_connector(connector = "sqlite")]
+#[test_each_connector(tags("sqlite"))]
 #[test]
 async fn compound_foreign_keys_should_work_for_one_to_many_relations_with_non_unique_index(api: &TestApi) {
     let barrel = api.barrel();
@@ -324,10 +324,10 @@ async fn compound_foreign_keys_should_work_for_one_to_many_relations_with_non_un
                age      Int
                id       Int                 @id @default(autoincrement())
                posts    Post[]
-               
+
                @@unique([id, age], name: "sqlite_autoindex_User_1")
             }
-            
+
             model Post {
                 id      Int                 @id @default(autoincrement())
                 user    User                @map(["user_id", "user_age"]) @relation(references:[id, age])

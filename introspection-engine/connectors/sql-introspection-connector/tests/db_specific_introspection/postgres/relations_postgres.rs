@@ -2,7 +2,7 @@ use crate::*;
 use barrel::types;
 use test_harness::*;
 
-#[test_one_connector(connector = "postgres")]
+#[test_each_connector(tags("postgres"))]
 async fn introspecting_a_one_to_one_req_relation_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
@@ -22,17 +22,17 @@ async fn introspecting_a_one_to_one_req_relation_should_work(api: &TestApi) {
                id      Int @id @default(autoincrement())
                user_id User
             }
-          
+
             model User {
                id      Int @id @default(autoincrement())
-               post Post? 
+               post Post?
             }
         "#;
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
 
-#[test_one_connector(connector = "postgres")]
+#[test_each_connector(tags("postgres"))]
 async fn introspecting_two_one_to_one_relations_between_the_same_models_should_work(api: &TestApi) {
     let barrel = api.barrel();
     barrel
@@ -56,7 +56,7 @@ async fn introspecting_two_one_to_one_relations_between_the_same_models_should_w
                user_id User  @relation("Post_user_idToUser")
                user    User? @relation("PostToUser_post_id", references: [post_id])
             }
-        
+
             model User {
                id      Int @id @default(autoincrement())
                post_id Post  @relation("PostToUser_post_id")
@@ -67,7 +67,7 @@ async fn introspecting_two_one_to_one_relations_between_the_same_models_should_w
     custom_assert(&result, dm);
 }
 
-#[test_one_connector(connector = "postgres")]
+#[test_each_connector(tags("postgres"))]
 async fn introspecting_a_one_to_one_relation_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
@@ -81,22 +81,22 @@ async fn introspecting_a_one_to_one_relation_should_work(api: &TestApi) {
             });
         })
         .await;
-    let dm = r#"        
+    let dm = r#"
             model Post {
                id      Int @id @default(autoincrement())
                user_id User?
             }
-            
+
             model User {
                id      Int @id @default(autoincrement())
-               post Post? 
+               post Post?
             }
         "#;
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
 
-#[test_one_connector(connector = "postgres")]
+#[test_each_connector(tags("postgres"))]
 async fn introspecting_a_one_to_one_relation_referencing_non_id_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
@@ -111,23 +111,23 @@ async fn introspecting_a_one_to_one_relation_referencing_non_id_should_work(api:
             });
         })
         .await;
-    let dm = r#"        
+    let dm = r#"
             model Post {
                id           Int     @id  @default(autoincrement())
                user_email   User?   @relation(references: [email])
             }
-            
+
             model User {
-               email        String? @unique 
+               email        String? @unique
                id           Int     @id  @default(autoincrement())
-               post         Post? 
+               post         Post?
             }
         "#;
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
 
-#[test_one_connector(connector = "postgres")]
+#[test_each_connector(tags("postgres"))]
 async fn introspecting_a_one_to_many_relation_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
@@ -141,22 +141,22 @@ async fn introspecting_a_one_to_many_relation_should_work(api: &TestApi) {
             });
         })
         .await;
-    let dm = r#"  
+    let dm = r#"
             model Post {
                id      Int @id @default(autoincrement())
                user_id User?
             }
-            
+
             model User {
                id      Int @id @default(autoincrement())
-               posts Post[] 
+               posts Post[]
             }
         "#;
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
 
-#[test_one_connector(connector = "postgres")]
+#[test_each_connector(tags("postgres"))]
 async fn introspecting_a_one_req_to_many_relation_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
@@ -175,17 +175,17 @@ async fn introspecting_a_one_req_to_many_relation_should_work(api: &TestApi) {
                id      Int @id @default(autoincrement())
                user_id User
             }
-            
+
             model User {
                id      Int @id @default(autoincrement())
-               posts Post[] 
+               posts Post[]
             }
        "#;
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
 
-#[test_one_connector(connector = "postgres")]
+#[test_each_connector(tags("postgres"))]
 async fn introspecting_a_prisma_many_to_many_relation_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
@@ -219,12 +219,12 @@ async fn introspecting_a_prisma_many_to_many_relation_should_work(api: &TestApi)
     let dm = r#"
             model Post {
                id      Int @id @default(autoincrement())
-               users User[] 
+               users User[]
             }
-            
+
             model User {
                id      Int @id @default(autoincrement())
-               posts Post[] 
+               posts Post[]
             }
         "#;
     let result = dbg!(api.introspect().await);
@@ -340,23 +340,22 @@ async fn introspecting_a_many_to_many_relation_with_an_id_should_work(api: &Test
                id      Int @id @default(autoincrement())
                postsToUserses PostsToUsers[] @relation(references: [post_id])
             }
-            
+
             model PostsToUsers {
               id    Int @id
-              post_id Post 
+              post_id Post
               user_id User
             }
-            
+
             model User {
                id      Int @id @default(autoincrement())
-               postsToUserses PostsToUsers[] 
+               postsToUserses PostsToUsers[]
             }
         "#;
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
-
-#[test_one_connector(connector = "postgres")]
+#[test_each_connector(tags("postgres"))]
 async fn introspecting_a_self_relation_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
@@ -386,7 +385,7 @@ async fn introspecting_a_self_relation_should_work(api: &TestApi) {
 // on delete cascade
 
 // TODO: bring `onDelete` back once `prisma migrate` is a thing
-//#[test_one_connector(connector = "postgres")]
+//#[test_each_connector(tags("postgres"))]
 async fn introspecting_cascading_delete_behaviour_should_work(api: &TestApi) {
     let barrel = api.barrel();
     barrel
@@ -401,12 +400,12 @@ async fn introspecting_cascading_delete_behaviour_should_work(api: &TestApi) {
         })
         .await;
 
-    let dm = r#"  
+    let dm = r#"
             model Post {
                id      Int @id @default(autoincrement())
                user_id User?
             }
-            
+
             model User {
                id    Int @id @default(autoincrement())
                posts Post[] @relation(onDelete: CASCADE)
@@ -420,7 +419,7 @@ async fn introspecting_cascading_delete_behaviour_should_work(api: &TestApi) {
 
 // native arrays
 
-#[test_one_connector(connector = "postgres")]
+#[test_each_connector(tags("postgres"))]
 async fn introspecting_default_values_on_relations_should_be_ignored(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
@@ -454,7 +453,7 @@ async fn introspecting_default_values_on_relations_should_be_ignored(api: &TestA
     custom_assert(&result, dm);
 }
 
-#[test_one_connector(connector = "postgres")]
+#[test_each_connector(tags("postgres"))]
 async fn introspecting_default_values_on_lists_should_be_ignored(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
@@ -483,7 +482,7 @@ async fn introspecting_default_values_on_lists_should_be_ignored(api: &TestApi) 
     custom_assert(&result, dm);
 }
 
-#[test_one_connector(connector = "postgres")]
+#[test_each_connector(tags("postgres"))]
 async fn introspecting_id_fields_with_foreign_key_should_ignore_the_relation(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel

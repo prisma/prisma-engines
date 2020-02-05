@@ -2,7 +2,7 @@ use crate::*;
 use barrel::types;
 use test_harness::*;
 
-#[test_one_connector(connector = "sqlite")]
+#[test_each_connector(tags("sqlite"))]
 async fn remapping_fields_with_invalid_characters_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
@@ -39,7 +39,7 @@ async fn remapping_fields_with_invalid_characters_should_work(api: &TestApi) {
     custom_assert(&result, dm);
 }
 
-#[test_one_connector(connector = "sqlite")]
+#[test_each_connector(tags("sqlite"))]
 async fn remapping_tables_with_invalid_characters_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
@@ -70,7 +70,7 @@ async fn remapping_tables_with_invalid_characters_should_work(api: &TestApi) {
     custom_assert(&result, dm);
 }
 
-#[test_one_connector(connector = "sqlite")]
+#[test_each_connector(tags("sqlite"))]
 async fn remapping_models_in_relations_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
@@ -93,10 +93,10 @@ async fn remapping_models_in_relations_should_work(api: &TestApi) {
                id       Int                             @id  @default(autoincrement())
                name     String
                post     Post?
-               
+
                @@map("User with Space")
             }
-            
+
             model Post {
                 id                  Int                 @id  @default(autoincrement())
                 user_id     User_with_Space
@@ -106,7 +106,7 @@ async fn remapping_models_in_relations_should_work(api: &TestApi) {
     custom_assert(&result, dm);
 }
 
-#[test_one_connector(connector = "sqlite")]
+#[test_each_connector(tags("sqlite"))]
 #[test]
 async fn remapping_models_in_compound_relations_should_work(api: &TestApi) {
     let barrel = api.barrel();
@@ -132,21 +132,21 @@ async fn remapping_models_in_compound_relations_should_work(api: &TestApi) {
                age      Int
                id       Int                             @id  @default(autoincrement())
                post     Post?
-               
+
                @@map("User with Space")
                @@unique([id, age], name: "sqlite_autoindex_User with Space_1")
             }
-           
+
             model Post {
                 id      Int                             @id @default(autoincrement())
-                user_with_Space    User_with_Space      @map(["user_id", "user_age"]) @relation(references:[id, age]) 
+                user_with_Space    User_with_Space      @map(["user_id", "user_age"]) @relation(references:[id, age])
             }
         "#;
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
 
-#[test_one_connector(connector = "sqlite")]
+#[test_each_connector(tags("sqlite"))]
 #[test]
 async fn remapping_fields_in_compound_relations_should_work(api: &TestApi) {
     let barrel = api.barrel();
@@ -172,13 +172,13 @@ async fn remapping_fields_in_compound_relations_should_work(api: &TestApi) {
                age_that_is_invalid      Int     @map("age-that-is-invalid")
                id                       Int     @id @default(autoincrement())
                post                     Post?
-               
+
                @@unique([id, age_that_is_invalid], name: "sqlite_autoindex_User_1")
             }
-            
+
             model Post {
                 id                      Int     @id @default(autoincrement())
-                user                    User    @map(["user_id", "user_age"]) @relation(references:[id, age_that_is_invalid]) 
+                user                    User    @map(["user_id", "user_age"]) @relation(references:[id, age_that_is_invalid])
             }
         "#;
     let result = dbg!(api.introspect().await);

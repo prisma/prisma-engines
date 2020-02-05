@@ -160,7 +160,7 @@ async fn creating_a_field_for_an_existing_column_and_simultaneously_making_it_op
     Ok(())
 }
 
-#[test_one_connector(connector = "postgres")]
+#[test_each_connector(tags("postgres"))]
 async fn creating_a_scalar_list_field_for_an_existing_table_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
             datasource pg {
@@ -236,7 +236,7 @@ async fn delete_a_field_for_a_non_existent_column_must_work(api: &TestApi) -> Te
     Ok(())
 }
 
-#[test_one_connector(connector = "postgres")]
+#[test_each_connector(tags("postgres"))]
 async fn deleting_a_scalar_list_field_for_a_non_existent_column_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
             datasource pg {

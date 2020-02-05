@@ -2,7 +2,7 @@ use crate::*;
 use barrel::types;
 use test_harness::*;
 
-#[test_one_connector(connector = "sqlite")]
+#[test_each_connector(tags("sqlite"))]
 async fn introspecting_a_one_to_one_req_relation_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
@@ -23,9 +23,9 @@ async fn introspecting_a_one_to_one_req_relation_should_work(api: &TestApi) {
     let dm = r#"
             model User {
                id Int @id @default(autoincrement())
-               post Post? 
+               post Post?
             }
-            
+
             model Post {
                id Int @id @default(autoincrement())
                user_id User
@@ -35,7 +35,7 @@ async fn introspecting_a_one_to_one_req_relation_should_work(api: &TestApi) {
     custom_assert(&result, dm);
 }
 
-#[test_one_connector(connector = "sqlite")]
+#[test_each_connector(tags("sqlite"))]
 async fn introspecting_two_one_to_one_relations_between_the_same_models_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
@@ -63,7 +63,7 @@ async fn introspecting_two_one_to_one_relations_between_the_same_models_should_w
                post_id Post  @relation("PostToUser_post_id")
                post Post?    @relation("Post_user_idToUser")
             }
-            
+
             model Post {
                id Int @id @default(autoincrement())
                user_id User  @relation("Post_user_idToUser")
@@ -74,7 +74,7 @@ async fn introspecting_two_one_to_one_relations_between_the_same_models_should_w
     custom_assert(&result, dm);
 }
 
-#[test_one_connector(connector = "sqlite")]
+#[test_each_connector(tags("sqlite"))]
 async fn introspecting_a_one_to_one_relation_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
@@ -95,9 +95,9 @@ async fn introspecting_a_one_to_one_relation_should_work(api: &TestApi) {
     let dm = r#"
             model User {
                id Int @id @default(autoincrement())
-               post Post? 
+               post Post?
             }
-            
+
             model Post {
                id Int @id @default(autoincrement())
                user_id User?
@@ -107,7 +107,7 @@ async fn introspecting_a_one_to_one_relation_should_work(api: &TestApi) {
     custom_assert(&result, dm);
 }
 
-#[test_one_connector(connector = "sqlite")]
+#[test_each_connector(tags("sqlite"))]
 async fn introspecting_a_one_to_one_relation_referencing_non_id_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
@@ -127,11 +127,11 @@ async fn introspecting_a_one_to_one_relation_referencing_non_id_should_work(api:
         .await;
     let dm = r#"
             model User {
-               email        String? @unique 
+               email        String? @unique
                id           Int     @id  @default(autoincrement())
-               post         Post? 
+               post         Post?
             }
-            
+
             model Post {
                id           Int     @id   @default(autoincrement())
                user_email   User?   @relation(references: [email])
@@ -141,7 +141,7 @@ async fn introspecting_a_one_to_one_relation_referencing_non_id_should_work(api:
     custom_assert(&result, dm);
 }
 
-#[test_one_connector(connector = "sqlite")]
+#[test_each_connector(tags("sqlite"))]
 async fn introspecting_a_one_to_many_relation_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
@@ -162,9 +162,9 @@ async fn introspecting_a_one_to_many_relation_should_work(api: &TestApi) {
     let dm = r#"
             model User {
                id Int @id @default(autoincrement())
-               posts Post[] 
+               posts Post[]
             }
-            
+
             model Post {
                id Int @id @default(autoincrement())
                user_id User?
@@ -174,7 +174,7 @@ async fn introspecting_a_one_to_many_relation_should_work(api: &TestApi) {
     custom_assert(&result, dm);
 }
 
-#[test_one_connector(connector = "sqlite")]
+#[test_each_connector(tags("sqlite"))]
 async fn introspecting_a_one_req_to_many_relation_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
@@ -195,9 +195,9 @@ async fn introspecting_a_one_req_to_many_relation_should_work(api: &TestApi) {
     let dm = r#"
             model User {
                id Int @id @default(autoincrement())
-               posts Post[] 
+               posts Post[]
             }
-            
+
             model Post {
                id Int @id @default(autoincrement())
                user_id User
@@ -207,7 +207,7 @@ async fn introspecting_a_one_req_to_many_relation_should_work(api: &TestApi) {
     custom_assert(&result, dm);
 }
 
-#[test_one_connector(connector = "sqlite")]
+#[test_each_connector(tags("sqlite"))]
 async fn introspecting_a_prisma_many_to_many_relation_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
@@ -245,12 +245,12 @@ async fn introspecting_a_prisma_many_to_many_relation_should_work(api: &TestApi)
     let dm = r#"
             model User {
                id Int @id @default(autoincrement())
-               posts Post[] 
+               posts Post[]
             }
-            
+
             model Post {
                id Int @id @default(autoincrement())
-               users User[] 
+               users User[]
             }
         "#;
     let result = dbg!(api.introspect().await);
@@ -258,7 +258,7 @@ async fn introspecting_a_prisma_many_to_many_relation_should_work(api: &TestApi)
 }
 
 // currently disallowed by the validator since the relation tables do not have ids
-//#[test_one_connector(connector = "sqlite")]
+//#[test_each_connector(tags("sqlite"))]
 //async fn introspecting_a_many_to_many_relation_should_work(api: &TestApi) {
 //    let barrel = api.barrel();
 //    let _setup_schema = barrel
@@ -300,7 +300,7 @@ async fn introspecting_a_prisma_many_to_many_relation_should_work(api: &TestApi)
 //    custom_assert(&result, dm);
 //}
 //
-//#[test_one_connector(connector = "sqlite")]
+//#[test_each_connector(tags("sqlite"))]
 //async fn introspecting_a_many_to_many_relation_with_extra_fields_should_work(api: &TestApi) {
 //    let barrel = api.barrel();
 //    let _setup_schema = barrel
@@ -344,7 +344,7 @@ async fn introspecting_a_prisma_many_to_many_relation_should_work(api: &TestApi)
 //    custom_assert(&result, dm);
 //}
 
-#[test_one_connector(connector = "sqlite")]
+#[test_each_connector(tags("sqlite"))]
 async fn introspecting_a_many_to_many_relation_with_an_id_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
@@ -370,17 +370,17 @@ async fn introspecting_a_many_to_many_relation_with_an_id_should_work(api: &Test
     let dm = r#"
             model User {
                id Int @id @default(autoincrement())
-               postsToUserses PostsToUsers[] 
+               postsToUserses PostsToUsers[]
             }
-            
+
             model Post {
                id Int @id @default(autoincrement())
                postsToUserses PostsToUsers[] @relation(references: [post_id])
             }
-            
+
             model PostsToUsers {
               id      Int @id @default(autoincrement())
-              post_id Post 
+              post_id Post
               user_id User
             }
         "#;
@@ -388,7 +388,7 @@ async fn introspecting_a_many_to_many_relation_with_an_id_should_work(api: &Test
     custom_assert(&result, dm);
 }
 
-#[test_one_connector(connector = "sqlite")]
+#[test_each_connector(tags("sqlite"))]
 async fn introspecting_a_self_relation_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
@@ -421,7 +421,7 @@ async fn introspecting_a_self_relation_should_work(api: &TestApi) {
 // on delete cascade
 
 // TODO: bring `onDelete` back once `prisma migrate` is a thing
-//#[test_one_connector(connector = "sqlite")]
+//#[test_each_connector(tags("sqlite"))]
 async fn introspecting_cascading_delete_behaviour_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
@@ -444,7 +444,7 @@ async fn introspecting_cascading_delete_behaviour_should_work(api: &TestApi) {
                id      Int @id @default(autoincrement())
                posts Post[] @relation(onDelete: CASCADE)
             }
-            
+
             model Post {
                id      Int @id @default(autoincrement())
                user_id User?
@@ -454,7 +454,7 @@ async fn introspecting_cascading_delete_behaviour_should_work(api: &TestApi) {
     custom_assert(&result, dm);
 }
 
-#[test_one_connector(connector = "sqlite")]
+#[test_each_connector(tags("sqlite"))]
 async fn introspecting_id_fields_with_foreign_key_should_ignore_the_relation(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
@@ -478,7 +478,7 @@ async fn introspecting_id_fields_with_foreign_key_should_ignore_the_relation(api
             model Post {
                test    String
                user_id Int @id @default(autoincrement())
-            } 
+            }
         "#;
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);

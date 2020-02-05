@@ -1,8 +1,8 @@
 use crate::test_harness::*;
-use crate::{test_one_connector, BarrelMigrationExecutor, TestApi};
+use crate::{BarrelMigrationExecutor, TestApi};
 use barrel::types;
 
-#[test_one_connector(connector = "mysql")]
+#[test_each_connector(tags("mysql"))]
 async fn metadata_for_mysql_should_work(api: &TestApi) {
     let barrel = api.barrel();
     setup(&barrel, api.db_name()).await;
@@ -11,7 +11,7 @@ async fn metadata_for_mysql_should_work(api: &TestApi) {
     assert_eq!(result.size_in_bytes, 49152);
 }
 
-#[test_one_connector(connector = "postgres")]
+#[test_each_connector(tags("postgres"))]
 async fn metadata_for_postgres_should_work(api: &TestApi) {
     let barrel = api.barrel();
     setup(&barrel, api.schema_name()).await;
@@ -20,7 +20,7 @@ async fn metadata_for_postgres_should_work(api: &TestApi) {
     assert_eq!(result.size_in_bytes, 40960);
 }
 
-#[test_one_connector(connector = "sqlite")]
+#[test_each_connector(tags("sqlite"))]
 async fn metadata_for_sqlite_should_work(api: &TestApi) {
     let barrel = api.barrel();
     setup(&barrel, api.schema_name()).await;

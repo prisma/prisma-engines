@@ -4,7 +4,6 @@ use migration_connector::MigrationWarning;
 use migration_engine_tests::sql::*;
 use pretty_assertions::assert_eq;
 use quaint::ast::*;
-use std::borrow::Cow;
 
 #[test_each_connector]
 async fn adding_a_required_field_if_there_is_data(api: &TestApi) {
