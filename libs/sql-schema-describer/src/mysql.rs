@@ -137,7 +137,9 @@ impl SqlSchemaDescriber {
             SELECT column_name column_name, data_type data_type, column_type full_data_type, column_default column_default, is_nullable is_nullable, extra extra
             FROM information_schema.columns
             WHERE table_schema = ? AND table_name = ?
-            ORDER BY column_name";
+            ORDER BY column_name
+            COLLATE utf8_general_ci
+        ";
 
         let rows = self
             .conn
