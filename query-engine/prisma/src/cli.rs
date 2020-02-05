@@ -60,7 +60,7 @@ impl TryFrom<&PrismaOpt> for CliCommand {
 
                     Ok(CliCommand::Dmmf(DmmfRequest {
                         build_mode,
-                        enable_raw_queries: opts.always_force_transactions,
+                        enable_raw_queries: opts.enable_raw_queries,
                     }))
                 }
                 CliOpt::DmmfToDml(input) => {
