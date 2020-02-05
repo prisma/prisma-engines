@@ -141,39 +141,44 @@ pub fn connect_nested_delete_many(
     value: ParsedInputValue,
     child_model: &ModelRef,
 ) -> QueryGraphBuilderResult<()> {
-    // for value in utils::coerce_vec(value) {
-    //     let as_map: ParsedInputMap = value.try_into()?;
-    //     let filter = extract_filter(as_map, child_model, true)?;
+    let child_model_identifier = parent_relation_field.related_model().primary_identifier();
 
-    //     let find_child_records_node =
-    //         utils::insert_find_children_by_parent_node(graph, parent, parent_relation_field, filter.clone())?;
+    for value in utils::coerce_vec(value) {
+        let as_map: ParsedInputMap = value.try_into()?;
+        let filter = extract_filter(as_map, child_model, true)?;
 
-    //     let delete_many = WriteQuery::DeleteManyRecords(DeleteManyRecords {
-    //         model: Arc::clone(&child_model),
-    //         filter,
-    //     });
+        let find_child_records_node =
+            utils::insert_find_children_by_parent_node(graph, parent, parent_relation_field, filter.clone())?;
 
-    //     let delete_many_node = graph.create_node(Query::Write(delete_many));
-    //     let id_field = child_model.fields().id();
+        let delete_many = WriteQuery::DeleteManyRecords(DeleteManyRecords {
+            model: Arc::clone(&child_model),
+            filter,
+        });
 
-    //     utils::insert_deletion_checks(graph, child_model, &find_child_records_node, &delete_many_node)?;
+        let delete_many_node = graph.create_node(Query::Write(delete_many));
+        let id_field = child_model.fields().find_singular_id().unwrap().upgrade().unwrap();
 
-    //     graph.create_edge(
-    //         &find_child_records_node,
-    //         &delete_many_node,
-    //         QueryGraphDependency::ParentIds(Box::new(move |mut node, parent_ids| {
-    //             if let Node::Query(Query::Write(WriteQuery::DeleteManyRecords(ref mut ur))) = node {
-    //                 let ids_filter = id_field.is_in(parent_ids);
-    //                 let new_filter = Filter::and(vec![ur.filter.clone(), ids_filter]);
+        utils::insert_deletion_checks(graph, child_model, &find_child_records_node, &delete_many_node)?;
 
-    //                 ur.filter = new_filter;
-    //             }
+        graph.create_edge(
+            &find_child_records_node,
+            &delete_many_node,
+            QueryGraphDependency::ParentIds(
+                child_model_identifier.clone(),
+                Box::new(move |mut node, parent_ids| {
+                    if let Node::Query(Query::Write(WriteQuery::DeleteManyRecords(ref mut ur))) = node {
+                        let as_prisma_values = parent_ids.iter().map(|x| x.single_value()).collect();
+                        let ids_filter = id_field.data_source_field().is_in(as_prisma_values);
+                        let new_filter = Filter::and(vec![ur.filter.clone(), ids_filter]);
 
-    //             Ok(node)
-    //         })),
-    //     )?;
-    // }
+                        ur.filter = new_filter;
+                    }
 
-    // Ok(())
-    todo!()
+                    Ok(node)
+                }),
+            ),
+        )?;
+    }
+
+    Ok(())
 }
