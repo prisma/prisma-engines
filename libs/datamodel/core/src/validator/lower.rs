@@ -1,4 +1,4 @@
-use super::{common::*, DirectiveBox};
+use super::DirectiveBox;
 use crate::configuration;
 use crate::error::ErrorCollection;
 use crate::{ast, dml};
@@ -55,7 +55,7 @@ impl LowerDmlToAst {
 
         for field in model.fields() {
             if !field.is_generated {
-                match self.lower_field(field, model, datamodel) {
+                match self.lower_field(field, datamodel) {
                     Ok(ast_field) => fields.push(ast_field),
                     Err(mut err) => errors.append(&mut err),
                 };
@@ -92,18 +92,13 @@ impl LowerDmlToAst {
         })
     }
 
-    fn lower_field(
-        &self,
-        field: &dml::Field,
-        model: &dml::Model,
-        datamodel: &dml::Datamodel,
-    ) -> Result<ast::Field, ErrorCollection> {
+    fn lower_field(&self, field: &dml::Field, datamodel: &dml::Datamodel) -> Result<ast::Field, ErrorCollection> {
         Ok(ast::Field {
             name: ast::Identifier::new(&field.name),
             arity: self.lower_field_arity(field.arity),
             default_value: field.default_value.clone().map(|dv| Self::lower_default_value(dv)),
             directives: self.directives.field.serialize(field, datamodel)?,
-            field_type: self.lower_type(&field.field_type, field, model, &datamodel),
+            field_type: self.lower_type(&field.field_type),
             documentation: field.documentation.clone().map(|text| ast::Comment { text }),
             span: ast::Span::empty(),
         })
@@ -146,41 +141,11 @@ impl LowerDmlToAst {
     }
 
     /// Internal: Lowers a field's arity.
-    fn lower_type(
-        &self,
-        field_type: &dml::FieldType,
-        field: &dml::Field,
-        model: &dml::Model,
-        datamodel: &dml::Datamodel,
-    ) -> ast::Identifier {
+    fn lower_type(&self, field_type: &dml::FieldType) -> ast::Identifier {
         match field_type {
             dml::FieldType::Base(tpe) => ast::Identifier::new(&tpe.to_string()),
             dml::FieldType::Enum(tpe) => ast::Identifier::new(&tpe.to_string()),
-            dml::FieldType::Relation(rel) => {
-                let related_model = datamodel.find_model(&rel.to).expect(STATE_ERROR);
-
-                if related_model.is_generated && related_model.is_pure_relation_model() {
-                    // This is a special simplification case: We need to point to the original related field for rendering.
-                    // This hides auto-generated relation tables.
-                    let related_field = related_model
-                        .related_field(&model.name, &rel.name, &field.name)
-                        .expect(STATE_ERROR);
-                    let other_field = related_model
-                        .fields()
-                        .find(|f| f.name != related_field.name)
-                        .expect(STATE_ERROR);
-
-                    if let dml::FieldType::Relation(rel) = &other_field.field_type {
-                        ast::Identifier::new(&rel.to)
-                    } else {
-                        panic!(STATE_ERROR);
-                    }
-                } else if related_model.is_generated {
-                    panic!("Error during rendering model: We found a relation to a generated model, but we do not know how to handle it. This is an internal error.")
-                } else {
-                    ast::Identifier::new(&rel.to)
-                }
-            }
+            dml::FieldType::Relation(rel) => ast::Identifier::new(&rel.to),
             _ => unimplemented!("Connector specific types are not supported atm."),
         }
     }

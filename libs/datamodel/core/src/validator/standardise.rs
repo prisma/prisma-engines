@@ -177,6 +177,7 @@ impl Standardiser {
 
     // This is intentionally disabled for now, since the generated types would surface in the
     // client schema.
+    //todo can this die together with model.generated????
     #[allow(unused)]
     fn add_missing_relation_tables(
         &self,
