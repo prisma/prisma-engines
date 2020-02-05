@@ -94,7 +94,7 @@ impl<'a> GqlTypeRenderer<'a> {
                     ScalarType::Boolean => "Boolean",
                     ScalarType::Float => "Float",
                     ScalarType::DateTime => "DateTime",
-                    ScalarType::Json => "DateTime",
+                    ScalarType::Json => "Json",
                     ScalarType::ID => "ID",
                     ScalarType::UUID => "UUID",
                     ScalarType::JsonList => "JsonList",
