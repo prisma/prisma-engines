@@ -126,10 +126,13 @@ impl SqlSchemaDescriber {
     }
 
     async fn get_columns(&self, schema: &str, table: &str, enums: &Vec<Enum>) -> Vec<Column> {
-        let sql = "SELECT column_name, data_type, udt_name as full_data_type, column_default, is_nullable, is_identity, data_type
-            FROM information_schema.columns
-            WHERE table_schema = $1 AND table_name = $2
-            ORDER BY column_name";
+        let sql = r#"
+            SELECT column_name, data_type, udt_name as full_data_type, column_default, is_nullable, is_identity, data_type
+                FROM information_schema.columns
+                WHERE table_schema = $1 AND table_name = $2
+                ORDER BY column_name
+            COLLATE "default"
+        "#;
         let rows = self
             .conn
             .query_raw(&sql, &[schema.into(), table.into()])
