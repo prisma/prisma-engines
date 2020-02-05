@@ -94,46 +94,51 @@ pub fn connect_nested_update_many(
     value: ParsedInputValue,
     child_model: &ModelRef,
 ) -> QueryGraphBuilderResult<()> {
-    // for value in utils::coerce_vec(value) {
-    //     let mut map: ParsedInputMap = value.try_into()?;
-    //     let where_arg = map.remove("where").unwrap();
-    //     let data_value = map.remove("data").unwrap();
-    //     let data_map: ParsedInputMap = data_value.try_into()?;
-    //     let where_map: ParsedInputMap = where_arg.try_into()?;
+    let child_model_identifier = parent_relation_field.related_model().primary_identifier();
 
-    //     let filter = extract_filter(where_map, child_model, true)?;
-    //     let update_args = WriteArguments::from(&child_model, data_map)?;
+    for value in utils::coerce_vec(value) {
+        let mut map: ParsedInputMap = value.try_into()?;
+        let where_arg = map.remove("where").unwrap();
+        let data_value = map.remove("data").unwrap();
+        let data_map: ParsedInputMap = data_value.try_into()?;
+        let where_map: ParsedInputMap = where_arg.try_into()?;
 
-    //     let find_child_records_node =
-    //         utils::insert_find_children_by_parent_node(graph, parent, parent_relation_field, filter.clone())?;
+        let filter = extract_filter(where_map, child_model, true)?;
+        //        let update_args = WriteArguments::from(&child_model, data_map)?;
+        let update_args = WriteArgsParser::from(&child_model, data_map)?;
 
-    //     // TODO: this looks like some duplication from write/update.rs
-    //     let update_many = WriteQuery::UpdateManyRecords(UpdateManyRecords {
-    //         model: Arc::clone(&child_model),
-    //         filter,
-    //         args: update_args.args,
-    //     });
+        let find_child_records_node =
+            utils::insert_find_children_by_parent_node(graph, parent, parent_relation_field, filter.clone())?;
 
-    //     let update_many_node = graph.create_node(Query::Write(update_many));
-    //     let id_field = child_model.fields().id();
+        // TODO: this looks like some duplication from write/update.rs
+        let update_many = WriteQuery::UpdateManyRecords(UpdateManyRecords {
+            model: Arc::clone(&child_model),
+            filter,
+            args: update_args.args,
+        });
 
-    //     graph.create_edge(
-    //         &find_child_records_node,
-    //         &update_many_node,
-    //         QueryGraphDependency::ParentIds(Box::new(move |mut node, parent_ids| {
-    //             if let Node::Query(Query::Write(WriteQuery::UpdateManyRecords(ref mut ur))) = node {
-    //                 let ids_filter = id_field.is_in(parent_ids);
-    //                 let new_filter = Filter::and(vec![ur.filter.clone(), ids_filter]);
+        let update_many_node = graph.create_node(Query::Write(update_many));
+        let id_field = child_model.fields().find_singular_id().unwrap().upgrade().unwrap();
 
-    //                 ur.filter = new_filter;
-    //             }
+        graph.create_edge(
+            &find_child_records_node,
+            &update_many_node,
+            QueryGraphDependency::ParentIds(
+                child_model_identifier.clone(),
+                Box::new(move |mut node, parent_ids| {
+                    if let Node::Query(Query::Write(WriteQuery::UpdateManyRecords(ref mut ur))) = node {
+                        let as_prisma_values = parent_ids.iter().map(|x| x.single_value()).collect();
+                        let ids_filter = id_field.data_source_field().is_in(as_prisma_values);
+                        let new_filter = Filter::and(vec![ur.filter.clone(), ids_filter]);
 
-    //             Ok(node)
-    //         })),
-    //     )?;
-    // }
+                        ur.filter = new_filter;
+                    }
 
-    // Ok(())
+                    Ok(node)
+                }),
+            ),
+        )?;
+    }
 
-    todo!()
+    Ok(())
 }
