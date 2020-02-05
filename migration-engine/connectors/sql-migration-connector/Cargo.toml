@@ -10,7 +10,6 @@ async-trait = "0.1.17"
 barrel = { version = "0.6.5", features = ["sqlite3", "mysql", "pg"] }
 chrono = { version = "0.4" }
 datamodel = { path = "../../../libs/datamodel/core" }
-itertools = "0.8"
 migration-connector = { path = "../migration-connector" }
 prisma-models = { path = "../../../libs/prisma-models" }
 quaint = { git = "https://github.com/prisma/quaint", features = ["single"] }
