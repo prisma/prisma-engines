@@ -4,21 +4,25 @@ use proc_macro2::Span;
 use quote::quote;
 use std::str::FromStr;
 use syn::{parse_macro_input, spanned::Spanned, AttributeArgs, Ident, ItemFn};
-use test_setup::connectors::{Capabilities, Connector, CONNECTORS};
+use test_setup::connectors::{Capabilities, Connector, Tags, CONNECTORS};
 
 #[derive(Debug, FromMeta)]
 struct TestEachConnectorArgs {
-    #[darling(default)]
-    ignore: Option<String>,
-
-    #[darling(default)]
-    starts_with: Option<String>,
-
+    /// If present, setup tracing logging with the passed in configuration string.
     #[darling(default)]
     log: Option<String>,
 
+    /// If present, run only the tests for the connectors with all of the passed in capabilities.
     #[darling(default)]
     capabilities: CapabilitiesWrapper,
+
+    /// If present, run only the tests for the connectors with any of the passed in tags.
+    #[darling(default)]
+    tags: TagsWrapper,
+
+    /// Optional list of tags to ignore.
+    #[darling(default)]
+    ignore: TagsWrapper,
 }
 
 #[derive(Debug)]
@@ -55,22 +59,47 @@ impl darling::FromMeta for CapabilitiesWrapper {
     }
 }
 
+#[derive(Debug)]
+struct TagsWrapper(Tags);
+
+impl Default for TagsWrapper {
+    fn default() -> Self {
+        TagsWrapper(Tags::empty())
+    }
+}
+
+impl darling::FromMeta for TagsWrapper {
+    fn from_list(items: &[syn::NestedMeta]) -> Result<Self, darling::Error> {
+        let mut tags = Tags::empty();
+
+        for item in items {
+            match item {
+                syn::NestedMeta::Lit(syn::Lit::Str(s)) => {
+                    let s = s.value();
+                    let tag = Tags::from_str(&s)
+                        .map_err(|err| darling::Error::unknown_value(&err.to_string()).with_span(&item.span()))?;
+                    tags.insert(tag);
+                }
+                syn::NestedMeta::Lit(other) => {
+                    return Err(darling::Error::unexpected_lit_type(other).with_span(&other.span()))
+                }
+                syn::NestedMeta::Meta(meta) => {
+                    return Err(darling::Error::unsupported_shape("Expected string literal").with_span(&meta.span()))
+                }
+            }
+        }
+
+        Ok(TagsWrapper(tags))
+    }
+}
+
 impl TestEachConnectorArgs {
     fn connectors_to_test(&self) -> impl Iterator<Item = &Connector> {
-        let ignore = self.ignore.as_ref().map(String::as_str);
-        let starts_with = self.starts_with.as_ref().map(String::as_str);
-
         CONNECTORS
             .all()
-            .filter(move |connector| match ignore {
-                Some(ignore) => !connector.name().starts_with(&ignore),
-                None => true,
-            })
-            .filter(move |connector| match starts_with {
-                Some(pat) => connector.name().starts_with(pat),
-                None => true,
-            })
             .filter(move |connector| connector.capabilities.contains(self.capabilities.0))
+            .filter(move |connector| self.tags.0.is_empty() || connector.tags.intersects(self.tags.0))
+            .filter(move |connector| !connector.tags.intersects(self.ignore.0))
     }
 }
 

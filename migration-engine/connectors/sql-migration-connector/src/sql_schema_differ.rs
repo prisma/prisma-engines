@@ -29,6 +29,7 @@ pub struct SqlSchemaDiff {
     pub alter_indexes: Vec<AlterIndex>,
     pub create_enums: Vec<CreateEnum>,
     pub drop_enums: Vec<DropEnum>,
+    pub alter_enums: Vec<AlterEnum>,
 }
 
 impl SqlSchemaDiff {
@@ -77,6 +78,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
             alter_indexes,
             create_enums: self.create_enums(),
             drop_enums: self.drop_enums(),
+            alter_enums: self.alter_enums(),
         }
     }
 
@@ -252,6 +254,10 @@ impl<'schema> SqlSchemaDiffer<'schema> {
                 name: r#enum.name.clone(),
             })
             .collect()
+    }
+
+    fn alter_enums(&self) -> Vec<AlterEnum> {
+        Vec::new()
     }
 
     /// An iterator over the tables that are present in both schemas.

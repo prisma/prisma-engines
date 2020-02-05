@@ -73,7 +73,7 @@ async fn adding_an_id_field_with_a_special_name_must_work(api: &TestApi) {
     assert_eq!(column.is_some(), true);
 }
 
-#[test_each_connector(ignore = "sqlite")]
+#[test_each_connector(ignore("sqlite"))]
 async fn adding_an_id_field_of_type_int_must_work(api: &TestApi) {
     let dm2 = r#"
         model Test {
@@ -88,7 +88,7 @@ async fn adding_an_id_field_of_type_int_must_work(api: &TestApi) {
     assert_eq!(column.auto_increment, false);
 }
 
-#[test_each_connector(starts_with = "sqlite")]
+#[test_each_connector(tags("sqlite"))]
 async fn adding_an_id_field_of_type_int_must_work_for_sqlite(api: &TestApi) {
     let dm2 = r#"
         model Test {
@@ -1556,7 +1556,7 @@ async fn created_at_does_not_get_arbitrarily_migrated(api: &TestApi) -> TestResu
     Ok(())
 }
 
-#[test_each_connector(starts_with = "sqlite")]
+#[test_each_connector(tags("sqlite"))]
 async fn renaming_a_datasource_works(api: &TestApi) -> TestResult {
     let dm1 = r#"
         datasource db1 {

@@ -69,21 +69,31 @@ pub struct InferApplyAssertion<'a> {
 
 impl<'a> InferApplyAssertion<'a> {
     pub fn assert_green(self) -> AssertionResult<Self> {
-        assert!(self.result.warnings.is_empty());
-        assert!(self.result.general_errors.is_empty());
-        assert!(self.result.unexecutable_migrations.is_empty());
-
-        Ok(self)
+        self.assert_no_warning()?.assert_no_error()?.assert_executable()
     }
 
     pub fn assert_no_warning(self) -> AssertionResult<Self> {
-        assert!(self.result.warnings.is_empty());
+        anyhow::ensure!(
+            self.result.warnings.is_empty(),
+            "Assertion failed. Expected no warning, got {:?}",
+            self.result.warnings
+        );
 
         Ok(self)
     }
 
     pub fn assert_no_error(self) -> AssertionResult<Self> {
         assert!(self.result.general_errors.is_empty());
+
+        Ok(self)
+    }
+
+    pub fn assert_no_steps(self) -> AssertionResult<Self> {
+        anyhow::ensure!(
+            self.result.datamodel_steps.is_empty(),
+            "Assertion failed. Datamodel migration steps should be empty, but found {:?}",
+            self.result.datamodel_steps
+        );
 
         Ok(self)
     }

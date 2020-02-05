@@ -48,6 +48,7 @@ pub enum SqlMigrationStep {
     AlterIndex(AlterIndex),
     CreateEnum(CreateEnum),
     DropEnum(DropEnum),
+    AlterEnum(AlterEnum),
 }
 
 /// A helper struct to serialize an [SqlMigrationStep](/sql-migration/enum.SqlMigrationStep.html)
@@ -145,4 +146,11 @@ pub struct CreateEnum {
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct DropEnum {
     pub name: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
+pub struct AlterEnum {
+    pub name: String,
+    pub created_variants: Vec<String>,
+    pub dropped_variants: Vec<String>,
 }

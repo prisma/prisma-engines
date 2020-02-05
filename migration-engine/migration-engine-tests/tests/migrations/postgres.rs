@@ -1,7 +1,7 @@
 use migration_engine_tests::*;
 use sql_schema_describer::{ColumnArity, ColumnTypeFamily};
 
-#[test_each_connector(starts_with = "postgres")]
+#[test_each_connector(tags("postgres"))]
 async fn enums_can_be_dropped_on_postgres(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Cat {
