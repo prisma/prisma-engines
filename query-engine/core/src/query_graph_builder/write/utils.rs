@@ -114,7 +114,7 @@ where
 
     let selected_fields: SelectedFields = parent_relation_field.related_model().primary_identifier().into();
 
-    let read_parent_node = graph.create_node(Query::Read(ReadQuery::RelatedRecordsQuery(RelatedRecordsQuery {
+    let read_children_node = graph.create_node(Query::Read(ReadQuery::RelatedRecordsQuery(RelatedRecordsQuery {
         name: "find_children_by_parent".to_owned(),
         alias: None,
         parent_field: Arc::clone(parent_relation_field),
@@ -127,13 +127,12 @@ where
 
     graph.create_edge(
         parent_node,
-        &read_parent_node,
+        &read_children_node,
         QueryGraphDependency::ParentIds(
             parent_model_identifier,
             Box::new(|mut node, parent_ids| {
                 if let Node::Query(Query::Read(ReadQuery::RelatedRecordsQuery(ref mut rq))) = node {
-                    // We know that all PrismaValues in `parent_ids` are transformable into GraphqlIds.
-                    rq.relation_parent_ids = Some(parent_ids.into_iter().map(|id| id.try_into().unwrap()).collect());
+                    rq.relation_parent_ids = Some(parent_ids);
                 };
 
                 Ok(node)
@@ -141,7 +140,7 @@ where
         ),
     )?;
 
-    Ok(read_parent_node)
+    Ok(read_children_node)
 }
 
 /// Creates an update many records query node and adds it to the query graph.
@@ -309,49 +308,52 @@ pub fn insert_deletion_checks(
     parent_node: &NodeRef,
     child_node: &NodeRef,
 ) -> QueryGraphBuilderResult<()> {
-    // let internal_model = model.internal_data_model();
-    // let relation_fields = internal_model.fields_requiring_model(model);
-    // let mut check_nodes = vec![];
+    let internal_model = model.internal_data_model();
+    let relation_fields = internal_model.fields_requiring_model(model);
+    let mut check_nodes = vec![];
 
-    // if relation_fields.len() > 0 {
-    //     let noop_node = graph.create_node(Node::Empty);
+    if relation_fields.len() > 0 {
+        let noop_node = graph.create_node(Node::Empty);
 
-    //     // We know that the relation can't be a list and must be required on the related model for `model` (see fields_requiring_model).
-    //     // For all requiring models (RM), we use the field on `model` to query for existing RM records and error out if at least one exists.
-    //     for rf in relation_fields {
-    //         let relation_field = rf.related_field();
-    //         let read_node = insert_find_children_by_parent_node(graph, parent_node, &relation_field, Filter::empty())?;
+        // We know that the relation can't be a list and must be required on the related model for `model` (see fields_requiring_model).
+        // For all requiring models (RM), we use the field on `model` to query for existing RM records and error out if at least one exists.
+        for rf in relation_fields {
+            let relation_field = rf.related_field();
+            let child_model_identifier = relation_field.related_model().primary_identifier();
+            let read_node = insert_find_children_by_parent_node(graph, parent_node, &relation_field, Filter::empty())?;
 
-    //         graph.create_edge(
-    //             &read_node,
-    //             &noop_node,
-    //             QueryGraphDependency::ParentIds(Box::new(move |node, parent_ids| {
-    //                 if !parent_ids.is_empty() {
-    //                     return Err(QueryGraphBuilderError::RelationViolation((relation_field).into()));
-    //                 }
+            graph.create_edge(
+                &read_node,
+                &noop_node,
+                QueryGraphDependency::ParentIds(
+                    child_model_identifier,
+                    Box::new(move |node, parent_ids| {
+                        if !parent_ids.is_empty() {
+                            return Err(QueryGraphBuilderError::RelationViolation((relation_field).into()));
+                        }
 
-    //                 Ok(node)
-    //             })),
-    //         )?;
+                        Ok(node)
+                    }),
+                ),
+            )?;
 
-    //         check_nodes.push(read_node);
-    //     }
+            check_nodes.push(read_node);
+        }
 
-    //     // Connects all `Find Connected Model` nodes with execution order dependency from the example in the docs.
-    //     check_nodes.into_iter().fold1(|prev, next| {
-    //         graph
-    //             .create_edge(&prev, &next, QueryGraphDependency::ExecutionOrder)
-    //             .unwrap();
+        // Connects all `Find Connected Model` nodes with execution order dependency from the example in the docs.
+        check_nodes.into_iter().fold1(|prev, next| {
+            graph
+                .create_edge(&prev, &next, QueryGraphDependency::ExecutionOrder)
+                .unwrap();
 
-    //         next
-    //     });
+            next
+        });
 
-    //     // Edge from empty node to the child (delete).
-    //     graph.create_edge(&noop_node, child_node, QueryGraphDependency::ExecutionOrder)?;
-    // }
+        // Edge from empty node to the child (delete).
+        graph.create_edge(&noop_node, child_node, QueryGraphDependency::ExecutionOrder)?;
+    }
 
-    // Ok(())
-    todo!()
+    Ok(())
 }
 
 /// Checks if the parent node returns the set of fields required to satisfy the relation .
