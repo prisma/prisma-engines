@@ -83,11 +83,6 @@ impl<'a> Validator<'a> {
     }
 
     fn validate_model_has_id(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), DatamodelError> {
-        if model.is_relation_model() {
-            return Ok(());
-            // Extempt from the id rule, we have an relation table.
-        }
-
         let multiple_single_field_id_error = Err(DatamodelError::new_model_validation_error(
             "At most one field must be marked as the id field with the `@id` directive.",
             &model.name,
