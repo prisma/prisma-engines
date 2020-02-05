@@ -1,6 +1,8 @@
 package util
 
 import play.api.libs.json._
+
+import scala.sys.process.Process
 case class TestServer() extends PlayJsonExtensions {
   def query(
       query: String,
@@ -8,10 +10,21 @@ case class TestServer() extends PlayJsonExtensions {
       dataContains: String = "",
   ): JsValue = {
     val result = queryBinaryCLI(
-      query = query,
+      request = createSingleQuery(query),
       project = project,
     )
     result.assertSuccessfulResponse(dataContains)
+    result
+  }
+
+  def batch(
+     queries: Array[String],
+     project: Project,
+  ): JsValue = {
+    val result = queryBinaryCLI(
+      request = createMultiQuery(queries),
+      project = project,
+    )
     result
   }
 
@@ -24,7 +37,7 @@ case class TestServer() extends PlayJsonExtensions {
   ): JsValue = {
     val result =
       queryBinaryCLI(
-        query = query,
+        request = createSingleQuery(query),
         project = project,
       )
 
@@ -33,12 +46,18 @@ case class TestServer() extends PlayJsonExtensions {
     result
   }
 
-  def queryBinaryCLI(query: String, project: Project) = {
-    import sys.process._
-
+  def createSingleQuery(query: String): JsValue = {
     val formattedQuery = query.stripMargin.replace("\n", "")
-    println(formattedQuery)
-    val encoded_query = UTF8Base64.encode(formattedQuery)
+    Json.obj("query" -> formattedQuery, "variables" -> Json.obj())
+  }
+
+  def createMultiQuery(queries: Array[String]): JsValue = {
+    Json.obj("batch" -> queries.map(createSingleQuery))
+  }
+
+  def queryBinaryCLI(request: JsValue, project: Project) = {
+    val encoded_query = UTF8Base64.encode(Json.stringify(request))
+
     val response = project.isPgBouncer match {
       case true =>
         Process(Seq(EnvVars.prismaBinaryPath, "--enable_raw_queries", "--always_force_transactions", "cli", "--execute_request", encoded_query),

@@ -13,7 +13,7 @@ use tracing_subscriber::{EnvFilter, FmtSubscriber};
 use cli::*;
 use error::*;
 use lazy_static::lazy_static;
-use request_handlers::{PrismaRequest, RequestHandler};
+use request_handlers::{PrismaRequest, PrismaResponse, RequestHandler};
 use server::HttpServer;
 
 mod cli;
@@ -112,7 +112,7 @@ async fn main() -> Result<(), AnyError> {
 
     match CliCommand::try_from(&opts) {
         Ok(cmd) => {
-            if let Err(err) = cmd.execute() {
+            if let Err(err) = cmd.execute().await {
                 info!("Encountered error during initialization:");
                 err.render_as_json().expect("error rendering");
                 process::exit(1);
