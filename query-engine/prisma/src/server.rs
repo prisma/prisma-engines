@@ -20,8 +20,14 @@ use std::{sync::Arc, time::Instant};
 struct StaticFiles;
 
 pub(crate) struct RequestContext {
-    context: PrismaContext,
+    context: Arc<PrismaContext>,
     graphql_request_handler: GraphQlRequestHandler,
+}
+
+impl RequestContext {
+    pub(crate) fn context(&self) -> &Arc<PrismaContext> {
+        &self.context
+    }
 }
 
 pub struct HttpServerBuilder {
@@ -73,7 +79,7 @@ impl HttpServer {
         let now = Instant::now();
 
         let ctx = Arc::new(RequestContext {
-            context,
+            context: Arc::new(context),
             graphql_request_handler: GraphQlRequestHandler,
         });
 
@@ -145,7 +151,7 @@ impl HttpServer {
     }
 
     async fn http_handler(req: PrismaRequest<GraphQlBody>, cx: Arc<RequestContext>) -> Response<Body> {
-        let result = cx.graphql_request_handler.handle(req, &cx.context).await;
+        let result = cx.graphql_request_handler.handle(req, cx.context()).await;
         let bytes = serde_json::to_vec(&result).unwrap();
 
         Response::builder()

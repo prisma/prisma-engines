@@ -1,18 +1,17 @@
 use std::{convert::TryFrom, fs::File, io::Read, sync::Arc};
 
-use graphql_parser as gql;
 use serde::Deserialize;
 
 use datamodel::json::dmmf::Datamodel;
 use query_core::{
-    response_ir,
     schema::{QuerySchemaRef, SupportedCapabilities},
-    BuildMode, CoreError, QuerySchemaBuilder, Responses,
+    BuildMode, QuerySchemaBuilder,
 };
+use std::collections::HashMap;
 
 use crate::context::PrismaContext;
 use crate::error::PrismaError;
-use crate::request_handlers::graphql::*;
+use crate::request_handlers::{graphql::*, PrismaRequest, RequestHandler};
 use crate::{
     data_model_loader::{load_configuration, load_data_model_components},
     dmmf, PrismaResult,
@@ -87,12 +86,12 @@ impl TryFrom<&PrismaOpt> for CliCommand {
 }
 
 impl CliCommand {
-    pub fn execute(self) -> PrismaResult<()> {
+    pub async fn execute(self) -> PrismaResult<()> {
         match self {
             CliCommand::Dmmf(request) => Self::dmmf(request),
             CliCommand::DmmfToDml(input) => Self::dmmf_to_dml(input),
             CliCommand::GetConfig(input) => Self::get_config(input),
-            CliCommand::ExecuteRequest(request) => Self::execute_request(request),
+            CliCommand::ExecuteRequest(request) => Self::execute_request(request).await,
         }
     }
 
@@ -140,65 +139,29 @@ impl CliCommand {
         Ok(())
     }
 
-    fn execute_request(request: ExecuteRequest) -> PrismaResult<()> {
-        use futures::executor::block_on;
-        use futures::FutureExt;
-        use std::panic::AssertUnwindSafe;
-        use user_facing_errors::Error;
-
+    async fn execute_request(request: ExecuteRequest) -> PrismaResult<()> {
         let decoded = base64::decode(&request.query)?;
         let decoded_request = String::from_utf8(decoded)?;
 
-        let cmd =
-            CliCommand::handle_gql_request(decoded_request, request.force_transactions, request.enable_raw_queries);
+        let ctx = PrismaContext::builder()
+            .legacy(true)
+            .force_transactions(request.force_transactions)
+            .enable_raw_queries(request.enable_raw_queries)
+            .build()
+            .await?;
 
-        let response = match block_on(AssertUnwindSafe(cmd).catch_unwind()) {
-            Ok(Ok(responses)) => responses,
-            Ok(Err(err)) => {
-                let mut responses = response_ir::Responses::default();
-                responses.insert_error(err);
-                responses
-            }
-            // panicked
-            Err(err) => {
-                let mut responses = response_ir::Responses::default();
-                let error = Error::from_panic_payload(&err);
-
-                responses.insert_error(error);
-                responses
-            }
+        let req = PrismaRequest {
+            body: serde_json::from_str(&decoded_request).unwrap(),
+            headers: HashMap::new(),
+            path: String::new(),
         };
 
+        let response = GraphQlRequestHandler.handle(req, &Arc::new(ctx)).await;
         let response = serde_json::to_string(&response).unwrap();
 
         let encoded_response = base64::encode(&response);
         print!("{}", encoded_response);
 
         Ok(())
-    }
-
-    async fn handle_gql_request(
-        input: String,
-        force_transactions: bool,
-        enable_raw_queries: bool,
-    ) -> Result<Responses, PrismaError> {
-        let ctx = PrismaContext::builder()
-            .legacy(true)
-            .force_transactions(force_transactions)
-            .enable_raw_queries(enable_raw_queries)
-            .build()
-            .await?;
-
-        let gql_doc = gql::parse_query(&input)?;
-        let query_doc = GraphQLProtocolAdapter::convert(gql_doc, None)?;
-
-        ctx.executor
-            .execute(query_doc, Arc::clone(ctx.query_schema()))
-            .await
-            .map_err(|err| {
-                debug!("{}", err);
-                let ce: CoreError = err.into();
-                ce.into()
-            })
     }
 }
