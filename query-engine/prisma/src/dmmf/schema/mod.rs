@@ -14,7 +14,7 @@ use query_core::schema::*;
 use schema_renderer::*;
 use std::{
     cell::RefCell,
-    collections::HashMap,
+    collections::HashSet,
     sync::{Arc, Weak},
 };
 use type_renderer::*;
@@ -26,7 +26,7 @@ pub struct DMMFQuerySchemaRenderer;
 impl QuerySchemaRenderer<(DMMFSchema, Vec<DMMFMapping>)> for DMMFQuerySchemaRenderer {
     fn render(query_schema: QuerySchemaRef) -> (DMMFSchema, Vec<DMMFMapping>) {
         let ctx = RenderContext::new();
-        let (_, ctx) = query_schema.into_renderer().render(ctx);
+        query_schema.into_renderer().render(&ctx);
 
         ctx.finalize()
     }
@@ -41,7 +41,7 @@ pub struct RenderContext {
 
     /// Prevents double rendering of elements that are referenced multiple times.
     /// Names of input / output types / enums / models are globally unique.
-    rendered: RefCell<HashMap<String, ()>>,
+    rendered: RefCell<HashSet<String>>,
 }
 
 impl RenderContext {
@@ -49,7 +49,7 @@ impl RenderContext {
         RenderContext {
             schema: RefCell::new(DMMFSchema::new()),
             mappings: RefCell::new(vec![]),
-            rendered: RefCell::new(HashMap::new()),
+            rendered: RefCell::new(HashSet::new()),
         }
     }
 
@@ -64,11 +64,11 @@ impl RenderContext {
     }
 
     pub fn already_rendered(&self, cache_key: &str) -> bool {
-        self.rendered.borrow().contains_key(cache_key)
+        self.rendered.borrow().contains(cache_key)
     }
 
     pub fn mark_as_rendered(&self, cache_key: String) {
-        self.rendered.borrow_mut().insert(cache_key, ());
+        self.rendered.borrow_mut().insert(cache_key);
     }
 
     pub fn add_enum(&self, name: String, dmmf_enum: DMMFEnum) {
@@ -109,7 +109,7 @@ impl RenderContext {
 }
 
 pub trait Renderer<'a, T> {
-    fn render(&self, ctx: RenderContext) -> (T, RenderContext);
+    fn render(&self, ctx: &RenderContext) -> T;
 }
 
 trait IntoRenderer<'a, T> {
