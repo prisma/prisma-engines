@@ -296,8 +296,19 @@ impl Record {
                 model: String::new(),
             })
         })?;
-
-        Ok(&self.values[index])
+        match self.values.get(index) {
+            Some(v) => Ok(v),
+            None => {
+                //panic!("boom")
+                Err(DomainError::FieldNotFound {
+                    name: field.to_owned(),
+                    model: format!(
+                        "Field not found in record {:?}. Field names were: {:?}",
+                        &self, &field_names
+                    ),
+                })
+            }
+        }
     }
 
     pub fn set_parent_id(&mut self, parent_id: RecordIdentifier) {

@@ -65,7 +65,7 @@ fn read_many<'a, 'b>(
 ) -> BoxFuture<'a, InterpretationResult<QueryResult>> {
     let fut = async move {
         let scalars = tx
-            .get_many_records(&query.model, query.args.clone(), &query.selected_fields)
+            .get_many_records(&query.model, query.args.clone(), &query.selected_fields.only_scalar_and_inlined())
             .await?;
 
         let model_id = query.model.primary_identifier();
