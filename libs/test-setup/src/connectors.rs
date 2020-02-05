@@ -1,19 +1,23 @@
 mod capabilities;
+mod tags;
 
 pub use capabilities::*;
+pub use tags::*;
 
 use once_cell::sync::Lazy;
 
-const CONNECTOR_NAMES: &[&'static str] = &[
-    "mysql_8",
-    "mysql",
-    "postgres9",
-    "postgres",
-    "postgres11",
-    "postgres12",
-    "mysql_mariadb",
-    "sqlite",
-];
+fn connector_names() -> Vec<(&'static str, Tags)> {
+    vec![
+        ("mysql_8", Tags::MYSQL),
+        ("mysql", Tags::MYSQL),
+        ("postgres9", Tags::POSTGRES),
+        ("postgres", Tags::POSTGRES),
+        ("postgres11", Tags::POSTGRES),
+        ("postgres12", Tags::POSTGRES),
+        ("mysql_mariadb", Tags::MYSQL | Tags::MARIADB),
+        ("sqlite", Tags::SQLITE),
+    ]
+}
 
 fn postgres_capabilities() -> Capabilities {
     Capabilities::SCALAR_LISTS | Capabilities::ENUMS
@@ -23,25 +27,28 @@ fn mysql_capabilities() -> Capabilities {
     Capabilities::ENUMS
 }
 
+fn infer_capabilities(tags: Tags) -> Capabilities {
+    if tags.intersects(Tags::POSTGRES) {
+        return postgres_capabilities();
+    }
+
+    if tags.intersects(Tags::MYSQL) {
+        return mysql_capabilities();
+    }
+
+    Capabilities::empty()
+}
+
 pub static CONNECTORS: Lazy<Connectors> = Lazy::new(|| {
-    let mut connectors: Vec<Connector> = CONNECTOR_NAMES
+    let connectors: Vec<Connector> = connector_names()
         .iter()
-        .map(|name| Connector {
+        .map(|(name, tags)| Connector {
             name: (*name).to_owned(),
             test_api_factory_name: format!("{}_test_api", name),
-            capabilities: Capabilities::empty(),
+            capabilities: infer_capabilities(*tags),
+            tags: *tags,
         })
         .collect();
-
-    connectors
-        .iter_mut()
-        .filter(|connector| connector.name.starts_with("postgres"))
-        .for_each(|connector| connector.capabilities.insert(postgres_capabilities()));
-
-    connectors
-        .iter_mut()
-        .filter(|connector| connector.name.starts_with("mysql"))
-        .for_each(|connector| connector.capabilities.insert(mysql_capabilities()));
 
     Connectors::new(connectors)
 });
@@ -69,6 +76,7 @@ pub struct Connector {
     name: String,
     test_api_factory_name: String,
     pub capabilities: Capabilities,
+    pub tags: Tags,
 }
 
 impl Connector {

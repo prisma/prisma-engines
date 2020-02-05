@@ -3,7 +3,7 @@ use migration_engine_tests::sql::*;
 /// We need to test this specifically for mysql, because foreign keys are indexes, and they are
 /// inferred as both foreign key and index by the sql-schema-describer. We do not want to
 /// create/delete a second index.
-#[test_each_connector(starts_with = "mysql")]
+#[test_each_connector(tags("mysql"))]
 async fn indexes_on_foreign_key_fields_are_not_created_twice(api: &TestApi) -> TestResult {
     let schema = r#"
         model Human {
@@ -46,7 +46,7 @@ async fn indexes_on_foreign_key_fields_are_not_created_twice(api: &TestApi) -> T
 }
 
 // We have to test this because one enum on MySQL can map to multiple enums in the database.
-#[test_each_connector(starts_with = "mysql")]
+#[test_each_connector(tags("mysql"))]
 async fn enum_creation_is_idempotent(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Cat {

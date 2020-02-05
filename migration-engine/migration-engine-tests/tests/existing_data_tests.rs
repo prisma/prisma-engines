@@ -685,7 +685,7 @@ async fn altering_the_type_of_a_column_in_a_non_empty_table_always_warns(api: &T
         .map(drop)
 }
 
-#[test_each_connector(ignore = "mysql")]
+#[test_each_connector(ignore("mysql"))]
 async fn migrating_a_required_column_from_int_to_string_should_warn_and_cast(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Test {
