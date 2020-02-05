@@ -373,6 +373,57 @@ async fn introspecting_a_many_to_many_relation_with_extra_fields_should_work(api
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
+
+#[test_one_connector(connector = "mysql")]
+async fn introspecting_a_many_to_many_relation_with_an_id_should_work(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute_with_schema(
+            |migration| {
+                migration.create_table("User", |t| {
+                    t.add_column("id", types::primary());
+                });
+                migration.create_table("Post", |t| {
+                    t.add_column("id", types::primary());
+                });
+                migration.create_table("PostsToUsers", |t| {
+                    t.inject_custom(
+                        "id INTEGER PRIMARY KEY,
+                     user_id INTEGER NOT NULL,
+                     post_id INTEGER NOT NULL,
+                     FOREIGN KEY (`user_id`) REFERENCES  `User`(`id`),
+                     FOREIGN KEY (`post_id`) REFERENCES  `Post`(`id`)",
+                    )
+                });
+            },
+            api.db_name(),
+        )
+        .await;
+
+    let dm = r#"
+            model Post {
+               id      Int @id @default(autoincrement())
+               postsToUserses PostsToUsers[] @relation(references: [post_id])
+            }
+            
+            model PostsToUsers {
+              id      Int @id 
+              post_id Post 
+              user_id User
+              
+              @@index([post_id], name: "post_id")  
+              @@index([user_id], name: "user_id")
+            }
+            
+            model User {
+               id      Int @id @default(autoincrement())
+               postsToUserses PostsToUsers[] 
+            }
+        "#;
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}
+
 #[test_one_connector(connector = "mysql")]
 async fn introspecting_a_self_relation_should_work(api: &TestApi) {
     let barrel = api.barrel();
