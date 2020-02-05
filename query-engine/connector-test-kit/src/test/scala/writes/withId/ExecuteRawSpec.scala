@@ -26,7 +26,7 @@ class ExecuteRawSpec extends WordSpecLike with Matchers with ApiSpecBase {
   lazy val idField     = field("id")
   lazy val titleField  = field("title")
 
-  val project = SchemaDsl.fromStringV11() {
+  val project = ProjectDsl.fromString {
     """
       |model Todo {
       |  id String @id @default(cuid())
@@ -68,9 +68,9 @@ class ExecuteRawSpec extends WordSpecLike with Matchers with ApiSpecBase {
     database.setup(project)
   }
 
-  "the simplest query Select 1 should work" in {
-    executeRaw(sql.deleteFrom(modelTable))
+  override def beforeEach(): Unit = database.truncateProjectTables(project)
 
+  "the simplest query Select 1 should work" in {
     val result = server.query(
       """mutation {
         |  executeRaw(
@@ -86,8 +86,6 @@ class ExecuteRawSpec extends WordSpecLike with Matchers with ApiSpecBase {
   }
 
   "parameterized queries should work" in {
-    executeRaw(sql.deleteFrom(modelTable))
-
     val query = if (isPostgres) {
       """mutation {
         |  executeRaw(
@@ -111,8 +109,6 @@ class ExecuteRawSpec extends WordSpecLike with Matchers with ApiSpecBase {
   }
 
   "querying model tables should work" in {
-    executeRaw(sql.deleteFrom(modelTable))
-
     val res = server.query(
       s"""mutation {
         |   createTodo(data: { title: "title1" }) { id }
@@ -127,8 +123,6 @@ class ExecuteRawSpec extends WordSpecLike with Matchers with ApiSpecBase {
   }
 
   "inserting into a model table should work" in {
-    executeRaw(sql.deleteFrom(modelTable))
-
     val query = sql
       .insertInto(modelTable)
       .columns(idField, titleField)
@@ -144,8 +138,6 @@ class ExecuteRawSpec extends WordSpecLike with Matchers with ApiSpecBase {
   }
 
   "querying model tables with alias should work" in {
-    executeRaw(sql.deleteFrom(modelTable))
-
     server.query(
       s"""mutation {
          |   createTodo(data: { title: "title1" }) { id }
@@ -159,8 +151,6 @@ class ExecuteRawSpec extends WordSpecLike with Matchers with ApiSpecBase {
   }
 
   "querying the same column name twice but aliasing it should work" in {
-    executeRaw(sql.deleteFrom(modelTable))
-
     server.query(
       s"""mutation {
          |   createTodo(data: { title: "title1" }) { id }
@@ -176,8 +166,6 @@ class ExecuteRawSpec extends WordSpecLike with Matchers with ApiSpecBase {
   }
 
   "postgres arrays should work" in {
-    executeRaw(sql.deleteFrom(modelTable))
-
     if (isPostgres) {
       val query =
         """
@@ -208,8 +196,6 @@ class ExecuteRawSpec extends WordSpecLike with Matchers with ApiSpecBase {
   }
 
   "syntactic errors should bubble through to the user" in {
-    executeRaw(sql.deleteFrom(modelTable))
-
     val (errorCode, errorContains) = () match {
       case _ if isPostgres => (0, "error at end of input")
       case _ if isMySQL    => (1064, "check the manual that corresponds to your MySQL server version for the right syntax to use near")
@@ -230,8 +216,6 @@ class ExecuteRawSpec extends WordSpecLike with Matchers with ApiSpecBase {
   }
 
   "other errors should also bubble through to the user" in {
-    executeRaw(sql.deleteFrom(modelTable))
-
     val res = server.query(
       s"""mutation {
          |   createTodo(data: { title: "title1" }) { id }
