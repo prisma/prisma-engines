@@ -4,6 +4,7 @@ use datamodel::{
     ScalarValue, ValueGenerator,
 };
 use log::debug;
+use once_cell::sync::Lazy;
 use regex::Regex;
 use sql_schema_describer::{Column, ColumnArity, ColumnTypeFamily, ForeignKey, Index, IndexType, SqlSchema, Table};
 
@@ -370,10 +371,11 @@ pub fn deduplicate_names_of_fields_to_be_added(fields_to_be_added: &mut Vec<(Str
     });
 }
 
+static RE_NUM: Lazy<Regex> = Lazy::new(|| Regex::new(r"^'?(\d+)'?$").expect("compile regex"));
+
 fn parse_int(value: &str) -> Option<i32> {
     debug!("Parsing int '{}'", value);
-    let re_num = Regex::new(r"^'?(\d+)'?$").expect("compile regex");
-    let rslt = re_num.captures(value);
+    let rslt = RE_NUM.captures(value);
     if rslt.is_none() {
         debug!("Couldn't parse int");
         return None;
@@ -396,10 +398,11 @@ fn parse_bool(value: &str) -> Option<bool> {
     value.to_lowercase().parse().ok()
 }
 
+static RE_FLOAT: Lazy<Regex> = Lazy::new(|| Regex::new(r"^'?([^']+)'?$").expect("compile regex"));
+
 fn parse_float(value: &str) -> Option<f32> {
     debug!("Parsing float '{}'", value);
-    let re_num = Regex::new(r"^'?([^']+)'?$").expect("compile regex");
-    let rslt = re_num.captures(value);
+    let rslt = RE_FLOAT.captures(value);
     if rslt.is_none() {
         debug!("Couldn't parse float");
         return None;

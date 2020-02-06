@@ -1,4 +1,5 @@
 use datamodel::{Datamodel, FieldType};
+use once_cell::sync::Lazy;
 use regex::Regex;
 use std::collections::HashMap;
 
@@ -72,14 +73,16 @@ pub fn sanitize_datamodel_names(datamodel: &mut Datamodel) {
     }
 }
 
+static RE_START: Lazy<Regex> = Lazy::new(|| Regex::new("^[^a-zA-Z]+").unwrap());
+
+static RE: Lazy<Regex> = Lazy::new(|| Regex::new("[^_a-zA-Z0-9]").unwrap());
+
 fn sanitize_name(name: String) -> (String, Option<String>) {
-    let re_start = Regex::new("^[^a-zA-Z]+").unwrap();
-    let re = Regex::new("[^_a-zA-Z0-9]").unwrap();
-    let needs_sanitation = re_start.is_match(name.as_str()) || re.is_match(name.as_str());
+    let needs_sanitation = RE_START.is_match(name.as_str()) || RE.is_match(name.as_str());
 
     if needs_sanitation {
-        let start_cleaned: String = re_start.replace_all(name.as_str(), "").parse().unwrap();
-        (re.replace_all(start_cleaned.as_str(), "_").parse().unwrap(), Some(name))
+        let start_cleaned: String = RE_START.replace_all(name.as_str(), "").parse().unwrap();
+        (RE.replace_all(start_cleaned.as_str(), "_").parse().unwrap(), Some(name))
     } else {
         (name, None)
     }
