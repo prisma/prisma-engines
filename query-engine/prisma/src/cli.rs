@@ -150,7 +150,7 @@ impl CliCommand {
         let response = serde_json::to_string(&response).unwrap();
 
         let encoded_response = base64::encode(&response);
-        println!("{}", encoded_response);
+        println!("Response: {}", encoded_response); // reason for prefix is explained in TestServer.scala
 
         Ok(())
     }

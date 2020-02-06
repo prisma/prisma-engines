@@ -48,18 +48,18 @@ case class TestServer() extends PlayJsonExtensions {
                 "PRISMA_DML" -> project.pgBouncerEnvVar).!!
       case false => Process(Seq(EnvVars.prismaBinaryPath, "cli", "--execute_request", encoded_query), None, "PRISMA_DML" -> project.envVar).!!
     }
-    val lines           = response.linesIterator.toVector
-    val normalLogOutput = lines.init
-    val lastLine        = lines.last
-    Try(UTF8Base64.decode(lastLine)) match {
+    val lines          = response.linesIterator.toVector
+    val responseMarker = "Response: " // due to race conditions the response can not always be found in the last line
+    val responseLine   = lines.find(_.startsWith(responseMarker)).get.stripPrefix(responseMarker).stripSuffix("\n")
+
+    println(response)
+    Try(UTF8Base64.decode(responseLine)) match {
       case Success(decodedResponse) =>
-        println(normalLogOutput.mkString("\n"))
         println(decodedResponse)
         Json.parse(decodedResponse)
 
       case Failure(e) =>
-        println(lines.mkString("\n"))
-        println(s"Error while decoding this line: \n$lastLine")
+        println(s"Error while decoding this line: \n$responseLine")
         throw e
     }
 
