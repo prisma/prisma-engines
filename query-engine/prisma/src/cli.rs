@@ -150,7 +150,7 @@ impl CliCommand {
         let response = serde_json::to_string(&response).unwrap();
 
         let encoded_response = base64::encode(&response);
-        print!("{}", encoded_response);
+        println!("{}", encoded_response);
 
         Ok(())
     }
