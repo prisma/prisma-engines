@@ -5,7 +5,7 @@ use crate::{
 };
 use connector::{Filter, QueryArguments, ScalarCompare, WriteArgs};
 use itertools::Itertools;
-use prisma_models::{ModelIdentifier, ModelRef, RecordIdentifier, RelationFieldRef, SelectedFields};
+use prisma_models::{ModelIdentifier, ModelRef, PrismaValue, RecordIdentifier, RelationFieldRef, SelectedFields};
 use std::{convert::TryInto, sync::Arc};
 
 pub trait IdFilter {
@@ -206,6 +206,7 @@ pub fn insert_existing_1to1_related_model_checks(
     let child_model_identifier = parent_relation_field.related_model().primary_identifier();
 
     let child_model = parent_relation_field.related_model();
+    let child_id_field = child_model.fields().find_singular_id().unwrap().upgrade().unwrap();
     let child_side_required = parent_relation_field.related_field().is_required;
     let relation_inlined_parent = parent_relation_field.relation_is_inlined_in_parent();
     let rf = Arc::clone(&parent_relation_field);
@@ -242,6 +243,8 @@ pub fn insert_existing_1to1_related_model_checks(
         ),
     )?;
 
+    let relation_field_name = parent_relation_field.related_field().name.clone();
+
     graph.create_edge(&if_node, &update_existing_child, QueryGraphDependency::Then)?;
     graph.create_edge(&read_existing_children, &update_existing_child, QueryGraphDependency::ParentIds(child_model_identifier.clone(), Box::new(move |mut child_node, mut child_ids| {
              // This has to succeed or the if-then node wouldn't trigger.
@@ -251,9 +254,11 @@ pub fn insert_existing_1to1_related_model_checks(
              }?;
 
              if let Node::Query(Query::Write(ref mut wq)) = child_node {
-//                 wq.add_filter(child_id.filter());
-//                 wq.inject_field_arg(relation_field.into(), vec![]);
-                 wq.inject_id(child_id);
+////                 wq.add_filter(child_id.filter());
+//////                 wq.inject_field_arg(relation_field.into(), vec![]);
+////                 wq.inject_id(child_id);
+                 wq.add_filter(child_id_field.data_source_field().equals(child_id.single_value()));
+                 wq.inject_field_arg(relation_field_name, PrismaValue::Null);
              }
 
              Ok(child_node)
