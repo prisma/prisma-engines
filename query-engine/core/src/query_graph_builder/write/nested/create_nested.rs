@@ -390,7 +390,12 @@ fn handle_one_to_one(
     // For explanation see doc comment.
     if relation_inlined_parent && !parent_is_create {
         let parent_model = parent_relation_field.model();
-        let parent_model_id = parent_model.fields().find_singular_id().expect("No id field found");
+        let parent_model_id = parent_model
+            .fields()
+            .find_singular_id()
+            .expect("No id field found")
+            .upgrade()
+            .unwrap();
         let update_node = utils::update_records_node_placeholder(graph, Filter::empty(), parent_model);
 
         graph.create_edge(
@@ -403,7 +408,8 @@ fn handle_one_to_one(
                  }?;
 
                  if let Node::Query(Query::Write(ref mut wq)) = child_node {
-                     wq.inject_id_into_args(parent_id);
+//                     wq.inject_id_into_args(parent_id);
+                     wq.inject_field_arg(relation_field_name, parent_id.single_value());
                  }
 
                  Ok(child_node)
@@ -420,8 +426,8 @@ fn handle_one_to_one(
                  }?;
 
                  if let Node::Query(Query::Write(ref mut wq)) = child_node {
-//                     wq.add_filter(parent_model_id.equals(parent_id));
-                     wq.inject_id_into_args(parent_id);
+//                     wq.inject_id_into_args(parent_id);
+                     wq.add_filter(parent_model_id.data_source_field().equals(parent_id.single_value()));
                  }
 
                  Ok(child_node)
