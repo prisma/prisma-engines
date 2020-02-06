@@ -2,7 +2,7 @@ use datamodel::{Datamodel, FieldType};
 use regex::Regex;
 use std::collections::HashMap;
 
-pub fn sanitize_datamodel_names(mut datamodel: Datamodel) -> Datamodel {
+pub fn sanitize_datamodel_names(datamodel: &mut Datamodel) {
     let mut enum_renames = HashMap::new();
 
     for model in &mut datamodel.models {
@@ -70,10 +70,6 @@ pub fn sanitize_datamodel_names(mut datamodel: Datamodel) -> Datamodel {
             enm.database_name = enum_db_name.to_owned();
         }
     }
-
-    // todo: do a pass over all modified names and deduplicate them
-
-    datamodel
 }
 
 fn sanitize_name(name: String) -> (String, Option<String>) {

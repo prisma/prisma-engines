@@ -39,7 +39,7 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
                 model
                     .fields
                     .iter()
-                    .find(|f| !f.database_names.is_empty() && f.database_names == index.columns.clone())
+                    .find(|f| !f.database_names.is_empty() && f.database_names == index.columns)
                     .unwrap()
                     .name
                     .clone()
@@ -65,11 +65,9 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
     }
 
     for e in schema.enums.iter() {
-        let mut values: Vec<String> = e.values.iter().cloned().collect();
-        values.sort_unstable();
         data_model.add_enum(dml::Enum {
             name: e.name.clone(),
-            values,
+            values: e.values.clone(),
             database_name: None,
             documentation: None,
         });
@@ -122,8 +120,8 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
         model.add_field(field);
     }
 
-    let final_datamodel = sanitize_datamodel_names(data_model);
-    debug!("Done calculating data model {:?}", final_datamodel);
+    sanitize_datamodel_names(&mut data_model);
+    debug!("Done calculating data model {:?}", data_model);
 
-    Ok(final_datamodel)
+    Ok(data_model)
 }
