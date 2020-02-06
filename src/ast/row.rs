@@ -126,7 +126,7 @@ impl<'a> Comparable<'a> for Row<'a> {
         T: Into<DatabaseValue<'a>>,
     {
         let value: DatabaseValue<'a> = self.into();
-        value.not_equals(comparison)
+        value.less_than(comparison)
     }
 
     #[inline]
