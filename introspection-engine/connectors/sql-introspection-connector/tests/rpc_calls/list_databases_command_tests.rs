@@ -1,7 +1,7 @@
-use crate::{test_harness::*, test_one_connector, BarrelMigrationExecutor};
+use crate::{test_harness::*, BarrelMigrationExecutor};
 use barrel::types;
 
-#[test_one_connector(connector = "mysql")]
+#[test_each_connector(tags("mysql"))]
 async fn databases_for_mysql_should_work(api: &TestApi) {
     let barrel = api.barrel();
     setup(&barrel, api.db_name());
@@ -9,15 +9,7 @@ async fn databases_for_mysql_should_work(api: &TestApi) {
     assert!(result.contains(&api.db_name().to_string()));
 }
 
-#[test_one_connector(connector = "mysql_8")]
-async fn databases_for_mysql_8_should_work(api: &TestApi) {
-    let barrel = api.barrel();
-    setup(&barrel, api.db_name());
-    let result = dbg!(api.list_databases().await);
-    assert!(result.contains(&api.db_name().to_string()));
-}
-
-#[test_one_connector(connector = "postgres")]
+#[test_each_connector(tags("postgres"))]
 async fn databases_for_postgres_should_work(api: &TestApi) {
     let barrel = api.barrel();
     setup(&barrel, api.schema_name());
@@ -25,7 +17,7 @@ async fn databases_for_postgres_should_work(api: &TestApi) {
     assert!(result.contains(&api.schema_name().to_string()));
 }
 
-#[test_one_connector(connector = "sqlite")]
+#[test_each_connector(tags("sqlite"))]
 async fn databases_for_sqlite_should_work(api: &TestApi) {
     let barrel = api.barrel();
     setup(&barrel, api.schema_name());

@@ -256,7 +256,7 @@ async fn bad_datasource_url_and_provider_combinations_must_return_a_proper_error
     assert_eq!(json_error, expected);
 }
 
-#[test_one_connector(connector = "postgres")]
+#[test_each_connector(tags("postgres"))]
 async fn command_errors_must_return_an_unknown_error(api: &TestApi) {
     let steps = vec![MigrationStep::DeleteModel(DeleteModel {
         model: "abcd".to_owned(),

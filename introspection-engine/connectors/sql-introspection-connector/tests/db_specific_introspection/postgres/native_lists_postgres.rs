@@ -2,7 +2,7 @@ use crate::*;
 use barrel::types;
 use test_harness::*;
 
-#[test_one_connector(connector = "postgres")]
+#[test_each_connector(tags("postgres"))]
 async fn introspecting_native_arrays_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
@@ -22,7 +22,7 @@ async fn introspecting_native_arrays_should_work(api: &TestApi) {
               provider = "postgres"
               url = "postgresql://localhost:5432"
             }
-            
+
             model Post {
                bools    Boolean []
                floats   Float []
