@@ -56,7 +56,11 @@ impl Display for ReadQuery {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             Self::RecordQuery(q) => write!(f, "RecordQuery(name: '{}', filter: {:?})", q.name, q.filter),
-            Self::ManyRecordsQuery(q) => write!(f, "ManyRecordsQuery(name: '{}', model: {})", q.name, q.model.name),
+            Self::ManyRecordsQuery(q) => write!(
+                f,
+                "ManyRecordsQuery(name: '{}', model: {}, args: {:?})",
+                q.name, q.model.name, q.args
+            ),
             Self::RelatedRecordsQuery(q) => write!(
                 f,
                 "RelatedRecordsQuery(name: '{}', parent model: {}, parent relation field: {})",
