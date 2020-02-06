@@ -31,10 +31,11 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
         let table_names = self.get_table_names(schema).await;
         let mut tables = Vec::with_capacity(table_names.len());
         let mut columns = get_all_columns(self.conn.as_ref(), schema).await;
+        let mut indexes = get_all_indexes(self.conn.as_ref(), schema).await;
 
         let mut enums = vec![];
         for table_name in &table_names {
-            let (table, enms) = self.get_table(schema, table_name, &mut columns).await;
+            let (table, enms) = self.get_table(schema, table_name, &mut columns, &mut indexes).await;
             tables.push(table);
             enums.extend(enms.iter().cloned());
         }
@@ -118,18 +119,19 @@ impl SqlSchemaDescriber {
         schema: &str,
         name: &str,
         columns: &mut HashMap<String, (Vec<Column>, Vec<Enum>)>,
+        indexes: &mut HashMap<String, (BTreeMap<String, Index>, Option<PrimaryKey>)>,
     ) -> (Table, Vec<Enum>) {
         debug!("Getting table '{}'", name);
         let (columns, enums) = columns.remove(name).expect("table columns not found");
+        let (indices, primary_key) = indexes.remove(name).unwrap_or_else(|| (BTreeMap::new(), None));
 
         let foreign_keys = self.get_foreign_keys(schema, name).await;
-        let (indices, primary_key) = self.get_indices(schema, name).await;
         (
             Table {
                 name: name.to_string(),
                 columns,
                 foreign_keys,
-                indices,
+                indices: indices.into_iter().map(|(_k, v)| v).collect(),
                 primary_key,
             },
             enums,
@@ -251,89 +253,6 @@ impl SqlSchemaDescriber {
 
         fks
     }
-
-    async fn get_indices(&self, schema: &str, table_name: &str) -> (Vec<Index>, Option<PrimaryKey>) {
-        // We alias all the columns because MySQL column names are case-insensitive in queries, but the
-        // information schema column names became upper-case in MySQL 8, causing the code fetching
-        // the result values by column name below to fail.
-        let sql = "
-            SELECT DISTINCT
-                index_name AS index_name,
-                non_unique AS non_unique,
-                column_name AS column_name,
-                seq_in_index AS seq_in_index
-            FROM INFORMATION_SCHEMA.STATISTICS
-            WHERE table_schema = ? AND table_name = ?
-            ORDER BY index_name, seq_in_index
-            ";
-        debug!("describing indices, SQL: {}", sql);
-        let rows = self
-            .conn
-            .query_raw(sql, &[schema.into(), table_name.into()])
-            .await
-            .expect("querying for indices");
-
-        // Multi-column indices will return more than one row (with different column_name values).
-        // We cannot assume that one row corresponds to one index.
-
-        let mut primary_key: Option<PrimaryKey> = None;
-        let mut indexes_map: BTreeMap<String, Index> = BTreeMap::new();
-
-        for row in rows {
-            debug!("Got index row: {:#?}", row);
-            let seq_in_index = row.get("seq_in_index").and_then(|x| x.as_i64()).expect("seq_in_index");
-            let pos = seq_in_index - 1;
-            let index_name = row.get("index_name").and_then(|x| x.to_string()).expect("index_name");
-            let is_unique = !row.get("non_unique").and_then(|x| x.as_bool()).expect("non_unique");
-            let column_name = row.get("column_name").and_then(|x| x.to_string()).expect("column_name");
-            let is_pk = index_name.to_lowercase() == "primary";
-            if is_pk {
-                debug!("Column '{}' is part of the primary key", column_name);
-                match primary_key.as_mut() {
-                    Some(pk) => {
-                        if pk.columns.len() < (pos + 1) as usize {
-                            pk.columns.resize((pos + 1) as usize, "".to_string());
-                        }
-                        pk.columns[pos as usize] = column_name;
-                        debug!(
-                            "The primary key has already been created, added column to it: {:?}",
-                            pk.columns
-                        );
-                    }
-                    None => {
-                        debug!("Instantiating primary key");
-                        primary_key = Some(PrimaryKey {
-                            columns: vec![column_name],
-                            sequence: None,
-                        });
-                    }
-                };
-            } else {
-                if indexes_map.contains_key(&index_name) {
-                    indexes_map.get_mut(&index_name).map(|index: &mut Index| {
-                        index.columns.push(column_name);
-                    });
-                } else {
-                    indexes_map.insert(
-                        index_name.clone(),
-                        Index {
-                            name: index_name,
-                            columns: vec![column_name],
-                            tpe: match is_unique {
-                                true => IndexType::Unique,
-                                false => IndexType::Normal,
-                            },
-                        },
-                    );
-                }
-            }
-        }
-
-        let indices = indexes_map.into_iter().map(|(_k, v)| v).collect();
-
-        debug!("Found table indices: {:?}, primary key: {:?}", indices, primary_key);
-        (indices, primary_key)
-    }
 }
 
 async fn get_all_columns(conn: &dyn Queryable, schema_name: &str) -> HashMap<String, (Vec<Column>, Vec<Enum>)> {
@@ -422,6 +341,95 @@ async fn get_all_columns(conn: &dyn Queryable, schema_name: &str) -> HashMap<Str
         };
 
         entry.0.push(col);
+    }
+
+    map
+}
+
+async fn get_all_indexes(
+    conn: &dyn Queryable,
+    schema_name: &str,
+) -> HashMap<String, (BTreeMap<String, Index>, Option<PrimaryKey>)> {
+    let mut map = HashMap::new();
+
+    // We alias all the columns because MySQL column names are case-insensitive in queries, but the
+    // information schema column names became upper-case in MySQL 8, causing the code fetching
+    // the result values by column name below to fail.
+    let sql = "
+            SELECT DISTINCT
+                index_name AS index_name,
+                non_unique AS non_unique,
+                column_name AS column_name,
+                seq_in_index AS seq_in_index,
+                table_name AS table_name
+            FROM INFORMATION_SCHEMA.STATISTICS
+            WHERE table_schema = ?
+            ORDER BY index_name, seq_in_index
+            ";
+    debug!("describing indices, SQL: {}", sql);
+    let rows = conn
+        .query_raw(sql, &[schema_name.into()])
+        .await
+        .expect("querying for indices");
+
+    for row in rows {
+        debug!("Got index row: {:#?}", row);
+        let table_name = row.get("table_name").and_then(|x| x.to_string()).expect("table_name");
+        let seq_in_index = row.get("seq_in_index").and_then(|x| x.as_i64()).expect("seq_in_index");
+        let pos = seq_in_index - 1;
+        let index_name = row.get("index_name").and_then(|x| x.to_string()).expect("index_name");
+        let is_unique = !row.get("non_unique").and_then(|x| x.as_bool()).expect("non_unique");
+        let column_name = row.get("column_name").and_then(|x| x.to_string()).expect("column_name");
+
+        // Multi-column indices will return more than one row (with different column_name values).
+        // We cannot assume that one row corresponds to one index.
+        let (ref mut indexes_map, ref mut primary_key): &mut (_, Option<PrimaryKey>) =
+            map.entry(table_name).or_insert((BTreeMap::new(), None));
+
+        let is_pk = index_name.to_lowercase() == "primary";
+        if is_pk {
+            debug!("Column '{}' is part of the primary key", column_name);
+            match primary_key {
+                Some(pk) => {
+                    if pk.columns.len() < (pos + 1) as usize {
+                        pk.columns.resize((pos + 1) as usize, "".to_string());
+                    }
+                    pk.columns[pos as usize] = column_name;
+                    debug!(
+                        "The primary key has already been created, added column to it: {:?}",
+                        pk.columns
+                    );
+                }
+                None => {
+                    debug!("Instantiating primary key");
+                    std::mem::replace(
+                        primary_key,
+                        Some(PrimaryKey {
+                            columns: vec![column_name],
+                            sequence: None,
+                        }),
+                    );
+                }
+            };
+        } else {
+            if indexes_map.contains_key(&index_name) {
+                indexes_map.get_mut(&index_name).map(|index: &mut Index| {
+                    index.columns.push(column_name);
+                });
+            } else {
+                indexes_map.insert(
+                    index_name.clone(),
+                    Index {
+                        name: index_name,
+                        columns: vec![column_name],
+                        tpe: match is_unique {
+                            true => IndexType::Unique,
+                            false => IndexType::Normal,
+                        },
+                    },
+                );
+            }
+        }
     }
 
     map
