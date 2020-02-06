@@ -5,7 +5,7 @@ use crate::{
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
     ParsedInputMap, ParsedInputValue, QueryResult,
 };
-use connector::Filter;
+use connector::{Filter, ScalarCompare};
 use itertools::Itertools;
 use prisma_models::{ModelRef, RelationFieldRef};
 use std::convert::TryInto;
@@ -329,6 +329,8 @@ fn handle_one_to_one(
     filter: Filter,
     child_model: &ModelRef,
 ) -> QueryGraphBuilderResult<()> {
+    let child_model_id_field = child_model.fields().find_singular_id().unwrap().upgrade().unwrap();
+
     let parent_model_identifier = parent_relation_field.model().primary_identifier();
     let child_model_identifier = parent_relation_field.related_model().primary_identifier();
 
@@ -409,7 +411,8 @@ fn handle_one_to_one(
                  }?;
 
                  if let Node::Query(Query::Write(ref mut wq)) = child_node {
-                     wq.inject_id(parent_id);
+//                     wq.inject_id(parent_id);
+                     wq.add_filter(child_model_id_field.clone().data_source_field().equals(parent_id.single_value()));
                  }
 
                  Ok(child_node)
@@ -467,7 +470,8 @@ fn handle_one_to_one(
                  }?;
 
                  if let Node::Query(Query::Write(ref mut wq)) = child_node {
-                     wq.inject_id(parent_id);
+//                     wq.inject_id(parent_id);
+                     wq.add_filter(child_model_id_field.clone().data_source_field().equals(parent_id.single_value()));
                  }
 
                  Ok(child_node)
