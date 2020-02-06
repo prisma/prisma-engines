@@ -233,3 +233,23 @@ async fn introspecting_a_table_with_a_multi_column_non_unique_index_should_work(
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
+
+#[test_each_connector(tags("sqlite"))]
+async fn introspecting_a_table_with_optional_autoincrement_should_work(api: &TestApi) {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("Book", |t| {
+                t.inject_custom("book_id Integer Primary Key Autoincrement");
+            });
+        })
+        .await;
+
+    let dm = r#"
+        model Book {
+            book_id      Int     @default(autoincrement()) @id
+        }
+    "#;
+
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}

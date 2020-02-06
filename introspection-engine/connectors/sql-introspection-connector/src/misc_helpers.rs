@@ -102,6 +102,7 @@ pub(crate) fn calculate_scalar_field(schema: &&SqlSchema, table: &&Table, column
     debug!("Handling column {:?}", column);
     let field_type = calculate_field_type(&schema, &column, &table);
     let arity = match column.tpe.arity {
+        _ if column.auto_increment && field_type == FieldType::Base(ScalarType::Int) => FieldArity::Required,
         ColumnArity::Required => FieldArity::Required,
         ColumnArity::Nullable => FieldArity::Optional,
         ColumnArity::List => FieldArity::List,
@@ -115,7 +116,7 @@ pub(crate) fn calculate_scalar_field(schema: &&SqlSchema, table: &&Table, column
         name: column.name.clone(),
         arity,
         field_type,
-        database_names: Vec::new(),
+        database_names: vec![],
         default_value,
         is_unique,
         is_id,
@@ -241,21 +242,21 @@ pub(crate) fn calculate_backrelation_field(
 }
 
 pub(crate) fn calculate_default(column: &Column, arity: &FieldArity) -> Option<DefaultValue> {
-    match (arity, &column.default, &column.tpe.family) {
-        (FieldArity::List, _, _) => None,
-        (_, Some(d), ColumnTypeFamily::Boolean) => match parse_int(d) {
+    match (&column.default, &column.tpe.family) {
+        (_, _) if *arity == FieldArity::List => None,
+        (Some(d), ColumnTypeFamily::Boolean) => match parse_int(d) {
             Some(x) => Some(DefaultValue::Single(ScalarValue::Boolean(x != 0))),
             None => parse_bool(d).map(|b| DefaultValue::Single(ScalarValue::Boolean(b))),
         },
-        (_, Some(d), ColumnTypeFamily::Int) => match column.auto_increment {
+        (Some(d), ColumnTypeFamily::Int) => match column.auto_increment {
             true => Some(DefaultValue::Expression(ValueGenerator::new_autoincrement())),
             false => parse_int(d).map(|x| DefaultValue::Single(ScalarValue::Int(x))),
         },
-        (_, Some(d), ColumnTypeFamily::Float) => parse_float(d).map(|x| DefaultValue::Single(ScalarValue::Float(x))),
-        (_, Some(d), ColumnTypeFamily::String) => Some(DefaultValue::Single(ScalarValue::String(d.to_string()))),
-        (_, Some(_), ColumnTypeFamily::DateTime) => None, //todo
-        (_, None, _) if column.auto_increment => Some(DefaultValue::Expression(ValueGenerator::new_autoincrement())),
-        (_, _, _) => None,
+        (Some(d), ColumnTypeFamily::Float) => parse_float(d).map(|x| DefaultValue::Single(ScalarValue::Float(x))),
+        (Some(d), ColumnTypeFamily::String) => Some(DefaultValue::Single(ScalarValue::String(d.to_string()))),
+        (Some(_), ColumnTypeFamily::DateTime) => None, //todo
+        (None, _) if column.auto_increment => Some(DefaultValue::Expression(ValueGenerator::new_autoincrement())),
+        (_, _) => None,
     }
 }
 
