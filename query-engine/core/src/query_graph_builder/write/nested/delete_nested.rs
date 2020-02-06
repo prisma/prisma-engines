@@ -98,7 +98,7 @@ pub fn connect_nested_delete(
         let should_delete = if let PrismaValue::Boolean(b) = val { b } else { false };
 
         if should_delete {
-            let id_field = child_model.fields().id();
+            let id_field = child_model.fields().find_singular_id().unwrap().upgrade().unwrap();
             let find_child_records_node =
                 utils::insert_find_children_by_parent_node(graph, parent_node, parent_relation_field, Filter::empty())?;
 
@@ -122,7 +122,8 @@ pub fn connect_nested_delete(
 
                      if let Node::Query(Query::Write(ref mut wq)) = node {
 //                         wq.add_filter(id_field.equals(parent_id));
-                         wq.inject_id(parent_id);
+//                         wq.inject_id(parent_id);
+                         wq.add_filter(id_field.data_source_field().equals(parent_id.single_value()));
                      }
 
                      Ok(node)
