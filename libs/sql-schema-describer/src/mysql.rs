@@ -29,12 +29,12 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
         debug!("describing schema '{}'", schema);
 
         let table_names = self.get_table_names(schema).await;
-
         let mut tables = Vec::with_capacity(table_names.len());
+        let mut columns = get_all_columns(self.conn.as_ref(), schema).await;
 
         let mut enums = vec![];
         for table_name in &table_names {
-            let (table, enms) = self.get_table(schema, table_name).await;
+            let (table, enms) = self.get_table(schema, table_name, &mut columns).await;
             tables.push(table);
             enums.extend(enms.iter().cloned());
         }
@@ -97,10 +97,12 @@ impl SqlSchemaDescriber {
 
     async fn get_size(&self, schema: &str) -> usize {
         debug!("Getting db size");
-        let sql = "SELECT 
-      SUM(data_length + index_length) as size 
-      FROM information_schema.TABLES 
-      WHERE table_schema = ?";
+        let sql = r#"
+            SELECT
+            SUM(data_length + index_length) as size
+            FROM information_schema.TABLES
+            WHERE table_schema = ?
+        "#;
         let result = self.conn.query_raw(sql, &[schema.into()]).await.expect("get db size ");
         let size = result
             .first()
@@ -111,9 +113,14 @@ impl SqlSchemaDescriber {
         size.parse().unwrap()
     }
 
-    async fn get_table(&self, schema: &str, name: &str) -> (Table, Vec<Enum>) {
+    async fn get_table(
+        &self,
+        schema: &str,
+        name: &str,
+        columns: &mut HashMap<String, (Vec<Column>, Vec<Enum>)>,
+    ) -> (Table, Vec<Enum>) {
         debug!("Getting table '{}'", name);
-        let (columns, enums) = self.get_columns(schema, name).await;
+        let (columns, enums) = columns.remove(name).expect("table columns not found");
 
         let foreign_keys = self.get_foreign_keys(schema, name).await;
         let (indices, primary_key) = self.get_indices(schema, name).await;
@@ -127,88 +134,6 @@ impl SqlSchemaDescriber {
             },
             enums,
         )
-    }
-
-    async fn get_columns(&self, schema: &str, table: &str) -> (Vec<Column>, Vec<Enum>) {
-        // We alias all the columns because MySQL column names are case-insensitive in queries, but the
-        // information schema column names became upper-case in MySQL 8, causing the code fetching
-        // the result values by column name below to fail.
-        let sql = "
-            SELECT column_name column_name, data_type data_type, column_type full_data_type, column_default column_default, is_nullable is_nullable, extra extra
-            FROM information_schema.columns
-            WHERE table_schema = ? AND table_name = ?
-            ORDER BY column_name
-            COLLATE utf8_general_ci
-        ";
-
-        let rows = self
-            .conn
-            .query_raw(sql, &[schema.into(), table.into()])
-            .await
-            .expect("querying for columns");
-
-        let mut enums = vec![];
-        let cols = rows
-            .into_iter()
-            .map(|col| {
-                debug!("Got column: {:?}", col);
-
-                let name = col
-                    .get("column_name")
-                    .and_then(|x| x.to_string())
-                    .expect("get column name");
-                let data_type = col.get("data_type").and_then(|x| x.to_string()).expect("get data_type");
-                let full_data_type = col
-                    .get("full_data_type")
-                    .and_then(|x| x.to_string())
-                    .expect("get full_data_type aka column_type");
-                let is_nullable = col
-                    .get("is_nullable")
-                    .and_then(|x| x.to_string())
-                    .expect("get is_nullable")
-                    .to_lowercase();
-                let is_required = match is_nullable.as_ref() {
-                    "no" => true,
-                    "yes" => false,
-                    x => panic!(format!("unrecognized is_nullable variant '{}'", x)),
-                };
-                let arity = if is_required {
-                    ColumnArity::Required
-                } else {
-                    ColumnArity::Nullable
-                };
-                let (tpe, enum_option) =
-                    get_column_type_and_enum(&table, name.clone(), &data_type, &full_data_type, arity);
-                let extra = col
-                    .get("extra")
-                    .and_then(|x| x.to_string())
-                    .expect("get extra")
-                    .to_lowercase();
-                let auto_increment = match extra.as_str() {
-                    "auto_increment" => true,
-                    _ => false,
-                };
-
-                if let Some(enm) = enum_option {
-                    enums.push(enm);
-                }
-
-                Column {
-                    name,
-                    tpe,
-                    default: col
-                        .get("column_default")
-                        .and_then(|x| x.as_str())
-                        .and_then(sanitize_default_value)
-                        .map(String::from),
-                    auto_increment,
-                }
-            })
-            .collect();
-
-        debug!("Found table columns: {:?}", cols);
-        debug!("Found table enums: {:?}", enums);
-        (cols, enums)
     }
 
     async fn get_foreign_keys(&self, schema: &str, table: &str) -> Vec<ForeignKey> {
@@ -411,9 +336,100 @@ impl SqlSchemaDescriber {
     }
 }
 
+async fn get_all_columns(conn: &dyn Queryable, schema_name: &str) -> HashMap<String, (Vec<Column>, Vec<Enum>)> {
+    // We alias all the columns because MySQL column names are case-insensitive in queries, but the
+    // information schema column names became upper-case in MySQL 8, causing the code fetching
+    // the result values by column name below to fail.
+    let sql = "
+            SELECT
+                column_name column_name,
+                data_type data_type,
+                column_type full_data_type,
+                column_default column_default,
+                is_nullable is_nullable,
+                extra extra,
+                table_name table_name
+            FROM information_schema.columns
+            WHERE table_schema = ?
+            ORDER BY column_name
+            COLLATE utf8_general_ci
+        ";
+
+    let mut map = HashMap::new();
+
+    let rows = conn
+        .query_raw(sql, &[schema_name.into()])
+        .await
+        .expect("querying for columns");
+
+    for col in rows {
+        debug!("Got column: {:?}", col);
+
+        let table_name = col
+            .get("table_name")
+            .and_then(|x| x.to_string())
+            .expect("get table name");
+        let name = col
+            .get("column_name")
+            .and_then(|x| x.to_string())
+            .expect("get column name");
+        let data_type = col.get("data_type").and_then(|x| x.to_string()).expect("get data_type");
+        let full_data_type = col
+            .get("full_data_type")
+            .and_then(|x| x.to_string())
+            .expect("get full_data_type aka column_type");
+        let is_nullable = col
+            .get("is_nullable")
+            .and_then(|x| x.to_string())
+            .expect("get is_nullable")
+            .to_lowercase();
+        let is_required = match is_nullable.as_ref() {
+            "no" => true,
+            "yes" => false,
+            x => panic!(format!("unrecognized is_nullable variant '{}'", x)),
+        };
+        let arity = if is_required {
+            ColumnArity::Required
+        } else {
+            ColumnArity::Nullable
+        };
+        let (tpe, enum_option) = get_column_type_and_enum(&table_name, &name, &data_type, &full_data_type, arity);
+        let extra = col
+            .get("extra")
+            .and_then(|x| x.to_string())
+            .expect("get extra")
+            .to_lowercase();
+        let auto_increment = match extra.as_str() {
+            "auto_increment" => true,
+            _ => false,
+        };
+
+        let entry = map.entry(table_name).or_insert((Vec::new(), Vec::new()));
+
+        if let Some(enm) = enum_option {
+            entry.1.push(enm);
+        }
+
+        let col = Column {
+            name,
+            tpe,
+            default: col
+                .get("column_default")
+                .and_then(|x| x.as_str())
+                .and_then(sanitize_default_value)
+                .map(String::from),
+            auto_increment,
+        };
+
+        entry.0.push(col);
+    }
+
+    map
+}
+
 fn get_column_type_and_enum(
     table: &str,
-    column_name: String,
+    column_name: &str,
     data_type: &str,
     full_data_type: &str,
     arity: ColumnArity,
