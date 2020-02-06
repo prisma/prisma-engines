@@ -1,5 +1,5 @@
 use super::common::*;
-use crate::SqlFamily;
+use crate::{sql_schema_helpers::*, SqlFamily};
 use sql_schema_describer::*;
 use std::fmt::Write as _;
 
@@ -18,19 +18,12 @@ impl super::SqlRenderer for SqliteRenderer {
         write!(buf, "{}", quoted(name))
     }
 
-    fn render_column(
-        &self,
-        _schema_name: &str,
-        _table: &Table,
-        column: &Column,
-        _add_fk_prefix: bool,
-        _next_schema: &SqlSchema,
-    ) -> String {
-        let column_name = quoted(&column.name);
-        let tpe_str = self.render_column_type(&column.tpe);
+    fn render_column(&self, _schema_name: &str, column: ColumnRef<'_>, _add_fk_prefix: bool) -> String {
+        let column_name = quoted(column.name());
+        let tpe_str = self.render_column_type(column.column_type());
         let nullability_str = render_nullability(&column);
         let default_str = render_default(&column);
-        let auto_increment_str = if column.auto_increment {
+        let auto_increment_str = if column.auto_increment() {
             "PRIMARY KEY AUTOINCREMENT"
         } else {
             ""
