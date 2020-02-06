@@ -32,11 +32,13 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
         debug!("describing schema '{}'", schema);
         let sequences = self.get_sequences(schema).await?;
         let enums = self.get_enums(schema).await?;
+        let mut columns = self.get_columns(schema, &enums).await;
 
         let table_names = self.get_table_names(schema).await;
         let mut tables = Vec::with_capacity(table_names.len());
+
         for table_name in &table_names {
-            tables.push(self.get_table(schema, &table_name, &sequences, &enums).await);
+            tables.push(self.get_table(schema, &table_name, &sequences, &mut columns).await);
         }
 
         Ok(SqlSchema {
@@ -111,11 +113,17 @@ impl SqlSchemaDescriber {
         size.try_into().unwrap()
     }
 
-    async fn get_table(&self, schema: &str, name: &str, sequences: &Vec<Sequence>, enums: &Vec<Enum>) -> Table {
+    async fn get_table(
+        &self,
+        schema: &str,
+        name: &str,
+        sequences: &Vec<Sequence>,
+        columns: &mut HashMap<String, Vec<Column>>,
+    ) -> Table {
         debug!("Getting table '{}'", name);
-        let columns = self.get_columns(schema, name, enums).await;
         let (indices, primary_key) = self.get_indices(schema, name, sequences).await;
         let foreign_keys = self.get_foreign_keys(schema, name).await;
+        let columns = columns.remove(name).expect("could not get columns");
         Table {
             name: name.to_string(),
             columns,
@@ -125,83 +133,100 @@ impl SqlSchemaDescriber {
         }
     }
 
-    async fn get_columns(&self, schema: &str, table: &str, enums: &Vec<Enum>) -> Vec<Column> {
+    async fn get_columns(&self, schema: &str, enums: &Vec<Enum>) -> HashMap<String, Vec<Column>> {
+        let mut columns: HashMap<String, Vec<Column>> = HashMap::new();
+
         let sql = r#"
-            SELECT column_name, data_type, udt_name as full_data_type, column_default, is_nullable, is_identity, data_type
-                FROM information_schema.columns
-                WHERE table_schema = $1 AND table_name = $2
-                ORDER BY column_name
+            SELECT
+                table_name,
+                column_name,
+                data_type,
+                udt_name as full_data_type,
+                column_default,
+                is_nullable,
+                is_identity,
+                data_type
+            FROM information_schema.columns
+            WHERE table_schema = $1
+            ORDER BY column_name
             COLLATE "default"
         "#;
+
         let rows = self
             .conn
-            .query_raw(&sql, &[schema.into(), table.into()])
+            .query_raw(&sql, &[schema.into()])
             .await
             .expect("querying for columns");
-        let cols = rows
-            .into_iter()
-            .map(|col| {
-                debug!("Got column: {:?}", col);
-                let col_name = col
-                    .get("column_name")
-                    .and_then(|x| x.to_string())
-                    .expect("get column name");
-                let data_type = col.get("data_type").and_then(|x| x.to_string()).expect("get data_type");
-                let full_data_type = col
-                    .get("full_data_type")
-                    .and_then(|x| x.to_string())
-                    .expect("get full_data_type aka udt_name");
-                let is_identity_str = col
-                    .get("is_identity")
-                    .and_then(|x| x.to_string())
-                    .expect("get is_identity")
-                    .to_lowercase();
-                let is_identity = match is_identity_str.as_str() {
-                    "no" => false,
-                    "yes" => true,
-                    _ => panic!("unrecognized is_identity variant '{}'", is_identity_str),
-                };
-                let is_nullable = col
-                    .get("is_nullable")
-                    .and_then(|x| x.to_string())
-                    .expect("get is_nullable")
-                    .to_lowercase();
-                let is_required = match is_nullable.as_ref() {
-                    "no" => true,
-                    "yes" => false,
-                    x => panic!(format!("unrecognized is_nullable variant '{}'", x)),
+
+        for col in rows {
+            debug!("Got column: {:?}", col);
+            let table_name = col
+                .get("table_name")
+                .and_then(|x| x.to_string())
+                .expect("get table name");
+            let col_name = col
+                .get("column_name")
+                .and_then(|x| x.to_string())
+                .expect("get column name");
+            let data_type = col.get("data_type").and_then(|x| x.to_string()).expect("get data_type");
+            let full_data_type = col
+                .get("full_data_type")
+                .and_then(|x| x.to_string())
+                .expect("get full_data_type aka udt_name");
+            let is_identity_str = col
+                .get("is_identity")
+                .and_then(|x| x.to_string())
+                .expect("get is_identity")
+                .to_lowercase();
+            let is_identity = match is_identity_str.as_str() {
+                "no" => false,
+                "yes" => true,
+                _ => panic!("unrecognized is_identity variant '{}'", is_identity_str),
+            };
+            let is_nullable = col
+                .get("is_nullable")
+                .and_then(|x| x.to_string())
+                .expect("get is_nullable")
+                .to_lowercase();
+            let is_required = match is_nullable.as_ref() {
+                "no" => true,
+                "yes" => false,
+                x => panic!(format!("unrecognized is_nullable variant '{}'", x)),
+            };
+
+            let arity = if data_type == "ARRAY" {
+                ColumnArity::List
+            } else if is_required {
+                ColumnArity::Required
+            } else {
+                ColumnArity::Nullable
+            };
+            let tpe = get_column_type(data_type.as_ref(), &full_data_type, arity, enums);
+
+            let default = col.get("column_default").and_then(|param_value| {
+                param_value
+                    .to_string()
+                    .map(|x| x.replace("\'", "").replace("::text", ""))
+            });
+            let is_auto_increment = is_identity
+                || match default {
+                    Some(ref val) => is_autoincrement(val, schema, &table_name, &col_name),
+                    _ => false,
                 };
 
-                let arity = if data_type == "ARRAY" {
-                    ColumnArity::List
-                } else if is_required {
-                    ColumnArity::Required
-                } else {
-                    ColumnArity::Nullable
-                };
-                let tpe = get_column_type(data_type.as_ref(), &full_data_type, arity, enums);
+            let col = Column {
+                name: col_name,
+                tpe,
+                default,
+                auto_increment: is_auto_increment,
+            };
 
-                let default = col.get("column_default").and_then(|param_value| {
-                    param_value
-                        .to_string()
-                        .map(|x| x.replace("\'", "").replace("::text", ""))
-                });
-                let is_auto_increment = is_identity
-                    || match default {
-                        Some(ref val) => is_autoincrement(val, schema, table, &col_name),
-                        _ => false,
-                    };
-                Column {
-                    name: col_name,
-                    tpe,
-                    default,
-                    auto_increment: is_auto_increment,
-                }
-            })
-            .collect();
+            columns.entry(table_name).or_default().push(col);
+        }
 
-        debug!("Found table columns: {:?}", cols);
-        cols
+        debug!("Found table columns: {:?}", columns);
+
+        columns
     }
 
     async fn get_foreign_keys(&self, schema: &str, table: &str) -> Vec<ForeignKey> {

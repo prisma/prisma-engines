@@ -36,7 +36,7 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
 
         let mut enums = vec![];
         for table_name in &table_names {
-            let (table, enms) = self.get_table(table_name, &mut columns, &mut indexes, &mut fks).await;
+            let (table, enms) = self.get_table(table_name, &mut columns, &mut indexes, &mut fks);
             tables.push(table);
             enums.extend(enms.iter().cloned());
         }
@@ -115,7 +115,7 @@ impl SqlSchemaDescriber {
         size.parse().unwrap()
     }
 
-    async fn get_table(
+    fn get_table(
         &self,
         name: &str,
         columns: &mut HashMap<String, (Vec<Column>, Vec<Enum>)>,
