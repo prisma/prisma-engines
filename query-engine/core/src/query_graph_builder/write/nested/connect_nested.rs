@@ -377,7 +377,8 @@ fn handle_one_to_one(
              // This takes care of cases where the relation is inlined, CREATE ONLY. See doc comment for explanation.
              if relation_inlined_parent && parent_is_create {
                  if let Node::Query(Query::Write(ref mut wq)) = child_node {
-                     wq.inject_id(parent_id);
+//                     wq.inject_id(parent_id);
+                     wq.inject_field_arg(relation_field_name, parent_id.single_value());
                  }
              }
 
