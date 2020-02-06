@@ -28,7 +28,7 @@ fn read_one<'conn, 'tx>(
     let fut = async move {
         let model = query.model;
         let filter = query.filter.expect("Expected filter to be set for ReadOne query.");
-        let scalars = tx.get_single_record(&model, &filter, &query.selected_fields).await?;
+        let scalars = tx.get_single_record(&model, &filter, &query.selected_fields.only_scalar_and_inlined()).await?;
         let model_id = model.primary_identifier();
 
         match scalars {
@@ -121,7 +121,7 @@ fn read_related<'a, 'b>(
 
         let mut scalars = if !use_prisma_level_join {
             tx
-                .get_related_records(&query.parent_field, &relation_parent_ids, query.args.clone(), &query.selected_fields)
+                .get_related_records(&query.parent_field, &relation_parent_ids, query.args.clone(), &query.selected_fields.only_scalar_and_inlined())
                 .await?
         } else {
             // PRISMA LEVEL JOIN
