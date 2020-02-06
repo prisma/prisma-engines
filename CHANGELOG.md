@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.2.0-alpha.3
+
+- Fix broken less_than in a row
+
 ## v0.2.0-alpha.2
 
 - Implement support for Arrays of Enums
