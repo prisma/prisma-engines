@@ -330,6 +330,13 @@ fn handle_one_to_one(
     child_model: &ModelRef,
 ) -> QueryGraphBuilderResult<()> {
     let child_model_id_field = child_model.fields().find_singular_id().unwrap().upgrade().unwrap();
+    let parent_model_id = parent_relation_field
+        .model()
+        .fields()
+        .find_singular_id()
+        .unwrap()
+        .upgrade()
+        .unwrap();
 
     let parent_model_identifier = parent_relation_field.model().primary_identifier();
     let child_model_identifier = parent_relation_field.related_model().primary_identifier();
@@ -440,7 +447,7 @@ fn handle_one_to_one(
         // Create an update node for Parent to set the connection to the child.
         let parent_model = parent_relation_field.model();
         let relation_field_name = parent_relation_field.name.clone();
-        let parent_model_id = parent_model.fields().id();
+        //        let parent_model_id = parent_model.fields().id();
         let update_node = utils::update_records_node_placeholder(graph, Filter::empty(), parent_model);
 
         graph.create_edge(
@@ -453,7 +460,8 @@ fn handle_one_to_one(
                  }?;
 
                  if let Node::Query(Query::Write(ref mut wq)) = child_node {
-                     wq.inject_id_into_args(parent_id);
+//                     wq.inject_id_into_args(parent_id);
+                     wq.inject_field_arg(relation_field_name, parent_id.single_value());
                  }
 
                  Ok(child_node)
@@ -471,7 +479,7 @@ fn handle_one_to_one(
 
                  if let Node::Query(Query::Write(ref mut wq)) = child_node {
 //                     wq.inject_id(parent_id);
-                     wq.add_filter(child_model_id_field.clone().data_source_field().equals(parent_id.single_value()));
+                     wq.add_filter(parent_model_id.clone().data_source_field().equals(parent_id.single_value()));
                  }
 
                  Ok(child_node)
