@@ -1,6 +1,8 @@
 package util
 
 import play.api.libs.json._
+
+import scala.util.{Failure, Success, Try}
 case class TestServer() extends PlayJsonExtensions {
   def query(
       query: String,
@@ -49,9 +51,17 @@ case class TestServer() extends PlayJsonExtensions {
     val lines           = response.linesIterator.toVector
     val normalLogOutput = lines.init
     val lastLine        = lines.last
-    println(normalLogOutput.mkString("\n"))
-    val decoded_response = UTF8Base64.decode(lastLine)
-    println(decoded_response)
-    Json.parse(decoded_response)
+    Try(UTF8Base64.decode(lastLine)) match {
+      case Success(decodedResponse) =>
+        println(normalLogOutput.mkString("\n"))
+        println(decodedResponse)
+        Json.parse(decodedResponse)
+
+      case Failure(e) =>
+        println(lines.mkString("\n"))
+        println(s"Error while decoding this line: \n$lastLine")
+        throw e
+    }
+
   }
 }
