@@ -453,7 +453,7 @@ fn handle_one_to_one(
                  }?;
 
                  if let Node::Query(Query::Write(ref mut wq)) = child_node {
-                     wq.inject_id(parent_id);
+                     wq.inject_id_into_args(parent_id);
                  }
 
                  Ok(child_node)

@@ -16,14 +16,14 @@ pub enum WriteQuery {
 }
 
 impl WriteQuery {
-    pub fn inject_id(&mut self, record_id: RecordIdentifier) {
+    pub fn inject_id_into_args(&mut self, record_id: RecordIdentifier) {
         let keys = record_id.fields().map(|dsf| dsf.name.clone()).collect();
         let values = record_id.values().map(|v| v.clone()).collect();
 
-        self.inject_all(keys, values);
+        self.inject_values_into_args(keys, values);
     }
 
-    pub fn inject_all(&mut self, keys: Vec<String>, values: Vec<PrismaValue>) {
+    pub fn inject_values_into_args(&mut self, keys: Vec<String>, values: Vec<PrismaValue>) {
         keys.into_iter()
             .zip(values)
             .for_each(|(key, value)| self.inject_field_arg(key, value));

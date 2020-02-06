@@ -183,7 +183,7 @@ fn handle_one_to_many(
                 }?;
 
                 if let Node::Query(Query::Write(ref mut wq)) = child_node {
-                    wq.inject_id(parent_model_id.assimilate(parent_id)?);
+                    wq.inject_id_into_args(parent_model_id.assimilate(parent_id)?);
                 }
 
                 Ok(child_node)
@@ -213,7 +213,7 @@ fn handle_one_to_many(
                     }?;
 
                     if let Node::Query(Query::Write(ref mut wq)) = child_node {
-                        wq.inject_id(child_model_id.assimilate(parent_id)?);
+                        wq.inject_id_into_args(child_model_id.assimilate(parent_id)?);
                     }
 
                     Ok(child_node)
@@ -403,7 +403,7 @@ fn handle_one_to_one(
                  }?;
 
                  if let Node::Query(Query::Write(ref mut wq)) = child_node {
-                     wq.inject_id(parent_id);
+                     wq.inject_id_into_args(parent_id);
                  }
 
                  Ok(child_node)
@@ -421,7 +421,7 @@ fn handle_one_to_one(
 
                  if let Node::Query(Query::Write(ref mut wq)) = child_node {
 //                     wq.add_filter(parent_model_id.equals(parent_id));
-                     wq.inject_id(parent_id);
+                     wq.inject_id_into_args(parent_id);
                  }
 
                  Ok(child_node)
