@@ -151,13 +151,13 @@ pub(crate) fn calculate_relation_field(schema: &SqlSchema, table: &Table, foreig
             .map(|c| table.columns.iter().find(|tc| tc.name == *c).unwrap())
             .collect();
 
-        let arity = match columns.iter().find(|c| c.is_required()).is_none() {
+        let arity = match !columns.iter().any(|c| c.is_required()) {
             true => FieldArity::Optional,
             false => FieldArity::Required,
         };
 
         let (name, database_name) = match columns.len() {
-            1 => (columns[0].name.clone(), Vec::new()),
+            1 => (columns[0].name.clone(), vec![]),
             _ => (
                 foreign_key.referenced_table.clone().camel_case(),
                 columns.iter().map(|c| c.name.clone()).collect(),
@@ -185,8 +185,8 @@ pub(crate) fn calculate_backrelation_field(
     relation_field: &&Field,
     relation_info: &RelationInfo,
 ) -> Field {
-    let table = schema.table_bang(model.name.as_str());
-    let fk = table.foreign_key_for_column(relation_field.name.as_str());
+    let table = schema.table_bang(&model.name);
+    let fk = table.foreign_key_for_column(&relation_field.name);
     let on_delete = match fk {
         // TODO: bring `onDelete` back once `prisma migrate` is a thing
         //        Some(fk) if fk.on_delete_action == ForeignKeyAction::Cascade => OnDeleteStrategy::Cascade,
@@ -203,7 +203,7 @@ pub(crate) fn calculate_backrelation_field(
         let table = schema.table_bang(&model.name);
 
         match &relation_field.database_names.len() {
-            0 => table.is_column_unique(relation_field.name.as_str()),
+            0 => table.is_column_unique(&relation_field.name),
             1 => {
                 let column_name = relation_field.database_names.first().unwrap();
                 table.is_column_unique(column_name)
@@ -219,25 +219,24 @@ pub(crate) fn calculate_backrelation_field(
         FieldArity::Required | FieldArity::Optional => FieldArity::List,
         FieldArity::List => FieldArity::Optional,
     };
-    let inflector = prisma_inflector::default();
+
     let name = match arity {
-        FieldArity::List => inflector.pluralize(&model.name).camel_case(), // pluralize
+        FieldArity::List => prisma_inflector::default().pluralize(&model.name).camel_case(), // pluralize
         FieldArity::Optional => model.name.clone().camel_case(),
         FieldArity::Required => model.name.clone().camel_case(),
     };
-    let field = Field {
+    Field {
         name,
         arity,
         field_type,
-        database_names: Vec::new(),
+        database_names: vec![],
         default_value: None,
         is_unique: false,
         is_id: false,
         documentation: None,
         is_generated: false,
         is_updated_at: false,
-    };
-    field
+    }
 }
 
 pub(crate) fn calculate_default(column: &Column, arity: &FieldArity) -> Option<DefaultValue> {
