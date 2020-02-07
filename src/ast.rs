@@ -15,6 +15,7 @@ mod function;
 mod grouping;
 mod insert;
 mod join;
+mod ops;
 mod ordering;
 mod over;
 mod query;
@@ -24,7 +25,6 @@ mod table;
 mod union;
 mod update;
 mod values;
-mod ops;
 
 pub use column::Column;
 pub use compare::{Comparable, Compare};
@@ -36,6 +36,7 @@ pub use function::*;
 pub use grouping::*;
 pub use insert::*;
 pub use join::{Join, JoinData, Joinable};
+pub use ops::*;
 pub use ordering::{IntoOrderDefinition, Order, OrderDefinition, Orderable, Ordering};
 pub use over::*;
 pub use query::Query;
@@ -44,8 +45,7 @@ pub use select::Select;
 pub use table::*;
 pub use union::Union;
 pub use update::*;
-pub use ops::*;
 
 #[cfg(any(feature = "sqlite", feature = "mysql", feature = "postgresql"))]
 pub(crate) use values::Params;
-pub use values::{asterisk, DatabaseValue, ParameterizedValue};
+pub use values::{asterisk, DatabaseValue, ParameterizedValue, Values};

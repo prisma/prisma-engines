@@ -110,6 +110,21 @@ impl<'a> Visitor<'a> for Mysql<'a> {
         self.write(" GROUP_CONCAT")?;
         self.surround_with("(", ")", |ref mut s| s.visit_database_value(value))
     }
+
+    fn visit_values(&mut self, values: Values<'a>) -> fmt::Result {
+        self.surround_with("(VALUES ", ")", |ref mut s| {
+            let len = values.len();
+            for (i, row) in values.into_iter().enumerate() {
+                s.write("ROW")?;
+                s.visit_row(row)?;
+
+                if i < (len - 1) {
+                    s.write(",")?;
+                }
+            }
+            Ok(())
+        })
+    }
 }
 
 #[cfg(test)]
@@ -196,5 +211,48 @@ mod tests {
 
         assert_eq!(expected.0, sql);
         assert_eq!(expected.1, params);
+    }
+
+    #[test]
+    fn test_select_from_values() {
+        use crate::values;
+
+        let expected_sql = "SELECT `vals`.* FROM (VALUES ROW(?,?),ROW(?,?)) AS `vals`";
+        let values = Table::from(values!((1, 2), (3, 4))).alias("vals");
+        let query = Select::from_table(values);
+        let (sql, params) = Mysql::build(query);
+
+        assert_eq!(expected_sql, sql);
+        assert_eq!(
+            vec![
+                ParameterizedValue::Integer(1),
+                ParameterizedValue::Integer(2),
+                ParameterizedValue::Integer(3),
+                ParameterizedValue::Integer(4),
+            ],
+            params
+        );
+    }
+
+    #[test]
+    fn test_in_values() {
+        use crate::{col, values};
+
+        let expected_sql = "SELECT `test`.* FROM `test` WHERE (`id1`,`id2`) IN (VALUES ROW(?,?),ROW(?,?))";
+        let query = Select::from_table("test")
+            .so_that(Row::from((col!("id1"), col!("id2"))).in_selection(values!((1, 2), (3, 4))));
+
+        let (sql, params) = Mysql::build(query);
+
+        assert_eq!(expected_sql, sql);
+        assert_eq!(
+            vec![
+                ParameterizedValue::Integer(1),
+                ParameterizedValue::Integer(2),
+                ParameterizedValue::Integer(3),
+                ParameterizedValue::Integer(4),
+            ],
+            params
+        );
     }
 }

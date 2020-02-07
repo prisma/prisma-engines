@@ -160,6 +160,49 @@ mod tests {
     }
 
     #[test]
+    fn test_select_from_values() {
+        use crate::values;
+
+        let expected_sql = "SELECT `vals`.* FROM (VALUES (?,?),(?,?)) AS `vals`";
+        let values = Table::from(values!((1, 2), (3, 4))).alias("vals");
+        let query = Select::from_table(values);
+        let (sql, params) = Sqlite::build(query);
+
+        assert_eq!(expected_sql, sql);
+        assert_eq!(
+            vec![
+                ParameterizedValue::Integer(1),
+                ParameterizedValue::Integer(2),
+                ParameterizedValue::Integer(3),
+                ParameterizedValue::Integer(4),
+            ],
+            params
+        );
+    }
+
+    #[test]
+    fn test_in_values() {
+        use crate::{col, values};
+
+        let expected_sql = "SELECT `test`.* FROM `test` WHERE (`id1`,`id2`) IN (VALUES (?,?),(?,?))";
+        let query = Select::from_table("test")
+            .so_that(Row::from((col!("id1"), col!("id2"))).in_selection(values!((1, 2), (3, 4))));
+
+        let (sql, params) = Sqlite::build(query);
+
+        assert_eq!(expected_sql, sql);
+        assert_eq!(
+            vec![
+                ParameterizedValue::Integer(1),
+                ParameterizedValue::Integer(2),
+                ParameterizedValue::Integer(3),
+                ParameterizedValue::Integer(4),
+            ],
+            params
+        );
+    }
+
+    #[test]
     fn test_select_order_by() {
         let expected_sql = "SELECT `musti`.* FROM `musti` ORDER BY `foo`, `baz` ASC, `bar` DESC";
         let query = Select::from_table("musti")

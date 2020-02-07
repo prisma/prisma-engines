@@ -123,7 +123,7 @@ pub trait Visitor<'a> {
         if let Some(table) = select.table {
             if select.columns.is_empty() {
                 match table.typ {
-                    TableType::Query(_) => match table.alias {
+                    TableType::Query(_) | TableType::Values(_) => match table.alias {
                         Some(ref alias) => {
                             self.surround_with(Self::C_BACKTICK, Self::C_BACKTICK, |ref mut s| s.write(alias))?;
                             self.write(".*")?;
@@ -323,6 +323,7 @@ pub trait Visitor<'a> {
             DatabaseValue::Select(select) => self.surround_with("(", ")", |ref mut s| s.visit_select(*select)),
             DatabaseValue::Function(function) => self.visit_function(function),
             DatabaseValue::Op(op) => self.visit_operation(*op),
+            DatabaseValue::Values(values) => self.visit_values(*values),
             DatabaseValue::Asterisk(table) => match table {
                 Some(table) => {
                     self.visit_table(*table, false)?;
@@ -333,6 +334,20 @@ pub trait Visitor<'a> {
         }
     }
 
+    fn visit_values(&mut self, values: Values<'a>) -> fmt::Result {
+        self.surround_with("(VALUES ", ")", |ref mut s| {
+            let len = values.len();
+            for (i, row) in values.into_iter().enumerate() {
+                s.visit_row(row)?;
+
+                if i < (len - 1) {
+                    s.write(",")?;
+                }
+            }
+            Ok(())
+        })
+    }
+
     /// A database table identifier
     fn visit_table(&mut self, table: Table<'a>, include_alias: bool) -> fmt::Result {
         match table.typ {
@@ -340,6 +355,7 @@ pub trait Visitor<'a> {
                 Some(database) => self.delimited_identifiers(&[&*database, &*table_name])?,
                 None => self.delimited_identifiers(&[&*table_name])?,
             },
+            TableType::Values(values) => self.visit_values(values)?,
             TableType::Query(select) => self.surround_with("(", ")", |ref mut s| s.visit_select(select))?,
         };
 

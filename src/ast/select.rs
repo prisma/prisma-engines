@@ -49,7 +49,7 @@ impl<'a> Select<'a> {
     /// assert_eq!("SELECT `crm`.`users`.* FROM `crm`.`users`", sql);
     /// ```
     ///
-    /// It is also possible to use a nested `SELECT`.
+    /// Selecting from a nested `SELECT`.
     ///
     /// ```rust
     /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
@@ -59,6 +59,28 @@ impl<'a> Select<'a> {
     ///
     /// assert_eq!("SELECT `num`.* FROM (SELECT ?) AS `num`", sql);
     /// assert_eq!(vec![ParameterizedValue::from(1)], params);
+    /// ```
+    ///
+    /// Selecting from a set of values.
+    ///
+    /// ```rust
+    /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # use quaint::values;
+    /// let expected_sql = "SELECT `vals`.* FROM (VALUES (?,?),(?,?)) AS `vals`";
+    /// let values = Table::from(values!((1, 2), (3, 4))).alias("vals");
+    /// let query = Select::from_table(values);
+    /// let (sql, params) = Sqlite::build(query);
+    ///
+    /// assert_eq!(expected_sql, sql);
+    /// assert_eq!(
+    ///     vec![
+    ///         ParameterizedValue::Integer(1),
+    ///         ParameterizedValue::Integer(2),
+    ///         ParameterizedValue::Integer(3),
+    ///         ParameterizedValue::Integer(4),
+    ///     ],
+    ///     params
+    /// );
     /// ```
     #[inline]
     pub fn from_table<T>(table: T) -> Self

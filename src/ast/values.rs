@@ -329,6 +329,8 @@ pub enum DatabaseValue<'a> {
     Asterisk(Option<Box<Table<'a>>>),
     /// An operation: sum, sub, mul or div.
     Op(Box<SqlOp<'a>>),
+    /// A `VALUES` statement
+    Values(Box<Values<'a>>),
 }
 
 /// A quick alias to create an asterisk to a table.
@@ -523,6 +525,13 @@ macro_rules! database_value {
 
 database_value!(Row, Row);
 database_value!(Function, Function);
+
+impl<'a> From<Values<'a>> for DatabaseValue<'a> {
+    #[inline]
+    fn from(p: Values<'a>) -> Self {
+        Self::Values(Box::new(p))
+    }
+}
 
 impl<'a> From<SqlOp<'a>> for DatabaseValue<'a> {
     #[inline]
@@ -755,4 +764,65 @@ mod tests {
 
         assert!(rslt.is_none());
     }
+}
+
+/// An in-memory temporary table. Can be used in some of the databases in a
+/// place of an actual table. Doesn't work in MySQL 5.7.
+#[derive(Debug, Clone, Default, PartialEq)]
+pub struct Values<'a> {
+    pub(crate) rows: Vec<Row<'a>>,
+}
+
+impl<'a> Values<'a> {
+    /// Create a new in-memory set of values.
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Add value to the temporary table.
+    pub fn push<T>(mut self, row: T) -> Self
+    where
+        T: Into<Row<'a>>,
+    {
+        self.rows.push(row.into());
+        self
+    }
+
+    /// The number of rows in the in-memory table.
+    pub fn len(&self) -> usize {
+        self.rows.len()
+    }
+
+    /// True if has no rows.
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
+}
+
+impl<'a, I, R> From<I> for Values<'a>
+where
+    I: Iterator<Item = R>,
+    R: Into<Row<'a>>,
+{
+    fn from(rows: I) -> Self {
+        Self {
+            rows: rows.map(|r| r.into()).collect(),
+        }
+    }
+}
+
+impl<'a> IntoIterator for Values<'a> {
+    type Item = Row<'a>;
+    type IntoIter = std::vec::IntoIter<Self::Item>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.rows.into_iter()
+    }
+}
+
+#[macro_export]
+macro_rules! values {
+    ($($x:expr),*) => (
+        Values::from(std::iter::empty() $(.chain(std::iter::once(Row::from($x))))*)
+    );
 }

@@ -1,4 +1,4 @@
-use crate::ast::{DatabaseValue, Select};
+use crate::ast::{DatabaseValue, Row, Select, Values};
 use std::borrow::Cow;
 
 /// An object that can be aliased.
@@ -14,6 +14,7 @@ pub trait Aliasable<'a> {
 pub enum TableType<'a> {
     Table(Cow<'a, str>),
     Query(Select<'a>),
+    Values(Values<'a>),
 }
 
 /// A table definition
@@ -65,6 +66,24 @@ impl<'a> From<String> for Table<'a> {
     fn from(s: String) -> Self {
         Table {
             typ: TableType::Table(s.into()),
+            alias: None,
+            database: None,
+        }
+    }
+}
+
+impl<'a> From<Vec<Row<'a>>> for Table<'a> {
+    #[inline]
+    fn from(values: Vec<Row<'a>>) -> Self {
+        Table::from(Values::from(values.into_iter()))
+    }
+}
+
+impl<'a> From<Values<'a>> for Table<'a> {
+    #[inline]
+    fn from(values: Values<'a>) -> Self {
+        Self {
+            typ: TableType::Values(values),
             alias: None,
             database: None,
         }
