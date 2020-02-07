@@ -6,7 +6,7 @@ fn get_query_schema(datamodel_string: &str) -> (QuerySchema, datamodel::dml::Dat
     let internal_datamodel = prisma_models::DatamodelConverter::convert(&lifted_datamodel).build("blah".to_owned());
     let supported_capabilities = SupportedCapabilities::empty();
     (
-        QuerySchemaBuilder::new(&internal_datamodel, &supported_capabilities, BuildMode::Modern).build(),
+        QuerySchemaBuilder::new(&internal_datamodel, &supported_capabilities, BuildMode::Modern, false).build(),
         lifted_datamodel,
     )
 }

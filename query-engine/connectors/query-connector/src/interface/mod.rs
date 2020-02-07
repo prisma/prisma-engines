@@ -4,6 +4,7 @@ pub use dispatch::*;
 
 use crate::{Filter, QueryArguments, WriteArgs};
 use prisma_models::*;
+use prisma_value::PrismaValue;
 
 pub trait Connector {
     fn get_connection<'a>(&'a self) -> crate::IO<Box<dyn Connection + 'a>>;
@@ -80,4 +81,6 @@ pub trait WriteOperations {
         parent_id: &'a RecordIdentifier,
         child_ids: &'a [RecordIdentifier],
     ) -> crate::IO<()>;
+
+    fn execute_raw<'a>(&'a self, query: String, parameters: Vec<PrismaValue>) -> crate::IO<serde_json::Value>;
 }

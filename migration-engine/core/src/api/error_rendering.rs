@@ -45,7 +45,7 @@ fn fallback_jsonrpc_error(err: impl std::error::Error) -> JsonRpcError {
     }
 }
 
-pub(crate) fn pretty_print_datamodel_errors(
+pub fn pretty_print_datamodel_errors(
     errors: &datamodel::error::ErrorCollection,
     datamodel: &str,
 ) -> std::io::Result<String> {

@@ -91,10 +91,8 @@ object Dependencies {
   val parserCombinators = "org.scala-lang.modules"     %% "scala-parser-combinators"      % "1.0.4"
   val apacheCommons     = "org.apache.commons"         % "commons-lang3"                  % "3.8.1"
   val microMeter        = "io.micrometer"              % "micrometer-registry-prometheus" % "1.0.6"
-  val jooq = Vector(
-    "org.jooq" % "jooq"        % "3.11.10",
-    "org.jooq" %% "jooq-scala" % "3.11.10"
-  )
+  val jooqCore          = "org.jooq"                   % "jooq"                           % "3.11.10"
+  val jooqScala         = "org.jooq"                   %% "jooq-scala"                    % "3.11.10"
 
   val jna              = "net.java.dev.jna"      % "jna"                   % "4.5.2"
   val javaxPersistence = "javax.persistence"     % "javax.persistence-api" % "2.2"
@@ -117,7 +115,9 @@ object Dependencies {
     java8Compat,
     scalaTest,
     scalactic,
-    enumeratum
+    enumeratum,
+    jooqCore,
+    jooqScala
   )
 
   lazy val commonServerDependencies: Seq[ModuleID] = common ++ sangria ++ joda ++ Seq(

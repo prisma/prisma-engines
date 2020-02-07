@@ -13,17 +13,21 @@ pub enum WriteQuery {
     DeleteManyRecords(DeleteManyRecords),
     ConnectRecords(ConnectRecords),
     DisconnectRecords(DisconnectRecords),
+    Raw {
+        query: String,
+        parameters: Vec<PrismaValue>,
+    },
 }
 
 impl WriteQuery {
-    pub fn inject_id(&mut self, record_id: RecordIdentifier) {
+    pub fn inject_id_into_args(&mut self, record_id: RecordIdentifier) {
         let keys = record_id.fields().map(|dsf| dsf.name.clone()).collect();
         let values = record_id.values().map(|v| v.clone()).collect();
 
-        self.inject_all(keys, values);
+        self.inject_values_into_args(keys, values);
     }
 
-    pub fn inject_all(&mut self, keys: Vec<String>, values: Vec<PrismaValue>) {
+    pub fn inject_values_into_args(&mut self, keys: Vec<String>, values: Vec<PrismaValue>) {
         keys.into_iter()
             .zip(values)
             .for_each(|(key, value)| self.inject_field_arg(key, value));
@@ -58,6 +62,10 @@ impl WriteQuery {
             Self::DeleteManyRecords(q) => false,
             Self::ConnectRecords(q) => false,
             Self::DisconnectRecords(q) => false,
+            Self::Raw {
+                query: _,
+                parameters: _,
+            } => unimplemented!(),
         }
     }
 
@@ -70,6 +78,10 @@ impl WriteQuery {
             Self::DeleteManyRecords(q) => Arc::clone(&q.model),
             Self::ConnectRecords(q) => q.relation_field.model(),
             Self::DisconnectRecords(q) => q.relation_field.model(),
+            Self::Raw {
+                query: _,
+                parameters: _,
+            } => unimplemented!(),
         }
     }
 }
@@ -110,6 +122,7 @@ impl std::fmt::Display for WriteQuery {
             Self::DeleteManyRecords(q) => write!(f, "DeleteManyRecords: {}", q.model.name),
             Self::ConnectRecords(_) => write!(f, "ConnectRecords"),
             Self::DisconnectRecords(_) => write!(f, "DisconnectRecords"),
+            Self::Raw { query, parameters } => write!(f, "Raw: {} ({:?})", query, parameters),
         }
     }
 }

@@ -16,43 +16,50 @@ pub fn build(query_arguments: &QueryArguments, model: ModelRef) -> ConditionTree
     ) {
         (None, None, _) => ConditionTree::NoCondition,
         (before, after, order_by) => {
-            let sort_order: SortOrder = order_by.map(|order| order.sort_order).unwrap_or(SortOrder::Ascending);
+            let id_field = model.fields().find_singular_id().unwrap().upgrade().unwrap();
+            let (comparison_field, sort_order) = match order_by {
+                Some(x) => (&x.field, x.sort_order),
+                None => (&id_field, SortOrder::Ascending),
+            };
 
             let cursor_for = |cursor_type: CursorType, pairs: &[(ScalarFieldRef, PrismaValue)]| {
                 let (fields, values): (Vec<_>, Vec<_>) = pairs.iter().cloned().unzip();
-                let columns: Vec<_> = fields.into_iter().map(|sf| sf.as_column()).collect();
-                let row = Row::from(columns.clone());
+                let columns: Vec<_> = vec![comparison_field.as_column()];
+                let order_row = Row::from(columns.clone());
 
-                let where_condition = row.clone().equals(values.clone());
+                let cursor_columns: Vec<_> = fields.into_iter().map(|sf| sf.as_column()).collect();
+                let cursor_row = Row::from(cursor_columns);
+
+                let where_condition = cursor_row.clone().equals(values.clone());
 
                 let select_query = Select::from_table(model.as_table())
                     .columns(columns.clone())
                     .so_that(where_condition);
 
                 let compare = match (cursor_type, sort_order) {
-                    (CursorType::Before, SortOrder::Ascending) => row
+                    (CursorType::Before, SortOrder::Ascending) => order_row
                         .clone()
                         .equals(select_query.clone())
-                        .and(row.clone().less_than(values))
-                        .or(row.less_than(select_query)),
+                        .and(cursor_row.clone().less_than(values))
+                        .or(order_row.less_than(select_query)),
 
-                    (CursorType::Before, SortOrder::Descending) => row
+                    (CursorType::Before, SortOrder::Descending) => order_row
                         .clone()
                         .equals(select_query.clone())
-                        .and(row.clone().less_than(values))
-                        .or(row.greater_than(select_query)),
+                        .and(cursor_row.clone().less_than(values))
+                        .or(order_row.greater_than(select_query)),
 
-                    (CursorType::After, SortOrder::Ascending) => row
+                    (CursorType::After, SortOrder::Ascending) => order_row
                         .clone()
                         .equals(select_query.clone())
-                        .and(row.clone().greater_than(values))
-                        .or(row.greater_than(select_query)),
+                        .and(cursor_row.clone().greater_than(values))
+                        .or(order_row.greater_than(select_query)),
 
-                    (CursorType::After, SortOrder::Descending) => row
+                    (CursorType::After, SortOrder::Descending) => order_row
                         .clone()
                         .equals(select_query.clone())
-                        .and(row.clone().greater_than(values))
-                        .or(row.less_than(select_query)),
+                        .and(cursor_row.clone().greater_than(values))
+                        .or(order_row.less_than(select_query)),
                 };
 
                 ConditionTree::single(compare)

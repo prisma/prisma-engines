@@ -14,3 +14,4 @@ darling = "0.10.1"
 syn = "1.0.5"
 quote = "1.0.2"
 proc-macro2 = "1.0.6"
+test-setup = { path = "../test-setup" }

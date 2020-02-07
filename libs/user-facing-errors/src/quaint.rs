@@ -1,5 +1,5 @@
 use crate::{common, query_engine, KnownError};
-use quaint::{error::{Error as QuaintError}, prelude::ConnectionInfo};
+use quaint::{error::ErrorKind, prelude::ConnectionInfo};
 
 impl From<&quaint::error::DatabaseConstraint> for crate::query_engine::DatabaseConstraint {
     fn from(other: &quaint::error::DatabaseConstraint) -> Self {
@@ -10,9 +10,18 @@ impl From<&quaint::error::DatabaseConstraint> for crate::query_engine::DatabaseC
     }
 }
 
-pub fn render_quaint_error(quaint_error: &QuaintError, connection_info: &ConnectionInfo) -> Option<KnownError> {
-    match (quaint_error, connection_info) {
-        (QuaintError::DatabaseDoesNotExist { .. }, ConnectionInfo::Sqlite { file_path, .. }) => {
+impl From<quaint::error::DatabaseConstraint> for crate::query_engine::DatabaseConstraint {
+    fn from(other: quaint::error::DatabaseConstraint) -> Self {
+        match other {
+            quaint::error::DatabaseConstraint::Fields(fields) => Self::Fields(fields.to_vec()),
+            quaint::error::DatabaseConstraint::Index(index) => Self::Index(index.to_string()),
+        }
+    }
+}
+
+pub fn render_quaint_error(kind: &ErrorKind, connection_info: &ConnectionInfo) -> Option<KnownError> {
+    match (kind, connection_info) {
+        (ErrorKind::DatabaseDoesNotExist { .. }, ConnectionInfo::Sqlite { file_path, .. }) => {
             KnownError::new(common::DatabaseDoesNotExist::Sqlite {
                 database_file_path: file_path.clone(),
                 database_file_name: std::path::Path::new(file_path)
@@ -23,7 +32,7 @@ pub fn render_quaint_error(quaint_error: &QuaintError, connection_info: &Connect
             .ok()
         }
 
-        (QuaintError::DatabaseDoesNotExist { .. }, ConnectionInfo::Postgres(url)) => {
+        (ErrorKind::DatabaseDoesNotExist { .. }, ConnectionInfo::Postgres(url)) => {
             KnownError::new(common::DatabaseDoesNotExist::Postgres {
                 database_name: url.dbname().to_owned(),
                 database_schema_name: url.schema().to_owned(),
@@ -33,7 +42,7 @@ pub fn render_quaint_error(quaint_error: &QuaintError, connection_info: &Connect
             .ok()
         }
 
-        (QuaintError::DatabaseDoesNotExist { .. }, ConnectionInfo::Mysql(url)) => {
+        (ErrorKind::DatabaseDoesNotExist { .. }, ConnectionInfo::Mysql(url)) => {
             KnownError::new(common::DatabaseDoesNotExist::Mysql {
                 database_name: url.dbname().to_owned(),
                 database_host: url.host().to_owned(),
@@ -42,7 +51,7 @@ pub fn render_quaint_error(quaint_error: &QuaintError, connection_info: &Connect
             .ok()
         }
 
-        (QuaintError::DatabaseAccessDenied { .. }, ConnectionInfo::Postgres(url)) => {
+        (ErrorKind::DatabaseAccessDenied { .. }, ConnectionInfo::Postgres(url)) => {
             KnownError::new(common::DatabaseAccessDenied {
                 database_user: url.username().into_owned(),
                 database_name: format!("{}.{}", url.dbname(), url.schema()),
@@ -50,7 +59,7 @@ pub fn render_quaint_error(quaint_error: &QuaintError, connection_info: &Connect
             .ok()
         }
 
-        (QuaintError::DatabaseAccessDenied { .. }, ConnectionInfo::Mysql(url)) => {
+        (ErrorKind::DatabaseAccessDenied { .. }, ConnectionInfo::Mysql(url)) => {
             KnownError::new(common::DatabaseAccessDenied {
                 database_user: url.username().into_owned(),
                 database_name: url.dbname().to_owned(),
@@ -58,7 +67,7 @@ pub fn render_quaint_error(quaint_error: &QuaintError, connection_info: &Connect
             .ok()
         }
 
-        (QuaintError::DatabaseAlreadyExists { db_name }, ConnectionInfo::Postgres(url)) => {
+        (ErrorKind::DatabaseAlreadyExists { db_name }, ConnectionInfo::Postgres(url)) => {
             KnownError::new(common::DatabaseAlreadyExists {
                 database_name: db_name.to_owned(),
                 database_host: url.host().to_owned(),
@@ -67,7 +76,7 @@ pub fn render_quaint_error(quaint_error: &QuaintError, connection_info: &Connect
             .ok()
         }
 
-        (QuaintError::DatabaseAlreadyExists { db_name }, ConnectionInfo::Mysql(url)) => {
+        (ErrorKind::DatabaseAlreadyExists { db_name }, ConnectionInfo::Mysql(url)) => {
             KnownError::new(common::DatabaseAlreadyExists {
                 database_name: db_name.to_owned(),
                 database_host: url.host().to_owned(),
@@ -76,7 +85,7 @@ pub fn render_quaint_error(quaint_error: &QuaintError, connection_info: &Connect
             .ok()
         }
 
-        (QuaintError::AuthenticationFailed { user }, ConnectionInfo::Postgres(url)) => {
+        (ErrorKind::AuthenticationFailed { user }, ConnectionInfo::Postgres(url)) => {
             KnownError::new(common::IncorrectDatabaseCredentials {
                 database_user: user.to_owned(),
                 database_host: url.host().to_owned(),
@@ -84,7 +93,7 @@ pub fn render_quaint_error(quaint_error: &QuaintError, connection_info: &Connect
             .ok()
         }
 
-        (QuaintError::AuthenticationFailed { user }, ConnectionInfo::Mysql(url)) => {
+        (ErrorKind::AuthenticationFailed { user }, ConnectionInfo::Mysql(url)) => {
             KnownError::new(common::IncorrectDatabaseCredentials {
                 database_user: user.to_owned(),
                 database_host: url.host().to_owned(),
@@ -92,7 +101,7 @@ pub fn render_quaint_error(quaint_error: &QuaintError, connection_info: &Connect
             .ok()
         }
 
-        (QuaintError::ConnectionError(_), ConnectionInfo::Postgres(url)) => {
+        (ErrorKind::ConnectionError(_), ConnectionInfo::Postgres(url)) => {
             KnownError::new(common::DatabaseNotReachable {
                 database_port: url.port(),
                 database_host: url.host().to_owned(),
@@ -100,37 +109,35 @@ pub fn render_quaint_error(quaint_error: &QuaintError, connection_info: &Connect
             .ok()
         }
 
-        (QuaintError::ConnectionError(_), ConnectionInfo::Mysql(url)) => {
-            KnownError::new(common::DatabaseNotReachable {
-                database_port: url.port(),
-                database_host: url.host().to_owned(),
-            })
-            .ok()
-        }
+        (ErrorKind::ConnectionError(_), ConnectionInfo::Mysql(url)) => KnownError::new(common::DatabaseNotReachable {
+            database_port: url.port(),
+            database_host: url.host().to_owned(),
+        })
+        .ok(),
 
-        (QuaintError::UniqueConstraintViolation { constraint }, _) => {
-            KnownError::new(query_engine::UniqueKeyViolation {
-                constraint: constraint.into(),
-            })
-            .ok()
-        }
+        (ErrorKind::UniqueConstraintViolation { constraint }, _) => KnownError::new(query_engine::UniqueKeyViolation {
+            constraint: constraint.into(),
+        })
+        .ok(),
 
-        (QuaintError::TlsError { message }, _) => KnownError::new(common::TlsConnectionError {
+        (ErrorKind::TlsError { message }, _) => KnownError::new(common::TlsConnectionError {
             message: message.into(),
         })
         .ok(),
 
-        (QuaintError::ConnectTimeout, ConnectionInfo::Mysql(url)) => KnownError::new(common::DatabaseNotReachable {
+        (ErrorKind::ConnectTimeout(..), ConnectionInfo::Mysql(url)) => KnownError::new(common::DatabaseNotReachable {
             database_host: url.host().to_owned(),
             database_port: url.port(),
         })
         .ok(),
 
-        (QuaintError::ConnectTimeout, ConnectionInfo::Postgres(url)) => KnownError::new(common::DatabaseNotReachable {
-            database_host: url.host().to_owned(),
-            database_port: url.port(),
-        })
-        .ok(),
+        (ErrorKind::ConnectTimeout(..), ConnectionInfo::Postgres(url)) => {
+            KnownError::new(common::DatabaseNotReachable {
+                database_host: url.host().to_owned(),
+                database_port: url.port(),
+            })
+            .ok()
+        }
 
         _ => None,
     }

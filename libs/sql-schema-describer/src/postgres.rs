@@ -4,7 +4,7 @@ use log::debug;
 use once_cell::sync::Lazy;
 use quaint::prelude::Queryable;
 use regex::Regex;
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 use std::convert::TryInto;
 use std::sync::Arc;
 
@@ -31,15 +31,16 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
     async fn describe(&self, schema: &str) -> SqlSchemaDescriberResult<SqlSchema> {
         debug!("describing schema '{}'", schema);
         let sequences = self.get_sequences(schema).await?;
-        let table_names = self.get_table_names(schema).await;
+        let enums = self.get_enums(schema).await?;
+        let mut columns = self.get_columns(schema, &enums).await;
 
+        let table_names = self.get_table_names(schema).await;
         let mut tables = Vec::with_capacity(table_names.len());
 
         for table_name in &table_names {
-            tables.push(self.get_table(schema, &table_name, &sequences).await);
+            tables.push(self.get_table(schema, &table_name, &sequences, &mut columns).await);
         }
 
-        let enums = self.get_enums(schema).await?;
         Ok(SqlSchema {
             enums,
             sequences,
@@ -112,11 +113,17 @@ impl SqlSchemaDescriber {
         size.try_into().unwrap()
     }
 
-    async fn get_table(&self, schema: &str, name: &str, sequences: &Vec<Sequence>) -> Table {
+    async fn get_table(
+        &self,
+        schema: &str,
+        name: &str,
+        sequences: &Vec<Sequence>,
+        columns: &mut HashMap<String, Vec<Column>>,
+    ) -> Table {
         debug!("Getting table '{}'", name);
-        let columns = self.get_columns(schema, name).await;
         let (indices, primary_key) = self.get_indices(schema, name, sequences).await;
         let foreign_keys = self.get_foreign_keys(schema, name).await;
+        let columns = columns.remove(name).expect("could not get columns");
         Table {
             name: name.to_string(),
             columns,
@@ -126,80 +133,100 @@ impl SqlSchemaDescriber {
         }
     }
 
-    async fn get_columns(&self, schema: &str, table: &str) -> Vec<Column> {
-        let sql = "SELECT column_name, data_type, udt_name as full_column_type, column_default, is_nullable, is_identity, data_type
+    async fn get_columns(&self, schema: &str, enums: &Vec<Enum>) -> HashMap<String, Vec<Column>> {
+        let mut columns: HashMap<String, Vec<Column>> = HashMap::new();
+
+        let sql = r#"
+            SELECT
+                table_name,
+                column_name,
+                data_type,
+                udt_name as full_data_type,
+                column_default,
+                is_nullable,
+                is_identity,
+                data_type
             FROM information_schema.columns
-            WHERE table_schema = $1 AND table_name = $2
-            ORDER BY column_name";
+            WHERE table_schema = $1
+            ORDER BY column_name
+            COLLATE "default"
+        "#;
+
         let rows = self
             .conn
-            .query_raw(&sql, &[schema.into(), table.into()])
+            .query_raw(&sql, &[schema.into()])
             .await
             .expect("querying for columns");
-        let cols = rows
-            .into_iter()
-            .map(|col| {
-                debug!("Got column: {:?}", col);
-                let col_name = col
-                    .get("column_name")
-                    .and_then(|x| x.to_string())
-                    .expect("get column name");
-                let data_type = col.get("data_type").and_then(|x| x.to_string()).expect("get data_type");
-                let full_data_type = col
-                    .get("full_column_type")
-                    .and_then(|x| x.to_string())
-                    .expect("get full_column_type aka udt_name");
-                let is_identity_str = col
-                    .get("is_identity")
-                    .and_then(|x| x.to_string())
-                    .expect("get is_identity")
-                    .to_lowercase();
-                let is_identity = match is_identity_str.as_str() {
-                    "no" => false,
-                    "yes" => true,
-                    _ => panic!("unrecognized is_identity variant '{}'", is_identity_str),
-                };
-                let is_nullable = col
-                    .get("is_nullable")
-                    .and_then(|x| x.to_string())
-                    .expect("get is_nullable")
-                    .to_lowercase();
-                let is_required = match is_nullable.as_ref() {
-                    "no" => true,
-                    "yes" => false,
-                    x => panic!(format!("unrecognized is_nullable variant '{}'", x)),
+
+        for col in rows {
+            debug!("Got column: {:?}", col);
+            let table_name = col
+                .get("table_name")
+                .and_then(|x| x.to_string())
+                .expect("get table name");
+            let col_name = col
+                .get("column_name")
+                .and_then(|x| x.to_string())
+                .expect("get column name");
+            let data_type = col.get("data_type").and_then(|x| x.to_string()).expect("get data_type");
+            let full_data_type = col
+                .get("full_data_type")
+                .and_then(|x| x.to_string())
+                .expect("get full_data_type aka udt_name");
+            let is_identity_str = col
+                .get("is_identity")
+                .and_then(|x| x.to_string())
+                .expect("get is_identity")
+                .to_lowercase();
+            let is_identity = match is_identity_str.as_str() {
+                "no" => false,
+                "yes" => true,
+                _ => panic!("unrecognized is_identity variant '{}'", is_identity_str),
+            };
+            let is_nullable = col
+                .get("is_nullable")
+                .and_then(|x| x.to_string())
+                .expect("get is_nullable")
+                .to_lowercase();
+            let is_required = match is_nullable.as_ref() {
+                "no" => true,
+                "yes" => false,
+                x => panic!(format!("unrecognized is_nullable variant '{}'", x)),
+            };
+
+            let arity = if data_type == "ARRAY" {
+                ColumnArity::List
+            } else if is_required {
+                ColumnArity::Required
+            } else {
+                ColumnArity::Nullable
+            };
+            let tpe = get_column_type(data_type.as_ref(), &full_data_type, arity, enums);
+
+            let default = col.get("column_default").and_then(|param_value| {
+                param_value
+                    .to_string()
+                    .map(|x| x.replace("\'", "").replace("::text", ""))
+            });
+            let is_auto_increment = is_identity
+                || match default {
+                    Some(ref val) => is_autoincrement(val, schema, &table_name, &col_name),
+                    _ => false,
                 };
 
-                let arity = if full_data_type.starts_with("_") {
-                    ColumnArity::List
-                } else if is_required {
-                    ColumnArity::Required
-                } else {
-                    ColumnArity::Nullable
-                };
-                let tpe = get_column_type(data_type.as_ref(), &full_data_type, arity);
+            let col = Column {
+                name: col_name,
+                tpe,
+                default,
+                auto_increment: is_auto_increment,
+            };
 
-                let default = col.get("column_default").and_then(|param_value| {
-                    param_value
-                        .to_string()
-                        .map(|x| x.replace("\'", "").replace("::text", ""))
-                });
-                let is_auto_increment = is_identity
-                    || match default {
-                        Some(ref val) => is_autoincrement(val, schema, table, &col_name),
-                        _ => false,
-                    };
-                Column {
-                    name: col_name,
-                    tpe,
-                    default,
-                    auto_increment: is_auto_increment,
-                }
-            })
-            .collect();
+            columns.entry(table_name).or_default().push(col);
+        }
 
-        debug!("Found table columns: {:?}", cols);
-        cols
+        debug!("Found table columns: {:?}", columns);
+
+        columns
     }
 
     async fn get_foreign_keys(&self, schema: &str, table: &str) -> Vec<ForeignKey> {
@@ -489,81 +516,76 @@ impl SqlSchemaDescriber {
             FROM pg_type t
             JOIN pg_enum e ON t.oid = e.enumtypid
             JOIN pg_catalog.pg_namespace n ON n.oid = t.typnamespace
-            WHERE n.nspname = $1";
-        let rows = self
-            .conn
-            .query_raw(&sql, &[schema.into()])
-            .await
-            .expect("querying for enums");
-        let mut enum_values: HashMap<String, HashSet<String>> = HashMap::new();
+            WHERE n.nspname = $1
+            ORDER BY name, value";
+        let rows = self.conn.query_raw(&sql, &[schema.into()]).await.unwrap();
+        let mut enum_values: HashMap<String, Vec<String>> = HashMap::new();
         for row in rows.into_iter() {
             debug!("Got enum row: {:?}", row);
-            let name = row.get("name").and_then(|x| x.to_string()).expect("get name");
-            let value = row.get("value").and_then(|x| x.to_string()).expect("get value");
-            if !enum_values.contains_key(&name) {
-                enum_values.insert(name.clone(), HashSet::new());
-            }
-            let vals = enum_values.get_mut(&name).expect("get enum values");
-            vals.insert(value);
+            let name = row.get("name").and_then(|x| x.to_string()).unwrap();
+            let value = row.get("value").and_then(|x| x.to_string()).unwrap();
+
+            let values = enum_values.entry(name).or_insert(vec![]);
+            values.push(value);
         }
 
-        let enums: Vec<Enum> = enum_values
+        let mut enums: Vec<Enum> = enum_values
             .into_iter()
             .map(|(k, v)| Enum { name: k, values: v })
             .collect();
+
+        enums.sort_by(|a, b| Ord::cmp(&a.name, &b.name));
+
         debug!("Found enums: {:?}", enums);
         Ok(enums)
     }
 }
 
-fn get_column_type(_data_type: &str, full_data_type: &str, arity: ColumnArity) -> ColumnType {
-    let family = match full_data_type {
-        "int2" => ColumnTypeFamily::Int,
-        "int4" => ColumnTypeFamily::Int,
-        "int8" => ColumnTypeFamily::Int,
-        "float4" => ColumnTypeFamily::Float,
-        "float8" => ColumnTypeFamily::Float,
-        "bool" => ColumnTypeFamily::Boolean,
-        "text" => ColumnTypeFamily::String,
-        "varchar" => ColumnTypeFamily::String,
-        "date" => ColumnTypeFamily::DateTime,
-        "bytea" => ColumnTypeFamily::Binary,
-        "json" => ColumnTypeFamily::Json,
-        "jsonb" => ColumnTypeFamily::Json,
-        "uuid" => ColumnTypeFamily::Uuid,
-        "bit" => ColumnTypeFamily::Binary,
-        "varbit" => ColumnTypeFamily::Binary,
-        "box" => ColumnTypeFamily::Geometric,
-        "circle" => ColumnTypeFamily::Geometric,
-        "line" => ColumnTypeFamily::Geometric,
-        "lseg" => ColumnTypeFamily::Geometric,
-        "path" => ColumnTypeFamily::Geometric,
-        "polygon" => ColumnTypeFamily::Geometric,
-        "bpchar" => ColumnTypeFamily::String,
-        "interval" => ColumnTypeFamily::DateTime,
-        "numeric" => ColumnTypeFamily::Float,
-        "pg_lsn" => ColumnTypeFamily::LogSequenceNumber,
-        "time" => ColumnTypeFamily::DateTime,
-        "timetz" => ColumnTypeFamily::DateTime,
-        "timestamp" => ColumnTypeFamily::DateTime,
-        "timestamptz" => ColumnTypeFamily::DateTime,
-        "tsquery" => ColumnTypeFamily::TextSearch,
-        "tsvector" => ColumnTypeFamily::TextSearch,
-        "txid_snapshot" => ColumnTypeFamily::TransactionId,
-        // Array types
-        "_bytea" => ColumnTypeFamily::Binary,
-        "_bool" => ColumnTypeFamily::Boolean,
-        "_date" => ColumnTypeFamily::DateTime,
-        "_float8" => ColumnTypeFamily::Float,
-        "_float4" => ColumnTypeFamily::Float,
-        "_int4" => ColumnTypeFamily::Int,
-        "_text" => ColumnTypeFamily::String,
-        "_varchar" => ColumnTypeFamily::String,
-        _ => ColumnTypeFamily::Unknown,
+fn get_column_type<'a>(data_type: &str, full_data_type: &'a str, arity: ColumnArity, enums: &Vec<Enum>) -> ColumnType {
+    use ColumnTypeFamily::*;
+    let trim = |name: &'a str| name.trim_start_matches("_");
+    let enum_exists = |name: &'a str| enums.iter().any(|e| e.name == name);
+
+    let family: ColumnTypeFamily = match full_data_type {
+        x if data_type == "USER-DEFINED" && enum_exists(x) => Enum(x.to_owned()),
+        x if data_type == "ARRAY" && x.starts_with("_") && enum_exists(trim(x)) => Enum(trim(x).to_owned()),
+        "int2" | "_int2" => Int,
+        "int4" | "_int4" => Int,
+        "int8" | "_int8" => Int,
+        "float4" | "_float4" => Float,
+        "float8" | "_float8" => Float,
+        "bool" | "_bool" => Boolean,
+        "text" | "_text" => String,
+        "varchar" | "_varchar" => String,
+        "date" | "_date" => DateTime,
+        "bytea" | "_bytea" => Binary,
+        "json" | "_json" => Json,
+        "jsonb" | "_jsonb" => Json,
+        "uuid" | "_uuid" => Uuid,
+        "bit" | "_bit" => Binary,
+        "varbit" | "_varbit" => Binary,
+        "box" | "_box" => Geometric,
+        "circle" | "_circle" => Geometric,
+        "line" | "_line" => Geometric,
+        "lseg" | "_lseg" => Geometric,
+        "path" | "_path" => Geometric,
+        "polygon" | "_polygon" => Geometric,
+        "bpchar" | "_bpchar" => String,
+        "interval" | "_interval" => DateTime,
+        "numeric" | "_numeric" => Float,
+        "pg_lsn" | "_pg_lsn" => LogSequenceNumber,
+        "time" | "_time" => DateTime,
+        "timetz" | "_timetz" => DateTime,
+        "timestamp" | "_timestamp" => DateTime,
+        "timestamptz" | "_timestamptz" => DateTime,
+        "tsquery" | "_tsquery" => TextSearch,
+        "tsvector" | "_tsvector" => TextSearch,
+        "txid_snapshot" | "_txid_snapshot" => TransactionId,
+        _ => Unknown,
     };
     ColumnType {
-        raw: full_data_type.to_string(),
-        family: family,
+        raw: full_data_type.to_owned(),
+        family,
         arity,
     }
 }

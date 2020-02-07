@@ -127,7 +127,9 @@ impl RelationField {
     /// The set of fields required by the relation (on the model of the relation field) to be able to link the related records.
     /// Tbd examples
     pub fn linking_fields(&self) -> ModelIdentifier {
-        if self.relation_info.to_fields.is_empty() {
+        if self.relation().is_many_to_many() {
+            self.model().primary_identifier()
+        } else if self.relation_info.to_fields.is_empty() {
             let related_field = self.related_field();
             let model = self.model();
             let fields = model.fields();

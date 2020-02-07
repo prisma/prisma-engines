@@ -69,17 +69,19 @@ where
     let mut idents: Vec<_> = selected_fields.types().collect();
     idents.extend(from_field.related_field().type_identifiers_with_arities());
     idents.extend(from_field.linking_fields().type_identifiers_with_arities());
+    idents.extend(from_field.linking_fields().type_identifiers_with_arities());
 
     let mut field_names: Vec<String> = selected_fields
         .db_names()
-        .chain(from_field.related_field().db_names())
+//        .chain(from_field.related_field().db_names())
         .map(String::from)
         .collect();
 
-    field_names.push(from_field.name.clone());
+//    field_names.push(from_field.name.clone());
 
     let can_skip_joins = from_field.relation_is_inlined_in_child() && !query_arguments.is_with_pagination();
     let mut columns: Vec<_> = selected_fields.columns().collect();
+    let is_with_pagination = query_arguments.is_with_pagination();
 
     columns.extend(
         from_field
@@ -97,7 +99,7 @@ where
             .collect::<Vec<_>>(),
     );
 
-    let query = if can_skip_joins {
+    let query = if can_skip_joins && false { // no optimizations for now
         let model = from_field.related_model();
         let relation_columns: Vec<_> = from_field.relation_columns(true).collect();
         let select = read::get_records(&model, columns.into_iter(), query_arguments)
@@ -123,7 +125,11 @@ where
             let relation_cols = from_field.relation_columns(true);
             let mut parent_ids: Vec<(DataSourceFieldRef, PrismaValue)> = Vec::with_capacity(relation_cols.len());
 
+            if is_with_pagination && T::uses_row_number(){
+                let _ = row.values.pop();
+            }
             // Todo: This doesn't work with @relation(references ...), it assumes primary ids.
+            // parent id is always the last column
             for field in from_field.linking_fields().fields() {
                 match field {
                     Field::Scalar(sf) => {
@@ -148,7 +154,13 @@ where
             let _ = row.values.pop();
 
             let mut record = Record::from(row);
+
+            for (_, value) in parent_ids.iter() {
+                record.values.push(value.clone()); // we need the id there as well for some reason :shrug:
+            }
+
             record.set_parent_id(RecordIdentifier::from(parent_ids));
+
 
             Ok(record)
         })

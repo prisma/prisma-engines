@@ -4,6 +4,7 @@ use connector_interface::{
     self as connector, filter::Filter, QueryArguments, ReadOperations, Transaction, WriteArgs, WriteOperations, IO,
 };
 use prisma_models::prelude::*;
+use prisma_value::PrismaValue;
 use quaint::prelude::ConnectionInfo;
 use std::marker::PhantomData;
 
@@ -133,5 +134,9 @@ where
         child_ids: &'b [RecordIdentifier],
     ) -> connector::IO<()> {
         IO::new(self.catch(async move { write::disconnect(&self.inner, field, parent_id, child_ids).await }))
+    }
+
+    fn execute_raw(&self, query: String, parameters: Vec<PrismaValue>) -> connector::IO<serde_json::Value> {
+        IO::new(self.catch(async move { write::execute_raw(&self.inner, query, parameters).await }))
     }
 }

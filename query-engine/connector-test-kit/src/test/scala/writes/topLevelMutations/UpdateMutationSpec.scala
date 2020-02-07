@@ -21,7 +21,7 @@ class UpdateMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
         |
         |enum MyEnum {
         |  A
-        |  ABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJA
+        |  ABCD
         |}
       """.stripMargin
     }
@@ -32,7 +32,7 @@ class UpdateMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
         |  createScalarModel(data: {
         |  })
         |  { id }
-        |}""".stripMargin,
+        |}""",
       project = project
     )
     val id = createResult.pathAsString("data.createScalarModel.id")

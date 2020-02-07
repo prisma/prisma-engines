@@ -36,55 +36,58 @@ pub fn connect_nested_update(
     value: ParsedInputValue,
     child_model: &ModelRef,
 ) -> QueryGraphBuilderResult<()> {
-    // for value in utils::coerce_vec(value) {
-    //     let (data, filter) = if parent_relation_field.is_list {
-    //         // We have to have a record specified as a record finder in "where".
-    //         // This finder is used to read the children first, to make sure they're actually connected.
-    //         // The update itself operates on the ID found by the read check.
-    //         let mut map: ParsedInputMap = value.try_into()?;
-    //         let where_arg: ParsedInputMap = map.remove("where").unwrap().try_into()?;
+    let child_model_identifier = parent_relation_field.related_model().primary_identifier();
 
-    //         where_arg.assert_size(1)?;
-    //         where_arg.assert_non_null()?;
+    for value in utils::coerce_vec(value) {
+        let (data, filter) = if parent_relation_field.is_list {
+            // We have to have a record specified as a record finder in "where".
+            // This finder is used to read the children first, to make sure they're actually connected.
+            // The update itself operates on the ID found by the read check.
+            let mut map: ParsedInputMap = value.try_into()?;
+            let where_arg: ParsedInputMap = map.remove("where").unwrap().try_into()?;
 
-    //         let filter = extract_filter(where_arg, &child_model, false)?;
-    //         let data_value = map.remove("data").unwrap();
+            where_arg.assert_size(1)?;
+            where_arg.assert_non_null()?;
 
-    //         (data_value, filter)
-    //     } else {
-    //         (value, Filter::empty())
-    //     };
+            let filter = extract_filter(where_arg, &child_model, false)?;
+            let data_value = map.remove("data").unwrap();
 
-    //     let find_child_records_node =
-    //         utils::insert_find_children_by_parent_node(graph, parent, parent_relation_field, filter)?;
+            (data_value, filter)
+        } else {
+            (value, Filter::empty())
+        };
 
-    //     let update_node =
-    //         update::update_record_node(graph, Filter::empty(), Arc::clone(child_model), data.try_into()?)?;
-    //     let id_field = child_model.fields().id();
+        let find_child_records_node =
+            utils::insert_find_children_by_parent_node(graph, parent, parent_relation_field, filter)?;
 
-    //     graph.create_edge(
-    //         &find_child_records_node,
-    //         &update_node,
-    //         QueryGraphDependency::ParentIds(Box::new(move |mut node, mut parent_ids| {
-    //             let parent_id = match parent_ids.pop() {
-    //                 Some(pid) => Ok(pid),
-    //                 None => Err(QueryGraphBuilderError::AssertionError(format!(
-    //                     "Expected a valid parent ID to be present for nested update to-one case."
-    //                 ))),
-    //             }?;
+        let update_node =
+            update::update_record_node(graph, Filter::empty(), Arc::clone(child_model), data.try_into()?)?;
+        let id_field = child_model.fields().find_singular_id().unwrap().upgrade().unwrap();
 
-    //             if let Node::Query(Query::Write(WriteQuery::UpdateRecord(ref mut ur))) = node {
-    //                 ur.add_filter(id_field.equals(parent_id));
-    //             }
+        graph.create_edge(
+            &find_child_records_node,
+            &update_node,
+            QueryGraphDependency::ParentIds(
+                child_model_identifier.clone(),
+                Box::new(move |mut node, mut parent_ids| {
+                    let parent_id = match parent_ids.pop() {
+                        Some(pid) => Ok(pid),
+                        None => Err(QueryGraphBuilderError::AssertionError(format!(
+                            "Expected a valid parent ID to be present for nested update to-one case."
+                        ))),
+                    }?;
 
-    //             Ok(node)
-    //         })),
-    //     )?;
-    // }
+                    if let Node::Query(Query::Write(WriteQuery::UpdateRecord(ref mut ur))) = node {
+                        ur.add_filter(id_field.data_source_field().equals(parent_id.single_value()));
+                    }
 
-    // Ok(())
+                    Ok(node)
+                }),
+            ),
+        )?;
+    }
 
-    todo!()
+    Ok(())
 }
 
 pub fn connect_nested_update_many(
@@ -94,46 +97,51 @@ pub fn connect_nested_update_many(
     value: ParsedInputValue,
     child_model: &ModelRef,
 ) -> QueryGraphBuilderResult<()> {
-    // for value in utils::coerce_vec(value) {
-    //     let mut map: ParsedInputMap = value.try_into()?;
-    //     let where_arg = map.remove("where").unwrap();
-    //     let data_value = map.remove("data").unwrap();
-    //     let data_map: ParsedInputMap = data_value.try_into()?;
-    //     let where_map: ParsedInputMap = where_arg.try_into()?;
+    let child_model_identifier = parent_relation_field.related_model().primary_identifier();
 
-    //     let filter = extract_filter(where_map, child_model, true)?;
-    //     let update_args = WriteArguments::from(&child_model, data_map)?;
+    for value in utils::coerce_vec(value) {
+        let mut map: ParsedInputMap = value.try_into()?;
+        let where_arg = map.remove("where").unwrap();
+        let data_value = map.remove("data").unwrap();
+        let data_map: ParsedInputMap = data_value.try_into()?;
+        let where_map: ParsedInputMap = where_arg.try_into()?;
 
-    //     let find_child_records_node =
-    //         utils::insert_find_children_by_parent_node(graph, parent, parent_relation_field, filter.clone())?;
+        let filter = extract_filter(where_map, child_model, true)?;
+        //        let update_args = WriteArguments::from(&child_model, data_map)?;
+        let update_args = WriteArgsParser::from(&child_model, data_map)?;
 
-    //     // TODO: this looks like some duplication from write/update.rs
-    //     let update_many = WriteQuery::UpdateManyRecords(UpdateManyRecords {
-    //         model: Arc::clone(&child_model),
-    //         filter,
-    //         args: update_args.args,
-    //     });
+        let find_child_records_node =
+            utils::insert_find_children_by_parent_node(graph, parent, parent_relation_field, filter.clone())?;
 
-    //     let update_many_node = graph.create_node(Query::Write(update_many));
-    //     let id_field = child_model.fields().id();
+        // TODO: this looks like some duplication from write/update.rs
+        let update_many = WriteQuery::UpdateManyRecords(UpdateManyRecords {
+            model: Arc::clone(&child_model),
+            filter,
+            args: update_args.args,
+        });
 
-    //     graph.create_edge(
-    //         &find_child_records_node,
-    //         &update_many_node,
-    //         QueryGraphDependency::ParentIds(Box::new(move |mut node, parent_ids| {
-    //             if let Node::Query(Query::Write(WriteQuery::UpdateManyRecords(ref mut ur))) = node {
-    //                 let ids_filter = id_field.is_in(parent_ids);
-    //                 let new_filter = Filter::and(vec![ur.filter.clone(), ids_filter]);
+        let update_many_node = graph.create_node(Query::Write(update_many));
+        let id_field = child_model.fields().find_singular_id().unwrap().upgrade().unwrap();
 
-    //                 ur.filter = new_filter;
-    //             }
+        graph.create_edge(
+            &find_child_records_node,
+            &update_many_node,
+            QueryGraphDependency::ParentIds(
+                child_model_identifier.clone(),
+                Box::new(move |mut node, parent_ids| {
+                    if let Node::Query(Query::Write(WriteQuery::UpdateManyRecords(ref mut ur))) = node {
+                        let as_prisma_values = parent_ids.iter().map(|x| x.single_value()).collect();
+                        let ids_filter = id_field.data_source_field().is_in(as_prisma_values);
+                        let new_filter = Filter::and(vec![ur.filter.clone(), ids_filter]);
 
-    //             Ok(node)
-    //         })),
-    //     )?;
-    // }
+                        ur.filter = new_filter;
+                    }
 
-    // Ok(())
+                    Ok(node)
+                }),
+            ),
+        )?;
+    }
 
-    todo!()
+    Ok(())
 }

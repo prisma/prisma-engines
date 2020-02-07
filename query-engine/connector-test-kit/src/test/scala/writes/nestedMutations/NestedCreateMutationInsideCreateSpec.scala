@@ -377,7 +377,7 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
       s"""model Todo{
         |   id     String @id @default(cuid())
         |   title  String
-        |   tags   Tag[] $relationInlineDirective
+        |   tags   Tag[]
         |}
         |
         |model Tag{

@@ -1,7 +1,7 @@
 use migration_connector::{ConnectorError, ErrorKind};
-use quaint::error::{Error as QuaintError, DatabaseConstraint};
+use quaint::error::{Error as QuaintError, ErrorKind as QuaintKind};
 use thiserror::Error;
-use user_facing_errors::quaint::render_quaint_error;
+use user_facing_errors::{quaint::render_quaint_error, query_engine::DatabaseConstraint};
 
 pub type SqlResult<T> = Result<T, SqlError>;
 
@@ -13,7 +13,7 @@ pub enum SqlError {
     #[error("Error connecting to the database {cause}")]
     ConnectionError {
         #[source]
-        cause: QuaintError,
+        cause: QuaintKind,
     },
 
     #[error("Error querying the database: {}", _0)]
@@ -23,32 +23,32 @@ pub enum SqlError {
     DatabaseDoesNotExist {
         db_name: String,
         #[source]
-        cause: QuaintError,
+        cause: QuaintKind,
     },
 
     #[error("Access denied to database '{}'", db_name)]
     DatabaseAccessDenied {
         db_name: String,
         #[source]
-        cause: QuaintError,
+        cause: QuaintKind,
     },
 
     #[error("Database '{}' already exists", db_name)]
     DatabaseAlreadyExists {
         db_name: String,
         #[source]
-        cause: QuaintError,
+        cause: QuaintKind,
     },
 
     #[error("Authentication failed for user '{}'", user)]
     AuthenticationFailed {
         user: String,
         #[source]
-        cause: QuaintError,
+        cause: QuaintKind,
     },
 
     #[error("Connect timed out")]
-    ConnectTimeout(#[source] QuaintError),
+    ConnectTimeout(#[source] QuaintKind),
 
     #[error("Operation timed out")]
     Timeout,
@@ -56,14 +56,14 @@ pub enum SqlError {
     #[error("Error opening a TLS connection. {}", cause)]
     TlsError {
         #[source]
-        cause: QuaintError,
+        cause: QuaintKind,
     },
 
     #[error("Unique constraint violation")]
     UniqueConstraintViolation {
-        field_name: String,
+        constraint: DatabaseConstraint,
         #[source]
-        cause: QuaintError,
+        cause: QuaintKind,
     },
 }
 
@@ -98,6 +98,7 @@ impl SqlError {
             SqlError::Timeout => ConnectorError::from_kind(ErrorKind::Timeout),
             SqlError::TlsError { cause } => {
                 let user_facing_error = render_quaint_error(&cause, connection_info);
+
                 ConnectorError {
                     user_facing_error,
                     kind: ErrorKind::TlsError {
@@ -130,41 +131,41 @@ impl SqlError {
     }
 }
 
-impl From<quaint::error::Error> for SqlError {
-    fn from(error: quaint::error::Error) -> Self {
-        match &error {
-            quaint::error::Error::DatabaseDoesNotExist { db_name } => Self::DatabaseDoesNotExist {
+impl From<QuaintKind> for SqlError {
+    fn from(kind: QuaintKind) -> Self {
+        match kind {
+            QuaintKind::DatabaseDoesNotExist { ref db_name } => Self::DatabaseDoesNotExist {
                 db_name: db_name.clone(),
-                cause: error,
+                cause: kind,
             },
-            quaint::error::Error::DatabaseAlreadyExists { db_name } => Self::DatabaseAlreadyExists {
+            QuaintKind::DatabaseAlreadyExists { ref db_name } => Self::DatabaseAlreadyExists {
                 db_name: db_name.clone(),
-                cause: error,
+                cause: kind,
             },
-            quaint::error::Error::DatabaseAccessDenied { db_name } => Self::DatabaseAccessDenied {
+            QuaintKind::DatabaseAccessDenied { ref db_name } => Self::DatabaseAccessDenied {
                 db_name: db_name.clone(),
-                cause: error,
+                cause: kind,
             },
-            quaint::error::Error::AuthenticationFailed { user } => Self::AuthenticationFailed {
+            QuaintKind::AuthenticationFailed { ref user } => Self::AuthenticationFailed {
                 user: user.clone(),
-                cause: error,
+                cause: kind,
             },
-            quaint::error::Error::ConnectTimeout => Self::ConnectTimeout(error),
-            quaint::error::Error::ConnectionError { .. } => Self::ConnectionError { cause: error },
-            quaint::error::Error::Timeout => Self::Timeout,
-            quaint::error::Error::TlsError { .. } => Self::TlsError { cause: error },
-            quaint::error::Error::UniqueConstraintViolation { constraint } => match constraint {
-                DatabaseConstraint::Fields(fields) => Self::UniqueConstraintViolation {
-                    field_name: fields.join(","),
-                    cause: error,
-                },
-                DatabaseConstraint::Index(index) => Self::UniqueConstraintViolation {
-                    field_name: index.into(),
-                    cause: error,
-                }
+            e @ QuaintKind::ConnectTimeout(..) => Self::ConnectTimeout(e),
+            QuaintKind::ConnectionError { .. } => Self::ConnectionError { cause: kind },
+            QuaintKind::Timeout(..) => Self::Timeout,
+            QuaintKind::TlsError { .. } => Self::TlsError { cause: kind },
+            QuaintKind::UniqueConstraintViolation { ref constraint } => Self::UniqueConstraintViolation {
+                constraint: constraint.into(),
+                cause: kind,
             },
-            _ => SqlError::QueryError(error.into()),
+            _ => SqlError::QueryError(kind.into()),
         }
+    }
+}
+
+impl From<QuaintError> for SqlError {
+    fn from(e: QuaintError) -> Self {
+        QuaintKind::from(e).into()
     }
 }
 

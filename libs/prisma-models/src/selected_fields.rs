@@ -11,6 +11,25 @@ pub struct SelectedFields {
     pub scalar: Vec<SelectedScalarField>,
     pub relation: Vec<SelectedRelationField>,
 }
+impl SelectedFields {
+    pub fn only_scalar_and_inlined(&self) -> SelectedFields {
+        SelectedFields {
+            scalar: self.scalar.clone(),
+            relation: self
+                .relation
+                .iter()
+                .filter_map(|x| {
+                    if x.field.is_inlined_on_enclosing_model() {
+                        Some(SelectedRelationField { field: x.field.clone() })
+                    } else {
+                        None
+                    }
+                })
+                .collect(),
+        }
+    }
+}
+
 #[derive(Debug, Clone)]
 pub enum SelectedField {
     Scalar(SelectedScalarField),

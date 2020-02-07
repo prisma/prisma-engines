@@ -32,12 +32,12 @@ failure = { version = "0.1" }
 indexmap = { version = "1.0", features = [ "serde-1" ] }
 itertools = "0.8"
 url = "2.1"
-clap = "2.33"
-rust_decimal = "1.1"
+structopt = "0.3"
+rust_decimal = "=1.1.0"
 
 tracing = "0.1"
 tracing-log = "0.1"
-tracing-subscriber = { git = "https://github.com/pimeys/tracing", branch = "fix-type-annotations", features = ["json"] }
+tracing-subscriber = { version = "0.2", features = ["json"] }
 tracing-attributes = "0.1"
 log = "0.4"
 

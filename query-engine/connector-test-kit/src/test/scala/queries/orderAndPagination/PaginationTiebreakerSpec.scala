@@ -52,7 +52,9 @@ class PaginationTiebreakerSpec extends FlatSpec with Matchers with ApiSpecBase {
       s"""
          |{
          |  users(
-         |  after: "$after"
+         |  after: {
+         |    id: "$after"
+       |    }
          |  ){numFollowers, pos}
          |}
       """,
@@ -90,7 +92,7 @@ class PaginationTiebreakerSpec extends FlatSpec with Matchers with ApiSpecBase {
         |{
         |  users(
         |  orderBy: numFollowers_DESC,
-        |  after: "$after"
+        |  after: { id: "$after" }
         |  ){numFollowers, pos}
         |}
       """,
@@ -129,7 +131,7 @@ class PaginationTiebreakerSpec extends FlatSpec with Matchers with ApiSpecBase {
          |{
          |  users(
          |  orderBy: numFollowers_ASC,
-         |  after: "$after"
+         |  after: { id: "$after" }
          |  ){numFollowers, pos}
          |}
       """,
@@ -171,7 +173,7 @@ class PaginationTiebreakerSpec extends FlatSpec with Matchers with ApiSpecBase {
       s"""
          |{
          |  users(
-         |  before: "$before"
+         |  before: { id: "$before" }
          |  ){numFollowers, pos}
          |}
       """,
@@ -209,7 +211,7 @@ class PaginationTiebreakerSpec extends FlatSpec with Matchers with ApiSpecBase {
          |{
          |  users(
          |  orderBy: numFollowers_DESC,
-         |  before: "$before"
+         |  before: { id: "$before" }
          |  ){numFollowers, pos}
          |}
       """,
@@ -247,7 +249,7 @@ class PaginationTiebreakerSpec extends FlatSpec with Matchers with ApiSpecBase {
          |{
          |  users(
          |  orderBy: numFollowers_ASC,
-         |  before: "$before"
+         |  before: { id: "$before" }
          |  ){numFollowers, pos}
          |}
       """,

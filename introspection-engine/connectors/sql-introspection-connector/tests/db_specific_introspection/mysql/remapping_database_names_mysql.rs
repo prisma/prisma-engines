@@ -2,7 +2,7 @@ use crate::*;
 use barrel::types;
 use test_harness::*;
 
-#[test_one_connector(connector = "mysql")]
+#[test_each_connector(tags("mysql"))]
 async fn remapping_fields_with_invalid_characters_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
@@ -39,7 +39,7 @@ async fn remapping_fields_with_invalid_characters_should_work(api: &TestApi) {
     custom_assert(&result, dm);
 }
 
-#[test_one_connector(connector = "mysql")]
+#[test_each_connector(tags("mysql"))]
 async fn remapping_tables_with_invalid_characters_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
@@ -70,7 +70,7 @@ async fn remapping_tables_with_invalid_characters_should_work(api: &TestApi) {
     custom_assert(&result, dm);
 }
 
-#[test_one_connector(connector = "mysql")]
+#[test_each_connector(tags("mysql"))]
 async fn remapping_models_in_relations_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
@@ -98,7 +98,7 @@ async fn remapping_models_in_relations_should_work(api: &TestApi) {
                id       Int                             @id  @default(autoincrement())
                name     String
                post     Post?
-               
+
                @@map("User with Space")
             }
         "#;
@@ -106,7 +106,7 @@ async fn remapping_models_in_relations_should_work(api: &TestApi) {
     custom_assert(&result, dm);
 }
 
-#[test_one_connector(connector = "mysql")]
+#[test_each_connector(tags("mysql"))]
 #[test]
 async fn remapping_models_in_compound_relations_should_work(api: &TestApi) {
     let barrel = api.barrel();
@@ -130,14 +130,14 @@ async fn remapping_models_in_compound_relations_should_work(api: &TestApi) {
     let dm = r#"
             model Post {
                 id      Int                             @id @default(autoincrement())
-                user_with_Space    User_with_Space      @map(["user_id", "user_age"]) @relation(references:[id, age]) 
+                user_with_Space    User_with_Space      @map(["user_id", "user_age"]) @relation(references:[id, age])
             }
 
             model User_with_Space {
                age      Int
                id       Int                             @id  @default(autoincrement())
                post     Post?
-               
+
                @@map("User with Space")
                @@unique([id, age], name: "user_unique")
             }
@@ -146,7 +146,7 @@ async fn remapping_models_in_compound_relations_should_work(api: &TestApi) {
     custom_assert(&result, dm);
 }
 
-#[test_one_connector(connector = "mysql")]
+#[test_each_connector(tags("mysql"))]
 #[test]
 async fn remapping_fields_in_compound_relations_should_work(api: &TestApi) {
     let barrel = api.barrel();
@@ -170,17 +170,45 @@ async fn remapping_fields_in_compound_relations_should_work(api: &TestApi) {
     let dm = r#"
             model Post {
                 id                      Int     @id @default(autoincrement())
-                user                    User    @map(["user_id", "user_age"]) @relation(references:[id, age_that_is_invalid]) 
+                user                    User    @map(["user_id", "user_age"]) @relation(references:[id, age_that_is_invalid])
             }
 
             model User {
                age_that_is_invalid      Int     @map("age-that-is-invalid")
                id                       Int     @id @default(autoincrement())
                post                     Post?
-               
+
                @@unique([id, age_that_is_invalid], name: "user_unique")
             }
         "#;
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}
+
+#[test_each_connector(tags("mysql"))]
+async fn remapping_enum_names_should_work(api: &TestApi) {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("123MySQLBook", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom("1color  Enum('black')");
+            });
+        })
+        .await;
+
+    let dm = r#"
+        model MySQLBook {
+            color   MySQLBook_color? @map("1color")
+            id      Int     @default(autoincrement()) @id
+            @@map("123MySQLBook")
+        }
+
+        enum MySQLBook_color {
+            black
+            @@map("123MySQLBook_1color")
+        }
+    "#;
+
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }

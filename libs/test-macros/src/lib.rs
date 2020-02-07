@@ -17,17 +17,6 @@ struct TestOneConnectorArgs {
     log: Option<String>,
 }
 
-const CONNECTOR_NAMES: &[&'static str] = &[
-    "mysql_8",
-    "mysql",
-    "postgres9",
-    "postgres",
-    "postgres11",
-    "postgres12",
-    "mysql_mariadb",
-    "sqlite",
-];
-
 #[proc_macro_attribute]
 pub fn test_each_connector(attr: TokenStream, input: TokenStream) -> TokenStream {
     test_each_connector::test_each_connector_impl(attr, input)

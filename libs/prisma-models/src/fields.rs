@@ -186,7 +186,7 @@ impl Fields {
         acc
     }
 
-    fn find_singular_id(&self) -> Option<ScalarFieldWeak> {
+    pub fn find_singular_id(&self) -> Option<ScalarFieldWeak> {
         self.scalar_weak().into_iter().find_map(|wsf| {
             let sf = wsf.upgrade().unwrap();
 

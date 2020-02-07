@@ -2,7 +2,7 @@ use crate::*;
 use barrel::types;
 use test_harness::*;
 
-#[test_one_connector(connector = "sqlite")]
+#[test_each_connector(tags("sqlite"))]
 #[test]
 async fn introspecting_a_simple_table_with_gql_types_must_work(api: &TestApi) {
     let barrel = api.barrel();
@@ -32,7 +32,7 @@ async fn introspecting_a_simple_table_with_gql_types_must_work(api: &TestApi) {
     custom_assert(&result, dm);
 }
 
-#[test_one_connector(connector = "sqlite")]
+#[test_each_connector(tags("sqlite"))]
 async fn introspecting_a_table_with_compound_primary_keys_must_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
@@ -56,7 +56,7 @@ async fn introspecting_a_table_with_compound_primary_keys_must_work(api: &TestAp
     custom_assert(&result, dm);
 }
 
-#[test_one_connector(connector = "sqlite")]
+#[test_each_connector(tags("sqlite"))]
 async fn introspecting_a_table_with_unique_index_must_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
@@ -79,7 +79,7 @@ async fn introspecting_a_table_with_unique_index_must_work(api: &TestApi) {
     custom_assert(&result, dm);
 }
 
-#[test_one_connector(connector = "sqlite")]
+#[test_each_connector(tags("sqlite"))]
 async fn introspecting_a_table_with_multi_column_unique_index_must_work(api: &TestApi) {
     let barrel = api.barrel();
     barrel
@@ -105,7 +105,7 @@ async fn introspecting_a_table_with_multi_column_unique_index_must_work(api: &Te
     custom_assert(&result, dm);
 }
 
-#[test_one_connector(connector = "sqlite")]
+#[test_each_connector(tags("sqlite"))]
 async fn introspecting_a_table_with_required_and_optional_columns_must_work(api: &TestApi) {
     let barrel = api.barrel();
     barrel
@@ -129,7 +129,7 @@ async fn introspecting_a_table_with_required_and_optional_columns_must_work(api:
     custom_assert(&result, dm);
 }
 
-//#[test_one_connector(connector = "sqlite")]
+//#[test_each_connector(tags("sqlite"))]
 //#[ignore]
 //fn introspecting_a_table_with_datetime_default_values_should_work(api: &TestApi) {
 //    let barrel = api.barrel();
@@ -152,7 +152,7 @@ async fn introspecting_a_table_with_required_and_optional_columns_must_work(api:
 //    custom_assert(&result, dm);
 //}
 
-#[test_one_connector(connector = "sqlite")]
+#[test_each_connector(tags("sqlite"))]
 async fn introspecting_a_table_with_default_values_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
@@ -184,7 +184,7 @@ async fn introspecting_a_table_with_default_values_should_work(api: &TestApi) {
     custom_assert(&result, dm);
 }
 
-#[test_one_connector(connector = "sqlite")]
+#[test_each_connector(tags("sqlite"))]
 async fn introspecting_a_table_with_a_non_unique_index_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
@@ -208,7 +208,7 @@ async fn introspecting_a_table_with_a_non_unique_index_should_work(api: &TestApi
     custom_assert(&result, dm);
 }
 
-#[test_one_connector(connector = "sqlite")]
+#[test_each_connector(tags("sqlite"))]
 async fn introspecting_a_table_with_a_multi_column_non_unique_index_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
@@ -230,6 +230,26 @@ async fn introspecting_a_table_with_a_multi_column_non_unique_index_should_work(
                 @@index([a,b], name: "test")
             }
         "#;
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}
+
+#[test_each_connector(tags("sqlite"))]
+async fn introspecting_a_table_with_optional_autoincrement_should_work(api: &TestApi) {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("Book", |t| {
+                t.inject_custom("book_id Integer Primary Key Autoincrement");
+            });
+        })
+        .await;
+
+    let dm = r#"
+        model Book {
+            book_id      Int     @default(autoincrement()) @id
+        }
+    "#;
+
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }

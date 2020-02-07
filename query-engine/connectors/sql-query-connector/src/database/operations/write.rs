@@ -1,70 +1,48 @@
-use crate::{error::SqlError, query_builder::write, QueryExt};
+use crate::{error::SqlError, query_builder::write, QueryExt, RawQuery};
 use connector_interface::*;
 use itertools::Itertools;
 use prisma_models::*;
-use quaint::error::{DatabaseConstraint, Error as QueryError};
+use prisma_value::PrismaValue;
+use quaint::error::{Error as QueryError, ErrorKind};
 use std::convert::TryFrom;
+use user_facing_errors::query_engine::DatabaseConstraint;
 
 pub async fn create_record(conn: &dyn QueryExt, model: &ModelRef, args: WriteArgs) -> crate::Result<RecordIdentifier> {
     let (insert, returned_id) = write::create_record(model, args);
 
     let result_set = match conn.insert(insert).await {
-        Ok(result_set) => result_set,
-        Err(QueryError::UniqueConstraintViolation { constraint }) => match constraint {
-            DatabaseConstraint::Index(_) => {
-                let fields = model
-                    .primary_identifier()
-                    .into_iter()
-                    .map(|id_field| format!("{}.{}", model.name, id_field.name()));
-                return Err(SqlError::UniqueConstraintViolation {
-                    field_names: fields.collect(),
-                });
-            }
-            DatabaseConstraint::Fields(fields) if fields.first().map(|s| s.as_str()) == Some("PRIMARY") => {
-                let fields = model
-                    .primary_identifier()
-                    .into_iter()
-                    .map(|id_field| format!("{}.{}", model.name, id_field.name()));
-                return Err(SqlError::UniqueConstraintViolation {
-                    field_names: fields.collect(),
-                });
-            }
-            DatabaseConstraint::Fields(fields) => {
-                let field_names = fields
-                    .into_iter()
-                    .map(|field_name| format!("{}.{}", model.name, field_name))
-                    .collect();
-                return Err(SqlError::UniqueConstraintViolation { field_names });
-            }
+        Ok(id) => id,
+        Err(e) => match e.kind() {
+            ErrorKind::UniqueConstraintViolation { constraint } => match constraint {
+                quaint::error::DatabaseConstraint::Index(name) => {
+                    let constraint = DatabaseConstraint::Index(name.clone());
+                    return Err(SqlError::UniqueConstraintViolation {
+                        constraint,
+                    });
+                }
+                quaint::error::DatabaseConstraint::Fields(fields) => {
+                    let constraint = DatabaseConstraint::Fields(fields.clone());
+                    return Err(SqlError::UniqueConstraintViolation {
+                        constraint,
+                    });
+                }
+            },
+            ErrorKind::NullConstraintViolation { constraint } => match constraint {
+                quaint::error::DatabaseConstraint::Index(name) => {
+                    let constraint = DatabaseConstraint::Index(name.clone());
+                    return Err(SqlError::NullConstraintViolation {
+                        constraint,
+                    });
+                }
+                quaint::error::DatabaseConstraint::Fields(fields) => {
+                    let constraint = DatabaseConstraint::Fields(fields.clone());
+                    return Err(SqlError::NullConstraintViolation {
+                        constraint,
+                    });
+                }
+            },
+            _ => return Err(SqlError::from(e)),
         },
-        Err(QueryError::NullConstraintViolation { constraint }) => match constraint {
-            DatabaseConstraint::Index(_) => {
-                let mut fields = model
-                    .primary_identifier()
-                    .into_iter()
-                    .map(|id_field| format!("{}.{}", model.name, id_field.name()));
-                return Err(SqlError::NullConstraintViolation {
-                    field_name: fields.join(","),
-                });
-            }
-            DatabaseConstraint::Fields(fields) if fields.first().map(|s| s.as_str()) == Some("PRIMARY") => {
-                let mut fields = model
-                    .primary_identifier()
-                    .into_iter()
-                    .map(|id_field| format!("{}.{}", model.name, id_field.name()));
-                return Err(SqlError::NullConstraintViolation {
-                    field_name: fields.join(","),
-                });
-            }
-            DatabaseConstraint::Fields(fields) => {
-                let field_name = fields
-                    .into_iter()
-                    .map(|field_name| format!("{}.{}", model.name, field_name))
-                    .collect();
-                return Err(SqlError::NullConstraintViolation { field_name });
-            }
-        },
-        Err(e) => return Err(SqlError::from(e)),
     };
 
     match (returned_id, result_set.len(), result_set.last_insert_id()) {
@@ -146,4 +124,13 @@ pub async fn disconnect(
     conn.delete(query).await?;
 
     Ok(())
+}
+
+pub async fn execute_raw(
+    conn: &dyn QueryExt,
+    query: String,
+    parameters: Vec<PrismaValue>,
+) -> crate::Result<serde_json::Value> {
+    let value = conn.raw_json(RawQuery::new(query, parameters)).await?;
+    Ok(value)
 }

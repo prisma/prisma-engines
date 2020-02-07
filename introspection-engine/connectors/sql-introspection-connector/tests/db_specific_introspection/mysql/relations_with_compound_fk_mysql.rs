@@ -2,7 +2,7 @@ use crate::*;
 use barrel::types;
 use test_harness::*;
 
-#[test_one_connector(connector = "mysql")]
+#[test_each_connector(tags("mysql"))]
 #[test]
 async fn compound_foreign_keys_should_work_for_one_to_one_relations(api: &TestApi) {
     let barrel = api.barrel();
@@ -26,14 +26,14 @@ async fn compound_foreign_keys_should_work_for_one_to_one_relations(api: &TestAp
     let dm = r#"
             model Post {
                 id      Int                 @id  @default(autoincrement())
-                user    User?               @map(["user_id", "user_age"]) @relation(references:[id, age]) 
+                user    User?               @map(["user_id", "user_age"]) @relation(references:[id, age])
             }
 
             model User {
                age      Int
                id       Int                 @id  @default(autoincrement())
                post     Post?
-               
+
                @@unique([id, age], name: "user_unique")
             }
         "#;
@@ -41,7 +41,7 @@ async fn compound_foreign_keys_should_work_for_one_to_one_relations(api: &TestAp
     custom_assert(&result, dm);
 }
 
-#[test_one_connector(connector = "mysql")]
+#[test_each_connector(tags("mysql"))]
 #[test]
 async fn compound_foreign_keys_should_work_for_required_one_to_one_relations(api: &TestApi) {
     let barrel = api.barrel();
@@ -65,14 +65,14 @@ async fn compound_foreign_keys_should_work_for_required_one_to_one_relations(api
     let dm = r#"
             model Post {
                 id      Int                 @id   @default(autoincrement())
-                user    User                @map(["user_id", "user_age"]) @relation(references:[id, age]) 
+                user    User                @map(["user_id", "user_age"]) @relation(references:[id, age])
             }
 
             model User {
                age     Int
                id       Int                 @id   @default(autoincrement())
                post     Post?
-               
+
                @@unique([id, age], name: "user_unique")
             }
         "#;
@@ -80,7 +80,7 @@ async fn compound_foreign_keys_should_work_for_required_one_to_one_relations(api
     custom_assert(&result, dm);
 }
 
-#[test_one_connector(connector = "mysql")]
+#[test_each_connector(tags("mysql"))]
 #[test]
 async fn compound_foreign_keys_should_work_for_one_to_many_relations(api: &TestApi) {
     let barrel = api.barrel();
@@ -103,8 +103,8 @@ async fn compound_foreign_keys_should_work_for_one_to_many_relations(api: &TestA
     let dm = r#"
             model Post {
                 id      Int                 @id  @default(autoincrement())
-                user    User?               @map(["user_id", "user_age"]) @relation(references:[id, age]) 
-                
+                user    User?               @map(["user_id", "user_age"]) @relation(references:[id, age])
+
                 @@index([user], name: "user_id")
             }
 
@@ -112,7 +112,7 @@ async fn compound_foreign_keys_should_work_for_one_to_many_relations(api: &TestA
                age      Int
                id       Int                 @id  @default(autoincrement())
                posts    Post[]
-               
+
                @@unique([id, age], name: "user_unique")
             }
         "#;
@@ -120,7 +120,7 @@ async fn compound_foreign_keys_should_work_for_one_to_many_relations(api: &TestA
     custom_assert(&result, dm);
 }
 
-#[test_one_connector(connector = "mysql")]
+#[test_each_connector(tags("mysql"))]
 #[test]
 async fn compound_foreign_keys_should_work_for_required_one_to_many_relations(api: &TestApi) {
     let barrel = api.barrel();
@@ -143,8 +143,8 @@ async fn compound_foreign_keys_should_work_for_required_one_to_many_relations(ap
     let dm = r#"
             model Post {
                 id      Int                 @id  @default(autoincrement())
-                user    User               @map(["user_id", "user_age"]) @relation(references:[id, age]) 
-                
+                user    User               @map(["user_id", "user_age"]) @relation(references:[id, age])
+
                 @@index([user], name: "user_id")
             }
 
@@ -152,7 +152,7 @@ async fn compound_foreign_keys_should_work_for_required_one_to_many_relations(ap
                age      Int
                id       Int                 @id  @default(autoincrement())
                posts    Post[]
-               
+
                @@unique([id, age], name: "user_unique")
             }
         "#;
@@ -160,7 +160,7 @@ async fn compound_foreign_keys_should_work_for_required_one_to_many_relations(ap
     custom_assert(&result, dm);
 }
 
-#[test_one_connector(connector = "mysql")]
+#[test_each_connector(tags("mysql"))]
 #[test]
 async fn compound_foreign_keys_should_work_for_required_self_relations(api: &TestApi) {
     let barrel = api.barrel();
@@ -181,9 +181,9 @@ async fn compound_foreign_keys_should_work_for_required_self_relations(api: &Tes
             model Person {
                age      Int
                id       Int         @id @default(autoincrement())
-               person   Person      @map(["partner_id", "partner_age"]) @relation("PersonToPerson_partner_id_partner_age")
+               person   Person      @map(["partner_id", "partner_age"]) @relation("PersonToPerson_partner_id_partner_age", references: [id, age])
                persons  Person[]    @relation("PersonToPerson_partner_id_partner_age")
-               
+
                @@unique([id, age], name: "person_unique")
                @@index([person], name: "partner_id")
             }
@@ -192,7 +192,7 @@ async fn compound_foreign_keys_should_work_for_required_self_relations(api: &Tes
     custom_assert(&result, dm);
 }
 
-#[test_one_connector(connector = "mysql")]
+#[test_each_connector(tags("mysql"))]
 #[test]
 async fn compound_foreign_keys_should_work_for_self_relations(api: &TestApi) {
     let barrel = api.barrel();
@@ -213,9 +213,9 @@ async fn compound_foreign_keys_should_work_for_self_relations(api: &TestApi) {
             model Person {
                age      Int
                id       Int         @id @default(autoincrement())
-               person   Person?     @map(["partner_id", "partner_age"]) @relation("PersonToPerson_partner_id_partner_age")
+               person   Person?     @map(["partner_id", "partner_age"]) @relation("PersonToPerson_partner_id_partner_age", references: [id, age])
                persons  Person[]    @relation("PersonToPerson_partner_id_partner_age")
-               
+
                @@unique([id, age], name: "person_unique")
                @@index([person], name: "partner_id")
             }
@@ -224,7 +224,7 @@ async fn compound_foreign_keys_should_work_for_self_relations(api: &TestApi) {
     custom_assert(&result, dm);
 }
 
-#[test_one_connector(connector = "mysql")]
+#[test_each_connector(tags("mysql"))]
 #[test]
 async fn compound_foreign_keys_should_work_with_defaults(api: &TestApi) {
     let barrel = api.barrel();
@@ -245,9 +245,9 @@ async fn compound_foreign_keys_should_work_with_defaults(api: &TestApi) {
             model Person {
                age      Int
                id       Int         @id @default(autoincrement())
-               person   Person      @map(["partner_id", "partner_age"]) @relation("PersonToPerson_partner_id_partner_age")
+               person   Person      @map(["partner_id", "partner_age"]) @relation("PersonToPerson_partner_id_partner_age", references: [id, age])
                persons  Person[]    @relation("PersonToPerson_partner_id_partner_age")
-               
+
                @@unique([id, age], name: "person_unique")
                @@index([person], name: "partner_id")
             }
@@ -263,7 +263,7 @@ async fn compound_foreign_keys_should_work_with_defaults(api: &TestApi) {
 // model.indexes contains a multi-field unique index that matches the colums exactly, then it is unique
 // if there are separate uniques it probably should not become a relation
 // what breaks by having an @@unique that refers to fields that do not have a representation on the model anymore due to the merged relation field?
-//#[test_one_connector(connector = "mysql")]
+//#[test_each_connector(tags("mysql"))]
 //#[test]
 //async fn compound_foreign_keys_should_work_for_one_to_one_relations_with_separate_uniques(api: &TestApi) {
 //    let barrel = api.barrel();
@@ -301,7 +301,7 @@ async fn compound_foreign_keys_should_work_with_defaults(api: &TestApi) {
 //    custom_assert(&result, dm);
 //}
 
-#[test_one_connector(connector = "mysql")]
+#[test_each_connector(tags("mysql"))]
 #[test]
 async fn compound_foreign_keys_should_work_for_one_to_many_relations_with_non_unique_index(api: &TestApi) {
     let barrel = api.barrel();
@@ -325,7 +325,7 @@ async fn compound_foreign_keys_should_work_for_one_to_many_relations_with_non_un
             model Post {
                 id      Int                 @id @default(autoincrement())
                 user    User               @map(["user_id", "user_age"]) @relation(references:[id, age])
-                
+
                 @@index([user], name: "user_id")
             }
 
@@ -333,7 +333,7 @@ async fn compound_foreign_keys_should_work_for_one_to_many_relations_with_non_un
                age      Int
                id       Int                 @id @default(autoincrement())
                posts    Post[]
-               
+
                @@unique([id, age], name: "user_unique")
             }
         "#;

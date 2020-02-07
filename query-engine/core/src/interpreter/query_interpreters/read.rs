@@ -28,7 +28,7 @@ fn read_one<'conn, 'tx>(
     let fut = async move {
         let model = query.model;
         let filter = query.filter.expect("Expected filter to be set for ReadOne query.");
-        let scalars = tx.get_single_record(&model, &filter, &query.selected_fields).await?;
+        let scalars = tx.get_single_record(&model, &filter, &query.selected_fields.only_scalar_and_inlined()).await?;
         let model_id = model.primary_identifier();
 
         match scalars {
@@ -65,7 +65,7 @@ fn read_many<'a, 'b>(
 ) -> BoxFuture<'a, InterpretationResult<QueryResult>> {
     let fut = async move {
         let scalars = tx
-            .get_many_records(&query.model, query.args.clone(), &query.selected_fields)
+            .get_many_records(&query.model, query.args.clone(), &query.selected_fields.only_scalar_and_inlined())
             .await?;
 
         let model_id = query.model.primary_identifier();
@@ -107,96 +107,115 @@ fn read_related<'a, 'b>(
             }
         };
 
-        let other_fields: Vec<_> = query
-            .parent_field
-            .related_field()
-            .linking_fields()
-            .fields()
-            .flat_map(|f| f.data_source_fields())
-            .collect();
+        let relation = query.parent_field.relation();
 
-        let filters: Vec<Filter> = relation_parent_ids
-            .clone()
-            .into_iter()
-            .map(|id| {
-                let filters = id
-                    .pairs
-                    .into_iter()
-                    .zip(other_fields.iter())
-                    .map(|((_, value), other_field)| other_field.equals(value))
-                    .collect();
-                Filter::and(filters)
-            })
-            .collect();
+        // prisma level join does not work for many 2 many yet
+        // can only work if we have a parent result. This is not the case when we e.g. have nested delete inside an update
+        let use_prisma_level_join = !relation.is_many_to_many() && parent_result.is_some() && !query.args.is_with_pagination();
 
-        let filter = Filter::or(filters);
-        let mut args = query.args.clone();
+        let mut scalars = if !use_prisma_level_join {
+            tx
+                .get_related_records(&query.parent_field, &relation_parent_ids, query.args.clone(), &query.selected_fields.only_scalar_and_inlined())
+                .await?
+        } else {
+            // PRISMA LEVEL JOIN
+            let other_fields: Vec<_> = query
+                .parent_field
+                .related_field()
+                .linking_fields()
+                .fields()
+                .flat_map(|f| f.data_source_fields())
+                .collect();
 
-        args.filter = match args.filter {
-            Some(existing_filter) => Some(Filter::and(vec![existing_filter, filter])),
-            None => Some(filter),
+            let filters: Vec<Filter> = relation_parent_ids
+                .clone()
+                .into_iter()
+                .map(|id| {
+                    let filters = id
+                        .pairs
+                        .into_iter()
+                        .zip(other_fields.iter())
+                        .map(|((_, value), other_field)| other_field.equals(value))
+                        .collect();
+                    Filter::and(filters)
+                })
+                .collect();
+
+            let filter = Filter::or(filters);
+            let mut args = query.args.clone();
+
+            args.filter = match args.filter {
+                Some(existing_filter) => Some(Filter::and(vec![existing_filter, filter])),
+                None => Some(filter),
+            };
+
+            tx
+            .get_many_records(&query.parent_field.related_model(), args, &query.selected_fields)
+            .await?
         };
 
-        let mut scalars = tx
-            .get_many_records(&query.parent_field.related_model(), args, &query.selected_fields)
-            .await?;
+        if use_prisma_level_join {
+            // Write parent IDs into the retrieved records
+            if parent_result.is_some() && query.parent_field.is_inlined_on_enclosing_model() {
+                let parent_identifier = query.parent_field.model().primary_identifier();
+                let field_names = scalars.field_names.clone();
 
-        // Write parent IDs into the retrieved records
-        if parent_result.is_some() && query.parent_field.is_inlined_on_enclosing_model() {
-            let parent_identifier = query.parent_field.model().primary_identifier();
-            let field_names = scalars.field_names.clone();
+                let parent_link_fields = query.parent_field.linking_fields();
+                let child_link_fields = query.parent_field.related_field().linking_fields();
 
-            let parent_link_fields = query.parent_field.linking_fields();
-            let child_link_fields = query.parent_field.related_field().linking_fields();
+                let parent_result =
+                    parent_result.expect("No parent results present in the query graph for reading related records.");
 
-            let parent_result =
-                parent_result.expect("No parent results present in the query graph for reading related records.");
+                let parent_fields = &parent_result.field_names;
+                let mut additional_records = vec![];
 
-            let parent_fields = &parent_result.field_names;
-            let mut additional_records = vec![];
+                for mut record in scalars.records.iter_mut() {
+                    let child_link: RecordIdentifier = record.identifier(&field_names, &child_link_fields)?;
 
-            for mut record in scalars.records.iter_mut() {
-                let child_link: RecordIdentifier = record.identifier(&field_names, &child_link_fields)?;
+                    let mut parent_records = parent_result.records.iter().filter(|record| {
+                        let parent_link = record.identifier(parent_fields, &parent_link_fields).unwrap();
 
-                let mut parent_records = parent_result.records.iter().filter(|record| {
-                    let parent_link = record.identifier(parent_fields, &parent_link_fields).unwrap();
+                        child_link.values().eq(parent_link.values())
+                    });
 
-                    child_link.values().eq(parent_link.values())
-                });
-
-                let parent_id = parent_records
-                    .next()
-                    .unwrap()
-                    .identifier(parent_fields, &parent_identifier)
-                    .unwrap();
-
-                record.parent_id = Some(parent_id);
-
-                for p_record in parent_records {
-                    let parent_id = p_record.identifier(parent_fields, &parent_identifier).unwrap();
-                    let mut record = record.clone();
+                    let parent_id = parent_records
+                        .next()
+                        .unwrap()
+                        .identifier(parent_fields, &parent_identifier)
+                        .unwrap();
 
                     record.parent_id = Some(parent_id);
-                    additional_records.push(record);
+
+                    for p_record in parent_records {
+                        let parent_id = p_record.identifier(parent_fields, &parent_identifier).unwrap();
+                        let mut record = record.clone();
+
+                        record.parent_id = Some(parent_id);
+                        additional_records.push(record);
+                    }
                 }
-            }
 
-            scalars.records.extend(additional_records);
-        } else if parent_result.is_some() && query.parent_field.related_field().is_inlined_on_enclosing_model() {
-            let parent_identifier = query.parent_field.model().primary_identifier();
-            let field_names = scalars.field_names.clone();
-            let child_link_fields = query.parent_field.related_field().linking_fields();
+                scalars.records.extend(additional_records);
+            } else if parent_result.is_some() && query.parent_field.related_field().is_inlined_on_enclosing_model() {
+                let parent_identifier = query.parent_field.model().primary_identifier();
+                let field_names = scalars.field_names.clone();
+                let child_link_fields = query.parent_field.related_field().linking_fields();
 
-            for record in scalars.records.iter_mut() {
-                let parent_id: RecordIdentifier = record.identifier(&field_names, &child_link_fields)?;
-                let parent_id = parent_id
-                    .into_iter()
-                    .zip(parent_identifier.data_source_fields())
-                    .map(|((_, value), field)| (field, value))
-                    .collect::<Vec<_>>()
-                    .into();
+                for record in scalars.records.iter_mut() {
+                    let parent_id: RecordIdentifier = record.identifier(&field_names, &child_link_fields)?;
+                    let parent_id = parent_id
+                        .into_iter()
+                        .zip(parent_identifier.data_source_fields())
+                        .map(|((_, value), field)| (field, value))
+                        .collect::<Vec<_>>()
+                        .into();
 
-                record.parent_id = Some(parent_id);
+                    record.parent_id = Some(parent_id);
+                }
+            } else if query.parent_field.relation().is_many_to_many() {
+                // nothing to do for many to many. parent ids are already present
+            } else {
+                panic!(format!("parent result: {:?}, relation: {:?}", &parent_result, &query.parent_field.relation()));
             }
         }
 

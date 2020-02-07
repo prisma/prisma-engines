@@ -1,6 +1,6 @@
 use super::{pipeline::QueryPipeline, QueryExecutor};
 use crate::{
-    CoreResult, IrSerializer, QueryDocument, QueryGraph, QueryGraphBuilder, QueryInterpreter, QuerySchemaRef, Response, Responses,
+    CoreResult, IrSerializer, QueryDocument, QueryType, QueryGraphBuilder, QueryInterpreter, QuerySchemaRef, Response, Responses,
 };
 use async_trait::async_trait;
 use connector::{ConnectionLike, Connector};
@@ -41,19 +41,19 @@ where
         let conn = self.connector.get_connection().await?;
 
         // Parse, validate, and extract query graphs from query document.
-        let queries: Vec<(QueryGraph, IrSerializer)> = QueryGraphBuilder::new(query_schema).build(query_doc)?;
+        let queries: Vec<(QueryType, IrSerializer)> = QueryGraphBuilder::new(query_schema).build(query_doc)?;
 
         // Create pipelines for all separate queries
         let mut responses = Responses::with_capacity(queries.len());
 
-        for (query_graph, info) in queries {
-            let needs_transaction = self.force_transactions || query_graph.needs_transaction();
+        for (query, info) in queries {
+            let needs_transaction = self.force_transactions || query.needs_transaction();
 
             let result = if needs_transaction {
                 let tx = conn.start_transaction().await?;
 
                 let interpreter = QueryInterpreter::new(ConnectionLike::Transaction(tx.as_ref()));
-                let result = QueryPipeline::new(query_graph, interpreter, info).execute().await;
+                let result = QueryPipeline::new(query, interpreter, info).execute().await;
 
                 if result.is_ok() {
                     tx.commit().await?;
@@ -64,7 +64,7 @@ where
                 result?
             } else {
                 let interpreter = QueryInterpreter::new(ConnectionLike::Connection(conn.as_ref()));
-                QueryPipeline::new(query_graph, interpreter, info).execute().await?
+                QueryPipeline::new(query, interpreter, info).execute().await?
             };
 
             match result {

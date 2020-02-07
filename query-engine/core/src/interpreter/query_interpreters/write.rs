@@ -3,7 +3,8 @@ use crate::{
     query_ast::*,
     QueryResult,
 };
-use connector::{ConnectionLike, Filter, WriteOperations};
+use connector::{ConnectionLike, Filter, WriteArgs, WriteOperations};
+use prisma_value::PrismaValue;
 
 pub async fn execute<'a, 'b>(
     tx: &'a ConnectionLike<'a, 'b>,
@@ -17,7 +18,19 @@ pub async fn execute<'a, 'b>(
         WriteQuery::DeleteManyRecords(q) => delete_many(tx, q).await,
         WriteQuery::ConnectRecords(q) => connect(tx, q).await,
         WriteQuery::DisconnectRecords(q) => disconnect(tx, q).await,
+        // WriteQuery::SetRecords(q) => set(tx, q).await,
+//        WriteQuery::ResetData(q) => reset(tx, q).await,
+        WriteQuery::Raw { query, parameters } => execute_raw(tx, query, parameters).await,
     }
+}
+
+async fn execute_raw<'a, 'b>(
+    tx: &'a ConnectionLike<'a, 'b>,
+    query: String,
+    parameters: Vec<PrismaValue>,
+) -> InterpretationResult<QueryResult> {
+    let res = tx.execute_raw(query, parameters).await?;
+    Ok(QueryResult::Json(res))
 }
 
 async fn create_one<'a, 'b>(tx: &'a ConnectionLike<'a, 'b>, q: CreateRecord) -> InterpretationResult<QueryResult> {

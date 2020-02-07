@@ -6,9 +6,9 @@ pub use base_query::*;
 pub use row_number::*;
 pub use union_all::*;
 
-use quaint::ast::{Query, Conjuctive};
-use crate::{query_builder, ordering::Ordering};
+use crate::{ordering::Ordering, query_builder};
 use prisma_models::sql_ext::RelationFieldExt;
+use quaint::ast::{Conjuctive, Query};
 
 pub trait ManyRelatedRecordsQueryBuilder {
     const BASE_TABLE_ALIAS: &'static str = "prismaBaseTableAlias";
@@ -32,4 +32,6 @@ pub trait ManyRelatedRecordsQueryBuilder {
             .fold(base.query.so_that(conditions), |acc, ord| acc.order_by(ord))
             .into()
     }
+
+    fn uses_row_number() -> bool;
 }

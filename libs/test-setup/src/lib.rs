@@ -9,6 +9,9 @@ pub mod logging;
 #[doc(hidden)]
 pub mod runtime;
 
+/// The built-in connectors database.
+pub mod connectors;
+
 use quaint::{prelude::Queryable, single::Quaint};
 use url::Url;
 
@@ -16,6 +19,7 @@ type AnyError = Box<dyn std::error::Error + Send + Sync>;
 
 const SCHEMA_NAME: &str = "prisma-tests";
 
+/// DANGER. This will be used for destructive filesystem access, be careful when changing this. DANGER.
 pub fn server_root() -> String {
     std::env::var("SERVER_ROOT").expect("Env var SERVER_ROOT required but not found.")
 }
