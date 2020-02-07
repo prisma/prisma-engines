@@ -6,6 +6,7 @@ use rust_decimal::{prelude::FromPrimitive, Decimal};
 use std::{
     borrow::Borrow,
     collections::{BTreeMap, HashSet},
+    convert::TryFrom,
     sync::Arc,
 };
 use uuid::Uuid;
@@ -177,7 +178,7 @@ impl QueryDocumentParser {
             (QueryValue::Null, _)                         => Ok(PrismaValue::Null),
             (QueryValue::String(s), ScalarType::String)   => Ok(PrismaValue::String(s)),
             (QueryValue::String(s), ScalarType::DateTime) => Self::parse_datetime(s.as_str()).map(PrismaValue::DateTime),
-            (QueryValue::String(_s), ScalarType::Json)     => unimplemented!(),
+            (QueryValue::String(s), ScalarType::JsonList) => Self::parse_json_list(&s),
             (QueryValue::String(s), ScalarType::UUID)     => Self::parse_uuid(s.as_str()).map(PrismaValue::Uuid),
             (QueryValue::Int(i), ScalarType::Float)       => Ok(PrismaValue::Float(Decimal::from_f64(i as f64).expect("f64 is not a Decimal."))),
             (QueryValue::Int(i), ScalarType::Int)         => Ok(PrismaValue::Int(i)),
@@ -200,6 +201,25 @@ impl QueryDocumentParser {
                     err
                 ))
             })
+    }
+
+    pub fn parse_json_list(s: &str) -> QueryParserResult<PrismaValue> {
+        let json = Self::parse_json(s)?;
+
+        let values = json
+            .as_array()
+            .ok_or_else(|| QueryParserError::AssertionError("JSON parameter needs to be an array".into()))?;
+
+        let mut prisma_values = Vec::with_capacity(values.len());
+
+        for v in values.into_iter() {
+            let pv = PrismaValue::try_from(v.clone())
+                .map_err(|_| QueryParserError::AssertionError("Nested JSON arguments are not supported".into()))?;
+
+            prisma_values.push(pv);
+        }
+
+        Ok(PrismaValue::List(prisma_values))
     }
 
     pub fn parse_json(s: &str) -> QueryParserResult<serde_json::Value> {

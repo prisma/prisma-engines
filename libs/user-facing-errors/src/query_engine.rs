@@ -1,8 +1,8 @@
 use serde::Serialize;
-use user_facing_error_macros::*;
 use std::fmt;
+use user_facing_error_macros::*;
 
-#[derive(Debug, PartialEq, Eq, Serialize)]
+#[derive(Debug, PartialEq, Eq, Serialize, Clone)]
 #[serde(untagged)]
 pub enum DatabaseConstraint {
     Fields(Vec<String>),
@@ -15,6 +15,12 @@ impl fmt::Display for DatabaseConstraint {
             Self::Fields(fields) => write!(f, "fields: ({})", fields.join(",")),
             Self::Index(index) => write!(f, "constraint: {}", index),
         }
+    }
+}
+
+impl From<Vec<String>> for DatabaseConstraint {
+    fn from(fields: Vec<String>) -> Self {
+        Self::Fields(fields)
     }
 }
 
@@ -50,9 +56,10 @@ pub struct RecordNotFound {
 }
 
 #[derive(Debug, UserFacingError, Serialize)]
-#[user_facing(code = "P2002", message = "Unique constraint failed on `${constraint}`")]
+#[user_facing(code = "P2002", message = "Unique constraint failed on the field: `${constraint}`")]
 pub struct UniqueKeyViolation {
     /// Field name from one model from Prisma schema
+    #[serde(rename = "field_name")]
     pub constraint: DatabaseConstraint,
 }
 
@@ -133,4 +140,11 @@ pub struct QueryValidationFailed {
 
     /// Location of the incorrect parsing, validation in a query. Represented by tuple or object with (line, character)
     pub query_position: String,
+}
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(code = "P2010", message = "Raw query failed. Code: `${code}`. Message: `${message}`")]
+pub struct RawQueryFailed {
+    pub code: String,
+    pub message: String,
 }

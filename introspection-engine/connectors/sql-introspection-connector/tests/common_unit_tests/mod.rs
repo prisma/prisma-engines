@@ -1,10 +1,8 @@
-use pretty_assertions::assert_eq;
-use std::collections::HashSet;
-
 use datamodel::{
     common::{ScalarType, ScalarValue},
     dml, Datamodel, DefaultValue, Field, FieldArity, FieldType, Model, OnDeleteStrategy, RelationInfo, ValueGenerator,
 };
+use pretty_assertions::assert_eq;
 use sql_introspection_connector::calculate_datamodel::calculate_model;
 use sql_schema_describer::*;
 
@@ -1088,9 +1086,7 @@ fn enums_are_preserved_when_generating_data_model_from_a_schema() {
         }],
     };
 
-    let mut enum_values = HashSet::new();
-    enum_values.insert("a".to_string());
-    enum_values.insert("b".to_string());
+    let enum_values = vec!["a".to_string(), "b".to_string()];
     let schema = SqlSchema {
         tables: vec![],
         enums: vec![Enum {

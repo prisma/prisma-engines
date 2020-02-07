@@ -4,6 +4,7 @@ use datamodel::{
     ScalarValue, ValueGenerator,
 };
 use log::debug;
+use once_cell::sync::Lazy;
 use regex::Regex;
 use sql_schema_describer::{Column, ColumnArity, ColumnTypeFamily, ForeignKey, Index, IndexType, SqlSchema, Table};
 
@@ -102,6 +103,7 @@ pub(crate) fn calculate_scalar_field(schema: &&SqlSchema, table: &&Table, column
     debug!("Handling column {:?}", column);
     let field_type = calculate_field_type(&schema, &column, &table);
     let arity = match column.tpe.arity {
+        _ if column.auto_increment && field_type == FieldType::Base(ScalarType::Int) => FieldArity::Required,
         ColumnArity::Required => FieldArity::Required,
         ColumnArity::Nullable => FieldArity::Optional,
         ColumnArity::List => FieldArity::List,
@@ -115,7 +117,7 @@ pub(crate) fn calculate_scalar_field(schema: &&SqlSchema, table: &&Table, column
         name: column.name.clone(),
         arity,
         field_type,
-        database_names: Vec::new(),
+        database_names: vec![],
         default_value,
         is_unique,
         is_id,
@@ -153,13 +155,13 @@ pub(crate) fn calculate_relation_field(schema: &SqlSchema, table: &Table, foreig
             .map(|c| table.columns.iter().find(|tc| tc.name == *c).unwrap())
             .collect();
 
-        let arity = match columns.iter().find(|c| c.is_required()).is_none() {
+        let arity = match !columns.iter().any(|c| c.is_required()) {
             true => FieldArity::Optional,
             false => FieldArity::Required,
         };
 
         let (name, database_name) = match columns.len() {
-            1 => (columns[0].name.clone(), Vec::new()),
+            1 => (columns[0].name.clone(), vec![]),
             _ => (
                 foreign_key.referenced_table.clone().camel_case(),
                 columns.iter().map(|c| c.name.clone()).collect(),
@@ -188,8 +190,8 @@ pub(crate) fn calculate_backrelation_field(
     relation_field: &&Field,
     relation_info: &RelationInfo,
 ) -> Field {
-    let table = schema.table_bang(model.name.as_str());
-    let fk = table.foreign_key_for_column(relation_field.name.as_str());
+    let table = schema.table_bang(&model.name);
+    let fk = table.foreign_key_for_column(&relation_field.name);
     let on_delete = match fk {
         // TODO: bring `onDelete` back once `prisma migrate` is a thing
         //        Some(fk) if fk.on_delete_action == ForeignKeyAction::Cascade => OnDeleteStrategy::Cascade,
@@ -206,7 +208,7 @@ pub(crate) fn calculate_backrelation_field(
         let table = schema.table_bang(&model.name);
 
         match &relation_field.database_names.len() {
-            0 => table.is_column_unique(relation_field.name.as_str()),
+            0 => table.is_column_unique(&relation_field.name),
             1 => {
                 let column_name = relation_field.database_names.first().unwrap();
                 table.is_column_unique(column_name)
@@ -222,17 +224,17 @@ pub(crate) fn calculate_backrelation_field(
         FieldArity::Required | FieldArity::Optional => FieldArity::List,
         FieldArity::List => FieldArity::Optional,
     };
-    let inflector = prisma_inflector::default();
+
     let name = match arity {
-        FieldArity::List => inflector.pluralize(&model.name).camel_case(), // pluralize
+        FieldArity::List => prisma_inflector::default().pluralize(&model.name).camel_case(), // pluralize
         FieldArity::Optional => model.name.clone().camel_case(),
         FieldArity::Required => model.name.clone().camel_case(),
     };
-    let field = Field {
+    Field {
         name,
         arity,
         field_type,
-        database_names: Vec::new(),
+        database_names: vec![],
         default_value: None,
         is_unique: false,
         is_id: false,
@@ -240,26 +242,25 @@ pub(crate) fn calculate_backrelation_field(
         is_generated: false,
         is_updated_at: false,
         data_source_fields: vec![],
-    };
-    field
+    }
 }
 
 pub(crate) fn calculate_default(column: &Column, arity: &FieldArity) -> Option<DefaultValue> {
-    match (arity, &column.default, &column.tpe.family) {
-        (FieldArity::List, _, _) => None,
-        (_, Some(d), ColumnTypeFamily::Boolean) => match parse_int(d) {
+    match (&column.default, &column.tpe.family) {
+        (_, _) if *arity == FieldArity::List => None,
+        (Some(d), ColumnTypeFamily::Boolean) => match parse_int(d) {
             Some(x) => Some(DefaultValue::Single(ScalarValue::Boolean(x != 0))),
             None => parse_bool(d).map(|b| DefaultValue::Single(ScalarValue::Boolean(b))),
         },
-        (_, Some(d), ColumnTypeFamily::Int) => match column.auto_increment {
+        (Some(d), ColumnTypeFamily::Int) => match column.auto_increment {
             true => Some(DefaultValue::Expression(ValueGenerator::new_autoincrement())),
             false => parse_int(d).map(|x| DefaultValue::Single(ScalarValue::Int(x))),
         },
-        (_, Some(d), ColumnTypeFamily::Float) => parse_float(d).map(|x| DefaultValue::Single(ScalarValue::Float(x))),
-        (_, Some(d), ColumnTypeFamily::String) => Some(DefaultValue::Single(ScalarValue::String(d.to_string()))),
-        (_, Some(_), ColumnTypeFamily::DateTime) => None, //todo
-        (_, None, _) if column.auto_increment => Some(DefaultValue::Expression(ValueGenerator::new_autoincrement())),
-        (_, _, _) => None,
+        (Some(d), ColumnTypeFamily::Float) => parse_float(d).map(|x| DefaultValue::Single(ScalarValue::Float(x))),
+        (Some(d), ColumnTypeFamily::String) => Some(DefaultValue::Single(ScalarValue::String(d.to_string()))),
+        (Some(_), ColumnTypeFamily::DateTime) => None, //todo
+        (None, _) if column.auto_increment => Some(DefaultValue::Expression(ValueGenerator::new_autoincrement())),
+        (_, _) => None,
     }
 }
 
@@ -329,12 +330,13 @@ pub(crate) fn calculate_field_type(schema: &SqlSchema, column: &Column, table: &
         }
         _ => {
             debug!("Found no corresponding foreign key");
-            match column.tpe.family {
+            match &column.tpe.family {
                 ColumnTypeFamily::Boolean => FieldType::Base(ScalarType::Boolean),
                 ColumnTypeFamily::DateTime => FieldType::Base(ScalarType::DateTime),
                 ColumnTypeFamily::Float => FieldType::Base(ScalarType::Float),
                 ColumnTypeFamily::Int => FieldType::Base(ScalarType::Int),
                 ColumnTypeFamily::String => FieldType::Base(ScalarType::String),
+                ColumnTypeFamily::Enum(name) => FieldType::Enum(name.clone()),
                 // XXX: We made a conscious decision to punt on mapping of ColumnTypeFamily
                 // variants that don't yet have corresponding PrismaType variants
                 _ => FieldType::Base(ScalarType::String),
@@ -374,10 +376,11 @@ pub fn deduplicate_names_of_fields_to_be_added(fields_to_be_added: &mut Vec<(Str
     });
 }
 
+static RE_NUM: Lazy<Regex> = Lazy::new(|| Regex::new(r"^'?(\d+)'?$").expect("compile regex"));
+
 fn parse_int(value: &str) -> Option<i32> {
     debug!("Parsing int '{}'", value);
-    let re_num = Regex::new(r"^'?(\d+)'?$").expect("compile regex");
-    let rslt = re_num.captures(value);
+    let rslt = RE_NUM.captures(value);
     if rslt.is_none() {
         debug!("Couldn't parse int");
         return None;
@@ -400,10 +403,11 @@ fn parse_bool(value: &str) -> Option<bool> {
     value.to_lowercase().parse().ok()
 }
 
+static RE_FLOAT: Lazy<Regex> = Lazy::new(|| Regex::new(r"^'?([^']+)'?$").expect("compile regex"));
+
 fn parse_float(value: &str) -> Option<f32> {
     debug!("Parsing float '{}'", value);
-    let re_num = Regex::new(r"^'?([^']+)'?$").expect("compile regex");
-    let rslt = re_num.captures(value);
+    let rslt = RE_FLOAT.captures(value);
     if rslt.is_none() {
         debug!("Couldn't parse float");
         return None;

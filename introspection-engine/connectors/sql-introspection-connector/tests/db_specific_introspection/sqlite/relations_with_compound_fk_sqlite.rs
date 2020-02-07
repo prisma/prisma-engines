@@ -2,7 +2,7 @@ use crate::*;
 use barrel::types;
 use test_harness::*;
 
-#[test_one_connector(connector = "sqlite")]
+#[test_each_connector(tags("sqlite"))]
 #[test]
 async fn compound_foreign_keys_should_work_for_one_to_one_relations(api: &TestApi) {
     let barrel = api.barrel();
@@ -42,7 +42,7 @@ async fn compound_foreign_keys_should_work_for_one_to_one_relations(api: &TestAp
     custom_assert(&result, dm);
 }
 
-#[test_one_connector(connector = "sqlite")]
+#[test_each_connector(tags("sqlite"))]
 #[test]
 async fn compound_foreign_keys_should_work_for_required_one_to_one_relations(api: &TestApi) {
     let barrel = api.barrel();
@@ -82,7 +82,7 @@ async fn compound_foreign_keys_should_work_for_required_one_to_one_relations(api
     custom_assert(&result, dm);
 }
 
-#[test_one_connector(connector = "sqlite")]
+#[test_each_connector(tags("sqlite"))]
 #[test]
 async fn compound_foreign_keys_should_work_for_one_to_many_relations(api: &TestApi) {
     let barrel = api.barrel();
@@ -121,7 +121,7 @@ async fn compound_foreign_keys_should_work_for_one_to_many_relations(api: &TestA
     custom_assert(&result, dm);
 }
 
-#[test_one_connector(connector = "sqlite")]
+#[test_each_connector(tags("sqlite"))]
 #[test]
 async fn compound_foreign_keys_should_work_for_required_one_to_many_relations(api: &TestApi) {
     let barrel = api.barrel();
@@ -159,7 +159,7 @@ async fn compound_foreign_keys_should_work_for_required_one_to_many_relations(ap
     custom_assert(&result, dm);
 }
 
-#[test_one_connector(connector = "sqlite")]
+#[test_each_connector(tags("sqlite"))]
 #[test]
 async fn compound_foreign_keys_should_work_for_required_self_relations(api: &TestApi) {
     let barrel = api.barrel();
@@ -190,7 +190,7 @@ async fn compound_foreign_keys_should_work_for_required_self_relations(api: &Tes
     custom_assert(&result, dm);
 }
 
-#[test_one_connector(connector = "sqlite")]
+#[test_each_connector(tags("sqlite"))]
 #[test]
 async fn compound_foreign_keys_should_work_for_self_relations(api: &TestApi) {
     let barrel = api.barrel();
@@ -221,7 +221,7 @@ async fn compound_foreign_keys_should_work_for_self_relations(api: &TestApi) {
     custom_assert(&result, dm);
 }
 
-#[test_one_connector(connector = "sqlite")]
+#[test_each_connector(tags("sqlite"))]
 #[test]
 async fn compound_foreign_keys_should_work_with_defaults(api: &TestApi) {
     let barrel = api.barrel();
@@ -259,7 +259,7 @@ async fn compound_foreign_keys_should_work_with_defaults(api: &TestApi) {
 // model.indexes contains a multi-field unique index that matches the colums exactly, then it is unique
 // if there are separate uniques it probably should not become a relation
 // what breaks by having an @@unique that refers to fields that do not have a representation on the model anymore due to the merged relation field?
-//#[test_one_connector(connector = "sqlite")]
+//#[test_each_connector(tags("sqlite"))]
 //#[test]
 //async fn compound_foreign_keys_should_work_for_one_to_one_relations_with_separate_uniques(api: &TestApi) {
 //    let barrel = api.barrel();
@@ -298,7 +298,7 @@ async fn compound_foreign_keys_should_work_with_defaults(api: &TestApi) {
 //}
 
 // the fk indexes are created implicitly on mysql
-#[test_one_connector(connector = "sqlite")]
+#[test_each_connector(tags("sqlite"))]
 #[test]
 async fn compound_foreign_keys_should_work_for_one_to_many_relations_with_non_unique_index(api: &TestApi) {
     let barrel = api.barrel();

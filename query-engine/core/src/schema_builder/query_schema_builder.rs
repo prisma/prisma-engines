@@ -1,5 +1,6 @@
 use super::*;
 use crate::{query_graph_builder::*, Query, QueryGraph};
+use prisma_models::dml;
 
 /// Build mode for schema generation.
 #[derive(Debug, Copy, Clone)]
@@ -51,6 +52,7 @@ pub struct QuerySchemaBuilder<'a> {
     input_type_builder: Arc<InputTypeBuilder<'a>>,
     argument_builder: ArgumentBuilder<'a>,
     filter_object_type_builder: Arc<FilterObjectTypeBuilder<'a>>,
+    enable_raw_queries: bool,
 }
 
 impl<'a> QuerySchemaBuilder<'a> {
@@ -58,6 +60,7 @@ impl<'a> QuerySchemaBuilder<'a> {
         internal_data_model: &InternalDataModelRef,
         capabilities: &'a SupportedCapabilities,
         mode: BuildMode,
+        enable_raw_queries: bool,
     ) -> Self {
         let filter_object_type_builder = Arc::new(FilterObjectTypeBuilder::new(capabilities));
         let input_type_builder = Arc::new(InputTypeBuilder::new(
@@ -79,13 +82,14 @@ impl<'a> QuerySchemaBuilder<'a> {
         );
 
         QuerySchemaBuilder {
-            mode,
             internal_data_model: Arc::clone(internal_data_model),
             _capabilities: capabilities,
+            mode,
             object_type_builder,
             input_type_builder,
             argument_builder,
             filter_object_type_builder,
+            enable_raw_queries,
         }
     }
 
@@ -152,7 +156,7 @@ impl<'a> QuerySchemaBuilder<'a> {
     /// Builds the root mutation type.
     fn build_mutation_type(&self) -> (OutputType, ObjectTypeStrongRef) {
         let non_embedded_models = self.non_embedded_models();
-        let fields = non_embedded_models
+        let mut fields: Vec<Field> = non_embedded_models
             .into_iter()
             .map(|model| {
                 let mut vec = vec![self.create_item_field(Arc::clone(&model))];
@@ -168,6 +172,10 @@ impl<'a> QuerySchemaBuilder<'a> {
             })
             .flatten()
             .collect();
+
+        if self.enable_raw_queries {
+            fields.push(self.create_execute_raw_field());
+        }
 
         let strong_ref = Arc::new(object_type("Mutation", fields, None));
 
@@ -265,6 +273,22 @@ impl<'a> QuerySchemaBuilder<'a> {
                     Ok(graph)
                 }),
             ))),
+        )
+    }
+
+    fn create_execute_raw_field(&self) -> Field {
+        field(
+            "executeRaw",
+            vec![
+                argument("query", InputType::string(), None),
+                argument(
+                    "parameters",
+                    InputType::opt(InputType::json_list()),
+                    Some(dml::DefaultValue::Single(dml::ScalarValue::String("[]".into()))),
+                ),
+            ],
+            OutputType::json(),
+            None,
         )
     }
 

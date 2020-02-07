@@ -23,7 +23,7 @@ class CreateMutationListSpec extends FlatSpec with Matchers with ApiSpecBase {
       |
       |enum MyEnum {
       |  A
-      |  ABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJABCDEFGHIJA
+      |  ABCD
       |}
     """.stripMargin
   }
@@ -92,7 +92,6 @@ class CreateMutationListSpec extends FlatSpec with Matchers with ApiSpecBase {
       project = project,
       errorCode = 1
     )
-
 
     res.pathAsString("errors.[0].error") should be(
       s"""Error in query graph construction: InputError(\"The `set` argument was not provided for field `optStrings` on `ScalarModel`")"""

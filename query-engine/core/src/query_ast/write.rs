@@ -13,6 +13,10 @@ pub enum WriteQuery {
     DeleteManyRecords(DeleteManyRecords),
     ConnectRecords(ConnectRecords),
     DisconnectRecords(DisconnectRecords),
+    Raw {
+        query: String,
+        parameters: Vec<PrismaValue>,
+    },
 }
 
 impl WriteQuery {
@@ -58,6 +62,10 @@ impl WriteQuery {
             Self::DeleteManyRecords(q) => false,
             Self::ConnectRecords(q) => false,
             Self::DisconnectRecords(q) => false,
+            Self::Raw {
+                query: _,
+                parameters: _,
+            } => unimplemented!(),
         }
     }
 
@@ -70,6 +78,10 @@ impl WriteQuery {
             Self::DeleteManyRecords(q) => Arc::clone(&q.model),
             Self::ConnectRecords(q) => q.relation_field.model(),
             Self::DisconnectRecords(q) => q.relation_field.model(),
+            Self::Raw {
+                query: _,
+                parameters: _,
+            } => unimplemented!(),
         }
     }
 }
@@ -110,6 +122,7 @@ impl std::fmt::Display for WriteQuery {
             Self::DeleteManyRecords(q) => write!(f, "DeleteManyRecords: {}", q.model.name),
             Self::ConnectRecords(_) => write!(f, "ConnectRecords"),
             Self::DisconnectRecords(_) => write!(f, "DisconnectRecords"),
+            Self::Raw { query, parameters } => write!(f, "Raw: {} ({:?})", query, parameters),
         }
     }
 }

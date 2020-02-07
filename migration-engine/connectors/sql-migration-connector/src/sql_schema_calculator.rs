@@ -1,19 +1,22 @@
-use crate::SqlResult;
+use crate::{sql_renderer::IteratorJoin, DatabaseInfo, SqlResult};
 use chrono::*;
 use datamodel::common::*;
 use datamodel::*;
-use itertools::Itertools;
 use prisma_models::{DatamodelConverter, TempManifestationHolder, TempRelationHolder};
-use sql_schema_describer as sql;
-use sql_schema_describer::ColumnArity;
+use quaint::prelude::SqlFamily;
+use sql_schema_describer::{self as sql, ColumnArity};
 
 pub struct SqlSchemaCalculator<'a> {
     data_model: &'a Datamodel,
+    database_info: &'a DatabaseInfo,
 }
 
 impl<'a> SqlSchemaCalculator<'a> {
-    pub fn calculate(data_model: &Datamodel) -> SqlResult<sql::SqlSchema> {
-        let calculator = SqlSchemaCalculator { data_model };
+    pub fn calculate(data_model: &Datamodel, database_info: &DatabaseInfo) -> SqlResult<sql::SqlSchema> {
+        let calculator = SqlSchemaCalculator {
+            data_model,
+            database_info,
+        };
         calculator.calculate_internal()
     }
 
@@ -28,10 +31,12 @@ impl<'a> SqlSchemaCalculator<'a> {
 
         // guarantee same sorting as in the sql-schema-describer
         for table in &mut tables {
-            table.columns.sort_unstable_by_key(|col| col.name.clone());
+            table
+                .columns
+                .sort_unstable_by(|a, b| a.name.as_str().cmp(b.name.as_str()));
         }
 
-        let enums = Vec::new();
+        let enums = self.calculate_enums();
         let sequences = Vec::new();
 
         Ok(sql::SqlSchema {
@@ -41,6 +46,19 @@ impl<'a> SqlSchemaCalculator<'a> {
         })
     }
 
+    fn calculate_enums(&self) -> Vec<sql::Enum> {
+        self.data_model
+            .enums()
+            .map(|r#enum| sql::Enum {
+                name: r#enum
+                    .single_database_name()
+                    .map(|s| s.to_owned())
+                    .unwrap_or_else(|| r#enum.name.clone()),
+                values: r#enum.values.clone(),
+            })
+            .collect()
+    }
+
     fn calculate_model_tables(&self) -> SqlResult<Vec<ModelTable>> {
         self.data_model
             .models()
@@ -48,7 +66,7 @@ impl<'a> SqlSchemaCalculator<'a> {
                 let columns = model
                     .fields()
                     .flat_map(|f| match &f.field_type {
-                        FieldType::Base(_) | FieldType::Enum(_) => Some(sql::Column {
+                        FieldType::Base(_) => Some(sql::Column {
                             name: f.db_name(),
                             tpe: column_type(f),
                             default: f.migration_value_new(&self.data_model),
@@ -63,6 +81,20 @@ impl<'a> SqlSchemaCalculator<'a> {
                                 }
                             },
                         }),
+                        FieldType::Enum(r#enum) => {
+                            let enum_db_name = self
+                                .data_model
+                                .find_enum(r#enum)
+                                .unwrap()
+                                .single_database_name()
+                                .unwrap_or_else(|| r#enum.as_str());
+                            Some(sql::Column {
+                                name: f.db_name(),
+                                tpe: enum_column_type(f, &self.database_info, enum_db_name),
+                                default: f.migration_value_new(&self.data_model),
+                                auto_increment: false,
+                            })
+                        }
                         _ => None,
                     })
                     .collect();
@@ -415,6 +447,16 @@ fn default_migration_value(field_type: &FieldType, datamodel: &Datamodel) -> Sca
             ScalarValue::String(first_value.to_string())
         }
         _ => unimplemented!("this functions must only be called for scalar fields"),
+    }
+}
+
+fn enum_column_type(field: &Field, database_info: &DatabaseInfo, db_name: &str) -> sql::ColumnType {
+    let arity = column_arity(field);
+    match database_info.sql_family() {
+        SqlFamily::Postgres | SqlFamily::Mysql => {
+            sql::ColumnType::pure(sql::ColumnTypeFamily::Enum(db_name.to_owned()), arity)
+        }
+        _ => column_type(field),
     }
 }
 

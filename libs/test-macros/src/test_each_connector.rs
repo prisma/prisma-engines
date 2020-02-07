@@ -1,38 +1,105 @@
-use super::CONNECTOR_NAMES;
 use darling::FromMeta;
 use proc_macro::TokenStream;
 use proc_macro2::Span;
 use quote::quote;
-use syn::{parse_macro_input, AttributeArgs, Ident, ItemFn};
+use std::str::FromStr;
+use syn::{parse_macro_input, spanned::Spanned, AttributeArgs, Ident, ItemFn};
+use test_setup::connectors::{Capabilities, Connector, Tags, CONNECTORS};
 
 #[derive(Debug, FromMeta)]
 struct TestEachConnectorArgs {
-    /// Comma-separated list of connectors to exclude.
-    #[darling(default)]
-    ignore: Option<String>,
-
-    #[darling(default)]
-    starts_with: Option<String>,
-
+    /// If present, setup tracing logging with the passed in configuration string.
     #[darling(default)]
     log: Option<String>,
+
+    /// If present, run only the tests for the connectors with all of the passed in capabilities.
+    #[darling(default)]
+    capabilities: CapabilitiesWrapper,
+
+    /// If present, run only the tests for the connectors with any of the passed in tags.
+    #[darling(default)]
+    tags: TagsWrapper,
+
+    /// Optional list of tags to ignore.
+    #[darling(default)]
+    ignore: TagsWrapper,
+}
+
+#[derive(Debug)]
+struct CapabilitiesWrapper(Capabilities);
+
+impl Default for CapabilitiesWrapper {
+    fn default() -> Self {
+        CapabilitiesWrapper(Capabilities::empty())
+    }
+}
+
+impl darling::FromMeta for CapabilitiesWrapper {
+    fn from_list(items: &[syn::NestedMeta]) -> Result<Self, darling::Error> {
+        let mut capabilities = Capabilities::empty();
+
+        for item in items {
+            match item {
+                syn::NestedMeta::Lit(syn::Lit::Str(s)) => {
+                    let s = s.value();
+                    let capability = Capabilities::from_str(&s)
+                        .map_err(|err| darling::Error::unknown_value(&err.to_string()).with_span(&item.span()))?;
+                    capabilities.insert(capability);
+                }
+                syn::NestedMeta::Lit(other) => {
+                    return Err(darling::Error::unexpected_lit_type(other).with_span(&other.span()))
+                }
+                syn::NestedMeta::Meta(meta) => {
+                    return Err(darling::Error::unsupported_shape("Expected string literal").with_span(&meta.span()))
+                }
+            }
+        }
+
+        Ok(CapabilitiesWrapper(capabilities))
+    }
+}
+
+#[derive(Debug)]
+struct TagsWrapper(Tags);
+
+impl Default for TagsWrapper {
+    fn default() -> Self {
+        TagsWrapper(Tags::empty())
+    }
+}
+
+impl darling::FromMeta for TagsWrapper {
+    fn from_list(items: &[syn::NestedMeta]) -> Result<Self, darling::Error> {
+        let mut tags = Tags::empty();
+
+        for item in items {
+            match item {
+                syn::NestedMeta::Lit(syn::Lit::Str(s)) => {
+                    let s = s.value();
+                    let tag = Tags::from_str(&s)
+                        .map_err(|err| darling::Error::unknown_value(&err.to_string()).with_span(&item.span()))?;
+                    tags.insert(tag);
+                }
+                syn::NestedMeta::Lit(other) => {
+                    return Err(darling::Error::unexpected_lit_type(other).with_span(&other.span()))
+                }
+                syn::NestedMeta::Meta(meta) => {
+                    return Err(darling::Error::unsupported_shape("Expected string literal").with_span(&meta.span()))
+                }
+            }
+        }
+
+        Ok(TagsWrapper(tags))
+    }
 }
 
 impl TestEachConnectorArgs {
-    fn connectors_to_test(&self) -> impl Iterator<Item = &&str> {
-        let ignore = self.ignore.as_ref().map(String::as_str);
-        let starts_with = self.starts_with.as_ref().map(String::as_str);
-
-        CONNECTOR_NAMES
-            .iter()
-            .filter(move |connector_name| match ignore {
-                Some(ignore) => !connector_name.starts_with(&ignore),
-                None => true,
-            })
-            .filter(move |connector_name| match starts_with {
-                Some(pat) => connector_name.starts_with(pat),
-                None => true,
-            })
+    fn connectors_to_test(&self) -> impl Iterator<Item = &Connector> {
+        CONNECTORS
+            .all()
+            .filter(move |connector| connector.capabilities.contains(self.capabilities.0))
+            .filter(move |connector| self.tags.0.is_empty() || connector.tags.intersects(self.tags.0))
+            .filter(move |connector| !connector.tags.intersects(self.ignore.0))
     }
 }
 
@@ -45,7 +112,7 @@ pub fn test_each_connector_impl(attr: TokenStream, input: TokenStream) -> TokenS
 
     let tests = match args {
         Ok(args) => test_each_connector_async_wrapper_functions(&args, &test_function),
-        Err(err) => panic!("{}", err),
+        Err(err) => return err.write_errors().into(),
     };
 
     let output = quote! {
@@ -62,9 +129,9 @@ fn test_each_connector_async_wrapper_functions(
     test_function: &ItemFn,
 ) -> Vec<proc_macro2::TokenStream> {
     let test_fn_name = &test_function.sig.ident;
-    let test_fn_name_str = format!("{}", test_fn_name);
+    let test_fn_name_str = test_fn_name.to_string();
 
-    let mut tests = Vec::with_capacity(CONNECTOR_NAMES.len());
+    let mut tests = Vec::with_capacity(CONNECTORS.len());
 
     let optional_logging_import = args.log.as_ref().map(|_| {
         quote!(
@@ -82,8 +149,9 @@ fn test_each_connector_async_wrapper_functions(
     };
 
     for connector in args.connectors_to_test() {
-        let connector_test_fn_name = Ident::new(&format!("{}_on_{}", test_fn_name, connector), Span::call_site());
-        let connector_api_factory = Ident::new(&format!("{}_test_api", connector), Span::call_site());
+        let connector_test_fn_name =
+            Ident::new(&format!("{}_on_{}", test_fn_name, connector.name()), Span::call_site());
+        let connector_api_factory = Ident::new(connector.test_api(), Span::call_site());
 
         let test = quote! {
             #[test]
@@ -100,6 +168,14 @@ fn test_each_connector_async_wrapper_functions(
         };
 
         tests.push(test);
+    }
+
+    if tests.is_empty() {
+        return vec![
+            syn::Error::new_spanned(test_function, "All connectors were filtered out for this test.")
+                .to_compile_error()
+                .into(),
+        ];
     }
 
     tests

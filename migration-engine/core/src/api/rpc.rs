@@ -1,11 +1,8 @@
-use super::{GenericApi, MigrationApi};
+use super::GenericApi;
 use crate::{commands::*, CoreResult};
-use datamodel::configuration::{MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME};
 use futures::{FutureExt, TryFutureExt};
-use json_rpc_stdio::ServerBuilder;
 use jsonrpc_core::types::error::Error as JsonRpcError;
 use jsonrpc_core::{IoHandler, Params};
-use sql_migration_connector::SqlMigrationConnector;
 use std::{io, sync::Arc};
 use thiserror::Error;
 
@@ -54,22 +51,9 @@ static AVAILABLE_COMMANDS: &[RpcCommand] = &[
 
 impl RpcApi {
     pub async fn new(datamodel: &str) -> CoreResult<Self> {
-        let config = datamodel::parse_configuration(datamodel)?;
-
-        let source = config.datasources.first().ok_or(CommandError::DataModelErrors {
-            errors: vec!["There is no datasource in the configuration.".to_string()],
-        })?;
-
-        let connector = match source.connector_type() {
-            provider if [MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME].contains(&provider) => {
-                SqlMigrationConnector::new(&source.url().value, provider).await?
-            }
-            x => unimplemented!("Connector {} is not supported yet", x),
-        };
-
         let mut rpc_api = Self {
             io_handler: IoHandler::default(),
-            executor: Arc::new(MigrationApi::new(connector).await?),
+            executor: crate::migration_api(datamodel).await?,
         };
 
         for cmd in AVAILABLE_COMMANDS {
@@ -81,7 +65,7 @@ impl RpcApi {
 
     /// Block the thread and handle IO in async until EOF.
     pub async fn start_server(self) -> std::io::Result<()> {
-        ServerBuilder::new(self.io_handler).run().await
+        json_rpc_stdio::run(self.io_handler).await
     }
 
     /// Handle one request

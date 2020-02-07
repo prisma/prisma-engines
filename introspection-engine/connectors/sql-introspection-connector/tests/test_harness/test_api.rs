@@ -31,8 +31,11 @@ impl TestApi {
     }
 
     pub async fn get_metadata(&self) -> DatabaseMetadata {
-        let metadata = self.introspection_connector.get_metadata().await.unwrap();
-        metadata
+        self.introspection_connector.get_metadata().await.unwrap()
+    }
+
+    pub async fn get_database_description(&self) -> String {
+        self.introspection_connector.get_database_description().await.unwrap()
     }
 
     pub fn sql_family(&self) -> SqlFamily {

@@ -48,24 +48,6 @@ pub trait MigrationPersistence: Send + Sync {
     /// This powers the listMigrations command.
     async fn load_all(&self) -> Result<Vec<Migration>, ConnectorError>;
 
-    /// Load all current trailing watch migrations from Migration Event Log.
-    async fn load_current_watch_migrations(&self) -> Result<Vec<Migration>, ConnectorError> {
-        let mut all_migrations = self.load_all().await?;
-        let mut result = Vec::new();
-        // start to take all migrations from the back until we hit a migration that is not watch
-        all_migrations.reverse();
-        for migration in all_migrations {
-            if migration.is_watch_migration() {
-                result.push(migration);
-            } else {
-                break;
-            }
-        }
-        // reverse the result so the migrations are in the right order again
-        result.reverse();
-        Ok(result)
-    }
-
     /// Write the migration to the Migration table.
     async fn create(&self, migration: Migration) -> Result<Migration, ConnectorError>;
 

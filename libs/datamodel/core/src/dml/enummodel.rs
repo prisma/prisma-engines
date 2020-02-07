@@ -6,12 +6,22 @@ pub struct Enum {
     /// Name of the enum.
     pub name: String,
     /// Values of the enum.
+    //todo this needs to be able to hold database names for enum values
     pub values: Vec<String>,
     /// Comments for this enum.
     pub documentation: Option<String>,
     /// Database internal name of this enum.
     pub database_name: Option<String>,
 }
+
+/// Represents a value of an enum
+//#[derive(Debug, PartialEq, Clone)]
+//pub struct EnumValue {
+//    /// Value as exposed by the api
+//    pub value: String,
+//    /// Actual value as defined in the database
+//    pub database_value: String,
+//}
 
 impl Enum {
     /// Creates a new enum with the given name and values.

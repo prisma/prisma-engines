@@ -22,6 +22,6 @@ failure = { version = "0.1", features = ["derive"] }
 rand = "0.6"
 datamodel = { path = "../datamodel/core" }
 itertools = "0.8"
-rust_decimal = "1.1"
-quaint = { version = "0.1", optional = true, features = ["uuid-0_8"] }
+rust_decimal = "=1.1.0"
+quaint = { git = "https://github.com/prisma/quaint", optional = true, features = ["uuid-0_8"] }
 prisma-value = { path = "../prisma-value", features = ["sql-ext"] }

@@ -1,16 +1,17 @@
-use tracing_subscriber::*;
-
-type Subscriber = FmtSubscriber<
-    tracing_subscriber::fmt::format::NewRecorder,
-    tracing_subscriber::fmt::format::Format,
+use tracing_subscriber::{
+    fmt::{
+        format::{DefaultFields, Format},
+        Subscriber,
+    },
     EnvFilter,
-    PrintWriter,
->;
+};
 
-pub fn test_tracing_subscriber(log_config: &'static str) -> Subscriber {
+type Sub = Subscriber<DefaultFields, Format, EnvFilter, PrintWriter>;
+
+pub fn test_tracing_subscriber(log_config: &'static str) -> Sub {
     let filter = EnvFilter::new(log_config);
 
-    FmtSubscriber::builder()
+    Subscriber::builder()
         .with_env_filter(filter)
         .with_writer(PrintWriter)
         .finish()

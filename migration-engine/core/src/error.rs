@@ -3,6 +3,8 @@ use datamodel::error::ErrorCollection;
 use migration_connector::ConnectorError;
 use thiserror::Error;
 
+pub type CoreResult<T> = Result<T, Error>;
+
 #[derive(Debug, Error)]
 pub enum Error {
     #[error("Error in connector: {0}")]

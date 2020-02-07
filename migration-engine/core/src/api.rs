@@ -1,8 +1,7 @@
 mod error_rendering;
 mod rpc;
 
-pub(crate) use error_rendering::pretty_print_datamodel_errors;
-pub use error_rendering::render_error;
+pub use error_rendering::{pretty_print_datamodel_errors, render_error};
 pub use rpc::*;
 
 use crate::{commands::*, migration_engine::MigrationEngine, CoreResult};
@@ -33,6 +32,10 @@ where
         E: MigrationCommand,
     {
         Ok(E::execute(input, &self.engine).await?)
+    }
+
+    pub fn connector(&self) -> &C {
+        self.engine.connector()
     }
 }
 

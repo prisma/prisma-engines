@@ -31,7 +31,7 @@ impl GraphQLProtocolAdapter {
                 .ok_or_else(|| {
                     PrismaError::QueryConversionError(format!("Operation '{}' does not match any query.", op))
                 })
-                .and_then(|def| Self::convert_definition(def)),
+                .and_then(Self::convert_definition),
 
             None => gql_doc
                 .definitions
