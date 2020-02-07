@@ -3,6 +3,7 @@ use graphql_parser::query::{
     Definition, Document, OperationDefinition, Selection as GqlSelection, SelectionSet, Value,
 };
 use query_core::query_document::*;
+use rust_decimal::{prelude::FromPrimitive, Decimal};
 use std::collections::BTreeMap;
 
 /// Protocol adapter for GraphQL -> Query Document.
@@ -22,8 +23,8 @@ use std::collections::BTreeMap;
 pub struct GraphQLProtocolAdapter;
 
 impl GraphQLProtocolAdapter {
-    pub fn convert(gql_doc: Document, operation: Option<String>) -> PrismaResult<QueryDocument> {
-        let operations: Vec<Operation> = match operation {
+    pub fn convert(gql_doc: Document, operation: Option<String>) -> PrismaResult<Operation> {
+        let mut operations: Vec<Operation> = match operation {
             Some(ref op) => gql_doc
                 .definitions
                 .into_iter()
@@ -41,7 +42,12 @@ impl GraphQLProtocolAdapter {
                 .map(|r| r.into_iter().flatten().collect::<Vec<Operation>>()),
         }?;
 
-        Ok(QueryDocument { operations }.dedup_operations())
+        let operation = operations
+            .pop()
+            .ok_or_else(|| PrismaError::QueryConversionError("Document contained no operations.".into()))?
+            .dedup_selections();
+
+        Ok(operation)
     }
 
     fn convert_definition(def: Definition) -> PrismaResult<Vec<Operation>> {
@@ -88,12 +94,15 @@ impl GraphQLProtocolAdapter {
                         .map(|(k, v)| Ok((k, Self::convert_value(v)?)))
                         .collect::<PrismaResult<Vec<_>>>()?;
 
-                    Ok(Selection {
-                        name: f.name,
-                        alias: f.alias,
-                        arguments,
-                        nested_selections: Self::convert_selection_set(f.selection_set)?,
-                    })
+                    let mut builder = Selection::builder(f.name);
+                    builder.set_arguments(arguments);
+                    builder.nested_selections(Self::convert_selection_set(f.selection_set)?);
+
+                    if let Some(alias) = f.alias {
+                        builder.alias(alias);
+                    };
+
+                    Ok(builder.build())
                 }
 
                 GqlSelection::FragmentSpread(fs) => Err(PrismaError::UnsupportedFeatureError(
@@ -136,7 +145,13 @@ impl GraphQLProtocolAdapter {
                     i
                 ))),
             },
-            Value::Float(f) => Ok(QueryValue::Float(f)),
+            Value::Float(f) => match Decimal::from_f64(f) {
+                Some(dec) => Ok(QueryValue::Float(dec)),
+                None => Err(PrismaError::QueryConversionError(format!(
+                    "invalid 64-bit float: {:?}",
+                    f
+                ))),
+            },
             Value::String(s) => Ok(QueryValue::String(s)),
             Value::Boolean(b) => Ok(QueryValue::Boolean(b)),
             Value::Null => Ok(QueryValue::Null),

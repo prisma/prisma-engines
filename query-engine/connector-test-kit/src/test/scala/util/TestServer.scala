@@ -10,10 +10,12 @@ case class TestServer() extends PlayJsonExtensions {
       query: String,
       project: Project,
       dataContains: String = "",
+      legacy: Boolean = true,
   ): JsValue = {
     val result = queryBinaryCLI(
       request = createSingleQuery(query),
       project = project,
+      legacy = legacy,
     )
     result.assertSuccessfulResponse(dataContains)
     result
@@ -22,10 +24,12 @@ case class TestServer() extends PlayJsonExtensions {
   def batch(
       queries: Array[String],
       project: Project,
+      legacy: Boolean = true,
   ): JsValue = {
     val result = queryBinaryCLI(
       request = createMultiQuery(queries),
       project = project,
+      legacy = legacy,
     )
     result
   }
@@ -36,11 +40,13 @@ case class TestServer() extends PlayJsonExtensions {
       errorCode: Int,
       errorCount: Int = 1,
       errorContains: String = "",
+      legacy: Boolean = true,
   ): JsValue = {
     val result =
       queryBinaryCLI(
         request = createSingleQuery(query),
         project = project,
+        legacy = legacy,
       )
 
     // Ignore error codes for external tests (0) and containment checks ("")
@@ -58,11 +64,26 @@ case class TestServer() extends PlayJsonExtensions {
     Json.obj("batch" -> queries.map(createSingleQuery))
   }
 
-  def queryBinaryCLI(request: JsValue, project: Project) = {
+  def queryBinaryCLI(request: JsValue, project: Project, legacy: Boolean = true) = {
     val encoded_query = UTF8Base64.encode(Json.stringify(request))
 
-    val response = project.isPgBouncer match {
-      case true =>
+    val response = (project.isPgBouncer, legacy) match {
+      case (true, true) =>
+        Process(
+          Seq(
+            EnvVars.prismaBinaryPath,
+            "--enable_raw_queries",
+            "--always_force_transactions",
+            "cli",
+            "--execute_request",
+            "--legacy",
+            encoded_query
+          ),
+          None,
+          "PRISMA_DML" -> project.pgBouncerEnvVar
+        ).!!
+
+      case (true, false) =>
         Process(
           Seq(
             EnvVars.prismaBinaryPath,
@@ -76,19 +97,32 @@ case class TestServer() extends PlayJsonExtensions {
           "PRISMA_DML" -> project.pgBouncerEnvVar
         ).!!
 
-      case false => {
+      case (false, true) =>
         Process(
           Seq(
             EnvVars.prismaBinaryPath,
             "--enable_raw_queries",
             "cli",
             "--execute_request",
+            "--legacy",
             encoded_query
           ),
           None,
           "PRISMA_DML" -> project.envVar,
         ).!!
-      }
+
+        case (false, false) =>
+          Process(
+            Seq(
+              EnvVars.prismaBinaryPath,
+              "--enable_raw_queries",
+              "cli",
+              "--execute_request",
+              encoded_query
+            ),
+            None,
+            "PRISMA_DML" -> project.envVar,
+          ).!!
     }
     val lines = response.linesIterator.toVector
     println(lines.mkString("\n"))

@@ -262,18 +262,11 @@ class PaginationTiebreakerSpec extends FlatSpec with Matchers with ApiSpecBase {
   //endregion
 
   private def createData(): Unit = {
-    server.query(
-      """
-        |mutation {
-        |  a: createUser(data: {numFollowers: 9, pos: 1}) { id }
-        |  b: createUser(data: {numFollowers: 9, pos: 2}) { id }
-        |  c: createUser(data: {numFollowers: 9, pos: 3}) { id }
-        |  e: createUser(data: {numFollowers: 10, pos: 4}) { id }
-        |  f: createUser(data: {numFollowers: 10, pos: 5}) { id }
-        |  d: createUser(data: {numFollowers: 10, pos: 6}) { id }
-        |}
-      """,
-      project
-    )
+    server.query("""mutation { createUser(data: {numFollowers: 9, pos: 1}) { id } }""", project)
+    server.query("""mutation { createUser(data: {numFollowers: 9, pos: 2}) { id } }""", project)
+    server.query("""mutation { createUser(data: {numFollowers: 9, pos: 3}) { id } }""", project)
+    server.query("""mutation { createUser(data: {numFollowers: 10, pos: 4}) { id } }""", project)
+    server.query("""mutation { createUser(data: {numFollowers: 10, pos: 5}) { id } }""", project)
+    server.query("""mutation { createUser(data: {numFollowers: 10, pos: 6}) { id } }""", project)
   }
 }

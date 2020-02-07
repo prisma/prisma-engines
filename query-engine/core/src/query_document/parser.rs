@@ -1,8 +1,8 @@
 use super::*;
 use crate::schema::*;
 use chrono::prelude::*;
-use prisma_models::PrismaValue;
-use rust_decimal::{prelude::FromPrimitive, Decimal};
+use prisma_value::PrismaValue;
+use rust_decimal::{prelude::ToPrimitive, Decimal};
 use std::{
     borrow::Borrow,
     collections::{BTreeMap, HashSet},
@@ -37,10 +37,10 @@ impl QueryDocumentParser {
         selections
             .iter()
             .map(|selection| {
-                let parsed_field = match schema_object.find_field(selection.name.as_str()) {
+                let parsed_field = match schema_object.find_field(selection.name()) {
                     Some(ref field) => Self::parse_field(selection, field),
                     None => Err(QueryParserError::FieldValidationError {
-                        field_name: selection.name.clone(),
+                        field_name: selection.name().into(),
                         inner: Box::new(QueryParserError::FieldNotFoundError),
                     }),
                 };
@@ -57,13 +57,13 @@ impl QueryDocumentParser {
     /// Parses and validates a selection against a schema (output) field.
     fn parse_field(selection: &Selection, schema_field: &FieldRef) -> QueryParserResult<ParsedField> {
         // Parse and validate all provided arguments for the field
-        Self::parse_arguments(schema_field, &selection.arguments)
+        Self::parse_arguments(schema_field, selection.arguments())
             .and_then(|arguments| {
                 // If the output type of the field is an object type of any form, validate the sub selection as well.
                 let nested_fields = schema_field
                     .field_type
                     .as_object_type()
-                    .map(|obj| Self::parse_object(&selection.nested_selections, &obj));
+                    .map(|obj| Self::parse_object(selection.nested_selections(), &obj));
 
                 let nested_fields = match nested_fields {
                     Some(sub) => Some(sub?),
@@ -71,8 +71,8 @@ impl QueryDocumentParser {
                 };
 
                 Ok(ParsedField {
-                    name: selection.name.clone(),
-                    alias: selection.alias.clone(),
+                    name: selection.name().to_string(),
+                    alias: selection.alias().clone(),
                     arguments,
                     nested_fields,
                     schema_field: Arc::clone(schema_field),
@@ -180,10 +180,12 @@ impl QueryDocumentParser {
             (QueryValue::String(s), ScalarType::DateTime) => Self::parse_datetime(s.as_str()).map(PrismaValue::DateTime),
             (QueryValue::String(s), ScalarType::JsonList) => Self::parse_json_list(&s),
             (QueryValue::String(s), ScalarType::UUID)     => Self::parse_uuid(s.as_str()).map(PrismaValue::Uuid),
-            (QueryValue::Int(i), ScalarType::Float)       => Ok(PrismaValue::Float(Decimal::from_f64(i as f64).expect("f64 is not a Decimal."))),
+            (QueryValue::Int(i), ScalarType::Float)       => Ok(PrismaValue::Float(Decimal::from(i))),
             (QueryValue::Int(i), ScalarType::Int)         => Ok(PrismaValue::Int(i)),
-            (QueryValue::Float(f), ScalarType::Float)     => Ok(PrismaValue::Float(Decimal::from_f64(f).expect("f64 is not a Decimal."))),
-            (QueryValue::Float(f), ScalarType::Int)       => Ok(PrismaValue::Int(f as i64)),
+            (QueryValue::Float(f), ScalarType::Float)     => Ok(PrismaValue::Float(f)),
+            (QueryValue::Float(f), ScalarType::Int)       => {
+                Ok(PrismaValue::Int(f.to_i64().unwrap()))
+            },
             (QueryValue::Boolean(b), ScalarType::Boolean) => Ok(PrismaValue::Boolean(b)),
 
             // All other combinations are invalid.
