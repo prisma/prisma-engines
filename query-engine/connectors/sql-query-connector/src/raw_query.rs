@@ -10,6 +10,8 @@ pub struct RawQuery<'a> {
 impl<'a> RawQuery<'a> {
     pub fn new(query: String, parameters: Vec<PrismaValue>) -> Self {
         let parameters = parameters.into_iter().map(ParameterizedValue::from).collect();
+        let query = query.trim().to_string();
+
         Self { query, parameters }
     }
 
