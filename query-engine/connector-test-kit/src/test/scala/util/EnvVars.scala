@@ -6,10 +6,14 @@ object EnvVars {
     .orElse(sys.env.get("BUILDKITE_BUILD_CHECKOUT_PATH").map(path => s"$path/server")) // todo change as soon as the split is done
     .getOrElse(sys.error("Unable to resolve cargo root path"))
 
-  val prismaBinaryPath = if(PrismaRsBuild.isDebug) {
-    s"$serverRoot/target/debug/prisma"
+  // compatibility with `test_connector.sh`
+  println(sys.env.get("ABSOLUTE_CARGO_TARGET_DIR"))
+  val targetDirectory = sys.env.getOrElse("ABSOLUTE_CARGO_TARGET_DIR", s"$serverRoot/target")
+
+  val prismaBinaryPath = if (PrismaRsBuild.isDebug) {
+    s"$targetDirectory/debug/prisma"
   } else {
-    s"$serverRoot/target/release/prisma"
+    s"$targetDirectory/release/prisma"
   }
 
   val migrationEngineBinaryPath: String = sys.env.getOrElse(
