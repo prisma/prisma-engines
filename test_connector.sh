@@ -3,7 +3,7 @@
 set -e
 export CONNECTOR_TO_TEST=$1
 export ABSOLUTE_CARGO_TARGET_DIR=`realpath $CARGO_TARGET_DIR`
-export IS_DEBUG_BUILD=1
+export IS_DEBUG_BUILD=0
 
 echo "Will run tests against connector $CONNECTOR_TO_TEST"
 echo $CONNECTOR_TO_TEST > current_connector
