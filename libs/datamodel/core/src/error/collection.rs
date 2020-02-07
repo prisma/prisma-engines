@@ -42,6 +42,17 @@ impl ErrorCollection {
             Ok(())
         }
     }
+
+    pub fn to_pretty_string(&self, file_name: &str, datamodel_string: &str) -> String {
+        let mut message: Vec<u8> = Vec::new();
+
+        for err in self.to_iter() {
+            err.pretty_print(&mut message, file_name, datamodel_string)
+                .expect("printing datamodel error");
+        }
+
+        String::from_utf8_lossy(&message).into_owned()
+    }
 }
 
 impl std::fmt::Display for ErrorCollection {
