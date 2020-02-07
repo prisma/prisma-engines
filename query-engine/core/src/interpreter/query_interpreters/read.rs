@@ -109,12 +109,6 @@ fn read_related<'a, 'b>(
 
         let relation = query.parent_field.relation();
 
-
-
-        dbg!("RELATION: {}", &query.parent_field.relation().manifestation);
-
-        dbg!("READ RELATED", &parent_result);
-
         // prisma level join does not work for many 2 many yet
         // can only work if we have a parent result. This is not the case when we e.g. have nested delete inside an update
         let use_prisma_level_join = !relation.is_many_to_many() && parent_result.is_some() && !query.args.is_with_pagination();
@@ -163,7 +157,6 @@ fn read_related<'a, 'b>(
         if use_prisma_level_join {
             // Write parent IDs into the retrieved records
             if parent_result.is_some() && query.parent_field.is_inlined_on_enclosing_model() {
-                dbg!("The relation is inlined in the parent model");
                 let parent_identifier = query.parent_field.model().primary_identifier();
                 let field_names = scalars.field_names.clone();
 
@@ -204,7 +197,6 @@ fn read_related<'a, 'b>(
 
                 scalars.records.extend(additional_records);
             } else if parent_result.is_some() && query.parent_field.related_field().is_inlined_on_enclosing_model() {
-                dbg!("The relation is inlined in the child model");
                 let parent_identifier = query.parent_field.model().primary_identifier();
                 let field_names = scalars.field_names.clone();
                 let child_link_fields = query.parent_field.related_field().linking_fields();

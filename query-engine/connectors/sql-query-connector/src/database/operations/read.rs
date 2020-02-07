@@ -66,12 +66,12 @@ where
     // Q: The following code simply queries both field sides, is this correct?
     //    Columns that don't exist are ignored? Iterator is empty?
     // Q: Additionally: field names contains always both, isn't that breaking the above assumption?
-    let mut idents: Vec<_> = dbg!(selected_fields.types().collect());
+    let mut idents: Vec<_> = selected_fields.types().collect();
     idents.extend(from_field.related_field().type_identifiers_with_arities());
     idents.extend(from_field.linking_fields().type_identifiers_with_arities());
     idents.extend(from_field.linking_fields().type_identifiers_with_arities());
 
-    let mut field_names: Vec<String> = dbg!(selected_fields)
+    let mut field_names: Vec<String> = selected_fields
         .db_names()
 //        .chain(from_field.related_field().db_names())
         .map(String::from)

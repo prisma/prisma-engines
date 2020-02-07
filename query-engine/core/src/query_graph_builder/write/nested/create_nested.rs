@@ -196,15 +196,10 @@ fn handle_one_to_many(
             let parent_model_id = parent_relation_field.linking_fields();
             let child_model_id = parent_relation_field.related_field().linking_fields();
 
-            dbg!(&parent_model_id);
-            dbg!(&child_model_id);
-
             graph.create_edge(
                 &reload_node,
                 &create_node,
                 QueryGraphDependency::ParentIds(parent_model_id, Box::new(move |mut child_node, mut parent_ids| {
-                    dbg!(&parent_ids);
-
                     let parent_id = match parent_ids.pop() {
                         Some(pid) => Ok(pid),
                         None => Err(QueryGraphBuilderError::AssertionError(format!(

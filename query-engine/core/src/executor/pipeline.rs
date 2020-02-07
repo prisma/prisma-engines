@@ -21,11 +21,10 @@ impl<'conn, 'tx> QueryPipeline<'conn, 'tx> {
         match self.query {
             QueryType::Graph(mut graph) => {
                 // Run final validations and transformations.
-                println!("BEFORE: {}", graph);
+//                println!("BEFORE: {}", graph);
                 graph.finalize()?;
                 trace!("{}", graph);
-                eprintln!("TEST TEST TEST0");
-                println!("AFTER: {}", graph);
+//                println!("AFTER: {}", graph);
 
                 let expr = Expressionista::translate(graph)?;
                 let result = self.interpreter.interpret(expr, Env::default(), 0).await;

@@ -34,11 +34,6 @@ pub struct DiffResult {
 impl ExpressionResult {
     /// Attempts to transform the result into a vector of record identifiers.
     pub fn as_ids(&self, model_id: &ModelIdentifier) -> InterpretationResult<Vec<RecordIdentifier>> {
-//        println!("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-//        dbg!(self);
-//        dbg!(model_id);
-//        println!("{:?}", self);
-//        println!("{:?}", model_id);
         let converted = match self {
             Self::Query(ref result) => match result {
                 QueryResult::Id(id) => match id {
