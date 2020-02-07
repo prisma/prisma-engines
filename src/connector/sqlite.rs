@@ -7,9 +7,9 @@ use crate::{
     error::{Error, ErrorKind},
     visitor::{self, Visitor},
 };
-use futures::future;
 use rusqlite::NO_PARAMS;
-use std::{collections::HashSet, convert::TryFrom, path::Path, sync::Mutex, time::Duration};
+use std::{collections::HashSet, convert::TryFrom, path::Path, time::Duration};
+use tokio::sync::Mutex;
 
 const DEFAULT_SCHEMA_NAME: &str = "quaint";
 
@@ -130,8 +130,8 @@ impl Sqlite {
         Self::try_from(file_path)
     }
 
-    pub fn attach_database(&mut self, db_name: &str) -> crate::Result<()> {
-        let client = self.client.lock().unwrap();
+    pub async fn attach_database(&mut self, db_name: &str) -> crate::Result<()> {
+        let client = self.client.lock().await;
         let mut stmt = client.prepare("PRAGMA database_list")?;
 
         let databases: HashSet<String> = stmt
@@ -168,8 +168,9 @@ impl Queryable for Sqlite {
 
     fn query_raw<'a>(&'a self, sql: &'a str, params: &'a [ParameterizedValue]) -> DBIO<'a, ResultSet> {
         metrics::query("sqlite.query_raw", sql, params, move || {
-            let res = move || {
-                let client = self.client.lock().unwrap();
+            async move {
+                let client = self.client.lock().await;
+
                 let mut stmt = client.prepare_cached(sql)?;
 
                 let mut rows = stmt.query(params)?;
@@ -182,39 +183,28 @@ impl Queryable for Sqlite {
                 result.set_last_insert_id(u64::try_from(client.last_insert_rowid()).unwrap_or(0));
 
                 Ok(result)
-            };
-
-            match res() {
-                Ok(res) => future::ok(res),
-                Err(e) => future::err(e),
             }
         })
     }
 
     fn execute_raw<'a>(&'a self, sql: &'a str, params: &'a [ParameterizedValue<'a>]) -> DBIO<'a, u64> {
         metrics::query("sqlite.query_raw", sql, params, move || {
-            let res = move || {
-                let client = self.client.lock().unwrap();
+            async move {
+                let client = self.client.lock().await;
                 let mut stmt = client.prepare_cached(sql)?;
                 let res = u64::try_from(stmt.execute(params)?)?;
 
                 Ok(res)
-            };
-
-            match res() {
-                Ok(res) => future::ok(res),
-                Err(e) => future::err(e),
             }
         })
     }
 
     fn raw_cmd<'a>(&'a self, cmd: &'a str) -> DBIO<'a, ()> {
         metrics::query("sqlite.raw_cmd", cmd, &[], move || {
-            let client = self.client.lock().unwrap();
-
-            match client.execute_batch(cmd) {
-                Ok(_) => future::ok(()),
-                Err(e) => future::err(e.into()),
+            async move {
+                let client = self.client.lock().await;
+                client.execute_batch(cmd)?;
+                Ok(())
             }
         })
     }

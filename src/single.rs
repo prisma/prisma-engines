@@ -97,7 +97,7 @@ impl Quaint {
                 let params = connector::SqliteParams::try_from(url_str)?;
                 let mut sqlite = connector::Sqlite::new(&params.file_path)?;
 
-                sqlite.attach_database(&params.db_name)?;
+                sqlite.attach_database(&params.db_name).await?;
 
                 Mutex::new(Box::new(sqlite) as Box<dyn Queryable + Send + Sync>)
             }
