@@ -236,9 +236,9 @@ checksum = "be0fdd54b507df8f22012890aadd099979befdba27713c767993f8380112ca7c"
 
 [[package]]
 name = "byteorder"
-version = "1.3.2"
+version = "1.3.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a7c3dd8985a7111efc5c80b44e23ecdd8c007de8ade3b96595387e812b957cf5"
+checksum = "08c48aae112d48ed9f069b33538ea9e3e90aa263cfa3d1c24309612b1f7472de"
 
 [[package]]
 name = "bytes"
@@ -678,9 +678,9 @@ checksum = "1b980f2816d6ee8673b6517b52cb0e808a180efc92e5c19d02cdda79066703ef"
 
 [[package]]
 name = "futures"
-version = "0.3.3"
+version = "0.3.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ad6636318d07abeb4656157ef1936c64485f066c7f9ce5d7c5b879fcb6dd5ccb"
+checksum = "5c329ae8753502fb44ae4fc2b622fa2a94652c41e795143765ba0927f92ab780"
 dependencies = [
  "futures-channel",
  "futures-core",
@@ -693,9 +693,9 @@ dependencies = [
 
 [[package]]
 name = "futures-channel"
-version = "0.3.3"
+version = "0.3.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7264eb65b194d2fa6ec31b898ead7c332854bfa42521659226e72a585fca5b85"
+checksum = "f0c77d04ce8edd9cb903932b608268b3fffec4163dc053b3b402bf47eac1f1a8"
 dependencies = [
  "futures-core",
  "futures-sink",
@@ -713,9 +713,9 @@ dependencies = [
 
 [[package]]
 name = "futures-core"
-version = "0.3.3"
+version = "0.3.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b597b16aa1a19ce2dfde5128a7c656d75346b35601a640be2d9efd4e9c83609d"
+checksum = "f25592f769825e89b92358db00d26f965761e094951ac44d3663ef25b7ac464a"
 
 [[package]]
 name = "futures-core-preview"
@@ -725,9 +725,9 @@ checksum = "b35b6263fb1ef523c3056565fa67b1d16f0a8604ff12b11b08c25f28a734c60a"
 
 [[package]]
 name = "futures-executor"
-version = "0.3.3"
+version = "0.3.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "46a5e593d77bee52393c7f3b16b8b413214096d3f7dc4f5f4c57dee01ad2bdaf"
+checksum = "f674f3e1bcb15b37284a90cedf55afdba482ab061c407a9c0ebbd0f3109741ba"
 dependencies = [
  "futures-core",
  "futures-task",
@@ -736,15 +736,15 @@ dependencies = [
 
 [[package]]
 name = "futures-io"
-version = "0.3.3"
+version = "0.3.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3d429f824b5e5dbd45fc8e54e1005a37e1f8c6d570cd64d0b59b24d3a80b8b8e"
+checksum = "a638959aa96152c7a4cddf50fcb1e3fede0583b27157c26e67d6f99904090dc6"
 
 [[package]]
 name = "futures-macro"
-version = "0.3.3"
+version = "0.3.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a1d75b72904b78044e0091355fc49d29f48bff07a68a719a41cf059711e071b4"
+checksum = "9a5081aa3de1f7542a794a397cde100ed903b0630152d0973479018fd85423a7"
 dependencies = [
  "proc-macro-hack",
  "proc-macro2 1.0.8",
@@ -754,9 +754,9 @@ dependencies = [
 
 [[package]]
 name = "futures-sink"
-version = "0.3.3"
+version = "0.3.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "04299e123547ea7c56f3e1b376703142f5fc0b6700433eed549e9d0b8a75a66c"
+checksum = "3466821b4bc114d95b087b850a724c6f83115e929bc88f1fa98a3304a944c8a6"
 
 [[package]]
 name = "futures-sink-preview"
@@ -766,9 +766,9 @@ checksum = "86f148ef6b69f75bb610d4f9a2336d4fc88c4b5b67129d1a340dd0fd362efeec"
 
 [[package]]
 name = "futures-task"
-version = "0.3.3"
+version = "0.3.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "86f9ceab4bce46555ee608b1ec7c414d6b2e76e196ef46fa5a8d4815a8571398"
+checksum = "7b0a34e53cf6cdcd0178aa573aed466b646eb3db769570841fda0c7ede375a27"
 
 [[package]]
 name = "futures-timer"
@@ -788,9 +788,9 @@ checksum = "a1de7508b218029b0f01662ed8f61b1c964b3ae99d6f25462d0f55a595109df6"
 
 [[package]]
 name = "futures-util"
-version = "0.3.3"
+version = "0.3.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7d2f1296f7644d2cd908ebb2fa74645608e39f117c72bac251d40418c6d74c4f"
+checksum = "22766cf25d64306bedf0384da004d05c9974ab104fcc4528f1236181c18004c5"
 dependencies = [
  "futures 0.1.29",
  "futures-channel",
@@ -1046,7 +1046,7 @@ dependencies = [
  "datamodel",
  "failure",
  "futures 0.1.29",
- "futures 0.3.3",
+ "futures 0.3.4",
  "introspection-connector",
  "json-rpc-stdio",
  "jsonrpc-core",
@@ -1103,7 +1103,7 @@ dependencies = [
 name = "json-rpc-stdio"
 version = "0.1.0"
 dependencies = [
- "futures 0.3.3",
+ "futures 0.3.4",
  "jsonrpc-core",
  "tokio",
  "tracing",
@@ -1161,13 +1161,13 @@ dependencies = [
 
 [[package]]
 name = "jsonrpc-pubsub"
-version = "14.0.5"
+version = "14.0.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3453625f0f0f5cd6d6776d389d73b7d70fcc98620b7cbb1cbbb1f6a36e95f39a"
+checksum = "5b31c9b90731276fdd24d896f31bb10aecf2e5151733364ae81123186643d939"
 dependencies = [
  "jsonrpc-core",
  "log",
- "parking_lot 0.9.0",
+ "parking_lot 0.10.0",
  "serde",
 ]
 
@@ -1390,7 +1390,7 @@ dependencies = [
  "async-trait",
  "chrono",
  "datamodel",
- "futures 0.3.3",
+ "futures 0.3.4",
  "json-rpc-stdio",
  "jsonrpc-core",
  "migration-connector",
@@ -1409,7 +1409,7 @@ name = "migration-engine-cli"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "futures 0.3.3",
+ "futures 0.3.4",
  "migration-connector",
  "migration-core",
  "quaint",
@@ -1433,7 +1433,7 @@ dependencies = [
  "anyhow",
  "barrel",
  "datamodel",
- "futures 0.3.3",
+ "futures 0.3.4",
  "git2",
  "migration-connector",
  "migration-core",
@@ -1532,7 +1532,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b39c877c2879c5dc6861686c06cabc2edff4654f633df079bda44446a76c4407"
 dependencies = [
  "async-trait",
- "futures 0.3.3",
+ "futures 0.3.4",
  "futures-timer 2.0.2",
  "log",
  "tokio",
@@ -1987,7 +1987,7 @@ checksum = "47cb5f148a31d981d6a5f88f82c6fcc9b5aeb1b6c626d56568f9e007308acfbf"
 dependencies = [
  "bytes",
  "fallible-iterator",
- "futures 0.3.3",
+ "futures 0.3.4",
  "log",
  "tokio",
  "tokio-postgres",
@@ -2000,7 +2000,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "616bfdeeb542b2b0d444391dbcdd91e9a800bc7f35950c9741fe24b07e958900"
 dependencies = [
  "bytes",
- "futures 0.3.3",
+ "futures 0.3.4",
  "native-tls",
  "tokio",
  "tokio-postgres",
@@ -2067,7 +2067,7 @@ dependencies = [
  "base64 0.10.1",
  "datamodel",
  "failure",
- "futures 0.3.3",
+ "futures 0.3.4",
  "graphql-parser",
  "http",
  "hyper",
@@ -2223,13 +2223,13 @@ dependencies = [
 [[package]]
 name = "quaint"
 version = "0.2.0-alpha.3"
-source = "git+https://github.com/prisma/quaint#22e75c9fd77eb3211724247ebd730ca60a271cb8"
+source = "git+https://github.com/prisma/quaint#6a898ee3b3081a3803da18297d23021f21ee78dc"
 dependencies = [
  "async-trait",
  "bytes",
  "chrono",
  "debug_stub_derive",
- "futures 0.3.3",
+ "futures 0.3.4",
  "lazy_static",
  "libsqlite3-sys",
  "log",
@@ -2258,7 +2258,7 @@ version = "0.1.0"
 dependencies = [
  "chrono",
  "failure",
- "futures 0.3.3",
+ "futures 0.3.4",
  "itertools",
  "once_cell",
  "prisma-models",
@@ -2279,7 +2279,7 @@ dependencies = [
  "crossbeam-queue",
  "debug_stub_derive",
  "failure",
- "futures 0.3.3",
+ "futures 0.3.4",
  "im",
  "indexmap",
  "itertools",
@@ -2693,9 +2693,9 @@ dependencies = [
 
 [[package]]
 name = "serde_json"
-version = "1.0.46"
+version = "1.0.47"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "21b01d7f0288608a01dca632cf1df859df6fd6ffa885300fc275ce2ba6221953"
+checksum = "15913895b61e0be854afd32fd4163fcd2a3df34142cf2cb961b310ce694cbf90"
 dependencies = [
  "indexmap",
  "itoa",
@@ -2847,7 +2847,7 @@ dependencies = [
  "cuid",
  "datamodel",
  "failure",
- "futures 0.3.3",
+ "futures 0.3.4",
  "itertools",
  "log",
  "parking_lot 0.7.1",
@@ -2872,7 +2872,7 @@ dependencies = [
  "barrel",
  "chrono",
  "failure",
- "futures 0.3.3",
+ "futures 0.3.4",
  "log",
  "once_cell",
  "pretty_assertions",
@@ -3155,7 +3155,7 @@ dependencies = [
  "byteorder",
  "bytes",
  "fallible-iterator",
- "futures 0.3.3",
+ "futures 0.3.4",
  "log",
  "parking_lot 0.10.0",
  "percent-encoding 2.1.0",
