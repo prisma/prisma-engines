@@ -1,7 +1,7 @@
 use crate::{commands::CommandError, error::Error as CoreError};
 use jsonrpc_core::types::Error as JsonRpcError;
 use migration_connector::ConnectorError;
-use user_facing_errors::Error;
+use user_facing_errors::{Error, KnownError};
 
 pub fn render_error(crate_error: CoreError) -> Error {
     match crate_error {
@@ -13,6 +13,11 @@ pub fn render_error(crate_error: CoreError) -> Error {
             user_facing_error: Some(user_facing_error),
             ..
         })) => user_facing_error.into(),
+        CoreError::CommandError(CommandError::ReceivedBadDatamodel(full_error)) => {
+            KnownError::new(user_facing_errors::common::SchemaParserError { full_error })
+                .unwrap()
+                .into()
+        }
         _ => Error::from_fail(crate_error).into(),
     }
 }
