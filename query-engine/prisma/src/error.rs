@@ -43,28 +43,21 @@ pub enum PrismaError {
 
 impl PrismaError {
     pub(crate) fn render_as_json(&self) -> Result<(), failure::Error> {
+        use std::fmt::Write as _;
         use std::io::Write as _;
 
-        // Datamodel errors need raw byte IO instead of String IO.
-        let mut message: Vec<u8> = Vec::with_capacity(60);
-
-        match self {
+        let error: user_facing_errors::Error = match self {
             PrismaError::ConversionError(errors, dml_string) => {
-                let file_name = "schema.prisma";
+                let mut full_error = errors.to_pretty_string("schema.prisma", dml_string);
+                write!(full_error, "\nValidation Error Count: {}", errors.to_iter().len())?;
 
-                for error in errors.to_iter() {
-                    writeln!(&mut message)?;
-
-                    error.pretty_print(&mut message, file_name, dml_string)?
-                }
-                write!(message, "Validation Error Count: {}", errors.to_iter().len())?;
+                user_facing_errors::Error::from(
+                    user_facing_errors::KnownError::new(user_facing_errors::common::SchemaParserError { full_error })
+                        .unwrap(),
+                )
             }
-            other => write!(message, "{}", other)?,
+            other => user_facing_errors::Error::new_non_panic_with_current_backtrace(other.to_string()),
         };
-
-        let error = user_facing_errors::Error::new_non_panic_with_current_backtrace(
-            String::from_utf8_lossy(&message).into_owned(),
-        );
 
         // Because of how the node frontend works (stderr.on('data', ...)), we want to emit one clean JSON message on a single line at once.
         let stderr = std::io::stderr();

@@ -21,9 +21,10 @@ use std::sync::Arc;
 pub async fn migration_api(datamodel: &str) -> CoreResult<Arc<dyn api::GenericApi>> {
     let config = datamodel::parse_configuration(datamodel)?;
 
-    let source = config.datasources.first().ok_or(CommandError::DataModelErrors {
-        errors: vec!["There is no datasource in the configuration.".to_string()],
-    })?;
+    let source = config
+        .datasources
+        .first()
+        .ok_or_else(|| CommandError::Generic(anyhow::anyhow!("There is no datasource in the schema.")))?;
 
     let connector = match source.connector_type() {
         #[cfg(feature = "sql")]
@@ -39,6 +40,6 @@ pub async fn migration_api(datamodel: &str) -> CoreResult<Arc<dyn api::GenericAp
 }
 
 pub(crate) fn parse_datamodel(datamodel: &str) -> CommandResult<Datamodel> {
-    let result = datamodel::parse_datamodel_or_pretty_error(&datamodel, "datamodel file, line");
-    result.map_err(|e| CommandError::DataModelErrors { errors: vec![e] })
+    datamodel::parse_datamodel(&datamodel)
+        .map_err(|err| CommandError::ReceivedBadDatamodel(err.to_pretty_string("schema.prisma", datamodel)))
 }

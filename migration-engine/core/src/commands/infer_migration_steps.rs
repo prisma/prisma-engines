@@ -44,10 +44,11 @@ impl<'a> MigrationCommand for InferMigrationStepsCommand<'a> {
         let assumed_datamodel_ast = engine
             .datamodel_calculator()
             .infer(&current_datamodel_ast, assume_to_be_applied.as_slice())?;
-        let assumed_datamodel = datamodel::lift_ast(&assumed_datamodel_ast)?;
+        let assumed_datamodel =
+            datamodel::lift_ast(&assumed_datamodel_ast).map_err(CommandError::ProducedBadDatamodel)?;
 
         let next_datamodel = parse_datamodel(&cmd.input.datamodel)?;
-        let next_datamodel_ast = parse(&cmd.input.datamodel)?;
+        let next_datamodel_ast = parse(&cmd.input.datamodel).map_err(CommandError::ProducedBadDatamodel)?;
 
         let model_migration_steps = engine
             .datamodel_migration_steps_inferrer()

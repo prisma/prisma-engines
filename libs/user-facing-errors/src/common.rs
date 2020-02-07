@@ -177,6 +177,12 @@ pub struct TlsConnectionError {
     pub message: String,
 }
 
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(code = "P1012", message = "${full_error}")]
+pub struct SchemaParserError {
+    pub full_error: String,
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

@@ -256,7 +256,7 @@ async fn bad_datasource_url_and_provider_combinations_must_return_a_proper_error
     assert_eq!(json_error, expected);
 }
 
-#[test_each_connector(tags("postgres"))]
+#[test_each_connector(tags("sqlite"))]
 async fn command_errors_must_return_an_unknown_error(api: &TestApi) {
     let steps = vec![MigrationStep::DeleteModel(DeleteModel {
         model: "abcd".to_owned(),
@@ -274,6 +274,28 @@ async fn command_errors_must_return_an_unknown_error(api: &TestApi) {
     let expected_error = user_facing_errors::Error::from(user_facing_errors::UnknownError {
         message: "Failure during a migration command: Generic error. (error: The model abcd does not exist in this Datamodel. It is not possible to delete it.)".to_owned(),
         backtrace: None,
+    });
+
+    assert_eq!(error, expected_error);
+}
+
+#[test_each_connector(tags("sqlite"))]
+async fn datamodel_parser_errors_must_return_a_known_error(api: &TestApi) {
+    let bad_dm = r#"
+        model Test {
+            id Float @id
+            post Post[]
+        }
+    "#;
+
+    let error = api.infer_apply(bad_dm).send_user_facing().await.unwrap_err();
+
+    let expected_msg = "\u{1b}[1;91merror\u{1b}[0m: \u{1b}[1mType \"Post\" is neither a built-in type, nor refers to another model, custom type, or enum.\u{1b}[0m\n  \u{1b}[1;94m-->\u{1b}[0m  \u{1b}[4mschema.prisma:4\u{1b}[0m\n\u{1b}[1;94m   | \u{1b}[0m\n\u{1b}[1;94m 3 | \u{1b}[0m            id Float @id\n\u{1b}[1;94m 4 | \u{1b}[0m            post \u{1b}[1;91mPost[]\u{1b}[0m\n\u{1b}[1;94m   | \u{1b}[0m\n";
+
+    let expected_error = user_facing_errors::Error::from(user_facing_errors::KnownError {
+        error_code: "P1012".into(),
+        message: expected_msg.into(),
+        meta: serde_json::json!({ "full_error": expected_msg }),
     });
 
     assert_eq!(error, expected_error);
