@@ -7,19 +7,15 @@ object EnvVars {
     .getOrElse(sys.error("Unable to resolve cargo root path"))
 
   // compatibility with `test_connector.sh`
-  println(sys.env.get("ABSOLUTE_CARGO_TARGET_DIR"))
   val targetDirectory = sys.env.getOrElse("ABSOLUTE_CARGO_TARGET_DIR", s"$serverRoot/target")
-
-  val prismaBinaryPath = if (PrismaRsBuild.isDebug) {
-    s"$targetDirectory/debug/prisma"
+  val binaryDirectory = if (PrismaRsBuild.isDebug) {
+    s"$targetDirectory/debug"
   } else {
-    s"$targetDirectory/release/prisma"
+    s"$targetDirectory/release"
   }
 
-  val migrationEngineBinaryPath: String = sys.env.getOrElse(
-    "MIGRATION_ENGINE_BINARY_PATH",
-    sys.error("Required MIGRATION_ENGINE_BINARY_PATH env var not found")
-  )
+  val prismaBinaryPath                  = s"$binaryDirectory/prisma"
+  val migrationEngineBinaryPath: String = s"$binaryDirectory/migration-engine"
 
   val isBuildkite = sys.env.get("IS_BUILDKITE").isDefined
 }
