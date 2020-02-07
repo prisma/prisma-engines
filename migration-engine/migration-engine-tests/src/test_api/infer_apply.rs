@@ -32,6 +32,22 @@ impl<'a> InferApply<'a> {
     }
 
     pub async fn send(self) -> Result<MigrationStepsResultOutput, anyhow::Error> {
+        Ok(self.send_inner().await?)
+    }
+
+    pub async fn send_assert(self) -> Result<InferApplyAssertion<'a>, anyhow::Error> {
+        let api = self.api;
+        let result = self.send().await?;
+
+        Ok(InferApplyAssertion { result, _api: api })
+    }
+
+    pub async fn send_user_facing(self) -> Result<MigrationStepsResultOutput, user_facing_errors::Error> {
+        let api = self.api;
+        self.send_inner().await.map_err(|err| api.render_error(err))
+    }
+
+    pub async fn send_inner(self) -> Result<MigrationStepsResultOutput, migration_core::error::Error> {
         let migration_id = self.migration_id.map(Into::into).unwrap_or_else(unique_migration_id);
 
         let input = InferMigrationStepsInput {
@@ -52,13 +68,6 @@ impl<'a> InferApply<'a> {
         let migration_output = self.api.apply_migration(&input).await?;
 
         Ok(migration_output)
-    }
-
-    pub async fn send_assert(self) -> Result<InferApplyAssertion<'a>, anyhow::Error> {
-        let api = self.api;
-        let result = self.send().await?;
-
-        Ok(InferApplyAssertion { result, _api: api })
     }
 }
 
