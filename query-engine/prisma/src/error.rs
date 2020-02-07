@@ -57,6 +57,7 @@ impl PrismaError {
 
                     error.pretty_print(&mut message, file_name, dml_string)?
                 }
+                write!(message, "Validation Error Count: {}", errors.to_iter().len())?;
             }
             other => write!(message, "{}", other)?,
         };
