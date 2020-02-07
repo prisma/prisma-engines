@@ -16,6 +16,9 @@ pub trait RelationExt {
 pub trait RelationFieldExt {
     fn opposite_columns(&self, alias: bool) -> ColumnIterator;
     fn relation_columns(&self, alias: bool) -> ColumnIterator;
+
+    // legacy single column unique
+    fn relation_column(&self, alias: bool) -> Column<'static>;
 }
 
 pub trait InlineRelationExt {
@@ -59,6 +62,17 @@ impl RelationFieldExt for RelationField {
             ColumnIterator::new(inner, count)
         } else {
             cols
+        }
+    }
+
+    fn relation_column(&self, alias: bool) -> Column<'static> {
+        let mut col_iter = self.relation().columns_for_relation_side(self.relation_side);
+        let col = col_iter.next().unwrap();
+
+        if alias && !self.relation_is_inlined_in_child() {
+            col.table(Relation::TABLE_ALIAS)
+        } else {
+            col
         }
     }
 }

@@ -29,16 +29,25 @@ impl ManyRelatedRecordsQueryBuilder for ManyRelatedRecordsWithUnionAll {
         let base_query = order_columns.into_iter().fold(base_query, |acc, ord| acc.order_by(ord));
         let mut distinct_ids = distinct_ids.into_iter();
 
-        let build_cond = |ids: RecordIdentifier| {
-            let id_cond = ids.into_iter().fold(ConditionTree::NoCondition, |acc, (dsf, val)| {
-                let col = dsf.as_column();
-                match acc {
-                    ConditionTree::NoCondition => col.equals(val).into(),
-                    cond => cond.and(col.equals(val)),
-                }
-            });
+        //        let build_cond = |ids: RecordIdentifier| {
+        //            let id_cond = ids.into_iter().fold(ConditionTree::NoCondition, |acc, (dsf, val)| {
+        //                let col = dsf.as_column();
+        //                match acc {
+        //                    ConditionTree::NoCondition => col.equals(val).into(),
+        //                    cond => cond.and(col.equals(val)),
+        //                }
+        //            });
+        //
+        //            let conditions = base_condition.clone().and(id_cond);
+        //
+        //            base_query.clone().so_that(conditions)
+        //        };
 
-            let conditions = base_condition.clone().and(id_cond);
+        let from_field = base.from_field;
+        let build_cond = |id: RecordIdentifier| {
+            let conditions = base_condition
+                .clone()
+                .and(from_field.relation_column(true).equals(id.single_value()));
 
             base_query.clone().so_that(conditions)
         };
@@ -50,5 +59,9 @@ impl ManyRelatedRecordsQueryBuilder for ManyRelatedRecordsWithUnionAll {
         } else {
             Query::from(Union::default())
         }
+    }
+
+    fn uses_row_number() -> bool {
+        false
     }
 }

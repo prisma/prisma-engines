@@ -2,8 +2,8 @@ use super::*;
 
 pub struct ManyRelatedRecordsWithRowNumber;
 
-use crate::{query_builder, ordering::Ordering};
-use prisma_models::{SelectedFields, sql_ext::AsColumn};
+use crate::{ordering::Ordering, query_builder};
+use prisma_models::{sql_ext::AsColumn, SelectedFields};
 use quaint::ast::*;
 
 impl ManyRelatedRecordsQueryBuilder for ManyRelatedRecordsWithRowNumber {
@@ -45,5 +45,9 @@ impl ManyRelatedRecordsQueryBuilder for ManyRelatedRecordsWithRowNumber {
             .value(Table::from(Self::ROW_NUMBER_TABLE_ALIAS).asterisk())
             .so_that(Self::ROW_NUMBER_ALIAS.between(base.window_limits.0 as i64, base.window_limits.1 as i64))
             .into()
+    }
+
+    fn uses_row_number() -> bool {
+        true
     }
 }

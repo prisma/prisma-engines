@@ -125,7 +125,7 @@ where
             let relation_cols = from_field.relation_columns(true);
             let mut parent_ids: Vec<(DataSourceFieldRef, PrismaValue)> = Vec::with_capacity(relation_cols.len());
 
-            if is_with_pagination {
+            if is_with_pagination && T::uses_row_number(){
                 let _ = row.values.pop();
             }
             // Todo: This doesn't work with @relation(references ...), it assumes primary ids.
