@@ -1,4 +1,4 @@
-use crate::{CoreResult, Env, Expression, Expressionista, IrSerializer, QueryInterpreter, QueryType, Response};
+use crate::{Env, Expression, Expressionista, IrSerializer, QueryInterpreter, QueryType, Response};
 
 pub struct QueryPipeline<'conn, 'tx> {
     query: QueryType,
@@ -15,7 +15,7 @@ impl<'conn, 'tx> QueryPipeline<'conn, 'tx> {
         }
     }
 
-    pub async fn execute(self) -> CoreResult<Response> {
+    pub async fn execute(self) -> crate::Result<Response> {
         let serializer = self.serializer;
 
         match self.query {

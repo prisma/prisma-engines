@@ -2,6 +2,7 @@ use crate::{
     dml::FieldArity, DataSourceFieldRef, DomainError, Field, ModelRef, PrismaValue, PrismaValueExtensions,
     TypeIdentifier,
 };
+use std::convert::TryFrom;
 
 // Collection of fields that uniquely identify a record of a model.
 // There can be different sets of fields at the same time identifying a model.
@@ -182,6 +183,17 @@ impl RecordIdentifier {
             "This function must only be called on singular record identifiers"
         );
         self.pairs.iter().next().unwrap().1.clone()
+    }
+}
+
+impl TryFrom<RecordIdentifier> for PrismaValue {
+    type Error = DomainError;
+
+    fn try_from(id: RecordIdentifier) -> crate::Result<Self> {
+        match id.pairs.into_iter().next() {
+            Some(value) => Ok(value.1),
+            None => Err(DomainError::ConversionFailure("RecordIdentifier".into(), "PrismaValue".into()))
+        }
     }
 }
 

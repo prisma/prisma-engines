@@ -11,19 +11,79 @@
 mod internal;
 mod utils;
 
-use crate::{ExpressionResult, QueryResult, OutputType, OutputTypeRef};
+use crate::{ExpressionResult, OutputType, OutputTypeRef, QueryResult, QueryValue};
 use indexmap::IndexMap;
 use internal::*;
 use prisma_models::PrismaValue;
-use serde::ser::{Serialize, Serializer, SerializeMap, SerializeSeq};
-use std::{borrow::Borrow, sync::Arc};
+use serde::ser::{Serialize, SerializeMap, SerializeSeq, Serializer};
+use std::{borrow::Borrow, fmt, sync::Arc};
 use utils::*;
 
 /// A `key -> value` map to an IR item
 pub type Map = IndexMap<String, Item>;
 
-/// A list of IR items
-pub type List = Vec<Item>;
+#[derive(Clone)]
+pub struct List {
+    inner: Vec<Item>,
+}
+
+impl fmt::Debug for List {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        self.inner.fmt(f)
+    }
+}
+
+impl List {
+    pub fn len(&self) -> usize {
+        self.inner.len()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
+
+    pub fn index_by(self, keys: &[String]) -> IndexMap<Vec<QueryValue>, Map> {
+        let mut map = IndexMap::with_capacity(self.len());
+
+        for item in self.into_iter() {
+            let inner = item.into_map().unwrap();
+
+            let key = keys
+                .iter()
+                .map(|key| inner.get(&key.to_string()).unwrap().clone().into_value().unwrap())
+                .map(QueryValue::from)
+                .collect();
+
+            map.insert(key, inner);
+        }
+
+        map
+    }
+}
+
+impl From<Vec<Item>> for List {
+    fn from(inner: Vec<Item>) -> Self {
+        Self { inner }
+    }
+}
+
+impl IntoIterator for List {
+    type Item = Item;
+    type IntoIter = std::vec::IntoIter<Self::Item>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.inner.into_iter()
+    }
+}
+
+impl<'a> IntoIterator for &'a List {
+    type Item = &'a Item;
+    type IntoIter = std::slice::Iter<'a, Item>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.inner.iter()
+    }
+}
 
 /// Convenience type wrapper for Arc<Item>.
 pub type ItemRef = Arc<Item>;
@@ -87,6 +147,23 @@ impl Responses {
     pub fn insert_error(&mut self, error: impl Into<ResponseError>) {
         self.errors.push(error.into());
     }
+
+    pub fn get_data(&self, key: impl AsRef<str>) -> Option<&Item> {
+        self.data.get(key.as_ref())
+    }
+
+    pub fn take_data(&mut self, key: impl AsRef<str>) -> Option<Item> {
+        self.data.remove(key.as_ref())
+    }
+}
+
+impl From<Map> for Responses {
+    fn from(data: Map) -> Self {
+        Self {
+            data,
+            ..Default::default()
+        }
+    }
 }
 
 /// An IR item that either expands to a subtype or leaf-record.
@@ -101,6 +178,48 @@ pub enum Item {
     /// to claim the same item without copying data
     /// (serialization can then choose how to copy if necessary).
     Ref(ItemRef),
+}
+
+impl Item {
+    pub fn null() -> Self {
+        Self::Value(PrismaValue::Null)
+    }
+
+    pub fn list(inner: Vec<Item>) -> Self {
+        Self::List(List::from(inner))
+    }
+
+    pub fn as_map(&self) -> Option<&Map> {
+        match self {
+            Self::Map(m) => Some(m),
+            Self::Ref(r) => r.as_map(),
+            _ => None,
+        }
+    }
+
+    pub fn into_map(self) -> Option<Map> {
+        match self {
+            Self::Map(m) => Some(m),
+            Self::Ref(r) => Arc::try_unwrap(r).ok().map(|r| r.into_map()).flatten(),
+            _ => None,
+        }
+    }
+
+    pub fn into_value(self) -> Option<PrismaValue> {
+        match self {
+            Self::Value(pv) => Some(pv),
+            Self::Ref(r) => Arc::try_unwrap(r).ok().map(|r| r.into_value()).flatten(),
+            _ => None,
+        }
+    }
+
+    pub fn into_list(self) -> Option<List> {
+        match self {
+            Self::List(l) => Some(l),
+            Self::Ref(r) => Arc::try_unwrap(r).ok().map(|r| r.into_list()).flatten(),
+            _ => None,
+        }
+    }
 }
 
 impl Serialize for Item {
@@ -147,9 +266,7 @@ pub struct IrSerializer {
 impl IrSerializer {
     pub fn serialize(&self, result: ExpressionResult) -> Response {
         match result {
-            ExpressionResult::Query(QueryResult::Json(json)) => {
-                Response::Data(self.key.clone(), Item::Json(json))
-            }
+            ExpressionResult::Query(QueryResult::Json(json)) => Response::Data(self.key.clone(), Item::Json(json)),
             ExpressionResult::Query(r) => {
                 match serialize_internal(r, &self.output_type, false, false) {
                     Ok(result) => {
@@ -160,7 +277,7 @@ impl IrSerializer {
                         let result = if result.is_empty() {
                             match self.output_type.borrow() {
                                 OutputType::Opt(_) => Item::Value(PrismaValue::Null),
-                                OutputType::List(_) => Item::List(Vec::new()),
+                                OutputType::List(_) => Item::list(Vec::new()),
                                 _ => unreachable!(),
                             }
                         } else {

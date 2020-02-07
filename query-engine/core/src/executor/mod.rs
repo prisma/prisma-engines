@@ -10,12 +10,12 @@ mod pipeline;
 
 pub use interpreting_executor::*;
 
-use crate::{query_document::QueryDocument, response_ir::Responses, schema::QuerySchemaRef, CoreResult};
+use crate::{query_document::Operation, response_ir::Responses, schema::QuerySchemaRef};
 use async_trait::async_trait;
 
 #[async_trait]
 pub trait QueryExecutor {
-    async fn execute(&self, query_doc: QueryDocument, query_schema: QuerySchemaRef) -> CoreResult<Responses>;
+    async fn execute(&self, query_doc: Operation, query_schema: QuerySchemaRef) -> crate::Result<Responses>;
 
     fn primary_connector(&self) -> &'static str;
 }

@@ -29,6 +29,7 @@ pub struct ExecuteRequest {
     query: String,
     force_transactions: bool,
     enable_raw_queries: bool,
+    legacy: bool,
 }
 
 pub struct DmmfRequest {
@@ -79,6 +80,7 @@ impl TryFrom<&PrismaOpt> for CliCommand {
                     query: input.query.clone(),
                     force_transactions: opts.always_force_transactions,
                     enable_raw_queries: opts.enable_raw_queries,
+                    legacy: input.legacy,
                 })),
             },
         }
@@ -144,7 +146,7 @@ impl CliCommand {
         let decoded_request = String::from_utf8(decoded)?;
 
         let ctx = PrismaContext::builder()
-            .legacy(true)
+            .legacy(request.legacy)
             .force_transactions(request.force_transactions)
             .enable_raw_queries(request.enable_raw_queries)
             .build()

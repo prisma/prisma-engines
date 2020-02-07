@@ -59,17 +59,8 @@ impl QueryGraphBuilder {
         Self { query_schema }
     }
 
-    pub fn build(self, query_doc: QueryDocument) -> QueryGraphBuilderResult<Vec<(QueryType, IrSerializer)>> {
-        query_doc
-            .operations
-            .into_iter()
-            .map(|op| self.map_operation(op))
-            .collect::<QueryGraphBuilderResult<Vec<(QueryType, IrSerializer)>>>()
-            .map_err(|err| err.into())
-    }
-
     /// Maps an operation to a query.
-    fn map_operation(&self, operation: Operation) -> QueryGraphBuilderResult<(QueryType, IrSerializer)> {
+    pub fn build(self, operation: Operation) -> QueryGraphBuilderResult<(QueryType, IrSerializer)> {
         match operation {
             Operation::Read(selection) => self.map_read_operation(selection),
             Operation::Write(selection) => self.map_write_operation(selection),
@@ -127,7 +118,10 @@ impl QueryGraphBuilder {
 
     fn derive_serializer(selection: &Selection, field: &ParsedField) -> IrSerializer {
         IrSerializer {
-            key: selection.alias.clone().unwrap_or_else(|| selection.name.clone()),
+            key: selection
+                .alias()
+                .clone()
+                .unwrap_or_else(|| selection.name().to_string()),
             output_type: field.schema_field.field_type.clone(),
         }
     }
