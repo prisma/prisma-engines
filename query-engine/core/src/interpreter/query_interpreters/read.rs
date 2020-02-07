@@ -117,7 +117,7 @@ fn read_related<'a, 'b>(
 
         // prisma level join does not work for many 2 many yet
         // can only work if we have a parent result. This is not the case when we e.g. have nested delete inside an update
-        let use_prisma_level_join = !relation.is_many_to_many() && parent_result.is_some();
+        let use_prisma_level_join = !relation.is_many_to_many() && parent_result.is_some() && !query.args.is_with_pagination();
 
         let mut scalars = if !use_prisma_level_join {
             tx

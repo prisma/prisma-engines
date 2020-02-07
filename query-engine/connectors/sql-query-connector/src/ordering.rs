@@ -45,7 +45,7 @@ impl Ordering {
                 .primary_order_by
                 .as_ref()
                 .map(|oby| (alias.to_string(), oby.field.db_name().to_string()).into()),
-            vec![secondary_alias.into(), secondary_field.into()],
+            vec![(secondary_alias, secondary_field).into()],
             order_directive,
         )
     }

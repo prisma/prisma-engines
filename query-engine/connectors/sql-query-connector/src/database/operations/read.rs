@@ -81,6 +81,7 @@ where
 
     let can_skip_joins = from_field.relation_is_inlined_in_child() && !query_arguments.is_with_pagination();
     let mut columns: Vec<_> = selected_fields.columns().collect();
+    let is_with_pagination = query_arguments.is_with_pagination();
 
     columns.extend(
         from_field
@@ -124,6 +125,9 @@ where
             let relation_cols = from_field.relation_columns(true);
             let mut parent_ids: Vec<(DataSourceFieldRef, PrismaValue)> = Vec::with_capacity(relation_cols.len());
 
+            if is_with_pagination {
+                let _ = row.values.pop();
+            }
             // Todo: This doesn't work with @relation(references ...), it assumes primary ids.
             // parent id is always the last column
             for field in from_field.linking_fields().fields() {
