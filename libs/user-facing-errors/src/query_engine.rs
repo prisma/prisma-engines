@@ -12,8 +12,11 @@ pub enum DatabaseConstraint {
 impl fmt::Display for DatabaseConstraint {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::Fields(fields) => write!(f, "fields: ({})", fields.join(",")),
-            Self::Index(index) => write!(f, "constraint: {}", index),
+            Self::Fields(fields) => {
+                let quoted_fields: Vec<String> = fields.iter().map(|f| format!("`{}`", f)).collect();
+                write!(f, "fields: ({})", quoted_fields.join(","))
+            }
+            Self::Index(index) => write!(f, "constraint: `{}`", index),
         }
     }
 }
@@ -56,10 +59,10 @@ pub struct RecordNotFound {
 }
 
 #[derive(Debug, UserFacingError, Serialize)]
-#[user_facing(code = "P2002", message = "Unique constraint failed on the field: `${constraint}`")]
+#[user_facing(code = "P2002", message = "Unique constraint failed on the ${constraint}")]
 pub struct UniqueKeyViolation {
     /// Field name from one model from Prisma schema
-    #[serde(rename = "field_name")]
+    #[serde(rename = "target")]
     pub constraint: DatabaseConstraint,
 }
 
