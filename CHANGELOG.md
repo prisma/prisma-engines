@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.2.0-alpha.4
+
+- Fix a deadlock in sqlite when panicking
+- Introduce VALUES construct
+
 ## v0.2.0-alpha.3
 
 - Fix broken less_than in a row
